@@ -105,7 +105,7 @@ public class AssetManagerDeletePropertyTest extends AssetManagerDeleteTestBase i
     assertTotals(3, 3, 1);
     final RichAResult r = enrich(q.select(q.properties()).where(q.mediaPackageId(mp[0])).run());
     assertEquals("Media package " + mp[0] + " should still have the agent property",
-                 p.agent.name(), r.getProperties().head2().getId().getFqn());
+                 p.agent.name(), r.getProperties().stream().findFirst().get().getId().getFqn());
     assertEquals("The media package itself should be found", 1, r.getSize());
   }
 
@@ -132,7 +132,8 @@ public class AssetManagerDeletePropertyTest extends AssetManagerDeleteTestBase i
       );
     }
     assertTotals(6, 6, 1);
-    assertEquals(Value.mk("agent-5"), enrich(q.select(p.agent.target()).run()).getProperties().head2().getValue());
+    assertEquals(Value.mk("agent-5"),
+        enrich(q.select(p.agent.target()).run()).getProperties().stream().findFirst().get().getValue());
   }
 
   @Test
@@ -155,7 +156,8 @@ public class AssetManagerDeletePropertyTest extends AssetManagerDeleteTestBase i
         ).run()
     );
     assertTotals(12, 12, 1);
-    assertEquals(Value.mk("agent-1"), enrich(q.select(p.agent.target()).run()).getProperties().head2().getValue());
+    assertEquals(Value.mk("agent-1"),
+        enrich(q.select(p.agent.target()).run()).getProperties().stream().findFirst().get().getValue());
   }
 
   @Test
@@ -177,7 +179,8 @@ public class AssetManagerDeletePropertyTest extends AssetManagerDeleteTestBase i
         q.delete(OWNER, q.properties()).where(q.mediaPackageId(mp[1])).run()
     );
     assertTotals(6, 6, 1);
-    assertEquals(Value.mk("agent-5"), enrich(q.select(p.agent.target()).run()).getProperties().head2().getValue());
+    assertEquals(Value.mk("agent-5"),
+        enrich(q.select(p.agent.target()).run()).getProperties().stream().findFirst().get().getValue());
   }
 
   @Test

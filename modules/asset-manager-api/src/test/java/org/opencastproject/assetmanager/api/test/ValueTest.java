@@ -28,14 +28,12 @@ import static org.junit.Assert.assertThat;
 import org.opencastproject.assetmanager.api.Value;
 import org.opencastproject.assetmanager.api.Version;
 
-import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.Fns;
-
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
 
 import java.util.Date;
+import java.util.function.Function;
 
 /**
  * Test the {@link org.opencastproject.assetmanager.api.Value} type.
@@ -59,12 +57,46 @@ public class ValueTest {
   @Test
   public void testDecompose() {
     final Object value = Value.mk(1511L)
-        .<Object>decompose(Fns.<String>id(), Fns.<Date>id(), Fns.<Long>id(), Fns.<Boolean>id(), Fns.<Version>id());
+        .<Object>decompose(
+            new Function<String, String>() {
+              @Override public String apply(String a) {
+                return a;
+              }
+            },
+            new Function<Date, Date>() {
+              @Override public Date apply(Date a) {
+                return a;
+              }
+            },
+            new Function<Long, Long>() {
+              @Override public Long apply(Long a) {
+                return a;
+              }
+            },
+            new Function<Boolean, Boolean>() {
+              @Override public Boolean apply(Boolean a) {
+                return a;
+              }
+            },
+            new Function<Version, Version>() {
+              @Override public Version apply(Version a) {
+                return a;
+              }
+            }
+        );
     assertEquals(1511L, value);
     final String valueAsString = Value.mk(1511L).decompose(
             Value.<String>doNotMatch(),
-            asString.o(Fns.<Date>id()),
-            asString.o(Fns.<Long>id()),
+            o(asString, new Function<Date, Date>() {
+              @Override public Date apply(Date a) {
+                return a;
+              }
+            }),
+            o(asString, new Function<Long, Long>() {
+              @Override public Long apply(Long a) {
+                return a;
+              }
+            }),
             Value.<String>doNotMatch(),
             Value.<String>doNotMatch());
     assertEquals("1511", valueAsString);
@@ -99,9 +131,21 @@ public class ValueTest {
     assertNotEquals(Value.mk(now), Value.mk(new Date(0)));
   }
 
-  private static final Fn<Object, String> asString = new Fn<Object, String>() {
+  private static final Function<Object, String> asString = new Function<Object, String>() {
     @Override public String apply(Object o) {
       return o.toString();
     }
   };
+
+  // Utility function copied from com.entwinemedia.fn.Fns
+  public static <A, B, C> Function<A, C> o(
+      final Function<? super B, ? extends C> f,
+      final Function<? super A, ? extends B> g
+  ) {
+    return new Function<A, C>() {
+      public C apply(A a) {
+        return f.apply(g.apply(a));
+      }
+    };
+  }
 }

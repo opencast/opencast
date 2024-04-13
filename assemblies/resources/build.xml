@@ -14,16 +14,10 @@
     <concat destfile="target/assembly/etc/system.properties" append="true">
       <filelist dir="../resources" files="system.properties.append"/>
     </concat>
-    <concat destfile="target/assembly/etc/shell.init.script" append="true">
-      <filelist dir="resources" files="shell.init.script.append"/>
-    </concat>
     <!-- Adding extra OSGi system packages to configuration -->
     <replace file="target/assembly/etc/config.properties" token="org.osgi.framework.system.packages= \" value="org.osgi.framework.system.packages= com.sun.image.codec.jpeg, com.sun.jndi.ldap, \"/>
     <!-- Disabled write permissions on karaf configuration by deactivating config saves -->
     <replaceregexp file="target/assembly/etc/config.properties" match="^felix.fileinstall.enableConfigSave .*=.*$" replace="felix.fileinstall.enableConfigSave = false" byline="true"/>
-    <!-- Special configuration for development -->
-    <replaceregexp file="target/classes/package.xml" match="tar\.gz" replace="dir" byline="true"/>
-    <replaceregexp file="target/classes/package.xml" match="baseDirectory&gt;.*&lt;/baseDirectory&gt;" replace="includeBaseDirectory&gt;false&lt;/includeBaseDirectory&gt;" byline="true"/>
   </target>
 
   <target if="enableJobDispatching" name="job dispatching">
@@ -33,5 +27,15 @@
       match="^#dispatch.interval=0$"
       replace="dispatch.interval=2"
       byline="true" />
+  </target>
+
+  <target if="enableDeveloperMode" name="developer mode">
+    <echo>Enabling developer mode</echo>
+    <concat destfile="target/assembly/etc/shell.init.script" append="true">
+      <filelist dir="resources" files="shell.init.script.append"/>
+    </concat>
+    <!-- Special configuration for development -->
+    <replaceregexp file="target/classes/package.xml" match="tar\.gz" replace="dir" byline="true"/>
+    <replaceregexp file="target/classes/package.xml" match="baseDirectory&gt;.*&lt;/baseDirectory&gt;" replace="includeBaseDirectory&gt;false&lt;/includeBaseDirectory&gt;" byline="true"/>
   </target>
 </project>

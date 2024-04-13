@@ -38,7 +38,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RequireUtil;
 
-import com.entwinemedia.fn.data.Opt;
 import com.google.gson.Gson;
 
 import org.osgi.service.component.ComponentContext;
@@ -53,6 +52,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 @Component(
@@ -101,8 +101,8 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
   }
 
   public boolean datastoreExists(String storeId) {
-    Opt<AssetStore> store = tsam.getAssetStore(storeId);
-    return store.isSome();
+    Optional<AssetStore> store = tsam.getAssetStore(storeId);
+    return store.isPresent();
   }
 
   /** Utility class to collect RecordInformation for moving larger 

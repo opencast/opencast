@@ -1,0 +1,133 @@
+{
+    "search-results": {
+        "offset": 0,
+        "limit": 100,
+        "total": 1,
+        "searchTime": 0,
+        "query": "(id:ID\\-strong\\-river\\-flowing\\-down\\-the\\-green\\-forest) AND oc_organization:mh_default_org AND (oc_acl_read:ROLE_USER OR oc_acl_read:ROLE_GROUP_MH_DEFAULT_ORG_SYSTEM_ADMINS OR oc_acl_read:ROLE_ADMIN OR oc_acl_read:ROLE_SUDO OR oc_acl_read:ROLE_USER_ADMIN OR oc_acl_read:ROLE_ANONYMOUS OR oc_acl_read:ROLE_OAUTH_USER) AND -oc_mediatype:Series AND -oc_deleted:[* TO *]",
+        "result": {
+            "id": "ID-strong-river-flowing-down-the-green-forest",
+            "org": "mh_default_org",
+            "mediapackage": {
+                "duration": 29996,
+                "id": "ID-strong-river-flowing-down-the-green-forest",
+                "start": "2019-06-18T07:40:53Z",
+                "title": "Strong river flowing down the forest",
+                "creators": {
+                    "creator": "Nature Stock Videos"
+                },
+                "license": "CC0",
+                "media": {
+                    "track": {
+                        "id": "7e038786-3d06-4073-8ce8-55086f8e7b08",
+                        "type": "presenter/preview",
+                        "ref": "track:28b54cbc-124c-4d29-98ab-6ce104e9ca6c",
+                        "mimetype": "video/mp4",
+                        "tags": {
+                            "tag": [
+                                "atom",
+                                "default",
+                                "engage-download",
+                                "engage-streaming",
+                                "rss"
+                            ]
+                        },
+                        "url": "/test_mock_static/mh_default_org/engage-player/ID-strong-river-flowing-down-the-green-forest/2835803a-a332-4512-a231-a2236271b6e6/strong-river-flowing-down-the-green-forest.mp4",
+                        "size": 186376983,
+                        "checksum": {
+                            "type": "md5",
+                            "$": "30d52a37438495e2847aa54959e0f60b"
+                        },
+                        "duration": 29996,
+                        "video": {
+                            "id": "video-1",
+                            "device": "",
+                            "encoder": {
+                                "type": "H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10"
+                            },
+                            "framecount": 899,
+                            "bitrate": 4.9702744E7,
+                            "framerate": 29.97003,
+                            "resolution": "3840x2160"
+                        },
+                        "live": false,
+                        "master": false
+                    }
+                },
+                "metadata": {
+                    "catalog": {
+                        "id": "5d1f0251-34f2-4244-aab5-652b11ea5d1b",
+                        "type": "dublincore/episode",
+                        "mimetype": "text/xml",
+                        "tags": "",
+                        "url": "/test_mock_static/mh_default_org/engage-player/ID-strong-river-flowing-down-the-green-forest/1c91233a-7535-456d-b656-e85c7d47fb1a/dublincore.xml"
+                    }
+                },
+                "attachments": {
+                    "attachment": [
+                        {
+                            "id": "7fe05664-2f0c-4aef-b4c0-5700344f42c6",
+                            "type": "security/xacml+episode",
+                            "mimetype": "text/xml",
+                            "tags": "",
+                            "url": "/test_mock_static/mh_default_org/engage-player/ID-strong-river-flowing-down-the-green-forest/c51dd2c1-3105-424f-9744-ac1ecb36d9f4/episode-security.xml"
+                        },
+                        {
+                            "id": "140b770a-a320-4a4f-931f-b815c98f0ab4",
+                            "type": "presenter/search+preview",
+                            "ref": "track:28b54cbc-124c-4d29-98ab-6ce104e9ca6c",
+                            "mimetype": "image/jpeg",
+                            "tags": {
+                                "tag": "engage-download"
+                            },
+                            "url": "/test_mock_static/mh_default_org/engage-player/ID-strong-river-flowing-down-the-green-forest/d815d2f2-af37-442e-91ee-84062209fccb/strong-river-flowing-down-the-green-forest_1.000s-search.jpg",
+                            "size": 4879
+                        },
+                        {
+                            "id": "a1e6c4f7-9147-49e7-9ba8-61b3f163207f",
+                            "type": "presenter/player+preview",
+                            "ref": "track:28b54cbc-124c-4d29-98ab-6ce104e9ca6c",
+                            "mimetype": "image/jpeg",
+                            "tags": {
+                                "tag": "engage-download"
+                            },
+                            "url": "/test_mock_static/mh_default_org/engage-player/ID-strong-river-flowing-down-the-green-forest/82f402ac-73f6-4fb6-90f1-3c64278739e9/strong-river-flowing-down-the-green-forest_1.000s-player.jpg",
+                            "size": 156020
+                        }
+                    ]
+                },
+                "publications": ""
+            },
+            "acl": {
+                "ace": [
+                    {
+                        "action": "read",
+                        "allow": true,
+                        "role": "ROLE_ADMIN"
+                    },
+                    {
+                        "action": "read",
+                        "allow": true,
+                        "role": "ROLE_ANONYMOUS"
+                    },
+                    {
+                        "action": "write",
+                        "allow": true,
+                        "role": "ROLE_ADMIN"
+                    }
+                ]
+            },
+            "dcExtent": 29996,
+            "dcTitle": "Strong river flowing down the forest",
+            "dcCreator": "Nature Stock Videos",
+            "dcDescription": "Free stock footage of a strong river flowing down the dense green summer forest on a sunny day, late in the evening. Different trees on each side of the river, while white bubbles coming from the water as it rushes down the rocky landscape. This footage was taken with a Mavic 2 Pro drone mounted on a tripod with a Katana grip",
+            "dcCreated": "2019-06-18T09:40:53+02:00",
+            "dcLicense": "CC0",
+            "ocMediapackage": "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><mediapackage duration=\"29996\" id=\"ID-strong-river-flowing-down-the-green-forest\" start=\"2019-06-18T07:40:53Z\" xmlns=\"http://mediapackage.opencastproject.org\"><title>Strong river flowing down the forest<\/title><creators><creator>Nature Stock Videos<\/creator><\/creators><license>CC0<\/license><media><track id=\"7e038786-3d06-4073-8ce8-55086f8e7b08\" type=\"presenter/preview\" ref=\"track:28b54cbc-124c-4d29-98ab-6ce104e9ca6c\"><mimetype>video/mp4<\/mimetype><tags><tag>atom<\/tag><tag>default<\/tag><tag>engage-download<\/tag><tag>engage-streaming<\/tag><tag>rss<\/tag><\/tags><url>/test_mock_static/mh_default_org/engage-player/ID-strong-river-flowing-down-the-green-forest/2835803a-a332-4512-a231-a2236271b6e6/strong-river-flowing-down-the-green-forest.mp4<\/url><size>186376983<\/size><checksum type=\"md5\">30d52a37438495e2847aa54959e0f60b<\/checksum><duration>29996<\/duration><video id=\"video-1\"><device/><encoder type=\"H.264 / AVC / MPEG-4 AVC / MPEG-4 part 10\"/><framecount>899<\/framecount><bitrate>4.9702744E7<\/bitrate><framerate>29.97003<\/framerate><resolution>3840x2160<\/resolution><\/video><live>false<\/live><master>false<\/master><\/track><\/media><metadata><catalog id=\"5d1f0251-34f2-4244-aab5-652b11ea5d1b\" type=\"dublincore/episode\"><mimetype>text/xml<\/mimetype><tags/><url>/test_mock_static/mh_default_org/engage-player/ID-strong-river-flowing-down-the-green-forest/1c91233a-7535-456d-b656-e85c7d47fb1a/dublincore.xml<\/url><\/catalog><\/metadata><attachments><attachment id=\"7fe05664-2f0c-4aef-b4c0-5700344f42c6\" type=\"security/xacml+episode\"><mimetype>text/xml<\/mimetype><tags/><url>/test_mock_static/mh_default_org/engage-player/ID-strong-river-flowing-down-the-green-forest/c51dd2c1-3105-424f-9744-ac1ecb36d9f4/episode-security.xml<\/url><\/attachment><attachment id=\"140b770a-a320-4a4f-931f-b815c98f0ab4\" type=\"presenter/search+preview\" ref=\"track:28b54cbc-124c-4d29-98ab-6ce104e9ca6c\"><mimetype>image/jpeg<\/mimetype><tags><tag>engage-download<\/tag><\/tags><url>/test_mock_static/mh_default_org/engage-player/ID-strong-river-flowing-down-the-green-forest/d815d2f2-af37-442e-91ee-84062209fccb/strong-river-flowing-down-the-green-forest_1.000s-search.jpg<\/url><size>4879<\/size><\/attachment><attachment id=\"a1e6c4f7-9147-49e7-9ba8-61b3f163207f\" type=\"presenter/player+preview\" ref=\"track:28b54cbc-124c-4d29-98ab-6ce104e9ca6c\"><mimetype>image/jpeg<\/mimetype><tags><tag>engage-download<\/tag><\/tags><url>/test_mock_static/mh_default_org/engage-player/ID-strong-river-flowing-down-the-green-forest/82f402ac-73f6-4fb6-90f1-3c64278739e9/strong-river-flowing-down-the-green-forest_1.000s-player.jpg<\/url><size>156020<\/size><\/attachment><\/attachments><publications/><\/mediapackage>",
+            "mediaType": "AudioVisual",
+            "keywords": "",
+            "modified": "2024-03-20T02:15:19.968+01:00",
+            "score": 1.3249191
+        }
+    }
+}

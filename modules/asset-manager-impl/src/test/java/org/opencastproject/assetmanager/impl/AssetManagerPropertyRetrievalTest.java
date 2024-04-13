@@ -29,6 +29,8 @@ import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.opencastproject.assetmanager.api.fn.ARecords.getProperties;
+import static org.opencastproject.assetmanager.api.fn.ARecords.getSnapshot;
 
 import org.opencastproject.assetmanager.api.Property;
 import org.opencastproject.assetmanager.api.PropertyId;
@@ -36,7 +38,6 @@ import org.opencastproject.assetmanager.api.PropertyName;
 import org.opencastproject.assetmanager.api.Value;
 import org.opencastproject.assetmanager.api.Value.ValueType;
 import org.opencastproject.assetmanager.api.Values;
-import org.opencastproject.assetmanager.api.fn.ARecords;
 import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.assetmanager.api.query.ASelectQuery;
 import org.opencastproject.assetmanager.api.query.Predicate;
@@ -44,15 +45,16 @@ import org.opencastproject.assetmanager.api.query.Target;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.Stream;
-import com.entwinemedia.fn.fns.Booleans;
 
 import org.hamcrest.Matcher;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -85,7 +87,7 @@ public class AssetManagerPropertyRetrievalTest extends AssetManagerTestBase {
                   final PropertyName pName = propertyNames[random.nextInt(propertyNames.length)];
                   // check if the selected property is already associated with the current media package
                   final ASelectQuery doesPropertyExist = q.select(q.properties(pName)).where(q.mediaPackageId(mp));
-                  if (sizeOf(doesPropertyExist.run().getRecords().bind(ARecords.getProperties)) == 0) {
+                  if (getProperties(doesPropertyExist.run().getRecords()).size() == 0) {
                     // create a property with a randomly picked value
                     final Property p = Property.mk(
                         PropertyId.mk(mp, pName),
@@ -112,20 +114,21 @@ public class AssetManagerPropertyRetrievalTest extends AssetManagerTestBase {
               .run();
       // get all properties of the result records
       assertThat("Number of records", r.getSize(), params.expectRecords);
-      final Stream<Property> allProps = r.getRecords().bind(ARecords.getProperties);
+      final List<Property> allProps = getProperties(r.getRecords());
       assertThat(
-          "Total number of properties: " + allProps.mkString(", "),
-          sizeOf(allProps),
+          "Total number of properties: " + allProps.toString(),
+          allProps.size(),
           params.expectPropertiesTotal
       );
       assertThat(
           "Total number of snapshots",
-          sizeOf(r.getRecords().bind(ARecords.getSnapshot)),
+          getSnapshot(r.getRecords()).size(),
           params.expectSnapshotsTotal
       );
-      final Stream<Property> findSavedProperty = r.getRecords()
-          .bind(ARecords.getProperties)
-          .filter(Booleans.eq(prop));
+      final List<Property> findSavedProperty = getProperties(r.getRecords())
+          .stream()
+          .filter(p -> p.equals(prop))
+          .collect(Collectors.toList());
       if (params.expectContainsSavedProperty) {
         assertThat("Contains saved property", findSavedProperty, hasItem(prop));
       }

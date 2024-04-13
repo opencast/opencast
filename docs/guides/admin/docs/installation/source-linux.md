@@ -79,6 +79,10 @@ OR
     
     Whisper >= 20230314
 
+OR 
+    
+    WhisperC++ >= 1.4.0
+
 ### Dependency Download
 
 Pre-built versions of most dependencies that are not in the repositories can be downloaded from the respective project

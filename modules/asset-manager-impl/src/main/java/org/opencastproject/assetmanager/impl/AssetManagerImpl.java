@@ -42,7 +42,6 @@ import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Value;
 import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.api.fn.Enrichments;
-import org.opencastproject.assetmanager.api.fn.Snapshots;
 import org.opencastproject.assetmanager.api.query.ADeleteQuery;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.ARecord;
@@ -56,7 +55,6 @@ import org.opencastproject.assetmanager.api.storage.DeletionSelector;
 import org.opencastproject.assetmanager.api.storage.RemoteAssetStore;
 import org.opencastproject.assetmanager.api.storage.Source;
 import org.opencastproject.assetmanager.api.storage.StoragePath;
-import org.opencastproject.assetmanager.impl.persistence.AssetDtos;
 import org.opencastproject.assetmanager.impl.persistence.Database;
 import org.opencastproject.assetmanager.impl.persistence.SnapshotDto;
 import org.opencastproject.assetmanager.impl.query.AQueryBuilderImpl;
@@ -109,9 +107,7 @@ import com.entwinemedia.fn.P1;
 import com.entwinemedia.fn.P1Lazy;
 import com.entwinemedia.fn.Pred;
 import com.entwinemedia.fn.Prelude;
-import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.fns.Booleans;
-import com.entwinemedia.fn.fns.Strings;
 import com.google.common.collect.Sets;
 
 import org.apache.commons.io.FileUtils;
@@ -319,48 +315,56 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
    */
 
   @Override
-  public Opt<MediaPackage> getMediaPackage(String mediaPackageId) {
+  public Optional<MediaPackage> getMediaPackage(String mediaPackageId) {
     final AQueryBuilder q = createQuery();
     final AResult r = q.select(q.snapshot()).where(q.mediaPackageId(mediaPackageId).and(q.version().isLatest()))
             .run();
 
     if (r.getSize() == 0) {
-      return Opt.none();
+      return Optional.empty();
     }
-    return Opt.some(r.getRecords().head2().getSnapshot().get().getMediaPackage());
+    return Optional.of(r.getRecords().stream().findFirst().get().getSnapshot().get().getMediaPackage());
   }
 
   @Override
-  public Opt<Asset> getAsset(Version version, String mpId, String mpElementId) {
+  public Optional<Asset> getAsset(Version version, String mpId, String mpElementId) {
     if (isAuthorized(mpId, READ_ACTION)) {
       // try to fetch the asset
-      for (final AssetDtos.Medium asset : getDatabase().getAsset(RuntimeTypes.convert(version), mpId, mpElementId)) {
-        for (final String storageId : getSnapshotStorageLocation(version, mpId)) {
-          for (final AssetStore store : getAssetStore(storageId)) {
-            for (final InputStream assetStream
-                    : store.get(StoragePath.mk(asset.getOrganizationId(), mpId, version, mpElementId))) {
+      var asset = getDatabase().getAsset(RuntimeTypes.convert(version), mpId, mpElementId);
+      if (asset.isPresent()) {
+        var storageId = getSnapshotStorageLocation(version, mpId);
+        if (storageId.isPresent()) {
+          var store = getAssetStore(storageId.get());
+          if (store.isPresent()) {
+            var assetStream = store.get().get(StoragePath.mk(
+                asset.get().getOrganizationId(),
+                mpId,
+                version,
+                mpElementId
+            ));
+            if (assetStream.isPresent()) {
 
               Checksum checksum = null;
               try {
-                checksum = Checksum.fromString(asset.getAssetDto().getChecksum());
+                checksum = Checksum.fromString(asset.get().getAssetDto().getChecksum());
               } catch (NoSuchAlgorithmException e) {
                 logger.warn("Invalid checksum for asset {} of media package {}", mpElementId, mpId, e);
               }
 
               final Asset a = new AssetImpl(
                       AssetId.mk(version, mpId, mpElementId),
-                      assetStream,
-                      asset.getAssetDto().getMimeType(),
-                      asset.getAssetDto().getSize(),
-                      asset.getStorageId(),
-                      asset.getAvailability(),
+                      assetStream.get(),
+                      asset.get().getAssetDto().getMimeType(),
+                      asset.get().getAssetDto().getSize(),
+                      asset.get().getStorageId(),
+                      asset.get().getAvailability(),
                       checksum);
-              return Opt.some(a);
+              return Optional.of(a);
             }
           }
         }
       }
-      return Opt.none();
+      return Optional.empty();
     }
     return chuck(new UnauthorizedException(
             format("Not allowed to read assets of snapshot %s, version=%s", mpId, version)
@@ -368,14 +372,14 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   @Override
-  public Opt<AssetStore> getAssetStore(String storeId) {
+  public Optional<AssetStore> getAssetStore(String storeId) {
     if (assetStore.getStoreType().equals(storeId)) {
-      return Opt.some(assetStore);
+      return Optional.of(assetStore);
     } else {
       if (remoteStores.containsKey(storeId)) {
-        return Opt.some(remoteStores.get(storeId));
+        return Optional.of(remoteStores.get(storeId));
       } else {
-        return Opt.none();
+        return Optional.empty();
       }
     }
   }
@@ -454,10 +458,10 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     AQueryBuilder queryBuilder = createQuery();
     AResult result = queryBuilder.select(queryBuilder.snapshot())
             .where(queryBuilder.mediaPackageId(mediaPackageId).and(queryBuilder.version().isLatest())).run();
-    Opt<ARecord> record = result.getRecords().head();
-    if (record.isSome()) {
-      Opt<Snapshot> snapshot = record.get().getSnapshot();
-      if (snapshot.isSome()) {
+    Optional<ARecord> record = result.getRecords().stream().findFirst();
+    if (record.isPresent()) {
+      Optional<Snapshot> snapshot = Optional.of(record.get().getSnapshot().get());
+      if (snapshot.isPresent()) {
         return takeSnapshotInternal(snapshot.get().getOwner(), mediaPackage);
       }
     }
@@ -505,8 +509,6 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
    *
    * @param snapshot
    *         The newest snapshot of the event to update
-   * @param index
-   *         The Elasticsearch index to update
    */
   private void updateEventInIndex(Snapshot snapshot) {
     final MediaPackage mp = snapshot.getMediaPackage();
@@ -579,8 +581,6 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
    *
    * @param eventId
    *         The id of the event to remove
-   * @param index
-   *         The Elasticsearch index to update
    */
   private void removeArchivedVersionFromIndex(String eventId) {
     final String orgId = securityService.getOrganization().getId();
@@ -750,9 +750,9 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   private void processOperations(final RichAResult results, final String targetStoreId) {
     results.getRecords().forEach(record -> {
       Snapshot s = record.getSnapshot().get();
-      Opt<String> currentStoreId = getSnapshotStorageLocation(s);
+      Optional<String> currentStoreId = getSnapshotStorageLocation(s);
 
-      if (currentStoreId.isNone()) {
+      if (currentStoreId.isEmpty()) {
         logger.warn("IsNone store ID");
         return;
       }
@@ -766,16 +766,16 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       AssetStore currentStore;
       AssetStore targetStore;
 
-      Opt<AssetStore> optCurrentStore = getAssetStore(currentStoreId.get());
-      Opt<AssetStore> optTargetStore = getAssetStore(targetStoreId);
+      Optional<AssetStore> optCurrentStore = getAssetStore(currentStoreId.get());
+      Optional<AssetStore> optTargetStore = getAssetStore(targetStoreId);
 
-      if (!optCurrentStore.isNone()) {
+      if (!optCurrentStore.isEmpty()) {
         currentStore = optCurrentStore.get();
       } else {
         logger.error("Unknown current store: " + currentStoreId.get());
         return;
       }
-      if (!optTargetStore.isNone()) {
+      if (!optTargetStore.isEmpty()) {
         targetStore = optTargetStore.get();
       } else {
         logger.error("Unknown target store: " + targetStoreId);
@@ -816,18 +816,18 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   // Return the asset store ID that is currently storing the snapshot
-  public Opt<String> getSnapshotStorageLocation(final Version version, final String mpId) {
+  public Optional<String> getSnapshotStorageLocation(final Version version, final String mpId) {
     RichAResult result = getSnapshotsByIdAndVersion(mpId, version);
 
     for (Snapshot snapshot : result.getSnapshots()) {
-      return Opt.some(snapshot.getStorageId());
+      return Optional.of(snapshot.getStorageId());
     }
 
     logger.error("Mediapackage " + mpId + "@" + version + " not found!");
-    return Opt.none();
+    return Optional.empty();
   }
 
-  public Opt<String> getSnapshotStorageLocation(final Snapshot snap) {
+  public Optional<String> getSnapshotStorageLocation(final Snapshot snap) {
     return getSnapshotStorageLocation(snap.getVersion(), snap.getMediaPackage().getIdentifier().toString());
   }
 
@@ -899,11 +899,11 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   @Override
-  public Opt<Version> toVersion(String version) {
+  public Optional<Version> toVersion(String version) {
     try {
-      return Opt.some(VersionImpl.mk(Long.parseLong(version)));
+      return Optional.of(VersionImpl.mk(Long.parseLong(version)));
     } catch (NumberFormatException e) {
-      return Opt.none();
+      return Optional.empty();
     }
   }
 
@@ -952,7 +952,8 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
         offset += PAGE_SIZE;
         int n = 20;
 
-        final Map<String, List<Snapshot>> byOrg = r.getSnapshots().groupMulti(Snapshots.getOrganizationId);
+        final Map<String, List<Snapshot>> byOrg = r.getSnapshots().stream()
+            .collect(Collectors.groupingBy(Snapshot::getOrganizationId));
         for (String orgId : byOrg.keySet()) {
           final Organization snapshotOrg;
           try {
@@ -1184,19 +1185,17 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       }
 
       // find asset in versions & stores
-      final Opt<StoragePath> existingAssetOpt = getDatabase().findAssetByChecksumAndStore(e.getChecksum().toString(),
-              store.getStoreType()).map(new Fn<AssetDtos.Full, StoragePath>() {
-                @Override public StoragePath apply(AssetDtos.Full dto) {
-                  return StoragePath.mk(
-                    dto.getOrganizationId(),
-                    dto.getMediaPackageId(),
-                    dto.getVersion(),
-                    dto.getAssetDto().getMediaPackageElementId()
-                  );
-                }
-              });
+      final Optional<StoragePath> existingAssetOpt =
+          getDatabase()
+          .findAssetByChecksumAndStore(e.getChecksum().toString(), store.getStoreType())
+          .map(dto -> StoragePath.mk(
+              dto.getOrganizationId(),
+              dto.getMediaPackageId(),
+              dto.getVersion(),
+              dto.getAssetDto().getMediaPackageElementId()
+          ));
 
-      if (existingAssetOpt.isSome()) {
+      if (existingAssetOpt.isPresent()) {
         final StoragePath existingAsset = existingAssetOpt.get();
         logger.debug("Content of asset {} with checksum {} already exists in {}",
                 existingAsset.getMediaPackageElementId(), e.getChecksum(), store.getStoreType());
@@ -1209,8 +1208,8 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
           ));
         }
       } else {
-        final Opt<Long> size = e.getSize() > 0 ? Opt.some(e.getSize()) : Opt.none();
-        store.put(storagePath, Source.mk(e.getURI(), size, Opt.nul(e.getMimeType())));
+        final Optional<Long> size = e.getSize() > 0 ? Optional.of(e.getSize()) : Optional.empty();
+        store.put(storagePath, Source.mk(e.getURI(), size, Optional.ofNullable(e.getMimeType())));
       }
       getDatabase().setAssetStorageLocation(VersionImpl.mk(version), mpId, e.getIdentifier(), store.getStoreType());
     }
@@ -1222,8 +1221,8 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     final Version version = snap.getVersion();
 
     AssetStore currentStore = getAssetStore(snap.getStorageId()).get();
-    Opt<String> manifestOpt = findManifestBaseName(snap, MANIFEST_DEFAULT_NAME, currentStore);
-    if (manifestOpt.isNone()) {
+    Optional<String> manifestOpt = findManifestBaseName(snap, MANIFEST_DEFAULT_NAME, currentStore);
+    if (manifestOpt.isEmpty()) {
       return; // Nothing to do, already moved to long-term storage
     }
 
@@ -1233,12 +1232,12 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
     // Already copied?
     if (!targetStore.contains(pathToManifest)) {
-      Opt<InputStream> inputStreamOpt;
+      Optional<InputStream> inputStreamOpt;
       InputStream inputStream = null;
       String manifestFileName = null;
       try {
         inputStreamOpt = currentStore.get(pathToManifest);
-        if (inputStreamOpt.isNone()) { // This should never happen because it has been tested before
+        if (inputStreamOpt.isEmpty()) { // This should never happen because it has been tested before
           throw new NotFoundException(
                   String.format("Unexpected error. Manifest %s not found in current asset store", manifestBaseName));
         }
@@ -1246,7 +1245,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
         inputStream = inputStreamOpt.get();
         manifestFileName = UUID.randomUUID() + ".xml";
         URI manifestTmpUri = workspace.putInCollection("archive", manifestFileName, inputStream);
-        targetStore.put(pathToManifest, Source.mk(manifestTmpUri, Opt.none(), Opt.some(MimeTypes.XML)));
+        targetStore.put(pathToManifest, Source.mk(manifestTmpUri, Optional.empty(), Optional.of(MimeTypes.XML)));
       } finally {
         IOUtils.closeQuietly(inputStream);
         try {
@@ -1269,16 +1268,16 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     }
   }
 
-  Opt<String> findManifestBaseName(Snapshot snap, String manifestName, AssetStore store) {
+  Optional<String> findManifestBaseName(Snapshot snap, String manifestName, AssetStore store) {
     StoragePath path = new StoragePath(snap.getOrganizationId(), snap.getMediaPackage().getIdentifier().toString(),
             snap.getVersion(), manifestName);
     // If manifest_.xml, etc not found, return previous name (copied from the EpsiodeServiceImpl logic)
     if (!store.contains(path)) {
       // If first call, manifest is not found, which probably means it has already been moved
       if (MANIFEST_DEFAULT_NAME.equals(manifestName)) {
-        return Opt.none(); // No manifest found in current store
+        return Optional.empty(); // No manifest found in current store
       } else {
-        return Opt.some(manifestName.substring(0, manifestName.length() - 1));
+        return Optional.of(manifestName.substring(0, manifestName.length() - 1));
       }
     }
     // This is the same logic as when building the manifest name: manifest, manifest_, manifest__, etc
@@ -1374,20 +1373,15 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       logger.debug("Archiving {} {} {}", e.getFlavor(), e.getMimeType(), e.getURI());
       final StoragePath storagePath = StoragePath.mk(orgId, mpId, version, e.getIdentifier());
       // find asset in versions
-      final Opt<StoragePath> existingAssetOpt = getDatabase().findAssetByChecksumAndStore(e.getChecksum().toString(),
-              getLocalAssetStore().getStoreType())
-              .map(new Fn<AssetDtos.Full, StoragePath>() {
-                @Override public StoragePath apply(AssetDtos.Full dto) {
-                  return StoragePath.mk(
-                          dto.getOrganizationId(),
-                          dto.getMediaPackageId(),
-                          dto.getVersion(),
-                          dto.getAssetDto().getMediaPackageElementId()
-                  );
-                }
-              });
+      final Optional<StoragePath> existingAssetOpt = getDatabase()
+          .findAssetByChecksumAndStore(e.getChecksum().toString(), getLocalAssetStore().getStoreType())
+          .map(dto -> StoragePath.mk(
+                  dto.getOrganizationId(),
+                  dto.getMediaPackageId(),
+                  dto.getVersion(),
+                  dto.getAssetDto().getMediaPackageElementId()));
 
-      if (existingAssetOpt.isSome()) {
+      if (existingAssetOpt.isPresent()) {
         final StoragePath existingAsset = existingAssetOpt.get();
         logger.debug("Content of asset {} with checksum {} has been archived before",
                 existingAsset.getMediaPackageElementId(), e.getChecksum());
@@ -1400,8 +1394,8 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
           ));
         }
       } else {
-        final Opt<Long> size = e.getSize() > 0 ? Opt.some(e.getSize()) : Opt.none();
-        getLocalAssetStore().put(storagePath, Source.mk(e.getURI(), size, Opt.nul(e.getMimeType())));
+        final Optional<Long> size = e.getSize() > 0 ? Optional.of(e.getSize()) : Optional.empty();
+        getLocalAssetStore().put(storagePath, Source.mk(e.getURI(), size, Optional.ofNullable(e.getMimeType())));
       }
     }
   }
@@ -1422,7 +1416,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     try {
       getLocalAssetStore().put(
               StoragePath.mk(orgId, mpId, version, manifestAssetId(pmp, "manifest")),
-              Source.mk(manifestTmpUri, Opt.none(), Opt.some(MimeTypes.XML)));
+              Source.mk(manifestTmpUri, Optional.empty(), Optional.of(MimeTypes.XML)));
     } finally {
       // make sure to clean up the temporary file
       workspace.deleteFromCollection("archive", manifestFileName);
@@ -1457,7 +1451,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       return p.get1();
     } catch (Exception e) {
       logger.error("An error occurred", e);
-      throw unwrapExceptionUntil(AssetManagerException.class, e).getOr(new AssetManagerException(e));
+      throw unwrapExceptionUntil(AssetManagerException.class, e).orElse(new AssetManagerException(e));
     }
   }
 
@@ -1465,11 +1459,11 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
    * Walk up the stacktrace to find a cause of type <code>type</code>. Return none if no such
    * type can be found.
    */
-  static <A extends Throwable> Opt<A> unwrapExceptionUntil(Class<A> type, Throwable e) {
+  static <A extends Throwable> Optional<A> unwrapExceptionUntil(Class<A> type, Throwable e) {
     if (e == null) {
-      return Opt.none();
+      return Optional.empty();
     } else if (type.isAssignableFrom(e.getClass())) {
-      return Opt.some((A) e);
+      return Optional.of((A) e);
     } else {
       return unwrapExceptionUntil(type, e.getCause());
     }
@@ -1489,7 +1483,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
    *
    * @return the file name or none if it could not be determined
    */
-  public static Opt<String> getFileNameFromUrn(MediaPackageElement mpe) {
+  public static Optional<String> getFileNameFromUrn(MediaPackageElement mpe) {
     Fn<URI, String> toString = new Fn<URI, String>() {
       @Override
       public String apply(URI uri) {
@@ -1497,11 +1491,15 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       }
     };
 
-    Opt<URI> uri = Opt.nul(mpe.getURI());
-    if (uri.isSome() && "urn".equals(uri.get().getScheme())) {
-      return uri.toStream().map(toString).bind(Strings.split(":")).drop(1).reverse().head();
+    Optional<URI> uri = Optional.ofNullable(mpe.getURI());
+    if (uri.isPresent() && "urn".equals(uri.get().getScheme())) {
+      String[] tmp = uri.get().toString().split(":");
+      if (tmp.length < 1) {
+        return Optional.empty();
+      }
+      return Optional.of(tmp[tmp.length - 1]);
     }
-    return Opt.none();
+    return Optional.empty();
   }
 
   /**
@@ -1559,8 +1557,6 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   /**
    * Get the function to update a commented event in the Elasticsearch index.
    *
-   * @param eventId
-   *          The id of the current event
    * @return the function to do the update
    */
   private Function<Optional<Event>, Optional<Event>> getEventUpdateFunction(Snapshot snapshot,

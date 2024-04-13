@@ -612,11 +612,11 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
     final AQueryBuilder q = assetManager.createQuery();
     final AResult properties = q.select(q.propertiesOf(namespace))
         .where(q.mediaPackageId(source.getIdentifier().toString())).run();
-    if (properties.getRecords().head().isNone()) {
+    if (properties.getRecords().stream().findFirst().isEmpty()) {
       logger.info("No properties to copy for media package {}, namespace {}.", source.getIdentifier(), namespace);
       return;
     }
-    for (final Property p : properties.getRecords().head().get().getProperties()) {
+    for (final Property p : properties.getRecords().stream().findFirst().get().getProperties()) {
       final PropertyId newPropId = PropertyId.mk(destination.getIdentifier().toString(), namespace, p.getId()
           .getName());
       assetManager.setProperty(Property.mk(newPropId, p.getValue()));

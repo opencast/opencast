@@ -47,7 +47,7 @@ jobs:
           echo "::set-output name=VERSION_COMBINED::$GITHUB_REF" | sed 's_refs/tags/\([0-9]*\).\([0-9]*\)$_\1\2_'
 
       - name: create new release
-        uses: softprops/action-gh-release@v1
+        uses: softprops/action-gh-release@v2
         with:
           files: build/opencast-dist-*.tar.gz
           fail_on_unmatched_files: true

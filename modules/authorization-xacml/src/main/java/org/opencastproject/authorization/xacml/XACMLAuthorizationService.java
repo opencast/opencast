@@ -305,9 +305,13 @@ public class XACMLAuthorizationService implements AuthorizationService {
     return Optional.empty();
   }
 
-  @Override
   public boolean hasPermission(final MediaPackage mp, final String action) {
     AccessControlList acl = getActiveAcl(mp).getA();
+    return hasPermission(acl, action);
+  }
+
+  @Override
+  public boolean hasPermission(AccessControlList acl, final String action) {
     boolean allowed = false;
     final User user = securityService.getUser();
     for (AccessControlEntry entry: acl.getEntries()) {

@@ -29,7 +29,7 @@ import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.MimeTypes;
 
-import com.entwinemedia.fn.data.Opt;
+import java.util.Optional;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -54,15 +54,15 @@ public final class Conversions {
     }
   }
 
-  public static Opt<MimeType> toMimeType(@Nullable String a) {
+  public static Optional<MimeType> toMimeType(@Nullable String a) {
     if (a != null) {
       try {
-        return Opt.some(MimeTypes.parseMimeType(a));
+        return Optional.of(MimeTypes.parseMimeType(a));
       } catch (Exception e) {
-        return Opt.none();
+        return Optional.empty();
       }
     } else {
-      return Opt.none();
+      return Optional.empty();
     }
   }
 }

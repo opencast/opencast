@@ -43,6 +43,8 @@ import com.mysema.query.types.expr.BooleanExpression;
 import com.mysema.query.types.expr.BooleanOperation;
 import com.mysema.query.types.expr.ComparableExpressionBase;
 
+import java.util.function.Function;
+
 /**
  * Generic implementation to query {@link org.opencastproject.assetmanager.impl.persistence.SnapshotDto} fields.
  *
@@ -167,10 +169,12 @@ public abstract class AbstractSnapshotField<A, B extends Comparable> implements 
    * Create a predicate for comparisons with a property field.
    */
   private Predicate mkComparison(final Operator<? super Boolean> op, final PropertyField<A> right) {
-    return mkPredicate(PropertyPredicates.mkWhereSelect(right.name(), new Fn<QPropertyDto, Opt<BooleanExpression>>() {
-      @Override public Opt<BooleanExpression> apply(QPropertyDto qPropertyDto) {
-        return Opt.some(BooleanOperation.create(op, path, RuntimeTypes.convert(right).getPath(qPropertyDto)));
-      }
-    }));
+    return mkPredicate(PropertyPredicates.mkWhereSelect(
+        right.name(),
+        new Function<QPropertyDto, Opt<BooleanExpression>>() {
+          @Override public Opt<BooleanExpression> apply(QPropertyDto qPropertyDto) {
+            return Opt.some(BooleanOperation.create(op, path, RuntimeTypes.convert(right).getPath(qPropertyDto)));
+          }
+        }));
   }
 }

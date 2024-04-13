@@ -41,7 +41,7 @@ public interface SpeechToTextService {
    * @param mediaFile Location of the media file to generate subtitles for.
    * @param language The language of the audio.
    * @return SpeechToText service job.
-   * @throws SpeechToTextServiceException If something went wrong during the subtitles generation.
+   * @throws SpeechToTextServiceException If something went wrong during the subtitle's generation.
    */
   Job transcribe(URI mediaFile, String language, Boolean translate) throws SpeechToTextServiceException;
 
