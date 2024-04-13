@@ -1704,7 +1704,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     try {
       if (uri.toString().startsWith("http")) {
         HttpGet get = new HttpGet(uri);
-        var clusterUrls = securityService.getOrganization().getServers().keySet();
 
         if (!isBlank(downloadSource) && uri.toString().matches(downloadSource)) {
           // NB: We're creating a new client here with *different* auth than the system auth creds
@@ -1717,13 +1716,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
             get.setHeader(HttpHeaders.AUTHORIZATION, authHeader);
           }
           response = externalHttpClient.execute(get);
-        } else if (clusterUrls.contains(uri.getScheme() + "://" + uri.getHost())) {
-          // Only using the system-level httpclient and digest credentials against our own servers
-          response = httpClient.execute(get);
         } else {
-          //NB: No auth here at all
-          externalHttpClient = getNoAuthHttpClient();
-          response = externalHttpClient.execute(get);
+          // httpClient checks internally to see if it should be sending the default auth, or not.
+          response = httpClient.execute(get);
         }
 
         if (null == response) {
@@ -1915,11 +1910,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   @Override
   protected OrganizationDirectoryService getOrganizationDirectoryService() {
     return organizationDirectoryService;
-  }
-
-  //Used in testing
-  protected CloseableHttpClient getNoAuthHttpClient() {
-    return HttpClientBuilder.create().build();
   }
 
   protected CloseableHttpClient getAuthedHttpClient() {
