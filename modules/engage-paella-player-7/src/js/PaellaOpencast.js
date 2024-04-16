@@ -78,6 +78,10 @@ function myWebsiteCheckConsentFunction(type) {
   return consent_level[type] || false;
 }
 
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 const initParams = {
   customPluginContext: [
     require.context('../plugins', true, /\.js/),
@@ -142,6 +146,10 @@ const initParams = {
       if (!me.roles.includes('ROLE_USER')) {
         player.log.info('Video not found and user is not authenticated. Try to log in.');
         location.href = getUrlFromOpencastPaella('auth.html?redirect=' + encodeURIComponent(window.location.href));
+        // We need to interrupt the player loading to redirect the user to the auth page.
+        await sleep(100);
+        // This Error should not happen, as the user is redirected to the auth page.
+        throw Error('Video not found and user is not authenticated. Try to log in.');
       }
       else {
         // TODO: the video does not exist or the user can't see it
