@@ -4,6 +4,15 @@ Changelog
 Opencast 14
 -----------
 
+### Opencast 14.11
+
+*Released on April 16th, 2024*
+
+- [[#5682](https://github.com/opencast/opencast/pull/5682)] -
+Quickfix dangling hard links on cephfs volumes
+- [[#5667](https://github.com/opencast/opencast/pull/5667)] -
+Fixed NPE on filtering data
+
 ### Opencast 14.10
 
 *Released on March 14th, 2024*

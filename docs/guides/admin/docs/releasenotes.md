@@ -1,5 +1,16 @@
 # Opencast 14: Release Notes
 
+## Opencast 14.11
+
+Opencast 14.11 release includes two bug fixes.
+
+If you plan to use CephFS as a storage for the media data, this release includes an workaround for the hardlinking bug
+in CephFS. For detailed information please consult the mailinglist article linked in
+[PR 5682](https://github.com/opencast/opencast/pull/5682).
+
+See [changelog](changelog.md#opencast-1411) for a comprehensive list of changes.
+
+
 ## Opencast 14.10
 
 Opencast 14.10 release includes bug fixes and improvements.
