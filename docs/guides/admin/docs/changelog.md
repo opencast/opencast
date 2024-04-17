@@ -6,16 +6,28 @@ Opencast 15
 
 ### Opencast 15.4
 
+- [[#5738](https://github.com/opencast/opencast/pull/5738)] -
+  Update (New) Admin UI to 2024-04-10
 - [[#5696](https://github.com/opencast/opencast/pull/5696)] -
   Mark RPMs as available
+- [[#5689](https://github.com/opencast/opencast/pull/5689)] -
+  Process-smil WOH tag-with-profile configuration does not work depending on the encoding profile suffix configured
+- [[#5686](https://github.com/opencast/opencast/pull/5686)] -
+  Fix editor track selection for updating tags
 - [[#5678](https://github.com/opencast/opencast/pull/5678)] -
   Remove Spurious Warnings During Build
 - [[#5677](https://github.com/opencast/opencast/pull/5677)] -
   Fix more JavaDoc
+- [[#5675](https://github.com/opencast/opencast/pull/5675)] -
+  Add synchronous deletion to Search API
 - [[#5673](https://github.com/opencast/opencast/pull/5673)] -
   Paella7: Avoid opening downloaded video
 - [[#5670](https://github.com/opencast/opencast/pull/5670)] -
   Make a dynamic OSGi dependency static
+- [[#5669](https://github.com/opencast/opencast/pull/5669)] -
+  Update temporal if empty
+- [[#5588](https://github.com/opencast/opencast/pull/5588)] -
+  Update typescript type definitions in ltitools
 
 ### Opencast 15.3
 

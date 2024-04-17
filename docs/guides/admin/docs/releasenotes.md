@@ -11,12 +11,24 @@ Fixes Bug for CephFS regarding strayed inodes when hard linking
 Fixes NullPointerException on roles without a description when calling REST endpoint
 [[#5667](https://github.com/opencast/opencast/pull/5667)]
 - **Paella7: Avoid opening downloaded video:**
-Fixes bug where a video is opened in another window instead of beeing downloaded in the Paella7 download plugin
+Fixes bug where a video is opened in another window instead
+of beeing downloaded in the Paella7 download plugin
 [[#5673](https://github.com/opencast/opencast/pull/5673)]
 - **Mark RPMs as available:**
 Fixes an issue in the Opencast documentation, accidentally
 marking the RPMs for Opencast 15 as not yet available
 [[#5696](https://github.com/opencast/opencast/pull/5696)]
+- **Update (New) Admin UI to 2024-04-10:**
+Contains various bug fixes as well as code enhancements
+[[#5738](https://github.com/opencast/opencast/pull/5738)]
+- **Process-smil WOH tag-with-profile configuration does
+not work depending on the encoding profile suffix configured:**
+Fixes tagging with the profile name for encoding profiles with a suffix
+[[#5689](https://github.com/opencast/opencast/pull/5689)]
+- **Fix editor track selection for updating tags**
+[[#5686](https://github.com/opencast/opencast/pull/5686)]
+
+
 
 ### Improvements
 
@@ -26,6 +38,16 @@ marking the RPMs for Opencast 15 as not yet available
 [[#5677](https://github.com/opencast/opencast/pull/5677)]
 - **Make a dynamic OSGi dependency static**
 [[#5670](https://github.com/opencast/opencast/pull/5670)]
+- **Add synchronous deletion to Search API**
+[[#5675](https://github.com/opencast/opencast/pull/5675)]
+- **Update temporal if empty:**
+If the dcterm extent of the episode dublincore catalog is empty,
+it is updated by the inspect operation with the current length of the media package;
+this change applies the same behavior for the dcterm temporal.
+[[#5669](https://github.com/opencast/opencast/pull/5669)]
+- **Update typescript type definitions in ltitools**
+[[#5588](https://github.com/opencast/opencast/pull/5588)]
+
 
 ## Opencast 15.3
 
