@@ -30,6 +30,8 @@ import static org.opencastproject.util.JobUtil.waitForJob;
 import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Option.none;
 
+import org.opencastproject.authorization.xacml.XACMLParsingException;
+import org.opencastproject.authorization.xacml.XACMLUtils;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.ingest.api.IngestException;
 import org.opencastproject.ingest.api.IngestService;
@@ -38,6 +40,7 @@ import org.opencastproject.inspection.api.MediaInspectionService;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
+import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -616,12 +619,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
         URI dest = workingFileRepository.moveTo(wfrCollectionId, FilenameUtils.getName(uri.toString()), mediaPackageId,
                 element.getIdentifier(), FilenameUtils.getName(element.getURI().toString()));
         element.setURI(dest);
-
-        // TODO: This should be triggered somehow instead of being handled here
-        if (MediaPackageElements.SERIES.equals(element.getFlavor())) {
-          logger.info("Ingested mediapackage {} contains updated series information", mediaPackageId);
-          updateSeries(element.getURI());
-        }
       }
 
       // Now that all elements are in place, start with ingest
@@ -857,7 +854,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * {@inheritDoc}
    *
    * @see org.opencastproject.ingest.api.IngestService#addCatalog(java.net.URI,
-   *      org.opencastproject.mediapackage.MediaPackageElementFlavor, org.opencastproject.mediapackage.MediaPackage)
+   *      org.opencastproject.mediapackage.MediaPackageElementFlavor, String[], org.opencastproject.mediapackage.MediaPackage)
    */
   @Override
   public MediaPackage addCatalog(URI uri, MediaPackageElementFlavor flavor, String[] tags, MediaPackage mediaPackage)
@@ -872,9 +869,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       String elementId = UUID.randomUUID().toString();
       logger.info("Start adding catalog {} from URL {} on mediapackage {}", elementId, uri, mediaPackage);
       URI newUrl = addContentToRepo(mediaPackage, elementId, uri);
-      if (MediaPackageElements.SERIES.equals(flavor)) {
-        updateSeries(newUrl);
-      }
       MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Catalog,
               flavor);
       if (tags != null && tags.length > 0) {
@@ -899,41 +893,53 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   /**
    * Updates the persistent representation of a series based on a potentially modified dublin core document.
    *
-   * @param uri
-   *          the URI to the dublin core document containing series metadata.
+   * @param mediaPackage
+   *         the media package containing series metadata and ACLs.
    * @return
    *         true, if the series is created or overwritten, false if the existing series remains intact.
    * @throws IOException if the series catalog was not found
    * @throws IngestException if any other exception was encountered
    */
-  protected boolean updateSeries(URI uri) throws IOException, IngestException {
+  protected boolean updateSeries(MediaPackage mediaPackage) throws IOException, IngestException {
+    Catalog[] seriesCatalogs = mediaPackage.getCatalogs(MediaPackageElements.SERIES);
+    if (seriesCatalogs.length == 0) {
+      return false;
+    } else if (seriesCatalogs.length > 1) {
+      logger.warn("Mediapackage {} has more than one series dublincore catalogs. Using catalog {} with ID {}.",
+          mediaPackage.getIdentifier(), seriesCatalogs[0].getURI(), seriesCatalogs[0].getIdentifier());
+    }
+    // Parse series dublincore
     HttpResponse response = null;
     InputStream in = null;
     boolean isUpdated = false;
+    boolean isNew = false;
+    String seriesId = null;
     try {
-      HttpGet getDc = new HttpGet(uri);
+      HttpGet getDc = new HttpGet(seriesCatalogs[0].getURI());
       response = httpClient.execute(getDc);
       in = response.getEntity().getContent();
       DublinCoreCatalog dc = dublinCoreService.load(in);
-      String id = dc.getFirst(DublinCore.PROPERTY_IDENTIFIER);
-      if (id == null) {
-        logger.warn("Series dublin core document contains no identifier, rejecting ingested series cagtalog.");
+      seriesId = dc.getFirst(DublinCore.PROPERTY_IDENTIFIER);
+      if (seriesId == null) {
+        logger.warn("Series dublin core document contains no identifier, "
+            + "rejecting ingested series catalog for mediapackage {}.", mediaPackage.getIdentifier());
       } else {
         try {
           try {
-            seriesService.getSeries(id);
+            seriesService.getSeries(seriesId);
             if (isAllowModifySeries) {
               // Update existing series
               seriesService.updateSeries(dc);
               isUpdated = true;
-              logger.debug("Ingest is overwriting the existing series {} with the ingested series", id);
+              logger.debug("Ingest is overwriting the existing series {} with the ingested series", seriesId);
             } else {
-              logger.debug("Series {} already exists. Ignoring series catalog from ingest.", id);
+              logger.debug("Series {} already exists. Ignoring series catalog from ingest.", seriesId);
             }
           } catch (NotFoundException e) {
-            logger.info("Creating new series {} with default ACL", id);
+            logger.info("Creating new series {} with default ACL.", seriesId);
             seriesService.updateSeries(dc);
             isUpdated = true;
+            isNew = true;
           }
 
         } catch (Exception e) {
@@ -942,10 +948,75 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       }
       in.close();
     } catch (IOException e) {
-      logger.error("Error updating series from DublinCoreCatalog: {}", e.getMessage());
+      logger.error("Error updating series from DublinCoreCatalog.}", e);
     } finally {
       IOUtils.closeQuietly(in);
       httpClient.close(response);
+    }
+    if (!isUpdated) {
+      return isUpdated;
+    }
+    // Apply series extended metadata
+    for (MediaPackageElement seriesElement : mediaPackage.getElementsByFlavor(
+        MediaPackageElementFlavor.parseFlavor("*/series"))) {
+      if (MediaPackageElement.Type.Catalog == seriesElement.getElementType()
+          && !MediaPackageElements.SERIES.equals(seriesElement.getFlavor())) {
+        String catalogType = seriesElement.getFlavor().getType();
+        logger.info("Apply series {} metadata catalog from mediapackage {} to newly created series {}.",
+            catalogType, mediaPackage.getIdentifier(), seriesId);
+        byte[] data;
+        try {
+          HttpGet getExtendedMetadata = new HttpGet(seriesElement.getURI());
+          response = httpClient.execute(getExtendedMetadata);
+          in = response.getEntity().getContent();
+          data = IOUtils.readFully(in, (int) response.getEntity().getContentLength());
+        } catch (Exception e) {
+          throw new IngestException("Unable to read series " + catalogType + " metadata catalog for series "
+              + seriesId + ".", e);
+        } finally {
+          IOUtils.closeQuietly(in);
+          httpClient.close(response);
+        }
+        try {
+          seriesService.updateSeriesElement(seriesId, catalogType, data);
+        } catch (SeriesException e) {
+          throw new IngestException(
+              "Unable to update series " + catalogType + " catalog on newly created series " + seriesId + ".", e);
+        }
+      }
+    }
+    if (isNew) {
+      logger.info("Apply series ACL from mediapackage {} to newly created series {}.",
+          mediaPackage.getIdentifier(), seriesId);
+      Attachment[] seriesXacmls = mediaPackage.getAttachments(MediaPackageElements.XACML_POLICY_SERIES);
+      if (seriesXacmls.length > 0) {
+        if (seriesXacmls.length > 1) {
+          logger.warn("Mediapackage {} has more than one series xacml attachments. Using {}.",
+              mediaPackage.getIdentifier(), seriesXacmls[0].getURI());
+        }
+        AccessControlList seriesAcl = null;
+        try {
+          HttpGet getXacml = new HttpGet(seriesXacmls[0].getURI());
+          response = httpClient.execute(getXacml);
+          in = response.getEntity().getContent();
+          seriesAcl = XACMLUtils.parseXacml(in);
+        } catch (XACMLParsingException ex) {
+          throw new IngestException("Unable to parse series xacml from mediapackage "
+              + mediaPackage.getIdentifier() + ".", ex);
+        } catch (IOException e) {
+          logger.error("Error updating series {} ACL from mediapackage {}.",
+              seriesId, mediaPackage.getIdentifier(), e.getMessage());
+          throw e;
+        } finally {
+          IOUtils.closeQuietly(in);
+          httpClient.close(response);
+        }
+        try {
+          seriesService.updateAccessControl(seriesId, seriesAcl);
+        } catch (Exception e) {
+          throw new IngestException("Unable to update series ACL on newly created series " + seriesId + ".", e);
+        }
+      }
     }
     return isUpdated;
   }
@@ -1002,10 +1073,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
           throw new IllegalArgumentException("Catalog XML is invalid", e);
         }
       }
-
-      if (MediaPackageElements.SERIES.equals(flavor)) {
-        updateSeries(newUrl);
-      }
       MediaPackage mp = addContentToMediaPackage(mediaPackage, elementId, newUrl, MediaPackageElement.Type.Catalog,
               flavor);
       if (tags != null && tags.length > 0) {
@@ -1032,7 +1099,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    * {@inheritDoc}
    *
    * @see org.opencastproject.ingest.api.IngestService#addAttachment(java.net.URI,
-   *      org.opencastproject.mediapackage.MediaPackageElementFlavor, org.opencastproject.mediapackage.MediaPackage)
+   *      org.opencastproject.mediapackage.MediaPackageElementFlavor, String[], org.opencastproject.mediapackage.MediaPackage)
    */
   @Override
   public MediaPackage addAttachment(URI uri, MediaPackageElementFlavor flavor, String[] tags, MediaPackage mediaPackage)
@@ -1169,6 +1236,12 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       mp = createSmil(mp);
     } catch (IOException e) {
       throw new IngestException("Unable to add SMIL Catalog", e);
+    }
+
+    try {
+      updateSeries(mp);
+    } catch (IOException e) {
+      throw new IngestException("Unable to create or update series from mediapackage " + mp.getIdentifier() + ".", e);
     }
 
     // Done, update the job status and return the created workflow instance
