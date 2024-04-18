@@ -31,7 +31,6 @@
               <url>${editor.url}</url>
               <sha256>${editor.sha256}</sha256>
               <unpack>true</unpack>
-              <checkSignature>true</checkSignature>
               <outputDirectory>target/classes/editor/</outputDirectory>
             </configuration>
           </execution>

@@ -621,6 +621,9 @@
           <groupId>com.googlecode.maven-download-plugin</groupId>
           <artifactId>download-maven-plugin</artifactId>
           <version>1.6.8</version>
+          <configuration>
+            <checkSignature>true</checkSignature>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
