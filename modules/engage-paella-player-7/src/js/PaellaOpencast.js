@@ -78,10 +78,6 @@ function myWebsiteCheckConsentFunction(type) {
   return consent_level[type] || false;
 }
 
-function sleep(ms) {
-  return new Promise(resolve => setTimeout(resolve, ms));
-}
-
 const initParams = {
   customPluginContext: [
     require.context('../plugins', true, /\.js/),
@@ -106,6 +102,9 @@ const initParams = {
   },
 
   loadVideoManifest: async function (url, config, player) {
+    const stopLoadVideoManifest = () => {
+      return new Promise(() => {});
+    };
     // check cookie consent (if enabled)
     const cookieConsent = config?.opencast?.cookieConsent?.enable ?? true;
     const cookieConsentConfig = config?.opencast?.cookieConsent?.config ?? {
@@ -147,9 +146,9 @@ const initParams = {
         player.log.info('Video not found and user is not authenticated. Try to log in.');
         location.href = getUrlFromOpencastPaella('auth.html?redirect=' + encodeURIComponent(window.location.href));
         // We need to interrupt the player loading to redirect the user to the auth page.
-        await sleep(100);
+        await stopLoadVideoManifest();
         // This Error should not happen, as the user is redirected to the auth page.
-        throw Error('Video not found and user is not authenticated. Try to log in.');
+        throw Error('Video not found and user is not authenticated. Log in and try again.');
       }
       else {
         // TODO: the video does not exist or the user can't see it
