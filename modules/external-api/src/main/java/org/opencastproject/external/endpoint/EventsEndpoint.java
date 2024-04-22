@@ -394,13 +394,14 @@ public class EventsEndpoint implements ManagedService {
                   @RestParameter(name = "withacl", isRequired = false, description = "Whether the acl metadata should be included in the response.", type = Type.BOOLEAN),
                   @RestParameter(name = "withmetadata", isRequired = false, description = "Whether the metadata catalogs should be included in the response.", type = Type.BOOLEAN),
                   @RestParameter(name = "withscheduling", isRequired = false, description = "Whether the scheduling information should be included in the response.", type = Type.BOOLEAN),
-                  @RestParameter(name = "withpublications", isRequired = false, description = "Whether the publication ids and urls should be included in the response.", type = Type.BOOLEAN), }, responses = {
+                  @RestParameter(name = "withpublications", isRequired = false, description = "Whether the publication ids and urls should be included in the response.", type = Type.BOOLEAN),
+                  @RestParameter(name = "includeInternalPublications", isRequired = false, description = "Whether internal publications should be included.", type = Type.BOOLEAN)}, responses = {
                           @RestResponse(description = "The event is returned.", responseCode = HttpServletResponse.SC_OK),
                           @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEvent(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @QueryParam("sign") boolean sign, @QueryParam("withacl") Boolean withAcl,
           @QueryParam("withmetadata") Boolean withMetadata, @QueryParam("withscheduling") Boolean withScheduling,
-          @QueryParam("withpublications") Boolean withPublications)
+          @QueryParam("withpublications") Boolean withPublications, @QueryParam("includeInternalPublications") Boolean includeInternalPublications)
           throws Exception {
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
     if (requestedVersion.isSmallerThan(VERSION_1_1_0)) {
@@ -410,7 +411,7 @@ public class EventsEndpoint implements ManagedService {
     for (final Event event : indexService.getEvent(id, elasticsearchIndex)) {
       event.updatePreview(previewSubtype);
       return ApiResponses.Json.ok(
-          requestedVersion, eventToJSON(event, withAcl, withMetadata, withScheduling, withPublications, sign, requestedVersion));
+          requestedVersion, eventToJSON(event, withAcl, withMetadata, withScheduling, withPublications, includeInternalPublications, sign, requestedVersion));
     }
     return ApiResponses.notFound("Cannot find an event with id '%s'.", id);
   }
@@ -709,6 +710,7 @@ public class EventsEndpoint implements ManagedService {
           @RestParameter(name = "withmetadata", isRequired = false, description = "Whether the metadata catalogs should be included in the response.", type = Type.BOOLEAN),
           @RestParameter(name = "withscheduling", isRequired = false, description = "Whether the scheduling information should be included in the response.", type = Type.BOOLEAN),
           @RestParameter(name = "withpublications", isRequired = false, description = "Whether the publication ids and urls should be included in the response.", type = Type.BOOLEAN),
+          @RestParameter(name = "includeInternalPublications", description = "Whether internal publications should be included.", isRequired = false, type = Type.BOOLEAN),
           @RestParameter(name = "onlyWithWriteAccess", isRequired = false, description = "Whether only to get the events to which we have write access.", type = Type.BOOLEAN),
           @RestParameter(name = "filter", isRequired = false, description = "Usage [Filter Name]:[Value to Filter With]. Multiple filters can be used by combining them with commas \",\". Available Filters: presenters, contributors, location, textFilter, series, subject. If API ver > 1.1.0 also: identifier, title, description, series_name, language, created, license, rightsholder, is_part_of, source, status, agent_id, start, technical_start.", type = STRING),
           @RestParameter(name = "sort", description = "Sort the results based upon a list of comma seperated sorting criteria. In the comma seperated list each type of sorting is specified as a pair such as: <Sort Name>:ASC or <Sort Name>:DESC. Adding the suffix ASC or DESC sets the order as ascending or descending order and is mandatory.", isRequired = false, type = STRING),
@@ -720,7 +722,7 @@ public class EventsEndpoint implements ManagedService {
           @QueryParam("filter") List<String> filter, @QueryParam("sort") String sort, @QueryParam("offset") Integer offset,
           @QueryParam("limit") Integer limit, @QueryParam("sign") boolean sign, @QueryParam("withacl") Boolean withAcl,
           @QueryParam("withmetadata") Boolean withMetadata, @QueryParam("withscheduling") Boolean withScheduling,
-          @QueryParam("onlyWithWriteAccess") Boolean onlyWithWriteAccess, @QueryParam("withpublications") Boolean withPublications) {
+          @QueryParam("onlyWithWriteAccess") Boolean onlyWithWriteAccess, @QueryParam("withpublications") Boolean withPublications, @QueryParam("includeInternalPublications") Boolean includeInternalPublications) {
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
     if (requestedVersion.isSmallerThan(VERSION_1_1_0)) {
       // withscheduling was added for version 1.1.0 and should be ignored for smaller versions.
@@ -995,7 +997,7 @@ public class EventsEndpoint implements ManagedService {
     }
     try {
       return getJsonEvents(
-          acceptHeader, allEvents, withAcl, withMetadata, withScheduling, withPublications, sign, requestedVersion);
+          acceptHeader, allEvents, withAcl, withMetadata, withScheduling, withPublications, includeInternalPublications, sign, requestedVersion);
     } catch (Exception e) {
       logger.error("Unable to get events", e);
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
@@ -1025,11 +1027,11 @@ public class EventsEndpoint implements ManagedService {
    * @throws UnauthorizedException
    */
   protected Response getJsonEvents(String acceptHeader, List<IndexObject> events, Boolean withAcl, Boolean withMetadata,
-          Boolean withScheduling, Boolean withPublications, Boolean withSignedUrls, ApiVersion requestedVersion)
+          Boolean withScheduling, Boolean withPublications,Boolean includeInternalPublications, Boolean withSignedUrls, ApiVersion requestedVersion)
       throws IndexServiceException, UnauthorizedException, SchedulerException {
     List<JValue> eventsList = new ArrayList<>();
     for (IndexObject item : events) {
-      eventsList.add(eventToJSON((Event) item, withAcl, withMetadata, withScheduling, withPublications, withSignedUrls,
+      eventsList.add(eventToJSON((Event) item, withAcl, withMetadata, withScheduling, withPublications, includeInternalPublications, withSignedUrls,
               requestedVersion));
     }
     return ApiResponses.Json.ok(requestedVersion, arr(eventsList));
@@ -1057,7 +1059,7 @@ public class EventsEndpoint implements ManagedService {
    * @throws UnauthorizedException
    */
   protected JValue eventToJSON(Event event, Boolean withAcl, Boolean withMetadata, Boolean withScheduling,
-          Boolean withPublications, Boolean withSignedUrls, ApiVersion requestedVersion) throws IndexServiceException, SchedulerException, UnauthorizedException {
+          Boolean withPublications, Boolean includeInternalPublications, Boolean withSignedUrls, ApiVersion requestedVersion) throws IndexServiceException, SchedulerException, UnauthorizedException {
     List<Field> fields = new ArrayList<>();
     if (event.getArchiveVersion() != null)
       fields.add(f("archive_version", v(event.getArchiveVersion())));
@@ -1124,7 +1126,7 @@ public class EventsEndpoint implements ManagedService {
       fields.add(f("scheduling", SchedulingInfo.of(event.getIdentifier(), schedulerService).toJson()));
     }
     if (withPublications != null && withPublications) {
-      List<JValue> publications = getPublications(event, withSignedUrls, requestedVersion);
+      List<JValue> publications = getPublications(event, withSignedUrls, includeInternalPublications,requestedVersion);
       fields.add(f("publications", arr(publications)));
     }
     return obj(fields);
@@ -1612,21 +1614,20 @@ public class EventsEndpoint implements ManagedService {
              restParameters = {
                @RestParameter(name = "sign", description = "Whether public distribution urls should be signed.",
                               isRequired = false, type = Type.BOOLEAN),
-               @RestParameter(name = "internal", description = "Whether internal publication should be listed.",
-                     isRequired = false, type = Type.BOOLEAN)
+               @RestParameter(name = "includeInternalPublications", description = "Whether internal publications should be included.",
+                              isRequired = false, type = Type.BOOLEAN)
              },
              responses = {
                   @RestResponse(description = "The list of publications is returned.", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
 
-  // in Response: add boolean for internal_publications like sign
     public Response getEventPublications(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
-          @QueryParam("sign") boolean sign, @QueryParam("internal") boolean internal) throws Exception {
+          @QueryParam("sign") boolean sign, @QueryParam("includeInternalPublications") boolean includeInternalPublications) throws Exception {
     try {
       final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
       final Opt<Event> event = indexService.getEvent(id, elasticsearchIndex);
       if (event.isSome()) {
-        return ApiResponses.Json.ok(acceptHeader, arr(getPublications(event.get(), sign, internal, requestedVersion)));
+        return ApiResponses.Json.ok(acceptHeader, arr(getPublications(event.get(), sign, includeInternalPublications, requestedVersion)));
       } else {
         return ApiResponses.notFound(String.format("Unable to find event with id '%s'", id));
       }
@@ -1636,13 +1637,9 @@ public class EventsEndpoint implements ManagedService {
     }
   }
 
-  private List<JValue> getPublications(Event event, Boolean withSignedUrls, ApiVersion requestedVersion) {
-    return getPublications(event, withSignedUrls, false, requestedVersion);
-  }
 
-  private List<JValue> getPublications(Event event, Boolean withSignedUrls, Boolean internal, ApiVersion requestedVersion) {
-    // if internal is true, do not filter out the internal publications
-    if (internal) {
+  private List<JValue> getPublications(Event event, Boolean withSignedUrls, Boolean includeInternalPublications, ApiVersion requestedVersion) {
+    if (includeInternalPublications) {
       return event.getPublications().stream()
           .map(p -> getPublication(p, withSignedUrls, requestedVersion))
           .collect(Collectors.toList());
@@ -1755,8 +1752,8 @@ public class EventsEndpoint implements ManagedService {
              restParameters = {
                @RestParameter(name = "sign", description = "Whether public distribution urls should be signed.",
                               isRequired = false, type = Type.BOOLEAN),
-               @RestParameter(name = "internal", description = "Whether internal publication should be listed.",
-                     isRequired = false, type = Type.BOOLEAN)
+               @RestParameter(name = "includeInternalPublications", description = "Whether internal publication should be included.",
+                              isRequired = false, type = Type.BOOLEAN)
              },
              responses = {
                   @RestResponse(description = "The track details are returned.", responseCode = HttpServletResponse.SC_OK),
@@ -1764,10 +1761,10 @@ public class EventsEndpoint implements ManagedService {
 
   // same as above
   public Response getEventPublication(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String eventId,
-          @PathParam("publicationId") String publicationId, @QueryParam("sign") boolean sign, @QueryParam("internal") boolean internal) throws Exception {
+          @PathParam("publicationId") String publicationId, @QueryParam("sign") boolean sign, @QueryParam("includeInternalPublications") boolean includeInternalPublications) throws Exception {
     try {
       final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
-      return ApiResponses.Json.ok(acceptHeader, getPublication(eventId, publicationId, sign, requestedVersion, internal));
+      return ApiResponses.Json.ok(acceptHeader, getPublication(eventId, publicationId, sign, requestedVersion, includeInternalPublications));
     } catch (NotFoundException e) {
       return ApiResponses.notFound(e.getMessage());
     } catch (SearchIndexException e) {
@@ -1777,11 +1774,11 @@ public class EventsEndpoint implements ManagedService {
   }
 
 
-  private JObject getPublication(String eventId, String publicationId, Boolean withSignedUrls, ApiVersion requestedVersion, Boolean internal)
+  private JObject getPublication(String eventId, String publicationId, Boolean withSignedUrls, ApiVersion requestedVersion, Boolean includeInternalPublications)
           throws SearchIndexException, NotFoundException {
     for (final Event event : indexService.getEvent(eventId, elasticsearchIndex)) {
       List<Publication> publications;
-      if (internal) {
+      if (includeInternalPublications) {
         publications = $(event.getPublications()).toList();
       } else {
         publications = $(event.getPublications()).filter(EventUtils.internalChannelFilter).toList();
