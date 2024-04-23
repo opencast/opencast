@@ -21,12 +21,16 @@
 
 package org.opencastproject.graphql.type.output;
 
+import org.opencastproject.graphql.type.MapFunction;
 import org.opencastproject.graphql.type.resolver.MetadataFieldInterfaceResolver;
 import org.opencastproject.metadata.dublincore.MetadataField;
+
+import java.util.Map;
 
 import graphql.annotations.annotationTypes.GraphQLDescription;
 import graphql.annotations.annotationTypes.GraphQLField;
 import graphql.annotations.annotationTypes.GraphQLName;
+import graphql.annotations.annotationTypes.GraphQLType;
 import graphql.annotations.annotationTypes.GraphQLTypeResolver;
 
 @GraphQLName(GqlMetadataFieldInterface.TYPE_NAME)
@@ -65,6 +69,12 @@ public interface GqlMetadataFieldInterface {
   @GraphQLField
   default String listProvider() {
     return getMetadataField().getListprovider();
+  }
+
+  @GraphQLField
+  @GraphQLType(MapFunction.class)
+  default Map<String, String> collection() {
+    return getMetadataField().getCollection();
   }
 
   @GraphQLField
