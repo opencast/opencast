@@ -211,6 +211,10 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
     }
   }
 
+  public boolean deleteSynchronously(String mediaPackageId) throws SearchException {
+    return index.deleteSynchronously(mediaPackageId);
+  }
+
   /**
    * {@inheritDoc}
    *
