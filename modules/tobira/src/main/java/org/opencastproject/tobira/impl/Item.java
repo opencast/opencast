@@ -165,6 +165,7 @@ class Item {
           }))),
           Jsons.p("captions", Jsons.arr(captions)),
           Jsons.p("slideText", slideText.map(t -> t.toString()).orElse(null)),
+          Jsons.p("segments", Jsons.arr(findSegments(mp))),
           Jsons.p("updated", event.getModified().getTime())
       );
     }
@@ -326,6 +327,17 @@ class Item {
         .map(a -> a.getURI().toString())
         .findFirst()
         .orElse(null);
+  }
+
+  private static List<Jsons.Val> findSegments(MediaPackage mp) {
+    return Arrays.stream(mp.getAttachments())
+      .filter(a -> a.getFlavor().getSubtype().equals("segment+preview"))
+      .map(s -> Jsons.obj(
+          Jsons.p("uri", s.toString()),
+          Jsons.p("startTime", s.getReference().getProperty("time"))
+        )
+      )
+      .collect(Collectors.toCollection(ArrayList::new));
   }
 
   private static Jsons.Val findTimelinePreview(MediaPackage mp) {
