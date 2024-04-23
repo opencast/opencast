@@ -57,7 +57,7 @@ module.exports = function (env) {
           publicPath: '/test_mock_static'
         }
       ],
-      proxy: {
+      proxy: [{
         '/search/**': proxyOpts,
         '/info/**': proxyOpts,
         '/series/**': proxyOpts,
@@ -67,7 +67,7 @@ module.exports = function (env) {
         '/usertracking/**': proxyOpts,
         '/editor/**': proxyOpts,
         '/editor-ui/**': proxyOpts
-      }
+      }]
     },
 
     module: {
