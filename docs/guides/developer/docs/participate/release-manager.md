@@ -420,8 +420,11 @@ I am looking forward to your applications on list, please
 voice your interest until <DATE_ROUGHLY_2_WEEKS_IN_THE_FUTURE>.
 ```
 
-In the case where someone steps up and offers to fill in the role of a release manager for the upcoming release, a vote
-is held on the committers list to determine whether the candidates are deemed suitable for the position.
+In many cases only a single pair of users will step forward to fill these roles.  In this case, barring any objection
+from the community, these two will be selected to be release managers automatically.
+
+In the case where more than one pair steps up, a vote is held on the committers list to determine which pair of
+candidates are deemed most suitable for the position.
 
 This email template may be used to initiate the vote:
 

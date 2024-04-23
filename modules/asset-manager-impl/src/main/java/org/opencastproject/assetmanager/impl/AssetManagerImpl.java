@@ -1557,8 +1557,6 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   /**
    * Get the function to update a commented event in the Elasticsearch index.
    *
-   * @param eventId
-   *          The id of the current event
    * @return the function to do the update
    */
   private Function<Optional<Event>, Optional<Event>> getEventUpdateFunction(Snapshot snapshot,

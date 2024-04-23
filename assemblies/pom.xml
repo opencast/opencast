@@ -145,6 +145,7 @@
                   <ant antfile="../resources/build.xml">
                     <target name="basic configuration"/>
                     <target name="job dispatching"/>
+                    <target name="developer mode"/>
                   </ant>
                 </target>
               </configuration>
