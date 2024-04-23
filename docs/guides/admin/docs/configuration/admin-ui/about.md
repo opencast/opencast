@@ -12,3 +12,9 @@ privacy.%{language_code}.html
 The corresponding language codes can be found here: https://github.com/opencast/opencast-admin-interface/blob/admin-ui-picard/app/src/i18n/i18n.ts#L44
 
 If a language is not provided, the english version will be displayed.
+
+To display both links in the footer, set the following in `etc/org.opencastproject.organization-mh_default_org.cfg`:
+
+```
+prop.org.opencastproject.admin.display_about=true
+```
