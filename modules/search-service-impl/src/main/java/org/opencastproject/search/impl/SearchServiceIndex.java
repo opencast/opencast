@@ -429,7 +429,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
           }
         });
         offset += pageSize;
-      } while (page.size() == pageSize);
+      } while (offset <= total);
       //NB: Catching RuntimeException since it can be thrown inside the functional forEach here
     } catch (SearchServiceDatabaseException | RuntimeException e) {
       logIndexRebuildError(logger, "search", e);
