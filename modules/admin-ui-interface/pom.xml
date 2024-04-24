@@ -31,7 +31,6 @@
                             <url>${interface.url}</url>
                             <sha256>${interface.sha256}</sha256>
                             <unpack>true</unpack>
-                            <checkSignature>true</checkSignature>
                             <outputDirectory>target/classes/admin-ui/</outputDirectory>
                         </configuration>
                     </execution>
