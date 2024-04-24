@@ -569,6 +569,7 @@
           <version>5.1.9</version>
           <inherited>true</inherited>
           <configuration>
+            <obrRepository>NONE</obrRepository>
             <instructions>
               <Bundle-Category>opencastproject</Bundle-Category>
               <Bundle-DocURL>https://opencast.org/</Bundle-DocURL>
