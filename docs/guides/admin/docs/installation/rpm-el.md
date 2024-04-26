@@ -70,6 +70,8 @@ Make sure to install it on the node which also serves the admin interface.
 dnf install elasticsearch-oss
 ```
 
+
+
 Opencast automatically configures the search index once it is connected.
 The default configuration will work for a local Elasticsearch with no modifications.
 The only exception for this is to add a configuration to mitigate Log4Shell.

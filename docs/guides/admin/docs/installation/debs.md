@@ -77,6 +77,10 @@ accomplished by running the following:
 If you wish to use the upstream OpenSearch repository directly be aware that Opencast only supported with OpenSearch 1.x
 and will not work with OpenSearch 2.x yet.  Future support for this is forthcoming.
 
+To install the ICU plugin for OpenSearch, run the following:
+
+    bin/opensearch-plugin install analysis-icu
+
 Configure OpenSearch
 --------------------
 
