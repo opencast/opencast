@@ -13,8 +13,8 @@
             "type" : "keyword",
             "fields" : {
                 "sort": {
-                    "type": "keyword",
-                    "normalizer": "sort_normalizer"
+                    "type": "icu_collation_keyword",
+                    "index": false
                 }
             }
         },
@@ -35,8 +35,8 @@
             "type" : "keyword",
             "fields" : {
                 "sort": {
-                    "type": "keyword",
-                    "normalizer": "sort_normalizer"
+                    "type": "icu_collation_keyword",
+                    "index": false
                 }
             }
         },
@@ -50,8 +50,8 @@
         "location": { "type" : "keyword",
             "fields" : {
                 "sort": {
-                    "type": "keyword",
-                    "normalizer": "sort_normalizer"
+                    "type": "icu_collation_keyword",
+                    "index": false
                 }
             }
         },
@@ -67,8 +67,8 @@
         "series_name": { "type" : "keyword",
             "fields" : {
                 "sort": {
-                    "type": "keyword",
-                    "normalizer": "sort_normalizer"
+                    "type": "icu_collation_keyword",
+                    "index": false
                 }
             }
         },

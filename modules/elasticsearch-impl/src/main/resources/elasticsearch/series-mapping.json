@@ -12,8 +12,8 @@
           "title": { "type" : "keyword",
             "fields" : {
               "sort": {
-                "type": "keyword",
-                "normalizer": "sort_normalizer"
+                "type": "icu_collation_keyword",
+                "index": false
               }
             }
           },
@@ -23,8 +23,8 @@
           "description": { "type" : "keyword",
             "fields" : {
               "sort": {
-                "type": "keyword",
-                "normalizer": "sort_normalizer"
+                "type": "icu_collation_keyword",
+                "index": false
               }
             }
           },
@@ -32,8 +32,8 @@
           "subject": { "type" : "keyword",
             "fields" : {
               "sort": {
-                "type": "keyword",
-                "normalizer": "sort_normalizer"
+                "type": "icu_collation_keyword",
+                "index": false
               }
             }
           },
@@ -41,8 +41,8 @@
           "language": { "type" : "keyword",
             "fields" : {
               "sort": {
-                "type": "keyword",
-                "normalizer": "sort_normalizer"
+                "type": "icu_collation_keyword",
+                "index": false
               }
             }
           },
@@ -50,8 +50,8 @@
           "creator": { "type" : "keyword",
             "fields" : {
               "sort": {
-                "type": "keyword",
-                "normalizer": "sort_normalizer"
+                "type": "icu_collation_keyword",
+                "index": false
               }
             }
           },
@@ -59,8 +59,8 @@
           "license": { "type" : "keyword",
             "fields" : {
               "sort": {
-                "type": "keyword",
-                "normalizer": "sort_normalizer"
+                "type": "icu_collation_keyword",
+                "index": false
               }
             }
           },
@@ -74,8 +74,8 @@
           "organizers": { "copy_to" : "organizer", "type" : "keyword",
             "fields" : {
               "sort": {
-                "type": "keyword",
-                "normalizer": "sort_normalizer"
+                "type": "icu_collation_keyword",
+                "index": false
               }
             }
           },
@@ -83,8 +83,8 @@
           "contributors": { "copy_to" : "contributor", "type" : "keyword",
             "fields" : {
               "sort": {
-                "type": "keyword",
-                "normalizer": "sort_normalizer"
+                "type": "icu_collation_keyword",
+                "index": false
               }
             }
           },
@@ -92,8 +92,8 @@
           "publisher": { "type" : "keyword",
             "fields" : {
               "sort": {
-                "type": "keyword",
-                "normalizer": "sort_normalizer"
+                "type": "icu_collation_keyword",
+                "index": false
               }
             }
           },
@@ -101,8 +101,8 @@
           "rights_holder": { "type" : "keyword",
             "fields" : {
               "sort": {
-                "type": "keyword",
-                "normalizer": "sort_normalizer"
+                "type": "icu_collation_keyword",
+                "index": false
               }
             }
           },

@@ -255,9 +255,9 @@ public class AbstractSearchQuery implements SearchQuery {
    *          the order direction, must not be {@code null}
    * @return the updated search query
    */
-  public SearchQuery withNormalizerSortOrder(String field, Order order) {
+  public SearchQuery withSortFieldSortOrder(String field, Order order) {
     sortOrders.put(
-        requireNonNull(field).concat(IndexSchema.NORMALIZER_SORT_FIELD_NAME_EXTENSION),
+        requireNonNull(field).concat(IndexSchema.SORT_FIELD_NAME_EXTENSION),
         requireNonNull(order)
     );
     return this;

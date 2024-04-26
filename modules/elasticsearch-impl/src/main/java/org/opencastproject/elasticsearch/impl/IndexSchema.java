@@ -40,6 +40,6 @@ public interface IndexSchema {
   String TEXT_FUZZY = "text" + FUZZY_FIELDNAME_EXTENSION;
 
   /** Extension for sort field names */
-  String NORMALIZER_SORT_FIELD_NAME_EXTENSION = ".sort";
+  String SORT_FIELD_NAME_EXTENSION = ".sort";
 
 }

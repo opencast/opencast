@@ -533,7 +533,7 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public SeriesSearchQuery sortBySubject(Order order) {
-    withNormalizerSortOrder(SeriesIndexSchema.SUBJECT, order);
+    withSortFieldSortOrder(SeriesIndexSchema.SUBJECT, order);
     return this;
   }
 
@@ -554,7 +554,7 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public SeriesSearchQuery sortByCreator(Order order) {
-    withNormalizerSortOrder(SeriesIndexSchema.CREATOR, order);
+    withSortFieldSortOrder(SeriesIndexSchema.CREATOR, order);
     return this;
   }
 
@@ -575,7 +575,7 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public SeriesSearchQuery sortByPublishers(Order order) {
-    withNormalizerSortOrder(SeriesIndexSchema.PUBLISHERS, order);
+    withSortFieldSortOrder(SeriesIndexSchema.PUBLISHERS, order);
     return this;
   }
 
@@ -596,7 +596,7 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public SeriesSearchQuery sortByDescription(Order order) {
-    withNormalizerSortOrder(SeriesIndexSchema.DESCRIPTION, order);
+    withSortFieldSortOrder(SeriesIndexSchema.DESCRIPTION, order);
     return this;
   }
 
@@ -617,7 +617,7 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public SeriesSearchQuery sortByLanguage(Order order) {
-    withNormalizerSortOrder(SeriesIndexSchema.LANGUAGE, order);
+    withSortFieldSortOrder(SeriesIndexSchema.LANGUAGE, order);
     return this;
   }
 
@@ -638,7 +638,7 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public SeriesSearchQuery sortByRightsHolder(Order order) {
-    withNormalizerSortOrder(SeriesIndexSchema.RIGHTS_HOLDER, order);
+    withSortFieldSortOrder(SeriesIndexSchema.RIGHTS_HOLDER, order);
     return this;
   }
 
@@ -659,7 +659,7 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public SeriesSearchQuery sortByLicense(Order order) {
-    withNormalizerSortOrder(SeriesIndexSchema.LICENSE, order);
+    withSortFieldSortOrder(SeriesIndexSchema.LICENSE, order);
     return this;
   }
 
@@ -680,7 +680,7 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public SeriesSearchQuery sortByContributors(Order order) {
-    withNormalizerSortOrder(SeriesIndexSchema.CONTRIBUTORS, order);
+    withSortFieldSortOrder(SeriesIndexSchema.CONTRIBUTORS, order);
     return this;
   }
 
@@ -743,7 +743,7 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public SeriesSearchQuery sortByOrganizers(Order order) {
-    withNormalizerSortOrder(SeriesIndexSchema.ORGANIZERS, order);
+    withSortFieldSortOrder(SeriesIndexSchema.ORGANIZERS, order);
     return this;
   }
 
@@ -764,7 +764,7 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public SeriesSearchQuery sortByTitle(Order order) {
-    withNormalizerSortOrder(SeriesIndexSchema.TITLE, order);
+    withSortFieldSortOrder(SeriesIndexSchema.TITLE, order);
     return this;
   }
 

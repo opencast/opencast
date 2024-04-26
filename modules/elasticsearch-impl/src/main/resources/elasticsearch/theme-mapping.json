@@ -16,8 +16,8 @@
         "creator": { "type" : "keyword",
             "fields" : {
                 "sort": {
-                    "type": "keyword",
-                    "normalizer": "sort_normalizer"
+                    "type": "icu_collation_keyword",
+                    "index": false
                 }
             }
         },
@@ -25,8 +25,8 @@
         "name": { "type" : "keyword",
             "fields" : {
                 "sort": {
-                    "type": "keyword",
-                    "normalizer": "sort_normalizer"
+                    "type": "icu_collation_keyword",
+                    "index": false
                 }
             }
         },
@@ -34,8 +34,8 @@
         "description": { "type" : "keyword",
             "fields" : {
                 "sort": {
-                    "type": "keyword",
-                    "normalizer": "sort_normalizer"
+                    "type": "icu_collation_keyword",
+                    "index": false
                 }
             }
         },
