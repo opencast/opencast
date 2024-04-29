@@ -400,13 +400,13 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
     try {
       int total = persistence.countMediaPackages();
       int pageSize = 50;
-      int offset = 0;
-      AtomicInteger current = new AtomicInteger(0);
+      int pageOffset = 0;
+      AtomicInteger current = new AtomicInteger(1);
       logIndexRebuildBegin(logger, esIndex.getIndexName(), total, "search");
       List<Tuple<MediaPackage, String>> page = null;
 
       do {
-        page = persistence.getAllMediaPackages(pageSize, offset).collect(Collectors.toList());
+        page = persistence.getAllMediaPackages(pageSize, pageOffset).collect(Collectors.toList());
         page.forEach(tuple -> {
           try {
             MediaPackage mediaPackage = tuple.getA();
@@ -428,8 +428,8 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
             throw new RuntimeException("Internal Index Rebuild Failure", e);
           }
         });
-        offset += pageSize;
-      } while (offset <= total);
+        pageOffset += 1;
+      } while (pageOffset * pageSize <= total);
       //NB: Catching RuntimeException since it can be thrown inside the functional forEach here
     } catch (SearchServiceDatabaseException | RuntimeException e) {
       logIndexRebuildError(logger, "search", e);
