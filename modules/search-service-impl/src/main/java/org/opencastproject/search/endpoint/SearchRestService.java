@@ -224,6 +224,47 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
   }
 
   @DELETE
+  @Path("removeSynchronously/{id}")
+  @Produces(MediaType.APPLICATION_XML)
+  @RestQuery(
+      name = "remove",
+      description = "Removes a mediapackage from the search index.",
+      pathParameters = {
+          @RestParameter(
+              description = "The media package ID to remove from the search index.",
+              isRequired = true,
+              name = "id",
+              type = RestParameter.Type.STRING
+          )
+      },
+      responses = {
+          @RestResponse(description = "OK", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(
+              description = "The mediapackage could not be delete by you or does not exist",
+              responseCode = HttpServletResponse.SC_BAD_REQUEST
+          ),
+          @RestResponse(
+              description = "There has been an internal error and the mediapackage could not be deleted",
+              responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR
+          )
+      },
+      returnDescription = "Nothing"
+  )
+  public Response removeSynchronously(@PathParam("id") String mediaPackageId) throws SearchException {
+    try {
+      boolean removed = searchService.deleteSynchronously(mediaPackageId);
+      if (removed) {
+        return Response.ok().build();
+      } else {
+        return Response.status(Response.Status.BAD_REQUEST).build();
+      }
+    } catch (Exception e) {
+      logger.info("Unable to remove mediapackage {} from search index: {}", mediaPackageId, e.getMessage());
+      return Response.serverError().build();
+    }
+  }
+
+  @DELETE
   @Path("/seriesId/{seriesid}")
   @Produces(MediaType.APPLICATION_XML)
   @RestQuery(

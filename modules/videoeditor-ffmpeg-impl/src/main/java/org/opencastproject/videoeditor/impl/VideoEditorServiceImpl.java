@@ -31,6 +31,8 @@ import org.opencastproject.job.api.JobBarrier;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
+import org.opencastproject.mediapackage.MediaPackageReference;
+import org.opencastproject.mediapackage.MediaPackageReferenceImpl;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.security.api.OrganizationDirectoryService;
@@ -193,12 +195,15 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
     }
     MediaPackageElementFlavor sourceTrackFlavor = null;
     String sourceTrackUri = null;
+    MediaPackageReference ref = null;
     // get source track metadata
     for (SmilMediaParam param : trackParamGroup.getParams()) {
       if (SmilMediaParam.PARAM_NAME_TRACK_SRC.equals(param.getName())) {
         sourceTrackUri = param.getValue();
       } else if (SmilMediaParam.PARAM_NAME_TRACK_FLAVOR.equals(param.getName())) {
         sourceTrackFlavor = MediaPackageElementFlavor.parseFlavor(param.getValue());
+      } else if (SmilMediaParam.PARAM_NAME_TRACK_ID.equals(param.getName())) {
+        ref = new MediaPackageReferenceImpl("track", param.getValue());
       }
     }
     File sourceFile;
@@ -411,6 +416,7 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
       Track editedTrack = (Track) MediaPackageElementParser.getFromXml(inspectionJob.getPayload());
       logger.info("Finished editing track {}", editedTrack);
       editedTrack.setIdentifier(newTrackId);
+      editedTrack.setReference(ref);
       if (videoclips.size() > 0) {
         editedTrack.setFlavor(new MediaPackageElementFlavor(sourceTrackFlavor.getType(), SINK_FLAVOR_SUBTYPE));
       }
@@ -418,7 +424,7 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
         String extension = FilenameUtils.getExtension(sourceTrackUri);
         if (VideoEditorProperties.WEBVTT_EXTENSION.equals(extension)) {
           editedTrack.setFlavor(new MediaPackageElementFlavor(sourceTrackFlavor.getType(),
-                  sourceTrackFlavor.getSubtype() + "+" + SINK_FLAVOR_SUBTYPE));
+              sourceTrackFlavor.getSubtype() + "+" + SINK_FLAVOR_SUBTYPE));
         }
       }
 
