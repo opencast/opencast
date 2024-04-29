@@ -43,7 +43,7 @@ import java.util.Map;
 /**
  * Base implementation for search queries.
  */
-public class AbstractSearchQuery implements SearchQuery {
+public abstract class AbstractSearchQuery implements SearchQuery {
 
   /** The document types */
   protected List<String> types = new ArrayList<>();
@@ -242,24 +242,7 @@ public class AbstractSearchQuery implements SearchQuery {
 
   @Override
   public SearchQuery withSortOrder(String field, Order order) {
-    sortOrders.put(requireNonNull(field), requireNonNull(order));
-    return this;
-  }
-
-  /**
-   * Sort the result set by the sort multi field and the given order. The insertion-order is kept.
-   *
-   * @param field
-   *          the field name, must not be {@code null}
-   * @param order
-   *          the order direction, must not be {@code null}
-   * @return the updated search query
-   */
-  public SearchQuery withSortFieldSortOrder(String field, Order order) {
-    sortOrders.put(
-        requireNonNull(field).concat(IndexSchema.SORT_FIELD_NAME_EXTENSION),
-        requireNonNull(order)
-    );
+    sortOrders.put(requireNonNull(sortOrderFieldName(field)), requireNonNull(order));
     return this;
   }
 
@@ -270,13 +253,14 @@ public class AbstractSearchQuery implements SearchQuery {
 
   @Override
   public Order getSortOrder(String field) {
-    var order = Order.None;
-    if (sortOrders.containsKey(field)) {
-      order = sortOrders.get(field);
-    } else if (sortOrders.containsKey(field.concat(IndexSchema.SORT_FIELD_NAME_EXTENSION))) {
-      order = sortOrders.get(field.concat(IndexSchema.SORT_FIELD_NAME_EXTENSION));
+    String sortField = sortOrderFieldName(field);
+    if (!sortOrders.containsKey(sortField)) {
+      return Order.None;
     }
-    return order;
+
+    return sortOrders.get(sortField);
   }
+
+  protected abstract String sortOrderFieldName(String field);
 
 }

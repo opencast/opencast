@@ -24,6 +24,7 @@ package org.opencastproject.elasticsearch.index.objects.event;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 
 import org.opencastproject.elasticsearch.impl.AbstractSearchQuery;
+import org.opencastproject.elasticsearch.impl.IndexSchema;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.Permissions.Action;
 import org.opencastproject.security.api.User;
@@ -35,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -82,10 +84,30 @@ public class EventSearchQuery extends AbstractSearchQuery {
   private String agentId = null;
   private Date technicalStartTime = null;
   private Date technicalEndTime = null;
-  private List<String> technicalPresenters = new ArrayList<String>();
+  private final List<String> technicalPresenters = new ArrayList<String>();
+
+  private static final Map<String, String> SORT_FIELDS = Map.of(
+          EventIndexSchema.TITLE, EventIndexSchema.TITLE.concat(IndexSchema.SORT_FIELD_NAME_EXTENSION),
+          EventIndexSchema.CONTRIBUTOR, EventIndexSchema.CONTRIBUTOR.concat(IndexSchema.SORT_FIELD_NAME_EXTENSION),
+          EventIndexSchema.PRESENTER, EventIndexSchema.PRESENTER.concat(IndexSchema.SORT_FIELD_NAME_EXTENSION),
+          EventIndexSchema.SUBJECT, EventIndexSchema.SUBJECT.concat(IndexSchema.SORT_FIELD_NAME_EXTENSION),
+          EventIndexSchema.DESCRIPTION, EventIndexSchema.DESCRIPTION.concat(IndexSchema.SORT_FIELD_NAME_EXTENSION),
+          EventIndexSchema.LOCATION, EventIndexSchema.LOCATION.concat(IndexSchema.SORT_FIELD_NAME_EXTENSION),
+          EventIndexSchema.SERIES_NAME, EventIndexSchema.SERIES_NAME.concat(IndexSchema.SORT_FIELD_NAME_EXTENSION),
+          EventIndexSchema.CREATOR, EventIndexSchema.CREATOR.concat(IndexSchema.SORT_FIELD_NAME_EXTENSION),
+          EventIndexSchema.PUBLISHER, EventIndexSchema.PUBLISHER.concat(IndexSchema.SORT_FIELD_NAME_EXTENSION)
+  );
 
   @SuppressWarnings("unused")
   private EventSearchQuery() {
+  }
+
+  @Override
+  protected String sortOrderFieldName(String field) {
+    if (SORT_FIELDS.containsKey(field)) {
+      return SORT_FIELDS.get(field);
+    }
+    return field;
   }
 
   /**
@@ -1077,7 +1099,7 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery sortByTitle(Order order) {
-    withSortFieldSortOrder(EventIndexSchema.TITLE, order);
+    withSortOrder(EventIndexSchema.TITLE, order);
     return this;
   }
 
@@ -1098,7 +1120,7 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery sortByPresenter(Order order) {
-    withSortFieldSortOrder(EventIndexSchema.PRESENTER, order);
+    withSortOrder(EventIndexSchema.PRESENTER, order);
     return this;
   }
 
@@ -1119,7 +1141,7 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the updated query
    */
   public EventSearchQuery sortByLocation(Order order) {
-    withSortFieldSortOrder(EventIndexSchema.LOCATION, order);
+    withSortOrder(EventIndexSchema.LOCATION, order);
     return this;
   }
 
@@ -1140,7 +1162,7 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the updated query
    */
   public EventSearchQuery sortBySeriesName(Order order) {
-    withSortFieldSortOrder(EventIndexSchema.SERIES_NAME, order);
+    withSortOrder(EventIndexSchema.SERIES_NAME, order);
     return this;
   }
 
