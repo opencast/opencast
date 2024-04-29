@@ -402,7 +402,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
       int pageSize = 50;
       int pageOffset = 0;
       AtomicInteger current = new AtomicInteger(1);
-      logIndexRebuildBegin(logger, esIndex.getIndexName(), total, "search");
+      logIndexRebuildBegin(logger, total, "search");
       List<Tuple<MediaPackage, String>> page = null;
 
       do {
@@ -420,10 +420,10 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
                 .stream().reduce(new AccessControlList(acl.getEntries()), AccessControlList::mergeActions);
             logger.debug("Updating series ACL with merged access control list: {}", seriesAcl);
 
-            logIndexRebuildProgress(logger, esIndex.getIndexName(), total, current.getAndIncrement(), pageSize);
+            logIndexRebuildProgress(logger, total, current.getAndIncrement(), pageSize);
             indexMediaPackage(mediaPackage, acl, modificationDate, deletionDate);
           } catch (SearchServiceDatabaseException | UnauthorizedException | NotFoundException e) {
-            logIndexRebuildError(logger, "search", total, current.get(), e);
+            logIndexRebuildError(logger, total, current.get(), e);
             //NB: Runtime exception thrown to escape the functional interfacing
             throw new RuntimeException("Internal Index Rebuild Failure", e);
           }
@@ -432,7 +432,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
       } while (pageOffset * pageSize <= total);
       //NB: Catching RuntimeException since it can be thrown inside the functional forEach here
     } catch (SearchServiceDatabaseException | RuntimeException e) {
-      logIndexRebuildError(logger, "search", e);
+      logIndexRebuildError(logger, e);
       throw new IndexRebuildException("Index Rebuild Failure", e);
     }
   }
