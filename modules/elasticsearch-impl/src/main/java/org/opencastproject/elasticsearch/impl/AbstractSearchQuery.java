@@ -270,11 +270,13 @@ public class AbstractSearchQuery implements SearchQuery {
 
   @Override
   public Order getSortOrder(String field) {
-    if (!sortOrders.containsKey(field)) {
-      return Order.None;
+    var order = Order.None;
+    if (sortOrders.containsKey(field)) {
+      order = sortOrders.get(field);
+    } else if (sortOrders.containsKey(field.concat(IndexSchema.SORT_FIELD_NAME_EXTENSION))) {
+      order = sortOrders.get(field.concat(IndexSchema.SORT_FIELD_NAME_EXTENSION));
     }
-
-    return sortOrders.get(field);
+    return order;
   }
 
 }
