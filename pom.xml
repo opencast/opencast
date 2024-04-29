@@ -39,7 +39,7 @@
     <httpcomponents-httpcore.version>4.4.16</httpcomponents-httpcore.version>
     <jackson.version>2.16.0</jackson.version>
     <jakarta.mail.version>1.6.7</jakarta.mail.version>
-    <java.release>11</java.release>
+    <java.release>17</java.release>
     <javadoc-plugin.version>3.3.1</javadoc-plugin.version>
     <jersey.version>2.29.1</jersey.version>
     <jettison.version>1.5.4</jettison.version>
@@ -323,7 +323,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.11.0</version>
+        <version>3.13.0</version>
         <configuration>
           <release>${java.release}</release>
           <encoding>UTF-8</encoding>
@@ -1149,7 +1149,7 @@
       <dependency>
         <groupId>org.easymock</groupId>
         <artifactId>easymock</artifactId>
-        <version>5.1.0</version>
+        <version>5.2.0</version>
         <scope>test</scope>
       </dependency>
       <dependency>

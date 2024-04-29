@@ -25,8 +25,8 @@ jobs:
     strategy:
       matrix:
         java:
-          - 11
           - 17
+          - 21
     name: build (java ${{ matrix.java }})
     runs-on: ubuntu-22.04
     steps:
