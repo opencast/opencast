@@ -420,7 +420,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
                 .stream().reduce(new AccessControlList(acl.getEntries()), AccessControlList::mergeActions);
             logger.debug("Updating series ACL with merged access control list: {}", seriesAcl);
 
-            logIndexRebuildProgress(logger, total, current.getAndIncrement(), pageSize);
+            current.getAndIncrement();
             indexMediaPackage(mediaPackage, acl, modificationDate, deletionDate);
           } catch (SearchServiceDatabaseException | UnauthorizedException | NotFoundException e) {
             logIndexRebuildError(logger, total, current.get(), e);
@@ -428,6 +428,8 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
             throw new RuntimeException("Internal Index Rebuild Failure", e);
           }
         });
+        //Current is the *page* index, so we remove one since each page only has pageSize entries
+        logIndexRebuildProgress(logger, total, current.get() - 1, pageSize);
         pageOffset += 1;
       } while (pageOffset * pageSize <= total);
       //NB: Catching RuntimeException since it can be thrown inside the functional forEach here
