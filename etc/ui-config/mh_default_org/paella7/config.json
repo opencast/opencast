@@ -70,7 +70,7 @@
             "presentation/player+preview"
         ],
         "theme": "custom_theme",
-        "preventVideoDownload": true
+        "preventVideoDownload": false
     },
 
     "cookieConsent": [
