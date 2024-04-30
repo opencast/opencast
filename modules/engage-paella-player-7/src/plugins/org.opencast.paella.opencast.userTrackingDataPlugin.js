@@ -39,8 +39,13 @@ export default class OpencastUserTrackingDataPlugin extends DataPlugin {
   }
 
   async write(context, { id }, data) {
-    const currentTime = await this.player.videoContainer.currentTime();
-    const playing = !(await this.player.videoContainer.paused());
+    let currentTime = 0;
+    let playing = false;
+    // If player is ready, it's safe to request it's current time
+    if (this.player.ready) {
+      currentTime = await this.player.videoContainer.currentTime();
+      playing = !(await this.player.videoContainer.paused());
+    }
     this.player.log.debug(`Logging event for video id ${ id } at time: ${ currentTime }`);
 
     const opencastLog = {
