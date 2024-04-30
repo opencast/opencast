@@ -89,6 +89,17 @@ function getStreamType(track) {
   return result;
 }
 
+function getTags(mpe) {
+  let tags = [];
+  if (mpe.tags && mpe.tags.tag) {
+    tags = mpe.tags.tag;
+    if (!(tags instanceof Array)) {
+      tags = [tags];
+    }
+  }
+  return tags;
+}
+
 function getSourceData(track, config) {
   let data = null;
   // Get substring of type before slash
@@ -101,7 +112,7 @@ function getSourceData(track, config) {
         type: streamType.streamType,
         content: type,
         flavor: track.type,
-        tags: track.tags.tag
+        tags: getTags(track)
       };
     }
   }
@@ -196,20 +207,22 @@ function mergeSources(sources, config) {
     if (!stream) {
       // check which video canvases to use
       let canvas = [];
-      for (var key of Object.keys(config.videoCanvas)) {
-        let canvasConfig = config.videoCanvas[key];
-        // check if the flavor matches
-        if (canvasConfig.flavor && matchesFlavor(flavor, canvasConfig.flavor)) {
-          canvas.push(key);
-          continue;
-        }
+      if (config.videoCanvas) {
+        for (var key of Object.keys(config.videoCanvas)) {
+          let canvasConfig = config.videoCanvas[key];
+          // check if the flavor matches
+          if (canvasConfig.flavor && matchesFlavor(flavor, canvasConfig.flavor)) {
+            canvas.push(key);
+            continue;
+          }
 
-        // check if a tag matches
-        if (canvasConfig.tag) {
-          for (let i = 0; i < tags.length; i++) {
-            if (tags[i] === canvasConfig.tag) {
-              canvas.push(key);
-              break;
+          // check if a tag matches
+          if (canvasConfig.tag) {
+            for (let i = 0; i < tags.length; i++) {
+              if (tags[i] === canvasConfig.tag) {
+                canvas.push(key);
+                break;
+              }
             }
           }
         }
@@ -385,22 +398,18 @@ function readCaptions(potentialNewCaptions, captions) {
         let captions_closed = '';
         const captions_subtype = captions_match[1];
 
-        if (potentialCaption.tags && potentialCaption.tags.tag) {
-          if (!(potentialCaption.tags.tag instanceof Array)) {
-            potentialCaption.tags.tag = [potentialCaption.tags.tag];
+        let tags = getTags(potentialCaption);
+        tags.forEach((tag)=>{
+          if (tag.startsWith('lang:')){
+            captions_lang = tag.substring('lang:'.length);
           }
-          potentialCaption.tags.tag.forEach((tag)=>{
-            if (tag.startsWith('lang:')){
-              captions_lang = tag.substring('lang:'.length);
-            }
-            if (tag.startsWith('generator-type:') && tag.substring('generator-type:'.length) === 'auto') {
-              captions_generated = ' (' + translate('automatically generated') + ')';
-            }
-            if (tag.startsWith('type:') && tag.substring('type:'.length) === 'closed-caption') {
-              captions_closed = '[CC] ';
-            }
-          });
-        }
+          if (tag.startsWith('generator-type:') && tag.substring('generator-type:'.length) === 'auto') {
+            captions_generated = ' (' + translate('automatically generated') + ')';
+          }
+          if (tag.startsWith('type:') && tag.substring('type:'.length) === 'closed-caption') {
+            captions_closed = '[CC] ';
+          }
+        });
 
         let captions_format = potentialCaption.url.split('.').pop();
         // Backwards support for 'captions/dfxp' flavored xml files
