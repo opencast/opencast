@@ -40,6 +40,13 @@ of translations just below.
 
 In case you have questions, we are happy to answer them on the Opencast Users mailing list.
 
+I need to update the wording of the source translation, what happens?
+---------------------------------------------------------------------
+
+From time to time a source translation key (current `en_US`) needs to be updated.  Whether this changes the meaning of
+the source text or not, this will mark all of the translated versions as requiring re-translation.  Note that modifying
+the meaning of the source key is not allowed in non-`develop` branches, aside from exceptional cases.
+
 Inclusion and Exclusion of Translations
 ---------------------------------------
 
