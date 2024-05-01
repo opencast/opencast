@@ -143,7 +143,6 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Build-Number>${buildNumber}</Build-Number>
             <Export-Package>
               org.opencastproject.playlists.persistence;version=${project.version},
               org.opencastproject.playlists;version=${project.version},
