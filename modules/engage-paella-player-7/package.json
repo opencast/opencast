@@ -37,7 +37,7 @@
   },
   "dependencies": {
     "paella-basic-plugins": "^1.44.7",
-    "paella-core": "^1.46.6",
+    "paella-core": "^1.48.2",
     "paella-skins": "^1.32.4",
     "paella-slide-plugins": "^1.41.4",
     "paella-webgl-plugins": "^1.41.0",
