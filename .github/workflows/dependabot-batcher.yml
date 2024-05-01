@@ -26,7 +26,7 @@ jobs:
     steps:
   # Batches Dependabot PRs into one by merging them into a combined branch, then raising a new PR
       - name: 'Dependabot Batcher'
-        uses: Legal-and-General/dependabot-batcher@v1.0.3
+        uses: Legal-and-General/dependabot-batcher@v1.0.4
         with:
           token: ${{ secrets.GITHUB_TOKEN }} #required
           baseBranchName: 'r/13.x' #optional

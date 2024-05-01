@@ -48,7 +48,7 @@
     <junit5.version>5.10.2</junit5.version>
     <karaf.version>4.4.4</karaf.version>
     <lucene.version>8.7.0</lucene.version>
-    <node.version>v18.16.0</node.version>
+    <node.version>v20.12.2</node.version>
     <osgi.core.version>8.0.0</osgi.core.version>
     <osgi.annotation.version>8.1.0</osgi.annotation.version>
     <org.osgi.service.component.version>1.5.1</org.osgi.service.component.version>
