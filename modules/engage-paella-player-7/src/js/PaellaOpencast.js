@@ -230,6 +230,15 @@ export class PaellaOpencast extends Paella {
     }
 
     bindEvent(paella, Events.PLAYER_LOADED, async () => {
+      // Prevent video download: Disable context menu
+      if (paella?.config?.opencast?.preventVideoDownload == true) {
+        paella.videoContainer.streamProvider.players.forEach(player => {
+          player.video?.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+          });
+        });
+      }
+
       // Enable trimming
       // Retrieve video duration in case a default trim end time is needed
       const videoDuration = paella.videoManifest?.metadata?.duration;

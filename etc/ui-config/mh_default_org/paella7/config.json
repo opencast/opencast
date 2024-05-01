@@ -69,7 +69,8 @@
             "presenter/player+preview",
             "presentation/player+preview"
         ],
-        "theme": "custom_theme"
+        "theme": "custom_theme",
+        "preventVideoDownload": false
     },
 
     "cookieConsent": [
