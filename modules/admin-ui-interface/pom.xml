@@ -47,7 +47,6 @@
         <configuration>
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Build-Number>${buildNumber}</Build-Number>
             <Private-Package>admin-ui.*</Private-Package>
             <Http-Alias>/admin-ui</Http-Alias>
             <Http-Classpath>/admin-ui</Http-Classpath>
