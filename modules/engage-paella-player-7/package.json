@@ -39,6 +39,7 @@
     "paella-basic-plugins": "^1.44.7",
     "paella-core": "^1.48.2",
     "paella-skins": "^1.48.0",
+    "paella-mp4multiquality-plugin": "^1.47.1",
     "paella-slide-plugins": "^1.41.4",
     "paella-webgl-plugins": "^1.41.0",
     "paella-user-tracking": "^1.42.2",

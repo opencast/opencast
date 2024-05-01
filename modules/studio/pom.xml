@@ -31,7 +31,6 @@
               <url>${opencast.studio.url}</url>
               <sha256>${opencast.studio.sha256}</sha256>
               <unpack>true</unpack>
-              <checkSignature>true</checkSignature>
               <outputDirectory>${project.build.directory}/classes/opencast-studio/</outputDirectory>
             </configuration>
           </execution>
