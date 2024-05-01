@@ -104,6 +104,14 @@ const initParams = {
   },
 
   loadVideoManifest: async function (url, config, player) {
+    const redirectToAuthPage = async () => {
+      location.href = getUrlFromOpencastPaella('auth.html?redirect=' + encodeURIComponent(window.location.href));
+      // Create a loader spinner.
+      player._loader = new player.initParams.Loader(player);
+      player._loader.create();
+      // We need to interrupt the player loading to redirect the user to the auth page.
+      await new Promise(() => {});
+    };
     // check cookie consent (if enabled)
     const cookieConsent = config?.opencast?.cookieConsent?.enable ?? true;
     const cookieConsentConfig = config?.opencast?.cookieConsent?.config ?? {
@@ -143,7 +151,9 @@ const initParams = {
 
       if (!me.roles.includes('ROLE_USER')) {
         player.log.info('Video not found and user is not authenticated. Try to log in.');
-        location.href = getUrlFromOpencastPaella('auth.html?redirect=' + encodeURIComponent(window.location.href));
+        await redirectToAuthPage();
+        // This Error should not happen, as the user is redirected to the auth page.
+        throw Error('Video not found and user is not authenticated. Log in and try again.');
       }
       else {
         // TODO: the video does not exist or the user can't see it
@@ -223,6 +233,15 @@ export class PaellaOpencast extends Paella {
     }
 
     bindEvent(paella, Events.PLAYER_LOADED, async () => {
+      // Prevent video download: Disable context menu
+      if (paella?.config?.opencast?.preventVideoDownload == true) {
+        paella.videoContainer.streamProvider.players.forEach(player => {
+          player.video?.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+          });
+        });
+      }
+
       // Enable trimming
       // Retrieve video duration in case a default trim end time is needed
       const videoDuration = paella.videoManifest?.metadata?.duration;

@@ -59,12 +59,19 @@
         },
         "previewAttachment": "presentation/segment+preview",
         "mainAudioContent": "presenter",
+        "contentTypes": {
+            "presentation/delivery": "presentation",
+            "presenter/delivery": "presenter",
+            "presentation/preview": "presentation",
+            "presenter/preview": "presenter"
+        },
         "videoPreviewAttachment": [
             "presenter/player+preview",
             "presentation/player+preview"
         ],
         "theme": "custom_theme",
-        "hideTimeLineOnLive": false
+        "hideTimeLineOnLive": false,
+        "preventVideoDownload": false
     },
 
     "cookieConsent": [

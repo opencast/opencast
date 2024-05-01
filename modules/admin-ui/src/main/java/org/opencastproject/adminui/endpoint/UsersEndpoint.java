@@ -163,6 +163,15 @@ public class UsersEndpoint {
   }
 
   /**
+   * @param jpaUserReferenceProvider
+   *          the user provider to set
+   */
+  @Reference
+  public void setJpaUserReferenceProvider(JpaUserReferenceProvider jpaUserReferenceProvider) {
+    this.jpaUserReferenceProvider = jpaUserReferenceProvider;
+  }
+
+  /**
    * @param jpaUserAndRoleProvider
    *          the user provider to set
    */
@@ -439,7 +448,7 @@ public class UsersEndpoint {
 
     try {
       try {
-        jpaUserAndRoleProvider.deleteUser(username, organization.getId());
+        jpaUserReferenceProvider.deleteUser(username, organization.getId());
       } catch (NotFoundException e) {
         userReferenceNotFound = true;
       }
