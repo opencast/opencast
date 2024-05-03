@@ -38,6 +38,7 @@
     <bundle>mvn:com.entwinemedia.common/functional/${functional.version}</bundle>
     <bundle>mvn:com.fasterxml.jackson.core/jackson-core/${jackson.version}</bundle>
     <bundle>mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-yaml/${jackson.version}</bundle>
+    <bundle>mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-xml/${jackson.version}</bundle>
     <bundle>mvn:com.fasterxml.jackson.module/jackson-module-jaxb-annotations/${jackson.version}</bundle>
     <bundle>mvn:org.yaml/snakeyaml/2.2</bundle>
     <bundle>mvn:com.google.guava/guava/${guava.version}</bundle>
