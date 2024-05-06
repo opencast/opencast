@@ -27,6 +27,7 @@ import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
 import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildException;
 import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
@@ -77,9 +78,11 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -237,6 +240,44 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
     DublinCoreCatalog dc = null == delDate
         ? DublinCoreUtil.loadEpisodeDublinCore(workspace, mediaPackage).orElse(DublinCores.mkSimple())
         : DublinCores.mkSimple();
+
+    List<DublinCoreCatalog> seriesList = Collections.emptyList();
+    if (dc.hasValue(DublinCore.PROPERTY_IS_PART_OF)) {
+      //Find the series (if any), filter for those which exist to prevent linking non-existent series
+      List<DublinCoreValue> seriesIds = dc.get(DublinCore.PROPERTY_IS_PART_OF);
+      seriesList = seriesIds.stream().map(DublinCoreValue::getValue).map(s -> {
+        try {
+          return seriesService.getSeries(s);
+        } catch (NotFoundException e) {
+          logger.warn("Series {} not found during index of event {}, omitting the link from the indexed data", s,
+              mediaPackageId);
+        } catch (UnauthorizedException e) {
+          logger.warn("Not authorized for series {} during index of event {}, omitting the link from the indexed data",
+              s, mediaPackageId);
+        } catch (SeriesException e) {
+          throw new SearchException(e);
+        }
+        return null;
+      }).filter(Objects::nonNull).collect(Collectors.toList());
+
+      //Get the list of filtered series IDs from the list of filtered series
+      List<String> filteredSeriesIds = seriesList.stream().map(s -> {
+        return s.getFirst(DublinCore.PROPERTY_IDENTIFIER);
+      }).collect(Collectors.toList());
+
+      //Note that if a series is listed in the input, but is not present in the series service then this will clear it
+      // from the indexed data.  This is deliberate, since a series which does not exist should not be listed as an ep's
+      // series.  This (IMO) is a data consistency issue - it should not happen, but better to handle it than break.
+      if (0 == filteredSeriesIds.size()) {
+        dc.remove(DublinCore.PROPERTY_IS_PART_OF);
+      } else {
+        //An episode is only part of *one* series, right?!
+        for (String sid : filteredSeriesIds) {
+          dc.set(DublinCore.PROPERTY_IS_PART_OF, sid);
+        }
+      }
+    }
+
     String orgId = securityService.getOrganization().getId();
     SearchResult item = new SearchResult(SearchService.IndexEntryType.Episode, dc, acl, orgId, mediaPackage,
         null != modDate ? modDate.toInstant() : Instant.now(),
@@ -253,26 +294,22 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
     }
 
     // Elasticsearch series
-    for (DublinCoreValue seriesId : item.getDublinCore().get(DublinCoreCatalog.PROPERTY_IS_PART_OF)) {
-      try {
-        DublinCoreCatalog seriesDc = seriesService.getSeries(seriesId.getValue());
-        AccessControlList seriesAcl = persistence.getAccessControlLists(seriesId.getValue(), mediaPackageId).stream()
-            .reduce(new AccessControlList(acl.getEntries()), AccessControlList::mergeActions);
-        item = new SearchResult(SearchService.IndexEntryType.Series, seriesDc, seriesAcl, orgId,
-            null, Instant.now(), null);
+    for (DublinCoreCatalog seriesDc : seriesList) {
+      String seriesId = seriesDc.getFirst(DublinCore.PROPERTY_IDENTIFIER);
+      AccessControlList seriesAcl = persistence.getAccessControlLists(seriesId, mediaPackageId).stream()
+          .reduce(new AccessControlList(acl.getEntries()), AccessControlList::mergeActions);
+      item = new SearchResult(SearchService.IndexEntryType.Series, seriesDc, seriesAcl, orgId,
+          null, Instant.now(), null);
 
-        Map<String, Object> seriesData = item.dehydrateForIndex();
-        try {
-          var request = new IndexRequest(INDEX_NAME);
-          request.id(seriesId.getValue());
-          request.source(seriesData);
-          esIndex.getClient().index(request, RequestOptions.DEFAULT);
-          logger.debug("Indexed series {} related to episode {}", seriesId.getValue(), mediaPackageId);
-        } catch (IOException e) {
-          throw new SearchException(e);
-        }
-      } catch (NotFoundException | SeriesException e) {
-        logger.warn("Could not get series {} from series service. Skipping its publication", seriesId);
+      Map<String, Object> seriesData = item.dehydrateForIndex();
+      try {
+        var request = new IndexRequest(INDEX_NAME);
+        request.id(seriesId);
+        request.source(seriesData);
+        esIndex.getClient().index(request, RequestOptions.DEFAULT);
+        logger.debug("Indexed series {} related to episode {}", seriesId, mediaPackageId);
+      } catch (IOException e) {
+        throw new SearchException(e);
       }
     }
   }
