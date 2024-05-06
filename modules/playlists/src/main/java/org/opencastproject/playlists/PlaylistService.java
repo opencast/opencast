@@ -56,6 +56,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Component(
@@ -170,6 +171,19 @@ public class PlaylistService {
       return playlists;
     } catch (PlaylistDatabaseException e) {
       throw new IllegalStateException("Could not get playlist from database with id ");
+    }
+  }
+
+  public List<Playlist> getAllForAdministrativeRead(Date from, Date to, int limit)
+          throws IllegalStateException, UnauthorizedException {
+    if (!this.securityService.getUser().hasRole(GLOBAL_ADMIN_ROLE)) {
+      throw new UnauthorizedException("Only admins can call this method");
+    }
+
+    try {
+      return persistence.getAllForAdministrativeRead(from, to, limit);
+    } catch (PlaylistDatabaseException e) {
+      throw new IllegalStateException("Could not get playlist from database", e);
     }
   }
 

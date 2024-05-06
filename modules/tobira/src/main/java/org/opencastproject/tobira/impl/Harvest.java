@@ -21,6 +21,7 @@
 
 package org.opencastproject.tobira.impl;
 
+import org.opencastproject.playlists.PlaylistService;
 import org.opencastproject.search.api.SearchQuery;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.AuthorizationService;
@@ -38,6 +39,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -73,12 +75,15 @@ final class Harvest {
       SearchService searchService,
       SeriesService seriesService,
       AuthorizationService authorizationService,
+      PlaylistService playlistService,
       Workspace workspace
   ) throws UnauthorizedException, SeriesException {
-    // Retrieve episodes from index.
+    // ===== Retrieve information about events, series, and playlists =============================
     //
-    // We actually fetch `preferredAmount + 1` to get some useful extra information: whether there
-    // are more events and if so, what timestamp that extra event was modified at.
+    // In this step, we always request `preferredAmount + 1` in order to figure out the values for
+    // `hasMore` and `includesItemsUntil` more precisely.
+
+    // Retrieve episodes from index.
     final var q = new SearchQuery()
         .withUpdatedSince(since)
         .withSort(SearchQuery.Sort.DATE_MODIFIED)
@@ -88,55 +93,55 @@ final class Harvest {
     final var hasMoreEvents = rawEvents.length == preferredAmount + 1;
     logger.debug("Retrieved {} events from the index during harvest", rawEvents.length);
 
+    // Start tracking the timestamp upper limit. It starts with "now" but gets decreased whenever we
+    // query items that are limited by `preferredAmount`. We can use this timestamp to restrict
+    // queries below, to avoid loading useless items: any item modified after this timestamp will be
+    // requested in the next harvest request anyway.
+    var includesItemsUntilRaw = new Date();
+    if (hasMoreEvents) {
+      includesItemsUntilRaw = rawEvents[rawEvents.length - 1].getModified();
+    }
+
 
     // Retrieve series from DB.
-    //
-    // Here we optimize a bit to avoid transfering some items twice. If the events were limited by
-    // `preferredAmount` (i.e. there are more than we will return), we only fetch series that
-    // were modified before the modification date of the last event we will return. Consider that
-    // `includesItemsUntil` can be at most that event's modification date. So if we were to now
-    // return any series that are modified after that timestamp, they will be returned by the
-    // next request of the client as well, since the next request's `since` parameter is the
-    // `includesItemsUntil` value of the current response.
-    //
-    // We also fetch `preferredAmount + 1` here to be able to know whether there are more series
-    // in the given time range, which allows us to figure out `hasMore` and `includesItemsUntil`
-    // more precisely.
-    final Optional<Date> seriesRangeEnd = hasMoreEvents
-        ? Optional.of(rawEvents[rawEvents.length - 1].getModified())
-        : Optional.empty();
     final var rawSeries = seriesService.getAllForAdministrativeRead(
         since,
-        seriesRangeEnd,
+        Optional.of(includesItemsUntilRaw),
         preferredAmount + 1
     );
     final var hasMoreSeriesInRange = rawSeries.size() == preferredAmount + 1;
     logger.debug("Retrieved {} series from the database during harvest", rawSeries.size());
 
+    if (hasMoreSeriesInRange) {
+      final var lastSeriesUpdated = rawSeries.get(rawSeries.size() - 1).getModifiedDate();
+      if (lastSeriesUpdated.before(includesItemsUntilRaw)) {
+        includesItemsUntilRaw = lastSeriesUpdated;
+      }
+    }
 
-    // Convert events and series into JSON representation. We limit both to `preferredAmount` here
-    // again, because we fetched `preferredAmount + 1` above.
+
+    // Retrieve playlists from DB.
+    final var rawPlaylists = playlistService.getAllForAdministrativeRead(
+        since,
+        includesItemsUntilRaw,
+        preferredAmount + 1
+    );
+    final var hasMorePlaylistsInRange = rawPlaylists.size() == preferredAmount + 1;
+    logger.debug("Retrieved {} playlists from the database during harvest", rawPlaylists.size());
+
+    if (hasMorePlaylistsInRange) {
+      final var lastPlaylistUpdated = rawPlaylists.get(rawPlaylists.size() - 1).getUpdated();
+      if (lastPlaylistUpdated.before(includesItemsUntilRaw)) {
+        includesItemsUntilRaw = lastPlaylistUpdated;
+      }
+    }
+
+
+    // ===== Convert all items into the JSON output representation ================================
+
+    // We limit to `preferredAmount` here again, because we fetched `preferredAmount + 1` above.
     final var eventItems = Arrays.stream(rawEvents)
         .limit(preferredAmount)
-        .filter(event -> {
-          // Here, we potentially filter out some events. Compare to above: when loading series
-          // from the DB, we used the modified date of the last event as upper bound of the
-          // series modified date. That is, IF we had more events than `preferredAmount`. The
-          // same reasoning applies the other way: if we have more series than `preferredAmount`,
-          // then all events with modified dates after the modified date of the last series we
-          // return will be included in the next request anyway. So we might as well filter them
-          // out here to save a bit on the size of this request.
-          //
-          // The reason we first filter series, then events, is because it is likely that an
-          // Opencast instance contains way more events than series. This means that
-          // `hasMoreSeriesInRange` being true is actually very uncommon.
-          if (!hasMoreSeriesInRange) {
-            return true;
-          }
-
-          final var lastSeriesModifiedDate = rawSeries.get(rawSeries.size() - 1).getModifiedDate();
-          return !event.getModified().after(lastSeriesModifiedDate);
-        })
         .map(event -> {
           try {
             return new Item(event, authorizationService, workspace);
@@ -161,41 +166,37 @@ final class Harvest {
         })
         .filter(item -> item != null);
 
+    final var playlistItems = rawPlaylists.stream()
+        .limit(preferredAmount)
+        .map(playlist -> {
+          try {
+            return new Item(playlist);
+          } catch (Exception e) {
+            var id = playlist == null ? null : playlist.getId();
+            logger.error("Error reading playlist '{}' (skipping...)", id, e);
+            return null;
+          }
+        })
+        .filter(item -> item != null);
 
-    // Combine series and events into one combined list and sort it.
+
+    // Combine events, series, and playlists into one combined list and sort it. We filter out all
+    // items that were modified after `includesItemsUntilRaw` as those are transferred in the next
+    // request anyway. So this is just about response size savings.
     //
     // The sorting is, again, not for correctness, because consumers of this API need to be
     // able to deal with that. However, sorting this here will result in fewer temporary objects
     // or invalid states in the consumer.
-    final var items = Stream.concat(eventItems, seriesItems)
+    Date finalIncludesItemsUntilRaw = includesItemsUntilRaw; // copy for lambda
+    final var items = Stream.of(eventItems, seriesItems, playlistItems)
+        .flatMap(Function.identity())
+        .filter(item -> !item.getModifiedDate().after(finalIncludesItemsUntilRaw))
         .collect(Collectors.toCollection(ArrayList::new));
     items.sort(Comparator.comparing(item -> item.getModifiedDate()));
 
 
     // Obtain information to allow Tobira to plan the next harvesting request.
-    final var hasMore = hasMoreEvents || hasMoreSeriesInRange;
-    final Date includesItemsUntilRaw;
-    if (!hasMoreEvents && !hasMoreSeriesInRange) {
-      // All events and series up to now have been harvested.
-      includesItemsUntilRaw = new Date();
-    } else if (!hasMoreEvents && hasMoreSeriesInRange) {
-      // `rawEvents` contains all events that currently exist. Our response won't contain the ones
-      // that have a modified date after the one of the last raw series. But that means that we
-      // will return all series and events until the last raw series.
-      includesItemsUntilRaw = rawSeries.get(rawSeries.size() - 1).getModifiedDate();
-    } else if (hasMoreEvents && !hasMoreSeriesInRange) {
-      // There are more events, but no additional series in the range from `since` to the modified
-      // date of the last raw event. So we know there are no other events or series before the
-      // last raw events.
-      includesItemsUntilRaw = rawEvents[rawEvents.length - 1].getModified();
-    } else {
-      // There are more events and more series in the given range. In theory, this would be
-      // `Math.min()` of the last raw event and last raw series. However, since `hasMoreEvents`
-      // is set, we only loaded series with modified dates smaller than the last raw event's
-      // modified date. That means, that the modified date of the last raw series is always
-      // smaller than that of the last raw event.
-      includesItemsUntilRaw = rawSeries.get(rawSeries.size() - 1).getModifiedDate();
-    }
+    final var hasMore = hasMoreEvents || hasMoreSeriesInRange || hasMorePlaylistsInRange;
 
     // The `includesItemsUntil` we return has to be at least `TIME_BUFFER_SIZE` in the past. See
     // the constant's documentation for more information on that.
