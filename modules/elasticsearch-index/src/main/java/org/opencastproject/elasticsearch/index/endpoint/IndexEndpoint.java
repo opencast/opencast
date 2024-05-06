@@ -134,8 +134,8 @@ public class IndexEndpoint {
       returnDescription = "OK if repopulation has started", pathParameters = {
       @RestParameter(name = "service", isRequired = true, description = "The service to recreate index from. "
         + "The available services are: Themes, Series, Scheduler, AssetManager, Comments, Workflow and Search. "
-        + "The service order (see above) is very important except for Search! Make sure, you do not run index rebuild for more than one "
-        + "service at a time!",
+        + "The service order (see above) is very important except for Search! Make sure, you do not run index rebuild"
+        + "for more than one service at a time!",
         type = RestParameter.Type.STRING) }, responses = {
       @RestResponse(description = "OK if repopulation has started", responseCode = HttpServletResponse.SC_OK) })
   public Response partiallyRebuildIndex(@PathParam("service") final String service) {
