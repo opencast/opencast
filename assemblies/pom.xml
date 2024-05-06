@@ -121,6 +121,7 @@
             <installedFeatures>
               <feature>opencast-security-cas</feature>
               <feature>opencast-security-jwt</feature>
+              <feature>opencast-plugin-admin-ng</feature>
               <feature>opencast-plugin-legacy-annotation</feature>
               <feature>opencast-plugin-paella-player-6</feature>
               <feature>opencast-plugin-transcription-services</feature>
