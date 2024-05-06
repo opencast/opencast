@@ -81,7 +81,7 @@ public class TobiraEndpoint {
 
   // Versioning the Tobira API:
   //
-  // Since both Tobira and this API are changing over time, we need some machanism for ensuring they
+  // Since both Tobira and this API are changing over time, we need some mechanism for ensuring they
   // are compatible. We don't want to enforce a 1:1 thing, where a particular Tobira needs one
   // exact API as that makes the update process harder (especially once this module is included in
   // the community version). So instead we have some semver-like versioning here. Increase the
@@ -95,7 +95,7 @@ public class TobiraEndpoint {
   // adding new JSON fields is a non-breaking change. You should also consider whether Tobira needs
   // to resynchronize, i.e. to get new data.
   private static final int VERSION_MAJOR = 1;
-  private static final int VERSION_MINOR = 5;
+  private static final int VERSION_MINOR = 6;
   private static final String VERSION = VERSION_MAJOR + "." + VERSION_MINOR;
 
   private SearchService searchService;
