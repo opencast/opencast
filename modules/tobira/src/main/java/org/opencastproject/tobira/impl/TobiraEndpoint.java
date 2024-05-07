@@ -82,7 +82,7 @@ public class TobiraEndpoint {
 
   // Versioning the Tobira API:
   //
-  // Since both Tobira and this API are changing over time, we need some machanism for ensuring they
+  // Since both Tobira and this API are changing over time, we need some mechanism for ensuring they
   // are compatible. We don't want to enforce a 1:1 thing, where a particular Tobira needs one
   // exact API as that makes the update process harder (especially once this module is included in
   // the community version). So instead we have some semver-like versioning here. Increase the
