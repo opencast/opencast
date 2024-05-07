@@ -101,7 +101,8 @@
 [subtitles.languages]
 ## A list of languages for which new subtitles can be created
 # For each language, various tags can be specified
-# A list of officially recommended tags can be found at https://docs.opencast.org/develop/admin/#modules/subtitles/#tags
+# A list of officially recommended tags can be found at
+# https://docs.opencast.org/develop/admin/#configuration/subtitles/#tags
 # At least the "lang" tag MUST be specified
 german = { lang = "de-DE" }
 english = { lang = "en-US", type = "closed-caption" }
@@ -146,3 +147,14 @@ spanish = { lang = "es" }
 # Type: boolean
 # Default: false
 #simpleMode = false
+
+
+[opencast]
+
+# Replace media package URLs with local URLs if possible.
+# This is done only if:
+# - Opencast indicates that the files are available locally
+# - Opencast URL has not been overwritten
+# Type: boolean
+# Default: true
+#local =
