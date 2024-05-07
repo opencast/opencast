@@ -36,7 +36,6 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.requests.SortCriterion;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.collect.Lists;
 
 import org.easymock.EasyMock;
@@ -113,8 +112,6 @@ public class TestPlaylistsEndpoint extends PlaylistsEndpoint {
     PlaylistRestService restService = createNiceMock(PlaylistRestService.class);
     expect(restService.parseJsonToPlaylist(invalidPlaylistJson)).andThrow(new ParseException(0));
     expect(restService.parseJsonToPlaylist(anyObject(String.class))).andReturn(playlist);
-    expect(restService.parseJsonToPlaylistEntries(invalidPlaylistJson)).andThrow(new JsonProcessingException("") { });
-    expect(restService.parseJsonToPlaylistEntries(anyObject(String.class))).andReturn(Lists.newArrayList(entry1, entry2));
     replay(restService);
 
     setPlaylistService(service);

@@ -576,6 +576,7 @@
           <version>5.1.9</version>
           <inherited>true</inherited>
           <configuration>
+            <obrRepository>NONE</obrRepository>
             <instructions>
               <Bundle-Category>opencastproject</Bundle-Category>
               <Bundle-DocURL>https://opencast.org/</Bundle-DocURL>
@@ -629,6 +630,9 @@
           <groupId>com.googlecode.maven-download-plugin</groupId>
           <artifactId>download-maven-plugin</artifactId>
           <version>1.8.0</version>
+          <configuration>
+            <alwaysVerifyChecksum>true</alwaysVerifyChecksum>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>

@@ -30,7 +30,6 @@ import static org.junit.Assert.assertEquals;
 import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
 
 import org.opencastproject.playlists.Playlist;
-import org.opencastproject.playlists.PlaylistEntry;
 import org.opencastproject.test.rest.RestServiceTestEnv;
 
 import org.json.simple.JSONArray;
@@ -39,8 +38,6 @@ import org.json.simple.parser.JSONParser;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-
-import java.util.ArrayList;
 
 /** Unit tests for {@link PlaylistsEndpoint} */
 public class PlaylistsEndpointTest {
@@ -185,16 +182,5 @@ public class PlaylistsEndpointTest {
         .expect()
         .statusCode(SC_FORBIDDEN).when()
         .delete(env.host("/{id}"));
-  }
-
-  @Test
-  public void testUpdateEntriesPlaylist() throws Exception {
-    String response = given()
-        .pathParam("id", PLAYLIST_ID)
-        .formParam("playlistEntries", new ArrayList<PlaylistEntry>())
-        .expect()
-        .statusCode(SC_OK).when()
-        .post(env.host("/{id}/entries"))
-        .asString();
   }
 }
