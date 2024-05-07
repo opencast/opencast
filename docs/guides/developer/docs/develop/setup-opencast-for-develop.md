@@ -6,6 +6,10 @@ This is meant for developers.
 For the installation of a production cluster, take a look at the admin guides.
 
 
+Warning: This probably won´t work with Windows.
+
+
+
 ## TL;DR
 
 

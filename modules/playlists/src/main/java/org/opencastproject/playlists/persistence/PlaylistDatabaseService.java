@@ -24,6 +24,7 @@ import org.opencastproject.playlists.Playlist;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.requests.SortCriterion;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -58,6 +59,9 @@ public interface PlaylistDatabaseService {
    * @throws PlaylistDatabaseException if there is a problem communicating with the underlying data store
    */
   List<Playlist> getPlaylists(int limit, int offset, SortCriterion sortCriterion)
+          throws PlaylistDatabaseException;
+
+  List<Playlist> getAllForAdministrativeRead(Date from, Date endDate, int limit)
           throws PlaylistDatabaseException;
 
   /**

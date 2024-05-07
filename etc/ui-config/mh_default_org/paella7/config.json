@@ -65,6 +65,7 @@
         ],
         "theme": "custom_theme",
         "hideTimeLineOnLive": false,
+        "preventVideoDownload": false,
         "videoCanvas": {
             "video360": {
                "flavor": "*/delivery+360",
@@ -283,8 +284,12 @@
                 }
             }
         },
-        "es.upv.paella.mp4VideoFormat": {
+        "es.upv.paella.mp4MultiQualityVideoFormat": {
             "enabled": true,
+            "order": 1
+        },
+        "es.upv.paella.mp4VideoFormat": {
+            "enabled": false,
             "order": 1
         },
         "es.upv.paella.htmlVideoFormat": {

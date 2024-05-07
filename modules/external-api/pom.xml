@@ -195,11 +195,6 @@
       <artifactId>opencast-playlists</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.core</groupId>
-      <artifactId>jackson-core</artifactId>
-      <version>${jackson.version}</version>
-    </dependency>
     <!-- Testing -->
     <dependency>
       <groupId>io.rest-assured</groupId>

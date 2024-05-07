@@ -26,11 +26,6 @@ const webpack = require('webpack');
 
 module.exports = function (env) {
   const ocServer = env.server || 'http://localhost:8080';
-  const proxyOpts = {
-    target: ocServer,
-    secure: false,
-    changeOrigin: true
-  };
 
   return {
     entry: './src/index.js',
@@ -57,17 +52,24 @@ module.exports = function (env) {
           publicPath: '/test_mock_static'
         }
       ],
-      proxy: {
-        '/search/**': proxyOpts,
-        '/info/**': proxyOpts,
-        '/series/**': proxyOpts,
-        '/annotation/**': proxyOpts,
-        '/engage/**': proxyOpts,
-        '/play/**': proxyOpts,
-        '/usertracking/**': proxyOpts,
-        '/editor/**': proxyOpts,
-        '/editor-ui/**': proxyOpts
-      }
+      proxy: [
+        {
+          context: [
+            '/search/**',
+            '/info/**',
+            '/series/**',
+            '/annotation/**',
+            '/engage/**',
+            '/play/**',
+            '/usertracking/**',
+            '/editor/**',
+            '/editor-ui/**'
+          ],
+          target: ocServer,
+          secure: false,
+          changeOrigin: true
+        },
+      ]
     },
 
     module: {

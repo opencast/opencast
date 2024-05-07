@@ -3,7 +3,7 @@
   <id>publish-uploaded-assets</id>
   <title>Publish uploaded assets</title>
   <tags>
-     <!-- Only launched from add asset in admin-ng, not available for selection by end users via the Admin UI -->
+     <!-- Only launched from add asset in admin interface, not available for selection by end users via the Admin UI -->
   </tags>
   <description>Publish uploaded assets</description>
   <configuration_panel>
