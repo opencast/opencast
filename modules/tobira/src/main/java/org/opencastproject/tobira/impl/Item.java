@@ -127,6 +127,12 @@ class Item {
 
       final var captions = findCaptions(mp);
 
+      // Get the generated slide text.
+      final var slideText = Arrays.stream(mp.getElements())
+          .filter(mpe -> mpe.getFlavor().eq("mpeg-7/text"))
+          .map(element -> element.getURI())
+          .findFirst();
+
       // Obtain duration from tracks, as that's usually more accurate (stores information from
       // inspect operations). Fall back to `getDcExtent`.
       final var duration = Arrays.stream(mp.getTracks())
@@ -160,6 +166,8 @@ class Item {
               "created", "creator", "title", "extent", "isPartOf", "description", "identifier",
           }))),
           Jsons.p("captions", Jsons.arr(captions)),
+          Jsons.p("slideText", slideText.map(t -> t.toString()).orElse(null)),
+          Jsons.p("segments", Jsons.arr(findSegments(mp))),
           Jsons.p("updated", event.getModified().getTime())
       );
     }
@@ -321,6 +329,17 @@ class Item {
         .map(a -> a.getURI().toString())
         .findFirst()
         .orElse(null);
+  }
+
+  private static List<Jsons.Val> findSegments(MediaPackage mp) {
+    return Arrays.stream(mp.getAttachments())
+      .filter(a -> a.getFlavor().getSubtype().equals("segment+preview"))
+      .map(s -> Jsons.obj(
+          Jsons.p("uri", s.toString()),
+          Jsons.p("startTime", s.getReference().getProperty("time"))
+        )
+      )
+      .collect(Collectors.toCollection(ArrayList::new));
   }
 
   private static Jsons.Val findTimelinePreview(MediaPackage mp) {
