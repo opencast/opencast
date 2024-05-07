@@ -163,6 +163,22 @@ const initParams = {
       }
     }
 
+    // Load the series, if appropriate
+    const loadSeries = async (sid) => {
+      const response = await fetch(getUrlFromOpencastServer('/search/series.json?id=' + sid));
+
+      if (response.ok) {
+        const sdata = await response.json();
+        return sdata['result'][0]['dc']['title'][0];
+      }
+      else {
+        throw Error('Series data missing');
+      }
+    };
+    const series = data?.metadata?.series !== undefined ? await loadSeries(data?.metadata?.series) : undefined;
+
+    data.metadata.seriestitle = series;
+
     // Add event title to browser tab
     const videoTitle = data?.metadata?.title ?? 'Unknown video title';
     const seriesTitle = data?.metadata?.seriestitle ?? 'No series';
@@ -328,7 +344,7 @@ export class PaellaOpencast extends Paella {
   async getEpisode({episodeId}) {
     return fetch(getUrlFromOpencastServer(`/search/episode.json?id=${episodeId}`))
     .then(response => response.json() )
-    .then(response => response['search-results']?.result)
+    .then(response => response['result'][0]?.id)
     .catch(() => null);
   }
 

@@ -211,13 +211,15 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.search.impl.persistence.SearchServiceDatabase#getAllMediaPackages()
+   * @see org.opencastproject.search.impl.persistence.SearchServiceDatabase#getAllMediaPackages(int, int)
    */
   @Override
-  public Stream<Tuple<MediaPackage, String>> getAllMediaPackages() throws SearchServiceDatabaseException {
+  public Stream<Tuple<MediaPackage, String>> getAllMediaPackages(int pagesize, int offset)
+          throws SearchServiceDatabaseException {
     List<SearchEntity> searchEntities;
     try {
-      searchEntities = db.exec(namedQuery.findAll("Search.findAll", SearchEntity.class));
+      int firstResult = pagesize * offset;
+      searchEntities = db.exec(namedQuery.findSome("Search.findAll", firstResult, pagesize, SearchEntity.class));
     } catch (Exception e) {
       logger.error("Could not retrieve all episodes: {}", e.getMessage());
       throw new SearchServiceDatabaseException(e);
@@ -296,24 +298,26 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.search.impl.persistence.SearchServiceDatabase#getMediaPackages(String)
+   * @see org.opencastproject.search.impl.persistence.SearchServiceDatabase#getSeries(String)
    */
-  @Override
-  public Collection<MediaPackage> getMediaPackages(final String seriesId) throws SearchServiceDatabaseException {
-    List<MediaPackage> episodes = new ArrayList<>();
+  public Collection<Pair<Organization, MediaPackage>> getSeries(final String seriesId)
+          throws SearchServiceDatabaseException {
+    List<Pair<Organization, MediaPackage>> episodes = new ArrayList<>();
+    EntityManager em = emf.createEntityManager();
+    TypedQuery<SearchEntity> q = em.createNamedQuery("Search.findBySeriesId", SearchEntity.class)
+        .setParameter("seriesId", seriesId);
     try {
-      List<SearchEntity> result = db.exec(namedQuery.findAll(
-          "Search.findBySeriesId",
-          SearchEntity.class,
-          Pair.of("seriesId", seriesId)
-      ));
-      for (SearchEntity entity: result) {
+      for (SearchEntity entity: q.getResultList()) {
         if (entity.getMediaPackageXML() != null) {
-          episodes.add(MediaPackageParser.getFromXml(entity.getMediaPackageXML()));
+          episodes.add(Pair.of(
+              entity.getOrganization(),
+              MediaPackageParser.getFromXml(entity.getMediaPackageXML())));
         }
       }
     } catch (MediaPackageException e) {
       throw new SearchServiceDatabaseException(e);
+    } finally {
+      em.close();
     }
     return episodes;
   }
@@ -376,7 +380,8 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
    * @see org.opencastproject.search.impl.persistence.SearchServiceDatabase#getMediaPackage(String)
    */
   @Override
-  public MediaPackage getMediaPackage(String mediaPackageId) throws NotFoundException, SearchServiceDatabaseException {
+  public MediaPackage getMediaPackage(String mediaPackageId)
+          throws NotFoundException, SearchServiceDatabaseException, UnauthorizedException {
     try {
       return db.execTxChecked(em -> {
         Optional<SearchEntity> episodeEntity = getSearchEntityQuery(mediaPackageId).apply(em);
@@ -391,14 +396,14 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
           Organization currentOrg = securityService.getOrganization();
           // There are several reasons a user may need to load a episode: to read content, to edit it, or add content
           if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, READ.toString())
-              && !AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, CONTRIBUTE.toString())
-              && !AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, WRITE.toString())) {
+                  && !AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, CONTRIBUTE.toString())
+                  && !AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, WRITE.toString())) {
             throw new UnauthorizedException(currentUser + " is not authorized to see episode " + mediaPackageId);
           }
         }
         return MediaPackageParser.getFromXml(episodeEntity.get().getMediaPackageXML());
       });
-    } catch (NotFoundException e) {
+    } catch (NotFoundException | UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
       logger.error("Could not get episode {} from database: {} ", mediaPackageId, e.getMessage());

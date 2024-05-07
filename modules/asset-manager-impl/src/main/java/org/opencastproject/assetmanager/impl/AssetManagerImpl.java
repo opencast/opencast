@@ -572,7 +572,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       index.addOrUpdateEvent(eventId, updateFunction, organization, user);
       logger.debug("Event {} updated in the {} index.", eventId, index.getIndexName());
     } catch (SearchIndexException e) {
-      logger.error("Error updating the event {} in the {} index.", eventId, index.getIndexName(), e);
+      logger.error("Error updating the event {} in the {} index.", eventId, e);
     }
   }
 
@@ -601,7 +601,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       index.addOrUpdateEvent(eventId, updateFunction, orgId, user);
       logger.debug("Event {} removed from the {} index", eventId, index.getIndexName());
     } catch (SearchIndexException e) {
-      logger.error("Error deleting the event {} from the {} index.", eventId, index.getIndexName(), e);
+      logger.error("Error deleting the event {} from the {} index.", eventId, e);
     }
   }
 
@@ -944,7 +944,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       final AQueryBuilder q = createQuery();
       RichAResult r;
       int current = 0;
-      logIndexRebuildBegin(logger, index.getIndexName(), total, "snapshot(s)");
+      logIndexRebuildBegin(logger, total, "snapshot(s)");
       var updatedEventRange = new ArrayList<Event>();
       do {
         r = enrich(q.select(q.snapshot()).where(q.version().isLatest()).orderBy(q.mediapackageId().desc())
@@ -972,7 +972,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
                 if (updatedEventRange.size() >= n || current >= total) {
                   index.bulkEventUpdate(updatedEventRange);
-                  logIndexRebuildProgress(logger, index.getIndexName(), total, current, n);
+                  logIndexRebuildProgress(logger, total, current, n);
                   updatedEventRange.clear();
                 }
               } catch (Throwable t) {
@@ -981,8 +981,8 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
               }
             }
           } catch (Throwable t) {
-            logIndexRebuildError(logger, index.getIndexName(), t, originalOrg);
-            throw new IndexRebuildException(index.getIndexName(), getService(), originalOrg, t);
+            logIndexRebuildError(logger, t, originalOrg);
+            throw new IndexRebuildException(getService(), originalOrg, t);
           } finally {
             securityService.setOrganization(defaultOrg);
             securityService.setUser(defaultSystemUser);

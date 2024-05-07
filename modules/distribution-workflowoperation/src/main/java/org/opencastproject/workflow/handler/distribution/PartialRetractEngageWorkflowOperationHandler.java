@@ -35,10 +35,10 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.search.api.SearchException;
-import org.opencastproject.search.api.SearchQuery;
-import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchService;
+import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationHandler;
@@ -53,10 +53,8 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Workflow operation for retracting parts of a media package from the engage player.
@@ -118,45 +116,36 @@ public class PartialRetractEngageWorkflowOperationHandler extends RetractEngageW
     logger.info("Partially retracting {}", mediaPackage.getIdentifier());
     List<Job> jobs;
     try {
-      SearchQuery query = new SearchQuery().withId(mediaPackage.getIdentifier().toString());
-      query.includeEpisodes(true);
-      query.includeSeries(false);
-      SearchResult result = searchService.getByQuery(query);
-      if (result.size() == 0) {
-        logger.info("The search service doesn't know mediapackage {}", mediaPackage);
+      try {
+        searchMP = searchService.get(mediaPackage.getIdentifier().toString());
+      } catch (NotFoundException e) {
+        logger.info("The search service doesn't know media package {}", mediaPackage);
         return createResult(mediaPackage, WorkflowOperationResult.Action.SKIP);
-      } else if (result.size() > 1) {
-        logger.warn("More than one mediapackage with id {} returned from search service", mediaPackage.getIdentifier());
-        throw new WorkflowOperationException(
-                "More than one mediapackage with id " + mediaPackage.getIdentifier() + " found");
-      } else {
-        searchMP = result.getItems()[0].getMediaPackage();
-        Set<String> retractElementIds = new HashSet<>();
-        Collection<MediaPackageElement> retractElements = retractElementSelector.select(searchMP, false);
-        Publication publicationElement = findPublicationElement(mediaPackage);
+      } catch (UnauthorizedException e) {
+        throw new WorkflowOperationException("Not allowed to access media package " + mediaPackage);
+      }
+      var retractElements = retractElementSelector.select(searchMP, false);
+      var retractElementIds = retractElements.stream()
+          .map(MediaPackageElement::getIdentifier)
+          .collect(Collectors.toSet());
+      logger.debug("Found {} matching elements", retractElementIds.size());
 
-        //Pull down the elements themselves
-        logger.debug("Found {} matching elements", retractElements.size());
-        for (MediaPackageElement element : retractElements) {
-          retractElementIds.add(element.getIdentifier());
-          logger.debug("Retracting {}", element.getIdentifier());
-        }
-        jobs = retractElements(retractElementIds, searchMP);
-        if (jobs.size() < 1) {
-          logger.debug("No matching elements found");
-          return createResult(mediaPackage, WorkflowOperationResult.Action.CONTINUE);
-        }
+      // Pull down the elements themselves
+      jobs = retractElements(retractElementIds, searchMP);
+      if (jobs.size() < 1) {
+        logger.debug("No matching elements found");
+        return createResult(mediaPackage, WorkflowOperationResult.Action.CONTINUE);
+      }
 
-        for (MediaPackageElement element : retractElements) {
-          logger.debug("Removing {} from mediapackage", element.getIdentifier());
-          //Remove the element from the workflow mp
-          mediaPackage.remove(element);
-          searchMP.remove(element);
-        }
+      for (MediaPackageElement element : retractElements) {
+        logger.debug("Removing {} from mediapackage", element.getIdentifier());
+        //Remove the element from the workflow mp
+        mediaPackage.remove(element);
+        searchMP.remove(element);
       }
 
       // Wait for retraction to finish
-      if (!waitForStatus(jobs.toArray(new Job[jobs.size()])).isSuccess()) {
+      if (!waitForStatus(jobs.toArray(new Job[0])).isSuccess()) {
         throw new WorkflowOperationException("The retract jobs did not complete successfully");
       }
       Job deleteSearchJob = null;

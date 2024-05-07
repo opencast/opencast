@@ -199,16 +199,16 @@ export async function searchEpisode(
         urlSuffix += "&id=" + episodeId;
     const url = `${hostAndPort()}/search/episode.json?limit=${limit}&offset=${offset}${urlSuffix}`;
     const response = await axios.get<any>(url);
-    const resultsRaw = response.data["search-results"]["result"];
+    const resultsRaw = response.data["result"];
     const results = Array.isArray(resultsRaw) ? resultsRaw : resultsRaw !== undefined ? [resultsRaw] : [];
     return {
         results: results.map((result: any) => ({
-            dcCreator: result.dcCreator,
-            id: result.id,
-            dcTitle: result.dcTitle,
-            dcCreated: result.dcCreated,
-            languageShortCode: result.dcLanguage,
-            licenseKey: result.dcLicense,
+            dcCreator: result.dc.creator?.[0],
+            id: result.mediapackage.id,
+            dcTitle: result.dc.title[0],
+            dcCreated: result.dc.created?.[0],
+            languageShortCode: result.dc?.language?.[0],
+            licenseKey: result.dc?.license?.[0],
             mediapackage: {
                 creators: result.mediapackage.creators !== undefined
                     ? Array.isArray(result.mediapackage.creators.creator)
@@ -226,9 +226,9 @@ export async function searchEpisode(
                 tracks: parseTracksFromResult(result)
             }
         })),
-        total: response.data["search-results"].total,
-        limit: response.data["search-results"].limit,
-        offset: response.data["search-results"].offset
+        total: response.data.total,
+        limit: response.data.limit,
+        offset: response.data.offset
     }
 }
 

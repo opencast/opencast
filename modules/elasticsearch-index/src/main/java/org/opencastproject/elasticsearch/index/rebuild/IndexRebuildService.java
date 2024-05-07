@@ -65,7 +65,7 @@ public class IndexRebuildService implements BundleActivator {
    * Attention: The order is relevant for the index rebuild and should not be changed!
    */
   public enum Service {
-    Themes, Series, Scheduler, AssetManager, Comments, Workflow
+    Themes, Series, Scheduler, AssetManager, Comments, Workflow, Search
   }
 
   public enum State {
@@ -131,7 +131,7 @@ public class IndexRebuildService implements BundleActivator {
   public synchronized void rebuildIndex(ElasticsearchIndex index)
           throws IOException, IndexRebuildException {
     index.clear();
-    logger.info("{} Index cleared, starting complete rebuild.", index.getIndexName());
+    logger.info("Index cleared, starting complete rebuild.");
     setAllRebuildStates(IndexRebuildService.State.PENDING);
     for (IndexRebuildService.Service service: IndexRebuildService.Service.values()) {
       rebuildIndex(index, service);
@@ -154,7 +154,7 @@ public class IndexRebuildService implements BundleActivator {
   public synchronized void rebuildIndex(ElasticsearchIndex index, String serviceName)
           throws IllegalArgumentException, IndexRebuildException {
     IndexRebuildService.Service service = IndexRebuildService.Service.valueOf(serviceName);
-    logger.info("Starting partial rebuild of the {} index from service '{}'.", index.getIndexName(), service);
+    logger.info("Starting partial rebuild of the {} index.", service);
     setRebuildState(service, IndexRebuildService.State.PENDING);
     rebuildIndex(index, service);
   }
@@ -176,7 +176,7 @@ public class IndexRebuildService implements BundleActivator {
   public synchronized void resumeIndexRebuild(ElasticsearchIndex index, String serviceName)
           throws IllegalArgumentException, IndexRebuildException {
     IndexRebuildService.Service startingService = IndexRebuildService.Service.valueOf(serviceName);
-    logger.info("Resuming rebuild of {} index with service '{}'.", index.getIndexName(), startingService);
+    logger.info("Resuming rebuild of {} index.", startingService);
     setSubsetOfRebuildStates(startingService, IndexRebuildService.State.PENDING);
     Service[] services = IndexRebuildService.Service.values();
     for (int i = startingService.ordinal(); i < services.length; i++) {
@@ -203,7 +203,7 @@ public class IndexRebuildService implements BundleActivator {
     }
 
     IndexProducer indexProducer = indexProducers.get(service);
-    logger.info("Starting to rebuild the {} index from service '{}'", index.getIndexName(), service);
+    logger.info("Starting to rebuild the {} index", service);
     setRebuildState(service, IndexRebuildService.State.RUNNING);
     try {
       indexProducer.repopulate();
@@ -211,7 +211,7 @@ public class IndexRebuildService implements BundleActivator {
     } catch (IndexRebuildException e) {
       setRebuildState(service, IndexRebuildService.State.ERROR);
     }
-    logger.info("Finished to rebuild the {} index from service '{}'", index.getIndexName(), service);
+    logger.info("Finished rebuilding the {} index", service);
   }
 
   /**
@@ -347,7 +347,7 @@ public class IndexRebuildService implements BundleActivator {
   /**
    * Set a subset of rebuild States following the rebuild order.
    *
-   * @param startingservice
+   * @param startingService
    *           the service to start from
    * @param state
    *           the state to be set

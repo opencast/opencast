@@ -1448,7 +1448,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
           EventIndexUtils.updateSeriesName(event, organization, user, index);
         } catch (SearchIndexException e) {
           logger.error("Error updating the series name of the event {} in the {} index.", mediaPackageId,
-                  index.getIndexName(), e);
+                  e);
         }
       }
       if (presenters.isSome()) {
@@ -1479,7 +1479,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       index.addOrUpdateEvent(mediaPackageId, updateFunction, organization, user);
       logger.debug("Scheduled event {} updated in the {} index.", mediaPackageId, index.getIndexName());
     } catch (SearchIndexException e) {
-      logger.error("Error updating the scheduled event {} in the {} index.", mediaPackageId, index.getIndexName(), e);
+      logger.error("Error updating the scheduled event {} in the {} index.", mediaPackageId, e);
     }
   }
 
@@ -1504,7 +1504,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       logger.debug("Recording state of event {} removed from the {} index.", mediaPackageId, index.getIndexName());
     } catch (SearchIndexException e) {
       logger.error("Failed to remove the recording state of event {} from the {} index.", mediaPackageId,
-              index.getIndexName(), e);
+              e);
     }
   }
 
@@ -1523,7 +1523,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
               index.getIndexName());
     } catch (SearchIndexException e) {
       logger.error("Failed to delete the scheduling information of event {} from the {} index.", mediaPackageId,
-              index.getIndexName(), e);
+              e);
     }
   }
 
@@ -1716,10 +1716,10 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       try {
         total = persistence.countEvents();
       } catch (SchedulerServiceDatabaseException e) {
-        logIndexRebuildError(logger, index.getIndexName(), e);
-        throw new IndexRebuildException(index.getIndexName(), getService(), e);
+        logIndexRebuildError(logger, e);
+        throw new IndexRebuildException(getService(), e);
       }
-      logIndexRebuildBegin(logger, index.getIndexName(), total, "scheduled events");
+      logIndexRebuildBegin(logger, total, "scheduled events");
       final int[] current = {0};
       int n = 20;
       var updatedEventRange = new ArrayList<Event>();
@@ -1732,7 +1732,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
                   try {
                     events = persistence.getEvents();
                   } catch (SchedulerServiceDatabaseException e) {
-                    logIndexRebuildError(logger, index.getIndexName(), e, organization);
+                    logIndexRebuildError(logger, e, organization);
                     return;
                   }
 
@@ -1747,7 +1747,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
                       if (updatedEventRange.size() >= n || current[0] >= events.size()) {
                         index.bulkEventUpdate(updatedEventRange);
-                        logIndexRebuildProgress(logger, index.getIndexName(), total, current[0], n);
+                        logIndexRebuildProgress(logger, total, current[0], n);
                         updatedEventRange.clear();
                       }
                     } catch (SearchIndexException e) {
@@ -1757,8 +1757,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
                });
       }
     } catch (Exception e) {
-      logIndexRebuildError(logger, index.getIndexName(), e);
-      throw new IndexRebuildException(index.getIndexName(), getService(), e);
+      logIndexRebuildError(logger, e);
+      throw new IndexRebuildException(getService(), e);
     }
   }
 
@@ -1815,7 +1815,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
           EventIndexUtils.updateSeriesName(event, orgId, user, index);
         } catch (SearchIndexException e) {
           logger.error("Error updating the series name of the event {} in the {} index.",
-                  scheduledEvent.getMediaPackageId(), index.getIndexName(), e);
+                  scheduledEvent.getMediaPackageId(), e);
         }
       }
       if (presentersOpt.isSome()) {

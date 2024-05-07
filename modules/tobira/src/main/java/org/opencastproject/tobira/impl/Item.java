@@ -30,12 +30,13 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.TrackSupport;
 import org.opencastproject.mediapackage.VideoStream;
+import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.playlists.Playlist;
-import org.opencastproject.search.api.SearchResultItem;
+import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
@@ -73,14 +74,14 @@ class Item {
   private Jsons.Val obj;
 
   /** Converts a event into the corresponding JSON representation */
-  Item(SearchResultItem event, AuthorizationService authorizationService, Workspace workspace) {
-    this.modifiedDate = event.getModified();
+  Item(SearchResult event, AuthorizationService authorizationService, Workspace workspace) {
+    this.modifiedDate = event.getModifiedDate();
 
     if (event.getDeletionDate() != null) {
       this.obj = Jsons.obj(
           Jsons.p("kind", "event-deleted"),
           Jsons.p("id", event.getId()),
-          Jsons.p("updated", event.getModified().getTime())
+          Jsons.p("updated", event.getModifiedDate().getTime())
       );
     } else {
       final var mp = event.getMediaPackage();
@@ -118,9 +119,6 @@ class Item {
               .findFirst()
               .orElse(mp.getTitle());
       if (title == null) {
-        title = event.getDcTitle();
-      }
-      if (title == null) {
         // If there is no title to be found, we throw an exception to skip this event.
         throw new RuntimeException("Event has no title");
       }
@@ -144,15 +142,20 @@ class Item {
           // worse than any other thing that I can think of. And usually all durations are basically
           // the same.
           .max()
-          .orElse(Math.max(0, event.getDcExtent()));
+          //NB: This is an else case, so we ignore the item(s) in the stream
+          .orElseGet(() -> {
+            String dcExtent = event.getDublinCore().getFirst(DublinCore.PROPERTY_EXTENT);
+            DCMIPeriod p = EncodingSchemeUtils.decodeMandatoryPeriod(dcExtent);
+            return Math.max(0L, p.getEnd().getTime() - p.getStart().getTime());
+          });
 
       this.obj = Jsons.obj(
           Jsons.p("kind", "event"),
           Jsons.p("id", event.getId()),
           Jsons.p("title", title),
-          Jsons.p("partOf", event.getDcIsPartOf()),
-          Jsons.p("description", event.getDcDescription()),
-          Jsons.p("created", event.getDcCreated().getTime()),
+          Jsons.p("partOf", event.getDublinCore().getFirst(DublinCore.PROPERTY_IS_PART_OF)),
+          Jsons.p("description", event.getDublinCore().getFirst(PROPERTY_DESCRIPTION)),
+          Jsons.p("created", event.getDublinCore().getFirst(DublinCore.PROPERTY_CREATED)),
           Jsons.p("startTime", period.map(p -> p.getStart().getTime()).orElse(null)),
           Jsons.p("endTime", period.map(p -> p.getEnd().getTime()).orElse(null)),
           Jsons.p("creators", Jsons.arr(new ArrayList<>(creators))),
@@ -168,7 +171,7 @@ class Item {
           Jsons.p("captions", Jsons.arr(captions)),
           Jsons.p("slideText", slideText.map(t -> t.toString()).orElse(null)),
           Jsons.p("segments", Jsons.arr(findSegments(mp))),
-          Jsons.p("updated", event.getModified().getTime())
+          Jsons.p("updated", event.getModifiedDate().getTime())
       );
     }
   }
@@ -250,7 +253,7 @@ class Item {
     return Jsons.obj(props);
   }
 
-  private static List<Jsons.Val> assembleTracks(SearchResultItem event, MediaPackage mp) {
+  private static List<Jsons.Val> assembleTracks(SearchResult event, MediaPackage mp) {
     return Arrays.stream(mp.getTracks())
         .filter(track -> track.hasAudio() || track.hasVideo())
         .map(track -> {
@@ -422,7 +425,7 @@ class Item {
     }
   }
 
-    /** Converts a series into the corresponding JSON representation */
+  /** Converts a series into the corresponding JSON representation */
   Item(Playlist playlist) {
     this.modifiedDate = playlist.getUpdated();
 

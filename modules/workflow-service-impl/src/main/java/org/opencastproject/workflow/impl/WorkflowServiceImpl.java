@@ -2180,12 +2180,12 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       try {
         total = persistence.countMediaPackages();
       } catch (WorkflowDatabaseException e) {
-        logIndexRebuildError(logger, index.getIndexName(), e);
-        throw new IndexRebuildException(index.getIndexName(), getService(), e);
+        logIndexRebuildError(logger, e);
+        throw new IndexRebuildException(getService(), e);
       }
 
       if (total > 0) {
-        logIndexRebuildBegin(logger, index.getIndexName(), total, "workflows");
+        logIndexRebuildBegin(logger, total, "workflows");
         int current = 0;
         int n = 20;
         List<WorkflowIndexData> workflowIndexData;
@@ -2199,8 +2199,8 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           try {
             workflowIndexData = persistence.getWorkflowIndexData(limit, offset);
           } catch (WorkflowDatabaseException e) {
-            logIndexRebuildError(logger, index.getIndexName(), e);
-            throw new IndexRebuildException(index.getIndexName(), getService(), e);
+            logIndexRebuildError(logger, e);
+            throw new IndexRebuildException(getService(), e);
           }
           if (!workflowIndexData.isEmpty()) {
             offset += limit;
@@ -2242,7 +2242,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
                 if (updatedWorkflowRange.size() >= n || current >= total) {
                   index.bulkEventUpdate(updatedWorkflowRange);
-                  logIndexRebuildProgress(logger, index.getIndexName(), total, current, n);
+                  logIndexRebuildProgress(logger, total, current, n);
                   updatedWorkflowRange.clear();
                 }
               }
@@ -2256,8 +2256,8 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         } while (!workflowIndexData.isEmpty());
       }
     } catch (Exception e) {
-      logIndexRebuildError(logger, index.getIndexName(), e);
-      throw new IndexRebuildException(index.getIndexName(), getService(), e);
+      logIndexRebuildError(logger, e);
+      throw new IndexRebuildException(getService(), e);
     }
   }
 
@@ -2284,7 +2284,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       results = index.getByQuery(new EventSearchQuery(orgId, user).withWorkflowId(workflowInstanceId));
     } catch (SearchIndexException e) {
       logger.error("Error retrieving the events for workflow instance {} from the {} index.", workflowInstanceId,
-              index.getIndexName(), e);
+              e);
       return;
     }
 
@@ -2324,7 +2324,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
                 index.getIndexName());
       } catch (SearchIndexException e) {
         logger.error("Error removing the workflow instance {} of event {} from the {} index.", workflowInstanceId,
-                eventId, index.getIndexName(), e);
+                eventId, e);
       }
     }
   }
@@ -2360,7 +2360,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
               index.getIndexName());
     } catch (SearchIndexException e) {
       logger.error("Error updating the workflow instance {} of event {} in the {} index.", id, mpId,
-              index.getIndexName(), e);
+              e);
     }
   }
 

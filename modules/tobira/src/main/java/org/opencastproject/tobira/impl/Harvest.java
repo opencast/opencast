@@ -22,7 +22,8 @@
 package org.opencastproject.tobira.impl;
 
 import org.opencastproject.playlists.PlaylistService;
-import org.opencastproject.search.api.SearchQuery;
+import org.opencastproject.search.api.SearchResult;
+import org.opencastproject.search.api.SearchResultList;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.UnauthorizedException;
@@ -31,11 +32,13 @@ import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.Jsons;
 import org.opencastproject.workspace.api.Workspace;
 
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.elasticsearch.search.sort.SortOrder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.Optional;
@@ -84,14 +87,16 @@ final class Harvest {
     // `hasMore` and `includesItemsUntil` more precisely.
 
     // Retrieve episodes from index.
-    final var q = new SearchQuery()
-        .withUpdatedSince(since)
-        .withSort(SearchQuery.Sort.DATE_MODIFIED)
-        .includeDeleted(true)
-        .withLimit(preferredAmount + 1);
-    final var rawEvents = searchService.getForAdministrativeRead(q).getItems();
-    final var hasMoreEvents = rawEvents.length == preferredAmount + 1;
-    logger.debug("Retrieved {} events from the index during harvest", rawEvents.length);
+    final SearchSourceBuilder q = new SearchSourceBuilder().query(
+            QueryBuilders.boolQuery()
+                .must(QueryBuilders.rangeQuery(SearchResult.MODIFIED_DATE).gte(since.getTime()))
+                .must(QueryBuilders.termQuery(SearchResult.TYPE, SearchService.IndexEntryType.Episode)))
+        .sort(SearchResult.MODIFIED_DATE, SortOrder.ASC)
+        .size(preferredAmount + 1);
+    final SearchResultList results = searchService.search(q);
+    final var hasMoreEvents = results.getTotalHits() == preferredAmount + 1;
+
+    logger.debug("Retrieved {} events from the index during harvest", results.getHits().size());
 
     // Start tracking the timestamp upper limit. It starts with "now" but gets decreased whenever we
     // query items that are limited by `preferredAmount`. We can use this timestamp to restrict
@@ -99,7 +104,7 @@ final class Harvest {
     // requested in the next harvest request anyway.
     var includesItemsUntilRaw = new Date();
     if (hasMoreEvents) {
-      includesItemsUntilRaw = rawEvents[rawEvents.length - 1].getModified();
+      includesItemsUntilRaw = results.getHits().get(results.getHits().size() - 1).getModifiedDate();
     }
 
 
@@ -140,7 +145,7 @@ final class Harvest {
     // ===== Convert all items into the JSON output representation ================================
 
     // We limit to `preferredAmount` here again, because we fetched `preferredAmount + 1` above.
-    final var eventItems = Arrays.stream(rawEvents)
+    final var eventItems = results.getHits().stream()
         .limit(preferredAmount)
         .map(event -> {
           try {
