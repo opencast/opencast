@@ -257,9 +257,20 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
       return createResult(mediaPackage, WorkflowOperationResult.Action.CONTINUE);
     }
 
-    final List<AugmentedTrack> augmentedTracks = createAugmentedTracks(tracks, workflowInstance);
+    final List<AugmentedTrack> augmentedTracksAll = createAugmentedTracks(tracks, workflowInstance);
+    List<AugmentedTrack> augmentedTracks = new ArrayList<>();
 
     final MuxResult result = MuxResult.empty();
+
+    // add non video/audio tracks, like captions, directly to result as only video/audio tracks are relevant for selection
+    for (final AugmentedTrack t : augmentedTracksAll) {
+      if (t.hasVideo() || t.hasAudio()) {
+        augmentedTracks.add(t);
+      } else {
+        result.add(copyTrack(t.track));
+      }
+    }
+
     // Note that the logic below currently supports at most two input tracks
 
     if (allNonHidden(augmentedTracks, SubTrack.VIDEO)) {
