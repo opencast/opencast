@@ -35,15 +35,6 @@ jobs:
           npm run eslint
           git add package.json package-lock.json
 
-      - name: update paella-player test libraries
-        working-directory: modules/engage-paella-player
-        run: |
-          set -eu
-          npm install --save --dev eslint@latest eslint-plugin-header@latest
-          npm audit fix || true
-          npm run eslint
-          git add package.json package-lock.json
-
       - name: update runtime-info-ui test libraries
         working-directory: modules/runtime-info-ui
         run: |

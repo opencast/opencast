@@ -717,15 +717,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-annotation-impl/${project.version}</bundle>
   </feature>
 
-  <feature name="opencast-plugin-paella-player-6" version="${project.version}">
-    <conditional>
-      <condition>opencast-allinone</condition>
-      <condition>opencast-presentation</condition>
-      <condition>opencast-adminpresentation</condition>
-    </conditional>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-engage-paella-player/${project.version}</bundle>
-  </feature>
-
   <feature name="opencast-plugin-admin-ng" version="${project.version}">
     <conditional>
       <condition>opencast-allinone</condition>

@@ -31,6 +31,26 @@ G
 ```
 
 
+### Removal of Paella 6 in OC 16
+Proposed by Greg Logan <gregorydlogan@gmail.com>, passed on Wed, Feb 14 2024
+```no-highlight
+Hi all,
+
+With the freshly filed PR[1] upgrading the Search Index, we have broken compatibility with most existing integrations.
+I say most, since I updated Tobira, and Paella 7 as part of that work. If you're integrations depend on endpoints in
+the /search/* namespace, please test!
+
+With that in mind, Paella 6 would be broken by this pull request, and I'm #proposing that we remove it completely with
+Opencast 16. As far as I know all development is against Paella 7, and Paella 6 is already disabled by default.
+
+
+G
+
+1: https://github.com/opencast/opencast/pull/5597
+
+```
+
+
 ### Deprecate Theodul with Opencast 12
 Proposed by Greg Logan <gregorydlogan@gmail.com>, passed on Fri, July 1 2022
 ```no-highlight
