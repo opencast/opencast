@@ -1640,14 +1640,8 @@ public class EventsEndpoint implements ManagedService {
 
 
   private List<JValue> getPublications(Event event, Boolean withSignedUrls, Boolean includeInternalPublication, ApiVersion requestedVersion) {
-    if (includeInternalPublication) {
-      return event.getPublications().stream()
-          .map(p -> getPublication(p, withSignedUrls, requestedVersion))
-          .collect(Collectors.toList());
-    }
-
-    return event.getPublications().stream()
-        .filter(EventUtils.internalChannelFilter::apply)
+        return event.getPublications().stream()
+        .filter(publication -> ((includeInternalPublication && !requestedVersion.isSmallerThan(VERSION_1_11_0)) || EventUtils.internalChannelFilter.apply(publication)))
         .map(p -> getPublication(p, withSignedUrls, requestedVersion))
         .collect(Collectors.toList());
   }
@@ -1752,17 +1746,14 @@ public class EventsEndpoint implements ManagedService {
              },
              restParameters = {
                @RestParameter(name = "sign", description = "Whether public distribution urls should be signed.",
-                              isRequired = false, type = Type.BOOLEAN),
-               @RestParameter(name = "includeInternalPublication", description = "Whether internal publication should be included.",
                               isRequired = false, type = Type.BOOLEAN)
              },
              responses = {
                   @RestResponse(description = "The track details are returned.", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "The specified event or publication does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
 
-  // same as above
   public Response getEventPublication(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String eventId,
-          @PathParam("publicationId") String publicationId, @QueryParam("sign") boolean sign, @QueryParam("includeInternalPublication") boolean includeInternalPublication) throws Exception {
+          @PathParam("publicationId") String publicationId, @QueryParam("sign") boolean sign) throws Exception {
     try {
       final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
       return ApiResponses.Json.ok(acceptHeader, getPublication(eventId, publicationId, sign, requestedVersion));
@@ -1779,11 +1770,7 @@ public class EventsEndpoint implements ManagedService {
           throws SearchIndexException, NotFoundException {
     for (final Event event : indexService.getEvent(eventId, elasticsearchIndex)) {
       List<Publication> publications;
-      if (requestedVersion.isSmallerThan(VERSION_1_11_0)) {
-        publications = $(event.getPublications()).filter(EventUtils.internalChannelFilter).toList();
-      } else {
-        publications = $(event.getPublications()).toList();
-      }
+      publications = event.getPublications().stream().filter(publication -> (!requestedVersion.isSmallerThan(VERSION_1_11_0) || EventUtils.internalChannelFilter.apply(publication))).collect(Collectors.toList());
       for (Publication publication : publications) {
         if (publicationId.equals(publication.getIdentifier())) {
           return getPublication(publication, withSignedUrls, requestedVersion);
