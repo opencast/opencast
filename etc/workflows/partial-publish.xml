@@ -12,21 +12,21 @@
     <!-- Fall back to */source if */prepared does not exist -->
 
     <operation
-        id="analyze-tracks"
-        fail-on-error="true"
-        exception-handler-workflow="partial-error"
-        description="Analyze tracks in media package and set control variables">
+      id="analyze-tracks"
+      fail-on-error="true"
+      exception-handler-workflow="partial-error"
+      description="Analyze tracks in media package and set control variables">
       <configurations>
         <configuration key="source-flavor">*/prepared</configuration>
       </configurations>
     </operation>
 
     <operation
-        if="NOT (${presentation_prepared_media} OR ${presenter_prepared_media})"
-        id="clone"
-        fail-on-error="true"
-        exception-handler-workflow="partial-error"
-        description="Preparing media">
+      if="NOT (${presentation_prepared_media} OR ${presenter_prepared_media})"
+      id="clone"
+      fail-on-error="true"
+      exception-handler-workflow="partial-error"
+      description="Preparing media">
       <configurations>
         <configuration key="source-flavor">*/source</configuration>
         <configuration key="target-flavor">*/prepared</configuration>
@@ -50,8 +50,8 @@
     <!-- Keep captions in the loop, as they are ignored by select-tracks -->
 
     <operation
-        id="tag"
-        description="Tag captions for cutting">
+      id="tag"
+      description="Tag captions for cutting">
       <configurations>
         <configuration key="source-flavors">captions/prepared</configuration>
         <configuration key="target-flavor">captions/work</configuration>
@@ -101,8 +101,8 @@
     <!-- Mark captions for publication -->
 
     <operation
-        id="tag"
-        description="Mark captions for publication">
+      id="tag"
+      description="Mark captions for publication">
       <configurations>
         <configuration key="source-flavors">captions/trimmed</configuration>
         <configuration key="target-flavor">captions/delivery</configuration>
@@ -208,6 +208,7 @@
 
     <operation
       id="timelinepreviews"
+      if="(${presenter_work_video} OR $ ${presentation_work_video})"
       fail-on-error="false"
       exception-handler-workflow="partial-error"
       description="Creating timeline preview images">
@@ -227,6 +228,7 @@
 
     <operation
       id="include"
+      if="(${presenter_work_video} OR $ ${presentation_work_video})"
       description="Including theming operations">
       <configurations>
         <configuration key="workflow-id">partial-theming</configuration>
@@ -245,6 +247,7 @@
 
     <operation
       id="encode"
+      if="(${presenter_work_video} OR $ ${presentation_work_video})"
       exception-handler-workflow="partial-error"
       description="Encoding videos to mp4 delivery format">
       <configurations>
@@ -252,6 +255,19 @@
         <configuration key="target-flavor">*/delivery</configuration>
         <configuration key="target-tags">engage-download,engage-streaming</configuration>
         <configuration key="encoding-profile">adaptive-parallel.http</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+      id="encode"
+      if="NOT (${presenter_work_video} OR $ ${presentation_work_video}) AND (${presenter_work_audio} OR ${presentation_work_audio})"
+      exception-handler-workflow="partial-error"
+      description="Encoding audio-only files to mp3 delivery format">
+      <configurations>
+        <configuration key="source-flavor">*/trimmed</configuration>
+        <configuration key="target-flavor">*/delivery</configuration>
+        <configuration key="target-tags">engage-download,engage-streaming</configuration>
+        <configuration key="encoding-profile">audio-to-mp3.http</configuration>
       </configurations>
     </operation>
 
