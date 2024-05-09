@@ -71,6 +71,18 @@ const g_streamTypes = [
       const mimetype = track.mimetype;
       return { src, mimetype };
     }
+  },
+  {
+    enabled: true,
+    streamType: 'audio',
+    conditions: {
+      mimetype: 'audio/mpeg'
+    },
+    getSourceData: (track) => {
+      const src = track.url;
+      const mimetype = track.mimetype;
+      return { src, mimetype };
+    }
   }
 ];
 
@@ -246,6 +258,7 @@ function mergeSources(sources, config) {
 
       if (content === audioContent) {
         stream.role = 'mainAudio';
+        stream.canvas = ['audio']; // add canvas so that audio-only can be detected by paella-core functions
       }
 
       streams.push(stream);

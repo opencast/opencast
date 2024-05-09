@@ -27,6 +27,23 @@ window.onload = async () => {
   try {
     await applyOpencastTheme(paella);
     await paella.loadManifest();
+
+    // The player manifest access functions will only be available after the manifest has been loaded.
+    if (paella.streams.isNativelyPlayable &&
+      paella.streams.isAudioOnly &&
+      (!paella.captions || paella.captions.length === 0))
+    {
+      // paella.log.info(paella.streams.isNativelyPlayable);
+      // paella.log.info(paella.streams.isAudioOnly);
+      // paella.log.info(paella.frameList.isEmpty); --> false
+
+      const nativePlayer = paella.streams.nativePlayer;
+      nativePlayer.setAttribute('controls','');
+      await paella.unload();
+      const playerContainer = document.getElementById('player-container');
+      playerContainer.innerHTML = '';
+      playerContainer.appendChild(nativePlayer);
+    }
     paella.log.info('Paella player load done');
   }
   catch(error){
