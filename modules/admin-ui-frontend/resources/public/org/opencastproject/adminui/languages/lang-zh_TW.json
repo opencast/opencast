@@ -217,7 +217,7 @@
       "CONFLICT_ALREADY_ENDED": "排程有誤，此一事件已經結束。",
       "CONFLICT_END_BEFORE_START": "排程有誤: 排程結束的時間，必須晚於開始時間。",
       "CONFLICT_IN_THE_PAST": "無法更新排程：您不能將事件安排在過去。",
-      "INVALID_ACL_RULES": "規則必須包含一個有效的角色，讀 或/和 寫的權利。",
+      "INVALID_ACL_RULES": "規則必須包含一個有效的角色，讀 或\/和 寫的權利。",
       "MISSING_ACL_RULES": "至少有一個角色必須具有讀取和寫入權限。",
       "SAVED_ACL_RULES": "存取權限已儲存",
       "SAVED_METADATA": "後設(詮釋)資料已儲存",
@@ -263,10 +263,10 @@
       "TOBIRA_OVERRIDE_NAME": "The title of the selected page will be overridden with the title of the series.",
       "TOBIRA_NO_PATH_SEGMENT": "Page needs a path segment.",
       "TOBIRA_NOT_MOUNTED": "Series could not be mounted in Tobira.",
-      "TOBIRA_PATH_SEGMENT_INVALID": "Path segment is invalid. A valid path segment is at least 2 characters long, does not contain any whitespace or control characters, none of the characters '<>\"[\\]^`{|}#%/?]', and doesn't start with any of the characters '-+~@_!$&;:.,=*'()'.",
+      "TOBIRA_PATH_SEGMENT_INVALID": "Path segment is invalid. A valid path segment is at least 2 characters long, does not contain any whitespace or control characters, none of the characters '<>\"[\\]^`{|}#%\/?]', and doesn't start with any of the characters '-+~@_!$&;:.,=*'()'.",
       "TOBIRA_PATH_SEGMENT_UNIQUE": "The path segment of a page must be unqiue among all its sibling pages.",
       "TOBIRA_PAGE_NOT_FOUND": "The page you tried to navigate to does not or no longer exist. Maybe try starting from the beginning.",
-      "TOBIRA_SERVER_ERROR": " Error talking to Tobira. Contact your system administrator and/or try again later.",
+      "TOBIRA_SERVER_ERROR": " Error talking to Tobira. Contact your system administrator and\/or try again later.",
       "TOBIRA_COPIED_DIRECT_LINK": "Copied link to clipboard.",
       "TOBIRA_FAILED_COPYING_DIRECT_LINK": "Couldn't copy link to clipboard.",
       "TOBIRA_NOT_FOUND": "Tobira doesn't know about this series (yet). Try again in a few minutes or contact your system administrator."
@@ -352,7 +352,7 @@
             }
          },
          "EDIT": {
-            "DESCRIPTION": "編輯和/或選擇要更新的後設資料欄位。 如果這不會導致至少一個事件的值發生更改，或者該欄位是無效（例如，必填欄位不能為空）則無法選擇該欄位。 已被強調顯示的後設資料欄位對於所選事件具有許多不同的值。",
+            "DESCRIPTION": "編輯和\/或選擇要更新的後設資料欄位。 如果這不會導致至少一個事件的值發生更改，或者該欄位是無效（例如，必填欄位不能為空）則無法選擇該欄位。 已被強調顯示的後設資料欄位對於所選事件具有許多不同的值。",
             "TABLE": {
                "CAPTION": "選定事件的後設資料",
                "FIELDS": "後設資料",
@@ -1807,7 +1807,7 @@
       "ACTIONS": {
          "SPLIT": "分割",
          "SPLIT_TOOLTIP": "在目前游標位置拆分影片片段。",
-         "CUT": "隱藏/顯示",
+         "CUT": "隱藏\/顯示",
          "CUT_TOOLTIP": "隱藏或顯示影片被選定的部分。",
          "REPLAY_SEGMENT": "播放影片片段的開頭",
          "REPLAY_SEGMENT_TOOLTIP": "從頭開始播放目前影片片段。",
@@ -1900,8 +1900,8 @@
          "PAUSE": "暫停...",
          "NEXT_FRAME": "下一格",
          "PREVIOUS_FRAME": "上一格",
-         "NEXT_SEGMENT": "下一個片段/跳到結束",
-         "PREVIOUS_SEGMENT": "上一個片段 / 跳到開始",
+         "NEXT_SEGMENT": "下一個片段\/跳到結束",
+         "PREVIOUS_SEGMENT": "上一個片段 \/ 跳到開始",
          "MUTE": "静音",
          "VOLUME": "音量"
       }
@@ -1912,7 +1912,7 @@
       "USERNAME": "使用者名稱...",
       "PASSWORD": "密碼...",
       "LOGIN": "登入",
-      "ERROR": "不正確的使用者名稱 和/或 密碼"
+      "ERROR": "不正確的使用者名稱 和\/或 密碼"
    },
    "TABLE_FILTERS": {
       "FILTER_SELECTION": {
@@ -2202,7 +2202,7 @@
          "GENERAL": "一般",
          "PLAYER": "播放器",
          "EDITOR": "編輯",
-         "ADD_MEDIA": "Create Event/Series"
+         "ADD_MEDIA": "Create Event\/Series"
       },
       "DESCRIPTIONS": {
          "GENERAL": {
@@ -2217,16 +2217,16 @@
             "CHEAT_SHEET": "鍵盤快捷鍵"
          },
          "PLAYER": {
-            "PLAY_PAUSE": "播放/暫停",
+            "PLAY_PAUSE": "播放\/暫停",
             "PREVIOUS_FRAME": "上一格",
             "NEXT_FRAME": "下一格",
             "STEP_BACKWARD": "向後跳 10 秒",
             "STEP_FORWARD": "向前跳 10 秒",
-            "PREVIOUS_SEGMENT": "上一段/跳到開始",
-            "NEXT_SEGMENT": "下一段/跳到結尾",
+            "PREVIOUS_SEGMENT": "上一段\/跳到開始",
+            "NEXT_SEGMENT": "下一段\/跳到結尾",
             "VOLUME_UP": "提高音量",
             "VOLUME_DOWN": "降低音量",
-            "MUTE": "靜音/取消靜音"
+            "MUTE": "靜音\/取消靜音"
          },
          "EDITOR": {
             "SPLIT_AT_CURRENT_TIME": "分割",
@@ -2237,7 +2237,7 @@
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "區段結束"
          },
          "ADD_MEDIA": {
-            "NEXT_TAB": "Next tab/Create",
+            "NEXT_TAB": "Next tab\/Create",
             "PREVIOUS_TAB": "Previous tab"
          }
       }
@@ -2275,7 +2275,7 @@
          "PUBLISHEDHOURS": "已發行的影片時數"
       },
       "DESCRIPTION": {
-         "RANDOM": "這顯示隨機數據作為展示。 您可以通過從 etc/providers 中刪除相對應的統計提供者的 json 定義值來停用此圖表",
+         "RANDOM": "這顯示隨機數據作為展示。 您可以通過從 etc\/providers 中刪除相對應的統計提供者的 json 定義值來停用此圖表",
          "VIEWS_SUM": "這將顯示每個時間單位的總觀看次數。",
          "VIEWS_AVG": "這顯示了每個時間單位的平均觀看次數。",
          "PUBLISHEDHOURS": "這將顯示已發布的影片時數"

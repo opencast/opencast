@@ -205,8 +205,8 @@
       "EVENT_DELETED": "Das Video wurde gelöscht.",
       "EVENT_WILL_BE_DELETED": "Das Video wird gelöscht",
       "EVENTS_DELETED": "Die Videos werden gelöscht.",
-      "EVENTS_NOT_DELETED": "Das/die Video(s) konnte(n) nicht gelöscht werden.",
-      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "Die/das Video(s) konnte(n) nicht gelöscht werden, da Sie dazu nicht berechtigt sind.",
+      "EVENTS_NOT_DELETED": "Das\/die Video(s) konnte(n) nicht gelöscht werden.",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "Die\/das Video(s) konnte(n) nicht gelöscht werden, da Sie dazu nicht berechtigt sind.",
       "SERIES_DELETED": "Die Serie wurde gelöscht",
       "SERIES_NOT_DELETED": "Die Serie konnte nicht gelöscht werden",
       "LOCATION_DELETED": "Der Standort wurde gelöscht",
@@ -217,7 +217,7 @@
       "CONFLICT_ALREADY_ENDED": "Planungs-Fehler: Das Video endete bereits.",
       "CONFLICT_END_BEFORE_START": "Planungs-Fehler: Der Endzeitpunkt des Ereignisses muss nach dem Anfangszeitpunkt liegen.",
       "CONFLICT_IN_THE_PAST": "Die Planung konnte nicht aktualisiert werden: Sie können ein Video nicht in der Vergangenheit planen.",
-      "INVALID_ACL_RULES": "Regeln müssen eine gültige Rolle und Lese-/Schreibrechte enthalten.",
+      "INVALID_ACL_RULES": "Regeln müssen eine gültige Rolle und Lese-\/Schreibrechte enthalten.",
       "MISSING_ACL_RULES": "Es ist mindestens eine Rolle mit Lese- und Schreibberechtigungen erforderlich!",
       "SAVED_ACL_RULES": "Die Zugriffsregeln wurden gespeichert.",
       "SAVED_METADATA": "Die Metadaten wurden gespeichert.",
@@ -263,10 +263,10 @@
       "TOBIRA_OVERRIDE_NAME": "Der Titel der ausgewählten Seite wird mit dem Titel der Serie überschrieben.",
       "TOBIRA_NO_PATH_SEGMENT": "Die Seite benötigt ein Pfadsegment.",
       "TOBIRA_NOT_MOUNTED": "Die Serie konnte nicht in Tobira eingehängt werden.",
-      "TOBIRA_PATH_SEGMENT_INVALID": "Pfadsegment ist ungültig. Ein gültiges Pfadsegment ist mindestens 2 Zeichen lang, enthält keine Leerzeichen oder Kontrollzeichen, keines der Zeichen '<>\"[\\]^`{|}#%/? ', und startet nicht mit einem der Zeichen '-+~@_! &;:. =*'()'.",
+      "TOBIRA_PATH_SEGMENT_INVALID": "Pfadsegment ist ungültig. Ein gültiges Pfadsegment ist mindestens 2 Zeichen lang, enthält keine Leerzeichen oder Kontrollzeichen, keines der Zeichen '<>\"[\\]^`{|}#%\/? ', und startet nicht mit einem der Zeichen '-+~@_! &;:. =*'()'.",
       "TOBIRA_PATH_SEGMENT_UNIQUE": "Das Pfadsegment einer Seite muss in der gleichen Ebene eindeutig sein.",
       "TOBIRA_PAGE_NOT_FOUND": "Die Seite, auf die du navigieren wolltest, existiert nicht oder nicht mehr. Versuche es vielleicht von Anfang an.",
-      "TOBIRA_SERVER_ERROR": " Fehler bei der Kommunikation mit Tobira. Kontaktieren Sie Ihren Systemadministrator und/oder versuchen Sie es später erneut.",
+      "TOBIRA_SERVER_ERROR": " Fehler bei der Kommunikation mit Tobira. Kontaktieren Sie Ihren Systemadministrator und\/oder versuchen Sie es später erneut.",
       "TOBIRA_COPIED_DIRECT_LINK": "Der Link wurde in Ihre Zwischenablage kopiert.",
       "TOBIRA_FAILED_COPYING_DIRECT_LINK": "Fehler beim Kopieren in die Zwischenablage",
       "TOBIRA_NOT_FOUND": "Tobira kennt diese Serie (noch) nicht. Versuchen Sie es in ein paar Minuten noch einmal oder kontaktieren Sie Ihren Systemadministrator."
@@ -352,7 +352,7 @@
             }
          },
          "EDIT": {
-            "DESCRIPTION": "Bearbeiten und/oder wählen Sie die Metadatenfelder, die Sie aktualisieren möchten. Ein Feld kann nicht ausgewählt werden, wenn dies nicht zu einem geänderten Wert für mindestens ein Video führt, oder wenn das Feld ungültig ist (beispielsweise dürfen Pflichtfelder nicht leer sein). Markierte Metadatenfelder haben abweichende Werte für die ausgewählten Videos.",
+            "DESCRIPTION": "Bearbeiten und\/oder wählen Sie die Metadatenfelder, die Sie aktualisieren möchten. Ein Feld kann nicht ausgewählt werden, wenn dies nicht zu einem geänderten Wert für mindestens ein Video führt, oder wenn das Feld ungültig ist (beispielsweise dürfen Pflichtfelder nicht leer sein). Markierte Metadatenfelder haben abweichende Werte für die ausgewählten Videos.",
             "TABLE": {
                "CAPTION": "Metadaten gewählter Videos",
                "FIELDS": "Metadaten",
@@ -940,7 +940,7 @@
                "REASONS": {
                   "CUTTING": "Schneiden erforderlich",
                   "REVIEW": "Überprüfung erforderlich",
-                  "ASYNC": "A/V Spuren asynchron",
+                  "ASYNC": "A\/V Spuren asynchron",
                   "AUDIO_ISSUE": "Fehlende oder beschädigte Audiospur",
                   "CANCELLED": "Abgebrochene Aufzeichnung",
                   "CONFLICTING_METADATA": "Widersprüchliche Metadaten",
@@ -1163,7 +1163,7 @@
             "THEME": {
                "CAPTION": "Branding",
                "DESCRIPTION": {
-                  "TEXT": "Es kann optional ein Branding ausgewählt werden. Damit lassen sich Vor-/ Nachspannvideos, Wasserzeichen oder Titelbild mit Metadaten generieren."
+                  "TEXT": "Es kann optional ein Branding ausgewählt werden. Damit lassen sich Vor-\/ Nachspannvideos, Wasserzeichen oder Titelbild mit Metadaten generieren."
                },
                "TITLE": "Branding",
                "LABEL": "Branding auswählen",
@@ -1807,7 +1807,7 @@
       "ACTIONS": {
          "SPLIT": "Auftrennen",
          "SPLIT_TOOLTIP": "Segment an der aktuellen Cursor-Position teilen.",
-         "CUT": "Aus-/Einblenden",
+         "CUT": "Aus-\/Einblenden",
          "CUT_TOOLTIP": "Verstecke oder zeige den ausgewählten Teil des Videos.",
          "REPLAY_SEGMENT": "Anfang des Segments abspielen",
          "REPLAY_SEGMENT_TOOLTIP": "Spiele das aktuelle Segment von Anfang an.",
@@ -1900,8 +1900,8 @@
          "PAUSE": "Pause",
          "NEXT_FRAME": "Nächstes Bild",
          "PREVIOUS_FRAME": "Vorheriges Bild",
-         "NEXT_SEGMENT": "Nächstes Segment/zum Ende springen",
-         "PREVIOUS_SEGMENT": "Vorheriges Segment/zum Start springen",
+         "NEXT_SEGMENT": "Nächstes Segment\/zum Ende springen",
+         "PREVIOUS_SEGMENT": "Vorheriges Segment\/zum Start springen",
          "MUTE": "Stummschalten",
          "VOLUME": "Lautstärke"
       }
@@ -1912,7 +1912,7 @@
       "USERNAME": "Benutzername…",
       "PASSWORD": "Passwort…",
       "LOGIN": "Anmelden",
-      "ERROR": "Falscher Benutzername und/oder Passwort"
+      "ERROR": "Falscher Benutzername und\/oder Passwort"
    },
    "TABLE_FILTERS": {
       "FILTER_SELECTION": {
@@ -2202,7 +2202,7 @@
          "GENERAL": "Allgemein",
          "PLAYER": "Player",
          "EDITOR": "Editor",
-         "ADD_MEDIA": "Video/Serie erstellen"
+         "ADD_MEDIA": "Video\/Serie erstellen"
       },
       "DESCRIPTIONS": {
          "GENERAL": {
@@ -2217,16 +2217,16 @@
             "CHEAT_SHEET": "Tastenkürzel"
          },
          "PLAYER": {
-            "PLAY_PAUSE": "Wiedergabe/Pause",
+            "PLAY_PAUSE": "Wiedergabe\/Pause",
             "PREVIOUS_FRAME": "Vorheriges Bild",
             "NEXT_FRAME": "Nächstes Bild",
             "STEP_BACKWARD": "10s zurück springen",
             "STEP_FORWARD": "10s vorwärts springen",
-            "PREVIOUS_SEGMENT": "Vorheriges Segment/zum Start springen",
-            "NEXT_SEGMENT": "Nächstes Segment/zum Ende springen",
+            "PREVIOUS_SEGMENT": "Vorheriges Segment\/zum Start springen",
+            "NEXT_SEGMENT": "Nächstes Segment\/zum Ende springen",
             "VOLUME_UP": "Lautstärke erhöhen",
             "VOLUME_DOWN": "Lautstärke senken",
-            "MUTE": "Ton ein-/ausschalten"
+            "MUTE": "Ton ein-\/ausschalten"
          },
          "EDITOR": {
             "SPLIT_AT_CURRENT_TIME": "Auftrennen",
@@ -2237,7 +2237,7 @@
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "Segmentende"
          },
          "ADD_MEDIA": {
-            "NEXT_TAB": "Nächster Tab/Erstellen",
+            "NEXT_TAB": "Nächster Tab\/Erstellen",
             "PREVIOUS_TAB": "Vorheriger Tab"
          }
       }
@@ -2275,7 +2275,7 @@
          "PUBLISHEDHOURS": "Veröffentlichte Stunden an Videomaterial"
       },
       "DESCRIPTION": {
-         "RANDOM": "Diese Zufallsdaten dienen ausschließlich Test- und Demonstrationszwecken. Um diese Darstellung zu deaktivieren, können Sie die entsprechende Konfiguration in etc/providers entfernen",
+         "RANDOM": "Diese Zufallsdaten dienen ausschließlich Test- und Demonstrationszwecken. Um diese Darstellung zu deaktivieren, können Sie die entsprechende Konfiguration in etc\/providers entfernen",
          "VIEWS_SUM": "Diese Statistik zeigt die Summe der Zugriffe pro Zeiteinheit.",
          "VIEWS_AVG": "Diese Statistik zeigt die durchschnittliche Anzahl von Zugriffe pro Zeiteinheit.",
          "PUBLISHEDHOURS": "Dies zeigt die veröffentlichten Videostunden an"
