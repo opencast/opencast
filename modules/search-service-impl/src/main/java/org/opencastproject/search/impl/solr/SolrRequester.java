@@ -639,7 +639,7 @@ public class SolrRequester {
     if (solrIdRequest != null) {
 
       // If user has ROLE_EPISODE_<ID>_READ/WRITE, no further permission checks are necessary
-      if (user.hasRole(ACL_ID_PREFIX_EPISODE + solrIdRequest + action.toUpperCase())) {
+      if (user.hasRole(ACL_ID_PREFIX_EPISODE + solrIdRequest + "_" + action.toUpperCase())) {
         applyPermissions = false;
       }
       String cleanSolrIdRequest = SolrUtils.clean(solrIdRequest);
