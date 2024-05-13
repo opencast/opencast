@@ -950,7 +950,10 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       throw new IndexRebuildException("The given type " + type + " was not valid. Should be null or "
           + ServicePart.values());
     }
-    ServicePart parsedType = ServicePart.valueOf(type);
+    ServicePart parsedType = null;
+    if (type != null && EnumUtils.isValidEnum(ServicePart.class, type)) {
+      parsedType = ServicePart.valueOf(type);
+    }
 
     final Organization originalOrg = securityService.getOrganization();
     final User originalUser = (originalOrg != null ? securityService.getUser() : null);
