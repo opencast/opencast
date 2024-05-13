@@ -736,6 +736,7 @@
     <bundle dependency="true">mvn:com.graphql-java/graphql-java/${graphql.version}</bundle>
     <bundle dependency="true">mvn:io.github.graphql-java/graphql-java-annotations/${graphql-annotations.version}</bundle>
     <bundle dependency="true">wrap:mvn:com.graphql-java/graphql-java-extended-scalars/21.0$Bundle-SymbolicName=graphql-java-extended-scalars&amp;Bundle-Version=21.0</bundle>
+    <bundle dependency="true">mvn:com.github.ben-manes.caffeine/caffeine/3.1.8</bundle>
 
     <!-- graphql transitive dependencies -->
     <bundle dependency="true">mvn:org.antlr/antlr4-runtime/4.7.2</bundle>

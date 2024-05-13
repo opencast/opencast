@@ -1416,6 +1416,11 @@
         <artifactId>graphql-java-extended-scalars</artifactId>
         <version>${graphql-java-extended-scalars.version}</version>
       </dependency>
+      <dependency>
+        <groupId>com.github.ben-manes.caffeine</groupId>
+        <artifactId>caffeine</artifactId>
+        <version>3.1.8</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <!-- All non-build related project data below here -->

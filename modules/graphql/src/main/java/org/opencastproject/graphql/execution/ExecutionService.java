@@ -157,6 +157,7 @@ public class ExecutionService {
       graphQL = GraphQL.newGraphQL(schema)
           .queryExecutionStrategy(new AsyncExecutionStrategy(exceptionHandler))
           .mutationExecutionStrategy(new AsyncSerialExecutionStrategy(exceptionHandler))
+          .preparsedDocumentProvider(new QueryCache())
           .executionIdProvider(new OrganizationExecutionIdProvider(organizationId))
           .defaultDataFetcherExceptionHandler(exceptionHandler)
           .instrumentation(new ChainedInstrumentation(chainedList))
