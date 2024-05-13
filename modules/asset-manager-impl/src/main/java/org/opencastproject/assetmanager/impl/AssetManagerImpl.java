@@ -987,13 +987,13 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
                 var updatedEventData = index.getEvent(snapshot.getMediaPackage().getIdentifier().toString(), orgId,
                     snapshotSystemUser);
-                if (ServicePart.ACL.equals(parsedType)) {
-                  // Only reindex ACLs
-                  updatedEventData = getEventUpdateFunctionOnlyAcl(snapshot, orgId, snapshotSystemUser)
-                      .apply(updatedEventData);
-                } else if (type == null) {
+                if (type == null) {
                   // Reindex everything (default)
                   updatedEventData = getEventUpdateFunction(snapshot, orgId, snapshotSystemUser)
+                      .apply(updatedEventData);
+                } else if (ServicePart.ACL.equals(parsedType)) {
+                  // Only reindex ACLs
+                  updatedEventData = getEventUpdateFunctionOnlyAcl(snapshot, orgId, snapshotSystemUser)
                       .apply(updatedEventData);
                 } else {
                   throw new IndexRebuildException("The value for service part was " + type + ", which is not an "
