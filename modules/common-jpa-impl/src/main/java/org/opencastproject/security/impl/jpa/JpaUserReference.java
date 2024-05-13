@@ -122,8 +122,10 @@ public class JpaUserReference {
     for (JpaRole role : roles) {
       roleSet.add(JaxbRole.fromRole(role));
     }
-    return new JaxbUser(username, null, name, email, providerName, JaxbOrganization.fromOrganization(organization),
+    var user = new JaxbUser(username, null, name, email, providerName, JaxbOrganization.fromOrganization(organization),
             roleSet);
+    user.setManageable(true);
+    return user;
   }
 
   /**
