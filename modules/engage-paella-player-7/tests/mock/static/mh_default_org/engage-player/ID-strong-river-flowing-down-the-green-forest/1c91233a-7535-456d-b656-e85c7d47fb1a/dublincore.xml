@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?><dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/" xmlns:dcterms="http://purl.org/dc/terms/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <dcterms:created>2019-06-18T07:40:53Z</dcterms:created>
+    <dcterms:creator>Nature Stock Videos</dcterms:creator>
+    <dcterms:description>Free stock footage of a strong river flowing down the dense green summer forest on a sunny day, late in the evening. Different trees on each side of the river, while white bubbles coming from the water as it rushes down the rocky landscape. This footage was taken with a Mavic 2 Pro drone mounted on a tripod with a Katana grip</dcterms:description>
+    <dcterms:extent xsi:type="dcterms:ISO8601">PT29.996S</dcterms:extent>
+    <dcterms:identifier>ID-strong-river-flowing-down-the-green-forest</dcterms:identifier>
+    <dcterms:license>CC0</dcterms:license>
+    <dcterms:source>https://www.naturestockvideos.com/free-stock-footage-of-rivers/strong-river-flowing-down-the-green-forest/</dcterms:source>
+    <dcterms:temporal xsi:type="dcterms:Period">start=2019-06-18T07:40:53Z; end=2019-06-18T07:41:22Z; scheme=W3C-DTF;</dcterms:temporal>
+    <dcterms:title>Strong river flowing down the forest</dcterms:title>
+</dublincore>

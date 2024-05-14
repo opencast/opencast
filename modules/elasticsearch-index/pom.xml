@@ -7,12 +7,11 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>14-SNAPSHOT</version>
+    <version>16-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
-    <elasticsearch.version>7.10.2</elasticsearch.version>
     <checkstyle.skip>false</checkstyle.skip>
   </properties>
   <dependencies>
@@ -118,8 +117,7 @@
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <scope>test</scope>
+      <artifactId>slf4j-reload4j</artifactId>
     </dependency>
     <dependency>
       <groupId>jakarta.xml.bind</groupId>
@@ -137,6 +135,11 @@
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -146,7 +149,7 @@
         <extensions>true</extensions>
         <configuration>
           <ignoredUnusedDeclaredDependencies>
-            <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-log4j12</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-reload4j</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.osgi:org.osgi.service.cm</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
@@ -157,8 +160,6 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Build-Number>${buildNumber}</Build-Number>
             <Bundle-Activator>org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService</Bundle-Activator>
             <!-- Only with this can the endpoint class use OSGI annotations while the IndexRebuildService doesn't -->
             <_dsannotations-options>norequirements</_dsannotations-options>

@@ -30,7 +30,7 @@
   "username": "Kullanıcı Adı",
   "password": "Şifre",
   "remember_me": "Beni hatırla.",
-  "sthWentWrong": "Something went wrong. Please try again.",
+  "sthWentWrong": "Bir şeyler ters gitti. Lütfen yeniden deneyin.",
   "loading": "Yükleniyor ...",
   "no_data": "Veri bulunamadı.",
   "login_success": "Oturum açma başarılı.",

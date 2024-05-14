@@ -1,7 +1,7 @@
-Upgrading Opencast from 13.x to 14.x
+Upgrading Opencast from 14.x to 15.x
 ====================================
 
-This guide describes how to upgrade Opencast 13.x to 14.x.
+This guide describes how to upgrade Opencast 14.x to 15.x.
 In case you need information about how to upgrade older versions of Opencast,
 please refer to [older release notes](https://docs.opencast.org).
 
@@ -12,73 +12,108 @@ please refer to [older release notes](https://docs.opencast.org).
 1. [Migrate the database](#database-migration)
 1. Start Opencast
 
+Subtitle changes
+----------------
+With Opencast 15 we want to put more emphasis on subtitles. You can find more details on how subtitles should be
+handled going forward in [Subtitles](./configuration/subtitles.md).
+
+This comes with a bit of migration. Namely, subtitles should not be stored as "attachments" or "catalogs" anymore, but
+as "media"(as they are called in the Admin UI) or "tracks" (as they are called internally). Therefore, all subtitle
+files currently stored as attachments or catalogs in your events should be moved to tracks. This can easily be
+accomplished with the "changetype" workflow operation handler new to Opencast 15. See example below. (Subtitles should
+then be republished)
+
+Additionally, we recommend adding a language tag `lang:<language-code>` to your subtitle files. While tags for subtitles
+are optional, the flavor will not encode the given language for a subtitle anymore, so a language tag is useful for
+identification and display purposes.
+You can read more about subtitles tags in [Subtitles](./configuration/subtitles.md).
+
+If your subtitles are not in WebVTT format, they should be converted to WebVTT as well. While other formats are possible,
+WebVTT is the only one that will be guaranteed to work.
+
+<details>
+
+<summary>Example workflow for changing subtitle type to track</summary>
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<definition xmlns="http://workflow.opencastproject.org">
+
+<id>change-subtitles</id>
+  <title>Change Subtitles Type</title>
+  <tags>
+    <tag>archive</tag>
+  </tags>
+  <description></description>
+  <operations>
+
+    <!-- Add a language tag for the english subtitles -->
+
+    <operation
+        id="tag"
+        description="Tagging media package elements">
+      <configurations>
+        <configuration key="source-flavors">captions/vtt+en</configuration>
+        <configuration key="target-tags">+lang:en</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Change the type of all files with the "captions/*" flavor to track -->
+    <!-- And their flavor to "captions/source" -->
+
+    <operation
+        id="changetype"
+        description="Retracting elements flavored with presentation and tagged with preview from Engage">
+      <configurations>
+        <configuration key="source-flavors">captions/*</configuration>
+        <configuration key="target-flavor">captions/source</configuration>
+        <configuration key="target-type">track</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Save changes -->
+
+    <operation
+        id="snapshot"
+        if="NOT (${presenter_delivery_exists} OR ${presentation_delivery_exists})"
+        description="Archive publishing information">
+      <configurations>
+        <configuration key="source-tags">archive</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Clean up work artifacts -->
+
+    <operation
+        id="cleanup"
+        fail-on-error="false"
+        description="Remove temporary processing artifacts">
+      <configurations>
+        <!-- On systems with shared workspace or working file repository -->
+        <!-- you want to set this option to false. -->
+        <configuration key="delete-external">true</configuration>
+        <!-- ACLs are required again when working through ActiveMQ messages -->
+        <configuration key="preserve-flavors">security/*</configuration>
+      </configurations>
+    </operation>
+
+  </operations>
+</definition>
+```
+</details>
+
 Configuration changes
 ---------------------
-
-### Analyze-mediapackage workflow operation changes
-
-The behaviour of the `analyze-mediapackage` workflow operation has been changed.
-Instead of replacing every character that doesn't match `a-z` or `0-9` with an underscore character,
-the operation now only replaces the `/` separating flavor and subflavor. This makes it behave identical to the
-`analyze-tracks` operation. If you make use of `analyze-mediapackage` workflow operation in your custom workflows,
-please adopt this changes.
-
-For more details see the documentation for the
-[analyze-mediapackage operation](workflowoperationhandlers/analyze-mediapackage-woh.md).
-
-### Composite workflow operation changes
-
-Instead of the `#{compositeCommand}` variable which was build by the composite workflow operation handler and could not
-be configured, the composite operation now supports multiple different variables for constructing the ffmpeg command to
-create the composite, most of which can be configured in the encoding profile. This is relevant e.g. for GPU encoding.
-
-If you use custom encoding profiles for composite or use the existing profiles in a different way than the standard
-workflows do, you might need to make some changes. Specifically, the `#{compositeCommand}` variable is no longer
-supported in the ffmpeg command, and the `mp4-preview` profile now only supports dual-streams and no watermark,
-while the `composite` profile retains its full functionality, but offers more configuration options than before.
-
-For more details see the updated documentation for the
-[composite operation](workflowoperationhandlers/composite-woh.md).
-
-### New default editor
-
-The default editor of Opencast has changed.
-If you want to continue using the internal editor of the old admin interface,
-you need to specifically configure this in `etc/org.opencastproject.organization-mh_default_org.cfg`
-by configuring `prop.admin.editor.url`.
-
-Note that the old admin interface is deprecated and will be removed in one of the next major releases.
-Even if you use the old editor for now, please make sure to test the new one
-and report potential problems.
-
-### New default player
-
-Paella 7 is the new default player in Opencast.
-If you want to continue using the Paella 6 you need to specifically configure this in
-`etc/org.opencastproject.organization-mh_default_org.cfg` by configuring `prop.player`.
-
-Note that the old player Paella 6 is deprecated and will be removed in one of the next major releases.
-Even if you use the old player for now, please make sure to test the new one and report potential problems.
-
-### Theodul player removed
-
-The Theodul player was removed and can not be used any more.
-Please move to the new [Paella7 player](#new-default-player).
-
-### Global oc-remember-me cookie
-
-It's now possible, to use the same `oc-remember-me` cookie for all nodes.
-So, if you log into the admin node for example, you don't have to log in again, when switching to the presentation
-node. You can enable it in the `etc/security/mh_default_org.xml` configuration (search for `rememberMeServices` bean
-and set the property named `key`).
-
-### Login page moved
-
-The login web page is moved from `/admin-ng/login.html` to `/login.html`. You may want to adopt this change in yor
-reverse proxy configuration in some cases.
+- The default admin ui is now the "new" admin ui. If it does not suit your needs for whatever reason, you can always
+  switch back the "old" admin ui in `etc/ui-config/mh_default_org/runtime-info-ui/settings.json`
+  [[#5414](https://github.com/opencast/opencast/pull/5414)]
+- Paella Player 6 has been turned into a plugin. If you are still using it, you will need to enable it.
+  [[#4965](https://github.com/opencast/opencast/pull/4965)]
 
 Database Migration
 ------------------
 
-You will find database upgrade scripts in `docs/upgrade/13_to_14/`. These scripts are suitable for both, MariaDB and
-PostgreSQL. Changes include DB schema optimizations as well as fixes for the new workflow tables.
+There is no database migration required for upgrading form 14.x to 15.x.
+
+Elasticsearch Index Rebuild
+---------------------------
+There is no index rebuild required for upgrading form 14.x to 15.x.

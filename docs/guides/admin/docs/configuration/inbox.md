@@ -78,7 +78,7 @@ Addition: How to Prepare a Media Package
 
 Media packages contain media files and metadata files describing them.
 Opencast is able to generate zipped media packages using the
-[ZipWorkflowOperation](../workflowoperationhandlers/zip-woh/).
+[ZipWorkflowOperation](../workflowoperationhandlers/zip-woh.md).
 
 To generate a media package on your own, first, create a `manifest.xml` or manifest file.
 You can also let Opencast create a valid empty media package XML using the `/ingest/createMediaPackage` REST endpoint.

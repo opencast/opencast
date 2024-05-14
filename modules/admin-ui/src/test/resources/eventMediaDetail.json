@@ -8,6 +8,7 @@
   "mimetype": "video\/quicktime",
   "streams": {
     "audio": [],
+    "subtitle": [],
     "video": [
       {
         "id": "fortesting",
@@ -24,6 +25,7 @@
   "checksum": "43b7d843b02c4a429b2f547a4f230d31",
   "type": "presentation\/source",
   "has_audio": false,
+  "has_subtitle": false,
   "reference": "",
   "url": "media.mov",
   "size": -1

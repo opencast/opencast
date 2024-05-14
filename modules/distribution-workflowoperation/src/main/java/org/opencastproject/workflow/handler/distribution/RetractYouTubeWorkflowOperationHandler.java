@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -50,7 +50,7 @@ import org.slf4j.LoggerFactory;
     immediate = true,
     service = WorkflowOperationHandler.class,
     property = {
-        "service.description=Youtube Retraction Workflow Operation Handler",
+        "service.description=YouTube Retraction Workflow Operation Handler",
         "workflow.operation=retract-youtube"
     }
 )

@@ -77,7 +77,6 @@
       id="snapshot"
       description="Archive raw recording after ingest">
       <configurations>
-        <configuration key="source-flavors">captions/*</configuration>
         <configuration key="source-tags">archive</configuration>
       </configurations>
     </operation>
@@ -98,7 +97,6 @@
       id="snapshot"
       description="Archive preview information">
       <configurations>
-        <configuration key="source-flavors">captions/*</configuration>
         <configuration key="source-tags">archive</configuration>
       </configurations>
     </operation>
@@ -146,7 +144,6 @@
       if="${straightToPublishing}"
       description="Archive publishing information">
       <configurations>
-        <configuration key="source-flavors">captions/*</configuration>
         <configuration key="source-tags">archive</configuration>
       </configurations>
     </operation>

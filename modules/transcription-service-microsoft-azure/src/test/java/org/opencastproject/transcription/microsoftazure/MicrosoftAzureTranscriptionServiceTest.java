@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -38,6 +38,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.Track;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
@@ -61,7 +62,6 @@ import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.Stream;
-import com.entwinemedia.fn.data.Opt;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
@@ -75,12 +75,15 @@ import org.osgi.service.component.ComponentContext;
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 public class MicrosoftAzureTranscriptionServiceTest {
@@ -236,7 +239,7 @@ public class MicrosoftAzureTranscriptionServiceTest {
     EasyMock.expect(workspace.get(uri)).andReturn(null); // Doesn't matter what is returned
     EasyMock.replay(workspace);
 
-    MediaPackageElement mpe = service.getGeneratedTranscription(MP_ID, null);
+    MediaPackageElement mpe = service.getGeneratedTranscription(MP_ID, null, Track.TYPE);
     Assert.assertEquals("captions", mpe.getFlavor().getType());
     Assert.assertEquals("microsoft-azure", mpe.getFlavor().getSubtype());
   }
@@ -287,8 +290,8 @@ public class MicrosoftAzureTranscriptionServiceTest {
     Snapshot snapshot = EasyMock.createNiceMock(Snapshot.class);
     EasyMock.expect(snapshot.getOrganizationId()).andReturn(org.getId());
     ARecord aRec = EasyMock.createNiceMock(ARecord.class);
-    EasyMock.expect(aRec.getSnapshot()).andReturn(Opt.some(snapshot));
-    Stream<ARecord> recStream = Stream.mk(aRec);
+    EasyMock.expect(aRec.getSnapshot()).andReturn(Optional.of(snapshot));
+    LinkedHashSet<ARecord> recStream = new LinkedHashSet<>(Arrays.asList(aRec));
     Predicate p = EasyMock.createNiceMock(Predicate.class);
     EasyMock.expect(p.and(p)).andReturn(p);
     AResult r = EasyMock.createNiceMock(AResult.class);

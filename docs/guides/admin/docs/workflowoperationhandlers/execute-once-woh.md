@@ -12,14 +12,14 @@ may be used to create a new mediapackage element, or to add configuration proper
 To run a command for each element in a MediaPackage, use the [Execute Many](execute-many-woh.md) operation.
 
 Commands run by this operation handler must first be included in the `commands.allowed` list in the
-[Execute Service](../modules/execute.md#service-configuration) configuration.
+[Execute Service](../configuration/execute.md#service-configuration) configuration.
 
 
 Parameter Table
 ---------------
 
 All parameters are empty by default if not specified. The special parameters `#id`, `#flavor` and `#out` are described
-in [Execute Service: Parameter Substitution](../modules/execute.md#parameter-substitution)
+in [Execute Service: Parameter Substitution](../configuration/execute.md#parameter-substitution)
 
 |Configuration keys|Example    |Description       |Required?|
 |------------------|-----------|------------------|---------|

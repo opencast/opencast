@@ -1,0 +1,1 @@
+Opencast 16 replaces the previous Solr base Search Service with an Elasticsearch based implementation.  This requires a search index rebuild upon upgrade.

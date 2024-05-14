@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -24,14 +24,11 @@ import static com.entwinemedia.fn.Stream.$;
 import static com.entwinemedia.fn.data.Opt.some;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.opencastproject.scheduler.impl.SchedulerUtil.calculateChecksum;
-import static org.opencastproject.scheduler.impl.SchedulerUtil.episodeToMp;
 import static org.opencastproject.scheduler.impl.SchedulerUtil.eventOrganizationFilter;
 import static org.opencastproject.scheduler.impl.SchedulerUtil.isNotEpisodeDublinCore;
-import static org.opencastproject.scheduler.impl.SchedulerUtil.recordToMp;
 import static org.opencastproject.scheduler.impl.SchedulerUtil.uiAdapterToFlavor;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.util.EqualsUtil.ne;
-import static org.opencastproject.util.Log.getHumanReadableTimeString;
 import static org.opencastproject.util.RequireUtil.notEmpty;
 import static org.opencastproject.util.RequireUtil.notNull;
 import static org.opencastproject.util.RequireUtil.requireTrue;
@@ -191,7 +188,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   private static final String SNAPSHOT_OWNER = SchedulerService.JOB_TYPE;
 
   private static final Gson gson = new Gson();
-
   /**
    * Deserializes properties stored in string columns of the extended event table
    * @param props Properties as retrieved from the DB
@@ -398,9 +394,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       if (cacheExpireDuration.isSome()) {
         lastModifiedCache = CacheBuilder.newBuilder().expireAfterWrite(cacheExpireDuration.get(), TimeUnit.SECONDS)
                 .build();
-        logger.info("Set last modified cache to {}", getHumanReadableTimeString(cacheExpireDuration.get()));
+        logger.info("Set last modified cache to {}", DateTimeSupport.humanReadableTime(cacheExpireDuration.get()));
       } else {
-        logger.info("Set last modified cache to default {}", getHumanReadableTimeString(DEFAULT_CACHE_EXPIRE));
+        logger.info("Set last modified cache to default {}", DateTimeSupport.humanReadableTime(DEFAULT_CACHE_EXPIRE));
       }
       final Option<Boolean> maintenance = OsgiUtil.getOptCfgAsBoolean(properties, CFG_KEY_MAINTENANCE);
       if (maintenance.getOrElse(false)) {
@@ -443,8 +439,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       AResult result = query.select(query.nothing())
               .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId).and(query.version().isLatest())))
               .run();
-      Opt<ARecord> record = result.getRecords().head();
-      if (record.isSome()) {
+      Optional<ARecord> record = result.getRecords().stream().findFirst();
+      if (record.isPresent()) {
         logger.warn("Mediapackage with id '{}' already exists!", mediaPackageId);
         throw new SchedulerConflictException("Mediapackage with id '" + mediaPackageId + "' already exists!");
       }
@@ -587,6 +583,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         DublinCoreValue eventTime = EncodingSchemeUtils.encodePeriod(new DCMIPeriod(startDate, endDate),
                 Precision.Second);
         dc.set(DublinCore.PROPERTY_TEMPORAL, eventTime);
+        dc.set(DublinCore.PROPERTY_CREATED, EncodingSchemeUtils.encodeDate(startDate, Precision.Second));
         try {
           mediaPackage = updateDublincCoreCatalog(mediaPackage, dc);
         } catch (Exception e) {
@@ -689,13 +686,13 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
               .select(query.snapshot())
               .where(withOrganization(query).and(query.mediaPackageId(mpId).and(query.version().isLatest())
                   .and(withOwner(query))));
-      Opt<ARecord> optEvent = select.run().getRecords().head();
+      Optional<ARecord> optEvent = select.run().getRecords().stream().findFirst();
       Opt<ExtendedEventDto> optExtEvent = persistence.getEvent(mpId);
-      if (optEvent.isNone() || optExtEvent.isNone())
+      if (optEvent.isEmpty() || optExtEvent.isNone())
         throw new NotFoundException("No event found while updating event " + mpId);
 
       ARecord record = optEvent.get();
-      if (record.getSnapshot().isNone())
+      if (record.getSnapshot().isEmpty())
         throw new NotFoundException("No mediapackage found while updating event " + mpId);
       Snapshot snapshot = record.getSnapshot().get();
       MediaPackage archivedMediaPackage = snapshot.getMediaPackage();
@@ -856,9 +853,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     if (dcCatalog.isNone())
       return Opt.none();
 
-    Opt<Asset> asset = assetManager.getAsset(snapshot.getVersion(),
+    Optional<Asset> asset = assetManager.getAsset(snapshot.getVersion(),
             snapshot.getMediaPackage().getIdentifier().toString(), dcCatalog.get().getIdentifier());
-    if (asset.isNone())
+    if (asset.isEmpty())
       return Opt.none();
 
     if (Availability.OFFLINE.equals(asset.get().getAvailability()))
@@ -943,8 +940,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
               .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId)).and(withOwner(query))
               .and(query.version().isLatest()))
               .run();
-      Opt<ARecord> record = result.getRecords().head();
-      if (record.isNone())
+      Optional<ARecord> record = result.getRecords().stream().findFirst();
+      if (record.isEmpty())
         throw new NotFoundException();
 
       Opt<DublinCoreCatalog> dublinCore = loadEpisodeDublinCoreFromAsset(record.get().getSnapshot().get());
@@ -1169,10 +1166,12 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
       final CalendarGenerator cal = new CalendarGenerator(seriesService);
       for (final ARecord record : result.getRecords()) {
-        final Opt<MediaPackage> optMp = record.getSnapshot().map(episodeToMp);
+        final Optional<MediaPackage> optMp = record.getSnapshot().isPresent()
+            ? Optional.of(record.getSnapshot().get().getMediaPackage())
+            : Optional.empty();
 
         // If the event media package is empty, skip the event
-        if (optMp.isNone()) {
+        if (optMp.isEmpty()) {
           logger.warn("Mediapackage for event '{}' can't be found, event is not recorded", record.getMediaPackageId());
           continue;
         }
@@ -1449,7 +1448,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
           EventIndexUtils.updateSeriesName(event, organization, user, index);
         } catch (SearchIndexException e) {
           logger.error("Error updating the series name of the event {} in the {} index.", mediaPackageId,
-                  index.getIndexName(), e);
+                  e);
         }
       }
       if (presenters.isSome()) {
@@ -1480,7 +1479,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       index.addOrUpdateEvent(mediaPackageId, updateFunction, organization, user);
       logger.debug("Scheduled event {} updated in the {} index.", mediaPackageId, index.getIndexName());
     } catch (SearchIndexException e) {
-      logger.error("Error updating the scheduled event {} in the {} index.", mediaPackageId, index.getIndexName(), e);
+      logger.error("Error updating the scheduled event {} in the {} index.", mediaPackageId, e);
     }
   }
 
@@ -1505,7 +1504,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       logger.debug("Recording state of event {} removed from the {} index.", mediaPackageId, index.getIndexName());
     } catch (SearchIndexException e) {
       logger.error("Failed to remove the recording state of event {} from the {} index.", mediaPackageId,
-              index.getIndexName(), e);
+              e);
     }
   }
 
@@ -1524,7 +1523,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
               index.getIndexName());
     } catch (SearchIndexException e) {
       logger.error("Failed to delete the scheduling information of event {} from the {} index.", mediaPackageId,
-              index.getIndexName(), e);
+              e);
     }
   }
 
@@ -1630,11 +1629,11 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       predicate = predicate.and(withOwner(query));
     }
 
-    Opt<ARecord> record = query.select(query.snapshot()).where(predicate).run().getRecords().head();
-    if (record.isNone())
+    Optional<ARecord> record = query.select(query.snapshot()).where(predicate).run().getRecords().stream().findFirst();
+    if (record.isEmpty())
       throw new RuntimeNotFoundException(new NotFoundException());
 
-    return record.bind(recordToMp).get();
+    return record.get().getSnapshot().get().getMediaPackage();
   }
 
   private MediaPackage getEventMediaPackage(final String mediaPackageId) {
@@ -1717,10 +1716,10 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       try {
         total = persistence.countEvents();
       } catch (SchedulerServiceDatabaseException e) {
-        logIndexRebuildError(logger, index.getIndexName(), e);
-        throw new IndexRebuildException(index.getIndexName(), getService(), e);
+        logIndexRebuildError(logger, e);
+        throw new IndexRebuildException(getService(), e);
       }
-      logIndexRebuildBegin(logger, index.getIndexName(), total, "scheduled events");
+      logIndexRebuildBegin(logger, total, "scheduled events");
       final int[] current = {0};
       int n = 20;
       var updatedEventRange = new ArrayList<Event>();
@@ -1733,7 +1732,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
                   try {
                     events = persistence.getEvents();
                   } catch (SchedulerServiceDatabaseException e) {
-                    logIndexRebuildError(logger, index.getIndexName(), e, organization);
+                    logIndexRebuildError(logger, e, organization);
                     return;
                   }
 
@@ -1748,7 +1747,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
                       if (updatedEventRange.size() >= n || current[0] >= events.size()) {
                         index.bulkEventUpdate(updatedEventRange);
-                        logIndexRebuildProgress(logger, index.getIndexName(), total, current[0], n);
+                        logIndexRebuildProgress(logger, total, current[0], n);
                         updatedEventRange.clear();
                       }
                     } catch (SearchIndexException e) {
@@ -1758,8 +1757,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
                });
       }
     } catch (Exception e) {
-      logIndexRebuildError(logger, index.getIndexName(), e);
-      throw new IndexRebuildException(index.getIndexName(), getService(), e);
+      logIndexRebuildError(logger, e);
+      throw new IndexRebuildException(getService(), e);
     }
   }
 
@@ -1792,7 +1791,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       AQueryBuilder query = assetManager.createQuery();
       final AResult result = query.select(query.snapshot())
               .where(query.mediaPackageId(scheduledEvent.getMediaPackageId()).and(query.version().isLatest())).run();
-      final Snapshot snapshot = result.getRecords().head().get().getSnapshot().get();
+      final Snapshot snapshot = result.getRecords().stream().findFirst().get().getSnapshot().get();
 
       Opt<AccessControlList> acl = Opt.some(authorizationService.getActiveAcl(snapshot.getMediaPackage()).getA());
       Opt<DublinCoreCatalog> dublinCore = loadEpisodeDublinCoreFromAsset(snapshot);
@@ -1816,7 +1815,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
           EventIndexUtils.updateSeriesName(event, orgId, user, index);
         } catch (SearchIndexException e) {
           logger.error("Error updating the series name of the event {} in the {} index.",
-                  scheduledEvent.getMediaPackageId(), index.getIndexName(), e);
+                  scheduledEvent.getMediaPackageId(), e);
         }
       }
       if (presentersOpt.isSome()) {

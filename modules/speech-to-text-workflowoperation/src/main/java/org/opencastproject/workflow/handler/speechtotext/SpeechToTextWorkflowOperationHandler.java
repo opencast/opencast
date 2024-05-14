@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -29,6 +29,7 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.attachment.AttachmentImpl;
+import org.opencastproject.mediapackage.selector.TrackSelector;
 import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.metadata.api.MediaPackageMetadata;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
@@ -56,6 +57,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -132,13 +134,16 @@ public class
             Configuration.many, Configuration.one);
     MediaPackageElementFlavor sourceFlavor = tagsAndFlavors.getSingleSrcFlavor();
 
-    Track[] tracks = mediaPackage.getTracks(sourceFlavor);
-    if (tracks.length == 0) {
+    TrackSelector trackSelector = new TrackSelector();
+    trackSelector.addFlavor(sourceFlavor);
+    Collection<Track> tracks = trackSelector.select(mediaPackage, false);
+
+    if (tracks.size() == 0) {
       throw new WorkflowOperationException(
               String.format("No tracks with source flavor '%s' found for transcription", sourceFlavor));
     }
 
-    logger.info("Found {} track(s) with source flavor '{}'.", tracks.length, sourceFlavor);
+    logger.info("Found {} track(s) with source flavor '{}'.", tracks.size(), sourceFlavor);
 
     // Get the information in which language the audio track should be
     String languageCode = getMediaPackageLanguage(mediaPackage, workflowInstance);
@@ -194,17 +199,18 @@ public class
       String[] jobOutput = job.getPayload().split(",");
       URI output = new URI(jobOutput[0]);
       String outputLanguage = jobOutput[1];
+      String engineType = jobOutput[2];
 
       String mediaPackageIdentifier = UUID.randomUUID().toString();
 
       MediaPackageElement subtitleMediaPackageElement;
       switch (appendSubtitleAs) {
-        case track:
-          subtitleMediaPackageElement = new TrackImpl();
-          break;
         case attachment:
-        default:
           subtitleMediaPackageElement = new AttachmentImpl();
+          break;
+        case track:
+        default:
+          subtitleMediaPackageElement = new TrackImpl();
       }
 
       subtitleMediaPackageElement.setIdentifier(mediaPackageIdentifier);
@@ -214,14 +220,12 @@ public class
         subtitleMediaPackageElement.setURI(uri);
       }
       MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor().applyTo(track.getFlavor());
-      targetFlavor = new MediaPackageElementFlavor(
-          targetFlavor.getType(),
-          targetFlavor.getSubtype().replace(PLACEHOLDER_LANG, languageCode)
-      );
       subtitleMediaPackageElement.setFlavor(targetFlavor);
 
       List<String> targetTags = tagsAndFlavors.getTargetTags();
       targetTags.add("lang:" + outputLanguage);
+      targetTags.add("generator-type:auto");
+      targetTags.add("generator:" + engineType.toLowerCase());
 
       // this is used to set some values automatically, like the correct mimetype
       Job inspection = mediaInspectionService.enrich(subtitleMediaPackageElement, true);

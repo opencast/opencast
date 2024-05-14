@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -166,7 +166,7 @@ public class SpeechToTextServiceImpl extends AbstractJobProducer implements Spee
     } finally {
       FileUtils.deleteQuietly(jobDir);
     }
-    return subtitleFilesURI.toString() + "," + language;
+    return subtitleFilesURI.toString() + "," + language + "," + speechToTextEngine.getEngineName();
   }
 
 
@@ -213,7 +213,7 @@ public class SpeechToTextServiceImpl extends AbstractJobProducer implements Spee
 
   @Reference(
           name = "SpeechToTextEngine",
-          target = "(engineType=vosk)"
+          target = "(enginetype=whisper)"
   )
   public void setSpeechToTextEngine(SpeechToTextEngine engine) {
     this.speechToTextEngine = engine;

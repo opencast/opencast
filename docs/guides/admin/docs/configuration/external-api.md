@@ -131,6 +131,15 @@ directly in the Opencast administrative user interface.
 |-----------------------------|-------|--------------------|
 | ROLE_API_LISTPROVIDERS_VIEW |GET    | /api/listproviders |
 
+**Playlists API**
+
+| ROLE                        | METHOD | URL              |
+|-----------------------------|--------|------------------|
+| ROLE_API_PLAYLISTS_CREATE   | POST   | /api/playlists   |
+| ROLE_API_PLAYLISTS_VIEW     | GET    | /api/playlists   |
+| ROLE_API_PLAYLISTS_EDIT     | POST   | /api/playlists   |
+| ROLE_API_PLAYLISTS_DELETE   | DELETE | /api/playlists   |
+
 **User- and Role-switching**
 
 The External API supports user- and role-switching, i.e. it is possible to perform requests on behalf of another
@@ -156,4 +165,4 @@ creates publication elements that do not just contain a single URL to the public
 but also contain URLs for each of the attachments and tracks that have been published.
 
 **Note:** Secure access to distribution artefacts requires stream security to be enabled,
-see [Stream Security Configuration](stream-security.md).
+see [Stream Security Configuration](stream-security/stream-security-config.md).

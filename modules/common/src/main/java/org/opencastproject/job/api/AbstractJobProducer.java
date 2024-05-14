@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -65,7 +65,7 @@ public abstract class AbstractJobProducer implements JobProducer {
   public static final boolean DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING = true;
 
   /**
-   * The key to look for in the service configuration file to override the {@link DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING}
+   * The key to look for in the service configuration file to override the {@link .DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING}
    */
   public static final String ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY = "org.opencastproject.job.load.acceptexceeding";
 

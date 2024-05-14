@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -42,8 +42,10 @@ public class TrackSupportTest {
             "http://foo"), 100L, Checksum.create(ChecksumType.DEFAULT_TYPE, "1234"));
     t.addStream(new AudioStreamImpl("audio-1"));
     t.addStream(new VideoStreamImpl("video-1"));
+    t.addStream(new SubtitleStreamImpl("subtitle-1"));
     Assert.assertEquals(1, TrackSupport.byType(t.getStreams(), AudioStream.class).length);
     Assert.assertEquals(1, TrackSupport.byType(t.getStreams(), VideoStream.class).length);
-    Assert.assertEquals(2, TrackSupport.byType(t.getStreams(), Stream.class).length);
+    Assert.assertEquals(1, TrackSupport.byType(t.getStreams(), SubtitleStreamImpl.class).length);
+    Assert.assertEquals(3, TrackSupport.byType(t.getStreams(), Stream.class).length);
   }
 }

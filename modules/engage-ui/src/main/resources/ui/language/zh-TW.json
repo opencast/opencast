@@ -30,7 +30,7 @@
   "username": "使用者名稱",
   "password": "密碼",
   "remember_me": "記住我",
-  "sthWentWrong": "Something went wrong. Please try again.",
+  "sthWentWrong": "未知錯誤，請重試!",
   "loading": "載入中...",
   "no_data": "查無資料。",
   "login_success": "登錄成功。",

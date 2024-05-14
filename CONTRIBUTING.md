@@ -3,8 +3,8 @@ Contributing to Opencast
 
 This is a short outline of what to pay attention to when contributing to Opencast. If you are interested in a long
 document defining rules and recommendations as well as a detailed explanation of Opencast's branching model, take a look
-at [the development process documentation](https://docs.opencast.org/develop/developer/#development-process). But this
-guide should suffice for most contributions.
+at [the development process documentation](https://docs.opencast.org/develop/developer/#participate/development-process).
+But this guide should suffice for most contributions.
 
 
 Accepting Criteria for Patches in Different Versions

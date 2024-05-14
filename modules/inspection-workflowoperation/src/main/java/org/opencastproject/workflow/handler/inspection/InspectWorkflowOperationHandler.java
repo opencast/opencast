@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -36,6 +36,7 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageReferenceImpl;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.UnsupportedElementException;
+import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
@@ -43,7 +44,6 @@ import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.Precision;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.util.MimeType;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -65,6 +65,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -169,42 +171,36 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
 
       Job inspectJob = null;
       Track inspectedTrack;
-      if (track != null && track.getURI() != null && (track.getURI().toString().endsWith(".vtt")
-              || track.getURI().toString().endsWith(".srt"))) {
-        inspectedTrack = (Track)track.clone();
-        inspectedTrack.setMimeType(MimeType.mimeType("text", "vtt"));
-        logger.info("Track '{}' of {} contains captions", track.getIdentifier(), mediaPackage);
-      } else {
-        try {
-          inspectJob = inspectionService.enrich(track, rewrite, options);
-          if (!waitForStatus(inspectJob).isSuccess()) {
-            throw new WorkflowOperationException("Track " + track + " could not be inspected");
-          }
-        } catch (MediaInspectionException e) {
-          throw new WorkflowOperationException("Error inspecting media package", e);
-        } catch (MediaPackageException e) {
-          throw new WorkflowOperationException("Error parsing media package", e);
-        }
-
-        // add this receipt's queue and execution times to the total
-        long timeInQueue = inspectJob.getQueueTime() == null ? 0 : inspectJob.getQueueTime();
-        totalTimeInQueue += timeInQueue;
-
-
-        try {
-          inspectedTrack = (Track) MediaPackageElementParser.getFromXml(inspectJob.getPayload());
-        } catch (MediaPackageException e) {
-          throw new WorkflowOperationException("Unable to parse track from job " + inspectJob.getId(), e);
-        }
-
-        if (inspectedTrack == null) {
+      try {
+        inspectJob = inspectionService.enrich(track, rewrite, options);
+        if (!waitForStatus(inspectJob).isSuccess()) {
           throw new WorkflowOperationException("Track " + track + " could not be inspected");
         }
-
-        if (inspectedTrack.getStreams().length == 0) {
-          throw new WorkflowOperationException(format("Track %s does not contain any streams", track));
-        }
+      } catch (MediaInspectionException e) {
+        throw new WorkflowOperationException("Error inspecting media package", e);
+      } catch (MediaPackageException e) {
+        throw new WorkflowOperationException("Error parsing media package", e);
       }
+
+      // add this receipt's queue and execution times to the total
+      long timeInQueue = inspectJob.getQueueTime() == null ? 0 : inspectJob.getQueueTime();
+      totalTimeInQueue += timeInQueue;
+
+
+      try {
+        inspectedTrack = (Track) MediaPackageElementParser.getFromXml(inspectJob.getPayload());
+      } catch (MediaPackageException e) {
+        throw new WorkflowOperationException("Unable to parse track from job " + inspectJob.getId(), e);
+      }
+
+      if (inspectedTrack == null) {
+        throw new WorkflowOperationException("Track " + track + " could not be inspected");
+      }
+
+      if (inspectedTrack.getStreams().length == 0) {
+        throw new WorkflowOperationException(format("Track %s does not contain any streams", track));
+      }
+
       // Replace the original track with the inspected one
       try {
         mediaPackage.remove(track);
@@ -250,6 +246,25 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
         DublinCoreValue date = EncodingSchemeUtils.encodeDate(mediaPackage.getDate(), Precision.Minute);
         dublinCore.set(DublinCore.PROPERTY_CREATED, date);
         logger.debug("Setting dc:date to '{}'", date.getValue());
+      }
+
+      // Temporal
+      if (mediaPackage.getDuration() != null
+          && dublinCore.hasValue(DublinCore.PROPERTY_CREATED)
+          && !dublinCore.hasValue(DublinCore.PROPERTY_TEMPORAL)) {
+        var created = EncodingSchemeUtils.decodeDate(dublinCore.getFirst(DublinCore.PROPERTY_CREATED));
+        if (created != null) {
+          // Instant end =
+          var end = Date.from(created.toInstant().plus(mediaPackage.getDuration(), ChronoUnit.MILLIS));
+          var temporal = EncodingSchemeUtils.encodePeriod(new DCMIPeriod(created, end), Precision.Second);
+          dublinCore.set(DublinCore.PROPERTY_TEMPORAL, temporal);
+          logger.debug("Setting dc:temporal to '{}'", temporal.getValue());
+        } else {
+          logger.warn("Unable to parse dc:created value '{}'; mediapackage '{}'",
+              dublinCore.getFirst(DublinCore.PROPERTY_CREATED),
+              mediaPackage.getIdentifier()
+          );
+        }
       }
 
       // Serialize changed dublin core

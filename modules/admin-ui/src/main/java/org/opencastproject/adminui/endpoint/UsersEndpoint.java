@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -160,6 +160,15 @@ public class UsersEndpoint {
   @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
+  }
+
+  /**
+   * @param jpaUserReferenceProvider
+   *          the user provider to set
+   */
+  @Reference
+  public void setJpaUserReferenceProvider(JpaUserReferenceProvider jpaUserReferenceProvider) {
+    this.jpaUserReferenceProvider = jpaUserReferenceProvider;
   }
 
   /**
@@ -439,7 +448,7 @@ public class UsersEndpoint {
 
     try {
       try {
-        jpaUserAndRoleProvider.deleteUser(username, organization.getId());
+        jpaUserReferenceProvider.deleteUser(username, organization.getId());
       } catch (NotFoundException e) {
         userReferenceNotFound = true;
       }

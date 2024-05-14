@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -33,8 +33,6 @@ import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
@@ -48,6 +46,10 @@ import org.junit.rules.TemporaryFolder;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Optional;
 
 public class AbstractFileSystemAssetStoreTest {
   private static final String XML_EXTENSTION = ".xml";
@@ -65,13 +67,17 @@ public class AbstractFileSystemAssetStoreTest {
   private static final VersionImpl VERSION_2 = new VersionImpl(2);
 
   private File tmpRoot;
+  private File tmpRoot2;
 
-  private AbstractFileSystemAssetStore repo;
+  private OsgiFileSystemAssetStore repo;
 
   private File sampleElemDir;
 
   @Rule
   public TemporaryFolder tmpFolder = new TemporaryFolder();
+
+  @Rule
+  public TemporaryFolder tmpFolder2 = new TemporaryFolder();
 
   @Before
   public void setUp() throws Exception {
@@ -86,16 +92,17 @@ public class AbstractFileSystemAssetStoreTest {
     EasyMock.replay(workspace);
 
     tmpRoot = tmpFolder.newFolder();
+    tmpRoot2 = tmpFolder2.newFolder();
 
-    repo = new AbstractFileSystemAssetStore() {
+    repo = new OsgiFileSystemAssetStore() {
       @Override protected Workspace getWorkspace() {
         return workspace;
       }
-
-      @Override protected String getRootDirectory() {
-        return tmpRoot.getAbsolutePath();
-      }
     };
+    Field rootDirectories = OsgiFileSystemAssetStore.class.getDeclaredField("rootDirectories");
+    rootDirectories.setAccessible(true);
+    rootDirectories.set(repo, new ArrayList(Arrays.asList(tmpRoot.getAbsolutePath(), tmpRoot2.getAbsolutePath())));
+    repo.setupCache();
 
     sampleElemDir = new File(
             PathSupport.concat(new String[] { tmpRoot.toString(), ORG_ID, MP_ID, VERSION_2.toString() }));
@@ -171,8 +178,8 @@ public class AbstractFileSystemAssetStoreTest {
   @Test
   public void testGet() throws Exception {
     StoragePath storagePath = new StoragePath(ORG_ID, MP_ID, VERSION_2, MP_ELEM_ID);
-    Opt<InputStream> option = repo.get(storagePath);
-    assertTrue(option.isSome());
+    Optional<InputStream> option = repo.get(storagePath);
+    assertTrue(option.isPresent());
 
     InputStream original = null;
     InputStream repo = option.get();
@@ -190,8 +197,8 @@ public class AbstractFileSystemAssetStoreTest {
   @Test
   public void testGetBad() throws Exception {
     StoragePath storagePath = new StoragePath(ORG_ID, MP_ID, VERSION_1, MP_ELEM_ID);
-    Opt<InputStream> option = repo.get(storagePath);
-    assertFalse(option.isSome());
+    Optional<InputStream> option = repo.get(storagePath);
+    assertFalse(option.isPresent());
   }
 
   @Test

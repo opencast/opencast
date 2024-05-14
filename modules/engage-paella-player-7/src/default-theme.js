@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -32,11 +32,11 @@ export async function applyOpencastTheme(paella) {
     ?? configJson?.opencast?.theme
     ?? 'default_theme'  ;
   try {
-    paella.log.info(`Applying opencast theme '${ocTheme}'.`);
+    paella.log.info(`Applying theme '${ocTheme}'.`);
     await paella.skin.loadSkin(getUrlFromOpencastConfig(`${ocTheme}/theme.json`));
   }
   catch (err) {
-    paella.log.info(`Error applying opencast theme '${ocTheme}'. Using default theme!`);
+    paella.log.info(`Error applying theme '${ocTheme}'. Using default theme!`);
     await paella.skin.loadSkin(getUrlFromOpencastPaella('default_theme/theme.json'));
   }
 }

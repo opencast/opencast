@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -626,7 +626,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
     return this.indexIdentifier + "_" + type;
   }
 
-  protected RestHighLevelClient getClient() {
+  public RestHighLevelClient getClient() {
     return client;
   }
 

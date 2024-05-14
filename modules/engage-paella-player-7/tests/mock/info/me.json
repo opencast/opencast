@@ -1,0 +1,48 @@
+{
+    "org": {
+        "anonymousRole": "ROLE_ANONYMOUS",
+        "name": "Opencast Project",
+        "adminRole": "ROLE_ADMIN",
+        "id": "mh_default_org",
+        "properties": {
+            "admin.shortcut.general.select_next_dashboard_filter": "f",
+            "admin.shortcut.general.main_menu": "m",
+            "admin.shortcut.editor.play_current_segment_with_pre-roll": "C",
+            "org.opencastproject.admin.help.restdocs.url": "/rest_docs.html",
+            "admin.shortcut.player.step_backward": "ctrl+left",
+            "adminui.user.external_role_display": "false",
+            "org.opencastproject.admin.mediamodule.url": "/engage/ui",
+            "admin.shortcut.general.new_series": "N",
+            "admin.shortcut.general.new_event": "n",
+            "admin.shortcut.editor.split_at_current_time": "v",
+            "admin.shortcut.player.play_pause": "space",
+            "admin.shortcut.editor.play_current_segment": "c",
+            "admin.shortcut.player.mute": "m",
+            "admin.shortcut.general.select_previous_dashboard_filter": "F",
+            "admin.shortcut.add_media.next_tab": "shift+alt+right",
+            "admin.shortcut.player.previous_segment": "up",
+            "admin.shortcut.player.volume_up": "plus",
+            "admin.shortcut.player.volume_down": "-",
+            "admin.shortcut.editor.cut_selected_segment": "backspace",
+            "org.opencastproject.oaipmh.server.hosturl": "",
+            "org.opencastproject.admin.help.documentation.url": "https://docs.opencast.org",
+            "admin.shortcut.player.next_segment": "down",
+            "admin.shortcut.add_media.previous_tab": "shift+alt+left",
+            "admin.shortcut.general.series_view": "s",
+            "admin.shortcut.player.next_frame": "right",
+            "admin.shortcut.player.previous_frame": "left",
+            "admin.shortcut.general.event_view": "e",
+            "admin.shortcut.general.remove_filters": "r",
+            "admin.shortcut.editor.clear_list": "ctrl+backspace",
+            "admin.shortcut.player.step_forward": "ctrl+right",
+            "admin.shortcut.editor.play_ending_of_current_segment": "n"
+        }
+    },
+    "roles": [
+        "ROLE_ANONYMOUS"
+    ],
+    "userRole": "ROLE_USER_ANONYMOUS",
+    "user": {
+        "username": "anonymous"
+    }
+}

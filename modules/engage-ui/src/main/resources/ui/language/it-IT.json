@@ -30,7 +30,7 @@
   "username": "Nome Utente",
   "password": "Password",
   "remember_me": "Ricordami.",
-  "sthWentWrong": "Something went wrong. Please try again.",
+  "sthWentWrong": "Si è verificato un errore. Si prega di riprovare.",
   "loading": "Caricamento ...",
   "no_data": "Nessun dato disponibile.",
   "login_success": "Accesso riuscito.",

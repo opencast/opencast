@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -57,6 +57,13 @@ public interface Track extends MediaPackageElement {
   boolean hasVideo();
 
   /**
+   * Returns <code>true</code> if the track features a subtitle stream.
+   *
+   * @return <code>true</code> if the track has a subtitle stream
+   */
+  boolean hasSubtitle();
+
+  /**
    * Returns the track duration in milliseconds or <code>null</code> if the duration is not available.
    *
    * @return the track duration
@@ -91,7 +98,7 @@ public interface Track extends MediaPackageElement {
 
   /**
    * Sets master - it is an adaptive playlist
-   * 
+   *
    * @param master
    *          if true
    */

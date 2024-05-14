@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -77,6 +77,14 @@ public interface MediaPackageElement extends ManifestContributor, Comparable<Med
    *          the new element description
    */
   void setElementDescription(String description);
+
+  /**
+   * Sets the given tags for the media package element, overwriting any that may have been set previously.
+   *
+   * @param tags
+   *          array of tags
+   */
+  void setTags(String [] tags);
 
   /**
    * Tags the media package element with the given tag.

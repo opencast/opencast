@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -69,13 +69,13 @@ import java.util.List;
 import java.util.UUID;
 
 /**
- * Publishes media to a Youtube play list.
+ * Publishes media to a YouTube play list.
  */
 @Component(
     immediate = true,
     service = { ManagedService.class,YouTubePublicationService.class },
     property = {
-        "service.description=Publication Service (Youtube API Version 3)"
+        "service.description=Publication Service (YouTube API Version 3)"
     }
 )
 public class YouTubeV3PublicationServiceImpl
@@ -88,10 +88,10 @@ public class YouTubeV3PublicationServiceImpl
   /** The load on the system introduced by creating a retract job */
   public static final float DEFAULT_YOUTUBE_RETRACT_JOB_LOAD = 0.1f;
 
-  /** The key to look for in the service configuration file to override the {@link DEFAULT_YOUTUBE_PUBLISH_JOB_LOAD} */
+  /** The key to look for in the service configuration file to override the {@link #DEFAULT_YOUTUBE_PUBLISH_JOB_LOAD} */
   public static final String YOUTUBE_PUBLISH_LOAD_KEY = "job.load.youtube.publish";
 
-  /** The key to look for in the service configuration file to override the {@link DEFAULT_YOUTUBE_RETRACT_JOB_LOAD} */
+  /** The key to look for in the service configuration file to override the {@link #DEFAULT_YOUTUBE_RETRACT_JOB_LOAD} */
   public static final String YOUTUBE_RETRACT_LOAD_KEY = "job.load.youtube.retract";
 
   public static final String YOUTUBE_ENABLED_KEY = "org.opencastproject.publication.youtube.enabled";
@@ -134,7 +134,7 @@ public class YouTubeV3PublicationServiceImpl
   /** The security service */
   private SecurityService securityService;
 
-  /** Youtube configuration instance */
+  /** YouTube configuration instance */
   private final YouTubeAPIVersion3Service youTubeService;
 
   private boolean enabled = false;
@@ -306,7 +306,7 @@ public class YouTubeV3PublicationServiceImpl
       return PublicationImpl.publication(
           UUID.randomUUID().toString(), CHANNEL_NAME, url.toURI(), MimeTypes.parseMimeType(MIME_TYPE));
     } catch (Exception e) {
-      logger.error("failed publishing to Youtube", e);
+      logger.error("failed publishing to YouTube", e);
       logger.warn("Error publishing {}, {}", element, e.getMessage());
       if (e instanceof PublicationException) {
         throw (PublicationException) e;

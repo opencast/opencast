@@ -147,5 +147,9 @@
     "Video quality": "Video quality",
     "Captions": "Captions",
     "Opencast player version": "Opencast player version",
-    "Opencast player": "Opencast player"
+    "Opencast player": "Opencast player",
+
+    "Undefined caption": "Unknown language",
+    "Unknown language": "Unknown language",
+    "automatically generated": "automatically generated"
 }

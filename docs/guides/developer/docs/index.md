@@ -1,32 +1,17 @@
 Opencast Development Guides
 ===========================
 
-These guides will help you if you want to participate in Opencast development.
+Welcome to the Opencast development documentation! If you are new to Opencast, be sure to check out our
+[Administration Guide](https://docs.opencast.org/stable/admin/).
 
+This documentation will help you if you want to participate in Opencast development. It is split into three main
+sections:
 
-* [Development Process](development-process.md)
-* [Committers](committer.md)
-* [Decision Making](decision-making)
-* [Proposal Log](proposal-log.md)
-* [QA Coordinator](qa-coordinator.md)
-* [Release Manager](release-manager.md)
-* [Committers](committer.md)
-* [Security Issues](security.md)
-* [Licenses and Legal Matters](license.md)
-* [Localization](localization.md)
-* [Governance](governance.md)
-* [Development Environment](development-environment.md)
-    * [Docker](development-environment-docker.md)
-* [Packaging Guidelines](packaging.md)
-* [Modules](modules/index.md)
-    * Administrative User Interface
-        * [Development](modules/admin-ui/development.md)
-        * [Style Guide](modules/admin-ui/style/index.md)
-    * [Capture Agent](modules/capture-agent/capture-agent.md)
-    * [Stream Security](modules/stream-security.md)
-    * […](modules/index.md)
-* [Configure a Local Cluster for Testing](local-cluster.md)
-* [External API](api/index.md)
-* [Explore H2 Database](explore-h2-database.md)
-* [Project Infrastructure](infrastructure/index.md)
-    * [Maven Repository](infrastructure/maven-repository.md)
+- [Participate](./participate/development-process.md) contains information on all the different ways you can take a
+  part in the Opencast project. Besides programming, there are many other tasks required to keep the project running.
+  Consider helping with translations or even becoming a release manager!
+- [Develop](./develop/setup-opencast-for-develop.md) provides helpful tips and tricks on how set up your development
+  environment, as well as write and debug your code.
+- [Opencast Architecture](./architecture/overview.md) supplies in depth, technical description on the different parts
+  that make up Opencast, such as the External API. If you are looking for information on how to configure certain parts,
+  check the [Administration Guide](https://docs.opencast.org/stable/admin/#configuration/) instead.

@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -545,6 +545,9 @@ public class ConfigurableLoginHandler implements ShibbolethLoginHandler, RolePro
   }
 
   private boolean like(String string, final String query) {
+    if (string == null) {
+      return false;
+    }
     String regex = query.replace("_", ".").replace("%", ".*?");
     Pattern p = Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     return p.matcher(string).matches();

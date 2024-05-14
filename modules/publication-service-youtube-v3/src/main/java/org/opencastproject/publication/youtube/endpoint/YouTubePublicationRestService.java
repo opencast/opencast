@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -75,7 +75,7 @@ import javax.ws.rs.core.Response.Status;
     immediate = true,
     service = YouTubePublicationRestService.class,
     property = {
-        "service.description=Youtube Publication REST Endpoint",
+        "service.description=YouTube Publication REST Endpoint",
         "opencast.service.type=org.opencastproject.publication.youtube",
         "opencast.service.path=/youtube",
         "opencast.service.jobproducer=true"

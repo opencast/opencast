@@ -8,14 +8,12 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>14-SNAPSHOT</version>
+    <version>16-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
-    <lucene.version>8.7.0</lucene.version>
-    <elasticsearch.version>7.10.2</elasticsearch.version>
   </properties>
   <dependencies>
     <dependency>
@@ -135,8 +133,7 @@
     <!-- testing -->
     <dependency>
       <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-log4j12</artifactId>
-      <scope>test</scope>
+      <artifactId>slf4j-reload4j</artifactId>
     </dependency>
   </dependencies>
   <build>
@@ -153,7 +150,7 @@
             <ignoredUnusedDeclaredDependency>org.apache.lucene:lucene-join</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.lucene:lucene-queryparser</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>com.carrotsearch:hppc</ignoredUnusedDeclaredDependency>
-            <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-log4j12</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-reload4j</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.httpcomponents:httpcore</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.httpcomponents:httpcore-osgi</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.httpcomponents:httpclient-osgi</ignoredUnusedDeclaredDependency>
@@ -169,14 +166,13 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Build-Number>${buildNumber}</Build-Number>
             <Import-Package>
               !com.carrotsearch.randomizedtesting,
               !com.conversantmedia.util.*,
               !com.fasterxml.jackson.dataformat.smile,
               !com.fasterxml.jackson.dataformat.xml.*,
               !com.fasterxml.jackson.dataformat.yaml.*,
+              !com.google.common.*,
               !com.lmax.disruptor.*,
               !com.sun.jna.*,
               !com.sun.management*,
@@ -196,12 +192,14 @@
               !org.jctools.queues.*,
               !org.locationtech.jts.geom.*,
               !org.locationtech.spatial4j.*,
+              !org.tartarus.*,
               !org.zeromq.*,
               !com.github.mustachejava.*,
               *
             </Import-Package>
             <Export-Package>
               org.apache.logging.log4j*,
+              org.apache.lucene.*,
               org.opencastproject.elasticsearch.impl;version=${project.version}
             </Export-Package>
             <Embed-Dependency>

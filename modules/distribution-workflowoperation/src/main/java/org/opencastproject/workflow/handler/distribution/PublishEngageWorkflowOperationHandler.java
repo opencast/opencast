@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -52,8 +52,6 @@ import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.DublinCoreXmlFormat;
 import org.opencastproject.search.api.SearchException;
-import org.opencastproject.search.api.SearchQuery;
-import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
@@ -130,14 +128,19 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   static final String CHECK_AVAILABILITY = "check-availability";
   static final String STRATEGY = "strategy";
   static final String MERGE_FORCE_FLAVORS = "merge-force-flavors";
+  static final String ADD_FORCE_FLAVORS = "add-force-flavors";
 
   private static final String MERGE_FORCE_FLAVORS_DEFAULT = "dublincore/*,security/*";
+  private static final String ADD_FORCE_FLAVORS_DEFAULT = "";
 
   /** Path the REST endpoint which will re-direct users to the currently configured video player **/
   static final String PLAYER_PATH = "/play/";
 
-  /** Merge strategy **/
-  static final String MERGE_STRATEGY = "merge";
+  /** Name constant for the 'merge' strategy **/
+  static final String PUBLISH_STRATEGY_MERGE = "merge";
+
+  /** Name constant for the 'default' 'strategy **/
+  static final String PUBLISH_STRATEGY_DEFAULT = "default";
 
   /** The streaming distribution service */
   private StreamingDistributionService streamingDistributionService = null;
@@ -247,17 +250,28 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     String streamingTargetTags = StringUtils.trimToEmpty(op.getConfiguration(STREAMING_TARGET_TAGS));
     String streamingSourceFlavors = StringUtils.trimToEmpty(op.getConfiguration(STREAMING_SOURCE_FLAVORS));
     String streamingTargetSubflavor = StringUtils.trimToNull(op.getConfiguration(STREAMING_TARGET_SUBFLAVOR));
-    String republishStrategy = StringUtils.trimToEmpty(op.getConfiguration(STRATEGY));
+    String republishStrategy = StringUtils.trimToEmpty(
+            StringUtils.defaultString(op.getConfiguration(STRATEGY), PUBLISH_STRATEGY_DEFAULT));
     String mergeForceFlavorsStr = StringUtils.trimToEmpty(
             StringUtils.defaultString(op.getConfiguration(MERGE_FORCE_FLAVORS), MERGE_FORCE_FLAVORS_DEFAULT));
+    String addForceFlavorsStr = StringUtils.trimToEmpty(
+            StringUtils.defaultString(op.getConfiguration(ADD_FORCE_FLAVORS), ADD_FORCE_FLAVORS_DEFAULT));
+
 
     boolean checkAvailability = option(op.getConfiguration(CHECK_AVAILABILITY)).bind(trimToNone).map(toBool)
             .getOrElse(true);
 
     // First check if mp exists in the search index and strategy is merge
     // to avoid leaving distributed elements around.
-    MediaPackage distributedMp = getDistributedMediapackage(mediaPackage.getIdentifier().toString());
-    if (MERGE_STRATEGY.equals(republishStrategy) && distributedMp == null) {
+    MediaPackage distributedMp = null;
+    try {
+      distributedMp = searchService.get(mediaPackage.getIdentifier().toString());
+    } catch (NotFoundException e) {
+      logger.debug("No published mediapackage found for {}", mediaPackage.getIdentifier().toString());
+    } catch (UnauthorizedException e) {
+      throw new WorkflowOperationException("Unauthorized for " + mediaPackage.getIdentifier().toString(), e);
+    }
+    if (PUBLISH_STRATEGY_MERGE.equals(republishStrategy) && distributedMp == null) {
       logger.info("Skipping republish for {} since it is not currently published",
               mediaPackage.getIdentifier().toString());
       return createResult(mediaPackage, Action.SKIP);
@@ -280,6 +294,8 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     // Parse forced flavors
     List<MediaPackageElementFlavor> mergeForceFlavors = Arrays.stream(StringUtils.split(mergeForceFlavorsStr, ", "))
             .map(MediaPackageElementFlavor::parseFlavor).collect(Collectors.toList());
+    List<MediaPackageElementFlavor> addForceFlavors = Arrays.stream(StringUtils.split(addForceFlavorsStr, ", "))
+        .map(MediaPackageElementFlavor::parseFlavor).collect(Collectors.toList());
 
     // Parse the download target flavor
     MediaPackageElementFlavor downloadSubflavor = null;
@@ -336,12 +352,8 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
       }
 
       removePublicationElement(mediaPackage);
-      switch (republishStrategy) {
-        case (MERGE_STRATEGY):
-          // nothing to do here. other publication strategies can be added to this list later on
-          break;
-        default:
-          retractFromEngage(distributedMp);
+      if (republishStrategy.equals(PUBLISH_STRATEGY_DEFAULT)) {
+        retractFromEngage(distributedMp);
       }
 
       List<Job> jobs = new ArrayList<Job>();
@@ -386,12 +398,9 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
         // MH-10216, check if only merging into existing mediapackage
         removePublicationElement(mediaPackage);
-        switch (republishStrategy) {
-          case (MERGE_STRATEGY):
-            mediaPackageForSearch = mergePackages(mediaPackageForSearch, distributedMp, mergeForceFlavors);
-            break;
-          default:
-          // nothing to do here
+        if (republishStrategy.equals(PUBLISH_STRATEGY_MERGE)) {
+          mediaPackageForSearch = mergePackages(mediaPackageForSearch, distributedMp, mergeForceFlavors,
+              addForceFlavors);
         }
 
         if (StringUtils.isBlank(mediaPackageForSearch.getTitle())) {
@@ -555,9 +564,9 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
         continue;
       }
 
-      List <MediaPackageElement> distributedElements = null;
+      List<? extends MediaPackageElement> distributedElements = null;
       try {
-        distributedElements = (List <MediaPackageElement>) MediaPackageElementParser.getArrayFromXml(job.getPayload());
+        distributedElements = MediaPackageElementParser.getArrayFromXml(job.getPayload());
       } catch (MediaPackageException e) {
         throw new WorkflowOperationException(e);
       }
@@ -687,23 +696,13 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     }
   }
 
-  protected MediaPackage getDistributedMediapackage(String mediaPackageID) throws WorkflowOperationException {
-    MediaPackage mediaPackage = null;
-    SearchQuery query = new SearchQuery().withId(mediaPackageID);
-    query.includeEpisodes(true);
-    query.includeSeries(false);
-    SearchResult result = searchService.getByQuery(query);
-    if (result.size() == 0) {
-      logger.info("The search service doesn't know mediapackage {}.", mediaPackageID);
-      return mediaPackage; // i.e. null
-    } else if (result.size() > 1) {
-      logger.warn("More than one mediapackage with id {} returned from search service", mediaPackageID);
-      throw new WorkflowOperationException("More than one mediapackage with id " + mediaPackageID + " found");
-    } else {
-      // else, merge the new with the existing (new elements will overwrite existing elements)
-      mediaPackage = result.getItems()[0].getMediaPackage();
+  protected MediaPackage getDistributedMediaPackage(String mediaPackageID) throws UnauthorizedException {
+    try {
+      return searchService.get(mediaPackageID);
+    } catch (NotFoundException e) {
+      logger.info("The search service doesn't know media package {}.", mediaPackageID);
+      return null;
     }
-    return mediaPackage;
   }
 
 
@@ -723,7 +722,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    * @return the merged mediapackage
    */
   protected MediaPackage mergePackages(MediaPackage updatedMp, MediaPackage publishedMp,
-          List<MediaPackageElementFlavor> forceFlavors) {
+          List<MediaPackageElementFlavor> mergeForceFlavors, List<MediaPackageElementFlavor> addForceFlavors) {
     if (publishedMp == null) {
       return updatedMp;
     }
@@ -731,8 +730,17 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     MediaPackage mergedMediaPackage = (MediaPackage) updatedMp.clone();
     for (MediaPackageElement element : publishedMp.elements()) {
       String type = element.getElementType().toString().toLowerCase();
-      if (updatedMp.getElementsByFlavor(element.getFlavor()).length == 0) {
-        if (forceFlavors.stream().anyMatch((f) -> element.getFlavor().matches(f))) {
+      boolean elementHasFlavorThatAlreadyExists = updatedMp.getElementsByFlavor(element.getFlavor()).length > 0;
+      boolean elementHasForceMergeFlavor = mergeForceFlavors.stream().anyMatch((f) -> element.getFlavor().matches(f));
+      boolean elementHasForceAddFlavor = addForceFlavors.stream().anyMatch((f) -> element.getFlavor().matches(f));
+
+      if (elementHasForceAddFlavor) {
+        logger.info("Adding {} '{}' into the updated mediapackage", type, element.getIdentifier());
+        mergedMediaPackage.add((MediaPackageElement) element.clone());
+        continue;
+      }
+      if (!elementHasFlavorThatAlreadyExists) {
+        if (elementHasForceMergeFlavor) {
           logger.info("Forcing removal of {} {} due to the absence of a new element with flavor {}",
                   type, element.getIdentifier(), element.getFlavor().toString());
           continue;
@@ -765,8 +773,8 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    * @throws WorkflowOperationException
    */
   private void retractFromEngage(MediaPackage distributedMediaPackage) throws WorkflowOperationException {
-    List<Job> jobs = new ArrayList<Job>();
-    Set<String> elementIds = new HashSet<String>();
+    List<Job> jobs = new ArrayList<>();
+    Set<String> elementIds = new HashSet<>();
     try {
       if (distributedMediaPackage != null) {
 
@@ -809,7 +817,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     } catch (SearchException e) {
       throw new WorkflowOperationException("Error retracting media package", e);
     } catch (UnauthorizedException | NotFoundException ex) {
-      logger.error("Retraction failed of Mediapackage: { }", distributedMediaPackage.getIdentifier().toString(), ex);
+      logger.error("Retraction failed of Mediapackage: {}", distributedMediaPackage.getIdentifier().toString(), ex);
     }
   }
 }

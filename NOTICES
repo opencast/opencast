@@ -1215,13 +1215,6 @@ search-service-api
   jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
 
 
-search-service-feeds
-  GroupId                                ArtifactId                                       Licenses
-  commons-io                             commons-io                                       Apache License, Version 2.0
-  org.apache.felix                       org.apache.felix.fileinstall                     Apache License, Version 2.0
-  org.slf4j                              slf4j-api                                        MIT License
-
-
 search-service-impl
   GroupId                                ArtifactId                                       Licenses
   com.google.code.gson                   gson                                             Apache 2.0
@@ -1237,13 +1230,6 @@ search-service-impl
   org.eclipse.persistence                jakarta.persistence                              Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
   org.eclipse.persistence                org.eclipse.persistence.core                     Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
   org.jdom                               jdom2                                            -
-  org.slf4j                              slf4j-api                                        MIT License
-
-
-search-service-remote
-  GroupId                                ArtifactId                                       Licenses
-  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
-  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 

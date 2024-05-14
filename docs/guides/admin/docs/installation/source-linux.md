@@ -79,6 +79,10 @@ OR
     
     Whisper >= 20230314
 
+OR 
+    
+    WhisperC++ >= 1.4.0
+
 ### Dependency Download
 
 Pre-built versions of most dependencies that are not in the repositories can be downloaded from the respective project
@@ -94,7 +98,7 @@ Building Opencast
 Automatically build all Opencast modules and assemble distributions for different server types:
 
     cd opencast-dir
-    mvn clean install
+    ./mvnw clean install
 
 Deploy all-in-one distribution:
 

@@ -31,7 +31,7 @@
       "REGISTRATION": "veraltet"
    },
    "LTI": {
-      "ERROR_LOADING_METADATA": "Fehler beim Laden der Metadaten. Bitte versuche es später erneut.",
+      "ERROR_LOADING_METADATA": "Fehler beim Laden der Videometadaten. Bitte versuchen Sie es später noch einmal.",
       "SERIES_TITLE": "Serie anzeigen",
       "UPLOAD_TITLE": "Video hochladen",
       "LOADING": "Wird geladen…",
@@ -43,7 +43,7 @@
       "VIDEOFILE": "Videodatei",
       "VIDEOFILE_DESCRIPTION": "Videodatei zum Hochladen",
       "CAPTION": "Untertitel",
-      "CAPTION_DESCRIPTION": "Untertiteldatei; VTT- oder dxfp-Dateiformat wird unterstützt",
+      "CAPTION_DESCRIPTION": "Untertiteldatei im VTT-Format",
       "UPLOAD": "Hochladen",
       "UPLOADING": "Lädt hoch",
       "EDIT": "Speichern",
@@ -63,7 +63,7 @@
       "GENERIC_ERROR": "Fehler: {{message}}",
       "DELETION_SUCCESS": "Video erfolgreich gelöscht",
       "DELETION_SUCCESS_DESCRIPTION": "Das Video wird in wenigen Augenblicken aus der Liste entfernt…",
-      "EVENT_LOCKED": "An dem Event wird gerade gearbeitet. Bitte warten Sie, bevor Sie weitere Änderungen vornehmen…",
+      "EVENT_LOCKED": "Das Video wird gerade bearbeitet. Bitte warten Sie mit der Vornahme von Änderungen…",
       "DELETION_FAILURE": "Löschen des Videos fehlgeschlagen",
       "DELETION_FAILURE_DESCRIPTION": "Bitte versuchen Sie es später noch einmal…",
       "RESULT_HEADING": "Ergebnisse {{range.begin}}-{{range.end}} von {{total}}",
@@ -104,7 +104,7 @@
          "SUBHEADING": "Wählen Sie die Standard-Daten, die Sie in der {{ tableName }}-Ansicht anzeigen möchten",
          "AVAILABLE_COLUMNS": "Verfügbare Spalten",
          "SELECTED_COLUMNS": "Ausgewählte Spalten",
-         "FOOTER_TEXT": "Die Reihenfolge und Auswahl wird automatisch gespeichert. Drücken Sie \"{{resetTranslation}}\", um die Standardansicht wiederherzustellen."
+         "FOOTER_TEXT": "Die Reihenfolge und Auswahl werden automatisch gespeichert. Drücken Sie \"{{resetTranslation}}\", um die Standardansicht wiederherzustellen."
       }
    },
    "CONFIRMATIONS": {
@@ -130,9 +130,9 @@
          }
       },
       "WARNINGS": {
-         "SERIES_HAS_EVENTS": "Diese Serie enthält Events. Das Löschen der Serie löscht die Ereignisse nicht.",
+         "SERIES_HAS_EVENTS": "Diese Serie enthält noch Videos. Das Löschen der Serie löscht nicht die Videos.",
          "EVENT_WILL_BE_GONE": "Wenn Sie fortfahren, wird das Video unwiderruflich gelöscht.",
-         "UNSAVED_CHANGES": "Es gibt ungespeicherte Änderungen. Wenn Sie fortfahren, werden diese Änderungen verworfen. Sind Sie sicher, dass Sie fortfahren möchten?"
+         "UNSAVED_CHANGES": "Sie haben ungespeicherte Änderungen. Wenn Sie fortfahren, werden diese Änderungen verworfen. Sind Sie sicher, dass Sie fortfahren möchten?"
       },
       "ERRORS": {
          "SERIES_HAS_EVENTS": "Diese Serie enthält Videos und kann daher nicht gelöscht werden."
@@ -178,7 +178,7 @@
       "GROUP_NOT_SAVED": "Die Gruppe konnte nicht gespeichert werden",
       "GROUP_DELETED": "Die Gruppe wurde gelöscht",
       "GROUP_NOT_DELETED": "Die Gruppe konnte nicht gelöscht werden",
-      "ACCESS_DENIED": "Zugriff verweigert. Sie sind nicht berechtigt, diese Seite zu sehen.",
+      "ACCESS_DENIED": "Zugriff verweigert. Sie sind nicht berechtigt, diese Seite anzusehen.",
       "SERIES_ADDED": "Die Serie wurde angelegt",
       "SERIES_NOT_SAVED": "Die Serie konnte nicht gespeichert werden",
       "EVENTS_CREATED": "Das Video wurde angelegt",
@@ -205,19 +205,19 @@
       "EVENT_DELETED": "Das Video wurde gelöscht.",
       "EVENT_WILL_BE_DELETED": "Das Video wird gelöscht",
       "EVENTS_DELETED": "Die Videos werden gelöscht.",
-      "EVENTS_NOT_DELETED": "Das/die Video(s) konnte(n) nicht gelöscht werden.",
-      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "Die/das Video(s) konnte(n) nicht gelöscht werden, da Sie dazu nicht berechtigt sind.",
+      "EVENTS_NOT_DELETED": "Das\/die Video(s) konnte(n) nicht gelöscht werden.",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "Die\/das Video(s) konnte(n) nicht gelöscht werden, da Sie dazu nicht berechtigt sind.",
       "SERIES_DELETED": "Die Serie wurde gelöscht",
       "SERIES_NOT_DELETED": "Die Serie konnte nicht gelöscht werden",
       "LOCATION_DELETED": "Der Standort wurde gelöscht",
       "LOCATION_NOT_DELETED": "Der Standort konnte nicht entfernt werden",
       "LOCATION_NOT_DELETED_NOT_AUTHORIZED": "Der Standort konnte nicht entfernt werden, weil Sie nicht dazu berechtigt sind.",
-      "CONFLICT_DETECTED": "Planungskonflikt: Das neue Ereignis wird von einem bestehenden Ereignis überlappt. Bitte ändern Sie Ort, Datum oder Uhrzeit.",
-      "CONFLICT_BULK_DETECTED": "Planungskonflikt: Das Ändern der Ereignisse führt zu Konflikten. Bitte ändern Sie Ort, Datum oder Uhrzeit.",
+      "CONFLICT_DETECTED": "Planungs-Konflikt: Das neue Video überlappt zeitlich mit einem bereits bestehenden Video. Bitte Standort, Datum oder Zeit anpassen.",
+      "CONFLICT_BULK_DETECTED": "Planungs-Konflikt: Das Ändern des Videos führt zu Konflikten. Bitte Standort, Datum oder Zeit anpassen.",
       "CONFLICT_ALREADY_ENDED": "Planungs-Fehler: Das Video endete bereits.",
       "CONFLICT_END_BEFORE_START": "Planungs-Fehler: Der Endzeitpunkt des Ereignisses muss nach dem Anfangszeitpunkt liegen.",
       "CONFLICT_IN_THE_PAST": "Die Planung konnte nicht aktualisiert werden: Sie können ein Video nicht in der Vergangenheit planen.",
-      "INVALID_ACL_RULES": "Regeln müssen eine gültige Rolle und Lese-/Schreibrechte enthalten.",
+      "INVALID_ACL_RULES": "Regeln müssen eine gültige Rolle und Lese-\/Schreibrechte enthalten.",
       "MISSING_ACL_RULES": "Es ist mindestens eine Rolle mit Lese- und Schreibberechtigungen erforderlich!",
       "SAVED_ACL_RULES": "Die Zugriffsregeln wurden gespeichert.",
       "SAVED_METADATA": "Die Metadaten wurden gespeichert.",
@@ -247,29 +247,29 @@
       "THUMBNAIL_CHANGE_FAILED": "Das Vorschaubild konnte nicht aktualisiert werden.",
       "VIDEO_SOURCE_TRACKS_INVALID": "Keine Videospuren selektiert",
       "VIDEO_TOO_MANY_AUDIOS": "Mehrere Audiospuren können nicht mit einer Videospur verarbeitet werden",
-      "SERVER_UNRESPONSIVE": "Hoppla! Der Server scheint nicht zu reagieren. Bitte versuche es später erneut.",
-      "SERVICE_UNAVAILABLE": "Tut uns leid! Der Server scheint nicht zu reagieren. Bitte versuche es später erneut.",
+      "SERVER_UNRESPONSIVE": "Hoppla! Der Server scheint nicht zu reagieren. Bitte versuchen Sie es später erneut.",
+      "SERVICE_UNAVAILABLE": "Hoppla! Der Server scheint nicht zu reagieren. Bitte versuchen Sie es später erneut.",
       "ACTIVE_TRANSACTION": "Dieses Video kann nicht bearbeitet werden, während ein Workflow oder eine Transaktion auf diesem aktiv sind.",
       "BULK_METADATA_UPDATE": {
-         "UNEXPECTED_ERROR": "Beim Aktualisieren ist ein unerwarteter Fehler aufgetreten. Einige Ereignisse könnten aktualisiert worden sein.",
+         "UNEXPECTED_ERROR": "Beim Aktualisieren ist ein unerwarteter Fehler aufgetreten. Einige Videos wurden möglicherweise aktualisiert.",
          "ALL_EVENTS_UPDATED": "Alle Videos wurden erfolgreich aktualisiert.",
          "NO_EVENTS_UPDATED": "Alle Aktualisierungen schlugen fehl.",
          "SOME_EVENTS_NOT_UPDATED": "Einige Videos konnten nicht aktualisiert werden."
       },
       "ADOPTER_PROFILE_UPDATED": "Profil-Informationen erfolgreich aktualisiert.",
-      "ADOPTER_PROFILE_NOT_UPDATED": "Tut uns leid! Profilinformationen konnten nicht aktualisiert werden. Bitte erneut versuchen.",
+      "ADOPTER_PROFILE_NOT_UPDATED": "Hoppla! Profil-Informationen konnten nicht aktualisiert werden. Bitte versuchen Sie es erneut!",
       "ADOPTER_PROFILE_DELETED": "Profil-Informationen erfolgreich gelöscht.",
-      "ADOPTER_PROFILE_NOT_DELETED": "Tut uns leid! Profilinformationen konnten nicht gelöscht werden. Bitte erneut versuchen.",
+      "ADOPTER_PROFILE_NOT_DELETED": "Hoppla! Profil-Informationen konnten nicht gelöscht werden. Bitte versuchen Sie es erneut!",
       "TOBIRA_OVERRIDE_NAME": "Der Titel der ausgewählten Seite wird mit dem Titel der Serie überschrieben.",
       "TOBIRA_NO_PATH_SEGMENT": "Die Seite benötigt ein Pfadsegment.",
       "TOBIRA_NOT_MOUNTED": "Die Serie konnte nicht in Tobira eingehängt werden.",
-      "TOBIRA_PATH_SEGMENT_INVALID": "Pfadsegment ist ungültig. Ein gültiges Pfadsegment ist mindestens 2 Zeichen lang und enthält keine Leer- oder Kontrollzeichen, keines der Zeichen '<>\"[\\]^`{|}#%/? ', und beginnt nicht mit einem der Zeichen '-+~@_! &;:. =*'()'.",
+      "TOBIRA_PATH_SEGMENT_INVALID": "Pfadsegment ist ungültig. Ein gültiges Pfadsegment ist mindestens 2 Zeichen lang, enthält keine Leerzeichen oder Kontrollzeichen, keines der Zeichen '<>\"[\\]^`{|}#%\/? ', und startet nicht mit einem der Zeichen '-+~@_! &;:. =*'()'.",
       "TOBIRA_PATH_SEGMENT_UNIQUE": "Das Pfadsegment einer Seite muss in der gleichen Ebene eindeutig sein.",
-      "TOBIRA_PAGE_NOT_FOUND": "Die Seite, die Sie aufgerufen haben, existiert nicht oder nicht mehr. Vielleicht versuchen Sie es noch einmal von vorn.",
-      "TOBIRA_SERVER_ERROR": " Fehler bei der Kommunikation mit Tobira. Kontaktieren Sie Ihren Systemadministrator oder versuchen Sie es später erneut.",
+      "TOBIRA_PAGE_NOT_FOUND": "Die Seite, auf die du navigieren wolltest, existiert nicht oder nicht mehr. Versuche es vielleicht von Anfang an.",
+      "TOBIRA_SERVER_ERROR": " Fehler bei der Kommunikation mit Tobira. Kontaktieren Sie Ihren Systemadministrator und\/oder versuchen Sie es später erneut.",
       "TOBIRA_COPIED_DIRECT_LINK": "Der Link wurde in Ihre Zwischenablage kopiert.",
       "TOBIRA_FAILED_COPYING_DIRECT_LINK": "Fehler beim Kopieren in die Zwischenablage",
-      "TOBIRA_NOT_FOUND": "Tobira ist diese Serie (noch) nicht bekannt. Versuchen Sie es in wenigen Minuten noch einmal oder kontaktieren Sie Ihren Systemadministrator."
+      "TOBIRA_NOT_FOUND": "Tobira kennt diese Serie (noch) nicht. Versuchen Sie es in ein paar Minuten noch einmal oder kontaktieren Sie Ihren Systemadministrator."
    },
    "BULK_ACTIONS": {
       "CAPTION": "Aktionen",
@@ -282,19 +282,19 @@
          "EVENTS": {
             "CAPTION": "Löschen",
             "DELETE_EVENTS": "Videos löschen",
-            "UNAUTHORIZED": "Sie sind nicht berechtigt, die markierten Ereignisse zu löschen. Bitte heben Sie die Auswahl auf, um fortzufahren."
+            "UNAUTHORIZED": "Sie sind nicht berechtigt die hervorgehobenen Videos zu löschen. Um fortzufahren heben Sie die Auswahl dieser auf."
          }
       },
       "DELETE_EVENTS_WARNING_LINE1": "Sobald alle Metadaten gelöscht sind, werden die Audio- und Video-Dateien gelöscht und können nicht wiederhergestellt werden.",
       "DELETE_EVENTS_WARNING_LINE2": "",
-      "DELETE_SERIES_WARNING_LINE1": "Nach dem Löschen sind alle Serien-Metadaten unwiederbringlich verloren. Ereignisse in der Serie werden nicht gelöscht.",
+      "DELETE_SERIES_WARNING_LINE1": "Die Metadaten der Serien werden unwiderruflich gelöscht. Die Videos werden nicht gelöscht.",
       "DELETE_SERIES_WARNING_LINE2": "",
       "SCHEDULE_TASK": {
          "CAPTION": "Aufgabe starten",
          "GENERAL": {
             "CAPTION": "Allgemein",
             "SUMMARY": "({{ count }} Videos ausgewählt)",
-            "CANNOTSTART": "Hervorgehobene Ereignisse(n) können momentan nicht verarbeitet werden. Entfernen Sie diese(s) oder versuchen Sie es später erneut."
+            "CANNOTSTART": "Markierte Videos können im Moment nicht verarbeitet werden. Entfernen Sie diese aus der Auswahl oder versuchen Sie es später erneut."
          },
          "TASKS": {
             "CAPTION": "Aufgaben",
@@ -317,7 +317,7 @@
             "NOCHANGES": "Keine Änderungen der Videos!",
             "CONFLICT_FIRST_EVENT": "Geändertes Video",
             "CONFLICT_SECOND_EVENT": "Kollidierendes Video",
-            "CANNOTEDITSCHEDULE": "Für die hervorgehobenen Ereignisse haben Sie nicht die Berechtigung, Zeitpläne zu bearbeiten. Sie können fortfahren, aber Sie können Planung keines der Ereignisse bearbeiten."
+            "CANNOTEDITSCHEDULE": "Für die hervorgehobenen Videos fehlt Ihnen die Berechtigung zum Anpassen der Planung. Sie können fortfahren, aber die Planung der Videos können Sie nicht ändern."
          },
          "METADATA": {
             "EDIT": "Metadaten bearbeiten"
@@ -333,7 +333,7 @@
             "CAPTION": "Bearbeiten",
             "EVENT": "Video",
             "EVENTS": "Videos",
-            "HEADER": "Auf dieser Seite können Sie geplante Ereignisse nach Wochentagen gruppiert bearbeiten. Die Eingabefelder werden vorausgefüllt, falls alle geplanten Ereignisse den gleichen Wert für ein bestimmtes Feld haben. Andernfalls bleiben die Eingabefelder leer. Leere Eingabefelder bedeuten, dass die entsprechenden Werte nicht geändert werden sollen.",
+            "HEADER": "Diese Seite erlaubt es Ihnen, geplante Videos nach Wochentagen gruppiert zu bearbeiten. Die Eingabefelder sind vorausgefüllt, wenn alle Videos den gleichen Wert haben. Andernfalls sind die Felder leer. Werden Felder leer gelassen, werden diese Felder bei den Videos nicht geändert.",
             "METADATA": "Metadaten",
             "SCHEDULING": "{{ weekday }} ({{ noEvents }} {{ eventOrEvents }})"
          }
@@ -352,7 +352,7 @@
             }
          },
          "EDIT": {
-            "DESCRIPTION": "Bearbeiten und/oder wählen Sie die Metadatenfelder aus, die Sie aktualisieren möchten. Ein Feld kann nicht ausgewählt werden, wenn sich nicht der Wert für min. eine Aufnahme ändern würde, oder der Wert nicht valide ist (z.B. dürfen Pflichtfelder nicht leer sein). Hervorgehobene Metadatenfelder haben abweichende Werte für die ausgewählten Aufnahmen.",
+            "DESCRIPTION": "Bearbeiten und\/oder wählen Sie die Metadatenfelder, die Sie aktualisieren möchten. Ein Feld kann nicht ausgewählt werden, wenn dies nicht zu einem geänderten Wert für mindestens ein Video führt, oder wenn das Feld ungültig ist (beispielsweise dürfen Pflichtfelder nicht leer sein). Markierte Metadatenfelder haben abweichende Werte für die ausgewählten Videos.",
             "TABLE": {
                "CAPTION": "Metadaten gewählter Videos",
                "FIELDS": "Metadaten",
@@ -442,7 +442,7 @@
          },
          "INFORMATION_STATE": {
             "HEADER": "Danke, dass Sie Opencast nutzen!",
-            "INFORMATION_PARAGRAPH_1": "Unsere Entwickler arbeiten ständig daran, die Nutzererfahrung zu verbessern. Dafür benötigen wir mehr Informationen darüber, wer Opencast nutzt und wie. Sie können uns mit einer schnellen Registrierung helfen.",
+            "INFORMATION_PARAGRAPH_1": "Unsere Entwickler arbeiten beständig daran, Ihnen die bestmögliche Benutzererfahrung zu bieten. Dazu müssen wir mehr darüber wissen, wer Opencast verwendet und wie es eingesetzt wird. Sie können uns mit einer kurzen Registrierung helfen.",
             "INFORMATION_PARAGRAPH_2": "Wir freuen uns über jede Rückmeldung, da selbst ein Teil der Daten, die wir über die Opencast-Nutzung sammeln dürfen, helfen werden, bessere Software zu erstellen, die Chancen für zusätzliche Finanzierungen zu verbessern und mehr Unternehmen zu gewinnen, Dienstleistungen rund um Opencast anzubieten."
          },
          "FORM_STATE": {
@@ -459,7 +459,7 @@
             "LAST_NAME": "Nachname",
             "STREET": "Straße",
             "NUMBER": "Hausnummer",
-            "ADDITIONAL_ADDRESS_INFO": "Hinzufügen Zusätzl. Adressinformationen",
+            "ADDITIONAL_ADDRESS_INFO": "Adressinformationen hinzufügen",
             "MAIL": "E-Mail-Adresse",
             "CONTACT_ME": "Kontaktiere mich für Aktualisierungen und Sicherheitsupdates",
             "WHICH_DATA_TO_SHARE": "Welche Daten möchtest du teilen?",
@@ -484,7 +484,7 @@
             "TEXT": "Beim Ausführen der Abfrage ist ein Fehler aufgetreten."
          },
          "DELETE_SUBMIT_STATE": {
-            "TEXT": "Sind Sie sicher, dass Sie die Registrierung löschen möchten? Mit der Bestätigung werden auch ihre Registrierungsdaten beim nächsten Update-Intervall von den Opencast-Servern entfernt."
+            "TEXT": "Sind Sie sicher, dass Sie Ihre Registrierungsdaten löschen möchten? Wenn Sie dies bestätigen, werden Ihre Registrierungsdaten mit dem nächsten Update-Intervall vom Server des Opencast Projekt entfernt."
          }
       }
    },
@@ -541,6 +541,10 @@
                      "SHORT": "Vortragender",
                      "DETAIL": "Die Datei enthält die Aufnahme einer zum Publikum sprechenden Person."
                   },
+                  "SUBTITLES": {
+                     "SHORT": "Untertitel",
+                     "DETAIL": "Die Textdatei enthält die Wörter, die in den obigen Videos gesprochen werden."
+                  },
                   "AUDIO_ONLY": {
                      "SHORT": "Nur Audio",
                      "DETAIL": "Die Datei enthält nur Audio."
@@ -584,8 +588,7 @@
                "NO_OPTIONS": "Es wurden keine Optionen konfiguriert!",
                "OPTION": {
                   "CLASS_HANDOUT_NOTES": "Unterrichtsnotizen",
-                  "CAPTIONS_DFXP": "Untertitel (DFXP)",
-                  "CAPTIONS_WEBVTT": "Untertitel (WebVTT)",
+                  "SUBTITLES": "Untertitel",
                   "PREVIEW_IMAGE": "Vorschaubild",
                   "SMIL": "SMIL-Katalog",
                   "TRACK_PARTS": "Spur-Teile"
@@ -937,7 +940,7 @@
                "REASONS": {
                   "CUTTING": "Schneiden erforderlich",
                   "REVIEW": "Überprüfung erforderlich",
-                  "ASYNC": "A/V Spuren asynchron",
+                  "ASYNC": "A\/V Spuren asynchron",
                   "AUDIO_ISSUE": "Fehlende oder beschädigte Audiospur",
                   "CANCELLED": "Abgebrochene Aufzeichnung",
                   "CONFLICTING_METADATA": "Widersprüchliche Metadaten",
@@ -1160,7 +1163,7 @@
             "THEME": {
                "CAPTION": "Branding",
                "DESCRIPTION": {
-                  "TEXT": "Optional können Sie ihre Aufzeichnungen mit Brandings versehen. Brandings können Vor- und Abspänne sowie Wasserzeichen und Titelfolien mit Metadaten enthalten."
+                  "TEXT": "Es kann optional ein Branding ausgewählt werden. Damit lassen sich Vor-\/ Nachspannvideos, Wasserzeichen oder Titelbild mit Metadaten generieren."
                },
                "TITLE": "Branding",
                "LABEL": "Branding auswählen",
@@ -1168,7 +1171,7 @@
             },
             "TOBIRA": {
                "CAPTION": "Tobira",
-               "DESCRIPTION": "Hier können Sie auswählen, wo die Serie im Videoportal Tobira erscheinen soll. Sie können hier nur einen Ort auswählen, der leer sein muss (fett markiert). Sie können hier neue Seiten anlegen, aber beachten Sie, dass diese nur persistiert werden, wenn sie im Pfad der ausgewählten Seite liegen.",
+               "DESCRIPTION": "Hier können Sie auswählen, wo die Serie im Videoportal Tobira erscheinen soll. Sie können nur einen Ort auswählen, und dieser darf noch nicht belegt sein (fett markiert). Sie können auch neue Seiten anlegen. Diese werden aber nur dann in Tobira erstellt, wenn sie auf dem Pfad zur ausgewählten Seite liegen.",
                "SELECT_PAGE": "Zielseite auswählen",
                "PAGE_TITLE": "Titel der Unterseite",
                "PATH_SEGMENT": "Pfadsegment",
@@ -1177,7 +1180,7 @@
                "CANCEL": "Abbrechen",
                "HOMEPAGE": "Startseite",
                "SELECTED_PAGE": "Serie wird in folgendem Pfad eingebunden",
-               "NO_PAGE_SELECTED": "Keine Seite ausgewählt. Die Serie wird nicht in Tobira eingehängt.",
+               "NO_PAGE_SELECTED": "Keine Seite ausgewählt. Serie wird nicht im Videoportal eingehängt.",
                "PATH": "Pfad"
             },
             "SUMMARY": {
@@ -1688,7 +1691,7 @@
                "BOTTOM_RIGHT": "Unten rechts",
                "UPLOAD": "Hochladen",
                "POSITION": "Wasserzeichen-Position & -Vorschau",
-               "FILEUPLOAD_DESCRIPTION": "Die Datei sollte einen Alphakanal haben (transparenter Hintergrund). Zulässige Dateitypen sind .PNG, .GIF, .SVG, .WEBP",
+               "FILEUPLOAD_DESCRIPTION": "Die Datei sollten einen Alpha-Kanal (transparenten Hintergrund) haben. Zulässige Dateiformate sind PNG, GIF, SVG und WEBP",
                "UPLOAD_LABEL": "Bild hochladen",
                "UPLOAD_BUTTON": "Hochladen"
             },
@@ -1777,7 +1780,7 @@
       }
    },
    "VIDEO_TOOL": {
-      "WARNING_UNSAVED": "Warnung: Einige Ihrer Änderungen wurden nicht gespeichert. Wenn Sie den Video-Editor verlassen, gehen diese Änderungen verloren. Möchten Sie wirklich fortfahren?",
+      "WARNING_UNSAVED": "Achtung: Einige der Änderungen wurden noch nicht gespeichert. Beim Verlassen des Video Editors werden diese Änderungen verworfen. Wirklich fortsetzen?",
       "TIMELINE": "Zeitleiste",
       "ZOOMLEVEL": "Zoomlevel",
       "PREVIEW_MODE": "Vorschau Modus",
@@ -1804,7 +1807,7 @@
       "ACTIONS": {
          "SPLIT": "Auftrennen",
          "SPLIT_TOOLTIP": "Segment an der aktuellen Cursor-Position teilen.",
-         "CUT": "Aus-/Einblenden",
+         "CUT": "Aus-\/Einblenden",
          "CUT_TOOLTIP": "Verstecke oder zeige den ausgewählten Teil des Videos.",
          "REPLAY_SEGMENT": "Anfang des Segments abspielen",
          "REPLAY_SEGMENT_TOOLTIP": "Spiele das aktuelle Segment von Anfang an.",
@@ -1825,7 +1828,7 @@
          "END": "Ende"
       },
       "THUMBNAIL": {
-         "DESCRIPTION": "Ein Standardvorschaubild für die Aufnahme wird automatisch generiert. Falls Sie ein anderes Vorschaubild verwenden wollen, können Sie dieses an der aktuellen Videoposition extrahieren oder ein Bild hochladen.",
+         "DESCRIPTION": "Ein Vorschaubild, welches das Video grafisch repräsentieren kann, wird automatisch erstellt. Falls Sie ein anderes Vorschaubild wünschen, können Sie eines aus dem Video an der aktuellen Wiedergabeposition extrahieren oder eine Bilddatei hochladen.",
          "ACTIONS": {
             "EXTRACT": {
                "FROM_VIDEO": {
@@ -1852,7 +1855,7 @@
          },
          "PREVIEW": {
             "NOT_AVAILABLE": "Keine Vorschau vorhanden",
-            "OUTDATED": "Die Vorschau ist nicht mehr aktuell, weil Segmente angepasst wurden. Dies wird geupdatet, sobald sie Ihre Änderungen speichern."
+            "OUTDATED": "Die Vorschau ist nicht aktuell weil der Schnitt geändert wurde. Sobald Sie die Änderungen speichern, wird die Vorschau aktualisiert."
          },
          "CURRENT": {
             "DEFAULT": "Sie verwenden aktuell das automatisch erstellte Vorschaubild.",
@@ -1861,10 +1864,12 @@
          }
       },
       "TRACKS": {
-         "DESCRIPTION": "Sie können Spuren deaktivieren, um diese von der weiteren Verarbeitung auszuschließen. Bitte beachten Sie, dass die Aufnahmen (erneut) publiziert werden müssen, um die Änderungen anzuwenden.",
+         "DESCRIPTION": "Sie können Spuren von der Auswahl entfernen, damit diese nicht verarbeitet werden. Bitte beachten Sie, dass Sie die Videos erneut publizieren müssen, damit die Änderung aktiv werden.",
          "NOTIFICATION": {
-            "NO_VIDEO_TRACK_SELECTED": "Bitte wählen Sie mindestens eine Videospur aus",
-            "NO_AUDIO_TRACK_SELECTED": "Bitte wählen Sie mindestens eine Audiospur aus"
+            "NO_VIDEO_TRACK_SELECTED_WARNING": "Sie sollten mindestens eine Videospur aktivieren",
+            "NO_AUDIO_TRACK_SELECTED_WARNING": "Sie sollten mindestens eine Audiospur aktivieren",
+            "TOO_MANY_AUDIO_TRACKS_SELECTED_WARNING": "Sie sollten nicht mehr Audio- als Videospuren aktivieren",
+            "NO_TRACK_SELECTED_ERROR": "Sie müssen mindestens eine Spur aktivieren"
          },
          "TRACK": {
             "HEADER": "Spur"
@@ -1875,8 +1880,8 @@
             "NO_PREVIEW_AVAILABLE": "Keine Vorschau verfügbar",
             "NO_TRACK_SELECTED": "Es sind keine Videospuren ausgewählt",
             "TOOLTIPS": {
-               "HIDE": "Diese Videospur ist aktuell aktiviert. Klicken zum Deaktivieren",
-               "UNHIDE": "Diese Videospur ist aktuell deaktiviert. Klicken zum Aktivieren."
+               "HIDE": "Diese Videospur ist aktuell aktiv. Bitte klicken, um diese Spur zu deaktivieren",
+               "UNHIDE": "Diese Videospur ist aktuell inaktiv. Bitte klicken, um die Spur zu aktivieren."
             }
          },
          "AUDIO": {
@@ -1885,8 +1890,8 @@
             "NO_PREVIEW_AVAILABLE": "Keine Vorschau vorhanden",
             "NO_TRACK_SELECTED": "Keine Audiospuren ausgewählt",
             "TOOLTIPS": {
-               "HIDE": "Diese Audiospur ist aktuell aktiviert. Klicken zum Deaktivieren",
-               "UNHIDE": "Diese Audiospur ist aktuell deaktiviert. Klicken zum Aktivieren"
+               "HIDE": "Diese Audiospur ist aktuell aktiv. Bitte klicken, um die Spur zu deaktivieren.",
+               "UNHIDE": "Diese Audiospur ist aktuell inaktiv. Bitte klicken, um die Spur zu aktivieren."
             }
          }
       },
@@ -1895,8 +1900,8 @@
          "PAUSE": "Pause",
          "NEXT_FRAME": "Nächstes Bild",
          "PREVIOUS_FRAME": "Vorheriges Bild",
-         "NEXT_SEGMENT": "Nächstes Segment/zum Ende springen",
-         "PREVIOUS_SEGMENT": "Vorheriges Segment/zum Start springen",
+         "NEXT_SEGMENT": "Nächstes Segment\/zum Ende springen",
+         "PREVIOUS_SEGMENT": "Vorheriges Segment\/zum Start springen",
          "MUTE": "Stummschalten",
          "VOLUME": "Lautstärke"
       }
@@ -1907,7 +1912,7 @@
       "USERNAME": "Benutzername…",
       "PASSWORD": "Passwort…",
       "LOGIN": "Anmelden",
-      "ERROR": "Falscher Benutzername und/oder Passwort"
+      "ERROR": "Falscher Benutzername und\/oder Passwort"
    },
    "TABLE_FILTERS": {
       "FILTER_SELECTION": {
@@ -2165,7 +2170,7 @@
    "HOTKEYS": {
       "CHEAT_SHEET": {
          "TITLE": "Tastenkürzel",
-         "HINT": "Diese Ansicht listet die aktuell verfügbaren Tastaturkombinationen auf. Beachten Sie, dass sich diese in Abhängigkeit von der betrachteten Seite ändern können."
+         "HINT": "Diese Seite listet die aktuell verfügbaren Tastenkürzel auf. Man beachte, dass diese mit der aktuell besuchten Seite variieren können."
       },
       "KEYS": {
          "CTRL": "Strg",
@@ -2197,7 +2202,7 @@
          "GENERAL": "Allgemein",
          "PLAYER": "Player",
          "EDITOR": "Editor",
-         "ADD_MEDIA": "Video/Serie erstellen"
+         "ADD_MEDIA": "Video\/Serie erstellen"
       },
       "DESCRIPTIONS": {
          "GENERAL": {
@@ -2212,16 +2217,16 @@
             "CHEAT_SHEET": "Tastenkürzel"
          },
          "PLAYER": {
-            "PLAY_PAUSE": "Wiedergabe/Pause",
+            "PLAY_PAUSE": "Wiedergabe\/Pause",
             "PREVIOUS_FRAME": "Vorheriges Bild",
             "NEXT_FRAME": "Nächstes Bild",
             "STEP_BACKWARD": "10s zurück springen",
             "STEP_FORWARD": "10s vorwärts springen",
-            "PREVIOUS_SEGMENT": "Vorheriges Segment/zum Start springen",
-            "NEXT_SEGMENT": "Nächstes Segment/zum Ende springen",
+            "PREVIOUS_SEGMENT": "Vorheriges Segment\/zum Start springen",
+            "NEXT_SEGMENT": "Nächstes Segment\/zum Ende springen",
             "VOLUME_UP": "Lautstärke erhöhen",
             "VOLUME_DOWN": "Lautstärke senken",
-            "MUTE": "Ton ein-/ausschalten"
+            "MUTE": "Ton ein-\/ausschalten"
          },
          "EDITOR": {
             "SPLIT_AT_CURRENT_TIME": "Auftrennen",
@@ -2232,7 +2237,7 @@
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "Segmentende"
          },
          "ADD_MEDIA": {
-            "NEXT_TAB": "Nächster Tab/Erstellen",
+            "NEXT_TAB": "Nächster Tab\/Erstellen",
             "PREVIOUS_TAB": "Vorheriger Tab"
          }
       }
@@ -2254,7 +2259,7 @@
       }
    },
    "STATISTICS": {
-      "NOT_AVAILABLE": "Es können aktuell keine Statistiken dargestellt werden. Bitte versuche es später erneut.",
+      "NOT_AVAILABLE": "Die Statistik kann aktuell nicht angezeigt werden. Bitte versuchen Sie es später nochmals.",
       "UNSUPPORTED_TYPE": "Diese Statistik-Daten können nicht dargestellt werden.",
       "FROM": "Von",
       "TO": "Bis",
@@ -2270,7 +2275,7 @@
          "PUBLISHEDHOURS": "Veröffentlichte Stunden an Videomaterial"
       },
       "DESCRIPTION": {
-         "RANDOM": "Dies zeigt zufällige Daten als Beispiel an. Sie können dieses Diagramm deaktivieren, indem sie die entsprechende Statistikkonfiguration aus /etc/providers entfernen",
+         "RANDOM": "Diese Zufallsdaten dienen ausschließlich Test- und Demonstrationszwecken. Um diese Darstellung zu deaktivieren, können Sie die entsprechende Konfiguration in etc\/providers entfernen",
          "VIEWS_SUM": "Diese Statistik zeigt die Summe der Zugriffe pro Zeiteinheit.",
          "VIEWS_AVG": "Diese Statistik zeigt die durchschnittliche Anzahl von Zugriffe pro Zeiteinheit.",
          "PUBLISHEDHOURS": "Dies zeigt die veröffentlichten Videostunden an"

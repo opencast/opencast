@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -21,6 +21,7 @@
 
 package org.opencastproject.tobira.impl;
 
+import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_CREATED;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_DESCRIPTION;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TITLE;
 
@@ -29,11 +30,14 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.TrackSupport;
 import org.opencastproject.mediapackage.VideoStream;
+import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
-import org.opencastproject.search.api.SearchResultItem;
+import org.opencastproject.playlists.Playlist;
+import org.opencastproject.search.api.SearchResult;
+import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.AclScope;
@@ -70,14 +74,14 @@ class Item {
   private Jsons.Val obj;
 
   /** Converts a event into the corresponding JSON representation */
-  Item(SearchResultItem event, AuthorizationService authorizationService, Workspace workspace) {
-    this.modifiedDate = event.getModified();
+  Item(SearchResult event, AuthorizationService authorizationService, Workspace workspace) {
+    this.modifiedDate = event.getModifiedDate();
 
     if (event.getDeletionDate() != null) {
       this.obj = Jsons.obj(
           Jsons.p("kind", "event-deleted"),
           Jsons.p("id", event.getId()),
-          Jsons.p("updated", event.getModified().getTime())
+          Jsons.p("updated", event.getModifiedDate().getTime())
       );
     } else {
       final var mp = event.getMediaPackage();
@@ -115,14 +119,17 @@ class Item {
               .findFirst()
               .orElse(mp.getTitle());
       if (title == null) {
-        title = event.getDcTitle();
-      }
-      if (title == null) {
         // If there is no title to be found, we throw an exception to skip this event.
         throw new RuntimeException("Event has no title");
       }
 
       final var captions = findCaptions(mp);
+
+      // Get the generated slide text.
+      final var slideText = Arrays.stream(mp.getElements())
+          .filter(mpe -> mpe.getFlavor().eq("mpeg-7/text"))
+          .map(element -> element.getURI())
+          .findFirst();
 
       // Obtain duration from tracks, as that's usually more accurate (stores information from
       // inspect operations). Fall back to `getDcExtent`.
@@ -135,15 +142,20 @@ class Item {
           // worse than any other thing that I can think of. And usually all durations are basically
           // the same.
           .max()
-          .orElse(Math.max(0, event.getDcExtent()));
+          //NB: This is an else case, so we ignore the item(s) in the stream
+          .orElseGet(() -> {
+            String dcExtent = event.getDublinCore().getFirst(DublinCore.PROPERTY_EXTENT);
+            DCMIPeriod p = EncodingSchemeUtils.decodeMandatoryPeriod(dcExtent);
+            return Math.max(0L, p.getEnd().getTime() - p.getStart().getTime());
+          });
 
       this.obj = Jsons.obj(
           Jsons.p("kind", "event"),
           Jsons.p("id", event.getId()),
           Jsons.p("title", title),
-          Jsons.p("partOf", event.getDcIsPartOf()),
-          Jsons.p("description", event.getDcDescription()),
-          Jsons.p("created", event.getDcCreated().getTime()),
+          Jsons.p("partOf", event.getDublinCore().getFirst(DublinCore.PROPERTY_IS_PART_OF)),
+          Jsons.p("description", event.getDublinCore().getFirst(PROPERTY_DESCRIPTION)),
+          Jsons.p("created", event.getDublinCore().getFirst(DublinCore.PROPERTY_CREATED)),
           Jsons.p("startTime", period.map(p -> p.getStart().getTime()).orElse(null)),
           Jsons.p("endTime", period.map(p -> p.getEnd().getTime()).orElse(null)),
           Jsons.p("creators", Jsons.arr(new ArrayList<>(creators))),
@@ -151,11 +163,15 @@ class Item {
           Jsons.p("thumbnail", findThumbnail(mp)),
           Jsons.p("timelinePreview", findTimelinePreview(mp)),
           Jsons.p("tracks", Jsons.arr(assembleTracks(event, mp))),
-          Jsons.p("acl", assembleAcl(authorizationService.getAcl(mp, AclScope.Merged).getA())),
+          Jsons.p("acl", assembleAcl(authorizationService.getAcl(mp, AclScope.Merged).getA().getEntries())),
           Jsons.p("isLive", isLive),
-          Jsons.p("metadata", dccToMetadata(dccs)),
+          Jsons.p("metadata", dccToMetadata(dccs, Set.of(new String[] {
+              "created", "creator", "title", "extent", "isPartOf", "description", "identifier",
+          }))),
           Jsons.p("captions", Jsons.arr(captions)),
-          Jsons.p("updated", event.getModified().getTime())
+          Jsons.p("slideText", slideText.map(t -> t.toString()).orElse(null)),
+          Jsons.p("segments", Jsons.arr(findSegments(mp))),
+          Jsons.p("updated", event.getModifiedDate().getTime())
       );
     }
   }
@@ -176,15 +192,13 @@ class Item {
             .collect(Collectors.toCollection(ArrayList::new));
   }
 
-  /** Assembles the object containing all additional metadata. */
-  private static Jsons.Obj dccToMetadata(List<DublinCoreCatalog> dccs) {
-    /* Metadata fields from dcterms that we already handle elsewhere. Therefore, we don't need to
-      * include them here again. */
-    final var ignoredDcFields = Set.of(new String[] {
-        "created", "creator", "title", "extent", "isPartOf", "description", "identifier",
-    });
-
-
+  /**
+   * Assembles the object containing all additional metadata.
+   *
+   * The second argument is a list of dcterms metadata fields that is already included elsewhere in
+   * the response. They will be ignored here.
+   */
+  private static Jsons.Obj dccToMetadata(List<DublinCoreCatalog> dccs, Set<String> ignoredDcFields) {
     final var namespaces = new HashMap<String, ArrayList<Jsons.Prop>>();
 
     for (final var dcc : (Iterable<DublinCoreCatalog>) dccs::iterator) {
@@ -196,13 +210,13 @@ class Item {
         final var ns = key.getNamespaceURI().equals("http://purl.org/dc/terms/")
             ? "dcterms"
             : key.getNamespaceURI();
-        final var fields = namespaces.computeIfAbsent(ns, k -> new ArrayList<>());
 
         // We skip fields that we already include elsewhere.
         if (ns.equals("dcterms") && ignoredDcFields.contains(key.getLocalName())) {
           continue;
         }
 
+        final var fields = namespaces.computeIfAbsent(ns, k -> new ArrayList<>());
         final var values = e.getValue().stream()
             .map(v -> Jsons.v(v.getValue()))
             .collect(Collectors.toCollection(ArrayList::new));
@@ -221,12 +235,12 @@ class Item {
     return Jsons.obj(fields);
   }
 
-  private static Jsons.Obj assembleAcl(AccessControlList acl) {
+  private static Jsons.Obj assembleAcl(List<AccessControlEntry> acl) {
     // We just transform the ACL into a map with one field per action, and the
     // value being a list of roles, e.g.
     // `{ "read": ["ROLE_USER", "ROLE_FOO"], "write": [...] }`
     final var actionToRoles = new HashMap<String, ArrayList<Jsons.Val>>();
-    for (final var entry: acl.getEntries()) {
+    for (final var entry: acl) {
       final var action = entry.getAction();
       actionToRoles.putIfAbsent(action, new ArrayList());
       actionToRoles.get(action).add(Jsons.v(entry.getRole()));
@@ -239,7 +253,7 @@ class Item {
     return Jsons.obj(props);
   }
 
-  private static List<Jsons.Val> assembleTracks(SearchResultItem event, MediaPackage mp) {
+  private static List<Jsons.Val> assembleTracks(SearchResult event, MediaPackage mp) {
     return Arrays.stream(mp.getTracks())
         .filter(track -> track.hasAudio() || track.hasVideo())
         .map(track -> {
@@ -320,6 +334,17 @@ class Item {
         .orElse(null);
   }
 
+  private static List<Jsons.Val> findSegments(MediaPackage mp) {
+    return Arrays.stream(mp.getAttachments())
+      .filter(a -> a.getFlavor().getSubtype().equals("segment+preview"))
+      .map(s -> Jsons.obj(
+          Jsons.p("uri", s.toString()),
+          Jsons.p("startTime", s.getReference().getProperty("time"))
+        )
+      )
+      .collect(Collectors.toCollection(ArrayList::new));
+  }
+
   private static Jsons.Val findTimelinePreview(MediaPackage mp) {
     return Arrays.stream(mp.getAttachments())
         .filter(a -> a.getFlavor().getSubtype().equals("timeline+preview"))
@@ -373,13 +398,67 @@ class Item {
         Jsons.p("updated", series.getModifiedDate().getTime())
       );
     } else {
+      // Created date
+      var createdDateString = series.getDublinCore().getFirst(PROPERTY_CREATED);
+      var created = Jsons.NULL;
+      var date = EncodingSchemeUtils.decodeDate(createdDateString);
+      if (date != null) {
+        created = Jsons.v(date.getTime());
+      } else {
+        logger.warn("Series {} has unparsable created-date: {}", series.getId(), createdDateString);
+      }
+
+      var additionalMetadata = dccToMetadata(Arrays.asList(series.getDublinCore()), Set.of(new String[] {
+          "created", "title", "description", "identifier",
+      }));
+
       this.obj = Jsons.obj(
         Jsons.p("kind", "series"),
         Jsons.p("id", series.getId()),
         Jsons.p("title", series.getDublinCore().getFirst(PROPERTY_TITLE)),
         Jsons.p("description", series.getDublinCore().getFirst(PROPERTY_DESCRIPTION)),
-        Jsons.p("acl", assembleAcl(acl)),
+        Jsons.p("acl", assembleAcl(acl.getEntries())),
+        Jsons.p("metadata", additionalMetadata),
+        Jsons.p("created", created),
         Jsons.p("updated", series.getModifiedDate().getTime())
+      );
+    }
+  }
+
+  /** Converts a series into the corresponding JSON representation */
+  Item(Playlist playlist) {
+    this.modifiedDate = playlist.getUpdated();
+
+    final var acl = assembleAcl(
+        playlist.getAccessControlEntries()
+            .stream()
+            .map(entry -> entry.toAccessControlEntry())
+            .collect(Collectors.toList())
+    );
+
+    // Assemble entries
+    final List<Jsons.Val> entries = playlist.getEntries().stream().map(entry -> Jsons.obj(
+          Jsons.p("id", entry.getId()),
+          Jsons.p("contentId", entry.getContentId()),
+          Jsons.p("type", entry.getType().getCode())
+    )).collect(Collectors.toCollection(ArrayList::new));
+
+    if (playlist.isDeleted()) {
+      this.obj = Jsons.obj(
+        Jsons.p("kind", "playlist-deleted"),
+        Jsons.p("id", playlist.getId()),
+        Jsons.p("updated", playlist.getUpdated().getTime())
+      );
+    } else {
+      this.obj = Jsons.obj(
+        Jsons.p("kind", "playlist"),
+        Jsons.p("id", playlist.getId()),
+        Jsons.p("title", playlist.getTitle()),
+        Jsons.p("description", playlist.getDescription()),
+        Jsons.p("creator", playlist.getCreator()),
+        Jsons.p("entries", Jsons.arr(entries)),
+        Jsons.p("acl", acl),
+        Jsons.p("updated", this.modifiedDate.getTime())
       );
     }
   }

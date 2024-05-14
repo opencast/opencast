@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -315,19 +315,26 @@ public class XACMLAuthorizationService implements AuthorizationService {
     return Optional.empty();
   }
 
-  @Override
   public boolean hasPermission(final MediaPackage mp, final String action) {
     AccessControlList acl = getActiveAcl(mp).getA();
-    final User user = securityService.getUser();
-    var allowed = false;
 
     // Check special ROLE_EPISODE_<ID>_<ACTION> permissions
+    final User user = securityService.getUser();
+    var allowed = false;
     logger.debug("episodeIdRole set to: {}", episodeIdRole);
     if (episodeIdRole) {
       var episodeRole = "ROLE_EPISODE_" + mp.getIdentifier() + "_" + action.toUpperCase();
       logger.debug("Checking for role: {}", episodeRole);
       allowed = user.getRoles().stream().map(Role::getName).anyMatch(r -> r.equals(episodeRole));
     }
+
+    return allowed || hasPermission(acl, action);
+  }
+
+  @Override
+  public boolean hasPermission(AccessControlList acl, final String action) {
+    final User user = securityService.getUser();
+    var allowed = false;
 
     // Check ACL
     for (AccessControlEntry entry: acl.getEntries()) {

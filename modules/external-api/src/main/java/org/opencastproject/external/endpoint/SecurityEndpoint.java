@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -32,7 +32,7 @@ import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponses;
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
-import org.opencastproject.util.Log;
+import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.RestUtil.R;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -68,7 +68,7 @@ import javax.ws.rs.core.Response;
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0,
             ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0,
             ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0,
-            ApiMediaType.VERSION_1_9_0, ApiMediaType.VERSION_1_10_0 })
+            ApiMediaType.VERSION_1_9_0, ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0 })
 @RestService(name = "externalapisecurity", title = "External API Security Service", notes = {}, abstractText = "Provides security operations related to the external API")
 @Component(
     immediate = true,
@@ -118,11 +118,11 @@ public class SecurityEndpoint implements ManagedService {
     if (expiration.isSome()) {
       expireSeconds = expiration.get();
       log.info("The property {} has been configured to expire signed URLs in {}.",
-              URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, Log.getHumanReadableTimeString(expireSeconds));
+              URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, DateTimeSupport.humanReadableTime(expireSeconds));
     } else {
       expireSeconds = DEFAULT_URL_SIGNING_EXPIRE_DURATION;
       log.info("The property {} has not been configured, so the default is being used to expire signed URLs in {}.",
-              URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, Log.getHumanReadableTimeString(expireSeconds));
+              URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, DateTimeSupport.humanReadableTime(expireSeconds));
     }
   }
 

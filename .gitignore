@@ -52,3 +52,6 @@ phantomjsdriver.log
 
 # Ignore python cache folder
 __pycache__
+
+# Ignore maven wrapper windows batch file
+mvnw.cmd

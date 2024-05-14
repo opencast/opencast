@@ -29,7 +29,12 @@ Parameter Table
 |streaming-target-tags      |Add tags (comma separated) to published media                                                |
 |streaming-target-subflavors|Subflavor to use for distributed material                                                    |
 |merge-force-flavors        |Flavors of elements for which an update is enforced when merging catalogs.                   |
-|                           |Defaults to `dublincore/*,security/*`.
+|                           |Defaults to `dublincore/*,security/*`.                                                       |
+|add-force-flavors          |Works only if strategy 'merge' is used.                                                      |
+|                           |Elements with these flavors will be added to an existing publication.                        |
+|                           |No published elements will be deleted or overwritten.                                        |
+|                           |You can use: 'presenter/delivery' for example to add another track.                          |
+|                           |Default: empty                                                                               |
 
 Operation Example
 -----------------

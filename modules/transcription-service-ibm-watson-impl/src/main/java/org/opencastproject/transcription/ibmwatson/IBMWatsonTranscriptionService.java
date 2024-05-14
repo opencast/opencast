@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -20,6 +20,8 @@
  */
 package org.opencastproject.transcription.ibmwatson;
 
+import static org.opencastproject.systems.OpencastConstants.ADMIN_EMAIL_PROPERTY;
+
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.fn.Enrichments;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
@@ -28,7 +30,6 @@ import org.opencastproject.assetmanager.util.Workflows;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.kernel.mail.SmtpService;
-import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementBuilder;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
@@ -144,7 +145,6 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
 
   // Global configuration (custom.properties)
   public static final String ADMIN_URL_PROPERTY = "org.opencastproject.admin.ui.url";
-  private static final String ADMIN_EMAIL_PROPERTY = "org.opencastproject.admin.email";
   private static final String DIGEST_USER_PROPERTY = "org.opencastproject.security.digest.user";
 
   // Cluster name
@@ -778,7 +778,8 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
   }
 
   @Override
-  public MediaPackageElement getGeneratedTranscription(String mpId, String jobId) throws TranscriptionServiceException {
+  public MediaPackageElement getGeneratedTranscription(String mpId, String jobId, MediaPackageElement.Type type)
+          throws TranscriptionServiceException {
     try {
       // If jobId is unknown, look for all jobs associated to that mpId
       if (jobId == null || "null".equals(jobId)) {
@@ -805,7 +806,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
         getAndSaveJobResults(jobId);
       }
       MediaPackageElementBuilder builder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
-      return builder.elementFromURI(uri, Attachment.TYPE, new MediaPackageElementFlavor("captions", "ibm-watson-json"));
+      return builder.elementFromURI(uri, type, new MediaPackageElementFlavor("captions", "ibm-watson-json"));
     } catch (TranscriptionDatabaseException e) {
       throw new TranscriptionServiceException("Job id not informed and could not find transcription", e);
     }
@@ -1076,7 +1077,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
       return null;
     }
 
-    String org = Enrichments.enrich(r).getSnapshots().head2().getOrganizationId();
+    String org = Enrichments.enrich(r).getSnapshots().stream().findFirst().get().getOrganizationId();
     Organization organization = null;
     try {
       organization = organizationDirectoryService.getOrganization(org);

@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -96,7 +96,7 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.systems.OpencastConstants;
-import org.opencastproject.util.Log;
+import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.RestUtil.R;
@@ -156,6 +156,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
@@ -185,7 +186,7 @@ import javax.ws.rs.core.Response.Status;
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0,
             ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0,
             ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0,
-            ApiMediaType.VERSION_1_9_0, ApiMediaType.VERSION_1_10_0 })
+            ApiMediaType.VERSION_1_9_0, ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0 })
 @RestService(name = "externalapievents", title = "External API Events Service", notes = {},
              abstractText = "Provides resources and operations related to the events")
 @Component(
@@ -359,20 +360,16 @@ public class EventsEndpoint implements ManagedService {
   public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
     // Ensure properties is not null
     if (properties == null) {
-      properties = new Hashtable();
+      properties = new Hashtable<>();
       logger.debug("No configuration set");
     }
 
     // Read URL Signing Expiration duration
     // Default to DEFAULT_URL_SIGNING_EXPIRE_DURATION.toString()));
-    try {
-      expireSeconds = Long.parseLong(StringUtils.defaultString(
-              (String) properties.get(URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY),
-              DEFAULT_URL_SIGNING_EXPIRE_DURATION.toString()));
-    } catch (NumberFormatException e) {
-      logger.error("Error parsing URL signing expiration configuration value", e);
-    }
-    logger.debug("URLs signatures are configured to expire in {}.", Log.getHumanReadableTimeString(expireSeconds));
+    expireSeconds = Long.parseLong(Objects.toString(
+        properties.get(URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY),
+        DEFAULT_URL_SIGNING_EXPIRE_DURATION.toString()));
+    logger.debug("URLs signatures are configured to expire in {}.", DateTimeSupport.humanReadableTime(expireSeconds));
 
     // Read preview subtype configuration
     // Default to DEFAULT_PREVIEW_SUBTYPE
@@ -1870,7 +1867,7 @@ public class EventsEndpoint implements ManagedService {
   @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0,
               ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0, ApiMediaType.VERSION_1_6_0,
               ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0, ApiMediaType.VERSION_1_9_0,
-              ApiMediaType.VERSION_1_10_0 })
+              ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0 })
   @RestQuery(name = "geteventscheduling", description = "Returns an event's scheduling information.", returnDescription = "", pathParameters = {
       @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) }, responses = {
       @RestResponse(description = "The scheduling information for the specified event is returned.", responseCode = HttpServletResponse.SC_OK),
@@ -1901,7 +1898,7 @@ public class EventsEndpoint implements ManagedService {
   @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0,
               ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0, ApiMediaType.VERSION_1_6_0,
               ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0, ApiMediaType.VERSION_1_9_0,
-              ApiMediaType.VERSION_1_10_0 })
+              ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0 })
   @RestQuery(name = "updateeventscheduling", description = "Update an event's scheduling information.", returnDescription = "", pathParameters = {
       @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = Type.STRING) }, restParameters = {
       @RestParameter(name = "scheduling", isRequired = true, description = "Scheduling Information", type = Type.STRING),

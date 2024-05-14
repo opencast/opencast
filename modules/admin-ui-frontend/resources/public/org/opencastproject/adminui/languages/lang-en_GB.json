@@ -43,7 +43,7 @@
       "VIDEOFILE": "Videofile",
       "VIDEOFILE_DESCRIPTION": "Video file for upload",
       "CAPTION": "Captions",
-      "CAPTION_DESCRIPTION": "Caption file; VTT or dfxp format is supported",
+      "CAPTION_DESCRIPTION": "Caption file in VTT format",
       "UPLOAD": "Upload",
       "UPLOADING": "Uploading",
       "EDIT": "Save",
@@ -178,7 +178,7 @@
       "GROUP_NOT_SAVED": "The group could not be saved",
       "GROUP_DELETED": "The group has been deleted",
       "GROUP_NOT_DELETED": "The group could not be deleted",
-      "ACCESS_DENIED": "Access denied. You're not allowed to view this page",
+      "ACCESS_DENIED": "Access denied. You are not allowed to view this page",
       "SERIES_ADDED": "The series has been created",
       "SERIES_NOT_SAVED": "The series could not be saved",
       "EVENTS_CREATED": "The event has been created",
@@ -217,7 +217,7 @@
       "CONFLICT_ALREADY_ENDED": "Scheduling error: The event has already ended.",
       "CONFLICT_END_BEFORE_START": "Scheduling error: Schedule end has to be later than the start.",
       "CONFLICT_IN_THE_PAST": "The schedule could not be updated: You cannot schedule an event to be in the past.",
-      "INVALID_ACL_RULES": "Rules have to contain a valid role and read or/and write right(s).",
+      "INVALID_ACL_RULES": "Rules have to contain a valid role and read or\/and write right(s).",
       "MISSING_ACL_RULES": "At least one role with Read and Write permissions is required!",
       "SAVED_ACL_RULES": "The access rules have been saved.",
       "SAVED_METADATA": "The metadata has been saved.",
@@ -263,10 +263,10 @@
       "TOBIRA_OVERRIDE_NAME": "The title of the selected page will be overridden with the title of the series.",
       "TOBIRA_NO_PATH_SEGMENT": "Page needs a path segment.",
       "TOBIRA_NOT_MOUNTED": "Series could not be mounted in Tobira.",
-      "TOBIRA_PATH_SEGMENT_INVALID": "Path segment is invalid. A valid path segment is at least 2 characters long, does not contain any whitespace or control characters, none of the characters '<>\"[\\]^`{|}#%/?]', and doesn't start with any of the characters '-+~@_!$&;:.,=*'()'.",
+      "TOBIRA_PATH_SEGMENT_INVALID": "Path segment is invalid. A valid path segment is at least 2 characters long, does not contain any whitespace or control characters, none of the characters '<>\"[\\]^`{|}#%\/?]', and doesn't start with any of the characters '-+~@_!$&;:.,=*'()'.",
       "TOBIRA_PATH_SEGMENT_UNIQUE": "The path segment of a page must be unqiue among all its sibling pages.",
       "TOBIRA_PAGE_NOT_FOUND": "The page you tried to navigate to does not or no longer exist. Maybe try starting from the beginning.",
-      "TOBIRA_SERVER_ERROR": " Error talking to Tobira. Contact your system administrator and/or try again later.",
+      "TOBIRA_SERVER_ERROR": " Error talking to Tobira. Contact your system administrator and\/or try again later.",
       "TOBIRA_COPIED_DIRECT_LINK": "Copied link to clipboard.",
       "TOBIRA_FAILED_COPYING_DIRECT_LINK": "Couldn't copy link to clipboard.",
       "TOBIRA_NOT_FOUND": "Tobira doesn't know about this series (yet). Try again in a few minutes or contact your system administrator."
@@ -294,7 +294,7 @@
          "GENERAL": {
             "CAPTION": "General",
             "SUMMARY": "({{ count }} events selected)",
-            "CANNOTSTART": "Highlighted event(s) cannot be processed at the moment. Deselect it/them or try again later."
+            "CANNOTSTART": "Highlighted event(s) cannot be processed at the moment. Deselect it\/them or try again later."
          },
          "TASKS": {
             "CAPTION": "Tasks",
@@ -352,7 +352,7 @@
             }
          },
          "EDIT": {
-            "DESCRIPTION": "Edit and/or select the metadata fields you want to update. A field cannot be selected if this doesn't result in a changed value for at least one event, or if the field isn't valid (e.g. required fields cannot be empty). Highlighted metadata fields have diverging values for the selected events.",
+            "DESCRIPTION": "Edit and\/or select the metadata fields you want to update. A field cannot be selected if this doesn't result in a changed value for at least one event, or if the field isn't valid (e.g. required fields cannot be empty). Highlighted metadata fields have diverging values for the selected events.",
             "TABLE": {
                "CAPTION": "Metadata of selected events",
                "FIELDS": "Metadata",
@@ -442,7 +442,7 @@
          },
          "INFORMATION_STATE": {
             "HEADER": "Thank you for using Opencast!",
-            "INFORMATION_PARAGRAPH_1": "Our developers are constantly working to provide you the best possible user experience. For that, we need to know more about who uses Opencast and how it is used. You can help us with a quick registration.",
+            "INFORMATION_PARAGRAPH_1": "Our developers are constantly working to provide you with the best possible user experience. For that, we need to know more about who uses Opencast and how it is used. You can help us with a quick registration.",
             "INFORMATION_PARAGRAPH_2": "We highly appreciate any feedback, the data that we gather about the Opencast usage will help us to create better software, have better chances for additional funding, and attract more companies to provide services around Opencast."
          },
          "FORM_STATE": {
@@ -541,6 +541,10 @@
                      "SHORT": "Presenter",
                      "DETAIL": "The file contains a recording of a person speaking to an audience."
                   },
+                  "SUBTITLES": {
+                     "SHORT": "Subtitles",
+                     "DETAIL": "The text file contains the words spoken in the video(s) above."
+                  },
                   "AUDIO_ONLY": {
                      "SHORT": "Audio only",
                      "DETAIL": "The file contains only audio."
@@ -584,8 +588,7 @@
                "NO_OPTIONS": "A list of asset options was not provided to this section of the web page!",
                "OPTION": {
                   "CLASS_HANDOUT_NOTES": "Class handout notes",
-                  "CAPTIONS_DFXP": "Captions DFXP",
-                  "CAPTIONS_WEBVTT": "Captions WebVTT",
+                  "SUBTITLES": "Subtitles",
                   "PREVIEW_IMAGE": "Preview image",
                   "SMIL": "Smil catalog",
                   "TRACK_PARTS": "Track parts"
@@ -937,7 +940,7 @@
                "REASONS": {
                   "CUTTING": "Cutting required",
                   "REVIEW": "Review required",
-                  "ASYNC": "A/V tracks asynchronous",
+                  "ASYNC": "A\/V tracks asynchronous",
                   "AUDIO_ISSUE": "Missing or defective audio track",
                   "CANCELLED": "Cancelled event",
                   "CONFLICTING_METADATA": "Conflicting metadata",
@@ -1688,7 +1691,7 @@
                "BOTTOM_RIGHT": "Bottom right",
                "UPLOAD": "Upload",
                "POSITION": "Watermark position and preview",
-               "FILEUPLOAD_DESCRIPTION": "File should have an alpha channel (transparent background). Acceptable file types are: .PNG, .GIF, .SVG, .WEBP",
+               "FILEUPLOAD_DESCRIPTION": "File should have an alpha channel (transparent background). Acceptable file types are: . PNG, . GIF, . SVG, . WEBP",
                "UPLOAD_LABEL": "Upload image",
                "UPLOAD_BUTTON": "Upload"
             },
@@ -1804,7 +1807,7 @@
       "ACTIONS": {
          "SPLIT": "Split",
          "SPLIT_TOOLTIP": "Split segment at the current cursor position.",
-         "CUT": "Hide/Show",
+         "CUT": "Hide\/Show",
          "CUT_TOOLTIP": "Hide or show the selected part of the video.",
          "REPLAY_SEGMENT": "Play Start of Segment",
          "REPLAY_SEGMENT_TOOLTIP": "Play the current segment from the beginning.",
@@ -1863,8 +1866,10 @@
       "TRACKS": {
          "DESCRIPTION": "You can unselect tracks to exclude them from further processing. Please note that you need to (re-)publish the event to actually apply the changes.",
          "NOTIFICATION": {
-            "NO_VIDEO_TRACK_SELECTED": "You must enable at least one video track",
-            "NO_AUDIO_TRACK_SELECTED": "You must enable at least one video track"
+            "NO_VIDEO_TRACK_SELECTED_WARNING": "You should probably enable at least one video track",
+            "NO_AUDIO_TRACK_SELECTED_WARNING": "You should probably enable at least one audio track",
+            "TOO_MANY_AUDIO_TRACKS_SELECTED_WARNING": "You probably shouldn't enable more audio than video tracks",
+            "NO_TRACK_SELECTED_ERROR": "You must enable at least one track"
          },
          "TRACK": {
             "HEADER": "Track"
@@ -1895,8 +1900,8 @@
          "PAUSE": "Pause",
          "NEXT_FRAME": "Next frame",
          "PREVIOUS_FRAME": "Previous frame",
-         "NEXT_SEGMENT": "Next segment / Jump to end",
-         "PREVIOUS_SEGMENT": "Previous segment / Jump to start",
+         "NEXT_SEGMENT": "Next segment \/ Jump to end",
+         "PREVIOUS_SEGMENT": "Previous segment \/ Jump to start",
          "MUTE": "Mute",
          "VOLUME": "Volume"
       }
@@ -1907,7 +1912,7 @@
       "USERNAME": "Username…",
       "PASSWORD": "Password…",
       "LOGIN": "Login",
-      "ERROR": "Incorrect username and / or password"
+      "ERROR": "Incorrect username and \/ or password"
    },
    "TABLE_FILTERS": {
       "FILTER_SELECTION": {
@@ -2197,7 +2202,7 @@
          "GENERAL": "General",
          "PLAYER": "Player",
          "EDITOR": "Editor",
-         "ADD_MEDIA": "Create Event/Series"
+         "ADD_MEDIA": "Create Event\/Series"
       },
       "DESCRIPTIONS": {
          "GENERAL": {
@@ -2212,16 +2217,16 @@
             "CHEAT_SHEET": "Keyboard shortcuts"
          },
          "PLAYER": {
-            "PLAY_PAUSE": "Play/pause",
+            "PLAY_PAUSE": "Play\/pause",
             "PREVIOUS_FRAME": "Previous frame",
             "NEXT_FRAME": "Next frame",
             "STEP_BACKWARD": "Jump 10s back",
             "STEP_FORWARD": "Jump 10s forward",
-            "PREVIOUS_SEGMENT": "Previous segment/jump to start",
-            "NEXT_SEGMENT": "Next segment/jump to end",
+            "PREVIOUS_SEGMENT": "Previous segment\/jump to start",
+            "NEXT_SEGMENT": "Next segment\/jump to end",
             "VOLUME_UP": "Volume up",
             "VOLUME_DOWN": "Volume down",
-            "MUTE": "Mute/unmute"
+            "MUTE": "Mute\/unmute"
          },
          "EDITOR": {
             "SPLIT_AT_CURRENT_TIME": "Split",
@@ -2232,7 +2237,7 @@
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "End of segment"
          },
          "ADD_MEDIA": {
-            "NEXT_TAB": "Next tab/Create",
+            "NEXT_TAB": "Next tab\/Create",
             "PREVIOUS_TAB": "Previous tab"
          }
       }
@@ -2270,7 +2275,7 @@
          "PUBLISHEDHOURS": "Published Hours of Video"
       },
       "DESCRIPTION": {
-         "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
+         "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc\/providers",
          "VIEWS_SUM": "This displays the total number of views per time unit.",
          "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
          "PUBLISHEDHOURS": "This displays the published hours of video"

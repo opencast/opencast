@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -570,7 +570,12 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
                 editedTrack.getIdentifier(), FilenameUtils.getName(editedTrack.getURI().toString()));
         editedTrack.setURI(editedTrackNewUri);
         for (Track track : sourceTracks) {
-          if (track.getFlavor().getType().equals(editedTrackFlavor.getType())) {
+          var reference = editedTrack.getReference();
+          if (reference == null) {
+            logger.warn("Edited track {} has no reference track assigned; skip restoring tags.",
+                editedTrack.getIdentifier());
+          } else if (track.getIdentifier().equals(reference.getIdentifier())) {
+            editedTrack.setTags(track.getTags());
             mp.addDerived(editedTrack, track);
             mpAdded = true;
             break;

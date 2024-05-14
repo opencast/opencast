@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -23,10 +23,12 @@ package org.opencastproject.transcription.workflowoperation;
 import org.opencastproject.caption.api.CaptionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
+import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
+import org.opencastproject.mediapackage.Track;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.transcription.api.TranscriptionService;
 import org.opencastproject.transcription.api.TranscriptionServiceException;
@@ -65,6 +67,7 @@ public class AmberscriptAttachTranscriptionOperationHandler extends AbstractWork
   /** Workflow configuration option keys */
   static final String TRANSCRIPTION_JOB_ID = "transcription-job-id";
   static final String TARGET_CAPTION_FORMAT = "target-caption-format";
+  static final String TARGET_TYPE = "target-element-type";
 
   private TranscriptionService service = null;
   private CaptionService captionService;
@@ -91,40 +94,42 @@ public class AmberscriptAttachTranscriptionOperationHandler extends AbstractWork
     }
 
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(
-        workflowInstance, Configuration.none, Configuration.none, Configuration.many, Configuration.many);
-    List<MediaPackageElementFlavor> targetFlavorOption = tagsAndFlavors.getTargetFlavors();
+        workflowInstance, Configuration.none, Configuration.none, Configuration.many, Configuration.one);
+    MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor();
     List<String> targetTagOption = tagsAndFlavors.getTargetTags();
     String captionFormatOption = StringUtils.trimToNull(operation.getConfiguration(TARGET_CAPTION_FORMAT));
-
-    MediaPackageElementFlavor flavor;
-    if (!targetFlavorOption.isEmpty()) {
-      flavor = targetFlavorOption.get(0);
-    } else {
-      // If the target format is not specified, we will leave it as is (srt).
-      String format = (captionFormatOption != null) ? captionFormatOption : "srt";
-      if (service.getLanguage() != null) {
-        flavor = new MediaPackageElementFlavor("captions", format + "+" + service.getLanguage());
-      } else {
-        flavor = new MediaPackageElementFlavor("captions", format);
+    String typeUnparsed = StringUtils.trimToEmpty(operation.getConfiguration(TARGET_TYPE));
+    MediaPackageElement.Type type = null;
+    if (!typeUnparsed.isEmpty()) {
+      // Case insensitive matching between user input (workflow config key) and enum value
+      for (MediaPackageElement.Type t : MediaPackageElement.Type.values()) {
+        if (t.name().equalsIgnoreCase(typeUnparsed)) {
+          type = t;
+        }
       }
+      if (type == null || (type != Track.TYPE && type != Attachment.TYPE)) {
+        throw new IllegalArgumentException(String.format("The given type '%s' for mediapackage %s was illegal. Please"
+                + "check the operations' configuration keys.", type, mediaPackage.getIdentifier()));
+      }
+    } else {
+      type = Track.TYPE;
     }
+
+    // If the target format is not specified, convert to vtt (default output format is srt)
+    String format = (captionFormatOption != null) ? captionFormatOption : "vtt";
 
     try {
       MediaPackageElement transcription
-          = service.getGeneratedTranscription(mediaPackage.getIdentifier().toString(), jobId);
+          = service.getGeneratedTranscription(mediaPackage.getIdentifier().toString(), jobId, type);
 
-      MediaPackageElement convertedTranscription;
-      if (captionFormatOption != null) {
-        Job job = captionService.convert(transcription, "subrip", captionFormatOption, service.getLanguage());
-        if (!waitForStatus(job).isSuccess()) {
-          throw new WorkflowOperationException("Transcription format conversion job did not complete successfully.");
-        }
-        convertedTranscription = MediaPackageElementParser.getFromXml(job.getPayload());
-        workspace.delete(transcription.getURI());
-      } else {
-        convertedTranscription = transcription;
+      Job job = captionService.convert(transcription, "subrip", format, service.getLanguage());
+      if (!waitForStatus(job).isSuccess()) {
+        throw new WorkflowOperationException("Transcription format conversion job did not complete successfully.");
       }
-      convertedTranscription.setFlavor(flavor);
+      MediaPackageElement convertedTranscription = MediaPackageElementParser.getFromXml(job.getPayload());
+      workspace.delete(transcription.getURI());
+
+      convertedTranscription.setFlavor(targetFlavor);
       for (String tag : targetTagOption) {
         convertedTranscription.addTag(tag);
       }

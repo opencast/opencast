@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -63,7 +63,7 @@ public class AssetManagerEventUpdateHandler extends UpdateHandler implements Ass
         case Update:
           if (item instanceof TakeSnapshot) { // Check class just in case
             TakeSnapshot snapshotItem = (TakeSnapshot) item;
-            // If no episopde dc, there's nothing to do.
+            // If no episode dc, there's nothing to do.
             if (snapshotItem.getEpisodeDublincore().isNone()) {
               break;
             }

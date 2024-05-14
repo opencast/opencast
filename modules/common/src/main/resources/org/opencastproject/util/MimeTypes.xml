@@ -515,6 +515,11 @@
     <Extensions>ass,ssa</Extensions>
   </MimeType>
   <MimeType>
+    <Type>text/x-subviewer</Type>
+    <Description>SubViewer</Description>
+    <Extensions>sub</Extensions>
+  </MimeType>
+  <MimeType>
     <Type>video/x-trec</Type>
     <Description>Camtasia TREC video</Description>
     <Extensions>trec</Extensions>

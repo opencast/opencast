@@ -206,6 +206,8 @@
     <sec:intercept-url pattern="/api/info/organization/properties/engageuiurl" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_EMBEDDING_CODE_VIEW" />
     <sec:intercept-url pattern="/api/listproviders" method="GET" access="ROLE_ADMIN, ROLE_API_LISTPROVIDERS_VIEW"/>
     <sec:intercept-url pattern="/api/listproviders/*" method="GET" access="ROLE_ADMIN, ROLE_API_LISTPROVIDERS_VIEW"/>
+    <sec:intercept-url pattern="/api/playlists" method="GET" access="ROLE_ADMIN, ROLE_API_PLAYLISTS_VIEW"/>
+    <sec:intercept-url pattern="/api/playlists/*" method="GET" access="ROLE_ADMIN, ROLE_API_PLAYLISTS_VIEW"/>
     <sec:intercept-url pattern="/api/series" method="GET" access="ROLE_ADMIN, ROLE_API_SERIES_VIEW"/>
     <sec:intercept-url pattern="/api/series/*" method="GET" access="ROLE_ADMIN, ROLE_API_SERIES_VIEW"/>
     <sec:intercept-url pattern="/api/series/*/acl" method="GET" access="ROLE_ADMIN, ROLE_API_SERIES_ACL_VIEW"/>
@@ -228,6 +230,7 @@
     <sec:intercept-url pattern="/api/events/*/scheduling" method="PUT" access="ROLE_ADMIN, ROLE_API_EVENTS_SCHEDULING_EDIT"/>
     <sec:intercept-url pattern="/api/events/*/track" method="POST" access="ROLE_ADMIN, ROLE_API_EVENTS_TRACK_EDIT"/>
     <sec:intercept-url pattern="/api/groups/*" method="PUT" access="ROLE_ADMIN, ROLE_API_GROUPS_EDIT"/>
+    <sec:intercept-url pattern="/api/playlists/*" method="PUT" access="ROLE_ADMIN, ROLE_API_PLAYLISTS_CREATE, ROLE_API_PLAYLISTS_EDIT"/>
     <sec:intercept-url pattern="/api/series/*" method="PUT" access="ROLE_ADMIN, ROLE_API_SERIES_EDIT"/>
     <sec:intercept-url pattern="/api/series/*/acl" method="PUT" access="ROLE_ADMIN, ROLE_API_SERIES_ACL_EDIT"/>
     <sec:intercept-url pattern="/api/series/*/metadata" method="PUT" access="ROLE_ADMIN, ROLE_API_SERIES_METADATA_EDIT"/>
@@ -243,6 +246,8 @@
     <sec:intercept-url pattern="/api/clearIndex" method="POST" access="ROLE_ADMIN"/>
     <sec:intercept-url pattern="/api/recreateIndex" method="POST" access="ROLE_ADMIN"/>
     <sec:intercept-url pattern="/api/recreateIndex/*" method="POST" access="ROLE_ADMIN"/>
+    <sec:intercept-url pattern="/api/playlists/*" method="POST" access="ROLE_ADMIN, ROLE_API_PLAYLISTS_CREATE, ROLE_API_PLAYLISTS_EDIT"/>
+    <sec:intercept-url pattern="/api/playlists/*/entries" method="POST" access="ROLE_ADMIN, ROLE_API_PLAYLISTS_CREATE, ROLE_API_PLAYLISTS_EDIT"/>
     <sec:intercept-url pattern="/api/series" method="POST" access="ROLE_ADMIN, ROLE_API_SERIES_CREATE"/>
     <sec:intercept-url pattern="/api/security/sign" method="POST" access="ROLE_ADMIN, ROLE_API_SECURITY_EDIT"/>
     <sec:intercept-url pattern="/api/statistics/data/query" method="POST" access="ROLE_ADMIN, ROLE_API_STATISTICS_VIEW"/>
@@ -255,6 +260,7 @@
     <sec:intercept-url pattern="/api/events/*/metadata/*" method="DELETE" access="ROLE_ADMIN, ROLE_API_EVENTS_METADATA_DELETE"/>
     <sec:intercept-url pattern="/api/groups/*" method="DELETE" access="ROLE_ADMIN, ROLE_API_GROUPS_DELETE"/>
     <sec:intercept-url pattern="/api/groups/*/members/*" method="DELETE" access="ROLE_ADMIN, ROLE_API_GROUPS_EDIT"/>
+    <sec:intercept-url pattern="/api/playlists/*" method="DELETE" access="ROLE_ADMIN, ROLE_API_PLAYLISTS_DELETE"/>
     <sec:intercept-url pattern="/api/series/*" method="DELETE" access="ROLE_ADMIN, ROLE_API_SERIES_DELETE"/>
     <sec:intercept-url pattern="/api/series/*/metadata" method="DELETE" access="ROLE_ADMIN, ROLE_API_SERIES_METADATA_DELETE"/>
     <sec:intercept-url pattern="/api/series/*/metadata/*" method="DELETE" access="ROLE_ADMIN, ROLE_API_SERIES_METADATA_DELETE"/>
@@ -281,9 +287,6 @@
     <!-- anonymous access to user interface configuration -->
     <sec:intercept-url pattern="/ui/config/**" access="ROLE_ANONYMOUS" />
 
-    <!-- Paella player 6 -->
-    <sec:intercept-url pattern="/paella/ui/auth.html" access="ROLE_USER" />
-    <sec:intercept-url pattern="/paella/ui/**" access="ROLE_ANONYMOUS" />
    <!-- Paella player 7 -->
     <sec:intercept-url pattern="/paella7/ui/auth.html" access="ROLE_USER" />
     <sec:intercept-url pattern="/paella7/ui/**" access="ROLE_ANONYMOUS" />
@@ -306,6 +309,7 @@
     <sec:intercept-url pattern="/studio/manifest.json" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/studio/static/js/**" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/studio/**" access="ROLE_ADMIN, ROLE_STUDIO" />
+    <sec:intercept-url pattern="/studio-api/**" access="ROLE_ADMIN, ROLE_STUDIO" />
 
     <!-- Enable access to Opencast Editor -->
     <sec:intercept-url pattern="/editor/**" access="ROLE_ADMIN, ROLE_USER" />
@@ -319,6 +323,7 @@
     <sec:intercept-url pattern="/series/**" method="GET" access="ROLE_ANONYMOUS, ROLE_CAPTURE_AGENT" />
     <sec:intercept-url pattern="/annotation/**" method="GET" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/annotation/**" method="PUT" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/playlists/**" access="ROLE_ANONYMOUS" />
 
     <!-- Enable anonymous access to the rss and atom feeds -->
     <sec:intercept-url pattern="/feeds/**" method="GET" access="ROLE_ANONYMOUS" />
@@ -407,11 +412,6 @@
 
     <!-- Enables log out -->
     <sec:logout success-handler-ref="logoutSuccessHandler" />
-
-    <!-- Shibboleth log out
-         Please specifiy the URL to return to after logging out
-    <sec:logout logout-success-url="/Shibboleth.sso/Logout?return=http://www.opencast.org" />
-    -->
 
     <!-- JWT single log out
          Please specify the URL to return to after logging out. Comment out the logoutSuccessHandler above.
@@ -547,6 +547,9 @@
 
   <bean id="logoutSuccessHandler" class="org.opencastproject.kernel.security.LogoutSuccessHandler">
     <property name="userDirectoryService" ref="userDirectoryService" />
+    <!-- Shibboleth log out
+    <property name="defaultTargetUrl" value="/Shibboleth.sso/Logout?return=www.opencast.org"/>
+    -->
   </bean>
 
   <!-- ################# -->

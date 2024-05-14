@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -89,6 +89,7 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.time.Duration;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArraySet;
@@ -162,7 +163,7 @@ public final class WorkspaceImpl implements Workspace {
   private boolean waitForResourceFlag = false;
 
   /** the asset manager directory if locally available */
-  private String assetManagerPath = null;
+  private List<String> assetManagerPaths = null;
 
   /** the download url and directory if locally available */
   private String downloadUrl = null;
@@ -318,7 +319,7 @@ public final class WorkspaceImpl implements Workspace {
     staticCollections.add("waveform");
 
     // Check if we can read from the asset manager locally to avoid downloading files via HTTP
-    assetManagerPath = AssetPathUtils.getAssetManagerPath(cc);
+    assetManagerPaths = AssetPathUtils.getAssetManagerPath(cc);
 
     // Check if we can read published files locally to avoid downloading files via HTTP
     downloadUrl = DistributionPathUtils.getDownloadUrl(cc);
@@ -390,7 +391,7 @@ public final class WorkspaceImpl implements Workspace {
     }
 
     // Check if we can get the files directly from the asset manager
-    final File asset = AssetPathUtils.getLocalFile(assetManagerPath, securityService.getOrganization().getId(), uri);
+    final File asset = AssetPathUtils.getLocalFile(assetManagerPaths, securityService.getOrganization().getId(), uri);
     if (asset != null) {
       logger.debug("Copy local file {} from asset manager to workspace", asset);
       Files.copy(asset.toPath(), inWs.toPath(), StandardCopyOption.REPLACE_EXISTING);
@@ -420,7 +421,7 @@ public final class WorkspaceImpl implements Workspace {
     }
 
     // Check if we can get the files directly from the asset manager
-    final File asset = AssetPathUtils.getLocalFile(assetManagerPath, securityService.getOrganization().getId(), uri);
+    final File asset = AssetPathUtils.getLocalFile(assetManagerPaths, securityService.getOrganization().getId(), uri);
     if (asset != null) {
       return new FileInputStream(asset);
     }
@@ -448,7 +449,7 @@ public final class WorkspaceImpl implements Workspace {
 
   /** {@link #copyOrLink(java.io.File, java.io.File)} as an effect. <code>src -> dst -> ()</code> */
   private Effect<File> copyOrLink(final File src) {
-    return new Effect.X<File>() {
+    return new Effect.X<>() {
       @Override
       protected void xrun(File dst) throws IOException {
         copyOrLink(src, dst);

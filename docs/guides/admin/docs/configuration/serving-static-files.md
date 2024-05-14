@@ -31,7 +31,7 @@ The configuration options for requiring authentication can be found in the servi
 
 For some external software, like the ILIAS plugin and Tobira, it is required to set `authentication.required` to `false` as static files authorization is active by default.
 
-An alternative method to this is Opencast's [token based authorization system](stream-security.md) which allows (and
+An alternative method to this is Opencast's [token based authorization system](stream-security/stream-security-config.md) which allows (and
 requires) to defer all security checks to external systems.
 
 
@@ -94,7 +94,7 @@ This will be picked up by Nginx if it is used as reverse proxy and treated as an
 Thus, for this to work, there needs to be a matching internal location configuration like this:
 
 ```
-location /protected {
+location /protected/ {
   internal;
   alias /srv/opencast/downloads/;
 }

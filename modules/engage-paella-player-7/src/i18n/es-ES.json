@@ -143,5 +143,8 @@
     "Video quality": "Calidad de vídeo",
     "Captions": "Subtítulos",
     "Opencast player version": "Versión del reproductor de Opencast",
-    "Opencast player": "Reproductor de vídeo de Opencast"
+    "Opencast player": "Reproductor de vídeo de Opencast",
+    "Undefined caption": "Idioma desconocido",
+    "Unknown language": "Idioma desconocido",
+    "automatically generated": "generado automáticamente"
 }

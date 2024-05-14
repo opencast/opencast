@@ -1,4 +1,4 @@
-Retract Youtube Workflow Operation
+Retract YouTube Workflow Operation
 ==================================
 
 ID: `retract-youtube`

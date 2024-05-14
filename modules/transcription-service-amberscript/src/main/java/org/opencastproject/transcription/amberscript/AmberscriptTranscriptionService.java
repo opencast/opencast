@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -27,7 +27,6 @@ import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.assetmanager.util.Workflows;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
-import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementBuilder;
@@ -825,7 +824,7 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
 
   @Override
   // Called by the attach workflow operation
-  public MediaPackageElement getGeneratedTranscription(String mpId, String jobId)
+  public MediaPackageElement getGeneratedTranscription(String mpId, String jobId, MediaPackageElement.Type type)
           throws TranscriptionServiceException {
     try {
       // If jobId is unknown, look for all jobs associated to that mpId
@@ -859,7 +858,7 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
       }
       MediaPackageElementBuilder builder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
       logger.debug("Returning MPE with results file URI: {}", uri);
-      return builder.elementFromURI(uri, Attachment.TYPE, new MediaPackageElementFlavor("captions", "srt"));
+      return builder.elementFromURI(uri, type, new MediaPackageElementFlavor("captions", "srt"));
     } catch (TranscriptionDatabaseException e) {
       throw new TranscriptionServiceException("Job id not informed and could not find transcription", e);
     }
@@ -1063,11 +1062,11 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
             final AResult r = q.select(q.snapshot()).where(q.mediaPackageId(mpId).and(q.version().isLatest())).run();
             if (r.getSize() == 0) {
               // Media package not archived yet? Skip until next time.
-              logger.warn("Media package {} has not been archived yet. Skipped.", mpId);
+              logger.debug("Media package {} has not been archived yet. Skipped.", mpId);
               continue;
             }
 
-            String org = Enrichments.enrich(r).getSnapshots().head2().getOrganizationId();
+            String org = Enrichments.enrich(r).getSnapshots().stream().findFirst().get().getOrganizationId();
             Organization organization = organizationDirectoryService.getOrganization(org);
             if (organization == null) {
               logger.warn("Media package {} has an unknown organization {}. Skipped.", mpId, org);

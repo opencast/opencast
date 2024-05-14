@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -117,6 +117,13 @@ public final class DateTimeSupport {
     utc.append("Z");
 
     return utc.toString();
+  }
+
+  /**
+   * Converts seconds to a human readable time string.
+   */
+  public static String humanReadableTime(long seconds) {
+    return String.format("%d:%02d:%02d", seconds / 3600, seconds / 60 % 60, seconds % 60);
   }
 
   /**

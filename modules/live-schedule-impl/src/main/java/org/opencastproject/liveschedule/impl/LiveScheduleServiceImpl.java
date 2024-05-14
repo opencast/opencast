@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -53,8 +53,6 @@ import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
-import org.opencastproject.search.api.SearchQuery;
-import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
@@ -72,7 +70,6 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.data.Opt;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
@@ -85,8 +82,6 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -169,7 +164,6 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
   private String streamMimeType;
   private String[] streamResolution;
   private MediaPackageElementFlavor[] liveFlavors;
-  private String distributionServiceType = DEFAULT_LIVE_DISTRIBUTION_SERVICE;
   private String serverUrl;
   private Cache<String, Version> snapshotVersionCache
       = CacheBuilder.newBuilder().expireAfterWrite(5, TimeUnit.MINUTES).build();
@@ -255,9 +249,6 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
       liveFlavors[i++] = MediaPackageElementFlavor.parseFlavor(f);
     }
 
-    if (!StringUtils.isBlank((String) properties.get(LIVE_DISTRIBUTION_SERVICE))) {
-      distributionServiceType = StringUtils.trimToEmpty((String) properties.get(LIVE_DISTRIBUTION_SERVICE));
-    }
     publishedStreamingFormats = Arrays.asList(Optional.ofNullable(StringUtils.split(
             (String)properties.get(LIVE_PUBLISH_STREAMING), ",")).orElse(new String[0]));
 
@@ -267,8 +258,8 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     }
 
     logger.info(
-        "Configured live stream name: {}, mime type: {}, resolution: {}, target flavors: {}, distribution service: {}",
-        streamName, streamMimeType, resolution, flavors, distributionServiceType);
+            "Configured live stream name: {}, mime type: {}, resolution: {}, target flavors: {}",
+            streamName, streamMimeType, resolution, flavors);
   }
 
   @Override
@@ -501,18 +492,11 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
     securityService.setUser(SecurityUtil.createSystemUser(systemUserName, org));
     try {
       // Look for the media package in the search index
-      SearchQuery query = new SearchQuery().withId(mediaPackageId);
-      SearchResult result = searchService.getForAdministrativeRead(query);
-      if (result.size() == 0) {
-        logger.debug("The search service doesn't know live mediapackage {}", mediaPackageId);
-        return null;
-      } else if (result.size() > 1) {
-        logger.warn("More than one live mediapackage with id {} returned from search service", mediaPackageId);
-        throw new LiveScheduleException("More than one live mediapackage with id " + mediaPackageId + " found");
-      }
-      return result.getItems()[0].getMediaPackage();
+      return searchService.get(mediaPackageId);
     } catch (UnauthorizedException e) {
       logger.warn("Unexpected unauthorized exception when querying the search index for mp {}", mediaPackageId, e);
+      return null;
+    } catch (NotFoundException e) {
       return null;
     } finally {
       securityService.setUser(prevUser);
@@ -654,8 +638,8 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
       // Media package not archived?.
       throw new LiveScheduleException(String.format("Unexpected error: media package %s has not been archived.", mpId));
     }
-    Opt<ARecord> record = result.getRecords().head();
-    if (record.isNone()) {
+    Optional<ARecord> record = result.getRecords().stream().findFirst();
+    if (record.isEmpty()) {
       // No snapshot?
       throw new LiveScheduleException(String.format("Unexpected error: media package %s has not been archived.", mpId));
     }
@@ -906,21 +890,12 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
   }
 
   @Reference(
-      cardinality = ReferenceCardinality.AT_LEAST_ONE,
-      policy = ReferencePolicy.DYNAMIC,
-      unbind = "unsetDownloadDistributionService"
+      name = "DownloadDistributionService",
+      target = "(distribution.channel=download)"
   )
   public void setDownloadDistributionService(DownloadDistributionService service) {
-    if (distributionServiceType.equalsIgnoreCase(service.getDistributionType())) {
-      this.downloadDistributionService = service;
-    }
-  }
-
-  public void unsetDownloadDistributionService(DownloadDistributionService service) {
-    if (distributionServiceType.equalsIgnoreCase(service.getDistributionType())
-        && downloadDistributionService.equals(service)) {
-      this.downloadDistributionService = null;
-    }
+    this.downloadDistributionService = service;
+    logger.info("Distribution service with type '{}' set.", downloadDistributionService.getDistributionType());
   }
 
   @Reference
