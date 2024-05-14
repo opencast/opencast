@@ -216,7 +216,11 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
             .build();
       }
       var order = SortOrder.fromString(sortParam.length > 1 ? sortParam[1] : "asc");
-      searchSource.sort("dc." + sortParam[0], order);
+      if ("modified".equals(sortParam[0])) {
+        searchSource.sort(sortParam[0], order);
+      } else {
+        searchSource.sort(SearchResult.DUBLINCORE + sortParam[0], order);
+      }
     }
 
     var hits = searchIndex.search(searchSource).getHits();
@@ -398,7 +402,11 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
             .build();
       }
       var order = SortOrder.fromString(sortParam.length > 1 ? sortParam[1] : "asc");
-      searchSource.sort(SearchResult.DUBLINCORE + "." + sortParam[0], order);
+      if ("modified".equals(sortParam[0])) {
+        searchSource.sort(sortParam[0], order);
+      } else {
+        searchSource.sort(SearchResult.DUBLINCORE + "." + sortParam[0], order);
+      }
     }
 
     SearchResultList hits = searchService.search(searchSource);
