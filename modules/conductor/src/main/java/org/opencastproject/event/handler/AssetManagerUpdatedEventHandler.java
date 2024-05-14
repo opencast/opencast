@@ -28,6 +28,7 @@ import org.opencastproject.assetmanager.api.AssetManagerException;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.AResult;
+import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
@@ -46,6 +47,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.Stream;
@@ -193,13 +195,15 @@ public class AssetManagerUpdatedEventHandler {
         MediaPackage mp = snapshot.getMediaPackage();
 
         // Update the series XACML file
+        Tuple<MediaPackage, Attachment> mpAclAttachmentTuple = null;
         if (SeriesItem.Type.UpdateAcl.equals(seriesItem.getType())) {
           // Build a new XACML file for this mediapackage
           try {
             if (seriesItem.getOverrideEpisodeAcl()) {
               authorizationService.removeAcl(mp, AclScope.Episode);
             }
-            authorizationService.setAcl(mp, AclScope.Series, seriesItem.getAcl());
+            mpAclAttachmentTuple = authorizationService.setAcl(mp,
+                AclScope.Series, seriesItem.getAcl());
           } catch (MediaPackageException e) {
             logger.error("Error setting ACL for media package {}", mp.getIdentifier(), e);
           }
@@ -265,6 +269,16 @@ public class AssetManagerUpdatedEventHandler {
           assetManager.takeSnapshot(snapshot.getOwner(), mp);
         } catch (AssetManagerException e) {
           logger.error("Error updating mediapackage {}", mp.getIdentifier().toString(), e);
+        } finally {
+          if (mpAclAttachmentTuple != null) {
+            try {
+              workspace.delete(mpAclAttachmentTuple.getB().getURI());
+            } catch (Exception ex) {
+              // We only want to clean up. If the file is gone, that is fine too.
+              logger.debug("Unable to delete series acl attachment for media package {} after updating it.",
+                  mp.getIdentifier().toString(), ex);
+            }
+          }
         }
       }
     } catch (IOException | NotFoundException e) {
