@@ -1,5 +1,11 @@
 # Opencast 14: Release Notes
 
+## Opencast 14.12
+
+Opencast 14.12 release includes bug fixes and improvements.
+
+See [changelog](changelog.md#opencast-1412) for a comprehensive list of changes.
+
 ## Opencast 14.11
 
 Opencast 14.11 release includes two bug fixes.
@@ -9,7 +15,6 @@ in CephFS. For detailed information please consult the mailinglist article linke
 [PR 5682](https://github.com/opencast/opencast/pull/5682).
 
 See [changelog](changelog.md#opencast-1411) for a comprehensive list of changes.
-
 
 ## Opencast 14.10
 

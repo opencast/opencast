@@ -4,6 +4,26 @@ Changelog
 Opencast 14
 -----------
 
+### Opencast 14.12
+
+*Released on May 14th, 2024*
+
+- [[#5769](https://github.com/opencast/opencast/pull/5769)] -
+  Document Translation Change Rules
+- [[#5761](https://github.com/opencast/opencast/pull/5761)] -
+  Paella:  Prevent video download. Disable context menu.
+- [[#5756](https://github.com/opencast/opencast/pull/5756)] -
+  Fix deleting user references from the admin UI
+- [[#5755](https://github.com/opencast/opencast/pull/5755)] -
+  Skip the OBR
+- [[#5752](https://github.com/opencast/opencast/pull/5752)] -
+  Reformat new admin UI `pom.xml`
+- [[#5751](https://github.com/opencast/opencast/pull/5751)] -
+  `download-maven-plugin` nitpicks
+- [[#5750](https://github.com/opencast/opencast/pull/5750)] -
+  Paella: Fix error displayed before authenticating user.
+
+
 ### Opencast 14.11
 
 *Released on April 16th, 2024*
