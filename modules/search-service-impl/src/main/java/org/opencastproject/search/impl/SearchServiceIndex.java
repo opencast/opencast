@@ -65,6 +65,7 @@ import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -424,9 +425,17 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
           "deleted", Instant.now().getEpochSecond(),
           "modified", Instant.now().toString()));
       var updateRequest = new UpdateRequest(INDEX_NAME, seriesId).doc(gson.toJson(json), XContentType.JSON);
-      UpdateResponse response = esIndex.getClient().update(updateRequest, RequestOptions.DEFAULT);
-      //NB: We're marking things as deleted but *not actually deleting them**
-      return DocWriteResponse.Result.UPDATED == response.getResult();
+      try {
+        UpdateResponse response = esIndex.getClient().update(updateRequest, RequestOptions.DEFAULT);
+        //NB: We're marking things as deleted but *not actually deleting them**
+        return DocWriteResponse.Result.UPDATED == response.getResult();
+      } catch (ElasticsearchStatusException e) {
+        if (RestStatus.NOT_FOUND == e.status()) {
+          logger.debug("Attempted to delete {}, but that series does not exist in the index.", seriesId);
+          return true;
+        }
+        throw new SearchException(e);
+      }
     } catch (IOException e) {
       throw new SearchException("Could not delete series " + seriesId + " from index", e);
     }
