@@ -275,8 +275,6 @@ public class AssetManagerUpdatedEventHandler {
               workspace.delete(mpAclAttachmentTuple.getB().getURI());
             } catch (Exception ex) {
               // We only want to clean up. If the file is gone, that is fine too.
-              logger.debug("Unable to delete series acl attachment for media package {} after updating it.",
-                  mp.getIdentifier().toString(), ex);
             }
           }
         }
