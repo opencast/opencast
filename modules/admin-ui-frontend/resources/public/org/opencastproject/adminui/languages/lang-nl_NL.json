@@ -217,14 +217,14 @@
       "CONFLICT_ALREADY_ENDED": "Planning fout: het event is reeds gestopt.",
       "CONFLICT_END_BEFORE_START": "Planning fout: het einde komt altijd later dan het begin.",
       "CONFLICT_IN_THE_PAST": "De planning kan niet worden geüpdatet. Je kan geen event inplannen in het verleden.",
-      "INVALID_ACL_RULES": "Regels moeten een geldige rol en lees- en/of schrijfrechten hebben.",
-      "MISSING_ACL_RULES": "Ten minste één rol met lees- en/of schrijfrechten is vereist!",
+      "INVALID_ACL_RULES": "Regels moeten een geldige rol en lees- en\/of schrijfrechten hebben.",
+      "MISSING_ACL_RULES": "Ten minste één rol met lees- en\/of schrijfrechten is vereist!",
       "SAVED_ACL_RULES": "De toegangsregels werden bewaard.",
       "SAVED_METADATA": "The metadata has been saved.",
       "SERIES_THEME_REPROCESS_EXISTING_EVENTS": "De bestaande events in deze series zullen opnieuw verwerkt moeten worden",
       "SERIES_ACL_LOCKED": "Bewerken van het toegangsbeleid is niet toegestaan wanneer er acties uitgevoerd worden op een event dat deel uitmaakt van de series",
-      "SERIES_ACL_MISSING_READWRITE_ROLE": "De toegangspolicy vereist ten minste één rol met lees- en/of schrijfrechten.",
-      "EVENT_ACL_MISSING_READWRITE_ROLE": "De toegangspolicy vereist minstens één rol met lees- en/of schrijfrechten.",
+      "SERIES_ACL_MISSING_READWRITE_ROLE": "De toegangspolicy vereist ten minste één rol met lees- en\/of schrijfrechten.",
+      "EVENT_ACL_MISSING_READWRITE_ROLE": "De toegangspolicy vereist minstens één rol met lees- en\/of schrijfrechten.",
       "THEME_NAME_ALREADY_TAKEN": "Deze naam is reeds in gebruik",
       "THEME_NAME_EMPTY": "De naam kan niet leeg zijn",
       "BUMPER_UPLOAD_ERROR": "Fout tijdens uploaden media",
@@ -263,10 +263,10 @@
       "TOBIRA_OVERRIDE_NAME": "The title of the selected page will be overridden with the title of the series.",
       "TOBIRA_NO_PATH_SEGMENT": "Page needs a path segment.",
       "TOBIRA_NOT_MOUNTED": "Series could not be mounted in Tobira.",
-      "TOBIRA_PATH_SEGMENT_INVALID": "Path segment is invalid. A valid path segment is at least 2 characters long, does not contain any whitespace or control characters, none of the characters '<>\"[\\]^`{|}#%/?]', and doesn't start with any of the characters '-+~@_!$&;:.,=*'()'.",
+      "TOBIRA_PATH_SEGMENT_INVALID": "Path segment is invalid. A valid path segment is at least 2 characters long, does not contain any whitespace or control characters, none of the characters '<>\"[\\]^`{|}#%\/?]', and doesn't start with any of the characters '-+~@_!$&;:.,=*'()'.",
       "TOBIRA_PATH_SEGMENT_UNIQUE": "The path segment of a page must be unqiue among all its sibling pages.",
       "TOBIRA_PAGE_NOT_FOUND": "The page you tried to navigate to does not or no longer exist. Maybe try starting from the beginning.",
-      "TOBIRA_SERVER_ERROR": " Error talking to Tobira. Contact your system administrator and/or try again later.",
+      "TOBIRA_SERVER_ERROR": " Error talking to Tobira. Contact your system administrator and\/or try again later.",
       "TOBIRA_COPIED_DIRECT_LINK": "Copied link to clipboard.",
       "TOBIRA_FAILED_COPYING_DIRECT_LINK": "Couldn't copy link to clipboard.",
       "TOBIRA_NOT_FOUND": "Tobira doesn't know about this series (yet). Try again in a few minutes or contact your system administrator."
@@ -352,7 +352,7 @@
             }
          },
          "EDIT": {
-            "DESCRIPTION": "Bewerk en/of selecteer de velden die je wilt updaten. Een veld kan niet worden geselecteerd als dit niet resulteert in een gewijzigde waarde voor minstens één event, of als het veld niet geldig is (bv. verplichte velden kunnen niet leeg blijven). Gemarkeerde velden hebben verschillende waarden voor de geselecteerde events.",
+            "DESCRIPTION": "Bewerk en\/of selecteer de velden die je wilt updaten. Een veld kan niet worden geselecteerd als dit niet resulteert in een gewijzigde waarde voor minstens één event, of als het veld niet geldig is (bv. verplichte velden kunnen niet leeg blijven). Gemarkeerde velden hebben verschillende waarden voor de geselecteerde events.",
             "TABLE": {
                "CAPTION": "Metadata van geselecteerde video's",
                "FIELDS": "Metadata",
@@ -940,7 +940,7 @@
                "REASONS": {
                   "CUTTING": "Knippen vereist",
                   "REVIEW": "Beoordeling vereist",
-                  "ASYNC": "A/V tracks asynchroon",
+                  "ASYNC": "A\/V tracks asynchroon",
                   "AUDIO_ISSUE": "Ontbrekend of gebrekkig audiokanaal",
                   "CANCELLED": "Event annuleren",
                   "CONFLICTING_METADATA": "Conflicterende metadata",
@@ -1807,7 +1807,7 @@
       "ACTIONS": {
          "SPLIT": "Splitsen",
          "SPLIT_TOOLTIP": "Splits segment op de huidige cursorpositie.",
-         "CUT": "Verberg/Toon",
+         "CUT": "Verberg\/Toon",
          "CUT_TOOLTIP": "Verberg of toon het geselecteerde deel van de video.",
          "REPLAY_SEGMENT": "Speel Start van Segment",
          "REPLAY_SEGMENT_TOOLTIP": "Speel het huidige segment vanaf het begin.",
@@ -1900,8 +1900,8 @@
          "PAUSE": "Pauze",
          "NEXT_FRAME": "Volgend frame",
          "PREVIOUS_FRAME": "Vorig frame",
-         "NEXT_SEGMENT": "Volgend segment / Direct naar einde",
-         "PREVIOUS_SEGMENT": "Vorig segment / Direct naar begin",
+         "NEXT_SEGMENT": "Volgend segment \/ Direct naar einde",
+         "PREVIOUS_SEGMENT": "Vorig segment \/ Direct naar begin",
          "MUTE": "Dempen",
          "VOLUME": "Volume"
       }
@@ -1912,7 +1912,7 @@
       "USERNAME": "Gebruikersnaam…",
       "PASSWORD": "Wachtwoord…",
       "LOGIN": "Aanmelden",
-      "ERROR": "Onjuiste gebruikersnaam en / of wachtwoord"
+      "ERROR": "Onjuiste gebruikersnaam en \/ of wachtwoord"
    },
    "TABLE_FILTERS": {
       "FILTER_SELECTION": {
@@ -2202,7 +2202,7 @@
          "GENERAL": "Algemeen",
          "PLAYER": "Player",
          "EDITOR": "Editor",
-         "ADD_MEDIA": "Create Event/Series"
+         "ADD_MEDIA": "Create Event\/Series"
       },
       "DESCRIPTIONS": {
          "GENERAL": {
@@ -2217,16 +2217,16 @@
             "CHEAT_SHEET": "Sneltoetsen"
          },
          "PLAYER": {
-            "PLAY_PAUSE": "Afspelen/pauzeren",
+            "PLAY_PAUSE": "Afspelen\/pauzeren",
             "PREVIOUS_FRAME": "Vorig frame",
             "NEXT_FRAME": "Volgend frame",
             "STEP_BACKWARD": "10s terug springen",
             "STEP_FORWARD": "10s vooruit springen",
-            "PREVIOUS_SEGMENT": "Vorige segment / Direct naar begin",
-            "NEXT_SEGMENT": "Volgende segment / Direct naar einde",
+            "PREVIOUS_SEGMENT": "Vorige segment \/ Direct naar begin",
+            "NEXT_SEGMENT": "Volgende segment \/ Direct naar einde",
             "VOLUME_UP": "Volume omhoog",
             "VOLUME_DOWN": "Volume omlaag",
-            "MUTE": "Dempen aan/uit"
+            "MUTE": "Dempen aan\/uit"
          },
          "EDITOR": {
             "SPLIT_AT_CURRENT_TIME": "Splitsen",
@@ -2237,7 +2237,7 @@
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "Einde van segment"
          },
          "ADD_MEDIA": {
-            "NEXT_TAB": "Next tab/Create",
+            "NEXT_TAB": "Next tab\/Create",
             "PREVIOUS_TAB": "Previous tab"
          }
       }
@@ -2275,7 +2275,7 @@
          "PUBLISHEDHOURS": "Gepubliceerde uren van video"
       },
       "DESCRIPTION": {
-         "RANDOM": "Dit toont willekeurige gegevens als showcase. U kunt deze grafiek uitschakelen door de bijbehorende statistieken provider definitie van etc/providers te verwijderen",
+         "RANDOM": "Dit toont willekeurige gegevens als showcase. U kunt deze grafiek uitschakelen door de bijbehorende statistieken provider definitie van etc\/providers te verwijderen",
          "VIEWS_SUM": "Dit toont het totale aantal weergaven per tijdeenheid.",
          "VIEWS_AVG": "Dit toont het gemiddelde aantal dagelijkse weergaven per tijdeenheid.",
          "PUBLISHEDHOURS": "Dit toont de gepubliceerde uren van video"
