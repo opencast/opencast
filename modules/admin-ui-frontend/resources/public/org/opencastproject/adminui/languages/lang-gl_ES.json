@@ -217,7 +217,7 @@
       "CONFLICT_ALREADY_ENDED": "Erro de programación: O evento xa rematou.",
       "CONFLICT_END_BEFORE_START": "Erro de programación: O final ten que ser máis tarde que o comezo.",
       "CONFLICT_IN_THE_PAST": "Non se puido actualizar a programación: non se pode programar un evento no pasado.",
-      "INVALID_ACL_RULES": "As regras deben conter un nome de rol válido e permiso(s) de lectura e/ou escritura.",
+      "INVALID_ACL_RULES": "As regras deben conter un nome de rol válido e permiso(s) de lectura e\/ou escritura.",
       "MISSING_ACL_RULES": "Requírese, como mínimo, un rol con permisos de Lectura e Escritura!",
       "SAVED_ACL_RULES": "Regras de acceso gardadas.",
       "SAVED_METADATA": "The metadata has been saved.",
@@ -263,10 +263,10 @@
       "TOBIRA_OVERRIDE_NAME": "The title of the selected page will be overridden with the title of the series.",
       "TOBIRA_NO_PATH_SEGMENT": "Page needs a path segment.",
       "TOBIRA_NOT_MOUNTED": "Series could not be mounted in Tobira.",
-      "TOBIRA_PATH_SEGMENT_INVALID": "Path segment is invalid. A valid path segment is at least 2 characters long, does not contain any whitespace or control characters, none of the characters '<>\"[\\]^`{|}#%/?]', and doesn't start with any of the characters '-+~@_!$&;:.,=*'()'.",
+      "TOBIRA_PATH_SEGMENT_INVALID": "Path segment is invalid. A valid path segment is at least 2 characters long, does not contain any whitespace or control characters, none of the characters '<>\"[\\]^`{|}#%\/?]', and doesn't start with any of the characters '-+~@_!$&;:.,=*'()'.",
       "TOBIRA_PATH_SEGMENT_UNIQUE": "The path segment of a page must be unqiue among all its sibling pages.",
       "TOBIRA_PAGE_NOT_FOUND": "The page you tried to navigate to does not or no longer exist. Maybe try starting from the beginning.",
-      "TOBIRA_SERVER_ERROR": " Error talking to Tobira. Contact your system administrator and/or try again later.",
+      "TOBIRA_SERVER_ERROR": " Error talking to Tobira. Contact your system administrator and\/or try again later.",
       "TOBIRA_COPIED_DIRECT_LINK": "Copied link to clipboard.",
       "TOBIRA_FAILED_COPYING_DIRECT_LINK": "Couldn't copy link to clipboard.",
       "TOBIRA_NOT_FOUND": "Tobira doesn't know about this series (yet). Try again in a few minutes or contact your system administrator."
@@ -313,7 +313,7 @@
          "CONFLICT_CHECK_RUNNING": "Verificación de conflitos en curso…",
          "GENERAL": {
             "CAPTION": "Xeral",
-            "CANNOTSTART": "O/Os evento( s) destacado(s) non poden ser procesados, admítense soamente os eventos programados.",
+            "CANNOTSTART": "O\/Os evento( s) destacado(s) non poden ser procesados, admítense soamente os eventos programados.",
             "NOCHANGES": "¡Non se detectaron cambios nos eventos!",
             "CONFLICT_FIRST_EVENT": "Evento modificado",
             "CONFLICT_SECOND_EVENT": "Evento en conflicto",
@@ -352,7 +352,7 @@
             }
          },
          "EDIT": {
-            "DESCRIPTION": "Modificar e/ou seleccionar os metadatos que se queiran actualizar. Non se poden seleccionar os campos que non cambien o valor dun ou máis eventos, ou os que conteñan valores non válidos (por exemplo, os campos obrigatorios non poden estar baleiros). Os campos resaltados conteñen distintos valores para os eventos seleccionados.",
+            "DESCRIPTION": "Modificar e\/ou seleccionar os metadatos que se queiran actualizar. Non se poden seleccionar os campos que non cambien o valor dun ou máis eventos, ou os que conteñan valores non válidos (por exemplo, os campos obrigatorios non poden estar baleiros). Os campos resaltados conteñen distintos valores para os eventos seleccionados.",
             "TABLE": {
                "CAPTION": "Metadatos dos eventos seleccionados",
                "FIELDS": "Metadatos",
@@ -940,7 +940,7 @@
                "REASONS": {
                   "CUTTING": "Pendente de cortar",
                   "REVIEW": "Pendente de revisar",
-                  "ASYNC": "Pistas de A/V asíncronas",
+                  "ASYNC": "Pistas de A\/V asíncronas",
                   "AUDIO_ISSUE": "Pista de audio non dispoñible ou defectuosa",
                   "CANCELLED": "Cancelled event",
                   "CONFLICTING_METADATA": "Conflito de metadatos",
@@ -1807,7 +1807,7 @@
       "ACTIONS": {
          "SPLIT": "Dividir",
          "SPLIT_TOOLTIP": "Divide o segmento na posición actuar do cursor.",
-         "CUT": "Ocultar/Amosar",
+         "CUT": "Ocultar\/Amosar",
          "CUT_TOOLTIP": "Oculta ou amosa a parte do vídeo seleccionada.",
          "REPLAY_SEGMENT": "Reproducir Inicio do Segmento",
          "REPLAY_SEGMENT_TOOLTIP": "Reproduce o segmento actual dende o seu inicio.",
@@ -1900,8 +1900,8 @@
          "PAUSE": "Pausa",
          "NEXT_FRAME": "Fotograma seguinte",
          "PREVIOUS_FRAME": "Fotograma anterior",
-         "NEXT_SEGMENT": "Seguinte segmento / Saltar ó fin",
-         "PREVIOUS_SEGMENT": "Segmento anterior / Saltar ó inicio",
+         "NEXT_SEGMENT": "Seguinte segmento \/ Saltar ó fin",
+         "PREVIOUS_SEGMENT": "Segmento anterior \/ Saltar ó inicio",
          "MUTE": "Silenciar",
          "VOLUME": "Volume"
       }
@@ -1912,7 +1912,7 @@
       "USERNAME": "Nome de usuario…",
       "PASSWORD": "Contrasinal…",
       "LOGIN": "Iniciar sesión",
-      "ERROR": "Contrasinal e / ou nome de usuario incorrecto"
+      "ERROR": "Contrasinal e \/ ou nome de usuario incorrecto"
    },
    "TABLE_FILTERS": {
       "FILTER_SELECTION": {
@@ -2202,7 +2202,7 @@
          "GENERAL": "Xeral",
          "PLAYER": "Reprodutor",
          "EDITOR": "Editor",
-         "ADD_MEDIA": "Create Event/Series"
+         "ADD_MEDIA": "Create Event\/Series"
       },
       "DESCRIPTIONS": {
          "GENERAL": {
@@ -2217,16 +2217,16 @@
             "CHEAT_SHEET": "Atallos de teclado"
          },
          "PLAYER": {
-            "PLAY_PAUSE": "Reproducir/Pausa",
+            "PLAY_PAUSE": "Reproducir\/Pausa",
             "PREVIOUS_FRAME": "Fotograma anterior",
             "NEXT_FRAME": "Fotograma seguinte",
             "STEP_BACKWARD": "Saltar 10s cara atrás",
             "STEP_FORWARD": "Saltar 10s cara adiante",
-            "PREVIOUS_SEGMENT": "Segmento anterior / Saltar ó inicio",
-            "NEXT_SEGMENT": "Seguinte segmento / Saltar ó fin",
+            "PREVIOUS_SEGMENT": "Segmento anterior \/ Saltar ó inicio",
+            "NEXT_SEGMENT": "Seguinte segmento \/ Saltar ó fin",
             "VOLUME_UP": "Subir volume",
             "VOLUME_DOWN": "Baixar volume",
-            "MUTE": "Activar/desactivar son"
+            "MUTE": "Activar\/desactivar son"
          },
          "EDITOR": {
             "SPLIT_AT_CURRENT_TIME": "Dividir",
@@ -2237,7 +2237,7 @@
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "Fin de segmento"
          },
          "ADD_MEDIA": {
-            "NEXT_TAB": "Next tab/Create",
+            "NEXT_TAB": "Next tab\/Create",
             "PREVIOUS_TAB": "Previous tab"
          }
       }
@@ -2275,7 +2275,7 @@
          "PUBLISHEDHOURS": "Horas de Vídeo Publicadas"
       },
       "DESCRIPTION": {
-         "RANDOM": "Esta gráfica amosa datos aleatorios como exemplo. Para que deixe de mostrarse, elimine da carpeta etc/providers o ficheiro JSON coa definición correspondente a este provedor",
+         "RANDOM": "Esta gráfica amosa datos aleatorios como exemplo. Para que deixe de mostrarse, elimine da carpeta etc\/providers o ficheiro JSON coa definición correspondente a este provedor",
          "VIEWS_SUM": "Aquí amósase o número total de visualizacións por unidade de tempo.",
          "VIEWS_AVG": "Aquí amósase o número total de visualizacións diarias por unidade de tempo.",
          "PUBLISHEDHOURS": "This displays the published hours of video"

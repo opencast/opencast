@@ -1,0 +1,15 @@
+{
+  "name": "eslint-config-opencast",
+  "description": "Base shared ESLint configuration for Opencast frontend modules",
+  "private": true,
+  "main": "index.js",
+  "license": "ECL-2.0",
+  "peerDependencies": {
+    "eslint": ">= 9"
+  },
+  "dependencies": {
+    "@eslint/js": "^9.2.0",
+    "eslint-plugin-headers": "^1.1.2",
+    "globals": "^15.1.0"
+  }
+}

@@ -205,7 +205,7 @@
       "EVENT_DELETED": "Wydarzenie zostało usunięte.",
       "EVENT_WILL_BE_DELETED": "Wydarzenie jest usuwane",
       "EVENTS_DELETED": "Wydarzenia są usuwane.",
-      "EVENTS_NOT_DELETED": "Wydarzenie/wydarzenia nie mogły być usunięte",
+      "EVENTS_NOT_DELETED": "Wydarzenie\/wydarzenia nie mogły być usunięte",
       "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "Wydarzenie (wydarzenia) nie może zostać usunięte, ponieważ nie masz do tego uprawnień.",
       "SERIES_DELETED": "Seria została skasowana",
       "SERIES_NOT_DELETED": "Seria nie mogła zostać usunięta",
@@ -217,7 +217,7 @@
       "CONFLICT_ALREADY_ENDED": "Błąd w harmonogramie: Wydarzenie się już zakończyło.",
       "CONFLICT_END_BEFORE_START": "Błąd w harmonogramie: Rozpoczęcie zakończenie zdarzenia zaplanowano przed jego rozpoczęciem.",
       "CONFLICT_IN_THE_PAST": "Nie można zaktualizować harmonogramu: nie można zaplanować wydarzenia w przeszłości.",
-      "INVALID_ACL_RULES": "Reguły dostępu muszą zawierać poprawne role użytkownika z określonymi zasadami odczytu i/lub zapisu.",
+      "INVALID_ACL_RULES": "Reguły dostępu muszą zawierać poprawne role użytkownika z określonymi zasadami odczytu i\/lub zapisu.",
       "MISSING_ACL_RULES": "Przynajmniej jedna rola, z uprawnieniem do zapisu lub odczytu jest wymagana!",
       "SAVED_ACL_RULES": "Reguły dostępu zostały zapisane.",
       "SAVED_METADATA": "Metadane zostały zapisane.",
@@ -263,10 +263,10 @@
       "TOBIRA_OVERRIDE_NAME": "The title of the selected page will be overridden with the title of the series.",
       "TOBIRA_NO_PATH_SEGMENT": "Strona potrzebuje segmentu ścieżki.",
       "TOBIRA_NOT_MOUNTED": "Seria nie mogła być zamontowana w Tobira.",
-      "TOBIRA_PATH_SEGMENT_INVALID": "Path segment is invalid. A valid path segment is at least 2 characters long, does not contain any whitespace or control characters, none of the characters '<>\"[\\]^`{|}#%/?]', and doesn't start with any of the characters '-+~@_!$&;:.,=*'()'.",
+      "TOBIRA_PATH_SEGMENT_INVALID": "Path segment is invalid. A valid path segment is at least 2 characters long, does not contain any whitespace or control characters, none of the characters '<>\"[\\]^`{|}#%\/?]', and doesn't start with any of the characters '-+~@_!$&;:.,=*'()'.",
       "TOBIRA_PATH_SEGMENT_UNIQUE": "The path segment of a page must be unqiue among all its sibling pages.",
       "TOBIRA_PAGE_NOT_FOUND": "The page you tried to navigate to does not or no longer exist. Maybe try starting from the beginning.",
-      "TOBIRA_SERVER_ERROR": " Wystąpił błąd podczas rozmowy z Tobira. Skontaktuj się z administratorem systemu i/lub spróbuj ponownie później.",
+      "TOBIRA_SERVER_ERROR": " Wystąpił błąd podczas rozmowy z Tobira. Skontaktuj się z administratorem systemu i\/lub spróbuj ponownie później.",
       "TOBIRA_COPIED_DIRECT_LINK": "Skopiowano link do schowka.",
       "TOBIRA_FAILED_COPYING_DIRECT_LINK": "Couldn't copy link to clipboard.",
       "TOBIRA_NOT_FOUND": "Tobira doesn't know about this series (yet). Try again in a few minutes or contact your system administrator."
@@ -352,7 +352,7 @@
             }
          },
          "EDIT": {
-            "DESCRIPTION": "Edytuj i/lub wybierz pola metadanych, które chcesz zaktualizować. Pole nie może być zaznaczone, jeśli nie powoduje to zmiany wartości dla co najmniej jednego wydarzenia lub jeśli pole jest nieprawidłowe (e. . wymagane pola nie mogą być puste. Zaznaczone pola metadanych mają różne wartości dla wybranych zdarzeń.",
+            "DESCRIPTION": "Edytuj i\/lub wybierz pola metadanych, które chcesz zaktualizować. Pole nie może być zaznaczone, jeśli nie powoduje to zmiany wartości dla co najmniej jednego wydarzenia lub jeśli pole jest nieprawidłowe (e. . wymagane pola nie mogą być puste. Zaznaczone pola metadanych mają różne wartości dla wybranych zdarzeń.",
             "TABLE": {
                "CAPTION": "Metadane wybranych wydarzeń",
                "FIELDS": "Metadane",
@@ -940,7 +940,7 @@
                "REASONS": {
                   "CUTTING": "Wymaga cięć",
                   "REVIEW": "Wymaga przeglądu",
-                  "ASYNC": "Ścieżki A/V asynchroniczne",
+                  "ASYNC": "Ścieżki A\/V asynchroniczne",
                   "AUDIO_ISSUE": "Brakująca lub uszkodzona ścieżka dżwiękowa",
                   "CANCELLED": "Anulowane wydarzenie",
                   "CONFLICTING_METADATA": "Konflikt w metadanych",
@@ -1807,7 +1807,7 @@
       "ACTIONS": {
          "SPLIT": "Podziel",
          "SPLIT_TOOLTIP": "Podziel segment w bieżącej pozycji kursora.",
-         "CUT": "Ukryj/Pokaż",
+         "CUT": "Ukryj\/Pokaż",
          "CUT_TOOLTIP": "Ukryj lub pokaż wybraną część wideo.",
          "REPLAY_SEGMENT": "Odtwórz początek segmentu",
          "REPLAY_SEGMENT_TOOLTIP": "Odtwarzaj bieżący segment od początku.",
@@ -1900,8 +1900,8 @@
          "PAUSE": "Wstrzymaj",
          "NEXT_FRAME": "Następna klatka",
          "PREVIOUS_FRAME": "Poprzednia ramka",
-         "NEXT_SEGMENT": "Następny segment / skok do końca",
-         "PREVIOUS_SEGMENT": "Poprzedni segment/przeskocz do początku",
+         "NEXT_SEGMENT": "Następny segment \/ skok do końca",
+         "PREVIOUS_SEGMENT": "Poprzedni segment\/przeskocz do początku",
          "MUTE": "Wycisz",
          "VOLUME": "Głośność"
       }
@@ -2202,7 +2202,7 @@
          "GENERAL": "Ogólne",
          "PLAYER": "Odtwarzacz",
          "EDITOR": "Edytor",
-         "ADD_MEDIA": "Utwórz Zdarzenie/Serie"
+         "ADD_MEDIA": "Utwórz Zdarzenie\/Serie"
       },
       "DESCRIPTIONS": {
          "GENERAL": {
@@ -2217,16 +2217,16 @@
             "CHEAT_SHEET": "Skróty klawiszowe"
          },
          "PLAYER": {
-            "PLAY_PAUSE": "Odtwórz/wstrzymaj",
+            "PLAY_PAUSE": "Odtwórz\/wstrzymaj",
             "PREVIOUS_FRAME": "Poprzednia ramka",
             "NEXT_FRAME": "Następna klatka",
             "STEP_BACKWARD": "Skocz 10s wstecz",
             "STEP_FORWARD": "Skok 10s do przodu",
-            "PREVIOUS_SEGMENT": "Poprzedni segment/skok do rozpoczęcia",
-            "NEXT_SEGMENT": "Następny segment/skok do końca",
+            "PREVIOUS_SEGMENT": "Poprzedni segment\/skok do rozpoczęcia",
+            "NEXT_SEGMENT": "Następny segment\/skok do końca",
             "VOLUME_UP": "Głośniej",
             "VOLUME_DOWN": "Ciszej",
-            "MUTE": "Wycisz/włącz dźwięk"
+            "MUTE": "Wycisz\/włącz dźwięk"
          },
          "EDITOR": {
             "SPLIT_AT_CURRENT_TIME": "Podziel",
@@ -2237,7 +2237,7 @@
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "Koniec segmentu"
          },
          "ADD_MEDIA": {
-            "NEXT_TAB": "Następna karta/Utwórz",
+            "NEXT_TAB": "Następna karta\/Utwórz",
             "PREVIOUS_TAB": "Previous tab"
          }
       }
@@ -2275,7 +2275,7 @@
          "PUBLISHEDHOURS": "Opublikowane godziny wideo"
       },
       "DESCRIPTION": {
-         "RANDOM": "Wyświetla losowe dane jako prezentację. Możesz wyłączyć ten wykres usuwając definicję json dostawcy statystyk z etc/providers",
+         "RANDOM": "Wyświetla losowe dane jako prezentację. Możesz wyłączyć ten wykres usuwając definicję json dostawcy statystyk z etc\/providers",
          "VIEWS_SUM": "Wyświetla całkowitą liczbę wyświetleń na jednostkę czasu.",
          "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
          "PUBLISHEDHOURS": "Wyświetla opublikowane godziny wideo"
