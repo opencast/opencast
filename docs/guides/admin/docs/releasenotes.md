@@ -1,5 +1,14 @@
 # Opencast 15: Release Notes
 
+## Opencast 15.5
+
+### Improvements
+
+- **Add slide text and segments to Tobira harvest API**
+[[#5757](https://github.com/opencast/opencast/pull/5757)]
+- **Paella 7 mp4 quality selector**
+[[#5685](https://github.com/opencast/opencast/pull/5685)]
+
 ## Opencast 15.4
 
 ### Bug Fixes
