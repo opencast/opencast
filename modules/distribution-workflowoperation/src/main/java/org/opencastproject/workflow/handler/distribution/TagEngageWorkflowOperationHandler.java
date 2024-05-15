@@ -134,7 +134,8 @@ public class TagEngageWorkflowOperationHandler extends AbstractWorkflowOperation
     try {
       mediaPackageForSearch = searchService.get(mediaPackageId);
     } catch (NotFoundException | UnauthorizedException e) {
-      throw new WorkflowOperationException(e);
+      logger.info("No tag engage workflow found for {}", mediaPackageId);
+      return createResult(WorkflowOperationResult.Action.SKIP);
     }
 
     // update tags & flavors in published mp
