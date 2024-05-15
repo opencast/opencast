@@ -26,6 +26,10 @@ import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
 import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildException;
 import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService;
+import org.opencastproject.list.api.ListProviderException;
+import org.opencastproject.list.api.ListProvidersService;
+import org.opencastproject.list.api.ResourceListQuery;
+import org.opencastproject.list.impl.ResourceListQueryImpl;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
@@ -37,6 +41,7 @@ import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.search.impl.persistence.SearchServiceDatabase;
 import org.opencastproject.search.impl.persistence.SearchServiceDatabaseException;
+import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.OrganizationDirectoryService;
@@ -55,6 +60,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.elasticsearch.ElasticsearchStatusException;
 import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.index.IndexRequest;
@@ -78,11 +84,15 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -130,6 +140,12 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
   /** The organization directory service */
   private OrganizationDirectoryService organizationDirectory = null;
 
+  private ListProvidersService listProvidersService;
+
+  private static final String CONFIG_EPISODE_ID_ROLE = "org.opencastproject.episode.id.role.access";
+
+  private boolean episodeIdRole = false;
+
   /**
    * Creates a new instance of the search service index.
    */
@@ -144,6 +160,10 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
    */
   @Activate
   public void activate(final ComponentContext cc) throws IllegalStateException {
+    episodeIdRole = BooleanUtils.toBoolean(Objects.toString(
+        cc.getBundleContext().getProperty(CONFIG_EPISODE_ID_ROLE), "false"));
+    logger.debug("Usage of episode ID roles is set to {}", episodeIdRole);
+
     createIndex();
   }
 
@@ -276,6 +296,31 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
           dc.set(DublinCore.PROPERTY_IS_PART_OF, sid);
         }
       }
+    }
+
+    // Add custom roles to the ACL
+    // This allows users with a role of the form ROLE_EPISODE_<ID>_<ACTION> to access the event through the index
+    if (episodeIdRole) {
+      Set<AccessControlEntry> customEntries = new HashSet<>();
+      customEntries.add(new AccessControlEntry("ROLE_EPISODE_" + mediaPackageId + "_" + "READ", "read", true));
+      customEntries.add(new AccessControlEntry("ROLE_EPISODE_" + mediaPackageId + "_" + "WRITE", "write", true));
+
+      ResourceListQuery query = new ResourceListQueryImpl();
+      if (listProvidersService.hasProvider("ACL.ACTIONS")) {
+        Map<String, String> actions = new HashMap<>();
+        try {
+          actions = listProvidersService.getList("ACL.ACTIONS", query, true);
+        } catch (ListProviderException e) {
+          throw new RuntimeException("Listproviders not loaded. " + e);
+        }
+        for (String action : actions.keySet()) {
+          customEntries.add(
+              new AccessControlEntry("ROLE_EPISODE_" + mediaPackageId + "_" + action.toUpperCase(), action, true));
+        }
+      }
+
+      AccessControlList customRoles = new AccessControlList(new ArrayList<>(customEntries));
+      acl = customRoles.merge(acl);
     }
 
     String orgId = securityService.getOrganization().getId();
@@ -433,7 +478,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
   }
 
   @Override
-  public void repopulate() throws IndexRebuildException {
+  public void repopulate(String type) throws IndexRebuildException {
     try {
       int total = persistence.countMediaPackages();
       int pageSize = 50;
@@ -516,5 +561,10 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
   @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectory) {
     this.organizationDirectory = organizationDirectory;
+  }
+
+  @Reference
+  public void setListProvidersService(ListProvidersService listProvidersService) {
+    this.listProvidersService = listProvidersService;
   }
 }
