@@ -33,10 +33,6 @@ window.onload = async () => {
       paella.streams.isAudioOnly &&
       (!paella.captions || paella.captions.length === 0))
     {
-      // paella.log.info(paella.streams.isNativelyPlayable);
-      // paella.log.info(paella.streams.isAudioOnly);
-      // paella.log.info(paella.frameList.isEmpty); --> false
-
       const nativePlayer = paella.streams.nativePlayer;
       nativePlayer.setAttribute('controls','');
       await paella.unload();
