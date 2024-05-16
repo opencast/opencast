@@ -34,6 +34,7 @@ import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
+import org.opencastproject.metadata.mpeg7.MediaTimePointImpl;
 import org.opencastproject.search.api.SearchResultItem;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlParser;
@@ -334,9 +335,10 @@ class Item {
       .filter(a -> a.getFlavor().getSubtype().equals("segment+preview"))
       .map(s -> Jsons.obj(
           Jsons.p("uri", s.toString()),
-          Jsons.p("startTime", s.getReference().getProperty("time"))
-        )
-      )
+          Jsons.p("startTime", MediaTimePointImpl.parseTimePoint(
+              s.getReference().getProperty("time")
+          ).getTimeInMilliseconds())
+      ))
       .collect(Collectors.toCollection(ArrayList::new));
   }
 
