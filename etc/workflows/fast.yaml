@@ -13,6 +13,17 @@ configuration_panel: |-
      <input id="straightToPublishing" name="straightToPublishing" type="checkbox" class="configField" value="true" checked=checked />
      <label for="straightToPublishing">Straight to publishing</label>
   </div>
+configuration_panel_json: |-
+  [{
+    "fieldset": [
+      {
+        "type": "checkbox",
+        "name": "straightToPublishing",
+        "label": "Straight to publishing",
+        "value": true
+      }
+    ]
+  }]
 operations:
   - id: defaults
     description: "Applying default configuration values"
