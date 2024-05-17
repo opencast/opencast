@@ -178,7 +178,7 @@ public class
     // Translate to english
     Boolean translate = getTranslationMode(mediaPackage, workflowInstance);
 
-    // Filter out all tracks without audio
+    // Create sublist that includes only the tracks that has audio
     List<Track> tracksWithAudio = Arrays.stream(tracks).filter(Track::hasAudio).collect(Collectors.toList());
 
     // Get the track selection strategy from the workflow configuration
@@ -188,8 +188,8 @@ public class
     // Use the selection strategy from the workflow config to get the tracks we want to transcribe
     List<Track> tracksToTranscribe = filterTracksByStrategy(tracksWithAudio, trackSelectionStrategy);
 
-    // Load limit-to-one config from workflow operation.
-    // It determines if the subtitle generation is limited to max 1 track
+    // Load the 'limit-to-one' configuration from the workflow operation.
+    // This configuration sets the limit of generated subtitle files to one
     boolean limitToOne = getLimitToOneConfig(mediaPackage, workflowInstance);
 
     int subtitleCounter = 0;
@@ -216,6 +216,12 @@ public class
     }
   }
 
+  /**
+   * Filters the tracks by the strategy configured in the workflow operation
+   * @param tracksWithAudio        List of the tracks that includes audio
+   * @param trackSelectionStrategy The strategy configured in the workflow operation
+   * @return The filtered tracks
+   */
   private List<Track> filterTracksByStrategy(List<Track> tracksWithAudio,
       TrackSelectionStrategy trackSelectionStrategy) {
 
@@ -225,10 +231,12 @@ public class
       String presenterTypeConstant = MediaPackageElements.PRESENTER_SOURCE.getType();
       String presentationTypeConstant = MediaPackageElements.PRESENTATION_SOURCE.getType();
 
+      // Creates a sublist only including the presenter tracks
       List<Track> presenterTracksWithAudio = tracksWithAudio.stream()
           .filter(track -> Objects.equals(track.getFlavor().getType(), presenterTypeConstant))
           .collect(Collectors.toList());
 
+      // Creates a sublist only including the presentation tracks
       List<Track> presentationTracksWithAudio = tracksWithAudio.stream()
           .filter(track -> Objects.equals(track.getFlavor().getType(), presentationTypeConstant))
           .collect(Collectors.toList());
