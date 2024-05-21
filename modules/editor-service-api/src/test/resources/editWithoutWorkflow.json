@@ -2,7 +2,7 @@
   "tracks": [
     {
       "flavor": {
-        "subtype": "prepared",
+        "subtype": "source",
         "type": "presenter"
       },
       "video_stream": {
@@ -18,7 +18,7 @@
     },
     {
       "flavor": {
-        "subtype": "prepared",
+        "subtype": "source",
         "type": "presentation"
       },
       "video_stream": {
