@@ -41,6 +41,7 @@ import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.NotFoundException;
 
+
 import java.time.Duration;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
@@ -100,13 +101,15 @@ public class UpdateEventCommand extends AbstractCommand<GqlEvent> {
     for (Map.Entry<String, Object> entry: eventMetadata.entrySet()) {
       String key = entry.getKey();
       final MetadataField target = collection.getOutputFields().get(key);
-      var type = (GraphQLScalarType) GraphQLTypeUtil.unwrapNonNull(MetadataFieldToGraphQLConverter.convertType(target));
+      var type = GraphQLTypeUtil.unwrapNonNull(MetadataFieldToGraphQLConverter.convertType(target));
 
-      Object value = type.getCoercing().parseValue(
-          eventMetadata.get(key),
-          environment.getGraphQlContext(),
-          environment.getLocale()
-      );
+      Object value;
+      if (type instanceof GraphQLScalarType) {
+        value = ((GraphQLScalarType)type).getCoercing()
+            .parseValue(eventMetadata.get(key), environment.getGraphQlContext(), environment.getLocale());
+      } else {
+        value = eventMetadata.get(key);
+      }
 
       if (value == null) {
         continue;
