@@ -90,6 +90,7 @@ public abstract class AbstractJobProducer implements JobProducer {
   public void activate(ComponentContext cc) {
     acceptJobLoadsExeedingMaxLoad = getOptContextProperty(cc, ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY).map(Strings.toBool)
             .getOrElse(DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING);
+    logger.debug("Job producer {} accepting excessively large jobs: {}", getJobType(), acceptJobLoadsExeedingMaxLoad);
   }
 
   /**
