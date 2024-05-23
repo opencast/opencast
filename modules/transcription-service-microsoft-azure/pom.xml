@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.opencastproject</groupId>
         <artifactId>base</artifactId>
-        <version>15-SNAPSHOT</version>
+        <version>17-SNAPSHOT</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     <properties>
@@ -53,11 +53,6 @@
             <artifactId>opencast-workflow-service-api</artifactId>
             <version>${project.version}</version>
         </dependency>
-        <!--dependency>
-            <groupId>org.opencastproject</groupId>
-            <artifactId>opencast-working-file-repository-service-api</artifactId>
-            <version>${project.version}</version>
-        </dependency-->
         <dependency>
             <groupId>org.opencastproject</groupId>
             <artifactId>opencast-workspace-api</artifactId>
@@ -99,11 +94,6 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
         </dependency>
-        <!--dependency>
-            <groupId>org.opencastproject</groupId>
-            <artifactId>opencast-dublincore</artifactId>
-            <version>${project.version}</version>
-        </dependency-->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>

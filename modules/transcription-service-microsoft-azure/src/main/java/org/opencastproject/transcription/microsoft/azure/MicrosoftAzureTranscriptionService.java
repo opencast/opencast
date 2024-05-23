@@ -420,7 +420,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
   public MediaPackageElement getGeneratedTranscription(String mpId, String jobId, MediaPackageElement.Type type)
           throws TranscriptionServiceException {
     if (type != MediaPackageElement.Type.Track && type != MediaPackageElement.Type.Attachment) {
-      throw new IllegalArgumentException("target type must be a Track or Attachment.");
+      throw new IllegalArgumentException("Target type must be a Track or Attachment.");
     }
     MicrosoftAzureSpeechTranscription transcription;
     try {
@@ -430,17 +430,23 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
       throw new TranscriptionServiceException(String.format(
           "Unable to get transcription '%s' for media package '%s'.", jobId, mpId), e);
     }
+    MicrosoftAzureSpeechTranscriptionJson transcriptionJson;
     URI transcriptionFileUri;
     try {
-      MicrosoftAzureSpeechTranscriptionJson transcriptionJson = getTranscriptionJson(mpId, transcription);
+      transcriptionJson = getTranscriptionJson(mpId, transcription);
       transcriptionFileUri = MicrosoftAzureSpeechServicesClient.writeTranscriptionFile(transcriptionJson,
           workspace, outputFileFormat, azureSpeechRecognitionMinConfidence, splitTextLineLength);
     } catch (IOException | MicrosoftAzureNotFoundException e) {
       throw new TranscriptionServiceException(String.format(
           "Unable to download transcription file for media package '%s'.", mpId), e);
     }
-    return MediaPackageElementBuilderFactory.newInstance().newElementBuilder().elementFromURI(
-        transcriptionFileUri, type, new MediaPackageElementFlavor("captions", outputFileFormat));
+    MediaPackageElement transcriptionElement =  MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
+        .elementFromURI(transcriptionFileUri, type, new MediaPackageElementFlavor("captions", outputFileFormat));
+    if (type.equals(MediaPackageElement.Type.Track)) {
+      // apply predefined tags as documented in https://docs.opencast.org/develop/admin/#configuration/subtitles/
+      transcriptionElement.setTags(new String[] { "generator-type:auto", "generator:azure", "type:subtitle"});
+    }
+    return transcriptionElement;
   }
 
   @Override
@@ -623,7 +629,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
       return null;
     }
 
-    String org = Enrichments.enrich(r).getSnapshots().head2().getOrganizationId();
+    String org = Enrichments.enrich(r).getSnapshots().get(0).getOrganizationId();
     Organization organization = organizationDirectoryService.getOrganization(org);
     if (organization == null) {
       logger.warn("Media package {} has an unknown organization {}. Skipped.", mpId, org);

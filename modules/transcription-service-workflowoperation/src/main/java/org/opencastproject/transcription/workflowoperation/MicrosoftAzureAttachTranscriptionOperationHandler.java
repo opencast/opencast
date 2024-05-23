@@ -23,9 +23,11 @@ package org.opencastproject.transcription.workflowoperation;
 
 import org.opencastproject.caption.api.CaptionService;
 import org.opencastproject.job.api.JobContext;
+import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
+import org.opencastproject.mediapackage.Track;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.transcription.api.TranscriptionService;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
@@ -66,6 +68,7 @@ public class MicrosoftAzureAttachTranscriptionOperationHandler extends AbstractW
   static final String TRANSCRIPTION_JOB_ID = "transcription-job-id";
   static final String TARGET_FLAVOR = "target-flavor";
   static final String TARGET_TAGS = "target-tags";
+  static final String TARGET_TYPE = "target-element-type";
 
   private TranscriptionService service = null;
   private CaptionService captionService;
@@ -80,6 +83,8 @@ public class MicrosoftAzureAttachTranscriptionOperationHandler extends AbstractW
     CONFIG_OPTIONS.put(TRANSCRIPTION_JOB_ID, "The job id that identifies the file to be attached");
     CONFIG_OPTIONS.put(TARGET_FLAVOR, "The target \"flavor\" of the transcription file");
     CONFIG_OPTIONS.put(TARGET_TAGS, "The target \"tags\" of the transcription file");
+    CONFIG_OPTIONS.put(TARGET_TYPE, "Define where to append the subtitles file. "
+        + "Accepted values: \"track\", \"attachment\". Default value is \"track\".");
   }
 
   @Override
@@ -110,10 +115,27 @@ public class MicrosoftAzureAttachTranscriptionOperationHandler extends AbstractW
       throw new WorkflowOperationException(TARGET_FLAVOR + " option not set.");
     }
     MediaPackageElementFlavor targetFlavor = targetFlavorOption.get(0);
+
+    String typeUnparsed = StringUtils.trimToEmpty(operation.getConfiguration(TARGET_TYPE));
+    MediaPackageElement.Type type = null;
+    if (!typeUnparsed.isEmpty()) {
+      // Case insensitive matching between user input (workflow config key) and enum value
+      for (MediaPackageElement.Type t : MediaPackageElement.Type.values()) {
+        if (t.name().equalsIgnoreCase(typeUnparsed)) {
+          type = t;
+        }
+      }
+      if (type == null || (type != Track.TYPE && type != Attachment.TYPE)) {
+        throw new IllegalArgumentException(String.format("The given type '%s' for mediapackage %s was illegal. Please"
+            + "check the operations' configuration keys.", type, mediaPackage.getIdentifier()));
+      }
+    } else {
+      type = Track.TYPE;
+    }
+
     try {
       MediaPackageElement transcription
-          = service.getGeneratedTranscription(mediaPackage.getIdentifier().toString(), jobId,
-          MediaPackageElement.Type.Attachment); // TODO switch to track
+          = service.getGeneratedTranscription(mediaPackage.getIdentifier().toString(), jobId, type);
       transcription.setFlavor(targetFlavor);
       for (String tag : targetTagOption) {
         transcription.addTag(tag);
