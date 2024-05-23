@@ -255,7 +255,6 @@
     <module>modules/transcription-service-api</module>
     <module>modules/transcription-service-google-speech-impl</module>
     <module>modules/transcription-service-ibm-watson-impl</module>
-    <module>modules/transcription-service-microsoft-azure</module>
     <module>modules/transcription-service-persistence</module>
     <module>modules/transcription-service-workflowoperation</module>
     <module>modules/urlsigning-common</module>
