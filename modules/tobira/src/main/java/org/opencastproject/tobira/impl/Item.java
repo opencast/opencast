@@ -50,6 +50,7 @@ import org.opencastproject.workspace.api.Workspace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -155,7 +156,9 @@ class Item {
           Jsons.p("title", title),
           Jsons.p("partOf", event.getDublinCore().getFirst(DublinCore.PROPERTY_IS_PART_OF)),
           Jsons.p("description", event.getDublinCore().getFirst(PROPERTY_DESCRIPTION)),
-          Jsons.p("created", event.getDublinCore().getFirst(DublinCore.PROPERTY_CREATED)),
+          Jsons.p("created", Instant.parse(
+            event.getDublinCore().getFirst(DublinCore.PROPERTY_CREATED)
+          ).toEpochMilli()),
           Jsons.p("startTime", period.map(p -> p.getStart().getTime()).orElse(null)),
           Jsons.p("endTime", period.map(p -> p.getEnd().getTime()).orElse(null)),
           Jsons.p("creators", Jsons.arr(new ArrayList<>(creators))),
