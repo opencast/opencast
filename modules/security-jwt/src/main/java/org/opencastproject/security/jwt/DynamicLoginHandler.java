@@ -156,9 +156,9 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
           }
         } catch (UsernameNotFoundException e) {
           newUserLogin(username, jwt);
-          userDirectoryService.invalidate(username);
         }
 
+        userDirectoryService.invalidate(username);
         cache.put(jwt.getSignature(), new CachedJWT(jwt, username));
         return username;
       } else {
