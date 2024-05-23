@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.transcription.microsoft.azure;
 
 import org.opencastproject.transcription.microsoft.azure.model.MicrosoftAzureSpeechTranscription;

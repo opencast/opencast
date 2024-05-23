@@ -1,4 +1,4 @@
-/**
+/*
  * Licensed to The Apereo Foundation under one or more contributor license
  * agreements. See the NOTICE file distributed with this work for additional
  * information regarding copyright ownership.
@@ -18,6 +18,7 @@
  * the License.
  *
  */
+
 package org.opencastproject.transcription.microsoft.azure;
 
 import org.opencastproject.assetmanager.api.AssetManager;
@@ -416,8 +417,11 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
   }
 
   @Override
-  public MediaPackageElement getGeneratedTranscription(String mpId, String jobId)
+  public MediaPackageElement getGeneratedTranscription(String mpId, String jobId, MediaPackageElement.Type type)
           throws TranscriptionServiceException {
+    if (type != MediaPackageElement.Type.Track && type != MediaPackageElement.Type.Attachment) {
+      throw new IllegalArgumentException("target type must be a Track or Attachment.");
+    }
     MicrosoftAzureSpeechTranscription transcription;
     try {
       transcription = azureSpeechServicesClient.getTranscriptionById(jobId);
@@ -435,8 +439,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
           "Unable to download transcription file for media package '%s'.", mpId), e);
     }
     return MediaPackageElementBuilderFactory.newInstance().newElementBuilder().elementFromURI(
-        transcriptionFileUri, MediaPackageElement.Type.Attachment,
-        new MediaPackageElementFlavor("captions", outputFileFormat));
+        transcriptionFileUri, type, new MediaPackageElementFlavor("captions", outputFileFormat));
   }
 
   @Override
