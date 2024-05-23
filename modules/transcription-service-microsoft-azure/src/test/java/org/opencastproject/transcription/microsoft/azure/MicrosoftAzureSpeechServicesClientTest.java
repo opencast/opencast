@@ -31,7 +31,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
 
@@ -55,8 +54,8 @@ public class MicrosoftAzureSpeechServicesClientTest {
 
   @Before
   public void setUp() {
-    azureSpeechServicesEndpoint = System.getProperty("AZURE_SPEECH_SERVICES_ENDPOINT", "");
-    azureCognitiveServicesSubscriptionKey = System.getProperty("AZURE_SPEECH_SERVICES_SUBSCRIPTION_KEY", "");
+    azureSpeechServicesEndpoint = System.getenv().getOrDefault("AZURE_SPEECH_SERVICES_ENDPOINT", "");
+    azureCognitiveServicesSubscriptionKey = System.getenv().getOrDefault("AZURE_SPEECH_SERVICES_SUBSCRIPTION_KEY", "");
     enabled = StringUtils.isNotBlank(azureSpeechServicesEndpoint)
         && StringUtils.isNotBlank(azureCognitiveServicesSubscriptionKey);
     if (enabled) {
@@ -94,7 +93,7 @@ public class MicrosoftAzureSpeechServicesClientTest {
 
   @Test
   public void createTranscription()
-          throws URISyntaxException, MicrosoftAzureNotAllowedException, IOException,
+          throws MicrosoftAzureNotAllowedException, IOException,
           MicrosoftAzureSpeechClientException, MicrosoftAzureStorageClientException {
     if (!enabled) {
       return;
@@ -105,20 +104,10 @@ public class MicrosoftAzureSpeechServicesClientTest {
     String azureAccountAccessKey = "access_key";
     MicrosoftAzureAuthorization azureAuthorization = new MicrosoftAzureAuthorization(azureStorageAccountName,
         azureAccountAccessKey);
-    //String sasToken = azureAuthorization.generateServiceSasToken("clw", null, null, "/opencast-transcriptions", null,
-    //    null, null, "c", null, null, null, null, null, null, null, null);
-    //String sasToken = azureAuthorization.generateServiceSasToken("clw", null, null, "/opencast-transcriptions", "c");
-    //String sasToken = azureAuthorization.generateUserDelegationSASToken("clw", null, null, "/opencast-transcriptions",
-    //    null, null, null, null, null, null, null, null, null, null, null, "c", null, null, null, null, null, null,
-    //    null, null);
-
-    //String sasToken = azureAuthorization.generateUserDelegationSASToken("cw", null, null, "/opencast-transcriptions",
-    //    "c");
     String sasToken = azureAuthorization.generateServiceSasToken("cw", null, null, "/opencast-transcriptions","c");
 
     MicrosoftAzureSpeechTranscription transcription = azureSpeechClient.createTranscription(Arrays.asList(contentUrl),
         destContainerUrl + "?" + sasToken, "Test createTranscription", "de-DE", null, "PT1H", null);
     Assert.assertNotNull(transcription);
-
   }
 }

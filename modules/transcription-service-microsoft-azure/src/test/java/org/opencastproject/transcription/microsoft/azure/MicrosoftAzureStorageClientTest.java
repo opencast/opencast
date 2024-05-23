@@ -48,6 +48,8 @@ public class MicrosoftAzureStorageClientTest {
    * put the value into AZURE_ACCOUNT_ACCESS_KEY environment variable.
    */
   private String azureAccountAccessKey;
+
+  private String azureStorageContainerName;
   private boolean enabled;   // will be set in setUp according the values of
                              // azureStorageAccountName and azureAccountAccessKey
 
@@ -55,15 +57,18 @@ public class MicrosoftAzureStorageClientTest {
 
   @Before
   public void setUp() throws MicrosoftAzureStorageClientException {
-    azureStorageAccountName = System.getProperty("AZURE_STORAGE_ACCOUNT_NAME", "");
-    azureAccountAccessKey = System.getProperty("AZURE_ACCOUNT_ACCESS_KEY", "");
+    azureStorageAccountName = System.getenv().getOrDefault("AZURE_STORAGE_ACCOUNT_NAME", "");
+    azureAccountAccessKey = System.getenv().getOrDefault("AZURE_ACCOUNT_ACCESS_KEY", "");
+    azureStorageContainerName = System.getenv().getOrDefault("AZURE_STORAGE_CONTAINER_NAME", "opencast-transcriptions");
     enabled = StringUtils.isNotBlank(azureStorageAccountName)
         && StringUtils.isNotBlank(azureAccountAccessKey);
     if (!enabled) {
+      logger.debug("Skip tests.");
       return;
     }
     azureStorageClient = new MicrosoftAzureStorageClient(new MicrosoftAzureAuthorization(azureStorageAccountName,
         azureAccountAccessKey));
+    logger.debug("Run tests on Azure storage account {}", azureStorageAccountName);
   }
 
   @Test
@@ -72,7 +77,7 @@ public class MicrosoftAzureStorageClientTest {
     if (!enabled) {
       return;
     }
-    boolean containerExists = azureStorageClient.containerExists("opencast-transcriptions");
+    boolean containerExists = azureStorageClient.containerExists(azureStorageContainerName);
     Assert.assertTrue(containerExists);
   }
 
@@ -83,10 +88,10 @@ public class MicrosoftAzureStorageClientTest {
     if (!enabled) {
       return;
     }
-    Map<String, String> containerProps = azureStorageClient.getContainerProperties("opencast-transcriptions");
+    Map<String, String> containerProps = azureStorageClient.getContainerProperties(azureStorageContainerName);
     Assert.assertNotNull(containerProps);
     Assert.assertFalse(containerProps.isEmpty());
-    logger.info("Container properties: {}", containerProps);
+    logger.debug("Container properties: {}", containerProps);
   }
 
   @Test
@@ -107,9 +112,9 @@ public class MicrosoftAzureStorageClientTest {
     }
     URL testFileUrl = MicrosoftAzureStorageClientTest.class.getResource("/test.txt");
     File testFile = new File(testFileUrl.toURI());
-    String blobUrl = azureStorageClient.uploadFile(testFile, "opencast-transcriptions", null, "test.txt");
-    Assert.assertTrue("Azure storage blob URL should end with /opencast-transcriptions/test.txt",
-        StringUtils.endsWithIgnoreCase(blobUrl, "/opencast-transcriptions/test.txt"));
+    String blobUrl = azureStorageClient.uploadFile(testFile, azureStorageContainerName, null, "test.txt");
+    Assert.assertTrue("Azure storage blob URL should end with /" + azureStorageContainerName + "/test.txt",
+        StringUtils.endsWithIgnoreCase(blobUrl, "/" + azureStorageContainerName + "/test.txt"));
   }
 
   @Test
@@ -121,9 +126,9 @@ public class MicrosoftAzureStorageClientTest {
     }
     URL testFileUrl = MicrosoftAzureStorageClientTest.class.getResource("/test.ogg");
     File testFile = new File(testFileUrl.toURI());
-    String blobUrl = azureStorageClient.uploadFile(testFile, "opencast-transcriptions", null, "test.ogg");
-    Assert.assertTrue("Azure storage blob URL should end with /opencast-transcriptions/test.txt",
-        StringUtils.endsWithIgnoreCase(blobUrl, "/opencast-transcriptions/test.ogg"));
+    String blobUrl = azureStorageClient.uploadFile(testFile, azureStorageContainerName, null, "test.ogg");
+    Assert.assertTrue("Azure storage blob URL should end with /" + azureStorageContainerName + "/test.txt",
+        StringUtils.endsWithIgnoreCase(blobUrl, "/" + azureStorageContainerName + "/test.ogg"));
   }
 
   @Test
@@ -135,7 +140,7 @@ public class MicrosoftAzureStorageClientTest {
     }
     URL testFileUrl = MicrosoftAzureStorageClientTest.class.getResource("/test.txt");
     File testFile = new File(testFileUrl.toURI());
-    String blobUrl = azureStorageClient.uploadFile(testFile, "opencast-transcriptions", null, "test.txt");
+    String blobUrl = azureStorageClient.uploadFile(testFile, azureStorageContainerName, null, "test.txt");
     Assert.assertNotNull(blobUrl);
     azureStorageClient.deleteFile(new URL(blobUrl));
   }
