@@ -67,6 +67,14 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
   protected abstract String getRootDirectory();
   protected abstract String getRootDirectory(String orgId, String mpId);
 
+  /**
+   * Optional further handling of the complete deletion of mediapackage from the local store.
+   * This method will be called after the deletion of the mediapackage directory.
+   * @param orgId Organization ID
+   * @param mpId Mediapackage ID
+   */
+  protected abstract void onDeleteMediaPackage(String orgId, String mpId);
+
   @Override
   public void put(StoragePath storagePath, Source source) throws AssetStoreException {
     // Retrieving the file from the workspace has the advantage that in most cases the file already exists in the local
@@ -145,8 +153,12 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
     try {
       FileUtils.deleteDirectory(dir);
       // also delete the media package directory if all versions have been deleted
-      FileSupport.deleteHierarchyIfEmpty(file(path(getRootDirectory(sel.getOrganizationId(), sel.getMediaPackageId()),
-              sel.getOrganizationId())), dir.getParentFile());
+      boolean mpDirDeleted = FileSupport.deleteHierarchyIfEmpty(file(path(
+              getRootDirectory(sel.getOrganizationId(), sel.getMediaPackageId()), sel.getOrganizationId())),
+              dir.getParentFile());
+      if (mpDirDeleted) {
+        onDeleteMediaPackage(sel.getOrganizationId(), sel.getMediaPackageId());
+      }
       return true;
     } catch (IOException e) {
       logger.error("Error deleting directory from archive {}", dir);
@@ -214,8 +226,12 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
 
   /** Create a file from a storage path and an optional extension. */
   private File createFile(StoragePath p, Opt<String> extension) {
+    String rootDirectory = getRootDirectory(p.getOrganizationId(), p.getMediaPackageId());
+    if (rootDirectory == null) {
+      rootDirectory = getRootDirectory();
+    }
     return file(
-            getRootDirectory(),
+            rootDirectory,
             p.getOrganizationId(),
             p.getMediaPackageId(),
             p.getVersion().toString(),
