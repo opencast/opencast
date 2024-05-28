@@ -21,7 +21,6 @@
 
 package org.opencastproject.transcription.workflowoperation;
 
-import org.opencastproject.caption.api.CaptionService;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -38,7 +37,6 @@ import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
-import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
@@ -66,14 +64,9 @@ public class MicrosoftAzureAttachTranscriptionOperationHandler extends AbstractW
 
   /** Workflow configuration option keys */
   static final String TRANSCRIPTION_JOB_ID = "transcription-job-id";
-  static final String TARGET_FLAVOR = "target-flavor";
-  static final String TARGET_TAGS = "target-tags";
   static final String TARGET_TYPE = "target-element-type";
 
   private TranscriptionService service = null;
-  private CaptionService captionService;
-
-  private Workspace workspace;
 
   /** The configuration options for this handler */
   private static final SortedMap<String, String> CONFIG_OPTIONS;
@@ -81,8 +74,8 @@ public class MicrosoftAzureAttachTranscriptionOperationHandler extends AbstractW
   static {
     CONFIG_OPTIONS = new TreeMap<String, String>();
     CONFIG_OPTIONS.put(TRANSCRIPTION_JOB_ID, "The job id that identifies the file to be attached");
-    CONFIG_OPTIONS.put(TARGET_FLAVOR, "The target \"flavor\" of the transcription file");
-    CONFIG_OPTIONS.put(TARGET_TAGS, "The target \"tags\" of the transcription file");
+    CONFIG_OPTIONS.put(TARGET_FLAVOR, "The flavor of the transcription file");
+    CONFIG_OPTIONS.put(TARGET_TAGS, "The tags of the transcription file");
     CONFIG_OPTIONS.put(TARGET_TYPE, "Define where to append the subtitles file. "
         + "Accepted values: \"track\", \"attachment\". Default value is \"track\".");
   }
@@ -107,14 +100,14 @@ public class MicrosoftAzureAttachTranscriptionOperationHandler extends AbstractW
     }
 
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(
-        workflowInstance, Configuration.none, Configuration.none, Configuration.many, Configuration.many);
-    List<MediaPackageElementFlavor> targetFlavorOption = tagsAndFlavors.getTargetFlavors();
+        workflowInstance, Configuration.none, Configuration.none, Configuration.many, Configuration.one);
     List<String> targetTagOption = tagsAndFlavors.getTargetTags();
-
-    if (targetFlavorOption.isEmpty()) {
-      throw new WorkflowOperationException(TARGET_FLAVOR + " option not set.");
+    MediaPackageElementFlavor targetFlavor;
+    try {
+      targetFlavor = tagsAndFlavors.getSingleTargetFlavor();
+    } catch (IllegalStateException ex) {
+      throw new WorkflowOperationException(TARGET_FLAVOR + " option not set or used correctly.", ex);
     }
-    MediaPackageElementFlavor targetFlavor = targetFlavorOption.get(0);
 
     String typeUnparsed = StringUtils.trimToEmpty(operation.getConfiguration(TARGET_TYPE));
     MediaPackageElement.Type type = null;
@@ -126,8 +119,9 @@ public class MicrosoftAzureAttachTranscriptionOperationHandler extends AbstractW
         }
       }
       if (type == null || (type != Track.TYPE && type != Attachment.TYPE)) {
-        throw new IllegalArgumentException(String.format("The given type '%s' for mediapackage %s was illegal. Please"
-            + "check the operations' configuration keys.", type, mediaPackage.getIdentifier()));
+        throw new WorkflowOperationException(new IllegalArgumentException(
+            String.format("The given type '%s' for mediapackage %s was illegal. Please"
+            + "check the operations' configuration keys.", type, mediaPackage.getIdentifier())));
       }
     } else {
       type = Track.TYPE;
@@ -154,11 +148,6 @@ public class MicrosoftAzureAttachTranscriptionOperationHandler extends AbstractW
   @Reference(target = "(provider=microsoft.azure)")
   public void setTranscriptionService(TranscriptionService service) {
     this.service = service;
-  }
-
-  @Reference
-  public void setWorkspace(Workspace service) {
-    this.workspace = service;
   }
 
   @Reference

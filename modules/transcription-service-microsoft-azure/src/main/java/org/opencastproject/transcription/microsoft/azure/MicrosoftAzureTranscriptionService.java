@@ -649,9 +649,11 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
     params.put("transcriptionLocale", locale);
     params.put("transcriptionLocaleSet", Boolean.toString(!StringUtils.isEmpty(locale)));
     params.put("transcriptionLocaleSubtypeSuffix", !StringUtils.isEmpty(locale) ? "+" + locale : "");
+    params.put("transcriptionLocaleTag", !StringUtils.isEmpty(locale) ? "lang:" + locale : "");
     params.put("transcriptionLanguage", language);
     params.put("transcriptionLanguageSet", Boolean.toString(!StringUtils.isEmpty(language)));
     params.put("transcriptionLanguageSubtypeSuffix", !StringUtils.isEmpty(language) ? "+" + language : "");
+    params.put("transcriptionLanguageTag", !StringUtils.isEmpty(language) ? "lang:" + language : "");
     WorkflowDefinition wfDef = workflowService.getWorkflowDefinitionById(workflowDefinitionId);
 
     // Apply workflow

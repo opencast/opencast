@@ -75,8 +75,6 @@ public class MicrosoftAzureStartTranscriptionOperationHandler extends AbstractWo
   private static final Logger logger = LoggerFactory.getLogger(MicrosoftAzureStartTranscriptionOperationHandler.class);
 
   /** Workflow configuration option keys */
-  static final String SOURCE_FLAVORS_KEY = "source-flavors";
-  static final String SOURCE_TAG_KEY = "source-tags";
   static final String LANGUAGE_KEY = "language";
   static final String SKIP_IF_FLAVOR_EXISTS_KEY = "skip-if-flavor-exists";
   static final String EXTRACT_AUDIO_ENCODING_PROFILE_KEY = "audio-extraction-encoding-profile";
@@ -94,10 +92,10 @@ public class MicrosoftAzureStartTranscriptionOperationHandler extends AbstractWo
 
   static {
     CONFIG_OPTIONS = new TreeMap<String, String>();
-    CONFIG_OPTIONS.put(SOURCE_FLAVORS_KEY, "The \"flavors\" of the tracks to use as audio input. "
+    CONFIG_OPTIONS.put(SOURCE_FLAVORS, "The flavors of the tracks to use as audio input. "
         + "Only the first available track will be used.");
-    CONFIG_OPTIONS.put(SOURCE_TAG_KEY, "The \"tags\" of the track to use as audio input.");
-    CONFIG_OPTIONS.put(LANGUAGE_KEY, "The \"language\" the transcription service will use.");
+    CONFIG_OPTIONS.put(SOURCE_TAGS, "The tags of the track to use as audio input.");
+    CONFIG_OPTIONS.put(LANGUAGE_KEY, "The language the transcription service should use.");
     CONFIG_OPTIONS.put(SKIP_IF_FLAVOR_EXISTS_KEY,
         "If this \"flavor\" is already in the media package, skip this operation.");
     CONFIG_OPTIONS.put(EXTRACT_AUDIO_ENCODING_PROFILE_KEY,
@@ -168,6 +166,9 @@ public class MicrosoftAzureStartTranscriptionOperationHandler extends AbstractWo
     Track audioTrack = null;
     try {
       for (Track track : elements) {
+        if (!track.hasAudio()) {
+          continue;
+        }
         try {
           EncodingProfile profile = composerService.getProfile(encodingProfile);
           if (profile == null) {
@@ -193,7 +194,8 @@ public class MicrosoftAzureStartTranscriptionOperationHandler extends AbstractWo
           // Return OK means that the transcription job was created, but not finished yet
           logger.debug("External transcription job for media package '{}' was created.", mediaPackage.getIdentifier());
           // Only one job per media package
-          break;
+          // Results are empty, we should get a callback when transcription is done
+          return createResult(Action.CONTINUE);
         } catch (TranscriptionServiceException e) {
           throw new WorkflowOperationException(e);
         }
@@ -202,8 +204,10 @@ public class MicrosoftAzureStartTranscriptionOperationHandler extends AbstractWo
       // We do not need the audio file anymore, delete it...
       deleteTrack(audioTrack);
     }
-    // Results are empty, we should get a callback when transcription is done
-    return createResult(Action.CONTINUE);
+    // If we are here, no audio tracks are found. Skip operation.
+    logger.info("Media package {} does not contain audio stream to transcribe. Skip operation.",
+        mediaPackage.getIdentifier());
+    return createResult(Action.SKIP);
   }
 
   protected void deleteTrack(Track track) {
