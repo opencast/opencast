@@ -69,6 +69,8 @@ The following table contains the workflow operations that are available in an ou
 | log                                  | Log workflow status                                                                       | [Documentation](log-woh.md)                                  |
 | mattermost-notify                    | Send messages to Mattermost                                                               | [Documentation](mattermost-notify-woh.md)                    |
 | metadata-to-acl                      | Add read/write access based on metadata                                                   | [Documentation](metadata-to-acl.md)                          |
+| microsoft-azure-attach-transcription | Attach Microsoft Azure Transcription                                                      | [Documentation](microsoft-azure-attach-transcription-woh.md) |
+| microsoft-azure-start-transcription  | Start Microsoft Azure Transcription                                                       | [Documentation](microsoft-azure-start-transcription-woh.md)  |
 | move-storage                         | Move files between asset manager storage systems                                          | [Documentation](move-storage-woh.md)                         |
 | multiencode                          | Encode to multiple profiles in one operation                                              | [Documentation](multiencode-woh.md)                          |
 | normalize-audio                      | Normalize first audio stream                                                              | [Documentation](normalizeaudio-woh.md)                       |
@@ -104,7 +106,7 @@ The following table contains the workflow operations that are available in an ou
 | series                               | Apply series to the mediapackage                                                          | [Documentation](series-woh.md)                               |
 | silence                              | Silence detection on audio of the mediapackage                                            | [Documentation](silence-woh.md)                              |
 | snapshot                             | Archive the current state of the mediapackage                                             | [Documentation](snapshot-woh.md)                             |
-| speechtotext                         | Create subtitles for video and audio sources                                              | [Documentation](speechtotext-woh.md)                       |
+| speechtotext                         | Create subtitles for video and audio sources                                              | [Documentation](speechtotext-woh.md)                         |
 | start-watson-transcription           | Starts automated transcription provided by IBM Watson                                     | [Documentation](start-watson-transcription-woh.md)           |
 | start-workflow                       | Start a new workflow for given media package ID                                           | [Documentation](start-workflow-woh.md)                       |
 | statistics-writer                    | Log statistical data about the video                                                      | [Documentation](statistics-writer.md)                        |
