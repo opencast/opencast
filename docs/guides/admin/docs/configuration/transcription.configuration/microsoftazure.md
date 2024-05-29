@@ -78,7 +78,7 @@ A sample attach transcript workflow that is preconfigured in the configuration f
         <configuration key="transcription-job-id">${transcriptionJobId}</configuration>
         <!-- Set the flavor to something the Paella player will parse -->
         <configuration key="target-flavor">captions/source</configuration>
-        <configuration key="target-tags">archive, ${transcriptionLocaleTag}</configuration>
+        <configuration key="target-tags">archive, ${transcriptionLocaleTag!}</configuration>
       </configurations>
     </operation>
 

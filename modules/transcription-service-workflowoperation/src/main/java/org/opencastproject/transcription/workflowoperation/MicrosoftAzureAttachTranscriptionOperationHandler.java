@@ -29,6 +29,7 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.transcription.api.TranscriptionService;
+import org.opencastproject.util.doc.DocUtil;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -46,7 +47,9 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 
@@ -91,6 +94,7 @@ public class MicrosoftAzureAttachTranscriptionOperationHandler extends AbstractW
           throws WorkflowOperationException {
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
     WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
+    Map<String, Object> wfProps = Collections.unmodifiableMap(workflowInstance.getConfigurations());
 
     logger.debug("Attach transcription for media package '{}' started.", mediaPackage.getIdentifier());
 
@@ -132,7 +136,10 @@ public class MicrosoftAzureAttachTranscriptionOperationHandler extends AbstractW
           = service.getGeneratedTranscription(mediaPackage.getIdentifier().toString(), jobId, type);
       transcription.setFlavor(targetFlavor);
       for (String tag : targetTagOption) {
-        transcription.addTag(tag);
+        String templatedTag = DocUtil.processTextTemplate("Replacing variables in tag", tag, wfProps);
+        if (StringUtils.isNotEmpty(templatedTag)) {
+          transcription.addTag(templatedTag);
+        }
       }
       mediaPackage.add(transcription);
       logger.info("Added transcription to the media package {}: {}",
