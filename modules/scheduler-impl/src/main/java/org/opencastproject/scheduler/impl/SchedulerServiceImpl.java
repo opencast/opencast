@@ -577,9 +577,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         // Set the new media package identifier
         mediaPackage.setIdentifier(id);
 
-        // Update dublincore title and temporal
-        String newTitle = dc.getFirst(DublinCore.PROPERTY_TITLE) + String.format(" %0" + Integer.toString(periods.size()).length() + "d", currentCounter + 1);
-        dc.set(DublinCore.PROPERTY_TITLE, newTitle);
+        // Update dublincore temporal
         DublinCoreValue eventTime = EncodingSchemeUtils.encodePeriod(new DCMIPeriod(startDate, endDate),
                 Precision.Second);
         dc.set(DublinCore.PROPERTY_TEMPORAL, eventTime);
@@ -589,7 +587,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         } catch (Exception e) {
           Misc.chuck(e);
         }
-        mediaPackage.setTitle(newTitle);
 
         String mediaPackageId = mediaPackage.getIdentifier().toString();
         //Converting from iCal4j DateTime objects to plain Date objects to prevent AMQ issues below
