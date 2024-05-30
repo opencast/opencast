@@ -80,8 +80,8 @@ public class ShibbolethRequestHeaderAuthenticationFilter extends RequestHeaderAu
         }
       } catch (UsernameNotFoundException e) {
         loginHandler.newUserLogin(o, request);
-        userDirectoryService.invalidate(o);
       }
+      userDirectoryService.invalidate(o);
     }
     return o;
   }

@@ -27,7 +27,6 @@
         <configuration key="smil-flavors">smil/cutting</configuration>
         <configuration key="target-smil-flavor">smil/cutting</configuration>
         <configuration key="target-flavor-subtype">source+trimmed</configuration>
-        <configuration key="skip-if-not-trimmed">true</configuration>
       </configurations>
     </operation>
 

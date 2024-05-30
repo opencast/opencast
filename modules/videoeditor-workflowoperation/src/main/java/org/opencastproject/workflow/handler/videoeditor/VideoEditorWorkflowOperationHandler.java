@@ -413,7 +413,8 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
       }
     }
 
-    boolean skipIfNoTrim = BooleanUtils.toBoolean(worflowOperationInstance.getConfiguration(SKIP_NOT_TRIMMED_PROPERTY));
+    boolean skipIfNoTrim = BooleanUtils.toBooleanDefaultIfNull(BooleanUtils.toBooleanObject(
+        worflowOperationInstance.getConfiguration(SKIP_NOT_TRIMMED_PROPERTY)), true);
 
     // Get source tracks
     TrackSelector trackSelector = new TrackSelector();

@@ -91,6 +91,12 @@ public class Activator implements BundleActivator {
         bundleContext.getProperty("org.opencastproject.db.jdbc.pool.max.idle.time"));
     Integer maxConnectionAge = getConfigProperty(
         bundleContext.getProperty("org.opencastproject.db.jdbc.pool.max.connection.age"));
+    Boolean testConnectionOnCheckin = getConfigBooleanProperty(
+        bundleContext.getProperty("org.opencastproject.db.jdbc.pool.test.connection.on.checkin"));
+    Boolean testConnectionOnCheckout = getConfigBooleanProperty(
+        bundleContext.getProperty("org.opencastproject.db.jdbc.pool.test.connection.on.checkout"));
+    Integer idleConnectionTestPeriod = getConfigProperty(
+        bundleContext.getProperty("org.opencastproject.db.jdbc.pool.idle.connection.test.period"));
 
     pooledDataSource = new ComboPooledDataSource();
     pooledDataSource.setDriverClass(jdbcDriver);
@@ -99,9 +105,17 @@ public class Activator implements BundleActivator {
     pooledDataSource.setPassword(jdbcPass);
     if (minPoolSize != null) {
       pooledDataSource.setMinPoolSize(minPoolSize);
+      // initial pool size should be at least the min value
+      if (pooledDataSource.getInitialPoolSize() < minPoolSize) {
+        pooledDataSource.setInitialPoolSize(minPoolSize);
+      }
     }
     if (maxPoolSize != null) {
       pooledDataSource.setMaxPoolSize(maxPoolSize);
+      // initial pool size should be at most the max value
+      if (pooledDataSource.getInitialPoolSize() > maxPoolSize) {
+        pooledDataSource.setInitialPoolSize(maxPoolSize);
+      }
     }
     if (acquireIncrement != null) {
       pooledDataSource.setAcquireIncrement(acquireIncrement);
@@ -124,6 +138,15 @@ public class Activator implements BundleActivator {
 
     if (maxConnectionAge != null) {
       pooledDataSource.setMaxConnectionAge(maxConnectionAge);
+    }
+    if (testConnectionOnCheckin != null) {
+      pooledDataSource.setTestConnectionOnCheckin(testConnectionOnCheckin);
+    }
+    if (testConnectionOnCheckout != null) {
+      pooledDataSource.setTestConnectionOnCheckout(testConnectionOnCheckout);
+    }
+    if (idleConnectionTestPeriod != null) {
+      pooledDataSource.setIdleConnectionTestPeriod(idleConnectionTestPeriod);
     }
 
     Connection connection = null;
@@ -199,6 +222,10 @@ public class Activator implements BundleActivator {
 
   private Integer getConfigProperty(String config) {
     return config == null ? null : Integer.parseInt(config);
+  }
+
+  private Boolean getConfigBooleanProperty(String config) {
+    return config == null ? null : Boolean.parseBoolean(config);
   }
 
 }
