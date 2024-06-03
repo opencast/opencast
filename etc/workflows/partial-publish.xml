@@ -149,6 +149,20 @@
     </operation>
 
     <operation
+      id="cover-image"
+      if="NOT (${presenter_work_video} OR $ ${presentation_work_video} OR ${presentation/thumbnail_edited}) AND (${presenter_work_audio} OR ${presentation_work_audio})"
+      description="Create a cover image for audio-only files">
+      <configurations>
+        <configuration key="stylesheet">file://${karaf.etc}/branding/coverimage.xsl</configuration>
+        <configuration key="width">1920</configuration>
+        <configuration key="height">1080</configuration>
+        <configuration key="posterimage-flavor">presenter/coverbackground</configuration>
+        <configuration key="target-flavor">presenter/player+preview</configuration>
+        <configuration key="target-tags">archive, engage-download</configuration>
+      </configurations>
+    </operation>
+
+    <operation
         id="tag"
         if="${presentation/thumbnail_edited}"
         exception-handler-workflow="partial-error"

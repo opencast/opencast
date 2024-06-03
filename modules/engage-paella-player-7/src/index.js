@@ -19,7 +19,7 @@
  *
  */
 import { applyOpencastTheme } from './default-theme.js';
-import { PaellaOpencast } from './js/PaellaOpencast.js';
+import { PaellaOpencast, getUrlFromOpencastConfig } from './js/PaellaOpencast.js';
 
 window.onload = async () => {
   let paella = new PaellaOpencast('player-container');
@@ -28,9 +28,15 @@ window.onload = async () => {
     await applyOpencastTheme(paella);
     await paella.loadManifest();
 
+    //check audio-only config
+    const config = await fetch(getUrlFromOpencastConfig('config.json'));
+    const configJson = await config.json();
+    const htmlPlayer = configJson?.opencast?.audioOnlyHTMLPlayer;
+
     // The player manifest access functions will only be available after the manifest has been loaded.
     if (paella.streams.isNativelyPlayable &&
       paella.streams.isAudioOnly &&
+      htmlPlayer &&
       (!paella.captions || paella.captions.length === 0))
     {
       const nativePlayer = paella.streams.nativePlayer;
