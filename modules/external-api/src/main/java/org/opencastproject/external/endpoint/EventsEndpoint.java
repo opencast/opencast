@@ -28,6 +28,7 @@ import static com.entwinemedia.fn.data.json.Jsons.f;
 import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static com.entwinemedia.fn.data.json.Jsons.v;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
+import static org.opencastproject.external.common.ApiVersion.VERSION_1_10_0;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_11_0;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_1_0;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_4_0;
@@ -1641,8 +1642,8 @@ public class EventsEndpoint implements ManagedService {
 
   private List<JValue> getPublications(Event event, Boolean withSignedUrls, Boolean includeInternalPublication, ApiVersion requestedVersion) {
         return event.getPublications().stream()
-        .filter(publication -> ((includeInternalPublication && !requestedVersion.isSmallerThan(VERSION_1_11_0)) || EventUtils.internalChannelFilter.apply(publication)))
-        .map(p -> getPublication(p, withSignedUrls, requestedVersion))
+            .filter(publication -> ((includeInternalPublication != null && includeInternalPublication && !requestedVersion.isSmallerThan(VERSION_1_10_0)) || EventUtils.internalChannelFilter.apply(publication)))
+            .map(p -> getPublication(p, withSignedUrls, requestedVersion))
         .collect(Collectors.toList());
   }
 
