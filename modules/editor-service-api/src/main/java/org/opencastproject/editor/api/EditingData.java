@@ -42,6 +42,7 @@ public class EditingData {
   public static final String LOCK_REFRESH = "lock_refresh";
   public static final String LOCK_UUID = "lock_uuid";
   public static final String LOCK_USER = "lock_user";
+  public static final String CUSTOMIZED_TRACK_SELECTION = "customized_track_selection";
   private final List<SegmentData> segments;
   private final List<WorkflowData> workflows;
   private final List<TrackData> tracks;
@@ -63,11 +64,13 @@ public class EditingData {
   private final List<String> waveformURIs;
   private final List<Subtitle> subtitles;
   private final Boolean local;
+  @SerializedName(CUSTOMIZED_TRACK_SELECTION)
+  private final Boolean customizedTrackSelection;
 
   public EditingData(List<SegmentData> segments, List<TrackData> tracks, List<WorkflowData> workflows, Long duration,
           String title, String recordingStartDate, String seriesId, String seriesName, Boolean workflowActive,
           List<String> waveformURIs, List<Subtitle> subtitles, Boolean local, Boolean lockingActive,
-          Integer lockRefresh, User user) {
+          Integer lockRefresh, User user, Boolean customizedTrackSelection) {
     this.segments = segments;
     this.tracks = tracks;
     this.workflows = workflows;
@@ -83,6 +86,7 @@ public class EditingData {
     this.lockRefresh = lockRefresh * 1000;
     this.lockUUID = UUID.randomUUID().toString();
     this.lockUser = user.getUsername();
+    this.customizedTrackSelection = customizedTrackSelection;
   }
 
   public static EditingData parse(String json) {
