@@ -1,6 +1,10 @@
 # Opencast 16: Release Notes
 
-## Opencast 15.0
+## Opencast 16.0
+
+Initial Release Notes Document for Opencast 16
+
+
 
 ### Features
 "Playlists" added to Opencast.
@@ -25,9 +29,6 @@ Playlist are a list of videos, similar to the same concept in YouTube. This prov
 - Playlists
 - OpenSearch/Elasticsearch replacing Solr
 
-## Opencast 16.0
-
-Initial Release Notes Document for Opencast 16
 
 
 ## Release Schedule
