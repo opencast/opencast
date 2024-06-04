@@ -1042,9 +1042,12 @@ public class EditorServiceImpl implements EditorService {
 
     User user = securityService.getUser();
 
+    // TODO
+    Boolean customizedTrackSelection = false;
+
     return new EditingData(segments, tracks, workflows, mp.getDuration(), mp.getTitle(), event.getRecordingStartDate(),
             event.getSeriesId(), event.getSeriesName(), workflowActive, waveformList, subtitles, localPublication,
-            lockingActive, lockRefresh, user);
+            lockingActive, lockRefresh, user, customizedTrackSelection);
   }
 
 
