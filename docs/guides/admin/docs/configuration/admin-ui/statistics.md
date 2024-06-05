@@ -36,6 +36,9 @@ InfluxDB using http(s). So the node hosting this bundle needs network access to 
 Configuration
 =============
 
+To enable the statistics view in the admin interface, set `prop.admin.statisttics.enabled=true`
+in `etc/org.opencastproject.organization-mh_default_org.cfg`.
+
 Before configuring Opencast, you should have a running InfluxDB instance and should think about how you want your data
 to be written to InfluxDB and what your InfluxDB database schema should look like. Specifically, you should think about
 retention policies, measurement names, field/tag names and how much you want to
