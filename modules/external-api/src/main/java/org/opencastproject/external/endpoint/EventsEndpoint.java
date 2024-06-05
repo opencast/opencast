@@ -1641,7 +1641,7 @@ public class EventsEndpoint implements ManagedService {
 
   private List<JValue> getPublications(Event event, Boolean withSignedUrls, Boolean includeInternalPublication, ApiVersion requestedVersion) {
         return event.getPublications().stream()
-        .filter(publication -> ((includeInternalPublication && !requestedVersion.isSmallerThan(VERSION_1_11_0)) || EventUtils.internalChannelFilter.apply(publication)))
+        .filter(publication -> ((includeInternalPublication != null && includeInternalPublication && !requestedVersion.isSmallerThan(VERSION_1_11_0)) || EventUtils.internalChannelFilter.apply(publication)))
         .map(p -> getPublication(p, withSignedUrls, requestedVersion))
         .collect(Collectors.toList());
   }
