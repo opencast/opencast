@@ -1044,6 +1044,9 @@ public class EditorServiceImpl implements EditorService {
 
     // TODO
     Boolean customizedTrackSelection = false;
+    if (latestWfProperties.get("hide_tracks").equals("true")) {
+      customizedTrackSelection = true;
+    }
 
     return new EditingData(segments, tracks, workflows, mp.getDuration(), mp.getTitle(), event.getRecordingStartDate(),
             event.getSeriesId(), event.getSeriesName(), workflowActive, waveformList, subtitles, localPublication,
@@ -1122,6 +1125,9 @@ public class EditorServiceImpl implements EditorService {
       }
       workflowProperties.put("hide_" + type + "_audio", Boolean.toString(!track.getAudio().isEnabled()));
       workflowProperties.put("hide_" + type + "_video", Boolean.toString(!track.getVideo().isEnabled()));
+    }
+    if (editingData.getCustomizedTrackSelection()) {
+      workflowProperties.put("hide_tracks", Boolean.toString(true));
     }
     WorkflowPropertiesUtil.storeProperties(assetManager, mediaPackage, workflowProperties);
 

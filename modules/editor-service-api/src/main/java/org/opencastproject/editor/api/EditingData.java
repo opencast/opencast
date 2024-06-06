@@ -42,7 +42,7 @@ public class EditingData {
   public static final String LOCK_REFRESH = "lock_refresh";
   public static final String LOCK_UUID = "lock_uuid";
   public static final String LOCK_USER = "lock_user";
-  public static final String CUSTOMIZED_TRACK_SELECTION = "customized_track_selection";
+  public static final String CUSTOMIZED_TRACK_SELECTION = "customizedTrackSelection";
   private final List<SegmentData> segments;
   private final List<WorkflowData> workflows;
   private final List<TrackData> tracks;
@@ -120,6 +120,10 @@ public class EditingData {
 
   public List<Subtitle> getSubtitles() {
     return subtitles;
+  }
+
+  public Boolean getCustomizedTrackSelection() {
+    return customizedTrackSelection;
   }
 
   public String toString() {
