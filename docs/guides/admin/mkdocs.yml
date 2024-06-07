@@ -263,6 +263,7 @@ nav:
    - Start Watson Transcription: 'workflowoperationhandlers/start-watson-transcription-woh.md'
    - Start Workflow: 'workflowoperationhandlers/start-workflow-woh.md'
    - Statistics Writer: 'workflowoperationhandlers/statistics-writer.md'
+   - Subtitle Timeshift: 'workflowoperationhandlers/subtitle-timeshift-woh.md'
    - Tag: 'workflowoperationhandlers/tag-woh.md'
    - Tag-By-DCTerm: 'workflowoperationhandlers/tag-by-dcterm-woh.md'
    - Tag-Engage: 'workflowoperationhandlers/tag-engage-woh.md'
