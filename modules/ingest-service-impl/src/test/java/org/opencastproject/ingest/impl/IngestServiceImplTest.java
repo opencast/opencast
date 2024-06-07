@@ -30,6 +30,7 @@ import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
+import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageParser;
@@ -57,6 +58,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.XmlUtil;
+import org.opencastproject.util.data.Arrays;
 import org.opencastproject.util.data.Either;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
@@ -101,7 +103,6 @@ import java.util.Map;
 
 public class IngestServiceImplTest {
   private IngestServiceImpl service = null;
-  private DublinCoreCatalogService dublinCoreService = null;
   private SeriesService seriesService = null;
   private WorkflowService workflowService = null;
   private WorkflowInstance workflowInstance = null;
@@ -570,6 +571,15 @@ public class IngestServiceImplTest {
     properties.put(IngestServiceImpl.ADD_ONLY_NEW_FLAVORS_KEY, "false");
     service.updated(properties);
 
+    // skip series update with mocked dependencies
+    DublinCoreCatalog dcCatalog = EasyMock.createNiceMock(DublinCoreCatalog.class);
+    EasyMock.expect(dcCatalog.getFirst(EasyMock.anyObject())).andReturn(null).once();
+    EasyMock.replay(dcCatalog);
+    DublinCoreCatalogService dcService = EasyMock.createNiceMock(DublinCoreCatalogService.class);
+    EasyMock.expect(dcService.load(EasyMock.anyObject())).andReturn(dcCatalog).once();
+    EasyMock.replay(dcService);
+    service.setDublinCoreService(dcService);
+
     MediaPackage mergedMediaPackage = service.ingest(ingestMediaPackage).getMediaPackage();
     Assert.assertEquals(4, mergedMediaPackage.getTracks().length);
     Track track = mergedMediaPackage.getTrack("track-1");
@@ -600,16 +610,21 @@ public class IngestServiceImplTest {
     MediaPackage ingestMediaPackage = MediaPackageParser
             .getFromXml(IOUtils.toString(getClass().getResourceAsStream("/source-manifest-partial.xml"), "UTF-8"));
 
+    // skip series update with mocked dependencies
+    DublinCoreCatalog dcCatalog = EasyMock.createNiceMock(DublinCoreCatalog.class);
+    EasyMock.expect(dcCatalog.getFirst(EasyMock.anyObject())).andReturn(null).anyTimes();
+    EasyMock.replay(dcCatalog);
+    DublinCoreCatalogService dcService = EasyMock.createNiceMock(DublinCoreCatalogService.class);
+    EasyMock.expect(dcService.load(EasyMock.anyObject())).andReturn(dcCatalog).anyTimes();
+    EasyMock.replay(dcService);
+    service.setDublinCoreService(dcService);
     Dictionary<String, String> properties = new Hashtable<>();
-
     MediaPackage mergedMediaPackage = service.ingest(ingestMediaPackage).getMediaPackage();
-
     // check element skipping
     properties.put(IngestServiceImpl.SKIP_ATTACHMENTS_KEY, "true");
     properties.put(IngestServiceImpl.SKIP_CATALOGS_KEY, "true");
     properties.put(IngestServiceImpl.ADD_ONLY_NEW_FLAVORS_KEY, "true");
     service.updated(properties);
-
     // Existing Opencast mp has 3 catalogs and 1 attachment, the ingest mp has 4 and 2.
     mergedMediaPackage = service.ingest(ingestMediaPackage).getMediaPackage();
     Assert.assertEquals(0, mergedMediaPackage.getCatalogs().length);
@@ -623,6 +638,14 @@ public class IngestServiceImplTest {
     // Test with properties and key is false
     properties.put(IngestServiceImpl.ADD_ONLY_NEW_FLAVORS_KEY, "false");
     service.updated(properties);
+    // skip series update with mocked dependencies
+    DublinCoreCatalog dcCatalog = EasyMock.createNiceMock(DublinCoreCatalog.class);
+    EasyMock.expect(dcCatalog.getFirst(EasyMock.anyObject())).andReturn(null).once();
+    EasyMock.replay(dcCatalog);
+    DublinCoreCatalogService dcService = EasyMock.createNiceMock(DublinCoreCatalogService.class);
+    EasyMock.expect(dcService.load(EasyMock.anyObject())).andReturn(dcCatalog).once();
+    EasyMock.replay(dcService);
+    service.setDublinCoreService(dcService);
     isAddOnlyNew = service.isAddOnlyNew;
     Assert.assertFalse("Updated overwrite property to false", isAddOnlyNew);
     testEpisodeUpdateNewAndExisting();
@@ -655,7 +678,14 @@ public class IngestServiceImplTest {
   @Test
   public void testLegacyMediaPackageId() throws Exception {
     SchedulerService schedulerService = EasyMock.createNiceMock(SchedulerService.class);
-
+    // skip series update with mocked dependencies
+    DublinCoreCatalog dcCatalog = EasyMock.createNiceMock(DublinCoreCatalog.class);
+    EasyMock.expect(dcCatalog.getFirst(EasyMock.anyObject())).andReturn(null).once();
+    EasyMock.replay(dcCatalog);
+    DublinCoreCatalogService dcService = EasyMock.createNiceMock(DublinCoreCatalogService.class);
+    EasyMock.expect(dcService.load(EasyMock.anyObject())).andReturn(dcCatalog).once();
+    EasyMock.replay(dcService);
+    service.setDublinCoreService(dcService);
     Map<String, String> properties = new HashMap<String, String>();
     properties.put(CaptureParameters.INGEST_WORKFLOW_DEFINITION, "sample");
     properties.put("agent-name", "matterhorn-agent");
@@ -805,7 +835,8 @@ public class IngestServiceImplTest {
   }
 
   /**
-   * Test method for {@link org.opencastproject.ingest.impl.IngestServiceImpl#updateSeries(java.net.URI)}
+   * Test method for {@link org.opencastproject.ingest.impl.IngestServiceImpl#updateSeries(
+   * org.opencastproject.mediapackage.MediaPackage)}
    */
   private void testSeriesUpdateNewAndExisting(Dictionary<String, String> properties) throws Exception {
 
@@ -821,6 +852,18 @@ public class IngestServiceImplTest {
         // If key or value not found or not boolean, use the default overwrite expectation
       }
     }
+    Catalog dcCatalog = EasyMock.createNiceMock(Catalog.class);
+    EasyMock.expect(dcCatalog.getIdentifier()).andReturn("series-xacml").anyTimes();
+    EasyMock.expect(dcCatalog.getURI()).andReturn(urlCatalog2).anyTimes();
+    EasyMock.replay(dcCatalog);
+    MediaPackage mp = EasyMock.createNiceMock(MediaPackage.class);
+    EasyMock.expect(mp.getCatalogs((MediaPackageElementFlavor) EasyMock.anyObject()))
+        .andReturn(Arrays.array(dcCatalog)).anyTimes();
+    EasyMock.expect(mp.getAttachments(EasyMock.anyObject()))
+        .andReturn(Arrays.array()).anyTimes();
+    EasyMock.expect(mp.getElementsByFlavor(EasyMock.anyObject()))
+        .andReturn(Arrays.array()).anyTimes();
+    EasyMock.replay(mp);
 
     // Get test series dublin core for the mock return value
     File catalogFile = new File(urlCatalog2);
@@ -831,9 +874,8 @@ public class IngestServiceImplTest {
     IOUtils.closeQuietly(in);
 
     // Set dublinCore service to return test dublin core
-    dublinCoreService = org.easymock.EasyMock.createNiceMock(DublinCoreCatalogService.class);
-    org.easymock.EasyMock.expect(dublinCoreService.load((InputStream) EasyMock.anyObject())).andReturn(series)
-            .anyTimes();
+    DublinCoreCatalogService dublinCoreService = org.easymock.EasyMock.createNiceMock(DublinCoreCatalogService.class);
+    org.easymock.EasyMock.expect(dublinCoreService.load(EasyMock.anyObject())).andReturn(series).anyTimes();
     org.easymock.EasyMock.replay(dublinCoreService);
     service.setDublinCoreService(dublinCoreService);
 
@@ -846,7 +888,7 @@ public class IngestServiceImplTest {
 
     // This is true or false depending on the isAddOnlyNew value
     Assert.assertEquals("Desire to update series is " + isUpdateSeries + ".",
-            isUpdateSeries, service.updateSeries(urlCatalog2));
+            isUpdateSeries, service.updateSeries(mp));
 
     // Test with mock not found exception
     EasyMock.reset(seriesService);
@@ -857,7 +899,7 @@ public class IngestServiceImplTest {
     service.setSeriesService(seriesService);
 
     // This should be true, i.e. create new series, in all cases
-    Assert.assertEquals("Always create a new series catalog.", true, service.updateSeries(urlCatalog2));
+    Assert.assertEquals("Always create a new series catalog.", true, service.updateSeries(mp));
   }
 
 }
