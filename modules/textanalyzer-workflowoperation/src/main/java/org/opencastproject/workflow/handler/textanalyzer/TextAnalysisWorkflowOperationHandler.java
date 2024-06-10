@@ -38,7 +38,6 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageReference;
 import org.opencastproject.mediapackage.MediaPackageReferenceImpl;
 import org.opencastproject.mediapackage.Track;
-import org.opencastproject.mediapackage.selector.CatalogSelector;
 import org.opencastproject.metadata.mpeg7.MediaDuration;
 import org.opencastproject.metadata.mpeg7.MediaRelTimePointImpl;
 import org.opencastproject.metadata.mpeg7.MediaTime;
@@ -83,7 +82,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.Collection;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -462,20 +460,27 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
           WorkflowOperationInstance operation, ConfiguredTagsAndFlavors tagsAndFlavors) throws IOException {
     HashMap<Catalog, Mpeg7Catalog> catalogs = new HashMap<Catalog, Mpeg7Catalog>();
 
-    List<MediaPackageElementFlavor> sourceFlavor = tagsAndFlavors.getSrcFlavors();
+    List<MediaPackageElementFlavor> sourceFlavors = tagsAndFlavors.getSrcFlavors();
     List<String> sourceTagSet = tagsAndFlavors.getSrcTags();
 
-    CatalogSelector catalogSelector = new CatalogSelector();
-    for (MediaPackageElementFlavor flavor : sourceFlavor) {
-      catalogSelector.addFlavor(flavor);
-    }
-    for (String tag : sourceTagSet) {
-      catalogSelector.addTag(tag);
-    }
-    Collection<Catalog> catalogsWithTags = catalogSelector.select(mediaPackage, true);
+    Catalog[] catalogsWithTags = mediaPackage.getCatalogsByTags(sourceTagSet);
 
     for (Catalog mediaPackageCatalog : catalogsWithTags) {
       if (!MediaPackageElements.SEGMENTS.equals(mediaPackageCatalog.getFlavor())) {
+        continue;
+      }
+      if (sourceFlavors != null) {
+        if (mediaPackageCatalog.getReference() == null) {
+          continue;
+        }
+        Track t = mediaPackage.getTrack(mediaPackageCatalog.getReference().getIdentifier());
+        if (t == null || sourceFlavors.stream().noneMatch(flavor -> t.getFlavor().matches(flavor))) {
+          continue;
+        }
+      }
+
+      // Make sure the catalog features at least one of the required tags
+      if (!mediaPackageCatalog.containsTag(sourceTagSet)) {
         continue;
       }
 
