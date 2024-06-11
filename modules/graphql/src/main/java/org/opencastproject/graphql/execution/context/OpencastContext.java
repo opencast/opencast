@@ -21,6 +21,7 @@
 
 package org.opencastproject.graphql.execution.context;
 
+import org.opencastproject.graphql.config.GraphQLConfiguration;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.User;
 
@@ -41,6 +42,10 @@ public class OpencastContext {
 
   public <T> T getService(Class<T> clazz) {
     return bundleContext.getService(bundleContext.getServiceReference(clazz));
+  }
+
+  public GraphQLConfiguration getConfiguration() {
+    return getService(GraphQLConfiguration.class);
   }
 
   public static OpencastContext newContext(BundleContext bundleContext) {

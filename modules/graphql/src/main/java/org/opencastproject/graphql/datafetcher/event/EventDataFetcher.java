@@ -56,7 +56,7 @@ public class EventDataFetcher implements ContextDataFetcher<GqlEvent> {
   public GqlEvent get(OpencastContext opencastContext, DataFetchingEnvironment dataFetchingEnvironment) {
     SecurityService securityService = opencastContext.getService(SecurityService.class);
     ElasticsearchIndex searchIndex = opencastContext.getService(ElasticsearchIndex.class);
-
+    var config = opencastContext.getConfiguration();
     try {
       SearchResult<Event> result = searchIndex.getByQuery(
           new EventSearchQuery(securityService.getOrganization().getId(), securityService.getUser())
@@ -65,6 +65,8 @@ public class EventDataFetcher implements ContextDataFetcher<GqlEvent> {
       if (result.getDocumentCount() == 0) {
         return null;
       } else if (result.getDocumentCount() == 1) {
+        Event event = result.getItems()[0].getSource();
+        event.updatePreview(config.eventPreviewSubtype());
         return new GqlEvent(result.getItems()[0].getSource());
       }
       throw new GraphQLRuntimeException(

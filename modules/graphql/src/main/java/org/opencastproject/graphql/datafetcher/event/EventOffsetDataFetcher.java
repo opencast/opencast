@@ -36,6 +36,7 @@ import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 
+import java.util.Arrays;
 import java.util.Objects;
 
 import graphql.schema.DataFetchingEnvironment;
@@ -89,6 +90,8 @@ public class EventOffsetDataFetcher extends ElasticsearchDataFetcher<GqlEventLis
 
     try {
       SearchResult<Event> result = searchIndex.getByQuery(eventSearchQuery);
+      Arrays.stream(result.getItems()).forEach(item -> item.getSource()
+          .updatePreview(opencastContext.getConfiguration().eventPreviewSubtype()));
       return new GqlEventList(result);
     } catch (SearchIndexException e) {
       throw new GraphQLRuntimeException(OpencastErrorType.InternalError, e);
