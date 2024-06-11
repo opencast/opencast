@@ -245,8 +245,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
     List<DublinCoreCatalog> seriesList = Collections.emptyList();
     if (dc.hasValue(DublinCore.PROPERTY_IS_PART_OF)) {
       //Find the series (if any), filter for those which exist to prevent linking non-existent series
-      List<DublinCoreValue> seriesIds = dc.get(DublinCore.PROPERTY_IS_PART_OF);
-      seriesList = seriesIds.stream().map(DublinCoreValue::getValue).map(s -> {
+      seriesList = dc.get(DublinCore.PROPERTY_IS_PART_OF).stream().map(DublinCoreValue::getValue).map(s -> {
         try {
           return seriesService.getSeries(s);
         } catch (NotFoundException e) {
@@ -260,23 +259,6 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
         }
         return null;
       }).filter(Objects::nonNull).collect(Collectors.toList());
-
-      //Get the list of filtered series IDs from the list of filtered series
-      List<String> filteredSeriesIds = seriesList.stream().map(s -> {
-        return s.getFirst(DublinCore.PROPERTY_IDENTIFIER);
-      }).collect(Collectors.toList());
-
-      //Note that if a series is listed in the input, but is not present in the series service then this will clear it
-      // from the indexed data.  This is deliberate, since a series which does not exist should not be listed as an ep's
-      // series.  This (IMO) is a data consistency issue - it should not happen, but better to handle it than break.
-      if (0 == filteredSeriesIds.size()) {
-        dc.remove(DublinCore.PROPERTY_IS_PART_OF);
-      } else {
-        //An episode is only part of *one* series, right?!
-        for (String sid : filteredSeriesIds) {
-          dc.set(DublinCore.PROPERTY_IS_PART_OF, sid);
-        }
-      }
     }
 
     String orgId = securityService.getOrganization().getId();
