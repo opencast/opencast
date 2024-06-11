@@ -123,14 +123,18 @@ public class JaxbWorkflowInstance {
   }
 
   public WorkflowInstance toWorkflowInstance() {
-    return new WorkflowInstance(id, state, template, title, description, creatorName, organizationId, dateCreated,
+    WorkflowInstance wf = new WorkflowInstance(id, state, template, title, description, creatorName, organizationId, dateCreated,
             dateCompleted, mediaPackage,
             Optional.ofNullable(operations).orElseGet(Collections::emptyList)
-                    .stream().map(JaxbWorkflowOperationInstance::toWorkflowOperationInstance).collect(Collectors.toList()),
+                    .stream().map(JaxbWorkflowOperationInstance::toWorkflowOperationInstance)
+                    .collect(Collectors.toList()),
             Optional.ofNullable(configurations).orElseGet(Collections::emptySet)
                     .stream()
                     .collect(Collectors.toMap(JaxbWorkflowConfiguration::getKey, JaxbWorkflowConfiguration::getValue)),
             mediaPackageId, seriesId);
+    // Set workflow reference in each operation
+    wf.getOperations().stream().forEach(wo -> wo.setWorkflowInstance(wf));
+    return wf;
   }
 
   @Override

@@ -2213,7 +2213,9 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
               }
               current++;
 
-              if (!WorkflowUtil.isActive(WorkflowInstance.WorkflowState.values()[indexData.getState()].toString())) {
+              // Include PAUSED; otherwise, paused workflows will show up as "Finished"
+              if (!WorkflowUtil.isActive(WorkflowInstance.WorkflowState.values()[indexData.getState()].toString())
+                      || WorkflowState.PAUSED == WorkflowInstance.WorkflowState.values()[indexData.getState()]) {
                 String orgid = indexData.getOrganizationId();
                 if (null == orgid) {
                   String mpId = indexData.getMediaPackageId();
