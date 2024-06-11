@@ -1,5 +1,12 @@
 # Opencast 14: Release Notes
 
+## Opencast 14.13
+
+Opencast 14.13 release includes bug fixes and improvements. This is the final release of Opencast 14.
+
+See [changelog](changelog.md#opencast-1413) for a comprehensive list of changes.
+
+
 ## Opencast 14.12
 
 Opencast 14.12 release includes bug fixes and improvements.
