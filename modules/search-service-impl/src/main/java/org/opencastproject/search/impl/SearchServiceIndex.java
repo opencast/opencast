@@ -65,6 +65,7 @@ import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -244,8 +245,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
     List<DublinCoreCatalog> seriesList = Collections.emptyList();
     if (dc.hasValue(DublinCore.PROPERTY_IS_PART_OF)) {
       //Find the series (if any), filter for those which exist to prevent linking non-existent series
-      List<DublinCoreValue> seriesIds = dc.get(DublinCore.PROPERTY_IS_PART_OF);
-      seriesList = seriesIds.stream().map(DublinCoreValue::getValue).map(s -> {
+      seriesList = dc.get(DublinCore.PROPERTY_IS_PART_OF).stream().map(DublinCoreValue::getValue).map(s -> {
         try {
           return seriesService.getSeries(s);
         } catch (NotFoundException e) {
@@ -259,23 +259,6 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
         }
         return null;
       }).filter(Objects::nonNull).collect(Collectors.toList());
-
-      //Get the list of filtered series IDs from the list of filtered series
-      List<String> filteredSeriesIds = seriesList.stream().map(s -> {
-        return s.getFirst(DublinCore.PROPERTY_IDENTIFIER);
-      }).collect(Collectors.toList());
-
-      //Note that if a series is listed in the input, but is not present in the series service then this will clear it
-      // from the indexed data.  This is deliberate, since a series which does not exist should not be listed as an ep's
-      // series.  This (IMO) is a data consistency issue - it should not happen, but better to handle it than break.
-      if (0 == filteredSeriesIds.size()) {
-        dc.remove(DublinCore.PROPERTY_IS_PART_OF);
-      } else {
-        //An episode is only part of *one* series, right?!
-        for (String sid : filteredSeriesIds) {
-          dc.set(DublinCore.PROPERTY_IS_PART_OF, sid);
-        }
-      }
     }
 
     String orgId = securityService.getOrganization().getId();
@@ -393,7 +376,13 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
                 SearchResult.INDEX_ACL, SearchResult.dehydrateAclForIndex(seriesAcl),
                 SearchResult.MODIFIED_DATE, deletionString));
             var updateRequest = new UpdateRequest(INDEX_NAME, seriesId).doc(gson.toJson(json), XContentType.JSON);
-            esIndex.getClient().update(updateRequest, RequestOptions.DEFAULT);
+            try {
+              esIndex.getClient().update(updateRequest, RequestOptions.DEFAULT);
+            } catch (ElasticsearchStatusException e) {
+              if (RestStatus.NOT_FOUND == e.status()) {
+                logger.warn("Attempted to modify {}, but that series does not exist in the index.", seriesId);
+              }
+            }
           } else {
             // Remove series if there are no episodes in the series any longer
             deleteSeriesSynchronously(seriesId);
@@ -424,9 +413,17 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
           "deleted", Instant.now().getEpochSecond(),
           "modified", Instant.now().toString()));
       var updateRequest = new UpdateRequest(INDEX_NAME, seriesId).doc(gson.toJson(json), XContentType.JSON);
-      UpdateResponse response = esIndex.getClient().update(updateRequest, RequestOptions.DEFAULT);
-      //NB: We're marking things as deleted but *not actually deleting them**
-      return DocWriteResponse.Result.UPDATED == response.getResult();
+      try {
+        UpdateResponse response = esIndex.getClient().update(updateRequest, RequestOptions.DEFAULT);
+        //NB: We're marking things as deleted but *not actually deleting them**
+        return DocWriteResponse.Result.UPDATED == response.getResult();
+      } catch (ElasticsearchStatusException e) {
+        if (RestStatus.NOT_FOUND == e.status()) {
+          logger.debug("Attempted to delete {}, but that series does not exist in the index.", seriesId);
+          return true;
+        }
+        throw new SearchException(e);
+      }
     } catch (IOException e) {
       throw new SearchException("Could not delete series " + seriesId + " from index", e);
     }
