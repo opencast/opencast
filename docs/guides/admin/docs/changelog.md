@@ -529,6 +529,25 @@ Opencast 15
 Opencast 14
 -----------
 
+
+### Opencast 14.13
+
+*Released on June 11th, 2024*
+
+- [[#5844](https://github.com/opencast/opencast/pull/5844)] -
+  Fixes handling of OAI-PMH setSpec
+- [[#5843](https://github.com/opencast/opencast/pull/5843)] -
+  Invalidate cached user on changes
+- [[#5840](https://github.com/opencast/opencast/pull/5840)] -
+  Remove series ACL file from workspaces
+- [[#5839](https://github.com/opencast/opencast/pull/5839)] -
+  More configuration options for database pool settings
+- [[#5769](https://github.com/opencast/opencast/pull/5769)] -
+  Document Translation Change Rules
+- [[#5754](https://github.com/opencast/opencast/pull/5754)] -
+  Series ACL and extended metadata handling on ingest
+
+
 ### Opencast 14.12
 
 *Released on May 14th, 2024*
