@@ -30,6 +30,7 @@ import org.opencastproject.search.api.SearchResultList;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.search.impl.SearchServiceImpl;
 import org.opencastproject.search.impl.SearchServiceIndex;
+import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
@@ -187,11 +188,10 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     var user = securityService.getUser();
     var orgAdminRole = securityService.getOrganization().getAdminRole();
     if (!user.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE) && !user.hasRole(orgAdminRole)) {
-      var roleQuery = QueryBuilders.boolQuery();
-      for (var role: user.getRoles()) {
-        roleQuery.should(QueryBuilders.matchQuery(SearchResult.INDEX_ACL + ".read", role.getName()));
-      }
-      query.must(roleQuery);
+      query.must(QueryBuilders.termsQuery(
+              SearchResult.INDEX_ACL + ".read",
+              user.getRoles().stream().map(Role::getName).collect(Collectors.toList())
+      ));
     }
 
     var size = NumberUtils.toInt(limit, 20);
@@ -361,11 +361,10 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     var orgAdminRole = securityService.getOrganization().getAdminRole();
     var admin = user.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE) || user.hasRole(orgAdminRole);
     if (!admin) {
-      var roleQuery = QueryBuilders.boolQuery();
-      for (var role: user.getRoles()) {
-        roleQuery.should(QueryBuilders.matchQuery(SearchResult.INDEX_ACL + ".read", role.getName()));
-      }
-      query.must(roleQuery);
+      query.must(QueryBuilders.termsQuery(
+              SearchResult.INDEX_ACL + ".read",
+              user.getRoles().stream().map(Role::getName).collect(Collectors.toList())
+      ));
     }
 
     logger.debug("limit: {}, offset: {}", limit, offset);
