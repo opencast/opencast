@@ -1,5 +1,17 @@
 # Opencast 15: Release Notes
 
+## Opencast 15.6
+
+### Behavior changes
+
+- **Handle lang tag by asset upload correctly:**
+The new behavior of handling multilingual subtitles expect the language is
+set with a lang:LANG-CODE tag. This should be handled properly.
+[[#5880](https://github.com/opencast/opencast/pull/5880)]
+- **Improve Assetmanager multi store behavior:**
+From now on all snapshots of a mediapackage are stored in the same asset store.
+[[#5857](https://github.com/opencast/opencast/pull/5857)]
+
 ## Opencast 15.5
 
 ### Improvements
