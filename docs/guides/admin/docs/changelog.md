@@ -4,6 +4,27 @@ Changelog
 Opencast 15
 -----------
 
+### Opencast 15.6
+
+- [[#5922](https://github.com/opencast/opencast/pull/5922)] -
+  Update Editor to 2024-06-11
+- [[#5880](https://github.com/opencast/opencast/pull/5880)] -
+  Handle lang tag by asset upload correctly
+- [[#5879](https://github.com/opencast/opencast/pull/5879)] -
+  Skip subtitle generation from tracks without audio stream
+- [[#5873](https://github.com/opencast/opencast/pull/5873)] -
+  Return dates as UNIX timestamp
+- [[#5860](https://github.com/opencast/opencast/pull/5860)] -
+  Fix missing configuration panel for fast.yaml workflow
+- [[#5858](https://github.com/opencast/opencast/pull/5858)] -
+  Change segment `startTime` from mpeg7 to milliseconds in Tobira API
+- [[#5857](https://github.com/opencast/opencast/pull/5857)] -
+  Improve Assetmanager multi store behavior
+- [[#5832](https://github.com/opencast/opencast/pull/5832)] -
+  Log Excessively Large Jobs Status
+- [[#5829](https://github.com/opencast/opencast/pull/5829)] -
+  Ignore subtitle tracks in select-tracks WHO
+
 ### Opencast 15.5
 
 - [[#5757](https://github.com/opencast/opencast/pull/5757)] -
