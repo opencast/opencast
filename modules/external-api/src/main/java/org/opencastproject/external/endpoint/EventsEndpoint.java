@@ -1992,8 +1992,15 @@ public class EventsEndpoint implements ManagedService {
           pathParameters = {
                   @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = STRING) },
           restParameters = {
-                  @RestParameter(description = "Flavor to add track to, e.g. captions/source+en", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
-                  @RestParameter(description = "If true, all other tracks in the specified flavor are REMOVED", isRequired = true, name = "overwriteExisting", type = RestParameter.Type.BOOLEAN),
+                  @RestParameter(description = "Flavor to add track to, e.g. captions/source",
+                      isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
+                  @RestParameter(description = "Comma separated list of tags for the given track, e.g. archive,publish. "
+                      + "If a 'lang:LANG-CODE' tag exists and overwriteExisting=true "
+                      + "only tracks with same lang tag and flavor will be replaced. This behavior is used for captions.",
+                      isRequired = false, name = "tags", type = RestParameter.Type.STRING),
+                  @RestParameter(description = "If true, all other tracks in the specified flavor are REMOVED. "
+                      + "If tags argument contains a lang:LANG-CODE tag, only elements with same tag would be removed.",
+                      isRequired = true, name = "overwriteExisting", type = RestParameter.Type.BOOLEAN),
                   @RestParameter(description = "The track file", isRequired = true, name = "track", type = RestParameter.Type.FILE),
           },
           responses = {
@@ -2009,6 +2016,8 @@ public class EventsEndpoint implements ManagedService {
       MediaPackageElementFlavor tmpFlavor = MediaPackageElementFlavor.parseFlavor("addTrack/temporary");
       MediaPackageElementFlavor newFlavor = null;
       Opt<Event> event;
+      List<String> tags = null;
+      String langTag = null;
 
       try {
         event = indexService.getEvent(id, elasticsearchIndex);
@@ -2043,6 +2052,19 @@ public class EventsEndpoint implements ManagedService {
             } catch (IllegalArgumentException e) {
               return RestUtil.R.badRequest(String.format("Could not parse flavor %s; %s", flavorString, e.getMessage()));
             }
+          } else if ("tags".equals(fieldName)) {
+            String tagsString = Streams.asString(item.openStream());
+            if (StringUtils.isNotBlank(tagsString)) {
+              tags = List.of(StringUtils.split(tagsString, ','));
+              // find lang tag if exists
+              for (String tag : tags) {
+                if (StringUtils.startsWith(StringUtils.trimToEmpty(tag), "lang:")) {
+                  // lang tag is set
+                  langTag = StringUtils.trimToEmpty(tag);
+                  break;
+                }
+              }
+            }
           } else if ("overwriteExisting".equals(fieldName)) {
             overwriteExisting = Boolean.parseBoolean(Streams.asString(item.openStream()));
           }
@@ -2058,13 +2080,21 @@ public class EventsEndpoint implements ManagedService {
         // remove existing attachments of the new flavor
         Track[] existing = mp.getTracks(newFlavor);
         for (int i = 0; i < existing.length; i++) {
-          mp.remove(existing[i]);
-          logger.debug("Overwriting existing asset {} {}", tmpFlavor, newFlavor);
+          // if lang tag is set, remove only matching elements
+          if (null == langTag || existing[i].containsTag(langTag)) {
+            mp.remove(existing[i]);
+            logger.debug("Overwriting existing asset {} {}", tmpFlavor, newFlavor);
+          }
         }
       }
       // correct the flavor of the new attachment
       for (Track track : mp.getTracks(tmpFlavor)) {
         track.setFlavor(newFlavor);
+        if (null != tags) {
+          for (String tag : tags) {
+            track.addTag(tag);
+          }
+        }
       }
       logger.debug("Updated asset {} {}", tmpFlavor, newFlavor);
 
