@@ -155,6 +155,11 @@ public class
     Boolean translate = getTranslationMode(mediaPackage, workflowInstance);
 
     for (Track track : tracks) {
+      if (!track.hasAudio()) {
+        logger.info("Track {} from media package {} doesn't contain audio stream. Skip subtitle generation.",
+            track.getFlavor(), mediaPackage.getIdentifier());
+        continue;
+      }
       createSubtitle(track, languageCode, mediaPackage, tagsAndFlavors, appendSubtitleAs, translate);
     }
 

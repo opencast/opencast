@@ -135,6 +135,11 @@ public class AmberscriptStartTranscriptionOperationHandler extends AbstractWorkf
     Collection<Track> elements = elementSelector.select(mediaPackage, false);
     Job job = null;
     for (Track track : elements) {
+      if (!track.hasAudio()) {
+        logger.info("Track {} from media package {} doesn't contain audio stream. Skip subtitle generation.",
+            track.getFlavor(), mediaPackage.getIdentifier());
+        continue;
+      }
       try {
         job = service.startTranscription(mediaPackage.getIdentifier().toString(), track, language, jobType, speaker,
             transcriptionType, glossary, transcriptionStyle, targetLanguage);
