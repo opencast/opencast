@@ -20,13 +20,10 @@
  */
 package org.opencastproject.assetmanager.api.storage;
 
-import static com.entwinemedia.fn.Equality.eq;
-
 import org.opencastproject.assetmanager.api.Version;
 
-import com.entwinemedia.fn.Equality;
-
 import java.io.Serializable;
+import java.util.Objects;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.concurrent.Immutable;
@@ -78,15 +75,15 @@ public final class StoragePath implements Serializable {
   }
 
   private boolean eqFields(StoragePath that) {
-    return eq(this.mediaPackageId, that.mediaPackageId)
-            && eq(this.mediaPackageElementId, that.mediaPackageElementId)
-            && eq(this.organizationId, that.organizationId)
-            && eq(this.version, that.version);
+    return Objects.equals(this.mediaPackageId, that.mediaPackageId)
+            && Objects.equals(this.mediaPackageElementId, that.mediaPackageElementId)
+            && Objects.equals(this.organizationId, that.organizationId)
+            && Objects.equals(this.version, that.version);
   }
 
   @Override
   public int hashCode() {
-    return Equality.hash(mediaPackageId, mediaPackageElementId, organizationId, version);
+    return Objects.hash(mediaPackageId, mediaPackageElementId, organizationId, version);
   }
 
   @Override public String toString() {

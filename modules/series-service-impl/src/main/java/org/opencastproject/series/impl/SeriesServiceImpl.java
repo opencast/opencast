@@ -513,7 +513,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
     try {
       List<SeriesEntity> databaseSeries = persistence.getAllSeries();
       final int total = databaseSeries.size();
-      logIndexRebuildBegin(logger, index.getIndexName(), total, "series");
+      logIndexRebuildBegin(logger, total, "series");
       int current = 0;
       int n = 20;
       var updatedSeriesRange = new ArrayList<Series>();
@@ -579,13 +579,13 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
         if (updatedSeriesRange.size() >= n || current >= databaseSeries.size()) {
           // do the actual index update
           index.bulkSeriesUpdate(updatedSeriesRange);
-          logIndexRebuildProgress(logger, index.getIndexName(), total, current, n);
+          logIndexRebuildProgress(logger, total, current, n);
           updatedSeriesRange.clear();
         }
       }
     } catch (Exception e) {
-      logIndexRebuildError(logger, index.getIndexName(), e);
-      throw new IndexRebuildException(index.getIndexName(), getService(), e);
+      logIndexRebuildError(logger, e);
+      throw new IndexRebuildException(getService(), e);
     }
   }
 

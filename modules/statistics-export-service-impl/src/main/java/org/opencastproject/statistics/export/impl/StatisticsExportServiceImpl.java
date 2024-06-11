@@ -598,7 +598,7 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
   }
 
   private List<MetadataField> getEventMetadata(String resourceId) {
-    final Opt<MediaPackage> optMp = this.assetManager.getMediaPackage(resourceId);
+    final Optional<MediaPackage> optMp = this.assetManager.getMediaPackage(resourceId);
     if (optMp.isEmpty()) {
       return Collections.emptyList();
     }

@@ -1250,8 +1250,8 @@ public class SchedulerServiceImplTest {
     AQueryBuilder query = assetManager.createQuery();
     AResult result = query.select(query.snapshot()).where(query.organizationId().eq(new DefaultOrganization().getId())
             .and(query.mediaPackageId(mp.getIdentifier().toString())).and(query.version().isLatest())).run();
-    Opt<ARecord> record = result.getRecords().head();
-    assertFalse(record.isSome());
+    Optional<ARecord> record = result.getRecords().stream().findFirst();
+    assertFalse(record.isPresent());
   }
 
   @Test
@@ -1273,7 +1273,7 @@ public class SchedulerServiceImplTest {
     {
       final RichAResult r = enrich(q.select(q.snapshot()).run());
       assertEquals("The asset manager should contain one episode", 1, r.getSize());
-      assertEquals("Episode ID", mpId, r.getRecords().head2().getMediaPackageId());
+      assertEquals("Episode ID", mpId, r.getRecords().stream().findFirst().get().getMediaPackageId());
     }
     // remove event
     schedSvc.removeEvent(mpId);
@@ -1675,7 +1675,7 @@ public class SchedulerServiceImplTest {
       public Snapshot prepareForDelivery(Snapshot snapshot) {
         return AssetManagerImpl.rewriteUris(snapshot, new Fn<MediaPackageElement, URI>() {
           @Override public URI apply(MediaPackageElement mpe) {
-            String baseName = AssetManagerImpl.getFileNameFromUrn(mpe).getOr(mpe.getElementType().toString());
+            String baseName = AssetManagerImpl.getFileNameFromUrn(mpe).orElse(mpe.getElementType().toString());
 
             // the returned uri must match the path of the {@link #getAsset} method
             return uri(archiveDir.toURI(),
@@ -1764,13 +1764,13 @@ public class SchedulerServiceImplTest {
       }
 
       @Override
-      public Opt<InputStream> get(StoragePath path) throws AssetStoreException {
+      public Optional<InputStream> get(StoragePath path) throws AssetStoreException {
         File file = getFirstFile(new File(archiveDir, UrlSupport.concat(path.getMediaPackageId(),
                 path.getVersion().toString(), path.getMediaPackageElementId())));
         InputStream inputStream;
         try {
           inputStream = new ByteArrayInputStream(FileUtils.readFileToByteArray(file));
-          return Opt.some(inputStream);
+          return Optional.of(inputStream);
         } catch (IOException e) {
           throw new RuntimeException(e);
         }

@@ -25,6 +25,7 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static org.opencastproject.util.doc.rest.RestParameter.Type;
 
+import org.opencastproject.playlists.PlaylistService;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.series.api.SeriesService;
@@ -101,6 +102,7 @@ public class TobiraEndpoint {
   private SearchService searchService;
   private SeriesService seriesService;
   private AuthorizationService authorizationService;
+  private PlaylistService playlistService;
   private Workspace workspace;
 
   @Activate
@@ -121,6 +123,11 @@ public class TobiraEndpoint {
   @Reference
   public void setAuthorizationService(AuthorizationService service) {
     this.authorizationService = service;
+  }
+
+  @Reference
+  public void setPlaylistService(PlaylistService service) {
+    this.playlistService = service;
   }
 
   @Reference
@@ -199,7 +206,7 @@ public class TobiraEndpoint {
       var json = Harvest.harvest(
           preferredAmount,
           new Date(since),
-          searchService, seriesService, authorizationService, workspace);
+          searchService, seriesService, authorizationService, playlistService, workspace);
 
       // TODO: encoding
       return Response.ok(json.toJson()).build();

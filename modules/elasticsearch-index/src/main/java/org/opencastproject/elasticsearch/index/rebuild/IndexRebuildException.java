@@ -56,22 +56,18 @@ public class IndexRebuildException extends Exception {
   /**
    * Constructor that builds an error message.
    *
-   * @param indexName
-   *           The name of the index that's being rebuild.
    * @param service
    *           The service that's adding to the index.
    * @param cause
    *           The cause.
    */
-  public IndexRebuildException(String indexName, IndexRebuildService.Service service, Throwable cause) {
-    super(String.format("Error updating the %s index for service %s", indexName, service.name()), cause);
+  public IndexRebuildException(IndexRebuildService.Service service, Throwable cause) {
+    super(String.format("Error updating the index for service %s", service.name()), cause);
   }
 
   /**
    * Constructor that builds an error message.
    *
-   * @param indexName
-   *           The name of the index that's being rebuild.
    * @param service
    *           The service that's adding to the index.
    * @param org
@@ -79,9 +75,9 @@ public class IndexRebuildException extends Exception {
    * @param cause
    *           The cause.
    */
-  public IndexRebuildException(String indexName, IndexRebuildService.Service service, Organization org,
+  public IndexRebuildException(IndexRebuildService.Service service, Organization org,
           Throwable cause) {
-    super(String.format("Error updating the %s index for service %s and organization %s", indexName, service.name(),
+    super(String.format("Error updating the index for service %s and organization %s", service.name(),
             org.getId()), cause);
   }
 }

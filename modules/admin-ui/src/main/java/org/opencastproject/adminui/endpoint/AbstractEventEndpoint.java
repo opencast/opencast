@@ -909,10 +909,10 @@ public abstract class AbstractEventEndpoint {
 
       Source eventSource = getIndexService().getEventSource(optEvent.get());
       if (eventSource == Source.ARCHIVE) {
-        Opt<MediaPackage> mediaPackage = getAssetManager().getMediaPackage(eventId);
+        Optional<MediaPackage> mediaPackage = getAssetManager().getMediaPackage(eventId);
         Option<AccessControlList> aclOpt = Option.option(accessControlList);
         // the episode service is the source of authority for the retrieval of media packages
-        if (mediaPackage.isSome()) {
+        if (mediaPackage.isPresent()) {
           MediaPackage episodeSvcMp = mediaPackage.get();
           aclOpt.fold(new Option.EMatch<AccessControlList>() {
             // set the new episode ACL

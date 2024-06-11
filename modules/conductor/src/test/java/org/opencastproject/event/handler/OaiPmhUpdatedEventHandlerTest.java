@@ -59,9 +59,6 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.Stream;
-import com.entwinemedia.fn.data.Opt;
-
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.EasyMockRule;
@@ -75,9 +72,12 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.LinkedHashSet;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -288,11 +288,11 @@ public class OaiPmhUpdatedEventHandlerTest extends EasyMockSupport {
     expect(selectQuery2.run()).andReturn(queryResult);
     expect(assetManagerMock.createQuery()).andReturn(queryBuilder);
     snapshotVersionCapture = EasyMock.newCapture();
-    expect(assetManagerMock.toVersion(capture(snapshotVersionCapture))).andReturn(Opt.some(mock(Version.class)));
+    expect(assetManagerMock.toVersion(capture(snapshotVersionCapture))).andReturn(Optional.of(mock(Version.class)));
     ARecord record = mock(ARecord.class);
-    expect(queryResult.getRecords()).andReturn(Stream.$(record));
+    expect(queryResult.getRecords()).andReturn(new LinkedHashSet<>(Arrays.asList(record)));
     Snapshot snapshot = mock(Snapshot.class);
-    expect(record.getSnapshot()).andReturn(Opt.some(snapshot));
+    expect(record.getSnapshot()).andReturn(Optional.of(snapshot));
     expect(snapshot.getMediaPackage()).andReturn(mediaPackage);
   }
 

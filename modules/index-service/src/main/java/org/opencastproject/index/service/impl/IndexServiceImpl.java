@@ -1140,8 +1140,16 @@ public class IndexServiceImpl implements IndexService {
           String flavorSubType = (String)((JSONObject) assetDataMap.get(asset)).get("flavorSubType");
           String tags = (String)((JSONObject) assetDataMap.get(asset)).get("tags");
           String[] tagsArray = null;
+          // Captions may have lang:LANG_CODE tag set.
+          String langTag = null;
           if (tags != null) {
             tagsArray = tags.split(",");
+            for (String tag : tagsArray) {
+              if (StringUtils.startsWith(StringUtils.trimToEmpty(tag), "lang:")) {
+                langTag = StringUtils.trimToEmpty(tag);
+                break;
+              }
+            }
           }
           // Use 'multiple' setting to allow multiple elements with same flavor or not.
           boolean overwriteExisting = !(Boolean) ((JSONObject) assetDataMap.get(asset)).getOrDefault("multiple", false);
@@ -1154,8 +1162,11 @@ public class IndexServiceImpl implements IndexService {
               // remove existing attachments of the new flavor
               Attachment[] existing = mp.getAttachments(newElemflavor);
               for (int i = 0; i < existing.length; i++) {
-                mp.remove(existing[i]);
-                logger.info("Overwriting existing asset {} {}", type, newElemflavor);
+                // if lang tag is set, we should only remove elements with the same lang tag
+                if (null == langTag || existing[i].containsTag(langTag)) {
+                  mp.remove(existing[i]);
+                  logger.info("Overwriting existing asset {} {}", type, newElemflavor);
+                }
               }
             }
             // correct the flavor of the new attachment
@@ -1172,8 +1183,11 @@ public class IndexServiceImpl implements IndexService {
               // remove existing catalogs of the new flavor
               Catalog[] existing = mp.getCatalogs(newElemflavor);
               for (int i = 0; i < existing.length; i++) {
-                mp.remove(existing[i]);
-                logger.info("Overwriting existing asset {} {}", type, newElemflavor);
+                // if lang tag is set, we should only remove elements with the same lang tag
+                if (null == langTag || existing[i].containsTag(langTag)) {
+                  mp.remove(existing[i]);
+                  logger.info("Overwriting existing asset {} {}", type, newElemflavor);
+                }
               }
             }
             Catalog[] catArray = mp.getCatalogs(new MediaPackageElementFlavor(assetOrig, "*"));
@@ -1192,8 +1206,11 @@ public class IndexServiceImpl implements IndexService {
               // remove existing catalogs of the new flavor
               Track[] existing = mp.getTracks(newElemflavor);
               for (int i = 0; i < existing.length; i++) {
-                mp.remove(existing[i]);
-                logger.info("Overwriting existing asset {} {}", type, newElemflavor);
+                // if lang tag is set, we should only remove elements with the same lang tag
+                if (null == langTag || existing[i].containsTag(langTag)) {
+                  mp.remove(existing[i]);
+                  logger.info("Overwriting existing asset {} {}", type, newElemflavor);
+                }
               }
             }
             Track[]  trackArray = mp.getTracks(new MediaPackageElementFlavor(assetOrig, "*"));
@@ -1595,8 +1612,8 @@ public class IndexServiceImpl implements IndexService {
           throw new IndexServiceException("Unable to get event media package " + event.getIdentifier() + " from WorkflowService because", e);
         }
       case ARCHIVE:
-        Opt<MediaPackage> mpOpt = assetManager.getMediaPackage(event.getIdentifier());
-        if (mpOpt.isSome()) {
+        Optional<MediaPackage> mpOpt = assetManager.getMediaPackage(event.getIdentifier());
+        if (mpOpt.isPresent()) {
           logger.debug("Found event in archive with id {}", event.getIdentifier());
           return mpOpt.get();
         }

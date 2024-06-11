@@ -29,42 +29,44 @@ import org.opencastproject.assetmanager.api.query.ARecord;
 import org.opencastproject.assetmanager.impl.persistence.SnapshotDto;
 
 import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.data.Opt;
+
+import java.util.List;
+import java.util.Optional;
 
 public final class ARecordImpl implements ARecord {
   private final long snapshotId;
   private final String mediaPackageId;
-  private final Stream<Property> properties;
-  private Opt<Snapshot> snapshot;
+  private final List<Property> properties;
+  private Optional<Snapshot> snapshot;
   private Opt<SnapshotDto> snapshotDto;
 
   public ARecordImpl(
           long snapshotId,
           String mediaPackageId,
-          Stream<Property> properties) {
+          List<Property> properties) {
     this.snapshotId = snapshotId;
     this.mediaPackageId = mediaPackageId;
     this.properties = properties;
-    this.snapshot = Opt.none(Snapshot.class);
+    this.snapshot = Optional.empty();
     this.snapshotDto = Opt.none(SnapshotDto.class);
   }
 
   public ARecordImpl(
           long snapshotId,
           String mediaPackageId,
-          Stream<Property> properties,
+          List<Property> properties,
           Snapshot snapshot) {
     this(snapshotId, mediaPackageId, properties);
     if (snapshot != null) {
-      this.snapshot = Opt.some(snapshot);
+      this.snapshot = Optional.of(snapshot);
     }
   }
 
   public ARecordImpl(
           long snapshotId,
           String mediaPackageId,
-          Stream<Property> properties,
+      List<Property> properties,
           SnapshotDto snapshotDto) {
     this(snapshotId, mediaPackageId, properties);
     if (snapshotDto != null) {
@@ -82,7 +84,7 @@ public final class ARecordImpl implements ARecord {
     return mediaPackageId;
   }
 
-  @Override public Stream<Property> getProperties() {
+  @Override public List<Property> getProperties() {
     return properties;
   }
 
@@ -93,9 +95,9 @@ public final class ARecordImpl implements ARecord {
    *
    * @return the snapshot
    */
-  @Override public Opt<Snapshot> getSnapshot() {
-    if (snapshot.isNone() && snapshotDto.isSome()) {
-      snapshot = Opt.some(snapshotDto.get().toSnapshot());
+  @Override public Optional<Snapshot> getSnapshot() {
+    if (snapshot.isEmpty() && snapshotDto.isSome()) {
+      snapshot = Optional.of(snapshotDto.get().toSnapshot());
     }
     return snapshot;
   }

@@ -25,6 +25,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementSelector;
+import org.opencastproject.mediapackage.Publication;
 
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
@@ -34,6 +35,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -65,6 +67,26 @@ public abstract class AbstractMediaPackageElementSelector<T extends MediaPackage
   @Override
   public Collection<T> select(MediaPackage mediaPackage, boolean withTagsAndFlavors) {
    return select(Arrays.asList(mediaPackage.getElements()), withTagsAndFlavors);
+  }
+
+  /**
+   * Similar to above, but will get media package elements from the given publication instead.
+   */
+  @Override
+  public Collection<T> select(MediaPackage mediaPackage, String publicationChannel, boolean withTagsAndFlavors) {
+    Optional<Publication> publication = Arrays.stream(mediaPackage.getPublications())
+        .filter(channel -> channel.getChannel().equals(publicationChannel)).findFirst();
+
+    // Skip if the media package does not contain a matching publication
+    if (publication.isEmpty()) {
+      return new LinkedHashSet<T>();
+    }
+
+    List<MediaPackageElement> list = new ArrayList(Arrays.asList(publication.get().getTracks()));
+    list.addAll(new ArrayList(Arrays.asList(publication.get().getAttachments())));
+    list.addAll(new ArrayList(Arrays.asList(publication.get().getCatalogs())));
+
+    return select(list, withTagsAndFlavors);
   }
 
   @Override

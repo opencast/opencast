@@ -263,7 +263,7 @@
       "TOBIRA_OVERRIDE_NAME": "所选页面的标题将被系列的标题覆盖。",
       "TOBIRA_NO_PATH_SEGMENT": "页面需要路径部分。",
       "TOBIRA_NOT_MOUNTED": "无法将系列挂载到 tobira。",
-      "TOBIRA_PATH_SEGMENT_INVALID": "路径段无效。 一个有效的路径段长度至少为2个字符，不包含任何空白或控制字符，不能包含 '<>\"[\\]^`{|}#%/? '，不能以字符 '-+~@_!$&;:.,=*'()'。",
+      "TOBIRA_PATH_SEGMENT_INVALID": "路径段无效。 一个有效的路径段长度至少为2个字符，不包含任何空白或控制字符，不能包含 '<>\"[\\]^`{|}#%\/? '，不能以字符 '-+~@_!$&;:.,=*'()'。",
       "TOBIRA_PATH_SEGMENT_UNIQUE": "一个页面的路径部分必须在所有同级页面中保持唯一。",
       "TOBIRA_PAGE_NOT_FOUND": "您试图访问的页面不存在。您可以尝试从头开始访问。",
       "TOBIRA_SERVER_ERROR": " 连接到 Tobira 时出错。请联系系统管理员或稍后重试。",
@@ -448,7 +448,7 @@
          "FORM_STATE": {
             "ORGANISATION": "组织",
             "DEPARTMENT": "部门",
-            "COUNTRY": "国家/地区",
+            "COUNTRY": "国家\/地区",
             "POSTAL_CODE": "邮政编码",
             "CITY": "城市",
             "CONTACT_INFO": "联系信息",
@@ -1807,7 +1807,7 @@
       "ACTIONS": {
          "SPLIT": "分割",
          "SPLIT_TOOLTIP": "在当前光标位置执行分段。",
-         "CUT": "隐藏/显示",
+         "CUT": "隐藏\/显示",
          "CUT_TOOLTIP": "隐藏或显示选中的视频部分。",
          "REPLAY_SEGMENT": "从分段开始处播放",
          "REPLAY_SEGMENT_TOOLTIP": "从当前分段的开始处播放。",
@@ -1900,8 +1900,8 @@
          "PAUSE": "暂停",
          "NEXT_FRAME": "下一帧",
          "PREVIOUS_FRAME": "前一帧",
-         "NEXT_SEGMENT": "下一段 / 跳转到结束",
-         "PREVIOUS_SEGMENT": "前一段 / 跳转到开始",
+         "NEXT_SEGMENT": "下一段 \/ 跳转到结束",
+         "PREVIOUS_SEGMENT": "前一段 \/ 跳转到开始",
          "MUTE": "静音",
          "VOLUME": "音量"
       }
@@ -2202,7 +2202,7 @@
          "GENERAL": "概况",
          "PLAYER": "播放器",
          "EDITOR": "编辑器",
-         "ADD_MEDIA": "新建 事件/系列"
+         "ADD_MEDIA": "新建 事件\/系列"
       },
       "DESCRIPTIONS": {
          "GENERAL": {
@@ -2217,16 +2217,16 @@
             "CHEAT_SHEET": "快捷键"
          },
          "PLAYER": {
-            "PLAY_PAUSE": "播放/暂停",
+            "PLAY_PAUSE": "播放\/暂停",
             "PREVIOUS_FRAME": "上一帧",
             "NEXT_FRAME": "下一帧",
             "STEP_BACKWARD": "后退10秒",
             "STEP_FORWARD": "快进10秒",
-            "PREVIOUS_SEGMENT": "前一个分段/跳到开始处",
-            "NEXT_SEGMENT": "后一个分段/跳到结尾处",
+            "PREVIOUS_SEGMENT": "前一个分段\/跳到开始处",
+            "NEXT_SEGMENT": "后一个分段\/跳到结尾处",
             "VOLUME_UP": "增大音量",
             "VOLUME_DOWN": "减小音量",
-            "MUTE": "静音/取消静音"
+            "MUTE": "静音\/取消静音"
          },
          "EDITOR": {
             "SPLIT_AT_CURRENT_TIME": "分割",
@@ -2237,7 +2237,7 @@
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "分段结尾"
          },
          "ADD_MEDIA": {
-            "NEXT_TAB": "下一个标签页 / 创建",
+            "NEXT_TAB": "下一个标签页 \/ 创建",
             "PREVIOUS_TAB": "上一个标签页"
          }
       }
@@ -2275,7 +2275,7 @@
          "PUBLISHEDHOURS": "已发布视频的小时数"
       },
       "DESCRIPTION": {
-         "RANDOM": "显示随机数据作为展示。您可以通过删除 etc/providers 中相应的统计定义json 来禁用此图表。",
+         "RANDOM": "显示随机数据作为展示。您可以通过删除 etc\/providers 中相应的统计定义json 来禁用此图表。",
          "VIEWS_SUM": "显示单位时间内的查看数。",
          "VIEWS_AVG": "显示单位时间内的平均每天查看数。",
          "PUBLISHEDHOURS": "显示已发布的视频小时数"

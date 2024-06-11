@@ -31,7 +31,6 @@ import org.opencastproject.oaipmh.persistence.OaiPmhEntity;
 import org.opencastproject.oaipmh.persistence.OaiPmhSetDefinition;
 import org.opencastproject.oaipmh.persistence.OaiPmhSetDefinitionFilter;
 import org.opencastproject.oaipmh.persistence.Query;
-import org.opencastproject.oaipmh.persistence.QueryBuilder;
 import org.opencastproject.oaipmh.persistence.SearchResult;
 import org.opencastproject.oaipmh.persistence.SearchResultElementItem;
 import org.opencastproject.oaipmh.persistence.SearchResultItem;
@@ -48,9 +47,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.regex.Pattern;
@@ -194,7 +193,6 @@ public abstract class AbstractOaiPmhDatabase implements OaiPmhDatabase {
 
   private SearchResult searchInternal(Query query, int chunkSize) {
     final String requestSetSpec = query.getSetSpec().getOrElseNull();
-    final List<SearchResultItem> filteredItems = new ArrayList<>();
     Date lastDate = new Date();
     long resultSize;
     long resultOffset;
@@ -242,56 +240,29 @@ public abstract class AbstractOaiPmhDatabase implements OaiPmhDatabase {
       return createSearchResult(typedQuery);
     });
 
-    if (requestSetSpec != null) {
-      Optional<OaiPmhSetDefinition> requestedSetDef = query.getSetDefinitions().stream()
-          .filter(def -> StringUtils.equals(def.getSetSpec(), requestSetSpec))
-          .findFirst();
-      // return empty result if there is no definition for a requested setSpec
-      if (requestedSetDef.isEmpty()) {
-        return new SearchResultImpl(result.getOffset(), result.getLimit(), new ArrayList<>());
-      }
+    if (requestSetSpec == null) {
+      return new SearchResultImpl(result.getOffset(), result.getLimit(), result.getItems());
     }
 
+    // If we are here, setSpec request is ongoing
+    final List<SearchResultItem> filteredItems = new ArrayList<>();
     for (SearchResultItem item : result.getItems()) {
       for (OaiPmhSetDefinition setDef : query.getSetDefinitions()) {
         if (matchSetDef(setDef, item.getElements())) {
           item.addSetSpec(setDef.getSetSpec());
         }
       }
-      if (requestSetSpec == null || item.getSetSpecs().contains(requestSetSpec)) {
+      if (item.getSetSpecs().contains(requestSetSpec)) {
         filteredItems.add(item);
+      } else {
+        // If the setSpec does not match, we should mark this item as deleted for this specific setSpec
+        filteredItems.add(new SearchResultItemImpl(item.getId(), item.getMediaPackageXml(), item.getOrganization(),
+            item.getRepository(), item.getModificationDate(), true, item.getMediaPackage(),
+            item.getElements(), Arrays.asList(requestSetSpec)));
       }
-    }
-    resultSize = result.size();
-    resultOffset = result.getOffset();
-    resultLimit = result.getLimit();
-    if (requestSetSpec != null && resultSize == chunkSize) {
-      lastDate = result.getItems().get(result.getItems().size() - 1).getModificationDate();
-    }
 
-    if (requestSetSpec != null) {
-      // only continue if we got the amount of results we requested in the first place
-      // otherwise, we have no more results and it does not make any sense to continue
-      logger.debug("result.size={}, chunk.size={}", resultSize, chunkSize);
-      if (resultSize == chunkSize) {
-        final int limit = query.getLimit().getOrElse(-1);
-        logger.debug("filteredItems.size={}, query.limit={}", filteredItems.size(), limit);
-        if (filteredItems.size() == 0 || filteredItems.size() < limit) {
-          // No results left after filtering. Automatically request the next range to avoid returning empty results.
-          QueryBuilder subQuery = QueryBuilder.query(query).modifiedAfter(lastDate)
-                  .limit(limit - filteredItems.size())
-                  .subsequentRequest(true);
-          filteredItems.addAll(searchInternal(subQuery.build(), chunkSize).getItems());
-        }
-      }
     }
-
-    if (query.getLimit().isSome() && filteredItems.size() > query.getLimit().get()) {
-      logger.debug("limit items");
-      return new SearchResultImpl(resultOffset, query.getLimit().get(),
-              filteredItems.subList(0, query.getLimit().get()));
-    }
-    return new SearchResultImpl(resultOffset, resultLimit, filteredItems);
+    return new SearchResultImpl(result.getOffset(), result.getLimit(), filteredItems);
   }
 
   /**

@@ -33,8 +33,6 @@ import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
@@ -51,6 +49,7 @@ import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Optional;
 
 public class AbstractFileSystemAssetStoreTest {
   private static final String XML_EXTENSTION = ".xml";
@@ -179,8 +178,8 @@ public class AbstractFileSystemAssetStoreTest {
   @Test
   public void testGet() throws Exception {
     StoragePath storagePath = new StoragePath(ORG_ID, MP_ID, VERSION_2, MP_ELEM_ID);
-    Opt<InputStream> option = repo.get(storagePath);
-    assertTrue(option.isSome());
+    Optional<InputStream> option = repo.get(storagePath);
+    assertTrue(option.isPresent());
 
     InputStream original = null;
     InputStream repo = option.get();
@@ -198,8 +197,8 @@ public class AbstractFileSystemAssetStoreTest {
   @Test
   public void testGetBad() throws Exception {
     StoragePath storagePath = new StoragePath(ORG_ID, MP_ID, VERSION_1, MP_ELEM_ID);
-    Opt<InputStream> option = repo.get(storagePath);
-    assertFalse(option.isSome());
+    Optional<InputStream> option = repo.get(storagePath);
+    assertFalse(option.isPresent());
   }
 
   @Test

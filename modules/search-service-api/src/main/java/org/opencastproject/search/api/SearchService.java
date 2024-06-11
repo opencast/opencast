@@ -25,14 +25,24 @@ package org.opencastproject.search.api;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageException;
+import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.NotFoundException;
+
+import org.apache.commons.lang3.tuple.Pair;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+
+import java.util.Collection;
 
 /**
  * Provides search capabilities, possibly to the engage tools, possibly to other services.
  */
 public interface SearchService {
+
+  enum IndexEntryType {
+    Episode, Series
+  }
 
   /**
    * Identifier for service registration and location
@@ -49,12 +59,23 @@ public interface SearchService {
    * @throws MediaPackageException
    *           if an error occurs accessing the media package
    * @throws UnauthorizedException
-   *           if the current user is not authorized to add this mediapackage to the search index
+   *           if the current user is not authorized to add this media package to the search index
    * @throws ServiceRegistryException
    *           if the job for adding the mediapackage can not be created
    */
   Job add(MediaPackage mediaPackage) throws SearchException, MediaPackageException, UnauthorizedException,
           ServiceRegistryException;
+
+  /**
+   * Returns a list of {@link Organization},{@link MediaPackage} pairs of mediapackages within a series.
+   * Note that the Organization should always be the same since series should not cross organizational bounds.
+   *
+   * @param seriesId
+   *          the series ID to query
+   * @return
+   *          A list of {@link Organization},{@link MediaPackage} pairs of mediapackages within the series.
+   */
+  Collection<Pair<Organization, MediaPackage>> getSeries(String seriesId);
 
   /**
    * Immediately adds the mediapackage to the search index.
@@ -85,13 +106,14 @@ public interface SearchService {
   Job delete(String mediaPackageId) throws SearchException, UnauthorizedException, NotFoundException;
 
   /**
-   * Removes the series identified by <code>seriesId</code> from the search index.
+   * Removes the series identified by <code>seriseId</code> from the search index.  Does *not* remove the associated
+   * events from the index!
    *
    * @param seriesId
    *          id of the series to remove
-   * @return <code>true</code> if the Series was found and deleted
+   * @return <code>true</code> if the series was found and deleted
    * @throws SearchException
-   *           if an error occurs while removing the Series
+   *           if an error occurs while removing the series
    * @throws UnauthorizedException
    *           if the current user is not authorized to remove this series from the search index
    */
@@ -109,42 +131,30 @@ public interface SearchService {
   boolean deleteSynchronously(String mediaPackageId) throws SearchException;
 
   /**
-   * Find search results based on the specified query object
+   * Gets the {@link MediaPackage} for an event, based on its mediapackage ID.
    *
-   * @param q
-   *          The {@link SearchQuery} containing the details of the desired results
-   * @return The search result
+   * @param mediaPackageId
+   *          The ID of the mediapackage in question
+   * @return
+   *          The {@link MediaPackage}
+   * @throws NotFoundException
+   *          If the mediapackage is not found.
    * @throws SearchException
-   *           if an error occurs while searching for media packages
-   */
-  SearchResult getByQuery(SearchQuery q) throws SearchException;
-
-  /**
-   * Finds search results across any organization, protected by any access control. This should be used for
-   * administrative purposes, such as bulk edits based on metadata updates.
-   *
-   * @param q
-   *          The {@link SearchQuery} containing the details of the desired results
-   * @return The search result
-   * @throws SearchException
-   *           if an error occurs while searching for media packages
+   *          If an error occurs while searching for the mediapackage.
    * @throws UnauthorizedException
-   *           if the user does not an administrative role
+   *           if the current user is not authorized to view this mediapackage.
    */
-  SearchResult getForAdministrativeRead(SearchQuery q) throws SearchException, UnauthorizedException;
+  MediaPackage get(String mediaPackageId) throws NotFoundException, SearchException, UnauthorizedException;
 
   /**
-   * Sends a query to the search service. Depending on the service implementation, the query might be an sql statement a
-   * solr query or something similar. In the future, a higher level query language might be a better solution.
+   * Searches the index based on a {@link SearchSourceBuilder}'s query
    *
-   * @param query
-   *          the search query
-   * @param offset
-   *          the offset
-   * @param limit
-   *          the limit
-   * @return the search result
+   * @param searchSource
+   *          The {@link SearchSourceBuilder} defining the search query
+   * @return
+   *          A {@link SearchResultList} of the search's results
    * @throws SearchException
+   *          If an error occurs while searching the index.
    */
-  SearchResult getByQuery(String query, int limit, int offset) throws SearchException;
+  SearchResultList search(SearchSourceBuilder searchSource) throws SearchException;
 }

@@ -29,6 +29,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.mediapackage.selector.TrackSelector;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Function2;
@@ -54,7 +55,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
 
@@ -164,8 +165,10 @@ public class SanitizeAdaptiveWorkflowOperationHandler extends AbstractWorkflowOp
     }
 
     // Select those tracks that have matching flavors
-    Track[] tracks = mediaPackage.getTracks(sourceFlavor);
-    List<Track> tracklist = Arrays.asList(tracks);
+    TrackSelector trackSelector = new TrackSelector();
+    trackSelector.addFlavor(sourceFlavor);
+    Collection<Track> tracks = trackSelector.select(mediaPackage, false);
+    List<Track> tracklist = new ArrayList<>(tracks);
 
     // Nothing to sanitize, do not set target tags or flavor on tracks, just return
     if (!tracklist.stream().filter(AdaptivePlaylist.isHLSTrackPred).findAny().isPresent()) {

@@ -31,6 +31,7 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.mediapackage.selector.TrackSelector;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
@@ -52,7 +53,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
@@ -250,9 +250,11 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
     final MediaPackageElementFlavor targetTrackFlavor = tagsAndFlavors.getSingleTargetFlavor();
     final List<String> targetTrackTags = tagsAndFlavors.getTargetTags();
 
-    final Track[] tracks = mediaPackage.getTracks(sourceFlavor);
+    TrackSelector trackSelector = new TrackSelector();
+    trackSelector.addFlavor(sourceFlavor);
+    final Collection<Track> tracks = trackSelector.select(mediaPackage, false);
 
-    if (tracks.length == 0) {
+    if (tracks.isEmpty()) {
       logger.info("No audio/video tracks with flavor '{}' found to prepare", sourceFlavor);
       return createResult(mediaPackage, WorkflowOperationResult.Action.CONTINUE);
     }
@@ -553,8 +555,8 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
     return Boolean.parseBoolean(hideProperty);
   }
 
-  private List<AugmentedTrack> createAugmentedTracks(final Track[] tracks, final WorkflowInstance instance) {
-    return Arrays.stream(tracks).map(t -> {
+  private List<AugmentedTrack> createAugmentedTracks(final Collection<Track> tracks, final WorkflowInstance instance) {
+    return tracks.stream().map(t -> {
       final boolean hideAudio = trackHidden(instance, t.getFlavor().getType(), SubTrack.AUDIO);
       final boolean hideVideo = trackHidden(instance, t.getFlavor().getType(), SubTrack.VIDEO);
       AugmentedTrack result = new AugmentedTrack(t, hideAudio, hideVideo);

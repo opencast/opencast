@@ -64,7 +64,6 @@ import com.amazonaws.services.s3.model.Tag;
 import com.amazonaws.services.s3.transfer.TransferManager;
 import com.amazonaws.services.s3.transfer.TransferManagerBuilder;
 import com.amazonaws.services.s3.transfer.Upload;
-import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -83,6 +82,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.List;
+import java.util.Optional;
 
 @Component(
     property = {
@@ -283,7 +283,7 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
    * Returns the aws s3 object id created by aws
    */
   @Override
-  protected AwsUploadOperationResult uploadObject(File origin, String objectName, Opt<MimeType> mimeType)
+  protected AwsUploadOperationResult uploadObject(File origin, String objectName, Optional<MimeType> mimeType)
           throws AssetStoreException {
     // Check first if bucket is there.
     if (!bucketCreated) {
@@ -307,7 +307,7 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
 
       // Tag objects that are suitable for Glacier storage class
       // NOTE: Use of S3TransferManager means that tagging has to be done as a separate request
-      if (mimeType.isSome()) {
+      if (mimeType.isPresent()) {
         switch (mimeType.get().getType()) {
           case "audio":
           case "image":

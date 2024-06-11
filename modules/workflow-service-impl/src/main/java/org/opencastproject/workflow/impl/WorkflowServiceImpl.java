@@ -101,7 +101,6 @@ import org.opencastproject.workflow.api.WorkflowUtil;
 import org.opencastproject.workflow.api.XmlWorkflowParser;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.data.Opt;
 import com.google.common.util.concurrent.Striped;
 
 import org.apache.commons.io.IOUtils;
@@ -1126,8 +1125,8 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
     WorkflowState state = workflow.getState();
     if (state != INSTANTIATED && state != RUNNING && workflow.getState() != FAILING) {
-      Opt<MediaPackage> assetMediapackage = assetManager.getMediaPackage(mediapackage.getIdentifier().toString());
-      if (assetMediapackage.isSome()) {
+      Optional<MediaPackage> assetMediapackage = assetManager.getMediaPackage(mediapackage.getIdentifier().toString());
+      if (assetMediapackage.isPresent()) {
         mediapackage = assetMediapackage.get();
       }
     }
@@ -1146,14 +1145,14 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
   protected boolean assertMediaPackagePermission(String mediaPackageId, String action) {
     var currentUser = securityService.getUser();
-    Opt<MediaPackage> mp = assetManager.getMediaPackage(mediaPackageId);
+    Optional<MediaPackage> mp = assetManager.getMediaPackage(mediaPackageId);
 
     // asset manager already checks if user is admin, org admin for same org as mp, or has explicit read rights
     // global admins can still get workflow instances if mp is gone from asset manager
     // org admins can't because then we don't know if mp belonged to same org as user
     return currentUser.hasRole(GLOBAL_ADMIN_ROLE)
-            || mp.isSome() && currentUser.hasRole(securityService.getOrganization().getAdminRole())
-            || mp.isSome() && authorizationService.hasPermission(mp.get(), action);
+            || mp.isPresent() && currentUser.hasRole(securityService.getOrganization().getAdminRole())
+            || mp.isPresent() && authorizationService.hasPermission(mp.get(), action);
   }
 
   /**
@@ -2181,12 +2180,12 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       try {
         total = persistence.countMediaPackages();
       } catch (WorkflowDatabaseException e) {
-        logIndexRebuildError(logger, index.getIndexName(), e);
-        throw new IndexRebuildException(index.getIndexName(), getService(), e);
+        logIndexRebuildError(logger, e);
+        throw new IndexRebuildException(getService(), e);
       }
 
       if (total > 0) {
-        logIndexRebuildBegin(logger, index.getIndexName(), total, "workflows");
+        logIndexRebuildBegin(logger, total, "workflows");
         int current = 0;
         int n = 20;
         List<WorkflowIndexData> workflowIndexData;
@@ -2200,8 +2199,8 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           try {
             workflowIndexData = persistence.getWorkflowIndexData(limit, offset);
           } catch (WorkflowDatabaseException e) {
-            logIndexRebuildError(logger, index.getIndexName(), e);
-            throw new IndexRebuildException(index.getIndexName(), getService(), e);
+            logIndexRebuildError(logger, e);
+            throw new IndexRebuildException(getService(), e);
           }
           if (!workflowIndexData.isEmpty()) {
             offset += limit;
@@ -2224,7 +2223,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
                     logger.debug("Dropping {} from the index since it is missing from the database", mpId);
                     continue;
                   }
-                  orgid = results.getSnapshots().head2().getOrganizationId();
+                  orgid = results.getSnapshots().stream().findFirst().get().getOrganizationId();
                   //We try-catch here since it's possible for the WF to exist in the *index* but not in the *DB*
                   // It probably shouldn't be, but that won't keep it from happening anyway.
                   try {
@@ -2243,7 +2242,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
                 if (updatedWorkflowRange.size() >= n || current >= total) {
                   index.bulkEventUpdate(updatedWorkflowRange);
-                  logIndexRebuildProgress(logger, index.getIndexName(), total, current, n);
+                  logIndexRebuildProgress(logger, total, current, n);
                   updatedWorkflowRange.clear();
                 }
               }
@@ -2257,8 +2256,8 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         } while (!workflowIndexData.isEmpty());
       }
     } catch (Exception e) {
-      logIndexRebuildError(logger, index.getIndexName(), e);
-      throw new IndexRebuildException(index.getIndexName(), getService(), e);
+      logIndexRebuildError(logger, e);
+      throw new IndexRebuildException(getService(), e);
     }
   }
 
@@ -2285,7 +2284,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       results = index.getByQuery(new EventSearchQuery(orgId, user).withWorkflowId(workflowInstanceId));
     } catch (SearchIndexException e) {
       logger.error("Error retrieving the events for workflow instance {} from the {} index.", workflowInstanceId,
-              index.getIndexName(), e);
+              e);
       return;
     }
 
@@ -2325,7 +2324,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
                 index.getIndexName());
       } catch (SearchIndexException e) {
         logger.error("Error removing the workflow instance {} of event {} from the {} index.", workflowInstanceId,
-                eventId, index.getIndexName(), e);
+                eventId, e);
       }
     }
   }
@@ -2361,7 +2360,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
               index.getIndexName());
     } catch (SearchIndexException e) {
       logger.error("Error updating the workflow instance {} of event {} in the {} index.", id, mpId,
-              index.getIndexName(), e);
+              e);
     }
   }
 

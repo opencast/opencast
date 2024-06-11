@@ -28,6 +28,7 @@ import getBasicPluginContext from 'paella-basic-plugins';
 import getSlidePluginContext from 'paella-slide-plugins';
 import getZoomPluginContext from 'paella-zoom-plugin';
 import getUserTrackingPluginContext from 'paella-user-tracking';
+import getVideo360CanvasPluginContext from 'paella-webgl-plugins';
 import getMP4MultiQualityContext from 'paella-mp4multiquality-plugin';
 
 import { loadTrimming, setTrimming } from './TrimmingLoader';
@@ -86,6 +87,7 @@ const initParams = {
     getSlidePluginContext(),
     getZoomPluginContext(),
     getUserTrackingPluginContext(),
+    getVideo360CanvasPluginContext(),
     getMP4MultiQualityContext()
   ],
   getCookieConsentFunction: (type) => {
@@ -160,6 +162,22 @@ const initParams = {
         throw Error('The video does not exist or the user can\'t see it');
       }
     }
+
+    // Load the series, if appropriate
+    const loadSeries = async (sid) => {
+      const response = await fetch(getUrlFromOpencastServer('/search/series.json?id=' + sid));
+
+      if (response.ok) {
+        const sdata = await response.json();
+        return sdata['result'][0]['dc']['title'][0];
+      }
+      else {
+        throw Error('Series data missing');
+      }
+    };
+    const series = data?.metadata?.series !== undefined ? await loadSeries(data?.metadata?.series) : undefined;
+
+    data.metadata.seriestitle = series;
 
     // Add event title to browser tab
     const videoTitle = data?.metadata?.title ?? 'Unknown video title';
@@ -326,7 +344,7 @@ export class PaellaOpencast extends Paella {
   async getEpisode({episodeId}) {
     return fetch(getUrlFromOpencastServer(`/search/episode.json?id=${episodeId}`))
     .then(response => response.json() )
-    .then(response => response['search-results']?.result)
+    .then(response => response['result'][0]?.id)
     .catch(() => null);
   }
 

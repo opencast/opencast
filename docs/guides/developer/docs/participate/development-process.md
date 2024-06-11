@@ -107,6 +107,33 @@ There are a couple of rules that committers must follow when merging pull reques
     * It is advised to be pragmatic and only do so if necessary.
 
 
+#### Automatically closing issues when a PR is merged
+
+Our pull request template wants you to "close an accompanying issue."
+This can be done as per the [GitHub documentation](https://help.github.com/en/articles/closing-issues-using-keywords)
+by using one of several magic keywords in front of a valid issue number,
+either in the pull request description, or in any of the commit messages
+of the commits you want to merge. For example:
+
+> This PR **fixes #1234**.
+
+A word of caution: due to our [branching model](#git-repository-branching-model)
+this might not always work as expected. GitHub only recognizes
+the magic words when acting on the default branch of the repository,
+which in our case is `develop`. Issues mentioned in descriptions
+of PRs targeting `develop` or in any message of a commit that lands
+in `develop` will be automatically closed.
+
+Thus, if you are submitting a PR **not** targeting `develop`, and you
+want to use this feature, you **have to** mention the magic words
+in a commit message. Tne PR description does not work in this case.
+And even then, the issue will only be closed, once your merged commits
+reach `develop` by our forward merging process.
+
+Mentioning related issues in the PR description **in addition** to
+the commit message(-s) might of course still be useful for reviewers!
+
+
 Git Repository Branching Model
 ------------------------------
 

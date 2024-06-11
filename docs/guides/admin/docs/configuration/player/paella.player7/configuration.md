@@ -4,8 +4,8 @@ Paella Player 7
 Paella 7 is Opencast's default player.
 
 The Paella `(pronounced 'paeja')` [Player](https://paellaplayer.upv.es) is an Open Source
-JavaScript video player capable of playing an unlimited number of audio & video streams 
-synchronously, Live Streaming, Zoom, Captions, contributed user plugins and a lot more. 
+JavaScript video player capable of playing an unlimited number of audio & video streams
+synchronously, Live Streaming, Zoom, Captions, contributed user plugins and a lot more.
 It is easy to install and customize for your own needs.
 
 Paella 7 will be a complete rewrite of Paella, aiming several issues
@@ -17,7 +17,7 @@ Paella 7 will be a complete rewrite of Paella, aiming several issues
 - Solve the technical debt of 10 years of development.
 
 Have a look at the paella 7 [repository](https://github.com/polimediaupv/paella-core)
-or [documentation page](https://github.com/polimediaupv/paella-core/blob/main/doc/index.md).
+or [documentation page](https://paellaplayer.upv.es/#/doc/index.md).
 
 
 Configuration
@@ -98,11 +98,11 @@ Cookie consent
 Paella uses cookies to store some user parameters (layout configuration, volume, etc...).
 And, if enabled, the paella user tracking plugin can use cookie to track the user.
 
-To comply with GDPR, ePrivacy Directive, or any other privacy laws, the opencast player uses 
-the [Terms Feed Privacy Consent](https://www.termsfeed.com/privacy-consent/) banner and the 
-paella `config.json` file is configured to use it. 
+To comply with GDPR, ePrivacy Directive, or any other privacy laws, the opencast player uses
+the [Terms Feed Privacy Consent](https://www.termsfeed.com/privacy-consent/) banner and the
+paella `config.json` file is configured to use it.
 
-To Learn more about paella cookie consent you can read paella 
+To Learn more about paella cookie consent you can read paella
 [cookie consent documentation](https://paellaplayer.upv.es/#/doc/cookie_consent.md).
 
 You can enable/disable the cookie consent banner in `config.json` file:
@@ -135,6 +135,41 @@ Example:
     ...
     "opencast": {
         "hideTimeLineOnLive": false
+        ...
+    }
+    ...
+}
+```
+
+Configure video canvas
+----------------------
+
+Paella Player 7 supports multiple types of video canvas to render videos. The default is `video`, but there is for
+example also `video360` for 360° videos.
+
+In Opencast it is possible to configure which video canvas will be used for which track, depending on its tags and/or
+flavor. Only one tag _or_ the flavor has to match for the canvas to be used. If the track meets the conditions of
+multiple canvases, all of them are set and the `order` field of the respective plugins controls in which order
+the player will try to use them.
+
+In any case, you should not remove the `video` option so it can be used as a fallback by the player in case the other
+canvases cannot be rendered for any reason.
+
+Example:
+
+```json
+{
+    ...
+    "opencast": {
+      "videoCanvas": {
+        "video360": {
+          "flavor": "*/delivery+360",
+          "tag": "video360"
+        },
+        "video": {
+          "flavor": "*/delivery"
+        }
+      }
         ...
     }
     ...

@@ -392,6 +392,12 @@ public class TimelinePreviewsServiceImpl extends AbstractJobProducer implements
         binary,
         "-loglevel", "error",
         "-t", String.valueOf(duration - seconds / 2.0),
+        // For longer videos, this operation only considers keyframes. This
+        // significantly speeds up this command. The difference in output is
+        // minimal and not relevant for the user. Nothing would crash without
+        // this duration check: short videos would just repeat keyframes in the
+        // output image, making the preview less useful.
+        "-skip_frame", duration > 15 * 60.0 ? "nokey" : "default",
         "-i", mediaFile.getAbsolutePath(),
         "-vf", "fps=1/" + seconds + ",scale=" + width + ":" + height + ",tile=" + tileX + "x" + tileY,
         imageFilePath

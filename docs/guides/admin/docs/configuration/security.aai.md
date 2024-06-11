@@ -81,10 +81,13 @@ within the HTTP request headers.
     <sec:custom-filter ref="shibbolethHeaderFilter" position="PRE_AUTH_FILTER"/>
 
 To ensure that a logout is not just logging out the user from the Opencast application but also from Shibboleth,
-you will need to configure the logout-success-url:
+you will need to configure the defaultTargetUrl inside the logoutSuccessHandler:
 
-    <!-- Enables log out -->
-    <sec:logout logout-success-url="/Shibboleth.sso/Logout?return=www.opencast.org" />
+    <bean id="logoutSuccessHandler" class="org.opencastproject.kernel.security.LogoutSuccessHandler">
+        <property name="userDirectoryService" ref="userDirectoryService" />
+        <!-- Shibboleth log out -->
+        <property name="defaultTargetUrl" value="/Shibboleth.sso/Logout?return=www.opencast.org"/>
+    </bean>
 
 **IMPORTANT:** In the section *Shibboleth Support*, be sure to adapt the value of *principalRequestHeader* to the
 respective name of the Shibboleth attribute you use in your Shibboleth Federation:

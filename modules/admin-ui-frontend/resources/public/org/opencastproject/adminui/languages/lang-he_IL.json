@@ -109,7 +109,7 @@
    },
    "CONFIRMATIONS": {
       "EMBEDDING_CODE": "Embedding code has been copied to the clipboard:",
-      "CONTINUE_ACTION": "האם את/ה בטוח/ה שאת/ה רוצה להמשיך?",
+      "CONTINUE_ACTION": "האם את\/ה בטוח\/ה שאת\/ה רוצה להמשיך?",
       "METADATA": {
          "NOTICE": {
             "UNKNOWN": "הרכיב שלהלן יימחקו",
@@ -217,7 +217,7 @@
       "CONFLICT_ALREADY_ENDED": "שגיאה בתזמון: האירוע כבר נגמר.",
       "CONFLICT_END_BEFORE_START": "שגיאה בתזמון: תזמון הסיום חייב להיות אחרי תזמון ההתחלה.",
       "CONFLICT_IN_THE_PAST": "לא היתה אפשרות לעדכן את לוח הזמנים: לא ניתן לתזמן אירוע בעבר.",
-      "INVALID_ACL_RULES": "חוקים חייבים להכיל תפקיד חוקי ו/או הרשאות קריאה/כתיבה.",
+      "INVALID_ACL_RULES": "חוקים חייבים להכיל תפקיד חוקי ו\/או הרשאות קריאה\/כתיבה.",
       "MISSING_ACL_RULES": "לפחות תפקיד אחד עם הרשאות קריאה וכתיבה נדרש!",
       "SAVED_ACL_RULES": "חוקי הגישה נשמרו.",
       "SAVED_METADATA": "The metadata has been saved.",
@@ -263,10 +263,10 @@
       "TOBIRA_OVERRIDE_NAME": "The title of the selected page will be overridden with the title of the series.",
       "TOBIRA_NO_PATH_SEGMENT": "Page needs a path segment.",
       "TOBIRA_NOT_MOUNTED": "Series could not be mounted in Tobira.",
-      "TOBIRA_PATH_SEGMENT_INVALID": "Path segment is invalid. A valid path segment is at least 2 characters long, does not contain any whitespace or control characters, none of the characters '<>\"[\\]^`{|}#%/?]', and doesn't start with any of the characters '-+~@_!$&;:.,=*'()'.",
+      "TOBIRA_PATH_SEGMENT_INVALID": "Path segment is invalid. A valid path segment is at least 2 characters long, does not contain any whitespace or control characters, none of the characters '<>\"[\\]^`{|}#%\/?]', and doesn't start with any of the characters '-+~@_!$&;:.,=*'()'.",
       "TOBIRA_PATH_SEGMENT_UNIQUE": "The path segment of a page must be unqiue among all its sibling pages.",
       "TOBIRA_PAGE_NOT_FOUND": "The page you tried to navigate to does not or no longer exist. Maybe try starting from the beginning.",
-      "TOBIRA_SERVER_ERROR": " Error talking to Tobira. Contact your system administrator and/or try again later.",
+      "TOBIRA_SERVER_ERROR": " Error talking to Tobira. Contact your system administrator and\/or try again later.",
       "TOBIRA_COPIED_DIRECT_LINK": "Copied link to clipboard.",
       "TOBIRA_FAILED_COPYING_DIRECT_LINK": "Couldn't copy link to clipboard.",
       "TOBIRA_NOT_FOUND": "Tobira doesn't know about this series (yet). Try again in a few minutes or contact your system administrator."
@@ -352,7 +352,7 @@
             }
          },
          "EDIT": {
-            "DESCRIPTION": "Edit and/or select the metadata fields you want to update. A field cannot be selected if this doesn't result in a changed value for at least one event, or if the field isn't valid (e.g. required fields cannot be empty). Highlighted metadata fields have diverging values for the selected events.",
+            "DESCRIPTION": "Edit and\/or select the metadata fields you want to update. A field cannot be selected if this doesn't result in a changed value for at least one event, or if the field isn't valid (e.g. required fields cannot be empty). Highlighted metadata fields have diverging values for the selected events.",
             "TABLE": {
                "CAPTION": "Metadata of selected events",
                "FIELDS": "Metadata",
@@ -940,7 +940,7 @@
                "REASONS": {
                   "CUTTING": "חיתוך נדרש",
                   "REVIEW": "סקירת דרישות",
-                  "ASYNC": "רצועות שמע/וידאו לא מתואמות",
+                  "ASYNC": "רצועות שמע\/וידאו לא מתואמות",
                   "AUDIO_ISSUE": "רצועת שמע חסרה או פגומה",
                   "CANCELLED": "Cancelled event",
                   "CONFLICTING_METADATA": "מטה-נתונים סותרים",
@@ -1785,7 +1785,7 @@
       "ZOOMLEVEL": "רמת גודל התצוגה",
       "PREVIEW_MODE": "מצב תצוגה מקדימה",
       "PREVIEW_MODE_TOOLTIP": "לנגן קטעים נבחרים בלבד",
-      "ZOOM": "הגדל/הקטן",
+      "ZOOM": "הגדל\/הקטן",
       "BUTTONS": {
          "CLOSE": "סגור",
          "SAVE": "שמור",
@@ -1807,7 +1807,7 @@
       "ACTIONS": {
          "SPLIT": "פצל",
          "SPLIT_TOOLTIP": "Split segment at the current cursor position.",
-         "CUT": "הסתר/הצג",
+         "CUT": "הסתר\/הצג",
          "CUT_TOOLTIP": "Hide or show the selected part of the video.",
          "REPLAY_SEGMENT": "Play Start of Segment",
          "REPLAY_SEGMENT_TOOLTIP": "Play the current segment from the beginning.",
@@ -1900,8 +1900,8 @@
          "PAUSE": "השהה",
          "NEXT_FRAME": "לפריים הבא",
          "PREVIOUS_FRAME": "פריים קודם",
-         "NEXT_SEGMENT": "קטע הבא / קפיצה אל הסוף",
-         "PREVIOUS_SEGMENT": "המקטע הקודם / קפיצה להתחלה",
+         "NEXT_SEGMENT": "קטע הבא \/ קפיצה אל הסוף",
+         "PREVIOUS_SEGMENT": "המקטע הקודם \/ קפיצה להתחלה",
          "MUTE": "השתק",
          "VOLUME": "עוצמת שמע"
       }
@@ -2202,7 +2202,7 @@
          "GENERAL": "כללי",
          "PLAYER": "נגן",
          "EDITOR": "עורך",
-         "ADD_MEDIA": "Create Event/Series"
+         "ADD_MEDIA": "Create Event\/Series"
       },
       "DESCRIPTIONS": {
          "GENERAL": {
@@ -2217,16 +2217,16 @@
             "CHEAT_SHEET": "מקשי קיצור במקלדת"
          },
          "PLAYER": {
-            "PLAY_PAUSE": "נגן/השהה",
+            "PLAY_PAUSE": "נגן\/השהה",
             "PREVIOUS_FRAME": "פריים קודם",
             "NEXT_FRAME": "לפריים הבא",
             "STEP_BACKWARD": "קפוץ 10ש' אחורה",
             "STEP_FORWARD": "קפוץ 10ש' קדימה",
-            "PREVIOUS_SEGMENT": "מקטע קודם/קפוץ להתחלה",
-            "NEXT_SEGMENT": "מקטע הבא/קפוץ לסיום",
+            "PREVIOUS_SEGMENT": "מקטע קודם\/קפוץ להתחלה",
+            "NEXT_SEGMENT": "מקטע הבא\/קפוץ לסיום",
             "VOLUME_UP": "הגבר שמע",
             "VOLUME_DOWN": "הנמך שמע",
-            "MUTE": "השתקה/קול"
+            "MUTE": "השתקה\/קול"
          },
          "EDITOR": {
             "SPLIT_AT_CURRENT_TIME": "פצל",
@@ -2237,7 +2237,7 @@
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "סוף קטע"
          },
          "ADD_MEDIA": {
-            "NEXT_TAB": "Next tab/Create",
+            "NEXT_TAB": "Next tab\/Create",
             "PREVIOUS_TAB": "Previous tab"
          }
       }
@@ -2275,7 +2275,7 @@
          "PUBLISHEDHOURS": "Published Hours of Video"
       },
       "DESCRIPTION": {
-         "RANDOM": "מוצג מידע אקראי לצורך הצגת יכולות. ניתן לבטל תצוגת תרשים זה על ידי מחיקת קובץ json המכיל המספק מידע סטטיסטי מתקיית etc/providers",
+         "RANDOM": "מוצג מידע אקראי לצורך הצגת יכולות. ניתן לבטל תצוגת תרשים זה על ידי מחיקת קובץ json המכיל המספק מידע סטטיסטי מתקיית etc\/providers",
          "VIEWS_SUM": "This displays the total number of views per time unit.",
          "VIEWS_AVG": "This displays the mean number of daily views per time unit.",
          "PUBLISHEDHOURS": "This displays the published hours of video"

@@ -482,4 +482,28 @@ Type          | Description
 `boolean`     | `true` or `false`
 `enumeration` | One of the values provided by the field `values`
 
+## Playlists
 
+### Playlist
+
+A playlist is represented as a JSON object with the following fields:
+
+| Field                  | Type                                                      | Description                                                                 |
+|------------------------|-----------------------------------------------------------|-----------------------------------------------------------------------------|
+| `id`                   | [`string`](types.md#basic)                                | Identifier. Will be created if not set.                                     |
+| `entries`              | [`List<PlaylistEntry>`](types.md#PlaylistEntry)           | List of entries.                                                            |
+| `title`                | [`string`](types.md#basic)                                | Metadata.                                                                   |
+| `description`          | [`string`](types.md#basic)                                | Metadata.                                                                   |
+| `creator`              | [`string`](types.md#basic)                                | Metadata.                                                                   |
+| `updated`              | `unix epoch in milliseconds`                              | Metadata. Updated by Opencast with current time when playlist gets updated. |
+| `accessControlEntries` | [`List<AccessControlEntry>`](types.md#AccessControlEntry) | List of access control entries, basically an ACL.                           |
+
+### Playlist Entry
+
+An entry for a playlist as a JSON object. There are different kinds of entries:
+
+| Field       | Type                       | Description                                                                                                                                                           |
+|-------------|----------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `id`        | [`long`](types.md#basic)   | Identifier. Will be created if not set.                                                                                                                               |
+| `contentId` | [`string`](types.md#basic) | Identifier for the content of the entry. What the "content" is is defined by `type`.                                                                                  |
+| `type`      | [`string`](types.md#basic) | Enumeration, current possible values are EVENT, INACCESSIBLE. Typically EVENT, set to INACCESSIBLE by Opencast if the requesting user lacks permissions on the event. |

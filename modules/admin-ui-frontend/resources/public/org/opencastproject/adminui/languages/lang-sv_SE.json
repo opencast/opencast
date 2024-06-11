@@ -205,8 +205,8 @@
       "EVENT_DELETED": "Händelsen har tagits bort.",
       "EVENT_WILL_BE_DELETED": "Händelsen tas bort",
       "EVENTS_DELETED": "Händelserna tas bort.",
-      "EVENTS_NOT_DELETED": "Händelsen/-erna kunde inte raderas.",
-      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "Händelsen/-erna kunde inte raderas för att du inte har rättigheterna.",
+      "EVENTS_NOT_DELETED": "Händelsen\/-erna kunde inte raderas.",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "Händelsen\/-erna kunde inte raderas för att du inte har rättigheterna.",
       "SERIES_DELETED": "Serien har tagits bort",
       "SERIES_NOT_DELETED": "Serien kunde inte raderas",
       "LOCATION_DELETED": "Platsen har raderats",
@@ -217,7 +217,7 @@
       "CONFLICT_ALREADY_ENDED": "Fel vid schemaläggning: Händelsen har redan avslutats.",
       "CONFLICT_END_BEFORE_START": "Fel vid schemaläggning: Slutet måste vara senare än början.",
       "CONFLICT_IN_THE_PAST": "Tidsplanen kunde inte updateras: Du kan inte planera en event som ligger i det förflutna.",
-      "INVALID_ACL_RULES": "Regler måste innehålla en giltig roll och läs- eller/och skrivrätt.",
+      "INVALID_ACL_RULES": "Regler måste innehålla en giltig roll och läs- eller\/och skrivrätt.",
       "MISSING_ACL_RULES": "Åtminstone en roll med läs- och skrivrättigheter krävs!",
       "SAVED_ACL_RULES": "Reglerna för åtkomst har sparats.",
       "SAVED_METADATA": "The metadata has been saved.",
@@ -263,10 +263,10 @@
       "TOBIRA_OVERRIDE_NAME": "The title of the selected page will be overridden with the title of the series.",
       "TOBIRA_NO_PATH_SEGMENT": "Page needs a path segment.",
       "TOBIRA_NOT_MOUNTED": "Series could not be mounted in Tobira.",
-      "TOBIRA_PATH_SEGMENT_INVALID": "Path segment is invalid. A valid path segment is at least 2 characters long, does not contain any whitespace or control characters, none of the characters '<>\"[\\]^`{|}#%/?]', and doesn't start with any of the characters '-+~@_!$&;:.,=*'()'.",
+      "TOBIRA_PATH_SEGMENT_INVALID": "Path segment is invalid. A valid path segment is at least 2 characters long, does not contain any whitespace or control characters, none of the characters '<>\"[\\]^`{|}#%\/?]', and doesn't start with any of the characters '-+~@_!$&;:.,=*'()'.",
       "TOBIRA_PATH_SEGMENT_UNIQUE": "The path segment of a page must be unqiue among all its sibling pages.",
       "TOBIRA_PAGE_NOT_FOUND": "The page you tried to navigate to does not or no longer exist. Maybe try starting from the beginning.",
-      "TOBIRA_SERVER_ERROR": " Error talking to Tobira. Contact your system administrator and/or try again later.",
+      "TOBIRA_SERVER_ERROR": " Error talking to Tobira. Contact your system administrator and\/or try again later.",
       "TOBIRA_COPIED_DIRECT_LINK": "Copied link to clipboard.",
       "TOBIRA_FAILED_COPYING_DIRECT_LINK": "Couldn't copy link to clipboard.",
       "TOBIRA_NOT_FOUND": "Tobira doesn't know about this series (yet). Try again in a few minutes or contact your system administrator."
@@ -294,7 +294,7 @@
          "GENERAL": {
             "CAPTION": "Allmänt",
             "SUMMARY": "({{ count }} händelser valda)",
-            "CANNOTSTART": "Framhävda händelse(r) kan inte bearbetas just nu. Avmarkera den/dem eller försök igen senare."
+            "CANNOTSTART": "Framhävda händelse(r) kan inte bearbetas just nu. Avmarkera den\/dem eller försök igen senare."
          },
          "TASKS": {
             "CAPTION": "Uppgifter",
@@ -352,7 +352,7 @@
             }
          },
          "EDIT": {
-            "DESCRIPTION": "Edit and/or select the metadata fields you want to update. A field cannot be selected if this doesn't result in a changed value for at least one event, or if the field isn't valid (e.g. required fields cannot be empty). Highlighted metadata fields have diverging values for the selected events.",
+            "DESCRIPTION": "Edit and\/or select the metadata fields you want to update. A field cannot be selected if this doesn't result in a changed value for at least one event, or if the field isn't valid (e.g. required fields cannot be empty). Highlighted metadata fields have diverging values for the selected events.",
             "TABLE": {
                "CAPTION": "Metadata of selected events",
                "FIELDS": "Metadata",
@@ -587,7 +587,7 @@
                "ADD": "Lägg till resurs",
                "NO_OPTIONS": "En list av resursoptioner blev inte laddad up på den här sektionen av webbsidan!",
                "OPTION": {
-                  "CLASS_HANDOUT_NOTES": "Lektionsanteckningar/Handout",
+                  "CLASS_HANDOUT_NOTES": "Lektionsanteckningar\/Handout",
                   "SUBTITLES": "Subtitles",
                   "PREVIEW_IMAGE": "Förhandsgranskningsbilden",
                   "SMIL": "SMIL-katalogen",
@@ -940,7 +940,7 @@
                "REASONS": {
                   "CUTTING": "Skärning krävs",
                   "REVIEW": "Granskning krävs",
-                  "ASYNC": "A/V spår asynkron",
+                  "ASYNC": "A\/V spår asynkron",
                   "AUDIO_ISSUE": "Ljudspår saknas eller är felaktig",
                   "CANCELLED": "Cancelled event",
                   "CONFLICTING_METADATA": "Motstridiga metadata",
@@ -1378,7 +1378,7 @@
             },
             "DESCRIPTION": {
                "ROLES": "Roller och grupper som kan tilldelas eller redan har tilldelats användaren.",
-               "EXTERNALROLES": "Listan över externa roller som tilldelats användaren genom externa roll-leverantören/-erna.",
+               "EXTERNALROLES": "Listan över externa roller som tilldelats användaren genom externa roll-leverantören\/-erna.",
                "EFFECTIVEROLES": "Listan över effektiva roller som direkt tilldelats användaren och rollerna som indirekt laddades via gruppmedlemskap."
             },
             "FORM": {
@@ -1807,7 +1807,7 @@
       "ACTIONS": {
          "SPLIT": "Dela",
          "SPLIT_TOOLTIP": "Dela upp segmentet på den aktuella positionen.",
-         "CUT": "Visa/Gömma",
+         "CUT": "Visa\/Gömma",
          "CUT_TOOLTIP": "Visa eller gömma utvalda delar av videon.",
          "REPLAY_SEGMENT": "Spela upp segmentets början",
          "REPLAY_SEGMENT_TOOLTIP": "Spela upp aktuella segmentet från början.",
@@ -1900,8 +1900,8 @@
          "PAUSE": "Pausa",
          "NEXT_FRAME": "Nästa bild",
          "PREVIOUS_FRAME": "Föregående bild",
-         "NEXT_SEGMENT": "Nästa segment / Hoppa till slutet",
-         "PREVIOUS_SEGMENT": "Föregående segment / Hoppa till start",
+         "NEXT_SEGMENT": "Nästa segment \/ Hoppa till slutet",
+         "PREVIOUS_SEGMENT": "Föregående segment \/ Hoppa till start",
          "MUTE": "Tyst",
          "VOLUME": "Volym"
       }
@@ -1912,7 +1912,7 @@
       "USERNAME": "Användarnamn…",
       "PASSWORD": "Lösenord…",
       "LOGIN": "Logga in",
-      "ERROR": "Felaktigt användarnamn, e-post och/eller lösenord"
+      "ERROR": "Felaktigt användarnamn, e-post och\/eller lösenord"
    },
    "TABLE_FILTERS": {
       "FILTER_SELECTION": {
@@ -2202,7 +2202,7 @@
          "GENERAL": "Allmänt",
          "PLAYER": "Spelare",
          "EDITOR": "Redigerare",
-         "ADD_MEDIA": "Create Event/Series"
+         "ADD_MEDIA": "Create Event\/Series"
       },
       "DESCRIPTIONS": {
          "GENERAL": {
@@ -2217,16 +2217,16 @@
             "CHEAT_SHEET": "Tangentbordsgenvägar"
          },
          "PLAYER": {
-            "PLAY_PAUSE": "Spela upp/pausa",
+            "PLAY_PAUSE": "Spela upp\/pausa",
             "PREVIOUS_FRAME": "Föregående bild",
             "NEXT_FRAME": "Nästa bild",
             "STEP_BACKWARD": "Hoppa tillbaka 10 sek",
             "STEP_FORWARD": "Hoppa fram 10 sek",
-            "PREVIOUS_SEGMENT": "Föregående segment/hoppa tillbaka till början",
-            "NEXT_SEGMENT": "Nästa segment/hoppa till slutet",
+            "PREVIOUS_SEGMENT": "Föregående segment\/hoppa tillbaka till början",
+            "NEXT_SEGMENT": "Nästa segment\/hoppa till slutet",
             "VOLUME_UP": "Volym upp",
             "VOLUME_DOWN": "Volym ner",
-            "MUTE": "Ljud av/på"
+            "MUTE": "Ljud av\/på"
          },
          "EDITOR": {
             "SPLIT_AT_CURRENT_TIME": "Dela",
@@ -2237,7 +2237,7 @@
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "Slutet av segmentet"
          },
          "ADD_MEDIA": {
-            "NEXT_TAB": "Next tab/Create",
+            "NEXT_TAB": "Next tab\/Create",
             "PREVIOUS_TAB": "Previous tab"
          }
       }
@@ -2275,7 +2275,7 @@
          "PUBLISHEDHOURS": "Publicerad antal timmar"
       },
       "DESCRIPTION": {
-         "RANDOM": "Det här visar random uppgifter som ett exempel. Du kan deaktivera detta igenom att du ta bort JSON definitionen av statistic provider ifrån pärmen etc/providers.",
+         "RANDOM": "Det här visar random uppgifter som ett exempel. Du kan deaktivera detta igenom att du ta bort JSON definitionen av statistic provider ifrån pärmen etc\/providers.",
          "VIEWS_SUM": "Det här visar totala antalet visningar per tidsenhet.",
          "VIEWS_AVG": "Det här visar det genomsnittliga antalet visningar per tidsenhet.",
          "PUBLISHEDHOURS": "Det här visar antalet publicerade timmar av video"

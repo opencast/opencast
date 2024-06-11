@@ -303,7 +303,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
         try {
           final List<Theme> themes = getThemes();
           int total = themes.size();
-          logIndexRebuildBegin(logger, index.getIndexName(), total, "themes", organization);
+          logIndexRebuildBegin(logger, total, "themes", organization);
           int current = 0;
           int n = 20;
           List<IndexTheme> updatedThemeRange = new ArrayList<>();
@@ -318,7 +318,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
 
             if (updatedThemeRange.size() >= n || current >= themes.size()) {
               index.bulkThemeUpdate(updatedThemeRange);
-              logIndexRebuildProgress(logger, index.getIndexName(), total, current, n);
+              logIndexRebuildProgress(logger, total, current, n);
               updatedThemeRange.clear();
             }
           }
@@ -328,8 +328,8 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
         }
       }
     } catch (Exception e) {
-      logIndexRebuildError(logger, index.getIndexName(), e);
-      throw new IndexRebuildException(index.getIndexName(), getService(), e);
+      logIndexRebuildError(logger, e);
+      throw new IndexRebuildException(getService(), e);
     }
   }
 
@@ -343,8 +343,6 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
    *
    * @param themeId
    *           the id of the theme to remove
-   * @param index
-   *           the index to remove the theme from
    * @param orgId
    *           the organization the theme belongs to
    */

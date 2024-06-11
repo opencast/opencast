@@ -36,15 +36,13 @@ import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.mediapackage.identifier.IdImpl;
-import org.opencastproject.search.api.SearchQuery;
-import org.opencastproject.search.api.SearchResult;
-import org.opencastproject.search.api.SearchResultItem;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowOperationException;
@@ -204,10 +202,8 @@ public class PublishEngageWorkflowOperationHandlerTest {
 
   @Test
   public void testPublish() throws Exception {
-    SearchResult searchResult = EasyMock.createNiceMock(SearchResult.class);
-    EasyMock.expect(searchResult.size()).andReturn(0L).anyTimes();
-    EasyMock.expect(searchService.getByQuery(EasyMock.anyObject(SearchQuery.class))).andReturn(searchResult).anyTimes();
-    EasyMock.replay(searchService, searchResult);
+    EasyMock.expect(searchService.get(EasyMock.anyString())).andThrow(new NotFoundException("Not found"));
+    EasyMock.replay(searchService);
 
     EasyMock.expect(distributionService.distribute(EasyMock.anyObject(String.class),
             EasyMock.anyObject(MediaPackage.class), EasyMock.anyObject(Set.class), EasyMock.anyBoolean()))
@@ -251,15 +247,8 @@ public class PublishEngageWorkflowOperationHandlerTest {
             .andReturn(distMergeJob);
     EasyMock.replay(distributionService);
 
-    SearchResultItem item = EasyMock.createNiceMock(SearchResultItem.class);
-    EasyMock.expect(item.getMediaPackage()).andReturn(mp).anyTimes();
-    SearchResultItem[] items = new SearchResultItem[1];
-    items[0] = item;
-    SearchResult searchResult = EasyMock.createNiceMock(SearchResult.class);
-    EasyMock.expect(searchResult.size()).andReturn(1L).anyTimes();
-    EasyMock.expect(searchResult.getItems()).andReturn(items).anyTimes();
-    EasyMock.expect(searchService.getByQuery(EasyMock.anyObject(SearchQuery.class))).andReturn(searchResult).anyTimes();
-    EasyMock.replay(searchService, searchResult, item);
+    EasyMock.expect(searchService.get(EasyMock.anyString())).andReturn(mp).anyTimes();
+    EasyMock.replay(searchService);
 
     operation.setConfiguration(PublishEngageWorkflowOperationHandler.DOWNLOAD_SOURCE_TAGS, "engage");
     operation.setConfiguration(PublishEngageWorkflowOperationHandler.STRATEGY,
@@ -309,15 +298,8 @@ public class PublishEngageWorkflowOperationHandlerTest {
             .andReturn(distMergeJob);
     EasyMock.replay(distributionService);
 
-    SearchResultItem item = EasyMock.createNiceMock(SearchResultItem.class);
-    EasyMock.expect(item.getMediaPackage()).andReturn(mp).anyTimes();
-    SearchResultItem[] items = new SearchResultItem[1];
-    items[0] = item;
-    SearchResult searchResult = EasyMock.createNiceMock(SearchResult.class);
-    EasyMock.expect(searchResult.size()).andReturn(1L).anyTimes();
-    EasyMock.expect(searchResult.getItems()).andReturn(items).anyTimes();
-    EasyMock.expect(searchService.getByQuery(EasyMock.anyObject(SearchQuery.class))).andReturn(searchResult).anyTimes();
-    EasyMock.replay(searchService, searchResult, item);
+    EasyMock.expect(searchService.get(EasyMock.anyString())).andReturn(mp).anyTimes();
+    EasyMock.replay(searchService);
 
     operation.setConfiguration(PublishEngageWorkflowOperationHandler.DOWNLOAD_SOURCE_TAGS, "engage");
     operation.setConfiguration(PublishEngageWorkflowOperationHandler.STRATEGY,
@@ -359,11 +341,9 @@ public class PublishEngageWorkflowOperationHandlerTest {
   }
 
   @Test
-  public void testPublishMergeSkip() throws WorkflowOperationException {
-    SearchResult searchResult = EasyMock.createNiceMock(SearchResult.class);
-    EasyMock.expect(searchResult.size()).andReturn(0L).anyTimes();
-    EasyMock.expect(searchService.getByQuery(EasyMock.anyObject(SearchQuery.class))).andReturn(searchResult).anyTimes();
-    EasyMock.replay(searchService, searchResult);
+  public void testPublishMergeSkip() throws Exception {
+    EasyMock.expect(searchService.get(EasyMock.anyString())).andThrow(new NotFoundException("Not found")).anyTimes();
+    EasyMock.replay(searchService);
 
     operation.setConfiguration(PublishEngageWorkflowOperationHandler.DOWNLOAD_SOURCE_TAGS, "engage");
     operation.setConfiguration(PublishEngageWorkflowOperationHandler.STRATEGY,

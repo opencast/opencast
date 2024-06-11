@@ -19,68 +19,261 @@
  *
  */
 
-
 package org.opencastproject.search.api;
 
-/**
- * A single result of searching.
- */
-public interface SearchResult {
+import org.opencastproject.mediapackage.EName;
+import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.MediaPackageException;
+import org.opencastproject.mediapackage.MediaPackageParser;
+import org.opencastproject.metadata.dublincore.DublinCore;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreValue;
+import org.opencastproject.metadata.dublincore.DublinCores;
+import org.opencastproject.metadata.dublincore.OpencastDctermsDublinCore;
+import org.opencastproject.security.api.AccessControlEntry;
+import org.opencastproject.security.api.AccessControlList;
+
+import com.google.gson.Gson;
+
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+public class SearchResult {
+
+  public static final String TYPE = "type";
+  public static final String MEDIAPACKAGE = "mediapackage";
+  public static final String MEDIAPACKAGE_XML = "mediapackage_xml";
+  public static final String DUBLINCORE = "dc";
+  public static final String ORG = "org";
+  public static final String MODIFIED_DATE = "modified";
+  public static final String DELETED_DATE = "deleted";
+  public static final String INDEX_ACL = "searchable_acl";
+  public static final String REST_ACL = "acl";
+
+  private static final Gson gson = new Gson();
+
+  private SearchService.IndexEntryType type;
+
+  private MediaPackage mp;
+
+  private DublinCoreCatalog dublinCore;
+
+  private AccessControlList acl;
+
+  private String orgId;
+
+  private String id = null;
+
+  private Instant modified = null;
+
+  private Instant deleted = null;
+
+  public SearchResult(SearchService.IndexEntryType type, DublinCoreCatalog dc, AccessControlList acl,
+          String orgId, MediaPackage mp, Instant modified, Instant deleted) {
+    this.type = type;
+    this.dublinCore = dc;
+    this.acl = acl;
+    this.orgId = orgId;
+    this.mp = mp;
+    this.deleted = deleted;
+    this.modified = modified;
+
+    if (SearchService.IndexEntryType.Episode.equals(type)) {
+      this.id = this.getMediaPackage().getIdentifier().toString();
+    } else if (SearchService.IndexEntryType.Series.equals(type)) {
+      this.id = this.dublinCore.getFirst(DublinCore.PROPERTY_IDENTIFIER);
+    }
+  }
+
+  public Date getModifiedDate() {
+    return new Date(this.modified.toEpochMilli());
+  }
+
+  public String getId() {
+    return this.id;
+  }
+
+  public Date getDeletionDate() {
+    return null == this.deleted ? null : new Date(this.deleted.toEpochMilli());
+  }
+
+  @SuppressWarnings("unchecked")
+  public static SearchResult rehydrate(Map<String, Object> data) throws SearchException {
+    //Our sole parameter here is a map containing a mix of string:string pairs, and String:Map<String, Object> pairs
+
+    try {
+      //We're *really* hoping that no one feeds us things that aren't what we expect
+      // but ES results come back in json, and get turned into multi-layered Maps
+      SearchService.IndexEntryType type = SearchService.IndexEntryType.valueOf((String) data.get(TYPE));
+      DublinCoreCatalog dc = rehydrateDC(type, (Map<String, Object>) data.get(DUBLINCORE));
+      AccessControlList acl = rehydrateACL((Map<String, Object>) data.get(INDEX_ACL));
+      String org = (String) data.get(ORG);
+
+      Instant deleted = null;
+      if (data.containsKey(DELETED_DATE) && null != data.get(DELETED_DATE)) {
+        deleted = Instant.parse((String) data.get(DELETED_DATE));
+      }
+
+      Instant modified = null;
+      if (data.containsKey(MODIFIED_DATE) && !data.get(MODIFIED_DATE).equals("null")) {
+        modified = Instant.parse((String) data.get(MODIFIED_DATE));
+      }
+
+
+      MediaPackage mp = null;
+      //There had better be a mediapackage with an episode...
+      if (SearchService.IndexEntryType.Episode.equals(type)) {
+        mp = MediaPackageParser.getFromXml((String) data.get(MEDIAPACKAGE_XML));
+      }
+      return new SearchResult(type, dc, acl, org, mp, modified, deleted);
+    } catch (MediaPackageException e) {
+      throw new SearchException(e);
+    }
+  }
+
+  public static Map<String, List<String>> dehydrateDC(DublinCoreCatalog dublinCoreCatalog) {
+    var metadata = new HashMap<String, List<String>>();
+    for (var entry : dublinCoreCatalog.getValues().entrySet()) {
+      var key = entry.getKey().getLocalName();
+      var values = entry.getValue().stream().map(DublinCoreValue::getValue).collect(Collectors.toList());
+      metadata.put(key, values);
+    }
+
+    return metadata;
+  }
 
   /**
-   * The search item list
-   *
-   * @return Item list.
+   * Simplify ACL structure, so we can easily search by action.
+   * @param acl The access control List to restructure
+   * @return Restructured ACL
    */
-  SearchResultItem[] getItems();
+  public static Map<String, Set<String>> dehydrateAclForIndex(AccessControlList acl) {
+    var result = new HashMap<String, Set<String>>();
+    for (var entry : acl.getEntries()) {
+      var action = entry.getAction();
+      if (!result.containsKey(action)) {
+        result.put(action, new HashSet<>());
+      }
+      result.get(action).add(entry.getRole());
+    }
+    return result;
+  }
 
-  /**
-   * Get the user query.
-   *
-   * @return The user query.
-   */
-  String getQuery();
+  public static List<Map<String, ?>> dehydrateAclForREST(AccessControlList acl) {
+    return acl.getEntries().stream()
+        .map(ace -> Map.of("action", ace.getAction(), "role", ace.getRole(), "allow", Boolean.TRUE))
+        .collect(Collectors.toList());
+  }
 
-  /**
-   * Get the total number of items found, limited by the value returned by {@link #getLimit()}.
-   *
-   * @return The number.
-   */
-  long size();
+  @SuppressWarnings("unchecked")
+  public static AccessControlList rehydrateACL(Map<String, Object> map) {
+    List<AccessControlEntry> aces = new LinkedList<>();
+    for (var entry : map.entrySet()) {
+      String action = entry.getKey();
+      for (String rolename : (List<String>)  entry.getValue()) {
+        AccessControlEntry ace = new AccessControlEntry(rolename, action, true);
+        aces.add(ace);
+      }
+    }
+    return new AccessControlList(aces);
+  }
 
-  /**
-   * Returns the number of hits for this query, regardless of the limit that has been defined.
-   *
-   * @return the total number of hits.
-   */
-  long getTotalSize();
+  @SuppressWarnings("unchecked")
+  public static DublinCoreCatalog rehydrateDC(SearchService.IndexEntryType type, Map<String, Object> map)
+          throws SearchException {
+    OpencastDctermsDublinCore dc;
+    if (SearchService.IndexEntryType.Episode.equals(type)) {
+      dc = DublinCores.mkOpencastEpisode();
+    } else if (SearchService.IndexEntryType.Series.equals(type)) {
+      dc = DublinCores.mkOpencastSeries();
+    } else {
+      throw new SearchException("Unknown DC type!");
+    }
+    for (var entry: map.entrySet()) {
+      String key = entry.getKey();
+      //This is *always* a list, per dehydrateACL
+      List<String> value = (List<String>) entry.getValue();
+      dc.set(EName.mk(DublinCore.TERMS_NS_URI, key), value);
+    }
+    return dc.getCatalog();
+  }
 
-  /**
-   * Get the offset.
-   *
-   * @return The offset.
-   */
-  long getOffset();
+  public Map<String, Object> dehydrateForIndex() {
+    return dehydrate().entrySet().stream()
+        .filter(entry -> !entry.getKey().equals(REST_ACL))
+        .collect(HashMap::new, (m,v)->m.put(v.getKey(), v.getValue()), HashMap::putAll);
+  }
 
-  /**
-   * Get the limit.
-   *
-   * @return The limit.
-   */
-  long getLimit();
+  public Map<String, Object> dehydrateForREST() {
+    return dehydrate().entrySet().stream()
+        .filter(entry -> !entry.getKey().equals(INDEX_ACL))
+        .filter(entry -> !entry.getKey().equals(MEDIAPACKAGE_XML))
+        .collect(HashMap::new, (m,v)->m.put(v.getKey(), v.getValue()), HashMap::putAll);
+  }
 
-  /**
-   * Get the search time.
-   *
-   * @return The time in ms.
-   */
-  long getSearchTime();
+  public Map<String, Object> dehydrate() {
+    if (SearchService.IndexEntryType.Episode.equals(getType())) {
+      return dehydrateEpisode();
+    } else if (SearchService.IndexEntryType.Series.equals(getType())) {
+      return dehydrateSeries();
+    }
+    return null;
+  }
 
-  /**
-   * Get the page of the current result.
-   *
-   * @return The page.
-   */
-  long getPage();
+  public Map<String, Object> dehydrateEpisode() {
+    Map<String, List<String>> metadata = SearchResult.dehydrateDC(this.dublinCore);
 
+    var mediaPackageJson = gson.fromJson(MediaPackageParser.getAsJSON(this.mp), Map.class).get(MEDIAPACKAGE);
+
+    var ret = new HashMap<>(
+        Map.of(MEDIAPACKAGE, mediaPackageJson, MEDIAPACKAGE_XML, MediaPackageParser.getAsXml(this.mp), INDEX_ACL,
+            SearchResult.dehydrateAclForIndex(acl), REST_ACL, SearchResult.dehydrateAclForREST(acl), DUBLINCORE,
+            metadata, ORG, this.orgId, TYPE, this.type.name(),
+            MODIFIED_DATE, DateTimeFormatter.ISO_INSTANT.format(this.modified)));
+
+    ret.put(DELETED_DATE, null == this.deleted ? null : DateTimeFormatter.ISO_INSTANT.format(this.deleted));
+
+    return ret;
+  }
+
+  public Map<String, Object> dehydrateSeries() {
+    Map<String, List<String>> metadata = SearchResult.dehydrateDC(this.dublinCore);
+
+    var ret = new HashMap<>(
+        Map.of(INDEX_ACL, SearchResult.dehydrateAclForIndex(acl), REST_ACL, SearchResult.dehydrateAclForREST(acl),
+            DUBLINCORE, metadata, ORG, this.orgId, TYPE, this.type.name(),
+            MODIFIED_DATE, DateTimeFormatter.ISO_INSTANT.format(this.modified)));
+
+    ret.put(DELETED_DATE, null == this.deleted ? null : DateTimeFormatter.ISO_INSTANT.format(this.deleted));
+
+    return ret;
+  }
+
+  public DublinCoreCatalog getDublinCore() {
+    return this.dublinCore;
+  }
+
+  public AccessControlList getAcl() {
+    return acl;
+  }
+
+  public MediaPackage getMediaPackage() {
+    return mp;
+  }
+
+  public SearchService.IndexEntryType getType() {
+    return type;
+  }
+
+  public String getOrgId() {
+    return orgId;
+  }
 }

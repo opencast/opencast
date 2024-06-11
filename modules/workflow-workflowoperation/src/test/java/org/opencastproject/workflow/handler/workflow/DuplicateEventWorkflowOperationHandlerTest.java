@@ -71,8 +71,6 @@ import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workflow.handler.distribution.InternalPublicationChannel;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.Stream;
-
 import org.easymock.Capture;
 import org.easymock.CaptureType;
 import org.junit.Assert;
@@ -86,6 +84,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -248,7 +247,7 @@ public class DuplicateEventWorkflowOperationHandlerTest {
     replay(workspace);
 
     final AResult qResult = createNiceMock(AResult.class);
-    expect(qResult.getRecords()).andReturn(Stream.empty()).anyTimes();
+    expect(qResult.getRecords()).andReturn(new LinkedHashSet<>()).anyTimes();
     replay(qResult);
     final ASelectQuery qSelect = createNiceMock(ASelectQuery.class);
     expect(qSelect.where(anyObject())).andReturn(qSelect).anyTimes();

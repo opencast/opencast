@@ -38,8 +38,6 @@ import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -50,6 +48,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Replaces the media package in the current workflow with a previous version from the asset manager. There are two ways
@@ -143,8 +142,8 @@ public class SelectVersionWorkflowOperationHandler extends AbstractWorkflowOpera
 
     for (ARecord rec : r.getRecords()) {
       // There should be only one
-      Opt<Snapshot> optSnap = rec.getSnapshot();
-      if (optSnap.isNone()) {
+      Optional<Snapshot> optSnap = rec.getSnapshot();
+      if (optSnap.isEmpty()) {
         continue;
       }
       logger.info("Replacing current media package with version: {}", version);
@@ -165,8 +164,8 @@ public class SelectVersionWorkflowOperationHandler extends AbstractWorkflowOpera
     }
 
     nextVersion: for (ARecord rec : r.getRecords()) {
-      Opt<Snapshot> optSnap = rec.getSnapshot();
-      if (optSnap.isNone()) {
+      Optional<Snapshot> optSnap = rec.getSnapshot();
+      if (optSnap.isEmpty()) {
         continue;
       }
       Snapshot snapshot = optSnap.get();

@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opencastproject</groupId>
   <artifactId>base</artifactId>
-  <version>15-SNAPSHOT</version>
+  <version>16-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>opencast</name>
   <description>Opencast is a media capture, processing, management and distribution system</description>
@@ -19,15 +19,17 @@
     <aws.version>1.12.269_1</aws.version>
     <commons-codec.version>1.15</commons-codec.version>
     <commons-collections.version>4.4</commons-collections.version>
-    <commons-compress.version>1.24.0</commons-compress.version>
+    <commons-compress.version>1.26.0</commons-compress.version>
     <commons-csv.version>1.9.0</commons-csv.version>
     <commons-fileupload.version>1.5</commons-fileupload.version>
-    <commons-io.version>2.8.0</commons-io.version>
+    <commons-io.version>2.15.1</commons-io.version>
     <commons-lang3.version>3.12.0</commons-lang3.version>
     <commons-text.version>1.10.0</commons-text.version>
     <cxf.version>3.5.7</cxf.version>
-    <eclipselink.version>2.7.11</eclipselink.version>
+    <eclipselink.version>2.7.14</eclipselink.version>
     <eclipselink.asm.version>9.5.0</eclipselink.asm.version>
+    <elasticsearch.version>7.10.2</elasticsearch.version>
+    <failureaccess.version>1.0.1</failureaccess.version>
     <freemarker.version>2.3.32</freemarker.version>
     <functional.version>1.4.2</functional.version>
     <gson.version>2.10.1</gson.version>
@@ -43,16 +45,17 @@
     <jettison.version>1.5.4</jettison.version>
     <joda-time.version>2.12.5</joda-time.version>
     <json-simple.version>1.1.1</json-simple.version>
-    <junit5.version>5.10.0</junit5.version>
+    <junit5.version>5.10.2</junit5.version>
     <karaf.version>4.4.4</karaf.version>
-    <node.version>v18.16.0</node.version>
+    <lucene.version>8.7.0</lucene.version>
+    <node.version>v20.12.2</node.version>
     <osgi.core.version>8.0.0</osgi.core.version>
     <osgi.annotation.version>8.1.0</osgi.annotation.version>
     <org.osgi.service.component.version>1.5.1</org.osgi.service.component.version>
     <org.osgi.service.component.annotations.version>1.5.1</org.osgi.service.component.annotations.version>
     <org.osgi.service.cm.version>1.6.0</org.osgi.service.cm.version>
     <org.osgi.service.log.version>1.5.0</org.osgi.service.log.version>
-    <org.osgi.service.http.version>1.2.1</org.osgi.service.http.version>
+    <org.osgi.service.http.version>1.2.2</org.osgi.service.http.version>
     <org.osgi.service.http.whiteboard.version>1.1.1</org.osgi.service.http.whiteboard.version>
     <org.osgi.service.jaxrs.version>1.0.1</org.osgi.service.jaxrs.version>
     <querydsl.version>3.7.4</querydsl.version>
@@ -128,7 +131,6 @@
     <module>modules/email-template-service-api</module>
     <module>modules/email-template-service-impl</module>
     <module>modules/engage-paella-player-7</module>
-    <module>modules/engage-paella-player</module>
     <module>modules/engage-ui</module>
     <module>modules/event-comment</module>
     <module>modules/execute-api</module>
@@ -173,6 +175,7 @@
     <module>modules/oaipmh-persistence</module>
     <module>modules/oaipmh-remote</module>
     <module>modules/oaipmh</module>
+    <module>modules/playlists</module>
     <module>modules/plugin-manager</module>
     <module>modules/presets</module>
     <module>modules/publication-service-api</module>
@@ -192,9 +195,7 @@
     <module>modules/scheduler-remote</module>
     <module>modules/schema</module>
     <module>modules/search-service-api</module>
-    <module>modules/search-service-feeds</module>
     <module>modules/search-service-impl</module>
-    <module>modules/search-service-remote</module>
     <module>modules/security-aai</module>
     <module>modules/security-cas-client-wrapper</module>
     <module>modules/security-cas</module>
@@ -213,7 +214,6 @@
     <module>modules/smil-api</module>
     <module>modules/smil-impl</module>
     <module>modules/smil-workflowoperation</module>
-    <module>modules/solr</module>
     <module>modules/sox-api</module>
     <module>modules/sox-impl</module>
     <module>modules/sox-remote</module>
@@ -827,11 +827,6 @@
         <version>3.1.0</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.geronimo.specs</groupId>
-        <artifactId>geronimo-jms_1.1_spec</artifactId>
-        <version>1.1.1</version>
-      </dependency>
-      <dependency>
         <groupId>org.apache.solr</groupId>
         <artifactId>solr-core</artifactId>
         <exclusions>
@@ -1119,7 +1114,7 @@
       <dependency>
         <groupId>org.owasp.esapi</groupId>
         <artifactId>esapi</artifactId>
-        <version>2.5.2.0</version>
+        <version>2.5.3.1</version>
       </dependency>
       <dependency>
         <groupId>org.opensaml</groupId>
@@ -1172,7 +1167,7 @@
       <dependency>
         <groupId>xml-apis</groupId>
         <artifactId>xml-apis</artifactId>
-        <version>1.4.01</version>
+        <version>2.0.2</version>
       </dependency>
       <!-- logging -->
       <dependency>
@@ -1289,11 +1284,6 @@
             <artifactId>hamcrest-core</artifactId>
           </exclusion>
         </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.codehaus.groovy</groupId>
-        <artifactId>groovy-all</artifactId>
-        <version>2.5.8</version>
       </dependency>
       <dependency>
         <groupId>org.hamcrest</groupId>
@@ -1659,9 +1649,9 @@
     <developer>
       <id>mtneug</id>
       <name>Matthias Neugebauer</name>
-      <email>matthias.neugebauer@uni-muenster.de</email>
-      <organization>University of Muenster</organization>
-      <organizationUrl>https://www.uni-muenster.de/</organizationUrl>
+      <email>mtneug@shio.solutions</email>
+      <organization>shio solutions GmbH, University of Muenster</organization>
+      <organizationUrl>https://shio.solutions, https://www.uni-muenster.de/</organizationUrl>
       <roles>
         <role>developer</role>
       </roles>

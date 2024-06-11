@@ -104,7 +104,7 @@ public class SearchServicePersistenceTest {
     searchDatabase.storeMediaPackage(mediaPackage, accessControlList, modificationDate);
     Assert.assertEquals(searchDatabase.countMediaPackages(), mpCount + 1);
 
-    Stream<Tuple<MediaPackage, String>> mediaPackages = searchDatabase.getAllMediaPackages();
+    Stream<Tuple<MediaPackage, String>> mediaPackages = searchDatabase.getAllMediaPackages(50, 0);
     mediaPackages.forEach(mediaPackage -> {
 
       String mediaPackageId = mediaPackage.getA().getIdentifier().toString();
@@ -165,7 +165,7 @@ public class SearchServicePersistenceTest {
     episode = searchDatabase.getMediaPackage(mediaPackage.getIdentifier().toString());
     Assert.assertEquals(deletionDate, searchDatabase.getDeletionDate(mediaPackage.getIdentifier().toString()));
 
-    Stream<Tuple<MediaPackage, String>> allMediaPackages = searchDatabase.getAllMediaPackages();
+    Stream<Tuple<MediaPackage, String>> allMediaPackages = searchDatabase.getAllMediaPackages(50, 0);
     AtomicInteger i = new AtomicInteger(0);
     allMediaPackages.forEach(mediaPackage -> {
       i.incrementAndGet();
@@ -174,7 +174,7 @@ public class SearchServicePersistenceTest {
 
     searchDatabase.storeMediaPackage(mediaPackage, accessControlList, new Date());
 
-    allMediaPackages = searchDatabase.getAllMediaPackages();
+    allMediaPackages = searchDatabase.getAllMediaPackages(50, 0);
     AtomicInteger x = new AtomicInteger(0);
     allMediaPackages.forEach(mediaPackage -> {
       x.incrementAndGet();

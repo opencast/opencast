@@ -134,6 +134,7 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
@@ -547,8 +548,8 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     env.setIndexService(indexService);
 
     AssetManager assetManager = EasyMock.createNiceMock(AssetManager.class);
-    EasyMock.expect(assetManager.getMediaPackage(EasyMock.anyString())).andReturn(Opt.some(new MediaPackageBuilderImpl()
-            .createNew())).anyTimes();
+    EasyMock.expect(assetManager.getMediaPackage(EasyMock.anyString())).andReturn(Optional.of(
+        new MediaPackageBuilderImpl().createNew())).anyTimes();
     EasyMock.replay(assetManager);
     env.setAssetManager(assetManager);
   }

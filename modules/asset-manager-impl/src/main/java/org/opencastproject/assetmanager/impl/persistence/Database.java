@@ -168,7 +168,7 @@ public class Database implements EntityPaths {
             e.getIdentifier(),
             snapshotDto,
             e.getChecksum().toString(),
-            Opt.nul(e.getMimeType()),
+            Optional.ofNullable(e.getMimeType()),
             storageId,
             e.getSize());
         em.persist(a);
@@ -195,7 +195,7 @@ public class Database implements EntityPaths {
           .set(q.storageId, storageId)
           .execute();
       // Get the snapshot (to get its database ID)
-      Opt<SnapshotDtos.Medium> s = getSnapshot(version, mpId);
+      Optional<SnapshotDtos.Medium> s = getSnapshot(version, mpId);
       // Update the assets
       new JPAUpdateClause(em, a, TEMPLATES)
           .where(a.snapshot.id.eq(s.get().getSnapshotDto().getId()))
@@ -209,7 +209,7 @@ public class Database implements EntityPaths {
           final String storageId) {
     db.execTx(em -> {
       final QAssetDto a = QAssetDto.assetDto;
-      Opt<SnapshotDtos.Medium> s = getSnapshot(version, mpId);
+      Optional<SnapshotDtos.Medium> s = getSnapshot(version, mpId);
       // Update the asset store id
       new JPAUpdateClause(em, a, TEMPLATES)
           .where(a.snapshot.id.eq(s.get().getSnapshotDto().getId()).and(a.mediaPackageElementId.eq(mpeId)))
@@ -234,7 +234,7 @@ public class Database implements EntityPaths {
    *
    * @return the asset or none, if no asset can be found
    */
-  public Opt<AssetDtos.Medium> getAsset(final VersionImpl version, final String mpId, final String mpeId) {
+  public Optional<AssetDtos.Medium> getAsset(final VersionImpl version, final String mpId, final String mpeId) {
     return db.execTx(em -> {
       final QAssetDto assetDto = QAssetDto.assetDto;
       final Tuple result = AssetDtos.baseJoin(em)
@@ -244,11 +244,12 @@ public class Database implements EntityPaths {
           // if no version has been specified make sure to get the latest by ordering
           .orderBy(assetDto.snapshot.version.desc())
           .uniqueResult(Medium.select);
-      return Opt.nul(result).map(AssetDtos.Medium.fromTuple);
+      var dtoOpt = Opt.nul(result).map(AssetDtos.Medium.fromTuple);
+      return dtoOpt.isSome() ? Optional.of(dtoOpt.get()) : Optional.empty();
     });
   }
 
-  public Opt<SnapshotDtos.Medium> getSnapshot(final VersionImpl version, final String mpId) {
+  public Optional<SnapshotDtos.Medium> getSnapshot(final VersionImpl version, final String mpId) {
     return db.execTx(em -> {
       final QSnapshotDto snapshotDto = QSnapshotDto.snapshotDto;
       final Tuple result = SnapshotDtos.baseQuery(em)
@@ -257,16 +258,18 @@ public class Database implements EntityPaths {
           // if no version has been specified make sure to get the latest by ordering
           .orderBy(snapshotDto.version.desc())
           .uniqueResult(SnapshotDtos.Medium.select);
-      return Opt.nul(result).map(SnapshotDtos.Medium.fromTuple);
+      var dtoOpt = Opt.nul(result).map(SnapshotDtos.Medium.fromTuple);
+      return dtoOpt.isSome() ? Optional.of(dtoOpt.get()) : Optional.empty();
     });
   }
 
-  public Opt<AssetDtos.Full> findAssetByChecksum(final String checksum) {
+  public Optional<AssetDtos.Full> findAssetByChecksum(final String checksum) {
     return db.execTx(em -> {
       final Tuple result = AssetDtos.baseJoin(em)
           .where(QAssetDto.assetDto.checksum.eq(checksum))
           .singleResult(Full.select);
-      return Opt.nul(result).map(Full.fromTuple);
+      var dtoOpt = Opt.nul(result).map(Full.fromTuple);
+      return dtoOpt.isSome() ? Optional.of(dtoOpt.get()) : Optional.empty();
     });
   }
 
@@ -345,12 +348,13 @@ public class Database implements EntityPaths {
     return db.exec(SnapshotDto.countEventsQuery(organization));
   }
 
-  public Opt<AssetDtos.Full> findAssetByChecksumAndStore(final String checksum, final String storeId) {
+  public Optional<AssetDtos.Full> findAssetByChecksumAndStore(final String checksum, final String storeId) {
     return db.execTx(em -> {
       final Tuple result = AssetDtos.baseJoin(em)
           .where(QAssetDto.assetDto.checksum.eq(checksum).and(QAssetDto.assetDto.storageId.eq(storeId)))
           .singleResult(Full.select);
-      return Opt.nul(result).map(Full.fromTuple);
+      var dtoOpt = Opt.nul(result).map(Full.fromTuple);
+      return dtoOpt.isSome() ? Optional.of(dtoOpt.get()) : Optional.empty();
     });
   }
 
