@@ -394,7 +394,13 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
                 SearchResult.INDEX_ACL, SearchResult.dehydrateAclForIndex(seriesAcl),
                 SearchResult.MODIFIED_DATE, deletionString));
             var updateRequest = new UpdateRequest(INDEX_NAME, seriesId).doc(gson.toJson(json), XContentType.JSON);
-            esIndex.getClient().update(updateRequest, RequestOptions.DEFAULT);
+            try {
+              esIndex.getClient().update(updateRequest, RequestOptions.DEFAULT);
+            } catch (ElasticsearchStatusException e) {
+              if (RestStatus.NOT_FOUND == e.status()) {
+                logger.warn("Attempted to modify {}, but that series does not exist in the index.", seriesId);
+              }
+            }
           } else {
             // Remove series if there are no episodes in the series any longer
             deleteSeriesSynchronously(seriesId);
