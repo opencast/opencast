@@ -11,6 +11,13 @@ set with a lang:LANG-CODE tag. This should be handled properly.
 - **Improve Assetmanager multi store behavior:**
 From now on all snapshots of a mediapackage are stored in the same asset store.
 [[#5857](https://github.com/opencast/opencast/pull/5857)]
+- **The latest three editor releases:**
+  Namely
+  [[2024-04-16](https://github.com/opencast/opencast-editor/releases/tag/2024-04-16)],
+  [[2024-05-07](https://github.com/opencast/opencast-editor/releases/tag/2024-05-07)] and
+  [[2024-06-11](https://github.com/opencast/opencast-editor/releases/tag/2024-06-11)].
+  They previously went into Opencast 16, but there is no reason to not have them in Opencast 15,
+  so here they are.
 
 ## Opencast 15.5
 
