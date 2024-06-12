@@ -33,6 +33,7 @@ For this upgrade, you should be particular aware of the following facts:
 - The search REST API for publications has slightly changed. This may impact integrations.
 - Thew new admin interface is the default and the old one is disabled by default and only available via plugin.
 - The feed generator has been removed from Opencast.
+- Paella Player 6 has been removed from Opencast.
 
 ## Release Schedule
 
