@@ -1,6 +1,13 @@
 Changelog
 =========
 
+Opencast 16
+-----------
+
+### Opencast 16.0
+
+- *Changelogs are being generated…*
+
 Opencast 15
 -----------
 
