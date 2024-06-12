@@ -23,13 +23,16 @@ In that case, the following steps might help.
    files (e.g. `.snapshots/`).
 
          # This changes the domain AND from http to https. Carefully adjust the command as needed!
+         # Your old URL may or may not have the port explicitly listed.  Check the previous value of org.opencastproject.server.url and match that.
          find . -type f -name "*.xml" -exec \
-            sed -i -E 's/http:\/\/old-domain.example.com:80/https:\/\/new-domain.example.com/g' {} +
+            sed -i 's#http://old-domain.example.com:80#https://new-domain.example.com#g' {} +
 
 5. Update database tables.
    Note: there more than the following two tables containing the old domain name, but only these two are relevant.
 
+         -- Reminder: Your old domain name may or may not have its port listed.  Use old value for org.opencastproject.server.url here.
          UPDATE oc_assets_snapshot SET mediapackage_xml = REPLACE(
+         
             mediapackage_xml, 'http://old-domain.example.com:80', 'https://new-domain.example.com');
          UPDATE oc_search SET mediapackage_xml = REPLACE(
             mediapackage_xml, 'http://old-domain.example.com:80', 'https://new-domain.example.com');
