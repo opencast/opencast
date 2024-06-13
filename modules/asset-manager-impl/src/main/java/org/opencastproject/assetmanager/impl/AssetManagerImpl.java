@@ -174,6 +174,10 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
   private static final String MANIFEST_DEFAULT_NAME = "manifest";
 
+  private static final String ACL_ID_PREFIX_EPISODE = "ROLE_EPISODE_";
+  private static final String CONFIG_EPISODE_ID_ROLE = "org.opencastproject.episode.id.role.access";
+  private static boolean episodeIdRole = false;
+
   private CopyOnWriteArrayList<AssetManagerUpdateHandler> handlers = new CopyOnWriteArrayList<>();
 
   private SecurityService securityService;
@@ -194,6 +198,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   private boolean includeAPIRoles;
   private boolean includeCARoles;
   private boolean includeUIRoles;
+
 
   public static final Set<MediaPackageElement.Type> MOVABLE_TYPES = Sets.newHashSet(
           MediaPackageElement.Type.Attachment,
@@ -219,6 +224,10 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     includeAPIRoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeAPIRoles"), null));
     includeCARoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeCARoles"), null));
     includeUIRoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeUIRoles"), null));
+
+    episodeIdRole = BooleanUtils.toBoolean(Objects.toString(
+        cc.getBundleContext().getProperty(CONFIG_EPISODE_ID_ROLE), "false"));
+    logger.debug("Usage of episode ID roles is set to {}", episodeIdRole);
   }
 
   /**
@@ -1047,6 +1056,9 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
    * Security handling
    */
 
+  //  .map((role) -> q.mediapackageId().eq(StringUtils.substringBetween(role.getName(), ACL_ID_PREFIX_EPISODE, "_"))
+
+
   /**
    * Create an authorization predicate to be used with {@link #isAuthorized(String, String)},
    * restricting access to the user's organization and the given action.
@@ -1058,8 +1070,13 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     final AQueryBuilder q = createQueryWithoutSecurityCheck();
     return securityService.getUser().getRoles().stream()
             .filter(roleFilter)
-            .map((role) -> q.property(Value.BOOLEAN, SECURITY_NAMESPACE, mkPropertyName(role.getName(), action))
-                    .eq(true))
+            .map((role) -> {
+              if (episodeIdRole && role.getName().startsWith(ACL_ID_PREFIX_EPISODE)) {
+                return q.mediapackageId().eq(StringUtils.substringBetween(role.getName(), ACL_ID_PREFIX_EPISODE, "_"));
+              } else {
+                return q.property(Value.BOOLEAN, SECURITY_NAMESPACE, mkPropertyName(role.getName(), action)).eq(true);
+              }
+            })
             .reduce(Predicate::or)
             .orElseGet(() -> q.always().not())
             .and(restrictToUsersOrganization());
@@ -1088,9 +1105,14 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
         if (!snapshotExists(mediaPackageId, org)) {
           return false;
         }
+        // check episode role id
+        User user = securityService.getUser();
+        if (episodeIdRole && user.hasRole(ACL_ID_PREFIX_EPISODE + mediaPackageId + "_" + action.toUpperCase())) {
+          return true;
+        }
         // check acl rules
         logger.debug("Non admin user. Checking ACL rules.");
-        final List<String> roles = securityService.getUser().getRoles().parallelStream()
+        final List<String> roles = user.getRoles().parallelStream()
                 .filter(roleFilter)
                 .map((role) -> mkPropertyName(role.getName(), action))
                 .collect(Collectors.toList());
