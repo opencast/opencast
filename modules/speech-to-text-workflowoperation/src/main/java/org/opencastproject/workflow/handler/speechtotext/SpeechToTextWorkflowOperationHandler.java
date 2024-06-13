@@ -393,7 +393,7 @@ public class
         trackSelectionStrategy = TrackSelectionStrategy.fromString(strategyCfg);
       } catch (IllegalArgumentException e) {
         throw new WorkflowOperationException(String.format(
-            "Speech-to-Text job for media package '%s' failed, because of wrong workflow xml configuration. "
+            "Speech-to-Text job for media package '%s' failed, because of wrong workflow configuration. "
                 + "track-selection-strategy of type '%s' does not exist.", mediaPackage, strategyCfg));
       }
     }
