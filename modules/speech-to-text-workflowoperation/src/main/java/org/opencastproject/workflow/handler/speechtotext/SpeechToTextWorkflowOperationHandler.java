@@ -46,6 +46,7 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -190,7 +191,7 @@ public class
 
     // Load the 'limit-to-one' configuration from the workflow operation.
     // This configuration sets the limit of generated subtitle files to one
-    boolean limitToOne = getLimitToOneConfig(mediaPackage, workflowInstance);
+    boolean limitToOne = BooleanUtils.toBoolean(workflowInstance.getCurrentOperation().getConfiguration(LIMIT_TO_ONE));
 
     int subtitleCounter = 0;
     for (Track track : tracksToTranscribe) {
@@ -458,32 +459,6 @@ public class
       }
     }
     return translateMode;
-  }
-
-  /**
-   * Gets the 'limit to one' configuration
-   *
-   * @param mediaPackage     Contains mediapackage information
-   * @param workflowInstance Contains the workflow configuration
-   * @return Boolean if only max one track shall be transcribed
-   */
-  private Boolean getLimitToOneConfig(MediaPackage mediaPackage, WorkflowInstance workflowInstance)
-          throws WorkflowOperationException {
-
-    WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
-    String limitToOneConfig = StringUtils.trimToEmpty(operation.getConfiguration(LIMIT_TO_ONE)).toLowerCase();
-    boolean limitToOne;
-
-    if (limitToOneConfig.isEmpty() || "false".equals(limitToOneConfig)) {
-      limitToOne = false;
-    } else if ("true".equals(limitToOneConfig)) {
-      limitToOne = true;
-    } else {
-      throw new IllegalArgumentException(String.format(
-          "Speech-to-Text job for media package %s failed, because an invalid 'limit-to-one' config value: '%s'.",
-          mediaPackage, limitToOneConfig));
-    }
-    return limitToOne;
   }
 
   /**
