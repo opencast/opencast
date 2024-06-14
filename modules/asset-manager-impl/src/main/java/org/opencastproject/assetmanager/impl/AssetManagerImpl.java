@@ -1056,9 +1056,6 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
    * Security handling
    */
 
-  //  .map((role) -> q.mediapackageId().eq(StringUtils.substringBetween(role.getName(), ACL_ID_PREFIX_EPISODE, "_"))
-
-
   /**
    * Create an authorization predicate to be used with {@link #isAuthorized(String, String)},
    * restricting access to the user's organization and the given action.
