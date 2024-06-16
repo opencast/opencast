@@ -41,8 +41,8 @@ service" service.
 
 ### Step 1
 
-Edit `etc/org.apache.karaf.features.cfg` and make sure the `opencast-moodle` feature is listed in the `featuresBoot`
-option.
+Edit `etc/org.opencastproject.plugin.impl.PluginManagerImpl` and make sure the `opencast-plugin-userdirectory-moodle`
+plugin is enabled.
 
 ### Step 2
 
