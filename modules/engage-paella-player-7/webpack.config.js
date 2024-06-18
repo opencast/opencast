@@ -66,8 +66,7 @@ module.exports = function (env) {
         { context: ['/play'], ...proxyOpts },
         { context: ['/usertracking'], ...proxyOpts },
         { context: ['/editor'], ...proxyOpts },
-        { context: ['/editor-ui'], ...proxyOpts },
-        { context: ['/ui'], ...proxyOpts },
+        { context: ['/editor-ui'], ...proxyOpts }
       ]
     },
 
