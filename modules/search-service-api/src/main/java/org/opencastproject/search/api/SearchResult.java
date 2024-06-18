@@ -35,6 +35,8 @@ import org.opencastproject.security.api.AccessControlList;
 
 import com.google.gson.Gson;
 
+import org.elasticsearch.index.mapper.DateFieldMapper;
+
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
@@ -271,6 +273,11 @@ public class SearchResult {
 
   public SearchService.IndexEntryType getType() {
     return type;
+  }
+
+  public Instant getCreatedDate() {
+    var acc = DateFieldMapper.DEFAULT_DATE_TIME_FORMATTER.parse(this.dublinCore.getFirst(DublinCore.PROPERTY_CREATED));
+    return Instant.from(acc);
   }
 
   public String getOrgId() {
