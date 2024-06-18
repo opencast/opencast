@@ -38,6 +38,7 @@ import com.google.gson.Gson;
 import org.elasticsearch.index.mapper.DateFieldMapper;
 
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.HashMap;
@@ -145,7 +146,18 @@ public class SearchResult {
     var metadata = new HashMap<String, List<String>>();
     for (var entry : dublinCoreCatalog.getValues().entrySet()) {
       var key = entry.getKey().getLocalName();
-      var values = entry.getValue().stream().map(DublinCoreValue::getValue).collect(Collectors.toList());
+      var values = entry.getValue().stream()
+              .map(DublinCoreValue::getValue)
+              .map(val -> {
+                // Normalize `created` field: we want it to be in ISO 8601 format in UTC.
+                if (entry.getKey().equals(DublinCore.PROPERTY_CREATED)) {
+                  var date = DateFieldMapper.DEFAULT_DATE_TIME_FORMATTER.parse(val);
+                  return DateFieldMapper.DEFAULT_DATE_TIME_FORMATTER.withZone(ZoneOffset.UTC).format(date);
+                } else {
+                  return val;
+                }
+              })
+              .collect(Collectors.toList());
       metadata.put(key, values);
     }
 
