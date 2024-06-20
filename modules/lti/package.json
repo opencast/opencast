@@ -30,7 +30,6 @@
     "autoprefixer": "10.4.5"
   },
   "scripts": {
-    "i18n": "./copy-translations.sh",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
