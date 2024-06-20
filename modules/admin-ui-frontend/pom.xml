@@ -13,165 +13,25 @@
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
-    <skipTests>false</skipTests>
+    <interface.url>https://radosgw.public.os.wwu.de/opencast-js-bin/opencast-admin-ng/webapp-2024-06-20.tar.gz</interface.url>
+    <interface.sha256>3c4e258eb8029f17d3ae86c85462a0160bba6ca4169f85c2b1d0f2735fe7576b</interface.sha256>
   </properties>
-  <profiles>
-    <profile>
-      <id>frontend-no-prebuilt</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>exec-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>npm ci</id>
-                <goals>
-                  <goal>exec</goal>
-                </goals>
-                <phase>initialize</phase>
-                <configuration>
-                  <executable>npm</executable>
-                  <arguments>
-                    <argument>ci</argument>
-                  </arguments>
-                </configuration>
-              </execution>
-              <execution>
-                <id>bower install</id>
-                <goals>
-                  <goal>exec</goal>
-                </goals>
-                <phase>initialize</phase>
-                <configuration>
-                  <executable>npx</executable>
-                  <arguments>
-                    <argument>bower</argument>
-                    <argument>--allow-root</argument>
-                    <argument>install</argument>
-                  </arguments>
-                </configuration>
-              </execution>
-              <execution>
-                <id>frontend build</id>
-                <goals>
-                  <goal>exec</goal>
-                </goals>
-                <phase>initialize</phase>
-                <configuration>
-                  <executable>npx</executable>
-                  <arguments>
-                    <argument>grunt</argument>
-                    <argument>build</argument>
-                    <argument>--skipTests=${skipTests}</argument>
-                  </arguments>
-                </configuration>
-              </execution>
-              <execution>
-                <id>eslint</id>
-                <goals>
-                  <goal>exec</goal>
-                </goals>
-                <phase>test</phase>
-                <configuration>
-                  <executable>npm</executable>
-                  <arguments>
-                    <argument>run</argument>
-                    <argument>eslint</argument>
-                  </arguments>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>frontend</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>com.github.eirslett</groupId>
-            <artifactId>frontend-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>install node and npm</id>
-                <goals>
-                  <goal>install-node-and-npm</goal>
-                </goals>
-                <configuration>
-                  <nodeVersion>${node.version}</nodeVersion>
-                </configuration>
-              </execution>
-              <execution>
-                <id>npm ci</id>
-                <goals>
-                  <goal>npm</goal>
-                </goals>
-                <configuration>
-                  <arguments>ci</arguments>
-                </configuration>
-              </execution>
-              <execution>
-                <id>bower install</id>
-                <goals>
-                  <goal>bower</goal>
-                </goals>
-                <configuration>
-                  <arguments>--allow-root install</arguments>
-                </configuration>
-              </execution>
-              <execution>
-                <id>grunt build</id>
-                <goals>
-                  <goal>grunt</goal>
-                </goals>
-                <configuration>
-                  <arguments>build --skipTests=${skipTests}</arguments>
-                </configuration>
-              </execution>
-              <execution>
-                <phase>test</phase>
-                <id>eslint</id>
-                <goals>
-                  <goal>npm</goal>
-                </goals>
-                <configuration>
-                  <arguments>run eslint</arguments>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
   <build>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-resources-plugin</artifactId>
+        <groupId>com.googlecode.maven-download-plugin</groupId>
+        <artifactId>download-maven-plugin</artifactId>
         <executions>
           <execution>
-            <id>copy-grunt</id>
-            <phase>compile</phase>
+            <id>fetch-admin-ug</id>
             <goals>
-              <goal>copy-resources</goal>
+              <goal>wget</goal>
             </goals>
             <configuration>
-              <outputDirectory>${basedir}/target/classes/webapp/</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>./target/grunt/webapp</directory>
-                  <includes>
-                    <include>**</include>
-                  </includes>
-                  <filtering>false</filtering>
-                </resource>
-              </resources>
+              <url>${interface.url}</url>
+              <sha256>${interface.sha256}</sha256>
+              <unpack>true</unpack>
+              <outputDirectory>target/classes/</outputDirectory>
             </configuration>
           </execution>
         </executions>
@@ -186,12 +46,11 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
+            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+            <Private-Package>webapp.*</Private-Package>
             <Http-Alias>/admin-ng</Http-Alias>
             <Http-Classpath>/webapp</Http-Classpath>
             <Http-Welcome>index.html</Http-Welcome>
-            <Private-Package>
-              webapp.*
-            </Private-Package>
           </instructions>
         </configuration>
       </plugin>
