@@ -2,7 +2,7 @@ Episode ID roles
 =================================
 
 If activated, users with a role like `ROLE_EPISODE_<ID>_<ACTION>` will have access to the episode with the given
-identifier, without this having to be specifically specified in the ACL attached to the episode.
+identifier, without this having to be explicitly stated in the ACL attached to the episode.
 
 For example, `ROLE_EPISODE_872dc4ec-ca8a-4e12-8dac-ce99784d6d29_READ` will allow the user to get read access to
 episode 872dc4ec-ca8a-4e12-8dac-ce99784d6d29.
