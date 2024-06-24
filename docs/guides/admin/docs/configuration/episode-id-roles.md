@@ -5,7 +5,7 @@ If activated, users with a role like `ROLE_EPISODE_<ID>_<ACTION>` will have acce
 identifier, without this having to be explicitly stated in the ACL attached to the episode.
 
 For example, `ROLE_EPISODE_872dc4ec-ca8a-4e12-8dac-ce99784d6d29_READ` will allow the user to get read access to
-episode 872dc4ec-ca8a-4e12-8dac-ce99784d6d29.
+episode `872dc4ec-ca8a-4e12-8dac-ce99784d6d29`.
 
 Setup
 --------------------
