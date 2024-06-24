@@ -13,7 +13,7 @@ Setup
 Enable `episode.id.role.access` in `etc/custom.properties`.
 
 To make this work for the Admin UI and External API, the Elasticsearch Index needs to be updated with modified
-ACLs. You can achieve this by calling the /index/rebuild/AssetManager/ACL endpoint AFTER enabling this feature
+ACLs. You can achieve this by calling the `/index/rebuild/AssetManager/ACL` endpoint **after** enabling this feature
 in the aforementioned configuration files.
 The endpoint will reindex only event ACLs.
 
