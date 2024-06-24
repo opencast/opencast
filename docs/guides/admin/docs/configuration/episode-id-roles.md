@@ -17,5 +17,5 @@ ACLs. You can achieve this by calling the `/index/rebuild/AssetManager/ACL` endp
 in the aforementioned configuration files.
 The endpoint will reindex only event ACLs.
 
-In case that you have custom actions configured, this will only work for the actions that were configured during the
+In case you have custom actions configured, this will only work for the actions that were configured during the
 reindex of the Elasticsearch Index. If you later add custom actions, you will have to reindex again.
