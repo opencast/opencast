@@ -27,8 +27,9 @@ package org.opencastproject.elasticsearch.index.rebuild;
 public interface IndexProducer {
 
   /**
-   * Re-add the data of this service to the index for the given type.
-   * Re-add ALL data of this service if null is passed instead.
+   * Re-add the data of this service to the index.
+   * @param type
+   *          Limit the data added to the index to the given type. Re-add all data if <code>null</code> is given.
    */
   void repopulate(String type) throws IndexRebuildException;
 
