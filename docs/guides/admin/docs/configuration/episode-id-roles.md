@@ -18,4 +18,4 @@ in the aforementioned configuration files.
 The endpoint will reindex only event ACLs.
 
 In case you have custom actions configured, this will only work for the actions that were configured during the
-reindex of the Elasticsearch Index. If you later add custom actions, you will have to reindex again.
+reindex of the Elasticsearch index. If you later add custom actions, you will have to reindex again.
