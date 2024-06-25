@@ -20,6 +20,8 @@
  */
 package org.opencastproject.transcription.ibmwatson;
 
+import static org.opencastproject.systems.OpencastConstants.ADMIN_EMAIL_PROPERTY;
+
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.fn.Enrichments;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
@@ -143,7 +145,6 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
 
   // Global configuration (custom.properties)
   public static final String ADMIN_URL_PROPERTY = "org.opencastproject.admin.ui.url";
-  private static final String ADMIN_EMAIL_PROPERTY = "org.opencastproject.admin.email";
   private static final String DIGEST_USER_PROPERTY = "org.opencastproject.security.digest.user";
 
   // Cluster name
@@ -1076,7 +1077,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
       return null;
     }
 
-    String org = Enrichments.enrich(r).getSnapshots().head2().getOrganizationId();
+    String org = Enrichments.enrich(r).getSnapshots().stream().findFirst().get().getOrganizationId();
     Organization organization = null;
     try {
       organization = organizationDirectoryService.getOrganization(org);

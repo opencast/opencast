@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>16-SNAPSHOT</version>
+    <version>17-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -238,8 +238,6 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Build-Number>${buildNumber}</Build-Number>
             <Import-Package>
               !com.mchange.v2.c3p0.*,
               !com.sun.*,
@@ -256,6 +254,8 @@
               !org.mozilla.javascript.*,
               !org.python.*,
               !org.zeroturnaround.javarebel.*,
+              !groovy.*,
+              !org.codehaus.groovy.*,
               javax.ws.rs;version=2.0.1,
               javax.ws.rs.core;version=2.0.1,
               javax.ws.rs.ext;version=2.0.1,

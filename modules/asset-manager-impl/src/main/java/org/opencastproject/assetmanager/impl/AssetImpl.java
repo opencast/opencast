@@ -26,14 +26,13 @@ import org.opencastproject.assetmanager.api.Availability;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.MimeType;
 
-import com.entwinemedia.fn.data.Opt;
-
 import java.io.InputStream;
+import java.util.Optional;
 
 public class AssetImpl implements Asset {
   private final AssetId id;
   private final InputStream in;
-  private final Opt<MimeType> mimeType;
+  private final Optional<MimeType> mimeType;
   private final long size;
   private final Availability availability;
   private final String storageId;
@@ -42,7 +41,7 @@ public class AssetImpl implements Asset {
   public AssetImpl(
           AssetId id,
           InputStream in,
-          Opt<MimeType> mimeType,
+          Optional<MimeType> mimeType,
           long size,
           String storeId,
           Availability availability,
@@ -64,7 +63,7 @@ public class AssetImpl implements Asset {
     return in;
   }
 
-  @Override public Opt<MimeType> getMimeType() {
+  @Override public Optional<MimeType> getMimeType() {
     return mimeType;
   }
 

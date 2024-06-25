@@ -28,6 +28,7 @@ import org.opencastproject.assetmanager.api.AssetManagerException;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.AResult;
+import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
@@ -46,9 +47,8 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
-
-import com.entwinemedia.fn.Stream;
 
 import org.apache.commons.io.FilenameUtils;
 import org.osgi.framework.BundleContext;
@@ -60,7 +60,9 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 
 /**
  * Responds to series events by re-distributing metadata and security policy files to episodes.
@@ -178,8 +180,12 @@ public class AssetManagerUpdatedEventHandler {
 
       final AQueryBuilder q = assetManager.createQuery();
       final AResult result = q.select(q.snapshot()).where(q.seriesId().eq(seriesId).and(q.version().isLatest())).run();
-      Stream<Snapshot> snapshots = enrich(result).getSnapshots().sort(
-              Comparator.comparing(s->s.getMediaPackage().getIdentifier().toString()));
+      List<Snapshot> snapshots = enrich(result).getSnapshots();
+      Collections.sort(
+          enrich(result).getSnapshots(),
+          Comparator.comparing(s->s.getMediaPackage().getIdentifier().toString())
+      );
+
       for (Snapshot snapshot : snapshots) {
         final String orgId = snapshot.getOrganizationId();
         final Organization organization = organizationDirectoryService.getOrganization(orgId);
@@ -193,13 +199,15 @@ public class AssetManagerUpdatedEventHandler {
         MediaPackage mp = snapshot.getMediaPackage();
 
         // Update the series XACML file
+        Tuple<MediaPackage, Attachment> mpAclAttachmentTuple = null;
         if (SeriesItem.Type.UpdateAcl.equals(seriesItem.getType())) {
           // Build a new XACML file for this mediapackage
           try {
             if (seriesItem.getOverrideEpisodeAcl()) {
               authorizationService.removeAcl(mp, AclScope.Episode);
             }
-            authorizationService.setAcl(mp, AclScope.Series, seriesItem.getAcl());
+            mpAclAttachmentTuple = authorizationService.setAcl(mp,
+                AclScope.Series, seriesItem.getAcl());
           } catch (MediaPackageException e) {
             logger.error("Error setting ACL for media package {}", mp.getIdentifier(), e);
           }
@@ -265,6 +273,14 @@ public class AssetManagerUpdatedEventHandler {
           assetManager.takeSnapshot(snapshot.getOwner(), mp);
         } catch (AssetManagerException e) {
           logger.error("Error updating mediapackage {}", mp.getIdentifier().toString(), e);
+        } finally {
+          if (mpAclAttachmentTuple != null) {
+            try {
+              workspace.delete(mpAclAttachmentTuple.getB().getURI());
+            } catch (Exception ex) {
+              // We only want to clean up. If the file is gone, that is fine too.
+            }
+          }
         }
       }
     } catch (IOException | NotFoundException e) {

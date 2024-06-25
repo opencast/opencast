@@ -129,7 +129,7 @@ public class AwsS3RestEndpoint {
         if (result.getSize() == 0) {
           return notFound();
         }
-        final ARecord item = result.getRecords().head2();
+        final ARecord item = result.getRecords().stream().findFirst().get();
 
         StringBuilder info = new StringBuilder();
         for (MediaPackageElement e : assetManager.getMediaPackage(item.getMediaPackageId()).get().elements()) {
@@ -211,7 +211,7 @@ public class AwsS3RestEndpoint {
         if (result.getSize() == 0) {
           return notFound();
         }
-        final ARecord item = result.getRecords().head2();
+        final ARecord item = result.getRecords().stream().findFirst().get();
 
         StringBuilder info = new StringBuilder();
         for (MediaPackageElement e : assetManager.getMediaPackage(item.getMediaPackageId()).get().elements()) {
@@ -285,7 +285,7 @@ public class AwsS3RestEndpoint {
         if (result.getSize() == 0) {
           return notFound();
         }
-        final ARecord item = result.getRecords().head2();
+        final ARecord item = result.getRecords().stream().findFirst().get();
 
         StringBuilder info = new StringBuilder();
         for (MediaPackageElement e : assetManager.getMediaPackage(item.getMediaPackageId()).get().elements()) {
@@ -378,7 +378,7 @@ public class AwsS3RestEndpoint {
         if (result.getSize() == 0) {
           return notFound();
         }
-        final ARecord item = result.getRecords().head2();
+        final ARecord item = result.getRecords().stream().findFirst().get();
 
 
         for (MediaPackageElement e : assetManager.getMediaPackage(item.getMediaPackageId()).get().elements()) {

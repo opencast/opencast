@@ -55,10 +55,14 @@ import com.mysema.query.types.expr.BooleanExpression;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public abstract class AbstractASelectQuery implements ASelectQuery, SelectQueryContributor, EntityPaths {
   protected static final Logger logger = LoggerFactory.getLogger(AbstractASelectQuery.class);
@@ -196,7 +200,7 @@ public abstract class AbstractASelectQuery implements ASelectQuery, SelectQueryC
       }
     }
     // Run the query and transform the result into records
-    final Stream<ARecordImpl> records;
+    final LinkedHashSet<ARecordImpl> records;
     {
       // run query
       am.getDatabase().logQuery(q);
@@ -205,22 +209,21 @@ public abstract class AbstractASelectQuery implements ASelectQuery, SelectQueryC
       // map result based on the fact whether properties have been fetched or not
       if (!toFetchProperties) {
         // No properties have been fetched -> each result row (tuple) is a distinct record (snapshot).
-        records = $($(result).map(toARecord(r))).map(new Fn<ARecordImpl, ARecordImpl>() {
-          @Override
-          public ARecordImpl apply(ARecordImpl record) {
-            Opt<Snapshot> snapshotOpt = record.getSnapshot();
-            Snapshot snapshot = null;
-            if (snapshotOpt.isSome()) {
-              // make sure the delivered media package has valid URIs
-              snapshot = am.getHttpAssetProvider().prepareForDelivery(snapshotOpt.get());
-            }
-            return new ARecordImpl(
-                    record.getSnapshotId(),
-                    record.getMediaPackageId(),
-                    record.getProperties(),
-                    snapshot);
-          }
-        });
+        records = result.stream()
+            .map(tuple -> toARecord(tuple, r))
+            .map(record -> {
+              Optional<Snapshot> snapshotOpt = record.getSnapshot();
+              Snapshot snapshot = null;
+              if (snapshotOpt.isPresent()) {
+                // make sure the delivered media package has valid URIs
+                snapshot = am.getHttpAssetProvider().prepareForDelivery(snapshotOpt.get());
+              }
+              return new ARecordImpl(
+                  record.getSnapshotId(),
+                  record.getMediaPackageId(),
+                  record.getProperties(),
+                  snapshot);
+            }).collect(Collectors.toCollection(LinkedHashSet::new));
       } else {
         logger.trace("Fetched properties");
         // Properties have been fetched -> there may be multiple rows (tuples)
@@ -244,33 +247,35 @@ public abstract class AbstractASelectQuery implements ASelectQuery, SelectQueryC
               }
             });
         // group records after their media package ID
-        final Map<String, List<ARecordImpl>> distinctRecords = $($(result)
-            .map(toARecord(r)).toSet())
-            .groupMulti(ARecordImpl.getMediaPackageId);
-        records = $(distinctRecords.values()).bind(new Fn<List<ARecordImpl>, Iterable<ARecordImpl>>() {
-          @Override public Iterable<ARecordImpl> apply(List<ARecordImpl> records) {
-            return $(records).map(new Fn<ARecordImpl, ARecordImpl>() {
-              @Override public ARecordImpl apply(ARecordImpl record) {
-                final Set<Property> properties = propertiesPerMp.get(record.getMediaPackageId());
-                final Stream<Property> p = properties != null ? $(properties) : Stream.<Property>empty();
-                Snapshot snapshot = null;
-                Opt<Snapshot> snapshotOpt = record.getSnapshot();
-                if (snapshotOpt.isSome()) {
-                  // make sure the delivered media package has valid URIs
-                  snapshot = am.getHttpAssetProvider().prepareForDelivery(snapshotOpt.get());
-                }
-                return new ARecordImpl(record.getSnapshotId(), record.getMediaPackageId(), p, snapshot);
+        final Map<String, List<ARecordImpl>> distinctRecords = result.stream()
+            .map(tuple -> toARecord(tuple, r))
+            .collect(Collectors.groupingBy(record -> record.getMediaPackageId()));
+        records = distinctRecords.values().stream()
+            .flatMap(List::stream)
+            .map(record -> {
+              final Set<Property> properties = propertiesPerMp.get(record.getMediaPackageId());
+              final List<Property> p = properties != null
+                  ? properties.stream().collect(Collectors.toList()) : new ArrayList<>();
+              Snapshot snapshot = null;
+              Optional<Snapshot> snapshotOpt = record.getSnapshot();
+              if (snapshotOpt.isPresent()) {
+                // make sure the delivered media package has valid URIs
+                snapshot = am.getHttpAssetProvider().prepareForDelivery(snapshotOpt.get());
               }
-            });
-          }
-        });
+              return new ARecordImpl(record.getSnapshotId(), record.getMediaPackageId(), p, snapshot);
+            })
+            .collect(Collectors.toCollection(LinkedHashSet::new));
       }
     }
     final long searchTime = (System.nanoTime() - startTime) / 1000000;
     logger.debug("Complete query ms " + searchTime);
+    LinkedHashSet<ARecord> narrowRecords = new LinkedHashSet<>();
+    for (ARecordImpl recordImpl : records) {
+      narrowRecords.add(recordImpl);
+    }
     return new AResultImpl(
-        AbstractASelectQuery.<ARecord>vary(records),
-        sizeOf(records),
+        narrowRecords,
+        narrowRecords.size(),
         r.offset.getOr(0),
         r.limit.getOr(-1),
         searchTime
@@ -300,9 +305,29 @@ public abstract class AbstractASelectQuery implements ASelectQuery, SelectQueryC
               "[BUG] snapshot table media package id"
           );
         }
-        return new ARecordImpl(id, mediaPackageId, Stream.<Property>empty(), snapshotDto);
+        return new ARecordImpl(id, mediaPackageId, new ArrayList<>(), snapshotDto);
       }
     };
+  }
+
+  private ARecordImpl toARecord(Tuple tuple, final SelectQueryContribution c) {
+    final String mediaPackageId;
+    SnapshotDto snapshotDto = null;
+    final long id;
+    // Only fetch the snapshot if it is in the fetch list.
+    if (c.fetch.exists(Booleans.<Expression<?>>eq(Q_SNAPSHOT))) {
+      snapshotDto = RequireUtil.notNull(tuple.get(Q_SNAPSHOT), "[BUG] snapshot table data");
+      id = snapshotDto.getId();
+      mediaPackageId = snapshotDto.getMediaPackageId();
+    } else {
+      // The media package ID and the snapshot's database ID must always be fetched.
+      id = RequireUtil.notNull(tuple.get(Q_SNAPSHOT.id), "[BUG] snapshot table id");
+      mediaPackageId = RequireUtil.notNull(
+          tuple.get(Q_SNAPSHOT.mediaPackageId),
+          "[BUG] snapshot table media package id"
+      );
+    }
+    return new ARecordImpl(id, mediaPackageId, new ArrayList<>(), snapshotDto);
   }
 
   private static Fn<Tuple, Opt<Property>> toProperty = new Fn<Tuple, Opt<Property>>() {

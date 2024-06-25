@@ -53,6 +53,10 @@ First you have to install the necessary repositories so that your package manage
 
         wget -qO - https://pkg.opencast.org/gpgkeys/opencast-deb.key | sudo apt-key add -
 
+    On latest Debian based systems (Debian 11+, Ubuntu 22.04+) importing gpg keys with `apt-key` is deprecated. You can use an alternative step:
+
+        wget -qO - https://pkg.opencast.org/gpgkeys/opencast-deb.key | gpg --dearmor | sudo dd of=/etc/apt/trusted.gpg.d/opencast-deb.gpg
+
 * Update your package listing
 
         apt-get update

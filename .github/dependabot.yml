@@ -12,6 +12,11 @@ updates:
     interval: monthly
   open-pull-requests-limit: 10
 - package-ecosystem: npm
+  directory: "/docs/checkstyle/eslint-config"
+  schedule:
+    interval: monthly
+  open-pull-requests-limit: 10
+- package-ecosystem: npm
   directory: "/modules/engage-ui"
   schedule:
     interval: monthly
@@ -23,11 +28,6 @@ updates:
   open-pull-requests-limit: 10
 - package-ecosystem: npm
   directory: "/modules/runtime-info-ui"
-  schedule:
-    interval: monthly
-  open-pull-requests-limit: 10
-- package-ecosystem: npm
-  directory: "/modules/engage-paella-player"
   schedule:
     interval: monthly
   open-pull-requests-limit: 10

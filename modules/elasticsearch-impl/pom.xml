@@ -8,14 +8,12 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>16-SNAPSHOT</version>
+    <version>17-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
-    <lucene.version>8.7.0</lucene.version>
-    <elasticsearch.version>7.10.2</elasticsearch.version>
   </properties>
   <dependencies>
     <dependency>
@@ -168,14 +166,13 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Build-Number>${buildNumber}</Build-Number>
             <Import-Package>
               !com.carrotsearch.randomizedtesting,
               !com.conversantmedia.util.*,
               !com.fasterxml.jackson.dataformat.smile,
               !com.fasterxml.jackson.dataformat.xml.*,
               !com.fasterxml.jackson.dataformat.yaml.*,
+              !com.google.common.*,
               !com.lmax.disruptor.*,
               !com.sun.jna.*,
               !com.sun.management*,
@@ -195,12 +192,14 @@
               !org.jctools.queues.*,
               !org.locationtech.jts.geom.*,
               !org.locationtech.spatial4j.*,
+              !org.tartarus.*,
               !org.zeromq.*,
               !com.github.mustachejava.*,
               *
             </Import-Package>
             <Export-Package>
               org.apache.logging.log4j*,
+              org.apache.lucene.*,
               org.opencastproject.elasticsearch.impl;version=${project.version}
             </Export-Package>
             <Embed-Dependency>

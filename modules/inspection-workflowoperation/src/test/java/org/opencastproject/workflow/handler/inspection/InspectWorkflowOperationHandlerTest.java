@@ -36,6 +36,8 @@ import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
+import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
+import org.opencastproject.metadata.dublincore.Precision;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
@@ -115,6 +117,11 @@ public class InspectWorkflowOperationHandlerTest {
     EasyMock.expect(dc.hasValue(DublinCore.PROPERTY_EXTENT)).andReturn(false);
     dc.set((EName) EasyMock.anyObject(), (DublinCoreValue) EasyMock.anyObject());
     EasyMock.expect(dc.hasValue(DublinCore.PROPERTY_CREATED)).andReturn(false);
+    dc.set((EName) EasyMock.anyObject(), (DublinCoreValue) EasyMock.anyObject());
+    EasyMock.expect(dc.hasValue(DublinCore.PROPERTY_CREATED)).andReturn(true);
+    EasyMock.expect(dc.hasValue(DublinCore.PROPERTY_TEMPORAL)).andReturn(false);
+    EasyMock.expect(dc.getFirst(DublinCore.PROPERTY_CREATED))
+        .andReturn(EncodingSchemeUtils.encodeDate(DATE, Precision.Minute).getValue());
     dc.set((EName) EasyMock.anyObject(), (DublinCoreValue) EasyMock.anyObject());
     dc.toXml((ByteArrayOutputStream) EasyMock.anyObject(), EasyMock.anyBoolean());
     // EasyMock.expect(dc.getIdentifier()).andReturn("123");

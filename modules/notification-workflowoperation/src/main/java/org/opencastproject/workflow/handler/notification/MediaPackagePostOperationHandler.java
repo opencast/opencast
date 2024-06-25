@@ -24,10 +24,10 @@ package org.opencastproject.workflow.handler.notification;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageParser;
-import org.opencastproject.search.api.SearchQuery;
-import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchService;
+import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
@@ -101,15 +101,12 @@ public class MediaPackagePostOperationHandler extends AbstractWorkflowOperationH
     // check if we need to replace the media package we got with the published
     // media package from the search service
     if (config.mpFromSearch()) {
-      SearchQuery searchQuery = new SearchQuery();
-      searchQuery.withId(mp.getIdentifier().toString());
-      SearchResult result = searchService.getByQuery(searchQuery);
-      if (result.size() != 1) {
-        throw new WorkflowOperationException("Received multiple results for identifier"
-            + "\"" + mp.getIdentifier().toString() + "\" from search service. ");
-      }
       logger.info("Getting media package from search service");
-      mp = result.getItems()[0].getMediaPackage();
+      try {
+        mp = searchService.get(mp.getIdentifier().toString());
+      } catch (NotFoundException | UnauthorizedException e) {
+        throw new WorkflowOperationException("could not get media package " + mp + " from search service.");
+      }
     }
 
     logger.info("Submitting {} ({}) as {} to {}",

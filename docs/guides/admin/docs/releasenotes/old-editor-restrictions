@@ -1,3 +1,0 @@
-Restrictions in regards to what kind of streams can be selected in the old integrated video editor were eased to allow
-for more diverse use cases. Previous errors were demoted to warnings. The user still has to select at least one stream,
-but publishing e.g. of an audio stream without a video stream is now allowed. For more details see PR 5023.

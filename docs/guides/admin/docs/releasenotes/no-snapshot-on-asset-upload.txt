@@ -1,3 +1,0 @@
-With this release, there will no longer be a snapshot taken to archive new assets uploaded to an existing event _before_
-the workflow is started. Instead, the workflow is expected to take care of this. The community workflow already did
-this, but if you have custom workflows, you might need to make changes to ensure this.

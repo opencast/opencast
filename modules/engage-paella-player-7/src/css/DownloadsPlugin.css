@@ -30,6 +30,10 @@
     color: lightsalmon;
 }
 
+.downloads-plugin .downloadStream .transcript {
+    color: coral;
+}
+
 
 .downloads-plugin a {
     color: lightsalmon;

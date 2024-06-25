@@ -9,6 +9,48 @@ The following list contains a list of passed proposals for reference.
 Passed Proposals
 ----------------
 
+### Release Manager Selection Process
+Proposed by Greg Logan <gregorydlogan@gmail.com>, passed on Tue, April 9 2023
+```no-highlight
+Hi all,
+
+As we've seen over the last few years, there isn't exactly a ton of competition
+to be a release manager.  Because of this, the voting requirement as outlined
+in our RM docs[1] seems a bit silly.  I #propose that we allow election via
+acclamation[2] in the case where there are no other volunteers.  This would
+remove the requirement for the vote until there is more than one set of
+candidates.
+
+Since it's Easter break and lots of folks are on holidays, let's vote for
+longer here.  Proposal closes on EOD 2024-04-09
+
+G
+
+1:https://docs.opencast.org/r/13.x/developer/#release-manager/#appointment-of-next-release-manager
+2: https://en.wikipedia.org/wiki/Acclamation, "Uncontested Election"
+```
+
+
+### Removal of Paella 6 in OC 16
+Proposed by Greg Logan <gregorydlogan@gmail.com>, passed on Wed, Feb 14 2024
+```no-highlight
+Hi all,
+
+With the freshly filed PR[1] upgrading the Search Index, we have broken compatibility with most existing integrations.
+I say most, since I updated Tobira, and Paella 7 as part of that work. If you're integrations depend on endpoints in
+the /search/* namespace, please test!
+
+With that in mind, Paella 6 would be broken by this pull request, and I'm #proposing that we remove it completely with
+Opencast 16. As far as I know all development is against Paella 7, and Paella 6 is already disabled by default.
+
+
+G
+
+1: https://github.com/opencast/opencast/pull/5597
+
+```
+
+
 ### Deprecate Theodul with Opencast 12
 Proposed by Greg Logan <gregorydlogan@gmail.com>, passed on Fri, July 1 2022
 ```no-highlight

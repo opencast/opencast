@@ -123,7 +123,6 @@ angular.module('adminNg.resources')
           });
           continue;
         }
-        // eslint-disable-next-line
         var xAxisTickCallback = createTickCallback(that, i);
         var tooltipLabelCallback = createTooltipCallback(that, i);
         var timeChooseMode, from, to, dataResolution;

@@ -33,7 +33,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: cache local maven repository
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
@@ -173,7 +173,7 @@ jobs:
         if: >
           matrix.java == 11
           && github.repository == 'opencast/opencast'
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: opencast-allinone
           path: build/opencast-dist-allinone/

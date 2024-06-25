@@ -7,14 +7,14 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>16-SNAPSHOT</version>
+    <version>17-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
-    <editor.url>https://github.com/opencast/opencast-editor/releases/download/2023-10-17/oc-editor-2023-10-17.tar.gz</editor.url>
-    <editor.sha256>77b2b5842d14d7f33125e47ea035292b009b0cb8aa1b253c6051c18700c346ac</editor.sha256>
+    <editor.url>https://github.com/opencast/opencast-editor/releases/download/2024-06-11/oc-editor-2024-06-11.tar.gz</editor.url>
+    <editor.sha256>8434f39180c220ff5175dfd26a66ce651a1f4f299df4df283649308479d38ad7</editor.sha256>
   </properties>
   <build>
     <plugins>
@@ -31,7 +31,6 @@
               <url>${editor.url}</url>
               <sha256>${editor.sha256}</sha256>
               <unpack>true</unpack>
-              <checkSignature>true</checkSignature>
               <outputDirectory>target/classes/editor/</outputDirectory>
             </configuration>
           </execution>
@@ -47,8 +46,6 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Build-Number>${buildNumber}</Build-Number>
             <Private-Package>editor.*</Private-Package>
             <Http-Alias>/editor-ui</Http-Alias>
             <Http-Classpath>/editor</Http-Classpath>

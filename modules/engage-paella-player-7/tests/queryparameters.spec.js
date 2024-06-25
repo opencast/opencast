@@ -18,14 +18,14 @@
  * the License.
  *
  */
-import { expect, test } from '@playwright/test';
-import { clickToStartVideo, pauseVideo, playerInstanceStr } from './utils';
+import { expect } from '@playwright/test';
+import { test, clickToStartVideo, pauseVideo, playerInstanceStr } from './utils';
 
 
 test.describe('Player URL query parameters', () => {
 
   test('Without additional query parameters', async ({ page }) => {
-    await page.goto('/paella7/ui/watch.html?id=ID-dual-stream-demo');
+    await page.goto('/paella7/ui/watch.html?id=ID-strong-river-flowing-down-the-green-forest');
     await clickToStartVideo(page);
     await pauseVideo(page);
     await page.waitForTimeout(1000);
@@ -36,17 +36,17 @@ test.describe('Player URL query parameters', () => {
     await expect(captionsVisible).toBeFalsy();
   });
 
-  test('Check time param in URL and seek: ?time=20s', async ({ page }) => {
-    await page.goto('/paella7/ui/watch.html?id=ID-dual-stream-demo&time=20s');
+  test('Check time param in URL and seek: ?time=10s', async ({ page }) => {
+    await page.goto('/paella7/ui/watch.html?id=ID-strong-river-flowing-down-the-green-forest&time=10s');
     await clickToStartVideo(page);
     await pauseVideo(page);
     await page.waitForTimeout(5000);
     const currentTime = await page.evaluate(`${playerInstanceStr}.videoContainer.currentTime()`);
-    await expect(currentTime).toBeCloseTo(20, 0);
+    await expect(currentTime).toBeCloseTo(10, 0);
   });
 
-  test('Check trimming param in URL: ?trimming=10s;50s', async ({ page }) => {
-    await page.goto('/paella7/ui/watch.html?id=ID-dual-stream-demo&trimming=10s;50s');
+  test('Check trimming param in URL: ?trimming=5s;20s', async ({ page }) => {
+    await page.goto('/paella7/ui/watch.html?id=ID-strong-river-flowing-down-the-green-forest&trimming=5s;20s');
     await clickToStartVideo(page);
     await pauseVideo(page);
     await page.waitForTimeout(5000);
@@ -55,13 +55,13 @@ test.describe('Player URL query parameters', () => {
     const trimEnd = await page.evaluate(`${playerInstanceStr}.videoContainer.trimEnd`);
     const duration = await page.evaluate(`${playerInstanceStr}.videoContainer.duration()`);
     await expect(trimState).toBeTruthy;
-    await expect(trimStart).toBe(10);
-    await expect(trimEnd).toBe(50);
-    await expect(duration).toBe(40);
+    await expect(trimStart).toBe(5);
+    await expect(trimEnd).toBe(20);
+    await expect(duration).toBe(15);
   });
 
-  test('Check time param in URL and seek: &start=20&end=45', async ({ page }) => {
-    await page.goto('/paella7/ui/watch.html?id=ID-dual-stream-demo&start=20&end=45');
+  test('Check time param in URL and seek: &start=5&end=20', async ({ page }) => {
+    await page.goto('/paella7/ui/watch.html?id=ID-strong-river-flowing-down-the-green-forest&start=5&end=20');
     await clickToStartVideo(page);
     await pauseVideo(page);
     await page.waitForTimeout(5000);
@@ -69,13 +69,15 @@ test.describe('Player URL query parameters', () => {
     const trimState = await page.evaluate(`${playerInstanceStr}.videoContainer.isTrimEnabled`);
     const trimStart = await page.evaluate(`${playerInstanceStr}.videoContainer.trimStart`);
     const trimEnd = await page.evaluate(`${playerInstanceStr}.videoContainer.trimEnd`);
+    const duration = await page.evaluate(`${playerInstanceStr}.videoContainer.duration()`);
     await expect(trimState).toBeTruthy;
-    await expect(trimStart).toBe(20);
-    await expect(trimEnd).toBe(45);
+    await expect(trimStart).toBe(5);
+    await expect(trimEnd).toBe(20);
+    await expect(duration).toBe(15);
   });
 
   // test('Check captions param in URL: ?captions=<lang>', async ({ page }) => {
-  //   await page.goto('/paella7/ui/watch.html?id=ID-dual-stream-demo&captions=en');
+  //   await page.goto('/paella7/ui/watch.html?id=ID-strong-river-flowing-down-the-green-forest&captions=en');
   //   await clickToStartVideo(page);
   //   await pauseVideo(page);
   //   await page.waitForTimeout(5000);

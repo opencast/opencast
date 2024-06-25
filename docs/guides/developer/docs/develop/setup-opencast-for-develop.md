@@ -6,13 +6,17 @@ This is meant for developers.
 For the installation of a production cluster, take a look at the admin guides.
 
 
+Warning: This probably won´t work with Windows.
+
+
+
 ## TL;DR
 
 
 ```sh
 $ git clone https://github.com/opencast/opencast.git
 $ cd opencast
-$ mvn clean install -Pdev
+$ ./mvnw clean install -Pdev
 $ cd build/opencast-dist-develop-*
 $ ./bin/start-opencast
 ```
@@ -49,7 +53,7 @@ Required:
     ffmpeg >= 3.2.4
     maven >= 3.6
     python
-    firefox/chrome
+    firefox/chrome/chromium
     unzip
     gcc-c++
     tar
@@ -74,7 +78,7 @@ install them.
 
 You can now build opencast by changing into your opencast directory and running:
 
-    $ mvn clean install [Options]
+    $ ./mvnw clean install [Options]
 
 After the successful compilation you can start opencast with:
 
@@ -108,20 +112,25 @@ Option | Description
 
 ### Build Single Modules
 
-When working on a single Opencast module, it can be extremely helpful having the new built version automatically included in the Opencast OSGi infrastructure. This can be achieved by watching the module with the [bundle:watch](https://karaf.apache.org/manual/latest/commands/bundle-watch.html) command in Karaf. The procedure would be as follows:
+When working on a single Opencast module, it can be extremely helpful having the new built version automatically
+included in the Opencast OSGi infrastructure. This can be achieved by watching the module with the
+[bundle:watch](https://karaf.apache.org/manual/latest/commands/bundle-watch.html) command in Karaf.
+The procedure would be as follows:
 
-* Start Opencast and use `la -u` in the Karaf console to list all installed bundles/modules. Note down the IDs of the
+- Start Opencast and use `la -u` in the Karaf console to list all installed bundles/modules. Note down the IDs of the
   bundles you want to watch.
-* Use `bundle:watch IDs` to watch the desired modules, e.g. `bundle:watch 190 199`
-* Make your changes and rebuild the module (e.g. execute `mvn clean install` in the module folder).
-* Watch how Karaf automatically redeploys the changed jars from your local Maven repository. You can verify that
+<<<<<<< HEAD
+- Use `bundle:watch IDs` to watch the desired modules, e.g. `bundle:watch 190 199`
+- Make your changes and rebuild the module (e.g. execute `./mvnw clean install` in the module folder).
+- Watch how Karaf automatically redeploys the changed jars from your local Maven repository. You can verify that
   everything went smoothly by checking the log with `log:tail`.
 
 To see this technique in action, you can watch the following short video:
 
-* [Opencast development: Watch and reload modules](https://asciinema.org/a/348132)
+- [Opencast development: Watch and reload modules](https://asciinema.org/a/348132)
 
-The updated bundles are only available in the currently running Karaf instance. To create a Opencast version that contains your changes permanently, you have to run `mvn install` in the assemblies directory again. 
+The updated bundles are only available in the currently running Karaf instance. To create an Opencast version that contains
+your changes permanently, you have to run `./mvnw install` in the `assemblies` directory again.
 
 In several cases the `bundle:watch` can put Karaf in an unstable condition, as dependencies between bundles will not
 correctly be restored after the new bundle has been deployed.
@@ -133,8 +142,8 @@ correctly be restored after the new bundle has been deployed.
 Building with multiple threads decreases the build time significantly.
 If you want to enable multiple threads, you can use the following command:
 
-    $ mvn clean install -T 1.0C -DskipTests -Pnone 
-    && cd assemblies && mvn install -T 1.0C -Dskiptests -Pdev  
+    $ ./mvnw clean install -T 1.0C -DskipTests -Pnone 
+    && cd assemblies && ./mvnw install -T 1.0C -Dskiptests -Pdev  
     && cd ..
     $ ./build/opencast-dist-develop-*/start-opencast
 
@@ -146,12 +155,12 @@ We don't advise using this feature for production.
 For a quick build, you can use the following command to skip Opencast's tests.
 
     $ cd opencast
-    $ mvn clean install -Pdev -DskipTests
+    $ ./mvnw clean install -Pdev -DskipTests
 
 To see the whole `stacktrace` of the installation you can use the following command to disable the trimming.
 
     $ cd opencast
-    $ mvn clean install -DtrimStackTrace=false
+    $ ./mvnw clean install -DtrimStackTrace=false
 
 If you want to start opencast in debug mode, you could use the debug argument:
 

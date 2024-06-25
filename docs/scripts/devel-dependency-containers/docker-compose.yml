@@ -1,8 +1,8 @@
-version: '2'
 services:
   elasticsearch:
     container_name: opencast-opensearch
     image: opensearchproject/opensearch:1
+    init: true
     ports:
       - 127.0.0.1:9200:9200
       - 127.0.0.1:9300:9300

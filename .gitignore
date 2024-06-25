@@ -24,9 +24,6 @@ node/
 # ignore VSCode project data
 .vscode/
 
-# ingore OS artifacts
-.DS_Store
-
 # Ignore all temporary editor files
 *.swp
 *.iml
@@ -52,3 +49,6 @@ phantomjsdriver.log
 
 # Ignore python cache folder
 __pycache__
+
+# Ignore maven wrapper windows batch file
+mvnw.cmd

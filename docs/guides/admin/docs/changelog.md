@@ -1,8 +1,1035 @@
 Changelog
 =========
 
+Opencast 16
+-----------
+
+### Opencast 16.0
+
+- [[#5927](https://github.com/opencast/opencast/pull/5927)] -
+  Update release notes for Opencast 16.0
+- [[#5923](https://github.com/opencast/opencast/pull/5923)] -
+  Update admin interface to release 2024-06-12
+- [[#5918](https://github.com/opencast/opencast/pull/5918)] -
+  Defaults should be commented out
+- [[#5915](https://github.com/opencast/opencast/pull/5915)] -
+  Mark old admin interface configuration as deprecated
+- [[#5914](https://github.com/opencast/opencast/pull/5914)] -
+  Admin interface theme configuration
+- [[#5911](https://github.com/opencast/opencast/pull/5911)] -
+  Upgraded to admin interface release 2024-06-06
+- [[#5909](https://github.com/opencast/opencast/pull/5909)] -
+  Add option to en-/disable statistics view in admin interface
+- [[#5908](https://github.com/opencast/opencast/pull/5908)] -
+  Tags parameter for External API event track update endpoint
+- [[#5907](https://github.com/opencast/opencast/pull/5907)] -
+  Fixed NullpointerException 330
+- [[#5877](https://github.com/opencast/opencast/pull/5877)] -
+  Add changelog note about Tobira harvest API
+- [[#5874](https://github.com/opencast/opencast/pull/5874)] -
+  Fix OCR text extraction handler issue
+- [[#5859](https://github.com/opencast/opencast/pull/5859)] -
+  Skip editor processing on empty cutting list
+- [[#5852](https://github.com/opencast/opencast/pull/5852)] -
+  Fix search REST bugs
+- [[#5810](https://github.com/opencast/opencast/pull/5810)] -
+  Make internal publication optionally visible in external api
+- [[#5811](https://github.com/opencast/opencast/pull/5811)] -
+  Turn old admin interface into plugin
+- [[#5809](https://github.com/opencast/opencast/pull/5809)] -
+  Fix Fixed Feature Version
+- [[#5807](https://github.com/opencast/opencast/pull/5807)] -
+  Developer Environment Setup Documentation change
+- [[#5806](https://github.com/opencast/opencast/pull/5806)] -
+  Bump ejs from 3.1.8 to 3.1.10 in /modules/lti
+- [[#5805](https://github.com/opencast/opencast/pull/5805)] -
+  Bump Legal-and-General/dependabot-batcher from 1.0.3 to 1.0.4
+- [[#5803](https://github.com/opencast/opencast/pull/5803)] -
+  Bump selenium-server-standalone-jar from 4.18.1 to 4.19.1 in /modules/admin-ui-frontend
+- [[#5802](https://github.com/opencast/opencast/pull/5802)] -
+  Bump html-validate from 8.18.1 to 8.18.2 in /modules/admin-ui-frontend
+- [[#5801](https://github.com/opencast/opencast/pull/5801)] -
+  Bump sass from 1.72.0 to 1.76.0 in /modules/admin-ui-frontend
+- [[#5800](https://github.com/opencast/opencast/pull/5800)] -
+  Bump chromedriver from 123.0.1 to 124.0.1 in /modules/admin-ui-frontend
+- [[#5794](https://github.com/opencast/opencast/pull/5794)] -
+  Bump react-i18next from 14.1.0 to 14.1.1 in /modules/lti
+- [[#5793](https://github.com/opencast/opencast/pull/5793)] -
+  Bump i18next from 23.10.1 to 23.11.3 in /modules/lti
+- [[#5791](https://github.com/opencast/opencast/pull/5791)] -
+  Bump iframe-resizer from 4.3.9 to 4.3.11 in /modules/lti
+- [[#5790](https://github.com/opencast/opencast/pull/5790)] -
+  Bump @types/node from 20.12.2 to 20.12.7 in /modules/lti
+- [[#5789](https://github.com/opencast/opencast/pull/5789)] -
+  Bump @fortawesome/free-solid-svg-icons from 6.5.1 to 6.5.2 in /modules/lti
+- [[#5788](https://github.com/opencast/opencast/pull/5788)] -
+  Bump @fortawesome/fontawesome-svg-core from 6.5.1 to 6.5.2 in /modules/lti
+- [[#5787](https://github.com/opencast/opencast/pull/5787)] -
+  Bump react and @types/react in /modules/lti
+- [[#5786](https://github.com/opencast/opencast/pull/5786)] -
+  Bump react-dom and @types/react-dom in /modules/lti
+- [[#5783](https://github.com/opencast/opencast/pull/5783)] -
+  Bump markdownlint-cli from 0.39.0 to 0.40.0 in /docs/guides
+- [[#5779](https://github.com/opencast/opencast/pull/5779)] -
+  Bump html-validate from 8.11.1 to 8.18.2 in /modules/engage-paella-player-7
+- [[#5778](https://github.com/opencast/opencast/pull/5778)] -
+  Bump paella-skins from 1.32.4 to 1.48.0 in /modules/engage-paella-player-7
+- [[#5777](https://github.com/opencast/opencast/pull/5777)] -
+  Bump webpack from 5.90.3 to 5.91.0 in /modules/engage-paella-player-7
+- [[#5776](https://github.com/opencast/opencast/pull/5776)] -
+  Bump paella-zoom-plugin from 1.41.1 to 1.41.3 in /modules/engage-paella-player-7
+- [[#5773](https://github.com/opencast/opencast/pull/5773)] -
+  Bump paella-user-tracking from 1.42.0 to 1.42.2 in /modules/engage-paella-player-7
+- [[#5772](https://github.com/opencast/opencast/pull/5772)] -
+  Bump paella-core from 1.46.6 to 1.48.2 in /modules/engage-paella-player-7
+- [[#5771](https://github.com/opencast/opencast/pull/5771)] -
+  Bump @babel/core from 7.24.3 to 7.24.5 in /modules/engage-paella-player-7
+- [[#5770](https://github.com/opencast/opencast/pull/5770)] -
+  Bump @babel/preset-env from 7.24.3 to 7.24.5 in /modules/engage-paella-player-7
+- [[#5767](https://github.com/opencast/opencast/pull/5767)] -
+  Fix paella tests
+- [[#5765](https://github.com/opencast/opencast/pull/5765)] -
+  Handle missing tags in Paella Player 7
+- [[#5764](https://github.com/opencast/opencast/pull/5764)] -
+  Speed up starting and stopping the OpenSearch dev container
+- [[#5762](https://github.com/opencast/opencast/pull/5762)] -
+  Use current LTS version of Node.js
+- [[#5749](https://github.com/opencast/opencast/pull/5749)] -
+  Documenting new RM selection rules
+- [[#5743](https://github.com/opencast/opencast/pull/5743)] -
+  Change Playlist Update behaviour
+- [[#5740](https://github.com/opencast/opencast/pull/5740)] -
+  Allow karma to use Chromium browser
+- [[#5734](https://github.com/opencast/opencast/pull/5734)] -
+  Add Playlists to Tobira Harvest API
+- [[#5732](https://github.com/opencast/opencast/pull/5732)] -
+  Opencast 16 Releasenotes
+- [[#5728](https://github.com/opencast/opencast/pull/5728)] -
+  Bump gulp from 4.0.2 to 5.0.0 in /modules/engage-paella-player
+- [[#5727](https://github.com/opencast/opencast/pull/5727)] -
+  Bump softprops/action-gh-release from 1 to 2
+- [[#5726](https://github.com/opencast/opencast/pull/5726)] -
+  Bump chromedriver from 122.0.4 to 123.0.1 in /modules/admin-ui-frontend
+- [[#5725](https://github.com/opencast/opencast/pull/5725)] -
+  Bump karma-firefox-launcher from 2.1.2 to 2.1.3 in /modules/admin-ui-frontend
+- [[#5724](https://github.com/opencast/opencast/pull/5724)] -
+  Bump selenium-server-standalone-jar from 4.17.0 to 4.18.1 in /modules/admin-ui-frontend
+- [[#5722](https://github.com/opencast/opencast/pull/5722)] -
+  Bump sass from 1.71.1 to 1.72.0 in /modules/admin-ui-frontend
+- [[#5721](https://github.com/opencast/opencast/pull/5721)] -
+  Bump html-validate from 8.11.1 to 8.18.1 in /modules/admin-ui-frontend
+- [[#5717](https://github.com/opencast/opencast/pull/5717)] -
+  Bump @babel/eslint-parser from 7.23.3 to 7.24.1 in /modules/engage-paella-player-7
+- [[#5716](https://github.com/opencast/opencast/pull/5716)] -
+  Bump @babel/preset-env from 7.23.9 to 7.24.3 in /modules/engage-paella-player-7
+- [[#5715](https://github.com/opencast/opencast/pull/5715)] -
+  Bump paella-basic-plugins from 1.44.2 to 1.44.7 in /modules/engage-paella-player-7
+- [[#5714](https://github.com/opencast/opencast/pull/5714)] -
+  Bump webpack-dev-server from 4.15.1 to 5.0.4 in /modules/engage-paella-player-7
+- [[#5713](https://github.com/opencast/opencast/pull/5713)] -
+  Bump @babel/core from 7.23.9 to 7.24.3 in /modules/engage-paella-player-7
+- [[#5709](https://github.com/opencast/opencast/pull/5709)] -
+  Bump @types/node from 20.11.24 to 20.12.2 in /modules/lti
+- [[#5708](https://github.com/opencast/opencast/pull/5708)] -
+  Bump i18next from 23.10.0 to 23.10.1 in /modules/lti
+- [[#5707](https://github.com/opencast/opencast/pull/5707)] -
+  Bump react-bootstrap from 2.10.1 to 2.10.2 in /modules/lti
+- [[#5706](https://github.com/opencast/opencast/pull/5706)] -
+  Bump axios from 1.6.7 to 1.6.8 in /modules/lti
+- [[#5702](https://github.com/opencast/opencast/pull/5702)] -
+  Bump i18next-browser-languagedetector from 7.2.0 to 7.2.1 in /modules/lti
+- [[#5701](https://github.com/opencast/opencast/pull/5701)] -
+  Bump react-i18next from 14.0.5 to 14.1.0 in /modules/lti
+- [[#5695](https://github.com/opencast/opencast/pull/5695)] -
+  Bump express from 4.18.1 to 4.19.2 in /modules/lti
+- [[#5694](https://github.com/opencast/opencast/pull/5694)] -
+  Bump express from 4.18.2 to 4.19.2 in /modules/engage-paella-player-7
+- [[#5693](https://github.com/opencast/opencast/pull/5693)] -
+  Change broken links in config files
+- [[#5691](https://github.com/opencast/opencast/pull/5691)] -
+  Bump webpack-dev-middleware from 5.3.3 to 5.3.4 in /modules/engage-paella-player-7
+- [[#5690](https://github.com/opencast/opencast/pull/5690)] -
+  Bump webpack-dev-middleware from 5.3.3 to 5.3.4 in /modules/lti
+- [[#5684](https://github.com/opencast/opencast/pull/5684)] -
+  Make the paella 7 tests locally without depending on develop.opencast…
+- [[#5681](https://github.com/opencast/opencast/pull/5681)] -
+  Bump follow-redirects from 1.15.5 to 1.15.6 in /modules/lti
+- [[#5680](https://github.com/opencast/opencast/pull/5680)] -
+  Bump follow-redirects from 1.15.5 to 1.15.6 in /modules/admin-ui-frontend
+- [[#5679](https://github.com/opencast/opencast/pull/5679)] -
+  Bump follow-redirects from 1.15.4 to 1.15.6 in /modules/engage-paella-player-7
+- [[#5674](https://github.com/opencast/opencast/pull/5674)] -
+  Feature request: privacy statement and imprint
+- [[#5671](https://github.com/opencast/opencast/pull/5671)] -
+  Bump @types/react from 17.0.39 to 18.2.65 in /modules/lti
+- [[#5664](https://github.com/opencast/opencast/pull/5664)] -
+  Fix a JavaDoc link
+- [[#5661](https://github.com/opencast/opencast/pull/5661)] -
+  Bump html-validate from 8.8.0 to 8.11.1 in /modules/engage-paella-player-7
+- [[#5660](https://github.com/opencast/opencast/pull/5660)] -
+  Bump style-loader from 3.3.3 to 3.3.4 in /modules/engage-paella-player-7
+- [[#5659](https://github.com/opencast/opencast/pull/5659)] -
+  Bump @playwright/test from 1.41.1 to 1.42.0 in /modules/engage-paella-player-7
+- [[#5658](https://github.com/opencast/opencast/pull/5658)] -
+  Bump express from 4.18.2 to 4.18.3 in /modules/engage-paella-player-7
+- [[#5652](https://github.com/opencast/opencast/pull/5652)] -
+  Bump eslint from 8.56.0 to 8.57.0 in /modules/engage-paella-player-7
+- [[#5651](https://github.com/opencast/opencast/pull/5651)] -
+  Bump junit5.version from 5.10.0 to 5.10.2 in /modules/db
+- [[#5647](https://github.com/opencast/opencast/pull/5647)] -
+  Bump org.owasp.esapi:esapi from 2.5.2.0 to 2.5.3.1 in /modules/db
+- [[#5646](https://github.com/opencast/opencast/pull/5646)] -
+  Bump eclipselink.version from 2.7.11 to 2.7.14 in /modules/db
+- [[#5644](https://github.com/opencast/opencast/pull/5644)] -
+  Bump org.osgi:org.osgi.service.http from 1.2.1 to 1.2.2 in /modules/metrics-exporter
+- [[#5640](https://github.com/opencast/opencast/pull/5640)] -
+  Bump @types/node from 20.11.20 to 20.11.24 in /modules/lti
+- [[#5639](https://github.com/opencast/opencast/pull/5639)] -
+  Bump bootstrap from 5.3.2 to 5.3.3 in /modules/lti
+- [[#5638](https://github.com/opencast/opencast/pull/5638)] -
+  Bump @types/react-dom from 18.2.18 to 18.2.19 in /modules/lti
+- [[#5637](https://github.com/opencast/opencast/pull/5637)] -
+  Bump @types/jest from 29.5.11 to 29.5.12 in /modules/lti
+- [[#5636](https://github.com/opencast/opencast/pull/5636)] -
+  Bump sass from 1.70.0 to 1.71.1 in /modules/admin-ui-frontend
+- [[#5635](https://github.com/opencast/opencast/pull/5635)] -
+  Bump html-validate from 8.9.1 to 8.11.1 in /modules/admin-ui-frontend
+- [[#5634](https://github.com/opencast/opencast/pull/5634)] -
+  Bump karma from 6.4.2 to 6.4.3 in /modules/admin-ui-frontend
+- [[#5633](https://github.com/opencast/opencast/pull/5633)] -
+  Bump eslint from 8.56.0 to 8.57.0 in /modules/admin-ui-frontend
+- [[#5632](https://github.com/opencast/opencast/pull/5632)] -
+  Bump jasmine-core from 5.1.1 to 5.1.2 in /modules/admin-ui-frontend
+- [[#5631](https://github.com/opencast/opencast/pull/5631)] -
+  Bump chromedriver from 122.0.3 to 122.0.4 in /modules/admin-ui-frontend
+- [[#5628](https://github.com/opencast/opencast/pull/5628)] -
+  Bump webpack from 5.88.2 to 5.90.3 in /modules/engage-paella-player-7
+- [[#5627](https://github.com/opencast/opencast/pull/5627)] -
+  Bump paella-core from 1.46.1 to 1.46.6 in /modules/engage-paella-player-7
+- [[#5625](https://github.com/opencast/opencast/pull/5625)] -
+  Bump chromedriver from 121.0.2 to 122.0.3 in /modules/admin-ui-frontend
+- [[#5624](https://github.com/opencast/opencast/pull/5624)] -
+  Bump @types/node from 20.10.6 to 20.11.20 in /modules/lti
+- [[#5623](https://github.com/opencast/opencast/pull/5623)] -
+  Fix use of s3 distribution service in live scheduler
+- [[#5622](https://github.com/opencast/opencast/pull/5622)] -
+  Remove `MediaPackageObserver`
+- [[#5621](https://github.com/opencast/opencast/pull/5621)] -
+  Fix some broken JavaDoc links
+- [[#5617](https://github.com/opencast/opencast/pull/5617)] -
+  Bump org.postgresql:postgresql from 42.5.3 to 42.7.2 in /modules/db
+- [[#5616](https://github.com/opencast/opencast/pull/5616)] -
+  Bump org.apache.commons:commons-compress from 1.24.0 to 1.26.0
+- [[#5610](https://github.com/opencast/opencast/pull/5610)] -
+  Update config file and docs for correct shibboleth logout
+- [[#5609](https://github.com/opencast/opencast/pull/5609)] -
+  Remove Entwine from Asset Manager API module
+- [[#5597](https://github.com/opencast/opencast/pull/5597)] -
+  Replace Solr Search with OpenSearch
+- [[#5593](https://github.com/opencast/opencast/pull/5593)] -
+  Use MediaPackageElementSelector in every WOH
+- [[#5592](https://github.com/opencast/opencast/pull/5592)] -
+  Patch for 360° Video
+- [[#5582](https://github.com/opencast/opencast/pull/5582)] -
+  Bump net.java.dev.jna:jna from 5.13.0 to 5.14.0 in /modules/db
+- [[#5581](https://github.com/opencast/opencast/pull/5581)] -
+  Bump source-map-loader from 4.0.1 to 5.0.0 in /modules/engage-paella-player-7
+- [[#5578](https://github.com/opencast/opencast/pull/5578)] -
+  Bump @babel/preset-env from 7.22.14 to 7.23.9 in /modules/engage-paella-player-7
+- [[#5577](https://github.com/opencast/opencast/pull/5577)] -
+  Bump css-loader from 6.8.1 to 6.10.0 in /modules/engage-paella-player-7
+- [[#5576](https://github.com/opencast/opencast/pull/5576)] -
+  Bump @playwright/test from 1.40.1 to 1.41.1 in /modules/engage-paella-player-7
+- [[#5575](https://github.com/opencast/opencast/pull/5575)] -
+  Bump @babel/core from 7.23.2 to 7.23.9 in /modules/engage-paella-player-7
+- [[#5574](https://github.com/opencast/opencast/pull/5574)] -
+  Bump peter-evans/create-or-update-comment from 3 to 4
+- [[#5573](https://github.com/opencast/opencast/pull/5573)] -
+  Bump actions/cache from 3 to 4
+- [[#5572](https://github.com/opencast/opencast/pull/5572)] -
+  Bump peter-evans/find-comment from 2 to 3
+- [[#5571](https://github.com/opencast/opencast/pull/5571)] -
+  Bump sass from 1.69.6 to 1.70.0 in /modules/admin-ui-frontend
+- [[#5569](https://github.com/opencast/opencast/pull/5569)] -
+  Bump selenium-server-standalone-jar from 4.16.1 to 4.17.0 in /modules/admin-ui-frontend
+- [[#5568](https://github.com/opencast/opencast/pull/5568)] -
+  Bump html-validate from 8.8.0 to 8.9.1 in /modules/admin-ui-frontend
+- [[#5566](https://github.com/opencast/opencast/pull/5566)] -
+  Bump markdownlint-cli from 0.38.0 to 0.39.0 in /docs/guides
+- [[#5565](https://github.com/opencast/opencast/pull/5565)] -
+  Bump react-select from 5.7.7 to 5.8.0 in /modules/lti
+- [[#5549](https://github.com/opencast/opencast/pull/5549)] -
+  Add `skip_frame nokey` to timelinepreview operation for longer videos
+- [[#5545](https://github.com/opencast/opencast/pull/5545)] -
+  Improve encoding profiles by relaxing the GOP range requirements and using CRF 22
+- [[#5542](https://github.com/opencast/opencast/pull/5542)] -
+  Update issue templates
+- [[#5533](https://github.com/opencast/opencast/pull/5533)] -
+  Build(deps-dev): Bump follow-redirects from 1.15.2 to 1.15.4 in /modules/engage-paella-player-7
+- [[#5525](https://github.com/opencast/opencast/pull/5525)] -
+  Bump markdownlint-cli from 0.37.0 to 0.38.0 in /docs/guides
+- [[#5520](https://github.com/opencast/opencast/pull/5520)] -
+  Bump com.googlecode.maven-download-plugin:download-maven-plugin from 1.6.8 to 1.8.0 in /modules/db
+- [[#5518](https://github.com/opencast/opencast/pull/5518)] -
+  Bump sass from 1.69.5 to 1.69.6 in /modules/admin-ui-frontend
+- [[#5517](https://github.com/opencast/opencast/pull/5517)] -
+  Bump eslint from 8.54.0 to 8.56.0 in /modules/admin-ui-frontend
+- [[#5516](https://github.com/opencast/opencast/pull/5516)] -
+  Bump chromedriver from 119.0.1 to 120.0.1 in /modules/admin-ui-frontend
+- [[#5515](https://github.com/opencast/opencast/pull/5515)] -
+  Bump selenium-server-standalone-jar from 4.14.0 to 4.16.1 in /modules/admin-ui-frontend
+- [[#5514](https://github.com/opencast/opencast/pull/5514)] -
+  Bump html-validate from 8.7.3 to 8.8.0 in /modules/admin-ui-frontend
+- [[#5513](https://github.com/opencast/opencast/pull/5513)] -
+  Bump actions/upload-artifact from 3 to 4
+- [[#5512](https://github.com/opencast/opencast/pull/5512)] -
+  Bump actions/setup-python from 4 to 5
+- [[#5511](https://github.com/opencast/opencast/pull/5511)] -
+  Bump paella-skins from 1.32.3 to 1.32.4 in /modules/engage-paella-player-7
+- [[#5510](https://github.com/opencast/opencast/pull/5510)] -
+  Bump paella-slide-plugins from 1.41.1 to 1.41.4 in /modules/engage-paella-player-7
+- [[#5508](https://github.com/opencast/opencast/pull/5508)] -
+  Bump paella-basic-plugins from 1.44.0 to 1.44.2 in /modules/engage-paella-player-7
+- [[#5505](https://github.com/opencast/opencast/pull/5505)] -
+  Bump html-validate from 8.7.3 to 8.8.0 in /modules/engage-paella-player-7
+- [[#5503](https://github.com/opencast/opencast/pull/5503)] -
+  Bump eslint from 8.54.0 to 8.56.0 in /modules/engage-paella-player-7
+- [[#5500](https://github.com/opencast/opencast/pull/5500)] -
+  Bump react-bootstrap from 2.9.1 to 2.9.2 in /modules/lti
+- [[#5499](https://github.com/opencast/opencast/pull/5499)] -
+  Bump @types/jest from 29.5.10 to 29.5.11 in /modules/lti
+- [[#5498](https://github.com/opencast/opencast/pull/5498)] -
+  Bump iframe-resizer from 4.3.7 to 4.3.9 in /modules/lti
+- [[#5496](https://github.com/opencast/opencast/pull/5496)] -
+  Bump react-i18next from 13.3.1 to 14.0.0 in /modules/lti
+- [[#5495](https://github.com/opencast/opencast/pull/5495)] -
+  Bump @types/react-dom from 18.2.14 to 18.2.18 in /modules/lti
+- [[#5494](https://github.com/opencast/opencast/pull/5494)] -
+  Bump @types/node from 20.8.10 to 20.10.6 in /modules/lti
+- [[#5490](https://github.com/opencast/opencast/pull/5490)] -
+  Docs: Mention other frontends in the developer docs
+- [[#5489](https://github.com/opencast/opencast/pull/5489)] -
+  Docs: Sort pages in Opencast Architecture
+- [[#5486](https://github.com/opencast/opencast/pull/5486)] -
+  Docs: Make Developer Overview page more verbose
+- [[#5485](https://github.com/opencast/opencast/pull/5485)] -
+  Docs: Remove outdated step from release branch cut
+- [[#5484](https://github.com/opencast/opencast/pull/5484)] -
+  Docs: Add beginner guide for submitting issues
+- [[#5483](https://github.com/opencast/opencast/pull/5483)] -
+  Docs: Move "Localization" to "Participate"
+- [[#5480](https://github.com/opencast/opencast/pull/5480)] -
+  Dev Debugging docs
+- [[#5478](https://github.com/opencast/opencast/pull/5478)] -
+  Add Playlists
+- [[#5477](https://github.com/opencast/opencast/pull/5477)] -
+  Don't set bogus default email for admin
+- [[#5473](https://github.com/opencast/opencast/pull/5473)] -
+  Make Whisper the default STT engine
+- [[#5466](https://github.com/opencast/opencast/pull/5466)] -
+  Remove unnecessary dependencies
+- [[#5462](https://github.com/opencast/opencast/pull/5462)] -
+  Bump @babel/eslint-parser from 7.22.15 to 7.23.3 in /modules/engage-paella-player-7
+- [[#5460](https://github.com/opencast/opencast/pull/5460)] -
+  Bump eslint from 8.52.0 to 8.54.0 in /modules/engage-paella-player-7
+- [[#5459](https://github.com/opencast/opencast/pull/5459)] -
+  Bump @playwright/test from 1.39.0 to 1.40.1 in /modules/engage-paella-player-7
+- [[#5457](https://github.com/opencast/opencast/pull/5457)] -
+  Bump html-validate from 8.7.0 to 8.7.3 in /modules/engage-paella-player-7
+- [[#5456](https://github.com/opencast/opencast/pull/5456)] -
+  Bump html-validate from 8.7.0 to 8.7.3 in /modules/admin-ui-frontend
+- [[#5455](https://github.com/opencast/opencast/pull/5455)] -
+  Bump eslint from 8.53.0 to 8.54.0 in /modules/admin-ui-frontend
+- [[#5453](https://github.com/opencast/opencast/pull/5453)] -
+  Bump actions/setup-java from 3 to 4
+- [[#5449](https://github.com/opencast/opencast/pull/5449)] -
+  Bump commons-io:commons-io from 2.8.0 to 2.15.1 in /modules/metrics-exporter
+- [[#5446](https://github.com/opencast/opencast/pull/5446)] -
+  Bump i18next-browser-languagedetector from 7.1.0 to 7.2.0 in /modules/lti
+- [[#5445](https://github.com/opencast/opencast/pull/5445)] -
+  Bump @types/jest from 29.5.7 to 29.5.10 in /modules/lti
+- [[#5443](https://github.com/opencast/opencast/pull/5443)] -
+  Bump @types/react-helmet from 6.1.8 to 6.1.9 in /modules/lti
+- [[#5442](https://github.com/opencast/opencast/pull/5442)] -
+  Bump @fortawesome/fontawesome-svg-core from 6.4.2 to 6.5.1 in /modules/lti
+- [[#5441](https://github.com/opencast/opencast/pull/5441)] -
+  Bump @types/react-js-pagination from 3.0.6 to 3.0.7 in /modules/lti
+- [[#5440](https://github.com/opencast/opencast/pull/5440)] -
+  Bump @fortawesome/free-solid-svg-icons from 6.4.2 to 6.5.1 in /modules/lti
+- [[#5439](https://github.com/opencast/opencast/pull/5439)] -
+  Bump i18next from 23.6.0 to 23.7.7 in /modules/lti
+- [[#5435](https://github.com/opencast/opencast/pull/5435)] -
+  Fix links in documentation
+- [[#5312](https://github.com/opencast/opencast/pull/5312)] -
+  Make LTI "Custom role" configuration more configurable
+- [[#5257](https://github.com/opencast/opencast/pull/5257)] -
+  Hint at how to properly close issues with pull requests
+- [[#4677](https://github.com/opencast/opencast/pull/4677)] -
+  Bump xml-apis from 1.4.01 to 2.0.2 in /modules/db
+
+Opencast 15
+-----------
+
+### Opencast 15.6
+
+- [[#5922](https://github.com/opencast/opencast/pull/5922)] -
+  Update Editor to 2024-06-11
+- [[#5880](https://github.com/opencast/opencast/pull/5880)] -
+  Handle lang tag by asset upload correctly
+- [[#5879](https://github.com/opencast/opencast/pull/5879)] -
+  Skip subtitle generation from tracks without audio stream
+- [[#5873](https://github.com/opencast/opencast/pull/5873)] -
+  Return dates as UNIX timestamp
+- [[#5860](https://github.com/opencast/opencast/pull/5860)] -
+  Fix missing configuration panel for fast.yaml workflow
+- [[#5858](https://github.com/opencast/opencast/pull/5858)] -
+  Change segment `startTime` from mpeg7 to milliseconds in Tobira API
+- [[#5857](https://github.com/opencast/opencast/pull/5857)] -
+  Improve Assetmanager multi store behavior
+- [[#5832](https://github.com/opencast/opencast/pull/5832)] -
+  Log Excessively Large Jobs Status
+- [[#5829](https://github.com/opencast/opencast/pull/5829)] -
+  Ignore subtitle tracks in select-tracks WHO
+
+### Opencast 15.5
+
+- [[#5757](https://github.com/opencast/opencast/pull/5757)] -
+  Add slide text and segments to Tobira harvest API
+- [[#5685](https://github.com/opencast/opencast/pull/5685)] -
+  Paella 7 mp4 quality selector
+
+### Opencast 15.4
+
+- [[#5738](https://github.com/opencast/opencast/pull/5738)] -
+  Update (New) Admin UI to 2024-04-10
+- [[#5696](https://github.com/opencast/opencast/pull/5696)] -
+  Mark RPMs as available
+- [[#5689](https://github.com/opencast/opencast/pull/5689)] -
+  Process-smil WOH tag-with-profile configuration does not work depending on the encoding profile suffix configured
+- [[#5686](https://github.com/opencast/opencast/pull/5686)] -
+  Fix editor track selection for updating tags
+- [[#5678](https://github.com/opencast/opencast/pull/5678)] -
+  Remove Spurious Warnings During Build
+- [[#5677](https://github.com/opencast/opencast/pull/5677)] -
+  Fix more JavaDoc
+- [[#5675](https://github.com/opencast/opencast/pull/5675)] -
+  Add synchronous deletion to Search API
+- [[#5673](https://github.com/opencast/opencast/pull/5673)] -
+  Paella7: Avoid opening downloaded video
+- [[#5670](https://github.com/opencast/opencast/pull/5670)] -
+  Make a dynamic OSGi dependency static
+- [[#5669](https://github.com/opencast/opencast/pull/5669)] -
+  Update temporal if empty
+- [[#5588](https://github.com/opencast/opencast/pull/5588)] -
+  Update typescript type definitions in ltitools
+
+### Opencast 15.3
+
+- [[#5669](https://github.com/opencast/opencast/pull/5669)] -
+  Update temporal if empty
+- [[#5663](https://github.com/opencast/opencast/pull/5663)] -
+  `publish-engage` nitpicks
+- [[#5630](https://github.com/opencast/opencast/pull/5630)] -
+  Add jersey to engage-ui build
+- [[#5618](https://github.com/opencast/opencast/pull/5618)] -
+  Update chromedriver
+- [[#5611](https://github.com/opencast/opencast/pull/5611)] -
+  Update maven bundle configuration
+- [[#5596](https://github.com/opencast/opencast/pull/5596)] -
+  Update build plugins
+- [[#5588](https://github.com/opencast/opencast/pull/5588)] -
+  Update typescript type definitions in ltitools
+- [[#5586](https://github.com/opencast/opencast/pull/5586)] -
+  Update axios from 0 to 1 in ltitools
+- [[#5543](https://github.com/opencast/opencast/pull/5543)] -
+  Use edited thumbnails in partial-publish.xml
+- [[#5487](https://github.com/opencast/opencast/pull/5487)] -
+  Add maven wrapper
+- [[#5339](https://github.com/opencast/opencast/pull/5339)] -
+  #5663 Paella7 patches frameList undefined exception
+- [[#4973](https://github.com/opencast/opencast/pull/4973)] -
+  Add WhisperC++ engine to speech-to-text-impl
+
+### Opencast 15.2
+
+- [[#5556](https://github.com/opencast/opencast/pull/5556)] -
+  Don't create composites for new editor
+- [[#5532](https://github.com/opencast/opencast/pull/5532)] -
+  Paella 7: Download audio trancripts (without timestamps)
+- [[#5530](https://github.com/opencast/opencast/pull/5530)] -
+  Don't log internal AmberScript service state
+- [[#5529](https://github.com/opencast/opencast/pull/5529)] -
+  Avoid unnecessary FFmpeg logs
+- [[#5528](https://github.com/opencast/opencast/pull/5528)] -
+  Editor shouldn't just overwrite existing files
+
+### Opencast 15.1
+
+- [[#5546](https://github.com/opencast/opencast/pull/5546)] -
+  Update (New) Admin UI to 2024-01-17
+- [[#5540](https://github.com/opencast/opencast/pull/5540)] -
+  Update xmlsec version (CAS fix)
+- [[#5539](https://github.com/opencast/opencast/pull/5539)] -
+  Fix Paella Player 7 for single stream videos
+- [[#5493](https://github.com/opencast/opencast/pull/5493)] -
+  Fix broken link in markdown documentation
+- [[#5491](https://github.com/opencast/opencast/pull/5491)] -
+  Paella7: Add support for text/vtt captions in DownloadsPlugin
+- [[#5488](https://github.com/opencast/opencast/pull/5488)] -
+  Fix Paella 7 with no segments
+
+### Opencast 15.0
+
+*Released on December 13th, 2023*
+
+- [[#5429](https://github.com/opencast/opencast/pull/5429)] -
+  Update Landing Page Libraries
+- [[#5428](https://github.com/opencast/opencast/pull/5428)] -
+  Fix Docs Landing Page
+- [[#5427](https://github.com/opencast/opencast/pull/5427)] -
+  Update Admin Interface to 2023-11-21
+- [[#5426](https://github.com/opencast/opencast/pull/5426)] -
+  Update integrated OC Studio to 2023-11-20
+- [[#5424](https://github.com/opencast/opencast/pull/5424)] -
+  Log cached FFmpeg files
+- [[#5423](https://github.com/opencast/opencast/pull/5423)] -
+  It's "YouTube," not "Youtube"
+- [[#5422](https://github.com/opencast/opencast/pull/5422)] -
+  (Re-)Enable the JWT feature by default
+- [[#5421](https://github.com/opencast/opencast/pull/5421)] -
+  Remove duplicate publication channel configuration
+- [[#5419](https://github.com/opencast/opencast/pull/5419)] -
+  Set publication variables in analyze-MP
+- [[#5418](https://github.com/opencast/opencast/pull/5418)] -
+  Update Studio to 2023-11-08
+- [[#5417](https://github.com/opencast/opencast/pull/5417)] -
+  Fix broken links in documentation
+- [[#5415](https://github.com/opencast/opencast/pull/5415)] -
+  Paella 7: Default skin loaded from paella-skins repository
+- [[#5414](https://github.com/opencast/opencast/pull/5414)] -
+  Update the default admin interface
+- [[#5409](https://github.com/opencast/opencast/pull/5409)] -
+  Don't Drop Tags in Editor WOH
+- [[#5405](https://github.com/opencast/opencast/pull/5405)] -
+  Fail on broken configuration
+- [[#5369](https://github.com/opencast/opencast/pull/5369)] -
+  Add calendar link, and sysadmin meeting to docs.opencast.org
+- [[#5368](https://github.com/opencast/opencast/pull/5368)] -
+  add chevron to `<details>` in docs
+- [[#5367](https://github.com/opencast/opencast/pull/5367)] -
+  Re-add details css for docs (reverts part of PR 5359)
+- [[#5360](https://github.com/opencast/opencast/pull/5360)] -
+  Documentation: Move "Modules" into "Configuration"
+- [[#5359](https://github.com/opencast/opencast/pull/5359)] -
+  Docs: Hide bot PRs in changelog
+- [[#5353](https://github.com/opencast/opencast/pull/5353)] -
+  Remove metadata layer from preview image (presenter)
+- [[#5352](https://github.com/opencast/opencast/pull/5352)] -
+  Set generator tags in speech-to-text WOH
+- [[#5351](https://github.com/opencast/opencast/pull/5351)] -
+  Return ISO 639 language code for language detected by Whisper
+- [[#5340](https://github.com/opencast/opencast/pull/5340)] -
+  Update Editor to 2023-10-17
+- [[#5318](https://github.com/opencast/opencast/pull/5318)] -
+  Update integrated Studio to 2023-10-10
+- [[#5314](https://github.com/opencast/opencast/pull/5314)] -
+  Do not nest GH Artifacts
+- [[#5311](https://github.com/opencast/opencast/pull/5311)] -
+  Remove Internal Logger
+- [[#5307](https://github.com/opencast/opencast/pull/5307)] -
+  Modified dispatch.interval in Job Dispatcher to allow float values
+- [[#5306](https://github.com/opencast/opencast/pull/5306)] -
+  Fix Crowdin Package Name
+- [[#5305](https://github.com/opencast/opencast/pull/5305)] -
+  Fix Headless Firefox in Selenium Tests
+- [[#5302](https://github.com/opencast/opencast/pull/5302)] -
+  Auto-Update GitHub Actions
+- [[#5301](https://github.com/opencast/opencast/pull/5301)] -
+  Replace internal logger where possible
+- [[#5271](https://github.com/opencast/opencast/pull/5271)] -
+  Fix Source Code headers
+- [[#5256](https://github.com/opencast/opencast/pull/5256)] -
+  Fix Translation Updates
+- [[#5249](https://github.com/opencast/opencast/pull/5249)] -
+  Prune Committer List
+- [[#5248](https://github.com/opencast/opencast/pull/5248)] -
+  Extend Asset Upload Workflow for Captions
+- [[#5247](https://github.com/opencast/opencast/pull/5247)] -
+  Don't take snapshot on asset upload before workflow
+- [[#5245](https://github.com/opencast/opencast/pull/5245)] -
+  Paella 7 download plugin
+- [[#5233](https://github.com/opencast/opencast/pull/5233)] -
+  Drop DeleteSnapshot Event Handler
+- [[#5183](https://github.com/opencast/opencast/pull/5183)] -
+  Change default karaf shutdown command
+- [[#5152](https://github.com/opencast/opencast/pull/5152)] -
+  Remove a quick-fix that's made obsolete by a Kraraf upgrade
+- [[#5128](https://github.com/opencast/opencast/pull/5128)] -
+  Fix bullet points in Developer Docs
+- [[#5126](https://github.com/opencast/opencast/pull/5126)] -
+  Improves Dev docs
+- [[#5125](https://github.com/opencast/opencast/pull/5125)] -
+  Logging nitpicks
+- [[#5121](https://github.com/opencast/opencast/pull/5121)] -
+  Paella 7: Add default layout for unknown track flavours and multiple streams
+- [[#5120](https://github.com/opencast/opencast/pull/5120)] -
+  Alter License Header
+- [[#5110](https://github.com/opencast/opencast/pull/5110)] -
+  Remove useless settings from `persistence.xml` files
+- [[#5100](https://github.com/opencast/opencast/pull/5100)] -
+  docs: Fix NGINX configuration template preventing alias traversals
+- [[#5057](https://github.com/opencast/opencast/pull/5057)] -
+  Cache FFmpeg Versions
+- [[#5046](https://github.com/opencast/opencast/pull/5046)] -
+  conditionally encode 1440p in profile.adaptive-parallel.http
+- [[#5035](https://github.com/opencast/opencast/pull/5035)] -
+  Publish and update maven cache
+- [[#5023](https://github.com/opencast/opencast/pull/5023)] -
+  Remove Track Selection Restrictions from the Old Editor
+- [[#4966](https://github.com/opencast/opencast/pull/4966)] -
+  Enable Java 17 support
+- [[#4965](https://github.com/opencast/opencast/pull/4965)] -
+  Turn Paella 6 into a plugin
+- [[#4960](https://github.com/opencast/opencast/pull/4960)] -
+  Remove unused method in composer service
+- [[#4959](https://github.com/opencast/opencast/pull/4959)] -
+  Add subtitle stream support
+- [[#4958](https://github.com/opencast/opencast/pull/4958)] -
+  Update to actions/checkout@v3
+- [[#4957](https://github.com/opencast/opencast/pull/4957)] -
+  Update to Node 18
+- [[#4956](https://github.com/opencast/opencast/pull/4956)] -
+  Prepare Opencast 14.x release notes the right way
+- [[#4955](https://github.com/opencast/opencast/pull/4955)] -
+  Asset manager multiple storage
+- [[#4951](https://github.com/opencast/opencast/pull/4951)] -
+  Allow opencast to share the oc-remember-me cookie between nodes
+- [[#4844](https://github.com/opencast/opencast/pull/4844)] -
+  Add migration notes for subtitles as tracks
+- [[#4842](https://github.com/opencast/opencast/pull/4842)] -
+  Subtitles as tracks in transcription services
+- [[#4828](https://github.com/opencast/opencast/pull/4828)] -
+  New developers docs (Part 1: Index)
+- [[#4791](https://github.com/opencast/opencast/pull/4791)] -
+  fixed faulty regex on analyze-mediapackage
+- [[#4711](https://github.com/opencast/opencast/pull/4711)] -
+  Fix caption creation in lti for subtitles as tracks
+- [[#4670](https://github.com/opencast/opencast/pull/4670)] -
+  Add a configuration file for the WebVTTCaptionConverter
+- [[#4651](https://github.com/opencast/opencast/pull/4651)] -
+  Add studio series dropdown selection
+- [[#4627](https://github.com/opencast/opencast/pull/4627)] -
+  Add documentation on subtitles
+- [[#4626](https://github.com/opencast/opencast/pull/4626)] -
+  Refit editor endpoint for subtitles as tracks
+- [[#4624](https://github.com/opencast/opencast/pull/4624)] -
+  Update tag support for subtitles as tracks in Paella Player
+- [[#4623](https://github.com/opencast/opencast/pull/4623)] -
+  Add captions as standard upload option in Admin UI
+- [[#4622](https://github.com/opencast/opencast/pull/4622)] -
+  Treat captions as tracks in standard workflows
+- [[#4617](https://github.com/opencast/opencast/pull/4617)] -
+  Adds the 'add-force-flavors' config to the publish-engage workflow
+- [[#4560](https://github.com/opencast/opencast/pull/4560)] -
+  chapter extraction as segmentation
+<details><summary>Dependency updates</summary>
+
+<ul>
+<li>[<a href="https://github.com/opencast/opencast/pull/5430">5430</a>] -
+  Bump paella-core from 1.44.1 to 1.46.1 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5401">5401</a>] -
+  Bump @types/jest from 29.5.6 to 29.5.7 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5400">5400</a>] -
+  Bump iframe-resizer from 4.3.6 to 4.3.7 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5399">5399</a>] -
+  Bump @types/node from 20.5.7 to 20.8.10 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5398">5398</a>] -
+  Bump i18next from 23.4.6 to 23.6.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5397">5397</a>] -
+  Bump @types/react-dom from 18.2.12 to 18.2.14 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5396">5396</a>] -
+  Bump @types/react-helmet from 6.1.6 to 6.1.8 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5395">5395</a>] -
+  Bump selenium-server-standalone-jar from 4.7.1 to 4.14.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5394">5394</a>] -
+  Bump sass from 1.69.1 to 1.69.5 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5393">5393</a>] -
+  Bump chromedriver from 117.0.3 to 119.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5392">5392</a>] -
+  Bump html-validate from 8.5.0 to 8.7.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5385">5385</a>] -
+  Bump html-validate from 8.6.0 to 8.7.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5380">5380</a>] -
+  Bump org.osgi:org.osgi.service.component.annotations from 1.5.0 to 1.5.1 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5379">5379</a>] -
+  Bump org.mariadb.jdbc:mariadb-java-client from 3.1.4 to 3.2.0 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5377">5377</a>] -
+  Bump react-bootstrap from 2.8.0 to 2.9.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5375">5375</a>] -
+  Bump @types/react-js-pagination from 3.0.4 to 3.0.6 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5374">5374</a>] -
+  Bump @types/jest from 29.5.4 to 29.5.6 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5373">5373</a>] -
+  Bump actions/setup-node from 1 to 4</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5372">5372</a>] -
+  Bump react-i18next from 13.2.1 to 13.3.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5357">5357</a>] -
+  Bump eslint from 8.50.0 to 8.52.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5356">5356</a>] -
+  Bump eslint from 8.51.0 to 8.52.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5355">5355</a>] -
+  Bump org.apache.santuario:xmlsec from 2.1.7 to 2.2.6</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5346">5346</a>] -
+  Bump @babel/traverse from 7.22.5 to 7.23.2 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5341">5341</a>] -
+  Bump @babel/traverse from 7.18.6 to 7.23.2 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5332">5332</a>] -
+  Bump react-select from 5.7.4 to 5.7.7 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5330">5330</a>] -
+  Bump sass from 1.68.0 to 1.69.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5326">5326</a>] -
+  Bump actions/setup-python from 1 to 4</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5324">5324</a>] -
+  Bump actions/setup-java from 1 to 3</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5323">5323</a>] -
+  Bump actions/checkout from 3 to 4</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5322">5322</a>] -
+  Bump @types/react-dom from 18.2.7 to 18.2.12 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5320">5320</a>] -
+  Bump actions/cache from 2 to 3</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5309">5309</a>] -
+  Bump postcss from 8.4.23 to 8.4.31 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5299">5299</a>] -
+  Bump html-validate from 8.3.0 to 8.5.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5298">5298</a>] -
+  Bump chromedriver from 116.0.0 to 117.0.3 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5297">5297</a>] -
+  Bump eslint from 8.48.0 to 8.50.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5296">5296</a>] -
+  Bump markdownlint-cli from 0.35.0 to 0.37.0 in /docs/guides</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5295">5295</a>] -
+  Bump sass from 1.66.1 to 1.68.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5293">5293</a>] -
+  Bump @babel/eslint-parser from 7.22.11 to 7.22.15 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5291">5291</a>] -
+  Bump @playwright/test from 1.36.2 to 1.38.1 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5289">5289</a>] -
+  Bump paella-user-tracking from 1.41.0 to 1.42.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5287">5287</a>] -
+  Bump paella-zoom-plugin from 1.41.0 to 1.41.1 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5285">5285</a>] -
+  Bump paella-basic-plugins from 1.38.0 to 1.44.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5284">5284</a>] -
+  Bump bootstrap from 5.3.1 to 5.3.2 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5283">5283</a>] -
+  Bump eslint from 8.48.0 to 8.50.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5281">5281</a>] -
+  Bump @babel/core from 7.22.11 to 7.23.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5279">5279</a>] -
+  Bump html-validate from 8.3.0 to 8.5.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5277">5277</a>] -
+  Bump paella-slide-plugins from 1.8.1 to 1.41.1 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5255">5255</a>] -
+  Bump org.apache.commons:commons-compress from 1.23.0 to 1.24.0</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5250">5250</a>] -
+  Bump paella-core from 1.41.0 to 1.42.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5225">5225</a>] -
+  Bump jasmine-core from 5.1.0 to 5.1.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5224">5224</a>] -
+  Bump html-validate from 8.1.0 to 8.3.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5223">5223</a>] -
+  Bump chromedriver from 115.0.0 to 116.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5222">5222</a>] -
+  Bump eslint from 8.46.0 to 8.48.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5221">5221</a>] -
+  Bump sass from 1.64.2 to 1.66.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5219">5219</a>] -
+  Bump jquery from 3.7.0 to 3.7.1 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5215">5215</a>] -
+  Bump paella-zoom-plugin from 1.29.0 to 1.41.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5214">5214</a>] -
+  Bump @babel/preset-env from 7.22.9 to 7.22.14 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5213">5213</a>] -
+  Bump babel-loader from 9.1.2 to 9.1.3 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5212">5212</a>] -
+  Bump eslint from 8.42.0 to 8.48.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5211">5211</a>] -
+  Bump paella-user-tracking from 1.8.0 to 1.41.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5210">5210</a>] -
+  Bump html-validate from 8.1.0 to 8.3.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5209">5209</a>] -
+  Bump @babel/eslint-parser from 7.21.8 to 7.22.11 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5208">5208</a>] -
+  Bump i18next from 23.4.2 to 23.4.6 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5206">5206</a>] -
+  Bump bootstrap from 5.3.0 to 5.3.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5204">5204</a>] -
+  Bump @types/node from 20.4.8 to 20.5.7 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5203">5203</a>] -
+  Bump @fortawesome/free-solid-svg-icons from 6.4.0 to 6.4.2 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5202">5202</a>] -
+  Bump @fortawesome/fontawesome-svg-core from 6.4.0 to 6.4.2 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5201">5201</a>] -
+  Bump @types/jest from 29.5.2 to 29.5.4 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5200">5200</a>] -
+  Bump react-i18next from 12.3.1 to 13.2.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5197">5197</a>] -
+  Bump org.apache.httpcomponents:httpclient-osgi from 4.5.13 to 4.5.14 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5196">5196</a>] -
+  Bump org.apache.servicemix.bundles:org.apache.servicemix.bundles.xerces from 2.12.1_1 to 2.12.2_1 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5195">5195</a>] -
+  Bump jquery from 3.7.0 to 3.7.1 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5193">5193</a>] -
+  Bump @babel/core from 7.21.8 to 7.22.11 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5182">5182</a>] -
+  Bump org.apache.xmlgraphics:batik-bridge from 1.14 to 1.17 in /modules/cover-image-impl</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5181">5181</a>] -
+  Bump org.apache.xmlgraphics:batik-transcoder from 1.14 to 1.17 in /modules/cover-image-impl</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5180">5180</a>] -
+  Bump org.apache.xmlgraphics:batik-svgrasterizer from 1.14 to 1.17 in /modules/cover-image-impl</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5179">5179</a>] -
+  Bump org.apache.xmlgraphics:batik-script from 1.14 to 1.17 in /modules/cover-image-impl</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5156">5156</a>] -
+  Bump i18next from 22.5.0 to 23.4.2 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5155">5155</a>] -
+  Bump @types/node from 20.4.5 to 20.4.8 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5149">5149</a>] -
+  Bump grunt-contrib-connect from 3.0.0 to 4.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5148">5148</a>] -
+  Bump jasmine-core from 5.0.1 to 5.1.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5147">5147</a>] -
+  Bump html-validate from 7.15.1 to 8.1.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5146">5146</a>] -
+  Bump eslint from 8.44.0 to 8.46.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5145">5145</a>] -
+  Bump chromedriver from 114.0.2 to 115.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5144">5144</a>] -
+  Bump sass from 1.62.1 to 1.64.2 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5139">5139</a>] -
+  Bump org.freemarker:freemarker from 2.3.31 to 2.3.32 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5137">5137</a>] -
+  Bump @types/node from 20.2.5 to 20.4.5 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5136">5136</a>] -
+  Bump @types/react-dom from 18.2.4 to 18.2.7 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5133">5133</a>] -
+  Bump react-select from 5.7.3 to 5.7.4 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5132">5132</a>] -
+  Bump webpack from 5.82.0 to 5.88.2 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5131">5131</a>] -
+  Bump html-validate from 8.0.0 to 8.1.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5130">5130</a>] -
+  Bump @playwright/test from 1.33.0 to 1.36.2 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5119">5119</a>] -
+  Bump word-wrap from 1.2.3 to 1.2.4 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5118">5118</a>] -
+  Bump word-wrap from 1.2.3 to 1.2.4 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5111">5111</a>] -
+  Bump @babel/preset-env from 7.21.5 to 7.22.9 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5106">5106</a>] -
+  Bump semver from 6.3.0 to 6.3.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5104">5104</a>] -
+  Bump tough-cookie from 4.0.0 to 4.1.3 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5093">5093</a>] -
+  Bump maven-assembly-plugin from 3.5.0 to 3.6.0 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5091">5091</a>] -
+  Bump grunt-html-validate from 2.0.0 to 3.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5090">5090</a>] -
+  Bump eslint from 8.42.0 to 8.44.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5089">5089</a>] -
+  Bump chromedriver from 114.0.1 to 114.0.2 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5086">5086</a>] -
+  Bump org.eclipse.persistence.asm from 9.3.0 to 9.5.0 in /modules/metrics-exporter</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5084">5084</a>] -
+  Bump jasmine-core from 5.0.0 to 5.0.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5081">5081</a>] -
+  Bump karma-coverage from 2.2.0 to 2.2.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5079">5079</a>] -
+  Bump webpack-dev-server from 4.13.3 to 4.15.1 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5077">5077</a>] -
+  Bump webpack-cli from 5.1.1 to 5.1.4 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5071">5071</a>] -
+  Bump react-bootstrap from 2.7.4 to 2.8.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5068">5068</a>] -
+  Bump markdownlint-cli from 0.34.0 to 0.35.0 in /docs/guides</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5066">5066</a>] -
+  Bump i18next-browser-languagedetector from 7.0.1 to 7.1.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5039">5039</a>] -
+  Bump jetty-server from 9.4.20.v20190813 to 9.4.51.v20230217 in /modules/rest-test-environment</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5028">5028</a>] -
+  Bump html-validate from 7.16.0 to 8.0.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5026">5026</a>] -
+  Bump chromedriver from 112.0.0 to 114.0.1 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5022">5022</a>] -
+  Bump eslint from 8.39.0 to 8.42.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5021">5021</a>] -
+  Bump eslint from 8.39.0 to 8.42.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5020">5020</a>] -
+  Bump socket.io-parser from 4.2.2 to 4.2.4 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5013">5013</a>] -
+  Bump style-loader from 3.3.2 to 3.3.3 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5009">5009</a>] -
+  Bump i18next from 22.4.15 to 22.5.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5008">5008</a>] -
+  Bump css-loader from 6.7.3 to 6.8.1 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5006">5006</a>] -
+  Bump react-select from 5.7.2 to 5.7.3 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5005">5005</a>] -
+  Bump jasmine-core from 4.6.0 to 5.0.0 in /modules/admin-ui-frontend</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5003">5003</a>] -
+  Bump @types/jest from 29.5.1 to 29.5.2 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/5001">5001</a>] -
+  Bump @types/node from 18.16.3 to 20.2.5 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4996">4996</a>] -
+  Bump maven-bundle-plugin from 5.1.2 to 5.1.9 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4993">4993</a>] -
+  Bump maven-plugin-plugin from 3.6.0 to 3.9.0 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4987">4987</a>] -
+  Bump jackson.version from 2.15.0 to 2.15.2 in /modules/metrics-exporter</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4986">4986</a>] -
+  Bump @types/react-dom from 18.2.1 to 18.2.4 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4985">4985</a>] -
+  Bump org.osgi.service.component from 1.5.0 to 1.5.1 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4984">4984</a>] -
+  Bump jackson.version from 2.15.0 to 2.15.2 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4982">4982</a>] -
+  Bump commons-compress from 1.21 to 1.23.0 in /modules/metrics-exporter</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4979">4979</a>] -
+  Bump mariadb-java-client from 3.1.2 to 3.1.4 in /modules/db</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4978">4978</a>] -
+  Bump bootstrap from 5.2.3 to 5.3.0 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4976">4976</a>] -
+  Bump react-i18next from 12.2.2 to 12.3.1 in /modules/lti</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4975">4975</a>] -
+  Bump jquery from 3.6.4 to 3.7.0 in /modules/runtime-info-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4974">4974</a>] -
+  Bump jquery from 3.6.4 to 3.7.0 in /modules/engage-ui</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4949">4949</a>] -
+  Bump webpack from 5.80.0 to 5.82.0 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4948">4948</a>] -
+  Bump webpack-cli from 5.0.1 to 5.1.1 in /modules/engage-paella-player-7</li>
+<li>[<a href="https://github.com/opencast/opencast/pull/4916">4916</a>] -
+  Bump jackson.version from 2.14.2 to 2.15.0 in /modules/db</li>
+</ul>
+</details>
+
+
 Opencast 14
 -----------
+
+
+### Opencast 14.13
+
+*Released on June 11th, 2024*
+
+- [[#5844](https://github.com/opencast/opencast/pull/5844)] -
+  Fixes handling of OAI-PMH setSpec
+- [[#5843](https://github.com/opencast/opencast/pull/5843)] -
+  Invalidate cached user on changes
+- [[#5840](https://github.com/opencast/opencast/pull/5840)] -
+  Remove series ACL file from workspaces
+- [[#5839](https://github.com/opencast/opencast/pull/5839)] -
+  More configuration options for database pool settings
+- [[#5769](https://github.com/opencast/opencast/pull/5769)] -
+  Document Translation Change Rules
+- [[#5754](https://github.com/opencast/opencast/pull/5754)] -
+  Series ACL and extended metadata handling on ingest
+
+
+### Opencast 14.12
+
+*Released on May 14th, 2024*
+
+- [[#5769](https://github.com/opencast/opencast/pull/5769)] -
+  Document Translation Change Rules
+- [[#5761](https://github.com/opencast/opencast/pull/5761)] -
+  Paella:  Prevent video download. Disable context menu.
+- [[#5756](https://github.com/opencast/opencast/pull/5756)] -
+  Fix deleting user references from the admin UI
+- [[#5755](https://github.com/opencast/opencast/pull/5755)] -
+  Skip the OBR
+- [[#5752](https://github.com/opencast/opencast/pull/5752)] -
+  Reformat new admin UI `pom.xml`
+- [[#5751](https://github.com/opencast/opencast/pull/5751)] -
+  `download-maven-plugin` nitpicks
+- [[#5750](https://github.com/opencast/opencast/pull/5750)] -
+  Paella: Fix error displayed before authenticating user.
+
+
+### Opencast 14.11
+
+*Released on April 16th, 2024*
+
+- [[#5682](https://github.com/opencast/opencast/pull/5682)] -
+Quickfix dangling hard links on cephfs volumes
+- [[#5667](https://github.com/opencast/opencast/pull/5667)] -
+Fixed NPE on filtering data
+
+### Opencast 14.10
+
+*Released on March 14th, 2024*
+
+- [[#5619](https://github.com/opencast/opencast/pull/5619)] -
+Update setenv with currently supported options for Karaf
+- [[#5607](https://github.com/opencast/opencast/pull/5607)] -
+Fixed created value on scheduling event series
+- [[#5606](https://github.com/opencast/opencast/pull/5606)] -
+Fix vosk output filenames
+- [[#5604](https://github.com/opencast/opencast/pull/5604)] -
+Encode player redirect id parameter
+- [[#5600](https://github.com/opencast/opencast/pull/5600)] -
+Fix removal of event ACL from search when updating series ACL
+- [[#5594](https://github.com/opencast/opencast/pull/5594)] -
+Include all metadata in Tobira harvest API for series
+
+
+### Opencast 14.9
+
+*Released on February 13th, 2024*
+
+- [[#5603](https://github.com/opencast/opencast/pull/5603)] -
+  Fixed encoding profile typo
+- [[#5555](https://github.com/opencast/opencast/pull/5555)] -
+  Debian installation documentation fixed
+- [[#5554](https://github.com/opencast/opencast/pull/5554)] -
+  Fix ACL Template Display for Series in old Admin UI
+- [[#5553](https://github.com/opencast/opencast/pull/5553)] -
+  Don't duplicate user roles when switching ACL templates in old Admin UI
+- [[#5551](https://github.com/opencast/opencast/pull/5551)] -
+  Disable running Firefox from Karma on Macs
+- [[#5548](https://github.com/opencast/opencast/pull/5548)] -
+  Encoding profile fix for portrait videos
+- [[#5526](https://github.com/opencast/opencast/pull/5526)] -
+  Document how to turn static file auth off for Tobira usage.
+- [[#5472](https://github.com/opencast/opencast/pull/5472)] -
+  Fix concurrency problem in Whisper integration
+- [[#5231](https://github.com/opencast/opencast/pull/5231)] -
+  Update Stud.IP User Provider
+
+### Opencast 14.8
+
+*Released on January 16th, 2024*
+
+- [[#5538](https://github.com/opencast/opencast/pull/5538)] -
+  Don't warn about using the default tool
+- [[#5537](https://github.com/opencast/opencast/pull/5537)] -
+  Fix ACL template selection breaking after first selection
+- [[#5492](https://github.com/opencast/opencast/pull/5492)] -
+  Add support for custom actions in ACL to Tobira harvest API
+- [[#5481](https://github.com/opencast/opencast/pull/5481)] -
+  Fix Paella Player 7 login redirect
+
+### Opencast 14.7
+
+*Released on December 12th, 2023*
+
+- [[#5425](https://github.com/opencast/opencast/pull/5425)] -
+Fix Unsaved ACL Changes popup if user can't request ACL
+- [[#5416](https://github.com/opencast/opencast/pull/5416)] -
+Silence detection: Skip attaching smil file if empty
+- [[#5412](https://github.com/opencast/opencast/pull/5412)] -
+Update Karaf from 4.4.3 to 4.4.4
+- [[#5270](https://github.com/opencast/opencast/pull/5270)] -
+Fix logging for WhisperEngine
 
 ### Opencast 14.6
 

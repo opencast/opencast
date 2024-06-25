@@ -32,6 +32,7 @@ import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.impl.jpa.JpaUser;
 import org.opencastproject.security.util.SecurityUtil;
+import org.opencastproject.systems.OpencastConstants;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
@@ -73,9 +74,6 @@ public class AdminUserAndGroupLoader implements OrganizationDirectoryListener {
    * Note that this is not set if it is not defined in the configuration file.
    **/
   private static final String DEFAULT_ADMIN_PASSWORD_CONFIGURATION = "opencast";
-
-  /** The administrator email configuration option */
-  public static final String OPT_ADMIN_EMAIL = "org.opencastproject.admin.email";
 
   /** The administrator roles configuration option */
   public static final String OPT_ADMIN_ROLES = "org.opencastproject.security.admin.roles";
@@ -122,7 +120,7 @@ public class AdminUserAndGroupLoader implements OrganizationDirectoryListener {
     BundleContext bundleCtx = cc.getBundleContext();
     adminUserName = StringUtils.trimToNull(bundleCtx.getProperty(SecurityConstants.GLOBAL_ADMIN_USER_PROPERTY));
     adminPassword = StringUtils.trimToNull(bundleCtx.getProperty(OPT_ADMIN_PASSWORD));
-    adminEmail = StringUtils.trimToNull(bundleCtx.getProperty(OPT_ADMIN_EMAIL));
+    adminEmail = StringUtils.trimToNull(bundleCtx.getProperty(OpencastConstants.ADMIN_EMAIL_PROPERTY));
     adminRoles = StringUtils.trimToNull(bundleCtx.getProperty(OPT_ADMIN_ROLES));
 
     if (DEFAULT_ADMIN_PASSWORD_CONFIGURATION.equals(adminPassword)) {

@@ -44,9 +44,6 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 
-import com.entwinemedia.fn.Stream;
-import com.entwinemedia.fn.data.Opt;
-
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
@@ -54,7 +51,10 @@ import org.junit.Test;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 
 public class SelectVersionWorkflowOperationHandlerTest {
   private static final String SOURCE_FLAVORS = "presenter/delivery,presentation/delivery";
@@ -94,13 +94,13 @@ public class SelectVersionWorkflowOperationHandlerTest {
       Snapshot snapshot = EasyMock.createNiceMock(Snapshot.class);
       EasyMock.expect(snapshot.getMediaPackage()).andReturn(builder.loadFromXml(uri.toURL().openStream()));
       aRecs[index] = EasyMock.createNiceMock(ARecord.class);
-      EasyMock.expect(aRecs[index].getSnapshot()).andReturn(Opt.some(snapshot));
+      EasyMock.expect(aRecs[index].getSnapshot()).andReturn(Optional.of(snapshot));
       EasyMock.replay(snapshot, aRecs[index]);
     }
 
     assetManager = EasyMock.createNiceMock(AssetManager.class);
     // Mocks for query, result, etc
-    Stream<ARecord> recStream = Stream.mk(aRecs);
+    LinkedHashSet<ARecord> recStream = new LinkedHashSet<>(Arrays.asList(aRecs));
     Predicate p = EasyMock.createNiceMock(Predicate.class);
     AResult r = EasyMock.createNiceMock(AResult.class);
     EasyMock.expect(r.getSize()).andReturn(new Long(versions));
@@ -125,7 +125,7 @@ public class SelectVersionWorkflowOperationHandlerTest {
     EasyMock.expect(query.version()).andReturn(v);
     EasyMock.expect(assetManager.createQuery()).andReturn(query);
     Version version = EasyMock.createNiceMock(Version.class);
-    Opt<Version> optV = Opt.some(version);
+    Optional<Version> optV = Optional.of(version);
     EasyMock.expect(assetManager.toVersion(EasyMock.anyObject(String.class))).andReturn(optV);
 
     EasyMock.replay(assetManager, p, r, t, selectQuery, order, query, v, version);

@@ -66,11 +66,9 @@ public class OsgiFileSystemAssetStore extends AbstractFileSystemAssetStore {
   private static final Logger logger = LoggerFactory.getLogger(OsgiFileSystemAssetStore.class);
 
   /** A cache of mediapckage ids and their associated storages */
-  private LoadingCache<String, Object> cache = null;
+  private LoadingCache<String, Option<String>> cache = null;
   private int cacheSize = 1000;
-  private int cacheExpiration = 60;
-  /** A token to store in the miss cache */
-  protected Object nullToken = new Object();
+  private int cacheExpiration = 1;
 
   /** Configuration key for the default Opencast storage directory. A value is optional. */
   public static final String CFG_OPT_STORAGE_DIR = "org.opencastproject.storage.dir";
@@ -125,13 +123,15 @@ public class OsgiFileSystemAssetStore extends AbstractFileSystemAssetStore {
    */
   protected String getRootDirectory(String orgId, String mpId) {
     try {
-      Object path = cache.getUnchecked(Paths.get(orgId, mpId).toString());
-      if (path == nullToken) {
-        logger.debug("Path could not be found, returning null.");
-        return null;
+      String cacheKey = Paths.get(orgId, mpId).toString();
+      Option<String> pathOpt = cache.getUnchecked(cacheKey);
+      if (pathOpt.isSome()) {
+        logger.debug("Root directory for mediapackage {} is {}", mpId, pathOpt.get());
+        return pathOpt.get();
       } else {
-        logger.debug("Returning path to mediapackage " + mpId);
-        return (String) path;
+        logger.debug("Root directory for mediapackage {} could not be found, returning null.", mpId);
+        cache.invalidate(cacheKey);
+        return null;
       }
     } catch (ExecutionError e) {
       logger.warn("Exception while getting path for mediapackage {}", mpId, e);
@@ -166,13 +166,18 @@ public class OsgiFileSystemAssetStore extends AbstractFileSystemAssetStore {
 
   protected void setupCache() {
     cache = CacheBuilder.newBuilder().maximumSize(cacheSize).expireAfterWrite(cacheExpiration, TimeUnit.MINUTES)
-            .build(new CacheLoader<String, Object>() {
+            .build(new CacheLoader<String, Option<String>>() {
               @Override
-              public Object load(String orgAndMpId) throws Exception {
+              public Option<String> load(String orgAndMpId) throws Exception {
                 String rootDirectory = getRootDirectoryForMediaPackage(orgAndMpId);
-                return rootDirectory == null ? null : rootDirectory;
+                return rootDirectory == null ? Option.none() : Option.some(rootDirectory);
               }
             });
+  }
+
+  protected void onDeleteMediaPackage(String orgId, String mpId) {
+    String cacheKey = Paths.get(orgId, mpId).toString();
+    cache.invalidate(cacheKey);
   }
 
   /**

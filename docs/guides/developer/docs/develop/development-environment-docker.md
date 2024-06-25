@@ -88,8 +88,8 @@ downloading the single-node Docker compose file, download the multi-node version
 $ curl -o docker-compose.yml https://raw.githubusercontent.com/opencast/opencast-docker/<version>/docker-compose/docker-compose.multiserver.build.yml
 ```
 
-This file defines a three node (admin, presentation, worker) cluster for use in testing, with all of the appropriate
-ports exported.  To access the a node run `docker-compose exec --user opencast-builder opencast-$nodetype bash`.  For
+This file defines a three node (admin, presentation, worker) cluster for use in testing, with all the appropriate
+ports exported.  To access a node run `docker-compose exec --user opencast-builder opencast-$nodetype bash`.  For
 example, to access the presentation node run `docker-compose exec --user opencast-builder opencast-presentation bash`.
 
 Available commands are otherwise identical.

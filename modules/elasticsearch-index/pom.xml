@@ -7,12 +7,11 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>16-SNAPSHOT</version>
+    <version>17-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
-    <elasticsearch.version>7.10.2</elasticsearch.version>
     <checkstyle.skip>false</checkstyle.skip>
   </properties>
   <dependencies>
@@ -155,8 +154,6 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Build-Number>${buildNumber}</Build-Number>
             <Bundle-Activator>org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService</Bundle-Activator>
             <!-- Only with this can the endpoint class use OSGI annotations while the IndexRebuildService doesn't -->
             <_dsannotations-options>norequirements</_dsannotations-options>

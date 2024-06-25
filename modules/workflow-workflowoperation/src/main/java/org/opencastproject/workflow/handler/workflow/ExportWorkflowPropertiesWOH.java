@@ -21,7 +21,6 @@
 package org.opencastproject.workflow.handler.workflow;
 
 import static com.entwinemedia.fn.Stream.$;
-import static org.opencastproject.workflow.handler.workflow.ImportWorkflowPropertiesWOH.loadPropertiesElementFromMediaPackage;
 import static org.opencastproject.workflow.handler.workflow.ImportWorkflowPropertiesWOH.loadPropertiesFromXml;
 
 import org.opencastproject.job.api.JobContext;
@@ -31,6 +30,7 @@ import org.opencastproject.mediapackage.MediaPackageElementBuilder;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
+import org.opencastproject.mediapackage.selector.AttachmentSelector;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
@@ -41,7 +41,6 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.fns.Strings;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
@@ -55,7 +54,9 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
@@ -108,8 +109,12 @@ public class ExportWorkflowPropertiesWOH extends AbstractWorkflowOperationHandle
 
     // Read optional existing workflow properties from mediapackage
     Properties workflowProps = new Properties();
-    Opt<Attachment> existingPropsElem = loadPropertiesElementFromMediaPackage(targetFlavor, mediaPackage);
-    if (existingPropsElem.isSome()) {
+    AttachmentSelector attachmentSelector = new AttachmentSelector();
+    attachmentSelector.addFlavor(targetFlavor);
+    Collection<Attachment> attachments = attachmentSelector.select(mediaPackage, false);
+    Optional<Attachment> existingPropsElem = Optional.empty();
+    if (attachments.size() == 1) {
+      existingPropsElem = Optional.of(attachments.iterator().next());
       workflowProps = loadPropertiesFromXml(workspace, existingPropsElem.get().getURI());
 
       // Remove specified keys
@@ -145,7 +150,7 @@ public class ExportWorkflowPropertiesWOH extends AbstractWorkflowOperationHandle
     }
 
     // Update attachment
-    if (existingPropsElem.isSome())
+    if (existingPropsElem.isPresent())
       mediaPackage.remove(existingPropsElem.get());
     mediaPackage.add(attachment);
 

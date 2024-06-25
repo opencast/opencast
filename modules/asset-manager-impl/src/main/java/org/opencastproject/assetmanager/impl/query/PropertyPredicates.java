@@ -26,10 +26,11 @@ import org.opencastproject.assetmanager.impl.persistence.QPropertyDto;
 import org.opencastproject.assetmanager.impl.persistence.QSnapshotDto;
 import org.opencastproject.assetmanager.impl.query.DeleteQueryContribution.Where;
 
-import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.Opt;
 import com.mysema.query.jpa.JPASubQuery;
 import com.mysema.query.types.expr.BooleanExpression;
+
+import java.util.function.Function;
 
 /**
  * A place to share common predicate constructor methods for properties.
@@ -39,8 +40,8 @@ public final class PropertyPredicates implements EntityPaths {
   private static final QPropertyDto Q_PROPERTY_ALIAS = new QPropertyDto("p");
 
   public static final Opt NONE = Opt.none();
-  public static final Fn<QPropertyDto, Opt<BooleanExpression>> NO_VALUE =
-      new Fn<QPropertyDto, Opt<BooleanExpression>>() {
+  public static final Function<QPropertyDto, Opt<BooleanExpression>> NO_VALUE =
+      new Function<QPropertyDto, Opt<BooleanExpression>>() {
         @Override public Opt<BooleanExpression> apply(QPropertyDto qPropertyDto) {
           return NONE;
         }
@@ -58,7 +59,7 @@ public final class PropertyPredicates implements EntityPaths {
    */
   public static BooleanExpression mkWhereSelect(
           PropertyName propertyName,
-          Fn<QPropertyDto, Opt<BooleanExpression>> mkValueExpression) {
+          Function<QPropertyDto, Opt<BooleanExpression>> mkValueExpression) {
     return mkWhereSelect(Opt.some(propertyName.getNamespace()), Opt.some(propertyName.getName()), mkValueExpression);
   }
 
@@ -75,7 +76,7 @@ public final class PropertyPredicates implements EntityPaths {
   public static BooleanExpression mkWhereSelect(
       Opt<String> namespace,
       Opt<String> propertyName,
-      Fn<QPropertyDto, Opt<BooleanExpression>> mkValueExpression) {
+      Function<QPropertyDto, Opt<BooleanExpression>> mkValueExpression) {
     return new JPASubQuery().from(Q_PROPERTY_ALIAS)
         .where(Q_SNAPSHOT.mediaPackageId.eq(Q_PROPERTY_ALIAS.mediaPackageId)
             .and(namespace.isSome()
@@ -92,14 +93,14 @@ public final class PropertyPredicates implements EntityPaths {
 
   public static Where mkWhereDelete(
           final PropertyName propertyName,
-          final Fn<QPropertyDto, Opt<BooleanExpression>> mkValueExpression) {
+          final Function<QPropertyDto, Opt<BooleanExpression>> mkValueExpression) {
     return mkWhereDelete(Opt.some(propertyName.getNamespace()), Opt.some(propertyName.getName()), mkValueExpression);
   }
 
   public static Where mkWhereDelete(
           final Opt<String> namespace,
           final Opt<String> propertyName,
-          final Fn<QPropertyDto, Opt<BooleanExpression>> mkValueExpression) {
+          final Function<QPropertyDto, Opt<BooleanExpression>> mkValueExpression) {
     final Opt<BooleanExpression> valueExpression = mkValueExpression.apply(Q_PROPERTY);
     final BooleanExpression propertyPredicate = (namespace.isSome()
             ? Q_PROPERTY.namespace.eq(namespace.get())

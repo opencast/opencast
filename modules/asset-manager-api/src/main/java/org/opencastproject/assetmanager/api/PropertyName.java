@@ -20,14 +20,12 @@
  */
 package org.opencastproject.assetmanager.api;
 
-import static com.entwinemedia.fn.Equality.eq;
 import static java.lang.String.format;
 
 import org.opencastproject.util.RequireUtil;
 
-import com.entwinemedia.fn.Equality;
-
 import java.io.Serializable;
+import java.util.Objects;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.concurrent.Immutable;
@@ -71,7 +69,7 @@ public final class PropertyName implements Serializable {
   //
 
   @Override public int hashCode() {
-    return Equality.hash(namespace, name);
+    return Objects.hash(namespace, name);
   }
 
   @Override public boolean equals(Object that) {
@@ -79,7 +77,7 @@ public final class PropertyName implements Serializable {
   }
 
   private boolean eqFields(PropertyName that) {
-    return eq(namespace, that.namespace) && eq(name, that.name);
+    return Objects.equals(namespace, that.namespace) && Objects.equals(name, that.name);
   }
 
   @Override public String toString() {

@@ -89,6 +89,17 @@ function getStreamType(track) {
   return result;
 }
 
+function getTags(mpe) {
+  let tags = [];
+  if (mpe.tags && mpe.tags.tag) {
+    tags = mpe.tags.tag;
+    if (!(tags instanceof Array)) {
+      tags = [tags];
+    }
+  }
+  return tags;
+}
+
 function getSourceData(track, config) {
   let data = null;
   // Get substring of type before slash
@@ -99,48 +110,85 @@ function getSourceData(track, config) {
       data = {
         source: streamType.getSourceData(track, config),
         type: streamType.streamType,
-        content: type
+        content: type,
+        flavor: track.type,
+        tags: getTags(track)
       };
     }
   }
   return data;
 }
 
-function getMetadata(episode) {
-  const { duration, title, language, series, seriestitle, subjects, license, type } = episode.mediapackage;
-  const startDate = new Date(episode.dcCreated);
-  const presenters = episode?.mediapackage?.creators?.creator
-    ? (Array.isArray(episode?.mediapackage?.creators?.creator)
-      ? episode?.mediapackage?.creators?.creator
-      : [episode?.mediapackage?.creators?.creator])
-    : [];
-  const contributors = episode?.mediapackage?.contributors?.contributor
-    ? (Array.isArray(episode.mediapackage.contributors.contributor)
-      ? episode.mediapackage.contributors.contributor
-      : [episode.mediapackage.contributors.contributor])
+function ensureArray(thing) {
+  //Ensure that thing is an array, if it's not wrap it into an array.  If it's null then return an empty array.
+  return thing ?
+    (Array.isArray(thing) ?
+      thing :
+      [ thing ]) :
+    [];
+}
+
+function ensureSingle(thing) {
+  //Ensure we get a single thing, either by taking the first element in an array, returning the input, or undefined
+  return thing ?
+    (Array.isArray(thing) ?
+      thing[0] :
+      thing) :
+    undefined ;
+}
+
+function getMetadata(episode, config) {
+  const dc = episode?.dc;
+
+  const tracks = episode?.mediapackage?.media?.track
+    ? (Array.isArray(episode.mediapackage.media.track)
+      ? episode.mediapackage.media.track
+      : [episode.mediapackage.media.track])
     : [];
 
+  const isLive = tracks.some((track) => track.live === true);
+  const visibleTimeLine = !(isLive && config?.hideTimeLineOnLive);
+
   const result = {
-    title,
-    subject: subjects?.subject,
-    description: episode?.dcDescription,
-    language,
-    rights: episode?.dcRightsHolder,
-    license,
-    series,
-    seriestitle,
-    presenters,
-    contributors,
-    startDate,
-    duration: duration / 1000,
-    location: episode?.dcSpatial,
-    UID: episode?.id,
-    type,
-    opencast: {episode}
+    title: ensureSingle(dc?.title),
+    subject: ensureSingle(dc?.subject),
+    description: ensureArray(dc?.description),
+    language: ensureSingle(dc?.language),
+    rights: ensureArray(dc?.rightsHolder),
+    license: ensureSingle(dc?.license),
+    series: ensureSingle(dc?.isPartOf),
+    presenters: ensureArray(dc?.creator),
+    contributors: ensureArray(dc?.contributor),
+    startDate: new Date(dc?.created),
+    duration: episode?.mediapackage?.duration / 1000, //FIXME: Parse from DC:extent (cf "PT9M57.002S")
+    location: ensureSingle(episode?.dc?.spatial),
+    UID: episode?.mediapackage?.id, //FIXME: Move this to the DC fields?
+    opencast: {episode},
+    visibleTimeLine
   };
 
   return result;
 }
+
+function splitFlavor(flavor) {
+  const flavorTypes = flavor.split('/');
+  if (flavorTypes.length != 2) {
+    throw new Error('Invalid flavor');
+  }
+  return flavorTypes;
+}
+
+function matchesFlavor(flavor, configFlavor) {
+  const [ flavorType, flavorSubtype ] = splitFlavor(flavor);
+  const [ configFlavorType, configFlavorSubtype ] = splitFlavor(configFlavor);
+
+  if ((configFlavorType === '*' || configFlavorType === flavorType) &&
+  (configFlavorSubtype === '*' || configFlavorSubtype === flavorSubtype)) {
+    return true;
+  }
+  return false;
+}
+
 
 function mergeSources(sources, config) {
   const streams = [];
@@ -158,12 +206,42 @@ function mergeSources(sources, config) {
   });
 
   sources.forEach(sourceData => {
-    const { content, type, source } = sourceData;
+    const { content, type, source, flavor, tags } = sourceData;
     let stream = streams.find(s => s.content === content);
+
     if (!stream) {
+      // check which video canvases to use
+      let canvas = [];
+      if (config.videoCanvas) {
+        for (var key of Object.keys(config.videoCanvas)) {
+          let canvasConfig = config.videoCanvas[key];
+          // check if the flavor matches
+          if (canvasConfig.flavor && matchesFlavor(flavor, canvasConfig.flavor)) {
+            canvas.push(key);
+            continue;
+          }
+
+          // check if a tag matches
+          if (canvasConfig.tag) {
+            for (let i = 0; i < tags.length; i++) {
+              if (tags[i] === canvasConfig.tag) {
+                canvas.push(key);
+                break;
+              }
+            }
+          }
+        }
+      }
+
+      // fall back to default canvas if necessary
+      if (!canvas.length) {
+        canvas.push('video');
+      }
+
       stream = {
         sources: {},
-        content: content
+        content: content,
+        canvas: canvas
       };
 
       if (content === audioContent) {
@@ -219,77 +297,97 @@ function processSegments(episode, manifest) {
   }
 }
 
+// Extract the player preview to show prior to loading videos
 export function getVideoPreview(mediapackage, config) {
   const { attachments } = mediapackage;
-  let videoPreview = null;
+  let playerPreviewImage = null;
 
   let attachment = attachments?.attachment || [];
   if (!Array.isArray(attachment)) {
     attachment = [attachment];
   }
 
-  const videoPreviewAttachments = config.videoPreviewAttachments || [
+  const playerPreviewImageAttachments = config.playerPreviewImageAttachments || [
     'presenter/player+preview',
     'presentation/player+preview'
   ];
+
   attachment.forEach(att => {
-    videoPreviewAttachments.some(validAttachment => {
+    playerPreviewImageAttachments.some(validAttachment => {
       if (validAttachment === att.type) {
-        videoPreview = att.url;
+        playerPreviewImage = att.url;
       }
-      return videoPreview !== null;
+      return playerPreviewImage !== null;
     });
   });
   // Get first preview if no predefined was found
-  if (videoPreview === null) {
+  if (playerPreviewImage === null) {
     const firstPreviewAttachment = attachment.find(att => {
       return att.type.split('/').pop() === 'player+preview';
     });
-    videoPreview = firstPreviewAttachment?.url ?? null;
+    playerPreviewImage = firstPreviewAttachment?.url ?? null;
   }
 
-  return videoPreview;
+  return playerPreviewImage;
 }
 
 function processAttachments(episode, manifest, config) {
   const { attachments } = episode.mediapackage;
-  const previewImages = [];
-  let videoPreview = null;
+  const navigationPreviewImages = [];
+  let playerPreviewImage = null;
 
   let attachment = attachments?.attachment || [];
   if (!Array.isArray(attachment)) {
     attachment = [attachment];
   }
 
-  const previewAttachment = config.previewAttachment || 'presentation/segment+preview';
+  // Fallback array of segment preview images, when config flavor is not found
+  let previewAttachments = config.previewAttachment || [
+    'presenter/segment+preview',
+    'presentation/segment+preview'
+  ];
+  // Ensure format is array, incase config flavor was a string
+  if (!(previewAttachments instanceof Array)) {
+    previewAttachments = [previewAttachments];
+  }
+  // Capture the video flavor of the segment preview images, used when
+  // overlaying preview images on the video container
+  let targetContent;
   attachment.forEach(att => {
     const timeRE = /time=T(\d+):(\d+):(\d+)/.exec(att.ref);
-    if (att.type === previewAttachment && timeRE) {
+    // By default, Opencast workflows create segment preview slides for one media.
+    // However, the following might cause duplicates if your workflow creates navigation
+    // preview slides for all videos in a mediapackage.
+    if (previewAttachments.includes(att.type) && timeRE) {
       const h = Number(timeRE[1]) * 60 * 60;
       const m = Number(timeRE[2]) * 60;
       const s = Number(timeRE[3]);
       const t = h + m + s;
-      previewImages.push({
+      navigationPreviewImages.push({
         mimetype: att.mimetype,
         url: att.url,
         thumb: att.url,
         id: `frame_${t}`,
         time: t
       });
+      // Capture the target flavor (e.g. 'presenter', 'presentation', etc)
+      targetContent = att.type.split('/')[0];
     }
-    else {
-      videoPreview = getVideoPreview(episode.mediapackage, config);
+    else if (playerPreviewImage === null) {
+      playerPreviewImage = getVideoPreview(episode.mediapackage, config);
     }
   });
 
-  if (previewImages.length > 0) {
-    manifest.frameList = previewImages;
-  }
-
-  if (videoPreview) {
-    manifest.metadata = manifest.metadata || {};
-    manifest.metadata.preview = videoPreview;
-  }
+  // Define frameList, even when there are no navigation segment preview slides
+  // Include the video target, used to position the navigation frame
+  // Otherwise the target video for navigation slides might not be found.
+  // https://github.com/polimediaupv/paella-core/blob/main/src/js/core/ManifestParser.js#L101-L114
+  manifest.frameList = {};
+  manifest.frameList.frames = navigationPreviewImages || [];
+  manifest.frameList.targetContent = targetContent;
+  // Define manifest metadata even if a player preview image doesn't exist
+  manifest.metadata = manifest.metadata || {};
+  manifest.metadata.preview = playerPreviewImage;
 }
 
 function readCaptions(potentialNewCaptions, captions) {
@@ -305,22 +403,18 @@ function readCaptions(potentialNewCaptions, captions) {
         let captions_closed = '';
         const captions_subtype = captions_match[1];
 
-        if (potentialCaption.tags && potentialCaption.tags.tag) {
-          if (!(potentialCaption.tags.tag instanceof Array)) {
-            potentialCaption.tags.tag = [potentialCaption.tags.tag];
+        let tags = getTags(potentialCaption);
+        tags.forEach((tag)=>{
+          if (tag.startsWith('lang:')){
+            captions_lang = tag.substring('lang:'.length);
           }
-          potentialCaption.tags.tag.forEach((tag)=>{
-            if (tag.startsWith('lang:')){
-              captions_lang = tag.substring('lang:'.length);
-            }
-            if (tag.startsWith('generator-type:') && tag.substring('generator-type:'.length) === 'auto') {
-              captions_generated = ' (' + translate('automatically generated') + ')';
-            }
-            if (tag.startsWith('type:') && tag.substring('type:'.length) === 'closed-caption') {
-              captions_closed = '[CC] ';
-            }
-          });
-        }
+          if (tag.startsWith('generator-type:') && tag.substring('generator-type:'.length) === 'auto') {
+            captions_generated = ' (' + translate('automatically generated') + ')';
+          }
+          if (tag.startsWith('type:') && tag.substring('type:'.length) === 'closed-caption') {
+            captions_closed = '[CC] ';
+          }
+        });
 
         let captions_format = potentialCaption.url.split('.').pop();
         // Backwards support for 'captions/dfxp' flavored xml files
@@ -366,9 +460,9 @@ function getCaptions(episode) {
 }
 
 export function episodeToManifest(ocResponse, config) {
-  const searchResults = ocResponse['search-results'];
-  if (searchResults?.total === 1) {
-    const episode = searchResults.result;
+  const searchResults = ocResponse['result'];
+  if (searchResults?.length === 1) {
+    const episode = searchResults[0];
     const metadata = getMetadata(episode, config);
     const streams = getStreams(episode, config);
     const captions = getCaptions(episode, config);

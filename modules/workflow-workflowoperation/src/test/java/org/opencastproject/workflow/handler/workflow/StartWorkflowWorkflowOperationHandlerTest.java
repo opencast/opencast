@@ -49,7 +49,6 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowService;
 
-import com.entwinemedia.fn.data.Opt;
 import com.google.common.collect.Lists;
 
 import org.easymock.Capture;
@@ -57,6 +56,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Map;
+import java.util.Optional;
 
 public class StartWorkflowWorkflowOperationHandlerTest {
 
@@ -71,7 +71,7 @@ public class StartWorkflowWorkflowOperationHandlerTest {
   @Before
   public void setUp() throws Exception {
     assetManager = createNiceMock(AssetManager.class);
-    expect(assetManager.getMediaPackage(anyString())).andReturn(Opt.none()).anyTimes();
+    expect(assetManager.getMediaPackage(anyString())).andReturn(Optional.empty()).anyTimes();
 
     workflowService = createNiceMock(WorkflowService.class);
 
@@ -118,7 +118,7 @@ public class StartWorkflowWorkflowOperationHandlerTest {
 
     // Asset Manager
     reset(assetManager);
-    expect(assetManager.getMediaPackage(anyString())).andReturn(Opt.some(mp));
+    expect(assetManager.getMediaPackage(anyString())).andReturn(Optional.of(mp));
 
     // Workflow Service
     WorkflowDefinition wd = new WorkflowDefinitionImpl();

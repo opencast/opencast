@@ -23,9 +23,8 @@ package org.opencastproject.assetmanager.api;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.MimeType;
 
-import com.entwinemedia.fn.data.Opt;
-
 import java.io.InputStream;
+import java.util.Optional;
 
 /**
  * An asset is a {@link org.opencastproject.mediapackage.MediaPackageElement}
@@ -45,7 +44,7 @@ public interface Asset {
   InputStream getInputStream();
 
   /** Mime type of the asset. */
-  Opt<MimeType> getMimeType();
+  Optional<MimeType> getMimeType();
 
   /** Size of the asset in bytes. */
   long getSize();

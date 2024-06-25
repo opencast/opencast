@@ -136,6 +136,7 @@
 
     <operation
       id="image"
+      if="NOT ${presentation/thumbnail_edited}"
       exception-handler-workflow="partial-error"
       description="Creating player preview image for presentation video">
       <configurations>
@@ -144,6 +145,17 @@
         <configuration key="target-tags">engage-download</configuration>
         <configuration key="encoding-profile">player-preview.http</configuration>
         <configuration key="time">3</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+        id="tag"
+        if="${presentation/thumbnail_edited}"
+        exception-handler-workflow="partial-error"
+        description="Prepare thumbnail for publication">
+      <configurations>
+        <configuration key="source-flavor">presentation/player+preview</configuration>
+        <configuration key="target-tags">+engage-download</configuration>
       </configurations>
     </operation>
 
@@ -167,6 +179,7 @@
 
     <operation
         id="image"
+        if="NOT ${presenter/thumbnail_edited}"
         exception-handler-workflow="partial-error"
         description="Creating player preview image for presenter video">
       <configurations>
@@ -175,6 +188,18 @@
         <configuration key="target-tags">engage-download</configuration>
         <configuration key="encoding-profile">player-preview.http</configuration>
         <configuration key="time">3</configuration>
+      </configurations>
+    </operation>
+
+
+    <operation
+        id="tag"
+        if="${presenter/thumbnail_edited}"
+        exception-handler-workflow="partial-error"
+        description="Prepare thumbnail for publication">
+      <configurations>
+        <configuration key="source-flavor">presenter/player+preview</configuration>
+        <configuration key="target-tags">+engage-download</configuration>
       </configurations>
     </operation>
 

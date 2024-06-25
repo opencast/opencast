@@ -62,7 +62,6 @@ import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.Stream;
-import com.entwinemedia.fn.data.Opt;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
@@ -76,12 +75,15 @@ import org.osgi.service.component.ComponentContext;
 import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 public class MicrosoftAzureTranscriptionServiceTest {
@@ -288,8 +290,8 @@ public class MicrosoftAzureTranscriptionServiceTest {
     Snapshot snapshot = EasyMock.createNiceMock(Snapshot.class);
     EasyMock.expect(snapshot.getOrganizationId()).andReturn(org.getId());
     ARecord aRec = EasyMock.createNiceMock(ARecord.class);
-    EasyMock.expect(aRec.getSnapshot()).andReturn(Opt.some(snapshot));
-    Stream<ARecord> recStream = Stream.mk(aRec);
+    EasyMock.expect(aRec.getSnapshot()).andReturn(Optional.of(snapshot));
+    LinkedHashSet<ARecord> recStream = new LinkedHashSet<>(Arrays.asList(aRec));
     Predicate p = EasyMock.createNiceMock(Predicate.class);
     EasyMock.expect(p.and(p)).andReturn(p);
     AResult r = EasyMock.createNiceMock(AResult.class);

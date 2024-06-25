@@ -23,10 +23,10 @@ package org.opencastproject.util.data;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
-import static org.opencastproject.util.data.Option.some;
 
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * An algebraic data type representing a disjoint union. By convention left is considered to represent an error while
@@ -86,7 +86,7 @@ public abstract class Either<A, B> {
 
     public abstract B getOrElse(B left);
 
-    public abstract Option<B> toOption();
+    public abstract Optional<B> toOptional();
 
   }
 
@@ -149,8 +149,8 @@ public abstract class Either<A, B> {
           }
 
           @Override
-          public Option<B> toOption() {
-            return Option.none();
+          public Optional<B> toOptional() {
+            return Optional.empty();
           }
 
           private List<B> toList() {
@@ -240,8 +240,8 @@ public abstract class Either<A, B> {
           }
 
           @Override
-          public Option<B> toOption() {
-            return some(right);
+          public Optional<B> toOptional() {
+            return Optional.of(right);
           }
 
           private List<B> toList() {

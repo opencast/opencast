@@ -65,7 +65,7 @@ public abstract class AbstractJobProducer implements JobProducer {
   public static final boolean DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING = true;
 
   /**
-   * The key to look for in the service configuration file to override the {@link DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING}
+   * The key to look for in the service configuration file to override the {@link .DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING}
    */
   public static final String ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY = "org.opencastproject.job.load.acceptexceeding";
 
@@ -90,6 +90,7 @@ public abstract class AbstractJobProducer implements JobProducer {
   public void activate(ComponentContext cc) {
     acceptJobLoadsExeedingMaxLoad = getOptContextProperty(cc, ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY).map(Strings.toBool)
             .getOrElse(DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING);
+    logger.debug("Job producer {} accepting excessively large jobs: {}", getJobType(), acceptJobLoadsExeedingMaxLoad);
   }
 
   /**

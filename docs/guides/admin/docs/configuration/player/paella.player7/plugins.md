@@ -25,7 +25,7 @@ Example:
 Plugins provided by Paella player
 ---------------------------------
 
-To view a full list of plugins, see the the paella [documentation page](https://paellaplayer.upv.es/docs/)
+To view a full list of plugins, see the the paella [documentation page](https://paellaplayer.upv.es/#/doc/index.md)
 
 
 Plugins provided by Opencast

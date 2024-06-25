@@ -88,49 +88,27 @@ Example on how to create the Opencast 7 release branch:
         git checkout develop
         git pull <remote> develop
 
-2. Modify the Paella target branch (For Paella 6.x and 7.x), found in the dependabot configuration
-   file `.github/dependabot.yml` to target the latest supported version when this version will released.
-
-        Example:
-        - package-ecosystem: npm
-          directory: "/modules/engage-paella-player-7"
-          schedule:
-          interval: daily
-          target-branch: "r/12.x"
-          open-pull-requests-limit: 10
-        
-        to
-
-        - package-ecosystem: npm
-          directory: "/modules/engage-paella-player-7"
-          schedule:
-          interval: daily
-          target-branch: "r/13.x"
-          open-pull-requests-limit: 10
-
-  make a PR then merge this change to `develop` branch.
-
-3. Make sure you did not modify any files. If you did, stash those changes:
+2. Make sure you did not modify any files. If you did, stash those changes:
 
         git status   # check for modified files
         git stash    # stash them if necessary
 
-4. Create and push the new release branch:
+3. Create and push the new release branch:
 
         git checkout -b r/7.x
         git push <remote> r/7.x
 
-5. That is it for the release branch. Now update the versions in `develop` in preparation for the next release:
+4. That is it for the release branch. Now update the versions in `develop` in preparation for the next release:
 
         git checkout develop
-        mvn versions:set -DnewVersion=8-SNAPSHOT versions:commit
+        ./mvnw versions:set -DnewVersion=8-SNAPSHOT versions:commit
 
-6. Have a look at the changes. Make sure that nothing else was modified:
+5. Have a look at the changes. Make sure that nothing else was modified:
 
         git diff
         git status | grep modified: | grep -v pom.xml   # this should have no output
 
-7. If everything looks fine, commit the changes and push it to the community repository:
+6. If everything looks fine, commit the changes and push it to the community repository:
 
         git add $(git status | grep 'modified:.*pom.xml' | awk '{print $2;}')
         git commit -s -m 'Bumping pom.xml Version Numbers'
@@ -176,7 +154,7 @@ source.
 ### Status of Translations
 
 After the release branch is cut, the release managers should check if there are languages to be in- or excluded for the
-upcoming release as specified by the [criteria in the localization documentation](../develop/localization.md) and notify the
+upcoming release as specified by the [criteria in the localization documentation](localization.md) and notify the
 community about the status of Opencast's translations if necessary.
 
 Example announcement for included languages:
@@ -321,7 +299,7 @@ For example, to merge the latest release branch into `develop`, follow these ste
 
 ### Updating Translations
 
-Updating the [localization translations](../develop/localization.md) is automated for existing translation files. If new files need
+Updating the [localization translations](localization.md) is automated for existing translation files. If new files need
 to be added, it is something that should happen early during the release process. If files need to be removed, this
 needs to be done manually.
 
@@ -353,7 +331,7 @@ The following steps outline the necessary steps for cutting the final release:
 
 4. Make the version changes for the release:
 
-        mvn versions:set -DnewVersion=6.0 versions:commit
+        ./mvnw versions:set -DnewVersion=6.0 versions:commit
 
 5. Have a look at the changes. Make sure that nothing else was modified:
 
@@ -442,8 +420,11 @@ I am looking forward to your applications on list, please
 voice your interest until <DATE_ROUGHLY_2_WEEKS_IN_THE_FUTURE>.
 ```
 
-In the case where someone steps up and offers to fill in the role of a release manager for the upcoming release, a vote
-is held on the committers list to determine whether the candidates are deemed suitable for the position.
+In many cases only a single pair of users will step forward to fill these roles.  In this case, barring any objection
+from the community, these two will be selected to be release managers automatically.
+
+In the case where more than one pair steps up, a vote is held on the committers list to determine which pair of
+candidates are deemed most suitable for the position.
 
 This email template may be used to initiate the vote:
 

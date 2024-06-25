@@ -579,7 +579,9 @@
                                       ng-options="id as name for (id, name) in acls"
                                       placeholder-text-single="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.LABEL' | translate }}'"
                                       no-results-text="'{{ 'EVENTS.EVENTS.DETAILS.ACCESS.ACCESS_POLICY.EMPTY' | translate }}'"
-                                      ></select>
+                                      >
+                                      <option value=""></option>
+                              </select>
                             </div>
                             <p ng-show="transactions.read_only">{{baseAclId}}</p>
                           </div>

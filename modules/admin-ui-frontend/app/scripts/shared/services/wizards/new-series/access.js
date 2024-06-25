@@ -78,7 +78,7 @@ angular.module('adminNg.services')
           };
 
       me.ud = {};
-      me.ud.id = {};
+      me.ud.id = undefined;
       me.ud.policies = [];
       me.ud.policiesUser = [];
       me.ud.baseAcl = {};
@@ -148,7 +148,6 @@ angular.module('adminNg.services')
 
               UserResource.get({ username: id }).$promise.then(function (data) {
                 policy.user = data;
-                me.ud.policiesUser.push(policy);
                 // Did we get a user not present in Opencast (e.g. LDAP)? Add it to the list!
                 if (me.users.map(user => user.id).indexOf(id) == -1) {
                   if (me.aclCreateDefaults['sanitize']) {

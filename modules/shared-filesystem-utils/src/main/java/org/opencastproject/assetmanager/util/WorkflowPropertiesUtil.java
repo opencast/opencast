@@ -71,8 +71,8 @@ public final class WorkflowPropertiesUtil {
     final AResult result = query.select(query.snapshot(), query.propertiesOf(WORKFLOW_PROPERTIES_NAMESPACE))
             .where(query.mediaPackageIds(eventIds.toArray(new String[0])).and(query.version().isLatest())).run();
     final Map<String, Map<String, String>> workflowProperties = new HashMap<>(eventIds.size());
-    for (final ARecord record : result.getRecords().toList()) {
-      final List<Property> recordProps = record.getProperties().toList();
+    for (final ARecord record : result.getRecords()) {
+      final List<Property> recordProps = record.getProperties();
       final Map<String, String> eventMap = new HashMap<>(recordProps.size());
       for (final Property property : recordProps) {
         eventMap.put(property.getId().getName(), property.getValue().get(Value.STRING));

@@ -22,9 +22,7 @@ package org.opencastproject.assetmanager.impl.persistence;
 
 import org.opencastproject.util.MimeType;
 
-import com.entwinemedia.fn.ProductBuilder;
-import com.entwinemedia.fn.Products;
-import com.entwinemedia.fn.data.Opt;
+import java.util.Optional;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -47,7 +45,6 @@ import javax.persistence.TableGenerator;
 // Otherwise duplicate key errors will most likely happen.
 @TableGenerator(name = "seq_oc_assets_asset", initialValue = 0, allocationSize = 50)
 public class AssetDto {
-  private static final ProductBuilder p = Products.E;
 
   @Id
   @GeneratedValue(strategy = GenerationType.TABLE, generator = "seq_oc_assets_asset")
@@ -81,7 +78,7 @@ public class AssetDto {
       String mediaPackageElementId,
       SnapshotDto snapshot,
       String checksum,
-      Opt<MimeType> mimeType,
+      Optional<MimeType> mimeType,
       String storeageId,
       long size
   ) {
@@ -89,7 +86,7 @@ public class AssetDto {
     dto.snapshot = snapshot;
     dto.mediaPackageElementId = mediaPackageElementId;
     dto.checksum = checksum;
-    dto.mimeType = mimeType.isSome() ? mimeType.get().toString() : null;
+    dto.mimeType = mimeType.isPresent() ? mimeType.get().toString() : null;
     dto.storageId = storeageId;
     dto.size = size;
     return dto;
@@ -107,7 +104,7 @@ public class AssetDto {
     return checksum;
   }
 
-  public Opt<MimeType> getMimeType() {
+  public Optional<MimeType> getMimeType() {
     return Conversions.toMimeType(mimeType);
   }
 

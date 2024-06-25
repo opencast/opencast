@@ -36,6 +36,8 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 import javax.ws.rs.GET;
@@ -91,7 +93,7 @@ public class PlayerRedirect {
   public Response redirect(@PathParam("id") String id) {
     final Organization org = securityService.getOrganization();
     final String playerPath = Objects.toString(org.getProperties().get("player"), PLAYER_DEFAULT)
-            .replace("#{id}", id);
+            .replace("#{id}", URLEncoder.encode(id, StandardCharsets.UTF_8));
     logger.debug("redirecting to player: {}", playerPath);
     return Response
             .status(Response.Status.TEMPORARY_REDIRECT)

@@ -20,9 +20,9 @@
  */
 package org.opencastproject.assetmanager.api;
 
-import static com.entwinemedia.fn.Equality.eq;
-import static com.entwinemedia.fn.Equality.hash;
 import static java.lang.String.format;
+
+import java.util.Objects;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -53,7 +53,7 @@ public class Property {
   }
 
   @Override public int hashCode() {
-    return hash(id, value);
+    return Objects.hash(id, value);
   }
 
   @Override public boolean equals(Object that) {
@@ -61,7 +61,7 @@ public class Property {
   }
 
   private boolean eqFields(Property that) {
-    return eq(id, that.id) && eq(value, that.value);
+    return Objects.equals(id, that.id) && Objects.equals(value, that.value);
   }
 
   @Override public String toString() {

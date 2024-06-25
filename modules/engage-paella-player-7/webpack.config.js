@@ -47,21 +47,27 @@ module.exports = function (env) {
         'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
         'Access-Control-Allow-Headers': 'X-Requested-With, content-type, Authorization'
       },
-      static: {
-        directory: path.join(__dirname, '../../etc/ui-config/mh_default_org/paella7'),
-        publicPath: env.OPENCAST_CONFIG_URL ?? '/ui/config/paella7'
-      },
-      proxy: {
-        '/search/**': proxyOpts,
-        '/info/**': proxyOpts,
-        '/series/**': proxyOpts,
-        '/annotation/**': proxyOpts,
-        '/engage/**': proxyOpts,
-        '/play/**': proxyOpts,
-        '/usertracking/**': proxyOpts,
-        '/editor/**': proxyOpts,
-        '/editor-ui/**': proxyOpts
-      }
+      static: [
+        {
+          directory: path.join(__dirname, '../../etc/ui-config/mh_default_org/paella7'),
+          publicPath: env.OPENCAST_CONFIG_URL ?? '/ui/config/paella7'
+        },
+        {
+          directory: path.join(__dirname, 'tests/mock/static'),
+          publicPath: '/test_mock_static'
+        }
+      ],
+      proxy: [
+        { context: ['/search'], ...proxyOpts },
+        { context: ['/info'], ...proxyOpts },
+        { context: ['/series'], ...proxyOpts },
+        { context: ['/annotation'], ...proxyOpts },
+        { context: ['/engage'], ...proxyOpts },
+        { context: ['/play'], ...proxyOpts },
+        { context: ['/usertracking'], ...proxyOpts },
+        { context: ['/editor'], ...proxyOpts },
+        { context: ['/editor-ui'], ...proxyOpts }
+      ]
     },
 
     module: {

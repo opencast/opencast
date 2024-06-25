@@ -35,15 +35,13 @@ public abstract class AbstractIndexProducer implements IndexProducer {
    *
    * @param logger
    *           An slf4j logger to preserve the context.
-   * @param indexName
-   *           The name of the index that's being rebuild.
    * @param total
    *           The total amount of elements to be re-added.
    * @param elementName
    *           The elements to be added (e.g. 'events').
    */
-  protected void logIndexRebuildBegin(Logger logger, String indexName, int total, String elementName) {
-    logger.info("Starting update of the {} index from service '{}' with {} {}", indexName, getService(), total,
+  protected void logIndexRebuildBegin(Logger logger, int total, String elementName) {
+    logger.info("Starting {} index rebuild with {} {}", getService(), total,
             elementName);
   }
 
@@ -52,8 +50,6 @@ public abstract class AbstractIndexProducer implements IndexProducer {
    *
    * @param logger
    *           An slf4j logger to preserve the context.
-   * @param indexName
-   *           The name of the index that's being rebuild.
    * @param total
    *           The total amount of elements to be re-added.
    * @param elementName
@@ -61,10 +57,10 @@ public abstract class AbstractIndexProducer implements IndexProducer {
    * @param org
    *           The organization.
    */
-  protected void logIndexRebuildBegin(Logger logger, String indexName, int total, String elementName,
+  protected void logIndexRebuildBegin(Logger logger, int total, String elementName,
           Organization org) {
-    logger.info("Starting update of the {} index from service '{}' with {} {} of organization '{}'", indexName,
-            getService(), total, elementName, org);
+    logger.info("Starting {} index rebuild for organization {} with {} {}",
+            getService(), org, total, elementName);
   }
 
   /**
@@ -72,15 +68,13 @@ public abstract class AbstractIndexProducer implements IndexProducer {
    *
    * @param logger
    *           An slf4j logger to preserve the context.
-   * @param indexName
-   *           The name of the index that's being rebuild.
    * @param total
    *           The total amount of elements to be re-added.
    * @param current
    *           The amount of elements that have already been re-added.
    */
-  protected void logIndexRebuildProgress(Logger logger, String indexName, int total, int current) {
-    logIndexRebuildProgress(logger, indexName, total, current, 1);
+  protected void logIndexRebuildProgress(Logger logger, int total, int current) {
+    logIndexRebuildProgress(logger, total, current, 1);
   }
 
   /**
@@ -88,8 +82,6 @@ public abstract class AbstractIndexProducer implements IndexProducer {
    *
    * @param logger
    *           An slf4j logger to preserve the context.
-   * @param indexName
-   *           The name of the index that's being rebuild.
    * @param total
    *           The total amount of elements to be re-added.
    * @param current
@@ -97,8 +89,8 @@ public abstract class AbstractIndexProducer implements IndexProducer {
    * @param org
    *           The organization.
    */
-  protected void logIndexRebuildProgress(Logger logger, String indexName, int total, int current, Organization org) {
-    logIndexRebuildProgress(logger, indexName, total, current, 1, org);
+  protected void logIndexRebuildProgress(Logger logger, int total, int current, Organization org) {
+    logIndexRebuildProgress(logger, total, current, 1, org);
   }
 
   /**
@@ -106,8 +98,6 @@ public abstract class AbstractIndexProducer implements IndexProducer {
    *
    * @param logger
    *           An slf4j logger to preserve the context.
-   * @param indexName
-   *           The name of the index that's being rebuild.
    * @param total
    *           The total amount of elements to be re-added.
    * @param current
@@ -115,8 +105,8 @@ public abstract class AbstractIndexProducer implements IndexProducer {
    * @param batchSize
    *           The size of the batch we re-add in one go.
    */
-  protected void logIndexRebuildProgress(Logger logger, String indexName, int total, int current, int batchSize) {
-    logIndexRebuildProgress(logger, indexName, total, current, batchSize, null);
+  protected void logIndexRebuildProgress(Logger logger, int total, int current, int batchSize) {
+    logIndexRebuildProgress(logger, total, current, batchSize, null);
   }
 
   /**
@@ -124,8 +114,6 @@ public abstract class AbstractIndexProducer implements IndexProducer {
    *
    * @param logger
    *           An slf4j logger to preserve the context.
-   * @param indexName
-   *           The name of the index that's being rebuild.
    * @param total
    *           The total amount of elements to be re-added.
    * @param current
@@ -135,18 +123,18 @@ public abstract class AbstractIndexProducer implements IndexProducer {
    * @param org
    *           The organization (can be null).
    */
-  protected void logIndexRebuildProgress(Logger logger, String indexName, int total, int current, int batchSize,
+  protected void logIndexRebuildProgress(Logger logger, int total, int current, int batchSize,
           Organization org) {
     final int responseInterval = (total < 100) ? 1 : (total / 100);
     if (responseInterval == 1 || batchSize > responseInterval || current == total
             || current % responseInterval < batchSize) {
 
       if (org == null) {
-        logger.info("Updating the {} index from service '{}': {}/{} finished, {}% complete.", indexName, getService(),
+        logger.info("{} index rebuild: {}/{} finished, {}% complete.", getService(),
                 current, total, (current * 100 / total));
       } else {
-        logger.info("Updating the {} index from service '{}' and organization '{}': {}/{} finished, {}% complete.",
-                indexName, getService(), org.getId(), current, total, (current * 100 / total));
+        logger.info("{} index rebuild for organization {}: {}/{} finished, {}% complete.",
+                getService(), org.getId(), current, total, (current * 100 / total));
       }
     }
   }
@@ -164,7 +152,7 @@ public abstract class AbstractIndexProducer implements IndexProducer {
    *           The error that occurred.
    */
   protected void logSkippingElement(Logger logger, String elementName, String element, Throwable t) {
-    logger.error("Unable to re-index '{}' {}, skipping.", elementName, element, t);
+    logger.error("Unable to re-index {} {}, skipping.", elementName, element, t);
   }
 
   /**
@@ -182,7 +170,7 @@ public abstract class AbstractIndexProducer implements IndexProducer {
    *           The organization.
    */
   protected void logSkippingElement(Logger logger, String elementName, String element, Organization org, Throwable t) {
-    logger.error("Unable to re-index '{}' {} of organization '{}', skipping.", elementName, element, org.getId(), t);
+    logger.error("Unable to re-index {} {} for organization {}, skipping.", elementName, element, org.getId(), t);
   }
 
   /**
@@ -190,13 +178,11 @@ public abstract class AbstractIndexProducer implements IndexProducer {
    *
    * @param logger
    *           An slf4j logger to preserve the context.
-   * @param indexName
-   *           The name of the index that's being rebuild.
    * @param t
    *           The error that occurred.
    */
-  protected void logIndexRebuildError(Logger logger, String indexName, Throwable t) {
-    logger.error("Error updating the {} index from service '{}'.", indexName, getService(), t);
+  protected void logIndexRebuildError(Logger logger, Throwable t) {
+    logger.error("Error updating the {} index.", getService(), t);
   }
 
   /**
@@ -204,8 +190,6 @@ public abstract class AbstractIndexProducer implements IndexProducer {
    *
    * @param logger
    *           An slf4j logger to preserve the context.
-   * @param indexName
-   *           The name of the index that's being rebuild.
    * @param total
    *           The total amount of elements to be re-added.
    * @param current
@@ -213,8 +197,8 @@ public abstract class AbstractIndexProducer implements IndexProducer {
    * @param t
    *           The error that occurred.
    */
-  protected void logIndexRebuildError(Logger logger, String indexName, int total, int current, Throwable t) {
-    logger.error("Error updating the {} index for service '{}': {}/{} could be finished.", indexName, getService(),
+  protected void logIndexRebuildError(Logger logger, int total, int current, Throwable t) {
+    logger.error("Error updating the {} index: {}/{} could be finished.", getService(),
             current, total, t);
   }
 
@@ -223,15 +207,13 @@ public abstract class AbstractIndexProducer implements IndexProducer {
    *
    * @param logger
    *           An slf4j logger to preserve the context.
-   * @param indexName
-   *           The name of the index that's being rebuild.
    * @param t
    *           The error that occurred.
    * @param org
    *           The organization.
    */
-  protected void logIndexRebuildError(Logger logger, String indexName, Throwable t, Organization org) {
-    logger.error("Error updating the {} index for service '{}' and organization '{}'.", indexName, getService(),
+  protected void logIndexRebuildError(Logger logger, Throwable t, Organization org) {
+    logger.error("Error updating the {} index for service for organization {}.", getService(),
             org.getId(), t);
   }
 }

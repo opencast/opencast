@@ -170,7 +170,7 @@ public class TimedMediaArchiver extends AbstractScanner implements ManagedServic
   public void scan() {
     Date maxAge = Calendar.getInstance().getTime();
     maxAge.setTime(maxAge.getTime() - TimeUnit.HOURS.toMillis(ageModifier));
-    if (assetManager.getAssetStore(storeId).isNone()) {
+    if (assetManager.getAssetStore(storeId).isEmpty()) {
       throw new RuntimeException("Store " + storeId + " is not available to the asset manager");
     }
 

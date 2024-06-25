@@ -28,6 +28,8 @@ import getBasicPluginContext from 'paella-basic-plugins';
 import getSlidePluginContext from 'paella-slide-plugins';
 import getZoomPluginContext from 'paella-zoom-plugin';
 import getUserTrackingPluginContext from 'paella-user-tracking';
+import getVideo360CanvasPluginContext from 'paella-webgl-plugins';
+import getMP4MultiQualityContext from 'paella-mp4multiquality-plugin';
 
 import { loadTrimming, setTrimming } from './TrimmingLoader';
 import EpisodeConversor from './EpisodeConversor.js';
@@ -84,7 +86,9 @@ const initParams = {
     getBasicPluginContext(),
     getSlidePluginContext(),
     getZoomPluginContext(),
-    getUserTrackingPluginContext()
+    getUserTrackingPluginContext(),
+    getVideo360CanvasPluginContext(),
+    getMP4MultiQualityContext()
   ],
   getCookieConsentFunction: (type) => {
     return myWebsiteCheckConsentFunction(type);
@@ -102,6 +106,14 @@ const initParams = {
   },
 
   loadVideoManifest: async function (url, config, player) {
+    const redirectToAuthPage = async () => {
+      location.href = getUrlFromOpencastPaella('auth.html?redirect=' + encodeURIComponent(window.location.href));
+      // Create a loader spinner.
+      player._loader = new player.initParams.Loader(player);
+      player._loader.create();
+      // We need to interrupt the player loading to redirect the user to the auth page.
+      await new Promise(() => {});
+    };
     // check cookie consent (if enabled)
     const cookieConsent = config?.opencast?.cookieConsent?.enable ?? true;
     const cookieConsentConfig = config?.opencast?.cookieConsent?.config ?? {
@@ -139,15 +151,33 @@ const initParams = {
       const data = await fetch(getUrlFromOpencastServer('/info/me.json'));
       const me = await data.json();
 
-      if (me.userRole === 'ROLE_USER_ANONYMOUS') {
+      if (!me.roles.includes('ROLE_USER')) {
         player.log.info('Video not found and user is not authenticated. Try to log in.');
-        location.href = getUrlFromOpencastPaella('auth.html?redirect=' + encodeURIComponent(window.location.href));
+        await redirectToAuthPage();
+        // This Error should not happen, as the user is redirected to the auth page.
+        throw Error('Video not found and user is not authenticated. Log in and try again.');
       }
       else {
         // TODO: the video does not exist or the user can't see it
         throw Error('The video does not exist or the user can\'t see it');
       }
     }
+
+    // Load the series, if appropriate
+    const loadSeries = async (sid) => {
+      const response = await fetch(getUrlFromOpencastServer('/search/series.json?id=' + sid));
+
+      if (response.ok) {
+        const sdata = await response.json();
+        return sdata['result'][0]['dc']['title'][0];
+      }
+      else {
+        throw Error('Series data missing');
+      }
+    };
+    const series = data?.metadata?.series !== undefined ? await loadSeries(data?.metadata?.series) : undefined;
+
+    data.metadata.seriestitle = series;
 
     // Add event title to browser tab
     const videoTitle = data?.metadata?.title ?? 'Unknown video title';
@@ -221,6 +251,15 @@ export class PaellaOpencast extends Paella {
     }
 
     bindEvent(paella, Events.PLAYER_LOADED, async () => {
+      // Prevent video download: Disable context menu
+      if (paella?.config?.opencast?.preventVideoDownload == true) {
+        paella.videoContainer.streamProvider.players.forEach(player => {
+          player.video?.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+          });
+        });
+      }
+
       // Enable trimming
       // Retrieve video duration in case a default trim end time is needed
       const videoDuration = paella.videoManifest?.metadata?.duration;
@@ -305,7 +344,7 @@ export class PaellaOpencast extends Paella {
   async getEpisode({episodeId}) {
     return fetch(getUrlFromOpencastServer(`/search/episode.json?id=${episodeId}`))
     .then(response => response.json() )
-    .then(response => response['search-results']?.result)
+    .then(response => response['result'][0]?.id)
     .catch(() => null);
   }
 

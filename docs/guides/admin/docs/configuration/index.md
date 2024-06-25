@@ -90,7 +90,6 @@ A list of everything.
 - [Multi Tenancy Configuration](multi.tenancy.md)
 - [OAI-PMH Configuration](oaipmh.md)
 - [Player Configuration](player/player.overview.md)
-    - [Paella player 6 Configuration](player/paella.player6/configuration.md)
     - [Paella player 7 Configuration](player/paella.player7/configuration.md)
 - [Plugin Management](plugin-management.md)
 - [Search Index Overview](searchindex/index.md)

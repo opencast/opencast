@@ -23,8 +23,8 @@ package org.opencastproject.assetmanager.api.query;
 import org.opencastproject.assetmanager.api.Property;
 import org.opencastproject.assetmanager.api.Snapshot;
 
-import com.entwinemedia.fn.Stream;
-import com.entwinemedia.fn.data.Opt;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * The result of a {@link ASelectQuery}. Each record represents a matching
@@ -44,8 +44,8 @@ public interface ARecord {
    * <p>
    * Please note that properties are not versioned but stored per episode.
    */
-  Stream<Property> getProperties();
+  List<Property> getProperties();
 
   /** Get the snapshot or return none if it has not been specified to fetch it. */
-  Opt<Snapshot> getSnapshot();
+  Optional<Snapshot> getSnapshot();
 }

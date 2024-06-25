@@ -56,8 +56,6 @@ import org.opencastproject.workflow.api.XmlWorkflowParser;
 import org.opencastproject.workflow.impl.WorkflowServiceImpl.HandlerRegistration;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
 import org.junit.Assert;
@@ -70,6 +68,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 public class PauseFinalOperationTest {
@@ -154,7 +153,7 @@ public class PauseFinalOperationTest {
     service.setWorkspace(workspace);
 
     final AssetManager assetManager = createNiceMock(AssetManager.class);
-    EasyMock.expect(assetManager.getMediaPackage(EasyMock.anyString())).andReturn(Opt.none()).anyTimes();
+    EasyMock.expect(assetManager.getMediaPackage(EasyMock.anyString())).andReturn(Optional.empty()).anyTimes();
     EasyMock.replay(assetManager);
     service.setAssetManager(assetManager);
 

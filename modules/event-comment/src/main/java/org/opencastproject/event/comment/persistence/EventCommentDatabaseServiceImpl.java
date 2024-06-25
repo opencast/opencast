@@ -385,7 +385,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
     try {
       index.addOrUpdateEvent(eventId, updateFunction, organization, user);
     } catch (SearchIndexException e) {
-      logger.error("Error updating comment status of event {} in the {} index:", eventId, index.getIndexName(), e);
+      logger.error("Error updating comment status of event {} in the {} index:", eventId, e);
     }
   }
 
@@ -407,7 +407,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   public void repopulate() throws IndexRebuildException {
     try {
       final int total = countComments();
-      logIndexRebuildBegin(logger, index.getIndexName(), total, "events with comment");
+      logIndexRebuildBegin(logger, total, "events with comment");
       final int[] current = new int[1];
       current[0] = 0;
       int n = 20;
@@ -431,7 +431,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
 
                       if (updatedEventRange.size() >= n || i >= eventsWithComments.get(orgId).size()) {
                         index.bulkEventUpdate(updatedEventRange);
-                        logIndexRebuildProgress(logger, index.getIndexName(), total, current[0], n);
+                        logIndexRebuildProgress(logger, total, current[0], n);
                         updatedEventRange.clear();
                       }
                     } catch (Throwable t) {
@@ -441,8 +441,8 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
                 });
       }
     } catch (Exception e) {
-      logIndexRebuildError(logger, index.getIndexName(), e);
-      throw new IndexRebuildException(index.getIndexName(), getService(), e);
+      logIndexRebuildError(logger, e);
+      throw new IndexRebuildException(getService(), e);
     }
   }
 

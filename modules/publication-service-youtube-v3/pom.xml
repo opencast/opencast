@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>16-SNAPSHOT</version>
+    <version>17-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -161,8 +161,6 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Build-Number>${buildNumber}</Build-Number>
             <Private-Package>
               com.google.*;-split-package:=merge-first,
             </Private-Package>
@@ -174,9 +172,11 @@
               com.google.api.*
             </_exportcontents>
             <Import-Package>
+              !android.os*,
               !com.google.appengine*,
               !com.google.apphosting*,
               !javax.annotation,
+              !javax.annotation.meta,
               !oracle.xml.parser.*,
               !org.jaxen.*,
               !sun.security.util,

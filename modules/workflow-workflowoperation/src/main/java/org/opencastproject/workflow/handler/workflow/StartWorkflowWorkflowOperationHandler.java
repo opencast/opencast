@@ -40,8 +40,6 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.WorkflowService;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
@@ -49,6 +47,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * This WOH starts a new workflow for given media package.
@@ -134,8 +133,8 @@ public class StartWorkflowWorkflowOperationHandler extends AbstractWorkflowOpera
     String delim = "";
     for (String mpId : asList(configuredMediaPackageIDs)) {
       // Get media package
-      Opt<MediaPackage> mpOpt = assetManager.getMediaPackage(mpId);
-      if (mpOpt.isNone()) {
+      Optional<MediaPackage> mpOpt = assetManager.getMediaPackage(mpId);
+      if (mpOpt.isEmpty()) {
         String errstr = format("Media package %s not found", mpId);
         if (failOnError) {
           throw new WorkflowOperationException(errstr);

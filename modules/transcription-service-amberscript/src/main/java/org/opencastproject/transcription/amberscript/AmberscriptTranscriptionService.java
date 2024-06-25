@@ -1062,11 +1062,11 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
             final AResult r = q.select(q.snapshot()).where(q.mediaPackageId(mpId).and(q.version().isLatest())).run();
             if (r.getSize() == 0) {
               // Media package not archived yet? Skip until next time.
-              logger.warn("Media package {} has not been archived yet. Skipped.", mpId);
+              logger.debug("Media package {} has not been archived yet. Skipped.", mpId);
               continue;
             }
 
-            String org = Enrichments.enrich(r).getSnapshots().head2().getOrganizationId();
+            String org = Enrichments.enrich(r).getSnapshots().stream().findFirst().get().getOrganizationId();
             Organization organization = organizationDirectoryService.getOrganization(org);
             if (organization == null) {
               logger.warn("Media package {} has an unknown organization {}. Skipped.", mpId, org);

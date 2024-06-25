@@ -1,0 +1,27 @@
+{
+  "id": "0",
+  "entries": [
+    {
+      "id": 0,
+      "contentId": "1234",
+      "type": "EVENT"
+    },
+    {
+      "id": 1,
+      "contentId": "abcd",
+      "type": "EVENT"
+    }
+  ],
+  "title": "title",
+  "description": "description",
+  "creator": "creator",
+  "updated": 1701361007521,
+  "accessControlEntries": [
+    {
+      "id": 0,
+      "allow": true,
+      "role": "ROLE_USER_BOB",
+      "action": "read"
+    }
+  ]
+}

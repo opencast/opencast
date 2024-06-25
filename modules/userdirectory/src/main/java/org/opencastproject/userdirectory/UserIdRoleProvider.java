@@ -202,6 +202,9 @@ public class UserIdRoleProvider implements RoleProvider, ManagedService {
   }
 
   private static boolean like(String string, final String query) {
+    if (string == null) {
+      return false;
+    }
     String regex = query.replace("_", ".").replace("%", ".*?");
     Pattern p = Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     return p.matcher(string).matches();

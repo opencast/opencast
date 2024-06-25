@@ -47,6 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
+import java.util.Optional;
 
 /**
  * Implementation of an {@link HttpAssetProvider} for the {@link OsgiAssetManagerRestEndpoint}.
@@ -106,9 +107,9 @@ public class OsgiEndpointHttpAssetProvider implements HttpAssetProvider {
   }
 
   private URI createUriFor(MediaPackageElement mpe, Snapshot snapshot) {
-    Opt<String> fileNameOpt = AssetManagerImpl.getFileNameFromUrn(mpe);
+    Optional<String> fileNameOpt = AssetManagerImpl.getFileNameFromUrn(mpe);
     String fileName;
-    if (fileNameOpt.isSome()) {
+    if (fileNameOpt.isPresent()) {
       fileName = fileNameOpt.get();
     } else {
       fileName = mpe.getElementType().toString() + "." + mimeTypeToSuffix(Opt.nul(mpe.getMimeType()));

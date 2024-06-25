@@ -23,18 +23,17 @@ package org.opencastproject.assetmanager.impl.query;
 import org.opencastproject.assetmanager.api.query.ARecord;
 import org.opencastproject.assetmanager.api.query.AResult;
 
-import com.entwinemedia.fn.Stream;
-
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 
 public final class AResultImpl implements AResult {
-  private final Stream<ARecord> records;
+  private final LinkedHashSet<ARecord> records;
   private final long size;
   private final long limit;
   private final long offset;
   private final long searchTime;
 
-  public AResultImpl(Stream<ARecord> records, long size, long offset, long limit, long searchTime) {
+  public AResultImpl(LinkedHashSet<ARecord> records, long size, long offset, long limit, long searchTime) {
     this.records = records;
     this.size = size;
     this.limit = limit;
@@ -46,7 +45,7 @@ public final class AResultImpl implements AResult {
     return records.iterator();
   }
 
-  @Override public Stream<ARecord> getRecords() {
+  @Override public LinkedHashSet<ARecord> getRecords() {
     return records;
   }
 

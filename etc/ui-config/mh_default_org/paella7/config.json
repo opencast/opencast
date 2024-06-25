@@ -63,7 +63,18 @@
             "presenter/player+preview",
             "presentation/player+preview"
         ],
-        "theme": "custom_theme"
+        "theme": "custom_theme",
+        "hideTimeLineOnLive": false,
+        "preventVideoDownload": false,
+        "videoCanvas": {
+            "video360": {
+               "flavor": "*/delivery+360",
+               "tag": "video360"
+            },
+            "video": {
+               "flavor": "*/delivery"
+            }
+        }
     },
 
     "cookieConsent": [
@@ -94,6 +105,14 @@
     ],
 
     "plugins": {
+       "es.upv.paella.video360Canvas": {
+            "enabled": true,
+            "maxZoom": 2,
+            "minZoom": 0.5,
+            "speedX": 0.4,
+            "speedY": 0.4,
+            "order": 0
+        },
         "/* layout plugins */": "*********************************************************",
         "es.upv.paella.singleVideo": {
             "enabled": true,
@@ -265,8 +284,12 @@
                 }
             }
         },
-        "es.upv.paella.mp4VideoFormat": {
+        "es.upv.paella.mp4MultiQualityVideoFormat": {
             "enabled": true,
+            "order": 1
+        },
+        "es.upv.paella.mp4VideoFormat": {
+            "enabled": false,
             "order": 1
         },
         "es.upv.paella.htmlVideoFormat": {
@@ -412,7 +435,7 @@
 
             "downloadFlavors": false,
             "downloadTags": false,
-            "downloadMimeTypes": ["audio/m4a", "video/mp4"],
+            "downloadMimeTypes": ["audio/m4a", "video/mp4", "text/vtt"],
 
             "enableOnLicenses": [
                 "CC-BY",
@@ -510,7 +533,7 @@
 
         "es.upv.paella.zoomPlugin": {
             "enabled": true,
-            "order": 0,
+            "order": 1,
             "maxZoom": 400,
             "showButtons": true,
             "target": "presenter"
@@ -518,7 +541,7 @@
 
         "es.upv.paella.videoCanvas": {
             "enabled": true,
-            "order": 1
+            "order": 2
         },
 
         "es.upv.paella.audioCanvas": {

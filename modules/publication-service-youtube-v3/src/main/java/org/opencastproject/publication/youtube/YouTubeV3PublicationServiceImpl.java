@@ -88,10 +88,10 @@ public class YouTubeV3PublicationServiceImpl
   /** The load on the system introduced by creating a retract job */
   public static final float DEFAULT_YOUTUBE_RETRACT_JOB_LOAD = 0.1f;
 
-  /** The key to look for in the service configuration file to override the {@link DEFAULT_YOUTUBE_PUBLISH_JOB_LOAD} */
+  /** The key to look for in the service configuration file to override the {@link #DEFAULT_YOUTUBE_PUBLISH_JOB_LOAD} */
   public static final String YOUTUBE_PUBLISH_LOAD_KEY = "job.load.youtube.publish";
 
-  /** The key to look for in the service configuration file to override the {@link DEFAULT_YOUTUBE_RETRACT_JOB_LOAD} */
+  /** The key to look for in the service configuration file to override the {@link #DEFAULT_YOUTUBE_RETRACT_JOB_LOAD} */
   public static final String YOUTUBE_RETRACT_LOAD_KEY = "job.load.youtube.retract";
 
   public static final String YOUTUBE_ENABLED_KEY = "org.opencastproject.publication.youtube.enabled";

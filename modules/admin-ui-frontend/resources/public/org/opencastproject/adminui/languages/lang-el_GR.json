@@ -43,7 +43,7 @@
       "VIDEOFILE": " Αρχείο Βίντεο",
       "VIDEOFILE_DESCRIPTION": "Επιλογή αρχείου βίντεο για μεταφόρτωση",
       "CAPTION": "Λεζάντες",
-      "CAPTION_DESCRIPTION": "Caption file in VTT format",
+      "CAPTION_DESCRIPTION": "Αρχείο λεζάντας σε μορφή VTT",
       "UPLOAD": "Μεταφόρτωση",
       "UPLOADING": "Αποστολή...",
       "EDIT": "Αποθήκευση",
@@ -542,8 +542,8 @@
                      "DETAIL": "Το αρχείο περιέχει μια καταγραφή ενός προσώπου μιλώντας σε ένα ακροατήριο."
                   },
                   "SUBTITLES": {
-                     "SHORT": "Subtitles",
-                     "DETAIL": "The text file contains the words spoken in the video(s) above."
+                     "SHORT": "Υπότιτλοι",
+                     "DETAIL": "Το αρχείο κειμένου περιέχει τις λέξεις που εκφωνήθηκαν στα παραπάνω βίντεο."
                   },
                   "AUDIO_ONLY": {
                      "SHORT": "Μόνο αρχείου ήχου",
@@ -588,7 +588,7 @@
                "NO_OPTIONS": "Δεν καθορίστηκε λίστα επιλογών αντικειμένων σε αυτό το τμήμα της ιστοσελίδας!",
                "OPTION": {
                   "CLASS_HANDOUT_NOTES": "Ενημερωτικές σημειώσεις κλάσης",
-                  "SUBTITLES": "Subtitles",
+                  "SUBTITLES": "Υπότιτλοι",
                   "PREVIEW_IMAGE": "Προεπισκόπηση εικόνας",
                   "SMIL": "Κατάλογος Smil",
                   "TRACK_PARTS": "Παρακολούθηση τμημάτων"
@@ -1275,7 +1275,7 @@
                "HOMEPAGE": "Αρχική σελίδα",
                "DIRECT_LINK": "Άμεσος σύνδεσμος με τη σειρά",
                "COPY_DIRECT_LINK": "Αντιγραφή στο πρόχειρο",
-               "NOT_MOUNTED": "This series is currently not included in the page structure, and can only be reached using the direct link above.",
+               "NOT_MOUNTED": "Αυτή η σειρά δεν περιλαμβάνεται στην δομή  της σελίδας  και μπορεί να είναι προσβάσιμη μόνο χρησιμοποιώντας τον παραπάνω σύνδεσμο.",
                "PAGES": "Σελίδες στο Tobira που περιέχουν αυτή τη σειρά"
             },
             "EVENTS": {
@@ -1496,10 +1496,10 @@
                   "DESCRIPTION": "Παρακαλώ επιλέξτε ένα σύνολο προ-διαμορφωμένων πολιτικών ή να προσθέσετε τις ακόλουθες προσαρμοσμένες πολιτικές",
                   "NEW_USER": "Νέος χρήστης",
                   "USER": "Χρήστης",
-                  "USERS": "Users who are authorized by this access policy",
+                  "USERS": "Χρήστες που είναι εξουσιοδοτημένοι για την πολιτική πρόσβασης",
                   "HELP": {
-                     "READ": "By setting read permissions, the entity to which this access policy is assigned becomes visible to the selected user.",
-                     "WRITE": "By setting write permissions, the entity to which this access policy is assigned can be modified by the selected user."
+                     "READ": "Ρυθμίζοντας τα δικαιώματα ανάγνωσης, η οντότητα στην οποία εκχωρείται αυτή η πολιτική πρόσβασης γίνεται ορατή στον επιλεγμένο χρήστη.",
+                     "WRITE": "Ρυθμίζοντας τα δικαιώματα ανάγνωσης, η οντότητα στην οποία εκχωρείται αυτή η πολιτική πρόσβασης γίνεται ορατή στον επιλεγμένο χρήστη."
                   }
                },
                "ROLES": {
@@ -1545,11 +1545,11 @@
                   "DESCRIPTION": "Παρακαλώ επιλέξτε ένα σύνολο προ-διαμορφωμένων πολιτικών ή να προσθέσετε τις ακόλουθες προσαρμοσμένες πολιτικές",
                   "NEW_USER": "Νέος χρήστης",
                   "USER": "Χρήστης",
-                  "USERS": "Users who are authorized by this access policy",
+                  "USERS": "Χρήστες που είναι εξουσιοδοτημένοι από αυτήν την πολιτική πρόσβασης",
                   "NONEXISTENT_USER": "Μη υπάρχων χρήστης",
                   "HELP": {
-                     "READ": "By setting read permissions, the entity to which this access policy is assigned becomes visible to the selected user.",
-                     "WRITE": "By setting write permissions, the entity to which this access policy is assigned can be modified by the selected user."
+                     "READ": "Ρυθμίζοντας τα δικαιώματα ανάγνωσης, η οντότητα στην οποία εκχωρείται αυτή η πολιτική πρόσβασης γίνεται ορατή στον επιλεγμένο χρήστη.",
+                     "WRITE": "Ρυθμίζοντας τα δικαιώματα ανάγνωσης, η οντότητα στην οποία εκχωρείται αυτή η πολιτική πρόσβασης γίνεται ορατή στον επιλεγμένο χρήστη."
                   }
                },
                "ROLES": {
@@ -1866,10 +1866,10 @@
       "TRACKS": {
          "DESCRIPTION": "Μπορείτε να αποεπιλέξετε κομμάτια για να τα αποκλείσετε από περαιτέρω επεξεργασία. Παρακαλώ σημειώστε ότι πρέπει να (επαν-) δημοσιεύετε την εκδλήλωση για να εφαρμόσετε τις αλλαγές.",
          "NOTIFICATION": {
-            "NO_VIDEO_TRACK_SELECTED_WARNING": "You should probably enable at least one video track",
-            "NO_AUDIO_TRACK_SELECTED_WARNING": "You should probably enable at least one audio track",
-            "TOO_MANY_AUDIO_TRACKS_SELECTED_WARNING": "You probably shouldn't enable more audio than video tracks",
-            "NO_TRACK_SELECTED_ERROR": "You must enable at least one track"
+            "NO_VIDEO_TRACK_SELECTED_WARNING": "Πρέπει να ενεργοποιήσετε τουλάχιστον ένα κομμάτι βίντεο",
+            "NO_AUDIO_TRACK_SELECTED_WARNING": "Πρέπει να ενεργοποιήσετε τουλάχιστον ένα κομμάτι ήχου",
+            "TOO_MANY_AUDIO_TRACKS_SELECTED_WARNING": "Πιθανώς δεν πρέπει να ενεργοποιήσετε περισσότερα  κομμάτια ήχου από κομμάτια βίντεο",
+            "NO_TRACK_SELECTED_ERROR": "Πρέπει να ενεργοποιήσετε τουλάχιστον ένα κομμάτι"
          },
          "TRACK": {
             "HEADER": "Κομμάτι"

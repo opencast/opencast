@@ -27,13 +27,13 @@ Developer Builds
 Besides the default `dist` Maven profile, the assemblies project defines a second `dev` profile which will cause only
 one `allinone` distribution to be created. It is already unpacked and ready to be started. Activate the profile using:
 
-    mvn clean install -Pdev
+    ./mvnw clean install -Pdev
 
 The administrative user interface needs nodejs to build and phantomjs for testing purposes. These will be downloaded as
 prebuilt binaries during the maven build process. If there are no prebuilt binaries for your operating system, you can
 build the tools manually and then build opencast using the `frontend-no-prebuilt` maven profile:
 
-    mvn clean install -Pdev,frontend-no-prebuilt
+    ./mvnw clean install -Pdev,frontend-no-prebuilt
 
 Logging During Builds
 ---------------------
@@ -52,7 +52,7 @@ be as follows:
 * Start Opencast and use `la -u` in the Karaf console to list all installed bundles/modules. Note down the IDs of the
   bundles you want to watch.
 * Use `bundle:watch IDs` to watch the desired modules, e.g. `bundle:watch 190 199`
-* Make your changes and rebuild the module (e.g. execute `mvn clean install` in the module folder).
+* Make your changes and rebuild the module (e.g. execute `./mvnw clean install` in the module folder).
 * Watch how Karaf automatically redeploys the changed jars from your local Maven repository. You can verify that
   everything went smoothly by checking the log with `log:tail`.
 
@@ -61,7 +61,7 @@ To see this technique in action, you can watch the following short video:
 * [Opencast development: Watch and reload modules](https://asciinema.org/a/348132)
 
 The updated bundles are only available in the currently running Karaf instance. To create a Opencast version that has
-this changes permanently, you have to run `mvn clean install` in the the assemblies directory again. Your current
+this changes permanently, you have to run `./mvnw clean install` in the the assemblies directory again. Your current
 instance will be deleted by the new assembly!
 
 In several cases the `bundle:watch` can bring Karaf in an unstable condition, as dependencies between bundles will not

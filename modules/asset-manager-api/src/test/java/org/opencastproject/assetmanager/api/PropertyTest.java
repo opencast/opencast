@@ -24,10 +24,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 
-import com.entwinemedia.fn.data.SetB;
-
 import org.junit.Test;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
@@ -42,9 +41,9 @@ public class PropertyTest {
                    Property.mk(PropertyId.mk(id, PropertyName.mk(ns, n)), Value.mk(true)));
       assertNotEquals(Property.mk(PropertyId.mk(id, PropertyName.mk(ns, n)), Value.mk(true)),
                       Property.mk(PropertyId.mk(id, PropertyName.mk(ns, n)), Value.mk(false)));
-      final Set<Property> p = SetB.IH.mk(
-              Property.mk(PropertyId.mk(id, PropertyName.mk(ns, n)), Value.mk(true)),
-              Property.mk(PropertyId.mk(id, PropertyName.mk(ns, n)), Value.mk(10L)));
+      final Set<Property> p = new HashSet<>();
+      p.add(Property.mk(PropertyId.mk(id, PropertyName.mk(ns, n)), Value.mk(true)));
+      p.add(Property.mk(PropertyId.mk(id, PropertyName.mk(ns, n)), Value.mk(10L)));
       assertEquals(2, p.size());
       assertTrue(p.contains(Property.mk(PropertyId.mk(id, PropertyName.mk(ns, n)), Value.mk(true))));
     }

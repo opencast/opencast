@@ -107,4 +107,4 @@ data entities. There are multiple ways to associate roles with a user:
 3. Indirectly through membership in groups (whatever roles have been assigned to the group)
 
 In addition, a special role is assigned that uniquely identifies a user ("user role"). The user role can be determined by
-evaluating the `userrole` attribute in the Base API's call to [/info/me](base-api/#get-apiinfome).
+evaluating the `userrole` attribute in the Base API's call to [/info/me](../base-api/#get-apiinfome).

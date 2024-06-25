@@ -30,7 +30,6 @@ import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.opencastproject.assetmanager.api.AssetManager.DEFAULT_OWNER;
 import static org.opencastproject.systems.OpencastConstants.WORKFLOW_PROPERTIES_NAMESPACE;
-import static org.opencastproject.util.MimeTypeUtil.Fns.suffix;
 import static org.opencastproject.util.RestUtil.R.badRequest;
 import static org.opencastproject.util.RestUtil.R.forbidden;
 import static org.opencastproject.util.RestUtil.R.noContent;
@@ -39,12 +38,10 @@ import static org.opencastproject.util.RestUtil.R.ok;
 import static org.opencastproject.util.RestUtil.R.serverError;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
-import org.opencastproject.assetmanager.api.Asset;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Property;
 import org.opencastproject.assetmanager.api.PropertyId;
 import org.opencastproject.assetmanager.api.Value;
-import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.assetmanager.api.query.ASelectQuery;
@@ -54,7 +51,6 @@ import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.ChecksumType;
-import org.opencastproject.util.MimeTypeUtil;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestParameter.Type;
@@ -62,7 +58,6 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
-import com.entwinemedia.fn.data.Opt;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -72,6 +67,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -231,9 +227,9 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
   public Response getMediaPackage(@PathParam("mediaPackageID") final String mediaPackageId) {
 
     try {
-      Opt<MediaPackage> mp = getAssetManager().getMediaPackage(mediaPackageId);
+      Optional<MediaPackage> mp = getAssetManager().getMediaPackage(mediaPackageId);
 
-      if (mp.isSome()) {
+      if (mp.isPresent()) {
         return ok(mp.get());
       } else {
         return notFound();
@@ -292,8 +288,11 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
                            @HeaderParam("If-None-Match") String ifNoneMatch) {
 
     try {
-      for (final Version v : getAssetManager().toVersion(version)) {
-        for (Asset asset : getAssetManager().getAsset(v, mediaPackageID, mediaPackageElementID)) {
+      final var v = getAssetManager().toVersion(version);
+      if (v.isPresent()) {
+        var assetOpt = getAssetManager().getAsset(v.get(), mediaPackageID, mediaPackageElementID);
+        if (assetOpt.isPresent()) {
+          var asset = assetOpt.get();
 
           if (StringUtils.isNotBlank(ifNoneMatch)) {
             Checksum checksum = asset.getChecksum();
@@ -312,15 +311,22 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
           }
 
           if (StringUtils.isBlank(fileName)) {
+            String suffix = "unknown";
+            if (asset.getMimeType().isPresent()) {
+              var mimetype = asset.getMimeType().get();
+              if (mimetype.getSuffix().isSome()) {
+                suffix = mimetype.getSuffix().get();
+              }
+            }
             fileName = mediaPackageElementID
                 .concat(".")
-                .concat(asset.getMimeType().bind(suffix).getOr("unknown"));
+                .concat(suffix);
           }
 
           // Write the file contents back
           Option<Long> length = asset.getSize() > 0 ? Option.some(asset.getSize()) : Option.none();
           return ok(asset.getInputStream(),
-                  Option.fromOpt(asset.getMimeType().map(MimeTypeUtil.Fns.toString)),
+                  asset.getMimeType().isPresent() ? Option.some(asset.getMimeType().get().toString()) : Option.none(),
                   length,
                   Option.some(fileName));
         }
@@ -381,8 +387,8 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
 
       // build map from properties
       HashMap<String, HashMap<String, String>> properties = new HashMap<>();
-      if (result.getRecords().head().isSome()) {
-        for (final Property property : result.getRecords().head().get().getProperties()) {
+      if (result.getRecords().stream().findFirst().isPresent()) {
+        for (final Property property : result.getRecords().stream().findFirst().get().getProperties()) {
           final String key = property.getId().getNamespace() + "." + property.getId().getName();
           final HashMap<String, String> val = new HashMap<>();
           val.put("type", property.getValue().getType().getClass().getSimpleName());
@@ -431,8 +437,8 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
 
       // build map from properties
       HashMap<String, String> properties = new HashMap<>();
-      if (result.getRecords().head().isSome()) {
-        for (final Property property : result.getRecords().head().get().getProperties()) {
+      if (result.getRecords().stream().findFirst().isPresent()) {
+        for (final Property property : result.getRecords().stream().findFirst().get().getProperties()) {
           properties.put(property.getId().getName(), property.getValue().get(Value.STRING));
         }
       }

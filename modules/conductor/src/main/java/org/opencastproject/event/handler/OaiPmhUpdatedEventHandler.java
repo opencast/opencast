@@ -44,8 +44,6 @@ import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Option;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -58,6 +56,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.Dictionary;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 @Component(
@@ -165,8 +164,8 @@ public class OaiPmhUpdatedEventHandler implements ManagedService {
               .where(q.organizationId().eq(prevOrg.getId())
                     .and(q.mediaPackageId(snapshotItem.getId())
                     .and(q.version().eq(assetManager.toVersion(versionStr).get())))).run();
-      Opt<ARecord> snapshotRecordOpt = snapshotQueryResult.getRecords().head();
-      if (snapshotRecordOpt.isSome()) {
+      Optional<ARecord> snapshotRecordOpt = snapshotQueryResult.getRecords().stream().findFirst();
+      if (snapshotRecordOpt.isPresent()) {
         Snapshot snapshot = snapshotRecordOpt.get().getSnapshot().get();
         MediaPackage snapshotMp = snapshot.getMediaPackage();
 
