@@ -108,7 +108,13 @@ public class MicrosoftAzureAttachTranscriptionOperationHandler extends AbstractW
     List<String> targetTagOption = tagsAndFlavors.getTargetTags();
     MediaPackageElementFlavor targetFlavor;
     try {
-      targetFlavor = tagsAndFlavors.getSingleTargetFlavor();
+
+      targetFlavor = MediaPackageElementFlavor.parseFlavor(DocUtil.processTextTemplate(
+          "Replacing variables in target-flavor",
+          operation.getConfiguration(TARGET_FLAVOR), // we can't use tagsAndFlavors.getSingleTargetFlavor() here
+                                                     // because the flavor will be all lower case
+                                                     // and templating may not work due to keys mismatch
+          wfProps));
     } catch (IllegalStateException ex) {
       throw new WorkflowOperationException(TARGET_FLAVOR + " option not set or used correctly.", ex);
     }
