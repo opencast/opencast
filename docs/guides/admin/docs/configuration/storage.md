@@ -11,12 +11,12 @@ The following sections describe both possible methods in detail.
 Prerequisites
 --------------
 
-You want to have one common user on all your systems, so that file permissions do not become an issue. As preparation for this it makes sense to manually create an opencast user and group with a common UID and GID:
+You want to have one common user on all your systems, so that file permissions do not become an issue. As preparation for this it makes sense to manually create an opencast user and group with a common UID and GID. In this case it would make sense to use `7967` since this is the default used by the Debian and RedHat based Opencast packaging:
 
-    sudo groupadd -g 1234 opencast
-    sudo useradd -g 1234 -u 1234 opencast
+    sudo groupadd -g 7967 opencast
+    sudo useradd -g 7967 -u 7967 opencast
 
-If the user and group id `1234` is already used, just pick another one but make sure to pick the same one on all your
+If the user and group id `7967` is already used, just pick another one but make sure to pick the same one on all your
 Opencast nodes.
 
 Then create the directory to be shared and set its ownership to the newly created users. The directory used in this example will be `/srv/opencast`:
@@ -47,9 +47,9 @@ To use the admin node as storage server, you first have to install and enable th
 
 Next we share the storage dir. For this we need to edit the file `/etc/exports` and set:
 
-    /srv/opencast  131.173.172.190(rw,sync,no_subtree_check)
+    /srv/opencast  $ip1(rw,sync,no_subtree_check) $ip2(rw,sync,no_subtree_check) $ip3(rw,sync,no_subtree_check)
 
-with 131.173.172.190 being the IP address of the other machine that should get access. You need to add a line with the corresponding IP for every other Opencast node. Finally we enable the share with:
+with `$ip[1-3]` being the IP addresses of the other machine that should get access. Finally we enable the share with:
 
     exportfs -a
 
@@ -77,8 +77,7 @@ Notes
 
 *Important:* With exception of the archive, do not use multiple NFS shares for different parts of the Opencast storage dir. Opencast will check if hard links are possible across in a distributed set-up, but the detection may fail if hard links are only possible between certain parts of the storage. This may lead to failures.
 
-*Important:* Do not share the Karaf data directory. Doing so will cause Opencast to fail. Please share the storage
-directory only.
+*Important:* Do not share the Karaf data directory, which is located in the folder where you installed Opencast into. For example if you used the Debian packages it is typically located in `/usr/share/opencast/data`. Doing so will cause Opencast to fail. Please share the storage directory only.
 
 
 
