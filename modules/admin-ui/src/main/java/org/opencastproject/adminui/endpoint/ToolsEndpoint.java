@@ -1057,7 +1057,7 @@ public class ToolsEndpoint {
                 tuple = Tuple.tuple(videoElem.getClipBeginMS(), videoElem.getClipEndMS());
               }
             } catch (SmilException e) {
-              logger.warn("Media element '{}' of SMIL catalog '{}' seems to be invalid: {}",
+              logger.warn("Media element '{}' of SMIL catalog '{}' seems to be invalid",
                       videoElem, smil, e);
             }
           }

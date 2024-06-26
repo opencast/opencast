@@ -77,7 +77,7 @@ public class IBMWatsonCaptionConverter implements CaptionConverter {
         JSONArray warningsArray = (JSONArray) resultsObj.get("warnings");
         if (warningsArray != null) {
           for (Object w : warningsArray)
-            logger.warn("Warning from Speech-To-Text service: {}" + w);
+            logger.warn("Warning from Speech-To-Text service: {}", w);
         }
       }
 
@@ -149,7 +149,7 @@ public class IBMWatsonCaptionConverter implements CaptionConverter {
         }
       }
     } catch (Exception e) {
-      logger.warn("Error when parsing IBM Watson transcriptions result: {}" + e.getMessage());
+      logger.warn("Error when parsing IBM Watson transcriptions result", e);
       throw new CaptionConverterException(e);
     }
 

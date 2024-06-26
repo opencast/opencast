@@ -587,7 +587,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
             }
           }
         } catch (IOException e) {
-          logger.warn("Unable to process zip entry {}: {}", entry.getName(), e);
+          logger.warn("Unable to process zip entry {}", entry.getName(), e);
           throw e;
         }
       }
@@ -1005,7 +1005,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
               + mediaPackage.getIdentifier() + ".", ex);
         } catch (IOException e) {
           logger.error("Error updating series {} ACL from mediapackage {}.",
-              seriesId, mediaPackage.getIdentifier(), e.getMessage());
+              seriesId, mediaPackage.getIdentifier(), e);
           throw e;
         } finally {
           IOUtils.closeQuietly(in);

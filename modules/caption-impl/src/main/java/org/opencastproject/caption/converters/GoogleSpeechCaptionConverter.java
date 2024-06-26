@@ -152,7 +152,7 @@ public class GoogleSpeechCaptionConverter implements CaptionConverter {
         }
       }
     } catch (Exception e) {
-      logger.warn("Error when parsing Google transcriptions result: {}" + e.getMessage());
+      logger.warn("Error when parsing Google transcriptions result", e);
       throw new CaptionConverterException(e);
     }
 

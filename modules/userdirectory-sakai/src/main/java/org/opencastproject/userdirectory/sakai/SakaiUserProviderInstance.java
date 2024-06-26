@@ -199,7 +199,7 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider, Ca
       }
       mbs.registerMBean(mbean, name);
     } catch (Exception e) {
-      logger.error("Unable to register {} as an mbean: {}", this, e);
+      logger.error("Unable to register {} as an mbean", this, e);
     }
   }
 
@@ -519,9 +519,9 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider, Ca
       return new String[]{sakaiID, sakaiEmail, sakaiDisplayName};
 
     } catch (FileNotFoundException fnf) {
-      logger.debug("user {} does not exist on Sakai system: {}", eid, fnf);
+      logger.debug("user {} does not exist on Sakai system", eid, fnf);
     } catch (Exception e) {
-      logger.warn("Exception getting Sakai user information for user {} at {}: {}", eid, sakaiUrl, e);
+      logger.warn("Exception getting Sakai user information for user {} at {}", eid, sakaiUrl, e);
     }
 
     return null;
@@ -642,7 +642,7 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider, Ca
     }
 
     // Not found
-    logger.debug("Return empty roleset for {} - not found on Sakai");
+    logger.debug("Return empty roleset for {} - not found on Sakai", userName);
     return new LinkedList<Role>();
   }
 

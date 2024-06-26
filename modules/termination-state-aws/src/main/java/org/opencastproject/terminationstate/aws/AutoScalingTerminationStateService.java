@@ -127,7 +127,7 @@ public final class AutoScalingTerminationStateService extends AbstractJobTermina
     try {
       configure(componentContext.getProperties());
     } catch (ConfigurationException e) {
-      logger.error("Unable to read configuration, using defaults", e.getMessage());
+      logger.error("Unable to read configuration, using defaults", e);
     }
 
     if (!enabled) {
@@ -209,7 +209,7 @@ public final class AutoScalingTerminationStateService extends AbstractJobTermina
     try {
       scheduler = new StdSchedulerFactory().getScheduler();
     } catch (SchedulerException e) {
-      logger.error("Cannot create quartz scheduler", e.getMessage());
+      logger.error("Cannot create quartz scheduler", e);
     }
 
     if (lifecyclePolling && lifecyclePollingPeriod > 0) {

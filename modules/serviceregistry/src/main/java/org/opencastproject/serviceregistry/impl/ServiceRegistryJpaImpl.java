@@ -668,7 +668,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           logger.debug("Parentless '{}' removed", job);
           c++;
         } catch (NotFoundException e) {
-          logger.debug("Parentless '{} ' not found in database: {}", job, e);
+          logger.debug("Parentless '{} ' not found in database", job, e);
         }
       }
 

@@ -415,7 +415,7 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
     try {
       smilgroups = selectTracksFromMP(mediaPackage, smil, srcFlavors);
     } catch (URISyntaxException e1) {
-      logger.info("Smil contains bad URI {}", e1);
+      logger.info("Smil contains bad URI", e1);
       throw new WorkflowOperationException("Smil contains bad URI - cannot process", e1);
     }
     if (smilgroups.size() == 0 || smilgroups.get(0).sourceTracks.size() == 0) {

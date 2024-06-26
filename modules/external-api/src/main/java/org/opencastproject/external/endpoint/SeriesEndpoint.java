@@ -1385,7 +1385,7 @@ public class SeriesEndpoint {
         q.withCreatedFrom(date);
       }
     } catch (java.text.ParseException e1) {
-      logger.warn("Could not parse date parameter: {}", e1);
+      logger.warn("Could not parse date parameter", e1);
     }
 
     if (StringUtils.isNotBlank(sort)) {

@@ -229,7 +229,7 @@ public class CaptureNowProlongingService implements ManagedService {
       quartz.unscheduleJob(agentId, TRIGGER_GROUP);
       logger.info("Stopped prolonging capture for agent '{}'", agentId);
     } catch (Exception e) {
-      logger.error("Error stopping Quartz job for agent '{}': {}", agentId, e);
+      logger.error("Error stopping Quartz job for agent '{}'", agentId, e);
     }
   }
 
@@ -322,7 +322,7 @@ public class CaptureNowProlongingService implements ManagedService {
           } catch (NotFoundException e) {
             logger.info("Unable to extend the ad-hoc recording for agent '{}': No ad-hoc recording found", agentId);
           } catch (Exception e) {
-            logger.error("Error extending the ad-hoc recording for agent '{}': {}", agentId, e);
+            logger.error("Error extending the ad-hoc recording for agent '{}'", agentId, e);
           }
         });
       }
@@ -339,7 +339,7 @@ public class CaptureNowProlongingService implements ManagedService {
       } catch (NotFoundException e) {
         logger.warn("Error extending the ad-hoc recording for agent '{}': No ad-hoc recording found", agentId);
       } catch (Exception e) {
-        logger.error("Error extending the ad-hoc recording for agent '{}': {}", agentId, e);
+        logger.error("Error extending the ad-hoc recording for agent '{}'", agentId, e);
       }
     }
 

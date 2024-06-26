@@ -396,7 +396,7 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
           boolean isRestored = null != s3.getObjectMetadata(bucketName, objectName).getRestoreExpirationTime();
           if (!isRestoring && !isRestored) {
             logger.warn("S3 Object {} can not be moved from storage class {} to {} without restoring the object first",
-                objectStorageClass, storageClass);
+                objectName, objectStorageClass, storageClass);
             return objectStorageClass;
           }
         }

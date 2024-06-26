@@ -83,7 +83,7 @@ public final class NopServiceImpl extends OsgiAbstractJobProducer implements Nop
   }
 
   @Override protected String process(Job job) throws Exception {
-    log.info("Processing job %d", job.getId());
+    log.info("Processing job {}", job.getId());
     return PAYLOAD;
   }
 
