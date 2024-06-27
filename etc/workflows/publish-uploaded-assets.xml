@@ -6,8 +6,6 @@
      <!-- Only launched from add asset in admin interface, not available for selection by end users via the Admin UI -->
   </tags>
   <description>Publish uploaded assets</description>
-  <configuration_panel>
-  </configuration_panel>
 
   <operations>
 

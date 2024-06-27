@@ -36,11 +36,6 @@ updates:
   schedule:
     interval: monthly
   open-pull-requests-limit: 10
-- package-ecosystem: npm
-  directory: "/modules/admin-ui-frontend"
-  schedule:
-    interval: monthly
-  open-pull-requests-limit: 10
 
 # Java dependencies
 - package-ecosystem: maven

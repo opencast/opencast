@@ -13,16 +13,6 @@
 
     If straight to publishing is checked, then the uploaded media will be published without cutting.
   </description>
-  <configuration_panel>
-    <![CDATA[
-      <div id="workflow-configuration">
-        <fieldset>
-          <input id="straightToPublishing" name="straightToPublishing" type="checkbox" class="configField" value="true" />
-          <label for="straightToPublishing">Straight to publishing</label>
-        </fieldset>
-      </div>
-    ]]>
-  </configuration_panel>
   <configuration_panel_json>
     [{
       "fieldset": [
