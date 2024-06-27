@@ -276,9 +276,7 @@
     <sec:intercept-url pattern="/admin-ng/shared/**" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/admin-ng/styles/**" access="ROLE_ANONYMOUS" />
 
-    <sec:intercept-url pattern="/admin-ui/static/media/**" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/admin-ui/static/js/**" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/admin-ui/static/css/**" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/admin-ui/assets/**" access="ROLE_ANONYMOUS" />
 
     <!-- Enable anonymous access to the /info/** resource -->
     <sec:intercept-url pattern="/info/**" method="GET" access="ROLE_ANONYMOUS" />
