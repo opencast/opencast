@@ -408,26 +408,25 @@ public class PlaylistService {
    * itself.
    */
   public JaxbPlaylist enrich(Playlist playlist) {
-    JaxbPlaylist jaxbPlaylist = new JaxbPlaylist(playlist);
+    var jaxbPlaylist = new JaxbPlaylist(playlist);
+    var org = securityService.getOrganization().getId();
+    var user = securityService.getUser();
 
     // Add additional infos about events
     List<JaxbPlaylistEntry> jaxbPlaylistEntries = jaxbPlaylist.getEntries();
-    for (int i = 0; i < jaxbPlaylistEntries.size(); i++) {
+    for (JaxbPlaylistEntry entry : jaxbPlaylistEntries) {
       try {
-        JaxbPlaylistEntry entry = jaxbPlaylistEntries.get(i);
         if (entry.getType() == PlaylistEntryType.EVENT) {
 
           // We only get an event from the index if we have permission to do so (and if it exists ofc)
-          SearchResult<Event> result = elasticsearchIndex.getByQuery(new EventSearchQuery(
-                  securityService.getOrganization().getId(), securityService.getUser())
-                  .withIdentifier(jaxbPlaylistEntries.get(i).getContentId()));
+          SearchResult<Event> result = elasticsearchIndex.getByQuery(
+              new EventSearchQuery(org, user).withIdentifier(entry.getContentId()));
           if (result.getPageSize() != 0) {
             Event event = result.getItems()[0].getSource();
             entry.setPublications(event.getPublications());
           } else {
             entry.setType(PlaylistEntryType.INACCESSIBLE);
           }
-          jaxbPlaylistEntries.set(i, entry);
         }
       } catch (SearchIndexException e) {
         throw new RuntimeException(e);
