@@ -8,29 +8,6 @@
 
   <operations>
 
-    <!-- create or update captions/prepared -->
-
-    <operation
-      id="tag"
-      description="Remove old captions/prepared">
-      <configurations>
-        <configuration key="source-flavors">captions/prepared</configuration>
-        <configuration key="target-tags">-archive</configuration>
-      </configurations>
-    </operation>
-
-    <operation
-      if="${presenter_prepared_exists} OR ${presentation_prepared_exists}"
-      id="clone"
-      fail-on-error="true"
-      exception-handler-workflow="partial-error"
-      description="Create captions/prepared">
-      <configurations>
-        <configuration key="source-flavor">captions/source</configuration>
-        <configuration key="target-flavor">captions/prepared</configuration>
-      </configurations>
-    </operation>
-
     <!-- cut captions -->
 
     <operation

@@ -179,7 +179,7 @@ public class EditorServiceImpl implements EditorService {
   private String distributionDirectory;
   private Boolean localPublication = null;
 
-  private static final String DEFAULT_PREVIEW_SUBTYPE = "prepared";
+  private static final String DEFAULT_PREVIEW_SUBTYPE = "source";
   private static final String DEFAULT_PREVIEW_TAG = "editor";
   private static final String DEFAULT_WAVEFORM_SUBTYPE = "waveform";
   private static final String DEFAULT_SMIL_CATALOG_FLAVOR = "smil/cutting";
