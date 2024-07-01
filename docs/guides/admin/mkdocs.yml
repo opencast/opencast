@@ -44,6 +44,7 @@ nav:
    - Overview: 'installation/index.md'
    - Hardware Requirements: installation/server-requirements.md
    - Multiple Servers: 'installation/multiple-servers.md'
+   - Example Installation: 'installation/example-installation.md'
    - Installation from Source:
       - Linux: 'installation/source-linux.md'
       - MacOS X: 'installation/source-macosx.md'
@@ -64,7 +65,6 @@ nav:
       - Using Nginx: 'configuration/https/nginx.md'
       - Using Apache httpd: configuration/https/apache-httpd.md
       - Internal HTTPS: 'configuration/https/opencast.only.md'
-      - Migrating old content to HTTPS: 'configuration/https/migration.md'
       - Self-Signed Certificates: 'configuration/https/self-signed-certificates.md'
    - Admin UI Configuration:
         - Capture-Agent Access: configuration/admin-ui/capture-agent-access.md
@@ -132,6 +132,7 @@ nav:
         - Solr: 'configuration/searchindex/solr.md'
         - Elasticsearch: 'configuration/searchindex/elasticsearch.md'
    - Serving Static Files: 'configuration/serving-static-files.md'
+   - Storage: 'configuration/storage.md'
    - Stream Security:
         - Overview: 'configuration/stream-security/stream-security-overview.md'
         - Configuration: 'configuration/stream-security/stream-security-config.md'

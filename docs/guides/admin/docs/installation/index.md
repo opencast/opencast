@@ -6,6 +6,12 @@ There are a few hints about a sensible machine setup to run Opencast on:
 
 - [Hardware requirements](server-requirements.md)
 
+Example Installation
+----------------------------
+As an entry point you can follow this example installation which describes the most common installation method and which you can follow along to setup a fully functional, distributed Opencast system.
+
+- [Example installation](example-installation.md)
+
 
 Installation from Repository
 ----------------------------

@@ -8,7 +8,7 @@ at the [basic configuration guide](basic.md).
 Essential Configuration
 -----------------------
 
-Required for Opencast to run properly.  
+Required for Opencast to run properly.
 Arguably part of installing Opencast.
 
 - [Basic Configuration](basic.md)
@@ -23,6 +23,7 @@ Not absolutely required, but should have thought about before going live.
 
 - [Firewall Configuration](firewall.md)
 - [Multi Tenancy Configuration](multi.tenancy.md)
+- [Storage Configuration](storage.md)
 
 Security Configuration
 ----------------------
@@ -96,6 +97,7 @@ A list of everything.
     - [Solr](searchindex/solr.md)
     - [Elasticsearch](searchindex/elasticsearch.md)
 - [Serving Static Files](serving-static-files.md)
+- [Storage Configuration](storage.md)
 - [Stream Security Overview](stream-security/stream-security-overview.md)
     -  [Configuration](stream-security/stream-security-config.md)
 - [Studio](studio.md)
