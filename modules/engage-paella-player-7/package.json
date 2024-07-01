@@ -36,7 +36,7 @@
     "xml-loader": "^1.2.1"
   },
   "dependencies": {
-    "paella-basic-plugins": "^1.44.7",
+    "paella-basic-plugins": "^1.44.9",
     "paella-core": "^1.48.2",
     "paella-mp4multiquality-plugin": "^1.47.1",
     "paella-skins": "^1.48.0",
