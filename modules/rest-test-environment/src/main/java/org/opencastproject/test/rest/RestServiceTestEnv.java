@@ -33,7 +33,7 @@ import org.glassfish.jersey.servlet.ServletContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.BindException;
+import java.io.IOException;
 import java.net.URL;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -117,28 +117,33 @@ public final class RestServiceTestEnv {
    * Call in @BeforeClass annotated method.
    */
   public void setUpServer() {
+    int port = -1;
+    int maxRetries = 100;
     try {
-      for (int tries = 100; tries > 0; tries--) {
+      ServletContainer servletContainer = new ServletContainer(cfg);
+      ServletHolder jerseyServlet = new ServletHolder(servletContainer);
+      for (int tries = maxRetries; tries > 0; tries--) {
         try {
-          final int port = 3000 + tries + ThreadLocalRandom.current().nextInt(62000);
-          logger.error("Start http server at port {}", port);
+          port = 3000 + tries + ThreadLocalRandom.current().nextInt(62000);
+          logger.info("Starting http server at port {}", port);
           server = new Server(port);
-          ServletContainer servletContainer = new ServletContainer(cfg);
-          ServletHolder jerseyServlet = new ServletHolder(servletContainer);
           ServletContextHandler context = new ServletContextHandler(server, "/");
           context.addServlet(jerseyServlet, "/*");
           server.start();
           baseUrl = UrlSupport.url("http", "127.0.0.1", port);
           return;
-        } catch (BindException e) {
+        } catch (IOException e) {
+          logger.error("Couldn't bind server to port {}. Retrying with new port...", port, e);
           // Rethrow exception after last try
           if (tries == 1) {
+            logger.error("Couldn't start server after {} tries.", maxRetries);
             throw e;
           }
           Thread.sleep(100);
         }
       }
     } catch (Exception e) {
+      logger.error("Unexpected Exception occurred while setting up http server");
       chuck(e);
     }
   }
