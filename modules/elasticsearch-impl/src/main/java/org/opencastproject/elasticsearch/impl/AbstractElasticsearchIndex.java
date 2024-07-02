@@ -274,7 +274,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
 
         if (retryAttempts <= maxRetryAttempts) {
           logger.warn("Could not update documents in index {}, retrying in {} ms.", getIndexName(),
-                  e, retryWaitingPeriod);
+                  retryWaitingPeriod, e);
           if (retryWaitingPeriod > 0) {
             Thread.sleep(retryWaitingPeriod);
           }

@@ -182,7 +182,7 @@ public class SanitizeAdaptiveWorkflowOperationHandler extends AbstractWorkflowOp
           try {
             return workspace.get(uri);
           } catch (NotFoundException | IOException e1) { // from workspace.get
-            logger.error("Cannot get {} from workspace {}", uri, e1);
+            logger.error("Cannot get {} from workspace", uri, e1);
           }
           return null;
         }
@@ -232,7 +232,7 @@ public class SanitizeAdaptiveWorkflowOperationHandler extends AbstractWorkflowOp
       try {
         hlstree.rewriteHLS(mediaPackage, replaceHLSPlaylistInWS, removeFromWS);
       } catch (Exception e) {
-        logger.error("Error: cannot rewrite HLS renditions {}", e);
+        logger.error("Error: cannot rewrite HLS renditions", e);
         throw new WorkflowOperationException(e);
       }
       for (Track track : tracks) { // Update the flavor and tags for all non HLS segments

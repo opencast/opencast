@@ -377,7 +377,7 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
           mediaPackage.remove(segmentCatalog);
           workspace.delete(segmentCatalog.getURI());
         } catch (Exception e) {
-          logger.warn("Unable to delete segment catalog {}: {}", segmentCatalog.getURI(), e);
+          logger.warn("Unable to delete segment catalog {}", segmentCatalog.getURI(), e);
         }
 
         // Add flavor and target tags
@@ -392,7 +392,7 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
           try {
             workspace.delete(image.getURI());
           } catch (Exception e) {
-            logger.warn("Unable to delete temporary image {}: {}", image.getURI(), e);
+            logger.warn("Unable to delete temporary image {}", image.getURI(), e);
           }
         }
         // Remove the temporary text
@@ -409,7 +409,7 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
             }
           } catch (Exception e) {
             if (catalog != null) {
-              logger.warn("Unable to delete temporary text file {}: {}", catalog.getURI(), e);
+              logger.warn("Unable to delete temporary text file {}", catalog.getURI(), e);
             } else {
               logger.warn("Unable to parse textextraction payload of job {}", j.getId());
             }

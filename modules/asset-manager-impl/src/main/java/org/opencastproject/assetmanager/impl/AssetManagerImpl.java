@@ -572,7 +572,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       index.addOrUpdateEvent(eventId, updateFunction, organization, user);
       logger.debug("Event {} updated in the {} index.", eventId, index.getIndexName());
     } catch (SearchIndexException e) {
-      logger.error("Error updating the event {} in the {} index.", eventId, e);
+      logger.error("Error updating the event {} in the {} index.", eventId, index.getIndexName(), e);
     }
   }
 
@@ -601,7 +601,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       index.addOrUpdateEvent(eventId, updateFunction, orgId, user);
       logger.debug("Event {} removed from the {} index", eventId, index.getIndexName());
     } catch (SearchIndexException e) {
-      logger.error("Error deleting the event {} from the {} index.", eventId, e);
+      logger.error("Error deleting the event {} from the {} index.", eventId, index.getIndexName(), e);
     }
   }
 
@@ -1259,7 +1259,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
           // after it was tested but before it was actually deleted. We will consider this ok.
           // Does the error message mention the manifest file name?
           if (e.getMessage().contains(manifestFileName)) {
-            logger.warn("The manifest file {} didn't get deleted from the archive collection: {}",
+            logger.warn("The manifest file {} didn't get deleted from the archive collection",
                     manifestBaseName, e);
           }
           // Else the error is related to the file-archive collection, which is fine
@@ -1354,7 +1354,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
               Availability.ONLINE, getLocalAssetStore().getStoreType(), owner
       );
     } catch (AssetManagerException e) {
-      logger.error("Could not take snapshot {}: {}", mpId, e);
+      logger.error("Could not take snapshot {}", mpId, e);
       throw new AssetManagerException(e);
     }
     // save manifest to element store

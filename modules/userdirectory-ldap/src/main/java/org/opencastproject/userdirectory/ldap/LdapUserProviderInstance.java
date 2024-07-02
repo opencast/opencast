@@ -209,7 +209,7 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
       }
       mbs.registerMBean(mbean, name);
     } catch (Exception e) {
-      logger.warn("Unable to register {} as an mbean: {}", this, e);
+      logger.warn("Unable to register {} as an mbean", this, e);
     }
   }
 

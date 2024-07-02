@@ -2286,7 +2286,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       results = index.getByQuery(new EventSearchQuery(orgId, user).withWorkflowId(workflowInstanceId));
     } catch (SearchIndexException e) {
       logger.error("Error retrieving the events for workflow instance {} from the {} index.", workflowInstanceId,
-              e);
+              index.getIndexName(), e);
       return;
     }
 
@@ -2326,7 +2326,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
                 index.getIndexName());
       } catch (SearchIndexException e) {
         logger.error("Error removing the workflow instance {} of event {} from the {} index.", workflowInstanceId,
-                eventId, e);
+                eventId, index.getIndexName(), e);
       }
     }
   }
@@ -2362,7 +2362,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
               index.getIndexName());
     } catch (SearchIndexException e) {
       logger.error("Error updating the workflow instance {} of event {} in the {} index.", id, mpId,
-              e);
+              index.getIndexName(), e);
     }
   }
 

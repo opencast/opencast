@@ -1301,7 +1301,7 @@ public class SchedulerRestService {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Unable to get the immediate recording for agent '{}': {}", agentId, e);
+      logger.error("Unable to get the immediate recording for agent '{}'", agentId, e);
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
   }
@@ -1331,7 +1331,7 @@ public class SchedulerRestService {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Unable to get the immediate recording for agent '{}': {}", agentId, e);
+      logger.error("Unable to get the immediate recording for agent '{}'", agentId, e);
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
   }
@@ -1376,7 +1376,7 @@ public class SchedulerRestService {
           return Response.status(Status.CONFLICT).build();
         }
       } catch (SchedulerException e) {
-        logger.error("Unable to create immediate event on agent {}: {}", agentId, e);
+        logger.error("Unable to create immediate event on agent {}", agentId, e);
         throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
       }
 
@@ -1425,7 +1425,7 @@ public class SchedulerRestService {
         prolongingService.stop(agentId);
         if (e instanceof UnauthorizedException)
           throw (UnauthorizedException) e;
-        logger.error("Unable to create immediate event on agent {}: {}", agentId, e);
+        logger.error("Unable to create immediate event on agent {}", agentId, e);
         throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
       } finally {
         if (mediaPackage != null) {
@@ -1491,7 +1491,7 @@ public class SchedulerRestService {
           eventId = mp.getIdentifier().toString();
         }
       } catch (Exception e) {
-        logger.error("Unable to get the immediate recording for agent '{}': {}", agentId, e);
+        logger.error("Unable to get the immediate recording for agent '{}'", agentId, e);
         throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
       }
 
@@ -1512,7 +1512,7 @@ public class SchedulerRestService {
       } catch (UnauthorizedException e) {
         throw e;
       } catch (Exception e) {
-        logger.error("Unable to update the temporal of event '{}': {}", eventId, e);
+        logger.error("Unable to update the temporal of event '{}'", eventId, e);
         throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
       }
     } catch (Throwable t) {
@@ -1546,7 +1546,7 @@ public class SchedulerRestService {
     } catch (NotFoundException | UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Unable to prolong the immediate recording for agent '{}': {}", agentId, e);
+      logger.error("Unable to prolong the immediate recording for agent '{}'", agentId, e);
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
   }
