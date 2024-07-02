@@ -1267,10 +1267,11 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           // Collect necessary information only for index update
           long id = workflowInstance.getId();
           int state = workflowInstance.getState().ordinal();
+          var template = workflowInstance.getTemplate();
           String mpId = workflowInstance.getMediaPackage().getIdentifier().toString();
           String orgId = workflowInstance.getOrganizationId();
 
-          updateWorkflowInstanceInIndex(id, state, mpId, orgId);
+          updateWorkflowInstanceInIndex(id, state, template, mpId, orgId);
         }
       } catch (ServiceRegistryException e) {
         throw new WorkflowDatabaseException("Update of workflow job " + workflowInstance.getId()
@@ -2342,7 +2343,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param orgId
    *         workflow organization id
    */
-  private void updateWorkflowInstanceInIndex(long id, int state, String mpId, String orgId) {
+  private void updateWorkflowInstanceInIndex(long id, int state, String wfDefId, String mpId, String orgId) {
     final WorkflowState workflowState = WorkflowState.values()[state];
     final User user = securityService.getUser();
 
@@ -2352,6 +2353,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       Event event = eventOpt.orElse(new Event(mpId, orgId));
       event.setWorkflowId(id);
       event.setWorkflowState(workflowState);
+      event.setWorkflowDefinitionId(wfDefId);
       return Optional.of(event);
     };
 
