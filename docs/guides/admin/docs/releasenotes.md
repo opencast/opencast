@@ -1,5 +1,13 @@
 # Opencast 16: Release Notes
 
+## Opencast 16.1
+
+This is an important bugfix release fixing a problem preventing the presentation node from properly starting up and
+therefor breaking cluster installations. Additional, it fixes a problem with Tobira harvesting new events. Don't try to
+use 16.0 use this release!
+
+It also comes with a lot more bug fixes. Especially the new admin interface got a lot of work.
+
 ## Opencast 16.0
 
 ### Features, Improvements and Behavior changes
