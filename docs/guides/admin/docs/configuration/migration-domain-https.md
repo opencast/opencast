@@ -10,9 +10,7 @@ In that case, the following steps might help.
 > Note that you modify stored data directly without any safety nets usually provided by Opencast. You should understand
 > what you are doing!
 
-1. Backup your database, and the Solr and OpenSearch/Elasticsearch indexes!
-    - OpenSearch/Elasticsearch: `{data}/index`
-    - Solr: `{data}/solr-indexes`
+1. Backup your database and the OpenSearch/Elasticsearch indices (in `{data}/index`)!
 2. Change `org.opencastproject.server.url` and test your set-up with a new publication (i.e. uploading a video).
 3. Put all your nodes into maintenance mode or, at least, do not process any videos.
 4. Update the media packages on disk.
@@ -37,11 +35,5 @@ In that case, the following steps might help.
          UPDATE oc_search SET mediapackage_xml = REPLACE(
             mediapackage_xml, 'http://old-domain.example.com:80', 'https://new-domain.example.com');
 
-6. Remove the search service's Solr index. It usually is located at `solr-indexes/search` but its location really
-   depends on `org.opencastproject.solr.dir` and `org.opencastproject.search.solr.dir`
-7. Rebuild the Solr indices by re-starting your Opencast node running the search service (usually presentation).
-8. Rebuild the OpenSearch indices using the REST endpoint listed in the docs:
+6. Rebuild the OpenSearch/Elasticsearch indices using the REST endpoint listed in the docs:
    https://admin.opencast.example.com/docs.html?path=/index
-
-Note: If the solr index does not repopulate by itself please check if your nodes are still in maintenance mode and
-reactivate them.
