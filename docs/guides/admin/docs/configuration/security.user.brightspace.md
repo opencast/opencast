@@ -9,7 +9,12 @@ set of roles made up of the user's membership in Brightspace courses, of the for
 member of the Brightspace course `myCourseID` will be granted the Opencast role `ROLE_myCourseID`.
 
 
-### Step 1: Configure the User Provider
+### Step 1: Enable the User Provider
+
+Edit `etc/org.opencastproject.plugin.impl.PluginManagerImpl` and make sure the
+`opencast-plugin-userdirectory-brightspace` plugin is enabled.
+
+### Step 2: Configure the User Provider
 
 To enable the Brightspace User Provider, copy and rename the bundled configuration
 template from
@@ -39,7 +44,7 @@ org.opencastproject.userdirectory.brightspace.application.key=application-key
 #org.opencastproject.userdirectory.brightspace.cache.expiration=60
 ```
 
-### Step 2: Verify Granted Access
+### Step 3: Verify Granted Access
 
 Verify that the Brightspace User Provider starts up with the correct Brightspace URL by looking
 for a log entry like this:
