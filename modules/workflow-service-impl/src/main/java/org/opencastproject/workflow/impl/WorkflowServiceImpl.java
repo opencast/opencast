@@ -56,6 +56,7 @@ import org.opencastproject.metadata.api.MediaPackageMetadataService;
 import org.opencastproject.metadata.api.MetadataService;
 import org.opencastproject.metadata.api.util.MediaPackageMetadataSupport;
 import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.AccessControlUtil;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
@@ -1144,7 +1145,20 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     }
   }
 
-  protected boolean assertMediaPackagePermission(String mediaPackageId, String action) {
+  protected boolean assertMediaPackagePermission(String mediaPackageId, String action) throws WorkflowDatabaseException {
+    try {
+      // Media package may not have been archived yet.
+      // First, check the current workflow running if there is one. If a workflow is
+      // returned, permissions have already been checked so return true.
+      Optional<WorkflowInstance> wfInstance = getRunningWorkflowInstanceByMediaPackage(mediaPackageId, action);
+      if (wfInstance.isPresent()) {
+        return true;
+      }
+    } catch (UnauthorizedException | WorkflowException e) {
+      return false;
+    }
+
+    // Then, check archived media package
     var currentUser = securityService.getUser();
     Opt<MediaPackage> mp = assetManager.getMediaPackage(mediaPackageId);
 
@@ -1176,6 +1190,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       }
 
       MediaPackage updatedMediaPackage = null;
+      Opt<AccessControlList> updatedAcl = Opt.none();
       try {
 
         // Before we persist this, extract the metadata
@@ -1195,6 +1210,8 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
             // Update series ACL if it differs from the active series ACL on the media package
             if (!AclScope.Series.equals(activeAcl.getB()) || !AccessControlUtil.equals(activeAcl.getA(), acl)) {
               authorizationService.setAcl(updatedMediaPackage, AclScope.Series, acl);
+              // Active acl may have changed after series acl was added to the media package
+              updatedAcl = Opt.some(authorizationService.getActiveAcl(updatedMediaPackage).getA());
             }
           } catch (NotFoundException e) {
             logger.debug("Not updating series ACL on event {} since series {} has no ACL set",
@@ -1270,7 +1287,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           String mpId = workflowInstance.getMediaPackage().getIdentifier().toString();
           String orgId = workflowInstance.getOrganizationId();
 
-          updateWorkflowInstanceInIndex(id, state, mpId, orgId);
+          updateWorkflowInstanceInIndex(id, state, mpId, orgId, updatedAcl);
         }
       } catch (ServiceRegistryException e) {
         throw new WorkflowDatabaseException("Update of workflow job " + workflowInstance.getId()
@@ -2341,8 +2358,11 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    *         corresponding mediapackage id
    * @param orgId
    *         workflow organization id
+   * @param acl
+   *         updated acl
    */
-  private void updateWorkflowInstanceInIndex(long id, int state, String mpId, String orgId) {
+  private void updateWorkflowInstanceInIndex(long id, int state, String mpId, String orgId,
+          final Opt<AccessControlList> acl) {
     final WorkflowState workflowState = WorkflowState.values()[state];
     final User user = securityService.getUser();
 
@@ -2352,6 +2372,10 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       Event event = eventOpt.orElse(new Event(mpId, orgId));
       event.setWorkflowId(id);
       event.setWorkflowState(workflowState);
+      // If acl updated, add it to event
+      if (acl.isSome()) {
+        event.setAccessPolicy(AccessControlParser.toJsonSilent(acl.get()));
+      }
       return Optional.of(event);
     };
 
