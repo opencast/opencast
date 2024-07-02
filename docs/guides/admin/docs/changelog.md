@@ -4,6 +4,31 @@ Changelog
 Opencast 16
 -----------
 
+### Opencast 16.1
+
+- [[#5999](https://github.com/opencast/opencast/pull/5999)] -
+  Update admin interface to release 2024-07-02
+- [[#5998](https://github.com/opencast/opencast/pull/5998)] -
+  Fix Tobira Harvest API (includesItemsUntil & hasMore)
+- [[#5997](https://github.com/opencast/opencast/pull/5997)] -
+  Add a connection from presentation to OpenSearch in firewall diagram
+- [[#5976](https://github.com/opencast/opencast/pull/5976)] -
+  Rescue admin interface settings from deprecated section
+- [[#5972](https://github.com/opencast/opencast/pull/5972)] -
+  Fix distributed OC 16
+- [[#5953](https://github.com/opencast/opencast/pull/5953)] -
+  Remove unused method `getDistributedMediaPackage`
+- [[#5947](https://github.com/opencast/opencast/pull/5947)] -
+  Make admin-ng a binary
+- [[#5939](https://github.com/opencast/opencast/pull/5939)] -
+  Add `SearchResult::getCreatedDate` and use it to fix Tobira harvest API
+- [[#5937](https://github.com/opencast/opencast/pull/5937)] -
+  Fix Non-Admin Access to New Admin UI
+- [[#5936](https://github.com/opencast/opencast/pull/5936)] -
+  Switch order of register and install
+- [[#5935](https://github.com/opencast/opencast/pull/5935)] -
+  Update RPM docs for Opencast 16
+
 ### Opencast 16.0
 
 - [[#5927](https://github.com/opencast/opencast/pull/5927)] -
