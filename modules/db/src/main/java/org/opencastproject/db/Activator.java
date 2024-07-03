@@ -217,9 +217,8 @@ public class Activator implements BundleActivator {
           connectionEstablished = connection != null && !connection.isClosed();
         } catch (SQLInvalidAuthorizationSpecException e) {
           // Invalid credentials
-          String errorMsg = "Couldn't connect to database. Probably invalid database credentials. Check you config.";
-          logger.error(errorMsg);
-          throw new RuntimeException(errorMsg, e);
+          throw new RuntimeException(
+              "Couldn't connect to database. Probably invalid database credentials. " + "Check you config.", e);
         } catch (SQLNonTransientConnectionException e) {
           // Connection failed, database is not reachable (yet? maybe its just starting up, so we wait)
           logger.error("Database connection attempt failed, message: {}", e.getMessage());
