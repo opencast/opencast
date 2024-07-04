@@ -20,21 +20,30 @@
  */
 package org.opencastproject.assetmanager.impl;
 
-import static org.mutabilitydetector.unittesting.MutabilityAssert.assertImmutable;
+import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.fields;
 
-import org.opencastproject.assetmanager.api.PropertyId;
-import org.opencastproject.assetmanager.api.PropertyName;
-import org.opencastproject.assetmanager.api.Value;
+import com.tngtech.archunit.core.domain.JavaClasses;
+import com.tngtech.archunit.core.importer.ClassFileImporter;
+import com.tngtech.archunit.lang.ArchRule;
 
 import org.junit.Test;
 
+import javax.annotation.concurrent.Immutable;
+
 public class ImmutabilityTest {
+
   @Test
   public void testImmutability() {
-    assertImmutable(PropertyId.class);
-    assertImmutable(PropertyName.class);
-    assertImmutable(Value.BooleanValue.class);
-    assertImmutable(Value.LongValue.class);
-    assertImmutable(Value.StringValue.class);
+    final JavaClasses valueObjects = new ClassFileImporter().importPackages("org.opencastproject.assetmanager.api");
+
+    final ArchRule fieldsAreImmutable = fields()
+        .that()
+        .areDeclaredInClassesThat()
+        .areAnnotatedWith(Immutable.class)
+        .should()
+        .beFinal();
+
+    fieldsAreImmutable.check(valueObjects);
+
   }
 }
