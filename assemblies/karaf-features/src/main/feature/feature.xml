@@ -11,6 +11,22 @@
     <bundle>mvn:com.mysema.querydsl/querydsl-jpa/${querydsl.version}</bundle>
   </feature>
 
+  <feature name="eclipselink-jdk21" description="Eclipselink JPA persistence engine support" version="${eclipselink.version}">
+    <details>Eclipselink persistence engine.</details>
+    <feature version="[2,3)">jpa</feature>
+    <bundle dependency="true">mvn:org.eclipse.persistence/javax.persistence/2.2.0</bundle>
+    <feature version="[2,3)">transaction</feature>
+    <bundle>mvn:org.eclipse.persistence/org.eclipse.persistence.jpa/${eclipselink.version}</bundle>
+    <bundle>mvn:org.eclipse.persistence/org.eclipse.persistence.core/${eclipselink.version}</bundle>
+    <bundle>mvn:org.eclipse.persistence/org.eclipse.persistence.asm/9.7.0</bundle>
+    <bundle>mvn:org.eclipse.persistence/org.eclipse.persistence.antlr/${eclipselink.version}</bundle>
+    <bundle>mvn:org.eclipse.persistence/org.eclipse.persistence.jpa.jpql/${eclipselink.version}</bundle>
+    <bundle>mvn:org.apache.aries.jpa/org.apache.aries.jpa.eclipselink.adapter/2.7.3</bundle>
+    <capability>
+      osgi.service;objectClass=javax.persistence.spi.PersistenceProvider;effective:=active;javax.persistence.provider=org.eclipse.persistence.jpa.PersistenceProvider
+    </capability>
+  </feature>
+
   <feature name="ext-core" version="${project.version}">
     <!-- Base features -->
     <feature>http</feature>
@@ -29,7 +45,7 @@
     <!-- JPA -->
     <feature>jndi</feature>
     <feature>jpa</feature>
-    <feature>eclipselink</feature>
+    <feature>eclipselink-jdk21</feature>
 
     <!-- Query DSL-->
     <feature>query-dsl</feature>

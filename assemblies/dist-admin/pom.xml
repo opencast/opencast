@@ -106,7 +106,7 @@
             <feature>cxf-http-jetty</feature>
             <feature>transaction</feature>
             <feature>jndi</feature>
-            <feature>eclipselink</feature>
+            <feature>eclipselink-jdk21</feature>
             <feature>wrap</feature>
             <!-- Opencast features -->
             <feature>opencast-admin</feature>
