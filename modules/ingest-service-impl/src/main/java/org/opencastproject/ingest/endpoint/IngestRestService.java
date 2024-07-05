@@ -45,6 +45,7 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.metadata.dublincore.DublinCoreXmlFormat;
 import org.opencastproject.metadata.dublincore.DublinCores;
+import org.opencastproject.metadata.dublincore.OpencastMetadataCodec;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.scheduler.api.SchedulerConflictException;
 import org.opencastproject.scheduler.api.SchedulerException;
@@ -786,6 +787,13 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
               if ("identifier".equals(fieldName)) {
                 /* Use the identifier for the mediapackage */
                 mp.setIdentifier(new IdImpl(value));
+              }
+              if ("created".equals(fieldName) || "date".equals(fieldName) || "temporal".equals(fieldName)) {
+                try {
+                  OpencastMetadataCodec.decodeDate(value);
+                } catch (IllegalArgumentException e) {
+                  return badRequest("Provided dates were not well formatted", e);
+                }
               }
               if (dcc == null) {
                 dcc = dublinCoreService.newInstance();
