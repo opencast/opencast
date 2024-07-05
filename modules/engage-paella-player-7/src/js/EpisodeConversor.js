@@ -76,7 +76,7 @@ const g_streamTypes = [
     enabled: true,
     streamType: 'audio',
     conditions: {
-      mimetype: 'audio/mpeg'
+      mimetype: 'audio/m4a'
     },
     getSourceData: (track) => {
       const src = track.url;
