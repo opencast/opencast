@@ -442,7 +442,7 @@ public class UsersEndpoint {
         return Response.status(SC_CONFLICT).build();
       }
     } catch (WorkflowDatabaseException e) {
-      logger.error("Error during deletion of user {}: {}", username, e);
+      logger.error("Error during deletion of user {}", username, e);
       return Response.status(SC_INTERNAL_SERVER_ERROR).build();
     }
 
@@ -469,7 +469,7 @@ public class UsersEndpoint {
     } catch (UnauthorizedException e) {
       return Response.status(SC_FORBIDDEN).build();
     } catch (Exception e) {
-      logger.error("Error during deletion of user {}: {}", username, e);
+      logger.error("Error during deletion of user {}", username, e);
       return Response.status(SC_INTERNAL_SERVER_ERROR).build();
     }
 

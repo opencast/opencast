@@ -127,7 +127,7 @@ public abstract class EditorRestEndpointBase {
     } catch (EditorServiceException e) {
       return checkErrorState(mediaPackageId, e);
     } catch (Exception e) {
-      logger.debug("Unable to create lock {}",  e);
+      logger.debug("Unable to create lock",  e);
       return RestUtil.R.badRequest();
     }
   }

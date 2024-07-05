@@ -31,6 +31,7 @@ graph LR
   oc2 -->|e.g. 3306| db
   oc3 -->|e.g. 3306| db
   oc1 -->|9200| os(OpenSearch)
+  oc3 -->|9200| os(OpenSearch)
   oc1 --> storage(Storage)
   oc2 --> storage
   oc3 --> storage

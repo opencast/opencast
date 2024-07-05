@@ -186,10 +186,10 @@ public class ListProvidersEndpoint {
           subList = generateJSONObject(listProvidersService.getList(source, query, true));
           list.put(source, subList);
         } catch (JsonCreationException e) {
-          logger.error("Not able to generate resources list JSON from source {}: {}", source, e);
+          logger.error("Not able to generate resources list JSON from source {}", source, e);
           return SERVER_ERROR;
         } catch (ListProviderException e) {
-          logger.error("Not able to get list from provider {}: {}", source, e);
+          logger.error("Not able to get list from provider {}", source, e);
           return SERVER_ERROR;
         }
       } else {
@@ -255,7 +255,7 @@ public class ListProvidersEndpoint {
         return RestUtils.okJson(JSONUtils.filtersToJSON(query, listProvidersService, securityService.getOrganization()));
       }
     } catch (ListProviderException e) {
-      logger.error("Not able to get list of options for the filters for the page {}: {}", page, e);
+      logger.error("Not able to get list of options for the filters for the page {}", page, e);
       return SERVER_ERROR;
     }
   }

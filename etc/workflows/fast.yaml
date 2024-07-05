@@ -143,9 +143,3 @@ operations:
     configurations:
       - delete-external: true
       - preserve-flavors: "security/*"
-
-state-mappings:
-  - state: "running"
-    value: EVENTS.EVENTS.STATE_MAPPING.IMPORTING
-  - state: "failing"
-    value: EVENTS.EVENTS.STATE_MAPPING.IMPORTING

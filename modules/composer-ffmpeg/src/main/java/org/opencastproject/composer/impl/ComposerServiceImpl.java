@@ -2346,7 +2346,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       } finally {
         activeEncoder.remove(encoderEngine);
       }
-      logger.info("ProcessSmil returns " + outputs.size() + " media files ", outputs);
+      logger.info("ProcessSmil returns {} media files ", outputs.size());
       boolean isHLS = outputs.parallelStream().anyMatch(AdaptivePlaylist.isHLSFilePred);
       /**
         * putToCollection changes the name of the output file (a.mp4 -> 12345-a.mp4) so that it

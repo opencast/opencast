@@ -14,7 +14,7 @@ Note that introducing HTTPS will not automatically migrate old content.
 It may still use the previously configured HTTP protocol.
 For a semi-automatic migration, please take a look at the following guide:
 
-- [Migrating old content to HTTPS](migration.md)
+- [Migrating old content to HTTPS](../../migration-domain-https.md)
 
 
 General Recommendations

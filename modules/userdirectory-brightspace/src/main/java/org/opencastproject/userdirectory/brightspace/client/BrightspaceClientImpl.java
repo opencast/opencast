@@ -132,7 +132,7 @@ public class BrightspaceClientImpl implements BrightspaceClient {
 
       return roleList;
     } catch (BrightspaceClientException e) {
-      logger.warn("Exception getting site/role membership for brightspace user {}: {}", userid, e);
+      logger.warn("Exception getting site/role membership for brightspace user {}", userid, e);
       throw new BrightspaceClientException(UNEXPECTED_JSON_RESPONSE, e);
     }
 

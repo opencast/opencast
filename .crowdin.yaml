@@ -5,13 +5,13 @@ preserve_hierarchy: true
 
 files:
   -
-    source: '/modules/admin-ui-frontend/resources/public/org/opencastproject/adminui/languages/lang-en_US.json'
-    translation: '/modules/admin-ui-frontend/resources/public/org/opencastproject/adminui/languages/lang-%locale_with_underscore%.json'
-
-  -
     source: '/modules/engage-ui/src/main/resources/ui/language/en-US.json'
     translation: '/modules/engage-ui/src/main/resources/ui/language/%locale%.json'
 
   -
     source: '/modules/engage-paella-player-7/src/i18n/en-US.json'
     translation: '/modules/engage-paella-player-7/src/i18n/%locale%.json'
+
+  -
+    source: '/modules/lti/src/i18n/lang-en_US.json'
+    translation: '/modules/lti/src/i18n/lang-%locale_with_underscore%.json'

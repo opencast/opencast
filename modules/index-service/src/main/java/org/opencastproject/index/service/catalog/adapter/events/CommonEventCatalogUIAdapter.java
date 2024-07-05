@@ -97,7 +97,7 @@ public class CommonEventCatalogUIAdapter extends ConfigurableEventDCCatalogUIAda
         SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(startDate.getPattern());
         mediaPackage.setDate(sdf.parse((String) startDate.getValue()));
       } catch (ParseException e) {
-        logger.warn("Not able to parse start date {} to update media package {} because {}", startDate.getValue(),
+        logger.warn("Not able to parse start date {} to update media package {}", startDate.getValue(),
                 mediaPackage.getIdentifier(), e);
       }
     }

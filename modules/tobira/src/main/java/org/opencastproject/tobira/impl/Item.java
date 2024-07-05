@@ -35,6 +35,7 @@ import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
+import org.opencastproject.metadata.mpeg7.MediaTimePointImpl;
 import org.opencastproject.playlists.Playlist;
 import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.security.api.AccessControlEntry;
@@ -155,7 +156,7 @@ class Item {
           Jsons.p("title", title),
           Jsons.p("partOf", event.getDublinCore().getFirst(DublinCore.PROPERTY_IS_PART_OF)),
           Jsons.p("description", event.getDublinCore().getFirst(PROPERTY_DESCRIPTION)),
-          Jsons.p("created", event.getDublinCore().getFirst(DublinCore.PROPERTY_CREATED)),
+          Jsons.p("created", event.getCreatedDate().toEpochMilli()),
           Jsons.p("startTime", period.map(p -> p.getStart().getTime()).orElse(null)),
           Jsons.p("endTime", period.map(p -> p.getEnd().getTime()).orElse(null)),
           Jsons.p("creators", Jsons.arr(new ArrayList<>(creators))),
@@ -339,9 +340,10 @@ class Item {
       .filter(a -> a.getFlavor().getSubtype().equals("segment+preview"))
       .map(s -> Jsons.obj(
           Jsons.p("uri", s.toString()),
-          Jsons.p("startTime", s.getReference().getProperty("time"))
-        )
-      )
+          Jsons.p("startTime", MediaTimePointImpl.parseTimePoint(
+              s.getReference().getProperty("time")
+          ).getTimeInMilliseconds())
+      ))
       .collect(Collectors.toCollection(ArrayList::new));
   }
 

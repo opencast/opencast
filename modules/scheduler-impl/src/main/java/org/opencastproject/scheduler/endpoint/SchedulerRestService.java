@@ -86,6 +86,9 @@ import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.data.Opt;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonPrimitive;
+import com.google.gson.JsonSerializer;
 
 import net.fortuna.ical4j.model.property.RRule;
 
@@ -119,6 +122,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
@@ -177,6 +181,11 @@ public class SchedulerRestService {
   private Workspace workspace;
 
   private final Gson gson = new Gson();
+  private final Gson gsonTimestamp = new GsonBuilder()
+      .registerTypeAdapter(
+          Date.class,
+          (JsonSerializer<Date>) (date, type, jsonSerializationContext) -> new JsonPrimitive(date.getTime()))
+      .create();
 
   private String defaultWorkflowDefinitionId;
 
@@ -573,11 +582,12 @@ public class SchedulerRestService {
   @Path("calendar.json")
   @RestQuery(
     name = "getCalendarJSON",
-    description = "Returns a calendar in JSON format for specified events. This endpoint is not yet stable and might change in the future with no priot notice.",
+    description = "Returns a calendar in JSON format for specified events.",
     returnDescription = "Calendar for events in JSON format",
     restParameters = {
       @RestParameter(name = "agentid", description = "Filter events by capture agent", isRequired = false, type = Type.STRING),
-      @RestParameter(name = "cutoff", description = "A cutoff date in UNIX milliseconds to limit the number of events returned in the calendar.", isRequired = false, type = Type.INTEGER)
+      @RestParameter(name = "cutoff", description = "A cutoff date in UNIX milliseconds to limit the number of events returned in the calendar.", isRequired = false, type = Type.INTEGER),
+      @RestParameter(name = "timestamp", description = "Return dates as UNIX timestamp in milliseconds instead of a date string.", isRequired = false, type = Type.BOOLEAN)
     }, responses = {
       @RestResponse(responseCode = HttpServletResponse.SC_NOT_MODIFIED, description = "Events were not modified since last request"),
       @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "Events were modified, new calendar is in the body")
@@ -585,6 +595,7 @@ public class SchedulerRestService {
   public Response getCalendarJson(
           @QueryParam("agentid") String captureAgentId,
           @QueryParam("cutoff") Long cutoff,
+          @QueryParam("timestamp") Boolean timestamp,
           @Context HttpServletRequest request) {
     try {
       var endDate = Optional.ofNullable(cutoff)
@@ -596,6 +607,7 @@ public class SchedulerRestService {
               .filter(id -> !id.isEmpty())
               .map(Opt::some)
               .orElse(Opt.none());
+      timestamp = !Objects.isNull(timestamp) && timestamp;
 
       String lastModified = null;
       // If the `etag` matches the if-not-modified header,return a 304
@@ -616,7 +628,7 @@ public class SchedulerRestService {
                 ));
       }
 
-      final ResponseBuilder response = Response.ok(gson.toJson(result));
+      final ResponseBuilder response = Response.ok((timestamp ? gsonTimestamp : gson).toJson(result));
       if (StringUtils.isNotBlank(lastModified)) {
         response.header(HttpHeaders.ETAG, lastModified);
       }
@@ -1289,7 +1301,7 @@ public class SchedulerRestService {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Unable to get the immediate recording for agent '{}': {}", agentId, e);
+      logger.error("Unable to get the immediate recording for agent '{}'", agentId, e);
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
   }
@@ -1319,7 +1331,7 @@ public class SchedulerRestService {
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Unable to get the immediate recording for agent '{}': {}", agentId, e);
+      logger.error("Unable to get the immediate recording for agent '{}'", agentId, e);
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
   }
@@ -1364,7 +1376,7 @@ public class SchedulerRestService {
           return Response.status(Status.CONFLICT).build();
         }
       } catch (SchedulerException e) {
-        logger.error("Unable to create immediate event on agent {}: {}", agentId, e);
+        logger.error("Unable to create immediate event on agent {}", agentId, e);
         throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
       }
 
@@ -1413,7 +1425,7 @@ public class SchedulerRestService {
         prolongingService.stop(agentId);
         if (e instanceof UnauthorizedException)
           throw (UnauthorizedException) e;
-        logger.error("Unable to create immediate event on agent {}: {}", agentId, e);
+        logger.error("Unable to create immediate event on agent {}", agentId, e);
         throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
       } finally {
         if (mediaPackage != null) {
@@ -1479,7 +1491,7 @@ public class SchedulerRestService {
           eventId = mp.getIdentifier().toString();
         }
       } catch (Exception e) {
-        logger.error("Unable to get the immediate recording for agent '{}': {}", agentId, e);
+        logger.error("Unable to get the immediate recording for agent '{}'", agentId, e);
         throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
       }
 
@@ -1500,7 +1512,7 @@ public class SchedulerRestService {
       } catch (UnauthorizedException e) {
         throw e;
       } catch (Exception e) {
-        logger.error("Unable to update the temporal of event '{}': {}", eventId, e);
+        logger.error("Unable to update the temporal of event '{}'", eventId, e);
         throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
       }
     } catch (Throwable t) {
@@ -1534,7 +1546,7 @@ public class SchedulerRestService {
     } catch (NotFoundException | UnauthorizedException e) {
       throw e;
     } catch (Exception e) {
-      logger.error("Unable to prolong the immediate recording for agent '{}': {}", agentId, e);
+      logger.error("Unable to prolong the immediate recording for agent '{}'", agentId, e);
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
   }

@@ -206,7 +206,7 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
                   + FilenameUtils.getExtension(compositeSettings.getSourceUrlWatermark()), in);
           urlAttachment.setURI(imageUrl);
         } catch (Exception e) {
-          logger.warn("Unable to read watermark source url {}: {}", compositeSettings.getSourceUrlWatermark(), e);
+          logger.warn("Unable to read watermark source url {}", compositeSettings.getSourceUrlWatermark(), e);
           throw new WorkflowOperationException("Unable to read watermark source url "
                   + compositeSettings.getSourceUrlWatermark(), e);
         } finally {
@@ -691,7 +691,7 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
         File watermarkFile = workspace.get(watermarkAttachment.get().getURI());
         image = ImageIO.read(watermarkFile);
       } catch (Exception e) {
-        logger.warn("Unable to read the watermark image attachment {}: {}", watermarkAttachment.get().getURI(), e);
+        logger.warn("Unable to read the watermark image attachment {}", watermarkAttachment.get().getURI(), e);
         throw new WorkflowOperationException("Unable to read the watermark image attachment", e);
       }
       Dimension imageDimension = Dimension.dimension(image.getWidth(), image.getHeight());

@@ -696,16 +696,6 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     }
   }
 
-  protected MediaPackage getDistributedMediaPackage(String mediaPackageID) throws UnauthorizedException {
-    try {
-      return searchService.get(mediaPackageID);
-    } catch (NotFoundException e) {
-      logger.info("The search service doesn't know media package {}.", mediaPackageID);
-      return null;
-    }
-  }
-
-
   /**
    * MH-10216, Copied from the original RepublishWorkflowOperationHandler
    *

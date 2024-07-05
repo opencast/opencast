@@ -35,10 +35,9 @@
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <!-- Special handling for captions                                     -->
     <!--                                                                   -->
-    <!-- Creates captions/prepared and captions/delivery.                  -->
+    <!-- Creates captions/delivery.                                        -->
     <!-- Sets the following tags:                                          -->
     <!--    captions/source     archive, exclude-publish                   -->
-    <!--    captions/prepared   archive                                    -->
     <!--    captions/delivery   engage-download                            -->
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 

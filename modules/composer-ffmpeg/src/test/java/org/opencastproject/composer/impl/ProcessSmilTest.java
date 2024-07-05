@@ -414,7 +414,7 @@ public class ProcessSmilTest {
       List<Track> outputs = (List<Track>) MediaPackageElementParser.getArrayFromXml(job.getPayload());
       assertNotNull(outputs);
       for (Track track : outputs) {
-        logger.info("testProcessOneTrack got file:", track.getDescription());
+        logger.info("testProcessOneTrack got file: {}", track.getDescription());
       }
       assertTrue(outputs.size() == 1); // One for each profile
     } catch (EncoderException e) {
@@ -505,7 +505,7 @@ public class ProcessSmilTest {
     assertNotNull(outputs);
     logger.info("testProcessSmilOneTrack got {} files", outputs);
     for (Track track : outputs) {
-      logger.info("testProcessOneTrack got file:", track.getDescription());
+      logger.info("testProcessOneTrack got file: {}", track.getDescription());
     }
     assertTrue(outputs.size() == 1); // One for each profile
   }
@@ -602,7 +602,7 @@ public class ProcessSmilTest {
       assertNotNull(outputs);
       logger.info("testProcessSmilOneTrack got {} files", outputs);
       for (Track track : outputs) {
-        logger.info("testProcessOneTrack got file:", track.getDescription());
+        logger.info("testProcessOneTrack got file: {}", track.getDescription());
       }
       assertTrue(outputs.size() == 1); // One for each profile
     } catch (EncoderException e) {

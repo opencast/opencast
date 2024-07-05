@@ -907,7 +907,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       // Update Elasticsearch index
       removeSchedulingInfoFromIndex(mediaPackageId);
     } catch (Exception e) {
-      logger.error("Could not remove event '{}' from persistent storage: {}", mediaPackageId, e);
+      logger.error("Could not remove event '{}' from persistent storage", mediaPackageId, e);
       throw new SchedulerException(e);
     }
 
@@ -1448,7 +1448,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
           EventIndexUtils.updateSeriesName(event, organization, user, index);
         } catch (SearchIndexException e) {
           logger.error("Error updating the series name of the event {} in the {} index.", mediaPackageId,
-                  e);
+                  index.getIndexName(), e);
         }
       }
       if (presenters.isSome()) {
@@ -1479,7 +1479,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       index.addOrUpdateEvent(mediaPackageId, updateFunction, organization, user);
       logger.debug("Scheduled event {} updated in the {} index.", mediaPackageId, index.getIndexName());
     } catch (SearchIndexException e) {
-      logger.error("Error updating the scheduled event {} in the {} index.", mediaPackageId, e);
+      logger.error("Error updating the scheduled event {} in the {} index.", mediaPackageId, index.getIndexName(), e);
     }
   }
 
@@ -1504,7 +1504,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       logger.debug("Recording state of event {} removed from the {} index.", mediaPackageId, index.getIndexName());
     } catch (SearchIndexException e) {
       logger.error("Failed to remove the recording state of event {} from the {} index.", mediaPackageId,
-              e);
+              index.getIndexName(), e);
     }
   }
 
@@ -1523,7 +1523,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
               index.getIndexName());
     } catch (SearchIndexException e) {
       logger.error("Failed to delete the scheduling information of event {} from the {} index.", mediaPackageId,
-              e);
+              index.getIndexName(), e);
     }
   }
 
@@ -1815,7 +1815,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
           EventIndexUtils.updateSeriesName(event, orgId, user, index);
         } catch (SearchIndexException e) {
           logger.error("Error updating the series name of the event {} in the {} index.",
-                  scheduledEvent.getMediaPackageId(), e);
+                  scheduledEvent.getMediaPackageId(), index.getIndexName(), e);
         }
       }
       if (presentersOpt.isSome()) {

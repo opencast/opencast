@@ -57,17 +57,17 @@ module.exports = function (env) {
           publicPath: '/test_mock_static'
         }
       ],
-      proxy: [{
-        '/search/**': proxyOpts,
-        '/info/**': proxyOpts,
-        '/series/**': proxyOpts,
-        '/annotation/**': proxyOpts,
-        '/engage/**': proxyOpts,
-        '/play/**': proxyOpts,
-        '/usertracking/**': proxyOpts,
-        '/editor/**': proxyOpts,
-        '/editor-ui/**': proxyOpts
-      }]
+      proxy: [
+        { context: ['/search'], ...proxyOpts },
+        { context: ['/info'], ...proxyOpts },
+        { context: ['/series'], ...proxyOpts },
+        { context: ['/annotation'], ...proxyOpts },
+        { context: ['/engage'], ...proxyOpts },
+        { context: ['/play'], ...proxyOpts },
+        { context: ['/usertracking'], ...proxyOpts },
+        { context: ['/editor'], ...proxyOpts },
+        { context: ['/editor-ui'], ...proxyOpts }
+      ]
     },
 
     module: {

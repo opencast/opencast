@@ -143,7 +143,7 @@ public class BrightspaceUserProviderInstance implements UserProvider, RoleProvid
 
       mbs.registerMBean(this, name);
     } catch (Exception e) {
-      logger.error("Unable to register {} as an mbean: {}", this, e);
+      logger.error("Unable to register {} as an mbean", this, e);
     }
 
   }

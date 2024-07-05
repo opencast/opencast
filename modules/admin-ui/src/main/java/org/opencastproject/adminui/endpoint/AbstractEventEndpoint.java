@@ -2053,7 +2053,7 @@ public abstract class AbstractEventEndpoint {
     } catch (NotFoundException e) {
       return notFound("Cannot find workflow %s", workflowId);
     } catch (WorkflowDatabaseException e) {
-      logger.error("Unable to get workflow operations of event %s and workflow %s", eventId, workflowId, e);
+      logger.error("Unable to get workflow operations of event {} and workflow {}", eventId, workflowId, e);
       return serverError();
     } catch (UnauthorizedException e) {
       return forbidden();
@@ -2090,7 +2090,7 @@ public abstract class AbstractEventEndpoint {
     } catch (NotFoundException e) {
       return notFound("Cannot find workflow %s", workflowId);
     } catch (WorkflowDatabaseException e) {
-      logger.error("Unable to get workflow operation of event %s and workflow %s at position %s", eventId, workflowId,
+      logger.error("Unable to get workflow operation of event {} and workflow {} at position {}", eventId, workflowId,
               operationPosition, e);
       return serverError();
     } catch (UnauthorizedException e) {

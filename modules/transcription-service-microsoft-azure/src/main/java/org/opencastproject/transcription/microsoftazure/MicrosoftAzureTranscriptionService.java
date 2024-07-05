@@ -1151,7 +1151,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
         return true;
       }
     } catch (Exception e) {
-      logger.error("ERROR while calculating transcription request expiration for job: %s", jobId, e);
+      logger.error("ERROR while calculating transcription request expiration for job: {}", jobId, e);
       // to avoid perpetual non-expired state, transcription is set as expired
       return true;
     }
@@ -1182,7 +1182,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
 
       sendEmail("Transcription ERROR", String.format("%s(media package %s, job id %s).", message, mpId, jobId));
     } catch (Exception e) {
-      logger.error("ERROR while deleting transcription job: %s", jobId, e);
+      logger.error("ERROR while deleting transcription job: {}}", jobId, e);
     }
   }
 

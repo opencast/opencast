@@ -192,7 +192,7 @@ public class IncidentServiceEndpoint {
       }
     } catch (NotFoundException e) {
       // should not happen
-      logger.error("Unable to get job incident for id {}! Consistency issue!");
+      logger.error("Unable to get job incident! Consistency issue!", e);
       throw new WebApplicationException(e, INTERNAL_SERVER_ERROR);
     } catch (IncidentServiceException e) {
       logger.warn("Unable to get job incident for id {}: {}", jobIds, e.getMessage());
@@ -268,7 +268,7 @@ public class IncidentServiceEndpoint {
       Incident incident = svc.getIncident(incidentId);
       return ok(getResponseType(type), new JaxbIncident(incident));
     } catch (IncidentServiceException e) {
-      logger.warn("Unable to get job incident for incident id {}: {}", incidentId, e);
+      logger.warn("Unable to get job incident for incident id {}", incidentId, e);
       throw new WebApplicationException(INTERNAL_SERVER_ERROR);
     }
   }
@@ -347,7 +347,7 @@ public class IncidentServiceEndpoint {
     } catch (IllegalStateException e) {
       return Response.status(Status.CONFLICT).build();
     } catch (Exception e) {
-      logger.warn("Unable to post incident for job {}: {}", job.getId(), e);
+      logger.warn("Unable to post incident for job {}", job.getId(), e);
       throw new WebApplicationException(INTERNAL_SERVER_ERROR);
     }
   }

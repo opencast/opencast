@@ -467,7 +467,7 @@ public class JobEndpoint {
       try {
         result = ((Comparable)value1).compareTo(value2);
       } catch (ClassCastException ex) {
-        logger.debug("Can not compare \"{}\" with \"{}\": {}",
+        logger.debug("Can not compare \"{}\" with \"{}\"",
                 value1, value2, ex);
       }
 
