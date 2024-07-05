@@ -255,7 +255,7 @@
         <configuration key="source-flavor">*/trimmed</configuration>
         <configuration key="target-flavor">*/delivery</configuration>
         <configuration key="target-tags">engage-download,engage-streaming</configuration>
-        <configuration key="encoding-profile">audio-to-mp3.http</configuration>
+        <configuration key="encoding-profile">audio-to-m4a.http</configuration>
       </configurations>
     </operation>
 
