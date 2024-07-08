@@ -206,6 +206,11 @@ public final class EventIndexUtils {
 
     metadata.addField(EventIndexSchema.NEEDS_CUTTING, event.needsCutting(), true);
 
+    /* #TODO hinzufügen an der richtigen stelle:
+    *    metadata.addField(EventIndexSchema.IS_PUBLISHED, event.isPUblished(), true)
+    * ist das die richtige Stelle?????*/
+    metadata.addField(EventIndexSchema.IS_PUBLISHED, event.isPublished(), true);
+
     if (event.getPublications() != null) {
       List<Publication> publications = event.getPublications();
       HashMap<String, Object>[] publicationsArray = new HashMap[publications.size()];
@@ -214,6 +219,7 @@ public final class EventIndexUtils {
       }
 
       metadata.addField(EventIndexSchema.PUBLICATION, publicationsArray, true);
+
     }
 
     if (event.getPresenters() != null) {

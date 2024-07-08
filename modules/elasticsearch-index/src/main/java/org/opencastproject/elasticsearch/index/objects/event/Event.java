@@ -901,7 +901,7 @@ public class Event implements IndexObject {
    *
    * @return the is published status from this event
    */
-  public Boolean getIsPublished() { return isPublished; }
+  public Boolean isPublished() { return isPublished; }
 
   /**
    * Sets the archive version
