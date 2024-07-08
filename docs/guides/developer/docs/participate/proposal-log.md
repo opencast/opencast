@@ -9,6 +9,29 @@ The following list contains a list of passed proposals for reference.
 Passed Proposals
 ----------------
 
+### Allow merges of admin interface and editor
+Proposed by Lars Kiesow <lkiesow@uos.de>, passed on Jun 21, 2024
+```no-highlight
+Hi everyone,
+the admin interface and editor are part of Opencast and follow the same
+set of rules when it comes to reviews. But right now we still always
+wait for a review of the merge into Opencast after a release.
+
+I hereby #propose to drop this requirement and allow committers to merge
+a new release themselves **if and only if** the pull request for the new
+release targets `develop` or the latest release branch.
+
+If someone wants to bring a new release of the admin interface or
+the editor to an older version of Opencast, that should still get a
+proper review. The same goes for external components we import and
+which do not follow the same rules like Paella Player or Studio.
+
+This proposal passes if no one vetoes it until
+Fri Jun 21 06:09 PM CEST 2024
+
+–Lars
+```
+
 ### Release Manager Selection Process
 Proposed by Greg Logan <gregorydlogan@gmail.com>, passed on Tue, April 9 2023
 ```no-highlight

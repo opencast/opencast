@@ -183,7 +183,7 @@ public class AwsS3DistributionRestService extends AbstractJobProducerEndpoint {
       logger.debug("Unable to distribute element: {}", e.getMessage());
       return status(Status.BAD_REQUEST).build();
     } catch (Exception e) {
-      logger.warn("Unable to distribute media package {}, element {} to aws s3 channel: {}",
+      logger.warn("Unable to distribute media package {}, element {} to aws s3 channel",
           mediaPackageXml, elementId, e);
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
     }
@@ -243,7 +243,7 @@ public class AwsS3DistributionRestService extends AbstractJobProducerEndpoint {
       logger.debug("Unable to distribute element: {}", e.getMessage());
       return status(Status.BAD_REQUEST).build();
     } catch (Exception e) {
-      logger.warn("Unable to distribute media package {}, element {} to aws s3 channel: {}",
+      logger.warn("Unable to distribute media package {}, element {} to aws s3 channel",
           mediaPackageXml, elementId, e);
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
     }
@@ -296,7 +296,7 @@ public class AwsS3DistributionRestService extends AbstractJobProducerEndpoint {
       logger.debug("Unable to retract element: {}", e.getMessage());
       return status(Status.BAD_REQUEST).build();
     } catch (Exception e) {
-      logger.warn("Unable to retract media package {}, element {} from aws s3 channel: {}",
+      logger.warn("Unable to retract media package {}, element {} from aws s3 channel",
           mediaPackageXml, elementId, e);
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
     }
@@ -349,7 +349,7 @@ public class AwsS3DistributionRestService extends AbstractJobProducerEndpoint {
       logger.debug("Unable to retract element: {}", e.getMessage());
       return status(Status.BAD_REQUEST).build();
     } catch (Exception e) {
-      logger.warn("Unable to retract media package {}, element {} from aws s3 channel: {}",
+      logger.warn("Unable to retract media package {}, element {} from aws s3 channel",
           mediaPackageXml, elementId, e);
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
     }

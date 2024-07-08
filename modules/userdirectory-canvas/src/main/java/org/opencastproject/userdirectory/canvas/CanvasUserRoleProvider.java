@@ -355,7 +355,7 @@ public class CanvasUserRoleProvider implements UserProvider, RoleProvider {
       String displayName = node.path("name").asText();
       return new String[]{email, displayName};
     } catch (IOException e) {
-      logger.warn("Exception getting Canvas user information for user {} at {}: {}", userName, urlString, e);
+      logger.warn("Exception getting Canvas user information for user {} at {}", userName, urlString, e);
     }
     return null;
   }
@@ -390,7 +390,7 @@ public class CanvasUserRoleProvider implements UserProvider, RoleProvider {
       return roleList;
 
     } catch (IOException e) {
-      logger.warn("Exception getting site/role membership for Canvas user {} at {}: {}", userName, urlString, e);
+      logger.warn("Exception getting site/role membership for Canvas user {} at {}", userName, urlString, e);
     }
     return null;
   }

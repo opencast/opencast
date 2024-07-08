@@ -148,6 +148,11 @@ public class GoogleSpeechStartTranscriptionOperationHandler extends AbstractWork
         logger.info("Skipping track {} since it contains a video stream", track);
         continue;
       }
+      if (!track.hasAudio()) {
+        logger.info("Track {} from media package {} doesn't contain audio stream. Skip subtitle generation.",
+            track.getFlavor(), mediaPackage.getIdentifier());
+        continue;
+      }
       try {
         job = service.startTranscription(mediaPackage.getIdentifier().toString(), track, language);
         // Only one job per media package

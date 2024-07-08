@@ -234,7 +234,7 @@ public class RemoteBase {
             }
           }
         } catch (Exception e) {
-          logger.error("Exception while trying to dispatch job to {}: {}", fullUrl, e);
+          logger.error("Exception while trying to dispatch job to {}", fullUrl, e);
           servicesInWarningState.add(fullUrl);
         }
         closeConnection(response);

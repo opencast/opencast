@@ -154,7 +154,7 @@ public class YouTubePublicationRestService extends AbstractJobProducerEndpoint {
       final MediaPackage mediapackage = MediaPackageParser.getFromXml(mediaPackageXml);
       job = service.retract(mediapackage);
     } catch (Exception e) {
-      logger.warn("Unable to retract mediapackage '{}' from YouTube: {}", mediaPackageXml, e);
+      logger.warn("Unable to retract mediapackage '{}' from YouTube", mediaPackageXml, e);
       return Response.serverError().status(Status.INTERNAL_SERVER_ERROR).build();
     }
     return Response.ok(new JaxbJob(job)).build();

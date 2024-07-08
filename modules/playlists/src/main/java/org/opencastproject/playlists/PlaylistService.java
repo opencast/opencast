@@ -23,9 +23,10 @@ package org.opencastproject.playlists;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 
 import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.event.Event;
-import org.opencastproject.index.service.api.IndexService;
+import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.playlists.persistence.PlaylistDatabaseException;
 import org.opencastproject.playlists.persistence.PlaylistDatabaseService;
 import org.opencastproject.playlists.serialization.JaxbPlaylist;
@@ -41,7 +42,6 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.requests.SortCriterion;
 
-import com.entwinemedia.fn.data.Opt;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -80,8 +80,6 @@ public class PlaylistService {
   /** The authorization service */
   protected AuthorizationService authorizationService = null;
 
-  private IndexService indexService;
-
   private ElasticsearchIndex elasticsearchIndex;
 
   /**
@@ -115,11 +113,6 @@ public class PlaylistService {
   @Reference
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
-  }
-
-  @Reference
-  public void setIndexService(IndexService indexService) {
-    this.indexService = indexService;
   }
 
   @Reference
@@ -415,23 +408,25 @@ public class PlaylistService {
    * itself.
    */
   public JaxbPlaylist enrich(Playlist playlist) {
-    JaxbPlaylist jaxbPlaylist = new JaxbPlaylist(playlist);
+    var jaxbPlaylist = new JaxbPlaylist(playlist);
+    var org = securityService.getOrganization().getId();
+    var user = securityService.getUser();
 
     // Add additional infos about events
     List<JaxbPlaylistEntry> jaxbPlaylistEntries = jaxbPlaylist.getEntries();
-    for (int i = 0; i < jaxbPlaylistEntries.size(); i++) {
+    for (JaxbPlaylistEntry entry : jaxbPlaylistEntries) {
       try {
-        JaxbPlaylistEntry entry = jaxbPlaylistEntries.get(i);
         if (entry.getType() == PlaylistEntryType.EVENT) {
-          Opt<Event> optEvent = indexService.getEvent(jaxbPlaylistEntries.get(i).getContentId(), elasticsearchIndex);
-          // We only get an event from the indexService if we have permission to do so (and if it exists ofc)
-          if (optEvent.isSome()) {
-            Event event = optEvent.get();
+
+          // We only get an event from the index if we have permission to do so (and if it exists ofc)
+          SearchResult<Event> result = elasticsearchIndex.getByQuery(
+              new EventSearchQuery(org, user).withIdentifier(entry.getContentId()));
+          if (result.getPageSize() != 0) {
+            Event event = result.getItems()[0].getSource();
             entry.setPublications(event.getPublications());
           } else {
             entry.setType(PlaylistEntryType.INACCESSIBLE);
           }
-          jaxbPlaylistEntries.set(i, entry);
         }
       } catch (SearchIndexException e) {
         throw new RuntimeException(e);

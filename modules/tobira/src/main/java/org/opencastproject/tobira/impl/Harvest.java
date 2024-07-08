@@ -94,7 +94,7 @@ final class Harvest {
         .sort(SearchResult.MODIFIED_DATE, SortOrder.ASC)
         .size(preferredAmount + 1);
     final SearchResultList results = searchService.search(q);
-    final var hasMoreEvents = results.getTotalHits() == preferredAmount + 1;
+    final var hasMoreEvents = results.getHits().size() >= preferredAmount + 1;
 
     logger.debug("Retrieved {} events from the index during harvest", results.getHits().size());
 
@@ -114,7 +114,7 @@ final class Harvest {
         Optional.of(includesItemsUntilRaw),
         preferredAmount + 1
     );
-    final var hasMoreSeriesInRange = rawSeries.size() == preferredAmount + 1;
+    final var hasMoreSeriesInRange = rawSeries.size() >= preferredAmount + 1;
     logger.debug("Retrieved {} series from the database during harvest", rawSeries.size());
 
     if (hasMoreSeriesInRange) {
@@ -131,7 +131,7 @@ final class Harvest {
         includesItemsUntilRaw,
         preferredAmount + 1
     );
-    final var hasMorePlaylistsInRange = rawPlaylists.size() == preferredAmount + 1;
+    final var hasMorePlaylistsInRange = rawPlaylists.size() >= preferredAmount + 1;
     logger.debug("Retrieved {} playlists from the database during harvest", rawPlaylists.size());
 
     if (hasMorePlaylistsInRange) {

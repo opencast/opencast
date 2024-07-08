@@ -17,11 +17,6 @@ pre-built Opencast installations.
     * [RedHat Enterprise Linux](rpm-el.md)
     * [CentOS Stream](rpm-el.md)
     * …
-* [Red Hat 7 based](rpm-el7.md)
-    * [RedHat Enterprise Linux 7](rpm-el7.md)
-    * [CentOS 7](rpm-el7.md)
-    * [Scientific Linux 7](rpm-el7.md)
-* [Fedora](rpm-fedora.md)
 * [Debian based](debs.md)
     * [Debian](debs.md)
     * [Ubuntu](debs.md)

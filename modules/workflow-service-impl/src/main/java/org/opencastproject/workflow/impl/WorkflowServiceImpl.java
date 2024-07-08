@@ -1266,10 +1266,11 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           // Collect necessary information only for index update
           long id = workflowInstance.getId();
           int state = workflowInstance.getState().ordinal();
+          var template = workflowInstance.getTemplate();
           String mpId = workflowInstance.getMediaPackage().getIdentifier().toString();
           String orgId = workflowInstance.getOrganizationId();
 
-          updateWorkflowInstanceInIndex(id, state, mpId, orgId);
+          updateWorkflowInstanceInIndex(id, state, template, mpId, orgId);
         }
       } catch (ServiceRegistryException e) {
         throw new WorkflowDatabaseException("Update of workflow job " + workflowInstance.getId()
@@ -2213,7 +2214,9 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
               }
               current++;
 
-              if (!WorkflowUtil.isActive(WorkflowInstance.WorkflowState.values()[indexData.getState()].toString())) {
+              // Include PAUSED; otherwise, paused workflows will show up as "Finished"
+              if (!WorkflowUtil.isActive(WorkflowInstance.WorkflowState.values()[indexData.getState()].toString())
+                      || WorkflowState.PAUSED == WorkflowInstance.WorkflowState.values()[indexData.getState()]) {
                 String orgid = indexData.getOrganizationId();
                 if (null == orgid) {
                   String mpId = indexData.getMediaPackageId();
@@ -2284,7 +2287,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       results = index.getByQuery(new EventSearchQuery(orgId, user).withWorkflowId(workflowInstanceId));
     } catch (SearchIndexException e) {
       logger.error("Error retrieving the events for workflow instance {} from the {} index.", workflowInstanceId,
-              e);
+              index.getIndexName(), e);
       return;
     }
 
@@ -2324,7 +2327,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
                 index.getIndexName());
       } catch (SearchIndexException e) {
         logger.error("Error removing the workflow instance {} of event {} from the {} index.", workflowInstanceId,
-                eventId, e);
+                eventId, index.getIndexName(), e);
       }
     }
   }
@@ -2341,7 +2344,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param orgId
    *         workflow organization id
    */
-  private void updateWorkflowInstanceInIndex(long id, int state, String mpId, String orgId) {
+  private void updateWorkflowInstanceInIndex(long id, int state, String wfDefId, String mpId, String orgId) {
     final WorkflowState workflowState = WorkflowState.values()[state];
     final User user = securityService.getUser();
 
@@ -2351,6 +2354,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       Event event = eventOpt.orElse(new Event(mpId, orgId));
       event.setWorkflowId(id);
       event.setWorkflowState(workflowState);
+      event.setWorkflowDefinitionId(wfDefId);
       return Optional.of(event);
     };
 
@@ -2360,7 +2364,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
               index.getIndexName());
     } catch (SearchIndexException e) {
       logger.error("Error updating the workflow instance {} of event {} in the {} index.", id, mpId,
-              e);
+              index.getIndexName(), e);
     }
   }
 

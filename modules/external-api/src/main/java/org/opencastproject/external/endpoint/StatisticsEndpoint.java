@@ -267,7 +267,7 @@ public class StatisticsEndpoint {
     try {
       queries = QueryUtils.parse(data, statisticsService);
     } catch (Exception e) {
-      logger.debug("Unable to parse form parameter 'data' {}, exception: {}", data, e);
+      logger.debug("Unable to parse form parameter 'data' {}, exception", data, e);
       return RestUtil.R.badRequest("Unable to parse form parameter 'data': " + e.getMessage());
     }
 
@@ -332,7 +332,7 @@ public class StatisticsEndpoint {
     try {
       query = QueryUtils.parseQuery(data, statisticsService);
     } catch (Exception e) {
-      logger.debug("Unable to parse form parameter 'data' {}, exception: {}", data, e);
+      logger.debug("Unable to parse form parameter 'data' {}, exception", data, e);
       return RestUtil.R.badRequest("Unable to parse form parameter 'data': " + e.getMessage());
     }
     checkAccess(query.getParameters().getResourceId(), query.getProvider().getResourceType());

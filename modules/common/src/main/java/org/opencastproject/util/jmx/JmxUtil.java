@@ -49,7 +49,7 @@ public final class JmxUtil {
       return ManagementFactory.getPlatformMBeanServer().registerMBean(bean,
               new ObjectName(MATTERORN_JMX_DOMAIN + ":type=" + type));
     } catch (Exception e) {
-      logger.warn("Unable to register {} as an mbean: {}", bean, e);
+      logger.warn("Unable to register {} as an mbean", bean, e);
     }
     return null;
   }
@@ -61,7 +61,7 @@ public final class JmxUtil {
         ManagementFactory.getPlatformMBeanServer().unregisterMBean(bean.getObjectName());
       }
     } catch (Exception e) {
-      logger.warn("Unable to unregister mbean {}: {}", bean.getClassName(), e);
+      logger.warn("Unable to unregister mbean {}", bean.getClassName(), e);
     }
   }
 

@@ -29,8 +29,8 @@ permissions of an account role in a Canvas instance.
 
 ### Step 1
 
-Edit `etc/org.apache.karaf.features.cfg` and make sure the `opencast-canvas` feature is listed in the `featuresBoot`
-option.
+Edit `etc/org.opencastproject.plugin.impl.PluginManagerImpl` and make sure the `opencast-plugin-userdirectory-canvas`
+plugin is enabled.
 
 ### Step 2
 

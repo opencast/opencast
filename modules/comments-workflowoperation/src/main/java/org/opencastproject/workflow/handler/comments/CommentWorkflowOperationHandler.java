@@ -130,7 +130,7 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
       default:
         logger.warn(
             "Unknown action '{}' for comment with description '{}' and reason '{}'. It should be "
-                + "one of the following: ",
+                + "one of the following: {}",
             inputAction, description, reason, StringUtils.join(Operation.values(), ","));
     }
     WorkflowOperationResult result = createResult(workflowInstance.getMediaPackage(), Action.CONTINUE,

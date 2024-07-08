@@ -295,7 +295,7 @@ public class AclEndpoint {
       if (!aclService().deleteAcl(aclId))
         return conflict();
     } catch (AclServiceException e) {
-      logger.warn("Error deleting manged acl with id '{}': {}", aclId, e);
+      logger.warn("Error deleting manged acl with id '{}'", aclId, e);
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
     }
     return noContent();

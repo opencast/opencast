@@ -425,10 +425,10 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
           distributedElements.add(distributedElement);
         }
       } catch (MediaPackageException | NotFoundException | IOException e1) {
-        logger.error("HLS Prepare failed for mediapackage {} in {}: {} ", elementSet.getKey(), mediapackage, e1);
+        logger.error("HLS Prepare failed for mediapackage {} in {}", elementSet.getKey(), mediapackage, e1);
         throw new DistributionException("Cannot distribute " + mediapackage);
       } catch (URISyntaxException e1) {
-        logger.error("HLS Prepare failed - Bad URI syntax {} in {}: {} ", elementSet.getKey(), mediapackage, e1);
+        logger.error("HLS Prepare failed - Bad URI syntax {} in {}", elementSet.getKey(), mediapackage, e1);
         throw new DistributionException("Cannot distribute - BAD URI syntax " + mediapackage);
       }
     }
