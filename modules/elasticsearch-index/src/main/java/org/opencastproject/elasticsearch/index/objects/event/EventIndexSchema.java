@@ -71,6 +71,9 @@ public interface EventIndexSchema extends IndexSchema {
   /** The publications */
   String PUBLICATION = "publication";
 
+  /** The is published field name */
+  String IS_PUBLISHED = "is_published";
+
   /** The event status */
   String EVENT_STATUS = "event_status";
 

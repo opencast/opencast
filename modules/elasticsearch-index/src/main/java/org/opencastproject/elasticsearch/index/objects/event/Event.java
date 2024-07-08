@@ -76,7 +76,7 @@ import javax.xml.stream.XMLStreamWriter;
         "contributors", "seriesId", "seriesName", "language", "source", "created", "creator",
         "publisher", "license", "rights", "extendedMetadata", "accessPolicy", "managedAcl", "workflowState",
         "workflowId", "workflowDefinitionId", "recordingStartTime", "recordingEndTime", "duration",
-        "hasComments", "hasOpenComments", "comments", "hasPreview", "needsCutting", "publications",
+        "hasComments", "hasOpenComments", "comments", "hasPreview", "needsCutting", "publications", "isPublished",
         "archiveVersion", "recordingStatus", "eventStatus", "agentId", "agentConfigurations",
         "technicalStartTime", "technicalEndTime", "technicalPresenters"
     }
@@ -251,6 +251,10 @@ public class Event implements IndexObject {
   @XmlElementWrapper(name = "publications")
   @XmlElement(name = "publication")
   private List<Publication> publications = new ArrayList<>();
+
+  /** Whether the event is published */
+  @XmlElement(name = "isPublished")
+  private Boolean isPublished = false;
 
   /** The recording status of the event */
   @XmlElement(name = "recording_status")
@@ -883,6 +887,21 @@ public class Event implements IndexObject {
   public List<Publication> getPublications() {
     return publications;
   }
+
+  /**
+   * Sets the is published status for the event
+   *
+   * @param isPublished
+   *          the is published status from this event
+   */
+  public void setIsPublished(boolean isPublished) { this.isPublished = isPublished; }
+
+  /**
+   * Returns the is published status from this event
+   *
+   * @return the is published status from this event
+   */
+  public Boolean getIsPublished() { return isPublished; }
 
   /**
    * Sets the archive version
