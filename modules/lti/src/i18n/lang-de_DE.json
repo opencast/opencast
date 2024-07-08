@@ -35,7 +35,7 @@
     "EVENT_LOCKED": "The event is currently being worked on. Please wait until making further changes…",
     "DELETION_FAILURE": "Event deletion failed",
     "DELETION_FAILURE_DESCRIPTION": "Please try again later…",
-    "RESULT_HEADING": "Ergebnisse {{range.begin}}-{{range.end}} von {{total}}",
+    "RESULT_HEADING": "Results {{range.begin}}-{{range.end}} of {{total}}",
     "CONFIRM_DELETION": "Really delete this event?",
     "COPY_TO_SERIES": "Copy event to series",
     "SELECT_COPY_TARGET": "Select destination series",
