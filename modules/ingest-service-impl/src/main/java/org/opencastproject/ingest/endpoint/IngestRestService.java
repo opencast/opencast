@@ -760,6 +760,24 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       int episodeDCCatalogNumber = 0;
       boolean hasMedia = false;
       if (ServletFileUpload.isMultipartContent(request)) {
+        // Validate first
+        for (FileItemIterator iter = new ServletFileUpload().getItemIterator(request); iter.hasNext();) {
+          FileItemStream item = iter.next();
+          if (item.isFormField()) {
+            String fieldName = item.getFieldName();
+            String value = Streams.asString(item.openStream(), "UTF-8");
+            if (dcterms.contains(fieldName)) {
+              if ("created".equals(fieldName) || "date".equals(fieldName) || "temporal".equals(fieldName)) {
+                try {
+                  OpencastMetadataCodec.decodeDate(value);
+                } catch (IllegalArgumentException e) {
+                  return badRequest("Provided dates were not well formatted", e);
+                }
+              }
+            }
+          }
+        }
+        // Add to mediapackage
         for (FileItemIterator iter = new ServletFileUpload().getItemIterator(request); iter.hasNext();) {
           FileItemStream item = iter.next();
           if (item.isFormField()) {
@@ -787,13 +805,6 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
               if ("identifier".equals(fieldName)) {
                 /* Use the identifier for the mediapackage */
                 mp.setIdentifier(new IdImpl(value));
-              }
-              if ("created".equals(fieldName) || "date".equals(fieldName) || "temporal".equals(fieldName)) {
-                try {
-                  OpencastMetadataCodec.decodeDate(value);
-                } catch (IllegalArgumentException e) {
-                  return badRequest("Provided dates were not well formatted", e);
-                }
               }
               if (dcc == null) {
                 dcc = dublinCoreService.newInstance();
