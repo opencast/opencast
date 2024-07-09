@@ -76,6 +76,7 @@ nav:
         - Statistics: 'configuration/admin-ui/statistics.md'
         - Thumbnails: 'configuration/admin-ui/thumbnails.md'
         - Imprint and Privacy Statement: 'configuration/admin-ui/about.md'
+        - Terms of use: 'configuration/admin-ui/terms.md'
    - Amazon Services:
         - Amazon S3 Archive Storage: 'configuration/awss3archive.md'
         - Amazon S3 Distribution: 'configuration/awss3distribution.md'
