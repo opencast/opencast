@@ -206,16 +206,17 @@ public final class EventIndexUtils {
 
     metadata.addField(EventIndexSchema.NEEDS_CUTTING, event.needsCutting(), true);
 
-    /* #TODO hinzufügen an der richtigen stelle:
-    *    metadata.addField(EventIndexSchema.IS_PUBLISHED, event.isPUblished(), true)
-    * ist das die richtige Stelle?????*/
-    metadata.addField(EventIndexSchema.IS_PUBLISHED, event.isPublished(), true);
-
     if (event.getPublications() != null) {
       List<Publication> publications = event.getPublications();
       HashMap<String, Object>[] publicationsArray = new HashMap[publications.size()];
       for (int i = 0; i < publications.size(); i++) {
         publicationsArray[i] = generatePublicationDoc(publications.get(i));
+      }
+
+      if (publications.size() == 1 && !publications.get(0).getChannel().equals("internal") || publications.size() > 1) {
+        metadata.addField(EventIndexSchema.IS_PUBLISHED, true, true);
+      } else {
+        metadata.addField(EventIndexSchema.IS_PUBLISHED, false, true);
       }
 
       metadata.addField(EventIndexSchema.PUBLICATION, publicationsArray, true);

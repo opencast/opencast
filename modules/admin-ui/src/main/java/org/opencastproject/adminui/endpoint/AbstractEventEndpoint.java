@@ -2591,7 +2591,9 @@ public abstract class AbstractEventEndpoint {
           case NO:
             query.withIsPublished(false);
             break;
-          /* #TODO write default case */
+          default:
+            logger.info("Unknown is published status {}", filters.get(name));
+            return Response.status(SC_BAD_REQUEST).build();
         }
       }
       if (EventListQuery.FILTER_STARTDATE_NAME.equals(name)) {
