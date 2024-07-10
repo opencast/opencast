@@ -49,7 +49,7 @@ Please make sure to install the following dependencies.
 
 Required:
 
-    java-11-openjdk-devel
+    java-17-openjdk-devel
     ffmpeg >= 3.2.4
     maven >= 3.6
     python
@@ -200,7 +200,7 @@ Follow the next steps, if you want to import opencast correctly
 - Search for projects recursively
 - Uncheck all listed profiles
 - Check all projects to import
-- Select JDK 11, it should be somewhere around `/usr/lib/jvm/java-11-openjdk` depending on your current system
+- Select JDK 17, it should be somewhere around `/usr/lib/jvm/java-17-openjdk` depending on your current system
 
 Now Idea should import the projects, it could take some time, you can make it faster by following [this](#slow-intellij-idea-fix).
 

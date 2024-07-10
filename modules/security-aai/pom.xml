@@ -13,7 +13,6 @@
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
-    <java.release>8</java.release>
   </properties>
   <dependencies>
     <dependency>
