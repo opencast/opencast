@@ -17,7 +17,7 @@ on:
       - 'docs/log4j/**'
       - 'assemblies/**'
       - '.github/**'
-    branches-ignore:    
+    branches-ignore:
       - 'dependabot/**'  # Don't run dependabot branches, as they are already covered by pull requests
 
 jobs:
@@ -81,7 +81,7 @@ jobs:
         if: matrix.java == 11
         working-directory: assemblies
         run: |
-          mvn clean install -Pallinone  \
+          mvn clean install \
             --batch-mode \
             -Dsurefire.rerunFailingTestsCount=2 \
             -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
@@ -89,39 +89,63 @@ jobs:
             -Dmaven.wagon.http.pool=false \
             -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
 
-      - name: prepare allinone distribution
+      - name: prepare cluster
         if: matrix.java == 11
-        working-directory: build
         run: |
-          tar xf opencast-dist-allinone*.tar.gz
+          ./.github/multi-node-test-setup
 
       - name: verify jar file integrity
         if: matrix.java == 11
         run: |
           .github/test-jars
 
-      - name: prepare runtime dependencies
-        if: matrix.java == 11
-        working-directory: docs/scripts/devel-dependency-containers
-        run: |
-          docker-compose up -d
-
-      - name: wait for elasticsearch to boot
+      - name: wait for opensearch to boot
         if: matrix.java == 11
         run: >
           curl -fisS --retry 60 --retry-delay 1 --retry-all-errors
           http://localhost:9200/
 
-      - name: integration test
+      - name: start admin
         if: matrix.java == 11
-        run: |
-          ./build/opencast-dist-allinone/bin/start-opencast daemon &
-          curl -fisS --retry 30 --retry-delay 10 --retry-all-errors -u admin:opencast http://localhost:8080/sysinfo/bundles/version
-          ./build/opencast-dist-allinone/bin/stop-opencast
+        run: ./build/opencast-dist-admin/bin/start-opencast daemon &
 
-      - name: show logs on failure
-        if: ${{ failure() }}
-        run: cat build/opencast-dist-allinone/data/log/opencast.log || true
+      - name: start presentation
+        if: matrix.java == 11
+        run: ./build/opencast-dist-presentation/bin/start-opencast daemon &
+
+      - name: start worker
+        if: matrix.java == 11
+        run: ./build/opencast-dist-worker/bin/start-opencast daemon &
+
+      - name: test admin
+        if: matrix.java == 11
+        run: >
+          curl -fisS --retry 30 --retry-delay 10 --retry-all-errors -u admin:opencast
+          http://localhost:8080/sysinfo/bundles/version
+
+      - name: test presentation
+        if: matrix.java == 11
+        run: >
+          curl -fisS --retry 30 --retry-delay 10 --retry-all-errors -u admin:opencast
+          http://localhost:8081/sysinfo/bundles/version
+
+      - name: test worker
+        if: matrix.java == 11
+        run: >
+          curl -fisS --retry 30 --retry-delay 10 --retry-all-errors -u admin:opencast
+          http://localhost:8082/sysinfo/bundles/version
+
+      - name: show admin logs
+        if: always()
+        run: cat build/opencast-dist-admin/data/log/opencast.log || true
+
+      - name: show presentation logs
+        if: always()
+        run: cat build/opencast-dist-presentation/data/log/opencast.log || true
+
+      - name: show worker logs
+        if: always()
+        run: cat build/opencast-dist-worker/data/log/opencast.log || true
 
       - name: save version
         working-directory: build
@@ -162,11 +186,10 @@ jobs:
         run: |
           s3cmd put -P *.commit opencast-dist-allinone*tar.gz s3://opencast-daily/
 
-      - name: clearing existing data
+      - name: prepare allinone for upload
         if: matrix.java == 11
         working-directory: build
         run: |
-          rm -rf opencast-dist-allinone
           tar xf opencast-dist-allinone*.tar.gz
 
       - name: upload tarball as workflow asset
