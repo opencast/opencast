@@ -21,13 +21,13 @@
 
 package org.opencastproject.authorization.xacml.manager.impl;
 
-import org.opencastproject.authorization.xacml.XACMLParsingException;
-import org.opencastproject.authorization.xacml.XACMLUtils;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceException;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.AccessControlParser;
+import org.opencastproject.security.api.AccessControlParsingException;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
@@ -45,7 +45,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
@@ -81,7 +80,7 @@ public class AclScanner implements ArtifactInstaller {
    * A map linking the Acl file name concatenate with the organization id {@code filename_organizationId} to the related
    * managed Acl Id
    */
-  private Map<String, Long> managedAcls = new HashMap<String, Long>();
+  private final Map<String, Long> managedAcls = new HashMap<>();
 
   /**
    * OSGI service activation method
@@ -124,7 +123,7 @@ public class AclScanner implements ArtifactInstaller {
    */
   @Override
   public boolean canHandle(File artifact) {
-    return ACL_DIRECTORY.equals(artifact.getParentFile().getName()) && artifact.getName().endsWith(".xml");
+    return ACL_DIRECTORY.equals(artifact.getParentFile().getName()) && artifact.getName().endsWith(".json");
   }
 
   /**
@@ -133,9 +132,9 @@ public class AclScanner implements ArtifactInstaller {
    * @param artifact
    *          The File representing the XACML File.
    * @throws IOException
-   * @throws JAXBException
+   * @throws AccessControlParsingException
    */
-  private void addAcl(File artifact) throws IOException, XACMLParsingException {
+  private void addAcl(File artifact) throws IOException, AccessControlParsingException {
     List<Organization> organizations = organizationDirectoryService.getOrganizations();
 
     logger.debug("Adding Acl {}", artifact.getAbsolutePath());
@@ -176,9 +175,9 @@ public class AclScanner implements ArtifactInstaller {
    * @param artifact
    *          The File representing the XACML File.
    * @throws IOException
-   * @throws JAXBException
+   * @throws AccessControlParser
    */
-  private void updateAcl(File artifact) throws IOException, XACMLParsingException {
+  private void updateAcl(File artifact) throws IOException, AccessControlParsingException {
     List<Organization> organizations = organizationDirectoryService.getOrganizations();
 
     logger.debug("Updating Acl {}", artifact.getAbsolutePath());
@@ -251,16 +250,17 @@ public class AclScanner implements ArtifactInstaller {
   }
 
   /**
-   * Parse the given XACML file into an Access Control List
+   * Parse the given ACL JSON file into an Access Control List
    *
-   * @param artifact
-   * @return
-   * @throws FileNotFoundException
-   * @throws JAXBException
+   * @param artifact JSON file
+   * @return Parsed access control list
+   * @throws IOException Error accessing the ACL file
+   * @throws AccessControlParsingException Error parsing the ACL files
    */
-  private AccessControlList parseToAcl(File artifact) throws IOException, XACMLParsingException {
+  private AccessControlList parseToAcl(File artifact)
+          throws IOException, AccessControlParsingException {
     try (FileInputStream in = new FileInputStream(artifact)) {
-      return XACMLUtils.parseXacml(in);
+      return AccessControlParser.parseAcl(in);
     }
   }
 

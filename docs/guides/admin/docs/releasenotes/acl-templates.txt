@@ -1,0 +1,1 @@
+ACL templates in `etc/acl/` must now be provided in JSON format. XACML files are no longer accepted.
