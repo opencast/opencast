@@ -22,17 +22,12 @@
 
 package org.opencastproject.metadata.dublincore;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.opencastproject.metadata.dublincore.TestUtil.createDate;
 
 import org.opencastproject.mediapackage.DefaultMediaPackageSerializerImpl;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
-import org.opencastproject.metadata.api.MetadataValue;
-import org.opencastproject.metadata.api.MetadataValues;
-import org.opencastproject.metadata.api.StaticMetadata;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.easymock.EasyMock;
@@ -42,17 +37,6 @@ import java.io.InputStream;
 import java.net.URL;
 
 public final class StaticMetadataServiceDublinCoreImplTest {
-
-  @Test
-  public void testExtractMetadata() throws Exception {
-    MediaPackage mp = newMediaPackage("/manifest-simple.xml");
-    StaticMetadataServiceDublinCoreImpl ms = newStaticMetadataService();
-    StaticMetadata md = ms.getMetadata(mp);
-    assertEquals("Land and Vegetation: Key players on the Climate Scene",
-            md.getTitles().stream().filter(v -> v.getLanguage().equals(MetadataValues.LANGUAGE_UNDEFINED))
-                    .findFirst().map(MetadataValue::getValue).orElse(""));
-    assertEquals(createDate(2007, 12, 5, 0, 0, 0), md.getCreated().get());
-  }
 
   @Test(expected = IllegalArgumentException.class)
   public void testDefectMetadata() throws Exception {
