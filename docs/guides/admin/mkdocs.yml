@@ -129,7 +129,6 @@ nav:
    - Plugin Management: configuration/plugin-management.md
    - Search Index:
         - Overview: 'configuration/searchindex/index.md'
-        - Solr: 'configuration/searchindex/solr.md'
         - Elasticsearch: 'configuration/searchindex/elasticsearch.md'
    - Serving Static Files: 'configuration/serving-static-files.md'
    - Stream Security:
