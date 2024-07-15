@@ -1982,6 +1982,11 @@
        "HOSTNAME": {
          "LABEL": "Host name"
        },
+       "IS_PUBLISHED": {
+         "LABEL": "Event is published",
+         "YES": "Yes",
+         "NO": "No"
+       },
        "LANGUAGE": {
          "LABEL": "Language"
        },
