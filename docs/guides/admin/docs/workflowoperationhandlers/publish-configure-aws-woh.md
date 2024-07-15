@@ -89,7 +89,7 @@ Publish to internal channel:
     id="publish-configure-aws"
     description="Publish to internal channel using AWS S3">
   <configurations>
-    <configuration key="source-tags">engage,atom,rss</configuration>
+    <configuration key="source-tags">engage</configuration>
     <configuration key="channel-id">internal</configuration>
     <configuration key="url-pattern">http://localhost:8080/admin-ng/index.html#/events/events/${event_id}/tools/playback</configuration>
   </configurations>

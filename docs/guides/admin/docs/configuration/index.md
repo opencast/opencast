@@ -58,7 +58,6 @@ A list of everything.
 - Amazon Services
     - [Amazon S3 Archive Storage](awss3archive.md)
     - [Amazon S3 Distribution](awss3distribution.md)
-- [Atom/RSS Feed](atomrss.md)
 - [Authentication, Authorizations, and User Management](security.md)
     - [CAS Security Configuration](security.cas.md)
     - [LDAP Authentication and Authorization (without CAS)](security.ldap.md)

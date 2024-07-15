@@ -54,12 +54,12 @@ Each source selector can have its own set of target tags and flavors, defined as
 For example:
 
 ```xml
-<configuration key="target-tags">engage-streaming,rss,atom;engage-download,rss,atom</configuration>
+<configuration key="target-tags">engage-streaming,example;engage-download,example</configuration>
 ```
 
 > Using the example above.
-> "presenter/preview" is tagged with "engage-streaming,rss,atom".
-> "presentation/preview" is tagged with "engage-download,rss,atom".
+> "presenter/preview" is tagged with "engage-streaming,example".
+> "presentation/preview" is tagged with "engage-download,example".
 
 When a configuration has the same number of sections as the source, then the configurations for the operation
 are taken from the corresponding sections.
@@ -69,7 +69,7 @@ Each section runs independently as a parallel encoding job.
 For example, if presenter/source is to encoded with "mp4-low.http,mp4-medium.http" and
 presentation/source is to be encoded with "mp4-hd.http,mp4-hd.http"
 
-The target flavors are presenter/delivery and presentation/delivery and all are tagged "rss, archive".
+The target flavors are presenter/delivery and presentation/delivery and all are tagged "engage-streaming, example".
 The target flavors are additionally tagged with encoding profiles, so that they can selected individually.
 
 This workflow supports HLS adaptive streaming.
@@ -105,7 +105,7 @@ Parameter Table
 |-------------------|-----------------------------|---------------------------------------------------------------------|
 |source-flavors     | presenter/source*;*presentation/source  | Which media should be encoded                               |
 |target-flavors     | \*/preview                | Specifies the flavor of the new media                               |
-|target-tags        | rss,archive              | Specifies the tags of the new media                                 |
+|target-tags        | archive              | Specifies the tags of the new media                                 |
 |encoding-profiles  | mp4-low.http,mp4-medium.http*;*mp4-hd.http,mp4-hd.http | Encoding profiles for each source flavor |
 |tag-with-profile   | true (default to false)  | target medium are tagged with corresponding encoding profile Id      |
 
@@ -119,7 +119,7 @@ Parameter Table
   <configurations>
     <configuration key="source-flavors">presenter/work;presentation/work</configuration>
     <configuration key="target-flavors">*/delivery</configuration>
-    <configuration key="target-tags">rss,archive</configuration>
+    <configuration key="target-tags">archive</configuration>
     <configuration key="encoding-profiles">
         hls-full-res-presenter-mp4,
         hls-half-res-presenter-mp4,
