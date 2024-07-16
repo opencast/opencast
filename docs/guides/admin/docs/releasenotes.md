@@ -1,5 +1,11 @@
 # Opencast 15: Release Notes
 
+## Opencast 15.7
+
+Opencast 15.7 release includes bug fixes and improvements.
+
+See [changelog](changelog.md#opencast-157) for a comprehensive list of changes.
+
 ## Opencast 15.6
 
 ### Behavior changes
