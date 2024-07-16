@@ -8,6 +8,7 @@ please refer to [older release notes](https://docs.opencast.org).
 1. Stop your current Opencast instance
 1. Replace Opencast with the new version
 1. [Migrate Solr to OpenSearch/Elasticsearch](#search-service-migration)
+1. Review the [configuration changes](#configuration-changes) and adjust your configuration accordingly
 1. [API changes](#api-changes)
 1. Start Opencast
 
@@ -29,6 +30,11 @@ to rebuild and you don't need to rebuild all indexes. To start this process:
 - Set `Search` as service and submit
 - The logs should show the status of the index rebuild
 
+## Configuration changes
+
+For the new admin-UI to work for non-admin users, access has to be granted for the assets directory in
+`etc/security/mh_default_org.xml`. Make sure the changes from [#5937](https://github.com/opencast/opencast/pull/5937/files)
+are applied to your local config file.
 
 ## API Changes
 
