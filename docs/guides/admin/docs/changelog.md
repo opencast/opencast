@@ -6,6 +6,10 @@ Opencast 15
 
 ### Opencast 15.7
 
+- [[#6022](https://github.com/opencast/opencast/pull/6022)] -
+  Update admin interface to 2024-07-12
+- [[#6021](https://github.com/opencast/opencast/pull/6021)] -
+  Update Editor to 2024-07-12
 - [[#6004](https://github.com/opencast/opencast/pull/6004)] -
   First steps towards java 21
 - [[#6003](https://github.com/opencast/opencast/pull/6003)] -

@@ -2,7 +2,13 @@
 
 ## Opencast 15.7
 
-Opencast 15.7 release includes bug fixes and improvements.
+Opencast 15.7 release includes various smaller bug fixes and improvements.
+
+Especially the admin interface (aka new admin ui) has received a lot of attention.
+To check all the changes look at these three releases:
+  [[2024-07-12](https://github.com/opencast/opencast-admin-interface/releases/tag/2024-07-12)],
+  [[2024-07-02](https://github.com/opencast/opencast-admin-interface/releases/tag/2024-07-02)] and
+  [[2024-06-12](https://github.com/opencast/opencast-admin-interface/releases/tag/2024-06-12)].
 
 See [changelog](changelog.md#opencast-157) for a comprehensive list of changes.
 
