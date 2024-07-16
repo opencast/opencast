@@ -4,6 +4,33 @@ Changelog
 Opencast 15
 -----------
 
+### Opencast 15.7
+
+- [[#6004](https://github.com/opencast/opencast/pull/6004)] -
+  First steps towards java 21
+- [[#6003](https://github.com/opencast/opencast/pull/6003)] -
+  Update maven and maven wrapper
+- [[#5996](https://github.com/opencast/opencast/pull/5996)] -
+  State mapping for fast workflow
+- [[#5994](https://github.com/opencast/opencast/pull/5994)] -
+  Fix sporadic port binding errors in tests
+- [[#5970](https://github.com/opencast/opencast/pull/5970)] -
+  Display state mappings in the status column again
+- [[#5956](https://github.com/opencast/opencast/pull/5956)] -
+  Fix publication icon paths for new admin ui
+- [[#5950](https://github.com/opencast/opencast/pull/5950)] -
+  Fix incorrect language parameter for Whisper
+- [[#5938](https://github.com/opencast/opencast/pull/5938)] -
+  Update documentation for enabling LMS user providers
+- [[#5933](https://github.com/opencast/opencast/pull/5933)] -
+  Update Studio to 2024-06-12
+- [[#5932](https://github.com/opencast/opencast/pull/5932)] -
+  Fix link in editor config file
+- [[#5931](https://github.com/opencast/opencast/pull/5931)] -
+  Add note about editor releases to release notes
+- [[#5864](https://github.com/opencast/opencast/pull/5864)] -
+  Update HTTPS migration guide to be more general & use standard SQL
+
 ### Opencast 15.6
 
 - [[#5922](https://github.com/opencast/opencast/pull/5922)] -
