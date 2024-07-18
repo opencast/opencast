@@ -54,6 +54,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -99,7 +100,7 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider, C
   protected Object nullToken = new Object();
 
   /** The URL of the Studip instance */
-  private String studipUrl = null;
+  private URI studipUrl;
 
   /** The URL of the Studip instance */
   private String studipToken = null;
@@ -123,7 +124,7 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider, C
   public StudipUserProviderInstance(
       String pid,
       Organization organization,
-      String url,
+      URI url,
       String token,
 
       int cacheSize,
@@ -298,11 +299,14 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider, C
    */
   private JSONObject getStudipUser(String uid) throws URISyntaxException, IOException, ParseException {
     // Build URL
-    URIBuilder url = new URIBuilder(studipUrl + "opencast/user/" + uid);
-    url.addParameter("token", studipToken);
+    var apiPath = new URIBuilder().setPathSegments("opencast", "user", uid).getPath();
+    var url = new URIBuilder(studipUrl)
+        .setPath(studipUrl.getPath().replaceAll("/*$", "") + apiPath)
+        .addParameter("token", studipToken)
+        .build();
 
     // Execute request
-    HttpGet get = new HttpGet(url.build());
+    HttpGet get = new HttpGet(url);
     get.setHeader("User-Agent", OC_USERAGENT);
 
     try (CloseableHttpClient client = HttpClients.createDefault()) {
