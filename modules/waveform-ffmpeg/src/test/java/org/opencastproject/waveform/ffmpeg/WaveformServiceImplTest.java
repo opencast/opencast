@@ -94,6 +94,7 @@ public class WaveformServiceImplTest {
     properties.put(WaveformServiceImpl.WAVEFORM_COLOR_CONFIG_KEY, "blue green 0x2A2A2A 323232CC");
     properties.put(WaveformServiceImpl.WAVEFORM_SPLIT_CHANNELS_CONFIG_KEY, "false");
     properties.put(WaveformServiceImpl.WAVEFORM_SCALE_CONFIG_KEY, "lin");
+    properties.put(WaveformServiceImpl.WAVEFORM_FILTER_MODE_CONFIG_KEY, "peak");
 
     ServiceRegistry serviceRegistry = EasyMock.createNiceMock(ServiceRegistry.class);
     EasyMock.expect(serviceRegistry.getHostRegistrations()).andReturn(new ArrayList());
