@@ -50,7 +50,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.Hashtable;
-import java.util.List;
+import java.util.Objects;
 
 /**
  * Test class for WaveformServiceImpl.
@@ -62,7 +62,7 @@ public class WaveformServiceImplTest {
   @BeforeClass
   public static void setUpClass() throws Exception {
     audioTrack = readTrackFromResource("/audio-track.xml");
-    audioTrack.setURI(WaveformServiceImplTest.class.getResource("/test.mp3").toURI());
+    audioTrack.setURI(Objects.requireNonNull(WaveformServiceImplTest.class.getResource("/test.mp3")).toURI());
     dummyTrack = readTrackFromResource("/dummy-track.xml");
   }
 
@@ -70,7 +70,7 @@ public class WaveformServiceImplTest {
     BufferedReader reader = null;
     try {
       reader = new BufferedReader(new InputStreamReader(
-              WaveformServiceImplTest.class.getResourceAsStream(resourceName)));
+          Objects.requireNonNull(WaveformServiceImplTest.class.getResourceAsStream(resourceName))));
       String line = reader.readLine();
       StringBuilder trackBuilder = new StringBuilder();
       while (line != null) {
@@ -97,7 +97,7 @@ public class WaveformServiceImplTest {
     properties.put(WaveformServiceImpl.WAVEFORM_FILTER_MODE_CONFIG_KEY, "peak");
 
     ServiceRegistry serviceRegistry = EasyMock.createNiceMock(ServiceRegistry.class);
-    EasyMock.expect(serviceRegistry.getHostRegistrations()).andReturn(new ArrayList());
+    EasyMock.expect(serviceRegistry.getHostRegistrations()).andReturn(new ArrayList<>());
     EasyMock.replay(serviceRegistry);
 
     WaveformServiceImpl instance = new WaveformServiceImpl();
@@ -120,7 +120,7 @@ public class WaveformServiceImplTest {
     EasyMock.expect(serviceRegistry.createJob(
             EasyMock.eq(WaveformServiceImpl.JOB_TYPE),
             EasyMock.eq(WaveformServiceImpl.Operation.Waveform.toString()),
-            (List<String>) EasyMock.anyObject(), EasyMock.anyFloat()))
+            EasyMock.anyObject(), EasyMock.anyFloat()))
             .andReturn(expectedJob);
     EasyMock.replay(serviceRegistry);
 
