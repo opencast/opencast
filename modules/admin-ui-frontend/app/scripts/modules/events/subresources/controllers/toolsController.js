@@ -178,7 +178,8 @@ angular.module('adminNg.controllers')
           return true;
         }
       }
-      return false;
+      // If we don't have any tracks at all, selecting none is valid
+      return $scope.video.source_tracks.length === 0;
     };
 
     $scope.trackClicked = function(index, type) {
