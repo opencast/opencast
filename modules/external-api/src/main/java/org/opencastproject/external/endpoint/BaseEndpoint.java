@@ -76,7 +76,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0,
             ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0,
             ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0,
-            ApiMediaType.VERSION_1_9_0, ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0})
+            ApiMediaType.VERSION_1_9_0, ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0,
+            ApiMediaType.VERSION_1_12_0})
 @RestService(name = "externalapiservice", title = "External API Service", notes = {},
              abstractText = "Provides a location for external apis to query the current server of the API.")
 @Tag(name = "External API", description = "The external service endpoint acts as a location for external apis to query the current server of the external supported API.")
@@ -264,6 +265,7 @@ public class BaseEndpoint {
     versions.add(ApiVersion.VERSION_1_9_0.toString());
     versions.add(ApiVersion.VERSION_1_10_0.toString());
     versions.add(ApiVersion.VERSION_1_11_0.toString());
+    versions.add(ApiVersion.VERSION_1_12_0.toString());
     JsonObject json = new JsonObject();
     json.add("versions", collectionToJsonArray(versions));
     json.addProperty("default", ApiVersion.CURRENT_VERSION.toString());

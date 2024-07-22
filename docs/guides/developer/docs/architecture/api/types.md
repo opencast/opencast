@@ -507,3 +507,9 @@ An entry for a playlist as a JSON object. There are different kinds of entries:
 | `id`        | [`long`](types.md#basic)   | Identifier. Will be created if not set.                                                                                                                               |
 | `contentId` | [`string`](types.md#basic) | Identifier for the content of the entry. What the "content" is is defined by `type`.                                                                                  |
 | `type`      | [`string`](types.md#basic) | Enumeration, current possible values are EVENT, INACCESSIBLE. Typically EVENT, set to INACCESSIBLE by Opencast if the requesting user lacks permissions on the event. |
+
+## LifeCycle Management
+
+### LifeCycle Policy
+
+TODO: Actually write this

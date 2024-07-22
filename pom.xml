@@ -155,6 +155,8 @@
     <module>modules/inspection-service-remote</module>
     <module>modules/inspection-workflowoperation</module>
     <module>modules/kernel</module>
+    <module>modules/lifecycle-management-api</module>
+    <module>modules/lifecycle-management-impl</module>
     <module>modules/list-providers-service</module>
     <module>modules/live-schedule-api</module>
     <module>modules/live-schedule-impl</module>
