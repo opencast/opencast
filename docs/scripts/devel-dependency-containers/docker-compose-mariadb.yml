@@ -16,7 +16,7 @@ services:
       - "discovery.type=single-node" # disables bootstrap checks that are enabled when network.host is set to a non-loopback address
   mariadb:
     container_name: opencast-mariadb
-    image: docker.io/library/mariadb:10.5.9
+    image: docker.io/library/mariadb:10
     ports:
       - 127.0.0.1:3306:3306
     environment:
