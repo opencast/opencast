@@ -1056,9 +1056,8 @@ public class IndexServiceImpl implements IndexService {
     MetadataField presentersMetadataField = eventMetadata.getOutputFields()
             .get(DublinCore.PROPERTY_CREATOR.getLocalName());
     if (presentersMetadataField.isUpdated()) {
-      Set<String> presenterUsernames = new HashSet<>();
       Tuple<List<String>, Set<String>> updatedPresenters = getTechnicalPresenters(eventMetadata);
-      presenterUsernames = updatedPresenters.getB();
+      Set<String> presenterUsernames = updatedPresenters.getB();
       eventMetadata.removeField(presentersMetadataField);
       MetadataField newPresentersMetadataField = new MetadataField(presentersMetadataField);
       newPresentersMetadataField.setValue(updatedPresenters.getA());
@@ -1329,11 +1328,6 @@ public class IndexServiceImpl implements IndexService {
 
     Event event = optEvent.get();
     MediaPackage mediaPackage = getEventMediapackage(event);
-    Opt<Set<String>> presenters = Opt.none();
-    DublinCoreMetadataCollection eventCatalog = metadataList.getMetadataByAdapter(getCommonEventCatalogUIAdapter());
-    if (eventCatalog != null) {
-      presenters = updatePresenters(eventCatalog);
-    }
     updateMediaPackageMetadata(mediaPackage, metadataList);
     switch (getEventSource(event)) {
       case WORKFLOW:
@@ -1355,6 +1349,8 @@ public class IndexServiceImpl implements IndexService {
         assetManager.takeSnapshot(mediaPackage);
         break;
       case SCHEDULE:
+        DublinCoreMetadataCollection eventCatalog = metadataList.getMetadataByAdapter(getCommonEventCatalogUIAdapter());
+        Opt<Set<String>> presenters = eventCatalog == null ? Opt.none() : updatePresenters(eventCatalog);
         try {
           schedulerService.updateEvent(id, Opt.none(), Opt.none(), Opt.none(), presenters, Opt.some(mediaPackage),
               Opt.none(), Opt.none());
