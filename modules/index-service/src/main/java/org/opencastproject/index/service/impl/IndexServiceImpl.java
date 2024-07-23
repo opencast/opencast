@@ -24,6 +24,7 @@ package org.opencastproject.index.service.impl;
 import static org.opencastproject.assetmanager.api.AssetManager.DEFAULT_OWNER;
 import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_IDENTIFIER;
+import static org.opencastproject.publication.api.EngagePublicationService.PUBLISH_STRATEGY_MERGE;
 import static org.opencastproject.security.api.DefaultOrganization.DEFAULT_ORGANIZATION_ID;
 import static org.opencastproject.workflow.api.ConfiguredWorkflow.workflow;
 
@@ -90,6 +91,8 @@ import org.opencastproject.metadata.dublincore.MetadataJson;
 import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.metadata.dublincore.Precision;
 import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
+import org.opencastproject.publication.api.EngagePublicationService;
+import org.opencastproject.publication.api.PublicationException;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.AccessControlList;
@@ -160,6 +163,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -201,6 +205,18 @@ public class IndexServiceImpl implements IndexService {
   /** A parser for handling JSON documents inside the body of a request. **/
   private static final JSONParser parser = new JSONParser();
 
+  private boolean autoRepublish;
+  private String downloadSourceFlavors;
+  private String downloadSourceTags;
+  private String downloadTargetSubflavor;
+  private String downloadTargetTags;
+  private String streamingSourceFlavors;
+  private String streamingSourceTags;
+  private String streamingTargetSubflavor;
+  private String streamingTargetTags;
+  private String mergeForceFlavors;
+  private String addForceFlavors;
+
   private String attachmentRegex = "^attachment.*";
   private String catalogRegex = "^catalog.*";
   private String trackRegex = "^track.*";
@@ -225,6 +241,9 @@ public class IndexServiceImpl implements IndexService {
   private WorkflowService workflowService;
   private Workspace workspace;
   private ElasticsearchIndex elasticsearchIndex;
+  private EngagePublicationService engagePublicationService;
+  private EngagePublicationService downloadEngagePublicationService;
+  private EngagePublicationService awsS3EngagePublicationService;
 
   /** The single thread executor service */
   private ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -245,6 +264,16 @@ public class IndexServiceImpl implements IndexService {
   @Reference
   public void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
     this.elasticsearchIndex = elasticsearchIndex;
+  }
+
+  @Reference(target = "(distribution.channel=download)")
+  public void setEngagePublicationService(EngagePublicationService engagePublicationService) {
+    this.downloadEngagePublicationService = engagePublicationService;
+  }
+
+  @Reference(target = "(distribution.channel=aws.s3)")
+  public void setAWSS3EngagePublicationService(EngagePublicationService engagePublicationService) {
+    this.awsS3EngagePublicationService = engagePublicationService;
   }
 
   /**
@@ -516,6 +545,35 @@ public class IndexServiceImpl implements IndexService {
   @Activate
   public void activate(ComponentContext cc) {
     workflowService.addWorkflowListener(new RetractionListener(this, securityService, retractions));
+
+    // Read auto-republish configuration
+    Dictionary<String, Object> properties = cc.getProperties();
+    autoRepublish = Boolean.parseBoolean((String) properties.get("autorepublish.engage.enabled"));
+    if (autoRepublish) {
+      String distributionChannel = StringUtils.defaultString(
+          StringUtils.trimToNull((String) properties.get("autorepublish.engage.distribution.channel")), "download");
+      switch (distributionChannel) {
+        case "download":
+          engagePublicationService = downloadEngagePublicationService;
+          break;
+        case "aws.s3":
+          engagePublicationService = awsS3EngagePublicationService;
+          break;
+        default:
+          throw new IllegalStateException("invalid distribution channel");
+      }
+
+      downloadSourceFlavors = (String) properties.get("autorepublish.engage.download.source.flavors");
+      downloadSourceTags = (String) properties.get("autorepublish.engage.download.source.tags");
+      downloadTargetSubflavor = (String) properties.get("autorepublish.engage.download.target.subflavor");
+      downloadTargetTags = (String) properties.get("autorepublish.engage.download.target.tags");
+      streamingSourceFlavors = (String) properties.get("autorepublish.engage.streaming.source.flavors");
+      streamingSourceTags = (String) properties.get("autorepublish.engage.streaming.source.tags");
+      streamingTargetSubflavor = (String) properties.get("autorepublish.engage.streaming.target.subflavor");
+      streamingTargetTags = (String) properties.get("autorepublish.engage.streaming.target.tags");
+      mergeForceFlavors = (String) properties.get("autorepublish.engage.merge.force.flavors");
+      addForceFlavors = (String) properties.get("autorepublish.engage.add.force.flavors");
+    }
   }
 
   @Deactivate
@@ -1352,6 +1410,12 @@ public class IndexServiceImpl implements IndexService {
         }
         break;
       case ARCHIVE:
+        try {
+          updateEngagePublication(mediaPackage);
+        } catch (PublicationException e) {
+          throw new IndexServiceException("Unable to update asset manager event " + id + " with metadata "
+              + RestUtils.getJsonStringSilent(MetadataJson.listToJson(metadataList, true)), e);
+        }
         assetManager.takeSnapshot(mediaPackage);
         break;
       case SCHEDULE:
@@ -1413,7 +1477,8 @@ public class IndexServiceImpl implements IndexService {
       case ARCHIVE:
         try {
           mediaPackage = authorizationService.setAcl(mediaPackage, AclScope.Episode, acl).getA();
-        } catch (MediaPackageException e) {
+          updateEngagePublication(mediaPackage);
+        } catch (MediaPackageException | PublicationException e) {
           throw new IndexServiceException("Unable to update  acl", e);
         }
         assetManager.takeSnapshot(mediaPackage);
@@ -2079,4 +2144,13 @@ public class IndexServiceImpl implements IndexService {
             || WorkflowState.PAUSED.toString().equals(workflowState);
   }
 
+  private void updateEngagePublication(MediaPackage mediaPackage) throws PublicationException {
+    if (!autoRepublish) {
+      return;
+    }
+
+  engagePublicationService.publishSync(mediaPackage, null, PUBLISH_STRATEGY_MERGE,
+        downloadSourceFlavors, downloadSourceTags, downloadTargetSubflavor, downloadTargetTags, streamingSourceFlavors,
+        streamingSourceTags, streamingTargetSubflavor, streamingTargetTags, mergeForceFlavors, addForceFlavors);
+  }
 }
