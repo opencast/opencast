@@ -19,7 +19,7 @@ Parameter Table
 |check-availability         |Check if the media is reachable                                                              |
 |download-source-flavors    |Distribute any mediapackage elements with one of these (comma separated) flavors to download |
 |download-source-tags       |Distribute any mediapackage elements with one of these (comma separated) tags to download    |
-|download-target-subflavors |Subflavor to use for distributed material                                                    |
+|download-target-subflavor  |Subflavor to use for distributed material                                                    |
 |download-target-tags       |Add tags (comma separated) to published media                                                |
 |strategy                   |If there is no key, published media would be retracted before publishing                     |
 |                           |`<configuration key="strategy">merge</configuration>`                                        |
@@ -27,7 +27,7 @@ Parameter Table
 |streaming-source-flavors   |Specifies which media should be published to the streaming server                            |
 |streaming-source-tags      |Specifies which media should be published to the streaming server                            |
 |streaming-target-tags      |Add tags (comma separated) to published media                                                |
-|streaming-target-subflavors|Subflavor to use for distributed material                                                    |
+|streaming-target-subflavor |Subflavor to use for distributed material                                                    |
 |merge-force-flavors        |Flavors of elements for which an update is enforced when merging catalogs.                   |
 |                           |Defaults to `dublincore/*,security/*`.                                                       |
 |add-force-flavors          |Works only if strategy 'merge' is used.                                                      |
