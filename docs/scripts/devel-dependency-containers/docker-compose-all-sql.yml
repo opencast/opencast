@@ -16,7 +16,7 @@ services:
       - "discovery.type=single-node" # disables bootstrap checks that are enabled when network.host is set to a non-loopback address
   postgresql:
     container_name: opencast-postgresql
-    image: docker.io/library/postgres:13.2
+    image: docker.io/library/postgres:13
     ports:
       - 127.0.0.1:5432:5432
     environment:
@@ -25,7 +25,7 @@ services:
       POSTGRES_DB: opencast
   mariadb:
     container_name: opencast-mariadb
-    image: docker.io/library/mariadb:10.5.9
+    image: docker.io/library/mariadb:10
     ports:
       - 127.0.0.1:3306:3306
     environment:
