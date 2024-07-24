@@ -35,7 +35,7 @@ to rebuild and you don't need to rebuild all indexes. To start this process:
 Check for changes in configuration files and apply those to your local copies. You can use the following command
 to list all changes:
 ```
-git diff origin/r/15.x origin/r/16.x -- etc/
+git diff origin/r/{{ opencast_major_version() | int - 1 }}.x origin/r/{{ opencast_major_version() }}.x -- etc/
 ```
 
 Please make sure to apply at least the following changes since they are crucial for a stable setup:
