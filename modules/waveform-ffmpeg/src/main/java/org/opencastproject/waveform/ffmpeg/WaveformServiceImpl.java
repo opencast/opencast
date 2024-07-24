@@ -117,7 +117,7 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
   /** The key to look for in the service configuration file to override the DEFAULT_WAVEFORM_COLOR */
   public static final String WAVEFORM_COLOR_CONFIG_KEY = "waveform.color";
 
-  public static final String DEFAULT_WAVEFORM_FILTER_MODE = "average";
+  public static final String DEFAULT_WAVEFORM_FILTER_MODE = "peak";
 
   public static final String WAVEFORM_FILTER_MODE_CONFIG_KEY = "waveform.filter-mode";
 
