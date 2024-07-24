@@ -130,7 +130,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -242,7 +241,6 @@ public class SeriesEndpoint {
     return aclServiceFactory.serviceFor(securityService.getOrganization());
   }
 
-  private Map<String, TobiraService> tobiras = new HashMap<>();
 
   /** OSGi DI. */
   @Reference
@@ -287,7 +285,7 @@ public class SeriesEndpoint {
       if (!matches.matches()) {
         return;
       }
-      var tobira = getTobira(matches.group("organization"));
+      var tobira = TobiraService.getTobira(matches.group("organization"));
       switch (matches.group("key")) {
         case "origin":
           tobira.setOrigin((String) value);
@@ -534,12 +532,8 @@ public class SeriesEndpoint {
     return Response.ok(themesJson.toJSONString()).build();
   }
 
-  private TobiraService getTobira(String organization) {
-    return tobiras.computeIfAbsent(organization, org -> new TobiraService());
-  }
-
   private TobiraService getTobira() {
-    return getTobira(securityService.getOrganization().getId());
+    return TobiraService.getTobira(securityService.getOrganization().getId());
   }
 
   @GET

@@ -34,6 +34,7 @@ import java.net.URISyntaxException;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.util.HashMap;
 import java.util.Map;
 
 public final class TobiraService {
@@ -73,6 +74,23 @@ public final class TobiraService {
                     + "}",
             Map.of("seriesId", seriesId))
             .get("series");
+  }
+
+  public JSONObject getEventHostPages(String eventId) throws TobiraException {
+    return (JSONObject) request(
+            "query AdminUIHostPages($eventId: String!) {"
+                    + "  event: eventByOpencastId(id: $eventId) {"
+                    + "    ...on AuthorizedEvent {"
+                    + "      hostPages: hostRealms {"
+                    + "        title: name"
+                    + "        path"
+                    + "        ancestors { title: name }"
+                    + "      }"
+                    + "    }"
+                    + "  }"
+                    + "}",
+            Map.of("eventId", eventId)
+    ).get("event");
   }
 
   public void mount(Map<String, Object> variables) throws TobiraException {
@@ -151,4 +169,10 @@ public final class TobiraService {
           .build();
 
   private static final Logger logger = LoggerFactory.getLogger(TobiraService.class);
+
+  private static Map<String, TobiraService> tobiras = new HashMap<>();
+
+  public static TobiraService getTobira(String organization) {
+    return tobiras.computeIfAbsent(organization, org -> new TobiraService());
+  }
 }
