@@ -20,32 +20,27 @@
  */
 package org.opencastproject.lifecyclemanagement.api;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+public interface LifeCyclePolicyAccessControlEntry {
+  long getId();
 
-@Entity(name = "LifeCyclePolicyAccessControlEntry")
-@Table(name = "oc_playlist_access_control_entry")
-public class LifeCyclePolicyAccessControlEntry extends AccessControlEntry {
+  void setId(long id);
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "lifecyclepolicy_id", nullable = false)
-  private LifeCyclePolicy policy;
+  boolean isAllow();
 
-  /**
-   * Default constructor
-   */
-  public LifeCyclePolicyAccessControlEntry() {
+  void setAllow(boolean allow);
 
-  }
+  String getRole();
 
-  public LifeCyclePolicy getPolicy() {
-    return policy;
-  }
+  void setRole(String role);
 
-  public void setPolicy(LifeCyclePolicy policy) {
-    this.policy = policy;
-  }
+  String getAction();
+
+  void setAction(String action);
+
+  org.opencastproject.security.api.AccessControlEntry toAccessControlEntry();
+
+  void fromAccessControlEntry(org.opencastproject.security.api.AccessControlEntry accessControlEntry);
+  LifeCyclePolicy getPolicy();
+
+  void setPolicy(LifeCyclePolicy policy);
 }

@@ -29,6 +29,7 @@ import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.elasticsearch.index.objects.event.EventIndexSchema;
 import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
+import org.opencastproject.elasticsearch.index.objects.event.EventSearchQueryField;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.lifecyclemanagement.api.LifeCycleDatabaseException;
 import org.opencastproject.lifecyclemanagement.api.LifeCycleDatabaseService;
@@ -56,6 +57,9 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.LocalDateTime;
+import java.time.Period;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -106,12 +110,13 @@ public class LifeCycleServiceImpl implements LifeCycleService {
 
   @Activate
   public void activate(ComponentContext cc) throws Exception {
-//    logger.info(securityService.getUserIP());
-//    logger.info(securityService.getOrganization().toString());
-//    logger.info(securityService.getOrganization().getId());
     logger.info("Activating LifeCycle Management Service");
   }
 
+  /**
+   * {@inheritDoc}
+   * @see LifeCycleService#getLifeCyclePolicyById(String) 
+   */
   @Override
   public LifeCyclePolicy getLifeCyclePolicyById(String id)
           throws NotFoundException, IllegalStateException, UnauthorizedException {
@@ -126,6 +131,10 @@ public class LifeCycleServiceImpl implements LifeCycleService {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   * @see LifeCycleService#getLifeCyclePolicies(int, int, SortCriterion)
+   */
   @Override
   public List<LifeCyclePolicy> getLifeCyclePolicies(int limit, int offset, SortCriterion sortCriterion)
           throws IllegalStateException {
@@ -138,6 +147,10 @@ public class LifeCycleServiceImpl implements LifeCycleService {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   * @see LifeCycleService#getActiveLifeCyclePolicies
+   */
   @Override
   public List<LifeCyclePolicy> getActiveLifeCyclePolicies() throws IllegalStateException {
     try {
@@ -150,6 +163,10 @@ public class LifeCycleServiceImpl implements LifeCycleService {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   * @see LifeCycleService#createLifeCyclePolicy(LifeCyclePolicy)
+   */
   @Override
   public LifeCyclePolicy createLifeCyclePolicy(LifeCyclePolicy policy) throws UnauthorizedException {
     try {
@@ -160,6 +177,10 @@ public class LifeCycleServiceImpl implements LifeCycleService {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   * @see LifeCycleService#updateLifeCyclePolicy(LifeCyclePolicy)
+   */
   @Override
   public boolean updateLifeCyclePolicy(LifeCyclePolicy policy)
           throws IllegalStateException, UnauthorizedException, IllegalArgumentException {
@@ -183,6 +204,10 @@ public class LifeCycleServiceImpl implements LifeCycleService {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   * @see LifeCycleService#deleteLifeCyclePolicy(String)
+   */
   @Override
   public boolean deleteLifeCyclePolicy(String id)
           throws NotFoundException, IllegalStateException, UnauthorizedException {
@@ -197,6 +222,10 @@ public class LifeCycleServiceImpl implements LifeCycleService {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   * @see LifeCycleService#getLifeCycleTaskById(String)
+   */
   @Override
   public LifeCycleTask getLifeCycleTaskById(String id)
           throws NotFoundException, IllegalStateException, UnauthorizedException {
@@ -211,6 +240,10 @@ public class LifeCycleServiceImpl implements LifeCycleService {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   * @see LifeCycleService#getLifeCycleTaskByTargetId(String)
+   */
   @Override
   public LifeCycleTask getLifeCycleTaskByTargetId(String targetId)
           throws NotFoundException, IllegalStateException, UnauthorizedException {
@@ -225,6 +258,10 @@ public class LifeCycleServiceImpl implements LifeCycleService {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   * @see LifeCycleService#getLifeCycleTasksWithStatus(Status) 
+   */
   @Override
   public List<LifeCycleTask> getLifeCycleTasksWithStatus(Status status) throws IllegalStateException {
     try {
@@ -239,6 +276,10 @@ public class LifeCycleServiceImpl implements LifeCycleService {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   * @see LifeCycleService#createLifeCycleTask(LifeCycleTask) 
+   */
   @Override
   public LifeCycleTask createLifeCycleTask(LifeCycleTask task) throws UnauthorizedException {
     try {
@@ -249,6 +290,10 @@ public class LifeCycleServiceImpl implements LifeCycleService {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   * @see LifeCycleService#updateLifeCycleTask(LifeCycleTask)
+   */
   @Override
   public boolean updateLifeCycleTask(LifeCycleTask task)
           throws IllegalStateException, UnauthorizedException, IllegalArgumentException {
@@ -272,6 +317,10 @@ public class LifeCycleServiceImpl implements LifeCycleService {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   * @see LifeCycleService#deleteLifeCycleTask(String) 
+   */
   @Override
   public boolean deleteLifeCycleTask(String id)
           throws NotFoundException, IllegalStateException, UnauthorizedException {
@@ -286,16 +335,11 @@ public class LifeCycleServiceImpl implements LifeCycleService {
     }
   }
 
-  // TODO: Better filtering
-  //   Currently we can only query
-  //   - no extended metadata
-  //   - if a string is contained in the metadata field ("conference" in "DACH conference").
-  //     - This basically means wildcard search?, which is said to be not very performant.
-  //     - Could we use existing fuzzy search mechanisms?
-  //   - We also want to check the opposite (if it is NOT there).
-  //     - Could add "withNot{fieldName}" functions to EventSearchQuery, but that would be a lot of writing
-  //   - only event metadata, but we probably want series metadata as well
-  public List<Event> filterForEntities(Map<String, String> filters) throws SearchIndexException {
+  /**
+   * {@inheritDoc}
+   * @see LifeCycleService#filterForEvents(Map)
+   */
+  public List<Event> filterForEvents(Map<String, EventSearchQueryField<String>> filters) throws SearchIndexException {
     try {
       SearchResult<Event> results = null;
       List<Event> eventsList = new ArrayList<>();
@@ -322,33 +366,61 @@ public class LifeCycleServiceImpl implements LifeCycleService {
     }
   }
 
-  private void addFiltersToQuery(EventSearchQuery query, Map<String, String> filters) {
+  /**
+   * Add arguments to a query for the index
+   * @param query The query the arguments should be added to
+   * @param filters The arguments that should be added to the query
+   */
+  private void addFiltersToQuery(EventSearchQuery query, Map<String, EventSearchQueryField<String>> filters) {
     for (String name : filters.keySet()) {
       switch (name) {
-        case EventIndexSchema.UID -> query.withIdentifier(filters.get(name));
-        case EventIndexSchema.TITLE -> query.withTitle(filters.get(name));
-        case EventIndexSchema.DESCRIPTION -> query.withDescription(filters.get(name));
-        case EventIndexSchema.PRESENTER -> query.withPresenter(filters.get(name));
-        case EventIndexSchema.CONTRIBUTOR-> query.withContributor(filters.get(name));
-        case EventIndexSchema.SUBJECT -> query.withSubject(filters.get(name));
-        case EventIndexSchema.LOCATION -> query.withLocation(filters.get(name));
-        case EventIndexSchema.SERIES_ID -> query.withSeriesId(filters.get(name));
-        case EventIndexSchema.SERIES_NAME -> query.withSeriesName(filters.get(name));
-        case EventIndexSchema.LANGUAGE -> query.withLanguage(filters.get(name));
-        case EventIndexSchema.SOURCE -> query.withSource(filters.get(name));
-        case EventIndexSchema.CREATED -> query.withCreated(filters.get(name));
-        case EventIndexSchema.CREATOR -> query.withCreator(filters.get(name));
-        case EventIndexSchema.PUBLISHER -> query.withPublisher(filters.get(name));
-        case EventIndexSchema.LICENSE -> query.withLicense(filters.get(name));
-        case EventIndexSchema.RIGHTS -> query.withRights(filters.get(name));
-        case EventIndexSchema.START_DATE -> query.withStartDate(filters.get(name));
+        case EventIndexSchema.UID -> query.withIdentifier(filters.get(name).getValue());
+        case EventIndexSchema.TITLE -> query.withTitle(
+            filters.get(name).getValue(), filters.get(name).getType(), filters.get(name).isMust());
+        case EventIndexSchema.DESCRIPTION -> query.withDescription(
+            filters.get(name).getValue(), filters.get(name).getType(), filters.get(name).isMust());
+        case EventIndexSchema.PRESENTER -> query.withPresenter(
+            filters.get(name).getValue(), filters.get(name).getType(), filters.get(name).isMust());
+        case EventIndexSchema.CONTRIBUTOR-> query.withContributor(
+            filters.get(name).getValue(), filters.get(name).getType(), filters.get(name).isMust());
+        case EventIndexSchema.SUBJECT -> query.withSubject(
+            filters.get(name).getValue(), filters.get(name).getType(), filters.get(name).isMust());
+        case EventIndexSchema.LOCATION -> query.withLocation(
+            filters.get(name).getValue(), filters.get(name).getType(), filters.get(name).isMust());
+        case EventIndexSchema.SERIES_ID -> query.withSeriesId(
+            filters.get(name).getValue(), filters.get(name).getType(), filters.get(name).isMust());
+        case EventIndexSchema.SERIES_NAME -> query.withSeriesName(
+            filters.get(name).getValue(), filters.get(name).getType(), filters.get(name).isMust());
+        case EventIndexSchema.LANGUAGE -> query.withLanguage(
+            filters.get(name).getValue(), filters.get(name).getType(), filters.get(name).isMust());
+        case EventIndexSchema.SOURCE -> query.withSource(
+            filters.get(name).getValue(), filters.get(name).getType(), filters.get(name).isMust());
+        case EventIndexSchema.CREATED -> query.withCreated(
+            filters.get(name).getValue(), filters.get(name).getType(), filters.get(name).isMust());
+        case EventIndexSchema.CREATOR -> query.withCreator(
+            filters.get(name).getValue(), filters.get(name).getType(), filters.get(name).isMust());
+        case EventIndexSchema.PUBLISHER -> query.withPublisher(
+            filters.get(name).getValue(), filters.get(name).getType(), filters.get(name).isMust());
+        case EventIndexSchema.LICENSE -> query.withLicense(
+            filters.get(name).getValue(), filters.get(name).getType(), filters.get(name).isMust());
+        case EventIndexSchema.RIGHTS -> query.withRights(filters.get(name).getValue());
+        case EventIndexSchema.START_DATE -> query.withStartDate(
+            filters.get(name).getValue(), filters.get(name).getType());
 
         case "start_date_range" -> {
-          Tuple<Date, Date> fromAndToCreationRange = RestUtils.getFromAndToDateRange(filters.get(name));
+          Tuple<Date, Date> fromAndToCreationRange = RestUtils.getFromAndToDateRange(filters.get(name).getValue());
           query.withStartFrom(fromAndToCreationRange.getA());
           query.withStartTo(fromAndToCreationRange.getB());
         }
-        default -> logger.info("Filter " + name + " is not supported");
+        case "start_date_relative" -> {
+          Period period = Period.parse(filters.get(name).getValue());
+          LocalDateTime now = LocalDateTime.now();
+          LocalDateTime relative = now.plus(period);
+          query.withStartDate(relative.atZone(ZoneId.systemDefault()).toInstant().toString(),
+              filters.get(name).getType());
+        }
+
+        default -> logger.debug("Filter " + name + " is not supported");
       }
     }
   }
@@ -371,7 +443,7 @@ public class LifeCycleServiceImpl implements LifeCycleService {
   }
 
   /**
-   * Parse the access information for a playlist from its database format into an {@link AccessControlList}
+   * Parse the access information for a policy from its database format into an {@link AccessControlList}
    * @param policy The {@link LifeCyclePolicy} to get the {@link AccessControlList} for
    * @return The {@link AccessControlList} for the given {@link LifeCyclePolicy}
    */

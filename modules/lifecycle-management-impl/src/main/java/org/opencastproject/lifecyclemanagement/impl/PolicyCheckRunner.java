@@ -37,6 +37,7 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.NotFoundException;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -45,6 +46,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -54,6 +56,10 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Periodically checks on the policies in the database.
+ * If policy timing is met, gets a list of entities based on policy filters and creates life cycle tasks for them.
+ */
 @Component(
     immediate = true,
     service = PolicyCheckRunner.class,
@@ -156,10 +162,19 @@ public class PolicyCheckRunner {
                     lifeCycleService.updateLifeCyclePolicy(policy);
 
                     // Get events this policy applies to
-                    List<Event> events = lifeCycleService.filterForEntities(policy.getTargetFilters());
+                    List<String> entityIds = new ArrayList<>();
+                    switch(policy.getTargetType()) {
+                      case EVENT -> {
+                        List<Event> events = lifeCycleService.filterForEvents(policy.getTargetFilters());
+                        for (Event event : events) {
+                          entityIds.add(event.getIdentifier());
+                        }
+                      }
+                      default -> throw new NotImplementedException();
+                    }
 
                     // and create tasks
-                    for (Event event : events) {
+                    for (String entityId : entityIds) {
                       LifeCycleTask task;
                       if (policy.getAction() == Action.START_WORKFLOW) {
                         task = new LifeCycleTaskStartWorkflow();
@@ -167,7 +182,7 @@ public class PolicyCheckRunner {
                         task = new LifeCycleTaskImpl();
                       }
                       task.setLifeCyclePolicyId(policy.getId());
-                      task.setTargetId(event.getIdentifier());
+                      task.setTargetId(entityId);
                       task.setStatus(Status.SCHEDULED);
 
                       lifeCycleService.createLifeCycleTask(task);
@@ -185,13 +200,21 @@ public class PolicyCheckRunner {
 
                 try {
                   // Filter for entities
-                  List<Event> events = lifeCycleService.filterForEntities(policy.getTargetFilters());
-
+                  List<String> entityIds = new ArrayList<>();
+                  switch(policy.getTargetType()) {
+                    case EVENT -> {
+                      List<Event> events = lifeCycleService.filterForEvents(policy.getTargetFilters());
+                      for (Event event : events) {
+                        entityIds.add(event.getIdentifier());
+                      }
+                    }
+                    default -> throw new NotImplementedException();
+                  }
                   // For every entity
-                  for (Event event : events) {
+                  for (String entityId : entityIds) {
                     // If entity does not yet have a task for this policy
                     try {
-                      lifeCycleService.getLifeCycleTaskByTargetId(event.getIdentifier());
+                      lifeCycleService.getLifeCycleTaskByTargetId(entityId);
                       // Task does exist, skip creating one
                       continue;
                     } catch (NotFoundException e) {
@@ -207,7 +230,7 @@ public class PolicyCheckRunner {
                     }
 
                     task.setLifeCyclePolicyId(policy.getId());
-                    task.setTargetId(event.getIdentifier());
+                    task.setTargetId(entityId);
                     task.setStatus(Status.SCHEDULED);
 
                     lifeCycleService.createLifeCycleTask(task);

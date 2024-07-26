@@ -30,10 +30,6 @@
       <artifactId>opencast-elasticsearch-index</artifactId>
       <version>${project.version}</version>
     </dependency>
-    <dependency>
-      <groupId>org.eclipse.persistence</groupId>
-      <artifactId>jakarta.persistence</artifactId>
-    </dependency>
   </dependencies>
   <build>
     <plugins>

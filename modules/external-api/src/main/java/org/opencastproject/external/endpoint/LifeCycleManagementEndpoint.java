@@ -32,9 +32,9 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
 
+import org.opencastproject.elasticsearch.index.objects.event.EventSearchQueryField;
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponses;
-import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.lifecyclemanagement.api.Action;
 import org.opencastproject.lifecyclemanagement.api.LifeCyclePolicy;
 import org.opencastproject.lifecyclemanagement.api.LifeCyclePolicyAccessControlEntry;
@@ -42,6 +42,7 @@ import org.opencastproject.lifecyclemanagement.api.LifeCycleService;
 import org.opencastproject.lifecyclemanagement.api.StartWorkflowParameters;
 import org.opencastproject.lifecyclemanagement.api.TargetType;
 import org.opencastproject.lifecyclemanagement.api.Timing;
+import org.opencastproject.lifecyclemanagement.impl.LifeCyclePolicyAccessControlEntryImpl;
 import org.opencastproject.lifecyclemanagement.impl.LifeCyclePolicyImpl;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.rest.RestConstants;
@@ -72,6 +73,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -239,14 +241,14 @@ public class LifeCycleManagementEndpoint {
                 defaultValue = "EVENT"),
             @RestParameter(name = "action", description = "START_WORKFLOW", isRequired = true, type = STRING,
                 defaultValue = "START_WORKFLOW"),
-            @RestParameter(name = "actionParameters", description = "JSON. To find how to structure your JSON check the documentation.", isRequired = false, type = TEXT,
+            @RestParameter(name = "actionParameters", description = "Depend entirely on the chosen action. JSON. To find how to structure your JSON check the documentation.", isRequired = false, type = TEXT,
                 defaultValue = actionParametersExampleJSON),
             @RestParameter(name = "actionDate", description = "Required if timing is SPECIFIC_DATE. E.g. 2023-11-30T16:16:47Z", isRequired = false, type = STRING),
             @RestParameter(name = "cronTrigger", description = "Required if timing is REPEATING. https://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/crontrigger.html", isRequired = false, type = STRING),
             @RestParameter(name = "timing", description = "SPECIFIC_DATE, REPEATING, ALWAYS", isRequired = true, type = STRING,
                 defaultValue = "SPECIFIC_DATE"),
-            @RestParameter(name = "filters", isRequired = false, description = "The filter(s) used to select applicable entities. Format: 'filter1:value1,filter2:value2'", type = STRING),
-            @RestParameter(name = "accessControlEntries", description = "JSON. To find how to structure your JSON check the documentation.", isRequired = false, type = TEXT,
+            @RestParameter(name = "filters", isRequired = false, description = "Used to select applicable entities. JSON. To find how to structure your JSON check the documentation.", type = TEXT),
+            @RestParameter(name = "accessControlEntries", description = "Which user have what permissions on this policy. JSON. To find how to structure your JSON check the documentation.", isRequired = false, type = TEXT,
                 defaultValue = ""),
         },
         responses = {
@@ -314,19 +316,33 @@ public class LifeCycleManagementEndpoint {
             }
 
             // Check if ACL is well formed
-            List<LifeCyclePolicyAccessControlEntry> accessControlEntriesParsed = new ArrayList<>();
-            if (accessControlEntries != null && accessControlEntries.isEmpty()) {
+            List<LifeCyclePolicyAccessControlEntryImpl> accessControlEntriesParsed = new ArrayList<>();
+            if (accessControlEntries != null && !accessControlEntries.isEmpty()) {
                 try {
                     accessControlEntriesParsed = gson.fromJson(accessControlEntries,
-                        new TypeToken<List<LifeCyclePolicyAccessControlEntry>>() { }.getType());
+                        new TypeToken<List<LifeCyclePolicyAccessControlEntryImpl>>() { }.getType());
+                    if (accessControlEntriesParsed == null) {
+                        accessControlEntriesParsed = new ArrayList<>();
+                    }
                 } catch (JsonSyntaxException e) {
                     return Response.status(Response.Status.BAD_REQUEST).build();
                 }
             }
 
-
             // Convert filters
-            Map<String, String> filtersMap = RestUtils.parseFilter(filters);
+//            Map<String, String> filtersMap = RestUtils.parseFilter(filters);
+            Map<String, EventSearchQueryField<String>> filtersMap = new HashMap<>();
+            if (filters != null && !filters.isEmpty()) {
+                try {
+                    filtersMap = gson.fromJson(filters,
+                        new TypeToken<Map<String, EventSearchQueryField<String>>>() { }.getType());
+                    if (filtersMap == null) {
+                        filtersMap = new HashMap<>();
+                    }
+                } catch (JsonSyntaxException e) {
+                    return Response.status(Response.Status.BAD_REQUEST).build();
+                }
+            }
 
             LifeCyclePolicy policy = new LifeCyclePolicyImpl(
                 title,
@@ -359,19 +375,15 @@ public class LifeCycleManagementEndpoint {
             @RestParameter(name = "id", isRequired = true, description = "Policy identifier", type = STRING)
         },
         restParameters = {
-            @RestParameter(name = "title", isRequired = true, description = "Policy Title", type = STRING),
-            @RestParameter(name = "targetType", description = "EVENT, SERIES", isRequired = true, type = STRING,
-                defaultValue = "EVENT"),
-            @RestParameter(name = "action", description = "START_WORKFLOW", isRequired = true, type = STRING,
-                defaultValue = "START_WORKFLOW"),
-            @RestParameter(name = "actionParameters", description = "JSON. To find how to structure your JSON check the documentation.", isRequired = false, type = TEXT),
+            @RestParameter(name = "title", isRequired = false, description = "Policy Title", type = STRING),
+            @RestParameter(name = "targetType", description = "EVENT, SERIES", isRequired = false, type = STRING),
+            @RestParameter(name = "action", description = "START_WORKFLOW", isRequired = false, type = STRING),
+            @RestParameter(name = "actionParameters", description = "Depend entirely on the chosen action. JSON. To find how to structure your JSON check the documentation.", isRequired = false, type = TEXT),
             @RestParameter(name = "actionDate", description = "Required if timing is SPECIFIC_DATE. E.g. 2023-11-30T16:16:47Z", isRequired = false, type = STRING),
             @RestParameter(name = "cronTrigger", description = "Required if timing is REPEATING. https://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/crontrigger.html", isRequired = false, type = STRING),
-            @RestParameter(name = "timing", description = "SPECIFIC_DATE, REPEATING, ALWAYS", isRequired = true, type = STRING,
-                defaultValue = "SPECIFIC_DATE"),
-            @RestParameter(name = "filters", isRequired = false, description = "The filter(s) used to select applicable entities. Format: 'filter1:value1,filter2:value2'", type = STRING),
-            @RestParameter(name = "accessControlEntries", description = "JSON. To find how to structure your JSON check the documentation.", isRequired = false, type = TEXT,
-                defaultValue = ""),
+            @RestParameter(name = "timing", description = "SPECIFIC_DATE, REPEATING, ALWAYS", isRequired = false, type = STRING),
+            @RestParameter(name = "filters", isRequired = false, description = "The filter(s) used to select applicable entities. Format: 'filter1:value1,filter2:value2'", type = TEXT),
+            @RestParameter(name = "accessControlEntries", description = "JSON. To find how to structure your JSON check the documentation.", isRequired = false, type = TEXT),
         },
         responses = {
             @RestResponse(description = "Policy updated.", responseCode = HttpServletResponse.SC_OK),
@@ -435,13 +447,29 @@ public class LifeCycleManagementEndpoint {
                 policy.setTiming(Timing.valueOf(timing));
             }
             if (!filters.isEmpty()) {
-                policy.setTargetFilters(RestUtils.parseFilter(filters));
+//                policy.setTargetFilters(RestUtils.parseFilter(filters));
+                Map<String, EventSearchQueryField<String>> filtersMap = new HashMap<>();
+                if (filters != null && !filters.isEmpty()) {
+                    try {
+                        filtersMap = gson.fromJson(filters,
+                            new TypeToken<Map<String, EventSearchQueryField<String>>>() { }.getType());
+                        if (filtersMap == null) {
+                            filtersMap = new HashMap<>();
+                        }
+                        policy.setTargetFilters(filtersMap);
+                    } catch (JsonSyntaxException e) {
+                        return Response.status(Response.Status.BAD_REQUEST).build();
+                    }
+                }
             }
             if (!accessControlEntries.isEmpty()) {
                 // Check if ACL is well formed
                 try {
                     List<LifeCyclePolicyAccessControlEntry> accessControlEntriesParsed = gson.fromJson(accessControlEntries,
                         new TypeToken<List<LifeCyclePolicyAccessControlEntry>>() { }.getType());
+                    if (accessControlEntriesParsed == null) {
+                        accessControlEntriesParsed = new ArrayList<>();
+                    }
                     policy.setAccessControlEntries(accessControlEntriesParsed);
                 } catch (JsonSyntaxException e) {
                     return Response.status(Response.Status.BAD_REQUEST).build();
@@ -497,9 +525,9 @@ public class LifeCycleManagementEndpoint {
         fields.add(f("actionDate", v(policy.getActionDate() != null ? toUTC(policy.getActionDate().getTime()) : null, BLANK)));
         fields.add(f("timing", enumToJSON(policy.getTiming())));
         fields.add(f("isActive", v(policy.isActive(), BLANK)));
-        fields.add(f("targetFilters", v(policy.getTargetFilters().keySet().stream()
-            .map(key -> key + ":" + policy.getTargetFilters().get(key))
-            .collect(Collectors.joining(",", "", "")),
+        fields.add(f("targetFilters", v("{" + policy.getTargetFilters().keySet().stream()
+            .map(key -> key + ":" + eventSearchQueryFieldToJson(policy.getTargetFilters().get(key)))
+            .collect(Collectors.joining(",", "", "")) + "}",
             BLANK
         )));
         fields.add(f("accessControlEntries", arr(policy.getAccessControlEntries()
@@ -517,6 +545,16 @@ public class LifeCycleManagementEndpoint {
         fields.add(f("allow", v(policyAccessControlEntry.isAllow())));
         fields.add(f("role", v(policyAccessControlEntry.getRole())));
         fields.add(f("action", v(policyAccessControlEntry.getAction())));
+
+        return obj(fields);
+    }
+
+    private JValue eventSearchQueryFieldToJson(EventSearchQueryField eventSearchQueryField) {
+        List<Field> fields = new ArrayList<>();
+
+        fields.add(f("value", v(eventSearchQueryField.getValue(), BLANK)));
+        fields.add(f("type", v(eventSearchQueryField.getType(), BLANK)));
+        fields.add(f("must", v(eventSearchQueryField.isMust(), BLANK)));
 
         return obj(fields);
     }

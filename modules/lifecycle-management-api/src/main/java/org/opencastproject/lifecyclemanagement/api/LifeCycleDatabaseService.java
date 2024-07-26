@@ -30,32 +30,122 @@ import java.util.List;
  */
 public interface LifeCycleDatabaseService {
 
+  /**
+   * Gets a single life cycle policy in the current organization context by its identifier.
+   * @param id the life cycle policy identifier
+   * @return the {@link LifeCyclePolicy} with the given identifier
+   * @throws NotFoundException if there is no life cycle policy with this identifier
+   * @throws LifeCycleDatabaseException if there is a problem communicating with the underlying data store
+   */
   LifeCyclePolicy getLifeCyclePolicy(String id) throws NotFoundException, LifeCycleDatabaseException;
 
+  /**
+   * Gets a single life cycle policy by its identifier.
+   * @param id the life cycle policy identifier
+   * @param orgId the organisation identifier
+   * @return the {@link LifeCyclePolicy} with the given identifier
+   * @throws NotFoundException if there is no life cycle policy  with this identifier
+   * @throws LifeCycleDatabaseException if there is a problem communicating with the underlying data store
+   */
   LifeCyclePolicy getLifeCyclePolicy(String id, String orgId) throws NotFoundException, LifeCycleDatabaseException;
 
+  /**
+   * Get several life cycle policies based on their order in the database
+   * @param limit Maximum amount of life cycle policys to return
+   * @param offset The index of the first result to return
+   * @return a list of {@link LifeCyclePolicy}s
+   * @throws LifeCycleDatabaseException if there is a problem communicating with the underlying data store
+   */
   List<LifeCyclePolicy> getLifeCyclePolicies(int limit, int offset, SortCriterion sortCriterion)
           throws LifeCycleDatabaseException;
 
+  /**
+   * Get currently active life cycle policies
+   * @param orgId the organisation identifier
+   * @return a list of {@link LifeCyclePolicy}s
+   * @throws LifeCycleDatabaseException if there is a problem communicating with the underlying data store
+   */
   List<LifeCyclePolicy> getActiveLifeCyclePolicies(String orgId)  throws LifeCycleDatabaseException;
 
+  /**
+   * Creates a single life cycle policy in the database.
+   * @param policy The {@link LifeCyclePolicy}
+   * @param orgId the organisation identifier
+   * @return The created {@link LifeCyclePolicy}
+   * @throws LifeCycleDatabaseException if there is a problem communicating with the underlying data store
+   */
   LifeCyclePolicy createLifeCyclePolicy(LifeCyclePolicy policy, String orgId) throws LifeCycleDatabaseException;
 
+  /**
+   * Updates a single life cycle policy in the database.
+   * @param policy The {@link LifeCyclePolicy}
+   * @param orgId the organisation identifier
+   * @return If the life cycle policy was successfully updated
+   * @throws LifeCycleDatabaseException if there is a problem communicating with the underlying data store
+   */
   boolean updateLifeCyclePolicy(LifeCyclePolicy policy, String orgId) throws LifeCycleDatabaseException;
 
+  /**
+   * Removes a single life cycle policy in the database.
+   * @param policy The {@link LifeCyclePolicy}
+   * @param orgId the organisation identifier
+   * @return If the life cycle policy was successfully updated
+   * @throws LifeCycleDatabaseException if there is a problem communicating with the underlying data store
+   */
   boolean deleteLifeCyclePolicy(LifeCyclePolicy policy, String orgId) throws LifeCycleDatabaseException;
 
 
-
+  /**
+   * Gets a single life cycle task in the current organization context by its identifier.
+   * @param id the life cycle task identifier
+   * @return the {@link LifeCycleTask} with the given identifier
+   * @throws NotFoundException if there is no life cycle task with this identifier
+   * @throws LifeCycleDatabaseException if there is a problem communicating with the underlying data store
+   */
   LifeCycleTask getLifeCycleTask(String id) throws NotFoundException, LifeCycleDatabaseException;
 
+  /**
+   * Gets a single life cycle task in the current organization context by its target identifier.
+   * @param targetId the id of the entity the task will act on
+   * @return the {@link LifeCycleTask} with the given identifier
+   * @throws NotFoundException if there is no life cycle task with this identifier
+   * @throws LifeCycleDatabaseException if there is a problem communicating with the underlying data store
+   */
   LifeCycleTask getLifeCycleTaskByTargetId(String targetId) throws NotFoundException, LifeCycleDatabaseException;
 
+  /**
+   * Get several life cycle policies based on their status
+   * @param status The state the tasks should be in
+   * @param orgId the organisation identifier
+   * @return a list of {@link LifeCycleTask}s
+   * @throws LifeCycleDatabaseException if there is a problem communicating with the underlying data store
+   */
   List<LifeCycleTask> getLifeCycleTasksWithStatus(Status status, String orgId) throws LifeCycleDatabaseException;
 
+  /**
+   * Creates a single life cycle task.
+   * @param task The {@link LifeCycleTask}
+   * @param orgId the organisation identifier
+   * @return The created {@link LifeCycleTask}
+   * @throws LifeCycleDatabaseException if there is a problem communicating with the underlying data store
+   */
   LifeCycleTask createLifeCycleTask(LifeCycleTask task, String orgId) throws LifeCycleDatabaseException;
 
+  /**
+   * Updates a single life cycle task.
+   * @param task The {@link LifeCycleTask}
+   * @param orgId the organisation identifier
+   * @return If the life cycle task was successfully updated
+   * @throws LifeCycleDatabaseException if there is a problem communicating with the underlying data store
+   */
   boolean updateLifeCycleTask(LifeCycleTask task, String orgId) throws LifeCycleDatabaseException;
 
+  /**
+   * Removes a single life cycle task.
+   * @param task The {@link LifeCycleTask}
+   * @param orgId the organisation identifier
+   * @return If the life cycle task was successfully updated
+   * @throws LifeCycleDatabaseException if there is a problem communicating with the underlying data store
+   */
   boolean deleteLifeCycleTask(LifeCycleTask task, String orgId) throws LifeCycleDatabaseException;
 }

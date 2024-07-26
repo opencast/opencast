@@ -28,6 +28,7 @@ import org.opencastproject.lifecyclemanagement.api.LifeCycleServiceException;
 import org.opencastproject.lifecyclemanagement.api.LifeCycleTask;
 import org.opencastproject.lifecyclemanagement.api.StartWorkflowParameters;
 import org.opencastproject.lifecyclemanagement.api.Status;
+import org.opencastproject.lifecyclemanagement.api.TargetType;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
@@ -62,6 +63,11 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Periodically checks on the tasks in the database.
+ * If there are scheduled tasks this attempts to run them.
+ * If there are running tasks this attempts to check if their status should be changed
+ */
 @Component(
     immediate = true,
     service = LifeCycleTaskRunner.class,
@@ -165,7 +171,7 @@ public class LifeCycleTaskRunner {
               logger.debug("SCHEDULED Task " + task.getId());
               LifeCyclePolicy policy = lifeCycleService.getLifeCyclePolicyById(task.getLifeCyclePolicyId());
               switch(policy.getAction()) {
-                case START_WORKFLOW -> startWorkflow((LifeCycleTaskStartWorkflow)task, policy.getActionParameters());
+                case START_WORKFLOW -> startWorkflow((LifeCycleTaskStartWorkflow)task, policy);
                 default -> throw new NotImplementedException();
               }
             } catch (NotFoundException e) {
@@ -207,9 +213,23 @@ public class LifeCycleTaskRunner {
     }
   }
 
-  private void startWorkflow(LifeCycleTaskStartWorkflow task, String actionParameters)
+  /**
+   * For a given task based on the START_WORKFLOW action, start a workflow
+   * @param task the life cycle task
+   * @param policy the life cycle policy
+   * @throws LifeCycleServiceException If something went wrong
+   */
+  private void startWorkflow(LifeCycleTaskStartWorkflow task, LifeCyclePolicy policy)
           throws LifeCycleServiceException {
     String mediaPackageId = task.getTargetId();
+    String actionParameters = policy.getActionParameters();
+
+    if (policy.getTargetType() != TargetType.EVENT) {
+      throw new IllegalArgumentException(
+          "The action START_WORKFLOW is only supported for the targetType EVENT. Given target type was: "
+              + policy.getAction()
+      );
+    }
 
     // Parse Parameters
     StartWorkflowParameters actionParametersParsed = gson.fromJson(actionParameters, StartWorkflowParameters.class);
@@ -280,11 +300,21 @@ public class LifeCycleTaskRunner {
     }
   }
 
+  /**
+   * For a given task that started a workflow, update the task status based on the workflow status
+   * @param task the life cycle task
+   */
   private void checkIfWorkflowDone(LifeCycleTaskStartWorkflow task) {
     try {
       WorkflowInstance instance = workflowService.getWorkflowById(task.getWorkflowInstanceId());
-      if (instance.getDateCompleted() != null) {
+      WorkflowInstance.WorkflowState wfState = instance.getState();
+
+      if (wfState == WorkflowInstance.WorkflowState.SUCCEEDED) {
         task.setStatus(Status.FINISHED);
+        lifeCycleService.updateLifeCycleTask(task);
+      }
+      if (wfState == WorkflowInstance.WorkflowState.FAILED) {
+        task.setStatus(Status.FAILED);
         lifeCycleService.updateLifeCycleTask(task);
       }
     } catch (WorkflowDatabaseException e) {

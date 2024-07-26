@@ -63,7 +63,7 @@ public class LifeCycleDatabaseServiceImpl implements LifeCycleDatabaseService {
   /**
    * JPA persistence unit name
    */
-  public static final String PERSISTENCE_UNIT = "org.opencastproject.lifecyclemanagement";
+  public static final String PERSISTENCE_UNIT = "org.opencastproject.lifecyclemanagement.impl.persistence";
   private static final Logger logger = LoggerFactory.getLogger(LifeCycleDatabaseServiceImpl.class);
   /**
    * Factory used to create {@link EntityManager}s for transactions
@@ -179,7 +179,7 @@ public class LifeCycleDatabaseServiceImpl implements LifeCycleDatabaseService {
   /**
    * {@inheritDoc}
    *
-   * @see LifeCycleDatabaseService#getLifeCyclePolicy(String, String)
+   * @see LifeCycleDatabaseService#getActiveLifeCyclePolicies(String)
    */
   @Override
   public List<LifeCyclePolicy> getActiveLifeCyclePolicies(String orgId)
@@ -202,7 +202,7 @@ public class LifeCycleDatabaseServiceImpl implements LifeCycleDatabaseService {
   /**
    * {@inheritDoc}
    *
-   * @see LifeCycleDatabaseService#updateLifeCyclePolicy(LifeCyclePolicy, String)
+   * @see LifeCycleDatabaseService#createLifeCyclePolicy(LifeCyclePolicy, String)
    */
   @Override
   public LifeCyclePolicy createLifeCyclePolicy(LifeCyclePolicy policy, String orgId) throws LifeCycleDatabaseException {
@@ -265,6 +265,11 @@ public class LifeCycleDatabaseServiceImpl implements LifeCycleDatabaseService {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see LifeCycleDatabaseService#getLifeCycleTask(String)
+   */
   @Override
   public LifeCycleTask getLifeCycleTask(String id) throws NotFoundException, LifeCycleDatabaseException {
     try {
@@ -284,6 +289,11 @@ public class LifeCycleDatabaseServiceImpl implements LifeCycleDatabaseService {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see LifeCycleDatabaseService#getLifeCycleTaskByTargetId(String)
+   */
   @Override
   public LifeCycleTask getLifeCycleTaskByTargetId(String targetId)
           throws NotFoundException, LifeCycleDatabaseException {
@@ -310,6 +320,11 @@ public class LifeCycleDatabaseServiceImpl implements LifeCycleDatabaseService {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see LifeCycleDatabaseService#getLifeCycleTasksWithStatus(Status, String)
+   */
   @Override
   public List<LifeCycleTask> getLifeCycleTasksWithStatus(Status status, String orgId)
           throws LifeCycleDatabaseException {
@@ -332,7 +347,7 @@ public class LifeCycleDatabaseServiceImpl implements LifeCycleDatabaseService {
   /**
    * {@inheritDoc}
    *
-   * @see LifeCycleDatabaseService#updateLifeCyclePolicy(LifeCyclePolicy, String)
+   * @see LifeCycleDatabaseService#createLifeCycleTask(LifeCycleTask, String)
    */
   @Override
   public LifeCycleTask createLifeCycleTask(LifeCycleTask task, String orgId) throws LifeCycleDatabaseException {
@@ -350,6 +365,11 @@ public class LifeCycleDatabaseServiceImpl implements LifeCycleDatabaseService {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see LifeCycleDatabaseService#updateLifeCycleTask(LifeCycleTask, String)
+   */
   @Override
   public boolean updateLifeCycleTask(LifeCycleTask task, String orgId) throws LifeCycleDatabaseException {
     try {
@@ -367,6 +387,11 @@ public class LifeCycleDatabaseServiceImpl implements LifeCycleDatabaseService {
     }
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @see LifeCycleDatabaseService#deleteLifeCycleTask(LifeCycleTask, String)
+   */
   @Override
   public boolean deleteLifeCycleTask(LifeCycleTask task, String orgId) throws LifeCycleDatabaseException {
     try {
@@ -385,7 +410,7 @@ public class LifeCycleDatabaseServiceImpl implements LifeCycleDatabaseService {
   }
 
   /**
-   * Gets a potentially deleted series by its ID, using the current organizational context.
+   * Gets a life cycle policy by its ID, using the current organizational context.
    *
    * @param id    the policy identifier
    * @param orgId the organisation identifier
@@ -396,6 +421,13 @@ public class LifeCycleDatabaseServiceImpl implements LifeCycleDatabaseService {
         Pair.of("organizationId", orgId));
   }
 
+  /**
+   * Gets a life cycle task by its ID, using the current organizational context.
+   *
+   * @param id    the task identifier
+   * @param orgId the organisation identifier
+   * @return the task in an optional
+   */
   protected Function<EntityManager, Optional<LifeCycleTask>> getLifeCycleTaskById(String id, String orgId) {
     return namedQuery.findOpt("LifeCycleTask.findById", LifeCycleTask.class, Pair.of("id", id),
         Pair.of("organizationId", orgId));

@@ -35,6 +35,10 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 
+/**
+ * A life cycle task represents a prompt to the task runner to execute the action of the related life cycle
+ * policy on the target. It is also use the track the progression of said execution.
+ */
 @Entity(name = "LifeCycleTask")
 @Table(name = "oc_lifecycletask")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)

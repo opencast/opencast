@@ -23,6 +23,10 @@ package org.opencastproject.lifecyclemanagement.impl;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 
+/**
+ * A life cycle task based on the @link{Action} START_WORKFLOW.
+ * Needs to know more than a standard task so that track if its status can be properly kept
+ */
 @Entity
 public class LifeCycleTaskStartWorkflow extends LifeCycleTaskImpl {
 

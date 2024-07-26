@@ -18,30 +18,8 @@
  * the License.
  *
  */
-package org.opencastproject.lifecyclemanagement.api;
+package org.opencastproject.elasticsearch.index.objects.event;
 
-import java.util.Map;
-
-/**
- * Struct for the action parameters of the action {@link Action} START_WORKFLOW
- */
-public class StartWorkflowParameters {
-  private String workflowId;
-  private Map<String, String> workflowParameters;
-
-  public String getWorkflowId() {
-    return workflowId;
-  }
-
-  public void setWorkflowId(String workflowId) {
-    this.workflowId = workflowId;
-  }
-
-  public Map<String, String> getWorkflowParameters() {
-    return workflowParameters;
-  }
-
-  public void setWorkflowParameters(Map<String, String> workflowParameters) {
-    this.workflowParameters = workflowParameters;
-  }
+public enum EventQueryType {
+  SEARCH, WILDCARD, GREATER_THAN, LESS_THAN
 }

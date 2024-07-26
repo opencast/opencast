@@ -47,33 +47,33 @@ public class EventSearchQuery extends AbstractSearchQuery {
   private final List<String> identifiers = new ArrayList<String>();
   private String organization = null;
   private User user = null;
-  private String title = null;
-  private String description = null;
-  private final Set<String> actions = new HashSet<String>();
-  private final List<String> presenters = new ArrayList<String>();
-  private final List<String> contributors = new ArrayList<String>();
-  private String subject = null;
-  private String location = null;
-  private String seriesId = null;
-  private String seriesName = null;
-  private String language = null;
-  private String source = null;
-  private String created = null;
+  private EventSearchQueryField<String> title = new EventSearchQueryField(null);
+  private EventSearchQueryField<String> description = new EventSearchQueryField(null);
+  private final Set<String> actions = new HashSet();
+  private final List<EventSearchQueryField<String>> presenters = new ArrayList<>();
+  private final List<EventSearchQueryField<String>> contributors = new ArrayList<>();
+  private EventSearchQueryField<String> subject = new EventSearchQueryField(null);
+  private EventSearchQueryField<String> location = new EventSearchQueryField(null);
+  private EventSearchQueryField<String> seriesId = new EventSearchQueryField(null);
+  private EventSearchQueryField<String> seriesName = new EventSearchQueryField(null);
+  private EventSearchQueryField<String> language = new EventSearchQueryField(null);
+  private EventSearchQueryField<String> source = new EventSearchQueryField(null);
+  private EventSearchQueryField<String> created = new EventSearchQueryField(null);
   private Date startFrom = null;
   private Date startTo = null;
   private Date technicalStartFrom = null;
   private Date technicalStartTo = null;
-  private String creator = null;
-  private String publisher = null;
-  private String license = null;
-  private String rights = null;
+  private EventSearchQueryField<String> creator = new EventSearchQueryField(null);
+  private EventSearchQueryField<String> publisher = new EventSearchQueryField(null);
+  private EventSearchQueryField<String> license = new EventSearchQueryField(null);
+  private EventSearchQueryField<String> rights = new EventSearchQueryField(null);
   private String accessPolicy = null;
   private String managedAcl = null;
   private String workflowState = null;
   private Long workflowId = null;
   private String workflowDefinition = null;
   private Long duration = null;
-  private String startDate = null;
+  private List<EventSearchQueryField<String>> startDate = new ArrayList<>();
   private String eventStatus = null;
   private Boolean hasComments = null;
   private Boolean hasOpenComments = null;
@@ -178,7 +178,20 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withTitle(String title) {
-    this.title = title;
+    return this.withTitle(title, EventQueryType.SEARCH, true);
+  }
+
+  /**
+   * Selects recordings with the given title.
+   *
+   * @param title
+   *          the title
+   * @return the enhanced search query
+   */
+  public EventSearchQuery withTitle(String title, EventQueryType type, boolean must) {
+    this.title.setValue(title);
+    this.title.setType(type);
+    this.title.setMust(must);
     return this;
   }
 
@@ -187,7 +200,16 @@ public class EventSearchQuery extends AbstractSearchQuery {
    *
    * @return the title
    */
-  public String getTitle() {
+  public String getTitleValue() {
+    return title.getValue();
+  }
+
+  /**
+   * Returns the title of the recording.
+   *
+   * @return the title
+   */
+  public EventSearchQueryField<String> getTitle() {
     return title;
   }
 
@@ -237,10 +259,23 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withPresenter(String presenter) {
+    return this.withPresenter(presenter, EventQueryType.SEARCH, true);
+  }
+
+  /**
+   * Selects recording events with the given presenter.
+   * <p>
+   * Note that this method may be called multiple times to support selection of multiple recording events.
+   *
+   * @param presenter
+   *          the presenter
+   * @return the enhanced search query
+   */
+  public EventSearchQuery withPresenter(String presenter, EventQueryType type, boolean must) {
     if (StringUtils.isBlank(presenter)) {
       throw new IllegalArgumentException("Presenter cannot be null");
     }
-    this.presenters.add(presenter);
+    this.presenters.add(new EventSearchQueryField(presenter, type, must));
     return this;
   }
 
@@ -249,8 +284,19 @@ public class EventSearchQuery extends AbstractSearchQuery {
    *
    * @return the presenters
    */
-  public String[] getPresenters() {
-    return presenters.toArray(new String[presenters.size()]);
+  public String[] getPresenterValues() {
+    return presenters.stream()
+        .map(presenter -> presenter.getValue())
+        .toArray(String[]::new);
+  }
+
+  /**
+   * Returns the list of recording presenters or an empty array if no presenter have been specified.
+   *
+   * @return the presenters
+   */
+  public List<EventSearchQueryField<String>> getPresenters() {
+    return presenters;
   }
 
   /**
@@ -263,10 +309,23 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withContributor(String contributor) {
+    return withContributor(contributor, EventQueryType.SEARCH, true);
+  }
+
+  /**
+   * Selects recording events with the given contributor.
+   * <p>
+   * Note that this method may be called multiple times to support selection of multiple recording events.
+   *
+   * @param contributor
+   *          the contributor
+   * @return the enhanced search query
+   */
+  public EventSearchQuery withContributor(String contributor, EventQueryType type, boolean must) {
     if (StringUtils.isBlank(contributor)) {
       throw new IllegalArgumentException("Contributor cannot be null");
     }
-    this.contributors.add(contributor);
+    this.contributors.add(new EventSearchQueryField(contributor, type, must));
     return this;
   }
 
@@ -275,8 +334,19 @@ public class EventSearchQuery extends AbstractSearchQuery {
    *
    * @return the contributors
    */
-  public String[] getContributors() {
-    return contributors.toArray(new String[contributors.size()]);
+  public String[] getContributorValues() {
+    return contributors.stream()
+        .map(contributor -> contributor.getValue())
+        .toArray(String[]::new);
+  }
+
+  /**
+   * Returns the list of recording contributors or an empty array if no contributors have been specified.
+   *
+   * @return the contributors
+   */
+  public List<EventSearchQueryField<String>> getContributors() {
+    return contributors;
   }
 
   /**
@@ -287,7 +357,20 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withSubject(String subject) {
-    this.subject = subject;
+    return this.withSubject(subject, EventQueryType.SEARCH, true);
+  }
+
+  /**
+   * Selects recording events with the given subject.
+   *
+   * @param subject
+   *          the subject
+   * @return the enhanced search query
+   */
+  public EventSearchQuery withSubject(String subject, EventQueryType type, boolean must) {
+    this.subject.setValue(subject);
+    this.subject.setType(type);
+    this.subject.setMust(must);
     return this;
   }
 
@@ -296,7 +379,16 @@ public class EventSearchQuery extends AbstractSearchQuery {
    *
    * @return the subject
    */
-  public String getSubject() {
+  public String getSubjectValue() {
+    return subject.getValue();
+  }
+
+  /**
+   * Returns the subject of the recording.
+   *
+   * @return the subject
+   */
+  public EventSearchQueryField<String> getSubject() {
     return subject;
   }
 
@@ -308,7 +400,20 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withDescription(String description) {
-    this.description = description;
+    return this.withDescription(description, EventQueryType.SEARCH, true);
+  }
+
+  /**
+   * Selects recordings with the given description.
+   *
+   * @param description
+   *          the description
+   * @return the enhanced search query
+   */
+  public EventSearchQuery withDescription(String description, EventQueryType type, boolean must) {
+    this.description.setValue(description);
+    this.description.setType(type);
+    this.description.setMust(must);
     return this;
   }
 
@@ -317,7 +422,16 @@ public class EventSearchQuery extends AbstractSearchQuery {
    *
    * @return the description
    */
-  public String getDescription() {
+  public String getDescriptionValue() {
+    return description.getValue();
+  }
+
+  /**
+   * Returns the description of the recording.
+   *
+   * @return the description
+   */
+  public EventSearchQueryField<String> getDescription() {
     return description;
   }
 
@@ -329,7 +443,20 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withLocation(String location) {
-    this.location = location;
+    return this.withLocation(location, EventQueryType.SEARCH, true);
+  }
+
+  /**
+   * Selects recordings with the given location.
+   *
+   * @param location
+   *          the location
+   * @return the enhanced search query
+   */
+  public EventSearchQuery withLocation(String location, EventQueryType type, boolean must) {
+    this.location.setValue(location);
+    this.location.setType(type);
+    this.location.setMust(must);
     return this;
   }
 
@@ -338,7 +465,16 @@ public class EventSearchQuery extends AbstractSearchQuery {
    *
    * @return the location
    */
-  public String getLocation() {
+  public String getLocationValue() {
+    return location.getValue();
+  }
+
+  /**
+   * Returns the location of the recording.
+   *
+   * @return the location
+   */
+  public EventSearchQueryField<String> getLocation() {
     return location;
   }
 
@@ -350,7 +486,20 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withSeriesId(String seriesId) {
-    this.seriesId = seriesId;
+    return this.withSeriesId(seriesId, EventQueryType.SEARCH, true);
+  }
+
+  /**
+   * Selects recordings with the given series identifier.
+   *
+   * @param seriesId
+   *          the series identifier
+   * @return the enhanced search query
+   */
+  public EventSearchQuery withSeriesId(String seriesId, EventQueryType type, boolean must) {
+    this.seriesId.setValue(seriesId);
+    this.seriesId.setType(type);
+    this.seriesId.setMust(must);
     return this;
   }
 
@@ -359,7 +508,16 @@ public class EventSearchQuery extends AbstractSearchQuery {
    *
    * @return the series identifier
    */
-  public String getSeriesId() {
+  public String getSeriesIdValue() {
+    return seriesId.getValue();
+  }
+
+  /**
+   * Returns the series identifier of the recording.
+   *
+   * @return the series identifier
+   */
+  public EventSearchQueryField<String> getSeriesId() {
     return seriesId;
   }
 
@@ -371,7 +529,20 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withSeriesName(String seriesName) {
-    this.seriesName = seriesName;
+    return this.withSeriesName(seriesName, EventQueryType.SEARCH, true);
+  }
+
+  /**
+   * Selects recordings with the given series name.
+   *
+   * @param seriesName
+   *          the series name
+   * @return the enhanced search query
+   */
+  public EventSearchQuery withSeriesName(String seriesName, EventQueryType type, boolean must) {
+    this.seriesName.setValue(seriesName);
+    this.seriesName.setType(type);
+    this.seriesName.setMust(must);
     return this;
   }
 
@@ -380,7 +551,16 @@ public class EventSearchQuery extends AbstractSearchQuery {
    *
    * @return the series name
    */
-  public String getSeriesName() {
+  public String getSeriesNameValue() {
+    return seriesName.getValue();
+  }
+
+  /**
+   * Returns the series name of the recording.
+   *
+   * @return the series name
+   */
+  public EventSearchQueryField<String> getSeriesName() {
     return seriesName;
   }
 
@@ -392,7 +572,20 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withLanguage(String language) {
-    this.language = language;
+    return this.withLanguage(language, EventQueryType.SEARCH, true);
+  }
+
+  /**
+   * Selects recordings with the given language.
+   *
+   * @param language
+   *          the language
+   * @return the enhanced search query
+   */
+  public EventSearchQuery withLanguage(String language, EventQueryType type, boolean must) {
+    this.language.setValue(language);
+    this.language.setType(type);
+    this.language.setMust(must);
     return this;
   }
 
@@ -401,7 +594,16 @@ public class EventSearchQuery extends AbstractSearchQuery {
    *
    * @return the language
    */
-  public String getLanguage() {
+  public String getLanguageValue() {
+    return language.getValue();
+  }
+
+  /**
+   * Returns the language of the recording.
+   *
+   * @return the language
+   */
+  public EventSearchQueryField<String> getLanguage() {
     return language;
   }
 
@@ -413,7 +615,20 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withSource(String source) {
-    this.source = source;
+    return this.withSource(source, EventQueryType.SEARCH, true);
+  }
+
+  /**
+   * Selects recordings with the given source type.
+   *
+   * @param source
+   *          the source
+   * @return the enhanced search query
+   */
+  public EventSearchQuery withSource(String source, EventQueryType type, boolean must) {
+    this.source.setValue(source);
+    this.source.setType(type);
+    this.source.setMust(must);
     return this;
   }
 
@@ -422,7 +637,16 @@ public class EventSearchQuery extends AbstractSearchQuery {
    *
    * @return the source
    */
-  public String getSource() {
+  public String getSourceValue() {
+    return source.getValue();
+  }
+
+  /**
+   * Returns the source of the recording.
+   *
+   * @return the source
+   */
+  public EventSearchQueryField<String> getSource() {
     return source;
   }
 
@@ -434,7 +658,20 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withCreated(String created) {
-    this.created = created;
+    return this.withCreated(created, EventQueryType.SEARCH, true);
+  }
+
+  /**
+   * Selects recordings with the given creation date.
+   *
+   * @param created
+   *          the creation date
+   * @return the enhanced search query
+   */
+  public EventSearchQuery withCreated(String created, EventQueryType type, boolean must) {
+    this.created.setValue(created);
+    this.created.setType(type);
+    this.created.setMust(must);
     return this;
   }
 
@@ -443,7 +680,16 @@ public class EventSearchQuery extends AbstractSearchQuery {
    *
    * @return the creation date
    */
-  public String getCreated() {
+  public String getCreatedValue() {
+    return created.getValue();
+  }
+
+  /**
+   * Returns the creation date of the recording.
+   *
+   * @return the creation date
+   */
+  public EventSearchQueryField<String> getCreated() {
     return created;
   }
 
@@ -531,7 +777,20 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withCreator(String creator) {
-    this.creator = creator;
+    return this.withCreator(creator, EventQueryType.SEARCH, true);
+  }
+
+  /**
+   * Selects recordings with the given creator.
+   *
+   * @param creator
+   *          the creator
+   * @return the enhanced search query
+   */
+  public EventSearchQuery withCreator(String creator, EventQueryType type, boolean must) {
+    this.creator.setValue(creator);
+    this.creator.setType(type);
+    this.creator.setMust(must);
     return this;
   }
 
@@ -540,7 +799,16 @@ public class EventSearchQuery extends AbstractSearchQuery {
    *
    * @return the creator
    */
-  public String getCreator() {
+  public String getCreatorValue() {
+    return creator.getValue();
+  }
+
+  /**
+   * Returns the creator of the recording.
+   *
+   * @return the creator
+   */
+  public EventSearchQueryField<String> getCreator() {
     return creator;
   }
 
@@ -552,7 +820,20 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withPublisher(String publisher) {
-    this.publisher = publisher;
+    return this.withPublisher(publisher, EventQueryType.SEARCH, true);
+  }
+
+  /**
+   * Selects recordings with the given publisher.
+   *
+   * @param publisher
+   *          the publisher
+   * @return the enhanced search query
+   */
+  public EventSearchQuery withPublisher(String publisher, EventQueryType type, boolean must) {
+    this.publisher.setValue(publisher);
+    this.publisher.setType(type);
+    this.publisher.setMust(must);
     return this;
   }
 
@@ -561,7 +842,16 @@ public class EventSearchQuery extends AbstractSearchQuery {
    *
    * @return the publisher
    */
-  public String getPublisher() {
+  public String getPublisherValue() {
+    return publisher.getValue();
+  }
+
+  /**
+   * Returns the publisher of the recording.
+   *
+   * @return the publisher
+   */
+  public EventSearchQueryField<String> getPublisher() {
     return publisher;
   }
 
@@ -573,7 +863,20 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withLicense(String license) {
-    this.license = license;
+    return this.withLicense(license, EventQueryType.SEARCH, true);
+  }
+
+  /**
+   * Selects recordings with the given license.
+   *
+   * @param license
+   *          the license
+   * @return the enhanced search query
+   */
+  public EventSearchQuery withLicense(String license, EventQueryType type, boolean must) {
+    this.license.setValue(license);
+    this.license.setType(type);
+    this.license.setMust(must);
     return this;
   }
 
@@ -582,7 +885,16 @@ public class EventSearchQuery extends AbstractSearchQuery {
    *
    * @return the license
    */
-  public String getLicense() {
+  public String getLicenseValue() {
+    return license.getValue();
+  }
+
+  /**
+   * Returns the license of the recording.
+   *
+   * @return the license
+   */
+  public EventSearchQueryField<String> getLicense() {
     return license;
   }
 
@@ -594,7 +906,20 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withRights(String rights) {
-    this.rights = rights;
+    return this.withRights(rights, EventQueryType.SEARCH, true);
+  }
+
+  /**
+   * Selects recordings with the given rights.
+   *
+   * @param rights
+   *          the rights
+   * @return the enhanced search query
+   */
+  public EventSearchQuery withRights(String rights, EventQueryType type, boolean must) {
+    this.rights.setValue(rights);
+    this.rights.setType(type);
+    this.rights.setMust(must);
     return this;
   }
 
@@ -603,7 +928,16 @@ public class EventSearchQuery extends AbstractSearchQuery {
    *
    * @return the rights
    */
-  public String getRights() {
+  public String getRightsValue() {
+    return rights.getValue();
+  }
+
+  /**
+   * Returns the rights of the recording.
+   *
+   * @return the rights
+   */
+  public EventSearchQueryField<String> getRights() {
     return rights;
   }
 
@@ -720,7 +1054,19 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withStartDate(String startDate) {
-    this.startDate = startDate;
+    this.startDate.add(new EventSearchQueryField(startDate, EventQueryType.SEARCH));
+    return this;
+  }
+
+  /**
+   * Selects recordings with the given start date.
+   *
+   * @param startDate
+   *          the start date
+   * @return the enhanced search query
+   */
+  public EventSearchQuery withStartDate(String startDate, EventQueryType type) {
+    this.startDate.add(new EventSearchQueryField(startDate, type));
     return this;
   }
 
@@ -729,8 +1075,14 @@ public class EventSearchQuery extends AbstractSearchQuery {
    *
    * @return the start date
    */
-  public String getStartDate() {
+  public List<EventSearchQueryField<String>> getStartDate() {
     return startDate;
+  }
+
+  public String[] getStartDateValues() {
+    return startDate.stream()
+        .map(date -> date.getValue())
+        .toArray(String[]::new);
   }
 
   /**

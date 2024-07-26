@@ -48,6 +48,11 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
+/**
+ * A special periodic checker for repeating policies.
+ * Repeating policies require date/time representation that is best reflected by a cron string.
+ * A quartz scheduler supports cron strings.
+ */
 public class RepeatingPolicyRunner {
 
   /** Log facility */
@@ -208,7 +213,7 @@ public class RepeatingPolicyRunner {
 
               // Filter for entities
               List<Event> events = repeatingPolicyRunner.getLifeCycleService()
-                  .filterForEntities(policy.getTargetFilters());
+                  .filterForEvents(policy.getTargetFilters());
 
               // For every entity
               for (Event event : events) {
