@@ -20,6 +20,8 @@
  */
 package org.opencastproject.lifecyclemanagement.api;
 
+import org.opencastproject.elasticsearch.index.objects.event.EventSearchQueryField;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -65,9 +67,9 @@ public interface LifeCyclePolicy {
 
   void setActive(boolean active);
 
-  Map<String, String> getTargetFilters();
+  Map<String, EventSearchQueryField<String>> getTargetFilters();
 
-  void setTargetFilters(Map<String, String> targetFilters);
+  void setTargetFilters(Map<String, EventSearchQueryField<String>> targetFilters);
 
   List<LifeCyclePolicyAccessControlEntry> getAccessControlEntries();
 

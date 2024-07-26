@@ -27,10 +27,10 @@ import static org.easymock.EasyMock.replay;
 
 import org.opencastproject.lifecyclemanagement.api.Action;
 import org.opencastproject.lifecyclemanagement.api.LifeCyclePolicy;
-import org.opencastproject.lifecyclemanagement.api.LifeCyclePolicyAccessControlEntry;
 import org.opencastproject.lifecyclemanagement.api.LifeCycleService;
 import org.opencastproject.lifecyclemanagement.api.TargetType;
 import org.opencastproject.lifecyclemanagement.api.Timing;
+import org.opencastproject.lifecyclemanagement.impl.LifeCyclePolicyAccessControlEntryImpl;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.requests.SortCriterion;
@@ -57,7 +57,7 @@ public class TestLifeCycleManagementEndpoint extends LifeCycleManagementEndpoint
     String missingPolicyId = "4444";
     String unauthorizedPolicyId = "1";
 
-    LifeCyclePolicyAccessControlEntry accessControlEntry1 = createNiceMock(LifeCyclePolicyAccessControlEntry.class);
+    LifeCyclePolicyAccessControlEntryImpl accessControlEntry1 = createNiceMock(LifeCyclePolicyAccessControlEntryImpl.class);
     expect(accessControlEntry1.getId()).andReturn(0L);
     expect(accessControlEntry1.isAllow()).andReturn(true);
     expect(accessControlEntry1.getRole()).andReturn("ROLE_USER_BOB");

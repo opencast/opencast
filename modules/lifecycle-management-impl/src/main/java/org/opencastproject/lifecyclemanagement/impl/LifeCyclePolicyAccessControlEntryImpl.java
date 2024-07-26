@@ -18,15 +18,34 @@
  * the License.
  *
  */
-package org.opencastproject.lifecyclemanagement.api;
+package org.opencastproject.lifecyclemanagement.impl;
+
+import org.opencastproject.lifecyclemanagement.api.LifeCyclePolicy;
+import org.opencastproject.lifecyclemanagement.api.LifeCyclePolicyAccessControlEntry;
+import org.opencastproject.security.api.AccessControlEntry;
 
 import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.MappedSuperclass;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
-@MappedSuperclass
-public class AccessControlEntry {
+// TODO: Reduce duplicate code between this class and the playlist version
+//  This is very much a copy of PlaylistAccessControlEntry.java. However, creating a general super class for
+//  this and the playlist version has proven difficult. The @MappedSuperClass annotation seems like the go
+//  to solution, however it seems to cause errors with out JPAProvider. Still, it would be good to investigate
+//  how we can reduce duplicate code here in the future.
+/**
+ * This has the same fields as an {@link AccessControlEntry}, but since policies purely exist in the database, ACLs
+ * need to be persisted alongside them, which is what this is for.
+ */
+@Entity(name = "LifeCyclePolicyAccessControlEntry")
+@Table(name = "oc_lifecyclepolicy_access_control_entry")
+public class LifeCyclePolicyAccessControlEntryImpl implements LifeCyclePolicyAccessControlEntry {
+
   @Id
   @GeneratedValue
   @Column(name = "id")
@@ -41,25 +60,30 @@ public class AccessControlEntry {
   @Column(name = "action", nullable = false)
   private String action;
 
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "lifecyclepolicy_id", nullable = false)
+  private LifeCyclePolicyImpl policy;
+
   /**
    * Default constructor
    */
-  public AccessControlEntry() {
+  public LifeCyclePolicyAccessControlEntryImpl() {
 
   }
 
-  public AccessControlEntry(boolean allow, String role, String action) {
+  public LifeCyclePolicyAccessControlEntryImpl(boolean allow, String role, String action) {
     this.allow = allow;
     this.role = role;
     this.action = action;
   }
 
-  public AccessControlEntry(long id, boolean allow, String role, String action) {
+  public LifeCyclePolicyAccessControlEntryImpl(long id, boolean allow, String role, String action) {
     this.id = id;
     this.allow = allow;
     this.role = role;
     this.action = action;
   }
+
 
   public long getId() {
     return id;
@@ -91,6 +115,14 @@ public class AccessControlEntry {
 
   public void setAction(String action) {
     this.action = action;
+  }
+
+  public LifeCyclePolicy getPolicy() {
+    return policy;
+  }
+
+  public void setPolicy(LifeCyclePolicy policy) {
+    this.policy = (LifeCyclePolicyImpl) policy;
   }
 
   public org.opencastproject.security.api.AccessControlEntry toAccessControlEntry() {

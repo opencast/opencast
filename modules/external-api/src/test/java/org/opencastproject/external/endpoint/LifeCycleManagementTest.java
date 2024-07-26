@@ -72,7 +72,7 @@ public class LifeCycleManagementTest {
     assertEquals("2023-11-30T16:16:47Z", json.get("actionDate"));
     assertEquals(Timing.SPECIFIC_DATE.toString(), json.get("timing"));
 
-    assertEquals("", json.get("targetFilters"));
+    assertEquals("{}", json.get("targetFilters"));
 
     final JSONArray accessControlEntries = (JSONArray) json.get("accessControlEntries");
     assertEquals(1, accessControlEntries.size());

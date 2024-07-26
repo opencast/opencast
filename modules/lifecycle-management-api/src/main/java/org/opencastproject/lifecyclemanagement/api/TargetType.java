@@ -21,13 +21,9 @@
 package org.opencastproject.lifecyclemanagement.api;
 
 public enum TargetType {
-  EVENT("EVENT"), SERIES("SERIES");
+  EVENT;
 
   private String code;
-
-  TargetType(String code) {
-    this.code = code;
-  }
 
   public String getCode() {
     return code;

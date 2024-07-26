@@ -10,6 +10,7 @@
     <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=jdbc/opencast)</non-jta-data-source>
     <class>org.opencastproject.lifecyclemanagement.impl.LifeCyclePolicyImpl</class>
     <class>org.opencastproject.lifecyclemanagement.impl.LifeCycleTaskImpl</class>
+    <class>org.opencastproject.lifecyclemanagement.impl.LifeCyclePolicyAccessControlEntryImpl</class>
     <shared-cache-mode>NONE</shared-cache-mode>
     <properties>
       <property name="eclipselink.ddl-generation" value="create-tables" />

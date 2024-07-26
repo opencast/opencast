@@ -20,6 +20,40 @@
  */
 package org.opencastproject.lifecyclemanagement.impl;
 
-// TODO: Write tests
+import org.opencastproject.lifecyclemanagement.api.LifeCyclePolicy;
+import org.opencastproject.lifecyclemanagement.api.LifeCyclePolicyAccessControlEntry;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+
 public class LifeCyclePolicyTest {
+
+  @Test
+  public void testPolicy() throws Exception {
+    LifeCyclePolicy policy = new LifeCyclePolicyImpl();
+    policy.setTitle("title");
+    Assert.assertEquals(policy.getTitle(), "title");
+  }
+
+  @Test
+  public void testPlaylistEntries() throws Exception {
+    LifeCyclePolicy policy = new LifeCyclePolicyImpl();
+
+    LifeCyclePolicyAccessControlEntry policyEntry =
+        new LifeCyclePolicyAccessControlEntryImpl(true, "ROLE_USER_BOB", "READ");
+    LifeCyclePolicyAccessControlEntry policyEntry2 =
+        new LifeCyclePolicyAccessControlEntryImpl(true, "ROLE_USER_BOB", "WRITE");
+    List<LifeCyclePolicyAccessControlEntry> entries = new ArrayList<>();
+    entries.add(policyEntry);
+    entries.add(policyEntry2);
+
+    policy.setAccessControlEntries(entries);
+    Assert.assertEquals(2, policy.getAccessControlEntries().size());
+
+    List<LifeCyclePolicyAccessControlEntry> policyEntries = policy.getAccessControlEntries();
+    Assert.assertEquals(policyEntries.get(0).getRole(), "ROLE_USER_BOB");
+  }
 }
