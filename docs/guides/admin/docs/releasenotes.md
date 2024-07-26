@@ -19,6 +19,12 @@ It also comes with a lot more bug fixes. Especially the new admin interface got 
 
 ## Opencast 16.0
 
+**Attention:**
+The fix for the handling of captions by the select-tracks operation
+([5829](https://github.com/opencast/opencast/pull/5829)) requires the removal of the operation directly afterwards from
+the `partial-publish` workflow, otherwise captions will be duplicated during publication.
+This workflow has been fixed in 16.3 (see [6046](https://github.com/opencast/opencast/pull/6046) for details).
+
 ### Features, Improvements and Behavior changes
 
 - Replaced Solr Search with OpenSearch/Elasticsearch. [[#5597](https://github.com/opencast/opencast/pull/5597)]
