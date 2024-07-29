@@ -26,6 +26,8 @@ import org.opencastproject.search.api.SearchResult;
 import org.opencastproject.search.api.SearchResultList;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.AuthorizationService;
+import org.opencastproject.security.api.SecurityConstants;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
@@ -78,9 +80,19 @@ final class Harvest {
       SearchService searchService,
       SeriesService seriesService,
       AuthorizationService authorizationService,
+      SecurityService securityService,
       PlaylistService playlistService,
       Workspace workspace
   ) throws UnauthorizedException, SeriesException {
+    final var org = securityService.getOrganization().getId();
+
+    var user = securityService.getUser();
+    var orgAdminRole = securityService.getOrganization().getAdminRole();
+    var isAdmin = user.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE) || user.hasRole(orgAdminRole);
+    if (!isAdmin) {
+      throw new UnauthorizedException(user, "only (org-) admins can access the Tobira harvest API");
+    }
+
     // ===== Retrieve information about events, series, and playlists =============================
     //
     // In this step, we always request `preferredAmount + 1` in order to figure out the values for
@@ -89,8 +101,9 @@ final class Harvest {
     // Retrieve episodes from index.
     final SearchSourceBuilder q = new SearchSourceBuilder().query(
             QueryBuilders.boolQuery()
-                .must(QueryBuilders.rangeQuery(SearchResult.MODIFIED_DATE).gte(since.getTime()))
-                .must(QueryBuilders.termQuery(SearchResult.TYPE, SearchService.IndexEntryType.Episode)))
+                    .must(QueryBuilders.termQuery(SearchResult.ORG, org))
+                    .must(QueryBuilders.rangeQuery(SearchResult.MODIFIED_DATE).gte(since.getTime()))
+                    .must(QueryBuilders.termQuery(SearchResult.TYPE, SearchService.IndexEntryType.Episode)))
         .sort(SearchResult.MODIFIED_DATE, SortOrder.ASC)
         .size(preferredAmount + 1);
     final SearchResultList results = searchService.search(q);
