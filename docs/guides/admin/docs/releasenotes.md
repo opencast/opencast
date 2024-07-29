@@ -1,4 +1,4 @@
-# Opencast 16: Release Notes
+# Opencast 17: Release Notes
 
 ## Release Schedule
 
