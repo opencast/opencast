@@ -248,6 +248,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-solr/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-sox-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-subtitle-parser/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-subtitle-timeshift-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-textanalyzer-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-themes/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-themes-workflowoperation/${project.version}</bundle>
@@ -368,6 +369,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-sox-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-sox-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-subtitle-parser/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-subtitle-timeshift-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-textanalyzer-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-textanalyzer-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-textanalyzer-workflowoperation/${project.version}</bundle>
@@ -506,6 +508,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-sox-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-sox-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-subtitle-parser/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-subtitle-timeshift-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-textanalyzer-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-textanalyzer-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-textanalyzer-workflowoperation/${project.version}</bundle>
