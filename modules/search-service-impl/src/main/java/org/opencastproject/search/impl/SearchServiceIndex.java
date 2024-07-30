@@ -21,6 +21,8 @@
 
 package org.opencastproject.search.impl;
 
+import static org.opencastproject.systems.OpencastConstants.DIGEST_USER_PROPERTY;
+
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
@@ -45,6 +47,7 @@ import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.NotFoundException;
@@ -131,6 +134,8 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
   /** The organization directory service */
   private OrganizationDirectoryService organizationDirectory = null;
 
+  private String systemUserName = null;
+
   /**
    * Creates a new instance of the search service index.
    */
@@ -146,6 +151,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
   @Activate
   public void activate(final ComponentContext cc) throws IllegalStateException {
     createIndex();
+    systemUserName = cc.getBundleContext().getProperty(DIGEST_USER_PROPERTY);
   }
 
   private void createIndex() {
@@ -216,7 +222,14 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
     checkMPWritePermission(mediaPackageId);
 
     logger.debug("Attempting to add media package {} to search index", mediaPackageId);
-    var acl = authorizationService.getActiveAcl(mediaPackage).getA();
+    final var acls = new AccessControlList[1];
+    final var org = securityService.getOrganization();
+    final var systemUser = SecurityUtil.createSystemUser(systemUserName, org);
+    // Ensure we always get the actual acl by forcing access
+    SecurityUtil.runAs(securityService, org, systemUser, () -> {
+      acls[0] = authorizationService.getActiveAcl(mediaPackage).getA();
+    });
+    var acl = acls[0] == null ? new AccessControlList() : acls[0];
     var now = new Date();
 
     try {
