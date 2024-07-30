@@ -24,8 +24,8 @@
     <!-- Keep captions in the loop, as they are ignored by select-tracks -->
 
     <operation
-        id="tag"
-        description="Tag captions for cutting">
+      id="tag"
+      description="Tag captions for cutting">
       <configurations>
         <configuration key="source-flavors">captions/source</configuration>
         <configuration key="target-flavor">captions/work</configuration>
@@ -75,8 +75,8 @@
     <!-- Mark captions for publication -->
 
     <operation
-        id="tag"
-        description="Mark captions for publication">
+      id="tag"
+      description="Mark captions for publication">
       <configurations>
         <configuration key="source-flavors">captions/trimmed</configuration>
         <configuration key="target-flavor">captions/delivery</configuration>
@@ -119,6 +119,20 @@
         <configuration key="target-tags">engage-download</configuration>
         <configuration key="encoding-profile">player-preview.http</configuration>
         <configuration key="time">3</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+      id="cover-image"
+      if="NOT (${presenter_work_video} OR $ ${presentation_work_video} OR ${presentation/thumbnail_edited}) AND (${presenter_work_audio} OR ${presentation_work_audio})"
+      description="Create a cover image for audio-only files">
+      <configurations>
+        <configuration key="stylesheet">file://${karaf.etc}/branding/coverimage.xsl</configuration>
+        <configuration key="width">1920</configuration>
+        <configuration key="height">1080</configuration>
+        <configuration key="posterimage-flavor">presenter/coverbackground</configuration>
+        <configuration key="target-flavor">presenter/player+preview</configuration>
+        <configuration key="target-tags">archive, engage-download</configuration>
       </configurations>
     </operation>
 
@@ -182,6 +196,7 @@
 
     <operation
       id="timelinepreviews"
+      if="(${presenter_work_video} OR $ ${presentation_work_video})"
       fail-on-error="false"
       exception-handler-workflow="partial-error"
       description="Creating timeline preview images">
@@ -201,6 +216,7 @@
 
     <operation
       id="include"
+      if="(${presenter_work_video} OR $ ${presentation_work_video})"
       description="Including theming operations">
       <configurations>
         <configuration key="workflow-id">partial-theming</configuration>
@@ -219,6 +235,7 @@
 
     <operation
       id="encode"
+      if="(${presenter_work_video} OR $ ${presentation_work_video})"
       exception-handler-workflow="partial-error"
       description="Encoding videos to mp4 delivery format">
       <configurations>
@@ -226,6 +243,19 @@
         <configuration key="target-flavor">*/delivery</configuration>
         <configuration key="target-tags">engage-download,engage-streaming</configuration>
         <configuration key="encoding-profile">adaptive-parallel.http</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+      id="encode"
+      if="NOT (${presenter_work_video} OR $ ${presentation_work_video}) AND (${presenter_work_audio} OR ${presentation_work_audio})"
+      exception-handler-workflow="partial-error"
+      description="Encoding audio-only files to mp3 delivery format">
+      <configurations>
+        <configuration key="source-flavor">*/trimmed</configuration>
+        <configuration key="target-flavor">*/delivery</configuration>
+        <configuration key="target-tags">engage-download,engage-streaming</configuration>
+        <configuration key="encoding-profile">audio-to-m4a.http</configuration>
       </configurations>
     </operation>
 
