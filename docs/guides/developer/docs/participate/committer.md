@@ -102,6 +102,9 @@ The current list of committers in aplhabetical order:
 <li><a href=https://github.com/lkiesow><img style="width: 40px; margin: 0"
  src=https://avatars.githubusercontent.com/u/1008395?u=9f82bb48d2d8f88f6c41ef382e41aae132d894e6&v=4
  /> lkiesow</a></li>
+ <li><a href=https://github.com/LukasKalbertodt><img style="width: 40px; margin: 0"
+  src=https://avatars.githubusercontent.com/u/7419664?v=4
+ /> LukasKalbertodt</a></li>
 <li><a href=https://github.com/mliradelc><img style="width: 40px; margin: 0"
  src=https://avatars.githubusercontent.com/u/8040628?u=d5028c1e9214b6cee0374a6651f8947e55bc546f&v=4
  /> mliradelc</a></li>
