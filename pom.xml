@@ -142,6 +142,7 @@
     <module>modules/hello-world-api</module>
     <module>modules/hello-world-impl</module>
     <module>modules/hello-world-workflowoperation</module>
+    <module>modules/subtitle-timeshift-workflowoperation</module>
     <module>modules/incident-workflowoperation</module>
     <module>modules/index-service</module>
     <module>modules/ingest-download-service-api</module>

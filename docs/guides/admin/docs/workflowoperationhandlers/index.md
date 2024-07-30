@@ -106,10 +106,11 @@ The following table contains the workflow operations that are available in an ou
 | series                               | Apply series to the mediapackage                                                          | [Documentation](series-woh.md)                               |
 | silence                              | Silence detection on audio of the mediapackage                                            | [Documentation](silence-woh.md)                              |
 | snapshot                             | Archive the current state of the mediapackage                                             | [Documentation](snapshot-woh.md)                             |
-| speechtotext                         | Create subtitles for video and audio sources                                              | [Documentation](speechtotext-woh.md)                       |
+| speechtotext                         | Create subtitles for video and audio sources                                              | [Documentation](speechtotext-woh.md)                         |
 | start-watson-transcription           | Starts automated transcription provided by IBM Watson                                     | [Documentation](start-watson-transcription-woh.md)           |
 | start-workflow                       | Start a new workflow for given media package ID                                           | [Documentation](start-workflow-woh.md)                       |
 | statistics-writer                    | Log statistical data about the video                                                      | [Documentation](statistics-writer.md)                        |
+| subtitle-timeshift                   | Shift the timestamps of subtitles                                                         | [Documentation](subtitle-timeshift-woh.md)                   |
 | tag                                  | Modify the tag sets of media package elements                                             | [Documentation](tag-woh.md)                                  |
 | tag-by-dcterm                        | Modify the tags if dublincore term matches value                                          | [Documentation](tag-by-dcterm-woh.md)                        |
 | tag-engage                           | Modify the tag sets of media package elements in the engage publication                   | [Documentation](tag-engage-woh.md)                           |

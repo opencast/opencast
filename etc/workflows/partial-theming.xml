@@ -124,5 +124,27 @@
       </configurations>
     </operation>
 
+    <operation
+        id="subtitle-timeshift"
+        if="${theme_bumper_active}"
+        exception-handler-workflow="partial-error"
+        description="Create new captions with time offset">
+      <configurations>
+        <configuration key="subtitle-source-flavor">captions/trimmed</configuration>
+        <configuration key="target-flavor">captions/shifted</configuration>
+        <configuration key="video-source-flavor">branding/bumper</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+        id="tag"
+        if="NOT ${theme_bumper_active}"
+        description="If no shifting was necessary, mark the trimmed captions as shifted">
+      <configurations>
+        <configuration key="source-flavors">captions/trimmed</configuration>
+        <configuration key="target-flavor">captions/shifted</configuration>
+      </configurations>
+    </operation>
+
   </operations>
 </definition>
