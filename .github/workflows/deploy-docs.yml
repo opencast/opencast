@@ -32,6 +32,14 @@ jobs:
       run: |
         python -m mkdocs build
 
+    - name: generate list of committers
+      working-directory: docs/guides/developer/
+      env:
+        GITHUB_USER: ${{ secrets.GH_USER }}
+        GITHUB_PA_TOKEN: ${{ secrets.GH_PA_TOKEN }}
+      run: |
+        ./.generate-list-of-committers.sh
+
     - name: build developer docs
       working-directory: docs/guides/developer/
       run: |
