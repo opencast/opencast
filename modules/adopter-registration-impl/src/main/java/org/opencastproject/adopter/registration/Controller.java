@@ -163,6 +163,8 @@ public class Controller {
                           isRequired = false, name = "agreedToPolicy", type = BOOLEAN),
                   @RestParameter(description = "Does the adopter allow the gathering of error reports.",
                           isRequired = false, name = "allowsErrorReports", type = BOOLEAN),
+                  @RestParameter(description = "Is this a test system.",
+                          isRequired = false, name = "isTestSystem", type = BOOLEAN),
                   @RestParameter(description = "Does the adopter allow the gathering of statistic data.",
                           isRequired = false, name = "allowsStatistics", type = BOOLEAN),
                   @RestParameter(description = "Is the adopter already registered.",
@@ -184,13 +186,14 @@ public class Controller {
           @FormParam("streetNo") String streetNo,
           @FormParam("contactMe") boolean contactMe,
           @FormParam("agreedToPolicy") boolean agreedToPolicy,
+          @FormParam("isTestSystem") boolean isTestSystem,
           @FormParam("allowsErrorReports") boolean allowsErrorReports,
           @FormParam("allowsStatistics") boolean allowsStatistics,
           @FormParam("registered") boolean registered) {
     logger.debug("Saving adopter registration data.");
 
     Form form = new Form(organisationName, departmentName, firstName, lastName, email, country, postalCode, city,
-            street, streetNo, contactMe, allowsStatistics, allowsErrorReports, agreedToPolicy, registered
+            street, streetNo, contactMe, isTestSystem, allowsStatistics, allowsErrorReports, agreedToPolicy, registered
     );
     try {
       registrationService.saveFormData(form);
