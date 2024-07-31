@@ -1,1 +1,0 @@
-With this release you can now provide an imprint and a privacy statement to the admin-ui. For configuration see [the respective docs](../configuration/admin-ui/about.md)
