@@ -115,6 +115,7 @@
               !software.amazon.awssdk.*,
               !waffle.*,
               !org.codehaus.groovy*,
+              !org.locationtech.jts.geom.*,
               org.w3c.dom;version=0,
               *
             </Import-Package>

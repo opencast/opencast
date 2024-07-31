@@ -72,18 +72,6 @@
       </configurations>
     </operation>
 
-    <!-- Mark captions for publication -->
-
-    <operation
-        id="tag"
-        description="Mark captions for publication">
-      <configurations>
-        <configuration key="source-flavors">captions/trimmed</configuration>
-        <configuration key="target-flavor">captions/delivery</configuration>
-        <configuration key="target-tags">+engage-download</configuration>
-      </configurations>
-    </operation>
-
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
     <!-- Extract preview images                                            -->
     <!--                                                                   -->
@@ -204,6 +192,18 @@
       description="Including theming operations">
       <configurations>
         <configuration key="workflow-id">partial-theming</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Mark captions for publication -->
+
+    <operation
+        id="tag"
+        description="Mark captions for publication">
+      <configurations>
+        <configuration key="source-flavors">captions/shifted</configuration>
+        <configuration key="target-flavor">captions/delivery</configuration>
+        <configuration key="target-tags">+engage-download</configuration>
       </configurations>
     </operation>
 
