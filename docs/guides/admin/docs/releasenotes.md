@@ -17,8 +17,8 @@ See [changelog](changelog.md#opencast-157) for a comprehensive list of changes.
 **Attention:**
 The fix for the handling of captions by the select-tracks operation
 ([5829](https://github.com/opencast/opencast/pull/5829)) requires the removal of the operation directly afterwards from
-the `partial-publish` community workflow, otherwise captions will be duplicated during publication (see
-[6046](https://github.com/opencast/opencast/pull/6046) which is _not_ included in this release).
+the `partial-publish` workflow, otherwise captions will be duplicated during publication.
+This workflow has been fixed in 15.8 (see [6046](https://github.com/opencast/opencast/pull/6046) for details).
 
 ### Behavior changes
 
