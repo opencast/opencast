@@ -1,3 +1,0 @@
-The External API endpoint `POST /api/events/{eventId}/track` now have a tags parameter.
-Setting `overwriteExisting=true` and `lang:LANG-CODE` tag will replace only the elements with the same lang tag.
-This allows us to put or update subtitles for multiple languages.
