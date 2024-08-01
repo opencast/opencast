@@ -33,6 +33,9 @@ import org.opencastproject.search.impl.SearchServiceIndex;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.urlsigning.exception.UrlSigningException;
+import org.opencastproject.security.urlsigning.service.UrlSigningService;
+import org.opencastproject.security.urlsigning.utils.UrlSigningServiceOsgiUtil;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -110,6 +113,10 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
   private SecurityService securityService;
 
   private final Gson gson = new Gson();
+
+  private UrlSigningService urlSigningService;
+
+  private long expireSeconds = UrlSigningServiceOsgiUtil.DEFAULT_URL_SIGNING_EXPIRE_DURATION;
 
   @GET
   @Path("series.json")
@@ -422,6 +429,12 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
       result = hits.getHits().stream()
           .map(SearchResult::dehydrateForREST)
           .collect(Collectors.toList());
+
+      // Sign urls if id is present
+      if (StringUtils.isNotEmpty(id) && this.urlSigningService != null) {
+        this.findURLsAndSign(result);
+      }
+
       total = hits.getTotalHits();
     }
     var json = gson.toJsonTree(Map.of(
@@ -431,6 +444,39 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
         "limit", size));
 
     return Response.ok(gson.toJson(json)).build();
+  }
+
+  /**
+   * Iterate recursively through Object List and sign all Strings with key=url
+   * @param obj
+   */
+  private void findURLsAndSign(Object obj) {
+    if (obj instanceof Map) {
+      Map<String, Object> map = (Map<String, Object>) obj;
+      for (Map.Entry<String, Object> entry : map.entrySet()) {
+        if (entry.getKey().equals("url") && entry.getValue() instanceof String) {
+          String urlToSign = (String) entry.getValue();
+          if (this.urlSigningService.accepts(urlToSign)) {
+            try {
+              String signedUrl = this.urlSigningService.sign(
+                  urlToSign,
+                  expireSeconds,
+                  null,
+                  null);
+              map.put(entry.getKey(), signedUrl);
+            } catch (UrlSigningException e) {
+              logger.debug("Unable to sign url '" + urlToSign + "'.");
+            }
+          }
+        } else {
+          findURLsAndSign(entry.getValue());
+        }
+      }
+    } else if (obj instanceof List) {
+      for (Object item : (List<?>) obj) {
+        findURLsAndSign(item);
+      }
+    }
   }
 
   /**
@@ -470,6 +516,11 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
   @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
+  }
+
+  @Reference
+  void setUrlSigningService(UrlSigningService service) {
+    this.urlSigningService = service;
   }
 
 }
