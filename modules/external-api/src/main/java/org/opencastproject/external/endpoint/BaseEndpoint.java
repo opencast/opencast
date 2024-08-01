@@ -29,12 +29,14 @@ import static org.opencastproject.util.RestUtil.getEndpointUrl;
 
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiVersion;
+import org.opencastproject.maintenance.api.MaintenanceService;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.systems.OpencastConstants;
+import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Tuple;
@@ -56,6 +58,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
@@ -95,16 +98,27 @@ public class BaseEndpoint {
   /** The json serializer */
   private static final SimpleSerializer serializer = new SimpleSerializer();
 
+  private static final DateTimeFormatter maintenanceDateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+
   /** Base URL of this endpoint */
   protected String endpointBaseUrl;
 
   /* OSGi service references */
   private SecurityService securityService;
 
+  /* OSGi service references */
+  private MaintenanceService maintenanceService;
+
   /** OSGi DI */
   @Reference
   void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
+  }
+
+  /** OSGi DI */
+  @Reference
+  void setMaintenanceService(MaintenanceService maintenanceService) {
+    this.maintenanceService = maintenanceService;
   }
 
   /** OSGi activation method */
@@ -242,6 +256,32 @@ public class BaseEndpoint {
           @RestResponse(description = "The default version is returned.", responseCode = HttpServletResponse.SC_OK) })
   public Response getVersionDefault() throws Exception {
     JValue json = obj(f("default", v(ApiVersion.CURRENT_VERSION.toString())));
+    return RestUtil.R.ok(MediaType.APPLICATION_JSON_TYPE, serializer.toJson(json));
+  }
+
+  @GET
+  @Path("info/maintenance")
+  @RestQuery(name = "getMaintenanceInfo",
+      description = "Returns maintenance info.",
+      returnDescription = "Status",
+      responses = {
+      @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "The maintenance info is returned.")
+  })
+  public Response getMaintenanceInfo() throws Exception {
+
+    final boolean inMaintenance = maintenanceService.isMaintenanceRunning();
+    final boolean inReadOnlyMode = maintenanceService.isReadOnlyActive();
+
+
+    final String startDate = maintenanceDateFormatter.format(maintenanceService.getStartDate());
+    final String endDate = maintenanceDateFormatter.format(maintenanceService.getEndDate());
+
+    JValue json = obj(
+        f("in_maintenance", v(inMaintenance)),
+        f("read_only", v(inReadOnlyMode)),
+        f("start_date", v(startDate, Jsons.BLANK)),
+        f("end_date", v(endDate, Jsons.BLANK))
+    );
     return RestUtil.R.ok(MediaType.APPLICATION_JSON_TYPE, serializer.toJson(json));
   }
 
