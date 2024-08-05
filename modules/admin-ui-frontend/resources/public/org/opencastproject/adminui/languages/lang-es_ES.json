@@ -28,7 +28,7 @@
    "YES": "Sí",
    "COPY": "Copiar en el portapapeles",
    "MONITOR": {
-      "REGISTRATION": "Out of date"
+      "REGISTRATION": "Desactualizado"
    },
    "LTI": {
       "ERROR_LOADING_METADATA": "Error al cargar los metadatos del evento. Por favor, inténtelo más tarde.",
@@ -63,7 +63,7 @@
       "GENERIC_ERROR": "Error: {{message}}",
       "DELETION_SUCCESS": "El evento ha sido eliminado exitosamente",
       "DELETION_SUCCESS_DESCRIPTION": "El evento se eliminará de la lista en unos momentos…",
-      "EVENT_LOCKED": "Actualmente se está trabajando en ello. Por favor, espere hasta hacer más cambios…",
+      "EVENT_LOCKED": "Actualmente se está trabajando e este evento. Por favor, espere hasta hacer más cambios…",
       "DELETION_FAILURE": "Error al eliminar el evento",
       "DELETION_FAILURE_DESCRIPTION": "Por favor, inténtelo más tarde...",
       "RESULT_HEADING": "Resultados {{range.begin}}-{{range.end}} de {{total}}",
@@ -153,12 +153,12 @@
       "TITLE": "Reconstrucción del índice",
       "WARNING": "¡Atención!",
       "HEADER": "¡Reconstrucción del índice en curso!",
-      "THEME_SERVICE": "Theme Service",
-      "SERIES_SERVICE": "Series Service",
-      "SCHEDULER_SERVICE": "Scheduler Service",
-      "ASSETMANAGER_SERVICE": "AssetManager Service",
-      "COMMENTS_SERVICE": "Comments Service",
-      "WORKFLOW_SERVICE": "Workflow Service"
+      "THEME_SERVICE": "Servicio de Temas y Personalización",
+      "SERIES_SERVICE": "Servicio de Series",
+      "SCHEDULER_SERVICE": "Servicio de programación (Scheduler)",
+      "ASSETMANAGER_SERVICE": "Servicio de AssetManager",
+      "COMMENTS_SERVICE": "Servicio de comentarios",
+      "WORKFLOW_SERVICE": "Servicio de flujo de trabajo (Workflows)"
    },
    "NOTIFICATIONS": {
       "ACL_ADDED": "Se ha creado la política de acceso",
@@ -205,8 +205,8 @@
       "EVENT_DELETED": "El evento ha sido eliminado.",
       "EVENT_WILL_BE_DELETED": "Se está eliminando el evento",
       "EVENTS_DELETED": "Se están eliminando los eventos.",
-      "EVENTS_NOT_DELETED": "No se ha(n) podido eliminar el/los evento(s).",
-      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "No se ha(n) podido borrar el/los evento(s) porque no se dispone del permiso para ello.",
+      "EVENTS_NOT_DELETED": "No se ha(n) podido eliminar el\/los evento(s).",
+      "EVENTS_NOT_DELETED_NOT_AUTHORIZED": "No se ha(n) podido borrar el\/los evento(s) porque no se dispone del permiso para ello.",
       "SERIES_DELETED": "Se ha borrado la serie",
       "SERIES_NOT_DELETED": "No se ha podido borrar la serie",
       "LOCATION_DELETED": "Se ha borrado la ubicación",
@@ -217,7 +217,7 @@
       "CONFLICT_ALREADY_ENDED": "Error de programación: El evento ya ha terminado.",
       "CONFLICT_END_BEFORE_START": "Error de programación: El final tiene que ser más tarde que el comienzo.",
       "CONFLICT_IN_THE_PAST": "El programa no podría ser actualizado: no se puede programar un evento que en el pasado.",
-      "INVALID_ACL_RULES": "Las reglas deben contener un nombre de rol válido y permiso(s) de lectura y/o escritura.",
+      "INVALID_ACL_RULES": "Las reglas deben contener un nombre de rol válido y permiso(s) de lectura y\/o escritura.",
       "MISSING_ACL_RULES": "¡Se requiere al menos un rol con permisos de Lectura y Escritura!",
       "SAVED_ACL_RULES": "Se han guardado las reglas de acceso.",
       "SAVED_METADATA": "Los metadatos han sido guardados.",
@@ -263,10 +263,10 @@
       "TOBIRA_OVERRIDE_NAME": "El título de la página seleccionada se sobrescribirá con el título de la serie.",
       "TOBIRA_NO_PATH_SEGMENT": "La página necesita un segmento de ruta.",
       "TOBIRA_NOT_MOUNTED": "No se pudo montar la serie en Tobira.",
-      "TOBIRA_PATH_SEGMENT_INVALID": "Path segment is invalid. A valid path segment is at least 2 characters long, does not contain any whitespace or control characters, none of the characters '<>\"[\\]^`{|}#%/?]', and doesn't start with any of the characters '-+~@_!$&;:.,=*'()'.",
+      "TOBIRA_PATH_SEGMENT_INVALID": "El segmento de ruta (PATH) no es válido. El segmento de ruta (PATH) no es válido. Un segmento de ruta válido tiene al menos 2 caracteres, no contiene ningún espacio en blanco o caracteres de control, ninguno de los caracteres '<>\"[\\]^`{|}#%\/? ', y no empieza con ninguno de los caracteres '-+~@_! &;:. =*'()'.",
       "TOBIRA_PATH_SEGMENT_UNIQUE": "El segmento de ruta de una página debe ser única entre todas sus páginas hermanas.",
       "TOBIRA_PAGE_NOT_FOUND": "La página a la que intentó navegar no existe o ya no existe. ¿Quiere empezar desde el principio?",
-      "TOBIRA_SERVER_ERROR": " Error al hablar con Tobira. Contacte con el administrador de su sistema y/o vuelva a intentarlo más tarde.",
+      "TOBIRA_SERVER_ERROR": " Error al hablar con Tobira. Contacte con el administrador de su sistema y\/o vuelva a intentarlo más tarde.",
       "TOBIRA_COPIED_DIRECT_LINK": "Enlace copiado al portapapeles.",
       "TOBIRA_FAILED_COPYING_DIRECT_LINK": "No se pudo copiar el enlace al portapapeles.",
       "TOBIRA_NOT_FOUND": "Tobira no conoce esta serie (aún). Inténtelo de nuevo en unos minutos o póngase en contacto con el administrador del sistema."
@@ -294,7 +294,7 @@
          "GENERAL": {
             "CAPTION": "General",
             "SUMMARY": "({{ count }} eventos seleccionados)",
-            "CANNOTSTART": "Los eventos destacados no pueden ser procesados en este momento. Deselect it/them or try again later."
+            "CANNOTSTART": "Los eventos destacados no pueden ser procesados en este momento. Elimine la selección o inténtelo de nuevo más tarde."
          },
          "TASKS": {
             "CAPTION": "Tareas",
@@ -352,7 +352,7 @@
             }
          },
          "EDIT": {
-            "DESCRIPTION": "Editar y/o seleccionar los campos de metadatos que desea actualizar. A field cannot be selected if this doesn't result in a changed value for at least one event, or if the field isn't valid (e.g. required fields cannot be empty). Highlighted metadata fields have diverging values for the selected events.",
+            "DESCRIPTION": "Editar y\/o seleccionar los campos de metadatos que desea actualizar. No se puede seleccionar un campo si esto no resulta en un valor cambiado para al menos un evento, o si el campo no es válido (los campos obligatorios no pueden estar vacíos). Los campos de metadatos destacados tienen valores no compatibles para los eventos seleccionados.",
             "TABLE": {
                "CAPTION": "Metadatos de los eventos seleccionados",
                "FIELDS": "Metadatos",
@@ -442,7 +442,7 @@
          },
          "INFORMATION_STATE": {
             "HEADER": "¡Gracias por usar Opencast!",
-            "INFORMATION_PARAGRAPH_1": "Our developers are constantly working to provide you the best possible user experience. For that, we need to know more about who uses Opencast and how it is used. Puede ayudarnos con un registro rápido.",
+            "INFORMATION_PARAGRAPH_1": " Para ello, necesitamos saber más sobre quién utiliza Opencast y cómo se utiliza. Puede ayudarnos con un registro rápido.",
             "INFORMATION_PARAGRAPH_2": "Agradecemos mucho cualquier comentario, ya que incluso algunos de los datos que recopilamos sobre el uso de Opencast nos ayudarán a crear mejor software, tener mejores posibilidades de financiación adicional y atraer más empresas para prestar servicios alrededor de Opencast."
          },
          "FORM_STATE": {
@@ -905,14 +905,14 @@
                   "ADDITIONAL_ACTIONS": "Más Acciones",
                   "ACTION": "Acciones",
                   "NEW": "Nueva política",
-                  "NEW_USER": "New user",
-                  "DETAILS": "Non-user roles",
+                  "NEW_USER": "Nuevo usuario",
+                  "DETAILS": "Non-user Roles",
                   "USER": "Usuario",
-                  "USERS": "Users who are authorized for the event",
-                  "NONEXISTENT_USER": "Nonexistent user",
+                  "USERS": "Usuarios autorizados para el evento",
+                  "NONEXISTENT_USER": "Usuario inexistente",
                   "HELP": {
-                     "READ": "By setting read rights, the event becomes visible for the selected user",
-                     "WRITE": "By setting write rights, the selected user can edit the event"
+                     "READ": "Al establecer los derechos de lectura, el evento se hace visible para el usuario seleccionado",
+                     "WRITE": "Configurando los derechos de escritura, el usuario seleccionado puede editar el evento"
                   }
                },
                "ROLES": {
@@ -920,8 +920,8 @@
                   "EMPTY": "No hay roles disponibles"
                },
                "USERS": {
-                  "LABEL": "Select a user",
-                  "EMPTY": "No user found"
+                  "LABEL": "Seleccione un usuario",
+                  "EMPTY": "Usuario no encontrado"
                }
             },
             "COMMENTS": {
@@ -937,7 +937,7 @@
                "REASONS": {
                   "CUTTING": "Pendiente de cortar",
                   "REVIEW": "Pendiente de revisar",
-                  "ASYNC": "Pistas de A/V asíncronas",
+                  "ASYNC": "Pistas de A\/V asíncronas",
                   "AUDIO_ISSUE": "Pista de audio no disponible o defectuosa",
                   "CANCELLED": "Evento cancelado",
                   "CONFLICTING_METADATA": "Conflicto de metadatos",
@@ -1139,13 +1139,13 @@
                   "ADDITIONAL_ACTIONS": "Acciones Adicionales",
                   "ACTION": "Acciones",
                   "NEW": "Nueva política",
-                  "NEW_USER": "New user",
-                  "DETAILS": "Non-user roles",
+                  "NEW_USER": "Nuevo usuario",
+                  "DETAILS": "Non-user Roles",
                   "USER": "Usuario",
-                  "USERS": "Users who are authorized for the series",
+                  "USERS": "Usuarios autorizados para la serie",
                   "HELP": {
-                     "READ": "By setting read rights, the series becomes visible for the selected user",
-                     "WRITE": "By setting write rights, the selected user can edit the series"
+                     "READ": "Al establecer los derechos de lectura, la serie se hace visible para el usuario seleccionado",
+                     "WRITE": "Configurando los derechos de escritura, el usuario seleccionado puede editar la serie"
                   }
                },
                "ROLES": {
@@ -1153,8 +1153,8 @@
                   "EMPTY": "No hay roles disponibles"
                },
                "USERS": {
-                  "LABEL": "Select a user",
-                  "EMPTY": "No user found"
+                  "LABEL": "Seleccione un usuario",
+                  "EMPTY": "Usuario no encontrado"
                }
             },
             "THEME": {
@@ -1168,7 +1168,7 @@
             },
             "TOBIRA": {
                "CAPTION": "Tobira",
-               "DESCRIPTION": "Aquí puede seleccionar dónde desea que la serie aparezca en el portal de vídeo de Tobira. You can only select one location here, and it needs to be empty (marked in bold). Puede crear nuevas páginas aquí, pero tenga en cuenta que sólo persisten si están en la ruta a la página seleccionada.",
+               "DESCRIPTION": "Aquí puede seleccionar dónde desea que la serie aparezca en el portal de vídeo de Tobira. Sólo puede seleccionar una ubicación aquí, y debe de estar vacía (marcada en negrita). Puede crear nuevas páginas aquí, pero tenga en cuenta que sólo persisten si están en la ruta a la página seleccionada.",
                "SELECT_PAGE": "Seleccione una página de destino",
                "PAGE_TITLE": "Título de subpágina",
                "PATH_SEGMENT": "Segmento de ruta",
@@ -1228,20 +1228,20 @@
                   "ADDITIONAL_ACTIONS": "Acciones Adicionales",
                   "ACTION": "Acciones",
                   "NEW": "Nueva política",
-                  "DETAILS": "Non-user roles",
+                  "DETAILS": "Non-user Roles",
                   "REPLACE_EVENT_ACLS": "Actualizar permisos de evento",
                   "REPLACE_EVENT_ACLS_HINT": "Asegúrese de que todos los eventos de esta serie tengan estos permisos en vigor",
                   "SAVE_SERIES_ACLS": "Guardar",
                   "SAVE_SERIES_ACLS_HINT": "Aplicar permisos sólo a series",
                   "LOAD_MORE_LIMIT": "políticas mostradas.",
                   "LOAD_MORE_LINK": "Cargar más",
-                  "NEW_USER": "New user",
+                  "NEW_USER": "Nuevo usuario",
                   "USER": "Usuario",
-                  "USERS": "Users who are authorized for the series",
-                  "NONEXISTENT_USER": "Nonexistent user",
+                  "USERS": "Usuarios autorizados para la serie",
+                  "NONEXISTENT_USER": "Usuario inexistente",
                   "HELP": {
-                     "READ": "By setting read rights, the series becomes visible for the selected user",
-                     "WRITE": "By setting write rights, the selected user can edit the series"
+                     "READ": "Al establecer los derechos de lectura, la serie se hace visible para el usuario seleccionado",
+                     "WRITE": "Configurando los derechos de escritura, el usuario seleccionado puede editar la serie"
                   }
                },
                "ROLES": {
@@ -1249,8 +1249,8 @@
                   "EMPTY": "No hay roles disponibles"
                },
                "USERS": {
-                  "LABEL": "Select a user",
-                  "EMPTY": "No user found"
+                  "LABEL": "Seleccione un usuario",
+                  "EMPTY": "Usuario no encontrado"
                }
             },
             "METADATA": {
@@ -1272,7 +1272,7 @@
                "HOMEPAGE": "(Página principal)",
                "DIRECT_LINK": "Enlace directo a la serie",
                "COPY_DIRECT_LINK": "Copiar en el portapapeles",
-               "NOT_MOUNTED": "This series is currently not included in the page structure, and can only be reached using the direct link above.",
+               "NOT_MOUNTED": "Esta serie no está actualmente incluida en la estructura de la página, y solo se puede alcanzar utilizando el enlace directo de arriba.",
                "PAGES": "Páginas en Tobira que contienen esta serie"
             },
             "EVENTS": {
@@ -1375,7 +1375,7 @@
             },
             "DESCRIPTION": {
                "ROLES": "Roles y grupos que pueden asignarse o ya se han asignado al usuario.",
-               "EXTERNALROLES": "La lista de roles externos asignados al usuario y proporcionados por el/los proveedor/es de roles externo/s.",
+               "EXTERNALROLES": "La lista de roles externos asignados al usuario y proporcionados por el\/los proveedor\/es de roles externo\/s.",
                "EFFECTIVEROLES": "La lista de roles efectivos asignados directamente al usuario y los roles obtenidos indirectamente por pertenecer a grupos."
             },
             "FORM": {
@@ -1489,14 +1489,14 @@
                   "ADDITIONAL_ACTIONS": "Acciones Adicionales",
                   "ACTION": "Acciones",
                   "NEW": "Nueva política",
-                  "DETAILS": "Non-user roles",
+                  "DETAILS": "Non-user Roles",
                   "DESCRIPTION": "Por favor, elija un conjunto de políticas preconfigurado o añada políticas personalizadas",
-                  "NEW_USER": "New user",
+                  "NEW_USER": "Nuevo usuario",
                   "USER": "Usuario",
-                  "USERS": "Users who are authorized by this access policy",
+                  "USERS": "Usuarios autorizados por esta política de acceso",
                   "HELP": {
-                     "READ": "By setting read permissions, the entity to which this access policy is assigned becomes visible to the selected user.",
-                     "WRITE": "By setting write permissions, the entity to which this access policy is assigned can be modified by the selected user."
+                     "READ": "Al configurar los permisos de lectura, la entidad a la que se asigna esta política de acceso se hace visible para el usuario seleccionado.",
+                     "WRITE": "Al configurar los permisos de lectura, la entidad a la que se asigna esta política de acceso se hace visible para el usuario seleccionado."
                   }
                },
                "ROLES": {
@@ -1504,8 +1504,8 @@
                   "EMPTY": "No hay roles disponibles"
                },
                "USERS": {
-                  "LABEL": "Select a user",
-                  "EMPTY": "No user found"
+                  "LABEL": "Seleccione un usuario",
+                  "EMPTY": "Usuario no encontrado"
                }
             }
          },
@@ -1538,15 +1538,15 @@
                   "ADDITIONAL_ACTIONS": "Acciones Adicionales",
                   "ACTION": "Acciones",
                   "NEW": "Nueva política",
-                  "DETAILS": "Non-user roles",
+                  "DETAILS": "Non-user Roles",
                   "DESCRIPTION": "Por favor, elija un conjunto de políticas preconfigurado o añada políticas personalizadas",
-                  "NEW_USER": "New user",
+                  "NEW_USER": "",
                   "USER": "Usuario",
-                  "USERS": "Users who are authorized by this access policy",
-                  "NONEXISTENT_USER": "Nonexistent user",
+                  "USERS": "Usuarios autorizados por esta política de acceso",
+                  "NONEXISTENT_USER": "Usuario inexistente",
                   "HELP": {
-                     "READ": "By setting read permissions, the entity to which this access policy is assigned becomes visible to the selected user.",
-                     "WRITE": "By setting write permissions, the entity to which this access policy is assigned can be modified by the selected user."
+                     "READ": "Al configurar los permisos de lectura, la entidad a la que se asigna esta política de acceso se hace visible para el usuario seleccionado.",
+                     "WRITE": "Al configurar los permisos de lectura, la entidad a la que se asigna esta política de acceso se hace visible para el usuario seleccionado."
                   }
                },
                "ROLES": {
@@ -1554,8 +1554,8 @@
                   "EMPTY": "No hay roles disponibles"
                },
                "USERS": {
-                  "LABEL": "Select a user",
-                  "EMPTY": "No user found"
+                  "LABEL": "Seleccione un usuario",
+                  "EMPTY": "Usuario no encontrado"
                }
             }
          }
@@ -1804,7 +1804,7 @@
       "ACTIONS": {
          "SPLIT": "Dividir",
          "SPLIT_TOOLTIP": "Dividir segmento en la posición actual del cursor.",
-         "CUT": "Ocultar/Mostrar",
+         "CUT": "Ocultar\/Mostrar",
          "CUT_TOOLTIP": "Ocultar o mostrar la parte seleccionada del vídeo.",
          "REPLAY_SEGMENT": "Reproducir Inicio del Segmento",
          "REPLAY_SEGMENT_TOOLTIP": "Reproducir el segmento actual desde el principio.",
@@ -1875,8 +1875,8 @@
             "NO_PREVIEW_AVAILABLE": "No se han encontrado imágenes de vista previa",
             "NO_TRACK_SELECTED": "No se ha seleccionado una pista de vídeo",
             "TOOLTIPS": {
-               "HIDE": "This video track is currently enabled. Haga clic para desactivar",
-               "UNHIDE": "This video track is currently disabled. Marque para activar"
+               "HIDE": " Haga clic para desactivar",
+               "UNHIDE": " Marque para activar"
             }
          },
          "AUDIO": {
@@ -1885,8 +1885,8 @@
             "NO_PREVIEW_AVAILABLE": "No se han encontrado imágenes de vista previa",
             "NO_TRACK_SELECTED": "No se ha seleccionado una pista de audio",
             "TOOLTIPS": {
-               "HIDE": "This audio track is currently enabled. Haga clic para desactivar",
-               "UNHIDE": "This audio track is currently disabled. Haga clic para activar"
+               "HIDE": " Haga clic para desactivar",
+               "UNHIDE": "Esta pista de audio está desactivada Haga clic para activar"
             }
          }
       },
@@ -1895,8 +1895,8 @@
          "PAUSE": "Pausa",
          "NEXT_FRAME": "Siguiente fotograma",
          "PREVIOUS_FRAME": "Fotograma anterior",
-         "NEXT_SEGMENT": "Siguiente segmento / Saltar al final",
-         "PREVIOUS_SEGMENT": "Segmento anterior / Saltar al principio",
+         "NEXT_SEGMENT": "Siguiente segmento \/ Saltar al final",
+         "PREVIOUS_SEGMENT": "Segmento anterior \/ Saltar al principio",
          "MUTE": "Silenciar",
          "VOLUME": "Volumen"
       }
@@ -1907,7 +1907,7 @@
       "USERNAME": "Nombre de usuario…",
       "PASSWORD": "Contraseña…",
       "LOGIN": "Identificarse",
-      "ERROR": "Nombre de usuario y/o contraseña incorrecto(s)"
+      "ERROR": "Nombre de usuario y\/o contraseña incorrecto(s)"
    },
    "TABLE_FILTERS": {
       "FILTER_SELECTION": {
@@ -2165,7 +2165,7 @@
    "HOTKEYS": {
       "CHEAT_SHEET": {
          "TITLE": "Atajos de teclado",
-         "HINT": "Esta página lista los atajos de teclado disponibles actualmente. Note that these might change depending on what page you are currently visiting."
+         "HINT": "Esta página lista los atajos de teclado disponibles actualmente. Tenga en cuenta que esto puede cambiar dependiendo de la página que esté visitando actualmente."
       },
       "KEYS": {
          "CTRL": "Ctrl",
@@ -2197,7 +2197,7 @@
          "GENERAL": "General",
          "PLAYER": "Reproductor",
          "EDITOR": "Editor",
-         "ADD_MEDIA": "Crear Evento/Serie"
+         "ADD_MEDIA": "Crear Evento\/Serie"
       },
       "DESCRIPTIONS": {
          "GENERAL": {
@@ -2212,16 +2212,16 @@
             "CHEAT_SHEET": "Atajos de teclado"
          },
          "PLAYER": {
-            "PLAY_PAUSE": "Reproducir/pausar",
+            "PLAY_PAUSE": "Reproducir\/pausar",
             "PREVIOUS_FRAME": "Fotograma anterior",
             "NEXT_FRAME": "Siguiente fotograma",
             "STEP_BACKWARD": "Retroceder 10s",
             "STEP_FORWARD": "Avanzar 10s",
-            "PREVIOUS_SEGMENT": "Segmento anterior / Saltar al principio",
-            "NEXT_SEGMENT": "Segmento siguiente / Saltar al final",
+            "PREVIOUS_SEGMENT": "Segmento anterior \/ Saltar al principio",
+            "NEXT_SEGMENT": "Segmento siguiente \/ Saltar al final",
             "VOLUME_UP": "Subir volumen",
             "VOLUME_DOWN": "Bajar volumen",
-            "MUTE": "Activar/desactivar sonido"
+            "MUTE": "Activar\/desactivar sonido"
          },
          "EDITOR": {
             "SPLIT_AT_CURRENT_TIME": "Dividir",
@@ -2232,7 +2232,7 @@
             "PLAY_ENDING_OF_CURRENT_SEGMENT": "Fin de segmento"
          },
          "ADD_MEDIA": {
-            "NEXT_TAB": "Siguiente pestaña/Crear",
+            "NEXT_TAB": "Siguiente pestaña\/Crear",
             "PREVIOUS_TAB": "Pestaña anterior"
          }
       }
@@ -2254,7 +2254,7 @@
       }
    },
    "STATISTICS": {
-      "NOT_AVAILABLE": "Statistics cannot be displayed at the moment. Por favor, inténtelo más tarde.",
+      "NOT_AVAILABLE": "Las estadísticas no se pueden mostrar en este momento. Por favor, inténtelo más tarde.",
       "UNSUPPORTED_TYPE": "Lo sentimos, Opencast no puede procesar este tipo de datos estadísticos.",
       "FROM": "Desde",
       "TO": "Hasta",
@@ -2270,7 +2270,7 @@
          "PUBLISHEDHOURS": "Horas de Vídeo Publicadas"
       },
       "DESCRIPTION": {
-         "RANDOM": "This displays random data as a showcase. You can disable this chart by deleting the corresponding statistics provider's json definition from etc/providers",
+         "RANDOM": "Muestra datos aleatorios como test. Esto muestra datos aleatorios como test. Puede desactivar este gráfico eliminando la definición json del proveedor de estadísticas correspondiente de etc\/providers",
          "VIEWS_SUM": "Aquí se muestra el número total de vistas por unidad de tiempo.",
          "VIEWS_AVG": "Aquí se muestra el número medio de vistas diarias por unidad de tiempo.",
          "PUBLISHEDHOURS": "Esto muestra las horas de video publicadas"
