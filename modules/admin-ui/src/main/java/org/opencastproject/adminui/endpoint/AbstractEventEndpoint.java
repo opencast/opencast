@@ -2584,7 +2584,7 @@ public abstract class AbstractEventEndpoint {
         }
       }
       if (EventListQuery.FILTER_IS_PUBLISHED_NAME.equals(name)) {
-        switch (IsPublished.valueOf(filters.get(name))){
+        switch (IsPublished.valueOf(filters.get(name))) {
           case YES:
             query.withIsPublished(true);
             break;

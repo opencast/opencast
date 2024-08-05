@@ -871,7 +871,9 @@ public class EventSearchQuery extends AbstractSearchQuery {
    *
    * @return the recording is published status
    */
-  public Boolean getIsPublished() { return isPublished; }
+  public Boolean getIsPublished() {
+    return isPublished;
+  }
 
   /**
    * Selects events with the given archive version.
