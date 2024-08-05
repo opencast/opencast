@@ -103,7 +103,7 @@ jobs:
         if: matrix.java == 11
         working-directory: docs/scripts/devel-dependency-containers
         run: |
-          docker-compose up -d
+          docker compose up -d
 
       - name: wait for elasticsearch to boot
         if: matrix.java == 11
