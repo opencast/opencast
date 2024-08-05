@@ -37,6 +37,7 @@
 
     <operation
       id="select-tracks"
+      if="${hide_tracks}"
       exception-handler-workflow="partial-error"
       description="Selecting audio/video streams for processing">
       <configurations>
@@ -44,6 +45,18 @@
         <configuration key="target-flavor">*/work</configuration>
         <configuration key="target-tags">-archive</configuration>
         <configuration key="audio-muxing">duplicate</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+        id="tag"
+        if="NOT ${hide_tracks}"
+        description="Tag properly if select-tracks is not run">
+      <configurations>
+        <configuration key="source-flavors">*/prepared</configuration>
+        <configuration key="target-flavor">*/work</configuration>
+        <configuration key="target-tags">-archive</configuration>
+        <configuration key="copy">true</configuration>
       </configurations>
     </operation>
 
