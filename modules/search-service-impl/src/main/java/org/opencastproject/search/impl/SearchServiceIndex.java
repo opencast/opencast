@@ -308,7 +308,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
         try {
           actions = listProvidersService.getList("ACL.ACTIONS", query, true);
         } catch (ListProviderException e) {
-          throw new RuntimeException("Listproviders not loaded. " + e);
+          throw new SearchException("Listproviders not loaded. " + e);
         }
         for (String action : actions.keySet()) {
           customEntries.add(
