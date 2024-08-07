@@ -21,6 +21,7 @@
 
 package org.opencastproject.search.impl;
 
+import static org.opencastproject.security.util.SecurityUtil.getEpisodeRoleId;
 import static org.opencastproject.systems.OpencastConstants.DIGEST_USER_PROPERTY;
 
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
@@ -299,8 +300,8 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
     // This allows users with a role of the form ROLE_EPISODE_<ID>_<ACTION> to access the event through the index
     if (episodeIdRole) {
       Set<AccessControlEntry> customEntries = new HashSet<>();
-      customEntries.add(new AccessControlEntry("ROLE_EPISODE_" + mediaPackageId + "_" + "READ", "read", true));
-      customEntries.add(new AccessControlEntry("ROLE_EPISODE_" + mediaPackageId + "_" + "WRITE", "write", true));
+      customEntries.add(new AccessControlEntry(getEpisodeRoleId(mediaPackageId, "READ"), "read", true));
+      customEntries.add(new AccessControlEntry(getEpisodeRoleId(mediaPackageId, "WRITE"), "write", true));
 
       ResourceListQuery query = new ResourceListQueryImpl();
       if (listProvidersService.hasProvider("ACL.ACTIONS")) {
@@ -312,7 +313,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
         }
         for (String action : actions.keySet()) {
           customEntries.add(
-              new AccessControlEntry("ROLE_EPISODE_" + mediaPackageId + "_" + action.toUpperCase(), action, true));
+              new AccessControlEntry(getEpisodeRoleId(mediaPackageId, action), action, true));
         }
       }
 

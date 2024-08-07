@@ -26,6 +26,7 @@ import static org.opencastproject.security.api.Permissions.Action.CONTRIBUTE;
 import static org.opencastproject.security.api.Permissions.Action.READ;
 import static org.opencastproject.security.api.Permissions.Action.WRITE;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLE;
+import static org.opencastproject.security.util.SecurityUtil.getEpisodeRoleId;
 
 import org.opencastproject.db.DBSession;
 import org.opencastproject.db.DBSessionFactory;
@@ -83,8 +84,6 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
 
   /** Logging utilities */
   private static final Logger logger = LoggerFactory.getLogger(SearchServiceDatabaseImpl.class);
-
-  private static final String ACL_ID_PREFIX_EPISODE = "ROLE_EPISODE_";
 
   /** Factory used to create {@link EntityManager}s for transactions */
   protected EntityManagerFactory emf;
@@ -175,7 +174,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
 
         // allow ca users to retract live publications without putting them into the ACL
         User user = securityService.getUser();
-        if (!user.hasRole(ACL_ID_PREFIX_EPISODE + mediaPackageId + "_" + WRITE.toString().toUpperCase())) {
+        if (!user.hasRole(getEpisodeRoleId(mediaPackageId, WRITE.toString()))) {
           if (!(searchMp.isLive() && currentUser.hasRole(GLOBAL_CAPTURE_AGENT_ROLE)) && accessControlXml != null) {
             AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
             if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, WRITE.toString())) {
@@ -354,7 +353,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
           // Ensure this user is allowed to update this media package
           // If user has ROLE_EPISODE_<ID>_WRITE, no further permission checks are necessary
           User user = securityService.getUser();
-          if (!user.hasRole(ACL_ID_PREFIX_EPISODE + mediaPackageId + "_" + WRITE.toString().toUpperCase())) {
+          if (!user.hasRole(getEpisodeRoleId(mediaPackageId, WRITE.toString()))) {
             String accessControlXml = entity.get().getAccessControl();
             if (accessControlXml != null && entity.get().getDeletionDate() == null) {
               AccessControlList accessList = AccessControlParser.parseAcl(accessControlXml);
@@ -402,7 +401,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
         User user = securityService.getUser();
         final String[] suffix = { READ.toString(), CONTRIBUTE.toString(), WRITE.toString() };
         for (var action : suffix) {
-          if (user.hasRole(ACL_ID_PREFIX_EPISODE + mediaPackageId + "_" + action.toUpperCase())) {
+          if (user.hasRole(getEpisodeRoleId(mediaPackageId, action))) {
             return MediaPackageParser.getFromXml(episodeEntity.get().getMediaPackageXML());
           }
         }
@@ -444,7 +443,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
         }
         // Ensure this user is allowed to read this media package
         User user = securityService.getUser();
-        if (!user.hasRole(ACL_ID_PREFIX_EPISODE + mediaPackageId + "_" + READ.toString().toUpperCase())) {
+        if (!user.hasRole(getEpisodeRoleId(mediaPackageId, READ.toString()))) {
           String accessControlXml = searchEntity.get().getAccessControl();
           if (accessControlXml != null) {
             AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
@@ -481,7 +480,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
         }
         // Ensure this user is allowed to read this media package
         User user = securityService.getUser();
-        if (!user.hasRole(ACL_ID_PREFIX_EPISODE + mediaPackageId + "_" + READ.toString().toUpperCase())) {
+        if (!user.hasRole(getEpisodeRoleId(mediaPackageId, READ.toString()))) {
           String accessControlXml = searchEntity.get().getAccessControl();
           if (accessControlXml != null) {
             AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
@@ -518,7 +517,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
         }
         // Ensure this user is allowed to read this media package
         User user = securityService.getUser();
-        if (!user.hasRole(ACL_ID_PREFIX_EPISODE + mediaPackageId + "_" + READ.toString().toUpperCase())) {
+        if (!user.hasRole(getEpisodeRoleId(mediaPackageId, READ.toString()))) {
           String accessControlXml = searchEntity.get().getAccessControl();
           if (accessControlXml != null) {
             AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);

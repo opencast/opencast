@@ -28,8 +28,10 @@ import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.hasNo
 import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.isNotPublication;
 import static org.opencastproject.mediapackage.MediaPackageSupport.getFileName;
 import static org.opencastproject.mediapackage.MediaPackageSupport.getMediaPackageElementId;
+import static org.opencastproject.security.api.SecurityConstants.EPISODE_ROLE_ID_PREFIX;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLE;
+import static org.opencastproject.security.util.SecurityUtil.getEpisodeRoleId;
 
 import org.opencastproject.assetmanager.api.Asset;
 import org.opencastproject.assetmanager.api.AssetId;
@@ -174,7 +176,6 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
   private static final String MANIFEST_DEFAULT_NAME = "manifest";
 
-  private static final String ACL_ID_PREFIX_EPISODE = "ROLE_EPISODE_";
   private static final String CONFIG_EPISODE_ID_ROLE = "org.opencastproject.episode.id.role.access";
   private static boolean episodeIdRole = false;
 
@@ -1068,8 +1069,9 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     return securityService.getUser().getRoles().stream()
             .filter(roleFilter)
             .map((role) -> {
-              if (episodeIdRole && role.getName().startsWith(ACL_ID_PREFIX_EPISODE)) {
-                return q.mediapackageId().eq(StringUtils.substringBetween(role.getName(), ACL_ID_PREFIX_EPISODE, "_"));
+              if (episodeIdRole && role.getName().startsWith(EPISODE_ROLE_ID_PREFIX)) {
+                return q.mediapackageId().eq(StringUtils.substringBetween(
+                    role.getName(), EPISODE_ROLE_ID_PREFIX + "_", "_"));
               } else {
                 return q.property(Value.BOOLEAN, SECURITY_NAMESPACE, mkPropertyName(role.getName(), action)).eq(true);
               }
@@ -1104,7 +1106,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
         }
         // check episode role id
         User user = securityService.getUser();
-        if (episodeIdRole && user.hasRole(ACL_ID_PREFIX_EPISODE + mediaPackageId + "_" + action.toUpperCase())) {
+        if (episodeIdRole && user.hasRole(getEpisodeRoleId(mediaPackageId, action))) {
           return true;
         }
         // check acl rules

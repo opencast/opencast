@@ -21,6 +21,7 @@
 
 package org.opencastproject.elasticsearch.index;
 
+import static org.opencastproject.security.util.SecurityUtil.getEpisodeRoleId;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.elasticsearch.api.SearchIndexException;
@@ -909,10 +910,8 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
     // Add custom roles to the ACL
     // This allows users with a role of the form ROLE_EPISODE_<ID>_<ACTION> to access the event through the index
     Set<AccessControlEntry> customEntries = new HashSet<>();
-    customEntries.add(new AccessControlEntry("ROLE_EPISODE_" + event.getIdentifier()
-        + "_" + "READ", "read", true));
-    customEntries.add(new AccessControlEntry("ROLE_EPISODE_" + event.getIdentifier()
-        + "_" + "WRITE", "write", true));
+    customEntries.add(new AccessControlEntry(getEpisodeRoleId(event.getIdentifier(), "READ"), "read", true));
+    customEntries.add(new AccessControlEntry(getEpisodeRoleId(event.getIdentifier(), "WRITE"), "write", true));
 
     ResourceListQuery query = new ResourceListQueryImpl();
     if (listProvidersService.hasProvider("ACL.ACTIONS")) {
@@ -923,8 +922,7 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
         throw new SearchIndexException("Listproviders not loaded. " + e);
       }
       for (String action : actions.keySet()) {
-        customEntries.add(new AccessControlEntry("ROLE_EPISODE_" + event.getIdentifier()
-            + "_" + action.toUpperCase(), action, true));
+        customEntries.add(new AccessControlEntry(getEpisodeRoleId(event.getIdentifier(), action), action, true));
       }
     }
 
