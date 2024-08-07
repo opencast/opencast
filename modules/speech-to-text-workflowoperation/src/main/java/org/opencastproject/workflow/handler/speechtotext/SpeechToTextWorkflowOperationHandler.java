@@ -27,6 +27,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
+import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.attachment.AttachmentImpl;
 import org.opencastproject.mediapackage.selector.TrackSelector;
@@ -46,6 +47,7 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -57,9 +59,12 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Workflow operation for the speech-to-text service.
@@ -91,6 +96,30 @@ public class
 
   /** Translation mode */
   private static final String TRANSLATE_MODE = "translate";
+
+  /** Configuration: Track Selection Strategy (Control which tracks shall be transcribed) */
+  private static final String TRACK_SELECTION_STRATEGY = "track-selection-strategy";
+
+  /** Configuration: Limit to One (If true, max 1 subtitle file will be generated) */
+  private static final String LIMIT_TO_ONE = "limit-to-one";
+
+  private enum TrackSelectionStrategy {
+    PRESENTER_OR_NOTHING,
+    PRESENTATION_OR_NOTHING,
+    TRY_PRESENTER_FIRST,
+    TRY_PRESENTATION_FIRST,
+    EVERYTHING;
+
+    private static TrackSelectionStrategy fromString(String value) {
+      for (TrackSelectionStrategy strategy : values()) {
+        if (strategy.name().equalsIgnoreCase(value)) {
+          return strategy;
+        }
+      }
+      throw new IllegalArgumentException(
+          "No TrackSelectionStrategy enum constant " + TrackSelectionStrategy.class.getCanonicalName() + "." + value);
+    }
+  }
 
   private enum AppendSubtitleAs {
     attachment, track
@@ -138,7 +167,7 @@ public class
     trackSelector.addFlavor(sourceFlavor);
     Collection<Track> tracks = trackSelector.select(mediaPackage, false);
 
-    if (tracks.size() == 0) {
+    if (tracks.isEmpty()) {
       throw new WorkflowOperationException(
               String.format("No tracks with source flavor '%s' found for transcription", sourceFlavor));
     }
@@ -154,12 +183,96 @@ public class
     // Translate to english
     Boolean translate = getTranslationMode(mediaPackage, workflowInstance);
 
-    for (Track track : tracks) {
-      createSubtitle(track, languageCode, mediaPackage, tagsAndFlavors, appendSubtitleAs, translate);
+    // Create sublist that includes only the tracks that has audio
+    List<Track> tracksWithAudio = tracks.stream().filter(Track::hasAudio).collect(Collectors.toList());
+
+    // Get the track selection strategy from the workflow configuration
+    // If nothing is set, all tracks (with audio) will be transcribed
+    TrackSelectionStrategy trackSelectionStrategy = getTrackSelectionStrategy(mediaPackage, workflowInstance);
+
+    // Use the selection strategy from the workflow config to get the tracks we want to transcribe
+    List<Track> tracksToTranscribe = filterTracksByStrategy(tracksWithAudio, trackSelectionStrategy);
+
+    // Load the 'limit-to-one' configuration from the workflow operation.
+    // This configuration sets the limit of generated subtitle files to one
+    boolean limitToOne = BooleanUtils.toBoolean(workflowInstance.getCurrentOperation().getConfiguration(LIMIT_TO_ONE));
+
+    int subtitleCounter = 0;
+    for (Track track : tracksToTranscribe) {
+      boolean success = createSubtitle(track, languageCode, mediaPackage, tagsAndFlavors, appendSubtitleAs, translate);
+      if (success) {
+        subtitleCounter++;
+        if (limitToOne) {
+          // if the transcription was successful and the limit-to-one config is enabled, we simply skip the rest
+          break;
+        }
+      }
     }
 
-    logger.info("Text-to-Speech workflow operation for media package {} completed", mediaPackage);
-    return createResult(mediaPackage, WorkflowOperationResult.Action.CONTINUE);
+    logger.info("Speech-To-Text workflow operation for media package {} completed", mediaPackage);
+
+    if (subtitleCounter > 0) {
+      return createResult(mediaPackage, WorkflowOperationResult.Action.CONTINUE);
+    } else {
+      logger.info("No subtitles were created for media package {}. "
+          + "Workflow Configuration 'track-selection-strategy' is set to {} "
+          + "and configuration 'limit-to-one' is set to {}", mediaPackage, trackSelectionStrategy, limitToOne);
+      return createResult(mediaPackage, WorkflowOperationResult.Action.SKIP);
+    }
+  }
+
+  /**
+   * Filters the tracks by the strategy configured in the workflow operation
+   * @param tracksWithAudio        List of the tracks that includes audio
+   * @param trackSelectionStrategy The strategy configured in the workflow operation
+   * @return The filtered tracks
+   */
+  private List<Track> filterTracksByStrategy(List<Track> tracksWithAudio,
+      TrackSelectionStrategy trackSelectionStrategy) {
+
+    List<Track> tracksToTranscribe = new ArrayList<>();
+    if (!tracksWithAudio.isEmpty()) {
+
+      String presenterTypeConstant = MediaPackageElements.PRESENTER_SOURCE.getType();
+      String presentationTypeConstant = MediaPackageElements.PRESENTATION_SOURCE.getType();
+
+      // Creates a sublist only including the presenter tracks
+      List<Track> presenterTracksWithAudio = tracksWithAudio.stream()
+          .filter(track -> Objects.equals(track.getFlavor().getType(), presenterTypeConstant))
+          .collect(Collectors.toList());
+
+      // Creates a sublist only including the presentation tracks
+      List<Track> presentationTracksWithAudio = tracksWithAudio.stream()
+          .filter(track -> Objects.equals(track.getFlavor().getType(), presentationTypeConstant))
+          .collect(Collectors.toList());
+
+      if (TrackSelectionStrategy.PRESENTER_OR_NOTHING.equals(trackSelectionStrategy)) {
+        tracksToTranscribe.addAll(presenterTracksWithAudio);
+      }
+
+      if (TrackSelectionStrategy.PRESENTATION_OR_NOTHING.equals(trackSelectionStrategy)) {
+        tracksToTranscribe.addAll(presentationTracksWithAudio);
+      }
+
+      if (TrackSelectionStrategy.TRY_PRESENTER_FIRST.equals(trackSelectionStrategy)) {
+        tracksToTranscribe.addAll(presenterTracksWithAudio);
+        if (tracksToTranscribe.isEmpty()) {
+          tracksToTranscribe.addAll(tracksWithAudio);
+        }
+      }
+
+      if (TrackSelectionStrategy.TRY_PRESENTATION_FIRST.equals(trackSelectionStrategy)) {
+        tracksToTranscribe.addAll((presentationTracksWithAudio));
+        if (tracksToTranscribe.isEmpty()) {
+          tracksToTranscribe.addAll(tracksWithAudio);
+        }
+      }
+
+      if (TrackSelectionStrategy.EVERYTHING.equals(trackSelectionStrategy)) {
+        tracksToTranscribe.addAll(tracksWithAudio);
+      }
+    }
+    return tracksToTranscribe;
   }
 
   /**
@@ -171,14 +284,22 @@ public class
    * @param tagsAndFlavors Tags and flavors instance (to get target flavor information)
    * @param appendSubtitleAs Tells how the subtitles file has to be appended.
    * @param translate Enable translation to english.
+   * @return False if subtitles wasn't generated (because of missing audio for example), true otherwise
    * @throws WorkflowOperationException Get thrown if an error occurs.
    */
-  private void createSubtitle(Track track, String languageCode, MediaPackage parentMediaPackage,
+  private boolean createSubtitle(Track track, String languageCode, MediaPackage parentMediaPackage,
           ConfiguredTagsAndFlavors tagsAndFlavors, AppendSubtitleAs appendSubtitleAs, Boolean translate)
           throws WorkflowOperationException {
 
     // Start the transcription job, create subtitles file
     URI trackURI = track.getURI();
+
+    if (!track.hasAudio()) {
+      // In case we have no audio, simply skip the track, so we don't run in any errors
+      logger.info("Track doesn't contain audio. Skipping subtitle generation for track {}", trackURI);
+      return false;
+    }
+
     Job job;
     logger.info("Generating subtitle for '{}'...", trackURI);
     try {
@@ -252,7 +373,38 @@ public class
     } catch (IOException e) {
       throw new WorkflowOperationException(e);
     }
+    return true;
   }
+
+  /**
+   * Get the config for the "track selection strategy". It's used to determine which tracks shall be transcribed.
+   * If there are 2 Videos and both has audio for example, what audio shall be transcribed?
+   *
+   * @param workflowInstance Contains the workflow configuration.
+   * @return Which strategy to use
+   * @throws WorkflowOperationException Get thrown if an error occurs.
+   */
+  private TrackSelectionStrategy getTrackSelectionStrategy(MediaPackage mediaPackage, WorkflowInstance workflowInstance)
+          throws WorkflowOperationException {
+
+    WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
+    String strategyCfg = StringUtils.trimToEmpty(operation.getConfiguration(TRACK_SELECTION_STRATEGY)).toLowerCase();
+
+    TrackSelectionStrategy trackSelectionStrategy;
+    if (strategyCfg.isEmpty()) {
+      trackSelectionStrategy = TrackSelectionStrategy.EVERYTHING; // "transcribe everything" is the default/fallback
+    } else {
+      try {
+        trackSelectionStrategy = TrackSelectionStrategy.fromString(strategyCfg);
+      } catch (IllegalArgumentException e) {
+        throw new WorkflowOperationException(String.format(
+            "Speech-to-Text job for media package '%s' failed, because of wrong workflow configuration. "
+                + "track-selection-strategy of type '%s' does not exist.", mediaPackage, strategyCfg));
+      }
+    }
+    return trackSelectionStrategy;
+  }
+
 
   /**
    * Get the information how to append the subtitles file to the media package.
@@ -312,7 +464,6 @@ public class
     }
     return translateMode;
   }
-
 
   /**
    * Searches some places to get the right language of the media package / track.

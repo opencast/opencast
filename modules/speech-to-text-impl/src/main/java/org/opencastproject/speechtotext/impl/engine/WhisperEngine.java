@@ -106,6 +106,9 @@ public class WhisperEngine implements SpeechToTextEngine {
   /** Map to get ISO 639 language code for language name in English */
   private Map<String, String> languageMap = new HashMap<>();
 
+  /** Map to get ISO 639 language code for 3-letter language code */
+  private Map<String, String> languageISO3to2Map = new HashMap<>();
+
   @Override
   public String getEngineName() {
     return engineName;
@@ -136,6 +139,8 @@ public class WhisperEngine implements SpeechToTextEngine {
       Locale locale = new Locale(languageCode);
       String languageName = locale.getDisplayLanguage(new Locale("en"));
       languageMap.put(languageName, languageCode);
+      String languageISO3 = locale.getISO3Language();
+      languageISO3to2Map.put(languageISO3, languageCode);
     }
     logger.debug("Filled language map.");
 
@@ -170,9 +175,15 @@ public class WhisperEngine implements SpeechToTextEngine {
     }
 
     if (!language.isBlank() && !translate) {
-      logger.debug("Using language {} from workflows", language);
-      transcriptionCommand.add("--language");
-      transcriptionCommand.add(language);
+      // get 2-letter language code
+      language = languageISO3to2Map.getOrDefault(language,"");
+      if (language.isBlank()) {
+        logger.warn("No 2-letter language code found, using language auto detection");
+      } else {
+        logger.debug("Using language {} from workflows", language);
+        transcriptionCommand.add("--language");
+        transcriptionCommand.add(language);
+      }
     }
 
     if (quantization != null) {
@@ -259,4 +270,3 @@ public class WhisperEngine implements SpeechToTextEngine {
     return new Result(language, output);
   }
 }
-

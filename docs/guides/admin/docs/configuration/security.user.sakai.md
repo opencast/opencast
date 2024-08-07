@@ -26,8 +26,8 @@ account on the Sakai instance.
 
 ### Step 1
 
-Edit `etc/org.apache.karaf.features.cfg` and make sure the `opencast-sakai` feature is listed in the `featuresBoot`
-option.
+Edit `etc/org.opencastproject.plugin.impl.PluginManagerImpl` and make sure the `opencast-plugin-userdirectory-sakai`
+plugin is enabled.
 
 ### Step 2
 

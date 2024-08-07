@@ -1056,9 +1056,8 @@ public class IndexServiceImpl implements IndexService {
     MetadataField presentersMetadataField = eventMetadata.getOutputFields()
             .get(DublinCore.PROPERTY_CREATOR.getLocalName());
     if (presentersMetadataField.isUpdated()) {
-      Set<String> presenterUsernames = new HashSet<>();
       Tuple<List<String>, Set<String>> updatedPresenters = getTechnicalPresenters(eventMetadata);
-      presenterUsernames = updatedPresenters.getB();
+      Set<String> presenterUsernames = updatedPresenters.getB();
       eventMetadata.removeField(presentersMetadataField);
       MetadataField newPresentersMetadataField = new MetadataField(presentersMetadataField);
       newPresentersMetadataField.setValue(updatedPresenters.getA());
@@ -1140,8 +1139,16 @@ public class IndexServiceImpl implements IndexService {
           String flavorSubType = (String)((JSONObject) assetDataMap.get(asset)).get("flavorSubType");
           String tags = (String)((JSONObject) assetDataMap.get(asset)).get("tags");
           String[] tagsArray = null;
+          // Captions may have lang:LANG_CODE tag set.
+          String langTag = null;
           if (tags != null) {
             tagsArray = tags.split(",");
+            for (String tag : tagsArray) {
+              if (StringUtils.startsWith(StringUtils.trimToEmpty(tag), "lang:")) {
+                langTag = StringUtils.trimToEmpty(tag);
+                break;
+              }
+            }
           }
           // Use 'multiple' setting to allow multiple elements with same flavor or not.
           boolean overwriteExisting = !(Boolean) ((JSONObject) assetDataMap.get(asset)).getOrDefault("multiple", false);
@@ -1154,8 +1161,11 @@ public class IndexServiceImpl implements IndexService {
               // remove existing attachments of the new flavor
               Attachment[] existing = mp.getAttachments(newElemflavor);
               for (int i = 0; i < existing.length; i++) {
-                mp.remove(existing[i]);
-                logger.info("Overwriting existing asset {} {}", type, newElemflavor);
+                // if lang tag is set, we should only remove elements with the same lang tag
+                if (null == langTag || existing[i].containsTag(langTag)) {
+                  mp.remove(existing[i]);
+                  logger.info("Overwriting existing asset {} {}", type, newElemflavor);
+                }
               }
             }
             // correct the flavor of the new attachment
@@ -1172,8 +1182,11 @@ public class IndexServiceImpl implements IndexService {
               // remove existing catalogs of the new flavor
               Catalog[] existing = mp.getCatalogs(newElemflavor);
               for (int i = 0; i < existing.length; i++) {
-                mp.remove(existing[i]);
-                logger.info("Overwriting existing asset {} {}", type, newElemflavor);
+                // if lang tag is set, we should only remove elements with the same lang tag
+                if (null == langTag || existing[i].containsTag(langTag)) {
+                  mp.remove(existing[i]);
+                  logger.info("Overwriting existing asset {} {}", type, newElemflavor);
+                }
               }
             }
             Catalog[] catArray = mp.getCatalogs(new MediaPackageElementFlavor(assetOrig, "*"));
@@ -1192,8 +1205,11 @@ public class IndexServiceImpl implements IndexService {
               // remove existing catalogs of the new flavor
               Track[] existing = mp.getTracks(newElemflavor);
               for (int i = 0; i < existing.length; i++) {
-                mp.remove(existing[i]);
-                logger.info("Overwriting existing asset {} {}", type, newElemflavor);
+                // if lang tag is set, we should only remove elements with the same lang tag
+                if (null == langTag || existing[i].containsTag(langTag)) {
+                  mp.remove(existing[i]);
+                  logger.info("Overwriting existing asset {} {}", type, newElemflavor);
+                }
               }
             }
             Track[]  trackArray = mp.getTracks(new MediaPackageElementFlavor(assetOrig, "*"));
@@ -1312,11 +1328,6 @@ public class IndexServiceImpl implements IndexService {
 
     Event event = optEvent.get();
     MediaPackage mediaPackage = getEventMediapackage(event);
-    Opt<Set<String>> presenters = Opt.none();
-    DublinCoreMetadataCollection eventCatalog = metadataList.getMetadataByAdapter(getCommonEventCatalogUIAdapter());
-    if (eventCatalog != null) {
-      presenters = updatePresenters(eventCatalog);
-    }
     updateMediaPackageMetadata(mediaPackage, metadataList);
     switch (getEventSource(event)) {
       case WORKFLOW:
@@ -1338,6 +1349,8 @@ public class IndexServiceImpl implements IndexService {
         assetManager.takeSnapshot(mediaPackage);
         break;
       case SCHEDULE:
+        DublinCoreMetadataCollection eventCatalog = metadataList.getMetadataByAdapter(getCommonEventCatalogUIAdapter());
+        Opt<Set<String>> presenters = eventCatalog == null ? Opt.none() : updatePresenters(eventCatalog);
         try {
           schedulerService.updateEvent(id, Opt.none(), Opt.none(), Opt.none(), presenters, Opt.some(mediaPackage),
               Opt.none(), Opt.none());

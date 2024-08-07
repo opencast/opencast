@@ -49,8 +49,6 @@ nav:
       - MacOS X: 'installation/source-macosx.md'
    - Installation from Package:
       - Debian/Ubuntu: 'installation/debs.md'
-      - Fedora: 'installation/rpm-fedora.md'
-      - RHEL/CentOS 7: 'installation/rpm-el7.md'
       - RHEL/CentOS Stream 8/9: 'installation/rpm-el.md'
    - Installation via script:
       - Ansible: 'installation/ansible.md'
@@ -66,8 +64,8 @@ nav:
       - Using Nginx: 'configuration/https/nginx.md'
       - Using Apache httpd: configuration/https/apache-httpd.md
       - Internal HTTPS: 'configuration/https/opencast.only.md'
-      - Migrating old content to HTTPS: 'configuration/https/migration.md'
       - Self-Signed Certificates: 'configuration/https/self-signed-certificates.md'
+   - Domain change/HTTPS migration: 'configuration/migration-domain-https.md'
    - Admin UI Configuration:
         - Capture-Agent Access: configuration/admin-ui/capture-agent-access.md
         - Event Filters: 'configuration/admin-ui/event-filters.md'
@@ -253,6 +251,7 @@ nav:
    - Start Watson Transcription: 'workflowoperationhandlers/start-watson-transcription-woh.md'
    - Start Workflow: 'workflowoperationhandlers/start-workflow-woh.md'
    - Statistics Writer: 'workflowoperationhandlers/statistics-writer.md'
+   - Subtitle Timeshift: 'workflowoperationhandlers/subtitle-timeshift-woh.md'
    - Tag: 'workflowoperationhandlers/tag-woh.md'
    - Tag-By-DCTerm: 'workflowoperationhandlers/tag-by-dcterm-woh.md'
    - Tag-Engage: 'workflowoperationhandlers/tag-engage-woh.md'

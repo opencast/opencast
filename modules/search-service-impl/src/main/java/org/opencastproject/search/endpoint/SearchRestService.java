@@ -30,6 +30,7 @@ import org.opencastproject.search.api.SearchResultList;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.search.impl.SearchServiceImpl;
 import org.opencastproject.search.impl.SearchServiceIndex;
+import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
@@ -187,11 +188,10 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     var user = securityService.getUser();
     var orgAdminRole = securityService.getOrganization().getAdminRole();
     if (!user.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE) && !user.hasRole(orgAdminRole)) {
-      var roleQuery = QueryBuilders.boolQuery();
-      for (var role: user.getRoles()) {
-        roleQuery.should(QueryBuilders.matchQuery(SearchResult.INDEX_ACL + ".read", role.getName()));
-      }
-      query.must(roleQuery);
+      query.must(QueryBuilders.termsQuery(
+              SearchResult.INDEX_ACL + ".read",
+              user.getRoles().stream().map(Role::getName).collect(Collectors.toList())
+      ));
     }
 
     var size = NumberUtils.toInt(limit, 20);
@@ -216,7 +216,11 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
             .build();
       }
       var order = SortOrder.fromString(sortParam.length > 1 ? sortParam[1] : "asc");
-      searchSource.sort("dc." + sortParam[0], order);
+      if ("modified".equals(sortParam[0])) {
+        searchSource.sort(sortParam[0], order);
+      } else {
+        searchSource.sort(SearchResult.DUBLINCORE + sortParam[0], order);
+      }
     }
 
     var hits = searchIndex.search(searchSource).getHits();
@@ -317,6 +321,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     final var org = securityService.getOrganization().getId();
     final var type = SearchService.IndexEntryType.Episode.name();
 
+    boolean snameNotFound = false;
     List<String> series = Collections.emptyList();
     if (StringUtils.isNotEmpty(seriesName)) {
       var seriesSearchSource = new SearchSourceBuilder().query(QueryBuilders.boolQuery()
@@ -327,6 +332,10 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
       series = searchService.search(seriesSearchSource).getHits().stream()
           .map(h -> h.getDublinCore().getFirst(DublinCore.PROPERTY_IDENTIFIER))
           .collect(Collectors.toList());
+      //If there is no series matching the sname provided
+      if (series.isEmpty()) {
+        snameNotFound = true;
+      }
     }
 
     var query = QueryBuilders.boolQuery()
@@ -361,11 +370,10 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     var orgAdminRole = securityService.getOrganization().getAdminRole();
     var admin = user.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE) || user.hasRole(orgAdminRole);
     if (!admin) {
-      var roleQuery = QueryBuilders.boolQuery();
-      for (var role: user.getRoles()) {
-        roleQuery.should(QueryBuilders.matchQuery(SearchResult.INDEX_ACL + ".read", role.getName()));
-      }
-      query.must(roleQuery);
+      query.must(QueryBuilders.termsQuery(
+              SearchResult.INDEX_ACL + ".read",
+              user.getRoles().stream().map(Role::getName).collect(Collectors.toList())
+      ));
     }
 
     logger.debug("limit: {}, offset: {}", limit, offset);
@@ -398,14 +406,24 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
             .build();
       }
       var order = SortOrder.fromString(sortParam.length > 1 ? sortParam[1] : "asc");
-      searchSource.sort(SearchResult.DUBLINCORE + "." + sortParam[0], order);
+      if ("modified".equals(sortParam[0])) {
+        searchSource.sort(sortParam[0], order);
+      } else {
+        searchSource.sort(SearchResult.DUBLINCORE + "." + sortParam[0], order);
+      }
     }
 
-    SearchResultList hits = searchService.search(searchSource);
-    var result = hits.getHits().stream()
-        .map(SearchResult::dehydrateForREST)
-        .collect(Collectors.toList());
-    var total = hits.getTotalHits();
+    List<Map<String, Object>> result = null;
+    long total = 0;
+    if (snameNotFound) {
+      result = Collections.emptyList();
+    } else {
+      SearchResultList hits = searchService.search(searchSource);
+      result = hits.getHits().stream()
+          .map(SearchResult::dehydrateForREST)
+          .collect(Collectors.toList());
+      total = hits.getTotalHits();
+    }
     var json = gson.toJsonTree(Map.of(
         "offset", from,
         "total", total,

@@ -21,6 +21,8 @@
 
 package org.opencastproject.search.impl;
 
+import static org.opencastproject.systems.OpencastConstants.DIGEST_USER_PROPERTY;
+
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
@@ -50,6 +52,7 @@ import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.NotFoundException;
@@ -71,6 +74,7 @@ import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.rest.RestStatus;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -146,6 +150,9 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
 
   private boolean episodeIdRole = false;
 
+  private String systemUserName = null;
+
+
   /**
    * Creates a new instance of the search service index.
    */
@@ -165,6 +172,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
     logger.debug("Usage of episode ID roles is set to {}", episodeIdRole);
 
     createIndex();
+    systemUserName = cc.getBundleContext().getProperty(DIGEST_USER_PROPERTY);
   }
 
   private void createIndex() {
@@ -235,7 +243,14 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
     checkMPWritePermission(mediaPackageId);
 
     logger.debug("Attempting to add media package {} to search index", mediaPackageId);
-    var acl = authorizationService.getActiveAcl(mediaPackage).getA();
+    final var acls = new AccessControlList[1];
+    final var org = securityService.getOrganization();
+    final var systemUser = SecurityUtil.createSystemUser(systemUserName, org);
+    // Ensure we always get the actual acl by forcing access
+    SecurityUtil.runAs(securityService, org, systemUser, () -> {
+      acls[0] = authorizationService.getActiveAcl(mediaPackage).getA();
+    });
+    var acl = acls[0] == null ? new AccessControlList() : acls[0];
     var now = new Date();
 
     try {
@@ -264,8 +279,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
     List<DublinCoreCatalog> seriesList = Collections.emptyList();
     if (dc.hasValue(DublinCore.PROPERTY_IS_PART_OF)) {
       //Find the series (if any), filter for those which exist to prevent linking non-existent series
-      List<DublinCoreValue> seriesIds = dc.get(DublinCore.PROPERTY_IS_PART_OF);
-      seriesList = seriesIds.stream().map(DublinCoreValue::getValue).map(s -> {
+      seriesList = dc.get(DublinCore.PROPERTY_IS_PART_OF).stream().map(DublinCoreValue::getValue).map(s -> {
         try {
           return seriesService.getSeries(s);
         } catch (NotFoundException e) {
@@ -279,23 +293,6 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
         }
         return null;
       }).filter(Objects::nonNull).collect(Collectors.toList());
-
-      //Get the list of filtered series IDs from the list of filtered series
-      List<String> filteredSeriesIds = seriesList.stream().map(s -> {
-        return s.getFirst(DublinCore.PROPERTY_IDENTIFIER);
-      }).collect(Collectors.toList());
-
-      //Note that if a series is listed in the input, but is not present in the series service then this will clear it
-      // from the indexed data.  This is deliberate, since a series which does not exist should not be listed as an ep's
-      // series.  This (IMO) is a data consistency issue - it should not happen, but better to handle it than break.
-      if (0 == filteredSeriesIds.size()) {
-        dc.remove(DublinCore.PROPERTY_IS_PART_OF);
-      } else {
-        //An episode is only part of *one* series, right?!
-        for (String sid : filteredSeriesIds) {
-          dc.set(DublinCore.PROPERTY_IS_PART_OF, sid);
-        }
-      }
     }
 
     // Add custom roles to the ACL
@@ -361,14 +358,14 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
 
   private void checkMPWritePermission(final String mediaPackageId) throws SearchException {
     try {
-      MediaPackage mp = persistence.getMediaPackage(mediaPackageId);
-      if (!authorizationService.hasPermission(mp, Permissions.Action.WRITE.toString())) {
+      AccessControlList acl = persistence.getAccessControlList(mediaPackageId);
+      if (!authorizationService.hasPermission(acl, Permissions.Action.WRITE.toString())) {
         boolean isAdmin = securityService.getUser().getRoles().stream()
             .map(Role::getName)
             .anyMatch(r -> r.equals(SecurityConstants.GLOBAL_ADMIN_ROLE));
         if (!isAdmin) {
           throw new UnauthorizedException(securityService.getUser(), "Write permission denied for " + mediaPackageId,
-              authorizationService.getActiveAcl(mp).getA());
+              acl);
         } else {
           logger.debug("Write for {} is not allowed by ACL, but user has {}",
               mediaPackageId, SecurityConstants.GLOBAL_ADMIN_ROLE);
@@ -438,7 +435,13 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
                 SearchResult.INDEX_ACL, SearchResult.dehydrateAclForIndex(seriesAcl),
                 SearchResult.MODIFIED_DATE, deletionString));
             var updateRequest = new UpdateRequest(INDEX_NAME, seriesId).doc(gson.toJson(json), XContentType.JSON);
-            esIndex.getClient().update(updateRequest, RequestOptions.DEFAULT);
+            try {
+              esIndex.getClient().update(updateRequest, RequestOptions.DEFAULT);
+            } catch (ElasticsearchStatusException e) {
+              if (RestStatus.NOT_FOUND == e.status()) {
+                logger.warn("Attempted to modify {}, but that series does not exist in the index.", seriesId);
+              }
+            }
           } else {
             // Remove series if there are no episodes in the series any longer
             deleteSeriesSynchronously(seriesId);
@@ -469,9 +472,17 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
           "deleted", Instant.now().getEpochSecond(),
           "modified", Instant.now().toString()));
       var updateRequest = new UpdateRequest(INDEX_NAME, seriesId).doc(gson.toJson(json), XContentType.JSON);
-      UpdateResponse response = esIndex.getClient().update(updateRequest, RequestOptions.DEFAULT);
-      //NB: We're marking things as deleted but *not actually deleting them**
-      return DocWriteResponse.Result.UPDATED == response.getResult();
+      try {
+        UpdateResponse response = esIndex.getClient().update(updateRequest, RequestOptions.DEFAULT);
+        //NB: We're marking things as deleted but *not actually deleting them**
+        return DocWriteResponse.Result.UPDATED == response.getResult();
+      } catch (ElasticsearchStatusException e) {
+        if (RestStatus.NOT_FOUND == e.status()) {
+          logger.debug("Attempted to delete {}, but that series does not exist in the index.", seriesId);
+          return true;
+        }
+        throw new SearchException(e);
+      }
     } catch (IOException e) {
       throw new SearchException("Could not delete series " + seriesId + " from index", e);
     }
