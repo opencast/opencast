@@ -21,6 +21,10 @@
 
 package org.opencastproject.elasticsearch.index.rebuild;
 
+import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService.DataType;
+
+import java.util.Arrays;
+
 /**
  * This service handles data that's added to an ElasticSearch index.
  */
@@ -28,10 +32,11 @@ public interface IndexProducer {
 
   /**
    * Re-add the data of this service to the index.
-   * @param type
-   *          Limit the data added to the index to the given type. Re-add all data if <code>null</code> is given.
+   *
+   * @param dataType
+   *          Limit the data added to the index. Use ALL to re-index all data.
    */
-  void repopulate(String type) throws IndexRebuildException;
+  void repopulate(DataType dataType) throws IndexRebuildException;
 
   /**
    * Get the service that implements IndexProducer.
@@ -40,4 +45,26 @@ public interface IndexProducer {
    *           The service that implements IndexProducer.
    */
   IndexRebuildService.Service getService();
+
+  /**
+   * Get supported data types for reindexing. Default: All.
+   *
+   * Should be overridden if a service offers partial index rebuilds.
+   *
+   * @return Array of supported data types
+   */
+  default DataType[] getSupportedDataTypes() {
+    return new DataType[]{ DataType.ALL };
+  }
+
+  /**
+   * Check if the data type is supported by this service.
+   *
+   * @param dataType The data type to check.
+   *
+   * @return Whether the data type is supported or not.
+   */
+  default boolean dataTypeSupported(DataType dataType) {
+    return Arrays.stream(getSupportedDataTypes()).anyMatch(s -> s == dataType);
+  }
 }

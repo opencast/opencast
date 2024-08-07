@@ -404,7 +404,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   };
 
   @Override
-  public void repopulate(String type) throws IndexRebuildException {
+  public void repopulate(IndexRebuildService.DataType type) throws IndexRebuildException {
     try {
       final int total = countComments();
       logIndexRebuildBegin(logger, total, "events with comment");

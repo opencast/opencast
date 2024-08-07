@@ -73,6 +73,7 @@ import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
 import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildException;
 import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService;
+import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService.DataType;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
@@ -115,7 +116,6 @@ import com.google.common.collect.Sets;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
-import org.apache.commons.lang3.EnumUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -132,17 +132,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -208,10 +198,6 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   );
 
   private final HashMap<String, RemoteAssetStore> remoteStores = new LinkedHashMap<>();
-
-  public enum ServicePart {
-    ACL
-  }
 
   /**
    * OSGi callback.
@@ -945,16 +931,12 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   @Override
-  public void repopulate(String type) throws IndexRebuildException {
-    if (type != null && !EnumUtils.isValidEnum(ServicePart.class, type)) {
-      throw new IndexRebuildException("The given type " + type + " was not valid. Should be null or "
-          + ServicePart.values());
-    }
-    ServicePart parsedType = null;
-    if (type != null && EnumUtils.isValidEnum(ServicePart.class, type)) {
-      parsedType = ServicePart.valueOf(type);
-    }
+  public DataType[] getSupportedDataTypes() {
+    return new DataType[]{ DataType.ALL, DataType.ACL };
+  }
 
+  @Override
+  public void repopulate(DataType dataType) throws IndexRebuildException {
     final Organization originalOrg = securityService.getOrganization();
     final User originalUser = (originalOrg != null ? securityService.getUser() : null);
     try {
@@ -991,17 +973,17 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
                 var updatedEventData = index.getEvent(snapshot.getMediaPackage().getIdentifier().toString(), orgId,
                     snapshotSystemUser);
-                if (type == null) {
+                if (dataType == DataType.ALL) {
                   // Reindex everything (default)
                   updatedEventData = getEventUpdateFunction(snapshot, orgId, snapshotSystemUser)
                       .apply(updatedEventData);
-                } else if (ServicePart.ACL.equals(parsedType)) {
+                } else if (dataType == DataType.ACL) {
                   // Only reindex ACLs
                   updatedEventData = getEventUpdateFunctionOnlyAcl(snapshot, orgId, snapshotSystemUser)
                       .apply(updatedEventData);
                 } else {
-                  throw new IndexRebuildException("The value for service part was " + type + ", which is not an "
-                      + "accepted value. Accepted values are ACL, null.");
+                  throw new IndexRebuildException(dataType + " is not a supported data type. " +
+                          "Accepted values are " + Arrays.toString(getSupportedDataTypes()) + ".");
                 }
                 updatedEventRange.add(updatedEventData.get());
 

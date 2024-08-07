@@ -490,7 +490,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
   }
 
   @Override
-  public void repopulate(String type) throws IndexRebuildException {
+  public void repopulate(IndexRebuildService.DataType type) throws IndexRebuildException {
     try {
       int total = persistence.countMediaPackages();
       int pageSize = 50;

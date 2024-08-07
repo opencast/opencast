@@ -22,7 +22,10 @@
 package org.opencastproject.elasticsearch.index.endpoint;
 
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
 import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService;
+import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService.DataType;
+import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService.Service;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.util.SecurityContext;
 import org.opencastproject.util.RestUtil.R;
@@ -139,13 +142,19 @@ public class IndexEndpoint {
         + "for more than one service at a time!",
         type = RestParameter.Type.STRING) }, responses = {
       @RestResponse(description = "OK if repopulation has started", responseCode = HttpServletResponse.SC_OK) })
-  public Response partiallyRebuildIndex(@PathParam("service") final String service) {
+  public Response partiallyRebuildIndex(@PathParam("service") final String serviceStr) {
+    Service service = EnumUtils.getEnum(Service.class, serviceStr);
+    if (service == null) {
+      return R.badRequest("The given path param for service was invalid.");
+    }
+    IndexProducer indexProducer = indexRebuildService.getIndexProducer(service);
+
     final SecurityContext securityContext = new SecurityContext(securityService, securityService.getOrganization(),
         securityService.getUser());
     executor.execute(() -> securityContext.runInContext(() -> {
       try {
         logger.info("Starting to repopulate the index from service {}", service);
-        indexRebuildService.rebuildIndex(elasticsearchIndex, service);
+        indexRebuildService.rebuildIndex(indexProducer, DataType.ALL);
       } catch (Throwable t) {
         logger.error("Repopulating the index failed", t);
       }
@@ -154,9 +163,9 @@ public class IndexEndpoint {
   }
 
   @POST
-  @Path("rebuild/{service}/{part}")
+  @Path("rebuild/{service}/{type}")
   @RestQuery(name = "partiallyRebuildIndexByPart",
-      description = "Repopulates the AssetManager index for a specific service, but only for the specified part "
+      description = "Repopulates the index for a specific service, but only for a specific type of data "
         + "in order to save time. "
         + "Only use this endpoint if you have been explicitly told to or know what you are doing, else you risk "
         + "inconsistent data in the index!",
@@ -165,15 +174,13 @@ public class IndexEndpoint {
           @RestParameter(
               name = "service",
               isRequired = true,
-              description = "The service to recreate index from. "
-                  + "The available services are: AssetManager. ",
+              description = "The service to recreate index from. The available services are: AssetManager. ",
               type = RestParameter.Type.STRING
           ),
           @RestParameter(
-              name = "part",
+              name = "type",
               isRequired = true,
-              description = "The part of the service to recreate index from. "
-                  + "The available parts for AssetManager are: ACL. ",
+              description = "The type of data to re-index. The available types are: ACL. ",
               type = RestParameter.Type.STRING
           )
       },
@@ -183,26 +190,32 @@ public class IndexEndpoint {
             responseCode = HttpServletResponse.SC_OK
         ),
         @RestResponse(
-            description = "If the given part parameter is not one of the possible values",
+            description = "If the given parameters aren't one of the supported values",
             responseCode = HttpServletResponse.SC_BAD_REQUEST
         )
       }
   )
-  public Response partiallyRebuildAssetManagerIndex(
-      @PathParam("service") final String service,
-      @PathParam("part") final String part
+  public Response partiallyRebuildIndexByType(
+      @PathParam("service") final String serviceStr,
+      @PathParam("type") final String dataTypeStr
   ) {
-    final SecurityContext securityContext = new SecurityContext(securityService, securityService.getOrganization(),
-        securityService.getUser());
-
-    if (!EnumUtils.isValidEnum(IndexRebuildService.Service.class, service)) {
+    Service service = EnumUtils.getEnum(Service.class, serviceStr);
+    if (service == null) {
       return R.badRequest("The given path param for service was invalid.");
     }
+    IndexProducer indexProducer = indexRebuildService.getIndexProducer(service);
 
+    DataType dataType = EnumUtils.getEnum(DataType.class, dataTypeStr);
+    if (dataType == null || indexProducer.dataTypeSupported(dataType)) {
+      return R.badRequest("The given path param for data type was invalid.");
+    }
+
+    final SecurityContext securityContext = new SecurityContext(securityService, securityService.getOrganization(),
+            securityService.getUser());
     executor.execute(() -> securityContext.runInContext(() -> {
       try {
-        logger.info("Starting to repopulate the index from service {}", "AssetManager");
-        indexRebuildService.rebuildIndex(elasticsearchIndex, service, part);
+        logger.info("Starting to repopulate the index from service {}", service);
+        indexRebuildService.rebuildIndex(indexProducer, dataType);
       } catch (Throwable t) {
         logger.error("Repopulating the index failed", t);
       }
@@ -242,13 +255,18 @@ public class IndexEndpoint {
                   + "All services that come after the specified service in the order above will also run.",
                   type = RestParameter.Type.STRING) }, responses = {
           @RestResponse(description = "OK if repopulation has started", responseCode = HttpServletResponse.SC_OK) })
-  public Response resumeIndexRebuild(@PathParam("service") final String service) {
+  public Response resumeIndexRebuild(@PathParam("service") final String serviceStr) {
+    Service service = EnumUtils.getEnum(Service.class, serviceStr);
+    if (service == null) {
+      return R.badRequest("The given path param for service was invalid.");
+    }
+
     final SecurityContext securityContext = new SecurityContext(securityService, securityService.getOrganization(),
             securityService.getUser());
     executor.execute(() -> securityContext.runInContext(() -> {
       try {
         logger.info("Resume repopulating the index from service {}", service);
-        indexRebuildService.resumeIndexRebuild(elasticsearchIndex, service);
+        indexRebuildService.resumeIndexRebuild(service);
       } catch (Throwable t) {
         logger.error("Repopulating the index failed", t);
       }
