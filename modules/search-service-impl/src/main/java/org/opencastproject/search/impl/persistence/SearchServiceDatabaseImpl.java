@@ -352,7 +352,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
           em.persist(searchEntity);
         } else {
           // Ensure this user is allowed to update this media package
-          // If user has ROLE_EPISODE_<ID>_READ/WRITE, no further permission checks are necessary
+          // If user has ROLE_EPISODE_<ID>_WRITE, no further permission checks are necessary
           User user = securityService.getUser();
           if (!user.hasRole(ACL_ID_PREFIX_EPISODE + mediaPackageId + "_" + WRITE.toString().toUpperCase())) {
             String accessControlXml = entity.get().getAccessControl();
