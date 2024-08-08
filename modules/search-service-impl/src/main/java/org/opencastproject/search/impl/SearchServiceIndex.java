@@ -359,8 +359,9 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
 
   private void checkMPWritePermission(final String mediaPackageId) throws SearchException {
     try {
+      MediaPackage mp = persistence.getMediaPackage(mediaPackageId);
       AccessControlList acl = persistence.getAccessControlList(mediaPackageId);
-      if (!authorizationService.hasPermission(acl, Permissions.Action.WRITE.toString())) {
+      if (!authorizationService.hasPermission(mp, Permissions.Action.WRITE.toString())) {
         boolean isAdmin = securityService.getUser().getRoles().stream()
             .map(Role::getName)
             .anyMatch(r -> r.equals(SecurityConstants.GLOBAL_ADMIN_ROLE));

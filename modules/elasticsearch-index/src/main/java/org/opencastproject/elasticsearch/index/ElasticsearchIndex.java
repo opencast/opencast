@@ -21,7 +21,6 @@
 
 package org.opencastproject.elasticsearch.index;
 
-import static org.opencastproject.security.util.SecurityUtil.getEpisodeRoleId;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.elasticsearch.api.SearchIndexException;
@@ -41,13 +40,7 @@ import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.elasticsearch.index.objects.theme.IndexTheme;
 import org.opencastproject.elasticsearch.index.objects.theme.ThemeQueryBuilder;
 import org.opencastproject.elasticsearch.index.objects.theme.ThemeSearchQuery;
-import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ListProvidersService;
-import org.opencastproject.list.api.ResourceListQuery;
-import org.opencastproject.list.impl.ResourceListQueryImpl;
-import org.opencastproject.security.api.AccessControlEntry;
-import org.opencastproject.security.api.AccessControlList;
-import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.User;
 
 import com.google.common.util.concurrent.Striped;
@@ -69,8 +62,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -433,12 +424,9 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
   private void update(Event event) throws SearchIndexException {
     logger.debug("Adding event {} to search index", event.getIdentifier());
 
-    if (episodeIdRole) {
-      updateEventAclWithCustomRoles(event);
-    }
-
     // Add the resource to the index
-    SearchMetadataCollection inputDocument = EventIndexUtils.toSearchMetadata(event);
+    SearchMetadataCollection inputDocument = EventIndexUtils.toSearchMetadata(event, listProvidersService,
+        episodeIdRole);
     List<SearchMetadata<?>> resourceMetadata = inputDocument.getMetadata();
     ElasticsearchDocument doc = new ElasticsearchDocument(inputDocument.getIdentifier(),
             inputDocument.getDocumentType(), resourceMetadata);
@@ -463,11 +451,9 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
     List<ElasticsearchDocument> docs = new ArrayList<>();
     for (Event event: eventList) {
       logger.debug("Adding event {} to search index", event.getIdentifier());
-      if (episodeIdRole) {
-        updateEventAclWithCustomRoles(event);
-      }
       // Add the resource to the index
-      SearchMetadataCollection inputDocument = EventIndexUtils.toSearchMetadata(event);
+      SearchMetadataCollection inputDocument = EventIndexUtils.toSearchMetadata(event, listProvidersService,
+          episodeIdRole);
       List<SearchMetadata<?>> resourceMetadata = inputDocument.getMetadata();
       docs.add(new ElasticsearchDocument(inputDocument.getIdentifier(),
               inputDocument.getDocumentType(), resourceMetadata));
@@ -896,39 +882,5 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
     }
 
     return sb.toString();
-  }
-
-  private Event updateEventAclWithCustomRoles(Event event) throws SearchIndexException {
-    AccessControlList acl = new AccessControlList();
-
-    try {
-      acl = AccessControlParser.parseAcl(event.getAccessPolicy());
-    } catch (Exception e) {
-      throw new SearchIndexException("Unable to parse access policy", e);
-    }
-
-    // Add custom roles to the ACL
-    // This allows users with a role of the form ROLE_EPISODE_<ID>_<ACTION> to access the event through the index
-    Set<AccessControlEntry> customEntries = new HashSet<>();
-    customEntries.add(new AccessControlEntry(getEpisodeRoleId(event.getIdentifier(), "READ"), "read", true));
-    customEntries.add(new AccessControlEntry(getEpisodeRoleId(event.getIdentifier(), "WRITE"), "write", true));
-
-    ResourceListQuery query = new ResourceListQueryImpl();
-    if (listProvidersService.hasProvider("ACL.ACTIONS")) {
-      Map<String, String> actions = new HashMap<>();
-      try {
-        actions = listProvidersService.getList("ACL.ACTIONS", query, true);
-      } catch (ListProviderException e) {
-        throw new SearchIndexException("Listproviders not loaded. " + e);
-      }
-      for (String action : actions.keySet()) {
-        customEntries.add(new AccessControlEntry(getEpisodeRoleId(event.getIdentifier(), action), action, true));
-      }
-    }
-
-    AccessControlList customRoles = new AccessControlList(new ArrayList<>(customEntries));
-    acl = customRoles.merge(acl);
-    event.setAccessPolicy(AccessControlParser.toJsonSilent(acl));
-    return event;
   }
 }

@@ -23,6 +23,7 @@ package org.opencastproject.authorization.xacml;
 
 import static org.opencastproject.mediapackage.MediaPackageElements.XACML_POLICY_EPISODE;
 import static org.opencastproject.mediapackage.MediaPackageElements.XACML_POLICY_SERIES;
+import static org.opencastproject.security.util.SecurityUtil.getEpisodeRoleId;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.mediapackage.Attachment;
@@ -323,7 +324,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
     var allowed = false;
     logger.debug("episodeIdRole set to: {}", episodeIdRole);
     if (episodeIdRole) {
-      var episodeRole = "ROLE_EPISODE_" + mp.getIdentifier() + "_" + action.toUpperCase();
+      var episodeRole = getEpisodeRoleId(mp.getIdentifier().toString(), action);
       logger.debug("Checking for role: {}", episodeRole);
       allowed = user.getRoles().stream().map(Role::getName).anyMatch(r -> r.equals(episodeRole));
     }
