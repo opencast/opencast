@@ -27,25 +27,25 @@ import static org.junit.Assert.assertTrue;
 
 import org.opencastproject.security.aai.api.AttributeMapper;
 
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.util.CollectionUtils;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.annotation.Resource;
-
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations = {"classpath:attributemapper.xml"})
 public class AttributeMapperTest {
 
-  @Resource(name = "attributeMapper")
   protected AttributeMapper attributeMapper;
+
+  @Before
+  public void setUp() throws Exception {
+    ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("attributemapper.xml");
+    attributeMapper = (AttributeMapper) ctx.getBean("attributeMapper");
+  }
 
   @Test
   public void testAttributeMapping() {

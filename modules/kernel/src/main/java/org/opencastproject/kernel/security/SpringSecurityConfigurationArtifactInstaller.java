@@ -111,7 +111,7 @@ public class SpringSecurityConfigurationArtifactInstaller implements ArtifactIns
     try {
       springContext.refresh();
     } catch (Exception e) {
-      logger.error("Unable to refresh spring security configuration file {}: {}", artifact, e);
+      logger.error("Unable to refresh spring security configuration file {}", artifact, e);
       return;
     }
 

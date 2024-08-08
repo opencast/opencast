@@ -48,7 +48,7 @@ Please make sure to install the following dependencies.
 Required:
 
     Xcode
-    jdk 11
+    jdk 17
     ffmpeg >= 3.2.4
     maven >= 3.6
     python >= 2.6

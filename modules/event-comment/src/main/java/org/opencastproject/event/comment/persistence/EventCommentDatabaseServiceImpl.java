@@ -385,7 +385,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
     try {
       index.addOrUpdateEvent(eventId, updateFunction, organization, user);
     } catch (SearchIndexException e) {
-      logger.error("Error updating comment status of event {} in the {} index:", eventId, e);
+      logger.error("Error updating comment status of event {} in the {} index:", eventId, index.getIndexName(), e);
     }
   }
 

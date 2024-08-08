@@ -168,10 +168,10 @@ public class UserSettingsEndpoint {
     try {
       userSettingsService.deleteUserSetting(id);
     } catch (UserSettingsServiceException e) {
-      logger.error("Unable to remove user setting id:'%s':", id, e);
+      logger.error("Unable to remove user setting id: '{}'", id, e);
       return Response.serverError().build();
     }
-    logger.debug("User setting with id %d removed.", id);
+    logger.debug("User setting with id {} removed.", id);
     return Response.status(SC_OK).build();
   }
 }

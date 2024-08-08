@@ -174,7 +174,7 @@ public abstract class AbstractCoverImageService extends AbstractJobProducer impl
         result = workspace.putInCollection(COVERIMAGE_WORKSPACE_COLLECTION, job.getId() + "_coverimage.png", in);
         log.debug("Put the cover image into the workspace ({})", result);
       } catch (IOException e) {
-        log.warn("Error while putting resulting image into workspace collection '{}': {}",
+        log.warn("Error while putting resulting image into workspace collection '{}'",
                 COVERIMAGE_WORKSPACE_COLLECTION, e);
         throw new CoverImageException("Error while putting resulting image into workspace collection", e);
       }

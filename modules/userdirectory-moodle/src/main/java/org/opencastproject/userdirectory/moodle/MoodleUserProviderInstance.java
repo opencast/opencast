@@ -240,7 +240,7 @@ public class MoodleUserProviderInstance implements UserProvider, RoleProvider, C
       }
       mbs.registerMBean(mbean, name);
     } catch (Exception e) {
-      logger.error("Unable to register {} as an mbean: {}", this, e);
+      logger.error("Unable to register {} as an mbean", this, e);
     }
   }
 

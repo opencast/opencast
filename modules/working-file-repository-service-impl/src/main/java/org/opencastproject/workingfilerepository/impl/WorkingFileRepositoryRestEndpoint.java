@@ -216,7 +216,7 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
       else
         return Response.status(HttpStatus.SC_NOT_FOUND).build();
     } catch (Exception e) {
-      logger.error("Unable to delete element '{}' from mediapackage '{}': {}", mediaPackageElementID,
+      logger.error("Unable to delete element '{}' from mediapackage '{}'", mediaPackageElementID,
               mediaPackageID, e);
       return Response.serverError().entity(e.getMessage()).build();
     }
@@ -237,7 +237,7 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
       else
         return Response.status(SC_NOT_FOUND).build();
     } catch (Exception e) {
-      logger.error("Unable to delete element '{}' from collection '{}': {}", fileName, collectionId, e);
+      logger.error("Unable to delete element '{}' from collection '{}'", fileName, collectionId, e);
       return Response.serverError().entity(e.getMessage()).build();
     }
   }
@@ -257,7 +257,7 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
       else
         return Response.status(SC_NOT_FOUND).build();
     } catch (Exception e) {
-      logger.error("Unable to delete files older than '{}' days from collection '{}': {}",
+      logger.error("Unable to delete files older than '{}' days from collection '{}'",
               days, collectionId, e);
       return Response.serverError().entity(e.getMessage()).build();
     }
@@ -312,7 +312,7 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
         throw new NotFoundException();
       }
     } catch (IllegalStateException e) {
-      logger.error("Unable to provide element '{}' from mediapackage '{}': {}", mediaPackageElementID,
+      logger.error("Unable to provide element '{}' from mediapackage '{}'", mediaPackageElementID,
               mediaPackageID, e);
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
@@ -354,7 +354,7 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
                 some(fileName)).tag(md5).build();
       }
     } catch (Exception e) {
-      logger.error("Unable to provide element '{}' from mediapackage '{}': {}", mediaPackageElementID,
+      logger.error("Unable to provide element '{}' from mediapackage '{}'", mediaPackageElementID,
               mediaPackageID, e);
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
@@ -441,7 +441,7 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
       URI uri = super.copyTo(fromCollection, fromFileName, toMediaPackage, toMediaPackageElement, toFileName);
       return Response.ok().entity(uri.toString()).build();
     } catch (IOException e) {
-      logger.error("Unable to copy file '{}' from collection '{}' to mediapackage {}/{}: {}",
+      logger.error("Unable to copy file '{}' from collection '{}' to mediapackage {}/{}",
               fromFileName, fromCollection, toMediaPackage, toMediaPackageElement, e);
       return Response.serverError().entity(e.getMessage()).build();
     }
@@ -465,7 +465,7 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
       URI uri = super.moveTo(fromCollection, fromFileName, toMediaPackage, toMediaPackageElement, toFileName);
       return Response.ok().entity(uri.toString()).build();
     } catch (IOException e) {
-      logger.error("Unable to move file '{}' from collection '{}' to mediapackage {}/{}: {}",
+      logger.error("Unable to move file '{}' from collection '{}' to mediapackage {}/{}",
               fromFileName, fromCollection, toMediaPackage, toMediaPackageElement, e);
       return Response.serverError().entity(e.getMessage()).build();
     }

@@ -24,9 +24,6 @@ node/
 # ignore VSCode project data
 .vscode/
 
-# ingore OS artifacts
-.DS_Store
-
 # Ignore all temporary editor files
 *.swp
 *.iml

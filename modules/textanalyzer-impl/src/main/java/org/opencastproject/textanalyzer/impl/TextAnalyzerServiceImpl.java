@@ -244,7 +244,7 @@ public class TextAnalyzerServiceImpl extends AbstractJobProducer implements Text
       try {
         workspace.delete(imageUrl);
       } catch (Exception e) {
-        logger.warn("Unable to delete temporary text analysis image {}: {}", imageUrl, e);
+        logger.warn("Unable to delete temporary text analysis image {}", imageUrl, e);
       }
     }
   }

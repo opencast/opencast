@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>16-SNAPSHOT</version>
+    <version>17-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -91,21 +91,6 @@
               </execution>
 
               <execution>
-                <id>i18n</id>
-                <goals>
-                  <goal>exec</goal>
-                </goals>
-                <phase>compile</phase>
-                <configuration>
-                  <executable>npm</executable>
-                  <arguments>
-                    <argument>run</argument>
-                    <argument>i18n</argument>
-                  </arguments>
-                </configuration>
-              </execution>
-
-              <execution>
                 <id>build</id>
                 <goals>
                   <goal>exec</goal>
@@ -156,17 +141,6 @@
                 </goals>
                 <configuration>
                   <arguments>ci</arguments>
-                </configuration>
-              </execution>
-
-              <execution>
-                <phase>initialize</phase>
-                <id>i18n</id>
-                <goals>
-                  <goal>npm</goal>
-                </goals>
-                <configuration>
-                  <arguments>run i18n</arguments>
                 </configuration>
               </execution>
 

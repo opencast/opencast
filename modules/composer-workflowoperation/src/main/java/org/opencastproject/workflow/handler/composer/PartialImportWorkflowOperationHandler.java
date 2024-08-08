@@ -201,7 +201,7 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
         try {
           workspace.delete(elem.getURI());
         } catch (Exception e) {
-          logger.warn("Unable to delete element {}: {}", elem, e);
+          logger.warn("Unable to delete element {}", elem, e);
         }
       }
     }

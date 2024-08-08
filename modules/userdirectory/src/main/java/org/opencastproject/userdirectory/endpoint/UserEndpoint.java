@@ -394,10 +394,10 @@ public class UserEndpoint {
       logger.debug("User {} not found.", username);
       return Response.status(SC_NOT_FOUND).build();
     } catch (UnauthorizedException e) {
-      logger.debug("Error during deletion of user {}: {}", username, e);
+      logger.debug("Error during deletion of user {}", username, e);
       return Response.status(SC_FORBIDDEN).build();
     } catch (Exception e) {
-      logger.error("Error during deletion of user {}: {}", username, e);
+      logger.error("Error during deletion of user {}", username, e);
       return Response.status(SC_INTERNAL_SERVER_ERROR).build();
     }
 

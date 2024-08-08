@@ -445,7 +445,7 @@ public class JobDispatcher {
           logger.debug("{} dispatched to {}", job, hostAcceptingJob);
         } catch (ServiceRegistryException e) {
           Throwable cause = (e.getCause() != null) ? e.getCause() : e;
-          logger.error("Error dispatching {}: {}", job, cause);
+          logger.error("Error dispatching {}", job, cause);
         } finally {
           securityService.setUser(null);
           securityService.setOrganization(null);

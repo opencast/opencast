@@ -88,7 +88,7 @@ public class IncidentCreatorWorkflowOperationHandler extends AbstractWorkflowOpe
             .collect(Collectors.toMap(x -> x[0], x -> x[1]));
     log.info("Create nop job");
     final Job job = nopService.nop();
-    log.info("Log a dummy incident with code %d", code);
+    log.info("Log a dummy incident with code {}", code);
     serviceRegistry.incident().record(job, severity, code, params, details);
     if (!waitForStatus(job).isSuccess()) {
       throw new WorkflowOperationException("Job did not complete successfully");

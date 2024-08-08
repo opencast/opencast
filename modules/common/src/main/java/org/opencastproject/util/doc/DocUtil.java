@@ -124,7 +124,7 @@ public final class DocUtil {
       result = output.toString();
       logger.debug("Generated complete document ({} chars) from template ({})", result.length(), templateName);
     } catch (TemplateException e) {
-      logger.error("Failed while processing the Doc template ({}): {}", templateName, e);
+      logger.error("Failed while processing the Doc template ({})", templateName, e);
       result = "ERROR:: Failed while processing the template (" + templateName + "): " + e + "\n Template: "
               + textTemplate + "\n Data: " + data;
     } catch (IOException e) {

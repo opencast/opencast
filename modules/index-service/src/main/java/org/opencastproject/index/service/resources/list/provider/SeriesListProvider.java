@@ -47,6 +47,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
@@ -130,7 +131,7 @@ public class SeriesListProvider implements ResourceListProvider {
         seriesQuery.sortByTitle(SortCriterion.Order.Ascending);
         seriesQuery.sortByCreatedDateTime(SortCriterion.Order.Descending);
         seriesQuery.sortByOrganizers(SortCriterion.Order.Ascending);
-        SearchResult searchResult = searchIndex.getByQuery(seriesQuery);
+        SearchResult<Series> searchResult = searchIndex.getByQuery(seriesQuery);
         Calendar calendar = Calendar.getInstance();
         for (SearchResultItem<Series> item : searchResult.getItems()) {
           Series s = item.getSource();
@@ -149,6 +150,24 @@ public class SeriesListProvider implements ResourceListProvider {
               sb.append(" (").append(StringUtils.join(extendedTitleData, ", ")).append(")");
             }
             result.put(s.getIdentifier(), sb.toString());
+          } else if (PROVIDER_PREFIX.equals(listName)) {
+            String newSeriesName = s.getTitle();
+            boolean isTitleRepeated = Arrays.stream(searchResult.getItems())
+                .anyMatch(series ->
+                    !series.equals(item) && series.getSource().getTitle().equals(s.getTitle())
+                );
+            if (isTitleRepeated) {
+              //If a series name is repeated, will add the first 7 characters of the series ID to the display name on the
+              //admin-ui
+              if (s.getIdentifier().length() > 8) {
+                newSeriesName += " " + "(ID: " + s.getIdentifier().substring(0, 8) + "...)";
+              } else {
+                newSeriesName += " " + "(ID: " + s.getIdentifier() + ")";
+              }
+              logger.trace(String.format("Repeated series title \"%s\" found, changing to \"%s\" for admin-ui display",
+                  s.getTitle(), newSeriesName));
+            }
+            result.put(s.getIdentifier(), newSeriesName);
           } else {
             result.put(s.getIdentifier(), s.getTitle());
           }

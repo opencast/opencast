@@ -1,0 +1,58 @@
+{
+  "LTI": {
+    "ERROR_LOADING_METADATA": "Error al cargar los metadatos del evento. Inténtalo de nuevo más tarde.",
+    "SERIES_TITLE": "Ver series",
+    "UPLOAD_TITLE": "Subir un nuevo evento",
+    "LOADING": "Cargando…",
+    "NEW_UPLOAD": "Subir un nuevo evento",
+    "EDIT_UPLOAD": "Editar el evento",
+    "CURRENT_JOBS": "Trabajos de hoy",
+    "PRESENTER": "Ponente",
+    "PRESENTER_DESCRIPTION": "Archivo de vídeo para presenter track",
+    "VIDEOFILE": "Archivo de vídeo",
+    "VIDEOFILE_DESCRIPTION": "Archivo de vídeo para subir",
+    "CAPTION": "Subtítulos",
+    "CAPTION_DESCRIPTION": "Archivo de subtítulos en formato VTT",
+    "UPLOAD": "Subir",
+    "UPLOADING": "Subiendo",
+    "EDIT": "Guardar",
+    "EDIT_TITLE": "Editar el evento",
+    "NO_OPTION_SELECTED": "Sin opción seleccionada",
+    "EDITING": "Guardando…",
+    "SELECT_OPTION": "Selecciona la opción",
+    "JOB_TITLE": "Título",
+    "JOB_STATUS": "Estado",
+    "UPLOAD_SUCCESS": "¡ El archivo ha sido enviado !",
+    "UPLOAD_FAILURE": "Subida fallida.",
+    "UPLOAD_FAILURE_DESCRIPTION": "Por favor, inténtelo más tarde.",
+    "EDIT_SUCCESS": "Edición exitosa, comenzando la republicación.",
+    "EDIT_FAILURE": "Fallo al editar",
+    "COPY_SUCCESS": "Iniciando copia…",
+    "COPY_SUCCESS_DESCRIPTION": "Por favor, espera un momento.",
+    "GENERIC_ERROR": "Error: {{message}}",
+    "DELETION_SUCCESS": "El evento ha sido eliminado exitosamente",
+    "DELETION_SUCCESS_DESCRIPTION": "El evento se eliminará de la lista en unos momentos…",
+    "EVENT_LOCKED": "El evento está activo. Por favor espere hasta que haga más cambios…",
+    "DELETION_FAILURE": "Error al eliminar el evento",
+    "DELETION_FAILURE_DESCRIPTION": "Por favor, inténtelo más tarde...",
+    "RESULT_HEADING": "Resultados {{range.begin}}-{{range.end}} de {{total}}",
+    "CONFIRM_DELETION": "¿Realmente desea eliminar este evento?",
+    "COPY_TO_SERIES": "Copiar evento a serie",
+    "SELECT_COPY_TARGET": "Seleccionar serie de destino",
+    "COPY": "Copiar",
+    "COPY_IN_PROGRESS": "Iniciando copia…",
+    "CREATOR": "por {{creator}}"
+  },
+  "EVENTS": {
+    "EVENTS": {
+      "DETAILS": {
+        "METADATA": {
+          "LANGUAGE": "Idioma",
+          "LICENSE": "Licencia",
+          "PRESENTERS": "Presenter(s)",
+          "TITLE": "Título"
+        }
+      }
+    }
+  }
+}

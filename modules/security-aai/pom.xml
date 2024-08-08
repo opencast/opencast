@@ -7,13 +7,12 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>16-SNAPSHOT</version>
+    <version>17-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
-    <java.release>8</java.release>
   </properties>
   <dependencies>
     <dependency>
@@ -40,11 +39,6 @@
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-userdirectory</artifactId>
       <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>jakarta.annotation</groupId>
-      <artifactId>jakarta.annotation-api</artifactId>
-      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -111,7 +105,6 @@
               <failOnWarning>true</failOnWarning>
               <ignoredUsedUndeclaredDependencies>
                 <ignoredUsedUndeclaredDependency>junit:junit</ignoredUsedUndeclaredDependency>
-                <ignoredUsedUndeclaredDependency>jakarta.annotation:jakarta.annotation-api</ignoredUsedUndeclaredDependency>
                 <ignoredUsedUndeclaredDependency>org.springframework:spring-expression</ignoredUsedUndeclaredDependency>
                 <ignoredUsedUndeclaredDependency>org.springframework:spring-core</ignoredUsedUndeclaredDependency>
                 <ignoredUsedUndeclaredDependency>org.springframework.security:spring-security-core</ignoredUsedUndeclaredDependency>

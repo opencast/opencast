@@ -133,7 +133,10 @@ public class TagEngageWorkflowOperationHandler extends AbstractWorkflowOperation
     MediaPackage mediaPackageForSearch = null;
     try {
       mediaPackageForSearch = searchService.get(mediaPackageId);
-    } catch (NotFoundException | UnauthorizedException e) {
+    } catch (NotFoundException e) {
+      logger.info("Media package {} is not published to Engage, skipping", mediaPackageId);
+      return createResult(WorkflowOperationResult.Action.SKIP);
+    } catch (UnauthorizedException e) {
       throw new WorkflowOperationException(e);
     }
 

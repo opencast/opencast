@@ -414,7 +414,7 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider, C
     }
 
     // Not found
-    logger.debug("Return empty roleset for {} - not found on Studip");
+    logger.debug("Return empty roleset for {} - not found on Studip", userName);
     return new LinkedList<Role>();
   }
 

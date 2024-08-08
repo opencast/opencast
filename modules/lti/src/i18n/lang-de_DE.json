@@ -1,0 +1,58 @@
+{
+  "LTI": {
+    "ERROR_LOADING_METADATA": "Fehler beim Laden der Videometadaten. Bitte versuchen Sie es später noch einmal.",
+    "SERIES_TITLE": "Serie anzeigen",
+    "UPLOAD_TITLE": "Video hochladen",
+    "LOADING": "Wird geladen…",
+    "NEW_UPLOAD": "Neues Video hochladen",
+    "EDIT_UPLOAD": "Video bearbeiten",
+    "CURRENT_JOBS": "Heutige Jobs",
+    "PRESENTER": "Vortragende(r)",
+    "PRESENTER_DESCRIPTION": "Videodatei für die Vortragenden-Spur",
+    "VIDEOFILE": "Videodatei",
+    "VIDEOFILE_DESCRIPTION": "Videodatei zum Hochladen",
+    "CAPTION": "Untertitel",
+    "CAPTION_DESCRIPTION": "Untertiteldatei im VTT-Format",
+    "UPLOAD": "Hochladen",
+    "UPLOADING": "Lädt hoch",
+    "EDIT": "Speichern",
+    "EDIT_TITLE": "Video bearbeiten",
+    "NO_OPTION_SELECTED": "Keine Option ausgewählt",
+    "EDITING": "Speichere…",
+    "SELECT_OPTION": "Option wählen",
+    "JOB_TITLE": "Titel",
+    "JOB_STATUS": "Status",
+    "UPLOAD_SUCCESS": "Hochladen erfolgreich!",
+    "UPLOAD_FAILURE": "Hochladen fehlgeschlagen!",
+    "UPLOAD_FAILURE_DESCRIPTION": "Bitte versuche es später erneut.",
+    "EDIT_SUCCESS": "Bearbeiten erfolgreich. Beginn der Neuveröffentlichung.",
+    "EDIT_FAILURE": "Bearbeiten fehlgeschlagen!",
+    "COPY_SUCCESS": "Kopieren gestartet…",
+    "COPY_SUCCESS_DESCRIPTION": "Einen Moment bitte…",
+    "GENERIC_ERROR": "Fehler: {{message}}",
+    "DELETION_SUCCESS": "Video erfolgreich gelöscht",
+    "DELETION_SUCCESS_DESCRIPTION": "Das Video wird in wenigen Augenblicken aus der Liste entfernt…",
+    "EVENT_LOCKED": "Das Video wird gerade bearbeitet. Bitte warten Sie mit der Vornahme von Änderungen…",
+    "DELETION_FAILURE": "Löschen des Videos fehlgeschlagen",
+    "DELETION_FAILURE_DESCRIPTION": "Bitte versuchen Sie es später noch einmal…",
+    "RESULT_HEADING": "Ergebnisse {{range.begin}}-{{range.end}} von {{total}}",
+    "CONFIRM_DELETION": "Soll dieses Video wirklich gelöscht werden?",
+    "COPY_TO_SERIES": "Video in Serie kopieren",
+    "SELECT_COPY_TARGET": "Zielserie auswählen",
+    "COPY": "Kopieren",
+    "COPY_IN_PROGRESS": "Kopie wird gestartet…",
+    "CREATOR": "von {{creator}}"
+  },
+  "EVENTS": {
+    "EVENTS": {
+      "DETAILS": {
+        "METADATA": {
+          "LANGUAGE": "Sprache",
+          "LICENSE": "Lizenz",
+          "PRESENTERS": "Vortragende(r)",
+          "TITLE": "Titel"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,1 @@
+With this release, we have updated the required Java version from 11 to 17.

@@ -197,7 +197,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
         mbs.registerMBean(mbean, name);
       }
     } catch (Exception e) {
-      logger.warn("Unable to register {} as an mbean: {}", this, e);
+      logger.warn("Unable to register {} as an mbean", this, e);
     }
 
     final Long expiration = NumberUtils.createLong(StringUtils.trimToNull(

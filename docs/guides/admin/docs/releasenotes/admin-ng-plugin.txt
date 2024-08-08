@@ -1,1 +1,0 @@
-The old admin interface is now a plugin and needs to be specifically enabled before it can be used.

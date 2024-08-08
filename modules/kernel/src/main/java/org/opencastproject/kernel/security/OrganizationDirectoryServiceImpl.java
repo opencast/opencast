@@ -242,7 +242,7 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
       }
       cache.invalidate();
     } catch (OrganizationDatabaseException e) {
-      logger.error("Unable to register organization '{}': {}", id, e);
+      logger.error("Unable to register organization '{}'", id, e);
     }
   }
 
