@@ -7,6 +7,8 @@ identifier, without this having to be explicitly stated in the ACL attached to t
 For example, `ROLE_EPISODE_872dc4ec-ca8a-4e12-8dac-ce99784d6d29_READ` will allow the user to get read access to
 episode `872dc4ec-ca8a-4e12-8dac-ce99784d6d29`.
 
+The `<ACTION>` will be capitalized, but special characters may not be converted to `_`, e.g. `ANNOTATE-ADMIN`.
+
 Setup
 --------------------
 
