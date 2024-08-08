@@ -206,7 +206,7 @@ public class IndexEndpoint {
     IndexProducer indexProducer = indexRebuildService.getIndexProducer(service);
 
     DataType dataType = EnumUtils.getEnum(DataType.class, dataTypeStr);
-    if (dataType == null || indexProducer.dataTypeSupported(dataType)) {
+    if (dataType == null || !indexProducer.dataTypeSupported(dataType)) {
       return R.badRequest("The given path param for data type was invalid.");
     }
 

@@ -132,7 +132,18 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -982,8 +993,8 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
                   updatedEventData = getEventUpdateFunctionOnlyAcl(snapshot, orgId, snapshotSystemUser)
                       .apply(updatedEventData);
                 } else {
-                  throw new IndexRebuildException(dataType + " is not a supported data type. " +
-                          "Accepted values are " + Arrays.toString(getSupportedDataTypes()) + ".");
+                  throw new IndexRebuildException(dataType + " is not a supported data type. "
+                      + "Accepted values are " + Arrays.toString(getSupportedDataTypes()) + ".");
                 }
                 updatedEventRange.add(updatedEventData.get());
 
