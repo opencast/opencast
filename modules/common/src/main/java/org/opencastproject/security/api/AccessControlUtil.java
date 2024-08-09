@@ -24,6 +24,7 @@ package org.opencastproject.security.api;
 import static com.entwinemedia.fn.Prelude.chuck;
 import static com.entwinemedia.fn.Stream.$;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
+import static org.opencastproject.security.util.SecurityUtil.getEpisodeRoleId;
 import static org.opencastproject.util.EqualsUtil.bothNotNull;
 import static org.opencastproject.util.EqualsUtil.eqListUnsorted;
 import static org.opencastproject.util.data.Either.left;
@@ -82,17 +83,30 @@ public final class AccessControlUtil {
    *          the string representation of the object (<code>#toString()</code>). This allows to group actions as enums
    *          and use them without converting them to a string manually. See
    *          {@link org.opencastproject.security.api.Permissions.Action}.
+   * @param episodeRoleId
+   *          If the user should be checked for having an authorizing episode role id. If the ACL does not belong
+   *          to a mediapackage, this won't work and should be set to false.
+   * @param mediaPackageId
+   *          Only required if episodeRoleId is true.
    * @return whether this action should be allowed
    * @throws IllegalArgumentException
    *           if any of the arguments are null
    */
-  public static boolean isAuthorized(AccessControlList acl, User user, Organization org, Object action) {
+  public static boolean isAuthorized(AccessControlList acl, User user, Organization org, Object action,
+      boolean episodeRoleId, String mediaPackageId) {
     if (action == null || user == null || acl == null || org == null)
       throw new IllegalArgumentException();
 
     // Check for the global and local admin role
     if (user.hasRole(GLOBAL_ADMIN_ROLE) || user.hasRole(org.getAdminRole()))
       return true;
+
+    // Check for episode role ids, if activated
+    if (episodeRoleId) {
+      if (user.hasRole(getEpisodeRoleId(mediaPackageId, action.toString()))) {
+        return true;
+      }
+    }
 
     Set<Role> userRoles = user.getRoles();
     for (AccessControlEntry entry : acl.getEntries()) {
@@ -118,7 +132,7 @@ public final class AccessControlUtil {
     return new Pred<Object>() {
       @Override
       public Boolean apply(Object action) {
-        return isAuthorized(acl, user, org, action);
+        return isAuthorized(acl, user, org, action, false, null);
       }
     };
   }

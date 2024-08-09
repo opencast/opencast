@@ -26,7 +26,6 @@ import static org.opencastproject.security.api.Permissions.Action.CONTRIBUTE;
 import static org.opencastproject.security.api.Permissions.Action.READ;
 import static org.opencastproject.security.api.Permissions.Action.WRITE;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLE;
-import static org.opencastproject.security.util.SecurityUtil.getEpisodeRoleId;
 
 import org.opencastproject.db.DBSession;
 import org.opencastproject.db.DBSessionFactory;
@@ -44,6 +43,7 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.osgi.service.component.ComponentContext;
@@ -59,6 +59,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -82,8 +83,12 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
   /** JPA persistence unit name */
   public static final String PERSISTENCE_UNIT = "org.opencastproject.search.impl.persistence";
 
+  private static final String CONFIG_EPISODE_ID_ROLE = "org.opencastproject.episode.id.role.access";
+
   /** Logging utilities */
   private static final Logger logger = LoggerFactory.getLogger(SearchServiceDatabaseImpl.class);
+
+  private boolean episodeRoleId = false;
 
   /** Factory used to create {@link EntityManager}s for transactions */
   protected EntityManagerFactory emf;
@@ -117,6 +122,10 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
     logger.info("Activating persistence manager for search service");
     db = dbSessionFactory.createSession(emf);
     this.populateSeriesData();
+
+    episodeRoleId = BooleanUtils.toBoolean(Objects.toString(
+        cc.getBundleContext().getProperty(CONFIG_EPISODE_ID_ROLE), "false"));
+    logger.debug("Usage of episode ID roles is set to {}", episodeRoleId);
   }
 
   /**
@@ -174,13 +183,12 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
 
         // allow ca users to retract live publications without putting them into the ACL
         User user = securityService.getUser();
-        if (!user.hasRole(getEpisodeRoleId(mediaPackageId, WRITE.toString()))) {
-          if (!(searchMp.isLive() && currentUser.hasRole(GLOBAL_CAPTURE_AGENT_ROLE)) && accessControlXml != null) {
-            AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
-            if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, WRITE.toString())) {
-              throw new UnauthorizedException(
-                  currentUser + " is not authorized to delete media package " + mediaPackageId);
-            }
+        if (!(searchMp.isLive() && currentUser.hasRole(GLOBAL_CAPTURE_AGENT_ROLE)) && accessControlXml != null) {
+          AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
+          if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, WRITE.toString(),
+              episodeRoleId, mediaPackageId)) {
+            throw new UnauthorizedException(
+                currentUser + " is not authorized to delete media package " + mediaPackageId);
           }
         }
 
@@ -353,16 +361,15 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
           // Ensure this user is allowed to update this media package
           // If user has ROLE_EPISODE_<ID>_WRITE, no further permission checks are necessary
           User user = securityService.getUser();
-          if (!user.hasRole(getEpisodeRoleId(mediaPackageId, WRITE.toString()))) {
-            String accessControlXml = entity.get().getAccessControl();
-            if (accessControlXml != null && entity.get().getDeletionDate() == null) {
-              AccessControlList accessList = AccessControlParser.parseAcl(accessControlXml);
-              User currentUser = securityService.getUser();
-              Organization currentOrg = securityService.getOrganization();
-              if (!AccessControlUtil.isAuthorized(accessList, currentUser, currentOrg, WRITE.toString())) {
-                throw new UnauthorizedException(currentUser + " is not authorized to update media package "
-                    + mediaPackageId);
-              }
+          String accessControlXml = entity.get().getAccessControl();
+          if (accessControlXml != null && entity.get().getDeletionDate() == null) {
+            AccessControlList accessList = AccessControlParser.parseAcl(accessControlXml);
+            User currentUser = securityService.getUser();
+            Organization currentOrg = securityService.getOrganization();
+            if (!AccessControlUtil.isAuthorized(accessList, currentUser, currentOrg, WRITE.toString(),
+                episodeRoleId, mediaPackageId)) {
+              throw new UnauthorizedException(currentUser + " is not authorized to update media package "
+                  + mediaPackageId);
             }
           }
           entity.get().setOrganization(securityService.getOrganization());
@@ -396,25 +403,18 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
           throw new NotFoundException("No episode with id=" + mediaPackageId + " exists");
         }
 
-        // Ensure this user is allowed to read this episode
-        // If user has ROLE_EPISODE_<ID>_READ/WRITE, no further permission checks are necessary
-        User user = securityService.getUser();
-        final String[] suffix = { READ.toString(), CONTRIBUTE.toString(), WRITE.toString() };
-        for (var action : suffix) {
-          if (user.hasRole(getEpisodeRoleId(mediaPackageId, action))) {
-            return MediaPackageParser.getFromXml(episodeEntity.get().getMediaPackageXML());
-          }
-        }
-
         String accessControlXml = episodeEntity.get().getAccessControl();
         if (accessControlXml != null) {
           AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
           User currentUser = securityService.getUser();
           Organization currentOrg = securityService.getOrganization();
           // There are several reasons a user may need to load a episode: to read content, to edit it, or add content
-          if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, READ.toString())
-                  && !AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, CONTRIBUTE.toString())
-                  && !AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, WRITE.toString())) {
+          if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, READ.toString(), episodeRoleId,
+                      mediaPackageId)
+                  && !AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, CONTRIBUTE.toString(), episodeRoleId,
+                      mediaPackageId)
+                  && !AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, WRITE.toString(), episodeRoleId,
+                      mediaPackageId)) {
             throw new UnauthorizedException(currentUser + " is not authorized to see episode " + mediaPackageId);
           }
         }
@@ -443,16 +443,15 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
         }
         // Ensure this user is allowed to read this media package
         User user = securityService.getUser();
-        if (!user.hasRole(getEpisodeRoleId(mediaPackageId, READ.toString()))) {
-          String accessControlXml = searchEntity.get().getAccessControl();
-          if (accessControlXml != null) {
-            AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
-            User currentUser = securityService.getUser();
-            Organization currentOrg = securityService.getOrganization();
-            if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, READ.toString())) {
-              throw new UnauthorizedException(
-                  currentUser + " is not authorized to read media package " + mediaPackageId);
-            }
+        String accessControlXml = searchEntity.get().getAccessControl();
+        if (accessControlXml != null) {
+          AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
+          User currentUser = securityService.getUser();
+          Organization currentOrg = securityService.getOrganization();
+          if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, READ.toString(),
+              episodeRoleId, mediaPackageId)) {
+            throw new UnauthorizedException(
+                currentUser + " is not authorized to read media package " + mediaPackageId);
           }
         }
         return searchEntity.get().getModificationDate();
@@ -480,16 +479,15 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
         }
         // Ensure this user is allowed to read this media package
         User user = securityService.getUser();
-        if (!user.hasRole(getEpisodeRoleId(mediaPackageId, READ.toString()))) {
-          String accessControlXml = searchEntity.get().getAccessControl();
-          if (accessControlXml != null) {
-            AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
-            User currentUser = securityService.getUser();
-            Organization currentOrg = securityService.getOrganization();
-            if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, READ.toString())) {
-              throw new UnauthorizedException(
-                  currentUser + " is not authorized to read media package " + mediaPackageId);
-            }
+        String accessControlXml = searchEntity.get().getAccessControl();
+        if (accessControlXml != null) {
+          AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
+          User currentUser = securityService.getUser();
+          Organization currentOrg = securityService.getOrganization();
+          if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, READ.toString(),
+              episodeRoleId, mediaPackageId)) {
+            throw new UnauthorizedException(
+                currentUser + " is not authorized to read media package " + mediaPackageId);
           }
         }
         return searchEntity.get().getDeletionDate();
@@ -517,16 +515,15 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
         }
         // Ensure this user is allowed to read this media package
         User user = securityService.getUser();
-        if (!user.hasRole(getEpisodeRoleId(mediaPackageId, READ.toString()))) {
-          String accessControlXml = searchEntity.get().getAccessControl();
-          if (accessControlXml != null) {
-            AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
-            User currentUser = securityService.getUser();
-            Organization currentOrg = securityService.getOrganization();
-            if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, READ.toString())) {
-              throw new UnauthorizedException(
-                  currentUser + " is not authorized to read media package " + mediaPackageId);
-            }
+        String accessControlXml = searchEntity.get().getAccessControl();
+        if (accessControlXml != null) {
+          AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
+          User currentUser = securityService.getUser();
+          Organization currentOrg = securityService.getOrganization();
+          if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, READ.toString(),
+              episodeRoleId, mediaPackageId)) {
+            throw new UnauthorizedException(
+                currentUser + " is not authorized to read media package " + mediaPackageId);
           }
         }
         return searchEntity.get().getOrganization().getId();

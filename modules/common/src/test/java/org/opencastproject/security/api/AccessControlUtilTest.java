@@ -46,21 +46,21 @@ public class AccessControlUtilTest {
             "someRole", org));
     User globalAdmin = new JaxbUser("globalAdmin", "test", org, new JaxbRole(GLOBAL_ADMIN_ROLE, org));
 
-    assertTrue(AccessControlUtil.isAuthorized(acl, user1, org, "action1"));
-    assertTrue(AccessControlUtil.isAuthorized(acl, user1, org, "action2"));
-    assertFalse(AccessControlUtil.isAuthorized(acl, user1, org, "action3"));
+    assertTrue(AccessControlUtil.isAuthorized(acl, user1, org, "action1", false, null));
+    assertTrue(AccessControlUtil.isAuthorized(acl, user1, org, "action2", false, null));
+    assertFalse(AccessControlUtil.isAuthorized(acl, user1, org, "action3", false, null));
 
-    assertFalse(AccessControlUtil.isAuthorized(acl, user2, org, "action1"));
-    assertFalse(AccessControlUtil.isAuthorized(acl, user2, org, "action2"));
-    assertTrue(AccessControlUtil.isAuthorized(acl, user2, org, "action3"));
+    assertFalse(AccessControlUtil.isAuthorized(acl, user2, org, "action1", false, null));
+    assertFalse(AccessControlUtil.isAuthorized(acl, user2, org, "action2", false, null));
+    assertTrue(AccessControlUtil.isAuthorized(acl, user2, org, "action3", false, null));
 
-    assertTrue(AccessControlUtil.isAuthorized(acl, localAdmin, org, "action1"));
-    assertTrue(AccessControlUtil.isAuthorized(acl, localAdmin, org, "action2"));
-    assertTrue(AccessControlUtil.isAuthorized(acl, localAdmin, org, "action3"));
+    assertTrue(AccessControlUtil.isAuthorized(acl, localAdmin, org, "action1", false, null));
+    assertTrue(AccessControlUtil.isAuthorized(acl, localAdmin, org, "action2", false, null));
+    assertTrue(AccessControlUtil.isAuthorized(acl, localAdmin, org, "action3", false, null));
 
-    assertTrue(AccessControlUtil.isAuthorized(acl, globalAdmin, org, "action1"));
-    assertTrue(AccessControlUtil.isAuthorized(acl, globalAdmin, org, "action2"));
-    assertTrue(AccessControlUtil.isAuthorized(acl, globalAdmin, org, "action3"));
+    assertTrue(AccessControlUtil.isAuthorized(acl, globalAdmin, org, "action1", false, null));
+    assertTrue(AccessControlUtil.isAuthorized(acl, globalAdmin, org, "action2", false, null));
+    assertTrue(AccessControlUtil.isAuthorized(acl, globalAdmin, org, "action3", false, null));
 
     assertTrue(AccessControlUtil.isAuthorizedAll(acl, globalAdmin, org, "action1", "action2", "action3"));
     assertFalse(AccessControlUtil.isAuthorizedAll(acl, user1, org, "action1", "action2", "action3"));
