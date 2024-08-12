@@ -438,7 +438,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
           .map(SearchResult::dehydrateForREST)
           .collect(Collectors.toList());
 
-      // Sign urls if id is present
+      // Sign urls if sign-parameter is not false
       if (!"false".equals(sign) && this.urlSigningService != null) {
         this.findURLsAndSign(result);
       }
