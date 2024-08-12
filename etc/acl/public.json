@@ -1,0 +1,10 @@
+{
+  "acl": {
+    "ace": [
+      {
+        "role": "ROLE_ANONYMOUS",
+        "action": "read"
+      }
+    ]
+  }
+}

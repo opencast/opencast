@@ -21,13 +21,13 @@
 
 package org.opencastproject.authorization.xacml.manager.impl;
 
-import org.opencastproject.authorization.xacml.XACMLParsingException;
-import org.opencastproject.authorization.xacml.XACMLUtils;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceException;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.AccessControlParser;
+import org.opencastproject.security.api.AccessControlParsingException;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
@@ -45,14 +45,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-
-import javax.xml.bind.JAXBException;
 
 @Component(
     immediate = true,
@@ -63,7 +60,7 @@ import javax.xml.bind.JAXBException;
 )
 public class AclScanner implements ArtifactInstaller {
 
-  /** The directory name that has the XACML file defining the Acl **/
+  /** The directory name that holds the ACL files **/
   public static final String ACL_DIRECTORY = "acl";
 
   /** The logging instance */
@@ -81,7 +78,7 @@ public class AclScanner implements ArtifactInstaller {
    * A map linking the Acl file name concatenate with the organization id {@code filename_organizationId} to the related
    * managed Acl Id
    */
-  private Map<String, Long> managedAcls = new HashMap<String, Long>();
+  private final Map<String, Long> managedAcls = new HashMap<>();
 
   /**
    * OSGI service activation method
@@ -124,18 +121,18 @@ public class AclScanner implements ArtifactInstaller {
    */
   @Override
   public boolean canHandle(File artifact) {
-    return ACL_DIRECTORY.equals(artifact.getParentFile().getName()) && artifact.getName().endsWith(".xml");
+    return ACL_DIRECTORY.equals(artifact.getParentFile().getName()) && artifact.getName().endsWith(".json");
   }
 
   /**
-   * Add an ACL based upon an XACML file to all the organizations.
+   * Add ACL from configuration directory to all organizations.
    *
    * @param artifact
-   *          The File representing the XACML File.
+   *          The File representing the ACL.
    * @throws IOException
-   * @throws JAXBException
+   * @throws AccessControlParsingException
    */
-  private void addAcl(File artifact) throws IOException, XACMLParsingException {
+  private void addAcl(File artifact) throws IOException, AccessControlParsingException {
     List<Organization> organizations = organizationDirectoryService.getOrganizations();
 
     logger.debug("Adding Acl {}", artifact.getAbsolutePath());
@@ -171,14 +168,14 @@ public class AclScanner implements ArtifactInstaller {
   }
 
   /**
-   * Update an ACL based upon an XACML file on all the organizations.
+   * Update ACL from configuration directory in all organizations.
    *
    * @param artifact
-   *          The File representing the XACML File.
+   *          The File representing the ACL.
    * @throws IOException
-   * @throws JAXBException
+   * @throws AccessControlParser
    */
-  private void updateAcl(File artifact) throws IOException, XACMLParsingException {
+  private void updateAcl(File artifact) throws IOException, AccessControlParsingException {
     List<Organization> organizations = organizationDirectoryService.getOrganizations();
 
     logger.debug("Updating Acl {}", artifact.getAbsolutePath());
@@ -195,24 +192,22 @@ public class AclScanner implements ArtifactInstaller {
         if (!getAclService(org).updateAcl(new ManagedAclImpl(id, fileName, org.getId(), acl))) {
           logger.warn("No Acl found with the id {} for the organisation {}.", id, org.getName());
         } else {
-          logger.debug("Acl from XACML file {} has been updated for the organisation {}", fileName, org.getName());
+          logger.debug("Acl from file {} has been updated for the organisation {}", fileName, org.getName());
         }
       } else {
-        logger.info("The XACML file {} has not been added to the organisation {} and will therefore not be updated",
+        logger.info("The ACL file {} has not been added to the organisation {} and will therefore not be updated",
                 fileName, org.getName());
       }
     }
   }
 
   /**
-   * Remove an ACL based upon an XACML file from all the organizations.
+   * Remove ACL from configuration directory from all the organizations.
    *
    * @param artifact
-   *          The File representing the XACML File.
-   * @throws IOException
-   * @throws JAXBException
+   *          The File representing the ACL.
    */
-  private void removeAcl(File artifact) throws IOException, JAXBException {
+  private void removeAcl(File artifact) {
     List<Organization> organizations = organizationDirectoryService.getOrganizations();
 
     logger.debug("Removing Acl {}", artifact.getAbsolutePath());
@@ -227,21 +222,21 @@ public class AclScanner implements ArtifactInstaller {
         try {
           getAclService(org).deleteAcl(id);
         } catch (NotFoundException e) {
-          logger.warn("Unable to delete managec acl {}: Managed acl already deleted!", id);
+          logger.debug("Unable to delete managed acl {}. Managed acl already deleted!", id);
         } catch (AclServiceException e) {
           logger.error("Unable to delete managed acl {}", id, e);
         }
       } else {
-        logger.debug("No Acl found with the id {}.", id);
+        logger.debug("No Acl matching file {} found.", fileName);
       }
     }
   }
 
   /**
-   * Generate an Acl Id with the XACML filename and the organization id
+   * Generate an Acl Id from ACL filename and organization id
    *
    * @param fileName
-   *          the XACML file
+   *          the ACL file
    * @param org
    *          the organization
    * @return the generated Acl Id
@@ -251,16 +246,17 @@ public class AclScanner implements ArtifactInstaller {
   }
 
   /**
-   * Parse the given XACML file into an Access Control List
+   * Parse the given ACL JSON file into an Access Control List
    *
-   * @param artifact
-   * @return
-   * @throws FileNotFoundException
-   * @throws JAXBException
+   * @param artifact JSON file
+   * @return Parsed access control list
+   * @throws IOException Error accessing the ACL file
+   * @throws AccessControlParsingException Error parsing the ACL files
    */
-  private AccessControlList parseToAcl(File artifact) throws IOException, XACMLParsingException {
+  private AccessControlList parseToAcl(File artifact)
+          throws IOException, AccessControlParsingException {
     try (FileInputStream in = new FileInputStream(artifact)) {
-      return XACMLUtils.parseXacml(in);
+      return AccessControlParser.parseAcl(in);
     }
   }
 
