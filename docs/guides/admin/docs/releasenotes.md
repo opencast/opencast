@@ -14,6 +14,12 @@ See [changelog](changelog.md#opencast-157) for a comprehensive list of changes.
 
 ## Opencast 15.6
 
+**Attention:**
+The fix for the handling of captions by the select-tracks operation
+([5829](https://github.com/opencast/opencast/pull/5829)) requires the removal of the operation directly afterwards from
+the `partial-publish` workflow, otherwise captions will be duplicated during publication.
+This workflow has been fixed in 15.8 (see [6046](https://github.com/opencast/opencast/pull/6046) for details).
+
 ### Behavior changes
 
 - **Handle lang tag by asset upload correctly:**
