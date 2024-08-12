@@ -299,6 +299,13 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
               type = RestParameter.Type.INTEGER,
               defaultValue = "0",
               description = "The page number."
+          ),
+          @RestParameter(
+              name = "sign",
+              isRequired = false,
+              type = RestParameter.Type.BOOLEAN,
+              defaultValue = "true",
+              description = "If results are to be signed"
           )
       },
       responses = {
@@ -316,7 +323,8 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
       @QueryParam("sname") String seriesName,
       @QueryParam("sort") String sort,
       @QueryParam("limit") String limit,
-      @QueryParam("offset") String offset
+      @QueryParam("offset") String offset,
+      @QueryParam("sign") String sign
   ) throws SearchException {
 
     // There can only be one, sid or sname
@@ -431,7 +439,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
           .collect(Collectors.toList());
 
       // Sign urls if id is present
-      if (StringUtils.isNotEmpty(id) && this.urlSigningService != null) {
+      if (!"false".equals(sign) && this.urlSigningService != null) {
         this.findURLsAndSign(result);
       }
 
@@ -465,7 +473,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
                   null);
               map.put(entry.getKey(), signedUrl);
             } catch (UrlSigningException e) {
-              logger.debug("Unable to sign url '" + urlToSign + "'.");
+              logger.debug("Unable to sign url '{}'.", urlToSign);
             }
           }
         } else {
