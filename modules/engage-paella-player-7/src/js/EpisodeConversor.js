@@ -450,11 +450,14 @@ function getCaptions(episode) {
   if (!(attachments instanceof Array)) { attachments = attachments ? [attachments] : []; }
   if (!(tracks instanceof Array)) { tracks = tracks ? [tracks] : []; }
 
-  // Read the attachments
-  readCaptions(attachments, captions);
-
-  // Read the tracks
+  // Read the captions from the tracks
   readCaptions(tracks, captions);
+
+  // If no captions were found in the tracks, read them from the attachments
+  // (compatibility with older versions of Opencast)
+  if (captions.length == 0) {
+    readCaptions(attachments, captions);
+  }
 
   return captions;
 }
