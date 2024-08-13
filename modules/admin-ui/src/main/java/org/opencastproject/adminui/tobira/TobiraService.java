@@ -35,6 +35,7 @@ import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public final class TobiraService {
@@ -66,11 +67,18 @@ public final class TobiraService {
             "query AdminUIHostPages($seriesId: String!) {"
                     + "  series: seriesByOpencastId(id: $seriesId) {"
                     + "    hostPages: hostRealms {"
-                    + "      title: name"
-                    + "      path"
-                    + "      ancestors { title: name }"
+                    + "      ... RealmData"
+                    + "      blocks { id }"
+                    + "      ancestors {"
+                    + "        ... RealmData"
+                    + "      }"
                     + "    }"
                     + "  }"
+                    + "}"
+                    + "fragment RealmData on Realm {"
+                    + "  title: name"
+                    + "  segment: pathSegment"
+                    + "  path"
                     + "}",
             Map.of("seriesId", seriesId))
             .get("series");
@@ -78,7 +86,7 @@ public final class TobiraService {
 
   public JSONObject getEventHostPages(String eventId) throws TobiraException {
     return (JSONObject) request(
-            "query AdminUIHostPages($eventId: String!) {"
+            "query AdminUIEventHostPages($eventId: String!) {"
                     + "  event: eventByOpencastId(id: $eventId) {"
                     + "    ...on AuthorizedEvent {"
                     + "      hostPages: hostRealms {"
@@ -89,8 +97,8 @@ public final class TobiraService {
                     + "    }"
                     + "  }"
                     + "}",
-            Map.of("eventId", eventId)
-    ).get("event");
+            Map.of("eventId", eventId))
+            .get("event");
   }
 
   public void mount(Map<String, Object> variables) throws TobiraException {
@@ -102,6 +110,37 @@ public final class TobiraService {
                     + "  }"
                     + "}",
             variables);
+  }
+
+  public Integer createRealmLineage(List<JSONObject> pathComponents) throws TobiraException {
+    return (Integer) request(
+            "mutation AdminUICreateRealmLineage($realms: [RealmLineageComponent!]!) {"
+                    + "  createRealmLineage(realms: $realms) { numCreated }"
+                    + "}",
+            Map.of("realms", pathComponents))
+            .get("numCreated");
+  }
+
+  public String addSeriesMountPoint(Map<String, Object> variables) throws TobiraException {
+    return (String) request(
+            "mutation AdminUIAddSeriesMountPoint($seriesId: String!, $targetPath: String!) {"
+                    + "  addSeriesMountPoint(seriesOcId: $seriesId, targetPath: $targetPath) {"
+                    + "    id"
+                    + "  }"
+                    + "}",
+            variables)
+            .get("id");
+  }
+
+  public JSONObject removeSeriesMountPoint(Map<String, Object> variables) throws TobiraException {
+    return (JSONObject) request(
+            "mutation AdminUIRemoveSeriesMountPoint($seriesId: String!, $currentPath: String!) {"
+                    + "  outcome: removeSeriesMountPoint(seriesOcId: $seriesId, path: $currentPath) {"
+                    + "    __typename"
+                    + "  }"
+                    + "}",
+            variables)
+            .get("outcome");
   }
 
   public boolean ready() {
