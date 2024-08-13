@@ -146,26 +146,6 @@
         <artifactId>maven-resources-plugin</artifactId>
         <executions>
           <execution>
-            <id>copy-libs</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${basedir}/target/classes/ui/scripts/</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>node_modules/</directory>
-                  <includes>
-                    <include>angular/angular.min.js</include>
-                    <include>angular-route/angular-route.min.js</include>
-                  </includes>
-                  <filtering>false</filtering>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-          <execution>
             <id>copy-rest-doc-libs</id>
             <phase>compile</phase>
             <goals>
