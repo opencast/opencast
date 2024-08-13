@@ -23,7 +23,7 @@ In that case, the following steps might help.
          # This changes the domain AND from http to https. Carefully adjust the command as needed!
          # Your old URL may or may not have the port explicitly listed.  Check the previous value of org.opencastproject.server.url and match that.
          find . -type f -name "*.xml" -exec \
-            sed -i 's#http://old-domain.example.com:80#https://new-domain.example.com#g' {} +
+            perl -p -i -e 's#http://old-domain.example.com:80#https://new-domain.example.com#g' {} +
 
 5. Update database tables.
    Note: there more than the following two tables containing the old domain name, but only these two are relevant.
