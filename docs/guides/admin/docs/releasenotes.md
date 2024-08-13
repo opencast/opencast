@@ -1,5 +1,31 @@
 # Opencast 15: Release Notes
 
+## Opencast 15.8
+
+### Bug Fixes
+
+- Don't duplicate captions during publication
+ [[#6046](https://github.com/opencast/opencast/pull/6046)]
+- Check org of role provider when adding roles
+ [[#6044](https://github.com/opencast/opencast/pull/6044)]
+- Downgrade Editor to 2024-06-11
+ [[#6030](https://github.com/opencast/opencast/pull/6030)]
+
+### Improvements
+
+- Cleanup everything
+ [[#6061](https://github.com/opencast/opencast/pull/6061)]
+- Make in-place text substitution in the docs more portable
+ [[#6037](https://github.com/opencast/opencast/pull/6037)]
+- Fix docs of `publish-engage` WOHs
+ [[#6017](https://github.com/opencast/opencast/pull/6017)]
+- Use current docker images for development
+ [[#6012](https://github.com/opencast/opencast/pull/6012)]
+- Add basic date validation check to ingest/addMediaPackage/{wfId}
+ [[#6008](https://github.com/opencast/opencast/pull/6008)]
+- Add new Workflow Operation: Subtitle Timeshift
+ [[#5913](https://github.com/opencast/opencast/pull/5913)]
+
 ## Opencast 15.7
 
 Opencast 15.7 release includes various smaller bug fixes and improvements.
