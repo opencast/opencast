@@ -116,8 +116,6 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
 
   private UrlSigningService urlSigningService;
 
-  private long expireSeconds = UrlSigningServiceOsgiUtil.DEFAULT_URL_SIGNING_EXPIRE_DURATION;
-
   @GET
   @Path("series.json")
   @Produces(MediaType.APPLICATION_JSON)
@@ -468,7 +466,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
             try {
               String signedUrl = this.urlSigningService.sign(
                   urlToSign,
-                  expireSeconds,
+                  UrlSigningServiceOsgiUtil.DEFAULT_URL_SIGNING_EXPIRE_DURATION,
                   null,
                   null);
               map.put(entry.getKey(), signedUrl);
