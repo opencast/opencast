@@ -69,7 +69,7 @@ Each section runs independently as a parallel encoding job.
 For example, if presenter/source is to encoded with "mp4-low.http,mp4-medium.http" and
 presentation/source is to be encoded with "mp4-hd.http,mp4-hd.http"
 
-The target flavors are presenter/delivery and presentation/delivery and all are tagged "engage-streaming, example".
+The target flavors are presenter/delivery and presentation/delivery and all are tagged "example".
 The target flavors are additionally tagged with encoding profiles, so that they can selected individually.
 
 This workflow supports HLS adaptive streaming.
