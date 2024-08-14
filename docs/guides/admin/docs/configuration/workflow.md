@@ -51,7 +51,7 @@ format.
 
 First create or select the encoding profiles you want to use. For more details on this, have a look at the [Encoding
 Profile Configuration Guide](encoding.md). For this guide we assume that we have an encoding profile `mov-low.http`
-which creates a distribution format definition for mp4 video and a `feed-cover.http` encoding profile to create
+which creates a distribution format definition for mp4 video and a `player-preview.http` encoding profile to create
 thumbnail images for the videos.
 
 ### Step 2: Describe the Workflow
@@ -209,7 +209,7 @@ The next operations will create thumbnails from the media:
             <configuration key="source-tags"></configuration>
             <configuration key="target-flavor">cover/source</configuration>
             <configuration key="target-tags"></configuration>
-            <configuration key="encoding-profile">feed-cover.http</configuration>
+            <configuration key="encoding-profile">player-preview.http</configuration>
             <configuration key="time">1</configuration>
           </configurations>
         </operation>
@@ -224,7 +224,7 @@ The next operations will create thumbnails from the media:
             <configuration key="source-tags"></configuration>
             <configuration key="target-flavor">cover/source</configuration>
             <configuration key="target-tags"></configuration>
-            <configuration key="encoding-profile">feed-cover.http</configuration>
+            <configuration key="encoding-profile">player-preview.http</configuration>
             <configuration key="time">1</configuration>
           </configurations>
         </operation>
