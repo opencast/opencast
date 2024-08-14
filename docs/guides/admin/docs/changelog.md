@@ -4,6 +4,19 @@ Changelog
 Opencast 16
 -----------
 
+### Opencast 16.3
+
+- [[#6101](https://github.com/opencast/opencast/pull/6101)] -
+  Release notes for Opencast 16.3
+- [[#6100](https://github.com/opencast/opencast/pull/6100)] -
+  Update admin interface to 2024-08-14
+- [[#6094](https://github.com/opencast/opencast/pull/6094)] -
+  Sign urls in search rest service again
+- [[#6086](https://github.com/opencast/opencast/pull/6086)] -
+  Update feed service security settings
+- [[#6057](https://github.com/opencast/opencast/pull/6057)] -
+  Fix version of subtitle timeshift operation
+
 ### Opencast 16.2
 
 - [[#6056](https://github.com/opencast/opencast/pull/6056)] -
