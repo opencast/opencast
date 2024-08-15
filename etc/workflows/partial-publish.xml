@@ -21,19 +21,6 @@
       </configurations>
     </operation>
 
-    <!-- Keep captions in the loop, as they are ignored by select-tracks -->
-
-    <operation
-        id="tag"
-        description="Tag captions for cutting">
-      <configurations>
-        <configuration key="source-flavors">captions/source</configuration>
-        <configuration key="target-flavor">captions/work</configuration>
-        <configuration key="target-tags">-archive</configuration>
-        <configuration key="copy">true</configuration>
-      </configurations>
-    </operation>
-
     <operation
       id="analyze-tracks"
       exception-handler-workflow="partial-error"

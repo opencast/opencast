@@ -323,9 +323,6 @@
     <sec:intercept-url pattern="/annotation/**" method="PUT" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/playlists/**" access="ROLE_ANONYMOUS" />
 
-    <!-- Enable anonymous access to the rss and atom feeds -->
-    <sec:intercept-url pattern="/feeds/**" method="GET" access="ROLE_ANONYMOUS" />
-
     <!-- Secure the system management URLs for admins only -->
     <sec:intercept-url pattern="/services/available.*" method="GET" access="ROLE_ADMIN, ROLE_CAPTURE_AGENT" />
     <sec:intercept-url pattern="/services/**" access="ROLE_ADMIN"/>

@@ -17,8 +17,8 @@
   <dependencies>
     <dependency>
       <groupId>org.opencastproject</groupId>
-    <artifactId>opencast-common</artifactId>
-    <version>${project.version}</version>
+      <artifactId>opencast-common</artifactId>
+      <version>${project.version}</version>
     </dependency>
   </dependencies>
   <build>
