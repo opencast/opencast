@@ -23,10 +23,6 @@ package org.opencastproject.ingest.endpoint;
 
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.opencastproject.mediapackage.MediaPackageElements.XACML_POLICY_EPISODE;
-import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_CREATED;
-import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_DATE;
-import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_IDENTIFIER;
-import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TEMPORAL;
 
 import org.opencastproject.authorization.xacml.XACMLUtils;
 import org.opencastproject.capture.CaptureParameters;
@@ -771,9 +767,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
             String fieldName = item.getFieldName();
             String value = Streams.asString(item.openStream(), StandardCharsets.UTF_8.toString());
             if (dcterms.contains(fieldName)) {
-              if (PROPERTY_CREATED.getLocalName().equals(fieldName)
-                  || PROPERTY_DATE.getLocalName().equals(fieldName)
-                  || PROPERTY_TEMPORAL.getLocalName().equals(fieldName)) {
+              if ("created".equals(fieldName) || "date".equals(fieldName) || "temporal".equals(fieldName)) {
                 try {
                   OpencastMetadataCodec.decodeDate(value);
                 } catch (IllegalArgumentException e) {
@@ -808,7 +802,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
               tags.add(value);
               /* Fields for DC catalog */
             } else if (dcterms.contains(fieldName)) {
-              if (PROPERTY_IDENTIFIER.getLocalName().equals(fieldName)) {
+              if ("identifier".equals(fieldName)) {
                 /* Use the identifier for the mediapackage */
                 mp.setIdentifier(new IdImpl(value));
               }
