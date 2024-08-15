@@ -505,7 +505,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
         String fieldName = item.getFieldName();
         if (item.isFormField()) {
           if ("flavor".equals(fieldName)) {
-            String flavorString = Streams.asString(item.openStream(), StandardCharsets.UTF_8.toString());
+            String flavorString = Streams.asString(item.openStream(), "UTF-8");
             logger.trace("flavor: {}", flavorString);
             if (flavorString != null) {
               try {
@@ -517,12 +517,12 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
               }
             }
           } else if ("tags".equals(fieldName)) {
-            String tagsString = Streams.asString(item.openStream(), StandardCharsets.UTF_8.toString());
+            String tagsString = Streams.asString(item.openStream(), "UTF-8");
             logger.trace("tags: {}", tagsString);
             tags = tagsString.split(",");
           } else if ("mediaPackage".equals(fieldName)) {
             try {
-              String mediaPackageString = Streams.asString(item.openStream(), StandardCharsets.UTF_8.toString());
+              String mediaPackageString = Streams.asString(item.openStream(), "UTF-8");
               logger.trace("mediaPackage: {}", mediaPackageString);
               mp = MP_FACTORY.newMediaPackageBuilder().loadFromXml(mediaPackageString);
             } catch (MediaPackageException e) {
@@ -530,7 +530,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
               return Response.serverError().status(Status.BAD_REQUEST).build();
             }
           } else if ("startTime".equals(fieldName) && "/addPartialTrack".equals(request.getPathInfo())) {
-            String startTimeString = Streams.asString(item.openStream(), StandardCharsets.UTF_8.toString());
+            String startTimeString = Streams.asString(item.openStream(), "UTF-8");
             logger.trace("startTime: {}", startTime);
             try {
               startTime = Long.parseLong(startTimeString);
@@ -765,7 +765,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           FileItemStream item = iter.next();
           if (item.isFormField()) {
             String fieldName = item.getFieldName();
-            String value = Streams.asString(item.openStream(), StandardCharsets.UTF_8.toString());
+            String value = Streams.asString(item.openStream(), "UTF-8");
             if (dcterms.contains(fieldName)) {
               if ("created".equals(fieldName) || "date".equals(fieldName) || "temporal".equals(fieldName)) {
                 try {
@@ -782,7 +782,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           FileItemStream item = iter.next();
           if (item.isFormField()) {
             String fieldName = item.getFieldName();
-            String value = Streams.asString(item.openStream(), StandardCharsets.UTF_8.toString());
+            String value = Streams.asString(item.openStream(), "UTF-8");
             logger.trace("form field {}: {}", fieldName, value);
             /* Ignore empty fields */
             if ("".equals(value)) {
@@ -1072,7 +1072,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           FileItemStream item = iter.next();
           if (item.isFormField()) {
             String fieldName = item.getFieldName();
-            String value = Streams.asString(item.openStream(), StandardCharsets.UTF_8.toString());
+            String value = Streams.asString(item.openStream(), "UTF-8");
             logger.trace("{}: {}", fieldName, value);
             if (WORKFLOW_INSTANCE_ID_PARAM.equals(fieldName)) {
               workflowIdAsString = value;
@@ -1202,7 +1202,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
         for (FileItemIterator iter = new ServletFileUpload().getItemIterator(request); iter.hasNext();) {
           FileItemStream item = iter.next();
           if (item.isFormField()) {
-            final String value = Streams.asString(item.openStream(), StandardCharsets.UTF_8.toString());
+            final String value = Streams.asString(item.openStream(), "UTF-8");
             formData.putSingle(item.getFieldName(), value);
           }
         }
@@ -1393,7 +1393,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
     }
 
-    try (InputStream in = IOUtils.toInputStream(dc, StandardCharsets.UTF_8.toString())) {
+    try (InputStream in = IOUtils.toInputStream(dc, "UTF-8")) {
       mediaPackage = ingestService.addCatalog(in, "dublincore.xml", dcFlavor, mediaPackage);
     } catch (MediaPackageException e) {
       return Response.serverError().status(Status.BAD_REQUEST).entity(e.getMessage()).build();
