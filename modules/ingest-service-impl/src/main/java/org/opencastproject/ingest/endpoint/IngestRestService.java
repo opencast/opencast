@@ -23,10 +23,6 @@ package org.opencastproject.ingest.endpoint;
 
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.opencastproject.mediapackage.MediaPackageElements.XACML_POLICY_EPISODE;
-import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_CREATED;
-import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_DATE;
-import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_IDENTIFIER;
-import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TEMPORAL;
 
 import org.opencastproject.authorization.xacml.XACMLUtils;
 import org.opencastproject.capture.CaptureParameters;
@@ -49,7 +45,6 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.metadata.dublincore.DublinCoreXmlFormat;
 import org.opencastproject.metadata.dublincore.DublinCores;
-import org.opencastproject.metadata.dublincore.OpencastMetadataCodec;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.scheduler.api.SchedulerConflictException;
 import org.opencastproject.scheduler.api.SchedulerException;
@@ -509,7 +504,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
         String fieldName = item.getFieldName();
         if (item.isFormField()) {
           if ("flavor".equals(fieldName)) {
-            String flavorString = Streams.asString(item.openStream(), StandardCharsets.UTF_8.toString());
+            String flavorString = Streams.asString(item.openStream(), "UTF-8");
             logger.trace("flavor: {}", flavorString);
             if (flavorString != null) {
               try {
@@ -521,12 +516,12 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
               }
             }
           } else if ("tags".equals(fieldName)) {
-            String tagsString = Streams.asString(item.openStream(), StandardCharsets.UTF_8.toString());
+            String tagsString = Streams.asString(item.openStream(), "UTF-8");
             logger.trace("tags: {}", tagsString);
             tags = tagsString.split(",");
           } else if ("mediaPackage".equals(fieldName)) {
             try {
-              String mediaPackageString = Streams.asString(item.openStream(), StandardCharsets.UTF_8.toString());
+              String mediaPackageString = Streams.asString(item.openStream(), "UTF-8");
               logger.trace("mediaPackage: {}", mediaPackageString);
               mp = MP_FACTORY.newMediaPackageBuilder().loadFromXml(mediaPackageString);
             } catch (MediaPackageException e) {
@@ -534,7 +529,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
               return Response.serverError().status(Status.BAD_REQUEST).build();
             }
           } else if ("startTime".equals(fieldName) && "/addPartialTrack".equals(request.getPathInfo())) {
-            String startTimeString = Streams.asString(item.openStream(), StandardCharsets.UTF_8.toString());
+            String startTimeString = Streams.asString(item.openStream(), "UTF-8");
             logger.trace("startTime: {}", startTime);
             try {
               startTime = Long.parseLong(startTimeString);
@@ -764,31 +759,11 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       int episodeDCCatalogNumber = 0;
       boolean hasMedia = false;
       if (ServletFileUpload.isMultipartContent(request)) {
-        // Validate first
         for (FileItemIterator iter = new ServletFileUpload().getItemIterator(request); iter.hasNext();) {
           FileItemStream item = iter.next();
           if (item.isFormField()) {
             String fieldName = item.getFieldName();
-            String value = Streams.asString(item.openStream(), StandardCharsets.UTF_8.toString());
-            if (dcterms.contains(fieldName)) {
-              if (PROPERTY_CREATED.getLocalName().equals(fieldName)
-                  || PROPERTY_DATE.getLocalName().equals(fieldName)
-                  || PROPERTY_TEMPORAL.getLocalName().equals(fieldName)) {
-                try {
-                  OpencastMetadataCodec.decodeDate(value);
-                } catch (IllegalArgumentException e) {
-                  return badRequest("Provided dates were not well formatted", e);
-                }
-              }
-            }
-          }
-        }
-        // Add to mediapackage
-        for (FileItemIterator iter = new ServletFileUpload().getItemIterator(request); iter.hasNext();) {
-          FileItemStream item = iter.next();
-          if (item.isFormField()) {
-            String fieldName = item.getFieldName();
-            String value = Streams.asString(item.openStream(), StandardCharsets.UTF_8.toString());
+            String value = Streams.asString(item.openStream(), "UTF-8");
             logger.trace("form field {}: {}", fieldName, value);
             /* Ignore empty fields */
             if ("".equals(value)) {
@@ -808,7 +783,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
               tags.add(value);
               /* Fields for DC catalog */
             } else if (dcterms.contains(fieldName)) {
-              if (PROPERTY_IDENTIFIER.getLocalName().equals(fieldName)) {
+              if ("identifier".equals(fieldName)) {
                 /* Use the identifier for the mediapackage */
                 mp.setIdentifier(new IdImpl(value));
               }
@@ -1078,7 +1053,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
           FileItemStream item = iter.next();
           if (item.isFormField()) {
             String fieldName = item.getFieldName();
-            String value = Streams.asString(item.openStream(), StandardCharsets.UTF_8.toString());
+            String value = Streams.asString(item.openStream(), "UTF-8");
             logger.trace("{}: {}", fieldName, value);
             if (WORKFLOW_INSTANCE_ID_PARAM.equals(fieldName)) {
               workflowIdAsString = value;
@@ -1208,7 +1183,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
         for (FileItemIterator iter = new ServletFileUpload().getItemIterator(request); iter.hasNext();) {
           FileItemStream item = iter.next();
           if (item.isFormField()) {
-            final String value = Streams.asString(item.openStream(), StandardCharsets.UTF_8.toString());
+            final String value = Streams.asString(item.openStream(), "UTF-8");
             formData.putSingle(item.getFieldName(), value);
           }
         }
@@ -1399,7 +1374,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
       return Response.status(Status.BAD_REQUEST).entity(e.getMessage()).build();
     }
 
-    try (InputStream in = IOUtils.toInputStream(dc, StandardCharsets.UTF_8.toString())) {
+    try (InputStream in = IOUtils.toInputStream(dc, "UTF-8")) {
       mediaPackage = ingestService.addCatalog(in, "dublincore.xml", dcFlavor, mediaPackage);
     } catch (MediaPackageException e) {
       return Response.serverError().status(Status.BAD_REQUEST).entity(e.getMessage()).build();
