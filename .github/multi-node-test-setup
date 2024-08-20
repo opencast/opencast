@@ -50,5 +50,5 @@ sed -i 's_^.*dispatch.interval=.*$_dispatch.interval=0_' opencast-dist-worker/et
 
 # start services
 cd ../docs/scripts/devel-dependency-containers/
-docker-compose -f docker-compose-postgresql.yml down
-docker-compose -f docker-compose-postgresql.yml up -d
+docker compose -f docker-compose-postgresql.yml down
+docker compose -f docker-compose-postgresql.yml up -d

@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>opencast-security-shibboleth</artifactId>
-  <name>Opencast :: security-shibboleth</name>
+  <artifactId>opencast-subtitle-timeshift-workflowoperation</artifactId>
   <packaging>bundle</packaging>
+  <name>Opencast :: subtitle-timeshift-workflowoperation</name>
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
@@ -21,25 +21,33 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>commons-logging</groupId>
-      <artifactId>commons-logging</artifactId>
-      <version>1.3.1</version>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-workflow-service-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-core</artifactId>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-core</artifactId>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.component.annotations</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-web</artifactId>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-workspace-api</artifactId>
+      <version>${project.version}</version>
+      <scope>compile</scope>
     </dependency>
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-subtitle-parser</artifactId>
+      <version>${project.version}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
     </dependency>
   </dependencies>
   <build>
@@ -47,9 +55,10 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
-        <extensions>true</extensions>
         <configuration>
           <ignoredUnusedDeclaredDependencies>
+            <!-- provide a logger for tests -->
+            <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-reload4j</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>
@@ -59,19 +68,8 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Fragment-Host>opencast-kernel</Fragment-Host>
-            <Import-Package>
-              javax.servlet.http,
-              org.apache.commons.logging,
-              org.opencastproject.security.api,
-              org.springframework.security.core.userdetails,
-              org.springframework.security.provisioning,
-              org.springframework.security.web.authentication.preauth,
-              org.springframework.util,
-              *
-            </Import-Package>
             <Export-Package>
-              org.opencastproject.security.shibboleth;version=${project.version}
+              org.opencastproject.workflow.handler.subtitletimeshift;version=${project.version}
             </Export-Package>
           </instructions>
         </configuration>

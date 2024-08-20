@@ -1,5 +1,26 @@
 # Opencast 16: Release Notes
 
+
+## Opencast 16.4
+
+This release fixes [a critical bug which may  cause ingests to fail](https://github.com/opencast/opencast/pull/6104).
+Please skip the 16.3 release and update to 16.4 directly.
+
+## Opencast 16.3
+
+This is again a bugfix release of Opencast 16. For example the broken docker compose command is fixed. A new version of
+Opencast's admin interface is included as well. [[#6100](https://github.com/opencast/opencast/pull/6100)]
+
+
+## Opencast 16.2
+
+This is a biugfix release of Opencast 16. Among several other problems, this fixes an important bug causing problems for
+non admin users when (re)publishing events. We recommend updating to this as soon as possible.
+
+Additionally, this includes a new version of Opencast's admin interface, which in turn [fixes a number of
+bugs](https://github.com/opencast/opencast-admin-interface/releases/tag/2024-07-30) including one which could cause data
+corruption.
+
 ## Opencast 16.1
 
 This is an important bugfix release fixing a problem preventing the presentation node from properly starting up and

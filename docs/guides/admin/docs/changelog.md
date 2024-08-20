@@ -4,8 +4,50 @@ Changelog
 Opencast 16
 -----------
 
+### Opencast 16.3
+
+- [[#6101](https://github.com/opencast/opencast/pull/6101)] -
+  Release notes for Opencast 16.3
+- [[#6100](https://github.com/opencast/opencast/pull/6100)] -
+  Update admin interface to 2024-08-14
+- [[#6094](https://github.com/opencast/opencast/pull/6094)] -
+  Sign urls in search rest service again
+- [[#6086](https://github.com/opencast/opencast/pull/6086)] -
+  Update feed service security settings
+- [[#6057](https://github.com/opencast/opencast/pull/6057)] -
+  Fix version of subtitle timeshift operation
+
+### Opencast 16.2
+
+- [[#6056](https://github.com/opencast/opencast/pull/6056)] -
+  Opencast 16.1 Release Notes
+- [[#6055](ttps://github.com/opencast/opencast/pull/6055)] -
+  Update admin interface to 2024-07-30
+- [[#6042](https://github.com/opencast/opencast/pull/6042)] -
+  Properly handle ACL publication for non-admins
+- [[#6034](https://github.com/opencast/opencast/pull/6034)] -
+  Fix Updating Engage for Non-Admins
+- [[#6029](https://github.com/opencast/opencast/pull/6029)] -
+  Modernize cluster install docs
+- [[#6025](https://github.com/opencast/opencast/pull/6025)] -
+  Add config changes to upgrade.md
+- [[#6020](https://github.com/opencast/opencast/pull/6020)] -
+  Request user data only if necessary
+- [[#6015](https://github.com/opencast/opencast/pull/6015)] -
+  Remove Solr Configuration
+- [[#6011](https://github.com/opencast/opencast/pull/6011)] -
+  Fix link to supported language codes
+- [[#6006](https://github.com/opencast/opencast/pull/6006)] -
+  Update karaf version to 4.4.6
+- [[#6002](https://github.com/opencast/opencast/pull/6002)] -
+  Remove Solr dependency
+- [[#6001](https://github.com/opencast/opencast/pull/6001)] -
+  Remove mentions of Solr from "migrating domain in media packages" guide
+
 ### Opencast 16.1
 
+- [[#6000](https://github.com/opencast/opencast/pull/6000)] -
+  Opencast 16.1 Release Notes
 - [[#5999](https://github.com/opencast/opencast/pull/5999)] -
   Update admin interface to release 2024-07-02
 - [[#5998](https://github.com/opencast/opencast/pull/5998)] -
@@ -394,6 +436,27 @@ Opencast 16
 
 Opencast 15
 -----------
+
+### Opencast 15.8
+
+- [[#6061](https://github.com/opencast/opencast/pull/6061)] -
+  Cleanup everything
+- [[#6046](https://github.com/opencast/opencast/pull/6046)] -
+  Don't duplicate captions during publication
+- [[#6044](https://github.com/opencast/opencast/pull/6044)] -
+  Check org of role provider when adding roles
+- [[#6037](https://github.com/opencast/opencast/pull/6037)] -
+  Make in-place text substitution in the docs more portable
+- [[#6030](https://github.com/opencast/opencast/pull/6030)] -
+  Downgrade Editor to 2024-06-11
+- [[#6017](https://github.com/opencast/opencast/pull/6017)] -
+  Fix docs of `publish-engage` WOHs
+- [[#6012](https://github.com/opencast/opencast/pull/6012)] -
+  Use current docker images for development
+- [[#6008](https://github.com/opencast/opencast/pull/6008)] -
+  Add basic date validation check to ingest/addMediaPackage/{wfId}
+- [[#5913](https://github.com/opencast/opencast/pull/5913)] -
+  Add new Workflow Operation: Subtitle Timeshift
 
 ### Opencast 15.7
 
