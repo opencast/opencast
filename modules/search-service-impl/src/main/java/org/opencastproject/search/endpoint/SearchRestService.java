@@ -443,13 +443,13 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
 
       total = hits.getTotalHits();
     }
-    var json = gson.toJsonTree(Map.of(
+    var json = gson.toJson(Map.of(
         "offset", from,
         "total", total,
         "result", result,
         "limit", size));
 
-    return Response.ok(gson.toJson(json)).build();
+    return Response.ok(json).build();
   }
 
   /**
