@@ -82,6 +82,10 @@ public class GeneralData {
   @SerializedName("contact_me")
   private final boolean allowContact;
 
+  /** Which type of system is this */
+  @SerializedName("system_type")
+  private final String systemType;
+
   /** Whether we can send error reports */
   @SerializedName("send_errors")
   private final boolean allowErrorReports;
@@ -108,6 +112,7 @@ public class GeneralData {
     this.streetNo = adopterRegistrationForm.getStreetNo();
     this.email = adopterRegistrationForm.getEmail();
     this.allowContact = adopterRegistrationForm.allowsContacting();
+    this.systemType = adopterRegistrationForm.systemType();
     this.allowErrorReports = adopterRegistrationForm.allowsErrorReports();
     this.allowStatistics = adopterRegistrationForm.allowsStatistics();
   }
@@ -175,6 +180,10 @@ public class GeneralData {
 
   public String getContactMe() {
     return Boolean.toString(allowContact);
+  }
+
+  public String getSystemType() {
+    return systemType;
   }
 
   public String getErrorReports() {
