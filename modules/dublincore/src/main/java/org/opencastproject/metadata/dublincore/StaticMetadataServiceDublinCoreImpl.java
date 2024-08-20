@@ -227,16 +227,6 @@ public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataServic
       }
 
       @Override
-      public Option<Date> getCreated() {
-        // Compatibility patch with SOLR search service, where DC_CREATED stores the time the recording has been recorded
-        // in Admin UI and external API this is stored in DC_TEMPORAL as a DC Period. DC_CREATED is the date on which the
-        // event was created there.
-        // Admin UI and External UI do not use this Class, that only seems to be used by the old SOLR modules,
-        // so data will be kept correctly there, and only be "exported" to DC_CREATED for compatibility reasons here.
-        return start;
-      }
-
-      @Override
       public Option<Date[]> getTemporalPeriod() {
         if (temporalOpt.isSome()) {
           if (temporalOpt.get() instanceof DCMIPeriod) {

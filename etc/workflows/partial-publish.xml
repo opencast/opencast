@@ -108,22 +108,6 @@
       </configurations>
     </operation>
 
-    <!-- Encode to feed cover images -->
-
-    <operation
-      id="image"
-      exception-handler-workflow="partial-error"
-      description="Creating feed cover image">
-      <configurations>
-        <configuration key="source-flavor">*/trimmed</configuration>
-        <configuration key="target-flavor">*/feed+preview</configuration>
-        <configuration key="target-tags">atom,rss</configuration>
-        <configuration key="encoding-profile">feed-cover.http</configuration>
-        <configuration key="time">3</configuration>
-      </configurations>
-    </operation>
-
-
     <!-- Create a cover image -->
 
     <operation
@@ -279,7 +263,7 @@
       description="Publishing to Opencast Media Module">
       <configurations>
         <configuration key="download-source-flavors">dublincore/*,security/*</configuration>
-        <configuration key="download-source-tags">engage-download,atom,rss</configuration>
+        <configuration key="download-source-tags">engage-download</configuration>
         <configuration key="streaming-source-tags">engage-streaming</configuration>
         <configuration key="check-availability">false</configuration>
       </configurations>

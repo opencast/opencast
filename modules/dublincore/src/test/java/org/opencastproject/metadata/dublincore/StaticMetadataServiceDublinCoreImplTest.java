@@ -24,7 +24,6 @@ package org.opencastproject.metadata.dublincore;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.opencastproject.metadata.dublincore.TestUtil.createDate;
 
 import org.opencastproject.mediapackage.DefaultMediaPackageSerializerImpl;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -49,9 +48,8 @@ public final class StaticMetadataServiceDublinCoreImplTest {
     StaticMetadataServiceDublinCoreImpl ms = newStaticMetadataService();
     StaticMetadata md = ms.getMetadata(mp);
     assertEquals("Land and Vegetation: Key players on the Climate Scene",
-            md.getTitles().stream().filter(v -> v.getLanguage().equals(MetadataValues.LANGUAGE_UNDEFINED))
-                    .findFirst().map(MetadataValue::getValue).orElse(""));
-    assertEquals(createDate(2007, 12, 5, 0, 0, 0), md.getCreated().get());
+        md.getTitles().stream().filter(v -> v.getLanguage().equals(MetadataValues.LANGUAGE_UNDEFINED)).findFirst()
+            .map(MetadataValue::getValue).orElse(""));
   }
 
   @Test(expected = IllegalArgumentException.class)

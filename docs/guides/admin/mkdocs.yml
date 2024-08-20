@@ -80,7 +80,6 @@ nav:
         - Amazon S3 Archive Storage: 'configuration/awss3archive.md'
         - Amazon S3 Distribution: 'configuration/awss3distribution.md'
    - Asset Manager: 'configuration/asset-manager.md'
-   - Atom/RSS Feed: 'configuration/atomrss.md'
    - Authentication, Authorization and User Management:
         - General Security: 'configuration/security.md'
         - Access Control Lists: 'configuration/acl.md'
@@ -129,7 +128,6 @@ nav:
    - Plugin Management: configuration/plugin-management.md
    - Search Index:
         - Overview: 'configuration/searchindex/index.md'
-        - Solr: 'configuration/searchindex/solr.md'
         - Elasticsearch: 'configuration/searchindex/elasticsearch.md'
    - Serving Static Files: 'configuration/serving-static-files.md'
    - Stream Security:

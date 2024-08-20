@@ -93,13 +93,13 @@ all media are encoded with "mp4-low.http" and "mp4-vga-medium" and
 targets are flavored as "presenter/preview" and "presentation/preview"
 
 ```xml
- <configuration key="target-tags">engage-streaming,rss,atom;engage-download,rss,atom</configuration>
+ <configuration key="target-tags">engage-streaming,example;engage-download,example</configuration>
  <configuration key="encoding-profiles">mp4-medium.http;mp4-vga-medium</configuration>
 ```
 
 Each section is tagged individually. Using the example above,
-presenter/preview is encoded with "mp4-medium.http" and tagged with "engage-streaming" ,"rss" and "atom",
-presentation/preview is encoded with "mp4-vga-medium" and tagged with "engage-download","rss" and "atom".
+presenter/preview is encoded with "mp4-medium.http" and tagged with "engage-streaming", and "example"",
+presentation/preview is encoded with "mp4-vga-medium" and tagged with "engage-download", and "example".
 
 
 If presenter/work is to be encoded with "mp4-low.http,mp4-medium.http" and

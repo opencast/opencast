@@ -61,7 +61,6 @@ to put the release schedule, short descriptions of features or noteworthy config
 In general, everyone assumes someone else is testing the upgrade guides and scripts.  That means it's your job to take
 a quick peek every one in a while and make sure that they work.  Things to think about:
 
-- Do we need Solr index rebuilds?
 - Do we need Elasticsearch index rebuilds?
 - Is there any database migration necessary?
 - Are there any leftover steps in the upgrade docs from previous Opencast versions?

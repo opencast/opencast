@@ -58,7 +58,6 @@ A list of everything.
 - Amazon Services
     - [Amazon S3 Archive Storage](awss3archive.md)
     - [Amazon S3 Distribution](awss3distribution.md)
-- [Atom/RSS Feed](atomrss.md)
 - [Authentication, Authorizations, and User Management](security.md)
     - [CAS Security Configuration](security.cas.md)
     - [LDAP Authentication and Authorization (without CAS)](security.ldap.md)
@@ -93,7 +92,6 @@ A list of everything.
     - [Paella player 7 Configuration](player/paella.player7/configuration.md)
 - [Plugin Management](plugin-management.md)
 - [Search Index Overview](searchindex/index.md)
-    - [Solr](searchindex/solr.md)
     - [Elasticsearch](searchindex/elasticsearch.md)
 - [Serving Static Files](serving-static-files.md)
 - [Stream Security Overview](stream-security/stream-security-overview.md)

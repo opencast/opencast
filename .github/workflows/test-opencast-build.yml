@@ -135,6 +135,43 @@ jobs:
           curl -fisS --retry 30 --retry-delay 10 --retry-all-errors -u admin:opencast
           http://localhost:8082/sysinfo/bundles/version
 
+      - name: create test user
+        if: matrix.java == 11
+        run: >
+          curl -i -u admin:opencast http://localhost:8080/user-utils/
+          -F username=test
+          -F password=opencast
+          -F 'roles=["ROLE_STUDIO"]'
+
+      - name: ingest test media as non-admin
+        if: matrix.java == 11
+        run: >
+          curl -i -f -u test:opencast http://localhost:8080/ingest/addMediaPackage/fast
+          -F flavor=presenter/source
+          -F BODY=@modules/inspection-service-ffmpeg/src/test/resources/segments_1.mp4
+          -F title=test
+          -F identifier=test
+          -F acl='{"acl": {"ace": [{"role": "ROLE_USER","action": "read"},{"role": "ROLE_USER","action": "write"}]}}'
+
+      - name: wait for event to finish
+        if: matrix.java == 11
+        env:
+          STATUS_URL: 'http://localhost:8080/workflow/mediaPackage/test/hasActiveWorkflows'
+        run: |
+          while [ "$(curl -s -u admin:opencast "${STATUS_URL}")" = "true" ]
+          do
+           sleep 1
+           echo -n .
+          done
+
+      - name: check that processing was successful
+        if: matrix.java == 11
+        run: |
+          curl -s -O -u admin:opencast http://localhost:8080/workflow/mediaPackage/test/instances.json
+          jq < instances.json
+          jq -r '.workflows.workflow.state' < instances.json | tee status
+          grep -q SUCCEEDED status
+
       - name: show admin logs
         if: always()
         run: cat build/opencast-dist-admin/data/log/opencast.log || true

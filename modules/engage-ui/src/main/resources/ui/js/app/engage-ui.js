@@ -39,6 +39,7 @@ function($, bootbox, _, alertify, jsyaml) {
   var configURL = '/ui/config/engage-ui/config.yml';
   var springSecurityLoginURL = '/j_spring_security_check';
   var springSecurityLogoutURL = '/j_spring_security_logout';
+  var customLoginURL = null;
 
   // various variables
   var mediaContainer = '<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">';
@@ -366,6 +367,13 @@ function($, bootbox, _, alertify, jsyaml) {
   });
 
   function login() {
+
+    // Redirect if login_url is present
+    if (customLoginURL) {
+      window.location.href = customLoginURL;
+      return null;
+    }
+
     if (!askedForLogin) {
       askedForLogin = true;
       var box = bootbox.dialog({
@@ -474,6 +482,7 @@ function($, bootbox, _, alertify, jsyaml) {
         log('Configuration loaded');
         var config = jsyaml.load(data);
         $($headerLogo).attr('src', config.logo || '');
+        customLoginURL = config.customLoginURL || null;
       }
     });
   }

@@ -51,7 +51,7 @@ format.
 
 First create or select the encoding profiles you want to use. For more details on this, have a look at the [Encoding
 Profile Configuration Guide](encoding.md). For this guide we assume that we have an encoding profile `mov-low.http`
-which creates a distribution format definition for mp4 video and a `feed-cover.http` encoding profile to create
+which creates a distribution format definition for mp4 video and a `player-preview.http` encoding profile to create
 thumbnail images for the videos.
 
 ### Step 2: Describe the Workflow
@@ -162,7 +162,7 @@ The next operations will encode the media to the Mp4 format:
           <configurations>
             <configuration key="source-flavor">presenter/source</configuration>
             <configuration key="target-flavor">presenter/delivery</configuration>
-            <configuration key="target-tags">rss, atom</configuration>
+            <configuration key="target-tags"></configuration>
             <configuration key="encoding-profile">mov-low.http</configuration>
           </configurations>
         </operation>
@@ -175,7 +175,7 @@ The next operations will encode the media to the Mp4 format:
           <configurations>
             <configuration key="source-flavor">presentation/source</configuration>
             <configuration key="target-flavor">presentation/delivery</configuration>
-            <configuration key="target-tags">rss, atom</configuration>
+            <configuration key="target-tags"></configuration>
             <configuration key="encoding-profile">mov-low.http</configuration>
           </configurations>
         </operation>
@@ -208,8 +208,8 @@ The next operations will create thumbnails from the media:
             <configuration key="source-flavor">presenter/source</configuration>
             <configuration key="source-tags"></configuration>
             <configuration key="target-flavor">cover/source</configuration>
-            <configuration key="target-tags">rss, atom</configuration>
-            <configuration key="encoding-profile">feed-cover.http</configuration>
+            <configuration key="target-tags"></configuration>
+            <configuration key="encoding-profile">player-preview.http</configuration>
             <configuration key="time">1</configuration>
           </configurations>
         </operation>
@@ -223,8 +223,8 @@ The next operations will create thumbnails from the media:
             <configuration key="source-flavor">presentation/source</configuration>
             <configuration key="source-tags"></configuration>
             <configuration key="target-flavor">cover/source</configuration>
-            <configuration key="target-tags">rss, atom</configuration>
-            <configuration key="encoding-profile">feed-cover.http</configuration>
+            <configuration key="target-tags"></configuration>
+            <configuration key="encoding-profile">player-preview.http</configuration>
             <configuration key="time">1</configuration>
           </configurations>
         </operation>
@@ -250,7 +250,7 @@ The next operation copies the encoded media to the Opencast distribution channel
           exception-handler-workflow="error"
           description="Distribute media to the local distribution channel">
           <configurations>
-            <configuration key="download-source-tags">publish,rss,atom</configuration>
+            <configuration key="download-source-tags">publish</configuration>
             <configuration key="streaming-source-tags"></configuration>
             <configuration key="check-availability">true</configuration>
           </configurations>
@@ -260,7 +260,7 @@ The next operation copies the encoded media to the Opencast distribution channel
 
     </definition>
 
-* The publish-engage operation uses all media tagged as *rss* or *atom* as input.
+* The publish-engage operation uses all media tagged as *publish* as input.
 
 <!-- _Are the next sections still part of Creating a Custom Workflow? -->
 ## Accept User Input

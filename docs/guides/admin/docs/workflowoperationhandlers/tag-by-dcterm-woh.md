@@ -23,13 +23,13 @@ Tags and flavors can be used in combination.
 
 |configuration keys|example|description|default value|
 |------------------|-------|-----------|-------------|
-|source-tags       |"engage,atom,rss,-publish"|Tag any media package elements with one of these (comma separated) tags. If a source-tag starts with a '-', media package elements with this tag will be excluded.|EMPTY|
+|source-tags       |"engage,-publish"|Tag any media package elements with one of these (comma separated) tags. If a source-tag starts with a '-', media package elements with this tag will be excluded.|EMPTY|
 |source-flavors    |"presentation/trimmed"    |Tag any media package elements with one of these (comma separated) flavors.|EMPTY|
 |dccatalog         |"episode" or "series"     |the type of catalog in which to search for dcterm|EMPTY|
 |dcterm            |"creator"                 |the name of the Dublin Core term which to check|EMPTY|
 |match-value       |"Joe Bloggs"              |the Dublin Core term value to check for|EMPTY|
 |default-value"    |"Anon"                    |the implied value if the dublincore term is not present in the catalog|EMPTY|
-|target-tags       |"tagged,+rss" / "-rss,+tagged"|Apply these (comma separated) tags to any media package elements. If a target-tag starts with a '-', it will be removed from preexisting tags, if a target-tag starts with a '+', it will be added to preexisting tags. If there is no prefix, all preexisting tags are removed and replaced by the target-tags.|EMPTY|
+|target-tags       |"tagged,+engage" / "-engaged,+tagged"|Apply these (comma separated) tags to any media package elements. If a target-tag starts with a '-', it will be removed from preexisting tags, if a target-tag starts with a '+', it will be added to preexisting tags. If there is no prefix, all preexisting tags are removed and replaced by the target-tags.|EMPTY|
 |target-flavor     |"presentation/tagged"     |Apply these flavor to any media package elements|EMPTY|
 |copy              |"true" or "false"         |Indicates if matching elements will be cloned before tagging is applied or whether tagging is applied to the original element. Set to "true" to create a copy first, "false" otherwise.|FALSE|
 

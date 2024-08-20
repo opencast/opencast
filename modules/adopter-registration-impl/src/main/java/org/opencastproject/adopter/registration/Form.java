@@ -103,6 +103,9 @@ public class Form implements IForm {
   @Column(name = "contact_me")
   private boolean contactMe;
 
+  @Column(name = "system_type")
+  private String systemType;
+
   @Column(name = "allows_statistics")
   private boolean allowsStatistics;
 
@@ -146,7 +149,8 @@ public class Form implements IForm {
 
   public Form(String organisationName, String departmentName, String firstName, String lastName, String email,
           String country, String postalCode, String city, String street, String streetNo, boolean contactMe,
-          boolean allowsStatistics, boolean allowsErrorReports, boolean agreedToPolicy, boolean registered) {
+          String systemType, boolean allowsStatistics, boolean allowsErrorReports, boolean agreedToPolicy,
+          boolean registered) {
     this.organisationName = organisationName;
     this.departmentName = departmentName;
     this.firstName = firstName;
@@ -158,6 +162,7 @@ public class Form implements IForm {
     this.street = street;
     this.streetNo = streetNo;
     this.contactMe = contactMe;
+    this.systemType = systemType;
     this.allowsStatistics = allowsStatistics;
     this.allowsErrorReports = allowsErrorReports;
     this.agreedToPolicy = agreedToPolicy;
@@ -180,6 +185,7 @@ public class Form implements IForm {
     this.street = f.street;
     this.streetNo = f.streetNo;
     this.contactMe = f.contactMe;
+    this.systemType = f.systemType;
     this.allowsStatistics = f.allowsStatistics;
     this.allowsErrorReports = f.allowsErrorReports;
     this.agreedToPolicy = f.agreedToPolicy;
@@ -320,6 +326,14 @@ public class Form implements IForm {
     this.contactMe = contactMe;
   }
 
+  public String systemType() {
+    return systemType;
+  }
+
+  public void setSystemType(String systemType) {
+    this.systemType = systemType;
+  }
+
   public boolean allowsStatistics() {
     return allowsStatistics;
   }
@@ -385,6 +399,7 @@ public class Form implements IForm {
     this.street = null;
     this.streetNo = null;
     this.contactMe = false;
+    this.systemType = null;
     this.allowsStatistics = false;
     this.allowsErrorReports = false;
     this.dateModified = new Date();

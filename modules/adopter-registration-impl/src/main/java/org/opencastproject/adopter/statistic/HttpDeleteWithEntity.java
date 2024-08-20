@@ -19,18 +19,26 @@
  *
  */
 
-package org.opencastproject.scheduler.impl;
+package org.opencastproject.adopter.statistic;
+
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
+
+import java.net.URI;
 
 /**
- * General exception representing failure in indexing or storing events, either to persistent storage or index.
- *
+ * Http DELETE method with request body
  */
-public class SchedulerServiceDatabaseException extends Exception {
+public class HttpDeleteWithEntity extends HttpEntityEnclosingRequestBase {
 
-  private static final long serialVersionUID = 7368335174562660234L;
+  public static final String METHOD_NAME = "DELETE";
 
-  public SchedulerServiceDatabaseException(Throwable cause) {
-    super(cause);
+  public HttpDeleteWithEntity(final String uri) {
+    super();
+    setURI(URI.create(uri));
   }
 
+  @Override
+  public String getMethod() {
+    return METHOD_NAME;
+  }
 }
