@@ -38,7 +38,7 @@ import graphql.annotations.annotationTypes.GraphQLNonNull;
 @GraphQLDescription("Represents the current user.")
 public class GqlCurrentUser {
 
-  public static final String TYPE_NAME = "GqlCurrentUser";
+  public static final String TYPE_NAME = "CurrentUser";
 
   private final User user;
 

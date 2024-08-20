@@ -42,7 +42,7 @@ import graphql.schema.DataFetchingEnvironment;
 @GraphQLDescription("A series of episodes.")
 public class GqlSeries {
 
-  public static final String TYPE_NAME = "GqlSeries";
+  public static final String TYPE_NAME = "Series";
 
   private final Series series;
 

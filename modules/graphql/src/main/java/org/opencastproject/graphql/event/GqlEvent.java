@@ -52,7 +52,7 @@ import graphql.schema.DataFetchingEnvironment;
 @GraphQLDescription("A Event.")
 public class GqlEvent {
 
-  public static final String TYPE_NAME = "GqlEvent";
+  public static final String TYPE_NAME = "Event";
 
   private final Event event;
 
