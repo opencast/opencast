@@ -4,6 +4,7 @@ edit_uri: edit/develop/docs/guides/developer/docs/
 
 plugins:
   - search:
+  - macros:
   - mermaid2:
       arguments:
         theme: 'neutral'
