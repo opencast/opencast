@@ -73,7 +73,7 @@ Parameter Table
 |------------------|-------|-----------|-------------|
 |source-flavors      |"presentation/work,presenter/work"    |The "flavors" of the track to use as a source input    |EMPTY|
 |source-flavor       |"presentation/work"    |The "flavor" of the track to use as a source input    |EMPTY|
-|source-tags         |"engage,atom,rss"    |The "tag" of the track to use as a source input    |EMPTY|
+|source-tags         |"engage"    |The "tag" of the track to use as a source input    |EMPTY|
 |target-flavor       |"presentation/normalized"    |The flavor to apply to the normalized file    |EMPTY|
 |target-tags         |"norm"    |The tags to apply to the normalized file    |EMPTY|
 |**target-decibel**\*|-30.4    |The target RMS Level Decibel    |EMPTY|

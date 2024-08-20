@@ -29,7 +29,7 @@ in [Execute Service: Parameter Substitution](../configuration/execute.md#paramet
 |load              |1.5                   |A floating point estimate of the load imposed on the node by this job|No|
 |set-workflow-properties|true / false     |Import workflow properties from the output file|No|
 |source-flavor     |presentation/source   |Run the command for any MediaPackage elements with this flavor. Elements must also match the source-tags condition, if present |No|
-|source-tag        |rss, trim, -engage    |Run the command for any MediaPackage elements with one of these (comma- separated) tags. If any of them starts with '-', MediaPackage elements containing this tag will be excluded. Elements must also match the source-flavor condition, if present|No|
+|source-tag        |exp, trim, -engage    |Run the command for any MediaPackage elements with one of these (comma- separated) tags. If any of them starts with '-', MediaPackage elements containing this tag will be excluded. Elements must also match the source-flavor condition, if present|No|
 |source-audio      |true                  |If present, require the element either to have an audio stream (true) or no audio stream (false), in addition to any source-flavor or source-tag conditions.|No|
 |source-video      |true                  |If present, require the element either to have a video stream (true) or no video stream (false), in addition to any source-flavor or source-tag conditions. |No|
 |source-subtitle   |true                  |If present, require the element either to have a subtitle stream (true) or no subtitle stream (false), in addition to any source-flavor or source-tag conditions. |No|
@@ -60,10 +60,10 @@ Run a command which creates a new version of a track:
     <configuration key="exec">qt-faststart</configuration>
     <configuration key="params">-f #{in} #{out}</configuration>
     <configuration key="source-flavor">*/toprocess</configuration>
-    <configuration key="source-tags">copy, -rss</configuration>
+    <configuration key="source-tags">copy,-exp</configuration>
     <configuration key="output-filename">result.avi</configuration>
     <configuration key="target-flavor">output/processed</configuration>
-    <configuration key="target-tags">copied, -copy</configuration>
+    <configuration key="target-tags">copied,-copy</configuration>
     <configuration key="expected-type">Track</configuration>
   </configurations>
 </operation>

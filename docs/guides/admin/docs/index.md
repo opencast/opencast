@@ -30,7 +30,6 @@ The Opencast Release Documentation is the official Opencast documentation for ea
     * [Workflow Configuration](configuration/workflow.md)
     * [Encoding Configuration](configuration/encoding.md)
     * [Plugin Management](configuration/plugin-management.md)
-    * [Atom and RSS Feed](configuration/atomrss.md)
     * [Metrics (OpenMetrics, Prometheus)](configuration/metrics.md)
     * [New Admin UI](configuration/admin-ui/new-admin-ui.md)
     * [Stream Security](configuration/stream-security/stream-security-overview.md)
