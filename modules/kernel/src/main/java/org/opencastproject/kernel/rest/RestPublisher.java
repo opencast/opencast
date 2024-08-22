@@ -72,6 +72,7 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
@@ -149,8 +150,6 @@ public class RestPublisher implements RestConstants {
   /** The List of JAX-RS resources */
   private final List<Object> serviceBeans = new CopyOnWriteArrayList<>();
 
-  private OpenApiFeature openApiFeature;
-
   /** Activates this rest publisher */
   @SuppressWarnings("unchecked")
   @Activate
@@ -186,22 +185,6 @@ public class RestPublisher implements RestConstants {
                 .build();
       }
     });
-
-    // Open API config
-    this.openApiFeature = new OpenApiFeature();
-    openApiFeature.setContactEmail("dev@opencast.org");
-    openApiFeature.setLicense("Educational Community License, Version 2.0");
-    openApiFeature.setLicenseUrl("https://opensource.org/licenses/ecl2.txt");
-    openApiFeature.setScan(false);
-    openApiFeature.setUseContextBasedConfig(true);
-    OpenApiCustomizer customizer = new OpenApiCustomizer();
-    customizer.setDynamicBasePath(false);
-    openApiFeature.setCustomizer(customizer);
-    SwaggerUiConfig config = new SwaggerUiConfig();
-    config.setDeepLinking(true);
-    config.setUrl("/openapi.json");
-    config.setQueryConfigEnabled(false);
-    openApiFeature.setSwaggerUiConfig(config);
 
     this.bus = BusFactory.getDefaultBus();
 
@@ -309,7 +292,6 @@ public class RestPublisher implements RestConstants {
 
     sf.setAddress("/");
 
-    sf.getFeatures().add(openApiFeature);
 
     sf.setProperties(new HashMap<>());
     BindingFactoryManager manager = sf.getBus().getExtension(BindingFactoryManager.class);
@@ -323,8 +305,33 @@ public class RestPublisher implements RestConstants {
       server.destroy();
     }
 
+    // Open API config
+    final OpenApiFeature openApiFeature = getOpenApiFeature();
+    sf.getFeatures().add(openApiFeature);
+
     sf.setServiceBeans(serviceBeans);
     server = sf.create();
+  }
+
+  private OpenApiFeature getOpenApiFeature() {
+    final OpenApiFeature openApiFeature = new OpenApiFeature();
+    openApiFeature.setContactEmail("dev@opencast.org");
+    openApiFeature.setLicense("Educational Community License, Version 2.0");
+    openApiFeature.setLicenseUrl("https://opensource.org/licenses/ecl2.txt");
+    openApiFeature.setScan(false);
+    openApiFeature.setUseContextBasedConfig(true);
+    // This is a workaround to turn off class scanning as the classgraph dependency has a bug.
+    // The defined class acts as a dummy, is available to the classloader, and has no Jax-rs annotations.
+    openApiFeature.setResourceClasses(Collections.singleton("io.swagger.v3.jaxrs2.Reader"));
+    OpenApiCustomizer customizer = new OpenApiCustomizer();
+    customizer.setDynamicBasePath(false);
+    openApiFeature.setCustomizer(customizer);
+    SwaggerUiConfig config = new SwaggerUiConfig();
+    config.setDeepLinking(true);
+    config.setUrl("/openapi.json");
+    config.setQueryConfigEnabled(false);
+    openApiFeature.setSwaggerUiConfig(config);
+    return openApiFeature;
   }
 
   /**
