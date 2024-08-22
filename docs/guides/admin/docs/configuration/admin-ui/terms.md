@@ -14,6 +14,6 @@ The content of the terms can be set in `/etc/ui-config/mh_default_org/admin-ui/`
 terms.%{language_code}.html
 ```
 
-The corresponding language codes can be found here: https://github.com/opencast/opencast-admin-interface/blob/admin-ui-picard/app/src/i18n/i18n.ts#L44
+The corresponding language codes can be found in [`/src/i18n/i18n.ts`](https://github.com/opencast/opencast-admin-interface/blob/4253105caedb11df193c05188e043a711f7e68cf/src/i18n/i18n.ts#L29) in the admin-UI repo.
 
-If a language is not provided, the english version will be displayed.
+If no language is provided, the english version will be displayed.
