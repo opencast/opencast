@@ -51,7 +51,7 @@ import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.elasticsearch.index.objects.event.EventIndexSchema;
 import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.external.common.ApiMediaType;
-import org.opencastproject.external.common.ApiResponses;
+import org.opencastproject.external.common.ApiResponseBuilder;
 import org.opencastproject.external.common.ApiVersion;
 import org.opencastproject.external.util.AclUtils;
 import org.opencastproject.external.util.ExternalMetadataUtils;
@@ -437,10 +437,10 @@ public class EventsEndpoint implements ManagedService {
     }
     for (final Event event : indexService.getEvent(id, elasticsearchIndex)) {
       event.updatePreview(previewSubtype);
-      return ApiResponses.Json.ok(
+      return ApiResponseBuilder.Json.ok(
           requestedVersion, eventToJSON(event, withAcl, withMetadata, withScheduling, withPublications, includeInternalPublication, sign, requestedVersion));
     }
-    return ApiResponses.notFound("Cannot find an event with id '%s'.", id);
+    return ApiResponseBuilder.notFound("Cannot find an event with id '%s'.", id);
   }
 
   @GET
@@ -513,9 +513,9 @@ public class EventsEndpoint implements ManagedService {
           fields.add(f("uri", v(track.getURI().toString())));
         tracksJson.add(obj(fields));
       }
-      return ApiResponses.Json.ok(acceptHeader, arr(tracksJson));
+      return ApiResponseBuilder.Json.ok(acceptHeader, arr(tracksJson));
     }
-    return ApiResponses.notFound("Cannot find an event with id '%s'.", id);
+    return ApiResponseBuilder.notFound("Cannot find an event with id '%s'.", id);
   }
 
   @DELETE
@@ -634,9 +634,9 @@ public class EventsEndpoint implements ManagedService {
 
         return Response.noContent().build();
       }
-      return ApiResponses.notFound("Cannot find an event with id '%s'.", eventId);
+      return ApiResponseBuilder.notFound("Cannot find an event with id '%s'.", eventId);
     } catch (NotFoundException e) {
-      return ApiResponses.notFound("Cannot find an event with id '%s'.", eventId);
+      return ApiResponseBuilder.notFound("Cannot find an event with id '%s'.", eventId);
     } catch (UnauthorizedException e) {
       return Response.status(Status.UNAUTHORIZED).build();
     } catch (IllegalArgumentException e) {
@@ -685,7 +685,7 @@ public class EventsEndpoint implements ManagedService {
       source.put("type", "UPLOAD");
       eventHttpServletRequest.setSource(source);
       String eventId = indexService.createEvent(eventHttpServletRequest);
-      return ApiResponses.Json.created(requestedVersion, URI.create(getEventUrl(eventId)), obj(f("identifier", v(eventId))));
+      return ApiResponseBuilder.Json.created(requestedVersion, URI.create(getEventUrl(eventId)), obj(f("identifier", v(eventId))));
     } catch (IllegalArgumentException | DateTimeParseException e) {
       logger.debug("Unable to create event", e);
       return RestUtil.R.badRequest(e.getMessage());
@@ -721,19 +721,19 @@ public class EventsEndpoint implements ManagedService {
 
       if (eventId.contains(",")) {
         // This the case when SCHEDULE_MULTIPLE is performed.
-        return ApiResponses.Json.ok(requestedVersion, arr(
+        return ApiResponseBuilder.Json.ok(requestedVersion, arr(
             Arrays.stream(eventId.split(","))
                 .map(s -> obj(f("identifier", v(s))))
                 .collect(Collectors.toList()))
         );
       }
 
-      return ApiResponses.Json.created(requestedVersion, URI.create(getEventUrl(eventId)), obj(f("identifier", v(eventId))));
+      return ApiResponseBuilder.Json.created(requestedVersion, URI.create(getEventUrl(eventId)), obj(f("identifier", v(eventId))));
     } catch (SchedulerConflictException e) {
       final List<MediaPackage> conflictingEvents =
           getConflictingEvents(schedulingInfo, agentStateService, schedulerService);
       logger.debug("Client tried to schedule conflicting event(s).");
-      return ApiResponses.Json.conflict(requestedVersion,
+      return ApiResponseBuilder.Json.conflict(requestedVersion,
           arr(convertConflictingEvents(Optional.empty(), conflictingEvents, indexService, elasticsearchIndex)));
     }
   }
@@ -1070,7 +1070,7 @@ public class EventsEndpoint implements ManagedService {
       eventsList.add(eventToJSON((Event) item, withAcl, withMetadata, withScheduling, withPublications, includeInternalPublication, withSignedUrls,
               requestedVersion));
     }
-    return ApiResponses.Json.ok(requestedVersion, arr(eventsList));
+    return ApiResponseBuilder.Json.ok(requestedVersion, arr(eventsList));
   }
 
   /**
@@ -1187,9 +1187,9 @@ public class EventsEndpoint implements ManagedService {
           throws Exception {
     for (final Event event : indexService.getEvent(id, elasticsearchIndex)) {
       AccessControlList acl = getAclFromEvent(event);
-      return ApiResponses.Json.ok(acceptHeader, arr(AclUtils.serializeAclToJson(acl)));
+      return ApiResponseBuilder.Json.ok(acceptHeader, arr(AclUtils.serializeAclToJson(acl)));
     }
-    return ApiResponses.notFound("Cannot find an event with id '%s'.", id);
+    return ApiResponseBuilder.notFound("Cannot find an event with id '%s'.", id);
   }
 
   @PUT
@@ -1220,7 +1220,7 @@ public class EventsEndpoint implements ManagedService {
       }
       return Response.noContent().build();
     } else {
-      return ApiResponses.notFound("Cannot find an event with id '%s'.", id);
+      return ApiResponseBuilder.notFound("Cannot find an event with id '%s'.", id);
     }
   }
 
@@ -1267,7 +1267,7 @@ public class EventsEndpoint implements ManagedService {
       }
       return Response.noContent().build();
     }
-    return ApiResponses.notFound("Cannot find an event with id '%s'.", id);
+    return ApiResponseBuilder.notFound("Cannot find an event with id '%s'.", id);
   }
 
   @DELETE
@@ -1293,7 +1293,7 @@ public class EventsEndpoint implements ManagedService {
       }
 
       if (!foundDelete) {
-        return ApiResponses.notFound("Unable to find an access control entry with action '%s' and role '%s'", action,
+        return ApiResponseBuilder.notFound("Unable to find an access control entry with action '%s' and role '%s'", action,
                 role);
       }
 
@@ -1306,7 +1306,7 @@ public class EventsEndpoint implements ManagedService {
       }
       return Response.noContent().build();
     }
-    return ApiResponses.notFound("Cannot find an event with id '%s'.", id);
+    return ApiResponseBuilder.notFound("Cannot find an event with id '%s'.", id);
   }
 
   @GET
@@ -1331,10 +1331,10 @@ public class EventsEndpoint implements ManagedService {
           convertStartDateTimeToApiV1(collection);
         }
 
-        return ApiResponses.Json.ok(requestedVersion, MetadataJson.listToJson(actualList, withOrderedText));
+        return ApiResponseBuilder.Json.ok(requestedVersion, MetadataJson.listToJson(actualList, withOrderedText));
       }
       else
-        return ApiResponses.notFound("Cannot find an event with id '%s'.", id);
+        return ApiResponseBuilder.notFound("Cannot find an event with id '%s'.", id);
     } else {
       return getEventMetadataByType(id, type, requestedVersion);
     }
@@ -1424,7 +1424,7 @@ public class EventsEndpoint implements ManagedService {
         ExternalMetadataUtils.changeSubjectToSubjects(collection);
         ExternalMetadataUtils.removeCollectionList(collection);
         convertStartDateTimeToApiV1(collection);
-        return ApiResponses.Json.ok(requestedVersion, MetadataJson.collectionToJson(collection, false));
+        return ApiResponseBuilder.Json.ok(requestedVersion, MetadataJson.collectionToJson(collection, false));
       }
       // Try the other catalogs
       List<EventCatalogUIAdapter> catalogUIAdapters = getEventCatalogUIAdapters();
@@ -1436,13 +1436,13 @@ public class EventsEndpoint implements ManagedService {
             DublinCoreMetadataCollection fields = catalogUIAdapter.getFields(mediaPackage);
             ExternalMetadataUtils.removeCollectionList(fields);
             convertStartDateTimeToApiV1(fields);
-            return ApiResponses.Json.ok(requestedVersion, MetadataJson.collectionToJson(fields, false));
+            return ApiResponseBuilder.Json.ok(requestedVersion, MetadataJson.collectionToJson(fields, false));
           }
         }
       }
-      return ApiResponses.notFound("Cannot find a catalog with type '%s' for event with id '%s'.", type, id);
+      return ApiResponseBuilder.notFound("Cannot find a catalog with type '%s' for event with id '%s'.", type, id);
     }
-    return ApiResponses.notFound("Cannot find an event with id '%s'.", id);
+    return ApiResponseBuilder.notFound("Cannot find an event with id '%s'.", id);
   }
 
   @PUT
@@ -1509,7 +1509,7 @@ public class EventsEndpoint implements ManagedService {
       }
 
       if (collection == null) {
-        return ApiResponses.notFound("Cannot find a catalog with type '%s' for event with id '%s'.", type, id);
+        return ApiResponseBuilder.notFound("Cannot find a catalog with type '%s' for event with id '%s'.", type, id);
       }
 
       for (String key : updatedFields.keySet()) {
@@ -1583,12 +1583,12 @@ public class EventsEndpoint implements ManagedService {
       indexService.updateEventMetadata(id, metadataList, elasticsearchIndex);
       return Response.noContent().build();
     }
-    return ApiResponses.notFound("Cannot find an event with id '%s'.", id);
+    return ApiResponseBuilder.notFound("Cannot find an event with id '%s'.", id);
   }
 
   private Opt<Response> validateField(MetadataField field, String key, String id, String type, Map<String, String> updatedFields) {
     if (field == null) {
-      return Opt.some(ApiResponses.notFound(
+      return Opt.some(ApiResponseBuilder.notFound(
               "Cannot find a metadata field with id '%s' from event with id '%s' and the metadata type '%s'.",
               key, id, type));
     } else if (field.isRequired() && StringUtils.isBlank(updatedFields.get(key))) {
@@ -1625,7 +1625,7 @@ public class EventsEndpoint implements ManagedService {
       try {
         indexService.removeCatalogByFlavor(event, flavor.get());
       } catch (NotFoundException e) {
-        return ApiResponses.notFound(e.getMessage());
+        return ApiResponseBuilder.notFound(e.getMessage());
       } catch (IndexServiceException e) {
         logger.error("Unable to remove metadata catalog with type '{}' from event '{}'", type, id, e);
         throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
@@ -1637,7 +1637,7 @@ public class EventsEndpoint implements ManagedService {
       }
       return Response.noContent().build();
     }
-    return ApiResponses.notFound("Cannot find an event with id '%s'.", id);
+    return ApiResponseBuilder.notFound("Cannot find an event with id '%s'.", id);
   }
 
   @GET
@@ -1663,9 +1663,9 @@ public class EventsEndpoint implements ManagedService {
       final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
       final Opt<Event> event = indexService.getEvent(id, elasticsearchIndex);
       if (event.isSome()) {
-        return ApiResponses.Json.ok(acceptHeader, arr(getPublications(event.get(), sign, includeInternalPublication, requestedVersion)));
+        return ApiResponseBuilder.Json.ok(acceptHeader, arr(getPublications(event.get(), sign, includeInternalPublication, requestedVersion)));
       } else {
-        return ApiResponses.notFound(String.format("Unable to find event with id '%s'", id));
+        return ApiResponseBuilder.notFound(String.format("Unable to find event with id '%s'", id));
       }
     } catch (SearchIndexException e) {
       logger.error("Unable to get list of publications from event with id '{}'", id, e);
@@ -1791,9 +1791,9 @@ public class EventsEndpoint implements ManagedService {
           @PathParam("publicationId") String publicationId, @QueryParam("sign") boolean sign) throws Exception {
     try {
       final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
-      return ApiResponses.Json.ok(acceptHeader, getPublication(eventId, publicationId, sign, requestedVersion));
+      return ApiResponseBuilder.Json.ok(acceptHeader, getPublication(eventId, publicationId, sign, requestedVersion));
     } catch (NotFoundException e) {
-      return ApiResponses.notFound(e.getMessage());
+      return ApiResponseBuilder.notFound(e.getMessage());
     } catch (SearchIndexException e) {
       logger.error("Unable to get list of publications from event with id '{}'", eventId, e);
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
@@ -1924,12 +1924,12 @@ public class EventsEndpoint implements ManagedService {
       final Opt<Event> event = indexService.getEvent(id, elasticsearchIndex);
 
       if (event.isNone()) {
-        return ApiResponses.notFound(String.format("Unable to find event with id '%s'", id));
+        return ApiResponseBuilder.notFound(String.format("Unable to find event with id '%s'", id));
       }
 
       final JObject scheduling = SchedulingInfo.of(event.get().getIdentifier(), schedulerService).toJson();
       if (!scheduling.isEmpty()) {
-        return ApiResponses.Json.ok(acceptHeader, scheduling);
+        return ApiResponseBuilder.Json.ok(acceptHeader, scheduling);
       }
       return Response.noContent().build();
     } catch (SearchIndexException e) {
@@ -1962,7 +1962,7 @@ public class EventsEndpoint implements ManagedService {
         allowConflict = false;
     }
     if (event.isNone()) {
-      return ApiResponses.notFound(String.format("Unable to find event with id '%s'", id));
+      return ApiResponseBuilder.notFound(String.format("Unable to find event with id '%s'", id));
     }
     final JSONParser parser = new JSONParser();
     JSONObject parsedJson;
@@ -2014,7 +2014,7 @@ public class EventsEndpoint implements ManagedService {
       final List<MediaPackage> conflictingEvents = getConflictingEvents(
           schedulingInfo.merge(technicalMetadata), agentStateService, schedulerService);
       logger.debug("Client tried to change scheduling information causing a conflict for event {}.", id);
-      return Optional.of(ApiResponses.Json.conflict(requestedVersion,
+      return Optional.of(ApiResponseBuilder.Json.conflict(requestedVersion,
           arr(convertConflictingEvents(Optional.of(id), conflictingEvents, indexService, elasticsearchIndex))));
     }
     return Optional.empty();
@@ -2061,7 +2061,7 @@ public class EventsEndpoint implements ManagedService {
       }
 
       if (event.isNone()) {
-        return ApiResponses.notFound(String.format("Unable to find event with id '%s'", id));
+        return ApiResponseBuilder.notFound(String.format("Unable to find event with id '%s'", id));
       }
       MediaPackage mp = indexService.getEventMediapackage(event.get());
 
