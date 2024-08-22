@@ -1,6 +1,6 @@
 # Terms of use
 
-Opencast allows you to display terms of use for new users in the admin-ui. The user will have to accept the terms to continue using the ui.
+Opencast allows you to display terms of use for new users in the admin UI. The user will have to accept the terms to continue using the UI.
 
 To enable terms of use, set the following in `etc/org.opencastproject.organization-mh_default_org.cfg`:
 
