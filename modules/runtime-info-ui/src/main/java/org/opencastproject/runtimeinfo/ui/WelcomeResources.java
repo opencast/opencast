@@ -27,11 +27,15 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import io.swagger.v3.oas.annotations.Hidden;
@@ -50,6 +54,17 @@ import io.swagger.v3.oas.annotations.Hidden;
 @JaxrsResource
 public class WelcomeResources {
 
+  private static final Map<String, MediaType> MEDIA_TYPES;
+
+  static {
+    MEDIA_TYPES = new HashMap<>();
+    MEDIA_TYPES.put("js", new MediaType("text", "javascript", StandardCharsets.UTF_8.name()));
+    MEDIA_TYPES.put("css", new MediaType("text", "css"));
+    MEDIA_TYPES.put("svg", new MediaType("image", "svg+xml"));
+    MEDIA_TYPES.put("png", new MediaType("image", "png"));
+  }
+
+
   @GET
   @Path("{path: .*}")
   public Response img(@PathParam("path") String path) {
@@ -65,10 +80,21 @@ public class WelcomeResources {
   @GET
   @Path("{path: (img|scripts|styles)/.*}")
   public Response staticResources(@PathParam("path") final String path) {
-    // log.debug("handling assets: {}", path);
     InputStream resource = getClass().getClassLoader().getResourceAsStream("ui/" + path);
-    return null == resource
-        ? Response.status(NOT_FOUND).build()
-        : Response.ok().entity(resource).build();
+
+    Response.ResponseBuilder builder = Objects.isNull(resource)
+        ? Response.status(NOT_FOUND)
+        : Response.ok().entity(resource);
+
+    int index = path.lastIndexOf(".");
+    if (index != -1) {
+      String extension = path.substring(index + 1);
+      if (MEDIA_TYPES.containsKey(extension)) {
+        builder.type(MEDIA_TYPES.get(extension));
+      }
+    }
+
+    return builder.build();
   }
+
 }
