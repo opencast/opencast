@@ -1347,8 +1347,8 @@ public class EventsEndpoint implements ManagedService {
     List<EventCatalogUIAdapter> catalogUIAdapters = getEventCatalogUIAdapters();
     EventCatalogUIAdapter eventCatalogUIAdapter = indexService.getCommonEventCatalogUIAdapter();
     catalogUIAdapters.remove(eventCatalogUIAdapter);
-    MediaPackage mediaPackage = indexService.getEventMediapackage(event);
     if (catalogUIAdapters.size() > 0) {
+      MediaPackage mediaPackage = indexService.getEventMediapackage(event);
       for (EventCatalogUIAdapter catalogUIAdapter : catalogUIAdapters) {
         // TODO: This is very slow:
         DublinCoreMetadataCollection fields = catalogUIAdapter.getFields(mediaPackage);
@@ -1394,8 +1394,8 @@ public class EventsEndpoint implements ManagedService {
       // Try the other catalogs
       List<EventCatalogUIAdapter> catalogUIAdapters = getEventCatalogUIAdapters();
       catalogUIAdapters.remove(eventCatalogUIAdapter);
-      MediaPackage mediaPackage = indexService.getEventMediapackage(event);
       if (catalogUIAdapters.size() > 0) {
+        MediaPackage mediaPackage = indexService.getEventMediapackage(event);
         for (EventCatalogUIAdapter catalogUIAdapter : catalogUIAdapters) {
           if (flavor.get().equals(catalogUIAdapter.getFlavor())) {
             DublinCoreMetadataCollection fields = catalogUIAdapter.getFields(mediaPackage);
@@ -1461,8 +1461,8 @@ public class EventsEndpoint implements ManagedService {
       // Try the other catalogs
       List<EventCatalogUIAdapter> catalogUIAdapters = getEventCatalogUIAdapters();
       catalogUIAdapters.remove(eventCatalogUIAdapter);
-      MediaPackage mediaPackage = indexService.getEventMediapackage(event);
       if (catalogUIAdapters.size() > 0) {
+        MediaPackage mediaPackage = indexService.getEventMediapackage(event);
         for (EventCatalogUIAdapter catalogUIAdapter : catalogUIAdapters) {
           if (flavor.get().equals(catalogUIAdapter.getFlavor())) {
             collection = catalogUIAdapter.getFields(mediaPackage);
