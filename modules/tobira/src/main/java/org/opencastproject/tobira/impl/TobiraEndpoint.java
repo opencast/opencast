@@ -25,9 +25,15 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static org.opencastproject.util.doc.rest.RestParameter.Type;
 
+import org.opencastproject.job.api.AbstractJobProducer;
+import org.opencastproject.job.api.Job;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.AuthorizationService;
+import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.Jsons;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -35,6 +41,11 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.workspace.api.Workspace;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
+import org.apache.commons.io.IOUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -42,13 +53,21 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
 /**
@@ -76,7 +95,9 @@ import javax.ws.rs.core.Response;
     immediate = true,
     service = TobiraEndpoint.class
 )
-public class TobiraEndpoint {
+public class TobiraEndpoint extends AbstractJobProducer {
+
+  public static final String JOB_TYPE = "org.opencastproject.tobira";
   private static final Logger logger = LoggerFactory.getLogger(TobiraEndpoint.class);
 
   // Versioning the Tobira API:
@@ -98,10 +119,30 @@ public class TobiraEndpoint {
   private static final int VERSION_MINOR = 6;
   private static final String VERSION = VERSION_MAJOR + "." + VERSION_MINOR;
 
+  private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+  private static final Gson gson = new Gson();
+
   private SearchService searchService;
   private SeriesService seriesService;
   private AuthorizationService authorizationService;
   private Workspace workspace;
+  private OrganizationDirectoryService organizationDirectoryService;
+  private UserDirectoryService userDirectoryService;
+  private ServiceRegistry serviceRegistry;
+
+  private SecurityService securityService;
+
+  private JsonObject stats = new JsonObject();
+
+  /**
+   * Creates a new abstract job producer for jobs of the given type.
+   *
+   * @param jobType the job type
+   */
+  public TobiraEndpoint() {
+    super(JOB_TYPE);
+  }
 
   @Activate
   public void activate(BundleContext bundleContext) {
@@ -212,5 +253,89 @@ public class TobiraEndpoint {
   private static Response badRequest(String msg) {
     logger.warn("Bad request to tobira/harvest: {}", msg);
     return Response.status(BAD_REQUEST).entity(msg).build();
+  }
+
+  @POST
+  @Path("/stats")
+  @Consumes(APPLICATION_JSON)
+  @RestQuery(
+      name = "stats",
+      description = "Accepts a json blob of statistical data about Tobira.",
+      restParameters = {},
+      bodyParameter = @RestParameter(description = "The Tobira data blob",
+            isRequired = true,
+            name = "BODY",
+            type = Type.STRING),
+      responses = {
+          @RestResponse(description = "Stats parsed", responseCode = HttpServletResponse.SC_ACCEPTED)
+      },
+      returnDescription = "No data returned, just a 204 on success"
+  )
+  public Response acceptStats(@Context HttpServletRequest request) {
+    try (InputStream is = request.getInputStream()) {
+      String json = IOUtils.toString(is, request.getCharacterEncoding());
+      stats = gson.fromJson(json, JsonElement.class).getAsJsonObject();
+      stats.addProperty("updated", sdf.format(Calendar.getInstance().getTime()));
+    } catch (IOException e) {
+      logger.error("Error parsing Tobira stats blob", e);
+      return Response.status(BAD_REQUEST).build();
+    }
+    return Response.noContent().build();
+  }
+
+  @GET
+  @Path("/stats")
+  @Produces(APPLICATION_JSON)
+  @RestQuery(name = "stats",
+      description = "Returns the stats, if any, pushed from Tobira",
+      returnDescription = "The stats, or an empty object",
+      responses = {
+          @RestResponse(description = "The stats, or an empty object", responseCode = HttpServletResponse.SC_OK)
+      })
+  public Response getStats() {
+    return Response.ok(gson.toJson(stats)).build();
+  }
+
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    this.serviceRegistry = serviceRegistry;
+  }
+
+  @Override
+  protected ServiceRegistry getServiceRegistry() {
+    return serviceRegistry;
+  }
+
+  @Reference
+  public void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
+  }
+
+  @Override
+  protected SecurityService getSecurityService() {
+    return securityService;
+  }
+
+  @Reference
+  public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
+    this.userDirectoryService = userDirectoryService;
+  }
+  @Override
+  protected UserDirectoryService getUserDirectoryService() {
+    return userDirectoryService;
+  }
+
+  @Reference
+  public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
+    this.organizationDirectoryService = organizationDirectoryService;
+  }
+
+  @Override
+  protected OrganizationDirectoryService getOrganizationDirectoryService() {
+    return organizationDirectoryService;
+  }
+
+  @Override
+  protected String process(Job job) throws Exception {
+    throw new RuntimeException("This should never be called for TobiraEndpoint!");
   }
 }
