@@ -60,6 +60,7 @@ import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.Jsons;
 
 import org.apache.commons.collections4.ComparatorUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -69,6 +70,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -161,7 +163,18 @@ public class GroupsEndpoint {
     }
 
     // The API currently does not offer full text search for groups
-    Map<String, String> filters = RestUtils.parseFilter(filter);
+    Map<String, String> filters = new HashMap<>();
+    if (StringUtils.isNotBlank(filter)) {
+      for (String f : filter.split(",")) {
+        String[] filterTuple = f.split(":");
+        if (filterTuple.length < 2) {
+          logger.debug("No value for filter '{}' in filters list: {}", filterTuple[0], filter);
+          continue;
+        }
+        // use substring because dates also contain : so there might be more than two parts
+        filters.put(filterTuple[0].trim(), f.substring(filterTuple[0].length() + 1).trim());
+      }
+    }
     Optional<String> optNameFilter = Optional.ofNullable(filters.get(GroupsListQuery.FILTER_NAME_NAME));
 
     Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(sort);

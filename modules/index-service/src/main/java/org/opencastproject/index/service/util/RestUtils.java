@@ -43,6 +43,8 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -292,7 +294,8 @@ public final class RestUtils {
           continue;
         }
         // use substring because dates also contain : so there might be more than two parts
-        filters.put(filterTuple[0].trim(), f.substring(filterTuple[0].length() + 1).trim());
+        filters.put(filterTuple[0].trim(), URLDecoder.decode(f.substring(filterTuple[0].length() + 1).trim(),
+            StandardCharsets.UTF_8));
       }
     }
     return filters;
