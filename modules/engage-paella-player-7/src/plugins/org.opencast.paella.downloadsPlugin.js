@@ -54,7 +54,10 @@ export default class DownloadsPlugin extends PopUpButtonPlugin {
 
   async getDownloadableContent() {
     const episode = await this.player.getEpisode({episodeId: this.player.videoId});
-    const tracks = episode?.mediapackage?.media?.track ?? [];
+    var tracks = episode?.mediapackage?.media?.track ?? [];
+    if (Object.getPrototypeOf(tracks) == Object.prototype) {
+      tracks = [].concat(tracks);
+    }
     // const attachments = episode?.mediapackage?.attachments?.attachment ?? [];
     const downloadable = {};
 
