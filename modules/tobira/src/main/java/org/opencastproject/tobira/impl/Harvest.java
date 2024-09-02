@@ -90,7 +90,7 @@ final class Harvest {
     var orgAdminRole = securityService.getOrganization().getAdminRole();
     var isAdmin = user.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE) || user.hasRole(orgAdminRole);
     if (!isAdmin) {
-      throw new UnauthorizedException(user, "only (org-) admins can access the Tobira harvest API");
+      throw new UnauthorizedException(user, "Only (org-) admins can access the Tobira harvest API");
     }
 
     // ===== Retrieve information about events, series, and playlists =============================
@@ -101,9 +101,9 @@ final class Harvest {
     // Retrieve episodes from index.
     final SearchSourceBuilder q = new SearchSourceBuilder().query(
             QueryBuilders.boolQuery()
-                    .must(QueryBuilders.termQuery(SearchResult.ORG, org))
-                    .must(QueryBuilders.rangeQuery(SearchResult.MODIFIED_DATE).gte(since.getTime()))
-                    .must(QueryBuilders.termQuery(SearchResult.TYPE, SearchService.IndexEntryType.Episode)))
+                .must(QueryBuilders.termQuery(SearchResult.ORG, org))
+                .must(QueryBuilders.rangeQuery(SearchResult.MODIFIED_DATE).gte(since.getTime()))
+                .must(QueryBuilders.termQuery(SearchResult.TYPE, SearchService.IndexEntryType.Episode)))
         .sort(SearchResult.MODIFIED_DATE, SortOrder.ASC)
         .size(preferredAmount + 1);
     final SearchResultList results = searchService.search(q);
