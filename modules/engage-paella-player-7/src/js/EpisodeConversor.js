@@ -388,6 +388,10 @@ function processAttachments(episode, manifest, config) {
   // Define manifest metadata even if a player preview image doesn't exist
   manifest.metadata = manifest.metadata || {};
   manifest.metadata.preview = playerPreviewImage;
+  // Opencast does not generate a portrait preview image.
+  // Use same image for both landscape and portrait mode.
+  // TODO: Should this be configurable?
+  manifest.metadata.previewPortrait = playerPreviewImage;
 }
 
 function readCaptions(potentialNewCaptions, captions) {
