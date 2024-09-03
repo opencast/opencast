@@ -126,6 +126,7 @@ nav:
                  - org.opencast.paella.versionButton.js: 'configuration/player/paella.player7/plugins/org.opencast.paella.versionButton.md'
    - Playlists: configuration/playlists.md
    - Plugin Management: configuration/plugin-management.md
+   - Role Based Event Access: 'configuration/episode-id-roles.md'
    - Search Index:
         - Overview: 'configuration/searchindex/index.md'
         - Elasticsearch: 'configuration/searchindex/elasticsearch.md'

@@ -28,8 +28,10 @@ import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.hasNo
 import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.isNotPublication;
 import static org.opencastproject.mediapackage.MediaPackageSupport.getFileName;
 import static org.opencastproject.mediapackage.MediaPackageSupport.getMediaPackageElementId;
+import static org.opencastproject.security.api.SecurityConstants.EPISODE_ROLE_ID_PREFIX;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLE;
+import static org.opencastproject.security.util.SecurityUtil.getEpisodeRoleId;
 
 import org.opencastproject.assetmanager.api.Asset;
 import org.opencastproject.assetmanager.api.AssetId;
@@ -71,6 +73,7 @@ import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
 import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildException;
 import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService;
+import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService.DataType;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
@@ -130,6 +133,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -173,6 +177,9 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
   private static final String MANIFEST_DEFAULT_NAME = "manifest";
 
+  private static final String CONFIG_EPISODE_ID_ROLE = "org.opencastproject.episode.id.role.access";
+  private static boolean episodeIdRole = false;
+
   private CopyOnWriteArrayList<AssetManagerUpdateHandler> handlers = new CopyOnWriteArrayList<>();
 
   private SecurityService securityService;
@@ -194,6 +201,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   private boolean includeCARoles;
   private boolean includeUIRoles;
 
+
   public static final Set<MediaPackageElement.Type> MOVABLE_TYPES = Sets.newHashSet(
           MediaPackageElement.Type.Attachment,
           MediaPackageElement.Type.Catalog,
@@ -214,6 +222,10 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     includeAPIRoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeAPIRoles"), null));
     includeCARoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeCARoles"), null));
     includeUIRoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeUIRoles"), null));
+
+    episodeIdRole = BooleanUtils.toBoolean(Objects.toString(
+        cc.getBundleContext().getProperty(CONFIG_EPISODE_ID_ROLE), "false"));
+    logger.debug("Usage of episode ID roles is set to {}", episodeIdRole);
   }
 
   /**
@@ -930,7 +942,12 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   @Override
-  public void repopulate() throws IndexRebuildException {
+  public DataType[] getSupportedDataTypes() {
+    return new DataType[]{ DataType.ALL, DataType.ACL };
+  }
+
+  @Override
+  public void repopulate(DataType dataType) throws IndexRebuildException {
     final Organization originalOrg = securityService.getOrganization();
     final User originalUser = (originalOrg != null ? securityService.getUser() : null);
     try {
@@ -948,7 +965,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       var updatedEventRange = new ArrayList<Event>();
       do {
         r = enrich(q.select(q.snapshot()).where(q.version().isLatest()).orderBy(q.mediapackageId().desc())
-          .page(offset, PAGE_SIZE).run());
+            .page(offset, PAGE_SIZE).run());
         offset += PAGE_SIZE;
         int n = 20;
 
@@ -967,7 +984,18 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
                 var updatedEventData = index.getEvent(snapshot.getMediaPackage().getIdentifier().toString(), orgId,
                     snapshotSystemUser);
-                updatedEventData = getEventUpdateFunction(snapshot, orgId, snapshotSystemUser).apply(updatedEventData);
+                if (dataType == DataType.ALL) {
+                  // Reindex everything (default)
+                  updatedEventData = getEventUpdateFunction(snapshot, orgId, snapshotSystemUser)
+                      .apply(updatedEventData);
+                } else if (dataType == DataType.ACL) {
+                  // Only reindex ACLs
+                  updatedEventData = getEventUpdateFunctionOnlyAcl(snapshot, orgId, snapshotSystemUser)
+                      .apply(updatedEventData);
+                } else {
+                  throw new IndexRebuildException(dataType + " is not a supported data type. "
+                      + "Accepted values are " + Arrays.toString(getSupportedDataTypes()) + ".");
+                }
                 updatedEventRange.add(updatedEventData.get());
 
                 if (updatedEventRange.size() >= n || current >= total) {
@@ -977,7 +1005,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
                 }
               } catch (Throwable t) {
                 logSkippingElement(logger, "event", snapshot.getMediaPackage().getIdentifier().toString(),
-                        snapshotOrg, t);
+                    snapshotOrg, t);
               }
             }
           } catch (Throwable t) {
@@ -1033,8 +1061,14 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     final AQueryBuilder q = createQueryWithoutSecurityCheck();
     return securityService.getUser().getRoles().stream()
             .filter(roleFilter)
-            .map((role) -> q.property(Value.BOOLEAN, SECURITY_NAMESPACE, mkPropertyName(role.getName(), action))
-                    .eq(true))
+            .map((role) -> {
+              if (episodeIdRole && role.getName().startsWith(EPISODE_ROLE_ID_PREFIX)) {
+                return q.mediapackageId().eq(StringUtils.substringBetween(
+                    role.getName(), EPISODE_ROLE_ID_PREFIX + "_", "_"));
+              } else {
+                return q.property(Value.BOOLEAN, SECURITY_NAMESPACE, mkPropertyName(role.getName(), action)).eq(true);
+              }
+            })
             .reduce(Predicate::or)
             .orElseGet(() -> q.always().not())
             .and(restrictToUsersOrganization());
@@ -1063,9 +1097,14 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
         if (!snapshotExists(mediaPackageId, org)) {
           return false;
         }
+        // check episode role id
+        User user = securityService.getUser();
+        if (episodeIdRole && user.hasRole(getEpisodeRoleId(mediaPackageId, action))) {
+          return true;
+        }
         // check acl rules
         logger.debug("Non admin user. Checking ACL rules.");
-        final List<String> roles = securityService.getUser().getRoles().parallelStream()
+        final List<String> roles = user.getRoles().parallelStream()
                 .filter(roleFilter)
                 .map((role) -> mkPropertyName(role.getName(), action))
                 .collect(Collectors.toList());
@@ -1566,12 +1605,8 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       String eventId = mp.getIdentifier().toString();
       Event event = eventOpt.orElse(new Event(eventId, orgId));
 
-      AccessControlList acl = authorizationService.getActiveAcl(mp).getA();
-      List<ManagedAcl> acls = aclServiceFactory.serviceFor(securityService.getOrganization()).getAcls();
-      for (final ManagedAcl managedAcl : AccessInformationUtil.matchAcls(acls, acl)) {
-        event.setManagedAcl(managedAcl.getName());
-      }
-      event.setAccessPolicy(AccessControlParser.toJsonSilent(acl));
+      event = updateAclInEvent(event, mp, eventId);
+
       event.setArchiveVersion(Long.parseLong(snapshot.getVersion().toString()));
       if (StringUtils.isBlank(event.getCreator())) {
         event.setCreator(securityService.getUser().getName());
@@ -1596,5 +1631,30 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       }
       return Optional.of(event);
     };
+  }
+
+  private Function<Optional<Event>, Optional<Event>> getEventUpdateFunctionOnlyAcl(Snapshot snapshot,
+      String orgId, User user) {
+    return (Optional<Event> eventOpt) -> {
+      MediaPackage mp = snapshot.getMediaPackage();
+      String eventId = mp.getIdentifier().toString();
+      Event event = eventOpt.orElse(new Event(eventId, orgId));
+
+      event = updateAclInEvent(event, mp, eventId);
+
+      return Optional.of(event);
+    };
+  }
+
+  private Event updateAclInEvent(Event event, MediaPackage mp, String eventId) {
+    AccessControlList acl = authorizationService.getActiveAcl(mp).getA();
+    List<ManagedAcl> acls = aclServiceFactory.serviceFor(securityService.getOrganization()).getAcls();
+
+    for (final ManagedAcl managedAcl : AccessInformationUtil.matchAcls(acls, acl)) {
+      event.setManagedAcl(managedAcl.getName());
+    }
+    event.setAccessPolicy(AccessControlParser.toJsonSilent(acl));
+
+    return event;
   }
 }

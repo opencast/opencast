@@ -21,6 +21,8 @@
 
 package org.opencastproject.elasticsearch.index.objects.event;
 
+import static org.opencastproject.security.util.SecurityUtil.getEpisodeRoleId;
+
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchMetadata;
 import org.opencastproject.elasticsearch.api.SearchResult;
@@ -29,6 +31,10 @@ import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.series.Series;
 import org.opencastproject.elasticsearch.index.objects.series.SeriesIndexSchema;
 import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
+import org.opencastproject.list.api.ListProviderException;
+import org.opencastproject.list.api.ListProvidersService;
+import org.opencastproject.list.api.ResourceListQuery;
+import org.opencastproject.list.impl.ResourceListQueryImpl;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
@@ -59,6 +65,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -108,7 +115,8 @@ public final class EventIndexUtils {
    *          the recording event
    * @return the set of metadata
    */
-  public static SearchMetadataCollection toSearchMetadata(Event event) {
+  public static SearchMetadataCollection toSearchMetadata(Event event, ListProvidersService listProviderService,
+      boolean episodeIdRole) {
     SearchMetadataCollection metadata = new SearchMetadataCollection(
             event.getIdentifier().concat(event.getOrganization()), Event.DOCUMENT_TYPE);
     metadata.addField(EventIndexSchema.UID, event.getIdentifier(), true);
@@ -232,7 +240,7 @@ public final class EventIndexUtils {
 
     if (StringUtils.isNotBlank(event.getAccessPolicy())) {
       metadata.addField(EventIndexSchema.ACCESS_POLICY, event.getAccessPolicy(), true);
-      addAuthorization(metadata, event.getAccessPolicy());
+      addAuthorization(metadata, event.getAccessPolicy(), event.getIdentifier(), listProviderService, episodeIdRole);
     }
 
     if (StringUtils.isNotBlank(event.getAgentId())) {
@@ -357,7 +365,8 @@ public final class EventIndexUtils {
    * @param aclString
    *          the access control list string
    */
-  private static void addAuthorization(SearchMetadataCollection doc, String aclString) {
+  private static void addAuthorization(SearchMetadataCollection doc, String aclString,
+      String eventId, ListProvidersService listProvidersService, boolean episodeIdRole) {
     Map<String, List<String>> permissions = new HashMap<>();
 
     // Define containers for common permissions
@@ -365,8 +374,34 @@ public final class EventIndexUtils {
       permissions.put(action.toString(), new ArrayList<>());
     }
 
+    // Add roles from acl
     AccessControlList acl = AccessControlParser.parseAclSilent(aclString);
-    for (AccessControlEntry entry : acl.getEntries()) {
+    List<AccessControlEntry> entries = acl.getEntries();
+
+    // Add special action roles for episode id roles
+    if (episodeIdRole) {
+      Set<AccessControlEntry> customEntries = new HashSet<>();
+      customEntries.add(new AccessControlEntry(getEpisodeRoleId(eventId, "READ"), "read", true));
+      customEntries.add(new AccessControlEntry(getEpisodeRoleId(eventId, "WRITE"), "write", true));
+
+      ResourceListQuery query = new ResourceListQueryImpl();
+      if (listProvidersService.hasProvider("ACL.ACTIONS")) {
+        Map<String, String> actions = new HashMap<>();
+        try {
+          actions = listProvidersService.getList("ACL.ACTIONS", query, true);
+        } catch (ListProviderException e) {
+          logger.error("Listproviders not loaded. " + e);
+        }
+        for (String action : actions.keySet()) {
+          customEntries.add(new AccessControlEntry(getEpisodeRoleId(eventId, action), action, true));
+        }
+      }
+
+      entries.addAll(customEntries);
+    }
+
+    // Convert roles to permission blocks
+    for (AccessControlEntry entry : entries) {
       if (!entry.isAllow()) {
         logger.info("Event index does not support denial via ACL, ignoring {}", entry);
         continue;

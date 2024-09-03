@@ -23,6 +23,7 @@ package org.opencastproject.authorization.xacml;
 
 import static org.opencastproject.mediapackage.MediaPackageElements.XACML_POLICY_EPISODE;
 import static org.opencastproject.mediapackage.MediaPackageElements.XACML_POLICY_SERIES;
+import static org.opencastproject.security.util.SecurityUtil.getEpisodeRoleId;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.mediapackage.Attachment;
@@ -44,6 +45,7 @@ import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -60,6 +62,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.xml.bind.JAXBException;
@@ -91,9 +94,11 @@ public class XACMLAuthorizationService implements AuthorizationService {
   private MediaPackageSerializer serializer;
 
   private static final String CONFIG_MERGE_MODE = "merge.mode";
+  private static final String CONFIG_EPISODE_ID_ROLE = "org.opencastproject.episode.id.role.access";
 
   /** Definition of how merging of series and episode ACLs work */
   private static MergeMode mergeMode = MergeMode.OVERRIDE;
+  private static boolean episodeIdRole = false;
 
   enum MergeMode {
     OVERRIDE, ROLES, ACTIONS
@@ -107,6 +112,8 @@ public class XACMLAuthorizationService implements AuthorizationService {
     if (properties == null) {
       mergeMode = MergeMode.OVERRIDE;
       logger.debug("Merge mode set to {}", mergeMode);
+      episodeIdRole = false;
+      logger.debug("Using episode ID roles is deactivated");
       return;
     }
     final String mode = StringUtils.defaultIfBlank((String) properties.get(CONFIG_MERGE_MODE),
@@ -118,6 +125,10 @@ public class XACMLAuthorizationService implements AuthorizationService {
       mergeMode = MergeMode.OVERRIDE;
     }
     logger.debug("Merge mode set to {}", mergeMode);
+
+    episodeIdRole = BooleanUtils.toBoolean(Objects.toString(
+        cc.getBundleContext().getProperty(CONFIG_EPISODE_ID_ROLE), "false"));
+    logger.debug("Usage of episode ID roles is set to {}", episodeIdRole);
   }
 
   @Reference(
@@ -307,13 +318,26 @@ public class XACMLAuthorizationService implements AuthorizationService {
 
   public boolean hasPermission(final MediaPackage mp, final String action) {
     AccessControlList acl = getActiveAcl(mp).getA();
-    return hasPermission(acl, action);
+
+    // Check special ROLE_EPISODE_<ID>_<ACTION> permissions
+    final User user = securityService.getUser();
+    var allowed = false;
+    logger.debug("episodeIdRole set to: {}", episodeIdRole);
+    if (episodeIdRole) {
+      var episodeRole = getEpisodeRoleId(mp.getIdentifier().toString(), action);
+      logger.debug("Checking for role: {}", episodeRole);
+      allowed = user.getRoles().stream().map(Role::getName).anyMatch(r -> r.equals(episodeRole));
+    }
+
+    return allowed || hasPermission(acl, action);
   }
 
   @Override
   public boolean hasPermission(AccessControlList acl, final String action) {
-    boolean allowed = false;
     final User user = securityService.getUser();
+    var allowed = false;
+
+    // Check ACL
     for (AccessControlEntry entry: acl.getEntries()) {
       // ignore entries for other actions
       if (!entry.getAction().equals(action)) {

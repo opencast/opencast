@@ -1505,7 +1505,7 @@ public class SchedulerServiceImplTest {
     EasyMock.replay(index, result);
     schedSvc.setIndex(index);
 
-    schedSvc.repopulate();
+    schedSvc.repopulate(null);
   }
 
   private String addDublinCore(Opt<String> id, MediaPackage mediaPackage, final DublinCoreCatalog initalEvent)

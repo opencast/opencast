@@ -183,7 +183,8 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
           AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
           User currentUser = securityService.getUser();
           Organization currentOrg = securityService.getOrganization();
-          if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.WRITE.toString())) {
+          if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.WRITE.toString(),
+              false, null)) {
             throw new UnauthorizedException(currentUser + " is not authorized to update series " + seriesId);
           }
         }
@@ -332,7 +333,8 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
             AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
             User currentUser = securityService.getUser();
             Organization currentOrg = securityService.getOrganization();
-            if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.WRITE.toString())) {
+            if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.WRITE.toString(),
+                false, null)) {
               throw new UnauthorizedException(currentUser + " is not authorized to update series " + seriesId);
             }
           }
@@ -499,7 +501,8 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
       AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
       User currentUser = securityService.getUser();
       Organization currentOrg = securityService.getOrganization();
-      return AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.WRITE.toString());
+      return AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.WRITE.toString(),
+          false, null);
     }
     return true;
   }
@@ -516,9 +519,12 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
         return true;
       }
       // There are several reasons a user may need to load a series: to read content, to edit it, or add content
-      return AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.READ.toString())
-          || AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.CONTRIBUTE.toString())
-          || AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.WRITE.toString());
+      return AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.READ.toString(),
+          false, null)
+          || AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.CONTRIBUTE.toString(),
+          false, null)
+          || AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.WRITE.toString(),
+          false, null);
     }
     return true;
   }
@@ -560,7 +566,8 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
             AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
             User currentUser = securityService.getUser();
             Organization currentOrg = securityService.getOrganization();
-            if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.WRITE.toString())) {
+            if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, Permissions.Action.WRITE.toString(),
+                false, null)) {
               throw new UnauthorizedException(currentUser + " is not authorized to update ACLs on series " + seriesId);
             }
           }

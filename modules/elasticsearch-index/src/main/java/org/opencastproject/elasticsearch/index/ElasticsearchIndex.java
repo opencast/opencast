@@ -40,10 +40,12 @@ import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.elasticsearch.index.objects.theme.IndexTheme;
 import org.opencastproject.elasticsearch.index.objects.theme.ThemeQueryBuilder;
 import org.opencastproject.elasticsearch.index.objects.theme.ThemeSearchQuery;
+import org.opencastproject.list.api.ListProvidersService;
 import org.opencastproject.security.api.User;
 
 import com.google.common.util.concurrent.Striped;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.delete.DeleteResponse;
@@ -54,6 +56,7 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,6 +64,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.locks.Lock;
@@ -115,6 +119,17 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
 
   private final Striped<Lock> locks = Striped.lazyWeakLock(1024);
 
+  private ListProvidersService listProvidersService;
+
+  private static final String CONFIG_EPISODE_ID_ROLE = "org.opencastproject.episode.id.role.access";
+
+  private boolean episodeIdRole = false;
+
+  @Reference
+  public void setListProvidersService(ListProvidersService listProvidersService) {
+    this.listProvidersService = listProvidersService;
+  }
+
   /**
    * OSGi callback to activate this component instance.
    *
@@ -135,6 +150,10 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
     } catch (Throwable t) {
       throw new ComponentException("Error initializing elastic search index", t);
     }
+
+    episodeIdRole = BooleanUtils.toBoolean(Objects.toString(
+        bundleContext.getProperty(CONFIG_EPISODE_ID_ROLE), "false"));
+    logger.debug("Usage of episode ID roles is set to {}", episodeIdRole);
   }
 
   /**
@@ -406,7 +425,8 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
     logger.debug("Adding event {} to search index", event.getIdentifier());
 
     // Add the resource to the index
-    SearchMetadataCollection inputDocument = EventIndexUtils.toSearchMetadata(event);
+    SearchMetadataCollection inputDocument = EventIndexUtils.toSearchMetadata(event, listProvidersService,
+        episodeIdRole);
     List<SearchMetadata<?>> resourceMetadata = inputDocument.getMetadata();
     ElasticsearchDocument doc = new ElasticsearchDocument(inputDocument.getIdentifier(),
             inputDocument.getDocumentType(), resourceMetadata);
@@ -432,7 +452,8 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
     for (Event event: eventList) {
       logger.debug("Adding event {} to search index", event.getIdentifier());
       // Add the resource to the index
-      SearchMetadataCollection inputDocument = EventIndexUtils.toSearchMetadata(event);
+      SearchMetadataCollection inputDocument = EventIndexUtils.toSearchMetadata(event, listProvidersService,
+          episodeIdRole);
       List<SearchMetadata<?>> resourceMetadata = inputDocument.getMetadata();
       docs.add(new ElasticsearchDocument(inputDocument.getIdentifier(),
               inputDocument.getDocumentType(), resourceMetadata));
