@@ -87,16 +87,15 @@ export default class OpencastAuth {
       if (!(roles instanceof Array)) { roles = [roles]; }
 
       let canWrite = false;
-      if (acl?.ace) {
-        let aces = acl?.ace;
-        if (!(aces instanceof Array)) { aces = [aces]; }
+      if (acl) {
+        if (!(acl instanceof Array)) { acl = [acl]; }
 
         canWrite = roles.some(function(currentRole) {
           if (currentRole == userInfo.org.adminRole) {
             return true;
           }
           else {
-            return aces.some(function(currentAce) {
+            return acl.some(function(currentAce) {
               if (currentRole == currentAce.role) {
                 if (currentAce.action == 'write') {
                   return true;
