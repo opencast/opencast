@@ -106,7 +106,6 @@ There are a couple of rules that committers must follow when merging pull reques
 * Reviewing or merging your own pull requests is strongly discouraged, but technically allowed.
     * It is advised to be pragmatic and only do so if necessary.
 
-
 #### Automatically closing issues when a PR is merged
 
 Our pull request template wants you to "close an accompanying issue."
@@ -132,6 +131,104 @@ reach `develop` by our forward merging process.
 
 Mentioning related issues in the PR description **in addition** to
 the commit message(-s) might of course still be useful for reviewers!
+
+
+Reviewing Code
+--------------
+
+Reviewing pull requests is as important as creating them, as pull requests cannot be merged without at least one
+approving review. Furthermore, the more people review a pull request the more likely it is that potential issues
+are found early, saving time and money down the line.
+
+This section intends to give guidelines on what to look for when reviewing a pull request. A review does not need
+to cover all of these, do as much as you can and then (at least roughly) write in the review what you looked at. Also if
+you found an issue with one of the guidelines, e.g. the description is not making any sense, it is completely okay to
+request a change to the description and holding of on reviewing other parts of the PR until the description is fixed.
+
+While a pull requests of course contains changes to the Opencast code base, it also consists of its trappings. Usually
+it makes sense to look at those first.
+
+### Trappings
+
+#### Title
+
+Was a sensible title chosen? Does the title serve as good identifier for the pull request? A bad title might be
+"LTI bug". A good title might be "Fix a bug where LTI users can not play videos".
+
+#### Description
+
+Was a sensible description chosen?
+
+- Does the description detail the goal of the pull request? A pull request should have one clear goal. If there are
+  multiple goals, it is usually best to split these among multiple pull requests.
+- Would the stated goal of the pull request improve the Opencast codebase, or should it be rejected outright? Fixing a 
+  bug usually improves the code, adding another video player might not.
+- Does the description explain how to test the pull request, e.g. is certain configuration necessary?
+
+#### Issues
+
+If the pull request fixes an existing issue on GitHub, is it linked in the pull request? If one or more issues are linked
+in the pull request, does the pull request actually address them?
+
+#### Labels
+
+Is the pull request labelled? Is it labelled sensibly?
+
+### Code base changes
+
+#### Hygene
+
+A pull request should have one clear goal. If there are  multiple goals, it is usually best to split these among
+multiple pull requests.
+
+Does the pull request have a sane commit tree?
+
+- The tree should be easy to follow, not needlessly complex.
+- Commits should have sensible titles and descriptions.
+- Merge commits should be avoided, suggest using rebasing instead.
+
+Does the pull request target the right branch? Usually
+
+- Major features go into develop
+- Minor features go into stable
+- Fixes go into legacy/stable
+
+#### Documentation
+
+- Not necessary for every kind of pull request, but required for new features and major changes to existing behaviour.
+- A mention should also be added to the release notes.
+- The documentation should be legible and sensible. It should integrate with the surrounding documentation.
+
+#### Functionality
+
+Do the changes actually do what the description promises?
+
+Proofreading: Read through the code and try to think it through.
+
+- What if this line of code throws an exception? What if the function is given bad parameters?
+- How computationally expensive is this loop?
+- Is the logging constructed so that it will be helpful? Are translations worded well?
+
+Test the code by compiling and running it. Try to test it in ways that won't be caught by the automated tests. Test it
+in a distributed Opencast setup if possible.
+
+#### Tests
+
+Does the code require (unit) testing? Are the given tests sensible? Are there any test cases missing?
+
+### Video guides
+
+The GitHub web interface is ever-changing. If you are looking for help with navigating the website, check the
+[official GitHub documentation](https://docs.github.com/de/pull-requests/collaborating-with-pull-requests/reviewing-changes-in-pull-requests/reviewing-proposed-changes-in-a-pull-request).
+
+If videos are more your style:
+
+- (English) [Talk from 2021 Opencast Summit](https://video.ethz.ch/events/opencast/2021/graz/0014efff-ff04-414c-876c-7a7eeb66122b.html),
+  slide presentation by Greg on how he does things.
+- (German) [Talk from 2020 Opencast D/A/CH](https://video.ethz.ch/events/opencast/2020/innsbruck/58a02ce8-1bf6-4b2a-b220-faf65931efbc.html),
+  shows how to navigate the Opencast GitHub website for beginners. Starts at minute 30.
+- (English) [Talk from 2024 Opencast Summit](https://video.ethz.ch/events/opencast/2024/zaragoza/b12f4344-12db-4d1e-8997-c8dd3832a462.html),
+  5 minutes of motivation for non-technical reviewers.
 
 
 Git Repository Branching Model
