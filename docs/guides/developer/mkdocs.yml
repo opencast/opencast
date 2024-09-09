@@ -83,6 +83,7 @@ nav:
             - Typeface: 'develop/frontends/admin-ui/style/typeface.md'
             - View Structure: 'develop/frontends/admin-ui/style/view-structure.md'
    - Documentation: 'develop/documentation.md'
+   - Integrating with Opencast: 'develop/integration.md'
 - Opencast architecture:
    - Overview: 'architecture/overview.md'
    - Admin-UI: 'architecture/admin-ui.md'

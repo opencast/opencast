@@ -289,6 +289,9 @@ and that code patches do not break the existing functionality. These tests are a
 built. If building repeatedly fails due to test failures, then something is most likely wrong. Please report this as a
 severe bug.
 
+For a guide on how to write unit tests, see [Writing Unit Tests](https://video.ethz.ch/events/opencast/2023/berlin/b4861f53-738b-40fb-a1ab-ec4726eec6bd.html),
+a talk how to write (good!) unit tests.
+
 ### User Tests
 
 Before each major release, the release and quality assurance managers will ask the whole community to participate in
