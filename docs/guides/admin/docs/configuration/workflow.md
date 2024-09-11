@@ -13,6 +13,9 @@ operations, see:
 
 > [List of Workflow Operation Handler](../workflowoperationhandlers/index.md)
 
+For a video introduction to workflow, take a look at this [workflow workshop](https://video.ethz.ch/events/opencast/2020/gent/7cb2164f-e060-4108-9b3f-770e9f361ec7.html).
+Or for longer session, check out this [in-depth webinar on workflows](https://video.ethz.ch/events/opencast/miscellaneous/webinars/445be642-685a-4575-9bbf-08db21bd8c94.html).
+
 ## Overview
 
 A Opencast workflow is an ordered list of operations. There is no limit to the number of operations or their
