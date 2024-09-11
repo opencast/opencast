@@ -54,6 +54,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 /**
  * Dynamic login handler for JWTs.
@@ -261,10 +262,29 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
   private Set<JpaRole> extractRoles(DecodedJWT jwt) {
     JpaOrganization organization = fromOrganization(securityService.getOrganization());
     Set<JpaRole> roles = new HashSet<>();
-    for (String mapping : roleMappings) {
-      String role = evaluateMapping(jwt, mapping, false);
+    Consumer<String> addRole = (String role) -> {
       if (StringUtils.isNotBlank(role)) {
         roles.add(new JpaRole(role, organization));
+      }
+    };
+
+    for (String mapping : roleMappings) {
+      ExpressionParser parser = new SpelExpressionParser();
+      Expression exp = parser.parseExpression(mapping);
+      Object value = exp.getValue(jwt.getClaims());
+      if (value != null) {
+        // We allow the expression to either return a string directly, or a list/array of strings.
+        if (value instanceof String) {
+          addRole.accept((String) value);
+        } else if (value.getClass().isArray()) {
+          for (var role : (Object[]) value) {
+            addRole.accept((String) role);
+          }
+        } else {
+          for (var role : (List<?>) value) {
+            addRole.accept((String) role);
+          }
+        }
       }
     }
     Assert.notEmpty(roles, "No roles could be extracted");
