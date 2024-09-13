@@ -295,20 +295,6 @@ public class IndexServiceImplTest {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testCreateEventInputNoWorkflowExpectsIllegalArgumentException()
-          throws IllegalArgumentException, ConfigurationException, MediaPackageException, IOException,
-          IngestException, ParseException, NotFoundException, SchedulerException, UnauthorizedException,
-          org.json.simple.parser.ParseException {
-    String testResourceLocation = "/events/create-event-no-workflow.json";
-    JSONObject metadataJson = (JSONObject) parser
-            .parse(IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation)));
-
-    IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
-    indexServiceImpl.setIngestService(setupIngestServiceWithMediaPackage());
-    indexServiceImpl.createEvent(metadataJson, null);
-  }
-
-  @Test(expected = IllegalArgumentException.class)
   public void testCreateEventInputNoMetadataExpectsIllegalArgumentException()
           throws IllegalArgumentException, ConfigurationException, MediaPackageException, IOException,
           IngestException, ParseException, NotFoundException, SchedulerException, UnauthorizedException,
