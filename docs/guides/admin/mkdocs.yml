@@ -43,6 +43,7 @@ nav:
 - Installation:
    - Overview: 'installation/index.md'
    - Hardware Requirements: installation/server-requirements.md
+   - Java Versions: installation/java-version.md
    - Multiple Servers: 'installation/multiple-servers.md'
    - Installation from Source:
       - Linux: 'installation/source-linux.md'
