@@ -169,8 +169,10 @@ public class PlaylistService {
 
   public List<Playlist> getAllForAdministrativeRead(Date from, Date to, int limit)
           throws IllegalStateException, UnauthorizedException {
-    if (!this.securityService.getUser().hasRole(GLOBAL_ADMIN_ROLE)) {
-      throw new UnauthorizedException("Only admins can call this method");
+    final var user = securityService.getUser();
+    final var orgAdminRole = securityService.getOrganization().getAdminRole();
+    if (!user.hasRole(GLOBAL_ADMIN_ROLE) && !user.hasRole(orgAdminRole)) {
+      throw new UnauthorizedException("Only (org-)admins can call this method");
     }
 
     try {
