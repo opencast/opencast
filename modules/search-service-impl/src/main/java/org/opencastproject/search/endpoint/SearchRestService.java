@@ -224,7 +224,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
       if ("modified".equals(sortParam[0])) {
         searchSource.sort(sortParam[0], order);
       } else {
-        searchSource.sort(SearchResult.DUBLINCORE + sortParam[0], order);
+        searchSource.sort(SearchResult.DUBLINCORE + "." + sortParam[0], order);
       }
     }
 
