@@ -473,7 +473,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
             logIndexRebuildError(logger, total, current.get(), e);
             //NB: Runtime exception thrown to escape the functional interfacing
             throw new RuntimeException("Internal Index Rebuild Failure", e);
-          } catch (NotFoundException e) {
+          } catch (RuntimeException | NotFoundException e) {
             logSkippingElement(logger, "event", tuple.getA().getIdentifier().toString(), e);
           }
         });
