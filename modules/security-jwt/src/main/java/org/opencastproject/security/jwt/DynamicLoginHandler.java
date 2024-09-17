@@ -27,6 +27,7 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.impl.jpa.JpaUserReference;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.userdirectory.api.UserReferenceProvider;
 
 import com.auth0.jwk.JwkException;
@@ -49,6 +50,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.util.Assert;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -100,6 +102,9 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
   /** Mapping used to extract the email from the JWT. */
   private String emailMapping = null;
 
+  /** Whether the built-in schema role mapping should be used. */
+  private boolean ocStandardRoleMappings = true;
+
   /** Mapping used to extract roles from the JWT. */
   private List<String> roleMappings = null;
 
@@ -128,7 +133,8 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
     Assert.notNull(usernameMapping, "User name mapping must be set");
     Assert.notNull(nameMapping, "Name mapping must be set");
     Assert.notNull(emailMapping, "Email mapping must be set");
-    Assert.notEmpty(roleMappings, "Role mappings must be set");
+    Assert.isTrue(roleMappings != null || ocStandardRoleMappings,
+            "Role mappings must be set if ocStandardRoleMappings is false");
 
     if (jwksUrl != null) {
       jwkProvider = new GuavaCachedUrlJwkProvider(jwksUrl, jwksCacheExpiresIn, TimeUnit.MINUTES);
@@ -268,7 +274,55 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
       }
     };
 
-    for (String mapping : roleMappings) {
+    // Evaluate the standard role mapping if specified
+    if (ocStandardRoleMappings) {
+      // Read `role` claim
+      try {
+        var rolesClaim = jwt.getClaim("roles");
+        if (rolesClaim != null && !rolesClaim.isNull()) {
+          for (String r : rolesClaim.asArray(String.class)) {
+            if (!r.isBlank()) {
+              addRole.accept("ROLE_" + r);
+            }
+          }
+        }
+      } catch (JWTDecodeException e) {
+        logger.warn("claim 'roles' is not an array of strings, ignoring");
+      }
+
+      // Read `oc` claim
+      try {
+        var ocClaim = jwt.getClaim("oc");
+        if (ocClaim != null && !ocClaim.isNull()) {
+          for (String entry : ocClaim.asArray(String.class)) {
+            var parts = entry.split(":", 3);
+            if (parts.length != 3) {
+              logger.warn("entry in 'oc' claim does not have three ':' separated parts, ignoring");
+              continue;
+            }
+
+            var actions = parts[0];
+            var type = parts[1];
+            var id = parts[2];
+            for (var action : actions.split("\\+")) {
+              if (action.isBlank()) {
+                continue;
+              }
+
+              if (type.equals("e")) {
+                addRole.accept(SecurityUtil.getEpisodeRoleId(id, action));
+              } else {
+                logger.warn("in 'oc' claim: granting access to item type '{}' is not yet supported", type);
+              }
+            }
+          }
+        }
+      } catch (JWTDecodeException e) {
+        logger.warn("claim 'oc' is not an array of strings, ignoring");
+      }
+    }
+
+    for (String mapping : (roleMappings == null ? new ArrayList<String>() : roleMappings)) {
       ExpressionParser parser = new SpelExpressionParser();
       Expression exp = parser.parseExpression(mapping);
       Object value = exp.getValue(jwt.getClaims());
@@ -473,6 +527,10 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
    */
   public void setEmailMapping(String emailMapping) {
     this.emailMapping = emailMapping;
+  }
+
+  public void setOcStandardRoleMappings(boolean ocStandardRoleMappings) {
+    this.ocStandardRoleMappings = ocStandardRoleMappings;
   }
 
   /**

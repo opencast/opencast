@@ -755,6 +755,7 @@
     <property name="usernameMapping" value="['username'].asString()" />
     <property name="nameMapping" value="['name'].asString()" />
     <property name="emailMapping" value="['email'].asString()" />
+    <property name="ocStandardRoleMappings" value="true" />
     <property name="roleMappings" ref="jwtRoleMappings" />
     <property name="jwtCacheSize" value="500" />
     <property name="jwtCacheExpiresIn" value="60" />
