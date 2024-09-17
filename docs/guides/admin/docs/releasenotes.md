@@ -1,5 +1,9 @@
 # Opencast 15: Release Notes
 
+## Opencast 15.10
+
+This release contains two bugfixes and a change to a test.
+
 ## Opencast 15.9
 
 This release fixes [a critical bug which may  cause ingests to fail](https://github.com/opencast/opencast/pull/6104).
