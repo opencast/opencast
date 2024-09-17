@@ -6,6 +6,11 @@ There are a few hints about a sensible machine setup to run Opencast on:
 
 - [Hardware requirements](server-requirements.md)
 
+Since Opencast is written in Java, you may also need to ensure to have the correct version of Java installed.
+On fresh installations, the packages will usually take care about that.
+
+- [Java version requirements](java-version.md)
+
 
 Installation from Repository
 ----------------------------
