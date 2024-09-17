@@ -28,6 +28,7 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.playlists.PlaylistService;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.AuthorizationService;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.Jsons;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -102,6 +103,7 @@ public class TobiraEndpoint {
   private SearchService searchService;
   private SeriesService seriesService;
   private AuthorizationService authorizationService;
+  private SecurityService securityService;
   private PlaylistService playlistService;
   private Workspace workspace;
 
@@ -123,6 +125,11 @@ public class TobiraEndpoint {
   @Reference
   public void setAuthorizationService(AuthorizationService service) {
     this.authorizationService = service;
+  }
+
+  @Reference
+  public void setSecurityService(SecurityService service) {
+    this.securityService = service;
   }
 
   @Reference
@@ -206,7 +213,7 @@ public class TobiraEndpoint {
       var json = Harvest.harvest(
           preferredAmount,
           new Date(since),
-          searchService, seriesService, authorizationService, playlistService, workspace);
+          searchService, seriesService, authorizationService, securityService, playlistService, workspace);
 
       // TODO: encoding
       return Response.ok(json.toJson()).build();
