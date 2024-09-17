@@ -1,6 +1,5 @@
 # Opencast 16: Release Notes
 
-
 ## Opencast 16.4
 
 This release fixes [a critical bug which may  cause ingests to fail](https://github.com/opencast/opencast/pull/6104).

@@ -437,6 +437,24 @@ Opencast 16
 Opencast 15
 -----------
 
+### Opencast 15.10
+
+- [[#6106](https://github.com/opencast/opencast/pull/6106)] -
+  Remove old database update test
+- [[#6083](https://github.com/opencast/opencast/pull/6083)] -
+  Always send adopter registration statistics in rest api
+- [[#5587](https://github.com/opencast/opencast/pull/5587)] -
+  Fix ltitools Upload crashing if extendedMetadata exists
+
+### Opencast 15.9
+
+- [[#6104](https://github.com/opencast/opencast/pull/6104)] -
+  Fix broken ingest
+- [[#6081](https://github.com/opencast/opencast/pull/6081)] -
+  Fix indentation
+- [[#6095](https://github.com/opencast/opencast/pull/6095)] -
+  Remove references to JIRA in feedback URL docs
+
 ### Opencast 15.8
 
 - [[#6061](https://github.com/opencast/opencast/pull/6061)] -
