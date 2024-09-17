@@ -1,5 +1,6 @@
 # Opencast 17: Release Notes
 
+
 ## Release Schedule
 
 | Date             | Phase                    |

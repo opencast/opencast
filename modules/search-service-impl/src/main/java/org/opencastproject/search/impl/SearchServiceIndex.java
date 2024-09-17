@@ -517,10 +517,12 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
 
             current.getAndIncrement();
             indexMediaPackage(mediaPackage, acl, modificationDate, deletionDate);
-          } catch (SearchServiceDatabaseException | UnauthorizedException | NotFoundException e) {
+          } catch (SearchServiceDatabaseException | UnauthorizedException e) {
             logIndexRebuildError(logger, total, current.get(), e);
             //NB: Runtime exception thrown to escape the functional interfacing
             throw new RuntimeException("Internal Index Rebuild Failure", e);
+          } catch (NotFoundException e) {
+            logSkippingElement(logger, "event", tuple.getA().getIdentifier().toString(), e);
           }
         });
         //Current is the *page* index, so we remove one since each page only has pageSize entries
