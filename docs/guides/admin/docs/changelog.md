@@ -4,6 +4,30 @@ Changelog
 Opencast 16
 -----------
 
+### Opencast 16.5
+
+- [[#6172](https://github.com/opencast/opencast/pull/6172)] -
+  Prevent broken XML from failing index rebuild completely
+- [[#6170](https://github.com/opencast/opencast/pull/6170)] -
+  Skip elements during search-index rebuild that throw a NotFoundException
+- [[#6169](https://github.com/opencast/opencast/pull/6169)] -
+  Fix sort parameter in search series rest endpoint
+- [[#6168](https://github.com/opencast/opencast/pull/6168)] -
+  Document Java version requirements
+- [[#6143](https://github.com/opencast/opencast/pull/6143)] -
+  Fix Amberscript example workflows
+- [[#6142](https://github.com/opencast/opencast/pull/6142)] -
+  Allow Amberscript transcriptions to be attached as tracks
+- [[#6141](https://github.com/opencast/opencast/pull/6141)] -
+  Add missing target-tags to amberscript attach transcription docs
+
+### Opencast 16.4
+
+*Just fixed the broken 16.3 release*
+
+- [[#6105](https://github.com/opencast/opencast/pull/6105)] -
+  Opencast 16.4 release notes
+
 ### Opencast 16.3
 
 - [[#6101](https://github.com/opencast/opencast/pull/6101)] -
