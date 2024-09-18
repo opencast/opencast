@@ -1,5 +1,10 @@
 # Opencast 16: Release Notes
 
+
+## Opencast 16.5
+
+This is a maintenance release of Opencast 16. It fixes several minor bugs.
+
 ## Opencast 16.4
 
 This release fixes [a critical bug which may  cause ingests to fail](https://github.com/opencast/opencast/pull/6104).
