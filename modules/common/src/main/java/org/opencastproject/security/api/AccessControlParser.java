@@ -136,11 +136,14 @@ public final class AccessControlParser {
    */
   private static AccessControlList parseJson(String content) throws AccessControlParsingException {
     try {
+      AccessControlList acl = new AccessControlList();
       JSONObject json = (JSONObject) new JSONParser().parse(content);
       JSONObject jsonAcl = (JSONObject) json.get(ACL);
+      if (jsonAcl == null) {
+        return acl;
+      }
       Object jsonAceObj = jsonAcl.get(ACE);
 
-      AccessControlList acl = new AccessControlList();
       if (jsonAceObj == null)
         return acl;
 
