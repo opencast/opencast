@@ -1,4 +1,4 @@
-# Terms of use
+# Terms of Use
 
 Opencast allows you to display terms of use for new users in the admin UI. The user will have to accept the terms to continue using the UI.
 
@@ -14,6 +14,6 @@ The content of the terms can be set in `/etc/ui-config/mh_default_org/admin-ui/`
 terms.%{language_code}.html
 ```
 
-The corresponding language codes can be found in [`/src/i18n/i18n.ts`](https://github.com/opencast/opencast-admin-interface/blob/4253105caedb11df193c05188e043a711f7e68cf/src/i18n/i18n.ts#L29) in the admin-UI repo.
+The corresponding language codes can be found in [`/src/i18n/i18n.ts`](https://github.com/opencast/opencast-admin-interface/blob/main/src/i18n/languages.ts#L29) in the admin-UI repo.
 
 If no language is provided, the english version will be displayed.
