@@ -403,7 +403,11 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
       var updateRequst = new UpdateRequest(INDEX_NAME, mediaPackageId)
           .doc(gson.toJson(json), XContentType.JSON);
       esIndex.getClient().update(updateRequst, RequestOptions.DEFAULT);
-
+    } catch (ElasticsearchStatusException e) {
+      if (e.status().getStatus() != RestStatus.NOT_FOUND.getStatus()) {
+        throw e;
+      }
+      logger.warn("Event {} is not in the search index. Skipping deletion", mediaPackageId);
     } catch (IOException e) {
       throw new SearchException("Could not delete episode " + mediaPackageId + " from index", e);
     }
