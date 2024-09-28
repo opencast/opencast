@@ -21,27 +21,46 @@ A visual representation of the communication within a three-node cluster will lo
 ```mermaid
 graph LR
 
-  user(User) -->|80, 443| oc1(Opencast Admin)
-  user -.->|80, 443| oc2(Opencast Worker)
-  user -->|80, 443| oc3(Opencast Presentation)
+  subgraph Internet
+    user(User)
+  end
+
+  subgraph Opencast
+    direction LR
+    oc1(Opencast Admin)
+    oc2(Opencast Worker)
+    oc3(Opencast Presentation)
+  end
+
+  subgraph Data
+    db(Database)
+    os(OpenSearch)
+    storage(Storage)
+  end
+
+  subgraph Recorder
+    ca(Capture Agent)
+  end
+
+  user -->|80, 443| oc1
+  user -->|80, 443| oc3
   oc1 <-->|80, 443| oc2
   oc2 <-->|80, 443| oc3
   oc3 <-->|80, 443| oc1
-  oc1 -->|e.g. 3306| db(Database)
+  oc1 -->|e.g. 3306| db
   oc2 -->|e.g. 3306| db
   oc3 -->|e.g. 3306| db
-  oc1 -->|9200| os(OpenSearch)
-  oc3 -->|9200| os(OpenSearch)
-  oc1 --> storage(Storage)
-  oc2 --> storage
-  oc3 --> storage
-  ca(Capture Agent) -->|80, 443| oc1
+  oc1 -->|9200| os
+  oc3 -->|9200| os
+  oc1 --- storage
+  oc2 --- storage
+  oc3 --- storage
+  ca -->|80, 443| oc1
 ```
 
 Notes:
 
 - The numbers in the diagram describe TCP ports
-- Communication between users and workers is often not necessary
 - If you use a database other than MariaDB, the port may differ
 
 
