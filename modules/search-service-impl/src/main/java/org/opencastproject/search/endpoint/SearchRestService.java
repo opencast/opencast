@@ -212,7 +212,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
         .size(size);
 
     if (StringUtils.isNotEmpty(sort)) {
-      var sortParam = StringUtils.split(sort);
+      var sortParam = StringUtils.split(sort.toLowerCase());
       var validSort = Arrays.asList("identifier", "title", "contributor", "creator", "modified").contains(sortParam[0]);
       var validOrder = sortParam.length < 2 || Arrays.asList("asc", "desc").contains(sortParam[1]);
       if (sortParam.length > 2 || !validSort || !validOrder) {
@@ -410,7 +410,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
         .size(size);
 
     if (StringUtils.isNotEmpty(sort)) {
-      var sortParam = StringUtils.split(sort);
+      var sortParam = StringUtils.split(sort.toLowerCase());
       var validSort = Arrays.asList("title", "contributor", "creator", "modified").contains(sortParam[0]);
       var validOrder = sortParam.length < 2 || Arrays.asList("asc", "desc").contains(sortParam[1]);
       if (sortParam.length > 2 || !validSort || !validOrder) {
