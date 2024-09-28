@@ -66,5 +66,5 @@ If you want a more complex, stricter set of rules:
 
 1. Allow external HTTP and HTTPS communication to admin, presentation and possibly ingest
 2. Allow all Opencast nodes to access the database
-3. Allow the admin node to access OpenSearch
+3. Allow the admin and presentation nodes to access OpenSearch
 4. Allow all nodes access to the storage infrastructure
