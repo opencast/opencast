@@ -10,7 +10,7 @@
     "js-yaml": "^4.1.0",
     "requirejs": "^2.3.6",
     "seedrandom": "^3.0.5",
-    "underscore": "^1.13.6"
+    "underscore": "^1.13.7"
   },
   "devDependencies": {
     "eslint": "^9.11.1",
