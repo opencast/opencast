@@ -158,7 +158,7 @@ public class WorkflowDefinitionsEndpoint {
       for (String f : filter.split(",")) {
         int sepIdx = f.indexOf(':');
         if (sepIdx < 0 || sepIdx == f.length() - 1) {
-          logger.info("No value for filter {} in filters list: {}", f, filter);
+          logger.debug("No value for filter {} in filters list: {}", f, filter);
           continue;
         }
         String name = f.substring(0, sepIdx);

@@ -754,7 +754,7 @@ public class EventsEndpoint implements ManagedService {
         for (String f : filterPart.split(",")) {
           String[] filterTuple = f.split(":");
           if (filterTuple.length < 2) {
-            logger.info("No value for filter {} in filters list: {}", filterTuple[0], filter);
+            logger.debug("No value for filter {} in filters list: {}", filterTuple[0], filter);
             continue;
           }
 

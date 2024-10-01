@@ -237,7 +237,7 @@ public class SeriesEndpoint {
         for (String f : filter.split(",")) {
           String[] filterTuple = f.split(":",2);
           if (filterTuple.length < 2) {
-            logger.info("Filter {} not valid: {}", filterTuple[0], filter);
+            logger.debug("Filter {} not valid: {}", filterTuple[0], filter);
             continue;
           }
           String name = filterTuple[0];
