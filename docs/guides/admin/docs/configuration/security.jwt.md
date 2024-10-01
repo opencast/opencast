@@ -21,7 +21,7 @@ In order to integrate Opencast with an OIDC provider you could use the
 Standard OC Schema for JWTs
 ---------------------------
 
-After the signature verification, a JWT is just a bunch of "claims" (JSON fields). How to interpret these claims is completely up to the communicating parties. Protocols like OIDC define exactly which claims are to be used and how. For other cases where external Opencast apps (like Tobira or an LMS) need to communicate with Opencast, this section defines a standard schema to follow. You can configure Opencast differently, but this aims at standardizing JWT usage across Opencast-related applications and offer an out-of-the-box solution.
+After the signature verification, a JWT is just a bunch of "claims" (JSON fields). The communicating parties can decide fairly freely on how to interpret these claims. Protocols like OIDC define exactly which claims are to be used and how. For other cases where external Opencast apps (like Tobira or an LMS) need to communicate with Opencast, this section defines a standard schema to follow. You can configure Opencast differently, but this aims at standardizing JWT usage across Opencast-related applications and offer an out-of-the-box solution.
 
 This schema is designed to be flexible and support all current and conceivable future use cases, while keeping the JWT size for each use case small.
 
