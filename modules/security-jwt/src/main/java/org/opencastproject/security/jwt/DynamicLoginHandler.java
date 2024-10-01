@@ -285,7 +285,7 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
           }
         }
       } catch (JWTDecodeException e) {
-        logger.warn("claim 'roles' is not an array of strings, ignoring");
+        logger.debug("claim 'roles' is not an array of strings, ignoring");
       }
 
       // Read `oc` claim
@@ -295,7 +295,7 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
           for (String entry : ocClaim.asArray(String.class)) {
             var parts = entry.split(":", 3);
             if (parts.length != 3) {
-              logger.warn("entry in 'oc' claim does not have three ':' separated parts, ignoring");
+              logger.debug("entry in 'oc' claim does not have three ':' separated parts, ignoring");
               continue;
             }
 
@@ -310,13 +310,13 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
               if (type.equals("e")) {
                 addRole.accept(SecurityUtil.getEpisodeRoleId(id, action));
               } else {
-                logger.warn("in 'oc' claim: granting access to item type '{}' is not yet supported", type);
+                logger.debug("in 'oc' claim: granting access to item type '{}' is not yet supported", type);
               }
             }
           }
         }
       } catch (JWTDecodeException e) {
-        logger.warn("claim 'oc' is not an array of strings, ignoring");
+        logger.debug("claim 'oc' is not an array of strings, ignoring");
       }
     }
 
