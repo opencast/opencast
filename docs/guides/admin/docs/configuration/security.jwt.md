@@ -34,7 +34,7 @@ This schema is designed to be flexible and support all current and conceivable f
     "nbf": 1548632170, // optional
 
     // User info
-    "username": "jose",
+    "sub": "jose", // username
     "name": "José Carreño Quiñones",
     "email": "jose@example.com",
 
@@ -56,7 +56,7 @@ A claim being "required" means that the JWT provider (e.g. Tobira, LMS) has to i
 - `nbf` (not before): As [defined in the JWT RFC](https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.5), a number timestamp in seconds since the unix epoch. JWTs with `nbf > now()` are rejected by Opencast. This claim is optional.
 
 - *User Info*: information about the user that's possibly used by parts of Opencast. Some JWT use cases don't require user information at all (e.g. static file auth), while others do (e.g. Studio). Therefore, these claims are optional. (TODO: specify when this is stored as user reference)
-    - `username`: string. (TODO: explain how this is used to lookup existing users, if at all)
+    - `sub`: Opencast username, string. (TODO: explain how this is used to lookup existing users, if at all)
     - `name`: display name, string.
     - `email`: string.
 
@@ -93,7 +93,7 @@ An external application wants to let a user use Opencast Studio to record and up
 ```json
 {
     "exp": 1499863217,
-    "username": "peter",
+    "sub": "peter",
     "name": "Peter Lustig",
     "email": "peter@example.com",
     "roles": ["ROLE_STUDIO"]
@@ -173,7 +173,7 @@ sections found in `etc/security/mh_default_org.xml`. Some of the options are con
   <property name="expectedAlgorithms" ref="jwtExpectedAlgorithms" />
   <property name="claimConstraints" ref="jwtClaimConstraints" />
   <!-- Mapping used to extract the username from the JWT (default: null) -->
-  <property name="usernameMapping" value="['username'].asString()" />
+  <property name="usernameMapping" value="['sub'].asString()" />
   <!-- Mapping used to extract the name from the JWT (default: null) -->
   <property name="nameMapping" value="['name'].asString()" />
   <!-- Mapping used to extract the email from the JWT (default: null) -->
@@ -207,7 +207,7 @@ sections found in `etc/security/mh_default_org.xml`. Some of the options are con
 <util:list id="jwtClaimConstraints" value-type="java.lang.String">
   <value>containsKey('iss')</value>
   <value>containsKey('aud')</value>
-  <value>containsKey('username')</value>
+  <value>containsKey('sub')</value>
   <value>containsKey('name')</value>
   <value>containsKey('email')</value>
   <value>containsKey('domain')</value>
@@ -225,8 +225,8 @@ sections found in `etc/security/mh_default_org.xml`. Some of the options are con
 <!-- The mapping from JWT claims to Opencast roles -->
 <util:list id="jwtRoleMappings" value-type="java.lang.String">
   <value>'ROLE_JWT_USER'</value>
-  <value>'ROLE_JWT_USER_' + ['username'].asString()</value>
-  <value>('ROLE_JWT_OWNER_' + ['username'].asString()).replaceAll("[^a-zA-Z0-9]","_").toUpperCase()</value>
+  <value>'ROLE_JWT_USER_' + ['sub'].asString()</value>
+  <value>('ROLE_JWT_OWNER_' + ['sub'].asString()).replaceAll("[^a-zA-Z0-9]","_").toUpperCase()</value>
   <value>['domain'] != null ? 'ROLE_JWT_ORG_' + ['domain'].asString() + '_MEMBER' : null</value>
   <value>['username'].asString() eq ('j_doe01@example.org') ? 'ROLE_ADMIN' : null</value>
   <value>['affiliation'].asList(T(String)).contains('faculty@example.org') ? 'ROLE_GROUP_JWT_TRAINER' : null</value>
