@@ -97,11 +97,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -139,6 +141,7 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
   public static final String AWS_S3_SECRET_ACCESS_KEY_CONFIG = "org.opencastproject.distribution.aws.s3.secret.key";
   public static final String AWS_S3_REGION_CONFIG = "org.opencastproject.distribution.aws.s3.region";
   public static final String AWS_S3_BUCKET_CONFIG = "org.opencastproject.distribution.aws.s3.bucket";
+  public static final String AWS_S3_BUCKET_CONFIG_PREFIX = "org.opencastproject.distribution.aws.s3.bucket.";
   public static final String AWS_S3_ENDPOINT_CONFIG = "org.opencastproject.distribution.aws.s3.endpoint";
   public static final String AWS_S3_PATH_STYLE_CONFIG = "org.opencastproject.distribution.aws.s3.path.style";
   public static final String AWS_S3_PRESIGNED_URL_CONFIG = "org.opencastproject.distribution.aws.s3.presigned.url";
@@ -187,12 +190,14 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
   /** Interval time in millis to sleep between checks of availability */
   private static final long SLEEP_INTERVAL = 30000L;
 
+  public static final String DEFAULT_ORG_KEY = "*";
+
   /** The AWS client and transfer manager */
   private AmazonS3 s3 = null;
   private TransferManager s3TransferManager = null;
 
-  /** The AWS S3 bucket name */
-  private String bucketName = null;
+  /** The AWS S3 org to bucket name mapping */
+  private Map<String, String> orgBucketNameMap = new HashMap<>();
   private Path tmpPath = null;
 
   /** The AWS S3 endpoint */
@@ -257,9 +262,21 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
         throw new IllegalStateException(e);
       }
 
-      // AWS S3 bucket name
-      bucketName = getAWSConfigKey(cc, AWS_S3_BUCKET_CONFIG);
-      logger.info("AWS S3 bucket name is {}", bucketName);
+      // AWS S3 default bucket name
+      Option<String> defaultBucketNameOpt = OsgiUtil.getOptCfg(cc.getProperties(), AWS_S3_BUCKET_CONFIG);
+      if (defaultBucketNameOpt.isSome()) {
+        orgBucketNameMap.put(DEFAULT_ORG_KEY, defaultBucketNameOpt.get());
+        logger.info("AWS S3 default bucket name is {}", defaultBucketNameOpt.get());
+      }
+
+      // AWS S3 org bucket name mapping
+      Collections.list(cc.getProperties().keys()).stream()
+          .filter(s -> s.startsWith(AWS_S3_BUCKET_CONFIG_PREFIX))
+          .forEach(s -> {
+            String orgId = s.substring(AWS_S3_BUCKET_CONFIG_PREFIX.length());
+            String bucketName = OsgiUtil.getComponentContextProperty(cc, s);
+            orgBucketNameMap.put(orgId, bucketName);
+          });
 
       // AWS region
       String regionStr = getAWSConfigKey(cc, AWS_S3_REGION_CONFIG);
@@ -502,6 +519,8 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
     // Use TransferManager to take advantage of multipart upload.
     // TransferManager processes all transfers asynchronously, so this call will return immediately.
     try {
+      String orgId = securityService.getOrganization().getId();
+      String bucketName = getBucketName(orgId);
       String objectName = buildObjectName(channelId, mediaPackage.getIdentifier().toString(), element);
       logger.info("Uploading {} to bucket {}...", objectName, bucketName);
       Upload upload = s3TransferManager.upload(bucketName, objectName, source);
@@ -654,6 +673,8 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
     notNull(element, "element");
 
     try {
+      String orgId = securityService.getOrganization().getId();
+      String bucketName = getBucketName(orgId);
       String objectName = getDistributedObjectName(element);
       if (objectName != null) {
         s3.deleteObject(bucketName, objectName);
@@ -918,42 +939,48 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
    * Creates the AWS S3 bucket if it doesn't exist yet.
    */
   protected void createAWSBucket() {
-    // Does bucket exist?
-    try {
-      s3.listObjects(bucketName);
-    } catch (AmazonServiceException e) {
-      if (e.getStatusCode() == 404) {
-        // Create the bucket
-        try {
-          s3.createBucket(bucketName);
-          // Allow public read
-          Statement allowPublicReadStatement = new Statement(Statement.Effect.Allow).withPrincipals(Principal.AllUsers)
-                  .withActions(S3Actions.GetObject).withResources(new S3ObjectResource(bucketName, "*"));
-          Policy policy = new Policy().withStatements(allowPublicReadStatement);
-          s3.setBucketPolicy(bucketName, policy.toJson());
+    orgBucketNameMap.forEach((org, bucketName) -> {
+      // Does bucket exist?
+      try {
+        s3.listObjects(bucketName);
+      } catch (AmazonServiceException e) {
+        if (e.getStatusCode() == 404) {
+          // Create the bucket
+          try {
+            s3.createBucket(bucketName);
+            // Allow public read
+            Statement allowPublicReadStatement = new Statement(Statement.Effect.Allow)
+                .withPrincipals(Principal.AllUsers)
+                .withActions(S3Actions.GetObject)
+                .withResources(new S3ObjectResource(bucketName, "*"));
+            Policy policy = new Policy().withStatements(allowPublicReadStatement);
+            s3.setBucketPolicy(bucketName, policy.toJson());
 
-          // Set the website configuration. This needs to be static-site-enabled currently.
-          BucketWebsiteConfiguration defaultWebsite = new BucketWebsiteConfiguration();
-          // These files don't actually exist, but that doesn't matter since no one should be looking around in the
-          // bucket anyway.
-          defaultWebsite.setIndexDocumentSuffix("index.html");
-          defaultWebsite.setErrorDocument("error.html");
-          s3.setBucketWebsiteConfiguration(new SetBucketWebsiteConfigurationRequest(bucketName, defaultWebsite));
-          logger.info("AWS S3 bucket {} created", bucketName);
-        } catch (Exception e2) {
-          throw new ConfigurationException("Bucket " + bucketName + " cannot be created: " + e2.getMessage(), e2);
+            // Set the website configuration. This needs to be static-site-enabled currently.
+            BucketWebsiteConfiguration defaultWebsite = new BucketWebsiteConfiguration();
+            // These files don't actually exist, but that doesn't matter since no one should be looking around in the
+            // bucket anyway.
+            defaultWebsite.setIndexDocumentSuffix("index.html");
+            defaultWebsite.setErrorDocument("error.html");
+            s3.setBucketWebsiteConfiguration(new SetBucketWebsiteConfigurationRequest(bucketName, defaultWebsite));
+            logger.info("AWS S3 bucket {} created", bucketName);
+          } catch (Exception e2) {
+            throw new ConfigurationException("Bucket " + bucketName + " cannot be created: " + e2.getMessage(), e2);
+          }
+        } else {
+          throw new ConfigurationException("Bucket " + bucketName + " exists, but we can't access it: "
+              + e.getMessage(), e);
         }
-      } else {
-        throw new ConfigurationException("Bucket " + bucketName + " exists, but we can't access it: " + e.getMessage(),
-                e);
       }
-    }
+    });
   }
 
   public URI presignedURI(URI uri) throws URISyntaxException {
     if (!presignedUrl) {
       return uri;
     }
+    String orgId = securityService.getOrganization().getId();
+    String bucketName = getBucketName(orgId);
     String s3UrlPrefix = s3.getUrl(bucketName, "").toString();
 
     // Only handle URIs match s3 domain and bucket
@@ -976,8 +1003,8 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
     this.s3TransferManager = s3TransferManager;
   }
 
-  protected void setBucketName(String bucketName) {
-    this.bucketName = bucketName;
+  protected void setBucketName(String orgId, String bucketName) {
+    orgBucketNameMap.put(orgId, bucketName);
   }
 
   protected void setOpencastDistributionUrl(String distributionUrl) {
@@ -992,6 +1019,18 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
     } catch (IOException e) {
       logger.info("AWS S3 bucket cannot create {} ", tmpPath);
     }
+  }
+
+  private String getBucketName(String orgId) {
+    String bucketName = orgBucketNameMap.get(orgId);
+    if (bucketName == null) {
+      // check if we have a default bucket name
+      bucketName = orgBucketNameMap.get(DEFAULT_ORG_KEY);
+      if (bucketName == null) {
+        throw new ConfigurationException("No bucket configured for organization " + orgId);
+      }
+    }
+    return bucketName;
   }
 
   @Reference
@@ -1023,5 +1062,4 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     super.setOrganizationDirectoryService(organizationDirectoryService);
   }
-
 }
