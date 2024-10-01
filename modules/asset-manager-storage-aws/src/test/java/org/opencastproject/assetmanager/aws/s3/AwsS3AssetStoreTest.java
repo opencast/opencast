@@ -136,7 +136,7 @@ public class AwsS3AssetStoreTest {
     EasyMock.replay(workspace);
 
     store = new AwsS3AssetStore();
-    store.setBucketName(BUCKET_NAME);
+    store.setBucketName(ORG_ID, BUCKET_NAME);
     store.setS3(s3Client);
     store.setS3TransferManager(s3Transfer);
     store.setWorkspace(workspace);

@@ -79,9 +79,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Dictionary;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Component(
@@ -108,6 +111,7 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
   public static final String AWS_S3_SECRET_ACCESS_KEY_CONFIG = "org.opencastproject.assetmanager.aws.s3.secret.key";
   public static final String AWS_S3_REGION_CONFIG = "org.opencastproject.assetmanager.aws.s3.region";
   public static final String AWS_S3_BUCKET_CONFIG = "org.opencastproject.assetmanager.aws.s3.bucket";
+  public static final String AWS_S3_BUCKET_CONFIG_PREFIX = "org.opencastproject.assetmanager.aws.s3.bucket.";
   public static final String AWS_S3_ENDPOINT_CONFIG = "org.opencastproject.assetmanager.aws.s3.endpoint";
   public static final String AWS_S3_PATH_STYLE_CONFIG = "org.opencastproject.assetmanager.aws.s3.path.style";
   public static final String AWS_S3_MAX_CONNECTIONS = "org.opencastproject.assetmanager.aws.s3.max.connections";
@@ -124,12 +128,14 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
 
   public static final long DOWNLOAD_URL_EXPIRATION_MS = 30 * 60 * 1000; // 30 min
 
+  public static final String DEFAULT_ORG_KEY = "*";
+
   /** The AWS client and transfer manager */
   private AmazonS3 s3 = null;
   private TransferManager s3TransferManager = null;
 
-  /** The AWS S3 bucket name */
-  private String bucketName = null;
+  /** The AWS S3 org to bucket name mapping */
+  private Map<String, String> orgBucketNameMap = new HashMap<>();
 
   private String endpoint = null;
 
@@ -180,9 +186,21 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
       }
       logger.info("{} is: {}", AssetStore.STORE_TYPE_PROPERTY, storeType);
 
-      // AWS S3 bucket name
-      bucketName = getAWSConfigKey(cc, AWS_S3_BUCKET_CONFIG);
-      logger.info("AWS S3 bucket name is {}", bucketName);
+      // AWS S3 default bucket name
+      Option<String> defaultBucketNameOpt = OsgiUtil.getOptCfg(cc.getProperties(), AWS_S3_BUCKET_CONFIG);
+      if (defaultBucketNameOpt.isSome()) {
+        orgBucketNameMap.put(DEFAULT_ORG_KEY, defaultBucketNameOpt.get());
+        logger.info("AWS S3 default bucket name is {}", defaultBucketNameOpt.get());
+      }
+
+      // AWS S3 org bucket name mapping
+      Collections.list(cc.getProperties().keys()).stream()
+          .filter(s -> s.startsWith(AWS_S3_BUCKET_CONFIG_PREFIX))
+          .forEach(s -> {
+            String orgId = s.substring(AWS_S3_BUCKET_CONFIG_PREFIX.length());
+            String bucketName = OsgiUtil.getComponentContextProperty(cc, s);
+            orgBucketNameMap.put(orgId, bucketName);
+          });
 
       // AWS region
       regionName = getAWSConfigKey(cc, AWS_S3_REGION_CONFIG);
@@ -252,43 +270,47 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
    * Creates the AWS S3 bucket if it doesn't exist yet.
    */
   void createAWSBucket() {
-    // Does bucket exist?
-    try {
-      s3.listObjects(bucketName);
-    } catch (AmazonServiceException e) {
-      if (e.getStatusCode() == 404) {
-        // Create the bucket
-        try {
-          s3.createBucket(bucketName);
-          // Enable versioning
-          BucketVersioningConfiguration configuration = new BucketVersioningConfiguration().withStatus("Enabled");
-          SetBucketVersioningConfigurationRequest configRequest = new SetBucketVersioningConfigurationRequest(
-                  bucketName, configuration);
-          s3.setBucketVersioningConfiguration(configRequest);
-          logger.info("AWS S3 ARCHIVE bucket {} created and versioning enabled", bucketName);
-        } catch (Exception e2) {
-          throw new IllegalStateException(
-              "ARCHIVE bucket " + bucketName + " cannot be created: " + e2.getMessage(), e2);
+    orgBucketNameMap.forEach((org, bucketName) -> {
+      // Does bucket exist?
+      try {
+        s3.listObjects(bucketName);
+      } catch (AmazonServiceException e) {
+        if (e.getStatusCode() == 404) {
+          // Create the bucket
+          try {
+            s3.createBucket(bucketName);
+            // Enable versioning
+            BucketVersioningConfiguration configuration = new BucketVersioningConfiguration().withStatus("Enabled");
+            SetBucketVersioningConfigurationRequest configRequest = new SetBucketVersioningConfigurationRequest(
+                    bucketName, configuration);
+            s3.setBucketVersioningConfiguration(configRequest);
+            logger.info("AWS S3 ARCHIVE bucket {} created and versioning enabled", bucketName);
+          } catch (Exception e2) {
+            throw new IllegalStateException(
+                "ARCHIVE bucket " + bucketName + " cannot be created: " + e2.getMessage(), e2);
+          }
+        } else {
+          throw new IllegalStateException("ARCHIVE bucket " + bucketName + " exists, but we can't access it: "
+                  + e.getMessage(), e);
         }
-      } else {
-        throw new IllegalStateException("ARCHIVE bucket " + bucketName + " exists, but we can't access it: "
-                + e.getMessage(), e);
       }
-    }
-    // Bucket already existed or was just created
-    bucketCreated = true;
+      // Bucket already existed or was just created
+      bucketCreated = true;
+    });
   }
 
   /**
    * Returns the aws s3 object id created by aws
    */
   @Override
-  protected AwsUploadOperationResult uploadObject(File origin, String objectName, Optional<MimeType> mimeType)
-          throws AssetStoreException {
+  protected AwsUploadOperationResult uploadObject(String orgId, File origin, String objectName,
+          Optional<MimeType> mimeType) throws AssetStoreException {
     // Check first if bucket is there.
     if (!bucketCreated) {
       createAWSBucket();
     }
+
+    String bucketName = getBucketName(orgId);
 
     // Upload file to AWS S3
     // Use TransferManager to take advantage of multipart upload.
@@ -356,11 +378,12 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
     if (!contains(storagePath)) {
       return "NONE";
     }
-    return getObjectStorageClass(getAssetObjectKey(storagePath));
+    return getObjectStorageClass(storagePath.getOrganizationId(), getAssetObjectKey(storagePath));
   }
 
-  private String getObjectStorageClass(String objectName) throws AssetStoreException {
+  private String getObjectStorageClass(String orgId, String objectName) throws AssetStoreException {
     try {
+      String bucketName = getBucketName(orgId);
       String storageClass = s3.getObjectMetadata(bucketName, objectName).getStorageClass();
       return storageClass == null ? StorageClass.Standard.toString() : storageClass;
     } catch (SdkClientException e) {
@@ -378,21 +401,22 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
     try {
       StorageClass storageClass = StorageClass.fromValue(storageClassId);
       AwsAssetMapping map = database.findMapping(storagePath);
-      return modifyObjectStorageClass(map.getObjectKey(), storageClass).toString();
+      return modifyObjectStorageClass(map.getOrganizationId(), map.getObjectKey(), storageClass).toString();
     } catch (AwsAssetDatabaseException | IllegalArgumentException e) {
       throw new AssetStoreException(e);
     }
   }
 
-  private StorageClass modifyObjectStorageClass(String objectName, StorageClass storageClass)
+  private StorageClass modifyObjectStorageClass(String orgId, String objectName, StorageClass storageClass)
           throws AssetStoreException {
     try {
-      StorageClass objectStorageClass = StorageClass.fromValue(getObjectStorageClass(objectName));
+      StorageClass objectStorageClass = StorageClass.fromValue(getObjectStorageClass(orgId, objectName));
+      String bucketName = getBucketName(orgId);
 
       if (storageClass != objectStorageClass) {
         /* objects can only be retrieved from Glacier not moved */
         if (objectStorageClass == StorageClass.Glacier || objectStorageClass == StorageClass.DeepArchive) {
-          boolean isRestoring = isRestoring(objectName);
+          boolean isRestoring = isRestoring(orgId, objectName);
           boolean isRestored = null != s3.getObjectMetadata(bucketName, objectName).getRestoreExpirationTime();
           if (!isRestoring && !isRestored) {
             logger.warn("S3 Object {} can not be moved from storage class {} to {} without restoring the object first",
@@ -430,16 +454,17 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
    */
   @Override
   protected InputStream getObject(AwsAssetMapping map) {
-    String storageClassId = getObjectStorageClass(map.getObjectKey());
+    String storageClassId = getObjectStorageClass(map.getOrganizationId(), map.getObjectKey());
 
     if (StorageClass.Glacier.name().equals(storageClassId) || StorageClass.DeepArchive.name().equals(storageClassId)) {
       // restore object and wait until available if necessary
-      restoreGlacierObject(map.getObjectKey(), restorePeriod, true);
+      restoreGlacierObject(map.getOrganizationId(), map.getObjectKey(), restorePeriod, true);
     }
 
     try {
       // Do not use S3 object stream anymore because the S3 object needs to be closed to release
       // the http connection so create the stream using the object url (signed).
+      String bucketName = getBucketName(map.getOrganizationId());
       String objectKey = map.getObjectKey();
       Date expiration = new Date(System.currentTimeMillis() + DOWNLOAD_URL_EXPIRATION_MS);
       GeneratePresignedUrlRequest generatePresignedUrlRequest = new GeneratePresignedUrlRequest(bucketName, objectKey)
@@ -455,6 +480,7 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
   public String getAssetRestoreStatusString(StoragePath storagePath) {
     try {
       AwsAssetMapping map = database.findMapping(storagePath);
+      String bucketName = getBucketName(map.getOrganizationId());
 
       Date expirationTime = s3.getObjectMetadata(bucketName, map.getObjectKey()).getRestoreExpirationTime();
       if (expirationTime != null) {
@@ -481,13 +507,14 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
   public void initiateRestoreAsset(StoragePath storagePath, Integer assetRestorePeriod) throws AssetStoreException {
     try {
       AwsAssetMapping map = database.findMapping(storagePath);
-      restoreGlacierObject(map.getObjectKey(), assetRestorePeriod, false);
+      restoreGlacierObject(map.getOrganizationId(), map.getObjectKey(), assetRestorePeriod, false);
     } catch (AwsAssetDatabaseException | IllegalArgumentException e) {
       throw new AssetStoreException(e);
     }
   }
 
-  private boolean isRestoring(String objectName) {
+  private boolean isRestoring(String orgId, String objectName) {
+    String bucketName = getBucketName(orgId);
     Boolean prevOngoingRestore = s3.getObjectMetadata(bucketName, objectName).getOngoingRestore();
     //FIXME: prevOngoingRestore is null when the object isn't being restored for some reason
     // The javadocs for getOngoingRestore don't say anything about retuning null, and it doesn't make a ton of sense
@@ -500,9 +527,10 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
     return false;
   }
 
-  private void restoreGlacierObject(String objectName, Integer objectRestorePeriod, Boolean wait) {
+  private void restoreGlacierObject(String orgId, String objectName, Integer objectRestorePeriod, Boolean wait) {
+    String bucketName = getBucketName(orgId);
     boolean newRestore = false;
-    if (isRestoring(objectName)) {
+    if (isRestoring(orgId, objectName)) {
       if (!wait) {
         return;
       }
@@ -544,12 +572,24 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
     }
   }
 
+  private String getBucketName(String orgId) {
+    String bucketName = orgBucketNameMap.get(orgId);
+    if (bucketName == null) {
+      // check if we have a default bucket name
+      bucketName = orgBucketNameMap.get(DEFAULT_ORG_KEY);
+      if (bucketName == null) {
+        throw new ConfigurationException("No bucket configured for organization " + orgId);
+      }
+    }
+    return bucketName;
+  }
 
   /**
   *
   */
   @Override
   protected void deleteObject(AwsAssetMapping map) {
+    String bucketName = getBucketName(map.getOrganizationId());
     s3.deleteObject(bucketName, map.getObjectKey());
   }
 
@@ -566,8 +606,7 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
     this.s3TransferManager = s3TransferManager;
   }
 
-  void setBucketName(String bucketName) {
-    this.bucketName = bucketName;
+  void setBucketName(String orgId, String bucketName) {
+    orgBucketNameMap.put(orgId, bucketName);
   }
-
 }
