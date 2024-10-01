@@ -281,9 +281,7 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
         var rolesClaim = jwt.getClaim("roles");
         if (rolesClaim != null && !rolesClaim.isNull()) {
           for (String r : rolesClaim.asArray(String.class)) {
-            if (!r.isBlank()) {
-              addRole.accept("ROLE_" + r);
-            }
+            addRole.accept(r);
           }
         }
       } catch (JWTDecodeException e) {

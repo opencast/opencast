@@ -39,7 +39,7 @@ This schema is designed to be flexible and support all current and conceivable f
     "email": "jose@example.com",
 
     // Authorization, i.e. privileges the request/user should have
-    "roles": ["STUDIO", "API_EVENTS_VIEW"], // without `ROLE_` prefix
+    "roles": ["ROLE_STUDIO", "ROLE_API_EVENTS_VIEW"],
     "oc": [
         "read+customaction:e:d622b861-4264-4947-8db1-c754c5956433",
         "write:s:4ed02421-144c-42a1-b98a-22e84f3ac691"
@@ -61,7 +61,7 @@ A claim being "required" means that the JWT provider (e.g. Tobira, LMS) has to i
     - `email`: string.
 
 - *Authorization*: at least one of these claims has to be set, as otherwise no privileges are granted (which is the same as not sending a JWT at all).
-    - `roles`: array of strings, specifying roles to grant to the request/user directly. The `ROLE_` prefix must be omitted as Opencast adds it itself.
+    - `roles`: array of strings, specifying roles to grant to the request/user directly.
     - `oc`: array of strings, grants access to single items in Opencast. The custom syntax is terse in order to keep JWTs as small as possible. Each string consists of three parts, which are separated by a colon (`:`):
         - *Action(s)*: the first part specifies what actions are granted, corresponding to actions in the OC ACLs, e.g. `read` and `write`. Multiple actions can be specified by joining them with `+`. To keep the syntax unambigious, actions cannot contain `:` or `+` (ideally they are ASCII alphabetic only!). To further preserve space, some actions imply others:
             - `write` implies `read` access
@@ -96,7 +96,7 @@ An external application wants to let a user use Opencast Studio to record and up
     "username": "peter",
     "name": "Peter Lustig",
     "email": "peter@example.com",
-    "roles": ["STUDIO"]
+    "roles": ["ROLE_STUDIO"]
 }
 ```
 
