@@ -19,6 +19,7 @@
     <feature>scr</feature>
     <feature>cxf-jaxrs</feature>
     <feature>cxf-http-jetty</feature>
+    <feature>war</feature>
 
     <!-- httpclient needs to start before common so that it can get org.apache.commons.logging -->
     <bundle start-level="55">mvn:org.apache.httpcomponents/httpclient-osgi/${httpcomponents-httpclient.version}</bundle>
@@ -727,6 +728,35 @@
       <condition>opencast-adminpresentation</condition>
     </conditional>
     <bundle start-level="82">mvn:org.opencastproject/opencast-admin-ui-frontend/${project.version}</bundle>
+  </feature>
+
+  <feature name="opencast-graphql-tp" version="${project.version}">
+    <!-- graphql -->
+    <bundle dependency="true">wrap:mvn:com.graphql-java/java-dataloader/3.2.2$Bundle-SymbolicName=java-dataloader&amp;Bundle-Version=3.2.2</bundle>
+    <bundle dependency="true">mvn:com.graphql-java/graphql-java/${graphql.version}</bundle>
+    <bundle dependency="true">mvn:io.github.graphql-java/graphql-java-annotations/${graphql-annotations.version}</bundle>
+    <bundle dependency="true">wrap:mvn:com.graphql-java/graphql-java-extended-scalars/21.0$Bundle-SymbolicName=graphql-java-extended-scalars&amp;Bundle-Version=21.0</bundle>
+    <bundle dependency="true">mvn:com.github.ben-manes.caffeine/caffeine/3.1.8</bundle>
+
+    <!-- graphql transitive dependencies -->
+    <bundle dependency="true">mvn:org.antlr/antlr4-runtime/4.7.2</bundle>
+    <bundle dependency="true">mvn:com.fasterxml.jackson.datatype/jackson-datatype-jdk8/${jackson.version}</bundle>
+    <bundle dependency="true">mvn:com.fasterxml.jackson.datatype/jackson-datatype-jsr310/${jackson.version}</bundle>
+    <bundle dependency="true">mvn:org.reactivestreams/reactive-streams/1.0.4</bundle>
+    <bundle dependency="true">mvn:commons-beanutils/commons-beanutils/1.9.4</bundle>
+    <bundle dependency="true">mvn:commons-collections/commons-collections/3.2.2</bundle>
+    <bundle dependency="true">mvn:javax.validation/validation-api/1.1.0.Final</bundle>
+  </feature>
+
+  <feature name="opencast-plugin-graphql" version="${project.version}">
+    <conditional>
+      <condition>opencast-allinone</condition>
+      <condition>opencast-admin</condition>
+      <condition>opencast-adminpresentation</condition>
+    </conditional>
+    <feature>opencast-graphql-tp</feature>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-graphql/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-graphql-ui/${project.version}</bundle>
   </feature>
 
   <feature name="opencast-pluginmanager" version="${project.version}">

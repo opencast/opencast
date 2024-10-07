@@ -132,6 +132,7 @@
               <feature>opencast-plugin-userdirectory-studip</feature>
               <feature>opencast-plugin-userdirectory-brightspace</feature>
               <feature>opencast-plugin-usertracking</feature>
+              <feature>opencast-plugin-graphql</feature>
             </installedFeatures>
           </configuration>
         </plugin>

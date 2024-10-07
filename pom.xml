@@ -32,6 +32,9 @@
     <failureaccess.version>1.0.1</failureaccess.version>
     <freemarker.version>2.3.32</freemarker.version>
     <functional.version>1.4.2</functional.version>
+    <graphql.version>21.5</graphql.version>
+    <graphql-annotations.version>21.5</graphql-annotations.version>
+    <graphql-java-extended-scalars.version>21.0</graphql-java-extended-scalars.version>
     <gson.version>2.10.1</gson.version>
     <guava.version>33.3.0-jre</guava.version>
     <failureaccess.version>1.0.2</failureaccess.version>
@@ -58,6 +61,8 @@
     <org.osgi.service.http.version>1.2.2</org.osgi.service.http.version>
     <org.osgi.service.http.whiteboard.version>1.1.1</org.osgi.service.http.whiteboard.version>
     <org.osgi.service.jaxrs.version>1.0.1</org.osgi.service.jaxrs.version>
+    <org.osgi.service.configurator.version>1.0.1</org.osgi.service.configurator.version>
+    <org.osgi.service.metatype.annotations.version>1.4.1</org.osgi.service.metatype.annotations.version>
     <querydsl.version>3.7.4</querydsl.version>
     <rest-assured.version>4.4.0</rest-assured.version>
     <spring.version>3.1.4.RELEASE</spring.version>
@@ -139,6 +144,8 @@
     <module>modules/execute-workflowoperation</module>
     <module>modules/external-api</module>
     <module>modules/fileupload</module>
+    <module>modules/graphql</module>
+    <module>modules/graphql-ui</module>
     <module>modules/hello-world-api</module>
     <module>modules/hello-world-impl</module>
     <module>modules/hello-world-workflowoperation</module>
@@ -885,6 +892,18 @@
       </dependency>
       <dependency>
         <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.service.metatype.annotations</artifactId>
+        <version>${org.osgi.service.metatype.annotations.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.service.configurator</artifactId>
+        <version>${org.osgi.service.configurator.version}</version>
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.osgi</groupId>
         <artifactId>org.osgi.service.jaxrs</artifactId>
         <version>${org.osgi.service.jaxrs.version}</version>
       </dependency>
@@ -1337,6 +1356,16 @@
         <version>${jackson.version}</version>
       </dependency>
       <dependency>
+        <groupId>com.fasterxml.jackson.module</groupId>
+        <artifactId>jackson-module-jaxb-annotations</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.datatype</groupId>
+        <artifactId>jackson-datatype-jsr310</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.apache.servicemix.bundles</groupId>
         <artifactId>org.apache.servicemix.bundles.aws-java-sdk</artifactId>
         <version>${aws.version}</version>
@@ -1371,6 +1400,26 @@
             <artifactId>stax-api</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>com.graphql-java</groupId>
+        <artifactId>graphql-java</artifactId>
+        <version>${graphql.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.github.graphql-java</groupId>
+        <artifactId>graphql-java-annotations</artifactId>
+        <version>${graphql-annotations.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.graphql-java</groupId>
+        <artifactId>graphql-java-extended-scalars</artifactId>
+        <version>${graphql-java-extended-scalars.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.github.ben-manes.caffeine</groupId>
+        <artifactId>caffeine</artifactId>
+        <version>3.1.8</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

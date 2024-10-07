@@ -266,6 +266,15 @@
     <sec:intercept-url pattern="/api/series/*/metadata/*" method="DELETE" access="ROLE_ADMIN, ROLE_API_SERIES_METADATA_DELETE"/>
     <sec:intercept-url pattern="/api/workflows/*" method="DELETE" access="ROLE_ADMIN, ROLE_API_WORKFLOW_INSTANCE_DELETE"/>
 
+    <!-- GraphQL -->
+    <sec:intercept-url pattern="/graphql" method="POST" access="ROLE_ANONYMOUS"/>
+    <sec:intercept-url pattern="/graphql" method="GET" access="ROLE_ANONYMOUS"/>
+    <sec:intercept-url pattern="/graphql" method="OPTIONS" access="ROLE_ANONYMOUS"/>
+    <sec:intercept-url pattern="/graphql/schema.json" method="GET" access="ROLE_ANONYMOUS"/>
+
+    <!-- GraphQL UI -->
+    <sec:intercept-url pattern="/graphql-ui/*" access="ROLE_ANONYMOUS"/>
+
     <!-- Enable anonymous access to the admin ui -->
     <sec:intercept-url pattern="/admin-ng/fonts/**" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/admin-ng/img/**" access="ROLE_ANONYMOUS" />

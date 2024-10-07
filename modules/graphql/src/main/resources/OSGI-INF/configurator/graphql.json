@@ -1,0 +1,14 @@
+{
+  ":configurator:resource-version" : 1,
+  ":configurator:symbolic-name" : "org.opencastproject.graphql.config",
+  "org.opencastproject.graphql": {
+    "event.preview.subtype:String": "preview"
+  },
+  "org.opencastproject.graphql.execution.ExecutionService": {
+    "execution.max.query.complexity:Integer": 1000,
+    "execution.max.query.depth:Integer": 25
+  },
+  "org.opencastproject.graphql.schema.SchemaService": {
+    "schema.update.trigger.delay:Integer": 2000
+  }
+}
