@@ -3,10 +3,6 @@
 
   <id>partial-theming-title-slide</id>
   <title>Theme title slide</title>
-  <tags/>
-  <description/>
-  <configuration_panel/>
-  <configuration_panel_json/>
   <operations>
 
     <!-- Create a title slide video if theme has active title slide -->

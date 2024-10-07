@@ -3,10 +3,6 @@
 
   <id>partial-publish</id>
   <title>Publish the recording</title>
-  <tags/>
-  <description/>
-  <configuration_panel/>
-  <configuration_panel_json/>
   <operations>
 
     <operation

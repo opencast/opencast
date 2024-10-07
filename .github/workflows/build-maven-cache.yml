@@ -39,10 +39,6 @@ jobs:
             tar \
             unzip
 
-      - name: prepare build
-        run: |
-          sed -i 's/build --skipTests=${skipTests}/build --skipTests=true/' modules/admin-ui-frontend/pom.xml
-
       - name: build opencast
         run: |
           mvn clean install -Pdev \

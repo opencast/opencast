@@ -3,10 +3,6 @@
 
   <id>partial-theming-watermark</id>
   <title>Render watermark into trimmed video</title>
-  <tags/>
-  <description/>
-  <configuration_panel/>
-  <configuration_panel_json/>
   <operations>
 
     <!-- Replace trimmed with branded variants -->

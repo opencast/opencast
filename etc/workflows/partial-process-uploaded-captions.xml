@@ -2,9 +2,6 @@
 <definition xmlns="http://workflow.opencastproject.org">
   <id>partial-process-uploaded-captions</id>
   <title>Process uploaded captions</title>
-  <tags/>
-  <description/>
-  <configuration_panel/>
 
   <operations>
 

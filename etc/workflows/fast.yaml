@@ -8,11 +8,6 @@ displayOrder: 100
 description: |-
   A minimal workflow that transcodes media into distribution formats,
   then publishes the resulting distribution files, along with their associated metadata.
-configuration_panel: |-
-  <div id="workflow-configuration">
-     <input id="straightToPublishing" name="straightToPublishing" type="checkbox" class="configField" value="true" checked=checked />
-     <label for="straightToPublishing">Straight to publishing</label>
-  </div>
 configuration_panel_json: |-
   [{
     "fieldset": [

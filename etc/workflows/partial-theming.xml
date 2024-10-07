@@ -5,8 +5,6 @@
   <title>Run theming operations on trimmed videos</title>
   <tags/>
   <description/>
-  <configuration_panel/>
-  <configuration_panel_json/>
   <operations>
 
     <!-- Apply the theme to the mediapackage -->
