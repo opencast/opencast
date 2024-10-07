@@ -4,13 +4,7 @@ Frontends
 Opencast boasts multiple graphical user interfaces for different purposes, living in different modules or even projects.
 The following is a brief overview.
 
-### Admin UI
-- Lives in the `admin-ui-frontend` module.
-- The main frontend for managing Opencast.
-- Was the default admin UI up until 15.0
-- Style guide can be found [here](./admin-ui/development.md).
-
-### New Admin UI
+### Admin Interface
 - Lives in its [own GitHub repository](https://github.com/opencast/opencast-admin-interface). Builds end up in the
   `admin-ui-interface` module.
 - Will eventually become and replace the (old) Admin UI.
