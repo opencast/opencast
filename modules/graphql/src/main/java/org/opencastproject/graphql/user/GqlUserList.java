@@ -21,9 +21,7 @@
 
 package org.opencastproject.graphql.user;
 
-import static org.opencastproject.userdirectory.UserIdRoleProvider.getUserIdRole;
-
-import org.opencastproject.security.api.Role;
+import org.opencastproject.graphql.type.output.OffsetPageInfo;
 import org.opencastproject.security.api.User;
 
 import java.util.List;
@@ -34,53 +32,51 @@ import graphql.annotations.annotationTypes.GraphQLField;
 import graphql.annotations.annotationTypes.GraphQLName;
 import graphql.annotations.annotationTypes.GraphQLNonNull;
 
-@GraphQLName(GqlUser.TYPE_NAME)
-public class GqlUser {
+@GraphQLName(GqlUserList.TYPE_NAME)
+@GraphQLNonNull
+@GraphQLDescription("A list of users")
+public class GqlUserList {
 
-  public static final String TYPE_NAME = "User";
+  public static final String TYPE_NAME = "UserList";
 
-  private final User user;
+  private final List<User> searchResult;
 
-  public GqlUser(User user) {
-    this.user = user;
+  private final Long totalCount;
+
+  private final Long offset;
+
+  private final Long limit;
+
+  public GqlUserList(List<User> searchResult) {
+    this(searchResult, null, 0L, 1000L);
   }
 
-  @GraphQLField
-  public String username() {
-    return user.getUsername();
-  }
-
-  @GraphQLField
-  public String name() {
-    return user.getName();
-  }
-
-  @GraphQLField
-  public String email() {
-    return user.getEmail();
-  }
-
-  @GraphQLField
-  public String provider() {
-    return user.getProvider();
+  public GqlUserList(List<User> searchResult, Long totalCount, Long offset, Long limit) {
+    this.searchResult = searchResult;
+    this.totalCount = totalCount;
+    this.offset = offset;
+    this.limit = limit;
   }
 
   @GraphQLField
   @GraphQLNonNull
-  @GraphQLDescription("A list of roles assigned to the user.")
-  public List<String> roles() {
-    return user.getRoles().stream().map(Role::getName).collect(Collectors.toList());
+  public Long totalCount() {
+    return this.totalCount;
   }
 
   @GraphQLField
   @GraphQLNonNull
-  @GraphQLDescription("The role of the user.")
-  public String userRole() {
-    return getUserIdRole(user.getUsername());
+  public OffsetPageInfo pageInfo() {
+    var pageCount = totalCount == null ? searchResult.size() : ((totalCount + limit - 1) / limit);
+    return new OffsetPageInfo(pageCount, limit, offset);
   }
 
-  public User getUser() {
-    return user;
+  @GraphQLField
+  @GraphQLNonNull
+  public List<GqlUser> nodes() {
+    return searchResult.stream()
+        .map(GqlUser::new)
+        .collect(Collectors.toList());
   }
 
 }

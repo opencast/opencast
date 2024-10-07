@@ -22,10 +22,12 @@
 package org.opencastproject.graphql.user;
 
 import org.opencastproject.graphql.datafetcher.user.CurrentUserDataFetcher;
+import org.opencastproject.graphql.datafetcher.user.UserOffsetDataFetcher;
 import org.opencastproject.graphql.type.output.Query;
 
 import graphql.annotations.annotationTypes.GraphQLDescription;
 import graphql.annotations.annotationTypes.GraphQLField;
+import graphql.annotations.annotationTypes.GraphQLName;
 import graphql.annotations.annotationTypes.GraphQLNonNull;
 import graphql.annotations.annotationTypes.GraphQLTypeExtension;
 import graphql.schema.DataFetchingEnvironment;
@@ -45,5 +47,15 @@ public final class UserQueryExtension {
     return new CurrentUserDataFetcher().get(environment);
   }
 
+  @GraphQLField
+  @GraphQLNonNull
+  @GraphQLDescription("Search for users")
+  public static GqlUserList searchUser(
+      @GraphQLName("limit") Integer limit,
+      @GraphQLName("offset") Integer offset,
+      @GraphQLName("query") String query,
+      final DataFetchingEnvironment environment) {
+    return new UserOffsetDataFetcher().withFilter(query).get(environment);
+  }
 
 }
