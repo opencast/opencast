@@ -28,6 +28,14 @@
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.service.cm</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.jaxrs</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.swagger.core.v3</groupId>
+      <artifactId>swagger-annotations</artifactId>
+    </dependency>
     <!-- opencast -->
     <dependency>
       <groupId>org.opencastproject</groupId>
@@ -269,11 +277,6 @@
               javax.ws.rs.core;version=2.0.1,
               *
             </Import-Package>
-            <Private-Package>
-              org.opencastproject.external.exception,
-              org.opencastproject.external.util,
-              org.opencastproject.external.util.statistics
-            </Private-Package>
             <Export-Package>
               org.opencastproject.external.api,
               org.opencastproject.external.common,

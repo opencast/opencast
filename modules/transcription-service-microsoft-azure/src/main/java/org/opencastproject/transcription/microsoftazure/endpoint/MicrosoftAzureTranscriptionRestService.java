@@ -30,12 +30,13 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.Path;
 
-@Path("/")
+@Path("/transcripts/microsoftazure")
 @RestService(
       name = "MicrosoftAzureTranscriptionRestService",
       title = "Transcription Service REST Endpoint (uses Microsoft Azure services)",
@@ -54,6 +55,7 @@ import javax.ws.rs.Path;
               "opencast.service.jobproducer=true"
       }
 )
+@JaxrsResource
 public class MicrosoftAzureTranscriptionRestService extends AbstractJobProducerEndpoint {
 
   /**

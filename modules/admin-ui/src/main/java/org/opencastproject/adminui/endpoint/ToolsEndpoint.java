@@ -117,6 +117,7 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -154,7 +155,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBException;
 
-@Path("/")
+@Path("/admin-ng/tools")
 @RestService(name = "toolsService", title = "Tools API Service",
   abstractText = "Provides a location for the tools API.",
   notes = { "This service provides a location for the tools API for the admin UI.",
@@ -171,6 +172,7 @@ import javax.xml.bind.JAXBException;
                 "opencast.service.path=/admin-ng/tools",
         }
 )
+@JaxrsResource
 public class ToolsEndpoint {
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ToolsEndpoint.class);

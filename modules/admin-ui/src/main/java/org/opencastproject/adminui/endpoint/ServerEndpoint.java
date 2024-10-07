@@ -43,6 +43,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +67,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("/")
+@Path("/admin-ng/server")
 @RestService(name = "ServerProxyService", title = "UI Servers",
   abstractText = "This service provides the server data for the UI.",
   notes = { "These Endpoints deliver informations about the server required for the UI.",
@@ -83,6 +84,7 @@ import javax.ws.rs.core.Response;
     "opencast.service.path=/admin-ng/server"
   }
 )
+@JaxrsResource
 public class ServerEndpoint {
 
   private static final Gson gson = new Gson();

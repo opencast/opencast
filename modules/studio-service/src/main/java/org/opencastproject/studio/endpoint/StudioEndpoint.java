@@ -40,6 +40,7 @@ import com.google.gson.GsonBuilder;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +56,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("/")
+@Path("/studio-api")
 @RestService(
     name = "studioservice",
     title = "Studio REST Endpoint",
@@ -79,6 +80,7 @@ import javax.ws.rs.core.Response;
         "opencast.service.path=/studio-api"
     }
 )
+@JaxrsResource
 public class StudioEndpoint {
 
   private static final Logger logger = LoggerFactory.getLogger(StudioEndpoint.class);

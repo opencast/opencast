@@ -50,6 +50,7 @@ import org.json.simple.JSONObject;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -71,7 +72,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("/")
+@Path("/admin-ng/services")
 @RestService(name = "ServicesProxyService", title = "UI Services",
   abstractText = "This service provides the services data for the UI.",
   notes = { "These Endpoints deliver informations about the services required for the UI.",
@@ -88,6 +89,7 @@ import javax.ws.rs.core.Response;
     "opencast.service.path=/admin-ng/services"
   }
 )
+@JaxrsResource
 public class ServicesEndpoint {
   private static final Logger logger = LoggerFactory.getLogger(ServicesEndpoint.class);
   private ServiceRegistry serviceRegistry;

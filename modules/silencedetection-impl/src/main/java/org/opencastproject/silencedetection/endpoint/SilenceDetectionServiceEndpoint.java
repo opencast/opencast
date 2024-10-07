@@ -36,6 +36,7 @@ import org.opencastproject.util.doc.rest.RestService;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 
 import java.util.List;
 
@@ -50,7 +51,7 @@ import javax.ws.rs.core.Response;
 /**
  * SilenceDetectionService REST Endpoint.
  */
-@Path("/")
+@Path("/silencedetection")
 @RestService(
     name = "SilenceDetectionServiceEndpoint",
     title = "Silence Detection Service REST Endpoint",
@@ -67,6 +68,7 @@ import javax.ws.rs.core.Response;
     immediate = true,
     service = SilenceDetectionServiceEndpoint.class
 )
+@JaxrsResource
 public class SilenceDetectionServiceEndpoint extends AbstractJobProducerEndpoint {
 
   private SilenceDetectionService silenceDetectionService;

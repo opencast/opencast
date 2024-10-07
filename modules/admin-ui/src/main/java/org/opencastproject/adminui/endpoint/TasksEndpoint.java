@@ -57,6 +57,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,7 +77,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-@Path("/")
+@Path("/admin-ng/tasks")
 @RestService(name = "TasksService", title = "UI Tasks",
   abstractText = "Provides resources and operations related to the tasks",
   notes = { "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
@@ -98,6 +99,7 @@ import javax.ws.rs.core.Response.Status;
     "opencast.service.path=/admin-ng/tasks"
   }
 )
+@JaxrsResource
 public class TasksEndpoint {
 
   private static final Logger logger = LoggerFactory.getLogger(TasksEndpoint.class);

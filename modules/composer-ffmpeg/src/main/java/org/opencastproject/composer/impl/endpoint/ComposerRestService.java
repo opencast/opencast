@@ -59,6 +59,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,7 +82,7 @@ import javax.ws.rs.core.Response;
 /**
  * A REST endpoint delegating functionality to the {@link ComposerService}
  */
-@Path("/")
+@Path("/composer/ffmpeg")
 @RestService(name = "composer", title = "Composer", abstractText = "This service creates and augments Opencast media packages that include media tracks, metadata "
         + "catalogs and attachments.", notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
@@ -100,6 +101,7 @@ import javax.ws.rs.core.Response;
   immediate = true,
   service = ComposerRestService.class
 )
+@JaxrsResource
 public class ComposerRestService extends AbstractJobProducerEndpoint {
 
   /** The logger */

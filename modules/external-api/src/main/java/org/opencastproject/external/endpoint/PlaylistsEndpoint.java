@@ -37,7 +37,7 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
 
 import org.opencastproject.external.common.ApiMediaType;
-import org.opencastproject.external.common.ApiResponses;
+import org.opencastproject.external.common.ApiResponseBuilder;
 import org.opencastproject.playlists.Playlist;
 import org.opencastproject.playlists.PlaylistAccessControlEntry;
 import org.opencastproject.playlists.PlaylistEntry;
@@ -160,9 +160,9 @@ public class PlaylistsEndpoint {
     try {
       Playlist playlist = service.getPlaylistById(id);
 
-      return ApiResponses.Json.ok(acceptHeader, playlistToJson(playlist));
+      return ApiResponseBuilder.Json.ok(acceptHeader, playlistToJson(playlist));
     } catch (NotFoundException e) {
-      return ApiResponses.notFound("Cannot find playlist instance with id '%s'.", id);
+      return ApiResponseBuilder.notFound("Cannot find playlist instance with id '%s'.", id);
     } catch (UnauthorizedException e) {
       return Response.status(Response.Status.FORBIDDEN).build();
     } catch (IllegalStateException e) {
@@ -224,7 +224,7 @@ public class PlaylistsEndpoint {
         .map(p -> playlistToJson(p))
         .collect(Collectors.toList());
 
-    return ApiResponses.Json.ok(acceptHeader, arr(playlistsJson));
+    return ApiResponseBuilder.Json.ok(acceptHeader, arr(playlistsJson));
   }
 
   @POST
@@ -252,7 +252,7 @@ public class PlaylistsEndpoint {
 
       // Persist
       playlist = service.update(playlist);
-      return ApiResponses.Json.created(
+      return ApiResponseBuilder.Json.created(
           acceptHeader,
           URI.create(getPlaylistUrl(playlist.getId())),
           playlistToJson(playlist)
@@ -289,7 +289,7 @@ public class PlaylistsEndpoint {
       @FormParam("playlist") String playlistText) {
     try {
       Playlist playlist = service.updateWithJson(id, playlistText);
-      return ApiResponses.Json.ok(acceptHeader, playlistToJson(playlist));
+      return ApiResponseBuilder.Json.ok(acceptHeader, playlistToJson(playlist));
     } catch (UnauthorizedException e) {
       return Response.status(Response.Status.FORBIDDEN).build();
     } catch (IOException | IllegalArgumentException e) {
@@ -318,9 +318,9 @@ public class PlaylistsEndpoint {
     try {
       Playlist playlist = service.remove(id);
 
-      return ApiResponses.Json.ok(acceptHeader, playlistToJson(playlist));
+      return ApiResponseBuilder.Json.ok(acceptHeader, playlistToJson(playlist));
     } catch (NotFoundException e) {
-      return ApiResponses.notFound("Cannot find playlist instance with id '%s'.", id);
+      return ApiResponseBuilder.notFound("Cannot find playlist instance with id '%s'.", id);
     } catch (UnauthorizedException e) {
       return Response.status(Response.Status.FORBIDDEN).build();
     }

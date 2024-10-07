@@ -76,6 +76,7 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -109,7 +110,7 @@ import javax.ws.rs.core.Response;
  * REST endpoint for Series Service.
  *
  */
-@Path("/")
+@Path("/series")
 @RestService(
     name = "seriesservice",
     title = "Series Service",
@@ -133,6 +134,7 @@ import javax.ws.rs.core.Response;
         "opencast.service.path=/series"
     }
 )
+@JaxrsResource
 public class SeriesRestService {
 
   private static final String SERIES_ELEMENT_CONTENT_TYPE_PREFIX = "series/";

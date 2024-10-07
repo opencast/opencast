@@ -38,6 +38,7 @@ import com.google.gson.Gson;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +57,7 @@ import javax.ws.rs.core.Response;
 /**
  * The REST endpoint for the adopter statistics service.
  */
-@Path("/")
+@Path("/admin-ng/adopter")
 @RestService(name = "registrationController",
         title = "Adopter Statistics Registration Service Endpoint",
         abstractText = "Rest Endpoint for the registration form.",
@@ -71,6 +72,7 @@ import javax.ws.rs.core.Response;
         "opencast.service.jobproducer=false"
     }
 )
+@JaxrsResource
 public class Controller {
 
   /** The logger */

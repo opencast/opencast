@@ -46,11 +46,12 @@
         <extensions>true</extensions>
         <configuration>
           <instructions>
-            <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
-            <Private-Package>webapp.*</Private-Package>
-            <Http-Alias>/admin-ng</Http-Alias>
+            <Http-Alias>/admin-ng-ui</Http-Alias>
             <Http-Classpath>/webapp</Http-Classpath>
             <Http-Welcome>index.html</Http-Welcome>
+            <Private-Package>
+              webapp.*
+            </Private-Package>
           </instructions>
         </configuration>
       </plugin>

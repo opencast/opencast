@@ -68,6 +68,7 @@ import org.json.simple.JSONValue;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -94,7 +95,7 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 /** REST endpoint for Incident Service. */
-@Path("/")
+@Path("/incidents")
 @RestService(name = "incidentservice", title = "Incident Service", abstractText = "This service creates, edits and retrieves and helps managing incidents.", notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
         "If the service is down or not working it will return a status 503, this means the the underlying service is "
@@ -111,6 +112,7 @@ import javax.ws.rs.core.Response.Status;
   immediate = true,
   service = { IncidentServiceEndpoint.class }
 )
+@JaxrsResource
 public class IncidentServiceEndpoint {
   /** Logging utility */
   private static final Logger logger = LoggerFactory.getLogger(IncidentServiceEndpoint.class);

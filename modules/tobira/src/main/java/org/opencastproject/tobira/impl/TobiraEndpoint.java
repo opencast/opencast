@@ -41,6 +41,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +57,7 @@ import javax.ws.rs.core.Response;
 /**
  * Tobira API Endpoint
  */
-@Path("")
+@Path("/tobira")
 @RestService(
     name = "TobiraApiEndpoint",
     title = "Tobira API Endpoint",
@@ -78,6 +79,7 @@ import javax.ws.rs.core.Response;
     immediate = true,
     service = TobiraEndpoint.class
 )
+@JaxrsResource
 public class TobiraEndpoint {
   private static final Logger logger = LoggerFactory.getLogger(TobiraEndpoint.class);
 
