@@ -241,11 +241,11 @@ class Item {
     // value being a list of roles, e.g.
     // `{ "read": ["ROLE_USER", "ROLE_FOO"], "write": [...] }`
     final var actionToRoles = new HashMap<String, ArrayList<Jsons.Val>>();
-    for (final var entry: acl) {
+    acl.stream().filter(AccessControlEntry::isAllow).forEach(entry -> {
       final var action = entry.getAction();
-      actionToRoles.putIfAbsent(action, new ArrayList());
+      actionToRoles.putIfAbsent(action, new ArrayList<>());
       actionToRoles.get(action).add(Jsons.v(entry.getRole()));
-    }
+    });
 
     final var props = actionToRoles.entrySet().stream()
         .map(e -> Jsons.p(e.getKey(), Jsons.arr(e.getValue())))
