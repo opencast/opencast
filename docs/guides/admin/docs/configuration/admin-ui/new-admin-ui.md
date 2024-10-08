@@ -10,6 +10,7 @@ Accessing Old And New Admin Interface
 -------------------------------------
 
 You can access the admin interfaces by replacing the `ng` in your address bar with `ui` and vice versa.
+Before you can use the old interface, its plugin needs to be enabled in `etc/org.opencastproject.plugin.impl.PluginManagerImpl.cfg`.
 
 - New: `/admin-ui/index.html`
 - Old: `/admin-ng/index.html`
