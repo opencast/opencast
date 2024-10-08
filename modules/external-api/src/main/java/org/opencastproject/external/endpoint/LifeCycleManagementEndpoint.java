@@ -525,6 +525,7 @@ public class LifeCycleManagementEndpoint {
         fields.add(f("actionDate", v(policy.getActionDate() != null ? toUTC(policy.getActionDate().getTime()) : null, BLANK)));
         fields.add(f("timing", enumToJSON(policy.getTiming())));
         fields.add(f("isActive", v(policy.isActive(), BLANK)));
+        fields.add(f("isCreatedFromConfig", v(policy.isCreatedFromConfig(), BLANK)));
         fields.add(f("targetFilters", v("{" + policy.getTargetFilters().keySet().stream()
             .map(key -> key + ":" + eventSearchQueryFieldToJson(policy.getTargetFilters().get(key)))
             .collect(Collectors.joining(",", "", "")) + "}",

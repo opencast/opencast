@@ -207,11 +207,8 @@ public class LifeCycleDatabaseServiceImpl implements LifeCycleDatabaseService {
   @Override
   public LifeCyclePolicy createLifeCyclePolicy(LifeCyclePolicy policy, String orgId) throws LifeCycleDatabaseException {
     try {
-      if (policy.getId() != null) {
-        throw new LifeCycleDatabaseException("Id must not be set when creating new policy");
-      }
       return db.execTx(em -> {
-        policy.setOrganization(securityService.getOrganization().getId());
+        policy.setOrganization(orgId);
         em.persist(policy);
         return policy;
       });
@@ -262,6 +259,25 @@ public class LifeCycleDatabaseServiceImpl implements LifeCycleDatabaseService {
       });
     } catch (Exception e) {
       throw new LifeCycleDatabaseException("Could not delete policy with ID '" + policy.getId() + "'", e);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see LifeCycleDatabaseService#deleteLifeCyclePolicy(LifeCyclePolicy, String)
+   */
+  @Override
+  public void deleteAllLifeCyclePoliciesCreatedByConfig(String orgId) throws LifeCycleDatabaseException {
+    try {
+      db.execTx(em -> {
+        namedQuery.delete(
+          "LifeCyclePolicy.deleteAllCreatedFromConfig",
+          Pair.of("organizationId", orgId)
+        ).apply(em);
+      });
+    } catch (Exception e) {
+      throw new LifeCycleDatabaseException("Could not delete policy created from config. ", e);
     }
   }
 

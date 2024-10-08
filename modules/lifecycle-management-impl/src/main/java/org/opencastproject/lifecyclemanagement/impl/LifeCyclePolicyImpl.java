@@ -73,6 +73,11 @@ import javax.persistence.Transient;
         name = "LifeCyclePolicy.findActive",
         query = "SELECT p FROM LifeCyclePolicy p WHERE p.isActive = true and p.organization = :organizationId"
     ),
+    @NamedQuery(
+        name = "LifeCyclePolicy.deleteAllCreatedFromConfig",
+        query = "DELETE FROM LifeCyclePolicy p WHERE p.isCreatedFromConfig = true "
+            + "and p.organization = :organizationId"
+    ),
 })
 public class LifeCyclePolicyImpl implements LifeCyclePolicy {
 
@@ -109,6 +114,9 @@ public class LifeCyclePolicyImpl implements LifeCyclePolicy {
 
   @Column(name = "isActive")
   private boolean isActive = true;
+
+  @Column(name = "isCreatedFromConfig")
+  private boolean isCreatedFromConfig = false;
 
   // JSON
   @Column(name = "targetFilters")
@@ -227,6 +235,14 @@ public class LifeCyclePolicyImpl implements LifeCyclePolicy {
 
   public void setActive(boolean active) {
     isActive = active;
+  }
+
+  public boolean isCreatedFromConfig() {
+    return isCreatedFromConfig;
+  }
+
+  public void setCreatedFromConfig(boolean createdFromConfig) {
+    isCreatedFromConfig = createdFromConfig;
   }
 
   public Map<String, EventSearchQueryField<String>> getTargetFilters() {
