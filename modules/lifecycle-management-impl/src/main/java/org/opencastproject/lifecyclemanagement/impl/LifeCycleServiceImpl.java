@@ -31,13 +31,16 @@ import org.opencastproject.elasticsearch.index.objects.event.EventIndexSchema;
 import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.elasticsearch.index.objects.event.EventSearchQueryField;
 import org.opencastproject.index.service.util.RestUtils;
+import org.opencastproject.lifecyclemanagement.api.Action;
 import org.opencastproject.lifecyclemanagement.api.LifeCycleDatabaseException;
 import org.opencastproject.lifecyclemanagement.api.LifeCycleDatabaseService;
 import org.opencastproject.lifecyclemanagement.api.LifeCyclePolicy;
 import org.opencastproject.lifecyclemanagement.api.LifeCyclePolicyAccessControlEntry;
 import org.opencastproject.lifecyclemanagement.api.LifeCycleService;
 import org.opencastproject.lifecyclemanagement.api.LifeCycleTask;
+import org.opencastproject.lifecyclemanagement.api.StartWorkflowParameters;
 import org.opencastproject.lifecyclemanagement.api.Status;
+import org.opencastproject.lifecyclemanagement.api.Timing;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AuthorizationService;
@@ -49,6 +52,9 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.requests.SortCriterion;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -76,6 +82,7 @@ import java.util.Map;
 public class LifeCycleServiceImpl implements LifeCycleService {
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(LifeCycleServiceImpl.class);
+  private static final Gson gson = new Gson();
 
   /** Persistent storage */
   protected LifeCycleDatabaseService persistence;
@@ -133,6 +140,24 @@ public class LifeCycleServiceImpl implements LifeCycleService {
 
   /**
    * {@inheritDoc}
+   * @see LifeCycleService#getLifeCyclePolicyById(String)
+   */
+  @Override
+  public LifeCyclePolicy getLifeCyclePolicyById(String id, String orgId)
+          throws NotFoundException, IllegalStateException, UnauthorizedException {
+    try {
+      LifeCyclePolicy policy = persistence.getLifeCyclePolicy(id, orgId);
+      if (!checkPermission(policy, Permissions.Action.READ)) {
+        throw new UnauthorizedException("User does not have read permissions");
+      }
+      return policy;
+    } catch (LifeCycleDatabaseException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
    * @see LifeCycleService#getLifeCyclePolicies(int, int, SortCriterion)
    */
   @Override
@@ -170,7 +195,11 @@ public class LifeCycleServiceImpl implements LifeCycleService {
   @Override
   public LifeCyclePolicy createLifeCyclePolicy(LifeCyclePolicy policy) throws UnauthorizedException {
     try {
-      policy = persistence.createLifeCyclePolicy(policy, securityService.getOrganization().getId());
+      if (policy.getOrganization() != null) {
+        policy = persistence.createLifeCyclePolicy(policy, policy.getOrganization());
+      } else {
+        policy = persistence.createLifeCyclePolicy(policy, securityService.getOrganization().getId());
+      }
       return policy;
     } catch (LifeCycleDatabaseException e) {
       throw new IllegalStateException(e);
@@ -219,6 +248,19 @@ public class LifeCycleServiceImpl implements LifeCycleService {
       return persistence.deleteLifeCyclePolicy(policy, securityService.getOrganization().getId());
     } catch (LifeCycleDatabaseException e) {
       throw new IllegalStateException("Could not delete policy from database with id " + id);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see LifeCycleService#deleteLifeCyclePolicy(String)
+   */
+  public void deleteAllLifeCyclePoliciesCreatedByConfig(String orgId)
+          throws IllegalStateException {
+    try {
+      persistence.deleteAllLifeCyclePoliciesCreatedByConfig(orgId);
+    } catch (LifeCycleDatabaseException e) {
+      throw new IllegalStateException("Could not delete policies created from config from database. ");
     }
   }
 
@@ -333,6 +375,77 @@ public class LifeCycleServiceImpl implements LifeCycleService {
     } catch (LifeCycleDatabaseException e) {
       throw new IllegalStateException("Could not delete task from database with id " + id);
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see LifeCycleService#checkValidity(LifeCyclePolicy)
+   */
+  public boolean checkValidity(LifeCyclePolicy policy) {
+    if (policy.getTitle() == null || policy.getTitle().isEmpty()) {
+      logger.warn("LifeCyclePolicy with id " + policy.getId() + " is not valid. Missing title.");
+      return false;
+    }
+    if (policy.getTargetType() == null) {
+      logger.warn("LifeCyclePolicy with id " + policy.getId() + " is not valid. Missing target type.");
+      return false;
+    }
+    if (policy.getAction() == null) {
+      logger.warn("LifeCyclePolicy with id " + policy.getId() + " is not valid. Missing action.");
+      return false;
+    }
+    if (policy.getTiming() == null) {
+      logger.warn("LifeCyclePolicy with id " + policy.getId() + " is not valid. Missing timing.");
+      return false;
+    }
+
+    // Check if conditionally required fields are present
+    if (policy.getTiming() == Timing.SPECIFIC_DATE) {
+      if (policy.getActionDate() == null) {
+        logger.warn("LifeCyclePolicy with id " + policy.getId() + " is not valid. A policy with the timing"
+            + Timing.SPECIFIC_DATE + " must have an action date.");
+        return false;
+      }
+    }
+    if (policy.getTiming() == Timing.REPEATING) {
+      if (policy.getCronTrigger() == null || policy.getCronTrigger().isEmpty()) {
+        logger.warn("LifeCyclePolicy with id " + policy.getId() + " is not valid. A policy with the timing"
+            + Timing.REPEATING + " must have an cron trigger.");
+        return false;
+      }
+    }
+
+    // Check if cron string is valid
+    if (policy.getCronTrigger() != null && !policy.getCronTrigger().isEmpty()) {
+      if (!org.quartz.CronExpression.isValidExpression(policy.getCronTrigger())) {
+        logger.warn("LifeCyclePolicy with id " + policy.getId() + " is not valid. Cron trigger "
+            + policy.getCronTrigger() + " is not valid.");
+        return false;
+      }
+    }
+
+    // Check if action parameters are well formed
+    try {
+      if (policy.getAction() == Action.START_WORKFLOW) {
+        StartWorkflowParameters actionParametersParsed = gson.fromJson(policy.getActionParameters(),
+            StartWorkflowParameters.class);
+        if (actionParametersParsed.getWorkflowId() == null) {
+          logger.warn("LifeCyclePolicy with id " + policy.getId() + " is not valid. Action parameters for the action"
+              + Action.START_WORKFLOW + " must include workflowId.");
+          return false;
+        }
+      }
+    } catch (JsonSyntaxException e) {
+      logger.warn("LifeCyclePolicy with id " + policy.getId() + " is not valid. Action parameters are not well formed"
+          + ".");
+      return false;
+    }
+
+    if (policy.getAccessControlEntries() == null || policy.getAccessControlEntries().isEmpty()) {
+      policy.setAccessControlEntries(new ArrayList<>());
+    }
+
+    return true;
   }
 
   /**

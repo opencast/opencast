@@ -1,0 +1,66 @@
+### Sample for a lifecycle policy configuration file.
+#
+# Valid file extensions for configuration files are .yml and .yaml.
+#
+# You can find more information on lifecycle management policies in the documentation, at
+# - admin/docs/configuration/lifecycle-management.md
+# - developer/docs/architecture/api/lifecycle-management-api.md
+# - developer/docs/architecture/api/types.md
+
+# Identifier. Must be unique.
+# Required
+id: sample
+
+# Which opencast tenant the policy belongs to.
+# Required
+organization: mh_default_org
+
+# Metadata
+title: "A descriptive title"
+
+# On which Opencast entities the policy operates on
+# Valid target types: EVENT
+# Required
+targetType: EVENT
+
+# Which action will be performed
+# Valid actions: START_WORKFLOW
+# Required
+action: START_WORKFLOW
+
+# When the policy should run its action
+# Valid timings: SPECIFIC_DATE, REPEATING, ALWAYS
+# Required
+timing: SPECIFIC_DATE
+
+# Additional parameters for the selected action.
+# Which parameters can/must be specified depends on the action.
+# JSON as string
+actionParameters: "{
+  workflowId: noop,
+  workflowParameters: {
+    straightToPublishing: true
+  }
+}"
+
+# At which exact point in time the policy will run
+# If the date is in the past, the policy will run immediately
+# Required if timing is SPECIFIC_DATE.
+actionDate: 2023-11-30T16:16:47Z
+
+## In which interval the policy will run
+## More info on cron triggers at https://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/crontrigger.html.
+## Required if timing is REPEATING.
+#cronTrigger:
+
+# Specify on which entities the policy action should be run on.
+# Not required, but very highly recommended.
+targetFilters:
+  series_name:
+    value: "banana"
+
+# Which user have what permissions on this policy.
+accessControlEntries:
+  - allow: true
+    action: "write"
+    role: "ROLE_ADMIN"

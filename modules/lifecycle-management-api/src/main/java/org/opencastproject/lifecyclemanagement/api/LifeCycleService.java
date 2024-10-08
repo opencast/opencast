@@ -44,6 +44,18 @@ public interface LifeCycleService {
           throws NotFoundException, IllegalStateException, UnauthorizedException;
 
   /**
+   * Returns a life cycle policy from the database by its id
+   * @param id life cycle policy id
+   * @param orgId life cycle policy organization
+   * @return The {@link LifeCyclePolicy} belonging to the id
+   * @throws NotFoundException If no life cycle policy with the given id could be found
+   * @throws IllegalStateException If something went wrong in the database service
+   * @throws UnauthorizedException If the user does not have read access for the life cycle policy
+   */
+  LifeCyclePolicy getLifeCyclePolicyById(String id, String orgId)
+          throws NotFoundException, IllegalStateException, UnauthorizedException;
+
+  /**
    * Get multiple life cycle policies from the database
    * @param limit The maximum amount of life cycle policies to get with one request.
    * @param offset The index of the first result to return.
@@ -91,6 +103,13 @@ public interface LifeCycleService {
    */
   boolean deleteLifeCyclePolicy(String id)
           throws NotFoundException, IllegalStateException, UnauthorizedException;
+
+  /**
+   * Delete all policies created from configuration files from the database.
+   * Only to be called as admin from the policy scanner.
+   * @param orgId
+   */
+  void deleteAllLifeCyclePoliciesCreatedByConfig(String orgId);
 
   /**
    * Returns a life cycle task from the database by its id
@@ -151,6 +170,13 @@ public interface LifeCycleService {
    */
   boolean deleteLifeCycleTask(String id)
           throws NotFoundException, IllegalStateException, UnauthorizedException;
+
+  /**
+   * Checks if the given policy has all required fields filled in
+   * @param policy The lifecycle policy to be checked
+   * @return True if the policy fulfills the criteria set by the function, else false
+   */
+  boolean checkValidity(LifeCyclePolicy policy);
 
   /**
    * Get a list of events based on a set of filters.

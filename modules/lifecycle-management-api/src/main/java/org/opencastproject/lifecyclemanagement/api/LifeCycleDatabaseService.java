@@ -94,6 +94,12 @@ public interface LifeCycleDatabaseService {
    */
   boolean deleteLifeCyclePolicy(LifeCyclePolicy policy, String orgId) throws LifeCycleDatabaseException;
 
+  /**
+   * Remove all life cycle policies that were created through configuration files from the database
+   * @param orgId
+   * @throws LifeCycleDatabaseException
+   */
+  void deleteAllLifeCyclePoliciesCreatedByConfig(String orgId) throws LifeCycleDatabaseException;
 
   /**
    * Gets a single life cycle task in the current organization context by its identifier.
