@@ -8,9 +8,6 @@ configuration to `on` or `off`.
 List of Available Plugins
 -------------------------
 
-- opencast-plugin-admin-ng
-    - Old version of the admin interface. The new UI has more features and is actively maintained and improved,
-      but until the old one is removed completely, this plugin can be turned on for legacy use-cases.
 - opencast-plugin-legacy-annotation
     - Legacy annotation functionality. We do not recommend turning this on. It also requires additional configuration in
       the player. It's kept for a few legacy use-cases.

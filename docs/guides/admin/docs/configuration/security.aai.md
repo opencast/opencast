@@ -134,7 +134,7 @@ interface which is supposed to be protected by Shibboleth.
 
     <!-- Redirects unauthenticated requests to the login form -->
     <bean id="userEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
-      <property name="loginFormUrl" value="/admin-ng/index.html" />
+      <property name="loginFormUrl" value="/admin-ui/index.html" />
     </bean>
 
 Last but not least, you need to add the *preauthAuthProvider* authentication provider to the *authentication-manager*:

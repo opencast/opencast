@@ -91,7 +91,7 @@ Publish to internal channel:
   <configurations>
     <configuration key="source-tags">engage</configuration>
     <configuration key="channel-id">internal</configuration>
-    <configuration key="url-pattern">http://localhost:8080/admin-ng/index.html#/events/events/${event_id}/tools/playback</configuration>
+    <configuration key="url-pattern">http://localhost:8080/editor-ui/index.html?id=${event_id}</configuration>
   </configurations>
 </operation>
 ```
