@@ -24,8 +24,8 @@ import static org.opencastproject.assetmanager.api.AssetManager.DEFAULT_OWNER;
 
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
+import org.opencastproject.assetmanager.impl.VersionImpl;
 import org.opencastproject.job.api.JobContext;
-import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -36,6 +36,7 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
 import org.apache.commons.lang3.BooleanUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -64,6 +65,7 @@ public class AssetManagerDeleteWorkflowOperationHandler extends AbstractWorkflow
 
   /** Configuration if last snapshot should not be deleted */
   private static final String OPT_LAST_SNAPSHOT = "keep-last-snapshot";
+  private static final String OPT_ROLL_BACK_TO = "roll-back-to";
 
   @Activate
   @Override
@@ -80,11 +82,17 @@ public class AssetManagerDeleteWorkflowOperationHandler extends AbstractWorkflow
   @Override
   public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
-    final MediaPackage mediaPackage = workflowInstance.getMediaPackage();
-    final String mpId = mediaPackage.getIdentifier().toString();
+    final String mpId = workflowInstance.getMediaPackage().getIdentifier().toString();
 
     WorkflowOperationInstance currentOperation = workflowInstance.getCurrentOperation();
     boolean keepLastSnapshot = BooleanUtils.toBoolean(currentOperation.getConfiguration(OPT_LAST_SNAPSHOT));
+    long rollbackVersion = NumberUtils.toLong(currentOperation.getConfiguration(OPT_ROLL_BACK_TO), -1);
+
+    if (rollbackVersion >= 0 && keepLastSnapshot) {
+      throw new WorkflowOperationException("Operation cannot roll back to an old version and keep the latest version.");
+    } else if (rollbackVersion < 0 && !keepLastSnapshot) {
+      throw new WorkflowOperationException("Operation needs a version to roll back to or keep the latest version.");
+    }
 
     try {
       final AQueryBuilder q = assetManager.createQuery();
@@ -92,18 +100,40 @@ public class AssetManagerDeleteWorkflowOperationHandler extends AbstractWorkflow
 
       if (keepLastSnapshot) {
         logger.info("Deleting all but latest snapshot of episode {}", mpId);
-        deleted = q.delete(DEFAULT_OWNER, q.snapshot())
-                .where(q.mediaPackageId(mpId).and(q.version().isLatest().not())).run();
+        deleted = q.delete(DEFAULT_OWNER, q.snapshot()).where(q.mediaPackageId(mpId).and(q.version().isLatest().not()))
+            .run();
       } else {
-        logger.info("Deleting all snapshots of episode {}", mpId);
+        logger.info("Rolling back to version {} in the asset manager", rollbackVersion);
         deleted = q.delete(DEFAULT_OWNER, q.snapshot())
-                .where(q.mediaPackageId(mpId)).run();
+            .where(q.mediaPackageId(mpId)
+            .and(q.version().gt(new VersionImpl(rollbackVersion)))).run();
       }
 
       logger.info("Successfully deleted {} version/s episode {} from the asset manager", deleted, mpId);
     } catch (Exception e) {
       var errorMessage = String.format("Error deleting episode %s from the asset manager", mpId);
       throw new WorkflowOperationException(errorMessage, e);
+    }
+
+    // Get the media package we rolled back to from asset manager
+    final AQueryBuilder q = assetManager.createQuery();
+    var record = q.select(q.snapshot()).where(q.mediaPackageId(mpId).and(q.version().isLatest()))
+        .run().getRecords().stream().findFirst();
+    if (record.isEmpty()) {
+      throw new WorkflowOperationException("Could not get any results from asset manager. Expected at least one.");
+    }
+    var snapshot = record.get().getSnapshot();
+    if (snapshot.isEmpty()) {
+      throw new WorkflowOperationException("Asset manager record contains no snapshot.");
+    }
+    var mediaPackage = snapshot.get().getMediaPackage();
+
+    // Update media package from asset manager with publications from workflow media package
+    for (var publication: mediaPackage.getPublications()) {
+      mediaPackage.remove(publication);
+    }
+    for (var publication: workflowInstance.getMediaPackage().getPublications()) {
+      mediaPackage.add(publication);
     }
     return createResult(mediaPackage, Action.CONTINUE);
   }
