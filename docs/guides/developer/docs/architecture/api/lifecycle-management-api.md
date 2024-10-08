@@ -4,7 +4,7 @@
 
 The LifeCycle Management API is available since API version 1.12.0.
 
-### GET /api/lifecyclemanagement/policy/{id}
+### GET /api/lifecyclemanagement/policies/{id}
 
 Returns a lifecycle policy.
 
@@ -80,7 +80,7 @@ __Example__
 ]
 ```
 
-### POST /api/lifecyclemanagement/policy
+### POST /api/lifecyclemanagement/policies
 
 Creates a new policy.
 
@@ -102,7 +102,7 @@ __Response__
 | `filters`              | [`string`](types.md#basic)                               | The filter(s) used to select applicable entities. JSON. Depends on the type of action                                  |
 | `accessControlEntries` | [`string`](types.md#acl)                                 | JSON for ACL.                                                                                                          |
 
-### PUT /api/lifecyclemanagement/policy/{id}
+### PUT /api/lifecyclemanagement/policies/{id}
 
 Updates a policy.
 
@@ -124,7 +124,7 @@ __Response__
 | `filters`              | [`string`](types.md#basic)                               | The filter(s) used to select applicable entities. Format: 'filter1:value1,filter2:value2'                              |
 | `accessControlEntries` | [`string`](types.md#acl)                                 | JSON for ACL.                                                                                                          |
 
-### DELETE /api/lifecyclemanagement/policy/{id}
+### DELETE /api/lifecyclemanagement/policies/{id}
 
 Removes a policy.
 
