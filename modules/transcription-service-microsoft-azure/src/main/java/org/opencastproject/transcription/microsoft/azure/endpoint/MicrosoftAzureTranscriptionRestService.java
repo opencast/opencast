@@ -18,12 +18,13 @@
  * the License.
  *
  */
-package org.opencastproject.transcription.microsoftazure.endpoint;
+
+package org.opencastproject.transcription.microsoft.azure.endpoint;
 
 import org.opencastproject.job.api.JobProducer;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.transcription.microsoftazure.MicrosoftAzureTranscriptionService;
+import org.opencastproject.transcription.microsoft.azure.MicrosoftAzureTranscriptionService;
 import org.opencastproject.util.doc.rest.RestService;
 
 import org.osgi.service.component.ComponentContext;
@@ -37,22 +38,23 @@ import javax.ws.rs.Path;
 
 @Path("/")
 @RestService(
-      name = "MicrosoftAzureTranscriptionRestService",
-      title = "Transcription Service REST Endpoint (uses Microsoft Azure services)",
-      abstractText = "Uses external service to generate transcriptions of recordings.",
-      notes = {
-        "All paths above are relative to the REST endpoint base (something like http://your.server/transcripts)"
-      }
+    name = "MicrosoftAzureTranscriptionRestService",
+    title = "Transcription Service REST Endpoint (uses Microsoft Azure Speech services)",
+    abstractText = "Uses external service to generate transcriptions of recordings.",
+    notes = {
+        "All paths above are relative to the REST endpoint base (something like http://your.server/transcripts)",
+    }
 )
+
 @Component(
-      immediate = true,
-      service = MicrosoftAzureTranscriptionRestService.class,
-      property = {
-              "service.description=Microsoft Azure Transcription REST Endpoint",
-              "opencast.service.type=org.opencastproject.transcription.microsoftazure",
-              "opencast.service.path=/transcripts/microsoftazure",
-              "opencast.service.jobproducer=true"
-      }
+    immediate = true,
+    service = MicrosoftAzureTranscriptionRestService.class,
+    property = {
+        "service.description=Microsoft Azure Transcription REST Endpoint",
+        "opencast.service.type=org.opencastproject.transcription.microsoft.azure",
+        "opencast.service.path=/transcripts/azure",
+        "opencast.service.jobproducer=true"
+    }
 )
 public class MicrosoftAzureTranscriptionRestService extends AbstractJobProducerEndpoint {
 
@@ -73,6 +75,7 @@ public class MicrosoftAzureTranscriptionRestService extends AbstractJobProducerE
 
   @Activate
   public void activate(ComponentContext cc) {
+    logger.debug("activate()");
   }
 
   @Reference
@@ -85,6 +88,7 @@ public class MicrosoftAzureTranscriptionRestService extends AbstractJobProducerE
     this.serviceRegistry = service;
   }
 
+
   @Override
   public JobProducer getService() {
     return service;
@@ -94,4 +98,5 @@ public class MicrosoftAzureTranscriptionRestService extends AbstractJobProducerE
   public ServiceRegistry getServiceRegistry() {
     return serviceRegistry;
   }
+
 }

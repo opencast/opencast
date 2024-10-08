@@ -69,8 +69,8 @@ The following table contains the workflow operations that are available in an ou
 | log                                  | Log workflow status                                                                       | [Documentation](log-woh.md)                                  |
 | mattermost-notify                    | Send messages to Mattermost                                                               | [Documentation](mattermost-notify-woh.md)                    |
 | metadata-to-acl                      | Add read/write access based on metadata                                                   | [Documentation](metadata-to-acl.md)                          |
-| microsoft-azure-attach-transcription | Attaches automated transcripts to mediapackage                                            | [Documentation](microsoft-azure-attach-transcription-woh.md) |
-| microsoft-azure-start-transcription  | Starts automated transcription provided by Microsoft Azure                                | [Documentation](microsoft-azure-start-transcription-woh.md)  |
+| microsoft-azure-attach-transcription | Attach Microsoft Azure Transcription                                                      | [Documentation](microsoft-azure-attach-transcription-woh.md) |
+| microsoft-azure-start-transcription  | Start Microsoft Azure Transcription                                                       | [Documentation](microsoft-azure-start-transcription-woh.md)  |
 | move-storage                         | Move files between asset manager storage systems                                          | [Documentation](move-storage-woh.md)                         |
 | multiencode                          | Encode to multiple profiles in one operation                                              | [Documentation](multiencode-woh.md)                          |
 | normalize-audio                      | Normalize first audio stream                                                              | [Documentation](normalizeaudio-woh.md)                       |

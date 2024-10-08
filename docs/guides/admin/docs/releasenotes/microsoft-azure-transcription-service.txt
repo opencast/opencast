@@ -1,0 +1,1 @@
+Microsoft Azure transcription service was rewritten. The main reason for that was to gain stability. A positive side effect, gstreamer dependency isn't needed any more. But there are breaking changes in the configuration and workflows. Please consult the [documentation](configuration/transcription.configuration/microsoftazure.md).
