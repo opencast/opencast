@@ -143,7 +143,7 @@ public class LifeCycleManagementEndpoint {
     }
 
     @GET
-    @Path("policy/{id}")
+    @Path("policies/{id}")
     @RestQuery(
         name = "lifeCyclePolicy",
         description = "Get a lifecycle policy.",
@@ -230,7 +230,7 @@ public class LifeCycleManagementEndpoint {
     }
 
     @POST
-    @Path("policy")
+    @Path("policies")
     @RestQuery(
         name = "create",
         description = "Creates a lifecycle policy.",
@@ -366,7 +366,7 @@ public class LifeCycleManagementEndpoint {
     }
 
     @PUT
-    @Path("policy/{id}")
+    @Path("policies/{id}")
     @RestQuery(
         name = "update",
         description = "Updates a lifecycle policy.",
@@ -488,7 +488,7 @@ public class LifeCycleManagementEndpoint {
     }
 
     @DELETE
-    @Path("policy/{id}")
+    @Path("policies/{id}")
     @RestQuery(
         name = "remove",
         description = "Removes a lifecycle policy.",

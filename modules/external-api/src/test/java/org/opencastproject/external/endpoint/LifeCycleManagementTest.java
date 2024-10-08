@@ -89,7 +89,7 @@ public class LifeCycleManagementTest {
         .pathParam("id", POLICY_ID)
         .expect()
         .statusCode(SC_OK).when()
-        .get(env.host("/policy/{id}"))
+        .get(env.host("/policies/{id}"))
         .asString();
 
     assertPolicy((JSONObject) parser.parse(response));
@@ -101,7 +101,7 @@ public class LifeCycleManagementTest {
         .pathParam("id", MISSING_POLICY_ID)
         .expect()
         .statusCode(SC_NOT_FOUND).when()
-        .get(env.host("/policy/{id}"));
+        .get(env.host("/policies/{id}"));
   }
 
   @Test
@@ -110,7 +110,7 @@ public class LifeCycleManagementTest {
         .pathParam("id", UNAUTHORIZED_POLICY_ID)
         .expect()
         .statusCode(SC_FORBIDDEN).when()
-        .get(env.host("/policy/{id}"));
+        .get(env.host("/policies/{id}"));
   }
 
   @Test
@@ -140,7 +140,7 @@ public class LifeCycleManagementTest {
         .formParam("timing", "SPECIFIC_DATE")
         .expect()
         .statusCode(SC_CREATED).when()
-        .post(env.host("policy"))
+        .post(env.host("policies"))
         .asString();
 
 //    assertPolicy((JSONObject) parser.parse(response));
@@ -152,7 +152,7 @@ public class LifeCycleManagementTest {
         .formParam("title", "title")
         .expect()
         .statusCode(SC_BAD_REQUEST).when()
-        .post(env.host("/policy"));
+        .post(env.host("/policies"));
   }
 
   @Test
@@ -161,7 +161,7 @@ public class LifeCycleManagementTest {
         .pathParam("id", POLICY_ID)
         .expect()
         .statusCode(SC_OK).when()
-        .delete(env.host("/policy/{id}"));
+        .delete(env.host("/policies/{id}"));
   }
 
   @Test
@@ -170,7 +170,7 @@ public class LifeCycleManagementTest {
         .pathParam("id", MISSING_POLICY_ID)
         .expect()
         .statusCode(SC_NOT_FOUND).when()
-        .delete(env.host("/policy/{id}"));
+        .delete(env.host("/policies/{id}"));
   }
 
   @Test
@@ -179,6 +179,6 @@ public class LifeCycleManagementTest {
         .pathParam("id", UNAUTHORIZED_POLICY_ID)
         .expect()
         .statusCode(SC_FORBIDDEN).when()
-        .delete(env.host("/policy/{id}"));
+        .delete(env.host("/policies/{id}"));
   }
 }
