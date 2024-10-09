@@ -191,23 +191,14 @@ function($, bootbox, _, alertify, jsyaml) {
 
     $('body').append(template(tData));
 
-    sortMap['DATE_CREATED_DESC'] = tData.recording_date_new;
-    sortMap['DATE_CREATED'] = tData.recording_date_old;
-    sortMap['DATE_MODIFIED_DESC'] = tData.publishing_date_new;
-    sortMap['DATE_MODIFIED'] = tData.publishing_date_old;
+    sortMap['MODIFIED_DESC'] = tData.publishing_date_new;
+    sortMap['MODIFIED'] = tData.publishing_date_old;
     sortMap['TITLE'] = tData.title_a_z;
     sortMap['TITLE_DESC'] = tData.title_z_a;
     sortMap['CREATOR'] = tData.author_a_z;
     sortMap['CREATOR_DESC'] = tData.author_z_a;
     sortMap['CONTRIBUTOR'] = tData.contributor_a_z;
     sortMap['CONTRIBUTOR_DESC'] = tData.contributor_z_a;
-    sortMap['PUBLISHER'] = tData.publisher_a_z;
-    sortMap['PUBLISHER_DESC'] = tData.publisher_z_a;
-    sortMap['SERIES_ID'] = tData.series;
-    sortMap['LANGUAGE'] = tData.language;
-    sortMap['LICENSE'] = tData.license;
-    sortMap['SUBJECT'] = tData.subject;
-    sortMap['DESCRIPTION'] = tData.description;
 
     // set variables
     title_enterUsernamePassword = tData.login_title;
@@ -265,7 +256,7 @@ function($, bootbox, _, alertify, jsyaml) {
       sort = '';
     } else {
       sort = 'sort=' + GetURLParameter('sort') + '&';
-      sortDescription = GetURLParameter('sort');
+      sortDescription = GetURLParameter('sort').replace(/[ +]/, '_').toUpperCase();
       $('#' + sortDescription).prop('checked', true);
       $('#buttonSorting').text(sortMap[sortDescription]);
     }
