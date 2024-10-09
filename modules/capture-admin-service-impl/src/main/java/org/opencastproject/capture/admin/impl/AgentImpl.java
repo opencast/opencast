@@ -21,6 +21,7 @@
 
 package org.opencastproject.capture.admin.impl;
 
+import java.util.Collections;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
 
@@ -237,7 +238,7 @@ public class AgentImpl implements Agent {
    * @return the schedulerRoles
    */
   public Set<String> getSchedulerRoles() {
-    return schedulerRoles;
+    return Collections.unmodifiableSet(schedulerRoles);
   }
 
   /**
