@@ -66,7 +66,7 @@ A claim being "required" means that the JWT provider (e.g. Tobira, LMS) has to i
         - *Action(s)*: the first part specifies what actions are granted, corresponding to actions in the OC ACLs, e.g. `read` and `write`. Multiple actions can be specified by joining them with `+`. To keep the syntax unambigious, actions cannot contain `:` or `+` (ideally they are ASCII alphabetic only!). To further preserve space, some actions imply others:
             - `write` implies `read` access
             - `annotate` implies `read` access
-        - *Item Type*: The second part specifies what type of item this applies to:
+        - *Item Type*: The second part specifies what type of item this applies to. Note: giving access to a series or playlist only gives access to that item directly, and *not* to its videos (e.g. give write access for a series to be able to edit its metadata or add videos to it).
             - `e`: event
             - `s`: series
             - `p`: playlist
