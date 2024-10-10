@@ -67,7 +67,7 @@ public class LifeCycleManagementTest {
     assertEquals("title", json.get("title"));
     assertEquals(TargetType.EVENT.toString(), json.get("targetType"));
     assertEquals(Action.START_WORKFLOW.toString(), json.get("action"));
-    assertEquals("{ workflowId: noop }", json.get("actionParameters"));
+    assertEquals("{\"workflowId\":\"noop\",\"workflowParameters\":\"{}\"}", json.get("actionParameters"));
 
     assertEquals("2023-11-30T16:16:47Z", json.get("actionDate"));
     assertEquals(Timing.SPECIFIC_DATE.toString(), json.get("timing"));
@@ -125,7 +125,8 @@ public class LifeCycleManagementTest {
         .get(env.host("/policies"))
         .asString();
 
-    JSONArray policies = (JSONArray) parser.parse(response);
+    JSONObject responseObj = (JSONObject) parser.parse(response);
+    final JSONArray policies = (JSONArray) responseObj.get("results");
     assertPolicy((JSONObject) policies.get(0));
   }
 

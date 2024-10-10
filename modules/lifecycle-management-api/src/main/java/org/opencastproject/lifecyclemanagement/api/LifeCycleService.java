@@ -56,6 +56,12 @@ public interface LifeCycleService {
           throws NotFoundException, IllegalStateException, UnauthorizedException;
 
   /**
+   * Get the total number of policies
+   * @return the total number of policies
+   */
+  long getLifeCyclePoliciesTotal() throws IllegalStateException;
+
+  /**
    * Get multiple life cycle policies from the database
    * @param limit The maximum amount of life cycle policies to get with one request.
    * @param offset The index of the first result to return.

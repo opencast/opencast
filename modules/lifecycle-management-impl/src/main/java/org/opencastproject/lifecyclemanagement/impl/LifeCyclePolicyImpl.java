@@ -78,6 +78,10 @@ import javax.persistence.Transient;
         query = "DELETE FROM LifeCyclePolicy p WHERE p.isCreatedFromConfig = true "
             + "and p.organization = :organizationId"
     ),
+    @NamedQuery(
+        name = "LifeCyclePolicy.getTotal",
+        query = "SELECT COUNT(p) FROM LifeCyclePolicy p WHERE p.organization = :organizationId"
+    ),
 })
 public class LifeCyclePolicyImpl implements LifeCyclePolicy {
 

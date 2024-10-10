@@ -147,6 +147,28 @@ public class LifeCycleDatabaseServiceImpl implements LifeCycleDatabaseService {
    * @see LifeCycleDatabaseService#getLifeCyclePolicies(int, int, SortCriterion)
    */
   @Override
+  public long getLifeCyclePoliciesTotal(String orgId) throws LifeCycleDatabaseException {
+    try {
+      return db.execTxChecked(em -> {
+        CriteriaBuilder cb = em.getCriteriaBuilder();
+        final CriteriaQuery<Long> query = cb.createQuery(Long.class);
+        Root<LifeCyclePolicyImpl> group = query.from(LifeCyclePolicyImpl.class);
+        query.select(cb.count(group));
+
+        TypedQuery<Long> typedQuery = em.createQuery(query);
+        return typedQuery.getSingleResult();
+      });
+    } catch (Exception e) {
+      logger.error("Could not find active lifecycle policies", e);
+      throw new LifeCycleDatabaseException(e);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see LifeCycleDatabaseService#getLifeCyclePolicies(int, int, SortCriterion)
+   */
+  @Override
   public List<LifeCyclePolicy> getLifeCyclePolicies(int limit, int offset, SortCriterion sortCriterion)
           throws LifeCycleDatabaseException {
 

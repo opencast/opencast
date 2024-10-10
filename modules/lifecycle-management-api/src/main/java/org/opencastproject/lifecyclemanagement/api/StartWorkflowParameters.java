@@ -20,6 +20,7 @@
  */
 package org.opencastproject.lifecyclemanagement.api;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -27,7 +28,7 @@ import java.util.Map;
  */
 public class StartWorkflowParameters {
   private String workflowId;
-  private Map<String, String> workflowParameters;
+  private Map<String, String> workflowParameters = new HashMap<>();
 
   public String getWorkflowId() {
     return workflowId;

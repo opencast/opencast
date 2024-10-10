@@ -222,11 +222,19 @@ public class LifeCycleManagementEndpoint {
         }
         List<LifeCyclePolicy> policies = service.getLifeCyclePolicies(limit, offset, sortCriterion);
 
+        long total = service.getLifeCyclePoliciesTotal();
+
         List<JValue> policiesJson = policies.stream()
             .map(p -> policyToJson(p))
             .collect(Collectors.toList());
 
-        return ApiResponses.Json.ok(acceptHeader, arr(policiesJson));
+        List<Field> results = new ArrayList<>();
+        results.add(f("total", v(total)));
+        results.add(f("limit", v(limit)));
+        results.add(f("offset", v(offset)));
+        results.add(f("results", arr(policiesJson)));
+
+        return ApiResponses.Json.ok(acceptHeader, obj(results));
     }
 
     @POST
@@ -521,13 +529,18 @@ public class LifeCycleManagementEndpoint {
         fields.add(f("title", v(policy.getTitle(), BLANK)));
         fields.add(f("targetType", enumToJSON(policy.getTargetType())));
         fields.add(f("action", enumToJSON(policy.getAction())));
-        fields.add(f("actionParameters", v(policy.getActionParameters(), BLANK)));
+        if (policy.getAction() == Action.START_WORKFLOW) {
+            fields.add(f("actionParameters", v(startWorkflowParametersToJson(policy.getActionParameters()), BLANK)));
+        } else {
+            fields.add(f("actionParameters", v(policy.getActionParameters(), BLANK)));
+        }
         fields.add(f("actionDate", v(policy.getActionDate() != null ? toUTC(policy.getActionDate().getTime()) : null, BLANK)));
+        fields.add(f("cronTrigger", v(policy.getCronTrigger(), BLANK)));
         fields.add(f("timing", enumToJSON(policy.getTiming())));
         fields.add(f("isActive", v(policy.isActive(), BLANK)));
         fields.add(f("isCreatedFromConfig", v(policy.isCreatedFromConfig(), BLANK)));
         fields.add(f("targetFilters", v("{" + policy.getTargetFilters().keySet().stream()
-            .map(key -> key + ":" + eventSearchQueryFieldToJson(policy.getTargetFilters().get(key)))
+            .map(key -> "\"" + key + "\"" + ":" + eventSearchQueryFieldToJson(policy.getTargetFilters().get(key)))
             .collect(Collectors.joining(",", "", "")) + "}",
             BLANK
         )));
@@ -556,6 +569,20 @@ public class LifeCycleManagementEndpoint {
         fields.add(f("value", v(eventSearchQueryField.getValue(), BLANK)));
         fields.add(f("type", v(eventSearchQueryField.getType(), BLANK)));
         fields.add(f("must", v(eventSearchQueryField.isMust(), BLANK)));
+
+        return obj(fields);
+    }
+
+    private JValue startWorkflowParametersToJson(String s) {
+        StartWorkflowParameters parameters = gson.fromJson(s, StartWorkflowParameters.class);
+
+        List<Field> fields = new ArrayList<>();
+        fields.add(f("workflowId", v(parameters.getWorkflowId())));
+        fields.add(f("workflowParameters", v("{" + parameters.getWorkflowParameters().keySet().stream()
+                .map(key -> key + ":" + parameters.getWorkflowParameters().get(key))
+                .collect(Collectors.joining(",", "", "")) + "}",
+            BLANK
+        )));
 
         return obj(fields);
     }
