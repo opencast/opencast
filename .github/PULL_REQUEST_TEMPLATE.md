@@ -1,3 +1,15 @@
+<!--
+Explain what this pull request does.  If this fixes a bug, also explain how to reproduce the issue.
+-->
+
+### How to test this patch
+
+<!--
+Explain how to test this patch. If this requires a particular set-up or configuration, explain that as well and provide
+the necessary configuration if possible. The easier it is for others to test the patch, the faster this will get
+reviewed and merged.
+-->
+
 ### Your pull request should…
 
 * [ ] have a concise title
