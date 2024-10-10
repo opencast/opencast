@@ -57,7 +57,11 @@ __Response__
 __Example__
 
 ```json
-[
+{
+  "total": 1,
+  "offset": 0,
+  "limit": 100,
+  "results": [
     {
       "actionParameters": "{ workflowId: noop }",
       "timing": "SPECIFIC_DATE",
@@ -77,7 +81,8 @@ __Example__
         }
       ]
     }
-]
+  ]
+}
 ```
 
 ### POST /api/lifecyclemanagement/policies

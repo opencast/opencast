@@ -158,6 +158,19 @@ public class LifeCycleServiceImpl implements LifeCycleService {
 
   /**
    * {@inheritDoc}
+   * @see LifeCycleService#getLifeCyclePoliciesTotal(String)
+   */
+  @Override
+  public long getLifeCyclePoliciesTotal() throws IllegalStateException {
+    try {
+      return persistence.getLifeCyclePoliciesTotal(securityService.getOrganization().getId());
+    } catch (LifeCycleDatabaseException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
    * @see LifeCycleService#getLifeCyclePolicies(int, int, SortCriterion)
    */
   @Override

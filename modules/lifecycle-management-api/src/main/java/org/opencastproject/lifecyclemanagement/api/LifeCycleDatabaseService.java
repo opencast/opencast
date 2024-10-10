@@ -50,6 +50,14 @@ public interface LifeCycleDatabaseService {
   LifeCyclePolicy getLifeCyclePolicy(String id, String orgId) throws NotFoundException, LifeCycleDatabaseException;
 
   /**
+   * Get the total number of policies
+   * @param orgId the organisation identifier
+   * @return the total number of policies
+   * @throws LifeCycleDatabaseException
+   */
+  long getLifeCyclePoliciesTotal(String orgId) throws LifeCycleDatabaseException;
+
+  /**
    * Get several life cycle policies based on their order in the database
    * @param limit Maximum amount of life cycle policys to return
    * @param offset The index of the first result to return
