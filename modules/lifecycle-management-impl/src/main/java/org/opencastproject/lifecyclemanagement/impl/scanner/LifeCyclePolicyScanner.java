@@ -129,10 +129,6 @@ public class LifeCyclePolicyScanner implements ArtifactInstaller {
    * @see org.apache.felix.fileinstall.ArtifactInstaller#install(java.io.File)
    */
   public void install(File artifact) {
-    // TODO: Changing policies (by changing the file or restarting the service), causes the policies to be
-    //   reinstalled as new policies, meaning they will activate again even if they already activated before.
-    //   They also create new tasks, even for events that already had tasks created.
-    //   Fix this.
     synchronized (artifactsWithError) {
       LifeCyclePolicyImpl policy = parseLifeCyclePolicyFile(artifact);
       if (policy == null) {

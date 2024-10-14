@@ -175,6 +175,15 @@ public class PolicyCheckRunner {
 
                     // and create tasks
                     for (String entityId : entityIds) {
+                      // If entity does not yet have a task for this policy
+                      try {
+                        lifeCycleService.getLifeCycleTaskByTargetId(entityId);
+                        // Task does exist, skip creating one
+                        continue;
+                      } catch (NotFoundException e) {
+                        // Task does not exist yet, so create one
+                      }
+
                       LifeCycleTask task;
                       if (policy.getAction() == Action.START_WORKFLOW) {
                         task = new LifeCycleTaskStartWorkflow();
