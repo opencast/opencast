@@ -2584,16 +2584,20 @@ public abstract class AbstractEventEndpoint {
         }
       }
       if (EventListQuery.FILTER_IS_PUBLISHED_NAME.equals(name)) {
-        switch (IsPublished.valueOf(filters.get(name))) {
-          case YES:
-            query.withIsPublished(true);
-            break;
-          case NO:
-            query.withIsPublished(false);
-            break;
-          default:
-            logger.info("Unknown is published status {}", filters.get(name));
-            return Response.status(SC_BAD_REQUEST).build();
+        if (filters.containsKey(name)) {
+          switch (IsPublished.valueOf(filters.get(name))) {
+            case YES:
+              query.withIsPublished(true);
+              break;
+            case NO:
+              query.withIsPublished(false);
+              break;
+            default:
+              break;
+          }
+        } else {
+          logger.info("Query for invalid published status: {}", filters.get(name));
+          return Response.status(SC_BAD_REQUEST).build();
         }
       }
       if (EventListQuery.FILTER_STARTDATE_NAME.equals(name)) {
