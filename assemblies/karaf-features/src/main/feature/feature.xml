@@ -250,6 +250,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-workflow-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-adopter-registration-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-adopter-registration-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-maintenance-api/${project.version}</bundle>
   </feature>
 
   <feature name="opencast-admin" version="${project.version}">
@@ -382,6 +383,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-workflow-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-adopter-registration-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-adopter-registration-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-maintenance-api/${project.version}</bundle>
   </feature>
 
   <feature name="opencast-adminpresentation" version="${project.version}">
@@ -519,6 +521,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-workflow-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-adopter-registration-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-adopter-registration-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-maintenance-api/${project.version}</bundle>
   </feature>
 
   <feature name="opencast-ingest" version="${project.version}">
