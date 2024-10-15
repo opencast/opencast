@@ -1,5 +1,9 @@
 # Opencast 15: Release Notes
 
+## Opencast 15.11
+
+This release includes a bug fix for the Tobira API ([[#6157](https://github.com/opencast/opencast/pull/6157)]).
+
 ## Opencast 15.10
 
 This release contains two bugfixes and a change to a test.
