@@ -24,6 +24,7 @@ import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_RO
 
 import org.opencastproject.elasticsearch.api.SearchTerms;
 import org.opencastproject.elasticsearch.impl.AbstractSearchQuery;
+import org.opencastproject.elasticsearch.impl.IndexSchema;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.Permissions.Action;
 import org.opencastproject.security.api.User;
@@ -35,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -46,25 +48,44 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
   private String title = null;
   private User user = null;
   private String description = null;
-  private Set<String> actions = new HashSet<String>();
-  private List<String> subjects = new ArrayList<String>();
+  private final Set<String> actions = new HashSet<String>();
+  private final List<String> subjects = new ArrayList<String>();
   private String organization = null;
   private String language = null;
   private String creator = null;
   private String license = null;
   private String accessPolicy = null;
   private String managedAcl = null;
-  private List<String> organizers = new ArrayList<String>();
-  private List<String> contributors = new ArrayList<String>();
-  private List<String> publishers = new ArrayList<String>();
+  private final List<String> organizers = new ArrayList<String>();
+  private final List<String> contributors = new ArrayList<String>();
+  private final List<String> publishers = new ArrayList<String>();
   private Date createdFrom = null;
   private Date createdTo = null;
   private boolean editOnly = false;
   private String rightsHolder = null;
   private Long theme = null;
 
+  private static final Map<String, String> SORT_FIELDS = Map.of(
+      SeriesIndexSchema.TITLE, SeriesIndexSchema.TITLE.concat(IndexSchema.SORT_FIELD_NAME_EXTENSION),
+      SeriesIndexSchema.DESCRIPTION, SeriesIndexSchema.DESCRIPTION.concat(IndexSchema.SORT_FIELD_NAME_EXTENSION),
+      SeriesIndexSchema.SUBJECT, SeriesIndexSchema.SUBJECT.concat(IndexSchema.SORT_FIELD_NAME_EXTENSION),
+      SeriesIndexSchema.CREATOR, SeriesIndexSchema.CREATOR.concat(IndexSchema.SORT_FIELD_NAME_EXTENSION),
+      SeriesIndexSchema.ORGANIZERS, SeriesIndexSchema.ORGANIZERS.concat(IndexSchema.SORT_FIELD_NAME_EXTENSION),
+      SeriesIndexSchema.CONTRIBUTORS, SeriesIndexSchema.CONTRIBUTORS.concat(IndexSchema.SORT_FIELD_NAME_EXTENSION),
+      SeriesIndexSchema.PUBLISHERS, SeriesIndexSchema.PUBLISHERS.concat(IndexSchema.SORT_FIELD_NAME_EXTENSION),
+      SeriesIndexSchema.RIGHTS_HOLDER, SeriesIndexSchema.RIGHTS_HOLDER.concat(IndexSchema.SORT_FIELD_NAME_EXTENSION)
+  );
+
   @SuppressWarnings("unused")
   private SeriesSearchQuery() {
+  }
+
+  @Override
+  protected String sortOrderFieldName(String field) {
+    if (SORT_FIELDS.containsKey(field)) {
+      return SORT_FIELDS.get(field);
+    }
+    return field;
   }
 
   /**

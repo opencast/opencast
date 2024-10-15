@@ -1,0 +1,3 @@
+An optimized sort method allows a more natural and intuitive sorting of events and series. It requires the installation
+of the OpenSearch/Elasticsearch Plugin analysis-icu and an update of the index mapping, which can be achieved
+via an index rebuild or without a rebuild by updating and refreshing the index as described in the migration guide.
