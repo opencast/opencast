@@ -1044,7 +1044,7 @@ public class EditorServiceImpl implements EditorService {
 
     return new EditingData(segments, tracks, workflows, mp.getDuration(), mp.getTitle(), event.getRecordingStartDate(),
             event.getSeriesId(), event.getSeriesName(), workflowActive, waveformList, subtitles, localPublication,
-            lockingActive, lockRefresh, user);
+            lockingActive, lockRefresh, user, "");
   }
 
 
@@ -1154,6 +1154,17 @@ public class EditorServiceImpl implements EditorService {
       throw new IOException(e);
     }
 
+    // Update Metadata
+    try {
+      index.updateAllEventMetadata(mediaPackageId, editingData.getMetadataJSON(), searchIndex);
+    } catch (SearchIndexException | IndexServiceException | IllegalArgumentException e) {
+      errorExit("Event metadata can't be updated.", mediaPackageId, ErrorStatus.METADATA_UPDATE_FAIL, e);
+    } catch (NotFoundException e) {
+      errorExit("Event not found.", mediaPackageId, ErrorStatus.MEDIAPACKAGE_NOT_FOUND, e);
+    } catch (UnauthorizedException e) {
+      errorExit("Not authorized to update event metadata .", mediaPackageId, ErrorStatus.NOT_AUTHORIZED, e);
+    }
+
     if (editingData.getPostProcessingWorkflow() != null) {
       final String workflowId = editingData.getPostProcessingWorkflow();
       try {
@@ -1200,18 +1211,4 @@ public class EditorServiceImpl implements EditorService {
 
     return MetadataJson.listToJson(metadataList, true).toString();
   }
-
-  @Override
-  public void setMetadata(String mediaPackageId, String metadata) throws EditorServiceException {
-    try {
-      index.updateAllEventMetadata(mediaPackageId, metadata, searchIndex);
-    } catch (SearchIndexException | IndexServiceException | IllegalArgumentException e) {
-      errorExit("Event metadata can't be updated.", mediaPackageId, ErrorStatus.METADATA_UPDATE_FAIL, e);
-    } catch (NotFoundException e) {
-      errorExit("Event not found.", mediaPackageId, ErrorStatus.MEDIAPACKAGE_NOT_FOUND, e);
-    } catch (UnauthorizedException e) {
-      errorExit("Not authorized to update event metadata .", mediaPackageId, ErrorStatus.NOT_AUTHORIZED, e);
-    }
-  }
-
 }
