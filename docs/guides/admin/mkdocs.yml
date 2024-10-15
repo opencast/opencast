@@ -98,6 +98,7 @@ nav:
    - External Monitoring: 'configuration/monitoring.md'
    - Firewall: 'configuration/firewall.md'
    - Inbox: 'configuration/inbox.md'
+   - LifeCycle Management: 'configuration/lifecycle-management.md'
    - LTI Module: 'configuration/ltimodule.md'
    - List Providers: 'configuration/listproviders.md'
    - Live Schedule: 'configuration/liveschedule.md'
