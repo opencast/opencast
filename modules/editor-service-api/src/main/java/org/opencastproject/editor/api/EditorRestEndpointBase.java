@@ -190,29 +190,6 @@ public abstract class EditorRestEndpointBase {
     return RestUtil.R.ok();
   }
 
-  @POST
-  @Path("{mediaPackageId}/metadata.json")
-  @RestQuery(name = "updateMetadata", description = "Update the passed metadata for the event with the given Id",
-          pathParameters = {
-          @RestParameter(name = "mediaPackageId", description = "The event id", isRequired = true,
-              type = RestParameter.Type.STRING) },
-          responses = {
-          @RestResponse(description = "The metadata have been updated.", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "Could not parse metadata.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-          @RestResponse(description = "No event with this identifier was found.",
-                  responseCode = HttpServletResponse.SC_NOT_FOUND) }, returnDescription = "No content is returned.")
-  public Response updateEventMetadata(
-      @PathParam("mediaPackageId") String eventId,
-      @Context HttpServletRequest request) {
-    try {
-      String details = readInputStream(request);
-      editorService.setMetadata(eventId, details);
-    } catch (EditorServiceException e) {
-      return checkErrorState(eventId, e);
-    }
-    return RestUtil.R.ok();
-  }
-
   protected String readInputStream(HttpServletRequest request) {
     String details;
     try (InputStream is = request.getInputStream()) {
