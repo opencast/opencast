@@ -23,6 +23,7 @@ package org.opencastproject.workflow.handler.composer;
 
 import static org.opencastproject.util.data.Collections.list;
 
+import java.util.Collections;
 import org.opencastproject.composer.api.ComposerService;
 import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.composer.api.EncodingProfile;
@@ -515,7 +516,7 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
     }
 
     public List<String> getTargetTags() {
-      return targetTags;
+      return Collections.unmodifiableList(targetTags);
     }
 
     public String getSourceAudioName() {
@@ -547,7 +548,7 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
     }
 
     public List<HorizontalCoverageLayoutSpec> getMultiSourceLayouts() {
-      return multiSourceLayouts;
+      return Collections.unmodifiableList(multiSourceLayouts);
     }
 
     public HorizontalCoverageLayoutSpec getSingleSourceLayout() {
