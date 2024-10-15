@@ -1,0 +1,1 @@
+Adds a new event filter to Opencast to filter for published or not published events. To apply the filter an index rebuild of the event index is required.

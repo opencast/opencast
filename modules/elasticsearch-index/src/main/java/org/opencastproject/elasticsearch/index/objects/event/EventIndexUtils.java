@@ -221,7 +221,14 @@ public final class EventIndexUtils {
         publicationsArray[i] = generatePublicationDoc(publications.get(i));
       }
 
+      if (publications.size() == 1 && !publications.get(0).getChannel().equals("internal") || publications.size() > 1) {
+        metadata.addField(EventIndexSchema.IS_PUBLISHED, true, true);
+      } else {
+        metadata.addField(EventIndexSchema.IS_PUBLISHED, false, true);
+      }
+
       metadata.addField(EventIndexSchema.PUBLICATION, publicationsArray, true);
+
     }
 
     if (event.getPresenters() != null) {
