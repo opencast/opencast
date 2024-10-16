@@ -27,9 +27,9 @@ import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.MetadataField;
+import org.opencastproject.publication.api.EngagePublicationChannel;
+import org.opencastproject.publication.api.InternalPublicationChannel;
 import org.opencastproject.util.DateTimeSupport;
-import org.opencastproject.workflow.handler.distribution.EngagePublicationChannel;
-import org.opencastproject.workflow.handler.distribution.InternalPublicationChannel;
 
 import com.entwinemedia.fn.Fn;
 

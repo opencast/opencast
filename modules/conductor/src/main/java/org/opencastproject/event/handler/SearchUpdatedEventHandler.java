@@ -24,7 +24,7 @@ package org.opencastproject.event.handler;
 import static org.opencastproject.job.api.Job.Status.FINISHED;
 import static org.opencastproject.mediapackage.MediaPackageElementParser.getFromXml;
 import static org.opencastproject.mediapackage.MediaPackageElements.XACML_POLICY_EPISODE;
-import static org.opencastproject.workflow.handler.distribution.EngagePublicationChannel.CHANNEL_ID;
+import static org.opencastproject.publication.api.EngagePublicationChannel.CHANNEL_ID;
 
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DistributionService;

@@ -39,6 +39,7 @@ import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.attachment.AttachmentImpl;
 import org.opencastproject.publication.api.ConfigurablePublicationService;
+import org.opencastproject.publication.api.InternalPublicationChannel;
 import org.opencastproject.publication.api.OaiPmhPublicationService;
 import org.opencastproject.publication.api.PublicationException;
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;
@@ -48,7 +49,6 @@ import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UnknownFileTypeException;
 import org.opencastproject.util.data.Tuple;
-import org.opencastproject.workflow.handler.distribution.InternalPublicationChannel;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.slf4j.Logger;

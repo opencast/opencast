@@ -18,8 +18,8 @@
  * the License.
  *
  */
-package org.opencastproject.workflow.handler.distribution;
+package org.opencastproject.publication.api;
 
-public interface InternalPublicationChannel {
-  String CHANNEL_ID = "internal";
+public interface EngagePublicationChannel {
+  String CHANNEL_ID = "engage-player";
 }

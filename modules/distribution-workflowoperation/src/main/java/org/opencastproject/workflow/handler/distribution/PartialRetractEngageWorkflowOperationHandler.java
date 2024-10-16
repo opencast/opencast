@@ -22,7 +22,7 @@
 package org.opencastproject.workflow.handler.distribution;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.opencastproject.workflow.handler.distribution.EngagePublicationChannel.CHANNEL_ID;
+import static org.opencastproject.publication.api.EngagePublicationChannel.CHANNEL_ID;
 
 import org.opencastproject.distribution.api.DownloadDistributionService;
 import org.opencastproject.distribution.api.StreamingDistributionService;

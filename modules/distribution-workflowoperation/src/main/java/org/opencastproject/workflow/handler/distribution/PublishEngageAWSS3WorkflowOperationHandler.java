@@ -21,10 +21,8 @@
 
 package org.opencastproject.workflow.handler.distribution;
 
-import org.opencastproject.distribution.api.DownloadDistributionService;
-import org.opencastproject.search.api.SearchService;
+import org.opencastproject.publication.api.EngagePublicationService;
 import org.opencastproject.security.api.OrganizationDirectoryService;
-import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.workflow.api.WorkflowOperationHandler;
 
 import org.osgi.service.component.ComponentContext;
@@ -45,38 +43,16 @@ import org.osgi.service.component.annotations.Reference;
     }
 )
 public class PublishEngageAWSS3WorkflowOperationHandler extends PublishEngageWorkflowOperationHandler {
-
-  /**
-   * Callback for the OSGi declarative services configuration.
-   *
-   * @param downloadDistributionService
-   *          the download distribution service
-   */
-  @Reference(target = "(distribution.channel=aws.s3)")
-  protected void setDownloadDistributionService(DownloadDistributionService downloadDistributionService) {
-    super.setDownloadDistributionService(downloadDistributionService);
-  }
-
-  /**
-   * Callback for declarative services configuration that will introduce us to the search service. Implementation
-   * assumes that the reference is configured as being static.
-   *
-   * @param searchService
-   *          an instance of the search service
-   */
-  @Reference
-  protected void setSearchService(SearchService searchService) {
-    super.setSearchService(searchService);
-  }
-
+  @Override
   @Reference
   public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
     super.setOrganizationDirectoryService(organizationDirectoryService);
   }
 
-  @Reference
-  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
-    super.setServiceRegistry(serviceRegistry);
+  @Override
+  @Reference(target = "(distribution.channel=aws.s3)")
+  public void setPublicationService(EngagePublicationService publicationService) {
+    super.setPublicationService(publicationService);
   }
 
   @Override
@@ -84,5 +60,4 @@ public class PublishEngageAWSS3WorkflowOperationHandler extends PublishEngageWor
   protected void activate(ComponentContext cc) {
     super.activate(cc);
   }
-
 }
