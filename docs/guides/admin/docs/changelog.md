@@ -461,6 +461,13 @@ Opencast 16
 Opencast 15
 -----------
 
+### Opencast 15.11
+
+- [[#6238](https://github.com/opencast/opencast/pull/6238)] -
+  Fix ICLA Check
+- [[#6157](https://github.com/opencast/opencast/pull/6157)] -
+  Fix tobira harvest acls
+
 ### Opencast 15.10
 
 - [[#6106](https://github.com/opencast/opencast/pull/6106)] -

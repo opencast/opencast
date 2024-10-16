@@ -1,6 +1,5 @@
 # Opencast 16: Release Notes
 
-
 ## Opencast 16.5
 
 This is a maintenance release of Opencast 16. It fixes several minor bugs.
