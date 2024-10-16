@@ -4,6 +4,23 @@ Changelog
 Opencast 16
 -----------
 
+### Opencast 16.6
+
+- [[#6232](https://github.com/opencast/opencast/pull/6232)] -
+  Update docs on how to access old admin ui
+- [[#6186](https://github.com/opencast/opencast/pull/6186)] -
+  Ignore uppercase in search sort parameters
+- [[#6185](https://github.com/opencast/opencast/pull/6185)] -
+  Fix sorting in engage interface
+- [[#6184](https://github.com/opencast/opencast/pull/6184)] -
+  Restructure Firewall Graph
+- [[#6183](https://github.com/opencast/opencast/pull/6183)] -
+  Update firewall documentation regarding OpenSearch
+- [[#6181](https://github.com/opencast/opencast/pull/6181)] -
+  Fix bug: user not always removed from LTI cache
+- [[#6175](https://github.com/opencast/opencast/pull/6175)] -
+  Deleting events which do not exist in the search index
+
 ### Opencast 16.5
 
 - [[#6172](https://github.com/opencast/opencast/pull/6172)] -
