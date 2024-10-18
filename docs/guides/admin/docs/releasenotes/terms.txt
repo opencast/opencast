@@ -1,0 +1,1 @@
+With this release you can now provide terms of use to be presented to new users in the admin UI. For configuration see [the respective docs](../configuration/admin-ui/terms.md).
