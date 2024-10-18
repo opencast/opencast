@@ -83,6 +83,7 @@ nav:
       - Base API: 'architecture/api/base-api.md'
       - Agents API: 'architecture/api/agents-api.md'
       - Events API: 'architecture/api/events-api.md'
+      - LifeCycle Management API: 'architecture/api/lifecycle-management-api.md'
       - ListProvider API: 'architecture/api/listprovider-api.md'
       - Playlists API: 'architecture/api/playlists-api.md'
       - Series API: 'architecture/api/series-api.md'
