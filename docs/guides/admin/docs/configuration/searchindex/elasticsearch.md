@@ -33,6 +33,7 @@ Additionally, the following settings can be configured in
 * `max.retry.attempts.update`
 * `retry.waiting.period.get`
 * `retry.waiting.period.update`
+* `retry.delay.on.startup`
 
 The identifier defines which index opencast is looking for. This might be interesting if you run an
 Elasticsearch cluster and want to follow a naming scheme. But you should be aware that the index actually consists of
@@ -44,6 +45,10 @@ are too many concurrent requests. The retry behavior can be configured different
 This way you could set more retry attempts for index updates because of the more serious consequences if those requests
 fail. The waiting period is used to not overwhelm the Elasticsearch with retry requests, making the problem worse. By
 default, no retry will be attempted.
+
+The `retry.delay.on.startup` defines how long Opencast will wait between retry attempts 
+when the connection to the index service fails on startup. The default is 10 seconds.
+
 
 Version
 -------
