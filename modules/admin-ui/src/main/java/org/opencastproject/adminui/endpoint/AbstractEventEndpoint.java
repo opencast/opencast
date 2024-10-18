@@ -85,6 +85,7 @@ import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.exception.UnsupportedAssetException;
 import org.opencastproject.index.service.impl.util.EventUtils;
 import org.opencastproject.index.service.resources.list.provider.EventsListProvider.Comments;
+import org.opencastproject.index.service.resources.list.provider.EventsListProvider.IsPublished;
 import org.opencastproject.index.service.resources.list.query.EventListQuery;
 import org.opencastproject.index.service.resources.list.query.SeriesListQuery;
 import org.opencastproject.index.service.util.JSONUtils;
@@ -2580,6 +2581,23 @@ public abstract class AbstractEventEndpoint {
           default:
             logger.info("Unknown comment {}", filters.get(name));
             return Response.status(SC_BAD_REQUEST).build();
+        }
+      }
+      if (EventListQuery.FILTER_IS_PUBLISHED_NAME.equals(name)) {
+        if (filters.containsKey(name)) {
+          switch (IsPublished.valueOf(filters.get(name))) {
+            case YES:
+              query.withIsPublished(true);
+              break;
+            case NO:
+              query.withIsPublished(false);
+              break;
+            default:
+              break;
+          }
+        } else {
+          logger.info("Query for invalid published status: {}", filters.get(name));
+          return Response.status(SC_BAD_REQUEST).build();
         }
       }
       if (EventListQuery.FILTER_STARTDATE_NAME.equals(name)) {

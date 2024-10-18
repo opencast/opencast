@@ -78,6 +78,7 @@ public class EventSearchQuery extends AbstractSearchQuery {
   private final List<String> comments = new ArrayList<>();
   private Boolean needsCutting = null;
   private final List<String> publications = new ArrayList<String>();
+  private Boolean isPublished = null;
   private Long archiveVersion = null;
   private String agentId = null;
   private Date technicalStartTime = null;
@@ -851,6 +852,27 @@ public class EventSearchQuery extends AbstractSearchQuery {
    */
   public String[] getPublications() {
     return publications.toArray(new String[publications.size()]);
+  }
+
+  /**
+   * Selects recordings with the given is published status.
+   *
+   * @param isPublished
+   *          the is published status
+   * @return the enhanced search query
+   */
+  public EventSearchQuery withIsPublished(boolean isPublished) {
+    this.isPublished = isPublished;
+    return this;
+  }
+
+  /**
+   * Returns the is published status of the recording.
+   *
+   * @return the recording is published status
+   */
+  public Boolean getIsPublished() {
+    return isPublished;
   }
 
   /**
