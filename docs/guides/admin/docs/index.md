@@ -31,7 +31,6 @@ The Opencast Release Documentation is the official Opencast documentation for ea
     * [Encoding Configuration](configuration/encoding.md)
     * [Plugin Management](configuration/plugin-management.md)
     * [Metrics (OpenMetrics, Prometheus)](configuration/metrics.md)
-    * [New Admin UI](configuration/admin-ui/new-admin-ui.md)
     * [Stream Security](configuration/stream-security/stream-security-overview.md)
     * [Stand-alone Video Editor](configuration/videoeditor.frontend.md)
     * [Studio](configuration/studio.md)
