@@ -163,6 +163,8 @@
     <module>modules/lti-service-impl</module>
     <module>modules/lti-service-remote</module>
     <module>modules/lti</module>
+    <module>modules/maintenance-api</module>
+    <module>modules/maintenance-impl</module>
     <module>modules/mattermost-notification-workflowoperation</module>
     <module>modules/message-broker-api</module>
     <module>modules/metadata-api</module>
