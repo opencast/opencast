@@ -1,5 +1,8 @@
 # Opencast 17: Release Notes
 
+## Opencast 16.6
+
+This is a maintenance release of Opencast 16. It fixes several minor bugs.
 
 ## Release Schedule
 
