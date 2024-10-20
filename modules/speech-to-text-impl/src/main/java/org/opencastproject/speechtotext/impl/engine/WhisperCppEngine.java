@@ -69,7 +69,7 @@ public class WhisperCppEngine implements SpeechToTextEngine {
   private static final String WHISPERCPP_EXECUTABLE_PATH_CONFIG_KEY = "whispercpp.root.path";
 
   /** Default path to WhisperC++. */
-  public static final String WHISPERCPP_EXECUTABLE_DEFAULT_PATH = "whispercpp";
+  public static final String WHISPERCPP_EXECUTABLE_DEFAULT_PATH = "whisper.cpp";
 
   /** Currently used path of the WhisperC++ installation. */
   private String whispercppExecutable = WHISPERCPP_EXECUTABLE_DEFAULT_PATH;
