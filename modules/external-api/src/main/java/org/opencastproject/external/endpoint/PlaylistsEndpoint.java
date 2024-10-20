@@ -88,7 +88,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 @Path("/")
-@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_11_0 })
+@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_11_0, ApiMediaType.VERSION_1_12_0 })
 @RestService(
     name = "externalapiplaylists",
     title = "External API Playlists Service",
@@ -140,7 +140,7 @@ public class PlaylistsEndpoint {
 
   @GET
   @Path("{id}")
-  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_11_0 })
+  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_11_0, ApiMediaType.VERSION_1_12_0  })
   @RestQuery(
       name = "playlist",
       description = "Get a playlist.",
@@ -171,7 +171,7 @@ public class PlaylistsEndpoint {
   }
 
   @GET
-  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_11_0 })
+  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_11_0, ApiMediaType.VERSION_1_12_0  })
   @Path("")
   @RestQuery(
       name = "playlists",
@@ -228,7 +228,7 @@ public class PlaylistsEndpoint {
   }
 
   @POST
-  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_11_0 })
+  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_11_0, ApiMediaType.VERSION_1_12_0  })
   @Path("")
   @RestQuery(
       name = "create",
@@ -265,7 +265,7 @@ public class PlaylistsEndpoint {
   }
 
   @PUT
-  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_11_0 })
+  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_11_0, ApiMediaType.VERSION_1_12_0  })
   @Path("{id}")
   @RestQuery(
       name = "update",
@@ -298,7 +298,7 @@ public class PlaylistsEndpoint {
   }
 
   @DELETE
-  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_11_0 })
+  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_11_0, ApiMediaType.VERSION_1_12_0  })
   @Path("{id}")
   @RestQuery(
       name = "remove",
