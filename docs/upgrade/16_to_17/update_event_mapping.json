@@ -1,0 +1,83 @@
+{
+  "properties" : {
+    "title": {
+      "type" : "keyword",
+      "fields" : {
+        "sort": {
+          "type": "icu_collation_keyword",
+          "index": false
+        }
+      }
+    },
+    "contributor": {
+      "type" : "keyword",
+      "fields" : {
+        "sort": {
+          "type": "icu_collation_keyword",
+          "index": false
+        }
+      }
+    },
+    "presenter": {
+      "type" : "keyword",
+      "fields" : {
+        "sort": {
+          "type": "icu_collation_keyword",
+          "index": false
+        }
+      }
+    },
+    "subject": {
+      "type" : "keyword",
+      "fields" : {
+        "sort": {
+          "type": "icu_collation_keyword",
+          "index": false
+        }
+      }
+    },
+    "description": {
+      "type" : "keyword",
+      "fields" : {
+        "sort": {
+          "type": "icu_collation_keyword",
+          "index": false
+        }
+      }
+    },
+    "location": { "type" : "keyword",
+      "fields" : {
+        "sort": {
+          "type": "icu_collation_keyword",
+          "index": false
+        }
+      }
+    },
+    "series_name": { "type" : "keyword",
+      "fields" : {
+        "sort": {
+          "type": "icu_collation_keyword",
+          "index": false
+        }
+      }
+    },
+    "creator": {
+      "type" : "keyword",
+      "fields" : {
+        "sort": {
+          "type": "icu_collation_keyword",
+          "index": false
+        }
+      }
+    },
+    "publisher": {
+      "type" : "keyword",
+      "fields" : {
+        "sort": {
+          "type": "icu_collation_keyword",
+          "index": false
+        }
+      }
+    }
+  }
+}

@@ -59,7 +59,7 @@ Required:
 
 Required (not necessarily on the same machine):
 
-    OpenSearch 1.x
+    OpenSearch 1.x and analysis-icu plugin
 
 Required for text extraction:
 
