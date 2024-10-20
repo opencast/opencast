@@ -1,0 +1,2 @@
+The Whisper.cpp integration is now automatically re-encode audio to a suitable format by default. This means that it is
+no longer necessary to include a separate encode operation for this in your workflow.
