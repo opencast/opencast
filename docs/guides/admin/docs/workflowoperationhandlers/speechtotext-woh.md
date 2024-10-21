@@ -16,61 +16,58 @@ The subtitles file format ist WebVTT.
 Parameter Table
 ---------------
 
-| configuration keys       | required | Example           | description                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       |
-|--------------------------|----------|-------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| source-flavor            | yes      | source/presenter  | The source media package to use                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| target-flavor            | yes      | archive           | Flavor of the produced subtitle file.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             |
-| target-element           | no       | track             | Define where to append the subtitles file. Possibilities are: as a 'track' or as an 'attachment'. The default is "track".                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| language-code            | no       | de                | The language of the video or audio source (default is "eng"). Vosk only: It has to match the name of the language model directory. See 'vosk-cli'.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| language-fallback        | yes*     | en                | The fallback value if the dublin core/media package language field is not present.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| target-tags              | no       | delivery/captions | Tags for the subtitle file.** The `generator` and `generator-type` tags will be set automatically. (Whisper/WhisperC++ only: If no `language-code` is set, the `lang` tag will be auto-generated.)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| translate                | no       | true              | Transcription is translated into English, valid values `true` or `false` (Whisper/WhisperC++ only)                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| limit-to-one             | no       | true              | Limits the maximum of generated subtitles to one. In most cases only one track will have the audio with the speech. Use this to prevent multiple transcription jobs that wastes computing resources. To have more control over which tracks shall be tried first for subtitle generation, use the `track-selection-strategy` option.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              |
-| track-selection-strategy | no       | everything        | Use this in combination with `limit-to-one`. Define your strategy what tracks shall be selected for subtitle generation. If you use the `source-flavor` `*/source`, because your are unsure which track of your dual stream includes the audio, you can use the `track-selection-strategy` to try transcribing the presenter track first with the option`try_presenter_first` for example. These are the possible strategy options: `presenter_or_nothing`: only uses presenter tracks. `presentation_or_nothing`: only uses presentation tracks. `try_presenter_first`: looks for presenter tracks first, if there are no usable, try to transcribe the other tracks. `try_presentation_first`: looks for presentation tracks first, if there are no usable, try to transcribe the other tracks. `everything`: just transcribe everything (this is the default). |
+| Configuration Keys       | Required | Example          | Description
+|--------------------------|----------|------------------|-------------
+| source-flavor            | yes      | presenter/source | The source media package to use
+| target-flavor            | yes      | archive          | Flavor of the produced subtitle
+| target-tags              | no       | captions/source  | Tags for the subtitle file².
+| target-element           | no       | track            | Define where to append the subtitles file. Possibilities are: as a 'track' or as an 'attachment' (default: `track`).
+| language-code            | no       | de               | The language of the video or audio source³.
+| language-fallback        | no¹      | en               | The fallback value if the dublin core/media package language field is not present (default: `en`).
+| translate                | no       | true             | Transcription is translated into English, valid values `true` or `false` (Whisper/WhisperC++ only)
+| limit-to-one             | no       | true             | Limits the maximum of generated subtitles to one.
+| track-selection-strategy | no       | everything       | Define what tracks shall be selected for subtitle generation if used together with `limit-to-one` (default: `everything`).
+| async                    | no       | false            | Start transcription in the background. Use [`speechtotext-attach`](speechtotext-attach-woh.md) to get the finished transcriptions later in the workflow (default: `false`).
 
 
-*Vosk Only, default value can be modified on Vosk config file.
-**For conventionally used tags see the general page on [Subtitles](../configuration/subtitles.md).
+1. Vosk default value can be modified on Vosk config file.
+2. For conventionally used tags see the general page on [Subtitles](../configuration/subtitles.md). The `generator`
+   and `generator-type` tags will be set automatically. For Whisper, iIf no `language-code` is set, the `lang` tag will
+   be auto-generated.
+3. Vosk only: It has to match the name of the language model directory. See 'vosk-cli'.
 
 Requirements
 ------------
 
 In order for it to work, you have to install the vosk-cli, whisper or whispercpp package.
 
+Track Selection Strategy
+------------------------
+
+Use the tack selection strategy in combination with the `limit-to-one` option to define  what tracks are selected for
+subtitle generation.
+
+For example, if you set `source-flavor` to `*/source` because your are unsure which track includes the audio, you can
+use the `track-selection-strategy` to have Opencast prefer the presenter track for transcriptions.
+
+Available options are:
+
+ - `presenter_or_nothing`: only uses presenter tracks.
+ - `presentation_or_nothing`: only uses presentation tracks.
+ - `try_presenter_first`: look for presenter tracks first, if there are no usable, try to transcribe the other tracks.
+ - `try_presentation_first`: look for presentation tracks first, falling back to other tracks if none are usable.
+ - `everything`: just transcribe everything (this is the default).
+
 
 Operation Examples
 ------------------
 
-```XML
-<operation
-    id="speechtotext"
-    description="Generates subtitles for video and audio files">
-  <configurations>
-    <configuration key="source-flavor">*/source</configuration>
-    <configuration key="target-flavor">captions/source</configuration>
-    <configuration key="target-element">track</configuration>
-    <configuration key="target-tags">archive,subtitle,engage-download</configuration>
-    <configuration key="language-code">eng</configuration>
-  </configurations>
-</operation>
+```yaml
+- id: speechtotext
+  description: Generates subtitles for video and audio files
+  configurations:
+    - source-flavor: '*/source'
+    - target-flavor: captions/source
+    - target-tags: engage-download
+    - limit-to-one: true
 ```
-
-```XML
-<operation
-    id="speechtotext"
-    description="Generates subtitles for video and audio files, derive language-code from metadata">
-    <configurations>
-      <configuration key="source-flavor">*/source</configuration>
-      <configuration key="target-flavor">captions/source</configuration>
-      <configuration key="target-element">track</configuration>
-      <configuration key="target-tags">archive,subtitle,engage-download</configuration>
-    </configurations>
-</operation>
-```
-
-Language code
--------------------------
-
-The accepted language code are the two letter codes defined in ISO 639-1. A reference list can be found here:
-
-[List of ISO 639-1 codes](https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes)

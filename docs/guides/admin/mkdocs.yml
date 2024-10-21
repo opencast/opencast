@@ -247,6 +247,7 @@ nav:
    - Series: 'workflowoperationhandlers/series-woh.md'
    - Silence: 'workflowoperationhandlers/silence-woh.md'
    - Speech to Text: 'workflowoperationhandlers/speechtotext-woh.md'
+   - Speech to Text Attach: 'workflowoperationhandlers/speechtotext-attach-woh.md'
    - Start Watson Transcription: 'workflowoperationhandlers/start-watson-transcription-woh.md'
    - Start Workflow: 'workflowoperationhandlers/start-workflow-woh.md'
    - Statistics Writer: 'workflowoperationhandlers/statistics-writer.md'

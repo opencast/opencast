@@ -38,6 +38,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.UUID;
 
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
@@ -180,6 +181,12 @@ public abstract class AbstractMediaPackageElement implements MediaPackageElement
   @Override
   public void setIdentifier(String id) {
     this.id = id;
+  }
+
+  @Override
+  public String generateIdentifier() {
+    id = UUID.randomUUID().toString();
+    return id;
   }
 
   /**
