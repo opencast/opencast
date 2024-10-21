@@ -26,6 +26,6 @@ import graphql.ErrorClassification;
 public enum OpencastErrorType implements ErrorClassification {
   NotFound,
   Undefined,
-  InternalError
-
+  InternalError,
+  Unauthorized;
 }

@@ -21,6 +21,7 @@
 
 package org.opencastproject.graphql.schema;
 
+import org.opencastproject.graphql.directive.RolesAllowed;
 import org.opencastproject.graphql.provider.GraphQLAdditionalTypeProvider;
 import org.opencastproject.graphql.provider.GraphQLDynamicTypeProvider;
 import org.opencastproject.graphql.provider.GraphQLExtensionProvider;
@@ -92,6 +93,7 @@ public class SchemaBuilder {
         .query(Query.class)
         .mutation(Mutation.class)
         .setAnnotationsProcessor(this.annotations)
+        .directive(RolesAllowed.class)
         .build();
   }
 

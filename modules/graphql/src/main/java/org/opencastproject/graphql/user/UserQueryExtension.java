@@ -23,6 +23,7 @@ package org.opencastproject.graphql.user;
 
 import org.opencastproject.graphql.datafetcher.user.CurrentUserDataFetcher;
 import org.opencastproject.graphql.datafetcher.user.UserOffsetDataFetcher;
+import org.opencastproject.graphql.directive.RolesAllowed;
 import org.opencastproject.graphql.type.output.Query;
 
 import graphql.annotations.annotationTypes.GraphQLDescription;
@@ -50,6 +51,7 @@ public final class UserQueryExtension {
   @GraphQLField
   @GraphQLNonNull
   @GraphQLDescription("Search for users")
+  @RolesAllowed("ROLE_USER")
   public static GqlUserList searchUser(
       @GraphQLName("limit") Integer limit,
       @GraphQLName("offset") Integer offset,

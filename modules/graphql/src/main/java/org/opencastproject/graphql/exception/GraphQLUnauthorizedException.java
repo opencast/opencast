@@ -42,6 +42,6 @@ public class GraphQLUnauthorizedException extends RuntimeException implements Gr
 
   @Override
   public ErrorClassification getErrorType() {
-    return null;
+    return OpencastErrorType.Unauthorized;
   }
 }
