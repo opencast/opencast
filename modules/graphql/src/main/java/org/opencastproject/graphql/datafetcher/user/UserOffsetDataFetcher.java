@@ -24,7 +24,6 @@ package org.opencastproject.graphql.datafetcher.user;
 import org.opencastproject.graphql.datafetcher.ParameterDataFetcher;
 import org.opencastproject.graphql.execution.context.OpencastContext;
 import org.opencastproject.graphql.user.GqlUserList;
-import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.util.SmartIterator;
@@ -34,7 +33,6 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import graphql.schema.DataFetchingEnvironment;
 
