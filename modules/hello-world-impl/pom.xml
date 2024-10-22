@@ -39,6 +39,10 @@
       <groupId>org.osgi</groupId>
       <artifactId>org.osgi.service.component.annotations</artifactId>
     </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.jaxrs</artifactId>
+    </dependency>
     <!-- Testing -->
     <dependency>
       <groupId>org.glassfish.jersey.core</groupId>

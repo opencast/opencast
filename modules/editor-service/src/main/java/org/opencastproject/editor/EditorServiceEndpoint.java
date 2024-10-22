@@ -27,12 +27,14 @@ import org.opencastproject.util.doc.rest.RestService;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 
 import javax.ws.rs.Path;
 
 /**
  * The REST endpoint for the {@link EditorService} service
  */
+@Path("/editor")
 @Component(
     property = {
         "service.description=Editor REST Endpoint",
@@ -42,11 +44,11 @@ import javax.ws.rs.Path;
     immediate = true,
     service = EditorServiceEndpoint.class
 )
-@Path("/")
 @RestService(name = "EditorServiceEndpoint",
     title = "Editor Service Endpoint",
     abstractText = "This is the editor service.",
     notes = { })
+@JaxrsResource
 public class EditorServiceEndpoint extends EditorRestEndpointBase {
 
   @Reference

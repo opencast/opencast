@@ -34,6 +34,7 @@ import org.opencastproject.util.doc.rest.RestService;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -56,6 +57,7 @@ import javax.ws.rs.core.MediaType;
 )
 @Path("/org")
 @RestService(name = "organization", title = "Organizations", notes = { "" }, abstractText = "Displays the organizations served by this system")
+@JaxrsResource
 public class OrganizationEndpoint {
 
   /** The organization directory */

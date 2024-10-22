@@ -65,6 +65,7 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,7 +88,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-@Path("/")
+@Path("/api/playlists")
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_11_0 })
 @RestService(
     name = "externalapiplaylists",
@@ -104,6 +105,7 @@ import javax.ws.rs.core.Response;
         "opencast.service.path=/api/playlists"
     }
 )
+@JaxrsResource
 public class PlaylistsEndpoint {
 
   /** The logging facility */
