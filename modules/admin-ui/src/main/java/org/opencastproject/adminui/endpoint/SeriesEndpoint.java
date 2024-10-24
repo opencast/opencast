@@ -130,7 +130,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -242,7 +241,6 @@ public class SeriesEndpoint {
     return aclServiceFactory.serviceFor(securityService.getOrganization());
   }
 
-  private Map<String, TobiraService> tobiras = new HashMap<>();
 
   /** OSGi DI. */
   @Reference
@@ -287,7 +285,7 @@ public class SeriesEndpoint {
       if (!matches.matches()) {
         return;
       }
-      var tobira = getTobira(matches.group("organization"));
+      var tobira = TobiraService.getTobira(matches.group("organization"));
       switch (matches.group("key")) {
         case "origin":
           tobira.setOrigin((String) value);
@@ -534,12 +532,8 @@ public class SeriesEndpoint {
     return Response.ok(themesJson.toJSONString()).build();
   }
 
-  private TobiraService getTobira(String organization) {
-    return tobiras.computeIfAbsent(organization, org -> new TobiraService());
-  }
-
   private TobiraService getTobira() {
-    return getTobira(securityService.getOrganization().getId());
+    return TobiraService.getTobira(securityService.getOrganization().getId());
   }
 
   @GET
@@ -1134,6 +1128,83 @@ public Response getSeriesHostPages(@PathParam("seriesId") String seriesId) {
       return Response.ok(seriesData.toJSONString()).build();
     } catch (TobiraException e) {
       throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @POST
+  @Path("{seriesId}/tobira/path")
+  @RestQuery(
+          name = "updateSeriesTobiraPath",
+          description = "Updates the path of the given series in a connected Tobira instance",
+          returnDescription = "Returns the new path if it has been updated in Tobira",
+          pathParameters = { @RestParameter(
+                  name = "seriesId",
+                  isRequired = true,
+                  description = "The series id",
+                  type = STRING) },
+          restParameters = {
+                  @RestParameter(
+                          name = "pathComponents",
+                          isRequired = true,
+                          description = "List of realms with name and path segment on path to series.",
+                          type = TEXT),
+                  @RestParameter(
+                          name = "currentPath",
+                          isRequired = true,
+                          description = "Path where the series is currently mounted.",
+                          type = STRING),
+                  @RestParameter(
+                          name = "targetPath",
+                          isRequired = true,
+                          description = "Path where the series will be mounted.",
+                          type = STRING) },
+          responses = {
+                  @RestResponse(
+                          responseCode = SC_OK,
+                          description = "The path of the series has successfully been updated in Tobira."),
+                  @RestResponse(
+                          responseCode = SC_NOT_FOUND,
+                          description = "Tobira doesn't know about the given series"),
+                  @RestResponse(
+                          responseCode = SC_SERVICE_UNAVAILABLE,
+                          description = "Tobira is not configured (correctly)") })
+  public Response updateSeriesTobiraPath(
+    @PathParam("seriesId") String seriesId,
+    @FormParam("pathComponents") String pathComponents,
+    @FormParam("currentPath") String currentPath,
+    @FormParam("targetPath") String targetPath
+  ) throws IOException, InterruptedException {
+    if (currentPath == null || targetPath == null) {
+      throw new WebApplicationException("one or more `path` parameters are missing", BAD_REQUEST);
+    }
+
+    var tobira = getTobira();
+    if (!tobira.ready()) {
+      return Response.status(Status.SERVICE_UNAVAILABLE)
+              .entity("Tobira is not configured (correctly)")
+              .build();
+    }
+
+    try {
+      var paths = (List<JSONObject>) new JSONParser().parse(pathComponents);
+
+      var mountParams = new JSONObject();
+      mountParams.put("seriesId", seriesId);
+      mountParams.put("targetPath", targetPath);
+
+      var unmountParams = new JSONObject();
+      unmountParams.put("seriesId", seriesId);
+      unmountParams.put("currentPath", currentPath);
+
+      tobira.createRealmLineage(paths);
+      tobira.addSeriesMountPoint(mountParams);
+      tobira.removeSeriesMountPoint(unmountParams);
+
+      return ok();
+    } catch (Exception e) {
+      return Response.status(Status.INTERNAL_SERVER_ERROR)
+              .entity("Internal server error: " + e.getMessage())
+              .build();
     }
   }
 

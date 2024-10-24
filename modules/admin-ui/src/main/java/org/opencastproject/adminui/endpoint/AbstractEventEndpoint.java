@@ -38,6 +38,7 @@ import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.servlet.http.HttpServletResponse.SC_SERVICE_UNAVAILABLE;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
+import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.opencastproject.index.service.util.RestUtils.conflictJson;
 import static org.opencastproject.index.service.util.RestUtils.notFound;
@@ -59,6 +60,8 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
 
 import org.opencastproject.adminui.exception.JobEndpointException;
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
+import org.opencastproject.adminui.tobira.TobiraException;
+import org.opencastproject.adminui.tobira.TobiraService;
 import org.opencastproject.adminui.util.BulkUpdateUtil;
 import org.opencastproject.adminui.util.QueryPreprocessor;
 import org.opencastproject.assetmanager.api.AssetManager;
@@ -1823,6 +1826,55 @@ public abstract class AbstractEventEndpoint {
     if (publication == null)
       return notFound("Cannot find publication with id '%s'.", id);
     return okJson(publicationToJSON(publication));
+  }
+
+  @GET
+  @Path("{eventId}/tobira/pages")
+  @RestQuery(
+          name = "getEventHostPages",
+          description = "Returns the pages of a connected Tobira instance that contain the given event",
+          returnDescription = "The Tobira pages that contain the given event",
+          pathParameters = {
+                  @RestParameter(
+                          name = "eventId",
+                          isRequired = true,
+                          description = "The event identifier",
+                          type = STRING
+                  ),
+          },
+          responses = {
+                  @RestResponse(
+                          responseCode = SC_OK,
+                          description = "The Tobira pages containing the given event"
+                  ),
+                  @RestResponse(
+                          responseCode = SC_NOT_FOUND,
+                          description = "Tobira doesn't know about the given event"
+                  ),
+                  @RestResponse(
+                          responseCode = SC_SERVICE_UNAVAILABLE,
+                          description = "Tobira is not configured (correctly)"
+                  ),
+          }
+  )
+  public Response getEventHostPages(@PathParam("eventId") String eventId) {
+    var tobira = TobiraService.getTobira(getSecurityService().getOrganization().getId());
+    if (!tobira.ready()) {
+      return Response.status(Status.SERVICE_UNAVAILABLE)
+              .entity("Tobira is not configured (correctly)")
+              .build();
+    }
+
+    try {
+      var eventData = tobira.getEventHostPages(eventId);
+      if (eventData == null) {
+        throw new WebApplicationException(NOT_FOUND);
+      }
+      eventData.put("baseURL", tobira.getOrigin());
+      return Response.ok(eventData.toJSONString()).build();
+    } catch (TobiraException e) {
+      throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
+    }
   }
 
   @GET
