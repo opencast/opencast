@@ -70,6 +70,11 @@ Make sure to install it on the node which also serves the admin interface.
 dnf install elasticsearch-oss
 ```
 
+Furthermore, the `analysis-icu` plugin for Elasticsearch is required to install. It is necessary for sorting naturally.
+To install the ICU plugin, run the following:
+
+    bin/elasticsearch-plugin install analysis-icu
+
 Opencast automatically configures the search index once it is connected.
 The default configuration will work for a local Elasticsearch with no modifications.
 The only exception for this is to add a configuration to mitigate Log4Shell.

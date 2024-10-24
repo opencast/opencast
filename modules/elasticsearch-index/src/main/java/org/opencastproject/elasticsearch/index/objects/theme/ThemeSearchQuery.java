@@ -24,6 +24,7 @@ package org.opencastproject.elasticsearch.index.objects.theme;
 
 import org.opencastproject.elasticsearch.api.SearchTerms;
 import org.opencastproject.elasticsearch.impl.AbstractSearchQuery;
+import org.opencastproject.elasticsearch.impl.IndexSchema;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.requests.SortCriterion.Order;
 
@@ -32,6 +33,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This interface defines a fluent api for a query object used to lookup themes in the search index.
@@ -61,8 +63,22 @@ public class ThemeSearchQuery extends AbstractSearchQuery {
   private String watermarkFile = null;
   private String watermarkPosition = null;
 
+  private static final Map<String, String> SORT_FIELDS = Map.of(
+      ThemeIndexSchema.CREATOR, ThemeIndexSchema.CREATOR.concat(IndexSchema.SORT_FIELD_NAME_EXTENSION),
+      ThemeIndexSchema.NAME, ThemeIndexSchema.NAME.concat(IndexSchema.SORT_FIELD_NAME_EXTENSION),
+      ThemeIndexSchema.DESCRIPTION, ThemeIndexSchema.DESCRIPTION.concat(IndexSchema.SORT_FIELD_NAME_EXTENSION)
+  );
+
   @SuppressWarnings("unused")
   private ThemeSearchQuery() {
+  }
+
+  @Override
+  protected String sortOrderFieldName(String field) {
+    if (SORT_FIELDS.containsKey(field)) {
+      return SORT_FIELDS.get(field);
+    }
+    return field;
   }
 
   /**

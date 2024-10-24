@@ -61,7 +61,7 @@ Required:
 
 Required as a service for running Opencast:
 
-    elasticsearch = 7.9.x
+    elasticsearch = 7.9.x and analysis-icu plugin
 
 Required for some services. Some tests may be skipped and some features
 may not be usable if they are not installed. Hence, it's generally a good idea to

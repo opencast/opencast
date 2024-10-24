@@ -74,8 +74,15 @@ accomplished by running the following:
 
     apt-get install opensearch
 
+Furthermore, the `analysis-icu` plugin for OpenSearch is required to install. It is necessary for sorting naturally.
+To install the ICU plugin, run the following:
+
+    bin/opensearch-plugin install analysis-icu
+
 If you wish to use the upstream OpenSearch repository directly be aware that Opencast only supported with OpenSearch 1.x
 and will not work with OpenSearch 2.x yet.  Future support for this is forthcoming.
+
+
 
 Configure OpenSearch
 --------------------
