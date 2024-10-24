@@ -21,6 +21,7 @@
 package org.opencastproject.external.endpoint;
 
 import static com.entwinemedia.fn.data.json.Jsons.BLANK;
+import static com.entwinemedia.fn.data.json.Jsons.NULL;
 import static com.entwinemedia.fn.data.json.Jsons.arr;
 import static com.entwinemedia.fn.data.json.Jsons.f;
 import static com.entwinemedia.fn.data.json.Jsons.obj;
@@ -350,7 +351,7 @@ public class PlaylistsEndpoint {
     List<Field> fields = new ArrayList<>();
 
     fields.add(f("id", v(playlistEntry.getId())));
-    fields.add(f("contentId", v(playlistEntry.getContentId())));
+    fields.add(f("contentId", v(playlistEntry.getContentId(), NULL)));
     fields.add(f("type", enumToJSON(playlistEntry.getType())));
     return obj(fields);
   }
