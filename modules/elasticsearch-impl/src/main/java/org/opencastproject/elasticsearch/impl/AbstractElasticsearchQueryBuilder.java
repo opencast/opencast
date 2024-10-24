@@ -41,6 +41,7 @@ import org.elasticsearch.index.query.QueryShardContext;
 import org.elasticsearch.index.query.QueryStringQueryBuilder;
 import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
+import org.elasticsearch.index.query.WildcardQueryBuilder;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -60,12 +61,21 @@ public abstract class AbstractElasticsearchQueryBuilder<T extends SearchQuery> i
 
   /** Term queries on fields */
   private Map<String, Set<Object>> searchTerms = null;
+  private Map<String, Set<Object>> searchTermsNot = null;
+
+  /** Wildcard query on fields */
+  private Map<String, String> wildcardTerms = null;
+  private Map<String, String> wildcardTermsNot = null;
 
   /** Fields that need to match all values */
   protected List<ValueGroup> groups = null;
 
   /** Fields that query a date range */
   private Set<DateRange> dateRanges = null;
+
+  private Map<String, String> datesGreaterThan = null;
+
+  private Map<String, String> datesLessThan = null;
 
   /** Filter expression */
   protected String filter = null;
@@ -124,10 +134,51 @@ public abstract class AbstractElasticsearchQueryBuilder<T extends SearchQuery> i
       this.queryBuilder = booleanQuery;
     }
 
+    // Terms
+    if (searchTermsNot != null) {
+      for (Map.Entry<String, Set<Object>> entry : searchTermsNot.entrySet()) {
+        booleanQuery.mustNot(new TermsQueryBuilder(entry.getKey(), entry.getValue().toArray(new Object[0])));
+      }
+      this.queryBuilder = booleanQuery;
+    }
+
+    // Wildcard
+    if (wildcardTerms != null) {
+      for (Map.Entry<String, String> entry : wildcardTerms.entrySet()) {
+        booleanQuery.must(new WildcardQueryBuilder(entry.getKey(), entry.getValue()));
+      }
+      this.queryBuilder = booleanQuery;
+    }
+
+    // Wildcard
+    if (wildcardTermsNot != null) {
+      for (Map.Entry<String, String> entry : wildcardTermsNot.entrySet()) {
+        booleanQuery.mustNot(new WildcardQueryBuilder(entry.getKey(), entry.getValue()));
+      }
+      this.queryBuilder = booleanQuery;
+    }
+
     // Date ranges
     if (dateRanges != null) {
       for (DateRange dr : dateRanges) {
         booleanQuery.must(dr.getQueryBuilder());
+      }
+      this.queryBuilder = booleanQuery;
+    }
+
+    // Dates greater/less than
+    if (datesGreaterThan != null) {
+      for (Map.Entry<String, String> entry : datesGreaterThan.entrySet()) {
+        RangeQueryBuilder rqb = new RangeQueryBuilder(entry.getKey());
+        booleanQuery.must(rqb.gt(entry.getValue()));
+      }
+      this.queryBuilder = booleanQuery;
+    }
+
+    if (datesLessThan != null) {
+      for (Map.Entry<String, String> entry : datesLessThan.entrySet()) {
+        RangeQueryBuilder rqb = new RangeQueryBuilder(entry.getKey());
+        booleanQuery.must(rqb.lt(entry.getValue()));
       }
       this.queryBuilder = booleanQuery;
     }
@@ -201,6 +252,73 @@ public abstract class AbstractElasticsearchQueryBuilder<T extends SearchQuery> i
    *
    * @param fieldName
    *          the field name
+   * @param fieldValues
+   *          the field value
+   */
+  protected void andNot(String fieldName, Object... fieldValues) {
+
+    // Make sure the data structures are set up accordingly
+    if (searchTermsNot == null) {
+      searchTermsNot = new HashMap<>();
+    }
+
+    // Fix the field name, just in case
+    fieldName = StringUtils.trim(fieldName);
+
+    // insert value
+    searchTermsNot.computeIfAbsent(fieldName, k -> new HashSet<>())
+        .addAll(Arrays.asList(fieldValues));
+  }
+
+  /**
+   * Stores <code>fieldValue</code> as a wildcard term on the <code>fieldName</code> field.
+   *
+   * @param fieldName
+   *          the field name
+   * @param fieldValues
+   *          the field value
+   */
+  protected void andWildcard(String fieldName, String fieldValue) {
+
+    // Make sure the data structures are set up accordingly
+    if (wildcardTerms == null) {
+      wildcardTerms = new HashMap<>();
+    }
+
+    // Fix the field name, just in case
+    fieldName = StringUtils.trim(fieldName);
+
+    // insert value
+    wildcardTerms.put(fieldName, fieldValue);
+  }
+
+  /**
+   * Stores <code>fieldValue</code> as a wildcard term on the <code>fieldName</code> field.
+   *
+   * @param fieldName
+   *          the field name
+   * @param fieldValues
+   *          the field value
+   */
+  protected void andWildcardNot(String fieldName, String fieldValue) {
+
+    // Make sure the data structures are set up accordingly
+    if (wildcardTermsNot == null) {
+      wildcardTermsNot = new HashMap<>();
+    }
+
+    // Fix the field name, just in case
+    fieldName = StringUtils.trim(fieldName);
+
+    // insert value
+    wildcardTermsNot.put(fieldName, fieldValue);
+  }
+
+  /**
+   * Stores <code>fieldValue</code> as a search term on the <code>fieldName</code> field.
+   *
+   * @param fieldName
+   *          the field name
    * @param startDate
    *          the start date
    * @param endDate
@@ -218,6 +336,34 @@ public abstract class AbstractElasticsearchQueryBuilder<T extends SearchQuery> i
 
     // Add the term
     dateRanges.add(new DateRange(fieldName, startDate, endDate));
+  }
+
+  protected void andDateGreaterThan(String fieldName, String date) {
+
+    // Fix the field name, just in case
+    fieldName = StringUtils.trim(fieldName);
+
+    // Make sure the data structures are set up accordingly
+    if (datesGreaterThan == null) {
+      datesGreaterThan = new HashMap();
+    }
+
+    // Add the term
+    datesGreaterThan.put(fieldName, date);
+  }
+
+  protected void andDateLessThan(String fieldName, String date) {
+
+    // Fix the field name, just in case
+    fieldName = StringUtils.trim(fieldName);
+
+    // Make sure the data structures are set up accordingly
+    if (datesLessThan == null) {
+      datesLessThan = new HashMap();
+    }
+
+    // Add the term
+    datesLessThan.put(fieldName, date);
   }
 
   @Override

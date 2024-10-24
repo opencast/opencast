@@ -68,13 +68,15 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
     }
 
     // Title
-    if (query.getTitle() != null) {
-      and(EventIndexSchema.TITLE, query.getTitle());
+    if (query.getTitleValue() != null) {
+      addToQuery(EventIndexSchema.TITLE,
+          query.getTitle().getValue(), query.getTitle().getType(), query.getTitle().isMust());
     }
 
     // Description
-    if (query.getDescription() != null) {
-      and(EventIndexSchema.DESCRIPTION, query.getDescription());
+    if (query.getDescriptionValue() != null) {
+      addToQuery(EventIndexSchema.DESCRIPTION,
+          query.getDescription().getValue(), query.getDescription().getType(), query.getDescription().isMust());
     }
 
     // Action
@@ -90,70 +92,85 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
     }
 
     // Presenter
-    if (query.getPresenters() != null) {
-      for (String presenter : query.getPresenters()) {
-        and(EventIndexSchema.PRESENTER, presenter);
+    if (query.getPresenterValues() != null) {
+      for (EventSearchQueryField<String> presenter : query.getPresenters()) {
+        addToQuery(EventIndexSchema.PRESENTER,
+            presenter.getValue(), presenter.getType(), presenter.isMust());
       }
     }
 
     // Contributors
-    if (query.getContributors().length > 0) {
-      and(EventIndexSchema.CONTRIBUTOR, query.getContributors());
+    if (query.getContributorValues() != null) {
+      for (EventSearchQueryField<String> contributor : query.getContributors()) {
+        addToQuery(EventIndexSchema.CONTRIBUTOR,
+            contributor.getValue(), contributor.getType(), contributor.isMust());
+      }
     }
 
     // Subject
-    if (query.getSubject() != null) {
-      and(EventIndexSchema.SUBJECT, query.getSubject());
+    if (query.getSubjectValue() != null) {
+      addToQuery(EventIndexSchema.SUBJECT,
+          query.getSubject().getValue(), query.getSubject().getType(), query.getSubject().isMust());
     }
 
     // Location
-    if (query.getLocation() != null) {
-      and(EventIndexSchema.LOCATION, query.getLocation());
+    if (query.getLocationValue() != null) {
+      addToQuery(EventIndexSchema.LOCATION,
+          query.getLocation().getValue(), query.getLocation().getType(), query.getLocation().isMust());
     }
 
     // Series Id
-    if (query.getSeriesId() != null) {
-      and(EventIndexSchema.SERIES_ID, query.getSeriesId());
+    if (query.getSeriesIdValue() != null) {
+      addToQuery(EventIndexSchema.SERIES_ID,
+          query.getSeriesId().getValue(), query.getSeriesId().getType(), query.getSeriesId().isMust());
     }
 
     // Series Name
-    if (query.getSeriesName() != null) {
-      and(EventIndexSchema.SERIES_NAME, query.getSeriesName());
+    if (query.getSeriesNameValue() != null) {
+      addToQuery(EventIndexSchema.SERIES_NAME,
+          query.getSeriesName().getValue(), query.getSeriesName().getType(), query.getSeriesName().isMust());
     }
 
     // Language
-    if (query.getLanguage() != null) {
-      and(EventIndexSchema.LANGUAGE, query.getLanguage());
+    if (query.getLanguageValue() != null) {
+      addToQuery(EventIndexSchema.LANGUAGE,
+          query.getLanguage().getValue(), query.getLanguage().getType(), query.getLanguage().isMust());
     }
 
     // Source
-    if (query.getSource() != null) {
-      and(EventIndexSchema.SOURCE, query.getSource());
+    if (query.getSourceValue() != null) {
+      addToQuery(EventIndexSchema.SOURCE,
+          query.getSource().getValue(), query.getSource().getType(), query.getSource().isMust());
     }
 
     // Created
-    if (query.getCreated() != null) {
-      and(EventIndexSchema.CREATED, query.getCreated());
+    if (query.getCreatedValue() != null) {
+      addToQuery(EventIndexSchema.CREATED,
+          query.getCreated().getValue(), query.getCreated().getType(), query.getCreated().isMust());
     }
 
     // Creator
-    if (query.getCreator() != null) {
-      and(EventIndexSchema.CREATOR, query.getCreator());
+    if (query.getCreatorValue() != null) {
+      addToQuery(EventIndexSchema.CREATOR,
+          query.getCreator().getValue(), query.getCreator().getType(), query.getCreator().isMust());
     }
 
     // Publisher
-    if (query.getPublisher() != null) {
-      and(EventIndexSchema.PUBLISHER, query.getPublisher());
+    if (query.getPublisherValue() != null) {
+      addToQuery(EventIndexSchema.PUBLISHER,
+          query.getPublisher().getValue(), query.getPublisher().getType(), query.getPublisher().isMust());
     }
 
     // License
-    if (query.getLicense() != null) {
-      and(EventIndexSchema.LICENSE, query.getLicense());
+    if (query.getLicenseValue() != null) {
+      addToQuery(EventIndexSchema.LICENSE,
+          query.getLicense().getValue(), query.getLicense().getType(), query.getLicense().isMust());
     }
 
     // Rights
-    if (query.getRights() != null) {
-      and(EventIndexSchema.RIGHTS, query.getRights());
+    if (query.getRightsValue() != null) {
+      addToQuery(EventIndexSchema.RIGHTS,
+          query.getRights().getValue(), query.getRights().getType(), query.getRights().isMust());
     }
 
     // Access policy
@@ -192,8 +209,11 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
     }
 
     // Recording start date
-    if (query.getStartDate() != null) {
-      and(EventIndexSchema.START_DATE, query.getStartDate());
+    if (query.getStartDateValues() != null) {
+      for (EventSearchQueryField<String> date : query.getStartDate()) {
+        addToQuery(EventIndexSchema.START_DATE,
+            date.getValue(), date.getType(), date.isMust());
+      }
     }
 
     // Recording duration
@@ -291,7 +311,32 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
     if (query.getFilter() != null) {
       this.filter = query.getFilter();
     }
+  }
 
+  private void addToQuery(String schema, Object value, EventQueryType type, boolean must) {
+    switch (type) {
+      case SEARCH -> addToQueryAndNot(must, schema, value);
+      case WILDCARD -> addToQueryWildcardAndNot(must, schema, (String) value);
+      case GREATER_THAN -> andDateGreaterThan(schema, (String) value);
+      case LESS_THAN -> andDateLessThan(schema, (String) value);
+      default -> throw new IllegalArgumentException("Unsupported event query type: " + type);
+    }
+  }
+
+  private void addToQueryAndNot(boolean must, String schema, Object value) {
+    if (must) {
+      and(schema, value);
+    } else {
+      andNot(schema, value);
+    }
+  }
+
+  private void addToQueryWildcardAndNot(boolean must, String schema, String value) {
+    if (must) {
+      andWildcard(schema, value);
+    } else {
+      andWildcardNot(schema, value);
+    }
   }
 
 }
