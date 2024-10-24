@@ -130,7 +130,7 @@ public final class AssetPathUtils {
     final String version = assetPath[5];
     final String filename = mediaPackageElementID + '.' + FilenameUtils.getExtension(assetPath[6]);
     // Check under which path the mediapackage exists
-    String localPath = null;
+    String localPath = localPaths.get(0);
     for (String path : localPaths) {
       Path dirPath = Path.of(path, organizationId, mediaPackageID);
       if (Files.exists(dirPath) && Files.isDirectory(dirPath)) {
