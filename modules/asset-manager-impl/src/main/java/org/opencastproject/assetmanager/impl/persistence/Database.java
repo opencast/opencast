@@ -348,10 +348,13 @@ public class Database implements EntityPaths {
     return db.exec(SnapshotDto.countEventsQuery(organization));
   }
 
-  public Optional<AssetDtos.Full> findAssetByChecksumAndStore(final String checksum, final String storeId) {
+  public Optional<AssetDtos.Full> findAssetByChecksumAndStoreAndOrg(final String checksum, final String storeId,
+      final String orgId) {
     return db.execTx(em -> {
       final Tuple result = AssetDtos.baseJoin(em)
-          .where(QAssetDto.assetDto.checksum.eq(checksum).and(QAssetDto.assetDto.storageId.eq(storeId)))
+          .where(QAssetDto.assetDto.checksum.eq(checksum)
+              .and(QAssetDto.assetDto.storageId.eq(storeId))
+              .and(QAssetDto.assetDto.snapshot.organizationId.eq(orgId)))
           .singleResult(Full.select);
       var dtoOpt = Opt.nul(result).map(Full.fromTuple);
       return dtoOpt.isSome() ? Optional.of(dtoOpt.get()) : Optional.empty();
