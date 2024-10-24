@@ -25,6 +25,7 @@ import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ListProvidersService;
 import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.list.impl.ResourceListQueryImpl;
+import org.opencastproject.util.data.Option;
 
 import com.google.common.collect.Iterables;
 
@@ -239,6 +240,12 @@ public class DublinCoreMetadataCollection {
         ResourceListQuery resourceListQuery;
         if (collectionQueryOverrideOpt.isPresent()) {
           resourceListQuery = collectionQueryOverrideOpt.get();
+
+          // shortcut: don't query list provider if limit is set to 0
+          Option<Integer> limit = resourceListQuery.getLimit();
+          if (limit.isSome() && limit.get() == 0) {
+            return Collections.emptyMap();
+          }
         } else {
           resourceListQuery = new ResourceListQueryImpl();
         }
