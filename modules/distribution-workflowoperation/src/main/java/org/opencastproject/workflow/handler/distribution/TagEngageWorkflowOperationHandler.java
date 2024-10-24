@@ -21,7 +21,7 @@
 
 package org.opencastproject.workflow.handler.distribution;
 
-import static org.opencastproject.workflow.handler.distribution.EngagePublicationChannel.CHANNEL_ID;
+import static org.opencastproject.publication.api.EngagePublicationChannel.CHANNEL_ID;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;

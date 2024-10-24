@@ -19,35 +19,34 @@
  *
  */
 
-package org.opencastproject.workflow.handler.distribution;
+package org.opencastproject.publication.engage;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import org.opencastproject.distribution.api.DownloadDistributionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageBuilder;
-import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
+import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.mediapackage.identifier.IdImpl;
+import org.opencastproject.publication.api.EngagePublicationChannel;
+import org.opencastproject.publication.api.EngagePublicationService;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.workflow.api.WorkflowInstance;
-import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
-import org.opencastproject.workflow.api.WorkflowOperationException;
-import org.opencastproject.workflow.api.WorkflowOperationInstance;
-import org.opencastproject.workflow.api.WorkflowOperationResult;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
@@ -58,34 +57,33 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class PublishEngageWorkflowOperationHandlerTest {
+public class EngagePublicationServiceTest {
   private Organization org;
-  private PublishEngageWorkflowOperationHandler handler;
-  private WorkflowOperationInstance operation;
-  private WorkflowInstance workflowInstance;
+  private EngagePublicationServiceImpl service;
+  private SecurityService securityService;
   private SearchService searchService;
   private DownloadDistributionService distributionService;
   private Capture<MediaPackage> capturePublishedMP;
-  private MediaPackageBuilder builder;
-  private static final long PUB_JOB_ID = 1L;
-  private static final long DIST_JOB_ID = 2L;
-  private static final long DIST_MERGE_JOB_ID = 3L;
+  private static final long PARENT_JOB_ID = 1L;
+  private static final long PUB_JOB_ID = 2L;
+  private static final long DIST_JOB_ID = 3L;
+  private static final long DIST_MERGE_JOB_ID = 4L;
+  private Job parentJob;
   private Job pubJob;
   private Job distJob;
   private Job distMergeJob;
 
   @Before
   public void setUp() throws Exception {
-    builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
-    URI uriMP = PublishEngageWorkflowOperationHandlerTest.class.getResource("/mp_to_be_published.xml").toURI();
-    MediaPackage mp = builder.loadFromXml(uriMP.toURL().openStream());
+    parentJob = EasyMock.createNiceMock(Job.class);
+    EasyMock.expect(parentJob.getId()).andReturn(PARENT_JOB_ID).anyTimes();
+    // Replay later
 
     pubJob = mockJob(PUB_JOB_ID, null);
     capturePublishedMP = Capture.newInstance();
@@ -99,13 +97,14 @@ public class PublishEngageWorkflowOperationHandlerTest {
     // Replay later
 
     ServiceRegistry serviceRegistry = EasyMock.createNiceMock(ServiceRegistry.class);
+    EasyMock.expect(serviceRegistry.getJob(PARENT_JOB_ID)).andReturn(parentJob).anyTimes();
     EasyMock.expect(serviceRegistry.getJob(PUB_JOB_ID)).andReturn(pubJob).anyTimes();
     EasyMock.expect(serviceRegistry.getJob(DIST_JOB_ID)).andReturn(distJob).anyTimes();
     EasyMock.expect(serviceRegistry.getJob(DIST_MERGE_JOB_ID)).andReturn(distMergeJob).anyTimes();
     EasyMock.replay(serviceRegistry);
 
     Map<String, String> orgProps = new HashMap<String, String>();
-    orgProps.put(PublishEngageWorkflowOperationHandler.ENGAGE_URL_PROPERTY, "https://opencast.edu");
+    orgProps.put(EngagePublicationService.ENGAGE_URL_PROPERTY, "https://opencast.edu");
     org = new JaxbOrganization(DefaultOrganization.DEFAULT_ORGANIZATION_ID,
             DefaultOrganization.DEFAULT_ORGANIZATION_NAME, null, DefaultOrganization.DEFAULT_ORGANIZATION_ADMIN,
             DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS, orgProps);
@@ -113,24 +112,15 @@ public class PublishEngageWorkflowOperationHandlerTest {
     EasyMock.expect(orgService.getOrganization(DefaultOrganization.DEFAULT_ORGANIZATION_ID)).andReturn(org).anyTimes();
     EasyMock.replay(orgService);
 
-    handler = new PublishEngageWorkflowOperationHandler();
-    handler.setJobBarrierPollingInterval(1L);
-    handler.setServiceRegistry(serviceRegistry);
-    handler.setOrganizationDirectoryService(orgService);
-    handler.setDownloadDistributionService(distributionService);
-    handler.setSearchService(searchService);
+    securityService = EasyMock.createNiceMock(SecurityService.class);
+    EasyMock.expect(securityService.getOrganization()).andReturn(org);
+    EasyMock.replay(securityService);
 
-    workflowInstance = new WorkflowInstance();
-    workflowInstance.setId(1);
-    workflowInstance.setMediaPackage(mp);
-    workflowInstance.setOrganizationId(DefaultOrganization.DEFAULT_ORGANIZATION_ID);
-    workflowInstance.setState(WorkflowState.RUNNING);
-
-    operation = new WorkflowOperationInstance("publish-engage", WorkflowOperationInstance.OperationState.RUNNING);
-
-    List<WorkflowOperationInstance> operationsList = new ArrayList<WorkflowOperationInstance>();
-    operationsList.add(operation);
-    workflowInstance.setOperations(operationsList);
+    service = new EngagePublicationServiceImpl();
+    service.setSecurityService(securityService);
+    service.setServiceRegistry(serviceRegistry);
+    service.setSearchService(searchService);
+    service.setDownloadDistributionService(distributionService);
   }
 
   private Job mockJob(Long jobId, String payloadFile) throws Exception {
@@ -141,7 +131,7 @@ public class PublishEngageWorkflowOperationHandlerTest {
     EasyMock.expect(job.getDateStarted()).andReturn(new Date()).anyTimes();
     EasyMock.expect(job.getQueueTime()).andReturn(0L).anyTimes();
     if (payloadFile != null) {
-      URI uriPayload = PublishEngageWorkflowOperationHandlerTest.class.getResource(payloadFile).toURI();
+      URI uriPayload = EngagePublicationServiceTest.class.getResource(payloadFile).toURI();
       String payload = new String(Files.readAllBytes(Paths.get(uriPayload)));
       EasyMock.expect(job.getPayload()).andReturn(payload).anyTimes();
     }
@@ -150,7 +140,7 @@ public class PublishEngageWorkflowOperationHandlerTest {
   }
 
   @Test
-  public void testPlayerUrl() throws WorkflowOperationException, URISyntaxException {
+  public void testPlayerUrl() throws URISyntaxException {
     URI engageURI = new URI("http://engage.org");
     String mpId = "mp-id";
 
@@ -161,9 +151,8 @@ public class PublishEngageWorkflowOperationHandlerTest {
     EasyMock.replay(element, mp);
 
     // Test configured organization player path
-    PublishEngageWorkflowOperationHandler publishEngagePublish = new PublishEngageWorkflowOperationHandler();
-    URI result = publishEngagePublish.createEngageUri(engageURI, mp);
-    assertEquals(engageURI.toString() + "/play/" + mpId, result.toString());
+    URI result = service.createEngageUri(engageURI, mp);
+    assertEquals(engageURI + "/play/" + mpId, result.toString());
   }
 
   @Test
@@ -178,26 +167,9 @@ public class PublishEngageWorkflowOperationHandlerTest {
     EasyMock.replay(element, mp);
 
     // Test default player path
-    PublishEngageWorkflowOperationHandler publishEngagePublish = new PublishEngageWorkflowOperationHandler();
-    URI result = publishEngagePublish.createEngageUri(engageURI, mp);
-    assertEquals(engageURI.toString() + PublishEngageWorkflowOperationHandler.PLAYER_PATH + mpId, result.toString());
+    URI result = service.createEngageUri(engageURI, mp);
+    assertEquals(engageURI + EngagePublicationService.PLAYER_PATH + mpId, result.toString());
 
-  }
-
-  // Util to set org properties with player path
-  private Organization getOrgWithPlayerPath() {
-    org = EasyMock.createNiceMock(Organization.class);
-    EasyMock.replay(org);
-    return org;
-  }
-
-  // Util to set org properties without player path
-  public Organization getOrgWithoutPlayerPath() {
-    Map<String, String> properties = new HashMap<String, String>();
-    org = EasyMock.createNiceMock(Organization.class);
-    EasyMock.expect(org.getProperties()).andStubReturn(properties);
-    EasyMock.replay(org);
-    return org;
   }
 
   @Test
@@ -210,13 +182,18 @@ public class PublishEngageWorkflowOperationHandlerTest {
             .andReturn(distJob);
     EasyMock.replay(distributionService);
 
-    operation.setConfiguration(PublishEngageWorkflowOperationHandler.DOWNLOAD_SOURCE_TAGS, "engage");
-    WorkflowOperationResult result = handler.start(workflowInstance, null);
+    URI uriMP = EngagePublicationServiceTest.class.getResource("/mp_to_be_published.xml").toURI();
+    String mp = new String(Files.readAllBytes(Paths.get(uriMP)));
+    EasyMock.expect(parentJob.getArguments())
+        .andReturn(Arrays.asList(mp, null, null, null, "engage", null, null, null, null, null, null, null, null));
+    EasyMock.replay(parentJob);
+    String resultPayload = service.process(parentJob);
 
-    assertEquals(WorkflowOperationResult.Action.CONTINUE, result.getAction());
+    assertNotNull(resultPayload);
+    MediaPackage resultMp = MediaPackageParser.getFromXml(resultPayload);
 
     // Check that result mp has a publication element
-    Publication[] pubs = result.getMediaPackage().getPublications();
+    Publication[] pubs = resultMp.getPublications();
     assertEquals(1, pubs.length);
     assertEquals(EngagePublicationChannel.CHANNEL_ID, pubs[0].getChannel());
 
@@ -239,28 +216,30 @@ public class PublishEngageWorkflowOperationHandlerTest {
 
   @Test
   public void testPublishMerge() throws Exception {
-    URI uriMP = PublishEngageWorkflowOperationHandlerTest.class.getResource("/mp_already_published.xml").toURI();
-    MediaPackage mp = builder.loadFromXml(uriMP.toURL().openStream());
+    URI uriMP = EngagePublicationServiceTest.class.getResource("/mp_already_published.xml").toURI();
+    String mp = new String(Files.readAllBytes(Paths.get(uriMP)));
 
     EasyMock.expect(distributionService.distribute(EasyMock.anyObject(String.class),
             EasyMock.anyObject(MediaPackage.class), EasyMock.anyObject(Set.class), EasyMock.anyBoolean()))
             .andReturn(distMergeJob);
     EasyMock.replay(distributionService);
 
-    EasyMock.expect(searchService.get(EasyMock.anyString())).andReturn(mp).anyTimes();
+    MediaPackage searchMp = MediaPackageParser.getFromXml(mp);
+    EasyMock.expect(searchService.get(EasyMock.anyString())).andReturn(searchMp).anyTimes();
     EasyMock.replay(searchService);
 
-    operation.setConfiguration(PublishEngageWorkflowOperationHandler.DOWNLOAD_SOURCE_TAGS, "engage");
-    operation.setConfiguration(PublishEngageWorkflowOperationHandler.STRATEGY,
-            PublishEngageWorkflowOperationHandler.PUBLISH_STRATEGY_MERGE);
     // Do not merge force any flavors
-    operation.setConfiguration(PublishEngageWorkflowOperationHandler.MERGE_FORCE_FLAVORS, "dummy/dummy"); // flavors
-    WorkflowOperationResult result = handler.start(workflowInstance, null);
+    EasyMock.expect(parentJob.getArguments()).andReturn(
+        Arrays.asList(mp, null, EngagePublicationService.PUBLISH_STRATEGY_MERGE, null, "engage", null, null, null, null,
+            null, null, "dummy/dummy", null));
+    EasyMock.replay(parentJob);
+    String resultPayload = service.process(parentJob);
 
-    assertEquals(WorkflowOperationResult.Action.CONTINUE, result.getAction());
+    assertNotNull(resultPayload);
 
     // Check that result mp has a publication element
-    Publication[] pubs = result.getMediaPackage().getPublications();
+    MediaPackage resultMp = MediaPackageParser.getFromXml(resultPayload);
+    Publication[] pubs = resultMp.getPublications();
     assertEquals(1, pubs.length);
     assertEquals(EngagePublicationChannel.CHANNEL_ID, pubs[0].getChannel());
 
@@ -290,30 +269,36 @@ public class PublishEngageWorkflowOperationHandlerTest {
 
   @Test
   public void testPublishMergeForceFlavors() throws Exception {
-    URI uriMP = PublishEngageWorkflowOperationHandlerTest.class.getResource("/mp_already_published.xml").toURI();
-    MediaPackage mp = builder.loadFromXml(uriMP.toURL().openStream());
-
     EasyMock.expect(distributionService.distribute(EasyMock.anyObject(String.class),
             EasyMock.anyObject(MediaPackage.class), EasyMock.anyObject(Set.class), EasyMock.anyBoolean()))
             .andReturn(distMergeJob);
     EasyMock.replay(distributionService);
 
+    URI uriMP = EngagePublicationServiceTest.class.getResource("/mp_already_published.xml").toURI();
+    String mpXml = new String(Files.readAllBytes(Paths.get(uriMP)));
+    MediaPackage mp = MediaPackageParser.getFromXml(mpXml);
     EasyMock.expect(searchService.get(EasyMock.anyString())).andReturn(mp).anyTimes();
     EasyMock.replay(searchService);
 
-    operation.setConfiguration(PublishEngageWorkflowOperationHandler.DOWNLOAD_SOURCE_TAGS, "engage");
-    operation.setConfiguration(PublishEngageWorkflowOperationHandler.STRATEGY,
-            PublishEngageWorkflowOperationHandler.PUBLISH_STRATEGY_MERGE);
+
+    uriMP = EngagePublicationServiceTest.class.getResource("/mp_to_be_published.xml").toURI();
+    mpXml = new String(Files.readAllBytes(Paths.get(uriMP)));
+    mp = MediaPackageParser.getFromXml(mpXml);
     // Use default merge force flavors. Remove "engage" tag from episode catalog so
     // that it's deleted from published mp.
-    MediaPackageElement mpe = workflowInstance.getMediaPackage().getElementById("d84b6672-ff84-4df5-9ada-f1cdc0f2d901");
+    MediaPackageElement mpe = mp.getElementById("d84b6672-ff84-4df5-9ada-f1cdc0f2d901");
     mpe.clearTags();
-    WorkflowOperationResult result = handler.start(workflowInstance, null);
+    EasyMock.expect(parentJob.getArguments()).andReturn(
+        Arrays.asList(mpXml, null, EngagePublicationService.PUBLISH_STRATEGY_MERGE, null, "engage", null, null, null,
+            null, null, null, null, null));
+    EasyMock.replay(parentJob);
+    String resultPayload = service.process(parentJob);
 
-    assertEquals(WorkflowOperationResult.Action.CONTINUE, result.getAction());
+    assertNotNull(resultPayload);
 
     // Check that result mp has a publication element
-    Publication[] pubs = result.getMediaPackage().getPublications();
+    MediaPackage resultMp = MediaPackageParser.getFromXml(resultPayload);
+    Publication[] pubs = resultMp.getPublications();
     assertEquals(1, pubs.length);
     assertEquals(EngagePublicationChannel.CHANNEL_ID, pubs[0].getChannel());
 
@@ -345,12 +330,14 @@ public class PublishEngageWorkflowOperationHandlerTest {
     EasyMock.expect(searchService.get(EasyMock.anyString())).andThrow(new NotFoundException("Not found")).anyTimes();
     EasyMock.replay(searchService);
 
-    operation.setConfiguration(PublishEngageWorkflowOperationHandler.DOWNLOAD_SOURCE_TAGS, "engage");
-    operation.setConfiguration(PublishEngageWorkflowOperationHandler.STRATEGY,
-            PublishEngageWorkflowOperationHandler.PUBLISH_STRATEGY_MERGE);
+    URI uriMP = EngagePublicationServiceTest.class.getResource("/mp_to_be_published.xml").toURI();
+    String mp = new String(Files.readAllBytes(Paths.get(uriMP)));
+    EasyMock.expect(parentJob.getArguments()).andReturn(
+        Arrays.asList(mp, null, EngagePublicationService.PUBLISH_STRATEGY_MERGE, null, "engage", null, null, null, null,
+            null, null, null, null));
+    EasyMock.replay(parentJob);
+    String resultPayload = service.process(parentJob);
 
-    WorkflowOperationResult result = handler.start(workflowInstance, null);
-
-    assertEquals(WorkflowOperationResult.Action.SKIP, result.getAction());
+    assertNull(resultPayload);
   }
 }
