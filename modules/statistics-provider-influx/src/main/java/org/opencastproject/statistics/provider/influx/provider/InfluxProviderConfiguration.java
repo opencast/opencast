@@ -21,6 +21,7 @@
 
 package org.opencastproject.statistics.provider.influx.provider;
 
+import java.util.Collections;
 import org.opencastproject.statistics.api.DataResolution;
 import org.opencastproject.statistics.api.ProviderConfiguration;
 import org.opencastproject.statistics.api.ResourceType;
@@ -74,7 +75,7 @@ public class InfluxProviderConfiguration extends ProviderConfiguration {
     }
 
     public Set<DataResolution> getResolutions() {
-      return resolutions;
+      return Collections.unmodifiableSet(resolutions);
     }
   }
 
@@ -98,7 +99,7 @@ public class InfluxProviderConfiguration extends ProviderConfiguration {
 
 
   public Set<InfluxProviderSource> getSources() {
-    return sources;
+    return Collections.unmodifiableSet(sources);
   }
 
   public static InfluxProviderConfiguration fromJson(String json) {

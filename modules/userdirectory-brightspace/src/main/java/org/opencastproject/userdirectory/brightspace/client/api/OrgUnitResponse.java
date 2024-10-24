@@ -25,6 +25,7 @@ package org.opencastproject.userdirectory.brightspace.client.api;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import java.util.Collections;
 import java.util.List;
 
 public class OrgUnitResponse {
@@ -43,6 +44,6 @@ public class OrgUnitResponse {
   }
 
   public List<OrgUnitItem> getItems() {
-    return items;
+    return Collections.unmodifiableList(items);
   }
 }

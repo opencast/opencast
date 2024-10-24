@@ -115,7 +115,7 @@ public class EditingData {
   }
 
   public List<Subtitle> getSubtitles() {
-    return subtitles;
+    return Collections.unmodifiableList(subtitles);
   }
 
   public String toString() {

@@ -21,6 +21,7 @@
 
 package org.opencastproject.workflow.handler.composer;
 
+import java.util.Collections;
 import org.opencastproject.composer.api.ComposerService;
 import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.composer.api.EncodingProfile;
@@ -120,7 +121,7 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
     }
 
     public List<Track> getSourceTracks() {
-      return sourceTracks;
+      return Collections.unmodifiableList(sourceTracks);
     }
 
     /**
@@ -161,7 +162,7 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
     }
 
     public List<String> getSmilTrackList() {
-      return smilTracks;
+      return Collections.unmodifiableList(smilTracks);
     }
   };
 
@@ -746,7 +747,7 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
     }
 
     public List<Track> getTracks() {
-      return tracks;
+      return Collections.unmodifiableList(tracks);
     }
 
     public MediaPackageElementFlavor getFlavor() {
@@ -754,7 +755,7 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
     }
 
     public List<String> getTags() {
-      return tags;
+      return Collections.unmodifiableList(tags);
     }
 
     public boolean getTagProfile() {

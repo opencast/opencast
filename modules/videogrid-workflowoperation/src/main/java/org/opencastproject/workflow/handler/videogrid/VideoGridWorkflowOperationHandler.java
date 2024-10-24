@@ -331,7 +331,7 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
       this.nextTimeStamp = nextTimeStamp;
     }
     public List<VideoInfo> getAreas() {
-      return areas;
+      return Collections.unmodifiableList(areas);
     }
     public void setAreas(List<VideoInfo> areas) {
       this.areas = areas;
