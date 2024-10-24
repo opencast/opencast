@@ -46,7 +46,7 @@
       if="NOT(${theme_active})"
       description="Tag elements as themed">
       <configurations>
-        <configuration key="source-flavors">*/trimmed</configuration>
+        <configuration key="source-flavors">presenter/trimmed,presentation/trimmed</configuration>
         <configuration key="target-flavor">*/themed</configuration>
         <configuration key="copy">false</configuration>
       </configurations>
