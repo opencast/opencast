@@ -176,7 +176,8 @@ public abstract class AwsAbstractArchive implements AssetStore {
     String objectVersion = null;
     try {
       // Upload file to AWS
-      AwsUploadOperationResult result = uploadObject(origin, objectName, source.getMimeType());
+      AwsUploadOperationResult result = uploadObject(storagePath.getOrganizationId(), origin, objectName,
+          source.getMimeType());
       objectName = result.getObjectName();
       objectVersion = result.getObjectVersion();
     } catch (Exception e) {
@@ -193,8 +194,8 @@ public abstract class AwsAbstractArchive implements AssetStore {
     }
   }
 
-  protected abstract AwsUploadOperationResult uploadObject(File origin, String objectName, Optional<MimeType> mimeType)
-          throws AssetStoreException;
+  protected abstract AwsUploadOperationResult uploadObject(String orgId, File origin, String objectName,
+          Optional<MimeType> mimeType) throws AssetStoreException;
 
   /** @see AssetStore#get(StoragePath) */
   public Optional<InputStream> get(final StoragePath path) throws AssetStoreException {
