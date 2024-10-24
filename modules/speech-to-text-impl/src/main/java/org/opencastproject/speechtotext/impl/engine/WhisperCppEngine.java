@@ -31,6 +31,7 @@ import org.opencastproject.util.data.functions.Strings;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -44,11 +45,14 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
+import java.util.UUID;
 
 /** WhisperC++ implementation of the Speech-to-text engine interface. */
 @Component(
@@ -161,6 +165,23 @@ public class WhisperCppEngine implements SpeechToTextEngine {
   /** Currently used whispercpp no fallback */
   private Option<Boolean> whispercppNoFallback;
 
+  /** Config key for automatic audio encoding */
+  private static final String AUTO_ENCODING_CONFIG_KEY = "whispercpp.auto-encode";
+
+  /** Default value for automatic audio encoding */
+  private static final Boolean AUTO_ENCODING_DEFAULT = true;
+
+  /** If Opencast should automatically re-encode tracks so that they are compatible with Whisper.cpp */
+  private boolean autoEncode = AUTO_ENCODING_DEFAULT;
+
+  /** The key to look for in the service configuration file to override the DEFAULT_FFMPEG_BINARY */
+  public static final String FFMPEG_BINARY_CONFIG_KEY = "org.opencastproject.composer.ffmpeg.path";
+
+  /** The default path to the ffmpeg binary */
+  public static final String DEFAULT_FFMPEG_BINARY = "ffmpeg";
+
+  /** Path to the executable */
+  protected String ffmpegBinary = DEFAULT_FFMPEG_BINARY;
 
   @Override
   public String getEngineName() {
@@ -247,6 +268,14 @@ public class WhisperCppEngine implements SpeechToTextEngine {
       logger.debug("WhisperC++ no fallback set to {}", whispercppNoFallback);
     }
 
+    autoEncode = BooleanUtils.toBoolean(Objects.toString(
+        cc.getProperties().get(AUTO_ENCODING_CONFIG_KEY),
+        AUTO_ENCODING_DEFAULT.toString()));
+    logger.debug("Automatically convert input media: {}", autoEncode);
+
+    ffmpegBinary = Objects.toString(cc.getBundleContext().getProperty(FFMPEG_BINARY_CONFIG_KEY), DEFAULT_FFMPEG_BINARY);
+    logger.debug("ffmpeg binary set to {}", ffmpegBinary);
+
     logger.debug("Finished activating/updating speech-to-text service");
   }
 
@@ -259,7 +288,26 @@ public class WhisperCppEngine implements SpeechToTextEngine {
   public Result generateSubtitlesFile(File mediaFile, File workingDirectory, String language, Boolean translate)
           throws SpeechToTextEngineException {
 
-    if (!mediaFile.getPath().toLowerCase().endsWith(".wav")) {
+    var whisperInput = mediaFile.getAbsolutePath();
+    if (autoEncode) {
+      whisperInput = FilenameUtils.concat(workingDirectory.getAbsolutePath(), UUID.randomUUID() + ".wav");
+      var ffmpegCommand = List.of(
+          ffmpegBinary,
+          "-i", mediaFile.getAbsolutePath(),
+          "-ar", "16000",
+          "-ac", "1",
+          "-c:a", "pcm_s16le",
+          whisperInput);
+      try {
+        execCommand(ffmpegCommand);
+      } catch (IOException e) {
+        throw new SpeechToTextEngineException("Failed to convert audio file", e);
+      } catch (InterruptedException e) {
+        throw new RuntimeException(e);
+      }
+    }
+
+    if (!whisperInput.toLowerCase().endsWith(".wav")) {
       throw new SpeechToTextEngineException("WhisperC++ currently doesn't support any media extension other than wav");
     }
 
@@ -267,7 +315,7 @@ public class WhisperCppEngine implements SpeechToTextEngine {
 
     List<String> command = new ArrayList<>(List.of(
         whispercppExecutable,
-        mediaFile.getAbsolutePath(),
+        whisperInput,
         "--model", whispercppModel,
         "-ovtt",
         "-oj",
@@ -345,36 +393,10 @@ public class WhisperCppEngine implements SpeechToTextEngine {
 
     logger.info("Executing WhisperC++'s transcription command: {}", command);
 
-    Process process = null;
     File vtt;
 
     try {
-      ProcessBuilder processBuilder = new ProcessBuilder(command);
-      processBuilder.redirectErrorStream(true);
-      processBuilder.redirectInput(ProcessBuilder.Redirect.PIPE)
-          .redirectError(ProcessBuilder.Redirect.PIPE)
-          .redirectOutput(ProcessBuilder.Redirect.PIPE);
-      process = processBuilder.start();
-
-      try (BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
-        String line;
-        while ((line = in.readLine()) != null) { // consume process output
-          logger.debug(line);
-        }
-      }
-
-      // wait until the task is finished
-      int exitCode = process.waitFor();
-      logger.info("WhisperC++ process finished with exit code {}", exitCode);
-
-      if (exitCode != 0) {
-        var error = "";
-        try (var errorStream = process.getInputStream()) {
-          error = "\n Output:\n" + IOUtils.toString(errorStream, StandardCharsets.UTF_8);
-        }
-        throw new SpeechToTextEngineException(
-            String.format("WhisperC++ exited abnormally with status %d (command: %s)%s", exitCode, command, error));
-      }
+      execCommand(command);
 
       vtt = new File(workingDirectory, outputName + ".vtt");
       if (!vtt.isFile()) {
@@ -382,10 +404,8 @@ public class WhisperCppEngine implements SpeechToTextEngine {
       }
       logger.info("Subtitles file generated successfully: {}", vtt);
     } catch (Exception e) {
-      logger.info("Transcription failed closing WhisperC++ transcription process for: {}", mediaFile);
+      logger.info("Transcription failed closing WhisperC++ transcription process for: {}", whisperInput);
       throw new SpeechToTextEngineException(e);
-    } finally {
-      IoSupport.closeQuietly(process);
     }
 
     // Detect language if not set
@@ -408,5 +428,41 @@ public class WhisperCppEngine implements SpeechToTextEngine {
     }
 
     return new Result(subtitleLanguage, vtt);
+  }
+
+  private void execCommand(List<String> command) throws IOException, InterruptedException, SpeechToTextEngineException {
+    logger.info("Executing command: {}", command);
+    Process process = null;
+
+    try {
+      ProcessBuilder processBuilder = new ProcessBuilder(command);
+      processBuilder.redirectErrorStream(true);
+      processBuilder.redirectInput(ProcessBuilder.Redirect.PIPE)
+          .redirectError(ProcessBuilder.Redirect.PIPE)
+          .redirectOutput(ProcessBuilder.Redirect.PIPE);
+      process = processBuilder.start();
+
+      try (BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+        String line;
+        while ((line = in.readLine()) != null) { // consume process output
+          logger.debug(line);
+        }
+      }
+
+      // wait until the task is finished
+      int exitCode = process.waitFor();
+      logger.info("Process finished with exit code {}", exitCode);
+
+      if (exitCode != 0) {
+        var error = "";
+        try (var errorStream = process.getInputStream()) {
+          error = "\n Output:\n" + IOUtils.toString(errorStream, StandardCharsets.UTF_8);
+        }
+        throw new SpeechToTextEngineException(
+            String.format("Process exited abnormally with status %d (command: %s) %s", exitCode, command, error));
+      }
+    } finally {
+      IoSupport.closeQuietly(process);
+    }
   }
 }
