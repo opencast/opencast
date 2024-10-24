@@ -46,6 +46,7 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,7 +71,7 @@ import javax.ws.rs.core.Response.Status;
 /**
  * REST Endpoint for User Tracking Service
  */
-@Path("")
+@Path("/usertracking")
 @RestService(name = "usertracking", title = "User Tracking Service", abstractText = "This service is used for tracking user interaction creates, edits and retrieves user actions and "
         + "viewing statistics.", notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
@@ -88,6 +89,7 @@ import javax.ws.rs.core.Response.Status;
         "opencast.service.path=/usertracking"
     }
 )
+@JaxrsResource
 public class UserTrackingRestService {
 
   private static final Logger logger = LoggerFactory.getLogger(UserTrackingRestService.class);

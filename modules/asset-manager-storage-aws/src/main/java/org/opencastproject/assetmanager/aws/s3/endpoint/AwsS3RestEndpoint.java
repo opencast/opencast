@@ -49,6 +49,7 @@ import com.amazonaws.services.s3.model.StorageClass;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +65,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("/")
+@Path("/assets/aws/s3")
 @RestService(name = "archive-aws-s3", title = "AWS S3 Archive",
     notes = {
         "All paths are relative to the REST endpoint base (something like http://your.server/files)",
@@ -82,6 +83,7 @@ import javax.ws.rs.core.Response;
         "opencast.service.path=/assets/aws/s3",
     }
 )
+@JaxrsResource
 public class AwsS3RestEndpoint {
 
   private static final Logger logger = LoggerFactory.getLogger(AwsS3RestEndpoint.class);

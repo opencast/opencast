@@ -40,6 +40,7 @@ import org.json.simple.JSONObject;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +60,7 @@ import javax.ws.rs.core.Response;
 /**
  * The index endpoint allows the management of the elasticsearch index.
  */
-@Path("/")
+@Path("/index")
 @RestService(name = "IndexEndpoint", title = "Index Endpoint",
     abstractText = "Provides operations related to the index that serves both the Admin UI and the External API",
     notes = {})
@@ -72,6 +73,7 @@ import javax.ws.rs.core.Response;
         },
         service = { IndexEndpoint.class }
 )
+@JaxrsResource
 public class IndexEndpoint {
 
   /** The logging facility */

@@ -53,6 +53,7 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,17 +68,23 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 /**
  * The external service endpoint acts as a location for external apis to query the current server of the external
  * supported API.
  */
-@Path("/")
+@Path("/api")
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0,
             ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0,
             ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0,
             ApiMediaType.VERSION_1_9_0, ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0})
 @RestService(name = "externalapiservice", title = "External API Service", notes = {},
              abstractText = "Provides a location for external apis to query the current server of the API.")
+@Tag(name = "External API", description = "The external service endpoint acts as a location for external apis to query the current server of the external supported API.")
 @Component(
     immediate = true,
     service = BaseEndpoint.class,
@@ -87,6 +94,7 @@ import javax.ws.rs.core.Response;
         "opencast.service.path=/api"
     }
 )
+@JaxrsResource
 public class BaseEndpoint {
 
   /** The logging facility */
@@ -122,6 +130,11 @@ public class BaseEndpoint {
   @Path("")
   @RestQuery(name = "getendpointinfo", description = "Returns key characteristics of the API such as the server name and the default version.", returnDescription = "", responses = {
           @RestResponse(description = "The api information is returned.", responseCode = HttpServletResponse.SC_OK) })
+  @Operation(
+      summary = "Get API information",
+      description = "Returns key characteristics of the API such as the server name and the default version."
+  )
+  @ApiResponse(responseCode = "200", description = "The api information is returned.")
   public Response getEndpointInfo() {
     Organization organization = securityService.getOrganization();
     String orgExternalAPIUrl = organization.getProperties().get(OpencastConstants.EXTERNAL_API_URL_ORG_PROPERTY);
@@ -141,6 +154,8 @@ public class BaseEndpoint {
   @Path("info/me")
   @RestQuery(name = "getuserinfo", description = "Returns information on the logged in user.", returnDescription = "", responses = {
           @RestResponse(description = "The user information is returned.", responseCode = HttpServletResponse.SC_OK) })
+  @Operation(summary = "Get user information", description = "Returns information on the logged in user.")
+  @ApiResponse(responseCode = "200", description = "The user information is returned.")
   public Response getUserInfo() {
     final User user = securityService.getUser();
 
@@ -154,6 +169,8 @@ public class BaseEndpoint {
   @Path("info/me/roles")
   @RestQuery(name = "getuserroles", description = "Returns current user's roles.", returnDescription = "", responses = {
           @RestResponse(description = "The set of roles is returned.", responseCode = HttpServletResponse.SC_OK) })
+  @Operation(summary = "Get user roles", description = "Returns current user's roles.")
+  @ApiResponse(responseCode = "200", description = "The set of roles is returned.")
   public Response getUserRoles() {
     final User user = securityService.getUser();
 
@@ -169,6 +186,8 @@ public class BaseEndpoint {
   @Path("info/organization")
   @RestQuery(name = "getorganizationinfo", description = "Returns the current organization.", returnDescription = "", responses = {
           @RestResponse(description = "The organization details are returned.", responseCode = HttpServletResponse.SC_OK) })
+  @Operation(summary = "Get organization information", description = "Returns the current organization.")
+  @ApiResponse(responseCode = "200", description = "The organization details are returned.")
   public Response getOrganizationInfo() {
     final Organization org = securityService.getOrganization();
 
@@ -182,6 +201,8 @@ public class BaseEndpoint {
   @Path("info/organization/properties")
   @RestQuery(name = "getorganizationproperties", description = "Returns the current organization's properties.", returnDescription = "", responses = {
           @RestResponse(description = "The organization properties are returned.", responseCode = HttpServletResponse.SC_OK) })
+  @Operation(summary = "Get organization properties", description = "Returns the current organization's properties.")
+  @ApiResponse(responseCode = "200", description = "The organization properties are returned.")
   public Response getOrganizationProperties() {
     final Organization org = securityService.getOrganization();
 
@@ -197,6 +218,8 @@ public class BaseEndpoint {
   @Path("info/organization/properties/engageuiurl")
   @RestQuery(name = "getorganizationpropertiesengageuiurl", description = "Returns the engage ui url property.", returnDescription = "", responses = {
           @RestResponse(description = "The engage ui url is returned.", responseCode = HttpServletResponse.SC_OK) })
+  @Operation(summary = "Get organization properties engage ui url", description = "Returns the engage ui url property.")
+  @ApiResponse(responseCode = "200", description = "The engage ui url is returned.")
   public Response getOrganizationPropertiesEngageUiUrl() {
     final Organization org = securityService.getOrganization();
 
@@ -218,6 +241,8 @@ public class BaseEndpoint {
   @Path("version")
   @RestQuery(name = "getversion", description = "Returns a list of available version as well as the default version.", returnDescription = "", responses = {
           @RestResponse(description = "The default version is returned.", responseCode = HttpServletResponse.SC_OK) })
+  @Operation(summary = "Get available versions", description = "Returns a list of available version as well as the default version.")
+  @ApiResponse(responseCode = "200", description = "The default version is returned.")
   public Response getVersion() throws Exception {
     List<JValue> versions = new ArrayList<>();
     versions.add(v(ApiVersion.VERSION_1_0_0.toString()));
@@ -240,6 +265,9 @@ public class BaseEndpoint {
   @Path("version/default")
   @RestQuery(name = "getversiondefault", description = "Returns the default version.", returnDescription = "", responses = {
           @RestResponse(description = "The default version is returned.", responseCode = HttpServletResponse.SC_OK) })
+  @Operation(summary = "Get default version", description = "Returns the default version.")
+  @ApiResponse(responseCode = "200", description = "The default version is returned.")
+  @Schema(name = "Version")
   public Response getVersionDefault() throws Exception {
     JValue json = obj(f("default", v(ApiVersion.CURRENT_VERSION.toString())));
     return RestUtil.R.ok(MediaType.APPLICATION_JSON_TYPE, serializer.toJson(json));

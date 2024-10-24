@@ -43,6 +43,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -68,7 +69,7 @@ import javax.ws.rs.core.Response.Status;
 /**
  * The REST endpoint for the remote LTI service (for multi-node setups with LTI)
  */
-@Path("/")
+@Path("/lti-service")
 @RestService(
     name = "ltirestservice",
     title = "LTI Service",
@@ -84,6 +85,7 @@ import javax.ws.rs.core.Response.Status;
         "opencast.service.path=/lti-service"
     }
 )
+@JaxrsResource
 public class LtiServiceRestEndpoint {
   private static final Gson gson = new Gson();
 

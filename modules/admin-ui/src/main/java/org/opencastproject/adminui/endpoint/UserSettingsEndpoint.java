@@ -43,6 +43,7 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +62,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("/")
+@Path("/admin-ng/user-settings")
 @RestService(name = "usersettings", title = "User Settings service",
   abstractText = "Provides operations for user settings",
   notes = { "This service offers the default CRUD Operations for user settings for the admin UI.",
@@ -78,6 +79,7 @@ import javax.ws.rs.core.Response;
     "opencast.service.path=/admin-ng/user-settings"
   }
 )
+@JaxrsResource
 public class UserSettingsEndpoint {
 
   /** The logging facility */

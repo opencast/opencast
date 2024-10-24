@@ -39,6 +39,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -66,7 +67,7 @@ import javax.ws.rs.core.Response.Status;
 /**
  * The endpoint for the LTI gui
  */
-@Path("/")
+@Path("/lti-service-gui")
 @RestService(
     name = "ltirestserviceguiendpoint",
     title = "LTI Service",
@@ -82,6 +83,7 @@ import javax.ws.rs.core.Response.Status;
         "opencast.service.path=/lti-service-gui"
     }
 )
+@JaxrsResource
 public class LtiServiceGuiEndpoint {
   /* OSGi service references */
   private LtiService service;

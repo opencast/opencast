@@ -29,7 +29,7 @@ import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.elasticsearch.index.objects.series.Series;
 import org.opencastproject.external.common.ApiMediaType;
-import org.opencastproject.external.common.ApiResponses;
+import org.opencastproject.external.common.ApiResponseBuilder;
 import org.opencastproject.external.util.statistics.QueryUtils;
 import org.opencastproject.external.util.statistics.ResourceTypeUtils;
 import org.opencastproject.external.util.statistics.StatisticsProviderUtils;
@@ -58,6 +58,7 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,7 +82,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-@Path("/")
+@Path("/api/statistics")
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0,
             ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0,
             ApiMediaType.VERSION_1_9_0, ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0 })
@@ -97,6 +98,7 @@ import javax.ws.rs.core.Response;
         "opencast.service.path=/api/statistics"
     }
 )
+@JaxrsResource
 public class StatisticsEndpoint {
 
   /** The logging facility */
@@ -201,7 +203,7 @@ public class StatisticsEndpoint {
     JSONArray result = new JSONArray();
     providers.stream().map(p -> StatisticsProviderUtils.toJson(p, withParameters)).forEach(result::add);
 
-    return ApiResponses.Json.ok(acceptHeader, result.toJSONString());
+    return ApiResponseBuilder.Json.ok(acceptHeader, result.toJSONString());
   }
 
   @GET
@@ -232,10 +234,10 @@ public class StatisticsEndpoint {
     if (StringUtils.isNotBlank(id)) {
       Optional<StatisticsProvider> provider = statisticsService.getProvider(id);
       if (provider.isPresent()) {
-        return ApiResponses.Json.ok(acceptHeader, StatisticsProviderUtils.toJson(provider.get(),
+        return ApiResponseBuilder.Json.ok(acceptHeader, StatisticsProviderUtils.toJson(provider.get(),
             withParameters).toJSONString());
       } else {
-        return ApiResponses.notFound("Cannot find a statistics provider with id '%s'.", id);
+        return ApiResponseBuilder.notFound("Cannot find a statistics provider with id '%s'.", id);
       }
     } else {
       return RestUtil.R.badRequest("Invalid value for providerId");
@@ -277,7 +279,7 @@ public class StatisticsEndpoint {
       .map(query -> QueryUtils.execute(query))
       .forEach(result::add);
 
-    return ApiResponses.Json.ok(acceptHeader, result.toJSONString());
+    return ApiResponseBuilder.Json.ok(acceptHeader, result.toJSONString());
   }
 
   @POST
@@ -353,7 +355,7 @@ public class StatisticsEndpoint {
             filters
     );
 
-    return ApiResponses.Json.ok(acceptHeader, new JSONObject(Collections.singletonMap("csv", result)).toJSONString());
+    return ApiResponseBuilder.Json.ok(acceptHeader, new JSONObject(Collections.singletonMap("csv", result)).toJSONString());
   }
 
   private void checkAccess(final String resourceId, final ResourceType resourceType) {

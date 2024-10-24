@@ -46,6 +46,7 @@ import com.google.gson.reflect.TypeToken;
 import org.apache.commons.codec.EncoderException;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +63,7 @@ import javax.ws.rs.core.Response;
 /**
  * A service endpoint to expose the {@link VideoGridService} via REST.
  */
-@Path("/")
+@Path("/videogrid")
 @RestService(
     name = "videogrid",
     title = "VideoGrid Service",
@@ -83,6 +84,7 @@ import javax.ws.rs.core.Response;
         "opencast.service.jobproducer=true"
     }
 )
+@JaxrsResource
 public class VideoGridServiceEndpoint extends AbstractJobProducerEndpoint {
 
   /** The logger */

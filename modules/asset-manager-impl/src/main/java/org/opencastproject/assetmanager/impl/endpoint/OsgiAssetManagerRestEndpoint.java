@@ -26,11 +26,12 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 
 import javax.ws.rs.Path;
 
 /** OSGi bound implementation. */
-@Path("/")
+@Path("/assets")
 @Component(
     immediate = true,
     service = OsgiAssetManagerRestEndpoint.class,
@@ -41,6 +42,7 @@ import javax.ws.rs.Path;
         "opencast.service.jobproducer=true"
     }
 )
+@JaxrsResource
 public class OsgiAssetManagerRestEndpoint extends AbstractTieredStorageAssetManagerRestEndpoint {
   private AssetManager assetManager;
 

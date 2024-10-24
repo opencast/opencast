@@ -21,7 +21,7 @@
 package org.opencastproject.external.endpoint;
 
 import org.opencastproject.external.common.ApiMediaType;
-import org.opencastproject.external.common.ApiResponses;
+import org.opencastproject.external.common.ApiResponseBuilder;
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ListProvidersService;
 import org.opencastproject.list.impl.ListProviderNotFoundException;
@@ -39,6 +39,7 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +54,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-@Path("/")
+@Path("/api/listproviders")
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0 })
 @RestService(
         name = "externalapilistproviders",
@@ -70,6 +71,7 @@ import javax.ws.rs.core.Response;
                 "opencast.service.path=/api/listproviders"
         }
 )
+@JaxrsResource
 public class ListProviderEndpoint {
 
   /** The logging facility */
@@ -99,7 +101,7 @@ public class ListProviderEndpoint {
 
     list.add(listProvidersService.getAvailableProviders());
 
-    return ApiResponses.Json.ok(acceptHeader, list.toJSONString());
+    return ApiResponseBuilder.Json.ok(acceptHeader, list.toJSONString());
   }
 
   @GET
@@ -122,15 +124,15 @@ public class ListProviderEndpoint {
       autocompleteList = listProvidersService.getList(source, query, false);
     } catch (ListProviderNotFoundException e) {
       logger.debug("No list found for {}", source, e);
-      return ApiResponses.notFound("");
+      return ApiResponseBuilder.notFound("");
     } catch (ListProviderException e) {
       logger.error("Server error when getting list from provider {}", source, e);
-      return ApiResponses.serverError("");
+      return ApiResponseBuilder.serverError("");
     }
 
     Gson gson = new Gson();
     String jsonList = gson.toJson(autocompleteList);
-    return ApiResponses.Json.ok(acceptHeader, jsonList);
+    return ApiResponseBuilder.Json.ok(acceptHeader, jsonList);
   }
 
   /**

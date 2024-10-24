@@ -41,6 +41,7 @@ import com.google.gson.reflect.TypeToken;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +60,7 @@ import javax.ws.rs.core.Response;
 /**
  * Rest endpoint, mainly for publishing media to a configurable channel
  */
-@Path("/")
+@Path("/publication/api")
 @RestService(
     name = "configurablepublicationservice",
     title = "Configurable Publication Service",
@@ -82,6 +83,7 @@ import javax.ws.rs.core.Response;
         "opencast.service.jobproducer=true"
     }
 )
+@JaxrsResource
 public class ConfigurablePublicationRestService extends AbstractJobProducerEndpoint {
 
   private static final Logger logger = LoggerFactory.getLogger(ConfigurablePublicationRestService.class);

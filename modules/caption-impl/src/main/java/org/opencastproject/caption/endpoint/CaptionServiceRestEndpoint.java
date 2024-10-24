@@ -43,6 +43,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -65,7 +66,7 @@ import javax.xml.transform.stream.StreamResult;
 /**
  * Rest endpoint for {@link CaptionService}.
  */
-@Path("/")
+@Path("/caption")
 @RestService(name = "caption", title = "Caption Service", abstractText = "This service enables conversion from one caption format to another.", notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
         "If the service is down or not working it will return a status 503, this means the the underlying service is "
@@ -83,6 +84,7 @@ import javax.xml.transform.stream.StreamResult;
         "opencast.service.jobproducer=true"
     }
 )
+@JaxrsResource
 public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
 
   /** The logger */

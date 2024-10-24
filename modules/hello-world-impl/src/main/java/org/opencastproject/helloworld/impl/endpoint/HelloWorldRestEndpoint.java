@@ -29,6 +29,7 @@ import org.opencastproject.util.doc.rest.RestService;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +54,7 @@ import javax.ws.rs.core.Response;
     immediate = true,
     service = HelloWorldRestEndpoint.class
 )
-@Path("/")
+@Path("/helloworld")
 @RestService(
     name = "HelloWorldServiceEndpoint",
     title = "Hello World Service Endpoint",
@@ -68,6 +69,7 @@ import javax.ws.rs.core.Response;
             + "<a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>"
     }
 )
+@JaxrsResource
 public class HelloWorldRestEndpoint {
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(HelloWorldRestEndpoint.class);

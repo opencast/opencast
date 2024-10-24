@@ -71,6 +71,7 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,7 +99,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("/")
+@Path("/admin-ng/users")
 @RestService(name = "users", title = "User service",
   abstractText = "Provides operations for users",
   notes = { "This service offers the default users CRUD Operations for the admin UI.",
@@ -115,6 +116,7 @@ import javax.ws.rs.core.Response;
     "opencast.service.path=/admin-ng/users"
   }
 )
+@JaxrsResource
 public class UsersEndpoint {
 
   /** The logging facility */

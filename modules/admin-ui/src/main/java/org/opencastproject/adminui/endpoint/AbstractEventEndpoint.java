@@ -217,6 +217,7 @@ import javax.ws.rs.core.Response.Status;
  * This first implementation uses the {@link org.opencastproject.assetmanager.api.AssetManager}. In a later iteration
  * the endpoint may abstract over the concrete archive.
  */
+@Path("/admin-ng/event")
 public abstract class AbstractEventEndpoint {
 
   /**

@@ -40,6 +40,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,6 +65,7 @@ import io.prometheus.client.hotspot.DefaultExports;
 /**
  * Opencast metrics endpoint
  */
+@Path("/metrics")
 @Component(
     property = {
         "service.description=Metrics Endpoint",
@@ -74,7 +76,6 @@ import io.prometheus.client.hotspot.DefaultExports;
     immediate = true,
     service = MetricsExporter.class
 )
-@Path("")
 @RestService(
     name = "MetricsEndpoint",
     title = "Metrics Endpoint",
@@ -84,6 +85,7 @@ import io.prometheus.client.hotspot.DefaultExports;
         "This can be used by <a href=https://prometheus.io>Prometheus</a>"
     }
 )
+@JaxrsResource
 public class MetricsExporter {
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(MetricsExporter.class);

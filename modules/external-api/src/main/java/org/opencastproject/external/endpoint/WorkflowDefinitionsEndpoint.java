@@ -33,7 +33,7 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import static org.opencastproject.util.requests.SortCriterion.Order.Descending;
 
 import org.opencastproject.external.common.ApiMediaType;
-import org.opencastproject.external.common.ApiResponses;
+import org.opencastproject.external.common.ApiResponseBuilder;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
@@ -59,6 +59,7 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,7 +79,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-@Path("/")
+@Path("/api/workflow-definitions")
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0,
             ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0, ApiMediaType.VERSION_1_6_0,
             ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0,
@@ -94,6 +95,7 @@ import javax.ws.rs.core.Response;
         "opencast.service.path=/api/workflow-definitions"
     }
 )
+@JaxrsResource
 public class WorkflowDefinitionsEndpoint {
 
   /**
@@ -150,7 +152,7 @@ public class WorkflowDefinitionsEndpoint {
       workflowDefinitions = workflowService.listAvailableWorkflowDefinitions().stream();
     } catch (WorkflowDatabaseException e) {
       logger.error("The workflow service was not able to get the workflow definitions:", e);
-      return ApiResponses.serverError("Could not retrieve workflow definitions, reason: '%s'", getMessage(e));
+      return ApiResponseBuilder.serverError("Could not retrieve workflow definitions, reason: '%s'", getMessage(e));
     }
 
     // Apply filter
@@ -224,7 +226,7 @@ public class WorkflowDefinitionsEndpoint {
     List<JValue> json = workflowDefinitions.map(
             wd -> workflowDefinitionToJSON(wd, withOperations, withConfigurationPanel, withConfigurationPanelJson)).collect(Collectors.toList());
 
-    return ApiResponses.Json.ok(acceptHeader, arr(json));
+    return ApiResponseBuilder.Json.ok(acceptHeader, arr(json));
   }
 
   @GET
@@ -244,10 +246,10 @@ public class WorkflowDefinitionsEndpoint {
     try {
       wd = workflowService.getWorkflowDefinitionById(id);
     } catch (NotFoundException e) {
-      return ApiResponses.notFound("Cannot find workflow definition with id '%s'.", id);
+      return ApiResponseBuilder.notFound("Cannot find workflow definition with id '%s'.", id);
     }
 
-    return ApiResponses.Json.ok(acceptHeader, workflowDefinitionToJSON(wd, withOperations, withConfigurationPanel, withConfigurationPanelJson));
+    return ApiResponseBuilder.Json.ok(acceptHeader, workflowDefinitionToJSON(wd, withOperations, withConfigurationPanel, withConfigurationPanelJson));
   }
 
   private JValue workflowDefinitionToJSON(WorkflowDefinition wd, boolean withOperations,
