@@ -756,9 +756,10 @@
     <property name="secret" value="***" />
     <property name="expectedAlgorithms" ref="jwtExpectedAlgorithms" />
     <property name="claimConstraints" ref="jwtClaimConstraints" />
-    <property name="usernameMapping" value="['username'].asString()" />
+    <property name="usernameMapping" value="['sub'].asString()" />
     <property name="nameMapping" value="['name'].asString()" />
     <property name="emailMapping" value="['email'].asString()" />
+    <property name="ocStandardRoleMappings" value="true" />
     <property name="roleMappings" ref="jwtRoleMappings" />
     <property name="jwtCacheSize" value="500" />
     <property name="jwtCacheExpiresIn" value="60" />
@@ -775,7 +776,7 @@
   <util:list id="jwtClaimConstraints" value-type="java.lang.String">
     <value>containsKey('iss')</value>
     <value>containsKey('aud')</value>
-    <value>containsKey('username')</value>
+    <value>containsKey('sub')</value>
     <value>containsKey('name')</value>
     <value>containsKey('email')</value>
     <value>containsKey('domain')</value>
@@ -790,8 +791,8 @@
   <!-- The mapping from JWT claims to Opencast roles
   <util:list id="jwtRoleMappings" value-type="java.lang.String">
     <value>'ROLE_JWT_USER'</value>
-    <value>'ROLE_JWT_USER_' + ['username'].asString()</value>
-    <value>('ROLE_JWT_OWNER_' + ['username'].asString()).replaceAll("[^a-zA-Z0-9]","_").toUpperCase()</value>
+    <value>'ROLE_JWT_USER_' + ['sub'].asString()</value>
+    <value>('ROLE_JWT_OWNER_' + ['sub'].asString()).replaceAll("[^a-zA-Z0-9]","_").toUpperCase()</value>
     <value>['domain'] != null ? 'ROLE_JWT_ORG_' + ['domain'].asString() + '_MEMBER' : null</value>
     <value>['username'].asString() eq ('j_doe01@example.org') ? 'ROLE_ADMIN' : null</value>
     <value>['affiliation'].asList(T(String)).contains('faculty@example.org') ? 'ROLE_GROUP_JWT_TRAINER' : null</value>
