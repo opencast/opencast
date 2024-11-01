@@ -37,7 +37,7 @@
     <failureaccess.version>1.0.2</failureaccess.version>
     <httpcomponents-httpclient.version>4.5.14</httpcomponents-httpclient.version>
     <httpcomponents-httpcore.version>4.4.16</httpcomponents-httpcore.version>
-    <jackson.version>2.16.0</jackson.version>
+    <jackson.version>2.18.1</jackson.version>
     <jakarta.mail.version>1.6.7</jakarta.mail.version>
     <java.release>17</java.release>
     <javadoc-plugin.version>3.3.1</javadoc-plugin.version>
