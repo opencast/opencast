@@ -178,7 +178,6 @@ public class LifeCycleDatabaseServiceImpl implements LifeCycleDatabaseService {
         CriteriaQuery<LifeCyclePolicyImpl> criteriaQuery = criteriaBuilder.createQuery(LifeCyclePolicyImpl.class);
         Root<LifeCyclePolicyImpl> from = criteriaQuery.from(LifeCyclePolicyImpl.class);
         CriteriaQuery<LifeCyclePolicyImpl> select = criteriaQuery.select(from);
-//            .where(criteriaBuilder.isNull(from.get("deletionDate")));
 
         if (sortCriterion.getOrder().equals(SortCriterion.Order.Ascending)) {
           criteriaQuery.orderBy(criteriaBuilder.asc(from.get(sortCriterion.getFieldName())));
