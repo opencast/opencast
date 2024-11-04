@@ -283,12 +283,9 @@ public class LifeCycleServiceImpl implements LifeCycleService {
    */
   @Override
   public LifeCycleTask getLifeCycleTaskById(String id)
-          throws NotFoundException, IllegalStateException, UnauthorizedException {
+          throws NotFoundException, IllegalStateException {
     try {
       LifeCycleTask task = persistence.getLifeCycleTask(id);
-//      if (!checkPermission(task, Permissions.Action.READ)) {
-//        throw new UnauthorizedException("User does not have read permissions");
-//      }
       return task;
     } catch (LifeCycleDatabaseException e) {
       throw new IllegalStateException(e);
@@ -301,12 +298,9 @@ public class LifeCycleServiceImpl implements LifeCycleService {
    */
   @Override
   public LifeCycleTask getLifeCycleTaskByTargetId(String targetId)
-          throws NotFoundException, IllegalStateException, UnauthorizedException {
+          throws NotFoundException, IllegalStateException {
     try {
       LifeCycleTask task = persistence.getLifeCycleTaskByTargetId(targetId);
-      //      if (!checkPermission(task, Permissions.Action.READ)) {
-      //        throw new UnauthorizedException("User does not have read permissions");
-      //      }
       return task;
     } catch (LifeCycleDatabaseException e) {
       throw new IllegalStateException(e);
@@ -322,9 +316,6 @@ public class LifeCycleServiceImpl implements LifeCycleService {
     try {
       String orgId = securityService.getOrganization().getId();
       List<LifeCycleTask> tasks = persistence.getLifeCycleTasksWithStatus(status, orgId);
-      //      if (!checkPermission(policies, Permissions.Action.READ)) {
-      //        throw new UnauthorizedException("User does not have read permissions");
-      //      }
       return tasks;
     } catch (LifeCycleDatabaseException e) {
       throw new IllegalStateException(e);
@@ -336,7 +327,7 @@ public class LifeCycleServiceImpl implements LifeCycleService {
    * @see LifeCycleService#createLifeCycleTask(LifeCycleTask) 
    */
   @Override
-  public LifeCycleTask createLifeCycleTask(LifeCycleTask task) throws UnauthorizedException {
+  public LifeCycleTask createLifeCycleTask(LifeCycleTask task) throws IllegalStateException {
     try {
       task = persistence.createLifeCycleTask(task, securityService.getOrganization().getId());
       return task;
@@ -351,12 +342,9 @@ public class LifeCycleServiceImpl implements LifeCycleService {
    */
   @Override
   public boolean updateLifeCycleTask(LifeCycleTask task)
-          throws IllegalStateException, UnauthorizedException, IllegalArgumentException {
+          throws IllegalStateException, IllegalArgumentException {
     try {
-      LifeCycleTask existingTask = persistence.getLifeCycleTask(task.getId());
-//      if (!checkPermission(existingTask, Permissions.Action.WRITE)) {
-//        throw new UnauthorizedException("User does not have write permissions");
-//      }
+      persistence.getLifeCycleTask(task.getId());
     } catch (NotFoundException | LifeCycleDatabaseException e) {
       throw new IllegalStateException(e);
     }
@@ -378,12 +366,9 @@ public class LifeCycleServiceImpl implements LifeCycleService {
    */
   @Override
   public boolean deleteLifeCycleTask(String id)
-          throws NotFoundException, IllegalStateException, UnauthorizedException {
+          throws NotFoundException, IllegalStateException {
     try {
       LifeCycleTask task = persistence.getLifeCycleTask(id);
-//      if (!checkPermission(task, Permissions.Action.WRITE)) {
-//        throw new UnauthorizedException("User does not have write permissions");
-//      }
       return persistence.deleteLifeCycleTask(task, securityService.getOrganization().getId());
     } catch (LifeCycleDatabaseException e) {
       throw new IllegalStateException("Could not delete task from database with id " + id);

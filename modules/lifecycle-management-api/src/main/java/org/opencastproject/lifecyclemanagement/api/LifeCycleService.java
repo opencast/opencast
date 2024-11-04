@@ -126,7 +126,7 @@ public interface LifeCycleService {
    * @throws UnauthorizedException If the user does not have read access for the life cycle task
    */
   LifeCycleTask getLifeCycleTaskById(String id)
-          throws NotFoundException, IllegalStateException, UnauthorizedException;
+          throws NotFoundException, IllegalStateException;
 
   /**
    * Returns a life cycle task from the database by its target identifier
@@ -137,7 +137,7 @@ public interface LifeCycleService {
    * @throws UnauthorizedException If the user does not have read access for the life cycle task
    */
   LifeCycleTask getLifeCycleTaskByTargetId(String targetId)
-          throws NotFoundException, IllegalStateException, UnauthorizedException;
+          throws NotFoundException, IllegalStateException;
 
   /**
    * Get multiple life cycle tasks based on their status
@@ -154,7 +154,7 @@ public interface LifeCycleService {
    * @throws IllegalStateException If something went wrong in the database service
    * @throws UnauthorizedException If the user does not have write access for an existing life cycle task
    */
-  LifeCycleTask createLifeCycleTask(LifeCycleTask task) throws UnauthorizedException;
+  LifeCycleTask createLifeCycleTask(LifeCycleTask task);
 
   /**
    * Updates a life cycle task
@@ -175,7 +175,7 @@ public interface LifeCycleService {
    * @throws UnauthorizedException If the user does not have write access for the life cycle task
    */
   boolean deleteLifeCycleTask(String id)
-          throws NotFoundException, IllegalStateException, UnauthorizedException;
+          throws NotFoundException, IllegalStateException;
 
   /**
    * Checks if the given policy has all required fields filled in
