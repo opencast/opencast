@@ -148,7 +148,7 @@ public class LifeCycleTaskRunner {
   class Runner implements Runnable {
     @Override
     public void run() {
-      logger.debug("TaskRunner runs");
+      logger.debug("LifeCycleTaskRunner runs");
 
       List<Organization> orgs = organizationDirectoryService.getOrganizations();
 
