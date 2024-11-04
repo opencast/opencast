@@ -160,7 +160,7 @@ public class LifeCycleTaskRunner {
           try {
             tasks = lifeCycleService.getLifeCycleTasksWithStatus(Status.SCHEDULED);
           } catch (NullPointerException e) {
-            logger.info("NPE: ", e);
+            logger.info("Could not get lifecycle tasks in status 'SCHEDULED' from service: ", e);
             return;
           }
 
@@ -175,10 +175,15 @@ public class LifeCycleTaskRunner {
                 default -> throw new NotImplementedException();
               }
             } catch (NotFoundException e) {
-              logger.warn(e.toString());
+              logger.warn("Could not start action for task with id " + task.getId() + ". Lifecycle Policy with id "
+                  + task.getLifeCyclePolicyId() + " was not found.");
             } catch (UnauthorizedException e) {
-              logger.warn(e.toString());
+              logger.warn("Could not start action for task with id " + task.getId() + ". User "
+                  + securityService.getUser().getUsername() + " was not authorized to access "
+                  + "lifecycle policy " + task.getLifeCyclePolicyId());
             } catch (LifeCycleServiceException e) {
+              logger.warn("Could not start action for task with id " + task.getId() + " based of policy "
+                  + task.getLifeCyclePolicyId());
               logger.warn(e.toString());
             }
           }
@@ -187,7 +192,7 @@ public class LifeCycleTaskRunner {
           try {
             tasks = lifeCycleService.getLifeCycleTasksWithStatus(Status.STARTED);
           } catch (NullPointerException e) {
-            logger.info("NPE: ", e);
+            logger.info("Could not get lifecycle tasks in status 'STARTED' from service: ", e);
             return;
           }
 
@@ -202,9 +207,12 @@ public class LifeCycleTaskRunner {
                 default -> throw new NotImplementedException();
               }
             } catch (NotFoundException e) {
-              logger.warn(e.toString());
+              logger.warn("Could not check on running task with id " + task.getId() + ". Lifecycle Policy with id "
+                  + task.getLifeCyclePolicyId() + " was not found.");
             } catch (UnauthorizedException e) {
-              logger.warn(e.toString());
+              logger.warn("Could not check on running task with id " + task.getId() + ". User "
+                  + securityService.getUser().getUsername() + " was not authorized to access "
+                  + "lifecycle policy " + task.getLifeCyclePolicyId());
             }
           }
 
