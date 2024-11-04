@@ -30,7 +30,7 @@ or series. Currently only EVENTS are supported.
 
 ## Policy Filters
 
-Criteria that further narrow down which entities the policy should be applied to. Filters make use of an entities'
+Criteria that further narrow down which entities the policy should be applied to. Filters make use of an entity's'
 metadata. A policy can have none, one or multiple filters. For example, if the policy should only run on a certain
 series it may have the filter “Series identifier is equal to ID-av-portal”. To have the policy apply to all videos of a
 semester it may have the two filters “Start Date > 2023-12-20” and “Start Date < 2024-02-30” to delete all videos
