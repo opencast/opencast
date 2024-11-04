@@ -95,17 +95,17 @@ __Response__
 `400 (BAD REQUEST)`: The request is invalid or inconsistent.  
 `403 (FORBIDDEN)`: The user doesn't have the rights to make this request.
 
-| Field                  | Type                                                     | Description                                                                                                            |
-|------------------------|----------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------|
-| `title`                | [`string`](types.md#basic)                               | Policy Title                                                                                                           |
-| `targetType`           | [`enumeration`]                                          | Which entities the policy should affect. Possible values: EVENT                                                        |
-| `action`               | [`enumeration`]                                          | The action that should be performed. Possible values: START_WORKFLOW                                                   |
-| `actionParameters`     | [`string`](types.md#LifeCycle Policy Action Parameters)  | JSON. Depends on the type of action                                                                                    |
-| `actionDate`           | [`string`](types.md#basic)                               | Required if timing is SPECIFIC_DATE. Should be an ISO string                                                           |
-| `cronTrigger`          | [`string`](types.md#basic)                               | Required if timing is REPEATING. https://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/crontrigger.htm |
-| `timing`               | [`enumeration`]                                          | When the policy should be applied. Possible values: SPECIFIC_DATE, REPEATING, ALWAYS                                   |
-| `targetFilters`              | [`string`](types.md#basic)                               | The filter(s) used to select applicable entities. JSON. Depends on the type of action                                  |
-| `accessControlEntries` | [`string`](types.md#acl)                                 | Policy ACL in JSON format.                                                                                                          |
+| Field                  | Type                                                    | Description                                                                                                            |
+|------------------------|---------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------|
+| `title`                | [`string`](types.md#basic)                              | Policy Title                                                                                                           |
+| `targetType`           | [`enumeration`]                                         | Which entities the policy should affect. Possible values: EVENT                                                        |
+| `action`               | [`enumeration`]                                         | The action that should be performed. Possible values: START_WORKFLOW                                                   |
+| `actionParameters`     | [`JSON object`](types.md#LifeCycle-Policy-Action-Parameters) | JSON. Depends on the type of action                                                                                    |
+| `actionDate`           | [`string`](types.md#basic)                              | Required if timing is SPECIFIC_DATE. Should be an ISO string                                                           |
+| `cronTrigger`          | [`string`](types.md#basic)                              | Required if timing is REPEATING. https://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/crontrigger.htm |
+| `timing`               | [`enumeration`]                                         | When the policy should be applied. Possible values: SPECIFIC_DATE, REPEATING, ALWAYS                                   |
+| `targetFilters`        | [`JSON object`](types.md#LifeCycle-Policy-Filters)      | The filter(s) used to select applicable entities. JSON. Depends on the type of action                                  |
+| `accessControlEntries` | [`string`](types.md#acl)                                | Policy ACL in JSON format.                                                                                                          |
 
 ### PUT /api/lifecyclemanagement/policies/{id}
 
@@ -117,17 +117,17 @@ __Response__
 `400 (BAD REQUEST)`: The request is invalid or inconsistent.  
 `403 (FORBIDDEN)`: The user doesn't have the rights to make this request.
 
-| Field                  | Type                                                     | Description                                                                                                            |
-|------------------------|----------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------|
-| `title`                | [`string`](types.md#basic)                               | Policy Title                                                                                                           |
-| `targetType`           | [`enumeration`]                                          | Which entities the policy should affect. Possible values: EVENT                                                        |
-| `action`               | [`enumeration`]                                          | The action that should be performed. Possible values: START_WORKFLOW                                                   |
-| `actionParameters`     | [`string`](types.md#LifeCycle Policy Action Parameters)  | JSON. Depends on the type of action                                                                                    |
-| `actionDate`           | [`string`](types.md#basic)                               | Required if timing is SPECIFIC_DATE. Should be an ISO string                                                           |
-| `cronTrigger`          | [`string`](types.md#basic)                               | Required if timing is REPEATING. https://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/crontrigger.htm |
-| `timing`               | [`enumeration`]                                          | When the policy should be applied. Possible values: SPECIFIC_DATE, REPEATING, ALWAYS                                   |
-| `targetFilters`              | [`string`](types.md#basic)                               | The filter(s) used to select applicable entities. Format: 'filter1:value1,filter2:value2'                              |
-| `accessControlEntries` | [`string`](types.md#acl)                                 | JSON for ACL.                                                                                                          |
+| Field                  | Type                                                    | Description                                                                                                            |
+|------------------------|---------------------------------------------------------|------------------------------------------------------------------------------------------------------------------------|
+| `title`                | [`string`](types.md#basic)                              | Policy Title                                                                                                           |
+| `targetType`           | [`enumeration`]                                         | Which entities the policy should affect. Possible values: EVENT                                                        |
+| `action`               | [`enumeration`]                                         | The action that should be performed. Possible values: START_WORKFLOW                                                   |
+| `actionParameters`     | [`JSON object`](types.md#LifeCycle-Policy-Action-Parameters) | JSON. Depends on the type of action                                                                                    |
+| `actionDate`           | [`string`](types.md#basic)                              | Required if timing is SPECIFIC_DATE. Should be an ISO string                                                           |
+| `cronTrigger`          | [`string`](types.md#basic)                              | Required if timing is REPEATING. https://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/crontrigger.htm |
+| `timing`               | [`enumeration`]                                         | When the policy should be applied. Possible values: SPECIFIC_DATE, REPEATING, ALWAYS                                   |
+| `targetFilters`        | [`JSON object`](types.md#LifeCycle-Policy-Filters)      | The filter(s) used to select applicable entities. Format: 'filter1:value1,filter2:value2'                              |
+| `accessControlEntries` | [`string`](types.md#acl)                                | JSON for ACL.                                                                                                          |
 
 ### DELETE /api/lifecyclemanagement/policies/{id}
 
