@@ -105,7 +105,7 @@ __Response__
 | `cronTrigger`          | [`string`](types.md#basic)                               | Required if timing is REPEATING. https://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/crontrigger.htm |
 | `timing`               | [`enumeration`]                                          | When the policy should be applied. Possible values: SPECIFIC_DATE, REPEATING, ALWAYS                                   |
 | `filters`              | [`string`](types.md#basic)                               | The filter(s) used to select applicable entities. JSON. Depends on the type of action                                  |
-| `accessControlEntries` | [`string`](types.md#acl)                                 | JSON for ACL.                                                                                                          |
+| `accessControlEntries` | [`string`](types.md#acl)                                 | Policy ACL in JSON format.                                                                                                          |
 
 ### PUT /api/lifecyclemanagement/policies/{id}
 
