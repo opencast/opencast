@@ -619,8 +619,8 @@ Example: Get all events with series “08/15 Algebra - 2024” three days after 
 - SEARCH: The given value must match the value in the field exactly. (default)
 - WILDCARD: The given string must match the value in the field exactly, unless wildcard characters are specified.
   Supported wildcard characters are:
-  - ?, which matches any single character
-  - *, which can match zero or more characters, including an empty one
+  - `?`, which matches any single character
+  - `*`, which can match zero or more characters, including an empty one
   Avoid beginning patterns with * or ?. This can increase the iterations needed to find matching terms and slow search performance.
   Can only be used for string values, i.e. not for dates.
 - GREATER_THAN: The given value is greater than the value in field.
