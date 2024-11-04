@@ -616,7 +616,7 @@ Example: Get all events with series “08/15 Algebra - 2024” three days after 
 
 #### Types
 
-- SEARCH: The given value must match the value in the field exactly. The default
+- SEARCH: The given value must match the value in the field exactly. (default)
 - WILDCARD: The given string must match the value in the field exactly, unless wildcard characters are specified.
   Supported wildcard characters are:
   - ?, which matches any single character
