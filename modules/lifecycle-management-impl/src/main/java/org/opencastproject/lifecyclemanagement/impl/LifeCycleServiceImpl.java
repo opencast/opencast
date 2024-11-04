@@ -456,9 +456,6 @@ public class LifeCycleServiceImpl implements LifeCycleService {
       List<Event> eventsList = new ArrayList<>();
       final Organization organization = securityService.getOrganization();
       final User user = securityService.getUser();
-      //      if (organization == null || user == null) {
-      //        return Response.status(SC_SERVICE_UNAVAILABLE).build();
-      //      }
       EventSearchQuery query = new EventSearchQuery(organization.getId(), user);
 
       addFiltersToQuery(query, filters);
