@@ -177,9 +177,11 @@ public class PolicyCheckRunner {
                     for (String entityId : entityIds) {
                       // If entity does not yet have a task for this policy
                       try {
-                        lifeCycleService.getLifeCycleTaskByTargetId(entityId);
-                        // Task does exist, skip creating one
-                        continue;
+                        LifeCycleTask task = lifeCycleService.getLifeCycleTaskByTargetId(entityId);
+                        if (task.getLifeCyclePolicyId() == policy.getId()) {
+                          // Task does exist, skip creating one
+                          continue;
+                        }
                       } catch (NotFoundException e) {
                         // Task does not exist yet, so create one
                       }
@@ -223,9 +225,11 @@ public class PolicyCheckRunner {
                   for (String entityId : entityIds) {
                     // If entity does not yet have a task for this policy
                     try {
-                      lifeCycleService.getLifeCycleTaskByTargetId(entityId);
-                      // Task does exist, skip creating one
-                      continue;
+                      LifeCycleTask task = lifeCycleService.getLifeCycleTaskByTargetId(entityId);
+                      if (task.getLifeCyclePolicyId() == policy.getId()) {
+                        // Task does exist, skip creating one
+                        continue;
+                      }
                     } catch (NotFoundException e) {
                       // Task does not exist yet, so create one
                     }
