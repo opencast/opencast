@@ -104,7 +104,7 @@ __Response__
 | `actionDate`           | [`string`](types.md#basic)                               | Required if timing is SPECIFIC_DATE. Should be an ISO string                                                           |
 | `cronTrigger`          | [`string`](types.md#basic)                               | Required if timing is REPEATING. https://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/crontrigger.htm |
 | `timing`               | [`enumeration`]                                          | When the policy should be applied. Possible values: SPECIFIC_DATE, REPEATING, ALWAYS                                   |
-| `filters`              | [`string`](types.md#basic)                               | The filter(s) used to select applicable entities. JSON. Depends on the type of action                                  |
+| `targetFilters`              | [`string`](types.md#basic)                               | The filter(s) used to select applicable entities. JSON. Depends on the type of action                                  |
 | `accessControlEntries` | [`string`](types.md#acl)                                 | Policy ACL in JSON format.                                                                                                          |
 
 ### PUT /api/lifecyclemanagement/policies/{id}
@@ -126,7 +126,7 @@ __Response__
 | `actionDate`           | [`string`](types.md#basic)                               | Required if timing is SPECIFIC_DATE. Should be an ISO string                                                           |
 | `cronTrigger`          | [`string`](types.md#basic)                               | Required if timing is REPEATING. https://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/crontrigger.htm |
 | `timing`               | [`enumeration`]                                          | When the policy should be applied. Possible values: SPECIFIC_DATE, REPEATING, ALWAYS                                   |
-| `filters`              | [`string`](types.md#basic)                               | The filter(s) used to select applicable entities. Format: 'filter1:value1,filter2:value2'                              |
+| `targetFilters`              | [`string`](types.md#basic)                               | The filter(s) used to select applicable entities. Format: 'filter1:value1,filter2:value2'                              |
 | `accessControlEntries` | [`string`](types.md#acl)                                 | JSON for ACL.                                                                                                          |
 
 ### DELETE /api/lifecyclemanagement/policies/{id}

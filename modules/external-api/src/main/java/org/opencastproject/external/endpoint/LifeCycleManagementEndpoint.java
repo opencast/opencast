@@ -255,7 +255,7 @@ public class LifeCycleManagementEndpoint {
             @RestParameter(name = "cronTrigger", description = "Required if timing is REPEATING. https://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/crontrigger.html", isRequired = false, type = STRING),
             @RestParameter(name = "timing", description = "SPECIFIC_DATE, REPEATING, ALWAYS", isRequired = true, type = STRING,
                 defaultValue = "SPECIFIC_DATE"),
-            @RestParameter(name = "filters", isRequired = false, description = "Used to select applicable entities. JSON. To find how to structure your JSON check the documentation.", type = TEXT),
+            @RestParameter(name = "targetFilters", isRequired = false, description = "Used to select applicable entities. JSON. To find how to structure your JSON check the documentation.", type = TEXT),
             @RestParameter(name = "accessControlEntries", description = "Which user have what permissions on this policy. JSON. To find how to structure your JSON check the documentation.", isRequired = false, type = TEXT,
                 defaultValue = ""),
         },
@@ -273,7 +273,7 @@ public class LifeCycleManagementEndpoint {
         @FormParam("actionDate") String actionDate,
         @FormParam("cronTrigger") String cronTrigger,
         @FormParam("timing") String timing,
-        @FormParam("filters") String filters,
+        @FormParam("targetFilters") String targetFilters,
         @FormParam("accessControlEntries") String accessControlEntries
     ) {
         try {
@@ -338,11 +338,10 @@ public class LifeCycleManagementEndpoint {
             }
 
             // Convert filters
-//            Map<String, String> filtersMap = RestUtils.parseFilter(filters);
             Map<String, EventSearchQueryField<String>> filtersMap = new HashMap<>();
-            if (filters != null && !filters.isEmpty()) {
+            if (targetFilters != null && !targetFilters.isEmpty()) {
                 try {
-                    filtersMap = gson.fromJson(filters,
+                    filtersMap = gson.fromJson(targetFilters,
                         new TypeToken<Map<String, EventSearchQueryField<String>>>() { }.getType());
                     if (filtersMap == null) {
                         filtersMap = new HashMap<>();
@@ -390,7 +389,7 @@ public class LifeCycleManagementEndpoint {
             @RestParameter(name = "actionDate", description = "Required if timing is SPECIFIC_DATE. E.g. 2023-11-30T16:16:47Z", isRequired = false, type = STRING),
             @RestParameter(name = "cronTrigger", description = "Required if timing is REPEATING. https://www.quartz-scheduler.org/documentation/quartz-2.3.0/tutorials/crontrigger.html", isRequired = false, type = STRING),
             @RestParameter(name = "timing", description = "SPECIFIC_DATE, REPEATING, ALWAYS", isRequired = false, type = STRING),
-            @RestParameter(name = "filters", isRequired = false, description = "The filter(s) used to select applicable entities. Format: 'filter1:value1,filter2:value2'", type = TEXT),
+            @RestParameter(name = "targetFilters", isRequired = false, description = "The filter(s) used to select applicable entities. Format: 'filter1:value1,filter2:value2'", type = TEXT),
             @RestParameter(name = "accessControlEntries", description = "JSON. To find how to structure your JSON check the documentation.", isRequired = false, type = TEXT),
         },
         responses = {
@@ -408,7 +407,7 @@ public class LifeCycleManagementEndpoint {
         @FormParam("actionDate") String actionDate,
         @FormParam("cronTrigger") String cronTrigger,
         @FormParam("timing") String timing,
-        @FormParam("filters") String filters,
+        @FormParam("targetFilters") String targetFilters,
         @FormParam("accessControlEntries") String accessControlEntries
     ) {
         try {
@@ -454,12 +453,11 @@ public class LifeCycleManagementEndpoint {
             if (!timing.isEmpty()) {
                 policy.setTiming(Timing.valueOf(timing));
             }
-            if (!filters.isEmpty()) {
-//                policy.setTargetFilters(RestUtils.parseFilter(filters));
+            if (!targetFilters.isEmpty()) {
                 Map<String, EventSearchQueryField<String>> filtersMap = new HashMap<>();
-                if (filters != null && !filters.isEmpty()) {
+                if (targetFilters != null && !targetFilters.isEmpty()) {
                     try {
-                        filtersMap = gson.fromJson(filters,
+                        filtersMap = gson.fromJson(targetFilters,
                             new TypeToken<Map<String, EventSearchQueryField<String>>>() { }.getType());
                         if (filtersMap == null) {
                             filtersMap = new HashMap<>();
