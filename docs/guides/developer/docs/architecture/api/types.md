@@ -622,7 +622,7 @@ Example: Get all events with series “08/15 Algebra - 2024” three days after 
   - `?`, which matches any single character
   - `*`, which can match zero or more characters, including an empty one
   Avoid beginning patterns with * or ?. This can increase the iterations needed to find matching terms and slow search performance.
-  Can only be used for string values, i.e. not for dates.
+  Matches alphabetically, and not by date.  `2024-10-*` will not match dates in October of 2024.
 - GREATER_THAN: The given value is greater than the value in field.
   Can only be used for dates.
 - LESS_THAN: The given value is less than the value in field.
