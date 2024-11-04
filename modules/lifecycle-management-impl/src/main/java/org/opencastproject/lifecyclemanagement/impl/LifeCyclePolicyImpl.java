@@ -256,7 +256,6 @@ public class LifeCyclePolicyImpl implements LifeCyclePolicy {
   public void setTargetFilters(Map<String, EventSearchQueryField<String>> targetFilters) {
     this.targetFilters = gson.toJson(targetFilters,
         new TypeToken< Map<String, EventSearchQueryField<String>>>() { }.getType());
-//    this.targetFilters = targetFilters;
   }
 
   public List<LifeCyclePolicyAccessControlEntry> getAccessControlEntries() {
