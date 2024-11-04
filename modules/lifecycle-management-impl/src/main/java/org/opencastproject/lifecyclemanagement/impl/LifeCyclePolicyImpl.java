@@ -154,7 +154,6 @@ public class LifeCyclePolicyImpl implements LifeCyclePolicy {
     this.cronTrigger = cronTrigger;
     this.timing = timing;
     setTargetFilters(targetFilters);
-//    this.targetFilters = targetFilters;
     for (var accessControlEntry : accessControlEntries) {
       accessControlEntry.setPolicy(this);
     }
