@@ -203,7 +203,7 @@ public class LifeCycleManagementEndpoint {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
-        if (limit < 0) {
+        if (limit < 1) {
             return Response.status(Response.Status.BAD_REQUEST).build();
         }
 
