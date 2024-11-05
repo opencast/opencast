@@ -157,10 +157,6 @@ public class PolicyCheckRunner {
                 if (policy.getActionDate().before(new Date())) {
 
                   try {
-                    // Deactivate policy
-                    policy.setActive(false);
-                    lifeCycleService.updateLifeCyclePolicy(policy);
-
                     // Get events this policy applies to
                     List<String> entityIds = new ArrayList<>();
                     switch(policy.getTargetType()) {
@@ -199,6 +195,10 @@ public class PolicyCheckRunner {
                       lifeCycleService.createLifeCycleTask(task);
                       logger.info("Created task based on policy " + policy.getTitle());
                     }
+
+                    // Deactivate policy
+                    policy.setActive(false);
+                    lifeCycleService.updateLifeCyclePolicy(policy);
                   } catch (SearchIndexException e) {
                     logger.warn(e.toString());
                   } catch (UnauthorizedException e) {
