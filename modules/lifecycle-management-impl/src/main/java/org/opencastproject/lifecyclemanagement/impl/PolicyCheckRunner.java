@@ -251,8 +251,6 @@ public class PolicyCheckRunner {
                   }
                 } catch (SearchIndexException e) {
                   logger.warn(e.toString());
-                } catch (UnauthorizedException e) {
-                  logger.warn(e.toString());
                 }
 
               } else if (policy.getTiming() == Timing.REPEATING) {

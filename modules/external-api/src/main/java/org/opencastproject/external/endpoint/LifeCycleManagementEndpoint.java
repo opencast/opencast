@@ -34,7 +34,7 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
 
 import org.opencastproject.elasticsearch.index.objects.event.EventSearchQueryField;
 import org.opencastproject.external.common.ApiMediaType;
-import org.opencastproject.external.common.ApiResponses;
+import org.opencastproject.external.common.ApiResponseBuilder;
 import org.opencastproject.lifecyclemanagement.api.Action;
 import org.opencastproject.lifecyclemanagement.api.LifeCyclePolicy;
 import org.opencastproject.lifecyclemanagement.api.LifeCyclePolicyAccessControlEntry;
@@ -69,6 +69,7 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -91,7 +92,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-@Path("/")
+@Path("/api/lifecyclemanagement")
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_12_0 })
 @RestService(
     name = "externalapilifecyclemanagement",
@@ -108,6 +109,7 @@ import javax.ws.rs.core.Response;
         "opencast.service.path=/api/lifecyclemanagement"
     }
 )
+@JaxrsResource
 public class LifeCycleManagementEndpoint {
 
     /** The logging facility */
@@ -163,9 +165,9 @@ public class LifeCycleManagementEndpoint {
         try {
             LifeCyclePolicy policy = service.getLifeCyclePolicyById(id);
 
-            return ApiResponses.Json.ok(acceptHeader, policyToJson(policy));
+            return ApiResponseBuilder.Json.ok(acceptHeader, policyToJson(policy));
         } catch (NotFoundException e) {
-            return ApiResponses.notFound("Cannot find playlist instance with id '%s'.", id);
+            return ApiResponseBuilder.notFound("Cannot find playlist instance with id '%s'.", id);
         } catch (UnauthorizedException e) {
             return Response.status(Response.Status.FORBIDDEN).build();
         } catch (IllegalStateException e) {
@@ -234,7 +236,7 @@ public class LifeCycleManagementEndpoint {
         results.add(f("offset", v(offset)));
         results.add(f("results", arr(policiesJson)));
 
-        return ApiResponses.Json.ok(acceptHeader, obj(results));
+        return ApiResponseBuilder.Json.ok(acceptHeader, obj(results));
     }
 
     @POST
@@ -485,7 +487,7 @@ public class LifeCycleManagementEndpoint {
             service.updateLifeCyclePolicy(policy);
             return Response.status(Response.Status.OK).build();
         } catch (NotFoundException e) {
-            return ApiResponses.notFound("Cannot find playlist instance with id '%s'.", id);
+            return ApiResponseBuilder.notFound("Cannot find playlist instance with id '%s'.", id);
         } catch (UnauthorizedException e) {
             return Response.status(Response.Status.FORBIDDEN).build();
         } catch (IllegalArgumentException e) {
@@ -514,7 +516,7 @@ public class LifeCycleManagementEndpoint {
             service.deleteLifeCyclePolicy(id);
             return Response.status(Response.Status.OK).build();
         } catch (NotFoundException e) {
-            return ApiResponses.notFound("Cannot find policy instance with id '%s'.", id);
+            return ApiResponseBuilder.notFound("Cannot find policy instance with id '%s'.", id);
         } catch (UnauthorizedException e) {
             return Response.status(Response.Status.FORBIDDEN).build();
         }
