@@ -23,6 +23,10 @@ definition ID (and workflow configuration) to define which workflow should be ru
 events we would want to run the “retract” workflow. What exactly the “retract” workflow does is then up to the admins
 of each institution, i.e. can be customized by each institution as they see fit.
 
+Should the action of a specific policy fail for any reason (i.e. no workflow can be found for the given workflow
+identifier, or the workflow itself fails during execution), the action will not be retried. Moreover, the policy will not
+be able to affect the event where the action failed again.
+
 ## Policy Target Type
 
 Determines which entity the policy should be applied to. The two entities we have in Opencast are events
