@@ -547,7 +547,8 @@ public class LifeCycleServiceImpl implements LifeCycleService {
 
     return currentUser.hasRole(GLOBAL_ADMIN_ROLE)
         || (currentUser.hasRole(currentOrgAdminRole) && currentOrgId.equals(policy.getOrganization()))
-        || authorizationService.hasPermission(getAccessControlList(policy), action.toString());
+        || authorizationService.hasPermission(getAccessControlList(policy), action.toString())
+           && currentOrgId.equals(policy.getOrganization());
   }
 
   /**
