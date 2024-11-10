@@ -120,6 +120,9 @@
             <installedFeatures>
               <feature>opencast-security-cas</feature>
               <feature>opencast-security-jwt</feature>
+              <feature>opencast-plugin-crop_allinone</feature>
+              <feature>opencast-plugin-crop_admin</feature>
+              <feature>opencast-plugin-crop_worker</feature>
               <feature>opencast-plugin-legacy-annotation</feature>
               <feature>opencast-plugin-transcription-services</feature>
               <feature>opencast-plugin-userdirectory-brightspace</feature>
