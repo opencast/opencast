@@ -422,16 +422,16 @@ public class LifeCycleManagementEndpoint {
                 }
             }
 
-            if (!title.isEmpty()) {
+            if (title != null && !title.isEmpty()) {
                 policy.setTitle(title);
             }
-            if (!targetType.isEmpty()) {
+            if (targetType != null && !targetType.isEmpty()) {
                 policy.setTargetType(TargetType.valueOf(targetType));
             }
-            if (!action.isEmpty()) {
+            if (action != null && !action.isEmpty()) {
                 policy.setAction(Action.valueOf(action));
             }
-            if (!actionParametersList.isEmpty()) {
+            if (actionParametersList != null && !actionParametersList.isEmpty()) {
                 // Check if action parameters are well formed
                 try {
                     if (Action.valueOf(action) == Action.START_WORKFLOW) {
@@ -446,16 +446,16 @@ public class LifeCycleManagementEndpoint {
                     return Response.status(Response.Status.BAD_REQUEST).build();
                 }
             }
-            if (!actionDate.isEmpty()) {
+            if (actionDate != null && !actionDate.isEmpty()) {
                 policy.setActionDate(EncodingSchemeUtils.decodeDate(actionDate));
             }
-            if (!cronTrigger.isEmpty()) {
+            if (cronTrigger != null && !cronTrigger.isEmpty()) {
                 policy.setCronTrigger(cronTrigger);
             }
-            if (!timing.isEmpty()) {
+            if (timing != null && !timing.isEmpty()) {
                 policy.setTiming(Timing.valueOf(timing));
             }
-            if (!targetFilters.isEmpty()) {
+            if (targetFilters != null && !targetFilters.isEmpty()) {
                 Map<String, EventSearchQueryField<String>> filtersMap = new HashMap<>();
                 if (targetFilters != null && !targetFilters.isEmpty()) {
                     try {
@@ -470,7 +470,7 @@ public class LifeCycleManagementEndpoint {
                     }
                 }
             }
-            if (!accessControlEntries.isEmpty()) {
+            if (accessControlEntries != null && !accessControlEntries.isEmpty()) {
                 // Check if ACL is well formed
                 try {
                     List<LifeCyclePolicyAccessControlEntry> accessControlEntriesParsed = gson.fromJson(accessControlEntries,
@@ -579,7 +579,7 @@ public class LifeCycleManagementEndpoint {
         List<Field> fields = new ArrayList<>();
         fields.add(f("workflowId", v(parameters.getWorkflowId())));
         fields.add(f("workflowParameters", v("{" + parameters.getWorkflowParameters().keySet().stream()
-                .map(key -> key + ":" + parameters.getWorkflowParameters().get(key))
+                .map(key -> "\"" + key + "\"" + ":" + parameters.getWorkflowParameters().get(key))
                 .collect(Collectors.joining(",", "", "")) + "}",
             BLANK
         )));
