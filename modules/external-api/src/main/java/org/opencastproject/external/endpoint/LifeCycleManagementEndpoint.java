@@ -474,7 +474,7 @@ public class LifeCycleManagementEndpoint {
                 // Check if ACL is well formed
                 try {
                     List<LifeCyclePolicyAccessControlEntry> accessControlEntriesParsed = gson.fromJson(accessControlEntries,
-                        new TypeToken<List<LifeCyclePolicyAccessControlEntry>>() { }.getType());
+                        new TypeToken<List<LifeCyclePolicyAccessControlEntryImpl>>() { }.getType());
                     if (accessControlEntriesParsed == null) {
                         accessControlEntriesParsed = new ArrayList<>();
                     }
