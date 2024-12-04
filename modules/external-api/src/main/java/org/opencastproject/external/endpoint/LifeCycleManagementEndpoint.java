@@ -74,6 +74,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -237,6 +238,54 @@ public class LifeCycleManagementEndpoint {
         results.add(f("results", arr(policiesJson)));
 
         return ApiResponseBuilder.Json.ok(acceptHeader, obj(results));
+    }
+
+    @GET
+    @Path("policies/actions")
+    @RestQuery(
+        name = "actions",
+        description = "Get lifecycle policy actions.",
+        returnDescription = "Lifecycle policy actions as JSON array",
+        responses = {
+            @RestResponse(description = "Returns the lifecycle policy actions.", responseCode = HttpServletResponse.SC_OK),
+        })
+    public Response getActions(@HeaderParam("Accept") String acceptHeader) {
+        return ApiResponseBuilder.Json.ok(acceptHeader, arr(Arrays.stream(Action.values())
+            .map(value -> v(value.toString()))
+            .collect(Collectors.toList())
+        ));
+    }
+
+    @GET
+    @Path("policies/targettypes")
+    @RestQuery(
+        name = "targettypes",
+        description = "Get lifecycle policy targettypes.",
+        returnDescription = "Lifecycle policy targettypes as JSON array",
+        responses = {
+            @RestResponse(description = "Returns the lifecycle policy targettypes.", responseCode = HttpServletResponse.SC_OK),
+        })
+    public Response getTargetTypes(@HeaderParam("Accept") String acceptHeader) {
+        return ApiResponseBuilder.Json.ok(acceptHeader, arr(Arrays.stream(TargetType.values())
+            .map(value -> v(value.toString()))
+            .collect(Collectors.toList())
+        ));
+    }
+
+    @GET
+    @Path("policies/timings")
+    @RestQuery(
+        name = "timings",
+        description = "Get lifecycle policy timings.",
+        returnDescription = "Lifecycle policy timings as JSON array",
+        responses = {
+            @RestResponse(description = "Returns the lifecycle policy timings.", responseCode = HttpServletResponse.SC_OK),
+        })
+    public Response getTimings(@HeaderParam("Accept") String acceptHeader) {
+        return ApiResponseBuilder.Json.ok(acceptHeader, arr(Arrays.stream(Timing.values())
+            .map(value -> v(value.toString()))
+            .collect(Collectors.toList())
+        ));
     }
 
     @POST

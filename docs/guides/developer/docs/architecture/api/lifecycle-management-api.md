@@ -85,6 +85,56 @@ __Example__
 }
 ```
 
+### GET /api/lifecyclemanagement/policies/actions
+
+Returns a lifecycle policy actions.
+
+__Response__
+
+`200 (OK)`: A list of actions as JSON.
+
+__Example__
+
+```json
+[
+  "START_WORKFLOW"
+]
+```
+
+### GET /api/lifecyclemanagement/policies/targettypes
+
+Returns a lifecycle policy target types.
+
+__Response__
+
+`200 (OK)`: A list of targets types as JSON.
+
+__Example__
+
+```json
+[
+  "EVENT"
+]
+```
+
+### GET /api/lifecyclemanagement/policies/timings
+
+Returns a lifecycle policy timings.
+
+__Response__
+
+`200 (OK)`: A list of timings as JSON.
+
+__Example__
+
+```json
+[
+  "SPECIFIC_DATE",
+  "REPEATING",
+  "ALWAYS"
+]
+```
+
 ### POST /api/lifecyclemanagement/policies
 
 Creates a new policy.

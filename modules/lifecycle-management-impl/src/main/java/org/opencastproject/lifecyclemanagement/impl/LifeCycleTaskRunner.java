@@ -167,6 +167,7 @@ public class LifeCycleTaskRunner {
           // For each task
           for (LifeCycleTask task : tasks) {
             // Check action and do action related things
+            // TODO: Limit number of retries in case of error?
             try {
               logger.debug("SCHEDULED Task " + task.getId());
               LifeCyclePolicy policy = lifeCycleService.getLifeCyclePolicyById(task.getLifeCyclePolicyId());
