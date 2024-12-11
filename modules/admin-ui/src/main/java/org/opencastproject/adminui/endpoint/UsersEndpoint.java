@@ -31,6 +31,8 @@ import static org.apache.http.HttpStatus.SC_FORBIDDEN;
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
 import static org.apache.http.HttpStatus.SC_OK;
+import static org.opencastproject.userdirectory.UserIdRoleProvider.getUserRolePrefix;
+import static org.opencastproject.userdirectory.UserIdRoleProvider.isSanitize;
 import static org.opencastproject.util.RestUtil.getEndpointUrl;
 import static org.opencastproject.util.UrlSupport.uri;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
@@ -313,6 +315,38 @@ public class UsersEndpoint {
     return Response.ok(gson.toJson(response)).build();
   }
 
+
+  @GET
+  @Path("usersforroles.json")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(
+      name = "usersforroles",
+      description = "Returns a list of users",
+      returnDescription = "Returns a JSON representation of the list of user accounts",
+      restParameters = {
+        @RestParameter(name = "roles", isRequired = false, description = "JSON Array", type = STRING),
+      },
+      responses = {
+          @RestResponse(responseCode = SC_OK, description = "The user accounts.")
+      })
+  public Response getsUsersForRoles(@QueryParam("roles") String roles) {
+    List<String> rolesList = gson.fromJson(roles, ArrayList.class);
+    Map<String, Map<String, Object>> roleUserMap = new HashMap<>();
+
+    for (String role : rolesList) {
+      if (!isSanitize()) {
+        User user = userDirectoryService.loadUser(role.replaceFirst(getUserRolePrefix(), ""));
+        if (user != null) {
+          roleUserMap.put(role, generateJsonUser(user));
+        } else {
+          roleUserMap.put(role, null);
+        }
+      }
+    }
+
+    return Response.ok(gson.toJson(roleUserMap)).build();
+  }
+
   @POST
   @Path("/")
   @RestQuery(name = "createUser", description = "Create a new  user", returnDescription = "The location of the new ressource", restParameters = {
@@ -511,7 +545,7 @@ public class UsersEndpoint {
     return rolesSet;
   }
 
-  private Map<String, Object> generateJsonUser(User user) {
+  public Map<String, Object> generateJsonUser(User user) {
     // Prepare the roles
     Map<String, Object> userData = new HashMap<>();
     userData.put("username", user.getUsername());

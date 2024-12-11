@@ -21,15 +21,24 @@
 
 package org.opencastproject.adminui.endpoint;
 
+import static org.opencastproject.userdirectory.UserIdRoleProvider.getUserRolePrefix;
+import static org.opencastproject.userdirectory.UserIdRoleProvider.isSanitize;
+
 import org.opencastproject.adminui.exception.JsonCreationException;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.list.impl.ResourceListQueryImpl;
 import org.opencastproject.list.query.StringListFilter;
+import org.opencastproject.security.api.AccessControlEntry;
+import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.User;
+import org.opencastproject.security.api.UserDirectoryService;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -90,5 +99,57 @@ public final class EndpointUtil {
     for (var filter : RestUtils.parseFilter(filterString).entrySet()) {
       query.addFilter(new StringListFilter(filter.getKey(), filter.getValue()));
     }
+  }
+
+  /**
+   * Transform ACL into the format the admin ui frontend uses.
+   * We do this in the backend so we can attach information about users to user roles.
+   */
+  public static JSONArray transformAccessControList(AccessControlList acl, UserDirectoryService userDirectoryService) {
+    class TransformedAcl {
+      protected String role;
+      protected boolean read = false;
+      protected boolean write = false;
+      protected List<String> actions = new ArrayList();
+    }
+    Map<String, TransformedAcl> newPolicies = new HashMap();
+    JSONArray jsonEntryArray = new JSONArray();
+
+    for (AccessControlEntry entry : acl.getEntries()) {
+      if (!newPolicies.containsKey(entry.getRole())) {
+        TransformedAcl transformedEntry = new TransformedAcl();
+        transformedEntry.role = entry.getRole();
+        newPolicies.put(entry.getRole(), transformedEntry);
+      }
+
+      if ("read".equals(entry.getAction())) {
+        newPolicies.get(entry.getRole()).read = entry.isAllow();
+      } else if ("write".equals(entry.getAction())) {
+        newPolicies.get(entry.getRole()).write = entry.isAllow();
+      } else if (entry.isAllow()) {
+        newPolicies.get(entry.getRole()).actions.add(entry.getAction());
+      }
+    }
+
+    for (TransformedAcl policy : newPolicies.values()) {
+      JSONObject jsonEntry = new JSONObject();
+      jsonEntry.put("role", policy.role);
+      jsonEntry.put("read", policy.read);
+      jsonEntry.put("write", policy.write);
+      jsonEntry.put("actions", policy.actions);
+      if (!isSanitize()) {
+        User user = userDirectoryService.loadUser(policy.role.replaceFirst(getUserRolePrefix(), ""));
+        if (user != null) {
+          Map<String, Object> userData = new HashMap<>();
+          userData.put("username", user.getUsername());
+          userData.put("name", user.getName());
+          userData.put("email", user.getEmail());
+          jsonEntry.put("user", userData);
+        }
+      }
+      jsonEntryArray.add(jsonEntry);
+    }
+
+    return jsonEntryArray;
   }
 }
