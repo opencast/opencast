@@ -139,6 +139,9 @@ public class SeriesEntity {
       @JoinColumn(name = "organization", referencedColumnName = "organization", nullable = false) })
   protected Map<String, byte[]> elements;
 
+  @Column(name = "creator", nullable = false, length = 128)
+  protected String creator;
+
   /**
    * Default constructor without any import.
    */
@@ -261,4 +264,13 @@ public class SeriesEntity {
   public void removeElement(String type) {
     elements.remove(type);
   }
+
+  public String getCreator() {
+    return creator;
+  }
+
+  public void setCreator(String creator) {
+    this.creator = creator;
+  }
+
 }

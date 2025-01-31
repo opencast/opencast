@@ -169,6 +169,20 @@ public class Series implements IndexObject {
   }
 
   /**
+   * The series identifier.
+   *
+   * @param identifier
+   *          the object identifier
+   * @param organization
+   *          the organization
+   */
+  public Series(String identifier, String organization, String creator) {
+    this.identifier = identifier;
+    this.organization = organization;
+    this.creator = creator;
+  }
+
+  /**
    * Create an unmarshaller for series
    * @return an unmarshaller for series
    * @throws IOException

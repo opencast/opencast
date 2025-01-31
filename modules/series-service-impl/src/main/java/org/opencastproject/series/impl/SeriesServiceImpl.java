@@ -528,7 +528,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
 
         SecurityUtil.runAs(securityService, organization, systemUser,
               () -> {
-                var updatedSeriesData = Optional.of(new Series(seriesId, organization.getId()));
+                var updatedSeriesData = Optional.of(new Series(seriesId, organization.getId(), series.getCreator()));
                 try {
                   DublinCoreCatalog catalog = DublinCoreXmlFormat.read(series.getDublinCoreXML());
                   updatedSeriesData = getMetadataUpdateFunction(seriesId, catalog, organization.getId())
@@ -746,13 +746,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   private Function<Optional<Series>, Optional<Series>> getMetadataUpdateFunction(String seriesId, DublinCoreCatalog dc,
           String orgId) {
     return (Optional<Series> seriesOpt) -> {
-      Series series = seriesOpt.orElse(new Series(seriesId, orgId));
-
-      // only for new series
-      if (!seriesOpt.isPresent()) {
-        series.setCreator(securityService.getUser().getName());
-      }
-
+      Series series = seriesOpt.orElse(new Series(seriesId, orgId, securityService.getUser().getName()));
       series.setTitle(dc.getFirst(DublinCoreCatalog.PROPERTY_TITLE));
       series.setDescription(dc.getFirst(DublinCore.PROPERTY_DESCRIPTION));
       series.setSubject(dc.getFirst(DublinCore.PROPERTY_SUBJECT));

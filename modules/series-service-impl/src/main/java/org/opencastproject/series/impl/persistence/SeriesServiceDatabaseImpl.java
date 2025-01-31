@@ -320,6 +320,7 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
           // no series stored, create new entity
           SeriesEntity newEntity = new SeriesEntity();
           newEntity.setOrganization(securityService.getOrganization().getId());
+          newEntity.setCreator(securityService.getUser().getName());
           newEntity.setSeriesId(seriesId);
           newEntity.setSeries(seriesXML);
           newEntity.setModifiedDate(new Date());
