@@ -85,7 +85,6 @@
         <configuration>
           <bootFeatures>
             <!-- Karaf internal features -->
-            <feature>aries-blueprint</feature>
             <feature>bundle</feature>
             <feature>feature</feature>
             <feature>deployer</feature>
