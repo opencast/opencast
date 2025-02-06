@@ -547,7 +547,7 @@ public class EditorServiceImpl implements EditorService {
           throws IOException, IllegalArgumentException {
     for (EditingData.Subtitle subtitle : subtitles) {
       // Generate ID for new tracks
-      String subtitleId = UUID.randomUUID().toString();
+      String subtitleId = subtitle.getId();
       String trackId = null;
 
       // Check if subtitle already exists
