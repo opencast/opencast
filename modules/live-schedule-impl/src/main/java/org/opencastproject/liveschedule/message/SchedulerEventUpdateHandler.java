@@ -37,6 +37,9 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,14 +60,14 @@ public class SchedulerEventUpdateHandler extends UpdateHandler implements Schedu
   private static final String DESTINATION_SCHEDULER = "SCHEDULER.Liveschedule";
   private static final String DELETE_ON_CAPTURE_ERROR = "live.deleteOnCapureError";
 
-  protected SchedulerService schedulerService;
+  protected volatile SchedulerService schedulerService;
 
   private boolean deleteOnCaptureError = true;
 
   /**
    * OSGi callback on component activation.
    *
-   * @param context
+   * @param cc
    *          the component context
    */
   @Activate
@@ -152,9 +155,17 @@ public class SchedulerEventUpdateHandler extends UpdateHandler implements Schedu
   }
 
   // === Set by OSGI begin
-  @Reference
+  @Reference(
+      cardinality = ReferenceCardinality.OPTIONAL,
+      policy = ReferencePolicy.DYNAMIC,
+      policyOption = ReferencePolicyOption.GREEDY
+  )
   public void setSchedulerService(SchedulerService service) {
     this.schedulerService = service;
+  }
+
+  public void unsetSchedulerService(SchedulerService service) {
+    this.schedulerService = null;
   }
 
   @Reference
