@@ -59,7 +59,6 @@ import javax.xml.bind.JAXBException;
     property = {
         "service.description=SMIL Service"
     },
-    immediate = true,
     service = { SmilService.class }
 )
 public class SmilServiceImpl implements SmilService {

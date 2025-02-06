@@ -79,7 +79,6 @@ import javax.xml.bind.Unmarshaller;
         property = {
                 "service.description=Elasticsearch Index"
         },
-        immediate = true,
         service = { ElasticsearchIndex.class }
 )
 public class ElasticsearchIndex extends AbstractElasticsearchIndex {

@@ -41,7 +41,6 @@ import java.util.Map;
 
 /** Jobs list provider. */
 @Component(
-    immediate = true,
     service = ResourceListProvider.class,
     property = {
         "service.description=Jobs list provider",

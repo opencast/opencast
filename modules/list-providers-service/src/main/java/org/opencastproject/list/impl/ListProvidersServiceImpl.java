@@ -42,7 +42,6 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component(
-    immediate = true,
     service = ListProvidersService.class,
     property = {
         "service.description=Resources list providers service",

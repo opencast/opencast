@@ -55,7 +55,6 @@ import java.util.List;
 import java.util.Map;
 
 @Component(
-    immediate = true,
     service = ResourceListProvider.class,
     property = {
         "service.description=Series list provider",

@@ -162,7 +162,6 @@ import java.util.stream.Collectors;
  * Implementation of {@link SchedulerService}.
  */
 @Component(
-    immediate = true,
     service = { ManagedService.class, SchedulerService.class, IndexProducer.class },
     property = {
         "service.description=Scheduler Service"

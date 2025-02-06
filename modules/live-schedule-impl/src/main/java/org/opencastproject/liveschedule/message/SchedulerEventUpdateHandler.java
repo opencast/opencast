@@ -45,7 +45,6 @@ import java.util.Map;
 import java.util.Objects;
 
 @Component(
-    immediate = true,
     service = { UpdateHandler.class, SchedulerUpdateHandler.class },
     property = {
         "service.description=Scheduler Update Listener for Live Schedule Service"

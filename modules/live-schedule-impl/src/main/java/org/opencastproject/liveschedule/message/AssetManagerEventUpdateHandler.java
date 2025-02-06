@@ -35,7 +35,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Component(
-    immediate = true,
     service = { UpdateHandler.class, AssetManagerUpdateHandler.class },
     property = {
         "service.description=Asset Manager Update Listener for Live Schedule Service"
