@@ -31,6 +31,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ServiceScope;
 import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardContextSelect;
 import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardServletName;
 import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardServletPattern;
@@ -52,7 +53,8 @@ import javax.ws.rs.core.Response;
 import graphql.ExecutionResult;
 
 @Component(
-    service = { HttpServlet.class, Servlet.class }
+    service = { HttpServlet.class, Servlet.class },
+    scope = ServiceScope.PROTOTYPE
 )
 @HttpWhiteboardServletName(GraphQLServlet.GRAPHQL_ENDPOINT)
 @HttpWhiteboardServletPattern(GraphQLServlet.GRAPHQL_ENDPOINT + "/*")
