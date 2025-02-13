@@ -2,7 +2,8 @@
   ":configurator:resource-version" : 1,
   ":configurator:symbolic-name" : "org.opencastproject.graphql.config",
   "org.opencastproject.graphql": {
-    "event.preview.subtype:String": "preview"
+    "event.preview.subtype:String": "preview",
+    "event.retract.workflow.id:String": "delete"
   },
   "org.opencastproject.graphql.execution.ExecutionService": {
     "execution.max.query.complexity:Integer": 1000,
