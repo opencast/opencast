@@ -36,6 +36,7 @@ import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
@@ -68,7 +69,7 @@ public class SchemaService implements OrganizationDirectoryListener {
   @ObjectClassDefinition
   public @interface SchemaConfiguration {
 
-    int schema_update_trigger_delay() default 2000;
+    int schema_update_trigger_delay() default 3000;
 
   }
 
@@ -95,7 +96,8 @@ public class SchemaService implements OrganizationDirectoryListener {
   private final List<GraphQLCodeRegistryProvider> codeRegistryProviders = new CopyOnWriteArrayList<>();
 
   private final ScheduledExecutorService schemaUpdateExecutor;
-  private final int schemaUpdateTriggerDelay;
+
+  private int schemaUpdateTriggerDelay;
 
   private final Map<Organization, ScheduledFuture<?>> scheduledFutureMap = new ConcurrentHashMap<>();
 
@@ -104,12 +106,18 @@ public class SchemaService implements OrganizationDirectoryListener {
       @Reference OrganizationDirectoryService organizationDirectoryService,
       final SchemaConfiguration config
   ) {
+    this.organizationDirectoryService = organizationDirectoryService;
+    schemaUpdateExecutor = Executors.newSingleThreadScheduledExecutor(new SchemaUpdateThreadFactory());
+
+    updateConfiguration(config);
+  }
+
+  @Modified
+  public void updateConfiguration(SchemaConfiguration config) {
     if (config.schema_update_trigger_delay() < 0) {
       throw new IllegalArgumentException("Schema update trigger delay must be greater than or equal to 0");
     }
-    this.organizationDirectoryService = organizationDirectoryService;
     this.schemaUpdateTriggerDelay = config.schema_update_trigger_delay();
-    schemaUpdateExecutor = Executors.newSingleThreadScheduledExecutor(new SchemaUpdateThreadFactory());
     triggerSchemaUpdate();
   }
 
