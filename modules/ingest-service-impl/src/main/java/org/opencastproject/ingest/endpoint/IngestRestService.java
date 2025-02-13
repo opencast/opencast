@@ -530,7 +530,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
               logger.debug("Unable to parse the 'mediaPackage' parameter: {}", ExceptionUtils.getMessage(e));
               return Response.serverError().status(Status.BAD_REQUEST).build();
             }
-          } else if ("startTime".equals(fieldName) && "/addPartialTrack".equals(request.getPathInfo())) {
+          } else if ("startTime".equals(fieldName) && "/ingest/addPartialTrack".equals(request.getPathInfo())) {
             String startTimeString = Streams.asString(item.openStream(), "UTF-8");
             logger.trace("startTime: {}", startTime);
             try {
