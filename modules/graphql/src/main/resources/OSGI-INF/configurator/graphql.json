@@ -9,6 +9,6 @@
     "execution.max.query.depth:Integer": 25
   },
   "org.opencastproject.graphql.schema.SchemaService": {
-    "schema.update.trigger.delay:Integer": 2000
+    "schema.update.trigger.delay:Integer": 3000
   }
 }
