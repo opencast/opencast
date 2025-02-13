@@ -22,6 +22,7 @@
 package org.opencastproject.graphql.schema;
 
 import org.opencastproject.graphql.provider.GraphQLAdditionalTypeProvider;
+import org.opencastproject.graphql.provider.GraphQLCodeRegistryProvider;
 import org.opencastproject.graphql.provider.GraphQLDynamicTypeProvider;
 import org.opencastproject.graphql.provider.GraphQLExtensionProvider;
 import org.opencastproject.graphql.provider.GraphQLFieldVisibilityProvider;
@@ -90,6 +91,8 @@ public class SchemaService implements OrganizationDirectoryListener {
 
   private final List<GraphQLTypeFunctionProvider> typeFunctionProviders = new CopyOnWriteArrayList<>();
 
+  private final List<GraphQLCodeRegistryProvider> codeRegistryProviders = new CopyOnWriteArrayList<>();
+
   private final ScheduledExecutorService schemaUpdateExecutor;
   private final int schemaUpdateTriggerDelay;
 
@@ -128,7 +131,7 @@ public class SchemaService implements OrganizationDirectoryListener {
         .dynamicTypeProviders(dynamicTypeProviders)
         .queryProviders(queryProviders)
         .mutationProviders(mutationProviders)
-        .codeRegistryProviders(additionalTypesProviders)
+        .codeRegistryProviders(codeRegistryProviders)
         .additionalTypeProviders(additionalTypesProviders)
         .fieldVisibilityProviders(fieldVisibilityProviders)
         .typeFunctionProviders(typeFunctionProviders);
