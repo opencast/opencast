@@ -39,6 +39,7 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 import org.osgi.service.component.propertytypes.ServiceDescription;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 import org.slf4j.Logger;
@@ -188,6 +189,7 @@ public class SchemaService implements OrganizationDirectoryListener {
 
   @Reference(
       policy = ReferencePolicy.DYNAMIC,
+      policyOption = ReferencePolicyOption.GREEDY,
       cardinality = ReferenceCardinality.MULTIPLE
   )
   public void bindQueryProvider(GraphQLQueryProvider provider) {
@@ -202,6 +204,7 @@ public class SchemaService implements OrganizationDirectoryListener {
 
   @Reference(
       policy = ReferencePolicy.DYNAMIC,
+      policyOption = ReferencePolicyOption.GREEDY,
       cardinality = ReferenceCardinality.MULTIPLE
   )
   public void bindMutationProvider(GraphQLMutationProvider provider) {
@@ -216,6 +219,7 @@ public class SchemaService implements OrganizationDirectoryListener {
 
   @Reference(
       policy = ReferencePolicy.DYNAMIC,
+      policyOption = ReferencePolicyOption.GREEDY,
       cardinality = ReferenceCardinality.MULTIPLE
   )
   public void bindExtensionProvider(GraphQLExtensionProvider provider) {
@@ -230,6 +234,7 @@ public class SchemaService implements OrganizationDirectoryListener {
 
   @Reference(
       policy = ReferencePolicy.DYNAMIC,
+      policyOption = ReferencePolicyOption.GREEDY,
       cardinality = ReferenceCardinality.MULTIPLE
   )
   public void bindAdditionalTypeProvider(GraphQLAdditionalTypeProvider provider) {
@@ -244,6 +249,7 @@ public class SchemaService implements OrganizationDirectoryListener {
 
   @Reference(
       policy = ReferencePolicy.DYNAMIC,
+      policyOption = ReferencePolicyOption.GREEDY,
       cardinality = ReferenceCardinality.MULTIPLE
   )
   public void bindFieldVisibilityProvider(GraphQLFieldVisibilityProvider provider) {
@@ -258,6 +264,7 @@ public class SchemaService implements OrganizationDirectoryListener {
 
   @Reference(
       policy = ReferencePolicy.DYNAMIC,
+      policyOption = ReferencePolicyOption.GREEDY,
       cardinality = ReferenceCardinality.MULTIPLE
   )
   public void bindDynamicTypeProvider(GraphQLDynamicTypeProvider provider) {
@@ -272,6 +279,7 @@ public class SchemaService implements OrganizationDirectoryListener {
 
   @Reference(
       policy = ReferencePolicy.DYNAMIC,
+      policyOption = ReferencePolicyOption.GREEDY,
       cardinality = ReferenceCardinality.MULTIPLE
   )
   public void bindTypeFunctionProvider(GraphQLTypeFunctionProvider provider) {
