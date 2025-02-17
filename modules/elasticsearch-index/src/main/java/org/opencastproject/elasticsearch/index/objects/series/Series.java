@@ -164,8 +164,7 @@ public class Series implements IndexObject {
    *          the organization
    */
   public Series(String identifier, String organization) {
-    this.identifier = identifier;
-    this.organization = organization;
+    this(identifier, organization, null);
   }
 
   /**

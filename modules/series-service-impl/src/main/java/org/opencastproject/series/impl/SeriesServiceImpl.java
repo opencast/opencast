@@ -528,7 +528,9 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
 
         SecurityUtil.runAs(securityService, organization, systemUser,
               () -> {
-                var updatedSeriesData = Optional.of(new Series(seriesId, organization.getId(), series.getCreator()));
+                var updatedSeriesData = Optional.of(
+                    new Series(seriesId, organization.getId(), series.getCreatorName())
+                );
                 try {
                   DublinCoreCatalog catalog = DublinCoreXmlFormat.read(series.getDublinCoreXML());
                   updatedSeriesData = getMetadataUpdateFunction(seriesId, catalog, organization.getId())

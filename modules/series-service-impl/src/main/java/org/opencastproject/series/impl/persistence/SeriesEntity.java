@@ -21,6 +21,8 @@
 
 package org.opencastproject.series.impl.persistence;
 
+import org.opencastproject.security.api.User;
+
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
@@ -28,9 +30,12 @@ import java.util.TreeMap;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -139,13 +144,21 @@ public class SeriesEntity {
       @JoinColumn(name = "organization", referencedColumnName = "organization", nullable = false) })
   protected Map<String, byte[]> elements;
 
-  @Column(name = "creator", nullable = false, length = 128)
-  protected String creator;
+  @Embedded
+  @AttributeOverrides({
+      @AttributeOverride(name = "username",
+          column = @Column(name = "creator_username", length = 128, nullable = false)
+      ),
+      @AttributeOverride(name = "name",
+          column = @Column(name = "creator_name")
+      ),
+  })
+  protected SeriesCreatorEntity creator;
 
   /**
    * Default constructor without any import.
    */
-  public SeriesEntity() {
+  protected SeriesEntity() {
   }
 
   /**
@@ -265,12 +278,12 @@ public class SeriesEntity {
     elements.remove(type);
   }
 
-  public String getCreator() {
-    return creator;
+  public String getCreatorName() {
+    return creator != null ? creator.name() : null;
   }
 
-  public void setCreator(String creator) {
-    this.creator = creator;
+  public void setCreator(User user) {
+    this.creator = new SeriesCreatorEntity(user);
   }
 
 }
