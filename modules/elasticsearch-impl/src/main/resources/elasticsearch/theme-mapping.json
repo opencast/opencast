@@ -70,7 +70,6 @@
         "watermark_position": { "type" : "keyword" },
 
         "text": { "type" : "text", "analyzer": "lowercasespaceanalyzer" },
-        "text_fuzzy": { "type" : "text", "analyzer": "lowercasespaceanalyzer" }
 
     }
 }

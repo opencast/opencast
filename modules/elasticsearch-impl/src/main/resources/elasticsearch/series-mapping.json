@@ -106,7 +106,6 @@
           "theme": { "type" : "long" },
 
           "text": { "type" : "text", "analyzer": "lowercasespaceanalyzer" },
-          "text_fuzzy": { "type" : "text", "analyzer": "lowercasespaceanalyzer" }
 
       },
       "dynamic_templates" : [
