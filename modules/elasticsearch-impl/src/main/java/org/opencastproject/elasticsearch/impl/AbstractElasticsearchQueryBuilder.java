@@ -119,7 +119,7 @@ public abstract class AbstractElasticsearchQueryBuilder<T extends SearchQuery> i
     // Terms
     if (searchTerms != null) {
       for (Map.Entry<String, Set<Object>> entry : searchTerms.entrySet()) {
-        booleanQuery.must(new TermsQueryBuilder(entry.getKey(), entry.getValue().toArray(new Object[0])));
+        booleanQuery.filter(new TermsQueryBuilder(entry.getKey(), entry.getValue().toArray(new Object[0])));
       }
       this.queryBuilder = booleanQuery;
     }
