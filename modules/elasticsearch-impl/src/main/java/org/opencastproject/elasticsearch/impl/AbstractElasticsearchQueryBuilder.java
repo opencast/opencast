@@ -73,11 +73,13 @@ public abstract class AbstractElasticsearchQueryBuilder<T extends SearchQuery> i
   /** Text query */
   protected String text = null;
 
+  protected List<String> additionalMultiQueryFields = new ArrayList<>();
+
   /** Fuzzy text query */
   protected boolean fuzzy = false;
 
   /** The original search query */
-  private T query;
+  private final T query;
 
   /** The boolean query */
   private QueryBuilder queryBuilder = null;
@@ -134,13 +136,16 @@ public abstract class AbstractElasticsearchQueryBuilder<T extends SearchQuery> i
 
     // Text
     if (text != null) {
-      MultiMatchQueryBuilder queryBuilder = QueryBuilders.multiMatchQuery(text, TEXT);
+      MultiMatchQueryBuilder queryBuilder = QueryBuilders.multiMatchQuery(text);
+      queryBuilder.field(TEXT, 1.2f);
+      additionalMultiQueryFields.forEach(field -> queryBuilder.field(field, 1.0f));
+      queryBuilder.type(MultiMatchQueryBuilder.Type.BEST_FIELDS);
       queryBuilder.operator(Operator.AND);
       if (fuzzy) {
         queryBuilder.fuzziness(Fuzziness.AUTO);
       }
-      booleanQuery.should(queryBuilder);
       booleanQuery.minimumShouldMatch(1);
+      booleanQuery.should(queryBuilder);
       this.queryBuilder = booleanQuery;
     }
 

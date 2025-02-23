@@ -119,7 +119,7 @@ public final class EventIndexUtils {
       boolean episodeIdRole) {
     SearchMetadataCollection metadata = new SearchMetadataCollection(
             event.getIdentifier().concat(event.getOrganization()), Event.DOCUMENT_TYPE);
-    metadata.addField(EventIndexSchema.UID, event.getIdentifier(), true);
+    metadata.addField(EventIndexSchema.UID, event.getIdentifier(), false);
     metadata.addField(EventIndexSchema.ORGANIZATION, event.getOrganization(), false);
     metadata.addField(EventIndexSchema.OBJECT, event.toXML(), false);
     if (StringUtils.isNotBlank(event.getTitle())) {
@@ -132,22 +132,22 @@ public final class EventIndexUtils {
       metadata.addField(EventIndexSchema.LOCATION, event.getLocation(), true);
     }
     if (StringUtils.isNotBlank(event.getSeriesId())) {
-      metadata.addField(EventIndexSchema.SERIES_ID, event.getSeriesId(), true);
+      metadata.addField(EventIndexSchema.SERIES_ID, event.getSeriesId(), false);
     }
     if (StringUtils.isNotBlank(event.getSeriesName())) {
       metadata.addField(EventIndexSchema.SERIES_NAME, event.getSeriesName(), true);
     }
     if (StringUtils.isNotBlank(event.getLanguage())) {
-      metadata.addField(EventIndexSchema.LANGUAGE, event.getLanguage(), true);
+      metadata.addField(EventIndexSchema.LANGUAGE, event.getLanguage(), false);
     }
     if (StringUtils.isNotBlank(event.getSubject())) {
       metadata.addField(EventIndexSchema.SUBJECT, event.getSubject(), true);
     }
     if (StringUtils.isNotBlank(event.getSource())) {
-      metadata.addField(EventIndexSchema.SOURCE, event.getSource(), true);
+      metadata.addField(EventIndexSchema.SOURCE, event.getSource(), false);
     }
     if (StringUtils.isNotBlank(event.getCreated())) {
-      metadata.addField(EventIndexSchema.CREATED, event.getCreated(), true);
+      metadata.addField(EventIndexSchema.CREATED, event.getCreated(), false);
     }
     if (StringUtils.isNotBlank(event.getCreator())) {
       metadata.addField(EventIndexSchema.CREATOR, event.getCreator(), true);
@@ -156,43 +156,43 @@ public final class EventIndexUtils {
       metadata.addField(EventIndexSchema.PUBLISHER, event.getPublisher(), true);
     }
     if (StringUtils.isNotBlank(event.getLicense())) {
-      metadata.addField(EventIndexSchema.LICENSE, event.getLicense(), true);
+      metadata.addField(EventIndexSchema.LICENSE, event.getLicense(), false);
     }
     if (StringUtils.isNotBlank(event.getRights())) {
       metadata.addField(EventIndexSchema.RIGHTS, event.getRights(), true);
     }
     if (StringUtils.isNotBlank(event.getManagedAcl())) {
-      metadata.addField(EventIndexSchema.MANAGED_ACL, event.getManagedAcl(), true);
+      metadata.addField(EventIndexSchema.MANAGED_ACL, event.getManagedAcl(), false);
     }
     if (StringUtils.isNotBlank(event.getWorkflowState())) {
-      metadata.addField(EventIndexSchema.WORKFLOW_STATE, event.getWorkflowState(), true);
+      metadata.addField(EventIndexSchema.WORKFLOW_STATE, event.getWorkflowState(), false);
     }
     if (event.getWorkflowId() != null) {
-      metadata.addField(EventIndexSchema.WORKFLOW_ID, event.getWorkflowId(), true);
+      metadata.addField(EventIndexSchema.WORKFLOW_ID, event.getWorkflowId(), false);
     }
     if (StringUtils.isNotBlank(event.getWorkflowDefinitionId())) {
-      metadata.addField(EventIndexSchema.WORKFLOW_DEFINITION_ID, event.getWorkflowDefinitionId(), true);
+      metadata.addField(EventIndexSchema.WORKFLOW_DEFINITION_ID, event.getWorkflowDefinitionId(), false);
     }
     if (StringUtils.isNotBlank(event.getRecordingStartDate())) {
-      metadata.addField(EventIndexSchema.START_DATE, event.getRecordingStartDate(), true);
+      metadata.addField(EventIndexSchema.START_DATE, event.getRecordingStartDate(), false);
     }
     if (StringUtils.isNotBlank(event.getRecordingEndDate())) {
-      metadata.addField(EventIndexSchema.END_DATE, event.getRecordingEndDate(), true);
+      metadata.addField(EventIndexSchema.END_DATE, event.getRecordingEndDate(), false);
     }
     if (event.getDuration() != null) {
-      metadata.addField(EventIndexSchema.DURATION, event.getDuration(), true);
+      metadata.addField(EventIndexSchema.DURATION, event.getDuration(), false);
     }
     if (event.getArchiveVersion() != null) {
-      metadata.addField(EventIndexSchema.ARCHIVE_VERSION, event.getArchiveVersion(), true);
+      metadata.addField(EventIndexSchema.ARCHIVE_VERSION, event.getArchiveVersion(), false);
     }
     if (event.getRecordingStatus() != null) {
-      metadata.addField(EventIndexSchema.RECORDING_STATUS, event.getRecordingStatus(), true);
+      metadata.addField(EventIndexSchema.RECORDING_STATUS, event.getRecordingStatus(), false);
     }
 
-    metadata.addField(EventIndexSchema.EVENT_STATUS, event.getEventStatus(), true);
+    metadata.addField(EventIndexSchema.EVENT_STATUS, event.getEventStatus(), false);
 
-    metadata.addField(EventIndexSchema.HAS_COMMENTS, event.hasComments(), true);
-    metadata.addField(EventIndexSchema.HAS_OPEN_COMMENTS, event.hasOpenComments(), true);
+    metadata.addField(EventIndexSchema.HAS_COMMENTS, event.hasComments(), false);
+    metadata.addField(EventIndexSchema.HAS_OPEN_COMMENTS, event.hasOpenComments(), false);
 
     if (event.comments() != null) {
       List<Comment> comments = event.comments();
@@ -212,7 +212,7 @@ public final class EventIndexUtils {
       metadata.addField(EventIndexSchema.COMMENTS, commentsArray, true);
     }
 
-    metadata.addField(EventIndexSchema.NEEDS_CUTTING, event.needsCutting(), true);
+    metadata.addField(EventIndexSchema.NEEDS_CUTTING, event.needsCutting(), false);
 
     if (event.getPublications() != null) {
       List<Publication> publications = event.getPublications();
@@ -222,12 +222,12 @@ public final class EventIndexUtils {
       }
 
       if (publications.size() == 1 && !publications.get(0).getChannel().equals("internal") || publications.size() > 1) {
-        metadata.addField(EventIndexSchema.IS_PUBLISHED, true, true);
+        metadata.addField(EventIndexSchema.IS_PUBLISHED, true, false);
       } else {
-        metadata.addField(EventIndexSchema.IS_PUBLISHED, false, true);
+        metadata.addField(EventIndexSchema.IS_PUBLISHED, false, false);
       }
 
-      metadata.addField(EventIndexSchema.PUBLICATION, publicationsArray, true);
+      metadata.addField(EventIndexSchema.PUBLICATION, publicationsArray, false);
 
     }
 
@@ -246,31 +246,31 @@ public final class EventIndexUtils {
     }
 
     if (StringUtils.isNotBlank(event.getAccessPolicy())) {
-      metadata.addField(EventIndexSchema.ACCESS_POLICY, event.getAccessPolicy(), true);
+      metadata.addField(EventIndexSchema.ACCESS_POLICY, event.getAccessPolicy(), false);
       addAuthorization(metadata, event.getAccessPolicy(), event.getIdentifier(), listProviderService, episodeIdRole);
     }
 
     if (StringUtils.isNotBlank(event.getAgentId())) {
-      metadata.addField(EventIndexSchema.AGENT_ID, event.getAgentId(), true);
+      metadata.addField(EventIndexSchema.AGENT_ID, event.getAgentId(), false);
     }
 
     if (StringUtils.isNotBlank(event.getTechnicalStartTime())) {
-      metadata.addField(EventIndexSchema.TECHNICAL_START, event.getTechnicalStartTime(), true);
+      metadata.addField(EventIndexSchema.TECHNICAL_START, event.getTechnicalStartTime(), false);
     }
 
     if (StringUtils.isNotBlank(event.getTechnicalEndTime())) {
-      metadata.addField(EventIndexSchema.TECHNICAL_END, event.getTechnicalEndTime(), true);
+      metadata.addField(EventIndexSchema.TECHNICAL_END, event.getTechnicalEndTime(), false);
     }
 
     if (event.getTechnicalPresenters() != null) {
       metadata.addField(EventIndexSchema.TECHNICAL_PRESENTERS,
-              event.getTechnicalPresenters().toArray(new String[event.getTechnicalPresenters().size()]), true);
+              event.getTechnicalPresenters().toArray(new String[event.getTechnicalPresenters().size()]), false);
     }
 
     return metadata;
   }
 
-  private static void addObjectStringtToMap(HashMap<String, Object> map, String key, Object value) {
+  private static void addObjectStringToMap(HashMap<String, Object> map, String key, Object value) {
     if (value == null) {
       map.put(key, "");
     } else {
@@ -290,7 +290,7 @@ public final class EventIndexUtils {
 
     // Add first level elements
     pMap.put(PublicationIndexSchema.CHANNEL, publication.getChannel());
-    addObjectStringtToMap(pMap, PublicationIndexSchema.MIMETYPE, publication.getMimeType());
+    addObjectStringToMap(pMap, PublicationIndexSchema.MIMETYPE, publication.getMimeType());
 
     // Attachments
     Attachment[] attachments = publication.getAttachments();
@@ -299,10 +299,10 @@ public final class EventIndexUtils {
       Attachment attachment = attachments[i];
       HashMap<String, Object> element = new HashMap<String, Object>();
       element.put(PublicationIndexSchema.ELEMENT_ID, attachment.getIdentifier());
-      addObjectStringtToMap(element, PublicationIndexSchema.ELEMENT_MIMETYPE, attachment.getMimeType());
-      addObjectStringtToMap(element, PublicationIndexSchema.ELEMENT_TYPE, attachment.getElementType());
+      addObjectStringToMap(element, PublicationIndexSchema.ELEMENT_MIMETYPE, attachment.getMimeType());
+      addObjectStringToMap(element, PublicationIndexSchema.ELEMENT_TYPE, attachment.getElementType());
       element.put(PublicationIndexSchema.ELEMENT_TAG, attachment.getTags());
-      addObjectStringtToMap(element, PublicationIndexSchema.ELEMENT_URL, attachment.getURI());
+      addObjectStringToMap(element, PublicationIndexSchema.ELEMENT_URL, attachment.getURI());
       element.put(PublicationIndexSchema.ELEMENT_SIZE, attachment.getSize());
       attachmentsArray[i] = element;
     }
@@ -315,10 +315,10 @@ public final class EventIndexUtils {
       Catalog catalog = catalogs[i];
       HashMap<String, Object> element = new HashMap<String, Object>();
       element.put(PublicationIndexSchema.ELEMENT_ID, catalog.getIdentifier());
-      addObjectStringtToMap(element, PublicationIndexSchema.ELEMENT_MIMETYPE, catalog.getMimeType());
-      addObjectStringtToMap(element, PublicationIndexSchema.ELEMENT_TYPE, catalog.getElementType());
+      addObjectStringToMap(element, PublicationIndexSchema.ELEMENT_MIMETYPE, catalog.getMimeType());
+      addObjectStringToMap(element, PublicationIndexSchema.ELEMENT_TYPE, catalog.getElementType());
       element.put(PublicationIndexSchema.ELEMENT_TAG, catalog.getTags());
-      addObjectStringtToMap(element, PublicationIndexSchema.ELEMENT_URL, catalog.getURI());
+      addObjectStringToMap(element, PublicationIndexSchema.ELEMENT_URL, catalog.getURI());
       element.put(PublicationIndexSchema.ELEMENT_SIZE, catalog.getSize());
       catalogsArray[i] = element;
     }
@@ -331,10 +331,10 @@ public final class EventIndexUtils {
       Track track = tracks[i];
       HashMap<String, Object> element = new HashMap<String, Object>();
       element.put(PublicationIndexSchema.ELEMENT_ID, track.getIdentifier());
-      addObjectStringtToMap(element, PublicationIndexSchema.ELEMENT_MIMETYPE, track.getMimeType());
-      addObjectStringtToMap(element, PublicationIndexSchema.ELEMENT_TYPE, track.getElementType());
+      addObjectStringToMap(element, PublicationIndexSchema.ELEMENT_MIMETYPE, track.getMimeType());
+      addObjectStringToMap(element, PublicationIndexSchema.ELEMENT_TYPE, track.getElementType());
       element.put(PublicationIndexSchema.ELEMENT_TAG, track.getTags());
-      addObjectStringtToMap(element, PublicationIndexSchema.ELEMENT_URL, track.getURI());
+      addObjectStringToMap(element, PublicationIndexSchema.ELEMENT_URL, track.getURI());
       element.put(PublicationIndexSchema.ELEMENT_SIZE, track.getSize());
       element.put(PublicationIndexSchema.TRACK_DURATION, track.getDuration());
       tracksArray[i] = element;

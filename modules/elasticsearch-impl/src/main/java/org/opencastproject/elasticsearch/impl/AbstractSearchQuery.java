@@ -215,7 +215,7 @@ public abstract class AbstractSearchQuery implements SearchQuery {
     StringBuilder query = new StringBuilder();
     for (SearchTerms<String> s : text) {
       for (String t : s.getTerms()) {
-        if (query.length() == 0) {
+        if (query.isEmpty()) {
           query.append(" ");
         }
         query.append(t);

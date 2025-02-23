@@ -62,7 +62,9 @@
       "null_value": "null"
     },
     "fulltext": {
-      "type": "text"
+      "type" : "search_as_you_type",
+      "analyzer": "autocomplete_analyzer",
+      "search_analyzer": "whitespace_analyzer"
     },
     "id": {
       "type": "keyword"

@@ -151,6 +151,8 @@ public class SeriesQueryBuilder extends AbstractElasticsearchQueryBuilder<Series
           queryText.append(term);
         }
 
+        additionalMultiQueryFields.add(SeriesIndexSchema.UID);
+
         fuzzy = query.isFuzzySearch();
         this.text = queryText.toString();
 
