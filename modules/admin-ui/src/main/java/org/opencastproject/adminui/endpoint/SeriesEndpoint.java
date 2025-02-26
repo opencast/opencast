@@ -135,7 +135,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletResponse;
@@ -777,7 +776,7 @@ public class SeriesEndpoint {
       }
 
       if (optSort.isSome()) {
-        Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
+        ArrayList<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
         for (SortCriterion criterion : sortCriteria) {
 
           switch (criterion.getFieldName()) {

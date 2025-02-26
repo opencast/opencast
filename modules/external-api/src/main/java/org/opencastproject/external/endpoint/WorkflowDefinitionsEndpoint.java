@@ -66,7 +66,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -175,7 +174,7 @@ public class WorkflowDefinitionsEndpoint {
     // TODO: this seems to not function as intended
     ComparatorChain<WorkflowDefinition> comparator = new ComparatorChain<>();
     if (StringUtils.isNoneBlank(sort)) {
-      Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(sort);
+      ArrayList<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(sort);
       for (SortCriterion criterion : sortCriteria) {
         switch (criterion.getFieldName()) {
           case "identifier":

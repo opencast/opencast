@@ -109,13 +109,13 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URI;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.Set;
 import java.util.TreeMap;
 
 import javax.servlet.http.HttpServletResponse;
@@ -307,7 +307,7 @@ public class SeriesEndpoint {
       }
 
       if (optSort.isSome()) {
-        Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
+        ArrayList<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
         for (SortCriterion criterion : sortCriteria) {
 
           switch (criterion.getFieldName()) {

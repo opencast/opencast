@@ -28,8 +28,7 @@ import org.opencastproject.util.requests.SortCriterion.Order;
 
 import org.junit.Test;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
 
 /**
  * Test methods for {@link RestUtils}
@@ -39,7 +38,7 @@ public class RestUtilsTest {
   /** Test method for {@link RestUtils#parseSortQueryParameter(String)} */
   @Test
   public void testParseSortQueryParameter() {
-    Set<SortCriterion> sortOrders = new HashSet<SortCriterion>();
+    ArrayList<SortCriterion> sortOrders = new ArrayList<SortCriterion>();
 
     sortOrders.add(new SortCriterion("name", Order.Descending));
     assertTrue(RestUtils.parseSortQueryParameter("name:DESC").equals(sortOrders));

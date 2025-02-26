@@ -61,7 +61,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletResponse;
@@ -170,7 +169,7 @@ public class ServicesEndpoint {
     int total = services.size();
 
     if (sortOpt.isSome()) {
-      Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(sortOpt.get());
+      ArrayList<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(sortOpt.get());
       if (!sortCriteria.isEmpty()) {
         try {
           SortCriterion sortCriterion = sortCriteria.iterator().next();

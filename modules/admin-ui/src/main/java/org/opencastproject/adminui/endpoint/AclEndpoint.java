@@ -88,7 +88,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -209,7 +208,7 @@ public class AclEndpoint {
 
     // Sort by name, description or role
     if (optSort.isSome()) {
-      final Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
+      final ArrayList<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
       Collections.sort(filteredAcls, new Comparator<ManagedAcl>() {
         @Override
         public int compare(ManagedAcl acl1, ManagedAcl acl2) {
