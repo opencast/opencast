@@ -150,7 +150,7 @@ export async function getConfig(): Promise<Config> {
 
 export function filterLiveEvents(sr: SearchEpisodeResults) {
     const filtered_results = sr.results.filter(result => !result.live);
-    const filtered_sr : SearchEpisodeResults = {results: filtered_results, total : filtered_results.length, limit : sr.limit, offset : sr.offset};
+    const filtered_sr : SearchEpisodeResults = {results: filtered_results, total : sr.total, limit : sr.limit, offset : sr.offset};
     return filtered_sr
 }
 
