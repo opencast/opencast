@@ -278,6 +278,10 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
             orgBucketNameMap.put(orgId, bucketName);
           });
 
+      if (orgBucketNameMap.isEmpty()) {
+        throw new ConfigurationException("AWS S3 distribution is enabled, but no buckets are configured");
+      }
+
       // AWS region
       String regionStr = getAWSConfigKey(cc, AWS_S3_REGION_CONFIG);
       logger.info("AWS region is {}", regionStr);
