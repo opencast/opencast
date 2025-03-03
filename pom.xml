@@ -74,10 +74,6 @@
     <module>modules/adopter-registration-api</module>
     <module>modules/adopter-registration-impl</module>
     <module>modules/analyze-mediapackage-workflowoperation</module>
-    <module>modules/animate-api</module>
-    <module>modules/animate-impl</module>
-    <module>modules/animate-remote</module>
-    <module>modules/animate-workflowoperation</module>
     <module>modules/annotation-api</module>
     <module>modules/annotation-impl</module>
     <module>modules/asset-manager-api</module>
