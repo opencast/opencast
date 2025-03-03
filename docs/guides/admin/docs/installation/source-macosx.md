@@ -9,7 +9,6 @@ The installation on macOS is not officially supported.
 Use this at your own risk.
 </div>
 
-
 Preparation
 -----------
 
@@ -39,7 +38,6 @@ directly from there or with the curl command specified below.
     curl -OL https://github.com/opencast/opencast/archive/[...].tar.gz
     tar xf [...].tar.gz
 
-
 Install Dependencies
 --------------------
 
@@ -65,10 +63,6 @@ Required for text extraction:
 
     tesseract >= 3
 
-Required for hunspell based text filtering:
-
-    hunspell >= 1.2.8
-
 Required for audio normalization:
 
     sox >= 14.4 (with MP3, FLAC and OGG support)
@@ -90,7 +84,6 @@ Homebrew is a package manager for OS X. For installation instruction see [their 
     brew install ffmpeg
 
     brew install tesseract
-    brew install hunspell
     brew install sox
     brew install synfig
 
@@ -106,7 +99,6 @@ Pre-built versions of most dependencies can be downloaded from the respective pr
 
 * [Get Apache Maven](https://maven.apache.org/download.cgi)
 * [Get FFmpeg](http://ffmpeg.org/download.html)
-
 
 Building Opencast
 -----------------

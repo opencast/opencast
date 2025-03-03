@@ -12,7 +12,6 @@ The sequence of the Opencast services used during slide detection and text extra
                        TextExtractor          DictionaryService
                     (OCR with Tesseract)   (Filter extracted texts)
 
-
 The segmentation will define the frames which are passed to the text analyzer. For extraction, a frame from the end of a
 segment is used to make sure that most of a slides text is visible.
 
@@ -25,15 +24,12 @@ implementation and configuration.
 
 Finally, the extracted text is attached to the media package as MPEG 7 XML and the Opencast workflow continues.
 
-
-
 Configuration
 -------------
 
 This section describes the configuration of all involved tools and services. In this guide, German is used as target
 language but the configuration for other languages should be similar. If necessary, important differences will be
 pointed out.
-
 
 ### OCR Engine: Tesseract
 
@@ -69,7 +65,6 @@ Newer versions of Tesseract come with additional neural nets LSTM. Its performan
 from the previous Tesseract engine. Its usage might be specified using `--oem N` with `N` being a number documented in
 your Tesseract manual.
 
-
 ### Encoding (Image Preprocessing)
 
 The text extraction works best if there is a high contrast between text and background and additionally, the text is not
@@ -97,7 +92,6 @@ The kind of preprocessing you should use highly depends on the input material. I
 material are among others the blur filters, the denoise filters, the curves filter and in some cases the color-channel
 mixer.
 
-
 ### DictionaryService (Filtering)
 
 The filtering you want to do on the recognized texts highly depends on what you want to use the recognized texts for.
@@ -109,14 +103,11 @@ swapped out at any time:
 
 * dictionary-none
 * dictionary-regexp (default)
-* dictionary-hunspell
-
 
 #### No Filtering (dictionary-none)
 
 The `dictionary-none` module is the simplest one. It will just let the recognized texts pass through
 unmodified. There is no additional configuration needed or even possible. Of course, this is also the fastest one.
-
 
 #### Using a Regular Expression (dictionary-regexp)
 
@@ -131,7 +122,7 @@ through, but will block all other characters. For the German language, for examp
 characters would be blocked as well. So you want to configure Opencast to let them pass as well.
 
 Example:
-    * pattern: `\w+`
+    *pattern: `\w+`
     * text input: "aäa bbb"
     * text output: "a a bbb"
 
@@ -150,30 +141,4 @@ A similar pattern that could be used for Spanish would be:
 
     pattern=[¿¡(]*[\\wáéíóúÁÉÍÓÚüÜñÑ][\\wáéíóúÁÉÍÓÚüÜñÑ]+[)-.,:;!?]*
 
-
-#### Using a Spell Checker (dictionary-hunspell)
-
-Last, the `dictionary-hunspell` will check words based on a spell checker and a dictionary. As spell checker,
-the tool `hunspell` is used which is one of the most common spell checkers on Linux and should be available from the
-system repositories for most common operating systems.
-
-For the Hunspell based DictionaryService, there are two configuration options: One specifies the location of the binary
-and one is for the arguments to use for filtering.
-
-By default, Opencast will just call `hunspell` without an absolute path. This will work as long as hunspell is in the
-systems path which should be the case unless you have built and installed it manually. In that case, the binary can be
-configured using the following option in the `custom.properties` file:
-
-    org.opencastproject.dictionary.hunspell.binary=/usr/bin/hunspell
-
-While most people will not need the binary path configuration, most people will need the filtering option which can be
-used for setting the languages. Configuration for this can be done using the following key in the `custom.properties`
-file:
-
-    org.opencastproject.dictionary.hunspell.command=-d de_DE,en_GB,en_US -G
-
 Note that equivalent to the Tesseract configuration, again the necessary languages have to be installed in the system.
-On RedHat based systems, for German, you would install the `hunspell-de` package from the system repositories.
-
-For Hunspell, you can also create custom dictionaries or add custom words to the existing ones. This might be
-interesting for technical terms.
