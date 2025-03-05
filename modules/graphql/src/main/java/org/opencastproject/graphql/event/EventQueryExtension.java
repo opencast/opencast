@@ -23,6 +23,7 @@ package org.opencastproject.graphql.event;
 
 import org.opencastproject.graphql.datafetcher.event.EventDataFetcher;
 import org.opencastproject.graphql.datafetcher.event.EventOffsetDataFetcher;
+import org.opencastproject.graphql.type.input.EventFilterByInput;
 import org.opencastproject.graphql.type.input.EventOrderByInput;
 import org.opencastproject.graphql.type.output.Query;
 
@@ -47,6 +48,7 @@ public final class EventQueryExtension {
       @GraphQLName("offset") Integer offset,
       @GraphQLName("query") String query,
       @GraphQLName("orderBy") EventOrderByInput orderBy,
+      @GraphQLName("filterBy") EventFilterByInput filterBy,
       final DataFetchingEnvironment environment) {
     return new EventOffsetDataFetcher().get(environment);
   }
