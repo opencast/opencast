@@ -256,7 +256,7 @@ public class UsersEndpoint {
 
     // Sort by name, description or role
     if (sort != null) {
-      final Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(sort);
+      final ArrayList<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(sort);
       filteredUsers.sort((user1, user2) -> {
         for (SortCriterion criterion : sortCriteria) {
           Order order = criterion.getOrder();

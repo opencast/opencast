@@ -93,7 +93,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
@@ -227,7 +226,7 @@ public class ThemesEndpoint {
     }
 
     if (optSort.isSome()) {
-      Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
+      ArrayList<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
       for (SortCriterion criterion : sortCriteria) {
         switch (criterion.getFieldName()) {
           case ThemeIndexSchema.NAME:

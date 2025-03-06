@@ -246,7 +246,7 @@ public final class UserDirectoryPersistenceUtil {
    */
   public static Function<EntityManager, List<JpaGroup>> findGroupsQuery(String orgId, Optional<Integer> limit,
       Optional<Integer> offset, Optional<String> nameFilter, Optional<String> textFilter,
-      Set<SortCriterion> sortCriteria) {
+      ArrayList<SortCriterion> sortCriteria) {
     return em -> {
       CriteriaBuilder cb = em.getCriteriaBuilder();
       final CriteriaQuery<JpaGroup> query = cb.createQuery(JpaGroup.class);

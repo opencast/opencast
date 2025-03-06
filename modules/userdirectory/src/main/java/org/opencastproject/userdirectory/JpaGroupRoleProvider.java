@@ -493,7 +493,7 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
    * @return a list of groups
    */
   public List<JpaGroup> getGroups(Optional<Integer> limit, Optional<Integer> offset, Optional<String> nameFilter,
-          Optional<String> textFilter, Set<SortCriterion> sortCriteria) {
+          Optional<String> textFilter, ArrayList<SortCriterion> sortCriteria) {
     String orgId = securityService.getOrganization().getId();
     return db.exec(UserDirectoryPersistenceUtil.findGroupsQuery(orgId, limit, offset, nameFilter, textFilter,
         sortCriteria));

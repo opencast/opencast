@@ -162,7 +162,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -890,7 +889,7 @@ public class EventsEndpoint implements ManagedService {
         }
 
         if (optSort.isSome()) {
-          Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
+          ArrayList<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
           for (SortCriterion criterion : sortCriteria) {
 
             switch (criterion.getFieldName()) {
@@ -969,7 +968,7 @@ public class EventsEndpoint implements ManagedService {
       }
     } else {
       if (optSort.isSome()) {
-        Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
+        ArrayList<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
         for (SortCriterion criterion : sortCriteria) {
 
           switch (criterion.getFieldName()) {

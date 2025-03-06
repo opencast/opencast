@@ -70,7 +70,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
@@ -181,7 +180,7 @@ public class CaptureAgentsEndpoint {
 
     // Sort by status, name or last updated date
     if (optSort.isSome()) {
-      final Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
+      final ArrayList<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
       Collections.sort(filteredAgents, new Comparator<Agent>() {
         @Override
         public int compare(Agent agent1, Agent agent2) {
