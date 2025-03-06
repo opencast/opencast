@@ -107,7 +107,6 @@
     <module>modules/crop-workflowoperation</module>
     <module>modules/db</module>
     <module>modules/dictionary-api</module>
-    <module>modules/dictionary-hunspell</module>
     <module>modules/dictionary-none</module>
     <module>modules/dictionary-regexp</module>
     <module>modules/distribution-service-api</module>

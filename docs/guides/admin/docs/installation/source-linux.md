@@ -33,7 +33,6 @@ Cloning the Git repository:
     git tag   <-  List all available versions
     git checkout TAG   <-  Switch to desired version
 
-
 Install Dependencies
 --------------------
 
@@ -59,10 +58,6 @@ Required for text extraction (recommended):
 
     tesseract >= 3
 
-Required for hunspell based text filtering (optional):
-
-    hunspell >= 1.2.8
-
 Required for audio normalization (optional):
 
     sox >= 14.4
@@ -75,12 +70,12 @@ Required for text to speech (optional):
 
     Vosk
 
-OR 
-    
+OR
+
     Whisper >= 20230314
 
-OR 
-    
+OR
+
     WhisperC++ >= 1.4.0
 
 ### Dependency Download
@@ -109,7 +104,6 @@ Make sure everything belongs to the user `opencast`:
 
     sudo chown -R opencast:opencast /opt/opencast
 
-
 Configure
 ---------
 
@@ -129,7 +123,6 @@ To start Opencast, run `.../bin/start-opencast` as user `opencast`:
 
 As soon as Opencast is completely started, browse to [http://localhost:8080](http://localhost:8080) to get to the
 administration interface.
-
 
 Run Opencast as a service
 -------------------------
