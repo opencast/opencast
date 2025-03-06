@@ -27,7 +27,6 @@ The following table contains the workflow operations that are available in an ou
 | analyze-audio                        | Analyze first audio stream                                                                | [Documentation](analyzeaudio-woh.md)                         |
 | analyze-tracks                       | Analyze tracks in media package                                                           | [Documentation](analyze-tracks-woh.md)                       |
 | analyze-mediapackage                 | Analyze media package                                                                     | [Documentation](analyze-mediapackage-woh.md)                 |
-| animate                              | Create animated video sequence                                                            | [Documentation](animate-woh.md)                              |
 | amberscript-start-transcription      | Start AmberScript Transcription                                                           | [Documentation](amberscript-start-transcription-woh.md)      |
 | amberscript-attach-transcription     | Attach AmberScript Transcription                                                          | [Documentation](amberscript-attach-transcription-woh.md)     |
 | assert                               | Verify preconditions with assertion                                                       | [Documentation](assert-woh.md)                               |
@@ -124,6 +123,7 @@ The following table contains the workflow operations that are available in an ou
 | zip                                  | Create zipped archive of the current state of the mediapackage                            | [Documentation](zip-woh.md)                                  |
 
 ## State Mappings
+
 Technically, a workflow can be in one of the following states:
 
 | Technical State | Description | What the Admin UI displays in the events table|
