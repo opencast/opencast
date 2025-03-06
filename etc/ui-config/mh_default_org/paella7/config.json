@@ -504,7 +504,7 @@
         },
 
         "org.opencast.paella.episodesFromSeries": {
-            "enabled": true,
+            "enabled": false,
             "side": "right",
             "parentContainer": "videoContainer",
             "order": 30,
