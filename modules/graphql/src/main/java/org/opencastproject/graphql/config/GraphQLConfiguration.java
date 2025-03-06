@@ -36,6 +36,8 @@ public class GraphQLConfiguration {
 
   public @interface Config {
     String event_preview_subtype() default "preview";
+    String event_retract_workflow_id() default "delete";
+
   }
 
   @Activate
@@ -46,6 +48,10 @@ public class GraphQLConfiguration {
 
   public String eventPreviewSubtype() {
     return config.event_preview_subtype();
+  }
+
+  public String eventRetractWorkflowId() {
+    return config.event_retract_workflow_id();
   }
 
 }

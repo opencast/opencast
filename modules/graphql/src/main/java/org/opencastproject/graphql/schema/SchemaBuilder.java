@@ -23,6 +23,7 @@ package org.opencastproject.graphql.schema;
 
 import org.opencastproject.graphql.directive.RolesAllowed;
 import org.opencastproject.graphql.provider.GraphQLAdditionalTypeProvider;
+import org.opencastproject.graphql.provider.GraphQLCodeRegistryProvider;
 import org.opencastproject.graphql.provider.GraphQLDynamicTypeProvider;
 import org.opencastproject.graphql.provider.GraphQLExtensionProvider;
 import org.opencastproject.graphql.provider.GraphQLFieldVisibilityProvider;
@@ -115,7 +116,7 @@ public class SchemaBuilder {
     return this;
   }
 
-  public SchemaBuilder codeRegistryProviders(List<GraphQLAdditionalTypeProvider> additionalTypesProviders) {
+  public SchemaBuilder codeRegistryProviders(List<GraphQLCodeRegistryProvider> codeRegistryProviders) {
     return this;
   }
 

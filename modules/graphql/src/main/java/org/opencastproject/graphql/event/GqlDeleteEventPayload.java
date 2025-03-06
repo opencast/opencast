@@ -22,6 +22,8 @@
 package org.opencastproject.graphql.event;
 
 
+import org.opencastproject.index.service.api.IndexService;
+
 import graphql.annotations.annotationTypes.GraphQLDescription;
 import graphql.annotations.annotationTypes.GraphQLField;
 import graphql.annotations.annotationTypes.GraphQLName;
@@ -37,14 +39,36 @@ public class GqlDeleteEventPayload {
 
   public GqlDeleteEventPayload(@GraphQLName("id") String id) {
     this.id = id;
+    this.status = IndexService.EventRemovalResult.SUCCESS;
+  }
+
+  public GqlDeleteEventPayload(
+      @GraphQLName("id") String id,
+      @GraphQLName("status") IndexService.EventRemovalResult status
+  ) {
+    this.id = id;
+    this.status = status;
   }
 
   @GraphQLField
   @GraphQLDescription("A unique identifier for the client performing the mutation.")
   private String id;
 
+  @GraphQLField
+  @GraphQLDescription("The deletion status of the event.")
+  private IndexService.EventRemovalResult status;
+
   public String getId() {
     return id;
+  }
+
+  public GqlDeleteEventState getStatus() {
+    return switch (status) {
+      case SUCCESS -> GqlDeleteEventState.SUCCESS;
+      case NOT_FOUND -> GqlDeleteEventState.SUCCESS;
+      case RETRACTING -> GqlDeleteEventState.RETRACTING;
+      case GENERAL_FAILURE -> GqlDeleteEventState.FAILED;
+    };
   }
 
 

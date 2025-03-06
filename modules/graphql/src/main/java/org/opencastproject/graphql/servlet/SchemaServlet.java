@@ -27,6 +27,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ServiceScope;
 import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardContextSelect;
 import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardServletName;
 import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardServletPattern;
@@ -45,7 +46,8 @@ import graphql.schema.GraphQLSchema;
 import graphql.schema.idl.SchemaPrinter;
 
 @Component(
-    service = { HttpServlet.class, Servlet.class }
+    service = { HttpServlet.class, Servlet.class },
+    scope = ServiceScope.PROTOTYPE
 )
 @HttpWhiteboardServletName(GraphQLServlet.GRAPHQL_ENDPOINT + "/schema.json")
 @HttpWhiteboardServletPattern(GraphQLServlet.GRAPHQL_ENDPOINT + "/schema.json")

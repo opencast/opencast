@@ -22,6 +22,7 @@
 package org.opencastproject.graphql.schema;
 
 import org.opencastproject.graphql.provider.GraphQLAdditionalTypeProvider;
+import org.opencastproject.graphql.provider.GraphQLCodeRegistryProvider;
 import org.opencastproject.graphql.provider.GraphQLDynamicTypeProvider;
 import org.opencastproject.graphql.provider.GraphQLExtensionProvider;
 import org.opencastproject.graphql.provider.GraphQLFieldVisibilityProvider;
@@ -35,9 +36,11 @@ import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 import org.osgi.service.component.propertytypes.ServiceDescription;
 import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 import org.slf4j.Logger;
@@ -66,7 +69,7 @@ public class SchemaService implements OrganizationDirectoryListener {
   @ObjectClassDefinition
   public @interface SchemaConfiguration {
 
-    int schema_update_trigger_delay() default 2000;
+    int schema_update_trigger_delay() default 3000;
 
   }
 
@@ -90,8 +93,11 @@ public class SchemaService implements OrganizationDirectoryListener {
 
   private final List<GraphQLTypeFunctionProvider> typeFunctionProviders = new CopyOnWriteArrayList<>();
 
+  private final List<GraphQLCodeRegistryProvider> codeRegistryProviders = new CopyOnWriteArrayList<>();
+
   private final ScheduledExecutorService schemaUpdateExecutor;
-  private final int schemaUpdateTriggerDelay;
+
+  private int schemaUpdateTriggerDelay;
 
   private final Map<Organization, ScheduledFuture<?>> scheduledFutureMap = new ConcurrentHashMap<>();
 
@@ -100,12 +106,18 @@ public class SchemaService implements OrganizationDirectoryListener {
       @Reference OrganizationDirectoryService organizationDirectoryService,
       final SchemaConfiguration config
   ) {
+    this.organizationDirectoryService = organizationDirectoryService;
+    schemaUpdateExecutor = Executors.newSingleThreadScheduledExecutor(new SchemaUpdateThreadFactory());
+
+    updateConfiguration(config);
+  }
+
+  @Modified
+  public void updateConfiguration(SchemaConfiguration config) {
     if (config.schema_update_trigger_delay() < 0) {
       throw new IllegalArgumentException("Schema update trigger delay must be greater than or equal to 0");
     }
-    this.organizationDirectoryService = organizationDirectoryService;
     this.schemaUpdateTriggerDelay = config.schema_update_trigger_delay();
-    schemaUpdateExecutor = Executors.newSingleThreadScheduledExecutor(new SchemaUpdateThreadFactory());
     triggerSchemaUpdate();
   }
 
@@ -128,7 +140,7 @@ public class SchemaService implements OrganizationDirectoryListener {
         .dynamicTypeProviders(dynamicTypeProviders)
         .queryProviders(queryProviders)
         .mutationProviders(mutationProviders)
-        .codeRegistryProviders(additionalTypesProviders)
+        .codeRegistryProviders(codeRegistryProviders)
         .additionalTypeProviders(additionalTypesProviders)
         .fieldVisibilityProviders(fieldVisibilityProviders)
         .typeFunctionProviders(typeFunctionProviders);
@@ -185,6 +197,7 @@ public class SchemaService implements OrganizationDirectoryListener {
 
   @Reference(
       policy = ReferencePolicy.DYNAMIC,
+      policyOption = ReferencePolicyOption.GREEDY,
       cardinality = ReferenceCardinality.MULTIPLE
   )
   public void bindQueryProvider(GraphQLQueryProvider provider) {
@@ -199,6 +212,7 @@ public class SchemaService implements OrganizationDirectoryListener {
 
   @Reference(
       policy = ReferencePolicy.DYNAMIC,
+      policyOption = ReferencePolicyOption.GREEDY,
       cardinality = ReferenceCardinality.MULTIPLE
   )
   public void bindMutationProvider(GraphQLMutationProvider provider) {
@@ -213,6 +227,7 @@ public class SchemaService implements OrganizationDirectoryListener {
 
   @Reference(
       policy = ReferencePolicy.DYNAMIC,
+      policyOption = ReferencePolicyOption.GREEDY,
       cardinality = ReferenceCardinality.MULTIPLE
   )
   public void bindExtensionProvider(GraphQLExtensionProvider provider) {
@@ -227,6 +242,7 @@ public class SchemaService implements OrganizationDirectoryListener {
 
   @Reference(
       policy = ReferencePolicy.DYNAMIC,
+      policyOption = ReferencePolicyOption.GREEDY,
       cardinality = ReferenceCardinality.MULTIPLE
   )
   public void bindAdditionalTypeProvider(GraphQLAdditionalTypeProvider provider) {
@@ -241,6 +257,7 @@ public class SchemaService implements OrganizationDirectoryListener {
 
   @Reference(
       policy = ReferencePolicy.DYNAMIC,
+      policyOption = ReferencePolicyOption.GREEDY,
       cardinality = ReferenceCardinality.MULTIPLE
   )
   public void bindFieldVisibilityProvider(GraphQLFieldVisibilityProvider provider) {
@@ -255,6 +272,7 @@ public class SchemaService implements OrganizationDirectoryListener {
 
   @Reference(
       policy = ReferencePolicy.DYNAMIC,
+      policyOption = ReferencePolicyOption.GREEDY,
       cardinality = ReferenceCardinality.MULTIPLE
   )
   public void bindDynamicTypeProvider(GraphQLDynamicTypeProvider provider) {
@@ -269,6 +287,7 @@ public class SchemaService implements OrganizationDirectoryListener {
 
   @Reference(
       policy = ReferencePolicy.DYNAMIC,
+      policyOption = ReferencePolicyOption.GREEDY,
       cardinality = ReferenceCardinality.MULTIPLE
   )
   public void bindTypeFunctionProvider(GraphQLTypeFunctionProvider provider) {
