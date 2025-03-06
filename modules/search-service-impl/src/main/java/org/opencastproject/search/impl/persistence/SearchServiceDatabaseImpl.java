@@ -26,6 +26,7 @@ import static org.opencastproject.security.api.Permissions.Action.CONTRIBUTE;
 import static org.opencastproject.security.api.Permissions.Action.READ;
 import static org.opencastproject.security.api.Permissions.Action.WRITE;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLE;
+import static org.opencastproject.systems.OpencastConstants.EPISODE_ID_ROLE_ACCESS_PROPERTY;
 
 import org.opencastproject.db.DBSession;
 import org.opencastproject.db.DBSessionFactory;
@@ -83,8 +84,6 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
   /** JPA persistence unit name */
   public static final String PERSISTENCE_UNIT = "org.opencastproject.search.impl.persistence";
 
-  private static final String CONFIG_EPISODE_ID_ROLE = "org.opencastproject.episode.id.role.access";
-
   /** Logging utilities */
   private static final Logger logger = LoggerFactory.getLogger(SearchServiceDatabaseImpl.class);
 
@@ -124,7 +123,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
     this.populateSeriesData();
 
     episodeRoleId = BooleanUtils.toBoolean(Objects.toString(
-        cc.getBundleContext().getProperty(CONFIG_EPISODE_ID_ROLE), "false"));
+        cc.getBundleContext().getProperty(EPISODE_ID_ROLE_ACCESS_PROPERTY), "false"));
     logger.debug("Usage of episode ID roles is set to {}", episodeRoleId);
   }
 

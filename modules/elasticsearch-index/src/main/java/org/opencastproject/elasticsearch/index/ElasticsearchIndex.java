@@ -21,6 +21,7 @@
 
 package org.opencastproject.elasticsearch.index;
 
+import static org.opencastproject.systems.OpencastConstants.EPISODE_ID_ROLE_ACCESS_PROPERTY;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.elasticsearch.api.SearchIndexException;
@@ -120,8 +121,6 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
 
   private ListProvidersService listProvidersService;
 
-  private static final String CONFIG_EPISODE_ID_ROLE = "org.opencastproject.episode.id.role.access";
-
   private boolean episodeIdRole = false;
 
   @Reference
@@ -151,7 +150,7 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
     }
 
     episodeIdRole = BooleanUtils.toBoolean(Objects.toString(
-        bundleContext.getProperty(CONFIG_EPISODE_ID_ROLE), "false"));
+        bundleContext.getProperty(EPISODE_ID_ROLE_ACCESS_PROPERTY), "false"));
     logger.debug("Usage of episode ID roles is set to {}", episodeIdRole);
   }
 

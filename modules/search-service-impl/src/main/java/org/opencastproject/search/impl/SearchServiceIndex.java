@@ -23,6 +23,7 @@ package org.opencastproject.search.impl;
 
 import static org.opencastproject.security.util.SecurityUtil.getEpisodeRoleId;
 import static org.opencastproject.systems.OpencastConstants.DIGEST_USER_PROPERTY;
+import static org.opencastproject.systems.OpencastConstants.EPISODE_ID_ROLE_ACCESS_PROPERTY;
 
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
@@ -148,8 +149,6 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
 
   private ListProvidersService listProvidersService;
 
-  private static final String CONFIG_EPISODE_ID_ROLE = "org.opencastproject.episode.id.role.access";
-
   private boolean episodeIdRole = false;
 
   private String systemUserName = null;
@@ -170,7 +169,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
   @Activate
   public void activate(final ComponentContext cc) throws IllegalStateException {
     episodeIdRole = BooleanUtils.toBoolean(Objects.toString(
-        cc.getBundleContext().getProperty(CONFIG_EPISODE_ID_ROLE), "false"));
+        cc.getBundleContext().getProperty(EPISODE_ID_ROLE_ACCESS_PROPERTY), "false"));
     logger.debug("Usage of episode ID roles is set to {}", episodeIdRole);
 
     createIndex();
