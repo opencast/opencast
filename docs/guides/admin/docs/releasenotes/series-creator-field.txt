@@ -1,7 +1,7 @@
 ## Database Migration and Elasticsearch Data Extraction
 
 ### **1. Database Migration**
-Before running the data extraction script, you **must** apply the database migration `mariadb-postgresql.sql`.
+Before running the data extraction script, you **must** apply the database migration `mariadb.sql` or `postgres.sql`.
 This step ensures that the necessary schema changes are applied before updating the records.
 
 ### **2. Elasticsearch Data Extraction and SQL Update Script Generation**
