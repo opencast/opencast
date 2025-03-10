@@ -35,7 +35,7 @@ while :; do
         break
     fi
 
-    echo "$RESPONSE" | jq -r '.hits.hits[] | "UPDATE oc_series SET creator_name = \"" + (._source.creator[0] // "") + "\" WHERE id = \"" + (._source.uid[0] // "") + "\" AND organization = \"" + (._source.organization[0] // "") + "\";"' >> "$OUTPUT_FILE" 2>> "$ERROR_LOG"
+    echo "$RESPONSE" | jq -r '.hits.hits[] | "UPDATE oc_series SET creator_name = '\''" + (._source.creator[0] // "") + "'\'' WHERE id = '\''" + (._source.uid[0] // "") + "'\'' AND organization = '\''" + (._source.organization[0] // "") + "'\'';"' >> "$OUTPUT_FILE" 2>> "$ERROR_LOG"
 
     PAGE=$((PAGE + 1))
 done
