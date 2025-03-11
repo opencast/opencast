@@ -48,10 +48,10 @@ You might want to edit the compose file and add extra volumes to include custom 
 At this point you are ready to start Opencast with the `up` command:
 
 ```sh
-$ docker-compose up
+$ docker compose up
 ```
 
-After downloading the necessary Docker images, `docker-compose` should start all relevant services and you should see
+After downloading the necessary Docker images, `docker compose` should start all relevant services and you should see
 the logging output. Alternatively, adding the `-d` flag will start Opencast in the background and hide the log messages.
 The admin UI is available at <http://localhost:8080>.
 
