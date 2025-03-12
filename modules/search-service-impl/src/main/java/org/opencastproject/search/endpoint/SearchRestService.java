@@ -143,7 +143,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
               isRequired = false,
               type = RestParameter.Type.STRING,
               description = "The sort order.  May include any of the following dublin core metadata: "
-              + "identifier, title, contributor, creator, modified. "
+              + "identifier, title, contributor, creator, created, modified. "
               + "Add ' asc' or ' desc' to specify the sort order (e.g. 'title desc')."
           ),
           @RestParameter(
@@ -215,7 +215,8 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
 
     if (StringUtils.isNotEmpty(sort)) {
       var sortParam = StringUtils.split(sort.toLowerCase());
-      var validSort = Arrays.asList("identifier", "title", "contributor", "creator", "modified").contains(sortParam[0]);
+      var validSort = Arrays.asList("identifier", "title", "contributor", "creator", "created", "modified")
+              .contains(sortParam[0]);
       var validOrder = sortParam.length < 2 || Arrays.asList("asc", "desc").contains(sortParam[1]);
       if (sortParam.length > 2 || !validSort || !validOrder) {
         return Response.status(Response.Status.BAD_REQUEST)
@@ -283,7 +284,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
               isRequired = false,
               type = RestParameter.Type.STRING,
               description = "The sort order.  May include any of the following dublin core metadata: "
-                  + "title, contributor, creator, modified. "
+                  + "title, contributor, creator, created, modified. "
                   + "Add ' asc' or ' desc' to specify the sort order (e.g. 'title desc')."
           ),
           @RestParameter(
@@ -413,7 +414,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
 
     if (StringUtils.isNotEmpty(sort)) {
       var sortParam = StringUtils.split(sort.toLowerCase());
-      var validSort = Arrays.asList("title", "contributor", "creator", "modified").contains(sortParam[0]);
+      var validSort = Arrays.asList("title", "contributor", "creator", "created", "modified").contains(sortParam[0]);
       var validOrder = sortParam.length < 2 || Arrays.asList("asc", "desc").contains(sortParam[1]);
       if (sortParam.length > 2 || !validSort || !validOrder) {
         return Response.status(Response.Status.BAD_REQUEST)
