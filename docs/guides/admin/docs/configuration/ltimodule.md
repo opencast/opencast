@@ -105,6 +105,9 @@ custom parameters to be defined globally.
     - `annotate=true` if you want to display an annotate (annotation tool) button next to each episode
     - `download=true` to show a button next to each episode that allows for downloading individual video files
     - `lng=LANG` to force a language (the browser language is used otherwise)
+    - `sort=SORT` to sort the results in a specific way. May include any of the following dublin core metadata:
+      identifier, title, contributor, creator, modified.
+      Add ' asc' or ' desc' to specify the sort order (e.g. 'title desc').
 - To show an upload dialog, use `ltitools/index.html` as LTI `custom_tool` launch parameter
   and specify the following query parameters:
     - `subtool=upload`
