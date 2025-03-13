@@ -107,9 +107,6 @@ public class SpeechToTextAttachWorkflowOperationHandler extends AbstractWorkflow
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
     logger.info("Start speechtotext-attach workflow operation for media package {}", mediaPackage);
 
-    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
-            Configuration.none, Configuration.none,
-            Configuration.many, Configuration.one);
 
     // How to save the subtitle file? (as attachment, as track...)
     AppendSubtitleAs appendSubtitleAs = howToAppendTheSubtitles(workflowInstance);
@@ -122,6 +119,9 @@ public class SpeechToTextAttachWorkflowOperationHandler extends AbstractWorkflow
     }
 
     for (var jobId: jobIds.split(",")) {
+      ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
+          Configuration.none, Configuration.none,
+          Configuration.many, Configuration.one);
       attachSubtitle(Long.parseLong(jobId), mediaPackage, tagsAndFlavors, appendSubtitleAs);
     }
 
