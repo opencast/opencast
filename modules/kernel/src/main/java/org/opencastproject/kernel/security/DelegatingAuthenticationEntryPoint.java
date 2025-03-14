@@ -62,9 +62,12 @@ public class DelegatingAuthenticationEntryPoint implements AuthenticationEntryPo
     } else {
       // if the user attempted to access a url other than /, store this in the session so we can forward the user there
       // after a successful login
-      String requestUri = request.getRequestURI();
+      String requestUri = null;
+      if (!request.getRequestURI().contains(".json")) {
+        requestUri = request.getRequestURI();
+      }
       String queryString = request.getQueryString();
-      if (requestUri != null && !requestUri.isEmpty() & !"/".equals(requestUri)) {
+      if (requestUri != null && !requestUri.isEmpty() && !"/".equals(requestUri)) {
         if (queryString == null) {
           request.getSession().setAttribute(INITIAL_REQUEST_PATH, requestUri);
         } else {
