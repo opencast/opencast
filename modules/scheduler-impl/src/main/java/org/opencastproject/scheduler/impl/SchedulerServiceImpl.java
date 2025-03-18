@@ -1752,6 +1752,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
                       }
                     } catch (SearchIndexException e) {
                       logger.error("Error while updating event '{}' from search index:", event.getMediaPackageId(), e);
+                    } catch (Exception e) {
+                      throw new RuntimeException("Fatal error while indexing event " + event.getMediaPackageId(), e);
                     }
                   }
                });
