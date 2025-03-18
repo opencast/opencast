@@ -32,6 +32,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -42,7 +43,6 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component(
-    immediate = true,
     service = ListProvidersService.class,
     property = {
         "service.description=Resources list providers service",
@@ -106,6 +106,7 @@ public class ListProvidersServiceImpl implements ListProvidersService {
   @Reference(
       cardinality = ReferenceCardinality.MULTIPLE,
       policy = ReferencePolicy.DYNAMIC,
+      policyOption = ReferencePolicyOption.GREEDY,
       unbind = "removeProvider"
   )
   public void addProvider(ResourceListProvider provider) {

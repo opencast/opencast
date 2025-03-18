@@ -39,7 +39,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Component(
-    immediate = true,
     service = ResourceListProvider.class,
     property = {
         "service.description=Events list provider",

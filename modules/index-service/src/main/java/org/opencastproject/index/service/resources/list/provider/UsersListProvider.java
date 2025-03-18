@@ -40,7 +40,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 @Component(
-    immediate = true,
     service = ResourceListProvider.class,
     property = {
         "service.description=Users list provider",
