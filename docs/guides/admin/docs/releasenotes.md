@@ -1,5 +1,10 @@
 # Opencast 17: Release Notes
 
+## Opencast 17.2
+
+This is a maintenance release of Opencast 17.
+It fixes a few minor bugs.
+
 ## Opencast 17.1
 
 This release contains a couple of bug fixes. It also includes new versions for the editor
