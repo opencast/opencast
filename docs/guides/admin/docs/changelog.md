@@ -403,6 +403,19 @@ Opencast 17
 Opencast 16
 -----------
 
+### Opencast 16.10
+
+- [[#6517](https://github.com/opencast/opencast/pull/6517)] -
+  Fix uncleaned merge conflict
+- [[#6499](https://github.com/opencast/opencast/pull/6499)] -
+  Use system user for repopulate search index
+- [[#6490](https://github.com/opencast/opencast/pull/6490)] -
+  Fix search index rebuild
+- [[#6484](https://github.com/opencast/opencast/pull/6484)] -
+  Replace Ubuntu 20.04 with 22.04 for GHA work
+- [[#6426](https://github.com/opencast/opencast/pull/6426)] -
+  Fixing SFA pattern for search and livestream
+
 ### Opencast 16.9
 
 - [[#6437](https://github.com/opencast/opencast/pull/6437)] -
