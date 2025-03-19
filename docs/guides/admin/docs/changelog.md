@@ -4,6 +4,43 @@ Changelog
 Opencast 17
 -----------
 
+### Opencast 17.2
+
+- [[#6542](https://github.com/opencast/opencast/pull/6542)] -
+  Don't fail theme index rebuild if user does not exist
+- [[#6537](https://github.com/opencast/opencast/pull/6537)] -
+  Fix stt attach operation
+- [[#6530](https://github.com/opencast/opencast/pull/6530)] -
+  Fix circular reference
+- [[#6528](https://github.com/opencast/opencast/pull/6528)] -
+  Revert org.apache.santuario upgrade
+- [[#6502](https://github.com/opencast/opencast/pull/6502)] -
+  Merge r/16.x into r/17.x
+- [[#6501](https://github.com/opencast/opencast/pull/6501)] -
+  Respect order of sort parameters for search queries
+- [[#6492](https://github.com/opencast/opencast/pull/6492)] -
+  Check acl against search entity
+- [[#6491](https://github.com/opencast/opencast/pull/6491)] -
+  Wait for OpenSearch cluster state yellow or green
+- [[#6487](https://github.com/opencast/opencast/pull/6487)] -
+  GraphQL bug fixes and chore
+- [[#6486](https://github.com/opencast/opencast/pull/6486)] -
+  Fix endpoint /ingest/addPartialTrack
+- [[#6473](https://github.com/opencast/opencast/pull/6473)] -
+  Update maven version used by maven wrapper
+- [[#6461](https://github.com/opencast/opencast/pull/6461)] -
+  Allow sorting events by UID
+- [[#6440](https://github.com/opencast/opencast/pull/6440)] -
+  Fix outright javadoc errors
+- [[#6439](https://github.com/opencast/opencast/pull/6439)] -
+  Update karaf 4.4.7
+- [[#6438](https://github.com/opencast/opencast/pull/6438)] -
+  Fix manual trigger in create release workflow
+- [[#6430](https://github.com/opencast/opencast/pull/6430)] -
+  Set wf variables for silent tracks in silence detection WOH
+- [[#6321](https://github.com/opencast/opencast/pull/6321)] -
+  Adds sorting parameter to series ltitools
+
 ### Opencast 17.1
 
 - [[#6432](https://github.com/opencast/opencast/pull/6432)] -
