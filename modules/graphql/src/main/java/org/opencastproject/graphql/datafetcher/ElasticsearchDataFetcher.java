@@ -22,6 +22,7 @@
 package org.opencastproject.graphql.datafetcher;
 
 import org.opencastproject.elasticsearch.api.SearchQuery;
+import org.opencastproject.elasticsearch.index.QueryPreprocessor;
 import org.opencastproject.graphql.type.input.SearchOrder;
 
 import graphql.schema.DataFetchingEnvironment;
@@ -47,7 +48,7 @@ public abstract class ElasticsearchDataFetcher<T> extends ParameterDataFetcher<T
 
   protected <E extends SearchQuery> E addQueryParams(E query, final DataFetchingEnvironment environment) {
     if (environment.containsArgument("query")) {
-      query.withText("*" + parseParam("query", null, environment) + "*");
+      query.withText(QueryPreprocessor.sanitize(parseParam("query", null, environment)));
     }
     return query;
   }

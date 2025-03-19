@@ -181,7 +181,6 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
         String accessControlXml = searchEntity.get().getAccessControl();
 
         // allow ca users to retract live publications without putting them into the ACL
-        User user = securityService.getUser();
         if (!(searchMp.isLive() && currentUser.hasRole(GLOBAL_CAPTURE_AGENT_ROLE)) && accessControlXml != null) {
           AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
           if (!AccessControlUtil.isAuthorized(acl, currentUser, currentOrg, WRITE.toString(), mediaPackageId)) {
@@ -358,7 +357,6 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
         } else {
           // Ensure this user is allowed to update this media package
           // If user has ROLE_EPISODE_<ID>_WRITE, no further permission checks are necessary
-          User user = securityService.getUser();
           String accessControlXml = entity.get().getAccessControl();
           if (accessControlXml != null && entity.get().getDeletionDate() == null) {
             AccessControlList accessList = AccessControlParser.parseAcl(accessControlXml);
@@ -440,7 +438,6 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
           throw new NotFoundException("No media package with id=" + mediaPackageId + " exists");
         }
         // Ensure this user is allowed to read this media package
-        User user = securityService.getUser();
         String accessControlXml = searchEntity.get().getAccessControl();
         if (accessControlXml != null) {
           AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
@@ -475,7 +472,6 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
           throw new NotFoundException("No media package with id=" + mediaPackageId + " exists");
         }
         // Ensure this user is allowed to read this media package
-        User user = securityService.getUser();
         String accessControlXml = searchEntity.get().getAccessControl();
         if (accessControlXml != null) {
           AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
@@ -527,7 +523,6 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
           throw new NotFoundException("No media package with id=" + mediaPackageId + " exists");
         }
         // Ensure this user is allowed to read this media package
-        User user = securityService.getUser();
         String accessControlXml = searchEntity.get().getAccessControl();
         if (accessControlXml != null) {
           AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);

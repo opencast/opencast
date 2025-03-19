@@ -189,7 +189,8 @@ export async function searchEpisode(
     offset: number,
     episodeId?: string,
     seriesId?: string,
-    seriesName?: string): Promise<SearchEpisodeResults> {
+    seriesName?: string,
+    sort?: string): Promise<SearchEpisodeResults> {
     let urlSuffix = "";
     if (seriesId !== undefined)
         urlSuffix += "&sid=" + seriesId;
@@ -197,6 +198,8 @@ export async function searchEpisode(
         urlSuffix += "&sname=" + seriesName;
     if (episodeId !== undefined)
         urlSuffix += "&id=" + episodeId;
+    if (sort !== undefined)
+        urlSuffix += "&sort=" + sort;
     const url = `${hostAndPort()}/search/episode.json?limit=${limit}&offset=${offset}${urlSuffix}`;
     const response = await axios.get<any>(url);
     const resultsRaw = response.data["result"];

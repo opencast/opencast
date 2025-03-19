@@ -33,7 +33,6 @@ import java.util.Map;
 
 /** Boolean list provider. */
 @Component(
-    immediate = true,
     service = ResourceListProvider.class,
     property = {
         "service.description=Boolean list provider",

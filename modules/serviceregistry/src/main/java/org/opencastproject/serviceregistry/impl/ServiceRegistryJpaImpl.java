@@ -38,7 +38,6 @@ import org.opencastproject.db.DBSessionFactory;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.job.jpa.JpaJob;
-import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClient;
@@ -73,9 +72,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpHead;
-import org.osgi.framework.BundleContext;
-import org.osgi.framework.InvalidSyntaxException;
-import org.osgi.framework.ServiceReference;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
@@ -86,8 +82,6 @@ import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
-import org.osgi.service.jaxrs.whiteboard.JaxrsWhiteboardConstants;
-import org.osgi.util.tracker.ServiceTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -253,9 +247,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   protected DBSession db;
 
-  /** Tracks services published locally and adds them to the service registry */
-  protected RestServiceTracker tracker = null;
-
   /** The thread pool to use for dispatching queued jobs and checking on phantom services. */
   protected ScheduledExecutorService scheduledExecutor = null;
 
@@ -373,17 +364,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       throw new IllegalStateException("Unable to register host " + hostName + " in the service registry", e);
     }
 
-    // Track any services from this host that need to be added to the service registry
-    if (cc != null) {
-      try {
-        tracker = new RestServiceTracker(cc.getBundleContext());
-        tracker.open(true);
-      } catch (InvalidSyntaxException e) {
-        logger.error("Invalid filter syntax:", e);
-        throw new IllegalStateException(e);
-      }
-    }
-
     // Whether a service accepts a job whose load exceeds the host’s max load
     if (cc != null) {
       acceptJobLoadsExeedingMaxLoad = getOptContextProperty(cc, ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY).map(Strings.toBool)
@@ -425,9 +405,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       JmxUtil.unregisterMXBean(mbean);
     }
 
-    if (tracker != null) {
-      tracker.close();
-    }
     try {
       unregisterHost(hostName);
     } catch (ServiceRegistryException e) {
@@ -2095,87 +2072,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   public ServiceRegistration getServiceRegistration(String serviceType, String host) {
     return db.exec(getServiceRegistrationQuery(serviceType, host))
         .orElse(null);
-  }
-
-  /**
-   * A custom ServiceTracker that registers all locally published servlets so clients can find the most appropriate
-   * service on the network to handle new jobs.
-   */
-  class RestServiceTracker extends ServiceTracker {
-    protected static final String FILTER = "(" +  JaxrsWhiteboardConstants.JAX_RS_RESOURCE + "=true)";
-
-    protected BundleContext bundleContext;
-
-    RestServiceTracker(BundleContext bundleContext) throws InvalidSyntaxException {
-      super(bundleContext, bundleContext.createFilter(FILTER), null);
-      this.bundleContext = bundleContext;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @see org.osgi.util.tracker.ServiceTracker#open(boolean)
-     */
-    @Override
-    public void open(boolean trackAllServices) {
-      super.open(trackAllServices);
-      try {
-        ServiceReference[] references = bundleContext.getAllServiceReferences(null, FILTER);
-        if (references != null) {
-          for (ServiceReference ref : references) {
-            addingService(ref);
-          }
-        }
-      } catch (InvalidSyntaxException e) {
-        throw new IllegalStateException("The tracker filter '" + FILTER + "' has syntax errors", e);
-      }
-    }
-
-    @Override
-    public Object addingService(ServiceReference reference) {
-      String serviceType = (String) reference.getProperty(RestConstants.SERVICE_TYPE_PROPERTY);
-      String servicePath = (String) reference.getProperty(RestConstants.SERVICE_PATH_PROPERTY);
-
-      boolean publishFlag = Boolean.parseBoolean(
-          Objects.requireNonNullElse(
-              reference.getProperty(RestConstants.SERVICE_PUBLISH_PROPERTY), "true").toString()
-      );
-      boolean jobProducer = Boolean.parseBoolean(
-          Objects.requireNonNullElse(
-              reference.getProperty(RestConstants.SERVICE_JOBPRODUCER_PROPERTY), "false").toString()
-      );
-
-      // Only register services that have the "publish" flag set to "true"
-      if (publishFlag) {
-        try {
-          registerService(serviceType, hostName, servicePath, jobProducer);
-        } catch (ServiceRegistryException e) {
-          logger.warn("Unable to register job producer of type " + serviceType + " on host " + hostName);
-        }
-      } else {
-        logger.debug("Not registering service " + serviceType + " in service registry by configuration");
-      }
-
-      return super.addingService(reference);
-    }
-
-    @Override
-    public void removedService(ServiceReference reference, Object service) {
-      String serviceType = (String) reference.getProperty(RestConstants.SERVICE_TYPE_PROPERTY);
-      boolean publishFlag = (Boolean) reference.getProperty(RestConstants.SERVICE_PUBLISH_PROPERTY);
-
-      // Services that have the "publish" flag set to "true" have been registered before.
-      if (publishFlag) {
-        try {
-          unRegisterService(serviceType, hostName);
-        } catch (ServiceRegistryException e) {
-          logger.warn("Unable to unregister job producer of type " + serviceType + " on host " + hostName);
-        }
-      } else {
-        logger.trace("Service " + reference + " was never registered");
-      }
-      super.removedService(reference, service);
-    }
   }
 
   /**

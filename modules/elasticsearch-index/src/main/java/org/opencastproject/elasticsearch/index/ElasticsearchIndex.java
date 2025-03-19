@@ -58,6 +58,9 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -80,7 +83,6 @@ import javax.xml.bind.Unmarshaller;
         property = {
                 "service.description=Elasticsearch Index"
         },
-        immediate = true,
         service = { ElasticsearchIndex.class }
 )
 public class ElasticsearchIndex extends AbstractElasticsearchIndex {
@@ -123,9 +125,17 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
 
   private boolean episodeIdRole = false;
 
-  @Reference
+  @Reference(
+      cardinality = ReferenceCardinality.OPTIONAL,
+      policy = ReferencePolicy.DYNAMIC,
+      policyOption = ReferencePolicyOption.GREEDY
+  )
   public void setListProvidersService(ListProvidersService listProvidersService) {
     this.listProvidersService = listProvidersService;
+  }
+
+  public void unsetListProvidersService(ListProvidersService listProvidersService) {
+    this.listProvidersService = null;
   }
 
   /**

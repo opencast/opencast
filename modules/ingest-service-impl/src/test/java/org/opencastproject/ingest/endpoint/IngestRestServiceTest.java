@@ -495,12 +495,12 @@ public class IngestRestServiceTest {
     restService.setIngestService(ingestService);
 
     MockHttpServletRequest request = newPartialMockRequest();
-    request.setPathInfo("/addTrack");
+    request.setPathInfo("/ingest/addTrack");
     Response response = restService.addMediaPackageTrack(request);
     assertEquals(Status.OK.getStatusCode(), response.getStatus());
 
     request = newPartialMockRequest();
-    request.setPathInfo("/addPartialTrack");
+    request.setPathInfo("/ingest/addPartialTrack");
     response = restService.addMediaPackageTrack(request);
     assertEquals(Status.OK.getStatusCode(), response.getStatus());
     EasyMock.verify(ingestService);

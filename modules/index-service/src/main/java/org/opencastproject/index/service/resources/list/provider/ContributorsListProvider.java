@@ -55,7 +55,6 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 @Component(
-    immediate = true,
     service = ResourceListProvider.class,
     property = {
         "service.description=Contributors list provider",

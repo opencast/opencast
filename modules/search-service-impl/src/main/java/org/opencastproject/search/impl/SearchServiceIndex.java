@@ -22,7 +22,6 @@
 package org.opencastproject.search.impl;
 
 import static org.opencastproject.security.util.SecurityUtil.getEpisodeRoleId;
-import static org.opencastproject.systems.OpencastConstants.DIGEST_USER_PROPERTY;
 import static org.opencastproject.systems.OpencastConstants.EPISODE_ID_ROLE_ACCESS_PROPERTY;
 
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
@@ -48,6 +47,7 @@ import org.opencastproject.search.impl.persistence.SearchServiceDatabaseExceptio
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AuthorizationService;
+import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.Role;
@@ -173,7 +173,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
     logger.debug("Usage of episode ID roles is set to {}", episodeIdRole);
 
     createIndex();
-    systemUserName = cc.getBundleContext().getProperty(DIGEST_USER_PROPERTY);
+    systemUserName = SecurityUtil.getSystemUserName(cc);
   }
 
   private void createIndex() {
@@ -241,7 +241,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
     }
     var mediaPackageId = mediaPackage.getIdentifier().toString();
 
-    checkMPWritePermission(mediaPackageId);
+    checkSearchEntityWritePermission(mediaPackageId);
 
     logger.debug("Attempting to add media package {} to search index", mediaPackageId);
     final var acls = new AccessControlList[1];
@@ -265,14 +265,14 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
   }
 
   private void indexMediaPackage(MediaPackage mediaPackage, AccessControlList acl)
-          throws SearchException, UnauthorizedException, SearchServiceDatabaseException {
-    indexMediaPackage(mediaPackage, acl, null, null, securityService.getOrganization().getId());
+          throws SearchException, SearchServiceDatabaseException {
+    indexMediaPackage(mediaPackage, acl, null, null);
   }
 
-  private void indexMediaPackage(MediaPackage mediaPackage, AccessControlList acl, Date modDate, Date delDate,
-      String orgId)
-          throws SearchException, UnauthorizedException, SearchServiceDatabaseException {
+  private void indexMediaPackage(MediaPackage mediaPackage, AccessControlList acl, Date modDate, Date delDate)
+          throws SearchException, SearchServiceDatabaseException {
     String mediaPackageId = mediaPackage.getIdentifier().toString();
+    String orgId = securityService.getOrganization().getId();
     //If the entry has been deleted then there's *probably* no dc file to load.
     DublinCoreCatalog dc = null == delDate
         ? DublinCoreUtil.loadEpisodeDublinCore(workspace, mediaPackage).orElse(DublinCores.mkSimple())
@@ -357,12 +357,11 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
     }
   }
 
-  private void checkMPWritePermission(final String mediaPackageId) throws SearchException {
+  private void checkSearchEntityWritePermission(final String mediaPackageId) throws SearchException {
     User user = securityService.getUser();
     try {
-      MediaPackage mp = persistence.getMediaPackage(mediaPackageId);
       AccessControlList acl = persistence.getAccessControlList(mediaPackageId);
-      if (!authorizationService.hasPermission(mp, Permissions.Action.WRITE.toString())) {
+      if (!authorizationService.hasPermission(acl, Permissions.Action.WRITE.toString())) {
         boolean isAdmin = user.getRoles().stream()
             .map(Role::getName)
             .anyMatch(r -> r.equals(SecurityConstants.GLOBAL_ADMIN_ROLE));
@@ -391,7 +390,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
    */
   public boolean deleteSynchronously(final String mediaPackageId) throws SearchException {
 
-    checkMPWritePermission(mediaPackageId);
+    checkSearchEntityWritePermission(mediaPackageId);
 
     String deletionString = DateTimeFormatter.ISO_INSTANT.format(Instant.now());
 
@@ -496,6 +495,9 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
 
   @Override
   public void repopulate(IndexRebuildService.DataType type) throws IndexRebuildException {
+    final Organization originalOrg = securityService.getOrganization();
+    final User originalUser = securityService.getUser();
+
     try {
       int total = persistence.countMediaPackages();
       int pageSize = 50;
@@ -509,6 +511,11 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
         page.forEach(tuple -> {
           try {
             MediaPackage mediaPackage = tuple.getA();
+            Organization organization = organizationDirectory.getOrganization(tuple.getB());
+            final var systemUser = SecurityUtil.createSystemUser(systemUserName, organization);
+            securityService.setUser(systemUser);
+            securityService.setOrganization(organization);
+
             String mediaPackageId = mediaPackage.getIdentifier().toString();
 
             AccessControlList acl = persistence.getAccessControlList(mediaPackageId);
@@ -520,8 +527,9 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
             logger.debug("Updating series ACL with merged access control list: {}", seriesAcl);
 
             current.getAndIncrement();
-            indexMediaPackage(mediaPackage, acl, modificationDate, deletionDate, tuple.getB());
-          } catch (SearchServiceDatabaseException | UnauthorizedException e) {
+
+            indexMediaPackage(mediaPackage, acl, modificationDate, deletionDate);
+          } catch (SearchServiceDatabaseException e) {
             logIndexRebuildError(logger, total, current.get(), e);
             //NB: Runtime exception thrown to escape the functional interfacing
             throw new RuntimeException("Internal Index Rebuild Failure", e);
@@ -537,6 +545,9 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
     } catch (SearchServiceDatabaseException | RuntimeException e) {
       logIndexRebuildError(logger, e);
       throw new IndexRebuildException("Index Rebuild Failure", e);
+    } finally {
+      securityService.setUser(originalUser);
+      securityService.setOrganization(originalOrg);
     }
   }
 

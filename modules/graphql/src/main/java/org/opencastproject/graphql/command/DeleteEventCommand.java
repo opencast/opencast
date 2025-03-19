@@ -21,14 +21,18 @@
 
 package org.opencastproject.graphql.command;
 
+import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.graphql.event.GqlDeleteEventPayload;
 import org.opencastproject.graphql.exception.GraphQLNotFoundException;
+import org.opencastproject.graphql.exception.GraphQLRuntimeException;
 import org.opencastproject.graphql.exception.GraphQLUnauthorizedException;
 import org.opencastproject.graphql.execution.context.OpencastContext;
 import org.opencastproject.graphql.execution.context.OpencastContextManager;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.workflow.api.WorkflowDatabaseException;
 
 public class DeleteEventCommand extends AbstractCommand<GqlDeleteEventPayload> {
 
@@ -43,13 +47,25 @@ public class DeleteEventCommand extends AbstractCommand<GqlDeleteEventPayload> {
   public GqlDeleteEventPayload execute() {
     OpencastContext context = OpencastContextManager.getCurrentContext();
     final IndexService indexService = context.getService(IndexService.class);
+    final ElasticsearchIndex index = context.getService(ElasticsearchIndex.class);
+
+    IndexService.EventRemovalResult result;
     try {
-      indexService.removeEvent(this.id);
+      var event = indexService.getEvent(this.id, index);
+      if (event.isSome()) {
+        result = indexService.removeEvent(event.get(), context.getConfiguration().eventRetractWorkflowId());
+      } else {
+        throw new GraphQLNotFoundException("Event with id " + this.id + " not found.");
+      }
     } catch (UnauthorizedException e) {
       throw new GraphQLUnauthorizedException(e.getMessage());
     } catch (NotFoundException e) {
       throw new GraphQLNotFoundException(e.getMessage());
-    } return new GqlDeleteEventPayload(id);
+    } catch (SearchIndexException | WorkflowDatabaseException e) {
+      throw new GraphQLRuntimeException(e);
+    }
+
+    return new GqlDeleteEventPayload(id, result);
   }
 
   public static Builder create(String id) {

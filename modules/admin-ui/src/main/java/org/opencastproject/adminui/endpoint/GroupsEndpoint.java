@@ -77,7 +77,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.ws.rs.DELETE;
@@ -196,7 +195,7 @@ public class GroupsEndpoint {
     Optional<String> optNameFilter = Optional.ofNullable(filters.get(GroupsListQuery.FILTER_NAME_NAME));
     Optional<String> optTextFilter = Optional.ofNullable(filters.get(GroupsListQuery.FILTER_TEXT_NAME));
 
-    Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(sort);
+    ArrayList<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(sort);
 
     List<JpaGroup> results = jpaGroupRoleProvider.getGroups(optLimit, optOffset, optNameFilter, optTextFilter,
             sortCriteria);

@@ -29,6 +29,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,7 +73,7 @@ public class ExecutionService {
 
   }
 
-  private final ExecutionConfiguration config;
+  private ExecutionConfiguration config;
 
   @Activate
   public ExecutionService(
@@ -81,16 +82,21 @@ public class ExecutionService {
       BundleContext bundleContext,
       ExecutionConfiguration config
   ) {
+    this.schemaService = schemaService;
+    this.securityService = securityService;
+    this.bundleContext = bundleContext;
+
+    updateConfiguration(config);
+  }
+
+  @Modified
+  public void updateConfiguration(ExecutionConfiguration config) {
     if (config.execution_max_query_complexity() <= 0) {
       throw new IllegalArgumentException("execution_max_query_complexity must be greater than 0");
     }
     if (config.execution_max_query_depth() <= 0) {
       throw new IllegalArgumentException("execution_max_query_depth must be greater than 0");
     }
-
-    this.schemaService = schemaService;
-    this.securityService = securityService;
-    this.bundleContext = bundleContext;
     this.config = config;
   }
 

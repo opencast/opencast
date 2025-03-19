@@ -179,7 +179,7 @@ public class GroupsEndpoint {
     }
     Optional<String> optNameFilter = Optional.ofNullable(filters.get(GroupsListQuery.FILTER_NAME_NAME));
 
-    Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(sort);
+    ArrayList<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(sort);
 
     // sorting by members & roles is not supported by the database, so we do this afterwards
     Set<SortCriterion> deprecatedSortCriteria = new HashSet<>();

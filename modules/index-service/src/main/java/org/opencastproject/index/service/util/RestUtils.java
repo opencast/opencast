@@ -48,11 +48,9 @@ import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.ws.rs.WebApplicationException;
@@ -221,8 +219,8 @@ public final class RestUtils {
    *          the parameter string to parse (will be checked if blank)
    * @return a set of sort criterion, never {@code null}
    */
-  public static Set<SortCriterion> parseSortQueryParameter(String sort) throws WebApplicationException {
-    Set<SortCriterion> sortOrders = new HashSet<>();
+  public static ArrayList<SortCriterion> parseSortQueryParameter(String sort) throws WebApplicationException {
+    ArrayList<SortCriterion> sortOrders = new ArrayList<>();
 
     if (StringUtils.isNotBlank(sort)) {
       StringTokenizer tokenizer = new StringTokenizer(sort, ",");

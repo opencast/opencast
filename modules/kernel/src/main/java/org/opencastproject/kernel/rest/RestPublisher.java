@@ -378,7 +378,8 @@ public class RestPublisher implements RestConstants {
 
     @Override
     public Object addingService(ServiceReference<Object> reference) {
-      Object service = componentContext.getBundleContext().getService(reference);
+      logger.trace("Adding jaxrs service {}", reference);
+      Object service = super.addingService(reference);
       if (service == null) {
         logger.info("JAX-RS service {} has not been instantiated yet, or has already been unregistered. Skipping "
                 + "endpoint creation.", reference);
@@ -393,7 +394,7 @@ public class RestPublisher implements RestConstants {
           createEndpoint(reference, service);
         }
       }
-      return super.addingService(reference);
+      return service;
     }
   }
 
