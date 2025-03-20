@@ -23,7 +23,9 @@ or
 
     bin/elasticsearch-plugin install analysis-icu
 
-on all nodes of your Elasticsearch/Opensearch cluster and restart each node.
+on all nodes of your Elasticsearch/Opensearch cluster.
+
+After installation, restart the Elasticsearch/OpenSearch service before starting the Opencast 17 service to apply the  plugin changes.
 
 ## Configuration Changes
 
