@@ -304,6 +304,9 @@ public class SmtpService extends BaseSmtpService implements ManagedService {
     }
 
     MimeMessage message = createMessage();
+    if (StringUtils.isNotBlank(getSender())) {
+      message.addFrom(new InternetAddress[] { new InternetAddress(getSender()) });
+    }
     addRecipients(message, RecipientType.TO, to);
     addRecipients(message, RecipientType.CC, cc);
     addRecipients(message, RecipientType.BCC, bcc);

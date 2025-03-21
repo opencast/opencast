@@ -151,6 +151,10 @@ public class BaseSmtpService {
     this.sender = sender;
   }
 
+  public String getSender() {
+    return this.sender;
+  }
+
   public void setSsl(boolean ssl) {
     this.ssl = ssl;
   }
