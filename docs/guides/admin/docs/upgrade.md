@@ -15,18 +15,32 @@ In case you need to upgrade older versions of Opencast, please refer to the docu
 
 ## Elasticsearch/OpenSearch Plugin Installation
 
-The `analysis-icu` plugin for OpenSearch is required for Opencast 17. To install the plugin, run either
+The `analysis-icu` plugin for OpenSearch is required for Opencast 17.
 
-    bin/opensearch-plugin install analysis-icu
+If you use Opencast's RPM package repository, install the plugin on your search cluster nodes with:
 
-or
+```bash
+# OpenSearch: CentOS, RHEL, Rocky, …
+dnf install opensearch-plugin-analysis-icu
 
-    bin/elasticsearch-plugin install analysis-icu
+# Elasticsearch:
+dnf install elasticsearch-oss-plugin-analysis-icu
+```
 
-on all nodes of your Elasticsearch/Opensearch cluster.
+Otherwise, you can manually install the plugin by running on all search cluster nodes:
 
+```bash
+# OpenSearch
+bin/opensearch-plugin install analysis-icu
+
+# Elasticsearch
+bin/elasticsearch-plugin install analysis-icu
+```
+
+<div class=warn>
 After installation, restart the Elasticsearch/OpenSearch service before starting the Opencast 17 service
 to apply the plugin changes.
+</div>
 
 ## Configuration Changes
 
