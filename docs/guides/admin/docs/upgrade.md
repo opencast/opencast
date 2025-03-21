@@ -6,24 +6,41 @@ In case you need to upgrade older versions of Opencast, please refer to the docu
 
 1. Read the [release notes](releasenotes.md)
 2. Stop your current Opencast instance
-3. Install the required [Elasticsearch/Opensearch plugin](#elasticsearchopensearch-plugin-installation)
+3. Install the required [Elasticsearch/OpenSearch plugin](#elasticsearchopensearch-plugin-installation)
 4. Replace Opencast with the new version
 5. Review the [configuration changes](#configuration-changes) and adjust your configuration accordingly
 6. Start Opencast
 7. [Rebuild the index](#index-rebuild)
 8. Optional: [Remove Gstreamer](#uninstall-gstreamer)
 
-## Elasticsearch/Opensearch Plugin Installation
+## Elasticsearch/OpenSearch Plugin Installation
 
-The `analysis-icu` plugin for OpenSearch is required for Opencast 17. To install the plugin, run either
+The `analysis-icu` plugin for OpenSearch is required for Opencast 17.
 
-    bin/opensearch-plugin install analysis-icu
+If you use Opencast's RPM package repository, install the plugin on your search cluster nodes with:
 
-or
+```bash
+# OpenSearch: CentOS, RHEL, Rocky, …
+dnf install opensearch-plugin-analysis-icu
 
-    bin/elasticsearch-plugin install analysis-icu
+# Elasticsearch:
+dnf install elasticsearch-oss-plugin-analysis-icu
+```
 
-on all nodes of your Elasticsearch/Opensearch cluster and restart each node.
+Otherwise, you can manually install the plugin by running on all search cluster nodes:
+
+```bash
+# OpenSearch
+bin/opensearch-plugin install analysis-icu
+
+# Elasticsearch
+bin/elasticsearch-plugin install analysis-icu
+```
+
+<div class=warn>
+After installation, restart the Elasticsearch/OpenSearch service before starting the Opencast 17 service
+to apply the plugin changes.
+</div>
 
 ## Configuration Changes
 
