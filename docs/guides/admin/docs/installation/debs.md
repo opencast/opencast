@@ -66,7 +66,7 @@ you can configure the URL in Opencast's configuration files.
 In our repository we provide validated OpenSearch packages copied from the upstream repository.  Installation can be
 accomplished by running the following:
 
-    apt-get install opensearch
+    apt-get install opensearch opensearch-analysis-icu
 
 If you wish to use the upstream OpenSearch repository directly be aware that Opencast only supported with OpenSearch 1.x
 and will not work with OpenSearch 2.x yet.  Future support for this is forthcoming.
