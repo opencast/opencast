@@ -1839,7 +1839,7 @@ Fix logging for WhisperEngine
 - [[#5053](https://github.com/opencast/opencast/pull/5053)] -
   Paella7 fix trimming url params
 - [[#5037](https://github.com/opencast/opencast/pull/5037)] -
-  Switch to Opensearch by default
+  Switch to OpenSearch by default
 
 
 ### Opencast 14.0
@@ -3485,7 +3485,7 @@ Opencast 12
 - [[#3890](https://github.com/opencast/opencast/pull/3890)] -
   fix brightspace api with large datasets
 - [[#3883](https://github.com/opencast/opencast/pull/3883)] -
-  Add formal Opensearch support
+  Add formal OpenSearch support
 - [[#3876](https://github.com/opencast/opencast/pull/3876)] -
   Remove Solr from Admin Node
 - [[#3874](https://github.com/opencast/opencast/pull/3874)] -

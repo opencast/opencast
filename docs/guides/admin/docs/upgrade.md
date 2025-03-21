@@ -6,14 +6,14 @@ In case you need to upgrade older versions of Opencast, please refer to the docu
 
 1. Read the [release notes](releasenotes.md)
 2. Stop your current Opencast instance
-3. Install the required [Elasticsearch/Opensearch plugin](#elasticsearchopensearch-plugin-installation)
+3. Install the required [Elasticsearch/OpenSearch plugin](#elasticsearchopensearch-plugin-installation)
 4. Replace Opencast with the new version
 5. Review the [configuration changes](#configuration-changes) and adjust your configuration accordingly
 6. Start Opencast
 7. [Rebuild the index](#index-rebuild)
 8. Optional: [Remove Gstreamer](#uninstall-gstreamer)
 
-## Elasticsearch/Opensearch Plugin Installation
+## Elasticsearch/OpenSearch Plugin Installation
 
 The `analysis-icu` plugin for OpenSearch is required for Opencast 17. To install the plugin, run either
 
