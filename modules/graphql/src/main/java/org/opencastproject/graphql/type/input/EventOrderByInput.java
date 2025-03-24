@@ -48,6 +48,10 @@ public class EventOrderByInput {
   private OrderDirection endDate;
 
   @GraphQLField
+  @GraphQLName("created")
+  private OrderDirection created;
+
+  @GraphQLField
   @GraphQLName("workflowState")
   private OrderDirection workflowState;
 
@@ -113,6 +117,10 @@ public class EventOrderByInput {
 
   public OrderDirection getEndDate() {
     return endDate;
+  }
+
+  public OrderDirection getCreated() {
+    return created;
   }
 
   public OrderDirection getWorkflowState() {

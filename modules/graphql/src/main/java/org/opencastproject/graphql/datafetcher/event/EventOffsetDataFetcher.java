@@ -25,6 +25,7 @@ import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.elasticsearch.index.objects.event.EventIndexSchema;
 import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.graphql.datafetcher.ElasticsearchDataFetcher;
 import org.opencastproject.graphql.event.GqlEventList;
@@ -156,6 +157,9 @@ public class EventOffsetDataFetcher extends ElasticsearchDataFetcher<GqlEventLis
     }
     if (eventOrderBy.getEndDate() != null) {
       eventSearchQuery.sortByEndDate(eventOrderBy.getEndDate().getOrder());
+    }
+    if (eventOrderBy.getCreated() != null) {
+      eventSearchQuery.withSortOrder(EventIndexSchema.CREATED, eventOrderBy.getCreated().getOrder());
     }
     if (eventOrderBy.getWorkflowState() != null) {
       eventSearchQuery.sortByWorkflowState(eventOrderBy.getWorkflowState().getOrder());
