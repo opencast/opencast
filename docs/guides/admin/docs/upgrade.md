@@ -27,6 +27,12 @@ dnf install opensearch-plugin-analysis-icu
 dnf install elasticsearch-oss-plugin-analysis-icu
 ```
 
+If you use Opencast's Debian package repository, install the plugin on your search cluster nodes with:
+```bash
+# OpenSearch: Debian based OSes
+apt install opensearch-analysis-icu
+```
+
 Otherwise, you can manually install the plugin by running on all search cluster nodes:
 
 ```bash

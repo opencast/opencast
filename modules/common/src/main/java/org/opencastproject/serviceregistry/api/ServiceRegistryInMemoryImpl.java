@@ -1083,7 +1083,7 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
         }
 
         Long parentJobId = job.getParentJobId();
-        if (parentJobId == null | parentJobId < 1)
+        if (parentJobId == null || parentJobId < 1)
           jobs.remove(job.getId());
       }
     }
