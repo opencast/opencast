@@ -545,7 +545,7 @@ public class UsersEndpoint {
     return rolesSet;
   }
 
-  public Map<String, Object> generateJsonUser(User user) {
+  private Map<String, Object> generateJsonUser(User user) {
     // Prepare the roles
     Map<String, Object> userData = new HashMap<>();
     userData.put("username", user.getUsername());
