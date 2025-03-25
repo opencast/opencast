@@ -341,7 +341,6 @@ public class SeriesEndpoint {
       seriesAccessJson.put("current_acl", currentAcl.isSome() ? currentAcl.get().getId() : 0);
       seriesAccessJson.put("privileges", AccessInformationUtil.serializePrivilegesByRole(seriesAccessControl));
       seriesAccessJson.put("acl", transformAccessControList(seriesAccessControl, userDirectoryService));
-//      seriesAccessJson.put("acl", AccessControlParser.toJsonSilent(seriesAccessControl));
       seriesAccessJson.put("locked", hasProcessingEvents);
     } catch (SeriesException e) {
       logger.error("Unable to get ACL from series {}", seriesId, e);

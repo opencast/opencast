@@ -2274,7 +2274,6 @@ public abstract class AbstractEventEndpoint {
     JSONObject episodeAccessJson = new JSONObject();
     episodeAccessJson.put("current_acl", currentAcl.isSome() ? currentAcl.get().getId() : 0L);
     episodeAccessJson.put("acl", transformAccessControList(activeAcl, getUserDirectoryService()));
-//    episodeAccessJson.put("acl", AccessControlParser.toJsonSilent(activeAcl));
     episodeAccessJson.put("privileges", AccessInformationUtil.serializePrivilegesByRole(activeAcl));
     if (StringUtils.isNotBlank(optEvent.get().getWorkflowState())
             && WorkflowUtil.isActive(WorkflowInstance.WorkflowState.valueOf(optEvent.get().getWorkflowState())))
