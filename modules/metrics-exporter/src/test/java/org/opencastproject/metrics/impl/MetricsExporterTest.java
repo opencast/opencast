@@ -101,7 +101,7 @@ public class MetricsExporterTest {
 
     // test exporter
     final String body = exporter.metrics().getEntity().toString();
-    Assert.assertTrue(body.contains("opencast_job_load_max{host=\"opencast.org\",} 12.3"));
-    Assert.assertTrue(body.contains("opencast_asset_manager_events{organization=\"mh_default_org\",} 5.0"));
+    Assert.assertTrue(body.contains("opencast_job_load_max{host=\"opencast.org\"} 12.3"));
+    Assert.assertTrue(body.contains("opencast_asset_manager_events{organization=\"mh_default_org\"} 5.0"));
   }
 }
