@@ -24,6 +24,7 @@ import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.RichAResult;
 import org.opencastproject.assetmanager.api.storage.AssetStore;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.NotFoundException;
 
 import java.util.Date;
@@ -360,4 +361,12 @@ public interface AssetManager {
    * @return Number of events
    */
   long countEvents(String organization);
+
+  /**
+   * Trigger search index update for event.
+   *
+   * @param mediaPackageId
+   *          The event ID to trigger an index update for
+   */
+  void triggerIndexUpdate(String mediaPackageId) throws NotFoundException, UnauthorizedException;
 }

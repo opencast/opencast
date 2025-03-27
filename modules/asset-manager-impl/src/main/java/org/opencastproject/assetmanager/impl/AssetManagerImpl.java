@@ -516,6 +516,24 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
             version, snapshot.getArchivalDate());
   }
 
+  @Override
+  public void triggerIndexUpdate(String mediaPackageId) throws NotFoundException, UnauthorizedException {
+
+    if (!securityService.getUser().hasRole("ROLE_ADMIN")) {
+      throw new UnauthorizedException("Only global administrators may trigger manual event updates.");
+    }
+    final AQueryBuilder q = createQuery();
+    final AResult r = q.select(q.snapshot()).where(q.mediaPackageId(mediaPackageId).and(q.version().isLatest())).run();
+
+    if (r.getSize() == 0) {
+      throw new NotFoundException("No event with ID `" + mediaPackageId + "`");
+    }
+
+    // Update event index with latest snapshot
+    var snapshot = r.getRecords().stream().findFirst().get().getSnapshot().get();
+    updateEventInIndex(snapshot);
+  }
+
   /**
    * Update the event in the Elasticsearch index.
    *
