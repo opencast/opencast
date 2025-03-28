@@ -1497,14 +1497,24 @@ public class IndexServiceImpl implements IndexService {
       if (workflowInstances.isEmpty()) {
         notFoundWorkflow = true;
       } else {
+        var toRemove = workflowInstances.size();
         for (WorkflowInstance instance : workflowInstances) {
-          workflowService.stop(instance.getId());
-          workflowService.remove(instance.getId());
+          try {
+            workflowService.stop(instance.getId());
+            workflowService.remove(instance.getId());
+            toRemove--;
+          } catch (WorkflowDatabaseException e) {
+            if (e.getCause() instanceof  NotFoundException) {
+              // Someone already removed this. That's fine. Continue with the next workflow
+              logger.warn("Workflow {} has already been removed", instance.getId());
+            } else {
+              throw e;
+            }
+          }
         }
-        removedWorkflow = true;
+        removedWorkflow = toRemove == 0;
+        notFoundWorkflow = toRemove >= 1;
       }
-    } catch (NotFoundException e) {
-      notFoundWorkflow = true;
     } catch (UnauthorizedException e) {
       unauthorizedWorkflow = true;
     } catch (WorkflowException e) {
