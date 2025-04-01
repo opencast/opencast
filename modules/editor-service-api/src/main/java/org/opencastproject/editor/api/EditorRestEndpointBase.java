@@ -209,7 +209,10 @@ public abstract class EditorRestEndpointBase {
         return RestUtil.R.conflict(String.format("Event '%s' is %s", eventId, e.getMessage()));
       case WORKFLOW_ACTIVE:
         return RestUtil.R.locked();
+      case NOT_AUTHORIZED:
+        return RestUtil.R.unauthorized(String.format("Unauthorized for event '%s'", eventId));
       case WORKFLOW_NOT_FOUND:
+      case METADATA_UPDATE_FAIL:
       case NO_INTERNAL_PUBLICATION:
         return RestUtil.R.badRequest(e.getMessage());
       case UNABLE_TO_CREATE_CATALOG:
