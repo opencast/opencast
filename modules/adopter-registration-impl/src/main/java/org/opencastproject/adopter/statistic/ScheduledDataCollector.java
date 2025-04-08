@@ -46,6 +46,8 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.userdirectory.JpaUserAndRoleProvider;
 import org.opencastproject.userdirectory.JpaUserReferenceProvider;
 
+import com.google.gson.JsonObject;
+
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.osgi.framework.BundleContext;
@@ -227,8 +229,16 @@ public class ScheduledDataCollector extends TimerTask {
 
       if (adopter.allowsStatistics()) {
         try {
-          String statisticDataAsJson = collectStatisticData(adopter.getAdopterKey(), adopter.getStatisticKey());
-          sender.sendStatistics(statisticDataAsJson);
+          StatisticData statisticData = collectStatisticData(adopter.getAdopterKey(), adopter.getStatisticKey());
+          sender.sendStatistics(statisticData.jsonify());
+          JsonObject tobiraJson = null;//tobiraRemoteRequester.getStats();
+          // This is null in the case that Tobira hasn't sent any stats yet.
+          // This could be due to Tobira not existing, or because we've just rebooted.
+          if (null != tobiraJson) {
+            sender.sendTobiraData(
+                "{ \"statistic_key\": \"" + statisticData.getStatisticKey()
+                  + "\", \"data\": " + tobiraJson.toString() + " }");
+          }
           //Note: save the form (unmodified) (again!) to update the dates.  Old dates cause warnings to the user!
           adopterFormService.saveFormData(adopter);
         } catch (Exception e) {
@@ -241,9 +251,15 @@ public class ScheduledDataCollector extends TimerTask {
   public String getRegistrationDataAsString() throws Exception {
     Form adopter = (Form) adopterFormService.retrieveFormData();
     String generalJson = collectGeneralData(adopter);
-    String statsJson = collectStatisticData(adopter.getAdopterKey(), adopter.getStatisticKey());
+    String statsJson = collectStatisticData(adopter.getAdopterKey(), adopter.getStatisticKey()).jsonify();
+    JsonObject tobiraJson = null; //tobiraRemoteRequester.getStats();
+
     //It's not stupid if it works!
-    return "{ \"general\":" + generalJson + ", \"statistics\":" + statsJson + "}";
+    if (null != tobiraJson) {
+      return "{ \"general\":" + generalJson + ", \"statistics\":" + statsJson + ", \"tobira\":" + tobiraJson + "}";
+    } else {
+      return "{ \"general\":" + generalJson + ", \"statistics\":" + statsJson + "}";
+    }
   }
 
 
@@ -267,7 +283,7 @@ public class ScheduledDataCollector extends TimerTask {
    * @return The statistic data as JSON string.
    * @throws Exception General exception that can occur while gathering data.
    */
-  private String collectStatisticData(String adopterKey, String statisticKey) throws Exception {
+  private StatisticData collectStatisticData(String adopterKey, String statisticKey) throws Exception {
     StatisticData statisticData = new StatisticData(statisticKey);
     statisticData.setAdopterKey(adopterKey);
     serviceRegistry.getHostRegistrations().forEach(host -> {
@@ -319,7 +335,7 @@ public class ScheduledDataCollector extends TimerTask {
       });
     }
     statisticData.setVersion(version);
-    return statisticData.jsonify();
+    return statisticData;
   }
 
 
@@ -384,5 +400,4 @@ public class ScheduledDataCollector extends TimerTask {
   public void setOrganizationDirectoryService(OrganizationDirectoryService orgDirServ) {
     this.organizationDirectoryService = orgDirServ;
   }
-
 }
