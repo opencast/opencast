@@ -82,12 +82,13 @@
       <artifactId>gson</artifactId>
     </dependency>
     <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-adopter-registration-api</artifactId>
+      <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>javax.servlet</groupId>
-      <artifactId>javax.servlet-api</artifactId>
+      <groupId>org.eclipse.persistence</groupId>
+      <artifactId>jakarta.persistence</artifactId>
     </dependency>
   </dependencies>
   <build>
