@@ -129,7 +129,6 @@ public class LifeCyclePolicyImpl implements LifeCyclePolicy {
   @OneToMany(
       fetch = FetchType.LAZY,
       cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE },
-      mappedBy = "policy",
       orphanRemoval = true
   )
   @OrderColumn(name = "position_policy_access_control_entries")
@@ -154,9 +153,6 @@ public class LifeCyclePolicyImpl implements LifeCyclePolicy {
     this.cronTrigger = cronTrigger;
     this.timing = timing;
     setTargetFilters(targetFilters);
-    for (var accessControlEntry : accessControlEntries) {
-      accessControlEntry.setPolicy(this);
-    }
     this.accessControlEntries = accessControlEntries;
   }
 
@@ -263,9 +259,6 @@ public class LifeCyclePolicyImpl implements LifeCyclePolicy {
   }
 
   public void setAccessControlEntries(List<LifeCyclePolicyAccessControlEntry> accessControlEntries) {
-    for (var accessControlEntry : accessControlEntries) {
-      accessControlEntry.setPolicy(this);
-    }
     this.accessControlEntries = (List<LifeCyclePolicyAccessControlEntryImpl>)(List<?>)accessControlEntries;
   }
 }

@@ -60,10 +60,6 @@ public class LifeCyclePolicyAccessControlEntryImpl implements LifeCyclePolicyAcc
   @Column(name = "action", nullable = false)
   private String action;
 
-  @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "lifecyclepolicy_id", nullable = false)
-  private LifeCyclePolicyImpl policy;
-
   /**
    * Default constructor
    */
@@ -115,14 +111,6 @@ public class LifeCyclePolicyAccessControlEntryImpl implements LifeCyclePolicyAcc
 
   public void setAction(String action) {
     this.action = action;
-  }
-
-  public LifeCyclePolicy getPolicy() {
-    return policy;
-  }
-
-  public void setPolicy(LifeCyclePolicy policy) {
-    this.policy = (LifeCyclePolicyImpl) policy;
   }
 
   public org.opencastproject.security.api.AccessControlEntry toAccessControlEntry() {

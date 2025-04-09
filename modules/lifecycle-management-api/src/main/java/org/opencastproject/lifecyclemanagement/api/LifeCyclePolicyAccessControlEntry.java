@@ -40,7 +40,4 @@ public interface LifeCyclePolicyAccessControlEntry {
   org.opencastproject.security.api.AccessControlEntry toAccessControlEntry();
 
   void fromAccessControlEntry(org.opencastproject.security.api.AccessControlEntry accessControlEntry);
-  LifeCyclePolicy getPolicy();
-
-  void setPolicy(LifeCyclePolicy policy);
 }
