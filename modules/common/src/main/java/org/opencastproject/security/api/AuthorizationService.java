@@ -33,15 +33,51 @@ import org.opencastproject.util.data.Tuple;
 public interface AuthorizationService {
 
   /**
-   * Determines whether the current user can take the specified action on the media package.
+   * {@code user} defaults to the current user returned by the security service.
+   * {@code org} defaults to the current organization returned by the security service.
+   *
+   * @see this#hasPermission(MediaPackage, User, Organization, String)
+   */
+  boolean hasPermission(MediaPackage mp, String action);
+
+  /**
+   * {@code user} defaults to the current user returned by the security service.
+   * {@code org} defaults to the current organization returned by the security service.
+   *
+   * @see this#hasPermission(AccessControlList, User, Organization, String)
+   */
+  boolean hasPermission(AccessControlList acl, String action);
+
+  /**
+   * {@code entityBelongsToOrg} defaults to {@boolean true}.
+   *
+   * @see this#hasPermission(MediaPackage, User, Organization, String, boolean)
+   */
+  boolean hasPermission(MediaPackage mp, User user, Organization org, String action);
+
+  /**
+   * {@code entityBelongsToOrg} defaults to {@boolean true}.
+   *
+   * @see this#hasPermission(AccessControlList, User, Organization, String, boolean)
+   */
+  boolean hasPermission(AccessControlList acl, User user, Organization org, String action);
+
+  /**
+   * Determines whether the user can take the specified action on the media package.
    *
    * @param mp
    *          the media package
+   * @param user
+   *          the current user
+   * @param org
+   *          the current organization
    * @param action
    *          the action (e.g. read, modify, delete)
+   * @param entityBelongsToOrg
+   *          whether the mediapackage belongs to the same organization as the current organization
    * @return whether the current user has the correct privileges to take this action
    */
-  boolean hasPermission(MediaPackage mp, String action);
+  boolean hasPermission(MediaPackage mp, User user, Organization org, String action, boolean entityBelongsToOrg);
 
   /**
    * Determines whether the current user can take the specified action given the access control list.
@@ -50,18 +86,16 @@ public interface AuthorizationService {
    *
    * @param acl
    *          the access control list
+   * @param user
+   *          the current user
+   * @param org
+   *          the current organization
    * @param action
    *          the action (e.g. read, modify, delete)
+   * @param entityBelongsToOrg
+   *          whether the entity belongs to the same organization as the current organization
    * @return whether the current user has the correct privileges to take this action
    */
-  boolean hasPermission(AccessControlList acl, String action);
-
-  boolean hasPermission(MediaPackage mp, User user, Organization org, String action);
-
-  boolean hasPermission(AccessControlList acl, User user, Organization org, String action);
-
-  boolean hasPermission(MediaPackage mp, User user, Organization org, String action, boolean entityBelongsToOrg);
-
   boolean hasPermission(AccessControlList acl, User user, Organization org, String action, boolean entityBelongsToOrg);
 
   /**
