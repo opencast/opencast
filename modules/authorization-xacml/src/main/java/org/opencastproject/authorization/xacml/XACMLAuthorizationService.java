@@ -325,18 +325,48 @@ public class XACMLAuthorizationService implements AuthorizationService {
   }
 
   public boolean hasPermission(final MediaPackage mp, User user, Organization org, String action) {
+    return hasPermission(mp, user, org, action, true);
+  }
+
+  public boolean hasPermission(AccessControlList acl, User user, Organization org, String action) {
+    return hasPermission(acl, user, org, action, true);
+  }
+
+  public boolean hasPermission(
+      final MediaPackage mp,
+      User user,
+      Organization org,
+      String action,
+      boolean entityBelongsToOrg
+  ) {
     // Check special ROLE_EPISODE_<ID>_<ACTION> permissions
     var episodeRole = getEpisodeRoleId(mp.getIdentifier().toString(), action);
     logger.debug("Checking for role: {}", episodeRole);
     var allowed = user.getRoles().stream().map(Role::getName).anyMatch(r -> r.equals(episodeRole));
 
     AccessControlList acl = getActiveAcl(mp).getA();
-    return allowed || hasPermission(acl, user, org, action);
+    return allowed || hasPermission(acl, user, org, action, entityBelongsToOrg);
   }
 
-  public boolean hasPermission(AccessControlList acl, User user, Organization org, String action) {
-    // Check for the global and local admin role
-    if (user.hasRole(GLOBAL_ADMIN_ROLE) || user.hasRole(org.getAdminRole())) {
+  public boolean hasPermission(
+      AccessControlList acl,
+      User user,
+      Organization org,
+      String action,
+      boolean entityBelongsToOrg
+  ) {
+    // Check for the global admin role
+    if (user.hasRole(GLOBAL_ADMIN_ROLE)) {
+      return true;
+    }
+
+    // If it does not belong to the user organization, no access
+    if (!entityBelongsToOrg) {
+      return false;
+    }
+
+    // Check for the local admin role
+    if (user.hasRole(org.getAdminRole())) {
       return true;
     }
 

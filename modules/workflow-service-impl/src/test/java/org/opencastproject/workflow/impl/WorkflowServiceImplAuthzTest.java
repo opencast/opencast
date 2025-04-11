@@ -261,7 +261,15 @@ public class WorkflowServiceImplAuthzTest {
     EasyMock.expect(authzService.getActiveAcl((MediaPackage) EasyMock.anyObject()))
             .andReturn(Tuple.tuple(acl, AclScope.Series)).anyTimes();
     EasyMock.expect(authzService.hasPermission((MediaPackage) EasyMock.anyObject(), (String) EasyMock.anyObject()))
-            .andReturn(true).anyTimes();
+        .andReturn(true).anyTimes();
+    EasyMock.expect(authzService.hasPermission(
+            (MediaPackage) EasyMock.anyObject(),
+            (User) EasyMock.anyObject(),
+            (Organization) EasyMock.anyObject(),
+            (String) EasyMock.anyObject(),
+            EasyMock.anyBoolean()
+        ))
+        .andReturn(true).anyTimes();
     EasyMock.replay(authzService);
     service.setAuthorizationService(authzService);
 
@@ -327,7 +335,15 @@ public class WorkflowServiceImplAuthzTest {
     EasyMock.expect(authzService.getActiveAcl((MediaPackage) EasyMock.anyObject()))
             .andReturn(Tuple.tuple(new AccessControlList(), AclScope.Series)).anyTimes();
     EasyMock.expect(authzService.hasPermission((MediaPackage) EasyMock.anyObject(), (String) EasyMock.anyObject()))
-            .andReturn(false).anyTimes();
+        .andReturn(false).anyTimes();
+    EasyMock.expect(authzService.hasPermission(
+            (MediaPackage) EasyMock.anyObject(),
+            (User) EasyMock.anyObject(),
+            (Organization) EasyMock.anyObject(),
+            (String) EasyMock.anyObject(),
+            EasyMock.anyBoolean()
+        ))
+        .andReturn(false).anyTimes();
     EasyMock.replay(authzService);
     service.setAuthorizationService(authzService);
 
@@ -342,22 +358,6 @@ public class WorkflowServiceImplAuthzTest {
     service.suspend(workflow.getId());
 
     // Ensure that this instructor can access the workflow
-    try {
-      service.getWorkflowById(workflow.getId());
-    } catch (Exception e) {
-      fail(e.getMessage());
-    }
-
-    // Ensure the organization admin can access that workflow
-    userResponder.setResponse(DEFAULT_ORG_ADMIN);
-    try {
-      service.getWorkflowById(workflow.getId());
-    } catch (Exception e) {
-      fail(e.getMessage());
-    }
-
-    // Ensure the global admin can access that workflow
-    userResponder.setResponse(globalAdmin);
     try {
       service.getWorkflowById(workflow.getId());
     } catch (Exception e) {

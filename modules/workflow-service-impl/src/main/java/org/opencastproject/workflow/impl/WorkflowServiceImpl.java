@@ -1135,7 +1135,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           throws UnauthorizedException {
     User currentUser = securityService.getUser();
     Organization currentOrg = securityService.getOrganization();
-    String currentOrgAdminRole = currentOrg.getAdminRole();
     String currentOrgId = currentOrg.getId();
 
     MediaPackage mediapackage = workflow.getMediaPackage();
@@ -1150,10 +1149,9 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
 
     var creatorName = workflow.getCreatorName();
     var workflowCreator = creatorName == null ? null : userDirectoryService.loadUser(creatorName);
-    boolean authorized = currentUser.hasRole(GLOBAL_ADMIN_ROLE)
-            || (currentUser.hasRole(currentOrgAdminRole) && currentOrgId.equals(workflowOrgId))
-            || (currentUser.equals(workflowCreator))
-            || (authorizationService.hasPermission(mediapackage, action) && currentOrgId.equals(workflowOrgId));
+    boolean authorized = (currentUser.equals(workflowCreator))
+            || (authorizationService.hasPermission(
+                mediapackage, currentUser, currentOrg, action, currentOrgId.equals(workflowOrgId)));
 
     if (!authorized) {
       throw new UnauthorizedException(currentUser, action);
