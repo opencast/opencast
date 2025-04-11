@@ -30,7 +30,6 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.TrackSupport;
 import org.opencastproject.mediapackage.VideoStream;
-import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
@@ -146,8 +145,7 @@ class Item {
           //NB: This is an else case, so we ignore the item(s) in the stream
           .orElseGet(() -> {
             String dcExtent = event.getDublinCore().getFirst(DublinCore.PROPERTY_EXTENT);
-            DCMIPeriod p = EncodingSchemeUtils.decodeMandatoryPeriod(dcExtent);
-            return Math.max(0L, p.getEnd().getTime() - p.getStart().getTime());
+            return Math.max(0L, EncodingSchemeUtils.decodeMandatoryDuration(dcExtent));
           });
 
       this.obj = Jsons.obj(
