@@ -357,7 +357,8 @@ public interface AssetManager {
    * Count the number of events stored for a given organization.
    *
    * @param organization
-   *          The organization to check
+   *          The organization to check.
+   *          This may be `null` to not filter for an organization which is significantly faster.
    * @return Number of events
    */
   long countEvents(String organization);
