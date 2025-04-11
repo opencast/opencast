@@ -306,8 +306,9 @@ public class ScheduledDataCollector extends TimerTask {
                     .mustNot(QueryBuilders.existsQuery(SearchResult.DELETED_DATE)));
         final SearchResultList results = searchService.search(q);
         long orgMilis = results.getHits().stream().map(
-                result -> EncodingSchemeUtils.decodeDuration(
-                    result.getDublinCore().getFirst(DublinCore.PROPERTY_EXTENT)))
+                result -> EncodingSchemeUtils.decodeDuration(Objects.toString(
+                    result.getDublinCore().getFirst(DublinCore.PROPERTY_EXTENT),
+                    "0")))
             .filter(Objects::nonNull)
             .reduce(Long::sum).orElse(0L);
         statisticData.setTotalMinutes(statisticData.getTotalMinutes() + (orgMilis / 1000 / 60));
