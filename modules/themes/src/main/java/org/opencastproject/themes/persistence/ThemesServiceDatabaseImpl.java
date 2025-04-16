@@ -28,6 +28,7 @@ import org.opencastproject.db.DBSessionFactory;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.theme.IndexTheme;
+import org.opencastproject.elasticsearch.index.objects.theme.ThemeIndexSchema;
 import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
 import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildException;
@@ -40,6 +41,7 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.themes.Theme;
 import org.opencastproject.themes.ThemesServiceDatabase;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.requests.SortCriterion;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -58,6 +60,13 @@ import java.util.stream.Collectors;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Order;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 
 /**
  * Implements {@link ThemesServiceDatabase}. Defines permanent storage for themes.
@@ -185,6 +194,99 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
     }
   }
 
+  public List<Theme> findThemesQuery(
+      Optional<Integer> limit,
+      Optional<Integer> offset,
+      ArrayList<SortCriterion> sortCriteria,
+      Optional<String> creatorFilter,
+      Optional<String> textFilter
+  ) {
+    String orgId = securityService.getOrganization().getId();
+
+    return db.execTxChecked(em -> {
+      CriteriaBuilder cb = em.getCriteriaBuilder();
+      final CriteriaQuery<ThemeDto> query = cb.createQuery(ThemeDto.class);
+      Root<ThemeDto> theme = query.from(ThemeDto.class);
+      query.select(theme);
+      query.distinct(true);
+
+      // filter
+      List<Predicate> conditions = new ArrayList<>();
+      conditions.add(cb.equal(theme.get("organization"), orgId));
+
+      // exact match, case sensitive
+      if (creatorFilter.isPresent()) {
+        conditions.add(cb.equal(theme.get("creator"), creatorFilter.get()));
+      }
+      // not exact match, case-insensitive, each token needs to match at least one field
+      if (textFilter.isPresent()) {
+        List<Predicate> fulltextConditions = new ArrayList<>();
+        String[] tokens = textFilter.get().split("\\s+");
+        for (String token: tokens) {
+          List<Predicate> fieldConditions = new ArrayList<>();
+          Expression<String> literal = cb.literal("%" + token + "%");
+
+          fieldConditions.add(cb.like(cb.lower(theme.get("creator")), cb.lower(literal)));
+          fieldConditions.add(cb.like(cb.lower(theme.get("name")), cb.lower(literal)));
+          fieldConditions.add(cb.like(cb.lower(theme.get("description")), cb.lower(literal)));
+
+          // token needs to match at least one field
+          fulltextConditions.add(cb.or(fieldConditions.toArray(new Predicate[0])));
+        }
+        // all token have to match something
+        // (different to fulltext search for Elasticsearch, where only one token has to match!)
+        conditions.add(cb.and(fulltextConditions.toArray(new Predicate[0])));
+      }
+      query.where(cb.and(conditions.toArray(new Predicate[0])));
+
+      // sort
+      List<Order> orders = new ArrayList<>();
+      for (SortCriterion criterion : sortCriteria) {
+        String fieldName = criterion.getFieldName();
+        switch(fieldName) {
+          case ThemeIndexSchema.NAME:
+            break;
+          case ThemeIndexSchema.DESCRIPTION:
+            break;
+          case ThemeIndexSchema.CREATOR:
+            fieldName = "username";
+            break;
+          case ThemeIndexSchema.DEFAULT:
+            fieldName = "isDefault";
+            break;
+          case ThemeIndexSchema.CREATION_DATE:
+            fieldName = "creationDate";
+            break;
+          default:
+            throw new IllegalArgumentException("Sorting criterion " + criterion.getFieldName() + " is not supported "
+                + "for themes.");
+        }
+
+        Expression expression = theme.get(fieldName);
+        if (criterion.getOrder() == SortCriterion.Order.Ascending) {
+          orders.add(cb.asc(expression));
+        } else if (criterion.getOrder() == SortCriterion.Order.Descending) {
+          orders.add(cb.desc(expression));
+        }
+
+      }
+      query.orderBy(orders);
+
+      // other
+      TypedQuery<ThemeDto> typedQuery = em.createQuery(query);
+      if (limit.isPresent()) {
+        typedQuery.setMaxResults(limit.get());
+      }
+      if (offset.isPresent()) {
+        typedQuery.setFirstResult(offset.get());
+      }
+
+      return typedQuery.getResultList().stream()
+          .map(t -> t.toTheme(userDirectoryService))
+          .collect(Collectors.toList());
+    });
+  }
+
   @Override
   public Theme updateTheme(final Theme theme) throws ThemesServiceDatabaseException {
     try {
@@ -207,11 +309,6 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
 
         return themeDto.toTheme(userDirectoryService);
       });
-
-      // update the elasticsearch indices
-      String orgId = securityService.getOrganization().getId();
-      User user = securityService.getUser();
-      updateThemeInIndex(newTheme, orgId, user);
 
       return newTheme;
     } catch (Exception e) {

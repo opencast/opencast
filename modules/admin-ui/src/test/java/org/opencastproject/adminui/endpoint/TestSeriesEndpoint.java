@@ -23,6 +23,8 @@ package org.opencastproject.adminui.endpoint;
 
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.anyString;
+import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
+import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 import static org.opencastproject.index.service.util.CatalogAdapterUtil.getCatalogProperties;
 
 import org.opencastproject.authorization.xacml.manager.api.AclService;
@@ -65,9 +67,12 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.themes.Theme;
+import org.opencastproject.themes.persistence.ThemesServiceDatabaseImpl;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PropertiesUtil;
+import org.opencastproject.util.data.Option;
 import org.opencastproject.util.requests.SortCriterion.Order;
 
 import org.easymock.Capture;
@@ -100,6 +105,7 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
   private SeriesService seriesService;
   private ElasticsearchIndex elasticsearchIndex;
   private ListProvidersService listProvidersService;
+  private ThemesServiceDatabaseImpl themesServiceDatabaseImpl;
 
   private ListProvidersService createListProviderService(List<User> users) {
     UserDirectoryService userDirectoryService = EasyMock.createMock(UserDirectoryService.class);
@@ -229,8 +235,30 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     indexServiceImpl.setSecurityService(securityService);
     indexServiceImpl.setSeriesService(seriesService);
 
+    // setup theme database
+    User user = new JaxbUser("test", null, "Test User", "test@test.com", "test", new DefaultOrganization(), new HashSet<>());
+    UserDirectoryService userDirectoryService = EasyMock.createNiceMock(UserDirectoryService.class);
+    EasyMock.expect(userDirectoryService.loadUser((String) EasyMock.anyObject())).andReturn(user).anyTimes();
+    EasyMock.replay(userDirectoryService);
+
+    themesServiceDatabaseImpl = new ThemesServiceDatabaseImpl();
+    themesServiceDatabaseImpl
+        .setEntityManagerFactory(newEntityManagerFactory(ThemesServiceDatabaseImpl.PERSISTENCE_UNIT));
+    themesServiceDatabaseImpl.setDBSessionFactory(getDbSessionFactory());
+    themesServiceDatabaseImpl.setUserDirectoryService(userDirectoryService);
+    themesServiceDatabaseImpl.setSecurityService(securityService);
+    themesServiceDatabaseImpl.setIndex(elasticsearchIndex);
+    themesServiceDatabaseImpl.activate(null);
+
+    // We only really care about id, name and description here
+    Theme theme = new Theme(Option.option(1L), new Date(1421064000000L), true, user, "theme-1-name", "theme-1-description",
+        true, "bumper-file", true, "trailer-file", true, "title,room,date", "title-background-file", true,
+        "license-background-file", "The license description", true, "watermark-file", "top-left");
+    themesServiceDatabaseImpl.updateTheme(theme);
+
     this.setIndex(elasticsearchIndex);
     this.setSeriesService(seriesService);
+    this.setThemesServiceDatabase(themesServiceDatabaseImpl);
     this.setSecurityService(securityService);
     this.setAclServiceFactory(aclServiceFactory);
     this.setIndexService(indexServiceImpl);
