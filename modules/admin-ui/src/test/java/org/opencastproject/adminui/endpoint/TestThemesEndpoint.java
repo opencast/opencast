@@ -30,8 +30,6 @@ import org.opencastproject.elasticsearch.impl.SearchResultImpl;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.series.Series;
 import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
-import org.opencastproject.elasticsearch.index.objects.theme.IndexTheme;
-import org.opencastproject.elasticsearch.index.objects.theme.ThemeSearchQuery;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
@@ -110,9 +108,6 @@ public class TestThemesEndpoint extends ThemesEndpoint {
 
     // Create AdminUI Search Index
     ElasticsearchIndex elasticsearchIndex = EasyMock.createNiceMock(ElasticsearchIndex.class);
-    final Capture<ThemeSearchQuery> themeQueryCapture = EasyMock.newCapture();
-    EasyMock.expect(elasticsearchIndex.getByQuery(EasyMock.capture(themeQueryCapture)))
-            .andAnswer(() -> createThemeCaptureResult(themeQueryCapture)).anyTimes();
     final Capture<SeriesSearchQuery> seriesQueryCapture = EasyMock.newCapture();
     EasyMock.expect(elasticsearchIndex.getByQuery(EasyMock.capture(seriesQueryCapture)))
             .andAnswer(() -> createSeriesCaptureResult(seriesQueryCapture));
@@ -125,7 +120,6 @@ public class TestThemesEndpoint extends ThemesEndpoint {
     themesServiceDatabaseImpl.setDBSessionFactory(getDbSessionFactory());
     themesServiceDatabaseImpl.setUserDirectoryService(userDirectoryService);
     themesServiceDatabaseImpl.setSecurityService(securityService);
-    themesServiceDatabaseImpl.setIndex(elasticsearchIndex);
     themesServiceDatabaseImpl.activate(null);
 
     StaticFileService staticFileService = EasyMock.createNiceMock(StaticFileService.class);
@@ -154,48 +148,6 @@ public class TestThemesEndpoint extends ThemesEndpoint {
     this.setStaticFileService(staticFileService);
     this.setStaticFileRestService(staticFileRestService);
     this.setIndex(elasticsearchIndex);
-  }
-
-  private SearchResult<IndexTheme> createThemeCaptureResult(
-          final Capture<ThemeSearchQuery> myCapture) {
-    SearchResultImpl<IndexTheme> searchResults = new SearchResultImpl<IndexTheme>(
-            myCapture.getValue(), 0, 0);
-    if (myCapture.hasCaptured()) {
-      if (myCapture.getValue().getIdentifiers().length == 1 && myCapture.getValue().getIdentifiers()[0] == theme1Id) {
-        SearchResultItem<IndexTheme> searchResultItem = getThemeSearchResultItem(
-                theme1Id, "theme-1-name");
-        searchResults.addResultItem(searchResultItem);
-      } else if (myCapture.getValue().getIdentifiers().length == 0) {
-        SearchResultItem<IndexTheme> searchResultItem1 = getThemeSearchResultItem(
-                theme1Id, "theme-1-name");
-        searchResults.addResultItem(searchResultItem1);
-        SearchResultItem<IndexTheme> searchResultItem2 = getThemeSearchResultItem(
-                theme2Id, "theme-2-name");
-        searchResults.addResultItem(searchResultItem2);
-        SearchResultItem<IndexTheme> searchResultItem3 = getThemeSearchResultItem(
-                theme3Id, "theme-3-name");
-        searchResults.addResultItem(searchResultItem3);
-      }
-    }
-    return searchResults;
-  }
-
-  @SuppressWarnings("unchecked")
-  private SearchResultItem<IndexTheme> getThemeSearchResultItem(Long id,
-          String name) {
-    IndexTheme theme = new IndexTheme(
-            id, defaultOrg.getId());
-    theme.setCreationDate(creationDate);
-    theme.setName(name);
-    theme.setCreator("Test User");
-    theme.setBumperFile("uuid1");
-    theme.setWatermarkFile("uuid2");
-    SearchResultItem<IndexTheme> searchResultItem = EasyMock
-            .createMock(SearchResultItem.class);
-    EasyMock.expect(searchResultItem.getSource()).andReturn(theme);
-    EasyMock.expect(searchResultItem.compareTo(EasyMock.anyObject(SearchResultItem.class))).andReturn(1);
-    EasyMock.replay(searchResultItem);
-    return searchResultItem;
   }
 
   private SearchResult<Series> createSeriesCaptureResult(Capture<SeriesSearchQuery> myCapture) {

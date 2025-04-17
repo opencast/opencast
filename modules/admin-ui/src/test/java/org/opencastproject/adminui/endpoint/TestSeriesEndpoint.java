@@ -39,8 +39,6 @@ import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.elasticsearch.index.objects.series.Series;
 import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
-import org.opencastproject.elasticsearch.index.objects.theme.IndexTheme;
-import org.opencastproject.elasticsearch.index.objects.theme.ThemeSearchQuery;
 import org.opencastproject.index.service.catalog.adapter.series.CommonSeriesCatalogUIAdapter;
 import org.opencastproject.index.service.impl.IndexServiceImpl;
 import org.opencastproject.index.service.resources.list.provider.UsersListProvider;
@@ -247,7 +245,6 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     themesServiceDatabaseImpl.setDBSessionFactory(getDbSessionFactory());
     themesServiceDatabaseImpl.setUserDirectoryService(userDirectoryService);
     themesServiceDatabaseImpl.setSecurityService(securityService);
-    themesServiceDatabaseImpl.setIndex(elasticsearchIndex);
     themesServiceDatabaseImpl.activate(null);
 
     // We only really care about id, name and description here
@@ -305,11 +302,6 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     time = DateTimeSupport.fromUTC("2014-04-29T14:35:50Z");
     Series series3 = createSeries("3", "title 3", "contributor 3", "organizer 3", time, null);
 
-    IndexTheme theme1 = new IndexTheme(
-            1L, new DefaultOrganization().getId());
-    theme1.setName("theme-1-name");
-    theme1.setDescription("theme-1-description");
-
     SearchResultItem<Series> item1 = EasyMock.createMock(SearchResultItem.class);
     EasyMock.expect(item1.getSource()).andReturn(series1).anyTimes();
 
@@ -337,10 +329,6 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
 
     // Setup the events for series 3
     final SearchResultItem<Event>[] eventItems3 = createEvents(0);
-
-    final SearchResultItem<IndexTheme> themeItem1 = EasyMock
-            .createMock(SearchResultItem.class);
-    EasyMock.expect(themeItem1.getSource()).andReturn(theme1);
 
     // Setup series search results
     final SearchResult<Series> ascSeriesSearchResult = EasyMock.createMock(SearchResult.class);
@@ -380,7 +368,6 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
 
     final Capture<SeriesSearchQuery> captureSeriesSearchQuery = EasyMock.newCapture();
     final Capture<EventSearchQuery> captureEventSearchQuery = EasyMock.newCapture();
-    final Capture<ThemeSearchQuery> captureThemeSearchQuery = EasyMock.newCapture();
 
     EasyMock.expect(elasticsearchIndex.getByQuery(EasyMock.capture(captureSeriesSearchQuery)))
             .andAnswer(new IAnswer<SearchResult<Series>>() {
@@ -483,23 +470,7 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
               }
             }).anyTimes();
 
-    EasyMock.expect(elasticsearchIndex.getByQuery(EasyMock.capture(captureThemeSearchQuery)))
-            .andAnswer(new IAnswer<SearchResult<IndexTheme>>() {
-
-              @Override
-              public SearchResult<IndexTheme> answer() throws Throwable {
-                SearchResult<IndexTheme> themeSearchResult = EasyMock
-                        .createMock(SearchResult.class);
-                // Setup theme search results
-                EasyMock.expect(themeSearchResult.getPageSize()).andReturn(1L).anyTimes();
-                EasyMock.expect(themeSearchResult.getItems()).andReturn(new SearchResultItem[] { themeItem1 })
-                        .anyTimes();
-                EasyMock.replay(themeSearchResult);
-                return themeSearchResult;
-              }
-            }).anyTimes();
-
-    EasyMock.replay(elasticsearchIndex, item1, item2, item3, themeItem1, ascSeriesSearchResult, descSeriesSearchResult,
+    EasyMock.replay(elasticsearchIndex, item1, item2, item3, ascSeriesSearchResult, descSeriesSearchResult,
             emptySearchResult, oneSearchResult, twoSearchResult);
   }
 

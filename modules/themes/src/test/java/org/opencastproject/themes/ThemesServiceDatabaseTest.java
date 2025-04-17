@@ -24,9 +24,6 @@ package org.opencastproject.themes;
 import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
-import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.theme.ThemeSearchQuery;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
@@ -70,21 +67,11 @@ public class ThemesServiceDatabaseTest {
     EasyMock.expect(userDirectoryService.loadUser(EasyMock.anyString())).andReturn(user).anyTimes();
     EasyMock.replay(userDirectoryService);
 
-    SearchResult result = EasyMock.createMock(SearchResult.class);
-    EasyMock.expect(result.getDocumentCount()).andReturn(0L).anyTimes();
-    EasyMock.replay(result);
-
-    ElasticsearchIndex index = EasyMock.createNiceMock(ElasticsearchIndex.class);
-    EasyMock.expect(index.getIndexName()).andReturn("adminui").anyTimes();
-    EasyMock.expect(index.getByQuery(EasyMock.anyObject(ThemeSearchQuery.class))).andReturn(result).anyTimes();
-    EasyMock.replay(index);
-
     themesDatabase = new ThemesServiceDatabaseImpl();
     themesDatabase.setEntityManagerFactory(newEntityManagerFactory(ThemesServiceDatabaseImpl.PERSISTENCE_UNIT));
     themesDatabase.setDBSessionFactory(getDbSessionFactory());
     themesDatabase.setSecurityService(securityService);
     themesDatabase.setUserDirectoryService(userDirectoryService);
-    themesDatabase.setIndex(index);
     themesDatabase.activate(null);
   }
 

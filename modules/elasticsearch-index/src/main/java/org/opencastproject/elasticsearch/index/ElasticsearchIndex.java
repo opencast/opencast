@@ -38,9 +38,6 @@ import org.opencastproject.elasticsearch.index.objects.series.Series;
 import org.opencastproject.elasticsearch.index.objects.series.SeriesIndexUtils;
 import org.opencastproject.elasticsearch.index.objects.series.SeriesQueryBuilder;
 import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
-import org.opencastproject.elasticsearch.index.objects.theme.IndexTheme;
-import org.opencastproject.elasticsearch.index.objects.theme.ThemeQueryBuilder;
-import org.opencastproject.elasticsearch.index.objects.theme.ThemeSearchQuery;
 import org.opencastproject.list.api.ListProvidersService;
 import org.opencastproject.security.api.User;
 
@@ -113,7 +110,6 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
   private static final String[] DOCUMENT_TYPES = new String[] {
       Event.DOCUMENT_TYPE,
       Series.DOCUMENT_TYPE,
-      IndexTheme.DOCUMENT_TYPE,
       VERSION_DOCUMENT_TYPE
   };
 
@@ -326,61 +322,6 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
     }
   }
 
-  /**
-   * Loads the theme from the search index if it exists.
-   *
-   * @param themeId
-   *          The theme identifier
-   * @param organization
-   *          The organization
-   * @param user
-   *          The user
-   * @return the theme wrapped in an optional
-   *
-   * @throws SearchIndexException
-   *          If querying the search index fails
-   * @throws IllegalStateException
-   *          If multiple themes with the same identifier are found
-   */
-  public Optional<IndexTheme> getTheme(long themeId, String organization, User user)
-          throws SearchIndexException {
-    return getTheme(themeId, organization, user, maxRetryAttemptsGet, retryWaitingPeriodGet);
-  }
-
-  /**
-   * Loads the theme from the search index if it exists.
-   *
-   * @param themeId
-   *          The theme identifier
-   * @param organization
-   *          The organization
-   * @param user
-   *          The user
-   * @param maxRetryAttempts
-   *          How often to retry query in case of ElasticsearchStatusException
-   * @param retryWaitingPeriod
-   *          How long to wait (in ms) between retries
-   * @return the theme wrapped in an optional
-   *
-   * @throws SearchIndexException
-   *          If querying the search index fails
-   * @throws IllegalStateException
-   *          If multiple themes with the same identifier are found
-   */
-  private Optional<IndexTheme> getTheme(long themeId, String organization, User user, int maxRetryAttempts,
-          int retryWaitingPeriod)
-          throws SearchIndexException {
-    ThemeSearchQuery query = new ThemeSearchQuery(organization, user).withIdentifier(themeId);
-    SearchResult<IndexTheme> searchResult = getByQuery(query, maxRetryAttempts, retryWaitingPeriod);
-    if (searchResult.getDocumentCount() == 0) {
-      return Optional.empty();
-    } else if (searchResult.getDocumentCount() == 1) {
-      return Optional.of(searchResult.getItems()[0].getSource());
-    } else {
-      throw new IllegalStateException("Multiple themes with identifier " + themeId + " found in search index");
-    }
-  }
-
   /*
    * Add or update index objects
    */
@@ -558,92 +499,6 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
     }
   }
 
-  /**
-   * Adds or updates the theme in the search index. Uses a locking mechanism to avoid issues like Lost Update.
-   *
-   * @param id
-   *          The id of the theme to update
-   * @param updateFunction
-   *          The function that does the actual updating
-   * @param orgId
-   *          The organization the theme belongs to
-   * @param user
-   *          The user
-   *
-   * @throws SearchIndexException
-   *          Thrown if unable to update the theme.
-   */
-  public Optional<IndexTheme> addOrUpdateTheme(long id, Function<Optional<IndexTheme>,
-          Optional<IndexTheme>> updateFunction, String orgId, User user) throws SearchIndexException {
-    final Lock lock = this.locks.get(id);
-    lock.lock();
-    logger.debug("Locked theme '{}'", id);
-
-    try {
-      Optional<IndexTheme> themeOpt = getTheme(id, orgId, user, maxRetryAttemptsUpdate, retryWaitingPeriodUpdate);
-      Optional<IndexTheme> updatedThemeOpt = updateFunction.apply(themeOpt);
-      if (updatedThemeOpt.isPresent()) {
-        update(updatedThemeOpt.get());
-      }
-      return updatedThemeOpt;
-    } finally {
-      lock.unlock();
-      logger.debug("Released locked theme '{}'", id);
-    }
-  }
-
-  /**
-   * Adds or updates the theme in the search index.
-   *
-   * @param theme
-   *          The theme to update
-   *
-   * @throws SearchIndexException
-   *          Thrown if unable to add or update the theme.
-   */
-  private void update(IndexTheme theme) throws SearchIndexException {
-    logger.debug("Adding theme {} to search index", theme.getIdentifier());
-
-    // Add the resource to the index
-    SearchMetadataCollection inputDocument = theme.toSearchMetadata();
-    List<SearchMetadata<?>> resourceMetadata = inputDocument.getMetadata();
-    ElasticsearchDocument doc = new ElasticsearchDocument(inputDocument.getIdentifier(),
-            inputDocument.getDocumentType(), resourceMetadata);
-
-    try {
-      update(maxRetryAttemptsUpdate, retryWaitingPeriodUpdate, doc);
-    } catch (Throwable t) {
-      throw new SearchIndexException("Cannot write theme " + theme + " to index", t);
-    }
-  }
-
-  /**
-   * Adds or updates the themes in the search index.
-   *
-   * @param themeList
-   *          The themes to update
-   *
-   * @throws SearchIndexException
-   *          Thrown if unable to add or update the themes.
-   */
-  public void bulkThemeUpdate(List<IndexTheme> themeList) throws SearchIndexException {
-    List<ElasticsearchDocument> docs = new ArrayList<>();
-    for (IndexTheme theme: themeList) {
-      logger.debug("Adding theme {} to search index", theme.getIdentifier());
-
-      // Add the resource to the index
-      SearchMetadataCollection inputDocument = theme.toSearchMetadata();
-      List<SearchMetadata<?>> resourceMetadata = inputDocument.getMetadata();
-      docs.add(new ElasticsearchDocument(inputDocument.getIdentifier(),
-              inputDocument.getDocumentType(), resourceMetadata));
-    }
-    try {
-      bulkUpdate(maxRetryAttemptsUpdate, retryWaitingPeriodUpdate, docs);
-    } catch (Throwable t) {
-      throw new SearchIndexException("Cannot write themes " + themeList + " to index", t);
-    }
-  }
-
   /*
    * Delete index objects
    */
@@ -678,22 +533,6 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
    */
   public boolean deleteSeries(String seriesId, String orgId) throws SearchIndexException {
     return delete(Series.DOCUMENT_TYPE, seriesId, orgId);
-  }
-
-  /**
-   * Delete theme from index.
-   *
-   * @param themeId
-   *         The theme identifier
-   * @param orgId
-   *         The organization id
-   * @return
-   *         true if it was deleted, false if it couldn't be found
-   * @throws SearchIndexException
-   *         If there was an error during deletion
-   */
-  public boolean deleteTheme(String themeId, String orgId) throws SearchIndexException {
-    return delete(IndexTheme.DOCUMENT_TYPE, themeId, orgId);
   }
 
   /**
@@ -823,50 +662,6 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
       }, maxRetryAttempts, retryWaitingPeriod);
     } catch (Throwable t) {
       throw new SearchIndexException("Error querying series index", t);
-    }
-  }
-
-  /**
-   * @param query
-   *          The query to use to retrieve the themes that match the query
-   * @return {@link SearchResult} collection of {@link IndexTheme} from a query.
-   *
-   * @throws SearchIndexException
-   *          Thrown if there is an error getting the results.
-   */
-  public SearchResult<IndexTheme> getByQuery(ThemeSearchQuery query) throws SearchIndexException {
-    return getByQuery(query, maxRetryAttemptsGet, retryWaitingPeriodGet);
-  }
-
-  /**
-   * @param query
-   *          The query to use to retrieve the themes that match the query
-   * @param maxRetryAttempts
-   *          How often to retry query in case of ElasticsearchStatusException
-   * @param retryWaitingPeriod
-   *          How long to wait (in ms) between retries
-   *
-   * @return {@link SearchResult} collection of {@link IndexTheme} from a query.
-   *
-   * @throws SearchIndexException
-   *          Thrown if there is an error getting the results.
-   */
-  private SearchResult<IndexTheme> getByQuery(ThemeSearchQuery query, int maxRetryAttempts, int retryWaitingPeriod)
-          throws SearchIndexException {
-    logger.debug("Searching index using theme query '{}'", query);
-    // Create the request
-    final SearchRequest searchRequest = getSearchRequest(query, new ThemeQueryBuilder(query));
-
-    try {
-      return executeQuery(query, searchRequest, metadata -> {
-        try {
-          return IndexTheme.fromSearchMetadata(metadata);
-        } catch (IOException e) {
-          return chuck(e);
-        }
-      }, maxRetryAttempts, retryWaitingPeriod);
-    } catch (Throwable t) {
-      throw new SearchIndexException("Error querying theme index", t);
     }
   }
 }

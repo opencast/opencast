@@ -25,25 +25,13 @@ import static org.opencastproject.db.Queries.namedQuery;
 
 import org.opencastproject.db.DBSession;
 import org.opencastproject.db.DBSessionFactory;
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.theme.IndexTheme;
-import org.opencastproject.elasticsearch.index.objects.theme.ThemeIndexSchema;
-import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
-import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
-import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildException;
-import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService;
-import org.opencastproject.security.api.Organization;
-import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.themes.Theme;
 import org.opencastproject.themes.ThemesServiceDatabase;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.requests.SortCriterion;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -73,12 +61,12 @@ import javax.persistence.criteria.Root;
  */
 @Component(
     immediate = true,
-    service = { ThemesServiceDatabase.class, IndexProducer.class },
+    service = { ThemesServiceDatabase.class },
     property = {
         "service.description=Themes Database Service"
     }
 )
-public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements ThemesServiceDatabase {
+public class ThemesServiceDatabaseImpl implements ThemesServiceDatabase {
 
   public static final String PERSISTENCE_UNIT = "org.opencastproject.themes";
 
@@ -97,12 +85,6 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
 
   /** The user directory service */
   protected UserDirectoryService userDirectoryService;
-
-  /** The organization directory service to get organizations */
-  protected OrganizationDirectoryService organizationDirectoryService;
-
-  /** The elasticsearch indices */
-  protected ElasticsearchIndex index;
 
   /** The component context for this themes service database */
   private ComponentContext cc;
@@ -150,18 +132,6 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
   @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
-  }
-
-  /** OSGi DI */
-  @Reference
-  public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
-    this.organizationDirectoryService = organizationDirectoryService;
-  }
-
-  /** OSGi DI */
-  @Reference
-  public void setIndex(ElasticsearchIndex index) {
-    this.index = index;
   }
 
   @Override
@@ -244,17 +214,17 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
       for (SortCriterion criterion : sortCriteria) {
         String fieldName = criterion.getFieldName();
         switch(fieldName) {
-          case ThemeIndexSchema.NAME:
+          case "name":
             break;
-          case ThemeIndexSchema.DESCRIPTION:
+          case "description":
             break;
-          case ThemeIndexSchema.CREATOR:
+          case "creator":
             fieldName = "username";
             break;
-          case ThemeIndexSchema.DEFAULT:
+          case "default":
             fieldName = "isDefault";
             break;
-          case ThemeIndexSchema.CREATION_DATE:
+          case "creation_date":
             fieldName = "creationDate";
             break;
           default:
@@ -349,10 +319,6 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
             .orElseThrow(() -> new NotFoundException("No theme with id=" + id + " exists"));
         namedQuery.remove(themeDto).accept(em);
       });
-
-      // update the elasticsearch indices
-      String organization = securityService.getOrganization().getId();
-      removeThemeFromIndex(id, organization);
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -391,159 +357,5 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
         Pair.of("id", id),
         Pair.of("org", orgId)
     );
-  }
-
-  @Override
-  public void repopulate(IndexRebuildService.DataType type) throws IndexRebuildException {
-    try {
-      for (final Organization organization : organizationDirectoryService.getOrganizations()) {
-        try {
-          final List<Theme> themes = getThemes();
-          int total = themes.size();
-          logIndexRebuildBegin(logger, total, "themes", organization);
-          int current = 0;
-          int n = 20;
-          List<IndexTheme> updatedThemeRange = new ArrayList<>();
-
-          for (Theme theme : themes) {
-            current++;
-
-            var updatedThemeData = index.getTheme(theme.getId().get(), organization.toString(),
-                        securityService.getUser());
-            updatedThemeData = getThemeUpdateFunction(theme, organization.toString()).apply(updatedThemeData);
-            updatedThemeRange.add(updatedThemeData.get());
-
-            if (updatedThemeRange.size() >= n || current >= themes.size()) {
-              index.bulkThemeUpdate(updatedThemeRange);
-              logIndexRebuildProgress(logger, total, current, n);
-              updatedThemeRange.clear();
-            }
-          }
-        } catch (ThemesServiceDatabaseException e) {
-          logger.error("Unable to get themes from the database", e);
-          throw new IllegalStateException(e);
-        }
-      }
-    } catch (Exception e) {
-      logIndexRebuildError(logger, e);
-      throw new IndexRebuildException(getService(), e);
-    }
-  }
-
-  @Override
-  public IndexRebuildService.Service getService() {
-    return IndexRebuildService.Service.Themes;
-  }
-
-  /**
-   * Remove the theme from the ElasticSearch index.
-   *
-   * @param themeId
-   *           the id of the theme to remove
-   * @param orgId
-   *           the organization the theme belongs to
-   */
-  private void removeThemeFromIndex(long themeId, String orgId) {
-    logger.debug("Removing theme {} from the {} index.", themeId, index.getIndexName());
-
-    try {
-      index.deleteTheme(Long.toString(themeId), orgId);
-      logger.debug("Theme {} removed from the {} index", themeId, index.getIndexName());
-    } catch (SearchIndexException e) {
-      logger.error("Error deleting the theme {} from the {} index", themeId, index.getIndexName(), e);
-    }
-  }
-
-  /**
-   * Update the theme in the ElasticSearch index.
-   *  @param theme
-   *           the theme to update
-   * @param orgId
-   *           the organization the theme belongs to
-   * @param user
-   */
-  private void updateThemeInIndex(Theme theme, String orgId,
-          User user) {
-    logger.debug("Updating the theme with id '{}', name '{}', description '{}', organization '{}' in the {} index.",
-            theme.getId(), theme.getName(), theme.getDescription(),
-            orgId, index.getIndexName());
-    try {
-      if (theme.getId().isNone()) {
-        throw new IllegalArgumentException("Can't put theme in index without valid id!");
-      }
-      Long id = theme.getId().get();
-
-      // the function to do the actual updating
-      Function<Optional<IndexTheme>, Optional<IndexTheme>> updateFunction = (Optional<IndexTheme> indexThemeOpt) -> {
-        IndexTheme indexTheme;
-        indexTheme = indexThemeOpt.orElseGet(() -> new IndexTheme(id, orgId));
-        String creator = StringUtils.isNotBlank(theme.getCreator().getName())
-                ? theme.getCreator().getName() : theme.getCreator().getUsername();
-
-        indexTheme.setCreationDate(theme.getCreationDate());
-        indexTheme.setDefault(theme.isDefault());
-        indexTheme.setName(theme.getName());
-        indexTheme.setDescription(theme.getDescription());
-        indexTheme.setCreator(creator);
-        indexTheme.setBumperActive(theme.isBumperActive());
-        indexTheme.setBumperFile(theme.getBumperFile());
-        indexTheme.setTrailerActive(theme.isTrailerActive());
-        indexTheme.setTrailerFile(theme.getTrailerFile());
-        indexTheme.setTitleSlideActive(theme.isTitleSlideActive());
-        indexTheme.setTitleSlideBackground(theme.getTitleSlideBackground());
-        indexTheme.setTitleSlideMetadata(theme.getTitleSlideMetadata());
-        indexTheme.setLicenseSlideActive(theme.isLicenseSlideActive());
-        indexTheme.setLicenseSlideBackground(theme.getLicenseSlideBackground());
-        indexTheme.setLicenseSlideDescription(theme.getLicenseSlideDescription());
-        indexTheme.setWatermarkActive(theme.isWatermarkActive());
-        indexTheme.setWatermarkFile(theme.getWatermarkFile());
-        indexTheme.setWatermarkPosition(theme.getWatermarkPosition());
-        return Optional.of(indexTheme);
-      };
-
-      index.addOrUpdateTheme(id, updateFunction, orgId, user);
-      logger.debug("Updated the theme {} in the {} index", theme.getId(), index.getIndexName());
-    } catch (SearchIndexException e) {
-      logger.error("Error updating the theme {} in the {} index", theme.getId(), index.getIndexName(), e);
-    }
-  }
-  /**
-   * Get the function to update a theme in the Elasticsearch index.
-   *
-   * @param theme
-   *          The theme to update
-   * @param orgId
-   *          The id of the current organization
-   * @return the function to do the update
-   */
-  private Function<Optional<IndexTheme>, Optional<IndexTheme>> getThemeUpdateFunction(Theme theme, String orgId) {
-    return (Optional<IndexTheme> indexThemeOpt) -> {
-      IndexTheme indexTheme;
-      indexTheme = indexThemeOpt.orElseGet(() -> new IndexTheme(theme.getId().get(), orgId));
-      String creator = theme.getCreator() == null ? "?" : (
-          StringUtils.isNotBlank(theme.getCreator().getName())
-              ? theme.getCreator().getName()
-              : theme.getCreator().getUsername());
-
-      indexTheme.setCreationDate(theme.getCreationDate());
-      indexTheme.setDefault(theme.isDefault());
-      indexTheme.setName(theme.getName());
-      indexTheme.setDescription(theme.getDescription());
-      indexTheme.setCreator(creator);
-      indexTheme.setBumperActive(theme.isBumperActive());
-      indexTheme.setBumperFile(theme.getBumperFile());
-      indexTheme.setTrailerActive(theme.isTrailerActive());
-      indexTheme.setTrailerFile(theme.getTrailerFile());
-      indexTheme.setTitleSlideActive(theme.isTitleSlideActive());
-      indexTheme.setTitleSlideBackground(theme.getTitleSlideBackground());
-      indexTheme.setTitleSlideMetadata(theme.getTitleSlideMetadata());
-      indexTheme.setLicenseSlideActive(theme.isLicenseSlideActive());
-      indexTheme.setLicenseSlideBackground(theme.getLicenseSlideBackground());
-      indexTheme.setLicenseSlideDescription(theme.getLicenseSlideDescription());
-      indexTheme.setWatermarkActive(theme.isWatermarkActive());
-      indexTheme.setWatermarkFile(theme.getWatermarkFile());
-      indexTheme.setWatermarkPosition(theme.getWatermarkPosition());
-      return Optional.of(indexTheme);
-    };
   }
 }
