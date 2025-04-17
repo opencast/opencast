@@ -21,16 +21,12 @@
 
 package org.opencastproject.index.service.resources.list.provider;
 
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.theme.IndexTheme;
-import org.opencastproject.elasticsearch.index.objects.theme.ThemeSearchQuery;
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ResourceListProvider;
 import org.opencastproject.list.api.ResourceListQuery;
-import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.themes.Theme;
+import org.opencastproject.themes.ThemesServiceDatabase;
+import org.opencastproject.util.requests.SortCriterion;
 import org.opencastproject.util.requests.SortCriterion.Order;
 
 import org.osgi.framework.BundleContext;
@@ -40,8 +36,11 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Component(
     service = ResourceListProvider.class,
@@ -60,25 +59,17 @@ public class ThemesListProvider implements ResourceListProvider {
 
   private static final Logger logger = LoggerFactory.getLogger(ThemesListProvider.class);
 
-  private ElasticsearchIndex searchIndex;
-
-  private SecurityService securityService;
+  private ThemesServiceDatabase themesServiceDatabase;
 
   @Activate
   protected void activate(BundleContext bundleContext) {
     logger.info("Themes list provider activated!");
   }
 
-  /** OSGi callback for the search index. */
+  /** OSGi callback for the themes service database. */
   @Reference
-  public void setIndex(ElasticsearchIndex index) {
-    this.searchIndex = index;
-  }
-
-  /** OSGi callback for the security service. */
-  @Reference
-  public void setSecurityService(SecurityService securityService) {
-    this.securityService = securityService;
+  public void setThemesServiceDatabase(ThemesServiceDatabase themesServiceDatabase) {
+    this.themesServiceDatabase = themesServiceDatabase;
   }
 
   @Override
@@ -91,50 +82,31 @@ public class ThemesListProvider implements ResourceListProvider {
           throws ListProviderException {
     Map<String, String> list = new HashMap<String, String>();
 
-    if (NAME.equals(listName)) {
-      ThemeSearchQuery themeQuery = new ThemeSearchQuery(securityService.getOrganization().getId(),
-              securityService.getUser());
-      themeQuery.withOffset(query.getOffset().getOrElse(0));
-      int limit = query.getLimit().getOrElse(Integer.MAX_VALUE - themeQuery.getOffset());
-      themeQuery.withLimit(limit);
-      themeQuery.sortByName(Order.Ascending);
-      SearchResult<IndexTheme> results = null;
-      try {
-        results = searchIndex.getByQuery(themeQuery);
-      } catch (SearchIndexException e) {
-        logger.error("The admin UI Search Index was not able to get the themes", e);
-        throw new ListProviderException("No themes list for list name " + listName + " found!");
-      }
+    int offset = query.getOffset().getOrElse(0);
+    int limit = query.getLimit().getOrElse(Integer.MAX_VALUE - offset);
+    SortCriterion sortCriterion = new SortCriterion("name", Order.Ascending);
+    ArrayList<SortCriterion> sortCriteria = new ArrayList<>();
+    sortCriteria.add(sortCriterion);
+    List<Theme> themes = themesServiceDatabase.findThemesQuery(
+        Optional.ofNullable(offset),
+        Optional.ofNullable(limit),
+        sortCriteria,
+        Optional.empty(),
+        Optional.empty()
+    );
 
-      for (SearchResultItem<IndexTheme> item : results.getItems()) {
-        IndexTheme theme = item.getSource();
-        list.put(Long.toString(theme.getIdentifier()), theme.getName());
+    if (NAME.equals(listName)) {
+      for (Theme theme : themes) {
+        list.put(Long.toString(theme.getId().get()), theme.getName());
       }
     }
     else if (DESCRIPTION.equals(listName)) {
-      ThemeSearchQuery themeQuery = new ThemeSearchQuery(securityService.getOrganization().getId(),
-              securityService.getUser());
-      themeQuery.withOffset(query.getOffset().getOrElse(0));
-      int limit = query.getLimit().getOrElse(Integer.MAX_VALUE - themeQuery.getOffset());
-      themeQuery.withLimit(limit);
-      themeQuery.sortByName(Order.Ascending);
-      SearchResult<IndexTheme> results = null;
-      try {
-        results = searchIndex.getByQuery(themeQuery);
-      } catch (SearchIndexException e) {
-        logger.error("The admin UI Search Index was not able to get the themes", e);
-        throw new ListProviderException("No themes list for list name " + listName + " found!");
-      }
-
-      for (SearchResultItem<IndexTheme> item : results.getItems()) {
-        IndexTheme theme = item.getSource();
+      for (Theme theme : themes) {
+        String description = theme.getDescription();
         if (theme.getDescription() == null) {
-          theme.setDescription("");
+          description = "";
         }
-        else {
-          theme.getDescription();
-        }
-        list.put(Long.toString(theme.getIdentifier()), theme.getDescription());
+        list.put(Long.toString(theme.getId().get()), description);
       }
     }
 
