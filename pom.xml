@@ -223,6 +223,7 @@
     <module>modules/statistics-export-service-api</module>
     <module>modules/statistics-export-service-impl</module>
     <module>modules/statistics-provider-influx</module>
+    <module>modules/statistics-provider-matomo</module>
     <module>modules/statistics-provider-random</module>
     <module>modules/statistics-service-api</module>
     <module>modules/statistics-service-impl</module>
