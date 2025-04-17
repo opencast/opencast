@@ -92,7 +92,10 @@ nav:
           - Languages: "configuration/admin-ui/languages.md"
           - Manual Asset Upload: "configuration/admin-ui/asset-upload.md"
           - Role-based Visibility: "configuration/admin-ui/role-based-visibility.md"
-          - Statistics: "configuration/admin-ui/statistics.md"
+          - Statistics:
+              - Overview: 'configuration/admin-ui/statistics/statistics.overview.md'
+              - InfluxDB Statistics Provider: 'configuration/admin-ui/statistics/influxdb-statistics-provider.md'
+              - Matomo Statistics Provider: 'configuration/admin-ui/statistics/matomo-statistics-provider.md'
           - Thumbnails: "configuration/admin-ui/thumbnails.md"
           - Imprint and Privacy Statement: "configuration/admin-ui/about.md"
           - Terms of Use: "configuration/admin-ui/terms.md"
