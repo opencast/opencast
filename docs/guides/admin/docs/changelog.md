@@ -4,6 +4,55 @@ Changelog
 Opencast 17
 -----------
 
+### Opencast 17.3
+
+- [[#6641](https://github.com/opencast/opencast/pull/6641)] -
+  Update Admin UI release to 2025-04-17
+- [[#6615](https://github.com/opencast/opencast/pull/6615)] -
+  Update Studio to 2025-04-02
+- [[#6573](https://github.com/opencast/opencast/pull/6573)] -
+  Include Job ID in Job Error
+- [[#6628](https://github.com/opencast/opencast/pull/6628)] -
+  Update Asset Manager Java API Documentation
+- [[#6616](https://github.com/opencast/opencast/pull/6616)] -
+  Fix series table sorting for organizers column
+- [[#6576](https://github.com/opencast/opencast/pull/6576)] -
+  Handle workflows without creator
+- [[#6575](https://github.com/opencast/opencast/pull/6575)] -
+  Add asset manager endpoint to trigger event index update
+- [[#6577](https://github.com/opencast/opencast/pull/6577)] -
+  Prevent errors when shutting down Opencast
+- [[#6578](https://github.com/opencast/opencast/pull/6578)] -
+  Fix adopter statistic breaking on non-set metadata
+- [[#6584](https://github.com/opencast/opencast/pull/6584)] -
+  Fix 500 response for editor endpoints
+- [[#6614](https://github.com/opencast/opencast/pull/6614)] -
+  Improved Paella player Matomo plugin documentation and default config
+- [[#6627](https://github.com/opencast/opencast/pull/6627)] -
+  Improve Performance of Metrics Endpoint
+- [[#6632](https://github.com/opencast/opencast/pull/6632)] -
+  Add isOnline to admin ui service endpoint
+- [[#6631](https://github.com/opencast/opencast/pull/6631)] -
+  Remove additional mailing list references
+- [[#6547](https://github.com/opencast/opencast/pull/6547)] -
+  Log ID of event failing in scheduler index rebuild
+- [[#6548](https://github.com/opencast/opencast/pull/6548)] -
+  Log Publications Blocking Event Deletion
+- [[#6549](https://github.com/opencast/opencast/pull/6549)] -
+  Don't fail removal on already deleted workflow
+- [[#6550](https://github.com/opencast/opencast/pull/6550)] -
+  Fix use of bitwise instead of logical operator
+- [[#6556](https://github.com/opencast/opencast/pull/6556)] -
+  Update admin interface to 2025-03-20
+- [[#6563](https://github.com/opencast/opencast/pull/6563)] -
+  Document OpenSearch analysis-icu plugin install in Debs
+- [[#6559](https://github.com/opencast/opencast/pull/6559)] -
+  Document OpenSearch plugin upgrade when using RPMs
+- [[#6558](https://github.com/opencast/opencast/pull/6558)] -
+  OpenSearch, not Opensearch
+- [[#6557](https://github.com/opencast/opencast/pull/6557)] -
+  Improve upgrade documentation
+
 ### Opencast 17.2
 
 - [[#6542](https://github.com/opencast/opencast/pull/6542)] -
