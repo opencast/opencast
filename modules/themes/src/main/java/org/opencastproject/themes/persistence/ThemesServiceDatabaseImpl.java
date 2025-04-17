@@ -186,7 +186,7 @@ public class ThemesServiceDatabaseImpl implements ThemesServiceDatabase {
 
       // exact match, case sensitive
       if (creatorFilter.isPresent()) {
-        conditions.add(cb.equal(theme.get("creator"), creatorFilter.get()));
+        conditions.add(cb.equal(theme.get("username"), creatorFilter.get()));
       }
       // not exact match, case-insensitive, each token needs to match at least one field
       if (textFilter.isPresent()) {
@@ -196,7 +196,7 @@ public class ThemesServiceDatabaseImpl implements ThemesServiceDatabase {
           List<Predicate> fieldConditions = new ArrayList<>();
           Expression<String> literal = cb.literal("%" + token + "%");
 
-          fieldConditions.add(cb.like(cb.lower(theme.get("creator")), cb.lower(literal)));
+          fieldConditions.add(cb.like(cb.lower(theme.get("username")), cb.lower(literal)));
           fieldConditions.add(cb.like(cb.lower(theme.get("name")), cb.lower(literal)));
           fieldConditions.add(cb.like(cb.lower(theme.get("description")), cb.lower(literal)));
 
