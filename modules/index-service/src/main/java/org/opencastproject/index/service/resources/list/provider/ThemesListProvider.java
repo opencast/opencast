@@ -87,7 +87,7 @@ public class ThemesListProvider implements ResourceListProvider {
     SortCriterion sortCriterion = new SortCriterion("name", Order.Ascending);
     ArrayList<SortCriterion> sortCriteria = new ArrayList<>();
     sortCriteria.add(sortCriterion);
-    List<Theme> themes = themesServiceDatabase.findThemesQuery(
+    List<Theme> themes = themesServiceDatabase.findThemes(
         Optional.ofNullable(offset),
         Optional.ofNullable(limit),
         sortCriteria,

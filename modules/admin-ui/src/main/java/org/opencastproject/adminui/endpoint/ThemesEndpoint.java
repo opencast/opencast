@@ -215,7 +215,7 @@ public class ThemesEndpoint {
     List<Theme> results = null;
     int total;
     try {
-      results = themesServiceDatabase.findThemesQuery(
+      results = themesServiceDatabase.findThemes(
           optLimit,
           optOffset,
           sortCriteria,

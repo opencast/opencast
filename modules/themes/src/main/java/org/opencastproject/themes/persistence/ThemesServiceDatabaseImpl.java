@@ -164,7 +164,7 @@ public class ThemesServiceDatabaseImpl implements ThemesServiceDatabase {
     }
   }
 
-  public List<Theme> findThemesQuery(
+  public List<Theme> findThemes(
       Optional<Integer> limit,
       Optional<Integer> offset,
       ArrayList<SortCriterion> sortCriteria,

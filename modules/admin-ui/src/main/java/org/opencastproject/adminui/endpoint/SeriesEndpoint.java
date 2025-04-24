@@ -520,7 +520,7 @@ public class SeriesEndpoint {
     SortCriterion sortCriterion = new SortCriterion("name", Order.Ascending);
     ArrayList<SortCriterion> sortCriteria = new ArrayList<>();
     sortCriteria.add(sortCriterion);
-    List<Theme> results = themesServiceDatabase.findThemesQuery(
+    List<Theme> results = themesServiceDatabase.findThemes(
         Optional.ofNullable(Integer.MAX_VALUE),
         Optional.ofNullable(0),
         sortCriteria,

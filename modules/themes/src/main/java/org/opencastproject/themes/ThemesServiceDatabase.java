@@ -62,7 +62,7 @@ public interface ThemesServiceDatabase {
    *          fulltext filter (optional)
    * @return A {@link List} of {@link Theme} that match the query parameters
    */
-  List<Theme> findThemesQuery(
+  List<Theme> findThemes(
       Optional<Integer> limit,
       Optional<Integer> offset,
       ArrayList<SortCriterion> sortCriteria,

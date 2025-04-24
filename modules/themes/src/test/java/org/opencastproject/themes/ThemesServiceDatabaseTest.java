@@ -130,7 +130,7 @@ public class ThemesServiceDatabaseTest {
     List<Theme> themes;
 
     // Empty query
-    themes = themesDatabase.findThemesQuery(
+    themes = themesDatabase.findThemes(
         Optional.empty(),
         Optional.empty(),
         new ArrayList<>(),
@@ -140,7 +140,7 @@ public class ThemesServiceDatabaseTest {
     Assert.assertEquals(3, themes.size());
 
     // With limit
-    themes = themesDatabase.findThemesQuery(
+    themes = themesDatabase.findThemes(
         Optional.ofNullable(1),
         Optional.empty(),
         new ArrayList<>(),
@@ -149,7 +149,7 @@ public class ThemesServiceDatabaseTest {
     );
     Assert.assertEquals(1, themes.size());
 
-    themes = themesDatabase.findThemesQuery(
+    themes = themesDatabase.findThemes(
         Optional.ofNullable(Integer.MAX_VALUE),
         Optional.empty(),
         new ArrayList<>(),
@@ -159,7 +159,7 @@ public class ThemesServiceDatabaseTest {
     Assert.assertEquals(3, themes.size());
 
     // With offset
-    themes = themesDatabase.findThemesQuery(
+    themes = themesDatabase.findThemes(
         Optional.ofNullable(Integer.MAX_VALUE),
         Optional.ofNullable(1),
         new ArrayList<>(),
@@ -174,7 +174,7 @@ public class ThemesServiceDatabaseTest {
     ArrayList<SortCriterion> sortCriteria = new ArrayList<>();
     sortCriteria.add(sortCriterion1);
     sortCriteria.add(sortCriterion2);
-    themes = themesDatabase.findThemesQuery(
+    themes = themesDatabase.findThemes(
         Optional.ofNullable(Integer.MAX_VALUE),
         Optional.ofNullable(0),
         sortCriteria,
@@ -186,7 +186,7 @@ public class ThemesServiceDatabaseTest {
     Assert.assertEquals("A theme", themes.get(2).getName());
 
     // With filter
-    themes = themesDatabase.findThemesQuery(
+    themes = themesDatabase.findThemes(
         Optional.ofNullable(Integer.MAX_VALUE),
         Optional.ofNullable(0),
         new ArrayList<>(),
@@ -195,7 +195,7 @@ public class ThemesServiceDatabaseTest {
     );
     Assert.assertEquals(1, themes.size());
 
-    themes = themesDatabase.findThemesQuery(
+    themes = themesDatabase.findThemes(
         Optional.ofNullable(Integer.MAX_VALUE),
         Optional.ofNullable(0),
         new ArrayList<>(),
