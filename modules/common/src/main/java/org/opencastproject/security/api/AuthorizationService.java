@@ -36,7 +36,7 @@ public interface AuthorizationService {
    * {@code user} defaults to the current user returned by the security service.
    * {@code org} defaults to the current organization returned by the security service.
    *
-   * @see this#hasPermission(MediaPackage, User, Organization, String)
+   * @see AuthorizationService#hasPermission(MediaPackage, User, Organization, String)
    */
   boolean hasPermission(MediaPackage mp, String action);
 
@@ -44,21 +44,21 @@ public interface AuthorizationService {
    * {@code user} defaults to the current user returned by the security service.
    * {@code org} defaults to the current organization returned by the security service.
    *
-   * @see this#hasPermission(AccessControlList, User, Organization, String)
+   * @see AuthorizationService#hasPermission(AccessControlList, User, Organization, String)
    */
   boolean hasPermission(AccessControlList acl, String action);
 
   /**
-   * {@code entityBelongsToOrg} defaults to {@boolean true}.
+   * {@code entityBelongsToOrg} defaults to true.
    *
-   * @see this#hasPermission(MediaPackage, User, Organization, String, boolean)
+   * @see AuthorizationService#hasPermission(MediaPackage, User, Organization, String, boolean)
    */
   boolean hasPermission(MediaPackage mp, User user, Organization org, String action);
 
   /**
-   * {@code entityBelongsToOrg} defaults to {@boolean true}.
+   * {@code entityBelongsToOrg} defaults to true.
    *
-   * @see this#hasPermission(AccessControlList, User, Organization, String, boolean)
+   * @see AuthorizationService#hasPermission(AccessControlList, User, Organization, String, boolean)
    */
   boolean hasPermission(AccessControlList acl, User user, Organization org, String action);
 
