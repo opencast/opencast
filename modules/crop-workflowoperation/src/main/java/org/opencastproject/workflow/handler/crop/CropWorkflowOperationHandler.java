@@ -101,7 +101,7 @@ public class CropWorkflowOperationHandler extends AbstractWorkflowOperationHandl
     // Check which tags have been configured
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
         Configuration.none, Configuration.one, Configuration.many, Configuration.many);
-    List<String> targetTags = tagsAndFlavors.getTargetTags();
+    ConfiguredTagsAndFlavors.TargetTags targetTags = tagsAndFlavors.getTargetTags();
     List<MediaPackageElementFlavor> targetFlavorOption = tagsAndFlavors.getTargetFlavors();
 
     MediaPackageElementFlavor targetFlavor = null;
@@ -166,7 +166,7 @@ public class CropWorkflowOperationHandler extends AbstractWorkflowOperationHandl
       }
 
       // Add target tags
-      targetTags.forEach(croppedTrack::addTag);
+      applyTargetTagsToElement(targetTags, croppedTrack);
       croppedTrack.setFlavor(targetFlavor);
 
       // add new track to mediapackage

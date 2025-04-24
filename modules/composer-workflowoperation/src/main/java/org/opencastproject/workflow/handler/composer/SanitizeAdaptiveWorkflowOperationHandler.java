@@ -145,24 +145,8 @@ public class SanitizeAdaptiveWorkflowOperationHandler extends AbstractWorkflowOp
 
     // Read the configuration properties
     MediaPackageElementFlavor sourceFlavor = tagsAndFlavors.getSingleSrcFlavor();
-    List<String> targetTrackTags = tagsAndFlavors.getTargetTags();
+    ConfiguredTagsAndFlavors.TargetTags targetTrackTags = tagsAndFlavors.getTargetTags();
     MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor();
-
-    List<String> removeTags = new ArrayList<String>();
-    List<String> addTags = new ArrayList<String>();
-    List<String> overrideTags = new ArrayList<String>();
-
-    if (!targetTrackTags.isEmpty()) {
-      for (String tag : targetTrackTags) {
-        if (tag.startsWith(MINUS)) {
-          removeTags.add(tag);
-        } else if (tag.startsWith(PLUS)) {
-          addTags.add(tag);
-        } else {
-          overrideTags.add(tag);
-        }
-      }
-    }
 
     // Select those tracks that have matching flavors
     TrackSelector trackSelector = new TrackSelector();
@@ -203,7 +187,7 @@ public class SanitizeAdaptiveWorkflowOperationHandler extends AbstractWorkflowOp
           URI uri = workspace.put(mediaPackage.getIdentifier().toString(), track.getIdentifier(), file.getName(),
                   inputStream);
           track.setURI(uri); // point track to new URI
-          handleTags(track, targetFlavor, overrideTags, removeTags, addTags); // add tags and flavor
+          handleTags(track, targetFlavor, targetTrackTags); // add tags and flavor
           return track;
         } catch (Exception e) {
           logger.error("Cannot add track file to mediapackage in workspace: {} {} ",
@@ -237,13 +221,13 @@ public class SanitizeAdaptiveWorkflowOperationHandler extends AbstractWorkflowOp
       }
       for (Track track : tracks) { // Update the flavor and tags for all non HLS segments
         if (!AdaptivePlaylist.isPlaylist(track.getURI().getPath())) {
-          handleTags(track, targetFlavor, overrideTags, removeTags, addTags);
+          handleTags(track, targetFlavor, targetTrackTags);
           logger.info("Set flavor {} and tags to {} ", track, targetFlavor);
         }
       }
     } else { // change flavor to mark as sanitized
       for (Track track : tracks) {
-        handleTags(track, targetFlavor, overrideTags, removeTags, addTags);
+        handleTags(track, targetFlavor, targetTrackTags);
         logger.info("Set flavor {} and tags to {} ", track, targetFlavor);
       }
     }
@@ -251,8 +235,8 @@ public class SanitizeAdaptiveWorkflowOperationHandler extends AbstractWorkflowOp
   }
 
   // Add the target tags and flavor
-  private void handleTags(Track track, MediaPackageElementFlavor targetFlavor, List<String> overrideTags,
-          List<String> removeTags, List<String> addTags) {
+  private void handleTags(Track track, MediaPackageElementFlavor targetFlavor,
+      ConfiguredTagsAndFlavors.TargetTags targetTags) {
     if (targetFlavor != null) {
       String flavorType = targetFlavor.getType();
       String flavorSubtype = targetFlavor.getSubtype();
@@ -263,21 +247,6 @@ public class SanitizeAdaptiveWorkflowOperationHandler extends AbstractWorkflowOp
       track.setFlavor(new MediaPackageElementFlavor(flavorType, flavorSubtype));
       logger.debug("Composed track has flavor '{}'", track.getFlavor());
     }
-    if (overrideTags.size() > 0) {
-      track.clearTags();
-      for (String tag : overrideTags) {
-        logger.trace("Tagging composed track with '{}'", tag);
-        track.addTag(tag);
-      }
-    } else {
-      for (String tag : removeTags) {
-        logger.trace("Remove tagging '{}' from composed track", tag);
-        track.removeTag(tag.substring(MINUS.length()));
-      }
-      for (String tag : addTags) {
-        logger.trace("Add tagging '{}' to composed track", tag);
-        track.addTag(tag.substring(PLUS.length()));
-      }
-    }
+    applyTargetTagsToElement(targetTags, track);
   }
 }

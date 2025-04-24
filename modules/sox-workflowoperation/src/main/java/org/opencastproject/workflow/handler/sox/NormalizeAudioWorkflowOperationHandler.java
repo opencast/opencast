@@ -155,7 +155,7 @@ public class NormalizeAudioWorkflowOperationHandler extends AbstractWorkflowOper
     // Check which tags have been configured
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance, Configuration.many,
         Configuration.many, Configuration.many, Configuration.many);
-    List<String> targetTagsOption = tagsAndFlavors.getTargetTags();
+    ConfiguredTagsAndFlavors.TargetTags targetTagsOption = tagsAndFlavors.getTargetTags();
     List<String> sourceTagsOption = tagsAndFlavors.getSrcTags();
     List<MediaPackageElementFlavor> sourceFlavorsOption = tagsAndFlavors.getSrcFlavors();
     List<MediaPackageElementFlavor> targetFlavorOption = tagsAndFlavors.getTargetFlavors();
@@ -299,13 +299,10 @@ public class NormalizeAudioWorkflowOperationHandler extends AbstractWorkflowOper
     extendStream.setRmsPkDb(sourceStream.getRmsPkDb());
   }
 
-  private void adjustFlavorAndTags(List<String> targetTags, MediaPackageElementFlavor targetFlavor, Track origTrack,
-          Track normalized) {
+  private void adjustFlavorAndTags(ConfiguredTagsAndFlavors.TargetTags targetTags,
+          MediaPackageElementFlavor targetFlavor, Track origTrack, Track normalized) {
     // Adjust the target tags
-    for (String tag : targetTags) {
-      logger.trace("Tagging normalized track with '{}'", tag);
-      normalized.addTag(tag);
-    }
+    applyTargetTagsToElement(targetTags, normalized);
 
     // Adjust the target flavor. Make sure to account for partial updates
     if (targetFlavor != null) {

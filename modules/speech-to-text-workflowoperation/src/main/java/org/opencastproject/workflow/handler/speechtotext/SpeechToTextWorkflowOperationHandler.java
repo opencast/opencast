@@ -341,10 +341,10 @@ public class
       MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor().applyTo(track.getFlavor());
       subtitleMediaPackageElement.setFlavor(targetFlavor);
 
-      List<String> targetTags = tagsAndFlavors.getTargetTags();
-      targetTags.add("lang:" + outputLanguage);
-      targetTags.add("generator-type:auto");
-      targetTags.add("generator:" + engineType.toLowerCase());
+      ConfiguredTagsAndFlavors.TargetTags targetTags = tagsAndFlavors.getTargetTags();
+      targetTags.getOverrideTags().add("lang:" + outputLanguage);
+      targetTags.getOverrideTags().add("generator-type:auto");
+      targetTags.getOverrideTags().add("generator:" + engineType.toLowerCase());
 
       // this is used to set some values automatically, like the correct mimetype
       Job inspection = mediaInspectionService.enrich(subtitleMediaPackageElement, true);
@@ -355,9 +355,7 @@ public class
 
       subtitleMediaPackageElement = MediaPackageElementParser.getFromXml(inspection.getPayload());
 
-      for (String tag : targetTags) {
-        subtitleMediaPackageElement.addTag(tag);
-      }
+      applyTargetTagsToElement(targetTags, subtitleMediaPackageElement);
 
       parentMediaPackage.add(subtitleMediaPackageElement);
 

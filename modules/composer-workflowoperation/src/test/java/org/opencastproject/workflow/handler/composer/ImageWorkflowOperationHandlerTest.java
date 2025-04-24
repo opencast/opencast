@@ -29,27 +29,23 @@ import static org.opencastproject.workflow.handler.composer.ImageWorkflowOperati
 import static org.opencastproject.workflow.handler.composer.ImageWorkflowOperationHandler.toSeconds;
 import static org.opencastproject.workflow.handler.composer.ImageWorkflowOperationHandler.validateTargetBaseNameFormat;
 
-import org.opencastproject.composer.api.EncodingProfile;
-import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.handler.composer.ImageWorkflowOperationHandler.Cfg;
-import org.opencastproject.workflow.handler.composer.ImageWorkflowOperationHandler.Extractor;
 import org.opencastproject.workflow.handler.composer.ImageWorkflowOperationHandler.MediaPosition;
 import org.opencastproject.workflow.handler.composer.ImageWorkflowOperationHandler.MediaPositionParser;
 import org.opencastproject.workflow.handler.composer.ImageWorkflowOperationHandler.PositionType;
 
-import com.entwinemedia.fn.data.ListBuilder;
-import com.entwinemedia.fn.data.ListBuilders;
-import com.entwinemedia.fn.data.Opt;
 import com.entwinemedia.fn.parser.Result;
 
 import org.easymock.EasyMock;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class ImageWorkflowOperationHandlerTest {
-  private static final ListBuilder l = ListBuilders.strictImmutableArray;
 
   @Test
   public void testMediaPositionParserSuccess() {
@@ -76,25 +72,33 @@ public class ImageWorkflowOperationHandlerTest {
   public void testFileNameGeneration() {
     final ImageWorkflowOperationHandler dummy = new ImageWorkflowOperationHandler();
     assertEquals("thumbnail_12.5p_small.jpg",
-            new Extractor(dummy, cfg(Opt.<String> none(), Opt.some("thumbnail_%.1fp%s"))).createFileName("_small.jpg",
-                    uri("http://localhost/path/filename.mp4"), new MediaPosition(PositionType.Percentage, 12.5)));
+        dummy.createFileName("_small.jpg", uri("http://localhost/path/filename.mp4"),
+            new MediaPosition(PositionType.Percentage, 12.5), cfg(Optional.empty(), Optional.of("thumbnail_%.1fp%s")))
+    );
     assertEquals("thumbnail_0p.jpg",
-            new Extractor(dummy, cfg(Opt.<String> none(), Opt.some("thumbnail_%.0fp%s"))).createFileName(".jpg",
-                    uri("http://localhost/path/filename.mp4"), new MediaPosition(PositionType.Percentage, 0)));
+        dummy.createFileName(".jpg", uri("http://localhost/path/filename.mp4"),
+            new MediaPosition(PositionType.Percentage, 0), cfg(Optional.empty(), Optional.of("thumbnail_%.0fp%s")))
+    );
     assertEquals("video_14.200s.jpg",
-            new Extractor(dummy, cfg(Opt.<String> none(), Opt.<String> none())).createFileName(".jpg",
-                    uri("http://localhost/path/video.mp4"), new MediaPosition(PositionType.Seconds, 14.2)));
+        dummy.createFileName(".jpg", uri("http://localhost/path/video.mp4"),
+            new MediaPosition(PositionType.Seconds, 14.2), cfg(Optional.empty(), Optional.empty()))
+    );
     assertEquals("video_15.110s_medium.jpg",
-            new Extractor(dummy, cfg(Opt.<String> none(), Opt.<String> none())).createFileName("_medium.jpg",
-                    uri("http://localhost/path/video.mp4"), new MediaPosition(PositionType.Seconds, 15.1099)));
+        dummy.createFileName("_medium.jpg", uri("http://localhost/path/video.mp4"),
+            new MediaPosition(PositionType.Seconds, 15.1099), cfg(Optional.empty(), Optional.empty()))
+    );
     assertEquals("thumbnail_15.110s_large.jpg",
-            new Extractor(dummy, cfg(Opt.some("thumbnail_%.3fs%s"), Opt.<String> none())).createFileName("_large.jpg",
-                    uri("http://localhost/path/video.mp4"), new MediaPosition(PositionType.Seconds, 15.1099)));
-    assertEquals("thumbnail", new Extractor(dummy, cfg(Opt.some("thumbnail"), Opt.<String> none())).createFileName(
-            "_large.jpg", uri("http://localhost/path/video.mp4"), new MediaPosition(PositionType.Seconds, 15.1099)));
+        dummy.createFileName("_large.jpg", uri("http://localhost/path/video.mp4"),
+            new MediaPosition(PositionType.Seconds, 15.1099), cfg(Optional.of("thumbnail_%.3fs%s"), Optional.empty()))
+    );
+    assertEquals("thumbnail",
+        dummy.createFileName("_large.jpg", uri("http://localhost/path/video.mp4"),
+            new MediaPosition(PositionType.Seconds, 15.1099), cfg(Optional.of("thumbnail"), Optional.empty()))
+    );
     assertEquals("thumbnail_large.jpg",
-            new Extractor(dummy, cfg(Opt.some("thumbnail%2$s"), Opt.<String> none())).createFileName("_large.jpg",
-                    uri("http://localhost/path/video.mp4"), new MediaPosition(PositionType.Seconds, 15.1099)));
+        dummy.createFileName("_large.jpg", uri("http://localhost/path/video.mp4"),
+            new MediaPosition(PositionType.Seconds, 15.1099), cfg(Optional.of("thumbnail%2$s"), Optional.empty()))
+    );
   }
 
   @Test
@@ -123,10 +127,10 @@ public class ImageWorkflowOperationHandlerTest {
 
   @Test
   public void testLimit() {
-    assertTrue(limit(track(1511), l.mk(sec(-1), sec(1511), sec(1512))).isEmpty());
-    assertTrue(limit(track(1511), l.mk(percent(-0.2), percent(101))).isEmpty());
-    assertEquals(4, limit(track(1511), l.mk(percent(0), percent(100), sec(0), sec(1510))).size());
-    assertEquals(4, limit(track(1511), l.mk(percent(0), percent(10), sec(10), sec(1500), percent(200))).size());
+    assertTrue(limit(track(1511), List.of(sec(-1), sec(1511), sec(1512))).isEmpty());
+    assertTrue(limit(track(1511), List.of(percent(-0.2), percent(101))).isEmpty());
+    assertEquals(4, limit(track(1511), List.of(percent(0), percent(100), sec(0), sec(1510))).size());
+    assertEquals(4, limit(track(1511), List.of(percent(0), percent(10), sec(10), sec(1500), percent(200))).size());
   }
 
   @Test
@@ -143,9 +147,9 @@ public class ImageWorkflowOperationHandlerTest {
 
   // ** ** **
 
-  private Cfg cfg(Opt<String> targetBaseNamePatternSecond, Opt<String> targetBaseNamePatternPercent) {
-    return new Cfg(l.<Track> nil(), l.<MediaPosition> nil(), l.<EncodingProfile> nil(),
-            l.<MediaPackageElementFlavor> nil(), l.<String> nil(), targetBaseNamePatternSecond,
+  private Cfg cfg(Optional<String> targetBaseNamePatternSecond, Optional<String> targetBaseNamePatternPercent) {
+    return new Cfg(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(),
+            new ArrayList<>(), new ConfiguredTagsAndFlavors.TargetTags(), targetBaseNamePatternSecond,
             targetBaseNamePatternPercent, 0);
   }
 
@@ -168,7 +172,7 @@ public class ImageWorkflowOperationHandlerTest {
     final Result<List<MediaPosition>> r = MediaPositionParser.positions.parse(expr);
     assertTrue(r.isDefined());
     assertTrue("Rest:\"" + r.getRest() + "\"", r.getRest().isEmpty());
-    assertEquals(l.mk(expected), r.getResult());
+    assertEquals(List.of(expected), r.getResult());
   }
 
   private boolean testSuccess(String expr) {

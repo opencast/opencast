@@ -454,7 +454,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
     }
     tagsAndFlavors.setSrcFlavors(srcFlavorList);
 
-    List<String> targetTagList = new ArrayList<>();
+    ConfiguredTagsAndFlavors.TargetTags targetTagMap = new ConfiguredTagsAndFlavors.TargetTags();
     String targetTag;
     switch(targetTags) {
       case none:
@@ -464,19 +464,20 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
         if (targetTag == null) {
           throw new WorkflowOperationException("Configuration key '" + TARGET_TAG + "' must be set");
         }
-        targetTagList.add(targetTag);
+        targetTagMap = parseTargetTagsByType(List.of(targetTag));
         break;
       case many:
-        targetTagList = asList(StringUtils.trimToNull(operation.getConfiguration(TARGET_TAGS)));
+        List<String> targetTagList = asList(StringUtils.trimToNull(operation.getConfiguration(TARGET_TAGS)));
+        targetTagMap = parseTargetTagsByType(targetTagList);
         targetTag = StringUtils.trimToNull(operation.getConfiguration(TARGET_TAG));
         if (targetTagList.isEmpty() && targetTag != null) {
-          targetTagList.add(targetTag);
+          targetTagMap = parseTargetTagsByType(List.of(targetTag));
         }
         break;
       default:
         throw new WorkflowOperationException("Couldn't process target-tag configuration option!");
     }
-    tagsAndFlavors.setTargetTags(targetTagList);
+    tagsAndFlavors.setTargetTags(targetTagMap);
 
     List<MediaPackageElementFlavor> targetFlavorList = new ArrayList<>();
     String singleTargetFlavor;
@@ -515,6 +516,63 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
     }
     tagsAndFlavors.setTargetFlavors(targetFlavorList);
     return tagsAndFlavors;
+  }
+
+  private ConfiguredTagsAndFlavors.TargetTags parseTargetTagsByType(List<String> tags) {
+    final String plus = "+";
+    final String minus = "-";
+    List<String> overrideTags = new ArrayList();
+    List<String> addTags = new ArrayList();
+    List<String> removeTags = new ArrayList();
+
+    for (String targetTag : tags) {
+      if (!StringUtils.startsWithAny(targetTag, plus, minus)) {
+        if (addTags.size() > 0
+            || removeTags.size() > 0) {
+          logger.warn("You may not mix override tags and tag changes. "
+              + "The list of override tags so far is {}. "
+              + "The tag {} is not prefixed with '{}' or '{}'.", overrideTags, targetTag, plus, minus);
+        }
+        overrideTags.add(targetTag);
+      } else if (StringUtils.startsWith(targetTag, plus)) {
+        addTags.add(StringUtils.substring(targetTag, 1));
+      } else if (StringUtils.startsWith(targetTag, minus)) {
+        removeTags.add(StringUtils.substring(targetTag, 1));
+      }
+    }
+
+    return new ConfiguredTagsAndFlavors.TargetTags(overrideTags, addTags, removeTags);
+  }
+
+  /**
+   * Helper function that applies target tags to the given element, based on the type(s) of the tag(s)
+   * @param targetTags The target tags to apply to the element
+   * @param element The element the target tags are applied to
+   * @return The element with the applied target tags
+   */
+  protected <T extends MediaPackageElement> T applyTargetTagsToElement(
+      ConfiguredTagsAndFlavors.TargetTags targetTags,
+      T element
+  ) {
+    // set tags on target element
+    List<String> overrideTags = targetTags.getOverrideTags();
+    List<String> addTags = targetTags.getAddTags();
+    List<String> removeTags = targetTags.getRemoveTags();
+    if (overrideTags.size() > 0) {
+      element.clearTags();
+      for (String tag : overrideTags) {
+        element.addTag(tag);
+      }
+    } else {
+      for (String tag : removeTags) {
+        element.removeTag(tag);
+      }
+      for (String tag : addTags) {
+        element.addTag(tag);
+      }
+    }
+
+    return element;
   }
 
   /**

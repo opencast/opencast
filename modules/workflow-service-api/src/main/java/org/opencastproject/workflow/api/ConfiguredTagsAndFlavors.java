@@ -27,6 +27,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Class for Handling source/target tags and flavors.
@@ -36,16 +38,46 @@ import java.util.List;
 public class ConfiguredTagsAndFlavors {
 
   private List<String> srcTags;
-  private List<String> targetTags;
+  private TargetTags targetTags;
   private List<MediaPackageElementFlavor> srcFlavors;
   private List<MediaPackageElementFlavor> targetFlavors;
+
+  public static class TargetTags {
+    private final List<String> overrideTags;
+    private final List<String> addTags;
+    private final List<String> removeTags;
+
+    public TargetTags() {
+      this.overrideTags = new ArrayList<>();
+      this.addTags = new ArrayList<>();
+      this.removeTags = new ArrayList<>();
+    }
+
+    public TargetTags(final List<String> overrideTags, final List<String> addTags, final List<String> removeTags) {
+      this.overrideTags = overrideTags;
+      this.addTags = addTags;
+      this.removeTags = removeTags;
+    }
+
+    public List<String> getOverrideTags() {
+      return overrideTags;
+    }
+
+    public List<String> getAddTags() {
+      return addTags;
+    }
+
+    public List<String> getRemoveTags() {
+      return removeTags;
+    }
+  }
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ConfiguredTagsAndFlavors.class);
 
   protected ConfiguredTagsAndFlavors() {
     this.srcTags = new ArrayList<>();
-    this.targetTags = new ArrayList<>();
+    this.targetTags = new TargetTags();
     this.srcFlavors = new ArrayList<>();
     this.targetFlavors = new ArrayList<>();
   }
@@ -60,7 +92,7 @@ public class ConfiguredTagsAndFlavors {
   /**
    * Return all configured target-tags as a list
    */
-  public List<String> getTargetTags() {
+  public TargetTags getTargetTags() {
     return this.targetTags;
   }
 
@@ -97,13 +129,14 @@ public class ConfiguredTagsAndFlavors {
    * Only use this, if there should be exactly one target-tag
    */
   public String getSingleTargetTag() {
-    if (this.targetTags.isEmpty()) {
+    List<String> allTargetTags = getTargetTagsAsList();
+    if (allTargetTags.isEmpty()) {
       throw new IllegalStateException("No target-tag was configured!");
     }
-    if (this.targetTags.size() > 1) {
+    if (allTargetTags.size() > 1) {
       throw new IllegalStateException("More than one target-tag was configured!");
     }
-    return this.targetTags.get(0);
+    return allTargetTags.get(0);
   }
 
   /**
@@ -145,9 +178,9 @@ public class ConfiguredTagsAndFlavors {
   /**
    * Setter for targetTags list
    */
-  protected void setTargetTags(List<String> targetTags) {
+  protected void setTargetTags(TargetTags targetTags) {
     this.targetTags = targetTags;
-    logger.debug("Added " + targetTags.size() + " elements to targetTags list");
+    logger.debug("Added " + getTargetTagsAsList().size() + " elements to targetTags list");
   }
 
   /**
@@ -164,5 +197,15 @@ public class ConfiguredTagsAndFlavors {
   protected void setTargetFlavors(List<MediaPackageElementFlavor> targetFlavors) {
     this.targetFlavors = targetFlavors;
     logger.debug("Added " + targetFlavors.size() + " elements to targetFlavors list");
+  }
+
+  /**
+   * Stuffs all the different target tags into a single list
+   * @return
+   */
+  private List<String> getTargetTagsAsList() {
+    return Stream.of(this.targetTags.overrideTags, this.targetTags.addTags, this.targetTags.removeTags)
+        .flatMap(List::stream)
+        .collect(Collectors.toList());
   }
 }

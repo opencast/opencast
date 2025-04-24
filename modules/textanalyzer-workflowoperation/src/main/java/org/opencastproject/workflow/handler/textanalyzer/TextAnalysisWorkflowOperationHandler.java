@@ -209,7 +209,7 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
     long totalTimeInQueue = 0;
 
     List<String> sourceTagSet = tagsAndFlavors.getSrcTags();
-    List<String> targetTagSet = tagsAndFlavors.getTargetTags();
+    ConfiguredTagsAndFlavors.TargetTags targetTagSet = tagsAndFlavors.getTargetTags();
 
     // Select the catalogs according to the tags
     Map<Catalog, Mpeg7Catalog> catalogs = loadSegmentCatalogs(mediaPackage, operation, tagsAndFlavors);
@@ -382,9 +382,7 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
 
         // Add flavor and target tags
         catalog.setFlavor(MediaPackageElements.TEXTS);
-        for (String tag : targetTagSet) {
-          catalog.addTag(tag);
-        }
+        applyTargetTagsToElement(targetTagSet, catalog);
       } finally {
         // Remove images that were created for text extraction
         logger.debug("Removing temporary images");
