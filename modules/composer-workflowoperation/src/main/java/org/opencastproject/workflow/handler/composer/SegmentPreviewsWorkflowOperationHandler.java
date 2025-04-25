@@ -192,7 +192,7 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
 
     // Read the configuration properties
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(wi,
-        Configuration.many, Configuration.one, Configuration.many, Configuration.one);
+        Configuration.atLeastOne, Configuration.many, Configuration.one);
     MediaPackageElementFlavor sourceVideoFlavor = tagsAndFlavors.getSingleSrcFlavor();
     List<String> sourceTagSet = tagsAndFlavors.getSrcTags();
     ConfiguredTagsAndFlavors.TargetTags targetImageTags = tagsAndFlavors.getTargetTags();
