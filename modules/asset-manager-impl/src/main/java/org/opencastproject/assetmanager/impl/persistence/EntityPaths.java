@@ -21,10 +21,8 @@
 package org.opencastproject.assetmanager.impl.persistence;
 
 import static com.entwinemedia.fn.Stream.$;
-import static com.entwinemedia.fn.Stream.empty;
 
 import com.entwinemedia.fn.Stream;
-import com.mysema.query.types.EntityPath;
 
 /**
  * Shortcuts to Querydsl entity paths.
@@ -35,5 +33,4 @@ public interface EntityPaths {
   QAssetDto Q_ASSET = QAssetDto.assetDto;
   Stream<QSnapshotDto> $Q_SNAPSHOT = $(Q_SNAPSHOT);
   Stream<QPropertyDto> $Q_PROPERTY = $(Q_PROPERTY);
-  Stream<EntityPath<?>> $NO_ENTITY = empty();
 }

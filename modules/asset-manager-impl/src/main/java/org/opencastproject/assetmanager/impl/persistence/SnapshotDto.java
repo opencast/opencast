@@ -76,7 +76,22 @@ import javax.persistence.UniqueConstraint;
         @NamedQuery(name = "Snapshot.countByMediaPackage", query = "select count(s) from Snapshot s "
                 + "where s.mediaPackageId = :mediaPackageId"),
         @NamedQuery(name = "Snapshot.countByMediaPackageAndOrg", query = "select count(s) from Snapshot s "
-                + "where s.mediaPackageId = :mediaPackageId and s.organizationId = :organizationId")})
+                + "where s.mediaPackageId = :mediaPackageId and s.organizationId = :organizationId"),
+        @NamedQuery(
+            name = "Snapshot.findMediumByMpIdAndVersion",
+            query = "SELECT s FROM Snapshot s "
+                + "WHERE s.mediaPackageId = :mpId "
+                + "AND s.version = :version "
+                + "ORDER BY s.version DESC"
+        ),
+        @NamedQuery(
+            name = "Snapshot.findPropertyOnMediaPackage",
+            query = "SELECT s, p FROM Snapshot s "
+            + "LEFT JOIN Property p ON s.mediaPackageId = p.mediaPackageId "
+            + "AND (p.namespace = :namespace AND p.propertyName = :propertyName OR p.namespace IS NULL) "
+            + "WHERE s.mediaPackageId = :mediaPackageId"
+        ),
+})
 // Maintain own generator to support database migrations from Archive to AssetManager
 // The generator's initial value has to be set after the data migration.
 // Otherwise duplicate key errors will most likely happen.
@@ -175,6 +190,18 @@ public class SnapshotDto {
 
   public String getStorageId() {
     return storageId;
+  }
+
+  public String getOrganizationId() {
+    return organizationId;
+  }
+
+  public String getAvailability() {
+    return availability;
+  }
+
+  public String getOwner() {
+    return owner;
   }
 
   void setAvailability(Availability a) {

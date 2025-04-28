@@ -32,6 +32,8 @@ import javax.persistence.Id;
 import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
 
@@ -40,6 +42,31 @@ import javax.persistence.TableGenerator;
 @Table(name = "oc_assets_asset", indexes = {
     @Index(name = "IX_oc_assets_asset_checksum", columnList = ("checksum")),
     @Index(name = "IX_oc_assets_asset_mediapackage_element_id", columnList = ("mediapackage_element_id")) })
+@NamedQueries({
+    @NamedQuery(
+        name = "Asset.findMediumByMpIdMpeIdAndVersion",
+        query = "SELECT a, s.availability, s.organizationId FROM Asset a "
+            + "JOIN a.snapshot s "
+            + "WHERE s.mediaPackageId = :mpId "
+            + "AND a.mediaPackageElementId = :mpeId "
+            + "AND s.version = :version "
+            + "ORDER BY s.version DESC"
+    ),
+    @NamedQuery(
+        name = "Asset.findByChecksum",
+        query = "SELECT a FROM Asset a "
+            + "INNER JOIN a.snapshot s "
+            + "WHERE a.checksum = :checksum"
+    ),
+    @NamedQuery(
+        name = "Asset.findByChecksumStorageIdAndOrganizationId",
+        query = "SELECT a FROM Asset a "
+            + "INNER JOIN a.snapshot s "
+            + "WHERE a.checksum = :checksum "
+            + "AND a.storageId = :storageId "
+            + "AND s.organizationId = :orgId "
+    ),
+})
 // Maintain own generator to support database migrations from Archive to AssetManager
 // The generator's initial value has to be set after the data migration.
 // Otherwise duplicate key errors will most likely happen.
@@ -127,4 +154,6 @@ public class AssetDto {
   public void setSnapshot(SnapshotDto snapshot) {
     this.snapshot = snapshot;
   }
+
+
 }

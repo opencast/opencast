@@ -28,13 +28,11 @@ import org.opencastproject.assetmanager.api.PropertyId;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.impl.PartialMediaPackage;
 import org.opencastproject.assetmanager.impl.VersionImpl;
-import org.opencastproject.assetmanager.impl.persistence.AssetDtos.Full;
-import org.opencastproject.assetmanager.impl.persistence.AssetDtos.Medium;
 import org.opencastproject.db.DBSession;
+import org.opencastproject.db.Queries;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.util.data.Function;
 
-import com.entwinemedia.fn.data.Opt;
 import com.mysema.query.Tuple;
 import com.mysema.query.jpa.EclipseLinkTemplates;
 import com.mysema.query.jpa.JPQLTemplates;
@@ -45,6 +43,7 @@ import com.mysema.query.jpa.impl.JPAUpdateClause;
 import com.mysema.query.types.expr.BooleanExpression;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,6 +120,39 @@ public class Database implements EntityPaths {
       }
     });
   }
+
+  // TODO: Fix this.
+//  public boolean saveProperty(final Property property) {
+//    return db.execTx(em -> {
+//      final PropertyId pId = property.getId();
+//
+//      // check the existence of both the media package and the property in one query
+//      //
+//      // either the property matches or it does not exist <- left outer join
+//      var result = namedQuery.findOpt(
+//          "Snapshot.findPropertyOnMediaPackage",
+//          Object.class,
+//          Pair.of("namespace", pId.getNamespace()),
+//          Pair.of("propertyName", pId.getName()),
+//          Pair.of("mediaPackageId", pId.getMediaPackageId())
+//      ).apply(em);
+//
+//      if (result.isPresent()) {
+//        // media package exists, now check if the property exists
+//        Object[] resultArray = (Object[]) result.get();
+//        PropertyDto exists = (PropertyDto) resultArray[1];
+//        namedQuery
+//            .persistOrUpdate(exists == null
+//                ? PropertyDto.mk(property)
+//                : exists.update(property.getValue()))
+//            .apply(em);
+//        return true;
+//      } else {
+//        // media package does not exist
+//        return false;
+//      }
+//    });
+//  }
 
   /**
    * Claim a new version for media package <code>mpId</code>.
@@ -236,42 +268,63 @@ public class Database implements EntityPaths {
    */
   public Optional<AssetDtos.Medium> getAsset(final VersionImpl version, final String mpId, final String mpeId) {
     return db.execTx(em -> {
-      final QAssetDto assetDto = QAssetDto.assetDto;
-      final Tuple result = AssetDtos.baseJoin(em)
-          .where(assetDto.snapshot.mediaPackageId.eq(mpId)
-              .and(assetDto.mediaPackageElementId.eq(mpeId))
-              .and(assetDto.snapshot.version.eq(version.value())))
-          // if no version has been specified make sure to get the latest by ordering
-          .orderBy(assetDto.snapshot.version.desc())
-          .uniqueResult(Medium.select);
-      var dtoOpt = Opt.nul(result).map(AssetDtos.Medium.fromTuple);
-      return dtoOpt.isSome() ? Optional.of(dtoOpt.get()) : Optional.empty();
+      return Queries.namedQuery
+          .findOpt(
+              "Asset.findMediumByMpIdMpeIdAndVersion",
+              Object[].class,
+              Pair.of("mpId", mpId),
+              Pair.of("mpeId", mpeId),
+              Pair.of("version", version.value()))
+          .apply(em)
+          .map(result -> {
+            AssetDto assetDto = (AssetDto) result[0];
+            String availability = (String) result[1];
+            String organizationId = (String) result[2];
+            return new AssetDtos.Medium(assetDto, Availability.valueOf(availability), organizationId);
+          });
     });
   }
 
   public Optional<SnapshotDtos.Medium> getSnapshot(final VersionImpl version, final String mpId) {
     return db.execTx(em -> {
-      final QSnapshotDto snapshotDto = QSnapshotDto.snapshotDto;
-      final Tuple result = SnapshotDtos.baseQuery(em)
-          .where(snapshotDto.mediaPackageId.eq(mpId)
-              .and(snapshotDto.version.eq(version.value())))
-          // if no version has been specified make sure to get the latest by ordering
-          .orderBy(snapshotDto.version.desc())
-          .uniqueResult(SnapshotDtos.Medium.select);
-      var dtoOpt = Opt.nul(result).map(SnapshotDtos.Medium.fromTuple);
-      return dtoOpt.isSome() ? Optional.of(dtoOpt.get()) : Optional.empty();
+      return namedQuery.findOpt(
+          "Snapshot.findMediumByMpIdAndVersion",
+            SnapshotDto.class,
+            Pair.of("mpId", mpId),
+            Pair.of("version", version.value()))
+          .apply(em)
+          .map(result -> new SnapshotDtos.Medium(
+              result,
+              Availability.valueOf(result.getAvailability()),
+              result.getStorageId(),
+              result.getOrganizationId(),
+              result.getOwner()
+          ));
     });
   }
 
   public Optional<AssetDtos.Full> findAssetByChecksum(final String checksum) {
     return db.execTx(em -> {
-      final Tuple result = AssetDtos.baseJoin(em)
-          .where(QAssetDto.assetDto.checksum.eq(checksum))
-          .singleResult(Full.select);
-      var dtoOpt = Opt.nul(result).map(Full.fromTuple);
-      return dtoOpt.isSome() ? Optional.of(dtoOpt.get()) : Optional.empty();
+      return namedQuery.findOpt(
+              "Asset.findByChecksum",
+              AssetDto.class,
+              Pair.of("checksum", checksum))
+          .apply(em)
+          .map(result -> {
+            SnapshotDto snapshot = result.getSnapshot();
+            return new AssetDtos.Full(
+                result,
+                Availability.valueOf(snapshot.getAvailability()),
+                snapshot.getStorageId(),
+                snapshot.getOrganizationId(),
+                snapshot.getOwner(),
+                snapshot.getMediaPackageId(),
+                snapshot.getVersion()
+            );
+          });
     });
   }
+
 
   /**
    * Delete all properties for a given media package identifier
@@ -351,13 +404,25 @@ public class Database implements EntityPaths {
   public Optional<AssetDtos.Full> findAssetByChecksumAndStoreAndOrg(final String checksum, final String storeId,
       final String orgId) {
     return db.execTx(em -> {
-      final Tuple result = AssetDtos.baseJoin(em)
-          .where(QAssetDto.assetDto.checksum.eq(checksum)
-              .and(QAssetDto.assetDto.storageId.eq(storeId))
-              .and(QAssetDto.assetDto.snapshot.organizationId.eq(orgId)))
-          .singleResult(Full.select);
-      var dtoOpt = Opt.nul(result).map(Full.fromTuple);
-      return dtoOpt.isSome() ? Optional.of(dtoOpt.get()) : Optional.empty();
+      return namedQuery.findOpt(
+              "Asset.findByChecksumStorageIdAndOrganizationId",
+              AssetDto.class,
+              Pair.of("checksum", checksum),
+              Pair.of("storageId", storeId),
+              Pair.of("orgId", orgId))
+          .apply(em)
+          .map(result -> {
+            SnapshotDto snapshot = result.getSnapshot();
+            return new AssetDtos.Full(
+                result,
+                Availability.valueOf(snapshot.getAvailability()),
+                snapshot.getStorageId(),
+                snapshot.getOrganizationId(),
+                snapshot.getOwner(),
+                snapshot.getMediaPackageId(),
+                snapshot.getVersion()
+            );
+          });
     });
   }
 

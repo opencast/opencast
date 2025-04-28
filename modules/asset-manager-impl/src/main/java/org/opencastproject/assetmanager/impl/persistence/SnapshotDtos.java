@@ -22,27 +22,11 @@ package org.opencastproject.assetmanager.impl.persistence;
 
 import org.opencastproject.assetmanager.api.Availability;
 
-import com.entwinemedia.fn.Fn;
-import com.mysema.query.Tuple;
-import com.mysema.query.jpa.impl.JPAQuery;
-import com.mysema.query.types.Expression;
-
-import javax.persistence.EntityManager;
-
 /**
  * Collection of non-JPA DTOs to tuple up the {@link SnapshotDto} JPA entity with some additional joined data.
  */
 public final class SnapshotDtos {
   private SnapshotDtos() {
-  }
-
-  /**
-   * Create base query for a {@link SnapshotDto} query.
-   */
-  public static JPAQuery baseQuery(EntityManager em) {
-    final QSnapshotDto snapshotDto = QSnapshotDto.snapshotDto;
-    return new JPAQuery(em, Database.TEMPLATES)
-            .from(snapshotDto);
   }
 
   public static class Medium {
@@ -85,31 +69,5 @@ public final class SnapshotDtos {
     public String getOwner() {
       return owner;
     }
-
-
-
-    public static final Fn<Tuple, Medium> fromTuple = new Fn<Tuple, Medium>() {
-      @Override public Medium apply(Tuple result) {
-        return new Medium(
-                result.get(QSnapshotDto.snapshotDto),
-                Availability.valueOf(result
-                        .get(QSnapshotDto.snapshotDto.availability)),
-                result.get(QSnapshotDto.snapshotDto.storageId),
-                result.get(QSnapshotDto.snapshotDto.organizationId),
-                result.get(QSnapshotDto.snapshotDto.owner));
-      }
-    };
-
-    /**
-     * Parameter for query execution methods like
-     * {@link com.mysema.query.jpa.impl.JPAQuery#singleResult(com.mysema.query.types.Expression[])} or
-     * {@link com.mysema.query.jpa.impl.JPAQuery#list(Expression[])}.
-     */
-    public static final Expression<?>[] select = new Expression[] {
-        QSnapshotDto.snapshotDto,
-        QSnapshotDto.snapshotDto.storageId,
-        QSnapshotDto.snapshotDto.availability,
-        QSnapshotDto.snapshotDto.organizationId
-    };
   }
 }
