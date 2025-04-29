@@ -556,6 +556,19 @@ public class Database implements EntityPaths {
     });
   }
 
+  public List<Snapshot> getSnapshotsForIndexRebuild(int offset, int limit) {
+    return db.execTx(em -> {
+      List<SnapshotDto> snapshotDto = namedQuery.findSome(
+          "Snapshot.findForIndexRebuild",
+          offset,
+          limit,
+          SnapshotDto.class
+      ).apply(em);
+
+      return snapshotDtoToSnapshot(snapshotDto);
+    });
+  }
+
   //
   // Utility
   //

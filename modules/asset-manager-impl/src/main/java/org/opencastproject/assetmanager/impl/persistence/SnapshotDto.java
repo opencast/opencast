@@ -155,6 +155,15 @@ import javax.persistence.UniqueConstraint;
                 + "AND s.archivalDate BETWEEN :startDate AND :endDate "
                 + "AND (:organizationId IS NULL OR s.organizationId = :organizationId)"
         ),
+        @NamedQuery(
+            name = "Snapshot.findForIndexRebuild",
+            query = "SELECT s FROM Snapshot s "
+            + "WHERE s.version = ( "
+            + "  SELECT MAX(s2.version) FROM Snapshot s2 "
+            + "  WHERE s2.mediaPackageId = s.mediaPackageId "
+            + ") "
+            + "ORDER BY s.mediaPackageId DESC "
+        ),
 })
 // Maintain own generator to support database migrations from Archive to AssetManager
 // The generator's initial value has to be set after the data migration.

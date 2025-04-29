@@ -23,7 +23,6 @@ package org.opencastproject.assetmanager.impl;
 import static com.entwinemedia.fn.Prelude.chuck;
 import static com.entwinemedia.fn.Stream.$;
 import static java.lang.String.format;
-import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
 import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.hasNoChecksum;
 import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.isNotPublication;
 import static org.opencastproject.mediapackage.MediaPackageSupport.getFileName;
@@ -48,7 +47,6 @@ import org.opencastproject.assetmanager.api.query.ADeleteQuery;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.ASelectQuery;
 import org.opencastproject.assetmanager.api.query.Predicate;
-import org.opencastproject.assetmanager.api.query.RichAResult;
 import org.opencastproject.assetmanager.api.query.Target;
 import org.opencastproject.assetmanager.api.storage.AssetStore;
 import org.opencastproject.assetmanager.api.storage.DeletionSelector;
@@ -1068,18 +1066,15 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
       int offset = 0;
       int total = (int) countEvents(null);
-      final AQueryBuilder q = createQuery();
-      RichAResult r;
       int current = 0;
       logIndexRebuildBegin(logger, total, "snapshot(s)");
       var updatedEventRange = new ArrayList<Event>();
       do {
-        r = enrich(q.select(q.snapshot()).where(q.version().isLatest()).orderBy(q.mediapackageId().desc())
-            .page(offset, PAGE_SIZE).run());
+        List<Snapshot> snapshots = getDatabase().getSnapshotsForIndexRebuild(offset, PAGE_SIZE);
         offset += PAGE_SIZE;
         int n = 20;
 
-        final Map<String, List<Snapshot>> byOrg = r.getSnapshots().stream()
+        final Map<String, List<Snapshot>> byOrg = snapshots.stream()
             .collect(Collectors.groupingBy(Snapshot::getOrganizationId));
         for (String orgId : byOrg.keySet()) {
           final Organization snapshotOrg;
