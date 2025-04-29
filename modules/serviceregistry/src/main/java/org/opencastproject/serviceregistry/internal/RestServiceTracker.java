@@ -103,17 +103,20 @@ public class RestServiceTracker extends ServiceTracker<Object, Object> {
     @Override
     public void removedService(ServiceReference reference, Object service) {
         String serviceType = (String) reference.getProperty(RestConstants.SERVICE_TYPE_PROPERTY);
-        boolean publishFlag = (Boolean) reference.getProperty(RestConstants.SERVICE_PUBLISH_PROPERTY);
+        boolean publishFlag = Boolean.parseBoolean(Objects.toString(
+            reference.getProperty(RestConstants.SERVICE_PUBLISH_PROPERTY),
+            "true"));
 
         // Services that have the "publish" flag set to "true" have been registered before.
         if (publishFlag) {
             try {
                 serviceRegistry.unRegisterService(serviceType, serviceRegistry.getRegistryHostname());
             } catch (ServiceRegistryException e) {
-                logger.warn("Unable to unregister job producer of type " + serviceType + " on host " + serviceRegistry.getRegistryHostname());
+                logger.warn("Unable to unregister job producer of type {} on host {}",
+                    serviceType, serviceRegistry.getRegistryHostname());
             }
         } else {
-            logger.trace("Service " + reference + " was never registered");
+            logger.trace("Service {} was never registered", reference);
         }
 
         super.removedService(reference, service);

@@ -22,7 +22,6 @@
 package org.opencastproject.metrics.impl;
 
 import org.opencastproject.assetmanager.api.AssetManager;
-import org.opencastproject.job.api.Job;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistration;
@@ -45,7 +44,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.StringWriter;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -163,50 +161,34 @@ public class MetricsExporter {
     servicesTotal.labels(ServiceState.WARNING.name()).set(warn);
     servicesTotal.labels(ServiceState.ERROR.name()).set(error);
 
-    // prepare series for jobs and workflows so we get a zero value if there is no job
-    Map<String, Integer> workflows = new HashMap<>();
-    Map<String, Map<String, Integer>> jobs = new HashMap<>();
-    for (Organization organization: organizationDirectoryService.getOrganizations()) {
-      workflows.put(organization.getId(), 0);
-      jobs.put(organization.getId(), new HashMap<>());
-    }
-
     // track host loads
     for (SystemLoad.NodeLoad nodeLoad: serviceRegistry.getCurrentHostLoads().getNodeLoads()) {
       jobLoadCurrent.labels(nodeLoad.getHost()).set(nodeLoad.getCurrentLoad());
       jobLoadMax.labels(nodeLoad.getHost()).set(nodeLoad.getMaxLoad());
-
-      // initialize job hosts
-      for (Map.Entry<String, Map<String, Integer>> entry: jobs.entrySet()) {
-        entry.getValue().put(nodeLoad.getHost(), 0);
-      }
-    }
-
-    // count jobs and workflows
-    for (Job job: serviceRegistry.getActiveJobs()) {
-      Map<String, Integer> orgJobs = jobs.getOrDefault(job.getOrganization(), null);
-      if (orgJobs != null) {
-        orgJobs.computeIfPresent(job.getProcessingHost(), (k, v) -> v + 1);
-      }
-      if ("START_WORKFLOW".equals(job.getOperation())) {
-        workflows.computeIfPresent(job.getOrganization(), (k, v) -> v + 1);
-      }
     }
 
     // set workflows by organization
-    for (Map.Entry<String, Integer> entry: workflows.entrySet()) {
+    for (var entry: serviceRegistry.countActiveTypeByOrganization("START_WORKFLOW").entrySet()) {
       workflowsActive.labels(entry.getKey()).set(entry.getValue());
     }
 
     // set jobs by organization and host
-    for (Map.Entry<String, Map<String, Integer>> entry: jobs.entrySet()) {
-      for (Map.Entry<String, Integer> orgEntry: entry.getValue().entrySet()) {
-        jobsActive.labels(orgEntry.getKey(), entry.getKey()).set(orgEntry.getValue());
+    for (var entry: serviceRegistry.countActiveByOrganizationAndHost().entrySet()) {
+      final var org = entry.getKey();
+      for (Map.Entry<String, Long> orgEntry: entry.getValue().entrySet()) {
+        final var host = orgEntry.getKey();
+        final var count = orgEntry.getValue();
+        jobsActive.labels(host, org).set(count);
       }
     }
 
     // Get numbers from asset manager
-    if (assetManager != null) {
+    if (assetManager != null && organizationDirectoryService.getOrganizations().size() == 1) {
+      var org = organizationDirectoryService.getOrganizations().get(0).getId();
+      eventsInAssetManager
+          .labels(org)
+          .set(assetManager.countEvents(null));
+    } else if (assetManager != null) {
       for (Organization organization: organizationDirectoryService.getOrganizations()) {
         eventsInAssetManager
             .labels(organization.getId())

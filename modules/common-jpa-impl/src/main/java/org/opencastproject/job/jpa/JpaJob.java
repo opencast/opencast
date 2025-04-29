@@ -89,6 +89,14 @@ import javax.persistence.Version;
         + "where j.status = :status order by j.dateCreated"),
     @NamedQuery(name = "Job.statuses", query = "SELECT j FROM Job j "
         + "where j.status in :statuses order by j.dateCreated"),
+    @NamedQuery(name = "Job.countByOrganizationAndHost",
+        query = "SELECT j.organization, j.processorServiceRegistration.hostRegistration.baseUrl, count(j) FROM Job j "
+            + "WHERE j.status in :statuses "
+            + "GROUP BY j.organization, j.processorServiceRegistration.hostRegistration.baseUrl"),
+    @NamedQuery(name = "Job.countTypeByOrganization",
+        query = "SELECT j.organization, count(j) FROM Job j "
+            + "WHERE j.operation = :operation and j.status in :statuses "
+            + "GROUP BY j.organization"),
     @NamedQuery(name = "Job.all", query = "SELECT j FROM Job j order by j.dateCreated"),
     @NamedQuery(name = "Job.dispatchable.status", query = "SELECT j FROM Job j where j.dispatchable = true and "
         + "j.status in :statuses order by j.dateCreated"),
