@@ -280,22 +280,21 @@ public class AssetManagerDeletePropertyTest extends AssetManagerDeleteTestBase i
     am.setProperty(p.agent.mk(mp[1], "agent"));
     am.setProperty(p.approved.mk(mp[1], true));
     am.setProperty(p.legacyId.mk(mp[1], "id"));
-    assertEquals(0L, Properties.removeProperties(am, OWNER, "unknown_org", mp[0], p.namespace()));
     assertEquals(0L, Properties.removeProperties(
-        am, OWNER, DefaultOrganization.DEFAULT_ORGANIZATION_ID, "unknown-mp-id", p.namespace()
+        am, "unknown-mp-id", p.namespace()
     ));
     assertEquals(0L, Properties.removeProperties(
-        am, OWNER, DefaultOrganization.DEFAULT_ORGANIZATION_ID, mp[0], "unknown-namespace"
+        am, mp[0], "unknown-namespace"
     ));
     assertEquals(3L, Properties.removeProperties(
-        am, OWNER, DefaultOrganization.DEFAULT_ORGANIZATION_ID, mp[0], p.namespace()
+        am, mp[0], p.namespace()
     ));
     assertEquals(1L, enrich(q.select(q.properties()).where(q.mediaPackageId(mp[0])).run()).countProperties());
     assertEquals(1L, Properties.removeProperties(
-        am, OWNER, DefaultOrganization.DEFAULT_ORGANIZATION_ID, mp[0], p2.namespace()
+        am, mp[0], p2.namespace()
     ));
     assertEquals(3L, Properties.removeProperties(
-        am, OWNER, DefaultOrganization.DEFAULT_ORGANIZATION_ID, mp[1], p.namespace()
+        am, mp[1], p.namespace()
     ));
   }
 }

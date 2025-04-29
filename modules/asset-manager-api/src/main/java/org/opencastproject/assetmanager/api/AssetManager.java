@@ -326,6 +326,8 @@ public interface AssetManager {
    */
   int deleteProperties(String mediaPackageId, String namespace);
 
+  int deletePropertiesWithCurrentUser(String mediaPackageId, String namespace);
+
 
   /* Misc. */
 

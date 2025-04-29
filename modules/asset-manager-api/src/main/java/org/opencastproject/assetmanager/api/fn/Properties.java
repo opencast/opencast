@@ -25,7 +25,6 @@ import org.opencastproject.assetmanager.api.Property;
 import org.opencastproject.assetmanager.api.PropertyId;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Value;
-import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.PropertyField;
 import org.opencastproject.mediapackage.MediaPackage;
 
@@ -89,9 +88,8 @@ public final class Properties {
     return am.setProperty(Property.mk(PropertyId.mk(mpId, namespace, propertyName), value));
   }
 
-  public static long removeProperties(AssetManager am, String owner, String orgId, String mpId, String namespace) {
-    final AQueryBuilder q = am.createQuery();
-    return q.delete(owner, q.propertiesOf(namespace)).where(q.organizationId(orgId).and(q.mediaPackageId(mpId))).run();
+  public static long removeProperties(AssetManager am, String mpId, String namespace) {
+    return am.deletePropertiesWithCurrentUser(mpId, namespace);
   }
 
   /** Create a property. */

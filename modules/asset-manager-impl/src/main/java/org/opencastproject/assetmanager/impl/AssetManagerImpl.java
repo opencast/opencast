@@ -980,6 +980,27 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     return getDatabase().deleteProperties(mediaPackageId, namespace);
   }
 
+  @Override
+  public int deletePropertiesWithCurrentUser(final String mediaPackageId, final String namespace) {
+    User user = securityService.getUser();
+    switch (isAdmin()) {
+      case GLOBAL:
+        return getDatabase().deleteProperties(mediaPackageId, namespace);
+      case ORGANIZATION:
+        Optional<Snapshot> snapshot = getDatabase().getLatestSnapshot(mediaPackageId);
+        if (snapshot.isPresent() && snapshot.get().getOrganizationId().equals(user.getOrganization().getId())) {
+          return getDatabase().deleteProperties(mediaPackageId, namespace);
+        }
+        return 0;
+      default:
+        Optional<MediaPackage> mediaPackage = getMediaPackage(mediaPackageId);
+        if (mediaPackage.isPresent() && authorizationService.hasPermission(mediaPackage.get(), "write")) {
+          return getDatabase().deleteProperties(mediaPackageId, namespace);
+        }
+        return 0;
+    }
+  }
+
   /** Misc. */
 
   @Override
