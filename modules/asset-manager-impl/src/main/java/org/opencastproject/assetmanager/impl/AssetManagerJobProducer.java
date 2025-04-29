@@ -24,8 +24,6 @@ import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.AssetManagerException;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Version;
-import org.opencastproject.assetmanager.api.query.ARecord;
-import org.opencastproject.assetmanager.api.query.RichAResult;
 import org.opencastproject.assetmanager.api.storage.AssetStore;
 import org.opencastproject.assetmanager.api.storage.RemoteAssetStore;
 import org.opencastproject.job.api.AbstractJobProducer;
@@ -53,7 +51,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 @Component(
     immediate = true,
@@ -265,7 +262,7 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
    *  [0 OK ][0 FAILED ]
    */
   protected String internalMoveById(final String mpId, final String targetStorage) {
-    RichAResult results = tsam.getSnapshotsByIdOrderedByVersion(mpId, true);
+    List<Snapshot> results = tsam.getSnapshotsByIdOrderedByVersion(mpId, true);
     MoveRecordInfo result = moveSnapshots(results, targetStorage);
     return result.toString();
   }
@@ -315,8 +312,8 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
    *  The number of subjobs spawned
    */
   protected String internalMoveByDate(final Date start, final Date end, final String targetStorage) {
-    RichAResult results = tsam.getSnapshotsByDateOrderedById(start, end);
-    List<Job> subjobs = spawnSubjobs(results, start, end, targetStorage);
+    List<Snapshot> snapshots = tsam.getSnapshotsByDateOrderedById(start, end);
+    List<Job> subjobs = spawnSubjobs(snapshots, start, end, targetStorage);
     return Integer.toString(subjobs.size());
   }
 
@@ -375,8 +372,8 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
       final Date end,
       final String targetStorage
   ) {
-    RichAResult results = tsam.getSnapshotsByIdAndDateOrderedByVersion(mpId, start, end, true);
-    MoveRecordInfo result = moveSnapshots(results, targetStorage);
+    List<Snapshot> snapshots = tsam.getSnapshotsByIdAndDateOrderedByVersion(mpId, start, end, true);
+    MoveRecordInfo result = moveSnapshots(snapshots, targetStorage);
     return result.toString();
   }
 
@@ -392,21 +389,17 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
    */
 
   private List<Job> spawnSubjobs(
-      final RichAResult records,
+      final List<Snapshot> snapshots,
       final Date start,
       final Date end,
       final String targetStorage
   ) {
     List<Job> jobs = new LinkedList<>();
     MoveRecordInfo recordInfo = new MoveRecordInfo();
-    records.forEach(new Consumer<ARecord>() {
-      @Override
-      public void accept(ARecord record) {
-        Snapshot snap = record.getSnapshot().get();
-        String mediaPackageId = snap.getMediaPackage().getIdentifier().toString();
-        if (recordInfo.isNewMpId(mediaPackageId)) {
-          jobs.add(moveByIdAndDate(mediaPackageId,start,end,targetStorage));
-        }
+    snapshots.forEach(snap -> {
+      String mediaPackageId = snap.getMediaPackage().getIdentifier().toString();
+      if (recordInfo.isNewMpId(mediaPackageId)) {
+        jobs.add(moveByIdAndDate(mediaPackageId,start,end,targetStorage));
       }
     });
     return jobs;
@@ -422,28 +415,24 @@ public class AssetManagerJobProducer extends AbstractJobProducer {
    * @return
    *  The {@link MoveRecordInfo}
    */
-  private MoveRecordInfo moveSnapshots(final RichAResult records, final String targetStorage) {
+  private MoveRecordInfo moveSnapshots(final List<Snapshot> snapshots, final String targetStorage) {
     final MoveRecordInfo result = new MoveRecordInfo();
-    records.forEach(new Consumer<ARecord>() {
-      @Override
-      public void accept(ARecord record) {
-        Snapshot snap = record.getSnapshot().get();
-          try {
-            logger.debug("moving Mediapackage {} Version {} from {} to {}",
-                snap.getMediaPackage().getIdentifier().toString(),
-                snap.getVersion().toString(),
-                snap.getStorageId(),
-                targetStorage
-            );
-            internalMoveByIdAndVersion(snap.getVersion(),
-                snap.getMediaPackage().getIdentifier().toString(),
-                targetStorage
-            );
-            result.addSuccess();
-          } catch (NotFoundException e) {
-            result.addFailed();
-            logger.warn(e.getMessage());
-          }
+    snapshots.forEach(snap -> {
+      try {
+        logger.debug("moving Mediapackage {} Version {} from {} to {}",
+            snap.getMediaPackage().getIdentifier().toString(),
+            snap.getVersion().toString(),
+            snap.getStorageId(),
+            targetStorage
+        );
+        internalMoveByIdAndVersion(snap.getVersion(),
+            snap.getMediaPackage().getIdentifier().toString(),
+            targetStorage
+        );
+        result.addSuccess();
+      } catch (NotFoundException e) {
+        result.addFailed();
+        logger.warn(e.getMessage());
       }
     });
     return result;

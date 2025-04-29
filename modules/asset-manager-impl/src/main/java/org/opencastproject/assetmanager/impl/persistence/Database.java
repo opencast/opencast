@@ -30,6 +30,7 @@ import org.opencastproject.assetmanager.impl.PartialMediaPackage;
 import org.opencastproject.assetmanager.impl.VersionImpl;
 import org.opencastproject.db.DBSession;
 import org.opencastproject.db.Queries;
+import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.util.data.Function;
 
@@ -50,6 +51,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -426,6 +428,148 @@ public class Database implements EntityPaths {
     });
   }
 
+  public Optional<Snapshot> getLatestSnapshot(String mediaPackageId) {
+    return getLatestSnapshot(mediaPackageId, null);
+  }
+
+  public Optional<Snapshot> getLatestSnapshot(String mediaPackageId, String orgId) {
+    return db.execTx(em -> {
+      Optional<SnapshotDto> snapshotDto = namedQuery.findOpt(
+          "Snapshot.findLatestVersionFirst",
+          SnapshotDto.class,
+          Pair.of("mediaPackageId", mediaPackageId),
+          Pair.of("organizationId", orgId)
+      ).apply(em);
+
+      if (snapshotDto.isEmpty()) {
+        return Optional.empty();
+      }
+
+      return Optional.of(snapshotDto.get().toSnapshot());
+    });
+  }
+  
+  public Optional<MediaPackage> getMediaPackage(String mediaPackageId) {
+    return getMediaPackage(mediaPackageId, null);
+  }
+  public Optional<MediaPackage> getMediaPackage(String mediaPackageId, String orgId) {
+    return getLatestSnapshot(mediaPackageId, orgId).map(Snapshot::getMediaPackage);
+  }
+
+  public List<Snapshot> getSnapshots(String mediaPackageId) {
+    return getSnapshots(mediaPackageId, null);
+  }
+
+  public List<Snapshot> getSnapshots(String mediaPackageId, String orgId) {
+    return getSnapshots(mediaPackageId, orgId, null);
+  }
+
+  public List<Snapshot> getSnapshots(String mediaPackageId, String orgId, String orderByVersion) {
+    return db.execTx(em -> {
+      String namedQueryName = "Snapshot.findByMpId";
+      if ("ASC".equals(orderByVersion)) {
+        namedQueryName = "Snapshot.findOldestVersionFirst";
+      }
+      if ("DESC".equals(orderByVersion)) {
+        namedQueryName = "Snapshot.findLatestVersionFirst";
+      }
+
+      List<SnapshotDto> snapshotDto = namedQuery.findAll(
+          namedQueryName,
+          SnapshotDto.class,
+          Pair.of("mediaPackageId", mediaPackageId),
+          Pair.of("organizationId", orgId)
+      ).apply(em);
+
+      return snapshotDtoToSnapshot(snapshotDto);
+    });
+  }
+
+  public List<Snapshot> getSnapshotsByMpIdAndVersion(String mediaPackageId, Long version, String orgId) {
+    return db.execTx(em -> {
+      List<SnapshotDto> snapshotDto = namedQuery.findAll(
+          "Snapshot.findByMpIdAndVersion",
+          SnapshotDto.class,
+          Pair.of("mediaPackageId", mediaPackageId),
+          Pair.of("version", version),
+          Pair.of("organizationId", orgId)
+      ).apply(em);
+
+      return snapshotDtoToSnapshot(snapshotDto);
+    });
+  }
+
+  public List<Snapshot> getSnapshotsByDate(Date start, Date end, String orgId) {
+    return db.execTx(em -> {
+      List<SnapshotDto> snapshotDto = namedQuery.findAll(
+          "Snapshot.findByDate",
+          SnapshotDto.class,
+          Pair.of("startDate", start),
+          Pair.of("endDate", end),
+          Pair.of("organizationId", orgId)
+      ).apply(em);
+
+      return snapshotDtoToSnapshot(snapshotDto);
+    });
+  }
+
+  public List<Snapshot> getSnapshotsByDateOrderByMpId(Date start, Date end, String orgId) {
+    return db.execTx(em -> {
+      List<SnapshotDto> snapshotDto = namedQuery.findAll(
+          "Snapshot.findByDateOrderByMpId",
+          SnapshotDto.class,
+          Pair.of("startDate", start),
+          Pair.of("endDate", end),
+          Pair.of("organizationId", orgId)
+      ).apply(em);
+
+      return snapshotDtoToSnapshot(snapshotDto);
+    });
+  }
+
+  public List<Snapshot> getSnapshotsByMpdIdAndDate(String mediaPackageId, Date start, Date end, String orgId) {
+    return getSnapshotsByMpdIdAndDate(mediaPackageId, start, end, orgId, null);
+  }
+
+  public List<Snapshot> getSnapshotsByMpdIdAndDate(String mediaPackageId, Date start, Date end, String orgId,
+      String orderByVersion) {
+    return db.execTx(em -> {
+      String namedQueryName = "Snapshot.findByMpIdAndDate";
+      if ("ASC".equals(orderByVersion)) {
+        namedQueryName = "Snapshot.findByMpIdAndDateOldestVersionFirst";
+      }
+      if ("DESC".equals(orderByVersion)) {
+        namedQueryName = "Snapshot.findByMpIdAndDateLatestVersionFirst";
+      }
+
+      List<SnapshotDto> snapshotDto = namedQuery.findAll(
+          namedQueryName,
+          SnapshotDto.class,
+          Pair.of("mediaPackageId", mediaPackageId),
+          Pair.of("startDate", start),
+          Pair.of("endDate", end),
+          Pair.of("organizationId", orgId)
+      ).apply(em);
+
+      return snapshotDtoToSnapshot(snapshotDto);
+    });
+  }
+
+  public List<Snapshot> getSnapshotsByNotStorageAndDate(String storageId, Date start, Date end, String orgId) {
+    return db.execTx(em -> {
+      List<SnapshotDto> snapshotDto = namedQuery.findAll(
+          "Snapshot.findByNotStorageAndDate",
+          SnapshotDto.class,
+          Pair.of("storageId", storageId),
+          Pair.of("startDate", start),
+          Pair.of("endDate", end),
+          Pair.of("organizationId", orgId)
+      ).apply(em);
+
+      return snapshotDtoToSnapshot(snapshotDto);
+    });
+  }
+
   //
   // Utility
   //
@@ -437,5 +581,11 @@ public class Database implements EntityPaths {
       throw new RuntimeException(
           "Used DTO outside of a persistence context or the DTO has not been assigned an ID yet.");
     }
+  }
+
+  private List<Snapshot> snapshotDtoToSnapshot(List<SnapshotDto> snapshotDtos) {
+    return snapshotDtos.stream()
+        .map(s -> s.toSnapshot())
+        .collect(Collectors.toList());
   }
 }

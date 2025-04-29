@@ -128,7 +128,7 @@ public interface AssetManager {
    * @return
    *   The {@link RichAResult} stream filtered by mediapackage ID
    */
-  RichAResult getSnapshotsById(String mpId);
+  List<Snapshot> getSnapshotsById(String mpId);
 
   /**
    * Returns a stream of {@link RichAResult} filtered by mediapackage IDs. This stream
@@ -141,7 +141,7 @@ public interface AssetManager {
    * @return
    *   The {@link RichAResult} stream filtered by mediapackage ID
    */
-  RichAResult getSnapshotsByIdOrderedByVersion(String mpId, boolean asc);
+  List<Snapshot> getSnapshotsByIdOrderedByVersion(String mpId, boolean asc);
 
   /**
    * Returns a stream of {@link RichAResult} filtered by mediapackage ID and version
@@ -153,7 +153,7 @@ public interface AssetManager {
    * @return
    *   The {@link RichAResult} stream filtered by mediapackage ID
    */
-  RichAResult getSnapshotsByIdAndVersion(String mpId, Version version);
+  List<Snapshot> getSnapshotsByIdAndVersion(String mpId, Version version);
 
   /**
    * Returns a stream of {@link RichAResult} filtered by date. This stream
@@ -166,7 +166,7 @@ public interface AssetManager {
    * @return
    *   The {@link RichAResult} stream filtered by date
    */
-  RichAResult getSnapshotsByDate(Date start, Date end);
+  List<Snapshot> getSnapshotsByDate(Date start, Date end);
 
   /**
    * Returns a stream of {@link RichAResult} filtered by date. This stream consists of all
@@ -179,7 +179,7 @@ public interface AssetManager {
    * @return
    *   The {@link RichAResult} stream filtered by date
    */
-  RichAResult getSnapshotsByDateOrderedById(Date start, Date end);
+  List<Snapshot> getSnapshotsByDateOrderedById(Date start, Date end);
 
   /**
    * Returns a stream of {@link RichAResult} filtered by date and mediapackage. This stream consists of all versions of
@@ -194,7 +194,7 @@ public interface AssetManager {
    * @return
    *   The {@link RichAResult} stream filtered by date
    */
-  RichAResult getSnapshotsByIdAndDate(String mpId, Date start, Date end);
+  List<Snapshot> getSnapshotsByIdAndDate(String mpId, Date start, Date end);
 
   /**
    * Returns a stream of {@link RichAResult} filtered by date and mediapackage. 
@@ -212,7 +212,7 @@ public interface AssetManager {
    * @return
    *   The {@link RichAResult} stream filtered by date
    */
-  RichAResult getSnapshotsByIdAndDateOrderedByVersion(String mpId, Date start, Date end, boolean asc);
+  List<Snapshot> getSnapshotsByIdAndDateOrderedByVersion(String mpId, Date start, Date end, boolean asc);
 
   /**
    * Take a versioned snapshot of a media package.

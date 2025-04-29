@@ -44,11 +44,8 @@ import org.opencastproject.assetmanager.api.PropertyId;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Value;
 import org.opencastproject.assetmanager.api.Version;
-import org.opencastproject.assetmanager.api.fn.Enrichments;
 import org.opencastproject.assetmanager.api.query.ADeleteQuery;
 import org.opencastproject.assetmanager.api.query.AQueryBuilder;
-import org.opencastproject.assetmanager.api.query.ARecord;
-import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.assetmanager.api.query.ASelectQuery;
 import org.opencastproject.assetmanager.api.query.Predicate;
 import org.opencastproject.assetmanager.api.query.RichAResult;
@@ -328,14 +325,22 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
   @Override
   public Optional<MediaPackage> getMediaPackage(String mediaPackageId) {
-    final AQueryBuilder q = createQuery();
-    final AResult r = q.select(q.snapshot()).where(q.mediaPackageId(mediaPackageId).and(q.version().isLatest()))
-            .run();
-
-    if (r.getSize() == 0) {
-      return Optional.empty();
+    String orgId = securityService.getOrganization().getId();
+    switch (isAdmin()) {
+      case GLOBAL:
+        return getDatabase().getMediaPackage(mediaPackageId);
+      case ORGANIZATION:
+        return getDatabase().getMediaPackage(mediaPackageId, orgId);
+      default:
+        Optional<MediaPackage> mp = getDatabase().getMediaPackage(mediaPackageId, orgId);
+        if (mp.isEmpty()) {
+          return mp;
+        }
+        if (authorizationService.hasPermission(mp.get(), "read")) {
+          return mp;
+        }
+        return Optional.empty();
     }
-    return Optional.of(r.getRecords().stream().findFirst().get().getSnapshot().get().getMediaPackage());
   }
 
   @Override
@@ -467,15 +472,28 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
   private Snapshot takeSnapshotInternal(MediaPackage mediaPackage) {
     final String mediaPackageId = mediaPackage.getIdentifier().toString();
-    AQueryBuilder queryBuilder = createQuery();
-    AResult result = queryBuilder.select(queryBuilder.snapshot())
-            .where(queryBuilder.mediaPackageId(mediaPackageId).and(queryBuilder.version().isLatest())).run();
-    Optional<ARecord> record = result.getRecords().stream().findFirst();
-    if (record.isPresent()) {
-      Optional<Snapshot> snapshot = Optional.of(record.get().getSnapshot().get());
-      if (snapshot.isPresent()) {
-        return takeSnapshotInternal(snapshot.get().getOwner(), mediaPackage);
-      }
+    String orgId = securityService.getOrganization().getId();
+    Optional<Snapshot> snapshot;
+    switch (isAdmin()) {
+      case GLOBAL:
+        snapshot = getDatabase().getLatestSnapshot(mediaPackageId);
+        break;
+      case ORGANIZATION:
+        snapshot = getDatabase().getLatestSnapshot(mediaPackageId, orgId);
+        break;
+      default:
+        Optional<Snapshot> snap = getDatabase().getLatestSnapshot(mediaPackageId, orgId);
+        if (snap.isEmpty()) {
+          snapshot = snap;
+        } else if (authorizationService.hasPermission(snap.get().getMediaPackage(), "read")) {
+          snapshot = snap;
+        } else {
+          snapshot = Optional.empty();
+        }
+        break;
+    }
+    if (snapshot.isPresent()) {
+      return takeSnapshotInternal(snapshot.get().getOwner(), mediaPackage);
     }
     return takeSnapshotInternal(DEFAULT_OWNER, mediaPackage);
   }
@@ -618,99 +636,205 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   @Override
-  public RichAResult getSnapshotsById(final String mpId) {
+  public List<Snapshot> getSnapshotsById(final String mpId) {
     RequireUtil.requireNotBlank(mpId, "mpId");
-    AQueryBuilder q = createQuery();
-    ASelectQuery query = baseQuery(q, mpId);
-    return Enrichments.enrich(query.run());
-  }
 
-  @Override
-  public RichAResult getSnapshotsByIdOrderedByVersion(String mpId, boolean asc) {
-    RequireUtil.requireNotBlank(mpId, "mpId");
-    AQueryBuilder q = createQuery();
-    ASelectQuery query = baseQuery(q, mpId);
-    if (asc) {
-      query = query.orderBy(q.version().asc());
-    } else {
-      query = query.orderBy(q.version().desc());
+    String orgId = securityService.getOrganization().getId();
+
+    switch (isAdmin()) {
+      case GLOBAL:
+        return getDatabase().getSnapshots(mpId);
+      case ORGANIZATION:
+        return getDatabase().getSnapshots(mpId, orgId);
+      default:
+        List<Snapshot> snapshots = new ArrayList<>();
+        List<Snapshot> snaps = getDatabase().getSnapshots(mpId, orgId);
+        for (int i = 0; i < snaps.size(); i++) {
+          if (authorizationService.hasPermission(snaps.get(i).getMediaPackage(), "read")) {
+            snapshots.add(snaps.get(i));
+          }
+        }
+        return snapshots;
     }
-    return Enrichments.enrich(query.run());
   }
 
   @Override
-  public RichAResult getSnapshotsByIdAndVersion(final String mpId, final Version version) {
+  public List<Snapshot> getSnapshotsByIdOrderedByVersion(String mpId, boolean asc) {
+    RequireUtil.requireNotBlank(mpId, "mpId");
+
+    String order;
+    if (asc) {
+      order = "ASC";
+    } else {
+      order = "DESC";
+    }
+
+    String orgId = securityService.getOrganization().getId();
+    switch (isAdmin()) {
+      case GLOBAL:
+        return getDatabase().getSnapshots(mpId, null, order);
+      case ORGANIZATION:
+        return getDatabase().getSnapshots(mpId, orgId, order);
+      default:
+        List<Snapshot> snapshots = new ArrayList<>();
+        List<Snapshot> snaps = getDatabase().getSnapshots(mpId, orgId, order);
+        for (int i = 0; i < snaps.size(); i++) {
+          if (authorizationService.hasPermission(snaps.get(i).getMediaPackage(), "read")) {
+            snapshots.add(snaps.get(i));
+          }
+        }
+        return snapshots;
+    }
+  }
+
+  @Override
+  public List<Snapshot> getSnapshotsByIdAndVersion(final String mpId, final Version version) {
     RequireUtil.requireNotBlank(mpId, "mpId");
     RequireUtil.notNull(version, "version");
-    AQueryBuilder q = createQuery();
-    ASelectQuery query = baseQuery(q, version, mpId);
-    return Enrichments.enrich(query.run());
-  }
 
-  @Override
-  public RichAResult getSnapshotsByDate(final Date start, final Date end) {
-    RequireUtil.notNull(start, "start");
-    RequireUtil.notNull(end, "end");
-    AQueryBuilder q = createQuery();
-    ASelectQuery query = baseQuery(q).where(q.archived().ge(start)).where(q.archived().le(end));
-    return Enrichments.enrich(query.run());
-  }
-
-  @Override
-  public RichAResult getSnapshotsByDateOrderedById(Date start, Date end) {
-    RequireUtil.notNull(start, "start");
-    RequireUtil.notNull(end, "end");
-    AQueryBuilder q = createQuery();
-    ASelectQuery query = baseQuery(q).where(q.archived().ge(start)).where(q.archived().le(end));
-    return Enrichments.enrich(query.orderBy(q.mediapackageId().asc()).run());
-  }
-
-  @Override
-  public RichAResult getSnapshotsByIdAndDate(final String mpId, final Date start, final Date end) {
-    RequireUtil.requireNotBlank(mpId, "mpId");
-    RequireUtil.notNull(start, "start");
-    RequireUtil.notNull(end, "end");
-    AQueryBuilder q = createQuery();
-    ASelectQuery query = baseQuery(q, mpId).where(q.archived().ge(start)).where(q.archived().le(end));
-    return Enrichments.enrich(query.run());
-  }
-
-  @Override
-  public RichAResult getSnapshotsByIdAndDateOrderedByVersion(String mpId, Date start, Date end, boolean asc) {
-    RequireUtil.requireNotBlank(mpId, "mpId");
-    RequireUtil.notNull(start, "start");
-    RequireUtil.notNull(end, "end");
-    AQueryBuilder q = createQuery();
-    ASelectQuery query = baseQuery(q, mpId).where(q.archived().ge(start)).where(q.archived().le(end));
-    if (asc) {
-      query = query.orderBy(q.version().asc());
-    } else {
-      query = query.orderBy(q.version().desc());
+    String orgId = securityService.getOrganization().getId();
+    // TODO: Simplify the version class?
+    Long v = Long.parseLong(version.toString());
+    switch (isAdmin()) {
+      case GLOBAL:
+        return getDatabase().getSnapshotsByMpIdAndVersion(mpId, v, null);
+      case ORGANIZATION:
+        return getDatabase().getSnapshotsByMpIdAndVersion(mpId, v, orgId);
+      default:
+        List<Snapshot> snapshots = new ArrayList<>();
+        List<Snapshot> snaps = getDatabase().getSnapshotsByMpIdAndVersion(mpId, v, orgId);
+        for (int i = 0; i < snaps.size(); i++) {
+          if (authorizationService.hasPermission(snaps.get(i).getMediaPackage(), "read")) {
+            snapshots.add(snaps.get(i));
+          }
+        }
+        return snapshots;
     }
-    return Enrichments.enrich(query.run());
+  }
+
+  @Override
+  public List<Snapshot> getSnapshotsByDate(final Date start, final Date end) {
+    RequireUtil.notNull(start, "start");
+    RequireUtil.notNull(end, "end");
+
+    String orgId = securityService.getOrganization().getId();
+
+    switch (isAdmin()) {
+      case GLOBAL:
+        return getDatabase().getSnapshotsByDate(start, end, null);
+      case ORGANIZATION:
+        return getDatabase().getSnapshotsByDate(start, end, orgId);
+      default:
+        List<Snapshot> snapshots = new ArrayList<>();
+        List<Snapshot> snaps = getDatabase().getSnapshotsByDate(start, end, orgId);
+        for (int i = 0; i < snaps.size(); i++) {
+          if (authorizationService.hasPermission(snaps.get(i).getMediaPackage(), "read")) {
+            snapshots.add(snaps.get(i));
+          }
+        }
+        return snapshots;
+    }
+  }
+
+  @Override
+  public List<Snapshot> getSnapshotsByDateOrderedById(Date start, Date end) {
+    RequireUtil.notNull(start, "start");
+    RequireUtil.notNull(end, "end");
+
+    String orgId = securityService.getOrganization().getId();
+    switch (isAdmin()) {
+      case GLOBAL:
+        return getDatabase().getSnapshotsByDateOrderByMpId(start, end, null);
+      case ORGANIZATION:
+        return getDatabase().getSnapshotsByDateOrderByMpId(start, end, orgId);
+      default:
+        List<Snapshot> snapshots = new ArrayList<>();
+        List<Snapshot> snaps = getDatabase().getSnapshotsByDateOrderByMpId(start, end, orgId);
+        for (int i = 0; i < snaps.size(); i++) {
+          if (authorizationService.hasPermission(snaps.get(i).getMediaPackage(), "read")) {
+            snapshots.add(snaps.get(i));
+          }
+        }
+        return snapshots;
+    }
+  }
+
+  @Override
+  public List<Snapshot> getSnapshotsByIdAndDate(final String mpId, final Date start, final Date end) {
+    RequireUtil.requireNotBlank(mpId, "mpId");
+    RequireUtil.notNull(start, "start");
+    RequireUtil.notNull(end, "end");
+
+    String orgId = securityService.getOrganization().getId();
+    switch (isAdmin()) {
+      case GLOBAL:
+        return getDatabase().getSnapshotsByMpdIdAndDate(mpId, start, end, null);
+      case ORGANIZATION:
+        return getDatabase().getSnapshotsByMpdIdAndDate(mpId, start, end, orgId);
+      default:
+        List<Snapshot> snapshots = new ArrayList<>();
+        List<Snapshot> snaps = getDatabase().getSnapshotsByMpdIdAndDate(mpId, start, end, orgId);
+        for (int i = 0; i < snaps.size(); i++) {
+          if (authorizationService.hasPermission(snaps.get(i).getMediaPackage(), "read")) {
+            snapshots.add(snaps.get(i));
+          }
+        }
+        return snapshots;
+    }
+  }
+
+  @Override
+  public List<Snapshot> getSnapshotsByIdAndDateOrderedByVersion(String mpId, Date start, Date end, boolean asc) {
+    RequireUtil.requireNotBlank(mpId, "mpId");
+    RequireUtil.notNull(start, "start");
+    RequireUtil.notNull(end, "end");
+
+    String order;
+    if (asc) {
+      order = "ASC";
+    } else {
+      order = "DESC";
+    }
+
+    String orgId = securityService.getOrganization().getId();
+    switch (isAdmin()) {
+      case GLOBAL:
+        return getDatabase().getSnapshotsByMpdIdAndDate(mpId, start, end, null, order);
+      case ORGANIZATION:
+        return getDatabase().getSnapshotsByMpdIdAndDate(mpId, start, end, orgId, order);
+      default:
+        List<Snapshot> snapshots = new ArrayList<>();
+        List<Snapshot> snaps = getDatabase().getSnapshotsByMpdIdAndDate(mpId, start, end, orgId, order);
+        for (int i = 0; i < snaps.size(); i++) {
+          if (authorizationService.hasPermission(snaps.get(i).getMediaPackage(), "read")) {
+            snapshots.add(snaps.get(i));
+          }
+        }
+        return snapshots;
+    }
   }
 
   @Override
   public void moveSnapshotsById(final String mpId, final String targetStore) throws NotFoundException {
-    RichAResult results = getSnapshotsById(mpId);
+    List<Snapshot> snapshots = getSnapshotsById(mpId);
 
-    if (results.getRecords().isEmpty()) {
+    if (snapshots.isEmpty()) {
       throw new NotFoundException("Mediapackage " + mpId + " not found!");
     }
 
-    processOperations(results, targetStore);
+    processOperations(snapshots, targetStore);
   }
 
   @Override
   public void moveSnapshotsByIdAndVersion(final String mpId, final Version version, final String targetStore)
           throws NotFoundException {
-    RichAResult results = getSnapshotsByIdAndVersion(mpId, version);
+    List<Snapshot> snapshots = getSnapshotsByIdAndVersion(mpId, version);
 
-    if (results.getRecords().isEmpty()) {
+    if (snapshots.isEmpty()) {
       throw new NotFoundException("Mediapackage " + mpId + "@" + version.toString() + " not found!");
     }
 
-    processOperations(results, targetStore);
+    processOperations(snapshots, targetStore);
   }
 
   @Override
@@ -718,30 +842,42 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
           throws NotFoundException {
     // We don't use #getSnapshotsByDate() as this includes also all snapshots already in targetStore. On large installs
     // this could lead to memory overflow.
-    AQueryBuilder q = createQuery();
-    ASelectQuery query = baseQuery(q)
-        .where(q.storage(targetStore).not())
-        .where(q.archived().ge(start))
-        .where(q.archived().le(end));
-    RichAResult results = Enrichments.enrich(query.run());
+    String orgId = securityService.getOrganization().getId();
+    List<Snapshot> snapshots = new ArrayList<>();
+    switch (isAdmin()) {
+      case GLOBAL:
+        snapshots = getDatabase().getSnapshotsByNotStorageAndDate(targetStore, start, end, null);
+        break;
+      case ORGANIZATION:
+        snapshots = getDatabase().getSnapshotsByNotStorageAndDate(targetStore, start, end, orgId);
+        break;
+      default:
+        List<Snapshot> snaps = getDatabase().getSnapshotsByNotStorageAndDate(targetStore, start, end, orgId);
+        for (int i = 0; i < snaps.size(); i++) {
+          if (authorizationService.hasPermission(snaps.get(i).getMediaPackage(), "read")) {
+            snapshots.add(snaps.get(i));
+          }
+        }
+        break;
+    }
 
-    if (results.getRecords().isEmpty()) {
+    if (snapshots.isEmpty()) {
       throw new NotFoundException("No media packages found between " + start + " and " + end);
     }
 
-    processOperations(results, targetStore);
+    processOperations(snapshots, targetStore);
   }
 
   @Override
   public void moveSnapshotsByIdAndDate(final String mpId, final Date start, final Date end, final String targetStore)
           throws NotFoundException {
-    RichAResult results = getSnapshotsByIdAndDate(mpId, start, end);
+    List<Snapshot> snapshots = getSnapshotsByIdAndDate(mpId, start, end);
 
-    if (results.getRecords().isEmpty()) {
+    if (snapshots.isEmpty()) {
       throw new NotFoundException("No media package with id " + mpId + " found between " + start + " and " + end);
     }
 
-    processOperations(results, targetStore);
+    processOperations(snapshots, targetStore);
   }
 
   @Override
@@ -749,19 +885,19 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
           throws NotFoundException {
 
     //Find the snapshot
-    AQueryBuilder q = createQuery();
-    RichAResult results = Enrichments.enrich(baseQuery(q, version, mpId).run());
+    List<Snapshot> snapshots = getSnapshotsByIdAndVersion(mpId, version);
 
-    if (results.getRecords().isEmpty()) {
+    if (snapshots.isEmpty()) {
       throw new NotFoundException("Mediapackage " + mpId + "@" + version.toString() + " not found!");
     }
-    processOperations(results, storeId);
+    processOperations(snapshots, storeId);
   }
 
   //Do the actual moving
-  private void processOperations(final RichAResult results, final String targetStoreId) {
-    results.getRecords().forEach(record -> {
-      Snapshot s = record.getSnapshot().get();
+  //TODO: Compare this to AssetManagerJobProducer.moveSnapshots. Check if they can be combined.
+  private void processOperations(List<Snapshot> snapshots, final String targetStoreId) {
+    snapshots.forEach(s -> {
+//      Snapshot s = record.getSnapshot().get();
       Optional<String> currentStoreId = getSnapshotStorageLocation(s);
 
       if (currentStoreId.isEmpty()) {
@@ -829,9 +965,9 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
   // Return the asset store ID that is currently storing the snapshot
   public Optional<String> getSnapshotStorageLocation(final Version version, final String mpId) {
-    RichAResult result = getSnapshotsByIdAndVersion(mpId, version);
+    List<Snapshot> snapshots = getSnapshotsByIdAndVersion(mpId, version);
 
-    for (Snapshot snapshot : result.getSnapshots()) {
+    for (Snapshot snapshot : snapshots) {
       return Optional.of(snapshot.getStorageId());
     }
 

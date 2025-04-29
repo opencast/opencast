@@ -91,6 +91,76 @@ import javax.persistence.UniqueConstraint;
             + "AND (p.namespace = :namespace AND p.propertyName = :propertyName OR p.namespace IS NULL) "
             + "WHERE s.mediaPackageId = :mediaPackageId"
         ),
+        @NamedQuery(
+            name = "Snapshot.findLatestVersionFirst",
+            query = "SELECT s FROM Snapshot s "
+                + "WHERE s.mediaPackageId = :mediaPackageId "
+                + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
+                + "ORDER BY s.version DESC"
+        ),
+        @NamedQuery(
+            name = "Snapshot.findByMpId",
+            query = "SELECT s FROM Snapshot s "
+                + "WHERE s.mediaPackageId = :mediaPackageId "
+                + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
+        ),
+        @NamedQuery(
+            name = "Snapshot.findOldestVersionFirst",
+            query = "SELECT s FROM Snapshot s "
+                + "WHERE s.mediaPackageId = :mediaPackageId "
+                + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
+                + "ORDER BY s.version ASC"
+        ),
+        @NamedQuery(
+            name = "Snapshot.findByMpIdAndVersion",
+            query = "SELECT s FROM Snapshot s "
+                + "WHERE s.mediaPackageId = :mediaPackageId "
+                + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
+                + "AND s.version = :version"
+        ),
+        @NamedQuery(
+            name = "Snapshot.findByDate",
+            query = "SELECT s FROM Snapshot s "
+                + "WHERE s.archivalDate BETWEEN :startDate AND :endDate "
+                + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
+        ),
+        @NamedQuery(
+            name = "Snapshot.findByDateOrderByMpId",
+            query = "SELECT s FROM Snapshot s "
+                + "WHERE s.archivalDate BETWEEN :startDate AND :endDate "
+                + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
+                + "ORDER BY s.mediaPackageId ASC"
+        ),
+        @NamedQuery(
+            name = "Snapshot.findByMpIdAndDate",
+            query = "SELECT s FROM Snapshot s "
+                + "WHERE s.mediaPackageId = :mediaPackageId "
+                + "AND s.archivalDate BETWEEN :startDate AND :endDate "
+                + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
+        ),
+        @NamedQuery(
+            name = "Snapshot.findByMpIdAndDateLatestVersionFirst",
+            query = "SELECT s FROM Snapshot s "
+                + "WHERE s.mediaPackageId = :mediaPackageId "
+                + "AND s.archivalDate BETWEEN :startDate AND :endDate "
+                + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
+                + "ORDER BY s.version DESC"
+        ),
+        @NamedQuery(
+            name = "Snapshot.findByMpIdAndDateOldestVersionFirst",
+            query = "SELECT s FROM Snapshot s "
+                + "WHERE s.mediaPackageId = :mediaPackageId "
+                + "AND s.archivalDate BETWEEN :startDate AND :endDate "
+                + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
+                + "ORDER BY s.version ASC"
+        ),
+        @NamedQuery(
+            name = "Snapshot.findByNotStorageAndDate",
+            query = "SELECT s FROM Snapshot s "
+                + "WHERE s.storageId != :storageId "
+                + "AND s.archivalDate BETWEEN :startDate AND :endDate "
+                + "AND (:organizationId IS NULL OR s.organizationId = :organizationId)"
+        ),
 })
 // Maintain own generator to support database migrations from Archive to AssetManager
 // The generator's initial value has to be set after the data migration.
