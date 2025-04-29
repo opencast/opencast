@@ -156,19 +156,6 @@ public interface AssetManager {
   List<Snapshot> getSnapshotsByIdAndVersion(String mpId, Version version);
 
   /**
-   * Returns a stream of {@link RichAResult} filtered by date. This stream
-   * consists of all versions of all mediapackages archived within the date range.
-   *
-   * @param start
-   *   The start {@link Date} to filter by
-   * @param end
-   *   The end{@link Date} to filter by
-   * @return
-   *   The {@link RichAResult} stream filtered by date
-   */
-  List<Snapshot> getSnapshotsByDate(Date start, Date end);
-
-  /**
    * Returns a stream of {@link RichAResult} filtered by date. This stream consists of all
    * a mediapackages which have at least one version archived within the date range.
    *

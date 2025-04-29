@@ -713,30 +713,6 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   @Override
-  public List<Snapshot> getSnapshotsByDate(final Date start, final Date end) {
-    RequireUtil.notNull(start, "start");
-    RequireUtil.notNull(end, "end");
-
-    String orgId = securityService.getOrganization().getId();
-
-    switch (isAdmin()) {
-      case GLOBAL:
-        return getDatabase().getSnapshotsByDate(start, end, null);
-      case ORGANIZATION:
-        return getDatabase().getSnapshotsByDate(start, end, orgId);
-      default:
-        List<Snapshot> snapshots = new ArrayList<>();
-        List<Snapshot> snaps = getDatabase().getSnapshotsByDate(start, end, orgId);
-        for (int i = 0; i < snaps.size(); i++) {
-          if (authorizationService.hasPermission(snaps.get(i).getMediaPackage(), "read")) {
-            snapshots.add(snaps.get(i));
-          }
-        }
-        return snapshots;
-    }
-  }
-
-  @Override
   public List<Snapshot> getSnapshotsByDateOrderedById(Date start, Date end) {
     RequireUtil.notNull(start, "start");
     RequireUtil.notNull(end, "end");
@@ -840,8 +816,6 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   @Override
   public void moveSnapshotsByDate(final Date start, final Date end, final String targetStore)
           throws NotFoundException {
-    // We don't use #getSnapshotsByDate() as this includes also all snapshots already in targetStore. On large installs
-    // this could lead to memory overflow.
     String orgId = securityService.getOrganization().getId();
     List<Snapshot> snapshots = new ArrayList<>();
     switch (isAdmin()) {

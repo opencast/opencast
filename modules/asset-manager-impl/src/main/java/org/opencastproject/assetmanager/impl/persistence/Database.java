@@ -448,7 +448,7 @@ public class Database implements EntityPaths {
       return Optional.of(snapshotDto.get().toSnapshot());
     });
   }
-  
+
   public Optional<MediaPackage> getMediaPackage(String mediaPackageId) {
     return getMediaPackage(mediaPackageId, null);
   }
@@ -492,20 +492,6 @@ public class Database implements EntityPaths {
           SnapshotDto.class,
           Pair.of("mediaPackageId", mediaPackageId),
           Pair.of("version", version),
-          Pair.of("organizationId", orgId)
-      ).apply(em);
-
-      return snapshotDtoToSnapshot(snapshotDto);
-    });
-  }
-
-  public List<Snapshot> getSnapshotsByDate(Date start, Date end, String orgId) {
-    return db.execTx(em -> {
-      List<SnapshotDto> snapshotDto = namedQuery.findAll(
-          "Snapshot.findByDate",
-          SnapshotDto.class,
-          Pair.of("startDate", start),
-          Pair.of("endDate", end),
           Pair.of("organizationId", orgId)
       ).apply(em);
 

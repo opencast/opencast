@@ -119,12 +119,6 @@ import javax.persistence.UniqueConstraint;
                 + "AND s.version = :version"
         ),
         @NamedQuery(
-            name = "Snapshot.findByDate",
-            query = "SELECT s FROM Snapshot s "
-                + "WHERE s.archivalDate BETWEEN :startDate AND :endDate "
-                + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
-        ),
-        @NamedQuery(
             name = "Snapshot.findByDateOrderByMpId",
             query = "SELECT s FROM Snapshot s "
                 + "WHERE s.archivalDate BETWEEN :startDate AND :endDate "
