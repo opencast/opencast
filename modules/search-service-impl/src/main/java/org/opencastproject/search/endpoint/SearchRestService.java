@@ -21,6 +21,14 @@
 
 package org.opencastproject.search.endpoint;
 
+import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
+import static org.opencastproject.util.RestUtil.R.forbidden;
+import static org.opencastproject.util.RestUtil.R.noContent;
+import static org.opencastproject.util.RestUtil.R.notFound;
+import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
+
 import org.opencastproject.job.api.JobProducer;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
@@ -33,10 +41,12 @@ import org.opencastproject.search.impl.SearchServiceIndex;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.security.urlsigning.utils.UrlSigningServiceOsgiUtil;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -63,10 +73,13 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -453,6 +466,40 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
         "limit", size));
 
     return Response.ok(json).build();
+  }
+
+  @POST
+  @Path("updateIndex")
+  @RestQuery(name = "updateIndex",
+          description = "Trigger search index update for event. The usage of this is limited to global administrators.",
+          restParameters = {
+                  @RestParameter(
+                          name = "id",
+                          isRequired = true,
+                          type = STRING,
+                          description = "The event ID to trigger an index update for.")},
+          responses = {
+                  @RestResponse(
+                          description = "Update successfully triggered.",
+                          responseCode = SC_NO_CONTENT),
+                  @RestResponse(
+                          description = "Not allowed to trigger update.",
+                          responseCode = SC_FORBIDDEN),
+                  @RestResponse(
+                          description = "No such event found.",
+                          responseCode = SC_NOT_FOUND)},
+          returnDescription = "No content is returned.")
+  public Response indexUpdate(@FormParam("id") final String id) {
+    try {
+      searchIndex.indexMediaPackage(id);
+      return noContent();
+    } catch (UnauthorizedException e) {
+      return forbidden();
+    } catch (NotFoundException e) {
+      return notFound();
+    } catch (Exception e) {
+      throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
+    }
   }
 
   /**

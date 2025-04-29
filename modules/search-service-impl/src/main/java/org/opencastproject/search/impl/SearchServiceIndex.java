@@ -265,6 +265,22 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
     indexMediaPackage(mediaPackage, acl);
   }
 
+  public void indexMediaPackage(String mediaPackageId)
+          throws SearchException, SearchServiceDatabaseException, UnauthorizedException, NotFoundException {
+    if (!securityService.getUser().hasRole("ROLE_ADMIN")) {
+      throw new UnauthorizedException("Only global administrators may trigger manual event updates.");
+    }
+    try {
+      MediaPackage mp = persistence.getMediaPackage(mediaPackageId);
+      AccessControlList acl = persistence.getAccessControlList(mediaPackageId);
+      Date modificationDate = persistence.getModificationDate(mediaPackageId);
+      Date deletionDate = persistence.getDeletionDate(mediaPackageId);
+      indexMediaPackage(mp, acl, modificationDate, deletionDate);
+    } catch (RuntimeException e) {
+      logSkippingElement(logger, "event", mediaPackageId, e);
+    }
+  }
+
   private void indexMediaPackage(MediaPackage mediaPackage, AccessControlList acl)
           throws SearchException, SearchServiceDatabaseException {
     indexMediaPackage(mediaPackage, acl, null, null);
