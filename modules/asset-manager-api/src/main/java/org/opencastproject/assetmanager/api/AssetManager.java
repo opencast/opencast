@@ -205,6 +205,8 @@ public interface AssetManager {
 
   int deleteSnapshots(String mpId);
 
+  int deleteAllButLatestSnapshot(String mpId);
+
   /**
    * Take a versioned snapshot of a media package.
    * <p>

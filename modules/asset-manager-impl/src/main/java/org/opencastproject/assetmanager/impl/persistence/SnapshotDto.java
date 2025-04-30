@@ -170,6 +170,15 @@ import javax.persistence.UniqueConstraint;
                 + "WHERE s.mediaPackageId = :mediaPackageId "
                 + "AND s.organizationId = :organizationId "
         ),
+        @NamedQuery(
+            name = "Snapshot.deleteAllButLatest",
+            query = "DELETE FROM Snapshot s "
+                + "WHERE s.mediaPackageId = :mediaPackageId "
+                + "AND s.organizationId = :organizationId "
+                + "AND s.version < ( "
+                + "  SELECT MAX(s2.version) FROM Snapshot s2 WHERE s2.mediaPackageId = :mediaPackageId "
+                + ") "
+    ),
 })
 // Maintain own generator to support database migrations from Archive to AssetManager
 // The generator's initial value has to be set after the data migration.

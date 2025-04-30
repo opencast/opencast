@@ -826,6 +826,23 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   @Override
+  public int deleteAllButLatestSnapshot(String mpId) {
+    String orgId = securityService.getOrganization().getId();
+    switch (isAdmin()) {
+      case GLOBAL:
+        return getDatabase().deleteAllButLatestSnapshot(mpId, null);
+      case ORGANIZATION:
+        return getDatabase().deleteAllButLatestSnapshot(mpId, orgId);
+      default:
+        Optional<MediaPackage> mediaPackage = getDatabase().getMediaPackage(mpId);
+        if (mediaPackage.isPresent() && authorizationService.hasPermission(mediaPackage.get(), "read")) {
+          return getDatabase().deleteAllButLatestSnapshot(mpId, orgId);
+        }
+        return 0;
+    }
+  }
+
+  @Override
   public void moveSnapshotsById(final String mpId, final String targetStore) throws NotFoundException {
     List<Snapshot> snapshots = getSnapshotsById(mpId);
 
