@@ -342,6 +342,26 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   @Override
+  public Optional<Snapshot> getLatestSnapshot(String mediaPackageId) {
+    String orgId = securityService.getOrganization().getId();
+    switch (isAdmin()) {
+      case GLOBAL:
+        return getDatabase().getLatestSnapshot(mediaPackageId);
+      case ORGANIZATION:
+        return getDatabase().getLatestSnapshot(mediaPackageId, orgId);
+      default:
+        Optional<Snapshot> snapshot = getDatabase().getLatestSnapshot(mediaPackageId, orgId);
+        if (snapshot.isEmpty()) {
+          return snapshot;
+        }
+        if (authorizationService.hasPermission(snapshot.get().getMediaPackage(), "read")) {
+          return snapshot;
+        }
+        return Optional.empty();
+    }
+  }
+
+  @Override
   public Optional<Asset> getAsset(Version version, String mpId, String mpElementId) {
     if (isAuthorized(mpId, READ_ACTION)) {
       // try to fetch the asset
