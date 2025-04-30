@@ -789,6 +789,23 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   @Override
+  public int deleteSnapshots(String mpId) {
+    String orgId = securityService.getOrganization().getId();
+    switch (isAdmin()) {
+      case GLOBAL:
+        return getDatabase().deleteSnapshots(mpId, null);
+      case ORGANIZATION:
+        return getDatabase().deleteSnapshots(mpId, orgId);
+      default:
+        Optional<MediaPackage> mediaPackage = getDatabase().getMediaPackage(mpId);
+        if (mediaPackage.isPresent() && authorizationService.hasPermission(mediaPackage.get(), "read")) {
+          return getDatabase().deleteSnapshots(mpId, orgId);
+        }
+        return 0;
+    }
+  }
+
+  @Override
   public void moveSnapshotsById(final String mpId, final String targetStore) throws NotFoundException {
     List<Snapshot> snapshots = getSnapshotsById(mpId);
 

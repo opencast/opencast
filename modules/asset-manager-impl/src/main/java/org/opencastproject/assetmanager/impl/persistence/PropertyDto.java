@@ -58,7 +58,8 @@ import javax.persistence.TypedQuery;
     @Index(name = "IX_oc_assets_properties_property_name", columnList = ("property_name")) })
 @NamedQueries({
     @NamedQuery(name = "Property.selectByMediaPackageAndNamespace", query = "select p from Property p where "
-            + "p.mediaPackageId = :mediaPackageId and p.namespace = :namespace"),
+            + "p.mediaPackageId = :mediaPackageId "
+            + "AND (:namespace IS NULL OR p.namespace = :namespace)"),
     @NamedQuery(name = "Property.delete", query = "delete from Property p where p.mediaPackageId = :mediaPackageId"),
     @NamedQuery(name = "Property.deleteByNamespace", query = "delete from Property p "
             + "where p.mediaPackageId = :mediaPackageId and p.namespace = :namespace")})

@@ -485,6 +485,16 @@ public class Database implements EntityPaths {
     });
   }
 
+  public int deleteSnapshots(String mediaPackageId, String orgId) {
+    return db.execTx(em -> {
+      return namedQuery.delete(
+          "Snapshot.delete",
+          Pair.of("mediaPackageId", mediaPackageId),
+          Pair.of("organizationId", orgId)
+      ).apply(em);
+    });
+  }
+
   public List<Snapshot> getSnapshotsByMpIdAndVersion(String mediaPackageId, Long version, String orgId) {
     return db.execTx(em -> {
       List<SnapshotDto> snapshotDto = namedQuery.findAll(

@@ -201,6 +201,8 @@ public interface AssetManager {
    */
   List<Snapshot> getSnapshotsByIdAndDateOrderedByVersion(String mpId, Date start, Date end, boolean asc);
 
+  int deleteSnapshots(String mpId);
+
   /**
    * Take a versioned snapshot of a media package.
    * <p>

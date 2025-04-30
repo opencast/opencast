@@ -164,6 +164,12 @@ import javax.persistence.UniqueConstraint;
             + ") "
             + "ORDER BY s.mediaPackageId DESC "
         ),
+        @NamedQuery(
+            name = "Snapshot.delete",
+            query = "DELETE FROM Snapshot s "
+                + "WHERE s.mediaPackageId = :mediaPackageId "
+                + "AND s.organizationId = :organizationId "
+        ),
 })
 // Maintain own generator to support database migrations from Archive to AssetManager
 // The generator's initial value has to be set after the data migration.
