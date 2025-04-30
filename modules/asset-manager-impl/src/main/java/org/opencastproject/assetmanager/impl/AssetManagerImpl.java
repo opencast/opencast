@@ -809,6 +809,29 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   @Override
+  public List<Snapshot> getLatestSnapshotsBySeriesId(final String seriesId) {
+    RequireUtil.requireNotBlank(seriesId, "seriesId");
+
+    String orgId = securityService.getOrganization().getId();
+
+    switch (isAdmin()) {
+      case GLOBAL:
+        return getDatabase().getSnapshotsBySeries(seriesId, null);
+      case ORGANIZATION:
+        return getDatabase().getSnapshotsBySeries(seriesId, orgId);
+      default:
+        List<Snapshot> snapshots = new ArrayList<>();
+        List<Snapshot> snaps = getDatabase().getSnapshotsBySeries(seriesId, orgId);
+        for (int i = 0; i < snaps.size(); i++) {
+          if (authorizationService.hasPermission(snaps.get(i).getMediaPackage(), "read")) {
+            snapshots.add(snaps.get(i));
+          }
+        }
+        return snapshots;
+    }
+  }
+
+  @Override
   public int deleteSnapshots(String mpId) {
     String orgId = securityService.getOrganization().getId();
     switch (isAdmin()) {

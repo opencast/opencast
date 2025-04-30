@@ -576,6 +576,19 @@ public class Database implements EntityPaths {
     });
   }
 
+  public List<Snapshot> getSnapshotsBySeries(String mediaPackageId, String orgId) {
+    return db.execTx(em -> {
+      List<SnapshotDto> snapshotDto = namedQuery.findAll(
+          "Snapshot.findBySeriesIdLatestVersionFirst",
+          SnapshotDto.class,
+          Pair.of("mediaPackageId", mediaPackageId),
+          Pair.of("organizationId", orgId)
+      ).apply(em);
+
+      return snapshotDtoToSnapshot(snapshotDto);
+    });
+  }
+
   public List<Snapshot> getSnapshotsForIndexRebuild(int offset, int limit) {
     return db.execTx(em -> {
       List<SnapshotDto> snapshotDto = namedQuery.findSome(
