@@ -8,7 +8,7 @@
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
     "axios": "^1.8.4",
-    "bootstrap": "^5.3.3",
+    "bootstrap": "^5.3.5",
     "i18next": "^23.16.4",
     "i18next-browser-languagedetector": "^8.0.4",
     "iframe-resizer": "^5.4.2",
