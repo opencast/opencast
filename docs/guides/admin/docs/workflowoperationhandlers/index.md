@@ -24,7 +24,6 @@ The following table contains the workflow operations that are available in an ou
 | Operation Handler                    | Description                                                                               | Details                                                      |
 |--------------------------------------|-------------------------------------------------------------------------------------------|--------------------------------------------------------------|
 | add-catalog                          | Add a catalog to the media package                                                        | [Documentation](add-catalog-woh.md)                          |
-| analyze-audio                        | Analyze first audio stream                                                                | [Documentation](analyzeaudio-woh.md)                         |
 | analyze-tracks                       | Analyze tracks in media package                                                           | [Documentation](analyze-tracks-woh.md)                       |
 | analyze-mediapackage                 | Analyze media package                                                                     | [Documentation](analyze-mediapackage-woh.md)                 |
 | amberscript-start-transcription      | Start AmberScript Transcription                                                           | [Documentation](amberscript-start-transcription-woh.md)      |
@@ -72,7 +71,6 @@ The following table contains the workflow operations that are available in an ou
 | microsoft-azure-start-transcription  | Start Microsoft Azure Transcription                                                       | [Documentation](microsoft-azure-start-transcription-woh.md)  |
 | move-storage                         | Move files between asset manager storage systems                                          | [Documentation](move-storage-woh.md)                         |
 | multiencode                          | Encode to multiple profiles in one operation                                              | [Documentation](multiencode-woh.md)                          |
-| normalize-audio                      | Normalize first audio stream                                                              | [Documentation](normalizeaudio-woh.md)                       |
 | partial-import                       | Import partial tracks and process according to a SMIL document                            | [Documentation](partial-import-woh.md)                       |
 | post-mediapackage                    | Send mediapackage to remote service                                                       | [Documentation](postmediapackage-woh.md)                     |
 | prepare-av                           | Preparing audio and video work versions                                                   | [Documentation](prepareav-woh.md)                            |
