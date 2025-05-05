@@ -138,8 +138,6 @@ public class AssetManagerMessagingTest extends AssetManagerTestBase {
           int deleteEpisodeMsgCount,
           Fx<String[]> deleteQuery)
           throws Exception {
-    q = am.createQuery();
-    assertThat(q, instanceOf(AQueryBuilderDecorator.class));
     // expect add messages
     expectObjectMessage(handler1, TakeSnapshot.class, mpCount * versionCount);
     // expect delete messages
