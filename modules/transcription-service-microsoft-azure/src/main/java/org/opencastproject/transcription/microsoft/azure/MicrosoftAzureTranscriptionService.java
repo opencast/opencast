@@ -22,9 +22,7 @@
 package org.opencastproject.transcription.microsoft.azure;
 
 import org.opencastproject.assetmanager.api.AssetManager;
-import org.opencastproject.assetmanager.api.fn.Enrichments;
-import org.opencastproject.assetmanager.api.query.AQueryBuilder;
-import org.opencastproject.assetmanager.api.query.AResult;
+import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.util.Workflows;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
@@ -89,6 +87,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -621,15 +620,14 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
     securityService.setUser(SecurityUtil.createSystemUser(systemAccount, defaultOrg));
 
     // Find the episode
-    final AQueryBuilder q = assetManager.createQuery();
-    final AResult r = q.select(q.snapshot()).where(q.mediaPackageId(mpId).and(q.version().isLatest())).run();
-    if (r.getSize() == 0) {
+    Optional<Snapshot> snapshot = assetManager.getLatestSnapshot(mpId);
+    if (snapshot.isEmpty()) {
       // Media package not archived yet? Skip until next time.
       logger.warn("Media package {} has not been archived yet. Skipped.", mpId);
       return null;
     }
 
-    String org = Enrichments.enrich(r).getSnapshots().get(0).getOrganizationId();
+    String org = snapshot.get().getOrganizationId();
     Organization organization = organizationDirectoryService.getOrganization(org);
     if (organization == null) {
       logger.warn("Media package {} has an unknown organization {}. Skipped.", mpId, org);

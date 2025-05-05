@@ -23,9 +23,7 @@ package org.opencastproject.transcription.ibmwatson;
 import static org.opencastproject.systems.OpencastConstants.ADMIN_EMAIL_PROPERTY;
 
 import org.opencastproject.assetmanager.api.AssetManager;
-import org.opencastproject.assetmanager.api.fn.Enrichments;
-import org.opencastproject.assetmanager.api.query.AQueryBuilder;
-import org.opencastproject.assetmanager.api.query.AResult;
+import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.util.Workflows;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
@@ -107,6 +105,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -1069,15 +1068,14 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
     securityService.setUser(SecurityUtil.createSystemUser(systemAccount, defaultOrg));
 
     // Find the episode
-    final AQueryBuilder q = assetManager.createQuery();
-    final AResult r = q.select(q.snapshot()).where(q.mediaPackageId(mpId).and(q.version().isLatest())).run();
-    if (r.getSize() == 0) {
+    Optional<Snapshot> snapshot = assetManager.getLatestSnapshot(mpId);
+    if (snapshot.isEmpty()) {
       // Media package not archived yet.
       logger.warn("Media package {} has not been archived yet.", mpId);
       return null;
     }
 
-    String org = Enrichments.enrich(r).getSnapshots().stream().findFirst().get().getOrganizationId();
+    String org = snapshot.get().getOrganizationId();
     Organization organization = null;
     try {
       organization = organizationDirectoryService.getOrganization(org);

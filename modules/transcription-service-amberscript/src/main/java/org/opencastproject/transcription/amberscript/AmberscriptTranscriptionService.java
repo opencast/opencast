@@ -21,9 +21,7 @@
 package org.opencastproject.transcription.amberscript;
 
 import org.opencastproject.assetmanager.api.AssetManager;
-import org.opencastproject.assetmanager.api.fn.Enrichments;
-import org.opencastproject.assetmanager.api.query.AQueryBuilder;
-import org.opencastproject.assetmanager.api.query.AResult;
+import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.util.Workflows;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
@@ -99,6 +97,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -1059,16 +1058,15 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
             securityService.setUser(SecurityUtil.createSystemUser(systemAccount, defaultOrg));
 
             // Find the episode
-            final AQueryBuilder q = assetManager.createQuery();
-            final AResult r = q.select(q.snapshot()).where(q.mediaPackageId(mpId).and(q.version().isLatest())).run();
-            if (r.getSize() == 0) {
+            Optional<Snapshot> snapshot = assetManager.getLatestSnapshot(mpId);
+            if (snapshot.isEmpty()) {
               logger.warn("Media package {} no longer exists in the asset manager. It was likely deleted. "
                   + "Dropping the generated transcription.", mpId);
               database.updateJobControl(jobId, TranscriptionJobControl.Status.Error.name());
               continue;
             }
 
-            String org = Enrichments.enrich(r).getSnapshots().stream().findFirst().get().getOrganizationId();
+            String org = snapshot.get().getOrganizationId();
             Organization organization = organizationDirectoryService.getOrganization(org);
             if (organization == null) {
               logger.warn("Media package {} has an unknown organization {}. Skipped.", mpId, org);
