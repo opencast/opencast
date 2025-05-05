@@ -603,6 +603,24 @@ public class Database implements EntityPaths {
     });
   }
 
+  public Optional<Snapshot> getSnapshot(String mediaPackageId, String orgId, Long version) {
+    return db.execTx(em -> {
+      Optional<SnapshotDto> snapshotDto = namedQuery.findOpt(
+          "Snapshot.findByMpIdOrgIdAndVersion",
+          SnapshotDto.class,
+          Pair.of("mediaPackageId", mediaPackageId),
+          Pair.of("organizationId", orgId),
+          Pair.of("version", version)
+      ).apply(em);
+
+      if (snapshotDto.isEmpty()) {
+        return Optional.empty();
+      }
+
+      return Optional.of(snapshotDto.get().toSnapshot());
+    });
+  }
+
   public List<Snapshot> getSnapshotsForIndexRebuild(int offset, int limit) {
     return db.execTx(em -> {
       List<SnapshotDto> snapshotDto = namedQuery.findSome(

@@ -25,9 +25,6 @@ import static org.opencastproject.util.OsgiUtil.getOptCfgAsBoolean;
 
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
-import org.opencastproject.assetmanager.api.query.AQueryBuilder;
-import org.opencastproject.assetmanager.api.query.ARecord;
-import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.selector.SimpleElementSelector;
@@ -159,14 +156,10 @@ public class OaiPmhUpdatedEventHandler implements ManagedService {
       // that has already been finished. The URLs may have become stale.
       // For that reason we get the mediapackage from the asset manager.
       String versionStr = Long.toString(snapshotItem.getVersion());
-      AQueryBuilder q = assetManager.createQuery();
-      AResult snapshotQueryResult = q.select(q.snapshot())
-              .where(q.organizationId().eq(prevOrg.getId())
-                    .and(q.mediaPackageId(snapshotItem.getId())
-                    .and(q.version().eq(assetManager.toVersion(versionStr).get())))).run();
-      Optional<ARecord> snapshotRecordOpt = snapshotQueryResult.getRecords().stream().findFirst();
-      if (snapshotRecordOpt.isPresent()) {
-        Snapshot snapshot = snapshotRecordOpt.get().getSnapshot().get();
+      Optional<Snapshot> snapshotOpt = assetManager.getSnapshotByMpIdOrgIdAndVersion(snapshotItem.getId(),
+          prevOrg.getId(), assetManager.toVersion(versionStr).get());
+      if (snapshotOpt.isPresent()) {
+        Snapshot snapshot = snapshotOpt.get();
         MediaPackage snapshotMp = snapshot.getMediaPackage();
 
         // Check weather the media package contains elements to republish

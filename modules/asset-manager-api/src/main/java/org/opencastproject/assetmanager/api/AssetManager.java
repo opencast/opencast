@@ -208,6 +208,8 @@ public interface AssetManager {
 
   List<Snapshot> getLatestSnapshotsBySeriesId(String seriesId);
 
+  Optional<Snapshot> getSnapshotByMpIdOrgIdAndVersion(String mpId, String orgId, Version version);
+
   int deleteSnapshots(String mpId);
 
   int deleteAllButLatestSnapshot(String mpId);

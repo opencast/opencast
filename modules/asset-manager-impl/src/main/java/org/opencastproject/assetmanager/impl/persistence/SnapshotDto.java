@@ -206,6 +206,13 @@ import javax.persistence.UniqueConstraint;
                 + "  SELECT MAX(s2.version) FROM Snapshot s2 WHERE s2.mediaPackageId = s.mediaPackageId "
                 + ") "
         ),
+        @NamedQuery(
+            name = "Snapshot.findByMpIdOrgIdAndVersion",
+            query = "SELECT s FROM Snapshot s "
+                + "WHERE s.mediaPackageId = :mediaPackageIds "
+                + "AND s.organizationId = :organizationId "
+                + "AND s.version = :version "
+        ),
 })
 // Maintain own generator to support database migrations from Archive to AssetManager
 // The generator's initial value has to be set after the data migration.

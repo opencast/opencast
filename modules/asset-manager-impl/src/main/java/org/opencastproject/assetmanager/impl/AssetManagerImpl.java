@@ -853,6 +853,11 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   @Override
+  public Optional<Snapshot> getSnapshotByMpIdOrgIdAndVersion(String mpId, String orgId, Version version) {
+    return getDatabase().getSnapshot(mpId, orgId, Long.parseLong(version.toString()));
+  }
+
+  @Override
   public int deleteSnapshots(String mpId) {
     String orgId = securityService.getOrganization().getId();
     switch (isAdmin()) {
