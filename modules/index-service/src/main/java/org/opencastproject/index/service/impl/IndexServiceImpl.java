@@ -21,17 +21,13 @@
 
 package org.opencastproject.index.service.impl;
 
-import static org.opencastproject.assetmanager.api.AssetManager.DEFAULT_OWNER;
-import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_IDENTIFIER;
 import static org.opencastproject.security.api.DefaultOrganization.DEFAULT_ORGANIZATION_ID;
 import static org.opencastproject.workflow.api.ConfiguredWorkflow.workflow;
 
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.AssetManagerException;
-import org.opencastproject.assetmanager.api.query.AQueryBuilder;
-import org.opencastproject.assetmanager.api.query.AResult;
-import org.opencastproject.assetmanager.api.query.Predicate;
+import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.util.WorkflowPropertiesUtil;
 import org.opencastproject.assetmanager.util.Workflows;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
@@ -1430,8 +1426,7 @@ public class IndexServiceImpl implements IndexService {
   }
 
   private boolean hasSnapshots(String eventId) {
-    AQueryBuilder q = assetManager.createQuery();
-    return !enrich(q.select(q.snapshot()).where(q.mediaPackageId(eventId).and(q.version().isLatest())).run()).getSnapshots().isEmpty();
+    return assetManager.snapshotExists(eventId);
   }
 
   @Override
@@ -1539,11 +1534,9 @@ public class IndexServiceImpl implements IndexService {
     boolean notFoundArchive = false;
     boolean removedArchive = false;
     try {
-      final AQueryBuilder q = assetManager.createQuery();
-      final Predicate p = q.organizationId().eq(securityService.getOrganization().getId()).and(q.mediaPackageId(id));
-      final AResult r = q.select(q.nothing()).where(p).run();
-      if (r.getSize() > 0) {
-        q.delete(DEFAULT_OWNER, q.snapshot()).where(p).run();
+      List<Snapshot> snapshots = assetManager.getSnapshotsById(id);
+      if (snapshots.size() > 0) {
+        assetManager.deleteSnapshots(id);
         removedArchive = true;
       } else {
         notFoundArchive = true;
