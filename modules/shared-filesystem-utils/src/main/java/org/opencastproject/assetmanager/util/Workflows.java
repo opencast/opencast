@@ -21,11 +21,9 @@
 package org.opencastproject.assetmanager.util;
 
 import static com.entwinemedia.fn.Stream.$;
-import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
 
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
-import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.workflow.api.ConfiguredWorkflow;
@@ -40,6 +38,10 @@ import com.entwinemedia.fn.data.Opt;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Utility class to apply workflows to episodes. Removed 'final class' so that we can mock it for
@@ -91,9 +93,12 @@ public class Workflows {
 
   private final Fn<String, Iterable<Snapshot>> findLatest = new Fn<String, Iterable<Snapshot>>() {
     @Override public Iterable<Snapshot> apply(String mpId) {
-      AQueryBuilder q = am.createQuery();
-      return enrich(q.select(q.snapshot()).where(q.mediaPackageId(mpId).and(q.version().isLatest())).run())
-          .getSnapshots();
+      List<Snapshot> list = new ArrayList<>();
+      Optional<Snapshot> snapshot = am.getLatestSnapshot(mpId);
+      if (snapshot.isPresent()) {
+        list.add(snapshot.get());
+      }
+      return list;
     }
   };
 }
