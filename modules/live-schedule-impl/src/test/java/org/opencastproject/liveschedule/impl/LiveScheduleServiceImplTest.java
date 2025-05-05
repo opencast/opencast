@@ -23,13 +23,7 @@ package org.opencastproject.liveschedule.impl;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Version;
-import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.ARecord;
-import org.opencastproject.assetmanager.api.query.AResult;
-import org.opencastproject.assetmanager.api.query.ASelectQuery;
-import org.opencastproject.assetmanager.api.query.Predicate;
-import org.opencastproject.assetmanager.api.query.Target;
-import org.opencastproject.assetmanager.api.query.VersionField;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.distribution.api.DownloadDistributionService;
 import org.opencastproject.job.api.Job;
@@ -83,12 +77,10 @@ import org.osgi.service.component.ComponentContext;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -424,25 +416,9 @@ public class LiveScheduleServiceImplTest {
     EasyMock.expect(snapshot.getVersion()).andReturn(version);
     ARecord aRec = EasyMock.createNiceMock(ARecord.class);
     EasyMock.expect(aRec.getSnapshot()).andReturn(Optional.of(snapshot)).anyTimes();
-    LinkedHashSet<ARecord> recStream = new LinkedHashSet<>(Arrays.asList(aRec));
-    Predicate p = EasyMock.createNiceMock(Predicate.class);
-    EasyMock.expect(p.and(p)).andReturn(p).anyTimes();
-    AResult r = EasyMock.createNiceMock(AResult.class);
-    EasyMock.expect(r.getSize()).andReturn(1L).anyTimes();
-    EasyMock.expect(r.getRecords()).andReturn(recStream).anyTimes();
-    Target t = EasyMock.createNiceMock(Target.class);
-    ASelectQuery selectQuery = EasyMock.createNiceMock(ASelectQuery.class);
-    EasyMock.expect(selectQuery.where(EasyMock.anyObject(Predicate.class))).andReturn(selectQuery).anyTimes();
-    EasyMock.expect(selectQuery.run()).andReturn(r).anyTimes();
-    AQueryBuilder query = EasyMock.createNiceMock(AQueryBuilder.class);
-    EasyMock.expect(query.snapshot()).andReturn(t).anyTimes();
-    EasyMock.expect(query.mediaPackageId(EasyMock.anyObject(String.class))).andReturn(p).anyTimes();
-    EasyMock.expect(query.select(EasyMock.anyObject(Target.class))).andReturn(selectQuery).anyTimes();
-    VersionField v = EasyMock.createNiceMock(VersionField.class);
-    EasyMock.expect(v.isLatest()).andReturn(p).anyTimes();
-    EasyMock.expect(query.version()).andReturn(v).anyTimes();
-    EasyMock.expect(assetManager.createQuery()).andReturn(query).anyTimes();
-    EasyMock.replay(snapshot, aRec, p, r, t, selectQuery, query, v);
+    EasyMock.expect(assetManager.getLatestSnapshot(EasyMock.anyString()))
+        .andReturn(Optional.of(snapshot)).anyTimes();
+    EasyMock.replay(snapshot, aRec);
   }
 
   @Test
