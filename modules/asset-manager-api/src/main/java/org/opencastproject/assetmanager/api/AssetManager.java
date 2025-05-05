@@ -26,6 +26,7 @@ import org.opencastproject.assetmanager.api.storage.AssetStore;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.util.NotFoundException;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -66,6 +67,8 @@ public interface AssetManager {
   Optional<MediaPackage> getMediaPackage(String mediaPackageId);
 
   Optional<Snapshot> getLatestSnapshot(String mediaPackageId);
+
+  List<Snapshot> getLatestSnapshots(Collection mediaPackageIds);
 
   /**
    * Get the asset that is uniquely identified by the triple {version, media package ID, media package element ID}.

@@ -48,6 +48,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -435,7 +436,7 @@ public class Database implements EntityPaths {
   public Optional<Snapshot> getLatestSnapshot(String mediaPackageId, String orgId) {
     return db.execTx(em -> {
       Optional<SnapshotDto> snapshotDto = namedQuery.findOpt(
-          "Snapshot.findLatestVersionFirst",
+          "Snapshot.findLatest",
           SnapshotDto.class,
           Pair.of("mediaPackageId", mediaPackageId),
           Pair.of("organizationId", orgId)
@@ -579,9 +580,22 @@ public class Database implements EntityPaths {
   public List<Snapshot> getSnapshotsBySeries(String mediaPackageId, String orgId) {
     return db.execTx(em -> {
       List<SnapshotDto> snapshotDto = namedQuery.findAll(
-          "Snapshot.findBySeriesIdLatestVersionFirst",
+          "Snapshot.findLatestBySeriesId",
           SnapshotDto.class,
           Pair.of("mediaPackageId", mediaPackageId),
+          Pair.of("organizationId", orgId)
+      ).apply(em);
+
+      return snapshotDtoToSnapshot(snapshotDto);
+    });
+  }
+
+  public List<Snapshot> getLatestSnapshotsByMediaPackageIds(Collection mediaPackageIds, String orgId) {
+    return db.execTx(em -> {
+      List<SnapshotDto> snapshotDto = namedQuery.findAll(
+          "Snapshot.findLatestByMpIds",
+          SnapshotDto.class,
+          Pair.of("mediaPackageIds", mediaPackageIds),
           Pair.of("organizationId", orgId)
       ).apply(em);
 

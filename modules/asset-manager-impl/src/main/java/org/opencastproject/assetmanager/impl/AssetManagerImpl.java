@@ -130,6 +130,7 @@ import java.net.URISyntaxException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -338,6 +339,26 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
           return mp;
         }
         return Optional.empty();
+    }
+  }
+
+  @Override
+  public List<Snapshot> getLatestSnapshots(Collection mediaPackageIds) {
+    String orgId = securityService.getOrganization().getId();
+    switch (isAdmin()) {
+      case GLOBAL:
+        return getDatabase().getLatestSnapshotsByMediaPackageIds(mediaPackageIds, null);
+      case ORGANIZATION:
+        return getDatabase().getLatestSnapshotsByMediaPackageIds(mediaPackageIds, orgId);
+      default:
+        List<Snapshot> snapshots = new ArrayList<>();
+        List<Snapshot> snaps = getDatabase().getLatestSnapshotsByMediaPackageIds(mediaPackageIds, orgId);
+        for (int i = 0; i < snaps.size(); i++) {
+          if (authorizationService.hasPermission(snaps.get(i).getMediaPackage(), "read")) {
+            snapshots.add(snaps.get(i));
+          }
+        }
+        return snapshots;
     }
   }
 
