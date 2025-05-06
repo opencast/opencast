@@ -34,14 +34,12 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.util.data.Function;
 
-import com.mysema.query.Tuple;
 import com.mysema.query.jpa.EclipseLinkTemplates;
 import com.mysema.query.jpa.JPQLTemplates;
 import com.mysema.query.jpa.impl.JPADeleteClause;
 import com.mysema.query.jpa.impl.JPAQuery;
 import com.mysema.query.jpa.impl.JPAQueryFactory;
 import com.mysema.query.jpa.impl.JPAUpdateClause;
-import com.mysema.query.types.expr.BooleanExpression;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -55,6 +53,8 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import javax.persistence.NoResultException;
+import javax.persistence.TypedQuery;
 
 /**
  * Data access object.
@@ -96,66 +96,49 @@ public class Database implements EntityPaths {
   public boolean saveProperty(final Property property) {
     return db.execTx(em -> {
       final PropertyId pId = property.getId();
-      // check the existence of both the media package and the property in one query
-      //
-      // either the property matches or it does not exist <- left outer join
-      final BooleanExpression eitherMatchOrNull =
-          Q_PROPERTY.namespace.eq(pId.getNamespace())
-              .and(Q_PROPERTY.propertyName.eq(pId.getName())).or(Q_PROPERTY.namespace.isNull());
-      final Tuple result = new JPAQuery(em, TEMPLATES)
-          .from(Q_SNAPSHOT)
-          .leftJoin(Q_PROPERTY).on(Q_SNAPSHOT.mediaPackageId.eq(Q_PROPERTY.mediaPackageId).and(eitherMatchOrNull))
-          .where(Q_SNAPSHOT.mediaPackageId.eq(pId.getMediaPackageId()))
-          // only one result is interesting, no need to fetch all versions of the media package
-          .singleResult(Q_SNAPSHOT.id, Q_PROPERTY);
-      if (result != null) {
-        // media package exists, now check if the property exists
-        final PropertyDto exists = result.get(Q_PROPERTY);
-        namedQuery
-            .persistOrUpdate(exists == null
-                ? PropertyDto.mk(property)
-                : exists.update(property.getValue()))
-            .apply(em);
-        return true;
-      } else {
-        // media package does not exist
-        return false;
+      final String mpId = pId.getMediaPackageId();
+      final String namespace = pId.getNamespace();
+      final String propertyName = pId.getName();
+
+      // Check if media package exists in oc_assets_snapshot table
+      Long snapshotCount = em.createQuery(
+              "SELECT COUNT(s.id) FROM Snapshot s "
+                  + "WHERE s.mediaPackageId = :mediaPackageId", Long.class)
+          .setParameter("mediaPackageId", mpId)
+          .getSingleResult();
+
+      if (snapshotCount == 0) {
+        return false; // media package does not exist
       }
+
+      // Try to find existing property
+      TypedQuery<PropertyDto> query = em.createQuery(
+          "SELECT p FROM Property p "
+              + "WHERE p.mediaPackageId = :mediaPackageId "
+              + "AND p.namespace = :namespace "
+              + "AND p.propertyName = :propertyName",
+          PropertyDto.class);
+      query.setParameter("mediaPackageId", mpId);
+      query.setParameter("namespace", namespace);
+      query.setParameter("propertyName", propertyName);
+
+      PropertyDto existing = null;
+      try {
+        existing = query.getSingleResult();
+      } catch (NoResultException e) {
+        // property does not exist, we'll insert
+      }
+
+      PropertyDto updatedOrNew = existing == null
+          ? PropertyDto.mk(property)
+          : existing.update(property.getValue());
+
+      namedQuery.persistOrUpdate(updatedOrNew).apply(em);
+      return true;
     });
   }
 
-  // TODO: Fix this.
-//  public boolean saveProperty(final Property property) {
-//    return db.execTx(em -> {
-//      final PropertyId pId = property.getId();
-//
-//      // check the existence of both the media package and the property in one query
-//      //
-//      // either the property matches or it does not exist <- left outer join
-//      var result = namedQuery.findOpt(
-//          "Snapshot.findPropertyOnMediaPackage",
-//          Object.class,
-//          Pair.of("namespace", pId.getNamespace()),
-//          Pair.of("propertyName", pId.getName()),
-//          Pair.of("mediaPackageId", pId.getMediaPackageId())
-//      ).apply(em);
-//
-//      if (result.isPresent()) {
-//        // media package exists, now check if the property exists
-//        Object[] resultArray = (Object[]) result.get();
-//        PropertyDto exists = (PropertyDto) resultArray[1];
-//        namedQuery
-//            .persistOrUpdate(exists == null
-//                ? PropertyDto.mk(property)
-//                : exists.update(property.getValue()))
-//            .apply(em);
-//        return true;
-//      } else {
-//        // media package does not exist
-//        return false;
-//      }
-//    });
-//  }
+
 
   /**
    * Claim a new version for media package <code>mpId</code>.

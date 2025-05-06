@@ -85,13 +85,6 @@ import javax.persistence.UniqueConstraint;
                 + "ORDER BY s.version DESC"
         ),
         @NamedQuery(
-            name = "Snapshot.findPropertyOnMediaPackage",
-            query = "SELECT s, p FROM Snapshot s "
-            + "LEFT JOIN Property p ON s.mediaPackageId = p.mediaPackageId "
-            + "AND (p.namespace = :namespace AND p.propertyName = :propertyName OR p.namespace IS NULL) "
-            + "WHERE s.mediaPackageId = :mediaPackageId"
-        ),
-        @NamedQuery(
             name = "Snapshot.findLatest",
             query = "SELECT s FROM Snapshot s "
                 + "WHERE s.mediaPackageId = :mediaPackageId "
