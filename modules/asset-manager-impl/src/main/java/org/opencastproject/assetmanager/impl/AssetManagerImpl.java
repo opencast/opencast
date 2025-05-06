@@ -27,7 +27,6 @@ import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.hasNo
 import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.isNotPublication;
 import static org.opencastproject.mediapackage.MediaPackageSupport.getFileName;
 import static org.opencastproject.mediapackage.MediaPackageSupport.getMediaPackageElementId;
-import static org.opencastproject.security.api.SecurityConstants.EPISODE_ROLE_ID_PREFIX;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLE;
 import static org.opencastproject.security.util.SecurityUtil.getEpisodeRoleId;
@@ -43,11 +42,6 @@ import org.opencastproject.assetmanager.api.PropertyId;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Value;
 import org.opencastproject.assetmanager.api.Version;
-import org.opencastproject.assetmanager.api.query.ADeleteQuery;
-import org.opencastproject.assetmanager.api.query.AQueryBuilder;
-import org.opencastproject.assetmanager.api.query.ASelectQuery;
-import org.opencastproject.assetmanager.api.query.Predicate;
-import org.opencastproject.assetmanager.api.query.Target;
 import org.opencastproject.assetmanager.api.storage.AssetStore;
 import org.opencastproject.assetmanager.api.storage.DeletionSelector;
 import org.opencastproject.assetmanager.api.storage.RemoteAssetStore;
@@ -55,8 +49,6 @@ import org.opencastproject.assetmanager.api.storage.Source;
 import org.opencastproject.assetmanager.api.storage.StoragePath;
 import org.opencastproject.assetmanager.impl.persistence.Database;
 import org.opencastproject.assetmanager.impl.persistence.SnapshotDto;
-import org.opencastproject.assetmanager.impl.query.AQueryBuilderImpl;
-import org.opencastproject.assetmanager.impl.query.AbstractADeleteQuery;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.authorization.xacml.manager.util.AccessInformationUtil;
@@ -77,7 +69,6 @@ import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
-import org.opencastproject.message.broker.api.update.AssetManagerUpdateHandler;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.security.api.AccessControlEntry;
@@ -141,7 +132,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -157,8 +147,7 @@ import javax.persistence.EntityManagerFactory;
     immediate = true,
     service = { AssetManager.class, IndexProducer.class }
 )
-public class AssetManagerImpl extends AbstractIndexProducer implements AssetManager,
-    AbstractADeleteQuery.DeleteEpisodeHandler {
+public class AssetManagerImpl extends AbstractIndexProducer implements AssetManager {
 
   private static final Logger logger = LoggerFactory.getLogger(AssetManagerImpl.class);
 
@@ -175,8 +164,6 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   private static final String MANIFEST_DEFAULT_NAME = "manifest";
 
   private static boolean episodeIdRole = false;
-
-  private CopyOnWriteArrayList<AssetManagerUpdateHandler> handlers = new CopyOnWriteArrayList<>();
 
   private SecurityService securityService;
   private AuthorizationService authorizationService;
@@ -261,19 +248,6 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   @Reference
   public void setAssetStore(AssetStore assetStore) {
     this.assetStore = assetStore;
-  }
-
-  @Reference(
-      cardinality = ReferenceCardinality.MULTIPLE,
-      policy = ReferencePolicy.DYNAMIC,
-      unbind = "removeEventHandler"
-  )
-  public void addEventHandler(AssetManagerUpdateHandler handler) {
-    this.handlers.add(handler);
-  }
-
-  public void removeEventHandler(AssetManagerUpdateHandler handler) {
-    this.handlers.remove(handler);
   }
 
   @Reference(
@@ -499,10 +473,6 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       }
 
       updateEventInIndex(snapshot);
-
-      logger.info("Trigger update handlers for snapshot {}, version {}",
-          snapshot.getMediaPackage().getIdentifier(), snapshot.getVersion());
-      fireEventHandlers(mkTakeSnapshotMessage(snapshot));
 
       return snapshot;
     }
@@ -1107,42 +1077,6 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   /** Misc. */
 
   @Override
-  public AQueryBuilder createQuery() {
-    return new AQueryBuilderDecorator(createQueryWithoutSecurityCheck()) {
-      @Override public ASelectQuery select(Target... target) {
-        switch (isAdmin()) {
-          case GLOBAL:
-            return super.select(target);
-          case ORGANIZATION:
-            return super.select(target).where(restrictToUsersOrganization());
-          default:
-            return super.select(target).where(mkAuthPredicate(READ_ACTION));
-        }
-      }
-
-      @Override public ADeleteQuery delete(String owner, Target target) {
-        switch (isAdmin()) {
-          case GLOBAL:
-            return super.delete(owner, target);
-          case ORGANIZATION:
-            return super.delete(owner, target).where(restrictToUsersOrganization());
-          default:
-            return super.delete(owner, target).where(mkAuthPredicate(WRITE_ACTION));
-        }
-      }
-    };
-  }
-
-  private AQueryBuilder createQueryWithoutSecurityCheck() {
-    return new AQueryBuilderDecorator(new AQueryBuilderImpl(this)) {
-      @Override
-      public ADeleteQuery delete(String owner, Target target) {
-        return new ADeleteQueryWithMessaging(super.delete(owner, target));
-      }
-    };
-  }
-
-  @Override
   public Optional<Version> toVersion(String version) {
     try {
       return Optional.of(VersionImpl.mk(Long.parseLong(version)));
@@ -1157,11 +1091,8 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   @Override
-  public void handleDeletedEpisode(String mpId) {
-    logger.info("Firing event handlers for deleting event {}", mpId);
-    fireEventHandlers(AssetManagerItem.deleteEpisode(mpId, new Date()));
-
-    removeArchivedVersionFromIndex(mpId);
+  public long countSnapshots(final String organization) {
+    return getDatabase().countSnapshots(organization);
   }
 
   /**
@@ -1279,35 +1210,6 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
    * Security handling
    */
 
-  /**
-   * Create an authorization predicate to be used with {@link #isAuthorized(String, String)},
-   * restricting access to the user's organization and the given action.
-   *
-   * @param action
-   *     the action to restrict access to
-   */
-  private Predicate mkAuthPredicate(final String action) {
-    final AQueryBuilder q = createQueryWithoutSecurityCheck();
-    return securityService.getUser().getRoles().stream()
-            .filter(roleFilter)
-            .map((role) -> {
-              if (episodeIdRole && role.getName().startsWith(EPISODE_ROLE_ID_PREFIX)) {
-                return q.mediapackageId().eq(StringUtils.substringBetween(
-                    role.getName(), EPISODE_ROLE_ID_PREFIX + "_", "_"));
-              } else {
-                return q.property(Value.BOOLEAN, SECURITY_NAMESPACE, mkPropertyName(role.getName(), action)).eq(true);
-              }
-            })
-            .reduce(Predicate::or)
-            .orElseGet(() -> q.always().not())
-            .and(restrictToUsersOrganization());
-  }
-
-  /** Create a predicate that restricts access to the user's organization. */
-  private Predicate restrictToUsersOrganization() {
-    return createQueryWithoutSecurityCheck().organizationId().eq(securityService.getUser().getOrganization().getId());
-  }
-
   /** Check authorization based on the given predicate. */
   private boolean isAuthorized(final String mediaPackageId, final String action) {
     switch (isAdmin()) {
@@ -1375,62 +1277,6 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   /*
    * Utility
    */
-
-  /**
-   * Return a basic query which returns the snapshot and its current storage location
-   *
-   * @param q
-   *   The query builder object to configure
-   * @return
-   *   The {@link ASelectQuery} configured with as described above
-   */
-  private ASelectQuery baseQuery(final AQueryBuilder q) {
-    RequireUtil.notNull(q, "q");
-    return q.select(q.snapshot());
-  }
-
-  /**
-   * Return a mediapackage filtered query which returns the snapshot and its current storage location
-   *
-   * @param q
-   *   The query builder object to configure
-   * @param mpId
-   *   The mediapackage ID to filter results for
-   * @return
-   *   The {@link ASelectQuery} configured with as described above
-   */
-  private ASelectQuery baseQuery(final AQueryBuilder q, final String mpId) {
-    RequireUtil.notNull(q, "q");
-    ASelectQuery query = baseQuery(q);
-    if (StringUtils.isNotEmpty(mpId)) {
-      return query.where(q.mediaPackageId(mpId));
-    } else {
-      return query;
-    }
-  }
-
-  /**
-   * Return a mediapackage and version filtered query which returns the snapshot and its current storage location
-   *
-   * @param q
-   *   The query builder object to configure
-   * @param version
-   *   The version to filter results for
-   * @param mpId
-   *   The mediapackage ID to filter results for
-   * @return
-   *   The {@link ASelectQuery} configured with as described above
-   */
-  private ASelectQuery baseQuery(final AQueryBuilder q, final Version version, final String mpId) {
-    RequireUtil.notNull(q, "q");
-    RequireUtil.requireNotBlank(mpId, "mpId");
-    ASelectQuery query = baseQuery(q, mpId);
-    if (null != version) {
-      return query.where(q.version().eq(version));
-    } else {
-      return query;
-    }
-  }
 
   /** Move the assets for a snapshot to the target store */
   private void copyAssetsToStore(Snapshot snap, AssetStore store) {
@@ -1787,39 +1633,6 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
             snapshot.getStorageId(),
             snapshot.getOwner(),
             mpCopy);
-  }
-
-  public void fireEventHandlers(AssetManagerItem item) {
-    while (handlers.size() != 2) {
-      logger.warn("Expecting 2 handlers, but {} are registered.  Waiting 10s then retrying...", handlers.size());
-      try {
-        Thread.sleep(10000L);
-      } catch (InterruptedException e) { /* swallow this, nothing to do */ }
-    }
-    for (AssetManagerUpdateHandler handler : handlers) {
-      handler.execute(item);
-    }
-  }
-
-  /**
-   * Call {@link
-   * org.opencastproject.assetmanager.impl.query.AbstractADeleteQuery#run(AbstractADeleteQuery.DeleteEpisodeHandler)}
-   * with a delete handler. Also make sure to propagate the behaviour to subsequent instances.
-   */
-  private final class ADeleteQueryWithMessaging extends ADeleteQueryDecorator {
-    ADeleteQueryWithMessaging(ADeleteQuery delegate) {
-      super(delegate);
-    }
-
-    @Override
-    public long run() {
-      return RuntimeTypes.convert(delegate).run(AssetManagerImpl.this);
-    }
-
-    @Override
-    protected ADeleteQueryDecorator mkDecorator(ADeleteQuery delegate) {
-      return new ADeleteQueryWithMessaging(delegate);
-    }
   }
 
   /**

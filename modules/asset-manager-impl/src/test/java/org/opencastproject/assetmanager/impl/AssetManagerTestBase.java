@@ -25,9 +25,7 @@ import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Version;
-import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.assetmanager.api.query.PropertyField;
-import org.opencastproject.assetmanager.api.query.PropertySchema;
 import org.opencastproject.assetmanager.api.storage.AssetStore;
 import org.opencastproject.assetmanager.api.storage.AssetStoreException;
 import org.opencastproject.assetmanager.api.storage.DeletionSelector;
@@ -35,6 +33,7 @@ import org.opencastproject.assetmanager.api.storage.RemoteAssetStore;
 import org.opencastproject.assetmanager.api.storage.Source;
 import org.opencastproject.assetmanager.api.storage.StoragePath;
 import org.opencastproject.assetmanager.impl.persistence.Database;
+import org.opencastproject.assetmanager.impl.query.PropertySchema;
 import org.opencastproject.assetmanager.impl.util.TestUser;
 import org.opencastproject.db.DBTestEnv;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
@@ -45,7 +44,6 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElements;
-import org.opencastproject.message.broker.api.update.AssetManagerUpdateHandler;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
@@ -104,22 +102,18 @@ public abstract class AssetManagerTestBase {
 
   /** The asset manager under test. */
   protected AssetManagerImpl am;
-  protected AQueryBuilder q;
   protected Props p;
   protected Props p2;
 
   @Before
   public void setUp() throws Exception {
     this.am = makeAssetManager();
-    q = am.createQuery();
-    p = new Props(q, "org.opencastproject.service");
-    p2 = new Props(q, "org.opencastproject.service.sub");
+    p = new Props( "org.opencastproject.service");
+    p2 = new Props( "org.opencastproject.service.sub");
   }
 
   protected AssetManagerImpl makeAssetManager() throws Exception {
     AssetManagerImpl am = makeAssetManagerWithoutHandlers();
-    am.addEventHandler(EasyMock.createNiceMock(AssetManagerUpdateHandler.class));
-    am.addEventHandler(EasyMock.createNiceMock(AssetManagerUpdateHandler.class));
     return am;
   }
 
@@ -312,8 +306,8 @@ public abstract class AssetManagerTestBase {
    * A property schema definition.
    */
   public static class Props extends PropertySchema {
-    public Props(AQueryBuilder q, String namespace) {
-      super(q, namespace);
+    public Props(String namespace) {
+      super(namespace);
     }
 
     // define your properties here below

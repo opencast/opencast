@@ -18,11 +18,13 @@
  * the License.
  *
  */
-package org.opencastproject.assetmanager.api.query;
+package org.opencastproject.assetmanager.impl.query;
 
+import org.opencastproject.assetmanager.api.PropertyName;
 import org.opencastproject.assetmanager.api.Value;
 import org.opencastproject.assetmanager.api.Value.ValueType;
 import org.opencastproject.assetmanager.api.Version;
+import org.opencastproject.assetmanager.api.query.PropertyField;
 
 import java.util.Date;
 
@@ -31,17 +33,14 @@ import java.util.Date;
  * It makes code using properties more readable and reliable.
  */
 public abstract class PropertySchema {
-  protected final AQueryBuilder q;
   protected final String namespace;
 
   /**
    * Create a new property schema.
    *
-   * @param q a query builder
    * @param namespace
    */
-  public PropertySchema(AQueryBuilder q, String namespace) {
-    this.q = q;
+  public PropertySchema(String namespace) {
     this.namespace = namespace;
   }
 
@@ -50,19 +49,9 @@ public abstract class PropertySchema {
     return namespace;
   }
 
-  /** Get a predicate that matches if a property of the schema's namespace exists. */
-  public Predicate hasPropertiesOfNamespace() {
-    return q.hasPropertiesOf(namespace);
-  }
-
-  /** Get a target to select all properties of the schema's namespace. */
-  public Target allProperties() {
-    return q.propertiesOf(namespace);
-  }
-
   /** Generic property field constructor. */
   protected <A> PropertyField<A> prop(ValueType<A> ev, String name) {
-    return q.property(ev, namespace, name);
+    return new PropertyFieldImpl<>(ev, PropertyName.mk(namespace, name));
   }
 
   /** Create a property field for Strings. */

@@ -79,7 +79,8 @@ public class AssetManagerDeleteTestBase extends AssetManagerTestBase implements 
   void assertSnapshotsTotal(long count) {
     assertEquals("[AssetManager] There should be " + count + " snapshots total",
                  count,
-                 q.select(q.snapshot()).run().getSize());
+                 am.countSnapshots(null));
+//                 q.select(q.snapshot()).run().getSize());
     assertEquals(format("[SQL] There should be %d snapshots total", count),
                  count,
                  runCount(new JPAQuery().from(Q_SNAPSHOT)));

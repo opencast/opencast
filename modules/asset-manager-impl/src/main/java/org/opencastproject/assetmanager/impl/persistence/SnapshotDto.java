@@ -192,7 +192,7 @@ import javax.persistence.UniqueConstraint;
             name = "Snapshot.findLatestBySeriesId",
             query = "SELECT s FROM Snapshot s "
                 + "WHERE s.seriesId = :seriesId "
-                + "AND (:organizationId IS NULL OR s.organizationId = :organizationId)"
+                + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
                 + "AND s.version = ( "
                 + "  SELECT MAX(s2.version) FROM Snapshot s2 WHERE s2.mediaPackageId = s.mediaPackageId "
                 + ")"
@@ -201,7 +201,7 @@ import javax.persistence.UniqueConstraint;
             name = "Snapshot.findLatestByMpIds",
             query = "SELECT s FROM Snapshot s "
                 + "WHERE s.mediaPackageId IN :mediaPackageIds "
-                + "AND (:organizationId IS NULL OR s.organizationId = :organizationId)"
+                + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
                 + "AND s.version = ( "
                 + "  SELECT MAX(s2.version) FROM Snapshot s2 WHERE s2.mediaPackageId = s.mediaPackageId "
                 + ") "
@@ -212,6 +212,11 @@ import javax.persistence.UniqueConstraint;
                 + "WHERE s.mediaPackageId = :mediaPackageIds "
                 + "AND s.organizationId = :organizationId "
                 + "AND s.version = :version "
+        ),
+        @NamedQuery(
+            name = "Snapshot.countSnapshots",
+            query = "SELECT COUNT(s) FROM Snapshot s "
+                + "WHERE (:organizationId IS NULL OR s.organizationId = :organizationId)"
         ),
 })
 // Maintain own generator to support database migrations from Archive to AssetManager
@@ -414,6 +419,23 @@ public class SnapshotDto {
       } else {
         query = em.createNamedQuery("Snapshot.countEvents", Long.class);
       }
+      logger.debug("Executing query {}", query);
+      return query.getSingleResult();
+    };
+  }
+
+  /**
+   * Count events with snapshots in the asset manager
+   *
+   * @param organization
+   *          An organization to count in
+   * @return Number of events
+   */
+  public static Function<EntityManager, Long> countSnapshotsQuery(final String organization) {
+    return em -> {
+      TypedQuery<Long> query;
+      query = em.createNamedQuery("Snapshot.countSnapshots", Long.class)
+          .setParameter("organizationId", organization);
       logger.debug("Executing query {}", query);
       return query.getSingleResult();
     };

@@ -404,6 +404,17 @@ public class Database implements EntityPaths {
     return db.exec(SnapshotDto.countEventsQuery(organization));
   }
 
+  /**
+   * Count events with snapshots in the asset manager
+   *
+   * @param organization
+   *          An organization to count in
+   * @return Number of events
+   */
+  public long countSnapshots(final String organization) {
+    return db.exec(SnapshotDto.countSnapshotsQuery(organization));
+  }
+
   public Optional<AssetDtos.Full> findAssetByChecksumAndStoreAndOrg(final String checksum, final String storeId,
       final String orgId) {
     return db.execTx(em -> {
@@ -577,12 +588,12 @@ public class Database implements EntityPaths {
     });
   }
 
-  public List<Snapshot> getSnapshotsBySeries(String mediaPackageId, String orgId) {
+  public List<Snapshot> getSnapshotsBySeries(String seriesId, String orgId) {
     return db.execTx(em -> {
       List<SnapshotDto> snapshotDto = namedQuery.findAll(
           "Snapshot.findLatestBySeriesId",
           SnapshotDto.class,
-          Pair.of("mediaPackageId", mediaPackageId),
+          Pair.of("seriesId", seriesId),
           Pair.of("organizationId", orgId)
       ).apply(em);
 

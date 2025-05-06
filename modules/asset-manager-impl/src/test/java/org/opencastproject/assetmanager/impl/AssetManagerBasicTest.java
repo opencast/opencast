@@ -25,15 +25,14 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
-import static org.opencastproject.assetmanager.api.fn.ARecords.getProperties;
 
 import org.opencastproject.assetmanager.api.AssetManagerException;
 import org.opencastproject.assetmanager.api.Availability;
 import org.opencastproject.assetmanager.api.Property;
 import org.opencastproject.assetmanager.api.PropertyId;
+import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Value;
 import org.opencastproject.assetmanager.api.Version;
-import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.assetmanager.impl.persistence.QSnapshotDto;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
@@ -47,6 +46,7 @@ import org.junit.Test;
 import java.net.URI;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 
 // CHECKSTYLE:OFF
@@ -108,15 +108,15 @@ public class AssetManagerBasicTest extends AssetManagerTestBase {
     final MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
     final Version v1 = am.takeSnapshot(OWNER, mp).getVersion();
     am.setAvailability(v1, mp.getIdentifier().toString(), Availability.OFFLINE);
-    assertEquals("One offline snapshot should be found", 1, q.select(q.snapshot()).where(q.availability(Availability.OFFLINE)).run().getSize());
-    assertEquals("No online snapshot should be found", 0, q.select(q.snapshot()).where(q.availability(Availability.ONLINE)).run().getSize());
+    Optional<Snapshot> optSnapshot = am.getLatestSnapshot(mp.getIdentifier().toString());
+    Snapshot snapshot = optSnapshot.get();
+    assertEquals("One offline snapshot should be found", Availability.OFFLINE, snapshot.getAvailability());
   }
 
   @Test
   public void testSetPropertyOnNonExistingMediaPackage() throws Exception {
     assertFalse("Property should not be stored since the referenced media package does not exist",
                 am.setProperty(Property.mk(PropertyId.mk("id", "namespace", "name"), Value.mk("value"))));
-    assertEquals("No properties should exist in the AssetManager", 0, q.select(q.properties()).run().getRecords().size());
   }
 
   @Test
@@ -149,20 +149,16 @@ public class AssetManagerBasicTest extends AssetManagerTestBase {
     assertTrue("The property should be set", am.setProperty(p.start.mk(mpId, d1)));
     logger.info("Select all properties of the media package");
     {
-      AResult r = q.select(p.allProperties()).where(q.mediaPackageId(mpId)).run();
-      assertEquals("One record should be found", 1, r.getSize());
-      assertEquals("One property should be found", 1, getProperties(r.getRecords()).size());
-      assertEquals("Value check", d1, getProperties(r.getRecords()).stream().findFirst().get().getValue().get(Value.DATE));
-      assertEquals("One property should be found", 1, q.select(q.properties()).run().getRecords().size());
+      List<Property> properties = am.selectProperties(mpId, null);
+      assertEquals("One property should be found", 1, properties.size());
+      assertEquals("Value check", d1, properties.stream().findFirst().get().getValue().get(Value.DATE));
     }
     logger.info("Update the property");
     assertTrue("The property should be updated", am.setProperty(p.start.mk(mpId, d2)));
     {
-      AResult r = q.select(p.allProperties()).where(q.mediaPackageId(mpId)).run();
-      assertEquals("One record should be found", 1, r.getSize());
-      assertEquals("One property should be found", 1, getProperties(r.getRecords()).size());
-      assertEquals("Value check", d2, getProperties(r.getRecords()).stream().findFirst().get().getValue().get(Value.DATE));
-      assertEquals("One record should be found", 1, q.select(q.properties()).run().getRecords().size());
+      List<Property> properties = am.selectProperties(mpId, null);
+      assertEquals("One property should be found", 1, properties.size());
+      assertEquals("Value check", d2, properties.stream().findFirst().get().getValue().get(Value.DATE));
     }
     logger.info("The existence of multiple versions of a media package should not affect property storage");
     logger.info("Add a new version of the media package");
@@ -170,13 +166,13 @@ public class AssetManagerBasicTest extends AssetManagerTestBase {
     logger.info("Update the property again");
     assertTrue("The property should be updated", am.setProperty(p.start.mk(mpId, d3)));
     {
-      AResult r = q.select(p.allProperties()).where(q.mediaPackageId(mpId)).run();
+      List<Snapshot> snapshots = am.getSnapshotsById(mpId);
+      List<Property> properties = am.selectProperties(mpId, null);
       assertEquals("Two records should be found since there are now two versions of the media package and no version restriction has been applied",
-                   2, r.getSize());
-      assertEquals("Two properties should be found, one per found record", 2, getProperties(r.getRecords()).size());
-      assertEquals("There should be one distinct property in all of the found records", 1, new HashSet(getProperties(r.getRecords())).size());
-      assertEquals("Value check", d3, getProperties(r.getRecords()).stream().findFirst().get().getValue().get(Value.DATE));
-      assertEquals("Two record should be found", 2, q.select(q.properties()).run().getRecords().size());
+                   2, snapshots.size());
+      assertEquals("One properties should be found", 1, properties.size());
+      assertEquals("There should be one distinct property in all of the found records", 1, new HashSet(properties).size());
+      assertEquals("Value check", d3, properties.stream().findFirst().get().getValue().get(Value.DATE));
     }
   }
 }

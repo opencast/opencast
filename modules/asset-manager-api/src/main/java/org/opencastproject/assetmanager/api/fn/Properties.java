@@ -40,8 +40,6 @@ public final class Properties {
   /**
    * Set a string property on a media package.
    *
-   * @deprecated make use of a {@link org.opencastproject.assetmanager.api.query.PropertySchema}
-   * instead of creating property IDs manually
    */
   public static boolean setProperty(AssetManager am, String mpId, String namespace, String propertyName, String value) {
     return setProperty(am, mpId, namespace, propertyName, Value.mk(value));
@@ -50,8 +48,6 @@ public final class Properties {
   /**
    * Set a date property on a media package.
    *
-   * @deprecated make use of a {@link org.opencastproject.assetmanager.api.query.PropertySchema}
-   * instead of creating property IDs manually
    */
   public static boolean setProperty(AssetManager am, String mpId, String namespace, String propertyName, Date value) {
     return setProperty(am, mpId, namespace, propertyName, Value.mk(value));
@@ -60,8 +56,6 @@ public final class Properties {
   /**
    * Set a long property on a media package.
    *
-   * @deprecated make use of a {@link org.opencastproject.assetmanager.api.query.PropertySchema}
-   * instead of creating property IDs manually
    */
   public static boolean setProperty(AssetManager am, String mpId, String namespace, String propertyName, Long value) {
     return setProperty(am, mpId, namespace, propertyName, Value.mk(value));
@@ -70,8 +64,6 @@ public final class Properties {
   /**
    * Set a boolean property on a media package.
    *
-   * @deprecated make use of a {@link org.opencastproject.assetmanager.api.query.PropertySchema}
-   * instead of creating property IDs manually
    */
   public static boolean setProperty(
       AssetManager am, String mpId, String namespace, String propertyName, boolean value) {
@@ -81,8 +73,6 @@ public final class Properties {
   /**
    * Set a property on a media package.
    *
-   * @deprecated make use of a {@link org.opencastproject.assetmanager.api.query.PropertySchema}
-   * instead of creating property IDs manually
    */
   public static boolean setProperty(AssetManager am, String mpId, String namespace, String propertyName, Value value) {
     return am.setProperty(Property.mk(PropertyId.mk(mpId, namespace, propertyName), value));
