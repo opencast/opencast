@@ -140,7 +140,7 @@ public class AssetManagerBasicTest extends AssetManagerTestBase {
     final Date d2 = new Date(1);
     final Date d3 = new Date(2);
     logger.info("Add a property to the media package");
-    assertTrue("The property should be set", am.setProperty(p.start.mk(mpId, d1)));
+    assertTrue("The property should be set", am.setProperty(p.start(mpId, d1)));
     logger.info("Select all properties of the media package");
     {
       List<Property> properties = am.selectProperties(mpId, null);
@@ -148,7 +148,7 @@ public class AssetManagerBasicTest extends AssetManagerTestBase {
       assertEquals("Value check", d1, properties.stream().findFirst().get().getValue().get(Value.DATE));
     }
     logger.info("Update the property");
-    assertTrue("The property should be updated", am.setProperty(p.start.mk(mpId, d2)));
+    assertTrue("The property should be updated", am.setProperty(p.start(mpId, d2)));
     {
       List<Property> properties = am.selectProperties(mpId, null);
       assertEquals("One property should be found", 1, properties.size());
@@ -158,7 +158,7 @@ public class AssetManagerBasicTest extends AssetManagerTestBase {
     logger.info("Add a new version of the media package");
     am.takeSnapshot(OWNER, mp);
     logger.info("Update the property again");
-    assertTrue("The property should be updated", am.setProperty(p.start.mk(mpId, d3)));
+    assertTrue("The property should be updated", am.setProperty(p.start(mpId, d3)));
     {
       List<Snapshot> snapshots = am.getSnapshotsById(mpId);
       List<Property> properties = am.selectProperties(mpId, null);

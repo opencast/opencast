@@ -26,7 +26,6 @@ import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
-import org.opencastproject.assetmanager.api.query.VersionField;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.impl.AclDb;
@@ -180,12 +179,10 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
     Snapshot snapshot = EasyMock.createNiceMock(Snapshot.class);
     EasyMock.expect(snapshot.getMediaPackage()).andReturn(new MediaPackageBuilderImpl().createNew()).anyTimes();
 
-    VersionField version = EasyMock.createNiceMock(VersionField.class);
-
     AssetManager assetManager = EasyMock.createNiceMock(AssetManager.class);
     EasyMock.expect(assetManager.getMediaPackage(EasyMock.anyString())).andReturn(Optional.of(
         new MediaPackageBuilderImpl().createNew())).anyTimes();
-    EasyMock.replay(assetManager, version, snapshot);
+    EasyMock.replay(assetManager, snapshot);
     return assetManager;
   }
 

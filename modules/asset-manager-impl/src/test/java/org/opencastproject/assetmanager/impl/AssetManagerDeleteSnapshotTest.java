@@ -36,9 +36,9 @@ public class AssetManagerDeleteSnapshotTest extends AssetManagerDeleteTestBase {
     final int versionCount = 5;
     final String[] mp = createAndAddMediaPackagesSimple(mpCount, versionCount, versionCount);
     // each mp has one property
-    am.setProperty(p.agent.mk(mp[0], "agent-1"));
-    am.setProperty(p.agent.mk(mp[1], "agent-2"));
-    am.setProperty(p.agent.mk(mp[2], "agent-2"));
+    am.setProperty(p.agent(mp[0], "agent-1"));
+    am.setProperty(p.agent(mp[1], "agent-2"));
+    am.setProperty(p.agent(mp[2], "agent-2"));
     assertTotals(mpCount * versionCount, mpCount * versionCount, 3);
     assertStoreSize(mpCount * versionCount * 2);
     assertEquals(versionCount, am.deleteSnapshots(mp[0]));
@@ -52,16 +52,15 @@ public class AssetManagerDeleteSnapshotTest extends AssetManagerDeleteTestBase {
   @Test
   public void testDeleteAllVersionsOfOne2() throws Exception {
     final String[] mp = createAndAddMediaPackagesSimple(3, 2, 2);
-    am.setProperty(p.agent.mk(mp[0], "agent-1"));
-    am.setProperty(p.agent.mk(mp[1], "agent-2"));
-    am.setProperty(p.agent.mk(mp[2], "agent-2"));
+    am.setProperty(p.agent(mp[0], "agent-1"));
+    am.setProperty(p.agent(mp[1], "agent-2"));
+    am.setProperty(p.agent(mp[2], "agent-2"));
     assertTotals(6, 6, 3);
     assertStoreSize(6 * 2);
     assertEquals(
         "Two snapshots should be deleted",
         2,
         am.deleteSnapshots(mp[0])
-//        q.delete(OWNER, q.snapshot()).where(q.version().isFirst()).run()
     );
     assertTotals(4, 4, 3);
     assertStoreSize(3 * 4);
@@ -76,9 +75,9 @@ public class AssetManagerDeleteSnapshotTest extends AssetManagerDeleteTestBase {
     final int versionCount = 5;
     final String[] mp = createAndAddMediaPackagesSimple(mpCount, versionCount, versionCount);
     // each mp has one property
-    am.setProperty(p.agent.mk(mp[0], "agent-1"));
-    am.setProperty(p.agent.mk(mp[1], "agent-2"));
-    am.setProperty(p.agent.mk(mp[2], "agent-2"));
+    am.setProperty(p.agent(mp[0], "agent-1"));
+    am.setProperty(p.agent(mp[1], "agent-2"));
+    am.setProperty(p.agent(mp[2], "agent-2"));
     assertTotals(mpCount * versionCount, mpCount * versionCount, 3);
     assertStoreSize(mpCount * versionCount * 2);
     assertEquals(versionCount - 1, am.deleteAllButLatestSnapshot(mp[0]));

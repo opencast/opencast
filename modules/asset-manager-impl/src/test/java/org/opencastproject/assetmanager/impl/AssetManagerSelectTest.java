@@ -118,9 +118,9 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
     logger.info("Add another media package with some properties of the same namespace");
     final MediaPackage mp2 = mkMediaPackage(mkCatalog());
     am.takeSnapshot(OWNER, mp2);
-    am.setProperty(p.count.mk(mp2.getIdentifier().toString(), 20L));
-    am.setProperty(p.approved.mk(mp2.getIdentifier().toString(), true));
-    am.setProperty(p.start.mk(mp2.getIdentifier().toString(), new Date()));
+    am.setProperty(p.count(mp2.getIdentifier().toString(), 20L));
+    am.setProperty(p.approved(mp2.getIdentifier().toString(), true));
+    am.setProperty(p.start(mp2.getIdentifier().toString(), new Date()));
     logger.info("Add a 3rd media package without any properties");
     am.takeSnapshot(OWNER, mkMediaPackage(mkCatalog()));
 
@@ -129,7 +129,7 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
     assertEquals("Three properties should be found", 3, am.selectProperties(mp2.getIdentifier().toString(), null).size());
 
     assertEquals("One property should be found", 1, am.selectProperties(mp1.getIdentifier().toString(), "org.opencastproject.service").size());
-    assertEquals("Three properties should be found", 3, am.selectProperties(mp2.getIdentifier().toString(), p.namespace()).size());
+    assertEquals("Three properties should be found", 3, am.selectProperties(mp2.getIdentifier().toString(), p.getNamespace()).size());
   }
 
   @Test

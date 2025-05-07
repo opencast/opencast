@@ -32,9 +32,9 @@ public class AssetManagerDeletePropertyTest extends AssetManagerDeleteTestBase {
   @Test
   public void testDeleteByMediaPackage() throws Exception {
     final String[] mp = createAndAddMediaPackagesSimple(3, 2, 2);
-    am.setProperty(p.agent.mk(mp[0], "agent-1"));
-    am.setProperty(p.agent.mk(mp[1], "agent-2"));
-    am.setProperty(p.agent.mk(mp[2], "agent-5"));
+    am.setProperty(p.agent(mp[0], "agent-1"));
+    am.setProperty(p.agent(mp[1], "agent-2"));
+    am.setProperty(p.agent(mp[2], "agent-5"));
     assertTotals(6, 6, 3);
     assertEquals(
         "One property should be deleted",
@@ -49,62 +49,62 @@ public class AssetManagerDeletePropertyTest extends AssetManagerDeleteTestBase {
     );
     assertTotals(6, 6, 1);
     assertEquals(Value.mk("agent-5"),
-        am.selectProperties(mp[2], p.namespace()).get(0).getValue());
+        am.selectProperties(mp[2], p.getNamespace()).get(0).getValue());
   }
 
   @Test
   public void testDeleteByMediaPackageAndNamespace() throws Exception {
     final String[] mp = createAndAddMediaPackagesSimple(3, 2, 2);
-    am.setProperty(p.agent.mk(mp[0], "agent-1"));
-    am.setProperty(p.agent.mk(mp[1], "agent-2"));
-    am.setProperty(p2.agent.mk(mp[1], "agent-12"));
-    am.setProperty(p.agent.mk(mp[2], "agent-5"));
+    am.setProperty(p.agent(mp[0], "agent-1"));
+    am.setProperty(p.agent(mp[1], "agent-2"));
+    am.setProperty(p2.agent(mp[1], "agent-12"));
+    am.setProperty(p.agent(mp[2], "agent-5"));
     assertTotals(6, 6, 4);
     assertEquals(
         "One property should be deleted",
         1,
-        am.deleteProperties(mp[0], p.namespace())
+        am.deleteProperties(mp[0], p.getNamespace())
     );
     assertTotals(6, 6, 3);
     assertEquals(
         "One property should be deleted",
         1,
-        am.deleteProperties(mp[1], p.namespace())
+        am.deleteProperties(mp[1], p.getNamespace())
     );
     assertTotals(6, 6, 2);
     assertEquals(Value.mk("agent-12"),
-        am.selectProperties(mp[1], p2.namespace()).get(0).getValue());
+        am.selectProperties(mp[1], p2.getNamespace()).get(0).getValue());
     assertEquals(Value.mk("agent-5"),
-        am.selectProperties(mp[2], p.namespace()).get(0).getValue());
+        am.selectProperties(mp[2], p.getNamespace()).get(0).getValue());
   }
 
   @Test
   public void testRemoveProperties() throws Exception {
     final String[] mp = createAndAddMediaPackagesSimple(2, 1, 1);
-    am.setProperty(p.agent.mk(mp[0], "agent"));
-    am.setProperty(p.approved.mk(mp[0], true));
-    am.setProperty(p.count.mk(mp[0], 1L));
-    am.setProperty(p2.agent.mk(mp[0], "agent"));
+    am.setProperty(p.agent(mp[0], "agent"));
+    am.setProperty(p.approved(mp[0], true));
+    am.setProperty(p.count(mp[0], 1L));
+    am.setProperty(p2.agent(mp[0], "agent"));
     //
-    am.setProperty(p.agent.mk(mp[1], "agent"));
-    am.setProperty(p.approved.mk(mp[1], true));
-    am.setProperty(p.legacyId.mk(mp[1], "id"));
+    am.setProperty(p.agent(mp[1], "agent"));
+    am.setProperty(p.approved(mp[1], true));
+    am.setProperty(p.legacyId(mp[1], "id"));
     assertEquals(0L, Properties.removeProperties(
-        am, "unknown-mp-id", p.namespace()
+        am, "unknown-mp-id", p.getNamespace()
     ));
     assertEquals(0L, Properties.removeProperties(
         am, mp[0], "unknown-namespace"
     ));
     assertEquals(3L, Properties.removeProperties(
-        am, mp[0], p.namespace()
+        am, mp[0], p.getNamespace()
     ));
     assertEquals(1L, am.selectProperties(mp[0], null).size());
 //    assertEquals(1L, enrich(q.select(q.properties()).where(q.mediaPackageId(mp[0])).run()).countProperties());
     assertEquals(1L, Properties.removeProperties(
-        am, mp[0], p2.namespace()
+        am, mp[0], p2.getNamespace()
     ));
     assertEquals(3L, Properties.removeProperties(
-        am, mp[1], p.namespace()
+        am, mp[1], p.getNamespace()
     ));
   }
 }

@@ -23,7 +23,6 @@ package org.opencastproject.liveschedule.impl;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Version;
-import org.opencastproject.assetmanager.api.query.ARecord;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.distribution.api.DownloadDistributionService;
 import org.opencastproject.job.api.Job;
@@ -414,11 +413,9 @@ public class LiveScheduleServiceImplTest {
     EasyMock.expect(snapshot.getMediaPackage()).andReturn(mp).anyTimes();
     EasyMock.expect(snapshot.getOrganizationId()).andReturn(org.getId()).anyTimes();
     EasyMock.expect(snapshot.getVersion()).andReturn(version);
-    ARecord aRec = EasyMock.createNiceMock(ARecord.class);
-    EasyMock.expect(aRec.getSnapshot()).andReturn(Optional.of(snapshot)).anyTimes();
     EasyMock.expect(assetManager.getLatestSnapshot(EasyMock.anyString()))
         .andReturn(Optional.of(snapshot)).anyTimes();
-    EasyMock.replay(snapshot, aRec);
+    EasyMock.replay(snapshot);
   }
 
   @Test

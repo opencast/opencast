@@ -23,9 +23,12 @@ package org.opencastproject.assetmanager.impl;
 import static org.junit.Assert.assertEquals;
 import static org.opencastproject.util.data.Tuple.tuple;
 
+import org.opencastproject.assetmanager.api.Property;
+import org.opencastproject.assetmanager.api.PropertyId;
+import org.opencastproject.assetmanager.api.PropertyName;
 import org.opencastproject.assetmanager.api.Snapshot;
+import org.opencastproject.assetmanager.api.Value;
 import org.opencastproject.assetmanager.api.Version;
-import org.opencastproject.assetmanager.api.query.PropertyField;
 import org.opencastproject.assetmanager.api.storage.AssetStore;
 import org.opencastproject.assetmanager.api.storage.AssetStoreException;
 import org.opencastproject.assetmanager.api.storage.DeletionSelector;
@@ -33,7 +36,6 @@ import org.opencastproject.assetmanager.api.storage.RemoteAssetStore;
 import org.opencastproject.assetmanager.api.storage.Source;
 import org.opencastproject.assetmanager.api.storage.StoragePath;
 import org.opencastproject.assetmanager.impl.persistence.Database;
-import org.opencastproject.assetmanager.impl.query.PropertySchema;
 import org.opencastproject.assetmanager.impl.util.TestUser;
 import org.opencastproject.db.DBTestEnv;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
@@ -305,30 +307,52 @@ public abstract class AssetManagerTestBase {
   /**
    * A property schema definition.
    */
-  public static class Props extends PropertySchema {
+  public static class Props {
+    private final String namespace;
+
     public Props(String namespace) {
-      super(namespace);
+      this.namespace = namespace;
     }
 
-    // define your properties here below
+    public String getNamespace() {
+      return namespace;
+    }
 
-    // CHECKSTYLE:OFF
-    public final PropertyField<Long> count = longProp("count");
+    private PropertyName name(String localName) {
+      return PropertyName.mk(namespace, localName);
+    }
 
-    public final PropertyField<Boolean> approved = booleanProp("approved");
+    public Property count(String mpId, long value) {
+      return Property.mk(PropertyId.mk(mpId, name("count")), Value.LONG.mk(value));
+    }
 
-    public final PropertyField<Date> start = dateProp("start");
+    public Property approved(String mpId, boolean value) {
+      return Property.mk(PropertyId.mk(mpId, name("approved")), Value.BOOLEAN.mk(value));
+    }
 
-    public final PropertyField<Date> end = dateProp("end");
+    public Property start(String mpId, Date value) {
+      return Property.mk(PropertyId.mk(mpId, name("start")), Value.DATE.mk(value));
+    }
 
-    public final PropertyField<String> legacyId = stringProp("legacyId");
+    public Property end(String mpId, Date value) {
+      return Property.mk(PropertyId.mk(mpId, name("end")), Value.DATE.mk(value));
+    }
 
-    public final PropertyField<String> agent = stringProp("agent");
+    public Property legacyId(String mpId, String value) {
+      return Property.mk(PropertyId.mk(mpId, name("legacyId")), Value.STRING.mk(value));
+    }
 
-    public final PropertyField<String> seriesId = stringProp("series");
+    public Property agent(String mpId, String value) {
+      return Property.mk(PropertyId.mk(mpId, name("agent")), Value.STRING.mk(value));
+    }
 
-    public final PropertyField<Version> versionId = versionProp("version");
-    // CHECKSTYLE:ON
+    public Property seriesId(String mpId, String value) {
+      return Property.mk(PropertyId.mk(mpId, name("series")), Value.STRING.mk(value));
+    }
+
+    public Property versionId(String mpId, Version value) {
+      return Property.mk(PropertyId.mk(mpId, name("version")), Value.VERSION.mk(value));
+    }
   }
 
   /**
