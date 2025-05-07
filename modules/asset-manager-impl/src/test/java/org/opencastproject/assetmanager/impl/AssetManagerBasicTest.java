@@ -33,7 +33,6 @@ import org.opencastproject.assetmanager.api.PropertyId;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Value;
 import org.opencastproject.assetmanager.api.Version;
-import org.opencastproject.assetmanager.impl.persistence.QSnapshotDto;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElement;
@@ -58,16 +57,6 @@ public class AssetManagerBasicTest extends AssetManagerTestBase {
     assertStoreSize(2);
     createAndAddMediaPackagesSimple(3, 1, 1);
     assertStoreSize(8);
-  }
-
-  @Test
-  public void testQuerydslEquality() {
-    final QSnapshotDto dto1 = QSnapshotDto.snapshotDto;
-    final QSnapshotDto dto2 = new QSnapshotDto("s");
-    final QSnapshotDto dto3 = new QSnapshotDto("s");
-    assertFalse("Entity paths with different names must not be equal", dto1.equals(dto2));
-    assertTrue("Two entity paths are equals if they have the same alias", dto2.equals(dto3));
-    assertFalse("Descendant paths of entities with different names must not be equal", dto1.mediaPackageId.equals(dto2.mediaPackageId));
   }
 
   @Test

@@ -22,11 +22,9 @@ package org.opencastproject.assetmanager.impl;
 
 import static org.junit.Assert.assertEquals;
 
-import org.opencastproject.assetmanager.impl.persistence.EntityPaths;
-
 import org.junit.Test;
 
-public class AssetManagerDeleteSnapshotTest extends AssetManagerDeleteTestBase implements EntityPaths {
+public class AssetManagerDeleteSnapshotTest extends AssetManagerDeleteTestBase {
 
   /**
    * Deleting a complete episode should also delete all of its properties.

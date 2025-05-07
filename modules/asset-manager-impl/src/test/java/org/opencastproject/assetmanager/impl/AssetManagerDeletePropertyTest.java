@@ -24,11 +24,10 @@ import static org.junit.Assert.assertEquals;
 
 import org.opencastproject.assetmanager.api.Value;
 import org.opencastproject.assetmanager.api.fn.Properties;
-import org.opencastproject.assetmanager.impl.persistence.EntityPaths;
 
 import org.junit.Test;
 
-public class AssetManagerDeletePropertyTest extends AssetManagerDeleteTestBase implements EntityPaths {
+public class AssetManagerDeletePropertyTest extends AssetManagerDeleteTestBase {
 
   @Test
   public void testDeleteByMediaPackage() throws Exception {

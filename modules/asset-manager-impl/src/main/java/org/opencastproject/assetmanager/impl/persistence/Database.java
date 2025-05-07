@@ -52,7 +52,7 @@ import javax.persistence.TypedQuery;
  * Data access object.
  */
 @ParametersAreNonnullByDefault
-public class Database implements EntityPaths {
+public class Database {
   private static final Logger logger = LoggerFactory.getLogger(Database.class);
 
   private final DBSession db;

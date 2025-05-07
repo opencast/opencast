@@ -25,11 +25,10 @@ import static org.junit.Assert.assertEquals;
 import static org.opencastproject.db.Queries.nativeQuery;
 
 import org.opencastproject.assetmanager.impl.persistence.Database;
-import org.opencastproject.assetmanager.impl.persistence.EntityPaths;
 import org.opencastproject.db.DBSession;
 import org.opencastproject.db.DBTestEnv;
 
-public class AssetManagerDeleteTestBase extends AssetManagerTestBase implements EntityPaths {
+public class AssetManagerDeleteTestBase extends AssetManagerTestBase {
 
   protected DBSession db;
 
