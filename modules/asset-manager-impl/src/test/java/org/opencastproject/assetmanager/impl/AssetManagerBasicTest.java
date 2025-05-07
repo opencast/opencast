@@ -40,6 +40,7 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderImpl;
 import org.opencastproject.mediapackage.MediaPackageElements;
+import org.opencastproject.security.api.DefaultOrganization;
 
 import org.junit.Test;
 
@@ -108,7 +109,11 @@ public class AssetManagerBasicTest extends AssetManagerTestBase {
     final MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
     final Version v1 = am.takeSnapshot(OWNER, mp).getVersion();
     am.setAvailability(v1, mp.getIdentifier().toString(), Availability.OFFLINE);
-    Optional<Snapshot> optSnapshot = am.getLatestSnapshot(mp.getIdentifier().toString());
+    Optional<Snapshot> optSnapshot = am.getSnapshotByMpIdOrgIdAndVersion(
+        mp.getIdentifier().toString(),
+        new DefaultOrganization().getId(),
+        v1
+    );
     Snapshot snapshot = optSnapshot.get();
     assertEquals("One offline snapshot should be found", Availability.OFFLINE, snapshot.getAvailability());
   }

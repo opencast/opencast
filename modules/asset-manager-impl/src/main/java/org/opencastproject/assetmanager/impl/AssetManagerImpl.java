@@ -1095,6 +1095,16 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     return getDatabase().countSnapshots(organization);
   }
 
+  @Override
+  public long countAssets() {
+    return getDatabase().countAssets();
+  }
+
+  @Override
+  public long countProperties() {
+    return getDatabase().countProperties();
+  }
+
   /**
    * AbstractIndexProducer Implementation
    */

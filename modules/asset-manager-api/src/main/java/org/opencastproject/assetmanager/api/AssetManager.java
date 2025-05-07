@@ -390,4 +390,8 @@ public interface AssetManager {
    * @return Number of snapshots
    */
   long countSnapshots(String organization);
+
+  long countAssets();
+
+  long countProperties();
 }

@@ -23,9 +23,11 @@ package org.opencastproject.assetmanager.impl.persistence;
 import org.opencastproject.util.MimeType;
 
 import java.util.Optional;
+import java.util.function.Function;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EntityManager;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -36,6 +38,7 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
 import javax.persistence.TableGenerator;
+import javax.persistence.TypedQuery;
 
 /** JPA DTO modeling the asset database table. */
 @Entity(name = "Asset")
@@ -65,6 +68,21 @@ import javax.persistence.TableGenerator;
             + "WHERE a.checksum = :checksum "
             + "AND a.storageId = :storageId "
             + "AND s.organizationId = :orgId "
+    ),
+    @NamedQuery(
+        name = "Asset.updateStorageIdBySnapshot",
+        query = "UPDATE Asset a SET a.storageId = :storageId "
+            + "WHERE a.snapshot = :snapshot "
+    ),
+    @NamedQuery(
+        name = "Asset.updateStorageIdBySnapshotAndMpElementId",
+        query = "UPDATE Asset a SET a.storageId = :storageId "
+            + "WHERE a.snapshot = :snapshot "
+            + "AND a.mediaPackageElementId = :mediaPackageElementId "
+    ),
+    @NamedQuery(
+        name = "Asset.countAssets",
+        query = "SELECT COUNT(a) FROM Asset a "
     ),
 })
 // Maintain own generator to support database migrations from Archive to AssetManager
@@ -155,5 +173,17 @@ public class AssetDto {
     this.snapshot = snapshot;
   }
 
+  /**
+   * Count assets in the asset manager
+   *
+   * @return Number of assts
+   */
+  public static Function<EntityManager, Long> countAssetsQuery() {
+    return em -> {
+      TypedQuery<Long> query;
+      query = em.createNamedQuery("Asset.countAssets", Long.class);
+      return query.getSingleResult();
+    };
+  }
 
 }

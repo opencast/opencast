@@ -32,14 +32,6 @@ import org.opencastproject.db.DBSession;
 import org.opencastproject.db.Queries;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
-import org.opencastproject.util.data.Function;
-
-import com.mysema.query.jpa.EclipseLinkTemplates;
-import com.mysema.query.jpa.JPQLTemplates;
-import com.mysema.query.jpa.impl.JPADeleteClause;
-import com.mysema.query.jpa.impl.JPAQuery;
-import com.mysema.query.jpa.impl.JPAQueryFactory;
-import com.mysema.query.jpa.impl.JPAUpdateClause;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -63,31 +55,10 @@ import javax.persistence.TypedQuery;
 public class Database implements EntityPaths {
   private static final Logger logger = LoggerFactory.getLogger(Database.class);
 
-  public static final JPQLTemplates TEMPLATES = EclipseLinkTemplates.DEFAULT;
-
   private final DBSession db;
 
   public Database(DBSession db) {
     this.db = db;
-  }
-
-  /**
-   * Run a Queryldsl query inside a persistence context/transaction.
-   *
-   * @param q the query function to run
-   */
-  public <A> A run(final Function<JPAQueryFactory, A> q) {
-    return db.execTx(em -> {
-      return q.apply(new JPAQueryFactory(TEMPLATES, () -> em));
-    });
-  }
-
-  public void logQuery(JPAQuery q) {
-    logger.debug("\n---\nQUERY\n{}\n---", q);
-  }
-
-  public void logDelete(String queryName, JPADeleteClause q) {
-    logger.debug("\n---\nDELETE {}\n{}\n---", queryName, q);
   }
 
   /**
@@ -205,20 +176,25 @@ public class Database implements EntityPaths {
 
   public void setStorageLocation(final VersionImpl version, final String mpId, final String storageId) {
     db.execTx(em -> {
-      final QSnapshotDto q = QSnapshotDto.snapshotDto;
-      final QAssetDto a = QAssetDto.assetDto;
-      // Update the snapshot
-      new JPAUpdateClause(em, q, TEMPLATES)
-          .where(q.version.eq(version.value()).and(q.mediaPackageId.eq(mpId)))
-          .set(q.storageId, storageId)
-          .execute();
-      // Get the snapshot (to get its database ID)
-      Optional<SnapshotDtos.Medium> s = getSnapshot(version, mpId);
-      // Update the assets
-      new JPAUpdateClause(em, a, TEMPLATES)
-          .where(a.snapshot.id.eq(s.get().getSnapshotDto().getId()))
-          .set(a.storageId, storageId)
-          .execute();
+      // Update snapshot
+      namedQuery.update(
+          "Snapshot.updateStorageIdByVersionAndMpId",
+          Pair.of("storageId", storageId),
+          Pair.of("version", version.value()),
+          Pair.of("mediaPackageId", mpId)
+      );
+
+      // Update asset
+      Optional<SnapshotDtos.Medium> optSnapshot = getSnapshot(version, mpId);
+      if (optSnapshot.isPresent()) {
+        // Update all associated assets
+        namedQuery.update(
+            "Asset.updateStorageIdBySnapshot",
+            Pair.of("storageId", storageId),
+            Pair.of("snapshot", optSnapshot.get().getSnapshotDto())
+        ).apply(em);
+      }
+
       return null;
     });
   }
@@ -226,24 +202,29 @@ public class Database implements EntityPaths {
   public void setAssetStorageLocation(final VersionImpl version, final String mpId, final String mpeId,
           final String storageId) {
     db.execTx(em -> {
-      final QAssetDto a = QAssetDto.assetDto;
-      Optional<SnapshotDtos.Medium> s = getSnapshot(version, mpId);
-      // Update the asset store id
-      new JPAUpdateClause(em, a, TEMPLATES)
-          .where(a.snapshot.id.eq(s.get().getSnapshotDto().getId()).and(a.mediaPackageElementId.eq(mpeId)))
-          .set(a.storageId, storageId).execute();
+      Optional<SnapshotDtos.Medium> optSnapshot = getSnapshot(version, mpId);
+      if (optSnapshot.isPresent()) {
+        // Update the asset store id
+        namedQuery.update(
+            "Asset.updateStorageIdBySnapshotAndMpElementId",
+            Pair.of("storageId", storageId),
+            Pair.of("snapshot", optSnapshot.get().getSnapshotDto()),
+            Pair.of("mediaPackageElementId", mpeId)
+        ).apply(em);
+      }
+
       return null;
     });
   }
 
-  public void setAvailability(final VersionImpl version, final String mpId, final Availability availability) {
-    db.execTx(em -> {
-      final QSnapshotDto q = QSnapshotDto.snapshotDto;
-      new JPAUpdateClause(em, q, TEMPLATES)
-          .where(q.version.eq(version.value()).and(q.mediaPackageId.eq(mpId)))
-          .set(q.availability, availability.name())
-          .execute();
-      return null;
+  public int setAvailability(final VersionImpl version, final String mpId, final Availability availability) {
+    return db.execTx(em -> {
+      return namedQuery.update(
+          "Snapshot.updateAvailabilityByVersionAndMpId",
+          Pair.of("availability", availability.name()),
+          Pair.of("version", version.value()),
+          Pair.of("mediaPackageId", mpId)
+      ).apply(em);
     });
   }
 
@@ -396,6 +377,14 @@ public class Database implements EntityPaths {
    */
   public long countSnapshots(final String organization) {
     return db.exec(SnapshotDto.countSnapshotsQuery(organization));
+  }
+
+  public long countAssets() {
+    return db.exec(AssetDto.countAssetsQuery());
+  }
+
+  public long countProperties() {
+    return db.exec(PropertyDto.countPropertiesQuery());
   }
 
   public Optional<AssetDtos.Full> findAssetByChecksumAndStoreAndOrg(final String checksum, final String storeId,

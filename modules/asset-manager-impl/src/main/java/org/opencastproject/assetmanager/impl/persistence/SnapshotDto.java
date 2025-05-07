@@ -202,7 +202,7 @@ import javax.persistence.UniqueConstraint;
         @NamedQuery(
             name = "Snapshot.findByMpIdOrgIdAndVersion",
             query = "SELECT s FROM Snapshot s "
-                + "WHERE s.mediaPackageId = :mediaPackageIds "
+                + "WHERE s.mediaPackageId = :mediaPackageId "
                 + "AND s.organizationId = :organizationId "
                 + "AND s.version = :version "
         ),
@@ -210,6 +210,18 @@ import javax.persistence.UniqueConstraint;
             name = "Snapshot.countSnapshots",
             query = "SELECT COUNT(s) FROM Snapshot s "
                 + "WHERE (:organizationId IS NULL OR s.organizationId = :organizationId)"
+        ),
+        @NamedQuery(
+            name = "Snapshot.updateStorageIdByVersionAndMpId",
+            query = "UPDATE Snapshot s SET s.storageId = :storageId "
+                + "WHERE s.version = :version "
+                + "AND s.mediaPackageId = :mediaPackageId"
+        ),
+        @NamedQuery(
+            name = "Snapshot.updateAvailabilityByVersionAndMpId",
+            query = "UPDATE Snapshot s SET s.availability = :availability "
+                + "WHERE s.version = :version "
+                + "AND s.mediaPackageId = :mediaPackageId"
         ),
 })
 // Maintain own generator to support database migrations from Archive to AssetManager
