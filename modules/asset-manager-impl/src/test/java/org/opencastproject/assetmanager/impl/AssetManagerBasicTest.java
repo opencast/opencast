@@ -49,7 +49,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
-// CHECKSTYLE:OFF
 public class AssetManagerBasicTest extends AssetManagerTestBase {
   @Test
   public void testAddToStore() {
@@ -81,7 +80,8 @@ public class AssetManagerBasicTest extends AssetManagerTestBase {
   @Test
   public void testUnwrapException() {
     assertTrue(AssetManagerImpl.unwrapExceptionUntil(Exception.class, new AssetManagerException()).isPresent());
-    assertThat(AssetManagerImpl.unwrapExceptionUntil(Exception.class, new AssetManagerException()).get(), instanceOf(AssetManagerException.class));
+    assertThat(AssetManagerImpl.unwrapExceptionUntil(Exception.class, new AssetManagerException()).get(),
+        instanceOf(AssetManagerException.class));
     assertEquals("error", AssetManagerImpl.unwrapExceptionUntil(
             AssetManagerException.class,
             new AssetManagerException("error")).get().getMessage());
@@ -110,7 +110,8 @@ public class AssetManagerBasicTest extends AssetManagerTestBase {
   @Test
   public void testSetPropertyOnNonExistingMediaPackage() throws Exception {
     assertFalse("Property should not be stored since the referenced media package does not exist",
-                am.setProperty(Property.mk(PropertyId.mk("id", "namespace", "name"), Value.mk("value"))));
+                am.setProperty(Property.mk(PropertyId.mk("id", "namespace", "name"),
+                    Value.mk("value"))));
   }
 
   @Test
@@ -162,10 +163,12 @@ public class AssetManagerBasicTest extends AssetManagerTestBase {
     {
       List<Snapshot> snapshots = am.getSnapshotsById(mpId);
       List<Property> properties = am.selectProperties(mpId, null);
-      assertEquals("Two records should be found since there are now two versions of the media package and no version restriction has been applied",
+      assertEquals("Two records should be found since there are now two versions of the media package and no"
+                  + "version restriction has been applied",
                    2, snapshots.size());
       assertEquals("One properties should be found", 1, properties.size());
-      assertEquals("There should be one distinct property in all of the found records", 1, new HashSet(properties).size());
+      assertEquals("There should be one distinct property in all of the found records",
+          1, new HashSet(properties).size());
       assertEquals("Value check", d3, properties.stream().findFirst().get().getValue().get(Value.DATE));
     }
   }

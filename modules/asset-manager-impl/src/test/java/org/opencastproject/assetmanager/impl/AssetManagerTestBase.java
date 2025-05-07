@@ -88,7 +88,6 @@ import java.util.stream.Collectors;
 /**
  * Base class for {@link org.opencastproject.assetmanager.api.AssetManager} tests.
  */
-// CHECKSTYLE:OFF
 public abstract class AssetManagerTestBase {
   protected static final Logger logger = LoggerFactory.getLogger(AssetManagerTestBase.class);
   public static final String PERSISTENCE_UNIT = "org.opencastproject.assetmanager.impl";
@@ -110,8 +109,8 @@ public abstract class AssetManagerTestBase {
   @Before
   public void setUp() throws Exception {
     this.am = makeAssetManager();
-    p = new Props( "org.opencastproject.service");
-    p2 = new Props( "org.opencastproject.service.sub");
+    p = new Props("org.opencastproject.service");
+    p2 = new Props("org.opencastproject.service.sub");
   }
 
   protected AssetManagerImpl makeAssetManager() throws Exception {
@@ -216,8 +215,8 @@ public abstract class AssetManagerTestBase {
   }
 
   @SafeVarargs
-  public static  <A> A[] $a(A... as) {
-    return as;
+  public static <A> A[] arrayOf(A... elements) {
+    return elements;
   }
 
   /**
@@ -507,4 +506,3 @@ public abstract class AssetManagerTestBase {
     return "test";
   }
 }
-// CHECKSTYLE:ON

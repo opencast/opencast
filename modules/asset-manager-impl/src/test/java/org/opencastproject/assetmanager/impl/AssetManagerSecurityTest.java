@@ -144,16 +144,16 @@ public class AssetManagerSecurityTest extends AssetManagerTestBase {
 
   private Object parametersForTestTakeSnapshot() {
     final Organization org = TestOrganization.mkDefault();
-    return $a($a(acl(ace(ROLE_TEACHER, WRITE_ACTION)),
+    return arrayOf(arrayOf(acl(ace(ROLE_TEACHER, WRITE_ACTION)),
                  TestUser.mk(org, ROLE_USER),
                  true),
-              $a(acl(ace(ROLE_TEACHER, WRITE_ACTION)),
+              arrayOf(acl(ace(ROLE_TEACHER, WRITE_ACTION)),
                  TestUser.mk(org, ROLE_USER, ROLE_TEACHER),
                  true),
-              $a(acl(ace(ROLE_TEACHER, WRITE_ACTION)),
+              arrayOf(acl(ace(ROLE_TEACHER, WRITE_ACTION)),
                  TestUser.mk(org),
                  true),
-              $a(acl(),
+              arrayOf(acl(),
                  TestUser.mk(org, SecurityConstants.GLOBAL_ADMIN_ROLE),
                  true));
   }
@@ -192,25 +192,25 @@ public class AssetManagerSecurityTest extends AssetManagerTestBase {
 
   private Object parametersForTestSetAvailabilityAndSetProperty() {
     final Organization org = TestOrganization.mkDefault();
-    return $a($a(acl(ace(ROLE_TEACHER, WRITE_ACTION)),
+    return arrayOf(arrayOf(acl(ace(ROLE_TEACHER, WRITE_ACTION)),
                  TestUser.mk(org, ROLE_USER),
                  false),
-              $a(acl(ace(ROLE_TEACHER, WRITE_ACTION)),
+              arrayOf(acl(ace(ROLE_TEACHER, WRITE_ACTION)),
                  TestUser.mk(org, ROLE_USER, ROLE_STUDENT),
                  false),
-              $a(acl(ace(ROLE_TEACHER, WRITE_ACTION)),
+              arrayOf(acl(ace(ROLE_TEACHER, WRITE_ACTION)),
                  TestUser.mk(org, ROLE_USER, ROLE_TEACHER),
                  true),
-              $a(acl(ace(ROLE_TEACHER, WRITE_ACTION)),
+              arrayOf(acl(ace(ROLE_TEACHER, WRITE_ACTION)),
                  TestUser.mk(org, ROLE_TEACHER),
                  true),
-              $a(acl(ace(ROLE_TEACHER, READ_ACTION)),
+              arrayOf(acl(ace(ROLE_TEACHER, READ_ACTION)),
                  TestUser.mk(org, ROLE_TEACHER),
                  false),
-              $a(acl(),
+              arrayOf(acl(),
                  TestUser.mk(org, SecurityConstants.GLOBAL_ADMIN_ROLE),
                  true),
-              $a(acl(),
+              arrayOf(acl(),
                  TestUser.mk(org, org.getAdminRole()),
                  true));
   }
@@ -240,25 +240,25 @@ public class AssetManagerSecurityTest extends AssetManagerTestBase {
 
   private Object parametersForTestGetAsset() {
     final Organization org = TestOrganization.mkDefault();
-    return $a($a(acl(ace(ROLE_TEACHER, WRITE_ACTION)),
+    return arrayOf(arrayOf(acl(ace(ROLE_TEACHER, WRITE_ACTION)),
                  TestUser.mk(org, ROLE_TEACHER),
                  false),
-              $a(acl(ace(ROLE_TEACHER, READ_ACTION)),
+              arrayOf(acl(ace(ROLE_TEACHER, READ_ACTION)),
                  TestUser.mk(org, ROLE_USER, ROLE_STUDENT),
                  false),
-              $a(acl(ace(ROLE_TEACHER, READ_ACTION)),
+              arrayOf(acl(ace(ROLE_TEACHER, READ_ACTION)),
                  TestUser.mk(org, ROLE_USER, ROLE_TEACHER),
                  true),
-              $a(acl(ace(ROLE_TEACHER, READ_ACTION)),
+              arrayOf(acl(ace(ROLE_TEACHER, READ_ACTION)),
                  TestUser.mk(org, ROLE_TEACHER),
                  true),
-              $a(acl(ace(ROLE_TEACHER, READ_ACTION)),
+              arrayOf(acl(ace(ROLE_TEACHER, READ_ACTION)),
                  mkGlobalAdmin(org),
                  true),
-              $a(acl(),
+              arrayOf(acl(),
                  mkOrgAdmin(org),
                  true),
-              $a(acl(),
+              arrayOf(acl(),
                  mkDefaultOrgGlobalAdmin(),
                  true));
   }
@@ -301,46 +301,46 @@ public class AssetManagerSecurityTest extends AssetManagerTestBase {
 //  private Object parametersForTestQuery() {
 //    final Organization org1 = TestOrganization.mk("org1", ROLE_ANONYMOUS, ROLE_ORG_ADMIN);
 //    final Organization org2 = TestOrganization.mk("org2", ROLE_ANONYMOUS, ROLE_ORG_ADMIN);
-//    return $a(
+//    return arrayOf(
 //        // make sure that a role with read rights can access its episodes
-//        $a(acl(ace(ROLE_TEACHER, READ_ACTION), ace(ROLE_TEACHER, WRITE_ACTION)),
+//        arrayOf(acl(ace(ROLE_TEACHER, READ_ACTION), ace(ROLE_TEACHER, WRITE_ACTION)),
 //           TestUser.mk(org1, ROLE_TEACHER),
 //           TestUser.mk(org1, ROLE_TEACHER),
 //           true,
 //           true),
 //        // make sure that roles without read rights cannot read
-//        $a(acl(ace(ROLE_TEACHER, WRITE_ACTION)),
+//        arrayOf(acl(ace(ROLE_TEACHER, WRITE_ACTION)),
 //           TestUser.mk(org1, ROLE_TEACHER),
 //           TestUser.mk(org1, ROLE_TEACHER),
 //           false,
 //           true),
 //        // make sure that a different role cannot read
-//        $a(acl(ace(ROLE_USER, READ_ACTION), ace(ROLE_USER, WRITE_ACTION)),
+//        arrayOf(acl(ace(ROLE_USER, READ_ACTION), ace(ROLE_USER, WRITE_ACTION)),
 //           TestUser.mk(org1, ROLE_USER),
 //           TestUser.mk(org1, ROLE_TEACHER),
 //           false,
 //           false),
 //        // make sure that the organization's admin can always read the episodes of her organization
-//        $a(acl(ace(ROLE_TEACHER, READ_ACTION), ace(ROLE_TEACHER, WRITE_ACTION)),
+//        arrayOf(acl(ace(ROLE_TEACHER, READ_ACTION), ace(ROLE_TEACHER, WRITE_ACTION)),
 //           TestUser.mk(org1, ROLE_TEACHER),
 //           TestUser.mk(org1, org1.getAdminRole()),
 //           true,
 //           true),
 //        // make sure that the global admin is always allowed to read
-//        $a(acl(ace(ROLE_TEACHER, READ_ACTION), ace(ROLE_TEACHER, WRITE_ACTION)),
+//        arrayOf(acl(ace(ROLE_TEACHER, READ_ACTION), ace(ROLE_TEACHER, WRITE_ACTION)),
 //           TestUser.mk(org1, ROLE_TEACHER),
 //           TestUser.mk(org1, SecurityConstants.GLOBAL_ADMIN_ROLE),
 //           true,
 //           true),
 //        // make sure that the global admin is always allowed to read, no matter what organization she is from
-//        $a(acl(ace(ROLE_TEACHER, READ_ACTION), ace(ROLE_TEACHER, WRITE_ACTION)),
+//        arrayOf(acl(ace(ROLE_TEACHER, READ_ACTION), ace(ROLE_TEACHER, WRITE_ACTION)),
 //           TestUser.mk(org1, ROLE_TEACHER),
 //           TestUser.mk(org2, SecurityConstants.GLOBAL_ADMIN_ROLE),
 //           true,
 //           true),
 //        // make sure that even if the admin roles are named the same, an admin from one organization
 //        // cannot read the episodes from a another one.
-//        $a(acl(ace(ROLE_TEACHER, READ_ACTION), ace(ROLE_TEACHER, WRITE_ACTION)),
+//        arrayOf(acl(ace(ROLE_TEACHER, READ_ACTION), ace(ROLE_TEACHER, WRITE_ACTION)),
 //           TestUser.mk(org1, ROLE_TEACHER),
 //           TestUser.mk(org2, org2.getAdminRole()),
 //           false,

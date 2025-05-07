@@ -52,7 +52,6 @@ import junitparams.JUnitParamsRunner;
 
 @RunWith(JUnitParamsRunner.class)
 @FixMethodOrder(MethodSorters.NAME_ASCENDING)
-// CHECKSTYLE:OFF
 public class AssetManagerSelectTest extends AssetManagerTestBase {
   @Test
   public void testSelectSnapshots() throws Exception {
@@ -76,31 +75,8 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
     am.calcChecksumsForMediaPackageElements(AssetManagerImpl.assetsOnly(mpCopy));
     assertEquals("Media package should be set up with a single catalog", 1, mpCopy.getCatalogs().length);
     final String checksum = mpCopy.getCatalogs()[0].getChecksum().toString();
-    assertTrue("Media package element should be retrievable by checksum", am.getDatabase().findAssetByChecksum(checksum).isPresent());
-    // issue some queries
-//    {
-//      logger.info("Run a failing query");
-//      assertEquals("The result should not contain any records", 0,
-//                   q.select(q.snapshot())
-//                           .where(q.mediaPackageId(mp.getIdentifier().toString()).and(q.availability(Availability.ONLINE)))
-//                           .where(q.mediaPackageId("12"))
-//                           .run().getSize());
-//    }
-//    {
-//      logger.info("Run query to find snapshot");
-//      final AResult r = q.select(q.snapshot())
-//              .where(q.mediaPackageId(mp.getIdentifier().toString()).and(q.availability(Availability.ONLINE)))
-//              .run();
-//      assertEquals("The result set should contain exactly one record", 1, r.getSize());
-//      assertEquals("The media package IDs should be equal", mp.getIdentifier().toString(), r.getRecords().stream().findFirst().get().getMediaPackageId());
-//      assertTrue("The snapshot should be contained in the record", r.getRecords().stream().findFirst().get().getSnapshot().isPresent());
-//      assertEquals("The media package IDs should be equal", mp.getIdentifier(), r.getRecords().stream().findFirst().get().getSnapshot().get().getMediaPackage().getIdentifier());
-//    }
-//    {
-//      final AResult r = q.select().where(q.mediaPackageId(mp.getIdentifier().toString()).and(q.availability(Availability.ONLINE))).run();
-//      assertEquals("The result should contain one record", 1, r.getSize());
-//      assertTrue("The result should not contain a snapshot", r.getRecords().stream().findFirst().get().getSnapshot().isEmpty());
-//    }
+    assertTrue("Media package element should be retrievable by checksum",
+        am.getDatabase().findAssetByChecksum(checksum).isPresent());
   }
 
   @Test
@@ -109,11 +85,14 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
     final MediaPackageElement mpe = mkCatalog();
     mp1.add(mpe);
     am.takeSnapshot(OWNER, mp1);
-    assertEquals("No properties should be found", 0, am.selectProperties(mp1.getIdentifier().toString(), null).size());
+    assertEquals("No properties should be found",
+        0, am.selectProperties(mp1.getIdentifier().toString(), null).size());
 
     logger.info("Set property on first episode");
-    am.setProperty(Property.mk(PropertyId.mk(mp1.getIdentifier().toString(), "org.opencastproject.service", "count"), Value.mk(10L)));
-    assertEquals("One property should be found", 1, am.selectProperties(mp1.getIdentifier().toString(), null).size());
+    am.setProperty(Property.mk(PropertyId.mk(mp1.getIdentifier().toString(), "org.opencastproject.service", "count"),
+        Value.mk(10L)));
+    assertEquals("One property should be found",
+        1, am.selectProperties(mp1.getIdentifier().toString(), null).size());
 
     logger.info("Add another media package with some properties of the same namespace");
     final MediaPackage mp2 = mkMediaPackage(mkCatalog());
@@ -125,19 +104,25 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
     am.takeSnapshot(OWNER, mkMediaPackage(mkCatalog()));
 
 
-    assertEquals("One property should be found", 1, am.selectProperties(mp1.getIdentifier().toString(), null).size());
-    assertEquals("Three properties should be found", 3, am.selectProperties(mp2.getIdentifier().toString(), null).size());
+    assertEquals("One property should be found",
+        1, am.selectProperties(mp1.getIdentifier().toString(), null).size());
+    assertEquals("Three properties should be found",
+        3, am.selectProperties(mp2.getIdentifier().toString(), null).size());
 
-    assertEquals("One property should be found", 1, am.selectProperties(mp1.getIdentifier().toString(), "org.opencastproject.service").size());
-    assertEquals("Three properties should be found", 3, am.selectProperties(mp2.getIdentifier().toString(), p.getNamespace()).size());
+    assertEquals("One property should be found",
+        1, am.selectProperties(mp1.getIdentifier().toString(), "org.opencastproject.service").size());
+    assertEquals("Three properties should be found",
+        3, am.selectProperties(mp2.getIdentifier().toString(), p.getNamespace()).size());
   }
 
   @Test
   public void testSelectAllPropertiesOfNamespace() throws Exception {
     final MediaPackage mp = mkMediaPackage(mkCatalog());
     am.takeSnapshot(OWNER, mp);
-    am.setProperty(Property.mk(PropertyId.mk(mp.getIdentifier().toString(), "namespace-1", "prop-1"), Value.mk(true)));
-    am.setProperty(Property.mk(PropertyId.mk(mp.getIdentifier().toString(), "namespace-2", "prop-2"), Value.mk("value-2")));
+    am.setProperty(Property.mk(PropertyId.mk(mp.getIdentifier().toString(), "namespace-1", "prop-1"),
+        Value.mk(true)));
+    am.setProperty(Property.mk(PropertyId.mk(mp.getIdentifier().toString(), "namespace-2", "prop-2"),
+        Value.mk("value-2")));
     {
       List<Property> properties = am.selectProperties(mp.getIdentifier().toString(), "namespace-1");
       assertEquals("One property should be returned", 1, properties.size());
@@ -167,7 +152,8 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
     am.takeSnapshot(OWNER, mp1);
     am.takeSnapshot(OWNER, mp1);
     am.takeSnapshot(OWNER, mp1);
-    assertEquals("4 records should be found", 4, am.getSnapshotsById(mp1.getIdentifier().toString()).size());
+    assertEquals("4 records should be found",
+        4, am.getSnapshotsById(mp1.getIdentifier().toString()).size());
 
     final Version latest;
     List<Snapshot> descSnapshots = am.getSnapshotsByIdOrderedByVersion(mp1.getIdentifier().toString(), false);
@@ -187,7 +173,8 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
   @Test
   public void testSelectBySeries() throws Exception {
     final MediaPackage mp = mkMediaPackage();
-    logger.info("The series ID field of the media package links it to a series. Attached DublinCore catalogs are not relevant.");
+    logger.info("The series ID field of the media package links it to a series. Attached DublinCore catalogs are not "
+        + "relevant.");
     mp.setSeries("series-1");
     am.takeSnapshot(OWNER, mp);
 
