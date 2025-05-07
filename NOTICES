@@ -420,7 +420,6 @@ asset-manager-api
 asset-manager-impl
   GroupId                                ArtifactId                                       Licenses
   com.google.code.gson                   gson                                             Apache 2.0
-  com.mysema.querydsl                    querydsl-jpa                                     Apache License, Version 2.0
   javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
   org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.eclipse.persistence                jakarta.persistence                              Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
