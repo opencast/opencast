@@ -21,12 +21,5 @@
 
 /**
  * Default query implementation.
- *
- * <h2>General implementation notes</h2>
- * Do not alias entities when creating Querydsl fragments like this
- * <code>new QPropertyDto("alias")</code>.
- * The code generator in {@link org.opencastproject.assetmanager.impl.query.AbstractASelectQuery#run()}
- * will get into serious trouble because it relies on equality checks on {@link org.opencastproject.assetmanager.impl.persistence.EntityPaths}
- * and other Querydsl types.
  */
 package org.opencastproject.assetmanager.impl.query;

@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * The result of a {@link ASelectQuery}. Each record represents a matching
+ * The result of a ASelectQuery. Each record represents a matching
  * snapshot of a media package. Its purpose is to group the various data that is
  * associated with a media package and to support their partial loading.
  */

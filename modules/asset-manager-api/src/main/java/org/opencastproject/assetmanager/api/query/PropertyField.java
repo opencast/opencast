@@ -29,8 +29,6 @@ import org.opencastproject.assetmanager.api.PropertyName;
  * Implementations are supposed to be immutable.
  */
 public interface PropertyField<A> extends Field<A> {
-  Target target();
-
   PropertyName name();
 
   Property mk(String mpId, A value);

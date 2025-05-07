@@ -31,7 +31,6 @@ import org.opencastproject.assetmanager.api.fn.ProductBuilder;
 import org.opencastproject.assetmanager.api.query.Order;
 import org.opencastproject.assetmanager.api.query.Predicate;
 import org.opencastproject.assetmanager.api.query.PropertyField;
-import org.opencastproject.assetmanager.api.query.Target;
 import org.opencastproject.assetmanager.impl.RuntimeTypes;
 import org.opencastproject.assetmanager.impl.persistence.EntityPaths;
 import org.opencastproject.assetmanager.impl.persistence.QPropertyDto;
@@ -65,10 +64,6 @@ public class PropertyFieldImpl<A> implements PropertyField<A>, EntityPaths {
   public PropertyFieldImpl(ValueType<A> mkValue, PropertyName name) {
     this.mkValue = mkValue;
     this.name = name;
-  }
-
-  @Override public Target target() {
-    return AQueryBuilderImpl.propertyTarget(name);
   }
 
   @Override public PropertyName name() {

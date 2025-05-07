@@ -133,10 +133,6 @@
       <groupId>com.mysema.querydsl</groupId>
       <artifactId>querydsl-jpa</artifactId>
     </dependency>
-    <dependency>
-      <groupId>javax.inject</groupId>
-      <artifactId>javax.inject</artifactId>
-    </dependency>
     <!--
       - JPA
       - Please note that Querydsl does not work with all versions of Eclipselink but version 2.4.2 is fine.

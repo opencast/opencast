@@ -23,7 +23,7 @@ package org.opencastproject.assetmanager.api.query;
 import java.util.LinkedHashSet;
 
 /**
- * The result of a {@link ASelectQuery}. Groups {@link ARecord}s.
+ * The result of a ASelectQuery. Groups {@link ARecord}s.
  */
 public interface AResult extends Iterable<ARecord> {
   /** Return the found records. */

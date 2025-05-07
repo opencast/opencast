@@ -22,12 +22,10 @@ package org.opencastproject.assetmanager.impl;
 
 import org.opencastproject.assetmanager.api.AssetManagerException;
 import org.opencastproject.assetmanager.api.Version;
-import org.opencastproject.assetmanager.api.query.ADeleteQuery;
 import org.opencastproject.assetmanager.api.query.Order;
 import org.opencastproject.assetmanager.api.query.Predicate;
 import org.opencastproject.assetmanager.api.query.PropertyField;
 import org.opencastproject.assetmanager.api.query.Target;
-import org.opencastproject.assetmanager.impl.query.AbstractADeleteQuery;
 import org.opencastproject.assetmanager.impl.query.AbstractOrder;
 import org.opencastproject.assetmanager.impl.query.AbstractPredicate;
 import org.opencastproject.assetmanager.impl.query.AbstractTarget;
@@ -61,10 +59,6 @@ public final class RuntimeTypes {
 
   public static AbstractOrder convert(Order a) {
     return cast(AbstractOrder.class, a);
-  }
-
-  public static AbstractADeleteQuery convert(ADeleteQuery a) {
-    return cast(AbstractADeleteQuery.class, a);
   }
 
   public static <A> PropertyFieldImpl<A> convert(PropertyField<A> a) {
