@@ -4,6 +4,7 @@
   "offset": 0,
   "results": [
     {
+      "id": 99467145,
       "cores": 8,
       "hostname": "host1",
       "maintenance": false,
@@ -13,6 +14,7 @@
       "running": 2
     },
     {
+      "id": 99467146,
       "cores": 4,
       "hostname": "host2",
       "maintenance": true,
@@ -22,6 +24,7 @@
       "running": 4
     },
     {
+      "id": 99467147,
       "cores": 2,
       "hostname": "host3",
       "maintenance": false,
@@ -31,6 +34,7 @@
       "running": 2
     },
     {
+      "id": 99467148,
       "cores": 6,
       "hostname": "host4",
       "maintenance": true,
