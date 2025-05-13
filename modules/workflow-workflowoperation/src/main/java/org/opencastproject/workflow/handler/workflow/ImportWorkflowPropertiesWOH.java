@@ -21,7 +21,6 @@
 
 package org.opencastproject.workflow.handler.workflow;
 
-import static com.entwinemedia.fn.Stream.$;
 import static org.opencastproject.workflow.api.WorkflowOperationResult.Action.CONTINUE;
 import static org.opencastproject.workflow.api.WorkflowOperationResult.Action.SKIP;
 
@@ -39,8 +38,6 @@ import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.fns.Strings;
-
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
@@ -51,11 +48,15 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Workflow operation handler for importing workflow properties.
@@ -99,7 +100,10 @@ public class ImportWorkflowPropertiesWOH extends AbstractWorkflowOperationHandle
     if (attachments.size() == 1) {
       Attachment propertiesElem = attachments.iterator().next();
       Properties properties = loadPropertiesFromXml(workspace, propertiesElem.getURI());
-      final Set<String> keys = $(getOptConfig(wi, KEYS_PROPERTY)).bind(Strings.splitCsv).toSet();
+      // Parse CSV
+      final Set<String> keys = Optional.ofNullable(getOptConfig(wi, KEYS_PROPERTY).orNull())
+          .map(s -> Arrays.stream(s.split("\\s*,\\s*")).collect(Collectors.toSet()))
+          .orElse(Collections.emptySet());
       return createResult(mp, convertToWorkflowProperties(properties, keys), CONTINUE, 0);
     } else {
       logger.info("No attachment with workflow properties found, skipping...");
