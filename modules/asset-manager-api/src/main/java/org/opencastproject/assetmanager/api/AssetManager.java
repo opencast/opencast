@@ -57,16 +57,12 @@ public interface AssetManager {
   String DEFAULT_OWNER = "default";
 
   /**
-   * Get the media package from the lates snapshot.
+   * Get the media package from the latest snapshot.
    *
    * @param mediaPackageId
    * @return mediapackage
    */
   Optional<MediaPackage> getMediaPackage(String mediaPackageId);
-
-  Optional<Snapshot> getLatestSnapshot(String mediaPackageId);
-
-  List<Snapshot> getLatestSnapshots(Collection mediaPackageIds);
 
   /**
    * Get the asset that is uniquely identified by the triple {version, media package ID, media package element ID}.
@@ -102,6 +98,23 @@ public interface AssetManager {
 
 
   /* Snapshots */
+
+  /**
+   * Get the latest snapshot.
+   *
+   * @param mediaPackageId
+   * @return Snapshot
+   */
+  Optional<Snapshot> getLatestSnapshot(String mediaPackageId);
+
+  /**
+   * Get the latest snapshots.
+   *
+   * @param mediaPackageIds
+   * @return Snapshot
+   *    returns the latest snapshot for each given mediaPackageId
+   */
+  List<Snapshot> getLatestSnapshots(Collection mediaPackageIds);
 
   /**
    * Check if any snapshot with the given media package identifier exists.
@@ -204,8 +217,25 @@ public interface AssetManager {
    */
   List<Snapshot> getSnapshotsByIdAndDateOrderedByVersion(String mpId, Date start, Date end, boolean asc);
 
+  /**
+   * Get the latest snapshots from the series
+   * @param seriesId
+   *   the id of the series
+   * @return
+   *   a list of the latest snapshots from the series
+   */
   List<Snapshot> getLatestSnapshotsBySeriesId(String seriesId);
 
+  /**
+   * Gets a snapshot that confirms to the given parameters
+   * @param mpId
+   *   the mediaPackageId
+   * @param orgId
+   *   the organizationId
+   * @param version
+   *   the version
+   * @return
+   */
   Optional<Snapshot> getSnapshotByMpIdOrgIdAndVersion(String mpId, String orgId, Version version);
 
   /**
@@ -391,7 +421,17 @@ public interface AssetManager {
    */
   long countSnapshots(String organization);
 
+  /**
+   * Count the number of assets
+   *
+   * @return Number of assets
+   */
   long countAssets();
 
+  /**
+   * Count the number of properties
+   *
+   * @return Number of properties
+   */
   long countProperties();
 }

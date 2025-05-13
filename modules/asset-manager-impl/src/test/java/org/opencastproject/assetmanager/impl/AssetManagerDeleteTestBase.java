@@ -50,23 +50,19 @@ public class AssetManagerDeleteTestBase extends AssetManagerTestBase {
   }
 
   void assertPropertiesTotal(long count) {
-    assertEquals(format("[SQL] There should be %d properties total", count),
+    assertEquals(format("There should be %d properties total", count),
                  count,
                  am.countProperties());
   }
 
   void assertAssetsTotal(long count) {
-    assertEquals(format("[SQL] There should be %d assets total", count),
+    assertEquals(format("There should be %d assets total", count),
                  count,
                  am.countAssets());
   }
 
   void assertSnapshotsTotal(long count) {
-    assertEquals("[AssetManager] There should be " + count + " snapshots total",
-                 count,
-                 am.countSnapshots(null));
-//                 q.select(q.snapshot()).run().getSize());
-    assertEquals(format("[SQL] There should be %d snapshots total", count),
+    assertEquals(format("There should be %d snapshots total", count),
                  count,
                  am.countSnapshots(null));
   }

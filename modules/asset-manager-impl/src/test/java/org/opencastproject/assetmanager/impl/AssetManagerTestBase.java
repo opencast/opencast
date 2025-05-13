@@ -64,7 +64,6 @@ import com.entwinemedia.fn.FnX;
 import com.entwinemedia.fn.P1;
 import com.entwinemedia.fn.P1Lazy;
 import com.entwinemedia.fn.Stream;
-import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
@@ -196,14 +195,6 @@ public abstract class AssetManagerTestBase {
     return mpe;
   }
 
-  static <A> int sizeOf(Stream<A> stream) {
-    int count = 0;
-    for (A ignore : stream) {
-      count++;
-    }
-    return count;
-  }
-
   static P1<Integer> inc() {
     return new P1Lazy<Integer>() {
       private int i = 0;
@@ -212,11 +203,6 @@ public abstract class AssetManagerTestBase {
         return i++;
       }
     };
-  }
-
-  @SafeVarargs
-  public static <A> A[] arrayOf(A... elements) {
-    return elements;
   }
 
   /**
@@ -241,7 +227,7 @@ public abstract class AssetManagerTestBase {
       int amount,
       final int minVersions,
       final int maxVersions,
-      final Opt<String> seriesId
+      final Optional<String> seriesId
   ) {
     return Arrays.stream(createAndAddMediaPackages(amount, minVersions, maxVersions, seriesId))
         .map(s -> s.getMediaPackage().getIdentifier().toString())
@@ -250,38 +236,38 @@ public abstract class AssetManagerTestBase {
   }
 
   /**
-   * Like {@link #createAndAddMediaPackagesSimple(int, int, int, Opt)} but without series ID.
+   * Like {@link #createAndAddMediaPackagesSimple(int, int, int, Optional)} but without series ID.
    */
   protected String[] createAndAddMediaPackagesSimple(int amount, final int minVersions, final int maxVersions) {
-    return createAndAddMediaPackagesSimple(amount, minVersions, maxVersions, Opt.<String>none());
+    return createAndAddMediaPackagesSimple(amount, minVersions, maxVersions, Optional.empty());
   }
 
   /**
    * Continuous versions.
    *
-   * @see #createAndAddMediaPackages(int, int, int, boolean, Opt)
+   * @see #createAndAddMediaPackages(int, int, int, boolean, Optional)
    */
   protected Snapshot[] createAndAddMediaPackages(
-          int amount, final int minVersions, final int maxVersions, final Opt<String> seriesId) {
+          int amount, final int minVersions, final int maxVersions, final Optional<String> seriesId) {
     return createAndAddMediaPackages(amount, minVersions, maxVersions, true, seriesId);
   }
 
   /**
    * @param continuousVersions true if version numbers should be increased continuously, false if there should be
    *          discontinuities
-   * @see #createAndAddMediaPackagesSimple(int, int, int, Opt)
+   * @see #createAndAddMediaPackagesSimple(int, int, int, Optional)
    */
   protected Snapshot[] createAndAddMediaPackages(
           int amount,
           final int minVersions, final int maxVersions,
           final boolean continuousVersions,
-          final Opt<String> seriesId) {
+          final Optional<String> seriesId) {
     logger.info("Create {} media packages with {} to {} snapshots each", amount, minVersions, maxVersions);
     final Stream<Snapshot> inserts = Stream.cont(inc()).take(amount).bind(new FnX<Integer, Iterable<Snapshot>>() {
       @Override public Iterable<Snapshot> applyX(final Integer mpCount) throws Exception {
         final MediaPackage mp = mkMediaPackage(mkCatalog());
-        for (String sid : seriesId) {
-          mp.setSeries(sid);
+        if (seriesId.isPresent()) {
+          mp.setSeries(seriesId.get());
         }
         final int versions = (int) (Math.random() * ((double) maxVersions - minVersions) + minVersions);
         final String mpId = mp.getIdentifier().toString();

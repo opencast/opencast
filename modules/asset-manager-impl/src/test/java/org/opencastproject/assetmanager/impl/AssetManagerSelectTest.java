@@ -39,19 +39,14 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.security.api.DefaultOrganization;
 
-import org.junit.FixMethodOrder;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.MethodSorters;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import junitparams.JUnitParamsRunner;
 
-@RunWith(JUnitParamsRunner.class)
-@FixMethodOrder(MethodSorters.NAME_ASCENDING)
 public class AssetManagerSelectTest extends AssetManagerTestBase {
   @Test
   public void testSelectSnapshots() throws Exception {
@@ -182,5 +177,148 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
     assertEquals(0, am.getLatestSnapshotsBySeriesId("series-2").size());
   }
 
-  // TODO: Write more tests related to getting things from the asset manager
+  @Test
+  public void testSelectLatestSnapshot() throws Exception {
+    assertTrue(am.getLatestSnapshot("").isEmpty());
+
+    final MediaPackage mp = mkMediaPackage();
+    mp.setSeries("series-2");
+    am.takeSnapshot(OWNER, mp);
+    mp.setSeries("series-1");
+    am.takeSnapshot(OWNER, mp);
+
+    assertEquals("series-1",
+        am.getLatestSnapshot(mp.getIdentifier().toString()).get().getMediaPackage().getSeries());
+  }
+
+  @Test
+  public void testSelectLatestSnapshots() throws Exception {
+    assertEquals(0, am.getLatestSnapshots(new ArrayList()).size());
+
+    final MediaPackage mp1 = mkMediaPackage();
+    final MediaPackage mp2 = mkMediaPackage();
+    final MediaPackage mp3 = mkMediaPackage();
+    am.takeSnapshot(OWNER, mp1);
+    am.takeSnapshot(OWNER, mp2);
+    am.takeSnapshot(OWNER, mp3);
+    mp1.setSeries("series-1");
+    mp2.setSeries("series-1");
+    mp3.setSeries("series-1");
+    am.takeSnapshot(OWNER, mp1);
+    am.takeSnapshot(OWNER, mp2);
+    am.takeSnapshot(OWNER, mp3);
+
+    assertEquals(0, am.getLatestSnapshots(List.of("")).size());
+    assertEquals(1, am.getLatestSnapshots(List.of(mp1.getIdentifier().toString())).size());
+    assertEquals(3, am.getLatestSnapshots(List.of(
+        mp1.getIdentifier().toString(),
+        mp2.getIdentifier().toString(),
+        mp3.getIdentifier().toString(),
+        ""
+    )).size());
+    assertEquals("series-1",
+        am.getLatestSnapshots(List.of(mp1.getIdentifier().toString())).get(0).getMediaPackage().getSeries());
+  }
+
+  @Test
+  public void testSnapshotExists() throws Exception {
+    final MediaPackage mp = mkMediaPackage();
+    assertFalse(am.snapshotExists(mp.getIdentifier().toString()));
+    assertFalse(am.snapshotExists(mp.getIdentifier().toString(), new DefaultOrganization().getId()));
+    assertFalse(am.snapshotExists(mp.getIdentifier().toString(), null));
+
+    am.takeSnapshot(OWNER, mp);
+
+    assertTrue(am.snapshotExists(mp.getIdentifier().toString()));
+    assertTrue(am.snapshotExists(mp.getIdentifier().toString(), new DefaultOrganization().getId()));
+    assertTrue(am.snapshotExists(mp.getIdentifier().toString(), null));
+  }
+
+  @Test
+  public void getSelectSnapshotsByIdAndVersion() throws Exception {
+    assertEquals(0, am.getSnapshotsByIdAndVersion("does-not-exist", am.toVersion("0").get()).size());
+
+    final MediaPackage mp1 = mkMediaPackage();
+    final MediaPackage mp2 = mkMediaPackage();
+    am.takeSnapshot(OWNER, mp1);
+    am.takeSnapshot(OWNER, mp2);
+
+    assertEquals(1, am.getSnapshotsByIdAndVersion(
+        mp1.getIdentifier().toString(),
+        am.toVersion("0").get()
+    ).size());
+    assertEquals(0, am.getSnapshotsByIdAndVersion(
+        mp1.getIdentifier().toString(),
+        am.toVersion("1").get()
+    ).size());
+
+    am.takeSnapshot(OWNER, mp1);
+    am.takeSnapshot(OWNER, mp2);
+
+    assertEquals(1, am.getSnapshotsByIdAndVersion(
+        mp1.getIdentifier().toString(),
+        am.toVersion("1").get()
+    ).size());
+    assertEquals(1, am.getSnapshotsByIdAndVersion(
+        mp1.getIdentifier().toString(),
+        am.toVersion("0").get()
+    ).size());
+  }
+
+  @Test
+  public void getSelectSnapshotsByDateOrderedById() throws Exception {
+    Date start = new Date(0);
+    Date end = new Date();
+    assertEquals(0, am.getSnapshotsByDateOrderedById(start, end).size());
+
+    final MediaPackage mp1 = mkMediaPackage();
+    final MediaPackage mp2 = mkMediaPackage();
+    am.takeSnapshot(OWNER, mp1);
+    am.takeSnapshot(OWNER, mp2);
+
+    end = new Date();
+    assertEquals(2, am.getSnapshotsByDateOrderedById(start, end).size());
+
+    am.takeSnapshot(OWNER, mp1);
+    am.takeSnapshot(OWNER, mp2);
+
+    assertEquals(2, am.getSnapshotsByDateOrderedById(start, end).size());
+  }
+
+  @Test
+  public void getSelectSnapshotsByIdAndDate() throws Exception {
+    Date start = new Date(0);
+    Date end = new Date();
+    assertEquals(0, am.getSnapshotsByIdAndDate("does-not-exist", start, end).size());
+
+    final MediaPackage mp1 = mkMediaPackage();
+    final MediaPackage mp2 = mkMediaPackage();
+    am.takeSnapshot(OWNER, mp1);
+    am.takeSnapshot(OWNER, mp2);
+
+    end = new Date();
+    assertEquals(1, am.getSnapshotsByIdAndDate(mp1.getIdentifier().toString(), start, end).size());
+    assertEquals(1, am.getSnapshotsByIdAndDate(mp2.getIdentifier().toString(), start, end).size());
+
+    am.takeSnapshot(OWNER, mp1);
+    am.takeSnapshot(OWNER, mp2);
+
+    assertEquals(1, am.getSnapshotsByIdAndDate(mp1.getIdentifier().toString(), start, end).size());
+    assertEquals(1, am.getSnapshotsByIdAndDate(mp2.getIdentifier().toString(), start, end).size());
+
+    end = new Date();
+    final Version latest;
+    List<Snapshot> descSnapshots = am.getSnapshotsByIdAndDateOrderedByVersion(
+        mp1.getIdentifier().toString(), start, end, false);
+    latest = descSnapshots.get(0).getVersion();
+    final Version first;
+    List<Snapshot> ascSnapshots = am.getSnapshotsByIdAndDateOrderedByVersion(
+        mp1.getIdentifier().toString(), start, end, true);
+    first = ascSnapshots.get(0).getVersion();
+
+    assertTrue("The first version should be older", first.isOlder(latest));
+    assertTrue("The last version should be younger", latest.isYounger(first));
+    assertFalse("The versions should not be equal", latest.equals(first));
+  }
+
 }

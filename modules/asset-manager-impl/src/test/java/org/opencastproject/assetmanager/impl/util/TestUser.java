@@ -98,6 +98,16 @@ public class TestUser implements User {
         }).toSet());
   }
 
+  public static User mk(String userName, Organization organization,
+      String... roles) {
+    return new TestUser(
+        userName, "password", "name", "email", "provider", true, organization,
+        $(roles).map(new Fn<String, Role>() {
+          @Override public Role apply(String role) {
+            return TestRole.mk(role, organization);
+          }
+        }).toSet());  }
+
   @Override public String getUsername() {
     return username;
   }
