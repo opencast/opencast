@@ -472,10 +472,13 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
     try {
       // test connection
       ClusterHealthRequest request = new ClusterHealthRequest();
-      request.waitForGreenStatus();
+      request.waitForYellowStatus();
       ClusterHealthResponse resp = client.cluster().health(request, RequestOptions.DEFAULT);
       if (resp.getStatus().equals(ClusterHealthStatus.GREEN)) {
         logger.debug("Connected to OpenSearch, cluster health is {}", resp.getStatus());
+        return true;
+      } else if (resp.getStatus().equals(ClusterHealthStatus.YELLOW)) {
+        logger.warn("Connected to OpenSearch, cluster health is {}", resp.getStatus());
         return true;
       }
       logger.debug("Connected to OpenSearch, but cluster health is {}", resp.getStatus());
