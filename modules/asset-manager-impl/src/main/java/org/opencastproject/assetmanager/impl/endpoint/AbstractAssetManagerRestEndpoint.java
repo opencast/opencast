@@ -47,6 +47,7 @@ import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.ChecksumType;
+import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestParameter.Type;
@@ -156,6 +157,40 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
     try {
       getAssetManager().takeSnapshot(DEFAULT_OWNER, mediaPackage);
       return noContent();
+    } catch (Exception e) {
+      return handleException(e);
+    }
+  }
+
+  @POST
+  @Path("updateIndex")
+  @RestQuery(name = "updateIndex",
+      description = "Trigger search index update for event. The usage of this is limited to global administrators.",
+      restParameters = {
+          @RestParameter(
+              name = "id",
+              isRequired = true,
+              type = STRING,
+              description = "The event ID to trigger an index update for.")},
+      responses = {
+          @RestResponse(
+              description = "Update successfully triggered.",
+              responseCode = SC_NO_CONTENT),
+          @RestResponse(
+              description = "Not allowed to trigger update.",
+              responseCode = SC_FORBIDDEN),
+          @RestResponse(
+              description = "No such event found.",
+              responseCode = SC_NOT_FOUND)},
+      returnDescription = "No content is returned.")
+  public Response indexUpdate(@FormParam("id") final String id) {
+    try {
+      getAssetManager().triggerIndexUpdate(id);
+      return noContent();
+    } catch (UnauthorizedException e) {
+      return forbidden();
+    } catch (NotFoundException e) {
+      return notFound();
     } catch (Exception e) {
       return handleException(e);
     }

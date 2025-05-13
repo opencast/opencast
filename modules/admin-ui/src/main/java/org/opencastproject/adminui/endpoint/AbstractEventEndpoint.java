@@ -1911,7 +1911,7 @@ public abstract class AbstractEventEndpoint {
           Date created = instance.getDateCreated();
           String submitter = instance.getCreatorName();
 
-          User user = getUserDirectoryService().loadUser(submitter);
+          User user = submitter == null ? null : getUserDirectoryService().loadUser(submitter);
           String submitterName = null;
           String submitterEmail = null;
           if (user != null) {

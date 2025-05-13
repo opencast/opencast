@@ -22,6 +22,7 @@ package org.opencastproject.assetmanager.api;
 
 import org.opencastproject.assetmanager.api.storage.AssetStore;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.NotFoundException;
 
 import java.util.Collection;
@@ -407,7 +408,8 @@ public interface AssetManager {
    * Count the number of events stored for a given organization.
    *
    * @param organization
-   *          The organization to check
+   *          The organization to check.
+   *          This may be `null` to not filter for an organization which is significantly faster.
    * @return Number of events
    */
   long countEvents(String organization);
@@ -434,4 +436,12 @@ public interface AssetManager {
    * @return Number of properties
    */
   long countProperties();
+
+  /**
+   * Trigger search index update for event.
+   *
+   * @param mediaPackageId
+   *          The event ID to trigger an index update for
+   */
+  void triggerIndexUpdate(String mediaPackageId) throws NotFoundException, UnauthorizedException;
 }

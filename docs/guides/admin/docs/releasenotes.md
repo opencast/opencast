@@ -1,5 +1,15 @@
 # Opencast 17: Release Notes
 
+## Opencast 17.3
+
+This release contains a few bug fixes, among them performance improvements for the metrics endpoint
+([#6627](https://github.com/opencast/opencast/pull/6627)). It's now also possible to trigger an index update for
+the archived information of an event ([#6575](https://github.com/opencast/opencast/pull/6575)).
+
+Additionally, this contains new versions of both the Admin Interface
+([2025-04-17](https://github.com/opencast/opencast-admin-interface/releases/tag/2025-04-17)) and Studio
+([2025-04-02](https://github.com/elan-ev/opencast-studio/releases/tag/2025-04-02)).
+
 ## Opencast 17.2
 
 This is a maintenance release of Opencast 17.

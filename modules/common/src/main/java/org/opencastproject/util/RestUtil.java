@@ -321,6 +321,10 @@ public final class RestUtil {
       return Response.status(Response.Status.FORBIDDEN).entity(msg).build();
     }
 
+    public static Response unauthorized(Object entity) {
+      return Response.status(Response.Status.UNAUTHORIZED).entity(entity).build();
+    }
+
     public static Response conflict(String msg) {
       return Response.status(Response.Status.CONFLICT).entity(msg).build();
     }
