@@ -62,4 +62,6 @@ public interface OpencastConstants {
   String ENVIRONMENT_NAME_PROPERTY = "org.opencastproject.environment.name";
 
   String EPISODE_ID_ROLE_ACCESS_PROPERTY = "org.opencastproject.episode.id.role.access";
+
+  boolean EPISODE_ID_ROLE_ACCESS_PROPERTY_DEFAULT = true;
 }

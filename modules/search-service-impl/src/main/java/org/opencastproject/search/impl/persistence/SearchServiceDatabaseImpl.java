@@ -27,6 +27,7 @@ import static org.opencastproject.security.api.Permissions.Action.READ;
 import static org.opencastproject.security.api.Permissions.Action.WRITE;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLE;
 import static org.opencastproject.systems.OpencastConstants.EPISODE_ID_ROLE_ACCESS_PROPERTY;
+import static org.opencastproject.systems.OpencastConstants.EPISODE_ID_ROLE_ACCESS_PROPERTY_DEFAULT;
 
 import org.opencastproject.db.DBSession;
 import org.opencastproject.db.DBSessionFactory;
@@ -60,7 +61,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
@@ -87,7 +87,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
   /** Logging utilities */
   private static final Logger logger = LoggerFactory.getLogger(SearchServiceDatabaseImpl.class);
 
-  private boolean episodeRoleId = false;
+  private boolean episodeRoleId = EPISODE_ID_ROLE_ACCESS_PROPERTY_DEFAULT;
 
   /** Factory used to create {@link EntityManager}s for transactions */
   protected EntityManagerFactory emf;
@@ -122,8 +122,9 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
     db = dbSessionFactory.createSession(emf);
     this.populateSeriesData();
 
-    episodeRoleId = BooleanUtils.toBoolean(Objects.toString(
-        cc.getBundleContext().getProperty(EPISODE_ID_ROLE_ACCESS_PROPERTY), "false"));
+    episodeRoleId = Optional.ofNullable(cc.getBundleContext().getProperty(EPISODE_ID_ROLE_ACCESS_PROPERTY))
+        .map(BooleanUtils::toBoolean)
+        .orElse(EPISODE_ID_ROLE_ACCESS_PROPERTY_DEFAULT);
     logger.debug("Usage of episode ID roles is set to {}", episodeRoleId);
   }
 

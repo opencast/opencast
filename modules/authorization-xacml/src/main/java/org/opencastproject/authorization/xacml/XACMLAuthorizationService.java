@@ -25,6 +25,7 @@ import static org.opencastproject.mediapackage.MediaPackageElements.XACML_POLICY
 import static org.opencastproject.mediapackage.MediaPackageElements.XACML_POLICY_SERIES;
 import static org.opencastproject.security.util.SecurityUtil.getEpisodeRoleId;
 import static org.opencastproject.systems.OpencastConstants.EPISODE_ID_ROLE_ACCESS_PROPERTY;
+import static org.opencastproject.systems.OpencastConstants.EPISODE_ID_ROLE_ACCESS_PROPERTY_DEFAULT;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.mediapackage.Attachment;
@@ -63,7 +64,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.Optional;
 
 import javax.xml.bind.JAXBException;
@@ -98,7 +98,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
 
   /** Definition of how merging of series and episode ACLs work */
   private static MergeMode mergeMode = MergeMode.OVERRIDE;
-  private static boolean episodeIdRole = false;
+  private static boolean episodeIdRole = EPISODE_ID_ROLE_ACCESS_PROPERTY_DEFAULT;
 
   enum MergeMode {
     OVERRIDE, ROLES, ACTIONS
@@ -112,7 +112,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
     if (properties == null) {
       mergeMode = MergeMode.OVERRIDE;
       logger.debug("Merge mode set to {}", mergeMode);
-      episodeIdRole = false;
+      episodeIdRole = EPISODE_ID_ROLE_ACCESS_PROPERTY_DEFAULT;
       logger.debug("Using episode ID roles is deactivated");
       return;
     }
@@ -126,8 +126,9 @@ public class XACMLAuthorizationService implements AuthorizationService {
     }
     logger.debug("Merge mode set to {}", mergeMode);
 
-    episodeIdRole = BooleanUtils.toBoolean(Objects.toString(
-        cc.getBundleContext().getProperty(EPISODE_ID_ROLE_ACCESS_PROPERTY), "false"));
+    episodeIdRole = Optional.ofNullable(cc.getBundleContext().getProperty(EPISODE_ID_ROLE_ACCESS_PROPERTY))
+        .map(BooleanUtils::toBoolean)
+        .orElse(EPISODE_ID_ROLE_ACCESS_PROPERTY_DEFAULT);
     logger.debug("Usage of episode ID roles is set to {}", episodeIdRole);
   }
 

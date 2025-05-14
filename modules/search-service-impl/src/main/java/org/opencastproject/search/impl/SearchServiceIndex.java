@@ -23,6 +23,7 @@ package org.opencastproject.search.impl;
 
 import static org.opencastproject.security.util.SecurityUtil.getEpisodeRoleId;
 import static org.opencastproject.systems.OpencastConstants.EPISODE_ID_ROLE_ACCESS_PROPERTY;
+import static org.opencastproject.systems.OpencastConstants.EPISODE_ID_ROLE_ACCESS_PROPERTY_DEFAULT;
 
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
@@ -99,6 +100,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -149,7 +151,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
 
   private ListProvidersService listProvidersService;
 
-  private boolean episodeIdRole = false;
+  private boolean episodeIdRole = EPISODE_ID_ROLE_ACCESS_PROPERTY_DEFAULT;
 
   private String systemUserName = null;
 
@@ -168,8 +170,9 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
    */
   @Activate
   public void activate(final ComponentContext cc) throws IllegalStateException {
-    episodeIdRole = BooleanUtils.toBoolean(Objects.toString(
-        cc.getBundleContext().getProperty(EPISODE_ID_ROLE_ACCESS_PROPERTY), "false"));
+    episodeIdRole = Optional.ofNullable(cc.getBundleContext().getProperty(EPISODE_ID_ROLE_ACCESS_PROPERTY))
+        .map(BooleanUtils::toBoolean)
+        .orElse(EPISODE_ID_ROLE_ACCESS_PROPERTY_DEFAULT);
     logger.debug("Usage of episode ID roles is set to {}", episodeIdRole);
 
     createIndex();

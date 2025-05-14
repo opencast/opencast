@@ -22,6 +22,7 @@
 package org.opencastproject.elasticsearch.index;
 
 import static org.opencastproject.systems.OpencastConstants.EPISODE_ID_ROLE_ACCESS_PROPERTY;
+import static org.opencastproject.systems.OpencastConstants.EPISODE_ID_ROLE_ACCESS_PROPERTY_DEFAULT;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.elasticsearch.api.SearchIndexException;
@@ -68,7 +69,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
@@ -123,7 +123,7 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
 
   private ListProvidersService listProvidersService;
 
-  private boolean episodeIdRole = false;
+  private boolean episodeIdRole = EPISODE_ID_ROLE_ACCESS_PROPERTY_DEFAULT;
 
   @Reference(
       cardinality = ReferenceCardinality.OPTIONAL,
@@ -159,8 +159,9 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
       throw new ComponentException("Error initializing elastic search index", t);
     }
 
-    episodeIdRole = BooleanUtils.toBoolean(Objects.toString(
-        bundleContext.getProperty(EPISODE_ID_ROLE_ACCESS_PROPERTY), "false"));
+    episodeIdRole = Optional.ofNullable(bundleContext.getProperty(EPISODE_ID_ROLE_ACCESS_PROPERTY))
+        .map(BooleanUtils::toBoolean)
+        .orElse(EPISODE_ID_ROLE_ACCESS_PROPERTY_DEFAULT);
     logger.debug("Usage of episode ID roles is set to {}", episodeIdRole);
   }
 

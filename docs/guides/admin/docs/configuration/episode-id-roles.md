@@ -12,11 +12,11 @@ The `<ACTION>` will be capitalized, but special characters may not be converted 
 Setup
 --------------------
 
-Enable `episode.id.role.access` in `etc/custom.properties`.
+`episode.id.role.access` in `etc/custom.properties` is enabled by default.
 
 To make this work for the Admin UI and External API, the Elasticsearch Index needs to be updated with modified
 ACLs. You can achieve this by calling the `/index/rebuild/AssetManager/ACL` and `/index/rebuild/Search` endpoints 
-**after** enabling this feature in the aforementioned configuration files.
+**after** enabling this feature.
 These endpoints will reindex the event ACLs in both the AssetManager index and the Search index.
 
 In case you have custom actions configured, this will only work for the actions that were configured during the
