@@ -26,6 +26,7 @@ import org.opencastproject.assetmanager.api.Availability;
 import org.opencastproject.assetmanager.api.Property;
 import org.opencastproject.assetmanager.api.PropertyId;
 import org.opencastproject.assetmanager.api.Snapshot;
+import org.opencastproject.assetmanager.impl.HttpAssetProvider;
 import org.opencastproject.assetmanager.impl.PartialMediaPackage;
 import org.opencastproject.assetmanager.impl.VersionImpl;
 import org.opencastproject.db.DBSession;
@@ -57,8 +58,14 @@ public class Database {
 
   private final DBSession db;
 
+  private HttpAssetProvider httpAssetProvider;
+
   public Database(DBSession db) {
     this.db = db;
+  }
+
+  public void setHttpAssetProvider(HttpAssetProvider httpAssetProvider) {
+    this.httpAssetProvider = httpAssetProvider;
   }
 
   /**
@@ -429,7 +436,11 @@ public class Database {
         return Optional.empty();
       }
 
-      return Optional.of(snapshotDto.get().toSnapshot());
+      Snapshot snapshot = snapshotDto.get().toSnapshot();
+      // make sure the delivered media package has valid URIs
+      snapshot = httpAssetProvider.prepareForDelivery(snapshot);
+
+      return Optional.of(snapshot);
     });
   }
 
@@ -600,7 +611,11 @@ public class Database {
         return Optional.empty();
       }
 
-      return Optional.of(snapshotDto.get().toSnapshot());
+      Snapshot snapshot = snapshotDto.get().toSnapshot();
+      // make sure the delivered media package has valid URIs
+      snapshot = httpAssetProvider.prepareForDelivery(snapshot);
+
+      return Optional.of(snapshot);
     });
   }
 
@@ -633,6 +648,7 @@ public class Database {
   private List<Snapshot> snapshotDtoToSnapshot(List<SnapshotDto> snapshotDtos) {
     return snapshotDtos.stream()
         .map(s -> s.toSnapshot())
+        .map(s -> httpAssetProvider.prepareForDelivery(s))
         .collect(Collectors.toList());
   }
 }

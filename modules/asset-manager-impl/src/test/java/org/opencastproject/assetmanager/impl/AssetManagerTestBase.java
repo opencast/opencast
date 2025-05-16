@@ -121,7 +121,14 @@ public abstract class AssetManagerTestBase {
    * Create a new test asset manager.
    */
   protected AssetManagerImpl makeAssetManagerWithoutHandlers() throws Exception {
+    HttpAssetProvider httpAssetProvider =  new HttpAssetProvider() {
+      @Override public Snapshot prepareForDelivery(Snapshot snapshot) {
+        return snapshot;
+      }
+    };
+
     final Database db = new Database(DBTestEnv.newDBSession(PERSISTENCE_UNIT));
+    db.setHttpAssetProvider(httpAssetProvider);
 
     final Workspace workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class)))
@@ -138,12 +145,6 @@ public abstract class AssetManagerTestBase {
     AssetStore localAssetStore = mkAssetStore(LOCAL_STORE_ID);
     RemoteAssetStore remoteAssetStore1 = mkRemoteAssetStore(REMOTE_STORE_1_ID);
     RemoteAssetStore remoteAssetStore2 = mkRemoteAssetStore(REMOTE_STORE_2_ID);
-
-    HttpAssetProvider httpAssetProvider =  new HttpAssetProvider() {
-      @Override public Snapshot prepareForDelivery(Snapshot snapshot) {
-        return snapshot;
-      }
-    };
 
     Organization org = new DefaultOrganization();
     User currentUser = TestUser.mk(org, org.getAdminRole());

@@ -199,6 +199,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   public synchronized void activate(ComponentContext cc) {
     logger.info("Activating AssetManager.");
     db = new Database(dbSessionFactory.createSession(emf));
+    db.setHttpAssetProvider(getHttpAssetProvider());
     systemUserName = SecurityUtil.getSystemUserName(cc);
 
     includeAPIRoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeAPIRoles"), null));
