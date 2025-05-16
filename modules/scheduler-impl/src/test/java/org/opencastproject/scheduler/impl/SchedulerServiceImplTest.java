@@ -1656,8 +1656,6 @@ public class SchedulerServiceImplTest {
   }
 
   AssetManager mkAssetManager() throws Exception {
-    final DBSession dbSession = newDBSession("org.opencastproject.assetmanager.impl");
-    final Database db = new Database(dbSession);
     HttpAssetProvider httpAssetProvider = new HttpAssetProvider() {
       @Override
       public Snapshot prepareForDelivery(Snapshot snapshot) {
@@ -1675,6 +1673,10 @@ public class SchedulerServiceImplTest {
         });
       }
     };
+
+    final DBSession dbSession = newDBSession("org.opencastproject.assetmanager.impl");
+    final Database db = new Database(dbSession);
+    db.setHttpAssetProvider(httpAssetProvider);
 
     JaxbOrganization org = new DefaultOrganization();
     JaxbUser user = new JaxbUser("user", null, org, new JaxbRole(DefaultOrganization.DEFAULT_ORGANIZATION_ADMIN,
