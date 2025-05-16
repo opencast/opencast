@@ -223,6 +223,13 @@ import javax.persistence.UniqueConstraint;
                 + "WHERE s.version = :version "
                 + "AND s.mediaPackageId = :mediaPackageId"
         ),
+        @NamedQuery(
+          name = "Snapshot.getSnapshotVersions",
+          query = "SELECT s.version FROM Snapshot s "
+                + "WHERE s.mediaPackageId = :mediaPackageId "
+                + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
+                + "ORDER BY s.version ASC"
+        ),
 })
 // Maintain own generator to support database migrations from Archive to AssetManager
 // The generator's initial value has to be set after the data migration.

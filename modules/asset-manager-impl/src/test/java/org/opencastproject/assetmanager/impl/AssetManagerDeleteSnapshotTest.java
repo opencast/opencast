@@ -43,7 +43,7 @@ public class AssetManagerDeleteSnapshotTest extends AssetManagerDeleteTestBase {
     assertStoreSize(mpCount * versionCount * 2);
     assertEquals(versionCount, am.deleteSnapshots(mp[0]));
     assertTotals((mpCount - 1) * versionCount, (mpCount - 1) * versionCount, 3);
-    assertStoreSize(mpCount * versionCount * 2);
+    assertStoreSize((mpCount - 1) * versionCount * 2);
   }
 
   /**
@@ -63,7 +63,7 @@ public class AssetManagerDeleteSnapshotTest extends AssetManagerDeleteTestBase {
         am.deleteSnapshots(mp[0])
     );
     assertTotals(4, 4, 3);
-    assertStoreSize(3 * 4);
+    assertStoreSize(4 * 2);
   }
 
   /**
@@ -82,6 +82,6 @@ public class AssetManagerDeleteSnapshotTest extends AssetManagerDeleteTestBase {
     assertStoreSize(mpCount * versionCount * 2);
     assertEquals(versionCount - 1, am.deleteAllButLatestSnapshot(mp[0]));
     assertTotals((mpCount - 1) * versionCount + 1, 11, 3);
-    assertStoreSize(mpCount * versionCount * 2);
+    assertStoreSize(((mpCount - 1) * versionCount * 2) + 2);
   }
 }

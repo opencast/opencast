@@ -791,29 +791,61 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   @Override
   public int deleteSnapshots(String mpId) {
     String orgId = securityService.getOrganization().getId();
+    int numberOfDeletedSnapshots = 0;
     switch (isAdmin()) {
       case GLOBAL:
-        return getDatabase().deleteSnapshots(mpId, null);
+        numberOfDeletedSnapshots = getDatabase().deleteSnapshots(mpId, null);
+        break;
       default:
         if (isAuthorized(mpId, "WRITE")) {
-          return getDatabase().deleteSnapshots(mpId, orgId);
+          numberOfDeletedSnapshots = getDatabase().deleteSnapshots(mpId, orgId);
         }
-        return 0;
+        break;
     }
+
+    // delete from store
+    if (numberOfDeletedSnapshots > 0) {
+      final DeletionSelector deletionSelector = DeletionSelector.deleteAll(orgId, mpId);
+      getLocalAssetStore().delete(deletionSelector);
+      for (AssetStore as : getRemoteAssetStores()) {
+        as.delete(deletionSelector);
+      }
+    }
+
+    return numberOfDeletedSnapshots;
   }
 
   @Override
   public int deleteAllButLatestSnapshot(String mpId) {
     String orgId = securityService.getOrganization().getId();
+    int numberOfDeletedSnapshots = 0;
+    List<Long> versions = getDatabase().getVersionsByMediaPackage(mpId, null);
+
     switch (isAdmin()) {
       case GLOBAL:
-        return getDatabase().deleteAllButLatestSnapshot(mpId, null);
+        numberOfDeletedSnapshots = getDatabase().deleteAllButLatestSnapshot(mpId, null);
+        break;
       default:
         if (isAuthorized(mpId, "WRITE")) {
-          return getDatabase().deleteAllButLatestSnapshot(mpId, orgId);
+          numberOfDeletedSnapshots = getDatabase().deleteAllButLatestSnapshot(mpId, orgId);
         }
-        return 0;
+        break;
     }
+
+    // delete from store
+    if (numberOfDeletedSnapshots > 0) {
+      // Skip last version
+      for (int i = 0; i < versions.size() - 1; i++) {
+        final DeletionSelector deletionSelector = DeletionSelector.delete(orgId, mpId,
+            new VersionImpl(versions.get(i)));
+        getLocalAssetStore().delete(deletionSelector);
+        for (AssetStore as : getRemoteAssetStores()) {
+          as.delete(deletionSelector);
+        }
+      }
+    }
+
+    return numberOfDeletedSnapshots;
   }
 
   @Override

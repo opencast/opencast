@@ -632,6 +632,19 @@ public class Database {
     });
   }
 
+  public List<Long> getVersionsByMediaPackage(String mediaPackageId, String orgId) {
+    return db.execTx(em -> {
+      List<Long> versions = namedQuery.findAll(
+          "Snapshot.getSnapshotVersions",
+          Long.class,
+          Pair.of("mediaPackageId", mediaPackageId),
+          Pair.of("organizationId", orgId)
+      ).apply(em);
+
+      return versions;
+    });
+  }
+
   //
   // Utility
   //
