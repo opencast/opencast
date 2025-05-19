@@ -20,12 +20,10 @@
  */
 package org.opencastproject.assetmanager.impl;
 
-import static com.entwinemedia.fn.Stream.$;
 import static java.lang.String.format;
 import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.hasNoChecksum;
 import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.isNotPublication;
 import static org.opencastproject.mediapackage.MediaPackageSupport.getFileName;
-import static org.opencastproject.mediapackage.MediaPackageSupport.getMediaPackageElementId;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLE;
 import static org.opencastproject.security.util.SecurityUtil.getEpisodeRoleId;
@@ -90,13 +88,6 @@ import org.opencastproject.util.RequireUtil;
 import org.opencastproject.util.data.functions.Functions;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.Fx;
-import com.entwinemedia.fn.P1;
-import com.entwinemedia.fn.P1Lazy;
-import com.entwinemedia.fn.Pred;
-import com.entwinemedia.fn.Prelude;
-import com.entwinemedia.fn.fns.Booleans;
 import com.google.common.collect.Sets;
 
 import org.apache.commons.io.FileUtils;
@@ -116,7 +107,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -132,6 +122,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import javax.persistence.EntityManagerFactory;
@@ -483,16 +474,13 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   private Snapshot takeSnapshotInternal(final String owner, final MediaPackage mp) {
-    return handleException(new P1Lazy<Snapshot>() {
-      @Override public Snapshot get1() {
-        try {
-          final Snapshot archived = addInternal(owner, MediaPackageSupport.copy(mp)).toSnapshot();
-          return getHttpAssetProvider().prepareForDelivery(archived);
-        } catch (Exception e) {
-          return Prelude.chuck(e);
-        }
-      }
-    });
+    try {
+      Snapshot archived = addInternal(owner, MediaPackageSupport.copy(mp)).toSnapshot();
+      return getHttpAssetProvider().prepareForDelivery(archived);
+    } catch (Exception e) {
+      logger.error("An error occurred", e);
+      throw unwrapExceptionUntil(AssetManagerException.class, e).orElse(new AssetManagerException(e));
+    }
   }
 
   /**
@@ -1411,26 +1399,25 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
    * Make sure each of the elements has a checksum.
    */
   void calcChecksumsForMediaPackageElements(PartialMediaPackage pmp) {
-    final Fx<MediaPackageElement> addChecksum = new Fx<MediaPackageElement>() {
-      @Override public void apply(MediaPackageElement mpe) {
-        File file = null;
-        try {
-          logger.trace("Calculate checksum for {}", mpe.getURI());
-          file = workspace.get(mpe.getURI(), true);
-          mpe.setChecksum(Checksum.create(ChecksumType.DEFAULT_TYPE, file));
-        } catch (IOException | NotFoundException e) {
-          throw new AssetManagerException(format(
-                  "Cannot calculate checksum for media package element %s",
-                  mpe.getURI()
-          ), e);
-        } finally {
-          if (file != null) {
-            FileUtils.deleteQuietly(file);
+    pmp.getElements().stream()
+        .filter(mpe -> hasNoChecksum.apply(mpe))
+        .forEach(mpe -> {
+          File file = null;
+          try {
+            logger.trace("Calculate checksum for {}", mpe.getURI());
+            file = workspace.get(mpe.getURI(), true);
+            mpe.setChecksum(Checksum.create(ChecksumType.DEFAULT_TYPE, file));
+          } catch (IOException | NotFoundException e) {
+            throw new AssetManagerException(String.format(
+                "Cannot calculate checksum for media package element %s",
+                mpe.getURI()
+            ), e);
+          } finally {
+            if (file != null) {
+              FileUtils.deleteQuietly(file);
+            }
           }
-        }
-      }
-    };
-    pmp.getElements().filter(hasNoChecksum.toFn()).each(addChecksum).run();
+        });
   }
 
   /** Mutates mp and its elements, so make sure to work on a copy. */
@@ -1449,24 +1436,14 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     final SnapshotDto snapshotDto;
     try {
       // rewrite URIs for archival
-      Fn<MediaPackageElement, URI> uriCreator = new Fn<MediaPackageElement, URI>() {
-        @Override
-        public URI apply(MediaPackageElement mpe) {
-          try {
-            String fileName = getFileName(mpe).getOr("unknown");
-            return new URI(
-                    "urn",
-                    "matterhorn:" + mpId + ":" + version + ":" + mpe.getIdentifier() + ":" + fileName,
-                    null
-            );
-          } catch (URISyntaxException e) {
-            throw new AssetManagerException(e);
-          }
-        }
-      };
-
       for (MediaPackageElement mpe : pmp.getElements()) {
-        mpe.setURI(uriCreator.apply(mpe));
+        String fileName = Optional.ofNullable(getFileName(mpe).orNull()).orElse("unknown");
+        URI archiveUri = new URI(
+            "urn",
+            "matterhorn:" + mpId + ":" + version + ":" + mpe.getIdentifier() + ":" + fileName,
+            null
+        );
+        mpe.setURI(archiveUri);
       }
 
       String currentOrgId = securityService.getOrganization().getId();
@@ -1554,27 +1531,15 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
    *          the id to start with
    */
   private String manifestAssetId(PartialMediaPackage pmp, String seedId) {
-    if ($(pmp.getElements()).map(getMediaPackageElementId.toFn()).exists(Booleans.eq(seedId))) {
-      return manifestAssetId(pmp, seedId + "_");
-    } else {
-      return seedId;
+    for (MediaPackageElement element : pmp.getElements()) {
+      if (seedId.equals(element.getIdentifier())) {
+        return manifestAssetId(pmp, seedId + "_");
+      }
     }
+    return seedId;
   }
 
   /* --------------------------------------------------------------------------------------------------------------- */
-
-  /**
-   * Unify exception handling by wrapping any occurring exception in an
-   * {@link AssetManagerException}.
-   */
-  static <A> A handleException(final P1<A> p) throws AssetManagerException {
-    try {
-      return p.get1();
-    } catch (Exception e) {
-      logger.error("An error occurred", e);
-      throw unwrapExceptionUntil(AssetManagerException.class, e).orElse(new AssetManagerException(e));
-    }
-  }
 
   /**
    * Walk up the stacktrace to find a cause of type <code>type</code>. Return none if no such
@@ -1595,7 +1560,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
    * non-publication elements.
    */
   static PartialMediaPackage assetsOnly(MediaPackage mp) {
-    final Pred<MediaPackageElement> isAsset = Pred.mk(isNotPublication.toFn());
+    Predicate<MediaPackageElement> isAsset = e -> isNotPublication.apply(e);
     return PartialMediaPackage.mk(mp, isAsset);
   }
 
@@ -1605,13 +1570,6 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
    * @return the file name or none if it could not be determined
    */
   public static Optional<String> getFileNameFromUrn(MediaPackageElement mpe) {
-    Fn<URI, String> toString = new Fn<URI, String>() {
-      @Override
-      public String apply(URI uri) {
-        return uri.toString();
-      }
-    };
-
     Optional<URI> uri = Optional.ofNullable(mpe.getURI());
     if (uri.isPresent() && "urn".equals(uri.get().getScheme())) {
       String[] tmp = uri.get().toString().split(":");
@@ -1627,7 +1585,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
    * Rewrite URIs of all asset elements of a snapshot's media package.
    * This method does not mutate anything.
    */
-  public static Snapshot rewriteUris(Snapshot snapshot, Fn<MediaPackageElement, URI> uriCreator) {
+  public static Snapshot rewriteUris(Snapshot snapshot, Function<MediaPackageElement, URI> uriCreator) {
     final MediaPackage mpCopy = MediaPackageSupport.copy(snapshot.getMediaPackage());
     for (final MediaPackageElement mpe : assetsOnly(mpCopy).getElements()) {
       mpe.setURI(uriCreator.apply(mpe));

@@ -55,15 +55,8 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.MimeTypes;
-import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
-
-import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.FnX;
-import com.entwinemedia.fn.P1;
-import com.entwinemedia.fn.P1Lazy;
-import com.entwinemedia.fn.Stream;
 
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
@@ -76,9 +69,11 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -196,16 +191,6 @@ public abstract class AssetManagerTestBase {
     return mpe;
   }
 
-  static P1<Integer> inc() {
-    return new P1Lazy<Integer>() {
-      private int i = 0;
-
-      @Override public Integer get1() {
-        return i++;
-      }
-    };
-  }
-
   /**
    * Create a number of media packages with one catalog each and add it to the
    * AssetManager. Return the media package IDs as an array.
@@ -259,33 +244,39 @@ public abstract class AssetManagerTestBase {
    * @see #createAndAddMediaPackagesSimple(int, int, int, Optional)
    */
   protected Snapshot[] createAndAddMediaPackages(
-          int amount,
-          final int minVersions, final int maxVersions,
-          final boolean continuousVersions,
-          final Optional<String> seriesId) {
+      int amount,
+      final int minVersions, final int maxVersions,
+      final boolean continuousVersions,
+      final Optional<String> seriesId) {
     logger.info("Create {} media packages with {} to {} snapshots each", amount, minVersions, maxVersions);
-    final Stream<Snapshot> inserts = Stream.cont(inc()).take(amount).bind(new FnX<Integer, Iterable<Snapshot>>() {
-      @Override public Iterable<Snapshot> applyX(final Integer mpCount) throws Exception {
-        final MediaPackage mp = mkMediaPackage(mkCatalog());
+
+    List<Snapshot> snapshots = new ArrayList<>();
+
+    for (int mpCount = 0; mpCount < amount; mpCount++) {
+      try {
+        MediaPackage mp = mkMediaPackage(mkCatalog());
         if (seriesId.isPresent()) {
           mp.setSeries(seriesId.get());
         }
-        final int versions = (int) (Math.random() * ((double) maxVersions - minVersions) + minVersions);
-        final String mpId = mp.getIdentifier().toString();
+        int versions = (int) (Math.random() * ((double) maxVersions - minVersions) + minVersions);
+        String mpId = mp.getIdentifier().toString();
         logger.debug("Going to take {} snapshot/s of media package {}", versions, mpId);
-        return Stream.cont(inc()).take(versions).map(new Fn<Integer, Snapshot>() {
-          @Override public Snapshot apply(Integer versionCount) {
-            if (!continuousVersions) {
-              // insert a gap into the version claim
-              am.getDatabase().claimVersion(mp.getIdentifier().toString());
-            }
-            logger.debug("Taking snapshot {} of media package {}", versionCount + 1, mpId);
-            return am.takeSnapshot(OWNER, mp);
+
+        for (int versionCount = 0; versionCount < versions; versionCount++) {
+          if (!continuousVersions) {
+            am.getDatabase().claimVersion(mpId);
           }
-        });
+
+          logger.debug("Taking snapshot {} of media package {}", versionCount + 1, mpId);
+          snapshots.add(am.takeSnapshot(OWNER, mp));
+        }
+      } catch (Exception e) {
+        logger.error("Failed to create media package or snapshot", e);
+        throw new RuntimeException("Media package generation failed", e);
       }
-    });
-    return Collections.toArray(Snapshot.class, inserts.toList());
+    }
+
+    return snapshots.toArray(new Snapshot[0]);
   }
 
   /* -------------------------------------------------------------------------------------------------------------- */

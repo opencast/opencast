@@ -20,19 +20,16 @@
  */
 package org.opencastproject.assetmanager.impl.util;
 
-import static com.entwinemedia.fn.Equality.eq;
-import static com.entwinemedia.fn.Equality.hash;
-import static com.entwinemedia.fn.Stream.$;
-
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.User;
 
-import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.fns.Booleans;
-
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of {@link User} for unit tests.
@@ -81,7 +78,8 @@ public class TestUser implements User {
   }
 
   public static User mk(Organization organization, Role... roles) {
-    return new TestUser("user", "password", "name", "email", "provider", true, organization, $(roles).toSet());
+    Set<Role> roleSet = new HashSet<>(Arrays.asList(roles));
+    return new TestUser("user", "password", "name", "email", "provider", true, organization, roleSet);
   }
 
   /**
@@ -89,24 +87,20 @@ public class TestUser implements User {
    * The created roles all belong to <code>organization</code>.
    */
   public static User mk(final Organization organization, String... roles) {
+    Set<Role> roleSet = Arrays.stream(roles)
+        .map(role -> TestRole.mk(role, organization))
+        .collect(Collectors.toSet());
     return new TestUser(
-        "user", "password", "name", "email", "provider", true, organization,
-        $(roles).map(new Fn<String, Role>() {
-          @Override public Role apply(String role) {
-            return TestRole.mk(role, organization);
-          }
-        }).toSet());
+        "user", "password", "name", "email", "provider", true, organization, roleSet);
   }
 
-  public static User mk(String userName, Organization organization,
-      String... roles) {
+  public static User mk(String userName, Organization organization, String... roles) {
+    Set<Role> roleSet = Arrays.stream(roles)
+        .map(role -> TestRole.mk(role, organization))
+        .collect(Collectors.toSet());
     return new TestUser(
-        userName, "password", "name", "email", "provider", true, organization,
-        $(roles).map(new Fn<String, Role>() {
-          @Override public Role apply(String role) {
-            return TestRole.mk(role, organization);
-          }
-        }).toSet());  }
+        userName, "password", "name", "email", "provider", true, organization, roleSet);
+  }
 
   @Override public String getUsername() {
     return username;
@@ -141,17 +135,13 @@ public class TestUser implements User {
   }
 
   @Override public boolean hasRole(String role) {
-    return $(roles).map(getRoleName).exists(Booleans.eq(role));
+    return roles.stream()
+        .map(Role::getName)
+        .anyMatch(role::equals);
   }
 
-  private final Fn<Role, String> getRoleName = new Fn<Role, String>() {
-    @Override public String apply(Role role) {
-      return role.getName();
-    }
-  };
-
   @Override public int hashCode() {
-    return hash(username, password, name, email, provider, manageable, organization, roles);
+    return Objects.hash(username, password, name, email, provider, manageable, organization, roles);
   }
 
   @Override public boolean equals(Object that) {
@@ -159,15 +149,23 @@ public class TestUser implements User {
   }
 
   private boolean eqFields(TestUser that) {
-    return eq(username, that.username) && eq(password, that.password) && eq(name, that.name) && eq(email, that.email)
-        && eq(provider, that.provider) && eq(manageable, that.manageable) && eq(organization, that.organization)
-        && eq(roles, that.roles);
+    return Objects.equals(username, that.username)
+        && Objects.equals(password, that.password)
+        && Objects.equals(name, that.name)
+        && Objects.equals(email, that.email)
+        && Objects.equals(provider, that.provider)
+        && Objects.equals(manageable, that.manageable)
+        && Objects.equals(organization, that.organization)
+        && Objects.equals(roles, that.roles);
   }
 
-  @Override public String toString() {
+  @Override
+  public String toString() {
     return "TestUser{"
         + "username='" + username + '\''
-        + ", roles=[" + $(roles).mkString(",")
+        + ", roles=[" + roles.stream()
+        .map(Role::getName)
+        .collect(Collectors.joining(","))
         + "]}";
   }
 }

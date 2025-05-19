@@ -127,7 +127,6 @@ import org.opencastproject.util.data.Monadics;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.functions.Misc;
 
-import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.Opt;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
@@ -1659,7 +1658,7 @@ public class SchedulerServiceImplTest {
     HttpAssetProvider httpAssetProvider = new HttpAssetProvider() {
       @Override
       public Snapshot prepareForDelivery(Snapshot snapshot) {
-        return AssetManagerImpl.rewriteUris(snapshot, new Fn<MediaPackageElement, URI>() {
+        return AssetManagerImpl.rewriteUris(snapshot, new java.util.function.Function<MediaPackageElement, URI>() {
           @Override public URI apply(MediaPackageElement mpe) {
             String baseName = AssetManagerImpl.getFileNameFromUrn(mpe).orElse(mpe.getElementType().toString());
 
