@@ -20,6 +20,7 @@
  */
 package org.opencastproject.assetmanager.impl;
 
+import static com.entwinemedia.fn.Prelude.chuck;
 import static java.lang.String.format;
 import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.hasNoChecksum;
 import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.isNotPublication;
@@ -94,6 +95,7 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.checkerframework.checker.units.qual.A;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -294,7 +296,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       case GLOBAL:
         return getDatabase().getMediaPackage(mediaPackageId);
       default:
-        if (isAuthorized(mediaPackageId, "READ")) {
+        if (isAuthorized(mediaPackageId, READ_ACTION)) {
           return getDatabase().getMediaPackage(mediaPackageId, orgId);
         }
         return Optional.empty();
@@ -308,7 +310,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       case GLOBAL:
         return getDatabase().getLatestSnapshotsByMediaPackageIds(mediaPackageIds, null);
       default:
-        mediaPackageIds = isAuthorized(mediaPackageIds.stream().toList(), "READ");
+        mediaPackageIds = isAuthorized(mediaPackageIds.stream().toList(), READ_ACTION);
         return getDatabase().getLatestSnapshotsByMediaPackageIds(mediaPackageIds, orgId);
     }
   }
@@ -320,7 +322,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       case GLOBAL:
         return getDatabase().getLatestSnapshot(mediaPackageId);
       default:
-        if (isAuthorized(mediaPackageId, "READ")) {
+        if (isAuthorized(mediaPackageId, READ_ACTION)) {
           return getDatabase().getLatestSnapshot(mediaPackageId, orgId);
         }
         return Optional.empty();
@@ -367,7 +369,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       }
       return Optional.empty();
     }
-    throw new RuntimeException(new UnauthorizedException(
+    return chuck(new UnauthorizedException(
             format("Not allowed to read assets of snapshot %s, version=%s", mpId, version)
     ));
   }
@@ -460,7 +462,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
         snapshot = getDatabase().getLatestSnapshot(mediaPackageId);
         break;
       default:
-        if (isAuthorized(mediaPackageId, "WRITE")) {
+        if (isAuthorized(mediaPackageId, WRITE_ACTION)) {
           snapshot = getDatabase().getLatestSnapshot(mediaPackageId, orgId);
         } else {
           snapshot = Optional.empty();
@@ -633,7 +635,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       case GLOBAL:
         return getDatabase().getSnapshots(mpId);
       default:
-        if (isAuthorized(mpId, "READ")) {
+        if (isAuthorized(mpId, READ_ACTION)) {
           return getDatabase().getSnapshots(mpId, orgId);
         }
         return new ArrayList<>();
@@ -656,7 +658,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       case GLOBAL:
         return getDatabase().getSnapshots(mpId, null, order);
       default:
-        if (isAuthorized(mpId, "READ")) {
+        if (isAuthorized(mpId, READ_ACTION)) {
           return getDatabase().getSnapshots(mpId, orgId);
         }
         return new ArrayList<>();
@@ -675,7 +677,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       case GLOBAL:
         return getDatabase().getSnapshotsByMpIdAndVersion(mpId, v, null);
       default:
-        if (isAuthorized(mpId, "READ")) {
+        if (isAuthorized(mpId, READ_ACTION)) {
           return getDatabase().getSnapshotsByMpIdAndVersion(mpId, v, orgId);
         }
         return new ArrayList<>();
@@ -697,7 +699,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
         List<Snapshot> snapshots = new ArrayList<>();
         List<Snapshot> snaps = getDatabase().getSnapshotsByDateOrderByMpId(start, end, orgId);
         for (int i = 0; i < snaps.size(); i++) {
-          if (authorizationService.hasPermission(snaps.get(i).getMediaPackage(), "read")) {
+          if (isAuthorized(snaps.get(i).getMediaPackage().getIdentifier().toString(), READ_ACTION)) {
             snapshots.add(snaps.get(i));
           }
         }
@@ -716,7 +718,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       case GLOBAL:
         return getDatabase().getSnapshotsByMpdIdAndDate(mpId, start, end, null);
       default:
-        if (isAuthorized(mpId, "READ")) {
+        if (isAuthorized(mpId, READ_ACTION)) {
           return getDatabase().getSnapshotsByMpdIdAndDate(mpId, start, end, orgId);
         }
         return new ArrayList<>();
@@ -741,7 +743,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       case GLOBAL:
         return getDatabase().getSnapshotsByMpdIdAndDate(mpId, start, end, null, order);
       default:
-        if (isAuthorized(mpId, "READ")) {
+        if (isAuthorized(mpId, READ_ACTION)) {
           return getDatabase().getSnapshotsByMpdIdAndDate(mpId, start, end, orgId, order);
         }
         return new ArrayList<>();
@@ -763,7 +765,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
         List<Snapshot> snapshots = new ArrayList<>();
         List<Snapshot> snaps = getDatabase().getSnapshotsBySeries(seriesId, orgId);
         for (int i = 0; i < snaps.size(); i++) {
-          if (authorizationService.hasPermission(snaps.get(i).getMediaPackage(), "read")) {
+          if (isAuthorized(snaps.get(i).getMediaPackage().getIdentifier().toString(), READ_ACTION)) {
             snapshots.add(snaps.get(i));
           }
         }
@@ -785,7 +787,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
         numberOfDeletedSnapshots = getDatabase().deleteSnapshots(mpId, null);
         break;
       default:
-        if (isAuthorized(mpId, "WRITE")) {
+        if (isAuthorized(mpId, WRITE_ACTION)) {
           numberOfDeletedSnapshots = getDatabase().deleteSnapshots(mpId, orgId);
         }
         break;
@@ -814,7 +816,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
         numberOfDeletedSnapshots = getDatabase().deleteAllButLatestSnapshot(mpId, null);
         break;
       default:
-        if (isAuthorized(mpId, "WRITE")) {
+        if (isAuthorized(mpId, WRITE_ACTION)) {
           numberOfDeletedSnapshots = getDatabase().deleteAllButLatestSnapshot(mpId, orgId);
         }
         break;
@@ -874,7 +876,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       default:
         List<Snapshot> snaps = getDatabase().getSnapshotsByNotStorageAndDate(targetStore, start, end, orgId);
         for (int i = 0; i < snaps.size(); i++) {
-          if (authorizationService.hasPermission(snaps.get(i).getMediaPackage(), "read")) {
+          if (isAuthorized(snaps.get(i).getMediaPackage().getIdentifier().toString(), READ_ACTION)) {
             snapshots.add(snaps.get(i));
           }
         }
@@ -1007,7 +1009,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     if (isAuthorized(mpId, WRITE_ACTION)) {
       return getDatabase().saveProperty(property);
     }
-    throw new RuntimeException(new UnauthorizedException("Not allowed to set property on episode " + mpId));
+    return chuck(new UnauthorizedException("Not allowed to set property on episode " + mpId));
   }
 
   @Override
@@ -1043,7 +1045,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
         return 0;
       default:
         Optional<MediaPackage> mediaPackage = getMediaPackage(mediaPackageId);
-        if (mediaPackage.isPresent() && authorizationService.hasPermission(mediaPackage.get(), "write")) {
+        if (mediaPackage.isPresent() && isAuthorized(mediaPackage.get().getIdentifier().toString(), WRITE_ACTION)) {
           return getDatabase().deleteProperties(mediaPackageId, namespace);
         }
         return 0;
@@ -1176,7 +1178,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     if (isAuthorized(mpId, WRITE_ACTION)) {
       getDatabase().setAvailability(RuntimeTypes.convert(version), mpId, availability);
     } else {
-      throw new RuntimeException(new UnauthorizedException("Not allowed to set availability of episode " + mpId));
+      chuck(new UnauthorizedException("Not allowed to set availability of episode " + mpId));
     }
   }
 
@@ -1221,17 +1223,17 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
         }
         // check acl rules
         logger.debug("Non admin user. Checking ACL rules.");
-        // Unsure if the authorization service makes for an adequate replacement here
-        // However I do believe we want to get away from checking ACL by mediaPackage properties eventually
-        return authorizationService.hasPermission(getDatabase().getMediaPackage(mediaPackageId).get(), action);
-//        final List<String> roles = user.getRoles().parallelStream()
-//                .filter(roleFilter)
-//                .map((role) -> mkPropertyName(role.getName(), action))
-//                .collect(Collectors.toList());
-//        return getDatabase().selectProperties(mediaPackageId, SECURITY_NAMESPACE).parallelStream()
-//                .map(p -> p.getId().getName())
-//                .filter(p -> p.endsWith(action))
-//                .anyMatch(p -> roles.stream().anyMatch(r -> r.equals(p)));
+        // TODO: Replace this custom ACL check with the general check from the auth service
+        //   Warning: For now this will cause many difficult to track down bugs and is thus hardly possible
+        // return authorizationService.hasPermission(getDatabase().getMediaPackage(mediaPackageId).get(), action);
+        final List<String> roles = user.getRoles().parallelStream()
+                .filter(roleFilter)
+                .map((role) -> mkPropertyName(role.getName(), action))
+                .collect(Collectors.toList());
+        return getDatabase().selectProperties(mediaPackageId, SECURITY_NAMESPACE).parallelStream()
+                .map(p -> p.getId().getName())
+                .filter(p -> p.endsWith(action))
+                .anyMatch(p -> roles.stream().anyMatch(r -> r.equals(p)));
     }
   }
 
