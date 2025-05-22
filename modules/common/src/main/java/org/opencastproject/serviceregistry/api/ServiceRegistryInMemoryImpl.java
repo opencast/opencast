@@ -35,6 +35,7 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.SystemLoad.NodeLoad;
 import org.opencastproject.util.NotFoundException;
 
+import org.apache.commons.lang3.NotImplementedException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1083,10 +1084,26 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
         }
 
         Long parentJobId = job.getParentJobId();
-        if (parentJobId == null | parentJobId < 1)
+        if (parentJobId == null || parentJobId < 1)
           jobs.remove(job.getId());
       }
     }
+  }
+
+  @Override
+  public Map<String, Map<String, Long>> countActiveByOrganizationAndHost() {
+    var hostMap = new HashMap<String, Long>();
+    for (var entry: jobHosts.entrySet()) {
+      var host = entry.getKey().host;
+      var count = entry.getValue().size();
+      hostMap.put(host, (long) count);
+    }
+    return Map.of("mh_dafault_org", hostMap);
+  }
+
+  @Override
+  public Map<String, Long> countActiveTypeByOrganization(String operation) {
+    throw new NotImplementedException("This has not been implemented");
   }
 
   @Override

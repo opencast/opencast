@@ -78,4 +78,4 @@ For external generation, various plugins are available:
 * [Amberscript](./transcription.configuration/amberscripttranscripts.md)
 * [Google Speech](./transcription.configuration/googlespeechtranscripts.md)
 * [IBM Watson](./transcription.configuration/watsontranscripts.md)
-* [Microsoft Azure](./transcription.configuration/microsoftazuretranscripts.md)
+* [Microsoft Azure](./transcription.configuration/microsoftazure.md)

@@ -77,6 +77,7 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,7 +88,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -102,7 +102,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("/")
+@Path("/admin-ng/acl")
 @RestService(name = "acl", title = "Acl service",
   abstractText = "Provides operations for acl",
   notes = { "This service offers the default acl CRUD Operations for the admin UI.",
@@ -119,6 +119,7 @@ import javax.ws.rs.core.Response;
                 "opencast.service.path=/admin-ng/acl",
         }
 )
+@JaxrsResource
 public class AclEndpoint {
 
   /** The logging facility */
@@ -207,7 +208,7 @@ public class AclEndpoint {
 
     // Sort by name, description or role
     if (optSort.isSome()) {
-      final Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
+      final ArrayList<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
       Collections.sort(filteredAcls, new Comparator<ManagedAcl>() {
         @Override
         public int compare(ManagedAcl acl1, ManagedAcl acl2) {

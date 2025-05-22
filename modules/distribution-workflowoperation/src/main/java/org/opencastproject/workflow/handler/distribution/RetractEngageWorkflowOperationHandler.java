@@ -50,6 +50,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -135,23 +136,18 @@ public class RetractEngageWorkflowOperationHandler extends AbstractWorkflowOpera
    */
   protected List<Job> retractElements(Set<String> retractElementIds, MediaPackage searchMediaPackage) throws
           DistributionException {
-    List<Job> jobs = new ArrayList<Job>();
-    if (retractElementIds.size() > 0) {
-      Job retractDownloadDistributionJob
-          = downloadDistributionService.retract(CHANNEL_ID, searchMediaPackage, retractElementIds);
-      if (retractDownloadDistributionJob != null) {
-        jobs.add(retractDownloadDistributionJob);
-      }
+    if (retractElementIds.isEmpty()) {
+      return Collections.emptyList();
     }
+
+    List<Job> jobs = new ArrayList<>();
+
+    jobs.add(downloadDistributionService.retract(CHANNEL_ID, searchMediaPackage, retractElementIds));
+
     if (streamingDistributionService != null && streamingDistributionService.publishToStreaming()) {
-      for (MediaPackageElement element : searchMediaPackage.getElements()) {
-        Job retractStreamingJob = streamingDistributionService.retract(CHANNEL_ID, searchMediaPackage,
-                element.getIdentifier());
-        if (retractStreamingJob != null) {
-          jobs.add(retractStreamingJob);
-        }
-      }
+      jobs.add(streamingDistributionService.retract(CHANNEL_ID, searchMediaPackage, retractElementIds));
     }
+
     return jobs;
   }
 

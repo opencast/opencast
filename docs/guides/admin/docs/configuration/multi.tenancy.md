@@ -30,7 +30,7 @@ installation that cannot be mapped to any organization.
 ### Limitations
 
 Multi tenancy in Opencast is working, however it is not fully finished. Certain objects are still shared amongst
-organizations, most notably RSS/Atom feeds and encoding profiles.
+organizations.
 
 
 Adding A Tenant

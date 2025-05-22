@@ -23,9 +23,8 @@ package org.opencastproject.adopter.statistic;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
@@ -130,15 +129,15 @@ public class Sender {
   private void send(String json, String urlSuffix, String method) throws IOException {
     HttpClient client = HttpClientBuilder.create().useSystemProperties().build();
     String url = new URL(baseUrl + urlSuffix).toString();
-    HttpRequestBase request = null;
+    HttpEntityEnclosingRequestBase request = null;
     if ("DELETE".equals(method)) {
-      request = new HttpDelete(url);
+      request = new HttpDeleteWithEntity(url);
     } else {
       request = new HttpPost(url);
-      request.addHeader("Content-Type", "application/json; utf-8");
-      request.addHeader("Accept", "application/json");
-      ((HttpPost) request).setEntity(new StringEntity(json, StandardCharsets.UTF_8));
     }
+    request.addHeader("Content-Type", "application/json; utf-8");
+    request.addHeader("Accept", "application/json");
+    request.setEntity(new StringEntity(json, StandardCharsets.UTF_8));
 
     HttpResponse resp = client.execute(request);
     int httpStatus = resp.getStatusLine().getStatusCode();

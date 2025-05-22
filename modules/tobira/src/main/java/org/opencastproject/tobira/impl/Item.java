@@ -30,7 +30,6 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.TrackSupport;
 import org.opencastproject.mediapackage.VideoStream;
-import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
@@ -146,8 +145,7 @@ class Item {
           //NB: This is an else case, so we ignore the item(s) in the stream
           .orElseGet(() -> {
             String dcExtent = event.getDublinCore().getFirst(DublinCore.PROPERTY_EXTENT);
-            DCMIPeriod p = EncodingSchemeUtils.decodeMandatoryPeriod(dcExtent);
-            return Math.max(0L, p.getEnd().getTime() - p.getStart().getTime());
+            return Math.max(0L, EncodingSchemeUtils.decodeMandatoryDuration(dcExtent));
           });
 
       this.obj = Jsons.obj(
@@ -241,11 +239,11 @@ class Item {
     // value being a list of roles, e.g.
     // `{ "read": ["ROLE_USER", "ROLE_FOO"], "write": [...] }`
     final var actionToRoles = new HashMap<String, ArrayList<Jsons.Val>>();
-    for (final var entry: acl) {
+    acl.stream().filter(AccessControlEntry::isAllow).forEach(entry -> {
       final var action = entry.getAction();
-      actionToRoles.putIfAbsent(action, new ArrayList());
+      actionToRoles.putIfAbsent(action, new ArrayList<>());
       actionToRoles.get(action).add(Jsons.v(entry.getRole()));
-    }
+    });
 
     final var props = actionToRoles.entrySet().stream()
         .map(e -> Jsons.p(e.getKey(), Jsons.arr(e.getValue())))
@@ -339,7 +337,7 @@ class Item {
     return Arrays.stream(mp.getAttachments())
       .filter(a -> a.getFlavor().getSubtype().equals("segment+preview"))
       .map(s -> Jsons.obj(
-          Jsons.p("uri", s.toString()),
+          Jsons.p("uri", s.getURI().toString()),
           Jsons.p("startTime", MediaTimePointImpl.parseTimePoint(
               s.getReference().getProperty("time")
           ).getTimeInMilliseconds())

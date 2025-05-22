@@ -169,8 +169,10 @@ public class PlaylistService {
 
   public List<Playlist> getAllForAdministrativeRead(Date from, Date to, int limit)
           throws IllegalStateException, UnauthorizedException {
-    if (!this.securityService.getUser().hasRole(GLOBAL_ADMIN_ROLE)) {
-      throw new UnauthorizedException("Only admins can call this method");
+    final var user = securityService.getUser();
+    final var orgAdminRole = securityService.getOrganization().getAdminRole();
+    if (!user.hasRole(GLOBAL_ADMIN_ROLE) && !user.hasRole(orgAdminRole)) {
+      throw new UnauthorizedException("Only (org-)admins can call this method");
     }
 
     try {
@@ -415,12 +417,20 @@ public class PlaylistService {
     // Add additional infos about events
     List<JaxbPlaylistEntry> jaxbPlaylistEntries = jaxbPlaylist.getEntries();
     for (JaxbPlaylistEntry entry : jaxbPlaylistEntries) {
+      String contentId = entry.getContentId();
+
+      if (contentId == null || contentId.isEmpty()) {
+        entry.setType(PlaylistEntryType.INACCESSIBLE);
+        logger.warn("Entry {} has no content, marking as inaccessible", entry.getId());
+        continue;
+      }
+
       try {
         if (entry.getType() == PlaylistEntryType.EVENT) {
 
           // We only get an event from the index if we have permission to do so (and if it exists ofc)
           SearchResult<Event> result = elasticsearchIndex.getByQuery(
-              new EventSearchQuery(org, user).withIdentifier(entry.getContentId()));
+              new EventSearchQuery(org, user).withIdentifier(contentId));
           if (result.getPageSize() != 0) {
             Event event = result.getItems()[0].getSource();
             entry.setPublications(event.getPublications());

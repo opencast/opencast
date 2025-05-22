@@ -44,6 +44,8 @@ import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.osgi.framework.BundleContext;
+import org.osgi.service.component.ComponentContext;
 
 import java.util.Date;
 import java.util.List;
@@ -84,11 +86,16 @@ public class SearchServicePersistenceTest {
     EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
     EasyMock.replay(securityService);
 
+    BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
+    ComponentContext cc = EasyMock.createNiceMock(ComponentContext.class);
+    EasyMock.expect(cc.getBundleContext()).andReturn(bc).anyTimes();
+    EasyMock.replay(bc, cc);
+
     searchDatabase = new SearchServiceDatabaseImpl();
     searchDatabase.setEntityManagerFactory(emf);
     searchDatabase.setDBSessionFactory(getDbSessionFactory());
     searchDatabase.setSecurityService(securityService);
-    searchDatabase.activate(null);
+    searchDatabase.activate(cc);
 
     mediaPackage = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
 
@@ -162,7 +169,15 @@ public class SearchServicePersistenceTest {
 
     Date deletionDate = new Date();
     searchDatabase.deleteMediaPackage(mediaPackage.getIdentifier().toString(), deletionDate);
-    episode = searchDatabase.getMediaPackage(mediaPackage.getIdentifier().toString());
+
+    exception = false;
+    try {
+      episode = searchDatabase.getMediaPackage(mediaPackage.getIdentifier().toString());
+    } catch (NotFoundException notFoundException) {
+      exception = true;
+    }
+    Assert.assertTrue(exception);
+    Assert.assertFalse(searchDatabase.isAvailable(mediaPackage.getIdentifier().toString()));
     Assert.assertEquals(deletionDate, searchDatabase.getDeletionDate(mediaPackage.getIdentifier().toString()));
 
     Stream<Tuple<MediaPackage, String>> allMediaPackages = searchDatabase.getAllMediaPackages(50, 0);

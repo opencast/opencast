@@ -71,7 +71,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * A Solr-based {@link SearchService} implementation.
+ * An Opensearch-based {@link SearchService} implementation.
  */
 @Component(
     immediate = true,
@@ -131,7 +131,8 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
 
   private final LoadingCache<Tuple<User, String>, Boolean> cache;
 
-  private static final Pattern staticFilePattern = Pattern.compile("^/([^/]+)/engage-player/([^/]+)/.*$");
+  private static final Pattern staticFilePattern =
+      Pattern.compile("^/([^/]+)/(?:engage-player|engage-live)/([^/]+)/.*$");
 
   /**
    * Creates a new instance of the search service.
@@ -151,9 +152,7 @@ public final class SearchServiceImpl extends AbstractJobProducer implements Sear
   }
 
   /**
-   * Service activator, called via declarative services configuration. If the
-   * solr server url is configured, we try to connect to it. If not, the solr
-   * data directory with an embedded Solr server is used.
+   * Service activator, called via declarative services configuration.
    *
    * @param cc
    *          the component context

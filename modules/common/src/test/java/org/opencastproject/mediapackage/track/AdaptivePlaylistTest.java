@@ -82,7 +82,7 @@ import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.DocumentBuilder;
 
 /**
- * Test case to Test the implementation of {@link AdaptivePlaylistImpl}.
+ * Test case to Test the implementation of {@link AdaptivePlaylist}.
  */
 public class AdaptivePlaylistTest {
 
@@ -180,7 +180,7 @@ public class AdaptivePlaylistTest {
   }
 
   /**
-   * Test method for {@link org.opencastproject.mediapackage.track.AdaptivePlaylistImpl#setDuration(long)}.
+   * Test method for {@link org.opencastproject.mediapackage.track.TrackImpl#setDuration(Long)}.
    */
   @Test
   public void testSetDuration() {
@@ -189,7 +189,7 @@ public class AdaptivePlaylistTest {
   }
 
   /**
-   * Test method for {@link org.opencastproject.mediapackage.track.AdaptivePlaylistImpl#getDuration()}.
+   * Test method for {@link org.opencastproject.mediapackage.track.TrackImpl#getDuration()}.
    */
   @Test
   public void testGetDuration() {
@@ -316,7 +316,7 @@ public class AdaptivePlaylistTest {
 
   /**
    * Test method for
-   * {@link PresenterTrackBuilderPlugin#accept(URI, org.opencastproject.mediapackage.MediaPackageElement.Type, org.opencastproject.mediapackage.MediaPackageElementFlavor)}
+   * {@link TrackBuilderPlugin#accept(URI, org.opencastproject.mediapackage.MediaPackageElement.Type, org.opencastproject.mediapackage.MediaPackageElementFlavor)}
    *
    * @throws Exception
    */

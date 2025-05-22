@@ -17,7 +17,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: 11
+          java-version: 17
 
       - name: clone mvn.opencast.org
         run: |
@@ -38,10 +38,6 @@ jobs:
             sox \
             tar \
             unzip
-
-      - name: prepare build
-        run: |
-          sed -i 's/build --skipTests=${skipTests}/build --skipTests=true/' modules/admin-ui-frontend/pom.xml
 
       - name: build opencast
         run: |

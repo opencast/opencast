@@ -38,6 +38,7 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 
 import java.io.IOException;
 import java.util.Iterator;
@@ -54,7 +55,7 @@ import javax.ws.rs.core.Response.Status;
 /**
  * Provides a sorted set of known users
  */
-@Path("/")
+@Path("/users")
 @RestService(
     name = "users",
     title = "User account manager",
@@ -71,6 +72,7 @@ import javax.ws.rs.core.Response.Status;
     immediate = true,
     service = { UserEndpoint.class }
 )
+@JaxrsResource
 public class UserEndpoint {
 
   /** The role directory service */

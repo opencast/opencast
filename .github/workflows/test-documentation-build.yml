@@ -16,7 +16,7 @@ jobs:
 
   # Check documentation with markdownlint and build it using mkdocs
   documentation:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     steps:
     - uses: actions/checkout@v4

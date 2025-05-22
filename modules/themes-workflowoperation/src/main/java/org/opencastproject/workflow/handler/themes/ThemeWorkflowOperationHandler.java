@@ -54,11 +54,6 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.Stream;
-import com.entwinemedia.fn.data.Opt;
-import com.entwinemedia.fn.fns.Strings;
-
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -68,8 +63,10 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -166,26 +163,39 @@ public class ThemeWorkflowOperationHandler extends AbstractWorkflowOperationHand
           throws WorkflowOperationException {
     logger.debug("Running theme workflow operation on workflow {}", workflowInstance.getId());
 
-    final MediaPackageElementFlavor bumperFlavor = getOptConfig(workflowInstance, BUMPER_FLAVOR).map(
-            toMediaPackageElementFlavor).getOr(new MediaPackageElementFlavor("branding", "bumper"));
-    final MediaPackageElementFlavor trailerFlavor = getOptConfig(workflowInstance, TRAILER_FLAVOR).map(
-            toMediaPackageElementFlavor).getOr(new MediaPackageElementFlavor("branding", "trailer"));
-    final MediaPackageElementFlavor titleSlideFlavor = getOptConfig(workflowInstance, TITLE_SLIDE_FLAVOR).map(
-            toMediaPackageElementFlavor).getOr(new MediaPackageElementFlavor("branding", "title-slide"));
-    final MediaPackageElementFlavor licenseSlideFlavor = getOptConfig(workflowInstance, LICENSE_SLIDE_FLAVOR).map(
-            toMediaPackageElementFlavor).getOr(new MediaPackageElementFlavor("branding", "license-slide"));
-    final MediaPackageElementFlavor watermarkFlavor = getOptConfig(workflowInstance, WATERMARK_FLAVOR).map(
-            toMediaPackageElementFlavor).getOr(new MediaPackageElementFlavor("branding", "watermark"));
+    final MediaPackageElementFlavor bumperFlavor = Optional.ofNullable(
+        getOptConfig(workflowInstance, BUMPER_FLAVOR).orNull())
+        .map(MediaPackageElementFlavor::parseFlavor)
+        .orElse(new MediaPackageElementFlavor("branding", "bumper"));
+    final MediaPackageElementFlavor trailerFlavor = Optional.ofNullable(
+        getOptConfig(workflowInstance, TRAILER_FLAVOR).orNull())
+        .map(MediaPackageElementFlavor::parseFlavor)
+        .orElse(new MediaPackageElementFlavor("branding", "trailer"));
+    final MediaPackageElementFlavor titleSlideFlavor = Optional.ofNullable(
+        getOptConfig(workflowInstance, TITLE_SLIDE_FLAVOR).orNull())
+        .map(MediaPackageElementFlavor::parseFlavor)
+        .orElse(new MediaPackageElementFlavor("branding", "title-slide"));
+    final MediaPackageElementFlavor licenseSlideFlavor = Optional.ofNullable(
+        getOptConfig(workflowInstance, LICENSE_SLIDE_FLAVOR).orNull())
+        .map(MediaPackageElementFlavor::parseFlavor)
+        .orElse(new MediaPackageElementFlavor("branding", "license-slide"));
+    final MediaPackageElementFlavor watermarkFlavor = Optional.ofNullable(
+        getOptConfig(workflowInstance, WATERMARK_FLAVOR).orNull())
+        .map(MediaPackageElementFlavor::parseFlavor)
+        .orElse(new MediaPackageElementFlavor("branding", "watermark"));
     final List<String> bumperTags = asList(workflowInstance.getConfiguration(BUMPER_TAGS));
     final List<String> trailerTags = asList(workflowInstance.getConfiguration(TRAILER_TAGS));
     final List<String> titleSlideTags = asList(workflowInstance.getConfiguration(TITLE_SLIDE_TAGS));
     final List<String> licenseSlideTags = asList(workflowInstance.getConfiguration(LICENSE_SLIDE_TAGS));
     final List<String> watermarkTags = asList(workflowInstance.getConfiguration(WATERMARK_TAGS));
 
-    Opt<String> layoutStringOpt = getOptConfig(workflowInstance, WATERMARK_LAYOUT);
-    Opt<String> watermarkLayoutVariable = getOptConfig(workflowInstance, WATERMARK_LAYOUT_VARIABLE);
+    Optional<String> layoutStringOpt = Optional.ofNullable(getOptConfig(workflowInstance, WATERMARK_LAYOUT).orNull());
+    Optional<String> watermarkLayoutVariable = Optional.ofNullable(
+        getOptConfig(workflowInstance, WATERMARK_LAYOUT_VARIABLE).orNull());
 
-    List<String> layoutList = new ArrayList<>(Stream.$(layoutStringOpt).bind(Strings.split(";")).toList());
+    List<String> layoutList = layoutStringOpt
+        .map(s -> Arrays.asList(s.split(";")))
+        .orElse(Collections.emptyList());
 
     try {
       MediaPackage mediaPackage = workflowInstance.getMediaPackage();
@@ -292,17 +302,17 @@ public class ThemeWorkflowOperationHandler extends AbstractWorkflowOperationHand
           logger.warn("Watermark file {} not found in static file service, skip applying it", theme.getWatermarkFile());
         }
 
-        if (layoutStringOpt.isNone() || watermarkLayoutVariable.isNone()) {
+        if (layoutStringOpt.isEmpty() || watermarkLayoutVariable.isEmpty()) {
           throw new WorkflowOperationException(format("Configuration key '%s' or '%s' is either missing or empty",
                   WATERMARK_LAYOUT, WATERMARK_LAYOUT_VARIABLE));
         }
 
         AbsolutePositionLayoutSpec watermarkLayout = parseLayout(theme.getWatermarkPosition());
         layoutList.set(layoutList.size() - 1, Serializer.json(watermarkLayout).toJson());
-        layoutStringOpt = Opt.some(Stream.$(layoutList).mkString(";"));
+        layoutStringOpt = Optional.of(String.join(";", layoutList));
       }
 
-      if (watermarkLayoutVariable.isSome() && layoutStringOpt.isSome()) {
+      if (watermarkLayoutVariable.isPresent() && layoutStringOpt.isPresent()) {
         workflowInstance.setConfiguration(watermarkLayoutVariable.get(), layoutStringOpt.get());
       }
 
@@ -347,13 +357,4 @@ public class ThemeWorkflowOperationHandler extends AbstractWorkflowOperationHand
     }
     mediaPackage.add(element);
   }
-
-  private static Fn<String, MediaPackageElementFlavor> toMediaPackageElementFlavor
-      = new Fn<String, MediaPackageElementFlavor>() {
-        @Override
-        public MediaPackageElementFlavor apply(String flavorString) {
-          return MediaPackageElementFlavor.parseFlavor(flavorString);
-        }
-      };
-
 }

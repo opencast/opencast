@@ -5,8 +5,6 @@
   <title>Run theming operations on trimmed videos</title>
   <tags/>
   <description/>
-  <configuration_panel/>
-  <configuration_panel_json/>
   <operations>
 
     <!-- Apply the theme to the mediapackage -->
@@ -46,7 +44,7 @@
       if="NOT(${theme_active})"
       description="Tag elements as themed">
       <configurations>
-        <configuration key="source-flavors">*/trimmed</configuration>
+        <configuration key="source-flavors">presenter/trimmed,presentation/trimmed</configuration>
         <configuration key="target-flavor">*/themed</configuration>
         <configuration key="copy">false</configuration>
       </configurations>
@@ -121,6 +119,28 @@
         <configuration key="encoding-profile">concat.work</configuration>
         <configuration key="output-resolution">part-2</configuration>
         <configuration key="output-framerate">part-2</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+        id="subtitle-timeshift"
+        if="${theme_bumper_active}"
+        exception-handler-workflow="partial-error"
+        description="Create new captions with time offset">
+      <configurations>
+        <configuration key="subtitle-source-flavor">captions/trimmed</configuration>
+        <configuration key="target-flavor">captions/shifted</configuration>
+        <configuration key="video-source-flavor">branding/bumper</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+        id="tag"
+        if="NOT ${theme_bumper_active}"
+        description="If no shifting was necessary, mark the trimmed captions as shifted">
+      <configurations>
+        <configuration key="source-flavors">captions/trimmed</configuration>
+        <configuration key="target-flavor">captions/shifted</configuration>
       </configurations>
     </operation>
 

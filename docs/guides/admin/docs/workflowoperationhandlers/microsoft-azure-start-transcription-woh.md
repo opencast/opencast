@@ -1,57 +1,61 @@
-Microsoft Azure Start Transcription Workflow Operation
-======================================================
+# Microsoft Azure Start Transcription Workflow Operation
 
 ID: `microsoft-azure-start-transcription`
 
-Description
------------
+## Description
 
-Microsoft Azure Start Transcription invokes the Azure Speech-to-Text service by passing a file with an audio track
-to be translated to text.
+Microsoft Azure Start Transcription invokes the Azure Speech service by passing a file with an audio track to transcript.
 
-Parameter Table
----------------
+Note: You have to configure the `Microsoft Azure Transcription Service` first to make use this operation. Read the [documentation](../configuration/transcription.configuration/microsoftazure.md) how to achieve it.
 
-|configuration keys|description|default value|example|
-|------------------|-------|-----------|-------------|
-|source-flavor|The flavor of the file to be sent for translation.|EMPTY|presenter/delivery|
-|source-tag|The flavor of the file to be sent for translation.|EMPTY|transcript|
-|skip-if-flavor-exists|If this flavor already exists in the media package, skip this operation.<br/>To be used when the media package already has a transcript file. Optional|false|captions/vtt+en-us|
-|language-code|The language code to use for the transcription. Optional. If set, it will override the configuration language code|EMPTY|en-US, [supported languages](https://docs.microsoft.com/de-de/azure/cognitive-services/speech-service/language-support?tabs=speechtotext#speech-to-text)|
-|auto-detect-language|Activate automatic language detection by Azure. Optional. Overrides the language set in `language-code`. If set, will override the value in the configuration|false|true
-|auto-detect-languages|A list of language codes. MUST be set if not set already in service configuration. The Azure language auto detection chooses from the given list and cannot detect any language not in the given list. The list needs to have at least one element and can have at most four elements.|EMPTY|en-US,de-DE,it-IT
+## Parameter Table
 
-**One of source-flavor or source-tag must be specified.**
+| Configuration keys                | Description                                                                                                                                                                                                                                           | Default value             | Example                     |
+|-----------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|---------------------------|-----------------------------|
+| source-flavors                    | The flavors of the media files to use as audio input. Only the first available track will be used.                                                                                                                                                    | EMPTY                     | presenter/delivery          |
+| source-tags                       | The comma separated list of tags of the file to transcribe.                                                                                                                                                                                           | EMPTY                     | transcript                  |
+| skip-if-flavor-exists             | If this flavor already exists in the media package, skip this operation.<br/>To be used when the media package already has a transcript file. Optional                                                                                                | EMPTY                     | captions/source             |
+| language                          | The language code to use for the transcription. Optional. If set, it will override the configuration language code. Read documentation for [supported languages](https://learn.microsoft.com/en-us/azure/ai-services/speech-service/language-support) | EMPTY                     | de-DE                       |
+| audio-extraction-encoding-profile | The encoding profile to extract audio from media file for transcription.                                                                                                                                                                              | transcription-azure.audio | audio-to-opus.transcription |
 
-Examples
---------
+**One of source-flavors or source-tags must be specified.**
+
+## Examples
+
+The example below will start the transcription on the first trimmed media file found in the media package, but only if `captions/source` element doesn't exist yet. The encoding profile to extract the audio stream is `custom-transcription-azure.audio`. 
 
 ```xml
-    <!-- Start Microsoft Azure transcription job -->
-    <operation
-        id="microsoft-azure-start-transcription"
-        fail-on-error="true"
-        exception-handler-workflow="partial-error"
-        description="Start Microsoft Azure transcription job">
-      <configurations>
-        <!--  Skip this operation if flavor already exists. Used for cases when mediapackage already has captions. -->
-        <configuration key="skip-if-flavor-exists">captions/vtt+de-DE</configuration>
-        <configuration key="language-code">de-DE</configuration>
-        <configuration key="source-flavor">presenter/prepared</configuration>
-      </configurations>
-    </operation>
+<!-- This operation will start the transcription job -->
+<operation
+  id="microsoft-azure-start-transcription"
+  fail-on-error="true"
+  exception-handler-workflow="partial-error"
+  description="Start Microsoft Azure transcription job">
+  <configurations>
+    <configuration key="source-flavors">*/trimmed</configuration>
+    <!-- Skip this operation if flavor already exists. -->
+    <!-- Used for cases when mediapackage already has captions. -->
+    <configuration key="skip-if-flavor-exists">captions/source</configuration>
+    <configuration key="audio-extraction-encoding-profile">custom-transcription-azure.audio</configuration>
+  </configurations>
+</operation>
 ```
 
+The next example shows you how to create a transcription of the `presenter/trimmed` media file with the language code `de-DE`. The transcription will start if `captions/source` element is missing.
+
 ```xml
-    <!-- Start Microsoft Azure transcription job, auto detect language -->
-    <operation
-        id="microsoft-azure-start-transcription"
-        fail-on-error="true"
-        exception-handler-workflow="partial-error"
-        description="Start Microsoft Azure transcription job">
-      <configurations>
-        <configuration key="auto-detect-language">true</configuration>
-        <configuration key="auto-detect-languages">es-ES,fr-FR,nl-NL,ja-JP</configuration>
-      </configurations>
-    </operation>
+<!-- This operation will start the transcription job -->
+<operation
+  id="microsoft-azure-start-transcription"
+  fail-on-error="true"
+  exception-handler-workflow="partial-error"
+  description="Start Microsoft Azure transcription job">
+  <configurations>
+    <configuration key="source-flavors">presenter/trimmed</configuration>
+    <!-- Skip this operation if flavor already exists. -->
+    <!-- Used for cases when mediapackage already has captions. -->
+    <configuration key="skip-if-flavor-exists">captions/source</configuration>
+    <configuration key="language">de-DE</configuration>
+  </configurations>
+</operation>
 ```

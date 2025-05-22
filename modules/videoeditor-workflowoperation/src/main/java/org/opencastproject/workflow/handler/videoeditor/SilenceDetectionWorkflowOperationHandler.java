@@ -201,6 +201,9 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
       // Skip over track with no audio stream
       if (!sourceTrack.hasAudio()) {
         logger.info("Skipping silence detection of track {} since it has no audio", sourceTrack);
+        if (exportSegmentsDuration) {
+          exportWorkflowProperties = exportEmptySegmentDuration(exportWorkflowProperties, sourceTrack);
+        }
         continue;
       }
       logger.info("Executing silence detection on track {}", sourceTrack.getIdentifier());
@@ -214,6 +217,9 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
 
         if (smil.getBody().getMediaElements().isEmpty()) {
           logger.debug("No segments detected in track {}, skip attaching smil file.", sourceTrack.getIdentifier());
+          if (exportSegmentsDuration) {
+            exportWorkflowProperties = exportEmptySegmentDuration(exportWorkflowProperties, sourceTrack);
+          }
           continue;
         }
 
@@ -240,14 +246,10 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
           for (SmilMediaObject smilElement : smil.getBody().getMediaElements()) {
             durationMS += getSegmentDurationMS(smilElement);
           }
-          String durationWfPropertyName = String.format("%s_%s_active_audio_duration",
-                  sourceTrack.getFlavor().getType(),
-                  sourceTrack.getFlavor().getSubtype());
+          String durationWfPropertyName = getDurationWfPropertyName(sourceTrack);
           exportWorkflowProperties.put(durationWfPropertyName,
                   Long.toString(TimeUnit.MILLISECONDS.toSeconds(durationMS)));
-          String relationWfPropertyName = String.format("%s_%s_active_audio_duration_percent",
-                  sourceTrack.getFlavor().getType(),
-                  sourceTrack.getFlavor().getSubtype());
+          String relationWfPropertyName = getRelationWfPropertyName(sourceTrack);
           double durationTrackLengthRelation = 0;
           if (sourceTrack.getDuration() > 0) {
             durationTrackLengthRelation = (double)durationMS / (double)sourceTrack.getDuration();
@@ -286,6 +288,32 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
     }
     SmilMediaElement smilMediaElement = (SmilMediaElement) smilElement;
     return smilMediaElement.getClipEndMS() - smilMediaElement.getClipBeginMS();
+  }
+
+  /**
+   * If the track has no audio, still add workflow variables that reflect this
+   * @param properties workflow variable map
+   * @param sourceTrack track without audio
+   * @return The updated workflow variable map
+   */
+  private Map<String, String> exportEmptySegmentDuration(Map<String, String> properties, Track sourceTrack) {
+    String durationWfPropertyName = getDurationWfPropertyName(sourceTrack);
+    properties.put(durationWfPropertyName, Long.toString(0L));
+    String relationWfPropertyName = getRelationWfPropertyName(sourceTrack);
+    properties.put(relationWfPropertyName, String.format("%.0f", 0D));
+    return properties;
+  }
+
+  private String getDurationWfPropertyName(Track sourceTrack) {
+    return String.format("%s_%s_active_audio_duration",
+        sourceTrack.getFlavor().getType(),
+        sourceTrack.getFlavor().getSubtype());
+  }
+
+  private String getRelationWfPropertyName(Track sourceTrack) {
+    return String.format("%s_%s_active_audio_duration_percent",
+        sourceTrack.getFlavor().getType(),
+        sourceTrack.getFlavor().getSubtype());
   }
 
   @Override

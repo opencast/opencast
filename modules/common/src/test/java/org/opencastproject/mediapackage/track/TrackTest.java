@@ -83,12 +83,12 @@ public class TrackTest {
   }
 
   /**
-   * Test method for {@link org.opencastproject.mediapackage.track.TrackImpl#setDuration(long)}.
+   * Test method for {@link org.opencastproject.mediapackage.track.TrackImpl#setDuration(Long)}.
    */
   @Test
   public void testSetDuration() {
     track.setDuration(null);
-    track.setDuration(new Long(10));
+    track.setDuration(10L);
   }
 
   /**
@@ -101,7 +101,7 @@ public class TrackTest {
 
   /**
    * Test method for
-   * {@link PresenterTrackBuilderPlugin#accept(URI, org.opencastproject.mediapackage.MediaPackageElement.Type, org.opencastproject.mediapackage.MediaPackageElementFlavor)}
+   * {@link TrackBuilderPlugin#accept(URI, org.opencastproject.mediapackage.MediaPackageElement.Type, org.opencastproject.mediapackage.MediaPackageElementFlavor)}
    *
    * @throws Exception
    */

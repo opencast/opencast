@@ -39,4 +39,7 @@ public interface IndexSchema {
   /** Accumulative text field with analysis targeted for fuzzy search */
   String TEXT_FUZZY = "text" + FUZZY_FIELDNAME_EXTENSION;
 
+  /** Extension for sort field names */
+  String SORT_FIELD_NAME_EXTENSION = ".sort";
+
 }

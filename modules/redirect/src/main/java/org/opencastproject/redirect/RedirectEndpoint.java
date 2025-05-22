@@ -31,6 +31,7 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -68,7 +69,8 @@ import javax.ws.rs.core.UriInfo;
         "This is mostly useful for external applications, for example to realize certain (pre-)authentication schemes.."
     }
 )
-@Path("/")
+@Path("/redirect")
+@JaxrsResource
 public class RedirectEndpoint {
   /**
    * Essentially the Post/Redirect/Get pattern

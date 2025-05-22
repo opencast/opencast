@@ -64,7 +64,7 @@ public class XACMLUtilsTest {
   }
 
   /**
-   * Unit test for method {@link XACMLUtils#parseXacml(java.io.InputStream}
+   * Unit test for method {@link XACMLUtils#parseXacml(java.io.InputStream)}
    */
   @Test
   public void testParseXacml() throws Exception {

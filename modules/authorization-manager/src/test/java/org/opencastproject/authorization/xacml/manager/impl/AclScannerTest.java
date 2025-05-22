@@ -24,10 +24,8 @@ package org.opencastproject.authorization.xacml.manager.impl;
 import static org.easymock.EasyMock.anyLong;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.anyString;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertThrows;
 
-import org.opencastproject.authorization.xacml.XACMLParsingException;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
@@ -39,6 +37,7 @@ import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.elasticsearch.index.objects.series.Series;
 import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.AccessControlParsingException;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
@@ -49,7 +48,6 @@ import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
-import org.xml.sax.SAXParseException;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -66,11 +64,11 @@ public class AclScannerTest {
   @Before
   public void setUp() throws Exception {
     Organization org1 = new JpaOrganization("org1", "org1", new HashMap<String, Integer>(), "ADMIN", "ANONYMOUS",
-            new HashMap<String, String>());
+        new HashMap<>());
     Organization org2 = new JpaOrganization("org2", "org2", new HashMap<String, Integer>(), "ADMIN", "ANONYMOUS",
-            new HashMap<String, String>());
+        new HashMap<>());
     Organization org3 = new JpaOrganization("org3", "org3", new HashMap<String, Integer>(), "ADMIN", "ANONYMOUS",
-            new HashMap<String, String>());
+        new HashMap<>());
 
     List<Organization> orgs = new ArrayList<>();
     orgs.add(org1);
@@ -117,13 +115,13 @@ public class AclScannerTest {
 
   @Test
   public void testCorrectFileInstall() throws Exception {
-    File file = new File(AclScannerTest.class.getResource("/xacml_correct.xml").toURI());
+    File file = new File(AclScannerTest.class.getResource("/correct.json").toURI());
 
     ManagedAcl acl = new ManagedAclImpl(1L, "TestAcl", "org", new AccessControlList());
     Optional<ManagedAcl> managedAcl = Optional.of(acl);
     EasyMock.expect(aclDb.createAcl(anyObject(Organization.class), anyObject(AccessControlList.class), anyString()))
             .andReturn(managedAcl).times(3);
-    EasyMock.expect(aclDb.getAcls(anyObject(Organization.class))).andReturn(new ArrayList<ManagedAcl>()).times(3);
+    EasyMock.expect(aclDb.getAcls(anyObject(Organization.class))).andReturn(new ArrayList<>()).times(3);
     EasyMock.replay(aclDb);
 
     aclScanner.install(file);
@@ -133,19 +131,14 @@ public class AclScannerTest {
 
   @Test
   public void testCorruptedFileInstall() throws Exception {
-    File file = new File(AclScannerTest.class.getResource("/xacml_errors.xml").toURI());
-
-    try {
-      aclScanner.install(file);
-      fail("Should not be parsed.");
-    } catch (XACMLParsingException e) {
-      assertTrue("The file can not be parsed.", e.getCause() instanceof SAXParseException);
-    }
+    File file = new File(AclScannerTest.class.getResource("/corrupt.json").toURI());
+    assertThrows(AccessControlParsingException.class, () ->
+        aclScanner.install(file));
   }
 
   @Test
   public void testCorrectFileUpdate() throws Exception {
-    File file = new File(AclScannerTest.class.getResource("/xacml_correct.xml").toURI());
+    File file = new File(AclScannerTest.class.getResource("/correct.json").toURI());
 
     ManagedAcl acl = new ManagedAclImpl(1L, "TestAcl", "org", new AccessControlList());
     Optional<ManagedAcl> managedAcl = Optional.of(acl);
@@ -153,7 +146,7 @@ public class AclScannerTest {
             .andReturn(managedAcl).times(3);
     EasyMock.expect(aclDb.getAcl(anyObject(Organization.class), anyLong())).andReturn(managedAcl).times(3);
     EasyMock.expect(aclDb.updateAcl(anyObject(ManagedAcl.class))).andReturn(true).times(3);
-    EasyMock.expect(aclDb.getAcls(anyObject(Organization.class))).andReturn(new ArrayList<ManagedAcl>()).times(3);
+    EasyMock.expect(aclDb.getAcls(anyObject(Organization.class))).andReturn(new ArrayList<>()).times(3);
     EasyMock.replay(aclDb);
 
     aclScanner.install(file);
@@ -165,8 +158,8 @@ public class AclScannerTest {
 
   @Test
   public void testMissingFileUpdate() throws Exception {
-    File file1 = new File(AclScannerTest.class.getResource("/xacml_correct.xml").toURI());
-    File file2 = new File(AclScannerTest.class.getResource("/xacml_correct2.xml").toURI());
+    File file1 = new File(AclScannerTest.class.getResource("/correct.json").toURI());
+    File file2 = new File(AclScannerTest.class.getResource("/correct2.json").toURI());
 
     ManagedAcl acl = new ManagedAclImpl(1L, "TestAcl", "org", new AccessControlList());
     Optional<ManagedAcl> managedAcl = Optional.of(acl);
@@ -184,19 +177,14 @@ public class AclScannerTest {
 
   @Test
   public void testCorruptedFileUpdate() throws Exception {
-    File file = new File(AclScannerTest.class.getResource("/xacml_errors.xml").toURI());
-
-    try {
-      aclScanner.update(file);
-      fail("Should not be parsed.");
-    } catch (XACMLParsingException e) {
-      assertTrue("The file can not be parsed.", e.getCause() instanceof SAXParseException);
-    }
+    File file = new File(AclScannerTest.class.getResource("/corrupt.json").toURI());
+    assertThrows(AccessControlParsingException.class, () ->
+        aclScanner.update(file));
   }
 
   @Test
   public void testRemoveFile() throws Exception {
-    File file1 = new File(AclScannerTest.class.getResource("/xacml_correct.xml").toURI());
+    File file1 = new File(AclScannerTest.class.getResource("/correct.json").toURI());
     Long id = 1L;
     String org = "org";
     ManagedAcl acl = new ManagedAclImpl(id, "TestAcl", org, new AccessControlList());
@@ -216,8 +204,8 @@ public class AclScannerTest {
 
   @Test
   public void testRemoveMissingFile() throws Exception {
-    File file1 = new File(AclScannerTest.class.getResource("/xacml_correct.xml").toURI());
-    File file2 = new File(AclScannerTest.class.getResource("/xacml_correct2.xml").toURI());
+    File file1 = new File(AclScannerTest.class.getResource("/correct.json").toURI());
+    File file2 = new File(AclScannerTest.class.getResource("/correct2.json").toURI());
     ManagedAcl acl = new ManagedAclImpl(1L, "TestAcl", "org", new AccessControlList());
     Optional<ManagedAcl> managedAcl = Optional.of(acl);
     EasyMock.expect(aclDb.createAcl(anyObject(Organization.class), anyObject(AccessControlList.class), anyString()))

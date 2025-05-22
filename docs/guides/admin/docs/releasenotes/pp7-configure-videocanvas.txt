@@ -1,3 +1,0 @@
-Paella Player 7 supports video canvases for special kinds of videos, for example 360°. For tis use case, it is now
-possible to define in the player which video canvases to use for which tracks, depending on tags and flavors. For more
-details see [the respective docs](../modules/paella.player7.configuration.md)

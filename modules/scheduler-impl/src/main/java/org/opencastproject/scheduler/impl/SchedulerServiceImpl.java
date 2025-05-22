@@ -128,6 +128,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -162,7 +163,6 @@ import java.util.stream.Collectors;
  * Implementation of {@link SchedulerService}.
  */
 @Component(
-    immediate = true,
     service = { ManagedService.class, SchedulerService.class, IndexProducer.class },
     property = {
         "service.description=Scheduler Service"
@@ -246,6 +246,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   @Reference(
       cardinality = ReferenceCardinality.MULTIPLE,
       policy = ReferencePolicy.DYNAMIC,
+      policyOption = ReferencePolicyOption.GREEDY,
       unbind = "removeSchedulerUpdateHandler"
   )
   public void addSchedulerUpdateHandler(SchedulerUpdateHandler handler) {
@@ -361,6 +362,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   @Reference(
       cardinality = ReferenceCardinality.MULTIPLE,
       policy = ReferencePolicy.DYNAMIC,
+      policyOption = ReferencePolicyOption.GREEDY,
       unbind = "removeCatalogUIAdapter"
   )
   public void addCatalogUIAdapter(EventCatalogUIAdapter catalogUIAdapter) {
@@ -1710,7 +1712,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   @Override
-  public void repopulate() throws IndexRebuildException {
+  public void repopulate(IndexRebuildService.DataType type) throws IndexRebuildException {
     try {
       final int total;
       try {
@@ -1752,6 +1754,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
                       }
                     } catch (SearchIndexException e) {
                       logger.error("Error while updating event '{}' from search index:", event.getMediaPackageId(), e);
+                    } catch (Exception e) {
+                      throw new RuntimeException("Fatal error while indexing event " + event.getMediaPackageId(), e);
                     }
                   }
                });

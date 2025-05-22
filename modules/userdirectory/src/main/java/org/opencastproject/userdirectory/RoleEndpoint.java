@@ -31,6 +31,7 @@ import org.opencastproject.util.doc.rest.RestService;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -40,7 +41,7 @@ import javax.ws.rs.core.MediaType;
 /**
  * Provides a sorted set of known roles
  */
-@Path("/")
+@Path("/roles")
 @RestService(
     name = "roles",
     title = "User Roles",
@@ -57,6 +58,7 @@ import javax.ws.rs.core.MediaType;
     immediate = true,
     service = { RoleEndpoint.class }
 )
+@JaxrsResource
 public class RoleEndpoint {
 
   /** The role directory service */

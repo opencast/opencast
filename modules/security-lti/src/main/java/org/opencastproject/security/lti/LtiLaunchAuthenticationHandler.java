@@ -396,6 +396,8 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
         logger.debug("Concurrent access of user {}. Ignoring.", username);
       } else if (!ltiRolesForUserCreation.contains("*") && !requestContainsMatchingRoles(request)) {
         logger.debug("No JpaUserReference will be created for LTI user {}.", username);
+        // Remove user from the cache; next time, the user may have additional/different roles.
+        activePersistenceTransactions.remove(username);
       } else {
         try {
           JpaOrganization organization = fromOrganization(securityService.getOrganization());

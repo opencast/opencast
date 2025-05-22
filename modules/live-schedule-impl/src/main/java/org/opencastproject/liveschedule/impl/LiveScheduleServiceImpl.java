@@ -450,29 +450,43 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
   }
 
   void retract(MediaPackage mp) throws LiveScheduleException {
+    Organization org = securityService.getOrganization();
+    User prevUser = org != null ? securityService.getUser() : null;
     try {
-      List<Job> jobs = new ArrayList<Job>();
+      securityService.setUser(SecurityUtil.createSystemUser(systemUserName, org));
       Set<String> elementIds = new HashSet<String>();
-      // Remove media package from the search index
       String mpId = mp.getIdentifier().toString();
       logger.info("Removing LIVE media package {} from the search index", mpId);
 
-      jobs.add(searchService.delete(mpId));
-      // Retract elements
       for (MediaPackageElement mpe : mp.getElements()) {
         if (!MediaPackageElement.Type.Publication.equals(mpe.getElementType())) {
           elementIds.add(mpe.getIdentifier());
         }
       }
-      jobs.add(downloadDistributionService.retract(CHANNEL_ID, mp, elementIds));
 
-      if (!waitForStatus(jobs.toArray(new Job[jobs.size()])).isSuccess()) {
-        throw new LiveScheduleException("Removing live media package from search did not complete successfully");
+      List<String> failedJobs = new ArrayList<>();
+      // Remove media package from the search index
+      Job searchDeleteJob = searchService.delete(mpId);
+      if (!waitForStatus(searchDeleteJob).isSuccess()) {
+        failedJobs.add("Search Index");
+      }
+
+      // Removing media from the download distribution service
+      Job distributionRetractJob =  downloadDistributionService.retract(CHANNEL_ID, mp, elementIds);
+      if (!waitForStatus(distributionRetractJob).isSuccess()) {
+        failedJobs.add("Distribution");
+      }
+
+      if (!failedJobs.isEmpty()) {
+        throw new LiveScheduleException(
+            String.format("Removing live media package %s from %s failed", mpId, String.join(" and ", failedJobs)));
       }
     } catch (LiveScheduleException e) {
       throw e;
     } catch (Exception e) {
       throw new LiveScheduleException(e);
+    } finally {
+      securityService.setUser(prevUser);
     }
   }
 

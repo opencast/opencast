@@ -25,6 +25,10 @@ updates:
   directory: "/modules/lti"
   schedule:
     interval: monthly
+  groups:
+    fontawesome:
+      patterns:
+        - "@fortawesome*"
   open-pull-requests-limit: 10
 - package-ecosystem: npm
   directory: "/modules/runtime-info-ui"
@@ -33,11 +37,6 @@ updates:
   open-pull-requests-limit: 10
 - package-ecosystem: npm
   directory: "/modules/engage-paella-player-7"
-  schedule:
-    interval: monthly
-  open-pull-requests-limit: 10
-- package-ecosystem: npm
-  directory: "/modules/admin-ui-frontend"
   schedule:
     interval: monthly
   open-pull-requests-limit: 10

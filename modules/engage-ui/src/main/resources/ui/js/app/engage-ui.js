@@ -39,6 +39,7 @@ function($, bootbox, _, alertify, jsyaml) {
   var configURL = '/ui/config/engage-ui/config.yml';
   var springSecurityLoginURL = '/j_spring_security_check';
   var springSecurityLogoutURL = '/j_spring_security_logout';
+  var customLoginURL = null;
 
   // various variables
   var mediaContainer = '<div class="col-xs-12 col-sm-6 col-md-4 col-lg-4">';
@@ -190,23 +191,14 @@ function($, bootbox, _, alertify, jsyaml) {
 
     $('body').append(template(tData));
 
-    sortMap['DATE_CREATED_DESC'] = tData.recording_date_new;
-    sortMap['DATE_CREATED'] = tData.recording_date_old;
-    sortMap['DATE_MODIFIED_DESC'] = tData.publishing_date_new;
-    sortMap['DATE_MODIFIED'] = tData.publishing_date_old;
+    sortMap['MODIFIED_DESC'] = tData.publishing_date_new;
+    sortMap['MODIFIED'] = tData.publishing_date_old;
     sortMap['TITLE'] = tData.title_a_z;
     sortMap['TITLE_DESC'] = tData.title_z_a;
     sortMap['CREATOR'] = tData.author_a_z;
     sortMap['CREATOR_DESC'] = tData.author_z_a;
     sortMap['CONTRIBUTOR'] = tData.contributor_a_z;
     sortMap['CONTRIBUTOR_DESC'] = tData.contributor_z_a;
-    sortMap['PUBLISHER'] = tData.publisher_a_z;
-    sortMap['PUBLISHER_DESC'] = tData.publisher_z_a;
-    sortMap['SERIES_ID'] = tData.series;
-    sortMap['LANGUAGE'] = tData.language;
-    sortMap['LICENSE'] = tData.license;
-    sortMap['SUBJECT'] = tData.subject;
-    sortMap['DESCRIPTION'] = tData.description;
 
     // set variables
     title_enterUsernamePassword = tData.login_title;
@@ -264,7 +256,7 @@ function($, bootbox, _, alertify, jsyaml) {
       sort = '';
     } else {
       sort = 'sort=' + GetURLParameter('sort') + '&';
-      sortDescription = GetURLParameter('sort');
+      sortDescription = GetURLParameter('sort').replace(/[ +]/, '_').toUpperCase();
       $('#' + sortDescription).prop('checked', true);
       $('#buttonSorting').text(sortMap[sortDescription]);
     }
@@ -366,6 +358,13 @@ function($, bootbox, _, alertify, jsyaml) {
   });
 
   function login() {
+
+    // Redirect if login_url is present
+    if (customLoginURL) {
+      window.location.href = customLoginURL;
+      return null;
+    }
+
     if (!askedForLogin) {
       askedForLogin = true;
       var box = bootbox.dialog({
@@ -474,6 +473,7 @@ function($, bootbox, _, alertify, jsyaml) {
         log('Configuration loaded');
         var config = jsyaml.load(data);
         $($headerLogo).attr('src', config.logo || '');
+        customLoginURL = config.customLoginURL || null;
       }
     });
   }
@@ -801,7 +801,7 @@ function($, bootbox, _, alertify, jsyaml) {
   function loadSeries(cleanGrid, rest, callback) {
     log('Loading Series with: ' + rest);
     active = 'series';
-    var requestUrl = restEndpoint + '/series.json'
+    var requestUrl = restEndpoint + 'series.json'
       + '?limit=' + bufferEntries + '&offset=' + (page - 1) * bufferEntries + '&' + rest;
     $.ajax({
       url: requestUrl,

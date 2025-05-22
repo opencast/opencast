@@ -43,7 +43,7 @@ import java.util.Map;
 /**
  * Base implementation for search queries.
  */
-public class AbstractSearchQuery implements SearchQuery {
+public abstract class AbstractSearchQuery implements SearchQuery {
 
   /** The document types */
   protected List<String> types = new ArrayList<>();
@@ -242,7 +242,7 @@ public class AbstractSearchQuery implements SearchQuery {
 
   @Override
   public SearchQuery withSortOrder(String field, Order order) {
-    sortOrders.put(requireNonNull(field), requireNonNull(order));
+    sortOrders.put(requireNonNull(sortOrderFieldName(field)), requireNonNull(order));
     return this;
   }
 
@@ -253,11 +253,14 @@ public class AbstractSearchQuery implements SearchQuery {
 
   @Override
   public Order getSortOrder(String field) {
-    if (!sortOrders.containsKey(field)) {
+    String sortField = sortOrderFieldName(field);
+    if (!sortOrders.containsKey(sortField)) {
       return Order.None;
     }
 
-    return sortOrders.get(field);
+    return sortOrders.get(sortField);
   }
+
+  protected abstract String sortOrderFieldName(String field);
 
 }

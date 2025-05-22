@@ -54,6 +54,7 @@ import org.opencastproject.workspace.api.Workspace;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
@@ -980,13 +981,17 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
 
     // Try to remove the parent folders, if possible
     File elementDir = elementFile.getParentFile();
-    if (elementDir != null && elementDir.exists() && elementDir.list() != null) {
-      if (elementDir.list().length == 0) {
-        if (!elementDir.delete()) {
-          logger.warn("Could not properly delete element directory: {}", elementDir);
+    if (elementDir != null && elementDir.exists()) {
+      try {
+        if (FileUtils.isEmptyDirectory(elementDir)) {
+          if (!elementDir.delete()) {
+            logger.warn("Could not properly delete element directory: {}", elementDir);
+          }
+        } else {
+          logger.warn("Element directory was not empty after deleting element. Skipping deletion: {}", elementDir);
         }
-      } else {
-        logger.warn("Element directory was not empty after deleting element. Skipping deletion: {}", elementDir);
+      } catch (IOException e) {
+        logger.warn("Unable to delete element directory: {}", elementDir);
       }
     } else {
       logger.warn("Element directory did not exist when trying to delete it: {}", elementDir);
@@ -994,13 +999,17 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
 
     File mediapackageDir = elementDir.getParentFile();
     if (mediapackageDir != null && mediapackageDir.exists()) {
-      if (mediapackageDir.list().length == 0) {
-        if (!mediapackageDir.delete()) {
-          logger.warn("Could not properly delete mediapackage directory: {}", mediapackageDir);
+      try {
+        if (FileUtils.isEmptyDirectory(mediapackageDir)) {
+          if (!mediapackageDir.delete()) {
+            logger.warn("Could not properly delete mediapackage directory: {}", mediapackageDir);
+          }
+        } else {
+          logger.debug("Mediapackage directory was not empty after deleting element. Skipping deletion: {}",
+              mediapackageDir);
         }
-      } else {
-        logger.debug("Mediapackage directory was not empty after deleting element. Skipping deletion: {}",
-                mediapackageDir);
+      } catch (IOException e) {
+        logger.warn("Unable to delete mediapackage directory: {}", elementDir);
       }
     } else {
       logger.warn("Mediapackage directory did not exist when trying to delete it: {}", mediapackageDir);

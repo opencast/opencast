@@ -1,0 +1,29 @@
+{
+  "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/b92ac2db-2f23-4888-b9f1-a45b5a8d1cc8",
+  "model": {
+    "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+  },
+  "links": {
+    "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/b92ac2db-2f23-4888-b9f1-a45b5a8d1cc8/files"
+  },
+  "properties": {
+    "diarizationEnabled": false,
+    "wordLevelTimestampsEnabled": false,
+    "displayFormWordLevelTimestampsEnabled": false,
+    "channels": [
+      0,
+      1
+    ],
+    "punctuationMode": "DictatedAndAutomatic",
+    "profanityFilterMode": "Masked",
+    "error": {
+      "code": "InvalidUri",
+      "message": "The provided container URI is invalid."
+    }
+  },
+  "lastActionDateTime": "2023-03-17T14:17:33Z",
+  "status": "Failed",
+  "createdDateTime": "2023-03-17T14:17:33Z",
+  "locale": "de-DE",
+  "displayName": "Transcription"
+}

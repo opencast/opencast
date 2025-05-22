@@ -38,6 +38,7 @@ import com.google.gson.Gson;
 
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +57,7 @@ import javax.ws.rs.core.Response;
 /**
  * The REST endpoint for the adopter statistics service.
  */
-@Path("/")
+@Path("/admin-ng/adopter")
 @RestService(name = "registrationController",
         title = "Adopter Statistics Registration Service Endpoint",
         abstractText = "Rest Endpoint for the registration form.",
@@ -71,6 +72,7 @@ import javax.ws.rs.core.Response;
         "opencast.service.jobproducer=false"
     }
 )
+@JaxrsResource
 public class Controller {
 
   /** The logger */
@@ -163,6 +165,8 @@ public class Controller {
                           isRequired = false, name = "agreedToPolicy", type = BOOLEAN),
                   @RestParameter(description = "Does the adopter allow the gathering of error reports.",
                           isRequired = false, name = "allowsErrorReports", type = BOOLEAN),
+                  @RestParameter(description = "Which type of system is this.",
+                          isRequired = false, name = "systemType", type = STRING),
                   @RestParameter(description = "Does the adopter allow the gathering of statistic data.",
                           isRequired = false, name = "allowsStatistics", type = BOOLEAN),
                   @RestParameter(description = "Is the adopter already registered.",
@@ -184,13 +188,14 @@ public class Controller {
           @FormParam("streetNo") String streetNo,
           @FormParam("contactMe") boolean contactMe,
           @FormParam("agreedToPolicy") boolean agreedToPolicy,
+          @FormParam("systemType") String systemType,
           @FormParam("allowsErrorReports") boolean allowsErrorReports,
           @FormParam("allowsStatistics") boolean allowsStatistics,
           @FormParam("registered") boolean registered) {
     logger.debug("Saving adopter registration data.");
 
     Form form = new Form(organisationName, departmentName, firstName, lastName, email, country, postalCode, city,
-            street, streetNo, contactMe, allowsStatistics, allowsErrorReports, agreedToPolicy, registered
+            street, streetNo, contactMe, systemType, allowsStatistics, allowsErrorReports, agreedToPolicy, registered
     );
     try {
       registrationService.saveFormData(form);

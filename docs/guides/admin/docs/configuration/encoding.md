@@ -10,6 +10,8 @@ build to work for everyone, meaning that in most cases optimization can be done 
 these profiles or building new ones often makes sense. This document will help you modify or augment Opencast's
 default encoding profiles for audio, video and still images.
 
+If you prefer a video introduction to the topic, check out [this talk on encoding profiles and ffmpeg](https://video.ethz.ch/events/opencast/2020/gent/63bccf44-3409-4434-9988-be4e8674f607.html) 
+
 Default Profiles and Possible Settings
 --------------------------------------
 
@@ -105,7 +107,7 @@ Once defined, use your encoding profile in your workflow by setting the encoding
       <configurations>
         <configuration key="source-flavor">presenter/work</configuration>
         <configuration key="target-flavor">presenter/delivery</configuration>
-        <configuration key="target-tags">rss, atom, captioning</configuration>
+        <configuration key="target-tags">captioning</configuration>
         <configuration key="encoding-profile">my-av-profile.http</configuration>
       </configurations>
     </operation>

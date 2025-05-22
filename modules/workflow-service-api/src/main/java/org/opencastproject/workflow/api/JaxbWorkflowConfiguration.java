@@ -29,7 +29,7 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
 
 /**
- * JAXB annotated implementation of Map<String, String> for {@link WorkflowInstance} and {@link WorkflowOperationInstance}
+ * JAXB annotated implementation of Map&lt;String, String&gt; for {@link WorkflowInstance} and {@link WorkflowOperationInstance}
  */
 @XmlType(name = "configuration", namespace = "http://workflow.opencastproject.org")
 @XmlRootElement(name = "configuration", namespace = "http://workflow.opencastproject.org")

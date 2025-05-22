@@ -14,6 +14,8 @@ Opencast videos without ever leaving their course.
 
 More information about the LTI specification is available at
 [IMS Learning Tools Interoperability](https://imsglobal.org/activity/learning-tools-interoperability).
+For a better  understanding of what LTI is and what it is not, consider this
+[introductory webinar](https://video.ethz.ch/events/opencast/miscellaneous/webinars/3bb13443-19d3-4147-8ff9-7106f5a959bb.html).
 
 
 Configuration
@@ -103,6 +105,9 @@ custom parameters to be defined globally.
     - `annotate=true` if you want to display an annotate (annotation tool) button next to each episode
     - `download=true` to show a button next to each episode that allows for downloading individual video files
     - `lng=LANG` to force a language (the browser language is used otherwise)
+    - `sort=SORT` to sort the results in a specific way. May include any of the following dublin core metadata:
+      identifier, title, contributor, creator, modified.
+      Add ' asc' or ' desc' to specify the sort order (e.g. 'title desc').
 - To show an upload dialog, use `ltitools/index.html` as LTI `custom_tool` launch parameter
   and specify the following query parameters:
     - `subtool=upload`

@@ -37,9 +37,9 @@ The following locations should be used for Opencast and its related data:
   Opencast related configuration files (Felix and service configuration, workflows, encoding profiles, etc.)
 * `/var/log/opencast`:
   The Opencast logfiles. Consider to enable logrotate for this directory.
-* `/srv/opencast` or `/var/lib/opencast`: Opencast storage, including the recordings, the archive, the Solr indexes,
-  etc. You may use one of these directories or both. For more details have a look at the explanation below and the
-  discussion in the comments.
+* `/srv/opencast` or `/var/lib/opencast`: Opencast storage, including the recordings, the archive,  etc. You may use
+  one of these directories or both. For more details have a look at the explanation below and the discussion in the
+  comments.
 * `/tmp/opencast`:
   Temporary data which are not necessarily preserved between reboots. This includes the felix-cache and other temporary
   data.

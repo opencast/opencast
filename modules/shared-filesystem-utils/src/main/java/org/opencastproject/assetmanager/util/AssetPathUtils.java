@@ -137,6 +137,11 @@ public final class AssetPathUtils {
         localPath = path;
       }
     }
+    // if remote asset stores are used, localPath could be null (i.e. all snapshots live remotely)
+    if (localPath == null) {
+      logger.debug("Local snapshot for {} not available.", uri);
+      return null;
+    }
     final File file = Paths.get(localPath, organizationId, mediaPackageID, version, filename).toFile();
     if (file.isFile()) {
       logger.debug("Converted {} to local file at {}", uri, file);

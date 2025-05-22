@@ -70,16 +70,13 @@ public class Mpeg7Test {
       throw new Exception("Unable to access mpeg-7 test catalog '" + catalogName + "'");
   }
 
-  /**
-   * @throws java.io.File.IOException
-   */
   @After
   public void tearDown() throws Exception {
     FileUtils.deleteQuietly(mpeg7TempFile);
   }
 
   /**
-   * Test method for {@link org.opencastproject.mediapackage.mpeg7.Mpeg7CatalogImpl#fromFile(java.io.File)} .
+   * Test method for {@link org.opencastproject.metadata.mpeg7.Mpeg7CatalogImpl#getMultimediaContent(MultimediaContent.Type)} .
    */
   @Test
   public void testFromFile() throws Exception {
@@ -88,7 +85,7 @@ public class Mpeg7Test {
   }
 
   /**
-   * Test method for {@link org.opencastproject.mediapackage.mpeg7.Mpeg7CatalogImpl#save()}.
+   * Test method for {@link org.opencastproject.metadata.mpeg7.Mpeg7CatalogImpl}.
    */
   @Test
   public void testNewInstance() throws Exception {

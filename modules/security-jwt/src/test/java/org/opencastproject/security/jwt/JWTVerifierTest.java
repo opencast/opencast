@@ -24,12 +24,14 @@ package org.opencastproject.security.jwt;
 import static org.easymock.EasyMock.anyBoolean;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.eq;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThrows;
 
 import com.auth0.jwk.JwkException;
+import com.auth0.jwk.SigningKeyNotFoundException;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
@@ -49,6 +51,7 @@ public class JWTVerifierTest {
   private GuavaCachedUrlJwkProvider validProvider;
   private GuavaCachedUrlJwkProvider invalidProvider;
   private GuavaCachedUrlJwkProvider rotatingProvider;
+  private GuavaCachedUrlJwkProvider staleProvider;
 
   @Before
   public void setUp() throws NoSuchAlgorithmException, JwkException {
@@ -73,6 +76,15 @@ public class JWTVerifierTest {
         .andReturn(List.of(Algorithm.RSA512(generator.getPublicKey(), null)))
         .once();
     replay(rotatingProvider);
+
+    staleProvider = createMock(GuavaCachedUrlJwkProvider.class);
+    expect(staleProvider.getAlgorithms(anyObject(), eq(false)))
+        .andThrow(new SigningKeyNotFoundException("", null))
+        .once();
+    expect(staleProvider.getAlgorithms(anyObject(), eq(true)))
+        .andReturn(List.of(Algorithm.RSA512(generator.getPublicKey(), null)))
+        .once();
+    replay(staleProvider);
   }
 
   @Test
@@ -162,6 +174,14 @@ public class JWTVerifierTest {
     decodedJWT = JWTVerifier.verify(
         generator.generateValidAsymmetricJWT(),
         rotatingProvider,
+        generator.generateValidClaimConstraints()
+    );
+    assertEquals(generator.getUsername(), decodedJWT.getClaim("username").asString());
+
+    // Simulate stale cache
+    decodedJWT = JWTVerifier.verify(
+        generator.generateValidAsymmetricJWT(),
+        staleProvider,
         generator.generateValidClaimConstraints()
     );
     assertEquals(generator.getUsername(), decodedJWT.getClaim("username").asString());

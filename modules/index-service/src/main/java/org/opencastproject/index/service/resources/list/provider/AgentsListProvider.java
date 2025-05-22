@@ -38,7 +38,6 @@ import java.util.Map;
 import java.util.TreeMap;
 
 @Component(
-    immediate = true,
     service = ResourceListProvider.class,
     property = {
         "service.description=Capture-agents list provider",

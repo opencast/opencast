@@ -134,7 +134,7 @@ public class VideoSegmenterTest {
     track.setFlavor(MediaPackageElements.PRESENTATION_SOURCE);
     track.setMimeType(MimeTypes.MJPEG);
     track.addStream(new VideoStreamImpl());
-    track.setDuration(new Long(20000));
+    track.setDuration(20000L);
 
     track1 = TrackImpl.fromURI(VideoSegmenterTest.class.getResource(mediaResource1).toURI());
     track1.setFlavor(MediaPackageElements.PRESENTATION_SOURCE);
@@ -239,9 +239,6 @@ public class VideoSegmenterTest {
     vsegmenter1.absoluteMin = 1;
   }
 
-  /**
-   * @throws java.io.File.IOException
-   */
   @After
   public void tearDown() throws Exception {
     FileUtils.deleteQuietly(tempFile);

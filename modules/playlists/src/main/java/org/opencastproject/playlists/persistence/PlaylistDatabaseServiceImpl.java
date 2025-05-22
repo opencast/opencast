@@ -170,10 +170,12 @@ public class PlaylistDatabaseServiceImpl implements PlaylistDatabaseService {
         final var criteriaBuilder = em.getCriteriaBuilder();
         final var criteriaQuery = criteriaBuilder.createQuery(Playlist.class);
         final var from = criteriaQuery.from(Playlist.class);
+        final var org = securityService.getOrganization().getId();
         final var select = criteriaQuery.select(from)
             .where(
                 criteriaBuilder.greaterThanOrEqualTo(from.get("updated"), startDate),
-                criteriaBuilder.lessThan(from.get("updated"), endDate)
+                criteriaBuilder.lessThan(from.get("updated"), endDate),
+                criteriaBuilder.equal(from.get("organization"), org)
             )
             .orderBy(criteriaBuilder.asc(from.get("updated")));
 

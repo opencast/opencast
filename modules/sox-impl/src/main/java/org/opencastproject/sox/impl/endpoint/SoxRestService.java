@@ -42,6 +42,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +57,7 @@ import javax.ws.rs.core.Response;
 /**
  * A REST endpoint delegating functionality to the {@link SoxService}
  */
-@Path("/")
+@Path("/sox")
 @RestService(
     name = "sox",
     title = "Sox",
@@ -82,6 +83,7 @@ import javax.ws.rs.core.Response;
         "opencast.service.jobproducer=true"
     }
 )
+@JaxrsResource
 public class SoxRestService extends AbstractJobProducerEndpoint {
 
   /** The logger */

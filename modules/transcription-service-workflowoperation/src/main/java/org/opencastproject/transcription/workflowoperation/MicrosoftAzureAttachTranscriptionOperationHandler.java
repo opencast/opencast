@@ -29,7 +29,7 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.transcription.api.TranscriptionService;
-import org.opencastproject.transcription.api.TranscriptionServiceException;
+import org.opencastproject.util.doc.DocUtil;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -38,9 +38,7 @@ import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
-import org.opencastproject.workspace.api.Workspace;
 
-import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -49,33 +47,41 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedMap;
+import java.util.TreeMap;
 
 @Component(
-        immediate = true,
-        service = WorkflowOperationHandler.class,
-        property = {
-                "service.description=Microsoft Azure Attach Transcription Workflow Operation Handler",
-                "workflow.operation=microsoft-azure-attach-transcription"
-        }
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Attach Transcription Workflow Operation Handler (Microsoft Azure)",
+        "workflow.operation=microsoft-azure-attach-transcription"
+    }
 )
 public class MicrosoftAzureAttachTranscriptionOperationHandler extends AbstractWorkflowOperationHandler {
 
-  /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(MicrosoftAzureAttachTranscriptionOperationHandler.class);
 
   /** Workflow configuration option keys */
   static final String TRANSCRIPTION_JOB_ID = "transcription-job-id";
-  static final String TARGET_CAPTION_FORMAT = "target-caption-format";
-  static final String OPT_AUTO_SET_LANGUAGE_TAG = "auto-set-language-tag";
   static final String TARGET_TYPE = "target-element-type";
 
-  /** The transcription service */
   private TranscriptionService service = null;
-  private Workspace workspace;
 
-  private String autoDetectedLanguage = null;
+  /** The configuration options for this handler */
+  private static final SortedMap<String, String> CONFIG_OPTIONS;
+
+  static {
+    CONFIG_OPTIONS = new TreeMap<String, String>();
+    CONFIG_OPTIONS.put(TRANSCRIPTION_JOB_ID, "The job id that identifies the file to be attached");
+    CONFIG_OPTIONS.put(TARGET_FLAVOR, "The flavor of the transcription file");
+    CONFIG_OPTIONS.put(TARGET_TAGS, "The tags of the transcription file");
+    CONFIG_OPTIONS.put(TARGET_TYPE, "Define where to append the subtitles file. "
+        + "Accepted values: \"track\", \"attachment\". Default value is \"track\".");
+  }
 
   @Override
   @Activate
@@ -88,22 +94,31 @@ public class MicrosoftAzureAttachTranscriptionOperationHandler extends AbstractW
           throws WorkflowOperationException {
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
     WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
+    Map<String, Object> wfProps = Collections.unmodifiableMap(workflowInstance.getConfigurations());
 
-    logger.info("Attach transcription for mediapackage {} started", mediaPackage);
+    logger.debug("Attach transcription for media package '{}' started.", mediaPackage.getIdentifier());
 
-    // Get job id.
     String jobId = StringUtils.trimToNull(operation.getConfiguration(TRANSCRIPTION_JOB_ID));
-    if (StringUtils.isBlank(jobId)) {
-      throw new WorkflowOperationException(TRANSCRIPTION_JOB_ID + " missing");
+    if (jobId == null) {
+      throw new WorkflowOperationException(TRANSCRIPTION_JOB_ID + " missing.");
     }
 
-    // Check which tags/flavors have been configured
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(
-            workflowInstance, Configuration.none, Configuration.none, Configuration.many, Configuration.one);
-    List<String> targetTags = tagsAndFlavors.getTargetTags();
-    // Target flavor is mandatory
-    MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor();
-    Boolean autoSetLanguageTag = BooleanUtils.toBoolean(operation.getConfiguration(OPT_AUTO_SET_LANGUAGE_TAG));
+        workflowInstance, Configuration.none, Configuration.none, Configuration.many, Configuration.one);
+    List<String> targetTagOption = tagsAndFlavors.getTargetTags();
+    MediaPackageElementFlavor targetFlavor;
+    try {
+
+      targetFlavor = MediaPackageElementFlavor.parseFlavor(DocUtil.processTextTemplate(
+          "Replacing variables in target-flavor",
+          operation.getConfiguration(TARGET_FLAVOR), // we can't use tagsAndFlavors.getSingleTargetFlavor() here
+                                                     // because the flavor will be all lower case
+                                                     // and templating may not work due to keys mismatch
+          wfProps));
+    } catch (IllegalStateException ex) {
+      throw new WorkflowOperationException(TARGET_FLAVOR + " option not set or used correctly.", ex);
+    }
+
     String typeUnparsed = StringUtils.trimToEmpty(operation.getConfiguration(TARGET_TYPE));
     MediaPackageElement.Type type = null;
     if (!typeUnparsed.isEmpty()) {
@@ -114,46 +129,28 @@ public class MicrosoftAzureAttachTranscriptionOperationHandler extends AbstractW
         }
       }
       if (type == null || (type != Track.TYPE && type != Attachment.TYPE)) {
-        throw new IllegalArgumentException(String.format("The given type '%s' for mediapackage %s was illegal. Please"
-                + "check the operations' configuration keys.", type, mediaPackage.getIdentifier()));
+        throw new WorkflowOperationException(new IllegalArgumentException(
+            String.format("The given type '%s' for mediapackage %s was illegal. Please"
+            + "check the operations' configuration keys.", type, mediaPackage.getIdentifier())));
       }
     } else {
       type = Track.TYPE;
     }
 
     try {
-      // Get transcription file from the service
-      MediaPackageElement transcription = service.getGeneratedTranscription(mediaPackage.getIdentifier().toString(),
-              jobId, type);
-
-      // Get return values from the service
-      try {
-        Map<String, Object> returnValues = service.getReturnValues(mediaPackage.getIdentifier().toString(), jobId);
-        autoDetectedLanguage = (String) returnValues.get("autoDetectedLanguage");
-      } catch (NullPointerException e) {
-        logger.warn("Key missing in return values", e);
-      } catch (TranscriptionServiceException e) {
-        logger.warn("Something went wrong when trying to receive return values", e);
-      }
-
-      // Set the target flavor
+      MediaPackageElement transcription
+          = service.getGeneratedTranscription(mediaPackage.getIdentifier().toString(), jobId, type);
       transcription.setFlavor(targetFlavor);
-
-      // Add tags
-      if (autoSetLanguageTag && autoDetectedLanguage != null) {
-        transcription.addTag("lang:" + autoDetectedLanguage);
+      for (String tag : targetTagOption) {
+        String templatedTag = DocUtil.processTextTemplate("Replacing variables in tag", tag, wfProps);
+        if (StringUtils.isNotEmpty(templatedTag)) {
+          transcription.addTag(templatedTag);
+        }
       }
-      for (String tag : targetTags) {
-        transcription.addTag(tag);
-      }
-
-      // Add to media package
       mediaPackage.add(transcription);
+      logger.info("Added transcription to the media package {}: {}",
+          mediaPackage.getIdentifier(), transcription.getURI());
 
-      String uri = transcription.getURI().toString();
-      String ext = uri.substring(uri.lastIndexOf("."));
-      transcription.setURI(workspace.moveTo(transcription.getURI(), mediaPackage.getIdentifier().toString(),
-              transcription.getIdentifier(), "captions" + ext));
     } catch (Exception e) {
       throw new WorkflowOperationException(e);
     }
@@ -167,13 +164,9 @@ public class MicrosoftAzureAttachTranscriptionOperationHandler extends AbstractW
   }
 
   @Reference
-  public void setWorkspace(Workspace service) {
-    this.workspace = service;
-  }
-
-  @Reference
   @Override
   public void setServiceRegistry(ServiceRegistry serviceRegistry) {
     super.setServiceRegistry(serviceRegistry);
   }
+
 }

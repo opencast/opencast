@@ -38,7 +38,7 @@
 # export JAVA_DEBUG_PORT     # Set debug port (defaults to 5005)
 
 
-export EXTRA_JAVA_OPTS="${EXTRA_JAVA_OPTS} -Dorg.eclipse.jetty.server.Request.maxFormContentSize=1500000 -Dfile.encoding=UTF-8 -Dlog4j2.formatMsgNoLookups=true"
+export EXTRA_JAVA_OPTS="${EXTRA_JAVA_OPTS} -Dorg.eclipse.jetty.server.Request.maxFormContentSize=1500000 -Dfile.encoding=UTF-8 -Dlog4j2.formatMsgNoLookups=true -Djava.awt.headless=true"
 export KARAF_NOROOT=true
 
 # Mitigation for new Tesseract 4.x locking up the system

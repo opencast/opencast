@@ -81,9 +81,6 @@ public class MediaPackageMergeTest {
     setUpTargeMediaPackage();
   }
 
-  /**
-   * @throws java.io.File.IOException
-   */
   @After
   public void tearDown() throws Exception {
     FileUtils.deleteDirectory(packageDir1);

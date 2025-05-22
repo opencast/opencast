@@ -85,7 +85,7 @@ $ apt upgrade -y
 #### Install Packages via APT
 
 ```sh
-$ apt install -y git openjdk-11-jdk maven gcc g++ build-essential cmake curl sox hunspell synfig ffmpeg
+$ apt install -y git openjdk-17-jdk maven gcc g++ build-essential cmake curl sox hunspell synfig ffmpeg
 ```
 
 #### Install NodeJS (optional)

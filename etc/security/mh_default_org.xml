@@ -40,6 +40,9 @@
     <sec:intercept-url pattern="/docs.*" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/rest_docs.*" access="ROLE_ANONYMOUS" />
 
+    <!-- Protect access to the REST API documentation -->
+    <sec:intercept-url pattern="/rest-docs/**" access="ROLE_ADMIN, ROLE_USER" />
+
     <!-- Allow anonymous access to the player redirect -->
     <sec:intercept-url pattern="/play/*" access="ROLE_ANONYMOUS" />
 
@@ -107,6 +110,7 @@
     <sec:intercept-url pattern="/admin-ng/users/users.json" method="GET" access="ROLE_ADMIN, ROLE_UI_USERS_VIEW" />
     <sec:intercept-url pattern="/admin-ng/users/*.json" method="GET" access="ROLE_ADMIN, ROLE_UI_USERS_EDIT, ROLE_UI_EVENTS_DETAILS_ACL_USER_ROLES_VIEW, ROLE_UI_SERIES_DETAILS_ACL_USER_ROLES_VIEW" />
     <sec:intercept-url pattern="/admin-ng/user-settings/signature" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
+    <sec:intercept-url pattern="/admin-ng/user-settings/settings.json" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
     <sec:intercept-url pattern="/admin-ng/resources/events/filters.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_VIEW" />
     <sec:intercept-url pattern="/admin-ng/resources/jobs/filters.json" method="GET" access="ROLE_ADMIN, ROLE_UI_JOBS_VIEW" />
     <sec:intercept-url pattern="/admin-ng/resources/series/filters.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_VIEW" />
@@ -141,6 +145,7 @@
     <sec:intercept-url pattern="/admin-ng/themes/*" method="PUT" access="ROLE_ADMIN, ROLE_UI_THEMES_EDIT" />
     <sec:intercept-url pattern="/admin-ng/users/*" method="PUT" access="ROLE_ADMIN, ROLE_UI_USERS_EDIT" />
     <sec:intercept-url pattern="/admin-ng/user-settings/signature/*" method="PUT" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
+    <sec:intercept-url pattern="/admin-ng/user-settings/setting/*" method="PUT" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
     <sec:intercept-url pattern="/admin-ng/adopter/**" method="PUT" access="ROLE_ADMIN" />
 
     <sec:intercept-url pattern="/services/maintenance" method="POST" access="ROLE_ADMIN, ROLE_UI_SERVERS_MAINTENANCE_EDIT" />
@@ -169,6 +174,7 @@
     <sec:intercept-url pattern="/admin-ng/tools/*/thumbnail.json" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_EDITOR_EDIT" />
     <sec:intercept-url pattern="/admin-ng/users" method="POST" access="ROLE_ADMIN, ROLE_UI_USERS_CREATE" />
     <sec:intercept-url pattern="/admin-ng/user-settings/signature" method="POST" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
+    <sec:intercept-url pattern="/admin-ng/user-settings/setting" method="POST" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
     <sec:intercept-url pattern="/admin-ng/adopter/**" method="POST" access="ROLE_ADMIN" />
 
     <sec:intercept-url pattern="/admin-ng/acl/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_ACLS_DELETE" />
@@ -182,6 +188,7 @@
     <sec:intercept-url pattern="/admin-ng/series/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_SERIES_DELETE" />
     <sec:intercept-url pattern="/admin-ng/themes/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_THEMES_DELETE" />
     <sec:intercept-url pattern="/admin-ng/users/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_USERS_DELETE" />
+    <sec:intercept-url pattern="/admin-ng/user-settings/setting/*" method="DELETE" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
     <sec:intercept-url pattern="/admin-ng/adopter/**" method="DELETE" access="ROLE_ADMIN" />
 
     <!-- Securing the URLs for the external API interface -->
@@ -266,6 +273,15 @@
     <sec:intercept-url pattern="/api/series/*/metadata/*" method="DELETE" access="ROLE_ADMIN, ROLE_API_SERIES_METADATA_DELETE"/>
     <sec:intercept-url pattern="/api/workflows/*" method="DELETE" access="ROLE_ADMIN, ROLE_API_WORKFLOW_INSTANCE_DELETE"/>
 
+    <!-- GraphQL -->
+    <sec:intercept-url pattern="/graphql" method="POST" access="ROLE_ANONYMOUS"/>
+    <sec:intercept-url pattern="/graphql" method="GET" access="ROLE_ANONYMOUS"/>
+    <sec:intercept-url pattern="/graphql" method="OPTIONS" access="ROLE_ANONYMOUS"/>
+    <sec:intercept-url pattern="/graphql/schema.json" method="GET" access="ROLE_ANONYMOUS"/>
+
+    <!-- GraphQL UI -->
+    <sec:intercept-url pattern="/graphql-ui/*" access="ROLE_ANONYMOUS"/>
+
     <!-- Enable anonymous access to the admin ui -->
     <sec:intercept-url pattern="/admin-ng/fonts/**" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/admin-ng/img/**" access="ROLE_ANONYMOUS" />
@@ -314,17 +330,14 @@
     <sec:intercept-url pattern="/editor-ui/**" access="ROLE_ADMIN, ROLE_USER" />
 
     <!-- Enable access to the Tobira module -->
-    <sec:intercept-url pattern="/tobira/**" access="ROLE_ADMIN" />
     <sec:intercept-url pattern="/tobira/version" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/tobira/**" access="ROLE_ADMIN" />
 
     <!-- Enable anonymous access to the annotation and the series endpoints -->
     <sec:intercept-url pattern="/series/**" method="GET" access="ROLE_ANONYMOUS, ROLE_CAPTURE_AGENT" />
     <sec:intercept-url pattern="/annotation/**" method="GET" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/annotation/**" method="PUT" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/playlists/**" access="ROLE_ANONYMOUS" />
-
-    <!-- Enable anonymous access to the rss and atom feeds -->
-    <sec:intercept-url pattern="/feeds/**" method="GET" access="ROLE_ANONYMOUS" />
 
     <!-- Secure the system management URLs for admins only -->
     <sec:intercept-url pattern="/services/available.*" method="GET" access="ROLE_ADMIN, ROLE_CAPTURE_AGENT" />
@@ -536,8 +549,8 @@
     <property name="securityService" ref="securityService" />
     <property name="welcomePages">
       <map>
-        <entry key="ROLE_ADMIN" value="/index.html" />
-        <entry key="ROLE_ADMIN_UI" value="/index.html" />
+        <entry key="ROLE_ADMIN" value="/admin-ui/index.html" />
+        <entry key="ROLE_ADMIN_UI" value="/admin-ui/index.html" />
         <entry key="*" value="/engage/ui/index.html" /> <!-- Any role not listed explicitly will redirect here -->
       </map>
     </property>
@@ -755,9 +768,10 @@
     <property name="secret" value="***" />
     <property name="expectedAlgorithms" ref="jwtExpectedAlgorithms" />
     <property name="claimConstraints" ref="jwtClaimConstraints" />
-    <property name="usernameMapping" value="['username'].asString()" />
+    <property name="usernameMapping" value="['sub'].asString()" />
     <property name="nameMapping" value="['name'].asString()" />
     <property name="emailMapping" value="['email'].asString()" />
+    <property name="ocStandardRoleMappings" value="true" />
     <property name="roleMappings" ref="jwtRoleMappings" />
     <property name="jwtCacheSize" value="500" />
     <property name="jwtCacheExpiresIn" value="60" />
@@ -774,7 +788,7 @@
   <util:list id="jwtClaimConstraints" value-type="java.lang.String">
     <value>containsKey('iss')</value>
     <value>containsKey('aud')</value>
-    <value>containsKey('username')</value>
+    <value>containsKey('sub')</value>
     <value>containsKey('name')</value>
     <value>containsKey('email')</value>
     <value>containsKey('domain')</value>
@@ -789,8 +803,8 @@
   <!-- The mapping from JWT claims to Opencast roles
   <util:list id="jwtRoleMappings" value-type="java.lang.String">
     <value>'ROLE_JWT_USER'</value>
-    <value>'ROLE_JWT_USER_' + ['username'].asString()</value>
-    <value>('ROLE_JWT_OWNER_' + ['username'].asString()).replaceAll("[^a-zA-Z0-9]","_").toUpperCase()</value>
+    <value>'ROLE_JWT_USER_' + ['sub'].asString()</value>
+    <value>('ROLE_JWT_OWNER_' + ['sub'].asString()).replaceAll("[^a-zA-Z0-9]","_").toUpperCase()</value>
     <value>['domain'] != null ? 'ROLE_JWT_ORG_' + ['domain'].asString() + '_MEMBER' : null</value>
     <value>['username'].asString() eq ('j_doe01@example.org') ? 'ROLE_ADMIN' : null</value>
     <value>['affiliation'].asList(T(String)).contains('faculty@example.org') ? 'ROLE_GROUP_JWT_TRAINER' : null</value>

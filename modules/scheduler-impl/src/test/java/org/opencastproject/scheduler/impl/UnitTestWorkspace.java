@@ -40,7 +40,7 @@ import java.util.UUID;
 
 /**
  * A {@link Workspace} implementation suitable for unit tests.
- * <p/>
+ * <p>
  * Call {@link #clean()} on test tear down to remove files again.
  */
 public class UnitTestWorkspace implements Workspace {

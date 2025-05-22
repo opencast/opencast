@@ -21,6 +21,14 @@
 
 package org.opencastproject.search.endpoint;
 
+import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
+import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
+import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
+import static org.opencastproject.util.RestUtil.R.forbidden;
+import static org.opencastproject.util.RestUtil.R.noContent;
+import static org.opencastproject.util.RestUtil.R.notFound;
+import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
+
 import org.opencastproject.job.api.JobProducer;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
@@ -33,7 +41,12 @@ import org.opencastproject.search.impl.SearchServiceIndex;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.UnauthorizedException;
+import org.opencastproject.security.urlsigning.exception.UrlSigningException;
+import org.opencastproject.security.urlsigning.service.UrlSigningService;
+import org.opencastproject.security.urlsigning.utils.UrlSigningServiceOsgiUtil;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -49,6 +62,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.sort.SortOrder;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,17 +73,20 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 /**
  * The REST endpoint
  */
-@Path("/")
+@Path("/search")
 @RestService(
     name = "search",
     title = "Search Service",
@@ -94,6 +111,7 @@ import javax.ws.rs.core.Response;
         "opencast.service.jobproducer=true"
     }
 )
+@JaxrsResource
 public class SearchRestService extends AbstractJobProducerEndpoint {
 
   private static final Logger logger = LoggerFactory.getLogger(SearchRestService.class);
@@ -110,6 +128,8 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
   private SecurityService securityService;
 
   private final Gson gson = new Gson();
+
+  private UrlSigningService urlSigningService;
 
   @GET
   @Path("series.json")
@@ -136,7 +156,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
               isRequired = false,
               type = RestParameter.Type.STRING,
               description = "The sort order.  May include any of the following dublin core metadata: "
-              + "identifier, title, contributor, creator, modified. "
+              + "identifier, title, contributor, creator, created, modified. "
               + "Add ' asc' or ' desc' to specify the sort order (e.g. 'title desc')."
           ),
           @RestParameter(
@@ -207,8 +227,9 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
         .size(size);
 
     if (StringUtils.isNotEmpty(sort)) {
-      var sortParam = StringUtils.split(sort);
-      var validSort = Arrays.asList("identifier", "title", "contributor", "creator", "modified").contains(sortParam[0]);
+      var sortParam = StringUtils.split(sort.toLowerCase());
+      var validSort = Arrays.asList("identifier", "title", "contributor", "creator", "created", "modified")
+              .contains(sortParam[0]);
       var validOrder = sortParam.length < 2 || Arrays.asList("asc", "desc").contains(sortParam[1]);
       if (sortParam.length > 2 || !validSort || !validOrder) {
         return Response.status(Response.Status.BAD_REQUEST)
@@ -219,7 +240,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
       if ("modified".equals(sortParam[0])) {
         searchSource.sort(sortParam[0], order);
       } else {
-        searchSource.sort(SearchResult.DUBLINCORE + sortParam[0], order);
+        searchSource.sort(SearchResult.DUBLINCORE + "." + sortParam[0], order);
       }
     }
 
@@ -276,7 +297,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
               isRequired = false,
               type = RestParameter.Type.STRING,
               description = "The sort order.  May include any of the following dublin core metadata: "
-                  + "title, contributor, creator, modified. "
+                  + "title, contributor, creator, created, modified. "
                   + "Add ' asc' or ' desc' to specify the sort order (e.g. 'title desc')."
           ),
           @RestParameter(
@@ -292,6 +313,13 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
               type = RestParameter.Type.INTEGER,
               defaultValue = "0",
               description = "The page number."
+          ),
+          @RestParameter(
+              name = "sign",
+              isRequired = false,
+              type = RestParameter.Type.BOOLEAN,
+              defaultValue = "true",
+              description = "If results are to be signed"
           )
       },
       responses = {
@@ -309,7 +337,8 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
       @QueryParam("sname") String seriesName,
       @QueryParam("sort") String sort,
       @QueryParam("limit") String limit,
-      @QueryParam("offset") String offset
+      @QueryParam("offset") String offset,
+      @QueryParam("sign") String sign
   ) throws SearchException {
 
     // There can only be one, sid or sname
@@ -397,8 +426,8 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
         .size(size);
 
     if (StringUtils.isNotEmpty(sort)) {
-      var sortParam = StringUtils.split(sort);
-      var validSort = Arrays.asList("title", "contributor", "creator", "modified").contains(sortParam[0]);
+      var sortParam = StringUtils.split(sort.toLowerCase());
+      var validSort = Arrays.asList("title", "contributor", "creator", "created", "modified").contains(sortParam[0]);
       var validOrder = sortParam.length < 2 || Arrays.asList("asc", "desc").contains(sortParam[1]);
       if (sortParam.length > 2 || !validSort || !validOrder) {
         return Response.status(Response.Status.BAD_REQUEST)
@@ -422,15 +451,88 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
       result = hits.getHits().stream()
           .map(SearchResult::dehydrateForREST)
           .collect(Collectors.toList());
+
+      // Sign urls if sign-parameter is not false
+      if (!"false".equals(sign) && this.urlSigningService != null) {
+        this.findURLsAndSign(result);
+      }
+
       total = hits.getTotalHits();
     }
-    var json = gson.toJsonTree(Map.of(
+    var json = gson.toJson(Map.of(
         "offset", from,
         "total", total,
         "result", result,
         "limit", size));
 
-    return Response.ok(gson.toJson(json)).build();
+    return Response.ok(json).build();
+  }
+
+  @POST
+  @Path("updateIndex")
+  @RestQuery(name = "updateIndex",
+          description = "Trigger search index update for event. The usage of this is limited to global administrators.",
+          restParameters = {
+                  @RestParameter(
+                          name = "id",
+                          isRequired = true,
+                          type = STRING,
+                          description = "The event ID to trigger an index update for.")},
+          responses = {
+                  @RestResponse(
+                          description = "Update successfully triggered.",
+                          responseCode = SC_NO_CONTENT),
+                  @RestResponse(
+                          description = "Not allowed to trigger update.",
+                          responseCode = SC_FORBIDDEN),
+                  @RestResponse(
+                          description = "No such event found.",
+                          responseCode = SC_NOT_FOUND)},
+          returnDescription = "No content is returned.")
+  public Response indexUpdate(@FormParam("id") final String id) {
+    try {
+      searchIndex.indexMediaPackage(id);
+      return noContent();
+    } catch (UnauthorizedException e) {
+      return forbidden();
+    } catch (NotFoundException e) {
+      return notFound();
+    } catch (Exception e) {
+      throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  /**
+   * Iterate recursively through Object List and sign all Strings with key=url
+   * @param obj
+   */
+  private void findURLsAndSign(Object obj) {
+    if (obj instanceof Map) {
+      Map<String, Object> map = (Map<String, Object>) obj;
+      for (Map.Entry<String, Object> entry : map.entrySet()) {
+        if (entry.getKey().equals("url") && entry.getValue() instanceof String) {
+          String urlToSign = (String) entry.getValue();
+          if (this.urlSigningService.accepts(urlToSign)) {
+            try {
+              String signedUrl = this.urlSigningService.sign(
+                  urlToSign,
+                  UrlSigningServiceOsgiUtil.DEFAULT_URL_SIGNING_EXPIRE_DURATION,
+                  null,
+                  null);
+              map.put(entry.getKey(), signedUrl);
+            } catch (UrlSigningException e) {
+              logger.debug("Unable to sign url '{}'.", urlToSign);
+            }
+          }
+        } else {
+          findURLsAndSign(entry.getValue());
+        }
+      }
+    } else if (obj instanceof List) {
+      for (Object item : (List<?>) obj) {
+        findURLsAndSign(item);
+      }
+    }
   }
 
   /**
@@ -470,6 +572,11 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
   @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
+  }
+
+  @Reference
+  void setUrlSigningService(UrlSigningService service) {
+    this.urlSigningService = service;
   }
 
 }

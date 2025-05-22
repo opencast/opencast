@@ -9,6 +9,150 @@ The following list contains a list of passed proposals for reference.
 Passed Proposals
 ----------------
 
+### Require 2FA for all committers
+Proposed by Daniel Ziegenberg <daniel@ziegenberg.at>, passed on Nov 29, 2024
+```no-highlight
+Hi all,
+
+In 2022, GitHub wrote a blog post titled "Software security starts with the
+developer: Securing developer accounts with 2FA" about requiring all users who
+contribute code on GitHub.com to enable one or more forms of two-factor
+authentication (2FA) in the future[1].
+
+They justified it with the following reason:
+
+> Most security breaches are not the product of exotic zero-day attacks, but
+> rather involve lower-cost attacks like social engineering, credential theft
+> or leakage, and other avenues that provide attackers with a broad range of
+> access to victim accounts and the resources they have access to. Compromised
+> accounts can be used to steal private code or push malicious changes to that
+> code. This places not only the individuals and organizations associated with
+> the compromised accounts at risk, but also any users of the affected code.
+> The potential for downstream impact to the broader software ecosystem and
+> supply chain as a result is substantial.
+
+In 2023 GitHub presented a timeline for the implementation of this policy[2] and
+wrote another blog post about a dramatically increased 2FA adoption on GitHub in
+2024[3]. At GitHub they have "seen an opt-in rate of nearly 95% across code
+contributors who received the 2FA requirement in 2023". Their current policy
+lists several key actions on GitHub that shows someone is a contributor and
+therefore eligible for the 2FA requirement[4].
+
+This enrollment criteria contains the following points:
+
+
+- Publishing an app or action for others
+- Creating a release for your repository
+- Contributing to specific high-importance repositories, such as the projects
+  tracked by the Open Source Security Foundation
+- Being an administrator or a contributor of a high-importance repository
+- Being an organization owner for an organization containing repositories or
+  other users
+- Being an administrator or a contributor for repositories that published one
+  or more packages
+- Being an enterprise administrator
+
+Additionally GitHub now offers enhanced 2FA management for orgs and
+enterprises[5]:
+
+> Enterprises can enable this new 2FA policy alongside a general 2FA requirement
+> for their members, and current enterprises with a 2FA requirement can update
+> their 2FA settings to add this secure methods enforcement. Members who are
+> non-compliant with the new 2FA policy will no longer be removed from
+> organizations, lessening a historical friction around enforcing 2FA policies
+> at an enterprise or organization level, and instead be prevented from
+> accessing enterprise or organization resources while non-compliant.
+
+GitHub offers detailed documentation on how to start requiring two-factor
+authentication in an organization[6].
+
+
+In conclusion, I hereby #propose that all committers are required to enable
+(2FA) for their GitHub account. This is a security measure to protect the
+Opencast project from unauthorized access to the repositories and other
+ressources. GitHub has shown that this is a feasible requirement and that it can
+be implemented without major issues.
+
+
+Proposal passes Nov 29, or whenever the relevant PR is merged.
+
+
+Greetings,
+Daniel
+
+
+1: https://github.blog/news-insights/company-news/software-security-starts-with-the-developer-securing-developer-accounts-with-2fa/
+2: https://github.blog/news-insights/product-news/raising-the-bar-for-software-security-github-2fa-begins-march-13/
+3: https://github.blog/security/supply-chain-security/securing-millions-of-developers-through-2fa/
+4: https://docs.github.com/en/authentication/securing-your-account-with-two-factor-authentication-2fa/about-mandatory-two-factor-authentication
+5: https://github.blog/changelog/2024-11-21-enhanced-2fa-management-for-orgs-and-enterprises-public-preview/
+6: https://docs.github.com/en/organizations/keeping-your-organization-secure/managing-two-factor-authentication-for-your-organization/requiring-two-factor-authentication-in-your-organization
+
+```
+
+
+### Move #Proposals to PRs
+Proposed by Greg Logan <gregorydlogan@gmail.com>, passed on Nov 11, 2024
+```no-highlight
+Hi all,
+
+As we have previously discussed moving the majority of our communication to
+Matrix, and GitHub, I hereby #propose that we move these email-based proposals
+and make them PRs instead.  This prevents us from forgetting about proposals.
+The PR I'm filing as part of this actually contains a passed proposal that was
+forgetten somewhere :)
+
+The downside to this is that it binds the proposals to our weekly technical
+meeting's PR review, but I don't see this as an issue.  And, if you want to get
+*really* rule-lawyery, proposals only change documentation so there's no actual
+requirement to review them prior to merge...
+
+Proposal passes Nov 11, or whenever the relevant PR is merged
+
+G
+```
+
+
+### Rules for adding patches to legacy
+Proposed by Lars Kiesow <lkiesow@uos.de>, passed on Oct 11, 2024
+```no-highlight
+Hi everyone,
+at the DACH meeting we had a longer discussion about making updates
+easier where we concluded that no participant is trusting Opencast to
+not break stuff. Even with a minor update.
+
+Discussing how we could maybe improve the situation we came up with two
+suggested changes to the development process. Both are specifically
+adressing patches to the legacy branch (the second newest release
+branch; r/15.x right now):
+
+- We strongly recommend to not add new features to the legacy branch.
+  Even bug fixes should only be added if the bugs pose a significant
+  problem to the overall community.
+
+- If a developer wants to add a patch to the legacy branch, the patch
+  (pull request) must come with an explanation why it needs to be
+  merged in legacy and cannot just go into stable or develop.
+
+This means that the rules for stable do not change and developers and
+adopters still have about 7 month before the rules apply to a given
+release branch. We hope that the most important bugs are found until
+then.
+
+It also means that developers still can add the same patches they can
+add now. But they need to actually think about why they need to go into
+legacy and about what risks are involved.
+
+We hope this helps making at least the legacy version of Opencast more
+stable, which in turn makes updates between minor versions easier.
+
+If no one objects, this proposal will pass on
+Fri Oct 11 02:42 PM CEST 2024
+
+All the best,
+Lars
+```
+
 ### Allow merges of admin interface and editor
 Proposed by Lars Kiesow <lkiesow@uos.de>, passed on Jun 21, 2024
 ```no-highlight

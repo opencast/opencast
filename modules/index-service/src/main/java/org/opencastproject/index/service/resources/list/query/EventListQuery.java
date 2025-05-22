@@ -87,6 +87,9 @@ public class EventListQuery extends ResourceListQueryImpl {
 
   public static final String FILTER_TEXT_NAME = "textFilter";
 
+  public static final String FILTER_IS_PUBLISHED_NAME = "isPublished";
+  public static final String FILTER_IS_PUBLISHED_LABEL = "FILTERS.EVENTS.IS_PUBLISHED.LABEL";
+
   public EventListQuery() {
     super();
     this.availableFilters.add(createSeriesFilter(Option.none()));
@@ -95,6 +98,7 @@ public class EventListQuery extends ResourceListQueryImpl {
     this.availableFilters.add(createStartDateFilter(Option.none()));
     this.availableFilters.add(createStatusFilter(Option.none()));
     this.availableFilters.add(createCommentsFilter(Option.none()));
+    this.availableFilters.add(createIsPublishedFilter(Option.none()));
   }
 
   /**
@@ -436,5 +440,16 @@ public class EventListQuery extends ResourceListQueryImpl {
   public static ResourceListFilter<String> createPublisherFilter(Option<String> publisher) {
     return FiltersUtils.generateFilter(publisher, FILTER_PUBLISHER_NAME, FILTER_PUBLISHER_LABEL, SourceType.SELECT,
             Option.some(EventsListProvider.PUBLISHER));
+  }
+
+  /**
+   * Create a new {@link ResourceListFilter} based on is published
+   * @param isPublished
+   *          the is published status to filter on wrapped in an {@link Option} or {@link Option#none()}
+   * @return a new {@link ResourceListFilter} for progress based query
+   */
+  public static ResourceListFilter<String> createIsPublishedFilter(Option<String> isPublished) {
+    return FiltersUtils.generateFilter(isPublished, FILTER_IS_PUBLISHED_NAME, FILTER_IS_PUBLISHED_LABEL, SourceType.SELECT,
+        Option.some(EventsListProvider.ISPUBLISHED));
   }
 }

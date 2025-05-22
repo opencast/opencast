@@ -40,6 +40,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.management.ManagementFactory;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Dictionary;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -133,8 +135,13 @@ public class StudipUserProviderFactory implements ManagedServiceFactory {
       throw new ConfigurationException(ORGANIZATION_KEY, "is not set");
     }
 
-    String url = (String) properties.get(STUDIP_URL_KEY);
-    if (StringUtils.isBlank(url)) {
+    URI url = null;
+    try {
+      url = new URI((String) properties.get(STUDIP_URL_KEY));
+    } catch (URISyntaxException e) {
+      throw new ConfigurationException(STUDIP_URL_KEY, "URI is invalid", e);
+    }
+    if (StringUtils.isBlank(url.toString())) {
       throw new ConfigurationException(STUDIP_URL_KEY, "is not set");
     }
 

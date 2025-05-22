@@ -4,7 +4,8 @@ import {
     EventMetadataField,
     EventMetadataContainer,
     EventMetadataCollection,
-    collectionToPairs
+    collectionToPairs,
+    findField
 } from "../OpencastRest";
 import Select, { OnChangeValue } from "react-select";
 import CreatableSelect from "react-select/creatable";
@@ -161,9 +162,9 @@ class TranslatedEditForm extends React.Component<EditFormProps> {
     }
 
     render() {
-        const languageField = this.props.data.fields.filter((field) => field.id === "language")[0];
+        const languageField = findField("language", this.props.data);
         let languageOptions: OptionType[] = [];
-        if(languageField.collection !== undefined){
+        if(languageField && languageField.collection !== undefined){
             languageOptions = collectionToOptions(languageField.collection, languageField.translatable, this.props.t);
         }
         return <form>

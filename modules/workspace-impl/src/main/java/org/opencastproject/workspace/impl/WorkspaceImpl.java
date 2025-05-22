@@ -339,7 +339,7 @@ public final class WorkspaceImpl implements Workspace {
    * Returns the filename translated into a version that can safely be used as part of a file system path.
    *
    * The method shortens both the base file name and the extension to a maximum of 255 characters each,
-   * and replaces unsafe characters with <doce>_</doce>.
+   * and replaces unsafe characters with &lt;doce&gt;_&lt;/doce&gt;.
    *
    * @param fileName
    *          The file name

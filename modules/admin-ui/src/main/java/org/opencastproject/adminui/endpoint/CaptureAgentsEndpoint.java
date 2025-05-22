@@ -59,6 +59,7 @@ import com.entwinemedia.fn.data.json.Jsons;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,7 +70,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
@@ -82,7 +82,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-@Path("/")
+@Path("/admin-ng/capture-agents")
 @RestService(name = "captureAgents", title = "Capture agents façade service",
   abstractText = "Provides operations for the capture agents",
   notes = { "This service offers the default capture agents CRUD Operations for the admin UI.",
@@ -99,6 +99,7 @@ import javax.ws.rs.core.Response.Status;
     "opencast.service.path=/admin-ng/capture-agents"
   }
 )
+@JaxrsResource
 public class CaptureAgentsEndpoint {
 
   private static final String TRANSLATION_KEY_PREFIX = "CAPTURE_AGENT.DEVICE.";
@@ -179,7 +180,7 @@ public class CaptureAgentsEndpoint {
 
     // Sort by status, name or last updated date
     if (optSort.isSome()) {
-      final Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
+      final ArrayList<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
       Collections.sort(filteredAgents, new Comparator<Agent>() {
         @Override
         public int compare(Agent agent1, Agent agent2) {

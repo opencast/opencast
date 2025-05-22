@@ -16,19 +16,13 @@ which can directly be built and installed. To build these distributions, you wou
 outlined in the basic installation guides and will then find a set of different distributions, both as archive and in a
 separate directory.
 
-To list all distributions, run the following command after Opencast is built:
+You will find a list of all available distributions attached to each release.
+Take a look at [the latest release on GitHub](https://github.com/opencast/opencast/releases/latest) to see the
+currently available distributions.
 
-    % ls -1 build/*.tar.gz
-    build/opencast-dist-admin-${version}.tar.gz
-    build/opencast-dist-allinone-${version}.tar.gz
-    build/opencast-dist-presentation-${version}.tar.gz
-    build/opencast-dist-worker-${version}.tar.g
-    ...
-
-
-The same distributions can be found in the packages provided in the Opencast RPM repository.  These packages will
-automatically install all dependencies for a given node type. For example, to install an Opencast worker node, you would
-install the package `opencast21-distribution-worker`.
+The same distributions can be found in the packages provided in the Opencast RPM and Debian repositories.
+These packages will automatically install all dependencies for a given node type.
+For example, to install an Opencast worker node, you would install the package `opencast-worker`.
 
 The following list describes possible set-ups:
 
@@ -59,36 +53,46 @@ Step 2: Set-Up NFS Server
 Though it is possible to have Opencast run without shared storage, it is still a good idea to do so, as hard links can
 be used to link files instead of copying them and not everything has to be tunneled over HTTP.
 
-Thus you should first set-up your NFS server. The best solution is certainly to have a dedicated storage server. For
-smaller set-ups, however, it can also be put on one of the Opencast nodes, i.e. on the admin node.
+Thus you should first set-up your NFS server. The best solution is certainly to have a dedicated storage server.
+For smaller set-ups, however, it can also be put on one of the Opencast nodes, i.e. on the admin node.
 
-To do this, you first have to install and enable the NFS server:
+To do this, first install and enable the NFS server:
 
-    yum install nfs-utils nfs-utils-lib
-    chkconfig  --level 345 nfs on
-    service nfs start
+```
+dnf install nfs-utils
+systemctl enable --now nfs-server.service
+```
 
-You want to have one common user on all your systems, so that file permissions do not become an issue.. As preparation
-for this it makes sense to manually create an *opencast* user and group with a common UID and GID:
+You want to have one common user on all your systems, so that file permissions do not become an issue.
+As preparation for this it makes sense to manually create an *opencast* user and group with a common UID and GID:
 
-    groupadd -g 1234 opencast
-    useradd -g 1234 -u 1234 opencast
+```
+groupadd -g 7967 opencast
+useradd -g 7967 -u 7967 opencast
+```
 
-If the user and group id `1234` is already used, just pick another one but make sure to pick the same one on all your
+If the user and group id `7967` is already used, just pick another one but make sure to pick the same one on all your
 Opencast nodes.
 
 Then create the directory to be shared and set its ownership to the newly created users:
 
-    mkdir -p /srv/opencast
-    chown opencast:opencast /srv/opencast
+```
+mkdir -p /srv/opencast
+chown opencast:opencast /srv/opencast
+```
 
-Next we actually share the storage dir. For this we need to edit the file `/etc/exports` and set:
+Next we actually share the storage directory.
+For this we need to edit the file `/etc/exports` and set:
 
-    /srv/opencast  131.173.172.190(rw,sync,no_subtree_check)
+```
+/srv/opencast  198.51.100.42(rw,sync,no_subtree_check)
+```
 
-with 131.173.172.190 being the IP address of the other machine that should get access. Finally we enable the share with:
+with 198.51.100.42 being the IP address of the other machine that should get access. Finally we enable the share with:
 
-    exportfs -a
+```
+exportfs -a
+```
 
 Of cause you have to open the necessary ports in your firewall configuration.  For iptables, appropriate rules could be
 for example:

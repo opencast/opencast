@@ -9,26 +9,17 @@ it.
 It may also be interesting for developers as all dependencies for Opencast usage, testing and development are provided
 by the Debian repository.
 
-
 Availability
 ------------
 
 Note that it may take some time (usually about a week after a new release is out) before the Debian packages are available.
 Watch for announcements on list or just check which versions are available in the repository.
 
-
 Currently Supported
 -------------------
 
 * Debian 10 and newer amd64
 * Ubuntu 18.04 and newer amd64
-
-
-Supported JDKs
---------------
-
-For Opencast 10 and newer we support JDK 11 only.
-
 
 Activate Repository
 -------------------
@@ -61,7 +52,6 @@ First you have to install the necessary repositories so that your package manage
 
         apt-get update
 
-
 Install OpenSearch
 ------------------
 
@@ -72,7 +62,7 @@ you can configure the URL in Opencast's configuration files.
 In our repository we provide validated OpenSearch packages copied from the upstream repository.  Installation can be
 accomplished by running the following:
 
-    apt-get install opensearch
+    apt-get install opensearch opensearch-analysis-icu
 
 If you wish to use the upstream OpenSearch repository directly be aware that Opencast only supported with OpenSearch 1.x
 and will not work with OpenSearch 2.x yet.  Future support for this is forthcoming.
@@ -80,21 +70,17 @@ and will not work with OpenSearch 2.x yet.  Future support for this is forthcomi
 Configure OpenSearch
 --------------------
 
-After installing OpenSearch please make sure to follow their
-[configuration documentation](https://opensearch.org/docs/1.3/install-and-configure/install-opensearch/debian/)
-to ensure that your OpenSearch instance is set up correctly and securely.  Once that setup is complete, ensure that
-your Opencast install matches your configured OpenSearch settings.  Notably, Opencast's current default assumes
-non-secured http rather than https, without a username and password.  Read the
-[Opencast OpenSearch Documentation](../configuration/searchindex/elasticsearch.md) to correctly configure Opencast's connection
-once Opencast has been installed below.
+After installing OpenSearch please make sure to install all necessary plugins and update the configuration.
+For details, please follow:
 
-After installing and configuring make sure to start and enable OpenSearch:
+* [Opencast OpenSearch Documentation](../configuration/searchindex/elasticsearch.md)
+
+When the configuration is done, start and enable OpenSearch:
 
 ```sh
 systemctl restart opensearch
 systemctl enable opensearch
 ```
-
 
 Install Opencast
 ------------------
@@ -111,14 +97,12 @@ pre-installed or otherwise takes precedence.  This version may work, however Ope
 version(s) in the repository.  To install the Opencast version of ffmpeg add `ffmpeg-dist` to the end of the command above.
 For more options, see the [advanced installation section below](#advanced-installation).
 
-
 Configuration
 -------------
 
 Make sure to set your hostname, login information and other configuration details by following the
 
-- [Basic Configuration guide](../configuration/basic.md)
-
+* [Basic Configuration guide](../configuration/basic.md)
 
 Start Opencast
 --------------
@@ -129,7 +113,6 @@ Finally, start and enable Opencast by running:
 systemctl start opencast.service
 systemctl enable opencast.service
 ```
-
 
 Advanced Installation
 ---------------------
@@ -158,7 +141,6 @@ To list all available packages and versions, use:
 
     apt list 'opencast*'
 
-
 Point Revisions (Experts only)
 ------------------------------
 
@@ -170,7 +152,6 @@ revision, you can select it by adding it, and the packaging build, to your `apt-
 Installs an Opencast {{ opencast_major_version() }}.0 admin node, using the second build of that series.  Not all series have more than a single build,
 and older point revisions may be removed once superceded, so please explore the repository prior to attempting this.
 
-
 Install 3rd-party-tools
 -----------------------
 
@@ -179,8 +160,7 @@ from the repository, all necessary dependencies will be installed automatically.
 
 You can install all necessary 3rd-Party-Tools for Opencast like this:
 
-    apt-get install ffmpeg-dist tesseract-ocr sox hunspell netcat
-
+    apt-get install ffmpeg-dist tesseract-ocr sox netcat
 
 Upgrading Major Versions
 ------------------------
@@ -208,7 +188,6 @@ Then install the new version (using Opencast 9 as an example):
 
 At this point you must follow the relevant [upgrade](../upgrade.md) instructions, prior to starting Opencast again.
 
-
 Uninstall Opencast
 --------------------
 
@@ -230,7 +209,6 @@ have to do that by yourself.
 
     # Remove logs
     sudo rm -rf /var/log/opencast
-
 
 Troubleshooting
 ---------------

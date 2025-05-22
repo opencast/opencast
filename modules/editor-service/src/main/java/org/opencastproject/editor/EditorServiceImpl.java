@@ -543,7 +543,7 @@ public class EditorServiceImpl implements EditorService {
    *          the subtitles to be added
    * @throws IOException
    */
-  private MediaPackage addSubtitleTrack(MediaPackage mediaPackage, List<EditingData.Subtitle> subtitles)
+  private MediaPackage processSubtitleTrack(MediaPackage mediaPackage, List<EditingData.Subtitle> subtitles)
           throws IOException, IllegalArgumentException {
     for (EditingData.Subtitle subtitle : subtitles) {
       // Generate ID for new tracks
@@ -561,6 +561,14 @@ public class EditorServiceImpl implements EditorService {
       }
 
       Track track = mediaPackage.getTrack(trackId);
+
+      if (subtitle.isDeleted()) {
+        // If the subtitle is empty, remove the track
+        if (trackId != null) {
+          mediaPackage.remove(track);
+        }
+        continue;
+      }
 
       // Memorize uri of the previous track file for deletion
       URI oldTrackURI = null;
@@ -1044,7 +1052,7 @@ public class EditorServiceImpl implements EditorService {
 
     return new EditingData(segments, tracks, workflows, mp.getDuration(), mp.getTitle(), event.getRecordingStartDate(),
             event.getSeriesId(), event.getSeriesName(), workflowActive, waveformList, subtitles, localPublication,
-            lockingActive, lockRefresh, user);
+            lockingActive, lockRefresh, user, "");
   }
 
 
@@ -1130,7 +1138,7 @@ public class EditorServiceImpl implements EditorService {
 
     try {
       if (editingData.getSubtitles() != null) {
-        mediaPackage = addSubtitleTrack(mediaPackage, editingData.getSubtitles());
+        mediaPackage = processSubtitleTrack(mediaPackage, editingData.getSubtitles());
       }
     } catch (IOException e) {
       errorExit("Unable to add subtitle track to archive", mediaPackageId, ErrorStatus.UNKNOWN, e);
@@ -1152,6 +1160,17 @@ public class EditorServiceImpl implements EditorService {
       logger.error("Error while adding the updated media package ({}) to the archive",
               mediaPackage.getIdentifier(), e);
       throw new IOException(e);
+    }
+
+    // Update Metadata
+    try {
+      index.updateAllEventMetadata(mediaPackageId, editingData.getMetadataJSON(), searchIndex);
+    } catch (SearchIndexException | IndexServiceException | IllegalArgumentException e) {
+      errorExit("Event metadata can't be updated.", mediaPackageId, ErrorStatus.METADATA_UPDATE_FAIL, e);
+    } catch (NotFoundException e) {
+      errorExit("Event not found.", mediaPackageId, ErrorStatus.MEDIAPACKAGE_NOT_FOUND, e);
+    } catch (UnauthorizedException e) {
+      errorExit("Not authorized to update event metadata .", mediaPackageId, ErrorStatus.NOT_AUTHORIZED, e);
     }
 
     if (editingData.getPostProcessingWorkflow() != null) {
@@ -1200,18 +1219,4 @@ public class EditorServiceImpl implements EditorService {
 
     return MetadataJson.listToJson(metadataList, true).toString();
   }
-
-  @Override
-  public void setMetadata(String mediaPackageId, String metadata) throws EditorServiceException {
-    try {
-      index.updateAllEventMetadata(mediaPackageId, metadata, searchIndex);
-    } catch (SearchIndexException | IndexServiceException | IllegalArgumentException e) {
-      errorExit("Event metadata can't be updated.", mediaPackageId, ErrorStatus.METADATA_UPDATE_FAIL, e);
-    } catch (NotFoundException e) {
-      errorExit("Event not found.", mediaPackageId, ErrorStatus.MEDIAPACKAGE_NOT_FOUND, e);
-    } catch (UnauthorizedException e) {
-      errorExit("Not authorized to update event metadata .", mediaPackageId, ErrorStatus.NOT_AUTHORIZED, e);
-    }
-  }
-
 }

@@ -75,8 +75,8 @@ export default class TranscriptionsPlugin extends PopUpButtonPlugin {
     this.transcriptions
     .filter(t => {  // filter trimming
       if (videoContainer.isTrimEnabled) {
-        return ((t.time / 1000) > videoContainer.trimStart)
-          && ((t.time / 1000) < videoContainer.trimEnd);
+        return (t.time > videoContainer.trimStart)
+          && (t.time < videoContainer.trimEnd);
       }
       return true;
     })
@@ -93,7 +93,7 @@ export default class TranscriptionsPlugin extends PopUpButtonPlugin {
     .forEach(t => {
       const id = `transcriptionItem${t.index}`;
       const trimmingOffset = videoContainer.isTrimEnabled ? videoContainer.trimStart : 0;
-      const instant = (t.time / 1000) - trimmingOffset;
+      const instant = t.time - trimmingOffset;
       const transcriptionItem = createElementWithHtmlText(`
         <li>
           <img id="${id}" src="${t.preview}" alt="${t.text}"/>
@@ -102,7 +102,7 @@ export default class TranscriptionsPlugin extends PopUpButtonPlugin {
       this._transcriptionsContainer);
       transcriptionItem.addEventListener('click', async evt => {
         const trimmingOffset = videoContainer.isTrimEnabled ? videoContainer.trimStart : 0;
-        this.player.videoContainer.setCurrentTime((t.time / 1000) - trimmingOffset);
+        this.player.videoContainer.setCurrentTime(t.time - trimmingOffset);
         evt.stopPropagation();
       });
     });

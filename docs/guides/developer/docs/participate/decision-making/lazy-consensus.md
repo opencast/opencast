@@ -29,13 +29,15 @@ Sometimes a member of the community will believe a specific action is the correc
 that there will be consensus and may not wish to proceed the work without giving the community an opportunity to
 feedback. In these circumstances, they can make the proposal and state Lazy Consensus is in operation.
 
-Proposals should be sent to list, preferably the development list. It is common to indicate proposals by including the
-string `[#proposal]` at the beginning of the subject to make it easier for the community to identify that the mail
-contains an important proposal.
+Proposals shall be filed as a pull request. It is common to indicate proposals by adding the
+label `proposal` to make it easier for the community to identify that the PR contains an important proposal.
 
-This triggers the Lazy Consensus mechanism, by which the proposal is considered accepted if no one objects within 72
-hours after the proposal submission. The period of 72 hours is chosen because it accounts for different timezones and
-any non-Opencast commitments the community members may have.
+This triggers the Lazy Consensus mechanism, by which the proposal is considered accepted automatically:
+- if discussed at the dev meeting's PR discussions, without vetos
+- AND if no one objects within 72 hours, counting from the PR creation date
+
+The period of 72 hours is chosen because it accounts for different timezones and any non-Opencast commitments
+the community members may have.
 
 In this approach the original proposer is not insisting that there is a discussion around the proposal, nor is it
 requested that the community explicitly supports their actions. This differs from assuming lazy consensus since it
@@ -45,6 +47,6 @@ work begins.
 Silence is Consent
 ------------------
 
-People may choose to indicate their support for the actions taken with a +1 mail - quick and easy to read and reassuring
+People may choose to indicate their support for the actions taken with a +1 comment - quick and easy to read and reassuring
 for the implementer. However, remember, in a lazy consensus world silence is the equivalent to support. This can take
 some time to get used to.

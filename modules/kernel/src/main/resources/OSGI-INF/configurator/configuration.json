@@ -1,0 +1,10 @@
+{
+  ":configurator:resource-version" : 1,
+  ":configurator:symbolic-name" : "org.opencastproject.kernel.config",
+
+  "org.apache.aries.jax.rs.whiteboard.default" : {
+    "default.application.base": "/",
+    "osgi.http.whiteboard.context.select": "(osgi.http.whiteboard.context.name=opencast)",
+    "osgi.http.whiteboard.servlet.multipart.enabled" : "true"
+  }
+}

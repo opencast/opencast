@@ -22,6 +22,7 @@
 package org.opencastproject.adminui.endpoint;
 
 import org.opencastproject.adminui.exception.JsonCreationException;
+import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.list.impl.ResourceListQueryImpl;
 import org.opencastproject.list.query.StringListFilter;
 
@@ -86,16 +87,8 @@ public final class EndpointUtil {
    *          The query to update with the filters
    */
   public static void addRequestFiltersToQuery(final String filterString, ResourceListQueryImpl query) {
-    if (filterString != null) {
-      String[] filters = filterString.split(",");
-      for (String filter : filters) {
-        String[] splitFilter = filter.split(":", 2);
-        if (splitFilter != null && splitFilter.length == 2) {
-          String key = splitFilter[0].trim();
-          String value = splitFilter[1].trim();
-          query.addFilter(new StringListFilter(key, value));
-        }
-      }
+    for (var filter : RestUtils.parseFilter(filterString).entrySet()) {
+      query.addFilter(new StringListFilter(filter.getKey(), filter.getValue()));
     }
   }
 }

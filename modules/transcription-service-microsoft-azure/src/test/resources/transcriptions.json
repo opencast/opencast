@@ -1,0 +1,1810 @@
+{
+  "values": [
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/2b58923c-d0d5-4e77-9f9a-74bf80f173df",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/ea10b647-5102-41db-966a-d3a872b1145c"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/2b58923c-d0d5-4e77-9f9a-74bf80f173df/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "duration": "PT1M4S"
+      },
+      "lastActionDateTime": "2022-06-02T07:03:56Z",
+      "status": "Succeeded",
+      "createdDateTime": "2022-06-02T07:03:32Z",
+      "locale": "en-US",
+      "displayName": "Transcription using default model for en-US"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/c3399fe0-4527-4cbb-a8f3-f91f30c2c876",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/ea10b647-5102-41db-966a-d3a872b1145c"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/c3399fe0-4527-4cbb-a8f3-f91f30c2c876/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "duration": "PT1M4S"
+      },
+      "lastActionDateTime": "2022-06-02T07:29:19Z",
+      "status": "Succeeded",
+      "createdDateTime": "2022-06-02T07:28:56Z",
+      "locale": "en-US",
+      "displayName": "Transcription using default model for en-US"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/56950081-5eb8-46ac-b4ee-4d0f19edc39d",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/ea10b647-5102-41db-966a-d3a872b1145c"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/56950081-5eb8-46ac-b4ee-4d0f19edc39d/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "duration": "PT1M4S"
+      },
+      "lastActionDateTime": "2022-06-02T07:32:34Z",
+      "status": "Succeeded",
+      "createdDateTime": "2022-06-02T07:32:12Z",
+      "locale": "en-US",
+      "displayName": "Transcription using default model for en-US"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/fde67336-2a2c-489c-86d1-3b7f795d7ea4",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/ea10b647-5102-41db-966a-d3a872b1145c"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/fde67336-2a2c-489c-86d1-3b7f795d7ea4/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "duration": "PT1M4S"
+      },
+      "lastActionDateTime": "2022-06-02T07:35:39Z",
+      "status": "Succeeded",
+      "createdDateTime": "2022-06-02T07:35:17Z",
+      "locale": "en-US",
+      "displayName": "Transcription using default model for en-US"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/16f06238-8a20-4a12-a27b-b660dc8d6e91",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/ea10b647-5102-41db-966a-d3a872b1145c"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/16f06238-8a20-4a12-a27b-b660dc8d6e91/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "duration": "PT1M4S"
+      },
+      "lastActionDateTime": "2022-06-02T07:37:39Z",
+      "status": "Succeeded",
+      "createdDateTime": "2022-06-02T07:37:17Z",
+      "locale": "en-US",
+      "displayName": "Transcription using default model for en-US"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/2f7901da-af8c-4cba-9649-b7a1fd558f09",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/ea10b647-5102-41db-966a-d3a872b1145c"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/2f7901da-af8c-4cba-9649-b7a1fd558f09/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "duration": "PT1M4S"
+      },
+      "lastActionDateTime": "2022-06-02T07:38:46Z",
+      "status": "Succeeded",
+      "createdDateTime": "2022-06-02T07:38:23Z",
+      "locale": "en-US",
+      "displayName": "Transcription using default model for en-US"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/c9af9925-8aa9-4c6b-aabb-1eb7c3542dd8",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/ea10b647-5102-41db-966a-d3a872b1145c"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/c9af9925-8aa9-4c6b-aabb-1eb7c3542dd8/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "duration": "PT1M4S"
+      },
+      "lastActionDateTime": "2022-06-02T07:38:46Z",
+      "status": "Succeeded",
+      "createdDateTime": "2022-06-02T07:38:23Z",
+      "locale": "en-US",
+      "displayName": "Transcription using default model for en-US"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/04b3b6c0-3129-488a-a724-0d5b91fd925f",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/ea10b647-5102-41db-966a-d3a872b1145c"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/04b3b6c0-3129-488a-a724-0d5b91fd925f/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "duration": "PT1M4S"
+      },
+      "lastActionDateTime": "2022-06-02T07:48:55Z",
+      "status": "Succeeded",
+      "createdDateTime": "2022-06-02T07:48:30Z",
+      "locale": "en-US",
+      "displayName": "Transcription using default model for en-US"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/030b77ff-484a-47f4-9bd5-8732b1183c05",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/ea10b647-5102-41db-966a-d3a872b1145c"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/030b77ff-484a-47f4-9bd5-8732b1183c05/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "duration": "PT1M4S"
+      },
+      "lastActionDateTime": "2022-06-02T07:49:00Z",
+      "status": "Succeeded",
+      "createdDateTime": "2022-06-02T07:48:30Z",
+      "locale": "en-US",
+      "displayName": "Transcription using default model for en-US"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/03a27abc-16fe-4906-a28f-4f13fae03e94",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/ea10b647-5102-41db-966a-d3a872b1145c"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/03a27abc-16fe-4906-a28f-4f13fae03e94/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "duration": "PT1M4S"
+      },
+      "lastActionDateTime": "2022-06-02T07:49:02Z",
+      "status": "Succeeded",
+      "createdDateTime": "2022-06-02T07:48:31Z",
+      "locale": "en-US",
+      "displayName": "Transcription using default model for en-US"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/03313137-a73f-4b33-a7bd-2f504359ad4e",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/ea10b647-5102-41db-966a-d3a872b1145c"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/03313137-a73f-4b33-a7bd-2f504359ad4e/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "duration": "PT1M4S"
+      },
+      "lastActionDateTime": "2022-06-02T07:56:22Z",
+      "status": "Succeeded",
+      "createdDateTime": "2022-06-02T07:55:49Z",
+      "locale": "en-US",
+      "displayName": "Transcription using default model for en-US"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/5b389274-57e5-49ca-878a-58ff8527c095",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/ea10b647-5102-41db-966a-d3a872b1145c"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/5b389274-57e5-49ca-878a-58ff8527c095/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "duration": "PT1M4S"
+      },
+      "lastActionDateTime": "2022-06-02T07:56:17Z",
+      "status": "Succeeded",
+      "createdDateTime": "2022-06-02T07:55:50Z",
+      "locale": "en-US",
+      "displayName": "Transcription using default model for en-US"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/640684af-be4e-48b0-887e-d76ef1cc1de0",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/ea10b647-5102-41db-966a-d3a872b1145c"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/640684af-be4e-48b0-887e-d76ef1cc1de0/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "duration": "PT1M4S"
+      },
+      "lastActionDateTime": "2022-06-02T07:57:17Z",
+      "status": "Succeeded",
+      "createdDateTime": "2022-06-02T07:56:54Z",
+      "locale": "en-US",
+      "displayName": "Transcription using default model for en-US"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/0c2712f2-f5f0-4222-9d55-d0bac37a7ea8",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/ea10b647-5102-41db-966a-d3a872b1145c"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/0c2712f2-f5f0-4222-9d55-d0bac37a7ea8/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "duration": "PT1M4S"
+      },
+      "lastActionDateTime": "2022-06-02T07:57:16Z",
+      "status": "Succeeded",
+      "createdDateTime": "2022-06-02T07:56:54Z",
+      "locale": "en-US",
+      "displayName": "Transcription using default model for en-US"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/a0fee618-86cd-46a0-9c16-9561ed8a8158",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/ea10b647-5102-41db-966a-d3a872b1145c"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/a0fee618-86cd-46a0-9c16-9561ed8a8158/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "duration": "PT1M4S"
+      },
+      "lastActionDateTime": "2022-06-02T07:57:16Z",
+      "status": "Succeeded",
+      "createdDateTime": "2022-06-02T07:56:54Z",
+      "locale": "en-US",
+      "displayName": "Transcription using default model for en-US"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/26e8417a-f616-40a9-ae09-97b962ddd7d8",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/ea10b647-5102-41db-966a-d3a872b1145c"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/26e8417a-f616-40a9-ae09-97b962ddd7d8/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "duration": "PT1M4S"
+      },
+      "lastActionDateTime": "2022-06-02T08:16:41Z",
+      "status": "Succeeded",
+      "createdDateTime": "2022-06-02T08:16:18Z",
+      "locale": "en-US",
+      "displayName": "Transcription using default model for en-US"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/4254fe0c-f914-45c0-8cd2-d247bfa6927d",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/ea10b647-5102-41db-966a-d3a872b1145c"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/4254fe0c-f914-45c0-8cd2-d247bfa6927d/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "duration": "PT1M4S"
+      },
+      "lastActionDateTime": "2022-06-02T08:16:43Z",
+      "status": "Succeeded",
+      "createdDateTime": "2022-06-02T08:16:18Z",
+      "locale": "en-US",
+      "displayName": "Transcription using default model for en-US"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/ae358979-6771-41ac-acdc-1bfedeac3dd4",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/ea10b647-5102-41db-966a-d3a872b1145c"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/ae358979-6771-41ac-acdc-1bfedeac3dd4/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "duration": "PT1M4S"
+      },
+      "lastActionDateTime": "2022-06-02T08:16:43Z",
+      "status": "Succeeded",
+      "createdDateTime": "2022-06-02T08:16:19Z",
+      "locale": "en-US",
+      "displayName": "Transcription using default model for en-US"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/91cf4988-5a35-4c2a-9cd4-ce107e48a6b7",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/ea10b647-5102-41db-966a-d3a872b1145c"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/91cf4988-5a35-4c2a-9cd4-ce107e48a6b7/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "duration": "PT1M4S"
+      },
+      "lastActionDateTime": "2022-06-02T08:20:38Z",
+      "status": "Succeeded",
+      "createdDateTime": "2022-06-02T08:20:15Z",
+      "locale": "en-US",
+      "displayName": "Transcription using default model for en-US"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/36873d9f-df5a-4187-870c-b26befddf562",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/ea10b647-5102-41db-966a-d3a872b1145c"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/36873d9f-df5a-4187-870c-b26befddf562/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "duration": "PT1M4S"
+      },
+      "lastActionDateTime": "2022-06-02T08:21:21Z",
+      "status": "Succeeded",
+      "createdDateTime": "2022-06-02T08:20:57Z",
+      "locale": "en-US",
+      "displayName": "Transcription using default model for en-US"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/f5585b36-4bbc-4afa-98b9-ddc18dcf223b",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/ea10b647-5102-41db-966a-d3a872b1145c"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/f5585b36-4bbc-4afa-98b9-ddc18dcf223b/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "duration": "PT1M4S"
+      },
+      "lastActionDateTime": "2022-06-02T08:27:42Z",
+      "status": "Succeeded",
+      "createdDateTime": "2022-06-02T08:27:17Z",
+      "locale": "en-US",
+      "displayName": "Transcription using default model for en-US"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/c877d078-52ce-4cbd-9070-f3d4c5f3311d",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/ea10b647-5102-41db-966a-d3a872b1145c"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/c877d078-52ce-4cbd-9070-f3d4c5f3311d/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "duration": "PT1M4S"
+      },
+      "lastActionDateTime": "2022-06-02T08:52:36Z",
+      "status": "Succeeded",
+      "createdDateTime": "2022-06-02T08:52:14Z",
+      "locale": "en-US",
+      "displayName": "Transcription using default model for en-US"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/09c3892c-4819-46b3-9161-9716679bdf01",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/ea10b647-5102-41db-966a-d3a872b1145c"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/09c3892c-4819-46b3-9161-9716679bdf01/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "duration": "PT1M4S"
+      },
+      "lastActionDateTime": "2022-06-02T12:17:56Z",
+      "status": "Succeeded",
+      "createdDateTime": "2022-06-02T12:17:32Z",
+      "locale": "en-US",
+      "displayName": "Transcription using default model for en-US"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/b92ac2db-2f23-4888-b9f1-a45b5a8d1cc8",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/b92ac2db-2f23-4888-b9f1-a45b5a8d1cc8/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "error": {
+          "code": "InvalidUri",
+          "message": "The provided container URI is invalid."
+        }
+      },
+      "lastActionDateTime": "2023-03-17T14:17:33Z",
+      "status": "Failed",
+      "createdDateTime": "2023-03-17T14:17:33Z",
+      "locale": "de-DE",
+      "displayName": "Transcription"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/a35fa266-3c06-4a06-8da0-731bae08d807",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/a35fa266-3c06-4a06-8da0-731bae08d807/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "error": {
+          "code": "InvalidUri",
+          "message": "The provided container URI is invalid."
+        }
+      },
+      "lastActionDateTime": "2023-03-17T14:18:10Z",
+      "status": "Failed",
+      "createdDateTime": "2023-03-17T14:18:09Z",
+      "locale": "de-DE",
+      "displayName": "Transcription"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/c5001492-73a1-4862-9e0d-889ff066f284",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/c5001492-73a1-4862-9e0d-889ff066f284/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "error": {
+          "code": "InvalidUri",
+          "message": "The provided container URI is invalid."
+        }
+      },
+      "lastActionDateTime": "2023-03-17T14:25:16Z",
+      "status": "Failed",
+      "createdDateTime": "2023-03-17T14:25:16Z",
+      "locale": "de-DE",
+      "displayName": "Transcription"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/b40c6147-4efb-423e-8690-8ba101d39148",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/b40c6147-4efb-423e-8690-8ba101d39148/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "error": {
+          "code": "InvalidUri",
+          "message": "The provided container URI is invalid."
+        }
+      },
+      "lastActionDateTime": "2023-03-17T14:29:48Z",
+      "status": "Failed",
+      "createdDateTime": "2023-03-17T14:29:48Z",
+      "locale": "de-DE",
+      "displayName": "Transcription"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/ad8054dc-d7a4-4f8b-aa42-4de1b4c10bd5",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/ad8054dc-d7a4-4f8b-aa42-4de1b4c10bd5/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "error": {
+          "code": "InvalidUri",
+          "message": "The provided container URI is invalid."
+        }
+      },
+      "lastActionDateTime": "2023-03-17T14:37:01Z",
+      "status": "Failed",
+      "createdDateTime": "2023-03-17T14:37:01Z",
+      "locale": "de-DE",
+      "displayName": "Transcription"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/1d1f8363-d939-43da-b895-3debdfba5646",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/1d1f8363-d939-43da-b895-3debdfba5646/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "error": {
+          "code": "InvalidUri",
+          "message": "The provided container URI is invalid."
+        }
+      },
+      "lastActionDateTime": "2023-03-17T14:38:05Z",
+      "status": "Failed",
+      "createdDateTime": "2023-03-17T14:38:05Z",
+      "locale": "de-DE",
+      "displayName": "Transcription"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/5418ef0a-9757-41b2-b398-32039467cfe0",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/5418ef0a-9757-41b2-b398-32039467cfe0/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "error": {
+          "code": "InvalidUri",
+          "message": "The provided container URI is invalid."
+        }
+      },
+      "lastActionDateTime": "2023-03-17T15:02:20Z",
+      "status": "Failed",
+      "createdDateTime": "2023-03-17T15:02:20Z",
+      "locale": "de-DE",
+      "displayName": "Transcription"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/68075bc0-bf81-4628-a345-93e2f10a703b",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/68075bc0-bf81-4628-a345-93e2f10a703b/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "error": {
+          "code": "InvalidUri",
+          "message": "The provided container URI is invalid."
+        }
+      },
+      "lastActionDateTime": "2023-03-17T15:20:40Z",
+      "status": "Failed",
+      "createdDateTime": "2023-03-17T15:20:39Z",
+      "locale": "de-DE",
+      "displayName": "Transcription"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/8bb6258e-7fee-409e-b340-312c5a103ddc",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/8bb6258e-7fee-409e-b340-312c5a103ddc/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "error": {
+          "code": "InvalidUri",
+          "message": "The provided container URI is invalid."
+        }
+      },
+      "lastActionDateTime": "2023-03-17T15:22:15Z",
+      "status": "Failed",
+      "createdDateTime": "2023-03-17T15:22:14Z",
+      "locale": "de-DE",
+      "displayName": "Transcription"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/fd3ff835-9aee-406b-a271-ca8fba4a42f2",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/fd3ff835-9aee-406b-a271-ca8fba4a42f2/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "error": {
+          "code": "InvalidUri",
+          "message": "The provided container URI is invalid."
+        }
+      },
+      "lastActionDateTime": "2023-03-17T15:30:27Z",
+      "status": "Failed",
+      "createdDateTime": "2023-03-17T15:30:27Z",
+      "locale": "de-DE",
+      "displayName": "Transcription"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/bce99e34-3457-4015-873e-3a7ec1c7bfd1",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/bce99e34-3457-4015-873e-3a7ec1c7bfd1/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "error": {
+          "code": "InvalidUri",
+          "message": "The provided container URI is invalid."
+        }
+      },
+      "lastActionDateTime": "2023-03-28T09:23:45Z",
+      "status": "Failed",
+      "createdDateTime": "2023-03-28T09:23:44Z",
+      "locale": "de-DE",
+      "displayName": "Transcription"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/5d8f95e2-6509-4c31-adcc-33e5d7303117",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/5d8f95e2-6509-4c31-adcc-33e5d7303117/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "error": {
+          "code": "InvalidUri",
+          "message": "The provided container URI is invalid."
+        }
+      },
+      "lastActionDateTime": "2023-03-28T09:36:53Z",
+      "status": "Failed",
+      "createdDateTime": "2023-03-28T09:36:53Z",
+      "locale": "de-DE",
+      "displayName": "Transcription"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/d6d334a0-2a7b-4779-908f-c5669e11de1e",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/d6d334a0-2a7b-4779-908f-c5669e11de1e/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "error": {
+          "code": "InvalidUri",
+          "message": "The provided container URI is invalid."
+        }
+      },
+      "lastActionDateTime": "2023-03-28T10:02:26Z",
+      "status": "Failed",
+      "createdDateTime": "2023-03-28T10:02:26Z",
+      "locale": "de-DE",
+      "displayName": "Transcription"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/6e6600e2-d7b6-4a16-a1ca-50a423973aa9",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/6e6600e2-d7b6-4a16-a1ca-50a423973aa9/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "error": {
+          "code": "InvalidUri",
+          "message": "The provided container URI is invalid."
+        }
+      },
+      "lastActionDateTime": "2023-03-28T10:09:21Z",
+      "status": "Failed",
+      "createdDateTime": "2023-03-28T10:09:20Z",
+      "locale": "de-DE",
+      "displayName": "test"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/7d9c2ac8-c152-42a8-97bc-871c4f4b9dcd",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/7d9c2ac8-c152-42a8-97bc-871c4f4b9dcd/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "error": {
+          "code": "InvalidUri",
+          "message": "The provided container URI is invalid."
+        }
+      },
+      "lastActionDateTime": "2023-03-28T10:11:53Z",
+      "status": "Failed",
+      "createdDateTime": "2023-03-28T10:11:53Z",
+      "locale": "de-DE",
+      "displayName": "test"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/c5fadeb3-9795-4e63-8e24-1cf4b6415a99",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/c5fadeb3-9795-4e63-8e24-1cf4b6415a99/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "error": {
+          "code": "InvalidUri",
+          "message": "The provided container URI is invalid."
+        }
+      },
+      "lastActionDateTime": "2023-03-28T10:12:57Z",
+      "status": "Failed",
+      "createdDateTime": "2023-03-28T10:12:57Z",
+      "locale": "de-DE",
+      "displayName": "test"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/949d9ce7-7e11-45bb-8daf-3d7f30783a6c",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/949d9ce7-7e11-45bb-8daf-3d7f30783a6c/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "error": {
+          "code": "InvalidUri",
+          "message": "The provided container URI is invalid."
+        }
+      },
+      "lastActionDateTime": "2023-03-28T11:19:07Z",
+      "status": "Failed",
+      "createdDateTime": "2023-03-28T11:19:07Z",
+      "locale": "de-DE",
+      "displayName": "test"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/421b53a0-f2e4-4f06-8b2e-117d0f6d3b65",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/421b53a0-f2e4-4f06-8b2e-117d0f6d3b65/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "error": {
+          "code": "InvalidUri",
+          "message": "The provided container URI is invalid."
+        }
+      },
+      "lastActionDateTime": "2023-03-28T11:33:21Z",
+      "status": "Failed",
+      "createdDateTime": "2023-03-28T11:33:21Z",
+      "locale": "de-DE",
+      "displayName": "test"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/f63781f0-c32a-4cc1-b61a-c83e7f2e865a",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/f63781f0-c32a-4cc1-b61a-c83e7f2e865a/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "error": {
+          "code": "InvalidUri",
+          "message": "The provided container URI is invalid."
+        }
+      },
+      "lastActionDateTime": "2023-03-28T11:38:28Z",
+      "status": "Failed",
+      "createdDateTime": "2023-03-28T11:38:27Z",
+      "locale": "de-DE",
+      "displayName": "test"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/4a1e2d74-78b9-42ab-bfa5-5c7e56c06a2a",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/4a1e2d74-78b9-42ab-bfa5-5c7e56c06a2a/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "error": {
+          "code": "InvalidUri",
+          "message": "The provided container URI is invalid."
+        }
+      },
+      "lastActionDateTime": "2023-03-28T13:12:33Z",
+      "status": "Failed",
+      "createdDateTime": "2023-03-28T13:12:32Z",
+      "locale": "de-DE",
+      "displayName": "test"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/2c08fb73-769d-4a1d-a50b-c7c8c29cf850",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/2c08fb73-769d-4a1d-a50b-c7c8c29cf850/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "error": {
+          "code": "InvalidUri",
+          "message": "The provided container URI is invalid."
+        }
+      },
+      "lastActionDateTime": "2023-03-28T13:19:40Z",
+      "status": "Failed",
+      "createdDateTime": "2023-03-28T13:19:40Z",
+      "locale": "de-DE",
+      "displayName": "test"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/0afec11b-dbf9-4afe-876a-8236871faa8f",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/0afec11b-dbf9-4afe-876a-8236871faa8f/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "error": {
+          "code": "InvalidUri",
+          "message": "The provided container URI is invalid."
+        }
+      },
+      "lastActionDateTime": "2023-03-28T13:32:19Z",
+      "status": "Failed",
+      "createdDateTime": "2023-03-28T13:32:19Z",
+      "locale": "de-DE",
+      "displayName": "test"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/795cb962-7908-49a5-9f22-53782a7b5001",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/795cb962-7908-49a5-9f22-53782a7b5001/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "error": {
+          "code": "InvalidUri",
+          "message": "The provided container URI is invalid."
+        }
+      },
+      "lastActionDateTime": "2023-03-28T13:33:25Z",
+      "status": "Failed",
+      "createdDateTime": "2023-03-28T13:33:25Z",
+      "locale": "de-DE",
+      "displayName": "test"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/b76ad85a-7066-4958-81ab-678f4b50f99b",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/b76ad85a-7066-4958-81ab-678f4b50f99b/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "error": {
+          "code": "InvalidUri",
+          "message": "The provided container URI is invalid."
+        }
+      },
+      "lastActionDateTime": "2023-03-28T13:34:10Z",
+      "status": "Failed",
+      "createdDateTime": "2023-03-28T13:34:10Z",
+      "locale": "de-DE",
+      "displayName": "test"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/931fd69a-67bf-4d70-b641-652119419061",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/931fd69a-67bf-4d70-b641-652119419061/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "duration": "PT1M15S"
+      },
+      "lastActionDateTime": "2023-03-28T13:37:10Z",
+      "status": "Succeeded",
+      "createdDateTime": "2023-03-28T13:36:49Z",
+      "locale": "de-DE",
+      "displayName": "test"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/e57595eb-aeb6-49bc-bfdb-aca45137b7b5",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/e57595eb-aeb6-49bc-bfdb-aca45137b7b5/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "duration": "PT1M15S"
+      },
+      "lastActionDateTime": "2023-03-28T13:38:22Z",
+      "status": "Succeeded",
+      "createdDateTime": "2023-03-28T13:38:09Z",
+      "locale": "de-DE",
+      "displayName": "test"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/c195eeea-5711-44c0-8504-f7afc5497f23",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/c195eeea-5711-44c0-8504-f7afc5497f23/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "error": {
+          "code": "InvalidUri",
+          "message": "The provided container URI is invalid."
+        }
+      },
+      "lastActionDateTime": "2023-03-28T14:52:22Z",
+      "status": "Failed",
+      "createdDateTime": "2023-03-28T14:52:21Z",
+      "locale": "de-DE",
+      "displayName": "test"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/a8a95e39-7389-434b-8ba8-e26289d6f6d9",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/a8a95e39-7389-434b-8ba8-e26289d6f6d9/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "duration": "PT10S"
+      },
+      "lastActionDateTime": "2023-03-28T14:53:58Z",
+      "status": "Succeeded",
+      "createdDateTime": "2023-03-28T14:53:44Z",
+      "locale": "de-DE",
+      "displayName": "test"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/5e165f89-b9f1-454e-ab9c-52ef1fa231fa",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/5e165f89-b9f1-454e-ab9c-52ef1fa231fa/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "duration": "PT1M15S"
+      },
+      "lastActionDateTime": "2023-03-28T14:56:20Z",
+      "status": "Succeeded",
+      "createdDateTime": "2023-03-28T14:56:06Z",
+      "locale": "de-DE",
+      "displayName": "test"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/90ae2ee0-9586-47d8-bce3-057297296697",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/90ae2ee0-9586-47d8-bce3-057297296697/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "error": {
+          "code": "InvalidUri",
+          "message": "The provided container URI is invalid."
+        }
+      },
+      "lastActionDateTime": "2023-03-28T14:57:47Z",
+      "status": "Failed",
+      "createdDateTime": "2023-03-28T14:56:49Z",
+      "locale": "de-DE",
+      "displayName": "test"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/563f667a-48d6-462f-8487-dec7c866f627",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/563f667a-48d6-462f-8487-dec7c866f627/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "duration": "PT1M15S"
+      },
+      "lastActionDateTime": "2023-03-28T15:50:59Z",
+      "status": "Succeeded",
+      "createdDateTime": "2023-03-28T15:50:27Z",
+      "locale": "de-DE",
+      "displayName": "test"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/4aac5f15-912b-4cec-a1dc-da3092753a5b",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/4aac5f15-912b-4cec-a1dc-da3092753a5b/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "error": {
+          "code": "InvalidUri",
+          "message": "The provided container URI is invalid."
+        }
+      },
+      "lastActionDateTime": "2023-03-29T08:52:07Z",
+      "status": "Failed",
+      "createdDateTime": "2023-03-29T08:52:06Z",
+      "locale": "de-DE",
+      "displayName": "test"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/b9778f74-fd3d-4066-8186-299e8e9a6332",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/b9778f74-fd3d-4066-8186-299e8e9a6332/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "error": {
+          "code": "InvalidUri",
+          "message": "The provided container URI is invalid."
+        }
+      },
+      "lastActionDateTime": "2023-03-29T09:11:43Z",
+      "status": "Failed",
+      "createdDateTime": "2023-03-29T09:11:43Z",
+      "locale": "de-DE",
+      "displayName": "test"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/c096cd1d-d4f3-4e78-980c-5095f73f202b",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/c096cd1d-d4f3-4e78-980c-5095f73f202b/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "error": {
+          "code": "InvalidUri",
+          "message": "The provided container URI is invalid."
+        }
+      },
+      "lastActionDateTime": "2023-03-29T09:13:51Z",
+      "status": "Failed",
+      "createdDateTime": "2023-03-29T09:13:51Z",
+      "locale": "de-DE",
+      "displayName": "test"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/faa5e397-00e9-4a31-b8c1-e6e8038f742d",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/faa5e397-00e9-4a31-b8c1-e6e8038f742d/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "error": {
+          "code": "InvalidUri",
+          "message": "The provided container URI is invalid."
+        }
+      },
+      "lastActionDateTime": "2023-03-29T09:15:33Z",
+      "status": "Failed",
+      "createdDateTime": "2023-03-29T09:15:33Z",
+      "locale": "de-DE",
+      "displayName": "test"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/8133ba4b-192f-4d94-a6f2-881a974220c3",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/8133ba4b-192f-4d94-a6f2-881a974220c3/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "duration": "PT1M26S"
+      },
+      "lastActionDateTime": "2023-03-29T09:17:38Z",
+      "status": "Succeeded",
+      "createdDateTime": "2023-03-29T09:17:18Z",
+      "locale": "de-DE",
+      "displayName": "test"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/3f61af3e-aca2-48e5-87ad-7c4984d0f7cb",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/3f61af3e-aca2-48e5-87ad-7c4984d0f7cb/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "duration": "PT1M26S"
+      },
+      "lastActionDateTime": "2023-03-29T09:24:49Z",
+      "status": "Succeeded",
+      "createdDateTime": "2023-03-29T09:24:22Z",
+      "locale": "de-DE",
+      "displayName": "Transcription"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/8a7d7346-4a1d-4023-a782-0a9bfc0c54ea",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/8a7d7346-4a1d-4023-a782-0a9bfc0c54ea/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "duration": "PT10S"
+      },
+      "lastActionDateTime": "2023-03-29T13:12:06Z",
+      "status": "Succeeded",
+      "createdDateTime": "2023-03-29T13:10:59Z",
+      "locale": "de-DE",
+      "displayName": "test"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/1afd29ed-1f67-4514-a7fa-1246e6f53b9e",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/1afd29ed-1f67-4514-a7fa-1246e6f53b9e/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "duration": "PT10S"
+      },
+      "lastActionDateTime": "2023-03-29T13:14:49Z",
+      "status": "Succeeded",
+      "createdDateTime": "2023-03-29T13:14:45Z",
+      "locale": "de-DE",
+      "displayName": "test"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/7688dc84-9f4b-460d-9b1d-3bed19612dad",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/7688dc84-9f4b-460d-9b1d-3bed19612dad/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "duration": "PT10S"
+      },
+      "lastActionDateTime": "2023-03-29T13:37:59Z",
+      "status": "Succeeded",
+      "createdDateTime": "2023-03-29T13:37:53Z",
+      "locale": "de-DE",
+      "displayName": "test"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/7a309275-e9a4-439e-9a95-1326679c898b",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/7a309275-e9a4-439e-9a95-1326679c898b/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "duration": "PT10S"
+      },
+      "lastActionDateTime": "2023-03-29T13:51:40Z",
+      "status": "Succeeded",
+      "createdDateTime": "2023-03-29T13:51:31Z",
+      "locale": "de-DE",
+      "displayName": "test"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/89a48b27-0e81-4dda-801e-6da041f6b838",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/89a48b27-0e81-4dda-801e-6da041f6b838/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "duration": "PT10S"
+      },
+      "lastActionDateTime": "2023-03-29T14:08:03Z",
+      "status": "Succeeded",
+      "createdDateTime": "2023-03-29T14:07:40Z",
+      "locale": "de-DE",
+      "displayName": "test"
+    },
+    {
+      "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/7a74ca47-33fe-4d2e-92c1-39cd10f9d89b",
+      "model": {
+        "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/02dd4b6f-1a4b-4186-a93d-e74c53766e06"
+      },
+      "links": {
+        "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/7a74ca47-33fe-4d2e-92c1-39cd10f9d89b/files"
+      },
+      "properties": {
+        "diarizationEnabled": false,
+        "wordLevelTimestampsEnabled": false,
+        "displayFormWordLevelTimestampsEnabled": false,
+        "channels": [
+          0,
+          1
+        ],
+        "punctuationMode": "DictatedAndAutomatic",
+        "profanityFilterMode": "Masked",
+        "duration": "PT10S"
+      },
+      "lastActionDateTime": "2023-03-30T06:02:19Z",
+      "status": "Succeeded",
+      "createdDateTime": "2023-03-30T06:01:58Z",
+      "locale": "de-DE",
+      "displayName": "test"
+    }
+  ]
+}

@@ -27,6 +27,7 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaRole;
 import org.opencastproject.security.impl.jpa.JpaUserReference;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.userdirectory.api.UserReferenceProvider;
 
 import com.auth0.jwk.JwkException;
@@ -49,11 +50,13 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.util.Assert;
 
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 /**
  * Dynamic login handler for JWTs.
@@ -99,6 +102,9 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
   /** Mapping used to extract the email from the JWT. */
   private String emailMapping = null;
 
+  /** Whether the built-in schema role mapping should be used. */
+  private boolean ocStandardRoleMappings = true;
+
   /** Mapping used to extract roles from the JWT. */
   private List<String> roleMappings = null;
 
@@ -127,7 +133,8 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
     Assert.notNull(usernameMapping, "User name mapping must be set");
     Assert.notNull(nameMapping, "Name mapping must be set");
     Assert.notNull(emailMapping, "Email mapping must be set");
-    Assert.notEmpty(roleMappings, "Role mappings must be set");
+    Assert.isTrue(roleMappings != null || ocStandardRoleMappings,
+            "Role mappings must be set if ocStandardRoleMappings is false");
 
     if (jwksUrl != null) {
       jwkProvider = new GuavaCachedUrlJwkProvider(jwksUrl, jwksCacheExpiresIn, TimeUnit.MINUTES);
@@ -261,10 +268,81 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
   private Set<JpaRole> extractRoles(DecodedJWT jwt) {
     JpaOrganization organization = fromOrganization(securityService.getOrganization());
     Set<JpaRole> roles = new HashSet<>();
-    for (String mapping : roleMappings) {
-      String role = evaluateMapping(jwt, mapping, false);
+    Consumer<String> addRole = (String role) -> {
       if (StringUtils.isNotBlank(role)) {
         roles.add(new JpaRole(role, organization));
+      }
+    };
+
+    // Evaluate the standard role mapping if specified
+    if (ocStandardRoleMappings) {
+      // Read `role` claim
+      try {
+        var rolesClaim = jwt.getClaim("roles");
+        if (rolesClaim != null && !rolesClaim.isNull()) {
+          for (String r : rolesClaim.asArray(String.class)) {
+            addRole.accept(r);
+          }
+        }
+      } catch (JWTDecodeException e) {
+        logger.debug("claim 'roles' is not an array of strings, ignoring");
+      }
+
+      // Read `oc` claim
+      try {
+        var ocClaim = jwt.getClaim("oc");
+        if (ocClaim != null && !ocClaim.isNull()) {
+          for (var entry : ocClaim.asMap().entrySet()) {
+            var key = entry.getKey();
+            var parts = key.split(":", 2);
+            if (parts.length != 2) {
+              logger.debug("key in 'oc' claim does not start with 'x:' -> ignoring");
+              continue;
+            }
+            var type = parts[0];
+            var id = parts[1];
+
+            try {
+              for (var actionObj : (List<?>) entry.getValue()) {
+                var action = (String) actionObj;
+                if (action.isBlank()) {
+                  continue;
+                }
+
+                if (type.equals("e")) {
+                  addRole.accept(SecurityUtil.getEpisodeRoleId(id, action));
+                } else {
+                  logger.debug("in 'oc' claim: granting access to item type '{}' is not yet supported", type);
+                }
+              }
+            } catch (ClassCastException e) {
+              logger.debug("value in 'oc' claim is not a string array -> ignoring");
+              continue;
+            }
+          }
+        }
+      } catch (JWTDecodeException e) {
+        logger.debug("claim 'oc' is not an array of strings, ignoring");
+      }
+    }
+
+    for (String mapping : (roleMappings == null ? new ArrayList<String>() : roleMappings)) {
+      ExpressionParser parser = new SpelExpressionParser();
+      Expression exp = parser.parseExpression(mapping);
+      Object value = exp.getValue(jwt.getClaims());
+      if (value != null) {
+        // We allow the expression to either return a string directly, or a list/array of strings.
+        if (value instanceof String) {
+          addRole.accept((String) value);
+        } else if (value.getClass().isArray()) {
+          for (var role : (Object[]) value) {
+            addRole.accept((String) role);
+          }
+        } else {
+          for (var role : (List<?>) value) {
+            addRole.accept((String) role);
+          }
+        }
       }
     }
     Assert.notEmpty(roles, "No roles could be extracted");
@@ -453,6 +531,10 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
    */
   public void setEmailMapping(String emailMapping) {
     this.emailMapping = emailMapping;
+  }
+
+  public void setOcStandardRoleMappings(boolean ocStandardRoleMappings) {
+    this.ocStandardRoleMappings = ocStandardRoleMappings;
   }
 
   /**

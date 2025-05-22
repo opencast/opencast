@@ -1,6 +1,6 @@
 on:
+  workflow_dispatch:
   push:
-    workflow_dispatch:
     tags:
       - '*.*'
 
@@ -17,7 +17,7 @@ jobs:
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: 11
+          java-version: 17
 
       - name: install dependencies
         run: |
@@ -42,9 +42,9 @@ jobs:
       - name: Get the version
         id: get_version
         run: |
-          echo "::set-output name=VERSION::$GITHUB_REF" | sed 's_refs/tags/\([0-9]*\).\([0-9]*\)$_\1.\2_'
-          echo "::set-output name=VERSION_MAIN::$GITHUB_REF" | sed 's_refs/tags/\([0-9]*\).\([0-9]*\)$_\1_'
-          echo "::set-output name=VERSION_COMBINED::$GITHUB_REF" | sed 's_refs/tags/\([0-9]*\).\([0-9]*\)$_\1\2_'
+          echo "VERSION=$GITHUB_REF"          | sed 's_refs/tags/\([0-9]*\).\([0-9]*\)$_\1.\2_' >> $GITHUB_OUTPUT
+          echo "VERSION_MAIN=$GITHUB_REF"     | sed 's_refs/tags/\([0-9]*\).\([0-9]*\)$_\1_' >> $GITHUB_OUTPUT
+          echo "VERSION_COMBINED=$GITHUB_REF" | sed 's_refs/tags/\([0-9]*\).\([0-9]*\)$_\1\2_' >> $GITHUB_OUTPUT
 
       - name: create new release
         uses: softprops/action-gh-release@v2

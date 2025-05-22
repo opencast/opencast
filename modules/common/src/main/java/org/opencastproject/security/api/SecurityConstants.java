@@ -62,4 +62,7 @@ public interface SecurityConstants {
   /** The administrator user configuration option */
   String GLOBAL_ADMIN_USER_PROPERTY = "org.opencastproject.security.admin.user";
 
+  /** The prefix for episode role ids */
+  String EPISODE_ROLE_ID_PREFIX = "ROLE_EPISODE";
+
 }

@@ -7,14 +7,41 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>17-SNAPSHOT</version>
+    <version>18-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
   </properties>
-
+  <dependencies>
+    <dependency>
+      <groupId>jakarta.ws.rs</groupId>
+      <artifactId>jakarta.ws.rs-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.component.annotations</artifactId>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.jaxrs</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>io.swagger.core.v3</groupId>
+      <artifactId>swagger-annotations</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.glassfish.jersey.core</groupId>
+      <artifactId>jersey-server</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
   <profiles>
     <profile>
       <id>frontend-no-prebuilt</id>
@@ -140,13 +167,19 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <ignoredUnusedDeclaredDependencies>
+            <ignoredUnusedDeclaredDependency>org.glassfish.jersey.core:jersey-server</ignoredUnusedDeclaredDependency>
+          </ignoredUnusedDeclaredDependencies>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
         <executions>
           <execution>
-            <id>copy-libs</id>
+            <id>copy-rest-doc-libs</id>
             <phase>compile</phase>
             <goals>
               <goal>copy-resources</goal>
@@ -155,29 +188,9 @@
               <outputDirectory>${basedir}/target/classes/ui/scripts/</outputDirectory>
               <resources>
                 <resource>
-                  <directory>node_modules/</directory>
+                  <directory>node_modules/jquery/dist/</directory>
                   <includes>
-                    <include>angular/angular.min.js</include>
-                    <include>angular-route/angular-route.min.js</include>
-                  </includes>
-                  <filtering>false</filtering>
-                </resource>
-              </resources>
-            </configuration>
-          </execution>
-          <execution>
-            <id>copy-rest-doc-libs</id>
-            <phase>compile</phase>
-            <goals>
-              <goal>copy-resources</goal>
-            </goals>
-            <configuration>
-              <outputDirectory>${basedir}/target/classes/ui/js/</outputDirectory>
-              <resources>
-                <resource>
-                  <directory>node_modules/</directory>
-                  <includes>
-                    <include>jquery/dist/jquery.min.js</include>
+                    <include>jquery.min.js</include>
                   </includes>
                   <filtering>false</filtering>
                 </resource>
@@ -195,9 +208,9 @@
             <Private-Package>
               ui.*
             </Private-Package>
-            <Http-Alias>/</Http-Alias>
+            <!--Http-Alias>/</Http-Alias>
             <Http-Classpath>/ui</Http-Classpath>
-            <Http-Welcome>index.html</Http-Welcome>
+            <Http-Welcome>index.html</Http-Welcome-->
           </instructions>
         </configuration>
       </plugin>

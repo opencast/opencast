@@ -1,57 +1,89 @@
-# Opencast 16: Release Notes
+# Opencast 17: Release Notes
 
-## Opencast 16.1
+## Opencast 17.3
 
-This is an important bugfix release fixing a problem preventing the presentation node from properly starting up and
-therefor breaking cluster installations. Additional, it fixes a problem with Tobira harvesting new events. Don't try to
-use 16.0 use this release!
+This release contains a few bug fixes, among them performance improvements for the metrics endpoint
+([#6627](https://github.com/opencast/opencast/pull/6627)). It's now also possible to trigger an index update for
+the archived information of an event ([#6575](https://github.com/opencast/opencast/pull/6575)).
 
-It also comes with a lot more bug fixes. Especially the new admin interface got a lot of work.
+Additionally, this contains new versions of both the Admin Interface
+([2025-04-17](https://github.com/opencast/opencast-admin-interface/releases/tag/2025-04-17)) and Studio
+([2025-04-02](https://github.com/elan-ev/opencast-studio/releases/tag/2025-04-02)).
 
-## Opencast 16.0
+## Opencast 17.2
 
-### Features, Improvements and Behavior changes
+This is a maintenance release of Opencast 17.
+It fixes a few minor bugs.
 
-- Replaced Solr Search with OpenSearch/Elasticsearch. [[#5597](https://github.com/opencast/opencast/pull/5597)]
-- Removed Paella 6 with OC 16. [[#5605](https://github.com/opencast/opencast/pull/5605)]
-- Added Playlists. Playlists are a list of videos, similar to the same concept in YouTube. This provides an n:m mapping,
-  meaning that every playlist can contain multiple videos, and each video can be included in multiple playlists. (As
-  opposed to the 1:n mapping of Opencast series, where each video is part of at most one series.)
-  [[#5478](https://github.com/opencast/opencast/pull/5478)]
-- Added Playlists to Tobira Harvest API. [[#5734](https://github.com/opencast/opencast/pull/5734)]
-- Whisper is the new default STT engine [[#5473](https://github.com/opencast/opencast/pull/5473)]
-- Implemented the ability to define multiple custom roles and custom roles that need to be added
-  [[#5312](https://github.com/opencast/opencast/pull/5312)]
-- The default encoding profiles changed to be less restrictive about GOP size, giving the codec more opportunity to
-  compress better.[[#5545](https://github.com/opencast/opencast/pull/5545)]
-- Added the possibility to enable 360°videos with paella player 7.
-  [[#5592](https://github.com/opencast/opencast/pull/5592)]
-- Turned old admin interface into a plugin. This patch disables the old admin interface by default. Users can still
-  activate this if they really want/need the old interface. [[#5811](https://github.com/opencast/opencast/pull/5811)]
+## Opencast 17.1
 
-For more details, please take a look at the [full changelog](changelog.md).
+This release contains a couple of bug fixes. It also includes new versions for the editor
+([2025-01-08](https://github.com/opencast/opencast-editor/releases/tag/2025-01-08)) and the admin interface
+([2025-01-21](https://github.com/opencast/opencast-admin-interface/releases/tag/2025-01-21)). See the respective release
+notes for more details.
 
-## Update
+One can now also remove subtitles from within the editor [[#6361](https://github.com/opencast/opencast/pull/6361)] and
+configure asset upload options in more detail [[#6362](https://github.com/opencast/opencast/pull/6362)].
 
-If you want to update Opencast from a previous version, please carefully read through the [upgrade guide](upgrade.md).
-For this upgrade, you should be particular aware of the following facts:
+## Opencast 17.0
 
-- Solr has been removed from Opencast which means that the presentation node now needs to have access to OpenSearch or
-  Elasticsearch.
-- The search REST API for publications has slightly changed. This may impact integrations.
-- Thew new admin interface is the default and the old one is disabled by default and only available via plugin.
-- The feed generator has been removed from Opencast.
-- Paella Player 6 has been removed from Opencast.
+### Features
+- New roles were added with which a user can get access to an event without having to be added to the ACLs. For more
+  details see the relevant [documentation](configuration/episode-id-roles.md).
+  [[#5056](https://github.com/opencast/opencast/pull/5056)]
+- You can now generate captions with Whisper asynchronously. [[#6247](https://github.com/opencast/opencast/pull/6247)]
+- The Whisper.cpp integration now automatically re-encodes audio to a suitable format. It's
+  no longer necessary to include a separate encode operation for this in the workflow.
+  [[#6248](https://github.com/opencast/opencast/pull/6248)]
+- You can now provide terms of use to be presented to new users in the Admin UI. For configuration see
+  [the respective docs](../configuration/admin-ui/terms.md). [[#6010](https://github.com/opencast/opencast/pull/6010)]
+- There is a new UI for the documentation of our REST endpoints but since it currently has some issues, it's not turned
+  on by default. You can however already try it out. [[#5668](https://github.com/opencast/opencast/pull/5668)]
+- There is a new GraphQL API as an alternative to the existing REST API. Please be aware that this is not yet production
+  ready and may change without further notice. [[#5766](https://github.com/opencast/opencast/pull/5766)]
+- There is a new filter available in the Admin interface to show only events that are published or not published.
+  [[#6023](https://github.com/opencast/opencast/pull/6023)]
+- The integration of Tobira in the Admin interface was improved.
+  [[#6091](https://github.com/opencast/opencast/pull/6091)]
+- Paella Player 7 now also shows a preview image in portrait mode.
+  [[#6052](https://github.com/opencast/opencast/pull/6052)]
+
+### Breaking Changes
+- **The old Admin UI was removed completely and is no longer available.**
+[[#5965](https://github.com/opencast/opencast/pull/5965)]
+- We changed the sorting of events and series in the new Admin interface to something more intuitive. This **requires the
+  installation of the OpenSearch/Elasticsearch plugin** `analysis-icu`. Check the [upgrade guide](upgrade.md) for more
+  details. [[#5413](https://github.com/opencast/opencast/pull/5413)]
+- The required Java version is now 17. [[#5763](https://github.com/opencast/opencast/pull/5763)]
+- The Microsoft Azure transcription integration was completely rewritten. Gstreamer is no longer needed as a dependency.
+  Please consult the updated [documentation](configuration/transcription.configuration/microsoftazure.md) to find out
+  how to change your configuration and workflows so they are compatible again.
+  [[#5876](https://github.com/opencast/opencast/pull/5876)]
+- ACL templates in `etc/acl/` must be provided in JSON format from now on. XACML files are no longer accepted.
+  [[#6018](https://github.com/opencast/opencast/pull/6018)]
+
+### Configuration Changes
+- We no longer use the prepared flavor in our workflows and the Editor configuration as it was no longer serving any
+  purpose and made updating subtitles from the Editor difficult. Instead, we now always use the source flavor.
+  [[#5862](https://github.com/opencast/opencast/pull/5862)]
+- Since we removed feeds in OC 16, we no longer generate feed previews in our workflows.
+  [[#6087](https://github.com/opencast/opencast/pull/6087)]
+- Waveform peaks are now more visible, but that behavior is configurable.
+  [[#6028](https://github.com/opencast/opencast/pull/6028)]
+
+For more details, please take a look at the [full changelog](changelog.md). If you want to update Opencast from a
+previous version, you should also read the [upgrade guide](upgrade.md).
+
 
 ## Release Schedule
 
-| Date              | Phase                    |
-|-------------------|--------------------------|
-| May 06, 2024      | Release Branch Cut       |
-| June 12, 2024     | Release of Opencast 16.0 |
+| Date             | Phase                    |
+|------------------|--------------------------|
+| November 6, 2024 | Release Branch Cut       |
+| December 4, 2024 | Release of Opencast 17.0 |
 
 
 ## Release Managers
 
-- Lars Kiesow (Osnabrück University)
-- Michael Schwenk (University of Bremen)
+- Katrin Ihler (elan e.V.)
+- Veronika Schröer (University of Konstanz)

@@ -134,7 +134,7 @@ interface which is supposed to be protected by Shibboleth.
 
     <!-- Redirects unauthenticated requests to the login form -->
     <bean id="userEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
-      <property name="loginFormUrl" value="/admin-ng/index.html" />
+      <property name="loginFormUrl" value="/admin-ui/index.html" />
     </bean>
 
 Last but not least, you need to add the *preauthAuthProvider* authentication provider to the *authentication-manager*:
@@ -160,6 +160,19 @@ To protect HTML pages, you will need to adapt the configuration of your web serv
         ShibUseHeaders On
         require valid-user
     </LocationMatch>
+
+Step 4: Configuring engage-UI
+-------------------------------------------
+
+By default the engage-UI uses a standard login form. To make use of an AAI login we need to redirect the loginbutton to the AAI login URL:
+
+`etc/ui-config/mh_default_org/engage-ui/config.yml`:
+
+    customLoginURL: /Shibboleth.sso/Login?target=/engage/ui/index.html
+
+The logout works out of the box since the logoutbutton calls `/j_spring_security_logout` which then will redirect to the AAI logout location
+configured earlier in the logoutSuccessHandler.
+
 
 Advanced SSO configuration: The DynamicLoginHandler
 -----------------------------------

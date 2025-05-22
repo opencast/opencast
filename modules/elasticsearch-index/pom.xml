@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>17-SNAPSHOT</version>
+    <version>18-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -29,6 +29,10 @@
       <groupId>org.osgi</groupId>
       <artifactId>osgi.core</artifactId>
       <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.service.jaxrs</artifactId>
     </dependency>
     <!-- Logging -->
     <dependency>
@@ -69,6 +73,12 @@
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-dublincore</artifactId>
+      <version>${project.version}</version>
+      <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-list-providers-service</artifactId>
       <version>${project.version}</version>
       <scope>compile</scope>
     </dependency>

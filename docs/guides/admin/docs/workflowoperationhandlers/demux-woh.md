@@ -16,7 +16,7 @@ Parameter Table
 |Configuration Key |Example                      |Description                            |
 |------------------|-----------------------------|---------------------------------------|
 |source-flavors    |`multitrack/source`          |Which media should be encoded          |
-|target-tags       |`archive,rss;rss`            |Specifies the tags of the new media    |
+|target-tags       |`archive,exp;exp`            |Specifies the tags of the new media    |
 |target-flavors    |`presenter/*,presentation/*` |Specifies the flavors of the new media |
 |encoding-profile  |`demux`                      |Specifies the encoding profile         |
 

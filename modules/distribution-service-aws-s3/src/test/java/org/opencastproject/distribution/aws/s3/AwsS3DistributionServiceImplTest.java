@@ -108,7 +108,7 @@ public class AwsS3DistributionServiceImplTest {
 
     service = new AwsS3DistributionServiceImpl();
     service.setServiceRegistry(serviceRegistry);
-    service.setBucketName(BUCKET_NAME);
+    service.setBucketName(defaultOrganization.getId(), BUCKET_NAME);
     service.setOpencastDistributionUrl(DOWNLOAD_URL);
     service.setS3(s3);
     service.setS3TransferManager(tm);

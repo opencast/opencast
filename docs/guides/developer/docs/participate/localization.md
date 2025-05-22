@@ -143,11 +143,6 @@ To show a list of files in the current project, use the following command:
 Note: Do not upload translations to Crowdin. Our current subscription plan will exceeded otherwise.
 
 
-### To consider when adding a translation
-
-* Add a SVG with the flag under modules/admin-ui-frontend/app/img/lang/
-
-
 Further Information
 -------------------
 

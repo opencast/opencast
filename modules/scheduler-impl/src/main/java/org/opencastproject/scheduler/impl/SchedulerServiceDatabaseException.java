@@ -22,7 +22,7 @@
 package org.opencastproject.scheduler.impl;
 
 /**
- * General exception representing failure in indexing or storing events, either to persistent storage or Solr index.
+ * General exception representing failure in indexing or storing events, either to persistent storage or index.
  *
  */
 public class SchedulerServiceDatabaseException extends Exception {

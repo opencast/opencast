@@ -1,1 +1,0 @@
-Due to a semi-backwards compatible change in the Tobira harvest API, Tobira before version v2.6 won't work with Opencast 16. In order to use OC16 with Tobira, you have to have at least Tobira v2.6. If you are not using Tobira, you can ignore this.

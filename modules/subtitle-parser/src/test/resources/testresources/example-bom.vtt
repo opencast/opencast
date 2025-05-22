@@ -1,0 +1,30 @@
+﻿WEBVTT There can be additional characters here
+kind: the best kind
+
+REGION
+There could be some region text here
+
+STYLE
+::cue(b) {
+  color: peachpuff;
+}
+
+REGION
+There could be some region text here
+So much region text
+
+x-o7MdlMG-qDMsG6oWbDm
+00:00.000 --> 00:05.000 vertical:undefined align:undefined size:undefined% line:undefined% position:undefined%
+Test Cue 1
+
+00:05.000 --> 00:06.000 vertical:undefined align:undefined size:undefined% line:undefined% position:undefined%
+Test Cue 2
+
+NOTE comment blocks can be used everywhere
+
+00:11.123 --> 00:14.456
+- Never drink liquid nitrogen.
+
+00:15.500 --> 00:19.500
+- It will perforate your stomach.
+- You could die.

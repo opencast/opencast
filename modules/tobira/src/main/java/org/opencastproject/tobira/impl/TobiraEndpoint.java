@@ -28,6 +28,7 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.playlists.PlaylistService;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.AuthorizationService;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.Jsons;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -40,6 +41,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -55,7 +57,7 @@ import javax.ws.rs.core.Response;
 /**
  * Tobira API Endpoint
  */
-@Path("")
+@Path("/tobira")
 @RestService(
     name = "TobiraApiEndpoint",
     title = "Tobira API Endpoint",
@@ -77,6 +79,7 @@ import javax.ws.rs.core.Response;
     immediate = true,
     service = TobiraEndpoint.class
 )
+@JaxrsResource
 public class TobiraEndpoint {
   private static final Logger logger = LoggerFactory.getLogger(TobiraEndpoint.class);
 
@@ -102,6 +105,7 @@ public class TobiraEndpoint {
   private SearchService searchService;
   private SeriesService seriesService;
   private AuthorizationService authorizationService;
+  private SecurityService securityService;
   private PlaylistService playlistService;
   private Workspace workspace;
 
@@ -123,6 +127,11 @@ public class TobiraEndpoint {
   @Reference
   public void setAuthorizationService(AuthorizationService service) {
     this.authorizationService = service;
+  }
+
+  @Reference
+  public void setSecurityService(SecurityService service) {
+    this.securityService = service;
   }
 
   @Reference
@@ -206,7 +215,7 @@ public class TobiraEndpoint {
       var json = Harvest.harvest(
           preferredAmount,
           new Date(since),
-          searchService, seriesService, authorizationService, playlistService, workspace);
+          searchService, seriesService, authorizationService, securityService, playlistService, workspace);
 
       // TODO: encoding
       return Response.ok(json.toJson()).build();

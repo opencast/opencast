@@ -1,0 +1,26 @@
+{
+  "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/2b58923c-d0d5-4e77-9f9a-74bf80f173df",
+  "model": {
+    "self": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/models/base/ea10b647-5102-41db-966a-d3a872b1145c"
+  },
+  "links": {
+    "files": "https://videountertitelung-cognitive-service.cognitiveservices.azure.com/speechtotext/v3.1/transcriptions/2b58923c-d0d5-4e77-9f9a-74bf80f173df/files"
+  },
+  "properties": {
+    "diarizationEnabled": false,
+    "wordLevelTimestampsEnabled": false,
+    "displayFormWordLevelTimestampsEnabled": false,
+    "channels": [
+      0,
+      1
+    ],
+    "punctuationMode": "DictatedAndAutomatic",
+    "profanityFilterMode": "Masked",
+    "duration": "PT1M4S"
+  },
+  "lastActionDateTime": "2022-06-02T07:03:56Z",
+  "status": "Succeeded",
+  "createdDateTime": "2022-06-02T07:03:32Z",
+  "locale": "en-US",
+  "displayName": "Transcription using default model for en-US"
+}

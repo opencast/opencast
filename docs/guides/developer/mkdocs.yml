@@ -4,6 +4,7 @@ edit_uri: edit/develop/docs/guides/developer/docs/
 
 plugins:
   - search:
+  - macros:
   - mermaid2:
       arguments:
         theme: 'neutral'
@@ -35,6 +36,7 @@ nav:
 - Home: 'index.md'
 - Participate:
    - Development process: 'participate/development-process.md'
+   - Security Issues: 'participate/security-issues.md'
    - Committers: 'participate/committer.md'
    - Release manager: 'participate/release-manager.md'
    - QA coordinator: 'participate/qa-coordinator.md'
@@ -63,25 +65,9 @@ nav:
       - Explore H2 database: 'develop/devops/explore-h2-database.md'
    - Code style: 'develop/code-style.md'
    - Debugging: 'develop/debugging.md'
-   - Frontend development:
-      - Overview: 'develop/frontends/overview.md'
-      - Admin UI:
-         - Overview: 'develop/frontends/admin-ui/development.md'
-         - Style:
-            - Alerts indicators: 'develop/frontends/admin-ui/style/alerts-indicators.md'
-            - Buttons: 'develop/frontends/admin-ui/style/buttons.md'
-            - Color-palette: 'develop/frontends/admin-ui/style/color-palette.md'
-            - dropdowns: 'develop/frontends/admin-ui/style/dropdowns.md'
-            - Forms: 'develop/frontends/admin-ui/style/forms.md'
-            - Icons: 'develop/frontends/admin-ui/style/icons.md'
-            - Index: 'develop/frontends/admin-ui/style/index.md'
-            - Modals: 'develop/frontends/admin-ui/style/modals.md'
-            - Navigation: 'develop/frontends/admin-ui/style/navigation.md'
-            - References: 'develop/frontends/admin-ui/style/references.md'
-            - Spacing: 'develop/frontends/admin-ui/style/spacing.md'
-            - Typeface: 'develop/frontends/admin-ui/style/typeface.md'
-            - View Structure: 'develop/frontends/admin-ui/style/view-structure.md'
+   - Frontends: 'develop/frontends.md'
    - Documentation: 'develop/documentation.md'
+   - Integrating with Opencast: 'develop/integration.md'
 - Opencast architecture:
    - Overview: 'architecture/overview.md'
    - Admin-UI: 'architecture/admin-ui.md'
@@ -107,6 +93,8 @@ nav:
       - Workflow API: 'architecture/api/workflow-api.md'
       - Data Types: 'architecture/api/types.md'
       - Glossary: 'architecture/api/glossary.md'
+   - GraphQL API:
+      - Introduction: 'architecture/graphql/index.md'
    - Filesystem: 'architecture/filesystem.md'
    - Job dispatch: 'architecture/job-dispatch.md'
    - OAI-PMH: 'architecture/oaipmh.md'

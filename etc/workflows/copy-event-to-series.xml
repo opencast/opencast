@@ -3,10 +3,6 @@
 
   <id>copy-event-to-series</id>
   <title>Copy event to a different series</title>
-  <tags />
-  <description/>
-  <configuration_panel />
-  <configuration_panel_json/>
   <displayOrder>10</displayOrder>
 
   <operations>

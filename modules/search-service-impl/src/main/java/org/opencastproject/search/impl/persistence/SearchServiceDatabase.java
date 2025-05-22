@@ -164,9 +164,11 @@ public interface SearchServiceDatabase {
    *           if exception occurs
    * @throws NotFoundException
    *           if media package with specified id is not found
+   * @throws UnauthorizedException
+   *           if the current user is not authorized to perform this action
    */
   void deleteMediaPackage(String mediaPackageId, Date deletionDate) throws SearchServiceDatabaseException,
-          NotFoundException;
+          NotFoundException, UnauthorizedException;
 
   /**
    * Store (or update) media package.
@@ -185,4 +187,12 @@ public interface SearchServiceDatabase {
   void storeMediaPackage(MediaPackage mediaPackage, AccessControlList acl, Date now)
           throws SearchServiceDatabaseException, UnauthorizedException;
 
+  /**
+   * Checks if a mediapackage is available.
+   *
+   * @param mediaPackageId The ID of the {@link MediaPackage} for which the availability is to be checked
+   * @return True if two conditions are met: The mediapackage exists in the database and the deletion date is not set
+   * @throws SearchServiceDatabaseException if an exception occurs
+   */
+  boolean isAvailable(String mediaPackageId) throws SearchServiceDatabaseException;
 }

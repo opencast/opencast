@@ -34,13 +34,14 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.Path;
 
 /** REST endpoint for ACL manager. */
-@Path("/")
+@Path("/acl-manager")
 @RestService(
     name = "aclmanager",
     title = "ACL Manager",
@@ -56,6 +57,7 @@ import javax.ws.rs.Path;
         "opencast.service.path=/acl-manager"
     }
 )
+@JaxrsResource
 public final class OsgiAclServiceRestEndpoint extends AbstractAclServiceRestEndpoint {
   /** Logging utility */
   private static final Logger logger = LoggerFactory.getLogger(OsgiAclServiceRestEndpoint.class);

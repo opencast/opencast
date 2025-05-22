@@ -41,6 +41,7 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,7 +66,7 @@ import javax.ws.rs.core.Response.Status;
 /**
  * The REST endpoint for the annotation service.
  */
-@Path("/")
+@Path("/annotation")
 @RestService(name = "annotation", title = "Annotation Service",
     abstractText = "This service is used for managing user generated annotations.",
     notes = {
@@ -87,6 +88,7 @@ import javax.ws.rs.core.Response.Status;
         "opencast.service.path=/annotation"
     }
 )
+@JaxrsResource
 public class AnnotationRestService {
 
   /** The logger */

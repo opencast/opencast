@@ -44,8 +44,6 @@ public interface StaticMetadata {
 
   Option<String> getId();
 
-  Option<Date> getCreated();
-
   Option<Long> getExtent();
 
   Option<String> getLanguage();

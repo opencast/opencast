@@ -60,4 +60,6 @@ public interface OpencastConstants {
 
   /** The property key for the environment defined in the custom.properties */
   String ENVIRONMENT_NAME_PROPERTY = "org.opencastproject.environment.name";
+
+  String EPISODE_ID_ROLE_ACCESS_PROPERTY = "org.opencastproject.episode.id.role.access";
 }

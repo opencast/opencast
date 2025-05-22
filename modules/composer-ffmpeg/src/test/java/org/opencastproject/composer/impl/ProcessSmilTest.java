@@ -1078,7 +1078,7 @@ public class ProcessSmilTest {
 
   /**
    * Test method for
-   * {@link org.opencastproject.composer.impl.ComposerServiceImpl#processSmil(org.opencastproject.smil.entity.api.Smil, String[])}
+   * {@link org.opencastproject.composer.impl.ComposerServiceImpl#processSmil(Smil, String, String, List)}
    */
   @Test
   public void testProcessSmilJob() throws Exception {

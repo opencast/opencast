@@ -54,6 +54,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
+import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -99,7 +100,7 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider, C
   protected Object nullToken = new Object();
 
   /** The URL of the Studip instance */
-  private String studipUrl = null;
+  private URI studipUrl;
 
   /** The URL of the Studip instance */
   private String studipToken = null;
@@ -123,7 +124,7 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider, C
   public StudipUserProviderInstance(
       String pid,
       Organization organization,
-      String url,
+      URI url,
       String token,
 
       int cacheSize,
@@ -170,7 +171,7 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider, C
       try {
         mbs.unregisterMBean(name);
       } catch (InstanceNotFoundException e) {
-        logger.debug("{} was not registered", name);
+        logger.debug("{} was not registered before", name);
       }
       mbs.registerMBean(mbean, name);
     } catch (Exception e) {
@@ -197,7 +198,7 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider, C
    */
   @Override
   public User loadUser(String userName) {
-    logger.debug("loaduser(" + userName + ")");
+    logger.debug("loaduser({})", userName);
 
     requests.incrementAndGet();
     try {
@@ -206,20 +207,17 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider, C
         logger.debug("Returning null user from cache");
         return null;
       } else {
-        logger.debug("Returning user " + userName + " from cache");
+        logger.debug("Returning user {} from cache", userName);
         return (JaxbUser) user;
       }
-    } catch (ExecutionError e) {
-      logger.warn("Exception while loading user {}", userName, e);
-      return null;
-    } catch (UncheckedExecutionException e) {
+    } catch (ExecutionError | UncheckedExecutionException e) {
       logger.warn("Exception while loading user {}", userName, e);
       return null;
     }
   }
 
   /**
-   * Loads a user from Studip.
+   * Loads a user from Stud.IP.
    * 
    * @param userName
    *          the username
@@ -227,13 +225,13 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider, C
    */
   protected User loadUserFromStudip(String userName) {
     if (cache == null) {
-      throw new IllegalStateException("The Studip user detail service has not yet been configured");
+      throw new IllegalStateException("The Stud.IP user detail service has not yet been configured");
     }
 
     // Don't answer for admin, anonymous or empty user
     if ("admin".equals(userName) || "".equals(userName) || "anonymous".equals(userName)) {
       cache.put(userName, nullToken);
-      logger.debug("we don't answer for: " + userName);
+      logger.debug("we don't answer for {}", userName);
       return null;
     }
 
@@ -263,7 +261,7 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider, C
 
       // Group role for all Stud.IP users
       roles.add(new JaxbRole(STUDIP_GROUP, jaxbOrganization, "Studip Users", Role.Type.EXTERNAL_GROUP));
-      logger.debug("Returning JaxbRoles: " + roles);
+      logger.debug("Returning JaxbRoles: {}", roles);
 
       // Email address
       var email = Objects.toString(userJsonObj.get("email"), null);
@@ -298,11 +296,14 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider, C
    */
   private JSONObject getStudipUser(String uid) throws URISyntaxException, IOException, ParseException {
     // Build URL
-    URIBuilder url = new URIBuilder(studipUrl + "opencast/user/" + uid);
-    url.addParameter("token", studipToken);
+    var apiPath = new URIBuilder().setPathSegments("opencast", "user", uid).getPath();
+    var url = new URIBuilder(studipUrl)
+        .setPath(studipUrl.getPath().replaceAll("/*$", "") + apiPath)
+        .addParameter("token", studipToken)
+        .build();
 
     // Execute request
-    HttpGet get = new HttpGet(url.build());
+    HttpGet get = new HttpGet(url);
     get.setHeader("User-Agent", OC_USERAGENT);
 
     try (CloseableHttpClient client = HttpClients.createDefault()) {
@@ -397,26 +398,26 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider, C
 
     // Don't answer for admin, anonymous or empty user
     if ("admin".equals(userName) || "".equals(userName) || "anonymous".equals(userName)) {
-      logger.debug("we don't answer for: " + userName);
+      logger.debug("we don't answer for {}", userName);
       return roles;
     }
 
-    logger.debug("getRolesForUser(" + userName + ")");
+    logger.debug("getRolesForUser({})", userName);
 
     User user = loadUser(userName);
     if (user != null) {
-      logger.debug("Returning cached roleset for {}", userName);
+      logger.debug("Returning cached role set for {}", userName);
       return new ArrayList<Role>(user.getRoles());
     }
 
     // Not found
-    logger.debug("Return empty roleset for {} - not found on Studip", userName);
-    return new LinkedList<Role>();
+    logger.debug("Return empty role set for {} - not found on Stud.IP", userName);
+    return new LinkedList<>();
   }
 
   @Override
   public Iterator<Role> findRoles(String query, Role.Target target, int offset, int limit) {
-    logger.debug("findRoles(query=" + query + " offset=" + offset + " limit=" + limit + ")");
+    logger.debug("findRoles(query={} offset={} limit={})", query, offset, limit);
 
     // Don't return roles for users or groups
     if (target == Role.Target.USER) {
@@ -432,7 +433,7 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider, C
     }
 
     // Roles list
-    List<Role> roles = new LinkedList<Role>();
+    List<Role> roles = new LinkedList<>();
 
     return roles.iterator();
   }

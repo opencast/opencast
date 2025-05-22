@@ -1,0 +1,2 @@
+- Opencast now supports distributed plugins
+- The crop service is now a plugin and disabled by default

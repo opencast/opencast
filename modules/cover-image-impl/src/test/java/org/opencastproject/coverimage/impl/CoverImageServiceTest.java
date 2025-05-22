@@ -41,7 +41,6 @@ import java.io.Writer;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.transform.Result;
-import javax.xml.transform.Source;
 import javax.xml.transform.stream.StreamResult;
 
 /**
@@ -94,7 +93,7 @@ public class CoverImageServiceTest {
   }
 
   /**
-   * Tests {@link AbstractCoverImageService#transformSvg(Result, Source, Document, int, int, String)}
+   * Tests {@link AbstractCoverImageService#transformSvg(Result, InputSource, Document, int, int, String)}
    */
   @Test(expected = IllegalArgumentException.class)
   public void testTransformSvgNullSvg() throws Exception {
@@ -104,7 +103,7 @@ public class CoverImageServiceTest {
 
 
   /**
-   * Tests {@link AbstractCoverImageService#transformSvg(Result, Source, Document, int, int, String)}
+   * Tests {@link AbstractCoverImageService#transformSvg(Result, InputSource, Document, int, int, String)} 
    */
   @Test(expected = IllegalArgumentException.class)
   public void testTransformSvgNullXmlSource() throws Exception {
@@ -113,7 +112,7 @@ public class CoverImageServiceTest {
   }
 
   /**
-   * Tests {@link AbstractCoverImageService#transformSvg(Result, Source, Document, int, int, String)}
+   * Tests {@link AbstractCoverImageService#transformSvg(Result, InputSource, Document, int, int, String)} 
    */
   @Test(expected = IllegalArgumentException.class)
   public void testTransformSvgNullXslDoc() throws Exception {
@@ -121,7 +120,7 @@ public class CoverImageServiceTest {
   }
 
   /**
-   * Tests {@link AbstractCoverImageService#transformSvg(Result, Source, Document, int, int, String)}
+   * Tests {@link AbstractCoverImageService#transformSvg(Result, InputSource, Document, int, int, String)} 
    */
   @Test
   public void testTransformSvg() throws Exception {

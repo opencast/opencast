@@ -1,0 +1,6 @@
+ curl -X PUT --data "@update_series_mapping.json" -H 'Content-Type: application/json' 'http://localhost:9200/opencast_series/_mapping'
+ curl -X POST -H 'Content-Type: application/json' 'http://localhost:9200/opencast_series/_update_by_query?refresh&conflicts=proceed'
+ curl -X PUT --data "@update_event_mapping.json" -H 'Content-Type: application/json' 'http://localhost:9200/opencast_event/_mapping'
+ curl -X POST -H 'Content-Type: application/json' 'http://localhost:9200/opencast_event/_update_by_query?refresh&conflicts=proceed'
+ curl -X PUT --data "@update_theme_mapping.json" -H 'Content-Type: application/json' 'http://localhost:9200/opencast_theme/_mapping'
+ curl -X POST -H 'Content-Type: application/json' 'http://localhost:9200/opencast_theme/_update_by_query?refresh&conflicts=proceed'

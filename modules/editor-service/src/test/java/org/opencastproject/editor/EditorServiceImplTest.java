@@ -234,7 +234,7 @@ public class EditorServiceImplTest {
     assertTrue(segments.contains(new SegmentData(15963L, 20132L)));
   }
 
-  /** Test method for {@link EditorServiceImpl#mergeSegments(List, List))} */
+  /** Test method for {@link EditorServiceImpl#mergeSegments(List, List)} */
   @Test
   public void testMergeSegments() throws Exception {
     List<SegmentData> segments = new ArrayList<>();

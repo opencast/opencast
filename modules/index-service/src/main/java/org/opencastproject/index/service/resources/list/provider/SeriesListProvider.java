@@ -55,7 +55,6 @@ import java.util.List;
 import java.util.Map;
 
 @Component(
-    immediate = true,
     service = ResourceListProvider.class,
     property = {
         "service.description=Series list provider",
@@ -75,8 +74,9 @@ public class SeriesListProvider implements ResourceListProvider {
   public static final String LANGUAGE = PROVIDER_PREFIX + ".LANGUAGE";
   public static final String ORGANIZERS = PROVIDER_PREFIX + ".ORGANIZERS";
   public static final String LICENSE = PROVIDER_PREFIX + ".LICENSE";
+  public static final String SERIES_WRITE_ONLY = PROVIDER_PREFIX + ".WRITE_ONLY";
 
-  private static final String[] NAMES = { PROVIDER_PREFIX, CONTRIBUTORS, ORGANIZERS, TITLE_EXTENDED };
+  private static final String[] NAMES = { PROVIDER_PREFIX, CONTRIBUTORS, ORGANIZERS, TITLE_EXTENDED, SERIES_WRITE_ONLY };
 
   /** The search index. */
   private ElasticsearchIndex searchIndex;
@@ -131,6 +131,9 @@ public class SeriesListProvider implements ResourceListProvider {
         seriesQuery.sortByTitle(SortCriterion.Order.Ascending);
         seriesQuery.sortByCreatedDateTime(SortCriterion.Order.Descending);
         seriesQuery.sortByOrganizers(SortCriterion.Order.Ascending);
+        if (SERIES_WRITE_ONLY.equals(listName)) {
+          seriesQuery.withAction(Permissions.Action.WRITE);
+        }
         SearchResult<Series> searchResult = searchIndex.getByQuery(seriesQuery);
         Calendar calendar = Calendar.getInstance();
         for (SearchResultItem<Series> item : searchResult.getItems()) {

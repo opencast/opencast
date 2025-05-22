@@ -55,6 +55,7 @@ import org.apache.commons.io.IOUtils;
 import org.json.simple.parser.ParseException;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
@@ -80,7 +81,7 @@ import javax.xml.bind.JAXBException;
 /**
  * A REST endpoint for the {@link PlaylistService}
  */
-@Path("/")
+@Path("/playlists")
 @RestService(
     name = "playlistservice",
     title = "Playlist Service",
@@ -101,6 +102,7 @@ import javax.xml.bind.JAXBException;
         "opencast.service.path=/playlists"
     }
 )
+@JaxrsResource
 public class PlaylistRestService {
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(PlaylistRestService.class);

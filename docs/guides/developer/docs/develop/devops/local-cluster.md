@@ -23,22 +23,22 @@ ln -s ../../opencast-dist-admin/data/opencast opencast-dist-worker/data/opencast
 Configure different network ports (`8080 -> admin`, `8081 -> presentation`, `8082 -> worker`) for the distributions:
 
 ```sh
-sed -i 's/8080/8081/' opencast-dist-presentation/etc/org.ops4j.pax.web.cfg
-sed -i 's/8080/8081/' opencast-dist-presentation/etc/custom.properties
-sed -i 's/8080/8082/' opencast-dist-worker/etc/org.ops4j.pax.web.cfg
-sed -i 's/8080/8082/' opencast-dist-worker/etc/custom.properties
+perl -p -i -e 's/8080/8081/' opencast-dist-presentation/etc/org.ops4j.pax.web.cfg
+perl -p -i -e 's/8080/8081/' opencast-dist-presentation/etc/custom.properties
+perl -p -i -e 's/8080/8082/' opencast-dist-worker/etc/org.ops4j.pax.web.cfg
+perl -p -i -e 's/8080/8082/' opencast-dist-worker/etc/custom.properties
 
-sed -i 's_#prop.org.opencastproject.engage.ui.url=.*$_prop.org.opencastproject.engage.ui.url=http://localhost:8081_' */etc/org.opencastproject.organization-mh_default_org.cfg
-sed -i 's_#prop.org.opencastproject.admin.ui.url=.*$_prop.org.opencastproject.admin.ui.url=http://localhost:8080_' */etc/org.opencastproject.organization-mh_default_org.cfg
+perl -p -i -e 's_#prop.org.opencastproject.engage.ui.url=.*$_prop.org.opencastproject.engage.ui.url=http://localhost:8081_' */etc/org.opencastproject.organization-mh_default_org.cfg
+perl -p -i -e 's_#prop.org.opencastproject.admin.ui.url=.*$_prop.org.opencastproject.admin.ui.url=http://localhost:8080_' */etc/org.opencastproject.organization-mh_default_org.cfg
 ```
 
 Configure a MariaDB database:
 
 ```sh
-sed -i 's/#org.opencastproject.db.jdbc.driver/org.opencastproject.db.jdbc.driver/' */etc/custom.properties
-sed -i 's/#org.opencastproject.db.jdbc.url/org.opencastproject.db.jdbc.url/' */etc/custom.properties
-sed -i 's/#org.opencastproject.db.jdbc.user/org.opencastproject.db.jdbc.user/' */etc/custom.properties
-sed -i 's/#org.opencastproject.db.jdbc.pass/org.opencastproject.db.jdbc.pass/' */etc/custom.properties
+perl -p -i -e 's/#org.opencastproject.db.jdbc.driver/org.opencastproject.db.jdbc.driver/' */etc/custom.properties
+perl -p -i -e 's/#org.opencastproject.db.jdbc.url/org.opencastproject.db.jdbc.url/' */etc/custom.properties
+perl -p -i -e 's/#org.opencastproject.db.jdbc.user/org.opencastproject.db.jdbc.user/' */etc/custom.properties
+perl -p -i -e 's/#org.opencastproject.db.jdbc.pass/org.opencastproject.db.jdbc.pass/' */etc/custom.properties
 ```
 
 Start Opencast:

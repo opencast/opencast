@@ -61,10 +61,11 @@ public final class JWTVerifier {
     DecodedJWT jwt = JWT.decode(token);
 
     // First try with cache...
-    List<Algorithm> algorithms = provider.getAlgorithms(jwt, false);
+    List<Algorithm> algorithms;
     try {
+      algorithms = provider.getAlgorithms(jwt, false);
       return verify(jwt, claimConstraints, algorithms);
-    } catch (JWTVerificationException e) {
+    } catch (JWTVerificationException | JwkException e) {
       // ...then try again with forced fetch
       // (recommended by e.g. https://openid.net/specs/openid-connect-core-1_0.html#RotateSigKeys)
       algorithms = provider.getAlgorithms(jwt, true);

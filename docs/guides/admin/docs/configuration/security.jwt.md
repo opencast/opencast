@@ -1,17 +1,103 @@
 Configuration for JWT-based Authentication and Authorization
 ============================================================
 
-This page describes how to configure Opencast to enable authentication and authorization based on
-[JSON Web Tokens (JWTs)](https://datatracker.ietf.org/doc/html/rfc7519). With this feature, a login-mechanism based
-on the [OpenID Connect (OIDC)](https://openid.net/connect/) protocol can be configured, since OIDC uses JWTs.
+This page describes how to configure Opencast to enable authentication and/or authorization based on
+[JSON Web Tokens (JWTs)](https://datatracker.ietf.org/doc/html/rfc7519). JWTs can be used in various ways:
+
+- With static file authorization (particularly useful with external tools).
+- External apps can send users to Opencast (e.g. for Studio or Editor) with a session that has certain roles.
+- A login-mechanism based on the [OpenID Connect (OIDC)](https://openid.net/connect/) protocol can be configured.
+
+*Note*: Some of these use cases might not be perfectly supported by Opencast yet, but are possible in principle.
 
 Prerequisites
 -------------
 
-This guide assumes that a JWT provider is already setup and Opencast receives the JWT within an HTTP request header,
-or in a request parameter (i.e. a query parameter for `GET`-requests, and a form parameter for `POST`-requests).
+Opencast does not generate JWTs, but reads them in incoming requests. This guide assumes that you already have a JWT provider, i.e. another services that generates JWTs for consumption in Opencast. This could be [Tobira](https://elan-ev.github.io/tobira/setup/auth/jwt), an LMS, an OIDC provider, or something else. These generally have their own setup guides. The JWT has to be passed to Opencast via HTTP header or via request parameter (i.e. a query parameter for `GET`-requests, and a form parameter for `POST`-requests).
+
 In order to integrate Opencast with an OIDC provider you could use the
 [oauth2-proxy](https://github.com/oauth2-proxy/oauth2-proxy).
+
+Standard OC Schema for JWTs
+---------------------------
+
+After the signature verification, a JWT is just a bunch of "claims" (JSON fields). The communicating parties can decide fairly freely on how to interpret these claims. Protocols like OIDC define exactly which claims are to be used and how. For other cases where external Opencast apps (like Tobira or an LMS) need to communicate with Opencast, this section defines a standard schema to follow. You can configure Opencast differently, but this aims at standardizing JWT usage across Opencast-related applications and offer an out-of-the-box solution.
+
+This schema is designed to be flexible and support all current and conceivable future use cases, while keeping the JWT size for each use case small.
+
+### Quick overview
+
+```json5
+{
+    // Standard claims
+    "exp": 1499863217, // required
+    "nbf": 1548632170, // optional
+
+    // User info
+    "sub": "jose", // username
+    "name": "José Carreño Quiñones",
+    "email": "jose@example.com",
+
+    // Authorization, i.e. privileges the request/user should have
+    "roles": ["ROLE_STUDIO", "ROLE_API_EVENTS_VIEW"],
+    "oc": {
+        "e:d622b861-4264-4947-8db1-c754c5956433": ["read, "annotate"],
+        "s:4ed02421-144c-42a1-b98a-22e84f3ac691": ["write"]
+    }
+}
+```
+
+### Claims
+
+A claim being "required" means that the JWT provider (e.g. Tobira, LMS) has to include it. Opencast will reject all JWTs which lack required claims.
+
+- `exp` (expiration time): As [defined in the JWT RFC](https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.4), a number timestamp in seconds since the unix epoch. JWTs with `exp < now()` are rejected by Opencast. This claim is *required*.
+
+- `nbf` (not before): As [defined in the JWT RFC](https://datatracker.ietf.org/doc/html/rfc7519#section-4.1.5), a number timestamp in seconds since the unix epoch. JWTs with `nbf > now()` are rejected by Opencast. This claim is optional.
+
+- *User Info*: information about the user that's possibly used by parts of Opencast. Some JWT use cases don't require user information at all (e.g. static file auth), while others do (e.g. Studio). Therefore, these claims are optional. (TODO: specify when this is stored as user reference)
+    - `sub`: Opencast username, string. (TODO: explain how this is used to lookup existing users, if at all)
+    - `name`: display name, string.
+    - `email`: string.
+
+- *Authorization*: at least one of these claims has to be set, as otherwise no privileges are granted (which is the same as not sending a JWT at all).
+    - `roles`: array of strings, specifying roles to grant to the request/user directly.
+    - `oc`: JSON map that grants access to single items in Opencast, as identified by the map key.
+        - The map key consists of a one-letter prefix (the item type), a colon, and finally the actual ID of the Opencast item. The following item types are supported. Note: giving access to a series or playlist only gives access to that item directly, and *not* to its videos (e.g. give write access for a series to be able to edit its metadata or add videos to it).
+            - `e`: event
+            - `s`: series
+            - `p`: playlist
+        - The map value is just an array of actions, corresponding to actions in the OC ACLs, e.g. `read` and `write`.
+
+
+### Examples
+
+#### Static file authorization
+
+An external application wants a user to load a protected static file from Opencast, e.g. a video file. The request needs read permission for the that event. The external app can achieve this with the following JWT (which can simply be attached to the URL as query parameter):
+
+```json
+{
+    "exp": 1499863217,
+    "oc": { "e:d622b861-4264-4947-8db1-c754c5956433": ["read"] }
+}
+```
+
+#### Opencast Studio
+
+An external application wants to let a user use Opencast Studio to record and upload a video. Since this does not happen in a single request, a browser session needs to be created. This can be achieved with the [`/redirect` API](https://develop.opencast.org/docs.html?path=/redirect). The JWT sent to that API needs to grant permissions to use all required APIs (which can be done by granting `ROLE_STUDIO`) and also specify user info, since Studio uses some use information.
+
+```json
+{
+    "exp": 1499863217,
+    "sub": "peter",
+    "name": "Peter Lustig",
+    "email": "peter@example.com",
+    "roles": ["ROLE_STUDIO"]
+}
+```
+
+
 
 Spring Security Configuration
 -----------------------------
@@ -84,11 +170,15 @@ sections found in `etc/security/mh_default_org.xml`. Some of the options are con
   <property name="expectedAlgorithms" ref="jwtExpectedAlgorithms" />
   <property name="claimConstraints" ref="jwtClaimConstraints" />
   <!-- Mapping used to extract the username from the JWT (default: null) -->
-  <property name="usernameMapping" value="['username'].asString()" />
+  <property name="usernameMapping" value="['sub'].asString()" />
   <!-- Mapping used to extract the name from the JWT (default: null) -->
   <property name="nameMapping" value="['name'].asString()" />
   <!-- Mapping used to extract the email from the JWT (default: null) -->
   <property name="emailMapping" value="['email'].asString()" />
+  <!-- Opencast standard role mapping as defined above in this chapter of the docs. -->
+  <!-- I.e. reads `roles` and `oc` claims to specify roles. -->
+  <property name="ocStandardRoleMappings" value="true" />
+  <!-- Custom role mappings, optional -->
   <property name="roleMappings" ref="jwtRoleMappings" />
   <!-- JWT cache holds already validated JWTs to not always re-validate in subsequent requests -->
   <!-- Maximum number of validated JWTs to cache (default: 500) -->
@@ -114,7 +204,7 @@ sections found in `etc/security/mh_default_org.xml`. Some of the options are con
 <util:list id="jwtClaimConstraints" value-type="java.lang.String">
   <value>containsKey('iss')</value>
   <value>containsKey('aud')</value>
-  <value>containsKey('username')</value>
+  <value>containsKey('sub')</value>
   <value>containsKey('name')</value>
   <value>containsKey('email')</value>
   <value>containsKey('domain')</value>
@@ -126,14 +216,14 @@ sections found in `etc/security/mh_default_org.xml`. Some of the options are con
   <value>['affiliation'].asList(T(String)).contains('faculty@example.org')</value>
 </util:list>
 ```
-* Configure the `jwtRoleMappings` list. This list contains expressions used to construct Opencast roles from JWT
-  claims.
+* Optionally configure the `jwtRoleMappings` list. This list contains expressions used to construct Opencast roles from JWT
+  claims. This can be used instead of or in addition to the OC standard role mapping. Each entry in this list contains a SPeL expression that needs to return `null`, or a string, or a `List<String>`, or `String[]`.
 ```xml
 <!-- The mapping from JWT claims to Opencast roles -->
 <util:list id="jwtRoleMappings" value-type="java.lang.String">
   <value>'ROLE_JWT_USER'</value>
-  <value>'ROLE_JWT_USER_' + ['username'].asString()</value>
-  <value>('ROLE_JWT_OWNER_' + ['username'].asString()).replaceAll("[^a-zA-Z0-9]","_").toUpperCase()</value>
+  <value>'ROLE_JWT_USER_' + ['sub'].asString()</value>
+  <value>('ROLE_JWT_OWNER_' + ['sub'].asString()).replaceAll("[^a-zA-Z0-9]","_").toUpperCase()</value>
   <value>['domain'] != null ? 'ROLE_JWT_ORG_' + ['domain'].asString() + '_MEMBER' : null</value>
   <value>['username'].asString() eq ('j_doe01@example.org') ? 'ROLE_ADMIN' : null</value>
   <value>['affiliation'].asList(T(String)).contains('faculty@example.org') ? 'ROLE_GROUP_JWT_TRAINER' : null</value>

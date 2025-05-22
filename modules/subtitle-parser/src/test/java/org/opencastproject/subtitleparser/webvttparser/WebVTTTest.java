@@ -38,10 +38,12 @@ import java.net.URISyntaxException;
  */
 public class WebVTTTest {
   protected String inputFilePath;
+  protected String inputFileWithBom;
   protected String outputFilePath;
 
   public WebVTTTest() throws URISyntaxException {
     inputFilePath = new File(getClass().getResource("/testresources/example.vtt").toURI()).getAbsolutePath();
+    inputFileWithBom = new File(getClass().getResource("/testresources/example-bom.vtt").toURI()).getAbsolutePath();
     outputFilePath = new File("target/testoutput/output.vtt").getAbsolutePath();
   }
 
@@ -61,9 +63,23 @@ public class WebVTTTest {
   }
 
   @Test
+  public void parseBomWithoutException() throws IOException, SubtitleParsingException {
+    WebVTTParser parser = new WebVTTParser();
+    parser.parse(new FileInputStream(inputFileWithBom));
+  }
+
+  @Test
   public void parseCorrectly() throws IOException, SubtitleParsingException {
     WebVTTParser parser = new WebVTTParser();
     WebVTTSubtitle subtitle = parser.parse(new FileInputStream(inputFilePath));
+
+    assertExampleVtt(subtitle);
+  }
+
+  @Test
+  public void parseBomCorrectly() throws IOException, SubtitleParsingException {
+    WebVTTParser parser = new WebVTTParser();
+    WebVTTSubtitle subtitle = parser.parse(new FileInputStream(inputFileWithBom));
 
     assertExampleVtt(subtitle);
   }

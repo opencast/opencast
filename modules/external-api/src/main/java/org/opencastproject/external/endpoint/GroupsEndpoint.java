@@ -39,7 +39,7 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.external.common.ApiMediaType;
-import org.opencastproject.external.common.ApiResponses;
+import org.opencastproject.external.common.ApiResponseBuilder;
 import org.opencastproject.external.common.ApiVersion;
 import org.opencastproject.index.service.resources.list.query.GroupsListQuery;
 import org.opencastproject.index.service.util.RestUtils;
@@ -60,15 +60,18 @@ import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.Jsons;
 
 import org.apache.commons.collections4.ComparatorUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -90,7 +93,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
-@Path("/")
+@Path("/api/groups")
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0,
             ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0,
             ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0,
@@ -105,6 +108,7 @@ import javax.ws.rs.core.Response;
         "opencast.service.path=/api/groups"
     }
 )
+@JaxrsResource
 public class GroupsEndpoint {
 
   /** The logging facility */
@@ -161,10 +165,21 @@ public class GroupsEndpoint {
     }
 
     // The API currently does not offer full text search for groups
-    Map<String, String> filters = RestUtils.parseFilter(filter);
+    Map<String, String> filters = new HashMap<>();
+    if (StringUtils.isNotBlank(filter)) {
+      for (String f : filter.split(",")) {
+        String[] filterTuple = f.split(":");
+        if (filterTuple.length < 2) {
+          logger.debug("No value for filter '{}' in filters list: {}", filterTuple[0], filter);
+          continue;
+        }
+        // use substring because dates also contain : so there might be more than two parts
+        filters.put(filterTuple[0].trim(), f.substring(filterTuple[0].length() + 1).trim());
+      }
+    }
     Optional<String> optNameFilter = Optional.ofNullable(filters.get(GroupsListQuery.FILTER_NAME_NAME));
 
-    Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(sort);
+    ArrayList<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(sort);
 
     // sorting by members & roles is not supported by the database, so we do this afterwards
     Set<SortCriterion> deprecatedSortCriteria = new HashSet<>();
@@ -224,7 +239,7 @@ public class GroupsEndpoint {
       fields.add(f("members", v(join(group.getMembers(), ","), Jsons.BLANK)));
       groupsJSON.add(obj(fields));
     }
-    return ApiResponses.Json.ok(acceptHeader, arr(groupsJSON));
+    return ApiResponseBuilder.Json.ok(acceptHeader, arr(groupsJSON));
   }
 
   /**
@@ -261,10 +276,10 @@ public class GroupsEndpoint {
     JpaGroup group = jpaGroupRoleProvider.getGroup(id);
 
     if (group == null) {
-      return ApiResponses.notFound("Cannot find a group with id '%s'.", id);
+      return ApiResponseBuilder.notFound("Cannot find a group with id '%s'.", id);
     }
 
-    return ApiResponses.Json.ok(acceptHeader,
+    return ApiResponseBuilder.Json.ok(acceptHeader,
             obj(
                     f("identifier", v(group.getGroupId())),
                     f("organization", v(group.getOrganization().getId())),  f("role", v(group.getRole())),
@@ -360,7 +375,7 @@ public class GroupsEndpoint {
       if (jpaGroupRoleProvider.addMemberToGroup(id, member)) {
         return Response.ok().build();
       } else {
-        return ApiResponses.Json.ok(acceptHeader, "Member is already member of group.");
+        return ApiResponseBuilder.Json.ok(acceptHeader, "Member is already member of group.");
       }
     } catch (IllegalArgumentException e) {
       logger.warn("Unable to add member to group id {}.", id, e);
@@ -368,10 +383,10 @@ public class GroupsEndpoint {
     } catch (UnauthorizedException ex) {
       return Response.status(SC_FORBIDDEN).build();
     } catch (NotFoundException e) {
-      return ApiResponses.notFound("Cannot find group with id '%s'.", id);
+      return ApiResponseBuilder.notFound("Cannot find group with id '%s'.", id);
     } catch (Exception e) {
       logger.warn("Could not update the group with id {}.",id, e);
-      return ApiResponses.serverError("Could not update group with id '%s', reason: '%s'",id,getMessage(e));
+      return ApiResponseBuilder.serverError("Could not update group with id '%s', reason: '%s'",id,getMessage(e));
     }
   }
 
@@ -388,7 +403,7 @@ public class GroupsEndpoint {
       if (jpaGroupRoleProvider.removeMemberFromGroup(id, memberId)) {
         return Response.ok().build();
       } else {
-        return ApiResponses.Json.ok(acceptHeader, "Member is already not member of group.");
+        return ApiResponseBuilder.Json.ok(acceptHeader, "Member is already not member of group.");
       }
     } catch (IllegalArgumentException e) {
       logger.warn("Unable to remove member from group id {}.", id, e);
@@ -396,10 +411,10 @@ public class GroupsEndpoint {
     } catch (UnauthorizedException ex) {
       return Response.status(SC_FORBIDDEN).build();
     } catch (NotFoundException e) {
-      return ApiResponses.notFound("Cannot find group with id '%s'.", id);
+      return ApiResponseBuilder.notFound("Cannot find group with id '%s'.", id);
     } catch (Exception e) {
       logger.warn("Could not update the group with id {}.", id, e);
-      return ApiResponses.serverError("Could not update group with id '%s', reason: '%s'", id, getMessage(e));
+      return ApiResponseBuilder.serverError("Could not update group with id '%s', reason: '%s'", id, getMessage(e));
     }
   }
 }

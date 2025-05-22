@@ -486,7 +486,7 @@
 
         "/* videocontainer toolbar */": "*********************************************************",
         "org.opencast.paella.loginPlugin": {
-            "enabled": true,
+            "enabled": false,
             "side": "right",
             "parentContainer": "videoContainer",
             "order": 10,
@@ -494,7 +494,7 @@
         },
 
         "org.opencast.paella.editorPlugin": {
-            "enabled": true,
+            "enabled": false,
             "side": "right",
             "parentContainer": "videoContainer",
             "order": 20,
@@ -505,7 +505,7 @@
         },
 
         "org.opencast.paella.episodesFromSeries": {
-            "enabled": true,
+            "enabled": false,
             "side": "right",
             "parentContainer": "videoContainer",
             "order": 30,
@@ -611,7 +611,6 @@
                 "SEEK",
                 "FULLSCREEN_CHANGED",
                 "VOLUME_CHANGED",
-                "TIMEUPDATE",
                 "CAPTIONS_CHANGED",
                 "BUTTON_PRESS",
                 "SHOW_POPUP",
@@ -655,13 +654,18 @@
             ],
             "server": "//matomo.server.com/",
             "siteId": "1",
+            "trackerUrl": {
+                "php": "matomo.php",
+                "js": "matomo.js"
+            },
             "matomoGlobalLoaded": false,
+            "mediaAnalyticsTitle": "${videoId}",
             "cookieType": "tracking",
             "logUserId": true,
             "events": {
                 "category": "PaellaPlayer",
                 "action": "${event}",
-                "name": "${videoId}"
+                "name": "${eventData}"
             },
             "customDimensions": {
                 "1": "${videoId}",

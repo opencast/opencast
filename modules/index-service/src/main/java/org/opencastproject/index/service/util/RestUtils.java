@@ -43,14 +43,14 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.StringTokenizer;
 
 import javax.ws.rs.WebApplicationException;
@@ -219,8 +219,8 @@ public final class RestUtils {
    *          the parameter string to parse (will be checked if blank)
    * @return a set of sort criterion, never {@code null}
    */
-  public static Set<SortCriterion> parseSortQueryParameter(String sort) throws WebApplicationException {
-    Set<SortCriterion> sortOrders = new HashSet<>();
+  public static ArrayList<SortCriterion> parseSortQueryParameter(String sort) throws WebApplicationException {
+    ArrayList<SortCriterion> sortOrders = new ArrayList<>();
 
     if (StringUtils.isNotBlank(sort)) {
       StringTokenizer tokenizer = new StringTokenizer(sort, ",");
@@ -292,7 +292,8 @@ public final class RestUtils {
           continue;
         }
         // use substring because dates also contain : so there might be more than two parts
-        filters.put(filterTuple[0].trim(), f.substring(filterTuple[0].length() + 1).trim());
+        filters.put(filterTuple[0].trim(), URLDecoder.decode(f.substring(filterTuple[0].length() + 1).trim(),
+            StandardCharsets.UTF_8));
       }
     }
     return filters;

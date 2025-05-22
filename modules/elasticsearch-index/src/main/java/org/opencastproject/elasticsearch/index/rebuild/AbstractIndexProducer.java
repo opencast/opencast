@@ -129,12 +129,13 @@ public abstract class AbstractIndexProducer implements IndexProducer {
     if (responseInterval == 1 || batchSize > responseInterval || current == total
             || current % responseInterval < batchSize) {
 
+      int progress = total > 0 ? (current * 100 / total) : 100;
       if (org == null) {
         logger.info("{} index rebuild: {}/{} finished, {}% complete.", getService(),
-                current, total, (current * 100 / total));
+                current, total, progress);
       } else {
         logger.info("{} index rebuild for organization {}: {}/{} finished, {}% complete.",
-                getService(), org.getId(), current, total, (current * 100 / total));
+                getService(), org.getId(), current, total, progress);
       }
     }
   }

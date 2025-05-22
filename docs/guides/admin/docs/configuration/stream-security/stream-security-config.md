@@ -124,7 +124,6 @@ Overview of configuration files for services that are able to automatically sign
 |-------------------------|---------------------------------------------------------------------------|
 |Video player content     | org.opencastproject.security.urlsigning.SigningMediaPackageSerializer.cfg |
 |Admin UI links           | org.opencastproject.adminui.endpoint.OsgiEventEndpoint.cfg                |
-|Preview and editor files | org.opencastproject.adminui.endpoint.ToolsEndpoint.cfg                    |
 
 The URLs will be signed by the first signing provider that will accept the URL’s path based upon the signing provider’s
 configuration. This makes it flexible to support many different scenarios. For example, we could configure the signing

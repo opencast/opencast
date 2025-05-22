@@ -7,14 +7,14 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>17-SNAPSHOT</version>
+    <version>18-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
-    <opencast.studio.url>https://github.com/elan-ev/opencast-studio/releases/download/2024-06-12/oc-studio-2024-06-12-integrated.tar.gz</opencast.studio.url>
-    <opencast.studio.sha256>29a9c5a7843241179405190878bd2e378f8ad022f6e9353ebc5702527682de55</opencast.studio.sha256>
+    <opencast.studio.url>https://github.com/elan-ev/opencast-studio/releases/download/2025-04-30/oc-studio-2025-04-30-integrated.tar.gz</opencast.studio.url>
+    <opencast.studio.sha256>d9ac678e753ee83ce2d02850ed1239e25c83170e2c127f50738bc75b96c6cc78</opencast.studio.sha256>
   </properties>
   <build>
     <plugins>

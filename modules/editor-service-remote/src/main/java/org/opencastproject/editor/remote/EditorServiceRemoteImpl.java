@@ -89,11 +89,6 @@ public class EditorServiceRemoteImpl extends RemoteBase implements EditorService
   }
 
   @Override
-  public void setMetadata(String mediaPackageId, String metadata) throws EditorServiceException {
-    doPostForMediaPackage(mediaPackageId, METADATA_SUFFIX, metadata);
-  }
-
-  @Override
   public void lockMediaPackage(String mediaPackageId, LockData lockData) throws EditorServiceException {
     Map<String, String> params = new HashMap<>();
     params.put("uuid", lockData.getUUID());

@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>17-SNAPSHOT</version>
+    <version>18-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -70,7 +70,7 @@
       <!-- runtime dependency for postgresql -->
       <groupId>org.checkerframework</groupId>
       <artifactId>checker-qual</artifactId>
-      <version>3.33.0</version>
+      <version>3.48.0</version>
     </dependency>
     <dependency>
       <groupId>net.java.dev.jna</groupId>
@@ -115,6 +115,7 @@
               !software.amazon.awssdk.*,
               !waffle.*,
               !org.codehaus.groovy*,
+              !org.locationtech.jts.geom.*,
               org.w3c.dom;version=0,
               *
             </Import-Package>

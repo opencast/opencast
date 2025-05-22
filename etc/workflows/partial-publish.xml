@@ -3,10 +3,6 @@
 
   <id>partial-publish</id>
   <title>Publish the recording</title>
-  <tags/>
-  <description/>
-  <configuration_panel/>
-  <configuration_panel_json/>
   <operations>
 
     <operation
@@ -18,19 +14,6 @@
         <configuration key="target-flavor">*/work</configuration>
         <configuration key="target-tags">-archive</configuration>
         <configuration key="audio-muxing">duplicate</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Keep captions in the loop, as they are ignored by select-tracks -->
-
-    <operation
-      id="tag"
-      description="Tag captions for cutting">
-      <configurations>
-        <configuration key="source-flavors">captions/source</configuration>
-        <configuration key="target-flavor">captions/work</configuration>
-        <configuration key="target-tags">-archive</configuration>
-        <configuration key="copy">true</configuration>
       </configurations>
     </operation>
 
@@ -69,18 +52,6 @@
         <configuration key="target-smil-flavor">smil/tmp</configuration>
         <configuration key="target-flavor-subtype">trimmed</configuration>
         <configuration key="interactive">false</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Mark captions for publication -->
-
-    <operation
-      id="tag"
-      description="Mark captions for publication">
-      <configurations>
-        <configuration key="source-flavors">captions/trimmed</configuration>
-        <configuration key="target-flavor">captions/delivery</configuration>
-        <configuration key="target-tags">+engage-download</configuration>
       </configurations>
     </operation>
 
@@ -123,20 +94,6 @@
     </operation>
 
     <operation
-      id="cover-image"
-      if="NOT (${presenter_work_video} OR $ ${presentation_work_video} OR ${presentation/thumbnail_edited}) AND (${presenter_work_audio} OR ${presentation_work_audio})"
-      description="Create a cover image for audio-only files">
-      <configurations>
-        <configuration key="stylesheet">file://${karaf.etc}/branding/coverimage.xsl</configuration>
-        <configuration key="width">1920</configuration>
-        <configuration key="height">1080</configuration>
-        <configuration key="posterimage-flavor">presenter/coverbackground</configuration>
-        <configuration key="target-flavor">presenter/player+preview</configuration>
-        <configuration key="target-tags">archive, engage-download</configuration>
-      </configurations>
-    </operation>
-
-    <operation
         id="tag"
         if="${presentation/thumbnail_edited}"
         exception-handler-workflow="partial-error"
@@ -146,22 +103,6 @@
         <configuration key="target-tags">+engage-download</configuration>
       </configurations>
     </operation>
-
-    <!-- Encode to feed cover images -->
-
-    <operation
-      id="image"
-      exception-handler-workflow="partial-error"
-      description="Creating feed cover image">
-      <configurations>
-        <configuration key="source-flavor">*/trimmed</configuration>
-        <configuration key="target-flavor">*/feed+preview</configuration>
-        <configuration key="target-tags">atom,rss</configuration>
-        <configuration key="encoding-profile">feed-cover.http</configuration>
-        <configuration key="time">3</configuration>
-      </configurations>
-    </operation>
-
 
     <!-- Create a cover image -->
 
@@ -220,6 +161,18 @@
       description="Including theming operations">
       <configurations>
         <configuration key="workflow-id">partial-theming</configuration>
+      </configurations>
+    </operation>
+
+    <!-- Mark captions for publication -->
+
+    <operation
+        id="tag"
+        description="Mark captions for publication">
+      <configurations>
+        <configuration key="source-flavors">captions/shifted</configuration>
+        <configuration key="target-flavor">captions/delivery</configuration>
+        <configuration key="target-tags">+engage-download</configuration>
       </configurations>
     </operation>
 
@@ -322,7 +275,7 @@
       description="Publishing to Opencast Media Module">
       <configurations>
         <configuration key="download-source-flavors">dublincore/*,security/*</configuration>
-        <configuration key="download-source-tags">engage-download,atom,rss</configuration>
+        <configuration key="download-source-tags">engage-download</configuration>
         <configuration key="streaming-source-tags">engage-streaming</configuration>
         <configuration key="check-availability">false</configuration>
       </configurations>

@@ -2,14 +2,14 @@ Runtime Dependencies for Developers
 ===================================
 
 This directory contains container configurations for an easy way of starting the necessary runtime dependencies for
-Opencast as a developer. You can use `docker-compose` or `podman-compose` to launch everything necessary for the current
+Opencast as a developer. You can use `docker compose` or `podman-compose` to launch everything necessary for the current
 version:
 
 ```sh
 # Podman
 podman-compose up -d
 # Docker
-docker-compose up -d
+docker compose up -d
 ```
 
 To shut down all services again:
@@ -18,7 +18,7 @@ To shut down all services again:
 # Podman
 podman-compose down
 # Docker
-docker-compose down
+docker compose down
 ```
 
 You can use the `-f` flag to launch specific compose files with additional services if required.

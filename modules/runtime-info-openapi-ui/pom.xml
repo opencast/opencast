@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <packaging>bundle</packaging>
+  <parent>
+    <groupId>org.opencastproject</groupId>
+    <artifactId>base</artifactId>
+    <version>18-SNAPSHOT</version>
+    <relativePath>../../pom.xml</relativePath>
+  </parent>
+
+  <artifactId>opencast-runtime-info-openapi-ui</artifactId>
+
+  <name>Opencast :: runtime-info-openapi-ui</name>
+
+  <properties>
+    <opencast.basedir>${project.basedir}/../..</opencast.basedir>
+    <swagger-ui.version>5.17.14</swagger-ui.version>
+    <path.swagger-ui>ui</path.swagger-ui>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.mvnpm</groupId>
+      <artifactId>swagger-ui-dist</artifactId>
+      <version>${swagger-ui.version}</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <!-- Copy all web content files META-INF folder, and push it though a filter to replace maven properties -->
+    <resources>
+      <resource>
+        <directory>${basedir}/src/main/resources</directory>
+      </resource>
+      <!-- Also included index.html in case a template is not used -->
+      <resource>
+        <directory>${basedir}/src/main/webapp</directory>
+        <targetPath>${project.build.directory}/classes/${path.swagger-ui}</targetPath>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/*.html</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>${basedir}/src/main/webapp</directory>
+        <targetPath>${project.build.directory}/classes/${path.swagger-ui}</targetPath>
+        <filtering>false</filtering>
+        <excludes>
+          <exclude>**/*.html</exclude>
+        </excludes>
+      </resource>
+    </resources>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <configuration>
+          <ignoredUnusedDeclaredDependencies>
+            <ignoredUnusedDeclaredDependency>org.mvnpm:swagger-ui-dist</ignoredUnusedDeclaredDependency>
+          </ignoredUnusedDeclaredDependencies>
+        </configuration>
+        <executions>
+          <execution>
+            <id>install-swagger-ui</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>org.mvnpm</groupId>
+                  <artifactId>swagger-ui-dist</artifactId>
+                  <version>${swagger-ui.version}</version>
+                  <type>jar</type>
+                  <overWrite>true</overWrite>
+                  <outputDirectory>${project.build.directory}/classes/${path.swagger-ui}/</outputDirectory>
+                  <includes>**/swagger-ui.css,
+                    **/swagger-ui.css.map,
+                    **/swagger-ui-bundle.js,
+                    **/swagger-ui-bundle.js.map,
+                    **/swagger-ui-standalone-preset.js,
+                    **/swagger-ui-standalone-preset.js.map,
+                    **/oauth2-redirect.html</includes>
+                  <fileMappers>
+                    <org.codehaus.plexus.components.io.filemappers.FlattenFileMapper />
+                  </fileMappers>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Private-Package>ui.*</Private-Package>
+            <Http-Alias>/rest-docs</Http-Alias>
+            <Http-Classpath>${path.swagger-ui}</Http-Classpath>
+            <Http-Welcome>index.html</Http-Welcome>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+
+  </build>
+</project>

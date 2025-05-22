@@ -394,9 +394,6 @@ public class VideoEditorTest {
 
   }
 
-  /**
-   * @throws java.io.File.IOException
-   */
   @After
   public void tearDown() throws Exception {
     FileUtils.deleteQuietly(tempFile1);

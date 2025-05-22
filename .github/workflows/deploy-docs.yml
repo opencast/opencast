@@ -13,7 +13,7 @@ concurrency:
 jobs:
   deploy-documentation:
     if: github.repository_owner == 'opencast'
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
     - uses: actions/checkout@v4
 
@@ -31,6 +31,14 @@ jobs:
       working-directory: docs/guides/admin/
       run: |
         python -m mkdocs build
+
+    - name: generate list of committers
+      working-directory: docs/guides/developer/
+      env:
+        GITHUB_USER: ${{ secrets.GH_USER }}
+        GITHUB_PA_TOKEN: ${{ secrets.GH_PA_TOKEN }}
+      run: |
+        ./.generate-list-of-committers.sh
 
     - name: build developer docs
       working-directory: docs/guides/developer/

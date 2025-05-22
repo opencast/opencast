@@ -297,7 +297,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
   }
 
   @Override
-  public void repopulate() throws IndexRebuildException {
+  public void repopulate(IndexRebuildService.DataType type) throws IndexRebuildException {
     try {
       for (final Organization organization : organizationDirectoryService.getOrganizations()) {
         try {
@@ -423,8 +423,10 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
     return (Optional<IndexTheme> indexThemeOpt) -> {
       IndexTheme indexTheme;
       indexTheme = indexThemeOpt.orElseGet(() -> new IndexTheme(theme.getId().get(), orgId));
-      String creator = StringUtils.isNotBlank(theme.getCreator().getName())
-              ? theme.getCreator().getName() : theme.getCreator().getUsername();
+      String creator = theme.getCreator() == null ? "?" : (
+          StringUtils.isNotBlank(theme.getCreator().getName())
+              ? theme.getCreator().getName()
+              : theme.getCreator().getUsername());
 
       indexTheme.setCreationDate(theme.getCreationDate());
       indexTheme.setDefault(theme.isDefault());

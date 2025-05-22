@@ -1,2 +1,0 @@
-This removes all remnants of the prepared flavor from the workflows and the EditorServiceImpl.cfg as it currently serves
-no purpose and only makes things unnecessarily complicated. Instead, the source flavor will be used directly.

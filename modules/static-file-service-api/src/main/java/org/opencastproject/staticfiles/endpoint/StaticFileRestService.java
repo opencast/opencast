@@ -50,6 +50,7 @@ import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,7 +78,7 @@ import javax.ws.rs.core.Response.Status;
 /**
  * Stores and serves static files via HTTP.
  */
-@Path("/")
+@Path("/staticfiles")
 @RestService(
     name = "StaticResourceService",
     title = "Static Resources Service",
@@ -102,6 +103,7 @@ import javax.ws.rs.core.Response.Status;
         "opencast.service.jobproducer=false"
     }
 )
+@JaxrsResource
 public class StaticFileRestService {
 
   /** The logging facility */

@@ -357,7 +357,7 @@ public class ComposerServiceTest {
 
   /**
    * Test method for
-   * {@link ComposerServiceImpl#composite(Dimension, Option, LaidOutElement, Option, String, String)}
+   * {@link ComposerServiceImpl#composite(Dimension, Option, LaidOutElement, Option, String, String, String)}
    */
   @Test
   public void testComposite() throws Exception {
@@ -399,7 +399,7 @@ public class ComposerServiceTest {
   }
 
   /**
-   * Test method for {@link ComposerServiceImpl#concat(String, Dimension, float, Track...)}
+   * Test method for {@link ComposerServiceImpl#concat(String, Dimension, boolean, Track...)}
    */
   @Test
   public void testConcatTransportStream() throws Exception {
@@ -528,7 +528,7 @@ public class ComposerServiceTest {
   }
 
   /**
-   * Test method for {@link ComposerServiceImpl#concat(String, Dimension, Track...)}
+   * Test method for {@link ComposerServiceImpl#concat(String, Dimension, boolean, Track...)}
    */
   @Test
   public void testConcat() throws Exception {
@@ -542,7 +542,7 @@ public class ComposerServiceTest {
   }
 
   /**
-   * Test method for {@link ComposerServiceImpl#concat(String, Dimension, float, Track...)}
+   * Test method for {@link ComposerServiceImpl#concat(String, Dimension, float, boolean, Track...)}
    */
   @Test
   public void testConcatWithFrameRate() throws Exception {
@@ -556,7 +556,7 @@ public class ComposerServiceTest {
   }
 
   /**
-   * Test method for {@link ComposerServiceImpl#concat(String, Dimension, float, Track...)}
+   * Test method for {@link ComposerServiceImpl#concat(String, Dimension, float, boolean, Track...)}
   */
   @Test
   public void testConcatWithSameCodec() throws Exception {
@@ -570,7 +570,7 @@ public class ComposerServiceTest {
 
   /**
    * Test method for
-   * {@link org.opencastproject.composer.impl.ComposerServiceImpl#imageToVideo(org.opencastproject.mediapackage.Attachment, String, Long)}
+   * {@link org.opencastproject.composer.impl.ComposerServiceImpl#imageToVideo(Attachment, String, double)}
    */
   @Test
   public void testImageToVideo() throws Exception {

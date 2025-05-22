@@ -42,6 +42,7 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +57,7 @@ import javax.ws.rs.core.Response;
 /**
  * The REST endpoint for {@link ExecuteService}s
  */
-@Path("/")
+@Path("/execute")
 // Endpoint to the execute service, that runs CLI commands using MediaPackageElement's as parameters
 @RestService(name = "execute", title = "Execute Service", notes = {"" }, abstractText = "Runs CLI commands with MediaPackageElement's as parameters")
 @Component(
@@ -69,6 +70,7 @@ import javax.ws.rs.core.Response;
         "opencast.service.jobproducer=true"
     }
 )
+@JaxrsResource
 public class ExecuteRestEndpoint extends AbstractJobProducerEndpoint {
 
   /** The logging facility */

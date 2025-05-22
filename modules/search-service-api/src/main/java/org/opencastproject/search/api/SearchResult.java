@@ -113,7 +113,7 @@ public class SearchResult {
     //Our sole parameter here is a map containing a mix of string:string pairs, and String:Map<String, Object> pairs
 
     try {
-      //We're *really* hoping that no one feeds us things that aren't what we expect
+      // We're *really* hoping that no one feeds us things that aren't what we expect
       // but ES results come back in json, and get turned into multi-layered Maps
       SearchService.IndexEntryType type = SearchService.IndexEntryType.valueOf((String) data.get(TYPE));
       DublinCoreCatalog dc = rehydrateDC(type, (Map<String, Object>) data.get(DUBLINCORE));
@@ -243,15 +243,16 @@ public class SearchResult {
   }
 
   public Map<String, Object> dehydrateEpisode() {
-    Map<String, List<String>> metadata = SearchResult.dehydrateDC(this.dublinCore);
 
-    var mediaPackageJson = gson.fromJson(MediaPackageParser.getAsJSON(this.mp), Map.class).get(MEDIAPACKAGE);
-
-    var ret = new HashMap<>(
-        Map.of(MEDIAPACKAGE, mediaPackageJson, MEDIAPACKAGE_XML, MediaPackageParser.getAsXml(this.mp), INDEX_ACL,
-            SearchResult.dehydrateAclForIndex(acl), REST_ACL, SearchResult.dehydrateAclForREST(acl), DUBLINCORE,
-            metadata, ORG, this.orgId, TYPE, this.type.name(),
-            MODIFIED_DATE, DateTimeFormatter.ISO_INSTANT.format(this.modified)));
+    var ret = new HashMap<>(Map.of(
+        MEDIAPACKAGE, gson.fromJson(MediaPackageParser.getAsJSON(this.mp), Map.class).get(MEDIAPACKAGE),
+        MEDIAPACKAGE_XML, MediaPackageParser.getAsXml(this.mp),
+        INDEX_ACL, SearchResult.dehydrateAclForIndex(acl),
+        REST_ACL, SearchResult.dehydrateAclForREST(acl),
+        DUBLINCORE, SearchResult.dehydrateDC(this.dublinCore),
+        ORG, this.orgId,
+        TYPE, this.type.name(),
+        MODIFIED_DATE, DateTimeFormatter.ISO_INSTANT.format(this.modified)));
 
     ret.put(DELETED_DATE, null == this.deleted ? null : DateTimeFormatter.ISO_INSTANT.format(this.deleted));
 
@@ -259,12 +260,14 @@ public class SearchResult {
   }
 
   public Map<String, Object> dehydrateSeries() {
-    Map<String, List<String>> metadata = SearchResult.dehydrateDC(this.dublinCore);
 
-    var ret = new HashMap<>(
-        Map.of(INDEX_ACL, SearchResult.dehydrateAclForIndex(acl), REST_ACL, SearchResult.dehydrateAclForREST(acl),
-            DUBLINCORE, metadata, ORG, this.orgId, TYPE, this.type.name(),
-            MODIFIED_DATE, DateTimeFormatter.ISO_INSTANT.format(this.modified)));
+    var ret = new HashMap<>(Map.of(
+        INDEX_ACL, SearchResult.dehydrateAclForIndex(acl),
+        REST_ACL, SearchResult.dehydrateAclForREST(acl),
+        DUBLINCORE, SearchResult.dehydrateDC(this.dublinCore),
+        ORG, this.orgId,
+        TYPE, this.type.name(),
+        MODIFIED_DATE, DateTimeFormatter.ISO_INSTANT.format(this.modified)));
 
     ret.put(DELETED_DATE, null == this.deleted ? null : DateTimeFormatter.ISO_INSTANT.format(this.deleted));
 

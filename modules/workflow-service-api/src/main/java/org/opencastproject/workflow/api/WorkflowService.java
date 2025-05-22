@@ -281,8 +281,8 @@ public interface WorkflowService {
    *
    * @param workflowInstance
    *          the workflow instance
-   * @throws WorkflowException
-   *           if there is a problem processing the workflow
+   * @throws WorkflowDatabaseException
+   *           if there is a database problem processing the workflow
    * @throws UnauthorizedException
    *           if the current user does not have read permissions on the workflow instance's mediapackage.
    */
@@ -341,7 +341,7 @@ public interface WorkflowService {
    *
    * @param mediaPackageId
    *          the identifier of the mediapackage
-   * @return a {@Link List} of {@Link WorkflowInstance}
+   * @return a {@link List} of {@link WorkflowInstance}
    * @throws WorkflowDatabaseException
    */
   List<WorkflowInstance> getWorkflowInstancesByMediaPackage(String mediaPackageId)

@@ -81,6 +81,7 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,7 +122,7 @@ import javax.ws.rs.core.Response.Status;
 /**
  * Creates and augments Opencast MediaPackages using the api. Stores media into the Working File Repository.
  */
-@Path("/")
+@Path("/ingest")
 @RestService(name = "ingestservice", title = "Ingest Service", abstractText = "This service creates and augments Opencast media packages that include media tracks, metadata "
         + "catalogs and attachments.", notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
@@ -140,6 +141,7 @@ import javax.ws.rs.core.Response.Status;
     "opencast.service.jobproducer=true"
   }
 )
+@JaxrsResource
 public class IngestRestService extends AbstractJobProducerEndpoint {
 
   private static final Logger logger = LoggerFactory.getLogger(IngestRestService.class);
@@ -528,7 +530,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
               logger.debug("Unable to parse the 'mediaPackage' parameter: {}", ExceptionUtils.getMessage(e));
               return Response.serverError().status(Status.BAD_REQUEST).build();
             }
-          } else if ("startTime".equals(fieldName) && "/addPartialTrack".equals(request.getPathInfo())) {
+          } else if ("startTime".equals(fieldName) && "/ingest/addPartialTrack".equals(request.getPathInfo())) {
             String startTimeString = Streams.asString(item.openStream(), "UTF-8");
             logger.trace("startTime: {}", startTime);
             try {

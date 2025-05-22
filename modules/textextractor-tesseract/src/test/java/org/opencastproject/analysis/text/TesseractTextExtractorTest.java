@@ -109,7 +109,7 @@ public class TesseractTextExtractorTest {
   }
 
   /**
-   * Test method for {@link org.opencastproject.textextractor.tesseract.TesseractTextExtractor#analyze(java.io.File)}.
+   * Test method for {@link org.opencastproject.textextractor.tesseract.TesseractTextExtractor#extract(File)}.
    */
   @Test
   public void testAnalyze() throws Exception {

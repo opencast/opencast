@@ -204,3 +204,11 @@ div.warn {
 .tippy-box[data-theme~='opencast'][data-placement^='top'] > .tippy-arrow::before {
   color: #24425c;
 }
+
+pre {
+  padding: 5px;
+}
+
+pre > code {
+  padding: 8px;
+}

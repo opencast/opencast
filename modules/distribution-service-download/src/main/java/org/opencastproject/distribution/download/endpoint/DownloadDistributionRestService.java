@@ -49,6 +49,7 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -67,7 +68,7 @@ import javax.ws.rs.core.Response.Status;
 /**
  * Rest endpoint for distributing media to the local distribution channel.
  */
-@Path("/")
+@Path("/distribution/download")
 @RestService(name = "localdistributionservice", title = "Local Distribution Service",
     abstractText = "This service distributes media packages to the Opencast feed and engage services.",
     notes = {
@@ -87,6 +88,7 @@ import javax.ws.rs.core.Response.Status;
         "opencast.service.jobproducer=true"
     }
 )
+@JaxrsResource
 public class DownloadDistributionRestService extends AbstractJobProducerEndpoint {
 
   /** The logger */

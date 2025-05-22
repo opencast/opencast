@@ -7,19 +7,19 @@ on:
 jobs:
   main:
     if: github.event.pull_request.user.login != 'dependabot[bot]'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/setup-python@v5
 
       - name: Install Python module
-        run: pip install apereocla
+        run: pip install --break-system-packages apereocla
 
       - name: Check Apereo ICLA for GitHub user
         run: apereocla -g "${{ github.event.pull_request.user.login }}"
 
       - name: Comment if no CLA has been filed
         if: ${{ failure() }}
-        uses: thollander/actions-comment-pull-request@main
+        uses: thollander/actions-comment-pull-request@v3
         with:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           message: >

@@ -22,6 +22,7 @@
 package org.opencastproject.security.util;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static org.opencastproject.security.api.SecurityConstants.EPISODE_ROLE_ID_PREFIX;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ANONYMOUS_USERNAME;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLE;
@@ -199,5 +200,16 @@ public final class SecurityUtil {
    */
   public static String getCaptureAgentRole(final String agentId) {
     return GLOBAL_CAPTURE_AGENT_ROLE + "_" + sanitizeCaName(agentId);
+  }
+
+  /**
+   * Get the episode role id for a mediapackage and an action
+   *
+   * @param mediaPackageId the id of the mediapackage
+   * @param action the action as a string
+   * @return the role
+   */
+  public static String getEpisodeRoleId(final String mediaPackageId, final String action) {
+    return EPISODE_ROLE_ID_PREFIX + "_" + mediaPackageId + "_" + action.toUpperCase();
   }
 }

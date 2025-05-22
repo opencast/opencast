@@ -34,6 +34,8 @@ import org.opencastproject.util.requests.SortCriterion;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.http.ConnectionClosedException;
 import org.apache.http.HttpHost;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
@@ -41,6 +43,8 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.ElasticsearchStatusException;
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
+import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.bulk.BulkRequest;
 import org.elasticsearch.action.bulk.BulkResponse;
@@ -61,6 +65,7 @@ import org.elasticsearch.client.RestClientBuilder;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.client.indices.CreateIndexRequest;
 import org.elasticsearch.client.indices.CreateIndexResponse;
+import org.elasticsearch.cluster.health.ClusterHealthStatus;
 import org.elasticsearch.common.document.DocumentField;
 import org.elasticsearch.common.xcontent.XContentType;
 import org.elasticsearch.index.query.QueryBuilder;
@@ -82,6 +87,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.ConnectException;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -166,6 +172,11 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
   /** Password of an external Elasticsearch server to connect to. */
   private String password;
 
+  /** Defines how long to wait between retries, when the connection to OpenSearch failed on startup */
+  private int retryDelayOnStartup;
+  private static final String RETRY_DELAY_ON_STARTUP = "retry.delay.on.startup";
+  private static final int DEFAULT_RETRY_DELAY_ON_STARTUP = 10000;
+
   /**
    * Returns an array of document types for the index. For every one of these, the corresponding document type
    * definition will be loaded.
@@ -216,6 +227,14 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
     indexName = StringUtils.defaultIfBlank((String) properties.get(INDEX_NAME_PROPERTY),
             DEFAULT_INDEX_NAME);
     logger.info("Index name set to {}.", indexName);
+
+    retryDelayOnStartup = NumberUtils.toInt((String) properties.get(RETRY_DELAY_ON_STARTUP),
+        DEFAULT_RETRY_DELAY_ON_STARTUP);
+    if (retryDelayOnStartup <= 0) {
+      throw new IllegalArgumentException(RETRY_DELAY_ON_STARTUP
+          + " was wrongly configured. Value has to be greater than 0.");
+    }
+    logger.info("Retry delay on startup set to {} ms.", retryDelayOnStartup);
   }
 
   @Override
@@ -414,8 +433,81 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
       client = new RestHighLevelClient(builder);
     }
 
+    // Test if opensearch is reachable and continuously retry if it is not
+    waitUntilOpensearchIsAvailable();
+
     // Create the index
     createIndex();
+  }
+
+  /**
+   * Continuously tries to connect to OpenSearch until it is reachable.
+   *
+   * @throws RuntimeException if an unexpected exception occurs
+   */
+  private void waitUntilOpensearchIsAvailable() {
+    String openSearchUrl = getOpensearchURL();
+    logger.info("Testing connection to OpenSearch at {}", openSearchUrl);
+    while (!isOpensearchReachable()) {
+      logger.warn("Could not reach OpenSearch at {}. Trying again after {} ms...", openSearchUrl, retryDelayOnStartup);
+      try {
+        Thread.sleep(retryDelayOnStartup);
+      } catch (InterruptedException e) {
+        throw new RuntimeException("Could not reach OpenSearch at " + openSearchUrl, e);
+      }
+    }
+    logger.info("Connection to OpenSearch at {} tested successfully", openSearchUrl);
+  }
+
+  /**
+   * Checks if OpenSearch is reachable.
+   *
+   * @return true if OpenSearch is reachable, false otherwise
+   *
+   * @throws ElasticsearchException if an ElasticsearchException occurs, e.g. if the server returns a 4xx or 5xx error
+   *
+   * @throws RuntimeException if an unexpected exception occurs
+   */
+  private boolean isOpensearchReachable() {
+    try {
+      // test connection
+      ClusterHealthRequest request = new ClusterHealthRequest();
+      request.waitForYellowStatus();
+      ClusterHealthResponse resp = client.cluster().health(request, RequestOptions.DEFAULT);
+      if (resp.getStatus().equals(ClusterHealthStatus.GREEN)) {
+        logger.debug("Connected to OpenSearch, cluster health is {}", resp.getStatus());
+        return true;
+      } else if (resp.getStatus().equals(ClusterHealthStatus.YELLOW)) {
+        logger.warn("Connected to OpenSearch, cluster health is {}", resp.getStatus());
+        return true;
+      }
+      logger.debug("Connected to OpenSearch, but cluster health is {}", resp.getStatus());
+      return false;
+    } catch (ConnectException | ConnectionClosedException connectException) {
+      // Get thrown when we are unable to connect. Normally this should only happen when
+      // opensearch is not running or is just starting up, therefore only log the error on debug level
+      logger.debug("Unable to connect to OpenSearch", connectException);
+      return false;
+    } catch (IOException ioException) {
+      // Could be thrown when a docker container with opensearch is just starting up,
+      // so we check further if the cause is a socket exception
+      if (ioException.getCause() instanceof java.net.SocketException) {
+        // it seems like a container is starting up, we continue the loop
+        logger.debug("Unable to connect to OpenSearch", ioException);
+        return false;
+      }
+      // something different triggered an ioexception, so we fail
+      throw new RuntimeException("Couldn't connect to opensearch due to IOExceptionError", ioException);
+    } catch (ElasticsearchException elasticsearchException) {
+      // An ElasticsearchException is usually thrown in case where the server returns a 4xx or 5xx error code.
+      // So for example for an HTTP 401 Unauthorized: In this case we want the startup to fail, so
+      // we get an error and have the chance to change the configuration
+      logger.error("Error while testing OpenSearch connection", elasticsearchException);
+      throw elasticsearchException;
+    } catch (Exception e) {
+      // When another exception occurs, we throw a runtime exception, so the startup of Opencast will fail
+      throw new RuntimeException("Unable to connect to OpenSearch, unexpected exception", e);
+    }
   }
 
   /**
@@ -729,6 +821,15 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
   }
 
   /**
+   * Construct the URL to the OpenSearch service.
+   *
+   * @return the OpenSearch URL
+   */
+  private String getOpensearchURL() {
+    return this.externalServerScheme + "://" + this.externalServerHostname + ":" + this.externalServerPort;
+  }
+
+  /**
    * Returns all the known terms for a field (aka facets).
    *
    * @param field
@@ -760,4 +861,5 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
       return chuck(e);
     }
   }
+
 }

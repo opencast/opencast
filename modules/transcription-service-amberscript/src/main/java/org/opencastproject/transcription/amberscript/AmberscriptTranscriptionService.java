@@ -1042,6 +1042,7 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
               } catch (TranscriptionServiceException e) {
                 try {
                   database.updateJobControl(jobId, TranscriptionJobControl.Status.Canceled.name());
+                  continue;
                 } catch (TranscriptionDatabaseException ex) {
                   logger.warn("Could not cancel job '{}'.", jobId);
                 }
@@ -1061,8 +1062,9 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
             final AQueryBuilder q = assetManager.createQuery();
             final AResult r = q.select(q.snapshot()).where(q.mediaPackageId(mpId).and(q.version().isLatest())).run();
             if (r.getSize() == 0) {
-              // Media package not archived yet? Skip until next time.
-              logger.debug("Media package {} has not been archived yet. Skipped.", mpId);
+              logger.warn("Media package {} no longer exists in the asset manager. It was likely deleted. "
+                  + "Dropping the generated transcription.", mpId);
+              database.updateJobControl(jobId, TranscriptionJobControl.Status.Error.name());
               continue;
             }
 

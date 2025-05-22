@@ -38,11 +38,11 @@ import static org.opencastproject.index.service.util.RestUtils.okJson;
 import static org.opencastproject.index.service.util.RestUtils.okJsonList;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
-import org.opencastproject.adminui.util.QueryPreprocessor;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.QueryPreprocessor;
 import org.opencastproject.elasticsearch.index.objects.series.Series;
 import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.elasticsearch.index.objects.theme.IndexTheme;
@@ -84,6 +84,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,7 +93,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
@@ -109,7 +109,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-@Path("/")
+@Path("/admin-ng/themes")
 @RestService(name = "themes", title = "Themes facade service",
   abstractText = "Provides operations for the themes",
   notes = { "This service offers the default themes CRUD Operations for the admin UI.",
@@ -126,6 +126,7 @@ import javax.ws.rs.core.Response.Status;
                 "opencast.service.path=/admin-ng/themes",
         }
 )
+@JaxrsResource
 public class ThemesEndpoint {
 
   /** The logging facility */
@@ -225,7 +226,7 @@ public class ThemesEndpoint {
     }
 
     if (optSort.isSome()) {
-      Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
+      ArrayList<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
       for (SortCriterion criterion : sortCriteria) {
         switch (criterion.getFieldName()) {
           case ThemeIndexSchema.NAME:

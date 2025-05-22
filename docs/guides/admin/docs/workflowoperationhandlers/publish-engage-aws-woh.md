@@ -19,7 +19,7 @@ Parameter Table
 |check-availability         |Check if the media is reachable                                                              |
 |download-source-flavors    |Distribute any mediapackage elements with one of these (comma separated) flavors to download |
 |download-source-tags       |Distribute any mediapackage elements with one of these (comma separated) tags to download    |
-|download-target-subflavors |Subflavor to use for distributed material                                                    |
+|download-target-subflavor  |Subflavor to use for distributed material                                                    |
 |download-target-tags       |Add tags (comma separated) to published media                                                |
 |strategy                   |If there is no key, published media would be retracted before publishing                     |
 |                           |`<configuration key="strategy">merge</configuration>`                                        |
@@ -39,7 +39,7 @@ Operation Example
     exception-handler-workflow="error"
     description="Distribute and publish to engage player using AWS S3">
   <configurations>
-    <configuration key="download-source-tags">engage,atom,rss</configuration>
+    <configuration key="download-source-tags">engage</configuration>
     <configuration key="check-availability">true</configuration>
     <configuration key="strategy">merge</configuration>
   </configurations>

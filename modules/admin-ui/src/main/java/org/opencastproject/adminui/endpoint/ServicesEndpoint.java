@@ -50,6 +50,7 @@ import org.json.simple.JSONObject;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +61,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletResponse;
@@ -71,7 +71,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-@Path("/")
+@Path("/admin-ng/services")
 @RestService(name = "ServicesProxyService", title = "UI Services",
   abstractText = "This service provides the services data for the UI.",
   notes = { "These Endpoints deliver informations about the services required for the UI.",
@@ -88,6 +88,7 @@ import javax.ws.rs.core.Response;
     "opencast.service.path=/admin-ng/services"
   }
 )
+@JaxrsResource
 public class ServicesEndpoint {
   private static final Logger logger = LoggerFactory.getLogger(ServicesEndpoint.class);
   private ServiceRegistry serviceRegistry;
@@ -168,7 +169,7 @@ public class ServicesEndpoint {
     int total = services.size();
 
     if (sortOpt.isSome()) {
-      Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(sortOpt.get());
+      ArrayList<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(sortOpt.get());
       if (!sortCriteria.isEmpty()) {
         try {
           SortCriterion sortCriterion = sortCriteria.iterator().next();
@@ -210,6 +211,10 @@ public class ServicesEndpoint {
     public static final String RUNNING_NAME = "running";
     /** Status model field name. */
     public static final String STATUS_NAME = "status";
+    /** Online model field name. */
+    public static final String ONLINE_NAME = "online";
+    /** Maintenance model field name. */
+    public static final String MAINTENANCE_NAME = "maintenance";
 
     /** Wrapped {@code ServiceStatistics} instance. */
     private final ServiceStatistics serviceStatistics;
@@ -295,6 +300,22 @@ public class ServicesEndpoint {
     }
 
     /**
+     * Returns whether the service is online.
+     * @return online status
+     */
+    public boolean getIsOnline() {
+      return serviceStatistics.getServiceRegistration().isOnline();
+    }
+
+    /**
+     * Returns whether the service is in maintenance.
+     * @return maintenance status
+     */
+    public boolean getisMaintenance() {
+      return serviceStatistics.getServiceRegistration().isInMaintenanceMode();
+    }
+
+    /**
      * Returns a map of all service fields.
      * @return a map of all service fields
      */
@@ -309,6 +330,8 @@ public class ServicesEndpoint {
       serviceMap.put(QUEUED_NAME, Integer.toString(getQueuedJobs()));
       serviceMap.put(RUNNING_NAME, Integer.toString(getRunningJobs()));
       serviceMap.put(STATUS_NAME, getStatus().name());
+      serviceMap.put(ONLINE_NAME, Boolean.toString(getIsOnline()));
+      serviceMap.put(MAINTENANCE_NAME, Boolean.toString(getisMaintenance()));
       return serviceMap;
     }
 
@@ -330,7 +353,9 @@ public class ServicesEndpoint {
               f(MEAN_QUEUE_TIME_NAME, v(getMeanQueueTime())), f(MEAN_RUN_TIME_NAME, v(getMeanRunTime())),
               f(NAME_NAME, v(getName(), Jsons.BLANK)), f(QUEUED_NAME, v(getQueuedJobs())),
               f(RUNNING_NAME, v(getRunningJobs())),
-              f(STATUS_NAME, v(SERVICE_STATUS_TRANSLATION_PREFIX + getStatus().name(), Jsons.BLANK)));
+              f(STATUS_NAME, v(SERVICE_STATUS_TRANSLATION_PREFIX + getStatus().name(), Jsons.BLANK)),
+              f(ONLINE_NAME, v(getIsOnline())),
+              f(MAINTENANCE_NAME, v(getisMaintenance())));
     }
   }
 

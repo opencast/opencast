@@ -22,6 +22,8 @@ package org.opencastproject.subtitleparser.webvttparser;
 
 import org.opencastproject.subtitleparser.SubtitleParsingException;
 
+import org.apache.commons.io.input.BOMInputStream;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -64,11 +66,14 @@ public class WebVTTParser {
   }
 
   public WebVTTSubtitle parse(InputStream is) throws IOException, SubtitleParsingException {
+    // Wrap input stream into Apache Commons IO BOMInputStream
+    BOMInputStream bomIn = new BOMInputStream(is, false);
+
     // Create subtitle object
     WebVTTSubtitle subtitle = new WebVTTSubtitle();
 
     // Read each line
-    BufferedReader webvttReader = new BufferedReader(new InputStreamReader(is, this.charset));
+    BufferedReader webvttReader = new BufferedReader(new InputStreamReader(bomIn, this.charset));
     String line = "";
 
     // File should start with "WEBVTT" on the first line

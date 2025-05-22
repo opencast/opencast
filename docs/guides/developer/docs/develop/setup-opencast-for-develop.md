@@ -49,7 +49,7 @@ Please make sure to install the following dependencies.
 
 Required:
 
-    java-11-openjdk-devel
+    java-17-openjdk-devel
     ffmpeg >= 3.2.4
     maven >= 3.6
     python
@@ -61,7 +61,7 @@ Required:
 
 Required as a service for running Opencast:
 
-    elasticsearch = 7.9.x
+    elasticsearch = 7.9.x and analysis-icu plugin
 
 Required for some services. Some tests may be skipped and some features
 may not be usable if they are not installed. Hence, it's generally a good idea to
@@ -119,7 +119,6 @@ The procedure would be as follows:
 
 - Start Opencast and use `la -u` in the Karaf console to list all installed bundles/modules. Note down the IDs of the
   bundles you want to watch.
-<<<<<<< HEAD
 - Use `bundle:watch IDs` to watch the desired modules, e.g. `bundle:watch 190 199`
 - Make your changes and rebuild the module (e.g. execute `./mvnw clean install` in the module folder).
 - Watch how Karaf automatically redeploys the changed jars from your local Maven repository. You can verify that
@@ -142,8 +141,8 @@ correctly be restored after the new bundle has been deployed.
 Building with multiple threads decreases the build time significantly.
 If you want to enable multiple threads, you can use the following command:
 
-    $ ./mvnw clean install -T 1.0C -DskipTests -Pnone 
-    && cd assemblies && ./mvnw install -T 1.0C -Dskiptests -Pdev  
+    $ ./mvnw clean install -T 1.0C -DskipTests -Pnone
+    && cd assemblies && ./mvnw install -T 1.0C -Dskiptests -Pdev
     && cd ..
     $ ./build/opencast-dist-develop-*/start-opencast
 
@@ -200,7 +199,7 @@ Follow the next steps, if you want to import opencast correctly
 - Search for projects recursively
 - Uncheck all listed profiles
 - Check all projects to import
-- Select JDK 11, it should be somewhere around `/usr/lib/jvm/java-11-openjdk` depending on your current system
+- Select JDK 17, it should be somewhere around `/usr/lib/jvm/java-17-openjdk` depending on your current system
 
 Now Idea should import the projects, it could take some time, you can make it faster by following [this](#slow-intellij-idea-fix).
 

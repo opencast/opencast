@@ -241,12 +241,7 @@ public class ScheduledDataCollector extends TimerTask {
   public String getRegistrationDataAsString() throws Exception {
     Form adopter = (Form) adopterFormService.retrieveFormData();
     String generalJson = collectGeneralData(adopter);
-    String statsJson;
-    if (adopter.allowsStatistics()) {
-      statsJson = collectStatisticData(adopter.getAdopterKey(), adopter.getStatisticKey());
-    } else {
-      statsJson = "{}";
-    }
+    String statsJson = collectStatisticData(adopter.getAdopterKey(), adopter.getStatisticKey());
     //It's not stupid if it works!
     return "{ \"general\":" + generalJson + ", \"statistics\":" + statsJson + "}";
   }
@@ -311,8 +306,9 @@ public class ScheduledDataCollector extends TimerTask {
                     .mustNot(QueryBuilders.existsQuery(SearchResult.DELETED_DATE)));
         final SearchResultList results = searchService.search(q);
         long orgMilis = results.getHits().stream().map(
-                result -> EncodingSchemeUtils.decodeDuration(
-                    result.getDublinCore().getFirst(DublinCore.PROPERTY_EXTENT)))
+                result -> EncodingSchemeUtils.decodeDuration(Objects.toString(
+                    result.getDublinCore().getFirst(DublinCore.PROPERTY_EXTENT),
+                    "0")))
             .filter(Objects::nonNull)
             .reduce(Long::sum).orElse(0L);
         statisticData.setTotalMinutes(statisticData.getTotalMinutes() + (orgMilis / 1000 / 60));

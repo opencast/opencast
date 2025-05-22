@@ -55,7 +55,6 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
 import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.adminui.tobira.TobiraException;
 import org.opencastproject.adminui.tobira.TobiraService;
-import org.opencastproject.adminui.util.QueryPreprocessor;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
@@ -64,6 +63,7 @@ import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.QueryPreprocessor;
 import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.elasticsearch.index.objects.series.Series;
@@ -123,6 +123,7 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -130,12 +131,10 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import javax.servlet.http.HttpServletResponse;
@@ -154,7 +153,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-@Path("/")
+@Path("/admin-ng/series")
 @RestService(name = "SeriesProxyService", title = "UI Series",
   abstractText = "This service provides the series data for the UI.",
   notes = { "This service offers the series CRUD Operations for the admin UI.",
@@ -171,6 +170,7 @@ import javax.ws.rs.core.Response.Status;
                 "opencast.service.path=/admin-ng/series",
         }
 )
+@JaxrsResource
 public class SeriesEndpoint {
 
   private static final Logger logger = LoggerFactory.getLogger(SeriesEndpoint.class);
@@ -242,7 +242,6 @@ public class SeriesEndpoint {
     return aclServiceFactory.serviceFor(securityService.getOrganization());
   }
 
-  private Map<String, TobiraService> tobiras = new HashMap<>();
 
   /** OSGi DI. */
   @Reference
@@ -287,7 +286,7 @@ public class SeriesEndpoint {
       if (!matches.matches()) {
         return;
       }
-      var tobira = getTobira(matches.group("organization"));
+      var tobira = TobiraService.getTobira(matches.group("organization"));
       switch (matches.group("key")) {
         case "origin":
           tobira.setOrigin((String) value);
@@ -534,12 +533,8 @@ public class SeriesEndpoint {
     return Response.ok(themesJson.toJSONString()).build();
   }
 
-  private TobiraService getTobira(String organization) {
-    return tobiras.computeIfAbsent(organization, org -> new TobiraService());
-  }
-
   private TobiraService getTobira() {
-    return getTobira(securityService.getOrganization().getId());
+    return TobiraService.getTobira(securityService.getOrganization().getId());
   }
 
   @GET
@@ -781,7 +776,7 @@ public class SeriesEndpoint {
       }
 
       if (optSort.isSome()) {
-        Set<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
+        ArrayList<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
         for (SortCriterion criterion : sortCriteria) {
 
           switch (criterion.getFieldName()) {
@@ -791,7 +786,7 @@ public class SeriesEndpoint {
             case SeriesIndexSchema.CONTRIBUTORS:
               query.sortByContributors(criterion.getOrder());
               break;
-            case SeriesIndexSchema.CREATOR:
+            case SeriesIndexSchema.ORGANIZERS:
               query.sortByOrganizers(criterion.getOrder());
               break;
             case SeriesIndexSchema.CREATED_DATE_TIME:
@@ -1134,6 +1129,139 @@ public Response getSeriesHostPages(@PathParam("seriesId") String seriesId) {
       return Response.ok(seriesData.toJSONString()).build();
     } catch (TobiraException e) {
       throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @POST
+  @Path("{seriesId}/tobira/path")
+  @RestQuery(
+          name = "updateSeriesTobiraPath",
+          description = "Updates the path of the given series in a connected Tobira instance",
+          returnDescription = "Status code",
+          pathParameters = { @RestParameter(
+                  name = "seriesId",
+                  isRequired = true,
+                  description = "The series id",
+                  type = STRING) },
+          restParameters = {
+                  @RestParameter(
+                          name = "pathComponents",
+                          isRequired = true,
+                          description = "List of realms with name and path segment on path to series.",
+                          type = TEXT),
+                  @RestParameter(
+                          name = "currentPath",
+                          isRequired = false,
+                          description = "Path where the series is currently mounted.",
+                          type = STRING),
+                  @RestParameter(
+                          name = "targetPath",
+                          isRequired = true,
+                          description = "Path where the series will be mounted.",
+                          type = STRING) },
+          responses = {
+                  @RestResponse(
+                          responseCode = SC_OK,
+                          description = "The path of the series has successfully been updated in Tobira."),
+                  @RestResponse(
+                          responseCode = SC_NOT_FOUND,
+                          description = "Tobira doesn't know about the given series"),
+                  @RestResponse(
+                          responseCode = SC_SERVICE_UNAVAILABLE,
+                          description = "Tobira is not configured (correctly)") })
+  public Response updateSeriesTobiraPath(
+    @PathParam("seriesId") String seriesId,
+    @FormParam("pathComponents") String pathComponents,
+    @FormParam("currentPath") String currentPath,
+    @FormParam("targetPath") String targetPath
+  ) throws IOException, InterruptedException {
+    if (targetPath == null) {
+      throw new WebApplicationException("target path is missing", BAD_REQUEST);
+    }
+
+    var tobira = getTobira();
+    if (!tobira.ready()) {
+      return Response.status(Status.SERVICE_UNAVAILABLE)
+              .entity("Tobira is not configured (correctly)")
+              .build();
+    }
+
+    try {
+      var paths = (List<JSONObject>) new JSONParser().parse(pathComponents);
+
+      var mountParams = new JSONObject();
+      mountParams.put("seriesId", seriesId);
+      mountParams.put("targetPath", targetPath);
+
+      tobira.createRealmLineage(paths);
+      tobira.addSeriesMountPoint(mountParams);
+
+      if (currentPath != null && !currentPath.trim().isEmpty()) {
+        var unmountParams = new JSONObject();
+        unmountParams.put("seriesId", seriesId);
+        unmountParams.put("currentPath", currentPath);
+        tobira.removeSeriesMountPoint(unmountParams);
+      }
+
+      return ok();
+    } catch (Exception e) {
+      return Response.status(Status.INTERNAL_SERVER_ERROR)
+              .entity("Internal server error: " + e.getMessage())
+              .build();
+    }
+  }
+
+  @DELETE
+  @Path("{seriesId}/tobira/{currentPath}")
+  @RestQuery(
+          name = "removeSeriesTobiraPath",
+          description = "Removes the path of the given series in a connected Tobira instance",
+          returnDescription = "Status code",
+          pathParameters = {
+                  @RestParameter(
+                          name = "seriesId",
+                          isRequired = true,
+                          description = "The series id",
+                          type = STRING),
+                  @RestParameter(
+                          name = "currentPath",
+                          isRequired = true,
+                          description = "URL encoded path where the series is currently mounted.",
+                          type = STRING) },
+          responses = {
+                  @RestResponse(
+                          responseCode = SC_OK,
+                          description = "The path of the series has successfully been removed in Tobira."),
+                  @RestResponse(
+                          responseCode = SC_NOT_FOUND,
+                          description = "Tobira doesn't know about the given series"),
+                  @RestResponse(
+                          responseCode = SC_SERVICE_UNAVAILABLE,
+                          description = "Tobira is not configured (correctly)") })
+  public Response removeSeriesTobiraPath(
+    @PathParam("seriesId") String seriesId,
+    @PathParam("currentPath") String currentPath
+  ) throws IOException, InterruptedException {
+    var tobira = getTobira();
+    if (!tobira.ready()) {
+      return Response.status(Status.SERVICE_UNAVAILABLE)
+              .entity("Tobira is not configured (correctly)")
+              .build();
+    }
+
+    try {
+      if (currentPath != null && !currentPath.trim().isEmpty()) {
+        var unmountParams = new JSONObject();
+        unmountParams.put("seriesId", seriesId);
+        unmountParams.put("currentPath", currentPath);
+        tobira.removeSeriesMountPoint(unmountParams);
+      }
+
+      return ok();
+    } catch (Exception e) {
+      return Response.status(Status.INTERNAL_SERVER_ERROR)
+              .entity("Internal server error: " + e.getMessage())
+              .build();
     }
   }
 

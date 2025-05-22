@@ -28,7 +28,6 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 /**
  * JAXB Adapter for the {@link org.opencastproject.util.data.Option Option} type
  *
- * @param <T>
  */
 public class OptionAdapter<T> extends XmlAdapter<T, Option<T>> {
 

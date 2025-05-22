@@ -33,3 +33,4 @@ jobs:
         name: playwright-report
         path: ./modules/engage-paella-player-7/playwright-report/
         retention-days: 30
+        overwrite: true

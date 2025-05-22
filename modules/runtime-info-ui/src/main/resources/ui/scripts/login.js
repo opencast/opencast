@@ -19,17 +19,17 @@
  *
  */
 
-/* global angular */
-
-'use strict';
-
-var app = angular.module('runtimeNg', []);
-app.controller('LoginCtrl', function ($scope, $location) {
-  $scope.isError = false;
-  $scope.username = 'Username';
-  $scope.password = 'Password';
-
-  if ($location.absUrl().match(/\?error$/)) {
-    $scope.isError = true;
+function init() {
+  const params = new URLSearchParams(document.location.search);
+  if (params.has('error')) {
+    document.getElementById('login').classList.add('error');
   }
-});
+
+  // fill in the default credential on test systems
+  if (window.location.hostname === 'localhost' || window.location.hostname.endsWith('opencast.org')) {
+    document.getElementById('username').value = 'admin';
+    document.getElementById('password').value = 'opencast';
+  }
+}
+
+addEventListener('DOMContentLoaded', () => init());

@@ -106,11 +106,6 @@ public class StaticMetadataServiceMediaPackageImpl implements StaticMetadataServ
       }
 
       @Override
-      public Option<Date> getCreated() {
-        return none();
-      }
-
-      @Override
       public Option<Long> getExtent() {
         return option(mp.getDuration());
       }

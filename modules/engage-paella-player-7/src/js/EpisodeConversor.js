@@ -291,25 +291,6 @@ function getStreams(episode, config) {
   return streams;
 }
 
-function processSegments(episode, manifest) {
-  const { segments } = episode;
-  if (segments) {
-    manifest.transcriptions = manifest.transcriptions || [];
-    if (!Array.isArray(segments.segment)) {
-      segments.segment = [segments.segment];
-    }
-    segments.segment.forEach(({ index, previews, text, time, duration}) => {
-      manifest.transcriptions.push({
-        index,
-        preview: previews?.preview?.$,
-        text,
-        time,
-        duration
-      });
-    });
-  }
-}
-
 // Extract the player preview to show prior to loading videos
 export function getVideoPreview(mediapackage, config) {
   const { attachments } = mediapackage;
@@ -401,6 +382,10 @@ function processAttachments(episode, manifest, config) {
   // Define manifest metadata even if a player preview image doesn't exist
   manifest.metadata = manifest.metadata || {};
   manifest.metadata.preview = playerPreviewImage;
+  // Opencast does not generate a portrait preview image.
+  // Use same image for both landscape and portrait mode.
+  // TODO: Should this be configurable?
+  manifest.metadata.previewPortrait = playerPreviewImage;
 }
 
 function readCaptions(potentialNewCaptions, captions) {
@@ -463,13 +448,71 @@ function getCaptions(episode) {
   if (!(attachments instanceof Array)) { attachments = attachments ? [attachments] : []; }
   if (!(tracks instanceof Array)) { tracks = tracks ? [tracks] : []; }
 
-  // Read the attachments
-  readCaptions(attachments, captions);
-
-  // Read the tracks
+  // Read the captions from the tracks
   readCaptions(tracks, captions);
 
+  // If no captions were found in the tracks, read them from the attachments
+  // (compatibility with older versions of Opencast)
+  if (captions.length == 0) {
+    readCaptions(attachments, captions);
+  }
+
   return captions;
+}
+
+function processTranscriptions(episode, manifest) {
+  var catalog = episode.mediapackage.metadata.catalog;
+  if (!(catalog instanceof Array)) { catalog = catalog ? [catalog] : []; }
+  // catalog contains also the path to the transcriptions XML file
+  catalog.forEach(async (potentialTranscriptions) => {
+    try {
+      if ('mpeg-7/text' === potentialTranscriptions.type) {
+        // Fetch the transcriptions XML file
+        const response = await fetch(potentialTranscriptions.url);
+
+        if (response.ok) {
+          const xml_data = await response.text();
+          const parser = new DOMParser();
+          const xmlDoc = parser.parseFromString(xml_data, 'application/xml');
+          manifest.transcriptions = [];
+          // get all VideoSegment elements which contain time and text of transcriptions
+          const videoSegments = xmlDoc.getElementsByTagName('VideoSegment');
+          for (let i = 0; i < videoSegments.length; i++) {
+            const segment = videoSegments[i];
+            // get and calculate time of VideoSegment in seconds
+            const time = segment.getElementsByTagName('MediaRelTimePoint')[0].textContent;
+            const timeRE = /T(\d+):(\d+):(\d+)/.exec(time);
+            if (timeRE !== null) {
+              const h = Number(timeRE[1]) * 60 * 60;
+              const m = Number(timeRE[2]) * 60;
+              const s = Number(timeRE[3]);
+              const t = h + m + s;
+              // each VideoSegment contains multiple Text elements for the same time
+              const texts = segment.getElementsByTagName('Text');
+              let concatenatedText = '';
+              for (let j = 0; j < texts.length; j++) {
+                if (texts[j].textContent != undefined) {
+                  concatenatedText += texts[j].textContent + ' ';
+                }
+              }
+              if (concatenatedText.trim() !== '') {
+                // search for the preview image with the same time
+                const preview = manifest.frameList.frames.find((preview) => preview.time === t);
+                manifest.transcriptions.push({
+                  id: `frame_${t}`,
+                  mimetype: preview.mimetype ?? '',
+                  time: t,
+                  preview: preview.url ?? '',
+                  text: concatenatedText.trim()
+                });
+              }
+            }
+          }
+        }
+      }
+    }
+    catch (err) {/**/}
+  });
 }
 
 export function episodeToManifest(ocResponse, config) {
@@ -487,9 +530,7 @@ export function episodeToManifest(ocResponse, config) {
     };
 
     processAttachments(episode, result, config);
-    processSegments(episode, result, config);
-
-
+    processTranscriptions(episode, result);
 
     return result;
   }

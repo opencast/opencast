@@ -17,7 +17,7 @@ on:
       - 'docs/log4j/**'
       - 'assemblies/**'
       - '.github/**'
-    branches-ignore:    
+    branches-ignore:
       - 'dependabot/**'  # Don't run dependabot branches, as they are already covered by pull requests
 
 jobs:
@@ -25,8 +25,8 @@ jobs:
     strategy:
       matrix:
         java:
-          - 11
           - 17
+          - 21
     name: build (java ${{ matrix.java }})
     runs-on: ubuntu-22.04
     steps:
@@ -63,10 +63,6 @@ jobs:
             tesseract-ocr-deu \
             unzip
 
-      - name: prepare build
-        run: |
-          sed -i 's/build --skipTests=${skipTests}/build --skipTests=true/' modules/admin-ui-frontend/pom.xml
-
       - name: build opencast
         run: |
           mvn clean install -Pnone \
@@ -77,11 +73,10 @@ jobs:
             -Dmaven.wagon.http.pool=false \
             -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
 
-      - name: build assemblies
-        if: matrix.java == 11
-        working-directory: assemblies
+        #This has to happen in a separate step or else various service classes aren't visible
+      - name: build javadocs
         run: |
-          mvn clean install -Pallinone  \
+          mvn javadoc:javadoc javadoc:aggregate -Pnone \
             --batch-mode \
             -Dsurefire.rerunFailingTestsCount=2 \
             -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
@@ -89,45 +84,118 @@ jobs:
             -Dmaven.wagon.http.pool=false \
             -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
 
-      - name: prepare allinone distribution
-        if: matrix.java == 11
-        working-directory: build
+      - name: build assemblies
+        if: matrix.java == 17
+        working-directory: assemblies
         run: |
-          tar xf opencast-dist-allinone*.tar.gz
+          mvn clean install \
+            --batch-mode \
+            -Dsurefire.rerunFailingTestsCount=2 \
+            -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
+            -Dhttp.keepAlive=false \
+            -Dmaven.wagon.http.pool=false \
+            -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
+
+      - name: prepare cluster
+        if: matrix.java == 17
+        run: |
+          ./.github/multi-node-test-setup
 
       - name: verify jar file integrity
-        if: matrix.java == 11
+        if: matrix.java == 17
         run: |
           .github/test-jars
 
-      - name: prepare runtime dependencies
-        if: matrix.java == 11
-        working-directory: docs/scripts/devel-dependency-containers
-        run: |
-          docker-compose up -d
-
-      - name: wait for elasticsearch to boot
-        if: matrix.java == 11
+      - name: wait for opensearch to boot
+        if: matrix.java == 17
         run: >
           curl -fisS --retry 60 --retry-delay 1 --retry-all-errors
           http://localhost:9200/
 
-      - name: integration test
-        if: matrix.java == 11
-        run: |
-          ./build/opencast-dist-allinone/bin/start-opencast daemon &
-          curl -fisS --retry 30 --retry-delay 10 --retry-all-errors -u admin:opencast http://localhost:8080/sysinfo/bundles/version
-          ./build/opencast-dist-allinone/bin/stop-opencast
+      - name: start admin
+        if: matrix.java == 17
+        run: ./build/opencast-dist-admin/bin/start-opencast daemon &
 
-      - name: show logs on failure
-        if: ${{ failure() }}
-        run: cat build/opencast-dist-allinone/data/log/opencast.log || true
+      - name: start presentation
+        if: matrix.java == 17
+        run: ./build/opencast-dist-presentation/bin/start-opencast daemon &
+
+      - name: start worker
+        if: matrix.java == 17
+        run: ./build/opencast-dist-worker/bin/start-opencast daemon &
+
+      - name: test admin
+        if: matrix.java == 17
+        run: >
+          curl -fisS --retry 30 --retry-delay 10 --retry-all-errors -u admin:opencast
+          http://localhost:8080/sysinfo/bundles/version
+
+      - name: test presentation
+        if: matrix.java == 17
+        run: >
+          curl -fisS --retry 30 --retry-delay 10 --retry-all-errors -u admin:opencast
+          http://localhost:8081/sysinfo/bundles/version
+
+      - name: test worker
+        if: matrix.java == 17
+        run: >
+          curl -fisS --retry 30 --retry-delay 10 --retry-all-errors -u admin:opencast
+          http://localhost:8082/sysinfo/bundles/version
+
+      - name: create test user
+        if: matrix.java == 17
+        run: >
+          curl -i -u admin:opencast http://localhost:8080/user-utils/
+          -F username=test
+          -F password=opencast
+          -F 'roles=["ROLE_STUDIO"]'
+
+      - name: ingest test media as non-admin
+        if: matrix.java == 17
+        run: >
+          curl -i -f -u test:opencast http://localhost:8080/ingest/addMediaPackage/fast
+          -F flavor=presenter/source
+          -F BODY=@modules/inspection-service-ffmpeg/src/test/resources/segments_1.mp4
+          -F title=test
+          -F identifier=test
+          -F acl='{"acl": {"ace": [{"role": "ROLE_USER","action": "read"},{"role": "ROLE_USER","action": "write"}]}}'
+
+      - name: wait for event to finish
+        if: matrix.java == 17
+        env:
+          STATUS_URL: 'http://localhost:8080/workflow/mediaPackage/test/hasActiveWorkflows'
+        run: |
+          while [ "$(curl -s -u admin:opencast "${STATUS_URL}")" = "true" ]
+          do
+           sleep 1
+           echo -n .
+          done
+
+      - name: check that processing was successful
+        if: matrix.java == 17
+        run: |
+          curl -s -O -u admin:opencast http://localhost:8080/workflow/mediaPackage/test/instances.json
+          jq < instances.json
+          jq -r '.workflows.workflow.state' < instances.json | tee status
+          grep -q SUCCEEDED status
+
+      - name: show admin logs
+        if: always()
+        run: cat build/opencast-dist-admin/data/log/opencast.log || true
+
+      - name: show presentation logs
+        if: always()
+        run: cat build/opencast-dist-presentation/data/log/opencast.log || true
+
+      - name: show worker logs
+        if: always()
+        run: cat build/opencast-dist-worker/data/log/opencast.log || true
 
       - name: save version
         working-directory: build
         if: >
           github.event_name == 'push'
-          && matrix.java == 11
+          && matrix.java == 17
           && github.repository == 'opencast/opencast'
           && (github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/r/'))
         run: |
@@ -136,7 +204,7 @@ jobs:
       - name: configure s3cmd
         if: >
           github.event_name == 'push'
-          && matrix.java == 11
+          && matrix.java == 17
           && github.repository == 'opencast/opencast'
           && (github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/r/'))
         env:
@@ -156,24 +224,24 @@ jobs:
         working-directory: build
         if: >
           github.event_name == 'push'
-          && matrix.java == 11
+          && matrix.java == 17
           && github.repository == 'opencast/opencast'
           && (github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/r/'))
         run: |
           s3cmd put -P *.commit opencast-dist-allinone*tar.gz s3://opencast-daily/
 
-      - name: clearing existing data
-        if: matrix.java == 11
+      - name: prepare allinone for upload
+        if: matrix.java == 17
         working-directory: build
         run: |
-          rm -rf opencast-dist-allinone
           tar xf opencast-dist-allinone*.tar.gz
 
       - name: upload tarball as workflow asset
         if: >
-          matrix.java == 11
+          matrix.java == 17
           && github.repository == 'opencast/opencast'
         uses: actions/upload-artifact@v4
         with:
           name: opencast-allinone
           path: build/opencast-dist-allinone/
+          overwrite: true

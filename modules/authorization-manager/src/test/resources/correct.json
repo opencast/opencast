@@ -1,0 +1,11 @@
+{
+  "acl": {
+    "ace": [
+      {
+        "allow": true,
+        "role": "ROLE_USER",
+        "action": "read"
+      }
+    ]
+  }
+}

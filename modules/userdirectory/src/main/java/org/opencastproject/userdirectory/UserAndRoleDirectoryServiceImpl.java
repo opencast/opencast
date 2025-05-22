@@ -410,8 +410,11 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
     // Add additional roles from role providers
     if (!InMemoryUserAndRoleProvider.PROVIDER_NAME.equals(user.getProvider())) {
       for (RoleProvider roleProvider : roleProviders) {
-        List<Role> rolesForUser = roleProvider.getRolesForUser(userName);
-        for (Role role : rolesForUser) {
+        String providerOrgId = roleProvider.getOrganization();
+        if (!ALL_ORGANIZATIONS.equals(providerOrgId) && !user.getOrganization().getId().equals(providerOrgId)) {
+          continue;
+        }
+        for (Role role : roleProvider.getRolesForUser(userName)) {
           authorities.add(new SimpleGrantedAuthority(role.getName()));
         }
       }

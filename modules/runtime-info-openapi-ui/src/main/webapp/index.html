@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Opencast OpenAPI UI (${project.version}</title>
+    <link href="swagger-ui.css" rel="stylesheet" type="text/css">
+    <link href="theme-feeling-blue.css" rel="stylesheet" type="text/css">
+    <link href="favicon.ico" rel="shortcut icon" type="image/x-icon">
+    <link href="favicon.ico" rel="icon" type="image/x-icon">
+    <link href="style.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<header class=center>
+    <a href="/">
+        <img alt=Opencast src=logo.svg style="width: 180px;"/>
+    </a>
+</header>
+<h1><span class=center>REST API Documentation</span></h1>
+<div id="swagger-ui"></div>
+<script charset="UTF-8" src="swagger-ui-bundle.js"></script>
+<script charset="UTF-8" src="swagger-ui-standalone-preset.js"></script>
+<script>
+    window.onload = function () {
+        // If Url is relative, append the host and port
+        var oar = "";
+        if (oar.startsWith("/")) {
+            oar = window.location.protocol + "//" + window.location.host + oar;
+        }
+        SwaggerUIBundle({
+            url: "/openapi.json",
+            dom_id: "#swagger-ui",
+            deepLinking: true,
+            presets: [SwaggerUIBundle.presets.apis, SwaggerUIStandalonePreset],
+            plugins: [SwaggerUIBundle.plugins.DownloadUrl],
+            layout: "BaseLayout",
+            oauth2RedirectUrl: oar,
+        })
+    }
+</script>
+</body>
+</html>

@@ -21,6 +21,7 @@
 
 package org.opencastproject.elasticsearch.index;
 
+import static org.opencastproject.systems.OpencastConstants.EPISODE_ID_ROLE_ACCESS_PROPERTY;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.elasticsearch.api.SearchIndexException;
@@ -40,10 +41,12 @@ import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.elasticsearch.index.objects.theme.IndexTheme;
 import org.opencastproject.elasticsearch.index.objects.theme.ThemeQueryBuilder;
 import org.opencastproject.elasticsearch.index.objects.theme.ThemeSearchQuery;
+import org.opencastproject.list.api.ListProvidersService;
 import org.opencastproject.security.api.User;
 
 import com.google.common.util.concurrent.Striped;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.delete.DeleteResponse;
@@ -54,6 +57,10 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
+import org.osgi.service.component.annotations.ReferencePolicyOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,8 +68,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.locks.Lock;
 import java.util.function.Function;
 
@@ -76,7 +83,6 @@ import javax.xml.bind.Unmarshaller;
         property = {
                 "service.description=Elasticsearch Index"
         },
-        immediate = true,
         service = { ElasticsearchIndex.class }
 )
 public class ElasticsearchIndex extends AbstractElasticsearchIndex {
@@ -115,6 +121,23 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
 
   private final Striped<Lock> locks = Striped.lazyWeakLock(1024);
 
+  private ListProvidersService listProvidersService;
+
+  private boolean episodeIdRole = false;
+
+  @Reference(
+      cardinality = ReferenceCardinality.OPTIONAL,
+      policy = ReferencePolicy.DYNAMIC,
+      policyOption = ReferencePolicyOption.GREEDY
+  )
+  public void setListProvidersService(ListProvidersService listProvidersService) {
+    this.listProvidersService = listProvidersService;
+  }
+
+  public void unsetListProvidersService(ListProvidersService listProvidersService) {
+    this.listProvidersService = null;
+  }
+
   /**
    * OSGi callback to activate this component instance.
    *
@@ -135,6 +158,10 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
     } catch (Throwable t) {
       throw new ComponentException("Error initializing elastic search index", t);
     }
+
+    episodeIdRole = BooleanUtils.toBoolean(Objects.toString(
+        bundleContext.getProperty(EPISODE_ID_ROLE_ACCESS_PROPERTY), "false"));
+    logger.debug("Usage of episode ID roles is set to {}", episodeIdRole);
   }
 
   /**
@@ -406,7 +433,8 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
     logger.debug("Adding event {} to search index", event.getIdentifier());
 
     // Add the resource to the index
-    SearchMetadataCollection inputDocument = EventIndexUtils.toSearchMetadata(event);
+    SearchMetadataCollection inputDocument = EventIndexUtils.toSearchMetadata(event, listProvidersService,
+        episodeIdRole);
     List<SearchMetadata<?>> resourceMetadata = inputDocument.getMetadata();
     ElasticsearchDocument doc = new ElasticsearchDocument(inputDocument.getIdentifier(),
             inputDocument.getDocumentType(), resourceMetadata);
@@ -432,7 +460,8 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
     for (Event event: eventList) {
       logger.debug("Adding event {} to search index", event.getIdentifier());
       // Add the resource to the index
-      SearchMetadataCollection inputDocument = EventIndexUtils.toSearchMetadata(event);
+      SearchMetadataCollection inputDocument = EventIndexUtils.toSearchMetadata(event, listProvidersService,
+          episodeIdRole);
       List<SearchMetadata<?>> resourceMetadata = inputDocument.getMetadata();
       docs.add(new ElasticsearchDocument(inputDocument.getIdentifier(),
               inputDocument.getDocumentType(), resourceMetadata));
@@ -839,27 +868,5 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
     } catch (Throwable t) {
       throw new SearchIndexException("Error querying theme index", t);
     }
-  }
-
-  /**
-   * Escapes all reserved Elasticsearch characters in a given string
-   * Useful for when a given query string does not know about Elasticsearch query syntax
-   * @param text String to escape reserved characters in
-   * @return the given string with escaped characters
-   */
-  public String escapeQuery(String text) {
-    Set<Character> specialChars = Set.of('\\', '+', '-', '!', '(', ')', ':', '^', '[', ']', '\"', '{', '}', '~', '*',
-            '?', '|', '&', '/');
-
-    StringBuilder sb = new StringBuilder(text.length());
-
-    for (char c : text.toCharArray()) {
-      if (specialChars.contains(c)) {
-        sb.append('\\');
-      }
-      sb.append(c);
-    }
-
-    return sb.toString();
   }
 }

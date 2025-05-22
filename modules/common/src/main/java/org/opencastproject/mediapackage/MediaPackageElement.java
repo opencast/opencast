@@ -56,6 +56,13 @@ public interface MediaPackageElement extends ManifestContributor, Comparable<Med
   void setIdentifier(String id);
 
   /**
+   * Generate a new random identifier for this element.
+   *
+   * @return The new identifier.
+   */
+  String generateIdentifier();
+
+  /**
    * Returns the element's manifest type.
    *
    * @return the manifest type

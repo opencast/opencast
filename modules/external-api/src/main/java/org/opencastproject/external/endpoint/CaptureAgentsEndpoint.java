@@ -27,7 +27,7 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.external.common.ApiMediaType;
-import org.opencastproject.external.common.ApiResponses;
+import org.opencastproject.external.common.ApiResponseBuilder;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -40,6 +40,7 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +57,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-@Path("/")
+@Path("/api/agents")
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0,
             ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0, ApiMediaType.VERSION_1_6_0,
             ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0, ApiMediaType.VERSION_1_9_0,
@@ -76,6 +77,7 @@ import javax.ws.rs.core.Response;
         "opencast.service.path=/api/agents"
     }
 )
+@JaxrsResource
 public class CaptureAgentsEndpoint {
 
   /** The logging facility */
@@ -122,10 +124,10 @@ public class CaptureAgentsEndpoint {
     final Agent agent = agentStateService.getAgent(id);
 
     if (agent == null) {
-      return ApiResponses.notFound("Cannot find an agent with id '%s'.", id);
+      return ApiResponseBuilder.notFound("Cannot find an agent with id '%s'.", id);
     }
 
-    return ApiResponses.Json.ok(acceptHeader, generateJsonAgent(agent));
+    return ApiResponseBuilder.Json.ok(acceptHeader, generateJsonAgent(agent));
   }
 
   @GET
@@ -163,7 +165,7 @@ public class CaptureAgentsEndpoint {
         .map(a -> generateJsonAgent(a))
         .collect(Collectors.toList());
 
-    return ApiResponses.Json.ok(acceptHeader, arr(agentsJSON));
+    return ApiResponseBuilder.Json.ok(acceptHeader, arr(agentsJSON));
   }
 
 

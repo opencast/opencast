@@ -27,6 +27,7 @@ import org.opencastproject.serviceregistry.api.SystemLoad.NodeLoad;
 import org.opencastproject.util.NotFoundException;
 
 import java.util.List;
+import java.util.Map;
 
 /** Manages clustered services and the {@link Job}s they may create to enable asynchronous job handling. */
 public interface ServiceRegistry {
@@ -607,6 +608,20 @@ public interface ServiceRegistry {
    *           if there is a problem accessing the service registry
    */
   long count(String serviceType, String host, String operation, Status status) throws ServiceRegistryException;
+
+  /**
+   * Count active jobs and group them by organization and host.
+   *
+   * @return Map of organizations, hosts and the number of jobs.
+   */
+  Map<String, Map<String, Long>> countActiveByOrganizationAndHost();
+
+  /**
+   * Count active jobs of a given operation type and group them by organization.
+   *
+   * @return Map of organizations and the number of jobs.
+   */
+  Map<String, Long> countActiveTypeByOrganization(String operation);
 
   /**
    * Sets the given service to NORMAL state
