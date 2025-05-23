@@ -55,11 +55,6 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.Fn2;
-import com.entwinemedia.fn.Stream;
-import com.entwinemedia.fn.data.Opt;
-
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -78,6 +73,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -204,16 +200,17 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
 
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
 
-    Opt<String> optSeries = getOptConfig(workflowInstance.getCurrentOperation(), SERIES_PROPERTY);
-    Opt<String> optAttachFlavors = getOptConfig(workflowInstance.getCurrentOperation(), ATTACH_PROPERTY);
-    Boolean applyAcl = getOptConfig(workflowInstance.getCurrentOperation(), APPLY_ACL_PROPERTY).map(toBoolean)
-            .getOr(false);
-    Opt<String> optCopyMetadata = getOptConfig(workflowInstance.getCurrentOperation(), COPY_METADATA_PROPERTY);
-    String defaultNamespace = getOptConfig(workflowInstance.getCurrentOperation(), DEFAULT_NS_PROPERTY)
-            .getOr(DublinCore.TERMS_NS_URI);
+    Optional<String> optSeries = Optional.ofNullable(getOptConfig(workflowInstance.getCurrentOperation(), SERIES_PROPERTY).orNull());
+    Optional<String> optAttachFlavors = Optional.ofNullable(getOptConfig(workflowInstance.getCurrentOperation(), ATTACH_PROPERTY).orNull());
+    Boolean applyAcl = Optional.ofNullable(getOptConfig(workflowInstance.getCurrentOperation(), APPLY_ACL_PROPERTY).orNull())
+        .map(value -> BooleanUtils.toBoolean(value))
+        .orElse(false);
+    Optional<String> optCopyMetadata = Optional.ofNullable(getOptConfig(workflowInstance.getCurrentOperation(), COPY_METADATA_PROPERTY).orNull());
+    String defaultNamespace = Optional.ofNullable(getOptConfig(workflowInstance.getCurrentOperation(), DEFAULT_NS_PROPERTY).orNull())
+        .orElse(DublinCore.TERMS_NS_URI);
     logger.debug("Using default namespace: '{}'", defaultNamespace);
 
-    if (optSeries.isSome() && !optSeries.get().equals(mediaPackage.getSeries())) {
+    if (optSeries.isPresent() && !optSeries.get().equals(mediaPackage.getSeries())) {
       logger.info("Changing series id from '{}' to '{}'", StringUtils.trimToEmpty(mediaPackage.getSeries()),
               optSeries.get());
       mediaPackage.setSeries(optSeries.get());
@@ -243,7 +240,7 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
 
     // Process extra metadata
     HashSet<EName> extraMetadata = new HashSet<>();
-    if (optCopyMetadata.isSome()) {
+    if (optCopyMetadata.isPresent()) {
       for (String strEName : optCopyMetadata.get().split(",+\\s*"))
         try {
           if (!strEName.isEmpty()) {
@@ -283,7 +280,7 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
     }
 
     // Attach series catalogs
-    if (optAttachFlavors.isSome()) {
+    if (optAttachFlavors.isPresent()) {
       // Remove existing series catalogs
       AbstractMediaPackageElementSelector<Catalog> catalogSelector = new CatalogSelector();
       String[] seriesFlavors = StringUtils.split(optAttachFlavors.get(), ",");
@@ -315,8 +312,8 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
               addDublinCoreCatalog(series, MediaPackageElements.SERIES, mediaPackage);
             } else {
               try {
-                Opt<byte[]> seriesElementData = seriesService.getSeriesElementData(seriesId, adapterFlavor.getType());
-                if (seriesElementData.isSome()) {
+                Optional<byte[]> seriesElementData = Optional.ofNullable(seriesService.getSeriesElementData(seriesId, adapterFlavor.getType()).orNull());
+                if (seriesElementData.isPresent()) {
                   DublinCoreCatalog catalog = DublinCores.read(new ByteArrayInputStream(seriesElementData.get()));
                   addDublinCoreCatalog(catalog, adapterFlavor, mediaPackage);
                 } else {
@@ -353,7 +350,16 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
    */
   private List<SeriesCatalogUIAdapter> getSeriesCatalogUIAdapters() {
     String organization = securityService.getOrganization().getId();
-    return Stream.$(seriesCatalogUIAdapters).filter(seriesOrganizationFilter._2(organization)).toList();
+
+    List<SeriesCatalogUIAdapter> filteredAdapters = new ArrayList<>();
+
+    for (SeriesCatalogUIAdapter adapter : seriesCatalogUIAdapters) {
+      if (adapter.handlesOrganization(organization)) {
+        filteredAdapters.add(adapter);
+      }
+    }
+
+    return filteredAdapters;
   }
 
   private MediaPackage addDublinCoreCatalog(DublinCoreCatalog catalog, MediaPackageElementFlavor flavor,
@@ -370,20 +376,4 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
       throw new WorkflowOperationException(e);
     }
   }
-
-  private static final Fn2<SeriesCatalogUIAdapter, String, Boolean> seriesOrganizationFilter = new Fn2<SeriesCatalogUIAdapter, String, Boolean>() {
-    @Override
-    public Boolean apply(SeriesCatalogUIAdapter catalogUIAdapter, String organization) {
-      return catalogUIAdapter.handlesOrganization(organization);
-    }
-  };
-
-  /** Convert a string into a boolean. */
-  private static final Fn<String, Boolean> toBoolean = new Fn<String, Boolean>() {
-    @Override
-    public Boolean apply(String s) {
-      return BooleanUtils.toBoolean(s);
-    }
-  };
-
 }

@@ -101,10 +101,20 @@ To add a dummy CA, go to the API Docs page in Opencast and enter a new capture a
 
   **Configuration:**
 
+General Structure:
+
     {
-    "key": "capture.device.names",
-    "value": "presentation,presenter"
+        "key": "value",
+        "another_key": "value",
+        ...
     }
+
+And here is a concrete example how you can add two channels:
+
+    {
+        "capture.device.names": "presentation,presenter"
+    }
+
 
 Click on `submit` and is ready to go.
 

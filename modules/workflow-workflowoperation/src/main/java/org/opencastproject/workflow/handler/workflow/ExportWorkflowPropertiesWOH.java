@@ -20,7 +20,6 @@
  */
 package org.opencastproject.workflow.handler.workflow;
 
-import static com.entwinemedia.fn.Stream.$;
 import static org.opencastproject.workflow.handler.workflow.ImportWorkflowPropertiesWOH.loadPropertiesFromXml;
 
 import org.opencastproject.job.api.JobContext;
@@ -41,8 +40,6 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.fns.Strings;
-
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -54,12 +51,15 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 /**
  * Workflow operation handler for exporting workflow properties.
@@ -97,7 +97,10 @@ public class ExportWorkflowPropertiesWOH extends AbstractWorkflowOperationHandle
           throws WorkflowOperationException {
     logger.info("Start exporting workflow properties for workflow {}", workflowInstance);
     final MediaPackage mediaPackage = workflowInstance.getMediaPackage();
-    final Set<String> keys = $(getOptConfig(workflowInstance, KEYS_PROPERTY)).bind(Strings.splitCsv).toSet();
+    // Parse CSV
+    final Set<String> keys = Optional.ofNullable(getOptConfig(workflowInstance, KEYS_PROPERTY).orNull())
+        .map(s -> Arrays.stream(s.split("\\s*,\\s*")).collect(Collectors.toSet()))
+        .orElse(Collections.emptySet());
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
         Configuration.none, Configuration.none, Configuration.many, Configuration.many);
     List<MediaPackageElementFlavor> targetFlavorList = tagsAndFlavors.getTargetFlavors();
