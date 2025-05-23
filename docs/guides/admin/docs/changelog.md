@@ -4,8 +4,21 @@ Changelog
 Opencast 16
 -----------
 
+### Opencast 16.11
+
+- [[#6681](https://github.com/opencast/opencast/pull/6681)] -
+  Allow Opensearch to be in yellow state
+- [[#6621](https://github.com/opencast/opencast/pull/6621)] -
+  Properly handle Tobira harvest of events with streaming-only tracks
+- [[#6581](https://github.com/opencast/opencast/pull/6581)] -
+  Set sender value in sent emails if set
+- [[#6431](https://github.com/opencast/opencast/pull/6431)] -
+  Avoid NPEs during wowza retraction
+
 ### Opencast 16.10
 
+- [[#6552](https://github.com/opencast/opencast/pull/6552)] -
+  Opencast 16.10 Release Notes
 - [[#6517](https://github.com/opencast/opencast/pull/6517)] -
   Fix uncleaned merge conflict
 - [[#6499](https://github.com/opencast/opencast/pull/6499)] -
