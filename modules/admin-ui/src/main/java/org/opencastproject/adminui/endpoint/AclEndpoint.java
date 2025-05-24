@@ -31,8 +31,6 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.opencastproject.index.service.util.RestUtils.okJsonList;
-import static org.opencastproject.userdirectory.UserIdRoleProvider.getUserRolePrefix;
-import static org.opencastproject.userdirectory.UserIdRoleProvider.isSanitize;
 import static org.opencastproject.util.RestUtil.R.conflict;
 import static org.opencastproject.util.RestUtil.R.noContent;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
@@ -54,8 +52,6 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.RoleDirectoryService;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.security.api.User;
-import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -89,7 +85,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -139,9 +134,6 @@ public class AclEndpoint {
   // The role directory service
   private RoleDirectoryService roleDirectoryService;
 
-  /** The global user directory service */
-  protected UserDirectoryService userDirectoryService;
-
   /**
    * @param aclServiceFactory
    *          the aclServiceFactory to set
@@ -174,11 +166,6 @@ public class AclEndpoint {
 
   private AclService aclService() {
     return aclServiceFactory.serviceFor(securityService.getOrganization());
-  }
-
-  @Reference
-  public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
-    this.userDirectoryService = userDirectoryService;
   }
 
   @GET
@@ -292,13 +279,6 @@ public class AclEndpoint {
       jsonRole.put("type", role.getType().toString());
       jsonRole.put("description", role.getDescription());
       jsonRole.put("organization", role.getOrganizationId());
-      jsonRole.put("isSanitize", isSanitize());
-      if (!isSanitize()) {
-        User user = userDirectoryService.loadUser(role.getName().replaceFirst(getUserRolePrefix(), ""));
-        if (user != null) {
-          jsonRole.put("user", generateJsonUser(user));
-        }
-      }
       jsonRoles.add(jsonRole);
     }
 
@@ -420,14 +400,5 @@ public class AclEndpoint {
       return full(acl);
     }
   };
-
-  public Map<String, Object> generateJsonUser(User user) {
-    // Prepare the roles
-    Map<String, Object> userData = new HashMap<>();
-    userData.put("username", user.getUsername());
-    userData.put("name", user.getName());
-    userData.put("email", user.getEmail());
-    return userData;
-  }
 
 }
