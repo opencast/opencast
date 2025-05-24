@@ -519,8 +519,8 @@ public class AbstractEventEndpointTest {
 
     // Fix ordering for embedded acl json string
     String expectedAclString = getAclString(eventAccessJson);
-    JSONArray aclString = getAclArray(result.toJSONString());
-    assertThat(expectedAclString, SameJSONAs.sameJSONAs(aclString.toJSONString()));
+    String aclString = getAclString(result.toJSONString());
+    assertThat(expectedAclString, SameJSONAs.sameJSONAs(aclString));
 
     JSONObject episodeAccess = (JSONObject) result.get("episode_access");
     episodeAccess.replace("acl", expectedAclString);
@@ -532,12 +532,6 @@ public class AbstractEventEndpointTest {
     JSONObject accessJson = (JSONObject) new JSONParser().parse(accessJsonString);
     JSONObject episodeAccess = (JSONObject) accessJson.get("episode_access");
     return (String) episodeAccess.get("acl");
-  }
-
-  private JSONArray getAclArray(String accessJsonString) throws ParseException {
-    JSONObject accessJson = (JSONObject) new JSONParser().parse(accessJsonString);
-    JSONObject episodeAccess = (JSONObject) accessJson.get("episode_access");
-    return (JSONArray) episodeAccess.get("acl");
   }
 
   @Test

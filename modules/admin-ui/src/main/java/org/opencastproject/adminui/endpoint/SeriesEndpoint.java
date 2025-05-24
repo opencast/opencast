@@ -37,7 +37,6 @@ import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static javax.ws.rs.core.Response.Status.NO_CONTENT;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
-import static org.opencastproject.adminui.endpoint.EndpointUtil.transformAccessControList;
 import static org.opencastproject.index.service.util.RestUtils.notFound;
 import static org.opencastproject.index.service.util.RestUtils.okJson;
 import static org.opencastproject.index.service.util.RestUtils.okJsonList;
@@ -91,7 +90,6 @@ import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
-import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.systems.OpencastConstants;
@@ -200,7 +198,6 @@ public class SeriesEndpoint {
   private ListProvidersService listProvidersService;
   private ElasticsearchIndex searchIndex;
   private AdminUIConfiguration adminUIConfiguration;
-  private UserDirectoryService userDirectoryService;
 
   /** Default server URL */
   private String serverUrl = "http://localhost:8080";
@@ -250,12 +247,6 @@ public class SeriesEndpoint {
   @Reference
   public void setAdminUIConfiguration(AdminUIConfiguration adminUIConfiguration) {
     this.adminUIConfiguration = adminUIConfiguration;
-  }
-
-  /** Sets the user directory service */
-  @Reference
-  public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
-    this.userDirectoryService = userDirectoryService;
   }
 
   @Activate
@@ -339,7 +330,7 @@ public class SeriesEndpoint {
               adminUIConfiguration.getMatchManagedAclRolePrefixes());
       seriesAccessJson.put("current_acl", currentAcl.isSome() ? currentAcl.get().getId() : 0);
       seriesAccessJson.put("privileges", AccessInformationUtil.serializePrivilegesByRole(seriesAccessControl));
-      seriesAccessJson.put("acl", transformAccessControList(seriesAccessControl, userDirectoryService));
+      seriesAccessJson.put("acl", AccessControlParser.toJsonSilent(seriesAccessControl));
       seriesAccessJson.put("locked", hasProcessingEvents);
     } catch (SeriesException e) {
       logger.error("Unable to get ACL from series {}", seriesId, e);
