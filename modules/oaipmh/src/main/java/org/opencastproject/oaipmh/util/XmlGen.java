@@ -20,7 +20,6 @@
  */
 package org.opencastproject.oaipmh.util;
 
-import static com.entwinemedia.fn.Stream.$;
 import static org.opencastproject.util.IoSupport.withResource;
 import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.functions.Misc.chuck;
@@ -31,7 +30,6 @@ import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Option;
 
-import com.entwinemedia.fn.Fn;
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang3.ObjectUtils;
@@ -43,8 +41,8 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -332,22 +330,22 @@ public abstract class XmlGen {
   // CHECKSTYLE:ON
 
   private List<Node> filter(List<Option<Node>> nodes) {
-    return $(nodes).bind(new Fn<Option<Node>, Collection<Node>>() {
-      @Override
-      public Collection<Node> apply(Option<Node> nodeOption) {
-        return nodeOption.fold(new Option.Match<Node, Collection<Node>>() {
-          @Override
-          public Collection<Node> some(Node node) {
-            return Collections.singletonList(node);
-          }
+    List<Node> result = new ArrayList<>();
+    for (Option<Node> option : nodes) {
+      option.fold(new Option.Match<Node, Void>() {
+        @Override
+        public Void some(Node node) {
+          result.add(node);
+          return null;
+        }
 
-          @Override
-          public Collection<Node> none() {
-            return Collections.emptyList();
-          }
-        });
-      }
-    }).toList();
+        @Override
+        public Void none() {
+          return null;
+        }
+      });
+    }
+    return result;
   }
 
   private Element appendNs(Element e, List<Namespace> namespaces) {
