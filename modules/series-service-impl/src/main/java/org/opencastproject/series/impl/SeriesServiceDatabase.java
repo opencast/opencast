@@ -29,8 +29,6 @@ import org.opencastproject.series.impl.persistence.SeriesEntity;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
 
-import com.entwinemedia.fn.data.Opt;
-
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -243,7 +241,7 @@ public interface SeriesServiceDatabase {
    * @throws SeriesServiceDatabaseException
    *           if an error occurs while retrieving the element from the database
    */
-  Opt<byte[]> getSeriesElement(String seriesId, String type) throws SeriesServiceDatabaseException;
+  Optional<byte[]> getSeriesElement(String seriesId, String type) throws SeriesServiceDatabaseException;
 
   /**
    * Returns all elements of a series or an empty map if the series does not contain any elements. The key of the map
@@ -255,6 +253,6 @@ public interface SeriesServiceDatabase {
    * @throws SeriesServiceDatabaseException
    *           if an error occurs while retrieving the element from the database
    */
-  Opt<Map<String, byte[]>> getSeriesElements(String seriesId) throws SeriesServiceDatabaseException;
+  Optional<Map<String, byte[]>> getSeriesElements(String seriesId) throws SeriesServiceDatabaseException;
 
 }

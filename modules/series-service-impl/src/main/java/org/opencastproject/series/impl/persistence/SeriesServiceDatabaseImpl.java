@@ -45,8 +45,6 @@ import org.opencastproject.series.impl.SeriesServiceDatabase;
 import org.opencastproject.series.impl.SeriesServiceDatabaseException;
 import org.opencastproject.util.NotFoundException;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
@@ -688,20 +686,20 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
   }
 
   @Override
-  public Opt<byte[]> getSeriesElement(String seriesId, String type) throws SeriesServiceDatabaseException {
+  public Optional<byte[]> getSeriesElement(String seriesId, String type) throws SeriesServiceDatabaseException {
     try {
       return db.exec(em -> {
         Optional<SeriesEntity> series = getSeriesEntity(seriesId).apply(em);
         if (series.isEmpty()) {
-          return Opt.none();
+          return Optional.empty();
         }
 
         Map<String, byte[]> elements = series.get().getElements();
         if (!elements.containsKey(type)) {
-          return Opt.none();
+          return Optional.empty();
         }
 
-        return Opt.some(elements.get(type));
+        return Optional.of(elements.get(type));
       });
 
     } catch (Exception e) {
@@ -710,14 +708,14 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
   }
 
   @Override
-  public Opt<Map<String, byte[]>> getSeriesElements(String seriesId) throws SeriesServiceDatabaseException {
+  public Optional<Map<String, byte[]>> getSeriesElements(String seriesId) throws SeriesServiceDatabaseException {
     try {
       return db.exec(em -> {
         Optional<SeriesEntity> series = getSeriesEntity(seriesId).apply(em);
         if (series.isEmpty()) {
-          return Opt.none();
+          return Optional.empty();
         }
-        return Opt.some(series.get().getElements());
+        return Optional.of(series.get().getElements());
       });
     } catch (Exception e) {
       throw new SeriesServiceDatabaseException(e);
@@ -726,6 +724,6 @@ public class SeriesServiceDatabaseImpl implements SeriesServiceDatabase {
 
   @Override
   public boolean existsSeriesElement(String seriesId, String type) throws SeriesServiceDatabaseException {
-    return getSeriesElement(seriesId, type).isSome();
+    return getSeriesElement(seriesId, type).isPresent();
   }
 }

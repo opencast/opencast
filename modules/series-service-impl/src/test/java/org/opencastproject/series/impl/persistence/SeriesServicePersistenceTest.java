@@ -43,8 +43,6 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
 import org.junit.Before;
@@ -52,6 +50,7 @@ import org.junit.Test;
 
 import java.io.InputStream;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Tests persistence: storing, merging, retrieving and removing.
@@ -163,7 +162,7 @@ public class SeriesServicePersistenceTest {
 
     assertTrue(seriesDatabase.deleteSeriesElement(seriesId, ELEMENT_TYPE));
     assertFalse(seriesDatabase.deleteSeriesElement(seriesId, ELEMENT_TYPE));
-    assertEquals(Opt.none(), seriesDatabase.getSeriesElement(seriesId, ELEMENT_TYPE));
+    assertEquals(Optional.empty(), seriesDatabase.getSeriesElement(seriesId, ELEMENT_TYPE));
   }
 
 }
