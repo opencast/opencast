@@ -43,6 +43,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -131,6 +132,7 @@ public class LifeCyclePolicyImpl implements LifeCyclePolicy {
       cascade = { CascadeType.PERSIST, CascadeType.MERGE, CascadeType.REMOVE },
       orphanRemoval = true
   )
+  @JoinColumn(name = "lifecyclepolicy_id", nullable = false)
   @OrderColumn(name = "position_policy_access_control_entries")
   private List<LifeCyclePolicyAccessControlEntryImpl> accessControlEntries = new ArrayList<>();
 
