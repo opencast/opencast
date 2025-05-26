@@ -1,7 +1,7 @@
-Opencast 10
-----------
+Opencast 10 Changelog
+---------------------
 
-### Opencast 10.14
+## Opencast 10.14
 
 *Released on June 14th, 2022*
 
@@ -11,7 +11,7 @@ Opencast 10
   Add Placeholders for Video Resolution to Rename-Files
 
 
-### Opencast 10.13
+## Opencast 10.13
 
 *Released on May 11th, 2022*
 
@@ -23,7 +23,7 @@ Opencast 10
   Update Paella 6.5.6 config.json
 
 
-### Opencast 10.12
+## Opencast 10.12
 
 *Released on Apr 19th, 2022*
 
@@ -35,7 +35,7 @@ Opencast 10
   Update paella player to paella 6.5.6
 
 
-### Opencast 10.11
+## Opencast 10.11
 
 *Released on Mar 22nd, 2022*
 
@@ -53,7 +53,7 @@ Opencast 10
   Opencast 10.10 release notes and changelog
 
 
-### Opencast 10.10
+## Opencast 10.10
 
 *Released on Feb 17th, 2022*
 
@@ -89,7 +89,7 @@ Opencast 10
   Add download artifacts in engage publication
 
 
-### Opencast 10.9
+## Opencast 10.9
 
 *Released on January 18th, 2022*
 
@@ -121,7 +121,7 @@ Opencast 10
   Inbox may fail at startup
 
 
-### Opencast 10.8
+## Opencast 10.8
 
 *Released on December 20th, 2021*
 
@@ -129,7 +129,7 @@ Opencast 10
   Security: Update to Pax Logging 1.11.12
 
 
-### Opencast 10.7
+## Opencast 10.7
 
 *Released on December 17th, 2021*
 
@@ -142,7 +142,7 @@ Opencast 10
 - [[#3223](https://github.com/opencast/opencast/pull/3223)] -
   Fix multiple extended metadata catalogs for series
 
-### Opencast 10.6
+## Opencast 10.6
 
 *Released on December 13th, 2021*
 
@@ -190,7 +190,7 @@ Opencast 10
   Stream Security Fix
 
 
-### Opencast 10.5
+## Opencast 10.5
 
 *Released on November 10th, 2021*
 
@@ -210,7 +210,7 @@ Opencast 10
   Handle wildcard target flavors in execute-many WOH
 
 
-### Opencast 10.4
+## Opencast 10.4
 
 *Released on October 13th, 2021*
 
@@ -240,7 +240,7 @@ Opencast 10
   Retry Documentation Deployment
 
 
-### Opencast 10.3
+## Opencast 10.3
 
 *Released on September 15th, 2021*
 
@@ -282,7 +282,7 @@ Opencast 10
   Use UTF-8 for config files
 
 
-### Opencast 10.2
+## Opencast 10.2
 
 *Released on August 18th, 2021*
 
@@ -369,7 +369,7 @@ Opencast 10
 </ul>
 </details>
 
-### Opencast 10.1
+## Opencast 10.1
 
 *Released on July 14th, 2021*
 
@@ -429,7 +429,7 @@ Opencast 10
   Improved Error Handling
 
 
-### Opencast 10.0
+## Opencast 10.0
 
 *Released on June 15th, 2021*
 

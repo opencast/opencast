@@ -1,8 +1,8 @@
-Opencast 14
------------
+Opencast 14 Changelog
+---------------------
 
 
-### Opencast 14.13
+## Opencast 14.13
 
 *Released on June 11th, 2024*
 
@@ -20,7 +20,7 @@ Opencast 14
   Series ACL and extended metadata handling on ingest
 
 
-### Opencast 14.12
+## Opencast 14.12
 
 *Released on May 14th, 2024*
 
@@ -40,7 +40,7 @@ Opencast 14
   Paella: Fix error displayed before authenticating user.
 
 
-### Opencast 14.11
+## Opencast 14.11
 
 *Released on April 16th, 2024*
 
@@ -49,7 +49,7 @@ Opencast 14
 - [[#5667](https://github.com/opencast/opencast/pull/5667)] -
   Fixed NPE on filtering data
 
-### Opencast 14.10
+## Opencast 14.10
 
 *Released on March 14th, 2024*
 
@@ -67,7 +67,7 @@ Opencast 14
   Include all metadata in Tobira harvest API for series
 
 
-### Opencast 14.9
+## Opencast 14.9
 
 *Released on February 13th, 2024*
 
@@ -90,7 +90,7 @@ Opencast 14
 - [[#5231](https://github.com/opencast/opencast/pull/5231)] -
   Update Stud.IP User Provider
 
-### Opencast 14.8
+## Opencast 14.8
 
 *Released on January 16th, 2024*
 
@@ -103,7 +103,7 @@ Opencast 14
 - [[#5481](https://github.com/opencast/opencast/pull/5481)] -
   Fix Paella Player 7 login redirect
 
-### Opencast 14.7
+## Opencast 14.7
 
 *Released on December 12th, 2023*
 
@@ -116,7 +116,7 @@ Opencast 14
 - [[#5270](https://github.com/opencast/opencast/pull/5270)] -
   Fix logging for WhisperEngine
 
-### Opencast 14.6
+## Opencast 14.6
 
 *Released on November 16th, 2023*
 
@@ -129,7 +129,7 @@ Opencast 14
 - [[#5315](https://github.com/opencast/opencast/pull/5315)] -
   Improve Performance of Permission Check in AssetManager
 
-### Opencast 14.5
+## Opencast 14.5
 
 *Released on October 19th, 2023*
 
@@ -144,7 +144,7 @@ Opencast 14
 - [[#5240](https://github.com/opencast/opencast/pull/5240)] -
   Use context aware logger for workflow service
 
-### Opencast 14.4
+## Opencast 14.4
 
 *Released on September 14th, 2023*
 
@@ -170,7 +170,7 @@ Opencast 14
   Opencast 14.3 release notes
 
 
-### Opencast 14.3
+## Opencast 14.3
 
 *Released on August 23rd, 2023*
 
@@ -184,7 +184,7 @@ Opencast 14
   Add Opencast 14.2 release notes
 
 
-### Opencast 14.2
+## Opencast 14.2
 
 *Released on August 9th, 2023*
 
@@ -196,7 +196,7 @@ Opencast 14
   Upgrade Crowdin Integration
 
 
-### Opencast 14.1
+## Opencast 14.1
 
 *Released on July 13th, 2023*
 
@@ -210,7 +210,7 @@ Opencast 14
   Switch to OpenSearch by default
 
 
-### Opencast 14.0
+## Opencast 14.0
 
 *Released on June 22th, 2023*
 

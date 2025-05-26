@@ -1,14 +1,14 @@
-Opencast 15
------------
+Opencast 15 Changelog
+---------------------
 
-### Opencast 15.13
+## Opencast 15.13
 
 - [[#6306](https://github.com/opencast/opencast/pull/6306)] -
   Fixes session timeout bug by upgrading pax-web
 - [[#6242](https://github.com/opencast/opencast/pull/6242)] -
   Backport "Attach Amberscript transcriptions as tracks"
 
-### Opencast 15.12
+## Opencast 15.12
 
 - [[#6296](https://github.com/opencast/opencast/pull/6296)] -
   Upgrade upload-artifacts from v3 to v4
@@ -17,14 +17,14 @@ Opencast 15
 - [[#6156](https://github.com/opencast/opencast/pull/6156)] -
   Fix non-themed subtitle publications
 
-### Opencast 15.11
+## Opencast 15.11
 
 - [[#6238](https://github.com/opencast/opencast/pull/6238)] -
   Fix ICLA Check
 - [[#6157](https://github.com/opencast/opencast/pull/6157)] -
   Fix tobira harvest acls
 
-### Opencast 15.10
+## Opencast 15.10
 
 - [[#6106](https://github.com/opencast/opencast/pull/6106)] -
   Remove old database update test
@@ -33,7 +33,7 @@ Opencast 15
 - [[#5587](https://github.com/opencast/opencast/pull/5587)] -
   Fix ltitools Upload crashing if extendedMetadata exists
 
-### Opencast 15.9
+## Opencast 15.9
 
 - [[#6104](https://github.com/opencast/opencast/pull/6104)] -
   Fix broken ingest
@@ -42,7 +42,7 @@ Opencast 15
 - [[#6095](https://github.com/opencast/opencast/pull/6095)] -
   Remove references to JIRA in feedback URL docs
 
-### Opencast 15.8
+## Opencast 15.8
 
 - [[#6061](https://github.com/opencast/opencast/pull/6061)] -
   Cleanup everything
@@ -63,7 +63,7 @@ Opencast 15
 - [[#5913](https://github.com/opencast/opencast/pull/5913)] -
   Add new Workflow Operation: Subtitle Timeshift
 
-### Opencast 15.7
+## Opencast 15.7
 
 - [[#6022](https://github.com/opencast/opencast/pull/6022)] -
   Update admin interface to 2024-07-12
@@ -94,7 +94,7 @@ Opencast 15
 - [[#5864](https://github.com/opencast/opencast/pull/5864)] -
   Update HTTPS migration guide to be more general & use standard SQL
 
-### Opencast 15.6
+## Opencast 15.6
 
 - [[#5922](https://github.com/opencast/opencast/pull/5922)] -
   Update Editor to 2024-06-11
@@ -115,14 +115,14 @@ Opencast 15
 - [[#5829](https://github.com/opencast/opencast/pull/5829)] -
   Ignore subtitle tracks in select-tracks WHO
 
-### Opencast 15.5
+## Opencast 15.5
 
 - [[#5757](https://github.com/opencast/opencast/pull/5757)] -
   Add slide text and segments to Tobira harvest API
 - [[#5685](https://github.com/opencast/opencast/pull/5685)] -
   Paella 7 mp4 quality selector
 
-### Opencast 15.4
+## Opencast 15.4
 
 - [[#5738](https://github.com/opencast/opencast/pull/5738)] -
   Update (New) Admin UI to 2024-04-10
@@ -147,7 +147,7 @@ Opencast 15
 - [[#5588](https://github.com/opencast/opencast/pull/5588)] -
   Update typescript type definitions in ltitools
 
-### Opencast 15.3
+## Opencast 15.3
 
 - [[#5669](https://github.com/opencast/opencast/pull/5669)] -
   Update temporal if empty
@@ -174,7 +174,7 @@ Opencast 15
 - [[#4973](https://github.com/opencast/opencast/pull/4973)] -
   Add WhisperC++ engine to speech-to-text-impl
 
-### Opencast 15.2
+## Opencast 15.2
 
 - [[#5556](https://github.com/opencast/opencast/pull/5556)] -
   Don't create composites for new editor
@@ -187,7 +187,7 @@ Opencast 15
 - [[#5528](https://github.com/opencast/opencast/pull/5528)] -
   Editor shouldn't just overwrite existing files
 
-### Opencast 15.1
+## Opencast 15.1
 
 - [[#5546](https://github.com/opencast/opencast/pull/5546)] -
   Update (New) Admin UI to 2024-01-17
@@ -202,7 +202,7 @@ Opencast 15
 - [[#5488](https://github.com/opencast/opencast/pull/5488)] -
   Fix Paella 7 with no segments
 
-### Opencast 15.0
+## Opencast 15.0
 
 *Released on December 13th, 2023*
 

@@ -1,7 +1,7 @@
-Opencast 7
-----------
+Opencast 7 Changelog
+--------------------
 
-### Opencast 7.9
+## Opencast 7.9
 
 *Released on December 8, 2020*
 
@@ -12,7 +12,7 @@ Opencast 7
 - [[#1922](https://github.com/opencast/opencast/pull/1922)] -
   Remove Spring snapshot repository from main pom
 
-### Opencast 7.8
+## Opencast 7.8
 
 *Released on August 17, 2020*
 
@@ -31,7 +31,7 @@ Opencast 7
 - [[#1589](https://github.com/opencast/opencast/pull/1589)] -
   Engage: Theodul: Audio: Refer to correct items
 
-### Opencast 7.7
+## Opencast 7.7
 
 *Released on April 27, 2020*
 
@@ -52,7 +52,7 @@ Opencast 7
 - [[#1379](https://github.com/opencast/opencast/pull/1379)] -
   Use active, not episode ACL in scheduler service
 
-### Opencast 7.6
+## Opencast 7.6
 
 *Released on January 29, 2020*
 
@@ -100,7 +100,7 @@ Opencast 7
 </ul>
 </details>
 
-### Opencast 7.5
+## Opencast 7.5
 
 *Released on December 10, 2019*
 
@@ -119,7 +119,7 @@ Opencast 7
 - [[#1122](https://github.com/opencast/opencast/pull/1122)] -
   fixes #1069 workflow tab shows scheduling info instead of workflows
 
-### Opencast 7.4
+## Opencast 7.4
 
 *Released on October 02, 2019*
 
@@ -134,7 +134,7 @@ Opencast 7
 - [[#1056](https://github.com/opencast/opencast/pull/1056)] -
   NOISSUE: CAS security example is very out of date
 
-### Opencast 7.3
+## Opencast 7.3
 
 *Released on September 19, 2019*
 
@@ -159,14 +159,14 @@ Opencast 7
 - [[MH-12533](https://opencast.jira.com/browse/MH-12533)][[#714](https://github.com/opencast/opencast/pull/714)] -
   Re-introduce ability to avoid data loss during ingest
 
-### Opencast 7.2
+## Opencast 7.2
 
 *Released on August 02, 2019*
 
 - [[MH-13662](https://opencast.jira.com/browse/MH-13662)][[#1000](https://github.com/opencast/opencast/pull/1000)] -
   Update LTI Information
 
-### Opencast 7.1
+## Opencast 7.1
 
 *Released on July 09, 2019*
 
@@ -199,7 +199,7 @@ Opencast 7
 - [[MH-13610](https://opencast.jira.com/browse/MH-13610)][[#947](https://github.com/opencast/opencast/pull/947)] -
   LDAP User Directory Fixes
 
-### Opencast 7.0
+## Opencast 7.0
 
 *Released on June 13, 2019*
 

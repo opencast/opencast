@@ -1,7 +1,7 @@
-Opencast 11
-----------
+Opencast 11 Changelog
+---------------------
 
-### Opencast 11.12
+## Opencast 11.12
 
 *Released on November 16th, 2022*
 
@@ -29,7 +29,7 @@ Opencast 11
 </ul>
 </details>
 
-### Opencast 11.11
+## Opencast 11.11
 
 *Released on September 21th, 2022*
 
@@ -54,7 +54,7 @@ Opencast 11
 - [[#3681](https://github.com/opencast/opencast/pull/3681)] -
   Make deletion of live publication in case of capture errors configurable
 
-### Opencast 11.10
+## Opencast 11.10
 
 *Released on August 17th, 2022*
 
@@ -67,7 +67,7 @@ Opencast 11
 - [[#3923](https://github.com/opencast/opencast/pull/3923)] -
   Handle tracks with multiple videos in engage player
 
-### Opencast 11.9
+## Opencast 11.9
 
 *Released on July 6th, 2022*
 
@@ -86,7 +86,7 @@ Opencast 11
 - [[#3805](https://github.com/opencast/opencast/pull/3805)] -
   Set Title and start date and time for duplicate events using duplicate WFH
 
-### Opencast 11.8
+## Opencast 11.8
 
 *Released on June 15th, 2022*
 
@@ -99,7 +99,7 @@ Opencast 11
 - [[#3672](https://github.com/opencast/opencast/pull/3672)] -
   Disable group removement upon missing group roles
 
-### Opencast 11.7
+## Opencast 11.7
 
 *Released on May 18th, 2022*
 
@@ -125,7 +125,7 @@ Opencast 11
 - [[#3635](https://github.com/opencast/opencast/pull/3635)] -
   Fix bug with adding a series when a deleted one still lingers
 
-### Opencast 11.6
+## Opencast 11.6
 
 *Released on April 20th, 2022*
 
@@ -150,7 +150,7 @@ Opencast 11
 - [[#3330](https://github.com/opencast/opencast/pull/3330)] -
   Removed ManagedService from MediaInspectionService
 
-### Opencast 11.5
+## Opencast 11.5
 
 *Released on March 23rd, 2022*
 
@@ -185,7 +185,7 @@ Opencast 11
 - [[#3197](https://github.com/opencast/opencast/pull/3197)] -
   Elasticsearch Retry Config
 
-### Opencast 11.4
+## Opencast 11.4
 
 *Released on February 16th, 2022*
 
@@ -225,7 +225,7 @@ Opencast 11
   Allow the use of organization properties in workflows
 
 
-### Opencast 11.3
+## Opencast 11.3
 
 *Released on January 19th, 2022*
 
@@ -255,7 +255,7 @@ Opencast 11
   Added speech to text (Vosk)
 
 
-### Opencast 11.2
+## Opencast 11.2
 
 *Released on December 20th, 2021*
 
@@ -263,7 +263,7 @@ Opencast 11
   Security: Update to Pax Logging 1.11.12
 
 
-### Opencast 11.1
+## Opencast 11.1
 
 *Released on December 17th, 2021*
 
@@ -287,7 +287,7 @@ Opencast 11
   Let Encode Handle HLS
 
 
-### Opencast 11.0
+## Opencast 11.0
 
 *Released on December 15th, 2021*
 

@@ -1,7 +1,7 @@
-Opencast 6
-----------
+Opencast 6 Changelog
+--------------------
 
-### Opencast 6.7
+## Opencast 6.7
 
 *Released on December 8, 2019*
 
@@ -22,7 +22,7 @@ Opencast 6
 - [[#1019](https://github.com/opencast/opencast/pull/1019)] -
   SMIL tests fail when doctype url can't be resolved
 
-### Opencast 6.6
+## Opencast 6.6
 
 *Released on August 2, 2019*
 
@@ -47,7 +47,7 @@ Opencast 6
 - [[MH-13611](https://opencast.jira.com/browse/MH-13611)][[#955](https://github.com/opencast/opencast/pull/955)] -
   Duplicate events fix
 
-### Opencast 6.5
+## Opencast 6.5
 
 *Released on June 14, 2019*
 
@@ -98,7 +98,7 @@ Opencast 6
 - [[MH-13476](https://opencast.jira.com/browse/MH-13476)][[#818](https://github.com/opencast/opencast/pull/818)] -
   Filter capture agent roles for ACLs
 
-### Opencast 6.4
+## Opencast 6.4
 
 *Released on April 01, 2019*
 
@@ -118,7 +118,7 @@ Opencast 6
 - [[MH-13429](https://opencast.jira.com/browse/MH-13429)][[#767](https://github.com/opencast/opencast/pull/767)] -
   Make sure series LTI tool respects provided series custom param
 
-### Opencast 6.3
+## Opencast 6.3
 
 *Released on March 05, 2019*
 
@@ -175,14 +175,14 @@ Opencast 6
 - [[MH-13312](https://opencast.jira.com/browse/MH-13312)][[#654](https://github.com/opencast/opencast/pull/654)] -
   Do not show outdated conflict information
 
-### Opencast 6.2
+## Opencast 6.2
 
 *Released on January 24, 2019*
 
 - [[MH-13309](https://opencast.jira.com/browse/MH-13309)][[#649](https://github.com/opencast/opencast/pull/649)] -
   return empty list when finding findUsersByUserName when the name param is empty.
 
-### Opencast 6.1
+## Opencast 6.1
 
 *Released on January 12, 2019*
 
@@ -205,7 +205,7 @@ Opencast 6
 - [[MH-13248](https://opencast.jira.com/browse/MH-13248)][[#623](https://github.com/opencast/opencast/pull/623)] -
   Allow hidden workflow parameters
 
-### Opencast 6.0
+## Opencast 6.0
 
 *Released on December 10, 2018*
 

@@ -1,5 +1,5 @@
-Opencast 2.x
-------------
+Opencast 2.x Changelog
+----------------------
 
 ## Opencast 2.3.x
 

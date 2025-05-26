@@ -1,7 +1,7 @@
-Opencast 5
-----------
+Opencast 5 Changelog
+--------------------
 
-### Opencast 5.5
+## Opencast 5.5
 
 *Released on April 1, 2019*
 
@@ -18,7 +18,7 @@ Opencast 5
 - [[MH-13333](https://opencast.jira.com/browse/MH-13333)][[#669](https://github.com/opencast/opencast/pull/669)] -
   Do not import properties in publish WF
 
-### Opencast 5.4
+## Opencast 5.4
 
 *Released on January 24, 2019*
 
@@ -30,7 +30,7 @@ Opencast 5
   Improve concurrency of OAIPMH republication
 
 
-### Opencast 5.3
+## Opencast 5.3
 
 *Released on January 11, 2019*
 
@@ -59,7 +59,7 @@ Opencast 5
 - [[MH-12332](https://opencast.jira.com/browse/MH-12332)][[#567](https://github.com/opencast/opencast/pull/567)] -
   disable workflows whose tags don't explicitly match the source type, UPLOAD|SCHEDULE 5.x
 
-### Opencast 5.2
+## Opencast 5.2
 
 *Released on November 13, 2018*
 
@@ -91,7 +91,7 @@ Opencast 5
   Fix CAS
 
 
-### Opencast 5.1
+## Opencast 5.1
 
 *Released on September 3, 2018*
 
@@ -161,7 +161,7 @@ Opencast 5
   wrong date format in coverimage file
 
 
-### Opencast 5.0
+## Opencast 5.0
 
 *Released on June 12, 2018*
 

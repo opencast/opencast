@@ -1,7 +1,7 @@
-Opencast 4
-------------
+Opencast 4 Changelog
+--------------------
 
-### Opencast 4.5
+## Opencast 4.5
 
 *Released on Oktober 30, 2018*
 
@@ -13,7 +13,7 @@ Opencast 4
 - [[MH-12953]](https://opencast.jira.com/browse/MH-12953) - stop loading editor.json twice
 - [[NOJIRA]](https://github.com/opencast/opencast/pull/273) - Update the release process docs
 
-### Opencast 4.4
+## Opencast 4.4
 
 *Released on May 31, 2018*
 
@@ -22,7 +22,7 @@ Opencast 4
 - [[MH-12840]](https://opencast.jira.com/browse/MH-12840) - LTI user provider may allow LMS admins to become Opencast
   admins
 
-### Opencast 4.3
+## Opencast 4.3
 
 *Released on March 28, 2018*
 
@@ -32,7 +32,7 @@ Opencast 4
 - [[MH-12789]](https://opencast.jira.com/browse/MH-12789) - Remove tabs and trailing spaces in LTI tools
 - [[MH-12790]](https://opencast.jira.com/browse/MH-12790) - Make LTI respect player configuration
 
-### Opencast 4.2
+## Opencast 4.2
 
 *Released on March 14, 2018*
 
@@ -57,7 +57,7 @@ Opencast 4
 - [[MH-12668]](https://opencast.jira.com/browse/MH-12668) - Update admin ui build pipeline
 - [[MH-12651]](https://opencast.jira.com/browse/MH-12651) - Scheduling repeating events through Admin UI is very slow
 
-### Opencast 4.1
+## Opencast 4.1
 
 *Released on Februar 7, 2018*
 
@@ -95,7 +95,7 @@ Opencast 4
 - [[MH-12476]](https://opencast.jira.com/browse/MH-12476) - Delay start of job dispatching on startup
 - [[MH-10016]](https://opencast.jira.com/browse/MH-10016) - Cannot Change Default Workflow
 
-### Opencast 4.0
+## Opencast 4.0
 
 *Released on December 8, 2017*
 

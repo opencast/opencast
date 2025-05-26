@@ -39,7 +39,7 @@ nav:
 - Version Support: 'version-support.md'
 - Release Notes: 'releasenotes.md'
 - Upgrade Guide: 'upgrade.md'
-- Changelog:
+- Changelogs:
     - Opencast 17: "changelog/opencast-17.md"
     - Opencast 16: "changelog/opencast-16.md"
     - Older versions:

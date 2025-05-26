@@ -1,7 +1,7 @@
-Opencast 8
-----------
+Opencast 8 Changelog
+--------------------
 
-### Opencast 8.11
+## Opencast 8.11
 
 *Released on April 6th, 2021*
 
@@ -29,7 +29,7 @@ Opencast 8
   Properly configure AWS S3 distribution on startup by default
 
 
-### Opencast 8.10
+## Opencast 8.10
 
 *Released on December 23rd, 2020*
 
@@ -39,7 +39,7 @@ Opencast 8
   Endtime of segments fixed in the editor
 
 
-### Opencast 8.9
+## Opencast 8.9
 
 *Released on December 8th, 2020*
 
@@ -55,7 +55,7 @@ Opencast 8
   #1987 Admin UI event start filter datepicker timezone patch
 
 
-### Opencast 8.8
+## Opencast 8.8
 
 *Released on November 19th, 2020*
 
@@ -85,7 +85,7 @@ Opencast 8
   Remove Dead OpenID Module
 
 
-### Opencast 8.7
+## Opencast 8.7
 
 *Released on September 27th, 2020*
 
@@ -112,7 +112,7 @@ Opencast 8
 - [[#1735](https://github.com/opencast/opencast/pull/1735)] -
   Added reloading of filters in users page
 
-### Opencast 8.6
+## Opencast 8.6
 
 *Released on August 5th, 2020*
 
@@ -128,7 +128,7 @@ Opencast 8
   Don't raise a NPE when the workflow creator was deleted
 
 
-### Opencast 8.5
+## Opencast 8.5
 
 *Released on June 15th, 2020*
 
@@ -145,7 +145,7 @@ Opencast 8
 - [[#1593](https://github.com/opencast/opencast/pull/1593)] -
   Update paella to 6.2.7
 
-### Opencast 8.4
+## Opencast 8.4
 
 *Released on May 22nd, 2020*
 
@@ -196,7 +196,7 @@ Opencast 8
 - [[#1479](https://github.com/opencast/opencast/pull/1479)] -
   Fix Theodul quality selection
 
-### Opencast 8.3
+## Opencast 8.3
 
 *Released on March 26th, 2020*
 
@@ -230,7 +230,7 @@ Opencast 8
   Studio in admin-presentation
 
 
-### Opencast 8.2
+## Opencast 8.2
 
 *Released on March 14th, 2020*
 
@@ -270,7 +270,7 @@ Opencast 8
   Fix conflict detection for non-admin users and for multiple events
 
 
-### Opencast 8.1
+## Opencast 8.1
 
 *Released on January 29, 2020*
 
@@ -295,7 +295,7 @@ Opencast 8
 - [[#1266](https://github.com/opencast/opencast/pull/1266)] -
   Allow capture agent users to read properties of series
 
-#### Fixed Security Issues
+### Fixed Security Issues
 
 - CVE-2020-5231 – [Users with ROLE\_COURSE\_ADMIN can create new users
   ](https://github.com/opencast/opencast/security/advisories/GHSA-94qw-r73x-j7hg)
@@ -311,7 +311,7 @@ Opencast 8
   ](https://github.com/opencast/opencast/security/advisories/GHSA-6f54-3qr9-pjgj)
 
 
-### Opencast 8.0
+## Opencast 8.0
 
 *Released on December 17, 2019*
 

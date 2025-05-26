@@ -1,7 +1,7 @@
-Opencast 17
------------
+Opencast 17 Changelog
+---------------------
 
-### Opencast 17.3
+## Opencast 17.3
 
 - [[#6641](https://github.com/opencast/opencast/pull/6641)] -
   Update Admin UI release to 2025-04-17
@@ -50,7 +50,7 @@ Opencast 17
 - [[#6557](https://github.com/opencast/opencast/pull/6557)] -
   Improve upgrade documentation
 
-### Opencast 17.2
+## Opencast 17.2
 
 - [[#6542](https://github.com/opencast/opencast/pull/6542)] -
   Don't fail theme index rebuild if user does not exist
@@ -87,7 +87,7 @@ Opencast 17
 - [[#6321](https://github.com/opencast/opencast/pull/6321)] -
   Adds sorting parameter to series ltitools
 
-### Opencast 17.1
+## Opencast 17.1
 
 - [[#6432](https://github.com/opencast/opencast/pull/6432)] -
   Update to admin interface release 2025-01-21
@@ -114,7 +114,7 @@ Opencast 17
 - [[#6241](https://github.com/opencast/opencast/pull/6241)] -
   Editor: Unify endpoints for saving
 
-### Opencast 17.0
+## Opencast 17.0
 
 - [[#6309](https://github.com/opencast/opencast/pull/6309)] -
   Remove duplicate dependency declaration

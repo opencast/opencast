@@ -1,7 +1,7 @@
-Opencast 12
------------
+Opencast 12 Changelog
+---------------------
 
-### Opencast 12.13
+## Opencast 12.13
 
 *Released on August 8th, 2023*
 
@@ -10,7 +10,7 @@ Opencast 12
   zip headers in jar files distributed by Opencast; otherwise
   Opencast would not start up with OpenJDK 11.0.20.
 
-### Opencast 12.12
+## Opencast 12.12
 
 *Released on June 15th, 2023*
 
@@ -26,7 +26,7 @@ Opencast 12
 - [[#4658](https://github.com/opencast/opencast/pull/4658)] -
   Editor service mediapackage locking
 
-### Opencast 12.11
+## Opencast 12.11
 
 *Released on May 16th, 2023*
 
@@ -45,14 +45,14 @@ Opencast 12
 - [[#4848](https://github.com/opencast/opencast/pull/4848)] -
   Service statistics DB query optimazation
 
-### Opencast 12.10
+## Opencast 12.10
 
 *Released on March 27th, 2023*
 
 - [[#4799](https://github.com/opencast/opencast/pull/4799)] -
   Sets values in specific config file to default
 
-### Opencast 12.9
+## Opencast 12.9
 
 *Released on March 16th, 2023*
 
@@ -61,7 +61,7 @@ Opencast 12
 - [[#4757](https://github.com/opencast/opencast/pull/4757)] -
   added missing publish-uploaded-assets.xml workflow
 
-### Opencast 12.8
+## Opencast 12.8
 
 *Released on February 20th, 2023*
 
@@ -80,7 +80,7 @@ Opencast 12
 - [[#4596](https://github.com/opencast/opencast/pull/4596)] -
   Always show save button for series access rights
 
-### Opencast 12.7
+## Opencast 12.7
 
 *Released on January 18th, 2023*
 
@@ -95,7 +95,7 @@ Opencast 12
 - [[#4539](https://github.com/opencast/opencast/pull/4539)] -
   Make event updating faster after changes to series metadata/ACL
 
-### Opencast 12.6
+## Opencast 12.6
 
 *Released on December 14th, 2022*
 
@@ -114,7 +114,7 @@ Opencast 12
 - [[#4459](https://github.com/opencast/opencast/pull/4459)] -
   Update Release Assemblies
 
-### Opencast 12.5
+## Opencast 12.5
 
 *Released on November 16th, 2022*
 
@@ -162,7 +162,7 @@ Opencast 12
 </ul>
 </details>
 
-### Opencast 12.4
+## Opencast 12.4
 
 *Released on October 19th, 2022*
 
@@ -233,7 +233,7 @@ Opencast 12
 </ul>
 </details>
 
-### Opencast 12.3
+## Opencast 12.3
 
 *Released on September 21th, 2022*
 
@@ -286,7 +286,7 @@ Opencast 12
 </ul>
 </details>
 
-### Opencast 12.2
+## Opencast 12.2
 
 *Released on August 17th, 2022*
 
@@ -333,7 +333,7 @@ Opencast 12
 </ul>
 </details>
 
-### Opencast 12.1
+## Opencast 12.1
 
 *Released on July 20th, 2022*
 
@@ -381,7 +381,7 @@ Opencast 12
   Opencast 12 Upgrade Guide
 
 
-### Opencast 12.0
+## Opencast 12.0
 
 Dependabot's changes are excluded from this log.
 

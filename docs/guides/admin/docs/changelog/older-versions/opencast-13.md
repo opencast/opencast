@@ -1,7 +1,7 @@
-Opencast 13
------------
+Opencast 13 Changelog
+---------------------
 
-### Opencast 13.12
+## Opencast 13.12
 
 *Released on November 15th, 2023*
 
@@ -34,7 +34,7 @@ Opencast 13
 - [[#5269](https://github.com/opencast/opencast/pull/5269)] -
   Fix custom roles pattern now working in access policy tab
 
-### Opencast 13.12
+## Opencast 13.12
 
 *Released on October 18th, 2023*
 
@@ -47,7 +47,7 @@ Opencast 13
 - [[#5246](https://github.com/opencast/opencast/pull/5246)] -
   Paella 7 plugins documentation
 
-### Opencast 13.11
+## Opencast 13.11
 
 *Released on September 14th, 2023*
 
@@ -76,7 +76,7 @@ Opencast 13
 - [[#4684](https://github.com/opencast/opencast/pull/4684)] -
   Ensure workflows have an associated org after upgrade
 
-### Opencast 13.10
+## Opencast 13.10
 
 *Released on August 23th, 2023*
 
@@ -89,7 +89,7 @@ Opencast 13
 - [[#5033](https://github.com/opencast/opencast/pull/5033)] -
   Escape ES query string in external API endpoints
 
-### Opencast 13.9
+## Opencast 13.9
 
 *Released on August 8th, 2023*
 
@@ -110,7 +110,7 @@ Opencast 13
 - [[#5108](https://github.com/opencast/opencast/pull/5108)] -
   Mark tag operation as skipped if nothing happened
 
-### Opencast 13.8
+## Opencast 13.8
 
 *Released on July 26th, 2023*
 
@@ -139,7 +139,7 @@ Opencast 13
 - [[#4969](https://github.com/opencast/opencast/pull/4969)] -
   Automate PR comments with built tarball links
 
-### Opencast 13.7
+## Opencast 13.7
 
 *Released on June 26th, 2023*
 
@@ -158,7 +158,7 @@ Opencast 13
 - [[#4927](https://github.com/opencast/opencast/pull/4927)] -
   Fix Check for Whether Live Publication has Changed
 
-### Opencast 13.6
+## Opencast 13.6
 
 *Released on Mai 26th, 2023*
 
@@ -194,7 +194,7 @@ Opencast 13
 </ul>
 </details>
 
-### Opencast 13.5
+## Opencast 13.5
 
 *Released on April 19th, 2023*
 
@@ -222,7 +222,7 @@ Opencast 13
 </ul>
 </details>
 
-### Opencast 13.4
+## Opencast 13.4
 
 *Released on March 21th, 2023*
 
@@ -234,7 +234,7 @@ Opencast 13
 </ul>
 </details>
 
-### Opencast 13.3
+## Opencast 13.3
 
 *Released on March 16th, 2023*
 
@@ -280,7 +280,7 @@ Opencast 13
 </ul>
 </details>
 
-### Opencast 13.2
+## Opencast 13.2
 
 *Released on February 15th, 2023*
 
@@ -308,7 +308,7 @@ Opencast 13
 </ul>
 </details>
 
-### Opencast 13.1
+## Opencast 13.1
 
 *Released on January 18th, 2023*
 
@@ -360,7 +360,7 @@ Opencast 13
 </ul>
 </details>
 
-### Opencast 13.0
+## Opencast 13.0
 
 *Released on December 14th, 2022*
 

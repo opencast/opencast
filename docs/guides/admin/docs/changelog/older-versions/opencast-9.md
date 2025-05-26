@@ -1,8 +1,8 @@
-Opencast 9
-----------
+Opencast 9 Changelog
+--------------------
 
 
-### Opencast 9.12
+## Opencast 9.12
 
 *Released on December 18th, 2021*
 
@@ -10,7 +10,7 @@ Opencast 9
   Security: Update to Pax Logging 1.11.12 (9.x)
 
 
-### Opencast 9.11
+## Opencast 9.11
 
 *Released on December 17th, 2021*
 
@@ -20,7 +20,7 @@ Opencast 9
   Security: Update to Pax Logging 1.11.11 (9.x)
 
 
-### Opencast 9.10
+## Opencast 9.10
 
 *Released on December 13th, 2021*
 
@@ -32,7 +32,7 @@ Opencast 9
   Backport fixes: chrome tests and Safari fix
 
 
-### Opencast 9.9
+## Opencast 9.9
 
 *Released on October 12th, 2021*
 
@@ -43,7 +43,7 @@ Opencast 9
 - [[#2951](https://github.com/opencast/opencast/pull/2951)] -
   Add Missing Translations Files
 
-### Opencast 9.8
+## Opencast 9.8
 
 *Released on August 18th, 2021*
 
@@ -60,7 +60,7 @@ Opencast 9
 - [[#2650](https://github.com/opencast/opencast/pull/2650)] -
   sort the options alphabeticaly, this makes the languages field etc more readable
 
-### Opencast 9.7
+## Opencast 9.7
 
 *Released on July 15th, 2021*
 
@@ -97,7 +97,7 @@ Opencast 9
 - [[#2535](https://github.com/opencast/opencast/pull/2535)] -
   Prevent Ingests with Illegal Data
 
-### Opencast 9.6
+## Opencast 9.6
 
 *Released on June 15th, 2021*
 
@@ -174,7 +174,7 @@ Opencast 9
 - [[#2489](https://github.com/opencast/opencast/pull/2489)] -
   Attachment is not a function LTI error fixed
 
-### Opencast 9.5
+## Opencast 9.5
 
 *Released on May 17th, 2021*
 
@@ -213,7 +213,7 @@ Opencast 9
 - [[#2103](https://github.com/opencast/opencast/pull/2103)] -
   Only persist users with specific LTI role
 
-### Opencast 9.4
+## Opencast 9.4
 
 *Released on April 19th, 2021*
 
@@ -289,7 +289,7 @@ Opencast 9
 </ul>
 </details>
 
-### Opencast 9.3
+## Opencast 9.3
 
 *Released on March 15th, 2021*
 
@@ -340,7 +340,7 @@ Opencast 9
 - [[#2026](https://github.com/opencast/opencast/pull/2026)] -
   Fix Job Dispatching Test
 
-### Opencast 9.2
+## Opencast 9.2
 
 *Released on February 15th, 2021*
 
@@ -423,7 +423,7 @@ Opencast 9
 - [[#1017](https://github.com/opencast/opencast/pull/1017)] -
   Securing Static Files
 
-### Opencast 9.1
+## Opencast 9.1
 
 *Released on December 16th, 2020*
 
@@ -434,7 +434,7 @@ Opencast 9
 - [[#2160](https://github.com/opencast/opencast/pull/2160)] -
   Fix Ingest by Non-privileged User
 
-### Opencast 9.0
+## Opencast 9.0
 
 *Released on December 15th, 2020*
 

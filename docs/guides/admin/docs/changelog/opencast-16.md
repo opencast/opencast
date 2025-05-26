@@ -1,7 +1,7 @@
-Opencast 16
------------
+Opencast 16 Changelog
+---------------------
 
-### Opencast 16.11
+## Opencast 16.11
 
 - [[#6681](https://github.com/opencast/opencast/pull/6681)] -
   Allow Opensearch to be in yellow state
@@ -12,7 +12,7 @@ Opencast 16
 - [[#6431](https://github.com/opencast/opencast/pull/6431)] -
   Avoid NPEs during wowza retraction
 
-### Opencast 16.10
+## Opencast 16.10
 
 - [[#6552](https://github.com/opencast/opencast/pull/6552)] -
   Opencast 16.10 Release Notes
@@ -27,14 +27,14 @@ Opencast 16
 - [[#6426](https://github.com/opencast/opencast/pull/6426)] -
   Fixing SFA pattern for search and livestream
 
-### Opencast 16.9
+## Opencast 16.9
 
 - [[#6437](https://github.com/opencast/opencast/pull/6437)] -
   Migrate away from deprecated ::set-output in GitHub Actions
 - [[#6434](https://github.com/opencast/opencast/pull/6434)] -
   Handle Opencast starting up before index is available
 
-### Opencast 16.8
+## Opencast 16.8
 
 - [[#6429](https://github.com/opencast/opencast/pull/6429)] -
   Fix OCR transcriptions in Paella player
@@ -57,7 +57,7 @@ Opencast 16
 - [[#6047](https://github.com/opencast/opencast/pull/6047)] -
   Release Notes for 6046 for OC 16
 
-### Opencast 16.7
+## Opencast 16.7
 
 - [[#6318](https://github.com/opencast/opencast/pull/6318)] -
   Opencast 16.7
@@ -92,7 +92,7 @@ Opencast 16
 - [[#6111](https://github.com/opencast/opencast/pull/6111)] -
   Treat `filter` parameter elements in admin UI APIs as URL encoded
 
-### Opencast 16.6
+## Opencast 16.6
 
 - [[#6232](https://github.com/opencast/opencast/pull/6232)] -
   Update docs on how to access old admin ui
@@ -109,7 +109,7 @@ Opencast 16
 - [[#6175](https://github.com/opencast/opencast/pull/6175)] -
   Deleting events which do not exist in the search index
 
-### Opencast 16.5
+## Opencast 16.5
 
 - [[#6172](https://github.com/opencast/opencast/pull/6172)] -
   Prevent broken XML from failing index rebuild completely
@@ -126,14 +126,14 @@ Opencast 16
 - [[#6141](https://github.com/opencast/opencast/pull/6141)] -
   Add missing target-tags to amberscript attach transcription docs
 
-### Opencast 16.4
+## Opencast 16.4
 
 *Just fixed the broken 16.3 release*
 
 - [[#6105](https://github.com/opencast/opencast/pull/6105)] -
   Opencast 16.4 release notes
 
-### Opencast 16.3
+## Opencast 16.3
 
 - [[#6101](https://github.com/opencast/opencast/pull/6101)] -
   Release notes for Opencast 16.3
@@ -146,7 +146,7 @@ Opencast 16
 - [[#6057](https://github.com/opencast/opencast/pull/6057)] -
   Fix version of subtitle timeshift operation
 
-### Opencast 16.2
+## Opencast 16.2
 
 - [[#6056](https://github.com/opencast/opencast/pull/6056)] -
   Opencast 16.1 Release Notes
@@ -173,7 +173,7 @@ Opencast 16
 - [[#6001](https://github.com/opencast/opencast/pull/6001)] -
   Remove mentions of Solr from "migrating domain in media packages" guide
 
-### Opencast 16.1
+## Opencast 16.1
 
 - [[#6000](https://github.com/opencast/opencast/pull/6000)] -
   Opencast 16.1 Release Notes
@@ -200,7 +200,7 @@ Opencast 16
 - [[#5935](https://github.com/opencast/opencast/pull/5935)] -
   Update RPM docs for Opencast 16
 
-### Opencast 16.0
+## Opencast 16.0
 
 - [[#5927](https://github.com/opencast/opencast/pull/5927)] -
   Update release notes for Opencast 16.0

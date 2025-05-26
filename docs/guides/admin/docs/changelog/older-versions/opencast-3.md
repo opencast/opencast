@@ -1,7 +1,7 @@
-Opencast 3.x
-------------
+Opencast 3 Changelog
+----------------------
 
-### Opencast 3.7
+## Opencast 3.7
 
 *Released on Oct 16, 2018*
 
@@ -16,7 +16,7 @@ Opencast 3.x
   communication
 
 
-### Opencast 3.6
+## Opencast 3.6
 
 *Released on May 31, 2018*
 
@@ -32,7 +32,7 @@ Opencast 3.x
 - [[MH-12091]](https://opencast.jira.com/browse/MH-12091) - Create a Capture Agent digest user with its own role
 
 
-### Opencast 3.5
+## Opencast 3.5
 
 *Released on February 6, 2018*
 
@@ -46,7 +46,7 @@ Opencast 3.x
 - [[MH-12399]](https://opencast.jira.com/browse/MH-12399) - Oaipmh Retract very slow
 
 
-### Opencast 3.4
+## Opencast 3.4
 
 *Released on December 4, 2017*
 
@@ -79,7 +79,7 @@ Opencast 3.x
 - [[MH-11042]](https://opencast.jira.com/browse/MH-11042) - Admin UI NG tests fail in +5:30 timezone
 
 
-### Opencast 3.3
+## Opencast 3.3
 
 *Released on September 21, 2017*
 
@@ -117,7 +117,7 @@ Opencast 3.x
 - [[MH-11768]](https://opencast.jira.com/browse/MH-11768) - Timeline preview images
 
 
-### Opencast 3.2
+## Opencast 3.2
 
 *Released on August 16, 2017*
 
@@ -157,7 +157,7 @@ Opencast 3.x
 - [[MH-10523]](https://opencast.jira.com/browse/MH-10523) - Misleading exception parameter in getFileFromCollection
 
 
-### Opencast 3.1
+## Opencast 3.1
 
 *Released on July 14, 2017*
 
@@ -174,7 +174,7 @@ Opencast 3.x
   translations
 
 
-### Opencast 3.0
+## Opencast 3.0
 
 *Released on June 13, 2017*
 
