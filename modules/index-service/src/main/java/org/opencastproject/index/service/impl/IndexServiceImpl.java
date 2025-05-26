@@ -1477,7 +1477,7 @@ public class IndexServiceImpl implements IndexService {
     final WorkflowDefinition wfd = workflowService.getWorkflowDefinitionById(retractWorkflowId);
     final Workflows workflows = new Workflows(assetManager, workflowService);
     final ConfiguredWorkflow workflow = workflow(wfd);
-    final List<WorkflowInstance> result = workflows.applyWorkflowToLatestVersion(Collections.singleton(id), workflow).toList();
+    final List<WorkflowInstance> result = workflows.applyWorkflowToLatestVersion(Collections.singleton(id), workflow);
     if (result.size() != 1) {
         throw new IllegalStateException("Couldn't start workflow to retract media package" + id);
     }
