@@ -20,17 +20,13 @@
  */
 package org.opencastproject.lifecyclemanagement.impl;
 
-import org.opencastproject.lifecyclemanagement.api.LifeCyclePolicy;
 import org.opencastproject.lifecyclemanagement.api.LifeCyclePolicyAccessControlEntry;
 import org.opencastproject.security.api.AccessControlEntry;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 // TODO: Reduce duplicate code between this class and the playlist version
