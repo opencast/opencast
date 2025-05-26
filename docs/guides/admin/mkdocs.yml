@@ -38,7 +38,24 @@ nav:
 - Home: 'index.md'
 - Release Notes: 'releasenotes.md'
 - Upgrade: 'upgrade.md'
-- Changelog: 'changelog.md'
+- Changelog:
+    - Opencast 17: "changelog/opencast-17.md"
+    - Opencast 16: "changelog/opencast-16.md"
+    - Older versions:
+        - Opencast 15: "changelog/older-versions/opencast-15.md"
+        - Opencast 14: "changelog/older-versions/opencast-14.md"
+        - Opencast 13: "changelog/older-versions/opencast-13.md"
+        - Opencast 12: "changelog/older-versions/opencast-12.md"
+        - Opencast 11: "changelog/older-versions/opencast-11.md"
+        - Opencast 10: "changelog/older-versions/opencast-10.md"
+        - Opencast 9: "changelog/older-versions/opencast-9.md"
+        - Opencast 8: "changelog/older-versions/opencast-8.md"
+        - Opencast 7: "changelog/older-versions/opencast-7.md"
+        - Opencast 6: "changelog/older-versions/opencast-6.md"
+        - Opencast 5: "changelog/older-versions/opencast-5.md"
+        - Opencast 4: "changelog/older-versions/opencast-4.md"
+        - Opencast 3: "changelog/older-versions/opencast-3.md"
+        - Opencast 2.x: "changelog/older-versions/opencast-2.x.md"
 - Registration: 'registration.md'
 - Installation:
    - Overview: 'installation/index.md'
