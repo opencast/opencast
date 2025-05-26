@@ -20,12 +20,10 @@ Apart from general information, this guide contains information about a specific
 
 * [Release Notes](releasenotes.md)
 * [Upgrade Guide](upgrade.md)
-* [Changelog](changelog/opencast-{{ opencast_major_version }}.md)
+* [Changelog](changelog/opencast-{{ opencast_major_version() }}.md)
 
 There are also several [Installation Guides](installation/index.md) and [Configuration Guides](configuration/index.md)
-available.
-
-For information about which versions of Opencast are currently supported, please see
+available. For information about which versions of Opencast are currently supported, please see
 [Version Support](version-support.md).
 
 Also please consider [registering your Opencast instance](registration.md)!
