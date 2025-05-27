@@ -3,6 +3,30 @@ Opencast 17 Changelog
 
 Changes marked with \* were also included in 16.x.
 
+## Opencast 17.4 (2025-05-26)
+- [[#6741](https://github.com/opencast/opencast/pull/6741)] -
+  Update Admin UI to 17.x-2025-05-24
+- [[#6738](https://github.com/opencast/opencast/pull/6738)] -
+  Update 17.x Editor to 17.x-2025-05-23
+- [[#6729](https://github.com/opencast/opencast/pull/6729)] -
+  Fix documentation regarding dummy capture agent configuration
+- [[#6561](https://github.com/opencast/opencast/pull/6561)] -
+  Add graphql event filter option
+- [[#6562](https://github.com/opencast/opencast/pull/6562)] -
+  Remove mentions of SysV Init scripts
+- [[#6633](https://github.com/opencast/opencast/pull/6633)] -
+  Enable partial matching in SearchRestService
+- [[#6637](https://github.com/opencast/opencast/pull/6637)] -
+  Workaround for "laggy" servers table in admin ui
+- [[#6688](https://github.com/opencast/opencast/pull/6688)] -
+  Document Search index rebuild when enabling episode id roles
+- [[#6681](https://github.com/opencast/opencast/pull/6681)] -
+  Allow Opensearch to be in yellow state\*
+- [[#6661](https://github.com/opencast/opencast/pull/6661)] -
+  Update to Studio 2025-04-30 (important bug fix)
+- [[#6653](https://github.com/opencast/opencast/pull/6653)] -
+  Add search endpoint to trigger single event index update
+
 ## Opencast 17.3 (2025-04-17)
 
 - [[#6641](https://github.com/opencast/opencast/pull/6641)] -
