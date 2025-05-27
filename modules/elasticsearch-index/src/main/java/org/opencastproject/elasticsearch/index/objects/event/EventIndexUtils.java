@@ -209,7 +209,7 @@ public final class EventIndexUtils {
 //        generatePublicationDoc(comments.get(i).getType());
       }
 
-      metadata.addField(EventIndexSchema.COMMENTS, commentsArray, true);
+      metadata.addField(EventIndexSchema.COMMENTS, commentsArray, false);
     }
 
     metadata.addField(EventIndexSchema.NEEDS_CUTTING, event.needsCutting(), false);
