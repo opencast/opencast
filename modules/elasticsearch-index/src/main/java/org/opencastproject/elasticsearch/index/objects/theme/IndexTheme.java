@@ -394,7 +394,7 @@ public class IndexTheme implements IndexObject {
     SearchMetadataCollection metadata = new SearchMetadataCollection(Long.toString(getIdentifier()).concat(
             getOrganization()), IndexTheme.DOCUMENT_TYPE);
     // Mandatory fields
-    metadata.addField(ThemeIndexSchema.ID, getIdentifier(), true);
+    metadata.addField(ThemeIndexSchema.ID, getIdentifier(), false);
     metadata.addField(ThemeIndexSchema.ORGANIZATION, getOrganization(), false);
     metadata.addField(ThemeIndexSchema.OBJECT, toXML(), false);
 
@@ -411,7 +411,7 @@ public class IndexTheme implements IndexObject {
 
     if (getCreationDate() != null) {
       metadata.addField(ThemeIndexSchema.CREATION_DATE,
-              DateTimeSupport.toUTC(getCreationDate().getTime()), true);
+              DateTimeSupport.toUTC(getCreationDate().getTime()), false);
     }
 
     if (StringUtils.isNotBlank(getCreator())) {
