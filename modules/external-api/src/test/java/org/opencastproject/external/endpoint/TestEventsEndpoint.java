@@ -69,6 +69,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 
 import javax.ws.rs.Path;
@@ -95,10 +96,10 @@ public class TestEventsEndpoint extends EventsEndpoint {
 
   private static Capture<MetadataList> capturedMetadataList1;
   private static Capture<MetadataList> capturedMetadataList2;
-  private static Capture<Opt<Date>> capturedStartDate;
-  private static Capture<Opt<Date>> capturedEndDate;
-  private static Capture<Opt<String>> capturedAgentId;
-  private static Capture<Opt<Map<String, String>>> capturedAgentConfig;
+  private static Capture<Optional<Date>> capturedStartDate;
+  private static Capture<Optional<Date>> capturedEndDate;
+  private static Capture<Optional<String>> capturedAgentId;
+  private static Capture<Optional<Map<String, String>>> capturedAgentConfig;
   private static Capture<MediaPackage> capturedMediaPackage;
 
   private static Organization defaultOrg = new DefaultOrganization();
@@ -265,7 +266,7 @@ public class TestEventsEndpoint extends EventsEndpoint {
         null,
         null,
         Collections.singletonMap(CaptureParameters.CAPTURE_DEVICE_NAMES, "default1"),
-        Opt.none()
+        Optional.empty()
     );
     capturedStartDate = Capture.newInstance();
     capturedEndDate = Capture.newInstance();
@@ -279,9 +280,9 @@ public class TestEventsEndpoint extends EventsEndpoint {
         capture(capturedStartDate),
         capture(capturedEndDate),
         capture(capturedAgentId),
-        eq(Opt.none()),
-        eq(Opt.none()),
-        eq(Opt.none()),
+        eq(Optional.empty()),
+        eq(Optional.empty()),
+        eq(Optional.empty()),
         capture(capturedAgentConfig),
         eq(false)
     );
@@ -299,7 +300,7 @@ public class TestEventsEndpoint extends EventsEndpoint {
         null,
         null,
         Collections.singletonMap(CaptureParameters.CAPTURE_DEVICE_NAMES, "default1,default2"),
-        Opt.none()
+        Optional.empty()
     );
     EasyMock.expect(indexService.getEvent(SCHEDULING_GET_EVENT, elasticsearchIndex)).andReturn(Opt.some(getEventScheduling)).anyTimes();
     EasyMock.expect(schedulerService.getTechnicalMetadata(SCHEDULING_GET_EVENT)).andReturn(technicalMetadata2).anyTimes();
@@ -328,19 +329,19 @@ public class TestEventsEndpoint extends EventsEndpoint {
     return capturedMetadataList2;
   }
 
-  public static Capture<Opt<Date>> getCapturedStartDate() {
+  public static Capture<Optional<Date>> getCapturedStartDate() {
     return capturedStartDate;
   }
 
-  public static Capture<Opt<Date>> getCapturedEndDate() {
+  public static Capture<Optional<Date>> getCapturedEndDate() {
     return capturedEndDate;
   }
 
-  public static Capture<Opt<String>> getCapturedAgentId() {
+  public static Capture<Optional<String>> getCapturedAgentId() {
     return capturedAgentId;
   }
 
-  public static Capture<Opt<Map<String, String>>> getCapturedAgentConfig() {
+  public static Capture<Optional<Map<String, String>>> getCapturedAgentConfig() {
     return capturedAgentConfig;
   }
 

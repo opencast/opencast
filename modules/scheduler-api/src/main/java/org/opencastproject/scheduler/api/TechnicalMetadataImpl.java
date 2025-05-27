@@ -20,12 +20,11 @@
  */
 package org.opencastproject.scheduler.api;
 
-import com.entwinemedia.fn.data.Opt;
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -40,7 +39,7 @@ public class TechnicalMetadataImpl implements TechnicalMetadata {
   private Set<String> presenters = new HashSet<>();
   private Map<String, String> workflowProperties = new HashMap<>();
   private Map<String, String> agentConfig = new HashMap<>();
-  private Opt<Recording> recording;
+  private Optional<Recording> recording;
 
   /**
    * Builds a representation of the technical metadata.
@@ -64,7 +63,7 @@ public class TechnicalMetadataImpl implements TechnicalMetadata {
    */
   public TechnicalMetadataImpl(String eventId, String agentId, Date startDate, Date endDate,
           Set<String> presenters, Map<String, String> workflowProperties, Map<String, String> agentConfig,
-          Opt<Recording> recording) {
+          Optional<Recording> recording) {
     this.eventId = eventId;
     this.agentId = agentId;
     this.startDate = startDate;
@@ -121,11 +120,11 @@ public class TechnicalMetadataImpl implements TechnicalMetadata {
   }
 
   @Override
-  public Opt<Recording> getRecording() {
+  public Optional<Recording> getRecording() {
     return recording;
   }
 
-  public void setRecording(Opt<Recording> recording) {
+  public void setRecording(Optional<Recording> recording) {
     this.recording = recording;
   }
 
