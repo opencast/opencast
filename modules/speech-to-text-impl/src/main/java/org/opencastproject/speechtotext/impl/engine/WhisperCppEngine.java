@@ -184,9 +184,6 @@ public class WhisperCppEngine implements SpeechToTextEngine {
   /** Path to the executable */
   protected String ffmpegBinary = DEFAULT_FFMPEG_BINARY;
 
-  /** The LangCodeUtil instance, contains language code mappings */
-  private LangCodeUtil langCodeUtil;
-
   @Override
   public String getEngineName() {
     return engineName;
@@ -279,9 +276,6 @@ public class WhisperCppEngine implements SpeechToTextEngine {
 
     ffmpegBinary = Objects.toString(cc.getBundleContext().getProperty(FFMPEG_BINARY_CONFIG_KEY), DEFAULT_FFMPEG_BINARY);
     logger.debug("ffmpeg binary set to {}", ffmpegBinary);
-
-    langCodeUtil = LangCodeUtil.getInstance();
-    logger.debug("LangCodeUtil initialized");
 
     logger.debug("Finished activating/updating speech-to-text service");
   }
@@ -383,7 +377,7 @@ public class WhisperCppEngine implements SpeechToTextEngine {
       // Convert ISO3 language code to ISO2 if possible, as WhisperC++ expects ISO2 codes.
       // If the conversion is not possible, retain the original language code.
       logger.info("Found language '{}'", language);
-      language = langCodeUtil.iso3ToIso2(language, language);
+      language = LangCodeUtil.iso3ToIso2(language, language);
       logger.info("Using language code '{}' for transcription process", language);
       command.add("--language");
       command.add(language);
@@ -430,7 +424,7 @@ public class WhisperCppEngine implements SpeechToTextEngine {
         JSONObject result = (JSONObject) jsonObject.get("result");
         subtitleLanguage = (String) result.get("language");
         // convert language name to iso3 if necessary or take default
-        subtitleLanguage = langCodeUtil.getIso2FromLang(subtitleLanguage, subtitleLanguage);
+        subtitleLanguage = LangCodeUtil.getIso2FromLang(subtitleLanguage, subtitleLanguage);
         logger.info("Language detected by WhisperC++: {}", subtitleLanguage);
       } catch (Exception e) {
         logger.info("Error reading WhisperC++ JSON file for: {}", mediaFile);

@@ -101,9 +101,6 @@ public class WhisperEngine implements SpeechToTextEngine {
   /** Currently used Whisper args */
   private String[] whisperArgs;
 
-  /** Holds some utility methods to handle locale names and codes **/
-  private LangCodeUtil langCodeUtil;
-
   @Override
   public String getEngineName() {
     return engineName;
@@ -128,9 +125,6 @@ public class WhisperEngine implements SpeechToTextEngine {
 
     whisperArgs = StringUtils.split(Objects.toString(prop.get(WHISPER_ARGS_CONFIG_KEY), ""));
     logger.debug("Additional args for Whisper: {}", (Object) whisperArgs);
-
-    langCodeUtil = LangCodeUtil.getInstance();
-    logger.debug("LangCodeUtil initialized");
 
     logger.debug("Finished activating/updating speech-to-text service");
   }
@@ -164,7 +158,7 @@ public class WhisperEngine implements SpeechToTextEngine {
 
     if (!language.isBlank() && !translate) {
       // get 2-letter language code
-      language = langCodeUtil.iso3ToIso2(language, "");
+      language = LangCodeUtil.iso3ToIso2(language, "");
       if (language.isBlank()) {
         logger.warn("No 2-letter language code found, using language auto detection");
       } else {
@@ -248,7 +242,7 @@ public class WhisperEngine implements SpeechToTextEngine {
         JSONObject jsonObject = (JSONObject) obj;
         language = (String) jsonObject.get("language");
         // convert language name to iso3 if necessary or take default
-        language = langCodeUtil.getIso2FromLang(language, language);
+        language = LangCodeUtil.getIso2FromLang(language, language);
         logger.debug("Language detected by Whisper: {}", language);
       } catch (Exception e) {
         logger.debug("Error reading Whisper JSON file for: {}", mediaFile);

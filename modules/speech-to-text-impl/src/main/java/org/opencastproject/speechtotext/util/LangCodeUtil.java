@@ -30,31 +30,20 @@ import java.util.Map;
  */
 public final class LangCodeUtil {
 
-  private static LangCodeUtil instance;
-
   /** Map to get ISO 639 language code for language name in English */
   private static final Map<String, String> iso3ToIso2Map = new HashMap<>();
 
   /** Map to get ISO 639 language code for 3-letter language code */
   private static final Map<String, String> langNameToIso2Map = new HashMap<>();
 
-  private LangCodeUtil() {
-    // Private constructor to prevent instantiation (singleton pattern)
-  }
-
-  public static synchronized LangCodeUtil getInstance() {
-    if (instance == null) {
-      instance = new LangCodeUtil();
-      for (String languageCode : Locale.getISOLanguages()) {
-        Locale locale = new Locale(languageCode);
-        String languageName = locale.getDisplayLanguage(new Locale("en"));
-        langNameToIso2Map.put(languageName, languageCode);
-        String languageISO3 = locale.getISO3Language();
-        iso3ToIso2Map.put(languageISO3, languageCode);
-      }
-
+  static {
+    for (String languageCode : Locale.getISOLanguages()) {
+      Locale locale = new Locale(languageCode);
+      String languageName = locale.getDisplayLanguage(new Locale("en"));
+      langNameToIso2Map.put(languageName, languageCode);
+      String languageISO3 = locale.getISO3Language();
+      iso3ToIso2Map.put(languageISO3, languageCode);
     }
-    return instance;
   }
 
   /**
@@ -64,7 +53,7 @@ public final class LangCodeUtil {
    * @param defaultValue The default value to return if the conversion fails.
    * @return The ISO 639-2 language code, or the default value if the conversion fails.
    */
-  public String iso3ToIso2(String langIso3Code, String defaultValue) {
+  public static String iso3ToIso2(String langIso3Code, String defaultValue) {
     return iso3ToIso2Map.getOrDefault(langIso3Code, defaultValue);
   }
 
@@ -75,7 +64,7 @@ public final class LangCodeUtil {
    * @param defaultValue      The default value to return if the conversion fails.
    * @return The ISO 639-2 language code, or the default value if the conversion fails.
    */
-  public String getIso2FromLang(String langNameInEnglish, String defaultValue) {
+  public static String getIso2FromLang(String langNameInEnglish, String defaultValue) {
     return langNameToIso2Map.getOrDefault(langNameInEnglish, defaultValue);
   }
 
