@@ -20,21 +20,13 @@
  */
 package org.opencastproject.metadata.dublincore;
 
-import static com.entwinemedia.fn.Stream.$;
-import static org.opencastproject.util.EqualsUtil.eq;
-import static org.opencastproject.util.data.Monadics.mlist;
-
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.XMLCatalogImpl;
 import org.opencastproject.metadata.api.MetadataCatalog;
 import org.opencastproject.util.RequireUtil;
 import org.opencastproject.util.XmlNamespaceContext;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Function2;
 
-import com.entwinemedia.fn.Fns;
-import com.entwinemedia.fn.data.ImmutableSetWrapper;
 import com.google.gson.annotations.JsonAdapter;
 
 import org.apache.commons.collections4.Closure;
@@ -46,11 +38,14 @@ import org.xml.sax.Attributes;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.annotation.Nonnull;
@@ -152,23 +147,26 @@ public class DublinCoreCatalog extends XMLCatalogImpl implements DublinCore, Met
 
   @Override
   public Map<EName, List<DublinCoreValue>> getValues() {
-    return mlist(data.values().iterator())
-            .foldl(new HashMap<EName, List<DublinCoreValue>>(),
-                    new Function2<HashMap<EName, List<DublinCoreValue>>, List<CatalogEntry>, HashMap<EName, List<DublinCoreValue>>>() {
-                      @Override
-                      public HashMap<EName, List<DublinCoreValue>> apply(HashMap<EName, List<DublinCoreValue>> map,
-                              List<CatalogEntry> entries) {
-                        if (entries.size() > 0) {
-                          final EName property = entries.get(0).getEName();
-                          map.put(property, mlist(entries).map(toDublinCoreValue).value());
-                        }
-                        return map;
-                      }
-                    });
+    Map<EName, List<DublinCoreValue>> result = new HashMap<>();
+
+    for (List<CatalogEntry> entries : data.values()) {
+      if (!entries.isEmpty()) {
+        EName property = entries.get(0).getEName();
+        List<DublinCoreValue> values = entries.stream()
+            .map(toDublinCoreValue)
+            .collect(Collectors.toList());
+        result.put(property, values);
+      }
+    }
+
+    return result;
   }
 
   @Override public List<DublinCoreValue> getValuesFlat() {
-    return $(data.values()).bind(Fns.<List<CatalogEntry>>id()).map(toDublinCoreValue.toFn()).toList();
+    return data.values().stream()
+        .flatMap(List::stream)
+        .map(toDublinCoreValue)
+        .collect(Collectors.toList());
   }
 
   @Override
@@ -233,7 +231,11 @@ public class DublinCoreCatalog extends XMLCatalogImpl implements DublinCore, Met
         values = getLocalizedValuesAsList(property, language);
         break;
     }
-    return values.size() > 0 ? $(values).mkString(delimiter) : null;
+    return (values != null && !values.isEmpty())
+        ? values.stream()
+          .map(CatalogEntry::toString)
+          .collect(Collectors.joining(delimiter))
+        : null;
   }
 
   @Override
@@ -322,7 +324,7 @@ public class DublinCoreCatalog extends XMLCatalogImpl implements DublinCore, Met
   public void set(EName property, @Nullable DublinCoreValue value) {
     RequireUtil.notNull(property, "property");
     if (value != null) {
-      setValue(property, value.getValue(), value.getLanguage(), value.getEncodingScheme().orNull());
+      setValue(property, value.getValue(), value.getLanguage(), value.getEncodingScheme().orElse(null));
     } else {
       removeValue(property, LANGUAGE_ANY);
     }
@@ -372,7 +374,7 @@ public class DublinCoreCatalog extends XMLCatalogImpl implements DublinCore, Met
     RequireUtil.notNull(property, "property");
     RequireUtil.notNull(value, "value");
 
-    add(property, value.getValue(), value.getLanguage(), value.getEncodingScheme().orNull());
+    add(property, value.getValue(), value.getLanguage(), value.getEncodingScheme().orElse(null));
   }
 
   void add(EName property, String value, String language, @Nullable EName encodingScheme) {
@@ -448,12 +450,15 @@ public class DublinCoreCatalog extends XMLCatalogImpl implements DublinCore, Met
 
   @Override
   public Set<EName> getProperties() {
-    return new ImmutableSetWrapper<>(data.keySet());
+    return Collections.unmodifiableSet(data.keySet());
   }
 
   boolean equalLanguage(String a, String b) {
-    return (a == null && eq(b, LANGUAGE_UNDEFINED)) || (b == null && eq(a, LANGUAGE_UNDEFINED)) || eq(a, LANGUAGE_ANY)
-            || eq(b, LANGUAGE_ANY) || (a != null && eq(a, b));
+    return (a == null && Objects.equals(b, LANGUAGE_UNDEFINED))
+        || (b == null && Objects.equals(a, LANGUAGE_UNDEFINED))
+        || Objects.equals(a, LANGUAGE_ANY)
+        || Objects.equals(b, LANGUAGE_ANY)
+        || (a != null && Objects.equals(a, b));
   }
 
   // make public

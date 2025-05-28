@@ -757,7 +757,7 @@ public class SeriesEndpoint {
       }
     }
 
-    if (optCollection.isNone()) {
+    if (optCollection.isEmpty()) {
       return ApiResponseBuilder.notFound("Cannot find a catalog with type '%s' for series with id '%s'.", type, id);
     }
 

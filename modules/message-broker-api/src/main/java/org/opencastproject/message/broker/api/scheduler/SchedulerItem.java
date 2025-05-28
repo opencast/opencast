@@ -289,7 +289,7 @@ public class SchedulerItem implements Serializable {
       return null;
     }
 
-    return DublinCoreXmlFormat.readOpt(event).orNull();
+    return DublinCoreXmlFormat.readOpt(event).orElse(null);
   }
 
   public Map<String, String> getProperties() {

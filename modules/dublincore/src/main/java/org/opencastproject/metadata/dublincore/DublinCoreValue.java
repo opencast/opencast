@@ -28,9 +28,8 @@ import org.opencastproject.mediapackage.EName;
 import org.opencastproject.util.EqualsUtil;
 import org.opencastproject.util.RequireUtil;
 
-import com.entwinemedia.fn.data.Opt;
-
 import java.io.Serializable;
+import java.util.Optional;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import javax.annotation.concurrent.Immutable;
@@ -49,7 +48,7 @@ public final class DublinCoreValue implements Serializable {
 
   private final String value;
   private final String language;
-  private final Opt<EName> encodingScheme;
+  private final Optional<EName> encodingScheme;
 
   /**
    * Create a new Dublin Core value.
@@ -61,7 +60,7 @@ public final class DublinCoreValue implements Serializable {
    * @param encodingScheme
    *          the encoding scheme used to encode the value
    */
-  public DublinCoreValue(String value, String language, Opt<EName> encodingScheme) {
+  public DublinCoreValue(String value, String language, Optional<EName> encodingScheme) {
     this.value = RequireUtil.notNull(value, "value");
     this.language = RequireUtil.notNull(language, "language");
     this.encodingScheme = RequireUtil.notNull(encodingScheme, "encodingScheme");
@@ -77,7 +76,7 @@ public final class DublinCoreValue implements Serializable {
    * @param encodingScheme
    *         the encoding scheme used to encode the value
    */
-  public static DublinCoreValue mk(String value, String language, Opt<EName> encodingScheme) {
+  public static DublinCoreValue mk(String value, String language, Optional<EName> encodingScheme) {
     return new DublinCoreValue(value, language, encodingScheme);
   }
 
@@ -92,7 +91,7 @@ public final class DublinCoreValue implements Serializable {
    *         the encoding scheme used to encode the value
    */
   public static DublinCoreValue mk(String value, String language, EName encodingScheme) {
-    return new DublinCoreValue(value, language, Opt.some(encodingScheme));
+    return new DublinCoreValue(value, language, Optional.of(encodingScheme));
   }
 
   /**
@@ -104,7 +103,7 @@ public final class DublinCoreValue implements Serializable {
    *          the language (two letter ISO 639)
    */
   public static DublinCoreValue mk(String value, String language) {
-    return new DublinCoreValue(value, language, Opt.<EName>none());
+    return new DublinCoreValue(value, language, Optional.empty());
   }
 
   /**
@@ -115,7 +114,7 @@ public final class DublinCoreValue implements Serializable {
    * @see org.opencastproject.metadata.dublincore.DublinCore#LANGUAGE_UNDEFINED
    */
   public static DublinCoreValue mk(String value) {
-    return new DublinCoreValue(value, DublinCore.LANGUAGE_UNDEFINED, Opt.<EName>none());
+    return new DublinCoreValue(value, DublinCore.LANGUAGE_UNDEFINED, Optional.empty());
   }
 
   /**
@@ -135,12 +134,12 @@ public final class DublinCoreValue implements Serializable {
   /**
    * Return the encoding scheme.
    */
-  public Opt<EName> getEncodingScheme() {
+  public Optional<EName> getEncodingScheme() {
     return encodingScheme;
   }
 
   public boolean hasEncodingScheme() {
-    return encodingScheme.isSome();
+    return encodingScheme.isPresent();
   }
 
   @Override

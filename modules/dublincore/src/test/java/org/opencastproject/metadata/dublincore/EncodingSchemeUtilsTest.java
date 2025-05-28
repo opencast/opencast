@@ -37,14 +37,13 @@ import static org.opencastproject.metadata.dublincore.TestUtil.createDate;
 import static org.opencastproject.metadata.dublincore.TestUtil.precisionDay;
 import static org.opencastproject.metadata.dublincore.TestUtil.precisionSecond;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.Optional;
 import java.util.TimeZone;
 
 /**
@@ -66,7 +65,7 @@ public class EncodingSchemeUtilsTest {
     assertEquals(4, encodeDate(now, Precision.Year).getValue().length());
     assertEquals(3, encodeDate(now, Precision.Day).getValue().split("-").length);
     assertEquals("2009-01-01T00:00:00Z".length(), encodeDate(now, Precision.Second).getValue().length());
-    assertEquals(Opt.some(DublinCore.ENC_SCHEME_W3CDTF), encodeDate(now, Precision.Year).getEncodingScheme());
+    assertEquals(Optional.of(DublinCore.ENC_SCHEME_W3CDTF), encodeDate(now, Precision.Year).getEncodingScheme());
     // Test symmetry
     assertEquals(decodeDate(encodeDate(now, Precision.Second)), precisionSecond(now));
     assertEquals(decodeDate(encodeDate(createDate(1999, 3, 21, 14, 0, 0), Precision.Day)), precisionDay(createDate(
@@ -99,7 +98,7 @@ public class EncodingSchemeUtilsTest {
     DublinCoreValue a = encodePeriod(new DCMIPeriod(createDate(2007, 2, 10, 12, 0, 0), createDate(2009, 12, 24, 10, 0,
             0), "long time"), Precision.Day);
     assertEquals("start=2007-02-10; end=2009-12-24; name=long time; scheme=W3C-DTF;", a.getValue());
-    assertEquals(Opt.some(DublinCore.ENC_SCHEME_PERIOD), a.getEncodingScheme());
+    assertEquals(Optional.of(DublinCore.ENC_SCHEME_PERIOD), a.getEncodingScheme());
     DublinCoreValue b = encodePeriod(new DCMIPeriod(createDate(2007, 2, 10, 12, 0, 0), null), Precision.Day);
     assertEquals("start=2007-02-10; scheme=W3C-DTF;", b.getValue());
   }
@@ -193,7 +192,7 @@ public class EncodingSchemeUtilsTest {
     assertEquals(d3, decodeDuration(encodeDuration(d3).getValue()));
     assertEquals(new Long(1 * 1000 * 60 * 60 + 10 * 1000 * 60 + 5 * 1000), decodeDuration("01:10:05"));
 
-    assertEquals(Opt.some(DublinCore.ENC_SCHEME_ISO8601), encodeDuration(d3).getEncodingScheme());
+    assertEquals(Optional.of(DublinCore.ENC_SCHEME_ISO8601), encodeDuration(d3).getEncodingScheme());
 
     assertNull(decodeDuration(DublinCoreValue.mk("bla")));
     assertNull(decodeDuration(DublinCoreValue.mk(encodeDuration(d1).getValue(), DublinCore.LANGUAGE_UNDEFINED,
