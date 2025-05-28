@@ -26,9 +26,14 @@ import java.util.Locale;
 import java.util.Map;
 
 /**
- * Utility class for language codes, singleton.
+ * Utility class for language codes
  */
 public final class LangCodeUtil {
+
+  // Prevent instantiation because of Checkstyle: "HideUtilityClassConstructor"
+  private LangCodeUtil() {
+    throw new UnsupportedOperationException("Utility class should not have a public or default constructor");
+  }
 
   /** Map to get ISO 639 language code for language name in English */
   private static final Map<String, String> iso3ToIso2Map = new HashMap<>();
