@@ -198,7 +198,7 @@ public class MetricsExporter {
 
     // collect metrics
     final StringWriter writer = new StringWriter();
-    TextFormat.write004(writer, registry.metricFamilySamples());
+    TextFormat.writeOpenMetrics100(writer, registry.metricFamilySamples());
     return Response.ok().entity(writer.toString()).build();
   }
 
