@@ -427,7 +427,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
 
                       var updatedEventData = index.getEvent(eventId, orgId, securityService.getUser());
                       updatedEventData = getEventUpdateFunction(eventId).apply(updatedEventData);
-                      updatedEventRange.add(updatedEventData.get());
+                      updatedEventData.ifPresent(updatedEventRange::add);
 
                       if (updatedEventRange.size() >= n || i >= eventsWithComments.get(orgId).size()) {
                         index.bulkEventUpdate(updatedEventRange);
