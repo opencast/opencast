@@ -18,7 +18,7 @@
     <!-- library version specifications -->
     <aws.version>1.12.269_1</aws.version>
     <commons-codec.version>1.18.0</commons-codec.version>
-    <commons-collections.version>4.4</commons-collections.version>
+    <commons-collections.version>4.5.0</commons-collections.version>
     <commons-compress.version>1.26.1</commons-compress.version>
     <commons-csv.version>1.9.0</commons-csv.version>
     <commons-fileupload.version>1.5</commons-fileupload.version>
