@@ -21,11 +21,6 @@
 
 package org.opencastproject.index.service.util;
 
-import static com.entwinemedia.fn.data.json.Jsons.arr;
-import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.obj;
-import static com.entwinemedia.fn.data.json.Jsons.v;
-
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ListProvidersService;
 import org.opencastproject.list.api.ResourceListFilter;
@@ -33,23 +28,23 @@ import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.util.data.Option;
 
-import com.entwinemedia.fn.data.json.Field;
-import com.entwinemedia.fn.data.json.JObject;
-import com.entwinemedia.fn.data.json.JValue;
-import com.entwinemedia.fn.data.json.Jsons;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 /**
  * Utility class providing helpers for all operation related to JSON.
@@ -66,42 +61,73 @@ public final class JSONUtils {
 
   }
 
+  public static String safeString(Object input) {
+    return input != null ? input.toString() : "";
+  }
+
   /**
-   * Turn a map into a {@link JObject} object
+   * Turn a collection into a {@link JsonArray}
+   *
+   * @param Collection
+   *          the collection
+   * @return a new {@link JsonArray} generated with the colleciton values
+   */
+  public static JsonArray collectionToJsonArray(Collection<?> collection) {
+    JsonArray jsonArray = new JsonArray();
+
+    if (collection != null) {
+      for (Object item : collection) {
+        jsonArray.add(convertToJsonElement(item));
+      }
+    }
+
+    return jsonArray;
+  }
+
+  public static <T> JsonArray arrayToJsonArray(T[] array) {
+    JsonArray jsonArray = new JsonArray();
+
+    if (array != null) {
+      for (T item : array) {
+        jsonArray.add(convertToJsonElement(item));
+      }
+    }
+
+    return jsonArray;
+  }
+
+
+  /**
+   * Turn a map into a {@link JsonObject} object
    *
    * @param map
    *          the source map
-   * @return a new {@link JObject} generated with the map values
+   * @return a new {@link JsonObject} generated with the map values
    */
-  public static JObject mapToJSON(Map<String, String> map) {
-    if (map == null) {
-      throw new IllegalArgumentException("Map must not be null!");
+  public static JsonObject mapToJsonObject(Map<?, ?> map) {
+    JsonObject jsonObject = new JsonObject();
+
+    if (map != null) {
+      for (Map.Entry<?, ?> entry : map.entrySet()) {
+        String key = String.valueOf(entry.getKey());
+        JsonElement value = convertToJsonElement(entry.getValue());
+        jsonObject.add(key, value);
+      }
     }
 
-    List<Field> fields = new ArrayList<Field>();
-    for (Entry<String, String> item : map.entrySet()) {
-      fields.add(f(item.getKey(), v(item.getValue(), Jsons.BLANK)));
-    }
-    return obj(fields);
+    return jsonObject;
   }
 
-  /**
-   * Turn a set into a {@link JObject} object
-   *
-   * @param set
-   *          the source set
-   * @return a new {@link JObject} generated with the map values
-   */
-  public static JValue setToJSON(Set<String> set) {
-    if (set == null) {
-      return arr();
-    }
-    List<JValue> arrEntries = new ArrayList<JValue>();
-    for (String item : set) {
-      arrEntries.add(v(item, Jsons.BLANK));
-    }
-    return arr(arrEntries);
+  private static JsonElement convertToJsonElement(Object item) {
+    if (item == null) return JsonNull.INSTANCE;
+    if (item instanceof JsonElement) return (JsonElement) item;
+    if (item instanceof Number) return new JsonPrimitive((Number) item);
+    if (item instanceof Boolean) return new JsonPrimitive((Boolean) item);
+    if (item instanceof Character) return new JsonPrimitive((Character) item);
+    if (item instanceof String) return new JsonPrimitive((String) item);
+    return new JsonPrimitive(item.toString());
   }
+
 
   /**
    * Generate JSON presentation of the given filters
@@ -116,50 +142,53 @@ public final class JSONUtils {
    * @throws ListProviderException
    *           if the possible values can not be retrieved correctly from the list provider.
    */
-  public static JValue filtersToJSON(ResourceListQuery query, ListProvidersService listProvidersService,
-          Organization org) throws ListProviderException {
+  public static JsonObject filtersToJSON(ResourceListQuery query, ListProvidersService listProvidersService,
+      Organization org) throws ListProviderException {
 
-    List<Field> filtersJSON = new ArrayList<Field>();
-    List<Field> fields = null;
+    JsonObject filtersJson = new JsonObject();
+
     List<ResourceListFilter<?>> filters = query.getAvailableFilters();
 
     for (ResourceListFilter<?> f : filters) {
-      fields = new ArrayList<Field>();
+      JsonObject filterObject = new JsonObject();
 
-      fields.add(f("type", v(f.getSourceType().toString().toLowerCase())));
-      fields.add(f("label", v(f.getLabel())));
+      filterObject.addProperty("type", f.getSourceType().toString().toLowerCase());
+      filterObject.addProperty("label", f.getLabel());
 
       Option<String> listProviderName = f.getValuesListName();
 
       if (listProviderName.isSome()) {
-        Map<String, String> values = null;
+        Map<String, String> values;
         boolean translatable = false;
 
-        if (org != null && !listProvidersService.hasProvider(listProviderName.get(), org.getId())
-                && !listProvidersService.hasProvider(listProviderName.get())) {
-          values = new HashMap<String, String>();
+        String providerName = listProviderName.get();
+
+        if (org != null
+            && !listProvidersService.hasProvider(providerName, org.getId())
+            && !listProvidersService.hasProvider(providerName)) {
+          values = new HashMap<>();
         } else {
-          values = listProvidersService.getList(listProviderName.get(), query, false);
-          if (Arrays.asList(userListsToReduce).contains(listProviderName.get())) {
+          values = listProvidersService.getList(providerName, query, false);
+          if (Arrays.asList(userListsToReduce).contains(providerName)) {
             // reduces the user list ('values' map) by the configured userFilterRegex
             values.keySet().removeIf(u -> !u.matches(userFilterRegex));
           }
-          translatable = listProvidersService.isTranslatable(listProviderName.get());
+          translatable = listProvidersService.isTranslatable(providerName);
         }
 
-        List<Field> valuesJSON = new ArrayList<Field>();
+        JsonObject optionsJson = new JsonObject();
         for (Entry<String, String> entry : values.entrySet()) {
-          valuesJSON.add(f(entry.getKey(), v(entry.getValue(), Jsons.BLANK)));
+          optionsJson.addProperty(entry.getKey(), entry.getValue() != null ? entry.getValue() : "");
         }
 
-        fields.add(f("options", obj(valuesJSON)));
-        fields.add(f("translatable", translatable));
+        filterObject.add("options", optionsJson);
+        filterObject.addProperty("translatable", translatable);
       }
 
-      filtersJSON.add(f(f.getName(), obj(fields)));
+      filtersJson.add(f.getName(), filterObject);
     }
 
-    return obj(filtersJSON);
+    return filtersJson;
   }
 
   /**
@@ -175,44 +204,45 @@ public final class JSONUtils {
    * @throws ListProviderException
    *           if the possible values can not be retrieved correctly from the list provider.
    */
-  public static JValue filtersToJSONSeriesWriteAccess(ResourceListQuery query, ListProvidersService listProvidersService,
-          Map<String, String> series) throws ListProviderException {
+  public static JsonObject filtersToJSONSeriesWriteAccess(ResourceListQuery query,
+      ListProvidersService listProvidersService, Map<String, String> series) throws ListProviderException {
+    JsonObject filtersJson = new JsonObject();
 
-    List<Field> filtersJSON = new ArrayList<>();
     for (ResourceListFilter<?> filter : query.getAvailableFilters()) {
-      List<Field> fields = new ArrayList<>();
-
-      fields.add(f("type", v(filter.getSourceType().toString().toLowerCase())));
-      fields.add(f("label", v(filter.getLabel())));
+      JsonObject filterObject = new JsonObject();
+      filterObject.addProperty("type", filter.getSourceType().toString().toLowerCase());
+      filterObject.addProperty("label", filter.getLabel());
 
       Option<String> listProviderName = filter.getValuesListName();
 
       if (listProviderName.isSome()) {
+        String providerName = listProviderName.get();
+        JsonObject optionsJson = new JsonObject();
         boolean translatable = false;
-        List<Field> valuesJSON = new ArrayList<>();
 
-        if (listProvidersService.hasProvider(listProviderName.get())) {
+        if (listProvidersService.hasProvider(providerName)) {
           if (listProviderName.get().equals("SERIES")) {
             for (Entry<String, String> entry : series.entrySet()) {
-              valuesJSON.add(f(entry.getValue(), v(entry.getKey(), Jsons.BLANK)));
+              optionsJson.addProperty(entry.getValue(), entry.getKey() != null ? entry.getKey() : "");
             }
           } else {
-            Map<String, String> values = listProvidersService.getList(listProviderName.get(), query, false);
+            Map<String, String> values = listProvidersService.getList(providerName, query, false);
             for (Entry<String, String> entry : values.entrySet()) {
-              valuesJSON.add(f(entry.getKey(), v(entry.getValue(), Jsons.BLANK)));
+              optionsJson.addProperty(entry.getKey(), entry.getValue() != null ? entry.getValue() : "");
             }
           }
-          translatable = listProvidersService.isTranslatable(listProviderName.get());
+
+          translatable = listProvidersService.isTranslatable(providerName);
         }
 
-        fields.add(f("options", obj(valuesJSON)));
-        fields.add(f("translatable", translatable));
+        filterObject.add("options", optionsJson);
+        filterObject.addProperty("translatable", translatable);
       }
 
-      filtersJSON.add(f(filter.getName(), obj(fields)));
+      filtersJson.add(filter.getName(), filterObject);
     }
 
-    return obj(filtersJSON);
+    return filtersJson;
   }
 
   /**

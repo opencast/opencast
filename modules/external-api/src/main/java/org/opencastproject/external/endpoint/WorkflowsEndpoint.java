@@ -20,15 +20,9 @@
  */
 package org.opencastproject.external.endpoint;
 
-import static com.entwinemedia.fn.data.json.Jsons.BLANK;
-import static com.entwinemedia.fn.data.json.Jsons.ZERO;
-import static com.entwinemedia.fn.data.json.Jsons.arr;
-import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.obj;
-import static com.entwinemedia.fn.data.json.Jsons.v;
-import static java.time.ZoneOffset.UTC;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNoneBlank;
+import static org.opencastproject.index.service.util.JSONUtils.safeString;
 import static org.opencastproject.util.RestUtil.getEndpointUrl;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
@@ -60,8 +54,10 @@ import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowStateException;
 
 import com.entwinemedia.fn.data.Opt;
-import com.entwinemedia.fn.data.json.Field;
-import com.entwinemedia.fn.data.json.JValue;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -75,12 +71,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URI;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
@@ -212,7 +206,9 @@ public class WorkflowsEndpoint {
               workflowInstanceToJSON(wi, withOperations, withConfiguration));
     } catch (IllegalStateException e) {
       final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
-      return ApiResponseBuilder.Json.conflict(requestedVersion, obj(f("message", v(e.getMessage(), BLANK))));
+      JsonObject json = new JsonObject();
+      json.addProperty("message", safeString(e.getMessage()));
+      return ApiResponseBuilder.Json.conflict(requestedVersion, json);
     } catch (Exception e) {
       logger.error("Could not create workflow instances", e);
       return ApiResponseBuilder.serverError("Could not create workflow instances, reason: '%s'", e.getMessage());
@@ -372,69 +368,76 @@ public class WorkflowsEndpoint {
     return Response.noContent().build();
   }
 
-  private JValue workflowInstanceToJSON(WorkflowInstance wi, boolean withOperations, boolean withConfiguration) {
-    List<Field> fields = new ArrayList<>();
+  private JsonObject workflowInstanceToJSON(WorkflowInstance wi, boolean withOperations, boolean withConfiguration) {
+    JsonObject json = new JsonObject();
 
-    fields.add(f("identifier", v(wi.getId())));
-    fields.add(f("title", v(wi.getTitle(), BLANK)));
-    fields.add(f("description", v(wi.getDescription(), BLANK)));
-    fields.add(f("workflow_definition_identifier", v(wi.getTemplate(), BLANK)));
-    fields.add(f("event_identifier", v(wi.getMediaPackage().getIdentifier().toString())));
-    fields.add(f("creator", v(wi.getCreatorName())));
-    fields.add(f("state", enumToJSON(wi.getState())));
+    json.addProperty("identifier", wi.getId());
+    json.addProperty("title", safeString(wi.getTitle()));
+    json.addProperty("description", safeString(wi.getDescription()));
+    json.addProperty("workflow_definition_identifier", safeString(wi.getTemplate()));
+    json.addProperty("event_identifier", wi.getMediaPackage().getIdentifier().toString());
+    json.addProperty("creator", wi.getCreatorName());
+    json.add("state", enumToJSON(wi.getState()));
     if (withOperations) {
-      fields.add(f("operations", arr(wi.getOperations()
-                                       .stream()
-                                       .map(this::workflowOperationInstanceToJSON)
-                                       .collect(Collectors.toList()))));
+      JsonArray operationsArray = new JsonArray();
+      for (WorkflowOperationInstance op : wi.getOperations()) {
+        operationsArray.add(workflowOperationInstanceToJSON(op));
+      }
+      json.add("operations", operationsArray);
     }
+
     if (withConfiguration) {
-      fields.add(f("configuration", obj(wi.getConfigurationKeys()
-                                          .stream()
-                                          .map(key -> f(key, wi.getConfiguration(key)))
-                                          .collect(Collectors.toList()))));
+      JsonObject configObject = new JsonObject();
+      for (String key : wi.getConfigurationKeys()) {
+        String value = wi.getConfiguration(key);
+        configObject.addProperty(key, value);
+      }
+      json.add("configuration", configObject);
     }
 
-    return obj(fields);
+    return json;
   }
 
-  private JValue workflowOperationInstanceToJSON(WorkflowOperationInstance woi) {
-    List<Field> fields = new ArrayList<>();
-    DateTimeFormatter dateFormatter = DateTimeFormatter.ISO_DATE_TIME;
+  private JsonObject workflowOperationInstanceToJSON(WorkflowOperationInstance woi) {
+    JsonObject json = new JsonObject();
+    DateTimeFormatter dateFormatter = DateTimeFormatter.ISO_DATE_TIME.withZone(ZoneOffset.UTC);
 
-    // The job ID can be null if the workflow was just created
-    fields.add(f("identifier", v(woi.getId(), BLANK)));
-    fields.add(f("operation", v(woi.getTemplate())));
-    fields.add(f("description", v(woi.getDescription(), BLANK)));
-    fields.add(f("state", enumToJSON(woi.getState())));
-    fields.add(f("time_in_queue", v(woi.getTimeInQueue(), ZERO)));
-    fields.add(f("host", v(woi.getExecutionHost(), BLANK)));
-    fields.add(f("if", v(woi.getExecutionCondition(), BLANK)));
-    fields.add(f("fail_workflow_on_error", v(woi.isFailOnError())));
-    fields.add(f("error_handler_workflow", v(woi.getExceptionHandlingWorkflow(), BLANK)));
-    fields.add(f("retry_strategy", v(new RetryStrategy.Adapter().marshal(woi.getRetryStrategy()), BLANK)));
-    fields.add(f("max_attempts", v(woi.getMaxAttempts())));
-    fields.add(f("failed_attempts", v(woi.getFailedAttempts())));
-    fields.add(f("configuration", obj(woi.getConfigurationKeys()
-                                         .stream()
-                                         .map(key -> f(key, woi.getConfiguration(key)))
-                                         .collect(Collectors.toList()))));
+    json.addProperty("identifier", woi.getId());
+    json.addProperty("operation", woi.getTemplate());
+    json.addProperty("description", safeString(woi.getDescription()));
+    json.add("state", enumToJSON(woi.getState()));
+    Long timeInQueue = woi.getTimeInQueue();
+    json.addProperty("time_in_queue", timeInQueue != null ? timeInQueue : 0);
+    json.addProperty("host", safeString(woi.getExecutionHost()));
+    json.addProperty("if", safeString(woi.getExecutionCondition()));
+    json.addProperty("fail_workflow_on_error", woi.isFailOnError());
+    json.addProperty("error_handler_workflow", safeString(woi.getExceptionHandlingWorkflow()));
+    json.addProperty("retry_strategy", safeString(new RetryStrategy.Adapter().marshal(woi.getRetryStrategy())));
+    json.addProperty("max_attempts", woi.getMaxAttempts());
+    json.addProperty("failed_attempts", woi.getFailedAttempts());
+    JsonObject config = new JsonObject();
+    for (String key : woi.getConfigurationKeys()) {
+      config.addProperty(key, woi.getConfiguration(key));
+    }
+    json.add("configuration", config);
+
     if (woi.getDateStarted() != null) {
-      fields.add(f("start", v(dateFormatter.format(woi.getDateStarted().toInstant().atZone(UTC)))));
+      json.addProperty("start", dateFormatter.format(woi.getDateStarted().toInstant().atZone(ZoneOffset.UTC)));
     } else {
-      fields.add(f("start", BLANK));
-    }
-    if (woi.getDateCompleted() != null) {
-      fields.add(f("completion", v(dateFormatter.format(woi.getDateCompleted().toInstant().atZone(UTC)))));
-    } else {
-      fields.add(f("completion", BLANK));
+      json.addProperty("start", "");
     }
 
-    return obj(fields);
+    if (woi.getDateCompleted() != null) {
+      json.addProperty("completion", dateFormatter.format(woi.getDateCompleted().toInstant().atZone(ZoneOffset.UTC)));
+    } else {
+      json.addProperty("completion", "");
+    }
+
+    return json;
   }
 
-  private JValue enumToJSON(Enum e) {
-    return e == null ? null : v(e.toString().toLowerCase());
+  private JsonElement enumToJSON(Enum<?> e) {
+    return e == null ? null : new JsonPrimitive(e.toString().toLowerCase());
   }
 
   private <T extends Enum<T>> T jsonToEnum(Class<T> enumType, String name) {

@@ -21,28 +21,19 @@
 
 package org.opencastproject.index.service.util;
 
-import static com.entwinemedia.fn.data.json.Jsons.arr;
-import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.obj;
-import static com.entwinemedia.fn.data.json.Jsons.v;
-import static java.lang.String.format;
-
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.requests.SortCriterion;
 
-import com.entwinemedia.fn.Fx;
-import com.entwinemedia.fn.data.json.Field;
-import com.entwinemedia.fn.data.json.JValue;
-import com.entwinemedia.fn.data.json.SimpleSerializer;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import org.apache.commons.lang3.StringUtils;
+import org.json.simple.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -57,15 +48,12 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.StreamingOutput;
 
 /**
  * Utils method for the Rest Endpoint implementation
  */
 public final class RestUtils {
   private static final Logger logger = LoggerFactory.getLogger(RestUtils.class);
-
-  private static final SimpleSerializer serializer = new SimpleSerializer();
 
   private RestUtils() {
   }
@@ -77,8 +65,8 @@ public final class RestUtils {
    *          the JSON string to add to the response body.
    * @return an OK response
    */
-  public static Response okJson(JValue json) {
-    return Response.ok(stream(serializer.fn.toJson(json)), MediaType.APPLICATION_JSON_TYPE).build();
+  public static Response okJson(JsonElement json) {
+    return Response.ok(json.toString(), MediaType.APPLICATION_JSON_TYPE).build();
   }
 
   /**
@@ -88,9 +76,11 @@ public final class RestUtils {
    *          the JSON string to add to the response body.
    * @return an OK response
    */
-  public static Response conflictJson(JValue json) {
-    return Response.status(Status.CONFLICT).entity(stream(serializer.fn.toJson(json)))
-            .type(MediaType.APPLICATION_JSON_TYPE).build();
+  public static Response conflictJson(JsonElement json) {
+    return Response.status(Status.CONFLICT)
+        .entity(json.toString())
+        .type(MediaType.APPLICATION_JSON_TYPE)
+        .build();
   }
 
   /**
@@ -101,7 +91,10 @@ public final class RestUtils {
    * @return a NOT FOUND response
    */
   public static Response notFound(String msg, Object... args) {
-    return Response.status(Status.NOT_FOUND).entity(format(msg, args)).type(MediaType.TEXT_PLAIN_TYPE).build();
+    return Response.status(Status.NOT_FOUND)
+        .entity(String.format(msg, args))
+        .type(MediaType.TEXT_PLAIN_TYPE)
+        .build();
   }
 
   /**
@@ -111,9 +104,11 @@ public final class RestUtils {
    *          the JSON string to add to the response body.
    * @return a NOT FOUND response
    */
-  public static Response notFoundJson(JValue json) {
-    return Response.status(Status.NOT_FOUND).entity(stream(serializer.fn.toJson(json)))
-        .type(MediaType.APPLICATION_JSON_TYPE).build();
+  public static Response notFoundJson(JsonElement json) {
+    return Response.status(Status.NOT_FOUND)
+        .entity(json.toString())
+        .type(MediaType.APPLICATION_JSON_TYPE)
+        .build();
   }
 
   /**
@@ -123,9 +118,11 @@ public final class RestUtils {
    *          the JSON string to add to the response body.
    * @return an INTERNAL SERVER ERROR response
    */
-  public static Response serverErrorJson(JValue json) {
-    return Response.status(Status.INTERNAL_SERVER_ERROR).entity(stream(serializer.fn.toJson(json)))
-        .type(MediaType.APPLICATION_JSON_TYPE).build();
+  public static Response serverErrorJson(JsonElement json) {
+    return Response.status(Status.INTERNAL_SERVER_ERROR)
+        .entity(json.toString())
+        .type(MediaType.APPLICATION_JSON_TYPE)
+        .build();
   }
 
   /**
@@ -145,7 +142,7 @@ public final class RestUtils {
    * @throws IllegalArgumentException
    *           if the value list is null
    */
-  public static Response okJsonList(List<JValue> jsonList, int offset, int limit, long total) {
+  public static Response okJsonList(List<JsonObject> jsonList, int offset, int limit, long total) {
     return okJsonList(jsonList, Optional.of(offset), Optional.of(limit), total);
   }
 
@@ -179,36 +176,30 @@ public final class RestUtils {
    * @throws IllegalArgumentException
    *           if the value list is null
    */
-  public static Response okJsonList(List<JValue> jsonList, Optional<Integer> optOffset, Optional<Integer> optLimit,
-          long total) {
-    if (jsonList == null)
-      throw new IllegalArgumentException("The list of value must not be null.");
+  public static Response okJsonList(List<JsonObject> jsonList, Optional<Integer> optOffset, Optional<Integer> optLimit,
+      long total) {
+    if (jsonList == null) {
+      throw new IllegalArgumentException("The list of values must not be null.");
+    }
 
-    ArrayList<Field> fields = new ArrayList<>();
-    fields.add(f("results", arr(jsonList)));
-    fields.add(f("count", v(jsonList.size())));
-    fields.add(f("total", v(total)));
+    JsonObject responseJson = new JsonObject();
+
+    JsonArray resultsArray = new JsonArray();
+    for (JsonObject obj : jsonList) {
+      resultsArray.add(obj);
+    }
+    responseJson.add("results", resultsArray);
+    responseJson.addProperty("count", jsonList.size());
+    responseJson.addProperty("total", total);
 
     if (optOffset.isPresent()) {
-      fields.add(f("offset", v(optOffset.get())));
+      responseJson.addProperty("offset", optOffset.get());
     }
     if (optLimit.isPresent()) {
-      fields.add(f("limit", v(optLimit.get())));
+     responseJson.addProperty("limit", optLimit.get());
     }
 
-    return okJson(obj(fields));
-  }
-
-  /**
-   * Create a streaming response entity. Pass it as an entity parameter to one of the response builder methods like
-   * {@link org.opencastproject.util.RestUtil.R#ok(Object)}.
-   */
-  public static StreamingOutput stream(final Fx<OutputStream> out) {
-    return s -> {
-      try (BufferedOutputStream bs = new BufferedOutputStream(s)) {
-        out.apply(bs);
-      }
-    };
+    return okJson(responseJson);
   }
 
   /**
@@ -299,38 +290,24 @@ public final class RestUtils {
     return filters;
   }
 
-  public static String getJsonString(JValue json) throws WebApplicationException, IOException {
-    OutputStream output = new OutputStream() {
-      private StringBuilder string = new StringBuilder();
-
-      @Override
-      public void write(int b) throws IOException {
-        this.string.append((char) b);
-      }
-
-      @Override
-      public String toString() {
-        return this.string.toString();
-      }
-    };
-
-    stream(serializer.fn.toJson(json)).write(output);
-
-    return output.toString();
+  public static String getJsonString(Object jsonObject) {
+    return JSONValue.toJSONString(jsonObject);
   }
 
   /**
-   * Get a {@link String} value from a {@link JValue} ignoring errors.
+   * Get a {@link String} value from a {@link JsonArray} ignoring errors.
    *
    * @param json
-   *          The {@link JValue} to convert to a {@link String}
-   * @return The {@link String} representation of the {@link JValue} or an empty string if there was an error.
+   *          The {@link JsonArray} to convert to a {@link String}
+   * @return The {@link String} representation of the {@link JsonArray} or an empty string if there was an error.
    */
-  public static String getJsonStringSilent(JValue json) {
+  public static String getJsonStringSilent(JsonArray json) {
     try {
-      return getJsonString(json);
+      return json.toString();
     } catch (Exception e) {
       return "";
     }
   }
+
+
 }

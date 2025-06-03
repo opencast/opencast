@@ -21,9 +21,7 @@
 
 package org.opencastproject.adminui.endpoint;
 
-import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.obj;
-import static com.entwinemedia.fn.data.json.Jsons.v;
+import static org.opencastproject.index.service.util.JSONUtils.safeString;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.index.service.resources.list.query.ServicesListQuery;
@@ -41,8 +39,7 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.util.requests.SortCriterion;
 import org.opencastproject.util.requests.SortCriterion.Order;
 
-import com.entwinemedia.fn.data.json.JValue;
-import com.entwinemedia.fn.data.json.Jsons;
+import com.google.gson.JsonObject;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONAware;
@@ -182,10 +179,13 @@ public class ServicesEndpoint {
       }
     }
 
-    List<JValue> jsonList = new ArrayList<JValue>();
-    for (Service s : new SmartIterator<Service>(limit, offset).applyLimitAndOffset(services)) {
+    List<JsonObject> jsonList = new ArrayList<>();
+    List<Service> limitedServices = new SmartIterator<Service>(limit, offset).applyLimitAndOffset(services);
+
+    for (Service s : limitedServices) {
       jsonList.add(s.toJSON());
     }
+
     return RestUtils.okJsonList(jsonList, offset, limit, total);
   }
 
@@ -348,14 +348,20 @@ public class ServicesEndpoint {
      * Returns a json representation of a service as {@code JValue}.
      * @return a json representation of a service as {@code JValue}
      */
-    public JValue toJSON() {
-      return obj(f(COMPLETED_NAME, v(getCompletedJobs())), f(HOST_NAME, v(getHost(), Jsons.BLANK)), f(NODE_NAME, v(getNodeName(), Jsons.BLANK)),
-              f(MEAN_QUEUE_TIME_NAME, v(getMeanQueueTime())), f(MEAN_RUN_TIME_NAME, v(getMeanRunTime())),
-              f(NAME_NAME, v(getName(), Jsons.BLANK)), f(QUEUED_NAME, v(getQueuedJobs())),
-              f(RUNNING_NAME, v(getRunningJobs())),
-              f(STATUS_NAME, v(SERVICE_STATUS_TRANSLATION_PREFIX + getStatus().name(), Jsons.BLANK)),
-              f(ONLINE_NAME, v(getIsOnline())),
-              f(MAINTENANCE_NAME, v(getisMaintenance())));
+    public JsonObject toJSON() {
+      JsonObject json = new JsonObject();
+      json.addProperty(COMPLETED_NAME, getCompletedJobs());
+      json.addProperty(HOST_NAME, safeString(getHost()));
+      json.addProperty(NODE_NAME, safeString(getNodeName()));
+      json.addProperty(MEAN_QUEUE_TIME_NAME, getMeanQueueTime());
+      json.addProperty(MEAN_RUN_TIME_NAME, getMeanRunTime());
+      json.addProperty(NAME_NAME, safeString(getName()));
+      json.addProperty(QUEUED_NAME, getQueuedJobs());
+      json.addProperty(RUNNING_NAME, getRunningJobs());
+      json.addProperty(STATUS_NAME, SERVICE_STATUS_TRANSLATION_PREFIX + getStatus().name());
+      json.addProperty(ONLINE_NAME, getIsOnline());
+      json.addProperty(MAINTENANCE_NAME, getisMaintenance());
+      return json;
     }
   }
 

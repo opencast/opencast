@@ -38,8 +38,8 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.data.Option;
 
-import com.entwinemedia.fn.data.json.JValue;
 import com.entwinemedia.fn.data.json.SimpleSerializer;
+import com.google.gson.JsonObject;
 
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jettison.json.JSONException;
@@ -47,13 +47,10 @@ import org.codehaus.jettison.json.JSONObject;
 import org.easymock.EasyMock;
 import org.junit.Test;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.ws.rs.core.StreamingOutput;
 
 import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
@@ -177,28 +174,12 @@ public class JSONUtilsTest {
     EasyMock.replay(query);
 
     JSONUtils.setUserRegex(".*"); //allow all users
-    JValue result = JSONUtils.filtersToJSON(query, listProvidersService, organization);
-
-    StreamingOutput stream = RestUtils.stream(serializer.fn.toJson(result));
-    ByteArrayOutputStream resultStream = new ByteArrayOutputStream();
-    try {
-      stream.write(resultStream);
-      assertThat(expectedJSON, SameJSONAs.sameJSONAs(resultStream.toString()));
-    } finally {
-      IOUtils.closeQuietly(resultStream);
-    }
+    JsonObject result = JSONUtils.filtersToJSON(query, listProvidersService, organization);
+    assertThat(expectedJSON, SameJSONAs.sameJSONAs(result.toString()));
 
     JSONUtils.setUserRegex("contributor2"); //allow just one user
     result = JSONUtils.filtersToJSON(query, listProvidersService, organization);
-
-    stream = RestUtils.stream(serializer.fn.toJson(result));
-    resultStream = new ByteArrayOutputStream();
-    try {
-      stream.write(resultStream);
-      assertThat(expectedJSONreduced, SameJSONAs.sameJSONAs(resultStream.toString()));
-    } finally {
-      IOUtils.closeQuietly(resultStream);
-    }
+    assertThat(expectedJSONreduced, SameJSONAs.sameJSONAs(result.toString()));
   }
 
   /**

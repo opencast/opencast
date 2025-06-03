@@ -21,11 +21,6 @@
 package org.opencastproject.external.endpoint;
 
 import static com.entwinemedia.fn.Stream.$;
-import static com.entwinemedia.fn.data.json.Jsons.BLANK;
-import static com.entwinemedia.fn.data.json.Jsons.arr;
-import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.obj;
-import static com.entwinemedia.fn.data.json.Jsons.v;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -34,6 +29,8 @@ import static org.apache.http.HttpStatus.SC_UNAUTHORIZED;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_1_0;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_2_0;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_5_0;
+import static org.opencastproject.index.service.util.JSONUtils.collectionToJsonArray;
+import static org.opencastproject.index.service.util.JSONUtils.safeString;
 import static org.opencastproject.util.DateTimeSupport.toUTC;
 import static org.opencastproject.util.RestUtil.getEndpointUrl;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
@@ -89,10 +86,9 @@ import org.opencastproject.util.requests.SortCriterion;
 
 import com.entwinemedia.fn.Fn;
 import com.entwinemedia.fn.data.Opt;
-import com.entwinemedia.fn.data.json.Field;
-import com.entwinemedia.fn.data.json.JObject;
-import com.entwinemedia.fn.data.json.JValue;
-import com.entwinemedia.fn.data.json.Jsons.Functions;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONArray;
@@ -348,54 +344,46 @@ public class SeriesEndpoint {
   }
 
   private Response queryResultToJson(SearchResult<Series> result, boolean includeAcl, ApiVersion requestedVersion) {
-    return ApiResponseBuilder.Json.ok(requestedVersion, arr($(result.getItems()).map(new Fn<SearchResultItem<Series>, JValue>() {
-      @Override
-      public JValue apply(SearchResultItem<Series> a) {
-        final Series s = a.getSource();
-        JValue subjects;
-        if (s.getSubject() == null) {
-          subjects = arr();
-        } else {
-          subjects = arr(splitSubjectIntoArray(s.getSubject()));
-        }
-        Date createdDate = s.getCreatedDateTime();
-        JObject result;
-        if (requestedVersion.isSmallerThan(VERSION_1_1_0)) {
-          result = obj(
-                  f("identifier", v(s.getIdentifier())),
-                  f("title", v(s.getTitle())),
-                  f("creator", v(s.getCreator(), BLANK)),
-                  f("created", v(createdDate != null ? toUTC(createdDate.getTime()) : null, BLANK)),
-                  f("subjects", subjects),
-                  f("contributors", arr($(s.getContributors()).map(Functions.stringToJValue))),
-                  f("organizers", arr($(s.getOrganizers()).map(Functions.stringToJValue))),
-                  f("publishers", arr($(s.getPublishers()).map(Functions.stringToJValue))));
-        }
-        else {
-          result = obj(
-                  f("identifier", v(s.getIdentifier())),
-                  f("title", v(s.getTitle())),
-                  f("description", v(s.getDescription(), BLANK)),
-                  f("creator", v(s.getCreator(), BLANK)),
-                  f("created", v(createdDate != null ? toUTC(createdDate.getTime()) : null, BLANK)),
-                  f("subjects", subjects),
-                  f("contributors", arr($(s.getContributors()).map(Functions.stringToJValue))),
-                  f("organizers", arr($(s.getOrganizers()).map(Functions.stringToJValue))),
-                  f("language", v(s.getLanguage(), BLANK)),
-                  f("license", v(s.getLicense(), BLANK)),
-                  f("rightsholder", v(s.getRightsHolder(), BLANK)),
-                  f("publishers", arr($(s.getPublishers()).map(Functions.stringToJValue))));
+    JsonArray seriesArray = new JsonArray();
 
-          if (includeAcl) {
-            AccessControlList acl = getAclFromSeries(s);
-            result = result.merge(f("acl", arr(AclUtils.serializeAclToJson(acl))));
-          }
-        }
-
-        return result;
-
+    for (SearchResultItem<Series> item : result.getItems()) {
+      final Series s = item.getSource();
+      JsonArray subjects;
+      if (s.getSubject() == null) {
+        subjects = new JsonArray();
+      } else {
+        subjects = splitSubjectIntoArray(s.getSubject());
       }
-    }).toList()));
+
+      Date createdDate = s.getCreatedDateTime();
+      JsonObject seriesJson = new JsonObject();
+
+      seriesJson.addProperty("identifier", s.getIdentifier());
+      seriesJson.addProperty("title", s.getTitle());
+      seriesJson.addProperty("creator", safeString(s.getCreator()));
+      seriesJson.addProperty("created", createdDate != null ? toUTC(createdDate.getTime()) : "");
+      seriesJson.add("subjects", subjects);
+
+      seriesJson.add("contributors", collectionToJsonArray(s.getContributors()));
+      seriesJson.add("organizers", collectionToJsonArray(s.getOrganizers()));
+      seriesJson.add("publishers", collectionToJsonArray(s.getPublishers()));
+
+      if (!requestedVersion.isSmallerThan(VERSION_1_1_0)) {
+        seriesJson.addProperty("description", safeString(s.getDescription()));
+        seriesJson.addProperty("language", safeString(s.getLanguage()));
+        seriesJson.addProperty("license", safeString(s.getLicense()));
+        seriesJson.addProperty("rightsholder", safeString(s.getRightsHolder()));
+
+        if (includeAcl) {
+          AccessControlList acl = getAclFromSeries(s);
+          seriesJson.add("acl", AclUtils.serializeAclToJson(acl));
+        }
+      }
+
+      seriesArray.add(seriesJson);
+    }
+
+    return ApiResponseBuilder.Json.ok(requestedVersion, seriesArray);
   }
 
   /**
@@ -441,50 +429,38 @@ public class SeriesEndpoint {
     Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization().getId(), securityService.getUser());
     if (optSeries.isPresent()) {
       final Series s = optSeries.get();
-      JValue subjects;
+      JsonArray subjects;
       if (s.getSubject() == null) {
-        subjects = arr();
+        subjects = new JsonArray();
       } else {
-        subjects = arr(splitSubjectIntoArray(s.getSubject()));
+        subjects = splitSubjectIntoArray(s.getSubject());
       }
       Date createdDate = s.getCreatedDateTime();
-      JObject responseContent;
-      if (requestedVersion.isSmallerThan(VERSION_1_1_0)) {
-        responseContent = obj(
-                f("identifier", v(s.getIdentifier())),
-                f("title", v(s.getTitle())),
-                f("description", v(s.getDescription(), BLANK)),
-                f("creator", v(s.getCreator(), BLANK)),
-                f("subjects", subjects),
-                f("organization", v(s.getOrganization())),
-                f("created", v(createdDate != null ? toUTC(createdDate.getTime()) : null, BLANK)),
-                f("contributors", arr($(s.getContributors()).map(Functions.stringToJValue))),
-                f("organizers", arr($(s.getOrganizers()).map(Functions.stringToJValue))),
-                // For compatibility (MH-13405)
-                f("opt_out", false),
-                f("publishers", arr($(s.getPublishers()).map(Functions.stringToJValue))));
-      }
-      else {
-        responseContent = obj(
-                f("identifier", v(s.getIdentifier())),
-                f("title", v(s.getTitle())),
-                f("description", v(s.getDescription(), BLANK)),
-                f("creator", v(s.getCreator(), BLANK)),
-                f("subjects", subjects),
-                f("organization", v(s.getOrganization())),
-                f("created", v(createdDate != null ? toUTC(createdDate.getTime()) : null, BLANK)),
-                f("contributors", arr($(s.getContributors()).map(Functions.stringToJValue))),
-                f("organizers", arr($(s.getOrganizers()).map(Functions.stringToJValue))),
-                // For compatibility (MH-13405)
-                f("opt_out", false),
-                f("publishers", arr($(s.getPublishers()).map(Functions.stringToJValue))),
-                f("language", v(s.getLanguage(), BLANK)),
-                f("license", v(s.getLicense(), BLANK)),
-                f("rightsholder", v(s.getRightsHolder(), BLANK)));
+
+      JsonObject responseContent = new JsonObject();
+
+      // Common fields
+      responseContent.addProperty("identifier", s.getIdentifier());
+      responseContent.addProperty("title", s.getTitle());
+      responseContent.addProperty("description", safeString(s.getDescription()));
+      responseContent.addProperty("creator", safeString(s.getCreator()));
+      responseContent.add("subjects", subjects);
+      responseContent.addProperty("organization", s.getOrganization());
+      responseContent.addProperty("created", createdDate != null ? toUTC(createdDate.getTime()) : "");
+      responseContent.add("contributors", collectionToJsonArray(s.getContributors()));
+      responseContent.add("organizers", collectionToJsonArray(s.getOrganizers()));
+      responseContent.addProperty("opt_out", false);
+      responseContent.add("publishers", collectionToJsonArray(s.getPublishers()));
+
+      if (!requestedVersion.isSmallerThan(VERSION_1_1_0)) {
+        responseContent.addProperty("language", safeString(s.getLanguage()));
+        responseContent.addProperty("license", safeString(s.getLicense()));
+        responseContent.addProperty("rightsholder", safeString(s.getRightsHolder()));
 
         if (withAcl != null && withAcl) {
           AccessControlList acl = getAclFromSeries(s);
-          responseContent = responseContent.merge(f("acl", arr(AclUtils.serializeAclToJson(acl))));
+          JsonArray aclJsonArray = AclUtils.serializeAclToJson(acl);
+          responseContent.add("acl", aclJsonArray);
         }
       }
 
@@ -493,13 +469,14 @@ public class SeriesEndpoint {
     return ApiResponseBuilder.notFound("Cannot find an series with id '%s'.", id);
   }
 
-  private List<JValue> splitSubjectIntoArray(final String subject) {
-    return com.entwinemedia.fn.Stream.$(subject.split(",")).map(new Fn<String, JValue>() {
-      @Override
-      public JValue apply(String a) {
-        return v(a.trim());
+  private JsonArray splitSubjectIntoArray(final String subject) {
+    JsonArray array = new JsonArray();
+    if (subject != null && !subject.trim().isEmpty()) {
+      for (String part : subject.split(",")) {
+        array.add(new JsonPrimitive(part.trim()));
       }
-    }).toList();
+    }
+    return array;
   }
 
   @GET
@@ -862,14 +839,14 @@ public class SeriesEndpoint {
     if (elasticsearchIndex.getSeries(id, securityService.getOrganization().getId(), securityService.getUser()).isPresent()) {
       final Map<String, String> properties = seriesService.getSeriesProperties(id);
 
-      return ApiResponseBuilder.Json.ok(acceptHeader, obj($(properties.entrySet()).map(new Fn<Entry<String, String>, Field>() {
-                @Override
-                public Field apply(Entry<String, String> a) {
-                  return f(a.getKey(), v(a.getValue(), BLANK));
-                }
-              }).toList()));
+      JsonObject json = new JsonObject();
+      for (Entry<String, String> entry : properties.entrySet()) {
+        json.addProperty(entry.getKey(), safeString(entry.getValue()));
+      }
+
+      return ApiResponseBuilder.Json.ok(acceptHeader, json);
     } else {
-      return ApiResponseBuilder.notFound("Cannot find an series with id '%s'.", id);
+      return ApiResponseBuilder.notFound("Cannot find a series with id '%s'.", id);
     }
   }
 
@@ -969,8 +946,9 @@ public class SeriesEndpoint {
 
     try {
       String seriesId = indexService.createSeries(metadataList, options, Opt.some(acl), optThemeId);
-      return ApiResponseBuilder.Json.created(acceptHeader, URI.create(getSeriesUrl(seriesId)),
-                                       obj(f("identifier", v(seriesId, BLANK))));
+      JsonObject json = new JsonObject();
+      json.addProperty("identifier", safeString(seriesId));
+      return ApiResponseBuilder.Json.created(acceptHeader, URI.create(getSeriesUrl(seriesId)), json);
     } catch (IndexServiceException e) {
       logger.error("Unable to create series with metadata '{}', acl '{}', theme '{}'",
               metadataParam, aclParam, themeIdParam, e);

@@ -20,13 +20,10 @@
  */
 package org.opencastproject.external.endpoint;
 
-import static com.entwinemedia.fn.data.json.Jsons.BLANK;
-import static com.entwinemedia.fn.data.json.Jsons.arr;
-import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.obj;
-import static com.entwinemedia.fn.data.json.Jsons.v;
 import static org.apache.commons.lang3.StringUtils.defaultString;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
+import static org.opencastproject.index.service.util.JSONUtils.arrayToJsonArray;
+import static org.opencastproject.index.service.util.JSONUtils.safeString;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
@@ -48,9 +45,8 @@ import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowOperationDefinition;
 import org.opencastproject.workflow.api.WorkflowService;
 
-import com.entwinemedia.fn.data.json.Field;
-import com.entwinemedia.fn.data.json.JValue;
-import com.entwinemedia.fn.data.json.Jsons;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import org.apache.commons.collections4.comparators.ComparatorChain;
 import org.apache.commons.lang3.ArrayUtils;
@@ -64,7 +60,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -222,10 +217,16 @@ public class WorkflowDefinitionsEndpoint {
       workflowDefinitions = workflowDefinitions.limit(limit);
     }
 
-    List<JValue> json = workflowDefinitions.map(
-            wd -> workflowDefinitionToJSON(wd, withOperations, withConfigurationPanel, withConfigurationPanelJson)).collect(Collectors.toList());
+    List<JsonObject> jsonObjects = workflowDefinitions
+        .map(wd -> workflowDefinitionToJSON(wd, withOperations, withConfigurationPanel, withConfigurationPanelJson))
+        .collect(Collectors.toList());
 
-    return ApiResponseBuilder.Json.ok(acceptHeader, arr(json));
+    JsonArray jsonArray = new JsonArray();
+    for (JsonObject obj : jsonObjects) {
+      jsonArray.add(obj);
+    }
+
+    return ApiResponseBuilder.Json.ok(acceptHeader, jsonArray);
   }
 
   @GET
@@ -251,46 +252,50 @@ public class WorkflowDefinitionsEndpoint {
     return ApiResponseBuilder.Json.ok(acceptHeader, workflowDefinitionToJSON(wd, withOperations, withConfigurationPanel, withConfigurationPanelJson));
   }
 
-  private JValue workflowDefinitionToJSON(WorkflowDefinition wd, boolean withOperations,
-          boolean withConfigurationPanel, boolean withConfigurationPanelJson) {
-    List<Field> fields = new ArrayList<>();
+  private JsonObject workflowDefinitionToJSON(WorkflowDefinition wd, boolean withOperations,
+      boolean withConfigurationPanel, boolean withConfigurationPanelJson) {
+    JsonObject json = new JsonObject();
 
-    fields.add(f("identifier", v(wd.getId())));
-    fields.add(f("title", v(wd.getTitle(), BLANK)));
-    fields.add(f("description", v(wd.getDescription(), BLANK)));
-    fields.add(f("tags", arr(Arrays.stream(wd.getTags()).map(Jsons::v).collect(Collectors.toList()))));
+    json.addProperty("identifier", wd.getId());
+    json.addProperty("title", safeString(wd.getTitle()));
+    json.addProperty("description", safeString(wd.getDescription()));
+    json.add("tags", arrayToJsonArray(wd.getTags()));
     if (withConfigurationPanel) {
-      fields.add(f("configuration_panel", v(wd.getConfigurationPanel(), BLANK)));
+      json.addProperty("configuration_panel", safeString(wd.getConfigurationPanel()));
     }
     if (withConfigurationPanelJson) {
-      fields.add(f("configuration_panel_json", v(wd.getConfigurationPanelJson(), BLANK)));
+      json.addProperty("configuration_panel_json", safeString(wd.getConfigurationPanelJson()));
     }
     if (withOperations) {
-      fields.add(f("operations", arr(wd.getOperations()
-                                       .stream()
-                                       .map(this::workflowOperationDefinitionToJSON)
-                                       .collect(Collectors.toList()))));
+      JsonArray operationsArray = new JsonArray();
+      for (WorkflowOperationDefinition op : wd.getOperations()) {
+        operationsArray.add(workflowOperationDefinitionToJSON(op));
+      }
+      json.add("operations", operationsArray);
     }
 
-    return obj(fields);
+    return json;
   }
 
-  private JValue workflowOperationDefinitionToJSON(WorkflowOperationDefinition wod) {
-    List<Field> fields = new ArrayList<>();
+  private JsonObject workflowOperationDefinitionToJSON(WorkflowOperationDefinition wod) {
+    JsonObject json = new JsonObject();
 
-    fields.add(f("operation", v(wod.getId())));
-    fields.add(f("description", v(wod.getDescription(), BLANK)));
-    fields.add(f("configuration", obj(wod.getConfigurationKeys()
-                                         .stream()
-                                         .map(key -> f(key, wod.getConfiguration(key)))
-                                         .collect(Collectors.toList()))));
-    fields.add(f("if", v(wod.getExecutionCondition(), BLANK)));
-    fields.add(f("unless", v(wod.getSkipCondition(), BLANK)));
-    fields.add(f("fail_workflow_on_error", v(wod.isFailWorkflowOnException())));
-    fields.add(f("error_handler_workflow", v(wod.getExceptionHandlingWorkflow(), BLANK)));
-    fields.add(f("retry_strategy", v(new RetryStrategy.Adapter().marshal(wod.getRetryStrategy()), BLANK)));
-    fields.add(f("max_attempts", v(wod.getMaxAttempts())));
+    json.addProperty("operation", wod.getId());
+    json.addProperty("description", safeString(wod.getDescription()));
+    JsonObject configJson = new JsonObject();
+    for (String key : wod.getConfigurationKeys()) {
+      String value = wod.getConfiguration(key);
+      configJson.addProperty(key, value);
+    }
+    json.add("configuration", configJson);
+    json.addProperty("if", safeString(wod.getExecutionCondition()));
+    json.addProperty("unless", safeString(wod.getSkipCondition()));
+    json.addProperty("fail_workflow_on_error", wod.isFailWorkflowOnException());
+    json.addProperty("error_handler_workflow", safeString(wod.getExceptionHandlingWorkflow()));
+    String retryStrategy = new RetryStrategy.Adapter().marshal(wod.getRetryStrategy());
+    json.addProperty("retry_strategy", safeString(retryStrategy));
+    json.addProperty("max_attempts", wod.getMaxAttempts());
 
-    return obj(fields);
+    return json;
   }
 }
