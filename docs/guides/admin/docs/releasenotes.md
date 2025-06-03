@@ -1,5 +1,20 @@
 # Opencast 17: Release Notes
 
+## Opencast 17.4
+
+This release contains a few bug fixes and enhancements of existing features. Among others, it enables the use of
+Elasticsearch even if the setup is in yellow state ([#6681](https://github.com/opencast/opencast/pull/6681)).
+It also adds an endpoint to trigger the update of a single event in search
+([#6653](https://github.com/opencast/opencast/pull/6653)).
+
+Most importantly, this contains a new version of both the Editor
+([17.x-2025-05-23](https://github.com/opencast/opencast-editor/releases/tag/17.x-2025-05-23)) and the Admin UI
+([17.x-2025-05-24](https://github.com/opencast/opencast-admin-interface/releases/tag/17.x-2025-05-24)).
+
+Additionally it contains a new version of Opencast Studio
+([2025-04-30](https://github.com/elan-ev/opencast-studio/releases/tag/2025-04-30))
+with a bugfix regarding incorrect error messages when uploading.
+
 ## Opencast 17.3
 
 This release contains a few bug fixes, among them performance improvements for the metrics endpoint
