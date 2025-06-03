@@ -50,6 +50,8 @@ public class Series {
    */
   private Date deletionDate;
 
+  /** The creator of this series */
+  private SeriesCreator creator;
 
   public String getId() {
     return this.id;
@@ -99,9 +101,16 @@ public class Series {
     this.deletionDate = deletionDate;
   }
 
-
   /** Returns whether or not this series is currently deleted. */
   public boolean isDeleted() {
     return deletionDate != null;
+  }
+
+  public void setCreator(SeriesCreator creator) {
+    this.creator = creator;
+  }
+
+  public SeriesCreator getCreator() {
+    return this.creator;
   }
 }

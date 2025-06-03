@@ -51,6 +51,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -74,8 +75,9 @@ public class SeriesServicePersistenceTest {
   public void setUp() throws Exception {
     // Mock up a security service
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
-    User user = new JaxbUser("admin", "test", new DefaultOrganization(), new JaxbRole(
-            SecurityConstants.GLOBAL_ADMIN_ROLE, new DefaultOrganization()));
+    User user = new JaxbUser("admin", "password", "Administrator", "admin@example.org",
+        "test", new DefaultOrganization(),
+        Collections.singleton(new JaxbRole(SecurityConstants.GLOBAL_ADMIN_ROLE, new DefaultOrganization())));
     EasyMock.expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
     EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
     EasyMock.replay(securityService);
