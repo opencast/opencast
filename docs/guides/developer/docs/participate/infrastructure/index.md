@@ -18,19 +18,10 @@ Technische Universität Ilmenau | legacy.opencast.org           | Lars Kiesow   
 ### CI Servers
 Institution                | Hostname                             | Admin (Software) | Admin (Hardware)
 ---------------------------|--------------------------------------|------------------|--------------------
-University of Cologne      | oc-com-admin.rrz.uni-koeln.de        | Greg Logan       | Ruth Lang
-University of Cologne      | oc-com-worker1.rrz.uni-koeln.de      | Greg Logan       | Ruth Lang
-University of Cologne      | oc-com-presentation.rrz.uni-koeln.de | Greg Logan       | Ruth Lang
-
+Logan IT Enterprises       | ci.opencast.org                      | Greg Logan       | Greg Logan
 
 
 ### Maven Repository
-
-Institution                | Hostname                      | Admin (Software) | Admin (Hardware)  | Notes
----------------------------|-------------------------------|------------------|-------------------|-----------------
-Harvard DCE                | mvncache.opencast.org         | Lars Kiesow      | DCE Devel group   | Nginx cache, AWS
-University of Osnabrück    | nexus.opencast.org            | Lars Kiesow      | Lars Kiesow       | nexus-oss
-
 Nexus administration:
 
 - Greg Logan
@@ -42,9 +33,7 @@ Nexus administration:
 Institution                | Hostname                        | Admin (Software) | Admin (Hardware)
 ---------------------------|---------------------------------|------------------|-------------------------
 University of Osnabrück    | pkg.opencast.org                | Lars Kiesow      | Lars Kiesow
-University of Cologne      | ci.opencast.org                 | Greg Logan       | Ruth Lang
 University of Osnabrück    | docs.opencast.org               | Lars Kiesow      | Lars Kiesow
-University of Stuttgart    | testrailoc.tik.uni-stuttgart.de | Release managers | Per Pascal Grube
 
 
 Administrators
@@ -99,11 +88,5 @@ order:
 
 Other services and the primary contact for them:
 
-- Google
-    - Greg Logan
 - YouTube
     - Greg Logan and ETH Staff
-- Twitter
-    - Lars Kiesow
-- Facebook
-    - Rüdiger Rolf
