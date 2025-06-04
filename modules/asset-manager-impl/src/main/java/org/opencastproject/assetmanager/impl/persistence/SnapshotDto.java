@@ -101,12 +101,6 @@ import javax.persistence.UniqueConstraint;
                 + "ORDER BY s.version DESC"
         ),
         @NamedQuery(
-            name = "Snapshot.findByMpId",
-            query = "SELECT s FROM Snapshot s "
-                + "WHERE s.mediaPackageId = :mediaPackageId "
-                + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
-        ),
-        @NamedQuery(
             name = "Snapshot.findOldestVersionFirst",
             query = "SELECT s FROM Snapshot s "
                 + "WHERE s.mediaPackageId = :mediaPackageId "

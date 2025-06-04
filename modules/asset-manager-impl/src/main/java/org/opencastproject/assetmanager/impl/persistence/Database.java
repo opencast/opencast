@@ -439,13 +439,8 @@ public class Database {
 
   public List<Snapshot> getSnapshots(String mediaPackageId, String orgId, String orderByVersion) {
     return db.execTx(em -> {
-      String namedQueryName = "Snapshot.findByMpId";
-      if ("ASC".equals(orderByVersion)) {
-        namedQueryName = "Snapshot.findOldestVersionFirst";
-      }
-      if ("DESC".equals(orderByVersion)) {
-        namedQueryName = "Snapshot.findLatestVersionFirst";
-      }
+      String namedQueryName = "ASC".equals(orderByVersion)
+          ? "Snapshot.findOldestVersionFirst" : "Snapshot.findLatestVersionFirst";
 
       List<SnapshotDto> snapshotDto = namedQuery.findAll(
           namedQueryName,
