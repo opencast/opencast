@@ -247,29 +247,6 @@ public abstract class OpencastDctermsDublinCore {
   }
 
   /** Set the {@link DublinCore#PROPERTY_CREATED} property. The date is encoded with a precision of {@link Precision#Day}. */
-//  public void setCreated(Temporal t) {
-//    // only allow to set a created date, if no start date is set. Otherwise DC created will be changed by changing the
-//    // start date with setTemporal. Synchronization is not vice versa, as setting DC created to arbitraty dates might
-//    // have unwanted side effects, like setting the wrong recording time, on imported data, or third-party REST calls.
-//    if (getTemporal().isEmpty()) {
-//      t.fold(new Match<Unit>() {
-//        @Override public Unit period(DCMIPeriod period) {
-//          setCreated(period.getStart());
-//          return Unit.unit;
-//        }
-//
-//        @Override public Unit instant(Date instant) {
-//          setCreated(instant);
-//          return Unit.unit;
-//        }
-//
-//        @Override public Unit duration(long duration) {
-//          return Unit.unit;
-//        }
-//      });
-//    }
-//  }
-
   public void setCreated(Temporal t) {
     // only allow to set a created date, if no start date is set. Otherwise DC created will be changed by changing the
     // start date with setTemporal. Synchronization is not vice versa, as setting DC created to arbitraty dates might
