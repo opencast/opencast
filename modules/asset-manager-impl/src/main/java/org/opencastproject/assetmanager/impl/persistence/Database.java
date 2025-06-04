@@ -262,7 +262,7 @@ public class Database {
   public Optional<SnapshotDtos.Medium> getSnapshot(final VersionImpl version, final String mpId) {
     return db.execTx(em -> {
       return namedQuery.findOpt(
-          "Snapshot.findMediumByMpIdAndVersion",
+          "Snapshot.findByMpIdAndVersionOrderByVersionDesc",
             SnapshotDto.class,
             Pair.of("mpId", mpId),
             Pair.of("version", version.value()))

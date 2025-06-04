@@ -78,7 +78,7 @@ import javax.persistence.UniqueConstraint;
         @NamedQuery(name = "Snapshot.countByMediaPackageAndOrg", query = "select count(s) from Snapshot s "
                 + "where s.mediaPackageId = :mediaPackageId and s.organizationId = :organizationId"),
         @NamedQuery(
-            name = "Snapshot.findMediumByMpIdAndVersion",
+            name = "Snapshot.findByMpIdAndVersionOrderByVersionDesc",
             query = "SELECT s FROM Snapshot s "
                 + "WHERE s.mediaPackageId = :mpId "
                 + "AND s.version = :version "
