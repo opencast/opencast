@@ -277,28 +277,6 @@ public class Database {
     });
   }
 
-  public Optional<AssetDtos.Full> findAssetByChecksum(final String checksum) {
-    return db.execTx(em -> {
-      return namedQuery.findOpt(
-              "Asset.findByChecksum",
-              AssetDto.class,
-              Pair.of("checksum", checksum))
-          .apply(em)
-          .map(result -> {
-            SnapshotDto snapshot = result.getSnapshot();
-            return new AssetDtos.Full(
-                result,
-                Availability.valueOf(snapshot.getAvailability()),
-                snapshot.getStorageId(),
-                snapshot.getOrganizationId(),
-                snapshot.getOwner(),
-                snapshot.getMediaPackageId(),
-                snapshot.getVersion()
-            );
-          });
-    });
-  }
-
 
   /**
    * Delete all properties for a given media package identifier

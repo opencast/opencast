@@ -56,12 +56,6 @@ import javax.persistence.TypedQuery;
             + "ORDER BY s.version DESC"
     ),
     @NamedQuery(
-        name = "Asset.findByChecksum",
-        query = "SELECT a FROM Asset a "
-            + "INNER JOIN a.snapshot s "
-            + "WHERE a.checksum = :checksum"
-    ),
-    @NamedQuery(
         name = "Asset.findByChecksumStorageIdAndOrganizationId",
         query = "SELECT a FROM Asset a "
             + "INNER JOIN a.snapshot s "
