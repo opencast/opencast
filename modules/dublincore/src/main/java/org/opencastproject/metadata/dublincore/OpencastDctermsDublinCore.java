@@ -251,7 +251,7 @@ public abstract class OpencastDctermsDublinCore {
     // only allow to set a created date, if no start date is set. Otherwise DC created will be changed by changing the
     // start date with setTemporal. Synchronization is not vice versa, as setting DC created to arbitraty dates might
     // have unwanted side effects, like setting the wrong recording time, on imported data, or third-party REST calls.
-    if (!getTemporal().isPresent()) {
+    if (getTemporal().isEmpty()) {
       t.fold(new Temporal.Match<Void>() {
         @Override
         public Void period(DCMIPeriod period) {
