@@ -47,6 +47,7 @@ tools.  These tools are
 - GitHub
 - Google Groups
 - Crowdin
+- Google Drive
 
 While many of our administrators are committers, an administrator is _not_ a committer by necessity.  Administrators
 have important responsibilities within the community, but mainly work behind the scenes.  These responsibilities
@@ -65,7 +66,7 @@ groups in multiple places when a change is necessary.  These changes are
 - Modifying the [GitHub committers group](https://github.com/orgs/opencast/teams/committers/members) upon request
 - Modifying the [Google committers group](https://admin.google.com/opencast.org/AdminHome?hl=de&pli=1&fral=1&groupId=committers@opencast.org&chromeless=1#OGX:Group?hl=de)
 - Modifying the [Crowdin committers group](https://crowdin.com/project/opencast-community/settings#members)
-- Modifying the list of committers on the [Opencast website](https://opencast.org/people)
+- Modifying the committer storage permissions in the admin google drive space
 
 ### Current Administrators
 
