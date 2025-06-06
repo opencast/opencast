@@ -499,6 +499,11 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
       // something different triggered an ioexception, so we fail
       throw new RuntimeException("Couldn't connect to opensearch due to IOExceptionError", ioException);
     } catch (ElasticsearchException elasticsearchException) {
+      if (elasticsearchException.status().getStatus() >= 500) {
+        logger.debug("OpenSearch health request ended with HTTP status code {}. Is OpenSearch service running?",
+            elasticsearchException.status().getStatus());
+        return false;
+      }
       // An ElasticsearchException is usually thrown in case where the server returns a 4xx or 5xx error code.
       // So for example for an HTTP 401 Unauthorized: In this case we want the startup to fail, so
       // we get an error and have the chance to change the configuration
