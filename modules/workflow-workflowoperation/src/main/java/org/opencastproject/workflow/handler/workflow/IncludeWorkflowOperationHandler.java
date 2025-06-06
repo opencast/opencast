@@ -21,8 +21,6 @@
 
 package org.opencastproject.workflow.handler.workflow;
 
-import static com.entwinemedia.fn.Stream.$;
-
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
@@ -33,8 +31,6 @@ import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workflow.api.WorkflowService;
-
-import com.entwinemedia.fn.Fn2;
 
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -90,12 +86,10 @@ public final class IncludeWorkflowOperationHandler extends AbstractWorkflowOpera
     // Return all existing workflow parameters with the result object to
     // make the workflow service replace the variables again. This is
     // necessary to 'propagate' the parameters to the included workflow.
-    final Map<String, String> props = $(wi.getConfigurationKeys()).foldl(new HashMap<String, String>(), new Fn2<HashMap<String, String>, String, HashMap<String, String>>() {
-      @Override public HashMap<String, String> apply(HashMap<String, String> sum, String key) {
-        sum.put(key, wi.getConfiguration(key));
-        return sum;
-      }
-    });
+    final Map<String, String> props = new HashMap<>();
+    for (String key : wi.getConfigurationKeys()) {
+      props.put(key, wi.getConfiguration(key));
+    }
     return createResult(wi.getMediaPackage(), props, Action.CONTINUE, 0);
   }
 

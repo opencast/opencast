@@ -1477,7 +1477,7 @@ public class IndexServiceImpl implements IndexService {
     final WorkflowDefinition wfd = workflowService.getWorkflowDefinitionById(retractWorkflowId);
     final Workflows workflows = new Workflows(assetManager, workflowService);
     final ConfiguredWorkflow workflow = workflow(wfd);
-    final List<WorkflowInstance> result = workflows.applyWorkflowToLatestVersion(Collections.singleton(id), workflow).toList();
+    final List<WorkflowInstance> result = workflows.applyWorkflowToLatestVersion(Collections.singleton(id), workflow);
     if (result.size() != 1) {
         throw new IllegalStateException("Couldn't start workflow to retract media package" + id);
     }
@@ -1690,8 +1690,9 @@ public class IndexServiceImpl implements IndexService {
         }
         // remove series extended metadata from the media package
         try {
-          Opt<Map<String, byte[]>> oldSeriesElementsOpt = seriesService.getSeriesElements(oldSeriesId);
-          for (Map<String, byte[]> oldSeriesElements : oldSeriesElementsOpt) {
+          Optional<Map<String, byte[]>> oldSeriesElementsOpt = seriesService.getSeriesElements(oldSeriesId);
+          if (oldSeriesElementsOpt.isPresent()) {
+            var oldSeriesElements = oldSeriesElementsOpt.get();
             for (String oldSeriesElementType : oldSeriesElements.keySet()) {
               for (MediaPackageElement mpe : mp
                       .getElementsByFlavor(MediaPackageElementFlavor.flavor(oldSeriesElementType, "series"))) {
@@ -1767,8 +1768,9 @@ public class IndexServiceImpl implements IndexService {
         }
         // add updated series extended metadata to the media package
         try {
-          Opt<Map<String, byte[]>> seriesElementsOpt = seriesService.getSeriesElements(mp.getSeries());
-          for (Map<String, byte[]> seriesElements : seriesElementsOpt) {
+          Optional<Map<String, byte[]>> seriesElementsOpt = seriesService.getSeriesElements(mp.getSeries());
+          if (seriesElementsOpt.isPresent()) {
+            var seriesElements = seriesElementsOpt.get();
             for (String seriesElementType : seriesElements.keySet()) {
               try (InputStream in = new ByteArrayInputStream(seriesElements.get(seriesElementType))) {
                 String elementId = UUID.randomUUID().toString();

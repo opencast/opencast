@@ -55,9 +55,6 @@ import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 
-import com.entwinemedia.fn.Fn2;
-import com.entwinemedia.fn.Stream;
-
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.junit.Before;
@@ -226,16 +223,10 @@ public class ConfigurablePublishWorkflowOperationHandlerTest {
     ConfigurablePublishWorkflowOperationHandler configurePublish = new ConfigurablePublishWorkflowOperationHandler() {
       @Override
       protected Result waitForStatus(long timeout, Job... jobs) {
-        HashMap<Job, Status> map = Stream.mk(jobs)
-            .foldl(
-                new HashMap<Job, Status>(),
-                new Fn2<HashMap<Job, Status>, Job, HashMap<Job, Status>>() {
-                  @Override
-                  public HashMap<Job, Status> apply(HashMap<Job, Status> a, Job b) {
-                    a.put(b, Status.FINISHED);
-                    return a;
-                  }
-                });
+        HashMap<Job, Status> map = new HashMap<>();
+        for (Job job : jobs) {
+          map.put(job, Status.FINISHED);
+        }
         return new Result(map);
       }
     };

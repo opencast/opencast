@@ -42,8 +42,6 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
 
-import com.entwinemedia.fn.Prelude;
-
 import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Before;
@@ -443,7 +441,7 @@ public class CaptureAgentStateServiceImplTest {
     assertTrue(lastHeardFrom <= agent.getLastHeardFrom());
 
     lastHeardFrom = agent.getLastHeardFrom();
-    Prelude.sleep(100L);
+    Thread.sleep(100L);
     service.setAgentState(name, IDLE);
     agent = service.getAgent(name);
     assertTrue(lastHeardFrom <= agent.getLastHeardFrom());

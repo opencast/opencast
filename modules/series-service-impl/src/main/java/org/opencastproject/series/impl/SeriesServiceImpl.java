@@ -61,8 +61,6 @@ import org.opencastproject.series.impl.persistence.SeriesEntity;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Option;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.parser.ParseException;
 import org.osgi.service.component.ComponentContext;
@@ -446,7 +444,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   @Override
-  public Opt<Map<String, byte[]>> getSeriesElements(String seriesId) throws SeriesException {
+  public Optional<Map<String, byte[]>> getSeriesElements(String seriesId) throws SeriesException {
     try {
       return persistence.getSeriesElements(seriesId);
     } catch (SeriesServiceDatabaseException e) {
@@ -455,7 +453,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   @Override
-  public Opt<byte[]> getSeriesElementData(String seriesId, String type) throws SeriesException {
+  public Optional<byte[]> getSeriesElementData(String seriesId, String type) throws SeriesException {
     try {
       return persistence.getSeriesElement(seriesId, type);
     } catch (SeriesServiceDatabaseException e) {

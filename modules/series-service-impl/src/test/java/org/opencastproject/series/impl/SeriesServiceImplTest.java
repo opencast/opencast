@@ -51,8 +51,6 @@ import org.opencastproject.series.impl.persistence.SeriesServiceDatabaseImpl;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
@@ -357,6 +355,6 @@ public class SeriesServiceImplTest {
 
     assertTrue(seriesService.deleteSeriesElement(seriesId, ELEMENT_TYPE));
     assertFalse(seriesService.deleteSeriesElement(seriesId, ELEMENT_TYPE));
-    assertEquals(Opt.none(), seriesService.getSeriesElementData(seriesId, ELEMENT_TYPE));
+    assertEquals(Optional.empty(), seriesService.getSeriesElementData(seriesId, ELEMENT_TYPE));
   }
 }

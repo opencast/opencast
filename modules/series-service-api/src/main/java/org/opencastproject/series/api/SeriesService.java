@@ -26,8 +26,6 @@ import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.NotFoundException;
 
-import com.entwinemedia.fn.data.Opt;
-
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -176,7 +174,7 @@ public interface SeriesService {
    * @throws SeriesException
    *           if an error occurred during loading the series elements
    */
-  Opt<Map<String, byte[]>> getSeriesElements(String seriesId) throws SeriesException;
+  Optional<Map<String, byte[]>> getSeriesElements(String seriesId) throws SeriesException;
 
   /**
    * Returns the element data of the series with the given type. If the series or the element with
@@ -190,7 +188,7 @@ public interface SeriesService {
    * @throws SeriesException
    *           if an error occurred during loading the series element
    */
-  Opt<byte[]> getSeriesElementData(String seriesId, String type) throws SeriesException;
+  Optional<byte[]> getSeriesElementData(String seriesId, String type) throws SeriesException;
 
   /**
    * Creates or updates an element of a series.
