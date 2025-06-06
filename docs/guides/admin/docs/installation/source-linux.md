@@ -58,10 +58,6 @@ Required for text extraction (recommended):
 
     tesseract >= 3
 
-Required for audio normalization (optional):
-
-    sox >= 14.4
-
 Required for animate service (optional):
 
     synfig
