@@ -51,7 +51,7 @@ configure asset upload options in more detail [[#6362](https://github.com/openca
   no longer necessary to include a separate encode operation for this in the workflow.
   [[#6248](https://github.com/opencast/opencast/pull/6248)]
 - You can now provide terms of use to be presented to new users in the Admin UI. For configuration see
-  [the respective docs](../configuration/admin-ui/terms.md). [[#6010](https://github.com/opencast/opencast/pull/6010)]
+  [the respective docs](configuration/admin-ui/terms.md). [[#6010](https://github.com/opencast/opencast/pull/6010)]
 - There is a new UI for the documentation of our REST endpoints but since it currently has some issues, it's not turned
   on by default. You can however already try it out. [[#5668](https://github.com/opencast/opencast/pull/5668)]
 - There is a new GraphQL API as an alternative to the existing REST API. Please be aware that this is not yet production
