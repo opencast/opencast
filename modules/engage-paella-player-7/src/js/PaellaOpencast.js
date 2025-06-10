@@ -39,8 +39,15 @@ import dictionary from '../default-dictionaries.js';
 import OpencastAuth from './OpencastAuth.js';
 
 function getUrlFromBase(base, url) {
-  const a = base.endsWith('/') ? base.slice(0, -1) : base;
+  let a = base.endsWith('/') ? base.slice(0, -1) : base;
+  a = a.startsWith('/') ? a.slice(1) : a;
+  if (a.length > 0 ) {
+    a = a.startsWith(window.location.origin)
+      ? a
+      : `${window.location.origin}/${a}`;
+  }
   const b = url.startsWith('/') ? url.slice(1) : url;
+
   const fullURL = `${a}/${b}`;
   return fullURL;
 }
