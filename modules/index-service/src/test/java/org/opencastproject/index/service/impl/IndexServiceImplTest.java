@@ -861,7 +861,7 @@ public class IndexServiceImplTest {
     DublinCoreCatalog seriesDC = DublinCores.read(getClass().getResourceAsStream("/events/update-event-series.xml"));
     EasyMock.expect(seriesService.getSeries(EasyMock.anyString())).andReturn(seriesDC);
     EasyMock.expect(seriesService.getSeriesAccessControl(EasyMock.anyString())).andReturn(null);
-    EasyMock.expect(seriesService.getSeriesElements(EasyMock.anyString())).andReturn(Opt.none());
+    EasyMock.expect(seriesService.getSeriesElements(EasyMock.anyString())).andReturn(Optional.empty());
     EasyMock.replay(seriesService);
 
     // create service

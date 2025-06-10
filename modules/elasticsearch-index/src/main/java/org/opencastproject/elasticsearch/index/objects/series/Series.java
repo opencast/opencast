@@ -164,8 +164,21 @@ public class Series implements IndexObject {
    *          the organization
    */
   public Series(String identifier, String organization) {
+    this(identifier, organization, null);
+  }
+
+  /**
+   * The series identifier.
+   *
+   * @param identifier
+   *          the object identifier
+   * @param organization
+   *          the organization
+   */
+  public Series(String identifier, String organization, String creator) {
     this.identifier = identifier;
     this.organization = organization;
+    this.creator = creator;
   }
 
   /**

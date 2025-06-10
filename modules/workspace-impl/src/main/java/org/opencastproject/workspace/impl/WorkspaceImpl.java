@@ -311,7 +311,6 @@ public final class WorkspaceImpl implements Workspace {
     staticCollections.add("executor");
     staticCollections.add("inbox");
     staticCollections.add("ocrtext");
-    staticCollections.add("sox");
     staticCollections.add("subtitles");
     staticCollections.add("uploaded");
     staticCollections.add("videoeditor");

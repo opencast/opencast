@@ -99,7 +99,6 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 
-import com.entwinemedia.fn.Stream;
 import com.entwinemedia.fn.data.Opt;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -157,6 +156,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import javax.management.ObjectInstance;
 
@@ -1937,22 +1937,41 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   }
 
   private MediaPackage createSmil(MediaPackage mediaPackage) throws IOException, IngestException {
-    Stream<Track> partialTracks = Stream.empty();
+    List<Track> partialTracks = new ArrayList<>();
     for (Track track : mediaPackage.getTracks()) {
       Long startTime = partialTrackStartTimes.getIfPresent(track.getIdentifier());
-      if (startTime == null)
-        continue;
-      partialTracks = partialTracks.append(Opt.nul(track));
+      if (startTime != null) {
+        partialTracks.add(track);
+      }
     }
 
     // No partial track available return without adding SMIL catalog
-    if (partialTracks.isEmpty())
+    if (partialTracks.isEmpty()) {
       return mediaPackage;
+    }
 
     // Inspect the partial tracks
-    List<Track> tracks = partialTracks.map(newEnrichJob(mediaInspectionService).toFn())
-            .map(payloadAsTrack(getServiceRegistry()).toFn())
-            .each(MediaPackageSupport.updateElement(mediaPackage).toFn().toFx()).toList();
+    List<Track> tracks = partialTracks.stream()
+        .map(track -> {
+          try {
+            // Create a media inspection job for a mediapackage element.
+            return mediaInspectionService.enrich(track, true);
+          } catch (Exception e) {
+            throw new RuntimeException("Error enriching track", e);
+          }
+        })
+        .map(job -> {
+          try {
+            // Interpret the payload of a completed Job as a MediaPackageElement.
+            // Wait for the job to complete if necessary
+            waitForJob(getServiceRegistry(), none(0L), job);
+            return (Track) MediaPackageElementParser.getFromXml(job.getPayload());
+          } catch (Exception e) {
+            throw new RuntimeException("Error parsing job payload as track", e);
+          }
+        })
+        .peek(MediaPackageSupport.updateElement(mediaPackage))
+        .collect(Collectors.toList());
 
     // Create the SMIL document
     org.w3c.dom.Document smilDocument = SmilUtil.createSmil();
@@ -2056,37 +2075,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       throw new IngestException(
               "Invalid partial flavor type " + track.getFlavor().getType() + " of track " + track.getURI().toString());
     }
-  }
-
-  /**
-   * Create a media inspection job for a mediapackage element.
-   *
-   * @param svc the media inspection service
-   * @return a function
-   */
-  public static Function<MediaPackageElement, Job> newEnrichJob(final MediaInspectionService svc) {
-    return new Function.X<MediaPackageElement, Job>() {
-      @Override
-      public Job xapply(MediaPackageElement e) throws Exception {
-        return svc.enrich(e, true);
-      }
-    };
-  }
-
-  /**
-   * Interpret the payload of a completed Job as a MediaPackageElement. Wait for the job to complete if necessary.
-   *
-   * @param reg the service registry
-   * @return a function
-   */
-  public static Function<Job, Track> payloadAsTrack(final ServiceRegistry reg) {
-    return new Function.X<Job, Track>() {
-      @Override
-      public Track xapply(Job job) throws MediaPackageException {
-        waitForJob(reg, none(0L), job);
-        return (Track) MediaPackageElementParser.getFromXml(job.getPayload());
-      }
-    };
   }
 
   private MediaPackage checkForCASeries(MediaPackage mp, String seriesAppendName) {
