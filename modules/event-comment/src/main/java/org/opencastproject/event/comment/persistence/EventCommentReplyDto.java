@@ -22,8 +22,11 @@
 package org.opencastproject.event.comment.persistence;
 
 import org.opencastproject.event.comment.EventCommentReply;
+import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.security.impl.jpa.JpaOrganization;
+import org.opencastproject.security.impl.jpa.JpaUser;
 import org.opencastproject.util.data.Option;
 
 import java.util.Date;
@@ -194,8 +197,17 @@ public class EventCommentReplyDto {
    *
    * @return the business object model of this comment reply
    */
-  public EventCommentReply toCommentReply(UserDirectoryService userDirectoryService) {
+  public EventCommentReply toCommentReply(UserDirectoryService userDirectoryService,
+      OrganizationDirectoryService organizationDirectoryService,
+      String organization) {
     User user = userDirectoryService.loadUser(author);
+    if (user == null) {
+      JpaOrganization org = null;
+      try {
+        org = (JpaOrganization) organizationDirectoryService.getOrganization(organization);
+      } catch (Exception ignore) { }
+      user = new JpaUser(author, null, org, author, "ghost@localhost", "ghost", false);
+    }
     return EventCommentReply.create(Option.option(id), text, user, creationDate, modificationDate);
   }
 

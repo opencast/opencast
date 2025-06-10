@@ -1704,6 +1704,36 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         .collect(Collectors.toList()));
   }
 
+  @Override
+  public Map<String, Map<String, Long>> countActiveByOrganizationAndHost() {
+    var rows = db.exec(namedQuery.findAll(
+        "Job.countByOrganizationAndHost",
+        Object[].class,
+        Pair.of("statuses", Arrays.stream(activeJobStatus).map(Enum::ordinal).collect(Collectors.toList()))
+    )).stream().collect(Collectors.toList());
+    var orgMap = new HashMap<String, Map<String, Long>>();
+    for (Object[] row: rows) {
+      var org = (String) row[0];
+      var host = (String) row[1];
+      var count = (Long) row[2];
+      orgMap.computeIfAbsent(org, o -> new HashMap<>()).put(host, count);
+    }
+    return orgMap;
+  }
+
+  @Override
+  public Map<String, Long> countActiveTypeByOrganization(final String operation) {
+    return db.exec(namedQuery.findAll(
+        "Job.countTypeByOrganization",
+        Object[].class,
+        Pair.of("statuses", Arrays.stream(activeJobStatus).map(Enum::ordinal).collect(Collectors.toList())),
+        Pair.of("operation", operation)
+    )).stream().collect(Collectors.toMap(
+        row -> (String) row[0],
+        row -> (Long) row[1]
+    ));
+  }
+
   /**
    * Gets jobs of all types that are in the given state.
    *

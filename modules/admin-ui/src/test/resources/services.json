@@ -12,6 +12,8 @@
       "nodeName": "node1",
       "name": "service1",
       "completed": 0,
+      "online": true,
+      "maintenance": false,
       "status": "SYSTEMS.SERVICES.STATUS.NORMAL"
     }, {
       "running": 0,
@@ -22,6 +24,8 @@
       "nodeName": "node1",
       "name": "service2",
       "completed": 5,
+      "online": true,
+      "maintenance": false,
       "status": "SYSTEMS.SERVICES.STATUS.ERROR"
     }, {
       "running": 2,
@@ -32,6 +36,8 @@
       "nodeName": "node2",
       "name": "service3",
       "completed": 20,
+      "online": true,
+      "maintenance": false,
       "status": "SYSTEMS.SERVICES.STATUS.NORMAL"
     }, {
       "running": 1,
@@ -42,6 +48,8 @@
       "nodeName": "node3",
       "name": "service4",
       "completed": 0,
+      "online": true,
+      "maintenance": false,
       "status": "SYSTEMS.SERVICES.STATUS.WARNING"
     }, {
       "running": 0,
@@ -52,6 +60,8 @@
       "nodeName": "node2",
       "name": "service5",
       "completed": 10,
+      "online": true,
+      "maintenance": false,
       "status": "SYSTEMS.SERVICES.STATUS.NORMAL"
     }, {
       "running": 0,
@@ -62,6 +72,8 @@
       "nodeName": "node4",
       "name": "service6",
       "completed": 0,
+      "online": true,
+      "maintenance": false,
       "status": "SYSTEMS.SERVICES.STATUS.NORMAL"
     }]
 }

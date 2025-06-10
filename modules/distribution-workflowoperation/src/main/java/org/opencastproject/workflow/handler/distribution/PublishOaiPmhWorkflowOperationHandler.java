@@ -20,7 +20,6 @@
  */
 package org.opencastproject.workflow.handler.distribution;
 
-import static com.entwinemedia.fn.Stream.$;
 import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.ofChannel;
 import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.data.Option.option;
@@ -50,8 +49,6 @@ import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -63,6 +60,7 @@ import org.slf4j.LoggerFactory;
 import java.net.URI;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -153,10 +151,13 @@ public class PublishOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
             .bind(trimToNone).map(toBool).getOrElse(true);
     String repository = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(REPOSITORY));
 
-    Opt<String> externalChannel = getOptConfig(workflowInstance.getCurrentOperation(), EXTERNAL_CHANNEL_NAME);
-    Opt<String> externalTempalte = getOptConfig(workflowInstance.getCurrentOperation(), EXTERNAL_TEMPLATE);
-    Opt<MimeType> externalMimetype = getOptConfig(workflowInstance.getCurrentOperation(), EXTERNAL_MIME_TYPE)
-            .bind(MimeTypes.toMimeType);
+    Optional<String> externalChannel = Optional.ofNullable(
+        getOptConfig(workflowInstance.getCurrentOperation(), EXTERNAL_CHANNEL_NAME).orNull());
+    Optional<String> externalTemplate = Optional.ofNullable(
+        getOptConfig(workflowInstance.getCurrentOperation(), EXTERNAL_TEMPLATE).orNull());
+    Optional<MimeType> externalMimetype = Optional.ofNullable(
+        getOptConfig(workflowInstance.getCurrentOperation(), EXTERNAL_MIME_TYPE).orNull())
+        .flatMap(MimeTypes::toMimeType);
 
     if (repository == null) {
       throw new IllegalArgumentException("No repository has been specified");
@@ -248,23 +249,25 @@ public class PublishOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
         return createResult(mediaPackage, Action.CONTINUE);
       }
 
-      for (Publication existingPublication : $(mediaPackage.getPublications())
-              .find(ofChannel(newElement.getChannel()).toFn())) {
-        mediaPackage.remove(existingPublication);
+      for (Publication existingPublication : mediaPackage.getPublications()) {
+        if (ofChannel(newElement.getChannel()).apply(existingPublication)) {
+          mediaPackage.remove(existingPublication);
+        }
       }
       mediaPackage.add(newElement);
 
-      if (externalChannel.isSome() && externalMimetype.isSome() && externalTempalte.isSome()) {
-        String template = externalTempalte.get().replace("{event}", mediaPackage.getIdentifier().toString());
+      if (externalChannel.isPresent() && externalMimetype.isPresent() && externalTemplate.isPresent()) {
+        String template = externalTemplate.get().replace("{event}", mediaPackage.getIdentifier().toString());
         if (StringUtils.isNotBlank(mediaPackage.getSeries())) {
           template = template.replace("{series}", mediaPackage.getSeries());
         }
 
         Publication externalElement = PublicationImpl.publication(UUID.randomUUID().toString(), externalChannel.get(),
                 URI.create(template), externalMimetype.get());
-        for (Publication existingPublication : $(mediaPackage.getPublications())
-                .find(ofChannel(externalChannel.get()).toFn())) {
-          mediaPackage.remove(existingPublication);
+        for (Publication existingPublication : mediaPackage.getPublications()) {
+          if (ofChannel(externalChannel.get()).apply(existingPublication)) {
+            mediaPackage.remove(existingPublication);
+          }
         }
         mediaPackage.add(externalElement);
       }

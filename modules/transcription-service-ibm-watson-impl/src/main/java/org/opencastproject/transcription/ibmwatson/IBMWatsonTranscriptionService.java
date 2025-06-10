@@ -1097,7 +1097,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
       Set<String> mpIds = new HashSet<String>();
       mpIds.add(mpId);
       List<WorkflowInstance> wfList = workflows
-              .applyWorkflowToLatestVersion(mpIds, ConfiguredWorkflow.workflow(wfDef, params)).toList();
+              .applyWorkflowToLatestVersion(mpIds, ConfiguredWorkflow.workflow(wfDef, params));
       return wfList.size() > 0 ? Long.toString(wfList.get(0).getId()) : null;
     } catch (NotFoundException | WorkflowDatabaseException e) {
       logger.warn("Could not get workflow definition: {}", wfDefId);

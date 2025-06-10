@@ -69,7 +69,6 @@ install them.
 
     tesseract >= 3
     hunspell >= 1.2.8
-    sox >= 14.4
     synfig
 
 

@@ -46,6 +46,7 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Optional;
 
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -88,8 +89,8 @@ public class ConfigurableSeriesDCCatalogUIAdapter extends ConfigurableDCCatalogU
 
   protected Opt<DublinCoreCatalog> loadDublinCoreCatalog(String seriesId) {
     try {
-      Opt<byte[]> seriesElementData = getSeriesService().getSeriesElementData(requireNonNull(seriesId), flavor.getType());
-      if (seriesElementData.isSome()) {
+      Optional<byte[]> seriesElementData = getSeriesService().getSeriesElementData(requireNonNull(seriesId), flavor.getType());
+      if (seriesElementData.isPresent()) {
         final DublinCoreCatalog dc = DublinCoreByteFormat.read(seriesElementData.get());
         // Make sure that the catalog has its flavor set.
         // It may happen, when updating a system, that already saved catalogs

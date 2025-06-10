@@ -51,8 +51,6 @@ import org.opencastproject.series.impl.persistence.SeriesServiceDatabaseImpl;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
@@ -65,6 +63,7 @@ import org.osgi.service.component.ComponentContext;
 
 import java.io.File;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Function;
@@ -97,8 +96,9 @@ public class SeriesServiceImplTest {
 
     // Mock up a security service
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
-    User user = new JaxbUser("admin", "test", new DefaultOrganization(), new JaxbRole(
-            SecurityConstants.GLOBAL_ADMIN_ROLE, new DefaultOrganization()));
+    var user = new JaxbUser("admin", "password", "Administrator", "admin@example.org",
+        "test", new DefaultOrganization(),
+        Collections.singleton(new JaxbRole(SecurityConstants.GLOBAL_ADMIN_ROLE, new DefaultOrganization())));
     EasyMock.expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
     EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
     EasyMock.replay(securityService);
@@ -355,6 +355,6 @@ public class SeriesServiceImplTest {
 
     assertTrue(seriesService.deleteSeriesElement(seriesId, ELEMENT_TYPE));
     assertFalse(seriesService.deleteSeriesElement(seriesId, ELEMENT_TYPE));
-    assertEquals(Opt.none(), seriesService.getSeriesElementData(seriesId, ELEMENT_TYPE));
+    assertEquals(Optional.empty(), seriesService.getSeriesElementData(seriesId, ELEMENT_TYPE));
   }
 }

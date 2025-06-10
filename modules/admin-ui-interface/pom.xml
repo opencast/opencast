@@ -13,8 +13,8 @@
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
-    <interface.url>https://github.com/opencast/opencast-admin-interface/releases/download/2025-03-20/oc-admin-ui-2025-03-20.tar.gz</interface.url>
-    <interface.sha256>0c8af5f9b5d74afcad52b424b9e2a7fcc66aebdd6378d777eb731777fa7e2f04</interface.sha256>
+    <interface.url>https://github.com/opencast/opencast-admin-interface/releases/download/17.x-2025-05-24/oc-admin-ui-17.x-2025-05-24.tar.gz</interface.url>
+    <interface.sha256>9d0438d8d2d158c295c07c9454b80b19127748fb19059988e8cb2d4eb8ce11a7</interface.sha256>
   </properties>
   <build>
     <plugins>

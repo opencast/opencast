@@ -22,8 +22,6 @@
 package org.opencastproject.metrics.impl;
 
 import org.opencastproject.assetmanager.api.AssetManager;
-import org.opencastproject.job.api.Job;
-import org.opencastproject.job.api.JobImpl;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
@@ -40,8 +38,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
 import java.util.Collections;
+import java.util.Map;
 
 /**
  * Test the metrics endpoint
@@ -67,22 +65,17 @@ public class MetricsExporterTest {
     nodeLoad.setCurrentLoad(1.23F);
     systemLoad.addNodeLoad(nodeLoad);
 
-    // prepare job
-    Job job1 = new JobImpl();
-    job1.setJobLoad(1.2F);
-    job1.setOperation("START_WORKFLOW");
-    job1.setOrganization("mh_default_org");
-    job1.setProcessingHost("opencast.org");
-    Job job2 = new JobImpl();
-
     // mock service registry
     ServiceRegistration serviceRegistration = new ServiceRegistrationInMemoryImpl("service.type", "opencast.org",
         ServiceState.ERROR.name(), false);
     ServiceRegistry serviceRegistry = EasyMock.createMock(ServiceRegistry.class);
     EasyMock.expect(serviceRegistry.getCurrentHostLoads()).andReturn(systemLoad).anyTimes();
-    EasyMock.expect(serviceRegistry.getActiveJobs()).andReturn(Arrays.asList(job1, job2)).anyTimes();
     EasyMock.expect(serviceRegistry.getServiceRegistrations())
         .andReturn(Collections.singletonList(serviceRegistration)).anyTimes();
+    EasyMock.expect(serviceRegistry.countActiveByOrganizationAndHost())
+        .andReturn(Map.of("mh_default_org", Map.of("opencast.org", 2L))).anyTimes();
+    EasyMock.expect(serviceRegistry.countActiveTypeByOrganization(EasyMock.anyString()))
+        .andReturn(Map.of("mh_default_org", 1L)).anyTimes();
 
     // prepare organization
     Organization organization = new DefaultOrganization();
@@ -101,7 +94,7 @@ public class MetricsExporterTest {
 
     // test exporter
     final String body = exporter.metrics().getEntity().toString();
-    Assert.assertTrue(body.contains("opencast_job_load_max{host=\"opencast.org\",} 12.3"));
-    Assert.assertTrue(body.contains("opencast_asset_manager_events{organization=\"mh_default_org\",} 5.0"));
+    Assert.assertTrue(body.contains("opencast_job_load_max{host=\"opencast.org\"} 12.3"));
+    Assert.assertTrue(body.contains("opencast_asset_manager_events{organization=\"mh_default_org\"} 5.0"));
   }
 }

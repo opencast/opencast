@@ -40,6 +40,7 @@ import static javax.servlet.http.HttpServletResponse.SC_SERVICE_UNAVAILABLE;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
+import static org.opencastproject.adminui.endpoint.EndpointUtil.transformAccessControList;
 import static org.opencastproject.index.service.util.RestUtils.conflictJson;
 import static org.opencastproject.index.service.util.RestUtils.notFound;
 import static org.opencastproject.index.service.util.RestUtils.notFoundJson;
@@ -1911,7 +1912,7 @@ public abstract class AbstractEventEndpoint {
           Date created = instance.getDateCreated();
           String submitter = instance.getCreatorName();
 
-          User user = getUserDirectoryService().loadUser(submitter);
+          User user = submitter == null ? null : getUserDirectoryService().loadUser(submitter);
           String submitterName = null;
           String submitterEmail = null;
           if (user != null) {
@@ -2272,7 +2273,7 @@ public abstract class AbstractEventEndpoint {
 
     JSONObject episodeAccessJson = new JSONObject();
     episodeAccessJson.put("current_acl", currentAcl.isSome() ? currentAcl.get().getId() : 0L);
-    episodeAccessJson.put("acl", AccessControlParser.toJsonSilent(activeAcl));
+    episodeAccessJson.put("acl", transformAccessControList(activeAcl, getUserDirectoryService()));
     episodeAccessJson.put("privileges", AccessInformationUtil.serializePrivilegesByRole(activeAcl));
     if (StringUtils.isNotBlank(optEvent.get().getWorkflowState())
             && WorkflowUtil.isActive(WorkflowInstance.WorkflowState.valueOf(optEvent.get().getWorkflowState())))
