@@ -49,7 +49,7 @@
 
     <operation
             id="encode"
-            if="(NOT(${presenter_source_video} OR $ ${presentation_source_video}))"
+            if="(NOT(${presenter_source_video} OR ${presentation_source_video}))"
             exception-handler-workflow="partial-error"
             description="Create single-stream video preview">
       <configurations>
