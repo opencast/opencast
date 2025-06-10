@@ -1,5 +1,20 @@
 # Opencast 17: Release Notes
 
+## Opencast 17.4
+
+This release contains a few bug fixes and enhancements of existing features. Among others, it enables the use of
+Elasticsearch even if the setup is in yellow state ([#6681](https://github.com/opencast/opencast/pull/6681)).
+It also adds an endpoint to trigger the update of a single event in search
+([#6653](https://github.com/opencast/opencast/pull/6653)).
+
+Most importantly, this contains a new version of both the Editor
+([17.x-2025-05-23](https://github.com/opencast/opencast-editor/releases/tag/17.x-2025-05-23)) and the Admin UI
+([17.x-2025-05-24](https://github.com/opencast/opencast-admin-interface/releases/tag/17.x-2025-05-24)).
+
+Additionally it contains a new version of Opencast Studio
+([2025-04-30](https://github.com/elan-ev/opencast-studio/releases/tag/2025-04-30))
+with a bugfix regarding incorrect error messages when uploading.
+
 ## Opencast 17.3
 
 This release contains a few bug fixes, among them performance improvements for the metrics endpoint
@@ -36,7 +51,7 @@ configure asset upload options in more detail [[#6362](https://github.com/openca
   no longer necessary to include a separate encode operation for this in the workflow.
   [[#6248](https://github.com/opencast/opencast/pull/6248)]
 - You can now provide terms of use to be presented to new users in the Admin UI. For configuration see
-  [the respective docs](../configuration/admin-ui/terms.md). [[#6010](https://github.com/opencast/opencast/pull/6010)]
+  [the respective docs](configuration/admin-ui/terms.md). [[#6010](https://github.com/opencast/opencast/pull/6010)]
 - There is a new UI for the documentation of our REST endpoints but since it currently has some issues, it's not turned
   on by default. You can however already try it out. [[#5668](https://github.com/opencast/opencast/pull/5668)]
 - There is a new GraphQL API as an alternative to the existing REST API. Please be aware that this is not yet production
