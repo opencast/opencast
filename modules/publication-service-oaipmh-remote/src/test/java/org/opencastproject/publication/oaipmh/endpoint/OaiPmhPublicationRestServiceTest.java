@@ -37,8 +37,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistration;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.test.rest.RestServiceTestEnv;
 
-import com.entwinemedia.fn.data.ListBuilders;
-
 import org.apache.http.client.methods.HttpRequestBase;
 import org.easymock.EasyMock;
 import org.junit.AfterClass;
@@ -46,6 +44,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import java.net.URI;
+import java.util.Arrays;
 import java.util.HashSet;
 
 /**
@@ -82,7 +81,7 @@ public class OaiPmhPublicationRestServiceTest {
         .anyTimes();
     EasyMock.expect(registration.getPath()).andReturn("").anyTimes();
     EasyMock.expect(registry.getServiceRegistrationsByLoad(EasyMock.anyString()))
-        .andReturn(ListBuilders.SIA.mk(registration))
+        .andReturn(Arrays.asList(registration))
         .anyTimes();
     EasyMock.replay(registry, registration);
     final OaiPmhPublicationServiceRemoteImpl remote = new OaiPmhPublicationServiceRemoteImpl();

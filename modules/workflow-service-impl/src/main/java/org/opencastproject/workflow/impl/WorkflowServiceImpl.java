@@ -1651,7 +1651,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     }
 
     // Make sure we are not excluding ourselves
-    if (workflow.getId() != workflowInstance.get().getId()) {
+    if (workflowInstance.isPresent() && workflow.getId() != workflowInstance.get().getId()) {
       delayWorkflow(workflow, mediaPackageId);
       return false;
     }

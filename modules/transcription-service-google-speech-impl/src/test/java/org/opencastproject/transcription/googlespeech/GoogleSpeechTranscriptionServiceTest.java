@@ -55,8 +55,6 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.Stream;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
@@ -559,10 +557,9 @@ public class GoogleSpeechTranscriptionServiceTest {
     if (wfStarted) {
       wfList.add(new WorkflowInstance());
     }
-    Stream<WorkflowInstance> wfListStream = Stream.mk(wfList);
     Workflows wfs = EasyMock.createNiceMock(Workflows.class);
     EasyMock.expect(wfs.applyWorkflowToLatestVersion(EasyMock.capture(capturedMpIds),
-            EasyMock.anyObject(ConfiguredWorkflow.class))).andReturn(wfListStream);
+            EasyMock.anyObject(ConfiguredWorkflow.class))).andReturn(wfList);
     service.setWfUtil(wfs);
 
     EasyMock.replay(wfService, wfs);

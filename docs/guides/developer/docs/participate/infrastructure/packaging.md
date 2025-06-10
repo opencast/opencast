@@ -43,10 +43,6 @@ The following locations should be used for Opencast and its related data:
 * `/tmp/opencast`:
   Temporary data which are not necessarily preserved between reboots. This includes the felix-cache and other temporary
   data.
-* `/usr/sbin/opencast`:
-  Opencast startscript
-* `/etc/init.d/opencast`
-  SysV-Initscript (if necessary)
 
 
 Reasoning for these Locations

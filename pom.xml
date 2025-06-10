@@ -18,7 +18,7 @@
     <!-- library version specifications -->
     <aws.version>1.12.269_1</aws.version>
     <commons-codec.version>1.18.0</commons-codec.version>
-    <commons-collections.version>4.4</commons-collections.version>
+    <commons-collections.version>4.5.0</commons-collections.version>
     <commons-compress.version>1.26.1</commons-compress.version>
     <commons-csv.version>1.9.0</commons-csv.version>
     <commons-fileupload.version>1.5</commons-fileupload.version>
@@ -135,7 +135,6 @@
     <module>modules/execute-remote</module>
     <module>modules/execute-workflowoperation</module>
     <module>modules/external-api</module>
-    <module>modules/fileupload</module>
     <module>modules/graphql</module>
     <module>modules/graphql-ui</module>
     <module>modules/hello-world-api</module>
@@ -215,10 +214,6 @@
     <module>modules/smil-api</module>
     <module>modules/smil-impl</module>
     <module>modules/smil-workflowoperation</module>
-    <module>modules/sox-api</module>
-    <module>modules/sox-impl</module>
-    <module>modules/sox-remote</module>
-    <module>modules/sox-workflowoperation</module>
     <module>modules/speech-to-text-api</module>
     <module>modules/speech-to-text-impl</module>
     <module>modules/speech-to-text-remote</module>
@@ -617,7 +612,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>3.5.2</version>
+          <version>3.5.3</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>

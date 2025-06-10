@@ -1,0 +1,60 @@
+## Database Migration and Elasticsearch Data Extraction
+
+### **1. Database Migration**
+Before running the data extraction script, you **must** apply the database migration `mariadb.sql` or `postgres.sql`.
+This step ensures that the necessary schema changes are applied before updating the records.
+
+### **2. Elasticsearch Data Extraction and SQL Update Script Generation**
+After completing the database migration, run the provided Bash script to extract data from Elasticsearch and generate
+an SQL update script.
+
+#### **Steps to Execute the Script:**
+1. **Install Required Dependencies**
+   - Ensure that `jq` is installed, as it is required to parse Elasticsearch responses.
+   - You can install `jq` using the following command:
+     ```sh
+     # Debian/Ubuntu
+     sudo apt-get install jq
+
+     # macOS (using Homebrew)
+     brew install jq
+
+     # Red Hat/Fedora
+     sudo dnf install jq
+     ```
+
+2. **Configure the Shell Script**
+   Update the following parameters in the script to match your environment:
+     - `ES_HOST` (Elasticsearch host)
+     - `ES_USER` (Elasticsearch username)
+     - `ES_PASS` (Elasticsearch password)
+
+3. **Run the Script**
+   Execute the script using the following command:
+   ```sh
+   ./extract_es_data.sh
+   ```
+   This script:
+   - Fetches records from Elasticsearch (`opencast_series` index)
+   - Generates an SQL update script (`update_statements.sql`)
+
+4. **Apply the SQL Update Statements**
+   After running the script, apply the generated SQL statements to the database:
+
+   ```sh
+   # PostgreSQL
+   psql -U <db_user> -d <db_name> -f update_statements.sql
+
+   # MariaDB
+   mysql -u <db_user> -p <db_name> < update_statements.sql
+   ```
+   Replace `<db_user>` and `<db_name>` with your actual database credentials.
+
+### **3. Error Handling**
+- Any errors encountered while generating the SQL script will be logged in `error_log.txt`.
+- Review this file for potential issues before applying the SQL updates.
+
+### **Important Notes**
+- The shell script processes Elasticsearch records in batches of **1000**.
+- If the database migration script is not executed first, applying the SQL update script may fail due to missing schema
+changes.

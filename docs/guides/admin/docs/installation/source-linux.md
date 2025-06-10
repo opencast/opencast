@@ -58,10 +58,6 @@ Required for text extraction (recommended):
 
     tesseract >= 3
 
-Required for audio normalization (optional):
-
-    sox >= 14.4
-
 Required for animate service (optional):
 
     synfig
@@ -148,21 +144,3 @@ Start Opencast and make it run automatically:
     systemctl start opencast.service
     systemctl enable opencast.service
 
-### Using SysV-Init
-
-> Note that this option is for compatibility to older systems. If you have the choice of either using the Systemd unit
-> file or the Init script, it is recommended to use the Systemd unit file.
-
-Make sure the path to Opencast is set correctly:
-
-    vim docs/scripts/service/etc-init.d-opencast
-
-1. Install init script:
-
-        cp docs/scripts/service/etc-init.d-opencast /etc/init.d/opencast
-
-2. Enable service using `chkconfig` or `update-rc.d`
-
-3. Start Opencast using
-
-        service opencast start

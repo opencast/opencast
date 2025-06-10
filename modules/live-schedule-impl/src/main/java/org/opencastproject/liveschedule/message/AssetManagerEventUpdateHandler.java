@@ -63,7 +63,7 @@ public class AssetManagerEventUpdateHandler extends UpdateHandler implements Ass
           if (item instanceof TakeSnapshot) { // Check class just in case
             TakeSnapshot snapshotItem = (TakeSnapshot) item;
             // If no episode dc, there's nothing to do.
-            if (snapshotItem.getEpisodeDublincore().isNone()) {
+            if (snapshotItem.getEpisodeDublincore().isEmpty()) {
               break;
             }
             // Does media package have a live publication channel? This is to ignore non-live

@@ -63,10 +63,6 @@ Required for text extraction:
 
     tesseract >= 3
 
-Required for audio normalization:
-
-    sox >= 14.4 (with MP3, FLAC and OGG support)
-
 Required for animate service:
 
     synfig
@@ -82,9 +78,7 @@ Homebrew is a package manager for OS X. For installation instruction see [their 
 
     brew install maven
     brew install ffmpeg
-
     brew install tesseract
-    brew install sox
     brew install synfig
 
 #### OpenSearch on macOS

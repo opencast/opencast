@@ -202,7 +202,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     }
 
     if (StringUtils.isNotEmpty(text)) {
-      query.must(QueryBuilders.matchQuery("fulltext", text));
+      query.must(QueryBuilders.wildcardQuery("fulltext", "*" + text.toLowerCase() + "*"));
     }
 
     var user = securityService.getUser();
@@ -392,7 +392,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     }
 
     if (StringUtils.isNotEmpty(text)) {
-      query.must(QueryBuilders.matchQuery("fulltext", text));
+      query.must(QueryBuilders.wildcardQuery("fulltext", "*" + text.toLowerCase() + "*"));
     }
 
     var user = securityService.getUser();

@@ -1367,28 +1367,6 @@ smil-impl
   org.slf4j                              slf4j-api                                        MIT License
 
 
-sox-impl
-  GroupId                                ArtifactId                                       Licenses
-  commons-io                             commons-io                                       Apache License, Version 2.0
-  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
-  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
-  org.slf4j                              slf4j-api                                        MIT License
-
-
-sox-remote
-  GroupId                                ArtifactId                                       Licenses
-  org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
-  org.apache.httpcomponents              httpcore-osgi                                    Apache License, Version 2.0
-  org.slf4j                              slf4j-api                                        MIT License
-
-
-sox-workflowoperation
-  GroupId                                ArtifactId                                       Licenses
-  commons-io                             commons-io                                       Apache License, Version 2.0
-  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
-  org.slf4j                              slf4j-api                                        MIT License
-
-
 static-file-service-api
   GroupId                                ArtifactId                                       Licenses
   commons-fileupload                     commons-fileupload                               Apache License, Version 2.0

@@ -30,9 +30,6 @@ import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.functions.Options;
 import org.opencastproject.util.data.functions.Strings;
 
-import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.data.Opt;
-
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,6 +42,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -134,16 +132,13 @@ public final class MimeTypes {
     }
   }
 
-  public static final Fn<String, Opt<MimeType>> toMimeType = new Fn<String, Opt<MimeType>>() {
-    @Override
-    public Opt<MimeType> apply(String name) {
-      try {
-        return Opt.some(parseMimeType(name));
-      } catch (Exception e) {
-        return Opt.none();
-      }
+  public static Optional<MimeType> toMimeType(String name) {
+    try {
+      return Optional.of(parseMimeType(name));
+    } catch (Exception e) {
+      return Optional.empty();
     }
-  };
+  }
 
 
   /**

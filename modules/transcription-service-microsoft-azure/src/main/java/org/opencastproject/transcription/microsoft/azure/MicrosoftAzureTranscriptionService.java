@@ -660,7 +660,7 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
     Set<String> mpIds = new HashSet<>();
     mpIds.add(mpId);
     List<WorkflowInstance> wfList = workflows
-        .applyWorkflowToLatestVersion(mpIds, ConfiguredWorkflow.workflow(wfDef, params)).toList();
+        .applyWorkflowToLatestVersion(mpIds, ConfiguredWorkflow.workflow(wfDef, params));
     return wfList.size() > 0 ? Long.toString(wfList.get(0).getId()) : null;
   }
 

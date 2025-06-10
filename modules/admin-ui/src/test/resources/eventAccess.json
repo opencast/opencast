@@ -11,7 +11,7 @@
   ],
   "episode_access": {
     "current_acl": 0,
-    "acl": "{\"acl\":{\"ace\":[{\"allow\":true,\"role\":\"ROLE_ADMIN\",\"action\":\"read\"},{\"allow\":true,\"role\":\"ROLE_ADMIN\",\"action\":\"write\"}]}}",
+    "acl": "[{\"role\":\"ROLE_ADMIN\",\"read\":true,\"write\":true,\"actions\":[]}]",
     "privileges": {
       "ROLE_ADMIN": {
         "read": true,

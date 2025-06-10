@@ -20,8 +20,6 @@
  */
 package org.opencastproject.assetmanager.util;
 
-import static com.entwinemedia.fn.Stream.$;
-
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -31,10 +29,6 @@ import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.WorkflowService;
-
-import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.Stream;
-import com.entwinemedia.fn.data.Opt;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,43 +56,41 @@ public class Workflows {
   /**
    * Apply a workflow to the latest version of each media package.
    */
-  public Stream<WorkflowInstance> applyWorkflowToLatestVersion(Iterable<String> mpIds, ConfiguredWorkflow wf) {
-    return $(mpIds).bind(findLatest).map(getMediapackage).bind(applyWorkflow(wf));
+  public List<WorkflowInstance> applyWorkflowToLatestVersion(Iterable<String> mpIds, ConfiguredWorkflow wf) {
+    List<WorkflowInstance> result = new ArrayList<>();
+
+    for (String mpId : mpIds) {
+      List<Snapshot> snapshots = findLatestSnapshots(mpId);
+      for (Snapshot snapshot : snapshots) {
+        MediaPackage mp = snapshot.getMediaPackage();
+        Optional<WorkflowInstance> optWorkflow = applyWorkflow(wf, mp);
+        optWorkflow.ifPresent(result::add);
+      }
+    }
+
+    return result;
   }
 
   /**
    * Apply a workflow to a media package. The function returns some workflow instance if the
    * workflow could be started successfully, none otherwise.
    */
-  public Fn<MediaPackage, Opt<WorkflowInstance>> applyWorkflow(final ConfiguredWorkflow wf) {
-    return new Fn<MediaPackage, Opt<WorkflowInstance>>() {
-      @Override public Opt<WorkflowInstance> apply(MediaPackage mp) {
-        try {
-          return Opt.some(wfs.start(wf.getWorkflowDefinition(), mp, wf.getParameters()));
-        } catch (WorkflowDatabaseException | WorkflowParsingException | UnauthorizedException e) {
-          logger.error("Cannot start workflow on media package " + mp.getIdentifier().toString(), e);
-          return Opt.none();
-        }
-      }
-    };
+  private Optional<WorkflowInstance> applyWorkflow(ConfiguredWorkflow wf, MediaPackage mp) {
+    try {
+      WorkflowInstance instance = wfs.start(wf.getWorkflowDefinition(), mp, wf.getParameters());
+      return Optional.of(instance);
+    } catch (WorkflowDatabaseException | WorkflowParsingException | UnauthorizedException e) {
+      logger.error("Cannot start workflow on media package {}", mp.getIdentifier(), e);
+      return Optional.empty();
+    }
   }
 
-  // CHECKSTYLE:OFF
-  private final Fn<Snapshot, MediaPackage> getMediapackage = new Fn<Snapshot, MediaPackage>() {
-    @Override public MediaPackage apply(Snapshot snapshot) {
-      return snapshot.getMediaPackage();
+  private List<Snapshot> findLatestSnapshots(String mpId) {
+    List<Snapshot> list = new ArrayList<>();
+    Optional<Snapshot> snapshot = am.getLatestSnapshot(mpId);
+    if (snapshot.isPresent()) {
+      list.add(snapshot.get());
     }
-  };
-  // CHECKSTYLE:ON
-
-  private final Fn<String, Iterable<Snapshot>> findLatest = new Fn<String, Iterable<Snapshot>>() {
-    @Override public Iterable<Snapshot> apply(String mpId) {
-      List<Snapshot> list = new ArrayList<>();
-      Optional<Snapshot> snapshot = am.getLatestSnapshot(mpId);
-      if (snapshot.isPresent()) {
-        list.add(snapshot.get());
-      }
-      return list;
-    }
-  };
+    return list;
+  }
 }

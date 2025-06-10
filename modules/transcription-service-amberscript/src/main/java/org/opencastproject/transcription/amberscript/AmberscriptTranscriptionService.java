@@ -1085,7 +1085,7 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
             Set<String> mpIds = new HashSet<String>();
             mpIds.add(mpId);
             List<WorkflowInstance> wfList = workflows
-                    .applyWorkflowToLatestVersion(mpIds, ConfiguredWorkflow.workflow(wfDef, params)).toList();
+                    .applyWorkflowToLatestVersion(mpIds, ConfiguredWorkflow.workflow(wfDef, params));
             String wfId = wfList.size() > 0 ? Long.toString(wfList.get(0).getId()) : "Unknown";
 
             // Update state in the database

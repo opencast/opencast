@@ -20,8 +20,6 @@
  */
 package org.opencastproject.message.broker.api.assetmanager;
 
-import static com.entwinemedia.fn.Prelude.chuck;
-
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElements;
@@ -35,9 +33,6 @@ import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.util.RequireUtil;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.data.Opt;
-
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
@@ -45,6 +40,8 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
+import java.util.Optional;
+import java.util.function.Function;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -71,8 +68,8 @@ public abstract class AssetManagerItem implements MessageItem, Serializable {
 
   public abstract Type getType();
 
-  public abstract <A> A decompose(Fn<? super TakeSnapshot, ? extends A> takeSnapshot,
-          Fn<? super DeleteEpisode, ? extends A> deleteEpisode);
+  public abstract <A> A decompose(Function<? super TakeSnapshot, ? extends A> takeSnapshot,
+      Function<? super DeleteEpisode, ? extends A> deleteEpisode);
 
   public final Date getDate() {
     return new Date(date);
@@ -108,8 +105,8 @@ public abstract class AssetManagerItem implements MessageItem, Serializable {
     }
 
     @Override
-    public <A> A decompose(Fn<? super TakeSnapshot, ? extends A> takeSnapshot,
-            Fn<? super DeleteEpisode, ? extends A> deleteEpisode) {
+    public <A> A decompose(Function<? super TakeSnapshot, ? extends A> takeSnapshot,
+        Function<? super DeleteEpisode, ? extends A> deleteEpisode) {
       return takeSnapshot.apply(this);
     }
 
@@ -122,7 +119,7 @@ public abstract class AssetManagerItem implements MessageItem, Serializable {
       try {
         return MediaPackageParser.getFromXml(mediapackage);
       } catch (MediaPackageException e) {
-        return chuck(e);
+        throw new RuntimeException(e);
       }
     }
 
@@ -130,15 +127,15 @@ public abstract class AssetManagerItem implements MessageItem, Serializable {
       return AccessControlParser.parseAclSilent(acl);
     }
 
-    public Opt<DublinCoreCatalog> getEpisodeDublincore() {
+    public Optional<DublinCoreCatalog> getEpisodeDublincore() {
       if (episodeDublincore == null) {
-        return Opt.none();
+        return Optional.empty();
       }
 
       try (InputStream is = IOUtils.toInputStream(episodeDublincore, "UTF-8")) {
-        return Opt.some(DublinCores.read(is));
+        return Optional.of(DublinCores.read(is));
       } catch (IOException e) {
-        return chuck(e);
+        throw new RuntimeException(e);
       }
     }
 
@@ -148,22 +145,24 @@ public abstract class AssetManagerItem implements MessageItem, Serializable {
 
     //
 
-    public static final Fn<TakeSnapshot, MediaPackage> getMediaPackage = new Fn<TakeSnapshot, MediaPackage>() {
+    public static final Function<TakeSnapshot, MediaPackage> getMediaPackage =
+        new Function<TakeSnapshot, MediaPackage>() {
       @Override
       public MediaPackage apply(TakeSnapshot a) {
         return a.getMediapackage();
       }
     };
 
-    public static final Fn<TakeSnapshot, Opt<DublinCoreCatalog>> getEpisodeDublincore
-        = new Fn<TakeSnapshot, Opt<DublinCoreCatalog>>() {
+    public static final Function<TakeSnapshot, Optional<DublinCoreCatalog>> getEpisodeDublincore
+        = new Function<TakeSnapshot, Optional<DublinCoreCatalog>>() {
           @Override
-          public Opt<DublinCoreCatalog> apply(TakeSnapshot a) {
+          public Optional<DublinCoreCatalog> apply(TakeSnapshot a) {
             return a.getEpisodeDublincore();
           }
         };
 
-    public static final Fn<TakeSnapshot, AccessControlList> getAcl = new Fn<TakeSnapshot, AccessControlList>() {
+    public static final Function<TakeSnapshot, AccessControlList> getAcl =
+        new Function<TakeSnapshot, AccessControlList>() {
       @Override
       public AccessControlList apply(TakeSnapshot a) {
         return a.getAcl();
@@ -191,8 +190,8 @@ public abstract class AssetManagerItem implements MessageItem, Serializable {
     }
 
     @Override
-    public <A> A decompose(Fn<? super TakeSnapshot, ? extends A> takeSnapshot,
-            Fn<? super DeleteEpisode, ? extends A> deleteEpisode) {
+    public <A> A decompose(Function<? super TakeSnapshot, ? extends A> takeSnapshot,
+        Function<? super DeleteEpisode, ? extends A> deleteEpisode) {
       return deleteEpisode.apply(this);
     }
 
@@ -205,7 +204,7 @@ public abstract class AssetManagerItem implements MessageItem, Serializable {
       return getId();
     }
 
-    public static final Fn<DeleteEpisode, String> getMediaPackageId = new Fn<DeleteEpisode, String>() {
+    public static final Function<DeleteEpisode, String> getMediaPackageId = new Function<DeleteEpisode, String>() {
       @Override
       public String apply(DeleteEpisode a) {
         return a.getMediaPackageId();

@@ -25,12 +25,14 @@ import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.elasticsearch.index.objects.event.EventIndexSchema;
 import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.graphql.datafetcher.ElasticsearchDataFetcher;
 import org.opencastproject.graphql.event.GqlEventList;
 import org.opencastproject.graphql.exception.GraphQLRuntimeException;
 import org.opencastproject.graphql.exception.OpencastErrorType;
 import org.opencastproject.graphql.execution.context.OpencastContext;
+import org.opencastproject.graphql.type.input.EventFilterByInput;
 import org.opencastproject.graphql.type.input.EventOrderByInput;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
@@ -78,6 +80,8 @@ public class EventOffsetDataFetcher extends ElasticsearchDataFetcher<GqlEventLis
 
     eventSearchQuery = addEventOrderByParams(eventSearchQuery, dataFetchingEnvironment);
 
+    eventSearchQuery = addEventFilterByParams(eventSearchQuery, dataFetchingEnvironment);
+
     eventSearchQuery = addQueryParams(eventSearchQuery, dataFetchingEnvironment);
 
     if (seriesId != null) {
@@ -96,6 +100,31 @@ public class EventOffsetDataFetcher extends ElasticsearchDataFetcher<GqlEventLis
     } catch (SearchIndexException e) {
       throw new GraphQLRuntimeException(OpencastErrorType.InternalError, e);
     }
+  }
+
+  private EventSearchQuery addEventFilterByParams(
+      EventSearchQuery eventSearchQuery,
+      final DataFetchingEnvironment environment
+  ) {
+    EventFilterByInput eventFilterBy = parseObjectParam("filterBy", EventFilterByInput.class, environment);
+
+    if (eventFilterBy == null) {
+      return eventSearchQuery;
+    }
+
+    if (eventFilterBy.getStatus() != null) {
+      eventSearchQuery.withEventStatus(eventFilterBy.getStatus().getFilterValue());
+    }
+
+    if (eventFilterBy.getSeriesId() != null) {
+      eventSearchQuery.withSeriesId(eventFilterBy.getSeriesId());
+    }
+
+    if (eventFilterBy.getPublished() != null) {
+      eventSearchQuery.withIsPublished(eventFilterBy.getPublished());
+    }
+
+    return eventSearchQuery;
   }
 
   public EventSearchQuery addEventOrderByParams(
@@ -128,6 +157,9 @@ public class EventOffsetDataFetcher extends ElasticsearchDataFetcher<GqlEventLis
     }
     if (eventOrderBy.getEndDate() != null) {
       eventSearchQuery.sortByEndDate(eventOrderBy.getEndDate().getOrder());
+    }
+    if (eventOrderBy.getCreated() != null) {
+      eventSearchQuery.withSortOrder(EventIndexSchema.CREATED, eventOrderBy.getCreated().getOrder());
     }
     if (eventOrderBy.getWorkflowState() != null) {
       eventSearchQuery.sortByWorkflowState(eventOrderBy.getWorkflowState().getOrder());
