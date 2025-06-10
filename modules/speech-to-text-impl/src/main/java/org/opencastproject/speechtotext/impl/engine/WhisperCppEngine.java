@@ -73,7 +73,7 @@ public class WhisperCppEngine implements SpeechToTextEngine {
   private static final String WHISPERCPP_EXECUTABLE_PATH_CONFIG_KEY = "whispercpp.root.path";
 
   /** Default path to WhisperC++. */
-  public static final String WHISPERCPP_EXECUTABLE_DEFAULT_PATH = "whisper.cpp";
+  public static final String WHISPERCPP_EXECUTABLE_DEFAULT_PATH = "whisper-cli";
 
   /** Currently used path of the WhisperC++ installation. */
   private String whispercppExecutable = WHISPERCPP_EXECUTABLE_DEFAULT_PATH;
@@ -82,7 +82,7 @@ public class WhisperCppEngine implements SpeechToTextEngine {
   private static final String WHISPERCPP_MODEL_CONFIG_KEY = "whispercpp.model";
 
   /** Default whispercpp model */
-  public static final String WHISPERCPP_MODEL_DEFAULT = "/usr/share/ggml/ggml-base.bin";
+  public static final String WHISPERCPP_MODEL_DEFAULT = "/usr/share/whisper.cpp/models/ggml-base.bin";
 
   /** Currently used whispercpp model */
   private String whispercppModel = WHISPERCPP_MODEL_DEFAULT;
