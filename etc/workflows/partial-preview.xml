@@ -17,8 +17,6 @@
 
     <!-- Analyze media assets -->
 
-    <!-- CHANGEME: Activate this if you use the old editor -->
-    <!--
     <operation
       id="analyze-tracks"
       exception-handler-workflow="partial-error"
@@ -27,18 +25,14 @@
         <configuration key="source-flavor">*/source</configuration>
       </configurations>
     </operation>
-    -->
 
     <!-- Transcode video previews -->
 
-    <!-- CHANGEME: Add
-        if="NOT (${presenter_source_video} AND ${presentation_source_video})"
-    to this operation if you use the old editor -->
     <operation
-            id="encode"
-            if="((${presenter_source_video} OR $ ${presentation_source_video}))"
-            exception-handler-workflow="partial-error"
-            description="Create single-stream video preview">
+      id="encode"
+      if="((${presenter_source_video} OR ${presentation_source_video}))"
+      exception-handler-workflow="partial-error"
+      description="Create single-stream video preview">
       <configurations>
         <configuration key="source-flavors">*/source</configuration>
         <configuration key="target-flavor">*/preview</configuration>
@@ -48,10 +42,10 @@
     </operation>
 
     <operation
-            id="encode"
-            if="(NOT(${presenter_source_video} OR ${presentation_source_video}))"
-            exception-handler-workflow="partial-error"
-            description="Create single-stream video preview">
+      id="encode"
+      if="(NOT(${presenter_source_video} OR $ ${presentation_source_video}))"
+      exception-handler-workflow="partial-error"
+      description="Create single-stream video preview">
       <configurations>
         <configuration key="source-flavors">*/source</configuration>
         <configuration key="target-flavor">*/preview</configuration>
@@ -94,9 +88,9 @@
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
     <operation
-            id="waveform"
-            exception-handler-workflow="partial-error"
-            description="Generating waveform">
+      id="waveform"
+      exception-handler-workflow="partial-error"
+      description="Generating waveform">
       <configurations>
         <configuration key="source-flavor">*/preview</configuration>
         <configuration key="target-flavor">*/waveform</configuration>
@@ -111,9 +105,9 @@
     <!-- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -->
 
     <operation
-            id="image"
-            exception-handler-workflow="partial-error"
-            description="Create video preview images for presenter and presentation">
+      id="image"
+      exception-handler-workflow="partial-error"
+      description="Create video preview images for presenter and presentation">
       <configurations>
         <configuration key="source-flavor">*/source</configuration>
         <configuration key="target-flavor">*/video+preview</configuration>
@@ -124,9 +118,9 @@
     </operation>
 
     <operation
-            id="waveform"
-            fail-on-error="false"
-            description="Generating audio preview waveform">
+      id="waveform"
+      fail-on-error="false"
+      description="Generating audio preview waveform">
       <configurations>
         <configuration key="source-flavor">*/source</configuration>
         <configuration key="target-flavor">*/audio+preview</configuration>
@@ -146,10 +140,10 @@
     <!-- Run silence detection -->
 
     <operation
-            id="silence"
-            if="NOT ${straightToPublishing}"
-            fail-on-error="false"
-            description="Detecting silence">
+      id="silence"
+      if="NOT ${straightToPublishing}"
+      fail-on-error="false"
+      description="Detecting silence">
       <configurations>
         <configuration key="source-flavors">*/preview</configuration>
         <configuration key="smil-flavor-subtype">silence</configuration>
@@ -161,9 +155,9 @@
     <!-- Fixme: remove once "silence" operation supports target-tags -->
 
     <operation
-            id="tag"
-            if="NOT ${straightToPublishing}"
-            description="Preparing silence detection for preview">
+      id="tag"
+      if="NOT ${straightToPublishing}"
+      description="Preparing silence detection for preview">
       <configurations>
         <configuration key="source-flavors">*/silence</configuration>
         <configuration key="target-tags">+archive</configuration>
@@ -179,9 +173,9 @@
     <!-- Publish previews -->
 
     <operation
-            id="publish-configure"
-            exception-handler-workflow="partial-error"
-            description="Publish to editor">
+      id="publish-configure"
+      exception-handler-workflow="partial-error"
+      description="Publish to editor">
       <configurations>
         <configuration key="download-source-tags">preview,editor</configuration>
         <configuration key="channel-id">internal</configuration>

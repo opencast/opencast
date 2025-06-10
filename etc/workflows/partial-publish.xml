@@ -107,10 +107,10 @@
     <!-- Create a cover image -->
 
     <operation
-        id="image"
-        if="NOT ${presenter/thumbnail_edited}"
-        exception-handler-workflow="partial-error"
-        description="Creating player preview image for presenter video">
+      id="image"
+      if="NOT ${presenter/thumbnail_edited}"
+      exception-handler-workflow="partial-error"
+      description="Creating player preview image for presenter video">
       <configurations>
         <configuration key="source-flavor">presenter/trimmed</configuration>
         <configuration key="target-flavor">presenter/player+preview</configuration>
@@ -121,9 +121,9 @@
     </operation>
 
     <operation
-            id="cover-image"
-            if="NOT (${presenter_work_video} OR $ ${presentation_work_video} OR ${presentation/thumbnail_edited}) AND (${presenter_work_audio} OR ${presentation_work_audio})"
-            description="Create a cover image for audio-only files">
+      id="cover-image"
+      if="NOT (${presenter_work_video} OR $ ${presentation_work_video} OR ${presentation/thumbnail_edited}) AND (${presenter_work_audio} OR ${presentation_work_audio})"
+      description="Create a cover image for audio-only files">
       <configurations>
         <configuration key="stylesheet">file://${karaf.etc}/branding/coverimage.xsl</configuration>
         <configuration key="width">1920</configuration>
