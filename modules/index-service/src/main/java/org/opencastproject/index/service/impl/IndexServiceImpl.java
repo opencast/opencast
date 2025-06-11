@@ -913,8 +913,8 @@ public class IndexServiceImpl implements IndexService {
 
     // Get presenter usernames for use as technical presenters
     Set<String> presenterUsernames = new HashSet<>();
-    Opt<Set<String>> technicalPresenters = updatePresenters(eventMetadata);
-    if (technicalPresenters.isSome()) {
+    Optional<Set<String>> technicalPresenters = updatePresenters(eventMetadata);
+    if (technicalPresenters.isPresent()) {
       presenterUsernames = technicalPresenters.get();
     }
 
@@ -1001,7 +1001,7 @@ public class IndexServiceImpl implements IndexService {
         eventHttpServletRequest.setMediaPackage(mediaPackage);
         try {
           schedulerService.addEvent(start.toDate(), start.plus(duration).toDate(), captureAgentId, presenterUsernames,
-                  mediaPackage, configuration, (Map) caProperties, Opt.<String> none());
+                  mediaPackage, configuration, (Map) caProperties, Optional.empty());
         } finally {
           for (MediaPackageElement mediaPackageElement : mediaPackage.getElements()) {
             try {
@@ -1014,7 +1014,7 @@ public class IndexServiceImpl implements IndexService {
         return mediaPackage.getIdentifier().toString();
       case SCHEDULE_MULTIPLE:
         final Map<String, Period> scheduled = schedulerService.addMultipleEvents(rRule, start.toDate(), end.toDate(), duration, tz, captureAgentId,
-                presenterUsernames, eventHttpServletRequest.getMediaPackage().get(), configuration, (Map) caProperties, Opt.none());
+                presenterUsernames, eventHttpServletRequest.getMediaPackage().get(), configuration, (Map) caProperties, Optional.empty());
         return StringUtils.join(scheduled.keySet(), ",");
       default:
         throw new IllegalArgumentException("Unknown source type: " + type);
@@ -1052,7 +1052,7 @@ public class IndexServiceImpl implements IndexService {
    * @return If the presenters (creator) field has been updated, the set of user names, if any, of the presenters. None
    *         if it wasn't updated.
    */
-  private Opt<Set<String>> updatePresenters(DublinCoreMetadataCollection eventMetadata) {
+  private Optional<Set<String>> updatePresenters(DublinCoreMetadataCollection eventMetadata) {
     MetadataField presentersMetadataField = eventMetadata.getOutputFields()
             .get(DublinCore.PROPERTY_CREATOR.getLocalName());
     if (presentersMetadataField.isUpdated()) {
@@ -1062,9 +1062,9 @@ public class IndexServiceImpl implements IndexService {
       MetadataField newPresentersMetadataField = new MetadataField(presentersMetadataField);
       newPresentersMetadataField.setValue(updatedPresenters.getA());
       eventMetadata.addField(newPresentersMetadataField);
-      return Opt.some(presenterUsernames);
+      return Optional.of(presenterUsernames);
     } else {
-      return Opt.none();
+      return Optional.empty();
     }
   }
 
@@ -1283,8 +1283,8 @@ public class IndexServiceImpl implements IndexService {
         break;
       case SCHEDULE:
         try {
-          schedulerService.updateEvent(event.getIdentifier(), Opt.none(), Opt.none(), Opt.none(), Opt.none(),
-              Opt.some(mediaPackage), Opt.none(), Opt.none());
+          schedulerService.updateEvent(event.getIdentifier(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
+              Optional.of(mediaPackage), Optional.empty(), Optional.empty());
         } catch (SchedulerException e) {
           throw new IndexServiceException("Unable to remove catalog with flavor " + flavor + " by updating scheduled "
               + "event " + event.getIdentifier(), e);
@@ -1350,10 +1350,10 @@ public class IndexServiceImpl implements IndexService {
         break;
       case SCHEDULE:
         DublinCoreMetadataCollection eventCatalog = metadataList.getMetadataByAdapter(getCommonEventCatalogUIAdapter());
-        Opt<Set<String>> presenters = eventCatalog == null ? Opt.none() : updatePresenters(eventCatalog);
+        Optional<Set<String>> presenters = eventCatalog == null ? Optional.empty() : updatePresenters(eventCatalog);
         try {
-          schedulerService.updateEvent(id, Opt.none(), Opt.none(), Opt.none(), presenters, Opt.some(mediaPackage),
-              Opt.none(), Opt.none());
+          schedulerService.updateEvent(id, Optional.empty(), Optional.empty(), Optional.empty(), presenters, Optional.of(mediaPackage),
+              Optional.empty(), Optional.empty());
         } catch (SchedulerException e) {
           throw new IndexServiceException("Unable to update scheduled event " + id + " with metadata "
               + RestUtils.getJsonStringSilent(MetadataJson.listToJson(metadataList, true)), e);
@@ -1417,8 +1417,8 @@ public class IndexServiceImpl implements IndexService {
       case SCHEDULE:
         try {
           mediaPackage = authorizationService.setAcl(mediaPackage, AclScope.Episode, acl).getA();
-          schedulerService.updateEvent(id, Opt.none(), Opt.none(), Opt.none(), Opt.none(), Opt.some(mediaPackage),
-                  Opt.none(), Opt.none());
+          schedulerService.updateEvent(id, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.of(mediaPackage),
+                  Optional.empty(), Optional.empty());
         } catch (SchedulerException | MediaPackageException e) {
           throw new IndexServiceException("Unable to update the acl for the scheduled event", e);
         }
@@ -1948,8 +1948,8 @@ public class IndexServiceImpl implements IndexService {
             break;
           case SCHEDULE:
             logger.info("Update scheduled mediapacakge {} with updated comments catalog.", event.getIdentifier());
-            schedulerService.updateEvent(event.getIdentifier(), Opt.none(), Opt.none(), Opt.none(), Opt.none(),
-                    Opt.some(mediaPackage), Opt.none(), Opt.none());
+            schedulerService.updateEvent(event.getIdentifier(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
+                    Optional.of(mediaPackage), Optional.empty(), Optional.empty());
             break;
           default:
             logger.error("Unknown event source {}!", event.getSource());
