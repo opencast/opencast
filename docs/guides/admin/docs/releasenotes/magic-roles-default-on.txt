@@ -1,3 +1,3 @@
-The feature "Episode ID Roles" is now enabled by default.
-If you haven't done that before, you need to rebuild parts of the index.
-For more information, see guides/admin/docs/configuration/episode-id-roles.md`.
+The feature "Episode ID Roles" is now a core feature: enabled by default with no to disable.
+If you haven't enabled the feature before, you need to rebuild parts of the index.
+For more information, see guides/admin/docs/configuration/episode-id-roles.md.

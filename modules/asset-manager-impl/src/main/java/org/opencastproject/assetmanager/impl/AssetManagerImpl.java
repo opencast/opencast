@@ -32,8 +32,6 @@ import static org.opencastproject.security.api.SecurityConstants.EPISODE_ROLE_ID
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLE;
 import static org.opencastproject.security.util.SecurityUtil.getEpisodeRoleId;
-import static org.opencastproject.systems.OpencastConstants.EPISODE_ID_ROLE_ACCESS_PROPERTY;
-import static org.opencastproject.systems.OpencastConstants.EPISODE_ID_ROLE_ACCESS_PROPERTY_DEFAULT;
 
 import org.opencastproject.assetmanager.api.Asset;
 import org.opencastproject.assetmanager.api.AssetId;
@@ -179,8 +177,6 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
   private static final String MANIFEST_DEFAULT_NAME = "manifest";
 
-  private static boolean episodeIdRole = EPISODE_ID_ROLE_ACCESS_PROPERTY_DEFAULT;
-
   private CopyOnWriteArrayList<AssetManagerUpdateHandler> handlers = new CopyOnWriteArrayList<>();
 
   private SecurityService securityService;
@@ -223,11 +219,6 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     includeAPIRoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeAPIRoles"), null));
     includeCARoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeCARoles"), null));
     includeUIRoles = BooleanUtils.toBoolean(Objects.toString(cc.getProperties().get("includeUIRoles"), null));
-
-    episodeIdRole = Optional.ofNullable(cc.getBundleContext().getProperty(EPISODE_ID_ROLE_ACCESS_PROPERTY))
-        .map(BooleanUtils::toBoolean)
-        .orElse(EPISODE_ID_ROLE_ACCESS_PROPERTY_DEFAULT);
-    logger.debug("Usage of episode ID roles is set to {}", episodeIdRole);
   }
 
   /**
@@ -1082,7 +1073,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     return securityService.getUser().getRoles().stream()
             .filter(roleFilter)
             .map((role) -> {
-              if (episodeIdRole && role.getName().startsWith(EPISODE_ROLE_ID_PREFIX)) {
+              if (role.getName().startsWith(EPISODE_ROLE_ID_PREFIX)) {
                 return q.mediapackageId().eq(StringUtils.substringBetween(
                     role.getName(), EPISODE_ROLE_ID_PREFIX + "_", "_"));
               } else {
@@ -1119,7 +1110,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
         }
         // check episode role id
         User user = securityService.getUser();
-        if (episodeIdRole && user.hasRole(getEpisodeRoleId(mediaPackageId, action))) {
+        if (user.hasRole(getEpisodeRoleId(mediaPackageId, action))) {
           return true;
         }
         // check acl rules

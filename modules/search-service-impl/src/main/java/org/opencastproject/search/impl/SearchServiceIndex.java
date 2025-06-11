@@ -22,8 +22,6 @@
 package org.opencastproject.search.impl;
 
 import static org.opencastproject.security.util.SecurityUtil.getEpisodeRoleId;
-import static org.opencastproject.systems.OpencastConstants.EPISODE_ID_ROLE_ACCESS_PROPERTY;
-import static org.opencastproject.systems.OpencastConstants.EPISODE_ID_ROLE_ACCESS_PROPERTY_DEFAULT;
 
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
@@ -67,7 +65,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.BooleanUtils;
 import org.elasticsearch.ElasticsearchStatusException;
 import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.index.IndexRequest;
@@ -100,7 +97,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -151,8 +147,6 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
 
   private ListProvidersService listProvidersService;
 
-  private boolean episodeIdRole = EPISODE_ID_ROLE_ACCESS_PROPERTY_DEFAULT;
-
   private String systemUserName = null;
 
 
@@ -170,11 +164,6 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
    */
   @Activate
   public void activate(final ComponentContext cc) throws IllegalStateException {
-    episodeIdRole = Optional.ofNullable(cc.getBundleContext().getProperty(EPISODE_ID_ROLE_ACCESS_PROPERTY))
-        .map(BooleanUtils::toBoolean)
-        .orElse(EPISODE_ID_ROLE_ACCESS_PROPERTY_DEFAULT);
-    logger.debug("Usage of episode ID roles is set to {}", episodeIdRole);
-
     createIndex();
     systemUserName = SecurityUtil.getSystemUserName(cc);
   }
@@ -318,28 +307,26 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
 
     // Add custom roles to the ACL
     // This allows users with a role of the form ROLE_EPISODE_<ID>_<ACTION> to access the event through the index
-    if (episodeIdRole) {
-      Set<AccessControlEntry> customEntries = new HashSet<>();
-      customEntries.add(new AccessControlEntry(getEpisodeRoleId(mediaPackageId, "READ"), "read", true));
-      customEntries.add(new AccessControlEntry(getEpisodeRoleId(mediaPackageId, "WRITE"), "write", true));
+    Set<AccessControlEntry> customEntries = new HashSet<>();
+    customEntries.add(new AccessControlEntry(getEpisodeRoleId(mediaPackageId, "READ"), "read", true));
+    customEntries.add(new AccessControlEntry(getEpisodeRoleId(mediaPackageId, "WRITE"), "write", true));
 
-      ResourceListQuery query = new ResourceListQueryImpl();
-      if (listProvidersService.hasProvider("ACL.ACTIONS")) {
-        Map<String, String> actions = new HashMap<>();
-        try {
-          actions = listProvidersService.getList("ACL.ACTIONS", query, true);
-        } catch (ListProviderException e) {
-          throw new SearchException("Listproviders not loaded. " + e);
-        }
-        for (String action : actions.keySet()) {
-          customEntries.add(
-              new AccessControlEntry(getEpisodeRoleId(mediaPackageId, action), action, true));
-        }
+    ResourceListQuery query = new ResourceListQueryImpl();
+    if (listProvidersService.hasProvider("ACL.ACTIONS")) {
+      Map<String, String> actions = new HashMap<>();
+      try {
+        actions = listProvidersService.getList("ACL.ACTIONS", query, true);
+      } catch (ListProviderException e) {
+        throw new SearchException("Listproviders not loaded. " + e);
       }
-
-      AccessControlList customRoles = new AccessControlList(new ArrayList<>(customEntries));
-      acl = customRoles.merge(acl);
+      for (String action : actions.keySet()) {
+        customEntries.add(
+            new AccessControlEntry(getEpisodeRoleId(mediaPackageId, action), action, true));
+      }
     }
+
+    AccessControlList customRoles = new AccessControlList(new ArrayList<>(customEntries));
+    acl = customRoles.merge(acl);
 
     SearchResult item = new SearchResult(SearchService.IndexEntryType.Episode, dc, acl, orgId, mediaPackage,
         null != modDate ? modDate.toInstant() : Instant.now(),

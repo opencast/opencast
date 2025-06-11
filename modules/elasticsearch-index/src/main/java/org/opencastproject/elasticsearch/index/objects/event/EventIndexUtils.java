@@ -115,8 +115,7 @@ public final class EventIndexUtils {
    *          the recording event
    * @return the set of metadata
    */
-  public static SearchMetadataCollection toSearchMetadata(Event event, ListProvidersService listProviderService,
-      boolean episodeIdRole) {
+  public static SearchMetadataCollection toSearchMetadata(Event event, ListProvidersService listProviderService) {
     SearchMetadataCollection metadata = new SearchMetadataCollection(
             event.getIdentifier().concat(event.getOrganization()), Event.DOCUMENT_TYPE);
     metadata.addField(EventIndexSchema.UID, event.getIdentifier(), false);
@@ -247,7 +246,7 @@ public final class EventIndexUtils {
 
     if (StringUtils.isNotBlank(event.getAccessPolicy())) {
       metadata.addField(EventIndexSchema.ACCESS_POLICY, event.getAccessPolicy(), false);
-      addAuthorization(metadata, event.getAccessPolicy(), event.getIdentifier(), listProviderService, episodeIdRole);
+      addAuthorization(metadata, event.getAccessPolicy(), event.getIdentifier(), listProviderService);
     }
 
     if (StringUtils.isNotBlank(event.getAgentId())) {
@@ -373,7 +372,7 @@ public final class EventIndexUtils {
    *          the access control list string
    */
   private static void addAuthorization(SearchMetadataCollection doc, String aclString,
-      String eventId, ListProvidersService listProvidersService, boolean episodeIdRole) {
+      String eventId, ListProvidersService listProvidersService) {
     Map<String, List<String>> permissions = new HashMap<>();
 
     // Define containers for common permissions
@@ -386,26 +385,24 @@ public final class EventIndexUtils {
     List<AccessControlEntry> entries = acl.getEntries();
 
     // Add special action roles for episode id roles
-    if (episodeIdRole) {
-      Set<AccessControlEntry> customEntries = new HashSet<>();
-      customEntries.add(new AccessControlEntry(getEpisodeRoleId(eventId, "READ"), "read", true));
-      customEntries.add(new AccessControlEntry(getEpisodeRoleId(eventId, "WRITE"), "write", true));
+    Set<AccessControlEntry> customEntries = new HashSet<>();
+    customEntries.add(new AccessControlEntry(getEpisodeRoleId(eventId, "READ"), "read", true));
+    customEntries.add(new AccessControlEntry(getEpisodeRoleId(eventId, "WRITE"), "write", true));
 
-      ResourceListQuery query = new ResourceListQueryImpl();
-      if (listProvidersService.hasProvider("ACL.ACTIONS")) {
-        Map<String, String> actions = new HashMap<>();
-        try {
-          actions = listProvidersService.getList("ACL.ACTIONS", query, true);
-        } catch (ListProviderException e) {
-          logger.error("Listproviders not loaded. " + e);
-        }
-        for (String action : actions.keySet()) {
-          customEntries.add(new AccessControlEntry(getEpisodeRoleId(eventId, action), action, true));
-        }
+    ResourceListQuery query = new ResourceListQueryImpl();
+    if (listProvidersService.hasProvider("ACL.ACTIONS")) {
+      Map<String, String> actions = new HashMap<>();
+      try {
+        actions = listProvidersService.getList("ACL.ACTIONS", query, true);
+      } catch (ListProviderException e) {
+        logger.error("Listproviders not loaded. " + e);
       }
-
-      entries.addAll(customEntries);
+      for (String action : actions.keySet()) {
+        customEntries.add(new AccessControlEntry(getEpisodeRoleId(eventId, action), action, true));
+      }
     }
+
+    entries.addAll(customEntries);
 
     // Convert roles to permission blocks
     for (AccessControlEntry entry : entries) {
