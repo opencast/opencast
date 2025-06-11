@@ -1,0 +1,36 @@
+id: republish-metadata
+title: Republish metadata
+tags:
+  - archive
+displayOrder: 900
+description: |-
+  Updates the publications with the latest metadata.
+state-mappings:
+  - state: running
+    value: EVENTS.EVENTS.STATE_MAPPING.REPUBLISHING_METADATA
+  - state: failing
+    value: EVENTS.EVENTS.STATE_MAPPING.REPUBLISHING_METADATA
+operations:
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # Publish to publication channels
+
+  # Update the recording metadata in the publication channels.
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # Publish to engage player
+  - id: publish-engage
+    exception-handler-workflow: partial-error
+    description: Update recording in Opencast Media Module
+    configurations:
+      - download-source-flavors: dublincore/*,security/*
+      - strategy: merge
+      - check-availability: false
+  # Here you can place operations to republish metadata to your publication channels
+  - id: cleanup
+    fail-on-error: false
+    description: Remove temporary processing artifacts
+    configurations:
+      # On systems with shared workspace or working file repository
+      # you want to set this option to false.
+      - delete-external: true
+      # ACLs are required again when working through ActiveMQ messages
+      - preserve-flavors: security/*

@@ -1,0 +1,30 @@
+id: partial-process-uploaded-captions
+title: Process uploaded captions
+operations:
+  # cut captions
+  - id: clone
+    exception-handler-workflow: partial-error
+    description: Create working copy of the cutting information
+    configurations:
+      - source-flavor: smil/cutting
+      - target-flavor: smil/tmp
+  - id: editor
+    exception-handler-workflow: partial-error
+    description: Cut the captions
+    configurations:
+      - source-flavors: captions/source
+      - smil-flavors: smil/tmp
+      - target-smil-flavor: smil/tmp
+      - target-flavor-subtype: delivery
+      - interactive: false
+  # tag results
+  - id: tag
+    description: Tag captions for delivery
+    configurations:
+      - source-flavors: captions/delivery
+      - target-tags: -archive,+generator:unknown,+engage-download
+  - id: tag
+    description: Don't publish captions/source
+    configurations:
+      - source-flavors: captions/source
+      - target-tags: +exclude-publish

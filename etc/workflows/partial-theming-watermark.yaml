@@ -1,0 +1,40 @@
+id: partial-theming-watermark
+title: Render watermark into trimmed video
+operations:
+  # Replace trimmed with branded variants
+  - id: tag
+    description: Select tracks for watermarking
+    configurations:
+      - source-flavors: '*/trimmed'
+      - target-flavor: '*/branding'
+  # Render watermark into presenter and presentation tracks
+  - id: composite
+    if: ${presenter_trimmed_video}
+    exception-handler-workflow: partial-error
+    description: Render watermark into presenter track
+    configurations:
+      - source-flavor-lower: presenter/branding
+      - source-flavor-upper: not/available
+      - source-flavor-watermark: branding/watermark
+      - encoding-profile: composite.http
+      - target-flavor: presenter/trimmed
+      - output-resolution: lower
+      - output-background: '0x000000FF'
+      - layout-single: |-
+          {"horizontalCoverage":1.0,"anchorOffset":{"referring":{"left":1.0,"top":0.0},"reference":{"left":1.0,"top":0.0},"offset":{"x":0,"y":0}}};
+                    ${theme_watermark_layout_variable}
+  - id: composite
+    if: ${presentation_trimmed_video}
+    exception-handler-workflow: partial-error
+    description: Render watermark into presentation track
+    configurations:
+      - source-flavor-lower: presentation/branding
+      - source-flavor-upper: not/available
+      - source-flavor-watermark: branding/watermark
+      - encoding-profile: composite.http
+      - target-flavor: presentation/trimmed
+      - output-resolution: lower
+      - output-background: '0x000000FF'
+      - layout-single: |-
+          {"horizontalCoverage":1.0,"anchorOffset":{"referring":{"left":1.0,"top":0.0},"reference":{"left":1.0,"top":0.0},"offset":{"x":0,"y":0}}};
+                    ${theme_watermark_layout_variable}

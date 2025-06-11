@@ -1,0 +1,52 @@
+id: publish
+title: Publish
+tags:
+  - archive
+  - editor
+displayOrder: 1000
+description: |-
+  Process media files and publish them.
+state-mappings:
+  - state: running
+    value: EVENTS.EVENTS.STATE_MAPPING.PUBLISHING
+  - state: failing
+    value: EVENTS.EVENTS.STATE_MAPPING.PUBLISHING
+operations:
+  - id: comment
+    description: Resolving the cutting marker
+    configurations:
+      - description: Recording has not been cut yet.
+      - reason: EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.CUTTING
+      - action: resolve
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # Publish
+
+  # Encode and publish the recording to the selected publication
+  # channels, unless review for cutting has been selected.
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # Encode and publish
+  - id: include
+    description: Publish the recording
+    configurations:
+      - workflow-id: partial-publish
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # Archive
+
+  # Download from external ingest nodes, tag, inspect and and prepare
+  # source recording and metadata catalogs.
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # Archive the recording
+  - id: snapshot
+    description: Archive publishing information
+    configurations:
+      - source-tags: archive
+  # Clean up work artifacts
+  - id: cleanup
+    fail-on-error: false
+    description: Remove temporary processing artifacts
+    configurations:
+      # On systems with shared workspace or working file repository
+      # you want to set this option to false.
+      - delete-external: true
+      # ACLs are required again when working through ActiveMQ messages
+      - preserve-flavors: security/*

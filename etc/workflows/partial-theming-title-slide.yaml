@@ -1,0 +1,42 @@
+id: partial-theming-title-slide
+title: Theme title slide
+operations:
+  # Create a title slide video if theme has active title slide
+  - id: image
+    if: NOT ${theme_title_slide_uploaded} AND ${presentation_trimmed_video}
+    exception-handler-workflow: partial-error
+    description: Extracting title slide image from presentation track
+    configurations:
+      - source-flavor: presentation/trimmed
+      - target-flavor: branding/titleslide
+      - encoding-profile: player-preview.http
+      - time: 1
+  - id: image
+    if: NOT ${theme_title_slide_uploaded} AND NOT ${presentation_trimmed_video} 
+      AND ${presenter_trimmed_video}
+    exception-handler-workflow: partial-error
+    description: Extracting title slide image from presenter track
+    configurations:
+      - source-flavor: presenter/trimmed
+      - target-flavor: branding/titleslide
+      - encoding-profile: player-preview.http
+      - time: 1
+  - id: cover-image
+    if: ${presentation_trimmed_video} OR ${presenter_trimmed_video}
+    exception-handler-workflow: partial-error
+    description: Create title slide with metadata
+    configurations:
+      - stylesheet: file://${karaf.etc}/branding/coverimage.xsl
+      - width: 1920
+      - height: 1080
+      - posterimage-flavor: branding/titleslide
+      - target-flavor: branding/titleslide+metadata
+  - id: image-to-video
+    if: ${presentation_trimmed_video} OR ${presenter_trimmed_video}
+    exception-handler-workflow: partial-error
+    description: Create video with title slide
+    configurations:
+      - source-flavor: branding/titleslide+metadata
+      - target-flavor: branding/titleslide+video
+      - duration: 5
+      - profile: image-movie.work

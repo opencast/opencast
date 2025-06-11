@@ -1,0 +1,32 @@
+id: copy-event-to-series
+title: Copy event to a different series
+displayOrder: 10
+state-mappings:
+  - state: running
+    value: EVENTS.EVENTS.STATE_MAPPING.DUPLICATING
+  - state: failing
+    value: EVENTS.EVENTS.STATE_MAPPING.DUPLICATING
+operations:
+  - id: duplicate-event
+    fail-on-error: true
+    exception-handler-workflow: partial-error
+    description: Duplicate Event
+    configurations:
+      - source-flavors: '*/*'
+      - number-of-events: ${numberOfEvents}
+      - target-tags: archive
+      - property-namespaces: 
+          org.opencastproject.assetmanager.security,org.opencastproject.workflow.configuration
+      - copy-number-prefix: copy
+      - no-suffix: ${noSuffix}
+      - set-series-id: ${setSeriesId}
+  # Clean up work artifacts
+  - id: cleanup
+    fail-on-error: false
+    description: Remove temporary processing artifacts
+    configurations:
+      # On systems with shared workspace or working file repository
+      # you want to set this option to false.
+      - delete-external: true
+      # ACLs are required again when working through ActiveMQ messages
+      - preserve-flavors: security/*
