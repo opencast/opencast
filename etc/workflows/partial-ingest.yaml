@@ -18,6 +18,7 @@ operations:
     description: Ingesting external elements
     configurations:
       - delete-external: true
+
   # Inspect the media
   - id: inspect
     exception-handler-workflow: partial-error
@@ -25,6 +26,7 @@ operations:
     configurations:
       - overwrite: false
       - accept-no-media: false
+
   # Apply access control lists from series to the mediapackage
   # Also append the series metadata catalogs
   - id: series
@@ -33,6 +35,7 @@ operations:
     configurations:
       - attach: '*'
       - apply-acl: true
+
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # Tag for archival
 

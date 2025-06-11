@@ -7,6 +7,7 @@ operations:
     configurations:
       - source-flavors: '*/trimmed'
       - target-flavor: '*/branding'
+
   # Render watermark into presenter and presentation tracks
   - id: composite
     if: ${presenter_trimmed_video}
@@ -23,6 +24,7 @@ operations:
       - layout-single: |-
           {"horizontalCoverage":1.0,"anchorOffset":{"referring":{"left":1.0,"top":0.0},"reference":{"left":1.0,"top":0.0},"offset":{"x":0,"y":0}}};
                     ${theme_watermark_layout_variable}
+
   - id: composite
     if: ${presentation_trimmed_video}
     exception-handler-workflow: partial-error

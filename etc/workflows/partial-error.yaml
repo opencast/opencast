@@ -9,6 +9,7 @@ operations:
     configurations:
       - source-flavors: '*/source,dublincore/*,security/*'
       - source-tags: archive
+
   # Clean up the temporary files from the working file repository
   - id: cleanup
     fail-on-error: false

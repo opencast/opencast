@@ -11,6 +11,7 @@ operations:
       - target-flavor: branding/titleslide
       - encoding-profile: player-preview.http
       - time: 1
+
   - id: image
     if: NOT ${theme_title_slide_uploaded} AND NOT ${presentation_trimmed_video} 
       AND ${presenter_trimmed_video}
@@ -21,6 +22,7 @@ operations:
       - target-flavor: branding/titleslide
       - encoding-profile: player-preview.http
       - time: 1
+
   - id: cover-image
     if: ${presentation_trimmed_video} OR ${presenter_trimmed_video}
     exception-handler-workflow: partial-error
@@ -31,6 +33,7 @@ operations:
       - height: 1080
       - posterimage-flavor: branding/titleslide
       - target-flavor: branding/titleslide+metadata
+
   - id: image-to-video
     if: ${presentation_trimmed_video} OR ${presenter_trimmed_video}
     exception-handler-workflow: partial-error

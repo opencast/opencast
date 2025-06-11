@@ -15,11 +15,12 @@ operations:
       - source-flavors: '*/*'
       - number-of-events: ${numberOfEvents}
       - target-tags: archive
-      - property-namespaces: 
+      - property-namespaces:
           org.opencastproject.assetmanager.security,org.opencastproject.workflow.configuration
       - copy-number-prefix: copy
       - no-suffix: ${noSuffix}
       - set-series-id: ${setSeriesId}
+
   # Clean up work artifacts
   - id: cleanup
     fail-on-error: false

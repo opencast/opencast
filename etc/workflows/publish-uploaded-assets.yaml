@@ -1,6 +1,6 @@
 id: publish-uploaded-assets
 title: Publish uploaded assets
-tags: []
+tags: [] # Only launched from add asset in admin interface, not available for selection by end users via the Admin UI
 description: |-
   Publish uploaded assets
 state-mappings:
@@ -14,12 +14,14 @@ operations:
     description: Set control variables for captions
     configurations:
       - set-tag-variables: true
+
   # Tag new assets for archival
   - id: tag
     description: Tag newly uploaded assets for archival
     configurations:
       - source-flavors: '*/*'
       - target-tags: +archive
+
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # Special handling for captions
 
@@ -33,23 +35,26 @@ operations:
     description: Include special handling for uploaded captions
     configurations:
       - workflow-id: partial-process-uploaded-captions
+
   # Publish to engage player
   - id: publish-engage
     exception-handler-workflow: partial-error
     description: Update recording in Opencast Media Module
     configurations:
-      - download-source-flavors: 
+      - download-source-flavors:
           ${download-source-flavors},dublincore/*,security/*
       - download-source-tags: engage-download,-exclude-publish
       # exclude necessary bc of download_source_flavors
       - streaming-source-tags: engage-streaming
       - strategy: merge
       - check-availability: false
+
   # Archive uploaded assets
   - id: snapshot
     description: Archiving new assets
     configurations:
       - source-tags: archive
+
   # Clean up work artifacts
   - id: cleanup
     fail-on-error: false

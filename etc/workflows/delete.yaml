@@ -14,14 +14,17 @@ operations:
     description: Retract the recording
     configurations:
       - workflow-id: retract
+
   - id: retract-configure
     exception-handler-workflow: partial-error
     description: Retract from internal publication channel
     configurations:
       - channel-id: internal
+
   - id: snapshot
     exception-handler-workflow: partial-error
     description: Archiving state of retracted recording
+
   - id: cleanup
     fail-on-error: false
     description: Remove temporary processing artifacts

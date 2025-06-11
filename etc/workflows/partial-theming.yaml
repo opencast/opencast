@@ -1,6 +1,5 @@
 id: partial-theming
 title: Run theming operations on trimmed videos
-tags: []
 operations:
   # Apply the theme to the mediapackage
   - id: theme

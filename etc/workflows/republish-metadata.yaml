@@ -24,6 +24,7 @@ operations:
       - download-source-flavors: dublincore/*,security/*
       - strategy: merge
       - check-availability: false
+
   # Here you can place operations to republish metadata to your publication channels
   - id: cleanup
     fail-on-error: false

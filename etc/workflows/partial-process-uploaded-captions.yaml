@@ -8,6 +8,7 @@ operations:
     configurations:
       - source-flavor: smil/cutting
       - target-flavor: smil/tmp
+
   - id: editor
     exception-handler-workflow: partial-error
     description: Cut the captions
@@ -17,6 +18,7 @@ operations:
       - target-smil-flavor: smil/tmp
       - target-flavor-subtype: delivery
       - interactive: false
+
   # tag results
   - id: tag
     description: Tag captions for delivery

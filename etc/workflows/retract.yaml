@@ -14,10 +14,12 @@ operations:
   - id: retract-engage
     exception-handler-workflow: partial-error
     description: Retract recording from Engage
+
   # Here you can place operations to retract publication from your publication channels
   - id: snapshot
     exception-handler-workflow: partial-error
     description: Archiving state of retracted recording
+
   - id: cleanup
     fail-on-error: false
     description: Remove temporary processing artifacts

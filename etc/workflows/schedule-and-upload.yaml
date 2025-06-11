@@ -7,20 +7,18 @@ displayOrder: 1000
 description: |-
   The default workflow for processing media.
 
-      If straight to publishing is checked, then the uploaded media will be published without cutting.
-configuration_panel_json: |2-
-
-      [{
-        "fieldset": [
-          {
-            "type": "checkbox",
-            "name": "straightToPublishing",
-            "label": "Straight to publishing",
-            "value": true
-          }
-        ]
-      }]
-    
+  If straight to publishing is checked, then the uploaded media will be published without cutting.
+configuration_panel_json: |-
+  [{
+    "fieldset": [
+      {
+        "type": "checkbox",
+        "name": "straightToPublishing",
+        "label": "Straight to publishing",
+        "value": true
+      }
+    ]
+  }]
 operations:
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # Apply default workflow properties
@@ -32,6 +30,7 @@ operations:
     description: Applying default configuration values
     configurations:
       - straightToPublishing: true
+
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # Prepare asset
 
@@ -45,21 +44,25 @@ operations:
     description: Finalize upload and ingest
     configurations:
       - workflow-id: partial-ingest
+
   # Archive the source material
   - id: snapshot
     description: Archive raw recording after ingest
     configurations:
       - source-tags: archive
+
   # Create preview artifacts
   - id: include
     description: Prepare preview versions of the recording
     configurations:
       - workflow-id: partial-preview
+
   # Archive generated preview assets
   - id: snapshot
     description: Archive preview information
     configurations:
       - source-tags: archive
+
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # Tag for review and cutting
 
@@ -74,6 +77,7 @@ operations:
       - description: Recording has not been cut yet.
       - reason: EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.CUTTING
       - action: create
+
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # Publish
 
@@ -85,12 +89,14 @@ operations:
     description: Publish the recording
     configurations:
       - workflow-id: partial-publish
+
   # Archive the recording
   - id: snapshot
     if: ${straightToPublishing}
     description: Archive publishing information
     configurations:
       - source-tags: archive
+
   # Clean up work artifacts
   - id: cleanup
     fail-on-error: false
