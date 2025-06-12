@@ -194,7 +194,7 @@ public class EditorServiceImpl implements EditorService {
   private static final List<MediaPackageElementFlavor> DEFAULT_THUMBNAIL_PRIORITY_FLAVOR = new ArrayList<>();
   private static final int DEFAULT_LOCK_TIMEOUT_SECONDS = 300; // ( 5 mins )
   private static final int DEFAULT_LOCK_REFRESH_SECONDS = 60;  // ( 1 min )
-  private static final String DEFAULT_PADDING_LENGTH = "0"; // (0 secs)
+  private static final String DEFAULT_PADDING_LENGTH = "3000"; // (0 secs)
   private static final String DEFAULT_MIN_VIDEO_DURATION = "6000"; // (6 secs)
 
   public static final String OPT_PREVIEW_SUBTYPE = "preview.subtype";
