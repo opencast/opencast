@@ -44,8 +44,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -72,9 +70,7 @@ import java.net.URI;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 /** Prolong immediate recordings before reaching the end, as long as there are no conflicts */
 @Component(
@@ -360,8 +356,8 @@ public class CaptureNowProlongingService implements ManagedService {
    */
   public MediaPackage getCurrentRecording(String agentId)
           throws NotFoundException, UnauthorizedException, SchedulerException {
-    Opt<MediaPackage> current = schedulerService.getCurrentRecording(agentId);
-    if (current.isNone()) {
+    Optional<MediaPackage> current = schedulerService.getCurrentRecording(agentId);
+    if (current.isEmpty()) {
       logger.warn("Unable to load the current recording for agent '{}': no recording found", agentId);
       throw new NotFoundException("No current recording found for agent '" + agentId + "'");
     }
@@ -436,9 +432,9 @@ public class CaptureNowProlongingService implements ManagedService {
       c.setChecksum(null);
     }
 
-    schedulerService.updateEvent(eventId, Opt.<Date> none(), Opt.some(prolongedEndDate), Opt.<String> none(),
-            Opt.<Set<String>> none(), Opt.some(event), Opt.<Map<String, String>> none(),
-            Opt.<Map<String, String>> none());
+    schedulerService.updateEvent(eventId, Optional.empty(), Optional.of(prolongedEndDate), Optional.empty(),
+        Optional.empty(), Optional.of(event), Optional.empty(),
+        Optional.empty());
   }
 
 }

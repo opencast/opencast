@@ -26,14 +26,13 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.NotFoundException;
 
-import com.entwinemedia.fn.data.Opt;
-
 import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.property.RRule;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -86,10 +85,16 @@ public interface SchedulerService {
    * @throws SchedulerException
    *           if creating new events failed
    */
-  void addEvent(Date startDateTime, Date endDateTime, String captureAgentId, Set<String> userIds,
-          MediaPackage mediaPackage, Map<String, String> wfProperties, Map<String, String> caMetadata,
-          Opt<String> schedulingSource) throws UnauthorizedException,
-                  SchedulerConflictException, SchedulerException;
+  void addEvent(
+      Date startDateTime,
+      Date endDateTime,
+      String captureAgentId,
+      Set<String> userIds,
+      MediaPackage mediaPackage,
+      Map<String, String> wfProperties,
+      Map<String, String> caMetadata,
+      Optional<String> schedulingSource
+  ) throws UnauthorizedException, SchedulerConflictException, SchedulerException;
 
   /**
    * Creates a group of new event using specified mediapackage, workflow configuration and capture agent configuration.
@@ -132,10 +137,19 @@ public interface SchedulerService {
    * @throws SchedulerException
    *           if creating new events failed
    */
-  Map<String, Period> addMultipleEvents(RRule rRule, Date start, Date end, Long duration, TimeZone tz,
-          String captureAgentId, Set<String> userIds, MediaPackage templateMp, Map<String,
-          String> wfProperties, Map<String, String> caMetadata, Opt<String> schedulingSource)
-          throws UnauthorizedException, SchedulerConflictException, SchedulerException;
+  Map<String, Period> addMultipleEvents(
+      RRule rRule,
+      Date start,
+      Date end,
+      Long duration,
+      TimeZone tz,
+      String captureAgentId,
+      Set<String> userIds,
+      MediaPackage templateMp,
+      Map<String, String> wfProperties,
+      Map<String, String> caMetadata,
+      Optional<String> schedulingSource
+  ) throws UnauthorizedException, SchedulerConflictException, SchedulerException;
 
   /**
    * Updates event with specified ID and check for conflicts.
@@ -172,10 +186,16 @@ public interface SchedulerService {
    * @throws SchedulerException
    *           if exception occurred
    */
-  void updateEvent(String mediaPackageId, Opt<Date> startDateTime, Opt<Date> endDateTime, Opt<String> captureAgentId,
-          Opt<Set<String>> userIds, Opt<MediaPackage> mediaPackage, Opt<Map<String, String>> wfProperties,
-          Opt<Map<String, String>> caMetadata)
-                  throws NotFoundException, UnauthorizedException, SchedulerConflictException, SchedulerException;
+  void updateEvent(
+      String mediaPackageId,
+      Optional<Date> startDateTime,
+      Optional<Date> endDateTime,
+      Optional<String> captureAgentId,
+      Optional<Set<String>> userIds,
+      Optional<MediaPackage> mediaPackage,
+      Optional<Map<String, String>> wfProperties,
+      Optional<Map<String, String>> caMetadata
+  ) throws NotFoundException, UnauthorizedException, SchedulerConflictException, SchedulerException;
 
   /**
    * Updates event with specified ID and possibly checking for conflicts.
@@ -214,10 +234,17 @@ public interface SchedulerService {
    * @throws SchedulerException
    *           if exception occurred
    */
-  void updateEvent(String mediaPackageId, Opt<Date> startDateTime, Opt<Date> endDateTime, Opt<String> captureAgentId,
-          Opt<Set<String>> userIds, Opt<MediaPackage> mediaPackage, Opt<Map<String, String>> wfProperties,
-          Opt<Map<String, String>> caMetadata, boolean allowConflict)
-                  throws NotFoundException, UnauthorizedException, SchedulerConflictException, SchedulerException;
+  void updateEvent(
+      String mediaPackageId,
+      Optional<Date> startDateTime,
+      Optional<Date> endDateTime,
+      Optional<String> captureAgentId,
+      Optional<Set<String>> userIds,
+      Optional<MediaPackage> mediaPackage,
+      Optional<Map<String, String>> wfProperties,
+      Optional<Map<String, String>> caMetadata,
+      boolean allowConflict
+  ) throws NotFoundException, UnauthorizedException, SchedulerConflictException, SchedulerException;
 
   /**
    * Removes event with specified ID.
@@ -334,8 +361,13 @@ public interface SchedulerService {
    * @throws SchedulerException
    *           if exception occurred
    */
-  List<MediaPackage> search(Opt<String> captureAgentId, Opt<Date> startsFrom, Opt<Date> startsTo, Opt<Date> endFrom,
-          Opt<Date> endTo) throws SchedulerException, UnauthorizedException;
+  List<MediaPackage> search(
+      Optional<String> captureAgentId,
+      Optional<Date> startsFrom,
+      Optional<Date> startsTo,
+      Optional<Date> endFrom,
+      Optional<Date> endTo
+  ) throws SchedulerException, UnauthorizedException;
 
   /**
    * Retrieves the currently active recording for the given capture agent (if any).
@@ -346,7 +378,7 @@ public interface SchedulerService {
    * @throws SchedulerException
    *           In case the current recording cannot be retrieved.
    */
-  Opt<MediaPackage> getCurrentRecording(String captureAgentId) throws SchedulerException, UnauthorizedException;
+  Optional<MediaPackage> getCurrentRecording(String captureAgentId) throws SchedulerException, UnauthorizedException;
 
   /**
    * Retrieves the upcoming recording for the given capture agent (if any).
@@ -357,7 +389,7 @@ public interface SchedulerService {
    * @throws SchedulerException
    *           In case the upcoming recording cannot be retrieved.
    */
-  Opt<MediaPackage> getUpcomingRecording(String captureAgentId) throws SchedulerException, UnauthorizedException;
+  Optional<MediaPackage> getUpcomingRecording(String captureAgentId) throws SchedulerException, UnauthorizedException;
 
   /**
    * Returns list of all conflicting events, i.e. all events that ends after start date and begins before end date.
@@ -416,7 +448,11 @@ public interface SchedulerService {
    * @throws SchedulerException
    *           if exception occurred
    */
-  String getCalendar(Opt<String> captureAgentId, Opt<String> seriesId, Opt<Date> cutoff) throws SchedulerException;
+  String getCalendar(
+      Optional<String> captureAgentId,
+      Optional<String> seriesId,
+      Optional<Date> cutoff
+  ) throws SchedulerException;
 
   /**
    * Returns hash of last modification of event belonging to specified capture agent.

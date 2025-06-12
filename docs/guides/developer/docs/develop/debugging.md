@@ -142,6 +142,6 @@ For security reasons, remember to disable the web console in production systems 
 
 ## Automatic Module Reloading
 
-See [Build Single Modules](development-environment.md#build-single-modules)
+See [Build Single Modules](setup-opencast-for-develop.md#build-single-modules)
 
 

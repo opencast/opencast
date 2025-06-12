@@ -83,8 +83,6 @@ import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.data.Opt;
-
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.property.RRule;
@@ -540,7 +538,7 @@ public class IndexServiceImplTest {
     schedulerService.addEvent(EasyMock.capture(captureStart), EasyMock.capture(captureEnd), EasyMock.anyString(),
             EasyMock.<Set<String>> anyObject(), EasyMock.anyObject(MediaPackage.class),
             EasyMock.<Map<String, String>> anyObject(), EasyMock.<Map<String, String>> anyObject(),
-            EasyMock.<Opt<String>> anyObject());
+            EasyMock.<Optional<String>> anyObject());
     EasyMock.expectLastCall().once();
     EasyMock.replay(schedulerService);
 
@@ -686,7 +684,7 @@ public class IndexServiceImplTest {
             EasyMock.capture(schedRRule), EasyMock.capture(schedStart), EasyMock.capture(schedEnd),
             EasyMock.captureLong(schedDuration), EasyMock.capture(schedTz), EasyMock.anyString(),
             EasyMock.<Set<String>>anyObject(), EasyMock.capture(mp), EasyMock.<Map<String, String>>anyObject(),
-            EasyMock.<Map<String, String>>anyObject(), EasyMock.<Opt<String>>anyObject())).
+            EasyMock.<Map<String, String>>anyObject(), EasyMock.<Optional<String>>anyObject())).
             andAnswer(new IAnswer<Map<String, Period>>() {
               @Override
               public Map<String, Period> answer() throws Throwable {
@@ -851,10 +849,10 @@ public class IndexServiceImplTest {
     // Using scheduler as the source of the media package here.
     SchedulerService schedulerService = EasyMock.createMock(SchedulerService.class);
     EasyMock.expect(schedulerService.getMediaPackage(EasyMock.anyString())).andReturn(mp);
-    Capture<Opt<MediaPackage>> mpCapture = Capture.newInstance();
-    schedulerService.updateEvent(EasyMock.anyString(), EasyMock.anyObject(Opt.class),
-            EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class),
-            EasyMock.capture(mpCapture), EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class));
+    Capture<Optional<MediaPackage>> mpCapture = Capture.newInstance();
+    schedulerService.updateEvent(EasyMock.anyString(), EasyMock.anyObject(Optional.class),
+            EasyMock.anyObject(Optional.class), EasyMock.anyObject(Optional.class), EasyMock.anyObject(Optional.class),
+            EasyMock.capture(mpCapture), EasyMock.anyObject(Optional.class), EasyMock.anyObject(Optional.class));
     EasyMock.expectLastCall();
     EasyMock.replay(schedulerService);
     SeriesService seriesService = EasyMock.createMock(SeriesService.class);

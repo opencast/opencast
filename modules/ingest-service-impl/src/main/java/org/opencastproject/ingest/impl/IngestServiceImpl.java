@@ -99,7 +99,6 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 
-import com.entwinemedia.fn.data.Opt;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 
@@ -152,6 +151,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -1352,7 +1352,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
     try {
       schedulerService.addEvent(period.getStart(), period.getEnd(), captureAgent, new HashSet<>(), mediaPackage,
-              workflowProperties, agentProperties, Opt.none());
+              workflowProperties, agentProperties, Optional.empty());
     } finally {
       for (MediaPackageElement mediaPackageElement : mediaPackage.getElements()) {
         try {
