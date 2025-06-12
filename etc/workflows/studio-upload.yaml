@@ -49,7 +49,7 @@ operations:
     exception-handler-workflow: partial-error
     description: Applying access control entries
     configurations:
-      # <configuration key="series">[put your fixed series id here]</configuration>
+      # - series: '[put your fixed series id here]'
       - attach: '*'
       - apply-acl: true
 

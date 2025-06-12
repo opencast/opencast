@@ -65,11 +65,9 @@ public class HelloWorldWorkflowOperationHandler extends AbstractWorkflowOperatio
     // Read configuration key `message`, falling back to "Hello world!".
     // Configuration for this operation could look like this:
     //
-    //   <operation id="hello-world">
-    //     <configurations>
-    //       <configuration key="message">A configured message</configuration>
-    //     </configurations>
-    //   </operation>
+    //   - id: hello-world
+    //     configurations:
+    //       - message: A configured message
     String message = Objects.toString(
         operation.getConfiguration("message"),
         "Hello World!");

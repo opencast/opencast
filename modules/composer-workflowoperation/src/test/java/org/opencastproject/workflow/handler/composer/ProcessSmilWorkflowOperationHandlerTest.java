@@ -117,21 +117,18 @@ public class ProcessSmilWorkflowOperationHandlerTest {
   private static final String ENCODED_VARIANT_ID = "multiencode-workflow-operation-test-encode-track-id2";
   private static final String ENCODED_X264_ID = "multiencode-workflow-operation-test-encode-track-id3";
 
-  // <operation
-  // id="processsmil"
-  // if="${trimHold}"
-  // fail-on-error="true"
-  // exception-handler-workflow="error"
-  // description="takes a smil edit and transcode to all final formats concurrently">
-  // <configurations>
-  // <configuration key="source-flavors">presenter/*;presentation/*</configuration>
-  // <configuration key="smil-flavor">smil/smil</configuration>
-  // <configuration key="target-flavors">presenter/delivery;presentation/delivery</configuration>
-  // <configuration key="target-tags">engage;engage</configuration>
-  // <configuration key="encoding-profile">flash-vga.http;h264-low.http</configuration>
-  // <configuration key="tag-with-profile">true</configuration>
-  // </configurations>
-  // </operation>
+  // - id: processsmil
+  //   if: ${trimHold}
+  //   fail-on-error: true
+  //   exception-handler-workflow: error
+  //   description: takes a smil edit and transcode to all final formats concurrently
+  //   configurations:
+  //     - source-flavors: presenter/*;presentation/*
+  //     - smil-flavor: smil/smil
+  //     - target-flavors: presenter/delivery;presentation/delivery
+  //     - target-tags: engage;engage
+  //     - encoding-profile: flash-vga.http;h264-low.http
+  //     - tag-with-profile: true
   SmilMediaParam mockSmilMediaParam(String name, String value, String id) {
     SmilMediaParam param = EasyMock.createNiceMock(SmilMediaParam.class);
     EasyMock.expect(param.getName()).andReturn(name).anyTimes();

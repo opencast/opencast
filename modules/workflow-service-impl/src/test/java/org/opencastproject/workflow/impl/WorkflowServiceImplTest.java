@@ -73,6 +73,7 @@ import org.opencastproject.workflow.api.WorkflowServiceDatabaseImpl;
 import org.opencastproject.workflow.api.WorkflowStateException;
 import org.opencastproject.workflow.api.WorkflowStateListener;
 import org.opencastproject.workflow.api.XmlWorkflowParser;
+import org.opencastproject.workflow.api.YamlWorkflowParser;
 import org.opencastproject.workflow.handler.workflow.ErrorResolutionWorkflowOperationHandler;
 import org.opencastproject.workflow.impl.WorkflowServiceImpl.HandlerRegistration;
 import org.opencastproject.workspace.api.Workspace;
@@ -244,20 +245,20 @@ public class WorkflowServiceImplTest {
       scanner.putWorkflowDefinition(
               new WorkflowIdentifier("exception-handler", securityService.getOrganization().getId()), exceptionHandler);
 
-      is = WorkflowServiceImplTest.class.getResourceAsStream("/workflow-definition-1.xml");
-      workingDefinition = XmlWorkflowParser.parseWorkflowDefinition(is);
+      is = WorkflowServiceImplTest.class.getResourceAsStream("/workflow-definition-1.yaml");
+      workingDefinition = YamlWorkflowParser.parseWorkflowDefinition(is);
       IOUtils.closeQuietly(is);
 
-      is = WorkflowServiceImplTest.class.getResourceAsStream("/workflow-definition-2.xml");
-      failingDefinitionWithoutErrorHandler = XmlWorkflowParser.parseWorkflowDefinition(is);
+      is = WorkflowServiceImplTest.class.getResourceAsStream("/workflow-definition-2.yaml");
+      failingDefinitionWithoutErrorHandler = YamlWorkflowParser.parseWorkflowDefinition(is);
       IOUtils.closeQuietly(is);
 
-      is = WorkflowServiceImplTest.class.getResourceAsStream("/workflow-definition-3.xml");
-      failingDefinitionWithErrorHandler = XmlWorkflowParser.parseWorkflowDefinition(is);
+      is = WorkflowServiceImplTest.class.getResourceAsStream("/workflow-definition-3.yaml");
+      failingDefinitionWithErrorHandler = YamlWorkflowParser.parseWorkflowDefinition(is);
       IOUtils.closeQuietly(is);
 
-      is = WorkflowServiceImplTest.class.getResourceAsStream("/workflow-definition-4.xml");
-      pausingWorkflowDefinition = XmlWorkflowParser.parseWorkflowDefinition(is);
+      is = WorkflowServiceImplTest.class.getResourceAsStream("/workflow-definition-4.yaml");
+      pausingWorkflowDefinition = YamlWorkflowParser.parseWorkflowDefinition(is);
       IOUtils.closeQuietly(is);
 
     } catch (Exception e) {

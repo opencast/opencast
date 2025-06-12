@@ -1,0 +1,14 @@
+id: definition-1
+description: |-
+  Unit testing workflow
+operations:
+  - id: op1
+    fail-on-error: true
+    description: operation 1
+    configurations:
+      - testkey: ${testproperty}
+  - id: op2
+    fail-on-error: true
+    description: operation 2
+    configurations:
+      - testkey: ${anotherproperty}

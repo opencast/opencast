@@ -1,0 +1,11 @@
+id: exception-handler
+title: Exception Handler Workflow
+description: |-
+  Exception Handler Workflow Definition for Unit Tests
+operations:
+  - id: op1
+    fail-on-error: true
+    description: operation 1
+  - id: op2
+    fail-on-error: false
+    description: operation 2
