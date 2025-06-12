@@ -14,6 +14,8 @@ There are also new releases for both the admin ui
 Additionally there is a minor change to the community workflows that should
 only affect adopters who ingest more than two streams ([#6728](https://github.com/opencast/opencast/pull/6728)).
 
+An index migration script is added to allow updates from Opencast 16.x to 17.x without a reindex ([#6524](https://github.com/opencast/opencast/pull/6524)).
+
 ## Opencast 17.4
 
 This release contains a few bug fixes and enhancements of existing features. Among others, it enables the use of
