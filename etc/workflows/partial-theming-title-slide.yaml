@@ -13,8 +13,7 @@ operations:
       - time: 1
 
   - id: image
-    if: NOT ${theme_title_slide_uploaded} AND NOT ${presentation_trimmed_video} 
-      AND ${presenter_trimmed_video}
+    if: NOT ${theme_title_slide_uploaded} AND NOT ${presentation_trimmed_video} AND ${presenter_trimmed_video}
     exception-handler-workflow: partial-error
     description: Extracting title slide image from presenter track
     configurations:
