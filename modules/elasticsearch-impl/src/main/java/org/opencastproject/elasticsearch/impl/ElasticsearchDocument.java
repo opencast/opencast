@@ -22,8 +22,6 @@
 
 package org.opencastproject.elasticsearch.impl;
 
-import static org.opencastproject.elasticsearch.impl.IndexSchema.FUZZY_FIELDNAME_EXTENSION;
-
 import org.opencastproject.elasticsearch.api.Language;
 import org.opencastproject.elasticsearch.api.SearchMetadata;
 
@@ -100,7 +98,6 @@ public final class ElasticsearchDocument extends HashMap<String, Object> {
     if (fulltext == null) {
       fulltext = new ArrayList<String>();
       put(fulltextFieldName, fulltext);
-      put(fulltextFieldName + FUZZY_FIELDNAME_EXTENSION, fulltext);
     }
 
     // Language neutral elements

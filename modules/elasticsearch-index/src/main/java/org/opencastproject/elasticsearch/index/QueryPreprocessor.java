@@ -85,7 +85,7 @@ public final class QueryPreprocessor {
    *        sanitized query string
    */
   public static String sanitize(String query) {
-    String sanitizedQuery = "";
+    StringBuilder sanitizedQuery = new StringBuilder();
     String sanitizedToken;
     ArrayList<String> tokens = tokenize(query);
     int i = 0;
@@ -98,22 +98,22 @@ public final class QueryPreprocessor {
         if ((i == 0) || isBinaryOperator(tokens.get(i - 1))
                 || (i >= tokens.size() - 1) || isBinaryOperator(tokens.get(i + 1))) {
           // Escape operator since operands missing
-          sanitizedToken = "" + BACKSLASH + token;
+          sanitizedToken = BACKSLASH + token;
         } else {
           sanitizedToken = token;
         }
       } else {
-        sanitizedToken = enablePartialMatches(token, 0);
+        sanitizedToken = token;
       }
 
       if (i != 0) {
-        sanitizedQuery += " ";
+        sanitizedQuery.append(" ");
       }
-      sanitizedQuery += sanitizedToken;
+      sanitizedQuery.append(sanitizedToken);
       i++;
     }
     logger.debug("Sanitized input '{}' to '{}'", query, sanitizedQuery);
-    return sanitizedQuery;
+    return sanitizedQuery.toString();
   }
 
   private static boolean isUnaryOperator(String token) {

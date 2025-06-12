@@ -149,16 +149,16 @@ public abstract class AbstractSearchQuery implements SearchQuery {
 
   @Override
   public SearchQuery withText(String text) {
-    return withText(false, Any, text);
+    return withText(true, Any, text);
   }
 
   @Override
-  public SearchQuery withText(boolean wildcardSearch, String text) {
-    return withText(wildcardSearch, Any, text);
+  public SearchQuery withText(boolean fuzzy, String text) {
+    return withText(fuzzy, Any, text);
   }
 
   @Override
-  public SearchQuery withText(boolean wildcardSearch, Quantifier quantifier, String... text) {
+  public SearchQuery withText(boolean fuzzy, Quantifier quantifier, String... text) {
     if (quantifier == null) {
       throw new IllegalArgumentException("Quantifier must not be null");
     }
@@ -172,7 +172,7 @@ public abstract class AbstractSearchQuery implements SearchQuery {
     }
 
     // Add the text to the search terms
-    this.fuzzySearch = wildcardSearch;
+    this.fuzzySearch = fuzzy;
 
     // Handle any quantifier
     if (text.length == 1 || Any.equals(quantifier)) {
@@ -215,7 +215,7 @@ public abstract class AbstractSearchQuery implements SearchQuery {
     StringBuilder query = new StringBuilder();
     for (SearchTerms<String> s : text) {
       for (String t : s.getTerms()) {
-        if (query.length() == 0) {
+        if (query.isEmpty()) {
           query.append(" ");
         }
         query.append(t);
