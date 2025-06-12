@@ -19,14 +19,12 @@ With this workflow one can copy or manipulate published elements without re-enco
 
 ## Operation Example
 
-```xml
-<operation id="publication-channel-to-workspace"
-           description="Copy publication channel to workspace">
-  <configurations>
-    <configuration key="source-channel">engage-player</configuration>
-    <configuration key="source-flavors">presenter/delivery,presentation/delivery</configuration>
-    <configuration key="source-tags">engage-download,engage-streaming</configuration>
-    <configuration key="target-tags">archive</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: publication-channel-to-workspace
+    description: Copy publication channel to workspace
+    configurations:
+      - source-channel: engage-player
+      - source-flavors: presenter/delivery,presentation/delivery
+      - source-tags: engage-download,engage-streaming
+      - target-tags: archive
 ```

@@ -39,16 +39,13 @@ There are multiple supported options:
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="add-catalog"
-    description="Add catalog to media package">
-  <configurations>
-    <configuration key="catalog-path">${karaf.etc}/catalogs/default_dublincore.xml</configuration>
-    <configuration key="catalog-flavor">dublincore/episode</configuration>
-    <configuration key="catalog-name">dublincore.xml</configuration>
-    <configuration key="catalog-tags">archive,dublincore</configuration>
-    <configuration key="catalog-type-collision-behavior">keep</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: add-catalog
+    description: Add catalog to media package
+    configurations:
+      - catalog-path: ${karaf.etc}/catalogs/default_dublincore.xml
+      - catalog-flavor: dublincore/episode
+      - catalog-name: dublincore.xml
+      - catalog-tags: archive,dublincore
+      - catalog-type-collision-behavior: keep
 ```

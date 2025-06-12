@@ -120,29 +120,24 @@ Since the extended metadata don't have the `dublincore/*` flavor, a tagging oper
 for the extended catalogs.
 In our examples below, we use ext/episode as a flavor, so the following operation should be added to the workflows
 
-    <!-- Tag the extended metadata catalogs for publishing -->
-    <operation
-        id="tag"
-        description="Tagging extended metadata catalogs for archival and/or publication">
-        <configurations>
-            <configuration key="source-flavors">ext/*</configuration>
-            <configuration key="target-tags">+archive</configuration>
-        </configurations>
-    </operation>
+  # Tag the extended metadata catalogs for publishing
+  - id: tag
+    description: Tagging extended metadata catalogs for archival and/or
+      publication
+    configurations:
+      - source-flavors: ext/*
+      - target-tags: +archive
 
 
 If you want the extended metadata to be published the same way as the standard metadata, you can update the existing
 tagging operation for dublincore metadata the following way
 
-    <!-- Tag the incoming metadata catalogs for publishing -->
-    <operation
-      id="tag"
-      description="Tagging metadata catalogs for archival and publication">
-      <configurations>
-        <configuration key="source-flavors">dublincore/*,ext/*</configuration>
-        <configuration key="target-tags">+archive,+engage-download</configuration>
-      </configurations>
-    </operation>
+  # Tag the incoming metadata catalogs for publishing
+  - id: tag
+    description: Tagging metadata catalogs for archival and publication
+    configurations:
+      - source-flavors: dublincore/*,ext/*
+      - target-tags: +archive,+engage-download
 
 ## Configuring the events publisher metadata field
 

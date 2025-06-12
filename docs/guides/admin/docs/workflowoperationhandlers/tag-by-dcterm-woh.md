@@ -59,17 +59,14 @@ catalog you may want to imply that the `audience` term has a value of `all-enrol
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="tag-by-dcterm"
-    description="Tagging media package elements according to dcterm">
-  <configurations>
-    <configuration key="source-flavors">dublincore/*,security/*</configuration>
-    <configuration key="dccatalog">episode</configuration>
-    <configuration key="dcterm">audience</configuration>
-    <configuration key="match-value">learning-difficulties</configuration>
-    <configuration key="default-value">all-enrolled</confiuration>
-    <configuration key="target-tags">+publishBeforeEditing</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: tag-by-dcterm
+    description: Tagging media package elements according to dcterm
+    configurations:
+      - source-flavors: dublincore/*,security/*
+      - dccatalog: episode
+      - dcterm: audience
+      - match-value: learning-difficulties
+      - default-value: all-enrolled
+      - target-tags: +publishBeforeEditing
 ```

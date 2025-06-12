@@ -12,44 +12,38 @@ An operation can have a retry-strategy specified to define what will happen if t
 
 If the operation1 fails, the workflow will fail because fail-on-error="true".
 
-```
-<operation
-  id="operation1"
-  retry-strategy="none"
-  fail-on-error="true"
-  exception-handler-workflow="error"
-  description="Operation One">
-</operation>
+```yaml
+  - id: operation1
+    retry-strategy: none
+    fail-on-error: true
+    exception-handler-workflow: error
+    description: Operation One
 ```
 
 **Example 2**: Automatic retry
 
 If operation2 fails, it will be retried until it succeeds or until it has failed 5 times.
 
-```
-<operation
-  id="operation2"
-  retry-strategy="retry"
-  max-attempts="5"
-  fail-on-error="true"
-  exception-handler-workflow="error"
-  description="Operation Two">
-</operation>
+```yaml
+  - id: operation2
+    retry-strategy: retry
+    max-attempts: 5
+    fail-on-error: true
+    exception-handler-workflow: error
+    description: Operation Two
 ```
 
 **Example 3**: Manual retry
 
 If operation3 fails, the user can choose between Retry or Abort. The user can manually retry the operation 4 times.
 
-```
-<operation
-  id="operation3"
-  retry-strategy="hold"
-  max-attempts="5"
-  fail-on-error="true"
-  exception-handler-workflow="error"
-  description="Operation Three">
-</operation>
+```yaml
+  - id: operation3
+    retry-strategy: hold
+    max-attempts: 5
+    fail-on-error: true
+    exception-handler-workflow: error
+    description: Operation Three
 ```
 
 

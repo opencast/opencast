@@ -52,13 +52,10 @@ Here are some common examples:
 Operation Example
 -----------------
 
-```XML
-<operation
-  id="rename-files"
-  description="Rename files based on metadata">
-  <configurations>
-    <configuration key="name-pattern">#{episode.title}.#{file.extension}</configuration>
-    <configuration key="source-flavors">*/*</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: rename-files
+    description: Rename files based on metadata
+    configurations:
+      - name-pattern: '#{episode.title}.#{file.extension}'
+      - source-flavors: '*/*'
 ```

@@ -189,37 +189,29 @@ Operation Example
 
 Operation example with metadata derived from events metadata:
 
-```xml
-<operation
-    id="cover-image"
-    description="Create a cover image">
-  <configurations>
-    <configuration key="stylesheet">file://${karaf.etc}/branding/coverimage.xsl</configuration>
-    <configuration key="width">1920</configuration>
-    <configuration key="height">1080</configuration>
-    <configuration key="posterimage-flavor">presenter/coverbackground</configuration>
-    <configuration key="target-flavor">presenter/player+preview</configuration>
-    <configuration key="target-tags">archive, engage-download</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: cover-image
+    description: Create a cover image
+    configurations:
+      - stylesheet: file://${karaf.etc}/branding/coverimage.xsl
+      - width: 1920
+      - height: 1080
+      - posterimage-flavor: presenter/coverbackground
+      - target-flavor: presenter/player+preview
+      - target-tags: archive, engage-download
 ```
 
 Operation example with metadata provided in the operations configuration:
 
-```xml
-<operation
-    id="cover-image"
-    description="Create a cover image">
-  <configurations>
-    <configuration key="stylesheet">file://${karaf.etc}/branding/coverimage.xsl</configuration>
-    <configuration key="metadata">
-      <![CDATA[<meta><title>my custom title</title><special>very special</special></meta>]]>
-    </configuration>
-    <configuration key="width">1920</configuration>
-    <configuration key="height">1080</configuration>
-    <configuration key="posterimage-flavor">presenter/player+preview</configuration>
-    <configuration key="target-flavor">image/cover</configuration>
- </configurations>
-</operation>
+```yaml
+  - id: cover-image
+    description: Create a cover image
+    configurations:
+      - stylesheet: file://${karaf.etc}/branding/coverimage.xsl
+      - metadata: <meta><title>my custom title</title><special>very special</special></meta>
+      - width: 1920
+      - height: 1080
+      - posterimage-flavor: presenter/player+preview
+      - target-flavor: image/cover
 
 ```

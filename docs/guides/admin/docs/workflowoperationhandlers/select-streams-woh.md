@@ -103,14 +103,11 @@ Note that those encoding profiles are included in the default configuration of O
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="select-tracks"
-    description="Select tracks for further processing">
-  <configurations>
-    <configuration key="source-flavor">*/source</configuration>
-    <configuration key="target-flavor">*/work</configuration>
-    <configuration key="audio-muxing">force</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: select-tracks
+    description: Select tracks for further processing
+    configurations:
+      - source-flavor: '*/source'
+      - target-flavor: '*/work'
+      - audio-muxing: force
 ```

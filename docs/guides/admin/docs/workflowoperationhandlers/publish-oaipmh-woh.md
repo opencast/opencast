@@ -74,15 +74,12 @@ The configuration key 'external-channel' is used to set the name of the publicat
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="publish-oaipmh"
-    description="Publish event to the OAI-PMH repository">
-  <configurations>
-    <configuration key="download-tags">oaipmh-download</configuration>
-    <configuration key="streaming-tags">oaipmh-streaming</configuration>
-    <configuration key="check-availability">true</configuration>
-    <configuration key="repository">default</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: publish-oaipmh
+    description: Publish event to the OAI-PMH repository
+    configurations:
+      - download-tags: oaipmh-download
+      - streaming-tags: oaipmh-streaming
+      - check-availability: true
+      - repository: default
 ```

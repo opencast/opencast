@@ -27,16 +27,13 @@ by the video editor frontend.
 Operation Example
 -----------------
 
-````xml
-<operation
-    id="editor"
-    description="Waiting for user to review / video edit recording">
-  <configurations>
-    <configuration key="source-flavors">*/work</configuration>
-    <configuration key="skipped-flavors">*/work</configuration>
-    <configuration key="smil-flavors">*/smil</configuration>
-    <configuration key="target-smil-flavor">smil/cutting</configuration>
-    <configuration key="target-flavor-subtype">trimmed</configuration>
-  </configurations>
-</operation>
+````yaml
+  - id: editor
+    description: Waiting for user to review / video edit recording
+    configurations:
+      - source-flavors: '*/work'
+      - skipped-flavors: '*/work'
+      - smil-flavors: '*/smil'
+      - target-smil-flavor: smil/cutting
+      - target-flavor-subtype: trimmed
 ```

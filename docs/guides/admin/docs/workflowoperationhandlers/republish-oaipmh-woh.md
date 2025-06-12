@@ -25,13 +25,10 @@ Parameter Table
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="republish-oaipmh"
-    description="Update recording metadata in default OAI-PMH repository">
-  <configurations>
-    <configuration key="source-flavors">dublincore/*,security/*</configuration>
-    <configuration key="repository">default</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: republish-oaipmh
+    description: Update recording metadata in default OAI-PMH repository
+    configurations:
+      - source-flavors: dublincore/*,security/*
+      - repository: default
 ```

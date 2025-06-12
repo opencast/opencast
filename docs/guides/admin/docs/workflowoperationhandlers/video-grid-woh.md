@@ -56,17 +56,14 @@ Finally, the videos for each section are combined into one final, single video f
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="video-grid"
-    description="Generate sections of the final video">
-  <configurations>
-    <configuration key="source-flavor">presenter/source</configuration>
-    <configuration key="source-smil-flavor">smil/source+partial</configuration>
-    <configuration key="target-flavor">presenter/partial</configuration>
-    <configuration key="concat-encoding-profile">concat-samecodec.work</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: video-grid
+    description: Generate sections of the final video
+    configurations:
+      - source-flavor: presenter/source
+      - source-smil-flavor: smil/source+partial
+      - target-flavor: presenter/partial
+      - concat-encoding-profile: concat-samecodec.work
 ```
 
 Encoding Profiles

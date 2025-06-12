@@ -150,7 +150,7 @@ The LiveScheduleService will generate a media package with two live tracks havin
 
 When scheduling a live event via the admin UI, the workflow needs to have the _publishLive_ configuration set to true
 (this is already included in the sample workflows).
-If not using the sample Opencast workflows, add to the `<configuration_panel>`:
+If not using the sample Opencast workflows, add to the `<configuration_panel_json>`:
 
 ```
         <fieldset>
@@ -167,15 +167,12 @@ If not using the sample Opencast workflows, add to the `<configuration_panel>`:
 And to the _defaults_ operation:
 
 ```
-    <operation
-      id="defaults"
-      description="Applying default configuration values">
-      <configurations>
-        <configuration key="comment">false</configuration>
-        <configuration key="publishToMediaModule">true</configuration>
-        <configuration key="publishToOaiPmh">true</configuration>
-        <configuration key="uploadedSearchPreview">false</configuration>
-        <configuration key="publishLive">false</configuration>
-      </configurations>
-    </operation>
+  - id: defaults
+    description: Applying default configuration values
+    configurations:
+      - comment: false
+      - publishToMediaModule: true
+      - publishToOaiPmh: true
+      - uploadedSearchPreview: false
+      - publishLive: false
 ```

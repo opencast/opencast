@@ -26,17 +26,14 @@ A parameter that is always posted is the workflow instance identifier in the par
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="http-notify"
-    description="Notify test">
-  <configurations>
-    <configuration key="url">http://www.test.ch</configuration>
-    <configuration key="subject">importing-started</configuration>
-    <configuration key="message">internal::25</configuration>
-    <configuration key="method">put</configuration>
-    <configuration key="max-retry">3</configuration>
-    <configuration key="timeout">5</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: http-notify
+    description: Notify test
+    configurations:
+      - url: http://www.test.ch
+      - subject: importing-started
+      - message: internal::25
+      - method: put
+      - max-retry: 3
+      - timeout: 5
 ```

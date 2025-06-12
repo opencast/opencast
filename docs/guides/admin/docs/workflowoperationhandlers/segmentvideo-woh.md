@@ -22,13 +22,10 @@ Parameter Table
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="segment-video"
-    description="Extracting segments from presentation">
-  <configurations>
-    <configuration key="source-tags">presentation-lowres</configuration>
-    <configuration key="source-flavor">presentation/trimmed</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: segment-video
+    description: Extracting segments from presentation
+    configurations:
+      - source-tags: presentation-lowres
+      - source-flavor: presentation/trimmed
 ```
