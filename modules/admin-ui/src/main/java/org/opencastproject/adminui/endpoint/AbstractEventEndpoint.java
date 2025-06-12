@@ -707,9 +707,9 @@ public abstract class AbstractEventEndpoint {
     final TechnicalMetadata technicalMetadata = getSchedulerService().getTechnicalMetadata(event.getIdentifier());
     final org.codehaus.jettison.json.JSONObject schedulingJson = new org.codehaus.jettison.json.JSONObject(
             scheduling);
-    Opt<String> agentId = Opt.none();
+    Optional<String> agentId = Optional.empty();
     if (schedulingJson.has(SCHEDULING_AGENT_ID_KEY)) {
-      agentId = Opt.some(schedulingJson.getString(SCHEDULING_AGENT_ID_KEY));
+      agentId = Optional.of(schedulingJson.getString(SCHEDULING_AGENT_ID_KEY));
       logger.trace("Updating agent id of event '{}' from '{}' to '{}'",
               event.getIdentifier(), technicalMetadata.getAgentId(), agentId);
     }
@@ -721,7 +721,7 @@ public abstract class AbstractEventEndpoint {
 
     Optional<String> previousAgentInputs = Optional.empty();
     Optional<String> agentInputs = Optional.empty();
-    if (agentId.isSome() && previousAgentId.isSome()) {
+    if (agentId.isPresent() && previousAgentId.isSome()) {
       Agent previousAgent = getCaptureAgentStateService().getAgent(previousAgentId.get());
       Agent agent = getCaptureAgentStateService().getAgent(agentId.get());
 
@@ -731,29 +731,29 @@ public abstract class AbstractEventEndpoint {
 
     // Check if we are allowed to re-schedule on this agent
     checkAgentAccessForAgent(technicalMetadata.getAgentId());
-    if (agentId.isSome()) {
+    if (agentId.isPresent()) {
       checkAgentAccessForAgent(agentId.get());
     }
 
-    Opt<Date> start = Opt.none();
+    Optional<Date> start = Optional.empty();
     if (schedulingJson.has(SCHEDULING_START_KEY)) {
-      start = Opt.some(new Date(DateTimeSupport.fromUTC(schedulingJson.getString(SCHEDULING_START_KEY))));
+      start = Optional.of(new Date(DateTimeSupport.fromUTC(schedulingJson.getString(SCHEDULING_START_KEY))));
       logger.trace("Updating start time of event '{}' id from '{}' to '{}'",
         event.getIdentifier(), DateTimeSupport.toUTC(technicalMetadata.getStartDate().getTime()),
                       DateTimeSupport.toUTC(start.get().getTime()));
     }
 
-    Opt<Date> end = Opt.none();
+    Optional<Date> end = Optional.empty();
     if (schedulingJson.has(SCHEDULING_END_KEY)) {
-      end = Opt.some(new Date(DateTimeSupport.fromUTC(schedulingJson.getString(SCHEDULING_END_KEY))));
+      end = Optional.of(new Date(DateTimeSupport.fromUTC(schedulingJson.getString(SCHEDULING_END_KEY))));
       logger.trace("Updating end time of event '{}' id from '{}' to '{}'",
         event.getIdentifier(), DateTimeSupport.toUTC(technicalMetadata.getEndDate().getTime()),
                       DateTimeSupport.toUTC(end.get().getTime()));
     }
 
-    Opt<Map<String, String>> agentConfiguration = Opt.none();
+    Optional<Map<String, String>> agentConfiguration = Optional.empty();
     if (schedulingJson.has(SCHEDULING_AGENT_CONFIGURATION_KEY)) {
-      agentConfiguration = Opt.some(JSONUtils.toMap(schedulingJson.getJSONObject(SCHEDULING_AGENT_CONFIGURATION_KEY)));
+      agentConfiguration = Optional.of(JSONUtils.toMap(schedulingJson.getJSONObject(SCHEDULING_AGENT_CONFIGURATION_KEY)));
       logger.trace("Updating agent configuration of event '{}' id from '{}' to '{}'",
         event.getIdentifier(), technicalMetadata.getCaptureAgentConfiguration(), agentConfiguration);
     }
@@ -775,18 +775,18 @@ public abstract class AbstractEventEndpoint {
       if (previousAgentInputs.equals(agentInputs)) {
         final Map<String, String> configMap = new HashMap<>(agentConfiguration.get());
         configMap.put(CaptureParameters.CAPTURE_DEVICE_NAMES, previousInputs);
-        agentConfiguration = Opt.some(configMap);
+        agentConfiguration = Optional.of(configMap);
       }
     }
 
-    if ((start.isSome() || end.isSome())
-            && end.getOr(technicalMetadata.getEndDate()).before(start.getOr(technicalMetadata.getStartDate()))) {
+    if ((start.isPresent() || end.isPresent())
+            && end.orElse(technicalMetadata.getEndDate()).before(start.orElse(technicalMetadata.getStartDate()))) {
       throw new IllegalStateException("The end date is before the start date");
     }
 
-    if (!start.isNone() || !end.isNone() || !agentId.isNone() || !agentConfiguration.isNone()) {
+    if (!start.isEmpty() || !end.isEmpty() || !agentId.isEmpty() || !agentConfiguration.isEmpty()) {
       getSchedulerService()
-        .updateEvent(event.getIdentifier(), start, end, agentId, Opt.none(), Opt.none(), Opt.none(), agentConfiguration);
+        .updateEvent(event.getIdentifier(), start, end, agentId, Optional.empty(), Optional.empty(), Optional.empty(), agentConfiguration);
     }
   }
 
@@ -995,8 +995,8 @@ public abstract class AbstractEventEndpoint {
         MediaPackage mediaPackage = getIndexService().getEventMediapackage(optEvent.get());
         mediaPackage = getAuthorizationService().setAcl(mediaPackage, AclScope.Episode, accessControlList).getA();
         // We could check agent access here if we want to forbid updating ACLs for users without access.
-        getSchedulerService().updateEvent(eventId, Opt.none(), Opt.none(), Opt.none(), Opt.none(),
-                Opt.some(mediaPackage), Opt.none(), Opt.none());
+        getSchedulerService().updateEvent(eventId, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
+                Optional.of(mediaPackage), Optional.empty(), Optional.empty());
         return ok();
       }
     } catch (MediaPackageException e) {
@@ -2037,28 +2037,28 @@ public abstract class AbstractEventEndpoint {
           return badRequest();
         }
 
-        Opt<Map<String, String>> caMetadataOpt = Opt.none();
-        Opt<Map<String, String>> workflowConfigOpt = Opt.none();
+        Optional<Map<String, String>> caMetadataOpt = Optional.empty();
+        Optional<Map<String, String>> workflowConfigOpt = Optional.empty();
 
         String workflowId = (String) configJSON.get("id");
         Map<String, String> caMetadata = new HashMap<>(getSchedulerService().getCaptureAgentConfiguration(id));
         if (!workflowId.equals(caMetadata.get(CaptureParameters.INGEST_WORKFLOW_DEFINITION))) {
           caMetadata.put(CaptureParameters.INGEST_WORKFLOW_DEFINITION, workflowId);
-          caMetadataOpt = Opt.some(caMetadata);
+          caMetadataOpt = Optional.of(caMetadata);
         }
 
         Map<String, String> workflowConfig = new HashMap<>((JSONObject) configJSON.get("configuration"));
         Map<String, String> oldWorkflowConfig = new HashMap<>(getSchedulerService().getWorkflowConfig(id));
         if (!oldWorkflowConfig.equals(workflowConfig))
-          workflowConfigOpt = Opt.some(workflowConfig);
+          workflowConfigOpt = Optional.of(workflowConfig);
 
-        if (caMetadataOpt.isNone() && workflowConfigOpt.isNone())
+        if (caMetadataOpt.isEmpty() && workflowConfigOpt.isEmpty())
           return Response.noContent().build();
 
         checkAgentAccessForAgent(optEvent.get().getAgentId());
 
-        getSchedulerService().updateEvent(id, Opt.<Date> none(), Opt.<Date> none(), Opt.<String> none(),
-                Opt.<Set<String>> none(), Opt.<MediaPackage> none(), workflowConfigOpt, caMetadataOpt);
+        getSchedulerService().updateEvent(id, Optional.empty(), Optional.empty(), Optional.empty(),
+            Optional.empty(), Optional.empty(), workflowConfigOpt, caMetadataOpt);
         return Response.noContent().build();
       } catch (NotFoundException e) {
         return notFound("Cannot find event %s in scheduler service", id);
@@ -3124,7 +3124,7 @@ public abstract class AbstractEventEndpoint {
     String eventId = technicalMetadata.getEventId();
     json.addProperty("eventId", safeString(eventId));
     json.add("presenters", collectionToJsonArray(technicalMetadata.getPresenters()));
-    Optional<Recording> optRecording = Optional.ofNullable(technicalMetadata.getRecording().orNull());
+    Optional<Recording> optRecording = technicalMetadata.getRecording();
     if (optRecording.isPresent()) {
       json.add("recording", recordingToJson(optRecording.get()));
     }

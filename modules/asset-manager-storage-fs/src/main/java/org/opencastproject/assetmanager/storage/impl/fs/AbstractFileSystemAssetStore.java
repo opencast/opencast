@@ -38,8 +38,6 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
@@ -201,14 +199,20 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
   }
 
   /** Return the extension of a file. */
-  private Opt<String> extension(File f) {
-    return trimToNone(getExtension(f.getAbsolutePath())).toOpt();
+  private Optional<String> extension(File f) {
+    Option<String> opt = trimToNone(getExtension(f.getAbsolutePath()));
+    return opt.isSome()
+        ? Optional.of(opt.get())
+        : Optional.empty();
   }
 
   /** Return the extension of a URI, i.e. the extension of its path. */
-  private Opt<String> extension(URI uri) {
+  private Optional<String> extension(URI uri) {
     try {
-      return trimToNone(getExtension(uri.toURL().getPath())).toOpt();
+      Option<String> opt = trimToNone(getExtension(uri.toURL().getPath()));
+      return opt.isSome()
+          ? Optional.of(opt.get())
+          : Optional.empty();
     } catch (MalformedURLException e) {
       throw new Error(e);
     }
@@ -225,7 +229,7 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
   }
 
   /** Create a file from a storage path and an optional extension. */
-  private File createFile(StoragePath p, Opt<String> extension) {
+  private File createFile(StoragePath p, Optional<String> extension) {
     String rootDirectory = getRootDirectory(p.getOrganizationId(), p.getMediaPackageId());
     if (rootDirectory == null) {
       rootDirectory = getRootDirectory();
@@ -235,12 +239,12 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
             p.getOrganizationId(),
             p.getMediaPackageId(),
             p.getVersion().toString(),
-            extension.isSome() ? p.getMediaPackageElementId() + EXTENSION_SEPARATOR + extension.get() : p
+            extension.isPresent() ? p.getMediaPackageElementId() + EXTENSION_SEPARATOR + extension.get() : p
                     .getMediaPackageElementId());
   }
 
   /** Returns a file from a storage path if it exists, null otherwise */
-  private File getExistingFile(StoragePath p, Opt<String> extension) {
+  private File getExistingFile(StoragePath p, Optional<String> extension) {
     String rootDirectory = getRootDirectory(p.getOrganizationId(), p.getMediaPackageId());
     if (rootDirectory == null) {
       return null;
@@ -250,7 +254,7 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
             p.getOrganizationId(),
             p.getMediaPackageId(),
             p.getVersion().toString(),
-            extension.isSome() ? p.getMediaPackageElementId() + EXTENSION_SEPARATOR + extension.get() : p
+            extension.isPresent() ? p.getMediaPackageElementId() + EXTENSION_SEPARATOR + extension.get() : p
                     .getMediaPackageElementId());
   }
 
@@ -268,7 +272,7 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
         return FilenameUtils.getBaseName(name).equals(storagePath.getMediaPackageElementId());
       }
     };
-    final File containerDir = getExistingFile(storagePath, Opt.none(String.class)).getParentFile();
+    final File containerDir = getExistingFile(storagePath, Optional.empty()).getParentFile();
 
     var files = containerDir.listFiles(filter);
     if (files == null) {

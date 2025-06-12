@@ -39,8 +39,6 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -49,6 +47,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * A workflow operation handler for creating, resolving and deleting comments
@@ -153,8 +152,8 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
   private void createComment(WorkflowInstance workflowInstance, String reason, String description)
           throws EventCommentException {
     String mpId = workflowInstance.getMediaPackage().getIdentifier().toString();
-    Opt<EventComment> optComment = findComment(mpId, reason, description);
-    if (optComment.isNone()) {
+    Optional<EventComment> optComment = findComment(mpId, reason, description);
+    if (optComment.isEmpty()) {
       final User user = userDirectoryService.loadUser(workflowInstance.getCreatorName());
       EventComment comment = EventComment.create(
           Option.none(), mpId,
@@ -181,8 +180,8 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
   private void resolveComment(WorkflowInstance workflowInstance, String reason, String description)
           throws EventCommentException {
     String mpId = workflowInstance.getMediaPackage().getIdentifier().toString();
-    Opt<EventComment> optComment = findComment(mpId, reason, description);
-    if (optComment.isSome()) {
+    Optional<EventComment> optComment = findComment(mpId, reason, description);
+    if (optComment.isPresent()) {
       EventComment comment = EventComment.create(
           optComment.get().getId(),
           mpId,
@@ -212,8 +211,8 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
   private void deleteComment(WorkflowInstance workflowInstance, String reason, String description)
           throws EventCommentException, NotFoundException {
     String mpId = workflowInstance.getMediaPackage().getIdentifier().toString();
-    Opt<EventComment> optComment = findComment(mpId, reason, description);
-    if (optComment.isSome()) {
+    Optional<EventComment> optComment = findComment(mpId, reason, description);
+    if (optComment.isPresent()) {
       try {
         eventCommentService.deleteComment(optComment.get().getId().get());
       } catch (NotFoundException e) {
@@ -238,26 +237,26 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
    * @throws EventCommentException
    *           Thrown if there was a problem finding the comment.
    */
-  private Opt<EventComment> findComment(String eventId, String reason, String description)
+  private Optional<EventComment> findComment(String eventId, String reason, String description)
           throws EventCommentException {
-    Opt<EventComment> comment = Opt.none();
+    Optional<EventComment> comment = Optional.empty();
     List<EventComment> eventComments = eventCommentService.getComments(eventId);
 
     for (EventComment existingComment : eventComments) {
       // Match on reason and description
       if (reason != null && description != null
           && reason.equals(existingComment.getReason()) && description.equals(existingComment.getText())) {
-        comment = Opt.some(existingComment);
+        comment = Optional.of(existingComment);
         break;
       }
       // Match on reason only
       if (reason != null && description == null && reason.equals(existingComment.getReason())) {
-        comment = Opt.some(existingComment);
+        comment = Optional.of(existingComment);
         break;
       }
       // Match on description only
       if (reason == null && description != null && description.equals(existingComment.getText())) {
-        comment = Opt.some(existingComment);
+        comment = Optional.of(existingComment);
         break;
       }
     }

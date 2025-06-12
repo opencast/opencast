@@ -380,7 +380,7 @@ public class EventCommentDto {
     EventComment comment = EventComment.create(Option.option(id), eventId, organization, text, user, reason,
             resolvedStatus, creationDate, modificationDate);
     for (EventCommentReplyDto reply : replies) {
-      comment.addReply(reply.toCommentReply(userDirectoryService));
+      comment.addReply(reply.toCommentReply(userDirectoryService, organizationDirectoryService, organization));
     }
     return comment;
   }

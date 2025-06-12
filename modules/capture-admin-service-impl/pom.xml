@@ -96,11 +96,6 @@
       <artifactId>jakarta.persistence</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.entwinemedia.common</groupId>
-      <artifactId>functional</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
       <scope>test</scope>

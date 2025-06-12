@@ -223,7 +223,7 @@ public class LtiServiceImpl implements LtiService {
             final ConfiguredWorkflow newWorkflow = workflow(wfd);
             final String targetMpId = workflow.getConfiguration(NEW_MP_ID_KEY);
             final List<WorkflowInstance> workflowInstances = workflows
-                    .applyWorkflowToLatestVersion(Collections.singleton(targetMpId), newWorkflow).toList();
+                    .applyWorkflowToLatestVersion(Collections.singleton(targetMpId), newWorkflow);
             if (workflowInstances.isEmpty()) {
               throw new RuntimeException(
                       String.format("couldn't start workflow '%s' for event %s", publishWorkflowName, targetMpId));
@@ -372,7 +372,7 @@ public class LtiServiceImpl implements LtiService {
       final ConfiguredWorkflow workflow
           = workflow(wfd, createCopyWorkflowConfig(seriesId, UUID.randomUUID().toString()));
       final List<WorkflowInstance> workflowInstances = workflows
-              .applyWorkflowToLatestVersion(Collections.singleton(eventId), workflow).toList();
+              .applyWorkflowToLatestVersion(Collections.singleton(eventId), workflow);
       if (workflowInstances.isEmpty()) {
         throw new RuntimeException(String.format("Couldn't start workflow '%s' for event %s", workflowId, eventId));
       }

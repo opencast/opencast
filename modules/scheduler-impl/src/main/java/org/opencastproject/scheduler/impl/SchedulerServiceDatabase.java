@@ -24,11 +24,10 @@ package org.opencastproject.scheduler.impl;
 import org.opencastproject.scheduler.impl.persistence.ExtendedEventDto;
 import org.opencastproject.util.NotFoundException;
 
-import com.entwinemedia.fn.data.Opt;
-
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Permanent storage for events. Does not support searching.
@@ -102,17 +101,17 @@ public interface SchedulerServiceDatabase {
   void storeEvent(
       String mediapackageId,
       String organizationId,
-      Opt<String> captureAgentId,
-      Opt<Date> start,
-      Opt<Date> end,
-      Opt<String> source,
-      Opt<String> recordingState,
-      Opt<Long> recordingLastHeard,
-      Opt<String> presenters,
-      Opt<Date> lastModifiedDate,
-      Opt<String> checksum,
-      Opt<Map<String,String>> workflowProperties,
-      Opt<Map<String,String>> captureAgentProperties
+      Optional<String> captureAgentId,
+      Optional<Date> start,
+      Optional<Date> end,
+      Optional<String> source,
+      Optional<String> recordingState,
+      Optional<Long> recordingLastHeard,
+      Optional<String> presenters,
+      Optional<Date> lastModifiedDate,
+      Optional<String> checksum,
+      Optional<Map<String,String>> workflowProperties,
+      Optional<Map<String,String>> captureAgentProperties
   ) throws SchedulerServiceDatabaseException;
 
   /**
@@ -154,7 +153,14 @@ public interface SchedulerServiceDatabase {
    * @throws SchedulerServiceDatabaseException
    *           If the database cannot be queried.
    */
-  List<ExtendedEventDto> search(Opt<String> captureAgentId, Opt<Date> startsFrom, Opt<Date> startsTo, Opt<Date> endFrom, Opt<Date> endTo, Opt<Integer> limit) throws SchedulerServiceDatabaseException;
+  List<ExtendedEventDto> search(
+      Optional<String> captureAgentId,
+      Optional<Date> startsFrom,
+      Optional<Date> startsTo,
+      Optional<Date> endFrom,
+      Optional<Date> endTo,
+      Optional<Integer> limit
+  ) throws SchedulerServiceDatabaseException;
 
   /**
    * Retrieve all events which have a recording state and a recording last heard.
@@ -188,7 +194,7 @@ public interface SchedulerServiceDatabase {
    * @throws SchedulerServiceDatabaseException
    *           If the database cannot be queried.
    */
-  Opt<ExtendedEventDto> getEvent(String mediapackageId) throws SchedulerServiceDatabaseException;
+  Optional<ExtendedEventDto> getEvent(String mediapackageId) throws SchedulerServiceDatabaseException;
 
   /**
    * Get the event with the given mediapackage id and organization.
@@ -203,7 +209,7 @@ public interface SchedulerServiceDatabase {
    * @throws SchedulerServiceDatabaseException
    *           If the database cannot be queried.
    */
-  Opt<ExtendedEventDto> getEvent(String mediapackageId, String orgId) throws SchedulerServiceDatabaseException;
+  Optional<ExtendedEventDto> getEvent(String mediapackageId, String orgId) throws SchedulerServiceDatabaseException;
 
   /**
    * Get all events from the scheduler for the current organizations.

@@ -30,7 +30,6 @@ import org.opencastproject.scheduler.impl.SchedulerServiceDatabaseException;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.NotFoundException;
 
-import com.entwinemedia.fn.data.Opt;
 import com.google.gson.Gson;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -158,10 +157,10 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
   }
 
   @Override
-  public void storeEvent(String mediapackageId, String organizationId, Opt<String> captureAgentId, Opt<Date> start,
-          Opt<Date> end, Opt<String> source, Opt<String> recordingState, Opt<Long> recordingLastHeard,
-          Opt<String> presenters, Opt<Date> lastModifiedDate, Opt<String> checksum, Opt<Map<String,
-          String>> workflowProperties, Opt<Map<String, String>> caProperties
+  public void storeEvent(String mediapackageId, String organizationId, Optional<String> captureAgentId, Optional<Date> start,
+          Optional<Date> end, Optional<String> source, Optional<String> recordingState, Optional<Long> recordingLastHeard,
+          Optional<String> presenters, Optional<Date> lastModifiedDate, Optional<String> checksum, Optional<Map<String,
+          String>> workflowProperties, Optional<Map<String, String>> caProperties
   ) throws SchedulerServiceDatabaseException {
     try {
       db.execTxChecked(em -> {
@@ -169,37 +168,37 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
         ExtendedEventDto entity = entityOpt.orElse(new ExtendedEventDto());
         entity.setMediaPackageId(mediapackageId);
         entity.setOrganization(organizationId);
-        if (captureAgentId.isSome()) {
+        if (captureAgentId.isPresent()) {
           entity.setCaptureAgentId(captureAgentId.get());
         }
-        if (start.isSome()) {
+        if (start.isPresent()) {
           entity.setStartDate(start.get());
         }
-        if (end.isSome()) {
+        if (end.isPresent()) {
           entity.setEndDate(end.get());
         }
-        if (source.isSome()) {
+        if (source.isPresent()) {
           entity.setSource(source.get());
         }
-        if (recordingState.isSome()) {
+        if (recordingState.isPresent()) {
           entity.setRecordingState(recordingState.get());
         }
-        if (recordingLastHeard.isSome()) {
+        if (recordingLastHeard.isPresent()) {
           entity.setRecordingLastHeard(recordingLastHeard.get());
         }
-        if (presenters.isSome()) {
+        if (presenters.isPresent()) {
           entity.setPresenters(presenters.get());
         }
-        if (lastModifiedDate.isSome()) {
+        if (lastModifiedDate.isPresent()) {
           entity.setLastModifiedDate(lastModifiedDate.get());
         }
-        if (checksum.isSome()) {
+        if (checksum.isPresent()) {
           entity.setChecksum(checksum.get());
         }
-        if (workflowProperties.isSome()) {
+        if (workflowProperties.isPresent()) {
           entity.setWorkflowProperties(gson.toJson(workflowProperties.get()));
         }
-        if (caProperties.isSome()) {
+        if (caProperties.isPresent()) {
           entity.setCaptureAgentProperties(gson.toJson(caProperties.get()));
         }
 
@@ -235,23 +234,23 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
 
   @Override
   public List<ExtendedEventDto> search(
-      Opt<String> captureAgentId,
-      Opt<Date> optStartsFrom,
-      Opt<Date> optStartsTo,
-      Opt<Date> optEndFrom,
-      Opt<Date> optEndTo,
-      Opt<Integer> limit) throws SchedulerServiceDatabaseException {
-    final Date startsFrom = optStartsFrom.getOr(new Date(0));
+      Optional<String> captureAgentId,
+      Optional<Date> optStartsFrom,
+      Optional<Date> optStartsTo,
+      Optional<Date> optEndFrom,
+      Optional<Date> optEndTo,
+      Optional<Integer> limit) throws SchedulerServiceDatabaseException {
+    final Date startsFrom = optStartsFrom.orElse(new Date(0));
     // A better value would be a Date initialized with Long.MAX_VALUE, but that leads to the DB (at least MySQL)
     // returning zero results.
     final Date farIntoTheFuture = DateTime.now().plusYears(30).toDate();
-    final Date startsTo = optStartsTo.getOr(farIntoTheFuture);
-    final Date endFrom = optEndFrom.getOr(new Date(0));
-    final Date endTo = optEndTo.getOr(farIntoTheFuture);
+    final Date startsTo = optStartsTo.orElse(farIntoTheFuture);
+    final Date endFrom = optEndFrom.orElse(new Date(0));
+    final Date endTo = optEndTo.orElse(farIntoTheFuture);
     try {
       return db.exec(em -> {
         final TypedQuery<ExtendedEventDto> query;
-        if (captureAgentId.isSome()) {
+        if (captureAgentId.isPresent()) {
           query = em.createNamedQuery("ExtendedEvent.searchEventsCA", ExtendedEventDto.class)
               .setParameter("org", securityService.getOrganization().getId())
               .setParameter("ca", captureAgentId.get())
@@ -267,7 +266,7 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
               .setParameter("endFrom", endFrom)
               .setParameter("endTo", endTo);
         }
-        if (limit.isSome()) {
+        if (limit.isPresent()) {
           return query.setMaxResults(limit.get()).getResultList();
         }
         return query.getResultList();
@@ -323,19 +322,17 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
   }
 
   @Override
-  public Opt<ExtendedEventDto> getEvent(String mediapackageId, String orgId)
+  public Optional<ExtendedEventDto> getEvent(String mediapackageId, String orgId)
       throws SchedulerServiceDatabaseException {
     try {
-      return db.exec(getExtendedEventDtoQuery(mediapackageId, orgId))
-          .map(Opt::some)
-          .orElse(Opt.none());
+      return db.exec(getExtendedEventDtoQuery(mediapackageId, orgId));
     } catch (Exception e) {
       throw new SchedulerServiceDatabaseException(e);
     }
   }
 
   @Override
-  public Opt<ExtendedEventDto> getEvent(String mediapackageId) throws SchedulerServiceDatabaseException {
+  public Optional<ExtendedEventDto> getEvent(String mediapackageId) throws SchedulerServiceDatabaseException {
     try {
       final String orgId = securityService.getOrganization().getId();
       return getEvent(mediapackageId, orgId);

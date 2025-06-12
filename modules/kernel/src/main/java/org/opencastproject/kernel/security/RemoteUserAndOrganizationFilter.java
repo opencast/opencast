@@ -42,9 +42,6 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.NotFoundException;
 
-import com.entwinemedia.fn.Fn2;
-import com.entwinemedia.fn.Stream;
-
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -59,6 +56,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -251,10 +250,14 @@ public class RemoteUserAndOrganizationFilter implements Filter {
         }
 
         // Set roles to requested user
+        Set<JaxbRole> jaxbRoles = new HashSet<>();
+        for (String role : requestedRoles) {
+          jaxbRoles.add(toJaxbRole(role, requestedOrganization));
+        }
         requestedUser = new JaxbUser(requestedUser.getUsername(), requestedUser.getPassword(), requestedUser.getName(),
                 requestedUser.getEmail(), requestedUser.getProvider(),
                 JaxbOrganization.fromOrganization(requestedUser.getOrganization()),
-                Stream.$(requestedRoles).map(toJaxbRole._2(requestedOrganization)).toSet());
+                jaxbRoles);
         logger.trace("Request roles '{}' are amended to user '{}'", rolesHeader, requestedUser.getUsername());
         securityService.setUser(requestedUser);
       }
@@ -310,11 +313,8 @@ public class RemoteUserAndOrganizationFilter implements Filter {
     this.userDirectory = userDirectory;
   }
 
-  private static final Fn2<String, Organization, JaxbRole> toJaxbRole = new Fn2<String, Organization, JaxbRole>() {
-    @Override
-    public JaxbRole apply(String role, Organization organization) {
-      return new JaxbRole(role, JaxbOrganization.fromOrganization(organization));
-    }
-  };
+  private static JaxbRole toJaxbRole(String role, Organization organization) {
+    return new JaxbRole(role, JaxbOrganization.fromOrganization(organization));
+  }
 
 }

@@ -33,16 +33,15 @@ import org.opencastproject.mediapackage.Track;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 
-import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.Stream;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Abstract base class of ConfigurablePublishWorkflerOperationHandler and ConfigurableRectractWorkflowOperationHandler.
@@ -160,12 +159,9 @@ public abstract class ConfigurableWorkflowOperationHandlerBase extends AbstractW
 
   public List<Publication> getPublications(final MediaPackage mp, final String channelId) {
     assert ((mp != null) && (channelId != null));
-    final List<Publication> publications = Stream.mk(mp.getPublications()).filter(new Fn<Publication, Boolean>() {
-      @Override
-      public Boolean apply(Publication a) {
-        return channelId.equals(a.getChannel());
-      }
-    }).toList();
+    final List<Publication> publications = Arrays.stream(mp.getPublications())
+        .filter(a -> channelId.equals(a.getChannel()))
+        .collect(Collectors.toList());
     assert (publications != null);
     return publications;
   }

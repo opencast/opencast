@@ -68,10 +68,6 @@
       <artifactId>org.apache.servicemix.bundles.quartz</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.entwinemedia.common</groupId>
-      <artifactId>functional</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpcore-osgi</artifactId>
     </dependency>
@@ -110,9 +106,6 @@
         <artifactId>maven-dependency-plugin</artifactId>
         <extensions>true</extensions>
         <configuration>
-          <ignoredNonTestScopedDependencies>
-            <ignoredNonTestScopedDependency>com.entwinemedia.common:functional</ignoredNonTestScopedDependency>
-          </ignoredNonTestScopedDependencies>
           <ignoredUnusedDeclaredDependencies>
             <!-- indirectly used when tests are run -->
             <ignoredUnusedDeclaredDependency>org.glassfish.jersey.core:jersey-server</ignoredUnusedDeclaredDependency>

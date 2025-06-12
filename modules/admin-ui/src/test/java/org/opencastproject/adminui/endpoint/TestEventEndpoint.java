@@ -73,7 +73,6 @@ import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.metadata.dublincore.StaticMetadataServiceDublinCoreImpl;
-import org.opencastproject.scheduler.api.Recording;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.scheduler.api.TechnicalMetadata;
 import org.opencastproject.scheduler.api.TechnicalMetadataImpl;
@@ -444,17 +443,17 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     mp.setIdentifier(new IdImpl("asdasd"));
     events.add(mp);
     SchedulerService schedulerService = EasyMock.createNiceMock(SchedulerService.class);
-    EasyMock.expect(schedulerService.search(EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class),
-            EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class)))
+    EasyMock.expect(schedulerService.search(EasyMock.anyObject(Optional.class), EasyMock.anyObject(Optional.class),
+            EasyMock.anyObject(Optional.class), EasyMock.anyObject(Optional.class), EasyMock.anyObject(Optional.class)))
             .andReturn(events).anyTimes();
     EasyMock.expect(schedulerService.findConflictingEvents(EasyMock.anyString(), EasyMock.anyObject(RRule.class),
             EasyMock.anyObject(Date.class), EasyMock.anyObject(Date.class), EasyMock.anyLong(),
             EasyMock.anyObject(TimeZone.class))).andReturn(events).anyTimes();
     EasyMock.expect(schedulerService.findConflictingEvents(EasyMock.anyString(), EasyMock.anyObject(Date.class),
             EasyMock.anyObject(Date.class))).andReturn(events).anyTimes();
-    schedulerService.updateEvent(EasyMock.anyString(), EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class),
-            EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class),
-            EasyMock.anyObject(Opt.class), EasyMock.anyObject(Opt.class));
+    schedulerService.updateEvent(EasyMock.anyString(), EasyMock.anyObject(Optional.class), EasyMock.anyObject(Optional.class),
+            EasyMock.anyObject(Optional.class), EasyMock.anyObject(Optional.class), EasyMock.anyObject(Optional.class),
+            EasyMock.anyObject(Optional.class), EasyMock.anyObject(Optional.class));
     EasyMock.expectLastCall().anyTimes();
     EasyMock.expect(schedulerService.getWorkflowConfig("asdasd")).andThrow(new NotFoundException()).anyTimes();
     Map<String, String> workFlowConfig = new HashMap<>();
@@ -475,7 +474,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     wfProperties.put("skip", "true");
     TechnicalMetadata technicalMetadata = new TechnicalMetadataImpl("asdasd", "demo",
             new Date(fromUTC("2017-01-27T10:00:37Z")), new Date(fromUTC("2017-01-27T10:10:37Z")), userIds,
-            wfProperties, caProperties, Opt.<Recording> none());
+            wfProperties, caProperties, Optional.empty());
     expect(schedulerService.getTechnicalMetadata("notExists")).andThrow(new NotFoundException()).anyTimes();
     expect(schedulerService.getTechnicalMetadata(anyString())).andReturn(technicalMetadata).anyTimes();
 

@@ -618,22 +618,22 @@ public class EventsEndpoint implements ManagedService {
             configuration = new HashMap<>((JSONObject) eventHttpServletRequest.getProcessing().get().get("configuration"));
           }
 
-          Opt<Map<String, String>> caMetadataOpt = Opt.none();
-          Opt<Map<String, String>> workflowConfigOpt = Opt.none();
+          Optional<Map<String, String>> caMetadataOpt = Optional.empty();
+          Optional<Map<String, String>> workflowConfigOpt = Optional.empty();
 
           Map<String, String> caMetadata = new HashMap<>(getSchedulerService().getCaptureAgentConfiguration(eventId));
           if (!workflowId.equals(caMetadata.get(CaptureParameters.INGEST_WORKFLOW_DEFINITION))) {
             caMetadata.put(CaptureParameters.INGEST_WORKFLOW_DEFINITION, workflowId);
-            caMetadataOpt = Opt.some(caMetadata);
+            caMetadataOpt = Optional.of(caMetadata);
           }
 
           Map<String, String> oldWorkflowConfig = new HashMap<>(getSchedulerService().getWorkflowConfig(eventId));
           if (!oldWorkflowConfig.equals(configuration))
-            workflowConfigOpt = Opt.some(configuration);
+            workflowConfigOpt = Optional.of(configuration);
 
-          if (!caMetadataOpt.isNone() || !workflowConfigOpt.isNone()) {
-            getSchedulerService().updateEvent(eventId, Opt.none(), Opt.none(), Opt.none(),
-                    Opt.none(), Opt.none(), workflowConfigOpt, caMetadataOpt);
+          if (!caMetadataOpt.isEmpty() || !workflowConfigOpt.isEmpty()) {
+            getSchedulerService().updateEvent(eventId, Optional.empty(), Optional.empty(), Optional.empty(),
+                    Optional.empty(), Optional.empty(), workflowConfigOpt, caMetadataOpt);
           }
         }
 
@@ -2064,22 +2064,22 @@ public class EventsEndpoint implements ManagedService {
     final TechnicalMetadata technicalMetadata = schedulerService.getTechnicalMetadata(id);
 
     // When "inputs" is updated, capture agent configuration needs to be merged
-    Opt<Map<String, String>> caConfig = Opt.none();
+    Optional<Map<String, String>> caConfig = Optional.empty();
     if (schedulingInfo.getInputs().isSome()) {
       final Map<String, String> configMap = new HashMap<>(technicalMetadata.getCaptureAgentConfiguration());
       configMap.put(CaptureParameters.CAPTURE_DEVICE_NAMES, schedulingInfo.getInputs().get());
-      caConfig = Opt.some(configMap);
+      caConfig = Optional.of(configMap);
     }
 
     try {
       schedulerService.updateEvent(
           id,
-          schedulingInfo.getStartDate(),
-          schedulingInfo.getEndDate(),
-          schedulingInfo.getAgentId(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
+          Optional.ofNullable(schedulingInfo.getStartDate().orNull()),
+          Optional.ofNullable(schedulingInfo.getEndDate().orNull()),
+          Optional.ofNullable(schedulingInfo.getAgentId().orNull()),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty(),
           caConfig,
           allowConflict);
     } catch (SchedulerConflictException e) {

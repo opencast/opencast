@@ -20,10 +20,9 @@
  */
 package org.opencastproject.scheduler.api;
 
-import com.entwinemedia.fn.data.Opt;
-
 import java.util.Date;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -71,7 +70,7 @@ public interface TechnicalMetadata {
    *
    * @return the optional recording
    */
-  Opt<Recording> getRecording();
+  Optional<Recording> getRecording();
 
   /**
    * Returns the workflow properties

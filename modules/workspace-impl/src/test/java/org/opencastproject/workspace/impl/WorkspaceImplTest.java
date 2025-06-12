@@ -31,8 +31,6 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 
-import com.entwinemedia.fn.Prelude;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpEntity;
@@ -296,7 +294,7 @@ public class WorkspaceImplTest {
     workspace.cleanup(100);
     Assert.assertEquals(4L, workspace.getUsedSpace().get().longValue());
 
-    Prelude.sleep(1100L);
+    Thread.sleep(1100L);
 
     Assert.assertTrue(Paths.get(workspaceRoot, "test", "c1").toFile().exists());
     workspace.cleanup(1);

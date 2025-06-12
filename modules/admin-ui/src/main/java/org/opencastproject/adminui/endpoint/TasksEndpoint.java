@@ -206,7 +206,7 @@ public class TasksEndpoint {
     for (final Entry<String, Map<String, String>> entry : configuration.entrySet()) {
       final ConfiguredWorkflow workflow = workflow(wfd, entry.getValue());
       final Set<String> mpIds = Collections.singleton(entry.getKey());
-      final List<WorkflowInstance> partialResult = workflows.applyWorkflowToLatestVersion(mpIds, workflow).toList();
+      final List<WorkflowInstance> partialResult = workflows.applyWorkflowToLatestVersion(mpIds, workflow);
 
       if (partialResult.size() != 1) {
         logger.warn("Couldn't start workflow for media package {}", entry.getKey());
