@@ -43,8 +43,6 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.easymock.Capture;
@@ -60,6 +58,7 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Test class for {@link SeriesWorkflowOperationHandler}
@@ -86,7 +85,7 @@ public class SeriesWorkflowOperationHandlerTest {
     EasyMock.expect(seriesService.getSeriesAccessControl(EasyMock.anyString())).andReturn(new AccessControlList())
             .anyTimes();
     EasyMock.expect(seriesService.getSeriesElementData(EasyMock.anyString(), EasyMock.anyString()))
-            .andReturn(Opt.some(FileUtils.readFileToByteArray(file))).anyTimes();
+            .andReturn(Optional.of(FileUtils.readFileToByteArray(file))).anyTimes();
     EasyMock.replay(seriesService);
 
     SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);

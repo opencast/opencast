@@ -59,8 +59,6 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Collections;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.client.utils.URIUtils;
@@ -1030,7 +1028,8 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
 
     // Merge the elements
     for (final MediaPackageElement updatedElement : updatedMp.elements()) {
-      for (final MediaPackageElementFlavor flavor : Opt.nul(updatedElement.getFlavor())) {
+      MediaPackageElementFlavor flavor = updatedElement.getFlavor();
+      if (flavor != null) {
         for (final MediaPackageElement outdated : mergedMp.getElementsByFlavor(flavor)) {
           mergedMp.remove(outdated);
         }

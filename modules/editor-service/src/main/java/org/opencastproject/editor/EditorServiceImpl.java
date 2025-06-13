@@ -1180,8 +1180,7 @@ public class EditorServiceImpl implements EditorService {
                 .getLatestWorkflowProperties(assetManager, mediaPackage.getIdentifier().toString());
         final Workflows workflows = new Workflows(assetManager, workflowService);
         workflows.applyWorkflowToLatestVersion(Collections.singletonList(mediaPackage.getIdentifier().toString()),
-                ConfiguredWorkflow.workflow(workflowService.getWorkflowDefinitionById(workflowId), workflowParameters))
-                .run();
+                ConfiguredWorkflow.workflow(workflowService.getWorkflowDefinitionById(workflowId), workflowParameters));
       } catch (AssetManagerException e) {
         errorExit("Unable to start workflow" + workflowId, mediaPackageId, ErrorStatus.WORKFLOW_ERROR, e);
       } catch (WorkflowDatabaseException e) {

@@ -36,8 +36,6 @@ import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
 import org.junit.After;
@@ -54,6 +52,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -93,7 +92,7 @@ public class SchedulerUtilTest {
   @Test
   public void testCalculateChecksum() throws Exception {
     String extendedFlavorType = "extended";
-    DublinCoreCatalog dc = SchedulerServiceImplTest.generateExtendedEvent(Opt.<String> none(), extendedFlavorType);
+    DublinCoreCatalog dc = SchedulerServiceImplTest.generateExtendedEvent(Optional.empty(), extendedFlavorType);
     FileUtils.writeStringToFile(workspaceFile, dc.toXmlString(), "UTF-8");
 
     List<MediaPackageElementFlavor> catalogAdapterFlavors = new ArrayList<>();
@@ -108,7 +107,7 @@ public class SchedulerUtilTest {
     Set<String> userIds = new HashSet<>();
     userIds.add("user2");
     userIds.add("user1");
-    MediaPackage mp = SchedulerServiceImplTest.generateEvent(Opt.<String> none());
+    MediaPackage mp = SchedulerServiceImplTest.generateEvent(Optional.empty());
     mp.setSeries(seriesId);
     DublinCoreCatalog event = SchedulerServiceImplTest.generateEvent(captureDeviceID, start, end);
     event.set(PROPERTY_CREATED, EncodingSchemeUtils.encodeDate(start, Precision.Minute));
@@ -126,14 +125,14 @@ public class SchedulerUtilTest {
 
     String expectedChecksum = "2d5398c961f0784a13eaad323ebc43f3";
     String checksum = SchedulerUtil.calculateChecksum(workspace, catalogAdapterFlavors, start, end, captureDeviceID,
-            userIds, mp, Opt.some(event), wfProperties, caProperties, acl);
+            userIds, mp, Optional.of(event), wfProperties, caProperties, acl);
     Assert.assertEquals(expectedChecksum, checksum);
 
     // change start date
     start = new Date();
 
     checksum = SchedulerUtil.calculateChecksum(workspace, catalogAdapterFlavors, start, end, captureDeviceID, userIds,
-            mp, Opt.some(event), wfProperties, caProperties, acl);
+            mp, Optional.of(event), wfProperties, caProperties, acl);
     Assert.assertNotEquals(expectedChecksum, checksum);
 
     // change end date
@@ -141,7 +140,7 @@ public class SchedulerUtilTest {
     end = new Date();
 
     checksum = SchedulerUtil.calculateChecksum(workspace, catalogAdapterFlavors, start, end, captureDeviceID, userIds,
-            mp, Opt.some(event), wfProperties, caProperties, acl);
+            mp, Optional.of(event), wfProperties, caProperties, acl);
     Assert.assertNotEquals(expectedChecksum, checksum);
 
     // change device
@@ -149,7 +148,7 @@ public class SchedulerUtilTest {
     captureDeviceID = "demo1";
 
     checksum = SchedulerUtil.calculateChecksum(workspace, catalogAdapterFlavors, start, end, captureDeviceID, userIds,
-            mp, Opt.some(event), wfProperties, caProperties, acl);
+            mp, Optional.of(event), wfProperties, caProperties, acl);
     Assert.assertNotEquals(expectedChecksum, checksum);
 
     // change users
@@ -157,7 +156,7 @@ public class SchedulerUtilTest {
     userIds.add("test");
 
     checksum = SchedulerUtil.calculateChecksum(workspace, catalogAdapterFlavors, start, end, captureDeviceID, userIds,
-            mp, Opt.some(event), wfProperties, caProperties, acl);
+            mp, Optional.of(event), wfProperties, caProperties, acl);
     Assert.assertNotEquals(expectedChecksum, checksum);
 
     // change episode dublincore
@@ -166,7 +165,7 @@ public class SchedulerUtilTest {
     event.set(PROPERTY_CREATED, EncodingSchemeUtils.encodeDate(end, Precision.Minute));
 
     checksum = SchedulerUtil.calculateChecksum(workspace, catalogAdapterFlavors, start, end, captureDeviceID, userIds,
-            mp, Opt.some(event), wfProperties, caProperties, acl);
+            mp, Optional.of(event), wfProperties, caProperties, acl);
     Assert.assertNotEquals(expectedChecksum, checksum);
 
     // change extended dublincore
@@ -177,7 +176,7 @@ public class SchedulerUtilTest {
     FileUtils.writeStringToFile(workspaceFile, dc.toXmlString(), "UTF-8");
 
     checksum = SchedulerUtil.calculateChecksum(workspace, catalogAdapterFlavors, start, end, captureDeviceID, userIds,
-            mp, Opt.some(event), wfProperties, caProperties, acl);
+            mp, Optional.of(event), wfProperties, caProperties, acl);
     Assert.assertNotEquals(expectedChecksum, checksum);
 
     // change wf properties
@@ -187,7 +186,7 @@ public class SchedulerUtilTest {
     wfProperties.put("change", "change");
 
     checksum = SchedulerUtil.calculateChecksum(workspace, catalogAdapterFlavors, start, end, captureDeviceID, userIds,
-            mp, Opt.some(event), wfProperties, caProperties, acl);
+            mp, Optional.of(event), wfProperties, caProperties, acl);
     Assert.assertNotEquals(expectedChecksum, checksum);
 
     // change ca properties
@@ -195,12 +194,12 @@ public class SchedulerUtilTest {
     caProperties.put("change", "change");
 
     checksum = SchedulerUtil.calculateChecksum(workspace, catalogAdapterFlavors, start, end, captureDeviceID, userIds,
-            mp, Opt.some(event), wfProperties, caProperties, acl);
+            mp, Optional.of(event), wfProperties, caProperties, acl);
     Assert.assertNotEquals(expectedChecksum, checksum);
 
     // change access control list
     checksum = SchedulerUtil.calculateChecksum(workspace, catalogAdapterFlavors, start, end, captureDeviceID, userIds,
-            mp, Opt.some(event), wfProperties, caProperties,
+            mp, Optional.of(event), wfProperties, caProperties,
             new AccessControlList(new AccessControlEntry("ROLE_ADMIN", "write", false)));
     Assert.assertNotEquals(expectedChecksum, checksum);
   }

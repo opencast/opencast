@@ -312,7 +312,7 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
               addDublinCoreCatalog(series, MediaPackageElements.SERIES, mediaPackage);
             } else {
               try {
-                Optional<byte[]> seriesElementData = Optional.ofNullable(seriesService.getSeriesElementData(seriesId, adapterFlavor.getType()).orNull());
+                Optional<byte[]> seriesElementData = seriesService.getSeriesElementData(seriesId, adapterFlavor.getType());
                 if (seriesElementData.isPresent()) {
                   DublinCoreCatalog catalog = DublinCores.read(new ByteArrayInputStream(seriesElementData.get()));
                   addDublinCoreCatalog(catalog, adapterFlavor, mediaPackage);

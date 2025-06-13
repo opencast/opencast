@@ -41,9 +41,6 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.NotFoundException;
 
-import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.Stream;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -340,8 +337,8 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
 
   private void updateIndices(String eventId) throws EventCommentDatabaseException {
     List<EventComment> comments = getComments(eventId);
-    boolean hasOpenComments = !Stream.$(comments).filter(filterOpenComments).toList().isEmpty();
-    boolean needsCutting = !Stream.$(comments).filter(filterNeedsCuttingComment).toList().isEmpty();
+    boolean hasOpenComments = comments.stream().anyMatch(filterOpenComments::apply);
+    boolean needsCutting = comments.stream().anyMatch(filterNeedsCuttingComment::apply);
 
     String organization = securityService.getOrganization().getId();
     User user = securityService.getUser();
@@ -389,14 +386,15 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
     }
   }
 
-  private static final Fn<EventComment, Boolean> filterOpenComments = new Fn<EventComment, Boolean>() {
+  private static final Function<EventComment, Boolean> filterOpenComments = new Function<EventComment, Boolean>() {
     @Override
     public Boolean apply(EventComment comment) {
       return !comment.isResolvedStatus();
     }
   };
 
-  private static final Fn<EventComment, Boolean> filterNeedsCuttingComment = new Fn<EventComment, Boolean>() {
+  private static final Function<EventComment, Boolean> filterNeedsCuttingComment =
+      new Function<EventComment, Boolean>() {
     @Override
     public Boolean apply(EventComment comment) {
       return EventComment.REASON_NEEDS_CUTTING.equals(comment.getReason()) && !comment.isResolvedStatus();
@@ -427,7 +425,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
 
                       var updatedEventData = index.getEvent(eventId, orgId, securityService.getUser());
                       updatedEventData = getEventUpdateFunction(eventId).apply(updatedEventData);
-                      updatedEventRange.add(updatedEventData.get());
+                      updatedEventData.ifPresent(updatedEventRange::add);
 
                       if (updatedEventRange.size() >= n || i >= eventsWithComments.get(orgId).size()) {
                         index.bulkEventUpdate(updatedEventRange);
@@ -467,8 +465,8 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
         }
         comments = getComments(eventId);
         Boolean hasComments = !comments.isEmpty();
-        Boolean hasOpenComments = !Stream.$(comments).filter(filterOpenComments).toList().isEmpty();
-        Boolean needsCutting = !Stream.$(comments).filter(filterNeedsCuttingComment).toList().isEmpty();
+        boolean hasOpenComments = comments.stream().anyMatch(filterOpenComments::apply);
+        boolean needsCutting = comments.stream().anyMatch(filterNeedsCuttingComment::apply);
 
         logger.debug("Updating comment status of event {} in the {} index.", eventId, index.getIndexName());
         if (!hasComments && hasOpenComments) {

@@ -176,10 +176,10 @@ public class EventsEndpointTest {
         .expect().statusCode(SC_NO_CONTENT).when().put(env.host("{event_id}/scheduling"));
 
     SchedulingUtils.SchedulingInfo schedulingInfo = new SchedulingUtils.SchedulingInfo();
-    schedulingInfo.setAgentId(TestEventsEndpoint.getCapturedAgentId().getValue());
-    schedulingInfo.setStartDate(TestEventsEndpoint.getCapturedStartDate().getValue());
-    schedulingInfo.setEndDate(TestEventsEndpoint.getCapturedEndDate().getValue());
-    if (TestEventsEndpoint.getCapturedAgentConfig().getValue().isSome()) {
+    schedulingInfo.setAgentId(Opt.nul(TestEventsEndpoint.getCapturedAgentId().getValue().get()));
+    schedulingInfo.setStartDate(Opt.nul(TestEventsEndpoint.getCapturedStartDate().getValue().get()));
+    schedulingInfo.setEndDate(Opt.nul(TestEventsEndpoint.getCapturedEndDate().getValue().get()));
+    if (TestEventsEndpoint.getCapturedAgentConfig().getValue().isPresent()) {
       schedulingInfo.setInputs(Opt.some(TestEventsEndpoint.getCapturedAgentConfig()
           .getValue().get().get(CaptureParameters.CAPTURE_DEVICE_NAMES)));
     }

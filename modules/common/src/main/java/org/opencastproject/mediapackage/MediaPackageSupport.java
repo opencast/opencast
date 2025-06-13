@@ -28,7 +28,6 @@ import static org.opencastproject.util.data.functions.Booleans.not;
 import static org.opencastproject.util.data.functions.Options.sequenceOpt;
 import static org.opencastproject.util.data.functions.Options.toOption;
 
-import org.opencastproject.util.data.Effect;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 
@@ -43,6 +42,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 /** Utility class used for media package handling. */
 public final class MediaPackageSupport {
@@ -161,13 +161,10 @@ public final class MediaPackageSupport {
   }
 
   /** {@link #updateElement(MediaPackage, MediaPackageElement)} as en effect. */
-  public static Effect<MediaPackageElement> updateElement(final MediaPackage mp) {
-    return new Effect<MediaPackageElement>() {
-      @Override
-      protected void run(MediaPackageElement e) {
-        updateElement(mp, e);
-      }
-    };
+
+
+  public static Consumer<MediaPackageElement> updateElement(final MediaPackage mp) {
+    return e -> updateElement(mp, e);
   }
 
   public static final Function<MediaPackageElement, String> getMediaPackageElementId = new Function<MediaPackageElement, String>() {
