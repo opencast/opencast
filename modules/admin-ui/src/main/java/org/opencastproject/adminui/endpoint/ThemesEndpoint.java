@@ -42,7 +42,6 @@ import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.QueryPreprocessor;
 import org.opencastproject.elasticsearch.index.objects.series.Series;
 import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.elasticsearch.index.objects.theme.IndexTheme;
@@ -222,7 +221,7 @@ public class ThemesEndpoint {
       if (ThemesListQuery.FILTER_CREATOR_NAME.equals(name))
         query.withCreator(filters.get(name));
       if (ThemesListQuery.FILTER_TEXT_NAME.equals(name))
-        query.withText(QueryPreprocessor.sanitize(filters.get(name)));
+        query.withText(filters.get(name));
     }
 
     if (optSort.isSome()) {

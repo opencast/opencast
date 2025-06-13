@@ -64,7 +64,6 @@ import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.QueryPreprocessor;
 import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.elasticsearch.index.objects.series.Series;
@@ -770,7 +769,7 @@ public class SeriesEndpoint {
         } else if (SeriesListQuery.FILTER_CREATOR_NAME.equals(name)) {
           query.withCreator(filters.get(name));
         } else if (SeriesListQuery.FILTER_TEXT_NAME.equals(name)) {
-          query.withText(QueryPreprocessor.sanitize(filters.get(name)));
+          query.withText(filters.get(name));
         } else if (SeriesListQuery.FILTER_LANGUAGE_NAME.equals(name)) {
           query.withLanguage(filters.get(name));
         } else if (SeriesListQuery.FILTER_LICENSE_NAME.equals(name)) {
