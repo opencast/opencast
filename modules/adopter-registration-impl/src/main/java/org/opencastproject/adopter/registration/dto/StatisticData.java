@@ -19,7 +19,7 @@
  *
  */
 
-package org.opencastproject.adopter.statistic.dto;
+package org.opencastproject.adopter.registration.dto;
 
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
@@ -45,7 +45,7 @@ public class StatisticData {
    * Every adopter has his own statistic key, so when the data of different adopters will be
    * collected, we can use this as an ID and identify every statistic data entry
    * later on to update existing entries in the database.
-   * We don't use the adopter key from {@link org.opencastproject.adopter.statistic.dto.GeneralData} at this point,
+   * We don't use the adopter key from {@link GeneralData} at this point,
    * because we are not allowed to associate the statistic data with the adopter.
    */
   @SerializedName("statistic_key")

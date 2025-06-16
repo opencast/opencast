@@ -19,13 +19,13 @@
  *
  */
 
-package org.opencastproject.adopter.statistic;
+package org.opencastproject.adopter.registration;
 
 import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpEntityEnclosingRequestBase;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,16 +34,17 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 /**
  * Contains methods for sending statistic data via rest.
  */
-public class Sender {
+public class AdopterRegistrationSender {
 
   /** The logger */
-  private static final Logger logger = LoggerFactory.getLogger(Sender.class);
+  private static final Logger logger = LoggerFactory.getLogger(AdopterRegistrationSender.class);
 
   /** The base URL for the external server where the data will be send to */
   private String baseUrl;
@@ -53,7 +54,7 @@ public class Sender {
   private static final String GENERAL_DATA_URL_SUFFIX = "api/1.0/adopter";
   private static final String STATISTIC_URL_SUFFIX = "api/1.0/statistic";
 
-  private static final String TOBIRA_URL_SUFFIX = "api/1.0/tobira";
+  private static final String EXTRA_URL_INFIX = "api/1.0";
 
   //================================================================================
   // Constructor
@@ -63,7 +64,7 @@ public class Sender {
    * Simple Constructor that requires the URL of the statistic server.
    * @param statisticServerBaseUrl The URL prefix of the statistic server.
    */
-  public Sender(String statisticServerBaseUrl) {
+  public AdopterRegistrationSender(String statisticServerBaseUrl) {
     if (!statisticServerBaseUrl.endsWith("/")) {
       statisticServerBaseUrl += "/";
     }
@@ -103,11 +104,12 @@ public class Sender {
 
   /**
    * Executes the 'send' method with the proper REST URL suffix.
+   * @param key The key for the extra data.
    * @param json The data which shall be sent.
    * @throws IOException General exception that can occur while sending the data.
    */
-  public void sendTobiraData(String json) throws IOException {
-    send(json, TOBIRA_URL_SUFFIX);
+  public void sendExtraData(String key, String json) throws IOException {
+    send(json, EXTRA_URL_INFIX + "/" + key);
   }
 
   /**
@@ -138,33 +140,50 @@ public class Sender {
    * @throws IOException General exception that can occur while processing the POST request.
    */
   private void send(String json, String urlSuffix, String method) throws IOException {
-    HttpClient client = HttpClientBuilder.create().useSystemProperties().build();
-    String url = new URL(baseUrl + urlSuffix).toString();
-    HttpEntityEnclosingRequestBase request = null;
-    if ("DELETE".equals(method)) {
-      request = new HttpDeleteWithEntity(url);
-    } else {
-      request = new HttpPost(url);
+    try (CloseableHttpClient client = HttpClientBuilder.create().useSystemProperties().build()) {
+      String url = new URL(baseUrl + urlSuffix).toString();
+      HttpEntityEnclosingRequestBase request = null;
+      if ("DELETE".equals(method)) {
+        request = new HttpDeleteWithEntity(url);
+      } else {
+        request = new HttpPost(url);
+      }
+      request.addHeader("Content-Type", "application/json; utf-8");
+      request.addHeader("Accept", "application/json");
+      request.setEntity(new StringEntity(json, StandardCharsets.UTF_8));
+
+      HttpResponse resp = client.execute(request);
+      int httpStatus = resp.getStatusLine().getStatusCode();
+      boolean errorOccurred = httpStatus < 200 || httpStatus > 299;
+      InputStream responseStream = resp.getEntity().getContent();
+
+      try (BufferedReader br = new BufferedReader(new InputStreamReader(responseStream, StandardCharsets.UTF_8))) {
+        StringBuilder response = new StringBuilder();
+        String responseLine;
+        while ((responseLine = br.readLine()) != null) {
+          response.append(responseLine.trim());
+        }
+        if (errorOccurred) {
+          String errorMessage = String.format("HttpStatus: %s, HttpResponse: %s", httpStatus, response);
+          throw new RuntimeException(errorMessage);
+        }
+      }
     }
-    request.addHeader("Content-Type", "application/json; utf-8");
-    request.addHeader("Accept", "application/json");
-    request.setEntity(new StringEntity(json, StandardCharsets.UTF_8));
+  }
 
-    HttpResponse resp = client.execute(request);
-    int httpStatus = resp.getStatusLine().getStatusCode();
-    boolean errorOccurred = httpStatus < 200 || httpStatus > 299;
-    InputStream responseStream = resp.getEntity().getContent();
+  //This custom class is here because HttpDelete doesn't accept entities, which is needed by the server
+  static class HttpDeleteWithEntity extends HttpEntityEnclosingRequestBase {
 
-    try (BufferedReader br = new BufferedReader(new InputStreamReader(responseStream, StandardCharsets.UTF_8))) {
-      StringBuilder response = new StringBuilder();
-      String responseLine;
-      while ((responseLine = br.readLine()) != null) {
-        response.append(responseLine.trim());
-      }
-      if (errorOccurred) {
-        String errorMessage = String.format("HttpStatus: %s, HttpResponse: %s", httpStatus, response);
-        throw new RuntimeException(errorMessage);
-      }
+    public static final String METHOD_NAME = "DELETE";
+
+    HttpDeleteWithEntity(final String uri) {
+      super();
+      setURI(URI.create(uri));
+    }
+
+    @Override
+    public String getMethod() {
+      return METHOD_NAME;
     }
   }
 
