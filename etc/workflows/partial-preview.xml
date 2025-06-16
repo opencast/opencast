@@ -41,21 +41,6 @@
       </configurations>
     </operation>
 
-    <operation
-      id="encode"
-      if="(NOT(${presenter_source_video} OR $ ${presentation_source_video}))"
-      exception-handler-workflow="partial-error"
-      description="Create single-stream video preview">
-      <configurations>
-        <configuration key="source-flavors">*/source</configuration>
-        <configuration key="target-flavor">*/preview</configuration>
-        <configuration key="target-tags">preview</configuration>
-        <configuration key="encoding-profile">mp4-audio-preview.http</configuration>
-      </configurations>
-    </operation>
-
-
-
     <!-- CHANGEME: Activate this if you use the old editor -->
     <!--
     <operation
@@ -92,7 +77,7 @@
       exception-handler-workflow="partial-error"
       description="Generating waveform">
       <configurations>
-        <configuration key="source-flavor">*/preview</configuration>
+        <configuration key="source-flavor">*/source</configuration>
         <configuration key="target-flavor">*/waveform</configuration>
         <configuration key="target-tags">preview</configuration>
       </configurations>
@@ -116,6 +101,53 @@
         <configuration key="time">50%</configuration>
       </configurations>
     </operation>
+
+    <operation
+    id="cover-image"
+    if="(NOT(${presenter_source_video} OR $ ${presentation_source_video}))"
+    description="Create a cover image for audio-only files">
+      <configurations>
+        <configuration key="stylesheet">file://${karaf.etc}/branding/coverimage.xsl</configuration>
+        <configuration key="width">1920</configuration>
+        <configuration key="height">1080</configuration>
+        <configuration key="target-flavor">presenter/image+work</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+    id="image-to-video"
+    if="(NOT(${presenter_source_video} OR $ ${presentation_source_video}))"
+    description="Composite">
+      <configurations>
+        <configuration key="source-flavor">presenter/image+work</configuration>
+        <configuration key="target-flavor">*/video+work</configuration>
+        <configuration key="duration">${presenter_source_duration}</configuration>
+        <configuration key="profile">image-movie.work</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+    id="prepare-av"
+    if="(NOT(${presenter_source_video} OR $ ${presentation_source_video}))"
+    description="Preparing presenter audio and video work versions">
+      <configurations>
+        <configuration key="source-flavor">presenter/video+work</configuration>
+        <configuration key="target-flavor">presenter/preview</configuration>
+        <configuration key="rewrite">false</configuration>
+        <configuration key="audio-muxing-source-flavors">*/source</configuration>
+      </configurations>
+    </operation>
+
+    <operation
+    id="tag"
+    description="Tagging media package elements">
+      <configurations>
+        <configuration key="source-flavors">presenter/preview</configuration>
+        <configuration key="target-tags">preview</configuration>
+        <configuration key="copy">false</configuration>
+      </configurations>
+    </operation>
+
 
     <operation
       id="waveform"
