@@ -216,6 +216,14 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
       }
     }
 
+    // Recording start date
+    if (query.getEndDateValues() != null) {
+      for (EventSearchQueryField<String> date : query.getEndDate()) {
+        addToQuery(EventIndexSchema.END_DATE,
+            date.getValue(), date.getType(), date.isMust());
+      }
+    }
+
     // Recording duration
     if (query.getDuration() != null) {
       and(EventIndexSchema.DURATION, query.getDuration());

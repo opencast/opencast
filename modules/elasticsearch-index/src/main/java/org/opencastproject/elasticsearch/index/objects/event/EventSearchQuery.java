@@ -74,6 +74,7 @@ public class EventSearchQuery extends AbstractSearchQuery {
   private String workflowDefinition = null;
   private Long duration = null;
   private List<EventSearchQueryField<String>> startDate = new ArrayList<>();
+  private List<EventSearchQueryField<String>> endDate = new ArrayList<>();
   private String eventStatus = null;
   private Boolean hasComments = null;
   private Boolean hasOpenComments = null;
@@ -1081,6 +1082,33 @@ public class EventSearchQuery extends AbstractSearchQuery {
 
   public String[] getStartDateValues() {
     return startDate.stream()
+        .map(date -> date.getValue())
+        .toArray(String[]::new);
+  }
+
+  /**
+   * Selects recordings with the given end date.
+   *
+   * @param endDate
+   *          the end date
+   * @return the enhanced search query
+   */
+  public EventSearchQuery withEndDate(String endDate, EventQueryType type) {
+    this.endDate.add(new EventSearchQueryField(endDate, type));
+    return this;
+  }
+
+  /**
+   * Returns the end date of the recording.
+   *
+   * @return the end date
+   */
+  public List<EventSearchQueryField<String>> getEndDate() {
+    return endDate;
+  }
+
+  public String[] getEndDateValues() {
+    return endDate.stream()
         .map(date -> date.getValue())
         .toArray(String[]::new);
   }

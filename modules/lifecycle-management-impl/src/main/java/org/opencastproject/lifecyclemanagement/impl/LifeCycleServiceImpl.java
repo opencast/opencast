@@ -528,7 +528,10 @@ public class LifeCycleServiceImpl implements LifeCycleService {
               filters.get(name).getType());
         }
 
-        default -> logger.debug("Filter " + name + " is not supported");
+        case EventIndexSchema.END_DATE -> query.withEndDate(
+            filters.get(name).getValue(), filters.get(name).getType());
+
+        default -> logger.warn("Filter " + name + " is not supported");
       }
     }
   }
