@@ -836,6 +836,11 @@
         <artifactId>org.apache.servicemix.bundles.quartz</artifactId>
         <version>1.8.5_1</version>
       </dependency>
+      <dependency>
+        <groupId>com.cronutils</groupId>
+        <artifactId>cron-utils</artifactId>
+        <version>9.2.1</version>
+      </dependency>
       <!-- OSGi -->
       <dependency>
         <groupId>org.osgi</groupId>

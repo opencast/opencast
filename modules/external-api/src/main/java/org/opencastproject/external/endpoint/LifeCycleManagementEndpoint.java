@@ -58,6 +58,11 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.util.requests.SortCriterion;
 
+import com.cronutils.mapper.CronMapper;
+import com.cronutils.model.Cron;
+import com.cronutils.model.CronType;
+import com.cronutils.model.definition.CronDefinitionBuilder;
+import com.cronutils.parser.CronParser;
 import com.entwinemedia.fn.data.json.Field;
 import com.entwinemedia.fn.data.json.JValue;
 import com.google.gson.Gson;
@@ -165,6 +170,14 @@ public class LifeCycleManagementEndpoint {
         @PathParam("id") String id) {
         try {
             LifeCyclePolicy policy = service.getLifeCyclePolicyById(id);
+
+            if (!policy.getCronTrigger().isEmpty()) {
+                CronParser unixParser = new CronParser(CronDefinitionBuilder.instanceDefinitionFor(CronType.QUARTZ));
+                Cron cron = unixParser.parse(policy.getCronTrigger());
+                CronMapper cronMapper = CronMapper.fromQuartzToUnix();
+                Cron cron4jCron = cronMapper.map(cron);
+                policy.setCronTrigger(cron4jCron.asString());
+            }
 
             return ApiResponseBuilder.Json.ok(acceptHeader, policyToJson(policy));
         } catch (NotFoundException e) {
@@ -356,6 +369,12 @@ public class LifeCycleManagementEndpoint {
 
             // Check if cron string is valid
             if (cronTrigger != null && !cronTrigger.isEmpty()) {
+                CronParser unixParser = new CronParser(CronDefinitionBuilder.instanceDefinitionFor(CronType.UNIX));
+                Cron cron = unixParser.parse(cronTrigger);
+                CronMapper cronMapper = CronMapper.fromUnixToQuartz();
+                Cron cron4jCron = cronMapper.map(cron);
+                cronTrigger = cron4jCron.asString();
+
                 if (!org.quartz.CronExpression.isValidExpression(cronTrigger)) {
                     return Response.status(Response.Status.BAD_REQUEST).build();
                 }
@@ -499,6 +518,12 @@ public class LifeCycleManagementEndpoint {
                 policy.setActionDate(EncodingSchemeUtils.decodeDate(actionDate));
             }
             if (cronTrigger != null && !cronTrigger.isEmpty()) {
+                CronParser unixParser = new CronParser(CronDefinitionBuilder.instanceDefinitionFor(CronType.UNIX));
+                Cron cron = unixParser.parse(cronTrigger);
+                CronMapper cronMapper = CronMapper.fromUnixToQuartz();
+                Cron cron4jCron = cronMapper.map(cron);
+                cronTrigger = cron4jCron.asString();
+
                 policy.setCronTrigger(cronTrigger);
             }
             if (timing != null && !timing.isEmpty()) {

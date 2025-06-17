@@ -80,6 +80,7 @@
     <bundle>mvn:org.codehaus.jettison/jettison/${jettison.version}</bundle>
     <bundle>mvn:org.opencastproject/android-mms/1.2</bundle>
     <bundle>wrap:mvn:com.googlecode.json-simple/json-simple/${json-simple.version}</bundle>
+    <bundle>wrap:mvn:com.cronutils/cron-utils/9.2.1</bundle>
 
     <!-- AWS Bits -->
     <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/${jackson.version}</bundle>

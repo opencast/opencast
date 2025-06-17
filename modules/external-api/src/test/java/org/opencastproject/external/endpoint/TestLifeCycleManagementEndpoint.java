@@ -74,6 +74,7 @@ public class TestLifeCycleManagementEndpoint extends LifeCycleManagementEndpoint
     expect(policy.getTiming()).andReturn(Timing.SPECIFIC_DATE).anyTimes();
     expect(policy.getTargetFilters()).andReturn(Maps.newHashMap()).anyTimes();
     expect(policy.getAccessControlEntries()).andReturn(Lists.newArrayList(accessControlEntry1)).anyTimes();
+    expect(policy.getCronTrigger()).andReturn("").anyTimes();
     replay(policy);
 
     List<LifeCyclePolicy> policies = new ArrayList<>();
