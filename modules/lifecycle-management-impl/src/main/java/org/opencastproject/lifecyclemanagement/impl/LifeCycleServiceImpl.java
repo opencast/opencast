@@ -495,7 +495,7 @@ public class LifeCycleServiceImpl implements LifeCycleService {
             filters.get(name).getValue(), filters.get(name).getType(), filters.get(name).isMust());
         case EventIndexSchema.LOCATION -> query.withLocation(
             filters.get(name).getValue(), filters.get(name).getType(), filters.get(name).isMust());
-        case EventIndexSchema.SERIES_ID -> query.withSeriesId(
+        case "isPartOf" -> query.withSeriesId(
             filters.get(name).getValue(), filters.get(name).getType(), filters.get(name).isMust());
         case EventIndexSchema.SERIES_NAME -> query.withSeriesName(
             filters.get(name).getValue(), filters.get(name).getType(), filters.get(name).isMust());
