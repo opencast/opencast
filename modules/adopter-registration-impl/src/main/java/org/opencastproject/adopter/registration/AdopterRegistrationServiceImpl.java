@@ -64,6 +64,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -340,14 +341,14 @@ public class AdopterRegistrationServiceImpl extends TimerTask {
     if (null == adopter) {
       adopter = new Adopter();
     }
-    Map<String, Object> map = Map.of(
-        "general", new GeneralData(adopter),
-        "statistics", collectStatisticData(adopter.getAdopterKey(), adopter.getStatisticKey()));
+    Map<String, Object> map = new LinkedHashMap<>();
+    map.put("general", new GeneralData(adopter));
+    map.put("statistics", collectStatisticData(adopter.getAdopterKey(), adopter.getStatisticKey()));
     db.exec(em -> {
       TypedQuery<AdopterRegistrationExtra> q =
           em.createNamedQuery("AdopterRegistrationExtra.findAll", AdopterRegistrationExtra.class);
       q.getResultList().forEach(extra -> {
-        map.put(extra.getType(), extra.getData());
+        map.put(extra.getType(),gson.fromJson(extra.getData(), Map.class));
       });
     });
 
