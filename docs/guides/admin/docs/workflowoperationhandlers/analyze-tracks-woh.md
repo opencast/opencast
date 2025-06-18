@@ -21,7 +21,7 @@ instance variables may be set:
 | *flavor*\_audio         | `presenter_source_audio=true`       | Track contains at least one audio stream    |
 | *flavor*\_video         | `presenter_source_video=true`       | Track contains at least one video stream    |
 | *flavor*\_subtitle      | `presenter_source_subtitle=true`    | Track contains at least one subtitle stream |
-| *flavor*\_resolution\_x | `presenter_source_resolution_x=1280` | Horizontal resolution of the video stream   |
+| *flavor*\_resolution\_x | `presenter_source_resolution_x=1280`| Horizontal resolution of the video stream   |
 | *flavor*\_resolution\_y | `presenter_source_resolution_y=720` | Vertical resolution of the video stream     |
 | *flavor*\_aspect        | `presenter_source_aspect=4/3`       | Exact aspect ratio of the video stream      |
 | *flavor*\_aspect\_snap  | `presenter_source_aspect_snap=4/3`  | Nearest specified aspect ratio of the video |
