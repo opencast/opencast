@@ -18,19 +18,10 @@ Technische Universität Ilmenau | legacy.opencast.org           | Lars Kiesow   
 ### CI Servers
 Institution                | Hostname                             | Admin (Software) | Admin (Hardware)
 ---------------------------|--------------------------------------|------------------|--------------------
-University of Cologne      | oc-com-admin.rrz.uni-koeln.de        | Greg Logan       | Ruth Lang
-University of Cologne      | oc-com-worker1.rrz.uni-koeln.de      | Greg Logan       | Ruth Lang
-University of Cologne      | oc-com-presentation.rrz.uni-koeln.de | Greg Logan       | Ruth Lang
-
+Logan IT Enterprises       | ci.opencast.org                      | Greg Logan       | Greg Logan
 
 
 ### Maven Repository
-
-Institution                | Hostname                      | Admin (Software) | Admin (Hardware)  | Notes
----------------------------|-------------------------------|------------------|-------------------|-----------------
-Harvard DCE                | mvncache.opencast.org         | Lars Kiesow      | DCE Devel group   | Nginx cache, AWS
-University of Osnabrück    | nexus.opencast.org            | Lars Kiesow      | Lars Kiesow       | nexus-oss
-
 Nexus administration:
 
 - Greg Logan
@@ -42,9 +33,7 @@ Nexus administration:
 Institution                | Hostname                        | Admin (Software) | Admin (Hardware)
 ---------------------------|---------------------------------|------------------|-------------------------
 University of Osnabrück    | pkg.opencast.org                | Lars Kiesow      | Lars Kiesow
-University of Cologne      | ci.opencast.org                 | Greg Logan       | Ruth Lang
 University of Osnabrück    | docs.opencast.org               | Lars Kiesow      | Lars Kiesow
-University of Stuttgart    | testrailoc.tik.uni-stuttgart.de | Release managers | Per Pascal Grube
 
 
 Administrators
@@ -58,6 +47,7 @@ tools.  These tools are
 - GitHub
 - Google Groups
 - Crowdin
+- Google Drive
 
 While many of our administrators are committers, an administrator is _not_ a committer by necessity.  Administrators
 have important responsibilities within the community, but mainly work behind the scenes.  These responsibilities
@@ -76,7 +66,7 @@ groups in multiple places when a change is necessary.  These changes are
 - Modifying the [GitHub committers group](https://github.com/orgs/opencast/teams/committers/members) upon request
 - Modifying the [Google committers group](https://admin.google.com/opencast.org/AdminHome?hl=de&pli=1&fral=1&groupId=committers@opencast.org&chromeless=1#OGX:Group?hl=de)
 - Modifying the [Crowdin committers group](https://crowdin.com/project/opencast-community/settings#members)
-- Modifying the list of committers on the [Opencast website](https://opencast.org/people)
+- Modifying the committer storage permissions in the admin google drive space
 
 ### Current Administrators
 
@@ -99,11 +89,5 @@ order:
 
 Other services and the primary contact for them:
 
-- Google
-    - Greg Logan
 - YouTube
     - Greg Logan and ETH Staff
-- Twitter
-    - Lars Kiesow
-- Facebook
-    - Rüdiger Rolf

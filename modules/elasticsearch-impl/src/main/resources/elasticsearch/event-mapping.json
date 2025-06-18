@@ -232,10 +232,11 @@
 
             }
         },
-
-        "text": { "type" : "text", "analyzer": "lowercasespaceanalyzer" },
-        "text_fuzzy": { "type" : "text", "analyzer": "lowercasespaceanalyzer" }
-
+        "text": {
+            "type" : "search_as_you_type",
+            "analyzer": "autocomplete_analyzer",
+            "search_analyzer": "whitespace_analyzer"
+        }
     },
     "dynamic_templates" : [
          {
