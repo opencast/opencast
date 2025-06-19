@@ -19,7 +19,7 @@
  *
  */
 
-package org.opencastproject.adopter.registration;
+package org.opencastproject.adopter.registration.dto;
 
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.util.EqualsUtil;
@@ -45,10 +45,10 @@ import javax.persistence.TemporalType;
 @Access(AccessType.FIELD)
 @Table(name = "oc_adopter_registration")
 @NamedQueries({
-        @NamedQuery(name = "Form.findAll", query = "SELECT f FROM Form f"),
-        @NamedQuery(name = "Form.deleteAll", query = "DELETE FROM Form f")
+        @NamedQuery(name = "Adopter.findAll", query = "SELECT f FROM Adopter f"),
+        @NamedQuery(name = "Adopter.deleteAll", query = "DELETE FROM Adopter f")
 })
-public class Form implements IForm {
+public class Adopter {
 
   public enum TERMSOFUSEVERSION {
     PRE_2022, APRIL_2022
@@ -143,11 +143,11 @@ public class Form implements IForm {
   //================================================================================
 
   /** No-arg constructor needed by JPA. */
-  public Form() {
+  public Adopter() {
 
   }
 
-  public Form(String organisationName, String departmentName, String firstName, String lastName, String email,
+  public Adopter(String organisationName, String departmentName, String firstName, String lastName, String email,
           String country, String postalCode, String city, String street, String streetNo, boolean contactMe,
           String systemType, boolean allowsStatistics, boolean allowsErrorReports, boolean agreedToPolicy,
           boolean registered) {
@@ -172,31 +172,30 @@ public class Form implements IForm {
     this.registered = registered;
   }
 
-  public void merge(IForm form) {
-    Form f = (Form) form;
-    this.organisationName = f.organisationName;
-    this.departmentName = f.departmentName;
-    this.firstName = f.firstName;
-    this.lastName = f.lastName;
-    this.email = f.email;
-    this.country = f.country;
-    this.postalCode = f.postalCode;
-    this.city = f.city;
-    this.street = f.street;
-    this.streetNo = f.streetNo;
-    this.contactMe = f.contactMe;
-    this.systemType = f.systemType;
-    this.allowsStatistics = f.allowsStatistics;
-    this.allowsErrorReports = f.allowsErrorReports;
-    this.agreedToPolicy = f.agreedToPolicy;
-    this.termsVersionAgreed = f.termsVersionAgreed;
+  public void merge(Adopter a) {
+    this.organisationName = a.organisationName;
+    this.departmentName = a.departmentName;
+    this.firstName = a.firstName;
+    this.lastName = a.lastName;
+    this.email = a.email;
+    this.country = a.country;
+    this.postalCode = a.postalCode;
+    this.city = a.city;
+    this.street = a.street;
+    this.streetNo = a.streetNo;
+    this.contactMe = a.contactMe;
+    this.systemType = a.systemType;
+    this.allowsStatistics = a.allowsStatistics;
+    this.allowsErrorReports = a.allowsErrorReports;
+    this.agreedToPolicy = a.agreedToPolicy;
+    this.termsVersionAgreed = a.termsVersionAgreed;
     if (!this.registered) {
       // overwrite this field only when an adopter isn't registered yet
       // once an adopter is registered, he stays registered
-      this.registered = f.registered;
+      this.registered = a.registered;
     }
     this.dateModified = new Date();
-    this.deleteMe = f.deleteMe;
+    this.deleteMe = a.deleteMe;
   }
 
   @Override
@@ -204,7 +203,7 @@ public class Form implements IForm {
     if (!(obj instanceof Organization)) {
       return false;
     }
-    return ((Form) obj).adopterKey.equals(adopterKey);
+    return ((Adopter) obj).adopterKey.equals(adopterKey);
   }
 
   @Override

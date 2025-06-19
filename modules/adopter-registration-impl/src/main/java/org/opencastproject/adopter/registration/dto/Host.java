@@ -19,7 +19,7 @@
  *
  */
 
-package org.opencastproject.adopter.statistic.dto;
+package org.opencastproject.adopter.registration.dto;
 
 import org.opencastproject.serviceregistry.api.HostRegistration;
 
