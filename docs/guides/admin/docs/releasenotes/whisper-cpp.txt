@@ -1,0 +1,2 @@
+- We switched to using the new default binary names used by Whisper.cpp
+- The default model directory is now /usr/share/whisper.cpp/models
