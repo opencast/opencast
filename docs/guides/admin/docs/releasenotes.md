@@ -71,7 +71,7 @@ configure asset upload options in more detail [[#6362](https://github.com/openca
 - Waveform peaks are now more visible, but that behavior is configurable.
   [[#6028](https://github.com/opencast/opencast/pull/6028)]
 
-For more details, please take a look at the [full changelog](changelog/opencast{{ opencast_major_version() }}.md).
+For more details, please take a look at the [full changelog](changelog/opencast-{{ opencast_major_version() }}.md).
 If you want to update Opencast from a previous version, you should also read the [upgrade guide](upgrade.md).
 
 
