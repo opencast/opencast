@@ -281,7 +281,7 @@ The following steps outline the necessary steps for cutting the final release:
 
         cd docs/guides/admin/docs/
         vim releasenotes.md
-        vim changelog.md
+        vim changelog/opencast-<version>.md
         git commit -S releasenotes.md changelog.md -m 'Updated Release Notes'
         git push <remote> r/6.x
 
