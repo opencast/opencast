@@ -66,6 +66,7 @@ public final class TobiraService {
     return (JSONObject) request(
             "query AdminUIHostPages($seriesId: String!) {"
                     + "  series: seriesByOpencastId(id: $seriesId) {"
+                    + "    id"
                     + "    hostPages: hostRealms {"
                     + "      ... RealmData"
                     + "      blocks { id }"
@@ -89,6 +90,7 @@ public final class TobiraService {
             "query AdminUIEventHostPages($eventId: String!) {"
                     + "  event: eventByOpencastId(id: $eventId) {"
                     + "    ...on AuthorizedEvent {"
+                    + "      id"
                     + "      hostPages: hostRealms {"
                     + "        title: name"
                     + "        path"
