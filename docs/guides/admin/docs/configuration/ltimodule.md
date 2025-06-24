@@ -15,7 +15,7 @@ Opencast videos without ever leaving their course.
 More information about the LTI specification is available at
 [IMS Learning Tools Interoperability](https://imsglobal.org/activity/learning-tools-interoperability).
 For a better  understanding of what LTI is and what it is not, consider this
-[introductory webinar](https://video.ethz.ch/events/opencast/miscellaneous/webinars/3bb13443-19d3-4147-8ff9-7106f5a959bb.html).
+[introductory webinar](https://explore.opencast.org/webinars/v/A_q9rVZ3Pzb).
 
 
 Configuration
