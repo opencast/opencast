@@ -17,7 +17,7 @@
     "@babel/core": "^7.25.7",
     "@babel/eslint-parser": "^7.25.9",
     "@babel/preset-env": "^7.26.0",
-    "@playwright/test": "^1.48.2",
+    "@playwright/test": "^1.53.1",
     "babel-loader": "^9.2.1",
     "copy-webpack-plugin": "^12.0.2",
     "css-loader": "^7.1.2",
