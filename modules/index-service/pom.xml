@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>18-SNAPSHOT</version>
+    <version>19-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -147,6 +147,12 @@
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-elasticsearch-index</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-themes</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>

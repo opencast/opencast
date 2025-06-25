@@ -24,9 +24,6 @@ package org.opencastproject.themes;
 import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
-import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.theme.ThemeSearchQuery;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
@@ -38,13 +35,17 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.themes.persistence.ThemesServiceDatabaseImpl;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Option;
+import org.opencastproject.util.requests.SortCriterion;
 
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Tests persistence: storing, merging, retrieving and removing.
@@ -70,21 +71,11 @@ public class ThemesServiceDatabaseTest {
     EasyMock.expect(userDirectoryService.loadUser(EasyMock.anyString())).andReturn(user).anyTimes();
     EasyMock.replay(userDirectoryService);
 
-    SearchResult result = EasyMock.createMock(SearchResult.class);
-    EasyMock.expect(result.getDocumentCount()).andReturn(0L).anyTimes();
-    EasyMock.replay(result);
-
-    ElasticsearchIndex index = EasyMock.createNiceMock(ElasticsearchIndex.class);
-    EasyMock.expect(index.getIndexName()).andReturn("adminui").anyTimes();
-    EasyMock.expect(index.getByQuery(EasyMock.anyObject(ThemeSearchQuery.class))).andReturn(result).anyTimes();
-    EasyMock.replay(index);
-
     themesDatabase = new ThemesServiceDatabaseImpl();
     themesDatabase.setEntityManagerFactory(newEntityManagerFactory(ThemesServiceDatabaseImpl.PERSISTENCE_UNIT));
     themesDatabase.setDBSessionFactory(getDbSessionFactory());
     themesDatabase.setSecurityService(securityService);
     themesDatabase.setUserDirectoryService(userDirectoryService);
-    themesDatabase.setIndex(index);
     themesDatabase.activate(null);
   }
 
@@ -121,4 +112,96 @@ public class ThemesServiceDatabaseTest {
     }
   }
 
+  @Test
+  public void testFindQuery() throws Exception {
+    JaxbOrganization org = new DefaultOrganization();
+    JaxbUser user1 = new JaxbUser("admin", "test", org);
+    JaxbUser user2 = new JaxbUser("bdmin", "test", org);
+    JaxbUser user3 = new JaxbUser("cdmin", "test", org);
+
+    Theme theme1 = new Theme(Option.<Long> none(), new Date(1), true, user1, "A theme");
+    Theme theme2 = new Theme(Option.<Long> none(), new Date(2), true, user2, "B theme");
+    Theme theme3 = new Theme(Option.<Long> none(), new Date(2), true, user3, "C theme");
+
+    themesDatabase.updateTheme(theme1);
+    themesDatabase.updateTheme(theme2);
+    themesDatabase.updateTheme(theme3);
+
+    List<Theme> themes;
+
+    // Empty query
+    themes = themesDatabase.findThemes(
+        Optional.empty(),
+        Optional.empty(),
+        new ArrayList<>(),
+        Optional.empty(),
+        Optional.empty()
+    );
+    Assert.assertEquals(3, themes.size());
+
+    // With limit
+    themes = themesDatabase.findThemes(
+        Optional.ofNullable(1),
+        Optional.empty(),
+        new ArrayList<>(),
+        Optional.empty(),
+        Optional.empty()
+    );
+    Assert.assertEquals(1, themes.size());
+
+    themes = themesDatabase.findThemes(
+        Optional.ofNullable(Integer.MAX_VALUE),
+        Optional.empty(),
+        new ArrayList<>(),
+        Optional.empty(),
+        Optional.empty()
+    );
+    Assert.assertEquals(3, themes.size());
+
+    // With offset
+    themes = themesDatabase.findThemes(
+        Optional.ofNullable(Integer.MAX_VALUE),
+        Optional.ofNullable(1),
+        new ArrayList<>(),
+        Optional.empty(),
+        Optional.empty()
+    );
+    Assert.assertEquals(2, themes.size());
+
+    // With sort
+    SortCriterion sortCriterion1 = new SortCriterion("creation_date", SortCriterion.Order.Descending);
+    SortCriterion sortCriterion2 = new SortCriterion("name", SortCriterion.Order.Ascending);
+    ArrayList<SortCriterion> sortCriteria = new ArrayList<>();
+    sortCriteria.add(sortCriterion1);
+    sortCriteria.add(sortCriterion2);
+    themes = themesDatabase.findThemes(
+        Optional.ofNullable(Integer.MAX_VALUE),
+        Optional.ofNullable(0),
+        sortCriteria,
+        Optional.empty(),
+        Optional.empty()
+    );
+    Assert.assertEquals("B theme", themes.get(0).getName());
+    Assert.assertEquals("C theme", themes.get(1).getName());
+    Assert.assertEquals("A theme", themes.get(2).getName());
+
+    // With filter
+    themes = themesDatabase.findThemes(
+        Optional.ofNullable(Integer.MAX_VALUE),
+        Optional.ofNullable(0),
+        new ArrayList<>(),
+        Optional.ofNullable("admin"),
+        Optional.empty()
+    );
+    Assert.assertEquals(1, themes.size());
+
+    themes = themesDatabase.findThemes(
+        Optional.ofNullable(Integer.MAX_VALUE),
+        Optional.ofNullable(0),
+        new ArrayList<>(),
+        Optional.empty(),
+        Optional.ofNullable("admin")
+    );
+    Assert.assertEquals(1, themes.size());
+  }
 }

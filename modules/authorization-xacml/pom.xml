@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>18-SNAPSHOT</version>
+    <version>19-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -50,10 +50,6 @@
       <groupId>jakarta.xml.bind</groupId>
       <artifactId>jakarta.xml.bind-api</artifactId>
       <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>osgi.core</artifactId>
     </dependency>
     <!-- Logging -->
     <dependency>

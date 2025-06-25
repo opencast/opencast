@@ -39,12 +39,8 @@ import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.QueryPreprocessor;
 import org.opencastproject.elasticsearch.index.objects.series.Series;
 import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
-import org.opencastproject.elasticsearch.index.objects.theme.IndexTheme;
-import org.opencastproject.elasticsearch.index.objects.theme.ThemeIndexSchema;
-import org.opencastproject.elasticsearch.index.objects.theme.ThemeSearchQuery;
 import org.opencastproject.index.service.resources.list.query.ThemesListQuery;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.security.api.SecurityService;
@@ -70,7 +66,6 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.util.requests.SortCriterion;
 
-import com.entwinemedia.fn.data.Opt;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -89,6 +84,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
@@ -197,80 +193,49 @@ public class ThemesEndpoint {
           @RestParameter(name = "sort", isRequired = false, description = "The sort order. May include any of the following: NAME, CREATOR.  Add '_DESC' to reverse the sort order (e.g. CREATOR_DESC).", type = STRING) }, responses = { @RestResponse(description = "A JSON representation of the themes", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
   public Response getThemes(@QueryParam("filter") String filter, @QueryParam("limit") int limit,
           @QueryParam("offset") int offset, @QueryParam("sort") String sort) {
-    Option<Integer> optLimit = Option.option(limit);
-    Option<Integer> optOffset = Option.option(offset);
-    Option<String> optSort = Option.option(trimToNull(sort));
-
-    ThemeSearchQuery query = new ThemeSearchQuery(securityService.getOrganization().getId(), securityService.getUser());
-
-    // If the limit is set to 0, this is not taken into account
-    if (optLimit.isSome() && limit == 0) {
-      optLimit = Option.none();
-    }
-
-    if (optLimit.isSome())
-      query.withLimit(optLimit.get());
-    if (optOffset.isSome())
-      query.withOffset(offset);
+    Optional<Integer> optLimit = Optional.ofNullable(limit);
+    Optional<Integer> optOffset = Optional.ofNullable(offset);
+    Optional<String> optSort = Optional.ofNullable(trimToNull(sort));
 
     Map<String, String> filters = RestUtils.parseFilter(filter);
-    for (String name : filters.keySet()) {
-      if (ThemesListQuery.FILTER_CREATOR_NAME.equals(name))
-        query.withCreator(filters.get(name));
-      if (ThemesListQuery.FILTER_TEXT_NAME.equals(name))
-        query.withText(QueryPreprocessor.sanitize(filters.get(name)));
+
+    ArrayList<SortCriterion> sortCriteria;
+    if (optSort.isPresent()) {
+      sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
+    } else {
+      sortCriteria = new ArrayList<>();
     }
+    Optional<String> optCreatorFilter = Optional.ofNullable(filters.get(ThemesListQuery.FILTER_CREATOR_NAME));
+    Optional<String> optTextFilter = Optional.ofNullable(filters.get(ThemesListQuery.FILTER_TEXT_NAME));
 
-    if (optSort.isSome()) {
-      ArrayList<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
-      for (SortCriterion criterion : sortCriteria) {
-        switch (criterion.getFieldName()) {
-          case ThemeIndexSchema.NAME:
-            query.sortByName(criterion.getOrder());
-            break;
-          case ThemeIndexSchema.DESCRIPTION:
-            query.sortByDescription(criterion.getOrder());
-            break;
-          case ThemeIndexSchema.CREATOR:
-            query.sortByCreator(criterion.getOrder());
-            break;
-          case ThemeIndexSchema.DEFAULT:
-            query.sortByDefault(criterion.getOrder());
-            break;
-          case ThemeIndexSchema.CREATION_DATE:
-            query.sortByCreatedDateTime(criterion.getOrder());
-            break;
-          default:
-            logger.info("Unknown sort criteria {}", criterion.getFieldName());
-            return Response.status(SC_BAD_REQUEST).build();
-        }
-      }
-    }
-
-    logger.trace("Using Query: " + query.toString());
-
-    SearchResult<IndexTheme> results = null;
+    List<Theme> results = null;
+    int total;
     try {
-      results = searchIndex.getByQuery(query);
-    } catch (SearchIndexException e) {
-      logger.error("The admin UI Search Index was not able to get the themes list:", e);
+      results = themesServiceDatabase.findThemes(
+          optLimit,
+          optOffset,
+          sortCriteria,
+          optCreatorFilter,
+          optTextFilter
+      );
+      total = themesServiceDatabase.countThemes();
+    } catch (Exception e) {
+      logger.error("Could not get themes from the database:", e);
       return RestUtil.R.serverError();
     }
 
-    List<JsonObject> themesJSON = new ArrayList<JsonObject>();
 
-    // If the results list if empty, we return already a response.
-    if (results.getPageSize() == 0) {
-      logger.debug("No themes match the given filters.");
-      return okJsonList(themesJSON, nul(offset).getOr(0), nul(limit).getOr(0), 0);
-    }
-
-    for (SearchResultItem<IndexTheme> item : results.getItems()) {
-      IndexTheme theme = item.getSource();
+    List<JsonObject> themesJSON = new ArrayList<>();
+    for (Theme theme : results) {
       themesJSON.add(themeToJSON(theme, false));
     }
 
-    return okJsonList(themesJSON, nul(offset).getOr(0), nul(limit).getOr(0), results.getHitCount());
+    return okJsonList(
+        themesJSON,
+        nul(offset).getOr(0),
+        nul(limit).getOr(0),
+        total
+    );
   }
 
   @GET
@@ -279,12 +244,16 @@ public class ThemesEndpoint {
   @RestQuery(name = "getTheme", description = "Returns the theme by the given id as JSON", returnDescription = "The theme as JSON", pathParameters = { @RestParameter(name = "themeId", description = "The theme id", isRequired = true, type = RestParameter.Type.INTEGER) }, responses = {
           @RestResponse(description = "Returns the theme as JSON", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "No theme with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
-  public Response getThemeResponse(@PathParam("themeId") long id) throws Exception {
-    Opt<IndexTheme> theme = getTheme(id);
-    if (theme.isNone())
-      return notFound("Cannot find a theme with id '%s'", id);
+  public Response getThemeResponse(@PathParam("themeId") long id) {
+    try {
+      Theme theme = themesServiceDatabase.getTheme(id);
 
-    return okJson(themeToJSON(theme.get(), true));
+      return okJson(themeToJSON(theme, true));
+    } catch (ThemesServiceDatabaseException e) {
+      return RestUtil.R.serverError();
+    } catch (NotFoundException e) {
+      return notFound("Cannot find a theme with id '%s'", id);
+    }
   }
 
   @GET
@@ -293,35 +262,37 @@ public class ThemesEndpoint {
   @RestQuery(name = "getThemeUsage", description = "Returns the theme usage by the given id as JSON", returnDescription = "The theme usage as JSON", pathParameters = { @RestParameter(name = "themeId", description = "The theme id", isRequired = true, type = RestParameter.Type.INTEGER) }, responses = {
           @RestResponse(description = "Returns the theme usage as JSON", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "Theme with the given id does not exist", responseCode = HttpServletResponse.SC_NOT_FOUND) })
-  public Response getThemeUsage(@PathParam("themeId") long themeId) throws Exception {
-    Opt<IndexTheme> theme = getTheme(themeId);
-    if (theme.isNone())
-      return notFound("Cannot find a theme with id {}", themeId);
-
-    SeriesSearchQuery query = new SeriesSearchQuery(securityService.getOrganization().getId(),
-            securityService.getUser()).withTheme(themeId);
-    SearchResult<Series> results = null;
+  public Response getThemeUsage(@PathParam("themeId") long themeId) {
     try {
-      results = searchIndex.getByQuery(query);
-    } catch (SearchIndexException e) {
-      logger.error("The admin UI Search Index was not able to get the series with theme '{}':", themeId,
-              e);
+      themesServiceDatabase.getTheme(themeId);
+
+      SeriesSearchQuery query = new SeriesSearchQuery(securityService.getOrganization().getId(),
+              securityService.getUser()).withTheme(themeId);
+      SearchResult<Series> results = null;
+      try {
+        results = searchIndex.getByQuery(query);
+      } catch (SearchIndexException e) {
+        logger.error("The admin UI Search Index was not able to get the series with theme '{}':", themeId,
+                e);
+        return RestUtil.R.serverError();
+      }
+      JsonArray seriesValues = new JsonArray();
+      for (SearchResultItem<Series> item : results.getItems()) {
+        Series series = item.getSource();
+        JsonObject seriesJson = new JsonObject();
+        seriesJson.addProperty("id", series.getIdentifier());
+        seriesJson.addProperty("title", series.getTitle());
+        seriesValues.add(seriesJson);
+      }
+      JsonObject responseJson = new JsonObject();
+      responseJson.add("series", seriesValues);
+
+      return okJson(responseJson);
+    } catch (ThemesServiceDatabaseException e) {
       return RestUtil.R.serverError();
+    } catch (NotFoundException e) {
+      return notFound("Cannot find a theme with id {}", themeId);
     }
-
-    JsonArray seriesValues = new JsonArray();
-    for (SearchResultItem<Series> item : results.getItems()) {
-      Series series = item.getSource();
-      JsonObject seriesJson = new JsonObject();
-      seriesJson.addProperty("id", series.getIdentifier());
-      seriesJson.addProperty("title", series.getTitle());
-      seriesValues.add(seriesJson);
-    }
-
-    JsonObject responseJson = new JsonObject();
-    responseJson.add("series", seriesValues);
-
-    return okJson(responseJson);
   }
 
   @POST
@@ -379,7 +350,7 @@ public class ThemesEndpoint {
 
     try {
       Theme createdTheme = themesServiceDatabase.updateTheme(theme);
-      return RestUtils.okJson(themeToJSON(createdTheme));
+      return RestUtils.okJson(themeToJSON(createdTheme,false));
     } catch (ThemesServiceDatabaseException e) {
       logger.error("Unable to create a theme");
       return RestUtil.R.serverError();
@@ -475,7 +446,7 @@ public class ThemesEndpoint {
       }
 
       Theme updatedTheme = themesServiceDatabase.updateTheme(theme);
-      return RestUtils.okJson(themeToJSON(updatedTheme));
+      return RestUtils.okJson(themeToJSON(updatedTheme, false));
     } catch (ThemesServiceDatabaseException e) {
       logger.error("Unable to update theme {}", themeId, e);
       return RestUtil.R.serverError();
@@ -541,23 +512,18 @@ public class ThemesEndpoint {
     }
   }
 
-  /**
-   * Get a single theme
-   *
-   * @param id
-   *          the theme id
-   * @return a theme or none if not found, wrapped in an option
-   * @throws SearchIndexException
-   */
-  private Opt<IndexTheme> getTheme(long id) throws SearchIndexException {
-    SearchResult<IndexTheme> result = searchIndex
-            .getByQuery(new ThemeSearchQuery(securityService.getOrganization().getId(), securityService.getUser())
-                    .withIdentifier(id));
-    if (result.getPageSize() == 0) {
-      logger.debug("Didn't find theme with id {}", id);
-      return Opt.<IndexTheme> none();
+  private void extendStaticFileInfo(String fieldName, String staticFileId, JsonObject json) {
+    if (StringUtils.isNotBlank(staticFileId)) {
+      try {
+        String fileName = staticFileService.getFileName(staticFileId);
+        String fileUrl = staticFileRestService.getStaticFileURL(staticFileId).toString();
+
+        json.addProperty(fieldName + "Name", fileName);
+        json.addProperty(fieldName + "Url", safeString(fileUrl));
+      } catch (IllegalStateException | NotFoundException e) {
+        logger.error("Error retrieving static file '{}'", staticFileId, e);
+      }
     }
-    return Opt.some(result.getItems()[0].getSource());
   }
 
   /**
@@ -569,14 +535,18 @@ public class ThemesEndpoint {
    *          whether the returning representation should contain edit information
    * @return the JSON representation of this theme.
    */
-  private JsonObject themeToJSON(IndexTheme theme, boolean editResponse) {
+  private JsonObject themeToJSON(Theme theme, boolean editResponse) {
+    String creator = StringUtils.isNotBlank(theme.getCreator().getName())
+        ? theme.getCreator().getName()
+        : theme.getCreator().getUsername();
+
     JsonObject json = new JsonObject();
 
-    json.addProperty("id", theme.getIdentifier());
+    json.addProperty("id",  theme.getId().getOrElse(-1L));
     json.addProperty("creationDate", DateTimeSupport.toUTC(theme.getCreationDate().getTime()));
     json.addProperty("default", theme.isDefault());
     json.addProperty("name", theme.getName());
-    json.addProperty("creator", theme.getCreator());
+    json.addProperty("creator", creator);
     json.addProperty("description", safeString(theme.getDescription()));
     json.addProperty("bumperActive", theme.isBumperActive());
     json.addProperty("bumperFile", safeString(theme.getBumperFile()));
@@ -599,53 +569,6 @@ public class ThemesEndpoint {
       extendStaticFileInfo("licenseSlideBackground", theme.getLicenseSlideBackground(), json);
       extendStaticFileInfo("watermarkFile", theme.getWatermarkFile(), json);
     }
-
-    return json;
-  }
-
-  private void extendStaticFileInfo(String fieldName, String staticFileId, JsonObject json) {
-    if (StringUtils.isNotBlank(staticFileId)) {
-      try {
-        String fileName = staticFileService.getFileName(staticFileId);
-        String fileUrl = staticFileRestService.getStaticFileURL(staticFileId).toString();
-
-        json.addProperty(fieldName + "Name", fileName);
-        json.addProperty(fieldName + "Url", safeString(fileUrl));
-      } catch (IllegalStateException | NotFoundException e) {
-        logger.error("Error retrieving static file '{}'", staticFileId, e);
-      }
-    }
-  }
-
-  /**
-   * @return The JSON representation of this theme.
-   */
-  private JsonObject themeToJSON(Theme theme) {
-    String creator = StringUtils.isNotBlank(theme.getCreator().getName())
-        ? theme.getCreator().getName()
-        : theme.getCreator().getUsername();
-
-    JsonObject json = new JsonObject();
-
-    json.addProperty("id", theme.getId().getOrElse(-1L));
-    json.addProperty("creationDate", DateTimeSupport.toUTC(theme.getCreationDate().getTime()));
-    json.addProperty("default", theme.isDefault());
-    json.addProperty("name", theme.getName());
-    json.addProperty("creator", creator);
-    json.addProperty("description", safeString(theme.getDescription()));
-    json.addProperty("bumperActive", theme.isBumperActive());
-    json.addProperty("bumperFile", safeString(theme.getBumperFile()));
-    json.addProperty("trailerActive", theme.isTrailerActive());
-    json.addProperty("trailerFile", safeString(theme.getTrailerFile()));
-    json.addProperty("titleSlideActive", theme.isTitleSlideActive());
-    json.addProperty("titleSlideMetadata", safeString(theme.getTitleSlideMetadata()));
-    json.addProperty("titleSlideBackground", safeString(theme.getTitleSlideBackground()));
-    json.addProperty("licenseSlideActive", theme.isLicenseSlideActive());
-    json.addProperty("licenseSlideDescription", safeString(theme.getLicenseSlideDescription()));
-    json.addProperty("licenseSlideBackground", safeString(theme.getLicenseSlideBackground()));
-    json.addProperty("watermarkActive", theme.isWatermarkActive());
-    json.addProperty("watermarkFile", safeString(theme.getWatermarkFile()));
-    json.addProperty("watermarkPosition", safeString(theme.getWatermarkPosition()));
 
     return json;
   }

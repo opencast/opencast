@@ -23,6 +23,11 @@ package org.opencastproject.themes;
 
 import org.opencastproject.themes.persistence.ThemesServiceDatabaseException;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.requests.SortCriterion;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * API that defines persistent storage of themes.
@@ -41,6 +46,29 @@ public interface ThemesServiceDatabase {
    *           if there is a problem communicating with the underlying data store
    */
   Theme getTheme(long id) throws ThemesServiceDatabaseException, NotFoundException;
+
+  /**
+   * Return themes that match the query parameters
+   *
+   * @param limit
+   *          Maximum amount of themes to return (optional)
+   * @param offset
+   *          The offset to read data from (optional)
+   * @param sortCriteria
+   *          How the resulting list should be sorted
+   * @param creatorFilter
+   *          filter by creator name (optional)
+   * @param textFilter
+   *          fulltext filter (optional)
+   * @return A {@link List} of {@link Theme} that match the query parameters
+   */
+  List<Theme> findThemes(
+      Optional<Integer> limit,
+      Optional<Integer> offset,
+      ArrayList<SortCriterion> sortCriteria,
+      Optional<String> creatorFilter,
+      Optional<String> textFilter
+  );
 
   /**
    * Crate or update a theme.

@@ -83,7 +83,7 @@ public final class SeriesIndexUtils {
   public static SearchMetadataCollection toSearchMetadata(Series series) {
     SearchMetadataCollection metadata = new SearchMetadataCollection(
             series.getIdentifier().concat(series.getOrganization()), Series.DOCUMENT_TYPE);
-    metadata.addField(SeriesIndexSchema.UID, series.getIdentifier(), true);
+    metadata.addField(SeriesIndexSchema.UID, series.getIdentifier(), false);
     metadata.addField(SeriesIndexSchema.ORGANIZATION, series.getOrganization(), false);
     metadata.addField(SeriesIndexSchema.OBJECT, series.toXML(), false);
     metadata.addField(SeriesIndexSchema.TITLE, series.getTitle(), true);
@@ -94,20 +94,20 @@ public final class SeriesIndexUtils {
       metadata.addField(SeriesIndexSchema.SUBJECT, series.getSubject(), true);
     }
     if (StringUtils.trimToNull(series.getLanguage()) != null) {
-      metadata.addField(SeriesIndexSchema.LANGUAGE, series.getLanguage(), true);
+      metadata.addField(SeriesIndexSchema.LANGUAGE, series.getLanguage(), false);
     }
     if (StringUtils.trimToNull(series.getCreator()) != null) {
       metadata.addField(SeriesIndexSchema.CREATOR, series.getCreator(), true);
     }
     if (StringUtils.trimToNull(series.getLicense()) != null) {
-      metadata.addField(SeriesIndexSchema.LICENSE, series.getLicense(), true);
+      metadata.addField(SeriesIndexSchema.LICENSE, series.getLicense(), false);
     }
     if (StringUtils.trimToNull(series.getManagedAcl()) != null) {
-      metadata.addField(SeriesIndexSchema.MANAGED_ACL, series.getManagedAcl(), true);
+      metadata.addField(SeriesIndexSchema.MANAGED_ACL, series.getManagedAcl(), false);
     }
     if (series.getCreatedDateTime() != null) {
       metadata.addField(SeriesIndexSchema.CREATED_DATE_TIME,
-              DateTimeSupport.toUTC(series.getCreatedDateTime().getTime()), true);
+              DateTimeSupport.toUTC(series.getCreatedDateTime().getTime()), false);
     }
     if (series.getOrganizers() != null) {
       metadata.addField(SeriesIndexSchema.ORGANIZERS, series.getOrganizers().toArray(), true);
