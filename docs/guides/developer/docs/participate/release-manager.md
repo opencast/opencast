@@ -120,7 +120,7 @@ Example on how to create the Opencast 7 release branch:
         git checkout -b r/7.x
         git push origin r/7.x
 
-7. Create a release branch in the editor repository:
+8. Create a release branch in the editor repository:
 
         git clone -b develop git@github.com:opencast/opencast-editor.git
         cd opencast-editor
