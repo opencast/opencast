@@ -49,6 +49,7 @@ test "$(jq .consistent < version.json)" = "true"
 
 # commit changes
 git add pom.xml modules/*/pom.xml assemblies/pom.xml assemblies/*/pom.xml
+git rm -f etc/workflows/fast.xml
 git commit -m "Opencast ${VERSION}"
 git tag "${VERSION}" -m "Opencast ${VERSION}"
 
