@@ -283,10 +283,10 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
    * @see org.opencastproject.search.impl.persistence.SearchServiceDatabase#getAccessControlLists(String, String...)
    */
   @Override
-  public Collection<AccessControlList> getAccessControlLists(final String seriesId, String ... excludeIds)
+  public Collection<Pair<String, AccessControlList>> getAccessControlLists(final String seriesId, String ... excludeIds)
           throws SearchServiceDatabaseException {
     List<String> excludes = Arrays.asList(excludeIds);
-    List<AccessControlList> accessControlLists = new ArrayList<>();
+    List<Pair<String,AccessControlList>> accessControlLists = new ArrayList<>();
     try {
       List<SearchEntity> result = db.exec(namedQuery.findAll(
           "Search.findBySeriesId",
@@ -295,7 +295,10 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
       ));
       for (SearchEntity entity: result) {
         if (entity.getAccessControl() != null && !excludes.contains(entity.getMediaPackageId())) {
-          accessControlLists.add(AccessControlParser.parseAcl(entity.getAccessControl()));
+          accessControlLists.add(Pair.of(
+              entity.getMediaPackageId(),
+              AccessControlParser.parseAcl(entity.getAccessControl()))
+          );
         }
       }
     } catch (IOException | AccessControlParsingException e) {

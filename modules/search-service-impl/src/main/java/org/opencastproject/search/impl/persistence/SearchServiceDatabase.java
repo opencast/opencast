@@ -120,11 +120,11 @@ public interface SearchServiceDatabase {
    *          series identifier for which ACL will be retrieved
    * @param excludeIds
    *          list of media package identifier to exclude from the list
-   * @return Collection of {@link AccessControlList} of media packages from the series
+   * @return Collection of pairs of media package id and its {@link AccessControlList} of media packages from the series
    * @throws SearchServiceDatabaseException
    *           if exception occurred
    */
-  Collection<AccessControlList> getAccessControlLists(String seriesId, String ... excludeIds)
+  Collection<Pair<String, AccessControlList>> getAccessControlLists(String seriesId, String ... excludeIds)
           throws SearchServiceDatabaseException;
 
   /**

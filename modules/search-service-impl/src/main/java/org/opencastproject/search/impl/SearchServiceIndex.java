@@ -314,7 +314,56 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
       }).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
-    // Add custom roles to the ACL
+    // Add custom roles if enabled
+    acl = addCustomAclRoles(mediaPackageId, acl);
+
+    SearchResult item = new SearchResult(SearchService.IndexEntryType.Episode, dc, acl, orgId, mediaPackage,
+        null != modDate ? modDate.toInstant() : Instant.now(),
+        null != delDate ? delDate.toInstant() : null);
+    Map<String, Object> metadata = item.dehydrateForIndex();
+    try {
+      var request = new IndexRequest(INDEX_NAME);
+      request.id(mediaPackageId);
+      request.source(metadata);
+      esIndex.getClient().index(request, RequestOptions.DEFAULT);
+      logger.debug("Indexed episode {}", mediaPackageId);
+    } catch (IOException e) {
+      throw new SearchException(e);
+    }
+
+    // Elasticsearch series
+    for (DublinCoreCatalog seriesDc : seriesList) {
+      String seriesId = seriesDc.getFirst(DublinCore.PROPERTY_IDENTIFIER);
+      AccessControlList seriesAcl = persistence.getAccessControlLists(seriesId, mediaPackageId).stream()
+          .map(aclPair -> addCustomAclRoles(aclPair.getKey(), aclPair.getValue()))
+          .reduce(new AccessControlList(acl.getEntries()), AccessControlList::mergeActions);
+      item = new SearchResult(SearchService.IndexEntryType.Series, seriesDc, seriesAcl, orgId,
+          null, Instant.now(), null);
+
+      Map<String, Object> seriesData = item.dehydrateForIndex();
+      try {
+        var request = new IndexRequest(INDEX_NAME);
+        request.id(seriesId);
+        request.source(seriesData);
+        esIndex.getClient().index(request, RequestOptions.DEFAULT);
+        logger.debug("Indexed series {} related to episode {}", seriesId, mediaPackageId);
+      } catch (IOException e) {
+        throw new SearchException(e);
+      }
+    }
+  }
+
+  /**
+   * Add custom roles of the media package to the passed ACL
+   *
+   * @param mediaPackageId
+   *          the media package
+   * @param acl
+   *          the existing access control list
+   * @return {@link AccessControlList} containing the passed and the custom roles merged together
+   *
+   */
+  private AccessControlList addCustomAclRoles(String mediaPackageId, AccessControlList acl) {
     // This allows users with a role of the form ROLE_EPISODE_<ID>_<ACTION> to access the event through the index
     if (episodeIdRole) {
       Set<AccessControlEntry> customEntries = new HashSet<>();
@@ -339,39 +388,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
       acl = customRoles.merge(acl);
     }
 
-    SearchResult item = new SearchResult(SearchService.IndexEntryType.Episode, dc, acl, orgId, mediaPackage,
-        null != modDate ? modDate.toInstant() : Instant.now(),
-        null != delDate ? delDate.toInstant() : null);
-    Map<String, Object> metadata = item.dehydrateForIndex();
-    try {
-      var request = new IndexRequest(INDEX_NAME);
-      request.id(mediaPackageId);
-      request.source(metadata);
-      esIndex.getClient().index(request, RequestOptions.DEFAULT);
-      logger.debug("Indexed episode {}", mediaPackageId);
-    } catch (IOException e) {
-      throw new SearchException(e);
-    }
-
-    // Elasticsearch series
-    for (DublinCoreCatalog seriesDc : seriesList) {
-      String seriesId = seriesDc.getFirst(DublinCore.PROPERTY_IDENTIFIER);
-      AccessControlList seriesAcl = persistence.getAccessControlLists(seriesId, mediaPackageId).stream()
-          .reduce(new AccessControlList(acl.getEntries()), AccessControlList::mergeActions);
-      item = new SearchResult(SearchService.IndexEntryType.Series, seriesDc, seriesAcl, orgId,
-          null, Instant.now(), null);
-
-      Map<String, Object> seriesData = item.dehydrateForIndex();
-      try {
-        var request = new IndexRequest(INDEX_NAME);
-        request.id(seriesId);
-        request.source(seriesData);
-        esIndex.getClient().index(request, RequestOptions.DEFAULT);
-        logger.debug("Indexed series {} related to episode {}", seriesId, mediaPackageId);
-      } catch (IOException e) {
-        throw new SearchException(e);
-      }
-    }
+    return acl;
   }
 
   private void checkSearchEntityWritePermission(final String mediaPackageId) throws SearchException {
@@ -452,6 +469,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
           if (!persistence.getSeries(seriesId).isEmpty()) {
             // Update series acl if there are still episodes in the series
             final AccessControlList seriesAcl = persistence.getAccessControlLists(seriesId).stream()
+                .map(aclPair -> addCustomAclRoles(aclPair.getKey(), aclPair.getValue()))
                 .reduce(new AccessControlList(), AccessControlList::mergeActions);
             JsonElement json = gson.toJsonTree(Map.of(
                 SearchResult.INDEX_ACL, SearchResult.dehydrateAclForIndex(seriesAcl),
@@ -538,10 +556,6 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
             AccessControlList acl = persistence.getAccessControlList(mediaPackageId);
             Date modificationDate = persistence.getModificationDate(mediaPackageId);
             Date deletionDate = persistence.getDeletionDate(mediaPackageId);
-
-            AccessControlList seriesAcl = persistence.getAccessControlLists(mediaPackage.getSeries(), mediaPackageId)
-                .stream().reduce(new AccessControlList(acl.getEntries()), AccessControlList::mergeActions);
-            logger.debug("Updating series ACL with merged access control list: {}", seriesAcl);
 
             current.getAndIncrement();
 
