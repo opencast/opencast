@@ -1,3 +1,3 @@
 # Under construction
 
-While this page is being constructed, consider checking out [this webinar on Job Dispatching and Job Loads](https://video.ethz.ch/events/opencast/miscellaneous/webinars/ac93170a-79ab-4981-b8c0-06bd224a07a8.html).
+While this page is being constructed, consider checking out [this webinar on Job Dispatching and Job Loads](https://explore.opencast.org/webinars/v/PGom1gu6yO4).
