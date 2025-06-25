@@ -113,6 +113,20 @@ Example on how to create the Opencast 7 release branch:
         git commit -s -m 'Bumping pom.xml Version Numbers'
         git push <remote> develop
 
+7. Create a release branch in the admin-ui-interface repository:
+
+        git clone -b develop git@github.com:opencast/opencast-admin-interface.git
+        cd opencast-admin-interface
+        git checkout -b r/7.x
+        git push origin r/7.x
+
+8. Create a release branch in the editor repository:
+
+        git clone -b develop git@github.com:opencast/opencast-editor.git
+        cd opencast-editor
+        git checkout -b r/7.x
+        git push origin r/7.x
+
 
 ### Status of Translations
 
