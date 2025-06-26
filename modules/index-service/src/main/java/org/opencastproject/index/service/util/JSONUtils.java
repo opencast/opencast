@@ -68,7 +68,7 @@ public final class JSONUtils {
   /**
    * Turn a collection into a {@link JsonArray}
    *
-   * @param Collection
+   * @param collection
    *          the collection
    * @return a new {@link JsonArray} generated with the colleciton values
    */
