@@ -32,8 +32,6 @@ import org.opencastproject.metadata.api.MediaPackageMetadataService;
 import org.opencastproject.metadata.api.MediapackageMetadataImpl;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.Stream;
-
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -45,6 +43,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -103,7 +102,9 @@ public class DublinCoreCatalogService implements CatalogService<DublinCoreCatalo
   @Override
   public MediaPackageMetadata getMetadata(MediaPackage mp) {
     MediapackageMetadataImpl metadata = new MediapackageMetadataImpl();
-    for (Catalog catalog : Stream.$(mp.getCatalogs(DublinCoreCatalog.ANY_DUBLINCORE)).sort(COMPARE_BY_FLAVOR)) {
+    Catalog[] catalogs = mp.getCatalogs(DublinCoreCatalog.ANY_DUBLINCORE);
+    Arrays.sort(catalogs, COMPARE_BY_FLAVOR);
+    for (Catalog catalog : catalogs) {
       DublinCoreCatalog dc = DublinCoreUtil.loadDublinCore(workspace, catalog);
       if (MediaPackageElements.EPISODE.equals(catalog.getFlavor())) {
         // Title

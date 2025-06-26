@@ -21,12 +21,9 @@
 
 package org.opencastproject.metadata.dublincore;
 
-import static com.entwinemedia.fn.Equality.ne;
 import static org.opencastproject.metadata.dublincore.DublinCore.LANGUAGE_UNDEFINED;
 
 import org.opencastproject.mediapackage.EName;
-
-import com.entwinemedia.fn.data.Opt;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -35,6 +32,7 @@ import org.json.simple.parser.ParseException;
 
 import java.util.List;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -145,14 +143,14 @@ public final class DublinCoreJsonFormat {
       }
       for (DublinCoreValue value : entry.getValue()) {
         final String lang = value.getLanguage();
-        final Opt<EName> encScheme = value.getEncodingScheme();
+        final Optional<EName> encScheme = value.getEncodingScheme();
         final JSONObject v = new JSONObject();
         v.put("value", value.getValue());
-        if (ne(DublinCore.LANGUAGE_UNDEFINED, lang)) {
+        if (!DublinCore.LANGUAGE_UNDEFINED.equals(lang)) {
           v.put("lang", lang);
         }
-        for (EName e : encScheme) {
-          v.put("type", dc.toQName(e));
+        if (encScheme.isPresent()) {
+          v.put("type", dc.toQName(encScheme.get()));
         }
         localNameArray.add(v);
       }
