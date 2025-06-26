@@ -185,3 +185,25 @@ __Example__
   "default": "v1.1.0"
 }
 ```
+
+### GET /api/maintainance
+
+Returns maintainance info.
+
+__Response__
+
+`200 (OK)`: The maintainance info is returned as JSON object containing the following fields:
+
+Field     | Type                                | Description
+:---------|:------------------------------------|:-----------
+`in_maintainance` | [`boolean`](types.md#basic) | The state of maintainance
+`read_only`       | [`boolean`](types.md#basic) | Whether the read only access is allowed
+
+__Example__
+
+```
+{
+  "in_maintainance": true,
+  "read_only": true,
+}
+```
