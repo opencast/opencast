@@ -72,7 +72,6 @@ import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workflow.api.WorkflowServiceDatabaseImpl;
 import org.opencastproject.workflow.api.WorkflowStateException;
 import org.opencastproject.workflow.api.WorkflowStateListener;
-import org.opencastproject.workflow.api.XmlWorkflowParser;
 import org.opencastproject.workflow.api.YamlWorkflowParser;
 import org.opencastproject.workflow.handler.workflow.ErrorResolutionWorkflowOperationHandler;
 import org.opencastproject.workflow.impl.WorkflowServiceImpl.HandlerRegistration;
@@ -236,8 +235,8 @@ public class WorkflowServiceImplTest {
 
     InputStream is = null;
     try {
-      is = WorkflowServiceImplTest.class.getResourceAsStream("/workflow-definition-exception-handler.xml");
-      WorkflowDefinition exceptionHandler = XmlWorkflowParser.parseWorkflowDefinition(is);
+      is = WorkflowServiceImplTest.class.getResourceAsStream("/workflow-definition-exception-handler.yaml");
+      WorkflowDefinition exceptionHandler = YamlWorkflowParser.parseWorkflowDefinition(is);
       IOUtils.closeQuietly(is);
 
       /* The exception handler workflow definition needs to be registered as the reference to it in
