@@ -22,10 +22,6 @@
 package org.opencastproject.adminui.endpoint;
 
 import static com.entwinemedia.fn.data.Opt.nul;
-import static com.entwinemedia.fn.data.json.Jsons.arr;
-import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.obj;
-import static com.entwinemedia.fn.data.json.Jsons.v;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
@@ -33,6 +29,7 @@ import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
+import static org.opencastproject.index.service.util.JSONUtils.safeString;
 import static org.opencastproject.index.service.util.RestUtils.notFound;
 import static org.opencastproject.index.service.util.RestUtils.okJson;
 import static org.opencastproject.index.service.util.RestUtils.okJsonList;
@@ -69,9 +66,8 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.util.requests.SortCriterion;
 
-import com.entwinemedia.fn.data.json.Field;
-import com.entwinemedia.fn.data.json.JValue;
-import com.entwinemedia.fn.data.json.Jsons;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -228,7 +224,8 @@ public class ThemesEndpoint {
       return RestUtil.R.serverError();
     }
 
-    List<JValue> themesJSON = new ArrayList<>();
+
+    List<JsonObject> themesJSON = new ArrayList<>();
     for (Theme theme : results) {
       themesJSON.add(themeToJSON(theme, false));
     }
@@ -279,12 +276,18 @@ public class ThemesEndpoint {
                 e);
         return RestUtil.R.serverError();
       }
-      List<JValue> seriesValues = new ArrayList<JValue>();
+      JsonArray seriesValues = new JsonArray();
       for (SearchResultItem<Series> item : results.getItems()) {
         Series series = item.getSource();
-        seriesValues.add(obj(f("id", v(series.getIdentifier())), f("title", v(series.getTitle()))));
+        JsonObject seriesJson = new JsonObject();
+        seriesJson.addProperty("id", series.getIdentifier());
+        seriesJson.addProperty("title", series.getTitle());
+        seriesValues.add(seriesJson);
       }
-      return okJson(obj(f("series", arr(seriesValues))));
+      JsonObject responseJson = new JsonObject();
+      responseJson.add("series", seriesValues);
+
+      return okJson(responseJson);
     } catch (ThemesServiceDatabaseException e) {
       return RestUtil.R.serverError();
     } catch (NotFoundException e) {
@@ -509,13 +512,16 @@ public class ThemesEndpoint {
     }
   }
 
-  private void extendStaticFileInfo(String fieldName, String staticFileId, List<Field> fields) {
+  private void extendStaticFileInfo(String fieldName, String staticFileId, JsonObject json) {
     if (StringUtils.isNotBlank(staticFileId)) {
       try {
-        fields.add(f(fieldName.concat("Name"), v(staticFileService.getFileName(staticFileId))));
-        fields.add(f(fieldName.concat("Url"), v(staticFileRestService.getStaticFileURL(staticFileId).toString(), Jsons.BLANK)));
+        String fileName = staticFileService.getFileName(staticFileId);
+        String fileUrl = staticFileRestService.getStaticFileURL(staticFileId).toString();
+
+        json.addProperty(fieldName + "Name", fileName);
+        json.addProperty(fieldName + "Url", safeString(fileUrl));
       } catch (IllegalStateException | NotFoundException e) {
-        logger.error("Error retreiving static file '{}' ", staticFileId, e);
+        logger.error("Error retrieving static file '{}'", staticFileId, e);
       }
     }
   }
@@ -529,38 +535,42 @@ public class ThemesEndpoint {
    *          whether the returning representation should contain edit information
    * @return the JSON representation of this theme.
    */
-  private JValue themeToJSON(Theme theme, boolean editResponse) {
-    String creator = StringUtils.isNotBlank(theme.getCreator().getName()) ? theme.getCreator().getName() : theme
-            .getCreator().getUsername();
+  private JsonObject themeToJSON(Theme theme, boolean editResponse) {
+    String creator = StringUtils.isNotBlank(theme.getCreator().getName())
+        ? theme.getCreator().getName()
+        : theme.getCreator().getUsername();
 
-    List<Field> fields = new ArrayList<Field>();
-    fields.add(f("id", v(theme.getId().getOrElse(-1L))));
-    fields.add(f("creationDate", v(DateTimeSupport.toUTC(theme.getCreationDate().getTime()))));
-    fields.add(f("default", v(theme.isDefault())));
-    fields.add(f("name", v(theme.getName())));
-    fields.add(f("creator", v(creator)));
-    fields.add(f("description", v(theme.getDescription(), Jsons.BLANK)));
-    fields.add(f("bumperActive", v(theme.isBumperActive())));
-    fields.add(f("bumperFile", v(theme.getBumperFile(), Jsons.BLANK)));
-    fields.add(f("trailerActive", v(theme.isTrailerActive())));
-    fields.add(f("trailerFile", v(theme.getTrailerFile(), Jsons.BLANK)));
-    fields.add(f("titleSlideActive", v(theme.isTitleSlideActive())));
-    fields.add(f("titleSlideMetadata", v(theme.getTitleSlideMetadata(), Jsons.BLANK)));
-    fields.add(f("titleSlideBackground", v(theme.getTitleSlideBackground(), Jsons.BLANK)));
-    fields.add(f("licenseSlideActive", v(theme.isLicenseSlideActive())));
-    fields.add(f("licenseSlideDescription", v(theme.getLicenseSlideDescription(), Jsons.BLANK)));
-    fields.add(f("licenseSlideBackground", v(theme.getLicenseSlideBackground(), Jsons.BLANK)));
-    fields.add(f("watermarkActive", v(theme.isWatermarkActive())));
-    fields.add(f("watermarkFile", v(theme.getWatermarkFile(), Jsons.BLANK)));
-    fields.add(f("watermarkPosition", v(theme.getWatermarkPosition(), Jsons.BLANK)));
+    JsonObject json = new JsonObject();
+
+    json.addProperty("id",  theme.getId().getOrElse(-1L));
+    json.addProperty("creationDate", DateTimeSupport.toUTC(theme.getCreationDate().getTime()));
+    json.addProperty("default", theme.isDefault());
+    json.addProperty("name", theme.getName());
+    json.addProperty("creator", creator);
+    json.addProperty("description", safeString(theme.getDescription()));
+    json.addProperty("bumperActive", theme.isBumperActive());
+    json.addProperty("bumperFile", safeString(theme.getBumperFile()));
+    json.addProperty("trailerActive", theme.isTrailerActive());
+    json.addProperty("trailerFile", safeString(theme.getTrailerFile()));
+    json.addProperty("titleSlideActive", theme.isTitleSlideActive());
+    json.addProperty("titleSlideMetadata", safeString(theme.getTitleSlideMetadata()));
+    json.addProperty("titleSlideBackground", safeString(theme.getTitleSlideBackground()));
+    json.addProperty("licenseSlideActive", theme.isLicenseSlideActive());
+    json.addProperty("licenseSlideDescription", safeString(theme.getLicenseSlideDescription()));
+    json.addProperty("licenseSlideBackground", safeString(theme.getLicenseSlideBackground()));
+    json.addProperty("watermarkActive", theme.isWatermarkActive());
+    json.addProperty("watermarkFile", theme.getWatermarkFile() != null ? theme.getWatermarkFile() : "");
+    json.addProperty("watermarkPosition", theme.getWatermarkPosition() != null ? theme.getWatermarkPosition() : "");
+
     if (editResponse) {
-      extendStaticFileInfo("bumperFile", theme.getBumperFile(), fields);
-      extendStaticFileInfo("trailerFile", theme.getTrailerFile(), fields);
-      extendStaticFileInfo("titleSlideBackground", theme.getTitleSlideBackground(), fields);
-      extendStaticFileInfo("licenseSlideBackground", theme.getLicenseSlideBackground(), fields);
-      extendStaticFileInfo("watermarkFile", theme.getWatermarkFile(), fields);
+      extendStaticFileInfo("bumperFile", theme.getBumperFile(), json);
+      extendStaticFileInfo("trailerFile", theme.getTrailerFile(), json);
+      extendStaticFileInfo("titleSlideBackground", theme.getTitleSlideBackground(), json);
+      extendStaticFileInfo("licenseSlideBackground", theme.getLicenseSlideBackground(), json);
+      extendStaticFileInfo("watermarkFile", theme.getWatermarkFile(), json);
     }
-    return obj(fields);
+
+    return json;
   }
 
   /**

@@ -21,11 +21,6 @@
 
 package org.opencastproject.adminui.endpoint;
 
-import static com.entwinemedia.fn.Stream.$;
-import static com.entwinemedia.fn.data.json.Jsons.arr;
-import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.obj;
-import static com.entwinemedia.fn.data.json.Jsons.v;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
@@ -38,6 +33,8 @@ import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static javax.ws.rs.core.Response.Status.NO_CONTENT;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.opencastproject.adminui.endpoint.EndpointUtil.transformAccessControList;
+import static org.opencastproject.index.service.util.JSONUtils.collectionToJsonArray;
+import static org.opencastproject.index.service.util.JSONUtils.safeString;
 import static org.opencastproject.index.service.util.RestUtils.notFound;
 import static org.opencastproject.index.service.util.RestUtils.okJson;
 import static org.opencastproject.index.service.util.RestUtils.okJsonList;
@@ -111,10 +108,7 @@ import org.opencastproject.util.requests.SortCriterion.Order;
 import org.opencastproject.workflow.api.WorkflowInstance;
 
 import com.entwinemedia.fn.data.Opt;
-import com.entwinemedia.fn.data.json.Field;
-import com.entwinemedia.fn.data.json.JValue;
-import com.entwinemedia.fn.data.json.Jsons;
-import com.entwinemedia.fn.data.json.Jsons.Functions;
+import com.google.gson.JsonObject;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -831,35 +825,37 @@ public class SeriesEndpoint {
         logger.debug("Found {} results in {} ms", result.getDocumentCount(), result.getSearchTime());
       }
 
-      List<JValue> series = new ArrayList<>();
+      List<JsonObject> series = new ArrayList<>();
       for (SearchResultItem<Series> item : result.getItems()) {
-        List<Field> fields = new ArrayList<>();
+        JsonObject sJson = new JsonObject();
         Series s = item.getSource();
-        String sId = s.getIdentifier();
-        fields.add(f("id", v(sId)));
-        fields.add(f("title", v(s.getTitle(), Jsons.BLANK)));
-        fields.add(f("organizers", arr($(s.getOrganizers()).map(Functions.stringToJValue))));
-        fields.add(f("contributors", arr($(s.getContributors()).map(Functions.stringToJValue))));
+
+        sJson.addProperty("id", s.getIdentifier());
+        sJson.addProperty("title", safeString(s.getTitle()));
+        sJson.add("organizers", collectionToJsonArray(s.getOrganizers()));
+        sJson.add("contributors", collectionToJsonArray(s.getContributors()));
         if (s.getCreator() != null) {
-          fields.add(f("createdBy", v(s.getCreator())));
+          sJson.addProperty("createdBy", s.getCreator());
         }
         if (s.getCreatedDateTime() != null) {
-          fields.add(f("creation_date", v(toUTC(s.getCreatedDateTime().getTime()), Jsons.BLANK)));
+          sJson.addProperty("creation_date", toUTC(s.getCreatedDateTime().getTime()));
         }
         if (s.getLanguage() != null) {
-          fields.add(f("language", v(s.getLanguage())));
+          sJson.addProperty("language", s.getLanguage());
         }
         if (s.getLicense() != null) {
-          fields.add(f("license", v(s.getLicense())));
+          sJson.addProperty("license", s.getLicense());
         }
         if (s.getRightsHolder() != null) {
-          fields.add(f("rightsHolder", v(s.getRightsHolder())));
+          sJson.addProperty("rightsHolder", s.getRightsHolder());
         }
         if (StringUtils.isNotBlank(s.getManagedAcl())) {
-          fields.add(f("managedAcl", v(s.getManagedAcl())));
+          sJson.addProperty("managedAcl", s.getManagedAcl());
         }
-        series.add(obj(fields));
+
+        series.add(sJson);
       }
+
       logger.debug("Request done");
 
       return okJsonList(series, offset, limit, result.getHitCount());
@@ -1027,7 +1023,9 @@ public class SeriesEndpoint {
    * @return A {@link Response} with the theme id and name as json contents
    */
   private Response getSimpleThemeJsonResponse(Theme theme) {
-    return okJson(obj(f(Long.toString(theme.getId().get()), v(theme.getName()))));
+    JsonObject json = new JsonObject();
+    json.addProperty(Long.toString(theme.getId().get()), theme.getName());
+    return okJson(json);
   }
 
   @GET
@@ -1051,7 +1049,7 @@ public class SeriesEndpoint {
 
     // If no theme is set return empty JSON
     if (themeId == null)
-      return okJson(obj());
+      return okJson(new JsonObject());
 
     try {
       Theme theme = themesServiceDatabase.getTheme(themeId);

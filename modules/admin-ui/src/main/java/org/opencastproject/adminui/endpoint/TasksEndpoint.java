@@ -22,14 +22,10 @@
 package org.opencastproject.adminui.endpoint;
 
 import static com.entwinemedia.fn.Stream.$;
-import static com.entwinemedia.fn.data.Opt.nul;
-import static com.entwinemedia.fn.data.json.Jsons.arr;
-import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.obj;
-import static com.entwinemedia.fn.data.json.Jsons.v;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static org.opencastproject.index.service.util.JSONUtils.safeString;
 import static org.opencastproject.index.service.util.RestUtils.okJson;
 import static org.opencastproject.workflow.api.ConfiguredWorkflow.workflow;
 
@@ -49,8 +45,9 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowService;
 
 import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.data.json.JValue;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
@@ -131,16 +128,18 @@ public class TasksEndpoint {
   public Response getProcessing(@QueryParam("tags") String tagsString) {
     List<String> tags = RestUtil.splitCommaSeparatedParam(Option.option(tagsString)).value();
 
-    // This is the JSON Object which will be returned by this request
-    List<JValue> actions = new ArrayList<>();
+    JsonArray actions = new JsonArray();
     try {
-      List<WorkflowDefinition> workflowsDefinitions = workflowService.listAvailableWorkflowDefinitions();
-      for (WorkflowDefinition wflDef : workflowsDefinitions) {
+      List<WorkflowDefinition> workflowDefinitions = workflowService.listAvailableWorkflowDefinitions();
+      for (WorkflowDefinition wflDef : workflowDefinitions) {
         if (wflDef.containsTag(tags)) {
-          actions.add(obj(f("id", v(wflDef.getId())), f("title", v(nul(wflDef.getTitle()).getOr(""))),
-                  f("description", v(nul(wflDef.getDescription()).getOr(""))),
-                  f("configuration_panel", v(nul(wflDef.getConfigurationPanel()).getOr(""))),
-                  f("configuration_panel_json", v(nul(wflDef.getConfigurationPanelJson()).getOr("")))));
+          JsonObject action = new JsonObject();
+          action.addProperty("id", wflDef.getId());
+          action.addProperty("title", safeString(wflDef.getTitle()));
+          action.addProperty("description", safeString(wflDef.getDescription()));
+          action.addProperty("configuration_panel", safeString(wflDef.getConfigurationPanel()));
+          action.addProperty("configuration_panel_json", safeString(wflDef.getConfigurationPanelJson()));
+          actions.add(action);
         }
       }
     } catch (WorkflowDatabaseException e) {
@@ -148,7 +147,7 @@ public class TasksEndpoint {
       return RestUtil.R.serverError();
     }
 
-    return okJson(arr(actions));
+    return okJson(actions);
   }
 
   @POST

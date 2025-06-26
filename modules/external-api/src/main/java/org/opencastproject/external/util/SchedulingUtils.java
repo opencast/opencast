@@ -20,10 +20,6 @@
  */
 package org.opencastproject.external.util;
 
-import static com.entwinemedia.fn.data.json.Jsons.arr;
-import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.obj;
-import static com.entwinemedia.fn.data.json.Jsons.v;
 import static java.time.ZoneOffset.UTC;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -43,9 +39,9 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.NotFoundException;
 
 import com.entwinemedia.fn.data.Opt;
-import com.entwinemedia.fn.data.json.Field;
-import com.entwinemedia.fn.data.json.JObject;
-import com.entwinemedia.fn.data.json.JValue;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 import net.fortuna.ical4j.model.property.RRule;
 
@@ -56,6 +52,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
@@ -167,24 +164,28 @@ public final class SchedulingUtils {
     }
 
     /**
-     * @return A JSON representation of this ScheudlingInfo object.
+     * @return A JSON representation of this SchedulingInfo object.
      */
-    public JObject toJson() {
-      final List<Field> fields = new ArrayList<>();
-      final DateTimeFormatter dateFormatter = DateTimeFormatter.ISO_DATE_TIME;
+    public JsonObject toJson() {
+      JsonObject json = new JsonObject();
+      DateTimeFormatter dateFormatter = DateTimeFormatter.ISO_DATE_TIME;
       if (startDate.isSome()) {
-        fields.add(f(JSON_KEY_START_DATE, dateFormatter.format(startDate.get().toInstant().atZone(UTC))));
+        json.addProperty(JSON_KEY_START_DATE, dateFormatter.format(startDate.get().toInstant().atZone(ZoneOffset.UTC)));
       }
       if (endDate.isSome()) {
-        fields.add(f(JSON_KEY_END_DATE, dateFormatter.format(endDate.get().toInstant().atZone(UTC))));
+        json.addProperty(JSON_KEY_END_DATE, dateFormatter.format(endDate.get().toInstant().atZone(ZoneOffset.UTC)));
       }
       if (agentId.isSome()) {
-        fields.add(f(JSON_KEY_AGENT_ID, agentId.get()));
+        json.addProperty(JSON_KEY_AGENT_ID, agentId.get());
       }
       if (inputs.isSome()) {
-        fields.add(f(JSON_KEY_INPUTS, arr(inputs.get().split(","))));
+        JsonArray inputsArray = new JsonArray();
+        for (String input : inputs.get().split(",")) {
+          inputsArray.add(new JsonPrimitive(input.trim()));
+        }
+        json.add(JSON_KEY_INPUTS, inputsArray);
       }
-      return obj(fields);
+      return json;
     }
 
     /**
@@ -354,22 +355,29 @@ public final class SchedulingUtils {
    * @throws SearchIndexException
    *          If an event cannot be found.
    */
-  public static List<JValue> convertConflictingEvents(
+  public static List<JsonObject> convertConflictingEvents(
       Optional<String> checkedEventId,
       List<MediaPackage> mediaPackages,
       IndexService indexService,
       ElasticsearchIndex elasticsearchIndex
   ) throws SearchIndexException {
-    final List<JValue> result = new ArrayList<>();
+    List<JsonObject> result = new ArrayList<>();
     for (MediaPackage mediaPackage : mediaPackages) {
-      final Opt<Event> eventOpt = indexService.getEvent(mediaPackage.getIdentifier().toString(), elasticsearchIndex);
+      Opt<Event> eventOpt = indexService.getEvent(mediaPackage.getIdentifier().toString(), elasticsearchIndex);
       if (eventOpt.isSome()) {
         final Event event = eventOpt.get();
-        if (checkedEventId.isPresent() && checkedEventId.equals(event.getIdentifier())) {
+        if (checkedEventId.isPresent() && checkedEventId.get().equals(event.getIdentifier())) {
           continue;
         }
-        result.add(obj(f("start", v(event.getTechnicalStartTime())), f("end", v(event.getTechnicalEndTime())),
-            f("title", v(event.getTitle()))));
+
+        JsonObject eventJson = new JsonObject();
+        if (event.getTechnicalStartTime() != null)
+          eventJson.addProperty("start", event.getTechnicalStartTime().toString());
+        if (event.getTechnicalEndTime() != null)
+          eventJson.addProperty("end", event.getTechnicalEndTime().toString());
+        eventJson.addProperty("title", event.getTitle());
+
+        result.add(eventJson);
       } else {
         logger.warn("Index out of sync! Conflicting event catalog {} not found on event index!",
             mediaPackage.getIdentifier().toString());

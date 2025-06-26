@@ -70,7 +70,6 @@ import org.opencastproject.workflow.api.WorkflowUtil;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.entwinemedia.fn.data.Opt;
-import com.entwinemedia.fn.data.json.SimpleSerializer;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
@@ -467,7 +466,7 @@ public class LtiServiceImpl implements LtiService {
     if (wfState != null && WorkflowUtil.isActive(WorkflowInstance.WorkflowState.valueOf(wfState))) {
       metadataList.setLocked(MetadataList.Locked.WORKFLOW_RUNNING);
     }
-    return new SimpleSerializer().toJson(MetadataJson.listToJson(metadataList, true));
+    return new Gson().toJson(MetadataJson.listToJson(metadataList, true));
   }
 
   @Override
@@ -512,7 +511,7 @@ public class LtiServiceImpl implements LtiService {
 
       metadataList.add(this.indexService.getCommonEventCatalogUIAdapter(), collection);
     }
-    return new SimpleSerializer().toJson(MetadataJson.listToJson(metadataList, true));
+    return new Gson().toJson(MetadataJson.listToJson(metadataList, true));
   }
 
   @Override

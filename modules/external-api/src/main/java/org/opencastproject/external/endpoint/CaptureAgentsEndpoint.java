@@ -20,7 +20,6 @@
  */
 package org.opencastproject.external.endpoint;
 
-import static com.entwinemedia.fn.data.json.Jsons.arr;
 import static org.opencastproject.external.util.CaptureAgentUtils.generateJsonAgent;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
@@ -34,7 +33,7 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
-import com.entwinemedia.fn.data.json.JValue;
+import com.google.gson.JsonArray;
 
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -46,7 +45,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.GET;
@@ -161,11 +159,12 @@ public class CaptureAgentsEndpoint {
       agents = agents.subList(0, Math.min(limit, agents.size()));
     }
 
-    final List<JValue> agentsJSON = agents.stream()
-        .map(a -> generateJsonAgent(a))
-        .collect(Collectors.toList());
+    JsonArray agentsJSON = new JsonArray();
+    for (Agent a : agents) {
+      agentsJSON.add(generateJsonAgent(a));
+    }
 
-    return ApiResponseBuilder.Json.ok(acceptHeader, arr(agentsJSON));
+    return ApiResponseBuilder.Json.ok(acceptHeader, agentsJSON);
   }
 
 

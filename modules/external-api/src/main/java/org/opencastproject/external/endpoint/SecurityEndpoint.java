@@ -20,8 +20,6 @@
  */
 package org.opencastproject.external.endpoint;
 
-import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.obj;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.opencastproject.util.DateTimeSupport.fromUTC;
@@ -41,6 +39,7 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
 import com.entwinemedia.fn.data.Opt;
+import com.google.gson.JsonObject;
 
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeConstants;
@@ -158,11 +157,19 @@ public class SecurityEndpoint implements ManagedService {
         signedUrl = urlSigningService.sign(url, validUntil, null, validSource);
       } catch (UrlSigningException e) {
         log.warn("Error while trying to sign url '{}':", url, e);
-        return ApiResponseBuilder.Json.ok(acceptHeader, obj(f("error", "Error while signing url")));
+        JsonObject errorJson = new JsonObject();
+        errorJson.addProperty("error", "Error while signing url");
+        return ApiResponseBuilder.Json.ok(acceptHeader, errorJson);
       }
-      return ApiResponseBuilder.Json.ok(acceptHeader, obj(f("url", signedUrl), f("valid-until", toUTC(validUntil.getMillis()))));
+
+      JsonObject successJson = new JsonObject();
+      successJson.addProperty("url", signedUrl);
+      successJson.addProperty("valid-until", toUTC(validUntil.getMillis()));
+      return ApiResponseBuilder.Json.ok(acceptHeader, successJson);
     } else {
-      return ApiResponseBuilder.Json.ok(acceptHeader, obj(f("error", "Given URL cannot be signed")));
+      JsonObject errorJson = new JsonObject();
+      errorJson.addProperty("error", "Given URL cannot be signed");
+      return ApiResponseBuilder.Json.ok(acceptHeader, errorJson);
     }
   }
 }
