@@ -161,7 +161,7 @@ Was a sensible description chosen?
 
 - Does the description detail the goal of the pull request? A pull request should have one clear goal. If there are
   multiple goals, it is usually best to split these among multiple pull requests.
-- Would the stated goal of the pull request improve the Opencast codebase, or should it be rejected outright? Fixing a 
+- Would the stated goal of the pull request improve the Opencast codebase, or should it be rejected outright? Fixing a
   bug usually improves the code, adding another video player might not.
 - Does the description explain how to test the pull request, e.g. is certain configuration necessary?
 
@@ -223,11 +223,11 @@ The GitHub web interface is ever-changing. If you are looking for help with navi
 
 If videos are more your style:
 
-- (English) [Talk from 2021 Opencast Summit](https://video.ethz.ch/events/opencast/2021/graz/0014efff-ff04-414c-876c-7a7eeb66122b.html),
+- (English) [Talk from 2021 Opencast Summit](https://explore.opencast.org/conferences/2021/summit/v/KFCy9-UiTQH),
   slide presentation by Greg on how he does things.
-- (German) [Talk from 2020 Opencast D/A/CH](https://video.ethz.ch/events/opencast/2020/innsbruck/58a02ce8-1bf6-4b2a-b220-faf65931efbc.html),
+- (German) [Talk from 2020 Opencast D/A/CH](https://explore.opencast.org/conferences/2020/dach/v/D_oVQk8WOMB),
   shows how to navigate the Opencast GitHub website for beginners. Starts at minute 30.
-- (English) [Talk from 2024 Opencast Summit](https://video.ethz.ch/events/opencast/2024/zaragoza/b12f4344-12db-4d1e-8997-c8dd3832a462.html),
+- (English) [Talk from 2024 Opencast Summit](https://explore.opencast.org/conferences/2024/summit/v/Bj1WJ_SPn_t),
   5 minutes of motivation for non-technical reviewers.
 
 
@@ -383,7 +383,7 @@ and that code patches do not break the existing functionality. These tests are a
 built. If building repeatedly fails due to test failures, then something is most likely wrong. Please report this as a
 severe bug.
 
-For a guide on how to write unit tests, see [Writing Unit Tests](https://video.ethz.ch/events/opencast/2023/berlin/b4861f53-738b-40fb-a1ab-ec4726eec6bd.html),
+For a guide on how to write unit tests, see [Writing Unit Tests](https://explore.opencast.org/conferences/2023/summit/v/EK9jXqbn78K),
 a talk how to write (good!) unit tests.
 
 ### User Tests

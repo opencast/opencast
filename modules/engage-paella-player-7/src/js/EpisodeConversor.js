@@ -169,6 +169,7 @@ function getMetadata(episode, config) {
     rights: ensureArray(dc?.rightsHolder),
     license: ensureSingle(dc?.license),
     series: ensureSingle(dc?.isPartOf),
+    seriestitle: ensureSingle(episode?.mediapackage?.seriestitle),
     presenters: ensureArray(dc?.creator),
     contributors: ensureArray(dc?.contributor),
     startDate: new Date(dc?.created),

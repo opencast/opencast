@@ -22,20 +22,39 @@
 package org.opencastproject.adopter.registration;
 
 /**
- * API for the repository that handles registration forms for the adopter statistics.
+ * Exception that will be thrown when an errors occurs in the form repository.
  */
-public interface FormRepository {
+public class AdopterRegistrationException extends RuntimeException {
 
-  /** Saves the registration form data. */
-  void save(IForm form);
+  private static final long serialVersionUID = 7482018840067182789L;
 
-  /** Deletes the registration entry. */
-  void delete();
+  /** The exception constructor. */
+  public AdopterRegistrationException() {
+  }
 
   /**
-   * Retrieves the registration data of an adopter.
-   * @return the form data.
+   * Creates an exception with a message.
+   * @param message An error message.
    */
-  IForm getForm();
+  public AdopterRegistrationException(String message) {
+    super(message);
+  }
+
+  /**
+   * Create exception with a cause.
+   * @param cause The exception cause.
+   */
+  public AdopterRegistrationException(Throwable cause) {
+    super(cause);
+  }
+
+  /**
+   * Create exception with a message and a cause.
+   * @param message An error message.
+   * @param cause The exception cause.
+   */
+  public AdopterRegistrationException(String message, Throwable cause) {
+    super(message, cause);
+  }
 
 }

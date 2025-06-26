@@ -129,7 +129,7 @@ Upgrading
 ---------
 
 > 🎞️ If you want to see how upgrading Opencast works if you are using the RPM repository,
-> [we made a short recording to show you the process](https://video.ethz.ch/events/opencast/miscellaneous/webinars/6803b383-239e-4a37-b0c6-e1fc7af124b0.html).
+> [we made a short recording to show you the process](https://explore.opencast.org/webinars/v/N_HuDZx9rO0).
 
 Packages will automatically upgrade to the latest minor version in a release series when running `dnf update`.
 They do not automatically upgrade the latest major version.

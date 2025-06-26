@@ -1683,10 +1683,25 @@ public class IndexServiceImpl implements IndexService {
           mp.remove(mpe);
           seriesDcTags.addAll(Arrays.asList(mpe.getTags()));
         }
-        // remove series ACL from the media package
-        for (MediaPackageElement mpe : mp.getElementsByFlavor(MediaPackageElements.XACML_POLICY_SERIES)) {
-          mp.remove(mpe);
-          seriesAclTags.addAll(Arrays.asList(mpe.getTags()));
+        if (mp.getSeries() != null || mp.getElementsByFlavor(MediaPackageElements.XACML_POLICY_EPISODE).length > 0) {
+          // a new series was set or the series was unset and episode ACL exists
+          // remove series ACL from the media package
+          for (MediaPackageElement mpe : mp.getElementsByFlavor(MediaPackageElements.XACML_POLICY_SERIES)) {
+            mp.remove(mpe);
+            seriesAclTags.addAll(Arrays.asList(mpe.getTags()));
+          }
+        } else {
+          // series was unset but episode don't have an episode ACL
+          // in this case user may lose access to the episode if we delete the series ACL
+          // but, we also shouldn't keep the series ACL because the series was unset
+          // let's keep the series ACL as episode ACL and provide same access rights as before
+          Tuple<AccessControlList, AclScope> activeAcl = authorizationService.getActiveAcl(mp);
+          try {
+            authorizationService.setAcl(mp, AclScope.Episode, activeAcl.getA());
+            authorizationService.removeAcl(mp, AclScope.Series);
+          } catch (MediaPackageException e) {
+            throw new IllegalStateException("Unable to set episode ACL on media package", e);
+          }
         }
         // remove series extended metadata from the media package
         try {

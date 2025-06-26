@@ -19,9 +19,7 @@
  *
  */
 
-package org.opencastproject.adopter.statistic.dto;
-
-import org.opencastproject.adopter.registration.Form;
+package org.opencastproject.adopter.registration.dto;
 
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
@@ -99,22 +97,22 @@ public class GeneralData {
   // Constructor and Methods
   //================================================================================
 
-  public GeneralData(Form adopterRegistrationForm) {
-    this.adopterKey = adopterRegistrationForm.getAdopterKey();
-    this.organisationName = adopterRegistrationForm.getOrganisationName();
-    this.departmentName = adopterRegistrationForm.getDepartmentName();
-    this.firstName = adopterRegistrationForm.getFirstName();
-    this.lastName = adopterRegistrationForm.getLastName();
-    this.country = adopterRegistrationForm.getCountry();
-    this.city = adopterRegistrationForm.getCity();
-    this.postalCode = adopterRegistrationForm.getPostalCode();
-    this.street = adopterRegistrationForm.getStreet();
-    this.streetNo = adopterRegistrationForm.getStreetNo();
-    this.email = adopterRegistrationForm.getEmail();
-    this.allowContact = adopterRegistrationForm.allowsContacting();
-    this.systemType = adopterRegistrationForm.systemType();
-    this.allowErrorReports = adopterRegistrationForm.allowsErrorReports();
-    this.allowStatistics = adopterRegistrationForm.allowsStatistics();
+  public GeneralData(Adopter adopter) {
+    this.adopterKey = adopter.getAdopterKey();
+    this.organisationName = adopter.getOrganisationName();
+    this.departmentName = adopter.getDepartmentName();
+    this.firstName = adopter.getFirstName();
+    this.lastName = adopter.getLastName();
+    this.country = adopter.getCountry();
+    this.city = adopter.getCity();
+    this.postalCode = adopter.getPostalCode();
+    this.street = adopter.getStreet();
+    this.streetNo = adopter.getStreetNo();
+    this.email = adopter.getEmail();
+    this.allowContact = adopter.allowsContacting();
+    this.systemType = adopter.systemType();
+    this.allowErrorReports = adopter.allowsErrorReports();
+    this.allowStatistics = adopter.allowsStatistics();
   }
 
   /**

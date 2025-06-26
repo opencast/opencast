@@ -274,16 +274,11 @@ The following steps outline the necessary steps for cutting the final release:
    ](https://github.com/opencast/helper-scripts/tree/master/release-management/create-changelog) is a convenient tool
    for this. You need to update:
 
-   - `docs/guides/admin/docs/releasenotes.md`
-   - `docs/guides/admin/docs/changelog.md`
-
-   Create a pull request for the updated documentation and merge it.
-
-2. Update your local release branch yet again, so that it contains the documentation:
-
-        git checkout r/16.x
-        git fetch <remote>
-        git merge <remote>/r/16.x
+        cd docs/guides/admin/docs/
+        vim releasenotes.md
+        vim changelog/opencast-<version>.md
+        git commit -S releasenotes.md changelog.md -m 'Updated Release Notes'
+        git push <remote> r/6.x
 
 3. Switch to a new branch to create the release (name does not really matter):
 

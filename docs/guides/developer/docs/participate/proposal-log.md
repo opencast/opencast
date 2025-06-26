@@ -362,30 +362,30 @@ Katrin
 ### External API deprecation policy
 Proposed by Maximiliano Lira Del Canto <mliradel@uni-koeln.de>, passed on 24 Feb 2021
 ```no-highlight
-As we talked in the draft thread and there are no more comments, this is the 
-final version of the proposal about the deprecation of the old 
+As we talked in the draft thread and there are no more comments, this is the
+final version of the proposal about the deprecation of the old
 versions in the external API.
 
 External API deprecation policy:
 
-- Any minor version should be supported at a maximum of 2 (Two) Opencast 
+- Any minor version should be supported at a maximum of 2 (Two) Opencast
 Releases since the release of the next minor version of the API.
- 
-    Example: If Opencast 10 has API v1.3.0 and Opencast 11 comes 
+
+    Example: If Opencast 10 has API v1.3.0 and Opencast 11 comes
     with API v1.4.0, the API v1.3.0 will be supported until Opencast 12)
- 
 
-- Deprecating a version does not require removing it from the code base, 
+
+- Deprecating a version does not require removing it from the code base,
 just removes the guarantee that it will be present in the next version.
- 
 
-- When an API version is set to be deprecated needs to notify the users 
-with a warning that they should start to use the newest version of the API. 
-A custom HTTP header when the flagged version is called plus a warning in 
+
+- When an API version is set to be deprecated needs to notify the users
+with a warning that they should start to use the newest version of the API.
+A custom HTTP header when the flagged version is called plus a warning in
 the website docs.
- 
 
-- In the case of a new major version, the immediate old version should 
+
+- In the case of a new major version, the immediate old version should
 be deprecated 4 (Four) next releases of Opencast.
 
 - Updating Opencast don't mean a new API version
@@ -606,7 +606,7 @@ OSGi component annotation example:
 If you want to know more about the service configuration and see
 annotations in action, watch the “Opencast OSGI Configuration“ webinar:
 
-  https://video.ethz.ch/events/opencast/webinars/7261ea70-ce36-4e17-8634-963966311028.html
+  https://explore.opencast.org/webinars/v/NJr9fCyXnqx
 
 This proposal passes on Wednesday evening if no one objects.
 
