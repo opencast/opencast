@@ -28,7 +28,7 @@ import static org.opencastproject.util.RestUtil.R.serverError;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
-import org.opencastproject.adopter.statistic.ScheduledDataCollector;
+import org.opencastproject.adopter.registration.dto.Adopter;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -64,19 +64,19 @@ import javax.ws.rs.core.Response;
         notes = {"Provides operations regarding the adopter registration form"})
 @Component(
     immediate = true,
-    service = Controller.class,
+    service = AdopterRegistrationRestService.class,
     property = {
         "service.description=Adopter Statistics REST Endpoint",
-        "opencast.service.type=org.opencastproject.adopter.registration.Controller",
+        "opencast.service.type=org.opencastproject.adopter.registration.AdopterRegistrationRestService",
         "opencast.service.path=/admin-ng/adopter",
         "opencast.service.jobproducer=false"
     }
 )
 @JaxrsResource
-public class Controller {
+public class AdopterRegistrationRestService {
 
   /** The logger */
-  private static final Logger logger = LoggerFactory.getLogger(Controller.class);
+  private static final Logger logger = LoggerFactory.getLogger(AdopterRegistrationRestService.class);
 
   /** The JSON parser */
   private static final Gson gson = new Gson();
@@ -85,20 +85,12 @@ public class Controller {
   protected String docs;
 
   /** The service that provides methods for the registration */
-  protected Service registrationService;
-
-  /** The scheduled data collector so we can pull the current stats on demand */
-  protected ScheduledDataCollector dataCollector;
+  protected AdopterRegistrationServiceImpl registrationService;
 
   /** OSGi setter for the registration service */
   @Reference
-  public void setRegistrationService(Service registrationService) {
+  public void setRegistrationService(AdopterRegistrationServiceImpl registrationService) {
     this.registrationService = registrationService;
-  }
-
-  @Reference
-  public void setDataCollector(ScheduledDataCollector collector) {
-    this.dataCollector = collector;
   }
 
   @GET
@@ -112,22 +104,24 @@ public class Controller {
                         returnDescription = "GETs the adopter registration data.")
   public String getRegistrationForm() {
     logger.debug("Retrieving adopter registration data.");
-    return gson.toJson(registrationService.retrieveFormData());
+    return gson.toJson(registrationService.get());
   }
 
   @GET
   @Path("summary")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getsummary", description = "GETs the adopter registration statistics data.", responses = {
-      @RestResponse(description = "Retrieved statistic data.",
-          responseCode = HttpServletResponse.SC_OK),
-      @RestResponse(description = "Error while retrieving adopter statistic data.",
-          responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
+  @RestQuery(name = "getsummary", description = "GETs the adopter registration statistics data.",
+      responses = {
+          @RestResponse(description = "Retrieved statistic data.",
+              responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "Error while retrieving adopter statistic data.",
+              responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+      },
       returnDescription = "GETs the adopter registration statistics data.")
   public Response getAdopterStatistics() {
     logger.debug("Retrieving adopter registration statistics data.");
     try {
-      return Response.ok(dataCollector.getRegistrationDataAsString()).build();
+      return Response.ok(registrationService.getRegistrationDataAsString()).build();
     } catch (Exception e) {
       return Response.serverError().build();
     }
@@ -194,11 +188,11 @@ public class Controller {
           @FormParam("registered") boolean registered) {
     logger.debug("Saving adopter registration data.");
 
-    Form form = new Form(organisationName, departmentName, firstName, lastName, email, country, postalCode, city,
-            street, streetNo, contactMe, systemType, allowsStatistics, allowsErrorReports, agreedToPolicy, registered
+    Adopter adopter = new Adopter(organisationName, departmentName, firstName, lastName, email, country, postalCode,
+        city, street, streetNo, contactMe, systemType, allowsStatistics, allowsErrorReports, agreedToPolicy, registered
     );
     try {
-      registrationService.saveFormData(form);
+      registrationService.save(adopter);
     } catch (Exception e) {
       logger.error("Error while saving adopter registration data.", e);
       return Response.serverError().build();
@@ -216,11 +210,11 @@ public class Controller {
   public Response register() {
     logger.debug("Finalizing adopter registration.");
 
-    Form form = (Form) registrationService.retrieveFormData();
-    form.setRegistered(true);
+    Adopter adopter = (Adopter) registrationService.get();
+    adopter.setRegistered(true);
 
     try {
-      registrationService.saveFormData(form);
+      registrationService.save(adopter);
     } catch (Exception e) {
       logger.error("Error while saving adopter registration data.", e);
       return Response.serverError().build();
@@ -237,7 +231,7 @@ public class Controller {
       },
       returnDescription = "true if registration has been updated in the last week, false otherwise")
   public Response isUpToDate() {
-    Form data = (Form) registrationService.retrieveFormData();
+    Adopter data = (Adopter) registrationService.get();
     Calendar cal = Calendar.getInstance();
     cal.add(Calendar.DAY_OF_MONTH, -7);
     //A fresh install might have no data at all, so we null check everything
@@ -274,7 +268,7 @@ public class Controller {
       @RestResponse(description = "Retrieved statistic data.", responseCode = HttpServletResponse.SC_OK) },
       returnDescription = "The latest terms of use version.")
   public String getLatestTermsofUse() {
-    return Form.getLatestTermsOfUse().name();
+    return Adopter.getLatestTermsOfUse().name();
   }
 
 

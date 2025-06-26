@@ -2,17 +2,15 @@
 
 ## Opencast 18.0
 
-TBA
-
 ## Release Schedule
 
 | Date             | Phase                    |
 |------------------|--------------------------|
-| June 19, 2025 | Release Branch Cut       |
-| July 24, 2025 | Release of Opencast 18.0 |
+| June 19, 2025    | Release Branch Cut       |
+| July 24, 2025    | Release of Opencast 18.0 |
 
 
 ## Release Managers
 
-- Dennis Benz (University of Osnabrück)
+- Dennis Benz (Osnabrück University)
 - Jonas Dühring (elan e.V.)

@@ -66,6 +66,7 @@
         "theme": "custom_theme",
         "hideTimeLineOnLive": false,
         "preventVideoDownload": false,
+        "audioOnlyHTMLPlayer": false,
         "videoCanvas": {
             "video360": {
                "flavor": "*/delivery+360",

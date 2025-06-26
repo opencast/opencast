@@ -21,10 +21,14 @@
 
 package org.opencastproject.tobira.impl;
 
+import static javax.ws.rs.core.MediaType.APPLICATION_FORM_URLENCODED;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static org.opencastproject.util.doc.rest.RestParameter.Type;
 
+import org.opencastproject.adopter.registration.AdopterRegistrationExtra;
+import org.opencastproject.db.DBSession;
+import org.opencastproject.db.DBSessionFactory;
 import org.opencastproject.playlists.PlaylistService;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.AuthorizationService;
@@ -37,6 +41,10 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.workspace.api.Workspace;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -45,10 +53,16 @@ import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
+import javax.persistence.EntityManagerFactory;
 import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
@@ -102,6 +116,10 @@ public class TobiraEndpoint {
   private static final int VERSION_MINOR = 6;
   private static final String VERSION = VERSION_MAJOR + "." + VERSION_MINOR;
 
+  private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+  private static final Gson gson = new Gson();
+
   private SearchService searchService;
   private SeriesService seriesService;
   private AuthorizationService authorizationService;
@@ -109,10 +127,33 @@ public class TobiraEndpoint {
   private PlaylistService playlistService;
   private Workspace workspace;
 
+
+  /** The factory used to generate the entity manager */
+  protected EntityManagerFactory emf = null;
+
+  protected DBSessionFactory dbSessionFactory;
+
+  protected DBSession db;
+
+  private JsonObject cachedStats = new JsonObject();
+
   @Activate
   public void activate(BundleContext bundleContext) {
     logger.info("Activated Tobira API");
+    this.db = dbSessionFactory.createSession(emf);
   }
+
+  /** OSGi DI */
+  @Reference(target = "(osgi.unit.name=org.opencastproject.adopter)")
+  void setEntityManagerFactory(EntityManagerFactory emf) {
+    this.emf = emf;
+  }
+
+  @Reference
+  public void setDBSessionFactory(DBSessionFactory dbSessionFactory) {
+    this.dbSessionFactory = dbSessionFactory;
+  }
+
 
   @Reference
   public void setSearchService(SearchService service) {
@@ -228,5 +269,54 @@ public class TobiraEndpoint {
   private static Response badRequest(String msg) {
     logger.warn("Bad request to tobira/harvest: {}", msg);
     return Response.status(BAD_REQUEST).entity(msg).build();
+  }
+
+  @POST
+  @Path("/stats")
+  @Consumes({APPLICATION_JSON, APPLICATION_FORM_URLENCODED})
+  @RestQuery(
+      name = "stats",
+      description = "Accepts a json blob of statistical data about Tobira.",
+      restParameters = {
+          @RestParameter(description = "The Tobira data blob", isRequired = true, name = "stats", type = Type.STRING),
+      },
+      responses = {
+          @RestResponse(description = "Stats parsed", responseCode = HttpServletResponse.SC_ACCEPTED)
+      },
+      returnDescription = "No data returned, just a 204 on success"
+  )
+  public Response acceptStats(@FormParam("stats") String stats) {
+    try {
+      cachedStats = gson.fromJson(stats, JsonElement.class).getAsJsonObject();
+    } catch (IllegalStateException e) {
+      return Response.notAcceptable(null).build();
+    }
+    cachedStats.addProperty("updated", sdf.format(Calendar.getInstance().getTime()));
+
+    db.execTx(em -> {
+      AdopterRegistrationExtra existing = em.find(AdopterRegistrationExtra.class, "tobira");
+      if (null != existing) {
+        existing.setData(gson.toJson(cachedStats));
+        em.merge(existing);
+      } else {
+        existing = new AdopterRegistrationExtra("tobira", gson.toJson(cachedStats));
+        em.persist(existing);
+      }
+    });
+
+    return Response.noContent().build();
+  }
+
+  @GET
+  @Path("/stats")
+  @Produces(APPLICATION_JSON)
+  @RestQuery(name = "stats",
+      description = "Returns the stats, if any, pushed from Tobira",
+      returnDescription = "The stats, or an empty object",
+      responses = {
+          @RestResponse(description = "The stats, or an empty object", responseCode = HttpServletResponse.SC_OK)
+      })
+  public Response getCachedStats() {
+    return Response.ok(gson.toJson(cachedStats)).build();
   }
 }
