@@ -41,9 +41,10 @@ nav:
   - Upgrade Guide: "upgrade.md"
   - Registration: "registration.md"
   - Changelogs:
+      - Opencast 18: "changelog/opencast-18.md"
       - Opencast 17: "changelog/opencast-17.md"
-      - Opencast 16: "changelog/opencast-16.md"
       - Older Versions:
+          - Opencast 16: "changelog/older-versions/opencast-16.md"
           - Opencast 15: "changelog/older-versions/opencast-15.md"
           - Opencast 14: "changelog/older-versions/opencast-14.md"
           - Opencast 13: "changelog/older-versions/opencast-13.md"
