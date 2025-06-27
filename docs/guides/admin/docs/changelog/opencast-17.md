@@ -3,6 +3,47 @@ Opencast 17 Changelog
 
 Changes marked with \* were also included in 16.x.
 
+## Opencast 17.5 (2025-06-27)
+
+- [[#6728](https://github.com/opencast/opencast/pull/6728)] -
+  Allow to select three or more tracks
+- [[#6827](https://github.com/opencast/opencast/pull/6827)] -
+  Fix Matrix Room Topic Update\*
+- [[#6822](https://github.com/opencast/opencast/pull/6822)] -
+  Fix episode id roles in series of search service index
+- [[#6818](https://github.com/opencast/opencast/pull/6818)] -
+  Replace video.ethz.ch links with OC explore & adjust docs dashboard
+- [[#6792](https://github.com/opencast/opencast/pull/6792)] -
+  Deselecting a series may result in loss of access to the event
+- [[#6813](https://github.com/opencast/opencast/pull/6813)] -
+  Remove series load in paella player
+- [[#6742](https://github.com/opencast/opencast/pull/6742)] -
+  Splitting the Changelog into Multiple Files and other Minor Docs Improvements
+- [[#6789](https://github.com/opencast/opencast/pull/6789)] -
+  Tobira URLs improvement
+- [[#6811](https://github.com/opencast/opencast/pull/6811)] -
+  Update r/17.x Editor to 17.x-2025-06-19
+- [[#6809](https://github.com/opencast/opencast/pull/6809)] -
+  Disable icla check for opencastproject user
+- [[#6802](https://github.com/opencast/opencast/pull/6802)] -
+  Add support for extra data in adopter registration
+- [[#6791](https://github.com/opencast/opencast/pull/6791)] -
+  Fix jwt validation failures when using ECDSA algorithms
+- [[#6524](https://github.com/opencast/opencast/pull/6524)] -
+  Add index migration script
+- [[#6795](https://github.com/opencast/opencast/pull/6795)] -
+  Explain that WhisperC++ autoencode is an Opencast feature
+- [[#6793](https://github.com/opencast/opencast/pull/6793)] -
+  Fix minor markdown doc warnings
+- [[#6733](https://github.com/opencast/opencast/pull/6733)] -
+  Add filters to series list query for admin ui
+- [[#6702](https://github.com/opencast/opencast/pull/6702)] -
+  Fix whispercpp operation when using the language from metadata
+- [[#6750](https://github.com/opencast/opencast/pull/6750)] -
+  Wait for Opensearch on Opencast boot\*
+- [[#6783](https://github.com/opencast/opencast/pull/6783)] -
+  Paella security fix: Paella Player can load configuration files from arbitrary servers\*
+
 ## Opencast 17.4 (2025-05-26)
 - [[#6741](https://github.com/opencast/opencast/pull/6741)] -
   Update Admin UI to 17.x-2025-05-24
