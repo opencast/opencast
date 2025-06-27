@@ -166,6 +166,54 @@ public class WhisperCppEngine implements SpeechToTextEngine {
   /** Currently used whispercpp no fallback */
   private Option<Boolean> whispercppNoFallback;
 
+  /** Config key for setting whispercpp Voice Activity Detection (VAD) */
+  private static final String WHISPERCPP_VAD_CONFIG_KEY = "whispercpp.vad";
+
+  /** Currently used whispercpp Voice Activity Detection (VAD) */
+  private Option<Boolean> whispercppVad;
+
+  /** Config key for setting whispercpp VAD model */
+  private static final String WHISPERCPP_VAD_MODEL_CONFIG_KEY = "whispercpp.vad-model";
+
+  /** Currently used whispercpp VAD model */
+  private Option<String> whispercppVadModel;
+
+  /** Config key for setting whispercpp VAD threshold */
+  private static final String WHISPERCPP_VAD_THRESHOLD_CONFIG_KEY = "whispercpp.vad-thold";
+
+  /** Currently used whispercpp VAD threshold */
+  private Option<Double> whispercppVadThreshold;
+
+  /** Config key for setting whispercpp VAD min speech duration */
+  private static final String WHISPERCPP_VAD_MIN_SPEECH_CONFIG_KEY = "whispercpp.vad-min-speech-dur";
+
+  /** Currently used whispercpp VAD min speech duration */
+  private Option<Integer> whispercppVadMinSpeech;
+
+  /** Config key for setting whispercpp VAD min silence duration */
+  private static final String WHISPERCPP_VAD_MIN_SILENCE_CONFIG_KEY = "whispercpp.vad-min-silence-dur";
+
+  /** Currently used whispercpp VAD min silence duration */
+  private Option<Integer> whispercppVadMinSilence;
+
+  /** Config key for setting whispercpp VAD max speech duration */
+  private static final String WHISPERCPP_VAD_MAX_SPEECH_CONFIG_KEY = "whispercpp.vad-max-speech-dur";
+
+  /** Currently used whispercpp VAD max speech duration */
+  private Option<String> whispercppVadMaxSpeech;
+
+  /** Config key for setting whispercpp VAD speech padding */
+  private static final String WHISPERCPP_VAD_SPEECH_PADDING_CONFIG_KEY = "whispercpp.vad-speech-pad";
+
+  /** Currently used whispercpp VAD speech padding */
+  private Option<Integer> whispercppVadSpeechPadding;
+
+  /** Config key for setting whispercpp VAD samples overlap */
+  private static final String WHISPERCPP_VAD_SAMPLES_OVERLAP_CONFIG_KEY = "whispercpp.vad-samples-overlap";
+
+  /** Currently used whispercpp samples overlap */
+  private Option<Double> whispercppVadSamplesOverlap;
+
   /** Config key for automatic audio encoding */
   private static final String AUTO_ENCODING_CONFIG_KEY = "whispercpp.auto-encode";
 
@@ -269,6 +317,48 @@ public class WhisperCppEngine implements SpeechToTextEngine {
       logger.debug("WhisperC++ no fallback set to {}", whispercppNoFallback);
     }
 
+    whispercppVad = OsgiUtil.getOptCfgAsBoolean(cc.getProperties(), WHISPERCPP_VAD_CONFIG_KEY);
+    if (whispercppVad.isSome()) {
+      logger.debug("WhisperC++ VAD set to {}", whispercppVad);
+    }
+
+    whispercppVadModel = OsgiUtil.getOptCfg(cc.getProperties(), WHISPERCPP_VAD_MODEL_CONFIG_KEY);
+    if (whispercppVadModel.isSome()) {
+      logger.debug("WhisperC++ VAD model set to {}", whispercppVadModel);
+    }
+
+    whispercppVadThreshold = OsgiUtil.getOptCfg(cc.getProperties(), WHISPERCPP_VAD_THRESHOLD_CONFIG_KEY).bind(
+        Strings.toDouble);
+    if (whispercppVadThreshold.isSome()) {
+      logger.debug("WhisperC++ VAD threshold set to {}", whispercppVadThreshold);
+    }
+
+    whispercppVadMinSpeech = OsgiUtil.getOptCfgAsInt(cc.getProperties(), WHISPERCPP_VAD_MIN_SPEECH_CONFIG_KEY);
+    if (whispercppVadMinSpeech.isSome()) {
+      logger.debug("WhisperC++ VAD min speech set to {}", whispercppVadMinSpeech);
+    }
+
+    whispercppVadMinSilence = OsgiUtil.getOptCfgAsInt(cc.getProperties(), WHISPERCPP_VAD_MIN_SILENCE_CONFIG_KEY);
+    if (whispercppVadMinSilence.isSome()) {
+      logger.debug("WhisperC++ VAD min silence set to {}", whispercppVadMinSilence);
+    }
+
+    whispercppVadMaxSpeech = OsgiUtil.getOptCfg(cc.getProperties(), WHISPERCPP_VAD_MAX_SPEECH_CONFIG_KEY);
+    if (whispercppVadMaxSpeech.isSome()) {
+      logger.debug("WhisperC++ VAD max speech set to {}", whispercppVadMaxSpeech);
+    }
+
+    whispercppVadSpeechPadding = OsgiUtil.getOptCfgAsInt(cc.getProperties(), WHISPERCPP_VAD_SPEECH_PADDING_CONFIG_KEY);
+    if (whispercppVadSpeechPadding.isSome()) {
+      logger.debug("WhisperC++ VAD speech padding set to {}", whispercppVadSpeechPadding);
+    }
+
+    whispercppVadSamplesOverlap = OsgiUtil.getOptCfg(cc.getProperties(), WHISPERCPP_VAD_SAMPLES_OVERLAP_CONFIG_KEY)
+        .bind(Strings.toDouble);
+    if (whispercppVadSamplesOverlap.isSome()) {
+      logger.debug("WhisperC++ VAD samples overlap set to {}", whispercppVadSamplesOverlap);
+    }
+
     autoEncode = BooleanUtils.toBoolean(Objects.toString(
         cc.getProperties().get(AUTO_ENCODING_CONFIG_KEY),
         AUTO_ENCODING_DEFAULT.toString()));
@@ -368,6 +458,39 @@ public class WhisperCppEngine implements SpeechToTextEngine {
     }
     if (whispercppNoFallback.isSome() && whispercppNoFallback.get()) {
       command.add("-nf");
+    }
+
+    // Optional VAD parameters
+    if (whispercppVad.isSome() && whispercppVad.get()) {
+      command.add("--vad");
+    }
+    if (whispercppVadModel.isSome()) {
+      command.add("-vm");
+      command.add(whispercppVadModel.get());
+    }
+    if (whispercppVadThreshold.isSome()) {
+      command.add("-vt");
+      command.add(String.format(Locale.US, "%f", whispercppVadThreshold.get()));
+    }
+    if (whispercppVadMinSpeech.isSome()) {
+      command.add("-vspd");
+      command.add(Integer.toString(whispercppVadMinSpeech.get()));
+    }
+    if (whispercppVadMinSilence.isSome()) {
+      command.add("-vsd");
+      command.add(Integer.toString(whispercppVadMinSilence.get()));
+    }
+    if (whispercppVadMaxSpeech.isSome()) {
+      command.add("-vmsd");
+      command.add(whispercppVadMaxSpeech.get());
+    }
+    if (whispercppVadSpeechPadding.isSome()) {
+      command.add("-vp");
+      command.add(Integer.toString(whispercppVadSpeechPadding.get()));
+    }
+    if (whispercppVadSamplesOverlap.isSome()) {
+      command.add("-vo");
+      command.add(String.format(Locale.US, "%f", whispercppVadSamplesOverlap.get()));
     }
 
     String subtitleLanguage;
