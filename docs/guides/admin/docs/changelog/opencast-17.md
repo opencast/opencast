@@ -1,42 +1,74 @@
 Opencast 17 Changelog
 ---------------------
 
-## Opencast 17.3
+Changes marked with \* were also included in 16.x.
+
+## Opencast 17.4 (2025-05-26)
+- [[#6741](https://github.com/opencast/opencast/pull/6741)] -
+  Update Admin UI to 17.x-2025-05-24
+- [[#6738](https://github.com/opencast/opencast/pull/6738)] -
+  Update 17.x Editor to 17.x-2025-05-23
+- [[#6729](https://github.com/opencast/opencast/pull/6729)] -
+  Fix documentation regarding dummy capture agent configuration
+- [[#6561](https://github.com/opencast/opencast/pull/6561)] -
+  Add graphql event filter option
+- [[#6562](https://github.com/opencast/opencast/pull/6562)] -
+  Remove mentions of SysV Init scripts
+- [[#6633](https://github.com/opencast/opencast/pull/6633)] -
+  Enable partial matching in SearchRestService
+- [[#6637](https://github.com/opencast/opencast/pull/6637)] -
+  Workaround for "laggy" servers table in admin ui
+- [[#6688](https://github.com/opencast/opencast/pull/6688)] -
+  Document Search index rebuild when enabling episode id roles
+- [[#6681](https://github.com/opencast/opencast/pull/6681)] -
+  Allow Opensearch to be in yellow state\*
+- [[#6661](https://github.com/opencast/opencast/pull/6661)] -
+  Update to Studio 2025-04-30 (important bug fix)
+- [[#6653](https://github.com/opencast/opencast/pull/6653)] -
+  Add search endpoint to trigger single event index update
+
+## Opencast 17.3 (2025-04-17)
 
 - [[#6641](https://github.com/opencast/opencast/pull/6641)] -
-  Update Admin UI release to 2025-04-17
+-  Update Admin UI release to 2025-04-17
 - [[#6615](https://github.com/opencast/opencast/pull/6615)] -
   Update Studio to 2025-04-02
+- [[#6616](https://github.com/opencast/opencast/pull/6616)] -
+  Fix series table sorting for organizers column
 - [[#6573](https://github.com/opencast/opencast/pull/6573)] -
   Include Job ID in Job Error
 - [[#6628](https://github.com/opencast/opencast/pull/6628)] -
   Update Asset Manager Java API Documentation
-- [[#6616](https://github.com/opencast/opencast/pull/6616)] -
-  Fix series table sorting for organizers column
+- [[#6627](https://github.com/opencast/opencast/pull/6627)] -
+  Improve Performance of Metrics Endpoint
+- [[#6614](https://github.com/opencast/opencast/pull/6614)] -
+  Improved Paella player Matomo plugin documentation and default config
+- [[#6584](https://github.com/opencast/opencast/pull/6584)] -
+  Fix 500 response for editor endpoints
+- [[#6578](https://github.com/opencast/opencast/pull/6578)] -
+  Fix adopter statistic breaking on non-set metadata
+- [[#6577](https://github.com/opencast/opencast/pull/6577)] -
+  Prevent errors when shutting down Opencast
 - [[#6576](https://github.com/opencast/opencast/pull/6576)] -
   Handle workflows without creator
 - [[#6575](https://github.com/opencast/opencast/pull/6575)] -
   Add asset manager endpoint to trigger event index update
-- [[#6577](https://github.com/opencast/opencast/pull/6577)] -
-  Prevent errors when shutting down Opencast
-- [[#6578](https://github.com/opencast/opencast/pull/6578)] -
-  Fix adopter statistic breaking on non-set metadata
-- [[#6584](https://github.com/opencast/opencast/pull/6584)] -
-  Fix 500 response for editor endpoints
-- [[#6614](https://github.com/opencast/opencast/pull/6614)] -
-  Improved Paella player Matomo plugin documentation and default config
-- [[#6627](https://github.com/opencast/opencast/pull/6627)] -
-  Improve Performance of Metrics Endpoint
 - [[#6632](https://github.com/opencast/opencast/pull/6632)] -
   Add isOnline to admin ui service endpoint
 - [[#6631](https://github.com/opencast/opencast/pull/6631)] -
   Remove additional mailing list references
-- [[#6547](https://github.com/opencast/opencast/pull/6547)] -
-  Log ID of event failing in scheduler index rebuild
-- [[#6548](https://github.com/opencast/opencast/pull/6548)] -
-  Log Publications Blocking Event Deletion
+- [[#6581](https://github.com/opencast/opencast/pull/6581)] -
+  Set sender value in sent emails if set\*
+- [[#6621](https://github.com/opencast/opencast/pull/6621)] -
+  Properly handle Tobira harvest of events with streaming-only tracks\*
+- [[#6431](https://github.com/opencast/opencast/pull/6431)] -
+  Avoid NPEs during wowza retraction\*
 - [[#6549](https://github.com/opencast/opencast/pull/6549)] -
   Don't fail removal on already deleted workflow
+- [[#6548](https://github.com/opencast/opencast/pull/6548)] -
+  Log Publications Blocking Event Deletion
+- [[#6547](https://github.com/opencast/opencast/pull/6547)] -
+  Log ID of event failing in scheduler index rebuild
 - [[#6550](https://github.com/opencast/opencast/pull/6550)] -
   Fix use of bitwise instead of logical operator
 - [[#6556](https://github.com/opencast/opencast/pull/6556)] -
@@ -50,71 +82,95 @@ Opencast 17 Changelog
 - [[#6557](https://github.com/opencast/opencast/pull/6557)] -
   Improve upgrade documentation
 
-## Opencast 17.2
+## Opencast 17.2 (2025-03-20)
 
+- [[#6528](https://github.com/opencast/opencast/pull/6528)] -
+  Revert org.apache.santuario upgrade
 - [[#6542](https://github.com/opencast/opencast/pull/6542)] -
   Don't fail theme index rebuild if user does not exist
 - [[#6537](https://github.com/opencast/opencast/pull/6537)] -
   Fix stt attach operation
 - [[#6530](https://github.com/opencast/opencast/pull/6530)] -
   Fix circular reference
-- [[#6528](https://github.com/opencast/opencast/pull/6528)] -
-  Revert org.apache.santuario upgrade
-- [[#6502](https://github.com/opencast/opencast/pull/6502)] -
-  Merge r/16.x into r/17.x
+- [[#6321](https://github.com/opencast/opencast/pull/6321)] -
+  Adds sorting parameter to series ltitools
 - [[#6501](https://github.com/opencast/opencast/pull/6501)] -
   Respect order of sort parameters for search queries
-- [[#6492](https://github.com/opencast/opencast/pull/6492)] -
-  Check acl against search entity
-- [[#6491](https://github.com/opencast/opencast/pull/6491)] -
-  Wait for OpenSearch cluster state yellow or green
-- [[#6487](https://github.com/opencast/opencast/pull/6487)] -
-  GraphQL bug fixes and chore
 - [[#6486](https://github.com/opencast/opencast/pull/6486)] -
   Fix endpoint /ingest/addPartialTrack
-- [[#6473](https://github.com/opencast/opencast/pull/6473)] -
-  Update maven version used by maven wrapper
-- [[#6461](https://github.com/opencast/opencast/pull/6461)] -
-  Allow sorting events by UID
+- [[#6487](https://github.com/opencast/opencast/pull/6487)] -
+  GraphQL bug fixes and chore
+- [[#6499](https://github.com/opencast/opencast/pull/6499)] -
+  Use system user for repopulate search index\*
+- [[#6492](https://github.com/opencast/opencast/pull/6492)] -
+  Check acl against search entity
+- [[#6517](https://github.com/opencast/opencast/pull/6517)] -
+  Fix uncleaned merge conflict\*
 - [[#6440](https://github.com/opencast/opencast/pull/6440)] -
   Fix outright javadoc errors
-- [[#6439](https://github.com/opencast/opencast/pull/6439)] -
-  Update karaf 4.4.7
+- [[#6491](https://github.com/opencast/opencast/pull/6491)] -
+  Wait for OpenSearch cluster state yellow or green
+- [[#6473](https://github.com/opencast/opencast/pull/6473)] -
+  Update maven version used by maven wrapper
+- [[#6426](https://github.com/opencast/opencast/pull/6426)] -
+  Fixing SFA pattern for search and livestream\*
+- [[#6484](https://github.com/opencast/opencast/pull/6484)] -
+  Replace Ubuntu 20.04 with 22.04 for GHA work\*
+- [[#6490](https://github.com/opencast/opencast/pull/6490)] -
+  Fix search index rebuild\*
+- [[#6434](https://github.com/opencast/opencast/pull/6434)] -
+  Handle Opencast starting up before index is available\*
 - [[#6438](https://github.com/opencast/opencast/pull/6438)] -
   Fix manual trigger in create release workflow
 - [[#6430](https://github.com/opencast/opencast/pull/6430)] -
   Set wf variables for silent tracks in silence detection WOH
-- [[#6321](https://github.com/opencast/opencast/pull/6321)] -
-  Adds sorting parameter to series ltitools
+- [[#6461](https://github.com/opencast/opencast/pull/6461)] -
+  Allow sorting events by UID
+- [[#6439](https://github.com/opencast/opencast/pull/6439)] -
+  Update karaf 4.4.7
 
-## Opencast 17.1
+## Opencast 17.1 (2025-01-23)
 
 - [[#6432](https://github.com/opencast/opencast/pull/6432)] -
-  Update to admin interface release 2025-01-21
-- [[#6419](https://github.com/opencast/opencast/pull/6419)] -
-  Remove superfluous slash in endpoint URL when loading series from Engage UI
-- [[#6415](https://github.com/opencast/opencast/pull/6415)] -
-  Document OpenSearch plugin requirements
-- [[#6390](https://github.com/opencast/opencast/pull/6390)] -
-  Fix jQuery mime type
-- [[#6388](https://github.com/opencast/opencast/pull/6388)] -
-  Update editor to version 2025-01-08
-- [[#6384](https://github.com/opencast/opencast/pull/6384)] -
-  Drop Paella Dependabot Batcher
-- [[#6379](https://github.com/opencast/opencast/pull/6379)] -
-  Fix security config to actually make `/tobira/version` public
-- [[#6364](https://github.com/opencast/opencast/pull/6364)] -
-  Refactor isAuthorized utility function
+-  Update to admin interface release 2025-01-21
+- [[#6429](https://github.com/opencast/opencast/pull/6429)] -
+  Fix OCR transcriptions in Paella player\*
 - [[#6362](https://github.com/opencast/opencast/pull/6362)] -
   Add "Show for new or existing" attribute to asset upload options
+- [[#6388](https://github.com/opencast/opencast/pull/6388)] -
+  Update editor to version 2025-01-08
+- [[#6385](https://github.com/opencast/opencast/pull/6385)] -
+  Allow live events to be published by the CA user\*
+- [[#6379](https://github.com/opencast/opencast/pull/6379)] -
+  Fix security config to actually make `/tobira/version` public
+- [[#6384](https://github.com/opencast/opencast/pull/6384)] -
+  Drop Paella Dependabot Batcher
+- [[#6419](https://github.com/opencast/opencast/pull/6419)] -
+  Remove superfluous slash in endpoint URL when loading series from Engage UI
+- [[#6363](https://github.com/opencast/opencast/pull/6363)] -
+  Fix partial retract streaming elements\*
+- [[#6367](https://github.com/opencast/opencast/pull/6367)] -
+  Segment preview image URL fixed for Tobira\*
+- [[#6233](https://github.com/opencast/opencast/pull/6233)] -
+  Handle content id being null for playlist entries\*
+- [[#6381](https://github.com/opencast/opencast/pull/6381)] -
+  Search Service Index Rebuild fails when done on the presentation node\*
+- [[#6415](https://github.com/opencast/opencast/pull/6415)] -
+  Document OpenSearch plugin requirements
+- [[#6364](https://github.com/opencast/opencast/pull/6364)] -
+  Refactor isAuthorized utility function
+- [[#6241](https://github.com/opencast/opencast/pull/6241)] -
+  Editor: Unify endpoints for saving
+- [[#6390](https://github.com/opencast/opencast/pull/6390)] -
+  Fix jQuery mime type
+- [[#6328](https://github.com/opencast/opencast/pull/6328)] -
+  Fix incorrect episode count in LTI series tool\*
 - [[#6361](https://github.com/opencast/opencast/pull/6361)] -
   Allow removing subtitles
 - [[#6317](https://github.com/opencast/opencast/pull/6317)] -
   Add tobira series endpoint to remove paths
-- [[#6241](https://github.com/opencast/opencast/pull/6241)] -
-  Editor: Unify endpoints for saving
 
-## Opencast 17.0
+## Opencast 17.0 (2024-12-04)
 
 - [[#6309](https://github.com/opencast/opencast/pull/6309)] -
   Remove duplicate dependency declaration
