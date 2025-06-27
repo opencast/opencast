@@ -230,8 +230,6 @@ public class UserSettingsService {
           return userSettingDto.toUserSetting();
         });
       } catch (Exception e) {
-        logger.error("Could not update user setting username '{}' org: '{}' key: '{}' value: '{}'", username, orgId,
-            key, value, e);
         throw new UserSettingsServiceException(e);
       }
     } else {
@@ -246,8 +244,7 @@ public class UserSettingsService {
           return userSettingDto.toUserSetting();
         });
       } catch (Exception e) {
-        logger.error("Could not add user setting username '{}' org: '{}' key: '{}' value: '{}'", username, orgId,
-            key, value, e);
+
         throw new UserSettingsServiceException(e);
       }
     }

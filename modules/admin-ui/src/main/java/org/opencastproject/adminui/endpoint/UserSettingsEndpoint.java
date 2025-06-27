@@ -31,6 +31,7 @@ import org.opencastproject.adminui.usersettings.UserSetting;
 import org.opencastproject.adminui.usersettings.UserSettings;
 import org.opencastproject.adminui.usersettings.UserSettingsService;
 import org.opencastproject.adminui.usersettings.persistence.UserSettingsServiceException;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Tuple;
@@ -90,12 +91,22 @@ public class UserSettingsEndpoint {
 
   private UserSettingsService userSettingsService;
 
+  private SecurityService securityService;
+
   /**
    * OSGi callback to set the service to retrieve user settings from.
    */
   @Reference
   public void setUserSettingsService(UserSettingsService userSettingsService) {
     this.userSettingsService = userSettingsService;
+  }
+
+  /**
+   * OSGi callback to set the security service
+   */
+  @Reference
+  public void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
   }
 
   /** OSGi callback. */
@@ -136,10 +147,14 @@ public class UserSettingsEndpoint {
           @RestParameter(description = "The value representing this setting.", isRequired = true, name = "value", type = STRING) }, responses = { @RestResponse(responseCode = HttpServletResponse.SC_OK, description = "User setting has been created.") })
   public Response createUserSetting(@FormParam("key") String key, @FormParam("value") String value)
           throws NotFoundException {
+    String orgId = securityService.getOrganization().getId();
+    String username = securityService.getUser().getUsername();
     try {
       UserSetting newUserSetting = userSettingsService.addUserSetting(key, value);
       return Response.ok(newUserSetting.toJson().toJson(), MediaType.APPLICATION_JSON).build();
     } catch (UserSettingsServiceException e) {
+      logger.error("Could not add user setting username '{}' org: '{}' key: '{}' value: '{}'", username, orgId,
+          key, value);
       return Response.serverError().build();
     }
   }
