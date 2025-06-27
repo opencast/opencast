@@ -38,8 +38,8 @@ import javax.persistence.UniqueConstraint;
 
 /** Entity object for user settings. */
 @Entity(name = "UserSettings")
-@Table(name = "oc_user_settings", indexes = {
-    @Index(name = "IX_oc_user_setting_organization", columnList = "organization")
+@Table(name = "oc_frontend_user_settings", indexes = {
+    @Index(name = "IX_oc_frontend_user_settings_organization", columnList = "organization")
   }, uniqueConstraints = {
     @UniqueConstraint(columnNames = { "setting_key", "username", "organization" })
 })
