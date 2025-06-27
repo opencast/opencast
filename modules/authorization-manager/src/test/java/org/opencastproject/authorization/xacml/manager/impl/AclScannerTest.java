@@ -121,7 +121,7 @@ public class AclScannerTest {
     Optional<ManagedAcl> managedAcl = Optional.of(acl);
     EasyMock.expect(aclDb.createAcl(anyObject(Organization.class), anyObject(AccessControlList.class), anyString()))
             .andReturn(managedAcl).times(3);
-    EasyMock.expect(aclDb.getAcls(anyObject(Organization.class))).andReturn(new ArrayList<>()).times(3);
+    EasyMock.expect(aclDb.getAcl(anyObject(Organization.class), anyString())).andReturn(Optional.empty()).times(3);
     EasyMock.replay(aclDb);
 
     aclScanner.install(file);
@@ -144,15 +144,19 @@ public class AclScannerTest {
     Optional<ManagedAcl> managedAcl = Optional.of(acl);
     EasyMock.expect(aclDb.createAcl(anyObject(Organization.class), anyObject(AccessControlList.class), anyString()))
             .andReturn(managedAcl).times(3);
-    EasyMock.expect(aclDb.getAcl(anyObject(Organization.class), anyLong())).andReturn(managedAcl).times(3);
-    EasyMock.expect(aclDb.updateAcl(anyObject(ManagedAcl.class))).andReturn(true).times(3);
-    EasyMock.expect(aclDb.getAcls(anyObject(Organization.class))).andReturn(new ArrayList<>()).times(3);
+    EasyMock.expect(aclDb.getAcl(anyObject(Organization.class), anyString())).andReturn(Optional.empty()).times(3);
     EasyMock.replay(aclDb);
 
     aclScanner.install(file);
+    EasyMock.verify(aclDb);
+
+    EasyMock.reset(aclDb);
+    EasyMock.expect(aclDb.getAcl(anyObject(Organization.class), anyString())).andReturn(managedAcl).times(3);
+    EasyMock.expect(aclDb.getAcl(anyObject(Organization.class), anyLong())).andReturn(managedAcl).times(3);
+    EasyMock.expect(aclDb.updateAcl(anyObject(ManagedAcl.class))).andReturn(true).times(3);
+    EasyMock.replay(aclDb);
 
     aclScanner.update(file);
-
     EasyMock.verify(aclDb);
   }
 
@@ -165,13 +169,10 @@ public class AclScannerTest {
     Optional<ManagedAcl> managedAcl = Optional.of(acl);
     EasyMock.expect(aclDb.createAcl(anyObject(Organization.class), anyObject(AccessControlList.class), anyString()))
             .andReturn(managedAcl).times(3);
-    EasyMock.expect(aclDb.getAcls(anyObject(Organization.class))).andReturn(new ArrayList<ManagedAcl>()).times(3);
+    EasyMock.expect(aclDb.getAcl(anyObject(Organization.class), anyString())).andReturn(Optional.empty()).times(6);
     EasyMock.replay(aclDb);
-
     aclScanner.install(file1);
-
     aclScanner.update(file2);
-
     EasyMock.verify(aclDb);
   }
 
@@ -191,14 +192,21 @@ public class AclScannerTest {
     Optional<ManagedAcl> managedAcl = Optional.of(acl);
     EasyMock.expect(aclDb.createAcl(anyObject(Organization.class), anyObject(AccessControlList.class), anyString()))
             .andReturn(managedAcl).times(3);
-    EasyMock.expect(aclDb.getAcl(EasyMock.anyObject(Organization.class), anyLong())).andReturn(managedAcl).times(3);
-    EasyMock.expect(aclDb.deleteAcl(anyObject(Organization.class), anyLong())).andReturn(true).times(3);
-    EasyMock.expect(aclDb.getAcls(anyObject(Organization.class))).andReturn(new ArrayList<ManagedAcl>()).times(3);
+    EasyMock.expect(aclDb.getAcl(EasyMock.anyObject(Organization.class),
+        anyString())).andReturn(Optional.empty()).times(3);
     EasyMock.replay(aclDb);
 
     aclScanner.install(file1);
-    aclScanner.uninstall(file1);
+    EasyMock.verify(aclDb);
 
+    EasyMock.reset(aclDb);
+    EasyMock.expect(aclDb.getAcl(EasyMock.anyObject(Organization.class),
+        anyString())).andReturn(managedAcl).times(3);
+    EasyMock.expect(aclDb.getAcl(EasyMock.anyObject(Organization.class), anyLong())).andReturn(managedAcl).times(3);
+    EasyMock.expect(aclDb.deleteAcl(anyObject(Organization.class), anyLong())).andReturn(true).times(3);
+    EasyMock.replay(aclDb);
+
+    aclScanner.uninstall(file1);
     EasyMock.verify(aclDb);
   }
 
@@ -210,7 +218,7 @@ public class AclScannerTest {
     Optional<ManagedAcl> managedAcl = Optional.of(acl);
     EasyMock.expect(aclDb.createAcl(anyObject(Organization.class), anyObject(AccessControlList.class), anyString()))
             .andReturn(managedAcl).times(3);
-    EasyMock.expect(aclDb.getAcls(anyObject(Organization.class))).andReturn(new ArrayList<ManagedAcl>()).times(3);
+    EasyMock.expect(aclDb.getAcl(anyObject(Organization.class), anyString())).andReturn(Optional.empty()).times(6);
     EasyMock.replay(aclDb);
 
     aclScanner.install(file1);

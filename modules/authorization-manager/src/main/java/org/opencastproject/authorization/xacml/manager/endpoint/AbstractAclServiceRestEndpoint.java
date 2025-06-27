@@ -108,7 +108,32 @@ public abstract class AbstractAclServiceRestEndpoint {
   public String getAcl(@PathParam("aclId") long aclId) throws NotFoundException {
     final Optional<ManagedAcl> managedAcl = aclService().getAcl(aclId);
     if (managedAcl.isEmpty()) {
-      logger.info("No ACL with id '{}' could be found", aclId);
+      logger.debug("No ACL with id '{}' could be found", aclId);
+      throw new NotFoundException();
+    }
+    return JsonConv.full(managedAcl.get()).toJson();
+  }
+
+  @GET
+  @Path("/acl/name/{aclName}")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(
+      name = "getaclbyname",
+      description = "Return the ACL by the given name",
+      returnDescription = "Return the ACL by the given name",
+      pathParameters = {
+          @RestParameter(name = "aclName", isRequired = true, description = "The ACL name", type = STRING)
+      },
+      responses = {
+          @RestResponse(responseCode = SC_OK, description = "The ACL has successfully been returned"),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "The ACL has not been found"),
+          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Error during returning the ACL")
+      }
+  )
+  public String getAcl(@PathParam("aclName") String aclName) throws NotFoundException {
+    final Optional<ManagedAcl> managedAcl = aclService().getAcl(aclName);
+    if (managedAcl.isEmpty()) {
+      logger.debug("No ACL with name '{}' could be found", aclName);
       throw new NotFoundException();
     }
     return JsonConv.full(managedAcl.get()).toJson();
@@ -227,7 +252,7 @@ public abstract class AbstractAclServiceRestEndpoint {
     final AccessControlList acl = parseAcl.apply(accessControlList);
     final Optional<ManagedAcl> managedAcl = aclService().createAcl(acl, name);
     if (managedAcl.isEmpty()) {
-      logger.info("An ACL with the same name '{}' already exists", name);
+      logger.debug("An ACL with the same name '{}' already exists", name);
       throw new WebApplicationException(Response.Status.CONFLICT);
     }
     return JsonConv.full(managedAcl.get()).toJson();
@@ -263,7 +288,7 @@ public abstract class AbstractAclServiceRestEndpoint {
     final AccessControlList acl = parseAcl.apply(accessControlList);
     final ManagedAclImpl managedAcl = new ManagedAclImpl(aclId, name, org.getId(), acl);
     if (!aclService().updateAcl(managedAcl)) {
-      logger.info("No ACL with id '{}' could be found under organization '{}'", aclId, org.getId());
+      logger.debug("No ACL with id '{}' could be found under organization '{}'", aclId, org.getId());
       throw new NotFoundException();
     }
     return JsonConv.full(managedAcl).toJson();

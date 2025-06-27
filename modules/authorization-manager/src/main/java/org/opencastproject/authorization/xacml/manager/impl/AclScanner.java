@@ -46,9 +46,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 @Component(
@@ -75,10 +73,10 @@ public class AclScanner implements ArtifactInstaller {
   private SecurityService securityService;
 
   /**
-   * A map linking the Acl file name concatenate with the organization id {@code filename_organizationId} to the related
-   * managed Acl Id
+   * Should we update override ACLs in DB on template changes?
+   * All user defined changes will be lost.
    */
-  private final Map<String, Long> managedAcls = new HashMap<>();
+  private boolean updateExisting = true;
 
   /**
    * OSGI service activation method
@@ -139,30 +137,20 @@ public class AclScanner implements ArtifactInstaller {
 
     String fileName = FilenameUtils.removeExtension(artifact.getName());
     AccessControlList acl = parseToAcl(artifact);
-    Optional<ManagedAcl> managedAcl;
 
     // Add the Acl to all the organizations
     for (Organization org : organizations) {
       securityService.setOrganization(org);
-      // If there are already (not-default) Acl defined for this organization, we skip this one.
-      boolean skip = false;
-      for (ManagedAcl a : getAclService(org).getAcls()) {
-        if (managedAcls.get(generateAclId(a.getName(), org)) == null) {
-          logger.debug(
-                  "The Acl {} will be not added to the organisation {} as it already contains other not-default Acls.",
-                  fileName, org.getName());
-          skip = true;
-          continue;
-        }
-      }
-      if (!skip) {
-        managedAcl = getAclService(org).createAcl(acl, fileName);
-        if (managedAcl.isPresent()) {
-          managedAcls.put(generateAclId(fileName, org), managedAcl.get().getId());
-          logger.debug("Acl from '{}' has been added for the organisation {}", fileName, org.getName());
-        } else {
-          logger.debug("Acl from '{}' has already been added to the organisation {}.", fileName, org.getName());
-        }
+      AclService aclService = getAclService(org);
+      Optional<ManagedAcl> managedAcl = aclService.getAcl(fileName);
+      if (managedAcl.isEmpty()) {
+        aclService.createAcl(acl, fileName);
+        logger.debug("Acl from '{}' has been added for the organisation {}", fileName, org.getName());
+      } else {
+        logger.debug("Acl from '{}' has already been added to the organisation {}. Lets update it.",
+            fileName, org.getName());
+        aclService.updateAcl(new ManagedAclImpl(managedAcl.get().getId(), fileName, org.getId(), acl));
+        logger.debug("Acl from file {} has been updated for the organisation {}", fileName, org.getName());
       }
     }
   }
@@ -186,17 +174,18 @@ public class AclScanner implements ArtifactInstaller {
     // Update the Acl on all the organizations
     for (Organization org : organizations) {
       securityService.setOrganization(org);
-      Long id = managedAcls.get(generateAclId(fileName, org));
-      if (id != null) {
+      AclService aclService = getAclService(org);
+      Optional<ManagedAcl> managedAcl = aclService.getAcl(fileName);
+      if (managedAcl.isPresent()) {
         // If the Acl Id is in the managedAcls map, we update the Acl
-        if (!getAclService(org).updateAcl(new ManagedAclImpl(id, fileName, org.getId(), acl))) {
-          logger.warn("No Acl found with the id {} for the organisation {}.", id, org.getName());
+        if (!aclService.updateAcl(new ManagedAclImpl(managedAcl.get().getId(), fileName, org.getId(), acl))) {
+          logger.warn("No Acl found with the id {} for the organisation {}.", managedAcl.get().getId(), org.getName());
         } else {
           logger.debug("Acl from file {} has been updated for the organisation {}", fileName, org.getName());
         }
       } else {
-        logger.info("The ACL file {} has not been added to the organisation {} and will therefore not be updated",
-                fileName, org.getName());
+        managedAcl = aclService.createAcl(acl, fileName);
+        logger.debug("Acl from '{}' has been added for the organisation {}", fileName, org.getName());
       }
     }
   }
@@ -217,14 +206,15 @@ public class AclScanner implements ArtifactInstaller {
     // Remove the Acl on all the organizations
     for (Organization org : organizations) {
       securityService.setOrganization(org);
-      Long id = managedAcls.get(generateAclId(fileName, org));
-      if (id != null) {
+      AclService aclService = getAclService(org);
+      Optional<ManagedAcl> managedAcl = aclService.getAcl(fileName);
+      if (managedAcl.isPresent()) {
         try {
-          getAclService(org).deleteAcl(id);
+          getAclService(org).deleteAcl(managedAcl.get().getId());
         } catch (NotFoundException e) {
-          logger.debug("Unable to delete managed acl {}. Managed acl already deleted!", id);
+          logger.debug("Unable to delete managed acl {}. Managed acl already deleted!", managedAcl.get().getId());
         } catch (AclServiceException e) {
-          logger.error("Unable to delete managed acl {}", id, e);
+          logger.error("Unable to delete managed acl {}", managedAcl.get().getId(), e);
         }
       } else {
         logger.debug("No Acl matching file {} found.", fileName);
