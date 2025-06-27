@@ -434,8 +434,6 @@ public class SchedulerServiceImplTest {
     assertEquals(seriesId, mediaPackage.getSeries());
     DublinCoreCatalog eventLoaded = schedSvc.getDublinCore(mp.getIdentifier().toString());
     assertEquals(event.getFirst(PROPERTY_TITLE), eventLoaded.getFirst(PROPERTY_TITLE));
-    // the returned map is of type com.entwinemedia.fn.data.ImmutableMapWrapper which
-    // does not delegate equals and hashcode so it is necessary to create a HashMap from it
     TechnicalMetadata technicalMetadata = schedSvc.getTechnicalMetadata(mp.getIdentifier().toString());
     assertEquals(mp.getIdentifier().toString(), technicalMetadata.getEventId());
     assertEquals(captureDeviceID, technicalMetadata.getAgentId());

@@ -77,10 +77,6 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.entwinemedia.common</groupId>
-      <artifactId>functional</artifactId>
-    </dependency>
-    <dependency>
       <groupId>joda-time</groupId>
       <artifactId>joda-time</artifactId>
     </dependency>
@@ -207,9 +203,6 @@
             <ignoredUnusedDeclaredDependency>commons-codec:commons-codec</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.opencastproject:opencast-list-providers-service</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
-          <ignoredNonTestScopedDependencies>
-            <ignoredNonTestScopedDependency>com.entwinemedia.common</ignoredNonTestScopedDependency>
-          </ignoredNonTestScopedDependencies>
         </configuration>
       </plugin>
       <plugin>
