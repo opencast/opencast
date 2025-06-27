@@ -75,6 +75,7 @@ jobs:
 
         #This has to happen in a separate step or else various service classes aren't visible
       - name: build javadocs
+        if: matrix.java == 23
         run: |
           mvn javadoc:javadoc javadoc:aggregate -Pnone \
             --batch-mode \
