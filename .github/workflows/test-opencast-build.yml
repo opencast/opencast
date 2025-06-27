@@ -53,11 +53,8 @@ jobs:
             bzip2 \
             ffmpeg \
             gzip \
-            hunspell \
-            hunspell-de-de \
             procps \
             s3cmd \
-            sox \
             tar \
             tesseract-ocr \
             tesseract-ocr-deu \
