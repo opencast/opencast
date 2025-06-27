@@ -65,7 +65,7 @@ jobs:
 
       - name: build opencast
         run: |
-          mvn clean install -Pnone \
+          ./mvnw clean install -Pnone \
             --batch-mode \
             -Dsurefire.rerunFailingTestsCount=2 \
             -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
@@ -76,7 +76,7 @@ jobs:
         #This has to happen in a separate step or else various service classes aren't visible
       - name: build javadocs
         run: |
-          mvn javadoc:javadoc javadoc:aggregate -Pnone \
+          ./mvnw javadoc:javadoc javadoc:aggregate -Pnone \
             --batch-mode \
             -Dsurefire.rerunFailingTestsCount=2 \
             -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
@@ -88,7 +88,7 @@ jobs:
         if: matrix.java == 21
         working-directory: assemblies
         run: |
-          mvn clean install \
+          ../mvnw clean install \
             --batch-mode \
             -Dsurefire.rerunFailingTestsCount=2 \
             -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
