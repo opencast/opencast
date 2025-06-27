@@ -20,10 +20,7 @@
  */
 package org.opencastproject.workflow.handler.assetmanager;
 
-import static org.opencastproject.assetmanager.api.AssetManager.DEFAULT_OWNER;
-
 import org.opencastproject.assetmanager.api.AssetManager;
-import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
@@ -87,17 +84,14 @@ public class AssetManagerDeleteWorkflowOperationHandler extends AbstractWorkflow
     boolean keepLastSnapshot = BooleanUtils.toBoolean(currentOperation.getConfiguration(OPT_LAST_SNAPSHOT));
 
     try {
-      final AQueryBuilder q = assetManager.createQuery();
       final long deleted;
 
       if (keepLastSnapshot) {
         logger.info("Deleting all but latest snapshot of episode {}", mpId);
-        deleted = q.delete(DEFAULT_OWNER, q.snapshot())
-                .where(q.mediaPackageId(mpId).and(q.version().isLatest().not())).run();
+        deleted = assetManager.deleteAllButLatestSnapshot(mpId);
       } else {
         logger.info("Deleting all snapshots of episode {}", mpId);
-        deleted = q.delete(DEFAULT_OWNER, q.snapshot())
-                .where(q.mediaPackageId(mpId)).run();
+        deleted = assetManager.deleteSnapshots(mpId);
       }
 
       logger.info("Successfully deleted {} version/s episode {} from the asset manager", deleted, mpId);

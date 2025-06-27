@@ -21,9 +21,7 @@
 package org.opencastproject.transcription.googlespeech;
 
 import org.opencastproject.assetmanager.api.AssetManager;
-import org.opencastproject.assetmanager.api.fn.Enrichments;
-import org.opencastproject.assetmanager.api.query.AQueryBuilder;
-import org.opencastproject.assetmanager.api.query.AResult;
+import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.util.Workflows;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
@@ -94,6 +92,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -1151,9 +1150,8 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     securityService.setUser(SecurityUtil.createSystemUser(systemAccount, defaultOrg));
 
     // Find the episode
-    final AQueryBuilder q = assetManager.createQuery();
-    final AResult r = q.select(q.snapshot()).where(q.mediaPackageId(mpId).and(q.version().isLatest())).run();
-    if (r.getSize() == 0) {
+    Optional<Snapshot> snapshot = assetManager.getLatestSnapshot(mpId);
+    if (snapshot.isEmpty()) {
       if (!hasTranscriptionRequestExpired(jobId)) {
         // Media package not archived but still within completion time? Skip until next time.
         logger.warn("Media package {} has not been archived yet or has been deleted. Will keep trying for {} "
@@ -1167,7 +1165,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
       return null;
     }
 
-    String org = Enrichments.enrich(r).getSnapshots().stream().findFirst().get().getOrganizationId();
+    String org = snapshot.get().getOrganizationId();
     Organization organization = null;
     try {
       organization = organizationDirectoryService.getOrganization(org);

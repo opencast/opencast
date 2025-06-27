@@ -188,12 +188,6 @@
       <artifactId>h2</artifactId>
       <scope>test</scope>
     </dependency>
-    <!-- contains javax.inject.Provider -->
-    <dependency>
-      <groupId>com.mysema.querydsl</groupId>
-      <artifactId>querydsl-apt</artifactId>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
   <build>
     <plugins>
@@ -211,7 +205,6 @@
             <ignoredUnusedDeclaredDependency>org.mnode.ical4j:ical4j</ignoredUnusedDeclaredDependency>
             <!-- commons-codec -->
             <ignoredUnusedDeclaredDependency>commons-codec:commons-codec</ignoredUnusedDeclaredDependency>
-            <ignoredUnusedDeclaredDependency>com.mysema.querydsl:querydsl-apt</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.opencastproject:opencast-list-providers-service</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
           <ignoredNonTestScopedDependencies>

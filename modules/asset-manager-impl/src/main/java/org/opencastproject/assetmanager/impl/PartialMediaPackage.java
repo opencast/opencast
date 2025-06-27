@@ -20,13 +20,13 @@
  */
 package org.opencastproject.assetmanager.impl;
 
-import static com.entwinemedia.fn.Stream.$;
-
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 
-import com.entwinemedia.fn.Pred;
-import com.entwinemedia.fn.Stream;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Product of a media package and a media package element filter.
@@ -35,14 +35,14 @@ import com.entwinemedia.fn.Stream;
  */
 public class PartialMediaPackage {
   private final MediaPackage mediaPackage;
-  private final Pred<MediaPackageElement> filter;
+  private final Predicate<MediaPackageElement> filter;
 
-  public PartialMediaPackage(MediaPackage mediaPackage, Pred<MediaPackageElement> filter) {
+  public PartialMediaPackage(MediaPackage mediaPackage, Predicate<MediaPackageElement> filter) {
     this.mediaPackage = mediaPackage;
     this.filter = filter;
   }
 
-  public static PartialMediaPackage mk(MediaPackage mp, Pred<MediaPackageElement> filter) {
+  public static PartialMediaPackage mk(MediaPackage mp, Predicate<MediaPackageElement> filter) {
     return new PartialMediaPackage(mp, filter);
   }
 
@@ -50,11 +50,13 @@ public class PartialMediaPackage {
     return mediaPackage;
   }
 
-  public Pred<MediaPackageElement> getPredicate() {
+  public Predicate<MediaPackageElement> getPredicate() {
     return filter;
   }
 
-  public Stream<MediaPackageElement> getElements() {
-    return $(mediaPackage.getElements()).filter(filter);
+  public List<MediaPackageElement> getElements() {
+    return Arrays.stream(mediaPackage.getElements())
+        .filter(filter)
+        .collect(Collectors.toList());
   }
 }

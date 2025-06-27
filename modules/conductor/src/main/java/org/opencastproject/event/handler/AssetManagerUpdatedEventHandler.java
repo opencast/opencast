@@ -21,13 +21,10 @@
 
 package org.opencastproject.event.handler;
 
-import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
 
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.AssetManagerException;
 import org.opencastproject.assetmanager.api.Snapshot;
-import org.opencastproject.assetmanager.api.query.AQueryBuilder;
-import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -178,11 +175,10 @@ public class AssetManagerUpdatedEventHandler {
     try {
       securityService.setUser(SecurityUtil.createSystemUser(systemAccount, prevOrg));
 
-      final AQueryBuilder q = assetManager.createQuery();
-      final AResult result = q.select(q.snapshot()).where(q.seriesId().eq(seriesId).and(q.version().isLatest())).run();
-      List<Snapshot> snapshots = enrich(result).getSnapshots();
+      List<Snapshot> snapshots = assetManager.getLatestSnapshotsBySeriesId(seriesId);
+
       Collections.sort(
-          enrich(result).getSnapshots(),
+          snapshots,
           Comparator.comparing(s->s.getMediaPackage().getIdentifier().toString())
       );
 

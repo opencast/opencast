@@ -45,7 +45,6 @@ import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.attachment.AttachmentImpl;
 import org.opencastproject.mediapackage.identifier.IdImpl;
-import org.opencastproject.message.broker.api.update.AssetManagerUpdateHandler;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
@@ -153,14 +152,16 @@ public class TestTasksEndpoint extends TasksEndpoint {
   }
 
   AssetManager mkAssetManager(final Workspace workspace) throws Exception {
-    final DBSession dbSession = newDBSession("org.opencastproject.assetmanager.impl");
-    final Database db = new Database(dbSession);
     HttpAssetProvider httpAssetProvider = new HttpAssetProvider() {
       @Override
       public Snapshot prepareForDelivery(Snapshot snapshot) {
         return snapshot;
       }
     };
+
+    final DBSession dbSession = newDBSession("org.opencastproject.assetmanager.impl");
+    final Database db = new Database(dbSession);
+    db.setHttpAssetProvider(httpAssetProvider);
 
     JaxbOrganization org = new DefaultOrganization();
     JaxbUser user = new JaxbUser("user", null, org, new JaxbRole(DefaultOrganization.DEFAULT_ORGANIZATION_ADMIN,
@@ -190,9 +191,6 @@ public class TestTasksEndpoint extends TasksEndpoint {
     am.setSecurityService(securityService);
     am.setAuthorizationService(authorizationService);
     am.setIndex(esIndex);
-    //We need two handlers
-    am.addEventHandler(EasyMock.createNiceMock(AssetManagerUpdateHandler.class));
-    am.addEventHandler(EasyMock.createNiceMock(AssetManagerUpdateHandler.class));
 
     return am;
   }

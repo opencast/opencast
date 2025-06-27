@@ -27,8 +27,6 @@ import static org.apache.commons.lang3.StringUtils.trimToEmpty;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Property;
 import org.opencastproject.assetmanager.api.PropertyId;
-import org.opencastproject.assetmanager.api.query.AQueryBuilder;
-import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.distribution.api.DistributionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
@@ -609,14 +607,12 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
   }
 
   private void copyProperties(String namespace, MediaPackage source, MediaPackage destination) {
-    final AQueryBuilder q = assetManager.createQuery();
-    final AResult properties = q.select(q.propertiesOf(namespace))
-        .where(q.mediaPackageId(source.getIdentifier().toString())).run();
-    if (properties.getRecords().stream().findFirst().isEmpty()) {
+    List<Property> properties = assetManager.selectProperties(source.getIdentifier().toString(), namespace);
+    if (properties.isEmpty()) {
       logger.info("No properties to copy for media package {}, namespace {}.", source.getIdentifier(), namespace);
       return;
     }
-    for (final Property p : properties.getRecords().stream().findFirst().get().getProperties()) {
+    for (final Property p : properties) {
       final PropertyId newPropId = PropertyId.mk(destination.getIdentifier().toString(), namespace, p.getId()
           .getName());
       assetManager.setProperty(Property.mk(newPropId, p.getValue()));

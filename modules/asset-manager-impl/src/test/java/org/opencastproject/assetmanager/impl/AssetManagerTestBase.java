@@ -23,11 +23,12 @@ package org.opencastproject.assetmanager.impl;
 import static org.junit.Assert.assertEquals;
 import static org.opencastproject.util.data.Tuple.tuple;
 
+import org.opencastproject.assetmanager.api.Property;
+import org.opencastproject.assetmanager.api.PropertyId;
+import org.opencastproject.assetmanager.api.PropertyName;
 import org.opencastproject.assetmanager.api.Snapshot;
+import org.opencastproject.assetmanager.api.Value;
 import org.opencastproject.assetmanager.api.Version;
-import org.opencastproject.assetmanager.api.query.AQueryBuilder;
-import org.opencastproject.assetmanager.api.query.PropertyField;
-import org.opencastproject.assetmanager.api.query.PropertySchema;
 import org.opencastproject.assetmanager.api.storage.AssetStore;
 import org.opencastproject.assetmanager.api.storage.AssetStoreException;
 import org.opencastproject.assetmanager.api.storage.DeletionSelector;
@@ -45,7 +46,6 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElements;
-import org.opencastproject.message.broker.api.update.AssetManagerUpdateHandler;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
@@ -55,16 +55,8 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.MimeTypes;
-import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
-
-import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.FnX;
-import com.entwinemedia.fn.P1;
-import com.entwinemedia.fn.P1Lazy;
-import com.entwinemedia.fn.Stream;
-import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.io.FileUtils;
 import org.easymock.EasyMock;
@@ -77,9 +69,11 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -88,7 +82,6 @@ import java.util.stream.Collectors;
 /**
  * Base class for {@link org.opencastproject.assetmanager.api.AssetManager} tests.
  */
-// CHECKSTYLE:OFF
 public abstract class AssetManagerTestBase {
   protected static final Logger logger = LoggerFactory.getLogger(AssetManagerTestBase.class);
   public static final String PERSISTENCE_UNIT = "org.opencastproject.assetmanager.impl";
@@ -104,22 +97,18 @@ public abstract class AssetManagerTestBase {
 
   /** The asset manager under test. */
   protected AssetManagerImpl am;
-  protected AQueryBuilder q;
   protected Props p;
   protected Props p2;
 
   @Before
   public void setUp() throws Exception {
     this.am = makeAssetManager();
-    q = am.createQuery();
-    p = new Props(q, "org.opencastproject.service");
-    p2 = new Props(q, "org.opencastproject.service.sub");
+    p = new Props("org.opencastproject.service");
+    p2 = new Props("org.opencastproject.service.sub");
   }
 
   protected AssetManagerImpl makeAssetManager() throws Exception {
     AssetManagerImpl am = makeAssetManagerWithoutHandlers();
-    am.addEventHandler(EasyMock.createNiceMock(AssetManagerUpdateHandler.class));
-    am.addEventHandler(EasyMock.createNiceMock(AssetManagerUpdateHandler.class));
     return am;
   }
 
@@ -127,7 +116,14 @@ public abstract class AssetManagerTestBase {
    * Create a new test asset manager.
    */
   protected AssetManagerImpl makeAssetManagerWithoutHandlers() throws Exception {
+    HttpAssetProvider httpAssetProvider =  new HttpAssetProvider() {
+      @Override public Snapshot prepareForDelivery(Snapshot snapshot) {
+        return snapshot;
+      }
+    };
+
     final Database db = new Database(DBTestEnv.newDBSession(PERSISTENCE_UNIT));
+    db.setHttpAssetProvider(httpAssetProvider);
 
     final Workspace workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.get(EasyMock.anyObject(URI.class)))
@@ -144,12 +140,6 @@ public abstract class AssetManagerTestBase {
     AssetStore localAssetStore = mkAssetStore(LOCAL_STORE_ID);
     RemoteAssetStore remoteAssetStore1 = mkRemoteAssetStore(REMOTE_STORE_1_ID);
     RemoteAssetStore remoteAssetStore2 = mkRemoteAssetStore(REMOTE_STORE_2_ID);
-
-    HttpAssetProvider httpAssetProvider =  new HttpAssetProvider() {
-      @Override public Snapshot prepareForDelivery(Snapshot snapshot) {
-        return snapshot;
-      }
-    };
 
     Organization org = new DefaultOrganization();
     User currentUser = TestUser.mk(org, org.getAdminRole());
@@ -201,29 +191,6 @@ public abstract class AssetManagerTestBase {
     return mpe;
   }
 
-  static <A> int sizeOf(Stream<A> stream) {
-    int count = 0;
-    for (A ignore : stream) {
-      count++;
-    }
-    return count;
-  }
-
-  static P1<Integer> inc() {
-    return new P1Lazy<Integer>() {
-      private int i = 0;
-
-      @Override public Integer get1() {
-        return i++;
-      }
-    };
-  }
-
-  @SafeVarargs
-  public static  <A> A[] $a(A... as) {
-    return as;
-  }
-
   /**
    * Create a number of media packages with one catalog each and add it to the
    * AssetManager. Return the media package IDs as an array.
@@ -246,7 +213,7 @@ public abstract class AssetManagerTestBase {
       int amount,
       final int minVersions,
       final int maxVersions,
-      final Opt<String> seriesId
+      final Optional<String> seriesId
   ) {
     return Arrays.stream(createAndAddMediaPackages(amount, minVersions, maxVersions, seriesId))
         .map(s -> s.getMediaPackage().getIdentifier().toString())
@@ -255,55 +222,61 @@ public abstract class AssetManagerTestBase {
   }
 
   /**
-   * Like {@link #createAndAddMediaPackagesSimple(int, int, int, Opt)} but without series ID.
+   * Like {@link #createAndAddMediaPackagesSimple(int, int, int, Optional)} but without series ID.
    */
   protected String[] createAndAddMediaPackagesSimple(int amount, final int minVersions, final int maxVersions) {
-    return createAndAddMediaPackagesSimple(amount, minVersions, maxVersions, Opt.<String>none());
+    return createAndAddMediaPackagesSimple(amount, minVersions, maxVersions, Optional.empty());
   }
 
   /**
    * Continuous versions.
    *
-   * @see #createAndAddMediaPackages(int, int, int, boolean, Opt)
+   * @see #createAndAddMediaPackages(int, int, int, boolean, Optional)
    */
   protected Snapshot[] createAndAddMediaPackages(
-          int amount, final int minVersions, final int maxVersions, final Opt<String> seriesId) {
+          int amount, final int minVersions, final int maxVersions, final Optional<String> seriesId) {
     return createAndAddMediaPackages(amount, minVersions, maxVersions, true, seriesId);
   }
 
   /**
    * @param continuousVersions true if version numbers should be increased continuously, false if there should be
    *          discontinuities
-   * @see #createAndAddMediaPackagesSimple(int, int, int, Opt)
+   * @see #createAndAddMediaPackagesSimple(int, int, int, Optional)
    */
   protected Snapshot[] createAndAddMediaPackages(
-          int amount,
-          final int minVersions, final int maxVersions,
-          final boolean continuousVersions,
-          final Opt<String> seriesId) {
+      int amount,
+      final int minVersions, final int maxVersions,
+      final boolean continuousVersions,
+      final Optional<String> seriesId) {
     logger.info("Create {} media packages with {} to {} snapshots each", amount, minVersions, maxVersions);
-    final Stream<Snapshot> inserts = Stream.cont(inc()).take(amount).bind(new FnX<Integer, Iterable<Snapshot>>() {
-      @Override public Iterable<Snapshot> applyX(final Integer mpCount) throws Exception {
-        final MediaPackage mp = mkMediaPackage(mkCatalog());
-        for (String sid : seriesId) {
-          mp.setSeries(sid);
+
+    List<Snapshot> snapshots = new ArrayList<>();
+
+    for (int mpCount = 0; mpCount < amount; mpCount++) {
+      try {
+        MediaPackage mp = mkMediaPackage(mkCatalog());
+        if (seriesId.isPresent()) {
+          mp.setSeries(seriesId.get());
         }
-        final int versions = (int) (Math.random() * ((double) maxVersions - minVersions) + minVersions);
-        final String mpId = mp.getIdentifier().toString();
+        int versions = (int) (Math.random() * ((double) maxVersions - minVersions) + minVersions);
+        String mpId = mp.getIdentifier().toString();
         logger.debug("Going to take {} snapshot/s of media package {}", versions, mpId);
-        return Stream.cont(inc()).take(versions).map(new Fn<Integer, Snapshot>() {
-          @Override public Snapshot apply(Integer versionCount) {
-            if (!continuousVersions) {
-              // insert a gap into the version claim
-              am.getDatabase().claimVersion(mp.getIdentifier().toString());
-            }
-            logger.debug("Taking snapshot {} of media package {}", versionCount + 1, mpId);
-            return am.takeSnapshot(OWNER, mp);
+
+        for (int versionCount = 0; versionCount < versions; versionCount++) {
+          if (!continuousVersions) {
+            am.getDatabase().claimVersion(mpId);
           }
-        });
+
+          logger.debug("Taking snapshot {} of media package {}", versionCount + 1, mpId);
+          snapshots.add(am.takeSnapshot(OWNER, mp));
+        }
+      } catch (Exception e) {
+        logger.error("Failed to create media package or snapshot", e);
+        throw new RuntimeException("Media package generation failed", e);
       }
-    });
-    return Collections.toArray(Snapshot.class, inserts.toList());
+    }
+
+    return snapshots.toArray(new Snapshot[0]);
   }
 
   /* -------------------------------------------------------------------------------------------------------------- */
@@ -311,30 +284,52 @@ public abstract class AssetManagerTestBase {
   /**
    * A property schema definition.
    */
-  public static class Props extends PropertySchema {
-    public Props(AQueryBuilder q, String namespace) {
-      super(q, namespace);
+  public static class Props {
+    private final String namespace;
+
+    public Props(String namespace) {
+      this.namespace = namespace;
     }
 
-    // define your properties here below
+    public String getNamespace() {
+      return namespace;
+    }
 
-    // CHECKSTYLE:OFF
-    public final PropertyField<Long> count = longProp("count");
+    private PropertyName name(String localName) {
+      return PropertyName.mk(namespace, localName);
+    }
 
-    public final PropertyField<Boolean> approved = booleanProp("approved");
+    public Property count(String mpId, long value) {
+      return Property.mk(PropertyId.mk(mpId, name("count")), Value.LONG.mk(value));
+    }
 
-    public final PropertyField<Date> start = dateProp("start");
+    public Property approved(String mpId, boolean value) {
+      return Property.mk(PropertyId.mk(mpId, name("approved")), Value.BOOLEAN.mk(value));
+    }
 
-    public final PropertyField<Date> end = dateProp("end");
+    public Property start(String mpId, Date value) {
+      return Property.mk(PropertyId.mk(mpId, name("start")), Value.DATE.mk(value));
+    }
 
-    public final PropertyField<String> legacyId = stringProp("legacyId");
+    public Property end(String mpId, Date value) {
+      return Property.mk(PropertyId.mk(mpId, name("end")), Value.DATE.mk(value));
+    }
 
-    public final PropertyField<String> agent = stringProp("agent");
+    public Property legacyId(String mpId, String value) {
+      return Property.mk(PropertyId.mk(mpId, name("legacyId")), Value.STRING.mk(value));
+    }
 
-    public final PropertyField<String> seriesId = stringProp("series");
+    public Property agent(String mpId, String value) {
+      return Property.mk(PropertyId.mk(mpId, name("agent")), Value.STRING.mk(value));
+    }
 
-    public final PropertyField<Version> versionId = versionProp("version");
-    // CHECKSTYLE:ON
+    public Property seriesId(String mpId, String value) {
+      return Property.mk(PropertyId.mk(mpId, name("series")), Value.STRING.mk(value));
+    }
+
+    public Property versionId(String mpId, Version value) {
+      return Property.mk(PropertyId.mk(mpId, name("version")), Value.VERSION.mk(value));
+    }
   }
 
   /**
@@ -489,4 +484,3 @@ public abstract class AssetManagerTestBase {
     return "test";
   }
 }
-// CHECKSTYLE:ON

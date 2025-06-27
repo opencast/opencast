@@ -29,14 +29,6 @@ import static org.junit.Assert.assertEquals;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Version;
-import org.opencastproject.assetmanager.api.query.AQueryBuilder;
-import org.opencastproject.assetmanager.api.query.ARecord;
-import org.opencastproject.assetmanager.api.query.AResult;
-import org.opencastproject.assetmanager.api.query.ASelectQuery;
-import org.opencastproject.assetmanager.api.query.Field;
-import org.opencastproject.assetmanager.api.query.Predicate;
-import org.opencastproject.assetmanager.api.query.Target;
-import org.opencastproject.assetmanager.api.query.VersionField;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.CatalogImpl;
@@ -72,11 +64,9 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import java.net.URI;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Hashtable;
-import java.util.LinkedHashSet;
 import java.util.Optional;
 import java.util.Set;
 
@@ -165,10 +155,6 @@ public class OaiPmhUpdatedEventHandlerTest extends EasyMockSupport {
     Assert.assertTrue(flavorsCapture.getValue().contains("dublincore/*"));
     Assert.assertTrue(flavorsCapture.getValue().contains("security/*"));
     Assert.assertTrue(tagsCapture.getValue().contains("archive"));
-    Assert.assertTrue(orgIdCapture.hasCaptured());
-    Assert.assertEquals(new DefaultOrganization().getId(), orgIdCapture.getValue());
-    Assert.assertTrue(mpIdCapture.hasCaptured());
-    Assert.assertEquals(updatedMp.getIdentifier().toString(), mpIdCapture.getValue());
     Assert.assertTrue(snapshotVersionCapture.hasCaptured());
     Assert.assertEquals("3", snapshotVersionCapture.getValue());
   }
@@ -263,37 +249,13 @@ public class OaiPmhUpdatedEventHandlerTest extends EasyMockSupport {
   }
 
   private void mockAssetManager(MediaPackage mediaPackage) {
-    AQueryBuilder queryBuilder = mock(AQueryBuilder.class);
-    ASelectQuery selectQuery = mock(ASelectQuery.class);
-    expect(queryBuilder.select(EasyMock.anyObject())).andReturn(selectQuery);
-    Target target = mock(Target.class);
-    expect(queryBuilder.snapshot()).andReturn(target);
-    Predicate queryPredicate1 = mock(Predicate.class);
-    Predicate queryPredicate2 = mock(Predicate.class);
-    Predicate queryPredicate3 = mock(Predicate.class);
-    expect(queryPredicate1.and(EasyMock.anyObject())).andReturn(queryPredicate2);
-    expect(queryPredicate2.and(EasyMock.anyObject())).andReturn(queryPredicate3);
-    orgIdCapture = Capture.newInstance();
-    Field<String> orgIdField = mock(Field.class);
-    expect(orgIdField.eq(capture(orgIdCapture))).andReturn(queryPredicate1);
-    expect(queryBuilder.organizationId()).andReturn(orgIdField);
-    mpIdCapture = Capture.newInstance();
-    expect(queryBuilder.mediaPackageId(capture(mpIdCapture))).andReturn(queryPredicate2);
-    VersionField versionField = mock(VersionField.class);
-    expect(versionField.eq(EasyMock.anyObject(Version.class))).andReturn(queryPredicate3);
-    expect(queryBuilder.version()).andReturn(versionField);
-    ASelectQuery selectQuery2 = mock(ASelectQuery.class);
-    expect(selectQuery.where(EasyMock.anyObject())).andReturn(selectQuery2);
-    AResult queryResult = mock(AResult.class);
-    expect(selectQuery2.run()).andReturn(queryResult);
-    expect(assetManagerMock.createQuery()).andReturn(queryBuilder);
     snapshotVersionCapture = EasyMock.newCapture();
     expect(assetManagerMock.toVersion(capture(snapshotVersionCapture))).andReturn(Optional.of(mock(Version.class)));
-    ARecord record = mock(ARecord.class);
-    expect(queryResult.getRecords()).andReturn(new LinkedHashSet<>(Arrays.asList(record)));
     Snapshot snapshot = mock(Snapshot.class);
-    expect(record.getSnapshot()).andReturn(Optional.of(snapshot));
     expect(snapshot.getMediaPackage()).andReturn(mediaPackage);
+    expect(assetManagerMock.getSnapshotByMpIdOrgIdAndVersion(EasyMock.anyString(), EasyMock.anyString(),
+        EasyMock.anyObject()))
+        .andReturn(Optional.of(snapshot)).anyTimes();
   }
 
   private void mockSecurityService() {

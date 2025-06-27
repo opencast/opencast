@@ -22,16 +22,6 @@ package org.opencastproject.assetmanager.impl;
 
 import org.opencastproject.assetmanager.api.AssetManagerException;
 import org.opencastproject.assetmanager.api.Version;
-import org.opencastproject.assetmanager.api.query.ADeleteQuery;
-import org.opencastproject.assetmanager.api.query.Order;
-import org.opencastproject.assetmanager.api.query.Predicate;
-import org.opencastproject.assetmanager.api.query.PropertyField;
-import org.opencastproject.assetmanager.api.query.Target;
-import org.opencastproject.assetmanager.impl.query.AbstractADeleteQuery;
-import org.opencastproject.assetmanager.impl.query.AbstractOrder;
-import org.opencastproject.assetmanager.impl.query.AbstractPredicate;
-import org.opencastproject.assetmanager.impl.query.AbstractTarget;
-import org.opencastproject.assetmanager.impl.query.PropertyFieldImpl;
 
 /**
  * This implementation of the AssetManager only takes its own implementation of query, result, record etc.
@@ -49,26 +39,6 @@ public final class RuntimeTypes {
    */
   public static VersionImpl convert(Version a) {
     return cast(VersionImpl.class, a);
-  }
-
-  public static AbstractPredicate convert(Predicate a) {
-    return cast(AbstractPredicate.class, a);
-  }
-
-  public static AbstractTarget convert(Target a) {
-    return cast(AbstractTarget.class, a);
-  }
-
-  public static AbstractOrder convert(Order a) {
-    return cast(AbstractOrder.class, a);
-  }
-
-  public static AbstractADeleteQuery convert(ADeleteQuery a) {
-    return cast(AbstractADeleteQuery.class, a);
-  }
-
-  public static <A> PropertyFieldImpl<A> convert(PropertyField<A> a) {
-    return cast(PropertyFieldImpl.class, a);
   }
 
   private static <B, A extends B> A cast(Class<A> ev, B b) {

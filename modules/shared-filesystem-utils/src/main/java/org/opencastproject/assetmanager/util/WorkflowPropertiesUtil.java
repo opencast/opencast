@@ -29,9 +29,6 @@ import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Property;
 import org.opencastproject.assetmanager.api.PropertyId;
 import org.opencastproject.assetmanager.api.Value;
-import org.opencastproject.assetmanager.api.query.AQueryBuilder;
-import org.opencastproject.assetmanager.api.query.ARecord;
-import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -67,17 +64,13 @@ public final class WorkflowPropertiesUtil {
    */
   public static Map<String, Map<String, String>> getLatestWorkflowPropertiesForEvents(final AssetManager assetManager,
           final Collection<String> eventIds) {
-    final AQueryBuilder query = assetManager.createQuery();
-    final AResult result = query.select(query.snapshot(), query.propertiesOf(WORKFLOW_PROPERTIES_NAMESPACE))
-            .where(query.mediaPackageIds(eventIds.toArray(new String[0])).and(query.version().isLatest())).run();
     final Map<String, Map<String, String>> workflowProperties = new HashMap<>(eventIds.size());
-    for (final ARecord record : result.getRecords()) {
-      final List<Property> recordProps = record.getProperties();
-      final Map<String, String> eventMap = new HashMap<>(recordProps.size());
-      for (final Property property : recordProps) {
+    for (String eventId : eventIds) {
+      final List<Property> properties = assetManager.selectProperties(eventId, WORKFLOW_PROPERTIES_NAMESPACE);
+      final Map<String, String> eventMap = new HashMap<>(properties.size());
+      for (final Property property : properties) {
         eventMap.put(property.getId().getName(), property.getValue().get(Value.STRING));
       }
-      final String eventId = record.getMediaPackageId();
       workflowProperties.put(eventId, eventMap);
     }
     return workflowProperties;

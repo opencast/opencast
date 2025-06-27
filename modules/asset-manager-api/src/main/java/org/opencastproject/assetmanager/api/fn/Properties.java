@@ -23,11 +23,7 @@ package org.opencastproject.assetmanager.api.fn;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Property;
 import org.opencastproject.assetmanager.api.PropertyId;
-import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Value;
-import org.opencastproject.assetmanager.api.query.AQueryBuilder;
-import org.opencastproject.assetmanager.api.query.PropertyField;
-import org.opencastproject.mediapackage.MediaPackage;
 
 import java.util.Date;
 
@@ -41,8 +37,6 @@ public final class Properties {
   /**
    * Set a string property on a media package.
    *
-   * @deprecated make use of a {@link org.opencastproject.assetmanager.api.query.PropertySchema}
-   * instead of creating property IDs manually
    */
   public static boolean setProperty(AssetManager am, String mpId, String namespace, String propertyName, String value) {
     return setProperty(am, mpId, namespace, propertyName, Value.mk(value));
@@ -51,8 +45,6 @@ public final class Properties {
   /**
    * Set a date property on a media package.
    *
-   * @deprecated make use of a {@link org.opencastproject.assetmanager.api.query.PropertySchema}
-   * instead of creating property IDs manually
    */
   public static boolean setProperty(AssetManager am, String mpId, String namespace, String propertyName, Date value) {
     return setProperty(am, mpId, namespace, propertyName, Value.mk(value));
@@ -61,8 +53,6 @@ public final class Properties {
   /**
    * Set a long property on a media package.
    *
-   * @deprecated make use of a {@link org.opencastproject.assetmanager.api.query.PropertySchema}
-   * instead of creating property IDs manually
    */
   public static boolean setProperty(AssetManager am, String mpId, String namespace, String propertyName, Long value) {
     return setProperty(am, mpId, namespace, propertyName, Value.mk(value));
@@ -71,8 +61,6 @@ public final class Properties {
   /**
    * Set a boolean property on a media package.
    *
-   * @deprecated make use of a {@link org.opencastproject.assetmanager.api.query.PropertySchema}
-   * instead of creating property IDs manually
    */
   public static boolean setProperty(
       AssetManager am, String mpId, String namespace, String propertyName, boolean value) {
@@ -82,26 +70,13 @@ public final class Properties {
   /**
    * Set a property on a media package.
    *
-   * @deprecated make use of a {@link org.opencastproject.assetmanager.api.query.PropertySchema}
-   * instead of creating property IDs manually
    */
   public static boolean setProperty(AssetManager am, String mpId, String namespace, String propertyName, Value value) {
     return am.setProperty(Property.mk(PropertyId.mk(mpId, namespace, propertyName), value));
   }
 
-  public static long removeProperties(AssetManager am, String owner, String orgId, String mpId, String namespace) {
-    final AQueryBuilder q = am.createQuery();
-    return q.delete(owner, q.propertiesOf(namespace)).where(q.organizationId(orgId).and(q.mediaPackageId(mpId))).run();
-  }
-
-  /** Create a property. */
-  public static <A> Property mkProperty(PropertyField<A> f, MediaPackage mp, A value)  {
-    return f.mk(mp.getIdentifier().toString(), value);
-  }
-
-  /** Create a property. */
-  public static <A> Property mkProperty(PropertyField<A> f, Snapshot e, A value)  {
-    return f.mk(e.getMediaPackage().getIdentifier().toString(), value);
+  public static long removeProperties(AssetManager am, String mpId, String namespace) {
+    return am.deletePropertiesWithCurrentUser(mpId, namespace);
   }
 
   /** Create a property. */
