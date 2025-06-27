@@ -273,8 +273,6 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
       }
     }
 
-    // Note that the logic below currently supports at most two input tracks
-
     if (allNonHidden(augmentedTracks, SubTrack.VIDEO)) {
       // Case 1: We have only tracks with non-hidden video streams. So we keep them all and possibly cut away audio.
 
@@ -359,12 +357,17 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
            }
          }
        }
-    } else {
-      /* Case 3: We have one or more tracks where exactly one track has a non-hidden video stream (implied as this
+    } else if (augmentedTracks.size() == 2) {
+      /* Case 3: We have two tracks where exactly one track has a non-hidden video stream (implied as this
          logic assumes at most two input tracks).
          Considering the audio stream, the track with the non-hidden video stream might also contain an audio stream
          or we have to mux the audio stream from another track into that track */
       final MuxResult muxResult = muxSingleVideoTrack(mediaPackage, augmentedTracks);
+      result.add(muxResult);
+    } else {
+      /* Case 4: We have three or more tracks where at least one track has a hidden video stream.
+         Simply remove video or audio streams where requested, or copy the track otherwise*/
+      final MuxResult muxResult = muxMultipleVideoTracks(mediaPackage, augmentedTracks);
       result.add(muxResult);
     }
 
@@ -426,21 +429,35 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
     long queueTime = 0L;
     final List<Track> resultingTracks = new ArrayList<>(0);
     for (final AugmentedTrack t : augmentedTracks) {
-      if (t.hasAudio() && t.hideAudio) {
+      // If track has non-hidden video and non-hidden audio, or only one non-hidden video/audio,
+      // clone this track and re-add it to the MP (since it will
+      // be a new track with a different flavor)
+      if (
+        t.hasVideo() && !t.hideVideo && t.hasAudio() && !t.hideAudio  // non-hidden video and non-hidden audio
+        || t.hasVideo() && !t.hideVideo && !t.hasAudio()  // non-hidden video without audio
+        || !t.hasVideo() && t.hasAudio() && !t.hideAudio  // non-hidden audio without video
+      ) {
+        logger.debug("Add clone of track {} to mediapackage {}", t.track.getIdentifier(),
+            mediaPackage.getIdentifier());
+        final Track clonedTrack = (Track) t.track.clone();
+        clonedTrack.setIdentifier(null);
+        resultingTracks.add(clonedTrack);
+      } else if (t.hasVideo() && !t.hideVideo && t.hasAudio() && t.hideAudio) {
+        // If track has non-hidden video and hidden audio, hide audio and add it to the MP
         // The flavor gets "nulled" in the process. Reverse that so we can treat all tracks equally.
         final MediaPackageElementFlavor previousFlavor = t.track.getFlavor();
         final TrackJobResult trackJobResult = hideAudio(t.track, mediaPackage);
         trackJobResult.track.setFlavor(previousFlavor);
         resultingTracks.add(trackJobResult.track);
         queueTime += trackJobResult.waitTime;
-      } else {
-        // Even if we don't modify the track, we clone and re-add it to the MP (since it will be a new track with a
-        // different flavor)
-        logger.debug("Add clone of track {} to mediapackage {}", t.track.getIdentifier(),
-            mediaPackage.getIdentifier());
-        final Track clonedTrack = (Track) t.track.clone();
-        clonedTrack.setIdentifier(null);
-        resultingTracks.add(clonedTrack);
+      } else if (t.hasVideo() && t.hideVideo && t.hasAudio() && !t.hideAudio) {
+        // If track has hidden video and non-hidden audio, hide video and add the audio track to the MP
+        // The flavor gets "nulled" in the process. Reverse that so we can treat all tracks equally.
+        final MediaPackageElementFlavor previousFlavor = t.track.getFlavor();
+        final TrackJobResult trackJobResult = hideVideo(t.track, mediaPackage);
+        trackJobResult.track.setFlavor(previousFlavor);
+        resultingTracks.add(trackJobResult.track);
+        queueTime += trackJobResult.waitTime;
       }
     }
     return new MuxResult(queueTime, resultingTracks);
