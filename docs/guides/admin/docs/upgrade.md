@@ -22,14 +22,14 @@ git diff origin/r/{{ opencast_major_version() | int - 1 }}.x origin/r/{{ opencas
 
 The most important changes are:
 
-- Series, Editor and Login-Buttons in the PaellaPlayer are now disabled by default. 
-  [[#6479](https://github.com/opencast/opencast/pull/6479)] [[#6480](https://github.com/opencast/opencast/pull/6480)] 
+- Series, Editor and Login-Buttons in the PaellaPlayer are now disabled by default.
+  [[#6479](https://github.com/opencast/opencast/pull/6479)] [[#6480](https://github.com/opencast/opencast/pull/6480)]
   [[#6481](https://github.com/opencast/opencast/pull/6481)]
 - The feature "Episode ID Roles" is now a core feature: enabled by default with no option to disable.
-  If you have not used this feature before, you'll need to perform an index rebuild. See 
+  If you have not used this feature before, you'll need to perform an index rebuild. See
   [Rebuild the index](#index-rebuild) for details. [[#6696](https://github.com/opencast/opencast/pull/6696)]
 - The default workflows partial-publish and partial-preview have been modified to enable audio-only processing.
-  If you want to use this feature and use your own workflows, have a look at the required changes in the PR. 
+  If you want to use this feature and use your own workflows, have a look at the required changes in the PR.
   [[#5856](https://github.com/opencast/opencast/pull/5856)]
 
 ## Database Migration and Elasticsearch Data Extraction
