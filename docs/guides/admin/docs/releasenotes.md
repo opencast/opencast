@@ -20,12 +20,16 @@
 - The required Java version is now 21. [[#6472](https://github.com/opencast/opencast/pull/6472)]
 
 ### Configuration Changes
-- Series, Editor and Login-Buttons in the PaellaPlayer are now disabled by default. [[#6479](https://github.com/opencast/opencast/pull/6479)] [[#6480](https://github.com/opencast/opencast/pull/6480)] [[#6481](https://github.com/opencast/opencast/pull/6481)]
-- The feature "Episode ID Roles" is now a core feature: enabled by default with no option to disable. [[#6696](https://github.com/opencast/opencast/pull/6696)]
+- Series, Editor and Login-Buttons in the PaellaPlayer are now disabled by default. 
+  [[#6479](https://github.com/opencast/opencast/pull/6479)] [[#6480](https://github.com/opencast/opencast/pull/6480)] 
+  [[#6481](https://github.com/opencast/opencast/pull/6481)]
+- The feature "Episode ID Roles" is now a core feature: enabled by default with no option to disable. 
+  [[#6696](https://github.com/opencast/opencast/pull/6696)]
   If you have not used this feature before, you'll need to perform an index rebuild. See [upgrade guide](upgrade.md) for
   details.
 - The default workflows partial-publish and partial-preview have been modified to enable audio-only processing.
-  If you want to use this feature and use your own workflows, have a look at the required changes in the PR. [[#5856](https://github.com/opencast/opencast/pull/5856)]
+  If you want to use this feature and use your own workflows, have a look at the required changes in the PR. 
+  [[#5856](https://github.com/opencast/opencast/pull/5856)]
 
 For more details, please take a look at the [full changelog](changelog.md). If you want to update Opencast from a
 previous version, you should also read the [upgrade guide](upgrade.md).
