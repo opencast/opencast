@@ -78,10 +78,6 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.entwinemedia.common</groupId>
-      <artifactId>functional</artifactId>
-    </dependency>
-    <dependency>
       <!-- we use this for the transitive dependency to elasticsearch -->
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-elasticsearch-api</artifactId>

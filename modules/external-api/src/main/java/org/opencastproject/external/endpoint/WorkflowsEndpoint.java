@@ -53,7 +53,6 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowStateException;
 
-import com.entwinemedia.fn.data.Opt;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
@@ -75,6 +74,7 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
@@ -175,8 +175,8 @@ public class WorkflowsEndpoint {
 
     try {
       // Media Package
-      Opt<Event> event = indexService.getEvent(eventId, elasticsearchIndex);
-      if (event.isNone()) {
+      Optional<Event> event = indexService.getEvent(eventId, elasticsearchIndex);
+      if (event.isEmpty()) {
         return ApiResponseBuilder.notFound("Cannot find an event with id '%s'.", eventId);
       }
       MediaPackage mp = indexService.getEventMediapackage(event.get());

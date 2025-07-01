@@ -87,8 +87,6 @@ import org.opencastproject.workflow.api.WorkflowUtil;
 import org.opencastproject.workflow.handler.distribution.InternalPublicationChannel;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -725,8 +723,8 @@ public class EditorServiceImpl implements EditorService {
    */
   private Event getEvent(final String mediaPackageId) throws EditorServiceException {
     try {
-      Opt<Event> optEvent = index.getEvent(mediaPackageId, searchIndex);
-      if (optEvent.isNone()) {
+      Optional<Event> optEvent = index.getEvent(mediaPackageId, searchIndex);
+      if (optEvent.isEmpty()) {
         errorExit("Event not found", mediaPackageId,
                 ErrorStatus.MEDIAPACKAGE_NOT_FOUND);
       } else {

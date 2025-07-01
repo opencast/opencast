@@ -118,7 +118,6 @@ import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.data.Opt;
 import com.google.common.net.MediaType;
 
 import net.fortuna.ical4j.model.Period;
@@ -836,19 +835,19 @@ public class IndexServiceImpl implements IndexService {
   public String createEvent(EventHttpServletRequest eventHttpServletRequest) throws ParseException, IOException,
           MediaPackageException, IngestException, NotFoundException, SchedulerException, UnauthorizedException {
     // Preconditions
-    if (eventHttpServletRequest.getAcl().isNone()) {
+    if (eventHttpServletRequest.getAcl().isEmpty()) {
       throw new IllegalArgumentException("No access control list available to create new event.");
     }
-    if (eventHttpServletRequest.getMediaPackage().isNone()) {
+    if (eventHttpServletRequest.getMediaPackage().isEmpty()) {
       throw new IllegalArgumentException("No mediapackage available to create new event.");
     }
-    if (eventHttpServletRequest.getMetadataList().isNone()) {
+    if (eventHttpServletRequest.getMetadataList().isEmpty()) {
       throw new IllegalArgumentException("No metadata list available to create new event.");
     }
-    if (eventHttpServletRequest.getProcessing().isNone()) {
+    if (eventHttpServletRequest.getProcessing().isEmpty()) {
       throw new IllegalArgumentException("No processing metadata available to create new event.");
     }
-    if (eventHttpServletRequest.getSource().isNone()) {
+    if (eventHttpServletRequest.getSource().isEmpty()) {
       throw new IllegalArgumentException("No source field metadata available to create new event.");
     }
 
@@ -1318,8 +1317,8 @@ public class IndexServiceImpl implements IndexService {
   @Override
   public MetadataList updateEventMetadata(String id, MetadataList metadataList, ElasticsearchIndex index)
           throws IndexServiceException, SearchIndexException, NotFoundException, UnauthorizedException {
-    Opt<Event> optEvent = getEvent(id, index);
-    if (optEvent.isNone())
+    Optional<Event> optEvent = getEvent(id, index);
+    if (optEvent.isEmpty())
       throw new NotFoundException("Cannot find an event with id " + id);
 
     Event event = optEvent.get();
@@ -1392,8 +1391,8 @@ public class IndexServiceImpl implements IndexService {
   public AccessControlList updateEventAcl(String id, AccessControlList acl, ElasticsearchIndex index)
           throws IllegalArgumentException, IndexServiceException, SearchIndexException, NotFoundException,
           UnauthorizedException {
-    Opt<Event> optEvent = getEvent(id, index);
-    if (optEvent.isNone())
+    Optional<Event> optEvent = getEvent(id, index);
+    if (optEvent.isEmpty())
       throw new NotFoundException("Cannot find an event with id " + id);
 
     Event event = optEvent.get();
@@ -1435,16 +1434,16 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
-  public Opt<Event> getEvent(String id, ElasticsearchIndex index) throws SearchIndexException {
+  public Optional<Event> getEvent(String id, ElasticsearchIndex index) throws SearchIndexException {
     SearchResult<Event> result = index
             .getByQuery(new EventSearchQuery(securityService.getOrganization().getId(), securityService.getUser())
                     .withIdentifier(id));
     // If the results list if empty, we return already a response.
     if (result.getPageSize() == 0) {
       logger.debug("Didn't find event with id {}", id);
-      return Opt.none();
+      return Optional.empty();
     }
-    return Opt.some(result.getItems()[0].getSource());
+    return Optional.of(result.getItems()[0].getSource());
   }
 
   @Override
@@ -1814,8 +1813,8 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
-  public String createSeries(MetadataList metadataList, Map<String, String> options, Opt<AccessControlList> optAcl,
-          Opt<Long> optThemeId) throws IndexServiceException {
+  public String createSeries(MetadataList metadataList, Map<String, String> options, Optional<AccessControlList> optAcl,
+          Optional<Long> optThemeId) throws IndexServiceException {
     DublinCoreCatalog dc = DublinCores.mkOpencastSeries().getCatalog();
     dc.set(PROPERTY_IDENTIFIER, UUID.randomUUID().toString());
     dc.set(DublinCore.PROPERTY_CREATED, EncodingSchemeUtils.encodeDate(new Date(), Precision.Second));
@@ -1829,7 +1828,7 @@ public class IndexServiceImpl implements IndexService {
     }
 
     AccessControlList acl;
-    if (optAcl.isSome()) {
+    if (optAcl.isPresent()) {
       acl = optAcl.get();
     } else {
       acl = new AccessControlList();
@@ -1840,8 +1839,8 @@ public class IndexServiceImpl implements IndexService {
       DublinCoreCatalog createdSeries = seriesService.updateSeries(dc);
       seriesId = createdSeries.getFirst(PROPERTY_IDENTIFIER);
       seriesService.updateAccessControl(seriesId, acl);
-      for (Long id : optThemeId)
-        seriesService.updateSeriesProperty(seriesId, THEME_PROPERTY_NAME, Long.toString(id));
+      if (optThemeId.isPresent())
+        seriesService.updateSeriesProperty(seriesId, THEME_PROPERTY_NAME, Long.toString(optThemeId.get()));
     } catch (Exception e) {
       logger.error("Unable to create new series:", e);
       throw new IndexServiceException("Unable to create new series");
@@ -1864,10 +1863,10 @@ public class IndexServiceImpl implements IndexService {
     if (options == null)
       throw new IllegalArgumentException("No options field in metadata");
 
-    Opt<Long> themeId = Opt.none();
+    Optional<Long> themeId = Optional.empty();
     Long theme = (Long) metadata.get("theme");
     if (theme != null) {
-      themeId = Opt.some(theme);
+      themeId = Optional.of(theme);
     }
 
     Map<String, String> optionsMap;
@@ -1899,8 +1898,8 @@ public class IndexServiceImpl implements IndexService {
       DublinCoreCatalog createdSeries = seriesService.updateSeries(dc);
       seriesId = createdSeries.getFirst(PROPERTY_IDENTIFIER);
       seriesService.updateAccessControl(seriesId, acl);
-      for (Long id : themeId)
-        seriesService.updateSeriesProperty(seriesId, THEME_PROPERTY_NAME, Long.toString(id));
+      if (themeId.isPresent())
+        seriesService.updateSeriesProperty(seriesId, THEME_PROPERTY_NAME, Long.toString(themeId.get()));
     } catch (Exception e) {
       throw new IndexServiceException("Unable to create new series", e);
     }

@@ -30,10 +30,9 @@ import org.opencastproject.graphql.util.MetadataFieldToGraphQLFieldMapper;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 
-import com.entwinemedia.fn.data.Opt;
-
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import graphql.schema.DataFetchingEnvironment;
 
@@ -47,8 +46,9 @@ public class CommonSeriesMetadataV2DataFetcher implements ContextDataFetcher<Map
     IndexService indexService = opencastContext.getService(IndexService.class);
 
     Map<String, GqlMetadataFieldInterface> result = new HashMap<>();
-    Opt<DublinCoreMetadataCollection> optSeries = indexService.getCommonSeriesCatalogUIAdapter().getFields(seriesId);
-    if (optSeries.isNone()) {
+    Optional<DublinCoreMetadataCollection> optSeries = indexService.getCommonSeriesCatalogUIAdapter()
+        .getFields(seriesId);
+    if (optSeries.isEmpty()) {
       throw new GraphQLNotFoundException("Series with id `" + seriesId + "` not found.");
     }
     optSeries.get().getOutputFields().forEach(

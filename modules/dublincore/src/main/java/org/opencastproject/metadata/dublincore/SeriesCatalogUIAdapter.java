@@ -20,7 +20,7 @@
  */
 package org.opencastproject.metadata.dublincore;
 
-import com.entwinemedia.fn.data.Opt;
+import java.util.Optional;
 
 /**
  * A {@link SeriesCatalogUIAdapter} converts between a concrete {@link org.opencastproject.metadata.api.MetadataCatalog}
@@ -36,7 +36,7 @@ public interface SeriesCatalogUIAdapter extends CatalogUIAdapter {
    *          The series identifer
    * @return Get the field names and values for this catalog.
    */
-  Opt<DublinCoreMetadataCollection> getFields(String seriesId);
+  Optional<DublinCoreMetadataCollection> getFields(String seriesId);
 
   /**
    * Store changes made to the fields of the metadata collection in the catalog and return if successful.

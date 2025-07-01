@@ -38,14 +38,13 @@ import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.security.api.SecurityService;
 
-import com.entwinemedia.fn.data.Opt;
-
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TimeZone;
 
 import graphql.schema.DataFetchingEnvironment;
@@ -80,7 +79,7 @@ public class CommonEventMetadataDataFetcher implements ContextDataFetcher<Map<St
 
   private Event getEventFromIndexService(IndexService indexService, String eventId, ElasticsearchIndex searchIndex)
           throws IndexServiceException, SearchIndexException {
-    Opt<Event> opt = indexService.getEvent(eventId, searchIndex);
+    Optional<Event> opt = indexService.getEvent(eventId, searchIndex);
     if (opt.isEmpty()) {
       throw new GraphQLNotFoundException(
           String.format("Could not resolve to a %s with the id of %s", GqlEvent.TYPE_NAME, eventId));

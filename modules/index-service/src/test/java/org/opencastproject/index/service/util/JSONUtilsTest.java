@@ -38,7 +38,6 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.data.Option;
 
-import com.entwinemedia.fn.data.json.SimpleSerializer;
 import com.google.gson.JsonObject;
 
 import org.apache.commons.io.IOUtils;
@@ -128,7 +127,6 @@ public class JSONUtilsTest {
     EasyMock.replay(securityService);
 
     ListProvidersServiceImpl listProvidersService = new ListProvidersServiceImpl();
-    SimpleSerializer serializer = new SimpleSerializer();
 
     listProvidersService.setSecurityService(securityService);
 

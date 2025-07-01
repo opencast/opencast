@@ -32,10 +32,6 @@ import org.opencastproject.security.api.RoleProvider;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserProvider;
 
-import com.entwinemedia.fn.Fn2;
-import com.entwinemedia.fn.Stream;
-import com.entwinemedia.fn.StreamOp;
-
 import org.apache.commons.io.IOUtils;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -52,7 +48,9 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.BiFunction;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 /**
  * The External API role provider.
@@ -115,8 +113,9 @@ public class ExternalApiRoleProvider implements RoleProvider {
    */
   @Override
   public Iterator<Role> findRoles(String query, Role.Target target, int offset, int limit) {
-    if (query == null)
+    if (query == null) {
       throw new IllegalArgumentException("Query must be set");
+    }
 
     // These roles are not meaningful for use in ACLs
     if (target == Role.Target.ACL) {
@@ -124,9 +123,30 @@ public class ExternalApiRoleProvider implements RoleProvider {
     }
 
     Organization organization = securityService.getOrganization();
-    return Stream.$(roles).filter(filterByName._2(query)).drop(offset)
-            .apply(limit > 0 ? StreamOp.<String> id().take(limit) : StreamOp.<String> id()).map(toRole._2(organization))
-            .iterator();
+
+    BiFunction<String, String, Boolean> filterByName = (role, q) -> like(role, q);
+
+    BiFunction<String, Organization, Role> toRole = (role, org) ->
+        new JaxbRole(role, JaxbOrganization.fromOrganization(org), "External API Role", Type.INTERNAL);
+
+    // Java Stream of roles (assuming roles is a Collection<String> or similar)
+    Stream<String> roleStream = roles.stream()
+        .filter(role -> filterByName.apply(role, query));
+
+    // Apply offset
+    if (offset > 0) {
+      roleStream = roleStream.skip(offset);
+    }
+
+    // Apply limit if positive
+    if (limit > 0) {
+      roleStream = roleStream.limit(limit);
+    }
+
+    // Map to Role objects
+    Stream<Role> resultStream = roleStream.map(role -> toRole.apply(role, organization));
+
+    return resultStream.iterator();
   }
 
   private static boolean like(String string, final String query) {
@@ -137,18 +157,4 @@ public class ExternalApiRoleProvider implements RoleProvider {
     Pattern p = Pattern.compile(regex, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
     return p.matcher(string).matches();
   }
-
-  private static final Fn2<String, Organization, Role> toRole = new Fn2<String, Organization, Role>() {
-    @Override
-    public Role apply(String role, Organization organization) {
-      return new JaxbRole(role, JaxbOrganization.fromOrganization(organization), "External API Role", Type.INTERNAL);
-    }
-  };
-
-  private static final Fn2<String, String, Boolean> filterByName = new Fn2<String, String, Boolean>() {
-    @Override
-    public Boolean apply(String role, String query) {
-      return like(role, query);
-    }
-  };
 }

@@ -21,7 +21,6 @@
 
 package org.opencastproject.adminui.endpoint;
 
-import static com.entwinemedia.fn.data.Opt.nul;
 import static java.lang.String.format;
 import static javax.servlet.http.HttpServletResponse.SC_ACCEPTED;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
@@ -154,7 +153,6 @@ import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowStateException;
 import org.opencastproject.workflow.api.WorkflowUtil;
 
-import com.entwinemedia.fn.data.Opt;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
@@ -387,7 +385,9 @@ public abstract class AbstractEventEndpoint {
                   @RestResponse(description = "Returns the event as JSON", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventResponse(@PathParam("eventId") String id) throws Exception {
-    for (final Event event : getIndexService().getEvent(id, getIndex())) {
+    Optional<Event> eventOpt = getIndexService().getEvent(id, getIndex());
+    if (eventOpt.isPresent()) {
+      Event event = eventOpt.get();
       event.updatePreview(getAdminUIConfiguration().getPreviewSubtype());
       JsonObject json = eventToJSON(event, Optional.empty());
       return okJson(json);
@@ -404,8 +404,8 @@ public abstract class AbstractEventEndpoint {
                   @RestResponse(responseCode = SC_ACCEPTED, description = "The event will be retracted and deleted afterwards."),
                   @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
   public Response deleteEvent(@PathParam("eventId") String id) throws UnauthorizedException, SearchIndexException {
-    final Opt<Event> event = checkAgentAccessForEvent(id);
-    if (event.isNone()) {
+    final Optional<Event> event = checkAgentAccessForEvent(id);
+    if (event.isEmpty()) {
       return RestUtil.R.notFound(id);
     }
     final IndexService.EventRemovalResult result;
@@ -461,8 +461,8 @@ public abstract class AbstractEventEndpoint {
     for (Object eventIdObject : eventIdsJsonArray) {
       final String eventId = eventIdObject.toString();
       try {
-        final Opt<Event> event = checkAgentAccessForEvent(eventId);
-        if (event.isSome()) {
+        final Optional<Event> event = checkAgentAccessForEvent(eventId);
+        if (event.isPresent()) {
           final IndexService.EventRemovalResult currentResult = getIndexService().removeEvent(event.get(),
                   getAdminUIConfiguration().getRetractWorkflowId());
           switch (currentResult) {
@@ -505,8 +505,8 @@ public abstract class AbstractEventEndpoint {
                   @RestResponse(description = "Returns all the data related to the event publications tab as JSON", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventPublicationsTab(@PathParam("eventId") String id) throws Exception {
-    Opt<Event> optEvent = getIndexService().getEvent(id, getIndex());
-    if (optEvent.isNone())
+    Optional<Event> optEvent = getIndexService().getEvent(id, getIndex());
+    if (optEvent.isEmpty())
       return notFound("Cannot find an event with id '%s'.", id);
 
     // Quick actions have been temporally removed from the publications tab
@@ -629,8 +629,8 @@ public abstract class AbstractEventEndpoint {
                   @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventScheduling(@PathParam("eventId") String eventId)
           throws NotFoundException, UnauthorizedException, SearchIndexException {
-    Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
-    if (optEvent.isNone())
+    Optional<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
+    if (optEvent.isEmpty())
       return notFound("Cannot find an event with id '%s'.", eventId);
 
     try {
@@ -714,14 +714,14 @@ public abstract class AbstractEventEndpoint {
               event.getIdentifier(), technicalMetadata.getAgentId(), agentId);
     }
 
-    Opt<String> previousAgentId = Opt.none();
+    Optional<String> previousAgentId = Optional.empty();
     if (schedulingJson.has(SCHEDULING_PREVIOUS_AGENTID)) {
-      previousAgentId = Opt.some(schedulingJson.getString(SCHEDULING_PREVIOUS_AGENTID));
+      previousAgentId = Optional.of(schedulingJson.getString(SCHEDULING_PREVIOUS_AGENTID));
     }
 
     Optional<String> previousAgentInputs = Optional.empty();
     Optional<String> agentInputs = Optional.empty();
-    if (agentId.isPresent() && previousAgentId.isSome()) {
+    if (agentId.isPresent() && previousAgentId.isPresent()) {
       Agent previousAgent = getCaptureAgentStateService().getAgent(previousAgentId.get());
       Agent agent = getCaptureAgentStateService().getAgent(agentId.get());
 
@@ -758,9 +758,9 @@ public abstract class AbstractEventEndpoint {
         event.getIdentifier(), technicalMetadata.getCaptureAgentConfiguration(), agentConfiguration);
     }
 
-    Opt<Map<String, String>> previousAgentInputMethods = Opt.none();
+    Optional<Map<String, String>> previousAgentInputMethods = Optional.empty();
     if (schedulingJson.has(SCHEDULING_PREVIOUS_PREVIOUSENTRIES)) {
-      previousAgentInputMethods = Opt.some(
+      previousAgentInputMethods = Optional.of(
               JSONUtils.toMap(schedulingJson.getJSONObject(SCHEDULING_PREVIOUS_PREVIOUSENTRIES)));
     }
 
@@ -791,8 +791,8 @@ public abstract class AbstractEventEndpoint {
   }
 
   private Event getEventOrThrowNotFoundException(final String eventId) throws NotFoundException, SearchIndexException {
-    Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
-    if (optEvent.isSome()) {
+    Optional<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
+    if (optEvent.isPresent()) {
       return optEvent.get();
     } else {
       throw new NotFoundException(format("Cannot find an event with id '%s'.", eventId));
@@ -807,8 +807,8 @@ public abstract class AbstractEventEndpoint {
                   @RestResponse(description = "Returns all the data related to the event comments tab as JSON", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventComments(@PathParam("eventId") String eventId) throws Exception {
-    Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
-    if (optEvent.isNone())
+    Optional<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
+    if (optEvent.isEmpty())
       return notFound("Cannot find an event with id '%s'.", eventId);
 
     try {
@@ -833,8 +833,8 @@ public abstract class AbstractEventEndpoint {
                   @RestResponse(description = "Returns whether there is currently a transaction in progress for the given event", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response hasActiveTransaction(@PathParam("eventId") String eventId) throws Exception {
-    Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
-    if (optEvent.isNone())
+    Optional<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
+    if (optEvent.isEmpty())
       return notFound("Cannot find an event with id '%s'.", eventId);
 
     JSONObject json = new JSONObject();
@@ -858,8 +858,8 @@ public abstract class AbstractEventEndpoint {
                   @RestResponse(responseCode = SC_NOT_FOUND, description = "No event or comment with this identifier was found.") })
   public Response getEventComment(@PathParam("eventId") String eventId, @PathParam("commentId") long commentId)
           throws NotFoundException, Exception {
-    Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
-    if (optEvent.isNone())
+    Optional<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
+    if (optEvent.isEmpty())
       return notFound("Cannot find an event with id '%s'.", eventId);
 
     try {
@@ -886,8 +886,8 @@ public abstract class AbstractEventEndpoint {
   public Response updateEventComment(@PathParam("eventId") String eventId, @PathParam("commentId") long commentId,
           @FormParam("text") String text, @FormParam("reason") String reason, @FormParam("resolved") Boolean resolved)
                   throws Exception {
-    Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
-    if (optEvent.isNone())
+    Optional<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
+    if (optEvent.isEmpty())
       return notFound("Cannot find an event with id '%s'.", eventId);
 
     try {
@@ -945,8 +945,8 @@ public abstract class AbstractEventEndpoint {
     }
 
     try {
-      final Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
-      if (optEvent.isNone()) {
+      final Optional<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
+      if (optEvent.isEmpty()) {
         logger.warn("Unable to find the event '{}'", eventId);
         return notFound();
       }
@@ -1024,8 +1024,8 @@ public abstract class AbstractEventEndpoint {
                           @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response createEventComment(@PathParam("eventId") String eventId, @FormParam("text") String text,
           @FormParam("reason") String reason, @FormParam("resolved") Boolean resolved) throws Exception {
-    Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
-    if (optEvent.isNone())
+    Optional<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
+    if (optEvent.isEmpty())
       return notFound("Cannot find an event with id '%s'.", eventId);
 
     if (StringUtils.isBlank(text))
@@ -1055,8 +1055,8 @@ public abstract class AbstractEventEndpoint {
                   @RestResponse(responseCode = SC_OK, description = "The resolved comment as JSON.") })
   public Response resolveEventComment(@PathParam("eventId") String eventId, @PathParam("commentId") long commentId)
           throws Exception {
-    Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
-    if (optEvent.isNone())
+    Optional<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
+    if (optEvent.isEmpty())
       return notFound("Cannot find an event with id '%s'.", eventId);
 
     try {
@@ -1087,8 +1087,8 @@ public abstract class AbstractEventEndpoint {
                   @RestResponse(description = "No event or comment with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response deleteEventComment(@PathParam("eventId") String eventId, @PathParam("commentId") long commentId)
           throws Exception {
-    Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
-    if (optEvent.isNone())
+    Optional<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
+    if (optEvent.isEmpty())
       return notFound("Cannot find an event with id '%s'.", eventId);
 
     try {
@@ -1114,8 +1114,8 @@ public abstract class AbstractEventEndpoint {
                   @RestResponse(responseCode = SC_OK, description = "The updated comment as JSON.") })
   public Response deleteEventCommentReply(@PathParam("eventId") String eventId, @PathParam("commentId") long commentId,
           @PathParam("replyId") long replyId) throws Exception {
-    Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
-    if (optEvent.isNone())
+    Optional<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
+    if (optEvent.isEmpty())
       return notFound("Cannot find an event with id '%s'.", eventId);
 
     EventComment comment = null;
@@ -1161,8 +1161,8 @@ public abstract class AbstractEventEndpoint {
     if (StringUtils.isBlank(text))
       return Response.status(Status.BAD_REQUEST).build();
 
-    Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
-    if (optEvent.isNone())
+    Optional<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
+    if (optEvent.isEmpty())
       return notFound("Cannot find an event with id '%s'.", eventId);
 
     EventComment comment = null;
@@ -1211,8 +1211,8 @@ public abstract class AbstractEventEndpoint {
     if (StringUtils.isBlank(text))
       return Response.status(Status.BAD_REQUEST).build();
 
-    Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
-    if (optEvent.isNone())
+    Optional<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
+    if (optEvent.isEmpty())
       return notFound("Cannot find an event with id '%s'.", eventId);
 
     EventComment comment = null;
@@ -1274,8 +1274,8 @@ public abstract class AbstractEventEndpoint {
                   @RestResponse(description = "Returns all the data related to the event metadata tab as JSON", responseCode = HttpServletResponse.SC_OK),
                   @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventMetadata(@PathParam("eventId") String eventId) throws Exception {
-    Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
-    if (optEvent.isNone())
+    Optional<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
+    if (optEvent.isEmpty())
       return notFound("Cannot find an event with id '%s'.", eventId);
     Event event = optEvent.get();
     MetadataList metadataList = new MetadataList();
@@ -1377,9 +1377,9 @@ public abstract class AbstractEventEndpoint {
     // collect the metadata of all events
     List<DublinCoreMetadataCollection> collectedMetadata = new ArrayList();
     for (String eventId: ids) {
-      Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
+      Optional<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
       // not found?
-      if (optEvent.isNone()) {
+      if (optEvent.isEmpty()) {
         eventsNotFound.add(eventId);
         continue;
       }
@@ -1633,8 +1633,8 @@ public abstract class AbstractEventEndpoint {
                           @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) }, returnDescription = "No content is returned.")
   public Response updateEventMetadata(@PathParam("eventId") String id, @FormParam("metadata") String metadataJSON)
           throws Exception {
-    Opt<Event> optEvent = getIndexService().getEvent(id, getIndex());
-    if (optEvent.isNone())
+    Optional<Event> optEvent = getIndexService().getEvent(id, getIndex());
+    if (optEvent.isEmpty())
       return notFound("Cannot find an event with id '%s'.", id);
 
     try {
@@ -1689,10 +1689,10 @@ public abstract class AbstractEventEndpoint {
     Set<String> eventsUpdateFailure = new HashSet();
 
     for (String eventId : ids) {
-      Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
+      Optional<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
       // not found?
 
-      if (optEvent.isNone()) {
+      if (optEvent.isEmpty()) {
         eventsNotFound.add(eventId);
         continue;
       }
@@ -1727,8 +1727,8 @@ public abstract class AbstractEventEndpoint {
           @RestResponse(description = "Returns the number of assets from each types as JSON", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getAssetList(@PathParam("eventId") String id) throws Exception {
-    Opt<Event> optEvent = getIndexService().getEvent(id, getIndex());
-    if (optEvent.isNone())
+    Optional<Event> optEvent = getIndexService().getEvent(id, getIndex());
+    if (optEvent.isEmpty())
       return notFound("Cannot find an event with id '%s'.", id);
     MediaPackage mp;
     try {
@@ -1763,8 +1763,8 @@ public abstract class AbstractEventEndpoint {
           @RestResponse(description = "Returns a list of attachments from the given event as JSON", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getAttachmentsList(@PathParam("eventId") String id) throws Exception {
-    Opt<Event> optEvent = getIndexService().getEvent(id, getIndex());
-    if (optEvent.isNone())
+    Optional<Event> optEvent = getIndexService().getEvent(id, getIndex());
+    if (optEvent.isEmpty())
       return notFound("Cannot find an event with id '%s'.", id);
     MediaPackage mp = getIndexService().getEventMediapackage(optEvent.get());
     return okJson(getEventMediaPackageElements(mp.getAttachments()));
@@ -1795,8 +1795,8 @@ public abstract class AbstractEventEndpoint {
           @RestResponse(description = "Returns a list of catalogs from the given event as JSON", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getCatalogList(@PathParam("eventId") String id) throws Exception {
-    Opt<Event> optEvent = getIndexService().getEvent(id, getIndex());
-    if (optEvent.isNone())
+    Optional<Event> optEvent = getIndexService().getEvent(id, getIndex());
+    if (optEvent.isEmpty())
       return notFound("Cannot find an event with id '%s'.", id);
     MediaPackage mp = getIndexService().getEventMediapackage(optEvent.get());
     return okJson(getEventMediaPackageElements(mp.getCatalogs()));
@@ -1827,8 +1827,8 @@ public abstract class AbstractEventEndpoint {
           @RestResponse(description = "Returns a list of media from the given event as JSON", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getMediaList(@PathParam("eventId") String id) throws Exception {
-    Opt<Event> optEvent = getIndexService().getEvent(id, getIndex());
-    if (optEvent.isNone())
+    Optional<Event> optEvent = getIndexService().getEvent(id, getIndex());
+    if (optEvent.isEmpty())
       return notFound("Cannot find an event with id '%s'.", id);
     MediaPackage mp = getIndexService().getEventMediapackage(optEvent.get());
     return okJson(getEventMediaPackageElements(mp.getTracks()));
@@ -1859,8 +1859,8 @@ public abstract class AbstractEventEndpoint {
           @RestResponse(description = "Returns a list of publications from the given event as JSON", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getPublicationList(@PathParam("eventId") String id) throws Exception {
-    Opt<Event> optEvent = getIndexService().getEvent(id, getIndex());
-    if (optEvent.isNone())
+    Optional<Event> optEvent = getIndexService().getEvent(id, getIndex());
+    if (optEvent.isEmpty())
       return notFound("Cannot find an event with id '%s'.", id);
     MediaPackage mp = getIndexService().getEventMediapackage(optEvent.get());
     return okJson(getEventPublications(mp.getPublications()));
@@ -1949,8 +1949,8 @@ public abstract class AbstractEventEndpoint {
                   @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventWorkflows(@PathParam("eventId") String id)
           throws UnauthorizedException, SearchIndexException, JobEndpointException {
-    Opt<Event> optEvent = getIndexService().getEvent(id, getIndex());
-    if (optEvent.isNone())
+    Optional<Event> optEvent = getIndexService().getEvent(id, getIndex());
+    if (optEvent.isEmpty())
       return notFound("Cannot find an event with id '%s'.", id);
 
     try {
@@ -2022,8 +2022,8 @@ public abstract class AbstractEventEndpoint {
                           @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) }, returnDescription = "The method does not retrun any content.")
   public Response updateEventWorkflow(@PathParam("eventId") String id, @FormParam("configuration") String configuration)
           throws SearchIndexException, UnauthorizedException {
-    Opt<Event> optEvent = getIndexService().getEvent(id, getIndex());
-    if (optEvent.isNone())
+    Optional<Event> optEvent = getIndexService().getEvent(id, getIndex());
+    if (optEvent.isEmpty())
       return notFound("Cannot find an event with id '%s'.", id);
 
     if (optEvent.get().isScheduledEvent() && !optEvent.get().hasRecordingStarted()) {
@@ -2082,8 +2082,8 @@ public abstract class AbstractEventEndpoint {
                   @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventWorkflow(@PathParam("eventId") String eventId, @PathParam("workflowId") String workflowId)
       throws SearchIndexException {
-    Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
-    if (optEvent.isNone()) {
+    Optional<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
+    if (optEvent.isEmpty()) {
       return notFound("Cannot find an event with id '%s'.", eventId);
     }
 
@@ -2147,8 +2147,8 @@ public abstract class AbstractEventEndpoint {
                   @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventOperations(@PathParam("eventId") String eventId, @PathParam("workflowId") String workflowId)
       throws SearchIndexException {
-    Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
-    if (optEvent.isNone()) {
+    Optional<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
+    if (optEvent.isEmpty()) {
       return notFound("Cannot find an event with id '%s'.", eventId);
     }
 
@@ -2200,8 +2200,8 @@ public abstract class AbstractEventEndpoint {
                   @RestResponse(description = "No operation with these identifiers was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventOperation(@PathParam("eventId") String eventId, @PathParam("workflowId") String workflowId,
       @PathParam("operationPosition") Integer operationPosition) throws SearchIndexException {
-    Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
-    if (optEvent.isNone()) {
+    Optional<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
+    if (optEvent.isEmpty()) {
       return notFound("Cannot find an event with id '%s'.", eventId);
     }
 
@@ -2267,7 +2267,8 @@ public abstract class AbstractEventEndpoint {
     // FIXME since there is no dependency between the event and the workflow (the fetched event is
     // simply ignored) an attacker can get access by using an event he owns and a workflow ID of
     // someone else.
-    for (final Event ignore : getIndexService().getEvent(eventId, getIndex())) {
+    Optional<Event> eventOpt = getIndexService().getEvent(eventId, getIndex());
+    if (eventOpt.isPresent()) {
       final long workflowIdLong;
       try {
         workflowIdLong = Long.parseLong(workflowId);
@@ -2301,7 +2302,8 @@ public abstract class AbstractEventEndpoint {
     // FIXME since there is no dependency between the event and the workflow (the fetched event is
     // simply ignored) an attacker can get access by using an event he owns and a workflow ID of
     // someone else.
-    for (Event ignore : getIndexService().getEvent(eventId, getIndex())) {
+    Optional<Event> eventOpt = getIndexService().getEvent(eventId, getIndex());
+    if (eventOpt.isPresent()) {
       final long errorIdLong;
       try {
         errorIdLong = Long.parseLong(errorId);
@@ -2328,8 +2330,8 @@ public abstract class AbstractEventEndpoint {
                   @RestResponse(responseCode = SC_NOT_FOUND, description = "If the event has not been found."),
                   @RestResponse(responseCode = SC_OK, description = "The access information ") })
   public Response getEventAccessInformation(@PathParam("eventId") String eventId) throws Exception {
-    Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
-    if (optEvent.isNone())
+    Optional<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
+    if (optEvent.isEmpty())
       return notFound("Cannot find an event with id '%s'.", eventId);
 
     // Add all available ACLs to the response
@@ -2607,8 +2609,8 @@ public abstract class AbstractEventEndpoint {
     SecurityUtil.runAs(getSecurityService(), organization, user, () -> {
       try {
         for (final MediaPackage event : events) {
-          final Opt<Event> eventOpt = getIndexService().getEvent(event.getIdentifier().toString(), getIndex());
-          if (eventOpt.isSome()) {
+          final Optional<Event> eventOpt = getIndexService().getEvent(event.getIdentifier().toString(), getIndex());
+          if (eventOpt.isPresent()) {
             final Event e = eventOpt.get();
             if (StringUtils.isNotEmpty(eventId) && eventId.equals(e.getIdentifier())) {
               continue;
@@ -2824,7 +2826,7 @@ public abstract class AbstractEventEndpoint {
     // If the results list if empty, we return already a response.
     if (results.getPageSize() == 0) {
       logger.debug("No events match the given filters.");
-      return okJsonList(eventsList, nul(offset).getOr(0), nul(limit).getOr(0), 0);
+      return okJsonList(eventsList, Optional.ofNullable(offset).orElse(0), Optional.ofNullable(limit).orElse(0), 0);
     }
 
     for (SearchResultItem<Event> item : results.getItems()) {
@@ -2842,15 +2844,15 @@ public abstract class AbstractEventEndpoint {
       eventsList.add(eventToJSON(source, Optional.ofNullable(comments)));
     }
 
-    return okJsonList(eventsList, nul(offset).getOr(0), nul(limit).getOr(0), results.getHitCount());
+    return okJsonList(eventsList, Optional.ofNullable(offset).orElse(0), Optional.ofNullable(limit).orElse(0), results.getHitCount());
   }
 
   // --
 
   private MediaPackage getMediaPackageByEventId(String eventId)
           throws SearchIndexException, NotFoundException, IndexServiceException {
-    Opt<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
-    if (optEvent.isNone())
+    Optional<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
+    if (optEvent.isEmpty())
       throw new NotFoundException(format("Cannot find an event with id '%s'.", eventId));
     return getIndexService().getEventMediapackage(optEvent.get());
   }
@@ -3161,8 +3163,8 @@ public abstract class AbstractEventEndpoint {
     }
 
     try {
-      final Opt<Event> optEvent = getIndexService().getEvent(id, getIndex());
-      if (optEvent.isNone()) {
+      final Optional<Event> optEvent = getIndexService().getEvent(id, getIndex());
+      if (optEvent.isEmpty()) {
         return notFound("Cannot find an event with id '%s'.", id);
       }
 
@@ -3204,9 +3206,9 @@ public abstract class AbstractEventEndpoint {
     @RestResponse(responseCode = SC_NO_CONTENT, description = "The method does not return any content") })
   public Response deleteWorkflow(@PathParam("eventId") String id, @PathParam("workflowId") long wfId)
     throws SearchIndexException {
-    final Opt<Event> optEvent = getIndexService().getEvent(id, getIndex());
+    final Optional<Event> optEvent = getIndexService().getEvent(id, getIndex());
     try {
-      if (optEvent.isNone()) {
+      if (optEvent.isEmpty()) {
         return notFound("Cannot find an event with id '%s'.", id);
       }
 
@@ -3234,9 +3236,9 @@ public abstract class AbstractEventEndpoint {
     }
   }
 
-  private Opt<Event> checkAgentAccessForEvent(final String eventId) throws UnauthorizedException, SearchIndexException {
-    final Opt<Event> event = getIndexService().getEvent(eventId, getIndex());
-    if (event.isNone() || !event.get().getEventStatus().contains("SCHEDULE")) {
+  private Optional<Event> checkAgentAccessForEvent(final String eventId) throws UnauthorizedException, SearchIndexException {
+    final Optional<Event> event = getIndexService().getEvent(eventId, getIndex());
+    if (event.isEmpty() || !event.get().getEventStatus().contains("SCHEDULE")) {
       return event;
     }
     SecurityUtil.checkAgentAccess(getSecurityService(), event.get().getAgentId());

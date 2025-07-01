@@ -200,13 +200,13 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
 
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
 
-    Optional<String> optSeries = Optional.ofNullable(getOptConfig(workflowInstance.getCurrentOperation(), SERIES_PROPERTY).orNull());
-    Optional<String> optAttachFlavors = Optional.ofNullable(getOptConfig(workflowInstance.getCurrentOperation(), ATTACH_PROPERTY).orNull());
-    Boolean applyAcl = Optional.ofNullable(getOptConfig(workflowInstance.getCurrentOperation(), APPLY_ACL_PROPERTY).orNull())
+    Optional<String> optSeries = getOptConfig(workflowInstance.getCurrentOperation(), SERIES_PROPERTY);
+    Optional<String> optAttachFlavors = getOptConfig(workflowInstance.getCurrentOperation(), ATTACH_PROPERTY);
+    Boolean applyAcl = getOptConfig(workflowInstance.getCurrentOperation(), APPLY_ACL_PROPERTY)
         .map(value -> BooleanUtils.toBoolean(value))
         .orElse(false);
-    Optional<String> optCopyMetadata = Optional.ofNullable(getOptConfig(workflowInstance.getCurrentOperation(), COPY_METADATA_PROPERTY).orNull());
-    String defaultNamespace = Optional.ofNullable(getOptConfig(workflowInstance.getCurrentOperation(), DEFAULT_NS_PROPERTY).orNull())
+    Optional<String> optCopyMetadata = getOptConfig(workflowInstance.getCurrentOperation(), COPY_METADATA_PROPERTY);
+    String defaultNamespace = getOptConfig(workflowInstance.getCurrentOperation(), DEFAULT_NS_PROPERTY)
         .orElse(DublinCore.TERMS_NS_URI);
     logger.debug("Using default namespace: '{}'", defaultNamespace);
 

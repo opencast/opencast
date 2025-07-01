@@ -48,8 +48,6 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PropertiesUtil;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.joda.time.DateTime;
@@ -73,6 +71,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.TreeMap;
 
@@ -380,27 +379,27 @@ public class DublinCoreCatalogUIAdapterTest {
     int endSecond = 23;
 
     // Test a none() period
-    Opt<DCMIPeriod> emptyPeriod = Opt.none();
+    Optional<DCMIPeriod> emptyPeriod = Optional.empty();
     Long result = DublinCoreMetadataUtil.getDuration(emptyPeriod);
-    assertEquals(new Long(0L), result);
+    assertEquals(Long.valueOf(0L), result);
 
     DateTime periodStart = new DateTime(2014, 11, 4, startHour, startMinute, startSecond, DateTimeZone.UTC);
     DateTime periodEnd = new DateTime(2014, 11, 4, endHour, endMinute, endSecond, DateTimeZone.UTC);
 
     // Test a period that is missing the start date
     DCMIPeriod withoutStartPeriod = new DCMIPeriod(null, periodEnd.toDate());
-    result = DublinCoreMetadataUtil.getDuration(Opt.some(withoutStartPeriod));
-    assertEquals(new Long(0L), result);
+    result = DublinCoreMetadataUtil.getDuration(Optional.of(withoutStartPeriod));
+    assertEquals(Long.valueOf(0L), result);
 
     // Test a period with a start but no end.
     DCMIPeriod withoutEndPeriod = new DCMIPeriod(periodStart.toDate(), null);
-    result = DublinCoreMetadataUtil.getDuration(Opt.some(withoutEndPeriod));
-    assertEquals(new Long(0L), result);
+    result = DublinCoreMetadataUtil.getDuration(Optional.of(withoutEndPeriod));
+    assertEquals(Long.valueOf(0L), result);
 
     // Test a period with both a start and an end.
     DCMIPeriod standardPeriod = new DCMIPeriod(periodStart.toDate(), periodEnd.toDate());
-    result = DublinCoreMetadataUtil.getDuration(Opt.some(standardPeriod));
-    assertEquals(new Long(4384000L), result);
+    result = DublinCoreMetadataUtil.getDuration(Optional.of(standardPeriod));
+    assertEquals(Long.valueOf(4384000L), result);
   }
 
   @Test

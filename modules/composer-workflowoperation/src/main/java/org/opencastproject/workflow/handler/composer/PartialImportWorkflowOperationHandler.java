@@ -211,22 +211,19 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
     final Long operationId = operation.getId();
     //
     // read config options
-    final Optional<String> presenterFlavor = Optional.ofNullable(
-        getOptConfig(operation, SOURCE_PRESENTER_FLAVOR).orNull());
-    final Optional<String> presentationFlavor = Optional.ofNullable(
-        getOptConfig(operation, SOURCE_PRESENTATION_FLAVOR).orNull());
+    final Optional<String> presenterFlavor = getOptConfig(operation, SOURCE_PRESENTER_FLAVOR);
+    final Optional<String> presentationFlavor = getOptConfig(operation, SOURCE_PRESENTATION_FLAVOR);
     final MediaPackageElementFlavor smilFlavor = MediaPackageElementFlavor.parseFlavor(getConfig(operation, SOURCE_SMIL_FLAVOR));
     final String concatEncodingProfile = getConfig(operation, CONCAT_ENCODING_PROFILE);
-    final Optional<String> concatOutputFramerate = Optional.ofNullable(
-        getOptConfig(operation, CONCAT_OUTPUT_FRAMERATE).orNull());
+    final Optional<String> concatOutputFramerate = getOptConfig(operation, CONCAT_OUTPUT_FRAMERATE);
     final String trimEncodingProfile = getConfig(operation, TRIM_ENCODING_PROFILE);
     final MediaPackageElementFlavor targetPresenterFlavor = parseTargetFlavor(
             getConfig(operation, TARGET_PRESENTER_FLAVOR), "presenter");
     final MediaPackageElementFlavor targetPresentationFlavor = parseTargetFlavor(
             getConfig(operation, TARGET_PRESENTATION_FLAVOR), "presentation");
-    final boolean forceEncoding = BooleanUtils.toBoolean(getOptConfig(operation, FORCE_ENCODING).getOr("false"));
+    final boolean forceEncoding = BooleanUtils.toBoolean(getOptConfig(operation, FORCE_ENCODING).orElse("false"));
     final Optional<EncodingProfile> forceProfile = getForceEncodingProfile(operation, forceEncoding);
-    final boolean forceDivisible = BooleanUtils.toBoolean(getOptConfig(operation, ENFORCE_DIVISIBLE_BY_TWO).getOr("false"));
+    final boolean forceDivisible = BooleanUtils.toBoolean(getOptConfig(operation, ENFORCE_DIVISIBLE_BY_TWO).orElse("false"));
     final List<String> requiredExtensions = getRequiredExtensions(operation);
     final String preencodeEncodingProfile = getConfig(operation, PREENCODE_ENCODING_PROFILE);
 
@@ -625,7 +622,7 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
       return Optional.empty();
     }
 
-    Optional<String> profileNameOpt = Optional.ofNullable(getOptConfig(woi, FORCE_ENCODING_PROFILE).orNull());
+    Optional<String> profileNameOpt = getOptConfig(woi, FORCE_ENCODING_PROFILE);
     if (forceEncoding && profileNameOpt.isEmpty()) {
       throw new WorkflowOperationException("Force encoding profile must be set!");
     }
