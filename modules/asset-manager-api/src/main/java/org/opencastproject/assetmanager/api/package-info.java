@@ -23,7 +23,7 @@
  * This package and all of its sub-packages contain the API definition of the asset manager.
  * <p>
  * Implementations of this API must neither accept nor yield null values. The use of null
- * to indicate optionality is strictly prohibited. Use the {@link com.entwinemedia.fn.data.Opt}
+ * to indicate optionality is strictly prohibited. Use the {@link java.util.Optional}
  * type instead.
  */
 package org.opencastproject.assetmanager.api;

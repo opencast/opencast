@@ -31,7 +31,6 @@
     <elasticsearch.version>7.10.2</elasticsearch.version>
     <failureaccess.version>1.0.1</failureaccess.version>
     <freemarker.version>2.3.32</freemarker.version>
-    <functional.version>1.4.2</functional.version>
     <graphql.version>21.5</graphql.version>
     <graphql-annotations.version>21.5</graphql-annotations.version>
     <graphql-java-extended-scalars.version>21.0</graphql-java-extended-scalars.version>
@@ -1291,11 +1290,6 @@
         <groupId>com.mchange</groupId>
         <artifactId>c3p0</artifactId>
         <version>0.9.5.5</version>
-      </dependency>
-      <dependency>
-        <groupId>com.entwinemedia.common</groupId>
-        <artifactId>functional</artifactId>
-        <version>${functional.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.servicemix.bundles</groupId>

@@ -20,7 +20,6 @@
  */
 package org.opencastproject.assetmanager.impl;
 
-import static com.entwinemedia.fn.Prelude.chuck;
 import static java.lang.String.format;
 import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.hasNoChecksum;
 import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.isNotPublication;
@@ -362,7 +361,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       }
       return Optional.empty();
     }
-    return chuck(new UnauthorizedException(
+    throw new RuntimeException(new UnauthorizedException(
             format("Not allowed to read assets of snapshot %s, version=%s", mpId, version)
     ));
   }
@@ -1002,7 +1001,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     if (isAuthorized(mpId, WRITE_ACTION)) {
       return getDatabase().saveProperty(property);
     }
-    return chuck(new UnauthorizedException("Not allowed to set property on episode " + mpId));
+    throw new RuntimeException(new UnauthorizedException("Not allowed to set property on episode " + mpId));
   }
 
   @Override
@@ -1171,7 +1170,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     if (isAuthorized(mpId, WRITE_ACTION)) {
       getDatabase().setAvailability(RuntimeTypes.convert(version), mpId, availability);
     } else {
-      chuck(new UnauthorizedException("Not allowed to set availability of episode " + mpId));
+      throw new RuntimeException(new UnauthorizedException("Not allowed to set availability of episode " + mpId));
     }
   }
 
