@@ -26,8 +26,6 @@ import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.util.data.functions.Functions;
 
-import com.entwinemedia.fn.Fn;
-
 /**
  * Function of arity 1.
  *
@@ -85,15 +83,6 @@ public abstract class Function<A, B> {
   /** Turn this function into an effect by discarding its result. */
   public Effect<A> toEffect() {
     return Functions.toEffect(this);
-  }
-
-  public Fn<A, B> toFn() {
-    return new Fn<A, B>() {
-      @Override
-      public B apply(A a) {
-        return Function.this.apply(a);
-      }
-    };
   }
 
   /** Version of {@link Function} that allows for throwing a checked exception. */

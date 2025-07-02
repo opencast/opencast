@@ -21,7 +21,6 @@
 
 package org.opencastproject.util;
 
-import static com.entwinemedia.fn.Stream.$;
 import static org.opencastproject.util.data.Collections.map;
 import static org.opencastproject.util.data.Collections.toArray;
 import static org.opencastproject.util.data.Option.none;
@@ -40,16 +39,14 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 
-import com.entwinemedia.fn.Fn2;
-import com.entwinemedia.fn.Pred;
-import com.entwinemedia.fn.data.Opt;
-
 import org.apache.http.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 /** Job related utility functions. */
 public final class JobUtil {
@@ -64,12 +61,13 @@ public final class JobUtil {
    *
    * @return the payload or none, if either to job cannot be found or if the job has no or an empty payload
    */
-  public static Opt<String> getPayload(ServiceRegistry reg, Job job)
+  public static Optional<String> getPayload(ServiceRegistry reg, Job job)
           throws NotFoundException, ServiceRegistryException {
-    for (Job updated : update(reg, job)) {
-      return Opt.nul(updated.getPayload());
+    Optional<Job> updatedOpt = update(reg, job);
+    if (updatedOpt.isPresent()) {
+      return Optional.ofNullable(updatedOpt.get().getPayload());
     }
-    return Opt.none();
+    return Optional.empty();
   }
 
   /**
@@ -77,11 +75,11 @@ public final class JobUtil {
    *
    * @return the updated job or none, if it cannot be found
    */
-  public static Opt<Job> update(ServiceRegistry reg, Job job) throws ServiceRegistryException {
+  public static Optional<Job> update(ServiceRegistry reg, Job job) throws ServiceRegistryException {
     try {
-      return Opt.some(reg.getJob(job.getId()));
+      return Optional.of(reg.getJob(job.getId()));
     } catch (NotFoundException e) {
-      return Opt.none();
+      return Optional.empty();
     }
   }
 
@@ -309,22 +307,16 @@ public final class JobUtil {
 
   /** Sum up the queue time of a list of jobs. */
   public static long sumQueueTime(List<Job> jobs) {
-    return $(jobs).foldl(0L, new Fn2<Long, Job, Long>() {
-      @Override
-      public Long apply(Long sum, Job job) {
-        return sum + job.getQueueTime();
-      }
-    });
+    return jobs.stream()
+        .mapToLong(Job::getQueueTime)
+        .sum();
   }
 
   /** Get all jobs that are not in state {@link org.opencastproject.job.api.Job.Status#FINISHED}. */
   public static List<Job> getNonFinished(List<Job> jobs) {
-    return $(jobs).filter(new Pred<Job>() {
-      @Override
-      public Boolean apply(Job job) {
-        return !job.getStatus().equals(Status.FINISHED);
-      }
-    }).toList();
+    return jobs.stream()
+        .filter(job -> !job.getStatus().equals(Status.FINISHED))
+        .collect(Collectors.toList());
   }
 
 }

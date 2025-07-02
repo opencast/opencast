@@ -370,7 +370,7 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
     MediaPackageElementFlavor adjustedTargetPresenterFlavor = targetPresenterFlavor;
     MediaPackageElementFlavor adjustedTargetPresentationFlavor = targetPresentationFlavor;
     for (final Entry<String, Job> job : jobs.entrySet()) {
-      final Optional<Job> concatJob = Optional.of(JobUtil.update(serviceRegistry, job.getValue()).orNull());
+      final Optional<Job> concatJob = JobUtil.update(serviceRegistry, job.getValue());
       if (concatJob.isPresent()) {
         final String concatPayload = concatJob.get().getPayload();
         if (concatPayload != null) {
@@ -1030,8 +1030,9 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
 
     // Get the latest copy
     try {
-      for (final String payload : getPayload(serviceRegistry, silentAudioJob)) {
-        final Track silentAudio = (Track) MediaPackageElementParser.getFromXml(payload);
+      Optional<String> payloadOpt = getPayload(serviceRegistry, silentAudioJob);
+      if (payloadOpt.isPresent()) {
+        final Track silentAudio = (Track) MediaPackageElementParser.getFromXml(payloadOpt.get());
         elementsToClean.add(silentAudio);
         return silentAudio;
       }

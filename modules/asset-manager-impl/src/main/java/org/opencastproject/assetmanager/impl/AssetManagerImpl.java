@@ -1431,7 +1431,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     try {
       // rewrite URIs for archival
       for (MediaPackageElement mpe : pmp.getElements()) {
-        String fileName = Optional.ofNullable(getFileName(mpe).orNull()).orElse("unknown");
+        String fileName = getFileName(mpe).orElse("unknown");
         URI archiveUri = new URI(
             "urn",
             "matterhorn:" + mpId + ":" + version + ":" + mpe.getIdentifier() + ":" + fileName,

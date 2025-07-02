@@ -50,8 +50,6 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.apache.http.HttpStatus;
 import org.apache.http.HttpVersion;
 import org.apache.http.entity.StringEntity;
@@ -62,6 +60,7 @@ import org.junit.Test;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 
 public class JobUtilTest {
 
@@ -129,20 +128,20 @@ public class JobUtilTest {
 
   @Test
   public void testGetPayload() throws NotFoundException, ServiceRegistryException {
-    Opt<String> payload = getPayload(serviceRegistry, new JobImpl(23));
-    assertTrue(payload.isNone());
+    Optional<String> payload = getPayload(serviceRegistry, new JobImpl(23));
+    assertTrue(payload.isEmpty());
 
     payload = getPayload(serviceRegistry, new JobImpl(20));
-    assertTrue(payload.isSome());
+    assertTrue(payload.isPresent());
   }
 
   @Test
   public void testUpdate() throws NotFoundException, ServiceRegistryException {
-    Opt<Job> update = update(serviceRegistry, new JobImpl(23));
-    assertTrue(update.isNone());
+    Optional<Job> update = update(serviceRegistry, new JobImpl(23));
+    assertTrue(update.isEmpty());
 
     update = update(serviceRegistry, new JobImpl(20));
-    assertTrue(update.isSome());
+    assertTrue(update.isPresent());
   }
 
   @Test
