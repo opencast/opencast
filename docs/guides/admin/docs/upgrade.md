@@ -70,9 +70,10 @@ The most important changes are:
 
 ## Index Rebuild
 
-[[#5413](https://github.com/opencast/opencast/pull/5413)] only requires an update of the index mappings, for which there
-are migration scripts in `docs/upgrade/16_to_17/`, but [[#6023](https://github.com/opencast/opencast/pull/6023)]
-requires a full rebuild of the indexes that feed the Admin Interface and External API, so that is what's described here.
+[[#5413](https://github.com/opencast/opencast/pull/5413)],[[#6023](https://github.com/opencast/opencast/pull/6023)] only
+require an update of the index mappings, for which there are migration scripts in `docs/upgrade/16_to_17/`,
+the alternative is a full rebuild of the indexes that feed the Admin Interface and External API, so that is what's
+described here.
 
 You can do so by making a POST request to `/index/rebuild`, either like this
 
