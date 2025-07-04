@@ -200,7 +200,7 @@ public class WhisperCppEngine implements SpeechToTextEngine {
   private static final String WHISPERCPP_VAD_MAX_SPEECH_CONFIG_KEY = "whispercpp.vad-max-speech-dur";
 
   /** Currently used whispercpp VAD max speech duration */
-  private Option<String> whispercppVadMaxSpeech;
+  private Option<Double> whispercppVadMaxSpeech;
 
   /** Config key for setting whispercpp VAD speech padding */
   private static final String WHISPERCPP_VAD_SPEECH_PADDING_CONFIG_KEY = "whispercpp.vad-speech-pad";
@@ -343,7 +343,8 @@ public class WhisperCppEngine implements SpeechToTextEngine {
       logger.debug("WhisperC++ VAD min silence set to {}", whispercppVadMinSilence);
     }
 
-    whispercppVadMaxSpeech = OsgiUtil.getOptCfg(cc.getProperties(), WHISPERCPP_VAD_MAX_SPEECH_CONFIG_KEY);
+    whispercppVadMaxSpeech = OsgiUtil.getOptCfg(cc.getProperties(), WHISPERCPP_VAD_MAX_SPEECH_CONFIG_KEY).bind(
+        Strings.toDouble);
     if (whispercppVadMaxSpeech.isSome()) {
       logger.debug("WhisperC++ VAD max speech set to {}", whispercppVadMaxSpeech);
     }
@@ -482,7 +483,7 @@ public class WhisperCppEngine implements SpeechToTextEngine {
     }
     if (whispercppVadMaxSpeech.isSome()) {
       command.add("-vmsd");
-      command.add(whispercppVadMaxSpeech.get());
+      command.add(String.format(Locale.US, "%f", whispercppVadMaxSpeech.get()));
     }
     if (whispercppVadSpeechPadding.isSome()) {
       command.add("-vp");
