@@ -8,7 +8,7 @@ In case you need to upgrade older versions of Opencast, please refer to the docu
 2. Stop your current Opencast instance
 3. Replace Opencast with the new version
 4. Review the [configuration changes](#configuration-changes) and adjust your configuration accordingly
-5. [Migrate the database and extract Elasticsearch/Opensearch data](#database-migration)
+5. [Migrate the database and extract Elasticsearch/Opensearch data](#1-database-migration)
 6. Start Opencast
 7. [Rebuild the index](#index-rebuild)
 
