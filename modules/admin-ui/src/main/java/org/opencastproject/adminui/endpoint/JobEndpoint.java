@@ -388,7 +388,15 @@ public class JobEndpoint {
     } catch (IncidentServiceException e) {
       throw new JobEndpointException(String.format("Not able to get the incident %d: %s", id, e), e.getCause());
     }
+    Long rootJobId = null;
+    try {
+      Job job = serviceRegistry.getJob(incident.getJobId());
+      rootJobId = job.getRootJobId();
+    } catch (ServiceRegistryException e) {
+      logger.info("Could not find job \"{}\" in service registry", incident.getJobId());
+    }
     return obj(f("id", v(incident.getId(), Jsons.BLANK)), f("job_id", v(incident.getJobId(), Jsons.BLANK)),
+            f("root_job_id", v(rootJobId, Jsons.BLANK)),
             f("severity", v(incident.getSeverity(), Jsons.BLANK)),
             f("timestamp", v(toUTC(incident.getTimestamp().getTime()), Jsons.BLANK)),
             f("processing_host", v(incident.getProcessingHost(), Jsons.BLANK)), f("service_type", v(incident.getServiceType(), Jsons.BLANK)),
