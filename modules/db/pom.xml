@@ -116,6 +116,7 @@
               !waffle.*,
               !org.codehaus.groovy*,
               !org.locationtech.jts.geom.*,
+              !jakarta.servlet*,
               org.w3c.dom;version=0,
               *
             </Import-Package>

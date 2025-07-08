@@ -126,7 +126,7 @@ public class SeriesEntity {
   @Lob
   @ElementCollection(targetClass = String.class)
   @MapKeyColumn(name = "name", nullable = false)
-  @Column(name = "value", length = 65535)
+  @Column(name = "\"value\"", length = 65535)
   @CollectionTable(name = "oc_series_property", uniqueConstraints = {
       @UniqueConstraint(name = "UNQ_series_properties", columnNames = {"series", "organization", "name"})
       }, joinColumns = {
