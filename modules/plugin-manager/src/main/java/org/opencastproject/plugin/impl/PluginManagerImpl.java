@@ -85,7 +85,7 @@ public class PluginManagerImpl implements PluginManager {
 
     // Load plugin configuration
     activePlugins = properties.entrySet().stream()
-            .filter(e -> BooleanUtils.toBoolean(Objects.toString(e.getValue(), "")))
+            .filter(e -> BooleanUtils.toBoolean(Objects.toString(e.getValue(), "").trim()))
             .map(Map.Entry::getKey)
             .collect(Collectors.toSet());
     logger.debug("Active plugin configuration: {}", activePlugins);
