@@ -3,9 +3,11 @@ name: Test LTI Tools
 on:
   pull_request:
     paths:
+      - .github/workflows/test-lti-tools.yml
       - modules/lti/**
   push:
     paths:
+      - .github/workflows/test-lti-tools.yml
       - modules/lti/**
 
 jobs:

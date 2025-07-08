@@ -3,11 +3,13 @@ name: Test documentation
 on:
   pull_request:
     paths:
+      - '.github/workflows/test-documentation-build.yml'
       - 'docs/guides/**'
       - 'docs/checkstyle/check-docs.sh'
       - '**.md'
   push:
     paths:
+      - '.github/workflows/test-documentation-build.yml'
       - 'docs/guides/**'
       - 'docs/checkstyle/check-docs.sh'
       - '**.md'
