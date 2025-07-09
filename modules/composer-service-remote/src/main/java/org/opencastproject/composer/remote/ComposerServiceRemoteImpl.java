@@ -246,6 +246,46 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
   /**
    * {@inheritDoc}
    *
+   * @see org.opencastproject.composer.api.ComposerService#mux(java.util.Map, java.lang.String)
+   */
+  @Override
+  public Job mux(Map<String, Track> sourceTracks, String profileId) throws EncoderException {
+    HttpPost post = new HttpPost("/mux");
+    try {
+      List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+      List<String> sourceTracksEntries = new ArrayList<>();
+      for (Entry<String, Track> sourceTrack : sourceTracks.entrySet()) {
+        String sourceTrackXml = MediaPackageElementParser.getAsXml(sourceTrack.getValue());
+        sourceTracksEntries.add(StringUtils.join(sourceTrack.getKey(), sourceTrackXml, "#=#"));
+      }
+      params.add(new BasicNameValuePair("sourceTracks", StringUtils.join(sourceTracksEntries, "#|#")));
+      params.add(new BasicNameValuePair("profileId", profileId));
+      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+    } catch (Exception e) {
+      throw new EncoderException("Unable to assemble a remote composer request", e);
+    }
+    HttpResponse response = null;
+    try {
+      response = getResponse(post);
+      if (response != null) {
+        String content = EntityUtils.toString(response.getEntity());
+        Job r = JobParser.parseJob(content);
+        logger.info("Muxing job {} started on a remote composer", r.getId());
+        return r;
+      }
+    } catch (IOException e) {
+      throw new EncoderException(e);
+    } finally {
+      closeConnection(response);
+    }
+    throw new EncoderException("Unable to mux tracks " + sourceTracks.entrySet().stream()
+        .map(entry -> String.format("%s: %s", entry.getKey(), entry.getValue().getIdentifier())).collect(
+        Collectors.joining(", ")) + " using a remote composer");
+  }
+
+  /**
+   * {@inheritDoc}
+   *
    * @see org.opencastproject.composer.api.ComposerService#getProfile(java.lang.String)
    */
   @Override

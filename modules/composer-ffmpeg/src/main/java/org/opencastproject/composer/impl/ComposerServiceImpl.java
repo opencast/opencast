@@ -82,6 +82,7 @@ import com.google.gson.Gson;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.osgi.service.cm.ConfigurationException;
@@ -363,8 +364,6 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    *          tracks to use for processing
    * @param profileId
    *          the encoding profile
-   * @param properties
-   *          encoding properties
    * @return the encoded track or none if the operation does not return a track. This may happen for example when doing
    *         two pass encodings where the first pass only creates metadata for the second one
    * @throws EncoderException
@@ -372,34 +371,79 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    */
   private Option<Track> encode(final Job job, Map<String, Track> tracks, String profileId)
           throws EncoderException, MediaPackageException {
+    return encode(job, tracks, profileId, null);
+  }
+
+  /**
+   * Mux tracks into one movie container.
+   *
+   * @param tracks
+   *          tracks to use for processing
+   * @param profileId
+   *          the encoding profile
+   * @param properties
+   *          encoding properties
+   * @return the encoded track or none if the operation does not return a track. This may happen for example when doing
+   *         two pass encodings where the first pass only creates metadata for the second one
+   * @throws EncoderException
+   *           if encoding fails
+   */
+  private Option<Track> encode(final Job job, Map<String, Track> tracks, String profileId,
+      Map<String, String> properties) throws EncoderException, MediaPackageException {
 
     final String targetTrackId = IdImpl.fromUUID().toString();
 
     Map<String, File> files = new HashMap<>();
     // Get the tracks and make sure they exist
-    for (Entry<String, Track> track: tracks.entrySet()) {
-      files.put(track.getKey(), loadTrackIntoWorkspace(job, track.getKey(), track.getValue(), false));
+    for (Entry<String, Track> trackEntry: tracks.entrySet()) {
+      files.put(trackEntry.getKey(), loadTrackIntoWorkspace(job, trackEntry.getKey(),
+          trackEntry.getValue(), false));
     }
 
     // Get the encoding profile
     final EncodingProfile profile = getProfile(job, profileId);
-
-    List <String> trackMsg = new LinkedList<>();
-    for (Entry<String, Track> track: tracks.entrySet()) {
-      trackMsg.add(format("%s: %s", track.getKey(), track.getValue().getIdentifier()));
+    Map<String, String> props = new HashMap<>();
+    if (properties != null) {
+      props.putAll(properties);
     }
-    logger.info("Encoding {} into {} using profile {}", StringUtils.join(trackMsg, ", "), targetTrackId, profileId);
+
+    // Handle input count substitution
+    String substitutionKey = String.format("if-input-count-eq-%d", tracks.size());
+    String substitution = profile.getExtension(StringUtils.join(CMD_SUFFIX, '.', substitutionKey));
+    if (StringUtils.isNotBlank(substitution)) {
+      props.put(substitutionKey, substitution);
+    }
+    for (int i = 1; i <= tracks.size(); i++) {
+      substitutionKey = String.format("if-input-count-geq-%d", i);
+      substitution = profile.getExtension(StringUtils.join(CMD_SUFFIX, '.', substitutionKey));
+      if (StringUtils.isNotBlank(substitution)) {
+        props.put(substitutionKey, substitution);
+      }
+    }
+    // Handle lang:<LOCALE> tags
+    tracks.entrySet().stream()
+        .map(e -> new Tuple<>(e.getKey(), Arrays.stream(e.getValue().getTags())
+            .filter(t -> StringUtils.startsWith(t, "lang:"))
+            .map(t -> StringUtils.substring(t, 5))
+            .filter(StringUtils::isNotBlank)
+            .findFirst()))
+        .filter(e -> e.getB().isPresent())
+        .forEach(e -> props.put(String.format("in.%s.language", e.getA()),
+            LocaleUtils.toLocale(e.getB().get()).getISO3Language()));
+    logger.info("Encoding {} into {} using profile {}",
+        tracks.entrySet().stream()
+          .map(entry -> String.format("%s: %s", entry.getKey(), entry.getValue().getIdentifier()))
+          .collect(Collectors.joining(", ")),
+        targetTrackId, profileId);
 
     // Do the work
     final EncoderEngine encoder = getEncoderEngine();
     List<File> output;
     try {
-      output = encoder.process(files, profile, null);
+      output = encoder.process(files, profile, props);
     } catch (EncoderException e) {
       Map<String, String> params = new HashMap<>();
-      for (Entry<String, Track> track: tracks.entrySet()) {
-        params.put(track.getKey(), track.getValue().getIdentifier());
-      }
+      tracks.forEach((key, value) -> params.put(key, value.getIdentifier()));
       params.put("profile", profile.getIdentifier());
       params.put("properties", "EMPTY");
       incident().recordFailure(job, ENCODING_FAILED, e, params, detailsFor(e, encoder));
@@ -409,7 +453,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     }
 
     // We expect zero or one file as output
-    if (output.size() == 0) {
+    if (output.isEmpty()) {
       return none();
     } else if (output.size() != 1) {
       // Ensure we do not leave behind old files in the workspace
@@ -664,25 +708,40 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    */
   @Override
   public Job mux(Track videoTrack, Track audioTrack, String profileId) throws EncoderException, MediaPackageException {
+    return mux(Map.of("video", videoTrack, "audio", audioTrack), profileId);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @see org.opencastproject.composer.api.ComposerService#mux(Map, String)
+   */
+  @Override
+  public Job mux(Map<String, Track> sourceTracks, String profileId) throws EncoderException, MediaPackageException {
     try {
+      if (sourceTracks == null || sourceTracks.size() < 2) {
+        throw new EncoderException("At least two source tracks must be given.");
+      }
       final EncodingProfile profile = profileScanner.getProfile(profileId);
-      return serviceRegistry.createJob(JOB_TYPE, Operation.Mux.toString(),
-              Arrays.asList(profileId, MediaPackageElementParser.getAsXml(videoTrack),
-                      MediaPackageElementParser.getAsXml(audioTrack)), profile.getJobLoad());
+      List<String> jobArgs = new ArrayList<>();
+      jobArgs.add(profileId);
+      for (Entry<String, Track> entry : sourceTracks.entrySet()) {
+        jobArgs.add(entry.getKey());
+        jobArgs.add(MediaPackageElementParser.getAsXml(entry.getValue()));
+      }
+      return serviceRegistry.createJob(JOB_TYPE, Operation.Mux.toString(), jobArgs, profile.getJobLoad());
     } catch (ServiceRegistryException e) {
       throw new EncoderException("Unable to create a job", e);
     }
   }
 
   /**
-   * Muxes the audio and video track into one movie container.
+   * Muxes tracks into one movie container.
    *
    * @param job
    *          the associated job
-   * @param videoTrack
-   *          the video track
-   * @param audioTrack
-   *          the audio track
+   * @param tracks
+   *          the tracks to mux
    * @param profileId
    *          the profile identifier
    * @return the muxed track
@@ -691,9 +750,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    * @throws MediaPackageException
    *           if serializing the mediapackage elements fails
    */
-  private Option<Track> mux(Job job, Track videoTrack, Track audioTrack, String profileId) throws EncoderException,
-          MediaPackageException {
-    return encode(job, Collections.map(tuple("audio", audioTrack), tuple("video", videoTrack)), profileId);
+  private Option<Track> mux(Job job, Map<String, Track> tracks, String profileId) throws EncoderException,
+      MediaPackageException {
+    return encode(job, tracks, profileId);
   }
 
   /**
@@ -1500,10 +1559,14 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
           serialized = MediaPackageElementParser.getArrayAsXml(convertedImages);
           break;
         case Mux:
-          firstTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(1));
-          secondTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(2));
-          serialized = mux(job, firstTrack, secondTrack, encodingProfile).map(
-                  MediaPackageElementParser.getAsXml()).getOrElse("");
+          Map<String, Track> sourceTracks = new HashMap<>();
+          for (int i = 1; i < arguments.size(); i += 2) {
+            String key = arguments.get(i);
+            firstTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(i + 1));
+            sourceTracks.put(key, firstTrack);
+          }
+          serialized = mux(job, sourceTracks, encodingProfile).map(MediaPackageElementParser.getAsXml())
+              .getOrElse("");
           break;
         case Trim:
           firstTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(1));

@@ -65,8 +65,10 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DefaultValue;
@@ -349,34 +351,53 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
   @Path("mux")
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "mux", description = "Starts an encoding process, which will mux the two tracks using the given encoding profile", restParameters = {
-          @RestParameter(description = "The track containing the audio stream", isRequired = true, name = "sourceAudioTrack", type = Type.TEXT, defaultValue = AUDIO_TRACK_DEFAULT),
-          @RestParameter(description = "The track containing the video stream", isRequired = true, name = "sourceVideoTrack", type = Type.TEXT, defaultValue = VIDEO_TRACK_DEFAULT),
+          @RestParameter(description = "The track containing the audio stream", isRequired = false, name = "sourceAudioTrack", type = Type.TEXT, defaultValue = AUDIO_TRACK_DEFAULT),
+          @RestParameter(description = "The track containing the video stream", isRequired = false, name = "sourceVideoTrack", type = Type.TEXT, defaultValue = VIDEO_TRACK_DEFAULT),
+          @RestParameter(description = "The track containing the video stream", isRequired = false, name = "sourceTracks", type = Type.TEXT),
           @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING, defaultValue = "mp4-medium.http") }, responses = {
           @RestResponse(description = "Results in an xml document containing the job for the encoding task", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "If required parameters aren't set or if the source tracks aren't from the type Track", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
   public Response mux(@FormParam("audioSourceTrack") String audioSourceTrackXml,
-          @FormParam("videoSourceTrack") String videoSourceTrackXml, @FormParam("profileId") String profileId)
+          @FormParam("videoSourceTrack") String videoSourceTrackXml,
+          @FormParam("sourceTracks") String sourceTracksXml, @FormParam("profileId") String profileId)
           throws Exception {
     // Ensure that the POST parameters are present
-    if (StringUtils.isBlank(audioSourceTrackXml) || StringUtils.isBlank(videoSourceTrackXml)
-            || StringUtils.isBlank(profileId)) {
+    if (StringUtils.isBlank(profileId)) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("profileId must not be null").build();
+    }
+    if ((StringUtils.isBlank(audioSourceTrackXml) || StringUtils.isBlank(videoSourceTrackXml))
+        && StringUtils.isBlank(sourceTracksXml)) {
       return Response.status(Response.Status.BAD_REQUEST)
-              .entity("audioSourceTrack, videoSourceTrack, and profileId must not be null").build();
+          .entity("audioSourceTrack, videoSourceTrack or sourceTracks must not be null").build();
     }
 
-    // Deserialize the audio track
-    MediaPackageElement audioSourceTrack = MediaPackageElementParser.getFromXml(audioSourceTrackXml);
-    if (!Track.TYPE.equals(audioSourceTrack.getElementType()))
-      return Response.status(Response.Status.BAD_REQUEST).entity("audioSourceTrack must be of type track").build();
-
-    // Deserialize the video track
-    MediaPackageElement videoSourceTrack = MediaPackageElementParser.getFromXml(videoSourceTrackXml);
-    if (!Track.TYPE.equals(videoSourceTrack.getElementType()))
-      return Response.status(Response.Status.BAD_REQUEST).entity("videoSourceTrack must be of type track").build();
-
     try {
-      // Asynchronously encode the specified tracks
-      Job job = composerService.mux((Track) videoSourceTrack, (Track) audioSourceTrack, profileId);
+      Job job;
+      Map<String, Track> sourceTracks = new HashMap<>();
+      if (StringUtils.isNotBlank(sourceTracksXml)) {
+        for (String sourceTrackEntry : StringUtils.split(sourceTracksXml, "#|#")) {
+          String[] sourceTrackEntryTuple = sourceTrackEntry.split("#=#", 2);
+          if (sourceTrackEntryTuple.length != 2) {
+            return Response.status(Response.Status.BAD_REQUEST).entity("sourceTracks value invalid").build();
+          }
+          sourceTracks.put(sourceTrackEntryTuple[0],
+              (Track) MediaPackageElementParser.getFromXml(sourceTrackEntryTuple[1]));
+        }
+        // Asynchronously encode the specified tracks
+        job = composerService.mux(sourceTracks, profileId);
+      } else {
+        // Deserialize the audio track
+        MediaPackageElement audioSourceTrack = MediaPackageElementParser.getFromXml(audioSourceTrackXml);
+        if (!Track.TYPE.equals(audioSourceTrack.getElementType()))
+          return Response.status(Response.Status.BAD_REQUEST).entity("audioSourceTrack must be of type track").build();
+
+        // Deserialize the video track
+        MediaPackageElement videoSourceTrack = MediaPackageElementParser.getFromXml(videoSourceTrackXml);
+        if (!Track.TYPE.equals(videoSourceTrack.getElementType()))
+          return Response.status(Response.Status.BAD_REQUEST).entity("videoSourceTrack must be of type track").build();
+
+        job = composerService.mux((Track) videoSourceTrack, (Track) audioSourceTrack, profileId);
+      }
       return Response.ok().entity(new JaxbJob(job)).build();
     } catch (EncoderException e) {
       logger.warn("Unable to mux tracks: " + e.getMessage());

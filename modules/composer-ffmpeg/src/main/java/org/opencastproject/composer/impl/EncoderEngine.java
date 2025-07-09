@@ -194,7 +194,8 @@ public class EncoderEngine implements AutoCloseable {
       params.put(pre + ".filename", FilenameUtils.getName(input));
       params.put(pre + ".mimetype", MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(input));
     }
-    final File parentFile = source.getOrDefault("video", source.get("audio"));
+    final File parentFile = source.getOrDefault("video", source.getOrDefault("audio",
+        source.values().stream().findAny().get()));
 
     final String outDir = parentFile.getAbsoluteFile().getParent();
     final String outFileName = FilenameUtils.getBaseName(parentFile.getName())
@@ -366,19 +367,12 @@ public class EncoderEngine implements AutoCloseable {
       }
     }
 
-    String[] arguments;
-    try {
-      arguments = CommandLineUtils.translateCommandline(commandline);
-    } catch (Exception e) {
-      throw new EncoderException("Could not parse encoding profile command line", e);
-    }
-
-    for (String arg: arguments) {
-      String result = processParameters(arg, argumentReplacements);
-      if (StringUtils.isNotBlank(result)) {
-        command.add(result);
+    String processedCommandLine = processParameters(commandline, argumentReplacements);
+      try {
+        command.addAll(Arrays.asList(CommandLineUtils.translateCommandline(processedCommandLine)));
+      } catch (Exception e) {
+        throw new EncoderException("Could not process encoding profile command line", e);
       }
-    }
     return command;
   }
 
@@ -407,8 +401,13 @@ public class EncoderEngine implements AutoCloseable {
    * @return the commandline
    */
   private String processParameters(String cmd, final Map<String, String> args) {
-    for (Map.Entry<String, String> e: args.entrySet()) {
-      cmd = cmd.replace("#{" + e.getKey() + "}", e.getValue());
+    // multi level templates handling
+    String cmdBefore = null;
+    while (!cmd.equals(cmdBefore)) {
+      cmdBefore = cmd;
+      for (Map.Entry<String, String> e : args.entrySet()) {
+        cmd = cmd.replace("#{" + e.getKey() + "}", e.getValue());
+      }
     }
 
     // Also replace spaces
