@@ -708,7 +708,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    */
   @Override
   public Job mux(Track videoTrack, Track audioTrack, String profileId) throws EncoderException, MediaPackageException {
-    return mux(Map.of("video", videoTrack, "audio", audioTrack), profileId);
+    return mux(Collections.map(Tuple.tuple("video", videoTrack), Tuple.tuple("audio", audioTrack)), profileId);
   }
 
   /**

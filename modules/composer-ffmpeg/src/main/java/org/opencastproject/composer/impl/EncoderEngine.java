@@ -195,7 +195,7 @@ public class EncoderEngine implements AutoCloseable {
       params.put(pre + ".mimetype", MimetypesFileTypeMap.getDefaultFileTypeMap().getContentType(input));
     }
     final File parentFile = source.getOrDefault("video", source.getOrDefault("audio",
-        source.values().stream().findAny().get()));
+        source.values().stream().findFirst().get()));
 
     final String outDir = parentFile.getAbsoluteFile().getParent();
     final String outFileName = FilenameUtils.getBaseName(parentFile.getName())
