@@ -1,7 +1,13 @@
 # Opencast 16: Release Notes
 
+## Opencast 16.12
+This is a maintenance release of Opencast 16.
+This is the final Release of Opencast 16.x.
+Consider updating to Opencast 17 or 18 soon.
+
 ## Opencast 16.11
-This is a maintenance release of Opencast 16, it fixes minor Bugs. OpenSearch Clusters are allowed to be in yellow status now.
+This is a maintenance release of Opencast 16, it fixes minor Bugs.
+OpenSearch Clusters are allowed to be in yellow status now.
 
 ## Opencast 16.10
 
