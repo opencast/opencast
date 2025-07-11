@@ -141,6 +141,8 @@ public class TesseractTextExtractor implements TextExtractor, ManagedService {
     try {
       ProcessBuilder processBuilder = new ProcessBuilder(command);
       processBuilder.redirectErrorStream(true);
+      // Mitigation for new Tesseract 4.x spawning too many threads locking up the system. Limit to one thread.
+      processBuilder.environment().put("OMP_THREAD_LIMIT", "1");
       Process tesseractProcess = processBuilder.start();
 
       // listen to output
