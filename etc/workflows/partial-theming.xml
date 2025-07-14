@@ -130,7 +130,7 @@
       <configurations>
         <configuration key="subtitle-source-flavor">captions/trimmed</configuration>
         <configuration key="target-flavor">captions/shifted</configuration>
-        <configuration key="video-source-flavor">branding/bumper</configuration>
+        <configuration key="video-source-flavors">branding/bumper</configuration>
       </configurations>
     </operation>
 
