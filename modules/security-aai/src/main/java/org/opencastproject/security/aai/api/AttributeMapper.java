@@ -90,10 +90,19 @@ public class AttributeMapper implements InitializingBean {
       Expression exp = null;
       try {
         exp = parser.parseExpression(expression);
-        String res = (String) exp.getValue(sourceAttributes);
+        Object res = exp.getValue(sourceAttributes);
         logger.debug("Mapping {} to {}", exp.getExpressionString(), res);
-        if (res != null) {
-          mappedAttributes.add(res);
+        if (res == null) {
+          continue;
+        }
+        if (res instanceof String) {
+          mappedAttributes.add((String) res);
+        } else if (res instanceof List<?>) {
+          for (Object resListItem : (List<?>) res) {
+            if (resListItem instanceof String) {
+              mappedAttributes.add((String) resListItem);
+            }
+          }
         }
       } catch (Exception e) {
         logger.warn("Mapping for '{}' with expression {} exp.getExpressionString() failed: {}",
