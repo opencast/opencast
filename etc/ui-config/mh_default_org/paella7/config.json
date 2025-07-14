@@ -641,12 +641,6 @@
                 "userTracking"
             ]
         },
-        "org.opencast.paella.opencast.userTrackingDataPlugin": {
-            "enabled": false,
-            "context": [
-                "userTracking"
-            ]
-        },
         "org.opencast.paella.matomo.userTrackingDataPlugin": {
             "enabled": false,
             "context": [
