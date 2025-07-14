@@ -679,16 +679,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-usertracking-impl/${project.version}</bundle>
   </feature>
 
-  <feature name="opencast-plugin-legacy-annotation" version="${project.version}">
-    <conditional>
-      <condition>opencast-allinone</condition>
-      <condition>opencast-presentation</condition>
-      <condition>opencast-adminpresentation</condition>
-    </conditional>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-annotation-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-annotation-impl/${project.version}</bundle>
-  </feature>
-
   <feature name="opencast-graphql-tp" version="${project.version}">
     <!-- graphql -->
     <bundle dependency="true">wrap:mvn:com.graphql-java/java-dataloader/3.2.2$Bundle-SymbolicName=java-dataloader&amp;Bundle-Version=3.2.2</bundle>
