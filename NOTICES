@@ -1676,17 +1676,6 @@ user-interface-configuration
   org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
 
 
-usertracking-impl
-  GroupId                                ArtifactId                                       Licenses
-  jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
-  jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
-  javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
-  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
-  org.eclipse.persistence                jakarta.persistence                              Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
-  org.eclipse.persistence                org.eclipse.persistence.core                     Eclipse Public License v. 2.0-Eclipse Distribution License v. 1.0
-  org.slf4j                              slf4j-api                                        MIT License
-
-
 videoeditor-ffmpeg-impl
   GroupId                                ArtifactId                                       Licenses
   commons-io                             commons-io                                       Apache License, Version 2.0
