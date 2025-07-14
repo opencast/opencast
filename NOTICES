@@ -1072,12 +1072,6 @@ oaipmh
   xml-apis                               xml-apis
 
 
-presets
-  GroupId                                ArtifactId                                       Licenses
-  org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
-  org.slf4j                              slf4j-api                                        MIT License
-
-
 publication-service-configurable-remote
   GroupId                                ArtifactId                                       Licenses
   com.google.code.gson                   gson                                             Apache 2.0

@@ -26,7 +26,6 @@ import static org.junit.Assert.assertEquals;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
-import org.opencastproject.presets.api.PresetProvider;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -72,9 +71,6 @@ public class DefaultsWorkflowOperationHandlerTest {
 
   // local resources
   private MediaPackage mp;
-
-  /** The preset provider to use */
-  private PresetProvider presetProvider;
 
   @Before
   public void setUp() throws Exception {

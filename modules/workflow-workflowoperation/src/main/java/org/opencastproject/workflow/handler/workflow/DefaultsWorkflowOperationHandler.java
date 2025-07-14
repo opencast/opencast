@@ -22,7 +22,6 @@ package org.opencastproject.workflow.handler.workflow;
 
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.presets.api.PresetProvider;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
@@ -60,13 +59,6 @@ public class DefaultsWorkflowOperationHandler extends AbstractWorkflowOperationH
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(DefaultsWorkflowOperationHandler.class);
-
-  private PresetProvider presetProvider;
-
-  @Reference
-  void setPresetProvider(PresetProvider presetProvider) {
-    this.presetProvider = presetProvider;
-  }
 
   /**
    * Gets a series or organization preset if it is present.
@@ -110,17 +102,10 @@ public class DefaultsWorkflowOperationHandler extends AbstractWorkflowOperationH
     for (String key : operation.getConfigurationKeys()) {
       String value = workflowInstance.getConfiguration(key);
       if (StringUtils.isBlank(value)) {
-        // Check to see if the default value was set as a preset at the series or organization level
-        String preset = getPreset(organizationId, seriesID, key);
-        if (StringUtils.isNotBlank(preset)) {
-          properties.put(key, preset);
-          logger.debug("Configuration key '{}' of workflow {} is set to preset value '{}'", key, id, preset);
-        } else {
-          String defaultValue = operation.getConfiguration(key);
-          properties.put(key, defaultValue);
-          logger.debug("Configuration key '{}' of workflow {} is set to default value '{}' specified in workflow", key,
-                  id, defaultValue);
-        }
+        String defaultValue = operation.getConfiguration(key);
+        properties.put(key, defaultValue);
+        logger.debug("Configuration key '{}' of workflow {} is set to default value '{}' specified in workflow", key,
+                id, defaultValue);
       } else {
         properties.put(key, value);
         logger.debug("Configuration key '{}' of workflow {} is set to '{}' specified in event.", key, id, value);
