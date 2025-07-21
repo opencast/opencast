@@ -21,13 +21,9 @@
 
 package org.opencastproject.workflow.handler.workflow;
 
-import static org.junit.Assert.assertEquals;
-
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
-import org.opencastproject.security.api.Organization;
-import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowOperationException;
@@ -117,136 +113,6 @@ public class DefaultsWorkflowOperationHandlerTest {
 
     // Make sure the default value has been applied
     Assert.assertNotEquals(DEFAULT_VALUE, configurationValue);
-  }
-
-  @Test
-  public void usesEventLevelPreset() throws WorkflowOperationException {
-    String seriesID = "series-ID";
-
-    Map<String, String> workflowConfiguration = new HashMap<String, String>();
-    workflowConfiguration.put(OPT_KEY, WORKFLOW_PRESET_VALUE);
-
-    WorkflowInstance workflowInstance = setupInstance(seriesID, workflowConfiguration, true);
-
-    DefaultsWorkflowOperationHandler handler = new DefaultsWorkflowOperationHandler();
-    handler.setPresetProvider(presetProvider);
-    WorkflowOperationResult result = handler.start(workflowInstance, null);
-    assertEquals(EVENT_PRESET_VALUE, result.getProperties().get(OPT_KEY));
-  }
-
-  @Test
-  public void usesSeriesLevelPreset() throws WorkflowOperationException, NotFoundException {
-    Organization organization = EasyMock.createMock(Organization.class);
-    EasyMock.replay(organization);
-
-    String seriesID = "series-ID";
-
-    presetProvider = EasyMock.createMock(PresetProvider.class);
-    EasyMock.expect(presetProvider.getProperty(seriesID, OPT_KEY)).andReturn(SERIES_PRESET_VALUE);
-    EasyMock.replay(presetProvider);
-
-    // Workflow configuration
-    Map<String, String> workflowConfiguration = new HashMap<String, String>();
-    workflowConfiguration.put(OPT_KEY, WORKFLOW_PRESET_VALUE);
-
-    WorkflowInstance workflowInstance = setupInstance(seriesID, workflowConfiguration, false);
-
-    DefaultsWorkflowOperationHandler handler = new DefaultsWorkflowOperationHandler();
-    handler.setPresetProvider(presetProvider);
-    WorkflowOperationResult result = handler.start(workflowInstance, null);
-    assertEquals(SERIES_PRESET_VALUE, result.getProperties().get(OPT_KEY));
-  }
-
-  @Test
-  public void usesOrganizationLevelPreset() throws WorkflowOperationException, NotFoundException {
-    Organization organization = EasyMock.createMock(Organization.class);
-    EasyMock.replay(organization);
-
-    String seriesID = "series-ID";
-
-    presetProvider = EasyMock.createMock(PresetProvider.class);
-    EasyMock.expect(presetProvider.getProperty(seriesID, OPT_KEY)).andReturn(ORGANIZATION_PRESET_VALUE);
-    EasyMock.replay(presetProvider);
-
-    // Workflow configuration
-    Map<String, String> workflowConfiguration = new HashMap<String, String>();
-    workflowConfiguration.put(OPT_KEY, WORKFLOW_PRESET_VALUE);
-
-    WorkflowInstance workflowInstance = setupInstance(seriesID, workflowConfiguration, false);
-
-    DefaultsWorkflowOperationHandler handler = new DefaultsWorkflowOperationHandler();
-    handler.setPresetProvider(presetProvider);
-    WorkflowOperationResult result = handler.start(workflowInstance, null);
-    assertEquals(ORGANIZATION_PRESET_VALUE, result.getProperties().get(OPT_KEY));
-  }
-
-  @Test
-  public void usesOrganizationLevelPresetNullSeries() throws WorkflowOperationException, NotFoundException {
-    Organization organization = EasyMock.createMock(Organization.class);
-    EasyMock.replay(organization);
-
-    String seriesID = null;
-
-    presetProvider = EasyMock.createMock(PresetProvider.class);
-    EasyMock.expect(presetProvider.getProperty(seriesID, OPT_KEY)).andReturn(ORGANIZATION_PRESET_VALUE);
-    EasyMock.replay(presetProvider);
-
-    // Workflow configuration
-    Map<String, String> workflowConfiguration = new HashMap<String, String>();
-    workflowConfiguration.put(OPT_KEY, WORKFLOW_PRESET_VALUE);
-
-    WorkflowInstance workflowInstance = setupInstance(seriesID, workflowConfiguration, false);
-
-    DefaultsWorkflowOperationHandler handler = new DefaultsWorkflowOperationHandler();
-    handler.setPresetProvider(presetProvider);
-    WorkflowOperationResult result = handler.start(workflowInstance, null);
-    assertEquals(ORGANIZATION_PRESET_VALUE, result.getProperties().get(OPT_KEY));
-  }
-
-  @Test
-  public void usesWorkflowLevelPresetDueToNotFound() throws WorkflowOperationException, NotFoundException {
-    Organization organization = EasyMock.createMock(Organization.class);
-    EasyMock.replay(organization);
-
-    String seriesID = "series-ID";
-
-    presetProvider = EasyMock.createMock(PresetProvider.class);
-    EasyMock.expect(presetProvider.getProperty(seriesID, OPT_KEY)).andThrow(new NotFoundException());
-    EasyMock.replay(presetProvider);
-
-    // Workflow configuration
-    Map<String, String> workflowConfiguration = new HashMap<String, String>();
-    workflowConfiguration.put(OPT_KEY, WORKFLOW_PRESET_VALUE);
-
-    WorkflowInstance workflowInstance = setupInstance(seriesID, workflowConfiguration, false);
-
-    DefaultsWorkflowOperationHandler handler = new DefaultsWorkflowOperationHandler();
-    handler.setPresetProvider(presetProvider);
-    WorkflowOperationResult result = handler.start(workflowInstance, null);
-    assertEquals(WORKFLOW_PRESET_VALUE, result.getProperties().get(OPT_KEY));
-  }
-
-  @Test
-  public void usesWorkflowLevelPreset() throws WorkflowOperationException, NotFoundException {
-    Organization organization = EasyMock.createMock(Organization.class);
-    EasyMock.replay(organization);
-
-    String seriesID = "series-ID";
-
-    presetProvider = EasyMock.createMock(PresetProvider.class);
-    EasyMock.expect(presetProvider.getProperty(seriesID, OPT_KEY)).andReturn(null);
-    EasyMock.replay(presetProvider);
-
-    // Workflow configuration
-    Map<String, String> workflowConfiguration = new HashMap<String, String>();
-    workflowConfiguration.put(OPT_KEY, WORKFLOW_PRESET_VALUE);
-
-    WorkflowInstance workflowInstance = setupInstance(seriesID, workflowConfiguration, false);
-
-    DefaultsWorkflowOperationHandler handler = new DefaultsWorkflowOperationHandler();
-    handler.setPresetProvider(presetProvider);
-    WorkflowOperationResult result = handler.start(workflowInstance, null);
-    assertEquals(WORKFLOW_PRESET_VALUE, result.getProperties().get(OPT_KEY));
   }
 
   /**

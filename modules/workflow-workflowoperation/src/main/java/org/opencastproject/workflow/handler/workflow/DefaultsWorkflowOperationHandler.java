@@ -23,7 +23,6 @@ package org.opencastproject.workflow.handler.workflow;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
@@ -59,30 +58,6 @@ public class DefaultsWorkflowOperationHandler extends AbstractWorkflowOperationH
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(DefaultsWorkflowOperationHandler.class);
-
-  /**
-   * Gets a series or organization preset if it is present.
-   *
-   * @param organizationId
-   *          The organization to check for organization level presets.
-   * @param seriesID
-   *          The id of the series to check for series level presets.
-   * @param key
-   *          The key name for the preset to check for.
-   * @return The preset if available, null if not.
-   */
-  private String getPreset(final String organizationId, final String seriesID, final String key) {
-    // Check to see if the default value was set as a preset at the series or organization level
-    try {
-      if (presetProvider != null) {
-        return presetProvider.getProperty(seriesID, key);
-      }
-    } catch (NotFoundException e) {
-      logger.debug("No preset for key {} from organization {} and series {}. Using the default value if available.",
-                   key, organizationId, seriesID);
-    }
-    return null;
-  }
 
   /**
    * {@inheritDoc}
