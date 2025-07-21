@@ -39,6 +39,16 @@ public class WorkflowConditionInterpreterTest {
   }
 
   @Test
+  public void replaceDefaultWithEscapedColonAndWithoutDefaultValue() {
+    assertEquals("before false after", WorkflowConditionInterpreter.replaceDefaults("before ${foo\\:1} after"));
+  }
+
+  @Test
+  public void replaceDefaultWithEscapedColonAndWithDefaultValue() {
+    assertEquals("before 2:3 after", WorkflowConditionInterpreter.replaceDefaults("before ${foo\\:1:2\\:3} after"));
+  }
+
+  @Test
   public void interpretTrue() {
     assertTrue(WorkflowConditionInterpreter.interpret("true"));
   }
