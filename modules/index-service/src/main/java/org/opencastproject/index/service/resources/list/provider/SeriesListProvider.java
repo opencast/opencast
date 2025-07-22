@@ -206,6 +206,37 @@ public class SeriesListProvider implements ResourceListProvider {
     if (query.getOffset().isSome()) {
       seriesQuery.withOffset(query.getOffset().get());
     }
+
+    for (ResourceListFilter filter : query.getFilters()) {
+      if (filter.getValue().isNone()) {
+        continue;
+      } else if (SeriesListQuery.FILTER_CREATIONDATE_NAME.equals(filter.getName())) {
+        Tuple<Date, Date> creationDate = (Tuple<Date, Date>) filter.getValue().get();
+        if (creationDate.getA() != null) {
+          seriesQuery.withCreatedFrom(creationDate.getA());
+        }
+        if (creationDate.getB() != null) {
+          seriesQuery.withCreatedTo(creationDate.getB());
+        }
+      } else if (SeriesListQuery.FILTER_CREATOR_NAME.equals(filter.getName())) {
+        seriesQuery.withCreator((String)filter.getValue().get());
+      } else if (SeriesListQuery.FILTER_CONTRIBUTORS_NAME.equals(filter.getName())) {
+        seriesQuery.withContributor((String)filter.getValue().get());
+      } else if (SeriesListQuery.FILTER_LANGUAGE_NAME.equals(filter.getName())) {
+        seriesQuery.withLanguage((String)filter.getValue().get());
+      } else if (SeriesListQuery.FILTER_LICENSE_NAME.equals(filter.getName())) {
+        seriesQuery.withLicense((String)filter.getValue().get());
+      } else if (SeriesListQuery.FILTER_ORGANIZERS_NAME.equals(filter.getName())) {
+        seriesQuery.withOrganizer((String)filter.getValue().get());
+      } else if (SeriesListQuery.FILTER_SUBJECT_NAME.equals(filter.getName())) {
+        seriesQuery.withSubject((String)filter.getValue().get());
+      } else if (SeriesListQuery.FILTER_TEXT_NAME.equals(filter.getName())) {
+        seriesQuery.withText((String)filter.getValue().get());
+      } else if (SeriesListQuery.FILTER_TITLE_NAME.equals(filter.getName())) {
+        seriesQuery.withTitle((String)filter.getValue().get());
+      }
+    }
+
     if (query instanceof SeriesListQuery) {
       if (((SeriesListQuery) query).getReadPermission().isSome()
           || ((SeriesListQuery) query).getWritePermission().isSome()) {
@@ -215,35 +246,6 @@ public class SeriesListProvider implements ResourceListProvider {
         }
         if (((SeriesListQuery) query).getWritePermission().getOrElse(false)) {
           seriesQuery.withAction(Permissions.Action.WRITE);
-        }
-      }
-      for (ResourceListFilter filter : query.getFilters()) {
-        if (filter.getValue().isNone()) {
-          continue;
-        } else if (SeriesListQuery.FILTER_CREATIONDATE_NAME.equals(filter.getName())) {
-          Tuple<Date, Date> creationDate = (Tuple<Date, Date>) filter.getValue().get();
-          if (creationDate.getA() != null) {
-            seriesQuery.withCreatedFrom(creationDate.getA());
-          }
-          if (creationDate.getB() != null) {
-            seriesQuery.withCreatedTo(creationDate.getB());
-          }
-        } else if (SeriesListQuery.FILTER_CREATOR_NAME.equals(filter.getName())) {
-          seriesQuery.withCreator((String)filter.getValue().get());
-        } else if (SeriesListQuery.FILTER_CONTRIBUTORS_NAME.equals(filter.getName())) {
-          seriesQuery.withContributor((String)filter.getValue().get());
-        } else if (SeriesListQuery.FILTER_LANGUAGE_NAME.equals(filter.getName())) {
-          seriesQuery.withLanguage((String)filter.getValue().get());
-        } else if (SeriesListQuery.FILTER_LICENSE_NAME.equals(filter.getName())) {
-          seriesQuery.withLicense((String)filter.getValue().get());
-        } else if (SeriesListQuery.FILTER_ORGANIZERS_NAME.equals(filter.getName())) {
-          seriesQuery.withOrganizer((String)filter.getValue().get());
-        } else if (SeriesListQuery.FILTER_SUBJECT_NAME.equals(filter.getName())) {
-          seriesQuery.withSubject((String)filter.getValue().get());
-        } else if (SeriesListQuery.FILTER_TEXT_NAME.equals(filter.getName())) {
-          seriesQuery.withText((String)filter.getValue().get());
-        } else if (SeriesListQuery.FILTER_TITLE_NAME.equals(filter.getName())) {
-          seriesQuery.withTitle((String)filter.getValue().get());
         }
       }
     }
