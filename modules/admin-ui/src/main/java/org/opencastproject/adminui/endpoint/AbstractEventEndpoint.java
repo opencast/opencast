@@ -1267,7 +1267,7 @@ public abstract class AbstractEventEndpoint {
     // We do this after extended metadata because we want to overwrite any extended metadata adapters with the same
     // flavor instead of the other way around.
     EventCatalogUIAdapter eventCatalogUiAdapter = getIndexService().getCommonEventCatalogUIAdapter();
-    DublinCoreMetadataCollection metadataCollection = eventCatalogUiAdapter.getRawFields(getCollectionQueryOverrides());
+    DublinCoreMetadataCollection metadataCollection = eventCatalogUiAdapter.getRawFields(getCollectionQueryDisable());
     EventUtils.setEventMetadataValues(event, metadataCollection);
     metadataList.add(eventCatalogUiAdapter, metadataCollection);
 
@@ -1283,19 +1283,16 @@ public abstract class AbstractEventEndpoint {
   }
 
   /**
-   * If we only want to show series with write access, create a special query to fill the collection of the series
-   * metadata field
+   * Create a special query that disables filling the collection of a series, for performance reasons.
+   * The collection can still be fetched via the listprovider endpoint.
    *
    * @return a map with resource list queries belonging to metadata fields
    */
-  private Map getCollectionQueryOverrides() {
+  private Map getCollectionQueryDisable() {
     HashMap<String, ResourceListQuery> collectionQueryOverrides = new HashMap();
-    if (getOnlySeriesWithWriteAccessEventModal()) {
-      SeriesListQuery seriesListQuery = new SeriesListQuery();
-      seriesListQuery.withReadPermission(true);
-      seriesListQuery.withWritePermission(true);
-      collectionQueryOverrides.put(DublinCore.PROPERTY_IS_PART_OF.getLocalName(), seriesListQuery);
-    }
+    SeriesListQuery seriesListQuery = new SeriesListQuery();
+    seriesListQuery.setLimit(0);
+    collectionQueryOverrides.put(DublinCore.PROPERTY_IS_PART_OF.getLocalName(), seriesListQuery);
     return collectionQueryOverrides;
   }
 
@@ -1358,7 +1355,7 @@ public abstract class AbstractEventEndpoint {
       // collect metadata
       EventCatalogUIAdapter eventCatalogUiAdapter = getIndexService().getCommonEventCatalogUIAdapter();
       DublinCoreMetadataCollection metadataCollection = eventCatalogUiAdapter.getRawFields(
-              getCollectionQueryOverrides());
+            getCollectionQueryDisable());
       EventUtils.setEventMetadataValues(event, metadataCollection);
       collectedMetadata.add(metadataCollection);
 
@@ -2332,7 +2329,7 @@ public abstract class AbstractEventEndpoint {
     // We do this after extended metadata because we want to overwrite any extended metadata adapters with the same
     // flavor instead of the other way around.
     EventCatalogUIAdapter commonCatalogUiAdapter = getIndexService().getCommonEventCatalogUIAdapter();
-    DublinCoreMetadataCollection commonMetadata = commonCatalogUiAdapter.getRawFields(getCollectionQueryOverrides());
+    DublinCoreMetadataCollection commonMetadata = commonCatalogUiAdapter.getRawFields(getCollectionQueryDisable());
 
     if (commonMetadata.getOutputFields().containsKey(DublinCore.PROPERTY_CREATED.getLocalName()))
       commonMetadata.removeField(commonMetadata.getOutputFields().get(DublinCore.PROPERTY_CREATED.getLocalName()));
