@@ -375,8 +375,8 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
       Job job;
       Map<String, Track> sourceTracks = new HashMap<>();
       if (StringUtils.isNotBlank(sourceTracksXml)) {
-        for (String sourceTrackEntry : StringUtils.split(sourceTracksXml, "#|#")) {
-          String[] sourceTrackEntryTuple = StringUtils.split(sourceTrackEntry, "#=#", 2);
+        for (String sourceTrackEntry : StringUtils.splitByWholeSeparator(sourceTracksXml, "#|#")) {
+          String[] sourceTrackEntryTuple = StringUtils.splitByWholeSeparator(sourceTrackEntry, "#=#", 2);
           if (sourceTrackEntryTuple.length != 2) {
             return Response.status(Response.Status.BAD_REQUEST).entity("sourceTracks value invalid").build();
           }
