@@ -110,7 +110,6 @@ A list of everything.
     - [Microsoft Azure](transcription.configuration/microsoftazure.md)
     - [Vosk](transcription.configuration/vosk.md)
     - [Whisper](transcription.configuration/whisper.md)
-- [User Statistics and Privacy Configuration](user-statistics.and.privacy.md)
 - [Video Editor Overview](videoeditor.overview.md)
     - [Architecture](videoeditor.architecture.md)
     - [Frontend](videoeditor.frontend.md)

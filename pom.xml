@@ -267,8 +267,6 @@
     <module>modules/userdirectory-sakai</module>
     <module>modules/userdirectory-studip</module>
     <module>modules/userdirectory</module>
-    <module>modules/usertracking-api</module>
-    <module>modules/usertracking-impl</module>
     <module>modules/videoeditor-api</module>
     <module>modules/videoeditor-ffmpeg-impl</module>
     <module>modules/videoeditor-remote</module>
