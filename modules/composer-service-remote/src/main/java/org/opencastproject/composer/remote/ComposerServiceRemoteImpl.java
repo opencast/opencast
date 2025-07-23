@@ -256,7 +256,7 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
       List<String> sourceTracksEntries = new ArrayList<>();
       for (Entry<String, Track> sourceTrack : sourceTracks.entrySet()) {
         String sourceTrackXml = MediaPackageElementParser.getAsXml(sourceTrack.getValue());
-        sourceTracksEntries.add(StringUtils.join(sourceTrack.getKey(), sourceTrackXml, "#=#"));
+        sourceTracksEntries.add(StringUtils.join(sourceTrack.getKey(), "#=#", sourceTrackXml));
       }
       params.add(new BasicNameValuePair("sourceTracks", StringUtils.join(sourceTracksEntries, "#|#")));
       params.add(new BasicNameValuePair("profileId", profileId));
