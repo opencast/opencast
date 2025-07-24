@@ -1,5 +1,27 @@
 # Opencast 17: Release Notes
 
+## Opencast 17.6
+
+This version contains a **security fix**! It is advised to update to this version in a timely fashion. More information
+to follow.
+
+Workflow variables containing a colon in the variable name can now be escaped with a backslash.
+Beforehand, the variable syntax ${var:iable} would interpret the part after the : as the default value if var was not
+defined. This is especially useful for workflow properties defined by analyze-mediapackage based on element tags like
+`lang:en`. Please note that this is a breaking change in the sense that the string "\:" will now be interpreted as a
+":" ([#6884](https://github.com/opencast/opencast/pull/6884)).
+
+Apart from that, this release contains multiple bug fixes, e.g. for timeouts in Stud.IP
+([#6825](https://github.com/opencast/opencast/pull/6825)) and multi-threading for WhisperCPP
+([#6883](https://github.com/opencast/opencast/pull/6883)) as well as snapshot deletion for remote storage
+(([#6885](https://github.com/opencast/opencast/pull/6885)).
+
+As a feature, we now accept AAI attributes as list ([#6831](https://github.com/opencast/opencast/pull/6831)).
+
+There are also new versions of both the admin ui
+([2025-07-24](https://github.com/opencast/opencast-admin-interface/releases/tag/2025-07-24) and the editor
+([2025-07-24](https://github.com/opencast/opencast-editor/releases/tag/2025-07-24) included.
+
 ## Opencast 17.5
 
 This release contains quite a few bug fixes and other improvements, most
