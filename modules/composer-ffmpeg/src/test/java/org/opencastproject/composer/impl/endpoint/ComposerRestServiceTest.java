@@ -126,13 +126,16 @@ public class ComposerRestServiceTest {
     response = restService.encode(null, "profile");
     Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
-    response = restService.mux(generateAudioTrack(), null, "profile");
+    response = restService.mux(generateAudioTrack(), null, null, "profile");
     Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
-    response = restService.mux(null, generateVideoTrack(), "profile");
+    response = restService.mux(null, generateVideoTrack(), null, "profile");
     Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
 
-    response = restService.mux(generateAudioTrack(), generateVideoTrack(), null);
+    response = restService.mux(generateAudioTrack(), generateVideoTrack(), null, null);
+    Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+
+    response = restService.mux(null, null, null, "profile");
     Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
   }
 
@@ -145,7 +148,7 @@ public class ComposerRestServiceTest {
 
   @Test
   public void testMux() throws Exception {
-    Response response = restService.mux(generateAudioTrack(), generateVideoTrack(), profileId);
+    Response response = restService.mux(generateAudioTrack(), generateVideoTrack(),null, profileId);
     Assert.assertEquals(Response.Status.OK.getStatusCode(), response.getStatus());
     Assert.assertEquals(new JaxbJob(job), response.getEntity());
   }
@@ -205,5 +208,4 @@ public class ComposerRestServiceTest {
             + "    <bitdepth>0</bitdepth>\n" + "    <bitrate>128004.0</bitrate>\n"
             + "    <samplingrate>44100</samplingrate>\n" + "  </audio>\n" + "</track>";
   }
-
 }
