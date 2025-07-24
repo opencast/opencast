@@ -31,8 +31,8 @@
   If you want to use this feature and use your own workflows, have a look at the required changes in the PR.
   [[#5856](https://github.com/opencast/opencast/pull/5856)]
 
-For more details, please take a look at the [full changelog](changelog.md). If you want to update Opencast from a
-previous version, you should also read the [upgrade guide](upgrade.md).
+For more details, please take a look at the [full changelog](changelog/opencast-18.md). If you want to update Opencast 
+from a previous version, you should also read the [upgrade guide](upgrade.md).
 
 ## Release Schedule
 

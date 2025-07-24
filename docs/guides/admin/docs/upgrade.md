@@ -37,7 +37,8 @@ The most important changes are:
 ### 1. Database Migration
 Before running the data extraction script, you **must** apply the database migration `mariadb.sql` or `postgres.sql`.
 This step ensures that the necessary schema changes are applied before updating the records. You will find database
-upgrade scripts in `docs/upgrade/17_to_18/`.
+upgrade scripts in `docs/upgrade/17_to_18/`. **Make sure to backup your database before migrating, to be able to easily 
+revert changes, if necessary.**
 
 ### 2. Elasticsearch Data Extraction and SQL Update Script Generation
 After completing the database migration, run the provided Bash script `extract_es_data.sh` to extract data from
@@ -97,7 +98,9 @@ Replace `<db_user>` and `<db_name>` with your actual database credentials.
 ## Index Rebuild
 
 [[#6498](https://github.com/opencast/opencast/pull/6498)] requires an update of the index settings, mappings and text
-fields, for which there is a migration script `optimize_search.sh`  in `docs/upgrade/17_to_18/`.
+fields, for which there is a migration script `optimize_search.sh`  in `docs/upgrade/17_to_18/`. The script makes use of
+the present files `event_mapping.json`, `series_mapping.json`, `theme_mapping.json`, `search_mapping.json` and
+`indexSettings.json`, so make sure to put these in the same folder as the script when executing.
 
 [[#6696](https://github.com/opencast/opencast/pull/6696)] only requires an update to the indexed Elasticsearch/Opensearch
 ACLs if you haven't used this feature before. **If this feature was already enabled, no further actions are required.**
