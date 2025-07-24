@@ -9,6 +9,8 @@
 - Opencast now supports plugins with different modules on different distributions. [[#6303](https://github.com/opencast/opencast/pull/6303)]
 - Various improvements to full-text search [[#6498](https://github.com/opencast/opencast/pull/6498)]
 - Added support for audio-only uploads [[#5856](https://github.com/opencast/opencast/pull/5856)]
+- Added the mux WOH which is able to encode multiple tracks into one.
+  [[#6894](https://github.com/opencast/opencast/pull/6894)]
 
 ### Breaking Changes
 - The animate service and workflow operation have been removed. Make sure to update your custom workflows, if you used
@@ -18,6 +20,8 @@
 - The crop service is now a plugin and disabled by default. If you have used it in previous versions, you need to enable
   it in `etc/org.opencastproject.plugin.impl.PluginManagerImpl.cfg`. [[#6303](https://github.com/opencast/opencast/pull/6303)]
 - The required Java version is now 21. [[#6472](https://github.com/opencast/opencast/pull/6472)]
+- We switched to using the new default binary names used by Whisper.cpp. The default model directory is now
+  /usr/share/whisper.cpp/models [[#6794](https://github.com/opencast/opencast/pull/6794)]
 
 ### Configuration Changes
 - Series, Editor and Login-Buttons in the PaellaPlayer are now disabled by default.
