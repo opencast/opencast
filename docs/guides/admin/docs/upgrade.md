@@ -37,7 +37,7 @@ The most important changes are:
 ### 1. Database Migration
 Before running the data extraction script, you **must** apply the database migration `mariadb.sql` or `postgres.sql`.
 This step ensures that the necessary schema changes are applied before updating the records. You will find database
-upgrade scripts in `docs/upgrade/17_to_18/`. **Make sure to backup your database before migrating, to be able to easily 
+upgrade scripts in `docs/upgrade/17_to_18/`. **Make sure to backup your database before migrating, to be able to easily
 revert changes, if necessary.**
 
 ### 2. Elasticsearch Data Extraction and SQL Update Script Generation
