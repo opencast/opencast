@@ -73,6 +73,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -108,8 +109,8 @@ public class IngestServiceImplTest {
   private WorkflowInstance workflowInstance = null;
   private WorkingFileRepository wfr = null;
   private CloseableHttpResponse httpResponse = null;
-  private CloseableHttpClient credClient = null;
-  private CloseableHttpClient noCredClient = null;
+  private CloseableHttpClient customClient = null;
+  private TrustedHttpClient httpClient;
   private static URI baseDir;
   private static URI urlTrack;
   private static URI urlTrack1;
@@ -273,7 +274,7 @@ public class IngestServiceImplTest {
     EasyMock.expect(httpResponse.getEntity()).andReturn(entity).anyTimes();
     EasyMock.replay(httpResponse);
 
-    TrustedHttpClient httpClient = EasyMock.createNiceMock(TrustedHttpClient.class);
+    httpClient = EasyMock.createNiceMock(TrustedHttpClient.class);
     EasyMock.expect(httpClient.execute((HttpGet) EasyMock.anyObject())).andReturn(httpResponse).anyTimes();
     EasyMock.replay(httpClient);
 
@@ -306,17 +307,6 @@ public class IngestServiceImplTest {
         //These are overriden so that we get mock requests, not *actual* requests
         @Override
         protected CloseableHttpClient getAuthedHttpClient() {
-          CloseableHttpClient client = EasyMock.createMock(CloseableHttpClient.class);
-          try {
-            EasyMock.expect(client.execute((HttpGet) EasyMock.anyObject())).andReturn(httpResponse).anyTimes();
-            client.close();
-            EasyMock.expectLastCall().once();
-          } catch (Exception e) { }
-          EasyMock.replay(client);
-          return client;
-        }
-        @Override
-        protected CloseableHttpClient getNoAuthHttpClient() {
           CloseableHttpClient client = EasyMock.createMock(CloseableHttpClient.class);
           try {
             EasyMock.expect(client.execute((HttpGet) EasyMock.anyObject())).andReturn(httpResponse).anyTimes();
@@ -434,33 +424,28 @@ public class IngestServiceImplTest {
   }
 
   private void testAuthWhitelist(String url, String regex, boolean shouldFail, boolean shouldSendAuth, boolean shouldTouchMocks) throws Exception {
-    credClient = EasyMock.createNiceMock(CloseableHttpClient.class);
-    noCredClient = EasyMock.createNiceMock(CloseableHttpClient.class);
+    customClient = EasyMock.createNiceMock(CloseableHttpClient.class);
+    EasyMock.reset(httpClient);
 
     //There's one case (accessing the filesystem) where we *don't* expect the mocks to be used
     if (shouldTouchMocks) {
       if (shouldSendAuth) {
-        EasyMock.expect(credClient.execute(EasyMock.anyObject())).andReturn(httpResponse).once();
-        credClient.close();
+        EasyMock.expect(customClient.execute(EasyMock.anyObject())).andReturn(httpResponse).once();
+        customClient.close();
         EasyMock.expectLastCall().once();
       } else {
-        EasyMock.expect(noCredClient.execute(EasyMock.anyObject())).andReturn(httpResponse).once();
-        noCredClient.close();
+        EasyMock.expect(httpClient.execute(EasyMock.anyObject())).andReturn(httpResponse).once();
+        httpClient.close(EasyMock.anyObject(HttpResponse.class));
         EasyMock.expectLastCall().once();
       }
     }
-    EasyMock.replay(noCredClient, credClient);
+    EasyMock.replay(httpClient, customClient);
 
     //Recreate the service so we use our own, custom mocks
     service = new IngestServiceImpl() {
       @Override
       protected CloseableHttpClient getAuthedHttpClient() {
-        return credClient;
-      }
-
-      @Override
-      protected CloseableHttpClient getNoAuthHttpClient() {
-        return noCredClient;
+        return customClient;
       }
     };
     setupService();
@@ -481,8 +466,8 @@ public class IngestServiceImplTest {
         Assert.fail("Should not have failed!");
       }
     }
-    EasyMock.verify(credClient, noCredClient);
-    EasyMock.reset(credClient, noCredClient);
+    EasyMock.verify(customClient, httpClient);
+    EasyMock.reset(customClient, httpClient);
   }
 
   @Test

@@ -28,15 +28,20 @@ import static org.easymock.EasyMock.isA;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbUser;
+import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClientException;
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
+import org.opencastproject.serviceregistry.api.HostRegistration;
+import org.opencastproject.serviceregistry.api.HostRegistrationInMemory;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 
 import org.apache.http.Header;
@@ -53,6 +58,7 @@ import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicHttpResponse;
 import org.apache.http.message.BasicStatusLine;
 import org.easymock.Capture;
+import org.easymock.CaptureType;
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
@@ -61,6 +67,11 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class TrustedHttpClientImplTest {
 
@@ -72,6 +83,7 @@ public class TrustedHttpClientImplTest {
   private CloseableHttpResponse nonceResponse;
   private ServiceRegistry serviceRegistry;
   private SecurityService securityService;
+  private OrganizationDirectoryService organizationDirectoryService;
 
   @Before
   public void setUp() throws Exception {
@@ -93,19 +105,36 @@ public class TrustedHttpClientImplTest {
     expect(currentJob.getId()).andReturn(currentJobId).anyTimes();
     replay(currentJob);
 
+    DefaultOrganization defaultOrganization = new DefaultOrganization();
+
     securityService = createNiceMock(SecurityService.class);
-    expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
+    expect(securityService.getOrganization()).andReturn(defaultOrganization).anyTimes();
     expect(securityService.getUser()).andReturn(new JaxbUser()).anyTimes();
     replay(securityService);
+
+    organizationDirectoryService = createNiceMock(OrganizationDirectoryService.class);
+    expect(organizationDirectoryService.getOrganizations()).andReturn(List.of(defaultOrganization));
+    replay(organizationDirectoryService);
+
+    HostRegistration localhost = new HostRegistrationInMemory("http://localhost:8080", "127.0.0.1",
+        "admin", 4.0f, 2, 4194304);
+    HostRegistration admin = new HostRegistrationInMemory("http://admin.example.org", "127.0.0.1",
+        "admin", 4.0f, 2, 4194304);
+    HostRegistration worker = new HostRegistrationInMemory("http://worker.example.org", "127.0.0.1",
+        "worker", 4.0f, 4, 2097152);
+    HostRegistration pres = new HostRegistrationInMemory("http://pres.example.org", "127.0.0.1",
+        "worker", 4.0f, 4, 2097152);
 
     serviceRegistry = createNiceMock(ServiceRegistry.class);
     expect(serviceRegistry.getCurrentJob()).andReturn(currentJob).anyTimes();
     expect(serviceRegistry.getJob(currentJobId)).andReturn(currentJob).anyTimes();
+    expect(serviceRegistry.getHostRegistrations()).andReturn(List.of(localhost, admin, worker, pres)).anyTimes();
     replay(serviceRegistry);
 
     client = new TrustedHttpClientImpl("u", "p");
     client.setServiceRegistry(serviceRegistry);
     client.setSecurityService(securityService);
+    client.setOrganizationDirectoryService(organizationDirectoryService);
     client.activate(componentContextMock);
     // Setup responses.
     final String digestValue = "Digest realm=\"testrealm@host.com\","
@@ -337,6 +366,7 @@ public class TrustedHttpClientImplTest {
 
     client.setServiceRegistry(serviceRegistry);
     client.setSecurityService(securityService);
+    client.setOrganizationDirectoryService(organizationDirectoryService);
     client.activate(componentContextMock);
 
     HttpPost httpPost = new HttpPost("http://localhost:8080/fake");
@@ -383,6 +413,7 @@ public class TrustedHttpClientImplTest {
     };
     client.setServiceRegistry(serviceRegistry);
     client.setSecurityService(securityService);
+    client.setOrganizationDirectoryService(organizationDirectoryService);
     client.activate(componentContextMock);
 
     HttpPost httpPost = new HttpPost("http://localhost:8080/fake");
@@ -428,6 +459,7 @@ public class TrustedHttpClientImplTest {
     };
     client.setServiceRegistry(serviceRegistry);
     client.setSecurityService(securityService);
+    client.setOrganizationDirectoryService(organizationDirectoryService);
     client.activate(componentContextMock);
 
     HttpPost httpPost = new HttpPost("http://localhost:8080/fake");
@@ -474,6 +506,7 @@ public class TrustedHttpClientImplTest {
     };
     client.setServiceRegistry(serviceRegistry);
     client.setSecurityService(securityService);
+    client.setOrganizationDirectoryService(organizationDirectoryService);
     client.activate(componentContextMock);
 
     HttpPost httpPost = new HttpPost("http://localhost:8080/fake");
@@ -527,6 +560,7 @@ public class TrustedHttpClientImplTest {
     };
     client.setServiceRegistry(serviceRegistry);
     client.setSecurityService(securityService);
+    client.setOrganizationDirectoryService(organizationDirectoryService);
     client.activate(componentContextMock);
 
     HttpPost httpPost = new HttpPost("http://localhost:8080/fake");
@@ -571,6 +605,8 @@ public class TrustedHttpClientImplTest {
       }
     };
     client.setSecurityService(securityService);
+    client.setOrganizationDirectoryService(organizationDirectoryService);
+    client.setServiceRegistry(serviceRegistry);
     client.setUrlSigningService(urlSigningService);
     client.activate(componentContextMock);
 
@@ -606,6 +642,8 @@ public class TrustedHttpClientImplTest {
       }
     };
     client.setSecurityService(securityService);
+    client.setOrganizationDirectoryService(organizationDirectoryService);
+    client.setServiceRegistry(serviceRegistry);
     client.setUrlSigningService(urlSigningService);
 
     client.execute(headRequest);
@@ -637,5 +675,86 @@ public class TrustedHttpClientImplTest {
     assertEquals(client.getSignedUrl(notAccepted), notAccepted);
     assertEquals(client.getSignedUrl(notGetOrHead), notGetOrHead);
     assertEquals(client.getSignedUrl(ok).getURI().toString(), signedOk);
+  }
+
+  @Test
+  public void testClusterDetection() throws IOException {
+
+    Map<String, Integer> servers = new HashMap<>();
+    servers.put("tenant-admin.example.org", 8080);
+    servers.put("tenant-pres.example.org", 8080);
+    servers = Collections.unmodifiableMap(servers);
+    Organization fakeOrg = new DefaultOrganization(servers);
+
+    SecurityService secSvc = createNiceMock(SecurityService.class);
+    expect(secSvc.getOrganization()).andReturn(fakeOrg).anyTimes();
+    expect(secSvc.getUser()).andReturn(new JaxbUser()).anyTimes();
+    replay(secSvc);
+
+    OrganizationDirectoryService orgDirSvc = createNiceMock(OrganizationDirectoryService.class);
+    expect(orgDirSvc.getOrganizations()).andReturn(List.of(fakeOrg)).anyTimes();
+    replay(orgDirSvc);
+
+    // Setup signing service
+    UrlSigningService urlSigningService = EasyMock.createNiceMock(UrlSigningService.class);
+    EasyMock.expect(urlSigningService.accepts(EasyMock.anyString())).andReturn(false).anyTimes();
+    EasyMock.replay(urlSigningService);
+
+    Capture<HttpUriRequest> request = EasyMock.newCapture(CaptureType.ALL);
+
+    // Setup Http Client
+    CloseableHttpClient httpClient = createNiceMock(CloseableHttpClient.class);
+    expect(httpClient.execute(EasyMock.capture(request))).andReturn(okResponse).anyTimes();
+    httpClient.close();
+    EasyMock.expectLastCall().anyTimes();
+
+    HttpClientBuilder httpClientBuilder = createNiceMock(HttpClientBuilder.class);
+    expect(httpClientBuilder.build()).andReturn(httpClient).anyTimes();
+
+    replay(httpClientBuilder, httpClient);
+
+    client = new TrustedHttpClientImpl("u", "p") {
+      @Override
+      public HttpClientBuilder makeHttpClientBuilder(int connectionTimeout, int socketTimeout) {
+        return httpClientBuilder;
+      }
+    };
+    client.setSecurityService(secSvc);
+    client.setServiceRegistry(serviceRegistry);
+    client.setOrganizationDirectoryService(orgDirSvc);
+    client.setUrlSigningService(urlSigningService);
+
+    //Reminder: the valid nodes for the current org are:
+    // - http://localhost:80
+    // - http://admin:8080
+    //Note that we are *not* checking that the auth credentials are correct.  That's a final method, which won't mock.
+    //Instead we check if the desire to use Digest auth is present.  That's close enough.
+    client.execute(new HttpGet("http://localhost:8080/info/me.json"));
+    //This isn't part of the cluster at all, don't send auth
+    client.execute(new HttpGet("http://www.example.org"));
+    //This is the admin node, but https rather than http as defined in the org.  Safe to send credentials, *but*
+    // the host cache in TrustedHttpClientImpl uses Organization::getServers, which returns a string like http://admin
+    // then compares the URI passed in to that string.  Thus, while we *could* send the auth, we don't since http!=https
+    client.execute(new HttpGet("https://admin.example.org"));
+    //This is the admin node, but on the wrong port (80 vs 8080).  Still safe to send credentials.
+    //The behaviour here is different than the above because same cache as above discards the port defined by the server
+    //This makes sense when you think of it - the *host* is the important part, not the port or protocol.
+    client.execute(new HttpGet("http://admin.example.org"));
+    //Similar to the admin node, but *not*.  Don't send credentials.
+    client.execute(new HttpGet("http://tenant-admin.example.org"));
+    client.execute(new HttpGet("https://tenant-pres.example.org"));
+
+    assertTrue(Arrays.stream(request.getValues().get(0).getHeaders(DelegatingAuthenticationEntryPoint.REQUESTED_AUTH_HEADER))
+        .anyMatch(header -> DelegatingAuthenticationEntryPoint.DIGEST_AUTH.equals(header.getValue())));
+    assertFalse(Arrays.stream(request.getValues().get(1).getHeaders(DelegatingAuthenticationEntryPoint.REQUESTED_AUTH_HEADER))
+        .anyMatch(header -> DelegatingAuthenticationEntryPoint.DIGEST_AUTH.equals(header.getValue())));
+    assertTrue(Arrays.stream(request.getValues().get(2).getHeaders(DelegatingAuthenticationEntryPoint.REQUESTED_AUTH_HEADER))
+        .anyMatch(header -> DelegatingAuthenticationEntryPoint.DIGEST_AUTH.equals(header.getValue())));
+    assertTrue(Arrays.stream(request.getValues().get(3).getHeaders(DelegatingAuthenticationEntryPoint.REQUESTED_AUTH_HEADER))
+        .anyMatch(header -> DelegatingAuthenticationEntryPoint.DIGEST_AUTH.equals(header.getValue())));
+    assertTrue(Arrays.stream(request.getValues().get(4).getHeaders(DelegatingAuthenticationEntryPoint.REQUESTED_AUTH_HEADER))
+        .anyMatch(header -> DelegatingAuthenticationEntryPoint.DIGEST_AUTH.equals(header.getValue())));
+    assertTrue(Arrays.stream(request.getValues().get(5).getHeaders(DelegatingAuthenticationEntryPoint.REQUESTED_AUTH_HEADER))
+        .anyMatch(header -> DelegatingAuthenticationEntryPoint.DIGEST_AUTH.equals(header.getValue())));
   }
 }

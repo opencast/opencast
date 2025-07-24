@@ -21,7 +21,6 @@
 
 package org.opencastproject.tobira.impl;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_FORM_URLENCODED;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.Response.Status.BAD_REQUEST;
 import static org.opencastproject.util.doc.rest.RestParameter.Type;
@@ -45,6 +44,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
+import org.apache.commons.io.IOUtils;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -53,19 +53,22 @@ import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
 import javax.persistence.EntityManagerFactory;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.Consumes;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
 /**
@@ -271,23 +274,50 @@ public class TobiraEndpoint {
     return Response.status(BAD_REQUEST).entity(msg).build();
   }
 
+  /* Since CXF doesn't seem to like accepting multiple types on a single endpoint, this is what Tobira currently sends:
+    curl http://localhost/tobira/stats \
+        -H "Authorization: Basic YWRtaW46b3BlbmNhc3Q=" \
+        -H "Content-Type: application/json" \
+        -d '{
+        "num_realms": 3641,
+        "num_blocks": 5544,
+        "version": {
+      "identifier": "v3.4",
+          "build_time_utc": "Fri, 27 Jun 2025 09:13:53 +0000",
+          "git_commit_hash": "d421b168cc6a004dd008f4b8bc0de4070cd99c2c",
+          "git_was_dirty": true,
+          "target": "aarch64-apple-darwin"
+    },
+        "config": {
+      "download_button_shown": true,
+          "auth_source": "tobira-session",
+          "login_credentials_handler": "login-callback",
+          "session_endpoint_handler": "none",
+          "login_link_overridden": false,
+          "logout_link_overridden": false,
+          "uses_pre_auth": true
+    }
+  }' \
+    -v
+  */
   @POST
   @Path("/stats")
-  @Consumes({APPLICATION_JSON, APPLICATION_FORM_URLENCODED})
+  @Consumes(APPLICATION_JSON)
   @RestQuery(
       name = "stats",
-      description = "Accepts a json blob of statistical data about Tobira.",
-      restParameters = {
-          @RestParameter(description = "The Tobira data blob", isRequired = true, name = "stats", type = Type.STRING),
-      },
+      description = "Accepts a json blob of statistical data about Tobira.  To test this properly see the code.",
       responses = {
           @RestResponse(description = "Stats parsed", responseCode = HttpServletResponse.SC_ACCEPTED)
       },
       returnDescription = "No data returned, just a 204 on success"
   )
-  public Response acceptStats(@FormParam("stats") String stats) {
-    try {
-      cachedStats = gson.fromJson(stats, JsonElement.class).getAsJsonObject();
+  public Response acceptStats(@Context HttpServletRequest request) {
+    try (InputStream is = request.getInputStream()) {
+      String body = IOUtils.toString(is, request.getCharacterEncoding());
+      cachedStats = gson.fromJson(body, JsonElement.class).getAsJsonObject();
+    } catch (IOException e) {
+      logger.error("Error reading request body:", e);
+      return badRequest("Error reading response body");
     } catch (IllegalStateException e) {
       return Response.notAcceptable(null).build();
     }
