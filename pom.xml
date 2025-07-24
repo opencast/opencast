@@ -175,7 +175,6 @@
     <module>modules/runtime-info-openapi-ui</module>
     <module>modules/playlists</module>
     <module>modules/plugin-manager</module>
-    <module>modules/presets</module>
     <module>modules/publication-service-api</module>
     <module>modules/publication-service-configurable-remote</module>
     <module>modules/publication-service-configurable</module>
