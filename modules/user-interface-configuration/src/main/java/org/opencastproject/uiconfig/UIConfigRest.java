@@ -167,10 +167,11 @@ public class UIConfigRest {
 
     try {
       final String basePath = new File(uiConfigFolder, orgId).getCanonicalPath();
+      final String basePathWithSep = basePath.endsWith(File.separator) ? basePath : basePath + File.separator;
       final String configFileCanPath = configFile.getCanonicalPath();
 
       // is configFile a subdirectory of basePath (additional directory traversal protection), if not stop
-      if (!configFileCanPath.startsWith(basePath)) {
+      if (!configFileCanPath.startsWith(basePathWithSep)) {
         logger.debug("Directory traversal prevented (trying to access '{}')", configFile.getPath());
         throw new AccessDeniedException(configFileCanPath);
       }
