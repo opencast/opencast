@@ -2,8 +2,10 @@
 
 ## Opencast 17.6
 
-This version contains a **security fix**! It is advised to update to this version in a timely fashion. More information
-to follow.
+This version contains a **security fix**! Please see
+[GHSA-j63h-hmgw-x4j7](https://github.com/opencast/opencast/security/advisories/GHSA-j63h-hmgw-x4j7)
+for more details.
+It is advised to update to this version in a timely fashion.
 
 Workflow variables containing a colon in the variable name can now be escaped with a backslash.
 Beforehand, the variable syntax ${var:iable} would interpret the part after the : as the default value if var was not
