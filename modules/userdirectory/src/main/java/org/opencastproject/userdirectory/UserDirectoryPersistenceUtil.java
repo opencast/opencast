@@ -48,6 +48,7 @@ import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
 import javax.persistence.criteria.CriteriaQuery;
 import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Join;
 import javax.persistence.criteria.JoinType;
 import javax.persistence.criteria.Order;
 import javax.persistence.criteria.Predicate;
@@ -161,14 +162,14 @@ public final class UserDirectoryPersistenceUtil {
    * @throws IllegalArgumentException
    */
   public static Function<EntityManager, Long> countTotalGroupsQuery(String orgId, Optional<String> nameFilter,
-      Optional<String> textFilter) {
+      Optional<String> roleFilter, Optional<String> textFilter) {
     return em -> {
       CriteriaBuilder cb = em.getCriteriaBuilder();
       final CriteriaQuery<Long> query = cb.createQuery(Long.class);
       Root<JpaGroup> group = query.from(JpaGroup.class);
       query.select(cb.count(group));
 
-      addWhereToQuery(query, cb, group, orgId, nameFilter, textFilter);
+      addWhereToQuery(query, cb, group, orgId, nameFilter, roleFilter, textFilter);
 
       TypedQuery<Long> typedQuery = em.createQuery(query);
       return typedQuery.getSingleResult();
@@ -192,13 +193,17 @@ public final class UserDirectoryPersistenceUtil {
    *          fulltext filter (optional)
    */
   private static <E> void addWhereToQuery(CriteriaQuery<E> query, CriteriaBuilder cb, Root<JpaGroup> group,
-          String orgId, Optional<String> nameFilter, Optional<String> textFilter) {
+          String orgId, Optional<String> nameFilter, Optional<String> roleFilter, Optional<String> textFilter) {
     List<Predicate> conditions = new ArrayList<>();
     conditions.add(cb.equal(group.join("organization").get("id"), orgId));
 
     // exact match, case sensitive
     if (nameFilter.isPresent()) {
       conditions.add(cb.equal(group.get("name"), nameFilter.get()));
+    }
+    if (roleFilter.isPresent()) {
+      Join<JpaGroup, JpaRole> roleJoin = group.joinSet("roles", JoinType.LEFT);
+      conditions.add(cb.equal(roleJoin.get("name"), roleFilter.get()));
     }
     // not exact match, case-insensitive, each token needs to match at least one field
     if (textFilter.isPresent()) {
@@ -245,7 +250,7 @@ public final class UserDirectoryPersistenceUtil {
    * @return the group list
    */
   public static Function<EntityManager, List<JpaGroup>> findGroupsQuery(String orgId, Optional<Integer> limit,
-      Optional<Integer> offset, Optional<String> nameFilter, Optional<String> textFilter,
+      Optional<Integer> offset, Optional<String> nameFilter, Optional<String> roleFilter, Optional<String> textFilter,
       ArrayList<SortCriterion> sortCriteria) {
     return em -> {
       CriteriaBuilder cb = em.getCriteriaBuilder();
@@ -255,7 +260,7 @@ public final class UserDirectoryPersistenceUtil {
       query.distinct(true);
 
       // filter
-      addWhereToQuery(query, cb, group, orgId, nameFilter, textFilter);
+      addWhereToQuery(query, cb, group, orgId, nameFilter, roleFilter, textFilter);
 
       // sort
       List<Order> orders = new ArrayList<>();

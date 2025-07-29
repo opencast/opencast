@@ -190,8 +190,8 @@ public class GroupsEndpoint {
       sortCriteria.removeAll(deprecatedSortCriteria);
     }
 
-    List<JpaGroup> results = jpaGroupRoleProvider.getGroups(optLimit, optOffset, optNameFilter, Optional.empty(),
-            sortCriteria);
+    List<JpaGroup> results = jpaGroupRoleProvider.getGroups(optLimit, optOffset, optNameFilter,
+        Optional.empty(), Optional.empty(), sortCriteria);
 
     // sorting by members & roles is only available for api versions < 1.6.0
     if (requestedVersion.isSmallerThan(VERSION_1_6_0)) {

@@ -41,12 +41,15 @@ import org.opencastproject.util.data.Option;
 public class GroupsListQuery extends ResourceListQueryImpl {
 
   public static final String FILTER_NAME_NAME = "Name";
+  public static final String FILTER_ROLE_NAME = "Role";
   private static final String FILTER_NAME_LABEL = "FILTERS.USERS.NAME.LABEL";
+  private static final String FILTER_ROLE_LABEL = "FILTERS.USERS.ROLE.LABEL";
 
   public static final String FILTER_TEXT_NAME = "textFilter";
 
   public GroupsListQuery() {
     super();
+    this.availableFilters.add(createRoleFilter(Option.none()));
   }
 
   /**
@@ -69,6 +72,25 @@ public class GroupsListQuery extends ResourceListQueryImpl {
   }
 
   /**
+   * Add a {@link ResourceListFilter} filter to the query with the given role
+   *
+   * @param role
+   *          the role to filter for
+   */
+  public void withRole(String role) {
+    this.addFilter(createRoleFilter(Option.option(role)));
+  }
+
+  /**
+   * Returns an {@link Option} containing the role used to filter if set
+   *
+   * @return an {@link Option} containing the role or none.
+   */
+  public Option<String> getRole() {
+    return this.getFilterValue(FILTER_ROLE_NAME);
+  }
+
+  /**
    * Create a new {@link ResourceListFilter} based on a name
    *
    * @param name
@@ -78,6 +100,11 @@ public class GroupsListQuery extends ResourceListQueryImpl {
   public static ResourceListFilter<String> createNameFilter(Option<String> name) {
     return FiltersUtils.generateFilter(name, FILTER_NAME_NAME, FILTER_NAME_LABEL, SourceType.SELECT,
             Option.some(GroupsListProvider.NAME));
+  }
+
+  public static ResourceListFilter<String> createRoleFilter(Option<String> role) {
+    return FiltersUtils.generateFilter(role, FILTER_ROLE_NAME, FILTER_ROLE_LABEL, SourceType.SELECT,
+        Option.some(GroupsListProvider.ROLE_ONLY));
   }
 
 }

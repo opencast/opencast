@@ -493,10 +493,10 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
    * @return a list of groups
    */
   public List<JpaGroup> getGroups(Optional<Integer> limit, Optional<Integer> offset, Optional<String> nameFilter,
-          Optional<String> textFilter, ArrayList<SortCriterion> sortCriteria) {
+          Optional<String> roleFilter, Optional<String> textFilter, ArrayList<SortCriterion> sortCriteria) {
     String orgId = securityService.getOrganization().getId();
-    return db.exec(UserDirectoryPersistenceUtil.findGroupsQuery(orgId, limit, offset, nameFilter, textFilter,
-        sortCriteria));
+    return db.exec(UserDirectoryPersistenceUtil.findGroupsQuery(orgId, limit, offset, nameFilter, roleFilter,
+        textFilter, sortCriteria));
   }
 
   /**
@@ -509,9 +509,9 @@ public class JpaGroupRoleProvider implements AAIRoleProvider, GroupProvider, Gro
    *
    * @return a list of groups
    */
-  public long countTotalGroups(Optional<String> nameFilter, Optional<String> textFilter) {
+  public long countTotalGroups(Optional<String> nameFilter, Optional<String> roleFilter, Optional<String> textFilter) {
     String orgId = securityService.getOrganization().getId();
-    return db.exec(UserDirectoryPersistenceUtil.countTotalGroupsQuery(orgId, nameFilter, textFilter));
+    return db.exec(UserDirectoryPersistenceUtil.countTotalGroupsQuery(orgId, nameFilter, roleFilter, textFilter));
   }
 
   /**
