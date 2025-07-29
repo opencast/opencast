@@ -185,7 +185,7 @@ public class UserAndRoleDirectoryServiceImplTest {
   @Test
   @SuppressWarnings("unchecked")
   public void testGetUsers() {
-    List<User> users = IteratorUtils.toList(directory.getUsers());
+    List<User> users = directory.getUsers();
     Assert.assertEquals(2, users.size());
   }
 
