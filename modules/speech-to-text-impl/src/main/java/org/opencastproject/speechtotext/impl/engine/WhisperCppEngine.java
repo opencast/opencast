@@ -50,6 +50,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -87,6 +88,12 @@ public class WhisperCppEngine implements SpeechToTextEngine {
 
   /** Currently used whispercpp model */
   private String whispercppModel = WHISPERCPP_MODEL_DEFAULT;
+
+  /** Config key for additional Whisper args */
+  private static final String WHISPERCPP_ARGS_CONFIG_KEY = "whisper.args";
+
+  /** Currently used Whisper args */
+  private String[] whispercppArgs;
 
   /** Config key for setting whispercpp beam size */
   private static final String WHISPERCPP_BEAM_SIZE_CONFIG_KEY = "whispercpp.beam-size";
@@ -269,6 +276,9 @@ public class WhisperCppEngine implements SpeechToTextEngine {
       logger.debug("WhisperC++ no fallback set to {}", whispercppNoFallback);
     }
 
+    whispercppArgs = StringUtils.split(Objects.toString(cc.getProperties().get(WHISPERCPP_ARGS_CONFIG_KEY), ""));
+    logger.debug("Additional args for WhisperC++: {}", (Object) whispercppArgs);
+
     autoEncode = BooleanUtils.toBoolean(Objects.toString(
         cc.getProperties().get(AUTO_ENCODING_CONFIG_KEY),
         AUTO_ENCODING_DEFAULT.toString()));
@@ -395,6 +405,7 @@ public class WhisperCppEngine implements SpeechToTextEngine {
       subtitleLanguage = language;
     }
 
+    command.addAll(Arrays.asList(whispercppArgs));
 
     logger.info("Executing WhisperC++'s transcription command: {}", command);
 
