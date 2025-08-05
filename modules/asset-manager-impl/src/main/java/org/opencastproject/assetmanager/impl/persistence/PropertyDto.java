@@ -58,10 +58,16 @@ import javax.persistence.TypedQuery;
     @Index(name = "IX_oc_assets_properties_property_name", columnList = ("property_name")) })
 @NamedQueries({
     @NamedQuery(name = "Property.selectByMediaPackageAndNamespace", query = "select p from Property p where "
-            + "p.mediaPackageId = :mediaPackageId and p.namespace = :namespace"),
+            + "p.mediaPackageId = :mediaPackageId "
+            + "AND (:namespace IS NULL OR p.namespace = :namespace)"),
     @NamedQuery(name = "Property.delete", query = "delete from Property p where p.mediaPackageId = :mediaPackageId"),
     @NamedQuery(name = "Property.deleteByNamespace", query = "delete from Property p "
-            + "where p.mediaPackageId = :mediaPackageId and p.namespace = :namespace")})
+            + "where p.mediaPackageId = :mediaPackageId and p.namespace = :namespace"),
+    @NamedQuery(
+        name = "Property.countProperties",
+        query = "SELECT COUNT(p) FROM Property p "
+    ),
+})
 public class PropertyDto {
   private static final Logger logger = LoggerFactory.getLogger(PropertyDto.class);
 
@@ -193,6 +199,19 @@ public class PropertyDto {
           .setParameter("namespace", namespace);
       logger.debug("Executing query {}", query);
       return query.getResultList().parallelStream().map(PropertyDto::toProperty).collect(Collectors.toList());
+    };
+  }
+
+  /**
+   * Count assets in the asset manager
+   *
+   * @return Number of assts
+   */
+  public static Function<EntityManager, Long> countPropertiesQuery() {
+    return em -> {
+      TypedQuery<Long> query;
+      query = em.createNamedQuery("Property.countProperties", Long.class);
+      return query.getSingleResult();
     };
   }
 }

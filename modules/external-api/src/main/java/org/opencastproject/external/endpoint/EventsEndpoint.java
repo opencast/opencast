@@ -42,7 +42,6 @@ import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.QueryPreprocessor;
 import org.opencastproject.elasticsearch.index.objects.IndexObject;
 import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.elasticsearch.index.objects.event.EventIndexSchema;
@@ -835,7 +834,7 @@ public class EventsEndpoint implements ManagedService {
           } else if ("location".equals(name)) {
             query.withLocation(value);
           } else if ("textFilter".equals(name)) {
-            query.withText(QueryPreprocessor.sanitize(value));
+            query.withText(value);
           } else if ("series".equals(name)) {
             query.withSeriesId(value);
           } else if ("subject".equals(name)) {

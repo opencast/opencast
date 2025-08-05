@@ -386,9 +386,18 @@ public class JobEndpoint {
       throw new JobEndpointException(String.format("Not able to get the incident %d: %s", id, e), e.getCause());
     }
 
+    Long rootJobId = null;
+    try {
+      Job job = serviceRegistry.getJob(incident.getJobId());
+      rootJobId = job.getRootJobId();
+    } catch (ServiceRegistryException e) {
+      logger.info("Could not find job \"{}\" in service registry", incident.getJobId());
+    }
+
     JsonObject json = new JsonObject();
     json.addProperty("id", incident.getId());
     json.addProperty("job_id", incident.getJobId());
+    json.addProperty("root_job_id", safeString(rootJobId));
     json.addProperty("severity", safeString(incident.getSeverity().toString()));
     json.addProperty("timestamp", toUTC(incident.getTimestamp().getTime()));
     json.addProperty("processing_host", safeString(incident.getProcessingHost()));

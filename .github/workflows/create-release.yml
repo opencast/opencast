@@ -57,4 +57,4 @@ jobs:
             For further information, please take a look at:
 
             - [Release notes](https://docs.opencast.org/r/${{ steps.get_version.outputs.VERSION_MAIN }}.x/admin/#releasenotes/#opencast-${{ steps.get_version.outputs.VERSION_COMBINED }})
-            - [Changelog](https://docs.opencast.org/r/${{ steps.get_version.outputs.VERSION_MAIN }}.x/admin/#changelog/#opencast-${{ steps.get_version.outputs.VERSION_COMBINED }})
+            - [Changelog](https://docs.opencast.org/r/${{ steps.get_version.outputs.VERSION_MAIN }}.x/admin/#changelog/opencast-${{ steps.get_version.outputs.VERSION_MAIN }})

@@ -41,7 +41,4 @@
 export EXTRA_JAVA_OPTS="${EXTRA_JAVA_OPTS} -Dorg.eclipse.jetty.server.Request.maxFormContentSize=1500000 -Dfile.encoding=UTF-8 -Dlog4j2.formatMsgNoLookups=true -Djava.awt.headless=true"
 export KARAF_NOROOT=true
 
-# Mitigation for new Tesseract 4.x locking up the system
-export OMP_THREAD_LIMIT=1
-
 . "$DIRNAME/check_ports"

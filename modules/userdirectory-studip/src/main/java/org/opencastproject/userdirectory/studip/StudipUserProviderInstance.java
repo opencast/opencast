@@ -38,11 +38,12 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.ExecutionError;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 
+import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -278,7 +279,7 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider, C
       logger.error("Exception while parsing response from provider for user {}", userName, e);
       return null;
     } catch (IOException e) {
-      logger.error(e.getMessage());
+      logger.error("Error requesting user data for user `{}`: {}", userName, e.getMessage());
       return null;
     } catch (URISyntaxException e) {
       logger.error("Misspelled URI", e);
@@ -306,7 +307,12 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider, C
     HttpGet get = new HttpGet(url);
     get.setHeader("User-Agent", OC_USERAGENT);
 
-    try (CloseableHttpClient client = HttpClients.createDefault()) {
+    // Don't wait for responses indefinitely
+    RequestConfig config = RequestConfig.custom()
+        .setConnectTimeout(5000)
+        .setSocketTimeout(10000).build();
+
+    try (CloseableHttpClient client = HttpClientBuilder.create().setDefaultRequestConfig(config).build();) {
       try (CloseableHttpResponse resp = client.execute(get)) {
         var statusCode = resp.getStatusLine().getStatusCode();
         if (statusCode == 404) {

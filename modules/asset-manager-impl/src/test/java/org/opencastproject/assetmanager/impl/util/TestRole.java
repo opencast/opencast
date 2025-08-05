@@ -20,11 +20,10 @@
  */
 package org.opencastproject.assetmanager.impl.util;
 
-import static com.entwinemedia.fn.Equality.eq;
-import static com.entwinemedia.fn.Equality.hash;
-
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
+
+import java.util.Objects;
 
 /**
  * Implementation of {@link Role} for unit tests.
@@ -61,7 +60,7 @@ public final class TestRole implements Role {
   }
 
   @Override public int hashCode() {
-    return hash(name, description, organizationId);
+    return Objects.hash(name, description, organizationId);
   }
 
   @Override public boolean equals(Object that) {
@@ -69,7 +68,9 @@ public final class TestRole implements Role {
   }
 
   private boolean eqFields(TestRole that) {
-    return eq(name, that.name) && eq(description, that.description) && eq(organizationId, that.organizationId);
+    return Objects.equals(name, that.name)
+        && Objects.equals(description, that.description)
+        && Objects.equals(organizationId, that.organizationId);
   }
 
   @Override public String toString() {

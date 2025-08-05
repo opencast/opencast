@@ -3,16 +3,6 @@
 
   <repository>mvn:org.apache.aries.jax.rs/org.apache.aries.jax.rs.features/2.0.2/xml</repository>
 
-  <feature name="query-dsl" version="${project.version}">
-    <bundle>mvn:com.google.guava/guava/${guava.version}</bundle>
-    <bundle>mvn:com.google.guava/failureaccess/${failureaccess.version}</bundle>
-    <bundle>mvn:joda-time/joda-time/${joda-time.version}</bundle>
-    <bundle>mvn:com.mysema.commons/mysema-commons-lang/0.2.4</bundle>
-    <bundle>mvn:com.mysema.querydsl/querydsl-core/${querydsl.version}</bundle>
-    <bundle>mvn:com.mysema.querydsl/querydsl-sql/${querydsl.version}</bundle>
-    <bundle>mvn:com.mysema.querydsl/querydsl-jpa/${querydsl.version}</bundle>
-  </feature>
-
   <feature name="opencast-jax-rs-whiteboard" description="Aries JAX-RS Whiteboard" version="${project.version}">
     <feature>cxf-rs-description-openapi-v3</feature>
     <bundle dependency="true">mvn:org.osgi/org.osgi.service.jaxrs/1.0.1</bundle>
@@ -39,9 +29,6 @@
     <feature>jndi</feature>
     <feature>jpa</feature>
     <feature>eclipselink</feature>
-
-    <!-- Query DSL-->
-    <feature>query-dsl</feature>
 
     <!-- 3rd party libraries -->
     <bundle>mvn:com.entwinemedia.common/functional/${functional.version}</bundle>
@@ -216,7 +203,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-oaipmh-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-oaipmh-persistence/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-playlists/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-presets/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-publication-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-publication-service-configurable/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-publication-service-oaipmh/${project.version}</bundle>
@@ -326,7 +312,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-notification-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-oaipmh-persistence/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-playlists/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-presets/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-publication-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-publication-service-configurable-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-publication-service-oaipmh-remote/${project.version}</bundle>
@@ -453,7 +438,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-oaipmh-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-oaipmh-persistence/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-playlists/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-presets/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-publication-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-publication-service-configurable/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-publication-service-oaipmh/${project.version}</bundle>
@@ -695,16 +679,6 @@
     </conditional>
     <bundle start-level="82">mvn:org.opencastproject/opencast-usertracking-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-usertracking-impl/${project.version}</bundle>
-  </feature>
-
-  <feature name="opencast-plugin-legacy-annotation" version="${project.version}">
-    <conditional>
-      <condition>opencast-allinone</condition>
-      <condition>opencast-presentation</condition>
-      <condition>opencast-adminpresentation</condition>
-    </conditional>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-annotation-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-annotation-impl/${project.version}</bundle>
   </feature>
 
   <feature name="opencast-graphql-tp" version="${project.version}">

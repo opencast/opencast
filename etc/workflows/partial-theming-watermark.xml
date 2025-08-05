@@ -10,7 +10,7 @@
       id="tag"
       description="Select tracks for watermarking">
       <configurations>
-        <configuration key="source-flavors">*/trimmed</configuration>
+        <configuration key="source-flavors">presenter/trimmed,presentation/trimmed</configuration>
         <configuration key="target-flavor">*/branding</configuration>
       </configurations>
     </operation>

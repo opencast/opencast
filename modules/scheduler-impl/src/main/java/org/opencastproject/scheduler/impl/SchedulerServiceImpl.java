@@ -33,11 +33,6 @@ import org.opencastproject.assetmanager.api.Asset;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Availability;
 import org.opencastproject.assetmanager.api.Snapshot;
-import org.opencastproject.assetmanager.api.query.AQueryBuilder;
-import org.opencastproject.assetmanager.api.query.ARecord;
-import org.opencastproject.assetmanager.api.query.AResult;
-import org.opencastproject.assetmanager.api.query.ASelectQuery;
-import org.opencastproject.assetmanager.api.query.Predicate;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.event.Event;
@@ -429,12 +424,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     final String mediaPackageId = mediaPackage.getIdentifier().toString();
 
     try {
-      AQueryBuilder query = assetManager.createQuery();
-      AResult result = query.select(query.nothing())
-              .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId).and(query.version().isLatest())))
-              .run();
-      Optional<ARecord> record = result.getRecords().stream().findFirst();
-      if (record.isPresent()) {
+      Optional<MediaPackage> noMediaPackage = assetManager.getMediaPackage(mediaPackageId);
+      if (noMediaPackage.isPresent()) {
         logger.warn("Mediapackage with id '{}' already exists!", mediaPackageId);
         throw new SchedulerConflictException("Mediapackage with id '" + mediaPackageId + "' already exists!");
       }
@@ -513,26 +504,18 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
     try {
       LinkedList<Id> ids = new LinkedList<>();
-      AQueryBuilder qb = assetManager.createQuery();
-      Predicate p = null;
       //While we don't have a list of IDs equal to the number of periods
       while (ids.size() <= periods.size()) {
         //Create a list of IDs equal to the number of periods, along with a set of AM predicates
         while (ids.size() <= periods.size()) {
           Id id = new IdImpl(UUID.randomUUID().toString());
           ids.add(id);
-          Predicate np = qb.mediaPackageId(id.toString());
-          //Haha, p = np jokes with the AM query language. Ha. Haha. Ha.  (Sob...)
-          if (null == p) {
-            p = np;
-          } else {
-            p = p.or(np);
-          }
         }
-        //Select the list of ids which alread exist.  Hint: this needs to be zero
-        AResult result = qb.select(qb.nothing()).where(withOrganization(qb).and(p).and(qb.version().isLatest())).run();
+        //Select the list of ids which already exist.  Hint: this needs to be zero
+        List<Snapshot> snapshots = assetManager.getLatestSnapshots(ids);
+
         //If there is conflict, clear the list and start over
-        if (result.getTotalSize() > 0) {
+        if (snapshots.size() > 0) {
           ids.clear();
         }
       }
@@ -672,21 +655,12 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     notNull(caMetadata, "caMetadata");
 
     try {
-      AQueryBuilder query = assetManager.createQuery();
-
-      ASelectQuery select = query
-              .select(query.snapshot())
-              .where(withOrganization(query).and(query.mediaPackageId(mpId).and(query.version().isLatest())
-                  .and(withOwner(query))));
-      Optional<ARecord> optEvent = select.run().getRecords().stream().findFirst();
+      Optional<Snapshot> optSnapshot = assetManager.getLatestSnapshot(mpId);
       Optional<ExtendedEventDto> optExtEvent = persistence.getEvent(mpId);
-      if (optEvent.isEmpty() || optExtEvent.isEmpty())
+      if (optSnapshot.isEmpty() || optExtEvent.isEmpty())
         throw new NotFoundException("No event found while updating event " + mpId);
 
-      ARecord record = optEvent.get();
-      if (record.getSnapshot().isEmpty())
-        throw new NotFoundException("No mediapackage found while updating event " + mpId);
-      Snapshot snapshot = record.getSnapshot().get();
+      Snapshot snapshot = optSnapshot.get();
       MediaPackage archivedMediaPackage = snapshot.getMediaPackage();
 
       Optional<DublinCoreCatalog> archivedDublinCoreOpt = loadEpisodeDublinCoreFromAsset(snapshot);
@@ -887,10 +861,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       }
 
       // Delete scheduler snapshot
-      AQueryBuilder query = assetManager.createQuery();
-      long deletedSnapshots = query.delete(SNAPSHOT_OWNER, query.snapshot())
-              .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId)))
-              .name("delete episode").run();
+      long deletedSnapshots = assetManager.deleteSnapshots(mediaPackageId);
       notFoundInAssetManager = deletedSnapshots == 0;
 
       // Update live event
@@ -927,16 +898,11 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     notEmpty(mediaPackageId, "mediaPackageId");
 
     try {
-      AQueryBuilder query = assetManager.createQuery();
-      AResult result = query.select(query.snapshot())
-              .where(withOrganization(query).and(query.mediaPackageId(mediaPackageId)).and(withOwner(query))
-              .and(query.version().isLatest()))
-              .run();
-      Optional<ARecord> record = result.getRecords().stream().findFirst();
-      if (record.isEmpty())
+      Optional<Snapshot> optSnapshot = assetManager.getLatestSnapshot(mediaPackageId);
+      if (optSnapshot.isEmpty())
         throw new NotFoundException();
 
-      Optional<DublinCoreCatalog> dublinCore = loadEpisodeDublinCoreFromAsset(record.get().getSnapshot().get());
+      Optional<DublinCoreCatalog> dublinCore = loadEpisodeDublinCoreFromAsset(optSnapshot.get());
       if (dublinCore.isEmpty())
         throw new NotFoundException("No dublincore catalog found " + mediaPackageId);
 
@@ -1150,52 +1116,51 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       final Map<String, ExtendedEventDto> searchResult = persistence.search(captureAgentId, Optional.empty(), cutoff,
           Optional.of(DateTime.now().minusHours(1).toDate()), Optional.empty(), Optional.empty()).stream()
           .collect(Collectors.toMap(ExtendedEventDto::getMediaPackageId, Function.identity()));
-      final AQueryBuilder query = assetManager.createQuery();
-      final AResult result = query.select(query.snapshot())
-          .where(withOrganization(query).and(query.mediaPackageIds(searchResult.keySet().toArray(new String[0])))
-              .and(withOwner(query)).and(query.version().isLatest()))
-          .run();
+      var mpIds = searchResult.keySet();
+      List<Snapshot> snapshots = assetManager.getLatestSnapshots(mpIds);
 
       final CalendarGenerator cal = new CalendarGenerator(seriesService);
-      for (final ARecord record : result.getRecords()) {
-        final Optional<MediaPackage> optMp = record.getSnapshot().isPresent()
-            ? Optional.of(record.getSnapshot().get().getMediaPackage())
-            : Optional.empty();
+      for (String mpId : mpIds) {
+        final Optional<Snapshot> optSnapshot = snapshots.stream()
+            .filter(mp -> mp.getMediaPackage().getIdentifier().toString().equals(mpId))
+            .findFirst();
 
         // If the event media package is empty, skip the event
-        if (optMp.isEmpty()) {
-          logger.warn("Mediapackage for event '{}' can't be found, event is not recorded", record.getMediaPackageId());
+        if (optSnapshot.isEmpty()) {
+          logger.warn("Mediapackage for event '{}' can't be found, event is not recorded", mpId);
           continue;
         }
 
-        if (seriesId.isPresent() && !seriesId.get().equals(optMp.get().getSeries())) {
+        Snapshot snapshot = optSnapshot.get();
+
+        if (seriesId.isPresent() && !seriesId.get().equals(snapshot.getMediaPackage().getSeries())) {
           continue;
         }
 
-        Optional<DublinCoreCatalog> catalogOpt = loadEpisodeDublinCoreFromAsset(record.getSnapshot().get());
+        Optional<DublinCoreCatalog> catalogOpt = loadEpisodeDublinCoreFromAsset(snapshot);
         if (catalogOpt.isEmpty()) {
           logger.warn("No episode catalog available, skipping!");
           continue;
         }
 
-        final Map<String, String> caMetadata = deserializeExtendedEventProperties(searchResult.get(record.getMediaPackageId()).getCaptureAgentProperties());
+        final Map<String, String> caMetadata = deserializeExtendedEventProperties(searchResult.get(mpId).getCaptureAgentProperties());
 
         // If the even properties are empty, skip the event
         if (caMetadata.isEmpty()) {
-          logger.warn("Properties for event '{}' can't be found, event is not recorded", record.getMediaPackageId());
+          logger.warn("Properties for event '{}' can't be found, event is not recorded", mpId);
           continue;
         }
 
-        final String agentId = searchResult.get(record.getMediaPackageId()).getCaptureAgentId();
-        final Date start = searchResult.get(record.getMediaPackageId()).getStartDate();
-        final Date end = searchResult.get(record.getMediaPackageId()).getEndDate();
-        final Date lastModified = record.getSnapshot().get().getArchivalDate();
+        final String agentId = searchResult.get(mpId).getCaptureAgentId();
+        final Date start = searchResult.get(mpId).getStartDate();
+        final Date end = searchResult.get(mpId).getEndDate();
+        final Date lastModified = snapshot.getArchivalDate();
 
         // Add the entry to the calendar, skip it with a warning if adding fails
         try {
-          cal.addEvent(optMp.get(), catalogOpt.get(), agentId, start, end, lastModified, toPropertyString(caMetadata));
+          cal.addEvent(snapshot.getMediaPackage(), catalogOpt.get(), agentId, start, end, lastModified, toPropertyString(caMetadata));
         } catch (Exception e) {
-          logger.warn("Error adding event '{}' to calendar, event is not recorded", record.getMediaPackageId(), e);
+          logger.warn("Error adding event '{}' to calendar, event is not recorded", mpId, e);
         }
       }
 
@@ -1613,19 +1578,12 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   private MediaPackage getEventMediaPackage(final String mediaPackageId, boolean checkOwner) {
-    AQueryBuilder query = assetManager.createQuery();
-    var predicate = withOrganization(query)
-            .and(query.mediaPackageId(mediaPackageId))
-            .and(query.version().isLatest());
-    if (checkOwner) {
-      predicate = predicate.and(withOwner(query));
-    }
+    Optional<MediaPackage> mediaPackage = assetManager.getMediaPackage(mediaPackageId);
 
-    Optional<ARecord> record = query.select(query.snapshot()).where(predicate).run().getRecords().stream().findFirst();
-    if (record.isEmpty())
+    if (mediaPackage.isEmpty())
       throw new RuntimeNotFoundException(new NotFoundException());
 
-    return record.get().getSnapshot().get().getMediaPackage();
+    return mediaPackage.get();
   }
 
   private MediaPackage getEventMediaPackage(final String mediaPackageId) {
@@ -1678,14 +1636,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
     return new TechnicalMetadataImpl(extEvt.getMediaPackageId(), agentId, start, end, presenters, wfProperties,
             caMetadata, Optional.ofNullable(recording));
-  }
-
-  private Predicate withOrganization(AQueryBuilder query) {
-    return query.organizationId().eq(securityService.getOrganization().getId());
-  }
-
-  private Predicate withOwner(AQueryBuilder query) {
-    return query.owner().eq(SNAPSHOT_OWNER);
   }
 
   private Set<String> getPresenters(String presentersString) {
@@ -1785,10 +1735,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       final Set<String> presenters = getPresenters(Optional.ofNullable(scheduledEvent.getPresenters()).orElse(""));
       final Map<String, String> caMetadata = deserializeExtendedEventProperties(scheduledEvent.
               getCaptureAgentProperties());
-      AQueryBuilder query = assetManager.createQuery();
-      final AResult result = query.select(query.snapshot())
-              .where(query.mediaPackageId(scheduledEvent.getMediaPackageId()).and(query.version().isLatest())).run();
-      final Snapshot snapshot = result.getRecords().stream().findFirst().get().getSnapshot().get();
+      Optional<Snapshot> optSnapshot = assetManager.getLatestSnapshot(scheduledEvent.getMediaPackageId());
+      final Snapshot snapshot = optSnapshot.get();
 
       Optional<AccessControlList> acl = Optional.of(authorizationService.getActiveAcl(snapshot.getMediaPackage()).getA());
       Optional<DublinCoreCatalog> dublinCore = loadEpisodeDublinCoreFromAsset(snapshot);

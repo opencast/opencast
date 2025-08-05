@@ -73,7 +73,6 @@ import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.QueryPreprocessor;
 import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.elasticsearch.index.objects.event.EventIndexSchema;
 import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
@@ -2701,7 +2700,7 @@ public abstract class AbstractEventEndpoint {
       if (EventListQuery.FILTER_AGENT_NAME.equals(name))
         query.withAgentId(filters.get(name));
       if (EventListQuery.FILTER_TEXT_NAME.equals(name))
-        query.withText(QueryPreprocessor.sanitize(filters.get(name)));
+        query.withText(filters.get(name));
       if (EventListQuery.FILTER_SERIES_NAME.equals(name))
         query.withSeriesId(filters.get(name));
       if (EventListQuery.FILTER_STATUS_NAME.equals(name))
