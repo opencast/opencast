@@ -2,7 +2,7 @@ Install from Repository (Debian, Ubuntu)
 ===========================================================================
 
 There is a Debian software repository (DEB) available for Debian-based Linux distributions provided by Greg Logan, and
-hosted at University of Osnabrück. This repository provides prebuilt Opencast installations, including all
+hosted at University of Münster. This repository provides prebuilt Opencast installations, including all
 3rd-Party-Tools. Using this method, you do not have to compile the software by yourself, but you still need to configure
 it.
 
@@ -20,8 +20,8 @@ Watch for announcements on list or just check which versions are available in th
 Currently Supported
 -------------------
 
-* Debian 10 and newer amd64
-* Ubuntu 18.04 and newer amd64
+* Debian 11 and newer amd64
+* Ubuntu 22.04 and newer amd64
 
 
 Activate Repository
@@ -44,10 +44,6 @@ First you have to install the necessary repositories so that your package manage
         echo "deb https://pkg.opencast.org/debian {{ opencast_major_version() }}.x stable testing" | sudo tee /etc/apt/sources.list.d/opencast.list
 
 * Add the repository key to your apt keyring:
-
-        wget -qO - https://pkg.opencast.org/gpgkeys/opencast-deb.key | sudo apt-key add -
-
-    On latest Debian based systems (Debian 11+, Ubuntu 22.04+) importing gpg keys with `apt-key` is deprecated. You can use an alternative step:
 
         wget -qO - https://pkg.opencast.org/gpgkeys/opencast-deb.key | gpg --dearmor | sudo dd of=/etc/apt/trusted.gpg.d/opencast-deb.gpg
 
