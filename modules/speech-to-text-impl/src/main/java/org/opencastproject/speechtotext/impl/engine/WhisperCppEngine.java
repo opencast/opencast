@@ -90,7 +90,7 @@ public class WhisperCppEngine implements SpeechToTextEngine {
   private String whispercppModel = WHISPERCPP_MODEL_DEFAULT;
 
   /** Config key for additional Whisper args */
-  private static final String WHISPERCPP_ARGS_CONFIG_KEY = "whisper.args";
+  private static final String WHISPERCPP_ARGS_CONFIG_KEY = "whispercpp.args";
 
   /** Currently used Whisper args */
   private String[] whispercppArgs;
