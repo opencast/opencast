@@ -20,12 +20,8 @@
  */
 package org.opencastproject.external.endpoint;
 
-import static com.entwinemedia.fn.data.json.Jsons.BLANK;
-import static com.entwinemedia.fn.data.json.Jsons.arr;
-import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.obj;
-import static com.entwinemedia.fn.data.json.Jsons.v;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
+import static org.opencastproject.index.service.util.JSONUtils.safeString;
 import static org.opencastproject.util.DateTimeSupport.toUTC;
 import static org.opencastproject.util.RestUtil.getEndpointUrl;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
@@ -63,9 +59,10 @@ import com.cronutils.model.Cron;
 import com.cronutils.model.CronType;
 import com.cronutils.model.definition.CronDefinitionBuilder;
 import com.cronutils.parser.CronParser;
-import com.entwinemedia.fn.data.json.Field;
-import com.entwinemedia.fn.data.json.JValue;
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSyntaxException;
 import com.google.gson.reflect.TypeToken;
 
@@ -79,7 +76,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -240,17 +236,19 @@ public class LifeCycleManagementEndpoint {
 
         long total = service.getLifeCyclePoliciesTotal();
 
-        List<JValue> policiesJson = policies.stream()
-            .map(p -> policyToJson(p))
-            .collect(Collectors.toList());
+        JsonArray policiesJsonArray = new JsonArray();
+        for (LifeCyclePolicy policy : policies) {
+            policiesJsonArray.add(policyToJson(policy));
+        }
 
-        List<Field> results = new ArrayList<>();
-        results.add(f("total", v(total)));
-        results.add(f("limit", v(limit)));
-        results.add(f("offset", v(offset)));
-        results.add(f("results", arr(policiesJson)));
+        JsonObject resultJson = new JsonObject();
+        resultJson.addProperty("total", total);
+        resultJson.addProperty("limit", limit);
+        resultJson.addProperty("offset", offset);
+        resultJson.add("results", policiesJsonArray);
 
-        return ApiResponseBuilder.Json.ok(acceptHeader, obj(results));
+        // Return the response
+        return ApiResponseBuilder.Json.ok(acceptHeader, resultJson);
     }
 
     @GET
@@ -263,10 +261,12 @@ public class LifeCycleManagementEndpoint {
             @RestResponse(description = "Returns the lifecycle policy actions.", responseCode = HttpServletResponse.SC_OK),
         })
     public Response getActions(@HeaderParam("Accept") String acceptHeader) {
-        return ApiResponseBuilder.Json.ok(acceptHeader, arr(Arrays.stream(Action.values())
-            .map(value -> v(value.toString()))
-            .collect(Collectors.toList())
-        ));
+        JsonArray actionsJson = new JsonArray();
+        for (Action action : Action.values()) {
+            actionsJson.add(new JsonPrimitive(action.toString()));
+        }
+
+        return ApiResponseBuilder.Json.ok(acceptHeader, actionsJson);
     }
 
     @GET
@@ -279,10 +279,12 @@ public class LifeCycleManagementEndpoint {
             @RestResponse(description = "Returns the lifecycle policy targettypes.", responseCode = HttpServletResponse.SC_OK),
         })
     public Response getTargetTypes(@HeaderParam("Accept") String acceptHeader) {
-        return ApiResponseBuilder.Json.ok(acceptHeader, arr(Arrays.stream(TargetType.values())
-            .map(value -> v(value.toString()))
-            .collect(Collectors.toList())
-        ));
+        JsonArray targetTypesJson = new JsonArray();
+        for (TargetType type : TargetType.values()) {
+            targetTypesJson.add(new JsonPrimitive(type.toString()));
+        }
+
+        return ApiResponseBuilder.Json.ok(acceptHeader, targetTypesJson);
     }
 
     @GET
@@ -295,10 +297,12 @@ public class LifeCycleManagementEndpoint {
             @RestResponse(description = "Returns the lifecycle policy timings.", responseCode = HttpServletResponse.SC_OK),
         })
     public Response getTimings(@HeaderParam("Accept") String acceptHeader) {
-        return ApiResponseBuilder.Json.ok(acceptHeader, arr(Arrays.stream(Timing.values())
-            .map(value -> v(value.toString()))
-            .collect(Collectors.toList())
-        ));
+        JsonArray timingsJson = new JsonArray();
+        for (Timing timing : Timing.values()) {
+            timingsJson.add(new JsonPrimitive(timing.toString()));
+        }
+
+        return ApiResponseBuilder.Json.ok(acceptHeader, timingsJson);
     }
 
     @POST
@@ -596,72 +600,73 @@ public class LifeCycleManagementEndpoint {
         }
     }
 
-    private JValue policyToJson(LifeCyclePolicy policy) {
-        List<Field> fields = new ArrayList<>();
+    private JsonObject policyToJson(LifeCyclePolicy policy) {
+        JsonObject json = new JsonObject();
 
-        fields.add(f("id", v(policy.getId())));
-        fields.add(f("title", v(policy.getTitle(), BLANK)));
-        fields.add(f("targetType", enumToJSON(policy.getTargetType())));
-        fields.add(f("action", enumToJSON(policy.getAction())));
+        json.addProperty("id", policy.getId());
+        json.addProperty("title", safeString(policy.getTitle()));
+        json.addProperty("targetType", enumToJson(policy.getTargetType()));
+        json.addProperty("action", enumToJson(policy.getAction()));
+
         if (policy.getAction() == Action.START_WORKFLOW) {
-            fields.add(f("actionParameters", v(startWorkflowParametersToJson(policy.getActionParameters()), BLANK)));
+            json.addProperty("actionParameters", startWorkflowParametersToJson(policy.getActionParameters()).toString());
         } else {
-            fields.add(f("actionParameters", v(policy.getActionParameters(), BLANK)));
+            json.addProperty("actionParameters", safeString(policy.getActionParameters()));
         }
-        fields.add(f("actionDate", v(policy.getActionDate() != null ? toUTC(policy.getActionDate().getTime()) : null, BLANK)));
-        fields.add(f("cronTrigger", v(policy.getCronTrigger(), BLANK)));
-        fields.add(f("timing", enumToJSON(policy.getTiming())));
-        fields.add(f("isActive", v(policy.isActive(), BLANK)));
-        fields.add(f("isCreatedFromConfig", v(policy.isCreatedFromConfig(), BLANK)));
-        fields.add(f("targetFilters", v("{" + policy.getTargetFilters().keySet().stream()
+
+        json.addProperty("actionDate", policy.getActionDate() != null ? toUTC(policy.getActionDate().getTime()) : "");
+        json.addProperty("cronTrigger", safeString(policy.getCronTrigger()));
+        json.addProperty("timing", enumToJson(policy.getTiming()));
+        json.addProperty("isActive", policy.isActive());
+        json.addProperty("isCreatedFromConfig", policy.isCreatedFromConfig());
+
+        String jsonString = "{" + policy.getTargetFilters().keySet().stream()
             .map(key -> "\"" + key + "\"" + ":" + eventSearchQueryFieldToJson(policy.getTargetFilters().get(key)))
-            .collect(Collectors.joining(",", "", "")) + "}",
-            BLANK
-        )));
-        fields.add(f("accessControlEntries", arr(policy.getAccessControlEntries()
-            .stream()
-            .map(this::policyAccessControlEntryToJson)
-            .collect(Collectors.toList()))));
+            .collect(Collectors.joining(",", "", "")) + "}";
+        json.addProperty("targetFilters", safeString(jsonString));
 
-        return obj(fields);
+
+        JsonArray accessControlEntries = new JsonArray();
+        for (LifeCyclePolicyAccessControlEntry entry : policy.getAccessControlEntries()) {
+            accessControlEntries.add(policyAccessControlEntryToJson(entry));
+        }
+        json.add("accessControlEntries", accessControlEntries);
+
+        return json;
     }
 
-    private JValue policyAccessControlEntryToJson(LifeCyclePolicyAccessControlEntry policyAccessControlEntry) {
-        List<Field> fields = new ArrayList<>();
-
-        fields.add(f("id", v(policyAccessControlEntry.getId())));
-        fields.add(f("allow", v(policyAccessControlEntry.isAllow())));
-        fields.add(f("role", v(policyAccessControlEntry.getRole())));
-        fields.add(f("action", v(policyAccessControlEntry.getAction())));
-
-        return obj(fields);
+    private JsonObject policyAccessControlEntryToJson(LifeCyclePolicyAccessControlEntry entry) {
+        JsonObject json = new JsonObject();
+        json.addProperty("id", entry.getId());
+        json.addProperty("allow", entry.isAllow());
+        json.addProperty("role", entry.getRole());
+        json.addProperty("action", entry.getAction());
+        return json;
     }
 
-    private JValue eventSearchQueryFieldToJson(EventSearchQueryField eventSearchQueryField) {
-        List<Field> fields = new ArrayList<>();
-
-        fields.add(f("value", v(eventSearchQueryField.getValue(), BLANK)));
-        fields.add(f("type", v(eventSearchQueryField.getType(), BLANK)));
-        fields.add(f("must", v(eventSearchQueryField.isMust(), BLANK)));
-
-        return obj(fields);
+    private JsonObject eventSearchQueryFieldToJson(EventSearchQueryField field) {
+        JsonObject json = new JsonObject();
+        json.addProperty("value", safeString(field.getValue()));
+        json.addProperty("type", safeString(field.getType()));
+        json.addProperty("must", field.isMust());
+        return json;
     }
 
-    private JValue startWorkflowParametersToJson(String s) {
-        StartWorkflowParameters parameters = gson.fromJson(s, StartWorkflowParameters.class);
+    private JsonObject startWorkflowParametersToJson(String jsonStr) {
+        StartWorkflowParameters parameters = gson.fromJson(jsonStr, StartWorkflowParameters.class);
 
-        List<Field> fields = new ArrayList<>();
-        fields.add(f("workflowId", v(parameters.getWorkflowId())));
-        fields.add(f("workflowParameters", v("{" + parameters.getWorkflowParameters().keySet().stream()
-                .map(key -> "\"" + key + "\"" + ":" + parameters.getWorkflowParameters().get(key))
-                .collect(Collectors.joining(",", "", "")) + "}",
-            BLANK
-        )));
+        JsonObject json = new JsonObject();
+        json.addProperty("workflowId", parameters.getWorkflowId());
 
-        return obj(fields);
+        String jsonString = "{" + parameters.getWorkflowParameters().keySet().stream()
+            .map(key -> "\"" + key + "\"" + ":" + parameters.getWorkflowParameters().get(key))
+            .collect(Collectors.joining(",", "", "")) + "}";
+        json.addProperty("workflowParameters", safeString(jsonString));
+
+        return json;
     }
 
-    private JValue enumToJSON(Enum e) {
-        return e == null ? null : v(e.toString());
+    private String enumToJson(Enum<?> e) {
+        return e != null ? e.toString() : null;
     }
 }
