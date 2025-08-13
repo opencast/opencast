@@ -32,6 +32,7 @@ jobs:
             [
               .[1].assets[]
               | select(.name | contains("${{ matrix.arch }}-gpl-"))
+              | select(.name | contains("linux"))
               | select(.name | contains("shared") | not)
             ]
             | sort_by(.name)
