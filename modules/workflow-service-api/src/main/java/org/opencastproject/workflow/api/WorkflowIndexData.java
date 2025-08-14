@@ -40,7 +40,8 @@ import javax.persistence.Table;
 @NamedNativeQueries({
         @NamedNativeQuery(
                 name = "WorkflowIndexData.getAll",
-                query = "SELECT id, state, mediapackage_id, organization_id FROM oc_workflow ORDER BY mediapackage_id, id DESC",
+                query = "SELECT id, state, mediapackage_id, organization_id, template FROM oc_workflow "
+                        + "ORDER BY mediapackage_id, id DESC",
                 resultSetMapping = "DataResult"
         ),
 })
@@ -53,7 +54,8 @@ import javax.persistence.Table;
                                   @FieldResult(name = "id",column = "id"),
                                   @FieldResult(name = "state", column = "state"),
                                   @FieldResult(name = "mediaPackageId", column = "mediapackage_id"),
-                                  @FieldResult(name = "organizationId", column = "organization_id")
+                                  @FieldResult(name = "organizationId", column = "organization_id"),
+                                  @FieldResult(name = "template", column = "template")
                         }
                 )
 })
@@ -70,6 +72,9 @@ public class WorkflowIndexData {
   @Column(name = "organization_id") //NB: This column definition needs to match WorkflowInstance!
   private String organizationId;
 
+  @Column(name = "template") //NB: This column definition needs to match WorkflowInstance!
+  private String template;
+
 
   /**
    * Default constructor without any import.
@@ -78,11 +83,12 @@ public class WorkflowIndexData {
 
   }
 
-  public WorkflowIndexData(Long id, int state, String mediaPackageId, String organizationId) {
+  public WorkflowIndexData(Long id, int state, String mediaPackageId, String organizationId, String template) {
     this.id = id;
     this.state = state;
     this.mediaPackageId = mediaPackageId;
     this.organizationId = organizationId;
+    this.template = template;
   }
 
   public Long getId() {
@@ -99,6 +105,10 @@ public class WorkflowIndexData {
 
   public String getOrganizationId() {
     return organizationId;
+  }
+
+  public String getTemplate() {
+    return template;
   }
 
 }
