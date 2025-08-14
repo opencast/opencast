@@ -534,65 +534,15 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
    *         The newest snapshot of the event to update
    */
   private void updateEventInIndex(Snapshot snapshot) {
-    final MediaPackage mp = snapshot.getMediaPackage();
-    String eventId = mp.getIdentifier().toString();
-    final String organization = securityService.getOrganization().getId();
+    final String eventId = snapshot.getMediaPackage().getIdentifier().toString();
+    final String orgId = securityService.getOrganization().getId();
     final User user = securityService.getUser();
+
     logger.debug("Updating event {} in the {} index.", eventId, index.getIndexName());
+    Function<Optional<Event>, Optional<Event>> updateFunction = getEventUpdateFunction(snapshot, orgId, user);
 
-    Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
-      Event event = eventOpt.orElse(new Event(eventId, organization));
-
-      AccessControlList acl = authorizationService.getActiveAcl(mp).getA();
-      List<ManagedAcl> acls = aclServiceFactory.serviceFor(securityService.getOrganization()).getAcls();
-      for (final ManagedAcl managedAcl : AccessInformationUtil.matchAcls(acls, acl)) {
-        event.setManagedAcl(managedAcl.getName());
-      }
-      event.setAccessPolicy(AccessControlParser.toJsonSilent(acl));
-      event.setArchiveVersion(Long.parseLong(snapshot.getVersion().toString()));
-      if (StringUtils.isBlank(event.getCreator())) {
-        event.setCreator(securityService.getUser().getName());
-      }
-      EventIndexUtils.updateEvent(event, mp);
-
-      // common metadata
-      for (Catalog catalog: mp.getCatalogs(MediaPackageElements.EPISODE)) {
-        try (InputStream in = workspace.read(catalog.getURI())) {
-          EventIndexUtils.updateEvent(event, DublinCores.read(in));
-        } catch (IOException | NotFoundException e) {
-          throw new IllegalStateException(String.format("Unable to load common dublin core catalog for event '%s'",
-                  mp.getIdentifier()), e);
-        }
-      }
-
-      // extended metadata
-      event.resetExtendedMetadata();  // getting rid of old data
-      for (EventCatalogUIAdapter extendedCatalogUIAdapter : extendedEventCatalogUIAdapters.getOrDefault(organization,
-              Collections.emptyList())) {
-        for (Catalog catalog: mp.getCatalogs(extendedCatalogUIAdapter.getFlavor())) {
-          try (InputStream in = workspace.read(catalog.getURI())) {
-            EventIndexUtils.updateEventExtendedMetadata(event, DublinCores.read(in),
-                    extendedCatalogUIAdapter.getFlavor());
-          } catch (IOException | NotFoundException e) {
-            throw new IllegalStateException(String.format("Unable to load extended dublin core catalog '%s' for event "
-                            + "'%s'", catalog.getFlavor(), mp.getIdentifier()), e);
-          }
-        }
-      }
-
-      // Update series name if not already done
-      try {
-        EventIndexUtils.updateSeriesName(event, organization, user, index);
-      } catch (SearchIndexException e) {
-        logger.error("Error updating the series name of the event {} in the {} index.", eventId, index.getIndexName(),
-                e);
-      }
-      return Optional.of(event);
-    };
-
-    // Persist the scheduling event
     try {
-      index.addOrUpdateEvent(eventId, updateFunction, organization, user);
+      index.addOrUpdateEvent(eventId, updateFunction, orgId, user);
       logger.debug("Event {} updated in the {} index.", eventId, index.getIndexName());
     } catch (SearchIndexException e) {
       logger.error("Error updating the event {} in the {} index.", eventId, index.getIndexName(), e);
@@ -1001,7 +951,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
                       .apply(updatedEventData);
                 } else if (dataType == DataType.ACL) {
                   // Only reindex ACLs
-                  updatedEventData = getEventUpdateFunctionOnlyAcl(snapshot, orgId, snapshotSystemUser)
+                  updatedEventData = getEventUpdateFunctionOnlyAcl(snapshot, orgId)
                       .apply(updatedEventData);
                 } else {
                   throw new IndexRebuildException(dataType + " is not a supported data type. "
@@ -1616,7 +1566,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       String eventId = mp.getIdentifier().toString();
       Event event = eventOpt.orElse(new Event(eventId, orgId));
 
-      event = updateAclInEvent(event, mp, eventId);
+      event = updateAclInEvent(event, mp);
 
       event.setArchiveVersion(Long.parseLong(snapshot.getVersion().toString()));
       if (StringUtils.isBlank(event.getCreator())) {
@@ -1633,6 +1583,21 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
         }
       }
 
+      // extended metadata
+      event.resetExtendedMetadata();  // getting rid of old data
+      for (EventCatalogUIAdapter extendedCatalogUIAdapter : extendedEventCatalogUIAdapters.getOrDefault(orgId,
+              Collections.emptyList())) {
+        for (Catalog catalog: mp.getCatalogs(extendedCatalogUIAdapter.getFlavor())) {
+          try (InputStream in = workspace.read(catalog.getURI())) {
+            EventIndexUtils.updateEventExtendedMetadata(event, DublinCores.read(in),
+                    extendedCatalogUIAdapter.getFlavor());
+          } catch (IOException | NotFoundException e) {
+            throw new IllegalStateException(String.format("Unable to load extended dublin core catalog '%s' for event "
+                    + "'%s'", catalog.getFlavor(), mp.getIdentifier()), e);
+          }
+        }
+      }
+
       // Update series name if not already done
       try {
         EventIndexUtils.updateSeriesName(event, orgId, user, index);
@@ -1645,19 +1610,19 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   }
 
   private Function<Optional<Event>, Optional<Event>> getEventUpdateFunctionOnlyAcl(Snapshot snapshot,
-      String orgId, User user) {
+      String orgId) {
     return (Optional<Event> eventOpt) -> {
       MediaPackage mp = snapshot.getMediaPackage();
       String eventId = mp.getIdentifier().toString();
       Event event = eventOpt.orElse(new Event(eventId, orgId));
 
-      event = updateAclInEvent(event, mp, eventId);
+      event = updateAclInEvent(event, mp);
 
       return Optional.of(event);
     };
   }
 
-  private Event updateAclInEvent(Event event, MediaPackage mp, String eventId) {
+  private Event updateAclInEvent(Event event, MediaPackage mp) {
     AccessControlList acl = authorizationService.getActiveAcl(mp).getA();
     List<ManagedAcl> acls = aclServiceFactory.serviceFor(securityService.getOrganization()).getAcls();
 
