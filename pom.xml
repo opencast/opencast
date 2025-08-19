@@ -10,6 +10,7 @@
   <url>https://opencast.org</url>
   <inceptionYear>2009</inceptionYear>
   <properties>
+    <argLine></argLine>
     <checkstyle.skip>false</checkstyle.skip>
     <opencast.basedir>${basedir}</opencast.basedir>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -413,10 +414,7 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <useFile>false</useFile>
-          <argLine>
-            -Dfile.encoding=UTF-8
-            --add-opens java.base/java.util=ALL-UNNAMED
-          </argLine>
+          <argLine>@{argLine} -Dfile.encoding=UTF-8 --add-opens java.base/java.util=ALL-UNNAMED</argLine>
           <!-- see https://jira.codehaus.org/browse/SUREFIRE-951 -->
           <systemPropertyVariables>
             <M2_REPO>${settings.localRepository}</M2_REPO>
@@ -465,16 +463,68 @@
         </executions>
       </plugin>
       <plugin>
-        <!-- use this to generate a code coverage report:
-          mvn cobertura:cobertura -->
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>cobertura-maven-plugin</artifactId>
-        <version>2.7</version>
+        <!-- use this to generate a code coverage report: -->
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.12</version>
         <configuration>
-          <format>html</format>
-          <aggregate>true</aggregate>
-          <check/>
+          <skip>${maven.test.skip}</skip>
+          <output>file</output>
+          <append>true</append>
         </configuration>
+        <executions>
+          <execution>
+            <id>prepare-agent-build</id>
+            <phase>test</phase>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>check</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>report</goal>
+              <goal>check</goal>
+              <goal>report-aggregate</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <rule>
+                  <element>BUNDLE</element>
+                  <limits>
+                    <limit>
+                      <counter>INSTRUCTION</counter>
+                      <value>COVEREDRATIO</value>
+                      <minimum>0.5</minimum>
+                    </limit>
+                  </limits>
+                </rule>
+              </rules>
+            </configuration>
+          </execution>
+          <execution>
+            <id>prepare-agent</id>
+            <phase>pre-site</phase>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>coveragereport</id>
+            <phase>site</phase>
+            <goals>
+              <goal>report</goal>
+              <goal>report-aggregate</goal>
+            </goals>
+            <configuration>
+              <dataFileIncludes>
+                <dataFileInclude>modules/*/target/jacoco.exec</dataFileInclude>
+              </dataFileIncludes>
+              <includeCurrentProject>true</includeCurrentProject>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
@@ -1478,6 +1528,17 @@
             </reports>
           </reportSet>
         </reportSets>
+      </plugin>
+      <plugin>
+        <!-- use this to generate a code coverage report: -->
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.2</version>
+        <configuration>
+          <skip>${maven.test.skip}</skip>
+          <output>file</output>
+          <append>true</append>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
