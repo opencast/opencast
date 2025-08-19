@@ -76,7 +76,7 @@ jobs:
         #This has to happen in a separate step or else various service classes aren't visible
       - name: build javadocs
         run: |
-          mvn javadoc:javadoc javadoc:aggregate -Pnone \
+          mvn site site:stage -Pnone \
             --batch-mode \
             -Dsurefire.rerunFailingTestsCount=2 \
             -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
