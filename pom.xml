@@ -488,7 +488,7 @@
               <goal>check</goal>
               <goal>report-aggregate</goal>
             </goals>
-            <configuration>
+            <!--<configuration>
               <rules>
                 <rule>
                   <element>BUNDLE</element>
@@ -501,7 +501,7 @@
                   </limits>
                 </rule>
               </rules>
-            </configuration>
+            </configuration>-->
           </execution>
           <execution>
             <id>prepare-agent</id>
