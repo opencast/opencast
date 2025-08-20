@@ -30,6 +30,7 @@ export interface SearchEpisodeResult {
     readonly mediapackage: MediaPackage;
     readonly languageShortCode: string;
     readonly licenseKey: string;
+    readonly live: boolean;
 }
 
 export interface SearchEpisodeResults {
@@ -63,6 +64,10 @@ export interface EventMetadataContainer {
 
 export interface LtiData {
     readonly roles: string[];
+}
+
+export interface Config {
+    readonly excludeLiveStreams: boolean;
 }
 
 export function findField(
@@ -135,6 +140,21 @@ export async function copyEventToSeries(eventId: string, targetSeries: string): 
     return axios.post(hostAndPort() + "/lti-service-gui/" + eventId + "/copy?target_series=" + targetSeries);
 }
 
+export async function getConfig(): Promise<Config> {
+    const response = await axios.get<any>(hostAndPort() + '/ui/config/ltitools/config.json');
+    return {
+        excludeLiveStreams: response.data.excludeLiveStreams !== undefined ? response.data.excludeLiveStreams : false
+    }
+
+}
+
+// TODO
+export function filterLiveEvents(sr: SearchEpisodeResults) {
+    const filtered_results = sr.results.filter(result => !result.live);
+    const filtered_sr : SearchEpisodeResults = {results: filtered_results, total : sr.total, limit : sr.limit, offset : sr.offset};
+    return filtered_sr
+}
+
 /**
  * Parse resolution from string to object if possible
  * A resolution is expected to have the format {width}x{height}
@@ -184,6 +204,23 @@ const parseTracksFromResult = (result: any) => {
   return undefined;
 }
 
+// TODO: Changed when Live in Index
+const parseLiveFromResults = (result :any) : boolean => {
+    if (Array.isArray(result.mediapackage.media.track)) {
+        let live : boolean = false;
+        result.mediapackage.media.track.forEach( (track: any) => {
+            if ('live' in track && track.live === true) {
+                live = true;
+            }
+        } )
+        return live;
+    } else if (result.mediapackage.media.track !== null) {
+        if (!('live' in result.mediapackage.media.track)) { return false }
+        return result.mediapackage.media.track.live === true;
+    }
+    return false;
+}
+
 export async function searchEpisode(
     limit: number,
     offset: number,
@@ -227,7 +264,8 @@ export async function searchEpisode(
                         url: attachment.url
                     })),
                 tracks: parseTracksFromResult(result)
-            }
+            },
+          live: parseLiveFromResults(result)
         })),
         total: response.data.total,
         limit: response.data.limit,

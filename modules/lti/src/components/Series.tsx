@@ -1,5 +1,15 @@
 import React, { DOMAttributes } from "react";
-import { SearchEpisodeResults, searchEpisode, getLti, SearchEpisodeResult, deleteEvent, Track } from "../OpencastRest";
+import {
+    SearchEpisodeResults,
+    searchEpisode,
+    getLti,
+    SearchEpisodeResult,
+    deleteEvent,
+    Track,
+    filterLiveEvents,
+    Config,
+    getConfig
+} from "../OpencastRest";
 import { Loading } from "./Loading";
 import { withTranslation, WithTranslation } from "react-i18next";
 import "../App.css";
@@ -19,6 +29,7 @@ interface SeriesState {
     readonly httpErrors: string[];
     readonly currentPage: number;
     readonly deleteSuccess?: boolean;
+    readonly config?: Config;
 }
 
 interface SeriesProps extends WithTranslation {
@@ -145,6 +156,14 @@ class TranslatedSeries extends React.Component<SeriesProps, SeriesState> {
             ...this.state,
             httpErrors: this.state.httpErrors.concat([error.message])
         }));
+
+        getConfig().then((result) => this.setState({
+            ...this.state,
+             config: result
+        })).catch((error) => this.setState({
+            ...this.state,
+            httpErrors: this.state.httpErrors.concat([error.message])
+        }));
     }
 
     unsetDeletionState() {
@@ -239,7 +258,10 @@ class TranslatedSeries extends React.Component<SeriesProps, SeriesState> {
         if (this.state.httpErrors.length > 0)
             return <div>{this.props.t("LTI.GENERIC_ERROR", { message: this.state.httpErrors[0] })}</div>;
         if (this.state.searchResults !== undefined && this.state.ltiRoles !== undefined) {
-            const sr = this.state.searchResults;
+            let sr = this.state.searchResults;
+            if (this.state.config !== undefined && this.state.config.excludeLiveStreams){
+                sr = filterLiveEvents(sr);
+            }
             const headingOpts = {
                 range: {
                     begin: Math.min(sr.offset + 1, sr.total),
