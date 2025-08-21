@@ -505,32 +505,6 @@
         </executions>
       </plugin>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>replace-site-jacoco</id>
-            <goals>
-              <goal>run</goal>
-            </goals>
-            <phase>post-site</phase>
-            <configuration>
-              <target name="Overwrite aggregate jacoco report">
-                <copy file="{project.build.directory}/site/jacoco"
-              </target>
-            </configuration>
-            <resources>
-              <resource>
-                <directory>src/main/java</directory>
-                <includes>
-                  <include> **/*.properties</include>
-                </includes>
-              </resource>
-            </resources>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-staging-maven-plugin</artifactId>
         <version>1.6.13</version>
