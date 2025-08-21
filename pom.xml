@@ -161,6 +161,7 @@
     <module>modules/inspection-service-ffmpeg</module>
     <module>modules/inspection-service-remote</module>
     <module>modules/inspection-workflowoperation</module>
+    <module>modules/jacoco-reports</module>
     <module>modules/kernel</module>
     <module>modules/list-providers-service</module>
     <module>modules/live-schedule-api</module>
@@ -475,7 +476,6 @@
         <executions>
           <execution>
             <id>prepare-agent-build</id>
-            <phase>test</phase>
             <goals>
               <goal>prepare-agent</goal>
             </goals>
@@ -486,11 +486,10 @@
             <goals>
               <goal>report</goal>
               <goal>check</goal>
-              <goal>report-aggregate</goal>
             </goals>
-            <!--<configuration>
+            <configuration>
               <rules>
-                <rule>
+                <!--<rule>
                   <element>BUNDLE</element>
                   <limits>
                     <limit>
@@ -499,30 +498,35 @@
                       <minimum>0.5</minimum>
                     </limit>
                   </limits>
-                </rule>
+                </rule>-->
               </rules>
-            </configuration>-->
-          </execution>
-          <execution>
-            <id>prepare-agent</id>
-            <phase>pre-site</phase>
-            <goals>
-              <goal>prepare-agent</goal>
-            </goals>
-          </execution>
-          <execution>
-            <id>coveragereport</id>
-            <phase>site</phase>
-            <goals>
-              <goal>report</goal>
-              <goal>report-aggregate</goal>
-            </goals>
-            <configuration>
-              <dataFileIncludes>
-                <dataFileInclude>modules/*/target/jacoco.exec</dataFileInclude>
-              </dataFileIncludes>
-              <includeCurrentProject>true</includeCurrentProject>
             </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>replace-site-jacoco</id>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <phase>post-site</phase>
+            <configuration>
+              <target name="Overwrite aggregate jacoco report">
+                <copy file="{project.build.directory}/site/jacoco"
+              </target>
+            </configuration>
+            <resources>
+              <resource>
+                <directory>src/main/java</directory>
+                <includes>
+                  <include> **/*.properties</include>
+                </includes>
+              </resource>
+            </resources>
           </execution>
         </executions>
       </plugin>
@@ -557,7 +561,7 @@
           <version>1.0.0</version>
           <configuration>
             <lifecycleMappingMetadata>
-              <pluginExecutions>
+              <!--<pluginExecutions>
                 <pluginExecution>
                   <pluginExecutionFilter>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -600,7 +604,7 @@
                     <execute/>
                   </action>
                 </pluginExecution>
-              </pluginExecutions>
+              </pluginExecutions>-->
             </lifecycleMappingMetadata>
           </configuration>
         </plugin>
@@ -740,12 +744,12 @@
             </execution>
           </executions>
         </plugin>
-        <plugin>
+        <!--<plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-pmd-plugin</artifactId>
           <version>3.25.0</version>
           <configuration>
-            <!--<includeTests>true</includeTests> -->
+            <!- -<includeTests>true</includeTests> - ->
             <typeResolution>true</typeResolution>
             <targetJdk>${java.release}</targetJdk>
           </configuration>
@@ -758,7 +762,7 @@
               </goals>
             </execution>
           </executions>
-        </plugin>
+        </plugin>-->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-clean-plugin</artifactId>
@@ -779,7 +783,7 @@
           <artifactId>exec-maven-plugin</artifactId>
           <version>3.5.0</version>
         </plugin>
-        <plugin>
+        <!--<plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-dependency-plugin</artifactId>
           <version>3.8.1</version>
@@ -794,7 +798,7 @@
               </configuration>
             </execution>
           </executions>
-        </plugin>
+        </plugin>-->
         <plugin>
           <groupId>org.apache.karaf.tooling</groupId>
           <artifactId>karaf-services-maven-plugin</artifactId>

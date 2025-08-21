@@ -63,6 +63,12 @@ jobs:
             tesseract-ocr-deu \
             unzip
 
+        # This needs to pass otherwise we can end up with modules which are *not* included in the code coverage reports!
+      - name: verify jacoco module depends on all opencast modules
+        if: matrix.java == 17
+        run: |
+          .github/check-jacoco-deps.sh
+
       - name: build opencast
         run: |
           mvn clean install -Pnone \
