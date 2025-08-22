@@ -276,7 +276,7 @@ public class WhisperCppEngine implements SpeechToTextEngine {
       logger.debug("WhisperC++ no fallback set to {}", whispercppNoFallback);
     }
 
-    whispercppArgs = StringUtils.split(Objects.toString(cc.getProperties().get(WHISPERCPP_ARGS_CONFIG_KEY), ""));
+    whispercppArgs = StringUtils.split(Objects.toString(cc.getProperties().get(WHISPERCPP_ARGS_CONFIG_KEY), ""), " ");
     logger.debug("Additional args for WhisperC++: {}", (Object) whispercppArgs);
 
     autoEncode = BooleanUtils.toBoolean(Objects.toString(
