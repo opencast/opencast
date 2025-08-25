@@ -227,8 +227,10 @@ public class MetricsExporter {
   }
 
   public void unsetAssetManager(AssetManager assetManager) {
-    this.assetManager = null;
-    registry.unregister(eventsInAssetManager);
+    if (this.assetManager == assetManager) {
+      this.assetManager = null;
+      registry.unregister(eventsInAssetManager);
+    }
   }
 
 }

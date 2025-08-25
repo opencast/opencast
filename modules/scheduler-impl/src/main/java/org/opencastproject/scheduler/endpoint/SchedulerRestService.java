@@ -213,7 +213,9 @@ public class SchedulerRestService {
    * @param service
    */
   public void unsetService(SchedulerService service) {
-    this.service = null;
+    if (this.service == service) {
+      this.service = null;
+    }
   }
 
   /**
@@ -235,7 +237,9 @@ public class SchedulerRestService {
    * @param prolongingService
    */
   public void unsetProlongingService(CaptureNowProlongingService prolongingService) {
-    this.prolongingService = null;
+    if (this.prolongingService == prolongingService) {
+      this.prolongingService = null;
+    }
   }
 
   /**
@@ -258,7 +262,9 @@ public class SchedulerRestService {
    * @param agentService
    */
   public void unsetCaptureAgentStateService(CaptureAgentStateService agentService) {
-    this.agentService = null;
+    if (this.agentService == agentService) {
+      this.agentService = null;
+    }
   }
 
   /**
