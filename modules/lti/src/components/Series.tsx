@@ -6,7 +6,7 @@ import {
     SearchEpisodeResult,
     deleteEvent,
     Track,
-    filterLiveEvents,
+    //filterLiveEvents,
     Config,
     getConfig
 } from "../OpencastRest";
@@ -142,13 +142,35 @@ class TranslatedSeries extends React.Component<SeriesProps, SeriesState> {
     loadCurrentPage(pageNumber: number = 1) {
         const qs = parsedQueryString();
 
+        getConfig().then((result) => this.setState({
+                    ...this.state,
+                     config: result
+                })).catch((error) => this.setState({
+                    ...this.state,
+                    httpErrors: this.state.httpErrors.concat([error.message])
+                }));
+
+        let live = undefined;
+
+        if (this.state.config !== undefined) {
+
+            if (this.state.config.excludeLiveStreams) {
+                live = "false";
+            } else if (this.state.config.onlyLiveStreams) {
+                live = "true";
+            }
+
+        }
+
+
         searchEpisode(
             EPISONDES_PER_PAGE,
             (pageNumber - 1) * EPISONDES_PER_PAGE,
             undefined,
             typeof qs.series === "string" ? qs.series : undefined,
             typeof qs.series_name === "string" ? qs.series_name : undefined,
-            typeof qs.sort === "string" ? qs.sort : undefined
+            typeof qs.sort === "string" ? qs.sort : undefined,
+            typeof live === "string" ? live : undefined
         ).then((results) => this.setState({
             ...this.state,
             searchResults: results
@@ -157,13 +179,6 @@ class TranslatedSeries extends React.Component<SeriesProps, SeriesState> {
             httpErrors: this.state.httpErrors.concat([error.message])
         }));
 
-        getConfig().then((result) => this.setState({
-            ...this.state,
-             config: result
-        })).catch((error) => this.setState({
-            ...this.state,
-            httpErrors: this.state.httpErrors.concat([error.message])
-        }));
     }
 
     unsetDeletionState() {
@@ -258,10 +273,10 @@ class TranslatedSeries extends React.Component<SeriesProps, SeriesState> {
         if (this.state.httpErrors.length > 0)
             return <div>{this.props.t("LTI.GENERIC_ERROR", { message: this.state.httpErrors[0] })}</div>;
         if (this.state.searchResults !== undefined && this.state.ltiRoles !== undefined) {
-            let sr = this.state.searchResults;
-            if (this.state.config !== undefined && this.state.config.excludeLiveStreams){
+            const sr = this.state.searchResults;
+            /*if (this.state.config !== undefined && this.state.config.excludeLiveStreams){
                 sr = filterLiveEvents(sr);
-            }
+            }*/
             const headingOpts = {
                 range: {
                     begin: Math.min(sr.offset + 1, sr.total),

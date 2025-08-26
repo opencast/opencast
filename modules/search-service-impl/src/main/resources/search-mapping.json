@@ -66,6 +66,9 @@
       "analyzer": "autocomplete_analyzer",
       "search_analyzer": "whitespace_analyzer"
     },
+    "live": {
+      "type": "keyword"
+    },
     "id": {
       "type": "keyword"
     },

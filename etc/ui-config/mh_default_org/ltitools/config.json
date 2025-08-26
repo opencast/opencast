@@ -1,3 +1,4 @@
 {
-  "excludeLiveStreams" : false
+  "excludeLiveStreams" : false,
+  "onlyLiveStreams" : false
 }
