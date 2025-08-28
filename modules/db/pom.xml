@@ -98,6 +98,18 @@
         </configuration>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <detectJavaApiLink>true</detectJavaApiLink>
+          <maxmemory>512m</maxmemory>
+          <quiet>false</quiet>
+          <!-- This is required to work around checker-qual's changes, which munge the javadoc options file
+                and lead to very misleading errors about not finding classes in the org.osgi.framework.* namespace -->
+          <sourcepath>src/main/java</sourcepath>
+        </configuration>
+      </plugin>
+      <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <extensions>true</extensions>

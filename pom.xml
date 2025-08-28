@@ -462,14 +462,14 @@
         </configuration>
       </plugin>
       <plugin>
-        <groupId>org.sonatype.plugins</groupId>
-        <artifactId>nexus-staging-maven-plugin</artifactId>
-        <version>1.6.13</version>
+        <groupId>org.sonatype.central</groupId>
+        <artifactId>central-publishing-maven-plugin</artifactId>
+        <version>0.8.0</version>
         <extensions>true</extensions>
         <configuration>
-          <serverId>ossrh</serverId>
-          <nexusUrl>https://oss.sonatype.org/</nexusUrl>
-          <autoReleaseAfterClose>false</autoReleaseAfterClose>
+          <publishingServerId>central</publishingServerId>
+          <autoPublish>true</autoPublish>
+          <waitUntil>published</waitUntil>
         </configuration>
       </plugin>
     </plugins>
@@ -1487,11 +1487,6 @@
   </reporting>
   <repositories>
     <repository>
-      <id>central</id>
-      <name>Central Maven Repository</name>
-      <url>https://repo.maven.apache.org/maven2/</url>
-    </repository>
-    <repository>
       <id>mvn.opencast.org</id>
       <name>Opencast 3rd-Party Repository</name>
       <url>https://mvn.opencast.org/</url>
@@ -1504,14 +1499,6 @@
     </repository>
   </repositories>
   <distributionManagement>
-    <snapshotRepository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-    </snapshotRepository>
-    <repository>
-      <id>ossrh</id>
-      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-    </repository>
     <site>
       <!-- Note that we do not deploy the site using maven, so this is totally fake -->
       <id>fakesite.opencast.org</id>

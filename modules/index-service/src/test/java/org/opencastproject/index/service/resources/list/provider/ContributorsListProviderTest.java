@@ -83,7 +83,7 @@ public class ContributorsListProviderTest {
       }
 
       @Override
-      public Iterator<User> getUsers() {
+      public List<User> getUsers() {
         return null;
       }
 

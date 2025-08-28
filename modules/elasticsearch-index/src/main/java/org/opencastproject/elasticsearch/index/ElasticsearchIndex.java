@@ -126,7 +126,9 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
   }
 
   public void unsetListProvidersService(ListProvidersService listProvidersService) {
-    this.listProvidersService = null;
+    if (this.listProvidersService == listProvidersService) {
+      this.listProvidersService = null;
+    }
   }
 
   /**

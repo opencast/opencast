@@ -31,8 +31,12 @@ import org.opencastproject.db.DBSessionFactory;
 import org.opencastproject.playlists.PlaylistService;
 import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.AuthorizationService;
+import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.User;
+import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.userdirectory.UserIdRoleProvider;
 import org.opencastproject.util.Jsons;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -50,6 +54,7 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
+import org.osgi.service.metatype.annotations.Designate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,6 +63,10 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+import java.util.function.Predicate;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import javax.persistence.EntityManagerFactory;
 import javax.servlet.http.HttpServletRequest;
@@ -66,9 +75,11 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 
 /**
@@ -97,6 +108,7 @@ import javax.ws.rs.core.Response;
     service = TobiraEndpoint.class
 )
 @JaxrsResource
+@Designate(ocd = TobiraConfig.class)
 public class TobiraEndpoint {
   private static final Logger logger = LoggerFactory.getLogger(TobiraEndpoint.class);
 
@@ -129,7 +141,12 @@ public class TobiraEndpoint {
   private SecurityService securityService;
   private PlaylistService playlistService;
   private Workspace workspace;
+  private UserDirectoryService userDirectoryService;
+  private UserIdRoleProvider userIdRoleProvider;
 
+  private String callbackToken;
+  private Predicate<String> allowedRolesPattern;
+  private String headerName;
 
   /** The factory used to generate the entity manager */
   protected EntityManagerFactory emf = null;
@@ -141,8 +158,11 @@ public class TobiraEndpoint {
   private JsonObject cachedStats = new JsonObject();
 
   @Activate
-  public void activate(BundleContext bundleContext) {
+  public void activate(TobiraConfig tobiraConfig, BundleContext bundleContext) {
     logger.info("Activated Tobira API");
+    callbackToken = tobiraConfig.callbackToken();
+    headerName = tobiraConfig.headerName();
+    allowedRolesPattern = Pattern.compile(tobiraConfig.allowedRolesPattern()).asMatchPredicate();
     this.db = dbSessionFactory.createSession(emf);
   }
 
@@ -186,6 +206,11 @@ public class TobiraEndpoint {
   @Reference
   public void setWorkspace(Workspace workspace) {
     this.workspace = workspace;
+  }
+
+  @Reference
+  public void setUserDirectoryService(UserDirectoryService service) {
+    this.userDirectoryService = service;
   }
 
   @GET
@@ -267,6 +292,68 @@ public class TobiraEndpoint {
       logger.error("Unexpected exception in tobira/harvest", e);
       return Response.serverError().build();
     }
+  }
+
+  @GET
+  @Path("/callback/{token}")
+  @Produces(APPLICATION_JSON)
+  @RestQuery(
+      name = "callback",
+      description = "Auth callback API to get user information. This is used by Tobira to get user information.",
+      pathParameters = {
+          @RestParameter(
+              name = "token",
+              isRequired = true,
+              description = "The token to authorize the request.",
+              type = Type.STRING
+          )
+      },
+      responses = {
+          @RestResponse(description = "User Outcome Data", responseCode = HttpServletResponse.SC_OK)
+      },
+      returnDescription = "Returns user information"
+  )
+  public Response callback(@PathParam("token") String token, @Context HttpHeaders headers) {
+
+    if (callbackToken == null || !callbackToken.equals(token)) {
+      return badRequest("Invalid token or callback disabled");
+    }
+
+    List<String> username = headers.getRequestHeader(headerName);
+
+    if (username == null) {
+      return badRequest("No username header provided");
+    }
+
+    User user = null;
+
+    if (!username.isEmpty() && username.get(0) != null) {
+      user = userDirectoryService.loadUser(username.get(0));
+    }
+
+    Jsons.Obj outcome;
+
+    if (user == null) {
+      outcome = Jsons.obj(
+        Jsons.p("outcome", "no-user")
+      );
+    } else {
+      outcome = Jsons.obj(
+          Jsons.p("outcome", "user"),
+          Jsons.p("username", user.getUsername()),
+          Jsons.p("displayName", user.getName()),
+          Jsons.p("email", user.getEmail()),
+          Jsons.p("userRole",UserIdRoleProvider.getUserIdRole(user.getUsername())),
+          Jsons.p("roles", Jsons.arr(
+            user.getRoles().stream()
+                .map(Role::getName)
+                .filter(allowedRolesPattern)
+                .map(Jsons::v)
+                .collect(Collectors.toList())))
+      );
+    }
+
+    return Response.ok(outcome.toJson()).build();
   }
 
   private static Response badRequest(String msg) {

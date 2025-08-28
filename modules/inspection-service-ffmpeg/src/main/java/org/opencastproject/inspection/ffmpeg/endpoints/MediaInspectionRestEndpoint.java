@@ -117,7 +117,9 @@ public class MediaInspectionRestEndpoint extends AbstractJobProducerEndpoint {
    * @param service
    */
   public void unsetService(MediaInspectionService service) {
-    this.service = null;
+    if (this.service == service) {
+      this.service = null;
+    }
   }
 
   /**
