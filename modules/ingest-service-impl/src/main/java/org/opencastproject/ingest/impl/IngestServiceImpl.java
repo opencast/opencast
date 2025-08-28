@@ -1868,7 +1868,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   }
 
   public void unsetSchedulerService(SchedulerService schedulerService) {
-    this.schedulerService = null;
+    if (this.schedulerService == schedulerService) {
+      this.schedulerService = null;
+    }
   }
 
   /**

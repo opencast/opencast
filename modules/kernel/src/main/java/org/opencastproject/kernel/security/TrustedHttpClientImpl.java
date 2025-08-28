@@ -253,7 +253,9 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
    *         the serviceRegistry to unset (unused, but needed for OSGI)
    */
   public void unsetServiceRegistry(ServiceRegistry serviceRegistry) {
-    this.serviceRegistry = null;
+    if (this.serviceRegistry == serviceRegistry) {
+      this.serviceRegistry = null;
+    }
   }
 
   /**

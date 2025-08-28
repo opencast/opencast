@@ -28,7 +28,6 @@ import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.data.Option;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.osgi.service.component.ComponentContext;
@@ -123,7 +122,7 @@ public class WhisperEngine implements SpeechToTextEngine {
     isVADEnabled = OsgiUtil.getOptCfgAsBoolean(prop, WHISPER_VAD);
     logger.debug("Whisper Voice Activity Detection set to {}", isVADEnabled.getOrElse(false));
 
-    whisperArgs = StringUtils.split(Objects.toString(prop.get(WHISPER_ARGS_CONFIG_KEY), ""));
+    whisperArgs = Objects.toString(prop.get(WHISPER_ARGS_CONFIG_KEY), "").trim().split("\\s+");
     logger.debug("Additional args for Whisper: {}", (Object) whisperArgs);
 
     logger.debug("Finished activating/updating speech-to-text service");
