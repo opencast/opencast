@@ -1,6 +1,40 @@
 Opencast 18 Changelog
 ---------------------
 
+Changes marked with \* were also included in 17.x.
+
+## Opencast 18.1 (2025-08-29)
+- [[#7004](https://github.com/opencast/opencast/pull/7004)] -
+  Update r/18.x Admin UI to 18.x-2025-08-29
+- [[#7003](https://github.com/opencast/opencast/pull/7003)] -
+  Update r/18.x Editor to 18.x-2025-08-29
+- [[#6938](https://github.com/opencast/opencast/pull/6938)] -
+  Reactivate user role filter for admin ui
+- [[#6925](https://github.com/opencast/opencast/pull/6925)] -
+  Add support for source-tags to speechtotext woh
+- [[#6879](https://github.com/opencast/opencast/pull/6879)] -
+  Adds Opencast 18 release notes + upgrade docs
+- [[#6619](https://github.com/opencast/opencast/pull/6619)] -
+  Add tobira auth callback
+- [[#6996](https://github.com/opencast/opencast/pull/6996)] -
+  Split whispercpp args\*
+- [[#6973](https://github.com/opencast/opencast/pull/6973)] -
+  Fix missing `isPresent` check for optional workflow\*
+- [[#6980](https://github.com/opencast/opencast/pull/6980)] -
+  Fix javadoc build\*
+- [[#6983](https://github.com/opencast/opencast/pull/6983)] -
+  Ensure removing the correct reference\*
+- [[#6985](https://github.com/opencast/opencast/pull/6985)] -
+  Fix maven central publication\*
+- [[#6979](https://github.com/opencast/opencast/pull/6979)] -
+  Fix partial path traversal vulnerability in UI config\*
+- [[#6969](https://github.com/opencast/opencast/pull/6969)] -
+  Update Debian package docs\*
+- [[#6966](https://github.com/opencast/opencast/pull/6966)] -
+  Add option to pass additional args to WhisperCpp\*
+- [[#6965](https://github.com/opencast/opencast/pull/6965)] -
+  Remove reencoding to utf-8 of JWTs\*
+
 ## Opencast 18.0 (2025-07-24)
 - [[#6934](https://github.com/opencast/opencast/pull/6934)] -
   Merge sql migrations 17 to 18

@@ -1,5 +1,19 @@
 # Opencast 18: Release Notes
 
+## Opencast 18.1
+
+Among other bug fixes, this version contains a **security fix**. Please see
+[#6979](https://github.com/opencast/opencast/pull/6979) and
+[GHSA-hq8m-v68g-8cf8](https://github.com/opencast/opencast/security/advisories/GHSA-hq8m-v68g-8cf8)
+(once published) for details.
+
+As a minor feature, it is now possible to pass additional arguments to whisper.cpp
+([#6966](https://github.com/opencast/opencast/pull/6966)).
+
+This version also contains new releases of both the admin ui
+([18.x-2025-08-29](https://github.com/opencast/opencast-admin-interface/releases/tag/18.x-2025-08-29)) and the editor
+([18.x-2025-08-29](https://github.com/opencast/opencast-editor/releases/tag/18.x-2025-08-29)).
+
 ## Opencast 18.0
 
 ### Features
