@@ -1,5 +1,19 @@
 # Opencast 17: Release Notes
 
+## Opencast 17.7
+
+Among other bug fixes, this version contains a **security fix**. Please see
+[#6979](https://github.com/opencast/opencast/pull/6979) and
+[GHSA-hq8m-v68g-8cf8](https://github.com/opencast/opencast/security/advisories/GHSA-hq8m-v68g-8cf8)
+(once published) for details.
+
+As a minor feature, it is now possible to pass additional arguments to whisper.cpp
+([#6966](https://github.com/opencast/opencast/pull/6966)).
+
+This version also contains new releases of both the admin ui
+([17.x-2025-08-29](https://github.com/opencast/opencast-admin-interface/releases/tag/17.x-2025-08-29)) and the editor
+([17.x-2025-08-28](https://github.com/opencast/opencast-editor/releases/tag/17.x-2025-08-28)).
+
 ## Opencast 17.6
 
 This version contains a **security fix**! Please see
@@ -21,8 +35,8 @@ Apart from that, this release contains multiple bug fixes, e.g. for timeouts in 
 As a feature, we now accept AAI attributes as list ([#6831](https://github.com/opencast/opencast/pull/6831)).
 
 There are also new versions of both the admin ui
-([2025-07-24](https://github.com/opencast/opencast-admin-interface/releases/tag/2025-07-24) and the editor
-([2025-07-24](https://github.com/opencast/opencast-editor/releases/tag/2025-07-24) included.
+([17.x-2025-07-24](https://github.com/opencast/opencast-admin-interface/releases/tag/17.x-2025-07-24) and the editor
+([17.x-2025-07-24](https://github.com/opencast/opencast-editor/releases/tag/17.x-2025-07-24) included.
 
 ## Opencast 17.5
 
@@ -31,9 +45,10 @@ importantly a security fix for the paella player ([#6783](https://github.com/ope
 and a bugfix for jwt tokens ([#6791](https://github.com/opencast/opencast/pull/6791)).
 
 There are also new releases for both the admin ui
-([2025-06-27](https://github.com/opencast/opencast-admin-interface/releases/tag/2025-06-27)) and the editor
-([2025-06-19](https://github.com/opencast/opencast-editor/releases/tag/2025-06-19), but also see the release notes for
-[2025-06-18](https://github.com/opencast/opencast-editor/releases/tag/2025-06-18)), respectively.
+([17.x-2025-06-27](https://github.com/opencast/opencast-admin-interface/releases/tag/17.x-2025-06-27)) and the editor
+([17.x-2025-06-19](https://github.com/opencast/opencast-editor/releases/tag/17.x-2025-06-19), but also see the
+release notes for
+[17.x-2025-06-18](https://github.com/opencast/opencast-editor/releases/tag/17.x-2025-06-18)), respectively.
 
 Additionally there is a minor change to the community workflows that should
 only affect adopters who ingest more than two streams ([#6728](https://github.com/opencast/opencast/pull/6728)).
