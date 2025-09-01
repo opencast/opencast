@@ -8,9 +8,6 @@ configuration to `on` or `off`.
 List of Available Plugins
 -------------------------
 
-- opencast-plugin-legacy-annotation
-    - Legacy annotation functionality. We do not recommend turning this on. It also requires additional configuration in
-      the player. It's kept for a few legacy use-cases.
 - opencast-plugin-transcription-services
     - Support for the Amberscript transcription service
     - Support for the Google cloud transcription service

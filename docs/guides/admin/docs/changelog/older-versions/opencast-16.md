@@ -1,6 +1,15 @@
 Opencast 16 Changelog
 ---------------------
 
+## Opencast 16.12
+
+- [[#6827](https://github.com/opencast/opencast/pull/6827)] -
+  Fix Matrix Room Topic Update
+- [[#6783](https://github.com/opencast/opencast/pull/6783)] -
+  Paella security fix: Paella Player can load configuration files from arbitrary servers
+- [[#6750](https://github.com/opencast/opencast/pull/6750)] -
+  Wait for Opensearch on Opencast boot
+
 ## Opencast 16.11
 
 - [[#6681](https://github.com/opencast/opencast/pull/6681)] -

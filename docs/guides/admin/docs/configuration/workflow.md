@@ -287,7 +287,9 @@ As the formal description above explains, such boolean expressions may containâ€
   are enclosed in `${}`, as shown below. A default value may be specified for a variable, after the name,
   separated by a colon, as such: `${foo:1}`. The default value will be used in case the variable doesnâ€™t exist.
   If no default value is specified, `false` will be used. This, of course, only makes sense in boolean contexts. Be
-  aware to specify a default value in relations such as `${foo} < ${bar}`.
+  aware to specify a default value in relations such as `${foo} < ${bar}`. If a colon is part of a variable name, it
+  needs to be escaped, as such: `${foo\:bar:1}`. Escaped colons in the variable name and the default will be replaced
+  by a colon in the output.
 
 Example for simple boolean expressions:
 

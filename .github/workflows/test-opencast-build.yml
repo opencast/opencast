@@ -9,6 +9,8 @@ on:
       - 'docs/log4j/**'
       - 'assemblies/**'
       - '.github/**'
+      - 'mvnw'
+      - '.mvn/**'
   push:
     paths:
       - 'pom.xml'
@@ -17,6 +19,8 @@ on:
       - 'docs/log4j/**'
       - 'assemblies/**'
       - '.github/**'
+      - 'mvnw'
+      - '.mvn/**'
     branches-ignore:
       - 'dependabot/**'  # Don't run dependabot branches, as they are already covered by pull requests
 
@@ -28,7 +32,7 @@ jobs:
           - 21
           - 23
     name: build (java ${{ matrix.java }})
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
 
@@ -53,11 +57,8 @@ jobs:
             bzip2 \
             ffmpeg \
             gzip \
-            hunspell \
-            hunspell-de-de \
             procps \
             s3cmd \
-            sox \
             tar \
             tesseract-ocr \
             tesseract-ocr-deu \
@@ -65,7 +66,7 @@ jobs:
 
       - name: build opencast
         run: |
-          mvn clean install -Pnone \
+          ./mvnw clean install -Pnone \
             --batch-mode \
             -Dsurefire.rerunFailingTestsCount=2 \
             -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
@@ -75,8 +76,9 @@ jobs:
 
         #This has to happen in a separate step or else various service classes aren't visible
       - name: build javadocs
+        if: matrix.java == 23
         run: |
-          mvn javadoc:javadoc javadoc:aggregate -Pnone \
+          ./mvnw javadoc:javadoc javadoc:aggregate -Pnone \
             --batch-mode \
             -Dsurefire.rerunFailingTestsCount=2 \
             -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
@@ -88,7 +90,7 @@ jobs:
         if: matrix.java == 21
         working-directory: assemblies
         run: |
-          mvn clean install \
+          ../mvnw clean install \
             --batch-mode \
             -Dsurefire.rerunFailingTestsCount=2 \
             -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \

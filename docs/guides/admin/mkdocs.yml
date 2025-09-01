@@ -63,17 +63,17 @@ nav:
       - Overview: "installation/index.md"
       - Hardware Requirements: installation/server-requirements.md
       - Java Versions: installation/java-version.md
-      - Multiple Servers: "installation/multiple-servers.md"
+      - Installation from Package:
+          - Debian/Ubuntu: "installation/debs.md"
+          - RHEL/Rocky/CentOS: "installation/rpm-el.md"
+      - Installation with Docker:
+          - Testing Locally: "installation/docker-local.md"
       - Installation from Source:
           - Linux: "installation/source-linux.md"
           - macOS: "installation/source-macosx.md"
-      - Installation from Package:
-          - Debian/Ubuntu: "installation/debs.md"
-          - RHEL/CentOS Stream 8/9: "installation/rpm-el.md"
       - Installation via script:
           - Ansible: "installation/ansible.md"
-      - Installation with Docker:
-          - Testing Locally: "installation/docker-local.md"
+      - Multiple Servers: "installation/multiple-servers.md"
       - Prerelease Testing: "installation/prereleases.md"
   - Configuration:
       - Overview: "configuration/index.md"
@@ -231,6 +231,7 @@ nav:
       - Microsoft Azure Start Transcription: "workflowoperationhandlers/microsoft-azure-start-transcription-woh.md"
       - Move Storage: "workflowoperationhandlers/move-storage-woh.md"
       - Multiencode: "workflowoperationhandlers/multiencode-woh.md"
+      - Mux: "workflowoperationhandlers/mux-woh.md"
       - Partial Import: "workflowoperationhandlers/partial-import-woh.md"
       - Post Media Package: "workflowoperationhandlers/postmediapackage-woh.md"
       - Prepare A/V: "workflowoperationhandlers/prepareav-woh.md"

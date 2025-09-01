@@ -90,6 +90,8 @@ public class ConductingEpisodeUpdatedEventHandler implements AssetManagerUpdateH
   }
 
   public void unsetOaiPmhUpdatedEventHandler(OaiPmhUpdatedEventHandler h) {
-    this.oaiPmhUpdatedEventHandler = null;
+    if (this.oaiPmhUpdatedEventHandler == h) {
+      this.oaiPmhUpdatedEventHandler = null;
+    }
   }
 }

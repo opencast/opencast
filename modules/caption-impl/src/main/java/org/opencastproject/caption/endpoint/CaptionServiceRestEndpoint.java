@@ -129,7 +129,9 @@ public class CaptionServiceRestEndpoint extends AbstractJobProducerEndpoint {
    *          the caption service to remove
    */
   protected void unsetCaptionService(CaptionService service) {
-    this.service = null;
+    if (this.service == service) {
+      this.service = null;
+    }
   }
 
   /**

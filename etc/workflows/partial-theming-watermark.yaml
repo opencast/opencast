@@ -5,7 +5,7 @@ operations:
   - id: tag
     description: Select tracks for watermarking
     configurations:
-      - source-flavors: '*/trimmed'
+      - source-flavors: 'presenter/trimmed,presentation/trimmed'
       - target-flavor: '*/branding'
 
   # Render watermark into presenter and presentation tracks

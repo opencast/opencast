@@ -49,7 +49,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.util.Assert;
 
-import java.nio.charset.StandardCharsets;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -230,7 +230,7 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
    * @return The username.
    */
   private String extractUsername(DecodedJWT jwt) {
-    String username = evaluateMapping(jwt, usernameMapping, false);
+    String username = evaluateMapping(jwt, usernameMapping);
     Assert.isTrue(StringUtils.isNotBlank(username), "Extracted username is blank");
     return username;
   }
@@ -242,7 +242,7 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
    * @return The name.
    */
   private String extractName(DecodedJWT jwt) {
-    String name = evaluateMapping(jwt, nameMapping, true);
+    String name = evaluateMapping(jwt, nameMapping);
     Assert.isTrue(StringUtils.isNotBlank(name), "Extracted name is blank");
     return name;
   }
@@ -254,7 +254,7 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
    * @return The email.
    */
   private String extractEmail(DecodedJWT jwt) {
-    String email = evaluateMapping(jwt, emailMapping, true);
+    String email = evaluateMapping(jwt, emailMapping);
     Assert.isTrue(StringUtils.isNotBlank(email), "Extracted email is blank");
     return email;
   }
@@ -354,18 +354,13 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
    *
    * @param jwt The decoded JWT.
    * @param mapping The mapping.
-   * @param ensureEncoding Whether to ensure UTF_8 encoding.
    *
    * @return The string evaluated from the mapping.
    */
-  private String evaluateMapping(DecodedJWT jwt, String mapping, boolean ensureEncoding) {
+  private String evaluateMapping(DecodedJWT jwt, String mapping) {
     ExpressionParser parser = new SpelExpressionParser();
     Expression exp = parser.parseExpression(mapping);
-    String value = exp.getValue(jwt.getClaims(), String.class);
-    if (ensureEncoding) {
-      value = new String(value.getBytes(StandardCharsets.ISO_8859_1), StandardCharsets.UTF_8);
-    }
-    return value;
+    return exp.getValue(jwt.getClaims(), String.class);
   }
 
   /**

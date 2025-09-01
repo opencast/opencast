@@ -36,7 +36,7 @@ public interface UserDirectoryService {
    *
    * @return the users
    */
-  Iterator<User> getUsers();
+  List<User> getUsers();
 
   /**
    * Loads a user by username, or returns null if this user is not known to the thread's current organization.

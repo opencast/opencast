@@ -53,6 +53,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component(
     service = ResourceListProvider.class,
@@ -136,6 +138,10 @@ public class SeriesListProvider implements ResourceListProvider {
         }
         SearchResult<Series> searchResult = searchIndex.getByQuery(seriesQuery);
         Calendar calendar = Calendar.getInstance();
+        //We might have duplicate series names, so let's count them and see
+        Map<String, Long> duplicates = Arrays.stream(searchResult.getItems())
+            .map(series -> series.getSource().getTitle())
+            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
         for (SearchResultItem<Series> item : searchResult.getItems()) {
           Series s = item.getSource();
           if (TITLE_EXTENDED.equals(listName)) {
@@ -155,11 +161,7 @@ public class SeriesListProvider implements ResourceListProvider {
             result.put(s.getIdentifier(), sb.toString());
           } else if (PROVIDER_PREFIX.equals(listName)) {
             String newSeriesName = s.getTitle();
-            boolean isTitleRepeated = Arrays.stream(searchResult.getItems())
-                .anyMatch(series ->
-                    !series.equals(item) && series.getSource().getTitle().equals(s.getTitle())
-                );
-            if (isTitleRepeated) {
+            if (duplicates.get(newSeriesName) > 1L) {
               //If a series name is repeated, will add the first 7 characters of the series ID to the display name on the
               //admin-ui
               if (s.getIdentifier().length() > 8) {

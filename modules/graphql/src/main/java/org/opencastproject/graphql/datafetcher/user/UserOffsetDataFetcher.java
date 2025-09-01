@@ -31,7 +31,6 @@ import org.opencastproject.util.SmartIterator;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import graphql.schema.DataFetchingEnvironment;
@@ -54,9 +53,7 @@ public class UserOffsetDataFetcher extends ParameterDataFetcher<GqlUserList> {
 
     // Filter users by filter criteria
     List<User> filteredUsers = new ArrayList<>();
-    for (Iterator<User> i = userDirectoryService.getUsers(); i.hasNext();) {
-      User user = i.next();
-
+    for (User user : userDirectoryService.getUsers()) {
       // Filter list
       if (filter != null && !match(filter, user.getUsername(), user.getName(), user.getEmail(), user.getProvider())) {
         continue;
