@@ -648,7 +648,7 @@
         <plugin>
           <groupId>com.googlecode.maven-download-plugin</groupId>
           <artifactId>download-maven-plugin</artifactId>
-          <version>1.8.0</version>
+          <version>1.13.0</version>
           <configuration>
             <alwaysVerifyChecksum>true</alwaysVerifyChecksum>
           </configuration>
