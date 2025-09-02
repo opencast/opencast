@@ -19,7 +19,7 @@
     "@babel/preset-env": "^7.27.2",
     "@playwright/test": "^1.55.0",
     "babel-loader": "^10.0.0",
-    "copy-webpack-plugin": "^13.0.0",
+    "copy-webpack-plugin": "^13.0.1",
     "css-loader": "^7.1.2",
     "eslint": "^9.34.0",
     "eslint-config-opencast": "file:../../docs/checkstyle/eslint-config",
