@@ -19,7 +19,7 @@
     "react-i18next": "^14.1.0",
     "react": "^18.3.1",
     "react-bootstrap": "^2.10.10",
-    "react-dom": "^18.3.1",
+    "react-dom": "^19.1.1",
     "react-i18next": "^15.4.1",
     "react-js-pagination": "^3.0.2",
     "react-scripts": "^5.0.1",
@@ -51,7 +51,7 @@
     "@types/jest": "30.0.0",
     "@types/node": "24.1.0",
     "@types/react": "18.3.12",
-    "@types/react-dom": "18.3.1",
+    "@types/react-dom": "19.1.9",
     "@types/react-helmet": "^6.1.9",
     "@types/react-js-pagination": "^3.0.7"
   }
