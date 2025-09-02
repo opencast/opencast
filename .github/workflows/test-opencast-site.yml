@@ -87,10 +87,10 @@ jobs:
 
       - name: prepare github ssh key
         env:
-          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY_COVERAGE }}
         run: |
           install -dm 700 ~/.ssh/
-          echo "${DEPLOY_KEY_COVERAGE}" > ~/.ssh/id_ed25519
+          echo "${DEPLOY_KEY}" > ~/.ssh/id_ed25519
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan github.com >> ~/.ssh/known_hosts
 
