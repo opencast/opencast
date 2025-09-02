@@ -30,7 +30,6 @@ export interface SearchEpisodeResult {
     readonly mediapackage: MediaPackage;
     readonly languageShortCode: string;
     readonly licenseKey: string;
-    readonly live: boolean;
 }
 
 export interface SearchEpisodeResults {
@@ -66,7 +65,7 @@ export interface LtiData {
     readonly roles: string[];
 }
 
-export interface Config {
+interface Config {
     readonly excludeLiveStreams: boolean;
     readonly onlyLiveStreams: boolean;
 }
@@ -141,20 +140,20 @@ export async function copyEventToSeries(eventId: string, targetSeries: string): 
     return axios.post(hostAndPort() + "/lti-service-gui/" + eventId + "/copy?target_series=" + targetSeries);
 }
 
-export async function getConfig(): Promise<Config> {
+async function getConfig(): Promise<Config> {
+  try {
     const response = await axios.get<any>(hostAndPort() + '/ui/config/ltitools/config.json');
     return {
-        excludeLiveStreams: response.data.excludeLiveStreams !== undefined ? response.data.excludeLiveStreams : false,
-        onlyLiveStreams: response.data.onlyLiveStreams !== undefined ? response.data.onlyLiveStreams : false
+      excludeLiveStreams: response.data.excludeLiveStreams !== undefined ? response.data.excludeLiveStreams : false,
+      onlyLiveStreams: response.data.onlyLiveStreams !== undefined ? response.data.onlyLiveStreams : false
     }
-
+  } catch (_) {
+    return {
+      excludeLiveStreams: false,
+      onlyLiveStreams: false}
+  }
 }
 
-export function filterLiveEvents(sr: SearchEpisodeResults) {
-    const filtered_results = sr.results.filter(result => !result.live);
-    const filtered_sr : SearchEpisodeResults = {results: filtered_results, total : sr.total, limit : sr.limit, offset : sr.offset};
-    return filtered_sr
-}
 
 /**
  * Parse resolution from string to object if possible
@@ -205,21 +204,20 @@ const parseTracksFromResult = (result: any) => {
   return undefined;
 }
 
-/*const parseLiveFromResults = (result :any) : boolean => {
-    if (Array.isArray(result.mediapackage.media.track)) {
-        let live : boolean = false;
-        result.mediapackage.media.track.forEach( (track: any) => {
-            if ('live' in track && track.live === true) {
-                live = true;
-            }
-        } )
-        return live;
-    } else if (result.mediapackage.media.track !== null) {
-        if (!('live' in result.mediapackage.media.track)) { return false }
-        return result.mediapackage.media.track.live === true;
+async function parseLiveFromConfig() : Promise<String> {
+  try {
+    const config = await getConfig();
+    if (config.excludeLiveStreams && !config.onlyLiveStreams) {
+    return "false";
     }
-    return false;
-}*/
+    if (!config.excludeLiveStreams && config.onlyLiveStreams) {
+      return "true";
+    }
+    return "";
+  } catch (_) {
+    return "";
+  }
+}
 
 export async function searchEpisode(
     limit: number,
@@ -227,8 +225,7 @@ export async function searchEpisode(
     episodeId?: string,
     seriesId?: string,
     seriesName?: string,
-    sort?: string,
-    live? : string): Promise<SearchEpisodeResults> {
+    sort?: string): Promise<SearchEpisodeResults> {
     let urlSuffix = "";
     if (seriesId !== undefined)
         urlSuffix += "&sid=" + seriesId;
@@ -238,7 +235,8 @@ export async function searchEpisode(
         urlSuffix += "&id=" + episodeId;
     if (sort !== undefined)
         urlSuffix += "&sort=" + sort;
-    if (live !== undefined)
+    const live = await parseLiveFromConfig();
+    if (typeof live === "string" && live !== "")
         urlSuffix += "&live=" + live;
     const url = `${hostAndPort()}/search/episode.json?limit=${limit}&offset=${offset}${urlSuffix}`;
     const response = await axios.get<any>(url);
@@ -267,8 +265,7 @@ export async function searchEpisode(
                         url: attachment.url
                     })),
                 tracks: parseTracksFromResult(result)
-            },
-          live: result.live
+            }
         })),
         total: response.data.total,
         limit: response.data.limit,
