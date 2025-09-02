@@ -280,7 +280,6 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
           throws SearchException, SearchServiceDatabaseException {
     String mediaPackageId = mediaPackage.getIdentifier().toString();
     String orgId = securityService.getOrganization().getId();
-    //String live = mediaPackage.isLive() ? "true" : "false";
 
     //If the entry has been deleted then there's *probably* no dc file to load.
     DublinCoreCatalog dc = null == delDate
