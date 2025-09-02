@@ -104,15 +104,13 @@ jobs:
       - name: clone repository
         if: >
           github.event_name == 'push'
-          && github.repository_owner == 'opencast'
           && (github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/r/'))
         run: |
-          git clone -b gh-pages "git@github.com:${{ github.repository_owner }}/coverage-reports.git" opencast
+          git clone -b gh-pages "git@github.com:opencast/coverage-reports.git" opencast
 
       - name: store site and build index
         if: >
           github.event_name == 'push'
-          && github.repository_owner == 'opencast'
           && (github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/r/'))
         working-directory: opencast
         run: |
@@ -132,7 +130,6 @@ jobs:
       - name: Push updates
         if: >
           github.event_name == 'push'
-          && github.repository_owner == 'opencast'
           && (github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/r/'))
         working-directory: opencast
         run: git push origin gh-pages --force
