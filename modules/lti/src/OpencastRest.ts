@@ -141,17 +141,18 @@ export async function copyEventToSeries(eventId: string, targetSeries: string): 
 }
 
 async function getConfig(): Promise<Config> {
-  try {
-    const response = await axios.get<any>(hostAndPort() + '/ui/config/ltitools/config.json');
-    return {
-      excludeLiveStreams: response.data.excludeLiveStreams !== undefined ? response.data.excludeLiveStreams : false,
-      onlyLiveStreams: response.data.onlyLiveStreams !== undefined ? response.data.onlyLiveStreams : false
+    try {
+        const response = await axios.get<any>(hostAndPort() + '/ui/config/ltitools/config.json');
+        return {
+            excludeLiveStreams: response.data.excludeLiveStreams !== undefined ? response.data.excludeLiveStreams : false,
+            onlyLiveStreams: response.data.onlyLiveStreams !== undefined ? response.data.onlyLiveStreams : false
+        }
+    } catch (_) {
+        return {
+            excludeLiveStreams: false,
+            onlyLiveStreams: false
+        }
     }
-  } catch (_) {
-    return {
-      excludeLiveStreams: false,
-      onlyLiveStreams: false}
-  }
 }
 
 
@@ -205,18 +206,18 @@ const parseTracksFromResult = (result: any) => {
 }
 
 async function parseLiveFromConfig() : Promise<String> {
-  try {
-    const config = await getConfig();
-    if (config.excludeLiveStreams && !config.onlyLiveStreams) {
-    return "false";
+    try {
+        const config = await getConfig();
+        if (config.excludeLiveStreams && !config.onlyLiveStreams) {
+            return "false";
+        }
+        if (!config.excludeLiveStreams && config.onlyLiveStreams) {
+            return "true";
+        }
+        return "";
+    } catch (_) {
+        return "";
     }
-    if (!config.excludeLiveStreams && config.onlyLiveStreams) {
-      return "true";
-    }
-    return "";
-  } catch (_) {
-    return "";
-  }
 }
 
 export async function searchEpisode(
