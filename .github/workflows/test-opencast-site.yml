@@ -67,15 +67,6 @@ jobs:
         run: |
           .github/check-jacoco-deps.sh
 
-      - name: prepare github ssh key
-        env:
-          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
-        run: |
-          install -dm 700 ~/.ssh/
-          echo "${DEPLOY_KEY}" > ~/.ssh/id_ed25519
-          chmod 600 ~/.ssh/id_ed25519
-          ssh-keyscan github.com >> ~/.ssh/known_hosts
-
         #This has to happen in a separate step or else various service classes aren't visible
       - name: build maven site
         run: |
@@ -94,15 +85,31 @@ jobs:
           git config --global user.name "Release Bot"
           git config --global user.email "cloud@opencast.org"
 
+      - name: prepare github ssh key
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+        run: |
+          install -dm 700 ~/.ssh/
+          echo "${DEPLOY_KEY_COVERAGE}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+      - name: wait for previous workflows to finish
+        uses: softprops/turnstyle@v2
+        with:
+          same-branch-only: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: clone repository
         if: >
           github.event_name == 'push'
           && github.repository_owner == 'opencast'
           && (github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/r/'))
         run: |
-          git clone -b gh-pages "git@github.com:${{ github.repository_owner }}/opencast.git" opencast
+          git clone -b gh-pages "git@github.com:${{ github.repository_owner }}/coverage-reports.git" opencast
 
-      - name: store site
+      - name: store site and build index
         if: >
           github.event_name == 'push'
           && github.repository_owner == 'opencast'
@@ -113,6 +120,12 @@ jobs:
           export BRANCH="${TEMP#r\/}"
           rm -rf $BRANCH
           mv ../target/staging $BRANCH
+          echo '<html><body><ul>' > index.html
+          find . -mindepth 1 -maxdepth 1 -type d \
+            | grep '[0-9]*.x\|develop' \
+            | sort -r \
+            | sed 's/^\(.*\)$/<li><a href=\1>\1<\/a><\/li>/' >> index.html
+          echo '</ul></body></html>' >> index.html
           git add .
           git commit --amend -m "Maven site build outputs"
 
