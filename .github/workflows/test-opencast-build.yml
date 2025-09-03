@@ -66,19 +66,7 @@ jobs:
 
       - name: build opencast
         run: |
-          ./mvnw clean install -Pnone \
-            --batch-mode \
-            -Dsurefire.rerunFailingTestsCount=2 \
-            -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
-            -Dhttp.keepAlive=false \
-            -Dmaven.wagon.http.pool=false \
-            -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
-
-        #This has to happen in a separate step or else various service classes aren't visible
-      - name: build javadocs
-        if: matrix.java == 23
-        run: |
-          ./mvnw javadoc:javadoc javadoc:aggregate -Pnone \
+          ./mvn clean install -Pnone -T1C \
             --batch-mode \
             -Dsurefire.rerunFailingTestsCount=2 \
             -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
