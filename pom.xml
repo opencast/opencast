@@ -10,6 +10,7 @@
   <url>https://opencast.org</url>
   <inceptionYear>2009</inceptionYear>
   <properties>
+    <argLine></argLine>
     <checkstyle.skip>false</checkstyle.skip>
     <opencast.basedir>${basedir}</opencast.basedir>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -160,6 +161,7 @@
     <module>modules/inspection-service-ffmpeg</module>
     <module>modules/inspection-service-remote</module>
     <module>modules/inspection-workflowoperation</module>
+    <module>modules/jacoco-reports</module>
     <module>modules/kernel</module>
     <module>modules/list-providers-service</module>
     <module>modules/live-schedule-api</module>
@@ -413,10 +415,7 @@
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <useFile>false</useFile>
-          <argLine>
-            -Dfile.encoding=UTF-8
-            --add-opens java.base/java.util=ALL-UNNAMED
-          </argLine>
+          <argLine>@{argLine} -Dfile.encoding=UTF-8 --add-opens java.base/java.util=ALL-UNNAMED</argLine>
           <!-- see https://jira.codehaus.org/browse/SUREFIRE-951 -->
           <systemPropertyVariables>
             <M2_REPO>${settings.localRepository}</M2_REPO>
@@ -465,16 +464,45 @@
         </executions>
       </plugin>
       <plugin>
-        <!-- use this to generate a code coverage report:
-          mvn cobertura:cobertura -->
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>cobertura-maven-plugin</artifactId>
-        <version>2.7</version>
+        <!-- use this to generate a code coverage report: -->
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.12</version>
         <configuration>
-          <format>html</format>
-          <aggregate>true</aggregate>
-          <check/>
+          <skip>${maven.test.skip}</skip>
+          <output>file</output>
+          <append>true</append>
         </configuration>
+        <executions>
+          <execution>
+            <id>prepare-agent-build</id>
+            <goals>
+              <goal>prepare-agent</goal>
+            </goals>
+          </execution>
+          <execution>
+            <id>check</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>report</goal>
+              <goal>check</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <!--<rule>
+                  <element>BUNDLE</element>
+                  <limits>
+                    <limit>
+                      <counter>INSTRUCTION</counter>
+                      <value>COVEREDRATIO</value>
+                      <minimum>0.5</minimum>
+                    </limit>
+                  </limits>
+                </rule>-->
+              </rules>
+            </configuration>
+          </execution>
+        </executions>
       </plugin>
       <plugin>
         <groupId>org.sonatype.central</groupId>
@@ -507,7 +535,7 @@
           <version>1.0.0</version>
           <configuration>
             <lifecycleMappingMetadata>
-              <pluginExecutions>
+              <!--<pluginExecutions>
                 <pluginExecution>
                   <pluginExecutionFilter>
                     <groupId>org.apache.maven.plugins</groupId>
@@ -550,7 +578,7 @@
                     <execute/>
                   </action>
                 </pluginExecution>
-              </pluginExecutions>
+              </pluginExecutions>-->
             </lifecycleMappingMetadata>
           </configuration>
         </plugin>
@@ -638,7 +666,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-site-plugin</artifactId>
-          <version>3.12.1</version>
+          <version>3.21.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -690,12 +718,12 @@
             </execution>
           </executions>
         </plugin>
-        <plugin>
+        <!--<plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-pmd-plugin</artifactId>
           <version>3.25.0</version>
           <configuration>
-            <!--<includeTests>true</includeTests> -->
+            <!- -<includeTests>true</includeTests> - ->
             <typeResolution>true</typeResolution>
             <targetJdk>${java.release}</targetJdk>
           </configuration>
@@ -708,7 +736,7 @@
               </goals>
             </execution>
           </executions>
-        </plugin>
+        </plugin>-->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-clean-plugin</artifactId>
@@ -729,7 +757,7 @@
           <artifactId>exec-maven-plugin</artifactId>
           <version>3.5.0</version>
         </plugin>
-        <plugin>
+        <!--<plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-dependency-plugin</artifactId>
           <version>3.8.1</version>
@@ -744,7 +772,7 @@
               </configuration>
             </execution>
           </executions>
-        </plugin>
+        </plugin>-->
         <plugin>
           <groupId>org.apache.karaf.tooling</groupId>
           <artifactId>karaf-services-maven-plugin</artifactId>
@@ -1478,6 +1506,17 @@
             </reports>
           </reportSet>
         </reportSets>
+      </plugin>
+      <plugin>
+        <!-- use this to generate a code coverage report: -->
+        <groupId>org.jacoco</groupId>
+        <artifactId>jacoco-maven-plugin</artifactId>
+        <version>0.8.2</version>
+        <configuration>
+          <skip>${maven.test.skip}</skip>
+          <output>file</output>
+          <append>true</append>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

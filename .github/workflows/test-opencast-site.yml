@@ -1,0 +1,147 @@
+name: Test Opencast Site
+
+on:
+  pull_request:
+    paths:
+      - 'pom.xml'
+      - 'modules/**'
+      - 'docs/checkstyle/**'
+      - 'docs/log4j/**'
+      - 'assemblies/**'
+      - '.github/**'
+  push:
+    paths:
+      - 'pom.xml'
+      - 'modules/**'
+      - 'docs/checkstyle/**'
+      - 'docs/log4j/**'
+      - 'assemblies/**'
+      - '.github/**'
+    branches-ignore:
+      - 'dependabot/**'  # Don't run dependabot branches, as they are already covered by pull requests
+
+jobs:
+  site:
+    strategy:
+      matrix:
+        java:
+          - 21
+    name: build (java ${{ matrix.java }})
+    runs-on: ubuntu-22.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: cache local maven repository
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: setup java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: ${{ matrix.java }}
+
+      - name: install dependencies
+        run: |
+          sudo apt update -q
+          sudo apt install -y -q \
+            bzip2 \
+            ffmpeg \
+            gzip \
+            hunspell \
+            hunspell-de-de \
+            procps \
+            s3cmd \
+            sox \
+            tar \
+            tesseract-ocr \
+            tesseract-ocr-deu \
+            unzip
+
+        # This needs to pass otherwise we can end up with modules which are *not* included in the code coverage reports!
+      - name: verify jacoco module depends on all opencast modules
+        run: |
+          .github/check-jacoco-deps.sh
+
+        #This has to happen in a separate step or else various service classes aren't visible
+      - name: build maven site
+        run: |
+          mvn site -T1C -Pnone \
+            --batch-mode \
+            -Dsurefire.rerunFailingTestsCount=2 \
+            -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
+            -Dhttp.keepAlive=false \
+            -Dmaven.wagon.http.pool=false \
+            -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 && \
+          mvn site:stage -Pnone
+
+      - name: Save site build
+        uses: actions/upload-artifact@v4
+        if: >
+          github.event_name == 'push'
+          && github.repository_owner == 'opencast'
+          && (github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/r/'))
+        with:
+          name: site_build
+          path: target/staging
+
+  pages:
+    name: generate github pages for reports
+    runs-on: ubuntu-22.04
+    needs: site
+    concurrency:
+      group: opencast-site-build
+      cancel-in-progress: false
+    if: >
+      github.event_name == 'push'
+      && github.repository_owner == 'opencast'
+      && (github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/r/'))
+    steps:
+      - name: Download site generation artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: site_build
+          path: site_build
+
+      - name: Prepare git
+        if: github.repository_owner == 'opencast'
+        run: |
+          git config --global user.name "Release Bot"
+          git config --global user.email "cloud@opencast.org"
+
+      - name: prepare github ssh key
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY_COVERAGE }}
+        run: |
+          install -dm 700 ~/.ssh/
+          echo "${DEPLOY_KEY}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+      - name: clone repository
+        run: |
+          git clone -b gh-pages "git@github.com:opencast/coverage-reports.git" opencast
+
+      - name: store site and build index
+        working-directory: opencast
+        run: |
+          export TEMP=${{ github.ref_name }}
+          export BRANCH="${TEMP#r\/}"
+          rm -rf $BRANCH
+          mv ../site_build $BRANCH
+          echo '<html><body><ul>' > index.html
+          find . -mindepth 1 -maxdepth 1 -type d \
+            | grep '[0-9]*.x\|develop' \
+            | sort -r \
+            | sed 's/^\(.*\)$/<li><a href=\1>\1<\/a><\/li>/' >> index.html
+          echo '</ul></body></html>' >> index.html
+          git add .
+          git commit --amend -m "Maven site build outputs"
+
+      - name: Push updates
+        working-directory: opencast
+        run: git push origin gh-pages --force
