@@ -83,7 +83,6 @@ jobs:
         uses: actions/upload-artifact@v4
         if: >
           github.event_name == 'push'
-          && github.repository_owner == 'opencast'
           && (github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/r/'))
         with:
           name: site_build
@@ -97,7 +96,6 @@ jobs:
       cancel-in-progress: false
     if: >
       github.event_name == 'push'
-      && github.repository_owner == 'opencast'
       && (github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/r/'))
     steps:
       - name: Download math result for job 1
