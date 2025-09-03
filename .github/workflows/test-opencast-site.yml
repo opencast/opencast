@@ -91,6 +91,7 @@ jobs:
   pages:
     name: generate github pages for reports
     runs-on: ubuntu-22.04
+    needs: site
     concurrency:
       group: opencast-site-build
       cancel-in-progress: false
