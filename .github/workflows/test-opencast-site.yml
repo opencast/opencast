@@ -79,8 +79,31 @@ jobs:
             -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 && \
           ./mvnw site:stage -Pnone
 
+      - name: Save site build
+        uses: actions/upload-artifact@v4
+        if: >
+          github.event_name == 'push'
+          && (github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/r/'))
+        with:
+          name: site_build
+          path: target/staging
+
+  pages:
+    name: generate github pages for reports
+    runs-on: ubuntu-22.04
+    concurrency:
+      group: opencast-site-build
+      cancel-in-progress: false
+    if: >
+      github.event_name == 'push'
+      && (github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/r/'))
+    steps:
+      - name: Download math result for job 1
+        uses: actions/download-artifact@v4
+        with:
+          name: site_build
+
       - name: Prepare git
-        if: github.repository_owner == 'opencast'
         run: |
           git config --global user.name "Release Bot"
           git config --global user.email "cloud@opencast.org"
@@ -102,16 +125,10 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: clone repository
-        if: >
-          github.event_name == 'push'
-          && (github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/r/'))
         run: |
           git clone -b gh-pages "git@github.com:opencast/coverage-reports.git" opencast
 
       - name: store site and build index
-        if: >
-          github.event_name == 'push'
-          && (github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/r/'))
         working-directory: opencast
         run: |
           export TEMP=${{ github.ref_name }}
@@ -128,8 +145,5 @@ jobs:
           git commit --amend -m "Maven site build outputs"
 
       - name: Push updates
-        if: >
-          github.event_name == 'push'
-          && (github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/r/'))
         working-directory: opencast
         run: git push origin gh-pages --force
