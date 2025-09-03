@@ -8,7 +8,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>18-SNAPSHOT</version>
+    <version>19-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -41,16 +41,6 @@
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-analyze-mediapackage-workflowoperation</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-annotation-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-annotation-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -551,11 +541,6 @@
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-plugin-manager</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-presets</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
