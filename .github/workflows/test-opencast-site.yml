@@ -99,10 +99,11 @@ jobs:
       github.event_name == 'push'
       && (github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/r/'))
     steps:
-      - name: Download math result for job 1
+      - name: Download site generation artifact
         uses: actions/download-artifact@v4
         with:
           name: site_build
+          path: site_build
 
       - name: Prepare git
         run: |
@@ -118,13 +119,6 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan github.com >> ~/.ssh/known_hosts
 
-      - name: wait for previous workflows to finish
-        uses: softprops/turnstyle@v2
-        with:
-          same-branch-only: false
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
       - name: clone repository
         run: |
           git clone -b gh-pages "git@github.com:opencast/coverage-reports.git" opencast
@@ -135,7 +129,7 @@ jobs:
           export TEMP=${{ github.ref_name }}
           export BRANCH="${TEMP#r\/}"
           rm -rf $BRANCH
-          mv ../target/staging $BRANCH
+          mv ../site_build $BRANCH
           echo '<html><body><ul>' > index.html
           find . -mindepth 1 -maxdepth 1 -type d \
             | grep '[0-9]*.x\|develop' \
