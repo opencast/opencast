@@ -24,6 +24,9 @@ To enable Whisper as for the `SpeechToText` WoH, follow these steps.
       on CPU.
 2. Enable whisper and set Job load in `org.opencastproject.speechtotext.impl.SpeechToTextServiceImpl.cfg`.
 3. Set the target model to use in `org.opencastproject.speechtotext.impl.engine.WhisperEngine`.
+4. If Whisper jobs are going to run asynchronously, outside the scope of the originating workflow, and subtitles attached by a separate workflow, enable the feature and configure the workflow to attach the subtitles in:
+`org.opencastproject.speechtotext.async.impl.SpeechToTextWorkflowSchedulerQuartz`.
+The workflow should use the` speechtotext-attach` woh to add the subtitles and then republish the media package.
 
 
 Additional Notes

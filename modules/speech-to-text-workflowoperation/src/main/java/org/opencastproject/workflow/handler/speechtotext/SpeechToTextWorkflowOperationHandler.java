@@ -20,6 +20,9 @@
  */
 package org.opencastproject.workflow.handler.speechtotext;
 
+import static org.opencastproject.speechtotext.async.api.SpeechToTextAsyncTracker.JOBS_WORKFLOW_CONFIGURATION;
+import static org.opencastproject.speechtotext.async.api.SpeechToTextAsyncTracker.STT_ASYNC_COLLECTION;
+
 import org.opencastproject.inspection.api.MediaInspectionService;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
@@ -37,6 +40,9 @@ import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.speechtotext.api.SpeechToTextService;
 import org.opencastproject.speechtotext.api.SpeechToTextServiceException;
+import org.opencastproject.speechtotext.async.api.SpeechToTextAsyncException;
+import org.opencastproject.speechtotext.async.api.SpeechToTextAsyncTracker;
+import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -105,9 +111,6 @@ public class
   /** Configuration: Synchronous or asynchronous mode */
   private static final String ASYNCHRONOUS = "async";
 
-  /** Workflow configuration name to store jobs in */
-  private static final String JOBS_WORKFLOW_CONFIGURATION = "speech-to-text-jobs";
-
   private enum TrackSelectionStrategy {
     PRESENTER_OR_NOTHING,
     PRESENTATION_OR_NOTHING,
@@ -132,6 +135,9 @@ public class
 
   /** The speech-to-text service. */
   private SpeechToTextService speechToTextService = null;
+
+  /** Service to tracker asynchrnous requests to the speech-to-text service */
+  private SpeechToTextAsyncTracker speechToTextTracker;
 
   /** The workspace service. */
   private Workspace workspace;
@@ -304,7 +310,7 @@ public class
     Job job;
     logger.info("Generating subtitle for '{}'...", trackURI);
     try {
-      job = speechToTextService.transcribe(trackURI, languageCode, translate);
+      job = speechToTextService.transcribe(trackURI, languageCode, translate, false);
     } catch (SpeechToTextServiceException e) {
       throw new WorkflowOperationException(
               String.format("Generating subtitles for '%s' in media package '%s' failed",
@@ -388,11 +394,31 @@ public class
     logger.info("Asynchronously generating subtitles");
     StringBuilder jobs = new StringBuilder();
     try {
-      for (var track: tracks) {
-        var job = speechToTextService.transcribe(track.getURI(), languageCode, translate);
-        jobs.append(",").append(job.getId());
+      try {
+        // Make sure workflow does not have any jobs being tracked currently e.g. cleanup a previous
+        // operation with retry-strategy=hold that failed.
+        speechToTextTracker.untrackAll(workflow.getId());
+      } catch (SpeechToTextAsyncException e) {
+        logger.warn("Could not delete existing trackers for mp {}", workflow.getMediaPackage().getIdentifier());
       }
-    } catch (SpeechToTextServiceException e) {
+      for (var track: tracks) {
+        // Make a copy of the track so that it isn't deleted by cleanup at the end of the workflow
+        String path = track.getURI().getPath();
+        String extension = path.lastIndexOf(".") > -1 ? path.substring(path.lastIndexOf(".")) : "";
+        String fileName = String.format("%d-%s%s", workflow.getId(), track.getIdentifier(), extension);
+        URI inputUri = workspace.putInCollection(STT_ASYNC_COLLECTION, fileName, workspace.read(track.getURI()));
+
+        var job = speechToTextService.transcribe(inputUri, languageCode, translate, true);
+        jobs.append(",").append(job.getId());
+        try {
+          speechToTextTracker.track(job, workflow.getMediaPackage().getIdentifier().toString(), workflow.getId());
+        } catch (SpeechToTextAsyncException e) {
+          logger.warn("Could not add tracker to async speech to text process for mp {}, track {}",
+                  workflow.getMediaPackage().getIdentifier(), track, e);
+          // Do not fail the workflow, just not track it
+        }
+      }
+    } catch (IOException | NotFoundException | SpeechToTextServiceException e) {
       throw new WorkflowOperationException(
           String.format("Starting subtitle job in media package '%s' failed",
               workflow.getMediaPackage().getIdentifier()), e);
@@ -503,6 +529,11 @@ public class
   @Reference
   public void setSpeechToTextService(SpeechToTextService speechToTextService) {
     this.speechToTextService = speechToTextService;
+  }
+
+  @Reference
+  public void setSpeechToTextAsyncTracker(SpeechToTextAsyncTracker sttTracker) {
+    this.speechToTextTracker = sttTracker;
   }
 
   @Reference

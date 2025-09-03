@@ -214,6 +214,8 @@
     <module>modules/smil-impl</module>
     <module>modules/smil-workflowoperation</module>
     <module>modules/speech-to-text-api</module>
+    <module>modules/speech-to-text-async-api</module>
+    <module>modules/speech-to-text-async-impl</module>
     <module>modules/speech-to-text-impl</module>
     <module>modules/speech-to-text-remote</module>
     <module>modules/speech-to-text-workflowoperation</module>
