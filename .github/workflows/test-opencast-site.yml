@@ -83,6 +83,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: >
           github.event_name == 'push'
+          && github.repository_owner == 'opencast'
           && (github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/r/'))
         with:
           name: site_build
@@ -97,6 +98,7 @@ jobs:
       cancel-in-progress: false
     if: >
       github.event_name == 'push'
+      && github.repository_owner == 'opencast'
       && (github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/r/'))
     steps:
       - name: Download site generation artifact
@@ -106,6 +108,7 @@ jobs:
           path: site_build
 
       - name: Prepare git
+        if: github.repository_owner == 'opencast'
         run: |
           git config --global user.name "Release Bot"
           git config --global user.email "cloud@opencast.org"
