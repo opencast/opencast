@@ -111,7 +111,6 @@ import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowService;
 
-import com.entwinemedia.fn.data.Opt;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
@@ -447,7 +446,9 @@ public class EventsEndpoint implements ManagedService {
       // withScheduling was added in version 1.1.0 and should be ignored for smaller versions
       withScheduling = false;
     }
-    for (final Event event : indexService.getEvent(id, elasticsearchIndex)) {
+    Optional<Event> eventOpt = indexService.getEvent(id, elasticsearchIndex);
+    if (eventOpt.isPresent()) {
+      Event event = eventOpt.get();
       event.updatePreview(previewSubtype);
       return ApiResponseBuilder.Json.ok(
           requestedVersion, eventToJSON(event, withAcl, withMetadata, withScheduling, withPublications, includeInternalPublication, sign, requestedVersion));
@@ -475,8 +476,9 @@ public class EventsEndpoint implements ManagedService {
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
     List<TrackImpl> tracks = new ArrayList<>();
 
-    for (final Event event : indexService.getEvent(id, elasticsearchIndex)) {
-      final MediaPackage mp = indexService.getEventMediapackage(event);
+    Optional<Event> eventOpt = indexService.getEvent(id, elasticsearchIndex);
+    if (eventOpt.isPresent()) {
+      final MediaPackage mp = indexService.getEventMediapackage(eventOpt.get());
       for (Track track : mp.getTracks()) {
         if (track instanceof TrackImpl) {
           tracks.add((TrackImpl) track);
@@ -540,8 +542,8 @@ public class EventsEndpoint implements ManagedService {
           @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response deleteEvent(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id)
           throws SearchIndexException, UnauthorizedException {
-    final Opt<Event> event = indexService.getEvent(id, elasticsearchIndex);
-    if (event.isNone()) {
+    final Optional<Event> event = indexService.getEvent(id, elasticsearchIndex);
+    if (event.isEmpty()) {
       return RestUtil.R.notFound(id);
     }
     final IndexService.EventRemovalResult result;
@@ -588,20 +590,22 @@ public class EventsEndpoint implements ManagedService {
     try {
       String startDatePattern = configuredMetadataFields.containsKey("startDate") ? configuredMetadataFields.get("startDate").getPattern() : null;
       String startTimePattern = configuredMetadataFields.containsKey("startTime") ? configuredMetadataFields.get("startTime").getPattern() : null;
-      for (final Event event : indexService.getEvent(eventId, elasticsearchIndex)) {
+      Optional<Event> eventOpt = indexService.getEvent(eventId, elasticsearchIndex);
+      if (eventOpt.isPresent()) {
+        Event event = eventOpt.get();
         EventHttpServletRequest eventHttpServletRequest = EventHttpServletRequest.updateFromHttpServletRequest(event,
                 request, getEventCatalogUIAdapters(), startDatePattern, startTimePattern);
 
         // FIXME: All of these update operations should be a part of a transaction to avoid a partially updated event.
-        if (eventHttpServletRequest.getMetadataList().isSome()) {
+        if (eventHttpServletRequest.getMetadataList().isPresent()) {
           indexService.updateEventMetadata(eventId, eventHttpServletRequest.getMetadataList().get(), elasticsearchIndex);
         }
 
-        if (eventHttpServletRequest.getAcl().isSome()) {
+        if (eventHttpServletRequest.getAcl().isPresent()) {
           indexService.updateEventAcl(eventId, eventHttpServletRequest.getAcl().get(), elasticsearchIndex);
         }
 
-        if (eventHttpServletRequest.getProcessing().isSome()) {
+        if (eventHttpServletRequest.getProcessing().isPresent()) {
 
           if (!event.isScheduledEvent() || event.hasRecordingStarted()) {
             return RestUtil.R.badRequest("Processing can't be updated for events that are already uploaded.");
@@ -636,7 +640,7 @@ public class EventsEndpoint implements ManagedService {
           }
         }
 
-        if (eventHttpServletRequest.getScheduling().isSome() && !requestedVersion.isSmallerThan(VERSION_1_1_0)) {
+        if (eventHttpServletRequest.getScheduling().isPresent() && !requestedVersion.isSmallerThan(VERSION_1_1_0)) {
           // Scheduling is only available for version 1.1.0 and above
           Optional<Response> clientError = updateSchedulingInformation(
               eventHttpServletRequest.getScheduling().get(), eventId, requestedVersion, false);
@@ -689,7 +693,7 @@ public class EventsEndpoint implements ManagedService {
           ingestService, getEventCatalogUIAdapters(), startDatePattern, startTimePattern);
 
       // If scheduling information is provided, the source has to be "SCHEDULE_SINGLE" or "SCHEDULE_MULTIPLE".
-      if (eventHttpServletRequest.getScheduling().isSome() && !requestedVersion.isSmallerThan(VERSION_1_1_0)) {
+      if (eventHttpServletRequest.getScheduling().isPresent() && !requestedVersion.isSmallerThan(VERSION_1_1_0)) {
         // Scheduling is only available for version 1.1.0 and above
         return scheduleNewEvent(eventHttpServletRequest, eventHttpServletRequest.getScheduling().get(), requestedVersion);
       }
@@ -1185,8 +1189,8 @@ public class EventsEndpoint implements ManagedService {
 
     if (withMetadata != null && withMetadata) {
       try {
-        Opt<MetadataList> metadata = getEventMetadata(event);
-        if (metadata.isSome()) {
+        Optional<MetadataList> metadata = getEventMetadata(event);
+        if (metadata.isPresent()) {
           json.add("metadata", MetadataJson.listToJson(metadata.get(), true));
         }
       } catch (Exception e) {
@@ -1229,8 +1233,9 @@ public class EventsEndpoint implements ManagedService {
                   @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventAcl(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id)
           throws Exception {
-    for (final Event event : indexService.getEvent(id, elasticsearchIndex)) {
-      AccessControlList acl = getAclFromEvent(event);
+    Optional<Event> eventOpt = indexService.getEvent(id, elasticsearchIndex);
+    if (eventOpt.isPresent()) {
+      AccessControlList acl = getAclFromEvent(eventOpt.get());
       return ApiResponseBuilder.Json.ok(acceptHeader, AclUtils.serializeAclToJson(acl));
     }
     return ApiResponseBuilder.notFound("Cannot find an event with id '%s'.", id);
@@ -1245,7 +1250,7 @@ public class EventsEndpoint implements ManagedService {
                           @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response updateEventAcl(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @FormParam("acl") String acl) throws Exception {
-    if (indexService.getEvent(id, elasticsearchIndex).isSome()) {
+    if (indexService.getEvent(id, elasticsearchIndex).isPresent()) {
       AccessControlList accessControlList;
       try {
         accessControlList = AclUtils.deserializeJsonToAcl(acl, false);
@@ -1279,8 +1284,9 @@ public class EventsEndpoint implements ManagedService {
   public Response addEventAce(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @PathParam("action") String action, @FormParam("role") String role) throws Exception {
     List<AccessControlEntry> entries = new ArrayList<>();
-    for (final Event event : indexService.getEvent(id, elasticsearchIndex)) {
-      AccessControlList accessControlList = getAclFromEvent(event);
+    Optional<Event> eventOpt = indexService.getEvent(id, elasticsearchIndex);
+    if (eventOpt.isPresent()) {
+      AccessControlList accessControlList = getAclFromEvent(eventOpt.get());
       AccessControlEntry newAce = new AccessControlEntry(role, action, true);
       boolean alreadyInAcl = false;
       for (AccessControlEntry ace : accessControlList.getEntries()) {
@@ -1325,8 +1331,9 @@ public class EventsEndpoint implements ManagedService {
   public Response deleteEventAce(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @PathParam("action") String action, @PathParam("role") String role) throws Exception {
     List<AccessControlEntry> entries = new ArrayList<>();
-    for (final Event event : indexService.getEvent(id, elasticsearchIndex)) {
-      AccessControlList accessControlList = getAclFromEvent(event);
+    Optional<Event> eventOpt = indexService.getEvent(id, elasticsearchIndex);
+    if (eventOpt.isPresent()) {
+      AccessControlList accessControlList = getAclFromEvent(eventOpt.get());
       boolean foundDelete = false;
       for (AccessControlEntry ace : accessControlList.getEntries()) {
         if (ace.getAction().equals(action) && ace.getRole().equals(role)) {
@@ -1364,8 +1371,8 @@ public class EventsEndpoint implements ManagedService {
           @QueryParam("type") String type) throws Exception {
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
     if (StringUtils.trimToNull(type) == null) {
-      Opt<MetadataList> metadataList = getEventMetadataById(id);
-      if (metadataList.isSome()) {
+      Optional<MetadataList> metadataList = getEventMetadataById(id);
+      if (metadataList.isPresent()) {
         MetadataList actualList = metadataList.get();
 
         // API v1 should return a two separate fields for start date and start time. Since those fields were merged in index service, we have to split them up.
@@ -1414,14 +1421,15 @@ public class EventsEndpoint implements ManagedService {
     }
   }
 
-  protected Opt<MetadataList> getEventMetadataById(String id) throws IndexServiceException, Exception {
-    for (final Event event : indexService.getEvent(id, elasticsearchIndex)) {
-      return getEventMetadata(event);
+  protected Optional<MetadataList> getEventMetadataById(String id) throws IndexServiceException, Exception {
+    Optional<Event> eventOpt = indexService.getEvent(id, elasticsearchIndex);
+    if (eventOpt.isPresent()) {
+      return getEventMetadata(eventOpt.get());
     }
-    return Opt.<MetadataList> none();
+    return Optional.<MetadataList> empty();
   }
 
-  protected Opt<MetadataList> getEventMetadata(Event event) throws IndexServiceException, Exception {
+  protected Optional<MetadataList> getEventMetadata(Event event) throws IndexServiceException, Exception {
     MetadataList metadataList = new MetadataList();
     List<EventCatalogUIAdapter> catalogUIAdapters = getEventCatalogUIAdapters();
     EventCatalogUIAdapter eventCatalogUIAdapter = indexService.getCommonEventCatalogUIAdapter();
@@ -1445,22 +1453,24 @@ public class EventsEndpoint implements ManagedService {
     if (WorkflowInstance.WorkflowState.RUNNING.toString().equals(event.getWorkflowState())) {
       metadataList.setLocked(Locked.WORKFLOW_RUNNING);
     }
-    return Opt.some(metadataList);
+    return Optional.of(metadataList);
   }
 
-  private Opt<MediaPackageElementFlavor> getFlavor(String flavorString) {
+  private Optional<MediaPackageElementFlavor> getFlavor(String flavorString) {
     try {
       MediaPackageElementFlavor flavor = MediaPackageElementFlavor.parseFlavor(flavorString);
-      return Opt.some(flavor);
+      return Optional.of(flavor);
     } catch (IllegalArgumentException e) {
-      return Opt.none();
+      return Optional.empty();
     }
   }
 
   private Response getEventMetadataByType(String id, String type, ApiVersion requestedVersion) throws Exception {
-    for (final Event event : indexService.getEvent(id, elasticsearchIndex)) {
-      Opt<MediaPackageElementFlavor> flavor = getFlavor(type);
-      if (flavor.isNone()) {
+    Optional<Event> eventOpt = indexService.getEvent(id, elasticsearchIndex);
+    if (eventOpt.isPresent()) {
+      Event event = eventOpt.get();
+      Optional<MediaPackageElementFlavor> flavor = getFlavor(type);
+      if (flavor.isEmpty()) {
         return R.badRequest(
                 String.format("Unable to parse type '%s' as a flavor so unable to find the matching catalog.", type));
       }
@@ -1522,15 +1532,17 @@ public class EventsEndpoint implements ManagedService {
                       metadataJSON));
     }
 
-    Opt<MediaPackageElementFlavor> flavor = getFlavor(type);
-    if (flavor.isNone()) {
+    Optional<MediaPackageElementFlavor> flavor = getFlavor(type);
+    if (flavor.isEmpty()) {
       return R.badRequest(
               String.format("Unable to parse type '%s' as a flavor so unable to find the matching catalog.", type));
     }
 
     DublinCoreMetadataCollection collection = null;
     EventCatalogUIAdapter adapter = null;
-    for (final Event event : indexService.getEvent(id, elasticsearchIndex)) {
+    Optional<Event> eventOpt = indexService.getEvent(id, elasticsearchIndex);
+    if (eventOpt.isPresent()) {
+      Event event = eventOpt.get();
       MetadataList metadataList = new MetadataList();
       // Try the main catalog first as we load it from the index.
       EventCatalogUIAdapter eventCatalogUIAdapter = indexService.getCommonEventCatalogUIAdapter();
@@ -1563,8 +1575,8 @@ public class EventsEndpoint implements ManagedService {
       for (String key : updatedFields.keySet()) {
         if ("subjects".equals(key)) {
           MetadataField field = collection.getOutputFields().get(DublinCore.PROPERTY_SUBJECT.getLocalName());
-          Opt<Response> error = validateField(field, key, id, type, updatedFields);
-          if (error.isSome()) {
+          Optional<Response> error = validateField(field, key, id, type, updatedFields);
+          if (error.isPresent()) {
             return error.get();
           }
           collection.removeField(field);
@@ -1574,8 +1586,8 @@ public class EventsEndpoint implements ManagedService {
         } else if ("startDate".equals(key)) {
           // Special handling for start date since in API v1 we expect start date and start time to be separate fields.
           MetadataField field = collection.getOutputFields().get(key);
-          Opt<Response> error = validateField(field, key, id, type, updatedFields);
-          if (error.isSome()) {
+          Optional<Response> error = validateField(field, key, id, type, updatedFields);
+          if (error.isPresent()) {
             return error.get();
           }
           String apiPattern = field.getPattern();
@@ -1594,8 +1606,8 @@ public class EventsEndpoint implements ManagedService {
         } else if ("startTime".equals(key)) {
           // Special handling for start time since in API v1 we expect start date and start time to be separate fields.
           MetadataField field = collection.getOutputFields().get("startDate");
-          Opt<Response> error = validateField(field, "startDate", id, type, updatedFields);
-          if (error.isSome()) {
+          Optional<Response> error = validateField(field, "startDate", id, type, updatedFields);
+          if (error.isPresent()) {
             return error.get();
           }
           String apiPattern = "HH:mm";
@@ -1617,8 +1629,8 @@ public class EventsEndpoint implements ManagedService {
                   MetadataJson.copyWithDifferentJsonValue(field, sdf.format(updatedStartDate.toDate())));
         } else {
           MetadataField field = collection.getOutputFields().get(key);
-          Opt<Response> error = validateField(field, key, id, type, updatedFields);
-          if (error.isSome()) {
+          Optional<Response> error = validateField(field, key, id, type, updatedFields);
+          if (error.isPresent()) {
             return error.get();
           }
           collection.removeField(field);
@@ -1634,17 +1646,17 @@ public class EventsEndpoint implements ManagedService {
     return ApiResponseBuilder.notFound("Cannot find an event with id '%s'.", id);
   }
 
-  private Opt<Response> validateField(MetadataField field, String key, String id, String type, Map<String, String> updatedFields) {
+  private Optional<Response> validateField(MetadataField field, String key, String id, String type, Map<String, String> updatedFields) {
     if (field == null) {
-      return Opt.some(ApiResponseBuilder.notFound(
+      return Optional.of(ApiResponseBuilder.notFound(
               "Cannot find a metadata field with id '%s' from event with id '%s' and the metadata type '%s'.",
               key, id, type));
     } else if (field.isRequired() && StringUtils.isBlank(updatedFields.get(key))) {
-      return Opt.some(R.badRequest(String.format(
+      return Optional.of(R.badRequest(String.format(
               "The event metadata field with id '%s' and the metadata type '%s' is required and can not be empty!.",
               key, type)));
     }
-    return Opt.none();
+    return Optional.empty();
   }
 
   @DELETE
@@ -1657,9 +1669,10 @@ public class EventsEndpoint implements ManagedService {
                           @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response deleteEventMetadataByType(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @QueryParam("type") String type) throws SearchIndexException {
-    for (final Event event : indexService.getEvent(id, elasticsearchIndex)) {
-      Opt<MediaPackageElementFlavor> flavor = getFlavor(type);
-      if (flavor.isNone()) {
+    Optional<Event> eventOpt = indexService.getEvent(id, elasticsearchIndex);
+    if (eventOpt.isPresent()) {
+      Optional<MediaPackageElementFlavor> flavor = getFlavor(type);
+      if (flavor.isEmpty()) {
         return R.badRequest(
                 String.format("Unable to parse type '%s' as a flavor so unable to find the matching catalog.", type));
       }
@@ -1671,7 +1684,7 @@ public class EventsEndpoint implements ManagedService {
                 .build();
       }
       try {
-        indexService.removeCatalogByFlavor(event, flavor.get());
+        indexService.removeCatalogByFlavor(eventOpt.get(), flavor.get());
       } catch (NotFoundException e) {
         return ApiResponseBuilder.notFound(e.getMessage());
       } catch (IndexServiceException e) {
@@ -1709,8 +1722,8 @@ public class EventsEndpoint implements ManagedService {
           @QueryParam("sign") boolean sign, @QueryParam("includeInternalPublication") boolean includeInternalPublication) throws Exception {
     try {
       final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
-      final Opt<Event> event = indexService.getEvent(id, elasticsearchIndex);
-      if (event.isSome()) {
+      final Optional<Event> event = indexService.getEvent(id, elasticsearchIndex);
+      if (event.isPresent()) {
         JsonArray jsonArray = new JsonArray();
         for (JsonElement pub : getPublications(event.get(), sign, includeInternalPublication, requestedVersion)) {
           jsonArray.add(pub);
@@ -1898,9 +1911,10 @@ public class EventsEndpoint implements ManagedService {
 
   private JsonObject getPublication(String eventId, String publicationId, Boolean withSignedUrls, ApiVersion requestedVersion)
           throws SearchIndexException, NotFoundException {
-    for (final Event event : indexService.getEvent(eventId, elasticsearchIndex)) {
+    Optional<Event> eventOpt = indexService.getEvent(eventId, elasticsearchIndex);
+    if (eventOpt.isPresent()) {
       List<Publication> publications;
-      publications = event.getPublications().stream().filter(publication -> (!requestedVersion.isSmallerThan(VERSION_1_11_0) || EventUtils.internalChannelFilter.test(publication))).collect(Collectors.toList());
+      publications = eventOpt.get().getPublications().stream().filter(publication -> (!requestedVersion.isSmallerThan(VERSION_1_11_0) || EventUtils.internalChannelFilter.test(publication))).collect(Collectors.toList());
       for (Publication publication : publications) {
         if (publicationId.equals(publication.getIdentifier())) {
           return getPublication(publication, withSignedUrls, requestedVersion);
@@ -1992,9 +2006,9 @@ public class EventsEndpoint implements ManagedService {
   public Response getEventScheduling(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id)
       throws Exception {
     try {
-      final Opt<Event> event = indexService.getEvent(id, elasticsearchIndex);
+      final Optional<Event> event = indexService.getEvent(id, elasticsearchIndex);
 
-      if (event.isNone()) {
+      if (event.isEmpty()) {
         return ApiResponseBuilder.notFound(String.format("Unable to find event with id '%s'", id));
       }
 
@@ -2027,12 +2041,12 @@ public class EventsEndpoint implements ManagedService {
                                  @FormParam("scheduling") String scheduling,
                                  @FormParam("allowConflict") @DefaultValue("false") boolean allowConflict) throws Exception {
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
-    final Opt<Event> event = indexService.getEvent(id, elasticsearchIndex);
+    final Optional<Event> event = indexService.getEvent(id, elasticsearchIndex);
 
     if (requestedVersion.isSmallerThan(ApiVersion.VERSION_1_2_0)) {
         allowConflict = false;
     }
-    if (event.isNone()) {
+    if (event.isEmpty()) {
       return ApiResponseBuilder.notFound(String.format("Unable to find event with id '%s'", id));
     }
     final JSONParser parser = new JSONParser();
@@ -2064,7 +2078,7 @@ public class EventsEndpoint implements ManagedService {
 
     // When "inputs" is updated, capture agent configuration needs to be merged
     Optional<Map<String, String>> caConfig = Optional.empty();
-    if (schedulingInfo.getInputs().isSome()) {
+    if (schedulingInfo.getInputs().isPresent()) {
       final Map<String, String> configMap = new HashMap<>(technicalMetadata.getCaptureAgentConfiguration());
       configMap.put(CaptureParameters.CAPTURE_DEVICE_NAMES, schedulingInfo.getInputs().get());
       caConfig = Optional.of(configMap);
@@ -2073,9 +2087,9 @@ public class EventsEndpoint implements ManagedService {
     try {
       schedulerService.updateEvent(
           id,
-          Optional.ofNullable(schedulingInfo.getStartDate().orNull()),
-          Optional.ofNullable(schedulingInfo.getEndDate().orNull()),
-          Optional.ofNullable(schedulingInfo.getAgentId().orNull()),
+          schedulingInfo.getStartDate(),
+          schedulingInfo.getEndDate(),
+          schedulingInfo.getAgentId(),
           Optional.empty(),
           Optional.empty(),
           Optional.empty(),
@@ -2129,7 +2143,7 @@ public class EventsEndpoint implements ManagedService {
       boolean overwriteExisting = false;
       MediaPackageElementFlavor tmpFlavor = MediaPackageElementFlavor.parseFlavor("addTrack/temporary");
       MediaPackageElementFlavor newFlavor = null;
-      Opt<Event> event;
+      Optional<Event> event;
       List<String> tags = null;
       String langTag = null;
 
@@ -2139,7 +2153,7 @@ public class EventsEndpoint implements ManagedService {
         return RestUtil.R.badRequest(String.format("Error while searching for event with id %s; %s", id, e.getMessage()));
       }
 
-      if (event.isNone()) {
+      if (event.isEmpty()) {
         return ApiResponseBuilder.notFound(String.format("Unable to find event with id '%s'", id));
       }
       MediaPackage mp = indexService.getEventMediapackage(event.get());

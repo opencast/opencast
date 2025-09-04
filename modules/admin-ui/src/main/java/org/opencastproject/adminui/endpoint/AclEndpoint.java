@@ -61,7 +61,6 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.util.requests.SortCriterion;
 import org.opencastproject.util.requests.SortCriterion.Order;
 
-import com.entwinemedia.fn.data.Opt;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -185,7 +184,7 @@ public class AclEndpoint {
           @QueryParam("offset") int offset, @QueryParam("limit") int limit) throws IOException {
     if (limit < 1)
       limit = 100;
-    Opt<String> optSort = Opt.nul(trimToNull(sort));
+    Optional<String> optSort = Optional.ofNullable(trimToNull(sort));
     Option<String> filterName = Option.none();
     Option<String> filterText = Option.none();
 
@@ -212,7 +211,7 @@ public class AclEndpoint {
     int total = filteredAcls.size();
 
     // Sort by name, description or role
-    if (optSort.isSome()) {
+    if (optSort.isPresent()) {
       final ArrayList<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
       Collections.sort(filteredAcls, new Comparator<ManagedAcl>() {
         @Override

@@ -23,12 +23,11 @@ package org.opencastproject.util.data;
 
 import static org.opencastproject.util.data.Tuple.tuple;
 
-import com.entwinemedia.fn.data.Opt;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * The option type encapsulates on optional value. It contains either some value or is empty. Please make sure to NEVER
@@ -104,7 +103,7 @@ public abstract class Option<A> implements Iterable<A> {
   /** Transform an option into a list, either with a single element or an empty list. */
   public abstract List<A> list();
 
-  public abstract Opt<A> toOpt();
+  public abstract Optional<A> toOpt();
 
   @Override
   public abstract int hashCode();
@@ -177,8 +176,8 @@ public abstract class Option<A> implements Iterable<A> {
       }
 
       @Override
-      public Opt<A> toOpt() {
-        return Opt.some(a);
+      public Optional<A> toOpt() {
+        return Optional.of(a);
       }
 
       @Override
@@ -264,8 +263,8 @@ public abstract class Option<A> implements Iterable<A> {
       }
 
       @Override
-      public Opt<A> toOpt() {
-        return Opt.none();
+      public Optional<A> toOpt() {
+        return Optional.empty();
       }
 
       @Override
@@ -306,14 +305,6 @@ public abstract class Option<A> implements Iterable<A> {
       return some(a);
     else
       return none();
-  }
-
-  /** Convert an <code>Opt</code> into an <code>Option</code>. */
-  public static <A> Option<A> fromOpt(Opt<A> a) {
-    for (A x : a) {
-      return some(x);
-    }
-    return none();
   }
 
   /**

@@ -38,7 +38,6 @@ import org.opencastproject.scheduler.api.TechnicalMetadata;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.NotFoundException;
 
-import com.entwinemedia.fn.data.Opt;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -78,12 +77,12 @@ public final class SchedulingUtils {
   }
 
   public static class SchedulingInfo {
-    private Opt<Date> startDate = Opt.none();
-    private Opt<Date> endDate = Opt.none();
-    private Opt<Long> duration = Opt.none();
-    private Opt<String> agentId = Opt.none();
-    private Opt<String> inputs = Opt.none();
-    private Opt<RRule> rrule = Opt.none();
+    private Optional<Date> startDate = Optional.empty();
+    private Optional<Date> endDate = Optional.empty();
+    private Optional<Long> duration = Optional.empty();
+    private Optional<String> agentId = Optional.empty();
+    private Optional<String> inputs = Optional.empty();
+    private Optional<RRule> rrule = Optional.empty();
 
     public SchedulingInfo() {
     }
@@ -103,63 +102,63 @@ public final class SchedulingUtils {
       this.rrule = other.rrule;
     }
 
-    public Opt<Date> getStartDate() {
+    public Optional<Date> getStartDate() {
       return startDate;
     }
 
-    public void setStartDate(Opt<Date> startDate) {
+    public void setStartDate(Optional<Date> startDate) {
       this.startDate = startDate;
     }
 
-    public Opt<Date> getEndDate() {
-      if (endDate.isSome()) {
+    public Optional<Date> getEndDate() {
+      if (endDate.isPresent()) {
         return endDate;
-      } else if (startDate.isSome() && duration.isSome()) {
-        return Opt.some(Date.from(startDate.get().toInstant().plusMillis(duration.get())));
+      } else if (startDate.isPresent() && duration.isPresent()) {
+        return Optional.of(Date.from(startDate.get().toInstant().plusMillis(duration.get())));
       } else {
-        return Opt.none();
+        return Optional.empty();
       }
     }
 
-    public void setEndDate(Opt<Date> endDate) {
+    public void setEndDate(Optional<Date> endDate) {
       this.endDate = endDate;
     }
 
-    public Opt<Long> getDuration() {
-      if (duration.isSome()) {
+    public Optional<Long> getDuration() {
+      if (duration.isPresent()) {
         return duration;
-      } else if (startDate.isSome() && endDate.isSome()) {
-        return Opt.some(endDate.get().getTime() - startDate.get().getTime());
+      } else if (startDate.isPresent() && endDate.isPresent()) {
+        return Optional.of(endDate.get().getTime() - startDate.get().getTime());
       } else {
-        return Opt.none();
+        return Optional.empty();
       }
     }
 
-    public void setDuration(Opt<Long> duration) {
+    public void setDuration(Optional<Long> duration) {
       this.duration = duration;
     }
 
-    public Opt<String> getAgentId() {
+    public Optional<String> getAgentId() {
       return agentId;
     }
 
-    public void setAgentId(Opt<String> agentId) {
+    public void setAgentId(Optional<String> agentId) {
       this.agentId = agentId;
     }
 
-    public Opt<String> getInputs() {
+    public Optional<String> getInputs() {
       return inputs;
     }
 
-    public void setInputs(Opt<String> inputs) {
+    public void setInputs(Optional<String> inputs) {
       this.inputs = inputs;
     }
 
-    public Opt<RRule> getRrule() {
+    public Optional<RRule> getRrule() {
       return rrule;
     }
 
-    public void setRrule(Opt<RRule> rrule) {
+    public void setRrule(Optional<RRule> rrule) {
       this.rrule = rrule;
     }
 
@@ -169,16 +168,16 @@ public final class SchedulingUtils {
     public JsonObject toJson() {
       JsonObject json = new JsonObject();
       DateTimeFormatter dateFormatter = DateTimeFormatter.ISO_DATE_TIME;
-      if (startDate.isSome()) {
+      if (startDate.isPresent()) {
         json.addProperty(JSON_KEY_START_DATE, dateFormatter.format(startDate.get().toInstant().atZone(ZoneOffset.UTC)));
       }
-      if (endDate.isSome()) {
+      if (endDate.isPresent()) {
         json.addProperty(JSON_KEY_END_DATE, dateFormatter.format(endDate.get().toInstant().atZone(ZoneOffset.UTC)));
       }
-      if (agentId.isSome()) {
+      if (agentId.isPresent()) {
         json.addProperty(JSON_KEY_AGENT_ID, agentId.get());
       }
-      if (inputs.isSome()) {
+      if (inputs.isPresent()) {
         JsonArray inputsArray = new JsonArray();
         for (String input : inputs.get().split(",")) {
           inputsArray.add(new JsonPrimitive(input.trim()));
@@ -194,29 +193,29 @@ public final class SchedulingUtils {
     @SuppressWarnings("unchecked")
     public JSONObject toSource() {
       final JSONObject source = new JSONObject();
-      if (rrule.isSome()) {
+      if (rrule.isPresent()) {
         source.put("type", "SCHEDULE_MULTIPLE");
       } else {
         source.put("type", "SCHEDULE_SINGLE");
       }
       final JSONObject sourceMetadata = new JSONObject();
       final DateTimeFormatter dateFormatter = DateTimeFormatter.ISO_DATE_TIME;
-      if (startDate.isSome()) {
+      if (startDate.isPresent()) {
         sourceMetadata.put("start", dateFormatter.format(startDate.get().toInstant().atZone(UTC)));
       }
-      if (endDate.isSome()) {
+      if (endDate.isPresent()) {
         sourceMetadata.put("end", dateFormatter.format(endDate.get().toInstant().atZone(UTC)));
       }
-      if (agentId.isSome()) {
+      if (agentId.isPresent()) {
         sourceMetadata.put("device", agentId.get());
       }
-      if (getDuration().isSome()) {
+      if (getDuration().isPresent()) {
         sourceMetadata.put("duration", String.valueOf(getDuration().get()));
       }
-      if (rrule.isSome()) {
+      if (rrule.isPresent()) {
         sourceMetadata.put("rrule", rrule.get().getValue());
       }
-      sourceMetadata.put("inputs", inputs.getOr(""));
+      sourceMetadata.put("inputs", inputs.orElse(""));
 
       source.put("metadata", sourceMetadata);
       return source;
@@ -233,14 +232,14 @@ public final class SchedulingUtils {
      */
     public SchedulingInfo merge(TechnicalMetadata metadata) {
       SchedulingInfo result = new SchedulingInfo(this);
-      if (result.startDate.isNone()) {
-        result.startDate = Opt.some(metadata.getStartDate());
+      if (result.startDate.isEmpty()) {
+        result.startDate = Optional.of(metadata.getStartDate());
       }
-      if (result.endDate.isNone()) {
-        result.endDate = Opt.some(metadata.getEndDate());
+      if (result.endDate.isEmpty()) {
+        result.endDate = Optional.of(metadata.getEndDate());
       }
-      if (result.agentId.isNone()) {
-        result.agentId = Opt.some(metadata.getAgentId());
+      if (result.agentId.isEmpty()) {
+        result.agentId = Optional.of(metadata.getAgentId());
       }
       return result;
     }
@@ -266,17 +265,17 @@ public final class SchedulingUtils {
       final String durationString = Objects.toString(json.get(JSON_KEY_DURATION), null);
 
       if (isNotBlank(startDate)) {
-        schedulingInfo.startDate = Opt.some(Date.from(Instant.from(dateFormatter.parse(startDate))));
+        schedulingInfo.startDate = Optional.of(Date.from(Instant.from(dateFormatter.parse(startDate))));
       }
       if (isNotBlank(endDate)) {
-        schedulingInfo.endDate = Opt.some(Date.from(Instant.from(dateFormatter.parse(endDate))));
+        schedulingInfo.endDate = Optional.of(Date.from(Instant.from(dateFormatter.parse(endDate))));
       }
       if (isNotBlank(agentId)) {
-        schedulingInfo.agentId = Opt.some(agentId);
+        schedulingInfo.agentId = Optional.of(agentId);
       }
       if (isNotBlank(durationString)) {
         try {
-          schedulingInfo.duration = Opt.some(Long.parseLong(durationString));
+          schedulingInfo.duration = Optional.of(Long.parseLong(durationString));
         } catch (Exception e) {
           throw new IllegalArgumentException("Invalid format of field 'duration'");
         }
@@ -287,13 +286,13 @@ public final class SchedulingUtils {
       }
 
       if (inputs != null) {
-        schedulingInfo.inputs = Opt.some(String.join(",", inputs));
+        schedulingInfo.inputs = Optional.of(String.join(",", inputs));
       }
       if (isNotBlank(rrule)) {
         try {
           RRule parsedRrule = new RRule(rrule);
           parsedRrule.validate();
-          schedulingInfo.rrule = Opt.some(parsedRrule);
+          schedulingInfo.rrule = Optional.of(parsedRrule);
         } catch (Exception e) {
           throw new IllegalArgumentException("Invalid RRule: " + rrule);
         }
@@ -324,12 +323,12 @@ public final class SchedulingUtils {
       final SchedulingInfo result = new SchedulingInfo();
       try {
         final TechnicalMetadata technicalMetadata = schedulerService.getTechnicalMetadata(eventId);
-        result.startDate = Opt.some(technicalMetadata.getStartDate());
-        result.endDate = Opt.some(technicalMetadata.getEndDate());
-        result.agentId = Opt.some(technicalMetadata.getAgentId());
+        result.startDate = Optional.of(technicalMetadata.getStartDate());
+        result.endDate = Optional.of(technicalMetadata.getEndDate());
+        result.agentId = Optional.of(technicalMetadata.getAgentId());
         String inputs = technicalMetadata.getCaptureAgentConfiguration().get(CaptureParameters.CAPTURE_DEVICE_NAMES);
         if (isNotBlank(inputs)) {
-          result.inputs = Opt.some(inputs);
+          result.inputs = Optional.of(inputs);
         }
         return result;
       } catch (NotFoundException e) {
@@ -363,8 +362,8 @@ public final class SchedulingUtils {
   ) throws SearchIndexException {
     List<JsonObject> result = new ArrayList<>();
     for (MediaPackage mediaPackage : mediaPackages) {
-      Opt<Event> eventOpt = indexService.getEvent(mediaPackage.getIdentifier().toString(), elasticsearchIndex);
-      if (eventOpt.isSome()) {
+      Optional<Event> eventOpt = indexService.getEvent(mediaPackage.getIdentifier().toString(), elasticsearchIndex);
+      if (eventOpt.isPresent()) {
         final Event event = eventOpt.get();
         if (checkedEventId.isPresent() && checkedEventId.get().equals(event.getIdentifier())) {
           continue;
@@ -411,7 +410,7 @@ public final class SchedulingUtils {
       SchedulerService schedulerService
   ) throws NotFoundException, UnauthorizedException, SchedulerException {
 
-    if (schedulingInfo.getRrule().isSome()) {
+    if (schedulingInfo.getRrule().isPresent()) {
       final Agent agent = agentStateService.getAgent(schedulingInfo.getAgentId().get());
       String timezone = agent.getConfiguration().getProperty("capture.device.timezone");
       if (StringUtils.isBlank(timezone)) {

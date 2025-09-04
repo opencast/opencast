@@ -98,7 +98,7 @@ public class ExportWorkflowPropertiesWOH extends AbstractWorkflowOperationHandle
     logger.info("Start exporting workflow properties for workflow {}", workflowInstance);
     final MediaPackage mediaPackage = workflowInstance.getMediaPackage();
     // Parse CSV
-    final Set<String> keys = Optional.ofNullable(getOptConfig(workflowInstance, KEYS_PROPERTY).orNull())
+    final Set<String> keys = getOptConfig(workflowInstance, KEYS_PROPERTY)
         .map(s -> Arrays.stream(s.split("\\s*,\\s*")).collect(Collectors.toSet()))
         .orElse(Collections.emptySet());
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,

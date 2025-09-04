@@ -43,9 +43,8 @@ import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.series.api.SeriesService;
 
-import com.entwinemedia.fn.data.Opt;
-
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 
 public class CreateSeriesCommand extends AbstractCommand<GqlSeries> {
@@ -67,7 +66,7 @@ public class CreateSeriesCommand extends AbstractCommand<GqlSeries> {
 
     MetadataList metadataList = createMetadataList(seriesMetadata, indexService);
     Map<String, String> options = new TreeMap<>();
-    Opt<Long> optThemeId = Opt.none();
+    Optional<Long> optThemeId = Optional.empty();
 
     final SeriesService seriesService = context.getService(SeriesService.class);
 
@@ -86,7 +85,7 @@ public class CreateSeriesCommand extends AbstractCommand<GqlSeries> {
     }
     String seriesId;
     try {
-      seriesId = indexService.createSeries(metadataList, options, Opt.some(acl), optThemeId);
+      seriesId = indexService.createSeries(metadataList, options, Optional.of(acl), optThemeId);
     } catch (IndexServiceException e) {
       throw new GraphQLRuntimeException(e);
     }

@@ -163,24 +163,19 @@ public class ThemeWorkflowOperationHandler extends AbstractWorkflowOperationHand
           throws WorkflowOperationException {
     logger.debug("Running theme workflow operation on workflow {}", workflowInstance.getId());
 
-    final MediaPackageElementFlavor bumperFlavor = Optional.ofNullable(
-        getOptConfig(workflowInstance, BUMPER_FLAVOR).orNull())
+    final MediaPackageElementFlavor bumperFlavor = getOptConfig(workflowInstance, BUMPER_FLAVOR)
         .map(MediaPackageElementFlavor::parseFlavor)
         .orElse(new MediaPackageElementFlavor("branding", "bumper"));
-    final MediaPackageElementFlavor trailerFlavor = Optional.ofNullable(
-        getOptConfig(workflowInstance, TRAILER_FLAVOR).orNull())
+    final MediaPackageElementFlavor trailerFlavor = getOptConfig(workflowInstance, TRAILER_FLAVOR)
         .map(MediaPackageElementFlavor::parseFlavor)
         .orElse(new MediaPackageElementFlavor("branding", "trailer"));
-    final MediaPackageElementFlavor titleSlideFlavor = Optional.ofNullable(
-        getOptConfig(workflowInstance, TITLE_SLIDE_FLAVOR).orNull())
+    final MediaPackageElementFlavor titleSlideFlavor = getOptConfig(workflowInstance, TITLE_SLIDE_FLAVOR)
         .map(MediaPackageElementFlavor::parseFlavor)
         .orElse(new MediaPackageElementFlavor("branding", "title-slide"));
-    final MediaPackageElementFlavor licenseSlideFlavor = Optional.ofNullable(
-        getOptConfig(workflowInstance, LICENSE_SLIDE_FLAVOR).orNull())
+    final MediaPackageElementFlavor licenseSlideFlavor = getOptConfig(workflowInstance, LICENSE_SLIDE_FLAVOR)
         .map(MediaPackageElementFlavor::parseFlavor)
         .orElse(new MediaPackageElementFlavor("branding", "license-slide"));
-    final MediaPackageElementFlavor watermarkFlavor = Optional.ofNullable(
-        getOptConfig(workflowInstance, WATERMARK_FLAVOR).orNull())
+    final MediaPackageElementFlavor watermarkFlavor = getOptConfig(workflowInstance, WATERMARK_FLAVOR)
         .map(MediaPackageElementFlavor::parseFlavor)
         .orElse(new MediaPackageElementFlavor("branding", "watermark"));
     final List<String> bumperTags = asList(workflowInstance.getConfiguration(BUMPER_TAGS));
@@ -189,9 +184,8 @@ public class ThemeWorkflowOperationHandler extends AbstractWorkflowOperationHand
     final List<String> licenseSlideTags = asList(workflowInstance.getConfiguration(LICENSE_SLIDE_TAGS));
     final List<String> watermarkTags = asList(workflowInstance.getConfiguration(WATERMARK_TAGS));
 
-    Optional<String> layoutStringOpt = Optional.ofNullable(getOptConfig(workflowInstance, WATERMARK_LAYOUT).orNull());
-    Optional<String> watermarkLayoutVariable = Optional.ofNullable(
-        getOptConfig(workflowInstance, WATERMARK_LAYOUT_VARIABLE).orNull());
+    Optional<String> layoutStringOpt = getOptConfig(workflowInstance, WATERMARK_LAYOUT);
+    Optional<String> watermarkLayoutVariable = getOptConfig(workflowInstance, WATERMARK_LAYOUT_VARIABLE);
 
     List<String> layoutList = layoutStringOpt
         .map(s -> Arrays.asList(s.split(";")))

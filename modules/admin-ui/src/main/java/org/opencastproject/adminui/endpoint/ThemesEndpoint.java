@@ -21,7 +21,6 @@
 
 package org.opencastproject.adminui.endpoint;
 
-import static com.entwinemedia.fn.data.Opt.nul;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
@@ -232,8 +231,8 @@ public class ThemesEndpoint {
 
     return okJsonList(
         themesJSON,
-        nul(offset).getOr(0),
-        nul(limit).getOr(0),
+        Optional.ofNullable(offset).orElse(0),
+        Optional.ofNullable(limit).orElse(0),
         total
     );
   }

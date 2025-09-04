@@ -53,7 +53,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -101,7 +100,7 @@ public class ImportWorkflowPropertiesWOH extends AbstractWorkflowOperationHandle
       Attachment propertiesElem = attachments.iterator().next();
       Properties properties = loadPropertiesFromXml(workspace, propertiesElem.getURI());
       // Parse CSV
-      final Set<String> keys = Optional.ofNullable(getOptConfig(wi, KEYS_PROPERTY).orNull())
+      final Set<String> keys = getOptConfig(wi, KEYS_PROPERTY)
           .map(s -> Arrays.stream(s.split("\\s*,\\s*")).collect(Collectors.toSet()))
           .orElse(Collections.emptySet());
       return createResult(mp, convertToWorkflowProperties(properties, keys), CONTINUE, 0);

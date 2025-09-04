@@ -21,9 +21,6 @@
 
 package org.opencastproject.index.service.catalog.adapter;
 
-import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.obj;
-import static com.entwinemedia.fn.data.json.Jsons.v;
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertNull;
 import static junit.framework.TestCase.assertTrue;
@@ -37,6 +34,8 @@ import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.metadata.dublincore.MetadataJson;
 
+import com.google.gson.Gson;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.easymock.EasyMock;
@@ -46,6 +45,7 @@ import org.junit.Test;
 import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.TreeMap;
@@ -217,9 +217,15 @@ public class MetadataFieldTest {
 
     final SimpleDateFormat dateFormat = new SimpleDateFormat();
     dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-    final String expectedJSON = RestUtils.getJsonString(obj(f("readOnly", v(readOnly)), f("id", v(defaultInputID)),
-            f("label", v(label)), f("type", v(MetadataField.Type.DATE.toString().toLowerCase())),
-            f("value", v(dateFormat.format(testDate))), f("required", v(required))));
+    Map<String, Object> jsonMap = new HashMap<>();
+    jsonMap.put("readOnly", readOnly);
+    jsonMap.put("id", defaultInputID);
+    jsonMap.put("label", label);
+    jsonMap.put("type", MetadataField.Type.DATE.toString().toLowerCase());
+    jsonMap.put("value", dateFormat.format(testDate));
+    jsonMap.put("required", required);
+    Gson gson = new Gson();
+    String expectedJSON = gson.toJson(jsonMap);
 
     assertThat(expectedJSON, SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(dateField1, true))));
   }

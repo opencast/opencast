@@ -20,7 +20,6 @@
  */
 package org.opencastproject.external.endpoint;
 
-import static com.entwinemedia.fn.Stream.$;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.apache.commons.lang3.StringUtils.isBlank;
@@ -83,8 +82,6 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.util.requests.SortCriterion;
 
-import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.data.Opt;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -112,6 +109,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
@@ -504,8 +502,8 @@ public class SeriesEndpoint {
     List<SeriesCatalogUIAdapter> catalogUIAdapters = indexService.getSeriesCatalogUIAdapters();
     catalogUIAdapters.remove(indexService.getCommonSeriesCatalogUIAdapter());
     for (SeriesCatalogUIAdapter adapter : catalogUIAdapters) {
-      final Opt<DublinCoreMetadataCollection> optSeriesMetadata = adapter.getFields(id);
-      if (optSeriesMetadata.isSome()) {
+      final Optional<DublinCoreMetadataCollection> optSeriesMetadata = adapter.getFields(id);
+      if (optSeriesMetadata.isPresent()) {
         metadataList.add(adapter.getFlavor().toString(), adapter.getUITitle(), optSeriesMetadata.get());
       }
     }
@@ -533,8 +531,8 @@ public class SeriesEndpoint {
 
     for (SeriesCatalogUIAdapter adapter : catalogUIAdapters) {
       if (typeMatchesSeriesCatalogUIAdapter(type, adapter)) {
-        final Opt<DublinCoreMetadataCollection> optSeriesMetadata = adapter.getFields(id);
-        if (optSeriesMetadata.isSome()) {
+        final Optional<DublinCoreMetadataCollection> optSeriesMetadata = adapter.getFields(id);
+        if (optSeriesMetadata.isPresent()) {
           return ApiResponseBuilder.Json.ok(requestedVersion, MetadataJson.collectionToJson(optSeriesMetadata.get(), true));
         }
       }
@@ -659,12 +657,12 @@ public class SeriesEndpoint {
     }
   }
 
-  private Opt<MediaPackageElementFlavor> getFlavor(String flavorString) {
+  private Optional<MediaPackageElementFlavor> getFlavor(String flavorString) {
     try {
       MediaPackageElementFlavor flavor = MediaPackageElementFlavor.parseFlavor(flavorString);
-      return Opt.some(flavor);
+      return Optional.of(flavor);
     } catch (IllegalArgumentException e) {
-      return Opt.none();
+      return Optional.empty();
     }
   }
 
@@ -699,7 +697,7 @@ public class SeriesEndpoint {
                       metadataJSON));
     }
 
-    Opt<DublinCoreMetadataCollection> optCollection = Opt.none();
+    Optional<DublinCoreMetadataCollection> optCollection = Optional.empty();
     SeriesCatalogUIAdapter adapter = null;
 
     Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization().getId(), securityService.getUser());
@@ -710,7 +708,7 @@ public class SeriesEndpoint {
 
     // Try the main catalog first as we load it from the index.
     if (typeMatchesSeriesCatalogUIAdapter(type, indexService.getCommonSeriesCatalogUIAdapter())) {
-      optCollection = Opt.some(getSeriesMetadata(optSeries.get()));
+      optCollection = Optional.of(getSeriesMetadata(optSeries.get()));
       adapter = indexService.getCommonSeriesCatalogUIAdapter();
     } else {
       metadataList.add(indexService.getCommonSeriesCatalogUIAdapter(), getSeriesMetadata(optSeries.get()));
@@ -725,8 +723,8 @@ public class SeriesEndpoint {
           optCollection = catalogUIAdapter.getFields(id);
           adapter = catalogUIAdapter;
         } else {
-          Opt<DublinCoreMetadataCollection> current = catalogUIAdapter.getFields(id);
-          if (current.isSome()) {
+          Optional<DublinCoreMetadataCollection> current = catalogUIAdapter.getFields(id);
+          if (current.isPresent()) {
             metadataList.add(catalogUIAdapter, current.get());
           }
         }
@@ -774,9 +772,9 @@ public class SeriesEndpoint {
               .badRequest(String.format("A type of catalog needs to be specified for series '%s' to delete it.", id));
     }
 
-    Opt<MediaPackageElementFlavor> flavor = getFlavor(type);
+    Optional<MediaPackageElementFlavor> flavor = getFlavor(type);
 
-    if (flavor.isNone()) {
+    if (flavor.isEmpty()) {
       return RestUtil.R.badRequest(
               String.format("Unable to parse flavor '%s' it should look something like dublincore/series.", type));
     }
@@ -923,11 +921,11 @@ public class SeriesEndpoint {
       return R.badRequest(e.getMessage());
     }
     Map<String, String> options = new TreeMap<>();
-    Opt<Long> optThemeId = Opt.none();
+    Optional<Long> optThemeId = Optional.empty();
     if (StringUtils.trimToNull(themeIdParam) != null) {
       try {
         Long themeId = Long.parseLong(themeIdParam);
-        optThemeId = Opt.some(themeId);
+        optThemeId = Optional.of(themeId);
       } catch (NumberFormatException e) {
         return R.badRequest(String.format("Unable to parse the theme id '%s' into a number", themeIdParam));
       }
@@ -944,7 +942,7 @@ public class SeriesEndpoint {
     }
 
     try {
-      String seriesId = indexService.createSeries(metadataList, options, Opt.some(acl), optThemeId);
+      String seriesId = indexService.createSeries(metadataList, options, Optional.of(acl), optThemeId);
       JsonObject json = new JsonObject();
       json.addProperty("identifier", safeString(seriesId));
       return ApiResponseBuilder.Json.created(acceptHeader, URI.create(getSeriesUrl(seriesId)), json);
@@ -1060,13 +1058,16 @@ public class SeriesEndpoint {
       return R.badRequest("Could not parse ACL");
     }
 
-    List<AccessControlEntry> accessControlEntries = $(acl.toArray()).map(new Fn<Object, AccessControlEntry>() {
-      @Override
-      public AccessControlEntry apply(Object a) {
+    List<AccessControlEntry> accessControlEntries = ((List<?>) acl).stream()
+      .map(a -> {
         JSONObject ace = (JSONObject) a;
-        return new AccessControlEntry((String) ace.get("role"), (String) ace.get("action"), (boolean) ace.get("allow"));
-      }
-    }).toList();
+        return new AccessControlEntry(
+            (String) ace.get("role"),
+            (String) ace.get("action"),
+            (Boolean) ace.get("allow")
+        );
+      })
+      .collect(Collectors.toList());
 
     seriesService.updateAccessControl(seriesID, new AccessControlList(accessControlEntries), override);
     return ApiResponseBuilder.Json.ok(acceptHeader, aclJson);

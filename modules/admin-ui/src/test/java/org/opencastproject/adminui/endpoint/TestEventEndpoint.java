@@ -107,8 +107,6 @@ import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowSetImpl;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.data.Opt;
-
 import net.fortuna.ical4j.model.property.RRule;
 
 import org.easymock.Capture;
@@ -523,14 +521,14 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     eventCatalogAdapterList.add(createEventCatalogUIAdapter("name 2"));
 
     IndexService indexService = EasyMock.createNiceMock(IndexService.class);
-    EasyMock.expect(indexService.getEvent("asdasd", searchIndex)).andReturn(Opt.some(event)).anyTimes();
-    EasyMock.expect(indexService.getEvent("exists", searchIndex)).andReturn(Opt.some(event)).anyTimes();
-    EasyMock.expect(indexService.getEvent("exists2", searchIndex)).andReturn(Opt.some(event2)).anyTimes();
-    EasyMock.expect(indexService.getEvent("archivedid", searchIndex)).andReturn(Opt.some(event2)).anyTimes();
-    EasyMock.expect(indexService.getEvent("workflowid", searchIndex)).andReturn(Opt.some(event3)).anyTimes();
-    EasyMock.expect(indexService.getEvent("notExists", searchIndex)).andReturn(Opt.<Event> none()).anyTimes();
-    EasyMock.expect(indexService.getEvent("notExists2", searchIndex)).andReturn(Opt.<Event> none()).anyTimes();
-    EasyMock.expect(indexService.getEvent("updateFailure", searchIndex)).andReturn(Opt.some(event3)).anyTimes();
+    EasyMock.expect(indexService.getEvent("asdasd", searchIndex)).andReturn(Optional.of(event)).anyTimes();
+    EasyMock.expect(indexService.getEvent("exists", searchIndex)).andReturn(Optional.of(event)).anyTimes();
+    EasyMock.expect(indexService.getEvent("exists2", searchIndex)).andReturn(Optional.of(event2)).anyTimes();
+    EasyMock.expect(indexService.getEvent("archivedid", searchIndex)).andReturn(Optional.of(event2)).anyTimes();
+    EasyMock.expect(indexService.getEvent("workflowid", searchIndex)).andReturn(Optional.of(event3)).anyTimes();
+    EasyMock.expect(indexService.getEvent("notExists", searchIndex)).andReturn(Optional.<Event> empty()).anyTimes();
+    EasyMock.expect(indexService.getEvent("notExists2", searchIndex)).andReturn(Optional.<Event> empty()).anyTimes();
+    EasyMock.expect(indexService.getEvent("updateFailure", searchIndex)).andReturn(Optional.of(event3)).anyTimes();
     EasyMock.expect(indexService.getEventMediapackage(event)).andReturn(mp1).anyTimes();
     EasyMock.expect(indexService.getEventCatalogUIAdapters()).andReturn(eventCatalogAdapterList).anyTimes();
     EasyMock.expect(indexService.getExtendedEventCatalogUIAdapters()).andReturn(Collections.emptyList()).anyTimes();

@@ -32,8 +32,6 @@ import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.metadata.dublincore.MetadataField.Type;
 import org.opencastproject.metadata.dublincore.Precision;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
@@ -48,6 +46,7 @@ import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TreeMap;
 
 /**
@@ -126,20 +125,20 @@ public final class DublinCoreMetadataUtil {
     }
   }
 
-  private static Opt<DCMIPeriod> getPeriodFromCatalog(DublinCoreCatalog dc, EName ename) {
+  private static Optional<DCMIPeriod> getPeriodFromCatalog(DublinCoreCatalog dc, EName ename) {
     List<DublinCoreValue> periodStrings = dc.get(ename);
-    Opt<DCMIPeriod> p = Opt.<DCMIPeriod> none();
+    Optional<DCMIPeriod> p = Optional.<DCMIPeriod> empty();
     for (DublinCoreValue periodString : periodStrings) {
-      p = Opt.nul(EncodingSchemeUtils.decodePeriod(periodString.getValue()));
+      p = Optional.ofNullable(EncodingSchemeUtils.decodePeriod(periodString.getValue()));
     }
-    if (p.isNone()) {
+    if (p.isEmpty()) {
       // fall back to created date with zero duration
       // opencast keep the event start date and created date in sync
       // if the start date isn't set, we can grab the created value
       DublinCoreValue createdDCValue = dc.getFirstVal(DublinCore.PROPERTY_CREATED);
       if (createdDCValue != null) {
         Date createdDate = EncodingSchemeUtils.decodeDate(createdDCValue.getValue());
-        p = Opt.nul(new DCMIPeriod(createdDate, createdDate));
+        p = Optional.ofNullable(new DCMIPeriod(createdDate, createdDate));
       }
     }
     return p;
@@ -150,9 +149,9 @@ public final class DublinCoreMetadataUtil {
    *          The dublin core period for this event.
    * @return The milliseconds between the start and end time for this event.
    */
-  static Long getDuration(Opt<DCMIPeriod> period) {
+  static Long getDuration(Optional<DCMIPeriod> period) {
     Long duration = 0L;
-    if (period.isSome() && period.get().hasStart() && period.get().hasEnd()) {
+    if (period.isPresent() && period.get().hasStart() && period.get().hasEnd()) {
       return period.get().getEnd().getTime() - period.get().getStart().getTime();
     }
     return duration;
@@ -203,7 +202,7 @@ public final class DublinCoreMetadataUtil {
       SimpleDateFormat dateFormat = MetadataField.getSimpleDateFormatter(field.getPattern());
       Date startDate = dateFormat.parse((String) field.getValue());
       // Get the current period
-      Opt<DCMIPeriod> period = getPeriodFromCatalog(dc, ename);
+      Optional<DCMIPeriod> period = getPeriodFromCatalog(dc, ename);
       // Get the current duration
       Long duration = getDuration(period);
       // Get the current end date based on new date and duration.
@@ -224,7 +223,7 @@ public final class DublinCoreMetadataUtil {
    *          The current period from dublin core.
    * @return A new DateTime with the current hour, minute and second.
    */
-  private static DateTime getCurrentStartDateTime(Opt<DCMIPeriod> period) {
+  private static DateTime getCurrentStartDateTime(Optional<DCMIPeriod> period) {
     DateTime currentStartTime = new DateTime();
     currentStartTime = currentStartTime.withZone(DateTimeZone.UTC);
     currentStartTime = currentStartTime.withYear(2001);
@@ -234,7 +233,7 @@ public final class DublinCoreMetadataUtil {
     currentStartTime = currentStartTime.withMinuteOfHour(0);
     currentStartTime = currentStartTime.withSecondOfMinute(0);
 
-    if (period.isSome() && period.get().hasStart()) {
+    if (period.isPresent() && period.get().hasStart()) {
       DateTime fromDC = new DateTime(period.get().getStart().getTime());
       fromDC = fromDC.withZone(DateTimeZone.UTC);
       currentStartTime = currentStartTime.withZone(DateTimeZone.UTC);
@@ -266,7 +265,7 @@ public final class DublinCoreMetadataUtil {
     }
 
     // Get the current period
-    Opt<DCMIPeriod> period = getPeriodFromCatalog(dc, ename);
+    Optional<DCMIPeriod> period = getPeriodFromCatalog(dc, ename);
     // Get the current duration
     Long duration = 0L;
     try {

@@ -20,11 +20,6 @@
  */
 package org.opencastproject.mediapackage;
 
-import static com.entwinemedia.fn.Prelude.chuck;
-import static com.entwinemedia.fn.Stream.$;
-
-import com.entwinemedia.fn.Fn2;
-
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
@@ -91,32 +86,33 @@ public class ChainingMediaPackageSerializer implements MediaPackageSerializer {
 
   @Override
   public URI encodeURI(URI uri) throws URISyntaxException {
-    return $(serializers).reverse().foldl(uri, new Fn2<URI, MediaPackageSerializer, URI>() {
-      @Override
-      public URI apply(URI uri, MediaPackageSerializer serializer) {
-        try {
-          return serializer.encodeURI(uri);
-        } catch (URISyntaxException e) {
-          logger.warn("Error while encoding URI with serializer '{}':", serializer, e);
-          return chuck(e);
-        }
+    URI result = uri;
+    // Reverse the serializers list and apply encodeURI one by one
+    for (int i = serializers.size() - 1; i >= 0; i--) {
+      MediaPackageSerializer serializer = serializers.get(i);
+      try {
+        result = serializer.encodeURI(result);
+      } catch (URISyntaxException e) {
+        logger.warn("Error while encoding URI with serializer '{}':", serializer, e);
+        throw e;
       }
-    });
+    }
+    return result;
   }
 
   @Override
   public URI decodeURI(URI uri) throws URISyntaxException {
-    return $(serializers).foldl(uri, new Fn2<URI, MediaPackageSerializer, URI>() {
-      @Override
-      public URI apply(URI uri, MediaPackageSerializer serializer) {
-        try {
-          return serializer.decodeURI(uri);
-        } catch (URISyntaxException e) {
-          logger.warn("Error while encoding URI with serializer '{}':", serializer, e);
-          return chuck(e);
-        }
+    URI result = uri;
+    // Apply decodeURI in order
+    for (MediaPackageSerializer serializer : serializers) {
+      try {
+        result = serializer.decodeURI(result);
+      } catch (URISyntaxException e) {
+        logger.warn("Error while encoding URI with serializer '{}':", serializer, e);
+        throw e;
       }
-    });
+    }
+    return result;
   }
 
   @Override

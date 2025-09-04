@@ -50,7 +50,6 @@ import org.opencastproject.util.requests.SortCriterion;
 import org.opencastproject.util.requests.SortCriterion.Order;
 import org.opencastproject.workflow.api.WorkflowService;
 
-import com.entwinemedia.fn.data.json.SimpleSerializer;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -100,8 +99,6 @@ import javax.ws.rs.core.Response;
 public class JobEndpoint {
 
   private static final Logger logger = LoggerFactory.getLogger(JobEndpoint.class);
-  private static final SimpleSerializer serializer = new SimpleSerializer();
-
   public static final Response NOT_FOUND = Response.status(Response.Status.NOT_FOUND).build();
 
   private enum JobSort {

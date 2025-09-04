@@ -21,7 +21,6 @@
 
 package org.opencastproject.mediapackage;
 
-import static com.entwinemedia.fn.Stream.$;
 import static java.lang.String.format;
 import static javax.xml.XMLConstants.DEFAULT_NS_PREFIX;
 import static javax.xml.XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI;
@@ -33,11 +32,6 @@ import org.opencastproject.util.RequireUtil;
 import org.opencastproject.util.XmlNamespaceBinding;
 import org.opencastproject.util.XmlNamespaceContext;
 import org.opencastproject.util.XmlSafeParser;
-
-import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.Fns;
-import com.entwinemedia.fn.P2;
-import com.entwinemedia.fn.fns.Booleans;
 
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
@@ -62,6 +56,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -333,10 +328,10 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
   }
 
   protected List<CatalogEntry> getEntriesSorted() {
-    return $(data.values())
-        .bind(Fns.<List<CatalogEntry>>id())
-        .sort(catalogEntryComparator)
-        .toList();
+    return data.values().stream()
+        .flatMap(List::stream)
+        .sorted(catalogEntryComparator)
+        .collect(Collectors.toList());
   }
 
   /**
@@ -736,26 +731,34 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
      */
     @Override
     public int compareTo(CatalogEntry o) {
-      int c;
-      c = getEName().compareTo(o.getEName());
+      int c = getEName().compareTo(o.getEName());
       if (c != 0) {
         return c;
-      } else { // compare attributes
-        c = attributes.size() - o.attributes.size();
+      }
+
+      c = Integer.compare(attributes.size(), o.attributes.size());
+      if (c != 0) {
+        return c;
+      }
+
+      // Sort attribute entries by attributeComparator
+      List<Entry<EName, String>> thisAttrs = attributes.entrySet().stream()
+          .sorted(attributeComparator)
+          .toList();
+
+      List<Entry<EName, String>> otherAttrs = o.attributes.entrySet().stream()
+          .sorted(attributeComparator)
+          .toList();
+
+      // Compare entries pairwise
+      for (int i = 0; i < thisAttrs.size(); i++) {
+        c = attributeComparator.compare(thisAttrs.get(i), otherAttrs.get(i));
         if (c != 0) {
           return c;
-        } else {
-          return $(attributes.entrySet()).sort(attributeComparator)
-              .zip($(o.attributes.entrySet()).sort(attributeComparator))
-              .map(new Fn<P2<Entry<EName, String>, Entry<EName, String>>, Integer>() {
-                @Override public Integer apply(P2<Entry<EName, String>, Entry<EName, String>> as) {
-                  return attributeComparator.compare(as.get1(), as.get2());
-                }
-              })
-              .find(Booleans.ne(0))
-              .getOr(0);
         }
       }
+
+      return 0; // all equal
     }
 
     /**
