@@ -554,52 +554,6 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
     }
   }
 
-
-//  static final class MediaPositionParser {
-//    private MediaPositionParser() {
-//    }
-//
-//    static final Parser<Double> number = token(Parsers.dbl);
-//    static final Parser<MediaPosition> seconds = number.bind(new Fn<Double, Parser<MediaPosition>>() {
-//      @Override public Parser<MediaPosition> apply(Double p) {
-//        return Parsers.yield(new MediaPosition(PositionType.Seconds, p));
-//      }
-//    });
-//    static final Parser<MediaPosition> percentage =
-//            number.bind(Parsers.<Double, String>ignore(symbol("%"))).bind(new Fn<Double, Parser<MediaPosition>>() {
-//              @Override public Parser<MediaPosition> apply(Double p) {
-//                return Parsers.yield(new MediaPosition(PositionType.Percentage, p));
-//              }
-//            });
-//    static final Parser<Character> comma = token(character(','));
-//    static final Parser<Character> ws = token(space);
-//    static final Parser<MediaPosition> position = percentage.or(seconds);
-//
-//    /** Main parser. */
-//    static final Parser<List<MediaPosition>> positions =
-//            position.bind(new Fn<MediaPosition, Parser<List<MediaPosition>>>() {
-//              // first position
-//              @Override public Parser<List<MediaPosition>> apply(final MediaPosition first) {
-//                // following
-//                return many(opt(comma).bind(Parsers.ignorePrevious(position)))
-//                        .bind(new Fn<List<MediaPosition>, Parser<List<MediaPosition>>>() {
-//                          @Override public Parser<List<MediaPosition>> apply(List<MediaPosition> rest) {
-//                            return Parsers.yield($(first).append(rest).toList());
-//                          }
-//                        });
-//              }
-//            });
-//  }
-//
-//  private List<MediaPosition> parsePositions(String time) throws WorkflowOperationException {
-//    final Result<List<MediaPosition>> r = MediaPositionParser.positions.parse(time);
-//    if (r.isDefined() && r.getRest().isEmpty()) {
-//      return r.getResult();
-//    } else {
-//      throw new WorkflowOperationException(format("Cannot parse time string %s.", time));
-//    }
-//  }
-
   enum PositionType {
     Percentage, Seconds
   }
