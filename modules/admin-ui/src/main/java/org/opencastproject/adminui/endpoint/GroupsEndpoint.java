@@ -189,12 +189,13 @@ public class GroupsEndpoint {
 
     Map<String, String> filters = RestUtils.parseFilter(filter);
     Optional<String> optNameFilter = Optional.ofNullable(filters.get(GroupsListQuery.FILTER_NAME_NAME));
+    Optional<String> optRoleFilter = Optional.ofNullable(filters.get(GroupsListQuery.FILTER_ROLE_NAME));
     Optional<String> optTextFilter = Optional.ofNullable(filters.get(GroupsListQuery.FILTER_TEXT_NAME));
 
     ArrayList<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(sort);
 
-    List<JpaGroup> results = jpaGroupRoleProvider.getGroups(optLimit, optOffset, optNameFilter, optTextFilter,
-            sortCriteria);
+    List<JpaGroup> results = jpaGroupRoleProvider.getGroups(optLimit, optOffset, optNameFilter, optRoleFilter,
+        optTextFilter, sortCriteria);
 
     // load users
     List<String> userNames = results.stream().flatMap(item -> item.getMembers().stream())
@@ -215,7 +216,7 @@ public class GroupsEndpoint {
       groupsJsonArray.add(groupJson);
     }
 
-    long dbTotal = jpaGroupRoleProvider.countTotalGroups(optNameFilter, optTextFilter);
+    long dbTotal = jpaGroupRoleProvider.countTotalGroups(optNameFilter, optRoleFilter, optTextFilter);
     long resultsTotal = optOffset.orElse(0) + results.size();
 
     // groups could've been added or deleted in the meantime, so...
