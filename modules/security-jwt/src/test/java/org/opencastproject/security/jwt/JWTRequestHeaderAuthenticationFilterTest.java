@@ -28,7 +28,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 
-import com.auth0.jwk.JwkException;
+import com.nimbusds.jose.JOSEException;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -45,7 +45,7 @@ public class JWTRequestHeaderAuthenticationFilterTest extends JWTLoginTest {
   private JWTRequestHeaderAuthenticationFilter headerAuthFilter = new JWTRequestHeaderAuthenticationFilter();
 
   @Override @Before
-  public void setUp() throws NoSuchAlgorithmException, JwkException {
+  public void setUp() throws NoSuchAlgorithmException, JOSEException {
     super.setUp();
 
     // Prepare authentication filter
@@ -71,7 +71,7 @@ public class JWTRequestHeaderAuthenticationFilterTest extends JWTLoginTest {
   }
 
   @Test
-  public void testLoginWithPrincipalPrefix() {
+  public void testLoginWithPrincipalPrefix() throws JOSEException {
     Object username;
     String prefix = "Bearer ";
     headerAuthFilter.setPrincipalPrefix(prefix);

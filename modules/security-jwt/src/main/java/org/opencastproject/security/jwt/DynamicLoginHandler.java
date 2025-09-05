@@ -30,26 +30,26 @@ import org.opencastproject.security.impl.jpa.JpaUserReference;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.userdirectory.api.UserReferenceProvider;
 
-import com.auth0.jwk.JwkException;
-import com.auth0.jwt.exceptions.JWTDecodeException;
-import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.auth0.jwt.interfaces.DecodedJWT;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jwt.SignedJWT;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.context.expression.MapAccessor;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.util.Assert;
 
-
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -81,8 +81,11 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
   /** JWKS URL to use for JWT validation (asymmetric algorithms). */
   private String jwksUrl = null;
 
-  /** Number of minutes fetched JWKs will be cached. */
-  private int jwksCacheExpiresIn = 60 * 24;
+  /** The default time to live of cached JWK sets, in milliseconds. */
+  private int jwksTimeToLive = 1000 * 60 * 60;
+
+  /** The default refresh timeout of cached JWK sets, in milliseconds. */
+  private int jwksRefreshTimeout = 1000 * 60;
 
   /** Secret to use for JWT validation (symmetric algorithms). */
   private String secret = null;
@@ -109,7 +112,7 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
   private List<String> roleMappings = null;
 
   /** Mapping used to extract roles from the JWT. */
-  private GuavaCachedUrlJwkProvider jwkProvider;
+  private JWKSetProvider jwkProvider;
 
   /** Size of the JWT cache. */
   private int jwtCacheSize = 500;
@@ -137,7 +140,7 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
             "Role mappings must be set if ocStandardRoleMappings is false");
 
     if (jwksUrl != null) {
-      jwkProvider = new GuavaCachedUrlJwkProvider(jwksUrl, jwksCacheExpiresIn, TimeUnit.MINUTES);
+      jwkProvider = new JWKSetProvider(jwksUrl, jwksTimeToLive, jwksRefreshTimeout);
     }
     userReferenceProvider.setRoleProvider(new JWTRoleProvider(securityService, userReferenceProvider));
     cache = CacheBuilder.newBuilder()
@@ -154,7 +157,7 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
 
       if (cachedJwt == null) {
         // JWT hasn't been cached before, so validate all claims
-        DecodedJWT jwt = decodeAndValidate(token);
+        SignedJWT jwt = decodeAndValidate(token);
         String username = extractUsername(jwt);
 
         try {
@@ -166,18 +169,18 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
         }
 
         userDirectoryService.invalidate(username);
-        cache.put(jwt.getSignature(), new CachedJWT(jwt, username));
+        cache.put(jwt.getSignature().toString(), new CachedJWT(jwt, username));
         return username;
       } else {
         // JWT has been cached before, so only check if it has expired
         if (cachedJwt.hasExpired()) {
           cache.invalidate(signature);
-          throw new JWTVerificationException("JWT token is not valid anymore");
+          throw new JOSEException("JWT token is not valid anymore");
         }
         logger.debug("Using decoded and validated JWT from cache");
         return cachedJwt.getUsername();
       }
-    } catch (JWTVerificationException | JwkException exception) {
+    } catch (ParseException | JOSEException exception) {
       logger.debug(exception.getMessage());
     }
 
@@ -189,10 +192,10 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
    *
    * @param token The JWT string.
    * @return The decoded JWT.
-   * @throws JwkException If the JWT fails to be validated.
+   * @throws JOSEException If the JWT fails to be validated.
    */
-  private DecodedJWT decodeAndValidate(String token) throws JwkException {
-    DecodedJWT jwt;
+  private SignedJWT decodeAndValidate(String token) throws ParseException, JOSEException {
+    SignedJWT jwt;
 
     if (jwksUrl != null) {
       jwt = JWTVerifier.verify(token, jwkProvider, claimConstraints);
@@ -200,9 +203,9 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
       jwt = JWTVerifier.verify(token, secret, claimConstraints);
     }
 
-    if (!expectedAlgorithms.contains(jwt.getAlgorithm())) {
-      throw new JWTVerificationException(
-          "JWT token was signed with an unexpected algorithm '" + jwt.getAlgorithm() + "'"
+    if (!expectedAlgorithms.contains(jwt.getHeader().getAlgorithm().getName())) {
+      throw new JOSEException(
+          "JWT token was signed with an unexpected algorithm '" + jwt.getHeader().getAlgorithm() + "'"
       );
     }
 
@@ -215,10 +218,10 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
    * @param token The JWT string.
    * @return The JWT's signature.
    */
-  private String extractSignature(String token) {
+  private String extractSignature(String token) throws JOSEException {
     String[] parts = token.split("\\.");
     if (parts.length != 3) {
-      throw new JWTDecodeException("Given token is not in a valid JWT format");
+      throw new JOSEException("Given token is not in a valid JWT format");
     }
     return parts[2];
   }
@@ -229,7 +232,7 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
    * @param jwt The decoded JWT.
    * @return The username.
    */
-  private String extractUsername(DecodedJWT jwt) {
+  private String extractUsername(SignedJWT jwt) throws ParseException {
     String username = evaluateMapping(jwt, usernameMapping);
     Assert.isTrue(StringUtils.isNotBlank(username), "Extracted username is blank");
     return username;
@@ -241,7 +244,7 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
    * @param jwt The decoded JWT.
    * @return The name.
    */
-  private String extractName(DecodedJWT jwt) {
+  private String extractName(SignedJWT jwt) throws ParseException {
     String name = evaluateMapping(jwt, nameMapping);
     Assert.isTrue(StringUtils.isNotBlank(name), "Extracted name is blank");
     return name;
@@ -253,7 +256,7 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
    * @param jwt The decoded JWT.
    * @return The email.
    */
-  private String extractEmail(DecodedJWT jwt) {
+  private String extractEmail(SignedJWT jwt) throws ParseException {
     String email = evaluateMapping(jwt, emailMapping);
     Assert.isTrue(StringUtils.isNotBlank(email), "Extracted email is blank");
     return email;
@@ -265,7 +268,7 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
    * @param jwt The decoded JWT.
    * @return The roles.
    */
-  private Set<JpaRole> extractRoles(DecodedJWT jwt) {
+  private Set<JpaRole> extractRoles(SignedJWT jwt) throws ParseException {
     JpaOrganization organization = fromOrganization(securityService.getOrganization());
     Set<JpaRole> roles = new HashSet<>();
     Consumer<String> addRole = (String role) -> {
@@ -278,21 +281,21 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
     if (ocStandardRoleMappings) {
       // Read `role` claim
       try {
-        var rolesClaim = jwt.getClaim("roles");
-        if (rolesClaim != null && !rolesClaim.isNull()) {
-          for (String r : rolesClaim.asArray(String.class)) {
+        var rolesClaim = jwt.getJWTClaimsSet().getStringArrayClaim("roles");
+        if (rolesClaim != null) {
+          for (String r : rolesClaim) {
             addRole.accept(r);
           }
         }
-      } catch (JWTDecodeException e) {
+      } catch (ParseException e) {
         logger.debug("claim 'roles' is not an array of strings, ignoring");
       }
 
       // Read `oc` claim
       try {
-        var ocClaim = jwt.getClaim("oc");
-        if (ocClaim != null && !ocClaim.isNull()) {
-          for (var entry : ocClaim.asMap().entrySet()) {
+        var ocClaim = jwt.getJWTClaimsSet().getJSONObjectClaim("oc");
+        if (ocClaim != null) {
+          for (var entry : ocClaim.entrySet()) {
             var key = entry.getKey();
             var parts = key.split(":", 2);
             if (parts.length != 2) {
@@ -321,7 +324,7 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
             }
           }
         }
-      } catch (JWTDecodeException e) {
+      } catch (ParseException e) {
         logger.debug("claim 'oc' is not an array of strings, ignoring");
       }
     }
@@ -329,7 +332,9 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
     for (String mapping : (roleMappings == null ? new ArrayList<String>() : roleMappings)) {
       ExpressionParser parser = new SpelExpressionParser();
       Expression exp = parser.parseExpression(mapping);
-      Object value = exp.getValue(jwt.getClaims());
+      StandardEvaluationContext ctx = new StandardEvaluationContext();
+      ctx.addPropertyAccessor(new MapAccessor());
+      Object value = exp.getValue(ctx, jwt.getJWTClaimsSet().getClaims());
       if (value != null) {
         // We allow the expression to either return a string directly, or a list/array of strings.
         if (value instanceof String) {
@@ -357,10 +362,12 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
    *
    * @return The string evaluated from the mapping.
    */
-  private String evaluateMapping(DecodedJWT jwt, String mapping) {
+  private String evaluateMapping(SignedJWT jwt, String mapping) throws ParseException {
     ExpressionParser parser = new SpelExpressionParser();
     Expression exp = parser.parseExpression(mapping);
-    return exp.getValue(jwt.getClaims(), String.class);
+    StandardEvaluationContext ctx = new StandardEvaluationContext();
+    ctx.addPropertyAccessor(new MapAccessor());
+    return exp.getValue(ctx, jwt.getJWTClaimsSet().getClaims(), String.class);
   }
 
   /**
@@ -369,7 +376,7 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
    * @param username The username.
    * @param jwt The decoded JWT.
    */
-  public void newUserLogin(String username, DecodedJWT jwt) {
+  public void newUserLogin(String username, SignedJWT jwt) throws ParseException {
     // Create a new user reference
     JpaUserReference userReference = new JpaUserReference(username, extractName(jwt), extractEmail(jwt), MECH_JWT,
         new Date(), fromOrganization(securityService.getOrganization()), extractRoles(jwt));
@@ -384,7 +391,7 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
    * @param username The username.
    * @param jwt The decoded JWT.
    */
-  public void existingUserLogin(String username, DecodedJWT jwt) {
+  public void existingUserLogin(String username, SignedJWT jwt) throws ParseException {
     Organization organization = securityService.getOrganization();
 
     // Load the user reference
@@ -468,12 +475,12 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
   }
 
   /**
-   * Setter for the JWKS cache expiration.
+   * Setter for the JWKS ttl.
    *
-   * @param jwksCacheExpiresIn The number of minutes after which a cached JWKS expires.
+   * @param jwksTimeToLive The default time to live of cached JWK sets, in milliseconds
    */
-  public void setJwksCacheExpiresIn(int jwksCacheExpiresIn) {
-    this.jwksCacheExpiresIn = jwksCacheExpiresIn;
+  public void setJwksTimeToLive(int jwksTimeToLive) {
+    this.jwksTimeToLive = jwksTimeToLive;
   }
 
   /**

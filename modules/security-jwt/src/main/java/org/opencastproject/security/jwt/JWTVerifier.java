@@ -21,20 +21,29 @@
 
 package org.opencastproject.security.jwt;
 
-import com.auth0.jwk.JwkException;
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.auth0.jwt.interfaces.DecodedJWT;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.JWSVerifier;
+import com.nimbusds.jose.crypto.ECDSAVerifier;
+import com.nimbusds.jose.crypto.Ed25519Verifier;
+import com.nimbusds.jose.crypto.MACVerifier;
+import com.nimbusds.jose.crypto.RSASSAVerifier;
+import com.nimbusds.jose.jwk.ECKey;
+import com.nimbusds.jose.jwk.JWK;
+import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jwt.SignedJWT;
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.expression.EvaluationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.context.expression.MapAccessor;
 import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
-import org.springframework.expression.ParseException;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
+import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.util.Assert;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -42,34 +51,43 @@ import java.util.List;
  */
 public final class JWTVerifier {
 
+  /** Logging facility. */
+  private static final Logger logger = LoggerFactory.getLogger(JWTVerifier.class);
+
   private JWTVerifier() { }
 
   /**
    * Verifies a given JWT string with a given JWK provider and given claim constraints.
    *
    * @param token The JWT string.
-   * @param provider The JWK provider.
+   * @param retriever The JWK provider.
    * @param claimConstraints The claim constraints.
    * @return The decoded and verified JWT.
-   * @throws JwkException If the JWT cannot be verified successfully.
+   * @throws JOSEException If the JWT cannot be verified successfully.
+   * @throws java.text.ParseException If some part of the JWT cannot be parsed successfully.
    */
-  public static DecodedJWT verify(String token, GuavaCachedUrlJwkProvider provider, List<String> claimConstraints)
-          throws JwkException {
+  public static SignedJWT verify(String token, JWKSetProvider retriever, List<String> claimConstraints)
+          throws JOSEException, java.text.ParseException {
     Assert.notNull(token, "A token must be set");
-    Assert.notNull(provider, "A JWKS provider must be set");
+    Assert.notNull(retriever, "A JWKS retriever must be set");
 
-    DecodedJWT jwt = JWT.decode(token);
+    SignedJWT jwt = SignedJWT.parse(token);
+    JWSAlgorithm alg = jwt.getHeader().getAlgorithm();
 
-    // First try with cache...
-    List<Algorithm> algorithms;
-    try {
-      algorithms = provider.getAlgorithms(jwt, false);
-      return verify(jwt, claimConstraints, algorithms);
-    } catch (JWTVerificationException | JwkException e) {
-      // ...then try again with forced fetch
-      // (recommended by e.g. https://openid.net/specs/openid-connect-core-1_0.html#RotateSigKeys)
-      algorithms = provider.getAlgorithms(jwt, true);
-      return verify(jwt, claimConstraints, algorithms);
+    List<JWK> jwkSet = retriever.getAll();
+
+    if (alg.equals(JWSAlgorithm.RS256) || alg.equals(JWSAlgorithm.RS384) || alg.equals(JWSAlgorithm.RS512)) {
+      RSAKey rsaKey = jwkSet.get(0).toRSAKey();
+      return verify(jwt, claimConstraints, new RSASSAVerifier(rsaKey));
+    } else if (alg.equals(JWSAlgorithm.ES256) || alg.equals(JWSAlgorithm.ES256K) || alg.equals(JWSAlgorithm.ES384)
+        || alg.equals(JWSAlgorithm.ES512)) {
+      ECKey ecKey = jwkSet.get(0).toECKey();
+      return verify(jwt, claimConstraints, new ECDSAVerifier(ecKey));
+    } else if (alg.equals(JWSAlgorithm.EdDSA) || alg.equals(JWSAlgorithm.Ed25519)) {
+      JWK jwk = jwkSet.get(0).toPublicJWK();
+      return verify(jwt, claimConstraints, new Ed25519Verifier(jwk.toOctetKeyPair()));
+    } else {
+      throw new IllegalArgumentException("Unsupported algorithm '" + alg + "'");
     }
   }
 
@@ -80,95 +98,59 @@ public final class JWTVerifier {
    * @param secret The secret.
    * @param claimConstraints The claim constraints.
    * @return The decoded and verified JWT.
-   * @throws JWTVerificationException If the JWT cannot be verified successfully.
+   * @throws JOSEException If the JWT cannot be verified successfully.
    */
-  public static DecodedJWT verify(String token, String secret, List<String> claimConstraints)
-          throws JWTVerificationException {
+  public static SignedJWT verify(String token, String secret, List<String> claimConstraints)
+          throws JOSEException, java.text.ParseException {
     Assert.notNull(token, "A token must be set");
     Assert.isTrue(StringUtils.isNotBlank(secret), "A secret must be set");
 
-    DecodedJWT jwt = JWT.decode(token);
-    return verify(jwt, claimConstraints, AlgorithmBuilder.buildAlgorithm(jwt, secret));
+    SignedJWT jwt = SignedJWT.parse(token);
+    JWSAlgorithm alg = jwt.getHeader().getAlgorithm();
+
+    if (alg.equals(JWSAlgorithm.HS256) || alg.equals(JWSAlgorithm.HS384) || alg.equals(JWSAlgorithm.HS512)) {
+      return verify(jwt, claimConstraints, new MACVerifier(secret));
+    } else {
+      throw new IllegalArgumentException("Unsupported algorithm '" + alg + "'");
+    }
   }
 
-  /**
-   * Verifies a given decoded JWT with the given claim constraints and algorithms. The verification has to be
-   * successful with at least one provided algorithm. Otherwise a {@link JWTVerificationException} is thrown.
-   *
-   * @param jwt The decoded JWT.
-   * @param claimConstraints The claim constraints.
-   * @param algorithms The algorithms.
-   * @return The decoded and verified JWT.
-   * @throws JWTVerificationException If the JWT cannot be verified successfully.
-   */
-  public static DecodedJWT verify(DecodedJWT jwt, List<String> claimConstraints, List<Algorithm> algorithms)
-          throws JWTVerificationException {
-    return verify(jwt, claimConstraints, algorithms.toArray(new Algorithm[0]));
-  }
-
-  /**
-   * Verifies a given decoded JWT with the given claim constraints and algorithms. The verification has to be
-   * successful with at least one provided algorithm. Otherwise a {@link JWTVerificationException} is thrown.
-   *
-   * @param jwt The decoded JWT.
-   * @param claimConstraints The claim constraints.
-   * @param algorithms The algorithms.
-   * @return The decoded and verified JWT.
-   * @throws JWTVerificationException If the JWT cannot be verified successfully.
-   */
-  public static DecodedJWT verify(DecodedJWT jwt, List<String> claimConstraints, Algorithm... algorithms)
-          throws JWTVerificationException {
+  public static SignedJWT verify(SignedJWT jwt, List<String> claimConstraints, JWSVerifier verifier)
+          throws JOSEException, java.text.ParseException {
     Assert.notNull(jwt, "A decoded JWT must be set");
     Assert.notEmpty(claimConstraints, "Claim constraints must be set");
-    Assert.notEmpty(algorithms, "Algorithms must be set");
-    Assert.isTrue(algorithmsMatch(algorithms), "Algorithms must be of same class");
+    Assert.notNull(verifier, "A verifier must be set");
 
-    boolean verified = false;
-    Exception lastException = new JWTVerificationException("JWT could not be verified");
-    for (Algorithm algorithm : algorithms) {
-      try {
-        // General verification
-        JWT.require(algorithm).build().verify(jwt);
-
-        // Claim constraints verification
-        ExpressionParser parser = new SpelExpressionParser();
-        for (String constraint : claimConstraints) {
-          Expression exp = parser.parseExpression(constraint);
-          if (!exp.getValue(jwt.getClaims(), Boolean.class)) {
-            throw new JWTVerificationException("The claims did not fulfill constraint '" + constraint + "'");
-          }
-        }
-
-        // Verification was successful if no exception has been thrown
-        verified = true;
-        break;
-      } catch (JWTVerificationException | EvaluationException | ParseException e) {
-        // Ignore for now and try next algorithm
-        lastException = e;
+    try {
+      // General verification
+      if (!jwt.verify(verifier)) {
+        throw new JOSEException("JWT could not be verified");
       }
-    }
 
-    // If verification was not successful until here, throw last known exception
-    if (!verified) {
-      throw new JWTVerificationException(lastException.getMessage());
+      // Expiration date verification
+      Date expirationTime = jwt.getJWTClaimsSet().getExpirationTime();
+      if (expirationTime != null && !new Date().before(expirationTime)) {
+        throw new JOSEException("JWT is expired");
+      }
+
+      // Claim constraints verification
+      ExpressionParser parser = new SpelExpressionParser();
+      StandardEvaluationContext ctx = new StandardEvaluationContext();
+      ctx.addPropertyAccessor(new MapAccessor());
+      for (String constraint : claimConstraints) {
+        Expression exp = parser.parseExpression(constraint);
+        if (!exp.getValue(ctx, jwt.getJWTClaimsSet().getClaims(), Boolean.class)) {
+          throw new JOSEException("The claims did not fulfill constraint '" + constraint + "'");
+        }
+      }
+    } catch (JOSEException e) {
+      logger.error("JWT could not be verified");
+      throw (e);
+    } catch (java.text.ParseException e) {
+      logger.error("JWT claims could not be parsed");
+      throw (e);
     }
 
     return jwt;
   }
-
-  /**
-   * Checks if the given array of algorithms match.
-   *
-   * @param algorithms The algorithms.
-   * @return <code>true</code> if all algorithms match, <code>false</code> otherwise.
-   */
-  private static boolean algorithmsMatch(Algorithm... algorithms) {
-    for (int i = 1; i < algorithms.length; i++) {
-      if (!algorithms[i].getClass().equals(algorithms[0].getClass())) {
-        return false;
-      }
-    }
-    return true;
-  }
-
 }

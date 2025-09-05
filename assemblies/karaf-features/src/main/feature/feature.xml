@@ -92,6 +92,9 @@
     <bundle>mvn:org.springframework/spring-expression/${spring.version}</bundle>
     <bundle>mvn:org.springframework/spring-tx/${spring.version}</bundle>
     <bundle>mvn:org.springframework/spring-web/${spring.version}</bundle>
+
+    <bundle>mvn:com.nimbusds/nimbus-jose-jwt/10.4.2</bundle>
+    <bundle>wrap:mvn:com.google.crypto.tink/tink/1.16.0$Bundle-SymbolicName=com.google.crypto.tink;Bundle-Version=1.16.0</bundle>
   </feature>
 
   <feature name="opencast-core" version="${project.version}">
