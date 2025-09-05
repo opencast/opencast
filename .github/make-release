@@ -21,10 +21,10 @@ VERSION="${MAJOR}.${MINOR}"
 git status | grep modified: && exit 1
 
 # update pom.xml versions
-mvn versions:set -DnewVersion="${VERSION}" versions:commit
+./mvnw versions:set -DnewVersion="${VERSION}" versions:commit
 
 # build opencast
-mvn clean install \
+./mvnw clean install \
   -Pdev \
   -DskipTests \
   -Dcheckstyle.skip=true \
