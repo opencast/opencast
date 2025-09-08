@@ -31,7 +31,7 @@ import org.opencastproject.metadata.dublincore.MetadataList.Locked;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.PropertiesUtil;
 
-import com.entwinemedia.fn.data.json.SimpleSerializer;
+import com.google.gson.Gson;
 
 import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
@@ -92,7 +92,7 @@ public class MetadataListTest {
     metadataList.setLocked(Locked.WORKFLOW_RUNNING);
 
     assertThat(inputJson.toJSONString(),
-      SameJSONAs.sameJSONAs(new SimpleSerializer().toJson(MetadataJson.listToJson(metadataList, true)))
+      SameJSONAs.sameJSONAs(new Gson().toJson(MetadataJson.listToJson(metadataList, true)))
         .allowingAnyArrayOrdering());
   }
 

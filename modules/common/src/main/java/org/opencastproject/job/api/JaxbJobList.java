@@ -21,11 +21,10 @@
 
 package org.opencastproject.job.api;
 
-import com.entwinemedia.fn.Stream;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -71,7 +70,9 @@ public class JaxbJobList {
    *          the jobs to set
    */
   public void setJobs(List<Job> jobs) {
-    this.jobs = Stream.$(jobs).map(JaxbJob.fnFromJob()).toList();
+    this.jobs = jobs.stream()
+        .map(JaxbJob::new)
+        .collect(Collectors.toList());
   }
 
   public void add(JaxbJob job) {

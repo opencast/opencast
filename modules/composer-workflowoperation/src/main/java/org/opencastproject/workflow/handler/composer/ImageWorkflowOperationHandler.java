@@ -336,7 +336,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
         posMs = position.position * 1000.0;
         break;
       default:
-        throw new WorkflowOperationException("Unexhaustive match");
+        throw new IllegalArgumentException("Unhandled MediaPosition type: " + position.type);
     }
     // limit maximum position to Xms before the end of the video
     return Math.abs(durationMs - posMs) >= endMarginMs
@@ -421,7 +421,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
     WorkflowOperationInstance woi = wi.getCurrentOperation();
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(wi,
         Configuration.many, Configuration.many, Configuration.many, Configuration.one);
-    final List<EncodingProfile> profiles = Optional.ofNullable(getOptConfig(woi, OPT_PROFILES).orNull())
+    final List<EncodingProfile> profiles = getOptConfig(woi, OPT_PROFILES)
         .map(config -> Arrays.asList(config.split(",")))
         .orElse(java.util.Collections.emptyList())
         .stream()
@@ -458,7 +458,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
           .collect(Collectors.toList());
     }
     final List<MediaPosition> positions = parsePositions(getConfig(woi, OPT_POSITIONS));
-    final long endMargin = Optional.ofNullable(getOptConfig(woi, OPT_END_MARGIN).orNull())
+    final long endMargin = getOptConfig(woi, OPT_END_MARGIN)
         .map(Long::parseLong)
         .orElse(END_MARGIN_DEFAULT);
     return new Cfg(sourceTracks,
@@ -474,7 +474,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
   /** Validate a target base name format. */
   private Optional<String> getTargetBaseNameFormat(WorkflowOperationInstance woi, final String formatName)
       throws WorkflowOperationException {
-    Optional<String> baseName = Optional.ofNullable(getOptConfig(woi, formatName).orNull());
+    Optional<String> baseName = getOptConfig(woi, formatName);
     if (baseName.isPresent()) {
       baseName = Optional.ofNullable(validateTargetBaseNameFormat(baseName.get(), formatName));
     }

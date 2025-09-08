@@ -168,7 +168,7 @@ public final class SeriesItem implements MessageItem, Serializable {
   }
 
   public DublinCoreCatalog getMetadata() {
-    return DublinCoreXmlFormat.readOpt(series).orNull();
+    return DublinCoreXmlFormat.readOpt(series).orElse(null);
   }
 
   public DublinCoreCatalog getExtendedMetadata() {

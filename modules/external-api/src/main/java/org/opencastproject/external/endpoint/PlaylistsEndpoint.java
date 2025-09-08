@@ -20,16 +20,11 @@
  */
 package org.opencastproject.external.endpoint;
 
-import static com.entwinemedia.fn.data.json.Jsons.BLANK;
-import static com.entwinemedia.fn.data.json.Jsons.NULL;
-import static com.entwinemedia.fn.data.json.Jsons.arr;
-import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.obj;
-import static com.entwinemedia.fn.data.json.Jsons.v;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
+import static org.opencastproject.index.service.util.JSONUtils.safeString;
 import static org.opencastproject.playlists.PlaylistRestService.SAMPLE_PLAYLIST_JSON;
 import static org.opencastproject.util.DateTimeSupport.toUTC;
 import static org.opencastproject.util.RestUtil.getEndpointUrl;
@@ -58,8 +53,10 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.util.requests.SortCriterion;
 
-import com.entwinemedia.fn.data.json.Field;
-import com.entwinemedia.fn.data.json.JValue;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 import org.json.simple.parser.ParseException;
 import org.osgi.service.component.ComponentContext;
@@ -72,9 +69,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
@@ -221,13 +216,15 @@ public class PlaylistsEndpoint {
           return Response.serverError().status(Response.Status.BAD_REQUEST).build();
       }
     }
+
     List<Playlist> playlists = service.getPlaylists(limit, offset, sortCriterion);
 
-    List<JValue> playlistsJson = playlists.stream()
-        .map(p -> playlistToJson(p))
-        .collect(Collectors.toList());
+    JsonArray playlistsJson = new JsonArray();
+    for (Playlist p : playlists) {
+      playlistsJson.add(playlistToJson(p));
+    }
 
-    return ApiResponseBuilder.Json.ok(acceptHeader, arr(playlistsJson));
+    return Response.ok(playlistsJson.toString(), acceptHeader).build();
   }
 
   @POST
@@ -329,48 +326,56 @@ public class PlaylistsEndpoint {
     }
   }
 
-  private JValue playlistToJson(Playlist playlist) {
-    List<Field> fields = new ArrayList<>();
+  private JsonObject playlistToJson(Playlist playlist) {
+    JsonObject json = new JsonObject();
 
-    fields.add(f("id", v(playlist.getId())));
-    fields.add(f("entries", arr(playlist.getEntries()
-        .stream()
-        .map(this::playlistEntryToJson)
-        .collect(Collectors.toList()))));
-    fields.add(f("title", v(playlist.getTitle(), BLANK)));
-    fields.add(f("description", v(playlist.getDescription(), BLANK)));
-    fields.add(f("creator", v(playlist.getCreator(), BLANK)));
-    fields.add(f("updated", v(playlist.getUpdated() != null ? toUTC(playlist.getUpdated().getTime()) : null, BLANK)));
-    fields.add(f("accessControlEntries", arr(playlist.getAccessControlEntries()
-        .stream()
-        .map(this::playlistAccessControlEntryToJson)
-        .collect(Collectors.toList()))));
+    json.addProperty("id", playlist.getId());
+    JsonArray entriesArray = new JsonArray();
+    for (PlaylistEntry entry : playlist.getEntries()) {
+      entriesArray.add(playlistEntryToJson(entry));
+    }
+    json.add("entries", entriesArray);
+    json.addProperty("title", safeString(playlist.getTitle()));
+    json.addProperty("description", safeString(playlist.getDescription()));
+    json.addProperty("creator", safeString(playlist.getCreator()));
+    json.addProperty("updated", playlist.getUpdated() != null ? toUTC(playlist.getUpdated().getTime()) : "");
+    JsonArray aceArray = new JsonArray();
+    for (PlaylistAccessControlEntry ace : playlist.getAccessControlEntries()) {
+      aceArray.add(playlistAccessControlEntryToJson(ace));
+    }
+    json.add("accessControlEntries", aceArray);
 
-    return obj(fields);
+    return json;
   }
 
-  private JValue playlistEntryToJson(PlaylistEntry playlistEntry) {
-    List<Field> fields = new ArrayList<>();
+  private JsonObject playlistEntryToJson(PlaylistEntry playlistEntry) {
+    JsonObject json = new JsonObject();
 
-    fields.add(f("id", v(playlistEntry.getId())));
-    fields.add(f("contentId", v(playlistEntry.getContentId(), NULL)));
-    fields.add(f("type", enumToJSON(playlistEntry.getType())));
-    return obj(fields);
+    json.addProperty("id", playlistEntry.getId());
+    if (playlistEntry.getContentId() != null) {
+      json.addProperty("contentId", playlistEntry.getContentId());
+    } else {
+      json.add("contentId", null);
+    }
+
+    json.add("type", enumToJSON(playlistEntry.getType()));
+
+    return json;
   }
 
-  private JValue playlistAccessControlEntryToJson(PlaylistAccessControlEntry playlistAccessControlEntry) {
-    List<Field> fields = new ArrayList<>();
+  private JsonObject playlistAccessControlEntryToJson(PlaylistAccessControlEntry playlistAccessControlEntry) {
+    JsonObject json = new JsonObject();
 
-    fields.add(f("id", v(playlistAccessControlEntry.getId())));
-    fields.add(f("allow", v(playlistAccessControlEntry.isAllow())));
-    fields.add(f("role", v(playlistAccessControlEntry.getRole())));
-    fields.add(f("action", v(playlistAccessControlEntry.getAction())));
+    json.addProperty("id", playlistAccessControlEntry.getId());
+    json.addProperty("allow", playlistAccessControlEntry.isAllow());
+    json.addProperty("role", playlistAccessControlEntry.getRole());
+    json.addProperty("action", playlistAccessControlEntry.getAction());
 
-    return obj(fields);
+    return json;
   }
 
-  private JValue enumToJSON(Enum e) {
-    return e == null ? null : v(e.toString());
+  private JsonElement enumToJSON(Enum<?> e) {
+    return e == null ? null : new JsonPrimitive(e.toString());
   }
 
   private String getPlaylistUrl(String playlistId) {

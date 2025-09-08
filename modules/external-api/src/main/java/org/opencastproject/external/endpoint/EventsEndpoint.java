@@ -20,13 +20,6 @@
  */
 package org.opencastproject.external.endpoint;
 
-import static com.entwinemedia.fn.Stream.$;
-import static com.entwinemedia.fn.data.json.Jsons.BLANK;
-import static com.entwinemedia.fn.data.json.Jsons.NULL;
-import static com.entwinemedia.fn.data.json.Jsons.arr;
-import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.obj;
-import static com.entwinemedia.fn.data.json.Jsons.v;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_11_0;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_1_0;
@@ -35,6 +28,9 @@ import static org.opencastproject.external.common.ApiVersion.VERSION_1_7_0;
 import static org.opencastproject.external.util.SchedulingUtils.SchedulingInfo;
 import static org.opencastproject.external.util.SchedulingUtils.convertConflictingEvents;
 import static org.opencastproject.external.util.SchedulingUtils.getConflictingEvents;
+import static org.opencastproject.index.service.util.JSONUtils.arrayToJsonArray;
+import static org.opencastproject.index.service.util.JSONUtils.collectionToJsonArray;
+import static org.opencastproject.index.service.util.JSONUtils.safeString;
 import static org.opencastproject.util.RestUtil.getEndpointUrl;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
@@ -46,7 +42,6 @@ import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.QueryPreprocessor;
 import org.opencastproject.elasticsearch.index.objects.IndexObject;
 import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.elasticsearch.index.objects.event.EventIndexSchema;
@@ -116,13 +111,11 @@ import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowService;
 
-import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.data.Opt;
-import com.entwinemedia.fn.data.json.Field;
-import com.entwinemedia.fn.data.json.JObject;
-import com.entwinemedia.fn.data.json.JValue;
-import com.entwinemedia.fn.data.json.Jsons;
-import com.entwinemedia.fn.data.json.Jsons.Functions;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
@@ -153,7 +146,6 @@ import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
@@ -454,7 +446,9 @@ public class EventsEndpoint implements ManagedService {
       // withScheduling was added in version 1.1.0 and should be ignored for smaller versions
       withScheduling = false;
     }
-    for (final Event event : indexService.getEvent(id, elasticsearchIndex)) {
+    Optional<Event> eventOpt = indexService.getEvent(id, elasticsearchIndex);
+    if (eventOpt.isPresent()) {
+      Event event = eventOpt.get();
       event.updatePreview(previewSubtype);
       return ApiResponseBuilder.Json.ok(
           requestedVersion, eventToJSON(event, withAcl, withMetadata, withScheduling, withPublications, includeInternalPublication, sign, requestedVersion));
@@ -480,60 +474,62 @@ public class EventsEndpoint implements ManagedService {
   public Response getEventMedia(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id)
           throws Exception {
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
-    ArrayList<TrackImpl> tracks = new ArrayList<>();
+    List<TrackImpl> tracks = new ArrayList<>();
 
-    for (final Event event : indexService.getEvent(id, elasticsearchIndex)) {
-      final MediaPackage mp = indexService.getEventMediapackage(event);
+    Optional<Event> eventOpt = indexService.getEvent(id, elasticsearchIndex);
+    if (eventOpt.isPresent()) {
+      final MediaPackage mp = indexService.getEventMediapackage(eventOpt.get());
       for (Track track : mp.getTracks()) {
         if (track instanceof TrackImpl) {
           tracks.add((TrackImpl) track);
         }
       }
 
-      List<JValue> tracksJson = new ArrayList<>();
+      JsonArray tracksJson = new JsonArray();
       for (Track track : tracks) {
-        List<Field> fields = new ArrayList<>();
+        JsonObject trackJson = new JsonObject();
         if (track.getChecksum() != null)
-          fields.add(f("checksum", v(track.getChecksum().toString())));
+          trackJson.addProperty("checksum", track.getChecksum().toString());
         if (track.getDescription() != null)
-          fields.add(f("description", v(track.getDescription())));
+          trackJson.addProperty("description", track.getDescription());
         if (track.getDuration() != null)
-          fields.add(f("duration", v(track.getDuration())));
+          trackJson.addProperty("duration", track.getDuration());
         if (track.getElementDescription() != null)
-          fields.add(f("element-description", v(track.getElementDescription())));
+          trackJson.addProperty("element-description", track.getElementDescription());
         if (track.getFlavor() != null)
-          fields.add(f("flavor", v(track.getFlavor().toString())));
+          trackJson.addProperty("flavor", track.getFlavor().toString());
         if (track.getIdentifier() != null)
-          fields.add(f("identifier", v(track.getIdentifier())));
+          trackJson.addProperty("identifier", track.getIdentifier());
         if (track.getMimeType() != null)
-          fields.add(f("mimetype", v(track.getMimeType().toString())));
-        fields.add(f("size", v(track.getSize())));
+          trackJson.addProperty("mimetype", track.getMimeType().toString());
+        trackJson.addProperty("size", track.getSize());
+
         if (!requestedVersion.isSmallerThan(VERSION_1_7_0)) {
-          fields.add(f("has_video", v(track.hasVideo())));
-          fields.add(f("has_audio", v(track.hasAudio())));
-          fields.add(f("is_master_playlist", v(track.isMaster())));
-          fields.add(f("is_live", v(track.isLive())));
+          trackJson.addProperty("has_video", track.hasVideo());
+          trackJson.addProperty("has_audio", track.hasAudio());
+          trackJson.addProperty("is_master_playlist", track.isMaster());
+          trackJson.addProperty("is_live", track.isLive());
         }
+
         if (track.getStreams() != null) {
-          List<Field> streams = new ArrayList<>();
+          JsonObject streamsJson = new JsonObject();
           for (Stream stream : track.getStreams()) {
-            streams.add(f(stream.getIdentifier(), getJsonStream(stream)));
+            streamsJson.add(stream.getIdentifier(), getJsonStream(stream));
           }
-          fields.add(f("streams", obj(streams)));
+          trackJson.add("streams", streamsJson);
         }
-        if (track.getTags() != null) {
-          List<JValue> tags = new ArrayList<>();
-          for (String tag : track.getTags()) {
-            tags.add(v(tag));
-          }
-          fields.add(f("tags", arr(tags)));
-        }
+
+        trackJson.add("tags", arrayToJsonArray(track.getTags()));
+
         if (track.getURI() != null)
-          fields.add(f("uri", v(track.getURI().toString())));
-        tracksJson.add(obj(fields));
+          trackJson.addProperty("uri", track.getURI().toString());
+
+        tracksJson.add(trackJson);
       }
-      return ApiResponseBuilder.Json.ok(acceptHeader, arr(tracksJson));
+
+      return ApiResponseBuilder.Json.ok(acceptHeader, tracksJson);
     }
+
     return ApiResponseBuilder.notFound("Cannot find an event with id '%s'.", id);
   }
 
@@ -546,8 +542,8 @@ public class EventsEndpoint implements ManagedService {
           @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response deleteEvent(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id)
           throws SearchIndexException, UnauthorizedException {
-    final Opt<Event> event = indexService.getEvent(id, elasticsearchIndex);
-    if (event.isNone()) {
+    final Optional<Event> event = indexService.getEvent(id, elasticsearchIndex);
+    if (event.isEmpty()) {
       return RestUtil.R.notFound(id);
     }
     final IndexService.EventRemovalResult result;
@@ -594,20 +590,22 @@ public class EventsEndpoint implements ManagedService {
     try {
       String startDatePattern = configuredMetadataFields.containsKey("startDate") ? configuredMetadataFields.get("startDate").getPattern() : null;
       String startTimePattern = configuredMetadataFields.containsKey("startTime") ? configuredMetadataFields.get("startTime").getPattern() : null;
-      for (final Event event : indexService.getEvent(eventId, elasticsearchIndex)) {
+      Optional<Event> eventOpt = indexService.getEvent(eventId, elasticsearchIndex);
+      if (eventOpt.isPresent()) {
+        Event event = eventOpt.get();
         EventHttpServletRequest eventHttpServletRequest = EventHttpServletRequest.updateFromHttpServletRequest(event,
                 request, getEventCatalogUIAdapters(), startDatePattern, startTimePattern);
 
         // FIXME: All of these update operations should be a part of a transaction to avoid a partially updated event.
-        if (eventHttpServletRequest.getMetadataList().isSome()) {
+        if (eventHttpServletRequest.getMetadataList().isPresent()) {
           indexService.updateEventMetadata(eventId, eventHttpServletRequest.getMetadataList().get(), elasticsearchIndex);
         }
 
-        if (eventHttpServletRequest.getAcl().isSome()) {
+        if (eventHttpServletRequest.getAcl().isPresent()) {
           indexService.updateEventAcl(eventId, eventHttpServletRequest.getAcl().get(), elasticsearchIndex);
         }
 
-        if (eventHttpServletRequest.getProcessing().isSome()) {
+        if (eventHttpServletRequest.getProcessing().isPresent()) {
 
           if (!event.isScheduledEvent() || event.hasRecordingStarted()) {
             return RestUtil.R.badRequest("Processing can't be updated for events that are already uploaded.");
@@ -623,26 +621,26 @@ public class EventsEndpoint implements ManagedService {
             configuration = new HashMap<>((JSONObject) eventHttpServletRequest.getProcessing().get().get("configuration"));
           }
 
-          Opt<Map<String, String>> caMetadataOpt = Opt.none();
-          Opt<Map<String, String>> workflowConfigOpt = Opt.none();
+          Optional<Map<String, String>> caMetadataOpt = Optional.empty();
+          Optional<Map<String, String>> workflowConfigOpt = Optional.empty();
 
           Map<String, String> caMetadata = new HashMap<>(getSchedulerService().getCaptureAgentConfiguration(eventId));
           if (!workflowId.equals(caMetadata.get(CaptureParameters.INGEST_WORKFLOW_DEFINITION))) {
             caMetadata.put(CaptureParameters.INGEST_WORKFLOW_DEFINITION, workflowId);
-            caMetadataOpt = Opt.some(caMetadata);
+            caMetadataOpt = Optional.of(caMetadata);
           }
 
           Map<String, String> oldWorkflowConfig = new HashMap<>(getSchedulerService().getWorkflowConfig(eventId));
           if (!oldWorkflowConfig.equals(configuration))
-            workflowConfigOpt = Opt.some(configuration);
+            workflowConfigOpt = Optional.of(configuration);
 
-          if (!caMetadataOpt.isNone() || !workflowConfigOpt.isNone()) {
-            getSchedulerService().updateEvent(eventId, Opt.none(), Opt.none(), Opt.none(),
-                    Opt.none(), Opt.none(), workflowConfigOpt, caMetadataOpt);
+          if (!caMetadataOpt.isEmpty() || !workflowConfigOpt.isEmpty()) {
+            getSchedulerService().updateEvent(eventId, Optional.empty(), Optional.empty(), Optional.empty(),
+                    Optional.empty(), Optional.empty(), workflowConfigOpt, caMetadataOpt);
           }
         }
 
-        if (eventHttpServletRequest.getScheduling().isSome() && !requestedVersion.isSmallerThan(VERSION_1_1_0)) {
+        if (eventHttpServletRequest.getScheduling().isPresent() && !requestedVersion.isSmallerThan(VERSION_1_1_0)) {
           // Scheduling is only available for version 1.1.0 and above
           Optional<Response> clientError = updateSchedulingInformation(
               eventHttpServletRequest.getScheduling().get(), eventId, requestedVersion, false);
@@ -695,7 +693,7 @@ public class EventsEndpoint implements ManagedService {
           ingestService, getEventCatalogUIAdapters(), startDatePattern, startTimePattern);
 
       // If scheduling information is provided, the source has to be "SCHEDULE_SINGLE" or "SCHEDULE_MULTIPLE".
-      if (eventHttpServletRequest.getScheduling().isSome() && !requestedVersion.isSmallerThan(VERSION_1_1_0)) {
+      if (eventHttpServletRequest.getScheduling().isPresent() && !requestedVersion.isSmallerThan(VERSION_1_1_0)) {
         // Scheduling is only available for version 1.1.0 and above
         return scheduleNewEvent(eventHttpServletRequest, eventHttpServletRequest.getScheduling().get(), requestedVersion);
       }
@@ -704,7 +702,9 @@ public class EventsEndpoint implements ManagedService {
       source.put("type", "UPLOAD");
       eventHttpServletRequest.setSource(source);
       String eventId = indexService.createEvent(eventHttpServletRequest);
-      return ApiResponseBuilder.Json.created(requestedVersion, URI.create(getEventUrl(eventId)), obj(f("identifier", v(eventId))));
+      JsonObject json = new JsonObject();
+      json.addProperty("identifier", eventId);
+      return ApiResponseBuilder.Json.created(requestedVersion, URI.create(getEventUrl(eventId)), json);
     } catch (IllegalArgumentException | DateTimeParseException e) {
       logger.debug("Unable to create event", e);
       return RestUtil.R.badRequest(e.getMessage());
@@ -723,8 +723,8 @@ public class EventsEndpoint implements ManagedService {
     }
   }
 
-  private Response scheduleNewEvent(EventHttpServletRequest request, JSONObject scheduling, ApiVersion requestedVersion) throws
-      MediaPackageException, IOException, IngestException, SchedulerException,
+  private Response scheduleNewEvent(EventHttpServletRequest request, JSONObject scheduling, ApiVersion requestedVersion)
+      throws MediaPackageException, IOException, IngestException, SchedulerException,
       NotFoundException, UnauthorizedException, SearchIndexException, java.text.ParseException {
 
     final SchedulingInfo schedulingInfo = SchedulingInfo.of(scheduling);
@@ -740,20 +740,28 @@ public class EventsEndpoint implements ManagedService {
 
       if (eventId.contains(",")) {
         // This the case when SCHEDULE_MULTIPLE is performed.
-        return ApiResponseBuilder.Json.ok(requestedVersion, arr(
-            Arrays.stream(eventId.split(","))
-                .map(s -> obj(f("identifier", v(s))))
-                .collect(Collectors.toList()))
-        );
+        JsonArray eventArray = new JsonArray();
+        for (String id : eventId.split(",")) {
+          JsonObject eventObj = new JsonObject();
+          eventObj.addProperty("identifier", id);
+          eventArray.add(eventObj);
+        }
+        return ApiResponseBuilder.Json.ok(requestedVersion, eventArray);
       }
 
-      return ApiResponseBuilder.Json.created(requestedVersion, URI.create(getEventUrl(eventId)), obj(f("identifier", v(eventId))));
+      JsonObject eventJson = new JsonObject();
+      eventJson.addProperty("identifier", eventId);
+      return ApiResponseBuilder.Json.created(requestedVersion, URI.create(getEventUrl(eventId)), eventJson);
     } catch (SchedulerConflictException e) {
-      final List<MediaPackage> conflictingEvents =
+      List<MediaPackage> conflictingEvents =
           getConflictingEvents(schedulingInfo, agentStateService, schedulerService);
       logger.debug("Client tried to schedule conflicting event(s).");
-      return ApiResponseBuilder.Json.conflict(requestedVersion,
-          arr(convertConflictingEvents(Optional.empty(), conflictingEvents, indexService, elasticsearchIndex)));
+      JsonArray conflictArray = new JsonArray();
+      for (JsonObject conflict : convertConflictingEvents(
+          Optional.empty(), conflictingEvents, indexService, elasticsearchIndex)) {
+        conflictArray.add(conflict);
+      }
+      return ApiResponseBuilder.Json.conflict(requestedVersion, conflictArray);
     }
   }
 
@@ -829,7 +837,7 @@ public class EventsEndpoint implements ManagedService {
           } else if ("location".equals(name)) {
             query.withLocation(value);
           } else if ("textFilter".equals(name)) {
-            query.withText(QueryPreprocessor.sanitize(value));
+            query.withText(value);
           } else if ("series".equals(name)) {
             query.withSeriesId(value);
           } else if ("subject".equals(name)) {
@@ -1082,14 +1090,16 @@ public class EventsEndpoint implements ManagedService {
    * @throws UnauthorizedException
    */
   protected Response getJsonEvents(String acceptHeader, List<IndexObject> events, Boolean withAcl, Boolean withMetadata,
-          Boolean withScheduling, Boolean withPublications,Boolean includeInternalPublication, Boolean withSignedUrls, ApiVersion requestedVersion)
+      Boolean withScheduling, Boolean withPublications, Boolean includeInternalPublication, Boolean withSignedUrls, ApiVersion requestedVersion)
       throws IndexServiceException, UnauthorizedException, SchedulerException {
-    List<JValue> eventsList = new ArrayList<>();
+    JsonArray eventsArray = new JsonArray();
     for (IndexObject item : events) {
-      eventsList.add(eventToJSON((Event) item, withAcl, withMetadata, withScheduling, withPublications, includeInternalPublication, withSignedUrls,
-              requestedVersion));
+      JsonObject jsonEvent = eventToJSON((Event) item, withAcl, withMetadata, withScheduling, withPublications,
+          includeInternalPublication, withSignedUrls, requestedVersion);
+      eventsArray.add(jsonEvent);
     }
-    return ApiResponseBuilder.Json.ok(requestedVersion, arr(eventsList));
+
+    return ApiResponseBuilder.Json.ok(requestedVersion, eventsArray);
   }
 
   /**
@@ -1113,87 +1123,106 @@ public class EventsEndpoint implements ManagedService {
    * @throws SchedulerException
    * @throws UnauthorizedException
    */
-  protected JValue eventToJSON(Event event, Boolean withAcl, Boolean withMetadata, Boolean withScheduling,
-          Boolean withPublications, Boolean includeInternalPublication, Boolean withSignedUrls, ApiVersion requestedVersion) throws IndexServiceException, SchedulerException, UnauthorizedException {
-    List<Field> fields = new ArrayList<>();
+  protected JsonObject eventToJSON(Event event, Boolean withAcl, Boolean withMetadata, Boolean withScheduling,
+      Boolean withPublications, Boolean includeInternalPublication, Boolean withSignedUrls,
+      ApiVersion requestedVersion) throws IndexServiceException, SchedulerException, UnauthorizedException {
+    JsonObject json = new JsonObject();
+
     if (event.getArchiveVersion() != null)
-      fields.add(f("archive_version", v(event.getArchiveVersion())));
-    fields.add(f("created", v(event.getCreated(), Jsons.BLANK)));
-    fields.add(f("creator", v(event.getCreator(), Jsons.BLANK)));
-    fields.add(f("contributor", arr($(event.getContributors()).map(Functions.stringToJValue))));
-    fields.add(f("description", v(event.getDescription(), Jsons.BLANK)));
-    fields.add(f("has_previews", v(event.hasPreview())));
-    fields.add(f("identifier", v(event.getIdentifier(), BLANK)));
-    fields.add(f("location", v(event.getLocation(), BLANK)));
-    fields.add(f("presenter", arr($(event.getPresenters()).map(Functions.stringToJValue))));
+      json.addProperty("archive_version", event.getArchiveVersion());
+    json.addProperty("created", safeString(event.getCreated()));
+    json.addProperty("creator", safeString(event.getCreator()));
+    json.add("contributor", collectionToJsonArray(event.getContributors()));
+    json.addProperty("description", safeString(event.getDescription()));
+    json.addProperty("has_previews", event.hasPreview());
+    json.addProperty("identifier", safeString(event.getIdentifier()));
+    json.addProperty("location", safeString(event.getLocation()));
+    json.add("presenter", collectionToJsonArray(event.getPresenters()));
+
     if (!requestedVersion.isSmallerThan(VERSION_1_1_0)) {
-      fields.add(f("language", v(event.getLanguage(), BLANK)));
-      fields.add(f("rightsholder", v(event.getRights(), BLANK)));
-      fields.add(f("license", v(event.getLicense(), BLANK)));
-      fields.add(f("is_part_of", v(event.getSeriesId(), BLANK)));
-      fields.add(f("series", v(event.getSeriesName(),BLANK)));
-      fields.add(f("source", v(event.getSource(), BLANK)));
-      fields.add(f("status", v(event.getEventStatus(), BLANK)));
+      json.addProperty("language", safeString(event.getLanguage()));
+      json.addProperty("rightsholder", safeString(event.getRights()));
+      json.addProperty("license", safeString(event.getLicense()));
+      json.addProperty("is_part_of", safeString(event.getSeriesId()));
+      json.addProperty("series", safeString(event.getSeriesName()));
+      json.addProperty("source", safeString(event.getSource()));
+      json.addProperty("status", safeString(event.getEventStatus()));
     }
-    List<JValue> publicationIds = new ArrayList<>();
+
+    JsonArray publicationIds = new JsonArray();
     if (event.getPublications() != null) {
       for (Publication publication : event.getPublications()) {
-        publicationIds.add(v(publication.getChannel()));
+        publicationIds.add(new JsonPrimitive(publication.getChannel()));
       }
     }
-    fields.add(f("publication_status", arr(publicationIds)));
-    fields.add(f("processing_state", v(event.getWorkflowState(), BLANK)));
+    json.add("publication_status", publicationIds);
+    json.addProperty("processing_state", safeString(event.getWorkflowState()));
 
     if (requestedVersion.isSmallerThan(VERSION_1_4_0)) {
-      fields.add(f("start", v(event.getTechnicalStartTime(), BLANK)));
+      json.addProperty("start", safeString(event.getTechnicalStartTime()));
       if (event.getTechnicalEndTime() != null) {
         long duration = new DateTime(event.getTechnicalEndTime()).getMillis()
-                - new DateTime(event.getTechnicalStartTime()).getMillis();
-        fields.add(f("duration", v(duration)));
+            - new DateTime(event.getTechnicalStartTime()).getMillis();
+        json.addProperty("duration", duration);
       }
     } else {
-      fields.add(f("start", v(event.getRecordingStartDate(), BLANK)));
-      fields.add(f("duration", v(event.getDuration(), NULL)));
+      json.addProperty("start", safeString(event.getRecordingStartDate()));
+      if (event.getDuration() != null) {
+        json.addProperty("duration", event.getDuration());
+      } else {
+        json.add("duration", JsonNull.INSTANCE);
+      }
     }
 
     if (StringUtils.trimToNull(event.getSubject()) != null) {
-      fields.add(f("subjects", arr(splitSubjectIntoArray(event.getSubject()))));
+      json.add("subjects", splitSubjectIntoArray(event.getSubject()));
     } else {
-      fields.add(f("subjects", arr()));
+      json.add("subjects", new JsonArray());
     }
-    fields.add(f("title", v(event.getTitle(), BLANK)));
+
+    json.addProperty("title", safeString(event.getTitle()));
+
     if (withAcl != null && withAcl) {
       AccessControlList acl = getAclFromEvent(event);
-      fields.add(f("acl", arr(AclUtils.serializeAclToJson(acl))));
+      json.add("acl", AclUtils.serializeAclToJson(acl));
     }
+
     if (withMetadata != null && withMetadata) {
       try {
-        Opt<MetadataList> metadata = getEventMetadata(event);
-        if (metadata.isSome()) {
-          fields.add(f("metadata", MetadataJson.listToJson(metadata.get(), true)));
+        Optional<MetadataList> metadata = getEventMetadata(event);
+        if (metadata.isPresent()) {
+          json.add("metadata", MetadataJson.listToJson(metadata.get(), true));
         }
       } catch (Exception e) {
         logger.error("Unable to get metadata for event '{}'", event.getIdentifier(), e);
         throw new IndexServiceException("Unable to add metadata to event", e);
       }
     }
+
     if (withScheduling != null && withScheduling) {
-      fields.add(f("scheduling", SchedulingInfo.of(event.getIdentifier(), schedulerService).toJson()));
+      json.add("scheduling", SchedulingInfo.of(event.getIdentifier(), schedulerService).toJson());
     }
+
     if (withPublications != null && withPublications) {
-      List<JValue> publications = getPublications(event, withSignedUrls, includeInternalPublication,requestedVersion);
-      fields.add(f("publications", arr(publications)));
+      List<JsonObject> publications = getPublications(event, withSignedUrls, includeInternalPublication, requestedVersion);
+      JsonArray pubDetails = new JsonArray();
+      for (JsonObject pub : publications) {
+        pubDetails.add(pub);
+      }
+      json.add("publications", pubDetails);
     }
-    return obj(fields);
+
+    return json;
   }
 
-  private List<JValue> splitSubjectIntoArray(final String subject) {
-    return com.entwinemedia.fn.Stream.$(subject.split(",")).map(new Fn<String, JValue>() {
-      @Override
-      public JValue apply(String a) {
-        return v(a.trim());
+  private JsonArray splitSubjectIntoArray(final String subject) {
+    JsonArray array = new JsonArray();
+    if (subject != null && !subject.trim().isEmpty()) {
+      for (String part : subject.split(",")) {
+        array.add(new JsonPrimitive(part.trim()));
       }
-    }).toList();
+    }
+    return array;
   }
 
   @GET
@@ -1204,9 +1233,10 @@ public class EventsEndpoint implements ManagedService {
                   @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response getEventAcl(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id)
           throws Exception {
-    for (final Event event : indexService.getEvent(id, elasticsearchIndex)) {
-      AccessControlList acl = getAclFromEvent(event);
-      return ApiResponseBuilder.Json.ok(acceptHeader, arr(AclUtils.serializeAclToJson(acl)));
+    Optional<Event> eventOpt = indexService.getEvent(id, elasticsearchIndex);
+    if (eventOpt.isPresent()) {
+      AccessControlList acl = getAclFromEvent(eventOpt.get());
+      return ApiResponseBuilder.Json.ok(acceptHeader, AclUtils.serializeAclToJson(acl));
     }
     return ApiResponseBuilder.notFound("Cannot find an event with id '%s'.", id);
   }
@@ -1220,7 +1250,7 @@ public class EventsEndpoint implements ManagedService {
                           @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response updateEventAcl(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @FormParam("acl") String acl) throws Exception {
-    if (indexService.getEvent(id, elasticsearchIndex).isSome()) {
+    if (indexService.getEvent(id, elasticsearchIndex).isPresent()) {
       AccessControlList accessControlList;
       try {
         accessControlList = AclUtils.deserializeJsonToAcl(acl, false);
@@ -1254,8 +1284,9 @@ public class EventsEndpoint implements ManagedService {
   public Response addEventAce(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @PathParam("action") String action, @FormParam("role") String role) throws Exception {
     List<AccessControlEntry> entries = new ArrayList<>();
-    for (final Event event : indexService.getEvent(id, elasticsearchIndex)) {
-      AccessControlList accessControlList = getAclFromEvent(event);
+    Optional<Event> eventOpt = indexService.getEvent(id, elasticsearchIndex);
+    if (eventOpt.isPresent()) {
+      AccessControlList accessControlList = getAclFromEvent(eventOpt.get());
       AccessControlEntry newAce = new AccessControlEntry(role, action, true);
       boolean alreadyInAcl = false;
       for (AccessControlEntry ace : accessControlList.getEntries()) {
@@ -1300,8 +1331,9 @@ public class EventsEndpoint implements ManagedService {
   public Response deleteEventAce(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @PathParam("action") String action, @PathParam("role") String role) throws Exception {
     List<AccessControlEntry> entries = new ArrayList<>();
-    for (final Event event : indexService.getEvent(id, elasticsearchIndex)) {
-      AccessControlList accessControlList = getAclFromEvent(event);
+    Optional<Event> eventOpt = indexService.getEvent(id, elasticsearchIndex);
+    if (eventOpt.isPresent()) {
+      AccessControlList accessControlList = getAclFromEvent(eventOpt.get());
       boolean foundDelete = false;
       for (AccessControlEntry ace : accessControlList.getEntries()) {
         if (ace.getAction().equals(action) && ace.getRole().equals(role)) {
@@ -1339,8 +1371,8 @@ public class EventsEndpoint implements ManagedService {
           @QueryParam("type") String type) throws Exception {
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
     if (StringUtils.trimToNull(type) == null) {
-      Opt<MetadataList> metadataList = getEventMetadataById(id);
-      if (metadataList.isSome()) {
+      Optional<MetadataList> metadataList = getEventMetadataById(id);
+      if (metadataList.isPresent()) {
         MetadataList actualList = metadataList.get();
 
         // API v1 should return a two separate fields for start date and start time. Since those fields were merged in index service, we have to split them up.
@@ -1389,14 +1421,15 @@ public class EventsEndpoint implements ManagedService {
     }
   }
 
-  protected Opt<MetadataList> getEventMetadataById(String id) throws IndexServiceException, Exception {
-    for (final Event event : indexService.getEvent(id, elasticsearchIndex)) {
-      return getEventMetadata(event);
+  protected Optional<MetadataList> getEventMetadataById(String id) throws IndexServiceException, Exception {
+    Optional<Event> eventOpt = indexService.getEvent(id, elasticsearchIndex);
+    if (eventOpt.isPresent()) {
+      return getEventMetadata(eventOpt.get());
     }
-    return Opt.<MetadataList> none();
+    return Optional.<MetadataList> empty();
   }
 
-  protected Opt<MetadataList> getEventMetadata(Event event) throws IndexServiceException, Exception {
+  protected Optional<MetadataList> getEventMetadata(Event event) throws IndexServiceException, Exception {
     MetadataList metadataList = new MetadataList();
     List<EventCatalogUIAdapter> catalogUIAdapters = getEventCatalogUIAdapters();
     EventCatalogUIAdapter eventCatalogUIAdapter = indexService.getCommonEventCatalogUIAdapter();
@@ -1420,22 +1453,24 @@ public class EventsEndpoint implements ManagedService {
     if (WorkflowInstance.WorkflowState.RUNNING.toString().equals(event.getWorkflowState())) {
       metadataList.setLocked(Locked.WORKFLOW_RUNNING);
     }
-    return Opt.some(metadataList);
+    return Optional.of(metadataList);
   }
 
-  private Opt<MediaPackageElementFlavor> getFlavor(String flavorString) {
+  private Optional<MediaPackageElementFlavor> getFlavor(String flavorString) {
     try {
       MediaPackageElementFlavor flavor = MediaPackageElementFlavor.parseFlavor(flavorString);
-      return Opt.some(flavor);
+      return Optional.of(flavor);
     } catch (IllegalArgumentException e) {
-      return Opt.none();
+      return Optional.empty();
     }
   }
 
   private Response getEventMetadataByType(String id, String type, ApiVersion requestedVersion) throws Exception {
-    for (final Event event : indexService.getEvent(id, elasticsearchIndex)) {
-      Opt<MediaPackageElementFlavor> flavor = getFlavor(type);
-      if (flavor.isNone()) {
+    Optional<Event> eventOpt = indexService.getEvent(id, elasticsearchIndex);
+    if (eventOpt.isPresent()) {
+      Event event = eventOpt.get();
+      Optional<MediaPackageElementFlavor> flavor = getFlavor(type);
+      if (flavor.isEmpty()) {
         return R.badRequest(
                 String.format("Unable to parse type '%s' as a flavor so unable to find the matching catalog.", type));
       }
@@ -1497,15 +1532,17 @@ public class EventsEndpoint implements ManagedService {
                       metadataJSON));
     }
 
-    Opt<MediaPackageElementFlavor> flavor = getFlavor(type);
-    if (flavor.isNone()) {
+    Optional<MediaPackageElementFlavor> flavor = getFlavor(type);
+    if (flavor.isEmpty()) {
       return R.badRequest(
               String.format("Unable to parse type '%s' as a flavor so unable to find the matching catalog.", type));
     }
 
     DublinCoreMetadataCollection collection = null;
     EventCatalogUIAdapter adapter = null;
-    for (final Event event : indexService.getEvent(id, elasticsearchIndex)) {
+    Optional<Event> eventOpt = indexService.getEvent(id, elasticsearchIndex);
+    if (eventOpt.isPresent()) {
+      Event event = eventOpt.get();
       MetadataList metadataList = new MetadataList();
       // Try the main catalog first as we load it from the index.
       EventCatalogUIAdapter eventCatalogUIAdapter = indexService.getCommonEventCatalogUIAdapter();
@@ -1538,8 +1575,8 @@ public class EventsEndpoint implements ManagedService {
       for (String key : updatedFields.keySet()) {
         if ("subjects".equals(key)) {
           MetadataField field = collection.getOutputFields().get(DublinCore.PROPERTY_SUBJECT.getLocalName());
-          Opt<Response> error = validateField(field, key, id, type, updatedFields);
-          if (error.isSome()) {
+          Optional<Response> error = validateField(field, key, id, type, updatedFields);
+          if (error.isPresent()) {
             return error.get();
           }
           collection.removeField(field);
@@ -1549,8 +1586,8 @@ public class EventsEndpoint implements ManagedService {
         } else if ("startDate".equals(key)) {
           // Special handling for start date since in API v1 we expect start date and start time to be separate fields.
           MetadataField field = collection.getOutputFields().get(key);
-          Opt<Response> error = validateField(field, key, id, type, updatedFields);
-          if (error.isSome()) {
+          Optional<Response> error = validateField(field, key, id, type, updatedFields);
+          if (error.isPresent()) {
             return error.get();
           }
           String apiPattern = field.getPattern();
@@ -1569,8 +1606,8 @@ public class EventsEndpoint implements ManagedService {
         } else if ("startTime".equals(key)) {
           // Special handling for start time since in API v1 we expect start date and start time to be separate fields.
           MetadataField field = collection.getOutputFields().get("startDate");
-          Opt<Response> error = validateField(field, "startDate", id, type, updatedFields);
-          if (error.isSome()) {
+          Optional<Response> error = validateField(field, "startDate", id, type, updatedFields);
+          if (error.isPresent()) {
             return error.get();
           }
           String apiPattern = "HH:mm";
@@ -1592,8 +1629,8 @@ public class EventsEndpoint implements ManagedService {
                   MetadataJson.copyWithDifferentJsonValue(field, sdf.format(updatedStartDate.toDate())));
         } else {
           MetadataField field = collection.getOutputFields().get(key);
-          Opt<Response> error = validateField(field, key, id, type, updatedFields);
-          if (error.isSome()) {
+          Optional<Response> error = validateField(field, key, id, type, updatedFields);
+          if (error.isPresent()) {
             return error.get();
           }
           collection.removeField(field);
@@ -1609,17 +1646,17 @@ public class EventsEndpoint implements ManagedService {
     return ApiResponseBuilder.notFound("Cannot find an event with id '%s'.", id);
   }
 
-  private Opt<Response> validateField(MetadataField field, String key, String id, String type, Map<String, String> updatedFields) {
+  private Optional<Response> validateField(MetadataField field, String key, String id, String type, Map<String, String> updatedFields) {
     if (field == null) {
-      return Opt.some(ApiResponseBuilder.notFound(
+      return Optional.of(ApiResponseBuilder.notFound(
               "Cannot find a metadata field with id '%s' from event with id '%s' and the metadata type '%s'.",
               key, id, type));
     } else if (field.isRequired() && StringUtils.isBlank(updatedFields.get(key))) {
-      return Opt.some(R.badRequest(String.format(
+      return Optional.of(R.badRequest(String.format(
               "The event metadata field with id '%s' and the metadata type '%s' is required and can not be empty!.",
               key, type)));
     }
-    return Opt.none();
+    return Optional.empty();
   }
 
   @DELETE
@@ -1632,9 +1669,10 @@ public class EventsEndpoint implements ManagedService {
                           @RestResponse(description = "The specified event does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
   public Response deleteEventMetadataByType(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @QueryParam("type") String type) throws SearchIndexException {
-    for (final Event event : indexService.getEvent(id, elasticsearchIndex)) {
-      Opt<MediaPackageElementFlavor> flavor = getFlavor(type);
-      if (flavor.isNone()) {
+    Optional<Event> eventOpt = indexService.getEvent(id, elasticsearchIndex);
+    if (eventOpt.isPresent()) {
+      Optional<MediaPackageElementFlavor> flavor = getFlavor(type);
+      if (flavor.isEmpty()) {
         return R.badRequest(
                 String.format("Unable to parse type '%s' as a flavor so unable to find the matching catalog.", type));
       }
@@ -1646,7 +1684,7 @@ public class EventsEndpoint implements ManagedService {
                 .build();
       }
       try {
-        indexService.removeCatalogByFlavor(event, flavor.get());
+        indexService.removeCatalogByFlavor(eventOpt.get(), flavor.get());
       } catch (NotFoundException e) {
         return ApiResponseBuilder.notFound(e.getMessage());
       } catch (IndexServiceException e) {
@@ -1684,9 +1722,13 @@ public class EventsEndpoint implements ManagedService {
           @QueryParam("sign") boolean sign, @QueryParam("includeInternalPublication") boolean includeInternalPublication) throws Exception {
     try {
       final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
-      final Opt<Event> event = indexService.getEvent(id, elasticsearchIndex);
-      if (event.isSome()) {
-        return ApiResponseBuilder.Json.ok(acceptHeader, arr(getPublications(event.get(), sign, includeInternalPublication, requestedVersion)));
+      final Optional<Event> event = indexService.getEvent(id, elasticsearchIndex);
+      if (event.isPresent()) {
+        JsonArray jsonArray = new JsonArray();
+        for (JsonElement pub : getPublications(event.get(), sign, includeInternalPublication, requestedVersion)) {
+          jsonArray.add(pub);
+        }
+        return ApiResponseBuilder.Json.ok(acceptHeader, jsonArray);
       } else {
         return ApiResponseBuilder.notFound(String.format("Unable to find event with id '%s'", id));
       }
@@ -1696,27 +1738,45 @@ public class EventsEndpoint implements ManagedService {
     }
   }
 
-
-  private List<JValue> getPublications(Event event, Boolean withSignedUrls, Boolean includeInternalPublication, ApiVersion requestedVersion) {
-        return event.getPublications().stream()
-        .filter(publication -> ((includeInternalPublication != null && includeInternalPublication && !requestedVersion.isSmallerThan(VERSION_1_11_0)) || EventUtils.internalChannelFilter.apply(publication)))
+  private List<JsonObject> getPublications(Event event, Boolean withSignedUrls, Boolean includeInternalPublication, ApiVersion requestedVersion) {
+    return event.getPublications().stream()
+        .filter(publication -> {
+          boolean isInternalAllowed = includeInternalPublication != null && includeInternalPublication && !requestedVersion.isSmallerThan(VERSION_1_11_0);
+          return isInternalAllowed || EventUtils.internalChannelFilter.test(publication);
+        })
         .map(p -> getPublication(p, withSignedUrls, requestedVersion))
         .collect(Collectors.toList());
   }
 
-  public JObject getPublication(Publication publication, Boolean sign, ApiVersion requestedVersion) {
-    // signing publication URLs was introduced in 1.7.0
+  public JsonObject getPublication(Publication publication, Boolean sign, ApiVersion requestedVersion) {
+    // Signing URLs introduced in version 1.7.0
     URI publicationUrl = publication.getURI();
     if (!requestedVersion.isSmallerThan(VERSION_1_7_0)) {
       publicationUrl = getSignedUrl(publicationUrl, sign);
     }
 
-    return obj(f("id", v(publication.getIdentifier())), f("channel", v(publication.getChannel())),
-            f("mediatype", v(publication.getMimeType(), BLANK)),
-            f("url", v(publicationUrl, BLANK)),
-            f("media", arr(getPublicationTracksJson(publication, sign, requestedVersion))),
-            f("attachments", arr(getPublicationAttachmentsJson(publication, sign))),
-            f("metadata", arr(getPublicationCatalogsJson(publication, sign))));
+    JsonObject json = new JsonObject();
+    json.addProperty("id", publication.getIdentifier());
+    json.addProperty("channel", publication.getChannel());
+    json.addProperty("mediatype", safeString(publication.getMimeType()));
+    json.addProperty("url", publicationUrl != null ? publicationUrl.toString() : "");
+    JsonArray mediaArray = new JsonArray();
+    for (JsonObject trackJson : getPublicationTracksJson(publication, sign, requestedVersion)) {
+      mediaArray.add(trackJson);
+    }
+    json.add("media", mediaArray);
+    JsonArray attachmentArray = new JsonArray();
+    for (JsonObject attachmentJson : getPublicationAttachmentsJson(publication, sign)) {
+      attachmentArray.add(attachmentJson);
+    }
+    json.add("attachments", attachmentArray);
+    JsonArray metadataArray = new JsonArray();
+    for (JsonObject catalogJson : getPublicationCatalogsJson(publication, sign)) {
+      metadataArray.add(catalogJson);
+    }
+    json.add("metadata", metadataArray);
+
+    return json;
   }
 
   private URI getSignedUrl(URI url, boolean sign) {
@@ -1734,65 +1794,90 @@ public class EventsEndpoint implements ManagedService {
     return url;
   }
 
-  private List<JValue> getPublicationTracksJson(Publication publication, Boolean sign, ApiVersion requestedVersion) {
-    List<JValue> tracks = new ArrayList<>();
+  private List<JsonObject> getPublicationTracksJson(Publication publication, Boolean sign, ApiVersion requestedVersion) {
+    List<JsonObject> tracksJson = new ArrayList<>();
+
     for (Track track : publication.getTracks()) {
+      JsonObject trackJson = new JsonObject();
+
+      trackJson.addProperty("id", safeString(track.getIdentifier()));
+      trackJson.addProperty("mediatype", safeString(track.getMimeType()));
+      trackJson.addProperty("url", safeString(getSignedUrl(track.getURI(), sign)));
+      trackJson.addProperty("flavor", safeString(track.getFlavor()));
+      trackJson.addProperty("size", track.getSize());
+      trackJson.addProperty("checksum", safeString(track.getChecksum()));
+      trackJson.add("tags", arrayToJsonArray(track.getTags()));
+      trackJson.addProperty("has_audio", track.hasAudio());
+      trackJson.addProperty("has_video", track.hasVideo());
+      trackJson.addProperty("duration", track.getDuration() != null ? track.getDuration() : null);
+      trackJson.addProperty("description", safeString(track.getDescription()));
 
       VideoStream[] videoStreams = TrackSupport.byType(track.getStreams(), VideoStream.class);
-      List<Field> trackInfo = new ArrayList<>();
-
       if (videoStreams.length > 0) {
         // Only supporting one stream, like in many other places...
-        final VideoStream videoStream = videoStreams[0];
+        VideoStream videoStream = videoStreams[0];
         if (videoStream.getBitRate() != null)
-          trackInfo.add(f("bitrate", v(videoStream.getBitRate())));
+          trackJson.addProperty("bitrate", videoStream.getBitRate());
         if (videoStream.getFrameRate() != null)
-          trackInfo.add(f("framerate", v(videoStream.getFrameRate())));
+          trackJson.addProperty("framerate", videoStream.getFrameRate());
         if (videoStream.getFrameCount() != null)
-          trackInfo.add(f("framecount", v(videoStream.getFrameCount())));
+          trackJson.addProperty("framecount", videoStream.getFrameCount());
         if (videoStream.getFrameWidth() != null)
-          trackInfo.add(f("width", v(videoStream.getFrameWidth())));
+          trackJson.addProperty("width", videoStream.getFrameWidth());
         if (videoStream.getFrameHeight() != null)
-          trackInfo.add(f("height", v(videoStream.getFrameHeight())));
+          trackJson.addProperty("height", videoStream.getFrameHeight());
       }
 
       if (!requestedVersion.isSmallerThan(VERSION_1_7_0)) {
-        trackInfo.add(f("is_master_playlist", v(track.isMaster())));
-        trackInfo.add(f("is_live", v(track.isLive())));
+        trackJson.addProperty("is_master_playlist", track.isMaster());
+        trackJson.addProperty("is_live", track.isLive());
       }
 
-      tracks.add(obj(f("id", v(track.getIdentifier(), BLANK)), f("mediatype", v(track.getMimeType(), BLANK)),
-              f("url", v(getSignedUrl(track.getURI(), sign), BLANK)), f("flavor", v(track.getFlavor(), BLANK)),
-              f("size", v(track.getSize())), f("checksum", v(track.getChecksum(), BLANK)),
-              f("tags", arr(track.getTags())), f("has_audio", v(track.hasAudio())),
-              f("has_video", v(track.hasVideo())), f("duration", v(track.getDuration(), NULL)),
-              f("description", v(track.getDescription(), BLANK))).merge(trackInfo));
+      tracksJson.add(trackJson);
     }
-    return tracks;
+
+    return tracksJson;
   }
 
-  private List<JValue> getPublicationAttachmentsJson(Publication publication, Boolean sign) {
-    List<JValue> attachments = new ArrayList<>();
+  private List<JsonObject> getPublicationAttachmentsJson(Publication publication, Boolean sign) {
+    List<JsonObject> attachmentsJson = new ArrayList<>();
+
     for (Attachment attachment : publication.getAttachments()) {
-      attachments.add(
-              obj(f("id", v(attachment.getIdentifier(), BLANK)), f("mediatype", v(attachment.getMimeType(), BLANK)),
-                      f("url", v(getSignedUrl(attachment.getURI(), sign), BLANK)),
-                      f("flavor", v(attachment.getFlavor(), BLANK)), f("ref", v(attachment.getReference(), BLANK)),
-                      f("size", v(attachment.getSize())), f("checksum", v(attachment.getChecksum(), BLANK)),
-                      f("tags", arr(attachment.getTags()))));
+      JsonObject json = new JsonObject();
+
+      json.addProperty("id", safeString(attachment.getIdentifier()));
+      json.addProperty("mediatype", safeString(attachment.getMimeType()));
+      json.addProperty("url", safeString(getSignedUrl(attachment.getURI(), sign)));
+      json.addProperty("flavor", safeString(attachment.getFlavor()));
+      json.addProperty("ref", safeString(attachment.getReference()));
+      json.addProperty("size", attachment.getSize());
+      json.addProperty("checksum", safeString(attachment.getChecksum()));
+      json.add("tags", arrayToJsonArray(attachment.getTags()));
+
+      attachmentsJson.add(json);
     }
-    return attachments;
+
+    return attachmentsJson;
   }
 
-  private List<JValue> getPublicationCatalogsJson(Publication publication, Boolean sign) {
-    List<JValue> catalogs = new ArrayList<>();
+  private List<JsonObject> getPublicationCatalogsJson(Publication publication, Boolean sign) {
+    List<JsonObject> catalogsJson = new ArrayList<>();
+
     for (Catalog catalog : publication.getCatalogs()) {
-      catalogs.add(obj(f("id", v(catalog.getIdentifier(), BLANK)), f("mediatype", v(catalog.getMimeType(), BLANK)),
-              f("url", v(getSignedUrl(catalog.getURI(), sign), BLANK)),
-              f("flavor", v(catalog.getFlavor(), BLANK)), f("size", v(catalog.getSize())),
-              f("checksum", v(catalog.getChecksum(), BLANK)), f("tags", arr(catalog.getTags()))));
+      JsonObject json = new JsonObject();
+
+      json.addProperty("id", safeString(catalog.getIdentifier()));
+      json.addProperty("mediatype", safeString(catalog.getMimeType()));
+      json.addProperty("url", safeString(getSignedUrl(catalog.getURI(), sign)));
+      json.addProperty("flavor", safeString(catalog.getFlavor()));
+      json.addProperty("size", catalog.getSize());
+      json.addProperty("checksum", safeString(catalog.getChecksum()));
+      json.add("tags", arrayToJsonArray(catalog.getTags()));
+
+      catalogsJson.add(json);
     }
-    return catalogs;
+
+    return catalogsJson;
   }
 
   @GET
@@ -1824,11 +1909,12 @@ public class EventsEndpoint implements ManagedService {
   }
 
 
-  private JObject getPublication(String eventId, String publicationId, Boolean withSignedUrls, ApiVersion requestedVersion)
+  private JsonObject getPublication(String eventId, String publicationId, Boolean withSignedUrls, ApiVersion requestedVersion)
           throws SearchIndexException, NotFoundException {
-    for (final Event event : indexService.getEvent(eventId, elasticsearchIndex)) {
+    Optional<Event> eventOpt = indexService.getEvent(eventId, elasticsearchIndex);
+    if (eventOpt.isPresent()) {
       List<Publication> publications;
-      publications = event.getPublications().stream().filter(publication -> (!requestedVersion.isSmallerThan(VERSION_1_11_0) || EventUtils.internalChannelFilter.apply(publication))).collect(Collectors.toList());
+      publications = eventOpt.get().getPublications().stream().filter(publication -> (!requestedVersion.isSmallerThan(VERSION_1_11_0) || EventUtils.internalChannelFilter.test(publication))).collect(Collectors.toList());
       for (Publication publication : publications) {
         if (publicationId.equals(publication.getIdentifier())) {
           return getPublication(publication, withSignedUrls, requestedVersion);
@@ -1858,72 +1944,48 @@ public class EventsEndpoint implements ManagedService {
     return activeAcl;
   }
 
-  private JValue getJsonStream(Stream stream) {
-    List<Field> fields = new ArrayList<>();
+  private JsonObject getJsonStream(Stream stream) {
+    JsonObject json = new JsonObject();
+
     if (stream instanceof AudioStream) {
-      AudioStream audioStream = (AudioStream) stream;
-      if (audioStream.getBitDepth() != null)
-        fields.add(f("bitdepth", v(audioStream.getBitDepth())));
-      if (audioStream.getBitRate() != null)
-        fields.add(f("bitrate", v(audioStream.getBitRate())));
-      if (audioStream.getCaptureDevice() != null)
-        fields.add(f("capturedevice", v(audioStream.getCaptureDevice())));
-      if (audioStream.getCaptureDeviceVendor() != null)
-        fields.add(f("capturedevicevendor", v(audioStream.getCaptureDeviceVendor())));
-      if (audioStream.getCaptureDeviceVersion() != null)
-        fields.add(f("capturedeviceversion", v(audioStream.getCaptureDeviceVersion())));
-      if (audioStream.getChannels() != null)
-        fields.add(f("channels", v(audioStream.getChannels())));
-      if (audioStream.getEncoderLibraryVendor() != null)
-        fields.add(f("encoderlibraryvendor", v(audioStream.getEncoderLibraryVendor())));
-      if (audioStream.getFormat() != null)
-        fields.add(f("format", v(audioStream.getFormat())));
-      if (audioStream.getFormatVersion() != null)
-        fields.add(f("formatversion", v(audioStream.getFormatVersion())));
-      if (audioStream.getFrameCount() != null)
-        fields.add(f("framecount", v(audioStream.getFrameCount())));
-      if (audioStream.getIdentifier() != null)
-        fields.add(f("identifier", v(audioStream.getIdentifier())));
-      if (audioStream.getPkLevDb() != null)
-        fields.add(f("pklevdb", v(audioStream.getPkLevDb())));
-      if (audioStream.getRmsLevDb() != null)
-        fields.add(f("rmslevdb", v(audioStream.getRmsLevDb())));
-      if (audioStream.getRmsPkDb() != null)
-        fields.add(f("rmspkdb", v(audioStream.getRmsPkDb())));
-      if (audioStream.getSamplingRate() != null)
-        fields.add(f("samplingrate", v(audioStream.getSamplingRate())));
+      AudioStream audio = (AudioStream) stream;
+
+      if (audio.getBitDepth() != null) json.addProperty("bitdepth", audio.getBitDepth());
+      if (audio.getBitRate() != null) json.addProperty("bitrate", audio.getBitRate());
+      if (audio.getCaptureDevice() != null) json.addProperty("capturedevice", audio.getCaptureDevice());
+      if (audio.getCaptureDeviceVendor() != null) json.addProperty("capturedevicevendor", audio.getCaptureDeviceVendor());
+      if (audio.getCaptureDeviceVersion() != null) json.addProperty("capturedeviceversion", audio.getCaptureDeviceVersion());
+      if (audio.getChannels() != null) json.addProperty("channels", audio.getChannels());
+      if (audio.getEncoderLibraryVendor() != null) json.addProperty("encoderlibraryvendor", audio.getEncoderLibraryVendor());
+      if (audio.getFormat() != null) json.addProperty("format", audio.getFormat());
+      if (audio.getFormatVersion() != null) json.addProperty("formatversion", audio.getFormatVersion());
+      if (audio.getFrameCount() != null) json.addProperty("framecount", audio.getFrameCount());
+      if (audio.getIdentifier() != null) json.addProperty("identifier", audio.getIdentifier());
+      if (audio.getPkLevDb() != null) json.addProperty("pklevdb", audio.getPkLevDb());
+      if (audio.getRmsLevDb() != null) json.addProperty("rmslevdb", audio.getRmsLevDb());
+      if (audio.getRmsPkDb() != null) json.addProperty("rmspkdb", audio.getRmsPkDb());
+      if (audio.getSamplingRate() != null) json.addProperty("samplingrate", audio.getSamplingRate());
+
     } else if (stream instanceof VideoStream) {
-      VideoStream videoStream = (VideoStream) stream;
-      if (videoStream.getBitRate() != null)
-        fields.add(f("bitrate", v(videoStream.getBitRate())));
-      if (videoStream.getCaptureDevice() != null)
-        fields.add(f("capturedevice", v(videoStream.getCaptureDevice())));
-      if (videoStream.getCaptureDeviceVendor() != null)
-        fields.add(f("capturedevicevendor", v(videoStream.getCaptureDeviceVendor())));
-      if (videoStream.getCaptureDeviceVersion() != null)
-        fields.add(f("capturedeviceversion", v(videoStream.getCaptureDeviceVersion())));
-      if (videoStream.getEncoderLibraryVendor() != null)
-        fields.add(f("encoderlibraryvendor", v(videoStream.getEncoderLibraryVendor())));
-      if (videoStream.getFormat() != null)
-        fields.add(f("format", v(videoStream.getFormat())));
-      if (videoStream.getFormatVersion() != null)
-        fields.add(f("formatversion", v(videoStream.getFormatVersion())));
-      if (videoStream.getFrameCount() != null)
-        fields.add(f("framecount", v(videoStream.getFrameCount())));
-      if (videoStream.getFrameHeight() != null)
-        fields.add(f("frameheight", v(videoStream.getFrameHeight())));
-      if (videoStream.getFrameRate() != null)
-        fields.add(f("framerate", v(videoStream.getFrameRate())));
-      if (videoStream.getFrameWidth() != null)
-        fields.add(f("framewidth", v(videoStream.getFrameWidth())));
-      if (videoStream.getIdentifier() != null)
-        fields.add(f("identifier", v(videoStream.getIdentifier())));
-      if (videoStream.getScanOrder() != null)
-        fields.add(f("scanorder", v(videoStream.getScanOrder().toString())));
-      if (videoStream.getScanType() != null)
-        fields.add(f("scantype", v(videoStream.getScanType().toString())));
+      VideoStream video = (VideoStream) stream;
+
+      if (video.getBitRate() != null) json.addProperty("bitrate", video.getBitRate());
+      if (video.getCaptureDevice() != null) json.addProperty("capturedevice", video.getCaptureDevice());
+      if (video.getCaptureDeviceVendor() != null) json.addProperty("capturedevicevendor", video.getCaptureDeviceVendor());
+      if (video.getCaptureDeviceVersion() != null) json.addProperty("capturedeviceversion", video.getCaptureDeviceVersion());
+      if (video.getEncoderLibraryVendor() != null) json.addProperty("encoderlibraryvendor", video.getEncoderLibraryVendor());
+      if (video.getFormat() != null) json.addProperty("format", video.getFormat());
+      if (video.getFormatVersion() != null) json.addProperty("formatversion", video.getFormatVersion());
+      if (video.getFrameCount() != null) json.addProperty("framecount", video.getFrameCount());
+      if (video.getFrameHeight() != null) json.addProperty("frameheight", video.getFrameHeight());
+      if (video.getFrameRate() != null) json.addProperty("framerate", video.getFrameRate());
+      if (video.getFrameWidth() != null) json.addProperty("framewidth", video.getFrameWidth());
+      if (video.getIdentifier() != null) json.addProperty("identifier", video.getIdentifier());
+      if (video.getScanOrder() != null) json.addProperty("scanorder", video.getScanOrder().toString());
+      if (video.getScanType() != null) json.addProperty("scantype", video.getScanType().toString());
     }
-    return obj(fields);
+
+    return json;
   }
 
   private String getEventUrl(String eventId) {
@@ -1944,13 +2006,13 @@ public class EventsEndpoint implements ManagedService {
   public Response getEventScheduling(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id)
       throws Exception {
     try {
-      final Opt<Event> event = indexService.getEvent(id, elasticsearchIndex);
+      final Optional<Event> event = indexService.getEvent(id, elasticsearchIndex);
 
-      if (event.isNone()) {
+      if (event.isEmpty()) {
         return ApiResponseBuilder.notFound(String.format("Unable to find event with id '%s'", id));
       }
 
-      final JObject scheduling = SchedulingInfo.of(event.get().getIdentifier(), schedulerService).toJson();
+      final JsonObject scheduling = SchedulingInfo.of(event.get().getIdentifier(), schedulerService).toJson();
       if (!scheduling.isEmpty()) {
         return ApiResponseBuilder.Json.ok(acceptHeader, scheduling);
       }
@@ -1979,12 +2041,12 @@ public class EventsEndpoint implements ManagedService {
                                  @FormParam("scheduling") String scheduling,
                                  @FormParam("allowConflict") @DefaultValue("false") boolean allowConflict) throws Exception {
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
-    final Opt<Event> event = indexService.getEvent(id, elasticsearchIndex);
+    final Optional<Event> event = indexService.getEvent(id, elasticsearchIndex);
 
     if (requestedVersion.isSmallerThan(ApiVersion.VERSION_1_2_0)) {
         allowConflict = false;
     }
-    if (event.isNone()) {
+    if (event.isEmpty()) {
       return ApiResponseBuilder.notFound(String.format("Unable to find event with id '%s'", id));
     }
     final JSONParser parser = new JSONParser();
@@ -2015,11 +2077,11 @@ public class EventsEndpoint implements ManagedService {
     final TechnicalMetadata technicalMetadata = schedulerService.getTechnicalMetadata(id);
 
     // When "inputs" is updated, capture agent configuration needs to be merged
-    Opt<Map<String, String>> caConfig = Opt.none();
-    if (schedulingInfo.getInputs().isSome()) {
+    Optional<Map<String, String>> caConfig = Optional.empty();
+    if (schedulingInfo.getInputs().isPresent()) {
       final Map<String, String> configMap = new HashMap<>(technicalMetadata.getCaptureAgentConfiguration());
       configMap.put(CaptureParameters.CAPTURE_DEVICE_NAMES, schedulingInfo.getInputs().get());
-      caConfig = Opt.some(configMap);
+      caConfig = Optional.of(configMap);
     }
 
     try {
@@ -2028,17 +2090,25 @@ public class EventsEndpoint implements ManagedService {
           schedulingInfo.getStartDate(),
           schedulingInfo.getEndDate(),
           schedulingInfo.getAgentId(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty(),
           caConfig,
           allowConflict);
     } catch (SchedulerConflictException e) {
       final List<MediaPackage> conflictingEvents = getConflictingEvents(
           schedulingInfo.merge(technicalMetadata), agentStateService, schedulerService);
       logger.debug("Client tried to change scheduling information causing a conflict for event {}.", id);
-      return Optional.of(ApiResponseBuilder.Json.conflict(requestedVersion,
-          arr(convertConflictingEvents(Optional.of(id), conflictingEvents, indexService, elasticsearchIndex))));
+      List<JsonObject> conflicts = convertConflictingEvents(
+          Optional.of(id), conflictingEvents, indexService, elasticsearchIndex
+      );
+
+      JsonArray conflictArray = new JsonArray();
+      for (JsonObject conflict : conflicts) {
+        conflictArray.add(conflict);
+      }
+
+      return Optional.of(ApiResponseBuilder.Json.conflict(requestedVersion, conflictArray));
     }
     return Optional.empty();
   }
@@ -2073,7 +2143,7 @@ public class EventsEndpoint implements ManagedService {
       boolean overwriteExisting = false;
       MediaPackageElementFlavor tmpFlavor = MediaPackageElementFlavor.parseFlavor("addTrack/temporary");
       MediaPackageElementFlavor newFlavor = null;
-      Opt<Event> event;
+      Optional<Event> event;
       List<String> tags = null;
       String langTag = null;
 
@@ -2083,7 +2153,7 @@ public class EventsEndpoint implements ManagedService {
         return RestUtil.R.badRequest(String.format("Error while searching for event with id %s; %s", id, e.getMessage()));
       }
 
-      if (event.isNone()) {
+      if (event.isEmpty()) {
         return ApiResponseBuilder.notFound(String.format("Unable to find event with id '%s'", id));
       }
       MediaPackage mp = indexService.getEventMediapackage(event.get());

@@ -21,7 +21,6 @@
 
 package org.opencastproject.metadata.dublincore;
 
-import static com.entwinemedia.fn.Stream.$;
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -35,11 +34,6 @@ import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.XMLCatalogImpl.CatalogEntry;
 import org.opencastproject.util.IoSupport;
 
-import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.FnX;
-import com.entwinemedia.fn.Unit;
-import com.entwinemedia.fn.data.Opt;
-
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -51,9 +45,11 @@ import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.CyclicBarrier;
+import java.util.stream.Collectors;
 
 import javax.xml.XMLConstants;
 
@@ -70,7 +66,7 @@ public class DublinCoreCatalogTest {
   public void testLoadFromFile() throws Exception {
     final DublinCoreCatalog dc = read("/dublincore-extended.xml");
     assertEquals(asList("2007-12-05"), dc.get(DublinCore.PROPERTY_MODIFIED, DublinCore.LANGUAGE_UNDEFINED));
-    assertEquals(Opt.<EName>none(), dc.get(DublinCore.PROPERTY_TYPE).get(0).getEncodingScheme());
+    assertEquals(Optional.<EName>empty(), dc.get(DublinCore.PROPERTY_TYPE).get(0).getEncodingScheme());
     assertEquals(2, dc.get(DublinCore.PROPERTY_TITLE).size());
     assertEquals(1, dc.get(DublinCore.PROPERTY_TITLE, DublinCore.LANGUAGE_UNDEFINED).size());
     assertEquals(2, dc.get(DublinCore.PROPERTY_TITLE, DublinCore.LANGUAGE_ANY).size());
@@ -79,9 +75,9 @@ public class DublinCoreCatalogTest {
             dc.get(DublinCore.PROPERTY_CONTRIBUTOR, DublinCore.LANGUAGE_UNDEFINED));
     assertEquals(
             "The modified property should be of type W3CDTF.",
-            Opt.some(DublinCore.ENC_SCHEME_W3CDTF), dc.get(DublinCore.PROPERTY_MODIFIED).get(0).getEncodingScheme());
+            Optional.of(DublinCore.ENC_SCHEME_W3CDTF), dc.get(DublinCore.PROPERTY_MODIFIED).get(0).getEncodingScheme());
     assertEquals(1, dc.get(PROPERTY_FOO_ID).size());
-    assertEquals(Opt.<EName>none(), dc.get(PROPERTY_FOO_ID).get(0).getEncodingScheme());
+    assertEquals(Optional.<EName>empty(), dc.get(PROPERTY_FOO_ID).get(0).getEncodingScheme());
     assertTrue(
             "Property foo:id should be in the list of known properties.",
             dc.getProperties().contains(PROPERTY_FOO_ID));
@@ -97,7 +93,7 @@ public class DublinCoreCatalogTest {
     assertEquals(9, dc.getValuesFlat().size());
     assertEquals(2, dc.get(DublinCore.PROPERTY_TITLE).size());
     assertEquals(
-            Opt.some(EName.mk("http://lib.org/metadata-enc", "PlainTitle")),
+            Optional.of(EName.mk("http://lib.org/metadata-enc", "PlainTitle")),
             dc.get(DublinCore.PROPERTY_TITLE).get(0).getEncodingScheme());
     for (CatalogEntry entry : dc.getEntriesSorted()) {
       logger.debug(entry.getEName().toString() + " " + entry.getValue());
@@ -123,7 +119,7 @@ public class DublinCoreCatalogTest {
     assertEquals(10, dc.getValuesFlat().size());
     assertEquals(2, dc.get(DublinCore.PROPERTY_TITLE).size());
     assertEquals(
-            Opt.some(EName.mk("http://lib.org/metadata-enc", "PlainTitle")),
+            Optional.of(EName.mk("http://lib.org/metadata-enc", "PlainTitle")),
             dc.get(DublinCore.PROPERTY_TITLE).get(0).getEncodingScheme());
     for (CatalogEntry entry : dc.getEntriesSorted()) {
       logger.debug(entry.getEName().toString() + " " + entry.getValue());
@@ -172,12 +168,9 @@ public class DublinCoreCatalogTest {
   public void testLoadAndSave() throws Exception {
     final DublinCoreCatalog dc = read("/dublincore-extended.xml");
     final File out = testFolder.newFile("dublincore.xml");
-    IoSupport.withResource(new FileOutputStream(out), new FnX<FileOutputStream, Unit>() {
-      @Override public Unit applyX(FileOutputStream out) throws Exception {
-        dc.toXml(out, false);
-        return Unit.unit;
-      }
-    });
+    try (FileOutputStream fos = new FileOutputStream(out)) {
+      dc.toXml(fos, false);
+    }
     final DublinCoreCatalog reloaded = DublinCoreXmlFormat.read(out);
     assertEquals(
             "The reloaded catalog should have the same amount of properties than the original one.",
@@ -199,13 +192,9 @@ public class DublinCoreCatalogTest {
     final DublinCoreCatalog dc2 = read("/sorting/dublincore1-2.xml");
     assertEquals(dc1.getEntriesSorted(), dc2.getEntriesSorted());
     // make sure attributes are sorted in the correct order
-    List<Map<EName, String>> attributes = $(dc1.getEntriesSorted())
-        .map(new Fn<CatalogEntry, Map<EName, String>>() {
-          @Override public Map<EName, String> apply(CatalogEntry entry) {
-            return entry.getAttributes();
-          }
-        })
-        .toList();
+    List<Map<EName, String>> attributes = dc1.getEntriesSorted().stream()
+        .map(CatalogEntry::getAttributes)
+        .collect(Collectors.toList());
     assertEquals("Attribute order", attributes, list(
         map(),
         map(tuple(EName.mk(XMLConstants.XML_NS_URI, "lang"), "de")),

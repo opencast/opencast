@@ -39,8 +39,15 @@ import dictionary from '../default-dictionaries.js';
 import OpencastAuth from './OpencastAuth.js';
 
 function getUrlFromBase(base, url) {
-  const a = base.endsWith('/') ? base.slice(0, -1) : base;
+  let a = base.endsWith('/') ? base.slice(0, -1) : base;
+  a = a.startsWith('/') ? a.slice(1) : a;
+  if (a.length > 0 ) {
+    a = a.startsWith(window.location.origin)
+      ? a
+      : `${window.location.origin}/${a}`;
+  }
   const b = url.startsWith('/') ? url.slice(1) : url;
+
   const fullURL = `${a}/${b}`;
   return fullURL;
 }
@@ -162,22 +169,6 @@ const initParams = {
         throw Error('The video does not exist or the user can\'t see it');
       }
     }
-
-    // Load the series, if appropriate
-    const loadSeries = async (sid) => {
-      const response = await fetch(getUrlFromOpencastServer('/search/series.json?id=' + sid));
-
-      if (response.ok) {
-        const sdata = await response.json();
-        return sdata['result'][0]['dc']['title'][0];
-      }
-      else {
-        throw Error('Series data missing');
-      }
-    };
-    const series = data?.metadata?.series !== undefined ? await loadSeries(data?.metadata?.series) : undefined;
-
-    data.metadata.seriestitle = series;
 
     // Add event title to browser tab
     const videoTitle = data?.metadata?.title ?? 'Unknown video title';

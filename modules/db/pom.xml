@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>18-SNAPSHOT</version>
+    <version>19-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -27,7 +27,7 @@
     <dependency>
       <groupId>com.typesafe</groupId>
       <artifactId>config</artifactId>
-      <version>1.4.2</version>
+      <version>1.4.4</version>
     </dependency>
     <dependency>
       <groupId>com.mchange</groupId>
@@ -98,6 +98,18 @@
         </configuration>
       </plugin>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <detectJavaApiLink>true</detectJavaApiLink>
+          <maxmemory>512m</maxmemory>
+          <quiet>false</quiet>
+          <!-- This is required to work around checker-qual's changes, which munge the javadoc options file
+                and lead to very misleading errors about not finding classes in the org.osgi.framework.* namespace -->
+          <sourcepath>src/main/java</sourcepath>
+        </configuration>
+      </plugin>
+      <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <extensions>true</extensions>
@@ -116,6 +128,7 @@
               !waffle.*,
               !org.codehaus.groovy*,
               !org.locationtech.jts.geom.*,
+              !jakarta.servlet*,
               org.w3c.dom;version=0,
               *
             </Import-Package>

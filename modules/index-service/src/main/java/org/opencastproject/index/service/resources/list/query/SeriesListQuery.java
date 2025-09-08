@@ -87,6 +87,8 @@ public class SeriesListQuery extends ResourceListQueryImpl {
   public SeriesListQuery() {
     super();
     this.availableFilters.add(createCreationDateFilter(Option.<Tuple<Date, Date>> none()));
+    this.availableFilters.add(createOrganizersFilter(Option.none()));
+    this.availableFilters.add(createContributorsFilter(Option.none()));
   }
 
   /**

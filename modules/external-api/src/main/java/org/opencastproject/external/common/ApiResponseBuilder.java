@@ -22,8 +22,8 @@ package org.opencastproject.external.common;
 
 import static java.lang.String.format;
 
-import com.entwinemedia.fn.data.json.JValue;
-import com.entwinemedia.fn.data.json.SimpleSerializer;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 
 import java.net.URI;
 
@@ -57,7 +57,7 @@ public final class ApiResponseBuilder {
 
     private static final String JSON_SUFFIX = "+json";
     /** The serializer to use to serialize json content. **/
-    private static final SimpleSerializer serializer = new SimpleSerializer();
+    private static final Gson gson = new Gson();
 
     /**
      * Create an ok json response for the external api
@@ -98,8 +98,8 @@ public final class ApiResponseBuilder {
      *          The json body of the response.
      * @return The new {@link Response}
      */
-    public static Response ok(ApiVersion version, JValue json) {
-      return Response.ok(serializer.toJson(json), APPLICATION_PREFIX + version.toExternalForm() + JSON_SUFFIX).build();
+    public static Response ok(ApiVersion version, JsonElement json) {
+      return Response.ok(gson.toJson(json), APPLICATION_PREFIX + version.toExternalForm() + JSON_SUFFIX).build();
     }
 
     /**
@@ -111,7 +111,7 @@ public final class ApiResponseBuilder {
      *          The json body of the response.
      * @return The new {@link Response}
      */
-    public static Response ok(String acceptHeader, JValue json) {
+    public static Response ok(String acceptHeader, JsonElement json) {
       final ApiVersion version = ApiMediaType.parse(acceptHeader).getVersion();
       return ok(version, json);
     }
@@ -127,7 +127,7 @@ public final class ApiResponseBuilder {
      *          The json body of the response.
      * @return The new {@link Response}
      */
-    public static Response created(String acceptHeader, URI location, JValue json) {
+    public static Response created(String acceptHeader, URI location, JsonElement json) {
       final ApiVersion version = ApiMediaType.parse(acceptHeader).getVersion();
       return created(version, location, json);
     }
@@ -143,8 +143,8 @@ public final class ApiResponseBuilder {
      *          The json body of the response.
      * @return The new {@link Response}
      */
-    public static Response created(ApiVersion version, URI location, JValue json) {
-      return Response.created(location).entity(serializer.toJson(json))
+    public static Response created(ApiVersion version, URI location, JsonElement json) {
+      return Response.created(location).entity(gson.toJson(json))
               .type(APPLICATION_PREFIX + version.toExternalForm() + JSON_SUFFIX).build();
     }
 
@@ -157,8 +157,8 @@ public final class ApiResponseBuilder {
      *          The json body of the response.
      * @return The new {@link Response}
      */
-    public static Response conflict(ApiVersion version, JValue json) {
-      return Response.status(Status.CONFLICT).entity(serializer.toJson(json))
+    public static Response conflict(ApiVersion version, JsonElement json) {
+      return Response.status(Status.CONFLICT).entity(gson.toJson(json))
           .type(APPLICATION_PREFIX + version.toExternalForm() + JSON_SUFFIX).build();
     }
   }

@@ -133,7 +133,9 @@ public class OldScheduledScanner extends AbstractBufferScanner implements Manage
    * @param service
    */
   public void unsetService(SchedulerService service) {
-    this.service = null;
+    if (this.service == service) {
+      this.service = null;
+    }
   }
 
   @Override

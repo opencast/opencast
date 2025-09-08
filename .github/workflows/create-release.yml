@@ -11,13 +11,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: setup java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
-          java-version: 17
+          java-version: 21
 
       - name: install dependencies
         run: |
@@ -57,4 +57,4 @@ jobs:
             For further information, please take a look at:
 
             - [Release notes](https://docs.opencast.org/r/${{ steps.get_version.outputs.VERSION_MAIN }}.x/admin/#releasenotes/#opencast-${{ steps.get_version.outputs.VERSION_COMBINED }})
-            - [Changelog](https://docs.opencast.org/r/${{ steps.get_version.outputs.VERSION_MAIN }}.x/admin/#changelog/#opencast-${{ steps.get_version.outputs.VERSION_COMBINED }})
+            - [Changelog](https://docs.opencast.org/r/${{ steps.get_version.outputs.VERSION_MAIN }}.x/admin/#changelog/opencast-${{ steps.get_version.outputs.VERSION_MAIN }})

@@ -25,6 +25,9 @@ import org.opencastproject.adminui.usersettings.UserSetting;
 import org.opencastproject.adminui.usersettings.UserSettings;
 import org.opencastproject.adminui.usersettings.UserSettingsService;
 import org.opencastproject.adminui.usersettings.persistence.UserSettingsServiceException;
+import org.opencastproject.security.api.DefaultOrganization;
+import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.User;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
@@ -77,6 +80,16 @@ public class TestUserSettingsEndpoint extends UserSettingsEndpoint {
 
   public TestUserSettingsEndpoint() throws Exception {
     setupUserSettingsService();
+
+    User user = EasyMock.createNiceMock(User.class);
+    EasyMock.expect(user.getUsername()).andReturn("test user").anyTimes();
+
+    SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
+    EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
+    EasyMock.expect(securityService.getOrganization()).andReturn(new DefaultOrganization()).anyTimes();
+    EasyMock.replay(user, securityService);
+    this.setSecurityService(securityService);
+
     this.setUserSettingsService(userSettingsService);
   }
 }

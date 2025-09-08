@@ -18,7 +18,8 @@ Parameter Table
 
 | Configuration Keys       | Required | Example          | Description
 |--------------------------|----------|------------------|-------------
-| source-flavor            | yes      | presenter/source | The source media package to use
+| source-flavor            | yes      | presenter/source | The source media element flavor to use
+| source-tags              | no       | master-video  | Comma-separated list of tags to help select the appropriate track
 | target-flavor            | yes      | archive          | Flavor of the produced subtitle
 | target-tags              | no       | captions/source  | Tags applies to the resulting subtitle element²³.
 | target-element           | no       | track            | Define where to append the subtitles file. Possibilities are: as a 'track' or as an 'attachment' (default: `track`).

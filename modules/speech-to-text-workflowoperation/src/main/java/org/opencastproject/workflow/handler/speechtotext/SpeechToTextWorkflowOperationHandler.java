@@ -168,13 +168,17 @@ public class
     var async = BooleanUtils.toBoolean(workflowInstance.getCurrentOperation().getConfiguration(ASYNCHRONOUS));
 
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
-            Configuration.none, Configuration.one,
+            Configuration.many, Configuration.one,
             Configuration.many, Configuration.one);
     MediaPackageElementFlavor sourceFlavor = tagsAndFlavors.getSingleSrcFlavor();
+    List<String> srcTags = tagsAndFlavors.getSrcTags();
 
     TrackSelector trackSelector = new TrackSelector();
     trackSelector.addFlavor(sourceFlavor);
-    Collection<Track> tracks = trackSelector.select(mediaPackage, false);
+    for (String tag : srcTags) {
+      trackSelector.addTag(tag);
+    }
+    Collection<Track> tracks = trackSelector.select(mediaPackage, true);
 
     if (tracks.isEmpty()) {
       throw new WorkflowOperationException(

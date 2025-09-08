@@ -36,25 +36,44 @@ extra:
 # Items will appear in this order
 nav:
   - Home: "index.md"
+  - Version Support: "version-support.md"
   - Release Notes: "releasenotes.md"
-  - Upgrade: "upgrade.md"
-  - Changelog: "changelog.md"
+  - Upgrade Guide: "upgrade.md"
   - Registration: "registration.md"
+  - Changelogs:
+      - Opencast 18: "changelog/opencast-18.md"
+      - Opencast 17: "changelog/opencast-17.md"
+      - Older Versions:
+          - Opencast 16: "changelog/older-versions/opencast-16.md"
+          - Opencast 15: "changelog/older-versions/opencast-15.md"
+          - Opencast 14: "changelog/older-versions/opencast-14.md"
+          - Opencast 13: "changelog/older-versions/opencast-13.md"
+          - Opencast 12: "changelog/older-versions/opencast-12.md"
+          - Opencast 11: "changelog/older-versions/opencast-11.md"
+          - Opencast 10: "changelog/older-versions/opencast-10.md"
+          - Opencast 9: "changelog/older-versions/opencast-9.md"
+          - Opencast 8: "changelog/older-versions/opencast-8.md"
+          - Opencast 7: "changelog/older-versions/opencast-7.md"
+          - Opencast 6: "changelog/older-versions/opencast-6.md"
+          - Opencast 5: "changelog/older-versions/opencast-5.md"
+          - Opencast 4: "changelog/older-versions/opencast-4.md"
+          - Opencast 3: "changelog/older-versions/opencast-3.md"
+          - Opencast 2.x: "changelog/older-versions/opencast-2.x.md"
   - Installation:
       - Overview: "installation/index.md"
       - Hardware Requirements: installation/server-requirements.md
       - Java Versions: installation/java-version.md
-      - Multiple Servers: "installation/multiple-servers.md"
-      - Installation from Source:
-          - Linux: "installation/source-linux.md"
-          - MacOS X: "installation/source-macosx.md"
       - Installation from Package:
           - Debian/Ubuntu: "installation/debs.md"
-          - RHEL/CentOS Stream 8/9: "installation/rpm-el.md"
-      - Installation via script:
-          - Ansible: "installation/ansible.md"
+          - RHEL/Rocky/CentOS: "installation/rpm-el.md"
       - Installation with Docker:
           - Testing Locally: "installation/docker-local.md"
+      - Installation from Source:
+          - Linux: "installation/source-linux.md"
+          - macOS: "installation/source-macosx.md"
+      - Installation via script:
+          - Ansible: "installation/ansible.md"
+      - Multiple Servers: "installation/multiple-servers.md"
       - Prerelease Testing: "installation/prereleases.md"
   - Configuration:
       - Overview: "configuration/index.md"
@@ -160,7 +179,6 @@ nav:
       - Workflow: "configuration/workflow.md"
       - Wowza Streaming Distribution Service: "configuration/streaming-wowza.md"
       - YouTube Publication: "configuration/youtubepublication.md"
-  - Version Support: "version-support.md"
   - Workflow Operation Handler:
       - Overview: "workflowoperationhandlers/index.md"
       - Retry Strategies: "workflowoperationhandlers/retry-strategies.md"
@@ -213,6 +231,7 @@ nav:
       - Microsoft Azure Start Transcription: "workflowoperationhandlers/microsoft-azure-start-transcription-woh.md"
       - Move Storage: "workflowoperationhandlers/move-storage-woh.md"
       - Multiencode: "workflowoperationhandlers/multiencode-woh.md"
+      - Mux: "workflowoperationhandlers/mux-woh.md"
       - Partial Import: "workflowoperationhandlers/partial-import-woh.md"
       - Post Media Package: "workflowoperationhandlers/postmediapackage-woh.md"
       - Prepare A/V: "workflowoperationhandlers/prepareav-woh.md"

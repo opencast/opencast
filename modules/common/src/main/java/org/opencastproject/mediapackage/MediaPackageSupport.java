@@ -31,9 +31,6 @@ import static org.opencastproject.util.data.functions.Options.toOption;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Option;
 
-import com.entwinemedia.fn.data.Opt;
-import com.entwinemedia.fn.fns.Strings;
-
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,6 +39,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 /** Utility class used for media package handling. */
@@ -135,13 +133,16 @@ public final class MediaPackageSupport {
    *
    * @return the file name or none if it could not be determined
    */
-  public static Opt<String> getFileName(MediaPackageElement mpe) {
-    final URI uri = mpe.getURI();
-    if (uri != null) {
-      return Opt.nul(FilenameUtils.getName(uri.toString())).bind(Strings.blankToNone);
-    } else {
-      return Opt.none();
+  public static Optional<String> getFileName(MediaPackageElement mpe) {
+    URI uri = mpe.getURI();
+    if (uri == null) {
+      return Optional.empty();
     }
+    String name = FilenameUtils.getName(uri.toString());
+    if (name == null || name.isBlank()) {
+      return Optional.empty();
+    }
+    return Optional.of(name);
   }
 
   /**

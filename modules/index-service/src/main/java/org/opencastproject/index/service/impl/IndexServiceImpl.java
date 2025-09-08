@@ -21,17 +21,13 @@
 
 package org.opencastproject.index.service.impl;
 
-import static org.opencastproject.assetmanager.api.AssetManager.DEFAULT_OWNER;
-import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_IDENTIFIER;
 import static org.opencastproject.security.api.DefaultOrganization.DEFAULT_ORGANIZATION_ID;
 import static org.opencastproject.workflow.api.ConfiguredWorkflow.workflow;
 
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.AssetManagerException;
-import org.opencastproject.assetmanager.api.query.AQueryBuilder;
-import org.opencastproject.assetmanager.api.query.AResult;
-import org.opencastproject.assetmanager.api.query.Predicate;
+import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.util.WorkflowPropertiesUtil;
 import org.opencastproject.assetmanager.util.Workflows;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
@@ -122,7 +118,6 @@ import org.opencastproject.workflow.api.WorkflowParsingException;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.data.Opt;
 import com.google.common.net.MediaType;
 
 import net.fortuna.ical4j.model.Period;
@@ -840,19 +835,19 @@ public class IndexServiceImpl implements IndexService {
   public String createEvent(EventHttpServletRequest eventHttpServletRequest) throws ParseException, IOException,
           MediaPackageException, IngestException, NotFoundException, SchedulerException, UnauthorizedException {
     // Preconditions
-    if (eventHttpServletRequest.getAcl().isNone()) {
+    if (eventHttpServletRequest.getAcl().isEmpty()) {
       throw new IllegalArgumentException("No access control list available to create new event.");
     }
-    if (eventHttpServletRequest.getMediaPackage().isNone()) {
+    if (eventHttpServletRequest.getMediaPackage().isEmpty()) {
       throw new IllegalArgumentException("No mediapackage available to create new event.");
     }
-    if (eventHttpServletRequest.getMetadataList().isNone()) {
+    if (eventHttpServletRequest.getMetadataList().isEmpty()) {
       throw new IllegalArgumentException("No metadata list available to create new event.");
     }
-    if (eventHttpServletRequest.getProcessing().isNone()) {
+    if (eventHttpServletRequest.getProcessing().isEmpty()) {
       throw new IllegalArgumentException("No processing metadata available to create new event.");
     }
-    if (eventHttpServletRequest.getSource().isNone()) {
+    if (eventHttpServletRequest.getSource().isEmpty()) {
       throw new IllegalArgumentException("No source field metadata available to create new event.");
     }
 
@@ -913,8 +908,8 @@ public class IndexServiceImpl implements IndexService {
 
     // Get presenter usernames for use as technical presenters
     Set<String> presenterUsernames = new HashSet<>();
-    Opt<Set<String>> technicalPresenters = updatePresenters(eventMetadata);
-    if (technicalPresenters.isSome()) {
+    Optional<Set<String>> technicalPresenters = updatePresenters(eventMetadata);
+    if (technicalPresenters.isPresent()) {
       presenterUsernames = technicalPresenters.get();
     }
 
@@ -1001,7 +996,7 @@ public class IndexServiceImpl implements IndexService {
         eventHttpServletRequest.setMediaPackage(mediaPackage);
         try {
           schedulerService.addEvent(start.toDate(), start.plus(duration).toDate(), captureAgentId, presenterUsernames,
-                  mediaPackage, configuration, (Map) caProperties, Opt.<String> none());
+                  mediaPackage, configuration, (Map) caProperties, Optional.empty());
         } finally {
           for (MediaPackageElement mediaPackageElement : mediaPackage.getElements()) {
             try {
@@ -1014,7 +1009,7 @@ public class IndexServiceImpl implements IndexService {
         return mediaPackage.getIdentifier().toString();
       case SCHEDULE_MULTIPLE:
         final Map<String, Period> scheduled = schedulerService.addMultipleEvents(rRule, start.toDate(), end.toDate(), duration, tz, captureAgentId,
-                presenterUsernames, eventHttpServletRequest.getMediaPackage().get(), configuration, (Map) caProperties, Opt.none());
+                presenterUsernames, eventHttpServletRequest.getMediaPackage().get(), configuration, (Map) caProperties, Optional.empty());
         return StringUtils.join(scheduled.keySet(), ",");
       default:
         throw new IllegalArgumentException("Unknown source type: " + type);
@@ -1052,7 +1047,7 @@ public class IndexServiceImpl implements IndexService {
    * @return If the presenters (creator) field has been updated, the set of user names, if any, of the presenters. None
    *         if it wasn't updated.
    */
-  private Opt<Set<String>> updatePresenters(DublinCoreMetadataCollection eventMetadata) {
+  private Optional<Set<String>> updatePresenters(DublinCoreMetadataCollection eventMetadata) {
     MetadataField presentersMetadataField = eventMetadata.getOutputFields()
             .get(DublinCore.PROPERTY_CREATOR.getLocalName());
     if (presentersMetadataField.isUpdated()) {
@@ -1062,9 +1057,9 @@ public class IndexServiceImpl implements IndexService {
       MetadataField newPresentersMetadataField = new MetadataField(presentersMetadataField);
       newPresentersMetadataField.setValue(updatedPresenters.getA());
       eventMetadata.addField(newPresentersMetadataField);
-      return Opt.some(presenterUsernames);
+      return Optional.of(presenterUsernames);
     } else {
-      return Opt.none();
+      return Optional.empty();
     }
   }
 
@@ -1283,8 +1278,8 @@ public class IndexServiceImpl implements IndexService {
         break;
       case SCHEDULE:
         try {
-          schedulerService.updateEvent(event.getIdentifier(), Opt.none(), Opt.none(), Opt.none(), Opt.none(),
-              Opt.some(mediaPackage), Opt.none(), Opt.none());
+          schedulerService.updateEvent(event.getIdentifier(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
+              Optional.of(mediaPackage), Optional.empty(), Optional.empty());
         } catch (SchedulerException e) {
           throw new IndexServiceException("Unable to remove catalog with flavor " + flavor + " by updating scheduled "
               + "event " + event.getIdentifier(), e);
@@ -1322,8 +1317,8 @@ public class IndexServiceImpl implements IndexService {
   @Override
   public MetadataList updateEventMetadata(String id, MetadataList metadataList, ElasticsearchIndex index)
           throws IndexServiceException, SearchIndexException, NotFoundException, UnauthorizedException {
-    Opt<Event> optEvent = getEvent(id, index);
-    if (optEvent.isNone())
+    Optional<Event> optEvent = getEvent(id, index);
+    if (optEvent.isEmpty())
       throw new NotFoundException("Cannot find an event with id " + id);
 
     Event event = optEvent.get();
@@ -1350,10 +1345,10 @@ public class IndexServiceImpl implements IndexService {
         break;
       case SCHEDULE:
         DublinCoreMetadataCollection eventCatalog = metadataList.getMetadataByAdapter(getCommonEventCatalogUIAdapter());
-        Opt<Set<String>> presenters = eventCatalog == null ? Opt.none() : updatePresenters(eventCatalog);
+        Optional<Set<String>> presenters = eventCatalog == null ? Optional.empty() : updatePresenters(eventCatalog);
         try {
-          schedulerService.updateEvent(id, Opt.none(), Opt.none(), Opt.none(), presenters, Opt.some(mediaPackage),
-              Opt.none(), Opt.none());
+          schedulerService.updateEvent(id, Optional.empty(), Optional.empty(), Optional.empty(), presenters, Optional.of(mediaPackage),
+              Optional.empty(), Optional.empty());
         } catch (SchedulerException e) {
           throw new IndexServiceException("Unable to update scheduled event " + id + " with metadata "
               + RestUtils.getJsonStringSilent(MetadataJson.listToJson(metadataList, true)), e);
@@ -1396,8 +1391,8 @@ public class IndexServiceImpl implements IndexService {
   public AccessControlList updateEventAcl(String id, AccessControlList acl, ElasticsearchIndex index)
           throws IllegalArgumentException, IndexServiceException, SearchIndexException, NotFoundException,
           UnauthorizedException {
-    Opt<Event> optEvent = getEvent(id, index);
-    if (optEvent.isNone())
+    Optional<Event> optEvent = getEvent(id, index);
+    if (optEvent.isEmpty())
       throw new NotFoundException("Cannot find an event with id " + id);
 
     Event event = optEvent.get();
@@ -1417,8 +1412,8 @@ public class IndexServiceImpl implements IndexService {
       case SCHEDULE:
         try {
           mediaPackage = authorizationService.setAcl(mediaPackage, AclScope.Episode, acl).getA();
-          schedulerService.updateEvent(id, Opt.none(), Opt.none(), Opt.none(), Opt.none(), Opt.some(mediaPackage),
-                  Opt.none(), Opt.none());
+          schedulerService.updateEvent(id, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.of(mediaPackage),
+                  Optional.empty(), Optional.empty());
         } catch (SchedulerException | MediaPackageException e) {
           throw new IndexServiceException("Unable to update the acl for the scheduled event", e);
         }
@@ -1430,8 +1425,7 @@ public class IndexServiceImpl implements IndexService {
   }
 
   private boolean hasSnapshots(String eventId) {
-    AQueryBuilder q = assetManager.createQuery();
-    return !enrich(q.select(q.snapshot()).where(q.mediaPackageId(eventId).and(q.version().isLatest())).run()).getSnapshots().isEmpty();
+    return assetManager.snapshotExists(eventId);
   }
 
   @Override
@@ -1440,16 +1434,16 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
-  public Opt<Event> getEvent(String id, ElasticsearchIndex index) throws SearchIndexException {
+  public Optional<Event> getEvent(String id, ElasticsearchIndex index) throws SearchIndexException {
     SearchResult<Event> result = index
             .getByQuery(new EventSearchQuery(securityService.getOrganization().getId(), securityService.getUser())
                     .withIdentifier(id));
     // If the results list if empty, we return already a response.
     if (result.getPageSize() == 0) {
       logger.debug("Didn't find event with id {}", id);
-      return Opt.none();
+      return Optional.empty();
     }
-    return Opt.some(result.getItems()[0].getSource());
+    return Optional.of(result.getItems()[0].getSource());
   }
 
   @Override
@@ -1539,11 +1533,9 @@ public class IndexServiceImpl implements IndexService {
     boolean notFoundArchive = false;
     boolean removedArchive = false;
     try {
-      final AQueryBuilder q = assetManager.createQuery();
-      final Predicate p = q.organizationId().eq(securityService.getOrganization().getId()).and(q.mediaPackageId(id));
-      final AResult r = q.select(q.nothing()).where(p).run();
-      if (r.getSize() > 0) {
-        q.delete(DEFAULT_OWNER, q.snapshot()).where(p).run();
+      List<Snapshot> snapshots = assetManager.getSnapshotsById(id);
+      if (snapshots.size() > 0) {
+        assetManager.deleteSnapshots(id);
         removedArchive = true;
       } else {
         notFoundArchive = true;
@@ -1683,10 +1675,25 @@ public class IndexServiceImpl implements IndexService {
           mp.remove(mpe);
           seriesDcTags.addAll(Arrays.asList(mpe.getTags()));
         }
-        // remove series ACL from the media package
-        for (MediaPackageElement mpe : mp.getElementsByFlavor(MediaPackageElements.XACML_POLICY_SERIES)) {
-          mp.remove(mpe);
-          seriesAclTags.addAll(Arrays.asList(mpe.getTags()));
+        if (mp.getSeries() != null || mp.getElementsByFlavor(MediaPackageElements.XACML_POLICY_EPISODE).length > 0) {
+          // a new series was set or the series was unset and episode ACL exists
+          // remove series ACL from the media package
+          for (MediaPackageElement mpe : mp.getElementsByFlavor(MediaPackageElements.XACML_POLICY_SERIES)) {
+            mp.remove(mpe);
+            seriesAclTags.addAll(Arrays.asList(mpe.getTags()));
+          }
+        } else {
+          // series was unset but episode don't have an episode ACL
+          // in this case user may lose access to the episode if we delete the series ACL
+          // but, we also shouldn't keep the series ACL because the series was unset
+          // let's keep the series ACL as episode ACL and provide same access rights as before
+          Tuple<AccessControlList, AclScope> activeAcl = authorizationService.getActiveAcl(mp);
+          try {
+            authorizationService.setAcl(mp, AclScope.Episode, activeAcl.getA());
+            authorizationService.removeAcl(mp, AclScope.Series);
+          } catch (MediaPackageException e) {
+            throw new IllegalStateException("Unable to set episode ACL on media package", e);
+          }
         }
         // remove series extended metadata from the media package
         try {
@@ -1806,8 +1813,8 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
-  public String createSeries(MetadataList metadataList, Map<String, String> options, Opt<AccessControlList> optAcl,
-          Opt<Long> optThemeId) throws IndexServiceException {
+  public String createSeries(MetadataList metadataList, Map<String, String> options, Optional<AccessControlList> optAcl,
+          Optional<Long> optThemeId) throws IndexServiceException {
     DublinCoreCatalog dc = DublinCores.mkOpencastSeries().getCatalog();
     dc.set(PROPERTY_IDENTIFIER, UUID.randomUUID().toString());
     dc.set(DublinCore.PROPERTY_CREATED, EncodingSchemeUtils.encodeDate(new Date(), Precision.Second));
@@ -1821,7 +1828,7 @@ public class IndexServiceImpl implements IndexService {
     }
 
     AccessControlList acl;
-    if (optAcl.isSome()) {
+    if (optAcl.isPresent()) {
       acl = optAcl.get();
     } else {
       acl = new AccessControlList();
@@ -1832,8 +1839,8 @@ public class IndexServiceImpl implements IndexService {
       DublinCoreCatalog createdSeries = seriesService.updateSeries(dc);
       seriesId = createdSeries.getFirst(PROPERTY_IDENTIFIER);
       seriesService.updateAccessControl(seriesId, acl);
-      for (Long id : optThemeId)
-        seriesService.updateSeriesProperty(seriesId, THEME_PROPERTY_NAME, Long.toString(id));
+      if (optThemeId.isPresent())
+        seriesService.updateSeriesProperty(seriesId, THEME_PROPERTY_NAME, Long.toString(optThemeId.get()));
     } catch (Exception e) {
       logger.error("Unable to create new series:", e);
       throw new IndexServiceException("Unable to create new series");
@@ -1856,10 +1863,10 @@ public class IndexServiceImpl implements IndexService {
     if (options == null)
       throw new IllegalArgumentException("No options field in metadata");
 
-    Opt<Long> themeId = Opt.none();
+    Optional<Long> themeId = Optional.empty();
     Long theme = (Long) metadata.get("theme");
     if (theme != null) {
-      themeId = Opt.some(theme);
+      themeId = Optional.of(theme);
     }
 
     Map<String, String> optionsMap;
@@ -1891,8 +1898,8 @@ public class IndexServiceImpl implements IndexService {
       DublinCoreCatalog createdSeries = seriesService.updateSeries(dc);
       seriesId = createdSeries.getFirst(PROPERTY_IDENTIFIER);
       seriesService.updateAccessControl(seriesId, acl);
-      for (Long id : themeId)
-        seriesService.updateSeriesProperty(seriesId, THEME_PROPERTY_NAME, Long.toString(id));
+      if (themeId.isPresent())
+        seriesService.updateSeriesProperty(seriesId, THEME_PROPERTY_NAME, Long.toString(themeId.get()));
     } catch (Exception e) {
       throw new IndexServiceException("Unable to create new series", e);
     }
@@ -1948,8 +1955,8 @@ public class IndexServiceImpl implements IndexService {
             break;
           case SCHEDULE:
             logger.info("Update scheduled mediapacakge {} with updated comments catalog.", event.getIdentifier());
-            schedulerService.updateEvent(event.getIdentifier(), Opt.none(), Opt.none(), Opt.none(), Opt.none(),
-                    Opt.some(mediaPackage), Opt.none(), Opt.none());
+            schedulerService.updateEvent(event.getIdentifier(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
+                    Optional.of(mediaPackage), Optional.empty(), Optional.empty());
             break;
           default:
             logger.error("Unknown event source {}!", event.getSource());

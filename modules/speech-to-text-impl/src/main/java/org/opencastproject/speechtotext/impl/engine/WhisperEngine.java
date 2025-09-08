@@ -23,11 +23,11 @@ package org.opencastproject.speechtotext.impl.engine;
 
 import org.opencastproject.speechtotext.api.SpeechToTextEngine;
 import org.opencastproject.speechtotext.api.SpeechToTextEngineException;
+import org.opencastproject.speechtotext.util.LangCodeUtil;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.data.Option;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.osgi.service.component.ComponentContext;
@@ -43,10 +43,7 @@ import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.Map;
 import java.util.Objects;
 import java.util.regex.Pattern;
 
@@ -103,12 +100,6 @@ public class WhisperEngine implements SpeechToTextEngine {
   /** Currently used Whisper args */
   private String[] whisperArgs;
 
-  /** Map to get ISO 639 language code for language name in English */
-  private Map<String, String> languageMap = new HashMap<>();
-
-  /** Map to get ISO 639 language code for 3-letter language code */
-  private Map<String, String> languageISO3to2Map = new HashMap<>();
-
   @Override
   public String getEngineName() {
     return engineName;
@@ -131,18 +122,8 @@ public class WhisperEngine implements SpeechToTextEngine {
     isVADEnabled = OsgiUtil.getOptCfgAsBoolean(prop, WHISPER_VAD);
     logger.debug("Whisper Voice Activity Detection set to {}", isVADEnabled.getOrElse(false));
 
-    whisperArgs = StringUtils.split(Objects.toString(prop.get(WHISPER_ARGS_CONFIG_KEY), ""));
+    whisperArgs = Objects.toString(prop.get(WHISPER_ARGS_CONFIG_KEY), "").trim().split("\\s+");
     logger.debug("Additional args for Whisper: {}", (Object) whisperArgs);
-
-    String[] languageCodes = Locale.getISOLanguages();
-    for (String languageCode: languageCodes) {
-      Locale locale = new Locale(languageCode);
-      String languageName = locale.getDisplayLanguage(new Locale("en"));
-      languageMap.put(languageName, languageCode);
-      String languageISO3 = locale.getISO3Language();
-      languageISO3to2Map.put(languageISO3, languageCode);
-    }
-    logger.debug("Filled language map.");
 
     logger.debug("Finished activating/updating speech-to-text service");
   }
@@ -176,7 +157,7 @@ public class WhisperEngine implements SpeechToTextEngine {
 
     if (!language.isBlank() && !translate) {
       // get 2-letter language code
-      language = languageISO3to2Map.getOrDefault(language,"");
+      language = LangCodeUtil.iso3ToIso2(language, "");
       if (language.isBlank()) {
         logger.warn("No 2-letter language code found, using language auto detection");
       } else {
@@ -259,7 +240,8 @@ public class WhisperEngine implements SpeechToTextEngine {
         Object obj = jsonParser.parse(reader);
         JSONObject jsonObject = (JSONObject) obj;
         language = (String) jsonObject.get("language");
-        language = languageMap.getOrDefault(language, language);
+        // convert language name to iso3 if necessary or take default
+        language = LangCodeUtil.getIso2FromLang(language, language);
         logger.debug("Language detected by Whisper: {}", language);
       } catch (Exception e) {
         logger.debug("Error reading Whisper JSON file for: {}", mediaFile);

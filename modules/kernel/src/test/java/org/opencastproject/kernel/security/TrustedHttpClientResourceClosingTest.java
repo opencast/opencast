@@ -23,9 +23,12 @@ package org.opencastproject.kernel.security;
 
 import static org.junit.Assert.assertEquals;
 
+import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -38,6 +41,7 @@ import org.slf4j.LoggerFactory;
 import java.io.PrintStream;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;
@@ -49,7 +53,7 @@ public class TrustedHttpClientResourceClosingTest {
   private static final int PORT = 8952;
 
   private static final class TestHttpClient extends TrustedHttpClientImpl {
-    TestHttpClient() throws UrlSigningException {
+    TestHttpClient() throws UrlSigningException, ServiceRegistryException {
       super("user", "pass");
       setSecurityService(EasyMock.createNiceMock(SecurityService.class));
       // Setup signing service
@@ -59,6 +63,16 @@ public class TrustedHttpClientResourceClosingTest {
               urlSigningService.sign(EasyMock.anyString(), EasyMock.anyLong(), EasyMock.anyLong(), EasyMock.anyString()))
               .andReturn("http://127.0.0.1:" + PORT);
       EasyMock.replay(urlSigningService);
+
+      ServiceRegistry serviceRegistry = EasyMock.createNiceMock(ServiceRegistry.class);
+      EasyMock.expect(serviceRegistry.getHostRegistrations()).andReturn(new LinkedList<>());
+      EasyMock.replay(serviceRegistry);
+      setServiceRegistry(serviceRegistry);
+
+      OrganizationDirectoryService orgDirSvc = EasyMock.createMock(OrganizationDirectoryService.class);
+      EasyMock.expect(orgDirSvc.getOrganizations()).andReturn(new LinkedList<>());
+      EasyMock.replay(orgDirSvc);
+      setOrganizationDirectoryService(orgDirSvc);
 
       setUrlSigningService(urlSigningService);
     }

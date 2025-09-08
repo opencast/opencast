@@ -57,8 +57,6 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PropertiesUtil;
 import org.opencastproject.workflow.api.WorkflowService;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 
@@ -69,6 +67,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 
 import javax.ws.rs.Path;
@@ -95,10 +94,10 @@ public class TestEventsEndpoint extends EventsEndpoint {
 
   private static Capture<MetadataList> capturedMetadataList1;
   private static Capture<MetadataList> capturedMetadataList2;
-  private static Capture<Opt<Date>> capturedStartDate;
-  private static Capture<Opt<Date>> capturedEndDate;
-  private static Capture<Opt<String>> capturedAgentId;
-  private static Capture<Opt<Map<String, String>>> capturedAgentConfig;
+  private static Capture<Optional<Date>> capturedStartDate;
+  private static Capture<Optional<Date>> capturedEndDate;
+  private static Capture<Optional<String>> capturedAgentId;
+  private static Capture<Optional<Map<String, String>>> capturedAgentConfig;
   private static Capture<MediaPackage> capturedMediaPackage;
 
   private static Organization defaultOrg = new DefaultOrganization();
@@ -120,7 +119,7 @@ public class TestEventsEndpoint extends EventsEndpoint {
     ElasticsearchIndex elasticsearchIndex = new ElasticsearchIndex();
 
     IndexService indexService = EasyMock.createMock(IndexService.class);
-    EasyMock.expect(indexService.getEvent(MISSING_ID, elasticsearchIndex)).andReturn(Opt.<Event> none()).anyTimes();
+    EasyMock.expect(indexService.getEvent(MISSING_ID, elasticsearchIndex)).andReturn(Optional.<Event> empty()).anyTimes();
 
     SchedulerService schedulerService = EasyMock.createMock(SchedulerService.class);
 
@@ -165,7 +164,7 @@ public class TestEventsEndpoint extends EventsEndpoint {
     EasyMock.expectLastCall().anyTimes();
 
     EasyMock.expect(indexService.getEvent(DELETE_EVENT_METADATA, elasticsearchIndex))
-            .andReturn(Opt.some(deleteMetadataEvent)).anyTimes();
+            .andReturn(Optional.of(deleteMetadataEvent)).anyTimes();
     EasyMock.expect(indexService.getEventMediapackage(deleteMetadataEvent)).andReturn(deleteMetadataMP).anyTimes();
 
     indexService.removeCatalogByFlavor(deleteMetadataEvent,
@@ -191,7 +190,7 @@ public class TestEventsEndpoint extends EventsEndpoint {
     MediaPackage noPublicationsMP = EasyMock.createMock(MediaPackage.class);
     EasyMock.expect(noPublicationsMP.getPublications()).andReturn(new Publication[] {}).anyTimes();
     EasyMock.expect(indexService.getEvent(NO_PUBLICATIONS_EVENT, elasticsearchIndex))
-            .andReturn(Opt.some(noPublicationsEvent)).anyTimes();
+            .andReturn(Optional.of(noPublicationsEvent)).anyTimes();
     EasyMock.expect(indexService.getEventMediapackage(noPublicationsEvent)).andReturn(noPublicationsMP).anyTimes();
     // Two Pubs
     Event twoPublicationsEvent = new Event(TWO_PUBLICATIONS, defaultOrg.getId());
@@ -204,7 +203,7 @@ public class TestEventsEndpoint extends EventsEndpoint {
             MimeType.mimeType("not", "used"));
     EasyMock.expect(twoPublicationsMP.getPublications()).andReturn(new Publication[] { paellaPublication, oaipmh })
             .anyTimes();
-    EasyMock.expect(indexService.getEvent(TWO_PUBLICATIONS, elasticsearchIndex)).andReturn(Opt.some(twoPublicationsEvent))
+    EasyMock.expect(indexService.getEvent(TWO_PUBLICATIONS, elasticsearchIndex)).andReturn(Optional.of(twoPublicationsEvent))
             .anyTimes();
     EasyMock.expect(indexService.getEventMediapackage(twoPublicationsEvent)).andReturn(twoPublicationsMP).anyTimes();
 
@@ -213,7 +212,7 @@ public class TestEventsEndpoint extends EventsEndpoint {
      */
     capturedMetadataList1 = Capture.newInstance();
     Event updateEvent = new Event(UPDATE_EVENT, defaultOrg.getId());
-    EasyMock.expect(indexService.getEvent(UPDATE_EVENT, elasticsearchIndex)).andReturn(Opt.some(updateEvent)).anyTimes();
+    EasyMock.expect(indexService.getEvent(UPDATE_EVENT, elasticsearchIndex)).andReturn(Optional.of(updateEvent)).anyTimes();
     EasyMock.expect(indexService.updateEventMetadata(eq(UPDATE_EVENT), capture(capturedMetadataList1), eq(elasticsearchIndex))).andReturn(null).anyTimes();
 
     /**
@@ -222,7 +221,7 @@ public class TestEventsEndpoint extends EventsEndpoint {
     capturedMetadataList2 = Capture.newInstance();
     Event updateEventMetadata = new Event(METADATA_UPDATE_EVENT, defaultOrg.getId());
     updateEventMetadata.setRecordingStartDate("2017-08-29T00:05:00.000Z");
-    EasyMock.expect(indexService.getEvent(METADATA_UPDATE_EVENT, elasticsearchIndex)).andReturn(Opt.some(updateEventMetadata)).anyTimes();
+    EasyMock.expect(indexService.getEvent(METADATA_UPDATE_EVENT, elasticsearchIndex)).andReturn(Optional.of(updateEventMetadata)).anyTimes();
     EasyMock.expect(indexService.updateEventMetadata(eq(METADATA_UPDATE_EVENT), capture(capturedMetadataList2), eq(elasticsearchIndex))).andReturn(null).anyTimes();
     EasyMock.expect(indexService.getEventMediapackage(updateEventMetadata)).andReturn(null).anyTimes();
 
@@ -238,7 +237,7 @@ public class TestEventsEndpoint extends EventsEndpoint {
     MediaPackage mp = builder.loadFromXml(uriMP.toURL().openStream());
     MediaPackage mpUpdated = builder.loadFromXml(uriMPUpdated.toURL().openStream());
 
-    EasyMock.expect(indexService.getEvent(TRACK_UPDATE_EVENT, elasticsearchIndex)).andReturn(Opt.some(updateEventTrack)).anyTimes();
+    EasyMock.expect(indexService.getEvent(TRACK_UPDATE_EVENT, elasticsearchIndex)).andReturn(Optional.of(updateEventTrack)).anyTimes();
     EasyMock.expect(indexService.getEventMediapackage(updateEventTrack)).andReturn(mp).anyTimes();
     EasyMock.expect(ingestService.addTrack((InputStream) EasyMock.anyObject(), (String) EasyMock.anyObject(),
             (MediaPackageElementFlavor) EasyMock.anyObject(), (MediaPackage) EasyMock.anyObject()))
@@ -251,7 +250,7 @@ public class TestEventsEndpoint extends EventsEndpoint {
      */
     Event getEvent = new Event(METADATA_GET_EVENT, defaultOrg.getId());
     getEvent.setRecordingStartDate("2017-08-29T00:05:00.000Z");
-    EasyMock.expect(indexService.getEvent(METADATA_GET_EVENT, elasticsearchIndex)).andReturn(Opt.some(getEvent)).anyTimes();
+    EasyMock.expect(indexService.getEvent(METADATA_GET_EVENT, elasticsearchIndex)).andReturn(Optional.of(getEvent)).anyTimes();
     EasyMock.expect(indexService.getEventMediapackage(getEvent)).andReturn(null).anyTimes();
 
     /**
@@ -265,23 +264,23 @@ public class TestEventsEndpoint extends EventsEndpoint {
         null,
         null,
         Collections.singletonMap(CaptureParameters.CAPTURE_DEVICE_NAMES, "default1"),
-        Opt.none()
+        Optional.empty()
     );
     capturedStartDate = Capture.newInstance();
     capturedEndDate = Capture.newInstance();
     capturedAgentId = Capture.newInstance();
     capturedAgentConfig = Capture.newInstance();
     Event updateEventScheduling = new Event(SCHEDULING_UPDATE_EVENT, defaultOrg.getId());
-    EasyMock.expect(indexService.getEvent(SCHEDULING_UPDATE_EVENT, elasticsearchIndex)).andReturn(Opt.some(updateEventScheduling)).anyTimes();
+    EasyMock.expect(indexService.getEvent(SCHEDULING_UPDATE_EVENT, elasticsearchIndex)).andReturn(Optional.of(updateEventScheduling)).anyTimes();
     EasyMock.expect(schedulerService.getTechnicalMetadata(SCHEDULING_UPDATE_EVENT)).andReturn(technicalMetadata1).anyTimes();
     schedulerService.updateEvent(
         eq(SCHEDULING_UPDATE_EVENT),
         capture(capturedStartDate),
         capture(capturedEndDate),
         capture(capturedAgentId),
-        eq(Opt.none()),
-        eq(Opt.none()),
-        eq(Opt.none()),
+        eq(Optional.empty()),
+        eq(Optional.empty()),
+        eq(Optional.empty()),
         capture(capturedAgentConfig),
         eq(false)
     );
@@ -299,9 +298,9 @@ public class TestEventsEndpoint extends EventsEndpoint {
         null,
         null,
         Collections.singletonMap(CaptureParameters.CAPTURE_DEVICE_NAMES, "default1,default2"),
-        Opt.none()
+        Optional.empty()
     );
-    EasyMock.expect(indexService.getEvent(SCHEDULING_GET_EVENT, elasticsearchIndex)).andReturn(Opt.some(getEventScheduling)).anyTimes();
+    EasyMock.expect(indexService.getEvent(SCHEDULING_GET_EVENT, elasticsearchIndex)).andReturn(Optional.of(getEventScheduling)).anyTimes();
     EasyMock.expect(schedulerService.getTechnicalMetadata(SCHEDULING_GET_EVENT)).andReturn(technicalMetadata2).anyTimes();
 
 
@@ -328,19 +327,19 @@ public class TestEventsEndpoint extends EventsEndpoint {
     return capturedMetadataList2;
   }
 
-  public static Capture<Opt<Date>> getCapturedStartDate() {
+  public static Capture<Optional<Date>> getCapturedStartDate() {
     return capturedStartDate;
   }
 
-  public static Capture<Opt<Date>> getCapturedEndDate() {
+  public static Capture<Optional<Date>> getCapturedEndDate() {
     return capturedEndDate;
   }
 
-  public static Capture<Opt<String>> getCapturedAgentId() {
+  public static Capture<Optional<String>> getCapturedAgentId() {
     return capturedAgentId;
   }
 
-  public static Capture<Opt<Map<String, String>>> getCapturedAgentConfig() {
+  public static Capture<Optional<Map<String, String>>> getCapturedAgentConfig() {
     return capturedAgentConfig;
   }
 

@@ -22,7 +22,6 @@
 package org.opencastproject.search.impl;
 
 import static org.opencastproject.security.util.SecurityUtil.getEpisodeRoleId;
-import static org.opencastproject.systems.OpencastConstants.EPISODE_ID_ROLE_ACCESS_PROPERTY;
 
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
@@ -66,7 +65,6 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.BooleanUtils;
 import org.elasticsearch.ElasticsearchStatusException;
 import org.elasticsearch.action.DocWriteResponse;
 import org.elasticsearch.action.index.IndexRequest;
@@ -91,7 +89,6 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -149,8 +146,6 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
 
   private ListProvidersService listProvidersService;
 
-  private boolean episodeIdRole = false;
-
   private String systemUserName = null;
 
 
@@ -168,10 +163,6 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
    */
   @Activate
   public void activate(final ComponentContext cc) throws IllegalStateException {
-    episodeIdRole = BooleanUtils.toBoolean(Objects.toString(
-        cc.getBundleContext().getProperty(EPISODE_ID_ROLE_ACCESS_PROPERTY), "false"));
-    logger.debug("Usage of episode ID roles is set to {}", episodeIdRole);
-
     createIndex();
     systemUserName = SecurityUtil.getSystemUserName(cc);
   }
@@ -313,30 +304,8 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
       }).filter(Objects::nonNull).collect(Collectors.toList());
     }
 
-    // Add custom roles to the ACL
-    // This allows users with a role of the form ROLE_EPISODE_<ID>_<ACTION> to access the event through the index
-    if (episodeIdRole) {
-      Set<AccessControlEntry> customEntries = new HashSet<>();
-      customEntries.add(new AccessControlEntry(getEpisodeRoleId(mediaPackageId, "READ"), "read", true));
-      customEntries.add(new AccessControlEntry(getEpisodeRoleId(mediaPackageId, "WRITE"), "write", true));
-
-      ResourceListQuery query = new ResourceListQueryImpl();
-      if (listProvidersService.hasProvider("ACL.ACTIONS")) {
-        Map<String, String> actions = new HashMap<>();
-        try {
-          actions = listProvidersService.getList("ACL.ACTIONS", query, true);
-        } catch (ListProviderException e) {
-          throw new SearchException("Listproviders not loaded. " + e);
-        }
-        for (String action : actions.keySet()) {
-          customEntries.add(
-              new AccessControlEntry(getEpisodeRoleId(mediaPackageId, action), action, true));
-        }
-      }
-
-      AccessControlList customRoles = new AccessControlList(new ArrayList<>(customEntries));
-      acl = customRoles.merge(acl);
-    }
+    // Add custom roles if enabled
+    acl = addCustomAclRoles(mediaPackageId, acl);
 
     SearchResult item = new SearchResult(SearchService.IndexEntryType.Episode, dc, acl, orgId, mediaPackage,
         null != modDate ? modDate.toInstant() : Instant.now(),
@@ -356,6 +325,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
     for (DublinCoreCatalog seriesDc : seriesList) {
       String seriesId = seriesDc.getFirst(DublinCore.PROPERTY_IDENTIFIER);
       AccessControlList seriesAcl = persistence.getAccessControlLists(seriesId, mediaPackageId).stream()
+          .map(aclPair -> addCustomAclRoles(aclPair.getKey(), aclPair.getValue()))
           .reduce(new AccessControlList(acl.getEntries()), AccessControlList::mergeActions);
       item = new SearchResult(SearchService.IndexEntryType.Series, seriesDc, seriesAcl, orgId,
           null, Instant.now(), null);
@@ -371,6 +341,39 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
         throw new SearchException(e);
       }
     }
+  }
+
+  /**
+   * Add custom roles of the media package to the passed ACL
+   *
+   * @param mediaPackageId
+   *          the media package
+   * @param acl
+   *          the existing access control list
+   * @return {@link AccessControlList} containing the passed and the custom roles merged together
+   *
+   */
+  private AccessControlList addCustomAclRoles(String mediaPackageId, AccessControlList acl) {
+    // This allows users with a role of the form ROLE_EPISODE_<ID>_<ACTION> to access the event through the index
+    Set<AccessControlEntry> customEntries = new HashSet<>();
+    customEntries.add(new AccessControlEntry(getEpisodeRoleId(mediaPackageId, "READ"), "read", true));
+    customEntries.add(new AccessControlEntry(getEpisodeRoleId(mediaPackageId, "WRITE"), "write", true));
+
+    ResourceListQuery query = new ResourceListQueryImpl();
+    if (listProvidersService.hasProvider("ACL.ACTIONS")) {
+      Map<String, String> actions = new HashMap<>();
+      try {
+        actions = listProvidersService.getList("ACL.ACTIONS", query, true);
+      } catch (ListProviderException e) {
+        throw new SearchException("Listproviders not loaded. " + e);
+      }
+      for (String action : actions.keySet()) {
+        customEntries.add(
+            new AccessControlEntry(getEpisodeRoleId(mediaPackageId, action), action, true));
+      }
+    }
+
+    return acl;
   }
 
   private void checkSearchEntityWritePermission(final String mediaPackageId) throws SearchException {
@@ -451,6 +454,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
           if (!persistence.getSeries(seriesId).isEmpty()) {
             // Update series acl if there are still episodes in the series
             final AccessControlList seriesAcl = persistence.getAccessControlLists(seriesId).stream()
+                .map(aclPair -> addCustomAclRoles(aclPair.getKey(), aclPair.getValue()))
                 .reduce(new AccessControlList(), AccessControlList::mergeActions);
             JsonElement json = gson.toJsonTree(Map.of(
                 SearchResult.INDEX_ACL, SearchResult.dehydrateAclForIndex(seriesAcl),
@@ -537,10 +541,6 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
             AccessControlList acl = persistence.getAccessControlList(mediaPackageId);
             Date modificationDate = persistence.getModificationDate(mediaPackageId);
             Date deletionDate = persistence.getDeletionDate(mediaPackageId);
-
-            AccessControlList seriesAcl = persistence.getAccessControlLists(mediaPackage.getSeries(), mediaPackageId)
-                .stream().reduce(new AccessControlList(acl.getEntries()), AccessControlList::mergeActions);
-            logger.debug("Updating series ACL with merged access control list: {}", seriesAcl);
 
             current.getAndIncrement();
 

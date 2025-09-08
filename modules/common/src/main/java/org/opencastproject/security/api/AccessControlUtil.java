@@ -21,8 +21,6 @@
 
 package org.opencastproject.security.api;
 
-import static com.entwinemedia.fn.Prelude.chuck;
-import static com.entwinemedia.fn.Stream.$;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.security.util.SecurityUtil.getEpisodeRoleId;
 import static org.opencastproject.util.EqualsUtil.bothNotNull;
@@ -37,21 +35,18 @@ import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function2;
 import org.opencastproject.util.data.Tuple;
 
-import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.Fn2;
-import com.entwinemedia.fn.Pred;
-import com.entwinemedia.fn.Stream;
-import com.entwinemedia.fn.fns.Booleans;
-
 import org.apache.commons.lang3.StringUtils;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * Provides common functions helpful in dealing with {@link AccessControlList}s.
@@ -152,13 +147,8 @@ public final class AccessControlUtil {
    * {@link AccessControlUtil#isAuthorized(org.opencastproject.security.api.AccessControlList, org.opencastproject.security.api.User, org.opencastproject.security.api.Organization, Object)}
    * as a predicate function.
    */
-  private static Pred<Object> isAuthorizedFn(final AccessControlList acl, final User user, final Organization org) {
-    return new Pred<Object>() {
-      @Override
-      public Boolean apply(Object action) {
-        return isAuthorized(acl, user, org, action);
-      }
-    };
+  private static Predicate<Object> isAuthorizedFn(final AccessControlList acl, final User user, final Organization org) {
+    return action -> isAuthorized(acl, user, org, action);
   }
 
   /**
@@ -167,7 +157,8 @@ public final class AccessControlUtil {
    * @see #isAuthorized(AccessControlList, User, Organization, Object)
    */
   public static boolean isAuthorizedAll(AccessControlList acl, User user, Organization org, Object... actions) {
-    return !$(actions).exists(Booleans.not(isAuthorizedFn(acl, user, org)));
+    Predicate<Object> isAuthorized = isAuthorizedFn(acl, user, org);
+    return Arrays.stream(actions).allMatch(isAuthorized);
   }
 
   /**
@@ -176,7 +167,8 @@ public final class AccessControlUtil {
    * @see #isAuthorized(AccessControlList, User, Organization, Object)
    */
   public static boolean isAuthorizedOne(AccessControlList acl, User user, Organization org, Object... actions) {
-    return $(actions).exists(isAuthorizedFn(acl, user, org));
+    Predicate<Object> isAuthorized = isAuthorizedFn(acl, user, org);
+    return Arrays.stream(actions).anyMatch(isAuthorized);
   }
 
   /**
@@ -185,7 +177,8 @@ public final class AccessControlUtil {
    * @see #isAuthorized(AccessControlList, User, Organization, Object)
    */
   public static boolean isProhibitedAll(AccessControlList acl, User user, Organization org, Object... actions) {
-    return !$(actions).exists(isAuthorizedFn(acl, user, org));
+    Predicate<Object> isAuthorized = isAuthorizedFn(acl, user, org);
+    return Arrays.stream(actions).noneMatch(isAuthorized);
   }
 
   /**
@@ -194,7 +187,8 @@ public final class AccessControlUtil {
    * @see #isAuthorized(AccessControlList, User, Organization, Object)
    */
   public static boolean isProhibitedOne(AccessControlList acl, User user, Organization org, Object... actions) {
-    return $(actions).exists(Booleans.not(isAuthorizedFn(acl, user, org)));
+    Predicate<Object> isAuthorized = isAuthorizedFn(acl, user, org);
+    return Arrays.stream(actions).anyMatch(isAuthorized.negate());
   }
 
   /**
@@ -312,25 +306,31 @@ public final class AccessControlUtil {
     // Use 0 as a word separator. This is safe since none of the UTF-8 code points
     // except \u0000 contains a null byte when converting to a byte array.
     final byte[] sep = new byte[] { 0 };
-    final MessageDigest md = $(acl.getEntries()).sort(sortAcl).bind(new Fn<AccessControlEntry, Stream<String>>() {
-      @Override
-      public Stream<String> apply(AccessControlEntry entry) {
-        return $(entry.getRole(), entry.getAction(), Boolean.toString(entry.isAllow()));
-      }
-    }).foldl(mkMd5MessageDigest(), new Fn2<MessageDigest, String, MessageDigest>() {
-      @Override
-      public MessageDigest apply(MessageDigest digest, String s) {
-        digest.update(s.getBytes(StandardCharsets.UTF_8));
+
+    // Sort ACL entries
+    List<AccessControlEntry> sortedEntries = acl.getEntries().stream()
+        .sorted(sortAcl)
+        .collect(Collectors.toList());
+
+    MessageDigest digest = mkMd5MessageDigest();
+
+    for (AccessControlEntry entry : sortedEntries) {
+      String[] fields = {
+          entry.getRole(),
+          entry.getAction(),
+          Boolean.toString(entry.isAllow())
+      };
+      for (String field : fields) {
+        digest.update(field.getBytes(StandardCharsets.UTF_8));
         // add separator byte (see definition above)
         digest.update(sep);
-        return digest;
       }
-    });
+    }
 
     try {
-      return Checksum.create("md5", Checksum.convertToHex(md.digest()));
+      return Checksum.create("md5", Checksum.convertToHex(digest.digest()));
     } catch (NoSuchAlgorithmException e) {
-      return chuck(e);
+      throw new RuntimeException(e);
     }
   }
 
@@ -338,7 +338,7 @@ public final class AccessControlUtil {
     try {
       return MessageDigest.getInstance("MD5");
     } catch (NoSuchAlgorithmException e) {
-      return chuck(e);
+      throw new RuntimeException(e);
     }
   }
 

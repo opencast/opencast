@@ -32,8 +32,6 @@ import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.workflow.handler.distribution.EngagePublicationChannel;
 import org.opencastproject.workflow.handler.distribution.InternalPublicationChannel;
 
-import com.entwinemedia.fn.Fn;
-
 import org.apache.commons.lang3.StringUtils;
 
 import java.text.ParseException;
@@ -42,6 +40,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.function.Predicate;
 
 public final class EventUtils {
 
@@ -177,12 +176,6 @@ public final class EventUtils {
   /**
    * A filter to remove all internal channel publications.
    */
-  public static final Fn<Publication, Boolean> internalChannelFilter = new Fn<Publication, Boolean>() {
-    @Override
-    public Boolean apply(Publication a) {
-      if (InternalPublicationChannel.CHANNEL_ID.equals(a.getChannel()))
-        return false;
-      return true;
-    }
-  };
+  public static final Predicate<Publication> internalChannelFilter =
+      publication -> !InternalPublicationChannel.CHANNEL_ID.equals(publication.getChannel());
 }

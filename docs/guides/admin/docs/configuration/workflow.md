@@ -13,8 +13,8 @@ operations, see:
 
 > [List of Workflow Operation Handler](../workflowoperationhandlers/index.md)
 
-For a video introduction to workflow, take a look at this [workflow workshop](https://video.ethz.ch/events/opencast/2020/gent/7cb2164f-e060-4108-9b3f-770e9f361ec7.html).
-Or for longer session, check out this [in-depth webinar on workflows](https://video.ethz.ch/events/opencast/miscellaneous/webinars/445be642-685a-4575-9bbf-08db21bd8c94.html).
+For a video introduction to workflow, take a look at this [workflow workshop](https://explore.opencast.org/conferences/2020/summit/v/CQeYQie869O).
+Or for longer session, check out this [in-depth webinar on workflows](https://explore.opencast.org/webinars/v/CjqLfpgeTVW).
 
 ## Overview
 
@@ -332,10 +332,12 @@ As the formal description above explains, such boolean expressions may contain�
 - …strings, which must be surrounded by single-quotes. Escaping of single quotes is supported, just use two single
   quotes next to each other: `'foo''bar'`
 - …as well as references to the variables of the workflow instance that contain these data types. Variables
-  are enclosed in `${}`, as shown below. A default value may be specified for a variable, after the name, 
-  separated by a colon, as such: `${foo:1}`. The default value will be used in case the variable doesn’t exist. 
+  are enclosed in `${}`, as shown below. A default value may be specified for a variable, after the name,
+  separated by a colon, as such: `${foo:1}`. The default value will be used in case the variable doesn’t exist.
   If no default value is specified, `false` will be used. This, of course, only makes sense in boolean contexts. Be
-  aware to specify a default value in relations such as `${foo} < ${bar}`.
+  aware to specify a default value in relations such as `${foo} < ${bar}`. If a colon is part of a variable name, it
+  needs to be escaped, as such: `${foo\:bar:1}`. Escaped colons in the variable name and the default will be replaced
+  by a colon in the output.
 
 Example for simple boolean expressions:
 

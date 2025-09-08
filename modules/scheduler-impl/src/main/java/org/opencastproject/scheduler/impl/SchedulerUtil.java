@@ -20,20 +20,15 @@
  */
 package org.opencastproject.scheduler.impl;
 
-import static com.entwinemedia.fn.Prelude.chuck;
-import static com.entwinemedia.fn.Stream.$;
-
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
-import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.metadata.dublincore.DublinCoreValue;
-import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.scheduler.api.SchedulerEvent;
 import org.opencastproject.scheduler.api.TechnicalMetadata;
 import org.opencastproject.security.api.AccessControlList;
@@ -41,10 +36,6 @@ import org.opencastproject.security.api.AccessControlUtil;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.workspace.api.Workspace;
-
-import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.Fn2;
-import com.entwinemedia.fn.data.Opt;
 
 import org.apache.commons.lang3.CharUtils;
 import org.slf4j.Logger;
@@ -54,12 +45,14 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -89,7 +82,7 @@ public final class SchedulerUtil {
       String captureAgentId,
       Set<String> userIds,
       MediaPackage mediaPackage,
-      Opt<DublinCoreCatalog> episodeDublincore,
+      Optional<DublinCoreCatalog> episodeDublincore,
       Map<String, String> wfProperties,
       Map<String, String> finalCaProperties,
       AccessControlList acl) {
@@ -102,9 +95,11 @@ public final class SchedulerUtil {
     for (String user : userIdsList) {
       messageDigest.update(mkChecksumInput(user));
     }
-    if (episodeDublincore.isSome()) {
-      Catalog episodeCatalog = $(mediaPackage.getCatalogs())
-          .filter(MediaPackageSupport.Filters.isEpisodeDublinCore.toFn()).head2();
+    if (episodeDublincore.isPresent()) {
+      Catalog episodeCatalog = Arrays.stream(mediaPackage.getCatalogs())
+          .filter(catalog -> MediaPackageElements.EPISODE.matches(catalog.getFlavor()))
+          .findFirst()
+          .orElse(null);
       Checksum checksum = episodeCatalog.getChecksum();
       if (checksum == null) {
         checksum = DublinCoreUtil.calculateChecksum(episodeDublincore.get());
@@ -113,7 +108,9 @@ public final class SchedulerUtil {
       messageDigest.update(mkChecksumInput(checksum.toString()));
     }
     // Add extended metadata to calculation
-    for (Catalog c : $(mediaPackage.getCatalogs()).sort(sortCatalogById)) {
+    Catalog[] catalogs = mediaPackage.getCatalogs();
+    Arrays.sort(catalogs, sortCatalogById);
+    for (Catalog c : catalogs) {
       if (eventCatalogUIAdapterFlavors.contains(c.getFlavor())) {
         Checksum checksum = c.getChecksum();
         if (checksum == null) {
@@ -141,7 +138,7 @@ public final class SchedulerUtil {
       return MessageDigest.getInstance("MD5");
     } catch (NoSuchAlgorithmException e) {
       logger.error("Unable to create md5 message digest");
-      return chuck(e);
+      throw new RuntimeException(e);
     }
   }
 
@@ -205,7 +202,7 @@ public final class SchedulerUtil {
     }
     sb.append(CharUtils.LF);
 
-    for (Catalog c : $(event.getMediaPackage().getCatalogs())) {
+    for (Catalog c : event.getMediaPackage().getCatalogs()) {
       if (!catalogFlavors.contains(c.getFlavor()))
         continue;
 
@@ -226,16 +223,16 @@ public final class SchedulerUtil {
 
           boolean hasLanguageDefined = !DublinCore.LANGUAGE_UNDEFINED.equals(value.getLanguage());
 
-          if (hasLanguageDefined || value.getEncodingScheme().isSome()) {
+          if (hasLanguageDefined || value.getEncodingScheme().isPresent()) {
             sb.append(" (");
             if (hasLanguageDefined) {
               sb.append("lang:").append(value.getLanguage());
-              if (value.getEncodingScheme().isSome())
+              if (value.getEncodingScheme().isPresent())
                 sb.append("/");
             }
 
-            for (EName schema : value.getEncodingScheme()) {
-              sb.append(schema.getLocalName());
+            if (value.getEncodingScheme().isPresent()) {
+              sb.append(value.getEncodingScheme().get().getLocalName());
             }
             sb.append(")");
           }
@@ -246,26 +243,4 @@ public final class SchedulerUtil {
     }
     return sb.toString();
   }
-
-  public static final Fn<MediaPackageElementFlavor, Boolean> isNotEpisodeDublinCore = new Fn<MediaPackageElementFlavor, Boolean>() {
-    @Override
-    public Boolean apply(MediaPackageElementFlavor mpe) {
-      // match is commutative
-      return !MediaPackageElements.EPISODE.matches(mpe);
-    }
-  };
-
-  public static final Fn<EventCatalogUIAdapter, MediaPackageElementFlavor> uiAdapterToFlavor = new Fn<EventCatalogUIAdapter, MediaPackageElementFlavor>() {
-    @Override
-    public MediaPackageElementFlavor apply(EventCatalogUIAdapter adapter) {
-      return adapter.getFlavor();
-    }
-  };
-
-  public static final Fn2<EventCatalogUIAdapter, String, Boolean> eventOrganizationFilter = new Fn2<EventCatalogUIAdapter, String, Boolean>() {
-    @Override
-    public Boolean apply(EventCatalogUIAdapter catalogUIAdapter, String organization) {
-      return catalogUIAdapter.getOrganization().equals(organization);
-    }
-  };
 }

@@ -41,8 +41,6 @@ import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.test.rest.RestServiceTestEnv;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.apache.commons.io.IOUtils;
 import org.json.simple.parser.ParseException;
 import org.junit.AfterClass;
@@ -52,6 +50,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
 
 import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
@@ -176,11 +175,11 @@ public class EventsEndpointTest {
         .expect().statusCode(SC_NO_CONTENT).when().put(env.host("{event_id}/scheduling"));
 
     SchedulingUtils.SchedulingInfo schedulingInfo = new SchedulingUtils.SchedulingInfo();
-    schedulingInfo.setAgentId(TestEventsEndpoint.getCapturedAgentId().getValue());
-    schedulingInfo.setStartDate(TestEventsEndpoint.getCapturedStartDate().getValue());
-    schedulingInfo.setEndDate(TestEventsEndpoint.getCapturedEndDate().getValue());
-    if (TestEventsEndpoint.getCapturedAgentConfig().getValue().isSome()) {
-      schedulingInfo.setInputs(Opt.some(TestEventsEndpoint.getCapturedAgentConfig()
+    schedulingInfo.setAgentId(Optional.ofNullable(TestEventsEndpoint.getCapturedAgentId().getValue().get()));
+    schedulingInfo.setStartDate(Optional.ofNullable(TestEventsEndpoint.getCapturedStartDate().getValue().get()));
+    schedulingInfo.setEndDate(Optional.ofNullable(TestEventsEndpoint.getCapturedEndDate().getValue().get()));
+    if (TestEventsEndpoint.getCapturedAgentConfig().getValue().isPresent()) {
+      schedulingInfo.setInputs(Optional.of(TestEventsEndpoint.getCapturedAgentConfig()
           .getValue().get().get(CaptureParameters.CAPTURE_DEVICE_NAMES)));
     }
     assertThat(schedulingInfo.toJson().toString(), SameJSONAs.sameJSONAs(jsonString).allowingAnyArrayOrdering());

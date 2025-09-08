@@ -24,13 +24,12 @@ package org.opencastproject.metadata.dublincore;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 
 public class DublinCoreMetadataCollectionTest {
   private static final String FIRST_ID = "first";
@@ -191,19 +190,19 @@ public class DublinCoreMetadataCollectionTest {
       .asList(unorderedOne, unorderedTwo, unorderedThree, first, third, seventh, newFirst));
 
     int numberOfFirsts = 0;
-    Opt<String> valueFound = Opt.none();
+    Optional<String> valueFound = Optional.empty();
 
     for (final MetadataField field : collection.getFields()) {
       if (field.getInputID().equals(FIRST_ID)) {
         numberOfFirsts++;
         if (field.getValue() != null && field.getValue() instanceof String) {
-          valueFound = Opt.some((String) field.getValue());
+          valueFound = Optional.of((String) field.getValue());
         }
       }
     }
 
     assertEquals("There should only be one field called first in the collection.", 1, numberOfFirsts);
-    assertTrue("The value has been set so it should be in the collection.", valueFound.isSome());
+    assertTrue("The value has been set so it should be in the collection.", valueFound.isPresent());
     assertEquals("There should only be one field called first in the collection.", value, valueFound.get());
   }
 }

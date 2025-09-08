@@ -71,6 +71,18 @@ const g_streamTypes = [
       const mimetype = track.mimetype;
       return { src, mimetype };
     }
+  },
+  {
+    enabled: true,
+    streamType: 'audio',
+    conditions: {
+      mimetype: 'audio/m4a'
+    },
+    getSourceData: (track) => {
+      const src = track.url;
+      const mimetype = track.mimetype;
+      return { src, mimetype };
+    }
   }
 ];
 
@@ -157,6 +169,7 @@ function getMetadata(episode, config) {
     rights: ensureArray(dc?.rightsHolder),
     license: ensureSingle(dc?.license),
     series: ensureSingle(dc?.isPartOf),
+    seriestitle: ensureSingle(episode?.mediapackage?.seriestitle),
     presenters: ensureArray(dc?.creator),
     contributors: ensureArray(dc?.contributor),
     startDate: new Date(dc?.created),
@@ -246,6 +259,7 @@ function mergeSources(sources, config) {
 
       if (content === audioContent) {
         stream.role = 'mainAudio';
+        stream.canvas = ['audio']; // add canvas so that audio-only can be detected by paella-core functions
       }
 
       streams.push(stream);

@@ -23,9 +23,6 @@ package org.opencastproject.liveschedule.impl;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Version;
-import org.opencastproject.assetmanager.api.query.AQueryBuilder;
-import org.opencastproject.assetmanager.api.query.ARecord;
-import org.opencastproject.assetmanager.api.query.AResult;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DownloadDistributionService;
@@ -645,19 +642,12 @@ public class LiveScheduleServiceImpl implements LiveScheduleService {
   }
 
   Snapshot getSnapshotFromArchive(String mpId) throws LiveScheduleException {
-    AQueryBuilder query = assetManager.createQuery();
-    AResult result = query.select(query.snapshot()).where(query.mediaPackageId(mpId).and(query.version().isLatest()))
-            .run();
-    if (result.getSize() == 0) {
-      // Media package not archived?.
-      throw new LiveScheduleException(String.format("Unexpected error: media package %s has not been archived.", mpId));
-    }
-    Optional<ARecord> record = result.getRecords().stream().findFirst();
-    if (record.isEmpty()) {
+    Optional<Snapshot> snapshot = assetManager.getLatestSnapshot(mpId);
+    if (snapshot.isEmpty()) {
       // No snapshot?
       throw new LiveScheduleException(String.format("Unexpected error: media package %s has not been archived.", mpId));
     }
-    return record.get().getSnapshot().get();
+    return snapshot.get();
   }
 
   MediaPackage distributeAclsAndCatalogs(Snapshot snapshot) throws LiveScheduleException {

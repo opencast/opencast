@@ -31,7 +31,7 @@ import static org.opencastproject.workflow.api.WorkflowInstance.WorkflowState.ST
 import static org.opencastproject.workflow.api.WorkflowInstance.WorkflowState.SUCCEEDED;
 
 import org.opencastproject.assetmanager.api.AssetManager;
-import org.opencastproject.assetmanager.api.query.RichAResult;
+import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.util.WorkflowPropertiesUtil;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
@@ -2221,12 +2221,12 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
                 if (null == orgid) {
                   String mpId = indexData.getMediaPackageId();
                   //We're assuming here that mediapackages don't change orgs
-                  RichAResult results = assetManager.getSnapshotsById(mpId);
-                  if (results.getSize() == 0) {
+                  List<Snapshot> snapshots = assetManager.getSnapshotsById(mpId);
+                  if (snapshots.size() == 0) {
                     logger.debug("Dropping {} from the index since it is missing from the database", mpId);
                     continue;
                   }
-                  orgid = results.getSnapshots().stream().findFirst().get().getOrganizationId();
+                  orgid = snapshots.stream().findFirst().get().getOrganizationId();
                   //We try-catch here since it's possible for the WF to exist in the *index* but not in the *DB*
                   // It probably shouldn't be, but that won't keep it from happening anyway.
                   try {

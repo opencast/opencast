@@ -5,10 +5,11 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence
     http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
-  <persistence-unit name="org.opencastproject.adopter" transaction-type="RESOURCE_LOCAL">
+  <persistence-unit name="org.opencastproject.adopter.impl" transaction-type="RESOURCE_LOCAL">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
     <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=jdbc/opencast)</non-jta-data-source>
-    <class>org.opencastproject.adopter.registration.Form</class>
+    <class>org.opencastproject.adopter.registration.dto.Adopter</class>
+    <class>org.opencastproject.adopter.registration.AdopterRegistrationExtra</class>
     <shared-cache-mode>NONE</shared-cache-mode>
     <properties>
       <property name="eclipselink.ddl-generation" value="create-or-extend-tables"/>

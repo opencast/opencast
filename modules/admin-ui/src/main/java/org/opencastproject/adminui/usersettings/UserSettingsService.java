@@ -40,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 
 import javax.persistence.EntityManager;
@@ -217,20 +218,35 @@ public class UserSettingsService {
   public UserSetting addUserSetting(String key, String value) throws UserSettingsServiceException {
     String orgId = securityService.getOrganization().getId();
     String username = securityService.getUser().getUsername();
-    try {
-      return db.execTx(em -> {
-        UserSettingDto userSettingDto = new UserSettingDto();
-        userSettingDto.setKey(key);
-        userSettingDto.setValue(value);
-        userSettingDto.setUsername(username);
-        userSettingDto.setOrganization(orgId);
-        em.persist(userSettingDto);
-        return userSettingDto.toUserSetting();
-      });
-    } catch (Exception e) {
-      logger.error("Could not update user setting username '{}' org: '{}' key: '{}' value: '{}'", username, orgId, key,
-          value, e);
-      throw new UserSettingsServiceException(e);
+    Optional<UserSettingDto> userSettingOpt = db.exec(getUserSettingsByKeyQuery(key)).stream()
+        .filter(setting -> setting.getKey().equalsIgnoreCase(key))
+        .findFirst();
+    if (userSettingOpt.isPresent()) {
+      try {
+        return db.execTx(em -> {
+          UserSettingDto userSettingDto = userSettingOpt.get();
+          userSettingDto.setValue(value);
+          em.merge(userSettingDto);
+          return userSettingDto.toUserSetting();
+        });
+      } catch (Exception e) {
+        throw new UserSettingsServiceException(e);
+      }
+    } else {
+      try {
+        return db.execTx(em -> {
+          UserSettingDto userSettingDto = new UserSettingDto();
+          userSettingDto.setKey(key);
+          userSettingDto.setValue(value);
+          userSettingDto.setUsername(username);
+          userSettingDto.setOrganization(orgId);
+          em.persist(userSettingDto);
+          return userSettingDto.toUserSetting();
+        });
+      } catch (Exception e) {
+
+        throw new UserSettingsServiceException(e);
+      }
     }
   }
 

@@ -194,7 +194,7 @@ public class WebvttToCutMarksWorkflowOperationHandler extends AbstractWorkflowOp
       );
     }
 
-    Optional<String> trackFlavor = Optional.ofNullable(getOptConfig(workflowInstance, CFGK_TRACK_FLAVOR).orNull());
+    Optional<String> trackFlavor = getOptConfig(workflowInstance, CFGK_TRACK_FLAVOR);
 
     String treatmentStrStart = getConfig(
             workflowInstance,

@@ -22,8 +22,6 @@
 
 package org.opencastproject.metadata.dublincore;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.joda.time.Duration;
 import org.joda.time.format.ISODateTimeFormat;
 import org.joda.time.format.ISOPeriodFormat;
@@ -32,6 +30,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -78,7 +77,7 @@ public final class EncodingSchemeUtils {
     if (precision == null)
       throw new IllegalArgumentException("The precision must not be null");
 
-    return DublinCoreValue.mk(formatDate(date, precision), DublinCore.LANGUAGE_UNDEFINED, Opt.some(DublinCore.ENC_SCHEME_W3CDTF));
+    return DublinCoreValue.mk(formatDate(date, precision), DublinCore.LANGUAGE_UNDEFINED, Optional.of(DublinCore.ENC_SCHEME_W3CDTF));
   }
 
   public static String formatDate(Date date, Precision precision) {
@@ -123,7 +122,7 @@ public final class EncodingSchemeUtils {
       b.append(" ").append("name=").append(period.getName().replace(";", "")).append(";");
     }
     b.append(" ").append("scheme=W3C-DTF;");
-    return DublinCoreValue.mk(b.toString(), DublinCore.LANGUAGE_UNDEFINED, Opt.some(DublinCore.ENC_SCHEME_PERIOD));
+    return DublinCoreValue.mk(b.toString(), DublinCore.LANGUAGE_UNDEFINED, Optional.of(DublinCore.ENC_SCHEME_PERIOD));
   }
 
   /**
@@ -139,7 +138,7 @@ public final class EncodingSchemeUtils {
    */
   public static DublinCoreValue encodeDuration(long duration) {
     return DublinCoreValue.mk(ISOPeriodFormat.standard().print(new Duration(duration).toPeriod()),
-            DublinCore.LANGUAGE_UNDEFINED, Opt.some(DublinCore.ENC_SCHEME_ISO8601));
+            DublinCore.LANGUAGE_UNDEFINED, Optional.of(DublinCore.ENC_SCHEME_ISO8601));
   }
 
   /**

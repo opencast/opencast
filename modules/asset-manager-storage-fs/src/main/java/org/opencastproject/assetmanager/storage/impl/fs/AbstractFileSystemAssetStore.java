@@ -148,6 +148,15 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
   @Override
   public boolean delete(DeletionSelector sel) throws AssetStoreException {
     File dir = getDeletionSelectorDir(sel);
+    if (dir == null) {
+      // MediaPackage could not be found locally. This could mean
+      //   - all snapshots live in a remote asset store
+      //   - mount failed and files are temporary not available
+      //   - file was deleted out-of-band
+      //   - other fs problem
+      // In any case, we cannot continue and return "false" to indicate that the files could not be found.
+      return false;
+    }
     try {
       FileUtils.deleteDirectory(dir);
       // also delete the media package directory if all versions have been deleted
@@ -169,11 +178,14 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
    *
    * @param sel
    *          the deletion selector
-   * @return the directory file
+   * @return the directory file or null if it does not exist (e.g. MediaPackage does not exist locally)
    */
   private File getDeletionSelectorDir(DeletionSelector sel) {
-    final String basePath = path(getRootDirectory(sel.getOrganizationId(), sel.getMediaPackageId()),
-            sel.getOrganizationId(), sel.getMediaPackageId());
+    final String rootPath = getRootDirectory(sel.getOrganizationId(), sel.getMediaPackageId());
+    if (rootPath == null) {
+      return null;
+    }
+    final String basePath = path(rootPath, sel.getOrganizationId(), sel.getMediaPackageId());
     if (sel.getVersion().isPresent()) {
       return file(basePath, sel.getVersion().get().toString());
     }

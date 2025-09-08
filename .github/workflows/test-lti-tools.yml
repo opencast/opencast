@@ -3,21 +3,23 @@ name: Test LTI Tools
 on:
   pull_request:
     paths:
+      - .github/workflows/test-lti-tools.yml
       - modules/lti/**
   push:
     paths:
+      - .github/workflows/test-lti-tools.yml
       - modules/lti/**
 
 jobs:
   main:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: set up python
       uses: actions/setup-python@v5
       with:
-        python-version: 3.9
+        python-version: 3.13
 
     - name: install javascript dependencies
       working-directory: modules/lti/

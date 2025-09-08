@@ -1,12 +1,14 @@
 name: Tests Paella 7
 
 on:
-    pull_request:
-      paths:
-        - 'modules/engage-paella-player-7/**'
-    push:
-      paths:
-        - 'modules/engage-paella-player-7/**'
+  pull_request:
+    paths:
+      - '.github/workflows/test-paella-7.yml'
+      - 'modules/engage-paella-player-7/**'
+  push:
+    paths:
+      - '.github/workflows/test-paella-7.yml'
+      - 'modules/engage-paella-player-7/**'
 
 
 jobs:
@@ -17,7 +19,7 @@ jobs:
         run:
           working-directory: ./modules/engage-paella-player-7
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - uses: actions/setup-node@v4
       with:
         node-version: 20

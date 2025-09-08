@@ -52,7 +52,7 @@ public class DeleteEventCommand extends AbstractCommand<GqlDeleteEventPayload> {
     IndexService.EventRemovalResult result;
     try {
       var event = indexService.getEvent(this.id, index);
-      if (event.isSome()) {
+      if (event.isPresent()) {
         result = indexService.removeEvent(event.get(), context.getConfiguration().eventRetractWorkflowId());
       } else {
         throw new GraphQLNotFoundException("Event with id " + this.id + " not found.");

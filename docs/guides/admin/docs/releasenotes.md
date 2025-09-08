@@ -1,89 +1,66 @@
-# Opencast 17: Release Notes
+# Opencast 18: Release Notes
 
-## Opencast 17.3
+## Opencast 18.1
 
-This release contains a few bug fixes, among them performance improvements for the metrics endpoint
-([#6627](https://github.com/opencast/opencast/pull/6627)). It's now also possible to trigger an index update for
-the archived information of an event ([#6575](https://github.com/opencast/opencast/pull/6575)).
+Among other bug fixes, this version contains a **security fix**. Please see
+[#6979](https://github.com/opencast/opencast/pull/6979) and
+[GHSA-hq8m-v68g-8cf8](https://github.com/opencast/opencast/security/advisories/GHSA-hq8m-v68g-8cf8)
+(once published) for details.
 
-Additionally, this contains new versions of both the Admin Interface
-([2025-04-17](https://github.com/opencast/opencast-admin-interface/releases/tag/2025-04-17)) and Studio
-([2025-04-02](https://github.com/elan-ev/opencast-studio/releases/tag/2025-04-02)).
+As a minor feature, it is now possible to pass additional arguments to whisper.cpp
+([#6966](https://github.com/opencast/opencast/pull/6966)).
 
-## Opencast 17.2
+This version also contains new releases of both the admin ui
+([18.x-2025-08-29](https://github.com/opencast/opencast-admin-interface/releases/tag/18.x-2025-08-29)) and the editor
+([18.x-2025-08-29](https://github.com/opencast/opencast-editor/releases/tag/18.x-2025-08-29)).
 
-This is a maintenance release of Opencast 17.
-It fixes a few minor bugs.
-
-## Opencast 17.1
-
-This release contains a couple of bug fixes. It also includes new versions for the editor
-([2025-01-08](https://github.com/opencast/opencast-editor/releases/tag/2025-01-08)) and the admin interface
-([2025-01-21](https://github.com/opencast/opencast-admin-interface/releases/tag/2025-01-21)). See the respective release
-notes for more details.
-
-One can now also remove subtitles from within the editor [[#6361](https://github.com/opencast/opencast/pull/6361)] and
-configure asset upload options in more detail [[#6362](https://github.com/opencast/opencast/pull/6362)].
-
-## Opencast 17.0
+## Opencast 18.0
 
 ### Features
-- New roles were added with which a user can get access to an event without having to be added to the ACLs. For more
-  details see the relevant [documentation](configuration/episode-id-roles.md).
-  [[#5056](https://github.com/opencast/opencast/pull/5056)]
-- You can now generate captions with Whisper asynchronously. [[#6247](https://github.com/opencast/opencast/pull/6247)]
-- The Whisper.cpp integration now automatically re-encodes audio to a suitable format. It's
-  no longer necessary to include a separate encode operation for this in the workflow.
-  [[#6248](https://github.com/opencast/opencast/pull/6248)]
-- You can now provide terms of use to be presented to new users in the Admin UI. For configuration see
-  [the respective docs](../configuration/admin-ui/terms.md). [[#6010](https://github.com/opencast/opencast/pull/6010)]
-- There is a new UI for the documentation of our REST endpoints but since it currently has some issues, it's not turned
-  on by default. You can however already try it out. [[#5668](https://github.com/opencast/opencast/pull/5668)]
-- There is a new GraphQL API as an alternative to the existing REST API. Please be aware that this is not yet production
-  ready and may change without further notice. [[#5766](https://github.com/opencast/opencast/pull/5766)]
-- There is a new filter available in the Admin interface to show only events that are published or not published.
-  [[#6023](https://github.com/opencast/opencast/pull/6023)]
-- The integration of Tobira in the Admin interface was improved.
-  [[#6091](https://github.com/opencast/opencast/pull/6091)]
-- Paella Player 7 now also shows a preview image in portrait mode.
-  [[#6052](https://github.com/opencast/opencast/pull/6052)]
+- JWT support has been improved by standardizing the JWT schema. This is the groundwork for further support
+  of JWT to ease the connection of external systems to Opencast. [[#6177](https://github.com/opencast/opencast/pull/6177)]
+- Added the ability to configure S3 buckets for each organization. [[#6253](https://github.com/opencast/opencast/pull/6253)]
+- Opencast now supports plugins with different modules on different distributions. [[#6303](https://github.com/opencast/opencast/pull/6303)]
+- Various improvements to full-text search [[#6498](https://github.com/opencast/opencast/pull/6498)]
+- Added support for audio-only uploads [[#5856](https://github.com/opencast/opencast/pull/5856)]
+- Added the mux WOH which is able to encode multiple tracks into one.
+  [[#6894](https://github.com/opencast/opencast/pull/6894)]
 
 ### Breaking Changes
-- **The old Admin UI was removed completely and is no longer available.**
-[[#5965](https://github.com/opencast/opencast/pull/5965)]
-- We changed the sorting of events and series in the new Admin interface to something more intuitive. This **requires the
-  installation of the OpenSearch/Elasticsearch plugin** `analysis-icu`. Check the [upgrade guide](upgrade.md) for more
-  details. [[#5413](https://github.com/opencast/opencast/pull/5413)]
-- The required Java version is now 17. [[#5763](https://github.com/opencast/opencast/pull/5763)]
-- The Microsoft Azure transcription integration was completely rewritten. Gstreamer is no longer needed as a dependency.
-  Please consult the updated [documentation](configuration/transcription.configuration/microsoftazure.md) to find out
-  how to change your configuration and workflows so they are compatible again.
-  [[#5876](https://github.com/opencast/opencast/pull/5876)]
-- ACL templates in `etc/acl/` must be provided in JSON format from now on. XACML files are no longer accepted.
-  [[#6018](https://github.com/opencast/opencast/pull/6018)]
+- The animate service and workflow operation have been removed. Make sure to update your custom workflows, if you used
+  this operation. [[#6518](https://github.com/opencast/opencast/pull/6518)]
+- All SoX related modules have been removed. Any workflows depending on this should switch to ffmpeg based normalization.
+  [[#6682](https://github.com/opencast/opencast/pull/6682)]
+- The crop service is now a plugin and disabled by default. If you have used it in previous versions, you need to enable
+  it in `etc/org.opencastproject.plugin.impl.PluginManagerImpl.cfg`. [[#6303](https://github.com/opencast/opencast/pull/6303)]
+- The required Java version is now 21. [[#6472](https://github.com/opencast/opencast/pull/6472)]
+- We switched to using the new default binary names used by Whisper.cpp. The default model directory is now
+  /usr/share/whisper.cpp/models [[#6794](https://github.com/opencast/opencast/pull/6794)]
 
 ### Configuration Changes
-- We no longer use the prepared flavor in our workflows and the Editor configuration as it was no longer serving any
-  purpose and made updating subtitles from the Editor difficult. Instead, we now always use the source flavor.
-  [[#5862](https://github.com/opencast/opencast/pull/5862)]
-- Since we removed feeds in OC 16, we no longer generate feed previews in our workflows.
-  [[#6087](https://github.com/opencast/opencast/pull/6087)]
-- Waveform peaks are now more visible, but that behavior is configurable.
-  [[#6028](https://github.com/opencast/opencast/pull/6028)]
+- Series, Editor and Login-Buttons in the PaellaPlayer are now disabled by default.
+  [[#6479](https://github.com/opencast/opencast/pull/6479)] [[#6480](https://github.com/opencast/opencast/pull/6480)]
+  [[#6481](https://github.com/opencast/opencast/pull/6481)]
+- The feature "Episode ID Roles" is now a core feature: enabled by default with no option to disable.
+  [[#6696](https://github.com/opencast/opencast/pull/6696)]
+  If you have not used this feature before, you'll need to perform an index rebuild. See [upgrade guide](upgrade.md) for
+  details.
+- The default workflows partial-publish and partial-preview have been modified to enable audio-only processing.
+  If you want to use this feature and use your own workflows, have a look at the required changes in the PR.
+  [[#5856](https://github.com/opencast/opencast/pull/5856)]
 
-For more details, please take a look at the [full changelog](changelog.md). If you want to update Opencast from a
-previous version, you should also read the [upgrade guide](upgrade.md).
-
+For more details, please take a look at the [full changelog](changelog/opencast-18.md). If you want to update Opencast
+from a previous version, you should also read the [upgrade guide](upgrade.md).
 
 ## Release Schedule
 
 | Date             | Phase                    |
 |------------------|--------------------------|
-| November 6, 2024 | Release Branch Cut       |
-| December 4, 2024 | Release of Opencast 17.0 |
+| June 19, 2025    | Release Branch Cut       |
+| July 24, 2025    | Release of Opencast 18.0 |
 
 
 ## Release Managers
 
-- Katrin Ihler (elan e.V.)
-- Veronika Schröer (University of Konstanz)
+- Dennis Benz (Osnabrück University)
+- Jonas Dühring (elan e.V.)

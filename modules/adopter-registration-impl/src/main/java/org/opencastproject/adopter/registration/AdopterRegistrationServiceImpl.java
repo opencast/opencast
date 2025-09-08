@@ -21,80 +21,470 @@
 
 package org.opencastproject.adopter.registration;
 
-import org.opencastproject.security.api.SecurityService;
+import static org.opencastproject.db.Queries.namedQuery;
 
+import org.opencastproject.adopter.registration.dto.Adopter;
+import org.opencastproject.adopter.registration.dto.GeneralData;
+import org.opencastproject.adopter.registration.dto.Host;
+import org.opencastproject.adopter.registration.dto.StatisticData;
+import org.opencastproject.assetmanager.api.AssetManager;
+import org.opencastproject.capture.admin.api.CaptureAgentStateService;
+import org.opencastproject.db.DBSession;
+import org.opencastproject.db.DBSessionFactory;
+import org.opencastproject.metadata.dublincore.DublinCore;
+import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
+import org.opencastproject.search.api.SearchResult;
+import org.opencastproject.search.api.SearchResultList;
+import org.opencastproject.search.api.SearchService;
+import org.opencastproject.security.api.DefaultOrganization;
+import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.User;
+import org.opencastproject.security.api.UserProvider;
+import org.opencastproject.security.util.SecurityUtil;
+import org.opencastproject.series.api.SeriesService;
+import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.serviceregistry.api.ServiceRegistryException;
+import org.opencastproject.userdirectory.JpaUserAndRoleProvider;
+import org.opencastproject.userdirectory.JpaUserReferenceProvider;
+
+import com.google.gson.Gson;
+
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.Version;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.IOException;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Timer;
+import java.util.TimerTask;
+import java.util.UUID;
+import java.util.stream.Collectors;
+
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.TypedQuery;
 
 /**
- * This service is used for registration and retrieving form data for
- * the logged in user in the context of adopter statistics.
+ * It collects and sends statistic data of an registered adopter.
  */
 @Component(
     immediate = true,
-    service = Service.class,
+    service = AdopterRegistrationServiceImpl.class,
     property = {
         "service.description=Adopter Statistics Registration Service"
     }
 )
-public class AdopterRegistrationServiceImpl implements Service {
+public class AdopterRegistrationServiceImpl extends TimerTask {
+
+  /** The logger */
+  private static final Logger logger = LoggerFactory.getLogger(AdopterRegistrationServiceImpl.class);
+
+  /** The property key containing the address of the external server where the statistic data will be send to. */
+  private static final String PROP_KEY_STATISTIC_SERVER_ADDRESS = "org.opencastproject.adopter.registration.server.url";
+  private static final String DEFAULT_STATISTIC_SERVER_ADDRESS = "https://register.opencast.org";
+
+  private static final int ONE_DAY_IN_MILLISECONDS = 1000 * 60 * 60 * 24;
+
+  private static final Gson gson = new Gson();
 
   //================================================================================
   // OSGi properties
   //================================================================================
 
-  /** Security service for getting user information. */
-  private SecurityService securityService;
+  /** Provides access to job and host information */
+  private ServiceRegistry serviceRegistry;
 
-  /** The database repository for the registration forms. */
-  private FormRepository formRepository;
+  /** Provides access to CA counts */
+  private CaptureAgentStateService caStateService;
 
+  private OrganizationDirectoryService organizationDirectoryService;
 
-  @Override
-  public void saveFormData(IForm form) {
-    formRepository.save(form);
+  /** Provides access to recording information */
+  private AssetManager assetManager;
+
+  /** Provides access to series information */
+  private SeriesService seriesService;
+
+  /** Provides access to search information */
+  private SearchService searchService;
+
+  /** User and role provider */
+  protected UserProvider userRefProvider;
+
+  protected JpaUserAndRoleProvider userProvider;
+
+  /** The security service */
+  protected SecurityService securityService;
+
+  /** The factory for creating the entity manager. */
+  protected EntityManagerFactory emf = null;
+
+  protected DBSessionFactory dbSessionFactory;
+
+  protected DBSession db;
+
+  /** OSGi setter for the entity manager factory. */
+  @Reference(target = "(osgi.unit.name=org.opencastproject.adopter.impl)")
+  public void setEntityManagerFactory(EntityManagerFactory emf) {
+    this.emf = emf;
   }
 
-
-  //================================================================================
-  // Methods
-  //================================================================================
-
-  @Override
-  public Form retrieveFormData() {
-    Form registrationForm = (Form) formRepository.getForm();
-    if (registrationForm == null) {
-      return new Form();
-    }
-    return registrationForm;
-  }
-
-  @Override
-  public void markForDeletion() {
-    Form form = ((Form) formRepository.getForm());
-    form.delete();
-    formRepository.save(form);
-  }
-
-  public void deleteRegistration() {
-    formRepository.delete();
-  }
-
-
-  //================================================================================
-  // OSGI setter
-  //================================================================================
-
-  /** OSGi setter for the security service. */
   @Reference
-  protected void setSecurityService(SecurityService securityService) {
+  public void setDBSessionFactory(DBSessionFactory dbSessionFactory) {
+    this.dbSessionFactory = dbSessionFactory;
+  }
+
+
+  //================================================================================
+  // Properties
+  //================================================================================
+
+  /** Provides methods for sending statistic data */
+  private AdopterRegistrationSender sender;
+
+  /** The organisation of the system admin user */
+  private Organization defaultOrganization;
+
+  /** System admin user */
+  private User systemAdminUser;
+
+  /** The Opencast version this is running in */
+  private String version;
+
+  /** The timer for shutdown uses */
+  private Timer timer;
+
+  //================================================================================
+  // Scheduler methods
+  //================================================================================
+
+  /**
+   * Entry point of the scheduler. Configured with the
+   * activate parameter at OSGi component declaration.
+   * @param ctx OSGi component context
+   */
+  @Activate
+  public void activate(BundleContext ctx) {
+    logger.info("Activating adopter registration service.");
+    this.defaultOrganization = new DefaultOrganization();
+    String systemAdminUserName = ctx.getProperty(SecurityUtil.PROPERTY_KEY_SYS_USER);
+    this.systemAdminUser = SecurityUtil.createSystemUser(systemAdminUserName, defaultOrganization);
+
+    final Version ctxVersion = ctx.getBundle().getVersion();
+    this.version = ctxVersion.toString();
+
+    // We read this key for testing but don't ever expect this to be set.
+    final String serverBaseUrl = ctx.getProperty(PROP_KEY_STATISTIC_SERVER_ADDRESS);
+    if (serverBaseUrl != null) {
+      logger.error("\nAdopter registration information are sent to a server other than register.opencast.org.\n"
+          + "We cannot take any responsibility for what is done with the data.");
+    }
+
+    db = dbSessionFactory.createSession(emf);
+
+    this.sender = new AdopterRegistrationSender(Objects.toString(serverBaseUrl, DEFAULT_STATISTIC_SERVER_ADDRESS));
+
+    // Send data now. Repeat every 24h.
+    timer = new Timer();
+    timer.schedule(this, 0, ONE_DAY_IN_MILLISECONDS);
+  }
+
+  @Deactivate
+  public void deactivate() {
+    timer.cancel();
+    db.close();
+  }
+
+  /**
+   * Saves the submitted registration form.
+   * @param adopter The adopter registration form.
+   */
+  public void save(Adopter adopter) throws AdopterRegistrationException {
+    try {
+      db.execTx(em -> {
+        Optional<Adopter> dbForm = namedQuery.findOpt("Adopter.findAll", Adopter.class).apply(em);
+        if (dbForm.isEmpty()) {
+          // Null means, that there is no entry in the DB yet, so we create UUIDs for the keys.
+          adopter.setAdopterKey(UUID.randomUUID().toString());
+          adopter.setStatisticKey(UUID.randomUUID().toString());
+          adopter.setDateCreated(new Date());
+          adopter.setDateModified(new Date());
+          em.persist(adopter);
+        } else {
+          dbForm.get().merge(adopter);
+          em.merge(dbForm.get());
+        }
+
+      });
+    } catch (Exception e) {
+      logger.error("Couldn't update the adopter statistics registration adopter: {}", e.getMessage());
+      throw new AdopterRegistrationException(e);
+    }
+  }
+
+  public void markForDeletion() {
+    Adopter a = get();
+    if (null != a) {
+      a.delete();
+      save(a);
+    }
+  }
+
+  public void delete() {
+    try {
+      db.execTx(namedQuery.delete("Adopter.deleteAll"));
+    } catch (Exception e) {
+      logger.error("Error occurred while deleting the adopter registration table. {}", e.getMessage());
+      throw new RuntimeException(e);
+    }
+  }
+
+  public Adopter get() throws AdopterRegistrationException {
+    return db.exec(namedQuery.findOpt("Adopter.findAll", Adopter.class)).orElse(null);
+  }
+
+  /**
+   * The scheduled method. It collects statistic data
+   * around Opencast and sends it via POST request.
+   */
+  @Override
+  public void run() {
+    logger.info("Executing adopter statistic scheduler task.");
+
+    Adopter adopter;
+    try {
+      adopter = get();
+      if (null == adopter) {
+        logger.info("Adopter not registered, aborting");
+        return;
+      }
+    } catch (Exception e) {
+      logger.error("Couldn't retrieve adopter registration data.", e);
+      return;
+    }
+
+    if (adopter.shouldDelete()) {
+      //Sanitize the data we're sending to delete things
+      Adopter f = new Adopter();
+      f.setAdopterKey(adopter.getAdopterKey());
+      GeneralData gd = new GeneralData(f);
+      gd.setAdopterKey(adopter.getAdopterKey());
+      StatisticData sd = new StatisticData(adopter.getStatisticKey());
+
+      try {
+        sender.deleteStatistics(sd.jsonify());
+        sender.deleteGeneralData(gd.jsonify());
+        markForDeletion();
+      } catch (IOException e) {
+        logger.warn("Error occurred while deleting registration data, will retry", e);
+      }
+      return;
+    }
+    // Don't send data unless they've agreed to the latest (at time of writing) terms.
+    // Pre April 2022 doesn't allow collection of a bunch of things, and doens't allow linking stat data to org
+    // so rather than burning time turning various things off (after figuring out what needs to be turned off)
+    // we just don't send anything.  By the time we need to update the ToU again this whole thing would need reworking
+    // anyway, so we'll run with this for now.
+    if (adopter.isRegistered() && adopter.getTermsVersionAgreed() == Adopter.TERMSOFUSEVERSION.APRIL_2022) {
+      try {
+        String generalDataAsJson = collectGeneralData(adopter);
+        sender.sendGeneralData(generalDataAsJson);
+        //Note: save the form (unmodified) to update the dates.  Old dates cause warnings to the user!
+        save(adopter);
+      } catch (IOException e) {
+        logger.warn("Error occurred while processing adopter general data.", e);
+      }
+
+      if (adopter.allowsStatistics()) {
+        try {
+          StatisticData statisticData = collectStatisticData(adopter.getAdopterKey(), adopter.getStatisticKey());
+          sender.sendStatistics(statisticData.jsonify());
+          db.exec(em -> {
+            TypedQuery<AdopterRegistrationExtra> q = em.createNamedQuery("AdopterRegistrationExtra.findAll",
+                AdopterRegistrationExtra.class);
+            q.getResultList().forEach(extra -> {
+              try {
+                Map<String, Object> data = Map.of("statistic_key", statisticData.getStatisticKey(),
+                    "data", gson.fromJson(extra.getData(), Map.class));
+                sender.sendExtraData(extra.getType(), gson.toJson(data));
+              } catch (IOException e) {
+                logger.warn("Unable to send extra adopter data with type '{}'", extra.getType(), e);
+              }
+            });
+          });
+          //Note: save the form (unmodified) (again!) to update the dates.  Old dates cause warnings to the user!
+          save(adopter);
+        } catch (IOException e) {
+          logger.warn("Unable to send adopter statistic data");
+        } catch (Exception e) {
+          logger.error("Error occurred while processing adopter statistic data.", e);
+        }
+      }
+    }
+  }
+
+  public String getRegistrationDataAsString() throws Exception {
+    Adopter adopter = get();
+    if (null == adopter) {
+      adopter = new Adopter();
+    }
+    Map<String, Object> map = new LinkedHashMap<>();
+    map.put("general", new GeneralData(adopter));
+    map.put("statistics", collectStatisticData(adopter.getAdopterKey(), adopter.getStatisticKey()));
+    db.exec(em -> {
+      TypedQuery<AdopterRegistrationExtra> q =
+          em.createNamedQuery("AdopterRegistrationExtra.findAll", AdopterRegistrationExtra.class);
+      q.getResultList().forEach(extra -> {
+        map.put(extra.getType(),gson.fromJson(extra.getData(), Map.class));
+      });
+    });
+
+    return gson.toJson(map);
+  }
+
+
+  //================================================================================
+  // Data collecting methods
+  //================================================================================
+
+  /**
+   * Just retrieves the form data of the adopter.
+   * @param adopterRegistrationAdopter The adopter registration form.
+   * @return The adopter form containing general data as JSON string.
+   */
+  private String collectGeneralData(Adopter adopterRegistrationAdopter) {
+    GeneralData generalData = new GeneralData(adopterRegistrationAdopter);
+    return generalData.jsonify();
+  }
+
+  /**
+   * Gathers various statistic data.
+   * @param statisticKey A Unique key per adopter for the statistic entry.
+   * @return The statistic data as JSON string.
+   * @throws Exception General exception that can occur while gathering data.
+   */
+  private StatisticData collectStatisticData(String adopterKey, String statisticKey) throws Exception {
+    StatisticData statisticData = new StatisticData(statisticKey);
+    statisticData.setAdopterKey(adopterKey);
+    serviceRegistry.getHostRegistrations().forEach(host -> {
+      Host h = new Host(host);
+      try {
+        String services = serviceRegistry.getServiceRegistrationsByHost(host.getBaseUrl())
+            .stream()
+            .map(sr -> sr.getServiceType())
+            .collect(Collectors.joining(",\n"));
+        h.setServices(services);
+      } catch (ServiceRegistryException e) {
+        logger.warn("Error gathering services for {}", host.getBaseUrl(), e);
+      }
+      statisticData.addHost(h);
+    });
+    statisticData.setJobCount(serviceRegistry.count(null, null));
+
+    statisticData.setSeriesCount(seriesService.getSeriesCount());
+
+    List<Organization> orgs = organizationDirectoryService.getOrganizations();
+    statisticData.setTenantCount(orgs.size());
+
+    for (Organization org : orgs) {
+      SecurityUtil.runAs(securityService, org, systemAdminUser, () -> {
+        statisticData.setEventCount(statisticData.getEventCount() + assetManager.countEvents(org.getId()));
+
+        //Calculate the number of attached CAs for this org, add it to the total
+        long current = statisticData.getCACount();
+        int orgCAs = caStateService.getKnownAgents().size();
+        statisticData.setCACount(current + orgCAs);
+
+        final SearchSourceBuilder q = new SearchSourceBuilder().query(
+                QueryBuilders.boolQuery()
+                    .must(QueryBuilders.termQuery(SearchResult.TYPE, SearchService.IndexEntryType.Episode))
+                    .must(QueryBuilders.termQuery(SearchResult.ORG, org.getId()))
+                    .mustNot(QueryBuilders.existsQuery(SearchResult.DELETED_DATE)));
+        final SearchResultList results = searchService.search(q);
+        long orgMilis = results.getHits().stream().map(
+                result -> EncodingSchemeUtils.decodeDuration(Objects.toString(
+                    result.getDublinCore().getFirst(DublinCore.PROPERTY_EXTENT),
+                    "0")))
+            .filter(Objects::nonNull)
+            .reduce(Long::sum).orElse(0L);
+        statisticData.setTotalMinutes(statisticData.getTotalMinutes() + (orgMilis / 1000 / 60));
+
+        //Add the users for each org
+        long currentUsers = statisticData.getUserCount();
+        statisticData.setUserCount(currentUsers + userProvider.countUsers() + userRefProvider.countUsers());
+      });
+    }
+    statisticData.setVersion(version);
+    return statisticData;
+  }
+
+
+  //================================================================================
+  // OSGi setter
+  //================================================================================
+
+  /** OSGi setter for the service registry. */
+  @Reference
+  public void setServiceRegistry(ServiceRegistry serviceRegistry) {
+    this.serviceRegistry = serviceRegistry;
+  }
+
+  @Reference
+  public void setCaptureAdminService(CaptureAgentStateService stateService) {
+    this.caStateService = stateService;
+  }
+
+  /** OSGi setter for the asset manager. */
+  @Reference
+  public void setAssetManager(AssetManager assetManager) {
+    this.assetManager = assetManager;
+  }
+
+  /** OSGi setter for the series service. */
+  @Reference
+  public void setSeriesService(SeriesService seriesService) {
+    this.seriesService = seriesService;
+  }
+
+  @Reference
+  public void setSearchService(SearchService searchService) {
+    this.searchService = searchService;
+  }
+
+  /** OSGi setter for the userref provider. */
+  @Reference
+  public void setUserRefProvider(JpaUserReferenceProvider userRefProvider) {
+    this.userRefProvider = userRefProvider;
+  }
+
+  /* OSGi setter for the user provider. */
+  @Reference
+  public void setUserAndRoleProvider(JpaUserAndRoleProvider userProvider) {
+    this.userProvider = userProvider;
+  }
+
+  /** OSGi callback for setting the security service. */
+  @Reference
+  public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
   }
 
-  /** OSGi setter for the form repository. */
+  /** OSGi callback for setting the org directory service. */
   @Reference
-  protected void setFormRepository(FormRepository formRepository) {
-    this.formRepository = formRepository;
+  public void setOrganizationDirectoryService(OrganizationDirectoryService orgDirServ) {
+    this.organizationDirectoryService = orgDirServ;
   }
-
 }

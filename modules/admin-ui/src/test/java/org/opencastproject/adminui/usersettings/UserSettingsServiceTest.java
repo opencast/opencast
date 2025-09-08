@@ -32,10 +32,12 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 
 import org.easymock.Capture;
+import org.easymock.CaptureType;
 import org.easymock.EasyMock;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -169,19 +171,41 @@ public class UserSettingsServiceTest {
   @Test
   public void addUserSettingInputNormalValuesExpectsSavedSetting() throws UserSettingsServiceException {
     String key = "newKey";
-    String value = "newValue";
-    Capture<UserSettingDto> userSettingDto = EasyMock.newCapture();
+    String firstValue = "firstValue";
+    String secondValue = "secondValue";
+    Capture<UserSettingDto> initialUserSetting = EasyMock.newCapture(CaptureType.ALL);
     EntityTransaction tx = EasyMock.createNiceMock(EntityTransaction.class);
     EasyMock.replay(tx);
 
+    TypedQuery query = EasyMock.createNiceMock(TypedQuery.class);
+    EasyMock.expect(query.setParameter("key", key)).andReturn(query);
+    EasyMock.expect(query.setParameter("username", securityService.getUser().getUsername())).andReturn(query);
+    EasyMock.expect(query.setParameter("org", securityService.getOrganization().getId())).andReturn(query);
+    EasyMock.expect(query.getResultList()).andReturn(Collections.emptyList());
+
+    TypedQuery secondQuery = EasyMock.createNiceMock(TypedQuery.class);
+    EasyMock.expect(secondQuery.setParameter("key", key)).andReturn(secondQuery);
+    EasyMock.expect(secondQuery.setParameter("username", securityService.getUser().getUsername())).andReturn(secondQuery);
+    EasyMock.expect(secondQuery.setParameter("org", securityService.getOrganization().getId())).andReturn(secondQuery);
+    UserSettingDto rval = new UserSettingDto(1, key, firstValue, securityService.getUser().getUsername(), securityService.getOrganization().getId());
+    EasyMock.expect(secondQuery.getResultList()).andReturn(Collections.singletonList(rval));
+    EasyMock.replay(query, secondQuery);
+
+
     EntityManager em = EasyMock.createNiceMock(EntityManager.class);
-    EasyMock.expect(em.getTransaction()).andReturn(tx);
-    em.persist(EasyMock.capture(userSettingDto));
+    EasyMock.expect(em.createNamedQuery("UserSettings.findByKey", UserSettingDto.class)).andReturn(query);
     EasyMock.expectLastCall();
+    em.persist(EasyMock.capture(initialUserSetting));
+    EasyMock.expectLastCall();
+    EasyMock.expect(em.createNamedQuery("UserSettings.findByKey", UserSettingDto.class)).andReturn(secondQuery);
+    EasyMock.expectLastCall();
+    UserSettingDto rval2 = new UserSettingDto(1, key, secondValue, securityService.getUser().getUsername(), securityService.getOrganization().getId());
+    EasyMock.expect(em.merge(EasyMock.capture(initialUserSetting))).andReturn(rval2);
+    EasyMock.expect(em.getTransaction()).andReturn(tx).anyTimes();
     EasyMock.replay(em);
 
     EntityManagerFactory emf = EasyMock.createNiceMock(EntityManagerFactory.class);
-    EasyMock.expect(emf.createEntityManager()).andReturn(em);
+    EasyMock.expect(emf.createEntityManager()).andReturn(em).anyTimes();
     EasyMock.replay(emf);
 
     UserSettingsService userSettingsService = new UserSettingsService();
@@ -190,10 +214,13 @@ public class UserSettingsServiceTest {
     userSettingsService.setDBSessionFactory(getDbSessionFactory());
     userSettingsService.setUserDirectoryService(userDirectoryService);
     userSettingsService.activate(null);
-    userSettingsService.addUserSetting(key, value);
+    userSettingsService.addUserSetting(key, firstValue);
+    userSettingsService.addUserSetting(key, secondValue);
 
-    assertEquals(userSettingDto.getValues().get(0).getKey(), key);
-    assertEquals(userSettingDto.getValues().get(0).getValue(), value);
+    assertEquals(key, initialUserSetting.getValues().get(0).getKey());
+    assertEquals(firstValue, initialUserSetting.getValues().get(0).getValue());
+    assertEquals(key, initialUserSetting.getValues().get(1).getKey());
+    assertEquals(secondValue, initialUserSetting.getValues().get(1).getValue());
   }
 
   @Test

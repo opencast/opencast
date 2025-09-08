@@ -53,6 +53,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Component(
     service = ResourceListProvider.class,
@@ -136,6 +138,10 @@ public class SeriesListProvider implements ResourceListProvider {
         }
         SearchResult<Series> searchResult = searchIndex.getByQuery(seriesQuery);
         Calendar calendar = Calendar.getInstance();
+        //We might have duplicate series names, so let's count them and see
+        Map<String, Long> duplicates = Arrays.stream(searchResult.getItems())
+            .map(series -> series.getSource().getTitle())
+            .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
         for (SearchResultItem<Series> item : searchResult.getItems()) {
           Series s = item.getSource();
           if (TITLE_EXTENDED.equals(listName)) {
@@ -155,11 +161,7 @@ public class SeriesListProvider implements ResourceListProvider {
             result.put(s.getIdentifier(), sb.toString());
           } else if (PROVIDER_PREFIX.equals(listName)) {
             String newSeriesName = s.getTitle();
-            boolean isTitleRepeated = Arrays.stream(searchResult.getItems())
-                .anyMatch(series ->
-                    !series.equals(item) && series.getSource().getTitle().equals(s.getTitle())
-                );
-            if (isTitleRepeated) {
+            if (duplicates.get(newSeriesName) > 1L) {
               //If a series name is repeated, will add the first 7 characters of the series ID to the display name on the
               //admin-ui
               if (s.getIdentifier().length() > 8) {
@@ -206,6 +208,37 @@ public class SeriesListProvider implements ResourceListProvider {
     if (query.getOffset().isSome()) {
       seriesQuery.withOffset(query.getOffset().get());
     }
+
+    for (ResourceListFilter filter : query.getFilters()) {
+      if (filter.getValue().isNone()) {
+        continue;
+      } else if (SeriesListQuery.FILTER_CREATIONDATE_NAME.equals(filter.getName())) {
+        Tuple<Date, Date> creationDate = (Tuple<Date, Date>) filter.getValue().get();
+        if (creationDate.getA() != null) {
+          seriesQuery.withCreatedFrom(creationDate.getA());
+        }
+        if (creationDate.getB() != null) {
+          seriesQuery.withCreatedTo(creationDate.getB());
+        }
+      } else if (SeriesListQuery.FILTER_CREATOR_NAME.equals(filter.getName())) {
+        seriesQuery.withCreator((String)filter.getValue().get());
+      } else if (SeriesListQuery.FILTER_CONTRIBUTORS_NAME.equals(filter.getName())) {
+        seriesQuery.withContributor((String)filter.getValue().get());
+      } else if (SeriesListQuery.FILTER_LANGUAGE_NAME.equals(filter.getName())) {
+        seriesQuery.withLanguage((String)filter.getValue().get());
+      } else if (SeriesListQuery.FILTER_LICENSE_NAME.equals(filter.getName())) {
+        seriesQuery.withLicense((String)filter.getValue().get());
+      } else if (SeriesListQuery.FILTER_ORGANIZERS_NAME.equals(filter.getName())) {
+        seriesQuery.withOrganizer((String)filter.getValue().get());
+      } else if (SeriesListQuery.FILTER_SUBJECT_NAME.equals(filter.getName())) {
+        seriesQuery.withSubject((String)filter.getValue().get());
+      } else if (SeriesListQuery.FILTER_TEXT_NAME.equals(filter.getName())) {
+        seriesQuery.withText((String)filter.getValue().get());
+      } else if (SeriesListQuery.FILTER_TITLE_NAME.equals(filter.getName())) {
+        seriesQuery.withTitle((String)filter.getValue().get());
+      }
+    }
+
     if (query instanceof SeriesListQuery) {
       if (((SeriesListQuery) query).getReadPermission().isSome()
           || ((SeriesListQuery) query).getWritePermission().isSome()) {
@@ -215,35 +248,6 @@ public class SeriesListProvider implements ResourceListProvider {
         }
         if (((SeriesListQuery) query).getWritePermission().getOrElse(false)) {
           seriesQuery.withAction(Permissions.Action.WRITE);
-        }
-      }
-      for (ResourceListFilter filter : query.getFilters()) {
-        if (filter.getValue().isNone()) {
-          continue;
-        } else if (SeriesListQuery.FILTER_CREATIONDATE_NAME.equals(filter.getName())) {
-          Tuple<Date, Date> creationDate = (Tuple<Date, Date>) filter.getValue().get();
-          if (creationDate.getA() != null) {
-            seriesQuery.withCreatedFrom(creationDate.getA());
-          }
-          if (creationDate.getB() != null) {
-            seriesQuery.withCreatedTo(creationDate.getB());
-          }
-        } else if (SeriesListQuery.FILTER_CREATOR_NAME.equals(filter.getName())) {
-          seriesQuery.withCreator((String)filter.getValue().get());
-        } else if (SeriesListQuery.FILTER_CONTRIBUTORS_NAME.equals(filter.getName())) {
-          seriesQuery.withContributor((String)filter.getValue().get());
-        } else if (SeriesListQuery.FILTER_LANGUAGE_NAME.equals(filter.getName())) {
-          seriesQuery.withLanguage((String)filter.getValue().get());
-        } else if (SeriesListQuery.FILTER_LICENSE_NAME.equals(filter.getName())) {
-          seriesQuery.withLicense((String)filter.getValue().get());
-        } else if (SeriesListQuery.FILTER_ORGANIZERS_NAME.equals(filter.getName())) {
-          seriesQuery.withOrganizer((String)filter.getValue().get());
-        } else if (SeriesListQuery.FILTER_SUBJECT_NAME.equals(filter.getName())) {
-          seriesQuery.withSubject((String)filter.getValue().get());
-        } else if (SeriesListQuery.FILTER_TEXT_NAME.equals(filter.getName())) {
-          seriesQuery.withText((String)filter.getValue().get());
-        } else if (SeriesListQuery.FILTER_TITLE_NAME.equals(filter.getName())) {
-          seriesQuery.withTitle((String)filter.getValue().get());
         }
       }
     }

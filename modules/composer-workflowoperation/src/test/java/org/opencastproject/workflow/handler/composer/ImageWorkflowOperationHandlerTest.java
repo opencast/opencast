@@ -47,7 +47,7 @@ import java.util.Optional;
 public class ImageWorkflowOperationHandlerTest {
 
   @Test
-  public void testMediaPositionParserSuccess() {
+  public void testMediaPositionParserSuccess() throws WorkflowOperationException {
     test("75900000000001", sec(75900000000001d));
     test("10, 20.3", sec(10), sec(20.3));
     test("10 20.3", sec(10), sec(20.3));

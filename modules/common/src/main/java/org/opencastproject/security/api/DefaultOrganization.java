@@ -68,4 +68,11 @@ public class DefaultOrganization extends JaxbOrganization {
             DEFAULT_PROPERTIES);
   }
 
+  public DefaultOrganization(Map<String, Integer> override) {
+    super(DefaultOrganization.DEFAULT_ORGANIZATION_ID, DefaultOrganization.DEFAULT_ORGANIZATION_NAME,
+        null != override ? override : DEFAULT_SERVERS,
+        DefaultOrganization.DEFAULT_ORGANIZATION_ADMIN, DefaultOrganization.DEFAULT_ORGANIZATION_ANONYMOUS,
+        DEFAULT_PROPERTIES);
+  }
+
 }

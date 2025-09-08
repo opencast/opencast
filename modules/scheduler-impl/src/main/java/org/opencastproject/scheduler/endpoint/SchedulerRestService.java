@@ -21,8 +21,6 @@
 
 package org.opencastproject.scheduler.endpoint;
 
-import static com.entwinemedia.fn.Prelude.chuck;
-import static com.entwinemedia.fn.Stream.$;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
@@ -52,7 +50,6 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
-import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
@@ -84,7 +81,6 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.data.Opt;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonPrimitive;
@@ -213,7 +209,9 @@ public class SchedulerRestService {
    * @param service
    */
   public void unsetService(SchedulerService service) {
-    this.service = null;
+    if (this.service == service) {
+      this.service = null;
+    }
   }
 
   /**
@@ -235,7 +233,9 @@ public class SchedulerRestService {
    * @param prolongingService
    */
   public void unsetProlongingService(CaptureNowProlongingService prolongingService) {
-    this.prolongingService = null;
+    if (this.prolongingService == prolongingService) {
+      this.prolongingService = null;
+    }
   }
 
   /**
@@ -258,7 +258,9 @@ public class SchedulerRestService {
    * @param agentService
    */
   public void unsetCaptureAgentStateService(CaptureAgentStateService agentService) {
-    this.agentService = null;
+    if (this.agentService == agentService) {
+      this.agentService = null;
+    }
   }
 
   /**
@@ -405,7 +407,7 @@ public class SchedulerRestService {
 
       Val state = v("");
       Val lastHeard = v("");
-      if (metadata.getRecording().isSome()) {
+      if (metadata.getRecording().isPresent()) {
         state = v(metadata.getRecording().get().getState());
         lastHeard = v(DateTimeSupport.toUTC(metadata.getRecording().get().getLastCheckinTime()));
       }
@@ -566,8 +568,8 @@ public class SchedulerRestService {
         }
       }
 
-      String result = service.getCalendar(Opt.nul(StringUtils.trimToNull(captureAgentId)),
-              Opt.nul(StringUtils.trimToNull(seriesId)), Opt.nul(endDate));
+      String result = service.getCalendar(Optional.ofNullable(StringUtils.trimToNull(captureAgentId)),
+              Optional.ofNullable(StringUtils.trimToNull(seriesId)), Optional.ofNullable(endDate));
 
       ResponseBuilder response = Response.ok(result).header(HttpHeaders.CONTENT_TYPE, "text/calendar; charset=UTF-8");
       if (StringUtils.isNotBlank(lastModified))
@@ -601,19 +603,15 @@ public class SchedulerRestService {
           @Context HttpServletRequest request) {
     try {
       var endDate = Optional.ofNullable(cutoff)
-              .map(Date::new)
-              .map(Opt::some)
-              .orElse(Opt.none());
+              .map(Date::new);
       var agent = Optional.ofNullable(captureAgentId)
               .map(String::trim)
-              .filter(id -> !id.isEmpty())
-              .map(Opt::some)
-              .orElse(Opt.none());
+              .filter(id -> !id.isEmpty());
       timestamp = !Objects.isNull(timestamp) && timestamp;
 
       String lastModified = null;
       // If the `etag` matches the if-not-modified header,return a 304
-      if (agent.isSome()) {
+      if (agent.isPresent()) {
         lastModified = service.getScheduleLastModified(agent.get());
         String ifNoneMatch = request.getHeader(HttpHeaders.IF_NONE_MATCH);
         if (StringUtils.isNotBlank(ifNoneMatch) && ifNoneMatch.equals(lastModified)) {
@@ -622,7 +620,7 @@ public class SchedulerRestService {
       }
 
       var result = new ArrayList<Map<String, Object>>();
-      for (var event: service.search(agent, Opt.none(), Opt.none(), Opt.some(new Date()), endDate)) {
+      for (var event: service.search(agent, Optional.empty(), Optional.empty(), Optional.of(new Date()), endDate)) {
         var id = event.getIdentifier().toString();
         result.add(Map.of(
                 "data", service.getTechnicalMetadata(id),
@@ -767,7 +765,7 @@ public class SchedulerRestService {
 
     try {
       service.addEvent(startDate.toDate(), endDate.toDate(), agentId, userIds, mediaPackage, wfProperties, caProperties,
-              Opt.nul(schedulingSource));
+              Optional.ofNullable(schedulingSource));
       return Response.status(Status.CREATED)
               .header("Location", serverUrl + serviceUrl + '/' + eventId + "/mediapackage.xml").build();
     } catch (UnauthorizedException e) {
@@ -875,7 +873,7 @@ public class SchedulerRestService {
 
     try {
       service.addMultipleEvents(rrule, startDate.toDate(), endDate.toDate(), duration, tz, agentId, userIds, templateMp, wfProperties, caProperties,
-              Opt.nul(schedulingSource));
+              Optional.ofNullable(schedulingSource));
       return Response.status(Status.CREATED).build();
     } catch (UnauthorizedException e) {
       throw e;
@@ -972,8 +970,8 @@ public class SchedulerRestService {
     }
 
     try {
-      service.updateEvent(eventID, Opt.nul(startDate), Opt.nul(endDate), Opt.nul(StringUtils.trimToNull(agentId)),
-              Opt.nul(userIds), Opt.nul(mediaPackage), Opt.nul(wfProperties), Opt.nul(caProperties));
+      service.updateEvent(eventID, Optional.ofNullable(startDate), Optional.ofNullable(endDate), Optional.ofNullable(StringUtils.trimToNull(agentId)),
+              Optional.ofNullable(userIds), Optional.ofNullable(mediaPackage), Optional.ofNullable(wfProperties), Optional.ofNullable(caProperties));
       return Response.ok().build();
     } catch (SchedulerConflictException e) {
       return Response.status(Status.CONFLICT).entity(generateErrorResponse(e)).type(MediaType.APPLICATION_JSON).build();
@@ -1000,8 +998,8 @@ public class SchedulerRestService {
       @RestResponse(responseCode = HttpServletResponse.SC_NO_CONTENT, description = "There is no current recording") })
   public Response currentRecording(@PathParam("agent") String agentId) throws UnauthorizedException {
     try {
-      Opt<MediaPackage> current = service.getCurrentRecording(agentId);
-      if (current.isNone()) {
+      Optional<MediaPackage> current = service.getCurrentRecording(agentId);
+      if (current.isEmpty()) {
         return Response.noContent().build();
       } else {
         return Response.ok(MediaPackageParser.getAsXml(current.get())).build();
@@ -1023,8 +1021,8 @@ public class SchedulerRestService {
       @RestResponse(responseCode = HttpServletResponse.SC_NO_CONTENT, description = "There is no upcoming recording") })
   public Response upcomingRecording(@PathParam("agent") String agentId) throws UnauthorizedException {
     try {
-      Opt<MediaPackage> upcoming = service.getUpcomingRecording(agentId);
-      if (upcoming.isNone()) {
+      Optional<MediaPackage> upcoming = service.getUpcomingRecording(agentId);
+      if (upcoming.isEmpty()) {
         return Response.noContent().build();
       } else {
         return Response.ok(MediaPackageParser.getAsXml(upcoming.get())).build();
@@ -1085,8 +1083,8 @@ public class SchedulerRestService {
       endsTo = new DateTime(endsToTime).toDateTime(DateTimeZone.UTC).toDate();
 
     try {
-      List<MediaPackage> events = service.search(Opt.nul(StringUtils.trimToNull(device)), Opt.nul(startsfrom),
-              Opt.nul(startsTo), Opt.nul(endsFrom), Opt.nul(endsTo));
+      List<MediaPackage> events = service.search(Optional.ofNullable(StringUtils.trimToNull(device)), Optional.ofNullable(startsfrom),
+              Optional.ofNullable(startsTo), Optional.ofNullable(endsFrom), Optional.ofNullable(endsTo));
       if ("json".equalsIgnoreCase(type)) {
         return Response.ok(getEventListAsJsonString(events)).build();
       } else {
@@ -1292,8 +1290,8 @@ public class SchedulerRestService {
               .entity("Scheduler service is unavailable, please wait...").build();
 
     try {
-      Opt<MediaPackage> current = service.getCurrentRecording(agentId);
-      if (current.isNone()) {
+      Optional<MediaPackage> current = service.getCurrentRecording(agentId);
+      if (current.isEmpty()) {
         logger.info("No recording to stop found for agent '{}'!", agentId);
         throw new NotFoundException("No recording to stop found for agent: " + agentId);
       } else {
@@ -1322,8 +1320,8 @@ public class SchedulerRestService {
               .entity("Scheduler service is unavailable, please wait...").build();
 
     try {
-      Opt<MediaPackage> upcoming = service.getUpcomingRecording(agentId);
-      if (upcoming.isNone()) {
+      Optional<MediaPackage> upcoming = service.getUpcomingRecording(agentId);
+      if (upcoming.isEmpty()) {
         logger.info("No recording to stop found for agent '{}'!", agentId);
         throw new NotFoundException("No recording to stop found for agent: " + agentId);
       } else {
@@ -1419,7 +1417,7 @@ public class SchedulerRestService {
 
         prolongingService.schedule(agentId);
         service.addEvent(now, temporaryEndDate, agentId, Collections.<String> emptySet(), mediaPackage, wfProperties,
-                caProperties, Opt.<String> none());
+                caProperties, Optional.empty());
         return Response.status(Status.CREATED)
                 .header("Location", serverUrl + serviceUrl + '/' + mediaPackage.getIdentifier().toString() + ".xml")
                 .build();
@@ -1431,15 +1429,16 @@ public class SchedulerRestService {
         throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
       } finally {
         if (mediaPackage != null) {
-          for (MediaPackageElement elem : $(mediaPackage.getElements())
-                  .bind(MediaPackageSupport.Filters.byFlavor(MediaPackageElements.EPISODE).toFn())) {
-            try {
-              workspace.delete(elem.getURI());
-            } catch (NotFoundException e) {
-              logger.warn("Unable to find (and hence, delete), this mediapackage '{}' element '{}'",
-                      mediaPackage.getIdentifier(), elem.getIdentifier());
-            } catch (IOException e) {
-              chuck(e);
+          for (MediaPackageElement elem : mediaPackage.getElements()) {
+            if (MediaPackageElements.EPISODE.matches(elem.getFlavor())) {
+              try {
+                workspace.delete(elem.getURI());
+              } catch (NotFoundException e) {
+                logger.warn("Unable to find (and hence, delete), this mediapackage '{}' element '{}'",
+                    mediaPackage.getIdentifier(), elem.getIdentifier());
+              } catch (IOException e) {
+                throw new RuntimeException(e);
+              }
             }
           }
         }
@@ -1483,8 +1482,8 @@ public class SchedulerRestService {
       MediaPackage mp;
       DublinCoreCatalog eventCatalog;
       try {
-        Opt<MediaPackage> current = service.getCurrentRecording(agentId);
-        if (current.isNone()) {
+        Optional<MediaPackage> current = service.getCurrentRecording(agentId);
+        if (current.isEmpty()) {
           logger.info("No recording to stop found for agent '{}'!", agentId);
           return Response.notModified().build();
         } else {
@@ -1506,9 +1505,9 @@ public class SchedulerRestService {
         mp = addCatalog(workspace, IOUtils.toInputStream(eventCatalog.toXmlString(), "UTF-8"), "dublincore.xml",
                 MediaPackageElements.EPISODE, mp);
 
-        service.updateEvent(eventId, Opt.<Date> none(), Opt.<Date> none(), Opt.<String> none(),
-                Opt.<Set<String>> none(), Opt.some(mp), Opt.<Map<String, String>> none(),
-                Opt.<Map<String, String>> none());
+        service.updateEvent(eventId, Optional.empty(), Optional.empty(), Optional.empty(),
+                Optional.empty(), Optional.of(mp), Optional.empty(),
+                Optional.empty());
         prolongingService.stop(agentId);
         return Response.ok().build();
       } catch (UnauthorizedException e) {

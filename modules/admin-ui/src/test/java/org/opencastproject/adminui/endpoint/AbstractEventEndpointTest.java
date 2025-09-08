@@ -47,8 +47,6 @@ import org.opencastproject.test.rest.NotFoundExceptionMapper;
 import org.opencastproject.test.rest.RestServiceTestEnv;
 import org.opencastproject.workflow.api.WorkflowService;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 import org.easymock.EasyMock;
@@ -630,17 +628,13 @@ public class AbstractEventEndpointTest {
     // 09/17/2015 @ 8:46pm UTC
     long lastCheckinTime = 1442522772000L;
     Recording recording = createRecording(id, lastCheckinTime, RecordingState.CAPTURING);
-    String result = RestUtils.getJsonString(AbstractEventEndpoint.recordingToJson.apply(Opt.some(recording)));
+    String result = RestUtils.getJsonString(AbstractEventEndpoint.recordingToJson(recording));
     String expected = "{\"lastCheckInTimeUTC\":\"2015-09-17T20:46:12Z\",\"id\":\"rec-id\",\"state\":\"capturing\",\"lastCheckInTime\":1442522772000}";
     assertThat(expected, SameJSONAs.sameJSONAs(result));
 
     recording = createRecording(null, 0L, null);
-    result = RestUtils.getJsonString(AbstractEventEndpoint.recordingToJson.apply(Opt.some(recording)));
+    result = RestUtils.getJsonString(AbstractEventEndpoint.recordingToJson(recording));
     expected = "{\"lastCheckInTimeUTC\":\"1970-01-01T00:00:00Z\",\"id\":\"\",\"state\":\"\",\"lastCheckInTime\":0}";
-    assertThat(expected, SameJSONAs.sameJSONAs(result));
-
-    result = RestUtils.getJsonString(AbstractEventEndpoint.recordingToJson.apply(Opt.<Recording> none()));
-    expected = "{}";
     assertThat(expected, SameJSONAs.sameJSONAs(result));
   }
 

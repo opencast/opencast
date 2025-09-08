@@ -81,6 +81,21 @@ public interface ComposerService {
           MediaPackageException;
 
   /**
+   * Mux multiple tracks into a new Track.
+   *
+   * @param sourceTracks
+   *          The source tracks
+   * @param profileId
+   *          The profile to use for encoding
+   * @return The receipt for this encoding job
+   * @throws EncoderException
+   *           if encoding fails
+   * @throws MediaPackageException
+   *           if the mediapackage is invalid
+   */
+  Job mux(Map<String, Track> sourceTracks, String profileId) throws EncoderException, MediaPackageException;
+
+  /**
    * Compose two videos into one with an optional watermark.
    *
    * @param outputDimension

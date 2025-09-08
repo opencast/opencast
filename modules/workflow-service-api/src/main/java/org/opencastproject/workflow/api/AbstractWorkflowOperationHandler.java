@@ -37,9 +37,6 @@ import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
-import com.entwinemedia.fn.data.Opt;
-import com.entwinemedia.fn.fns.Strings;
-
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.Constants;
@@ -52,6 +49,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Abstract base implementation for an operation handler, which implements a simple start operation that returns a
@@ -345,8 +343,9 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
    *        Value to return if key does not exists
    */
   protected String getConfig(WorkflowInstance w, String key, String defaultValue) {
-    for (final String cfg : getOptConfig(w.getCurrentOperation(), key)) {
-      return cfg;
+    Optional<String> cfgOpt = getOptConfig(w.getCurrentOperation(), key);
+    if (cfgOpt.isPresent()) {
+      return cfgOpt.get();
     }
     return defaultValue;
   }
@@ -358,8 +357,9 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
    *         if the configuration key is either missing or empty
    */
   protected String getConfig(WorkflowOperationInstance woi, String key) throws WorkflowOperationException {
-    for (final String cfg : getOptConfig(woi, key)) {
-      return cfg;
+    Optional<String> cfgOpt = getOptConfig(woi, key);
+    if (cfgOpt.isPresent()) {
+      return cfgOpt.get();
     }
     throw new WorkflowOperationException(format("Configuration key '%s' is either missing or empty", key));
   }
@@ -367,15 +367,17 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
   /**
    * Get an optional configuration key. Values are returned trimmed.
    */
-  protected Opt<String> getOptConfig(WorkflowInstance wi, String key) {
+  protected Optional<String> getOptConfig(WorkflowInstance wi, String key) {
     return getOptConfig(wi.getCurrentOperation(), key);
   }
 
   /**
    * Get an optional configuration key. Values are returned trimmed.
    */
-  protected Opt<String> getOptConfig(WorkflowOperationInstance woi, String key) {
-    return Opt.nul(woi.getConfiguration(key)).flatMap(Strings.trimToNone);
+  protected Optional<String> getOptConfig(WorkflowOperationInstance woi, String key) {
+    return Optional.ofNullable(woi.getConfiguration(key))
+        .map(String::trim)
+        .filter(s -> !s.isEmpty());
   }
 
   /**

@@ -1,5 +1,5 @@
-Install from Repository (Red Hat Enterprise Linux, CentOS Stream, …
-===================================================================
+Install from Repository (Red Hat Enterprise Linux, CentOS Stream, Rocky Linux, AlmaLinux, …
+===========================================================================================
 
 This guide is based on an RPM software repository available for Red Hat based Linux distributions provided
 by [Osnabrück University](https://uni-osnabrueck.de).
@@ -12,11 +12,10 @@ This repository provides preconfigured Opencast installations and all necessary 
 Currently Supported
 -------------------
 
-We frequently test on CentOS Stream 8/9 and infrequently test on Red Hat Enterprise Linux 8/9,
+We frequently test on Rocky Linux 8, CentOS Stream 9/10 and infrequently test on Red Hat Enterprise Linux 8/9/10,
 trying to ensure that installations on those systems work without problems.
 Since Rocky Linux and AlmaLinux OS are intended to be fully compatible to RHEL,
 those distributions should work as well.
-But we don't test against those.
 
 We support only the x86\_64 architecture.
 
@@ -129,7 +128,7 @@ Upgrading
 ---------
 
 > 🎞️ If you want to see how upgrading Opencast works if you are using the RPM repository,
-> [we made a short recording to show you the process](https://video.ethz.ch/events/opencast/miscellaneous/webinars/6803b383-239e-4a37-b0c6-e1fc7af124b0.html).
+> [we made a short recording to show you the process](https://explore.opencast.org/webinars/v/N_HuDZx9rO0).
 
 Packages will automatically upgrade to the latest minor version in a release series when running `dnf update`.
 They do not automatically upgrade the latest major version.

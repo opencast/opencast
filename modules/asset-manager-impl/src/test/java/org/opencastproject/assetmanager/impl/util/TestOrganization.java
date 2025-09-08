@@ -20,14 +20,12 @@
  */
 package org.opencastproject.assetmanager.impl.util;
 
-import static com.entwinemedia.fn.Equality.eq;
-import static com.entwinemedia.fn.Equality.hash;
-
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * Implementation of {@link Organization} for unit tests.
@@ -82,7 +80,7 @@ public final class TestOrganization implements Organization {
   }
 
   @Override public int hashCode() {
-    return hash(id, anonymousRole, adminRole, name);
+    return Objects.hash(id, anonymousRole, adminRole, name);
   }
 
   @Override public boolean equals(Object that) {
@@ -90,10 +88,10 @@ public final class TestOrganization implements Organization {
   }
 
   private boolean eqFields(TestOrganization that) {
-    return eq(id, that.id)
-        && eq(anonymousRole, that.anonymousRole)
-        && eq(adminRole, that.adminRole)
-        && eq(name, that.name);
+    return Objects.equals(id, that.id)
+        && Objects.equals(anonymousRole, that.anonymousRole)
+        && Objects.equals(adminRole, that.adminRole)
+        && Objects.equals(name, that.name);
   }
 
   @Override public String toString() {

@@ -28,7 +28,6 @@ import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.NotFoundException;
 
-import com.entwinemedia.fn.data.Opt;
 import com.google.gson.Gson;
 
 import org.easymock.EasyMock;
@@ -42,6 +41,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Tests persistent storage.
@@ -107,26 +107,26 @@ public class SchedulerServiceDatabaseImplTest {
     final Map<String, String> wfProperties = Collections.singletonMap("wffoo", "wfbar");
     final Map<String, String> caProperties = Collections.singletonMap("cafoo", "cabar");
 
-    final Opt<ExtendedEventDto> initialEvent = schedulerDatabase.getEvent(mpId);
-    Assert.assertFalse(initialEvent.isSome());
+    final Optional<ExtendedEventDto> initialEvent = schedulerDatabase.getEvent(mpId);
+    Assert.assertFalse(initialEvent.isPresent());
 
     schedulerDatabase.storeEvent(
         mpId,
         orgId,
-        Opt.some(agentId),
-        Opt.some(start),
-        Opt.some(end),
-        Opt.some(source),
-        Opt.some(recordingState),
-        Opt.some(lastHeard),
-        Opt.some(presenters),
-        Opt.some(lastModifiedDate),
-        Opt.some(checksum),
-        Opt.some(wfProperties),
-        Opt.some(caProperties)
+        Optional.of(agentId),
+        Optional.of(start),
+        Optional.of(end),
+        Optional.of(source),
+        Optional.of(recordingState),
+        Optional.of(lastHeard),
+        Optional.of(presenters),
+        Optional.of(lastModifiedDate),
+        Optional.of(checksum),
+        Optional.of(wfProperties),
+        Optional.of(caProperties)
     );
-    final Opt<ExtendedEventDto> newEvent = schedulerDatabase.getEvent(mpId);
-    Assert.assertTrue(newEvent.isSome());
+    final Optional<ExtendedEventDto> newEvent = schedulerDatabase.getEvent(mpId);
+    Assert.assertTrue(newEvent.isPresent());
     Assert.assertEquals(mpId, newEvent.get().getMediaPackageId());
     Assert.assertEquals(orgId, newEvent.get().getOrganization());
     Assert.assertEquals(agentId, newEvent.get().getCaptureAgentId());
@@ -158,23 +158,23 @@ public class SchedulerServiceDatabaseImplTest {
     final Map<String, String> wfProperties = Collections.singletonMap("wffoo", "wfbar");
     final Map<String, String> caProperties = Collections.singletonMap("cafoo", "cabar");
 
-    final Opt<ExtendedEventDto> initialEvent = schedulerDatabase.getEvent(mpId);
-    Assert.assertFalse(initialEvent.isSome());
+    final Optional<ExtendedEventDto> initialEvent = schedulerDatabase.getEvent(mpId);
+    Assert.assertFalse(initialEvent.isPresent());
 
     schedulerDatabase.storeEvent(
         mpId,
         orgId,
-        Opt.some(agentId),
-        Opt.some(start),
-        Opt.some(end),
-        Opt.some(source),
-        Opt.some(recordingState),
-        Opt.some(lastHeard),
-        Opt.some(presenters),
-        Opt.some(lastModifiedDate),
-        Opt.some(checksum),
-        Opt.some(wfProperties),
-        Opt.some(caProperties)
+        Optional.of(agentId),
+        Optional.of(start),
+        Optional.of(end),
+        Optional.of(source),
+        Optional.of(recordingState),
+        Optional.of(lastHeard),
+        Optional.of(presenters),
+        Optional.of(lastModifiedDate),
+        Optional.of(checksum),
+        Optional.of(wfProperties),
+        Optional.of(caProperties)
     );
     final String updatedRecordingState = "updatedRecordingState";
     final Map<String, String> updatedCaProperties = new HashMap<String, String>() {
@@ -186,20 +186,20 @@ public class SchedulerServiceDatabaseImplTest {
     schedulerDatabase.storeEvent(
         mpId,
         orgId,
-        Opt.none(),
-        Opt.none(),
-        Opt.none(),
-        Opt.none(),
-        Opt.some(updatedRecordingState),
-        Opt.none(),
-        Opt.none(),
-        Opt.none(),
-        Opt.none(),
-        Opt.none(),
-        Opt.some(updatedCaProperties)
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.of(updatedRecordingState),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.of(updatedCaProperties)
     );
-    final Opt<ExtendedEventDto> updatedEvent = schedulerDatabase.getEvent(mpId);
-    Assert.assertTrue(updatedEvent.isSome());
+    final Optional<ExtendedEventDto> updatedEvent = schedulerDatabase.getEvent(mpId);
+    Assert.assertTrue(updatedEvent.isPresent());
     Assert.assertEquals(mpId, updatedEvent.get().getMediaPackageId());
     Assert.assertEquals(orgId, updatedEvent.get().getOrganization());
     Assert.assertEquals(agentId, updatedEvent.get().getCaptureAgentId());
@@ -242,17 +242,17 @@ public class SchedulerServiceDatabaseImplTest {
       schedulerDatabase.storeEvent(
           mpId + i,
           orgId,
-          Opt.some(agentId),
-          Opt.some(start),
-          Opt.some(end),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none()
+          Optional.of(agentId),
+          Optional.of(start),
+          Optional.of(end),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty()
       );
     }
     final int separationMillis = 60 * 1000;
@@ -292,27 +292,27 @@ public class SchedulerServiceDatabaseImplTest {
       schedulerDatabase.storeEvent(
           mpId + i,
           orgId,
-          Opt.some(agentId),
-          Opt.some(start),
-          Opt.some(end),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none()
+          Optional.of(agentId),
+          Optional.of(start),
+          Optional.of(end),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty()
       );
     }
     // All events which start from now. expected: no.3 and no.4
     final List<ExtendedEventDto> events1 = schedulerDatabase.search(
-        Opt.none(),
-        Opt.some(new Date(nowMillis)),
-        Opt.none(),
-        Opt.none(),
-        Opt.none(),
-        Opt.none()
+        Optional.empty(),
+        Optional.of(new Date(nowMillis)),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty()
     );
     Assert.assertEquals(2, events1.size());
     Assert.assertTrue(events1.get(0).getMediaPackageId().equals(mpId + 2));
@@ -320,12 +320,12 @@ public class SchedulerServiceDatabaseImplTest {
 
     // All events which start to now. expected: no.1 and no.2
     final List<ExtendedEventDto> events2 = schedulerDatabase.search(
-        Opt.none(),
-        Opt.none(),
-        Opt.some(new Date(nowMillis)),
-        Opt.none(),
-        Opt.none(),
-        Opt.none()
+        Optional.empty(),
+        Optional.empty(),
+        Optional.of(new Date(nowMillis)),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty()
     );
     Assert.assertEquals(2, events2.size());
     Assert.assertTrue(events2.get(0).getMediaPackageId().equals(mpId + 0));
@@ -333,12 +333,12 @@ public class SchedulerServiceDatabaseImplTest {
 
     // All events which end from now. expected: no.2, no.3, and no.4
     final List<ExtendedEventDto> events3 = schedulerDatabase.search(
-        Opt.none(),
-        Opt.none(),
-        Opt.none(),
-        Opt.some(new Date(nowMillis)),
-        Opt.none(),
-        Opt.none()
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.of(new Date(nowMillis)),
+        Optional.empty(),
+        Optional.empty()
     );
     Assert.assertEquals(3, events3.size());
     Assert.assertTrue(events3.get(0).getMediaPackageId().equals(mpId + 1));
@@ -347,54 +347,54 @@ public class SchedulerServiceDatabaseImplTest {
 
     // All events which end to now. expected: no.1,
     final List<ExtendedEventDto> events4 = schedulerDatabase.search(
-        Opt.none(),
-        Opt.none(),
-        Opt.none(),
-        Opt.none(),
-        Opt.some(new Date(nowMillis)),
-        Opt.none()
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.of(new Date(nowMillis)),
+        Optional.empty()
     );
     Assert.assertEquals(1, events4.size());
     Assert.assertTrue(events4.get(0).getMediaPackageId().equals(mpId + 0));
 
     // All events which start from now AND start to now -> illegal combination, no results expected
     Assert.assertTrue(schedulerDatabase.search(
-        Opt.none(),
-        Opt.some(new Date(nowMillis)),
-        Opt.some(new Date(nowMillis)),
-        Opt.none(),
-        Opt.none(),
-        Opt.none()
+        Optional.empty(),
+        Optional.of(new Date(nowMillis)),
+        Optional.of(new Date(nowMillis)),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty()
     ).isEmpty());
 
     // All events which end from now AND end to now -> illegal combination, no results expected
     Assert.assertTrue(schedulerDatabase.search(
-        Opt.none(),
-        Opt.none(),
-        Opt.none(),
-        Opt.some(new Date(nowMillis)),
-        Opt.some(new Date(nowMillis)),
-        Opt.none()
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.of(new Date(nowMillis)),
+        Optional.of(new Date(nowMillis)),
+        Optional.empty()
     ).isEmpty());
 
     // All events which start from now AND end to now -> illegal combination, no results expected
     Assert.assertTrue(schedulerDatabase.search(
-        Opt.none(),
-        Opt.some(new Date(nowMillis)),
-        Opt.none(),
-        Opt.none(),
-        Opt.some(new Date(nowMillis)),
-        Opt.none()
+        Optional.empty(),
+        Optional.of(new Date(nowMillis)),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.of(new Date(nowMillis)),
+        Optional.empty()
     ).isEmpty());
 
     // All events which start from now + 1 hour. expected: no. 3 and no. 4
     final List<ExtendedEventDto> events5 = schedulerDatabase.search(
-        Opt.none(),
-        Opt.some(new Date(nowMillis + oneHourMillis)),
-        Opt.none(),
-        Opt.none(),
-        Opt.none(),
-        Opt.none()
+        Optional.empty(),
+        Optional.of(new Date(nowMillis + oneHourMillis)),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty()
     );
     Assert.assertEquals(2, events5.size());
     Assert.assertTrue(events5.get(0).getMediaPackageId().equals(mpId + 2));
@@ -402,12 +402,12 @@ public class SchedulerServiceDatabaseImplTest {
 
     // All events which start to now + 1 hour. expected: no. 1 and no. 2, but not no. 3
     final List<ExtendedEventDto> events6 = schedulerDatabase.search(
-        Opt.none(),
-        Opt.none(),
-        Opt.some(new Date(nowMillis + oneHourMillis)),
-        Opt.none(),
-        Opt.none(),
-        Opt.none()
+        Optional.empty(),
+        Optional.empty(),
+        Optional.of(new Date(nowMillis + oneHourMillis)),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty()
     );
     Assert.assertEquals(2, events6.size());
     Assert.assertTrue(events6.get(0).getMediaPackageId().equals(mpId + 0));
@@ -415,12 +415,12 @@ public class SchedulerServiceDatabaseImplTest {
 
     // All events which end from now + 1 hour. expected: no2., no.3, and no.4
     final List<ExtendedEventDto> events7 = schedulerDatabase.search(
-        Opt.none(),
-        Opt.none(),
-        Opt.none(),
-        Opt.some(new Date(nowMillis + oneHourMillis)),
-        Opt.none(),
-        Opt.none()
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.of(new Date(nowMillis + oneHourMillis)),
+        Optional.empty(),
+        Optional.empty()
     );
     Assert.assertEquals(3, events7.size());
     Assert.assertTrue(events7.get(0).getMediaPackageId().equals(mpId + 1));
@@ -429,24 +429,24 @@ public class SchedulerServiceDatabaseImplTest {
 
     // All events which end to now + 1 hour. expected: no.1
     final List<ExtendedEventDto> events8 = schedulerDatabase.search(
-        Opt.none(),
-        Opt.none(),
-        Opt.none(),
-        Opt.none(),
-        Opt.some(new Date(nowMillis + oneHourMillis)),
-        Opt.none()
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.of(new Date(nowMillis + oneHourMillis)),
+        Optional.empty()
     );
     Assert.assertEquals(1, events8.size());
     Assert.assertTrue(events8.get(0).getMediaPackageId().equals(mpId + 0));
 
     // No start/end dates given. expected: all events are returned
     final List<ExtendedEventDto> events9 = schedulerDatabase.search(
-        Opt.none(),
-        Opt.none(),
-        Opt.none(),
-        Opt.none(),
-        Opt.none(),
-        Opt.none()
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty()
     );
     Assert.assertEquals(4, events9.size());
     Assert.assertTrue(events9.get(0).getMediaPackageId().equals(mpId + 0));
@@ -456,36 +456,36 @@ public class SchedulerServiceDatabaseImplTest {
 
     // All events which start to now and end to now. expected: no. 1
     final List<ExtendedEventDto> eventsA = schedulerDatabase.search(
-        Opt.none(),
-        Opt.none(),
-        Opt.some(new Date(nowMillis)),
-        Opt.none(),
-        Opt.some(new Date(nowMillis)),
-        Opt.none()
+        Optional.empty(),
+        Optional.empty(),
+        Optional.of(new Date(nowMillis)),
+        Optional.empty(),
+        Optional.of(new Date(nowMillis)),
+        Optional.empty()
     );
     Assert.assertEquals(1, eventsA.size());
     Assert.assertTrue(eventsA.get(0).getMediaPackageId().equals(mpId + 0));
 
     // All events which start to now and end from now. expected: no. 2
     final List<ExtendedEventDto> eventsB = schedulerDatabase.search(
-        Opt.none(),
-        Opt.none(),
-        Opt.some(new Date(nowMillis)),
-        Opt.some(new Date(nowMillis)),
-        Opt.none(),
-        Opt.none()
+        Optional.empty(),
+        Optional.empty(),
+        Optional.of(new Date(nowMillis)),
+        Optional.of(new Date(nowMillis)),
+        Optional.empty(),
+        Optional.empty()
     );
     Assert.assertEquals(1, eventsB.size());
     Assert.assertTrue(eventsB.get(0).getMediaPackageId().equals(mpId + 1));
 
     // All events which start from now and end from now. expected: no. 3 and no. 4
     final List<ExtendedEventDto> eventsC = schedulerDatabase.search(
-        Opt.none(),
-        Opt.some(new Date(nowMillis)),
-        Opt.none(),
-        Opt.some(new Date(nowMillis)),
-        Opt.none(),
-        Opt.none()
+        Optional.empty(),
+        Optional.of(new Date(nowMillis)),
+        Optional.empty(),
+        Optional.of(new Date(nowMillis)),
+        Optional.empty(),
+        Optional.empty()
     );
     Assert.assertEquals(2, eventsC.size());
     Assert.assertTrue(eventsC.get(0).getMediaPackageId().equals(mpId + 2));
@@ -520,27 +520,27 @@ public class SchedulerServiceDatabaseImplTest {
       schedulerDatabase.storeEvent(
           mpId + i,
           orgId,
-          Opt.some(agentId),
-          Opt.some(start),
-          Opt.some(end),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none()
+          Optional.of(agentId),
+          Optional.of(start),
+          Optional.of(end),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty()
       );
     }
     // All events which start from now. expected: no.3 and no.4, but limit is 1, so just no. 3
     final List<ExtendedEventDto> events1 = schedulerDatabase.search(
-        Opt.none(),
-        Opt.some(new Date(nowMillis)),
-        Opt.none(),
-        Opt.none(),
-        Opt.none(),
-        Opt.some(1)
+        Optional.empty(),
+        Optional.of(new Date(nowMillis)),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.of(1)
     );
     Assert.assertEquals(1, events1.size());
     Assert.assertTrue(events1.get(0).getMediaPackageId().equals(mpId + 2));
@@ -574,51 +574,51 @@ public class SchedulerServiceDatabaseImplTest {
       schedulerDatabase.storeEvent(
           mpId + i,
           orgId,
-          Opt.some(agentIds[i % 2]),
-          Opt.some(start),
-          Opt.some(end),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none()
+          Optional.of(agentIds[i % 2]),
+          Optional.of(start),
+          Optional.of(end),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty()
       );
     }
     // All events which start from now on agent 1. expected: no.3
     final List<ExtendedEventDto> events1 = schedulerDatabase.search(
-        Opt.some(agentIds[0]),
-        Opt.some(new Date(nowMillis)),
-        Opt.none(),
-        Opt.none(),
-        Opt.none(),
-        Opt.none()
+        Optional.of(agentIds[0]),
+        Optional.of(new Date(nowMillis)),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty()
     );
     Assert.assertEquals(1, events1.size());
     Assert.assertTrue(events1.get(0).getMediaPackageId().equals(mpId + 2));
 
     // All events which start from now on agent 2. expected: no.4
     final List<ExtendedEventDto> events2 = schedulerDatabase.search(
-        Opt.some(agentIds[1]),
-        Opt.some(new Date(nowMillis)),
-        Opt.none(),
-        Opt.none(),
-        Opt.none(),
-        Opt.none()
+        Optional.of(agentIds[1]),
+        Optional.of(new Date(nowMillis)),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty()
     );
     Assert.assertEquals(1, events2.size());
     Assert.assertTrue(events2.get(0).getMediaPackageId().equals(mpId + 3));
 
     // No start/end dates given. expected: all events of agent 1 are returned
     final List<ExtendedEventDto> events3 = schedulerDatabase.search(
-        Opt.some(agentIds[0]),
-        Opt.none(),
-        Opt.none(),
-        Opt.none(),
-        Opt.none(),
-        Opt.none()
+        Optional.of(agentIds[0]),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty()
     );
     Assert.assertEquals(2, events3.size());
     Assert.assertTrue(events3.get(0).getMediaPackageId().equals(mpId + 0));
@@ -626,12 +626,12 @@ public class SchedulerServiceDatabaseImplTest {
 
     // No start/end dates given. expected: all events of agent 2 are returned
     final List<ExtendedEventDto> events4 = schedulerDatabase.search(
-        Opt.some(agentIds[1]),
-        Opt.none(),
-        Opt.none(),
-        Opt.none(),
-        Opt.none(),
-        Opt.none()
+        Optional.of(agentIds[1]),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty()
     );
     Assert.assertEquals(2, events4.size());
     Assert.assertTrue(events4.get(0).getMediaPackageId().equals(mpId + 1));
@@ -649,25 +649,25 @@ public class SchedulerServiceDatabaseImplTest {
     schedulerDatabase.storeEvent(
         mpId,
         orgId,
-        Opt.some(agentId),
-        Opt.some(start),
-        Opt.some(end),
-        Opt.none(),
-        Opt.none(),
-        Opt.none(),
-        Opt.none(),
-        Opt.none(),
-        Opt.none(),
-        Opt.none(),
-        Opt.none()
+        Optional.of(agentId),
+        Optional.of(start),
+        Optional.of(end),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty(),
+        Optional.empty()
     );
-    final Opt<ExtendedEventDto> initialEvent = schedulerDatabase.getEvent(mpId);
-    Assert.assertTrue(initialEvent.isSome());
+    final Optional<ExtendedEventDto> initialEvent = schedulerDatabase.getEvent(mpId);
+    Assert.assertTrue(initialEvent.isPresent());
 
     schedulerDatabase.deleteEvent(mpId);
 
-    final Opt<ExtendedEventDto> newEvent = schedulerDatabase.getEvent(mpId);
-    Assert.assertFalse(newEvent.isSome());
+    final Optional<ExtendedEventDto> newEvent = schedulerDatabase.getEvent(mpId);
+    Assert.assertFalse(newEvent.isPresent());
   }
 
   @Test
@@ -692,17 +692,17 @@ public class SchedulerServiceDatabaseImplTest {
       schedulerDatabase.storeEvent(
           mpId + i,
           orgId,
-          Opt.some(agentId),
-          Opt.some(start),
-          Opt.some(end),
-          Opt.none(),
-          i % 2 == 0 ? Opt.some(recordingState) : Opt.none(),
-          i % 2 == 0 ? Opt.some(lastHeard) : Opt.none(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none()
+          Optional.of(agentId),
+          Optional.of(start),
+          Optional.of(end),
+          Optional.empty(),
+          i % 2 == 0 ? Optional.of(recordingState) : Optional.empty(),
+          i % 2 == 0 ? Optional.of(lastHeard) : Optional.empty(),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty()
       );
     }
     final List<ExtendedEventDto> knownEvents = schedulerDatabase.getKnownRecordings();
@@ -732,23 +732,23 @@ public class SchedulerServiceDatabaseImplTest {
     schedulerDatabase.storeEvent(
         mpId,
         orgId,
-        Opt.some(agentId),
-        Opt.some(start),
-        Opt.some(end),
-        Opt.some(source),
-        Opt.some(recordingState),
-        Opt.some(lastHeard),
-        Opt.some(presenters),
-        Opt.some(lastModifiedDate),
-        Opt.some(checksum),
-        Opt.some(wfProperties),
-        Opt.some(caProperties)
+        Optional.of(agentId),
+        Optional.of(start),
+        Optional.of(end),
+        Optional.of(source),
+        Optional.of(recordingState),
+        Optional.of(lastHeard),
+        Optional.of(presenters),
+        Optional.of(lastModifiedDate),
+        Optional.of(checksum),
+        Optional.of(wfProperties),
+        Optional.of(caProperties)
     );
 
     schedulerDatabase.resetRecordingState(mpId);
 
-    final Opt<ExtendedEventDto> updatedEvent = schedulerDatabase.getEvent(mpId);
-    Assert.assertTrue(updatedEvent.isSome());
+    final Optional<ExtendedEventDto> updatedEvent = schedulerDatabase.getEvent(mpId);
+    Assert.assertTrue(updatedEvent.isPresent());
     Assert.assertEquals(mpId, updatedEvent.get().getMediaPackageId());
     Assert.assertEquals(orgId, updatedEvent.get().getOrganization());
     Assert.assertEquals(agentId, updatedEvent.get().getCaptureAgentId());
@@ -783,17 +783,17 @@ public class SchedulerServiceDatabaseImplTest {
       schedulerDatabase.storeEvent(
           mpId + i,
           orgId,
-          Opt.some(agentId),
-          Opt.some(start),
-          Opt.some(end),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none(),
-          Opt.none()
+          Optional.of(agentId),
+          Optional.of(start),
+          Optional.of(end),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty(),
+          Optional.empty()
       );
     }
     int count = schedulerDatabase.countEvents();

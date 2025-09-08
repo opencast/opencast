@@ -15,17 +15,18 @@ Note that this operation should be preceded by the inspect workflow operation ha
 For all tracks matching the flavor specified by the mandatory configuration key *source-flavor*, the following workflow
 instance variables may be set:
 
-|Name                       |Example                               |Description                                    |
-|---------------------------|--------------------------------------|-----------------------------------------------|
-|*flavor*\_media            |`presenter_source_media=true`         |Track with specific favor exists               |
-|*flavor*\_audio            |`presenter_source_audio=true`         |Track contains at least one audio stream       |
-|*flavor*\_video            |`presenter_source_video=true`         |Track contains at least one video stream       |
-|*flavor*\_subtitle         |`presenter_source_subtitle=true`      |Track contains at least one subtitle stream    |
-|*flavor*\_resolution\_x    |`presenter_source_resolution_x=1280`  |Horizontal resolution of the video stream      |
-|*flavor*\_resolution\_y    |`presenter_source_resolution_y=720`   |Vertical resolution of the video stream        |
-|*flavor*\_aspect           |`presenter_source_aspect=4/3`         |Exact aspect ratio of the video stream         |
-|*flavor*\_aspect\_snap     |`presenter_source_aspect_snap=4/3`    |Nearest specified aspect ratio of the video    |
-|*flavor*\_framerate        |`presenter_source_framerate=30.0`     |Framerate of the video stream                  |
+| Name                    | Example                             | Description                                 |
+|-------------------------|-------------------------------------|---------------------------------------------|
+| *flavor*\_media         | `presenter_source_media=true`       | Track with specific favor exists            |
+| *flavor*\_audio         | `presenter_source_audio=true`       | Track contains at least one audio stream    |
+| *flavor*\_video         | `presenter_source_video=true`       | Track contains at least one video stream    |
+| *flavor*\_subtitle      | `presenter_source_subtitle=true`    | Track contains at least one subtitle stream |
+| *flavor*\_resolution\_x | `presenter_source_resolution_x=1280`| Horizontal resolution of the video stream   |
+| *flavor*\_resolution\_y | `presenter_source_resolution_y=720` | Vertical resolution of the video stream     |
+| *flavor*\_aspect        | `presenter_source_aspect=4/3`       | Exact aspect ratio of the video stream      |
+| *flavor*\_aspect\_snap  | `presenter_source_aspect_snap=4/3`  | Nearest specified aspect ratio of the video |
+| *flavor*\_framerate     | `presenter_source_framerate=30.0`   | Framerate of the video stream               |
+| *flavor*\_duration      | `presenter_source_duration=112.04`  | Duration of the track in seconds            |
 
 
 Parameter Table
@@ -66,7 +67,7 @@ Operation Example
 </operation>
 ```
 
-If a video track with a resolution of 1280x720 and an included audio stream is passed to this operation as
+If a video track with a resolution of 1280x720, a duration of 40 seconds and an included audio stream is passed to this operation as
 `presentiation/source`, the resulting variables would be:
 
 ```properties
@@ -78,4 +79,5 @@ presentation_source_resolution_x=1280
 presentation_source_resolution_y=720
 presentation_source_video=true
 presentation_source_framerate=30.0
+presentation_source_duration=40.0
 ```

@@ -13,14 +13,14 @@ concurrency:
 jobs:
   deploy-documentation:
     if: github.repository_owner == 'opencast'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: set up python
       uses: actions/setup-python@v5
       with:
-        python-version: 3.9
+        python-version: 3.13
 
     - name: install dependencies
       working-directory: docs/guides/

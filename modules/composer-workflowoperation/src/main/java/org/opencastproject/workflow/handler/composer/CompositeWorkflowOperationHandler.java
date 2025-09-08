@@ -691,6 +691,12 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
         logger.warn("Unable to read the watermark image attachment {}", watermarkAttachment.get().getURI(), e);
         throw new WorkflowOperationException("Unable to read the watermark image attachment", e);
       }
+      //Such excellent documentation Orcale, much fun.  Because returning null is a totally sane thing to do here
+      //https://docs.oracle.com/javase/tutorial/2d/images/loadimage.html
+      if (null == image) {
+        logger.error("Unable to parse watermark file.  File must be gif, png, jp(e)g, or bmp");
+        throw new WorkflowOperationException("Unable to parse watermark file.  File must be gif, png, jp(e)g, or bmp");
+      }
       Dimension imageDimension = Dimension.dimension(image.getWidth(), image.getHeight());
       List<Tuple<Dimension, AbsolutePositionLayoutSpec>> watermarkShapes = new ArrayList<Tuple<Dimension, AbsolutePositionLayoutSpec>>();
       watermarkShapes.add(0, Tuple.tuple(imageDimension, compositeSettings.getWatermarkLayout().get()));

@@ -7,14 +7,14 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>18-SNAPSHOT</version>
+    <version>19-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
     <java-jwt.version>3.18.1</java-jwt.version>
-    <jwks-rsa.version>0.19.0</jwks-rsa.version>
+    <jwks-rsa.version>0.22.1</jwks-rsa.version>
   </properties>
   <dependencies>
     <!-- Internal -->
