@@ -56,15 +56,12 @@ option, `…_aspect_snap` would be set to 4/3.
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="analyze-tracks"
-    description="Analyze tracks in media package and set control variables">
-  <configurations>
-    <configuration key="source-flavor">*/source</configuration>
-    <configuration key="aspect-ratio">4/3,16/9</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: analyze-tracks
+    description: Analyze tracks in media package and set control variables
+    configurations:
+      - source-flavor: '*/source'
+      - aspect-ratio: 4/3,16/9
 ```
 
 If a video track with a resolution of 1280x720, a duration of 40 seconds and an included audio stream is passed to this operation as

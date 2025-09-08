@@ -30,19 +30,16 @@ Tags and flavors can be used in combination. But combined they should match one 
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="image-to-video"
-    description="Composite">
-  <configurations>
-    <configuration key="source-tags">intro</configuration>
-    <configuration key="source-flavor">intro/source</configuration>
-    <configuration key="target-tags">intro-video</configuration>
-    <configuration key="target-flavor">intro/video</configuration>
-    <configuration key="duration">10</configuration>
-    <configuration key="profile">image-movie</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: image-to-video
+    description: Composite
+    configurations:
+      - source-tags: intro
+      - source-flavor: intro/source
+      - target-tags: intro-video
+      - target-flavor: intro/video
+      - duration: 10
+      - profile: image-movie
 ```
 
 Encoding Profile Example

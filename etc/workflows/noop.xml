@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<definition xmlns="http://workflow.opencastproject.org">
-  <id>noop</id>
-  <title>Do nothing (mostly for debugging and maintenance purposes)</title>
-  <operations>
-    <!-- We need at least one operation for this to be considered a valid workflow definition -->
-    <operation id="defaults" />
-  </operations>
-</definition>

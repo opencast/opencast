@@ -23,38 +23,30 @@ Parameter Table
 Example
 -------
 
-```xml
-<!-- Extract audio from video in ogg/opus format -->
+```yaml
+  # Extract audio from video in ogg/opus format
+  - id: encode
+    fail-on-error: true
+    exception-handler-workflow: partial-error
+    description: Extract audio for transcript generation
+    configurations:
+      - source-tags: engage-download
+      - target-flavor: audio/ogg
+      - target-tags: transcript
+      - encoding-profile: audio-opus
+      # If there is more than one file that match the source-tags, use only the first one
+      - process-first-match-only: true
 
-<operation
-  id="encode"
-  fail-on-error="true"
-  exception-handler-workflow="partial-error"
-  description="Extract audio for transcript generation">
-  <configurations>
-    <configuration key="source-tags">engage-download</configuration>
-    <configuration key="target-flavor">audio/ogg</configuration>
-    <configuration key="target-tags">transcript</configuration>
-    <configuration key="encoding-profile">audio-opus</configuration>
-    <!-- If there is more than one file that match the source-tags, use only the first one -->
-    <configuration key="process-first-match-only">true</configuration>
-  </configurations>
-</operation>
-
-<!-- Start IBM Watson recognitions job -->
-
-<operation
-  id="start-watson-transcription"
-  fail-on-error="true"
-  exception-handler-workflow="partial-error"
-  description="Start IBM Watson transcription job">
-  <configurations>
-    <!--  Skip this operation if flavor already exists. Used for cases when mp already has captions. -->
-    <configuration key="skip-if-flavor-exists">captions/vtt+en</configuration>
-    <!-- Audio to be translated, produced in the previous compose operation -->
-    <configuration key="source-tag">transcript</configuration>
-  </configurations>
-</operation>
+  # Start IBM Watson recognitions job
+  - id: start-watson-transcription
+    fail-on-error: true
+    exception-handler-workflow: partial-error
+    description: Start IBM Watson transcription job
+    configurations:
+      # Skip this operation if flavor already exists. Used for cases when mp already has captions.
+      - skip-if-flavor-exists: captions/vtt+en
+      # Audio to be translated, produced in the previous compose operation
+      - source-tag: transcript
 ```
 
 ### Encoding profile used in example above

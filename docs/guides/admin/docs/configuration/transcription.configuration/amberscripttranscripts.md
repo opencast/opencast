@@ -131,13 +131,10 @@ Integrate AmberScript workflow operations by including the provided workflow fil
 into your existing workflow:
 
 ```
-<operation
-  id="include"
-  description="Start AmberScript Transcription">
-  <configurations>
-    <configuration key="workflow-id">amberscript-start-transcription</configuration>
-  </configurations>
-</operation>
+  - id: include
+    description: Start AmberScript Transcription
+    configurations:
+      - workflow-id: amberscript-start-transcription
 ```
 
 Workflow Operations

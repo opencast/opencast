@@ -27,19 +27,16 @@ Parameter Table
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="post-mediapackage"
-    description="Sending MediaPackage to Lernfunk3">
-  <configurations>
-    <configuration key="url">http://example.com:5000/</configuration>
-    <configuration key="format">xml</configuration>
-    <configuration key="debug">no</configuration>
-    <configuration key="mediapackage.type">search</configuration>
-    <configuration key="auth.enabled">yes</configuration>
-    <configuration key="auth.username">exportuser</configuration>
-    <configuration key="auth.password">secret</configuration>
-    <configuration key="+source_system">video.example.com</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: post-mediapackage
+    description: Sending MediaPackage to Lernfunk3
+    configurations:
+      - url: http://example.com:5000/
+      - format: xml
+      - debug: no
+      - mediapackage.type: search
+      - auth.enabled: yes
+      - auth.username: exportuser
+      - auth.password: secret
+      - +source_system: video.example.com
 ```

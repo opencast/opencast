@@ -22,13 +22,11 @@ Parameter Table
 Operation Example
 -----------------
 
-```xml
-<operation id="start-workflow">
-  <configurations>
-    <configuration key="workflow-definition">fast</configuration>
-    <configuration key="media-packages">${duplicate_media_package_ids}</configuration>
-    <configuration key="key">value</configuration>
-    <configuration key="publish">true</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: start-workflow
+    configurations:
+      - workflow-definition: fast
+      - media-packages: ${duplicate_media_package_ids}
+      - key: value
+      - publish: true
 ```

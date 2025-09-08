@@ -38,13 +38,11 @@ Java string formatting manner to ensure unique filenames.
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="copy"
-    description="Copy sources to my disk">
-  <configurations>
-    <configuration key="source-flavors">presenter/source, presentation/source</configuration>
-    <configuration key="target-directory">/mnt/mydisk</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: copy
+    description: Copy sources to my disk
+    configurations:
+      - source-flavors: presenter/source, presentation/source
+      - target-directory: /mnt/mydisk
+
 ```

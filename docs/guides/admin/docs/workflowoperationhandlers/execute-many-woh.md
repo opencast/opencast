@@ -52,41 +52,35 @@ Operation Example
 
 Run a command which creates a new version of a track:
 
-```xml
-<operation
-    id="execute-many"
-    description="Run command">
-  <configurations>
-    <configuration key="exec">qt-faststart</configuration>
-    <configuration key="params">-f #{in} #{out}</configuration>
-    <configuration key="source-flavor">*/toprocess</configuration>
-    <configuration key="source-tags">copy,-exp</configuration>
-    <configuration key="output-filename">result.avi</configuration>
-    <configuration key="target-flavor">output/processed</configuration>
-    <configuration key="target-tags">copied,-copy</configuration>
-    <configuration key="expected-type">Track</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: execute-many
+    description: Run command
+    configurations:
+      - exec: qt-faststart
+      - params: '-f #{in} #{out}'
+      - source-flavor: '*/toprocess'
+      - source-tags: copy,-exp
+      - output-filename: result.avi
+      - target-flavor: output/processed
+      - target-tags: copied,-copy
+      - expected-type: Track
 ```
 
 Run a command which inspects any track with a `presenter/source` flavor and an audio stream,
 and adds new configuration properties to the running workflow, leaving the mediapackage unchanged:
 
 
-```xml
-<operation
-  id="execute-many"
-  fail-on-error="true"
-  exception-handler-workflow="error"
-  description="Inspect track and update workflow properties">
-  <configurations>
-    <configuration key="exec">/usr/local/bin/oc-track-inspect-audio.sh</configuration>
-    <configuration key="source-flavor">presenter/source</configuration>
-    <configuration key="source-audio">true</configuration>
-    <configuration key="params">#{in} #{out}</configuration>
-    <configuration key="set-workflow-properties">true</configuration>
-    <configuration key="output-filename">wf.properties</configuration>
-    <configuration key="expected-type">Attachment</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: execute-many
+    fail-on-error: true
+    exception-handler-workflow: error
+    description: Inspect track and update workflow properties
+    configurations:
+      - exec: /usr/local/bin/oc-track-inspect-audio.sh
+      - source-flavor: presenter/source
+      - source-audio: true
+      - params: '#{in} #{out}'
+      - set-workflow-properties: true
+      - output-filename: wf.properties
+      - expected-type: Attachment
 ```

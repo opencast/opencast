@@ -46,16 +46,13 @@ The values are specified in milliseconds.
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="cut-marks-to-smil"
-    description="Process ingested cut marks by applying them to current tracks"
-    fail-on-error="true"
-    exception-handler-workflow="partial-error">
-  <configurations>
-    <configuration key="source-media-flavors">presenter/prepared,presentation/prepared</configuration>
-    <configuration key="source-json-flavor">cut-marks/json</configuration>
-    <configuration key="target-smil-flavor">smil/cutting</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: cut-marks-to-smil
+    description: Process ingested cut marks by applying them to current tracks
+    fail-on-error: true
+    exception-handler-workflow: partial-error
+    configurations:
+      - source-media-flavors: presenter/prepared,presentation/prepared
+      - source-json-flavor: cut-marks/json
+      - target-smil-flavor: smil/cutting
 ```

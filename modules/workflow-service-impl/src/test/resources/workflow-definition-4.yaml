@@ -1,0 +1,7 @@
+id: definition-4
+description: |-
+  Unit testing workflow
+operations:
+  - id: opPause
+    fail-on-error: true
+    description: Pausing operation

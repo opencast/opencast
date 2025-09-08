@@ -12,9 +12,7 @@ There are no configuration keys at this time.
 Operation Example
 -----------------
 
-```xml
-<operation
-  id="retract-engage-aws"
-  description="Retract recording from AWS">
-</operation>
+```yaml
+  - id: retract-engage-aws
+    description: Retract recording from AWS
 ```

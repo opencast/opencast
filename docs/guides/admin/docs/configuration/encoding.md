@@ -99,18 +99,15 @@ Using a Profile
 
 Once defined, use your encoding profile in your workflow by setting the encoding-profile property to the profiles name:
 
-    <operation
-        id="encode"
-        fail-on-error="true"
-        exception-handler-workflow="error"
-        description="Encode presenter using my audio/video encoding profile">
-      <configurations>
-        <configuration key="source-flavor">presenter/work</configuration>
-        <configuration key="target-flavor">presenter/delivery</configuration>
-        <configuration key="target-tags">captioning</configuration>
-        <configuration key="encoding-profile">my-av-profile.http</configuration>
-      </configurations>
-    </operation>
+  - id: encode
+    fail-on-error: true
+    exception-handler-workflow: error
+    description: Encode presenter using my audio/video encoding profile
+    configurations:
+      - source-flavor: presenter/work
+      - target-flavor: presenter/delivery
+      - target-tags: captioning
+      - encoding-profile: my-av-profile.http
 
 Have a look at the [Workflow Configuration section](workflow.md) for more details about workflows and workflow
 operations.

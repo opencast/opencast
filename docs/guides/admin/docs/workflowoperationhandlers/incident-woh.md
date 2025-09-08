@@ -24,15 +24,12 @@ Parameter Table
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="incident"
-    description="Provoke a job incident">
-  <configurations>
-    <configuration key="code">3</configuration>
-    <configuration key="severity">INFO</configuration>
-    <configuration key="details">exception=content;id=325</configuration>
-    <configuration key="params">track=track-1;profile=full</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: incident
+    description: Provoke a job incident
+    configurations:
+      - code: 3
+      - severity: INFO
+      - details: exception=content;id=325
+      - params: track=track-1;profile=full
 ```

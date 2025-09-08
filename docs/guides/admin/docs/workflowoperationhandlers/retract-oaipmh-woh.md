@@ -18,12 +18,9 @@ Parameter Table
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="retract-oaipmh"
-    description="Retract event from the OAI-PMH repository">
-  <configurations>
-    <configuration key="repository">default</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: retract-oaipmh
+    description: Retract event from the OAI-PMH repository
+    configurations:
+      - repository: default
 ```

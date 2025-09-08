@@ -29,12 +29,9 @@ Parameter Table
 Operation Example
 -----------------
 
-```xml
-  <operation
-    id="import-wf-properties"
-    description="Load processing settings">
-  <configurations>
-    <configuration key="source-flavor">processing/defaults</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: import-wf-properties
+    description: Load processing settings
+    configurations:
+      - source-flavor: processing/defaults
 ```

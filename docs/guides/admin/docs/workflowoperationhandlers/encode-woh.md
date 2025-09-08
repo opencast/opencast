@@ -43,17 +43,15 @@ run of the operation, the media package will contain four new tracks: the first 
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="encode"
-    description="encoding media files">
-  <configurations>
-    <configuration key="source-flavor">*/trimmed</configuration>
-    <configuration key="target-flavor">*/delivery</configuration>
-    <configuration key="target-tags">engage-download,engage-streaming</configuration>
-    <configuration key="encoding-profile">parallel.http</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: encode
+    description: encoding media files
+    configurations:
+      - source-flavor: '*/trimmed'
+      - target-flavor: '*/delivery'
+      - target-tags: engage-download,engage-streaming
+      - encoding-profile: parallel.http
+
 ```
 
 

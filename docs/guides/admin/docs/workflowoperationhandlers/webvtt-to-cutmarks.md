@@ -31,18 +31,15 @@ Tracks are assumed to start at 0.
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="webvtt-to-cutmarks"
-    description="Use WebVTT as a silence detection">
-  <configurations>
-    <configuration key="source-flavor">captions/vtt+en</configuration>
-    <configuration key="target-flavor">cut-marks/json</configuration>
-    <configuration key="min-time-silence-in-ms">5000</configuration>
-    <configuration key="buffer-time-around-subtitle">1500</configuration>
-    <configuration key="track-flavor">presenter/source</configuration>
-    <configuration key="start-treatment">USE_FOR_MIN_TIME</configuration>
-    <configuration key="end-treatment">USE_FOR_MIN_TIME</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: webvtt-to-cutmarks
+    description: Use WebVTT as a silence detection
+    configurations:
+      - source-flavor: captions/vtt+en
+      - target-flavor: cut-marks/json
+      - min-time-silence-in-ms: 5000
+      - buffer-time-around-subtitle: 1500
+      - track-flavor: presenter/source
+      - start-treatment: USE_FOR_MIN_TIME
+      - end-treatment: USE_FOR_MIN_TIME
 ```

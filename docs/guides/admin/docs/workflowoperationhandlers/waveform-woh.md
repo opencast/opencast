@@ -38,19 +38,16 @@ Additional notes:
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="waveform"
-    description="Generating waveform">
-  <configurations>
-    <configuration key="source-flavor">*/audio</configuration>
-    <configuration key="target-flavor">*/waveform</configuration>
-    <configuration key="target-tags">preview</configuration>
-    <configuration key="pixels-per-minute">200</configuration>
-    <configuration key="min-width">5000</configuration>
-    <configuration key="max-width">20000</configuration>
-    <configuration key="height">60</configuration>
-    <configuration key="color">black</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: waveform
+    description: Generating waveform
+    configurations:
+      - source-flavor: '*/audio'
+      - target-flavor: '*/waveform'
+      - target-tags: preview
+      - pixels-per-minute: 200
+      - min-width: 5000
+      - max-width: 20000
+      - height: 60
+      - color: black
 ```

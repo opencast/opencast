@@ -30,25 +30,19 @@ Operation Example
 
 Retract from internal channel:
 
-```xml
-<operation
-    id="retract-configure"
-    description="Retract from internal publication channel">
-  <configurations>
-    <configuration key="channel-id">internal</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: retract-configure
+    description: Retract from internal publication channel
+    configurations:
+      - channel-id: internal
 ```
 
 Retract from external API:
 
-```xml
-<operation
-    id="retract-configure"
-    description="Retract from external api publication channel">
-  <configurations>
-    <configuration key="channel-id">api</configuration>
-    <configuration key="retract-streaming">false</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: retract-configure
+    description: Retract from external api publication channel
+    configurations:
+      - channel-id: api
+      - retract-streaming: false
 ```

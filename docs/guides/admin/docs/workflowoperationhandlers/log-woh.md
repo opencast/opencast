@@ -29,19 +29,9 @@ Operation Example
   description: Log to system logger
 ```
 
-```xml
-<operation
-  id="log"
-  description="Log to system logger">
-</operation>
-```
-
-```xml
-<operation
-  id="log"
-  description="Log to file">
-  <configurations>
-    <configuration key="directory">/tmp/logtest</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: log
+    description: Log to file
+    configurations:
+      - directory: /tmp/logtest
 ```

@@ -38,15 +38,12 @@ presenter_source_active_audio_duration_percent = 75
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="silence"
-    description="Executing silence detection">
-  <configurations>
-    <configuration key="source-flavors">*/audio</configuration>
-    <configuration key="smil-flavor-subtype">smil</configuration>
-    <configuration key="reference-tracks-flavor">*/preview</configuration>
-    <configuration key="export-segments-duration">true</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: silence
+    description: Executing silence detection
+    configurations:
+      - source-flavors: '*/audio'
+      - smil-flavor-subtype: smil
+      - reference-tracks-flavor: '*/preview'
+      - export-segments-duration: true
 ```

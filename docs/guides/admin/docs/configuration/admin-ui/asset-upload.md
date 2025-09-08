@@ -65,18 +65,15 @@ download-source-flavors    | comma separated list | A convenience variable that 
 
 Example of variables in a workflow:
 
-```xml
-<!-- Tag any optionally uploaded assets -->
-<operation
-  id="tag"
-  if="${downloadSourceflavorsExist}"
-  exception-handler-workflow="partial-error"
-  description="Tagging uploaded assets for distribution">
-  <configurations>
-    <configuration key="source-flavors">${download-source-flavors}</configuration>
-    <configuration key="target-tags">+engage-download</configuration>
-  </configurations>
-</operation>
+```yaml
+  # Tag any optionally uploaded assets
+  - id: tag
+    if: ${downloadSourceflavorsExist}
+    exception-handler-workflow: partial-error
+    description: Tagging uploaded assets for distribution
+    configurations:
+      - source-flavors: ${download-source-flavors}
+      - target-tags: +engage-download
 ```
 
 How to Enable Preconfigured Asset Options
@@ -122,55 +119,37 @@ publish, and archive uploaded assets on existing events.
 
 Sample `publish-uploaded-assets` workflow:
 
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<definition xmlns="http://workflow.opencastproject.org">
-  <id>publish-uploaded-assets</id>
-  <title>Publish uploaded assets</title>
-  <tags />
-  <description>Publish uploaded assets</description>
-  <configuration_panel>
-  </configuration_panel>
+```yaml
+id: publish-uploaded-assets
+title: Publish uploaded assets
+description: |-
+  Publish uploaded assets
+operations:
+  # Publish to engage player
+  - id: publish-engage
+    exception-handler-workflow: partial-error
+    description: Update recording in Opencast Media Module
+    configurations:
+      - download-source-flavors:
+          ${download-source-flavors},dublincore/*,security/*
+      - download-source-tags: engage-download
+      - streaming-source-tags: engage-streaming
+      - strategy: merge
+      - check-availability: false
 
-  <operations>
-    <!-- Publish to engage player -->
+# Archive the current state of the mediapackage
+  - id: snapshot
+    description: Archiving new assets
+    configurations:
+      - source-flavors: '*/*'
 
-    <operation
-      id="publish-engage"
-      exception-handler-workflow="partial-error"
-      description="Update recording in Opencast Media Module">
-      <configurations>
-        <configuration key="download-source-flavors">${download-source-flavors},dublincore/*,security/*</configuration>
-        <configuration key="download-source-tags">engage-download</configuration>
-        <configuration key="streaming-source-tags">engage-streaming</configuration>
-        <configuration key="strategy">merge</configuration>
-        <configuration key="check-availability">false</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Archive the current state of the mediapackage -->
-
-    <operation
-      id="snapshot"
-      description="Archiving new assets">
-      <configurations>
-        <configuration key="source-flavors">*/*</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Clean up work artifacts -->
-
-    <operation
-        id="cleanup"
-        fail-on-error="false"
-        description="Remove temporary processing artifacts">
-      <configurations>
-        <configuration key="delete-external">true</configuration>
-        <configuration key="preserve-flavors">security/*</configuration>
-      </configurations>
-    </operation>
-  </operations>
-</definition>
+# Clean up work artifacts
+  - id: cleanup
+    fail-on-error: false
+    description: Remove temporary processing artifacts
+    configurations:
+      - delete-external: true
+      - preserve-flavors: security/*
 ```
 
 How to Upload Assets in the Admin UI

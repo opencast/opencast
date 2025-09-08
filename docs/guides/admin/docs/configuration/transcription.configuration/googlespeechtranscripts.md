@@ -180,83 +180,68 @@ published so that users can watch videos without having to wait for the transcri
 depends on your use case. The only requirement is to take a snapshot of the media package so that
 the second workflow can retrieve it from the archive to attach the caption/transcripts.
 
-```xml
-    <!--  Encode audio to flac -->
-    <operation
-      id="encode"
-      fail-on-error="true"
-      exception-handler-workflow="partial-error"
-      description="Extract audio for transcript generation">
-      <configurations>
-        <configuration key="source-flavor">*/source</configuration>
-        <configuration key="target-flavor">audio/flac</configuration>
-        <configuration key="target-tags">transcript</configuration>
-        <configuration key="encoding-profile">audio-flac</configuration>
-        <configuration key="process-first-match-only">true</configuration>
-      </configurations>
-    </operation> 
+```yaml
+  # Encode audio to flac
+  - id: encode
+    fail-on-error: true
+    exception-handler-workflow: partial-error
+    description: Extract audio for transcript generation
+    configurations:
+      - source-flavor: '*/source'
+      - target-flavor: audio/flac
+      - target-tags: transcript
+      - encoding-profile: audio-flac
+      - process-first-match-only: true
 
-    <!-- Start Google Speech transcription job -->
-    <operation
-      id="google-speech-start-transcription"
-      fail-on-error="true"
-      exception-handler-workflow="partial-error"
-      description="Start Google Speech transcription job">
-      <configurations>
-        <!--  Skip this operation if flavor already exists. Used for cases when mediapackage already has captions. -->
-        <configuration key="skip-if-flavor-exists">captions/timedtext</configuration>
-        <configuration key="language-code">en-US</configuration>
-        <!-- Audio to be translated, produced in the previous compose operation -->
-        <configuration key="source-tag">transcript</configuration>
-      </configurations>
-    </operation>
+  # Start Google Speech transcription job
+  - id: google-speech-start-transcription
+    fail-on-error: true
+    exception-handler-workflow: partial-error
+    description: Start Google Speech transcription job
+    configurations:
+      # Skip this operation if flavor already exists. Used for cases when mediapackage already has captions.
+      - skip-if-flavor-exists: captions/timedtext
+      - language-code: en-US
+      # Audio to be translated, produced in the previous compose operation
+      - source-tag: transcript
 
 
 ```
 ### Step 6: Create a workflow that will add the generated caption/transcript to the media package and republish it
 A sample one can be found in etc/workflows/google-speech-attach-transcripts.xml
 
-```xml
- <!-- Attach caption/transcript -->
+```yaml
+  # Attach caption/transcript
+  - id: google-speech-attach-transcription
+    fail-on-error: true
+    exception-handler-workflow: partial-error
+    description: Attach captions/transcription
+    configurations:
+      # This is filled out by the transcription service when starting this workflow
+      - transcription-job-id: ${transcriptionJobId}
+      - line-size: 80
+      - target-flavor: captions/timedtext
+      - target-tag: archive
+      - target-caption-format: vtt
 
-    <operation id="google-speech-attach-transcription"
-      fail-on-error="true"
-      exception-handler-workflow="partial-error" 
-      description="Attach captions/transcription">
-      <configurations>
-        <!-- This is filled out by the transcription service when starting this workflow -->
-        <configuration key="transcription-job-id">${transcriptionJobId}</configuration>
-        <configuration key="line-size">80</configuration>
-        <configuration key="target-flavor">captions/timedtext</configuration>
-        <configuration key="target-tag">archive</configuration>
-        <configuration key="target-caption-format">vtt</configuration>
-      </configurations>
-    </operation>
+  # Publish to engage player
+  - id: publish-engage
+    fail-on-error: true
+    exception-handler-workflow: partial-error
+    description: Distribute and publish to engage server
+    configurations:
+      - download-source-flavors: dublincore/*,security/*,captions/*
+      - strategy: merge
+      - check-availability: false
 
-    <!-- Publish to engage player -->
+  # Publish to oaipmh
+  - id: republish-oaipmh
+    exception-handler-workflow: partial-error
+    description: Update recording metadata in default OAI-PMH repository
+    configurations:
+      - source-flavors: dublincore/*,security/*,captions/*
+      - repository: default
 
-    <operation id="publish-engage"
-      fail-on-error="true"
-      exception-handler-workflow="partial-error"
-      description="Distribute and publish to engage server">
-      <configurations>
-        <configuration key="download-source-flavors">dublincore/*,security/*,captions/*</configuration>
-        <configuration key="strategy">merge</configuration>
-        <configuration key="check-availability">false</configuration>
-      </configurations>
-    </operation>
-
-    <!-- Publish to oaipmh -->
-
-    <operation
-      id="republish-oaipmh"
-      exception-handler-workflow="partial-error"
-      description="Update recording metadata in default OAI-PMH repository">
-      <configurations>
-        <configuration key="source-flavors">dublincore/*,security/*,captions/*</configuration>
-        <configuration key="repository">default</configuration>
-      </configurations>
-    </operation>
 
 ```
 Transcription delay before cancellation

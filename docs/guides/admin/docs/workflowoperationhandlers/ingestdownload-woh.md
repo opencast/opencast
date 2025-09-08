@@ -33,15 +33,12 @@ Parameter Table
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="ingest-download"
-    description="Downloads external artifacts to the working file repository">
-  <configurations>
-    <configuration key="delete-external">true</configuration>
-    <configuration key="source-flavors">dublincore/episode</configuration>
-    <configuration key="source-tags">archive</configuration>
-    <configuration key="tags-and-flavors">true</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: ingest-download
+    description: Downloads external artifacts to the working file repository
+    configurations:
+      - delete-external: true
+      - source-flavors: dublincore/episode
+      - source-tags: archive
+      - tags-and-flavors: true
 ```

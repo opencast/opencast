@@ -60,7 +60,7 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workflow.api.WorkflowServiceDatabaseImpl;
 import org.opencastproject.workflow.api.WorkflowStateListener;
-import org.opencastproject.workflow.api.XmlWorkflowParser;
+import org.opencastproject.workflow.api.YamlWorkflowParser;
 import org.opencastproject.workflow.impl.WorkflowServiceImpl.HandlerRegistration;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -185,8 +185,8 @@ public class CountWorkflowsTest {
 
     service.setServiceRegistry(serviceRegistry);
 
-    is = CountWorkflowsTest.class.getResourceAsStream("/workflow-definition-holdstate.xml");
-    def = XmlWorkflowParser.parseWorkflowDefinition(is);
+    is = CountWorkflowsTest.class.getResourceAsStream("/workflow-definition-holdstate.yaml");
+    def = YamlWorkflowParser.parseWorkflowDefinition(is);
     IOUtils.closeQuietly(is);
 
     serviceRegistry.registerService(service);

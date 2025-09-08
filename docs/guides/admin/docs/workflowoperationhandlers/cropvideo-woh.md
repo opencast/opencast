@@ -25,13 +25,10 @@ Parameter Table
 Example
 -------
 
-```xml
-<operation
-    id="crop-video"
-    description="Detecting black bars in presentation track">
-  <configurations>
-    <configuration key="source-flavor">*/source</configuration>
-    <configuration key="target-tags">engage-download</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: crop-video
+    description: Detecting black bars in presentation track
+    configurations:
+      - source-flavor: '*/source'
+      - target-tags: engage-download
 ```

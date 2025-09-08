@@ -30,12 +30,9 @@ Parameter Table
 Operation Example
 -----------------
 
-```xml
-<operation
-  id="metadata-to-acl"
-  description="Add read/write access for `publisher`">
-  <configurations>
-    <configuration key="field">publisher</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: metadata-to-acl
+    description: Add read/write access for `publisher`
+    configurations:
+      - field: publisher
 ```
