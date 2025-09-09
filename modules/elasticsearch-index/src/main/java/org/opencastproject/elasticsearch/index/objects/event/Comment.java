@@ -60,11 +60,11 @@ import javax.xml.stream.XMLStreamWriter;
  * Object wrapper for a recording comment.
  */
 @XmlType(
-        name = "comment",
-        namespace = IndexObject.INDEX_XML_NAMESPACE,
-        propOrder = {
-                "id", "reason", "text", "resolvedStatus"
-        }
+    name = "comment",
+    namespace = IndexObject.INDEX_XML_NAMESPACE,
+    propOrder = {
+        "id", "reason", "text", "resolvedStatus"
+    }
 )
 @XmlRootElement(name = "comment", namespace = IndexObject.INDEX_XML_NAMESPACE)
 @XmlAccessorType(XmlAccessType.NONE)

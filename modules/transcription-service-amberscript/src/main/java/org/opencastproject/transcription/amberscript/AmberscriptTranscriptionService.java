@@ -750,8 +750,9 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
               transcriptionDone(mpId, jobId);
               return true;
             default:
-              return false; // only here to obey checkstyle
+              break; //Checkstyles complains if we don't have a default case here
           }
+          return false; // but checkstyles complains that we fall through to the default below without something here
         default:
           String error = (String) jsonObject.get("error");
           String errorMessage = (String) jsonObject.get("errorMessage");

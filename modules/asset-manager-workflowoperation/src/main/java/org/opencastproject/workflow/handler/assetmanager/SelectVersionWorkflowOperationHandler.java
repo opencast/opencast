@@ -54,8 +54,13 @@ import java.util.List;
  * This operation should be the first one in a workflow executed from the archive because it REPLACES the media package
  * used by the current workflow.
  */
-@Component(immediate = true, service = WorkflowOperationHandler.class, property = {
-        "service.description=Selects a mp version from the archive", "workflow.operation=select-version" })
+@Component(
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Selects a mp version from the archive",
+        "workflow.operation=select-version"
+    })
 public class SelectVersionWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   private static final Logger logger = LoggerFactory.getLogger(SelectVersionWorkflowOperationHandler.class);

@@ -45,8 +45,8 @@ import javax.persistence.TemporalType;
 @Access(AccessType.FIELD)
 @Table(name = "oc_adopter_registration")
 @NamedQueries({
-        @NamedQuery(name = "Adopter.findAll", query = "SELECT f FROM Adopter f"),
-        @NamedQuery(name = "Adopter.deleteAll", query = "DELETE FROM Adopter f")
+    @NamedQuery(name = "Adopter.findAll", query = "SELECT f FROM Adopter f"),
+    @NamedQuery(name = "Adopter.deleteAll", query = "DELETE FROM Adopter f")
 })
 public class Adopter {
 

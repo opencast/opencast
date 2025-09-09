@@ -55,8 +55,8 @@ import java.util.Optional;
  */
 @Component(
     property = {
-    "service.description=HttpAssetProvider for the AssetManager",
-    "assetmanager.service.path=/assets"
+        "service.description=HttpAssetProvider for the AssetManager",
+        "assetmanager.service.path=/assets"
     },
     immediate = true,
     service = { HttpAssetProvider.class }

@@ -72,7 +72,7 @@ public class UrlSigningProviderImplTest {
     assertEquals(SIGNED_URL, result);
   }
 
-  private class TestRejectingSigningProvider implements UrlSigningProvider {
+  private final class TestRejectingSigningProvider implements UrlSigningProvider {
     @Override
     public boolean accepts(String baseUrl) {
       return false;
@@ -84,7 +84,7 @@ public class UrlSigningProviderImplTest {
     }
   }
 
-  private class TestAcceptingSigningProvider implements UrlSigningProvider {
+  private final class TestAcceptingSigningProvider implements UrlSigningProvider {
     @Override
     public boolean accepts(String baseUrl) {
       return true;

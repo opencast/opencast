@@ -175,18 +175,18 @@ public class LtiServiceRestEndpoint {
           )
       },
       responses = {
-        @RestResponse(
-            description = "A new event is created or the event is updated",
-            responseCode = HttpServletResponse.SC_OK
-        ),
-        @RestResponse(
-            description = "No authorization to create or update events",
-            responseCode = HttpServletResponse.SC_UNAUTHORIZED
-        ),
-        @RestResponse(
-            description = "The event to be updated wasn't found",
-            responseCode = HttpServletResponse.SC_NOT_FOUND
-        )
+          @RestResponse(
+              description = "A new event is created or the event is updated",
+              responseCode = HttpServletResponse.SC_OK
+          ),
+          @RestResponse(
+              description = "No authorization to create or update events",
+              responseCode = HttpServletResponse.SC_UNAUTHORIZED
+          ),
+          @RestResponse(
+              description = "The event to be updated wasn't found",
+              responseCode = HttpServletResponse.SC_NOT_FOUND
+          )
       }
   )
   public Response createNewEvent(@HeaderParam("Accept") String acceptHeader, @Context HttpServletRequest request) {

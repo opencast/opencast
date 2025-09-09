@@ -123,7 +123,7 @@ public class AttachmentImpl extends AbstractMediaPackageElement implements Attac
   /**
    * JAXB properties xml adapter class.
    */
-  private static class PropertiesXmlAdapter extends XmlAdapter<PropertiesAdapter, Map<String, String>> {
+  private static final class PropertiesXmlAdapter extends XmlAdapter<PropertiesAdapter, Map<String, String>> {
 
     @Override
     public Map<String, String> unmarshal(PropertiesAdapter pa) throws Exception {

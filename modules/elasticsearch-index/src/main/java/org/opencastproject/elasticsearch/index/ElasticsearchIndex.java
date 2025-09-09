@@ -74,10 +74,10 @@ import javax.xml.bind.Unmarshaller;
  * aggregated from multiple services.
  */
 @Component(
-        property = {
-                "service.description=Elasticsearch Index"
-        },
-        service = { ElasticsearchIndex.class }
+    property = {
+        "service.description=Elasticsearch Index"
+    },
+    service = { ElasticsearchIndex.class }
 )
 public class ElasticsearchIndex extends AbstractElasticsearchIndex {
 

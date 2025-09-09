@@ -75,7 +75,7 @@ public class RestDocsAnnotationTest {
   /**
    * This sample class simulates a annotated REST service class.
    */
-  private class TestServletSample {
+  private final class TestServletSample {
 
     @SuppressWarnings("unused")
     @RestQuery(

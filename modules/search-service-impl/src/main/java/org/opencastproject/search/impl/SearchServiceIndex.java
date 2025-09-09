@@ -107,8 +107,8 @@ import java.util.stream.Collectors;
         immediate = true,
         service = { SearchServiceIndex.class, IndexProducer.class },
         property = {
-                "service.description=Search Service Index",
-                "service.pid=org.opencastproject.search.impl.SearchServiceIndex"
+            "service.description=Search Service Index",
+            "service.pid=org.opencastproject.search.impl.SearchServiceIndex"
         }
 )
 public final class SearchServiceIndex extends AbstractIndexProducer implements IndexProducer {

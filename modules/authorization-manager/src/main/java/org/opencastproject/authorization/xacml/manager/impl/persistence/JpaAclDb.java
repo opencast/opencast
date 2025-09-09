@@ -45,11 +45,11 @@ import javax.persistence.RollbackException;
 
 /** JPA based impl of an {@link org.opencastproject.authorization.xacml.manager.impl.AclDb}. */
 @Component(
-        property = {
-                "service.description=JPA based ACL Provider"
-        },
-        immediate = true,
-        service = { AclDb.class }
+    property = {
+        "service.description=JPA based ACL Provider"
+    },
+    immediate = true,
+    service = { AclDb.class }
 )
 public final class JpaAclDb implements AclDb {
   private DBSessionFactory dbSessionFactory;

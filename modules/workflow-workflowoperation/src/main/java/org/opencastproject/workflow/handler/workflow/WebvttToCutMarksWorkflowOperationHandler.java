@@ -105,7 +105,7 @@ public class WebvttToCutMarksWorkflowOperationHandler extends AbstractWorkflowOp
 
   private static final Gson gson = new Gson();
 
-  private static class WFConfiguration {
+  private static final class WFConfiguration {
     protected long minTimeSilenceInMS;
     protected long bufferTime;
     protected MediaPackageElementFlavor sourceFlavor;
@@ -115,7 +115,7 @@ public class WebvttToCutMarksWorkflowOperationHandler extends AbstractWorkflowOp
     protected Treatment treatmentEnd;
   }
 
-  private static class Times {
+  private static final class Times {
     private Long begin;
     private Long duration;
   }

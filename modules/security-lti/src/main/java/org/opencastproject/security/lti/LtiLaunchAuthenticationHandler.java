@@ -69,11 +69,11 @@ import javax.persistence.RollbackException;
 import javax.servlet.http.HttpServletRequest;
 
 @Component(
-        property = {
-                "service.description=Lti User Login"
-        },
-        immediate = true,
-        service = { LtiLaunchAuthenticationHandler.class, OAuthAuthenticationHandler.class }
+    property = {
+        "service.description=Lti User Login"
+    },
+    immediate = true,
+    service = { LtiLaunchAuthenticationHandler.class, OAuthAuthenticationHandler.class }
 )
 
 /**

@@ -130,18 +130,18 @@ public class TimelinePreviewsRestEndpoint extends AbstractJobProducerEndpoint {
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "create", description = "Create preview images from the given track.",
           restParameters = {
-            @RestParameter(description = "The track to generate timeline preview images for.",
-                    isRequired = true, name = "track", type = RestParameter.Type.FILE),
-            @RestParameter(description = "The number of timeline preview images to generate.",
-                    isRequired = true, name = "imageCount", type = RestParameter.Type.INTEGER)
+              @RestParameter(description = "The track to generate timeline preview images for.",
+                  isRequired = true, name = "track", type = RestParameter.Type.FILE),
+              @RestParameter(description = "The number of timeline preview images to generate.",
+                  isRequired = true, name = "imageCount", type = RestParameter.Type.INTEGER)
           },
           responses = {
-            @RestResponse(description = "Timeline previews job successfully created",
-                    responseCode = HttpServletResponse.SC_OK),
-            @RestResponse(description = "The given track can't be parsed.",
-                    responseCode = HttpServletResponse.SC_BAD_REQUEST),
-            @RestResponse(description = "Internal server error.",
-                    responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+              @RestResponse(description = "Timeline previews job successfully created",
+                  responseCode = HttpServletResponse.SC_OK),
+              @RestResponse(description = "The given track can't be parsed.",
+                  responseCode = HttpServletResponse.SC_BAD_REQUEST),
+              @RestResponse(description = "Internal server error.",
+                  responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
           },
           returnDescription = "The job ID to use when polling for the resulting media package attachment, "
                   + "that contains the generated timeline preview images.")

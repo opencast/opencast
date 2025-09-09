@@ -89,8 +89,8 @@ import java.util.Optional;
 
 @Component(
     property = {
-    "service.description=Amazon S3 based asset store",
-    "store.type=aws-s3"
+        "service.description=Amazon S3 based asset store",
+        "store.type=aws-s3"
     },
     immediate = true,
     service = { RemoteAssetStore.class, AwsS3AssetStore.class }

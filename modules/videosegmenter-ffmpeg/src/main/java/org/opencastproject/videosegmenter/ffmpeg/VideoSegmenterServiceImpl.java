@@ -108,7 +108,7 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
     Segment
   };
 
-  private class Chapter {
+  private final class Chapter {
     protected double start;
     protected double end;
     protected Optional<String> title;

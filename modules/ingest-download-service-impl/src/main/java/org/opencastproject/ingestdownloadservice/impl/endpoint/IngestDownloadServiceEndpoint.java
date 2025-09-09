@@ -80,19 +80,21 @@ public class IngestDownloadServiceEndpoint extends AbstractJobProducerEndpoint {
   @Path("ingestdownload")
   @Produces(MediaType.TEXT_XML)
   @RestQuery(name = "ingestdownload",description = "Downloads mediapackage elements to workspace",
-          restParameters = { @RestParameter(description = "mediapackage as xml", isRequired = true, name = "mediapackage",
-                  type = RestParameter.Type.TEXT),
-          @RestParameter(description = "sourceFlavors as String seperated by , (presenter/source,presentation/source) ", isRequired = false, name = "sourceFlavors",
-          type = RestParameter.Type.STRING),
-          @RestParameter(description = "sourceTags as String seperated by , (archive,download)", isRequired = false, name = "sourceTags",
-          type = RestParameter.Type.STRING),
-          @RestParameter(description = "delete from external workingfile repository: Boolean true / false", isRequired = false, name = "deleteExternal",
-          type = RestParameter.Type.STRING),
-          @RestParameter(description = "select both tags and flavors: Boolean true / false", isRequired = false, name = "tagsAndFlavor",
-          type = RestParameter.Type.STRING),
+      restParameters = {
+          @RestParameter(description = "mediapackage as xml", isRequired = true, name = "mediapackage",
+              type = RestParameter.Type.TEXT),
+          @RestParameter(description = "sourceFlavors as String seperated by , (presenter/source,presentation/source) ",
+              isRequired = false, name = "sourceFlavors", type = RestParameter.Type.STRING),
+          @RestParameter(description = "sourceTags as String seperated by , (archive,download)",
+              isRequired = false, name = "sourceTags", type = RestParameter.Type.STRING),
+          @RestParameter(description = "delete from external workingfile repository: Boolean true / false",
+              isRequired = false, name = "deleteExternal", type = RestParameter.Type.STRING),
+          @RestParameter(description = "select both tags and flavors: Boolean true / false",
+              isRequired = false, name = "tagsAndFlavor", type = RestParameter.Type.STRING),
           },
-      responses =  {@RestResponse(description = "Mediapackage as xml", responseCode = HttpServletResponse.SC_OK)},
-          returnDescription = "Mediapackage as xml with element urls in workspace.")
+      responses =  {
+          @RestResponse(description = "Mediapackage as xml", responseCode = HttpServletResponse.SC_OK)
+      }, returnDescription = "Mediapackage as xml with element urls in workspace.")
   public Response ingestdownload(@FormParam("mediapackage") String mediapackageString,
           @FormParam("sourceFlavors") String sourceFlavors,
           @FormParam("sourceTags") String sourceTags,

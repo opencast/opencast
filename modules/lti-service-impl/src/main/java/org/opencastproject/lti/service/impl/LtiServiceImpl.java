@@ -333,9 +333,9 @@ public class LtiServiceImpl implements LtiService {
 
       if (accessControlList == null || accessControlList.getEntries().isEmpty()) {
         accessControlList = new AccessControlList(
-          new AccessControlEntry("ROLE_ADMIN", "write", true),
-          new AccessControlEntry("ROLE_ADMIN", "read", true),
-          new AccessControlEntry("ROLE_USER", "read", true));
+            new AccessControlEntry("ROLE_ADMIN", "write", true),
+            new AccessControlEntry("ROLE_ADMIN", "read", true),
+            new AccessControlEntry("ROLE_USER", "read", true));
       }
 
       this.authorizationService.setAcl(mediaPackage, AclScope.Episode, accessControlList);
