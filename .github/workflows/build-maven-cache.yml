@@ -41,7 +41,7 @@ jobs:
 
       - name: build opencast
         run: |
-          mvn clean install -Pdev \
+          ./mvnw clean install -Pdev \
             --batch-mode \
             -Dsurefire.rerunFailingTestsCount=2 \
             -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
