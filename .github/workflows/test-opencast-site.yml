@@ -67,17 +67,27 @@ jobs:
         run: |
           .github/check-jacoco-deps.sh
 
+      - name: build opencast, skipping tests which run during site
+        run: |
+          ./mvnw install -DskipTests -T1C -Pnone \
+            --batch-mode \
+            -Dcheckstyle.skip=true \
+            -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
+            -Dhttp.keepAlive=false \
+            -Dmaven.wagon.http.pool=false \
+            -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
+
         #This has to happen in a separate step or else various service classes aren't visible
       - name: build maven site
         run: |
-          mvn site -T1C -Pnone \
+          ./mvnw site -T1C -Pnone \
             --batch-mode \
             -Dsurefire.rerunFailingTestsCount=2 \
             -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
             -Dhttp.keepAlive=false \
             -Dmaven.wagon.http.pool=false \
             -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 && \
-          mvn site:stage -Pnone
+          ./mvnw site:stage -Pnone
 
       - name: Save site build
         uses: actions/upload-artifact@v4
