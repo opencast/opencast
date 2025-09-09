@@ -26,12 +26,9 @@ Tags and flavors can be used in combination.
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="defaults"
-    description="Applying default values">
-  <configurations>
-    <configuration key="key">hello world</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: defaults
+    description: Applying default values
+    configurations:
+      - key: hello world
 ```

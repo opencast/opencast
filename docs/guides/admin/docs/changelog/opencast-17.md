@@ -3,8 +3,61 @@ Opencast 17 Changelog
 
 Changes marked with \* were also included in 16.x.
 
+## Opencast 17.7 (2025-08-29)
+- [[#7002](https://github.com/opencast/opencast/pull/7002)] -
+  Update r/17.x Admin UI to 17.x-2025-08-29
+- [[#7001](https://github.com/opencast/opencast/pull/7001)] -
+  Update r/17.x Editor to 17.x-2025-08-28
+- [[#6996](https://github.com/opencast/opencast/pull/6996)] -
+  Split whispercpp args
+- [[#6973](https://github.com/opencast/opencast/pull/6973)] -
+  Fix missing `isPresent` check for optional workflow
+- [[#6980](https://github.com/opencast/opencast/pull/6980)] -
+  Fix javadoc build
+- [[#6983](https://github.com/opencast/opencast/pull/6983)] -
+  Ensure removing the correct reference
+- [[#6985](https://github.com/opencast/opencast/pull/6985)] -
+  Fix maven central publication
+- [[#6979](https://github.com/opencast/opencast/pull/6979)] -
+  Fix partial path traversal vulnerability in UI config
+- [[#6969](https://github.com/opencast/opencast/pull/6969)] -
+  Update Debian package docs
+- [[#6966](https://github.com/opencast/opencast/pull/6966)] -
+  Add option to pass additional args to WhisperCpp
+- [[#6965](https://github.com/opencast/opencast/pull/6965)] -
+  Remove reencoding to utf-8 of JWTs
+
+## Opencast 17.6 (2025-07-24)
+
+- [[#6890](https://github.com/opencast/opencast/pull/6890)] -
+  Trim plugin configuration data
+- [[#6892](https://github.com/opencast/opencast/pull/6892)] -
+  Fix incorrect media types in Tobira endpoint
+- [[#6898](https://github.com/opencast/opencast/pull/6898)] -
+  Fix subtitles when used in series that contain watermarks
+- [[#6921](https://github.com/opencast/opencast/pull/6921)] -
+  Watermarks must be specific filetypes
+- [[#6922](https://github.com/opencast/opencast/pull/6922)] -
+  Series list provider performance
+- [[#6884](https://github.com/opencast/opencast/pull/6884)] -
+  Allow to escape colons in workflow variable syntax
+- [[#6883](https://github.com/opencast/opencast/pull/6883)] -
+  Limit OpenMP Threads only for Tesseract
+- [[#6885](https://github.com/opencast/opencast/pull/6885)] -
+  Fix snapshot deletion for remote only MediaPackages
+- [[#6825](https://github.com/opencast/opencast/pull/6825)] -
+  HttpClient Timeouts in Stud.IP User Directory
+- [[#6831](https://github.com/opencast/opencast/pull/6831)] -
+  Accept AAI attribute values as list
+- [[#6837](https://github.com/opencast/opencast/pull/6837)] -
+  Fix changelog link in Github Release
+- [[#6839](https://github.com/opencast/opencast/pull/6839)] -
+  Update Java Version Support Documentation
+
 ## Opencast 17.5 (2025-06-27)
 
+- [[#6835](https://github.com/opencast/opencast/pull/6835)] -
+  Update r/17.x Admin UI to 17.x-2025-06-27
 - [[#6728](https://github.com/opencast/opencast/pull/6728)] -
   Allow to select three or more tracks
 - [[#6827](https://github.com/opencast/opencast/pull/6827)] -

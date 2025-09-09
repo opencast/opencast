@@ -223,16 +223,16 @@ public final class SchedulerUtil {
 
           boolean hasLanguageDefined = !DublinCore.LANGUAGE_UNDEFINED.equals(value.getLanguage());
 
-          if (hasLanguageDefined || value.getEncodingScheme().isSome()) {
+          if (hasLanguageDefined || value.getEncodingScheme().isPresent()) {
             sb.append(" (");
             if (hasLanguageDefined) {
               sb.append("lang:").append(value.getLanguage());
-              if (value.getEncodingScheme().isSome())
+              if (value.getEncodingScheme().isPresent())
                 sb.append("/");
             }
 
-            for (EName schema : value.getEncodingScheme()) {
-              sb.append(schema.getLocalName());
+            if (value.getEncodingScheme().isPresent()) {
+              sb.append(value.getEncodingScheme().get().getLocalName());
             }
             sb.append(")");
           }

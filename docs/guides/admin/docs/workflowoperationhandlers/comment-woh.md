@@ -31,27 +31,22 @@ Operation Example
 
 Create a comment:
 
-```xml
-<operation
-    id="comment"
-    description="Mark the recording for cutting">
-  <configurations>
-    <configuration key="action">create</configuration>
-    <configuration key="reason">EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.CUTTING</configuration>
-    <configuration key="description">Recording has not been cut yet.</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: comment
+    description: Mark the recording for cutting
+    configurations:
+      - action: create
+      - reason: EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.CUTTING
+      - description: Recording has not been cut yet.
 ```
 
 Resolve a comment:
 
-```xml
-<operation
-    id="comment"
-    description="Resolve the cutting flag">
-  <configurations>
-    <configuration key="action">resolve</configuration>
-    <configuration key="reason">EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.CUTTING</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: comment
+    description: Resolve the cutting flag
+    configurations:
+      - action: resolve
+      - reason: EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.CUTTING
+
 ```

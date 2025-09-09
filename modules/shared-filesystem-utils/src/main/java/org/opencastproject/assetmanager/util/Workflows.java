@@ -20,11 +20,8 @@
  */
 package org.opencastproject.assetmanager.util;
 
-import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
-
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
-import org.opencastproject.assetmanager.api.query.AQueryBuilder;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.workflow.api.ConfiguredWorkflow;
@@ -89,15 +86,11 @@ public class Workflows {
   }
 
   private List<Snapshot> findLatestSnapshots(String mpId) {
-    AQueryBuilder q = am.createQuery();
-    Iterable<Snapshot> snapshots = enrich(q.select(q.snapshot())
-        .where(q.mediaPackageId(mpId).and(q.version().isLatest())).run())
-        .getSnapshots();
-
-    List<Snapshot> result = new ArrayList<>();
-    for (Snapshot snapshot : snapshots) {
-      result.add(snapshot);
+    List<Snapshot> list = new ArrayList<>();
+    Optional<Snapshot> snapshot = am.getLatestSnapshot(mpId);
+    if (snapshot.isPresent()) {
+      list.add(snapshot.get());
     }
-    return result;
+    return list;
   }
 }

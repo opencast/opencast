@@ -24,8 +24,10 @@ package org.opencastproject.kernel.security;
 import static org.opencastproject.kernel.rest.CurrentJobFilter.CURRENT_JOB_HEADER;
 import static org.opencastproject.kernel.security.DelegatingAuthenticationEntryPoint.DIGEST_AUTH;
 import static org.opencastproject.kernel.security.DelegatingAuthenticationEntryPoint.REQUESTED_AUTH_HEADER;
+import static org.opencastproject.util.data.Collections.set;
 
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClient;
@@ -34,7 +36,9 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.urlsigning.exception.UrlSigningException;
 import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.security.util.HttpResponseWrapper;
+import org.opencastproject.serviceregistry.api.HostRegistration;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.urlsigning.utils.ResourceRequestUtil;
 
 import org.apache.commons.lang3.StringUtils;
@@ -68,9 +72,13 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.lang.management.ManagementFactory;
+import java.net.URI;
+import java.util.Collection;
 import java.util.Map;
 import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -172,8 +180,15 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
   /** The security service */
   protected SecurityService securityService = null;
 
+  /** The organization directory service */
+  protected OrganizationDirectoryService organizationDirectoryService = null;
+
   /** The url signing service */
   protected UrlSigningService urlSigningService = null;
+
+  /** A regularly emptying cache of hosts in the cluster */
+  private HostCache hosts = null;
+
 
   @Activate
   public void activate(ComponentContext cc) {
@@ -210,6 +225,13 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
     logger.debug("Expire signed URLs in {} seconds.", signedUrlExpiresDuration);
   }
 
+  private HostCache getHostCache() {
+    if (null == hosts) {
+      hosts = new HostCache(60000, this.organizationDirectoryService, this.serviceRegistry);
+    }
+    return hosts;
+  }
+
   /**
    * Sets the service registry.
    *
@@ -231,7 +253,9 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
    *         the serviceRegistry to unset (unused, but needed for OSGI)
    */
   public void unsetServiceRegistry(ServiceRegistry serviceRegistry) {
-    this.serviceRegistry = null;
+    if (this.serviceRegistry == serviceRegistry) {
+      this.serviceRegistry = null;
+    }
   }
 
   /**
@@ -243,6 +267,17 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
   @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
+  }
+
+  /**
+   * Sets the organization directory service.
+   *
+   * @param organizationDirectoryService
+   *         the organization directory service
+   */
+  @Reference
+  public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
+    this.organizationDirectoryService = organizationDirectoryService;
   }
 
   /**
@@ -323,6 +358,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
   }
 
   public TrustedHttpClientImpl() {
+
   }
 
   public TrustedHttpClientImpl(String user, String pass) {
@@ -351,11 +387,15 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
   @Override
   public HttpResponse execute(HttpUriRequest httpUriRequest, int connectionTimeout, int socketTimeout)
           throws TrustedHttpClientException {
-    // Add the request header to elicit a digest auth response
-    httpUriRequest.setHeader(REQUESTED_AUTH_HEADER, DIGEST_AUTH);
-
     if (serviceRegistry != null && serviceRegistry.getCurrentJob() != null) {
       httpUriRequest.setHeader(CURRENT_JOB_HEADER, Long.toString(serviceRegistry.getCurrentJob().getId()));
+    }
+
+    boolean enableDigest = getHostCache().contains(httpUriRequest.getURI().getHost());
+    logger.debug("Digest auth enabled for this request: " + enableDigest);
+    if (enableDigest) {
+      // Add the request header to elicit a digest auth response
+      httpUriRequest.setHeader(REQUESTED_AUTH_HEADER, DIGEST_AUTH);
     }
 
     // If a security service has been set, use it to pass the current security context on
@@ -364,19 +404,24 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
     if (organization != null) {
       httpUriRequest.setHeader(SecurityConstants.ORGANIZATION_HEADER, organization.getId());
       final User currentUser = securityService.getUser();
-      if (currentUser != null) {
+      if (enableDigest && currentUser != null) {
         httpUriRequest.setHeader(SecurityConstants.USER_HEADER, currentUser.getUsername());
       }
     }
 
     final HttpClientBuilder clientBuilder = makeHttpClientBuilder(connectionTimeout, socketTimeout);
     if ("GET".equalsIgnoreCase(httpUriRequest.getMethod()) || "HEAD".equalsIgnoreCase(httpUriRequest.getMethod())) {
-      // Set the user/pass
-      CredentialsProvider provider = new BasicCredentialsProvider();
-      provider.setCredentials(
-          new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM, AuthSchemes.DIGEST),
-          new UsernamePasswordCredentials(user, pass));
-      final CloseableHttpClient httpClient = clientBuilder.setDefaultCredentialsProvider(provider).build();
+      final CloseableHttpClient httpClient;
+      if (enableDigest) {
+        // Set the user/pass
+        CredentialsProvider provider = new BasicCredentialsProvider();
+        provider.setCredentials(
+            new AuthScope(AuthScope.ANY_HOST, AuthScope.ANY_PORT, AuthScope.ANY_REALM, AuthSchemes.DIGEST),
+            new UsernamePasswordCredentials(user, pass));
+        httpClient = clientBuilder.setDefaultCredentialsProvider(provider).build();
+      } else {
+        httpClient = clientBuilder.build();
+      }
       // Run the request (the http client handles the multiple back-and-forth requests)
       try {
         httpUriRequest = getSignedUrl(httpUriRequest);
@@ -391,7 +436,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
         }
         throw new TrustedHttpClientException(e);
       }
-    } else {
+    } else if (enableDigest) {
       final CloseableHttpClient httpClient = clientBuilder.build();
       // HttpClient doesn't handle the request dynamics for other verbs (especially when sending a streamed multipart
       // request), so we need to handle the details of the digest auth back-and-forth manually
@@ -410,6 +455,21 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
         if (response != null) {
           responseMap.remove(response);
         }
+        // close the http connection(s)
+        try {
+          httpClient.close();
+        } catch (IOException ioException) {
+          throw new TrustedHttpClientException(e);
+        }
+        throw new TrustedHttpClientException(e);
+      }
+    } else {
+      final CloseableHttpClient httpClient = clientBuilder.build();
+      HttpResponse response = null;
+      try {
+        response = httpClient.execute(httpUriRequest);
+        return response;
+      } catch (Exception e) {
         // close the http connection(s)
         try {
           httpClient.close();
@@ -641,4 +701,63 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
     return retryMaximumVariableTime;
   }
 
+  /**
+   * Very simple cache that does a <em>complete</em> refresh after a given interval. This type of cache is only suitable
+   * for small sets.
+   */
+  private static final class HostCache {
+    private final Object lock = new Object();
+
+    // A simple hash map is sufficient here.
+    // No need to deal with soft references or an LRU map since the number of organizations
+    // will be quite low.
+    private final Set<String> hosts = set();
+    private final long refreshInterval;
+    private long lastRefresh;
+
+    private final OrganizationDirectoryService organizationDirectoryService;
+    private final ServiceRegistry serviceRegistry;
+
+    HostCache(long refreshInterval, OrganizationDirectoryService orgDirSrv, ServiceRegistry serviceReg) {
+      this.refreshInterval = refreshInterval;
+      this.organizationDirectoryService = orgDirSrv;
+      this.serviceRegistry = serviceReg;
+      invalidate();
+    }
+
+    public boolean contains(String host) {
+      synchronized (lock) {
+        try {
+          refresh();
+        } catch (ServiceRegistryException e) {
+          logger.error("Unable to update host cache due to service registry exception!", e);
+        }
+        return hosts.contains(host);
+      }
+    }
+    public void invalidate() {
+      this.lastRefresh = System.currentTimeMillis() - 2 * refreshInterval;
+    }
+
+    private void refresh() throws ServiceRegistryException {
+      final long now = System.currentTimeMillis();
+      if (now - lastRefresh > refreshInterval) {
+        hosts.clear();
+        //The hosts from the SR come back as protocol://hostname:port, use the URI class to get just the host
+        hosts.addAll(serviceRegistry.getHostRegistrations().stream()
+            .map(HostRegistration::getBaseUrl)
+            .map(URI::create)
+            .map(URI::getHost)
+            .collect(Collectors.toSet()));
+        //This is the *org's* server urls, as defined by in the org config with
+        // something like prop.org.opencastproject.host.$SERVER_URL=$TENANT_URL
+        // You're getting just the hostname of the tenant URL
+        hosts.addAll(organizationDirectoryService.getOrganizations().stream()
+            .map(Organization::getServers)
+            .map(Map::keySet)
+            .flatMap(Collection::stream).collect(Collectors.toSet()));
+        lastRefresh = now;
+      }
+    }
+  }
 }

@@ -22,12 +22,9 @@ Parameter Table
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="snapshot"
-    description="Archiving">
-  <configurations>
-    <configuration key="source-tags">archive</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: snapshot
+    description: Archiving
+    configurations:
+      - source-tags: archive
 ```

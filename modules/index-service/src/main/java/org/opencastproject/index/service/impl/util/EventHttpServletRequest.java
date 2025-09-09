@@ -39,8 +39,6 @@ import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.util.NotFoundException;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
@@ -62,6 +60,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
@@ -75,58 +74,58 @@ public class EventHttpServletRequest {
   private static final String METADATA_JSON_KEY = "metadata";
   private static final String ROLE_JSON_KEY = "role";
 
-  private Opt<AccessControlList> acl = Opt.none();
-  private Opt<MediaPackage> mediaPackage = Opt.none();
-  private Opt<MetadataList> metadataList = Opt.none();
-  private Opt<JSONObject> processing = Opt.none();
-  private Opt<JSONObject> source = Opt.none();
-  private Opt<JSONObject> scheduling = Opt.none();
+  private Optional<AccessControlList> acl = Optional.empty();
+  private Optional<MediaPackage> mediaPackage = Optional.empty();
+  private Optional<MetadataList> metadataList = Optional.empty();
+  private Optional<JSONObject> processing = Optional.empty();
+  private Optional<JSONObject> source = Optional.empty();
+  private Optional<JSONObject> scheduling = Optional.empty();
 
   public void setAcl(AccessControlList acl) {
-    this.acl = Opt.some(acl);
+    this.acl = Optional.of(acl);
   }
 
   public void setMediaPackage(MediaPackage mediaPackage) {
-    this.mediaPackage = Opt.some(mediaPackage);
+    this.mediaPackage = Optional.of(mediaPackage);
   }
 
   public void setMetadataList(MetadataList metadataList) {
-    this.metadataList = Opt.some(metadataList);
+    this.metadataList = Optional.of(metadataList);
   }
 
   public void setProcessing(JSONObject processing) {
-    this.processing = Opt.some(processing);
+    this.processing = Optional.of(processing);
   }
 
   public void setScheduling(JSONObject scheduling) {
-    this.scheduling = Opt.some(scheduling);
+    this.scheduling = Optional.of(scheduling);
   }
 
   public void setSource(JSONObject source) {
-    this.source = Opt.some(source);
+    this.source = Optional.of(source);
   }
 
-  public Opt<AccessControlList> getAcl() {
+  public Optional<AccessControlList> getAcl() {
     return acl;
   }
 
-  public Opt<MediaPackage> getMediaPackage() {
+  public Optional<MediaPackage> getMediaPackage() {
     return mediaPackage;
   }
 
-  public Opt<MetadataList> getMetadataList() {
+  public Optional<MetadataList> getMetadataList() {
     return metadataList;
   }
 
-  public Opt<JSONObject> getProcessing() {
+  public Optional<JSONObject> getProcessing() {
     return processing;
   }
 
-  public Opt<JSONObject> getScheduling() {
+  public Optional<JSONObject> getScheduling() {
     return scheduling;
   }
 
-  public Opt<JSONObject> getSource() {
+  public Optional<JSONObject> getSource() {
     return source;
   }
 
@@ -160,7 +159,7 @@ public class EventHttpServletRequest {
     try {
       if (ServletFileUpload.isMultipartContent(request)) {
         eventHttpServletRequest.setMediaPackage(ingestService.createMediaPackage());
-        if (eventHttpServletRequest.getMediaPackage().isNone()) {
+        if (eventHttpServletRequest.getMediaPackage().isEmpty()) {
           throw new IndexServiceException("Unable to create a new mediapackage to store the new event's media.");
         }
 

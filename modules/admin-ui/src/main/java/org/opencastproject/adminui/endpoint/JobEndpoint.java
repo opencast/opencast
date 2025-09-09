@@ -20,11 +20,8 @@
  */
 package org.opencastproject.adminui.endpoint;
 
-import static com.entwinemedia.fn.Stream.$;
-import static com.entwinemedia.fn.data.json.Jsons.arr;
-import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.obj;
-import static com.entwinemedia.fn.data.json.Jsons.v;
+import static org.opencastproject.index.service.util.JSONUtils.mapToJsonObject;
+import static org.opencastproject.index.service.util.JSONUtils.safeString;
 import static org.opencastproject.util.DateTimeSupport.toUTC;
 
 import org.opencastproject.adminui.exception.JobEndpointException;
@@ -53,12 +50,8 @@ import org.opencastproject.util.requests.SortCriterion;
 import org.opencastproject.util.requests.SortCriterion.Order;
 import org.opencastproject.workflow.api.WorkflowService;
 
-import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.Stream;
-import com.entwinemedia.fn.data.json.JObject;
-import com.entwinemedia.fn.data.json.JValue;
-import com.entwinemedia.fn.data.json.Jsons;
-import com.entwinemedia.fn.data.json.SimpleSerializer;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
@@ -72,7 +65,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
@@ -107,8 +99,6 @@ import javax.ws.rs.core.Response;
 public class JobEndpoint {
 
   private static final Logger logger = LoggerFactory.getLogger(JobEndpoint.class);
-  private static final SimpleSerializer serializer = new SimpleSerializer();
-
   public static final Response NOT_FOUND = Response.status(Response.Status.NOT_FOUND).build();
 
   private enum JobSort {
@@ -244,7 +234,7 @@ public class JobEndpoint {
 
     JobComparator comparator = new JobComparator(sortKey, ascending);
     Collections.sort(jobs, comparator);
-    List<JValue> json = getJobsAsJSON(new SmartIterator(
+    List<JsonObject> json = getJobsAsJSON(new SmartIterator(
             query.getLimit().getOrElse(0),
             query.getOffset().getOrElse(0))
             .applyLimitAndOffset(jobs));
@@ -272,37 +262,24 @@ public class JobEndpoint {
     }
   }
 
-  public List<JValue> getJobsAsJSON(List<JobExtended> jobs) {
-    List<JValue> jsonList = new ArrayList<>();
+  public List<JsonObject> getJobsAsJSON(List<JobExtended> jobs) {
+    List<JsonObject> jsonList = new ArrayList<>();
     for (JobExtended jobEx : jobs) {
       Job job = jobEx.getJob();
-      long id = job.getId();
-      String jobType = job.getJobType();
-      String operation = job.getOperation();
-      Job.Status status = job.getStatus();
-      Date dateCreated = job.getDateCreated();
-      String created = null;
-      if (dateCreated != null)
-        created = DateTimeSupport.toUTC(dateCreated.getTime());
-      Date dateStarted = job.getDateStarted();
-      String started = null;
-      if (dateStarted != null)
-        started = DateTimeSupport.toUTC(dateStarted.getTime());
-      String creator = job.getCreator();
-      String processingHost = job.getProcessingHost();
-      String processingNode = jobEx.getNodeName();
 
-      jsonList.add(obj(f("id", v(id)),
-              f("type", v(jobType)),
-              f("operation", v(operation)),
-              f("status", v(JOB_STATUS_TRANSLATION_PREFIX + status.toString())),
-              f("submitted", v(created, Jsons.BLANK)),
-              f("started", v(started, Jsons.BLANK)),
-              f("creator", v(creator, Jsons.BLANK)),
-              f("processingHost", v(processingHost, Jsons.BLANK)),
-              f("processingNode", v(processingNode, Jsons.BLANK))));
+      JsonObject jobJson = new JsonObject();
+      jobJson.addProperty("id", job.getId());
+      jobJson.addProperty("type", job.getJobType());
+      jobJson.addProperty("operation", job.getOperation());
+      jobJson.addProperty("status", JOB_STATUS_TRANSLATION_PREFIX + job.getStatus().toString());
+      jobJson.addProperty("submitted", job.getDateCreated() != null ? DateTimeSupport.toUTC(job.getDateCreated().getTime()) : "");
+      jobJson.addProperty("started", job.getDateStarted() != null ? DateTimeSupport.toUTC(job.getDateStarted().getTime()) : "");
+      jobJson.addProperty("creator", safeString(job.getCreator()));
+      jobJson.addProperty("processingHost", safeString(job.getProcessingHost()));
+      jobJson.addProperty("processingNode", safeString(jobEx.getNodeName()));
+
+      jsonList.add(jobJson);
     }
-
     return jsonList;
   }
 
@@ -319,25 +296,36 @@ public class JobEndpoint {
    * @throws JobEndpointException
    * @throws NotFoundException
    */
-  public JValue getIncidentsAsJSON(long jobId, final Locale locale, boolean cascade)
-          throws JobEndpointException, NotFoundException {
+
+  public JsonArray getIncidentsAsJSON(long jobId, final Locale locale, boolean cascade)
+      throws JobEndpointException, NotFoundException {
     final List<Incident> incidents;
     try {
       final IncidentTree it = incidentService.getIncidentsOfJob(jobId, cascade);
       incidents = cascade ? flatten(it) : it.getIncidents();
     } catch (IncidentServiceException e) {
       throw new JobEndpointException(String.format(
-              "Not able to get the incidents for the job %d from the incident service : %s", jobId, e), e.getCause());
+          "Not able to get the incidents for the job %d from the incident service : %s", jobId, e), e.getCause());
     }
-    final Stream<JValue> json = $(incidents).map(new Fn<Incident, JValue>() {
-      @Override
-      public JValue apply(Incident i) {
-        return obj(f("id", v(i.getId())), f("severity", v(i.getSeverity(), Jsons.BLANK)),
-                f("timestamp", v(toUTC(i.getTimestamp().getTime()), Jsons.BLANK))).merge(
-                localizeIncident(i, locale));
+
+    JsonArray resultArray = new JsonArray();
+    for (Incident i : incidents) {
+      JsonObject incidentJson = new JsonObject();
+
+      incidentJson.addProperty("id", i.getId());
+      incidentJson.addProperty("severity", safeString(i.getSeverity()));
+      incidentJson.addProperty("timestamp", safeString(toUTC(i.getTimestamp().getTime())));
+
+      // Merge localized fields
+      JsonObject localized = localizeIncident(i, locale);
+      for (String key : localized.keySet()) {
+        incidentJson.add(key, localized.get(key));
       }
-    });
-    return arr(json);
+
+      resultArray.add(incidentJson);
+    }
+
+    return resultArray;
   }
 
   /**
@@ -363,13 +351,19 @@ public class JobEndpoint {
    *          the locale to be used to create title and description
    * @return JSON object
    */
-  private JObject localizeIncident(Incident incident, Locale locale) {
+  private JsonObject localizeIncident(Incident incident, Locale locale) {
+    JsonObject localized = new JsonObject();
+
     try {
-      final IncidentL10n loc = incidentService.getLocalization(incident.getId(), locale);
-      return obj(f("title", v(loc.getTitle(), Jsons.BLANK)), f("description", v(loc.getDescription(), Jsons.BLANK)));
+      IncidentL10n loc = incidentService.getLocalization(incident.getId(), locale);
+      localized.addProperty("title", safeString(loc.getTitle()));
+      localized.addProperty("description", safeString(loc.getDescription()));
     } catch (Exception e) {
-      return obj(f("title", v("")), f("description", v("")));
+      localized.addProperty("title", "");
+      localized.addProperty("description", "");
     }
+
+    return localized;
   }
 
   /**
@@ -381,28 +375,51 @@ public class JobEndpoint {
    *          the locale to be used to create title and description
    * @return JSON object
    */
-  public JValue getIncidentAsJSON(long id, Locale locale) throws JobEndpointException, NotFoundException {
+  public JsonObject getIncidentAsJSON(long id, Locale locale) throws JobEndpointException, NotFoundException {
     final Incident incident;
     try {
       incident = incidentService.getIncident(id);
     } catch (IncidentServiceException e) {
       throw new JobEndpointException(String.format("Not able to get the incident %d: %s", id, e), e.getCause());
     }
-    return obj(f("id", v(incident.getId(), Jsons.BLANK)), f("job_id", v(incident.getJobId(), Jsons.BLANK)),
-            f("severity", v(incident.getSeverity(), Jsons.BLANK)),
-            f("timestamp", v(toUTC(incident.getTimestamp().getTime()), Jsons.BLANK)),
-            f("processing_host", v(incident.getProcessingHost(), Jsons.BLANK)), f("service_type", v(incident.getServiceType(), Jsons.BLANK)),
-            f("technical_details", v(incident.getDescriptionParameters(), Jsons.BLANK)),
-            f("details", arr($(incident.getDetails()).map(errorDetailToJson))))
-      .merge(localizeIncident(incident, locale));
+
+    Long rootJobId = null;
+    try {
+      Job job = serviceRegistry.getJob(incident.getJobId());
+      rootJobId = job.getRootJobId();
+    } catch (ServiceRegistryException e) {
+      logger.info("Could not find job \"{}\" in service registry", incident.getJobId());
+    }
+
+    JsonObject json = new JsonObject();
+    json.addProperty("id", incident.getId());
+    json.addProperty("job_id", incident.getJobId());
+    json.addProperty("root_job_id", safeString(rootJobId));
+    json.addProperty("severity", safeString(incident.getSeverity().toString()));
+    json.addProperty("timestamp", toUTC(incident.getTimestamp().getTime()));
+    json.addProperty("processing_host", safeString(incident.getProcessingHost()));
+    json.addProperty("service_type", safeString(incident.getServiceType()));
+    json.add("technical_details", mapToJsonObject(incident.getDescriptionParameters()));
+
+    JsonArray detailsArray = new JsonArray();
+    for (Tuple<String, String> detail : incident.getDetails()) {
+      detailsArray.add(errorDetailToJson(detail));
+    }
+    json.add("details", detailsArray);
+
+    JsonObject localized = localizeIncident(incident, locale);
+    json.add("title", localized.get("title"));
+    json.add("description", localized.get("description"));
+
+    return json;
   }
 
-  private final Fn<Tuple<String, String>, JObject> errorDetailToJson = new Fn<Tuple<String, String>, JObject>() {
-    @Override
-    public JObject apply(Tuple<String, String> detail) {
-      return obj(f("name", v(detail.getA(), Jsons.BLANK)), f("value", v(detail.getB(), Jsons.BLANK)));
-    }
-  };
+  public JsonObject errorDetailToJson(Tuple<String, String> detail) {
+    JsonObject json = new JsonObject();
+    json.addProperty("name", safeString(detail.getA()));
+    json.addProperty("value", safeString(detail.getB()));
+    return json;
+  }
 
   private class JobComparator implements Comparator<JobExtended> {
 

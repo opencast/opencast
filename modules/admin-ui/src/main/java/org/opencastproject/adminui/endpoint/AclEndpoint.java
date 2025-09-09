@@ -21,10 +21,6 @@
 
 package org.opencastproject.adminui.endpoint;
 
-import static com.entwinemedia.fn.data.json.Jsons.arr;
-import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.obj;
-import static com.entwinemedia.fn.data.json.Jsons.v;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_CONFLICT;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
@@ -65,13 +61,8 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.util.requests.SortCriterion;
 import org.opencastproject.util.requests.SortCriterion.Order;
 
-import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.Stream;
-import com.entwinemedia.fn.StreamOp;
-import com.entwinemedia.fn.data.Opt;
-import com.entwinemedia.fn.data.json.Field;
-import com.entwinemedia.fn.data.json.JObject;
-import com.entwinemedia.fn.data.json.JValue;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -193,7 +184,7 @@ public class AclEndpoint {
           @QueryParam("offset") int offset, @QueryParam("limit") int limit) throws IOException {
     if (limit < 1)
       limit = 100;
-    Opt<String> optSort = Opt.nul(trimToNull(sort));
+    Optional<String> optSort = Optional.ofNullable(trimToNull(sort));
     Option<String> filterName = Option.none();
     Option<String> filterText = Option.none();
 
@@ -220,7 +211,7 @@ public class AclEndpoint {
     int total = filteredAcls.size();
 
     // Sort by name, description or role
-    if (optSort.isSome()) {
+    if (optSort.isPresent()) {
       final ArrayList<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
       Collections.sort(filteredAcls, new Comparator<ManagedAcl>() {
         @Override
@@ -242,10 +233,18 @@ public class AclEndpoint {
       });
     }
 
+    int start = Math.min(offset, filteredAcls.size());
+    int end = Math.min(start + limit, filteredAcls.size());
+
     // Apply Limit and offset
-    List<JValue> aclJSON = Stream.$(filteredAcls).drop(offset)
-            .apply(limit > 0 ? StreamOp.<ManagedAcl> id().take(limit) : StreamOp.<ManagedAcl> id()).map(fullManagedAcl)
-            .toList();
+    List<ManagedAcl> subList = filteredAcls.subList(start, end);
+
+    // Convert each ManagedAcl to JsonObject using a helper method
+    List<JsonObject> aclJSON = new ArrayList<>();
+    for (ManagedAcl acl : subList) {
+      aclJSON.add(full(acl));
+    }
+
     return okJsonList(aclJSON, offset, limit, total);
   }
 
@@ -332,7 +331,7 @@ public class AclEndpoint {
           @RestResponse(responseCode = SC_CONFLICT, description = "An ACL with the same name already exists"),
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "Unable to parse the ACL") })
   public Response createAcl(@FormParam("name") String name, @FormParam("acl") String accessControlList) {
-    final AccessControlList acl = parseAcl.apply(accessControlList);
+    final AccessControlList acl = parseAcl(accessControlList);
     Optional<ManagedAcl> managedAcl = aclService().createAcl(acl, name);
     if (managedAcl.isEmpty()) {
       logger.info("An ACL with the same name '{}' already exists", name);
@@ -353,7 +352,7 @@ public class AclEndpoint {
   public Response updateAcl(@PathParam("id") long aclId, @FormParam("name") String name,
           @FormParam("acl") String accessControlList) throws NotFoundException {
     final Organization org = securityService.getOrganization();
-    final AccessControlList acl = parseAcl.apply(accessControlList);
+    final AccessControlList acl = parseAcl(accessControlList);
     final ManagedAclImpl managedAcl = new ManagedAclImpl(aclId, name, org.getId(), acl);
     if (!aclService().updateAcl(managedAcl)) {
       logger.info("No ACL with id '{}' could be found under organization '{}'", aclId, org.getId());
@@ -377,49 +376,50 @@ public class AclEndpoint {
     throw new NotFoundException();
   }
 
-  private static final Fn<String, AccessControlList> parseAcl = new Fn<String, AccessControlList>() {
-    @Override
-    public AccessControlList apply(String acl) {
-      try {
-        return AccessControlParser.parseAcl(acl);
-      } catch (Exception e) {
-        logger.warn("Unable to parse ACL");
-        throw new WebApplicationException(Response.Status.BAD_REQUEST);
+  private static AccessControlList parseAcl(String acl) {
+    try {
+      return AccessControlParser.parseAcl(acl);
+    } catch (Exception e) {
+      logger.warn("Unable to parse ACL", e);
+      throw new WebApplicationException(Response.Status.BAD_REQUEST);
+    }
+  }
+
+  public JsonObject full(AccessControlEntry ace) {
+    JsonObject json = new JsonObject();
+    json.addProperty(JsonConv.KEY_ROLE, ace.getRole());
+    json.addProperty(JsonConv.KEY_ACTION, ace.getAction());
+    json.addProperty(JsonConv.KEY_ALLOW, ace.isAllow());
+    return json;
+  }
+
+  private JsonObject fullAccessControlEntry(AccessControlEntry ace) {
+    return full(ace);
+  }
+
+  public JsonObject full(AccessControlList acl) {
+    JsonObject json = new JsonObject();
+    JsonArray aceArray = new JsonArray();
+
+    List<AccessControlEntry> entries = acl.getEntries();
+    if (entries != null) {
+      for (AccessControlEntry entry : entries) {
+        aceArray.add(fullAccessControlEntry(entry));
       }
     }
-  };
 
-  public JObject full(AccessControlEntry ace) {
-    return obj(f(JsonConv.KEY_ROLE, v(ace.getRole())), f(JsonConv.KEY_ACTION, v(ace.getAction())),
-            f(JsonConv.KEY_ALLOW, v(ace.isAllow())));
+    json.add(JsonConv.KEY_ACE, aceArray);
+    return json;
   }
 
-  private final Fn<AccessControlEntry, JValue> fullAccessControlEntry = new Fn<AccessControlEntry, JValue>() {
-    @Override
-    public JValue apply(AccessControlEntry ace) {
-      return full(ace);
-    }
-  };
-
-  public JObject full(AccessControlList acl) {
-    return obj(f(JsonConv.KEY_ACE, arr(Stream.$(acl.getEntries()).map(fullAccessControlEntry))));
+  public JsonObject full(ManagedAcl acl) {
+    JsonObject json = new JsonObject();
+    json.addProperty(JsonConv.KEY_ID, acl.getId());
+    json.addProperty(JsonConv.KEY_NAME, acl.getName());
+    json.addProperty(JsonConv.KEY_ORGANIZATION_ID, acl.getOrganizationId());
+    json.add("acl", full(acl.getAcl()));
+    return json;
   }
-
-  public JObject full(ManagedAcl acl) {
-    List<Field> fields = new ArrayList<>();
-    fields.add(f(JsonConv.KEY_ID, v(acl.getId())));
-    fields.add(f(JsonConv.KEY_NAME, v(acl.getName())));
-    fields.add(f(JsonConv.KEY_ORGANIZATION_ID, v(acl.getOrganizationId())));
-    fields.add(f(JsonConv.KEY_ACL, full(acl.getAcl())));
-    return obj(fields);
-  }
-
-  private final Fn<ManagedAcl, JValue> fullManagedAcl = new Fn<ManagedAcl, JValue>() {
-    @Override
-    public JValue apply(ManagedAcl acl) {
-      return full(acl);
-    }
-  };
 
   public Map<String, Object> generateJsonUser(User user) {
     // Prepare the roles

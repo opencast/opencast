@@ -331,6 +331,7 @@
 
     <!-- Enable access to the Tobira module -->
     <sec:intercept-url pattern="/tobira/version" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/tobira/callback/*" method="GET" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/tobira/**" access="ROLE_ADMIN" />
 
     <!-- Enable anonymous access to the annotation and the series endpoints -->

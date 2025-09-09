@@ -22,9 +22,8 @@
 package org.opencastproject.workflow.handler.assetmanager;
 
 import org.opencastproject.assetmanager.api.AssetManager;
+import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Version;
-import org.opencastproject.assetmanager.api.query.AQueryBuilder;
-import org.opencastproject.assetmanager.api.query.ARecord;
 import org.opencastproject.assetmanager.impl.AssetManagerJobProducer;
 import org.opencastproject.assetmanager.impl.VersionImpl;
 import org.opencastproject.job.api.Job;
@@ -130,12 +129,9 @@ public class AssetManagerStorageMoveOperationHandler extends AbstractWorkflowOpe
   }
 
   private Version getLatestVersion(String mediaPackageId) throws WorkflowOperationException {
-    final AQueryBuilder q = assetManager.createQuery();
-    Optional<ARecord> result = q.select(q.snapshot())
-            .where(q.mediaPackageId(mediaPackageId).and(q.version().isLatest())).run()
-            .getRecords().stream().findFirst();
-    if (result.isPresent()) {
-      return result.get().getSnapshot().get().getVersion();
+    Optional<Snapshot> snapshot = assetManager.getLatestSnapshot(mediaPackageId);
+    if (snapshot.isPresent()) {
+      return snapshot.get().getVersion();
     } else {
       throw new WorkflowOperationException(String.format("No last version found for mpId: {}", mediaPackageId));
     }

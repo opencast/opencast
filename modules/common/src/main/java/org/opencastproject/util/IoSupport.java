@@ -38,10 +38,6 @@ import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Function2;
 import org.opencastproject.util.data.Option;
 
-import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.FnX;
-import com.entwinemedia.fn.Prelude;
-import com.entwinemedia.fn.Unit;
 import com.google.common.io.Resources;
 
 import org.apache.commons.io.IOUtils;
@@ -287,7 +283,7 @@ public final class IoSupport {
   /**
    * Handle a closeable resource inside <code>f</code> and ensure it gets closed properly.
    */
-  public static <A, B extends Closeable> A withResource(B b, Fn<? super B, ? extends A> f) {
+  public static <A, B extends Closeable> A withResource(B b, java.util.function.Function<B, A> f) {
     try {
       return f.apply(b);
     } finally {
@@ -520,22 +516,38 @@ public final class IoSupport {
     final ByteArrayOutputStream out = new ByteArrayOutputStream();
     try {
       withResource(
-              new ObjectOutputStream(out),
-              new FnX<ObjectOutputStream, Unit>() {
-                @Override public Unit applyX(ObjectOutputStream out) throws Exception {
-                  out.writeObject(a);
-                  return Unit.unit;
-                }
-              });
+          new ObjectOutputStream(out),
+          new Function<ObjectOutputStream, Void>() {
+            @Override
+            public Void apply(ObjectOutputStream outStream) {
+              try {
+                outStream.writeObject(a);
+              } catch (IOException e) {
+                throw new RuntimeException(e);
+              }
+              return null;
+            }
+          }
+      );
+
       return withResource(
-              new ObjectInputStream(new ByteArrayInputStream(out.toByteArray())),
-              new FnX<ObjectInputStream, A>() {
-                @Override public A applyX(ObjectInputStream in) throws Exception {
-                  return (A) in.readObject();
-                }
-              });
+          new ObjectInputStream(new ByteArrayInputStream(out.toByteArray())),
+          new Function<ObjectInputStream, A>() {
+            @Override
+            public A apply(ObjectInputStream inStream) {
+              try {
+                @SuppressWarnings("unchecked")
+                A obj = (A) inStream.readObject();
+                return obj;
+              } catch (IOException | ClassNotFoundException e) {
+                throw new RuntimeException(e);
+              }
+            }
+          }
+      );
+
     } catch (IOException e) {
-      return Prelude.chuck(e);
+      throw new RuntimeException(e);
     }
   }
 }

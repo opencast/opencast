@@ -36,8 +36,6 @@ import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.Prelude;
-
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
@@ -187,7 +185,7 @@ public class CatalogUIAdapterFactory implements ManagedServiceFactory {
         break;
       }
       default:
-        Prelude.unexhaustiveMatch(type);
+        throw new IllegalStateException("Illegal catalog type: " + type);
     }
 
   }

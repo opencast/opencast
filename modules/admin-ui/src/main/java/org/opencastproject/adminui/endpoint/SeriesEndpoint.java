@@ -21,11 +21,6 @@
 
 package org.opencastproject.adminui.endpoint;
 
-import static com.entwinemedia.fn.Stream.$;
-import static com.entwinemedia.fn.data.json.Jsons.arr;
-import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.obj;
-import static com.entwinemedia.fn.data.json.Jsons.v;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
@@ -38,6 +33,8 @@ import static javax.ws.rs.core.Response.Status.NOT_FOUND;
 import static javax.ws.rs.core.Response.Status.NO_CONTENT;
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.opencastproject.adminui.endpoint.EndpointUtil.transformAccessControList;
+import static org.opencastproject.index.service.util.JSONUtils.collectionToJsonArray;
+import static org.opencastproject.index.service.util.JSONUtils.safeString;
 import static org.opencastproject.index.service.util.RestUtils.notFound;
 import static org.opencastproject.index.service.util.RestUtils.okJson;
 import static org.opencastproject.index.service.util.RestUtils.okJsonList;
@@ -64,14 +61,11 @@ import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.QueryPreprocessor;
 import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.elasticsearch.index.objects.series.Series;
 import org.opencastproject.elasticsearch.index.objects.series.SeriesIndexSchema;
 import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
-import org.opencastproject.elasticsearch.index.objects.theme.IndexTheme;
-import org.opencastproject.elasticsearch.index.objects.theme.ThemeSearchQuery;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.resources.list.provider.SeriesListProvider;
@@ -95,6 +89,9 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.systems.OpencastConstants;
+import org.opencastproject.themes.Theme;
+import org.opencastproject.themes.ThemesServiceDatabase;
+import org.opencastproject.themes.persistence.ThemesServiceDatabaseException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.UrlSupport;
@@ -109,11 +106,7 @@ import org.opencastproject.util.requests.SortCriterion;
 import org.opencastproject.util.requests.SortCriterion.Order;
 import org.opencastproject.workflow.api.WorkflowInstance;
 
-import com.entwinemedia.fn.data.Opt;
-import com.entwinemedia.fn.data.json.Field;
-import com.entwinemedia.fn.data.json.JValue;
-import com.entwinemedia.fn.data.json.Jsons;
-import com.entwinemedia.fn.data.json.Jsons.Functions;
+import com.google.gson.JsonObject;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -200,6 +193,7 @@ public class SeriesEndpoint {
   private ListProvidersService listProvidersService;
   private ElasticsearchIndex searchIndex;
   private AdminUIConfiguration adminUIConfiguration;
+  private ThemesServiceDatabase themesServiceDatabase;
   private UserDirectoryService userDirectoryService;
 
   /** Default server URL */
@@ -250,6 +244,12 @@ public class SeriesEndpoint {
   @Reference
   public void setAdminUIConfiguration(AdminUIConfiguration adminUIConfiguration) {
     this.adminUIConfiguration = adminUIConfiguration;
+  }
+
+  /** OSGi callback for the themes service database. */
+  @Reference
+  public void setThemesServiceDatabase(ThemesServiceDatabase themesServiceDatabase) {
+    this.themesServiceDatabase = themesServiceDatabase;
   }
 
   /** Sets the user directory service */
@@ -370,8 +370,8 @@ public class SeriesEndpoint {
     List<SeriesCatalogUIAdapter> catalogUIAdapters = indexService.getSeriesCatalogUIAdapters();
     catalogUIAdapters.remove(indexService.getCommonSeriesCatalogUIAdapter());
     for (SeriesCatalogUIAdapter adapter : catalogUIAdapters) {
-      final Opt<DublinCoreMetadataCollection> optSeriesMetadata = adapter.getFields(series);
-      if (optSeriesMetadata.isSome()) {
+      final Optional<DublinCoreMetadataCollection> optSeriesMetadata = adapter.getFields(series);
+      if (optSeriesMetadata.isPresent()) {
         metadataList.add(adapter.getFlavor().toString(), adapter.getUITitle(), optSeriesMetadata.get());
       }
     }
@@ -518,27 +518,25 @@ public class SeriesEndpoint {
   @SuppressWarnings("unchecked")
   @RestQuery(name = "getNewThemes", description = "Returns all the data related to the themes tab in the new series modal as JSON", returnDescription = "All the data related to the series themes tab as JSON", responses = { @RestResponse(responseCode = SC_OK, description = "Returns all the data related to the series themes tab as JSON") })
   public Response getNewThemes() {
-    ThemeSearchQuery query = new ThemeSearchQuery(securityService.getOrganization().getId(), securityService.getUser());
-    // need to set limit because elasticsearch limit results by 10 per default
-    query.withLimit(Integer.MAX_VALUE);
-    query.withOffset(0);
-    query.sortByName(Order.Ascending);
-    SearchResult<IndexTheme> results = null;
-    try {
-      results = searchIndex.getByQuery(query);
-    } catch (SearchIndexException e) {
-      logger.error("The admin UI Search Index was not able to get the themes", e);
-      return RestUtil.R.serverError();
-    }
+    SortCriterion sortCriterion = new SortCriterion("name", Order.Ascending);
+    ArrayList<SortCriterion> sortCriteria = new ArrayList<>();
+    sortCriteria.add(sortCriterion);
+    List<Theme> results = themesServiceDatabase.findThemes(
+        Optional.ofNullable(Integer.MAX_VALUE),
+        Optional.ofNullable(0),
+        sortCriteria,
+        Optional.empty(),
+        Optional.empty()
+    );
 
     JSONObject themesJson = new JSONObject();
-    for (SearchResultItem<IndexTheme> item : results.getItems()) {
+    for (Theme theme : results) {
       JSONObject themeInfoJson = new JSONObject();
-      IndexTheme theme = item.getSource();
       themeInfoJson.put("name", theme.getName());
       themeInfoJson.put("description", theme.getDescription());
-      themesJson.put(theme.getIdentifier(), themeInfoJson);
+      themesJson.put(theme.getId().get(), themeInfoJson);
     }
+
     return Response.ok(themesJson.toJSONString()).build();
   }
 
@@ -770,7 +768,7 @@ public class SeriesEndpoint {
         } else if (SeriesListQuery.FILTER_CREATOR_NAME.equals(name)) {
           query.withCreator(filters.get(name));
         } else if (SeriesListQuery.FILTER_TEXT_NAME.equals(name)) {
-          query.withText(QueryPreprocessor.sanitize(filters.get(name)));
+          query.withText(filters.get(name));
         } else if (SeriesListQuery.FILTER_LANGUAGE_NAME.equals(name)) {
           query.withLanguage(filters.get(name));
         } else if (SeriesListQuery.FILTER_LICENSE_NAME.equals(name)) {
@@ -825,35 +823,37 @@ public class SeriesEndpoint {
         logger.debug("Found {} results in {} ms", result.getDocumentCount(), result.getSearchTime());
       }
 
-      List<JValue> series = new ArrayList<>();
+      List<JsonObject> series = new ArrayList<>();
       for (SearchResultItem<Series> item : result.getItems()) {
-        List<Field> fields = new ArrayList<>();
+        JsonObject sJson = new JsonObject();
         Series s = item.getSource();
-        String sId = s.getIdentifier();
-        fields.add(f("id", v(sId)));
-        fields.add(f("title", v(s.getTitle(), Jsons.BLANK)));
-        fields.add(f("organizers", arr($(s.getOrganizers()).map(Functions.stringToJValue))));
-        fields.add(f("contributors", arr($(s.getContributors()).map(Functions.stringToJValue))));
+
+        sJson.addProperty("id", s.getIdentifier());
+        sJson.addProperty("title", safeString(s.getTitle()));
+        sJson.add("organizers", collectionToJsonArray(s.getOrganizers()));
+        sJson.add("contributors", collectionToJsonArray(s.getContributors()));
         if (s.getCreator() != null) {
-          fields.add(f("createdBy", v(s.getCreator())));
+          sJson.addProperty("createdBy", s.getCreator());
         }
         if (s.getCreatedDateTime() != null) {
-          fields.add(f("creation_date", v(toUTC(s.getCreatedDateTime().getTime()), Jsons.BLANK)));
+          sJson.addProperty("creation_date", toUTC(s.getCreatedDateTime().getTime()));
         }
         if (s.getLanguage() != null) {
-          fields.add(f("language", v(s.getLanguage())));
+          sJson.addProperty("language", s.getLanguage());
         }
         if (s.getLicense() != null) {
-          fields.add(f("license", v(s.getLicense())));
+          sJson.addProperty("license", s.getLicense());
         }
         if (s.getRightsHolder() != null) {
-          fields.add(f("rightsHolder", v(s.getRightsHolder())));
+          sJson.addProperty("rightsHolder", s.getRightsHolder());
         }
         if (StringUtils.isNotBlank(s.getManagedAcl())) {
-          fields.add(f("managedAcl", v(s.getManagedAcl())));
+          sJson.addProperty("managedAcl", s.getManagedAcl());
         }
-        series.add(obj(fields));
+
+        series.add(sJson);
       }
+
       logger.debug("Request done");
 
       return okJsonList(series, offset, limit, result.getHitCount());
@@ -1020,8 +1020,10 @@ public class SeriesEndpoint {
    *          The theme to get the id and name from.
    * @return A {@link Response} with the theme id and name as json contents
    */
-  private Response getSimpleThemeJsonResponse(IndexTheme theme) {
-    return okJson(obj(f(Long.toString(theme.getIdentifier()), v(theme.getName()))));
+  private Response getSimpleThemeJsonResponse(Theme theme) {
+    JsonObject json = new JsonObject();
+    json.addProperty(Long.toString(theme.getId().get()), theme.getName());
+    return okJson(json);
   }
 
   @GET
@@ -1045,15 +1047,14 @@ public class SeriesEndpoint {
 
     // If no theme is set return empty JSON
     if (themeId == null)
-      return okJson(obj());
+      return okJson(new JsonObject());
 
     try {
-      Opt<IndexTheme> themeOpt = getTheme(themeId);
-      if (themeOpt.isNone())
-        return notFound("Cannot find a theme with id {}", themeId);
-
-      return getSimpleThemeJsonResponse(themeOpt.get());
-    } catch (SearchIndexException e) {
+      Theme theme = themesServiceDatabase.getTheme(themeId);
+      return getSimpleThemeJsonResponse(theme);
+    } catch (NotFoundException e) {
+      return notFound("Cannot find a theme with id {}", themeId);
+    } catch (ThemesServiceDatabaseException e) {
       logger.error("Unable to get theme {}", themeId, e);
       throw new WebApplicationException(e);
     }
@@ -1068,16 +1069,13 @@ public class SeriesEndpoint {
   public Response updateSeriesTheme(@PathParam("seriesId") String seriesID, @FormParam("themeId") long themeId)
           throws UnauthorizedException, NotFoundException {
     try {
-      Opt<IndexTheme> themeOpt = getTheme(themeId);
-      if (themeOpt.isNone())
-        return notFound("Cannot find a theme with id {}", themeId);
-
+      Theme theme = themesServiceDatabase.getTheme(themeId);
       seriesService.updateSeriesProperty(seriesID, THEME_KEY, Long.toString(themeId));
-      return getSimpleThemeJsonResponse(themeOpt.get());
+      return getSimpleThemeJsonResponse(theme);
     } catch (SeriesException e) {
       logger.error("Unable to update series theme {}", themeId, e);
       throw new WebApplicationException(e);
-    } catch (SearchIndexException e) {
+    } catch (ThemesServiceDatabaseException e) {
       logger.error("Unable to get theme {}", themeId, e);
       throw new WebApplicationException(e);
     }
@@ -1378,24 +1376,6 @@ public Response getSeriesHostPages(@PathParam("seriesId") String seriesId) {
     JSONObject jsonReturnObj = new JSONObject();
     jsonReturnObj.put("hasEvents", elementsCount > 0);
     return Response.ok(jsonReturnObj.toString()).build();
-  }
-
-  /**
-   * Get a single theme
-   *
-   * @param id
-   *          the theme id
-   * @return a theme or none if not found, wrapped in an option
-   * @throws SearchIndexException
-   */
-  private Opt<IndexTheme> getTheme(long id) throws SearchIndexException {
-    SearchResult<IndexTheme> result = searchIndex.getByQuery(new ThemeSearchQuery(securityService.getOrganization().getId(),
-            securityService.getUser()).withIdentifier(id));
-    if (result.getPageSize() == 0) {
-      logger.debug("Didn't find theme with id {}", id);
-      return Opt.<IndexTheme> none();
-    }
-    return Opt.some(result.getItems()[0].getSource());
   }
 
   @GET

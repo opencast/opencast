@@ -3,11 +3,13 @@ name: Test documentation
 on:
   pull_request:
     paths:
+      - '.github/workflows/test-documentation-build.yml'
       - 'docs/guides/**'
       - 'docs/checkstyle/check-docs.sh'
       - '**.md'
   push:
     paths:
+      - '.github/workflows/test-documentation-build.yml'
       - 'docs/guides/**'
       - 'docs/checkstyle/check-docs.sh'
       - '**.md'
@@ -19,7 +21,7 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: set up python
       uses: actions/setup-python@v5

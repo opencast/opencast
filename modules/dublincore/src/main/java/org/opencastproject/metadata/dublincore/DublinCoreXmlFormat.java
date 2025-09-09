@@ -27,8 +27,6 @@ import org.opencastproject.mediapackage.XMLCatalogImpl.CatalogEntry;
 import org.opencastproject.util.XmlNamespaceContext;
 import org.opencastproject.util.XmlSafeParser;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +46,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -146,11 +145,11 @@ public final class DublinCoreXmlFormat extends DefaultHandler {
         new InputSource(new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8))));
   }
 
-  public static Opt<DublinCoreCatalog> readOpt(String xml) {
+  public static Optional<DublinCoreCatalog> readOpt(String xml) {
     try {
-      return Opt.some(read(xml));
+      return Optional.of(read(xml));
     } catch (Exception e) {
-      return Opt.none();
+      return Optional.empty();
     }
   }
 

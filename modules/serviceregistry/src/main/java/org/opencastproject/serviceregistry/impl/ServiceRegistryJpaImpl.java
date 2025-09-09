@@ -253,6 +253,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** The security service */
   protected SecurityService securityService = null;
 
+  protected IncidentService incidentService = null;
+
   protected Incidents incidents;
 
   /** Whether to collect detailed job statistics */
@@ -2129,13 +2131,17 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** OSGi DI. */
   @Reference(cardinality = ReferenceCardinality.OPTIONAL, policy =  ReferencePolicy.DYNAMIC, unbind = "unsetIncidentService")
   public void setIncidentService(IncidentService incidentService) {
+    this.incidentService = incidentService;
     // Manually resolve the cyclic dependency between the incident service and the service registry
     ((OsgiIncidentService) incidentService).setServiceRegistry(this);
     this.incidents = new Incidents(this, incidentService);
   }
 
   public void unsetIncidentService(IncidentService incidentService) {
-    this.incidents = null;
+    if (this.incidentService == incidentService) {
+      this.incidentService = null;
+      this.incidents = null;
+    }
   }
 
   /**

@@ -26,14 +26,11 @@ Parameter Table
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="sanitize-adaptive"
-    description="Fix uploaded HLS files ">
-  <configurations>
-    <configuration key="source-flavor">presenter/ingested</configuration>
-    <configuration key="target-flavor">presenter/delivery</configuration>
-    <configuration key="target-tags">engage</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: sanitize-adaptive
+    description: 'Fix uploaded HLS files '
+    configurations:
+      - source-flavor: presenter/ingested
+      - target-flavor: presenter/delivery
+      - target-tags: engage
 ```

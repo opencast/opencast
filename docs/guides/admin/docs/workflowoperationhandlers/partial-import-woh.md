@@ -113,23 +113,21 @@ What we finally want, however, is a single presenter and a single presentation t
 workflow operations. To achieve this, the PartialImportWorkflowOperation is used to post-process the files as described
 in the SMIL file:
 
-```xml
-<operation id="partial-import"
-     description="Post-processing raw audio and video files from capture agent"
-     fail-on-error="true"
-     exception-handler-workflow="partial-error">
-  <configurations>
-    <configuration key="source-presenter-flavor">presenter/source</configuration>
-    <configuration key="source-presentation-flavor">presentation/source</configuration>
-    <configuration key="source-smil-flavor">smil/source+partial</configuration>
-    <configuration key="target-presenter-flavor">presenter/standard</configuration>
-    <configuration key="target-presentation-flavor">presentation/standard</configuration>
-    <configuration key="preencode-encoding-profile">partial-import-preencode</configuration>
-    <configuration key="concat-encoding-profile">concat.work</configuration>
-    <configuration key="trim-encoding-profile">trim.work</configuration>
-    <configuration key="force-encoding-profile">encode.partial-import</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: partial-import
+    description: Post-processing raw audio and video files from capture agent
+    fail-on-error: true
+    exception-handler-workflow: partial-error
+    configurations:
+      - source-presenter-flavor: presenter/source
+      - source-presentation-flavor: presentation/source
+      - source-smil-flavor: smil/source+partial
+      - target-presenter-flavor: presenter/standard
+      - target-presentation-flavor: presentation/standard
+      - preencode-encoding-profile: partial-import-preencode
+      - concat-encoding-profile: concat.work
+      - trim-encoding-profile: trim.work
+      - force-encoding-profile: encode.partial-import
 ```
 
 In our example, the PartialImportWorkflowOperation will create the target flavors presenter/standard and

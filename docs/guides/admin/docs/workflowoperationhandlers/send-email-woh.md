@@ -150,41 +150,35 @@ Examples
 
 Media package title in subject field, default email body.
 
-```xml
-<operation
-  id="send-email"
-  fail-on-error="false"
-  exception-handler-workflow="email-error"
-  description="Sending email to user after media package is published">
-  <configurations>
-    <configuration key="to">email-account@email-domain.org</configuration>
-    <!-- This is going to be replaced with the media package title -->
-    <configuration key="subject">${mediaPackage.title} has been published</configuration>
-    <!-- Neither body nor body-template-file specified so default body <Recording Title> (<Mediapackage ID>)<br>is sent -->
-  </configurations>
-</operation>
+```yaml
+  - id: send-email
+    fail-on-error: false
+    exception-handler-workflow: email-error
+    description: Sending email to user after media package is published
+    configurations:
+      - to: email-account@email-domain.org
+      # This is going to be replaced with the media package title
+      - subject: ${mediaPackage.title} has been published
+      # Neither body nor body-template-file specified so default body <Recording Title> (<Mediapackage ID>)<br>is sent
 ```
 
 ### Example 2
 
 To and subject are inline templates; the email body uses a template file named sample stored in`…/etc/email`:
 
-```xml
-<operation
-  id="send-email"
-  fail-on-error="false"
-  exception-handler-workflow="email-error"
-  description="Sending email to user before holding for edit">
-  <configurations>
-    <!-- This is going to be replaced with the episode catalog publisher field, which in this example it is assumed
-    it contains a notification email address -->
-    <configuration key="to">${catalogs['dublincore/episode']['publisher']}</configuration>
-    <!-- This is going to be replaced with the episode catalog title field -->
-    <configuration key="subject">${catalogs['dublincore/episode']['title']} is ready for EDIT</configuration>
-    <!-- Email body is going to be built using the sample template found in <config_dir>/etc/email -->
-    <configuration key="body-template-file">sample</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: send-email
+    fail-on-error: false
+    exception-handler-workflow: email-error
+    description: Sending email to user before holding for edit
+    configurations:
+      # This is going to be replaced with the episode catalog publisher field, which in this example it is assumed
+      # it contains a notification email address
+      - to: ${catalogs['dublincore/episode']['publisher']}
+      # This is going to be replaced with the episode catalog title field
+      - subject: ${catalogs['dublincore/episode']['title']} is ready for EDIT
+      # Email body is going to be built using the sample template found in <config_dir>/etc/email
+      - body-template-file: sample
 ```
 
 #### Template: sample
@@ -207,27 +201,23 @@ Event Date: ${mediaPackage.date?datetime?iso_local}
 
 Email address entered via admin UI as a workflow configuration parameter:
 
-```xml
-<operation
-  id="send-email"
-  fail-on-error="false"
-  exception-handler-workflow="email-error"
-  description="Sends email">
-  <configurations>
-    <configuration key="to">${workflowConfig['emailAddress']}</configuration>
-    <configuration key="subject">Media package has been published</configuration>
-    <configuration key="body-template-file">sample</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: send-email
+    fail-on-error: false
+    exception-handler-workflow: email-error
+    description: Sends email
+    configurations:
+      - to: ${workflowConfig['emailAddress']}
+      - subject: Media package has been published
+      - body-template-file: sample
 ```
 
 Workflow Configuration Panel:
 
-```xml
-<configuration_panel>
-<![CDATA[
-   <!-- Add after the other configuration fields (Holds, Archive, etc) -->
-   <fieldset>
+```yaml
+  configuration_panel_json: |-
+    <!-- Add after the other configuration fields (Holds, Archive, etc) -->
+    <fieldset>
       <legend>Notification</legend>
       <ul class="oc-ui-form-list">
         <li class="ui-helper-clearfix">
@@ -236,7 +226,7 @@ Workflow Configuration Panel:
           </label>
           <span id="emailconfig">
             <input id="emailAddress" name="emailAddress" type="text" class="configField"
-                   value="my-email-account@my-email-domain.org"/>
+                    value="my-email-account@my-email-domain.org"/>
           </span>
         </li>
       </ul>
@@ -250,10 +240,10 @@ Workflow Configuration Panel:
       // Register email configuration property
       ocWorkflowPanel.registerComponents = function(components){
         /* components with keys that begin with 'org.opencastproject.workflow.config' will be passed
-         * into the workflow. The component's nodeKey must match the components array key.
-         *
-         * Example:'org.opencastproject.workflow.config.myProperty' will be available at ${my.property}
-         */
+          * into the workflow. The component's nodeKey must match the components array key.
+          *
+          * Example:'org.opencastproject.workflow.config.myProperty' will be available at ${my.property}
+          */
         // After the other components (Hold, Archive, etc), add:
         components['org.opencastproject.workflow.config.emailAddress'] = new ocAdmin.Component(
           ['emailAddress'],
@@ -269,28 +259,24 @@ Workflow Configuration Panel:
           values['org.opencastproject.workflow.config.emailAddress']);
       }
     </script>
-]]>
-</configuration_panel>
 ```
 
 ### Example 4
 
 In error handling workflow (email-error):
 
-```xml
-<operation
-  id="send-email"
-  fail-on-error="true"
-  exception-handler-workflow="error"
-  description="Sends email">
-    <configurations>
-    <!-- Note that you can use variable substitution in to, subject, body
-         e.g. ${(catalogs['dublincore/episode']['FIELD']!'root@localhost'}  -->
-    <configuration key="to">root@localhost</configuration>
-    <configuration key="subject">Failure processing a mediapackage</configuration>
-    <configuration key="body-template-file">errorDetails</configuration>
-  </configurations>
-</operation>
+```yaml
+operations:
+  - id: send-email
+    fail-on-error: true
+    exception-handler-workflow: error
+    description: Sends email
+    configurations:
+      # Note that you can use variable substitution in to, subject, body
+      # e.g. ${(catalogs['dublincore/episode']['FIELD']!'root@localhost'}
+      - to: root@localhost
+      - subject: Failure processing a mediapackage
+      - body-template-file: errorDetails
 ```
 
 #### Template: errorDetails
@@ -328,17 +314,15 @@ Logged incident of the error looks like this:
 The username is stored in the episode dublin core `contributor` field. There's a user `jharvard` with email
 `jharvard@harvard.edu` defined in the system. The message will be sent to `jharvard@harvard.edu`:
 
-```xml
-   <operation
-      id="send-email"
-      fail-on-error="false"
-      description="Notify user associated to this recording that it is ready to be trimmed">
-      <configurations>
-        <configuration key="to">${(catalogs['dublincore/episode']['contributor'])}</configuration>
-        <configuration key="subject">Recording is ready for EDIT</configuration>
-        <configuration key="body-template-file">eventDetails</configuration>
-      </configurations>
-    </operation>
+```yaml
+  - id: send-email
+    fail-on-error: false
+    description: Notify user associated to this recording that it is ready to be
+      trimmed
+    configurations:
+      - to: ${(catalogs['dublincore/episode']['contributor'])}
+      - subject: Recording is ready for EDIT
+      - body-template-file: eventDetails
 ```
 
 #### Episode Dublin Core
@@ -364,16 +348,13 @@ The username is stored in the episode dublin core `contributor` field. There's a
 Email the user which started the workflow.
 Requires the user account to have a valid email address.
 
-```xml
-<operation
-    id="send-email"
-    description="Sending email to user after media package is published">
-  <configurations>
-    <!-- Lookup email address of the creator -->
-    <configuration key="to">${workflow.creatorName}</configuration>
-    <configuration key="subject">${mediaPackage.title} has been published</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: send-email
+    description: Sending email to user after media package is published
+    configurations:
+      # Lookup email address of the creator
+      - to: ${workflow.creatorName}
+      - subject: ${mediaPackage.title} has been published
 ```
 
 Appendix: Freemarker Variable Usage Guide

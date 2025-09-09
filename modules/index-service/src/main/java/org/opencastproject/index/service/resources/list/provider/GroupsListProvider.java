@@ -24,6 +24,7 @@ package org.opencastproject.index.service.resources.list.provider;
 import org.opencastproject.list.api.ResourceListProvider;
 import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.security.api.JaxbGroup;
+import org.opencastproject.security.api.Role;
 import org.opencastproject.userdirectory.JpaGroupRoleProvider;
 
 import org.osgi.framework.BundleContext;
@@ -51,8 +52,9 @@ public class GroupsListProvider implements ResourceListProvider {
 
   public static final String DESCRIPTION = PROVIDER_PREFIX + ".DESCRIPTION";
   public static final String NAME = PROVIDER_PREFIX + ".NAME";
+  public static final String ROLE_ONLY = PROVIDER_PREFIX + ".ROLE.ONLY"; // Role: Role
 
-  protected static final String[] NAMES = { PROVIDER_PREFIX, NAME, DESCRIPTION };
+  protected static final String[] NAMES = { PROVIDER_PREFIX, NAME, DESCRIPTION, ROLE_ONLY };
   private static final Logger logger = LoggerFactory.getLogger(GroupsListProvider.class);
 
   private JpaGroupRoleProvider groupRoleProvider;
@@ -100,6 +102,10 @@ public class GroupsListProvider implements ResourceListProvider {
         groupsList.put(g.getName(), g.getName());
       } else if (DESCRIPTION.equals(listName)) {
         groupsList.put(g.getDescription(), g.getDescription());
+      } else if (ROLE_ONLY.equals(listName) && g.getRoles().size() > 0) {
+        for (Role role : g.getRoles()) {
+          groupsList.put(role.getName(), role.getName());
+        }
       } else {
         groupsList.put(g.getGroupId(), g.getName());
       }

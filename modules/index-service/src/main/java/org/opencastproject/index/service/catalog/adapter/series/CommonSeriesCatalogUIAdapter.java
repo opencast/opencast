@@ -30,11 +30,11 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.util.NotFoundException;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Optional;
 
 public class CommonSeriesCatalogUIAdapter extends ConfigurableSeriesDCCatalogUIAdapter implements ManagedService {
 
@@ -51,20 +51,20 @@ public class CommonSeriesCatalogUIAdapter extends ConfigurableSeriesDCCatalogUIA
   }
 
   @Override
-  protected Opt<DublinCoreCatalog> loadDublinCoreCatalog(String seriesId) {
+  protected Optional<DublinCoreCatalog> loadDublinCoreCatalog(String seriesId) {
     try {
-      return Opt.nul(getSeriesService().getSeries(requireNonNull(seriesId)));
+      return Optional.ofNullable(getSeriesService().getSeries(requireNonNull(seriesId)));
     } catch (SeriesException e) {
       logger.error("Error while loading DublinCore catalog of series '{}':", seriesId, e);
-      return Opt.none();
+      return Optional.empty();
     } catch (NotFoundException e) {
       logger.debug("No DublinCore metadata catalog for series '{}' found", seriesId);
-      return Opt.none();
+      return Optional.empty();
     } catch (UnauthorizedException e) {
       logger.warn(
               "The current user does not have sufficient permissions to load the DublinCore metadata catalog of the series '{}'",
               seriesId);
-      return Opt.none();
+      return Optional.empty();
     }
   }
 

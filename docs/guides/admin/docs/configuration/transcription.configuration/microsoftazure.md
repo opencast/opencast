@@ -30,28 +30,23 @@ Edit `etc/org.opencastproject.transcription.microsoft.azure.MicrosoftAzureTransc
 
 Edit a workflow to start a transcription, e.g. `etc/workflows/partial-publish.xml`. You have to add the `microsoft-azure-start-transcription` operation right after the creation of the final cut of the media files. This operation may look like
 
-```xml
-<!-- This is a typical operation to generate final cut -->
-<!-- of the media files. -->
-<operation
-  id="editor"
-  …
-</operation>
+```yaml
+  # This is a typical operation to generate final cut
+  # of the media files.
+  - id: editor
+   ...
+  # This operation will start the transcription job
+  - id: microsoft-azure-start-transcription
+    fail-on-error: true
+    exception-handler-workflow: partial-error
+    description: Start Microsoft Azure transcription job
+    configurations:
+      - source-flavors: '*/trimmed'
+      # Skip this operation if flavor already exists.
+      # Used for cases when mediapackage already has captions.
+      - skip-if-flavor-exists: captions/*
+      - audio-extraction-encoding-profile: transcription-azure.audio
 
-<!-- This operation will start the transcription job -->
-<operation
-  id="microsoft-azure-start-transcription"
-  fail-on-error="true"
-  exception-handler-workflow="partial-error"
-  description="Start Microsoft Azure transcription job">
-  <configurations>
-    <configuration key="source-flavors">*/trimmed</configuration>
-    <!-- Skip this operation if flavor already exists. -->
-    <!-- Used for cases when mediapackage already has captions. -->
-    <configuration key="skip-if-flavor-exists">captions/*</configuration>
-    <configuration key="audio-extraction-encoding-profile">transcription-azure.audio</configuration>
-  </configurations>
-</operation>
 ```
 
 For more options please consult the [documentation](../../workflowoperationhandlers/microsoft-azure-start-transcription-woh.md).
@@ -60,72 +55,53 @@ For more options please consult the [documentation](../../workflowoperationhandl
 
 A sample attach transcript workflow that is preconfigured in the configuration from Step 2. Attaches the generated transcription to the mediapackage, archives and republishes it. Copy it into a new file under `etc/workflows/microsoft-azure-attach-transcription.xml` in your Opencast installation.
 
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<definition xmlns="http://workflow.opencastproject.org">
-  <id>microsoft-azure-attach-transcription</id>
-  <title>Attach Transcription from Microsoft Azure</title>
-  <description>Publish and archive transcription from Microsoft Azure Speech Services.</description>
-  <operations>
+```yaml
+id: microsoft-azure-attach-transcription
+title: Attach Transcription from Microsoft Azure
+description: |-
+  Publish and archive transcription from Microsoft Azure Speech Services.
+operations:
+  - id: microsoft-azure-attach-transcription
+    fail-on-error: true
+    exception-handler-workflow: partial-error
+    description: Attach transcription from Microsoft Azure
+    configurations:
+      # This is filled out by the transcription service when starting this workflow
+      - transcription-job-id: ${transcriptionJobId}
+      # Set the flavor to something the Paella player will parse
+      - target-flavor: captions/source
+      - target-tags: archive, ${transcriptionLocaleTag!}
 
-    <operation
-      id="microsoft-azure-attach-transcription"
-      fail-on-error="true"
-      exception-handler-workflow="partial-error"
-      description="Attach transcription from Microsoft Azure">
-      <configurations>
-        <!-- This is filled out by the transcription service when starting this workflow -->
-        <configuration key="transcription-job-id">${transcriptionJobId}</configuration>
-        <!-- Set the flavor to something the Paella player will parse -->
-        <configuration key="target-flavor">captions/source</configuration>
-        <configuration key="target-tags">archive, ${transcriptionLocaleTag!}</configuration>
-      </configurations>
-    </operation>
+  - id: snapshot
+    fail-on-error: true
+    exception-handler-workflow: partial-error
+    description: Archive transcription
+    configurations:
+      - source-tags: archive
 
-    <operation
-      id="snapshot"
-      fail-on-error="true"
-      exception-handler-workflow="partial-error"
-      description="Archive transcription">
-      <configurations>
-        <configuration key="source-tags">archive</configuration>
-      </configurations>
-    </operation>
+  - id: tag
+    description: Tagging captions for publishing
+    configurations:
+      - source-flavors: captions/source
+      - target-flavor: captions/delivery
+      - target-tags: -archive
+      - copy: true
 
-    <operation
-      id="tag"
-      description="Tagging captions for publishing">
-      <configurations>
-        <configuration key="source-flavors">captions/source</configuration>
-        <configuration key="target-flavor">captions/delivery</configuration>
-        <configuration key="target-tags">-archive</configuration>
-        <configuration key="copy">true</configuration>
-      </configurations>
-    </operation>
+  - id: publish-engage
+    fail-on-error: true
+    exception-handler-workflow: partial-error
+    description: Distribute and publish to engage server
+    configurations:
+      - download-source-flavors: captions/delivery
+      - strategy: merge
+      - check-availability: false
 
-    <operation
-      id="publish-engage"
-      fail-on-error="true"
-      exception-handler-workflow="partial-error"
-      description="Distribute and publish to engage server">
-      <configurations>
-        <configuration key="download-source-flavors">captions/delivery</configuration>
-        <configuration key="strategy">merge</configuration>
-        <configuration key="check-availability">false</configuration>
-      </configurations>
-    </operation>
-
-    <operation
-      id="cleanup"
-      fail-on-error="false"
-      description="Cleaning up">
-      <configurations>
-        <configuration key="preserve-flavors">security/*</configuration>
-        <configuration key="delete-external">false</configuration>
-      </configurations>
-    </operation>
-  </operations>
-</definition>
+  - id: cleanup
+    fail-on-error: false
+    description: Cleaning up
+    configurations:
+      - preserve-flavors: security/*
+      - delete-external: false
 ```
 
 All available options of the  `microsoft-azure-attach-transcription` operation are documented [here](../../workflowoperationhandlers/microsoft-azure-attach-transcription-woh.md).

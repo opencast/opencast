@@ -69,8 +69,6 @@ import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowUtil;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.data.Opt;
-import com.entwinemedia.fn.data.json.SimpleSerializer;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
@@ -101,6 +99,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -424,14 +423,14 @@ public class LtiServiceImpl implements LtiService {
 
   @Override
   public String getEventMetadata(final String eventId) throws NotFoundException, UnauthorizedException {
-    final Opt<Event> optEvent;
+    final Optional<Event> optEvent;
     try {
       optEvent = indexService.getEvent(eventId, searchIndex);
     } catch (SearchIndexException e) {
       throw new RuntimeException(e);
     }
 
-    if (optEvent.isNone()) {
+    if (optEvent.isEmpty()) {
       throw new NotFoundException("cannot find event with id '" + eventId + "'");
     }
 
@@ -467,7 +466,7 @@ public class LtiServiceImpl implements LtiService {
     if (wfState != null && WorkflowUtil.isActive(WorkflowInstance.WorkflowState.valueOf(wfState))) {
       metadataList.setLocked(MetadataList.Locked.WORKFLOW_RUNNING);
     }
-    return new SimpleSerializer().toJson(MetadataJson.listToJson(metadataList, true));
+    return new Gson().toJson(MetadataJson.listToJson(metadataList, true));
   }
 
   @Override
@@ -512,7 +511,7 @@ public class LtiServiceImpl implements LtiService {
 
       metadataList.add(this.indexService.getCommonEventCatalogUIAdapter(), collection);
     }
-    return new SimpleSerializer().toJson(MetadataJson.listToJson(metadataList, true));
+    return new Gson().toJson(MetadataJson.listToJson(metadataList, true));
   }
 
   @Override
@@ -534,8 +533,8 @@ public class LtiServiceImpl implements LtiService {
   @Override
   public void delete(String id) {
     try {
-      final Opt<Event> event = indexService.getEvent(id, searchIndex);
-      if (event.isNone()) {
+      final Optional<Event> event = indexService.getEvent(id, searchIndex);
+      if (event.isEmpty()) {
         throw new RuntimeException("Event '" + id + "' not found");
       }
       final IndexService.EventRemovalResult eventRemovalResult = indexService.removeEvent(event.get(),

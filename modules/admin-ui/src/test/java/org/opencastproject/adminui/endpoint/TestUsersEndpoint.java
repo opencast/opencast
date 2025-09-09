@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import javax.ws.rs.Path;
@@ -76,7 +77,7 @@ public class TestUsersEndpoint extends UsersEndpoint {
     users.add(user3);
     users.add(user4);
 
-    expect(userDirectoryService.getUsers()).andStubReturn(users.iterator());
+    expect(userDirectoryService.getUsers()).andStubReturn(users);
     EasyMock.expect(userDirectoryService.findUsers(EasyMock.anyString(), EasyMock.anyInt(), EasyMock.anyInt()))
             .andDelegateTo(new TestUsers()).anyTimes();
     replay(userDirectoryService);
@@ -88,7 +89,7 @@ public class TestUsersEndpoint extends UsersEndpoint {
   public class TestUsers implements UserDirectoryService {
 
     @Override
-    public Iterator<User> getUsers() {
+    public List<User> getUsers() {
       return null;
     }
 

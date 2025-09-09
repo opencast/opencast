@@ -20,9 +20,8 @@
  */
 package org.opencastproject.metadata.dublincore;
 
-import com.entwinemedia.fn.Fn;
-
 import java.util.Date;
+import java.util.function.Function;
 
 import javax.annotation.Nonnull;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -46,7 +45,7 @@ public final class OpencastMetadataCodec {
   }
 
   /** {@link OpencastMetadataCodec#decodeDate(java.lang.String)} as a function. */
-  public static final Fn<String, Date> decodeDate = new Fn<String, Date>() {
+  public static final Function<String, Date> decodeDate = new Function<String, Date>() {
     @Override public Date apply(String a) {
       return decodeDate(a);
     }
@@ -63,7 +62,7 @@ public final class OpencastMetadataCodec {
   }
 
   /** {@link OpencastMetadataCodec#decodeDuration(String)} as a function. */
-  public static final Fn<String, Long> decodeDuration = new Fn<String, Long>() {
+  public static final Function<String, Long> decodeDuration = new Function<String, Long>() {
     @Override public Long apply(String a) {
       return decodeDuration(a);
     }
@@ -80,7 +79,7 @@ public final class OpencastMetadataCodec {
   }
 
   /** {@link OpencastMetadataCodec#decodeTemporal(DublinCoreValue)} as a function. */
-  @Nonnull public static final Fn<DublinCoreValue, Temporal> decodeTemporal = new Fn<DublinCoreValue, Temporal>() {
+  @Nonnull public static final Function<DublinCoreValue, Temporal> decodeTemporal = new Function<DublinCoreValue, Temporal>() {
     @Override public Temporal apply(DublinCoreValue a) {
       return decodeTemporal(a);
     }

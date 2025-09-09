@@ -25,9 +25,10 @@ import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.replay;
 import static org.junit.Assert.assertEquals;
 
-import com.entwinemedia.fn.Stream;
-
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class JaxbJobListTest {
 
@@ -36,7 +37,10 @@ public class JaxbJobListTest {
     Job job1 = createNiceMock(Job.class);
     replay(job1);
 
-    JaxbJobList jobList = new JaxbJobList(Stream.$(job1).toList());
+    List<Job> jobs = new ArrayList<>();
+    jobs.add(job1);
+
+    JaxbJobList jobList = new JaxbJobList(jobs);
 
     assertEquals(1, jobList.getJobs().size());
   }

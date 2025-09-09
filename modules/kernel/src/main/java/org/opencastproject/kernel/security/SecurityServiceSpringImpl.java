@@ -196,7 +196,9 @@ public class SecurityServiceSpringImpl implements SecurityService {
    * OSGi callback for removing the user directory.
    */
   void removeUserDirectory(UserDirectoryService unused) {
-    this.userDirectory = null;
+    if (this.userDirectory == unused) {
+      this.userDirectory = null;
+    }
   }
 
 }

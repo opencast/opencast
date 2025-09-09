@@ -23,8 +23,6 @@ package org.opencastproject.job.api;
 
 import static java.util.Collections.unmodifiableList;
 
-import com.entwinemedia.fn.Fn;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
@@ -145,15 +143,6 @@ public class JaxbJob {
     return new JobImpl(id, creator, organization, version, jobType, operation, arguments, status, createdHost,
             processingHost, dateCreated, dateStarted, dateCompleted, queueTime, runTime, payload, parentJobId,
             rootJobId, dispatchable, uri, jobLoad);
-  }
-
-  public static Fn<Job, JaxbJob> fnFromJob() {
-    return new Fn<Job, JaxbJob>() {
-      @Override
-      public JaxbJob apply(Job job) {
-        return  new JaxbJob(job);
-      }
-    };
   }
 
   @Override

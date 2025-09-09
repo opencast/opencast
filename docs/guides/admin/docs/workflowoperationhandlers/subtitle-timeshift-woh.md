@@ -40,14 +40,11 @@ will not override the old one. The tags of the original subtitle file will be co
 Operation Examples
 ------------------
 
-```XML
-<operation
-    id="subtitle-timeshift"
-    description="Create new subtitle file with shifted timestamps">
-  <configurations>
-    <configuration key="subtitle-source-flavor">captions/source</configuration>
-    <configuration key="target-flavor">captions/shifted</configuration>
-    <configuration key="video-source-flavor">branding/bumper</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: subtitle-timeshift
+    description: Create new subtitle file with shifted timestamps
+    configurations:
+      - subtitle-source-flavor: captions/source
+      - target-flavor: captions/shifted
+      - video-source-flavor: branding/bumper
 ```

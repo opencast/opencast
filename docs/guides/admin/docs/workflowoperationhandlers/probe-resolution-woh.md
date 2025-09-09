@@ -35,18 +35,15 @@ taken.
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="probe-resolution"
-    description="Set control variables based on video resolution">
-  <configurations>
-    <configuration key="source-flavor">*/source</configuration>
-    <configuration key="var:aspect">1280x720,1920x1080,2592x1080</configuration>
-    <configuration key="val:aspect">16/9</configuration>
-    <configuration key="var:is_720">1280x720</configuration>
-    <configuration key="var:is_1080">1920x1080,2592x1080</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: probe-resolution
+    description: Set control variables based on video resolution
+    configurations:
+      - source-flavor: '*/source'
+      - var:aspect: 1280x720,1920x1080,2592x1080
+      - val:aspect: 16/9
+      - var:is_720: 1280x720
+      - var:is_1080: 1920x1080,2592x1080
 ```
 
 If a video track with a resolution of 1280x720 is passed to this operation as `presentation/source`, the resulting

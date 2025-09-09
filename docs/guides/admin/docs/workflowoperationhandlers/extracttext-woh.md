@@ -23,14 +23,11 @@ Parameter Table
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="extract-text"
-    description="Extracting text from presentation segments">
-  <configurations>
-    <configuration key="source-flavor">presentation/trimmed</configuration>
-    <configuration key="source-tags"></configuration>
-    <configuration key="target-tags">engage,archive</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: extract-text
+    description: Extracting text from presentation segments
+    configurations:
+      - source-flavor: presentation/trimmed
+      - source-tags: ''
+      - target-tags: engage,archive
 ```

@@ -26,66 +26,46 @@ import org.opencastproject.assetmanager.api.Availability;
 import org.opencastproject.assetmanager.api.Property;
 import org.opencastproject.assetmanager.api.PropertyId;
 import org.opencastproject.assetmanager.api.Snapshot;
+import org.opencastproject.assetmanager.impl.HttpAssetProvider;
 import org.opencastproject.assetmanager.impl.PartialMediaPackage;
 import org.opencastproject.assetmanager.impl.VersionImpl;
-import org.opencastproject.assetmanager.impl.persistence.AssetDtos.Full;
-import org.opencastproject.assetmanager.impl.persistence.AssetDtos.Medium;
 import org.opencastproject.db.DBSession;
+import org.opencastproject.db.Queries;
+import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
-import org.opencastproject.util.data.Function;
-
-import com.entwinemedia.fn.data.Opt;
-import com.mysema.query.Tuple;
-import com.mysema.query.jpa.EclipseLinkTemplates;
-import com.mysema.query.jpa.JPQLTemplates;
-import com.mysema.query.jpa.impl.JPADeleteClause;
-import com.mysema.query.jpa.impl.JPAQuery;
-import com.mysema.query.jpa.impl.JPAQueryFactory;
-import com.mysema.query.jpa.impl.JPAUpdateClause;
-import com.mysema.query.types.expr.BooleanExpression;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import javax.persistence.NoResultException;
+import javax.persistence.TypedQuery;
 
 /**
  * Data access object.
  */
 @ParametersAreNonnullByDefault
-public class Database implements EntityPaths {
+public class Database {
   private static final Logger logger = LoggerFactory.getLogger(Database.class);
 
-  public static final JPQLTemplates TEMPLATES = EclipseLinkTemplates.DEFAULT;
-
   private final DBSession db;
+
+  private HttpAssetProvider httpAssetProvider;
 
   public Database(DBSession db) {
     this.db = db;
   }
 
-  /**
-   * Run a Queryldsl query inside a persistence context/transaction.
-   *
-   * @param q the query function to run
-   */
-  public <A> A run(final Function<JPAQueryFactory, A> q) {
-    return db.execTx(em -> {
-      return q.apply(new JPAQueryFactory(TEMPLATES, () -> em));
-    });
-  }
-
-  public void logQuery(JPAQuery q) {
-    logger.debug("\n---\nQUERY\n{}\n---", q);
-  }
-
-  public void logDelete(String queryName, JPADeleteClause q) {
-    logger.debug("\n---\nDELETE {}\n{}\n---", queryName, q);
+  public void setHttpAssetProvider(HttpAssetProvider httpAssetProvider) {
+    this.httpAssetProvider = httpAssetProvider;
   }
 
   /**
@@ -94,33 +74,49 @@ public class Database implements EntityPaths {
   public boolean saveProperty(final Property property) {
     return db.execTx(em -> {
       final PropertyId pId = property.getId();
-      // check the existence of both the media package and the property in one query
-      //
-      // either the property matches or it does not exist <- left outer join
-      final BooleanExpression eitherMatchOrNull =
-          Q_PROPERTY.namespace.eq(pId.getNamespace())
-              .and(Q_PROPERTY.propertyName.eq(pId.getName())).or(Q_PROPERTY.namespace.isNull());
-      final Tuple result = new JPAQuery(em, TEMPLATES)
-          .from(Q_SNAPSHOT)
-          .leftJoin(Q_PROPERTY).on(Q_SNAPSHOT.mediaPackageId.eq(Q_PROPERTY.mediaPackageId).and(eitherMatchOrNull))
-          .where(Q_SNAPSHOT.mediaPackageId.eq(pId.getMediaPackageId()))
-          // only one result is interesting, no need to fetch all versions of the media package
-          .singleResult(Q_SNAPSHOT.id, Q_PROPERTY);
-      if (result != null) {
-        // media package exists, now check if the property exists
-        final PropertyDto exists = result.get(Q_PROPERTY);
-        namedQuery
-            .persistOrUpdate(exists == null
-                ? PropertyDto.mk(property)
-                : exists.update(property.getValue()))
-            .apply(em);
-        return true;
-      } else {
-        // media package does not exist
-        return false;
+      final String mpId = pId.getMediaPackageId();
+      final String namespace = pId.getNamespace();
+      final String propertyName = pId.getName();
+
+      // Check if media package exists in oc_assets_snapshot table
+      Long snapshotCount = em.createQuery(
+              "SELECT COUNT(s.id) FROM Snapshot s "
+                  + "WHERE s.mediaPackageId = :mediaPackageId", Long.class)
+          .setParameter("mediaPackageId", mpId)
+          .getSingleResult();
+
+      if (snapshotCount == 0) {
+        return false; // media package does not exist
       }
+
+      // Try to find existing property
+      TypedQuery<PropertyDto> query = em.createQuery(
+          "SELECT p FROM Property p "
+              + "WHERE p.mediaPackageId = :mediaPackageId "
+              + "AND p.namespace = :namespace "
+              + "AND p.propertyName = :propertyName",
+          PropertyDto.class);
+      query.setParameter("mediaPackageId", mpId);
+      query.setParameter("namespace", namespace);
+      query.setParameter("propertyName", propertyName);
+
+      PropertyDto existing = null;
+      try {
+        existing = query.getSingleResult();
+      } catch (NoResultException e) {
+        // property does not exist, we'll insert
+      }
+
+      PropertyDto updatedOrNew = existing == null
+          ? PropertyDto.mk(property)
+          : existing.update(property.getValue());
+
+      namedQuery.persistOrUpdate(updatedOrNew).apply(em);
+      return true;
     });
   }
+
+
 
   /**
    * Claim a new version for media package <code>mpId</code>.
@@ -187,20 +183,25 @@ public class Database implements EntityPaths {
 
   public void setStorageLocation(final VersionImpl version, final String mpId, final String storageId) {
     db.execTx(em -> {
-      final QSnapshotDto q = QSnapshotDto.snapshotDto;
-      final QAssetDto a = QAssetDto.assetDto;
-      // Update the snapshot
-      new JPAUpdateClause(em, q, TEMPLATES)
-          .where(q.version.eq(version.value()).and(q.mediaPackageId.eq(mpId)))
-          .set(q.storageId, storageId)
-          .execute();
-      // Get the snapshot (to get its database ID)
-      Optional<SnapshotDtos.Medium> s = getSnapshot(version, mpId);
-      // Update the assets
-      new JPAUpdateClause(em, a, TEMPLATES)
-          .where(a.snapshot.id.eq(s.get().getSnapshotDto().getId()))
-          .set(a.storageId, storageId)
-          .execute();
+      // Update snapshot
+      namedQuery.update(
+          "Snapshot.updateStorageIdByVersionAndMpId",
+          Pair.of("storageId", storageId),
+          Pair.of("version", version.value()),
+          Pair.of("mediaPackageId", mpId)
+      );
+
+      // Update asset
+      Optional<SnapshotDtos.Medium> optSnapshot = getSnapshot(version, mpId);
+      if (optSnapshot.isPresent()) {
+        // Update all associated assets
+        namedQuery.update(
+            "Asset.updateStorageIdBySnapshot",
+            Pair.of("storageId", storageId),
+            Pair.of("snapshot", optSnapshot.get().getSnapshotDto())
+        ).apply(em);
+      }
+
       return null;
     });
   }
@@ -208,24 +209,29 @@ public class Database implements EntityPaths {
   public void setAssetStorageLocation(final VersionImpl version, final String mpId, final String mpeId,
           final String storageId) {
     db.execTx(em -> {
-      final QAssetDto a = QAssetDto.assetDto;
-      Optional<SnapshotDtos.Medium> s = getSnapshot(version, mpId);
-      // Update the asset store id
-      new JPAUpdateClause(em, a, TEMPLATES)
-          .where(a.snapshot.id.eq(s.get().getSnapshotDto().getId()).and(a.mediaPackageElementId.eq(mpeId)))
-          .set(a.storageId, storageId).execute();
+      Optional<SnapshotDtos.Medium> optSnapshot = getSnapshot(version, mpId);
+      if (optSnapshot.isPresent()) {
+        // Update the asset store id
+        namedQuery.update(
+            "Asset.updateStorageIdBySnapshotAndMpElementId",
+            Pair.of("storageId", storageId),
+            Pair.of("snapshot", optSnapshot.get().getSnapshotDto()),
+            Pair.of("mediaPackageElementId", mpeId)
+        ).apply(em);
+      }
+
       return null;
     });
   }
 
-  public void setAvailability(final VersionImpl version, final String mpId, final Availability availability) {
-    db.execTx(em -> {
-      final QSnapshotDto q = QSnapshotDto.snapshotDto;
-      new JPAUpdateClause(em, q, TEMPLATES)
-          .where(q.version.eq(version.value()).and(q.mediaPackageId.eq(mpId)))
-          .set(q.availability, availability.name())
-          .execute();
-      return null;
+  public int setAvailability(final VersionImpl version, final String mpId, final Availability availability) {
+    return db.execTx(em -> {
+      return namedQuery.update(
+          "Snapshot.updateAvailabilityByVersionAndMpId",
+          Pair.of("availability", availability.name()),
+          Pair.of("version", version.value()),
+          Pair.of("mediaPackageId", mpId)
+      ).apply(em);
     });
   }
 
@@ -236,42 +242,41 @@ public class Database implements EntityPaths {
    */
   public Optional<AssetDtos.Medium> getAsset(final VersionImpl version, final String mpId, final String mpeId) {
     return db.execTx(em -> {
-      final QAssetDto assetDto = QAssetDto.assetDto;
-      final Tuple result = AssetDtos.baseJoin(em)
-          .where(assetDto.snapshot.mediaPackageId.eq(mpId)
-              .and(assetDto.mediaPackageElementId.eq(mpeId))
-              .and(assetDto.snapshot.version.eq(version.value())))
-          // if no version has been specified make sure to get the latest by ordering
-          .orderBy(assetDto.snapshot.version.desc())
-          .uniqueResult(Medium.select);
-      var dtoOpt = Opt.nul(result).map(AssetDtos.Medium.fromTuple);
-      return dtoOpt.isSome() ? Optional.of(dtoOpt.get()) : Optional.empty();
+      return Queries.namedQuery
+          .findOpt(
+              "Asset.findMediumByMpIdMpeIdAndVersion",
+              Object[].class,
+              Pair.of("mpId", mpId),
+              Pair.of("mpeId", mpeId),
+              Pair.of("version", version.value()))
+          .apply(em)
+          .map(result -> {
+            AssetDto assetDto = (AssetDto) result[0];
+            String availability = (String) result[1];
+            String organizationId = (String) result[2];
+            return new AssetDtos.Medium(assetDto, Availability.valueOf(availability), organizationId);
+          });
     });
   }
 
   public Optional<SnapshotDtos.Medium> getSnapshot(final VersionImpl version, final String mpId) {
     return db.execTx(em -> {
-      final QSnapshotDto snapshotDto = QSnapshotDto.snapshotDto;
-      final Tuple result = SnapshotDtos.baseQuery(em)
-          .where(snapshotDto.mediaPackageId.eq(mpId)
-              .and(snapshotDto.version.eq(version.value())))
-          // if no version has been specified make sure to get the latest by ordering
-          .orderBy(snapshotDto.version.desc())
-          .uniqueResult(SnapshotDtos.Medium.select);
-      var dtoOpt = Opt.nul(result).map(SnapshotDtos.Medium.fromTuple);
-      return dtoOpt.isSome() ? Optional.of(dtoOpt.get()) : Optional.empty();
+      return namedQuery.findOpt(
+          "Snapshot.findByMpIdAndVersionOrderByVersionDesc",
+            SnapshotDto.class,
+            Pair.of("mpId", mpId),
+            Pair.of("version", version.value()))
+          .apply(em)
+          .map(result -> new SnapshotDtos.Medium(
+              result,
+              Availability.valueOf(result.getAvailability()),
+              result.getStorageId(),
+              result.getOrganizationId(),
+              result.getOwner()
+          ));
     });
   }
 
-  public Optional<AssetDtos.Full> findAssetByChecksum(final String checksum) {
-    return db.execTx(em -> {
-      final Tuple result = AssetDtos.baseJoin(em)
-          .where(QAssetDto.assetDto.checksum.eq(checksum))
-          .singleResult(Full.select);
-      var dtoOpt = Opt.nul(result).map(Full.fromTuple);
-      return dtoOpt.isSome() ? Optional.of(dtoOpt.get()) : Optional.empty();
-    });
-  }
 
   /**
    * Delete all properties for a given media package identifier
@@ -348,16 +353,268 @@ public class Database implements EntityPaths {
     return db.exec(SnapshotDto.countEventsQuery(organization));
   }
 
+  /**
+   * Count events with snapshots in the asset manager
+   *
+   * @param organization
+   *          An organization to count in
+   * @return Number of events
+   */
+  public long countSnapshots(final String organization) {
+    return db.exec(SnapshotDto.countSnapshotsQuery(organization));
+  }
+
+  public long countAssets() {
+    return db.exec(AssetDto.countAssetsQuery());
+  }
+
+  public long countProperties() {
+    return db.exec(PropertyDto.countPropertiesQuery());
+  }
+
   public Optional<AssetDtos.Full> findAssetByChecksumAndStoreAndOrg(final String checksum, final String storeId,
       final String orgId) {
     return db.execTx(em -> {
-      final Tuple result = AssetDtos.baseJoin(em)
-          .where(QAssetDto.assetDto.checksum.eq(checksum)
-              .and(QAssetDto.assetDto.storageId.eq(storeId))
-              .and(QAssetDto.assetDto.snapshot.organizationId.eq(orgId)))
-          .singleResult(Full.select);
-      var dtoOpt = Opt.nul(result).map(Full.fromTuple);
-      return dtoOpt.isSome() ? Optional.of(dtoOpt.get()) : Optional.empty();
+      return namedQuery.findOpt(
+              "Asset.findByChecksumStorageIdAndOrganizationId",
+              AssetDto.class,
+              Pair.of("checksum", checksum),
+              Pair.of("storageId", storeId),
+              Pair.of("orgId", orgId))
+          .apply(em)
+          .map(result -> {
+            SnapshotDto snapshot = result.getSnapshot();
+            return new AssetDtos.Full(
+                result,
+                Availability.valueOf(snapshot.getAvailability()),
+                snapshot.getStorageId(),
+                snapshot.getOrganizationId(),
+                snapshot.getOwner(),
+                snapshot.getMediaPackageId(),
+                snapshot.getVersion()
+            );
+          });
+    });
+  }
+
+  public Optional<Snapshot> getLatestSnapshot(String mediaPackageId) {
+    return getLatestSnapshot(mediaPackageId, null);
+  }
+
+  public Optional<Snapshot> getLatestSnapshot(String mediaPackageId, String orgId) {
+    return db.execTx(em -> {
+      Optional<SnapshotDto> snapshotDto = namedQuery.findOpt(
+          "Snapshot.findLatest",
+          SnapshotDto.class,
+          Pair.of("mediaPackageId", mediaPackageId),
+          Pair.of("organizationId", orgId)
+      ).apply(em);
+
+      if (snapshotDto.isEmpty()) {
+        return Optional.empty();
+      }
+
+      Snapshot snapshot = snapshotDto.get().toSnapshot();
+      // make sure the delivered media package has valid URIs
+      snapshot = httpAssetProvider.prepareForDelivery(snapshot);
+
+      return Optional.of(snapshot);
+    });
+  }
+
+  public Optional<MediaPackage> getMediaPackage(String mediaPackageId) {
+    return getMediaPackage(mediaPackageId, null);
+  }
+  public Optional<MediaPackage> getMediaPackage(String mediaPackageId, String orgId) {
+    return getLatestSnapshot(mediaPackageId, orgId).map(Snapshot::getMediaPackage);
+  }
+
+  public List<Snapshot> getSnapshots(String mediaPackageId) {
+    return getSnapshots(mediaPackageId, null);
+  }
+
+  public List<Snapshot> getSnapshots(String mediaPackageId, String orgId) {
+    return getSnapshots(mediaPackageId, orgId, null);
+  }
+
+  public List<Snapshot> getSnapshots(String mediaPackageId, String orgId, String orderByVersion) {
+    return db.execTx(em -> {
+      String namedQueryName = "ASC".equals(orderByVersion)
+          ? "Snapshot.findOldestVersionFirst" : "Snapshot.findLatestVersionFirst";
+
+      List<SnapshotDto> snapshotDto = namedQuery.findAll(
+          namedQueryName,
+          SnapshotDto.class,
+          Pair.of("mediaPackageId", mediaPackageId),
+          Pair.of("organizationId", orgId)
+      ).apply(em);
+
+      return snapshotDtoToSnapshot(snapshotDto);
+    });
+  }
+
+  public int deleteSnapshots(String mediaPackageId, String orgId) {
+    return db.execTx(em -> {
+      return namedQuery.delete(
+          "Snapshot.delete",
+          Pair.of("mediaPackageId", mediaPackageId),
+          Pair.of("organizationId", orgId)
+      ).apply(em);
+    });
+  }
+
+  public int deleteAllButLatestSnapshot(String mediaPackageId, String orgId) {
+    return db.execTx(em -> {
+      return namedQuery.delete(
+          "Snapshot.deleteAllButLatest",
+          Pair.of("mediaPackageId", mediaPackageId),
+          Pair.of("organizationId", orgId)
+      ).apply(em);
+    });
+  }
+
+  public List<Snapshot> getSnapshotsByMpIdAndVersion(String mediaPackageId, Long version, String orgId) {
+    return db.execTx(em -> {
+      List<SnapshotDto> snapshotDto = namedQuery.findAll(
+          "Snapshot.findByMpIdAndVersion",
+          SnapshotDto.class,
+          Pair.of("mediaPackageId", mediaPackageId),
+          Pair.of("version", version),
+          Pair.of("organizationId", orgId)
+      ).apply(em);
+
+      return snapshotDtoToSnapshot(snapshotDto);
+    });
+  }
+
+  public List<Snapshot> getSnapshotsByDateOrderByMpId(Date start, Date end, String orgId) {
+    return db.execTx(em -> {
+      List<SnapshotDto> snapshotDto = namedQuery.findAll(
+          "Snapshot.findByDateOrderByMpId",
+          SnapshotDto.class,
+          Pair.of("startDate", start),
+          Pair.of("endDate", end),
+          Pair.of("organizationId", orgId)
+      ).apply(em);
+
+      return snapshotDtoToSnapshot(snapshotDto);
+    });
+  }
+
+  public List<Snapshot> getSnapshotsByMpdIdAndDate(String mediaPackageId, Date start, Date end, String orgId) {
+    return getSnapshotsByMpdIdAndDate(mediaPackageId, start, end, orgId, null);
+  }
+
+  public List<Snapshot> getSnapshotsByMpdIdAndDate(String mediaPackageId, Date start, Date end, String orgId,
+      String orderByVersion) {
+    return db.execTx(em -> {
+      String namedQueryName = "Snapshot.findByMpIdAndDate";
+      if ("ASC".equals(orderByVersion)) {
+        namedQueryName = "Snapshot.findByMpIdAndDateOldestVersionFirst";
+      }
+      if ("DESC".equals(orderByVersion)) {
+        namedQueryName = "Snapshot.findByMpIdAndDateLatestVersionFirst";
+      }
+
+      List<SnapshotDto> snapshotDto = namedQuery.findAll(
+          namedQueryName,
+          SnapshotDto.class,
+          Pair.of("mediaPackageId", mediaPackageId),
+          Pair.of("startDate", start),
+          Pair.of("endDate", end),
+          Pair.of("organizationId", orgId)
+      ).apply(em);
+
+      return snapshotDtoToSnapshot(snapshotDto);
+    });
+  }
+
+  public List<Snapshot> getSnapshotsByNotStorageAndDate(String storageId, Date start, Date end, String orgId) {
+    return db.execTx(em -> {
+      List<SnapshotDto> snapshotDto = namedQuery.findAll(
+          "Snapshot.findByNotStorageAndDate",
+          SnapshotDto.class,
+          Pair.of("storageId", storageId),
+          Pair.of("startDate", start),
+          Pair.of("endDate", end),
+          Pair.of("organizationId", orgId)
+      ).apply(em);
+
+      return snapshotDtoToSnapshot(snapshotDto);
+    });
+  }
+
+  public List<Snapshot> getSnapshotsBySeries(String seriesId, String orgId) {
+    return db.execTx(em -> {
+      List<SnapshotDto> snapshotDto = namedQuery.findAll(
+          "Snapshot.findLatestBySeriesId",
+          SnapshotDto.class,
+          Pair.of("seriesId", seriesId),
+          Pair.of("organizationId", orgId)
+      ).apply(em);
+
+      return snapshotDtoToSnapshot(snapshotDto);
+    });
+  }
+
+  public List<Snapshot> getLatestSnapshotsByMediaPackageIds(Collection mediaPackageIds, String orgId) {
+    return db.execTx(em -> {
+      List<SnapshotDto> snapshotDto = namedQuery.findAll(
+          "Snapshot.findLatestByMpIds",
+          SnapshotDto.class,
+          Pair.of("mediaPackageIds", mediaPackageIds),
+          Pair.of("organizationId", orgId)
+      ).apply(em);
+
+      return snapshotDtoToSnapshot(snapshotDto);
+    });
+  }
+
+  public Optional<Snapshot> getSnapshot(String mediaPackageId, String orgId, Long version) {
+    return db.execTx(em -> {
+      Optional<SnapshotDto> snapshotDto = namedQuery.findOpt(
+          "Snapshot.findByMpIdOrgIdAndVersion",
+          SnapshotDto.class,
+          Pair.of("mediaPackageId", mediaPackageId),
+          Pair.of("organizationId", orgId),
+          Pair.of("version", version)
+      ).apply(em);
+
+      if (snapshotDto.isEmpty()) {
+        return Optional.empty();
+      }
+
+      Snapshot snapshot = snapshotDto.get().toSnapshot();
+      // make sure the delivered media package has valid URIs
+      snapshot = httpAssetProvider.prepareForDelivery(snapshot);
+
+      return Optional.of(snapshot);
+    });
+  }
+
+  public List<Snapshot> getSnapshotsForIndexRebuild(int offset, int limit) {
+    return db.execTx(em -> {
+      List<SnapshotDto> snapshotDto = namedQuery.findSome(
+          "Snapshot.findForIndexRebuild",
+          offset,
+          limit,
+          SnapshotDto.class
+      ).apply(em);
+
+      return snapshotDtoToSnapshot(snapshotDto);
+    });
+  }
+
+  public List<Long> getVersionsByMediaPackage(String mediaPackageId, String orgId) {
+    return db.execTx(em -> {
+      List<Long> versions = namedQuery.findAll(
+          "Snapshot.getSnapshotVersions",
+          Long.class,
+          Pair.of("mediaPackageId", mediaPackageId),
+          Pair.of("organizationId", orgId)
+      ).apply(em);
+
+      return versions;
     });
   }
 
@@ -372,5 +629,12 @@ public class Database implements EntityPaths {
       throw new RuntimeException(
           "Used DTO outside of a persistence context or the DTO has not been assigned an ID yet.");
     }
+  }
+
+  private List<Snapshot> snapshotDtoToSnapshot(List<SnapshotDto> snapshotDtos) {
+    return snapshotDtos.stream()
+        .map(s -> s.toSnapshot())
+        .map(s -> httpAssetProvider.prepareForDelivery(s))
+        .collect(Collectors.toList());
   }
 }

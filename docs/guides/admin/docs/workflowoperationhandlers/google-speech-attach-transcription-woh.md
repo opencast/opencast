@@ -28,27 +28,23 @@ Parameter Table
 Example
 -------
 
-```xml
-<!-- Attach caption/transcript -->
-<operation id="google-speech-attach-transcription"
-    description="Attach captions/transcription">
-  <configurations>
-    <!-- This is filled out by the transcription service when starting this workflow -->
-    <configuration key="transcription-job-id">${transcriptionJobId}</configuration>
-    <configuration key="line-size">100</configuration>
-    <configuration key="target-flavor">captions/source</configuration>
-    <configuration key="target-tag">archive,generator-type:auto</configuration>
-    <configuration key="target-caption-format">vtt</configuration>
-  </configurations>
-</operation>
+```yaml
+  # Attach caption/transcript
+  - id: google-speech-attach-transcription
+    description: Attach captions/transcription
+    configurations:
+      # This is filled out by the transcription service when starting this workflow
+      - transcription-job-id: ${transcriptionJobId}
+      - line-size: 100
+      - target-flavor: captions/source
+      - target-tag: archive,generator-type:auto
+      - target-caption-format: vtt
 
-<!-- Publish to engage player -->
-<operation id="publish-engage"
-    description="Distribute and publish to engage server">
-  <configurations>
-    <configuration key="download-source-flavors">dublincore/*,security/*,captions/*</configuration>
-    <configuration key="strategy">merge</configuration>
-    <configuration key="check-availability">false</configuration>
-  </configurations>
-</operation>
+  # Publish to engage player
+  - id: publish-engage
+    description: Distribute and publish to engage server
+    configurations:
+      - download-source-flavors: dublincore/*,security/*,captions/*
+      - strategy: merge
+      - check-availability: false
 ```

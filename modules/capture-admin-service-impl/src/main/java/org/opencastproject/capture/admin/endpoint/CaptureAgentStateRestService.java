@@ -130,7 +130,9 @@ public class CaptureAgentStateRestService {
   }
 
   public void unsetService(CaptureAgentStateService service) {
-    this.service = null;
+    if (this.service == service) {
+      this.service = null;
+    }
   }
 
   @Reference

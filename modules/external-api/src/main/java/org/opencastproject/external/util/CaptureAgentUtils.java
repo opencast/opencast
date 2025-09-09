@@ -20,23 +20,15 @@
  */
 package org.opencastproject.external.util;
 
-import static com.entwinemedia.fn.data.json.Jsons.arr;
-import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.obj;
-import static com.entwinemedia.fn.data.json.Jsons.v;
+import static org.opencastproject.index.service.util.JSONUtils.safeString;
 import static org.opencastproject.util.DateTimeSupport.toUTC;
 
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
 
-import com.entwinemedia.fn.data.json.Field;
-import com.entwinemedia.fn.data.json.JValue;
-import com.entwinemedia.fn.data.json.Jsons;
-
-import org.apache.commons.lang3.StringUtils;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 public final class CaptureAgentUtils {
 
@@ -55,16 +47,22 @@ public final class CaptureAgentUtils {
    *
    * @param agent
    *          The capture agent
-   * @return A {@link JValue} representing the capture agent
+   * @return A {@link JsonObject} representing the capture agent
    */
-  public static JValue generateJsonAgent(Agent agent) {
-    List<Field> fields = new ArrayList<>();
+  public static JsonObject generateJsonAgent(Agent agent) {
+    JsonObject json = new JsonObject();
     String devices = (String) agent.getCapabilities().get(CaptureParameters.CAPTURE_DEVICE_NAMES);
-    fields.add(f(JSON_KEY_STATUS, v(agent.getState(), Jsons.BLANK)));
-    fields.add(f(JSON_KEY_AGENT_ID, v(agent.getName())));
-    fields.add(f(JSON_KEY_UPDATE, v(toUTC(agent.getLastHeardFrom()), Jsons.BLANK)));
-    fields.add(f(JSON_KEY_URL, v(agent.getUrl(), Jsons.BLANK)));
-    fields.add(f(JSON_KEY_INPUTS, (StringUtils.isEmpty(devices)) ? arr() : arr(devices.split(","))));
-    return obj(fields);
+    json.addProperty(JSON_KEY_STATUS, safeString(agent.getState()));
+    json.addProperty(JSON_KEY_AGENT_ID, agent.getName());
+    json.addProperty(JSON_KEY_UPDATE, safeString(toUTC(agent.getLastHeardFrom())));
+    json.addProperty(JSON_KEY_URL, safeString(agent.getUrl()));
+    JsonArray inputs = new JsonArray();
+    if (devices != null && !devices.trim().isEmpty()) {
+      for (String device : devices.split(",")) {
+        inputs.add(new JsonPrimitive(device.trim()));
+      }
+    }
+    json.add("inputs", inputs);
+    return json;
   }
 }

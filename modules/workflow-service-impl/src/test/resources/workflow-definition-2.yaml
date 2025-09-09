@@ -1,0 +1,10 @@
+id: definition-2
+description: |-
+  Unit testing workflow
+operations:
+  - id: op1
+    fail-on-error: true
+    description: operation 1
+  - id: op3
+    fail-on-error: true
+    description: operation 3

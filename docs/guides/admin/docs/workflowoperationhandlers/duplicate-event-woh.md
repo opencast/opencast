@@ -42,21 +42,18 @@ Parameter Table
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="duplicate-event"
-    description="Duplicate event">
-  <configurations>
-    <configuration key="source-flavors">*/*</configuration>
-    <configuration key="number-of-events">${numberOfEvents}</configuration>
-    <configuration key="max-number-of-events">1000</configuration>
-    <configuration key="target-tags"></configuration> 
-    <configuration key="no-suffix">false</configuration
-    <configuration key="set-series-id">${seriesId}</configuration>
-    <configuration key="set-title">${mpTitle}</configuration>
-    <configuration key="set-start-date-time">${startDateTime}</configuration>
-    <configuration key="property-namespaces">org.opencastproject.assetmanager.security</configuration>
-    <configuration key="copy-number-prefix">copy</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: duplicate-event
+    description: Duplicate event
+    configurations:
+      - source-flavors: '*/*'
+      - number-of-events: ${numberOfEvents}
+      - max-number-of-events: 1000
+      - target-tags: ''
+      - no-suffix: false
+      - set-series-id: ${seriesId}
+      - set-title: ${mpTitle}
+      - set-start-date-time: ${startDateTime}
+      - property-namespaces: org.opencastproject.assetmanager.security
+      - copy-number-prefix: copy
 ```

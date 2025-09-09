@@ -62,39 +62,30 @@ namespaces can be used in this operation. The allowed namespaces are:
 Operation Examples
 ------------------
 
-```XML
-<operation
-    id="series"
-    description="Applying series to mediapackage">
-  <configurations>
-    <configuration key="series">0d06537e-09d3-420c-8314-a21e45c5d032</configuration>
-    <configuration key="attach">*</configuration>
-    <configuration key="apply-acl">true</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: series
+    description: Applying series to mediapackage
+    configurations:
+      - series: 0d06537e-09d3-420c-8314-a21e45c5d032
+      - attach: '*'
+      - apply-acl: true
 ```
 
-```XML
-<operation
-    id="series"
-    description="Applying series to mediapackage">
-  <configurations>
-    <configuration key="attach">*</configuration>
-    <configuration key="apply-acl">false</configuration>
-    <configuration key="copy-metadata">contributor, license</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: series
+    description: Applying series to mediapackage
+    configurations:
+      - attach: '*'
+      - apply-acl: false
+      - copy-metadata: contributor, license
 ```
 
-```XML
-<operation
-    id="series"
-    description="Applying series to mediapackage">
-  <configurations>
-    <configuration key="attach">dublincore/*</configuration>
-    <configuration key="apply-acl">false</configuration>
-    <configuration key="copy-metadata">{http://purl.org/dc/terms/}contributor custom1 custom2</configuration>
-    <configuration key="default-namespace">http://www.opencastproject.org/</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: series
+    description: Applying series to mediapackage
+    configurations:
+      - attach: dublincore/*
+      - apply-acl: false
+      - copy-metadata: '{http://purl.org/dc/terms/}contributor custom1 custom2'
+      - default-namespace: http://www.opencastproject.org/
 ```

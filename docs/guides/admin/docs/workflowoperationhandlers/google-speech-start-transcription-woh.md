@@ -27,32 +27,26 @@ Parameter Table
 Example
 -------
 
-```xml
-<!--  Encode audio to flac -->
-<operation
-    id="encode"
-    description="Extract audio for transcript generation">
-  <configurations>
-    <configuration key="source-flavor">*/source</configuration>
-    <configuration key="target-flavor">audio/flac</configuration>
-    <configuration key="target-tags">transcript</configuration>
-    <configuration key="encoding-profile">audio-flac</configuration>
-    <configuration key="process-first-match-only">true</configuration>
-  </configurations>
-</operation> 
+```yaml
+  # Encode audio to flac
+  - id: encode
+    description: Extract audio for transcript generation
+    configurations:
+      - source-flavor: '*/source'
+      - target-flavor: audio/flac
+      - target-tags: transcript
+      - encoding-profile: audio-flac
+      - process-first-match-only: true
 
-<!-- Start Google Speech transcription job -->
-<operation
-    id="google-speech-start-transcription"
-    description="Start Google Speech transcription job">
-  <configurations>
-    <!--  Skip this operation if flavor already exists. Used for cases when mp already has captions. -->
-    <configuration key="skip-if-flavor-exists">captions/timedtext</configuration>
-    <configuration key="language-code">en-US</configuration>
-    <!-- Audio to be translated, produced in the previous compose operation -->
-    <configuration key="source-tag">transcript</configuration>
-  </configurations>
-</operation>
+  # Start Google Speech transcription job
+  - id: google-speech-start-transcription
+    description: Start Google Speech transcription job
+    configurations:
+      # Skip this operation if flavor already exists. Used for cases when mp already has captions.
+      - skip-if-flavor-exists: captions/timedtext
+      - language-code: en-US
+      # Audio to be translated, produced in the previous compose operation
+      - source-tag: transcript
 ```
 
 ### Encoding profile used in example above

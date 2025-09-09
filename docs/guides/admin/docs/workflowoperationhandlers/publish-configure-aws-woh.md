@@ -84,30 +84,24 @@ Operation Example
 
 Publish to internal channel:
 
-```xml
-<operation
-    id="publish-configure-aws"
-    description="Publish to internal channel using AWS S3">
-  <configurations>
-    <configuration key="source-tags">engage</configuration>
-    <configuration key="channel-id">internal</configuration>
-    <configuration key="url-pattern">http://localhost:8080/editor-ui/index.html?id=${event_id}</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: publish-configure-aws
+    description: Publish to internal channel using AWS S3
+    configurations:
+      - source-tags: engage
+      - channel-id: internal
+      - url-pattern: http://localhost:8080/editor-ui/index.html?id=${event_id}
 ```
 
 Publish to external API:
 
-```xml
-<operation
-    id="publish-configure-aws"
-    description="Publish to external api publication channel using AWS S3">
-  <configurations>
-    <configuration key="channel-id">api</configuration>
-    <configuration key="mimetype">application/json</configuration>
-    <configuration key="source-tags">engage-download</configuration>
-    <configuration key="url-pattern">http://api.oc.org/api/events/${event_id}</configuration>
-    <configuration key="check-availability">true</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: publish-configure-aws
+    description: Publish to external api publication channel using AWS S3
+    configurations:
+      - channel-id: api
+      - mimetype: application/json
+      - source-tags: engage-download
+      - url-pattern: http://api.oc.org/api/events/${event_id}
+      - check-availability: true
 ```

@@ -128,23 +128,20 @@ Example
 
 Example of a concat operation in a workflow definition.
 
-```xml
-<!-- Add intro and outro part to the presenter track -->
-<operation
-    id="concat"
-    description="Concatenate the presenter track and the intro/outro videos.">
-  <configurations>
-    <configuration key="source-flavor-part-0">intro/source</configuration>
-    <configuration key="source-flavor-part-1">presenter/trimmed</configuration>
-    <configuration key="source-flavor-part-1-mandatory">true</configuration>
-    <configuration key="source-flavor-part-2">outro/source</configuration>
-    <configuration key="target-flavor">presenter/concat</configuration>
-    <configuration key="target-tags">engage-download,engage-streaming</configuration>
-    <configuration key="encoding-profile">concat</configuration>
-    <configuration key="output-resolution">1920x1080</configuration>
-    <configuration key="output-framerate">part-1</configuration>
-  </configurations>
-</operation>
+```yaml
+  # Add intro and outro part to the presenter track
+  - id: concat
+    description: Concatenate the presenter track and the intro/outro videos.
+    configurations:
+      - source-flavor-part-0: intro/source
+      - source-flavor-part-1: presenter/trimmed
+      - source-flavor-part-1-mandatory: true
+      - source-flavor-part-2: outro/source
+      - target-flavor: presenter/concat
+      - target-tags: engage-download,engage-streaming
+      - encoding-profile: concat
+      - output-resolution: 1920x1080
+      - output-framerate: part-1
 ```
 
 Encoding Profile

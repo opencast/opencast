@@ -31,7 +31,6 @@ import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.opencastproject.assetmanager.api.fn.Enrichments.enrich;
 import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newDBSession;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
@@ -64,11 +63,6 @@ import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
-import org.opencastproject.assetmanager.api.Version;
-import org.opencastproject.assetmanager.api.query.AQueryBuilder;
-import org.opencastproject.assetmanager.api.query.ARecord;
-import org.opencastproject.assetmanager.api.query.AResult;
-import org.opencastproject.assetmanager.api.query.RichAResult;
 import org.opencastproject.assetmanager.api.storage.AssetStore;
 import org.opencastproject.assetmanager.api.storage.AssetStoreException;
 import org.opencastproject.assetmanager.api.storage.DeletionSelector;
@@ -76,7 +70,6 @@ import org.opencastproject.assetmanager.api.storage.Source;
 import org.opencastproject.assetmanager.api.storage.StoragePath;
 import org.opencastproject.assetmanager.impl.AssetManagerImpl;
 import org.opencastproject.assetmanager.impl.HttpAssetProvider;
-import org.opencastproject.assetmanager.impl.VersionImpl;
 import org.opencastproject.assetmanager.impl.persistence.Database;
 import org.opencastproject.authorization.xacml.XACMLUtils;
 import org.opencastproject.db.DBSession;
@@ -94,7 +87,6 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.identifier.IdImpl;
-import org.opencastproject.message.broker.api.update.AssetManagerUpdateHandler;
 import org.opencastproject.message.broker.api.update.SchedulerUpdateHandler;
 import org.opencastproject.metadata.dublincore.CatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
@@ -104,7 +96,6 @@ import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.Precision;
 import org.opencastproject.scheduler.api.Recording;
-import org.opencastproject.scheduler.api.RecordingState;
 import org.opencastproject.scheduler.api.SchedulerConflictException;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
@@ -135,8 +126,6 @@ import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Monadics;
 import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.functions.Misc;
-
-import com.entwinemedia.fn.Fn;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
@@ -445,8 +434,6 @@ public class SchedulerServiceImplTest {
     assertEquals(seriesId, mediaPackage.getSeries());
     DublinCoreCatalog eventLoaded = schedSvc.getDublinCore(mp.getIdentifier().toString());
     assertEquals(event.getFirst(PROPERTY_TITLE), eventLoaded.getFirst(PROPERTY_TITLE));
-    // the returned map is of type com.entwinemedia.fn.data.ImmutableMapWrapper which
-    // does not delegate equals and hashcode so it is necessary to create a HashMap from it
     TechnicalMetadata technicalMetadata = schedSvc.getTechnicalMetadata(mp.getIdentifier().toString());
     assertEquals(mp.getIdentifier().toString(), technicalMetadata.getEventId());
     assertEquals(captureDeviceID, technicalMetadata.getAgentId());
@@ -852,79 +839,6 @@ public class SchedulerServiceImplTest {
   }
 
   @Test
-  public void testGetArchivedOnly() throws Exception {
-    MediaPackage mediaPackage = generateEvent(Optional.of("1"));
-    Version version = assetManager.takeSnapshot("test", mediaPackage).getVersion();
-    Assert.assertEquals(VersionImpl.FIRST, version);
-
-    String mediaPackageId = mediaPackage.getIdentifier().toString();
-    try {
-      schedSvc.getMediaPackage(mediaPackageId);
-      fail();
-    } catch (NotFoundException e) {
-      Assert.assertNotNull(e);
-    }
-
-    try {
-      schedSvc.getDublinCore(mediaPackageId);
-      fail();
-    } catch (NotFoundException e) {
-      Assert.assertNotNull(e);
-    }
-
-    try {
-      schedSvc.getWorkflowConfig(mediaPackageId);
-      fail();
-    } catch (NotFoundException e) {
-      Assert.assertNotNull(e);
-    }
-
-    try {
-      schedSvc.getCaptureAgentConfiguration(mediaPackageId);
-      fail();
-    } catch (NotFoundException e) {
-      Assert.assertNotNull(e);
-    }
-
-    try {
-      schedSvc.getRecordingState(mediaPackageId);
-      fail();
-    } catch (NotFoundException e) {
-      Assert.assertNotNull(e);
-    }
-
-    try {
-      schedSvc.removeRecording(mediaPackageId);
-      fail();
-    } catch (NotFoundException e) {
-      Assert.assertNotNull(e);
-    }
-
-    try {
-      schedSvc.removeEvent(mediaPackageId);
-      fail();
-    } catch (NotFoundException e) {
-      Assert.assertNotNull(e);
-    }
-
-    try {
-      schedSvc.updateRecordingState(mediaPackageId, RecordingState.CAPTURING);
-      fail();
-    } catch (NotFoundException e) {
-      Assert.assertNotNull(e);
-    }
-
-    try {
-      schedSvc.updateEvent(mediaPackageId, Optional.empty(), Optional.empty(), Optional.empty(),
-              Optional.empty(), Optional.empty(), Optional.empty(),
-              Optional.empty());
-      fail();
-    } catch (NotFoundException e) {
-      Assert.assertNotNull(e);
-    }
-  }
-
-  @Test
   public void removeRecording() throws Exception {
     long currentTime = System.currentTimeMillis();
     String id = "Recording1";
@@ -1246,15 +1160,13 @@ public class SchedulerServiceImplTest {
       Assert.assertNotNull(e);
     }
 
-    AQueryBuilder query = assetManager.createQuery();
-    AResult result = query.select(query.snapshot()).where(query.organizationId().eq(new DefaultOrganization().getId())
-            .and(query.mediaPackageId(mp.getIdentifier().toString())).and(query.version().isLatest())).run();
-    Optional<ARecord> record = result.getRecords().stream().findFirst();
-    assertFalse(record.isPresent());
+    Optional<MediaPackage> mediaPackage = assetManager.getMediaPackage(mp.getIdentifier().toString());
+    assertFalse(mediaPackage.isPresent());
   }
 
   @Test
   public void testRemoveEventSimple() throws Exception {
+    String defaultOrgId = new DefaultOrganization().getId().toString();
     final Date start = new Date(System.currentTimeMillis() - 160000);
     final Date end = new Date(System.currentTimeMillis() - 60000);
     final String captureDeviceID = "demo";
@@ -1263,16 +1175,14 @@ public class SchedulerServiceImplTest {
     final DublinCoreCatalog event = generateEvent(captureDeviceID, start, end);
     addDublinCore(Optional.empty(), mp, event);
     final Map<String, String> caProperties = generateCaptureAgentMetadata(captureDeviceID);
-    final AQueryBuilder q = assetManager.createQuery();
     // make sure that the asset manager is empty
-    assertEquals("The asset manager should not contain any episodes", 0, q.select(q.snapshot()).run().getSize());
+    assertEquals("The asset manager should not contain any episodes", 0, assetManager.countEvents(defaultOrgId));
     // store event
     schedSvc.addEvent(start, end, captureDeviceID, Collections.<String> emptySet(), mp, wfProperties, caProperties,
             Optional.empty());
     {
-      final RichAResult r = enrich(q.select(q.snapshot()).run());
-      assertEquals("The asset manager should contain one episode", 1, r.getSize());
-      assertEquals("Episode ID", mpId, r.getRecords().stream().findFirst().get().getMediaPackageId());
+      assertEquals("The asset manager should contain one episode", 1, assetManager.countEvents(defaultOrgId));
+      assertTrue(assetManager.snapshotExists(mpId));
     }
     // remove event
     schedSvc.removeEvent(mpId);
@@ -1667,12 +1577,10 @@ public class SchedulerServiceImplTest {
   }
 
   AssetManager mkAssetManager() throws Exception {
-    final DBSession dbSession = newDBSession("org.opencastproject.assetmanager.impl");
-    final Database db = new Database(dbSession);
     HttpAssetProvider httpAssetProvider = new HttpAssetProvider() {
       @Override
       public Snapshot prepareForDelivery(Snapshot snapshot) {
-        return AssetManagerImpl.rewriteUris(snapshot, new Fn<MediaPackageElement, URI>() {
+        return AssetManagerImpl.rewriteUris(snapshot, new java.util.function.Function<MediaPackageElement, URI>() {
           @Override public URI apply(MediaPackageElement mpe) {
             String baseName = AssetManagerImpl.getFileNameFromUrn(mpe).orElse(mpe.getElementType().toString());
 
@@ -1686,6 +1594,10 @@ public class SchedulerServiceImplTest {
         });
       }
     };
+
+    final DBSession dbSession = newDBSession("org.opencastproject.assetmanager.impl");
+    final Database db = new Database(dbSession);
+    db.setHttpAssetProvider(httpAssetProvider);
 
     JaxbOrganization org = new DefaultOrganization();
     JaxbUser user = new JaxbUser("user", null, org, new JaxbRole(DefaultOrganization.DEFAULT_ORGANIZATION_ADMIN,
@@ -1715,8 +1627,6 @@ public class SchedulerServiceImplTest {
     am.setAuthorizationService(authorizationService);
     am.setSecurityService(securityService);
     am.setIndex(esIndex);
-    am.addEventHandler(EasyMock.createNiceMock(AssetManagerUpdateHandler.class));
-    am.addEventHandler(EasyMock.createNiceMock(AssetManagerUpdateHandler.class));
     return am;
   }
 

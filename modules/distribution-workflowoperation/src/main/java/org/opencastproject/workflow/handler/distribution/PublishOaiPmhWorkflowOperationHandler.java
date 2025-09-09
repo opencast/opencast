@@ -151,12 +151,9 @@ public class PublishOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
             .bind(trimToNone).map(toBool).getOrElse(true);
     String repository = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(REPOSITORY));
 
-    Optional<String> externalChannel = Optional.ofNullable(
-        getOptConfig(workflowInstance.getCurrentOperation(), EXTERNAL_CHANNEL_NAME).orNull());
-    Optional<String> externalTemplate = Optional.ofNullable(
-        getOptConfig(workflowInstance.getCurrentOperation(), EXTERNAL_TEMPLATE).orNull());
-    Optional<MimeType> externalMimetype = Optional.ofNullable(
-        getOptConfig(workflowInstance.getCurrentOperation(), EXTERNAL_MIME_TYPE).orNull())
+    Optional<String> externalChannel = getOptConfig(workflowInstance.getCurrentOperation(), EXTERNAL_CHANNEL_NAME);
+    Optional<String> externalTemplate = getOptConfig(workflowInstance.getCurrentOperation(), EXTERNAL_TEMPLATE);
+    Optional<MimeType> externalMimetype = getOptConfig(workflowInstance.getCurrentOperation(), EXTERNAL_MIME_TYPE)
         .flatMap(MimeTypes::toMimeType);
 
     if (repository == null) {

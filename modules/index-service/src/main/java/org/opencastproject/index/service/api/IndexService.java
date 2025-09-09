@@ -43,14 +43,13 @@ import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.json.simple.JSONObject;
 
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -78,7 +77,7 @@ public interface IndexService {
    * @throws SearchIndexException
    *           Thrown if the index cannot be read
    */
-  Opt<Event> getEvent(String id, ElasticsearchIndex index) throws SearchIndexException;
+  Optional<Event> getEvent(String id, ElasticsearchIndex index) throws SearchIndexException;
 
   /**
    * Creates a new event based on a request.
@@ -329,8 +328,8 @@ public interface IndexService {
    * @throws IndexServiceException
    *           Thrown if there are issues with processing the request.
    */
-  String createSeries(MetadataList metadataList, Map<String, String> options, Opt<AccessControlList> optAcl,
-          Opt<Long> optThemeId) throws IndexServiceException;
+  String createSeries(MetadataList metadataList, Map<String, String> options, Optional<AccessControlList> optAcl,
+          Optional<Long> optThemeId) throws IndexServiceException;
 
   /**
    * Remove a series.

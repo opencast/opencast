@@ -24,14 +24,10 @@ package org.opencastproject.assetmanager.aws.s3.endpoint;
 import static org.opencastproject.util.RestUtil.R.noContent;
 import static org.opencastproject.util.RestUtil.R.notFound;
 import static org.opencastproject.util.RestUtil.R.ok;
-import static org.opencastproject.util.RestUtil.R.serverError;
 
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.AssetManagerException;
-import org.opencastproject.assetmanager.api.query.AQueryBuilder;
-import org.opencastproject.assetmanager.api.query.ARecord;
-import org.opencastproject.assetmanager.api.query.AResult;
-import org.opencastproject.assetmanager.api.query.ASelectQuery;
+import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.storage.AssetStoreException;
 import org.opencastproject.assetmanager.api.storage.StoragePath;
 import org.opencastproject.assetmanager.aws.s3.AwsS3AssetStore;
@@ -52,6 +48,8 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.BadRequestException;
@@ -118,30 +116,20 @@ public class AwsS3RestEndpoint {
       }
 
       @Override public Response apply() {
-        AQueryBuilder q = assetManager.createQuery();
-        final ASelectQuery idQuery = q.select(q.snapshot())
-            .where(
-                q.organizationId(securityService.getOrganization().getId())
-                    .and(q.mediaPackageId(getMediaPackageId()))
-                    .and(q.version().isLatest()));
-        final AResult result = idQuery.run();
-        if (result.getSize() > 1) {
-          return serverError();
-        }
-        if (result.getSize() == 0) {
+        Optional<Snapshot> snapshot = assetManager.getLatestSnapshot(mediaPackageId);
+        if (snapshot.isEmpty()) {
           return notFound();
         }
-        final ARecord item = result.getRecords().stream().findFirst().get();
 
         StringBuilder info = new StringBuilder();
-        for (MediaPackageElement e : assetManager.getMediaPackage(item.getMediaPackageId()).get().elements()) {
+        for (MediaPackageElement e : snapshot.get().getMediaPackage().elements()) {
           if (e.getElementType() == MediaPackageElement.Type.Publication) {
             continue;
           }
 
           StoragePath storagePath = new StoragePath(securityService.getOrganization().getId(),
               getMediaPackageId(),
-              item.getSnapshot().get().getVersion(),
+              snapshot.get().getVersion(),
               e.getIdentifier());
           if (awsS3AssetStore.contains(storagePath)) {
             try {
@@ -200,30 +188,19 @@ public class AwsS3RestEndpoint {
       }
 
       @Override public Response apply() {
-        AQueryBuilder q = assetManager.createQuery();
-        final ASelectQuery idQuery = q.select(q.snapshot())
-            .where(
-                q.organizationId(securityService.getOrganization().getId())
-                    .and(q.mediaPackageId(getMediaPackageId()))
-                    .and(q.version().isLatest()));
-        final AResult result = idQuery.run();
-        if (result.getSize() > 1) {
-          return serverError();
-        }
-        if (result.getSize() == 0) {
+        Optional<Snapshot> snapshot = assetManager.getLatestSnapshot(mediaPackageId);
+        if (snapshot.isEmpty()) {
           return notFound();
         }
-        final ARecord item = result.getRecords().stream().findFirst().get();
-
         StringBuilder info = new StringBuilder();
-        for (MediaPackageElement e : assetManager.getMediaPackage(item.getMediaPackageId()).get().elements()) {
+        for (MediaPackageElement e : snapshot.get().getMediaPackage().elements()) {
           if (e.getElementType() == MediaPackageElement.Type.Publication) {
             continue;
           }
 
           StoragePath storagePath = new StoragePath(securityService.getOrganization().getId(),
               getMediaPackageId(),
-              item.getSnapshot().get().getVersion(),
+              snapshot.get().getVersion(),
               e.getIdentifier());
           if (awsS3AssetStore.contains(storagePath)) {
             try {
@@ -274,30 +251,20 @@ public class AwsS3RestEndpoint {
       }
 
       @Override public Response apply() {
-        AQueryBuilder q = assetManager.createQuery();
-        final ASelectQuery idQuery = q.select(q.snapshot())
-            .where(
-                q.organizationId(securityService.getOrganization().getId())
-                    .and(q.mediaPackageId(getMediaPackageId()))
-                    .and(q.version().isLatest()));
-        final AResult result = idQuery.run();
-        if (result.getSize() > 1) {
-          return serverError();
-        }
-        if (result.getSize() == 0) {
+        Optional<Snapshot> snapshot = assetManager.getLatestSnapshot(mediaPackageId);
+        if (snapshot.isEmpty()) {
           return notFound();
         }
-        final ARecord item = result.getRecords().stream().findFirst().get();
 
         StringBuilder info = new StringBuilder();
-        for (MediaPackageElement e : assetManager.getMediaPackage(item.getMediaPackageId()).get().elements()) {
+        for (MediaPackageElement e : snapshot.get().getMediaPackage().elements()) {
           if (e.getElementType() == MediaPackageElement.Type.Publication) {
             continue;
           }
 
           StoragePath storagePath = new StoragePath(securityService.getOrganization().getId(),
                                                     getMediaPackageId(),
-                                                    item.getSnapshot().get().getVersion(),
+                                                    snapshot.get().getVersion(),
                                                     e.getIdentifier());
           if (isFrozen(storagePath)) {
             try {
@@ -367,30 +334,19 @@ public class AwsS3RestEndpoint {
           throw new BadRequestException("Restore period must be greater than zero!");
         }
 
-        AQueryBuilder q = assetManager.createQuery();
-        final ASelectQuery idQuery = q.select(q.snapshot())
-            .where(
-                q.organizationId(securityService.getOrganization().getId())
-                    .and(q.mediaPackageId(getMediaPackageId()))
-                    .and(q.version().isLatest()));
-        final AResult result = idQuery.run();
-        if (result.getSize() > 1) {
-          return serverError();
-        }
-        if (result.getSize() == 0) {
+        Optional<Snapshot> snapshot = assetManager.getLatestSnapshot(mediaPackageId);
+        if (snapshot.isEmpty()) {
           return notFound();
         }
-        final ARecord item = result.getRecords().stream().findFirst().get();
 
-
-        for (MediaPackageElement e : assetManager.getMediaPackage(item.getMediaPackageId()).get().elements()) {
+        for (MediaPackageElement e : snapshot.get().getMediaPackage().elements()) {
           if (e.getElementType() == MediaPackageElement.Type.Publication) {
             continue;
           }
 
           StoragePath storagePath = new StoragePath(securityService.getOrganization().getId(),
                                                     getMediaPackageId(),
-                                                    item.getSnapshot().get().getVersion(),
+                                                    snapshot.get().getVersion(),
                                                     e.getIdentifier());
           if (isFrozen(storagePath)) {
             try {

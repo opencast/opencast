@@ -36,19 +36,16 @@ This operation would convert all image attachments with flavor matches `*/previe
 formats described by the encoding profiles `preview-regular.image` and `preview-small.image`.
 The produced image attachments will have an flavor with the subtype `preview+player`.
 
-```xml
-<operation
-    id="image-convert"
-    description="Resize images to fixed size">
-  <configurations>
-    <configuration key="source-tags">player</configuration>
-    <configuration key="source-flavors">*/preview</configuration>
-    <configuration key="tags-and-flavors">true</configuration>
-    <configuration key="target-tags"></configuration>
-    <configuration key="target-flavor">*/preview+player</configuration>
-    <configuration key="encoding-profiles">preview-regular.image,preview-small.image</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: image-convert
+    description: Resize images to fixed size
+    configurations:
+      - source-tags: player
+      - source-flavors: '*/preview'
+      - tags-and-flavors: true
+      - target-tags: ''
+      - target-flavor: '*/preview+player'
+      - encoding-profiles: preview-regular.image,preview-small.image
 ```
 
 ### Encoding Profile Example

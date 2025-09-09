@@ -26,8 +26,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.NotFoundException;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
@@ -37,6 +35,7 @@ import org.junit.runner.RunWith;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 import junitparams.JUnitParamsRunner;
 
@@ -64,7 +63,7 @@ public class AssetManagerJobProducerTest
 
   @Test
   public void testById() throws ServiceRegistryException {
-    String[] mp = createAndAddMediaPackagesSimple(1, 2, 2, Opt.<String>none());
+    String[] mp = createAndAddMediaPackagesSimple(1, 2, 2, Optional.empty());
 
     createIdExpectation(mp[0]);
     EasyMock.replay(sr);
@@ -76,7 +75,7 @@ public class AssetManagerJobProducerTest
 
   @Test
   public void testInternalById() throws ServiceRegistryException {
-    String[] mp = createAndAddMediaPackagesSimple(2, 2, 2, Opt.<String>none());
+    String[] mp = createAndAddMediaPackagesSimple(2, 2, 2, Optional.empty());
     // Because this is the internal check, this is an id-and-version check since
     // it's the terminal phase (ie, post process())
     createIdAndVersionExpectation(mp[1], 0, 2);
@@ -90,7 +89,7 @@ public class AssetManagerJobProducerTest
 
   @Test
   public void testProcessById() throws ServiceRegistryException {
-    String[] mp = createAndAddMediaPackagesSimple(2, 2, 2, Opt.<String>none());
+    String[] mp = createAndAddMediaPackagesSimple(2, 2, 2, Optional.empty());
     //This is checking the logic of process(), so we need to have terminal phase jobs
     List<Job> jobs = createIdAndVersionExpectation(mp[1], 0, 2);
     EasyMock.replay(sr);
@@ -102,7 +101,7 @@ public class AssetManagerJobProducerTest
 
   @Test
   public void testByIdAndVersion() throws ServiceRegistryException {
-    String[] mp = createAndAddMediaPackagesSimple(1, 2, 2, Opt.<String>none());
+    String[] mp = createAndAddMediaPackagesSimple(1, 2, 2, Optional.empty());
     //This is a terminal query, so we need terminal expectations
     createIdAndVersionExpectation(mp[0], 1, 2);
     EasyMock.replay(sr);
@@ -114,7 +113,7 @@ public class AssetManagerJobProducerTest
 
   @Test
   public void testInternalByIdAndVersion() throws NotFoundException, ServiceRegistryException {
-    String[] mp = createAndAddMediaPackagesSimple(2, 2, 2, Opt.<String>none());
+    String[] mp = createAndAddMediaPackagesSimple(2, 2, 2, Optional.empty());
     //This is a terminal query, so we need terminal expectations
     createIdAndVersionExpectation(mp[1], 1, 1);
     EasyMock.replay(sr);
@@ -126,7 +125,7 @@ public class AssetManagerJobProducerTest
 
   @Test
   public void testProcessByIdAndVersion() throws NotFoundException, ServiceRegistryException {
-    String[] mp = createAndAddMediaPackagesSimple(2, 2, 2, Opt.<String>none());
+    String[] mp = createAndAddMediaPackagesSimple(2, 2, 2, Optional.empty());
     //This is a terminal query, so we need terminal expectations;
     List<Job> jobs = createIdAndVersionExpectation(mp[1], 1, 1);
     EasyMock.replay(sr);
@@ -145,7 +144,7 @@ public class AssetManagerJobProducerTest
 
   @Test
   public void testByDate() throws ServiceRegistryException {
-    String[] mp = createAndAddMediaPackagesSimple(1, 2, 2, Opt.<String>none());
+    String[] mp = createAndAddMediaPackagesSimple(1, 2, 2, Optional.empty());
     Date start = new Date(-10000L);
     Date end = new Date(new Date().getTime() + 10000L);
     //Non terminal query, non terminal expectations
@@ -163,7 +162,7 @@ public class AssetManagerJobProducerTest
     Thread.sleep(1);
     Date before = new Date();
     Thread.sleep(1);
-    String[] mp = createAndAddMediaPackagesSimple(2, 2, 2, Opt.<String>none());
+    String[] mp = createAndAddMediaPackagesSimple(2, 2, 2, Optional.empty());
     Thread.sleep(1);
     Date after = new Date();
     //Non terminal query, but internal test so we create terminal expectations
@@ -189,7 +188,7 @@ public class AssetManagerJobProducerTest
   @Test
   public void testProcessByDate() throws NotFoundException, ServiceRegistryException {
     Date start = new Date();
-    String[] mps = createAndAddMediaPackagesSimple(2, 2, 2, Opt.<String>none());
+    String[] mps = createAndAddMediaPackagesSimple(2, 2, 2, Optional.empty());
     Date after = new Date();
     //Non terminal query, but internal test so we create terminal expectations
     List<Job> jobs = createDateTriggerJob(mps, 2);
@@ -203,7 +202,7 @@ public class AssetManagerJobProducerTest
 
   @Test
   public void testByDateAndId() throws ServiceRegistryException {
-    String[] mp = createAndAddMediaPackagesSimple(1, 2, 2, Opt.<String>none());
+    String[] mp = createAndAddMediaPackagesSimple(1, 2, 2, Optional.empty());
     Date start = new Date(-10000L);
     Date end = new Date(new Date().getTime() + 10000L);
     //Non terminal query, non terminal expectations
@@ -221,7 +220,7 @@ public class AssetManagerJobProducerTest
   public void testInternalByIdAndDate() throws NotFoundException, ServiceRegistryException {
     Date start = new Date();
     Date before = new Date();
-    String[] mp = createAndAddMediaPackagesSimple(2, 2, 2, Opt.<String>none());
+    String[] mp = createAndAddMediaPackagesSimple(2, 2, 2, Optional.empty());
     Date after = new Date();
     //Non terminal query, but internal test so we create terminal expectations
     createIdAndVersionExpectation(mp[1], 0, 2);
@@ -237,7 +236,7 @@ public class AssetManagerJobProducerTest
 
   @Test
   public void testProcessByIdAndDate() throws NotFoundException, ServiceRegistryException {
-    String[] mp = createAndAddMediaPackagesSimple(2, 2, 2, Opt.<String>none());
+    String[] mp = createAndAddMediaPackagesSimple(2, 2, 2, Optional.empty());
     //Non terminal query, but internal test so we create terminal expectations
     List<Job> jobs = createDateTriggerJob(mp, 2);
     EasyMock.replay(sr);

@@ -12,9 +12,7 @@ There are no configuration keys.
 Operation Example
 -----------------
 
-```xml
-<operation
-  id="retract-youtube"
-  description="Retract recording from YouTube">
-</operation>
+```yaml
+  - id: retract-youtube
+    description: Retract recording from YouTube
 ```

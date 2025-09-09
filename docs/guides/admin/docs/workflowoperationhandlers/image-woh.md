@@ -35,19 +35,16 @@ Operation Example
 
 Extract one image at position 1 second using the encoding profile `search-cover.http`.
 
-```xml
-<operation
-    id="image"
-    description="Encoding presenter preview image">
-  <configurations>
-    <configuration key="source-flavor">presenter/trimmed</configuration>
-    <configuration key="source-tags"></configuration>
-    <configuration key="target-flavor">presenter/search+preview</configuration>
-    <configuration key="target-tags">engage</configuration>
-    <configuration key="encoding-profile">search-cover.http</configuration>
-    <configuration key="time">1</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: image
+    description: Encoding presenter preview image
+    configurations:
+      - source-flavor: presenter/trimmed
+      - source-tags: ''
+      - target-flavor: presenter/search+preview
+      - target-tags: engage
+      - encoding-profile: search-cover.http
+      - time: 1
 ```
 
 Extract images at three relative positions (*1%, 50%, 100%*) from the `presenter/trimmed` track. For each position, we
@@ -55,18 +52,15 @@ use three different encoding profiles (`example.encoding.profile.*`). This opera
 total. The target filenames will be formed based on the `target-base-name-format-*` configuration keys (prefix) and the
 configuration of the encoding profiles (file extension and possibly suffix).
 
-```xml
-<operation
-    id="image"
-    description="Extract set of thumbnails">
-  <configurations>
-    <configuration key="source-flavor">presenter/trimmed</configuration>
-    <configuration key="target-flavor">presenter/thumbnails</configuration>
-    <configuration key="target-base-name-format-second">thumbnail_%.3f%s</configuration>
-    <configuration key="target-base-name-format-percent">thumbnail_%.0f%s</configuration>
-    <configuration key="encoding-profile"> example.encoding.profile.small, example.encoding.profile.medium, example.encoding.profile.large</configuration>
-    <configuration key="time">1%, 50%, 100%</configuration>
-    <configuration key="end-margin">1000</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: image
+    description: Extract set of thumbnails
+    configurations:
+      - source-flavor: presenter/trimmed
+      - target-flavor: presenter/thumbnails
+      - target-base-name-format-second: thumbnail_%.3f%s
+      - target-base-name-format-percent: thumbnail_%.0f%s
+      - encoding-profile: example.encoding.profile.small, example.encoding.profile.medium, example.encoding.profile.large
+      - time: 1%, 50%, 100%
+      - end-margin: 1000
 ```

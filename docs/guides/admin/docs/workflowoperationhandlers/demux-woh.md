@@ -27,17 +27,14 @@ output files (same order). Target flavors are separated by `,` as usual. They ar
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="demux"
-    description="Extract presenter and presentation video from multitrack source">
-  <configurations>
-    <configuration key="source-flavors">multitrack/source</configuration>
-    <configuration key="target-flavors">presenter/source,presentation/source</configuration>
-    <configuration key="target-tags">archive</configuration>
-    <configuration key="encoding-profile">demux</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: demux
+    description: Extract presenter and presentation video from multitrack source
+    configurations:
+      - source-flavors: multitrack/source
+      - target-flavors: presenter/source,presentation/source
+      - target-tags: archive
+      - encoding-profile: demux
 ```
 
 Example Profile

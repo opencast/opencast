@@ -34,28 +34,22 @@ Tags and flavors can be used in combination.
 
 ## Operation Example
 
-```xml
-<operation
-  id="tag"
-  description="Tagging media package elements">
-  <configurations>
-    <configuration key="source-tags">engage,publish</configuration>
-    <configuration key="source-flavors">presentation/trimmed</configuration>
-    <configuration key="target-flavor">presentation/tagged</configuration>
-    <configuration key="copy">true</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: tag
+    description: Tagging media package elements
+    configurations:
+      - source-tags: engage,publish
+      - source-flavors: presentation/trimmed
+      - target-flavor: presentation/tagged
+      - copy: true
 ```
 
 You can also use `tag` to just modify flavors (`*/source` will not be present any longer):
 
-```xml
-<operation
-  id="tag"
-  description="Changing flavor of source elements">
-  <configurations>
-    <configuration key="source-flavors">*/source</configuration>
-    <configuration key="target-flavor">*/delivery</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: tag
+    description: Changing flavor of source elements
+    configurations:
+      - source-flavors: '*/source'
+      - target-flavor: '*/delivery'
 ```

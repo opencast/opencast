@@ -75,8 +75,7 @@ public final class BulkUpdateUtil {
     final ElasticsearchIndex index,
     final String id) {
     try {
-      final Event event = indexSvc.getEvent(id, index).orNull();
-      return Optional.ofNullable(event);
+      return indexSvc.getEvent(id, index);
     } catch (SearchIndexException e) {
       throw new RuntimeException(e);
     }

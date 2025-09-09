@@ -26,13 +26,11 @@ Parameter Table
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="retract-partial"
-    description="Retracting elements flavored with presentation and tagged with preview from Engage">
-  <configurations>
-    <configuration key="retract-flavors">presentation/*</configuration>
-    <configuration key="retract-tags">preview</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: retract-partial
+    description: Retracting elements flavored with presentation and tagged with 
+      preview from Engage
+    configurations:
+      - retract-flavors: presentation/*
+      - retract-tags: preview
 ```

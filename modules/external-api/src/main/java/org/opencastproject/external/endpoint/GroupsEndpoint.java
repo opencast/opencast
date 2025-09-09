@@ -20,10 +20,6 @@
  */
 package org.opencastproject.external.endpoint;
 
-import static com.entwinemedia.fn.data.json.Jsons.arr;
-import static com.entwinemedia.fn.data.json.Jsons.f;
-import static com.entwinemedia.fn.data.json.Jsons.obj;
-import static com.entwinemedia.fn.data.json.Jsons.v;
 import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_CONFLICT;
 import static javax.servlet.http.HttpServletResponse.SC_CREATED;
@@ -32,9 +28,9 @@ import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.exception.ExceptionUtils.getMessage;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_6_0;
+import static org.opencastproject.index.service.util.JSONUtils.safeString;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
@@ -55,9 +51,8 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.util.requests.SortCriterion;
 
-import com.entwinemedia.fn.data.json.Field;
-import com.entwinemedia.fn.data.json.JValue;
-import com.entwinemedia.fn.data.json.Jsons;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import org.apache.commons.collections4.ComparatorUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -190,8 +185,8 @@ public class GroupsEndpoint {
       sortCriteria.removeAll(deprecatedSortCriteria);
     }
 
-    List<JpaGroup> results = jpaGroupRoleProvider.getGroups(optLimit, optOffset, optNameFilter, Optional.empty(),
-            sortCriteria);
+    List<JpaGroup> results = jpaGroupRoleProvider.getGroups(optLimit, optOffset, optNameFilter,
+        Optional.empty(), Optional.empty(), sortCriteria);
 
     // sorting by members & roles is only available for api versions < 1.6.0
     if (requestedVersion.isSmallerThan(VERSION_1_6_0)) {
@@ -227,19 +222,24 @@ public class GroupsEndpoint {
       Collections.sort(results, ComparatorUtils.chainedComparator(comparators));
     }
 
-    List<JValue> groupsJSON = new ArrayList<>();
+    List<JsonObject> groupsJson = new ArrayList<>();
     for (JpaGroup group : results) {
-      List<Field> fields = new ArrayList<>();
-      fields.add(f("identifier", v(group.getGroupId())));
-      fields.add(f("organization", v(group.getOrganization().getId())));
-      fields.add(f("role", v(group.getRole())));
-      fields.add(f("name", v(group.getName(), Jsons.BLANK)));
-      fields.add(f("description", v(group.getDescription(), Jsons.BLANK)));
-      fields.add(f("roles", v(join(group.getRoleNames(), ","), Jsons.BLANK)));
-      fields.add(f("members", v(join(group.getMembers(), ","), Jsons.BLANK)));
-      groupsJSON.add(obj(fields));
+      JsonObject groupJson = new JsonObject();
+
+      groupJson.addProperty("identifier", group.getGroupId());
+      groupJson.addProperty("organization", group.getOrganization().getId());
+      groupJson.addProperty("role", group.getRole());
+      groupJson.addProperty("name", safeString(group.getName()));
+      groupJson.addProperty("description", safeString(group.getDescription()));
+      groupJson.addProperty("roles", group.getRoleNames() != null ? String.join(",", group.getRoleNames()) : "");
+      groupJson.addProperty("members", group.getMembers() != null ? String.join(",", group.getMembers()) : "");
+
+      groupsJson.add(groupJson);
     }
-    return ApiResponseBuilder.Json.ok(acceptHeader, arr(groupsJSON));
+    JsonArray responseArray = new JsonArray();
+    groupsJson.forEach(responseArray::add);
+
+    return ApiResponseBuilder.Json.ok(acceptHeader, responseArray);
   }
 
   /**
@@ -279,16 +279,16 @@ public class GroupsEndpoint {
       return ApiResponseBuilder.notFound("Cannot find a group with id '%s'.", id);
     }
 
-    return ApiResponseBuilder.Json.ok(acceptHeader,
-            obj(
-                    f("identifier", v(group.getGroupId())),
-                    f("organization", v(group.getOrganization().getId())),  f("role", v(group.getRole())),
-                    f("name", v(group.getName(), Jsons.BLANK)),
-                    f("description", v(group.getDescription(), Jsons.BLANK)),
-                    f("roles", v(join(group.getRoleNames(), ","), Jsons.BLANK)),
-                    f("members", v(join(group.getMembers(), ","), Jsons.BLANK))
-            )
-    );
+    JsonObject json = new JsonObject();
+    json.addProperty("identifier", group.getGroupId());
+    json.addProperty("organization", group.getOrganization().getId());
+    json.addProperty("role", group.getRole());
+    json.addProperty("name", safeString(group.getName()));
+    json.addProperty("description", safeString(group.getDescription()));
+    json.addProperty("roles", safeString(group.getRoleNames()));
+    json.addProperty("members", safeString(group.getMembers()));
+
+    return ApiResponseBuilder.Json.ok(acceptHeader, json);
   }
 
   @DELETE
