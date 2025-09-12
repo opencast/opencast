@@ -376,6 +376,21 @@ public class AclEndpoint {
     throw new NotFoundException();
   }
 
+  @GET
+  @Path("acl/{name}")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "getaclbyname", description = "Return the ACL by the given name", returnDescription = "Return the ACL by the given name", pathParameters = { @RestParameter(name = "name", isRequired = true, description = "The ACL name", type = STRING) }, responses = {
+      @RestResponse(responseCode = SC_OK, description = "The ACL has successfully been returned"),
+      @RestResponse(responseCode = SC_NOT_FOUND, description = "The ACL has not been found") })
+  public Response getAcl(@PathParam("name") String aclName) throws NotFoundException {
+    Optional<ManagedAcl> managedAcl = aclService().getAcl(aclName);
+    if (managedAcl.isPresent()) {
+      return RestUtils.okJson(full(managedAcl.get()));
+    }
+    logger.info("No ACL with name '{}' could by found", aclName);
+    throw new NotFoundException();
+  }
+
   private static AccessControlList parseAcl(String acl) {
     try {
       return AccessControlParser.parseAcl(acl);
