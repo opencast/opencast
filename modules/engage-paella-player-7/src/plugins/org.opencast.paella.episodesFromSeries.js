@@ -84,14 +84,18 @@ export default class EpisodesFromSeriesPlugin extends PopUpButtonPlugin {
         if (id !== thisId) {
           const preview = getVideoPreview(mediapackage,this.player.config);
           const url = `watch.html?id=${id}`;
-          createElementWithHtmlText(`
+          const elm = createElementWithHtmlText(`
                   <li>
-                      <a href="${url}">
-                          <img src="${preview}" alt="${dcTitle}">
-                          <span>${dcTitle}</span>
+                      <a href="">
+                          <img src="" alt="">
+                          <span> </span>
                       </a>
                   </li>
-                  `,list);
+                  `, list);
+          elm.querySelector('a').href = url;
+          elm.querySelector('img').src = preview;
+          elm.querySelector('img').alt = dcTitle;
+          elm.querySelector('span').textContent = dcTitle;
         }
       });
     }
