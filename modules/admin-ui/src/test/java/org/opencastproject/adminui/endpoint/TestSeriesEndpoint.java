@@ -422,37 +422,37 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
               public SearchResult<Event> answer() throws Throwable {
                 SearchResult<Event> eventsSearchResult = EasyMock.createMock(SearchResult.class);
                 if (captureEventSearchQuery.hasCaptured()
-                        && "1".equals(captureEventSearchQuery.getValue().getSeriesId())
+                        && "1".equals(captureEventSearchQuery.getValue().getSeriesId().getValue())
                         && !("RUNNING".equals(captureEventSearchQuery.getValue().getWorkflowState()))
                         && !("INSTANTIATED".equals(captureEventSearchQuery.getValue().getWorkflowState()))) {
                   // Setup events search results
                   EasyMock.expect(eventsSearchResult.getItems()).andReturn(eventItems1).anyTimes();
                   EasyMock.expect(eventsSearchResult.getHitCount()).andReturn((long) eventItems1.length).anyTimes();
                 } else if (captureEventSearchQuery.hasCaptured()
-                        && "1".equals(captureEventSearchQuery.getValue().getSeriesId())
+                        && "1".equals(captureEventSearchQuery.getValue().getSeriesId().getValue())
                         && "INSTANTIATED".equals(captureEventSearchQuery.getValue().getWorkflowState())) {
                   // Setup events search results
                   EasyMock.expect(eventsSearchResult.getItems()).andReturn(eventItems2).anyTimes();
                   EasyMock.expect(eventsSearchResult.getHitCount()).andReturn((long) eventItems2.length).anyTimes();
                 } else if (captureEventSearchQuery.hasCaptured()
-                        && "1".equals(captureEventSearchQuery.getValue().getSeriesId())
+                        && "1".equals(captureEventSearchQuery.getValue().getSeriesId().getValue())
                         && "RUNNING".equals(captureEventSearchQuery.getValue().getWorkflowState())) {
                   // Setup events search results
                   EasyMock.expect(eventsSearchResult.getItems()).andReturn(eventItems2).anyTimes();
                   EasyMock.expect(eventsSearchResult.getHitCount()).andReturn((long) eventItems2.length).anyTimes();
                 } else if (captureEventSearchQuery.hasCaptured()
-                        && "2".equals(captureEventSearchQuery.getValue().getSeriesId())
+                        && "2".equals(captureEventSearchQuery.getValue().getSeriesId().getValue())
                         && !("RUNNING".equals(captureEventSearchQuery.getValue().getWorkflowState()))) {
                   // Setup events search results
                   EasyMock.expect(eventsSearchResult.getItems()).andReturn(eventItems2).anyTimes();
                   EasyMock.expect(eventsSearchResult.getHitCount()).andReturn((long) eventItems2.length).anyTimes();
                 } else if (captureEventSearchQuery.hasCaptured()
-                        && "3".equals(captureEventSearchQuery.getValue().getSeriesId())) {
+                        && "3".equals(captureEventSearchQuery.getValue().getSeriesId().getValue())) {
                   // Setup events search results
                   EasyMock.expect(eventsSearchResult.getItems()).andReturn(eventItems3).anyTimes();
                   EasyMock.expect(eventsSearchResult.getHitCount()).andReturn((long) eventItems3.length).anyTimes();
                 } else if (captureEventSearchQuery.hasCaptured()
-                        && "2".equals(captureEventSearchQuery.getValue().getSeriesId())
+                        && "2".equals(captureEventSearchQuery.getValue().getSeriesId().getValue())
                         && "RUNNING".equals(captureEventSearchQuery.getValue().getWorkflowState())) {
                   // Setup events search results
                   EasyMock.expect(eventsSearchResult.getItems()).andReturn(eventItems3).anyTimes();
