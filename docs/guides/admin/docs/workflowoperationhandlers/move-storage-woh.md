@@ -29,12 +29,9 @@ Notes:
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="move-storage"
-    description="Offloading to AWS S3">
-  <configurations>
-    <configuration key="target-storage">aws-s3</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: move-storage
+    description: Offloading to AWS S3
+    configurations:
+      - target-storage: aws-s3
 ```

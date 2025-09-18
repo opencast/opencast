@@ -66,26 +66,20 @@ Manual S3 Archiving
 Manually moving assets to and from S3 is done via a workflow operation handler added as part of a workflow.
 The workflow operation handler definition looks like this
 ```
-    <operation
-      id="move-storage"
-      description="Offloading to AWS S3">
-      <configurations>
-        <configuration key="target-storage">aws-s3</configuration>
-      </configurations>
-    </operation>
+  - id: move-storage
+    description: Offloading to AWS S3
+    configurations:
+      - target-storage: aws-s3
 ```
 
 Assets in S3 continue to be accessible to Opencast, however there may be cases where you wish to restore your content
 back to your local storage.  This can be accomplished using the same workflow operation definition as above, and
 changing the `target-storage` configuration value from `aws-s3` to `local-filesystem` like so
 ```
-    <operation
-      id="move-storage"
-      description="Restoring from AWS S3">
-      <configurations>
-        <configuration key="target-storage">local-filesystem</configuration>
-      </configurations>
-    </operation>
+  - id: move-storage
+    description: Restoring from AWS S3
+    configurations:
+      - target-storage: local-filesystem
 ```
 
 

@@ -37,51 +37,41 @@ Example
 
 Set presenter encoding profile based on presenter/work media attributes:
 
-```xml
-<operation id="conditional-config" 
-           description="Evaluate media properties and set presenter-encoding-profiles configuration">
-	<configurations>
-		<configuration key="configuration-name">presenter-encoding-profiles</configuration>
-		<configuration key="condition-1">
-			(${presenter_work_framerate} == 25) AND (${presenter_work_resolution_x} &gt; 1600)
-			AND (${presenter_work_bitrate} &gt; 1999999)
-		</configuration>
-		<configuration key="value-1">
-			z-full-3m-presenter,z-threequarters-1500k-presenter,z-half-700k-presenter,
-			z-quarter-300k-presenter,z-lowbr-160k-presenter,multiencode-hls
-		</configuration>
-		<configuration key="condition-2">
-          	(${presenter_work_framerate} == 25) AND (${presenter_work_resolution_x} &gt; 1600)
-          	AND (${presenter_work_bitrate} &lt; 2000000) AND (${presenter_work_bitrate} &gt; 499999)
-		</configuration>
-		<configuration key="value-2">
-			z-full-2m-presenter,z-threequarters-1m-presenter,z-half-500k-presenter,
-			z-quarter-250k-presenter,z-lowbr-160k-presenter,multiencode-hls
-		</configuration>
-		<!-- More conditions omitted… -->
-		<configuration key="no-match">
-			hls-half-res-presenter,hls-full-res-presenter,hls-threequarters-res-presenter,
-			hls-quarter-res-presenter,hls-quarter-15fps-presenter,multiencode-hls
-		</configuration>
-	</configurations>
-</operation>
+```yaml
+  - id: conditional-config
+    description: Evaluate media properties and set presenter-encoding-profiles
+      configuration
+    configurations:
+      - configuration-name: presenter-encoding-profiles
+      - condition-1: |-
+          (${presenter_work_framerate} == 25) AND (${presenter_work_resolution_x} > 1600)
+          AND (${presenter_work_bitrate} > 1999999)
+      - value-1: |-
+          z-full-3m-presenter,z-threequarters-1500k-presenter,z-half-700k-presenter,
+          z-quarter-300k-presenter,z-lowbr-160k-presenter,multiencode-hls
+      - condition-2: |-
+          (${presenter_work_framerate} == 25) AND (${presenter_work_resolution_x} > 1600)
+          AND (${presenter_work_bitrate} < 2000000) AND (${presenter_work_bitrate} > 499999)
+      - value-2: |-
+          z-full-2m-presenter,z-threequarters-1m-presenter,z-half-500k-presenter,
+          z-quarter-250k-presenter,z-lowbr-160k-presenter,multiencode-hls
+      # More conditions omitted…
+      - no-match: |-
+          hls-half-res-presenter,hls-full-res-presenter,hls-threequarters-res-presenter,
+          hls-quarter-res-presenter,hls-quarter-15fps-presenter,multiencode-hls
 ```
 
 Then, use variable set above to encode the presenter file:
 
-```xml
-<operation id="multiencode"
-           description="Encode to multiple delivery formats">
-	<configurations>
-		<configuration key="source-flavors">presenter/work</configuration>
-		<configuration key="target-flavors">*/delivery</configuration>
-		<configuration key="target-tags">archive,engage</configuration>
-		<configuration key="encoding-profiles">
-			${presenter-encoding-profiles}
-		</configuration>
-		<configuration key="tag-with-profile">true</configuration>
-	</configurations>
-</operation>
+```yaml
+  - id: multiencode
+    description: Encode to multiple delivery formats
+    configurations:
+      - source-flavors: presenter/work
+      - target-flavors: '*/delivery'
+      - target-tags: archive,engage
+      - encoding-profiles: ${presenter-encoding-profiles}
+      - tag-with-profile: true
 ```
 
 

@@ -25,12 +25,9 @@ Parameter Table
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="asset-delete"
-    description="Delete from AssetManager">
-  <configurations>
-    <configuration key="keep-last-snapshot">true</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: asset-delete
+    description: Delete from AssetManager
+    configurations:
+      - keep-last-snapshot: true
 ```

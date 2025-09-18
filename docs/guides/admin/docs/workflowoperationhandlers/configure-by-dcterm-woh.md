@@ -63,31 +63,24 @@ conditions can be negated though so it is possible to skip subsequent operations
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="configure-by-dcterm"
-    description="Configure publication channel by dcterm">
-  <configurations>
-    <configuration key="dccatalog">episode</configuration>
-    <configuration key="dcterm">audience</configuration>
-    <configuration key="match-value">private</configuration>
-    <configuration key="publishPrivate">true</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: configure-by-dcterm
+    description: Configure publication channel by dcterm
+    configurations:
+      - dccatalog: episode
+      - dcterm: audience
+      - match-value: private
+      - publishPrivate: true
 
 ...
 
-<operation
-   id="publish-engage"
-   if="${publishPrivate}"
-   description="Publish to internal audience only">
-   ...
-</operation>
+  - id: publish-engage
+    if: ${publishPrivate}
+    description: Publish to internal audience only
 
-<operation
-   id="publish-youtube"
-   if="NOT ${publishPrivate}"
-   description="Publish to global audience">
+  - id: publish-youtube
+    if: NOT ${publishPrivate}
+    description: Publish to global audience
    ...
-</operation>
+
 ```

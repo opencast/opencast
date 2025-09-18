@@ -34,27 +34,12 @@ Additional notes:
 Operation Example
 -----------------
 
-XML
-```xml
-<operation
-  id="zip"
-  description="Creating zipped recording archive">
-  <configurations>
-    <configuration key="zip-collection">failed.zips</configuration>
-    <configuration key="include-flavors">*/source,dublincore/*</configuration>
-    <configuration key="target-flavor">all/zip</configuration>
-    <configuration key="compression">false</configuration>
-  </configurations>
-</operation>
-```
-
-YAML
-```yml
+```yaml
 - id: zip
   description: Creating zipped recording archive
   configurations:
     - zip-collection: failed.zips
-    - include-flavors: */source,dublincore/*
+    - include-flavors: '*/source,dublincore/*'
     - target-flavor: all/zip
     - compression: false
 ```

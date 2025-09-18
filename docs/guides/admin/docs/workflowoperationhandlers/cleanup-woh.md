@@ -30,14 +30,11 @@ Parameter Table
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="cleanup"
-    description="Remove temporary processing artifacts">
-  <configurations>
-    <configuration key="preserve-flavors">security/*</configuration>
-    <configuration key="delete-external">true</configuration>
-    <configuration key="delay">5</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: cleanup
+    description: Remove temporary processing artifacts
+    configurations:
+      - preserve-flavors: security/*
+      - delete-external: true
+      - delay: 5
 ```

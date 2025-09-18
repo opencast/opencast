@@ -52,7 +52,7 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowServiceDatabaseImpl;
 import org.opencastproject.workflow.api.WorkflowStateListener;
-import org.opencastproject.workflow.api.XmlWorkflowParser;
+import org.opencastproject.workflow.api.YamlWorkflowParser;
 import org.opencastproject.workflow.impl.WorkflowServiceImpl.HandlerRegistration;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -167,8 +167,8 @@ public class PauseFinalOperationTest {
     service.activate(null);
     service.setServiceRegistry(serviceRegistry);
 
-    is = PauseFinalOperationTest.class.getResourceAsStream("/workflow-definition-pause-last.xml");
-    def = XmlWorkflowParser.parseWorkflowDefinition(is);
+    is = PauseFinalOperationTest.class.getResourceAsStream("/workflow-definition-pause-last.yaml");
+    def = YamlWorkflowParser.parseWorkflowDefinition(is);
     IOUtils.closeQuietly(is);
 
     SearchResult result = EasyMock.createNiceMock(SearchResult.class);

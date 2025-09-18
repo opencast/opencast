@@ -22,15 +22,12 @@ Tags and flavors can be used in combination. For examples see the [tag](tag-woh.
 
 ## Operation Example
 
-```xml
-    <operation
-    id="tag-engage"
-    description="Remove tag from composites in Engage">
-  <configurations>
-    <configuration key="source-flavors">presenter/*</configuration>
-    <configuration key="source-tags">engage-streaming</configuration>
-    <configuration key="target-flavor">presenter/tagged</configuration>
-    <configuration key="target-tags">+test</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: tag-engage
+    description: Remove tag from composites in Engage
+    configurations:
+      - source-flavors: presenter/*
+      - source-tags: engage-streaming
+      - target-flavor: presenter/tagged
+      - target-tags: +test
 ```

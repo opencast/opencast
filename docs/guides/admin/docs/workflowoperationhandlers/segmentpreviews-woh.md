@@ -25,18 +25,15 @@ Parameter Table
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="segmentpreviews"
-    description="Encoding presentation (screen) to segment preview image">
-  <configurations>
-    <configuration key="source-flavor">presentation/trimmed</configuration>
-    <configuration key="source-tags"></configuration>
-    <configuration key="target-flavor">presentation/segment+preview</configuration>
-    <configuration key="reference-flavor">presentation/delivery</configuration>
-    <configuration key="reference-tags">engage</configuration>
-    <configuration key="target-tags">engage</configuration>
-    <configuration key="encoding-profile">player-slides.http</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: segmentpreviews
+    description: Encoding presentation (screen) to segment preview image
+    configurations:
+      - source-flavor: presentation/trimmed
+      - source-tags: ''
+      - target-flavor: presentation/segment+preview
+      - reference-flavor: presentation/delivery
+      - reference-tags: engage
+      - target-tags: engage
+      - encoding-profile: player-slides.http
 ```

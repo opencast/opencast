@@ -33,14 +33,11 @@ Notes:
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="changetype"
-    description="Change type of captions to track">
-  <configurations>
-    <configuration key="source-flavors">captions/*</configuration>
-    <configuration key="target-flavor">captions/source</configuration>
-    <configuration key="target-type">track</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: changetype
+    description: Change type of captions to track
+    configurations:
+      - source-flavors: captions/*
+      - target-flavor: captions/source
+      - target-type: track
 ```

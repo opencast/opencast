@@ -24,38 +24,32 @@ Note: You have to configure the `Microsoft Azure Transcription Service` first to
 
 The example below will start the transcription on the first trimmed media file found in the media package, but only if `captions/source` element doesn't exist yet. The encoding profile to extract the audio stream is `custom-transcription-azure.audio`. 
 
-```xml
-<!-- This operation will start the transcription job -->
-<operation
-  id="microsoft-azure-start-transcription"
-  fail-on-error="true"
-  exception-handler-workflow="partial-error"
-  description="Start Microsoft Azure transcription job">
-  <configurations>
-    <configuration key="source-flavors">*/trimmed</configuration>
-    <!-- Skip this operation if flavor already exists. -->
-    <!-- Used for cases when mediapackage already has captions. -->
-    <configuration key="skip-if-flavor-exists">captions/source</configuration>
-    <configuration key="audio-extraction-encoding-profile">custom-transcription-azure.audio</configuration>
-  </configurations>
-</operation>
+```yaml
+  # This operation will start the transcription job
+  - id: microsoft-azure-start-transcription
+    fail-on-error: true
+    exception-handler-workflow: partial-error
+    description: Start Microsoft Azure transcription job
+    configurations:
+      - source-flavors: '*/trimmed'
+      # Skip this operation if flavor already exists.
+      # Used for cases when mediapackage already has captions.
+      - skip-if-flavor-exists: captions/source
+      - audio-extraction-encoding-profile: custom-transcription-azure.audio
 ```
 
 The next example shows you how to create a transcription of the `presenter/trimmed` media file with the language code `de-DE`. The transcription will start if `captions/source` element is missing.
 
-```xml
-<!-- This operation will start the transcription job -->
-<operation
-  id="microsoft-azure-start-transcription"
-  fail-on-error="true"
-  exception-handler-workflow="partial-error"
-  description="Start Microsoft Azure transcription job">
-  <configurations>
-    <configuration key="source-flavors">presenter/trimmed</configuration>
-    <!-- Skip this operation if flavor already exists. -->
-    <!-- Used for cases when mediapackage already has captions. -->
-    <configuration key="skip-if-flavor-exists">captions/source</configuration>
-    <configuration key="language">de-DE</configuration>
-  </configurations>
-</operation>
+```yaml
+  # This operation will start the transcription job
+  - id: microsoft-azure-start-transcription
+    fail-on-error: true
+    exception-handler-workflow: partial-error
+    description: Start Microsoft Azure transcription job
+    configurations:
+      - source-flavors: presenter/trimmed
+      # Skip this operation if flavor already exists.
+      # Used for cases when mediapackage already has captions.
+      - skip-if-flavor-exists: captions/source
+      - language: de-DE
 ```

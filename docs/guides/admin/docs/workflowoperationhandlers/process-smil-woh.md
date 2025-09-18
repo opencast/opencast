@@ -27,8 +27,8 @@ processing of multiple independent FFmpeg operations.
 To use this operation with the editor, the following must be added to the [editor](editor-woh.md) workflow operation
 to bypass the video editor encoding,
 
-```xml
-<configuration key="skip-processing">true</configuration>
+```yaml
+- skip-processing: true
 ```
 
 Configuration Details
@@ -56,14 +56,14 @@ as well as its own set of target tags and flavors, defined as a comma delimited 
 As an example, using presenter/source and presentation/source as uploaded media.
 eg:
 
-```xml
- <configuration key="source-flavors">*/source</configuration>
+```yaml
+ - source-flavors: '*/source'
 ```
 
 One source selector means that all the matching recording will be processed the same way.
 
-```xml
- <configuration key="source-flavors">presenter/source;presentation/source</configuration>
+```yaml
+ - source-flavors: presenter/source;presentation/source
 ```
 
 Two different source selectors separated by semicolons means that all the matching recordings in the
@@ -82,9 +82,9 @@ into one and they will apply to all the source flavors in the source selector.
 
 eg:
 
-```xml
-<configuration key="target-flavors">*/preview</configuration>
-<configuration key="encoding-profiles">mp4-low.http;mp4-vga-medium</configuration>
+```yaml
+- target-flavors: '*/preview'
+- encoding-profiles: mp4-low.http;mp4-vga-medium
 ```
 
 All targets are flavored the same way.
@@ -92,9 +92,9 @@ Using the example above,
 all media are encoded with "mp4-low.http" and "mp4-vga-medium" and
 targets are flavored as "presenter/preview" and "presentation/preview"
 
-```xml
- <configuration key="target-tags">engage-streaming,example;engage-download,example</configuration>
- <configuration key="encoding-profiles">mp4-medium.http;mp4-vga-medium</configuration>
+```yaml
+- target-tags: engage-streaming,example;engage-download,example
+- encoding-profiles: mp4-medium.http;mp4-vga-medium
 ```
 
 Each section is tagged individually. Using the example above,
@@ -148,25 +148,22 @@ Operation Example
 
 The parameters in the table above will look like this as a workflow operation.
 
-```xml
-<operation
-    id="process-smil"
-    description="Encoding presenter (camera) video to Flash download">
-  <configurations>
-    <configuration key="smil-flavor">smil/cutting</configuration>
-    <configuration key="source-flavors">presenter/work;presentation/work</configuration>
-    <configuration key="target-flavors">*/delivery</configuration>
-    <configuration key="target-tags">engage,archive</configuration>
-    <configuration key="encoding-profiles">mp4-low.http,mp4-medium.http*;*mp4-vga-medium,mp4-medium.http</configuration>
-    <configuration key="tag-with-profile">true</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: process-smil
+    description: Encoding presenter (camera) video to Flash download
+    configurations:
+      - smil-flavor: smil/cutting
+      - source-flavors: presenter/work;presentation/work
+      - target-flavors: '*/delivery'
+      - target-tags: engage,archive
+      - encoding-profiles: mp4-low.http,mp4-medium.http*;*mp4-vga-medium,mp4-medium.http
+      - tag-with-profile: true
 ```
 
 With HLS, encoding profiles line will look like:
 
-```xml
-<configuration key="encoding-profiles">mp4-low.http,mp4-medium.http,multiencode-hls*;*mp4-vga-medium,mp4-medium.http,multiencode-hls</configuration>
+```yaml
+- encoding-profiles: mp4-low.http,mp4-medium.http,multiencode-hls*;*mp4-vga-medium,mp4-medium.http,multiencode-hls
 ```
 
 Note: (Very Important)

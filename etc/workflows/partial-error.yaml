@@ -1,0 +1,22 @@
+id: partial-error
+description: |-
+  Cleanup after a processing failure
+operations:
+  # Archive the current state of the media package
+  - id: snapshot
+    fail-on-error: false
+    description: Preserve the current recording state
+    configurations:
+      - source-flavors: '*/source,dublincore/*,security/*'
+      - source-tags: archive
+
+  # Clean up the temporary files from the working file repository
+  - id: cleanup
+    fail-on-error: false
+    description: Cleaning up
+    configurations:
+      # On systems with shared workspace or working file repository
+      # you want to set this option to false.
+      - delete-external: true
+      # ACLs are required again when working through ActiveMQ messages
+      - preserve-flavors: security/*

@@ -25,13 +25,10 @@ Parameter Table
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="export-wf-properties"
-    description="Export workflow settings to Java properties file">
-  <configurations>
-    <configuration key="target-flavor">processing/defaults</configuration>
-    <configuration key="target-tags">archive</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: export-wf-properties
+    description: Export workflow settings to Java properties file
+    configurations:
+      - target-flavor: processing/defaults
+      - target-tags: archive
 ```

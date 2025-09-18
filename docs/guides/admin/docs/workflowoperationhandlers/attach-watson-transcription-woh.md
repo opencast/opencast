@@ -27,26 +27,22 @@ Parameter Table
 Example
 -------
 
-```xml
-<!-- Attach caption/transcript -->
-<operation id="attach-watson-transcription"
-    description="Attach captions/transcription">
-  <configurations>
-    <!-- This is filled out by the transcription service when starting this workflow so just use this as is -->
-    <configuration key="transcription-job-id">${transcriptionJobId}</configuration>
-    <configuration key="target-flavor">captions/source</configuration>
-    <configuration key="target-tag">engage-download,lang:en,generator-type:auto</configuration>
-    <configuration key="target-caption-format">vtt</configuration>
-  </configurations>
-</operation>
+```yaml
+  # Attach caption/transcript
+  - id: attach-watson-transcription
+    description: Attach captions/transcription
+    configurations:
+      # This is filled out by the transcription service when starting this workflow so just use this as is
+      - transcription-job-id: ${transcriptionJobId}
+      - target-flavor: captions/source
+      - target-tag: engage-download,lang:en,generator-type:auto
+      - target-caption-format: vtt
 
-<!-- Merge caption/transcript to existing publication and republish -->
-<operation id="publish-engage"
-    description="Distribute and publish to engage server">
-  <configurations>
-    <configuration key="download-source-tags">engage-download</configuration>
-    <configuration key="strategy">merge</configuration>
-    <configuration key="check-availability">true</configuration>
-  </configurations>
-</operation>
+  # Merge caption/transcript to existing publication and republish
+  - id: publish-engage
+    description: Distribute and publish to engage server
+    configurations:
+      - download-source-tags: engage-download
+      - strategy: merge
+      - check-availability: true
 ```

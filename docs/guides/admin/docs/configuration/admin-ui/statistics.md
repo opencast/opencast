@@ -161,21 +161,18 @@ To actually _write_ these hours to the statistics data base, you have to add the
 operation handler to your workflows. Specifically, somewhere in your publishing workflow, you have to add an entry
 such as this:
 
-```XML
-<operation
-  id="statistics-writer"
-  fail-on-error="true"
-  exception-handler-workflow="partial-error"
-  description="Collect video statistics">
-  <configurations>
-    <configuration key="flavor">presenter/video</configuration>
-    <configuration key="retract">false</configuration>
-    <configuration key="measurement-name">publishedhours</configuration>
-    <configuration key="organization-resource-id-name">organizationId</configuration>
-    <configuration key="length-field-name">hours</configuration>
-    <configuration key="temporal-resolution">hours</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: statistics-writer
+    fail-on-error: true
+    exception-handler-workflow: partial-error
+    description: Collect video statistics
+    configurations:
+      - flavor: presenter/video
+      - retract: false
+      - measurement-name: publishedhours
+      - organization-resource-id-name: organizationId
+      - length-field-name: hours
+      - temporal-resolution: hours
 ```
 
 To _decrement_ the running total of hours in the case of retractions, set the `retract` property to `true`.

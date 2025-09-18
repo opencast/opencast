@@ -27,17 +27,14 @@ Parameter Table
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="timelinepreviews"
-    description="Creating presentation timeline preview images">
-  <configurations>
-    <configuration key="source-flavor">*/trimmed</configuration>
-    <configuration key="target-flavor">*/timeline+preview</configuration>
-    <configuration key="target-tags">engage-download</configuration>
-    <configuration key="image-count">100</configuration>
-    <!-- If there is more than one file that match the source-tags, use only the first one -->
-    <configuration key="process-first-match-only">true</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: timelinepreviews
+    description: Creating presentation timeline preview images
+    configurations:
+      - source-flavor: '*/trimmed'
+      - target-flavor: '*/timeline+preview'
+      - target-tags: engage-download
+      - image-count: 100
+      # If there is more than one file that match the source-tags, use only the first one
+      - process-first-match-only: true
 ```

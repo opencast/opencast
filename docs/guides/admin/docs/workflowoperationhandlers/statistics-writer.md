@@ -29,20 +29,17 @@ Parameter Table
 Operation Examples
 ------------------
 
-```XML
-<operation
-  id="statistics-writer"
-  fail-on-error="true"
-  exception-handler-workflow="partial-error"
-  description="Collect video statistics">
-  <configurations>
-    <configuration key="flavor">presenter/video</configuration>
-    <configuration key="retract">false</configuration>
-    <configuration key="retention-policy">infinite</configuration>
-    <configuration key="measurement-name">publishedhours</configuration>
-    <configuration key="organization-resource-id-name">organizationId</configuration>
-    <configuration key="length-field-name">hours</configuration>
-    <configuration key="temporal-resolution">hours</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: statistics-writer
+    fail-on-error: true
+    exception-handler-workflow: partial-error
+    description: Collect video statistics
+    configurations:
+      - flavor: presenter/video
+      - retract: false
+      - retention-policy: infinite
+      - measurement-name: publishedhours
+      - organization-resource-id-name: organizationId
+      - length-field-name: hours
+      - temporal-resolution: hours
 ```

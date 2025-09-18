@@ -22,7 +22,7 @@ Parameter Table
 |download-target-subflavor  |Subflavor to use for distributed material                                                    |
 |download-target-tags       |Add tags (comma separated) to published media                                                |
 |strategy                   |If there is no key, published media would be retracted before publishing                     |
-|                           |`<configuration key="strategy">merge</configuration>`                                        |
+|                           |`- strategy: merge`                                        |
 |                           |merges new publication with existing publication                                             |
 |merge-force-flavors        |Flavors of elements for which an update is enforced when mergeing catalogs.                  |
 |                           |Defaults to `dublincore/*,security/*`.
@@ -31,17 +31,14 @@ Parameter Table
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="publish-engage-aws"
-    max-attempts="2"
-    fail-on-error="true"
-    exception-handler-workflow="error"
-    description="Distribute and publish to engage player using AWS S3">
-  <configurations>
-    <configuration key="download-source-tags">engage</configuration>
-    <configuration key="check-availability">true</configuration>
-    <configuration key="strategy">merge</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: publish-engage-aws
+    max-attempts: 2
+    fail-on-error: true
+    exception-handler-workflow: error
+    description: Distribute and publish to engage player using AWS S3
+    configurations:
+      - download-source-tags: engage
+      - check-availability: true
+      - strategy: merge
 ```

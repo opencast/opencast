@@ -23,14 +23,14 @@ The parameters for each configuration, such as flavors are separated positionall
 The use of the semi-colon is optional. If it is absent, there is only one section.
 
 
-```xml
-<configuration key="source-flavors">*/source</configuration>
+```yaml
+- source-flavors: '*/source'
 ```
 
 > One source selector means that all the matching recording will be processed the same way.
 
-```xml
-<configuration key="source-flavors">presenter/source;presentation/source</configuration>
+```yaml
+- source-flavors: presenter/source;presentation/source
 ```
 
 > Two different source selectors means that all the matching recordings in the first selector will be processed
@@ -43,8 +43,8 @@ but multiple sections in another, eg: source-flavors,
 then the sections are collapsed into one.
 For example:
 
-```xml
-<configuration key="target-flavors">*/preview</configuration>
+```yaml
+- target-flavors: '*/preview'
 ```
 
 > All targets are flavored the same way, using the example above, becomes "presenter/preview"
@@ -53,8 +53,8 @@ For example:
 Each source selector can have its own set of target tags and flavors, defined as a comma delimited list.
 For example:
 
-```xml
-<configuration key="target-tags">engage-streaming,example;engage-download,example</configuration>
+```yaml
+- target-tags: engage-streaming,example;engage-download,example
 ```
 
 > Using the example above.
@@ -112,31 +112,28 @@ Parameter Table
 
 
 ## Operation Example
-```xml
-<operation
-    id="multiencode"
-    description="Encode to delivery formats, with different encoding settings for each video source">
-  <configurations>
-    <configuration key="source-flavors">presenter/work;presentation/work</configuration>
-    <configuration key="target-flavors">*/delivery</configuration>
-    <configuration key="target-tags">archive</configuration>
-    <configuration key="encoding-profiles">
-        hls-full-res-presenter-mp4,
-        hls-half-res-presenter-mp4,
-        hls-quarter-15fps-presenter-mp4,
-        multiencode-hls
-    </configuration>
-    <configuration key="tag-with-profile">true</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: multiencode
+    description: Encode to delivery formats, with different encoding settings 
+      for each video source
+    configurations:
+      - source-flavors: presenter/work;presentation/work
+      - target-flavors: '*/delivery'
+      - target-tags: archive
+      - encoding-profiles: |-
+          hls-full-res-presenter-mp4,
+          hls-half-res-presenter-mp4,
+          hls-quarter-15fps-presenter-mp4,
+          multiencode-hls
+      - tag-with-profile: true
 ```
 
 On subsequent operations that run on the encoded files (e.g. `image`,`segment-video`, `segmentpreviews`,
 `timelinepreviews`, `extract-text`), you will **have to** specify on which encoding the operations run on, otherwise
 they will fail. This is done by adding a `source-tags` key to each operation like so:
 
-```xml
-<configuration key="source-tags">hls-full-res-presenter-mp4</configuration>
+```yaml
+- source-tags: hls-full-res-presenter-mp4
 ```
 
 Encoding Profile

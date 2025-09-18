@@ -19,16 +19,6 @@ Parameter Table
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="include"
-    description="Remove temporary processing artifacts">
-  <configurations>
-    <configuration key="workflow-id">partial-cleanup</configuration>
-  </configurations>
-</operation>
-```
-
 ```yml
 - id: include
   description: Include clean-up workflow

@@ -29,18 +29,15 @@ Parameter Table
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="mattermost-notify"
-    description="Notify Mattermost about error">
-  <configurations>
-    <configuration key="url">insert-url-of-mattermost-webhook</configuration>
-    <configuration key="message">Error at Workflow %i (%t) State: %s</configuration>
-    <configuration key="method">post</configuration>
-    <configuration key="max-retry">3</configuration>
-    <configuration key="timeout">5</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: mattermost-notify
+    description: Notify Mattermost about error
+    configurations:
+      - url: insert-url-of-mattermost-webhook
+      - message: 'Error at Workflow %i (%t) State: %s'
+      - method: post
+      - max-retry: 3
+      - timeout: 5
 ```
 
 Message Variables

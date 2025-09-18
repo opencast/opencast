@@ -149,36 +149,32 @@ A single layout is specified as follows:
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="composite"
-    description="Composite">
-  <configurations>
-    <configuration key="source-flavor-upper">presentation/trimmed</configuration>
-    <configuration key="source-flavor-lower">presenter/trimmed</configuration>
-    <configuration key="source-tags-upper">comp</configuration>
-    <configuration key="source-tags-lower">comp</configuration>
-    <configuration key="source-tags-watermark">branding</configuration>
-    <configuration key="source-flavor-watermark">image/work</configuration>
-    <configuration key="source-url-watermark">file:///Users/me/logo.jpg</configuration>
-    <configuration key="encoding-profile">composite</configuration>
-    <configuration key="target-tags">composite,archive</configuration>
-    <configuration key="target-flavor">composite/delivery</configuration>
-    <configuration key="output-resolution">1920x1080</configuration>
-    <configuration key="output-background">red</configuration>
-    <configuration key="layout">topleft</configuration>
-    <configuration key="layout-topleft">
-      {"horizontalCoverage":1.0,"anchorOffset":{"referring":{"left":1.0,"top":1.0},"offset":{"y":-20,"x":-20},"reference":{"left":1.0,"top":1.0}}};
-      {"horizontalCoverage":0.2,"anchorOffset":{"referring":{"left":0.0,"top":0.0},"offset":{"y":-20,"x":-20},"reference":{"left":0.0,"top":0.0}}};
-      {"horizontalCoverage":1.0,"anchorOffset":{"referring":{"left":1.0,"top":0.0},"offset":{"y":20,"x":20},"reference":{"left":1.0,"top":0.0}}}
-    </configuration>
-    <configuration key="layout-topright">
-      {"horizontalCoverage":1.0,"anchorOffset":{"referring":{"left":1.0,"top":1.0},"offset":{"y":-20,"x":-20},"reference":{"left":1.0,"top":1.0}}};
-      {"horizontalCoverage":0.2,"anchorOffset":{"referring":{"left":1.0,"top":0.0},"offset":{"y":-20,"x":-20},"reference":{"left":1.0,"top":0.0}}};
-      {"horizontalCoverage":1.0,"anchorOffset":{"referring":{"left":0.0,"top":0.0},"offset":{"y":20,"x":20},"reference":{"left":0.0,"top":0.0}}}
-    </configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: composite
+    description: Composite
+    configurations:
+      - source-flavor-upper: presentation/trimmed
+      - source-flavor-lower: presenter/trimmed
+      - source-tags-upper: comp
+      - source-tags-lower: comp
+      - source-tags-watermark: branding
+      - source-flavor-watermark: image/work
+      - source-url-watermark: file:///Users/me/logo.jpg
+      - encoding-profile: composite
+      - target-tags: composite,archive
+      - target-flavor: composite/delivery
+      - output-resolution: 1920x1080
+      - output-background: red
+      - layout: topleft
+      - layout-topleft: |-
+          {"horizontalCoverage":1.0,"anchorOffset":{"referring":{"left":1.0,"top":1.0},"offset":{"y":-20,"x":-20},"reference":{"left":1.0,"top":1.0}}};
+          {"horizontalCoverage":0.2,"anchorOffset":{"referring":{"left":0.0,"top":0.0},"offset":{"y":-20,"x":-20},"reference":{"left":0.0,"top":0.0}}};
+          {"horizontalCoverage":1.0,"anchorOffset":{"referring":{"left":1.0,"top":0.0},"offset":{"y":20,"x":20},"reference":{"left":1.0,"top":0.0}}}
+      - layout-topright: |-
+          {"horizontalCoverage":1.0,"anchorOffset":{"referring":{"left":1.0,"top":1.0},"offset":{"y":-20,"x":-20},"reference":{"left":1.0,"top":1.0}}};
+          {"horizontalCoverage":0.2,"anchorOffset":{"referring":{"left":1.0,"top":0.0},"offset":{"y":-20,"x":-20},"reference":{"left":1.0,"top":0.0}}};
+          {"horizontalCoverage":1.0,"anchorOffset":{"referring":{"left":0.0,"top":0.0},"offset":{"y":20,"x":20},"reference":{"left":0.0,"top":0.0}}}
+
 ```
 
 

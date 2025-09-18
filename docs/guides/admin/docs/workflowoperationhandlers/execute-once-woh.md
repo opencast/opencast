@@ -46,34 +46,29 @@ Operation Example
 
 Run a command which combines two tracks into a new track:
 
-```xml
-<operation
-    id="execute-once"
-    description="Run command">
-  <configurations>
-    <configuration key="exec">ges-launch</configuration>
-    <configuration key="params">-e #{flavor(presenter/source)} 0 5m14s #{flavor(presentation/source)} 0 14s</configuration>
-    <configuration key="output-filename">result.avi</configuration>
-    <configuration key="target-flavor">output/joined</configuration>
-    <configuration key="target-tags">joined, -tojoin</configuration>
-    <configuration key="expected-type">Track</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: execute-once
+    description: Run command
+    configurations:
+      - exec: ges-launch
+      - params: '-e #{flavor(presenter/source)} 0 5m14s #{flavor(presentation/source)}
+          0 14s'
+      - output-filename: result.avi
+      - target-flavor: output/joined
+      - target-tags: joined, -tojoin
+      - expected-type: Track
 ```
 
 Run a command which inspects a mediapackage and adds new configuration properties to the running workflow, leaving the
 mediapackage unchanged:
 
-```xml
-<operation
-    id="execute-once"
-    description="Inspect media and update workflow properties">
-  <configurations>
-    <configuration key="exec">/usr/local/bin/oc-inspect.sh</configuration>
-    <configuration key="params">#{out} #{id}</configuration>
-    <configuration key="set-workflow-properties">true</configuration>
-    <configuration key="output-filename">wf.properties</configuration>
-    <configuration key="expected-type">Attachment</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: execute-once
+    description: Inspect media and update workflow properties
+    configurations:
+      - exec: /usr/local/bin/oc-inspect.sh
+      - params: '#{out} #{id}'
+      - set-workflow-properties: true
+      - output-filename: wf.properties
+      - expected-type: Attachment
 ```
