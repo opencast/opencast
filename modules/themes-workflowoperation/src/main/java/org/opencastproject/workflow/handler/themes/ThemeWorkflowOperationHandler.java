@@ -337,7 +337,7 @@ public class ThemeWorkflowOperationHandler extends AbstractWorkflowOperationHand
   private void addElement(MediaPackage mediaPackage, final MediaPackageElementFlavor flavor, final List<String> tags,
           InputStream file, String filename, Type type) throws IOException {
     MediaPackageElement element = elementBuilderFactory.newElementBuilder().newElement(type, flavor);
-    element.setIdentifier(UUID.randomUUID().toString());
+    element.generateIdentifier();
     for (String tag : tags) {
       element.addTag(tag);
     }

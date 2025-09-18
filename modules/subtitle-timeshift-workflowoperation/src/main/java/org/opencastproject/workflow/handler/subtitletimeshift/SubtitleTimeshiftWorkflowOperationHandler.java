@@ -203,9 +203,8 @@ public class SubtitleTimeshiftWorkflowOperationHandler extends AbstractWorkflowO
   private Track createNewTrackFromSubtitleUri(URI subtitleFile, MediaPackageElementFlavor targetFlavor,
       Track originalSubtitleTrack) throws IOException, NotFoundException {
 
-    String id = UUID.randomUUID().toString();
     Track newSubtitleTrack = (Track) originalSubtitleTrack.clone();
-    newSubtitleTrack.setIdentifier(id);
+    newSubtitleTrack.generateIdentifier();
     newSubtitleTrack.setFlavor(targetFlavor);
     newSubtitleTrack.setURI(subtitleFile);
     newSubtitleTrack.setChecksum(Checksum.create(ChecksumType.DEFAULT_TYPE, workspace.get(subtitleFile, true)));

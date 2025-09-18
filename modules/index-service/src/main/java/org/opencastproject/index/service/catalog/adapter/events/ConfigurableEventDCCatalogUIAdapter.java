@@ -77,7 +77,7 @@ public class ConfigurableEventDCCatalogUIAdapter extends ConfigurableDCCatalogUI
     if (catalogs.length == 0) {
       catalog = (Catalog) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
               .newElement(org.opencastproject.mediapackage.MediaPackageElement.Type.Catalog, getFlavor());
-      catalog.setIdentifier(UUID.randomUUID().toString());
+      catalog.generateIdentifier();
       mediaPackage.add(catalog);
 
       dc = DublinCores.mkSimple();

@@ -343,7 +343,7 @@ public class WebvttToCutMarksWorkflowOperationHandler extends AbstractWorkflowOp
 
       MediaPackageElementBuilder mpeBuilder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
       MediaPackageElement mpe = mpeBuilder.newElement(MediaPackageElement.Type.Attachment, targetFlavor);
-      mpe.setIdentifier(UUID.randomUUID().toString());
+      mpe.generateIdentifier();
 
       URI cutMarksURI = workspace.put(mp.getIdentifier().toString(), mpe.getIdentifier(), TARGET_FILENAME, cutMarksOut);
 

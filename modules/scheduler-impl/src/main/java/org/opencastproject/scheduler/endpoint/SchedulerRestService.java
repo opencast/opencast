@@ -1607,7 +1607,7 @@ public class SchedulerRestService {
     if (c == null) {
       c = (Catalog) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
               .newElement(MediaPackageElement.Type.Catalog, flavor);
-      c.setIdentifier(UUID.randomUUID().toString());
+      c.generateIdentifier();
       logger.info("Adding catalog with flavor {} to mediapackage {}", flavor, mediaPackage);
       mediaPackage.add(c);
     }

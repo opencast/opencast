@@ -585,7 +585,7 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
   private TrackJobResult copyTrack(final Track track) throws WorkflowOperationException {
     logger.debug("Create copy of track {}", track);
     final Track copiedTrack = (Track) track.clone();
-    copiedTrack.setIdentifier(UUID.randomUUID().toString());
+    copiedTrack.generateIdentifier();
     try {
       // Generate a new filename
       String targetFilename = copiedTrack.getIdentifier();

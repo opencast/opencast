@@ -91,7 +91,7 @@ public class PublicationImpl extends AbstractMediaPackageElement implements Publ
     // Check (uniqueness of) track identifier
     String id = track.getIdentifier();
     if (id == null) {
-      track.setIdentifier(createElementIdentifier());
+      track.generateIdentifier();
     }
     tracks.add(track);
   }
@@ -106,7 +106,7 @@ public class PublicationImpl extends AbstractMediaPackageElement implements Publ
     // Check (uniqueness of) attachment identifier
     String id = attachment.getIdentifier();
     if (id == null) {
-      attachment.setIdentifier(createElementIdentifier());
+      attachment.generateIdentifier();
     }
     attachments.add(attachment);
   }
@@ -126,7 +126,7 @@ public class PublicationImpl extends AbstractMediaPackageElement implements Publ
     // Check (uniqueness of) catalog identifier
     String id = catalog.getIdentifier();
     if (id == null) {
-      catalog.setIdentifier(createElementIdentifier());
+      catalog.generateIdentifier();
     }
     catalogs.add(catalog);
   }
@@ -139,15 +139,6 @@ public class PublicationImpl extends AbstractMediaPackageElement implements Publ
   @Override
   public void setFlavor(MediaPackageElementFlavor flavor) {
     throw new UnsupportedOperationException("Unable to set the flavor of publications.");
-  }
-
-  /**
-   * Returns a media package element identifier. The identifier will be unique within the media package.
-   *
-   * @return the element identifier
-   */
-  private String createElementIdentifier() {
-    return UUID.randomUUID().toString();
   }
 
   /**

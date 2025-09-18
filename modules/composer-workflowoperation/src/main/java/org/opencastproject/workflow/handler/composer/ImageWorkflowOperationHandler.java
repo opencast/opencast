@@ -183,7 +183,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
 
               adjustMetadata(extraction, image);
               if (image.getIdentifier() == null) {
-                image.setIdentifier(UUID.randomUUID().toString());
+                image.generateIdentifier();
               }
               mp.addDerived(image, extraction.track);
               String fileName = createFileName(

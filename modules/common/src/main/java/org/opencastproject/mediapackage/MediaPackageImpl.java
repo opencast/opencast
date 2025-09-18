@@ -1006,7 +1006,7 @@ public final class MediaPackageImpl implements MediaPackage {
     // Check (uniqueness of) catalog identifier
     String id = catalog.getIdentifier();
     if (id == null || contains(id)) {
-      catalog.setIdentifier(createElementIdentifier());
+      catalog.generateIdentifier();
     }
     integrate(catalog);
   }
@@ -1022,7 +1022,7 @@ public final class MediaPackageImpl implements MediaPackage {
     // Check (uniqueness of) track identifier
     String id = track.getIdentifier();
     if (id == null || contains(id)) {
-      track.setIdentifier(createElementIdentifier());
+      track.generateIdentifier();
     }
     integrate(track);
   }
@@ -1038,18 +1038,9 @@ public final class MediaPackageImpl implements MediaPackage {
     // Check (uniqueness of) attachment identifier
     String id = attachment.getIdentifier();
     if (id == null || contains(id)) {
-      attachment.setIdentifier(createElementIdentifier());
+      attachment.generateIdentifier();
     }
     integrate(attachment);
-  }
-
-  /**
-   * Returns a unique media package element identifier.
-   *
-   * @return the element identifier
-   */
-  private String createElementIdentifier() {
-    return UUID.randomUUID().toString();
   }
 
   /**
@@ -1449,7 +1440,7 @@ public final class MediaPackageImpl implements MediaPackage {
     // Check if element has an id
     if (element.getIdentifier() == null) {
       if (element instanceof AbstractMediaPackageElement) {
-        element.setIdentifier(createElementIdentifier());
+        ((AbstractMediaPackageElement) element).generateIdentifier();
       } else
         throw new UnsupportedElementException(element, "Found unknown element without id");
     }
