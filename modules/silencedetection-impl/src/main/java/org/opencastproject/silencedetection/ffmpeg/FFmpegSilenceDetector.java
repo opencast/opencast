@@ -161,7 +161,8 @@ public class FFmpegSilenceDetector {
       while (null != line) {
         /* We want only lines from the silence detection filter */
         logger.debug("FFmpeg output: {}", line);
-        if (line.startsWith("[silencedetect ")) {
+        if (line.startsWith("[silencedetect ") // FFmpeg <= 8.0
+            || line.startsWith("[Parsed_silencedetect_")) { // FFmpeg > 8.0
           segmentsStrings.add(line);
         }
         line = reader.readLine();
