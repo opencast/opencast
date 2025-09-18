@@ -544,9 +544,8 @@ public class EditorServiceImpl implements EditorService {
   private MediaPackage processSubtitleTrack(MediaPackage mediaPackage, List<EditingData.Subtitle> subtitles)
           throws IOException, IllegalArgumentException {
     for (EditingData.Subtitle subtitle : subtitles) {
-      // Generate ID for new tracks
-      String subtitleId = UUID.randomUUID().toString();
       String trackId = null;
+      String subtitleId = null;
 
       // Check if subtitle already exists
       for (Track t : mediaPackage.getTracks()) {
@@ -574,23 +573,22 @@ public class EditorServiceImpl implements EditorService {
         oldTrackURI = track.getURI();
       }
 
+      // For new tracks, generate identifier first
+      if (subtitleId == null) {
+        MediaPackageElementBuilder mpeBuilder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
+        track = (Track) mpeBuilder.newElement(MediaPackageElement.Type.Track,
+                new MediaPackageElementFlavor(captionsFlavor.getType(),"source"));
+        track.generateIdentifier();
+        subtitleId = track.getIdentifier();
+        mediaPackage.add(track);
+        logger.info("Creating new subtitle track " + track.getIdentifier() + " with tags "
+                + track.getTags().toString());
+      }
+
       // Put updated filename in working file repository and update the track.
       try (InputStream is = IOUtils.toInputStream(subtitle.getSubtitle(), "UTF-8")) {
         URI subtitleUri = workspace.put(mediaPackage.getIdentifier().toString(), subtitleId, "subtitle.vtt", is);
-
-        // If not exists, create new Track
-        if (track == null) {
-          MediaPackageElementBuilder mpeBuilder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
-          // TODO: Figure out which flavor new subtitles from the editor should have
-          track = (Track) mpeBuilder.elementFromURI(subtitleUri, MediaPackageElement.Type.Track,
-                  new MediaPackageElementFlavor(captionsFlavor.getType(),"source"));
-          mediaPackage.add(track);
-          logger.info("Creating new subtitle track " + track.getIdentifier() + " with tags "
-                  + track.getTags().toString());
-        }
-
         track.setURI(subtitleUri);
-        track.setIdentifier(subtitleId);
         track.setChecksum(null);
         for (String tag : subtitle.getTags()) {
           track.addTag(tag);

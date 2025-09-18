@@ -365,11 +365,11 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
   private MediaPackage addDublinCoreCatalog(DublinCoreCatalog catalog, MediaPackageElementFlavor flavor,
           MediaPackage mediaPackage) throws WorkflowOperationException {
     try (InputStream in = IOUtils.toInputStream(catalog.toXmlString(), "UTF-8")) {
-      String elementId = UUID.randomUUID().toString();
-      URI catalogUrl = workspace.put(mediaPackage.getIdentifier().toString(), elementId, "dublincore.xml", in);
+      MediaPackageElement mpe = mediaPackage.add(null, MediaPackageElement.Type.Catalog, flavor);
+      mpe.generateIdentifier();
+      URI catalogUrl = workspace.put(mediaPackage.getIdentifier().toString(), mpe.getIdentifier(), "dublincore.xml", in);
       logger.info("Adding catalog with flavor {} to mediapackage {}", flavor, mediaPackage);
-      MediaPackageElement mpe = mediaPackage.add(catalogUrl, MediaPackageElement.Type.Catalog, flavor);
-      mpe.setIdentifier(elementId);
+      mpe.setURI(catalogUrl);
       mpe.setChecksum(Checksum.create(ChecksumType.DEFAULT_TYPE, workspace.get(catalogUrl)));
       return mediaPackage;
     } catch (IOException | NotFoundException e) {

@@ -135,19 +135,21 @@ public class AddCatalogWorkflowOperationHandler extends AbstractWorkflowOperatio
 
     // 'upload Catalog' to workspace
     File   catalogFile = new File(catalogPath);
-    String catalogId   = UUID.randomUUID().toString();
     URI    catalogURI  = null;
+    
+    // add Catalog to MediaPackage (and set Properties)
+    MediaPackageElement mpe = mp.add(null, MediaPackageElement.Type.Catalog, catalogFlavor);
+    mpe.generateIdentifier();
+    
     try (InputStream catalogInputStream = FileUtils.openInputStream(catalogFile)) {
-      catalogURI = workspace.put(mp.getIdentifier().toString(), catalogId,
+      catalogURI = workspace.put(mp.getIdentifier().toString(), mpe.getIdentifier(),
               catalogName, catalogInputStream);
     }
     catch (IOException e) {
       throw new WorkflowOperationException(e);
     }
 
-    // add Catalog to MediaPackage (and set Properties)
-    MediaPackageElement mpe = mp.add(catalogURI, MediaPackageElement.Type.Catalog, catalogFlavor);
-    mpe.setIdentifier(catalogId);
+    mpe.setURI(catalogURI);
     mpe.setMimeType(CATALOG_MIME_TYPE);
     for (String tag : asList(catalogTags)) {
       mpe.addTag(tag);

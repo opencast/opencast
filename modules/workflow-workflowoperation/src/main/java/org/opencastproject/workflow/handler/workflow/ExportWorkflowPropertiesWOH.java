@@ -135,11 +135,12 @@ public class ExportWorkflowPropertiesWOH extends AbstractWorkflowOperationHandle
     Attachment attachment;
     try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
       workflowProps.storeToXML(out, null, "UTF-8");
-      String elementId = UUID.randomUUID().toString();
-      URI uri = workspace.put(mediaPackage.getIdentifier().toString(), elementId, EXPORTED_PROPERTIES_FILENAME,
-              new ByteArrayInputStream(out.toByteArray()));
       MediaPackageElementBuilder builder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
-      attachment = (Attachment) builder.elementFromURI(uri, Attachment.TYPE, targetFlavor);
+      attachment = (Attachment) builder.newElement(Attachment.TYPE, targetFlavor);
+      attachment.generateIdentifier();
+      URI uri = workspace.put(mediaPackage.getIdentifier().toString(), attachment.getIdentifier(), EXPORTED_PROPERTIES_FILENAME,
+              new ByteArrayInputStream(out.toByteArray()));
+      attachment.setURI(uri);
       attachment.setMimeType(MimeTypes.XML);
     } catch (IOException e) {
       logger.error("Unable to store workflow properties as Attachment with flavor '{}':", targetFlavorList.get(0), e);
