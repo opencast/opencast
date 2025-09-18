@@ -158,6 +158,7 @@
     <feature>opencast-services-processing-heavy-load</feature>
     <feature>opencast-services-processing-light-load</feature>
 
+    <bundle start-level="82">mvn:org.opencastproject/opencast-acl-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-admin-ui/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-admin-ui-interface/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-adopter-registration-api/${project.version}</bundle>
@@ -259,6 +260,7 @@
   <feature name="opencast-admin" version="${project.version}">
     <feature>opencast-core</feature>
 
+    <bundle start-level="82">mvn:org.opencastproject/opencast-acl-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-admin-ui/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-admin-ui-interface/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-adopter-registration-api/${project.version}</bundle>
@@ -382,6 +384,7 @@
   <feature name="opencast-adminpresentation" version="${project.version}">
     <feature>opencast-core</feature>
 
+    <bundle start-level="82">mvn:org.opencastproject/opencast-acl-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-admin-ui/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-admin-ui-interface/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-adopter-registration-api/${project.version}</bundle>

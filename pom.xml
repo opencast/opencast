@@ -70,6 +70,7 @@
     <xmlsec.version>2.2.6</xmlsec.version>
   </properties>
   <modules>
+    <module>modules/acl-workflowoperation</module>
     <module>modules/admin-ui</module>
     <module>modules/admin-ui-interface</module>
     <module>modules/adopter-registration-api</module>
