@@ -1730,10 +1730,10 @@ public class IndexServiceImpl implements IndexService {
           if (seriesDC != null) {
             mp.setSeriesTitle(seriesDC.getFirst(DublinCore.PROPERTY_TITLE));
             try (InputStream in = IOUtils.toInputStream(seriesDC.toXmlString(), "UTF-8")) {
-              MediaPackageElement mpe = mp.add(null, MediaPackageElement.Type.Catalog, MediaPackageElements.SERIES);
-              mpe.generateIdentifier();
-              URI catalogUrl = workspace.put(mp.getIdentifier().toString(), mpe.getIdentifier(), "dublincore.xml", in);
-              mpe.setURI(catalogUrl);
+              String elementId = UUID.randomUUID().toString();
+              URI catalogUrl = workspace.put(mp.getIdentifier().toString(), elementId, "dublincore.xml", in);
+              MediaPackageElement mpe = mp.add(catalogUrl, MediaPackageElement.Type.Catalog, MediaPackageElements.SERIES);
+              mpe.setIdentifier(elementId);
               mpe.setChecksum(Checksum.create(ChecksumType.DEFAULT_TYPE, workspace.read(catalogUrl)));
               if (StringUtils.isNotBlank(oldSeriesId)) {
                 for (String tag : seriesDcTags) {
@@ -1780,11 +1780,11 @@ public class IndexServiceImpl implements IndexService {
             var seriesElements = seriesElementsOpt.get();
             for (String seriesElementType : seriesElements.keySet()) {
               try (InputStream in = new ByteArrayInputStream(seriesElements.get(seriesElementType))) {
-                MediaPackageElementFlavor flavor = MediaPackageElementFlavor.flavor(seriesElementType, "series");
-                MediaPackageElement mpe = mp.add(null, MediaPackageElement.Type.Catalog, flavor);
-                mpe.generateIdentifier();
-                URI catalogUrl = workspace.put(mp.getIdentifier().toString(), mpe.getIdentifier(), "dublincore.xml", in);
-                mpe.setURI(catalogUrl);
+                String elementId = UUID.randomUUID().toString();
+                URI catalogUrl = workspace.put(mp.getIdentifier().toString(), elementId, "dublincore.xml", in);
+                MediaPackageElement mpe = mp.add(catalogUrl, MediaPackageElement.Type.Catalog,
+                        MediaPackageElementFlavor.flavor(seriesElementType, "series"));
+                mpe.setIdentifier(elementId);
                 mpe.setChecksum(Checksum.create(ChecksumType.DEFAULT_TYPE, workspace.read(catalogUrl)));
                 if (StringUtils.isNotBlank(oldSeriesId)) {
                   if (seriesExtDcTags.containsKey(seriesElementType)) {

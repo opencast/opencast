@@ -52,7 +52,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * The <code>RenameFilesWorkflowOperationHandler</code> will rename files referenced in tracks based on metadata

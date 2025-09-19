@@ -63,7 +63,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -336,7 +335,8 @@ public class
 
       subtitleMediaPackageElement.generateIdentifier();
       try (InputStream in = workspace.read(output)) {
-        URI uri = workspace.put(parentMediaPackage.getIdentifier().toString(), subtitleMediaPackageElement.getIdentifier(),
+        URI uri = workspace.put(parentMediaPackage.getIdentifier().toString(),
+                subtitleMediaPackageElement.getIdentifier(),
                 FilenameUtils.getName(output.getPath()), in);
         subtitleMediaPackageElement.setURI(uri);
       }

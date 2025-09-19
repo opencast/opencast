@@ -54,7 +54,6 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Objects;
-import java.util.UUID;
 
 /**
  * This workflow operation allows to shift the timestamps of subtitle files.

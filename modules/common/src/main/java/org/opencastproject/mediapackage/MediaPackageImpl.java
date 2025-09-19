@@ -57,7 +57,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.UUID;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -1439,10 +1438,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
     // Check if element has an id
     if (element.getIdentifier() == null) {
-      if (element instanceof AbstractMediaPackageElement) {
-        ((AbstractMediaPackageElement) element).generateIdentifier();
-      } else
-        throw new UnsupportedElementException(element, "Found unknown element without id");
+      element.generateIdentifier();
     }
   }
 

@@ -1484,7 +1484,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
         MediaPackageElementBuilder builder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
         Attachment convertedImage = (Attachment) builder.elementFromURI(workspaceURI, Attachment.TYPE, null);
         convertedImage.setSize(output.length());
-        convertedImage.setIdentifier(IdImpl.fromUUID().toString());
+        convertedImage.generateIdentifier();
         try {
           convertedImage.setMimeType(MimeTypes.fromURI(convertedImage.getURI()));
         } catch (UnknownFileTypeException e) {
@@ -2129,7 +2129,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
       List<URI> workspaceURIs = putToCollection(job, outputs, "demuxed file");
       List<Track> tracks = inspect(job, workspaceURIs);
-      tracks.forEach(track -> track.setIdentifier(IdImpl.fromUUID().toString()));
+      tracks.forEach(MediaPackageElement::generateIdentifier);
       return tracks;
     } catch (Exception e) {
       logger.warn("Demux/MultiOutputEncode operation failed to encode " + videoTrack, e);
@@ -2422,9 +2422,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       List<URI> workspaceURIs = putToCollection(job, outputs, "processSmil files");
       List<Track> tracks = inspect(job, workspaceURIs);
       if (isHLS) {
-        tracks.forEach(eachtrack -> AdaptivePlaylist.setLogicalName(eachtrack));
+        tracks.forEach(AdaptivePlaylist::setLogicalName);
       }
-      tracks.forEach(track -> track.setIdentifier(IdImpl.fromUUID().toString()));
+      tracks.forEach(MediaPackageElement::generateIdentifier);
       return tracks;
     } catch (Exception e) { // clean up all the stored files
       throw new EncoderException("ProcessSmil operation failed to run ", e);
@@ -2512,8 +2512,8 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       List<URI> workspaceURIs = putToCollection(job, saveFiles, "multiencode files");
       List<Track> tracks = inspect(job, workspaceURIs);
       if (isHLS) // Keep a snapshot of its name and we will reconciled them later
-        tracks.forEach(eachtrack -> AdaptivePlaylist.setLogicalName(eachtrack));
-      tracks.forEach(eachtrack -> eachtrack.setIdentifier(IdImpl.fromUUID().toString()));
+        tracks.forEach(AdaptivePlaylist::setLogicalName);
+      tracks.forEach(MediaPackageElement::generateIdentifier);
       return tracks;
     } catch (Exception e) {
       throw new EncoderException("MultiEncode operation failed to run ", e);
