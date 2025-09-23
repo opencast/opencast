@@ -9,6 +9,8 @@ on:
       - 'docs/log4j/**'
       - 'assemblies/**'
       - '.github/**'
+      - 'mvnw'
+      - '.mvn'
   push:
     paths:
       - 'pom.xml'
@@ -17,6 +19,8 @@ on:
       - 'docs/log4j/**'
       - 'assemblies/**'
       - '.github/**'
+      - 'mvnw'
+      - '.mvn'
     branches-ignore:
       - 'dependabot/**'  # Don't run dependabot branches, as they are already covered by pull requests
 
