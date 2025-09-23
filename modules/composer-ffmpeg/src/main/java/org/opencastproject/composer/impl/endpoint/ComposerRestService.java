@@ -47,7 +47,6 @@ import org.opencastproject.util.JsonObj;
 import org.opencastproject.util.LocalHashMap;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -69,6 +68,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DefaultValue;
@@ -578,23 +578,23 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
       return Response.status(Response.Status.BAD_REQUEST).entity("lowerTrack element must be of type track").build();
     LaidOutElement<Track> lowerLaidOutElement = new LaidOutElement<Track>((Track) lowerTrack, lowerLayout);
 
-    Option<LaidOutElement<Track>> upperLaidOutElement = Option.<LaidOutElement<Track>> none();
+    Optional<LaidOutElement<Track>> upperLaidOutElement = Optional.<LaidOutElement<Track>> empty();
     if (StringUtils.isNotBlank(upperTrackXml)) {
       MediaPackageElement upperTrack = MediaPackageElementParser.getFromXml(upperTrackXml);
       Layout upperLayout = Serializer.layout(JsonObj.jsonObj(upperLayoutJson));
       if (!Track.TYPE.equals(upperTrack.getElementType())) {
         return Response.status(Response.Status.BAD_REQUEST).entity("upperTrack element must be of type track").build();
       }
-      upperLaidOutElement = Option.option(new LaidOutElement<Track>((Track) upperTrack, upperLayout));
+      upperLaidOutElement = Optional.ofNullable(new LaidOutElement<Track>((Track) upperTrack, upperLayout));
     }
-    Option<LaidOutElement<Attachment>> watermarkLaidOutElement = Option.<LaidOutElement<Attachment>> none();
+    Optional<LaidOutElement<Attachment>> watermarkLaidOutElement = Optional.<LaidOutElement<Attachment>> empty();
     if (StringUtils.isNotBlank(watermarkAttachmentXml)) {
       Layout watermarkLayout = Serializer.layout(JsonObj.jsonObj(watermarkLayoutJson));
       MediaPackageElement watermarkAttachment = MediaPackageElementParser.getFromXml(watermarkAttachmentXml);
       if (!Attachment.TYPE.equals(watermarkAttachment.getElementType()))
         return Response.status(Response.Status.BAD_REQUEST).entity("watermarkTrack element must be of type track")
                 .build();
-      watermarkLaidOutElement = Option.some(new LaidOutElement<Attachment>((Attachment) watermarkAttachment,
+      watermarkLaidOutElement = Optional.of(new LaidOutElement<Attachment>((Attachment) watermarkAttachment,
               watermarkLayout));
     }
 

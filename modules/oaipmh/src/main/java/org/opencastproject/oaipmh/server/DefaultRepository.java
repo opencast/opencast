@@ -27,7 +27,6 @@ import org.opencastproject.oaipmh.persistence.OaiPmhDatabase;
 import org.opencastproject.oaipmh.util.ResumptionTokenStore;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.data.Collections;
-import org.opencastproject.util.data.Option;
 
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
@@ -37,6 +36,7 @@ import org.osgi.service.component.annotations.Reference;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Factory for the default OAI-PMH repository that ships with each Opencast installation serving the
@@ -101,7 +101,7 @@ public class DefaultRepository extends OaiPmhRepository {
   }
 
   @Override
-  public Option<ResumableQuery> getSavedQuery(String resumptionToken) {
+  public Optional<ResumableQuery> getSavedQuery(String resumptionToken) {
     return tokenStore.get(resumptionToken);
   }
 

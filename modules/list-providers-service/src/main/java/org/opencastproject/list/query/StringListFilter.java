@@ -22,7 +22,8 @@
 package org.opencastproject.list.query;
 
 import org.opencastproject.list.api.ResourceListFilter;
-import org.opencastproject.util.data.Option;
+
+import java.util.Optional;
 
 /**
  * Simple {@link ResourceListFilter} implementation for freetext filter
@@ -33,7 +34,7 @@ public class StringListFilter implements ResourceListFilter<String> {
   private static final String FREETEXT_LABEL = "FREETEXT.LABEL";
 
   private String name = FREETEXT;
-  private final Option<String> value;
+  private final Optional<String> value;
   private SourceType sourceType = SourceType.FREETEXT;
   private String label = FREETEXT_LABEL;
 
@@ -44,7 +45,7 @@ public class StringListFilter implements ResourceListFilter<String> {
    * @param value
    */
   public StringListFilter(String name, String value) {
-    this.value = Option.some(value);
+    this.value = Optional.of(value);
     this.name = name;
   }
 
@@ -54,7 +55,7 @@ public class StringListFilter implements ResourceListFilter<String> {
    * @param value
    */
   public StringListFilter(String value) {
-    this.value = Option.some(value);
+    this.value = Optional.of(value);
   }
 
   @Override
@@ -63,7 +64,7 @@ public class StringListFilter implements ResourceListFilter<String> {
   }
 
   @Override
-  public Option<String> getValue() {
+  public Optional<String> getValue() {
     return value;
   }
 
@@ -78,8 +79,8 @@ public class StringListFilter implements ResourceListFilter<String> {
   }
 
   @Override
-  public Option<String> getValuesListName() {
-    return Option.none();
+  public Optional<String> getValuesListName() {
+    return Optional.empty();
   }
 
 }

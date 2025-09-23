@@ -23,8 +23,6 @@ package org.opencastproject.util;
 
 import static org.opencastproject.util.data.Collections.map;
 import static org.opencastproject.util.data.Collections.toArray;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.job.api.Job;
@@ -37,7 +35,6 @@ import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
 
 import org.apache.http.HttpResponse;
 import org.slf4j.Logger;
@@ -188,7 +185,7 @@ public final class JobUtil {
   }
 
   /** Check if <code>job</code> is not done yet and wait in case. */
-  public static JobBarrier.Result waitForJob(Job waiter, ServiceRegistry reg, Option<Long> timeout, Job job) {
+  public static JobBarrier.Result waitForJob(Job waiter, ServiceRegistry reg, Optional<Long> timeout, Job job) {
     final Job.Status status = job.getStatus();
     // only create a barrier if the job is not done yet
     switch (status) {
@@ -198,14 +195,14 @@ public final class JobUtil {
       case FINISHED:
         return new JobBarrier.Result(map(tuple(job, status)));
       default:
-        for (Long t : timeout)
-          return waitForJobs(waiter, reg, t, job);
+        if (timeout.isPresent())
+          return waitForJobs(waiter, reg, timeout.get(), job);
         return waitForJobs(waiter, reg, job);
     }
   }
 
   /** Check if <code>job</code> is not done yet and wait in case. */
-  public static JobBarrier.Result waitForJob(ServiceRegistry reg, Option<Long> timeout, Job job) {
+  public static JobBarrier.Result waitForJob(ServiceRegistry reg, Optional<Long> timeout, Job job) {
     return waitForJob(null, reg, timeout, job);
   }
 
@@ -221,12 +218,12 @@ public final class JobUtil {
    * @return the job barrier result
    */
   public static JobBarrier.Result waitForJob(Job waiter, ServiceRegistry reg, Job job) {
-    return waitForJob(waiter, reg, none(0L), job);
+    return waitForJob(waiter, reg, Optional.empty(), job);
   }
 
   /** Check if <code>job</code> is not done yet and wait in case. */
   public static JobBarrier.Result waitForJob(ServiceRegistry reg, Job job) {
-    return waitForJob(null, reg, none(0L), job);
+    return waitForJob(null, reg, Optional.empty(), job);
   }
 
   /**
@@ -260,7 +257,7 @@ public final class JobUtil {
 
   /** Wait for the job to complete and return the success value. */
   public static Function<Job, Boolean> waitForJobSuccess(final Job waiter, final ServiceRegistry reg,
-          final Option<Long> timeout) {
+          final Optional<Long> timeout) {
     return new Function<Job, Boolean>() {
       @Override
       public Boolean apply(Job job) {
@@ -279,7 +276,7 @@ public final class JobUtil {
     return new Function.X<Job, MediaPackageElement>() {
       @Override
       public MediaPackageElement xapply(Job job) throws MediaPackageException {
-        waitForJob(waiter, reg, none(0L), job);
+        waitForJob(waiter, reg, Optional.empty(), job);
         return MediaPackageElementParser.getFromXml(job.getPayload());
       }
     };
@@ -293,14 +290,14 @@ public final class JobUtil {
     return payloadAsMediaPackageElement(null, reg);
   }
 
-  public static final Function<HttpResponse, Option<Job>> jobFromHttpResponse = new Function<HttpResponse, Option<Job>>() {
+  public static final Function<HttpResponse, Optional<Job>> jobFromHttpResponse = new Function<HttpResponse, Optional<Job>>() {
     @Override
-    public Option<Job> apply(HttpResponse response) {
+    public Optional<Job> apply(HttpResponse response) {
       try {
-        return some(JobParser.parseJob(response.getEntity().getContent()));
+        return Optional.of(JobParser.parseJob(response.getEntity().getContent()));
       } catch (Exception e) {
         logger.error("Error parsing Job from HTTP response", e);
-        return none();
+        return Optional.empty();
       }
     }
   };

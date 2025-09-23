@@ -26,7 +26,8 @@ import org.opencastproject.index.service.util.FiltersUtils;
 import org.opencastproject.list.api.ResourceListFilter;
 import org.opencastproject.list.api.ResourceListFilter.SourceType;
 import org.opencastproject.list.impl.ResourceListQueryImpl;
-import org.opencastproject.util.data.Option;
+
+import java.util.Optional;
 
 /**
  * Query for the ACL list.
@@ -54,15 +55,15 @@ public class AclsListQuery extends ResourceListQueryImpl {
    *          the name to filter for
    */
   public void withName(String name) {
-    this.addFilter(createNameFilter(Option.option(name)));
+    this.addFilter(createNameFilter(Optional.ofNullable(name)));
   }
 
   /**
-   * Returns an {@link Option} containing the name used to filter if set
+   * Returns an {@link Optional} containing the name used to filter if set
    *
-   * @return an {@link Option} containing the name or none.
+   * @return an {@link Optional} containing the name or none.
    */
-  public Option<String> getName() {
+  public Optional<String> getName() {
     return this.getFilterValue(FILTER_NAME_NAME);
   }
 
@@ -70,12 +71,12 @@ public class AclsListQuery extends ResourceListQueryImpl {
    * Create a new {@link ResourceListFilter} based on a name
    *
    * @param name
-   *          the name to filter on wrapped in an {@link Option} or {@link Option#none()}
+   *          the name to filter on wrapped in an {@link Optional} or {@link Optional#empty()}
    * @return a new {@link ResourceListFilter} for a name based query
    */
-  public static ResourceListFilter<String> createNameFilter(Option<String> name) {
+  public static ResourceListFilter<String> createNameFilter(Optional<String> name) {
     return FiltersUtils.generateFilter(name, FILTER_NAME_NAME, FILTER_NAME_LABEL, SourceType.SELECT,
-            Option.some(AclListProvider.NAME));
+            Optional.of(AclListProvider.NAME));
   }
 
 }

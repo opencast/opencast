@@ -41,7 +41,6 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.SmartIterator;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -65,6 +64,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Properties;
 
 import javax.servlet.http.HttpServletResponse;
@@ -135,28 +135,28 @@ public class CaptureAgentsEndpoint {
           @RestParameter(name = "sort", isRequired = false, description = "The sort order. May include any of the following: STATUS, NAME OR LAST_UPDATED.  Add '_DESC' to reverse the sort order (e.g. STATUS_DESC).", type = STRING) }, responses = { @RestResponse(description = "An XML representation of the agent capabilities", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
   public Response getAgents(@QueryParam("limit") int limit, @QueryParam("offset") int offset,
           @QueryParam("inputs") boolean inputs, @QueryParam("filter") String filter, @QueryParam("sort") String sort) {
-    Option<String> filterName = Option.none();
-    Option<String> filterStatus = Option.none();
-    Option<Long> filterLastUpdated = Option.none();
-    Option<String> filterText = Option.none();
-    Option<String> optSort = Option.option(trimToNull(sort));
+    Optional<String> filterName = Optional.empty();
+    Optional<String> filterStatus = Optional.empty();
+    Optional<Long> filterLastUpdated = Optional.empty();
+    Optional<String> filterText = Optional.empty();
+    Optional<String> optSort = Optional.ofNullable(trimToNull(sort));
 
     Map<String, String> filters = RestUtils.parseFilter(filter);
     for (String name : filters.keySet()) {
       if (AgentsListQuery.FILTER_NAME_NAME.equals(name))
-        filterName = Option.some(filters.get(name));
+        filterName = Optional.of(filters.get(name));
       if (AgentsListQuery.FILTER_STATUS_NAME.equals(name))
-        filterStatus = Option.some(filters.get(name));
+        filterStatus = Optional.of(filters.get(name));
       if (AgentsListQuery.FILTER_LAST_UPDATED.equals(name)) {
         try {
-          filterLastUpdated = Option.some(Long.parseLong(filters.get(name)));
+          filterLastUpdated = Optional.of(Long.parseLong(filters.get(name)));
         } catch (NumberFormatException e) {
           logger.info("Unable to parse long {}", filters.get(name));
           return Response.status(Status.BAD_REQUEST).build();
         }
       }
       if (AgentsListQuery.FILTER_TEXT_NAME.equals(name) && StringUtils.isNotBlank(filters.get(name)))
-        filterText = Option.some(filters.get(name));
+        filterText = Optional.of(filters.get(name));
     }
 
     // Filter agents by filter criteria
@@ -165,17 +165,17 @@ public class CaptureAgentsEndpoint {
       Agent agent = entry.getValue();
 
       // Filter list
-      if ((filterName.isSome() && !filterName.get().equals(agent.getName()))
-              || (filterStatus.isSome() && !filterStatus.get().equals(agent.getState()))
-              || (filterLastUpdated.isSome() && filterLastUpdated.get() != agent.getLastHeardFrom())
-              || (filterText.isSome() && !TextFilter.match(filterText.get(), agent.getName(), agent.getState())))
+      if ((filterName.isPresent() && !filterName.get().equals(agent.getName()))
+              || (filterStatus.isPresent() && !filterStatus.get().equals(agent.getState()))
+              || (filterLastUpdated.isPresent() && filterLastUpdated.get() != agent.getLastHeardFrom())
+              || (filterText.isPresent() && !TextFilter.match(filterText.get(), agent.getName(), agent.getState())))
         continue;
       filteredAgents.add(agent);
     }
     int total = filteredAgents.size();
 
     // Sort by status, name or last updated date
-    if (optSort.isSome()) {
+    if (optSort.isPresent()) {
       final ArrayList<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
       Collections.sort(filteredAgents, new Comparator<Agent>() {
         @Override

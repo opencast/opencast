@@ -22,10 +22,10 @@
 package org.opencastproject.themes;
 
 import org.opencastproject.security.api.User;
-import org.opencastproject.util.data.Option;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Optional;
 
 /**
  * Business object of themes class
@@ -34,7 +34,7 @@ public class Theme implements Serializable {
 
   private static final long serialVersionUID = -1787920672441332673L;
 
-  private final Option<Long> id;
+  private final Optional<Long> id;
   private final Date creationDate;
   private final boolean isDefault;
   private final User creator;
@@ -55,12 +55,12 @@ public class Theme implements Serializable {
   private final String watermarkFile;
   private final String watermarkPosition;
 
-  public Theme(Option<Long> id, Date creationDate, boolean isDefault, User creator, String name) {
+  public Theme(Optional<Long> id, Date creationDate, boolean isDefault, User creator, String name) {
     this(id, creationDate, isDefault, creator, name, null, false, null, false, null, false, null, null, false, null,
             null, false, null, null);
   }
 
-  public Theme(Option<Long> id, Date creationDate, boolean isDefault, User creator, String name, String description,
+  public Theme(Optional<Long> id, Date creationDate, boolean isDefault, User creator, String name, String description,
           boolean bumperActive, String bumperFile, boolean trailerActive, String trailerFile, boolean titleSlideActive,
           String titleSlideMetadata, String titleSlideBackground, boolean licenseSlideActive,
           String licenseSlideBackground, String licenseSlideDescription, boolean watermarkActive, String watermarkFile,
@@ -86,7 +86,7 @@ public class Theme implements Serializable {
     this.watermarkPosition = watermarkPosition;
   }
 
-  public Option<Long> getId() {
+  public Optional<Long> getId() {
     return id;
   }
 

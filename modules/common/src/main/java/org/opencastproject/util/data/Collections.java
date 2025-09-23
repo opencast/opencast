@@ -21,8 +21,6 @@
 
 package org.opencastproject.util.data;
 
-import static org.opencastproject.util.data.Option.some;
-
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,6 +32,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -122,11 +121,11 @@ public final class Collections {
   }
 
   /** Return the head of list <code>as</code> or <code>none</code>. */
-  public static <A> Option<A> head(List<A> as) {
+  public static <A> Optional<A> head(List<A> as) {
     if (!as.isEmpty()) {
-      return some(as.get(0));
+      return Optional.of(as.get(0));
     } else {
-      return Option.none();
+      return Optional.empty();
     }
   }
 

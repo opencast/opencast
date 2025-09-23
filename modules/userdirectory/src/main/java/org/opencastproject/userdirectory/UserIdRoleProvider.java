@@ -31,7 +31,6 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.api.UserProvider;
 import org.opencastproject.util.OsgiUtil;
-import org.opencastproject.util.data.Option;
 
 import com.google.common.base.CharMatcher;
 
@@ -49,6 +48,7 @@ import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 /**
@@ -220,8 +220,8 @@ public class UserIdRoleProvider implements RoleProvider, ManagedService {
 
   @Override
   public void updated(Dictionary properties) throws ConfigurationException {
-    Option<String> userPrefixProperty = OsgiUtil.getOptCfg(properties, ROLE_USER_PREFIX_KEY);
-    if (userPrefixProperty.isSome()) {
+    Optional<String> userPrefixProperty = OsgiUtil.getOptCfg(properties, ROLE_USER_PREFIX_KEY);
+    if (userPrefixProperty.isPresent()) {
       userRolePrefix = userPrefixProperty.get();
       logger.info("Using configured userRole prefix '{}'", userRolePrefix);
     } else {
@@ -229,8 +229,8 @@ public class UserIdRoleProvider implements RoleProvider, ManagedService {
       logger.info("Using default userRole prefix '{}'", userRolePrefix);
     }
 
-    Option<String> sanitizeProperty = OsgiUtil.getOptCfg(properties, SANITIZE_KEY);
-    if (sanitizeProperty.isSome()) {
+    Optional<String> sanitizeProperty = OsgiUtil.getOptCfg(properties, SANITIZE_KEY);
+    if (sanitizeProperty.isPresent()) {
       sanitize = BooleanUtils.toBoolean(sanitizeProperty.get());
       logger.info("Using configured will sanitize user names '{}'", sanitize);
     } else {

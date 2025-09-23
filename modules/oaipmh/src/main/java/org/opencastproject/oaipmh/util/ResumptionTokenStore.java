@@ -20,16 +20,14 @@
  */
 package org.opencastproject.oaipmh.util;
 
-import static org.opencastproject.util.data.Option.option;
-
 import org.opencastproject.oaipmh.server.ResumableQuery;
-import org.opencastproject.util.data.Option;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.collections4.map.LRUMap;
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Strategy to store resumption tokens. Uses a {@link org.apache.commons.collections4.map.LRUMap}.
@@ -59,8 +57,8 @@ public final class ResumptionTokenStore {
     return token;
   }
 
-  public Option<ResumableQuery> get(String resumptionToken) {
-    return option(resumptionTokens.get(resumptionToken));
+  public Optional<ResumableQuery> get(String resumptionToken) {
+    return Optional.ofNullable(resumptionTokens.get(resumptionToken));
   }
 
 }

@@ -24,7 +24,6 @@ import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
@@ -36,6 +35,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -160,18 +160,18 @@ public class UnitTestWorkspace implements Workspace {
   }
 
   @Override
-  public Option<Long> getTotalSpace() {
-    return Option.none();
+  public Optional<Long> getTotalSpace() {
+    return Optional.empty();
   }
 
   @Override
-  public Option<Long> getUsableSpace() {
-    return Option.none();
+  public Optional<Long> getUsableSpace() {
+    return Optional.empty();
   }
 
   @Override
-  public Option<Long> getUsedSpace() {
-    return Option.none();
+  public Optional<Long> getUsedSpace() {
+    return Optional.empty();
   }
 
   @Override

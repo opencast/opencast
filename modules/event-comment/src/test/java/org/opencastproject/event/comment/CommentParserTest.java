@@ -75,7 +75,7 @@ public class CommentParserTest {
 
     // Reply 2
     reply = comment.getReplies().get(1);
-    Assert.assertTrue(reply.getId().isNone());
+    Assert.assertTrue(reply.getId().isEmpty());
     Assert.assertEquals("Test reply 2", reply.getText());
     Assert.assertEquals(DateTimeSupport.fromUTC("2014-08-21T10:09:45Z"), reply.getCreationDate().getTime());
     Assert.assertEquals(DateTimeSupport.fromUTC("2014-09-21T12:09:45Z"), reply.getModificationDate().getTime());

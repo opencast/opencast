@@ -314,7 +314,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     logger.trace("add media package from url: {} flavor: {} tags: {} mediaPackage: {}", url, flavor, tags, mpx);
     try {
       MediaPackage mp = MP_FACTORY.newMediaPackageBuilder().loadFromXml(mpx);
-      if (MediaPackageSupport.sanityCheck(mp).isSome())
+      if (MediaPackageSupport.sanityCheck(mp).isPresent())
         return Response.serverError().status(Status.BAD_REQUEST).build();
       String[] tagsArray = null;
       if (tags != null) {
@@ -367,7 +367,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
             url, flavor, startTime, mpx);
     try {
       MediaPackage mp = MP_FACTORY.newMediaPackageBuilder().loadFromXml(mpx);
-      if (MediaPackageSupport.sanityCheck(mp).isSome())
+      if (MediaPackageSupport.sanityCheck(mp).isPresent())
         return Response.serverError().status(Status.BAD_REQUEST).build();
 
       mp = ingestService.addPartialTrack(new URI(url), MediaPackageElementFlavor.parseFlavor(flavor), startTime, mp);
@@ -410,7 +410,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     logger.trace("add catalog with url: {} flavor: {} tags: {} mediaPackage: {}", url, flavor, tags, mpx);
     try {
       MediaPackage mp = MP_FACTORY.newMediaPackageBuilder().loadFromXml(mpx);
-      if (MediaPackageSupport.sanityCheck(mp).isSome())
+      if (MediaPackageSupport.sanityCheck(mp).isPresent())
         return Response.serverError().status(Status.BAD_REQUEST).build();
       String[] tagsArray = null;
       if (tags != null) {
@@ -457,7 +457,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     logger.trace("add attachment with url: {} flavor: {} mediaPackage: {}", url, flavor, mpx);
     try {
       MediaPackage mp = MP_FACTORY.newMediaPackageBuilder().loadFromXml(mpx);
-      if (MediaPackageSupport.sanityCheck(mp).isSome())
+      if (MediaPackageSupport.sanityCheck(mp).isPresent())
         return Response.serverError().status(Status.BAD_REQUEST).build();
       String[] tagsArray = null;
       if (tags != null) {
@@ -558,7 +558,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
        * Check if we actually got a valid request including a message body and a valid mediapackage to attach the
        * element to
        */
-      if (in == null || mp == null || MediaPackageSupport.sanityCheck(mp).isSome()) {
+      if (in == null || mp == null || MediaPackageSupport.sanityCheck(mp).isPresent()) {
         return Response.serverError().status(Status.BAD_REQUEST).build();
       }
       switch (type) {
@@ -1203,7 +1203,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     final MediaPackage mp;
     try {
       mp = MP_FACTORY.newMediaPackageBuilder().loadFromXml(formData.getFirst("mediaPackage"));
-      if (MediaPackageSupport.sanityCheck(mp).isSome()) {
+      if (MediaPackageSupport.sanityCheck(mp).isPresent()) {
         logger.warn("Rejected ingest with invalid mediapackage {}", mp);
         return Response.status(Status.BAD_REQUEST).build();
       }
@@ -1301,7 +1301,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     MediaPackage mp = null;
     try {
       mp = MP_FACTORY.newMediaPackageBuilder().loadFromXml(mediaPackageXml);
-      if (MediaPackageSupport.sanityCheck(mp).isSome()) {
+      if (MediaPackageSupport.sanityCheck(mp).isPresent()) {
         throw new MediaPackageException("Insane media package");
       }
     } catch (MediaPackageException e) {
@@ -1365,7 +1365,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     } catch (MediaPackageException e) {
       return Response.serverError().status(Status.BAD_REQUEST).build();
     }
-    if (MediaPackageSupport.sanityCheck(mediaPackage).isSome()) {
+    if (MediaPackageSupport.sanityCheck(mediaPackage).isPresent()) {
       return Response.status(Status.BAD_REQUEST).build();
     }
 

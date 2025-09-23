@@ -107,11 +107,11 @@ public class ServicesListProvider implements ResourceListProvider {
     }
 
     for (ServiceRegistration serviceRegistration : serviceRegistrations) {
-      if (servicesQuery.getHostname().isSome()
+      if (servicesQuery.getHostname().isPresent()
               && !StringUtils.equals(servicesQuery.getHostname().get(), serviceRegistration.getHost()))
         continue;
 
-      if (servicesQuery.getActions().isSome()
+      if (servicesQuery.getActions().isPresent()
               && servicesQuery.getActions().get()
               && serviceRegistration.getServiceState() == ServiceState.NORMAL)
         continue;
@@ -119,9 +119,9 @@ public class ServicesListProvider implements ResourceListProvider {
       result.put(serviceRegistration.getServiceType(), serviceRegistration.getServiceType());
     }
 
-    if (servicesQuery.getLimit().isSome() || servicesQuery.getLimit().isSome()) {
-      int limit = servicesQuery.getLimit().getOrElse(0);
-      int offset = servicesQuery.getOffset().getOrElse(0);
+    if (servicesQuery.getLimit().isPresent() || servicesQuery.getLimit().isPresent()) {
+      int limit = servicesQuery.getLimit().orElse(0);
+      int offset = servicesQuery.getOffset().orElse(0);
       result = new SmartIterator(limit, offset).applyLimitAndOffset(result);
     }
 

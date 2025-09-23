@@ -22,7 +22,8 @@
 package org.opencastproject.util;
 
 import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
+
+import java.util.Optional;
 
 /** Utility functions for mime types. */
 public final class MimeTypeUtil {
@@ -30,9 +31,9 @@ public final class MimeTypeUtil {
   }
 
   /** {@link org.opencastproject.util.MimeType#getSuffix()} as a function. */
-  public static final Function<MimeType, Option<String>> suffix = new Function<MimeType, Option<String>>() {
+  public static final Function<MimeType, Optional<String>> suffix = new Function<MimeType, Optional<String>>() {
     @Override
-    public Option<String> apply(MimeType mimeType) {
+    public Optional<String> apply(MimeType mimeType) {
       return mimeType.getSuffix();
     }
   };

@@ -21,12 +21,9 @@
 
 package org.opencastproject.util;
 
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
-
 import org.opencastproject.util.data.Function0;
-import org.opencastproject.util.data.Option;
 
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /** Only one function application can be threaded through the needle eye at a time. */
@@ -40,15 +37,15 @@ public final class NeedleEye {
    * 
    * @return the result of <code>f</code> or none if another function is currently being applied.
    */
-  public <A> Option<A> apply(Function0<A> f) {
+  public <A> Optional<A> apply(Function0<A> f) {
     if (running.compareAndSet(false, true)) {
       try {
-        return some(f.apply());
+        return Optional.of(f.apply());
       } finally {
         running.set(false);
       }
     } else {
-      return none();
+      return Optional.empty();
     }
   }
 }

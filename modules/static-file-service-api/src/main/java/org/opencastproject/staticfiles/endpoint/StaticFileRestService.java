@@ -35,7 +35,6 @@ import org.opencastproject.util.ProgressInputStream;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.RestUtil.R;
 import org.opencastproject.util.UrlSupport;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -59,6 +58,7 @@ import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -131,7 +131,7 @@ public class StaticFileRestService {
   private String serverUrl;
 
   /** The URL to serve static files from a webserver instead of Opencast. */
-  private Option<String> webserverURL = Option.none();
+  private Optional<String> webserverURL = Optional.empty();
 
   /** The maximum file size to allow to be uploaded in bytes, default 1GB */
   private long maxUploadSize = 1000000000;
@@ -165,11 +165,11 @@ public class StaticFileRestService {
     logger.info("Static File REST Service started.");
     serverUrl = OsgiUtil.getContextProperty(cc, OpencastConstants.SERVER_URL_PROPERTY);
     useWebserver = BooleanUtils.toBoolean(OsgiUtil.getOptCfg(cc.getProperties(), STATICFILES_WEBSERVER_ENABLED_KEY)
-            .getOrElse("false"));
+            .orElse("false"));
     webserverURL = OsgiUtil.getOptCfg(cc.getProperties(), STATICFILES_WEBSERVER_URL_KEY);
 
-    Option<String> cfgMaxUploadSize = OsgiUtil.getOptContextProperty(cc, STATICFILES_UPLOAD_MAX_SIZE_KEY);
-    if (cfgMaxUploadSize.isSome()) {
+    Optional<String> cfgMaxUploadSize = OsgiUtil.getOptContextProperty(cc, STATICFILES_UPLOAD_MAX_SIZE_KEY);
+    if (cfgMaxUploadSize.isPresent()) {
       maxUploadSize = Long.parseLong(cfgMaxUploadSize.get());
     }
   }
@@ -205,7 +205,7 @@ public class StaticFileRestService {
       final String filename = staticFileService.getFileName(uuid);
       final Long length = staticFileService.getContentLength(uuid);
       // It is safe to pass the InputStream without closing it, JAX-RS takes care of that
-      return RestUtil.R.ok(file, getMimeType(filename), Option.some(length), Option.some(filename));
+      return RestUtil.R.ok(file, getMimeType(filename), Optional.of(length), Optional.of(filename));
     } catch (NotFoundException | IOException e) {
       return RestUtil.R.notFound();
     }
@@ -416,7 +416,7 @@ public class StaticFileRestService {
    *           if the resource couldn't been found
    */
   public URI getStaticFileURL(String uuid) throws NotFoundException {
-    if (useWebserver && webserverURL.isSome()) {
+    if (useWebserver && webserverURL.isPresent()) {
       return URI.create(UrlSupport.concat(webserverURL.get(), securityService.getOrganization().getId(), uuid,
               staticFileService.getFileName(uuid)));
     } else {
@@ -424,13 +424,13 @@ public class StaticFileRestService {
     }
   }
 
-  private Option<String> getMimeType(final String filename) {
-    Option<String> mimeType;
+  private Optional<String> getMimeType(final String filename) {
+    Optional<String> mimeType;
     try {
-      mimeType = Option.some(MimeTypes.fromString(filename).toString());
+      mimeType = Optional.of(MimeTypes.fromString(filename).toString());
     } catch (Exception e) {
       logger.warn("Unable to detect the mime type of file {}", filename);
-      mimeType = Option.<String> none();
+      mimeType = Optional.<String> empty();
     }
     return mimeType;
   }

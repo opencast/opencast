@@ -25,11 +25,8 @@ import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.opencastproject.util.IoSupport.withResource;
 import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.data.functions.Booleans.not;
-import static org.opencastproject.util.data.functions.Options.sequenceOpt;
-import static org.opencastproject.util.data.functions.Options.toOption;
 
 import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
 
 import org.apache.commons.io.FilenameUtils;
 import org.slf4j.Logger;
@@ -39,8 +36,10 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 /** Utility class used for media package handling. */
 public final class MediaPackageSupport {
@@ -319,10 +318,15 @@ public final class MediaPackageSupport {
    *
    * @return none if the media package is a healthy condition, some([error_msgs]) otherwise
    */
-  public static Option<List<String>> sanityCheck(MediaPackage mp) {
-    final Option<List<String>> errors = sequenceOpt(list(toOption(mp.getIdentifier() != null, "no ID"),
-            toOption(mp.getIdentifier() != null && isNotBlank(mp.getIdentifier().toString()), "blank ID")));
-    return errors.getOrElse(NIL).size() == 0 ? Option.<List<String>> none() : errors;
+  public static Optional<List<String>> sanityCheck(MediaPackage mp) {
+    List<String> errors = java.util.stream.Stream.of(
+            mp.getIdentifier() == null ? "no ID" : null,
+            (mp.getIdentifier() != null && isNotBlank(mp.getIdentifier().toString())) ? null : "blank ID"
+        )
+        .filter(Objects::nonNull)
+        .collect(Collectors.toList());
+
+    return errors.isEmpty() ? Optional.empty() : Optional.of(errors);
   }
 
   /** To be used in unit tests. */

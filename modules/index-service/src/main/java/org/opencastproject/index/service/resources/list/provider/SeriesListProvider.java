@@ -202,15 +202,15 @@ public class SeriesListProvider implements ResourceListProvider {
    */
   protected SeriesSearchQuery toSearchQuery(ResourceListQuery query) {
     SeriesSearchQuery seriesQuery = new SeriesSearchQuery(securityService.getOrganization().getId(), securityService.getUser());
-    if (query.getLimit().isSome()) {
+    if (query.getLimit().isPresent()) {
       seriesQuery.withLimit(query.getLimit().get());
     }
-    if (query.getOffset().isSome()) {
+    if (query.getOffset().isPresent()) {
       seriesQuery.withOffset(query.getOffset().get());
     }
 
     for (ResourceListFilter filter : query.getFilters()) {
-      if (filter.getValue().isNone()) {
+      if (filter.getValue().isEmpty()) {
         continue;
       } else if (SeriesListQuery.FILTER_CREATIONDATE_NAME.equals(filter.getName())) {
         Tuple<Date, Date> creationDate = (Tuple<Date, Date>) filter.getValue().get();
@@ -240,13 +240,13 @@ public class SeriesListProvider implements ResourceListProvider {
     }
 
     if (query instanceof SeriesListQuery) {
-      if (((SeriesListQuery) query).getReadPermission().isSome()
-          || ((SeriesListQuery) query).getWritePermission().isSome()) {
+      if (((SeriesListQuery) query).getReadPermission().isPresent()
+          || ((SeriesListQuery) query).getWritePermission().isPresent()) {
         seriesQuery.withoutActions();
-        if (((SeriesListQuery) query).getReadPermission().getOrElse(true)) {
+        if (((SeriesListQuery) query).getReadPermission().orElse(true)) {
           seriesQuery.withAction(Permissions.Action.READ);
         }
-        if (((SeriesListQuery) query).getWritePermission().getOrElse(false)) {
+        if (((SeriesListQuery) query).getWritePermission().orElse(false)) {
           seriesQuery.withAction(Permissions.Action.WRITE);
         }
       }

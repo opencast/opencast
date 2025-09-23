@@ -34,7 +34,6 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.themes.persistence.ThemesServiceDatabaseImpl;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.requests.SortCriterion;
 
 import org.easymock.EasyMock;
@@ -84,7 +83,7 @@ public class ThemesServiceDatabaseTest {
     JaxbOrganization org = new DefaultOrganization();
     JaxbUser creator = new JaxbUser("admin", "test", org);
 
-    Theme theme = new Theme(Option.<Long> none(), new Date(), true, creator, "New");
+    Theme theme = new Theme(Optional.<Long> empty(), new Date(), true, creator, "New");
     Theme updateTheme = themesDatabase.updateTheme(theme);
     Assert.assertEquals("New", updateTheme.getName());
     Assert.assertEquals(1, themesDatabase.countThemes());
@@ -119,9 +118,9 @@ public class ThemesServiceDatabaseTest {
     JaxbUser user2 = new JaxbUser("bdmin", "test", org);
     JaxbUser user3 = new JaxbUser("cdmin", "test", org);
 
-    Theme theme1 = new Theme(Option.<Long> none(), new Date(1), true, user1, "A theme");
-    Theme theme2 = new Theme(Option.<Long> none(), new Date(2), true, user2, "B theme");
-    Theme theme3 = new Theme(Option.<Long> none(), new Date(2), true, user3, "C theme");
+    Theme theme1 = new Theme(Optional.<Long> empty(), new Date(1), true, user1, "A theme");
+    Theme theme2 = new Theme(Optional.<Long> empty(), new Date(2), true, user2, "B theme");
+    Theme theme3 = new Theme(Optional.<Long> empty(), new Date(2), true, user3, "C theme");
 
     themesDatabase.updateTheme(theme1);
     themesDatabase.updateTheme(theme2);

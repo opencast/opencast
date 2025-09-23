@@ -124,7 +124,6 @@ import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.XmlNamespaceContext;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Monadics;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.functions.Misc;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
@@ -1634,18 +1633,18 @@ public class SchedulerServiceImplTest {
     return new AssetStore() {
 
       @Override
-      public Option<Long> getUsedSpace() {
-        return Option.none();
+      public Optional<Long> getUsedSpace() {
+        return Optional.empty();
       }
 
       @Override
-      public Option<Long> getUsableSpace() {
-        return Option.none();
+      public Optional<Long> getUsableSpace() {
+        return Optional.empty();
       }
 
       @Override
-      public Option<Long> getTotalSpace() {
-        return Option.none();
+      public Optional<Long> getTotalSpace() {
+        return Optional.empty();
       }
 
       /**

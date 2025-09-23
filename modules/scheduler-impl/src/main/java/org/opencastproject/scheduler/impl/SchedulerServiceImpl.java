@@ -88,9 +88,7 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.XmlNamespaceBinding;
 import org.opencastproject.util.XmlNamespaceContext;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.functions.Misc;
-import org.opencastproject.util.data.functions.Strings;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.google.common.cache.Cache;
@@ -378,17 +376,16 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   @Override
   public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
     if (properties != null) {
-      final Option<Integer> cacheExpireDuration = OsgiUtil.getOptCfg(properties, CFG_KEY_LAST_MODIFIED_CACHE_EXPIRE)
-              .bind(Strings.toInt);
-      if (cacheExpireDuration.isSome()) {
+      final Optional<Integer> cacheExpireDuration = OsgiUtil.getOptCfgAsInt(properties, CFG_KEY_LAST_MODIFIED_CACHE_EXPIRE);
+      if (cacheExpireDuration.isPresent()) {
         lastModifiedCache = CacheBuilder.newBuilder().expireAfterWrite(cacheExpireDuration.get(), TimeUnit.SECONDS)
                 .build();
         logger.info("Set last modified cache to {}", DateTimeSupport.humanReadableTime(cacheExpireDuration.get()));
       } else {
         logger.info("Set last modified cache to default {}", DateTimeSupport.humanReadableTime(DEFAULT_CACHE_EXPIRE));
       }
-      final Option<Boolean> maintenance = OsgiUtil.getOptCfgAsBoolean(properties, CFG_KEY_MAINTENANCE);
-      if (maintenance.getOrElse(false)) {
+      final Optional<Boolean> maintenance = OsgiUtil.getOptCfgAsBoolean(properties, CFG_KEY_MAINTENANCE);
+      if (maintenance.orElse(false)) {
         final String name = SchedulerServiceImpl.class.getName();
         logger.warn("Putting scheduler into maintenance mode. This only makes sense when migrating data. If this is not"
                 + " intended, edit the config file '{}.cfg' accordingly and restart opencast.", name);
@@ -814,9 +811,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   private Optional<DublinCoreCatalog> loadEpisodeDublinCoreFromAsset(Snapshot snapshot) {
-    Option<MediaPackageElement> dcCatalog = mlist(snapshot.getMediaPackage().getElements())
+    Optional<MediaPackageElement> dcCatalog = mlist(snapshot.getMediaPackage().getElements())
             .filter(MediaPackageSupport.Filters.isEpisodeDublinCore).headOpt();
-    if (dcCatalog.isNone())
+    if (dcCatalog.isEmpty())
       return Optional.empty();
 
     Optional<Asset> asset = assetManager.getAsset(snapshot.getVersion(),

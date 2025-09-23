@@ -21,12 +21,10 @@
 
 package org.opencastproject.schema.test;
 
-import static org.opencastproject.util.data.Option.some;
-
 import org.opencastproject.schema.OcDublinCore;
-import org.opencastproject.util.data.Option;
 
 import java.util.Date;
+import java.util.Optional;
 import java.util.UUID;
 
 public final class TestUtil {
@@ -35,107 +33,107 @@ public final class TestUtil {
 
   public static OcDublinCore randomDc() {
     return new OcDublinCore() {
-      private final Option<String> abstrakt = some(UUID.randomUUID().toString());
-      private final Option<String> accessRights = some(UUID.randomUUID().toString());
-      private final Option<String> accrualMethod = some(UUID.randomUUID().toString());
-      private final Option<String> accrualPeriodicity = some(UUID.randomUUID().toString());
-      private final Option<String> accrualPolicy = some(UUID.randomUUID().toString());
-      private final Option<String> alternative = some(UUID.randomUUID().toString());
-      private final Option<String> audience = some(UUID.randomUUID().toString());
-      private final Option<String> available = some(UUID.randomUUID().toString());
-      private final Option<String> bibliographicCitation = some(UUID.randomUUID().toString());
-      private final Option<String> conformsTo = some(UUID.randomUUID().toString());
-      private final Option<String> contributor = some(UUID.randomUUID().toString());
-      private final Option<String> coverage = some(UUID.randomUUID().toString());
+      private final Optional<String> abstrakt = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> accessRights = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> accrualMethod = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> accrualPeriodicity = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> accrualPolicy = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> alternative = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> audience = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> available = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> bibliographicCitation = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> conformsTo = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> contributor = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> coverage = Optional.of(UUID.randomUUID().toString());
       private final Date created = new Date();
-      private final Option<String> creator = some(UUID.randomUUID().toString());
-      private final Option<Date> date = some(new Date());
-      private final Option<Date> dateAccepted = some(new Date());
-      private final Option<Date> dateCopyrighted = some(new Date());
-      private final Option<Date> dateSubmitted = some(new Date());
-      private final Option<String> description = some(UUID.randomUUID().toString());
-      private final Option<String> educationLevel = some(UUID.randomUUID().toString());
-      private final Option<Long> extent = some(1L);
-      private final Option<String> format = some(UUID.randomUUID().toString());
-      private final Option<String> hasFormat = some(UUID.randomUUID().toString());
-      private final Option<String> hasPart = some(UUID.randomUUID().toString());
-      private final Option<String> hasVersion = some(UUID.randomUUID().toString());
-      private final Option<String> identifier = some(UUID.randomUUID().toString());
-      private final Option<String> instructionalMethod = some(UUID.randomUUID().toString());
-      private final Option<String> isFormatOf = some(UUID.randomUUID().toString());
-      private final Option<String> isPartOf = some(UUID.randomUUID().toString());
-      private final Option<String> isReferencedBy = some(UUID.randomUUID().toString());
-      private final Option<String> isReplacedBy = some(UUID.randomUUID().toString());
-      private final Option<String> isRequiredBy = some(UUID.randomUUID().toString());
-      private final Option<String> issued = some(UUID.randomUUID().toString());
-      private final Option<String> isVersionOf = some(UUID.randomUUID().toString());
-      private final Option<String> language = some(UUID.randomUUID().toString());
-      private final Option<String> license = some(UUID.randomUUID().toString());
-      private final Option<String> mediator = some(UUID.randomUUID().toString());
-      private final Option<String> medium = some(UUID.randomUUID().toString());
-      private final Option<String> modified = some(UUID.randomUUID().toString());
-      private final Option<String> provenance = some(UUID.randomUUID().toString());
-      private final Option<String> publisher = some(UUID.randomUUID().toString());
-      private final Option<String> references = some(UUID.randomUUID().toString());
-      private final Option<String> relation = some(UUID.randomUUID().toString());
-      private final Option<String> replaces = some(UUID.randomUUID().toString());
-      private final Option<String> requires = some(UUID.randomUUID().toString());
-      private final Option<String> rights = some(UUID.randomUUID().toString());
-      private final Option<String> rightsHolder = some(UUID.randomUUID().toString());
-      private final Option<String> source = some(UUID.randomUUID().toString());
-      private final Option<String> spatial = some(UUID.randomUUID().toString());
-      private final Option<String> subject = some(UUID.randomUUID().toString());
-      private final Option<String> tableOfContents = some(UUID.randomUUID().toString());
-      private final Option<String> temporal = some(UUID.randomUUID().toString());
+      private final Optional<String> creator = Optional.of(UUID.randomUUID().toString());
+      private final Optional<Date> date = Optional.of(new Date());
+      private final Optional<Date> dateAccepted = Optional.of(new Date());
+      private final Optional<Date> dateCopyrighted = Optional.of(new Date());
+      private final Optional<Date> dateSubmitted = Optional.of(new Date());
+      private final Optional<String> description = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> educationLevel = Optional.of(UUID.randomUUID().toString());
+      private final Optional<Long> extent = Optional.of(1L);
+      private final Optional<String> format = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> hasFormat = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> hasPart = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> hasVersion = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> identifier = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> instructionalMethod = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> isFormatOf = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> isPartOf = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> isReferencedBy = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> isReplacedBy = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> isRequiredBy = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> issued = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> isVersionOf = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> language = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> license = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> mediator = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> medium = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> modified = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> provenance = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> publisher = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> references = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> relation = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> replaces = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> requires = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> rights = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> rightsHolder = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> source = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> spatial = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> subject = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> tableOfContents = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> temporal = Optional.of(UUID.randomUUID().toString());
       private final String title = UUID.randomUUID().toString();
-      private final Option<String> type = some(UUID.randomUUID().toString());
-      private final Option<String> valid = some(UUID.randomUUID().toString());
+      private final Optional<String> type = Optional.of(UUID.randomUUID().toString());
+      private final Optional<String> valid = Optional.of(UUID.randomUUID().toString());
 
-      @Override public Option<String> getAbstract() {
+      @Override public Optional<String> getAbstract() {
         return abstrakt;
       }
 
-      @Override public Option<String> getAccessRights() {
+      @Override public Optional<String> getAccessRights() {
         return accessRights;
       }
 
-      @Override public Option<String> getAccrualMethod() {
+      @Override public Optional<String> getAccrualMethod() {
         return accrualMethod;
       }
 
-      @Override public Option<String> getAccrualPeriodicity() {
+      @Override public Optional<String> getAccrualPeriodicity() {
         return accrualPeriodicity;
       }
 
-      @Override public Option<String> getAccrualPolicy() {
+      @Override public Optional<String> getAccrualPolicy() {
         return accrualPolicy;
       }
 
-      @Override public Option<String> getAlternative() {
+      @Override public Optional<String> getAlternative() {
         return alternative;
       }
 
-      @Override public Option<String> getAudience() {
+      @Override public Optional<String> getAudience() {
         return audience;
       }
 
-      @Override public Option<String> getAvailable() {
+      @Override public Optional<String> getAvailable() {
         return available;
       }
 
-      @Override public Option<String> getBibliographicCitation() {
+      @Override public Optional<String> getBibliographicCitation() {
         return bibliographicCitation;
       }
 
-      @Override public Option<String> getConformsTo() {
+      @Override public Optional<String> getConformsTo() {
         return conformsTo;
       }
 
-      @Override public Option<String> getContributor() {
+      @Override public Optional<String> getContributor() {
         return contributor;
       }
 
-      @Override public Option<String> getCoverage() {
+      @Override public Optional<String> getCoverage() {
         return coverage;
       }
 
@@ -143,159 +141,159 @@ public final class TestUtil {
         return created;
       }
 
-      @Override public Option<String> getCreator() {
+      @Override public Optional<String> getCreator() {
         return creator;
       }
 
-      @Override public Option<Date> getDate() {
+      @Override public Optional<Date> getDate() {
         return date;
       }
 
-      @Override public Option<Date> getDateAccepted() {
+      @Override public Optional<Date> getDateAccepted() {
         return dateAccepted;
       }
 
-      @Override public Option<Date> getDateCopyrighted() {
+      @Override public Optional<Date> getDateCopyrighted() {
         return dateCopyrighted;
       }
 
-      @Override public Option<Date> getDateSubmitted() {
+      @Override public Optional<Date> getDateSubmitted() {
         return dateSubmitted;
       }
 
-      @Override public Option<String> getDescription() {
+      @Override public Optional<String> getDescription() {
         return description;
       }
 
-      @Override public Option<String> getEducationLevel() {
+      @Override public Optional<String> getEducationLevel() {
         return educationLevel;
       }
 
-      @Override public Option<Long> getExtent() {
+      @Override public Optional<Long> getExtent() {
         return extent;
       }
 
-      @Override public Option<String> getFormat() {
+      @Override public Optional<String> getFormat() {
         return format;
       }
 
-      @Override public Option<String> getHasFormat() {
+      @Override public Optional<String> getHasFormat() {
         return hasFormat;
       }
 
-      @Override public Option<String> getHasPart() {
+      @Override public Optional<String> getHasPart() {
         return hasPart;
       }
 
-      @Override public Option<String> getHasVersion() {
+      @Override public Optional<String> getHasVersion() {
         return hasVersion;
       }
 
-      @Override public Option<String> getIdentifier() {
+      @Override public Optional<String> getIdentifier() {
         return identifier;
       }
 
-      @Override public Option<String> getInstructionalMethod() {
+      @Override public Optional<String> getInstructionalMethod() {
         return instructionalMethod;
       }
 
-      @Override public Option<String> getIsFormatOf() {
+      @Override public Optional<String> getIsFormatOf() {
         return isFormatOf;
       }
 
-      @Override public Option<String> getIsPartOf() {
+      @Override public Optional<String> getIsPartOf() {
         return isPartOf;
       }
 
-      @Override public Option<String> getIsReferencedBy() {
+      @Override public Optional<String> getIsReferencedBy() {
         return isReferencedBy;
       }
 
-      @Override public Option<String> getIsReplacedBy() {
+      @Override public Optional<String> getIsReplacedBy() {
         return isReplacedBy;
       }
 
-      @Override public Option<String> getIsRequiredBy() {
+      @Override public Optional<String> getIsRequiredBy() {
         return isRequiredBy;
       }
 
-      @Override public Option<String> getIssued() {
+      @Override public Optional<String> getIssued() {
         return issued;
       }
 
-      @Override public Option<String> getIsVersionOf() {
+      @Override public Optional<String> getIsVersionOf() {
         return isVersionOf;
       }
 
-      @Override public Option<String> getLanguage() {
+      @Override public Optional<String> getLanguage() {
         return language;
       }
 
-      @Override public Option<String> getLicense() {
+      @Override public Optional<String> getLicense() {
         return license;
       }
 
-      @Override public Option<String> getMediator() {
+      @Override public Optional<String> getMediator() {
         return mediator;
       }
 
-      @Override public Option<String> getMedium() {
+      @Override public Optional<String> getMedium() {
         return medium;
       }
 
-      @Override public Option<String> getModified() {
+      @Override public Optional<String> getModified() {
         return modified;
       }
 
-      @Override public Option<String> getProvenance() {
+      @Override public Optional<String> getProvenance() {
         return provenance;
       }
 
-      @Override public Option<String> getPublisher() {
+      @Override public Optional<String> getPublisher() {
         return publisher;
       }
 
-      @Override public Option<String> getReferences() {
+      @Override public Optional<String> getReferences() {
         return references;
       }
 
-      @Override public Option<String> getRelation() {
+      @Override public Optional<String> getRelation() {
         return relation;
       }
 
-      @Override public Option<String> getReplaces() {
+      @Override public Optional<String> getReplaces() {
         return replaces;
       }
 
-      @Override public Option<String> getRequires() {
+      @Override public Optional<String> getRequires() {
         return requires;
       }
 
-      @Override public Option<String> getRights() {
+      @Override public Optional<String> getRights() {
         return rights;
       }
 
-      @Override public Option<String> getRightsHolder() {
+      @Override public Optional<String> getRightsHolder() {
         return rightsHolder;
       }
 
-      @Override public Option<String> getSource() {
+      @Override public Optional<String> getSource() {
         return source;
       }
 
-      @Override public Option<String> getSpatial() {
+      @Override public Optional<String> getSpatial() {
         return spatial;
       }
 
-      @Override public Option<String> getSubject() {
+      @Override public Optional<String> getSubject() {
         return subject;
       }
 
-      @Override public Option<String> getTableOfContents() {
+      @Override public Optional<String> getTableOfContents() {
         return tableOfContents;
       }
 
-      @Override public Option<String> getTemporal() {
+      @Override public Optional<String> getTemporal() {
         return temporal;
       }
 
@@ -303,11 +301,11 @@ public final class TestUtil {
         return title;
       }
 
-      @Override public Option<String> getType() {
+      @Override public Optional<String> getType() {
         return type;
       }
 
-      @Override public Option<String> getValid() {
+      @Override public Optional<String> getValid() {
         return valid;
       }
     };

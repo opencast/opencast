@@ -22,7 +22,6 @@
 package org.opencastproject.oaipmh.server.remote;
 
 import static org.opencastproject.util.HttpUtil.get;
-import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.oaipmh.server.OaiPmhServerInfo;
@@ -40,6 +39,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Optional;
 
 @Component(
     immediate = true,
@@ -58,9 +58,12 @@ public class OaiPmhServerInfoRemoteImpl extends RemoteBase implements OaiPmhServ
   }
 
   @Override public boolean hasRepo(String id) {
-    for (HttpResponse r : option(getResponse(get(UrlSupport.concat("hasrepo", id)), HttpStatus.SC_OK))) {
+    Optional<HttpResponse> r = Optional.ofNullable(
+        getResponse(get(UrlSupport.concat("hasrepo", id)), HttpStatus.SC_OK)
+    );
+    if (r.isPresent()) {
       try {
-        return Boolean.parseBoolean(EntityUtils.toString(r.getEntity()));
+        return Boolean.parseBoolean(EntityUtils.toString(r.get().getEntity()));
       } catch (IOException e) {
         logger.error("Cannot contact remote service", e);
         chuck(e);
@@ -70,9 +73,10 @@ public class OaiPmhServerInfoRemoteImpl extends RemoteBase implements OaiPmhServ
   }
 
   @Override public String getMountPoint() {
-    for (HttpResponse r : option(getResponse(get("mountpoint"), HttpStatus.SC_OK))) {
+    Optional<HttpResponse> r = Optional.ofNullable(getResponse(get("mountpoint"), HttpStatus.SC_OK));
+    if (r.isPresent()) {
       try {
-        return EntityUtils.toString(r.getEntity());
+        return EntityUtils.toString(r.get().getEntity());
       } catch (IOException e) {
         logger.error("Cannot contact remote service", e);
         return chuck(e);

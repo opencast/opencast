@@ -45,7 +45,6 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -70,6 +69,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
@@ -204,8 +204,8 @@ public class PlaylistsEndpoint {
     }
 
     SortCriterion sortCriterion = new SortCriterion("", SortCriterion.Order.None);
-    Option<String> optSort = Option.option(trimToNull(sort));
-    if (optSort.isSome()) {
+    Optional<String> optSort = Optional.ofNullable(trimToNull(sort));
+    if (optSort.isPresent()) {
       sortCriterion = SortCriterion.parse(optSort.get());
 
       switch (sortCriterion.getFieldName()) {

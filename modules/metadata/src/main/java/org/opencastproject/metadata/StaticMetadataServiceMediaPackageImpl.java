@@ -22,8 +22,6 @@
 package org.opencastproject.metadata;
 
 import static org.opencastproject.util.data.Collections.map;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.option;
 
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.metadata.api.MetadataValue;
@@ -32,7 +30,6 @@ import org.opencastproject.metadata.api.StaticMetadataService;
 import org.opencastproject.metadata.api.util.Interval;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.NonEmptyList;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.osgi.service.component.annotations.Activate;
@@ -47,6 +44,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * This service provides {@link org.opencastproject.metadata.api.StaticMetadata} for a given mediapackage, based on the
@@ -101,53 +99,53 @@ public class StaticMetadataServiceMediaPackageImpl implements StaticMetadataServ
   public StaticMetadata getMetadata(final MediaPackage mp) {
     return new StaticMetadata() {
       @Override
-      public Option<String> getId() {
-        return option(mp.getIdentifier().toString());
+      public Optional<String> getId() {
+        return Optional.ofNullable(mp.getIdentifier().toString());
       }
 
       @Override
-      public Option<Long> getExtent() {
-        return option(mp.getDuration());
+      public Optional<Long> getExtent() {
+        return Optional.ofNullable(mp.getDuration());
       }
 
       @Override
-      public Option<String> getLanguage() {
-        return none();
+      public Optional<String> getLanguage() {
+        return Optional.empty();
       }
 
       @Override
-      public Option<String> getIsPartOf() {
-        return option(mp.getSeries());
+      public Optional<String> getIsPartOf() {
+        return Optional.ofNullable(mp.getSeries());
       }
 
       @Override
-      public Option<String> getReplaces() {
-        return none();
+      public Optional<String> getReplaces() {
+        return Optional.empty();
       }
 
       @Override
-      public Option<String> getType() {
-        return none();
+      public Optional<String> getType() {
+        return Optional.empty();
       }
 
       @Override
-      public Option<Interval> getAvailable() {
-        return none();
+      public Optional<Interval> getAvailable() {
+        return Optional.empty();
       }
 
       @Override
-      public Option<Date[]> getTemporalPeriod() {
-        return none();
+      public Optional<Date[]> getTemporalPeriod() {
+        return Optional.empty();
       }
 
       @Override
-      public Option<Date> getTemporalInstant() {
-        return none();
+      public Optional<Date> getTemporalInstant() {
+        return Optional.empty();
       }
 
       @Override
-      public Option<Long> getTemporalDuration() {
-        return none();
+      public Optional<Long> getTemporalDuration() {
+        return Optional.empty();
       }
 
       @Override

@@ -24,10 +24,10 @@ package org.opencastproject.util;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.opencastproject.util.EnumSupport.parseEnum;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
 
 import org.junit.Test;
+
+import java.util.Optional;
 
 public class EnumSupportTest {
   public enum Mushroom {
@@ -35,9 +35,9 @@ public class EnumSupportTest {
   }
   @Test
   public void testParseEnum() throws Exception {
-    assertEquals(some(Mushroom.chanterelle), parseEnum(Mushroom.flyAgaric).apply("chanterelle"));
-    assertEquals(some(Mushroom.deathCap), parseEnum(Mushroom.flyAgaric).apply("deathCap"));
-    assertNotEquals(some(Mushroom.kingOysterMushroom), parseEnum(Mushroom.flyAgaric).apply("flyAgaric"));
-    assertEquals(none(), parseEnum(Mushroom.flyAgaric).apply("pilz"));
+    assertEquals(Optional.of(Mushroom.chanterelle), parseEnum(Mushroom.flyAgaric).apply("chanterelle"));
+    assertEquals(Optional.of(Mushroom.deathCap), parseEnum(Mushroom.flyAgaric).apply("deathCap"));
+    assertNotEquals(Optional.of(Mushroom.kingOysterMushroom), parseEnum(Mushroom.flyAgaric).apply("flyAgaric"));
+    assertEquals(Optional.empty(), parseEnum(Mushroom.flyAgaric).apply("pilz"));
   }
 }

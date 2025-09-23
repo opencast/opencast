@@ -26,7 +26,6 @@ import org.opencastproject.terminationstate.api.AbstractJobTerminationStateServi
 import org.opencastproject.terminationstate.api.TerminationStateService;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
-import org.opencastproject.util.data.Option;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
@@ -70,6 +69,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Dictionary;
 import java.util.List;
+import java.util.Optional;
 
 @Component(
     immediate = true,
@@ -119,8 +119,8 @@ public final class AutoScalingTerminationStateService extends AbstractJobTermina
   private boolean lifecyclePolling = DEFAULT_LIFECYCLE_POLLING_ENABLE;
   private int lifecyclePollingPeriod = DEFAULT_LIFECYCLE_POLLING_PERIOD;
   private int lifecycleHeartbeatPeriod = DEFAULT_LIFECYCLE_HEARTBEAT_PERIOD;
-  private Option<String> accessKeyIdOpt = Option.none();
-  private Option<String> accessKeySecretOpt = Option.none();
+  private Optional<String> accessKeyIdOpt = Optional.empty();
+  private Optional<String> accessKeySecretOpt = Optional.empty();
 
   @Activate
   protected void activate(ComponentContext componentContext) {
@@ -143,7 +143,7 @@ public final class AutoScalingTerminationStateService extends AbstractJobTermina
       logger.error("Cannot take this host out of maintenance", e);
     }
 
-    if (accessKeyIdOpt.isNone() && accessKeySecretOpt.isNone()) {
+    if (accessKeyIdOpt.isEmpty() && accessKeySecretOpt.isEmpty()) {
       credentials = new DefaultAWSCredentialsProviderChain();
     } else {
       credentials = new AWSStaticCredentialsProvider(
@@ -260,13 +260,13 @@ public final class AutoScalingTerminationStateService extends AbstractJobTermina
   }
 
   protected void configure(Dictionary config) throws ConfigurationException {
-    this.enabled = OsgiUtil.getOptCfgAsBoolean(config, CONFIG_ENABLE).getOrElse(DEFAULT_ENABLE);
+    this.enabled = OsgiUtil.getOptCfgAsBoolean(config, CONFIG_ENABLE).orElse(DEFAULT_ENABLE);
     this.lifecyclePolling = OsgiUtil.getOptCfgAsBoolean(config, CONFIG_LIFECYCLE_POLLING_ENABLE)
-        .getOrElse(DEFAULT_LIFECYCLE_POLLING_ENABLE);
+        .orElse(DEFAULT_LIFECYCLE_POLLING_ENABLE);
     this.lifecyclePollingPeriod = OsgiUtil.getOptCfgAsInt(config, CONFIG_LIFECYCLE_POLLING_PERIOD)
-        .getOrElse(DEFAULT_LIFECYCLE_POLLING_PERIOD);
+        .orElse(DEFAULT_LIFECYCLE_POLLING_PERIOD);
     this.lifecycleHeartbeatPeriod = OsgiUtil.getOptCfgAsInt(config, CONFIG_LIFECYCLE_HEARTBEAT_PERIOD)
-        .getOrElse(DEFAULT_LIFECYCLE_HEARTBEAT_PERIOD);
+        .orElse(DEFAULT_LIFECYCLE_HEARTBEAT_PERIOD);
     this.accessKeyIdOpt = OsgiUtil.getOptCfg(config, CONFIG_AWS_ACCESS_KEY_ID);
     this.accessKeySecretOpt = OsgiUtil.getOptCfg(config, CONFIG_AWS_SECRET_ACCESS_KEY);
   }

@@ -91,20 +91,10 @@ public class CollectionsTest {
   @Test
   public void testHead() {
     List<String> list = newTestList();
-    Option.Match<String, Boolean> match = new Option.Match<String, Boolean>() {
-      @Override
-      public Boolean some(String s) {
-        return true;
-      }
+    assertTrue(head(list).isPresent());
 
-      @Override
-      public Boolean none() {
-        return false;
-      }
-    };
-    assertTrue(head(list).fold(match));
-    List<String> empty = list();
-    assertFalse(head(empty).fold(match));
+    List<String> empty = List.of();
+    assertFalse(head(empty).isPresent());
   }
 
   @Test

@@ -161,16 +161,16 @@ public class JobEndpoint {
     query.setOffset(offset);
 
     String fHostname = null;
-    if (query.getHostname().isSome())
+    if (query.getHostname().isPresent())
       fHostname = StringUtils.trimToNull(query.getHostname().get());
     String fNodeName = null;
-    if (query.getNodeName().isSome())
+    if (query.getNodeName().isPresent())
       fNodeName = StringUtils.trimToNull(query.getNodeName().get());
     String fStatus = null;
-    if (query.getStatus().isSome())
+    if (query.getStatus().isPresent())
       fStatus = StringUtils.trimToNull(query.getStatus().get());
     String fFreeText = null;
-    if (query.getFreeText().isSome())
+    if (query.getFreeText().isPresent())
       fFreeText = StringUtils.trimToNull(query.getFreeText().get());
 
     List<JobExtended> jobs = new ArrayList<>();
@@ -235,8 +235,8 @@ public class JobEndpoint {
     JobComparator comparator = new JobComparator(sortKey, ascending);
     Collections.sort(jobs, comparator);
     List<JsonObject> json = getJobsAsJSON(new SmartIterator(
-            query.getLimit().getOrElse(0),
-            query.getOffset().getOrElse(0))
+            query.getLimit().orElse(0),
+            query.getOffset().orElse(0))
             .applyLimitAndOffset(jobs));
 
     return RestUtils.okJsonList(json, offset, limit, jobs.size());

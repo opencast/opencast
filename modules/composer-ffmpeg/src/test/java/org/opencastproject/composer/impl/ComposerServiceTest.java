@@ -53,7 +53,6 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.JsonObj;
 import org.opencastproject.util.MimeType;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -82,6 +81,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 import javax.imageio.ImageIO;
@@ -357,7 +357,7 @@ public class ComposerServiceTest {
 
   /**
    * Test method for
-   * {@link ComposerServiceImpl#composite(Dimension, Option, LaidOutElement, Option, String, String, String)}
+   * {@link ComposerServiceImpl#composite(Dimension, Optional, LaidOutElement, Optional, String, String, String)}
    */
   @Test
   public void testComposite() throws Exception {
@@ -380,13 +380,13 @@ public class ComposerServiceTest {
 
     MultiShapeLayout multiShapeLayout = LayoutManager.multiShapeLayout(outputDimension, shapes);
 
-    Option<LaidOutElement<Attachment>> watermarkOption = Option.<LaidOutElement<Attachment>> none();
+    Optional<LaidOutElement<Attachment>> watermarkOption = Optional.<LaidOutElement<Attachment>> empty();
     LaidOutElement<Track> lowerLaidOutElement = new LaidOutElement<Track>(sourceVideoTrack, multiShapeLayout.getShapes()
             .get(0));
     LaidOutElement<Track> upperLaidOutElement = new LaidOutElement<Track>(sourceVideoTrack, multiShapeLayout.getShapes()
             .get(1));
 
-    Job composite = composerService.composite(outputDimension, Option.option(lowerLaidOutElement), upperLaidOutElement,
+    Job composite = composerService.composite(outputDimension, Optional.ofNullable(lowerLaidOutElement), upperLaidOutElement,
             watermarkOption, "composite.work", "black", "both");
             //  null or "both" means that both tracks are checked for audio and both audio tracks
             // are mixed into the final composite if they exist
@@ -433,13 +433,13 @@ public class ComposerServiceTest {
 
     MultiShapeLayout multiShapeLayout = LayoutManager.multiShapeLayout(outputDimension, shapes);
 
-    Option<LaidOutElement<Attachment>> watermarkOption = Option.<LaidOutElement<Attachment>> none();
+    Optional<LaidOutElement<Attachment>> watermarkOption = Optional.<LaidOutElement<Attachment>> empty();
     LaidOutElement<Track> lowerLaidOutElement = new LaidOutElement<Track>(sourceVideoTrack, multiShapeLayout.getShapes()
             .get(0));
     LaidOutElement<Track> upperLaidOutElement = new LaidOutElement<Track>(sourceVideoTrack, multiShapeLayout.getShapes()
             .get(1));
 
-    Job composite = composerService.composite(outputDimension, Option.option(lowerLaidOutElement), upperLaidOutElement,
+    Job composite = composerService.composite(outputDimension, Optional.ofNullable(lowerLaidOutElement), upperLaidOutElement,
             watermarkOption, "composite.work", "black", "upper");
     Track compositeTrack = (Track) MediaPackageElementParser.getFromXml(composite.getPayload());
     Assert.assertNotNull(compositeTrack);
@@ -483,7 +483,7 @@ public class ComposerServiceTest {
     watermarkShapes.add(0, Tuple.tuple(imageDimension, layout));
     MultiShapeLayout watermarkLayout = LayoutManager.absoluteMultiShapeLayout(outputDimension,
             watermarkShapes);
-    Option<LaidOutElement<Attachment>> watermarkOption = Option.some(new LaidOutElement<Attachment>(watermarkImageAttachment, watermarkLayout
+    Optional<LaidOutElement<Attachment>> watermarkOption = Optional.of(new LaidOutElement<Attachment>(watermarkImageAttachment, watermarkLayout
             .getShapes().get(0)));
 
     LaidOutElement<Track> lowerLaidOutElement = new LaidOutElement<Track>(sourceVideoTrack, multiShapeLayout.getShapes()
@@ -491,7 +491,7 @@ public class ComposerServiceTest {
     LaidOutElement<Track> upperLaidOutElement = new LaidOutElement<Track>(sourceVideoTrack, multiShapeLayout.getShapes()
             .get(1));
 
-    Job composite = composerService.composite(outputDimension, Option.option(lowerLaidOutElement), upperLaidOutElement,
+    Job composite = composerService.composite(outputDimension, Optional.ofNullable(lowerLaidOutElement), upperLaidOutElement,
             watermarkOption, "composite.work", "black", "upper");
     Track compositeTrack = (Track) MediaPackageElementParser.getFromXml(composite.getPayload());
     Assert.assertNotNull(compositeTrack);

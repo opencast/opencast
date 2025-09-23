@@ -57,7 +57,7 @@ public class NeedleEyeTest {
   private Runnable createRunnabe(final NeedleEye eye, final boolean[] result) {
     return new Runnable() {
       @Override public void run() {
-        for (Boolean ignore : eye.apply(sleep(1000))) {
+        if (eye.apply(sleep(1000)).isPresent()) {
           result[0] = true;
           return;
         }

@@ -37,7 +37,6 @@ import static org.opencastproject.util.data.Monadics.mlist;
 import org.opencastproject.util.Jsons;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Monadics;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.functions.Functions;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -50,6 +49,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletResponse;
@@ -121,7 +121,7 @@ public abstract class BundleInfoRestEndpoint {
       @Override
       public Response apply(List<BundleInfo> infos) {
         final String bundleVersion = infos.get(0).getBundleVersion();
-        final Option<String> buildNumber = infos.get(0).getBuildNumber();
+        final Optional<String> buildNumber = infos.get(0).getBuildNumber();
         for (BundleInfo a : infos) {
           if (ne(a.getBundleVersion(), bundleVersion) || ne(a.getBuildNumber(), buildNumber))
             return ok(TEXT_PLAIN_TYPE, "false");
@@ -205,7 +205,7 @@ public abstract class BundleInfoRestEndpoint {
   public static final Function<BundleVersion, Jsons.Obj> fullVersionJson = new Function<BundleVersion, Jsons.Obj>() {
     @Override
     public Jsons.Obj apply(BundleVersion version) {
-      return obj(p("version", version.getBundleVersion()), p("buildNumber", version.getBuildNumber().map(stringVal)));
+      return obj(p("version", version.getBundleVersion()), p("buildNumber", version.getBuildNumber().map(stringVal::apply)));
     }
   };
 

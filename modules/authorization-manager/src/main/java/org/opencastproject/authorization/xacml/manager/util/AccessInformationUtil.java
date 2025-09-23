@@ -27,7 +27,6 @@ import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlUtil;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Predicate;
 
 import org.codehaus.jettison.json.JSONException;
@@ -150,9 +149,9 @@ public final class AccessInformationUtil {
    *          the list of managed ACLs
    * @param acl
    *          the ACL to search
-   * @return an {@link Option} wrapping the matching ACL or none if not found
+   * @return an {@link Optional} wrapping the matching ACL or none if not found
    */
-  public static Option<ManagedAcl> matchAcls(List<ManagedAcl> acls, final AccessControlList acl) {
+  public static Optional<ManagedAcl> matchAcls(List<ManagedAcl> acls, final AccessControlList acl) {
     return mlist(acls).find(new Predicate<ManagedAcl>() {
       @Override
       public Boolean apply(ManagedAcl macl) {
@@ -170,9 +169,9 @@ public final class AccessInformationUtil {
    *          the ACL to search
    * @param ignorePrefixes
    *          list of prefixes that will cause all roles matching a prefix to be ignored in the matching
-   * @return an {@link Option} wrapping the matching ACL or none if not found
+   * @return an {@link Optional} wrapping the matching ACL or none if not found
    */
-  public static Option<ManagedAcl> matchAclsLenient(List<ManagedAcl> acls, final AccessControlList acl,
+  public static Optional<ManagedAcl> matchAclsLenient(List<ManagedAcl> acls, final AccessControlList acl,
           List<String> ignorePrefixes) {
     // No prefixes? Just do the usual matching
     if (ignorePrefixes == null || ignorePrefixes.size() <= 0) {
@@ -200,10 +199,10 @@ public final class AccessInformationUtil {
 
       // Lastly, compare
       if (AccessControlUtil.equals(aclCopy, managedAcl.getAcl())) {
-        return Option.some(managedAcl);
+        return Optional.of(managedAcl);
       }
     }
 
-    return Option.none();
+    return Optional.empty();
   }
 }

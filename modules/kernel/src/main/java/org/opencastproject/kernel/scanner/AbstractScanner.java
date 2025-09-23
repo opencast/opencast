@@ -31,7 +31,6 @@ import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NeedleEye;
 import org.opencastproject.util.data.Function0;
-import org.opencastproject.util.data.Option;
 
 import org.osgi.service.component.ComponentContext;
 import org.quartz.CronTrigger;
@@ -44,6 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
+import java.util.Optional;
 
 /**
  * This class is designed to provide a template for sub classes that will scan
@@ -280,21 +280,21 @@ public abstract class AbstractScanner {
    * </pre>
    */
   public abstract static class TypedQuartzJob<A> implements Job {
-    private final Option<NeedleEye> allowParallel;
+    private final Optional<NeedleEye> allowParallel;
 
     /**
      * @param allowParallel
      *          Pass a needle eye if only one job may be run at a time. Make the needle eye static to the inheriting
      *          class.
      */
-    protected TypedQuartzJob(Option<NeedleEye> allowParallel) {
+    protected TypedQuartzJob(Optional<NeedleEye> allowParallel) {
       this.allowParallel = allowParallel;
     }
 
     @Override
     public final void execute(final JobExecutionContext ctx) throws JobExecutionException {
-      for (NeedleEye eye : allowParallel) {
-        eye.apply(executeF(ctx));
+      if (allowParallel.isPresent()) {
+        allowParallel.get().apply(executeF(ctx));
         return;
       }
       executeF(ctx).apply();

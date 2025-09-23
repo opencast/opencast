@@ -24,9 +24,6 @@ package org.opencastproject.util;
 import static org.opencastproject.util.PathSupport.path;
 import static org.opencastproject.util.data.Either.left;
 import static org.opencastproject.util.data.Either.right;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.security.api.TrustedHttpClient;
@@ -36,7 +33,6 @@ import org.opencastproject.util.data.Either;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.data.Function2;
-import org.opencastproject.util.data.Option;
 
 import com.google.common.io.Resources;
 
@@ -64,6 +60,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.channels.FileLock;
 import java.nio.charset.Charset;
+import java.util.Optional;
 import java.util.Properties;
 
 import de.schlichtherle.io.FileWriter;
@@ -296,8 +293,8 @@ public final class IoSupport {
    *
    * @return an input stream to the resource wrapped in a Some or none if the resource cannot be found
    */
-  public static Option<InputStream> openClassPathResource(String resource, Class<?> clazz) {
-    return option(clazz.getResourceAsStream(resource));
+  public static Optional<InputStream> openClassPathResource(String resource, Class<?> clazz) {
+    return Optional.ofNullable(clazz.getResourceAsStream(resource));
   }
 
   /**
@@ -305,21 +302,21 @@ public final class IoSupport {
    *
    * @see #openClassPathResource(String, Class)
    */
-  public static Option<InputStream> openClassPathResource(String resource) {
+  public static Optional<InputStream> openClassPathResource(String resource) {
     return openClassPathResource(resource, IoSupport.class);
   }
 
   /** Get a classpath resource as a file using the class loader of {@link IoSupport}. */
-  public static Option<File> classPathResourceAsFile(String resource) {
+  public static Optional<File> classPathResourceAsFile(String resource) {
     try {
       final URL res = IoSupport.class.getResource(resource);
       if (res != null) {
-        return Option.some(new File(res.toURI()));
+        return Optional.of(new File(res.toURI()));
       } else {
-        return Option.none();
+        return Optional.empty();
       }
     } catch (URISyntaxException e) {
-      return Option.none();
+      return Optional.empty();
     }
   }
 
@@ -328,13 +325,13 @@ public final class IoSupport {
    *
    * @return the content of the resource wrapped in a Some or none in case of any error
    */
-  public static Option<String> loadFileFromClassPathAsString(String resource, Class<?> clazz) {
+  public static Optional<String> loadFileFromClassPathAsString(String resource, Class<?> clazz) {
     try {
       final URL url = clazz.getResource(resource);
-      return url != null ? some(Resources.toString(clazz.getResource(resource), Charset.forName("UTF-8")))
-              : none(String.class);
+      return url != null ? Optional.of(Resources.toString(clazz.getResource(resource), Charset.forName("UTF-8")))
+              : Optional.empty();
     } catch (IOException e) {
-      return none();
+      return Optional.empty();
     }
   }
 
@@ -343,7 +340,7 @@ public final class IoSupport {
    *
    * @see #loadFileFromClassPathAsString(String, Class)
    */
-  public static Option<String> loadFileFromClassPathAsString(String resource) {
+  public static Optional<String> loadFileFromClassPathAsString(String resource) {
     return loadFileFromClassPathAsString(resource, IoSupport.class);
   }
 
@@ -356,13 +353,13 @@ public final class IoSupport {
    *
    * @return none, if the file does not exist
    */
-  public static <A> Option<A> withFile(File file, Function2<InputStream, File, A> f) {
+  public static <A> Optional<A> withFile(File file, Function2<InputStream, File, A> f) {
     InputStream s = null;
     try {
       s = new FileInputStream(file);
-      return some(f.apply(s, file));
+      return Optional.of(f.apply(s, file));
     } catch (FileNotFoundException ignore) {
-      return none();
+      return Optional.empty();
     } finally {
       IoSupport.closeQuietly(s);
     }

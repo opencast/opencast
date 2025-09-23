@@ -25,7 +25,6 @@ import static java.lang.String.format;
 import static org.opencastproject.util.HttpUtil.param;
 import static org.opencastproject.util.HttpUtil.post;
 import static org.opencastproject.util.JobUtil.jobFromHttpResponse;
-import static org.opencastproject.util.data.functions.Options.join;
 
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DistributionService;
@@ -52,6 +51,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 /** A remote distribution service invoker. */
@@ -125,8 +125,9 @@ public class DownloadDistributionServiceRemoteImpl extends RemoteBase
                               param(PARAM_ELEMENT_ID, gson.toJson(elementIds)),
                               param(PARAM_CHECK_AVAILABILITY, Boolean.toString(checkAvailability)),
                               param(PARAM_PRESERVE_REFERENCE, Boolean.toString(preserveReference)));
-    for (Job job : join(runRequest(req, jobFromHttpResponse))) {
-      return job;
+    Optional<Job> job = runRequest(req, jobFromHttpResponse);
+    if (job.isPresent()) {
+      return job.get();
     }
     throw new DistributionException(format("Unable to distribute '%s' elements of "
                                                    + "mediapackage '%s' using a remote destribution service proxy",
@@ -147,8 +148,9 @@ public class DownloadDistributionServiceRemoteImpl extends RemoteBase
                               param(PARAM_MEDIAPACKAGE, MediaPackageParser.getAsXml(mediaPackage)),
                               param(PARAM_ELEMENT_ID, gson.toJson(elementIds)),
                               param(PARAM_CHANNEL_ID, channelId));
-    for (Job job : join(runRequest(req, jobFromHttpResponse))) {
-      return job;
+    Optional<Job> job = runRequest(req, jobFromHttpResponse);
+    if (job.isPresent()) {
+      return job.get();
     }
     throw new DistributionException(format("Unable to retract '%s' elements of "
                                                    + "mediapackage '%s' using a remote destribution service proxy",
@@ -171,8 +173,9 @@ public class DownloadDistributionServiceRemoteImpl extends RemoteBase
         param(PARAM_MEDIAPACKAGE, MediaPackageParser.getAsXml(mediapackage)),
         param(PARAM_ELEMENT_ID, gson.toJson(elementIds)),
         param(PARAM_CHECK_AVAILABILITY, Boolean.toString(checkAvailability)));
-    for (List<MediaPackageElement> elements : join(runRequest(req, elementsFromHttpResponse))) {
-      return elements;
+    Optional<List<MediaPackageElement>> elements = runRequest(req, elementsFromHttpResponse);
+    if (elements.isPresent()) {
+      return elements.get();
     }
     throw new DistributionException(format("Unable to distribute '%s' elements of "
             + "mediapackage '%s' using a remote destribution service proxy",
@@ -195,8 +198,9 @@ public class DownloadDistributionServiceRemoteImpl extends RemoteBase
         param(PARAM_MEDIAPACKAGE, MediaPackageParser.getAsXml(mediaPackage)),
         param(PARAM_ELEMENT_ID, gson.toJson(elementIds)),
         param(PARAM_CHANNEL_ID, channelId));
-    for (List<MediaPackageElement> elements : join(runRequest(req, elementsFromHttpResponse))) {
-      return elements;
+    Optional<List<MediaPackageElement>> elements = runRequest(req, elementsFromHttpResponse);
+    if (elements.isPresent()) {
+      return elements.get();
     }
     throw new DistributionException(format("Unable to retract '%s' elements of "
             + "mediapackage '%s' using a remote destribution service proxy",

@@ -40,7 +40,6 @@ import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.smil.entity.api.Smil;
-import org.opencastproject.util.data.Option;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -64,6 +63,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -515,8 +515,8 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
   }
 
   @Override
-  public Job composite(Dimension compositeTrackSize, Option<LaidOutElement<Track>> upperTrack,
-          LaidOutElement<Track> lowerTrack, Option<LaidOutElement<Attachment>> watermark, String profileId,
+  public Job composite(Dimension compositeTrackSize, Optional<LaidOutElement<Track>> upperTrack,
+          LaidOutElement<Track> lowerTrack, Optional<LaidOutElement<Attachment>> watermark, String profileId,
           String background, String sourceAudioName) throws EncoderException, MediaPackageException {
     HttpPost post = new HttpPost("/composite");
     try {
@@ -524,13 +524,13 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
       params.add(new BasicNameValuePair("compositeSize", Serializer.json(compositeTrackSize).toJson()));
       params.add(new BasicNameValuePair("lowerTrack", MediaPackageElementParser.getAsXml(lowerTrack.getElement())));
       params.add(new BasicNameValuePair("lowerLayout", Serializer.json(lowerTrack.getLayout()).toJson()));
-      if (upperTrack.isSome()) {
+      if (upperTrack.isPresent()) {
         params.add(new BasicNameValuePair("upperTrack", MediaPackageElementParser.getAsXml(upperTrack.get()
                 .getElement())));
         params.add(new BasicNameValuePair("upperLayout", Serializer.json(upperTrack.get().getLayout()).toJson()));
       }
 
-      if (watermark.isSome()) {
+      if (watermark.isPresent()) {
         params.add(new BasicNameValuePair("watermarkAttachment", MediaPackageElementParser.getAsXml(watermark.get()
                 .getElement())));
         params.add(new BasicNameValuePair("watermarkLayout", Serializer.json(watermark.get().getLayout()).toJson()));
@@ -555,7 +555,7 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
     } finally {
       closeConnection(response);
     }
-    if (upperTrack.isSome()) {
+    if (upperTrack.isPresent()) {
       throw new EncoderException("Unable to composite video from track " + lowerTrack.getElement() + " and "
               + upperTrack.get().getElement() + " using the remote composer service proxy");
     } else {

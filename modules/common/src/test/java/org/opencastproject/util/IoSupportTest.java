@@ -28,14 +28,11 @@ import static org.opencastproject.util.IoSupport.fileInputStream;
 import static org.opencastproject.util.IoSupport.locked;
 import static org.opencastproject.util.IoSupport.withFile;
 import static org.opencastproject.util.IoSupport.withResource;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
 
 import org.opencastproject.util.data.Effect;
 import org.opencastproject.util.data.Either;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function2;
-import org.opencastproject.util.data.Option;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -54,6 +51,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Optional;
 
 /**
  * Test for the IoSupporTest class
@@ -180,21 +178,21 @@ public class IoSupportTest {
   @Test
   public void testWithFile() throws Exception {
     final File f1 = new File(this.getClass().getResource("/dublincore.xml").toURI());
-    final Option<String> r1 = withFile(f1, new Function2.X<InputStream, File, String>() {
+    final Optional<String> r1 = withFile(f1, new Function2.X<InputStream, File, String>() {
       @Override
       public String xapply(InputStream in, File file) throws IOException {
         return IOUtils.readLines(in).get(0);
       }
     });
-    assertEquals(some("<?xml version=\"1.0\"?>"), r1);
+    assertEquals(Optional.of("<?xml version=\"1.0\"?>"), r1);
     final File f2 = new File("i-do-not-exist");
-    final Option<String> r2 = withFile(f2, new Function2.X<InputStream, File, String>() {
+    final Optional<String> r2 = withFile(f2, new Function2.X<InputStream, File, String>() {
       @Override
       public String xapply(InputStream in, File file) throws IOException {
         return IOUtils.readLines(in).get(0);
       }
     });
-    assertEquals(none(String.class), r2);
+    assertEquals(Optional.empty(), r2);
   }
 
   @Test

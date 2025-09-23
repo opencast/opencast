@@ -22,22 +22,23 @@
 package org.opencastproject.util.data.functions;
 
 import static org.junit.Assert.assertEquals;
-import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.functions.Misc.ifThen;
 
 import org.junit.Test;
 
+import java.util.Optional;
+
 public class MiscTest {
   @Test
   public void testIfThen() {
-    assertEquals(some("hallo"), some("hello").map(ifThen("hello", "hallo")));
-    assertEquals(some(-1), some("none").map(ifThen("none", "-1")).bind(Strings.toInt).orError(new RuntimeException()));
-    assertEquals(some(300), some("300").map(ifThen("none", "-1")).bind(Strings.toInt).orError(new RuntimeException()));
+    assertEquals(Optional.of("hallo"), Optional.of("hello").map(ifThen("hello", "hallo")::apply));
+    assertEquals(Optional.of(-1), Optional.of("none").map(ifThen("none", "-1")::apply).flatMap(Strings::toInt));
+    assertEquals(Optional.of(300), Optional.of("300").map(ifThen("none", "-1")::apply).flatMap(Strings::toInt));
   }
 
   @Test(expected = RuntimeException.class)
   public void testIfThenError() {
-    some("200a").map(ifThen("none", "-1")).bind(Strings.toInt).orError(new RuntimeException());
+    Optional.of("200a").map(ifThen("none", "-1")::apply).flatMap(Strings::toInt).orElseThrow(() -> new RuntimeException());
   }
 
   @Test

@@ -26,7 +26,8 @@ import org.opencastproject.index.service.util.FiltersUtils;
 import org.opencastproject.list.api.ResourceListFilter;
 import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.list.impl.ResourceListQueryImpl;
-import org.opencastproject.util.data.Option;
+
+import java.util.Optional;
 
 /**
  * Query for the servers list.
@@ -57,9 +58,9 @@ public class ServersListQuery extends ResourceListQueryImpl {
   /** Default constructor. */
   public ServersListQuery() {
     super();
-    availableFilters.add(createHostnameFilter(Option.<String> none()));
-    availableFilters.add(createNodeNameFilter(Option.<String> none()));
-    availableFilters.add(createStatusFilter(Option.<String> none()));
+    availableFilters.add(createHostnameFilter(Optional.<String> empty()));
+    availableFilters.add(createNodeNameFilter(Optional.<String> empty()));
+    availableFilters.add(createStatusFilter(Optional.<String> empty()));
   }
 
   /**
@@ -75,9 +76,9 @@ public class ServersListQuery extends ResourceListQueryImpl {
       addFilter(filter);
 
     sortBy = query.getSortBy();
-    if (query.getOffset().isSome())
+    if (query.getOffset().isPresent())
       setOffset(query.getOffset().get());
-    if (query.getLimit().isSome())
+    if (query.getLimit().isPresent())
       setLimit(query.getLimit().get());
   }
 
@@ -87,7 +88,7 @@ public class ServersListQuery extends ResourceListQueryImpl {
    * @param hostname the hostname to filter for
    */
   public void withHostname(String hostname) {
-    addFilter(createHostnameFilter(Option.option(hostname)));
+    addFilter(createHostnameFilter(Optional.ofNullable(hostname)));
   }
 
   /**
@@ -96,7 +97,7 @@ public class ServersListQuery extends ResourceListQueryImpl {
    * @param nodeName the node name to filter for
    */
   public void withNodeName(String nodeName) {
-    addFilter(createNodeNameFilter(Option.option(nodeName)));
+    addFilter(createNodeNameFilter(Optional.ofNullable(nodeName)));
   }
 
   /**
@@ -105,7 +106,7 @@ public class ServersListQuery extends ResourceListQueryImpl {
    * @param status the status to filter for
    */
   public void withStatus(String status) {
-    addFilter(createStatusFilter(Option.option(status)));
+    addFilter(createStatusFilter(Optional.ofNullable(status)));
   }
 
   /**
@@ -114,101 +115,101 @@ public class ServersListQuery extends ResourceListQueryImpl {
    * @param freeText the free text to filter for
    */
   public void withFreeText(String freeText) {
-    addFilter(createFreeTextFilter(Option.option(freeText)));
+    addFilter(createFreeTextFilter(Optional.ofNullable(freeText)));
   }
 
   /**
-   * Returns an {@link Option} containing the hostname used to filter if set.
-   * {@link Option#none()} otherwise.
+   * Returns an {@link Optional} containing the hostname used to filter if set.
+   * {@link Optional#empty()} otherwise.
    *
-   * @return an {@link Option} containing the hostname or none.
+   * @return an {@link Optional} containing the hostname or none.
    */
-  public Option<String> getHostname() {
+  public Optional<String> getHostname() {
     return getFilterValue(FILTER_NAME_HOSTNAME);
   }
 
   /**
-   * Returns an {@link Option} containing the node name used to filter if set.
-   * {@link Option#none()} otherwise.
+   * Returns an {@link Optional} containing the node name used to filter if set.
+   * {@link Optional#empty()} otherwise.
    *
-   * @return an {@link Option} containing the node name or none.
+   * @return an {@link Optional} containing the node name or none.
    */
-  public Option<String> getNodeName() {
+  public Optional<String> getNodeName() {
     return getFilterValue(FILTER_NAME_NODE_NAME);
   }
 
   /**
-   * Returns an {@link Option} containing the status used to filter if set.
-   * {@link Option#none()} otherwise.
+   * Returns an {@link Optional} containing the status used to filter if set.
+   * {@link Optional#empty()} otherwise.
    *
-   * @return an {@link Option} containing the status or none.
+   * @return an {@link Optional} containing the status or none.
    */
-  public Option<String> getStatus() {
+  public Optional<String> getStatus() {
     return getFilterValue(FILTER_NAME_STATUS);
   }
 
   /**
-   * Returns an {@link Option} containing the free text used to filter if set.
-   * {@link Option#none()} otherwise.
+   * Returns an {@link Optional} containing the free text used to filter if set.
+   * {@link Optional#empty()} otherwise.
    *
-   * @return an {@link Option} containing the free text or none.
+   * @return an {@link Optional} containing the free text or none.
    */
-  public Option<String> getFreeText() {
+  public Optional<String> getFreeText() {
     return getFilterValue(ResourceListFilter.FREETEXT);
   }
 
   /**
    * Create a new {@link ResourceListFilter} based on a hostname.
    *
-   * @param value the hostname to filter on wrapped in an {@link Option} or {@link Option#none()}
+   * @param value the hostname to filter on wrapped in an {@link Optional} or {@link Optional#empty()}
    * @return a new {@link ResourceListFilter} for a hostname based query
    */
-  public static ResourceListFilter<String> createHostnameFilter(Option<String> value) {
+  public static ResourceListFilter<String> createHostnameFilter(Optional<String> value) {
     return FiltersUtils.generateFilter(
             value,
             FILTER_NAME_HOSTNAME,
             FILTER_LABEL_HOSTNAME,
             ResourceListFilter.SourceType.SELECT,
-            Option.some(ServersListProvider.LIST_HOSTNAME));
+            Optional.of(ServersListProvider.LIST_HOSTNAME));
   }
 
   /**
    * Create a new {@link ResourceListFilter} based on a nodeName.
    *
-   * @param value the nodeName to filter on wrapped in an {@link Option} or {@link Option#none()}
+   * @param value the nodeName to filter on wrapped in an {@link Optional} or {@link Optional#empty()}
    * @return a new {@link ResourceListFilter} for a nodeName based query
    */
-  public static ResourceListFilter<String> createNodeNameFilter(Option<String> value) {
+  public static ResourceListFilter<String> createNodeNameFilter(Optional<String> value) {
     return FiltersUtils.generateFilter(
             value,
             FILTER_NAME_NODE_NAME,
             FILTER_LABEL_NODE_NAME,
             ResourceListFilter.SourceType.SELECT,
-            Option.some(ServersListProvider.LIST_NODE_NAME));
+            Optional.of(ServersListProvider.LIST_NODE_NAME));
   }
 
   /**
    * Create a new {@link ResourceListFilter} based on a status.
    *
-   * @param value the status to filter on wrapped in an {@link Option} or {@link Option#none()}
+   * @param value the status to filter on wrapped in an {@link Optional} or {@link Optional#empty()}
    * @return a new {@link ResourceListFilter} for a status based query
    */
-  public static ResourceListFilter<String> createStatusFilter(Option<String> value) {
+  public static ResourceListFilter<String> createStatusFilter(Optional<String> value) {
     return FiltersUtils.generateFilter(
             value,
             FILTER_NAME_STATUS,
             FILTER_LABEL_STATUS,
             ResourceListFilter.SourceType.SELECT,
-            Option.some(ServersListProvider.LIST_STATUS));
+            Optional.of(ServersListProvider.LIST_STATUS));
   }
 
   /**
    * Create a new {@link ResourceListFilter} based on a free text.
    *
-   * @param value the free text to filter on wrapped in an {@link Option} or {@link Option#none()}
+   * @param value the free text to filter on wrapped in an {@link Optional} or {@link Optional#empty()}
    * @return a new {@link ResourceListFilter} for a free text based query
    */
-  public static <String> ResourceListFilter<String> createFreeTextFilter(Option<String> value) {
+  public static <String> ResourceListFilter<String> createFreeTextFilter(Optional<String> value) {
     return FiltersUtils.generateFilter(
             value,
             ResourceListFilter.FREETEXT,

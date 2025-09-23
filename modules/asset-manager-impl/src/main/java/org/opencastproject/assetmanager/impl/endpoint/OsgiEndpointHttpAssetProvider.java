@@ -121,7 +121,7 @@ public class OsgiEndpointHttpAssetProvider implements HttpAssetProvider {
   private static String mimeTypeToSuffix(Optional<MimeType> t) {
     var test = t.map(MimeType::getSuffix).get();
 
-    if (test.isNone()) {
+    if (test.isEmpty()) {
       return "unknown";
     }
 

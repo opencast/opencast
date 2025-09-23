@@ -28,7 +28,6 @@ import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_RO
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLE;
 import static org.opencastproject.util.JobUtil.waitForJob;
 import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Option.none;
 
 import org.opencastproject.authorization.xacml.XACMLParsingException;
 import org.opencastproject.authorization.xacml.XACMLUtils;
@@ -88,8 +87,6 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.ProgressInputStream;
 import org.opencastproject.util.XmlSafeParser;
 import org.opencastproject.util.XmlUtil;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.functions.Misc;
 import org.opencastproject.util.jmx.JmxUtil;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
@@ -1955,7 +1952,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
           try {
             // Interpret the payload of a completed Job as a MediaPackageElement.
             // Wait for the job to complete if necessary
-            waitForJob(getServiceRegistry(), none(0L), job);
+            waitForJob(getServiceRegistry(), Optional.empty(), job);
             return (Track) MediaPackageElementParser.getFromXml(job.getPayload());
           } catch (Exception e) {
             throw new RuntimeException("Error parsing job payload as track", e);
@@ -1995,8 +1992,8 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    */
   private MediaPackage addSmilCatalog(org.w3c.dom.Document smilDocument, MediaPackage mediaPackage)
           throws IOException, IngestException {
-    Option<org.w3c.dom.Document> optSmilDocument = loadSmilDocument(workingFileRepository, mediaPackage);
-    if (optSmilDocument.isSome())
+    Optional<org.w3c.dom.Document> optSmilDocument = loadSmilDocument(workingFileRepository, mediaPackage);
+    if (optSmilDocument.isPresent())
       throw new IngestException("SMIL already exists!");
 
     InputStream in = null;
@@ -2020,24 +2017,21 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    *
    * @return the document or none if no media package element found.
    */
-  private Option<org.w3c.dom.Document> loadSmilDocument(final WorkingFileRepository workingFileRepository,
+  private Optional<org.w3c.dom.Document> loadSmilDocument(final WorkingFileRepository workingFileRepository,
           MediaPackage mp) {
-    return mlist(mp.getElements()).filter(MediaPackageSupport.Filters.isSmilCatalog).headOpt()
-            .map(new Function<MediaPackageElement, org.w3c.dom.Document>() {
-              @Override
-              public org.w3c.dom.Document apply(MediaPackageElement mpe) {
-                InputStream in = null;
-                try {
-                  in = workingFileRepository.get(mpe.getMediaPackage().getIdentifier().toString(), mpe.getIdentifier());
-                  return SmilUtil.loadSmilDocument(in, mpe);
-                } catch (Exception e) {
-                  logger.warn("Unable to load smil document from catalog '{}'", mpe, e);
-                  return Misc.chuck(e);
-                } finally {
-                  IOUtils.closeQuietly(in);
-                }
-              }
-            });
+    return mlist(mp.getElements())
+        .filter(MediaPackageSupport.Filters.isSmilCatalog)
+        .headOpt()
+        .map(mpe -> {
+          try (InputStream in = workingFileRepository.get(
+              mpe.getMediaPackage().getIdentifier().toString(),
+              mpe.getIdentifier())) {
+            return SmilUtil.loadSmilDocument(in, mpe);
+          } catch (Exception e) {
+            logger.warn("Unable to load smil document from catalog '{}'", mpe, e);
+            return Misc.chuck(e);
+          }
+        });
   }
 
   /**

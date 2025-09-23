@@ -38,7 +38,6 @@ import org.opencastproject.mediapackage.Track;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowOperationException;
@@ -65,6 +64,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class CompositeWorkflowOperationHandlerTest {
   private CompositeWorkflowOperationHandler operationHandler;
@@ -357,9 +357,10 @@ public class CompositeWorkflowOperationHandlerTest {
     composerService = EasyMock.createNiceMock(ComposerService.class);
     EasyMock.expect(composerService.getProfile(PROFILE_ID)).andReturn(profile);
     EasyMock.expect(
-            composerService.composite((Dimension) EasyMock.anyObject(), Option.option((LaidOutElement<Track>) EasyMock.anyObject()),
+            composerService.composite((Dimension) EasyMock.anyObject(),
+                Optional.ofNullable((LaidOutElement<Track>) EasyMock.anyObject()),
                     (LaidOutElement<Track>) EasyMock.anyObject(),
-                    (Option<LaidOutElement<Attachment>>) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+                    (Optional<LaidOutElement<Attachment>>) EasyMock.anyObject(), (String) EasyMock.anyObject(),
                     (String) EasyMock.anyObject(),
                     (String) EasyMock.anyObject())).andReturn(job);
     EasyMock.replay(composerService);

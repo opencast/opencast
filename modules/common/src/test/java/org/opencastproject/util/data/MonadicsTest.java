@@ -35,8 +35,6 @@ import static org.opencastproject.util.data.Iterators.intRangeE;
 import static org.opencastproject.util.data.Monadics.IteratorMonadic;
 import static org.opencastproject.util.data.Monadics.mlazy;
 import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.util.data.functions.Booleans;
@@ -44,6 +42,7 @@ import org.opencastproject.util.data.functions.Functions;
 
 import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -85,16 +84,22 @@ public class MonadicsTest {
   @Test
   public void testFlatMap2() {
     final List<Object> l = list((Object) 1);
-    final List<String> r1 = mlist(l).bind(new Function<Object, Option<String>>() {
-      @Override public Option<String> apply(Object o) {
-        return some("x");
-      }
-    }).value();
+    final List<String> r1 = mlist(l)
+        .flatMap(new Function<Object, List<String>>() {
+          @Override
+          public List<String> apply(Object o) {
+            List<String> result = new ArrayList<>();
+            result.add("x");
+            return result;
+          }
+        })
+        .value();
     assertEquals(1, r1.size());
     assertEquals("x", r1.get(0));
-    final List<String> r2 = mlist(l).bind(new Function<Object, Option<String>>() {
-      @Override public Option<String> apply(Object o) {
-        return none();
+    final List<String> r2 = mlist(l).bind(new Function<Object, Iterable<String>>() {
+      @Override
+      public Iterable<String> apply(Object o) {
+        return java.util.Collections.emptyList();
       }
     }).value();
     assertEquals(0, r2.size());
@@ -136,7 +141,21 @@ public class MonadicsTest {
   public void testFlatten() {
     List<Integer> mapped = mlist(list(list(1, 2), list(3, 4))).flatMap(Functions.<List<Integer>>identity()).value();
     assertEquals(4, mapped.size());
-    List<Integer> mapped2 = mlist(some(1), Option.<Integer>option(null), some(3), Option.<Integer>none()).flatMap(Functions.<Option<Integer>>identity()).value();
+    List<Integer> mapped2 = mlist(1, null, 3, null)
+        .bind(new Function<Integer, Iterable<Integer>>() {
+          @Override
+          public Iterable<Integer> apply(Integer x) {
+            if (x != null) {
+              List<Integer> l = new ArrayList<>();
+              l.add(x);
+              return l;
+            } else {
+              return java.util.Collections.emptyList();
+            }
+          }
+        })
+        .value();
+
     assertEquals(2, mapped2.size());
   }
 
@@ -271,7 +290,7 @@ public class MonadicsTest {
             .flatMap(new Function<Integer, Iterator<Integer>>() {
               @Override
               public Iterator<Integer> apply(Integer integer) {
-                return Option.<Integer>some(2).iterator();
+                return java.util.Collections.singletonList(2).iterator();
               }
             })
             .eval();
@@ -296,7 +315,7 @@ public class MonadicsTest {
             .flatMap(new Function<Integer, Iterator<Integer>>() {
               @Override
               public Iterator<Integer> apply(Integer integer) {
-                return Option.<Integer>none().iterator();
+                return java.util.Collections.<Integer>emptyList().iterator();
               }
             })
             .eval();

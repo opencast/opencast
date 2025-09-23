@@ -33,7 +33,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -55,6 +54,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Workflow operation handler for copying video data through NFS
@@ -114,7 +114,7 @@ public class CopyWorkflowOperationHandler extends AbstractWorkflowOperationHandl
     List<String> sourceTagsOption = tagsAndFlavors.getSrcTags();
     List<MediaPackageElementFlavor> sourceFlavorsOption = tagsAndFlavors.getSrcFlavors();
     String targetDirectoryOption = StringUtils.trimToNull(currentOperation.getConfiguration(OPT_TARGET_DIRECTORY));
-    Option<String> targetFilenameOption = Option.option(StringUtils.trimToNull(currentOperation
+    Optional<String> targetFilenameOption = Optional.ofNullable(StringUtils.trimToNull(currentOperation
             .getConfiguration(OPT_TARGET_FILENAME)));
 
     StringBuilder sb = new StringBuilder();
@@ -162,7 +162,7 @@ public class CopyWorkflowOperationHandler extends AbstractWorkflowOperationHandl
       for (MediaPackageElement element : elements) {
         logger.debug("Copy single element to: {}", targetDirectoryOption);
         final String fileName;
-        if (targetFilenameOption.isSome()) {
+        if (targetFilenameOption.isPresent()) {
           fileName = targetFilenameOption.get();
         } else {
           fileName = FilenameUtils.getBaseName(element.getURI().toString());
@@ -179,7 +179,7 @@ public class CopyWorkflowOperationHandler extends AbstractWorkflowOperationHandl
       int i = 1;
       for (MediaPackageElement element : elements) {
         final String fileName;
-        if (targetFilenameOption.isSome()) {
+        if (targetFilenameOption.isPresent()) {
           fileName = String.format(targetFilenameOption.get(), i);
         } else {
           fileName = FilenameUtils.getBaseName(element.getURI().toString());

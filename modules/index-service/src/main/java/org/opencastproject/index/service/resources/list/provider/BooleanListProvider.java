@@ -23,13 +23,13 @@ package org.opencastproject.index.service.resources.list.provider;
 
 import org.opencastproject.list.api.ResourceListProvider;
 import org.opencastproject.list.api.ResourceListQuery;
-import org.opencastproject.util.data.Option;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 /** Boolean list provider. */
 @Component(
@@ -75,17 +75,17 @@ public class BooleanListProvider implements ResourceListProvider {
    * Parse boolean value from the given string.
    *
    * @param filterValue boolean value as string
-   * @return boolean value wrapped in an {@link Option} or {@link Option#none()}
+   * @return boolean value wrapped in an {@link Optional} or {@link Optional#empty()}
    */
-  public static <Boolean> Option<Boolean> parseValue(String filterValue) {
+  public static <Boolean> Optional<Boolean> parseValue(String filterValue) {
     String value = StringUtils.trimToEmpty(filterValue);
     if (StringUtils.equalsIgnoreCase(YES, value)
             || StringUtils.equalsIgnoreCase("true", value))
-      return (Option<Boolean>) Option.option(true);
+      return (Optional<Boolean>) Optional.ofNullable(true);
     else if (StringUtils.equalsIgnoreCase(NO, value)
             || StringUtils.equalsIgnoreCase("false", value))
-      return (Option<Boolean>) Option.option(false);
-    else return Option.<Boolean> none();
+      return (Optional<Boolean>) Optional.ofNullable(false);
+    else return Optional.<Boolean> empty();
   }
 
   @Override

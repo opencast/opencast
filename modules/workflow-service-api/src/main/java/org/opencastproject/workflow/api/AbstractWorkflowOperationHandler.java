@@ -22,7 +22,6 @@
 package org.opencastproject.workflow.api;
 
 import static java.lang.String.format;
-import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.job.api.Job;
@@ -34,7 +33,6 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function0;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
 import org.apache.commons.io.FilenameUtils;
@@ -318,8 +316,8 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
    *
    * @deprecated use {@link #getConfig(WorkflowInstance, String)} or {@link #getOptConfig(org.opencastproject.workflow.api.WorkflowInstance, String)}
    */
-  protected Option<String> getCfg(WorkflowInstance wi, String key) {
-    return option(wi.getCurrentOperation().getConfiguration(key));
+  protected Optional<String> getCfg(WorkflowInstance wi, String key) {
+    return Optional.ofNullable(wi.getCurrentOperation().getConfiguration(key));
   }
 
   /**

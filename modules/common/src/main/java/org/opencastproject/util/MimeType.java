@@ -25,17 +25,16 @@ package org.opencastproject.util;
 import static org.opencastproject.util.EqualsUtil.eqObj;
 import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Option.none;
 
 import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Optional;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -69,13 +68,13 @@ public final class MimeType implements Comparable<MimeType>, Serializable {
   private final List<String> suffixes;
 
   /** Main description */
-  private final Option<String> description;
+  private final Optional<String> description;
 
   /** The mime type flavor */
-  private final Option<String> flavor;
+  private final Optional<String> flavor;
 
   /** The mime type flavor description */
-  private final Option<String> flavorDescription;
+  private final Optional<String> flavorDescription;
 
   /**
    * Creates a new mime type with the given type and subtype.
@@ -87,8 +86,8 @@ public final class MimeType implements Comparable<MimeType>, Serializable {
    */
   private MimeType(String type, String subtype, List<String> suffixes,
                   List<MimeType> equivalents,
-                  Option<String> description,
-                  Option<String> flavor, Option<String> flavorDescription) {
+                  Optional<String> description,
+                  Optional<String> flavor, Optional<String> flavorDescription) {
     this.type = type;
     this.subtype = subtype;
     this.suffixes = suffixes;
@@ -100,17 +99,17 @@ public final class MimeType implements Comparable<MimeType>, Serializable {
 
   public static MimeType mimeType(String type, String subtype, List<String> suffixes,
                                   List<MimeType> equivalents,
-                                  Option<String> description,
-                                  Option<String> flavor, Option<String> flavorDescription) {
+                                  Optional<String> description,
+                                  Optional<String> flavor, Optional<String> flavorDescription) {
     return new MimeType(type, subtype, suffixes, equivalents, description, flavor, flavorDescription);
   }
 
   public static MimeType mimeType(String type, String subtype, String suffix) {
-    return new MimeType(type, subtype, list(suffix), Collections.<MimeType>nil(), none(""), none(""), none(""));
+    return new MimeType(type, subtype, list(suffix), Collections.<MimeType>nil(), Optional.empty(), Optional.empty(), Optional.empty());
   }
 
   public static MimeType mimeType(String type, String subtype) {
-    return new MimeType(type, subtype, Collections.<String>nil(), Collections.<MimeType>nil(), none(""), none(""), none(""));
+    return new MimeType(type, subtype, Collections.<String>nil(), Collections.<MimeType>nil(), Optional.empty(), Optional.empty(), Optional.empty());
   }
 
   /**
@@ -144,7 +143,7 @@ public final class MimeType implements Comparable<MimeType>, Serializable {
    *
    * @return the file suffix
    */
-  public Option<String> getSuffix() {
+  public Optional<String> getSuffix() {
     return mlist(suffixes).headOpt();
   }
 
@@ -174,7 +173,7 @@ public final class MimeType implements Comparable<MimeType>, Serializable {
    *
    * @return the description
    */
-  public Option<String> getDescription() {
+  public Optional<String> getDescription() {
     return this.description;
   }
 
@@ -187,7 +186,7 @@ public final class MimeType implements Comparable<MimeType>, Serializable {
    *
    * @return the file's flavor
    */
-  public Option<String> getFlavor() {
+  public Optional<String> getFlavor() {
     return flavor;
   }
 
@@ -196,7 +195,7 @@ public final class MimeType implements Comparable<MimeType>, Serializable {
    *
    * @return the flavor description
    */
-  public Option<String> getFlavorDescription() {
+  public Optional<String> getFlavorDescription() {
     return flavorDescription;
   }
 

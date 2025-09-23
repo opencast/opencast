@@ -35,7 +35,6 @@ import org.opencastproject.assetmanager.api.storage.Source;
 import org.opencastproject.assetmanager.api.storage.StoragePath;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
@@ -212,8 +211,8 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
 
   /** Return the extension of a file. */
   private Optional<String> extension(File f) {
-    Option<String> opt = trimToNone(getExtension(f.getAbsolutePath()));
-    return opt.isSome()
+    Optional<String> opt = trimToNone(getExtension(f.getAbsolutePath()));
+    return opt.isPresent()
         ? Optional.of(opt.get())
         : Optional.empty();
   }
@@ -221,8 +220,8 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
   /** Return the extension of a URI, i.e. the extension of its path. */
   private Optional<String> extension(URI uri) {
     try {
-      Option<String> opt = trimToNone(getExtension(uri.toURL().getPath()));
-      return opt.isSome()
+      Optional<String> opt = trimToNone(getExtension(uri.toURL().getPath()));
+      return opt.isPresent()
           ? Optional.of(opt.get())
           : Optional.empty();
     } catch (MalformedURLException e) {
@@ -271,11 +270,11 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
   }
 
   /**
-   * Returns a file {@link Option} from a storage path if one is found or an empty {@link Option}
+   * Returns a file {@link Optional} from a storage path if one is found or an empty {@link Optional}
    *
    * @param storagePath
    *          the storage path
-   * @return the file {@link Option}
+   * @return the file {@link Optional}
    */
   private Optional<File> findStoragePathFile(final StoragePath storagePath) {
     final FilenameFilter filter = new FilenameFilter() {

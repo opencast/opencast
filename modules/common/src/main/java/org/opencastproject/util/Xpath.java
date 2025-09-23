@@ -21,12 +21,9 @@
 
 package org.opencastproject.util;
 
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.option;
-
-import org.opencastproject.util.data.Option;
-
 import org.w3c.dom.Node;
+
+import java.util.Optional;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.xpath.XPath;
@@ -53,11 +50,11 @@ public final class Xpath {
 
   /** Evaluate the xpath expression against the contained document. The expression must return a node. */
   // todo replace return type with Valid once it is implemented
-  public Option<Node> node(String expr) {
+  public Optional<Node> node(String expr) {
     try {
-      return option((Node) xpath.evaluate(expr, node, XPathConstants.NODE));
+      return Optional.ofNullable((Node) xpath.evaluate(expr, node, XPathConstants.NODE));
     } catch (XPathExpressionException e) {
-      return none();
+      return Optional.empty();
     }
   }
 

@@ -23,25 +23,25 @@ package org.opencastproject.list.impl;
 
 import org.opencastproject.list.api.ResourceListFilter;
 import org.opencastproject.list.api.ResourceListQuery;
-import org.opencastproject.util.data.Option;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class ResourceListQueryImpl implements ResourceListQuery {
 
   protected final List<ResourceListFilter<?>> availableFilters = new ArrayList<>();
   private final Map<String, ResourceListFilter<?>> filters = new HashMap<>();
-  private Option<Integer> limit;
-  private Option<Integer> offset;
-  protected Option<String> sortBy;
+  private Optional<Integer> limit;
+  private Optional<Integer> offset;
+  protected Optional<String> sortBy;
 
   public ResourceListQueryImpl() {
-    limit = Option.none();
-    offset = Option.none();
-    sortBy = Option.none();
+    limit = Optional.empty();
+    offset = Optional.empty();
+    sortBy = Optional.empty();
   }
 
   public void addFilter(ResourceListFilter<?> filter) {
@@ -53,11 +53,11 @@ public class ResourceListQueryImpl implements ResourceListQuery {
   }
 
   public void setLimit(Integer limit) {
-    this.limit = Option.option(limit);
+    this.limit = Optional.ofNullable(limit);
   }
 
   public void setOffset(Integer offset) {
-    this.offset = Option.option(offset);
+    this.offset = Optional.ofNullable(offset);
   }
 
   @Override
@@ -71,17 +71,17 @@ public class ResourceListQueryImpl implements ResourceListQuery {
   }
 
   @Override
-  public Option<Integer> getLimit() {
+  public Optional<Integer> getLimit() {
     return limit;
   }
 
   @Override
-  public Option<Integer> getOffset() {
+  public Optional<Integer> getOffset() {
     return offset;
   }
 
   @Override
-  public Option<String> getSortBy() {
+  public Optional<String> getSortBy() {
     return sortBy;
   }
 
@@ -96,18 +96,18 @@ public class ResourceListQueryImpl implements ResourceListQuery {
   }
 
   /**
-   * Returns the filter value wrapped in an {@link Option} or none if the filter is not existing or has no value.
+   * Returns the filter value wrapped in an {@link Optional} or none if the filter is not existing or has no value.
    *
    * @param name
    *          the filter name
-   * @return an {@link Option} wrapping the value or none.
+   * @return an {@link Optional} wrapping the value or none.
    */
-  public <A> Option<A> getFilterValue(String name) {
+  public <A> Optional<A> getFilterValue(String name) {
     if (this.hasFilter(name)) {
-      return (Option<A>) this.getFilter(name).getValue();
+      return (Optional<A>) this.getFilter(name).getValue();
     }
 
-    return Option.none();
+    return Optional.empty();
   }
 
 }

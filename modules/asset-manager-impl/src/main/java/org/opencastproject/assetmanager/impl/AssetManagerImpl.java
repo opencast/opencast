@@ -93,7 +93,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.checkerframework.checker.units.qual.A;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -1615,8 +1614,9 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     AccessControlList acl = authorizationService.getActiveAcl(mp).getA();
     List<ManagedAcl> acls = aclServiceFactory.serviceFor(securityService.getOrganization()).getAcls();
 
-    for (final ManagedAcl managedAcl : AccessInformationUtil.matchAcls(acls, acl)) {
-      event.setManagedAcl(managedAcl.getName());
+    Optional<ManagedAcl> managedAcl = AccessInformationUtil.matchAcls(acls, acl);
+    if (managedAcl.isPresent()) {
+      event.setManagedAcl(managedAcl.get().getName());
     }
     event.setAccessPolicy(AccessControlParser.toJsonSilent(acl));
 

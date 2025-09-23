@@ -23,8 +23,6 @@ package org.opencastproject.oaipmh.server;
 import static org.opencastproject.oaipmh.OaiPmhConstants.OAI_2_0_SCHEMA_LOCATION;
 import static org.opencastproject.oaipmh.OaiPmhConstants.OAI_2_0_XML_NS;
 import static org.opencastproject.oaipmh.OaiPmhUtil.toUtcSecond;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
 
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.metadata.dublincore.DublinCore;
@@ -35,8 +33,6 @@ import org.opencastproject.oaipmh.persistence.OaiPmhDatabaseException;
 import org.opencastproject.oaipmh.persistence.SearchResult;
 import org.opencastproject.oaipmh.persistence.SearchResultItem;
 import org.opencastproject.oaipmh.util.XmlGen;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
 
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -46,6 +42,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import javax.xml.XMLConstants;
 
@@ -60,7 +57,7 @@ public abstract class OaiXmlGen extends XmlGen {
    * Create a new OaiXmlGen for a certain repository.
    */
   public OaiXmlGen(OaiPmhRepository repository) {
-    super(some(OaiPmhConstants.OAI_2_0_XML_NS));
+    super(Optional.of(OaiPmhConstants.OAI_2_0_XML_NS));
     this.repository = repository;
   }
 
@@ -92,7 +89,7 @@ public abstract class OaiXmlGen extends XmlGen {
   /**
    * Create the dublin core tag from a search result item. Note: Sets are currently not supported.
    */
-  @SuppressWarnings("unchecked") Element dc(final SearchResultItem item, Option<String> set) {
+  @SuppressWarnings("unchecked") Element dc(final SearchResultItem item, Optional<String> set) {
     try {
       return getDublincoreElement(item.getEpisodeDublinCore());
     } catch (OaiPmhDatabaseException ex) {
@@ -136,31 +133,26 @@ public abstract class OaiXmlGen extends XmlGen {
   /**
    * Create the resumption token and store the query.
    */
-  Node resumptionToken(final Option<String> resumptionToken, final String metadataPrefix, final SearchResult result,
-                       Date until, Option<String> set) {
+  Node resumptionToken(final Optional<String> resumptionToken, final String metadataPrefix, final SearchResult result,
+                       Date until, Optional<String> set) {
     // compute the token value...
-    final Option<Option<String>> token;
+    final Optional<Optional<String>> token;
     if (result.size() == result.getLimit()) {
       SearchResultItem lastResult = result.getItems().get((int) (result.size() - 1));
       // more to come...
-      token = some(some(repository.saveQuery(new ResumableQuery(metadataPrefix, lastResult.getModificationDate(),
+      token = Optional.of(Optional.of(repository.saveQuery(new ResumableQuery(metadataPrefix, lastResult.getModificationDate(),
                                                                 until, set))));
-    } else if (resumptionToken.isSome()) {
+    } else if (resumptionToken.isPresent()) {
       // last page reached
-      token = some(Option.<String>none());
+      token = Optional.of(Optional.<String>empty());
     } else {
-      token = none();
+      token = Optional.empty();
     }
     // ... then transform it into a node
-    return token.map(new Function<Option<String>, Node>() {
-      @Override
-      public Node apply(Option<String> token) {
-        return $e("resumptionToken",
-                  // $a("completeListSize", Long.toString(result.getTotalSize())),
-                  // $a("cursor", Integer.toString(offset)),
-                  token.map(mkText).getOrElse(nodeZero));
-      }
-    }).getOrElse(nodeZero);
+    return $e(
+        "resumptionToken",
+        token.flatMap(inner -> inner.map(mkText::apply)).orElse(nodeZero.apply())
+    );
   }
 
   /**

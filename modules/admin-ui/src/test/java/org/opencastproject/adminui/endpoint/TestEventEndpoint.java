@@ -97,7 +97,6 @@ import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PropertiesUtil;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
@@ -368,11 +367,11 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     metadataSvcs.setWorkspace(workspace);
 
     final Date now = DateTime.parse("2014-06-05T09:15:56Z").toDate();
-    EventComment comment = EventComment.create(Option.some(65L), "abc123", "mh_default_org", "Comment 1",
+    EventComment comment = EventComment.create(Optional.of(65L), "abc123", "mh_default_org", "Comment 1",
             userWithPermissions, "Sick", true, now, now);
-    EventComment comment2 = EventComment.create(Option.some(65L), "abc123", "mh_default_org", "Comment 2",
+    EventComment comment2 = EventComment.create(Optional.of(65L), "abc123", "mh_default_org", "Comment 2",
             userWithPermissions, "Defect", false, now, now);
-    EventCommentReply reply = EventCommentReply.create(Option.some(78L), "Cant reproduce", userWithoutPermissions, now,
+    EventCommentReply reply = EventCommentReply.create(Optional.of(78L), "Cant reproduce", userWithoutPermissions, now,
             now);
     comment2.addReply(reply);
 
@@ -387,7 +386,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
       @Override
       public EventComment answer() throws Throwable {
         EventComment current = c.getValue();
-        EventComment result = EventComment.create(Option.some(65L), current.getEventId(), current.getOrganization(),
+        EventComment result = EventComment.create(Optional.of(65L), current.getEventId(), current.getOrganization(),
                 current.getText(), current.getAuthor(), current.getReason(), current.isResolvedStatus(), now, now,
                 current.getReplies());
         return result;

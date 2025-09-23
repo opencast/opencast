@@ -114,7 +114,7 @@ public class SecurityEndpoint implements ManagedService {
       return;
     }
 
-    Optional<Long> expiration = OsgiUtil.getOptCfg(properties, URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY).toOpt()
+    Optional<Long> expiration = OsgiUtil.getOptCfg(properties, URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY)
             .map(Long::parseLong);
     if (expiration.isPresent()) {
       expireSeconds = expiration.get();

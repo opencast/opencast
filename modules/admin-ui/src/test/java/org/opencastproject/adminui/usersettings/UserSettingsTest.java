@@ -22,12 +22,10 @@
 package org.opencastproject.adminui.usersettings;
 
 import static org.junit.Assert.assertThat;
-import static org.opencastproject.util.data.Option.none;
 
 import org.opencastproject.adminui.endpoint.SeriesEndpointTest;
 import org.opencastproject.kernel.mail.EmailAddress;
 import org.opencastproject.security.api.User;
-import org.opencastproject.util.data.Option;
 
 import org.easymock.EasyMock;
 import org.joda.time.DateTime;
@@ -38,6 +36,7 @@ import org.junit.Test;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.Optional;
 
 import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
@@ -64,7 +63,7 @@ public class UserSettingsTest {
     EasyMock.expect(creator.getEmail()).andReturn("adam@fake.com").anyTimes();
     EasyMock.replay(creator);
     EmailAddress sender = new EmailAddress("adam@fake.com", "Other Name");
-    Option<EmailAddress> replyTo = none();
+    Optional<EmailAddress> replyTo = Optional.empty();
     DateTime dateTime = new DateTime(1401465634101L);
     dateTime.toDateTime(DateTimeZone.UTC);
 

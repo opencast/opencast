@@ -29,8 +29,6 @@ import static org.opencastproject.util.data.Collections.appendToM;
 import static org.opencastproject.util.data.Collections.forc;
 import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.data.Collections.toList;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -41,6 +39,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 public final class Monadics {
 
@@ -106,7 +105,7 @@ public final class Monadics {
     public abstract ListMonadic<A> filter(Function<? super A, Boolean> p);
 
     /** Return the first element satisfying predicate <code>p</code>. */
-    public abstract Option<A> find(Function<? super A, Boolean> p);
+    public abstract Optional<A> find(Function<? super A, Boolean> p);
 
     /** Check if at least one element satisfies predicate <code>p</code>. */
     public abstract boolean exists(Function<? super A, Boolean> p);
@@ -119,7 +118,7 @@ public final class Monadics {
     public abstract ListMonadic<A> sort(Comparator<A> c);
 
     /** Return the head of the list. */
-    public abstract Option<A> headOpt();
+    public abstract Optional<A> headOpt();
 
     /** Limit the list to the first <code>n</code> elements. */
     public abstract ListMonadic<A> take(int n);
@@ -237,12 +236,12 @@ public final class Monadics {
       }
 
       @Override
-      public Option<A> find(Function<? super A, Boolean> p) {
+      public Optional<A> find(Function<? super A, Boolean> p) {
         for (A a : as) {
           if (p.apply(a))
-            return some(a);
+            return Optional.of(a);
         }
-        return none();
+        return Optional.empty();
       }
 
       @Override
@@ -277,8 +276,8 @@ public final class Monadics {
       }
 
       @Override
-      public Option<A> headOpt() {
-        return !as.isEmpty() ? some(head()) : Option.<A> none();
+      public Optional<A> headOpt() {
+        return !as.isEmpty() ? Optional.of(head()) : Optional.<A> empty();
       }
 
       private A head() {
@@ -379,12 +378,12 @@ public final class Monadics {
       }
 
       @Override
-      public Option<A> find(Function<? super A, Boolean> p) {
+      public Optional<A> find(Function<? super A, Boolean> p) {
         for (A a : as) {
           if (p.apply(a))
-            return some(a);
+            return Optional.of(a);
         }
-        return none();
+        return Optional.empty();
       }
 
       @Override
@@ -419,8 +418,8 @@ public final class Monadics {
       }
 
       @Override
-      public Option<A> headOpt() {
-        return as.length != 0 ? some(as[0]) : Option.<A> none();
+      public Optional<A> headOpt() {
+        return as.length != 0 ? Optional.of(as[0]) : Optional.<A> empty();
       }
 
       @Override
@@ -520,12 +519,12 @@ public final class Monadics {
       }
 
       @Override
-      public Option<A> find(Function<? super A, Boolean> p) {
+      public Optional<A> find(Function<? super A, Boolean> p) {
         for (A a : forc(as)) {
           if (p.apply(a))
-            return some(a);
+            return Optional.of(a);
         }
-        return none();
+        return Optional.empty();
       }
 
       @Override
@@ -560,7 +559,7 @@ public final class Monadics {
       }
 
       @Override
-      public Option<A> headOpt() {
+      public Optional<A> headOpt() {
         throw new UnsupportedOperationException();
       }
 

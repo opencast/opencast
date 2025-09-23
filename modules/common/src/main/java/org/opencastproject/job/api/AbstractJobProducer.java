@@ -37,7 +37,6 @@ import org.opencastproject.serviceregistry.api.SystemLoad.NodeLoad;
 import org.opencastproject.serviceregistry.api.UndispatchableJobException;
 import org.opencastproject.util.JobCanceledException;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.functions.Strings;
 
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -86,8 +85,9 @@ public abstract class AbstractJobProducer implements JobProducer {
    *          OSGI component context
    **/
   public void activate(ComponentContext cc) {
-    acceptJobLoadsExeedingMaxLoad = getOptContextProperty(cc, ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY).map(Strings.toBool)
-            .getOrElse(DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING);
+    acceptJobLoadsExeedingMaxLoad = getOptContextProperty(cc, ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY)
+            .map(Boolean::valueOf)
+            .orElse(DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING);
     logger.debug("Job producer {} accepting excessively large jobs: {}", getJobType(), acceptJobLoadsExeedingMaxLoad);
   }
 

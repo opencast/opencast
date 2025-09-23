@@ -27,7 +27,6 @@ import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function2;
 import org.opencastproject.util.data.Monadics;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Prelude;
 
 import org.json.simple.JSONArray;
@@ -36,6 +35,7 @@ import org.json.simple.JSONObject;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /** JSON builder based on json-simple. */
 public final class Jsons {
@@ -235,8 +235,8 @@ public final class Jsons {
   }
 
   /** Create a property. Passing none is like setting {@link #ZERO_VAL} which erases the property. */
-  public static Prop p(String key, Option<Val> val) {
-    return new Prop(key, val.getOrElse(ZERO_VAL));
+  public static Prop p(String key, Optional<Val> val) {
+    return new Prop(key, val.orElse(ZERO_VAL));
   }
 
   /** Create a property. Convenience. */

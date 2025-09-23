@@ -20,11 +20,9 @@
  */
 package org.opencastproject.kernel.bundleinfo;
 
-import static org.opencastproject.util.data.Option.option;
-
-import org.opencastproject.util.data.Option;
-
 import org.osgi.framework.Bundle;
+
+import java.util.Optional;
 
 /** Functions on {@link BundleInfo}. */
 public final class BundleInfos {
@@ -34,7 +32,7 @@ public final class BundleInfos {
   }
 
   /** Extract the build number of a bundle. */
-  public static Option<String> getBuildNumber(Bundle bundle) {
-    return option(bundle.getHeaders().get(MANIFEST_BUILD_NUMBER));
+  public static Optional<String> getBuildNumber(Bundle bundle) {
+    return Optional.ofNullable(bundle.getHeaders().get(MANIFEST_BUILD_NUMBER));
   }
 }

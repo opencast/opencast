@@ -24,7 +24,6 @@ package org.opencastproject.util.data.functions;
 import static org.opencastproject.util.EqualsUtil.eq;
 
 import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
 
 import java.util.List;
 import java.util.Optional;
@@ -98,11 +97,6 @@ public final class Misc {
   /** Widening cast. */
   public static <A> List<A> widen(List<? extends A> xs) {
     return (List<A>) xs;
-  }
-
-  /** Widening cast. */
-  public static <A> Option<A> widen(Option<? extends A> xs) {
-    return (Option<A>) xs;
   }
 
   /** Widening cast. */

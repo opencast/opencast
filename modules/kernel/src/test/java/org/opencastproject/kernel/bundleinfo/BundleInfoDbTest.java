@@ -24,20 +24,19 @@ package org.opencastproject.kernel.bundleinfo;
 import static org.junit.Assert.assertEquals;
 import static org.opencastproject.kernel.bundleinfo.BundleInfoImpl.bundleInfo;
 import static org.opencastproject.util.ReflectionUtil.run;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
 
 import org.opencastproject.db.DBSession;
 import org.opencastproject.db.DBTestEnv;
-import org.opencastproject.util.data.Option;
 
 import org.junit.Test;
+
+import java.util.Optional;
 
 public class BundleInfoDbTest {
   @Test
   public void testPersistence() {
     final BundleInfoDb db = db();
-    final BundleInfo info = bundleInfo("localhost", "bundle", 1L, "1.4.0", some("1345"), some("9012"));
+    final BundleInfo info = bundleInfo("localhost", "bundle", 1L, "1.4.0", Optional.of("1345"), Optional.of("9012"));
     db.store(info);
     assertEquals("db contains an element", 1, db.getBundles().size());
     for (final BundleInfo a : db.getBundles()) {
@@ -67,7 +66,7 @@ public class BundleInfoDbTest {
         }
 
         @Override
-        public Option<String> getBuildNumber() {
+        public Optional<String> getBuildNumber() {
           assertEquals("build number persisted", info.getBuildNumber(), a.getBuildNumber());
           return null;
         }
@@ -84,27 +83,27 @@ public class BundleInfoDbTest {
     db.clearAll();
     assertEquals("db is empty", 0, db.getBundles().size());
     //
-    db.store(bundleInfo("localhost", "bundle", 2L, "1.4.1", Option.<String> none()));
-    assertEquals("no build number", Option.<String> none(), db.getBundles().get(0).getBuildNumber());
+    db.store(bundleInfo("localhost", "bundle", 2L, "1.4.1", Optional.<String> empty()));
+    assertEquals("no build number", Optional.<String> empty(), db.getBundles().get(0).getBuildNumber());
   }
 
   @Test(expected = BundleInfoDbException.class)
   public void testContstraints() {
     final BundleInfoDb db = db();
-    db.store(bundleInfo("localhost", "bundle-1", 1L, "1.4.0", none("")));
+    db.store(bundleInfo("localhost", "bundle-1", 1L, "1.4.0", Optional.empty()));
     // insert violates constraints
-    db.store(bundleInfo("localhost", "bundle-1", 5L, "1.4.0", some("ae41b09")));
+    db.store(bundleInfo("localhost", "bundle-1", 5L, "1.4.0", Optional.of("ae41b09")));
   }
 
   @Test
   public void testPrefixQuery() {
     final BundleInfoDb db = db();
-    db.store(bundleInfo("localhost", "matterhorn-1", 1L, "1.4.0", none("")));
-    db.store(bundleInfo("localhost", "matterhorn-2", 2L, "1.4.0", none("")));
-    db.store(bundleInfo("localhost", "matterhorn-3", 3L, "1.4.0", none("")));
-    db.store(bundleInfo("localhost", "eth-1", 4L, "1.4.0", none("")));
-    db.store(bundleInfo("localhost", "opencast-1", 5L, "1.4.0", none("")));
-    db.store(bundleInfo("localhost", "opencast-2", 6L, "1.4.0", none("")));
+    db.store(bundleInfo("localhost", "matterhorn-1", 1L, "1.4.0", Optional.empty()));
+    db.store(bundleInfo("localhost", "matterhorn-2", 2L, "1.4.0", Optional.empty()));
+    db.store(bundleInfo("localhost", "matterhorn-3", 3L, "1.4.0", Optional.empty()));
+    db.store(bundleInfo("localhost", "eth-1", 4L, "1.4.0", Optional.empty()));
+    db.store(bundleInfo("localhost", "opencast-1", 5L, "1.4.0", Optional.empty()));
+    db.store(bundleInfo("localhost", "opencast-2", 6L, "1.4.0", Optional.empty()));
     assertEquals(6, db.getBundles().size());
     assertEquals(3, db.getBundles("matterhorn").size());
     assertEquals(1, db.getBundles("eth").size());
@@ -116,9 +115,9 @@ public class BundleInfoDbTest {
   @Test
   public void testDeleteOne() {
     final BundleInfoDb db = db();
-    db.store(bundleInfo("localhost", "matterhorn-1", 1L, "1.4.0", none("")));
-    db.store(bundleInfo("localhost", "matterhorn-2", 2L, "1.4.0", none("")));
-    db.store(bundleInfo("localhost", "matterhorn-3", 3L, "1.4.0", none("")));
+    db.store(bundleInfo("localhost", "matterhorn-1", 1L, "1.4.0", Optional.empty()));
+    db.store(bundleInfo("localhost", "matterhorn-2", 2L, "1.4.0", Optional.empty()));
+    db.store(bundleInfo("localhost", "matterhorn-3", 3L, "1.4.0", Optional.empty()));
     assertEquals(3, db.getBundles().size());
     db.delete("localhost", db.getBundles().get(0).getBundleId());
     assertEquals(2, db.getBundles().size());
@@ -127,8 +126,8 @@ public class BundleInfoDbTest {
   @Test
   public void testDeleteByHost() {
     final BundleInfoDb db = db();
-    db.store(bundleInfo("localhost", "matterhorn-1", 1L, "1.4.0", none("")));
-    db.store(bundleInfo("remote", "matterhorn-1", 1L, "1.4.0", none("")));
+    db.store(bundleInfo("localhost", "matterhorn-1", 1L, "1.4.0", Optional.empty()));
+    db.store(bundleInfo("remote", "matterhorn-1", 1L, "1.4.0", Optional.empty()));
     assertEquals("db size", 2, db.getBundles().size());
     db.clear("localhost");
     assertEquals("db size", 1, db.getBundles().size());

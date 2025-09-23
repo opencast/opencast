@@ -29,10 +29,10 @@ import org.opencastproject.index.service.util.FiltersUtils;
 import org.opencastproject.list.api.ResourceListFilter;
 import org.opencastproject.list.api.ResourceListFilter.SourceType;
 import org.opencastproject.list.impl.ResourceListQueryImpl;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 
 import java.util.Date;
+import java.util.Optional;
 
 /**
  * Query for the events list.
@@ -92,13 +92,13 @@ public class EventListQuery extends ResourceListQueryImpl {
 
   public EventListQuery() {
     super();
-    this.availableFilters.add(createSeriesFilter(Option.none()));
-    this.availableFilters.add(createLocationFilter(Option.none()));
-    this.availableFilters.add(createAgentFilter(Option.none()));
-    this.availableFilters.add(createStartDateFilter(Option.none()));
-    this.availableFilters.add(createStatusFilter(Option.none()));
-    this.availableFilters.add(createCommentsFilter(Option.none()));
-    this.availableFilters.add(createIsPublishedFilter(Option.none()));
+    this.availableFilters.add(createSeriesFilter(Optional.empty()));
+    this.availableFilters.add(createLocationFilter(Optional.empty()));
+    this.availableFilters.add(createAgentFilter(Optional.empty()));
+    this.availableFilters.add(createStartDateFilter(Optional.empty()));
+    this.availableFilters.add(createStatusFilter(Optional.empty()));
+    this.availableFilters.add(createCommentsFilter(Optional.empty()));
+    this.availableFilters.add(createIsPublishedFilter(Optional.empty()));
   }
 
   /**
@@ -108,15 +108,15 @@ public class EventListQuery extends ResourceListQueryImpl {
    *          the seriesId to filter with
    */
   public void withSeriesId(String seriesId) {
-    this.addFilter(createSeriesFilter(Option.option(seriesId)));
+    this.addFilter(createSeriesFilter(Optional.ofNullable(seriesId)));
   }
 
   /**
-   * Returns an {@link Option} containing the seriesId used to filter if set
+   * Returns an {@link Optional} containing the seriesId used to filter if set
    *
-   * @return an {@link Option} containing the seriesId or none.
+   * @return an {@link Optional} containing the seriesId or none.
    */
-  public Option<String> getSeriesId() {
+  public Optional<String> getSeriesId() {
     return this.getFilterValue(FILTER_SERIES_NAME);
   }
 
@@ -127,15 +127,15 @@ public class EventListQuery extends ResourceListQueryImpl {
    *          the presenter to filter for
    */
   public void withPresenter(String presenter) {
-    this.addFilter(createPresentersFilter(Option.option(presenter)));
+    this.addFilter(createPresentersFilter(Optional.ofNullable(presenter)));
   }
 
   /**
-   * Returns an {@link Option} containing the presenter used to filter if set
+   * Returns an {@link Optional} containing the presenter used to filter if set
    *
-   * @return an {@link Option} containing the presenter or none.
+   * @return an {@link Optional} containing the presenter or none.
    */
-  public Option<String> getPresenter() {
+  public Optional<String> getPresenter() {
     return this.getFilterValue(FILTER_PRESENTERS_BIBLIOGRAPHIC_NAME);
   }
 
@@ -146,15 +146,15 @@ public class EventListQuery extends ResourceListQueryImpl {
    *          presenter's username the presenter's username to filter for
    */
   public void withTechnicalPresenter(String presenter) {
-    this.addFilter(createTechnicalPresentersFilter(Option.option(presenter)));
+    this.addFilter(createTechnicalPresentersFilter(Optional.ofNullable(presenter)));
   }
 
   /**
-   * Returns an {@link Option} containing the technical presenter's username used to filter if set
+   * Returns an {@link Optional} containing the technical presenter's username used to filter if set
    *
-   * @return an {@link Option} containing the presenter or none.
+   * @return an {@link Optional} containing the presenter or none.
    */
-  public Option<String> getTechnicalPresenter() {
+  public Optional<String> getTechnicalPresenter() {
     return this.getFilterValue(FILTER_PRESENTERS_TECHNICAL_NAME);
   }
 
@@ -165,15 +165,15 @@ public class EventListQuery extends ResourceListQueryImpl {
    *          the contributor to filter for
    */
   public void withContributor(String contributor) {
-    this.addFilter(createContributorsFilter(Option.option(contributor)));
+    this.addFilter(createContributorsFilter(Optional.ofNullable(contributor)));
   }
 
   /**
-   * Returns an {@link Option} containing the contributor used to filter if set
+   * Returns an {@link Optional} containing the contributor used to filter if set
    *
-   * @return an {@link Option} containing the contributor or none.
+   * @return an {@link Optional} containing the contributor or none.
    */
-  public Option<String> getContributor() {
+  public Optional<String> getContributor() {
     return this.getFilterValue(FILTER_CONTRIBUTORS_NAME);
   }
 
@@ -184,15 +184,15 @@ public class EventListQuery extends ResourceListQueryImpl {
    *          the subject to filter for
    */
   public void withLocation(String location) {
-    this.addFilter(createLocationFilter(Option.option(location)));
+    this.addFilter(createLocationFilter(Optional.ofNullable(location)));
   }
 
   /**
-   * Returns an {@link Option} containing the location used to filter if set
+   * Returns an {@link Optional} containing the location used to filter if set
    *
-   * @return an {@link Option} containing the location or none.
+   * @return an {@link Optional} containing the location or none.
    */
-  public Option<String> getLocation() {
+  public Optional<String> getLocation() {
     return this.getFilterValue(FILTER_LOCATION_NAME);
   }
 
@@ -203,15 +203,15 @@ public class EventListQuery extends ResourceListQueryImpl {
    *          the agent to filter for
    */
   public void withAgent(String agent) {
-    this.addFilter(createAgentFilter(Option.option(agent)));
+    this.addFilter(createAgentFilter(Optional.ofNullable(agent)));
   }
 
   /**
-   * Returns an {@link Option} containing the agent used to filter if set
+   * Returns an {@link Optional} containing the agent used to filter if set
    *
-   * @return an {@link Option} containing the agent or none.
+   * @return an {@link Optional} containing the agent or none.
    */
-  public Option<String> getAgent() {
+  public Optional<String> getAgent() {
     return this.getFilterValue(FILTER_AGENT_NAME);
   }
 
@@ -222,15 +222,15 @@ public class EventListQuery extends ResourceListQueryImpl {
    *          the subject to filter for
    */
   public void withLanguage(String language) {
-    this.addFilter(createLanguageFilter(Option.option(language)));
+    this.addFilter(createLanguageFilter(Optional.ofNullable(language)));
   }
 
   /**
-   * Returns an {@link Option} containing the language used to filter if set
+   * Returns an {@link Optional} containing the language used to filter if set
    *
-   * @return an {@link Option} containing the language or none.
+   * @return an {@link Optional} containing the language or none.
    */
-  public Option<String> getLanguage() {
+  public Optional<String> getLanguage() {
     return this.getFilterValue(FILTER_LANGUAGE_NAME);
   }
 
@@ -241,15 +241,15 @@ public class EventListQuery extends ResourceListQueryImpl {
    *          the start date period as {@link Tuple} with two {@link Date}.
    */
   public void withStartDate(Tuple<Date, Date> startDate) {
-    this.addFilter(createStartDateFilter(Option.option(startDate)));
+    this.addFilter(createStartDateFilter(Optional.ofNullable(startDate)));
   }
 
   /**
-   * Returns an {@link Option} containing the start date period used to filter if set
+   * Returns an {@link Optional} containing the start date period used to filter if set
    *
-   * @return an {@link Option} containing the start date period or none.
+   * @return an {@link Optional} containing the start date period or none.
    */
-  public Option<Tuple<Date, Date>> getStartDate() {
+  public Optional<Tuple<Date, Date>> getStartDate() {
     return this.getFilterValue(FILTER_STARTDATE_NAME);
   }
 
@@ -260,15 +260,15 @@ public class EventListQuery extends ResourceListQueryImpl {
    *          the status to filter for
    */
   public void withStatus(String status) {
-    this.addFilter(createStatusFilter(Option.option(status)));
+    this.addFilter(createStatusFilter(Optional.ofNullable(status)));
   }
 
   /**
-   * Returns an {@link Option} containing the status used to filter if set
+   * Returns an {@link Optional} containing the status used to filter if set
    *
-   * @return an {@link Option} containing the status or none.
+   * @return an {@link Optional} containing the status or none.
    */
-  public Option<String> getStatus() {
+  public Optional<String> getStatus() {
     return this.getFilterValue(FILTER_STATUS_NAME);
   }
 
@@ -279,15 +279,15 @@ public class EventListQuery extends ResourceListQueryImpl {
    *          the comments to filter for
    */
   public void withComments(String comments) {
-    this.addFilter(createCommentsFilter(Option.option(comments)));
+    this.addFilter(createCommentsFilter(Optional.ofNullable(comments)));
   }
 
   /**
-   * Returns an {@link Option} containing the comments used to filter if set
+   * Returns an {@link Optional} containing the comments used to filter if set
    *
-   * @return an {@link Option} containing the comments or none.
+   * @return an {@link Optional} containing the comments or none.
    */
-  public Option<String> getComments() {
+  public Optional<String> getComments() {
     return this.getFilterValue(FILTER_COMMENTS_NAME);
   }
 
@@ -298,15 +298,15 @@ public class EventListQuery extends ResourceListQueryImpl {
    *          the publishers to filter for
    */
   public void withPublishers(String publishers) {
-    this.addFilter(createPublisherFilter(Option.option(publishers)));
+    this.addFilter(createPublisherFilter(Optional.ofNullable(publishers)));
   }
 
   /**
-   * Returns an {@link Option} containing the publisher used to filter if set
+   * Returns an {@link Optional} containing the publisher used to filter if set
    *
-   * @return an {@link Option} containing the publisher or none.
+   * @return an {@link Optional} containing the publisher or none.
    */
-  public Option<String> getPublisher() {
+  public Optional<String> getPublisher() {
     return this.getFilterValue(FILTER_PUBLISHER_NAME);
   }
 
@@ -314,142 +314,142 @@ public class EventListQuery extends ResourceListQueryImpl {
    * Create a new {@link ResourceListFilter} based on the Series id
    *
    * @param seriesId
-   *          the series id to filter on wrapped in an {@link Option} or {@link Option#none()}
+   *          the series id to filter on wrapped in an {@link Optional} or {@link Optional#empty()}
    * @return a new {@link ResourceListFilter} for the Series name based query
    */
-  public static ResourceListFilter<String> createSeriesFilter(Option<String> seriesId) {
+  public static ResourceListFilter<String> createSeriesFilter(Optional<String> seriesId) {
     return FiltersUtils.generateFilter(seriesId, FILTER_SERIES_NAME, FILTER_SERIES_LABEL, SourceType.SELECT,
-            Option.some(SeriesListProvider.PROVIDER_PREFIX));
+            Optional.of(SeriesListProvider.PROVIDER_PREFIX));
   }
 
   /**
    * Create a new {@link ResourceListFilter} based on a presenter's full name
    *
    * @param presenter's
-   *          name the presenters to filter on wrapped in an {@link Option} or {@link Option#none()}
+   *          name the presenters to filter on wrapped in an {@link Optional} or {@link Optional#empty()}
    * @return a new {@link ResourceListFilter} for a presenters based query
    */
-  public static ResourceListFilter<String> createPresentersFilter(Option<String> presenter) {
+  public static ResourceListFilter<String> createPresentersFilter(Optional<String> presenter) {
     return FiltersUtils.generateFilter(presenter, FILTER_PRESENTERS_BIBLIOGRAPHIC_NAME,
-            FILTER_PRESENTERS_BIBLIOGRAPHIC_LABEL, SourceType.SELECT, Option.some(ContributorsListProvider.DEFAULT));
+            FILTER_PRESENTERS_BIBLIOGRAPHIC_LABEL, SourceType.SELECT, Optional.of(ContributorsListProvider.DEFAULT));
   }
 
   /**
    * Create a new {@link ResourceListFilter} based on a presenter's user name
    *
    * @param presenter
-   *          the presenters to filter on wrapped in an {@link Option} or {@link Option#none()}
+   *          the presenters to filter on wrapped in an {@link Optional} or {@link Optional#empty()}
    * @return a new {@link ResourceListFilter} for a presenters based query
    */
-  public static ResourceListFilter<String> createTechnicalPresentersFilter(Option<String> presenter) {
+  public static ResourceListFilter<String> createTechnicalPresentersFilter(Optional<String> presenter) {
     return FiltersUtils.generateFilter(presenter, FILTER_PRESENTERS_TECHNICAL_NAME, FILTER_PRESENTERS_TECHNICAL_LABEL,
-            SourceType.SELECT, Option.some(ContributorsListProvider.USERNAMES));
+            SourceType.SELECT, Optional.of(ContributorsListProvider.USERNAMES));
   }
 
   /**
    * Create a new {@link ResourceListFilter} based on a contributor
    *
    * @param contributor
-   *          the series id to filter on wrapped in an {@link Option} or {@link Option#none()}
+   *          the series id to filter on wrapped in an {@link Optional} or {@link Optional#empty()}
    * @return a new {@link ResourceListFilter} for a contributor based query
    */
-  public static ResourceListFilter<String> createContributorsFilter(Option<String> contributor) {
+  public static ResourceListFilter<String> createContributorsFilter(Optional<String> contributor) {
     return FiltersUtils.generateFilter(contributor, FILTER_CONTRIBUTORS_NAME, FILTER_CONTRIBUTORS_LABEL,
-            SourceType.SELECT, Option.some(ContributorsListProvider.DEFAULT));
+            SourceType.SELECT, Optional.of(ContributorsListProvider.DEFAULT));
   }
 
   /**
    * Create a new {@link ResourceListFilter} based on a location
    *
    * @param location
-   *          the location to filter on wrapped in an {@link Option} or {@link Option#none()}
+   *          the location to filter on wrapped in an {@link Optional} or {@link Optional#empty()}
    * @return a new {@link ResourceListFilter} for a location based query
    */
-  public static ResourceListFilter<String> createLocationFilter(Option<String> location) {
+  public static ResourceListFilter<String> createLocationFilter(Optional<String> location) {
     return FiltersUtils.generateFilter(location, FILTER_LOCATION_NAME, FILTER_LOCATION_LABEL, SourceType.SELECT,
-            Option.some(EventsListProvider.LOCATION));
+            Optional.of(EventsListProvider.LOCATION));
   }
 
   /**
    * Create a new {@link ResourceListFilter} based on an agent
    *
    * @param agent
-   *          the agent to filter on wrapped in an {@link Option} or {@link Option#none()}
+   *          the agent to filter on wrapped in an {@link Optional} or {@link Optional#empty()}
    * @return a new {@link ResourceListFilter} for a location based query
    */
-  public static ResourceListFilter<String> createAgentFilter(Option<String> agent) {
+  public static ResourceListFilter<String> createAgentFilter(Optional<String> agent) {
     return FiltersUtils.generateFilter(agent, FILTER_AGENT_NAME, FILTER_AGENT_LABEL, SourceType.SELECT,
-            Option.some(AgentsListProvider.NAME));
+            Optional.of(AgentsListProvider.NAME));
   }
 
   /**
    * Create a new {@link ResourceListFilter} based on a language
    *
    * @param language
-   *          the language to filter on wrapped in an {@link Option} or {@link Option#none()}
+   *          the language to filter on wrapped in an {@link Optional} or {@link Optional#empty()}
    * @return a new {@link ResourceListFilter} for a language based query
    */
-  public static ResourceListFilter<String> createLanguageFilter(Option<String> language) {
+  public static ResourceListFilter<String> createLanguageFilter(Optional<String> language) {
     return FiltersUtils.generateFilter(language, FILTER_LANGUAGE_NAME, FILTER_LANGUAGE_LABEL, SourceType.SELECT,
-            Option.some("LANGUAGES"));
+            Optional.of("LANGUAGES"));
   }
 
   /**
    * Create a new {@link ResourceListFilter} based on start date period
    *
    * @param period
-   *          the period to filter on wrapped in an {@link Option} or {@link Option#none()}
+   *          the period to filter on wrapped in an {@link Optional} or {@link Optional#empty()}
    * @return a new {@link ResourceListFilter} for the given period
    */
-  public static ResourceListFilter<Tuple<Date, Date>> createStartDateFilter(Option<Tuple<Date, Date>> period) {
+  public static ResourceListFilter<Tuple<Date, Date>> createStartDateFilter(Optional<Tuple<Date, Date>> period) {
     return FiltersUtils.generateFilter(period, FILTER_STARTDATE_NAME, FILTER_STARTDATE_LABEL, SourceType.PERIOD,
-            Option.none());
+            Optional.empty());
   }
 
   /**
    * Create a new {@link ResourceListFilter} based on stats
    *
    * @param status
-   *          the status to filter on wrapped in an {@link Option} or {@link Option#none()}
+   *          the status to filter on wrapped in an {@link Optional} or {@link Optional#empty()}
    * @return a new {@link ResourceListFilter} for progress based query
    */
-  public static ResourceListFilter<String> createStatusFilter(Option<String> status) {
+  public static ResourceListFilter<String> createStatusFilter(Optional<String> status) {
     return FiltersUtils.generateFilter(status, FILTER_STATUS_NAME, FILTER_STATUS_LABEL, SourceType.SELECT,
-            Option.some(EventsListProvider.STATUS));
+            Optional.of(EventsListProvider.STATUS));
   }
 
   /**
    * Create a new {@link ResourceListFilter} based on comments
    *
    * @param comments
-   *          the comments to filter on wrapped in an {@link Option} or {@link Option#none()}
+   *          the comments to filter on wrapped in an {@link Optional} or {@link Optional#empty()}
    * @return a new {@link ResourceListFilter} for progress based query
    */
-  public static ResourceListFilter<String> createCommentsFilter(Option<String> comments) {
+  public static ResourceListFilter<String> createCommentsFilter(Optional<String> comments) {
     return FiltersUtils.generateFilter(comments, FILTER_COMMENTS_NAME, FILTER_COMMENTS_LABEL, SourceType.SELECT,
-            Option.some(EventsListProvider.COMMENTS));
+            Optional.of(EventsListProvider.COMMENTS));
   }
 
   /**
    * Create a new {@link ResourceListFilter} based on publishers
    *
    * @param publisher
-   *          the publisher to filter on wrapped in an {@link Option} or {@link Option#none()}
+   *          the publisher to filter on wrapped in an {@link Optional} or {@link Optional#empty()}
    * @return a new {@link ResourceListFilter} for progress based query
    */
-  public static ResourceListFilter<String> createPublisherFilter(Option<String> publisher) {
+  public static ResourceListFilter<String> createPublisherFilter(Optional<String> publisher) {
     return FiltersUtils.generateFilter(publisher, FILTER_PUBLISHER_NAME, FILTER_PUBLISHER_LABEL, SourceType.SELECT,
-            Option.some(EventsListProvider.PUBLISHER));
+            Optional.of(EventsListProvider.PUBLISHER));
   }
 
   /**
    * Create a new {@link ResourceListFilter} based on is published
    * @param isPublished
-   *          the is published status to filter on wrapped in an {@link Option} or {@link Option#none()}
+   *          the is published status to filter on wrapped in an {@link Optional} or {@link Optional#empty()}
    * @return a new {@link ResourceListFilter} for progress based query
    */
-  public static ResourceListFilter<String> createIsPublishedFilter(Option<String> isPublished) {
+  public static ResourceListFilter<String> createIsPublishedFilter(Optional<String> isPublished) {
     return FiltersUtils.generateFilter(isPublished, FILTER_IS_PUBLISHED_NAME, FILTER_IS_PUBLISHED_LABEL, SourceType.SELECT,
-        Option.some(EventsListProvider.ISPUBLISHED));
+        Optional.of(EventsListProvider.ISPUBLISHED));
   }
 }

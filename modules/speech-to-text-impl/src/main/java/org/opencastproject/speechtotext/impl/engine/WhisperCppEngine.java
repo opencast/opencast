@@ -26,8 +26,6 @@ import org.opencastproject.speechtotext.api.SpeechToTextEngineException;
 import org.opencastproject.speechtotext.util.LangCodeUtil;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.OsgiUtil;
-import org.opencastproject.util.data.Option;
-import org.opencastproject.util.data.functions.Strings;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -54,6 +52,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 /** WhisperC++ implementation of the Speech-to-text engine interface. */
@@ -99,127 +98,127 @@ public class WhisperCppEngine implements SpeechToTextEngine {
   private static final String WHISPERCPP_BEAM_SIZE_CONFIG_KEY = "whispercpp.beam-size";
 
   /** Currently used whispercpp beam size */
-  private Option<Integer> whispercppBeamSize;
+  private Optional<Integer> whispercppBeamSize;
 
   /** Config key for setting whispercpp maximum segment length */
   private static final String WHISPERCPP_MAX_LENGTH_CONFIG_KEY = "whispercpp.max-len";
 
   /** Currently used whispercpp maximum segment length */
-  private Option<Integer> whispercppMaxLength;
+  private Optional<Integer> whispercppMaxLength;
 
   /** Config key for setting whispercpp number of threads */
   private static final String WHISPERCPP_THREADS_CONFIG_KEY = "whispercpp.threads";
 
   /** Currently used whispercpp number of threads */
-  private Option<Integer> whispercppThreads;
+  private Optional<Integer> whispercppThreads;
 
   /** Config key for setting whispercpp number of processors */
   private static final String WHISPERCPP_PROCESSORS_CONFIG_KEY = "whispercpp.processors";
 
   /** Currently used whispercpp number of processors */
-  private Option<Integer> whispercppProcessors;
+  private Optional<Integer> whispercppProcessors;
 
   /** Config key for setting whispercpp maximum context */
   private static final String WHISPERCPP_MAX_CONTEXT_CONFIG_KEY = "whispercpp.max-context";
 
   /** Currently used whispercpp maximum context */
-  private Option<Integer> whispercppMaxContext;
+  private Optional<Integer> whispercppMaxContext;
 
   /** Config key for setting whispercpp split on word */
   private static final String WHISPERCPP_SPLIT_ON_WORD_CONFIG_KEY = "whispercpp.split-on-word";
 
   /** Currently used whispercpp split on word */
-  private Option<Boolean> whispercppSplitOnWord;
+  private Optional<Boolean> whispercppSplitOnWord;
 
   /** Config key for setting whispercpp number of best candidates to keep */
   private static final String WHISPERCPP_BEST_OF_CONFIG_KEY = "whispercpp.best-of";
 
   /** Currently used whispercpp number of best candidates to keep */
-  private Option<Integer> whispercppBestOf;
+  private Optional<Integer> whispercppBestOf;
 
   /** Config key for setting whispercpp word probability threshold */
   private static final String WHISPERCPP_WORD_THRESHOLD_CONFIG_KEY = "whispercpp.word-thold";
 
   /** Currently used whispercpp word probability threshold */
-  private Option<Double> whispercppWordThreshold;
+  private Optional<Double> whispercppWordThreshold;
 
   /** Config key for setting whispercpp entropy threshold for decoder fail */
   private static final String WHISPERCPP_ENTROPY_THRESHOLD_CONFIG_KEY = "whispercpp.entropy-thold";
 
   /** Currently used whispercpp entropy threshold for decoder fail */
-  private Option<Double> whispercppEntropyThreshold;
+  private Optional<Double> whispercppEntropyThreshold;
 
   /** Config key for setting whispercpp log probability threshold for decoder fail */
   private static final String WHISPERCPP_LOG_PROB_THRESHOLD_CONFIG_KEY = "whispercpp.logprob-thold";
 
   /** Currently used whispercpp log probability threshold for decoder fail */
-  private Option<Double> whispercppLogProbThreshold;
+  private Optional<Double> whispercppLogProbThreshold;
 
   /** Config key for setting whispercpp diarization */
   private static final String WHISPERCPP_DIARIZATION_CONFIG_KEY = "whispercpp.diarize";
 
   /** Currently used whispercpp diarization */
-  private Option<Boolean> whispercppDiarization;
+  private Optional<Boolean> whispercppDiarization;
 
   /** Config key for setting whispercpp tinydiarization */
   private static final String WHISPERCPP_TINY_DIARIZATION_CONFIG_KEY = "whispercpp.tinydiarize";
 
   /** Currently used whispercpp tinydiarization */
-  private Option<Boolean> whispercppTinyDiarization;
+  private Optional<Boolean> whispercppTinyDiarization;
 
   /** Config key for setting whispercpp no fallback */
   private static final String WHISPERCPP_NO_FALLBACK_CONFIG_KEY = "whispercpp.no-fallback";
 
   /** Currently used whispercpp no fallback */
-  private Option<Boolean> whispercppNoFallback;
+  private Optional<Boolean> whispercppNoFallback;
 
   /** Config key for setting whispercpp Voice Activity Detection (VAD) */
   private static final String WHISPERCPP_VAD_CONFIG_KEY = "whispercpp.vad";
 
   /** Currently used whispercpp Voice Activity Detection (VAD) */
-  private Option<Boolean> whispercppVad;
+  private Optional<Boolean> whispercppVad;
 
   /** Config key for setting whispercpp VAD model */
   private static final String WHISPERCPP_VAD_MODEL_CONFIG_KEY = "whispercpp.vad-model";
 
   /** Currently used whispercpp VAD model */
-  private Option<String> whispercppVadModel;
+  private Optional<String> whispercppVadModel;
 
   /** Config key for setting whispercpp VAD threshold */
   private static final String WHISPERCPP_VAD_THRESHOLD_CONFIG_KEY = "whispercpp.vad-thold";
 
   /** Currently used whispercpp VAD threshold */
-  private Option<Double> whispercppVadThreshold;
+  private Optional<Double> whispercppVadThreshold;
 
   /** Config key for setting whispercpp VAD min speech duration */
   private static final String WHISPERCPP_VAD_MIN_SPEECH_CONFIG_KEY = "whispercpp.vad-min-speech-dur";
 
   /** Currently used whispercpp VAD min speech duration */
-  private Option<Integer> whispercppVadMinSpeech;
+  private Optional<Integer> whispercppVadMinSpeech;
 
   /** Config key for setting whispercpp VAD min silence duration */
   private static final String WHISPERCPP_VAD_MIN_SILENCE_CONFIG_KEY = "whispercpp.vad-min-silence-dur";
 
   /** Currently used whispercpp VAD min silence duration */
-  private Option<Integer> whispercppVadMinSilence;
+  private Optional<Integer> whispercppVadMinSilence;
 
   /** Config key for setting whispercpp VAD max speech duration */
   private static final String WHISPERCPP_VAD_MAX_SPEECH_CONFIG_KEY = "whispercpp.vad-max-speech-dur";
 
   /** Currently used whispercpp VAD max speech duration */
-  private Option<Double> whispercppVadMaxSpeech;
+  private Optional<Double> whispercppVadMaxSpeech;
 
   /** Config key for setting whispercpp VAD speech padding */
   private static final String WHISPERCPP_VAD_SPEECH_PADDING_CONFIG_KEY = "whispercpp.vad-speech-pad";
 
   /** Currently used whispercpp VAD speech padding */
-  private Option<Integer> whispercppVadSpeechPadding;
+  private Optional<Integer> whispercppVadSpeechPadding;
 
   /** Config key for setting whispercpp VAD samples overlap */
   private static final String WHISPERCPP_VAD_SAMPLES_OVERLAP_CONFIG_KEY = "whispercpp.vad-samples-overlap";
 
   /** Currently used whispercpp samples overlap */
-  private Option<Double> whispercppVadSamplesOverlap;
+  private Optional<Double> whispercppVadSamplesOverlap;
 
   /** Config key for automatic audio encoding */
   private static final String AUTO_ENCODING_CONFIG_KEY = "whispercpp.auto-encode";
@@ -257,113 +256,111 @@ public class WhisperCppEngine implements SpeechToTextEngine {
     logger.debug("WhisperC++ Language model set to {}", whispercppModel);
 
     whispercppBeamSize = OsgiUtil.getOptCfgAsInt(cc.getProperties(), WHISPERCPP_BEAM_SIZE_CONFIG_KEY);
-    if (whispercppBeamSize.isSome()) {
+    if (whispercppBeamSize.isPresent()) {
       logger.debug("WhisperC++ beam size set to {}", whispercppBeamSize);
     }
 
     whispercppMaxLength = OsgiUtil.getOptCfgAsInt(cc.getProperties(), WHISPERCPP_MAX_LENGTH_CONFIG_KEY);
-    if (whispercppMaxLength.isSome()) {
+    if (whispercppMaxLength.isPresent()) {
       logger.debug("WhisperC++ maximum segment length set to {}", whispercppMaxLength);
     }
 
     whispercppThreads = OsgiUtil.getOptCfgAsInt(cc.getProperties(), WHISPERCPP_THREADS_CONFIG_KEY);
-    if (whispercppThreads.isSome()) {
+    if (whispercppThreads.isPresent()) {
       logger.debug("WhisperC++ number of threads set to {}", whispercppThreads);
     }
 
     whispercppProcessors = OsgiUtil.getOptCfgAsInt(cc.getProperties(), WHISPERCPP_PROCESSORS_CONFIG_KEY);
-    if (whispercppProcessors.isSome()) {
+    if (whispercppProcessors.isPresent()) {
       logger.debug("WhisperC++ number of processors set to {}", whispercppProcessors);
     }
 
     whispercppMaxContext = OsgiUtil.getOptCfgAsInt(cc.getProperties(), WHISPERCPP_MAX_CONTEXT_CONFIG_KEY);
-    if (whispercppMaxContext.isSome()) {
+    if (whispercppMaxContext.isPresent()) {
       logger.debug("WhisperC++ max context set to {}", whispercppMaxContext);
     }
 
     whispercppSplitOnWord = OsgiUtil.getOptCfgAsBoolean(cc.getProperties(), WHISPERCPP_SPLIT_ON_WORD_CONFIG_KEY);
-    if (whispercppSplitOnWord.isSome()) {
+    if (whispercppSplitOnWord.isPresent()) {
       logger.debug("WhisperC++ split on word set to {}", whispercppSplitOnWord);
     }
 
     whispercppBestOf = OsgiUtil.getOptCfgAsInt(cc.getProperties(), WHISPERCPP_BEST_OF_CONFIG_KEY);
-    if (whispercppBestOf.isSome()) {
+    if (whispercppBestOf.isPresent()) {
       logger.debug("WhisperC++ best of set to {}", whispercppBestOf);
     }
 
-    whispercppWordThreshold = OsgiUtil.getOptCfg(cc.getProperties(), WHISPERCPP_WORD_THRESHOLD_CONFIG_KEY).bind(
-        Strings.toDouble);
-    if (whispercppWordThreshold.isSome()) {
+    whispercppWordThreshold = OsgiUtil.getOptCfgAsDouble(cc.getProperties(), WHISPERCPP_WORD_THRESHOLD_CONFIG_KEY);
+    if (whispercppWordThreshold.isPresent()) {
       logger.debug("WhisperC++ word threshold set to {}", whispercppWordThreshold);
     }
 
-    whispercppEntropyThreshold = OsgiUtil.getOptCfg(cc.getProperties(), WHISPERCPP_ENTROPY_THRESHOLD_CONFIG_KEY).bind(
-        Strings.toDouble);
-    if (whispercppEntropyThreshold.isSome()) {
+    whispercppEntropyThreshold = OsgiUtil.getOptCfgAsDouble(
+        cc.getProperties(), WHISPERCPP_ENTROPY_THRESHOLD_CONFIG_KEY);
+    if (whispercppEntropyThreshold.isPresent()) {
       logger.debug("WhisperC++ entropy threshold set to {}", whispercppEntropyThreshold);
     }
 
-    whispercppLogProbThreshold = OsgiUtil.getOptCfg(cc.getProperties(), WHISPERCPP_LOG_PROB_THRESHOLD_CONFIG_KEY).bind(
-        Strings.toDouble);
-    if (whispercppLogProbThreshold.isSome()) {
+    whispercppLogProbThreshold = OsgiUtil.getOptCfgAsDouble(
+        cc.getProperties(), WHISPERCPP_LOG_PROB_THRESHOLD_CONFIG_KEY);
+    if (whispercppLogProbThreshold.isPresent()) {
       logger.debug("WhisperC++ log prob threshold set to {}", whispercppLogProbThreshold);
     }
 
     whispercppDiarization = OsgiUtil.getOptCfgAsBoolean(cc.getProperties(), WHISPERCPP_DIARIZATION_CONFIG_KEY);
-    if (whispercppDiarization.isSome()) {
+    if (whispercppDiarization.isPresent()) {
       logger.debug("WhisperC++ diarization set to {}", whispercppDiarization);
     }
 
-    whispercppTinyDiarization = OsgiUtil.getOptCfgAsBoolean(cc.getProperties(), WHISPERCPP_TINY_DIARIZATION_CONFIG_KEY);
-    if (whispercppTinyDiarization.isSome()) {
+    whispercppTinyDiarization = OsgiUtil.getOptCfgAsBoolean(
+        cc.getProperties(), WHISPERCPP_TINY_DIARIZATION_CONFIG_KEY);
+    if (whispercppTinyDiarization.isPresent()) {
       logger.debug("WhisperC++ tiny diarization set to {}", whispercppTinyDiarization);
     }
 
     whispercppNoFallback = OsgiUtil.getOptCfgAsBoolean(cc.getProperties(), WHISPERCPP_NO_FALLBACK_CONFIG_KEY);
-    if (whispercppNoFallback.isSome()) {
+    if (whispercppNoFallback.isPresent()) {
       logger.debug("WhisperC++ no fallback set to {}", whispercppNoFallback);
     }
 
     whispercppVad = OsgiUtil.getOptCfgAsBoolean(cc.getProperties(), WHISPERCPP_VAD_CONFIG_KEY);
-    if (whispercppVad.isSome()) {
+    if (whispercppVad.isPresent()) {
       logger.debug("WhisperC++ VAD set to {}", whispercppVad);
     }
 
     whispercppVadModel = OsgiUtil.getOptCfg(cc.getProperties(), WHISPERCPP_VAD_MODEL_CONFIG_KEY);
-    if (whispercppVadModel.isSome()) {
+    if (whispercppVadModel.isPresent()) {
       logger.debug("WhisperC++ VAD model set to {}", whispercppVadModel);
     }
 
-    whispercppVadThreshold = OsgiUtil.getOptCfg(cc.getProperties(), WHISPERCPP_VAD_THRESHOLD_CONFIG_KEY).bind(
-        Strings.toDouble);
-    if (whispercppVadThreshold.isSome()) {
+    whispercppVadThreshold = OsgiUtil.getOptCfgAsDouble(cc.getProperties(), WHISPERCPP_VAD_THRESHOLD_CONFIG_KEY);
+    if (whispercppVadThreshold.isPresent()) {
       logger.debug("WhisperC++ VAD threshold set to {}", whispercppVadThreshold);
     }
 
     whispercppVadMinSpeech = OsgiUtil.getOptCfgAsInt(cc.getProperties(), WHISPERCPP_VAD_MIN_SPEECH_CONFIG_KEY);
-    if (whispercppVadMinSpeech.isSome()) {
+    if (whispercppVadMinSpeech.isPresent()) {
       logger.debug("WhisperC++ VAD min speech set to {}", whispercppVadMinSpeech);
     }
 
     whispercppVadMinSilence = OsgiUtil.getOptCfgAsInt(cc.getProperties(), WHISPERCPP_VAD_MIN_SILENCE_CONFIG_KEY);
-    if (whispercppVadMinSilence.isSome()) {
+    if (whispercppVadMinSilence.isPresent()) {
       logger.debug("WhisperC++ VAD min silence set to {}", whispercppVadMinSilence);
     }
 
-    whispercppVadMaxSpeech = OsgiUtil.getOptCfg(cc.getProperties(), WHISPERCPP_VAD_MAX_SPEECH_CONFIG_KEY).bind(
-        Strings.toDouble);
-    if (whispercppVadMaxSpeech.isSome()) {
+    whispercppVadMaxSpeech = OsgiUtil.getOptCfgAsDouble(cc.getProperties(), WHISPERCPP_VAD_MAX_SPEECH_CONFIG_KEY);
+    if (whispercppVadMaxSpeech.isPresent()) {
       logger.debug("WhisperC++ VAD max speech set to {}", whispercppVadMaxSpeech);
     }
 
     whispercppVadSpeechPadding = OsgiUtil.getOptCfgAsInt(cc.getProperties(), WHISPERCPP_VAD_SPEECH_PADDING_CONFIG_KEY);
-    if (whispercppVadSpeechPadding.isSome()) {
+    if (whispercppVadSpeechPadding.isPresent()) {
       logger.debug("WhisperC++ VAD speech padding set to {}", whispercppVadSpeechPadding);
     }
 
-    whispercppVadSamplesOverlap = OsgiUtil.getOptCfg(cc.getProperties(), WHISPERCPP_VAD_SAMPLES_OVERLAP_CONFIG_KEY)
-        .bind(Strings.toDouble);
-    if (whispercppVadSamplesOverlap.isSome()) {
+    whispercppVadSamplesOverlap = OsgiUtil.getOptCfgAsDouble(
+        cc.getProperties(), WHISPERCPP_VAD_SAMPLES_OVERLAP_CONFIG_KEY);
+    if (whispercppVadSamplesOverlap.isPresent()) {
       logger.debug("WhisperC++ VAD samples overlap set to {}", whispercppVadSamplesOverlap);
     }
 
@@ -422,84 +419,84 @@ public class WhisperCppEngine implements SpeechToTextEngine {
         "-ovtt",
         "-oj",
         "--output-file", FilenameUtils.concat(workingDirectory.getAbsolutePath(), outputName)));
-    if (whispercppBeamSize.isSome()) {
+    if (whispercppBeamSize.isPresent()) {
       command.add("-bs");
       command.add(Integer.toString(whispercppBeamSize.get()));
     }
-    if (whispercppMaxLength.isSome()) {
+    if (whispercppMaxLength.isPresent()) {
       command.add("-ml");
       command.add(Integer.toString(whispercppMaxLength.get()));
     }
-    if (whispercppThreads.isSome()) {
+    if (whispercppThreads.isPresent()) {
       command.add("-t");
       command.add(Integer.toString(whispercppThreads.get()));
     }
-    if (whispercppProcessors.isSome()) {
+    if (whispercppProcessors.isPresent()) {
       command.add("-p");
       command.add(Integer.toString(whispercppProcessors.get()));
     }
-    if (whispercppMaxContext.isSome()) {
+    if (whispercppMaxContext.isPresent()) {
       command.add("-mc");
       command.add(Integer.toString(whispercppMaxContext.get()));
     }
-    if (whispercppSplitOnWord.isSome() && whispercppSplitOnWord.get()) {
+    if (whispercppSplitOnWord.isPresent() && whispercppSplitOnWord.get()) {
       command.add("-sow");
     }
-    if (whispercppBestOf.isSome()) {
+    if (whispercppBestOf.isPresent()) {
       command.add("-bo");
       command.add(Integer.toString(whispercppBestOf.get()));
     }
-    if (whispercppWordThreshold.isSome()) {
+    if (whispercppWordThreshold.isPresent()) {
       command.add("-wt");
       command.add(String.format(Locale.US, "%f", whispercppWordThreshold.get()));
     }
-    if (whispercppEntropyThreshold.isSome()) {
+    if (whispercppEntropyThreshold.isPresent()) {
       command.add("-et");
       command.add(String.format(Locale.US, "%f", whispercppEntropyThreshold.get()));
     }
-    if (whispercppLogProbThreshold.isSome()) {
+    if (whispercppLogProbThreshold.isPresent()) {
       command.add("-lpt");
       command.add(String.format(Locale.US, "%f", whispercppLogProbThreshold.get()));
     }
-    if (whispercppDiarization.isSome() && whispercppDiarization.get()) {
+    if (whispercppDiarization.isPresent() && whispercppDiarization.get()) {
       command.add("-di");
     }
-    if (whispercppTinyDiarization.isSome() && whispercppTinyDiarization.get()) {
+    if (whispercppTinyDiarization.isPresent() && whispercppTinyDiarization.get()) {
       command.add("-tdrz");
     }
-    if (whispercppNoFallback.isSome() && whispercppNoFallback.get()) {
+    if (whispercppNoFallback.isPresent() && whispercppNoFallback.get()) {
       command.add("-nf");
     }
 
     // Optional VAD parameters
-    if (whispercppVad.isSome() && whispercppVad.get()) {
+    if (whispercppVad.isPresent() && whispercppVad.get()) {
       command.add("--vad");
     }
-    if (whispercppVadModel.isSome()) {
+    if (whispercppVadModel.isPresent()) {
       command.add("-vm");
       command.add(whispercppVadModel.get());
     }
-    if (whispercppVadThreshold.isSome()) {
+    if (whispercppVadThreshold.isPresent()) {
       command.add("-vt");
       command.add(String.format(Locale.US, "%f", whispercppVadThreshold.get()));
     }
-    if (whispercppVadMinSpeech.isSome()) {
+    if (whispercppVadMinSpeech.isPresent()) {
       command.add("-vspd");
       command.add(Integer.toString(whispercppVadMinSpeech.get()));
     }
-    if (whispercppVadMinSilence.isSome()) {
+    if (whispercppVadMinSilence.isPresent()) {
       command.add("-vsd");
       command.add(Integer.toString(whispercppVadMinSilence.get()));
     }
-    if (whispercppVadMaxSpeech.isSome()) {
+    if (whispercppVadMaxSpeech.isPresent()) {
       command.add("-vmsd");
       command.add(String.format(Locale.US, "%f", whispercppVadMaxSpeech.get()));
     }
-    if (whispercppVadSpeechPadding.isSome()) {
+    if (whispercppVadSpeechPadding.isPresent()) {
       command.add("-vp");
       command.add(Integer.toString(whispercppVadSpeechPadding.get()));
     }
-    if (whispercppVadSamplesOverlap.isSome()) {
+    if (whispercppVadSamplesOverlap.isPresent()) {
       command.add("-vo");
       command.add(String.format(Locale.US, "%f", whispercppVadSamplesOverlap.get()));
     }

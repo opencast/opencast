@@ -54,7 +54,6 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.Jsons;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.functions.Functions;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -332,33 +331,28 @@ public abstract class AbstractAclServiceRestEndpoint {
       return notFound();
     }
     try {
-      Option<AccessControlList> aclOpt = Option.some(macl.get().getAcl());
+      Optional<AccessControlList> aclOpt = Optional.of(macl.get().getAcl());
       Optional<MediaPackage> mediaPackage = getAssetManager().getMediaPackage(episodeId);
       // the episode service is the source of authority for the retrieval of media packages
       if (mediaPackage.isPresent()) {
         MediaPackage episodeSvcMp = mediaPackage.get();
-        aclOpt.fold(new Option.EMatch<AccessControlList>() {
-          // set the new episode ACL
-          @Override
-          public void esome(final AccessControlList acl) {
-            // update in episode service
-            try {
-              MediaPackage mp = getAuthorizationService().setAcl(episodeSvcMp, AclScope.Episode, acl).getA();
+        aclOpt.ifPresentOrElse(
+            acl -> { // "some" branch
+              try {
+                MediaPackage mp = getAuthorizationService()
+                    .setAcl(episodeSvcMp, AclScope.Episode, acl)
+                    .getA();
+                getAssetManager().takeSnapshot(mp);
+              } catch (MediaPackageException e) {
+                logger.error("Error getting ACL from media package", e);
+              }
+            },
+            () -> { // "none" branch
+              MediaPackage mp = getAuthorizationService()
+                  .removeAcl(episodeSvcMp, AclScope.Episode);
               getAssetManager().takeSnapshot(mp);
-            } catch (MediaPackageException e) {
-              logger.error("Error getting ACL from media package", e);
             }
-          }
-
-          // if none EpisodeACLTransition#isDelete returns true so delete the episode ACL
-          @Override
-          public void enone() {
-            // update in episode service
-            MediaPackage mp = getAuthorizationService().removeAcl(episodeSvcMp, AclScope.Episode);
-            getAssetManager().takeSnapshot(mp);
-          }
-
-        });
+        );
         return ok();
       }
       // not found

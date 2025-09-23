@@ -40,8 +40,6 @@ import org.opencastproject.util.JobUtil;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function2;
 import org.opencastproject.util.data.Monadics;
-import org.opencastproject.util.data.Option;
-import org.opencastproject.util.data.functions.Booleans;
 import org.opencastproject.util.data.functions.Misc;
 import org.opencastproject.util.data.functions.Strings;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
@@ -60,6 +58,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * The workflow definition creating a video from a still image.
@@ -132,17 +131,24 @@ public class ImageToVideoWorkflowOperationHandler extends AbstractWorkflowOperat
       logger.warn("No source tags or flavor are given to determine the image to use");
       return createResult(mp, Action.SKIP);
     }
-    final Option<MediaPackageElementFlavor> sourceFlavor = Option.option(sourceFlavors.get(0));
+    final Optional<MediaPackageElementFlavor> sourceFlavor = Optional.ofNullable(sourceFlavors.get(0));
 
     final ConfiguredTagsAndFlavors.TargetTags targetTags = tagsAndFlavors.getTargetTags();
     List<MediaPackageElementFlavor> targetFlavors = tagsAndFlavors.getTargetFlavors();
-    final Option<MediaPackageElementFlavor> targetFlavor = Option.option(targetFlavors.get(0));
-    final double duration = getCfg(wi, OPT_DURATION).bind(Strings.toDouble).getOrElse(
-            this.<Double> cfgKeyMissing(OPT_DURATION));
-    final String profile = getCfg(wi, OPT_PROFILE).getOrElse(this.<String> cfgKeyMissing(OPT_PROFILE));
+    final Optional<MediaPackageElementFlavor> targetFlavor = Optional.ofNullable(targetFlavors.get(0));
+    final double duration = getCfg(wi, OPT_DURATION)
+        .flatMap(Strings::toDouble)
+        .orElseGet(() -> this.<Double>cfgKeyMissing(OPT_DURATION).apply());
+    final String profile = getCfg(wi, OPT_PROFILE).orElseGet(() -> this.<String>cfgKeyMissing(OPT_PROFILE).apply());
     // run image to video jobs
+    final Function<MediaPackageElement, Boolean> flavorFilter;
+    if (sourceFlavor.isPresent()) {
+      flavorFilter = Filters.matchesFlavor(sourceFlavor.get());
+    } else {
+      flavorFilter = alwaysTrue;
+    }
     final List<Job> jobs = Monadics.<MediaPackageElement> mlist(mp.getAttachments())
-            .filter(sourceFlavor.map(Filters.matchesFlavor).getOrElse(Booleans.<MediaPackageElement> yes()))
+            .filter(flavorFilter)
             .filter(Filters.hasTagAny(sourceTags)).map(Misc.<MediaPackageElement, Attachment> cast())
             .map(imageToVideo(profile, duration)).value();
     if (JobUtil.waitForJobs(serviceRegistry, jobs).isSuccess()) {
@@ -154,8 +160,8 @@ public class ImageToVideoWorkflowOperationHandler extends AbstractWorkflowOperat
           // Adjust the target tags
           applyTargetTagsToElement(targetTags, track);
           // Adjust the target flavor.
-          for (MediaPackageElementFlavor flavor : targetFlavor) {
-            track.setFlavor(flavor);
+          if (targetFlavor.isPresent()) {
+            track.setFlavor(targetFlavor.get());
           }
           // store new tracks to mediaPackage
           mp.add(track);
@@ -186,6 +192,14 @@ public class ImageToVideoWorkflowOperationHandler extends AbstractWorkflowOperat
       }
     };
   }
+
+  // Fallback function if sourceFlavor is empty
+  private final Function<MediaPackageElement, Boolean> alwaysTrue = new Function<MediaPackageElement, Boolean>() {
+    @Override
+    public Boolean apply(MediaPackageElement mpe) {
+      return true;
+    }
+  };
 
   @Reference
   @Override  public void setServiceRegistry(ServiceRegistry serviceRegistry) {

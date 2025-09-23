@@ -21,9 +21,8 @@
 
 package org.opencastproject.schema;
 
-import org.opencastproject.util.data.Option;
-
 import java.util.Date;
+import java.util.Optional;
 
 /**
  * Opencast Dublin Core schema.
@@ -34,113 +33,113 @@ import java.util.Date;
  * <a href="http://dublincore.org/documents/dcmi-type-vocabulary/#H2">DublinCore /terms/ namespace</a>.
  */
 public interface OcDublinCore {
-  Option<String> getAbstract();
+  Optional<String> getAbstract();
 
-  Option<String> getAccessRights();
+  Optional<String> getAccessRights();
 
-  Option<String> getAccrualMethod();
+  Optional<String> getAccrualMethod();
 
-  Option<String> getAccrualPeriodicity();
+  Optional<String> getAccrualPeriodicity();
 
-  Option<String> getAccrualPolicy();
+  Optional<String> getAccrualPolicy();
 
-  Option<String> getAlternative();
+  Optional<String> getAlternative();
 
-  Option<String> getAudience();
+  Optional<String> getAudience();
 
-  Option<String> getAvailable();
+  Optional<String> getAvailable();
 
-  Option<String> getBibliographicCitation();
+  Optional<String> getBibliographicCitation();
 
-  Option<String> getConformsTo();
+  Optional<String> getConformsTo();
 
-  Option<String> getContributor();
+  Optional<String> getContributor();
 
-  Option<String> getCoverage();
+  Optional<String> getCoverage();
 
   Date getCreated();
 
-  Option<String> getCreator();
+  Optional<String> getCreator();
 
-  Option<Date> getDate();
+  Optional<Date> getDate();
 
-  Option<Date> getDateAccepted();
+  Optional<Date> getDateAccepted();
 
-  Option<Date> getDateCopyrighted();
+  Optional<Date> getDateCopyrighted();
 
-  Option<Date> getDateSubmitted();
+  Optional<Date> getDateSubmitted();
 
-  Option<String> getDescription();
+  Optional<String> getDescription();
 
-  Option<String> getEducationLevel();
+  Optional<String> getEducationLevel();
 
-  Option<Long> getExtent();
+  Optional<Long> getExtent();
 
-  Option<String> getFormat();
+  Optional<String> getFormat();
 
-  Option<String> getHasFormat();
+  Optional<String> getHasFormat();
 
-  Option<String> getHasPart();
+  Optional<String> getHasPart();
 
-  Option<String> getHasVersion();
+  Optional<String> getHasVersion();
 
-  Option<String> getIdentifier();
+  Optional<String> getIdentifier();
 
-  Option<String> getInstructionalMethod();
+  Optional<String> getInstructionalMethod();
 
-  Option<String> getIsFormatOf();
+  Optional<String> getIsFormatOf();
 
-  Option<String> getIsPartOf();
+  Optional<String> getIsPartOf();
 
-  Option<String> getIsReferencedBy();
+  Optional<String> getIsReferencedBy();
 
-  Option<String> getIsReplacedBy();
+  Optional<String> getIsReplacedBy();
 
-  Option<String> getIsRequiredBy();
+  Optional<String> getIsRequiredBy();
 
-  Option<String> getIssued();
+  Optional<String> getIssued();
 
-  Option<String> getIsVersionOf();
+  Optional<String> getIsVersionOf();
 
-  Option<String> getLanguage();
+  Optional<String> getLanguage();
 
-  Option<String> getLicense();
+  Optional<String> getLicense();
 
-  Option<String> getMediator();
+  Optional<String> getMediator();
 
-  Option<String> getMedium();
+  Optional<String> getMedium();
 
-  Option<String> getModified();
+  Optional<String> getModified();
 
-  Option<String> getProvenance();
+  Optional<String> getProvenance();
 
-  Option<String> getPublisher();
+  Optional<String> getPublisher();
 
-  Option<String> getReferences();
+  Optional<String> getReferences();
 
-  Option<String> getRelation();
+  Optional<String> getRelation();
 
-  Option<String> getReplaces();
+  Optional<String> getReplaces();
 
-  Option<String> getRequires();
+  Optional<String> getRequires();
 
-  Option<String> getRights();
+  Optional<String> getRights();
 
-  Option<String> getRightsHolder();
+  Optional<String> getRightsHolder();
 
-  Option<String> getSource();
+  Optional<String> getSource();
 
-  Option<String> getSpatial();
+  Optional<String> getSpatial();
 
-  Option<String> getSubject();
+  Optional<String> getSubject();
 
-  Option<String> getTableOfContents();
+  Optional<String> getTableOfContents();
 
-  Option<String> getTemporal();
+  Optional<String> getTemporal();
 
   String getTitle();
 
-  Option<String> getType();
+  Optional<String> getType();
 
-  Option<String> getValid();
+  Optional<String> getValid();
 }

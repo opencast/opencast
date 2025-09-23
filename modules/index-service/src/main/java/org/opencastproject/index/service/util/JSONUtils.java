@@ -26,7 +26,6 @@ import org.opencastproject.list.api.ListProvidersService;
 import org.opencastproject.list.api.ResourceListFilter;
 import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.security.api.Organization;
-import org.opencastproject.util.data.Option;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -45,6 +44,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 
 /**
  * Utility class providing helpers for all operation related to JSON.
@@ -155,9 +155,9 @@ public final class JSONUtils {
       filterObject.addProperty("type", f.getSourceType().toString().toLowerCase());
       filterObject.addProperty("label", f.getLabel());
 
-      Option<String> listProviderName = f.getValuesListName();
+      Optional<String> listProviderName = f.getValuesListName();
 
-      if (listProviderName.isSome()) {
+      if (listProviderName.isPresent()) {
         Map<String, String> values;
         boolean translatable = false;
 
@@ -213,9 +213,9 @@ public final class JSONUtils {
       filterObject.addProperty("type", filter.getSourceType().toString().toLowerCase());
       filterObject.addProperty("label", filter.getLabel());
 
-      Option<String> listProviderName = filter.getValuesListName();
+      Optional<String> listProviderName = filter.getValuesListName();
 
-      if (listProviderName.isSome()) {
+      if (listProviderName.isPresent()) {
         String providerName = listProviderName.get();
         JsonObject optionsJson = new JsonObject();
         boolean translatable = false;
