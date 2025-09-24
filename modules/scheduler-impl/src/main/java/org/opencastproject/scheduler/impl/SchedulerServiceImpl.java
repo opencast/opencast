@@ -27,7 +27,6 @@ import static org.opencastproject.util.EqualsUtil.ne;
 import static org.opencastproject.util.RequireUtil.notEmpty;
 import static org.opencastproject.util.RequireUtil.notNull;
 import static org.opencastproject.util.RequireUtil.requireTrue;
-import static org.opencastproject.util.data.Monadics.mlist;
 
 import org.opencastproject.assetmanager.api.Asset;
 import org.opencastproject.assetmanager.api.AssetManager;
@@ -811,8 +810,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   private Optional<DublinCoreCatalog> loadEpisodeDublinCoreFromAsset(Snapshot snapshot) {
-    Optional<MediaPackageElement> dcCatalog = mlist(snapshot.getMediaPackage().getElements())
-            .filter(MediaPackageSupport.Filters.isEpisodeDublinCore).headOpt();
+    Optional<MediaPackageElement> dcCatalog = Arrays.stream(snapshot.getMediaPackage().getElements())
+        .filter(mpe -> MediaPackageSupport.Filters.isEpisodeDublinCore.apply(mpe))
+        .findFirst();
     if (dcCatalog.isEmpty())
       return Optional.empty();
 

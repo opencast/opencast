@@ -21,8 +21,6 @@
 
 package org.opencastproject.workflow.handler.composer;
 
-import static org.opencastproject.util.data.Monadics.mlist;
-
 import org.opencastproject.composer.api.ComposerService;
 import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.job.api.Job;
@@ -38,9 +36,6 @@ import org.opencastproject.mediapackage.Track;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.JobUtil;
 import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Function2;
-import org.opencastproject.util.data.Monadics;
-import org.opencastproject.util.data.functions.Misc;
 import org.opencastproject.util.data.functions.Strings;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
@@ -57,8 +52,10 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * The workflow definition creating a video from a still image.
@@ -147,10 +144,12 @@ public class ImageToVideoWorkflowOperationHandler extends AbstractWorkflowOperat
     } else {
       flavorFilter = alwaysTrue;
     }
-    final List<Job> jobs = Monadics.<MediaPackageElement> mlist(mp.getAttachments())
-            .filter(flavorFilter)
-            .filter(Filters.hasTagAny(sourceTags)).map(Misc.<MediaPackageElement, Attachment> cast())
-            .map(imageToVideo(profile, duration)).value();
+    final List<Job> jobs = Arrays.stream(mp.getAttachments())
+        .filter(mpe -> flavorFilter.apply(mpe))
+        .filter(mpe -> Filters.hasTagAny(sourceTags).apply(mpe))
+        .map(mpe -> (Attachment) mpe)
+        .map(imageToVideo(profile, duration)::apply)
+        .collect(Collectors.toList());
     if (JobUtil.waitForJobs(serviceRegistry, jobs).isSuccess()) {
       for (final Job job : jobs) {
         if (job.getPayload().length() > 0) {
@@ -171,12 +170,12 @@ public class ImageToVideoWorkflowOperationHandler extends AbstractWorkflowOperat
           return createResult(mp, Action.SKIP);
         }
       }
-      return createResult(mp, Action.CONTINUE, mlist(jobs).foldl(0L, new Function2<Long, Job, Long>() {
-        @Override
-        public Long apply(Long max, Job job) {
-          return Math.max(max, job.getQueueTime());
-        }
-      }));
+      return createResult(mp, Action.CONTINUE,
+          jobs.stream()
+              .mapToLong(Job::getQueueTime)
+              .max()
+              .orElse(0L)
+      );
     } else {
       throw new WorkflowOperationException("The image to video encoding jobs did not return successfully");
     }

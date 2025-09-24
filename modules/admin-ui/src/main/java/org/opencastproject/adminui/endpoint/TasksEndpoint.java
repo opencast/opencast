@@ -126,7 +126,7 @@ public class TasksEndpoint {
   @Path("processing.json")
   @RestQuery(name = "getProcessing", description = "Returns all the data related to the processing tab in the new tasks modal as JSON", returnDescription = "All the data related to the tasks processing tab as JSON", restParameters = { @RestParameter(name = "tags", isRequired = false, description = "A comma separated list of tags to filter the workflow definitions", type = RestParameter.Type.STRING) }, responses = { @RestResponse(responseCode = SC_OK, description = "Returns all the data related to the tasks processing tab as JSON") })
   public Response getProcessing(@QueryParam("tags") String tagsString) {
-    List<String> tags = RestUtil.splitCommaSeparatedParam(Optional.ofNullable(tagsString)).value();
+    List<String> tags = RestUtil.splitCommaSeparatedParam(Optional.ofNullable(tagsString));
 
     JsonArray actions = new JsonArray();
     try {

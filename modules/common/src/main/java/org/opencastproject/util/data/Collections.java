@@ -70,7 +70,7 @@ public final class Collections {
    *          the (empty) target collection
    * @param f
    *          the function to apply to each element of <code>as</code>
-   * @deprecated use {@link Monadics}
+   * @deprecated
    */
   @Deprecated
   public static <A, B, M extends Collection<B>> M map(Collection<A> as, M bs, Function<A, B> f) {
@@ -91,7 +91,7 @@ public final class Collections {
    *
    * @throws RuntimeException
    *           if the target collection cannot be created
-   * @deprecated use {@link Monadics}
+   * @deprecated
    */
   @Deprecated
   public static <A, B> Collection<B> map(Collection<A> as, Function<A, B> f) {
@@ -107,7 +107,7 @@ public final class Collections {
    *
    * The type of collection <code>as</code> needs a parameterless constructor.
    *
-   * @deprecated use {@link Monadics}
+   * @deprecated
    */
   @Deprecated
   public static <A, M extends Collection<A>> M filter(M as, Predicate<A> p) {

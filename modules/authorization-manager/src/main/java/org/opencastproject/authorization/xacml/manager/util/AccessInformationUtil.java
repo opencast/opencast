@@ -21,13 +21,10 @@
 
 package org.opencastproject.authorization.xacml.manager.util;
 
-import static org.opencastproject.util.data.Monadics.mlist;
-
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AccessControlUtil;
-import org.opencastproject.util.data.Predicate;
 
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -152,12 +149,9 @@ public final class AccessInformationUtil {
    * @return an {@link Optional} wrapping the matching ACL or none if not found
    */
   public static Optional<ManagedAcl> matchAcls(List<ManagedAcl> acls, final AccessControlList acl) {
-    return mlist(acls).find(new Predicate<ManagedAcl>() {
-      @Override
-      public Boolean apply(ManagedAcl macl) {
-        return AccessControlUtil.equals(acl, macl.getAcl());
-      }
-    });
+    return acls.stream()
+        .filter(macl -> AccessControlUtil.equals(acl, macl.getAcl()))
+        .findFirst();
   }
 
   /**

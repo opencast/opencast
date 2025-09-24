@@ -21,8 +21,6 @@
 
 package org.opencastproject.job.api;
 
-import static org.opencastproject.util.data.Monadics.mlist;
-
 import org.opencastproject.serviceregistry.api.IncidentL10n;
 import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.util.data.Function;
@@ -30,6 +28,7 @@ import org.opencastproject.util.data.Function;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -85,7 +84,9 @@ public final class JaxbIncidentFull {
     this.date = incident.getTimestamp();
     this.severity = incident.getSeverity().name();
     this.code = incident.getCode();
-    this.details = mlist(incident.getDetails()).map(JaxbIncidentDetail.mkFn).value();
+    this.details = incident.getDetails().stream()
+        .map(JaxbIncidentDetail.mkFn::apply)
+        .collect(Collectors.toList());
     this.description = l10n.getDescription();
   }
 

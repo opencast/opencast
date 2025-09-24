@@ -58,7 +58,6 @@ import static org.opencastproject.scheduler.api.RecordingState.UPLOAD_FINISHED;
 import static org.opencastproject.util.EqualsUtil.eqObj;
 import static org.opencastproject.util.UrlSupport.uri;
 import static org.opencastproject.util.data.Collections.map;
-import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.assetmanager.api.AssetManager;
@@ -123,8 +122,6 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.XmlNamespaceContext;
 import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Monadics;
-import org.opencastproject.util.data.functions.Misc;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
@@ -1507,17 +1504,21 @@ public class SchedulerServiceImplTest {
     for (Object co : cal.getComponents()) {
       final Component c = (Component) co;
       assertEquals("SUMMARY property should contain the DC title", title, c.getProperty(Property.SUMMARY).getValue());
-      final Monadics.ListMonadic<Property> attachments = mlist(c.getProperties(Property.ATTACH))
-              .map(Misc.<Object, Property> cast());
+      final List<Property> attachments = c.getProperties(Property.ATTACH).stream()
+          .map(obj -> (Property) obj)
+          .collect(Collectors.toList());
       // episode dublin core
-      final List<DublinCoreCatalog> dcsIcal = attachments.filter(byParamNameAndValue("X-APPLE-FILENAME", "episode.xml"))
-              .map(parseDc.o(decodeBase64).o(getValue)).value();
+      final List<DublinCoreCatalog> dcsIcal = attachments.stream()
+          .filter(byParamNameAndValue("X-APPLE-FILENAME", "episode.xml")::apply)
+          .map(p -> parseDc.o(decodeBase64).o(getValue).apply(p))
+          .toList();
       assertEquals("number of episode DCs", 1, dcsIcal.size());
       assertEquals("dcterms:title", title, dcsIcal.get(0).getFirst(PROPERTY_TITLE));
       // capture agent properties
-      final List<Properties> caPropsIcal = attachments
-              .filter(byParamNameAndValue("X-APPLE-FILENAME", "org.opencastproject.capture.agent.properties"))
-              .map(parseProperties.o(decodeBase64).o(getValue)).value();
+      final List<Properties> caPropsIcal = attachments.stream()
+          .filter(byParamNameAndValue("X-APPLE-FILENAME", "org.opencastproject.capture.agent.properties")::apply)
+          .map(p -> parseProperties.o(decodeBase64).o(getValue).apply(p))
+          .toList();
       assertEquals("number of CA property sets", 1, caPropsIcal.size());
       assertTrue("CA properties", eqObj(caProps, caPropsIcal.get(0)));
     }

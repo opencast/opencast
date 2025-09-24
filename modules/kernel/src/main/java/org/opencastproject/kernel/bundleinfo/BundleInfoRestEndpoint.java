@@ -32,12 +32,9 @@ import static org.opencastproject.util.RestUtil.R.notFound;
 import static org.opencastproject.util.RestUtil.R.ok;
 import static org.opencastproject.util.data.Collections.set;
 import static org.opencastproject.util.data.Collections.toArray;
-import static org.opencastproject.util.data.Monadics.mlist;
 
 import org.opencastproject.util.Jsons;
 import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Monadics;
-import org.opencastproject.util.data.functions.Functions;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -51,6 +48,8 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
@@ -94,9 +93,11 @@ public abstract class BundleInfoRestEndpoint {
       @RestResponse(description = "A list of bundles.", responseCode = HttpServletResponse.SC_OK) },
     returnDescription = "The search results, expressed as xml or json.")
   public Response getVersions() {
-    final Monadics.ListMonadic<Jsons.Val> bundleInfos = mlist(getDb().getBundles()).map(
-            Functions.<BundleInfo, Jsons.Val> co(bundleInfo));
-    return ok(obj(p("bundleInfos", arr(bundleInfos)), p("count", bundleInfos.value().size())));
+    List<Jsons.Val> bundleInfos = getDb().getBundles().stream()
+        .map(b -> (Jsons.Val) bundleInfo.apply(b))
+        .toList();
+
+    return ok(obj(p("bundleInfos", arr(bundleInfos)), p("count", bundleInfos.size())));
   }
 
   /** Return true if all bundles have the same bundle version and build number. */
@@ -169,10 +170,13 @@ public abstract class BundleInfoRestEndpoint {
                 .append(obj(p("last-modified", lastModified))));
           default:
             // multiple versions found
-            return ok(obj(p("consistent", false),
-                          p("versions",
-                            arr(mlist(versions.iterator())
-                                    .map(Functions.<BundleVersion, Jsons.Val> co(fullVersionJson))))));
+            return ok(obj(
+                p("consistent", false),
+                p("versions",
+                    arr(StreamSupport.stream(versions.spliterator(), false)
+                        .map(v -> (Jsons.Val) fullVersionJson.apply(v))
+                        .collect(Collectors.toList())))
+            ));
         }
       }
     });

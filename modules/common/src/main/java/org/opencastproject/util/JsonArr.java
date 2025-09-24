@@ -21,8 +21,6 @@
 
 package org.opencastproject.util;
 
-import static org.opencastproject.util.data.Monadics.mlist;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -40,6 +38,8 @@ public final class JsonArr implements Iterable<JsonVal> {
 
   @Override
   public Iterator<JsonVal> iterator() {
-    return mlist(val).map(JsonVal.asJsonVal).iterator();
+    return val.stream()
+        .map(JsonVal.asJsonVal::apply)
+        .iterator();
   }
 }

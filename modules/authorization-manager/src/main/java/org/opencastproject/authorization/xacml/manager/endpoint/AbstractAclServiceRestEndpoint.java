@@ -31,7 +31,6 @@ import static org.opencastproject.util.RestUtil.R.noContent;
 import static org.opencastproject.util.RestUtil.R.notFound;
 import static org.opencastproject.util.RestUtil.R.ok;
 import static org.opencastproject.util.RestUtil.R.serverError;
-import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
@@ -63,6 +62,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.List;
 import java.util.Optional;
 
 import javax.ws.rs.DELETE;
@@ -197,8 +197,10 @@ public abstract class AbstractAclServiceRestEndpoint {
       }
   )
   public String getAcls() {
-    return Jsons.arr(mlist(aclService().getAcls()).map(Functions.co(JsonConv.fullManagedAcl)))
-            .toJson();
+    List<Jsons.Val> acls = aclService().getAcls().stream()
+        .map(Functions.co(JsonConv.fullManagedAcl)::apply)
+        .toList();
+    return Jsons.arr(acls).toJson();
   }
 
   @POST

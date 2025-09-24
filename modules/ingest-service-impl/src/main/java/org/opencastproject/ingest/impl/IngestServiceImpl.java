@@ -27,7 +27,6 @@ import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TITLE;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLE;
 import static org.opencastproject.util.JobUtil.waitForJob;
-import static org.opencastproject.util.data.Monadics.mlist;
 
 import org.opencastproject.authorization.xacml.XACMLParsingException;
 import org.opencastproject.authorization.xacml.XACMLUtils;
@@ -2019,9 +2018,9 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    */
   private Optional<org.w3c.dom.Document> loadSmilDocument(final WorkingFileRepository workingFileRepository,
           MediaPackage mp) {
-    return mlist(mp.getElements())
-        .filter(MediaPackageSupport.Filters.isSmilCatalog)
-        .headOpt()
+    return Arrays.stream(mp.getElements())
+        .filter(MediaPackageSupport.Filters.isSmilCatalog::apply)
+        .findFirst()
         .map(mpe -> {
           try (InputStream in = workingFileRepository.get(
               mpe.getMediaPackage().getIdentifier().toString(),

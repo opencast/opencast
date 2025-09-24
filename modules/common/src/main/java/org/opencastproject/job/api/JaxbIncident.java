@@ -22,18 +22,17 @@
 package org.opencastproject.job.api;
 
 import static org.opencastproject.util.data.Collections.nullToNil;
-import static org.opencastproject.util.data.Monadics.mlist;
 
 import org.opencastproject.job.api.Incident.Severity;
 import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Function2;
+import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.jaxb.UtcTimestampAdapter;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -92,8 +91,12 @@ public final class JaxbIncident {
     this.timestamp = new Date(incident.getTimestamp().getTime());
     this.severity = incident.getSeverity();
     this.code = incident.getCode();
-    this.descriptionParameters = mlist(incident.getDescriptionParameters().entrySet()).map(Param.mkFn).value();
-    this.details = mlist(incident.getDetails()).map(JaxbIncidentDetail.mkFn).value();
+    this.descriptionParameters = incident.getDescriptionParameters().entrySet().stream()
+        .map(Param.mkFn::apply)
+        .collect(Collectors.toList());
+    this.details = incident.getDetails().stream()
+        .map(JaxbIncidentDetail.mkFn::apply)
+        .collect(Collectors.toList());
   }
 
   public static final Function<Incident, JaxbIncident> mkFn = new Function<Incident, JaxbIncident>() {
@@ -104,16 +107,27 @@ public final class JaxbIncident {
   };
 
   public Incident toIncident() {
-    return new IncidentImpl(id, jobId, serviceType, processingHost, timestamp, severity, code,
-            mlist(nullToNil(details)).map(JaxbIncidentDetail.toDetailFn).value(), mlist(
-                    nullToNil(descriptionParameters)).foldl(new HashMap<>(),
-                    new Function2<Map<String, String>, Param, Map<String, String>>() {
-                      @Override
-                      public Map<String, String> apply(Map<String, String> sum, Param param) {
-                        sum.put(param.getName(), param.getValue());
-                        return sum;
-                      }
-                    }));
+    List<Tuple<String, String>> mappedDetails = nullToNil(details).stream()
+        .map(JaxbIncidentDetail.toDetailFn::apply)
+        .collect(Collectors.toList());
+
+    Map<String, String> paramMap = nullToNil(descriptionParameters).stream()
+        .collect(Collectors.toMap(
+            Param::getName,
+            Param::getValue
+        ));
+
+    return new IncidentImpl(
+        id,
+        jobId,
+        serviceType,
+        processingHost,
+        timestamp,
+        severity,
+        code,
+        mappedDetails,
+        paramMap
+    );
   }
 
   public static final Function<JaxbIncident, Incident> toIncidentFn = new Function<JaxbIncident, Incident>() {

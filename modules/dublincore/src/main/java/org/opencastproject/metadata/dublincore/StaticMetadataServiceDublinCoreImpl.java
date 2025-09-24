@@ -41,7 +41,6 @@ import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TEMPOR
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TITLE;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TYPE;
 import static org.opencastproject.util.data.Collections.head;
-import static org.opencastproject.util.data.Monadics.mlist;
 
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -72,6 +71,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * This service provides {@link org.opencastproject.metadata.api.StaticMetadata} for a given mediapackage,
@@ -196,26 +196,38 @@ public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataServic
           }
           return Optional.of(Interval.fromValues(p.getStart(), p.getEnd()));
         });
-    final NonEmptyList<MetadataValue<String>> titles = new NonEmptyList<MetadataValue<String>>(
-            mlist(episode.get(PROPERTY_TITLE)).map(dc2mvString(PROPERTY_TITLE.getLocalName())).value());
-    final List<MetadataValue<String>> subjects =
-            mlist(episode.get(PROPERTY_SUBJECT)).map(dc2mvString(PROPERTY_SUBJECT.getLocalName())).value();
-    final List<MetadataValue<String>> creators =
-            mlist(episode.get(PROPERTY_CREATOR)).map(dc2mvString(PROPERTY_CREATOR.getLocalName())).value();
-    final List<MetadataValue<String>> publishers =
-            mlist(episode.get(PROPERTY_PUBLISHER)).map(dc2mvString(PROPERTY_PUBLISHER.getLocalName())).value();
-    final List<MetadataValue<String>> contributors =
-            mlist(episode.get(PROPERTY_CONTRIBUTOR)).map(dc2mvString(PROPERTY_CONTRIBUTOR.getLocalName())).value();
-    final List<MetadataValue<String>> description =
-            mlist(episode.get(PROPERTY_DESCRIPTION)).map(dc2mvString(PROPERTY_DESCRIPTION.getLocalName())).value();
-    final List<MetadataValue<String>> rightsHolders =
-            mlist(episode.get(PROPERTY_RIGHTS_HOLDER)).map(dc2mvString(PROPERTY_RIGHTS_HOLDER.getLocalName())).value();
-    final List<MetadataValue<String>> spatials =
-            mlist(episode.get(PROPERTY_SPATIAL)).map(dc2mvString(PROPERTY_SPATIAL.getLocalName())).value();
-    final List<MetadataValue<String>> accessRights =
-            mlist(episode.get(PROPERTY_ACCESS_RIGHTS)).map(dc2mvString(PROPERTY_ACCESS_RIGHTS.getLocalName())).value();
-    final List<MetadataValue<String>> licenses =
-            mlist(episode.get(PROPERTY_LICENSE)).map(dc2mvString(PROPERTY_LICENSE.getLocalName())).value();
+    final NonEmptyList<MetadataValue<String>> titles = new NonEmptyList<>(
+        episode.get(PROPERTY_TITLE).stream()
+            .map(dc2mvString(PROPERTY_TITLE.getLocalName())::apply)
+            .collect(Collectors.toList())
+    );
+    final List<MetadataValue<String>> subjects = episode.get(PROPERTY_SUBJECT).stream()
+            .map(dc2mvString(PROPERTY_SUBJECT.getLocalName())::apply)
+            .collect(Collectors.toList());
+    final List<MetadataValue<String>> creators = episode.get(PROPERTY_CREATOR).stream()
+            .map(dc2mvString(PROPERTY_CREATOR.getLocalName())::apply)
+            .collect(Collectors.toList());
+    final List<MetadataValue<String>> publishers = episode.get(PROPERTY_PUBLISHER).stream()
+            .map(dc2mvString(PROPERTY_PUBLISHER.getLocalName())::apply)
+            .collect(Collectors.toList());
+    final List<MetadataValue<String>> contributors = episode.get(PROPERTY_CONTRIBUTOR).stream()
+            .map(dc2mvString(PROPERTY_CONTRIBUTOR.getLocalName())::apply)
+            .collect(Collectors.toList());
+    final List<MetadataValue<String>> description = episode.get(PROPERTY_DESCRIPTION).stream()
+            .map(dc2mvString(PROPERTY_DESCRIPTION.getLocalName())::apply)
+            .collect(Collectors.toList());
+    final List<MetadataValue<String>> rightsHolders = episode.get(PROPERTY_RIGHTS_HOLDER).stream()
+            .map(dc2mvString(PROPERTY_RIGHTS_HOLDER.getLocalName())::apply)
+            .collect(Collectors.toList());
+    final List<MetadataValue<String>> spatials = episode.get(PROPERTY_SPATIAL).stream()
+            .map(dc2mvString(PROPERTY_SPATIAL.getLocalName())::apply)
+            .collect(Collectors.toList());
+    final List<MetadataValue<String>> accessRights = episode.get(PROPERTY_ACCESS_RIGHTS).stream()
+            .map(dc2mvString(PROPERTY_ACCESS_RIGHTS.getLocalName())::apply)
+            .collect(Collectors.toList());
+    final List<MetadataValue<String>> licenses = episode.get(PROPERTY_LICENSE).stream()
+            .map(dc2mvString(PROPERTY_LICENSE.getLocalName())::apply)
+            .collect(Collectors.toList());
 
     return new StaticMetadata() {
       @Override

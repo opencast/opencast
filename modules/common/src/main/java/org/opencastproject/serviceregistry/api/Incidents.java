@@ -21,7 +21,6 @@
 
 package org.opencastproject.serviceregistry.api;
 
-import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.job.api.Incident;
@@ -183,7 +182,8 @@ public final class Incidents {
   }
 
   static boolean findFailure(IncidentTree r) {
-    return mlist(r.getIncidents()).exists(isFailure) || mlist(r.getDescendants()).exists(findFailureFn);
+    return r.getIncidents().stream().anyMatch(isFailure::apply)
+        || r.getDescendants().stream().anyMatch(findFailureFn::apply);
   }
 
   static final Function<IncidentTree, Boolean> findFailureFn = new Function<IncidentTree, Boolean>() {

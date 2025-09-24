@@ -36,7 +36,6 @@ import static org.opencastproject.util.Jsons.obj;
 import static org.opencastproject.util.Jsons.p;
 import static org.opencastproject.util.Jsons.v;
 import static org.opencastproject.util.RestUtil.generateErrorResponse;
-import static org.opencastproject.util.data.Monadics.mlist;
 
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.capture.admin.api.AgentState;
@@ -124,6 +123,7 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -411,7 +411,10 @@ public class SchedulerRestService {
         lastHeard = v(DateTimeSupport.toUTC(metadata.getRecording().get().getLastCheckinTime()));
       }
 
-      Arr presenters = arr(mlist(metadata.getPresenters()).map(Jsons.stringVal));
+      List<Val> presenterVals = metadata.getPresenters().stream()
+          .map(s -> Jsons.stringVal.apply(s))
+          .collect(Collectors.toList());
+      Arr presenters = arr(presenterVals);
       List<Prop> wfProperties = new ArrayList<>();
       for (Entry<String, String> entry : metadata.getWorkflowProperties().entrySet()) {
         wfProperties.add(p(entry.getKey(), entry.getValue()));

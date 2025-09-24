@@ -21,9 +21,6 @@
 
 package org.opencastproject.composer.layout;
 
-import static org.opencastproject.util.data.Monadics.mlist;
-
-import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Tuple;
 
 import java.util.List;
@@ -92,13 +89,11 @@ public final class LayoutManager {
    */
   public static MultiShapeLayout multiShapeLayout(final Dimension canvas,
                                                   final List<Tuple<Dimension, HorizontalCoverageLayoutSpec>> shapes) {
-    return new MultiShapeLayout(
-            canvas,
-            mlist(shapes).map(new Function<Tuple<Dimension, HorizontalCoverageLayoutSpec>, Layout>() {
-              @Override public Layout apply(Tuple<Dimension, HorizontalCoverageLayoutSpec> a) {
-                return calcLayout(canvas, a.getA(), a.getB());
-              }
-            }).value());
+    List<Layout> layouts = shapes.stream()
+        .map(a -> calcLayout(canvas, a.getA(), a.getB()))
+        .toList();
+
+    return new MultiShapeLayout(canvas, layouts);
   }
 
   /**
@@ -113,13 +108,11 @@ public final class LayoutManager {
   public static MultiShapeLayout absoluteMultiShapeLayout(
           final Dimension canvas,
           final List<Tuple<Dimension, AbsolutePositionLayoutSpec>> shapes) {
-    return new MultiShapeLayout(
-            canvas,
-            mlist(shapes).map(new Function<Tuple<Dimension, AbsolutePositionLayoutSpec>, Layout>() {
-              @Override public Layout apply(Tuple<Dimension, AbsolutePositionLayoutSpec> a) {
-                return calcLayout(canvas, a.getA(), a.getB());
-              }
-            }).value());
+    List<Layout> layouts = shapes.stream()
+        .map(a -> calcLayout(canvas, a.getA(), a.getB()))
+        .toList();
+
+    return new MultiShapeLayout(canvas, layouts);
   }
 
   public static int limitMax(double v, int max) {

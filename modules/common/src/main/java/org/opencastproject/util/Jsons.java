@@ -21,18 +21,14 @@
 
 package org.opencastproject.util;
 
-import static org.opencastproject.util.data.Monadics.mlist;
-
 import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Function2;
-import org.opencastproject.util.data.Monadics;
 import org.opencastproject.util.data.Prelude;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -154,21 +150,19 @@ public final class Jsons {
   }
 
   private static JSONObject toJsonSimple(Obj obj) {
-    return mlist(obj.getProps()).foldl(new JSONObject(), new Function2<JSONObject, Prop, JSONObject>() {
-      @Override public JSONObject apply(JSONObject jo, Prop prop) {
-        jo.put(prop.getName(), toJsonSimple(prop.getVal()));
-        return jo;
-      }
-    });
+    JSONObject jo = new JSONObject();
+    for (Prop prop : obj.getProps()) {
+      jo.put(prop.getName(), toJsonSimple(prop.getVal()));
+    }
+    return jo;
   }
 
   private static JSONArray toJsonSimple(Arr arr) {
-    return mlist(arr.getVals()).foldl(new JSONArray(), new Function2<JSONArray, Val, JSONArray>() {
-      @Override public JSONArray apply(JSONArray ja, Val val) {
-        ja.add(toJsonSimple(val));
-        return ja;
-      }
-    });
+    JSONArray ja = new JSONArray();
+    for (Val val : arr.getVals()) {
+      ja.add(toJsonSimple(val));
+    }
+    return ja;
   }
 
   private static Object toJsonSimple(Val val) {
@@ -189,22 +183,26 @@ public final class Jsons {
 
   /** Create an object. */
   public static Obj obj(Prop... ps) {
-    return new Obj(mlist(ps).filter(notZero.o(getVal)).value());
+    List<Prop> filtered = Arrays.stream(ps)
+        .filter(p -> notZero.apply(getVal.apply(p)))
+        .toList();
+    return new Obj(filtered);
   }
 
   /** Create an array. */
   public static Arr arr(Val... vs) {
-    return new Arr(mlist(vs).filter(notZero).value());
+    List<Val> filtered = Arrays.stream(vs)
+        .filter(notZero::apply)
+        .toList();
+    return new Arr(filtered);
   }
 
   /** Create an array. */
   public static Arr arr(List<Val> vs) {
-    return new Arr(mlist(vs).filter(notZero).value());
-  }
-
-  /** Create an array. */
-  public static Arr arr(Monadics.ListMonadic<Val> vs) {
-    return new Arr(vs.filter(notZero).value());
+    List<Val> filtered = vs.stream()
+        .filter(notZero::apply)
+        .toList();
+    return new Arr(filtered);
   }
 
   public static Val v(Number v) {
@@ -256,23 +254,17 @@ public final class Jsons {
 
   /** Merge a list of objects into one (last one wins). */
   public static Obj append(Obj... os) {
-    final List<Prop> props = mlist(os).foldl(new ArrayList<Prop>(), new Function2<ArrayList<Prop>, Obj, ArrayList<Prop>>() {
-      @Override public ArrayList<Prop> apply(ArrayList<Prop> props, Obj obj) {
-        props.addAll(obj.getProps());
-        return props;
-      }
-    });
+    List<Prop> props = Arrays.stream(os)
+        .flatMap(o -> o.getProps().stream())
+        .toList();
     return new Obj(props);
   }
 
   /** Append a list of arrays into one. */
   public static Arr append(Arr... as) {
-    final List<Val> vals = mlist(as).foldl(new ArrayList<Val>(), new Function2<ArrayList<Val>, Arr, ArrayList<Val>>() {
-      @Override public ArrayList<Val> apply(ArrayList<Val> vals, Arr arr) {
-        vals.addAll(arr.getVals());
-        return vals;
-      }
-    });
+    List<Val> vals = Arrays.stream(as)
+        .flatMap(a -> a.getVals().stream())
+        .toList();
     return new Arr(vals);
   }
 }

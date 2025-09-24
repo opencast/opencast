@@ -22,13 +22,13 @@
 package org.opencastproject.job.api;
 
 import static org.opencastproject.util.data.Collections.nullToNil;
-import static org.opencastproject.util.data.Monadics.mlist;
 
 import org.opencastproject.serviceregistry.api.IncidentServiceException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Function;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -52,8 +52,13 @@ public final class JaxbIncidentTree {
   }
 
   public JaxbIncidentTree(IncidentTree tree) throws IncidentServiceException, NotFoundException {
-    this.incidents = mlist(tree.getIncidents()).map(JaxbIncident.mkFn).value();
-    this.descendants = mlist(tree.getDescendants()).map(mkFn).value();
+    this.incidents = tree.getIncidents().stream()
+        .map(JaxbIncident.mkFn::apply)
+        .collect(Collectors.toList());
+
+    this.descendants = tree.getDescendants().stream()
+        .map(mkFn::apply)
+        .collect(Collectors.toList());
   }
 
   public static final Function<IncidentTree, JaxbIncidentTree> mkFn = new Function.X<IncidentTree, JaxbIncidentTree>() {
@@ -63,9 +68,15 @@ public final class JaxbIncidentTree {
   };
 
   public IncidentTree toIncidentTree() {
-    return new IncidentTreeImpl(
-            mlist(nullToNil(incidents)).map(JaxbIncident.toIncidentFn).value(),
-            mlist(nullToNil(descendants)).map(toIncidentTreeFn).value());
+    List<Incident> mappedIncidents = nullToNil(incidents).stream()
+        .map(JaxbIncident.toIncidentFn::apply)
+        .collect(Collectors.toList());
+
+    List<IncidentTree> mappedDescendants = nullToNil(descendants).stream()
+        .map(toIncidentTreeFn::apply)
+        .collect(Collectors.toList());
+
+    return new IncidentTreeImpl(mappedIncidents, mappedDescendants);
   }
 
   public static final Function<JaxbIncidentTree, IncidentTree> toIncidentTreeFn = new Function<JaxbIncidentTree, IncidentTree>() {

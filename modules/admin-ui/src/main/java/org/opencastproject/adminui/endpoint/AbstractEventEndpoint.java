@@ -2446,7 +2446,7 @@ public abstract class AbstractEventEndpoint {
           @RestParameter(name = "tags", isRequired = false, description = "A comma separated list of tags to filter the workflow definitions", type = RestParameter.Type.STRING) }, responses = {
                   @RestResponse(responseCode = SC_OK, description = "Returns all the data related to the event processing tab as JSON") })
   public Response getNewProcessing(@QueryParam("tags") String tagsString) {
-    List<String> tags = RestUtil.splitCommaSeparatedParam(Optional.ofNullable(tagsString)).value();
+    List<String> tags = RestUtil.splitCommaSeparatedParam(Optional.ofNullable(tagsString));
 
     JsonArray workflowsArray = new JsonArray();
     try {

@@ -24,7 +24,6 @@ package org.opencastproject.util;
 import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.data.Either.left;
 import static org.opencastproject.util.data.Either.right;
-import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Prelude.sleep;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
@@ -46,7 +45,10 @@ import org.apache.http.message.BasicNameValuePair;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /** Functions to support Apache httpcomponents and HTTP related operations in general. */
 
@@ -68,16 +70,17 @@ public final class HttpUtil {
   }
 
   public static HttpGet get(String path, Tuple<String, String>... queryParams) {
-    final String url = mlist(path, mlist(queryParams).map(new Function<Tuple<String, String>, String>() {
-      @Override
-      public String apply(Tuple<String, String> a) {
-        try {
-          return a.getA() + "=" + URLEncoder.encode(a.getB(), "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-          return chuck(e);
-        }
-      }
-    }).mkString("&")).mkString("?");
+    String queryString = Arrays.stream(queryParams)
+        .map(a -> {
+          try {
+            return a.getA() + "=" + URLEncoder.encode(a.getB(), StandardCharsets.UTF_8.toString());
+          } catch (UnsupportedEncodingException e) {
+            return chuck(e);
+          }
+        })
+        .collect(Collectors.joining("&"));
+
+    String url = path + (queryString.isEmpty() ? "" : "?" + queryString);
     return new HttpGet(url);
   }
 

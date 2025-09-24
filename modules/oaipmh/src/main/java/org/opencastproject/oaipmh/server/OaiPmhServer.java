@@ -24,7 +24,6 @@ import static org.opencastproject.oaipmh.util.OsgiUtil.checkDictionary;
 import static org.opencastproject.oaipmh.util.OsgiUtil.getCfg;
 import static org.opencastproject.oaipmh.util.OsgiUtil.getContextProperty;
 import static org.opencastproject.util.data.Collections.map;
-import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.functions.Strings.trimToNil;
 
 import org.opencastproject.oaipmh.util.XmlGen;
@@ -47,6 +46,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.Map;
 import java.util.Optional;
@@ -256,8 +256,11 @@ public final class OaiPmhServer extends HttpServlet implements OaiPmhServerInfo 
    *          the base path of the OAI-PMH server, e.g. /oaipmh
    */
   public static Optional<String> repositoryId(HttpServletRequest req, String mountPoint) {
-    return mlist(StringUtils.removeStart(UrlSupport.removeDoubleSeparator(req.getRequestURI()), mountPoint).split("/"))
-            .bind(trimToNil).headOpt();
+    String[] parts = StringUtils.removeStart(UrlSupport.removeDoubleSeparator(req.getRequestURI()), mountPoint).split("/");
+
+    return Arrays.stream(parts)
+        .flatMap(s -> trimToNil.apply(s).stream())
+        .findFirst();
   }
 
   /** Get a repository by id. */

@@ -21,8 +21,6 @@
 
 package org.opencastproject.job.api;
 
-import static org.opencastproject.util.data.Monadics.mlist;
-
 import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.IncidentServiceException;
 import org.opencastproject.util.NotFoundException;
@@ -30,6 +28,7 @@ import org.opencastproject.util.data.Function;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -51,10 +50,15 @@ public final class JaxbIncidentDigestTree {
   public JaxbIncidentDigestTree() {
   }
 
-  public JaxbIncidentDigestTree(IncidentService svc, Locale locale, IncidentTree tree) throws IncidentServiceException,
-          NotFoundException {
-    this.incidents = mlist(tree.getIncidents()).map(JaxbIncidentDigest.mkFn(svc, locale)).value();
-    this.descendants = mlist(tree.getDescendants()).map(mkFn(svc, locale)).value();
+  public JaxbIncidentDigestTree(IncidentService svc, Locale locale, IncidentTree tree)
+      throws IncidentServiceException, NotFoundException {
+    this.incidents = tree.getIncidents().stream()
+        .map(JaxbIncidentDigest.mkFn(svc, locale)::apply)
+        .collect(Collectors.toList());
+
+    this.descendants = tree.getDescendants().stream()
+        .map(mkFn(svc, locale)::apply)
+        .collect(Collectors.toList());
   }
 
   public static Function<IncidentTree, JaxbIncidentDigestTree> mkFn(final IncidentService svc, final Locale locale) {

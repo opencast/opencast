@@ -23,7 +23,6 @@ package org.opencastproject.util;
 
 import static org.opencastproject.util.Jsons.obj;
 import static org.opencastproject.util.Jsons.p;
-import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Tuple.tuple;
 import static org.opencastproject.util.data.functions.Strings.split;
 import static org.opencastproject.util.data.functions.Strings.trimToNil;
@@ -35,7 +34,6 @@ import org.opencastproject.rest.RestConstants;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.Jsons.Obj;
 import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Monadics;
 import org.opencastproject.util.data.Tuple;
 
 import org.apache.commons.lang3.StringUtils;
@@ -45,6 +43,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -192,10 +192,12 @@ public final class RestUtil {
    * <p>
    * x=comma,separated,,%20value -&gt; ["comma", "separated", "value"]
    */
-  public static Monadics.ListMonadic<String> splitCommaSeparatedParam(Optional<String> param) {
-    if (param.isPresent())
-      return mlist(CSV_SPLIT.apply(param.get())).bind(trimToNil);
-    return mlist();
+  public static List<String> splitCommaSeparatedParam(Optional<String> param) {
+    return param.map(s -> Arrays.stream(CSV_SPLIT.apply(s))
+            .map(trimToNil::apply)
+            .flatMap(List::stream)
+            .toList())
+        .orElse(List.of());
   }
 
   public static String generateErrorResponse(ErrorCodeException e) {

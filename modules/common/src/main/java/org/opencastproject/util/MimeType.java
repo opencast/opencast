@@ -24,7 +24,6 @@ package org.opencastproject.util;
 
 import static org.opencastproject.util.EqualsUtil.eqObj;
 import static org.opencastproject.util.data.Collections.list;
-import static org.opencastproject.util.data.Monadics.mlist;
 
 import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Function;
@@ -144,7 +143,9 @@ public final class MimeType implements Comparable<MimeType>, Serializable {
    * @return the file suffix
    */
   public Optional<String> getSuffix() {
-    return mlist(suffixes).headOpt();
+    return suffixes == null || suffixes.isEmpty()
+        ? Optional.empty()
+        : Optional.of(suffixes.get(0));
   }
 
   /**
@@ -246,8 +247,9 @@ public final class MimeType implements Comparable<MimeType>, Serializable {
    * @return <code>true</code> if this mime type is equal
    */
   public boolean isEquivalentTo(String type, String subtype) {
-    return eq(type, subtype) || mlist(equivalents).exists(eq);
+    return eq(type, subtype) || equivalents.stream().anyMatch(e -> eq(e.getType(), e.getSubtype()));
   }
+
 
   /**
    * @see java.lang.Comparable#compareTo(java.lang.Object)

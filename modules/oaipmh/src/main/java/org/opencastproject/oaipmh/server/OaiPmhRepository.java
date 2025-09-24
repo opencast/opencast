@@ -26,7 +26,6 @@ import static org.opencastproject.oaipmh.OaiPmhUtil.toUtc;
 import static org.opencastproject.oaipmh.persistence.QueryBuilder.queryRepo;
 import static org.opencastproject.oaipmh.server.Functions.addDay;
 import static org.opencastproject.oaipmh.server.Functions.asDate;
-import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Prelude.unexhaustiveMatch;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
@@ -44,7 +43,6 @@ import org.opencastproject.oaipmh.persistence.SearchResultItem;
 import org.opencastproject.oaipmh.util.XmlGen;
 import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Function0;
-import org.opencastproject.util.data.Predicate;
 
 import org.apache.commons.collections4.EnumerationUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -64,6 +62,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * An OAI-PMH protocol compliant repository.
@@ -216,7 +215,10 @@ public abstract class OaiPmhRepository implements ManagedService {
 
   /** Return a list of all available metadata providers. The <code>oai_dc</code> format is always included. */
   public final List<MetadataProvider> getMetadataProviders() {
-    return mlist(getRepositoryMetadataProviders()).cons(OAI_DC_METADATA_PROVIDER).value();
+    return Stream.concat(
+        Stream.of(OAI_DC_METADATA_PROVIDER),
+        getRepositoryMetadataProviders().stream()
+    ).toList();
   }
 
   /** Add an item to the repository. */
@@ -251,12 +253,9 @@ public abstract class OaiPmhRepository implements ManagedService {
 
   /** Return the metadata provider for a given metadata prefix. */
   public Optional<MetadataProvider> getMetadataProvider(final String metadataPrefix) {
-    return mlist(getMetadataProviders()).find(new Predicate<MetadataProvider>() {
-      @Override
-      public Boolean apply(MetadataProvider metadataProvider) {
-        return metadataProvider.getMetadataFormat().getPrefix().equals(metadataPrefix);
-      }
-    });
+    return getMetadataProviders().stream()
+        .filter(metadataProvider -> metadataProvider.getMetadataFormat().getPrefix().equals(metadataPrefix))
+        .findFirst();
   }
 
   /** {@link #getMetadataProvider(String)} as a function. */
@@ -342,12 +341,9 @@ public abstract class OaiPmhRepository implements ManagedService {
     return new OaiVerbXmlGen(this, p) {
       @Override
       public Element create() {
-        final List<Node> metadataFormats = mlist(getMetadataProviders()).map(new Function<MetadataProvider, Node>() {
-          @Override
-          public Node apply(MetadataProvider metadataProvider) {
-            return metadataFormat(metadataProvider.getMetadataFormat());
-          }
-        }).value();
+        final List<Node> metadataFormats = getMetadataProviders().stream()
+            .map(metadataProvider -> (Node) metadataFormat(metadataProvider.getMetadataFormat()))
+            .toList();
         return oai(request($aSome("identifier", p.getIdentifier())), verb(metadataFormats));
       }
     };
@@ -360,14 +356,16 @@ public abstract class OaiPmhRepository implements ManagedService {
         return new ListXmlGen(listParams) {
           @Override
           protected List<Node> createContent(final Optional<String> set) {
-            return mlist(params.getResult().getItems()).map(new Function<SearchResultItem, Node>() {
-              @Override
-              public Node apply(SearchResultItem item) {
-                logger.debug("Requested set: {}", set);
-                final Element metadata = params.getMetadataProvider().createMetadata(OaiPmhRepository.this, item, set);
-                return record(item, metadata);
-              }
-            }).value();
+            return params.getResult().getItems().stream()
+                .map(new java.util.function.Function<SearchResultItem, Node>() {
+                  @Override
+                  public Node apply(SearchResultItem item) {
+                    logger.debug("Requested set: {}", set);
+                    final Element metadata = params.getMetadataProvider().createMetadata(OaiPmhRepository.this, item, set);
+                    return record(item, metadata);
+                  }
+                })
+                .toList();
           }
         };
       }
@@ -381,14 +379,10 @@ public abstract class OaiPmhRepository implements ManagedService {
       protected ListXmlGen respond(ListGenParams listParams) {
         // create XML response
         return new ListXmlGen(listParams) {
-          @Override
           protected List<Node> createContent(Optional<String> set) {
-            return mlist(params.getResult().getItems()).map(new Function<SearchResultItem, Node>() {
-              @Override
-              public Node apply(SearchResultItem item) {
-                return header(item);
-              }
-            }).value();
+            return params.getResult().getItems().stream()
+                .map(item -> (Node) header(item))
+                .toList();
           }
         };
       }
