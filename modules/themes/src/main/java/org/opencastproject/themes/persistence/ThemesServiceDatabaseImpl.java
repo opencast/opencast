@@ -365,49 +365,20 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
    *           the organization the theme belongs to
    * @param user
    */
-  private void updateThemeInIndex(Theme theme, String orgId,
-          User user) {
+  private void updateThemeInIndex(Theme theme, String orgId, User user) {
     logger.debug("Updating the theme with id '{}', name '{}', description '{}', organization '{}' in the {} index.",
             theme.getId(), theme.getName(), theme.getDescription(),
             orgId, index.getIndexName());
+    if (theme.getId().isNone()) {
+      throw new IllegalArgumentException("Can't put theme in index without valid id!");
+    }
+    Long id = theme.getId().get();
     try {
-      if (theme.getId().isNone()) {
-        throw new IllegalArgumentException("Can't put theme in index without valid id!");
-      }
-      Long id = theme.getId().get();
-
-      // the function to do the actual updating
-      Function<Optional<IndexTheme>, Optional<IndexTheme>> updateFunction = (Optional<IndexTheme> indexThemeOpt) -> {
-        IndexTheme indexTheme;
-        indexTheme = indexThemeOpt.orElseGet(() -> new IndexTheme(id, orgId));
-        String creator = StringUtils.isNotBlank(theme.getCreator().getName())
-                ? theme.getCreator().getName() : theme.getCreator().getUsername();
-
-        indexTheme.setCreationDate(theme.getCreationDate());
-        indexTheme.setDefault(theme.isDefault());
-        indexTheme.setName(theme.getName());
-        indexTheme.setDescription(theme.getDescription());
-        indexTheme.setCreator(creator);
-        indexTheme.setBumperActive(theme.isBumperActive());
-        indexTheme.setBumperFile(theme.getBumperFile());
-        indexTheme.setTrailerActive(theme.isTrailerActive());
-        indexTheme.setTrailerFile(theme.getTrailerFile());
-        indexTheme.setTitleSlideActive(theme.isTitleSlideActive());
-        indexTheme.setTitleSlideBackground(theme.getTitleSlideBackground());
-        indexTheme.setTitleSlideMetadata(theme.getTitleSlideMetadata());
-        indexTheme.setLicenseSlideActive(theme.isLicenseSlideActive());
-        indexTheme.setLicenseSlideBackground(theme.getLicenseSlideBackground());
-        indexTheme.setLicenseSlideDescription(theme.getLicenseSlideDescription());
-        indexTheme.setWatermarkActive(theme.isWatermarkActive());
-        indexTheme.setWatermarkFile(theme.getWatermarkFile());
-        indexTheme.setWatermarkPosition(theme.getWatermarkPosition());
-        return Optional.of(indexTheme);
-      };
-
+      Function<Optional<IndexTheme>, Optional<IndexTheme>> updateFunction = getThemeUpdateFunction(theme, orgId);
       index.addOrUpdateTheme(id, updateFunction, orgId, user);
-      logger.debug("Updated the theme {} in the {} index", theme.getId(), index.getIndexName());
+      logger.debug("Updated the theme {} in the {} index", id, index.getIndexName());
     } catch (SearchIndexException e) {
-      logger.error("Error updating the theme {} in the {} index", theme.getId(), index.getIndexName(), e);
+      logger.error("Error updating the theme {} in the {} index", id, index.getIndexName(), e);
     }
   }
   /**
@@ -421,8 +392,7 @@ public class ThemesServiceDatabaseImpl extends AbstractIndexProducer implements 
    */
   private Function<Optional<IndexTheme>, Optional<IndexTheme>> getThemeUpdateFunction(Theme theme, String orgId) {
     return (Optional<IndexTheme> indexThemeOpt) -> {
-      IndexTheme indexTheme;
-      indexTheme = indexThemeOpt.orElseGet(() -> new IndexTheme(theme.getId().get(), orgId));
+      IndexTheme indexTheme = indexThemeOpt.orElseGet(() -> new IndexTheme(theme.getId().get(), orgId));
       String creator = theme.getCreator() == null ? "?" : (
           StringUtils.isNotBlank(theme.getCreator().getName())
               ? theme.getCreator().getName()
