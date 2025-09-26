@@ -140,23 +140,23 @@ public class UserEndpoint {
       description = "Returns a list of users",
       returnDescription = "Returns a JSON representation of the list of user accounts",
       restParameters = {
-      @RestParameter(
-        name = "limit",
-        defaultValue = "100",
-        description = "The maximum number of items to return per page.",
-        isRequired = false,
-        type = RestParameter.Type.STRING),
-      @RestParameter(
-        name = "offset",
-        defaultValue = "0",
-        description = "The page number.",
-        isRequired = false,
-        type = RestParameter.Type.STRING)
+          @RestParameter(
+              name = "limit",
+              defaultValue = "100",
+              description = "The maximum number of items to return per page.",
+              isRequired = false,
+              type = RestParameter.Type.STRING),
+          @RestParameter(
+              name = "offset",
+              defaultValue = "0",
+              description = "The page number.",
+              isRequired = false,
+              type = RestParameter.Type.STRING)
       }, responses = {
-      @RestResponse(
-        responseCode = SC_OK,
-        description = "The user accounts.")
-    })
+          @RestResponse(
+              responseCode = SC_OK,
+              description = "The user accounts.")
+      })
   public JaxbUserList getUsersAsJson(@QueryParam("limit") int limit, @QueryParam("offset") int offset)
           throws IOException {
 
@@ -180,19 +180,19 @@ public class UserEndpoint {
       description = "Returns a user",
       returnDescription = "Returns a JSON representation of a user",
       pathParameters = {
-      @RestParameter(
-        name = "username",
-        description = "The username.",
-        isRequired = true,
-        type = STRING)
+          @RestParameter(
+              name = "username",
+              description = "The username.",
+              isRequired = true,
+              type = STRING)
       }, responses = {
-      @RestResponse(
-        responseCode = SC_OK,
-        description = "The user account."),
-      @RestResponse(
-        responseCode = SC_NOT_FOUND,
-        description = "User not found")
-    })
+          @RestResponse(
+              responseCode = SC_OK,
+              description = "The user account."),
+          @RestResponse(
+              responseCode = SC_NOT_FOUND,
+              description = "User not found")
+      })
   public Response getUserAsJson(@PathParam("username") String username) throws NotFoundException {
     User user = jpaUserAndRoleProvider.loadUser(username);
     if (user == null) {
@@ -210,10 +210,10 @@ public class UserEndpoint {
       description = "Returns a list of users which passwords are stored using MD5 hashes",
       returnDescription = "Returns a JSON representation of the list of matching user accounts",
       responses = {
-      @RestResponse(
-          responseCode = SC_OK,
-          description = "The user accounts.")
-  })
+          @RestResponse(
+              responseCode = SC_OK,
+              description = "The user accounts.")
+      })
   public JaxbUserList getUserWithInsecurePasswordHashingAsJson() {
     JaxbUserList userList = new JaxbUserList();
     for (User user: jpaUserAndRoleProvider.findInsecurePasswordHashes()) {
@@ -229,45 +229,45 @@ public class UserEndpoint {
       description = "Create a new  user",
       returnDescription = "Location of the new ressource",
       restParameters = {
-      @RestParameter(
-        name = "username",
-        description = "The username.",
-        isRequired = true,
-        type = STRING),
-      @RestParameter(
-        name = "password",
-        description = "The password.",
-        isRequired = true,
-        type = STRING),
-      @RestParameter(
-        name = "name",
-        description = "The name.",
-        isRequired = false,
-        type = STRING),
-      @RestParameter(
-        name = "email",
-        description = "The email.",
-        isRequired = false,
-        type = STRING),
-      @RestParameter(
-        name = "roles",
-        description = "The user roles as a json array, for example: [\"ROLE_USER\", \"ROLE_ADMIN\"]",
-        isRequired = false,
-        type = STRING)
+          @RestParameter(
+              name = "username",
+              description = "The username.",
+              isRequired = true,
+              type = STRING),
+          @RestParameter(
+              name = "password",
+              description = "The password.",
+              isRequired = true,
+              type = STRING),
+          @RestParameter(
+              name = "name",
+              description = "The name.",
+              isRequired = false,
+              type = STRING),
+          @RestParameter(
+              name = "email",
+              description = "The email.",
+              isRequired = false,
+              type = STRING),
+          @RestParameter(
+              name = "roles",
+              description = "The user roles as a json array, for example: [\"ROLE_USER\", \"ROLE_ADMIN\"]",
+              isRequired = false,
+              type = STRING)
       }, responses = {
-      @RestResponse(
-        responseCode = SC_BAD_REQUEST,
-        description = "Malformed request syntax."),
-      @RestResponse(
-        responseCode = SC_CREATED,
-        description = "User has been created."),
-      @RestResponse(
-        responseCode = SC_CONFLICT,
-        description = "An user with this username already exist."),
-      @RestResponse(
-        responseCode = SC_FORBIDDEN,
-        description = "Not enough permissions to create a user with the admin role.")
-    })
+          @RestResponse(
+              responseCode = SC_BAD_REQUEST,
+              description = "Malformed request syntax."),
+          @RestResponse(
+              responseCode = SC_CREATED,
+              description = "User has been created."),
+          @RestResponse(
+              responseCode = SC_CONFLICT,
+              description = "An user with this username already exist."),
+          @RestResponse(
+              responseCode = SC_FORBIDDEN,
+              description = "Not enough permissions to create a user with the admin role.")
+      })
   public Response createUser(@FormParam("username") String username, @FormParam("password") String password,
           @FormParam("name") String name, @FormParam("email") String email, @FormParam("roles") String roles) {
 
@@ -304,41 +304,44 @@ public class UserEndpoint {
       description = "Update an user",
       returnDescription = "Status ok",
       restParameters = {
-      @RestParameter(
-        name = "password",
-        description = "The password.",
-        isRequired = true,
-        type = STRING),
-      @RestParameter(
-        name = "name",
-        description = "The name.",
-        isRequired = false,
-        type = STRING),
-      @RestParameter(
-        name = "email",
-        description = "The email.",
-        isRequired = false,
-        type = STRING),
-      @RestParameter(
-        name = "roles",
-        description = "The user roles as a json array, for example: [\"ROLE_USER\", \"ROLE_ADMIN\"]",
-        isRequired = false,
-        type = STRING)
-      }, pathParameters = @RestParameter(
-      name = "username",
-      description = "The username",
-      isRequired = true,
-      type = STRING),
+          @RestParameter(
+              name = "password",
+              description = "The password.",
+              isRequired = true,
+              type = STRING),
+          @RestParameter(
+              name = "name",
+              description = "The name.",
+              isRequired = false,
+              type = STRING),
+          @RestParameter(
+              name = "email",
+              description = "The email.",
+              isRequired = false,
+              type = STRING),
+          @RestParameter(
+              name = "roles",
+              description = "The user roles as a json array, for example: [\"ROLE_USER\", \"ROLE_ADMIN\"]",
+              isRequired = false,
+              type = STRING)
+      },
+      pathParameters =
+          @RestParameter(
+              name = "username",
+              description = "The username",
+              isRequired = true,
+              type = STRING),
       responses = {
-      @RestResponse(
-        responseCode = SC_BAD_REQUEST,
-        description = "Malformed request syntax."),
-      @RestResponse(
-        responseCode = SC_FORBIDDEN,
-        description = "Not enough permissions to update a user with the admin role."),
-      @RestResponse(
-        responseCode = SC_OK,
-        description = "User has been updated.")    })
+          @RestResponse(
+              responseCode = SC_BAD_REQUEST,
+              description = "Malformed request syntax."),
+          @RestResponse(
+              responseCode = SC_FORBIDDEN,
+              description = "Not enough permissions to update a user with the admin role."),
+          @RestResponse(
+              responseCode = SC_OK,
+              description = "User has been updated.")
+      })
   public Response setUser(@PathParam("username") String username, @FormParam("password") String password,
           @FormParam("name") String name, @FormParam("email") String email, @FormParam("roles") String roles) {
 
@@ -373,22 +376,23 @@ public class UserEndpoint {
       name = "deleteUser",
       description = "Delete a new  user",
       returnDescription = "Status ok",
-      pathParameters = @RestParameter(
-      name = "username",
-      type = STRING,
-      isRequired = true,
-      description = "The username"),
+      pathParameters =
+        @RestParameter(
+            name = "username",
+            type = STRING,
+            isRequired = true,
+            description = "The username"),
       responses = {
-      @RestResponse(
-        responseCode = SC_OK,
-        description = "User has been deleted."),
-      @RestResponse(
-        responseCode = SC_FORBIDDEN,
-        description = "Not enough permissions to delete a user with the admin role."),
-      @RestResponse(
-        responseCode = SC_NOT_FOUND,
-        description = "User not found.")
-    })
+          @RestResponse(
+              responseCode = SC_OK,
+              description = "User has been deleted."),
+          @RestResponse(
+              responseCode = SC_FORBIDDEN,
+              description = "Not enough permissions to delete a user with the admin role."),
+          @RestResponse(
+              responseCode = SC_NOT_FOUND,
+              description = "User not found.")
+      })
   public Response deleteUser(@PathParam("username") String username) {
     try {
       jpaUserAndRoleProvider.deleteUser(username, securityService.getOrganization().getId());

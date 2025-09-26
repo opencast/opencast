@@ -146,7 +146,7 @@ public class ServerEndpoint {
     }
   }
 
-  private class Server {
+  private final class Server {
     protected long id;
     protected boolean online;
     protected boolean maintenance;
@@ -157,7 +157,7 @@ public class ServerEndpoint {
     protected long queued;
   }
 
-  private class CachedServer {
+  private final class CachedServer {
     protected long running;
     protected long queued;
   }

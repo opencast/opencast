@@ -60,12 +60,12 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Component(
-        immediate = true,
-        service = WorkflowOperationHandler.class,
-        property = {
-                "service.description=Tag Engage Workflow Operation Handler",
-                "workflow.operation=tag-engage"
-        }
+    immediate = true,
+    service = WorkflowOperationHandler.class,
+    property = {
+        "service.description=Tag Engage Workflow Operation Handler",
+        "workflow.operation=tag-engage"
+    }
 )
 public class TagEngageWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 

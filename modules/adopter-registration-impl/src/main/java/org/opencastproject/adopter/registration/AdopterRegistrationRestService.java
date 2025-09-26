@@ -97,11 +97,11 @@ public class AdopterRegistrationRestService {
   @Path("registration")
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(name = "getregistrationform", description = "GETs the adopter registration data.", responses = {
-          @RestResponse(description = "Retrieved registration data.",
-                        responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "Error while retrieving adopter registration data.",
-                        responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
-                        returnDescription = "GETs the adopter registration data.")
+      @RestResponse(description = "Retrieved registration data.",
+                    responseCode = HttpServletResponse.SC_OK),
+      @RestResponse(description = "Error while retrieving adopter registration data.",
+                    responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
+                    returnDescription = "GETs the adopter registration data.")
   public String getRegistrationForm() {
     logger.debug("Retrieving adopter registration data.");
     return gson.toJson(registrationService.get());
@@ -133,42 +133,42 @@ public class AdopterRegistrationRestService {
           description = "Saves the adopter registration data.",
           returnDescription = "Status",
           restParameters = {
-                  @RestParameter(description = "The Name of the organisation.",
-                          isRequired = false, name = "organisationName", type = STRING),
-                  @RestParameter(description = "The Name of the department.",
-                          isRequired = false, name = "departmentName", type = STRING),
-                  @RestParameter(description = "The First name.",
-                          isRequired = false, name = "firstName", type = STRING),
-                  @RestParameter(description = "The Last name.",
-                          isRequired = false, name = "lastName", type = STRING),
-                  @RestParameter(description = "The e-mail address.",
-                          isRequired = false, name = "email", type = STRING),
-                  @RestParameter(description = "The country.",
-                          isRequired = false, name = "country", type = STRING),
-                  @RestParameter(description = "The postal code.",
-                          isRequired = false, name = "postalCode", type = STRING),
-                  @RestParameter(description = "The city.",
-                          isRequired = false, name = "city", type = STRING),
-                  @RestParameter(description = "The street.",
-                          isRequired = false, name = "street", type = STRING),
-                  @RestParameter(description = "The street number.",
-                          isRequired = false, name = "streetNo", type = STRING),
-                  @RestParameter(description = "Does the adopter allows to be contacted.",
-                          isRequired = false, name = "contactMe", type = BOOLEAN),
-                  @RestParameter(description = "Does the adopter agreed to the policy.",
-                          isRequired = false, name = "agreedToPolicy", type = BOOLEAN),
-                  @RestParameter(description = "Does the adopter allow the gathering of error reports.",
-                          isRequired = false, name = "allowsErrorReports", type = BOOLEAN),
-                  @RestParameter(description = "Which type of system is this.",
-                          isRequired = false, name = "systemType", type = STRING),
-                  @RestParameter(description = "Does the adopter allow the gathering of statistic data.",
-                          isRequired = false, name = "allowsStatistics", type = BOOLEAN),
-                  @RestParameter(description = "Is the adopter already registered.",
-                          isRequired = false, name = "registered", type = BOOLEAN)
+              @RestParameter(description = "The Name of the organisation.",
+                      isRequired = false, name = "organisationName", type = STRING),
+              @RestParameter(description = "The Name of the department.",
+                      isRequired = false, name = "departmentName", type = STRING),
+              @RestParameter(description = "The First name.",
+                      isRequired = false, name = "firstName", type = STRING),
+              @RestParameter(description = "The Last name.",
+                      isRequired = false, name = "lastName", type = STRING),
+              @RestParameter(description = "The e-mail address.",
+                      isRequired = false, name = "email", type = STRING),
+              @RestParameter(description = "The country.",
+                      isRequired = false, name = "country", type = STRING),
+              @RestParameter(description = "The postal code.",
+                      isRequired = false, name = "postalCode", type = STRING),
+              @RestParameter(description = "The city.",
+                      isRequired = false, name = "city", type = STRING),
+              @RestParameter(description = "The street.",
+                      isRequired = false, name = "street", type = STRING),
+              @RestParameter(description = "The street number.",
+                      isRequired = false, name = "streetNo", type = STRING),
+              @RestParameter(description = "Does the adopter allows to be contacted.",
+                      isRequired = false, name = "contactMe", type = BOOLEAN),
+              @RestParameter(description = "Does the adopter agreed to the policy.",
+                      isRequired = false, name = "agreedToPolicy", type = BOOLEAN),
+              @RestParameter(description = "Does the adopter allow the gathering of error reports.",
+                      isRequired = false, name = "allowsErrorReports", type = BOOLEAN),
+              @RestParameter(description = "Which type of system is this.",
+                      isRequired = false, name = "systemType", type = STRING),
+              @RestParameter(description = "Does the adopter allow the gathering of statistic data.",
+                      isRequired = false, name = "allowsStatistics", type = BOOLEAN),
+              @RestParameter(description = "Is the adopter already registered.",
+                      isRequired = false, name = "registered", type = BOOLEAN)
           },
           responses = {
-          @RestResponse(responseCode = SC_OK, description = "Adopter registration data saved."),
-          @RestResponse(responseCode = SC_BAD_REQUEST, description = "Couldn't save adopter registration data.")})
+              @RestResponse(responseCode = SC_OK, description = "Adopter registration data saved."),
+              @RestResponse(responseCode = SC_BAD_REQUEST, description = "Couldn't save adopter registration data.")})
   public Response register(
           @FormParam("organisationName") String organisationName,
           @FormParam("departmentName") String departmentName,
@@ -244,11 +244,11 @@ public class AdopterRegistrationRestService {
   @DELETE
   @Path("registration")
   @RestQuery(name = "deleteregistrationform", description = "Deletes the adopter registration data", responses = {
-          @RestResponse(description = "Successful deleted form data.",
-                  responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "Error while deleting adopter registration data.",
-                  responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
-          returnDescription = "DELETEs the adopter registration data.")
+      @RestResponse(description = "Successful deleted form data.",
+              responseCode = HttpServletResponse.SC_OK),
+      @RestResponse(description = "Error while deleting adopter registration data.",
+              responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
+      returnDescription = "DELETEs the adopter registration data.")
   public Response deleteRegistrationData() {
     logger.debug("Deleting adopter registration data.");
     try {

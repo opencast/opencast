@@ -85,7 +85,8 @@ public class ExecuteRestEndpoint extends AbstractJobProducerEndpoint {
   @POST
   @Produces(MediaType.TEXT_XML)
   @Path(ExecuteService.ENDPOINT_NAME)
-  @RestQuery(name = "name", description = "Executes the given command", restParameters = {
+  @RestQuery(name = "name", description = "Executes the given command",
+      restParameters = {
           @RestParameter(description = "The command to execute", isRequired = true, name = ExecuteService.EXEC_FORM_PARAM, type = RestParameter.Type.STRING),
           @RestParameter(description = "The arguments to the command", isRequired = true, name = ExecuteService.PARAMS_FORM_PARAM, type = RestParameter.Type.STRING),
           @RestParameter(description = "The estimated load placed on the system by this command", isRequired = false, name = ExecuteService.LOAD_FORM_PARAM, type = RestParameter.Type.FLOAT),
@@ -95,14 +96,13 @@ public class ExecuteRestEndpoint extends AbstractJobProducerEndpoint {
           isRequired = false, name = ExecuteService.INPUT_ELEM_FORM_PARAM, type = RestParameter.Type.TEXT),
           @RestParameter(description = "The mediapackage element produced by the command", isRequired = false, name = ExecuteService.OUTPUT_NAME_FORM_PARAMETER,
           type = RestParameter.Type.STRING),
-          @RestParameter(description = "The type of the returned element", isRequired = false, name = ExecuteService.TYPE_FORM_PARAMETER, type = RestParameter.Type.STRING) },
-          responses = {
+          @RestParameter(description = "The type of the returned element", isRequired = false, name = ExecuteService.TYPE_FORM_PARAMETER, type = RestParameter.Type.STRING)
+      }, responses = {
           @RestResponse(description = "XML-encoded Job is returned.", responseCode = HttpServletResponse.SC_NO_CONTENT),
           @RestResponse(description = "Service unavailabe or not currently present", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE),
           @RestResponse(description = "Incorrect parameters", responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "Problem executing the command or serializing the arguments/results", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
-          },
-          returnDescription = "")
+      }, returnDescription = "")
   public Response execute(@FormParam(ExecuteService.EXEC_FORM_PARAM) String exec,
           @FormParam(ExecuteService.PARAMS_FORM_PARAM) String params,
           @FormParam(ExecuteService.LOAD_FORM_PARAM) Float loadParam,

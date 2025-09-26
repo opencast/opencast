@@ -91,10 +91,10 @@ import javax.ws.rs.core.Response;
     title = "Tobira API Endpoint",
     abstractText = "Opencast Tobira API endpoint.",
     notes = {
-      "This provides API endpoint used by Tobira to harvest media metadata. "
-              + "This API is specifically designed for Tobira and there are no "
-              + "stability guarantees for this API beyond what Tobira needs. "
-              + "Thus, you should not use this API for any other purposes!"
+        "This provides API endpoint used by Tobira to harvest media metadata. "
+                + "This API is specifically designed for Tobira and there are no "
+                + "stability guarantees for this API beyond what Tobira needs. "
+                + "Thus, you should not use this API for any other purposes!"
     }
 )
 @Component(

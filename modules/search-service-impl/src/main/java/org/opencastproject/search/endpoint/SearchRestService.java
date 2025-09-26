@@ -477,24 +477,24 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
   @POST
   @Path("updateIndex")
   @RestQuery(name = "updateIndex",
-          description = "Trigger search index update for event. The usage of this is limited to global administrators.",
-          restParameters = {
-                  @RestParameter(
-                          name = "id",
-                          isRequired = true,
-                          type = STRING,
-                          description = "The event ID to trigger an index update for.")},
-          responses = {
-                  @RestResponse(
-                          description = "Update successfully triggered.",
-                          responseCode = SC_NO_CONTENT),
-                  @RestResponse(
-                          description = "Not allowed to trigger update.",
-                          responseCode = SC_FORBIDDEN),
-                  @RestResponse(
-                          description = "No such event found.",
-                          responseCode = SC_NOT_FOUND)},
-          returnDescription = "No content is returned.")
+      description = "Trigger search index update for event. The usage of this is limited to global administrators.",
+      restParameters = {
+          @RestParameter(
+              name = "id",
+              isRequired = true,
+              type = STRING,
+              description = "The event ID to trigger an index update for.")
+      }, responses = {
+          @RestResponse(
+              description = "Update successfully triggered.",
+              responseCode = SC_NO_CONTENT),
+          @RestResponse(
+              description = "Not allowed to trigger update.",
+              responseCode = SC_FORBIDDEN),
+          @RestResponse(
+              description = "No such event found.",
+              responseCode = SC_NOT_FOUND)
+      }, returnDescription = "No content is returned.")
   public Response indexUpdate(@FormParam("id") final String id) {
     try {
       searchIndex.indexMediaPackage(id);

@@ -68,162 +68,162 @@ import javax.persistence.UniqueConstraint;
     @Index(name = "IX_oc_assets_snapshot_owner", columnList = ("owner")),
     @Index(name = "IX_oc_assets_snapshot_series", columnList = ("series_id, version"))
     }, uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"mediapackage_id", "version"}) })
+        @UniqueConstraint(columnNames = {"mediapackage_id", "version"}) })
 @NamedQueries({
-        @NamedQuery(name = "Snapshot.countOrgEvents", query = "select count(distinct s.mediaPackageId) from Snapshot s "
-                + "where s.organizationId = :organizationId"),
-        @NamedQuery(name = "Snapshot.countEvents", query = "select count(distinct s.mediaPackageId) from Snapshot s"),
-        @NamedQuery(name = "Snapshot.countByMediaPackage", query = "select count(s) from Snapshot s "
-                + "where s.mediaPackageId = :mediaPackageId"),
-        @NamedQuery(name = "Snapshot.countByMediaPackageAndOrg", query = "select count(s) from Snapshot s "
-                + "where s.mediaPackageId = :mediaPackageId and s.organizationId = :organizationId"),
-        @NamedQuery(
-            name = "Snapshot.findByMpIdAndVersionOrderByVersionDesc",
-            query = "SELECT s FROM Snapshot s "
-                + "WHERE s.mediaPackageId = :mpId "
-                + "AND s.version = :version "
-                + "ORDER BY s.version DESC"
-        ),
-        @NamedQuery(
-            name = "Snapshot.findLatest",
-            query = "SELECT s FROM Snapshot s "
-                + "WHERE s.mediaPackageId = :mediaPackageId "
-                + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
-                + "AND s.version = ( "
-                + "  SELECT MAX(s2.version) FROM Snapshot s2 WHERE s2.mediaPackageId = s.mediaPackageId "
-                + ")"
-        ),
-        @NamedQuery(
-            name = "Snapshot.findLatestVersionFirst",
-            query = "SELECT s FROM Snapshot s "
-                + "WHERE s.mediaPackageId = :mediaPackageId "
-                + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
-                + "ORDER BY s.version DESC"
-        ),
-        @NamedQuery(
-            name = "Snapshot.findOldestVersionFirst",
-            query = "SELECT s FROM Snapshot s "
-                + "WHERE s.mediaPackageId = :mediaPackageId "
-                + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
-                + "ORDER BY s.version ASC"
-        ),
-        @NamedQuery(
-            name = "Snapshot.findByMpIdAndVersion",
-            query = "SELECT s FROM Snapshot s "
-                + "WHERE s.mediaPackageId = :mediaPackageId "
-                + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
-                + "AND s.version = :version"
-        ),
-        @NamedQuery(
-            name = "Snapshot.findByDateOrderByMpId",
-            query = "SELECT s FROM Snapshot s "
-                + "WHERE s.archivalDate BETWEEN :startDate AND :endDate "
-                + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
-                + "ORDER BY s.mediaPackageId ASC"
-        ),
-        @NamedQuery(
-            name = "Snapshot.findByMpIdAndDate",
-            query = "SELECT s FROM Snapshot s "
-                + "WHERE s.mediaPackageId = :mediaPackageId "
-                + "AND s.archivalDate BETWEEN :startDate AND :endDate "
-                + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
-        ),
-        @NamedQuery(
-            name = "Snapshot.findByMpIdAndDateLatestVersionFirst",
-            query = "SELECT s FROM Snapshot s "
-                + "WHERE s.mediaPackageId = :mediaPackageId "
-                + "AND s.archivalDate BETWEEN :startDate AND :endDate "
-                + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
-                + "ORDER BY s.version DESC"
-        ),
-        @NamedQuery(
-            name = "Snapshot.findByMpIdAndDateOldestVersionFirst",
-            query = "SELECT s FROM Snapshot s "
-                + "WHERE s.mediaPackageId = :mediaPackageId "
-                + "AND s.archivalDate BETWEEN :startDate AND :endDate "
-                + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
-                + "ORDER BY s.version ASC"
-        ),
-        @NamedQuery(
-            name = "Snapshot.findByNotStorageAndDate",
-            query = "SELECT s FROM Snapshot s "
-                + "WHERE s.storageId != :storageId "
-                + "AND s.archivalDate BETWEEN :startDate AND :endDate "
-                + "AND (:organizationId IS NULL OR s.organizationId = :organizationId)"
-        ),
-        @NamedQuery(
-            name = "Snapshot.findForIndexRebuild",
-            query = "SELECT s FROM Snapshot s "
-                + "WHERE s.version = ( "
-                + "  SELECT MAX(s2.version) FROM Snapshot s2 "
-                + "  WHERE s2.mediaPackageId = s.mediaPackageId "
-                + ") "
-                + "ORDER BY s.mediaPackageId DESC "
-        ),
-        @NamedQuery(
-            name = "Snapshot.delete",
-            query = "DELETE FROM Snapshot s "
-                + "WHERE s.mediaPackageId = :mediaPackageId "
-                + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
-        ),
-        @NamedQuery(
-            name = "Snapshot.deleteAllButLatest",
-            query = "DELETE FROM Snapshot s "
-                + "WHERE s.mediaPackageId = :mediaPackageId "
-                + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
-                + "AND s.version < ( "
-                + "  SELECT MAX(s2.version) FROM Snapshot s2 WHERE s2.mediaPackageId = :mediaPackageId "
-                + ") "
-        ),
-        @NamedQuery(
-            name = "Snapshot.findLatestBySeriesId",
-            query = "SELECT s FROM Snapshot s "
-                + "WHERE s.seriesId = :seriesId "
-                + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
-                + "AND s.version = ( "
-                + "  SELECT MAX(s2.version) FROM Snapshot s2 WHERE s2.mediaPackageId = s.mediaPackageId "
-                + ")"
-        ),
-        @NamedQuery(
-            name = "Snapshot.findLatestByMpIds",
-            query = "SELECT s FROM Snapshot s "
-                + "WHERE s.mediaPackageId IN :mediaPackageIds "
-                + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
-                + "AND s.version = ( "
-                + "  SELECT MAX(s2.version) FROM Snapshot s2 WHERE s2.mediaPackageId = s.mediaPackageId "
-                + ") "
-        ),
-        @NamedQuery(
-            name = "Snapshot.findByMpIdOrgIdAndVersion",
-            query = "SELECT s FROM Snapshot s "
-                + "WHERE s.mediaPackageId = :mediaPackageId "
-                + "AND s.organizationId = :organizationId "
-                + "AND s.version = :version "
-        ),
-        @NamedQuery(
-            name = "Snapshot.countSnapshots",
-            query = "SELECT COUNT(s) FROM Snapshot s "
-                + "WHERE (:organizationId IS NULL OR s.organizationId = :organizationId)"
-        ),
-        @NamedQuery(
-            name = "Snapshot.updateStorageIdByVersionAndMpId",
-            query = "UPDATE Snapshot s SET s.storageId = :storageId "
-                + "WHERE s.version = :version "
-                + "AND s.mediaPackageId = :mediaPackageId"
-        ),
-        @NamedQuery(
-            name = "Snapshot.updateAvailabilityByVersionAndMpId",
-            query = "UPDATE Snapshot s SET s.availability = :availability "
-                + "WHERE s.version = :version "
-                + "AND s.mediaPackageId = :mediaPackageId"
-        ),
-        @NamedQuery(
-          name = "Snapshot.getSnapshotVersions",
-          query = "SELECT s.version FROM Snapshot s "
-                + "WHERE s.mediaPackageId = :mediaPackageId "
-                + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
-                + "ORDER BY s.version ASC"
-        ),
+    @NamedQuery(name = "Snapshot.countOrgEvents", query = "select count(distinct s.mediaPackageId) from Snapshot s "
+            + "where s.organizationId = :organizationId"),
+    @NamedQuery(name = "Snapshot.countEvents", query = "select count(distinct s.mediaPackageId) from Snapshot s"),
+    @NamedQuery(name = "Snapshot.countByMediaPackage", query = "select count(s) from Snapshot s "
+            + "where s.mediaPackageId = :mediaPackageId"),
+    @NamedQuery(name = "Snapshot.countByMediaPackageAndOrg", query = "select count(s) from Snapshot s "
+            + "where s.mediaPackageId = :mediaPackageId and s.organizationId = :organizationId"),
+    @NamedQuery(
+        name = "Snapshot.findByMpIdAndVersionOrderByVersionDesc",
+        query = "SELECT s FROM Snapshot s "
+            + "WHERE s.mediaPackageId = :mpId "
+            + "AND s.version = :version "
+            + "ORDER BY s.version DESC"
+    ),
+    @NamedQuery(
+        name = "Snapshot.findLatest",
+        query = "SELECT s FROM Snapshot s "
+            + "WHERE s.mediaPackageId = :mediaPackageId "
+            + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
+            + "AND s.version = ( "
+            + "  SELECT MAX(s2.version) FROM Snapshot s2 WHERE s2.mediaPackageId = s.mediaPackageId "
+            + ")"
+    ),
+    @NamedQuery(
+        name = "Snapshot.findLatestVersionFirst",
+        query = "SELECT s FROM Snapshot s "
+            + "WHERE s.mediaPackageId = :mediaPackageId "
+            + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
+            + "ORDER BY s.version DESC"
+    ),
+    @NamedQuery(
+        name = "Snapshot.findOldestVersionFirst",
+        query = "SELECT s FROM Snapshot s "
+            + "WHERE s.mediaPackageId = :mediaPackageId "
+            + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
+            + "ORDER BY s.version ASC"
+    ),
+    @NamedQuery(
+        name = "Snapshot.findByMpIdAndVersion",
+        query = "SELECT s FROM Snapshot s "
+            + "WHERE s.mediaPackageId = :mediaPackageId "
+            + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
+            + "AND s.version = :version"
+    ),
+    @NamedQuery(
+        name = "Snapshot.findByDateOrderByMpId",
+        query = "SELECT s FROM Snapshot s "
+            + "WHERE s.archivalDate BETWEEN :startDate AND :endDate "
+            + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
+            + "ORDER BY s.mediaPackageId ASC"
+    ),
+    @NamedQuery(
+        name = "Snapshot.findByMpIdAndDate",
+        query = "SELECT s FROM Snapshot s "
+            + "WHERE s.mediaPackageId = :mediaPackageId "
+            + "AND s.archivalDate BETWEEN :startDate AND :endDate "
+            + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
+    ),
+    @NamedQuery(
+        name = "Snapshot.findByMpIdAndDateLatestVersionFirst",
+        query = "SELECT s FROM Snapshot s "
+            + "WHERE s.mediaPackageId = :mediaPackageId "
+            + "AND s.archivalDate BETWEEN :startDate AND :endDate "
+            + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
+            + "ORDER BY s.version DESC"
+    ),
+    @NamedQuery(
+        name = "Snapshot.findByMpIdAndDateOldestVersionFirst",
+        query = "SELECT s FROM Snapshot s "
+            + "WHERE s.mediaPackageId = :mediaPackageId "
+            + "AND s.archivalDate BETWEEN :startDate AND :endDate "
+            + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
+            + "ORDER BY s.version ASC"
+    ),
+    @NamedQuery(
+        name = "Snapshot.findByNotStorageAndDate",
+        query = "SELECT s FROM Snapshot s "
+            + "WHERE s.storageId != :storageId "
+            + "AND s.archivalDate BETWEEN :startDate AND :endDate "
+            + "AND (:organizationId IS NULL OR s.organizationId = :organizationId)"
+    ),
+    @NamedQuery(
+        name = "Snapshot.findForIndexRebuild",
+        query = "SELECT s FROM Snapshot s "
+            + "WHERE s.version = ( "
+            + "  SELECT MAX(s2.version) FROM Snapshot s2 "
+            + "  WHERE s2.mediaPackageId = s.mediaPackageId "
+            + ") "
+            + "ORDER BY s.mediaPackageId DESC "
+    ),
+    @NamedQuery(
+        name = "Snapshot.delete",
+        query = "DELETE FROM Snapshot s "
+            + "WHERE s.mediaPackageId = :mediaPackageId "
+            + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
+    ),
+    @NamedQuery(
+        name = "Snapshot.deleteAllButLatest",
+        query = "DELETE FROM Snapshot s "
+            + "WHERE s.mediaPackageId = :mediaPackageId "
+            + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
+            + "AND s.version < ( "
+            + "  SELECT MAX(s2.version) FROM Snapshot s2 WHERE s2.mediaPackageId = :mediaPackageId "
+            + ") "
+    ),
+    @NamedQuery(
+        name = "Snapshot.findLatestBySeriesId",
+        query = "SELECT s FROM Snapshot s "
+            + "WHERE s.seriesId = :seriesId "
+            + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
+            + "AND s.version = ( "
+            + "  SELECT MAX(s2.version) FROM Snapshot s2 WHERE s2.mediaPackageId = s.mediaPackageId "
+            + ")"
+    ),
+    @NamedQuery(
+        name = "Snapshot.findLatestByMpIds",
+        query = "SELECT s FROM Snapshot s "
+            + "WHERE s.mediaPackageId IN :mediaPackageIds "
+            + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
+            + "AND s.version = ( "
+            + "  SELECT MAX(s2.version) FROM Snapshot s2 WHERE s2.mediaPackageId = s.mediaPackageId "
+            + ") "
+    ),
+    @NamedQuery(
+        name = "Snapshot.findByMpIdOrgIdAndVersion",
+        query = "SELECT s FROM Snapshot s "
+            + "WHERE s.mediaPackageId = :mediaPackageId "
+            + "AND s.organizationId = :organizationId "
+            + "AND s.version = :version "
+    ),
+    @NamedQuery(
+        name = "Snapshot.countSnapshots",
+        query = "SELECT COUNT(s) FROM Snapshot s "
+            + "WHERE (:organizationId IS NULL OR s.organizationId = :organizationId)"
+    ),
+    @NamedQuery(
+        name = "Snapshot.updateStorageIdByVersionAndMpId",
+        query = "UPDATE Snapshot s SET s.storageId = :storageId "
+            + "WHERE s.version = :version "
+            + "AND s.mediaPackageId = :mediaPackageId"
+    ),
+    @NamedQuery(
+        name = "Snapshot.updateAvailabilityByVersionAndMpId",
+        query = "UPDATE Snapshot s SET s.availability = :availability "
+            + "WHERE s.version = :version "
+            + "AND s.mediaPackageId = :mediaPackageId"
+    ),
+    @NamedQuery(
+      name = "Snapshot.getSnapshotVersions",
+      query = "SELECT s.version FROM Snapshot s "
+            + "WHERE s.mediaPackageId = :mediaPackageId "
+            + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
+            + "ORDER BY s.version ASC"
+    ),
 })
 // Maintain own generator to support database migrations from Archive to AssetManager
 // The generator's initial value has to be set after the data migration.

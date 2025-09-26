@@ -700,7 +700,7 @@ public abstract class OaiPmhRepository implements ManagedService {
       }
     }
 
-    private class BadResumptionTokenException extends RuntimeException {
+    private final class BadResumptionTokenException extends RuntimeException {
     }
   }
 }

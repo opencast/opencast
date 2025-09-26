@@ -110,7 +110,7 @@ import javax.ws.rs.core.UriBuilder;
  */
 @Component(
     property = {
-    "service.description=Workspace"
+        "service.description=Workspace"
     },
     immediate = true,
     service = { Workspace.class }

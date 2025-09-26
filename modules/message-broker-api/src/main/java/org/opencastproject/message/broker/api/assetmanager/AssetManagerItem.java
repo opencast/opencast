@@ -147,14 +147,14 @@ public abstract class AssetManagerItem implements MessageItem, Serializable {
 
     public static final Function<TakeSnapshot, MediaPackage> getMediaPackage =
         new Function<TakeSnapshot, MediaPackage>() {
-      @Override
-      public MediaPackage apply(TakeSnapshot a) {
-        return a.getMediapackage();
-      }
-    };
+          @Override
+          public MediaPackage apply(TakeSnapshot a) {
+            return a.getMediapackage();
+          }
+        };
 
-    public static final Function<TakeSnapshot, Optional<DublinCoreCatalog>> getEpisodeDublincore
-        = new Function<TakeSnapshot, Optional<DublinCoreCatalog>>() {
+    public static final Function<TakeSnapshot, Optional<DublinCoreCatalog>> getEpisodeDublincore =
+        new Function<TakeSnapshot, Optional<DublinCoreCatalog>>() {
           @Override
           public Optional<DublinCoreCatalog> apply(TakeSnapshot a) {
             return a.getEpisodeDublincore();
@@ -163,11 +163,11 @@ public abstract class AssetManagerItem implements MessageItem, Serializable {
 
     public static final Function<TakeSnapshot, AccessControlList> getAcl =
         new Function<TakeSnapshot, AccessControlList>() {
-      @Override
-      public AccessControlList apply(TakeSnapshot a) {
-        return a.getAcl();
-      }
-    };
+          @Override
+          public AccessControlList apply(TakeSnapshot a) {
+            return a.getAcl();
+          }
+        };
 
   }
 

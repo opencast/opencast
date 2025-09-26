@@ -137,9 +137,10 @@ public class UrlSigningEndpoint {
   ) {
     try {
       if (signingService.accepts(baseUrl)) {
-        final String signedUrl = signingService.sign(baseUrl, new DateTime(validUntil
-                * DateTimeConstants.MILLIS_PER_SECOND), (validFrom > 0 ? new DateTime(validFrom
-                * DateTimeConstants.MILLIS_PER_SECOND) : null), trimToNull(ipAddr));
+        final String signedUrl = signingService.sign(baseUrl,
+            new DateTime(validUntil * DateTimeConstants.MILLIS_PER_SECOND),
+            (validFrom > 0 ? new DateTime(validFrom * DateTimeConstants.MILLIS_PER_SECOND) : null),
+            trimToNull(ipAddr));
         return Response.ok(signedUrl).build();
       } else {
         return Response.status(SC_BAD_REQUEST).build();
