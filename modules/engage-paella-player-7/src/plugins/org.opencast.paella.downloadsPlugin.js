@@ -164,9 +164,14 @@ export default class DownloadsPlugin extends PopUpButtonPlugin {
           let cmeta = '';
           const lang_tag = d?.tags?.filter(x => x.startsWith('lang:'));
           if (lang_tag.length > 0) {
-            const captions_lang = lang_tag[0].split(':')[1];
-            const languageNames = new Intl.DisplayNames([window.navigator.language], {type: 'language'});
-            cmeta = languageNames.of(captions_lang) || translate('Unknown language');
+            try {
+              const captions_lang = lang_tag[0].split(':')[1];
+              const languageNames = new Intl.DisplayNames([window.navigator.language], {type: 'language'});
+              cmeta = languageNames.of(captions_lang.replace(/_/g, '-')) || translate('Unknown language');
+            }
+            catch (error) {
+              cmeta = translate('Unknown language');
+            }
           }
 
           const elm = createElementWithHtmlText(`
