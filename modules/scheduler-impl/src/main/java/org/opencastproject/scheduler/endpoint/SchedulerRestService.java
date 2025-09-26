@@ -124,7 +124,6 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -1607,7 +1606,7 @@ public class SchedulerRestService {
     if (c == null) {
       c = (Catalog) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
               .newElement(MediaPackageElement.Type.Catalog, flavor);
-      c.setIdentifier(UUID.randomUUID().toString());
+      c.generateIdentifier();
       logger.info("Adding catalog with flavor {} to mediapackage {}", flavor, mediaPackage);
       mediaPackage.add(c);
     }

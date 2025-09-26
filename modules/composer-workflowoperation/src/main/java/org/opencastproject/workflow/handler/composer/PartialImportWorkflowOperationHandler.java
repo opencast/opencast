@@ -87,7 +87,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -836,11 +835,10 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
       File originalFile = workspace.get(copyTrack.getURI());
       in = new FileInputStream(originalFile);
 
-      String elementID = UUID.randomUUID().toString();
-      copyTrack.setURI(workspace.put(mediaPackage.getIdentifier().toString(), elementID,
+      copyTrack.generateIdentifier();
+      copyTrack.setURI(workspace.put(mediaPackage.getIdentifier().toString(), copyTrack.getIdentifier(),
               FilenameUtils.getName(copyTrack.getURI().toString()), in));
       copyTrack.setFlavor(targetFlavor);
-      copyTrack.setIdentifier(elementID);
       copyTrack.referTo(track);
       mediaPackage.add(copyTrack);
       logger.info("Copied partial source element {} to {} with target flavor {}", track.toString(),

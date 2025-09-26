@@ -52,7 +52,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * The <code>RenameFilesWorkflowOperationHandler</code> will rename files referenced in tracks based on metadata
@@ -129,7 +128,7 @@ public class RenameFilesWorkflowOperationHandler extends AbstractWorkflowOperati
     for (var track: trackSelector.select(mediaPackage, false)) {
       var uri = track.getURI();
       var extension = FilenameUtils.getExtension(uri.toString());
-      var newElementId = UUID.randomUUID().toString();
+      track.generateIdentifier();
 
       // Prepare placeholders and filename
       var filename = pattern;
@@ -141,9 +140,8 @@ public class RenameFilesWorkflowOperationHandler extends AbstractWorkflowOperati
       // Put updated filename in working file repository and update the track.
       // Make sure it has a new identifier to prevent conflicts with the old files.
       try (var in = workspace.read(uri)) {
-        var newUri = workspace.put(mediaPackageId, newElementId, filename, in);
+        var newUri = workspace.put(mediaPackageId, track.getIdentifier(), filename, in);
         logger.info("Renaming {} to {}", uri, newUri);
-        track.setIdentifier(newElementId);
         track.setURI(newUri);
       } catch (NotFoundException | IOException e) {
         throw new WorkflowOperationException("Failed moving track file", e);

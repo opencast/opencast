@@ -29,7 +29,6 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
-import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
@@ -151,7 +150,7 @@ public class CropWorkflowOperationHandler extends AbstractWorkflowOperationHandl
       }
 
       // update identifier
-      croppedTrack.setIdentifier(IdImpl.fromUUID().toString());
+      croppedTrack.generateIdentifier();
 
       // move into space for media package in ws/wfr
       try {

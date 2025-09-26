@@ -53,7 +53,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Workflow operation handler for cloning tracks from a flavor
@@ -172,9 +171,8 @@ public class CloneWorkflowOperationHandler extends AbstractWorkflowOperationHand
   }
 
   private MediaPackageElement copyElement(MediaPackageElement element) throws WorkflowOperationException {
-    String elementId = UUID.randomUUID().toString();
     MediaPackageElement newElement = (MediaPackageElement) element.clone();
-    newElement.setIdentifier(elementId);
+    newElement.generateIdentifier();
 
     File sourceFile = null;
     String toFileName = null;
@@ -182,7 +180,7 @@ public class CloneWorkflowOperationHandler extends AbstractWorkflowOperationHand
       URI sourceURI = element.getURI();
       sourceFile = workspace.get(sourceURI);
 
-      toFileName = elementId;
+      toFileName = newElement.getIdentifier();
       String extension = FilenameUtils.getExtension(sourceFile.getName());
       if (!"".equals(extension))
         toFileName += "." + extension;
