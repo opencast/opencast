@@ -58,68 +58,6 @@ public final class Collections {
     }
   }
 
-  /**
-   * Apply a function <code>f</code> to all elements of collection <code>as</code> to produce a new collection
-   * <code>bs</code>.
-   *
-   * An (empty) instance of the target collection has to be provided explicitly.
-   *
-   * @param as
-   *          the source collection
-   * @param bs
-   *          the (empty) target collection
-   * @param f
-   *          the function to apply to each element of <code>as</code>
-   * @deprecated
-   */
-  @Deprecated
-  public static <A, B, M extends Collection<B>> M map(Collection<A> as, M bs, Function<A, B> f) {
-    for (A x : as) {
-      bs.add(f.apply(x));
-    }
-    return bs;
-  }
-
-  /**
-   * Apply a function <code>f</code> to all elements of collection <code>as</code> to produce a new collection
-   * <code>bs</code>.
-   *
-   * The type of collection <code>as</code> needs a parameterless constructor.
-   *
-   * Please note that since java does not support higher-order polymorphism -- which is needed to capture the type of
-   * the collection -- some casting on the client side may still be necessary.
-   *
-   * @throws RuntimeException
-   *           if the target collection cannot be created
-   * @deprecated
-   */
-  @Deprecated
-  public static <A, B> Collection<B> map(Collection<A> as, Function<A, B> f) {
-    Collection<B> b = buildFrom(as);
-    for (A x : as) {
-      b.add(f.apply(x));
-    }
-    return b;
-  }
-
-  /**
-   * Return a new collection containing only the elements that satisfy predicate <code>p</code>.
-   *
-   * The type of collection <code>as</code> needs a parameterless constructor.
-   *
-   * @deprecated
-   */
-  @Deprecated
-  public static <A, M extends Collection<A>> M filter(M as, Predicate<A> p) {
-    @SuppressWarnings("unchecked")
-    final M filtered = (M) buildFrom(as);
-    for (A a : as) {
-      if (p.apply(a))
-        filtered.add(a);
-    }
-    return filtered;
-  }
-
   /** Return the head of list <code>as</code> or <code>none</code>. */
   public static <A> Optional<A> head(List<A> as) {
     if (!as.isEmpty()) {

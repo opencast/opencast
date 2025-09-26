@@ -26,7 +26,6 @@ import static org.opencastproject.util.EqualsUtil.eqObj;
 import static org.opencastproject.util.data.Collections.list;
 
 import org.opencastproject.util.data.Collections;
-import org.opencastproject.util.data.Function;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -228,15 +227,6 @@ public final class MimeType implements Comparable<MimeType>, Serializable {
   public boolean eq(String type, String subtype) {
     return this.type.equalsIgnoreCase(type) && this.subtype.equalsIgnoreCase(subtype);
   }
-
-  /** {@link #eq(org.opencastproject.util.MimeType)} as a function. */
-  // CHECKSTYLE:OFF
-  public final Function<MimeType, Boolean> eq = new Function<MimeType, Boolean>() {
-    @Override public Boolean apply(MimeType other) {
-      return eq(other);
-    }
-  };
-  // CHECKSTYLE:ON
 
   /**
    * Returns <code>true</code> if this mime type is an equivalent for the specified type and subtype.

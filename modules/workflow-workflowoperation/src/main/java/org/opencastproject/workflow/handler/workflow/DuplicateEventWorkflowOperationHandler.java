@@ -515,7 +515,7 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
         final Job job = distributionService.distribute(InternalPublicationChannel.CHANNEL_ID, destination,
             element.getIdentifier());
         final MediaPackageElement distributedElement =
-            JobUtil.payloadAsMediaPackageElement(serviceRegistry).apply(job);
+            JobUtil.payloadAsMediaPackageElement(serviceRegistry, job);
         destination.remove(element);
 
         updateTags(distributedElement, targetTags);

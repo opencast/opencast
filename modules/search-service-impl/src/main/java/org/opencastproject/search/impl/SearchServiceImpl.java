@@ -22,7 +22,7 @@
 package org.opencastproject.search.impl;
 
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
-import static org.opencastproject.util.data.functions.Functions.chuck;
+import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;

@@ -52,8 +52,6 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.Jsons;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.functions.Functions;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -147,7 +145,7 @@ public abstract class AbstractAclServiceRestEndpoint {
       throw new WebApplicationException(Response.Status.BAD_REQUEST);
     }
 
-    AccessControlList acl = AccessControlUtil.extendAcl(parseAcl.apply(accessControlList), role, action, allow);
+    AccessControlList acl = AccessControlUtil.extendAcl(parseAcl(accessControlList), role, action, allow);
     return JsonConv.full(acl).toJson();
   }
 
@@ -177,7 +175,7 @@ public abstract class AbstractAclServiceRestEndpoint {
       throw new WebApplicationException(Response.Status.BAD_REQUEST);
     }
 
-    AccessControlList acl = AccessControlUtil.reduceAcl(parseAcl.apply(accessControlList), role, action);
+    AccessControlList acl = AccessControlUtil.reduceAcl(parseAcl(accessControlList), role, action);
     return JsonConv.full(acl).toJson();
   }
 
@@ -198,7 +196,7 @@ public abstract class AbstractAclServiceRestEndpoint {
   )
   public String getAcls() {
     List<Jsons.Val> acls = aclService().getAcls().stream()
-        .map(Functions.co(JsonConv.fullManagedAcl)::apply)
+        .map(JsonConv.fullManagedAcl)
         .toList();
     return Jsons.arr(acls).toJson();
   }
@@ -225,7 +223,7 @@ public abstract class AbstractAclServiceRestEndpoint {
       @FormParam("name") String name,
       @FormParam("acl") String accessControlList
   ) {
-    final AccessControlList acl = parseAcl.apply(accessControlList);
+    final AccessControlList acl = parseAcl(accessControlList);
     final Optional<ManagedAcl> managedAcl = aclService().createAcl(acl, name);
     if (managedAcl.isEmpty()) {
       logger.info("An ACL with the same name '{}' already exists", name);
@@ -261,7 +259,7 @@ public abstract class AbstractAclServiceRestEndpoint {
       @FormParam("acl") String accessControlList
   ) throws NotFoundException {
     final Organization org = getSecurityService().getOrganization();
-    final AccessControlList acl = parseAcl.apply(accessControlList);
+    final AccessControlList acl = parseAcl(accessControlList);
     final ManagedAclImpl managedAcl = new ManagedAclImpl(aclId, name, org.getId(), acl);
     if (!aclService().updateAcl(managedAcl)) {
       logger.info("No ACL with id '{}' could be found under organization '{}'", aclId, org.getId());
@@ -365,17 +363,14 @@ public abstract class AbstractAclServiceRestEndpoint {
     }
   }
 
-  private static final Function<String, AccessControlList> parseAcl = new Function<String, AccessControlList>() {
-    @Override
-    public AccessControlList apply(String acl) {
-      try {
-        return AccessControlParser.parseAcl(acl);
-      } catch (Exception e) {
-        logger.warn("Unable to parse ACL");
-        throw new WebApplicationException(Response.Status.BAD_REQUEST);
-      }
+  private static AccessControlList parseAcl(String acl) {
+    try {
+      return AccessControlParser.parseAcl(acl);
+    } catch (Exception e) {
+      logger.warn("Unable to parse ACL");
+      throw new WebApplicationException(Response.Status.BAD_REQUEST);
     }
-  };
+  }
 
   private AclService aclService() {
     return getAclServiceFactory().serviceFor(getSecurityService().getOrganization());

@@ -29,7 +29,6 @@ import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.util.data.Either;
-import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Tuple;
 
 import org.apache.http.HttpEntityEnclosingRequest;
@@ -96,13 +95,6 @@ public final class HttpUtil {
   public static NameValuePair param(String name, String value) {
     return new BasicNameValuePair(name, value);
   }
-
-  public static final Function<HttpResponse, Integer> getStatusCode = new Function<HttpResponse, Integer>() {
-    @Override
-    public Integer apply(HttpResponse response) {
-      return response.getStatusLine().getStatusCode();
-    }
-  };
 
   public static boolean isOk(HttpResponse res) {
     return res.getStatusLine().getStatusCode() == HttpStatus.SC_OK;

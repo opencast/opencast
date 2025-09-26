@@ -27,6 +27,7 @@ import static org.opencastproject.mediapackage.MediaPackageSupport.getFileName;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLE;
 import static org.opencastproject.security.util.SecurityUtil.getEpisodeRoleId;
+import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.assetmanager.api.Asset;
 import org.opencastproject.assetmanager.api.AssetId;
@@ -84,7 +85,6 @@ import org.opencastproject.util.ChecksumType;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RequireUtil;
-import org.opencastproject.util.data.functions.Functions;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.google.common.collect.Sets;
@@ -903,7 +903,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
           copyAssetsToStore(s, targetStore);
           copyManifest(s, targetStore);
         } catch (Exception e) {
-          Functions.chuck(e);
+          chuck(e);
         }
         getDatabase().setStorageLocation(s, targetStoreId);
         currentStore.delete(DeletionSelector.delete(s.getOrganizationId(),
@@ -920,7 +920,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
           moveSnapshotToStore(version, mpId, intermediateStore);
           moveSnapshotToStore(version, mpId, targetStoreId);
         } catch (NotFoundException e) {
-          Functions.chuck(e);
+          chuck(e);
         }
       }
     });
@@ -1342,7 +1342,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
    */
   void calcChecksumsForMediaPackageElements(PartialMediaPackage pmp) {
     pmp.getElements().stream()
-        .filter(mpe -> hasNoChecksum.apply(mpe))
+        .filter(hasNoChecksum)
         .forEach(mpe -> {
           File file = null;
           try {
@@ -1502,7 +1502,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
    * non-publication elements.
    */
   static PartialMediaPackage assetsOnly(MediaPackage mp) {
-    Predicate<MediaPackageElement> isAsset = e -> isNotPublication.apply(e);
+    Predicate<MediaPackageElement> isAsset = isNotPublication;
     return PartialMediaPackage.mk(mp, isAsset);
   }
 

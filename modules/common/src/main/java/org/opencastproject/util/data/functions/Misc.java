@@ -23,10 +23,9 @@ package org.opencastproject.util.data.functions;
 
 import static org.opencastproject.util.EqualsUtil.eq;
 
-import org.opencastproject.util.data.Function;
-
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 /** Various functions not directly bound to any type. */
 public final class Misc {
@@ -51,12 +50,7 @@ public final class Misc {
 
   /** {@link #chuck(Throwable)} as a function. */
   public static <A extends Throwable, B> Function<A, B> chuck() {
-    return new Function<A, B>() {
-      @Override
-      public B apply(Throwable throwable) {
-        return chuck(throwable);
-      }
-    };
+    return throwable -> chuck(throwable);
   }
 
   /** Cast from A to B with special treatment of the Number classes. */
@@ -84,16 +78,6 @@ public final class Misc {
     }
   }
 
-  /** Cast from A to B. */
-  public static <A, B> Function<A, B> cast() {
-    return new Function<A, B>() {
-      @Override
-      public B apply(A a) {
-        return (B) a;
-      }
-    };
-  }
-
   /** Widening cast. */
   public static <A> List<A> widen(List<? extends A> xs) {
     return (List<A>) xs;
@@ -104,12 +88,7 @@ public final class Misc {
     return (Optional<A>) xs;
   }
 
-  public static <A> Function<A, A> ifThen(final A predicate, final A b) {
-    return new Function<A, A>() {
-      @Override
-      public A apply(A a) {
-        return predicate.equals(a) ? b : a;
-      }
-    };
+  public static <A> Function<A, A> ifThen(A predicate, A b) {
+    return a -> predicate.equals(a) ? b : a;
   }
 }

@@ -23,9 +23,6 @@ package org.opencastproject.util;
 
 import static org.junit.Assert.assertEquals;
 import static org.opencastproject.util.IoSupport.loadFileFromClassPathAsString;
-import static org.opencastproject.util.JsonVal.asBoolean;
-import static org.opencastproject.util.JsonVal.asInteger;
-import static org.opencastproject.util.JsonVal.asString;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -44,9 +41,10 @@ public class JsonObjTest {
     final JsonObj json = JsonObj.jsonObj(jsonString);
     assertEquals("org.opencastproject.analytics", json.getObj("service").get(String.class, "type"));
     assertEquals(true, json.obj("service").get(Boolean.class, "active"));
-    assertEquals(true, json.obj("service").val("active").as(asBoolean));
-    assertEquals("http://localhost:8080", json.obj("service").val("host").as(asString));
-    assertEquals(new Integer(1), json.obj("service").arr("array").val(0).as(asInteger));
+    assertEquals(true, JsonVal.asBoolean(json.obj("service").val("active").get()));
+    assertEquals("http://localhost:8080", JsonVal.asString(json.obj("service").val("host").get()));
+    assertEquals(Integer.valueOf(1),
+        JsonVal.asInteger(json.obj("service").arr("array").val(0).get()));
   }
 
   @Test(expected = Exception.class)

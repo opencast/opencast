@@ -170,7 +170,7 @@ public final class UrlSupport {
     return URI.create(
         concat(
             Arrays.stream(parts)
-                .map(asStringNull()::apply)
+                .map(p -> asStringNull(p))
                 .collect(Collectors.toList())
         )
     );

@@ -55,7 +55,6 @@ import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Function0.X;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -1219,32 +1218,28 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     final Date ingestDate = startCache.getIfPresent(mp.getIdentifier().toString());
     wfConfig.put(IngestService.START_DATE_KEY, DATE_FORMAT.format(ingestDate != null ? ingestDate : new Date()));
 
-    final X<WorkflowInstance> ingest = new X<WorkflowInstance>() {
-      @Override
-      public WorkflowInstance xapply() throws Exception {
-        /* Legacy support: Try to convert the workflowInstance to integer */
-        Long workflowInstanceId = null;
-        if (StringUtils.isNotBlank(workflowInstance)) {
-          try {
-            workflowInstanceId = Long.parseLong(workflowInstance);
-          } catch (NumberFormatException e) {
-            // The workflowId is not a long value and might be the media package identifier
-            wfConfig.put(IngestServiceImpl.LEGACY_MEDIAPACKAGE_ID_KEY, workflowInstance);
-          }
-        }
-
-        if (workflowInstanceId != null) {
-          return ingestService.ingest(mp, trimToNull(workflowDefinition), wfConfig, workflowInstanceId);
-        } else {
-          return ingestService.ingest(mp, trimToNull(workflowDefinition), wfConfig);
+    try {
+      /* Legacy support: Try to convert the workflowInstance to integer */
+      Long workflowInstanceId = null;
+      if (StringUtils.isNotBlank(workflowInstance)) {
+        try {
+          workflowInstanceId = Long.parseLong(workflowInstance);
+        } catch (NumberFormatException e) {
+          // The workflowId is not a long value and might be the media package identifier
+          wfConfig.put(IngestServiceImpl.LEGACY_MEDIAPACKAGE_ID_KEY, workflowInstance);
         }
       }
-    };
 
-    try {
-      WorkflowInstance workflow = ingest.apply();
+      WorkflowInstance workflow;
+      if (workflowInstanceId != null) {
+        workflow = ingestService.ingest(mp, trimToNull(workflowDefinition), wfConfig, workflowInstanceId);
+      } else {
+        workflow = ingestService.ingest(mp, trimToNull(workflowDefinition), wfConfig);
+      }
+
       startCache.asMap().remove(mp.getIdentifier().toString());
       return Response.ok(XmlWorkflowParser.toXml(workflow)).build();
+
     } catch (Exception e) {
       Throwable cause = e.getCause();
       if (cause instanceof NotFoundException) {

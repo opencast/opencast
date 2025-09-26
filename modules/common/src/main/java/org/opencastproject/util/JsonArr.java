@@ -39,7 +39,7 @@ public final class JsonArr implements Iterable<JsonVal> {
   @Override
   public Iterator<JsonVal> iterator() {
     return val.stream()
-        .map(JsonVal.asJsonVal::apply)
+        .map(JsonVal::asJsonVal)
         .iterator();
   }
 }

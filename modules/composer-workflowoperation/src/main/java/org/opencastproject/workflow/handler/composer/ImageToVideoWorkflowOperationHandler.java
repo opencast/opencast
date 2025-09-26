@@ -21,8 +21,9 @@
 
 package org.opencastproject.workflow.handler.composer;
 
+import static org.opencastproject.util.data.functions.Misc.chuck;
+
 import org.opencastproject.composer.api.ComposerService;
-import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.Attachment;
@@ -30,12 +31,10 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
-import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageSupport.Filters;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.JobUtil;
-import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.functions.Strings;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
@@ -55,6 +54,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -135,8 +135,10 @@ public class ImageToVideoWorkflowOperationHandler extends AbstractWorkflowOperat
     final Optional<MediaPackageElementFlavor> targetFlavor = Optional.ofNullable(targetFlavors.get(0));
     final double duration = getCfg(wi, OPT_DURATION)
         .flatMap(Strings::toDouble)
-        .orElseGet(() -> this.<Double>cfgKeyMissing(OPT_DURATION).apply());
-    final String profile = getCfg(wi, OPT_PROFILE).orElseGet(() -> this.<String>cfgKeyMissing(OPT_PROFILE).apply());
+        .orElseThrow(() -> new WorkflowOperationException(OPT_DURATION + " is missing or malformed"));
+    final String profile = getCfg(wi, OPT_PROFILE)
+        .orElseThrow(() -> new WorkflowOperationException(OPT_PROFILE + " is missing or malformed"));
+
     // run image to video jobs
     final Function<MediaPackageElement, Boolean> flavorFilter;
     if (sourceFlavor.isPresent()) {
@@ -146,9 +148,9 @@ public class ImageToVideoWorkflowOperationHandler extends AbstractWorkflowOperat
     }
     final List<Job> jobs = Arrays.stream(mp.getAttachments())
         .filter(mpe -> flavorFilter.apply(mpe))
-        .filter(mpe -> Filters.hasTagAny(sourceTags).apply(mpe))
+        .filter(mpe -> Filters.hasTagAny(mpe, sourceTags))
         .map(mpe -> (Attachment) mpe)
-        .map(imageToVideo(profile, duration)::apply)
+        .map(imageToVideo(profile, duration))
         .collect(Collectors.toList());
     if (JobUtil.waitForJobs(serviceRegistry, jobs).isSuccess()) {
       for (final Job job : jobs) {
@@ -183,22 +185,18 @@ public class ImageToVideoWorkflowOperationHandler extends AbstractWorkflowOperat
 
   /** Returned function may throw exceptions. */
   private Function<Attachment, Job> imageToVideo(final String profile, final double duration) {
-    return new Function.X<Attachment, Job>() {
-      @Override
-      protected Job xapply(Attachment attachment) throws MediaPackageException, EncoderException {
-        logger.info("Converting image {} to a video of {} sec", attachment.getURI().toString(), duration);
+    return attachment -> {
+      try {
+        logger.info("Converting image {} to a video of {} sec", attachment.getURI(), duration);
         return composerService.imageToVideo(attachment, profile, duration);
+      } catch (Exception e) {
+        return chuck(e);
       }
     };
   }
 
   // Fallback function if sourceFlavor is empty
-  private final Function<MediaPackageElement, Boolean> alwaysTrue = new Function<MediaPackageElement, Boolean>() {
-    @Override
-    public Boolean apply(MediaPackageElement mpe) {
-      return true;
-    }
-  };
+  private final Function<MediaPackageElement, Boolean> alwaysTrue = mpe -> true;
 
   @Reference
   @Override  public void setServiceRegistry(ServiceRegistry serviceRegistry) {

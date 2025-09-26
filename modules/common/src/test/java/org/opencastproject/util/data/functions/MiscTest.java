@@ -31,14 +31,15 @@ import java.util.Optional;
 public class MiscTest {
   @Test
   public void testIfThen() {
-    assertEquals(Optional.of("hallo"), Optional.of("hello").map(ifThen("hello", "hallo")::apply));
-    assertEquals(Optional.of(-1), Optional.of("none").map(ifThen("none", "-1")::apply).flatMap(Strings::toInt));
-    assertEquals(Optional.of(300), Optional.of("300").map(ifThen("none", "-1")::apply).flatMap(Strings::toInt));
+    assertEquals(Optional.of("hallo"), Optional.of("hello").map(ifThen("hello", "hallo")));
+    assertEquals(Optional.of(-1), Optional.of("none").map(ifThen("none", "-1")).flatMap(Strings::toInt));
+    assertEquals(Optional.of(300), Optional.of("300").map(ifThen("none", "-1")).flatMap(Strings::toInt));
   }
+
 
   @Test(expected = RuntimeException.class)
   public void testIfThenError() {
-    Optional.of("200a").map(ifThen("none", "-1")::apply).flatMap(Strings::toInt).orElseThrow(() -> new RuntimeException());
+    Optional.of("200a").map(ifThen("none", "-1")).flatMap(Strings::toInt).orElseThrow(() -> new RuntimeException());
   }
 
   @Test

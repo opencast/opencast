@@ -22,11 +22,10 @@
 
 package org.opencastproject.util;
 
-import org.opencastproject.util.data.Function;
-
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * Enum utility methods.
@@ -72,14 +71,12 @@ public final class EnumSupport {
   }
 
   /** Create a function to parse a string into an Enum value. */
-  public static <A extends Enum> Function<String, Optional<A>> parseEnum(final A e) {
-    return new Function<String, Optional<A>>() {
-      @Override public Optional<A> apply(String s) {
-        try {
-          return Optional.of((A) Enum.valueOf(e.getClass(), s));
-        } catch (Exception ex) {
-          return Optional.empty();
-        }
+  public static <A extends Enum<A>> Function<String, Optional<A>> parseEnum(final A e) {
+    return s -> {
+      try {
+        return Optional.of((A) Enum.valueOf(e.getClass(), s));
+      } catch (Exception ex) {
+        return Optional.empty();
       }
     };
   }

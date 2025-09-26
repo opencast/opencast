@@ -50,7 +50,7 @@ public final class JaxbIncidentDigestList {
   public JaxbIncidentDigestList(IncidentService svc, Locale locale, List<Incident> incidents)
       throws IncidentServiceException, NotFoundException {
     this.incidents = incidents.stream()
-        .map(JaxbIncidentDigest.mkFn(svc, locale)::apply)
+        .map(i -> JaxbIncidentDigest.mkFn(svc, locale, i))
         .collect(Collectors.toList());
   }
 }

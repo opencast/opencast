@@ -274,10 +274,10 @@ public class OaiPmhRepositoryTest {
       boolean ok = true;
       for (JsonVal message : JsonObj.jsonObj(json).obj("json").arr("messages")) {
         if (message.isObj()) {
-          final JsonObj messageObj = message.as(JsonVal.asJsonObj);
+          final JsonObj messageObj = JsonVal.asJsonObj(message.get());
           if (messageObj.has("className")) {
-            final String className = messageObj.val("className").as(JsonVal.asString).trim();
-            final String text = messageObj.val("text").as(JsonVal.asString).trim();
+            final String className = JsonVal.asString(messageObj.val("className").get()).trim();
+            final String text = JsonVal.asString(messageObj.val("text").get()).trim();
             logger.info("[{}] {}", className, text);
             ok = ok && (eq(className, "correct")
                     // since the validator does not validate everything correctly here are some exclusions

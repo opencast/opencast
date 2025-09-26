@@ -25,7 +25,6 @@ import static org.opencastproject.util.Jsons.obj;
 import static org.opencastproject.util.Jsons.p;
 import static org.opencastproject.util.data.Tuple.tuple;
 import static org.opencastproject.util.data.functions.Strings.split;
-import static org.opencastproject.util.data.functions.Strings.trimToNil;
 
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
@@ -33,8 +32,8 @@ import org.opencastproject.rest.ErrorCodeException;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.Jsons.Obj;
-import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Tuple;
+import org.opencastproject.util.data.functions.Strings;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
@@ -185,7 +184,7 @@ public final class RestUtil {
     return "json".equalsIgnoreCase(type) ? MediaType.APPLICATION_JSON_TYPE : MediaType.APPLICATION_XML_TYPE;
   }
 
-  private static final Function<String, String[]> CSV_SPLIT = split(Pattern.compile(","));
+  private static final Pattern CSV_PATTERN = Pattern.compile(",");
 
   /**
    * Split a comma separated request param into a list of trimmed strings discarding any blank parts.
@@ -193,8 +192,8 @@ public final class RestUtil {
    * x=comma,separated,,%20value -&gt; ["comma", "separated", "value"]
    */
   public static List<String> splitCommaSeparatedParam(Optional<String> param) {
-    return param.map(s -> Arrays.stream(CSV_SPLIT.apply(s))
-            .map(trimToNil::apply)
+    return param.map(s -> Arrays.stream(split(CSV_PATTERN, s))
+            .map(Strings::trimToNil)
             .flatMap(List::stream)
             .toList())
         .orElse(List.of());

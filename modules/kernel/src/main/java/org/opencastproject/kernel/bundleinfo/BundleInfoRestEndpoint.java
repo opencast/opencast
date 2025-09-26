@@ -27,14 +27,12 @@ import static org.opencastproject.util.EqualsUtil.ne;
 import static org.opencastproject.util.Jsons.arr;
 import static org.opencastproject.util.Jsons.obj;
 import static org.opencastproject.util.Jsons.p;
-import static org.opencastproject.util.Jsons.stringVal;
 import static org.opencastproject.util.RestUtil.R.notFound;
 import static org.opencastproject.util.RestUtil.R.ok;
 import static org.opencastproject.util.data.Collections.set;
 import static org.opencastproject.util.data.Collections.toArray;
 
 import org.opencastproject.util.Jsons;
-import org.opencastproject.util.data.Function;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -48,6 +46,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -94,7 +93,7 @@ public abstract class BundleInfoRestEndpoint {
     returnDescription = "The search results, expressed as xml or json.")
   public Response getVersions() {
     List<Jsons.Val> bundleInfos = getDb().getBundles().stream()
-        .map(b -> (Jsons.Val) bundleInfo.apply(b))
+        .map(b -> (Jsons.Val) bundleInfo(b))
         .toList();
 
     return ok(obj(p("bundleInfos", arr(bundleInfos)), p("count", bundleInfos.size())));
@@ -118,17 +117,14 @@ public abstract class BundleInfoRestEndpoint {
       @RestResponse(description = "cannot find any bundles with the given prefix", responseCode = HttpServletResponse.SC_NOT_FOUND) },
     returnDescription = "The search results, expressed as xml or json.")
   public Response checkBundles(@DefaultValue(DEFAULT_BUNDLE_PREFIX) @QueryParam("prefix") List<String> prefixes) {
-    return withBundles(prefixes, new Function<List<BundleInfo>, Response>() {
-      @Override
-      public Response apply(List<BundleInfo> infos) {
-        final String bundleVersion = infos.get(0).getBundleVersion();
-        final Optional<String> buildNumber = infos.get(0).getBuildNumber();
-        for (BundleInfo a : infos) {
-          if (ne(a.getBundleVersion(), bundleVersion) || ne(a.getBuildNumber(), buildNumber))
-            return ok(TEXT_PLAIN_TYPE, "false");
-        }
-        return ok(TEXT_PLAIN_TYPE, "true");
+    return withBundles(prefixes, infos -> {
+      final String bundleVersion = infos.get(0).getBundleVersion();
+      final Optional<String> buildNumber = infos.get(0).getBuildNumber();
+      for (BundleInfo a : infos) {
+        if (ne(a.getBundleVersion(), bundleVersion) || ne(a.getBuildNumber(), buildNumber))
+          return ok(TEXT_PLAIN_TYPE, "false");
       }
+      return ok(TEXT_PLAIN_TYPE, "true");
     });
   }
 
@@ -151,33 +147,30 @@ public abstract class BundleInfoRestEndpoint {
       @RestResponse(description = "No bundles with the given prefix", responseCode = HttpServletResponse.SC_NOT_FOUND) },
     returnDescription = "The search results as json.")
   public Response getBundleVersion(@DefaultValue(DEFAULT_BUNDLE_PREFIX) @QueryParam("prefix") List<String> prefixes) {
-    return withBundles(prefixes, new Function<List<BundleInfo>, Response>() {
-      @Override
-      public Response apply(List<BundleInfo> infos) {
-        final Set<BundleVersion> versions = set();
-        for (BundleInfo bundle : infos) {
-          versions.add(bundle.getVersion());
-        }
-        final BundleInfo example = infos.get(0);
-        switch (versions.size()) {
-          case 0:
-            // no versions...
-            throw new Error("bug");
-          case 1:
-            // all versions align
-            return ok(obj(p("consistent", true))
-                .append(fullVersionJson.apply(example.getVersion()))
-                .append(obj(p("last-modified", lastModified))));
-          default:
-            // multiple versions found
-            return ok(obj(
-                p("consistent", false),
-                p("versions",
-                    arr(StreamSupport.stream(versions.spliterator(), false)
-                        .map(v -> (Jsons.Val) fullVersionJson.apply(v))
-                        .collect(Collectors.toList())))
-            ));
-        }
+    return withBundles(prefixes, infos -> {
+      final Set<BundleVersion> versions = set();
+      for (BundleInfo bundle : infos) {
+        versions.add(bundle.getVersion());
+      }
+      final BundleInfo example = infos.get(0);
+      switch (versions.size()) {
+        case 0:
+          // no versions...
+          throw new Error("bug");
+        case 1:
+          // all versions align
+          return ok(obj(p("consistent", true))
+              .append(fullVersionJson(example.getVersion()))
+              .append(obj(p("last-modified", lastModified))));
+        default:
+          // multiple versions found
+          return ok(obj(
+              p("consistent", false),
+              p("versions",
+                  arr(StreamSupport.stream(versions.spliterator(), false)
+                      .map(v -> (Jsons.Val) fullVersionJson(v))
+                      .collect(Collectors.toList())))
+          ));
       }
     });
   }
@@ -206,24 +199,18 @@ public abstract class BundleInfoRestEndpoint {
     return Response.noContent().build();
   }
 
-  public static final Function<BundleVersion, Jsons.Obj> fullVersionJson = new Function<BundleVersion, Jsons.Obj>() {
-    @Override
-    public Jsons.Obj apply(BundleVersion version) {
-      return obj(p("version", version.getBundleVersion()), p("buildNumber", version.getBuildNumber().map(stringVal::apply)));
-    }
-  };
+  public static final Jsons.Obj fullVersionJson(BundleVersion version) {
+    return obj(p("version", version.getBundleVersion()), p("buildNumber", version.getBuildNumber().map(Jsons::stringVal)));
+  }
 
   public static Jsons.Obj bundleInfoJson(BundleInfo bundle) {
     return obj(p("host", bundle.getHost()), p("bundleSymbolicName", bundle.getBundleSymbolicName()),
-            p("bundleId", bundle.getBundleId())).append(fullVersionJson.apply(bundle.getVersion()));
+            p("bundleId", bundle.getBundleId())).append(fullVersionJson(bundle.getVersion()));
   }
 
-  public static final Function<BundleInfo, Jsons.Obj> bundleInfo = new Function<BundleInfo, Jsons.Obj>() {
-    @Override
-    public Jsons.Obj apply(BundleInfo bundle) {
-      return bundleInfoJson(bundle);
-    }
-  };
+  public static final Jsons.Obj bundleInfo(BundleInfo bundle) {
+    return bundleInfoJson(bundle);
+  }
 
   /** Run <code>f</code> if there is at least one bundle matching the given prefixes. */
   private Response withBundles(List<String> prefixes, Function<List<BundleInfo>, Response> f) {

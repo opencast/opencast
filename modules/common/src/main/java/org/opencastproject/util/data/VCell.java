@@ -88,7 +88,7 @@ public final class VCell<A> extends Cell<A> {
     }
   }
 
-  public <B> Cell<B> lift(Function<A, B> f) {
+  public <B> Cell<B> lift(java.util.function.Function<A, B> f) {
     return fcell(this, f);
   }
 }

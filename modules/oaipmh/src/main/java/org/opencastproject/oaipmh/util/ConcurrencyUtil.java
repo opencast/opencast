@@ -22,8 +22,6 @@
 
 package org.opencastproject.oaipmh.util;
 
-import org.opencastproject.util.data.Function0;
-
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 
@@ -40,7 +38,7 @@ public final class ConcurrencyUtil {
    * to forcibly terminate the service. Waits again then calls <code>executorDoesNotTerminate</code>.
    */
   public static void shutdownAndAwaitTermination(ExecutorService exe, int waitSeconds,
-                                                 Function0<Void> executorDoesNotTerminate) {
+                                                 Runnable executorDoesNotTerminate) {
     // Disable new tasks from being submitted
     exe.shutdown();
     try {
@@ -50,7 +48,7 @@ public final class ConcurrencyUtil {
         exe.shutdownNow();
         // Wait a while for tasks to respond to being cancelled
         if (!exe.awaitTermination(waitSeconds, TimeUnit.SECONDS))
-          executorDoesNotTerminate.apply();
+          executorDoesNotTerminate.run();
       }
     } catch (InterruptedException ie) {
       // Forcibly terminate on interruption

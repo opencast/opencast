@@ -20,7 +20,7 @@
  */
 package org.opencastproject.assetmanager.impl.persistence;
 
-import static org.opencastproject.util.data.functions.Functions.chuck;
+import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.assetmanager.impl.VersionImpl;
 import org.opencastproject.mediapackage.MediaPackage;

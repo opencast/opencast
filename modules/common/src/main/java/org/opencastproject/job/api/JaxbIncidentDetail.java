@@ -23,7 +23,6 @@ package org.opencastproject.job.api;
 
 import static org.opencastproject.util.data.Tuple.tuple;
 
-import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Tuple;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -55,19 +54,7 @@ public final class JaxbIncidentDetail {
     this.content = detail.getB();
   }
 
-  public static final Function<Tuple<String, String>, JaxbIncidentDetail> mkFn = new Function<Tuple<String, String>, JaxbIncidentDetail>() {
-    @Override public JaxbIncidentDetail apply(Tuple<String, String> detail) {
-      return new JaxbIncidentDetail(detail);
-    }
-  };
-
   public Tuple<String, String> toDetail() {
     return tuple(title, content);
   }
-
-  public static final Function<JaxbIncidentDetail, Tuple<String, String>> toDetailFn = new Function<JaxbIncidentDetail, Tuple<String, String>>() {
-    @Override public Tuple<String, String> apply(JaxbIncidentDetail dto) {
-      return dto.toDetail();
-    }
-  };
 }

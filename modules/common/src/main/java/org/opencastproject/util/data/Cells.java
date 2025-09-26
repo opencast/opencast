@@ -49,7 +49,7 @@ public final class Cells {
     }
   }
 
-  public static <B, A> Cell<A> fcell(final Cell<B> master, final Function<B, A> f) {
+  public static <B, A> Cell<A> fcell(final Cell<B> master, final java.util.function.Function<B, A> f) {
     return new FCell<A>() {
       @Override protected A calc() {
         final Tuple<B, Object> mChange = master.change();

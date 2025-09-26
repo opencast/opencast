@@ -22,7 +22,8 @@
 package org.opencastproject.util.data.functions;
 
 import org.opencastproject.util.EqualsUtil;
-import org.opencastproject.util.data.Function;
+
+import java.util.function.Function;
 
 /** Boolean functions. */
 public final class Booleans {
@@ -30,50 +31,25 @@ public final class Booleans {
   }
 
   public static <A> Function<A, Boolean> eq(final A a) {
-    return new Function<A, Boolean>() {
-      @Override
-      public Boolean apply(A x) {
-        return EqualsUtil.eq(x, a);
-      }
-    };
+    return x -> EqualsUtil.eq(x, a);
   }
 
   public static <A extends Comparable<A>> Function<A, Boolean> lt(final A a) {
-    return new Function<A, Boolean>() {
-      @Override
-      public Boolean apply(A x) {
-        return x.compareTo(a) < 0;
-      }
-    };
+    return x -> x.compareTo(a) < 0;
   }
 
   public static <A extends Comparable<A>> Function<A, Boolean> gt(final A a) {
-    return new Function<A, Boolean>() {
-      @Override
-      public Boolean apply(A x) {
-        return x.compareTo(a) > 0;
-      }
-    };
+    return x -> x.compareTo(a) > 0;
   }
 
   /** A function that always returns true. */
   public static <A> Function<A, Boolean> yes() {
-    return new Function<A, Boolean>() {
-      @Override
-      public Boolean apply(A a) {
-        return true;
-      }
-    };
+    return a -> true;
   }
 
   public static <A> Function<A, Boolean> not(Function<A, Boolean> f) {
-    return not.o(f);
+    return a -> !f.apply(a);
   }
 
-  public static final Function<Boolean, Boolean> not = new Function<Boolean, Boolean>() {
-    @Override
-    public Boolean apply(Boolean a) {
-      return !a;
-    }
-  };
+  public static final Function<Boolean, Boolean> not = a -> !a;
 }

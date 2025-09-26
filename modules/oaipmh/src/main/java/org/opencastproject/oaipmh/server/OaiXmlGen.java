@@ -151,7 +151,7 @@ public abstract class OaiXmlGen extends XmlGen {
     // ... then transform it into a node
     return $e(
         "resumptionToken",
-        token.flatMap(inner -> inner.map(mkText::apply)).orElse(nodeZero.apply())
+        token.flatMap(inner -> inner.map(this::$txt)).orElseGet(this::nodeZero)
     );
   }
 

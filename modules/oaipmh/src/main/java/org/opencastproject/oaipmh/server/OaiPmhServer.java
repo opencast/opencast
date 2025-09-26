@@ -259,7 +259,7 @@ public final class OaiPmhServer extends HttpServlet implements OaiPmhServerInfo 
     String[] parts = StringUtils.removeStart(UrlSupport.removeDoubleSeparator(req.getRequestURI()), mountPoint).split("/");
 
     return Arrays.stream(parts)
-        .flatMap(s -> trimToNil.apply(s).stream())
+        .flatMap(s -> trimToNil(s).stream())
         .findFirst();
   }
 

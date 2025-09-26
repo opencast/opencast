@@ -25,8 +25,6 @@ import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.util.XmlSafeParser;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Function0;
 
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
@@ -122,11 +120,9 @@ public abstract class XmlGen {
 
   /** Generate the document as a string. */
   public String generateAsString() {
-    return withResource(new ByteArrayOutputStream(), new Function<ByteArrayOutputStream, String>() {
-      @Override public String apply(ByteArrayOutputStream out) {
-        generate(out);
-        return out.toString();
-      }
+    return withResource(new ByteArrayOutputStream(), out -> {
+      generate(out);
+      return out.toString();
     });
   }
 
@@ -227,7 +223,7 @@ public abstract class XmlGen {
       e.appendChild(txtNode);
       return e;
     } else {
-      return nodeZero.apply();
+      return nodeZero();
     }
   }
 
@@ -376,26 +372,6 @@ public abstract class XmlGen {
   protected Node nodeZero() {
     return document.createTextNode("");
   }
-
-  /**
-   * Lazy version of {@link #nodeZero()}.
-   */
-  protected Function0<Node> nodeZero = new Function0<Node>() {
-    @Override
-    public Node apply() {
-      return nodeZero();
-    }
-  };
-
-  /**
-   * Create a text node from a string.
-   */
-  protected Function<String, Node> mkText = new Function<String, Node>() {
-    @Override
-    public Node apply(String token) {
-      return $txt(token);
-    }
-  };
 
   protected class Namespace {
     private final String prefix;

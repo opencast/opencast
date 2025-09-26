@@ -22,7 +22,6 @@
 package org.opencastproject.util.data.functions;
 
 import org.opencastproject.util.data.Either;
-import org.opencastproject.util.data.Function;
 
 /** {@link Either} related functions. */
 public final class Eithers {
@@ -31,10 +30,6 @@ public final class Eithers {
 
   /** Flatten nested Eithers. */
   public static <A, B> Either<A, B> flatten(Either<A, Either<A, B>> e) {
-    return e.right().bind(new Function<Either<A, B>, Either<A, B>>() {
-      @Override public Either<A, B> apply(Either<A, B> e) {
-        return e.right().either();
-      }
-    });
+    return e.right().bind(inner -> inner.right().either());
   }
 }

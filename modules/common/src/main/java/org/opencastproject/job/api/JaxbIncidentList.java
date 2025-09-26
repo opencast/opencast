@@ -47,7 +47,7 @@ public final class JaxbIncidentList {
   public JaxbIncidentList(List<Incident> incidents)
       throws IncidentServiceException, NotFoundException {
     this.incidents = incidents.stream()
-        .map(JaxbIncident.mkFn::apply)
+        .map(JaxbIncident::new)
         .collect(Collectors.toList());
   }
 

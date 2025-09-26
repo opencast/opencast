@@ -21,13 +21,15 @@
 
 package org.opencastproject.job.api;
 
+import static org.opencastproject.util.data.functions.Misc.chuck;
+
 import org.opencastproject.serviceregistry.api.IncidentL10n;
 import org.opencastproject.serviceregistry.api.IncidentService;
-import org.opencastproject.util.data.Function;
 
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -85,16 +87,17 @@ public final class JaxbIncidentFull {
     this.severity = incident.getSeverity().name();
     this.code = incident.getCode();
     this.details = incident.getDetails().stream()
-        .map(JaxbIncidentDetail.mkFn::apply)
+        .map(JaxbIncidentDetail::new)
         .collect(Collectors.toList());
     this.description = l10n.getDescription();
   }
 
   public static Function<Incident, JaxbIncidentFull> mkFn(final IncidentService svc, final Locale locale) {
-    return new Function.X<Incident, JaxbIncidentFull>() {
-      @Override
-      public JaxbIncidentFull xapply(Incident incident) throws Exception {
+    return incident -> {
+      try {
         return new JaxbIncidentFull(incident, svc.getLocalization(incident.getId(), locale));
+      } catch (Exception e) {
+        return chuck(e);
       }
     };
   }

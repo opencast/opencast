@@ -52,11 +52,7 @@ public class CellTest {
   @Test
   public void testFCell() {
     final VCell<String> c = cell("hello");
-    final Cell<Integer> f = c.lift(new Function<String, Integer>() {
-      @Override public Integer apply(String s) {
-        return s.length();
-      }
-    });
+    final Cell<Integer> f = c.lift(s -> s.length());
     assertEquals(5, (int) f.get());
     final Object change1 = f.change().getB();
     c.set("hello");

@@ -37,7 +37,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Collections;
-import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
@@ -162,7 +161,7 @@ public abstract class AbstractIncidentService implements IncidentService {
     // fill cache from
     final String title = findText(loc, incident.getCode(), FIELD_TITLE).orElse(NO_TITLE);
     final String description = findText(loc, incident.getCode(), FIELD_DESCRIPTION)
-        .map(text -> replaceVarsF(incident.getDescriptionParameters()).apply(text))
+        .map(text -> replaceVars(text, incident.getDescriptionParameters()))
         .orElse(NO_DESCRIPTION);
     return new IncidentL10n() {
       @Override
@@ -296,18 +295,5 @@ public abstract class AbstractIncidentService implements IncidentService {
       s = s.replace("#{" + e.getKey() + "}", e.getValue());
     }
     return s;
-  }
-
-  /**
-   * {@link org.opencastproject.serviceregistry.impl.AbstractIncidentService#replaceVars(String, java.util.Map)} as a
-   * function.
-   */
-  public static Function<String, String> replaceVarsF(final Map<String, String> params) {
-    return new Function<String, String>() {
-      @Override
-      public String apply(String s) {
-        return replaceVars(s, params);
-      }
-    };
   }
 }

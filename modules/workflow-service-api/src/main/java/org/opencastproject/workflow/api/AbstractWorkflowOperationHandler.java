@@ -22,7 +22,6 @@
 package org.opencastproject.workflow.api;
 
 import static java.lang.String.format;
-import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobBarrier;
@@ -31,8 +30,6 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Function0;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 
 import org.apache.commons.io.FilenameUtils;
@@ -144,13 +141,6 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
     }
     return list;
   }
-
-  /** {@link #asList(String)} as a function. */
-  protected Function<String, List<String>> asList = new Function<String, List<String>>() {
-    @Override public List<String> apply(String s) {
-      return asList(s);
-    }
-  };
 
   /**
    * Generates a filename using the base name of a source element and the extension of a derived element.
@@ -573,22 +563,6 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
     }
 
     return element;
-  }
-
-  /**
-   * Create an error function.
-   * <p>
-   * Example usage: <code>getCfg(wi, "key").getOrElse(this.&lt;String&gt;cfgKeyMissing("key"))</code>
-   *
-   * @see #getCfg(WorkflowInstance, String)
-   * @deprecated see {@link #getCfg(WorkflowInstance, String)} for details
-   */
-  protected <A> Function0<A> cfgKeyMissing(final String key) {
-    return new Function0<A>() {
-      @Override public A apply() {
-        return chuck(new WorkflowOperationException(key + " is missing or malformed"));
-      }
-    };
   }
 
   /**

@@ -31,10 +31,8 @@ import org.opencastproject.job.api.JobBarrier;
 import org.opencastproject.job.api.JobParser;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
-import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
-import org.opencastproject.util.data.Function;
 
 import org.apache.http.HttpResponse;
 import org.slf4j.Logger;
@@ -256,51 +254,45 @@ public final class JobUtil {
   }
 
   /** Wait for the job to complete and return the success value. */
-  public static Function<Job, Boolean> waitForJobSuccess(final Job waiter, final ServiceRegistry reg,
-          final Optional<Long> timeout) {
-    return new Function<Job, Boolean>() {
-      @Override
-      public Boolean apply(Job job) {
-        return waitForJob(waiter, reg, timeout, job).isSuccess();
-      }
-    };
+  public static boolean waitForJobSuccess(final Job waiter, final ServiceRegistry reg,
+      final Optional<Long> timeout, Job job) {
+    return waitForJob(waiter, reg, timeout, job).isSuccess();
   }
+
 
   /**
    * Interpret the payload of a completed {@link Job} as a {@link MediaPackageElement}. Wait for the job to complete if
    * necessary.
    *
    */
-  public static Function<Job, MediaPackageElement> payloadAsMediaPackageElement(final Job waiter,
-          final ServiceRegistry reg) {
-    return new Function.X<Job, MediaPackageElement>() {
-      @Override
-      public MediaPackageElement xapply(Job job) throws MediaPackageException {
-        waitForJob(waiter, reg, Optional.empty(), job);
-        return MediaPackageElementParser.getFromXml(job.getPayload());
-      }
-    };
+  public static MediaPackageElement payloadAsMediaPackageElement(final Job waiter,
+      final ServiceRegistry reg,
+      Job job) {
+    try {
+      waitForJob(waiter, reg, Optional.empty(), job);
+      return MediaPackageElementParser.getFromXml(job.getPayload());
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /**
    * Interpret the payload of a completed {@link Job} as a {@link MediaPackageElement}. Wait for the job to complete if
    * necessary.
    */
-  public static Function<Job, MediaPackageElement> payloadAsMediaPackageElement(final ServiceRegistry reg) {
-    return payloadAsMediaPackageElement(null, reg);
+  public static MediaPackageElement payloadAsMediaPackageElement(final ServiceRegistry reg,
+      Job job) {
+    return payloadAsMediaPackageElement(null, reg, job);
   }
 
-  public static final Function<HttpResponse, Optional<Job>> jobFromHttpResponse = new Function<HttpResponse, Optional<Job>>() {
-    @Override
-    public Optional<Job> apply(HttpResponse response) {
-      try {
-        return Optional.of(JobParser.parseJob(response.getEntity().getContent()));
-      } catch (Exception e) {
-        logger.error("Error parsing Job from HTTP response", e);
-        return Optional.empty();
-      }
+  public static Optional<Job> jobFromHttpResponse(HttpResponse response) {
+    try {
+      return Optional.of(JobParser.parseJob(response.getEntity().getContent()));
+    } catch (Exception e) {
+      logger.error("Error parsing Job from HTTP response", e);
+      return Optional.empty();
     }
-  };
+  }
 
   /** Sum up the queue time of a list of jobs. */
   public static long sumQueueTime(List<Job> jobs) {

@@ -22,7 +22,6 @@
 package org.opencastproject.serviceregistry.impl;
 
 import static org.opencastproject.db.Queries.namedQuery;
-import static org.opencastproject.util.JsonVal.asString;
 import static org.opencastproject.util.Jsons.obj;
 import static org.opencastproject.util.Jsons.p;
 import static org.opencastproject.util.data.Tuple.tuple;
@@ -149,8 +148,8 @@ public class IncidentDto {
     final List<Tuple<String, String>> list = new ArrayList<Tuple<String, String>>();
     JsonObj messageJson = JsonObj.jsonObj(details);
     for (Object k : messageJson.keySet()) {
-      String title = JsonVal.asJsonVal.apply(k).as(asString);
-      String content = messageJson.val(title).as(asString);
+      String title = JsonVal.asString(k);
+      String content = JsonVal.asString(messageJson.val(title).get());
       list.add(tuple(title, content));
     }
     return list;
@@ -161,8 +160,8 @@ public class IncidentDto {
     Map<String, String> param = new HashMap<String, String>();
     JsonObj paramJson = JsonObj.jsonObj(parameters);
     for (Object k : paramJson.keySet()) {
-      String key = JsonVal.asJsonVal.apply(k).as(asString);
-      String value = paramJson.val(key).as(asString);
+      String key = JsonVal.asString(k);
+      String value = JsonVal.asString(paramJson.val(key).get());
       param.put(key, value);
     }
     return param;

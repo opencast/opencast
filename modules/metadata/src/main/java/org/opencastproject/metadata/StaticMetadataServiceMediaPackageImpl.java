@@ -21,14 +21,11 @@
 
 package org.opencastproject.metadata;
 
-import static org.opencastproject.util.data.Collections.map;
-
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.metadata.api.MetadataValue;
 import org.opencastproject.metadata.api.StaticMetadata;
 import org.opencastproject.metadata.api.StaticMetadataService;
 import org.opencastproject.metadata.api.util.Interval;
-import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.NonEmptyList;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -38,7 +35,6 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -225,18 +221,12 @@ public class StaticMetadataServiceMediaPackageImpl implements StaticMetadataServ
    *          the name of the returned {@link MetadataValue}
    */
   private static List<MetadataValue<String>> strings2MetadataValues(final String[] values, final String valueName) {
-    if (values != null) {
-      return map(Arrays.asList(values), new ArrayList<MetadataValue<String>>(),
-              new Function<String, MetadataValue<String>>() {
-                @Override
-                public MetadataValue<String> apply(String s) {
-                  return new MetadataValue<String>(s, valueName);
-                }
-              });
-    } else {
+    if (values == null) {
       return Collections.emptyList();
     }
-
+    return Arrays.stream(values)
+        .map(s -> new MetadataValue<>(s, valueName))
+        .toList();
   }
 
 }

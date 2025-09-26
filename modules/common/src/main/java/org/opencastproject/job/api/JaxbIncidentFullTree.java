@@ -24,7 +24,6 @@ package org.opencastproject.job.api;
 import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.IncidentServiceException;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Function;
 
 import java.util.List;
 import java.util.Locale;
@@ -53,20 +52,17 @@ public final class JaxbIncidentFullTree {
   public JaxbIncidentFullTree(IncidentService svc, Locale locale, IncidentTree tree)
       throws IncidentServiceException, NotFoundException {
     this.incidents = tree.getIncidents().stream()
-        .map(JaxbIncidentFull.mkFn(svc, locale)::apply)
+        .map(JaxbIncidentFull.mkFn(svc, locale))
         .collect(Collectors.toList());
 
     this.descendants = tree.getDescendants().stream()
-        .map(mkFn(svc, locale)::apply)
+        .map(t -> {
+          try {
+            return new JaxbIncidentFullTree(svc, locale, t);
+          } catch (Exception e) {
+            throw new RuntimeException(e); // wrap checked exception
+          }
+        })
         .collect(Collectors.toList());
-  }
-
-  public static Function<IncidentTree, JaxbIncidentFullTree> mkFn(final IncidentService svc, final Locale locale) {
-    return new Function.X<IncidentTree, JaxbIncidentFullTree>() {
-      @Override
-      public JaxbIncidentFullTree xapply(IncidentTree tree) throws Exception {
-        return new JaxbIncidentFullTree(svc, locale, tree);
-      }
-    };
   }
 }

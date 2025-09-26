@@ -25,8 +25,6 @@ package org.opencastproject.util.data.functions;
 import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.data.Collections.nil;
 
-import org.opencastproject.util.data.Function;
-
 import java.text.Format;
 import java.util.List;
 import java.util.Optional;
@@ -40,16 +38,6 @@ public final class Strings {
 
   private static final List<String> NIL = nil();
   private static final Optional<String> NONE = Optional.empty();
-
-  /**
-   * Trim a string and return either <code>some</code> or <code>none</code> if it's empty. The string may be null.
-   */
-  public static final Function<String, Optional<String>> trimToNone = new Function<String, Optional<String>>() {
-    @Override
-    public Optional<String> apply(String a) {
-      return trimToNone(a);
-    }
-  };
 
   /**
    * Trim a string and return either <code>some</code> or <code>none</code> if it's empty. The string may be null.
@@ -68,24 +56,9 @@ public final class Strings {
     return a != null ? Optional.of(a.toString()) : NONE;
   }
 
-  /** Return <code>a.toString()</code> wrapped in a some if <code>a != null</code>, none otherwise. */
-  public static <A> Function<A, Optional<String>> asString() {
-    return new Function<A, Optional<String>>() {
-      @Override
-      public Optional<String> apply(A a) {
-        return asString(a);
-      }
-    };
-  }
-
   /** Return <code>a.toString()</code> or <code>&lt;null&gt;</code> if argument is null. */
-  public static <A> Function<A, String> asStringNull() {
-    return new Function<A, String>() {
-      @Override
-      public String apply(A a) {
-        return a != null ? a.toString() : "<null>";
-      }
-    };
+  public static String asStringNull(Object a) {
+    return a != null ? a.toString() : "<null>";
   }
 
   /** Convert a string into a long if possible. */
@@ -106,35 +79,22 @@ public final class Strings {
     }
   }
 
-  public static <A> Function<A, String> format(final Format f) {
-    return new Function<A, String>() {
-      @Override
-      public String apply(A a) {
-        return f.format(a);
-      }
-    };
+  public static <A> String format(final Format f, A a) {
+    return f.format(a);
   }
 
-  public static final Function<String, List<String>> trimToNil = new Function<String, List<String>>() {
-    @Override
-    public List<String> apply(String a) {
-      if (a != null) {
-        final String trimmed = a.trim();
-        return trimmed.length() > 0 ? list(trimmed) : NIL;
-      } else {
-        return NIL;
-      }
+  public static List<String> trimToNil(String a) {
+    if (a != null) {
+      final String trimmed = a.trim();
+      return trimmed.length() > 0 ? list(trimmed) : NIL;
+    } else {
+      return NIL;
     }
-  };
+  }
 
   /** Create a {@linkplain Pattern#split(CharSequence) split} function from a regex pattern. */
-  public static Function<String, String[]> split(final Pattern splitter) {
-    return new Function<String, String[]>() {
-      @Override
-      public String[] apply(String s) {
-        return splitter.split(s);
-      }
-    };
+  public static String[] split(final Pattern splitter, String s) {
+    return splitter.split(s);
   }
 
 }

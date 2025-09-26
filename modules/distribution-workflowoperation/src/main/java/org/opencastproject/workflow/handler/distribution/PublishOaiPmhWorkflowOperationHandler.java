@@ -248,7 +248,7 @@ public class PublishOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
       }
 
       for (Publication existingPublication : mediaPackage.getPublications()) {
-        if (ofChannel(newElement.getChannel()).apply(existingPublication)) {
+        if (ofChannel(existingPublication, newElement.getChannel())) {
           mediaPackage.remove(existingPublication);
         }
       }
@@ -263,7 +263,7 @@ public class PublishOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
         Publication externalElement = PublicationImpl.publication(UUID.randomUUID().toString(), externalChannel.get(),
                 URI.create(template), externalMimetype.get());
         for (Publication existingPublication : mediaPackage.getPublications()) {
-          if (ofChannel(externalChannel.get()).apply(existingPublication)) {
+          if (ofChannel(existingPublication, externalChannel.get())) {
             mediaPackage.remove(existingPublication);
           }
         }

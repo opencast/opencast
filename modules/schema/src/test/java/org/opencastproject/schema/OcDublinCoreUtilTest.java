@@ -23,10 +23,6 @@ package org.opencastproject.schema;
 
 import static org.junit.Assert.assertEquals;
 import static org.opencastproject.schema.OcDublinCoreUtil.encodeCreated;
-import static org.opencastproject.schema.OcDublinCoreUtil.encodeDate;
-import static org.opencastproject.schema.OcDublinCoreUtil.encodeDateAccepted;
-import static org.opencastproject.schema.OcDublinCoreUtil.encodeDateCopyrighted;
-import static org.opencastproject.schema.OcDublinCoreUtil.encodeDateSubmitted;
 import static org.opencastproject.schema.test.TestUtil.randomDc;
 import static org.opencastproject.util.ReflectionUtil.run;
 
@@ -115,22 +111,22 @@ public class OcDublinCoreUtilTest {
       }
 
       @Override public Optional<Date> getDate() {
-        assertEquals("date copy", source.getDate().map(encodeDate::apply).orElse(null), target.getFirstVal(DublinCore.PROPERTY_DATE));
+        assertEquals("date copy", source.getDate().map(OcDublinCoreUtil::encodeDate).orElse(null), target.getFirstVal(DublinCore.PROPERTY_DATE));
         return null;
       }
 
       @Override public Optional<Date> getDateAccepted() {
-        assertEquals("dateAccepted copy", source.getDateAccepted().map(encodeDateAccepted::apply).orElse(null), target.getFirstVal(DublinCore.PROPERTY_DATE_ACCEPTED));
+        assertEquals("dateAccepted copy", source.getDateAccepted().map(OcDublinCoreUtil::encodeDateAccepted).orElse(null), target.getFirstVal(DublinCore.PROPERTY_DATE_ACCEPTED));
         return null;
       }
 
       @Override public Optional<Date> getDateCopyrighted() {
-        assertEquals("dateCopyrighted copy", source.getDateCopyrighted().map(encodeDateCopyrighted::apply).orElse(null), target.getFirstVal(DublinCore.PROPERTY_DATE_COPYRIGHTED));
+        assertEquals("dateCopyrighted copy", source.getDateCopyrighted().map(OcDublinCoreUtil::encodeDateCopyrighted).orElse(null), target.getFirstVal(DublinCore.PROPERTY_DATE_COPYRIGHTED));
         return null;
       }
 
       @Override public Optional<Date> getDateSubmitted() {
-        assertEquals("dateSubmitted copy", source.getDateSubmitted().map(encodeDateSubmitted::apply).orElse(null), target.getFirstVal(DublinCore.PROPERTY_DATE_SUBMITTED));
+        assertEquals("dateSubmitted copy", source.getDateSubmitted().map(OcDublinCoreUtil::encodeDateSubmitted).orElse(null), target.getFirstVal(DublinCore.PROPERTY_DATE_SUBMITTED));
         return null;
       }
 

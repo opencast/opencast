@@ -22,8 +22,6 @@
 
 package org.opencastproject.mediapackage;
 
-import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.presentations;
-
 import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.mediapackage.identifier.IdImpl;
@@ -783,9 +781,13 @@ public final class MediaPackageImpl implements MediaPackage {
   @XmlElement(name = "publication")
   @Override
   public Publication[] getPublications() {
+//    return elements.stream()
+//        .map(presentations::apply)
+//        .flatMap(List::stream)
+//        .toArray(Publication[]::new);
     return elements.stream()
-        .map(presentations::apply)
-        .flatMap(List::stream)
+        .filter(Publication.class::isInstance)
+        .map(Publication.class::cast)
         .toArray(Publication[]::new);
   }
 

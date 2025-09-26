@@ -25,8 +25,6 @@ import static java.lang.String.format;
 import static org.opencastproject.util.data.functions.Misc.cast;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
-import org.opencastproject.util.data.Function;
-
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
@@ -54,14 +52,6 @@ public final class JsonObj {
   public static JsonObj jsonObj(String json) {
     return new JsonObj(parse(json));
   }
-
-  /** {@link #jsonObj(java.util.Map)} as a function. */
-  public static final Function<Map, JsonObj> jsonObj = new Function<Map, JsonObj>() {
-    @Override
-    public JsonObj apply(Map json) {
-      return jsonObj(json);
-    }
-  };
 
   private static Map parse(String json) {
     try {

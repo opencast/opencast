@@ -811,7 +811,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   private Optional<DublinCoreCatalog> loadEpisodeDublinCoreFromAsset(Snapshot snapshot) {
     Optional<MediaPackageElement> dcCatalog = Arrays.stream(snapshot.getMediaPackage().getElements())
-        .filter(mpe -> MediaPackageSupport.Filters.isEpisodeDublinCore.apply(mpe))
+        .filter(MediaPackageSupport.Filters::isEpisodeDublinCore)
         .findFirst();
     if (dcCatalog.isEmpty())
       return Optional.empty();

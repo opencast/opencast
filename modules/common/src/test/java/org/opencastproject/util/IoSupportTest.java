@@ -28,11 +28,9 @@ import static org.opencastproject.util.IoSupport.fileInputStream;
 import static org.opencastproject.util.IoSupport.locked;
 import static org.opencastproject.util.IoSupport.withFile;
 import static org.opencastproject.util.IoSupport.withResource;
+import static org.opencastproject.util.data.functions.Misc.chuck;
 
-import org.opencastproject.util.data.Effect;
 import org.opencastproject.util.data.Either;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Function2;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
@@ -52,6 +50,7 @@ import java.io.InputStreamReader;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
  * Test for the IoSupporTest class
@@ -146,12 +145,7 @@ public class IoSupportTest {
   @Test(expected = IOException.class)
   public void testWithResource() throws Exception {
     final InputStream r = this.getClass().getResourceAsStream("/cover.png");
-    final String s = withResource(r, new Function<InputStream, String>() {
-      @Override
-      public String apply(InputStream in) {
-        return "read";
-      }
-    });
+    final String s = withResource(r, in -> "read");
     assertEquals("read", s);
     // this will throw an IOException
     r.read();
@@ -159,37 +153,32 @@ public class IoSupportTest {
 
   @Test
   public void testWithResourceLazy() {
-    final Function<Exception, String> errorHandler = new Function<Exception, String>() {
-      @Override
-      public String apply(Exception e) {
-        return "error";
-      }
-    };
-    final Either<String, Integer> r = withResource(fileInputStream(new File("i-do-not-exist")), errorHandler,
-            new Function<InputStream, Integer>() {
-              @Override
-              public Integer apply(InputStream in) {
-                return 1;
-              }
-            });
+    final Function<Exception, String> errorHandler = e -> "error";
+    final Either<String, Integer> r = withResource(
+        () -> fileInputStream(new File("i-do-not-exist")),
+        errorHandler,
+        in -> 1
+    );
     assertEquals("error", r.left().value());
   }
 
   @Test
   public void testWithFile() throws Exception {
     final File f1 = new File(this.getClass().getResource("/dublincore.xml").toURI());
-    final Optional<String> r1 = withFile(f1, new Function2.X<InputStream, File, String>() {
-      @Override
-      public String xapply(InputStream in, File file) throws IOException {
+    final Optional<String> r1 = withFile(f1, (in, file) -> {
+      try {
         return IOUtils.readLines(in).get(0);
+      } catch (Exception e) {
+        return chuck(e);
       }
     });
     assertEquals(Optional.of("<?xml version=\"1.0\"?>"), r1);
     final File f2 = new File("i-do-not-exist");
-    final Optional<String> r2 = withFile(f2, new Function2.X<InputStream, File, String>() {
-      @Override
-      public String xapply(InputStream in, File file) throws IOException {
+    final Optional<String> r2 = withFile(f2, (in, file) -> {
+      try {
         return IOUtils.readLines(in).get(0);
+      } catch (Exception e) {
+        return chuck(e);
       }
     });
     assertEquals(Optional.empty(), r2);
@@ -199,11 +188,12 @@ public class IoSupportTest {
   public void testDeleteLockedFile() throws Exception {
     final File dst = testFolder.newFile("test.tmp");
     final File src = new File(this.getClass().getResource("/dublincore.xml").toURI());
-    locked(dst, new Effect.X<File>() {
-      @Override
-      protected void xrun(File file) throws IOException {
+    locked(dst, file -> {
+      try {
         file.delete();
-        FileSupport.copy(src, file);
+        return FileSupport.copy(src, file);
+      } catch (IOException e) {
+        return chuck(e);
       }
     });
     assertTrue(dst.isFile());
@@ -213,28 +203,23 @@ public class IoSupportTest {
   @Test(expected = NotFoundException.class)
   public void testLockedNotFoundException() throws NotFoundException, IOException {
     final File file = IoSupport.file("foo/bar.txt");
-    IoSupport.locked(file, new Effect.X<File>() {
-      @Override
-      protected void xrun(File a) throws Exception {
-        Assert.fail("The path to the file to lock does not exist and should not be created.");
-      }
+    // Just call locked — it should throw NotFoundException because the path does not exist
+    IoSupport.locked(file, f -> {
+      // this lambda won't be executed
+      return null;
     });
   }
 
   @Test(expected = NotFoundException.class)
   public void testLockedParentDirNotExist() throws NotFoundException, IOException {
-    File file = testFolder.newFolder("foo");
-    file = IoSupport.file(file.toPath().toString(), "bar/some.txt");
+    File parent = testFolder.newFolder("foo");
+    File file = IoSupport.file(parent.toPath().toString(), "bar/some.txt");
+
     try {
-      IoSupport.locked(file, new Effect.X<File>() {
-        @Override
-        protected void xrun(File a) throws Exception {
-          Assert.fail("The parent directory isn't exist and should not be created.");
-        }
-      });
-    } catch (Exception e) {
-      FileUtils.deleteDirectory(file);
-      throw e;
+      // Just call locked — it should throw NotFoundException because "bar" does not exist
+      IoSupport.locked(file, f -> null);
+    } finally {
+      FileUtils.deleteQuietly(parent);
     }
   }
 }

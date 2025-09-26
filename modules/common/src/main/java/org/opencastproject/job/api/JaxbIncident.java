@@ -24,7 +24,6 @@ package org.opencastproject.job.api;
 import static org.opencastproject.util.data.Collections.nullToNil;
 
 import org.opencastproject.job.api.Incident.Severity;
-import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.jaxb.UtcTimestampAdapter;
 
@@ -92,23 +91,16 @@ public final class JaxbIncident {
     this.severity = incident.getSeverity();
     this.code = incident.getCode();
     this.descriptionParameters = incident.getDescriptionParameters().entrySet().stream()
-        .map(Param.mkFn::apply)
+        .map(Param::mk)
         .collect(Collectors.toList());
     this.details = incident.getDetails().stream()
-        .map(JaxbIncidentDetail.mkFn::apply)
+        .map(JaxbIncidentDetail::new)
         .collect(Collectors.toList());
   }
 
-  public static final Function<Incident, JaxbIncident> mkFn = new Function<Incident, JaxbIncident>() {
-    @Override
-    public JaxbIncident apply(Incident incident) {
-      return new JaxbIncident(incident);
-    }
-  };
-
   public Incident toIncident() {
     List<Tuple<String, String>> mappedDetails = nullToNil(details).stream()
-        .map(JaxbIncidentDetail.toDetailFn::apply)
+        .map(JaxbIncidentDetail::toDetail)
         .collect(Collectors.toList());
 
     Map<String, String> paramMap = nullToNil(descriptionParameters).stream()
@@ -129,13 +121,6 @@ public final class JaxbIncident {
         paramMap
     );
   }
-
-  public static final Function<JaxbIncident, Incident> toIncidentFn = new Function<JaxbIncident, Incident>() {
-    @Override
-    public Incident apply(JaxbIncident dto) {
-      return dto.toIncident();
-    }
-  };
 
   /**
    * An description parameter. To read about why this class is necessary, see http://java.net/jira/browse/JAXB-223
@@ -163,12 +148,5 @@ public final class JaxbIncident {
     public String getValue() {
       return value;
     }
-
-    public static final Function<Entry<String, String>, Param> mkFn = new Function<Entry<String, String>, Param>() {
-      @Override
-      public Param apply(Entry<String, String> entry) {
-        return mk(entry);
-      }
-    };
   }
 }

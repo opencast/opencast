@@ -23,7 +23,6 @@ package org.opencastproject.distribution.aws.s3.remote;
 import static java.lang.String.format;
 import static org.opencastproject.util.HttpUtil.param;
 import static org.opencastproject.util.HttpUtil.post;
-import static org.opencastproject.util.JobUtil.jobFromHttpResponse;
 
 import org.opencastproject.distribution.api.DistributionException;
 import org.opencastproject.distribution.api.DistributionService;
@@ -37,6 +36,7 @@ import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.util.JobUtil;
 import org.opencastproject.util.OsgiUtil;
 
 import com.google.gson.Gson;
@@ -121,7 +121,7 @@ public class AwsS3DistributionServiceRemoteImpl extends RemoteBase implements Aw
             param(PARAM_MEDIAPACKAGE, MediaPackageParser.getAsXml(mediaPackage)),
             param(PARAM_ELEMENT_ID, gson.toJson(elementIds)),
             param(PARAM_CHECK_AVAILABILITY, Boolean.toString(checkAvailability)));
-    Optional<Job> job = runRequest(req, jobFromHttpResponse);
+    Optional<Job> job = runRequest(req, JobUtil::jobFromHttpResponse);
     if (job.isPresent()) {
       return job.get();
     }
@@ -144,7 +144,7 @@ public class AwsS3DistributionServiceRemoteImpl extends RemoteBase implements Aw
             param(PARAM_MEDIAPACKAGE, MediaPackageParser.getAsXml(mediaPackage)),
             param(PARAM_ELEMENT_ID, gson.toJson(elementIds)),
             param(PARAM_CHANNEL_ID, channelId));
-    Optional<Job> job = runRequest(req, jobFromHttpResponse);
+    Optional<Job> job = runRequest(req, JobUtil::jobFromHttpResponse);
     if (job.isPresent()) {
       return job.get();
     }
@@ -169,7 +169,7 @@ public class AwsS3DistributionServiceRemoteImpl extends RemoteBase implements Aw
         param(PARAM_MEDIAPACKAGE, MediaPackageParser.getAsXml(mediapackage)),
         param(PARAM_ELEMENT_ID, gson.toJson(elementIds)),
         param(PARAM_CHECK_AVAILABILITY, Boolean.toString(checkAvailability)));
-    Optional<List<MediaPackageElement>> elements = runRequest(req, elementsFromHttpResponse);
+    Optional<List<MediaPackageElement>> elements = runRequest(req, RemoteBase::elementsFromHttpResponse);
     if (elements.isPresent()) {
       return elements.get();
     }
@@ -194,7 +194,7 @@ public class AwsS3DistributionServiceRemoteImpl extends RemoteBase implements Aw
         param(PARAM_MEDIAPACKAGE, MediaPackageParser.getAsXml(mediaPackage)),
         param(PARAM_ELEMENT_ID, gson.toJson(elementIds)),
         param(PARAM_CHANNEL_ID, channelId));
-    Optional<List<MediaPackageElement>> elements = runRequest(req, elementsFromHttpResponse);
+    Optional<List<MediaPackageElement>> elements = runRequest(req, RemoteBase::elementsFromHttpResponse);
     if (elements.isPresent()) {
       return elements.get();
     }

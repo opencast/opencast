@@ -26,7 +26,6 @@ import static org.junit.Assert.assertTrue;
 import static org.opencastproject.util.data.Collections.toArray;
 
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.util.data.Function;
 
 import org.easymock.EasyMock;
 import org.junit.Test;
@@ -35,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 public class JobBarrierTest {
 

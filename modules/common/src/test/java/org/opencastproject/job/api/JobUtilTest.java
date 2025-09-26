@@ -47,7 +47,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.JobUtil;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Function;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.HttpVersion;
@@ -160,13 +159,10 @@ public class JobUtilTest {
     JobImpl job = new JobImpl(20);
     job.setStatus(Status.FAILED);
 
-    Function<Job, Boolean> waitForJobSuccess = waitForJobSuccess(job, serviceRegistry, Optional.<Long> empty());
-    Boolean isSuccess = waitForJobSuccess.apply(job);
-    assertFalse(isSuccess);
+    assertFalse(waitForJobSuccess(job, serviceRegistry, Optional.empty(), job));
 
     job.setStatus(Status.FINISHED);
-    isSuccess = waitForJobSuccess.apply(job);
-    assertTrue(isSuccess);
+    assertTrue(waitForJobSuccess(job, serviceRegistry, Optional.empty(), job));
   }
 
   @Test
@@ -178,22 +174,20 @@ public class JobUtilTest {
     job.setStatus(Status.FINISHED);
     job.setPayload(MediaPackageElementParser.getAsXml(element));
 
-    Function<Job, MediaPackageElement> payloadAsMediaPackageElement = payloadAsMediaPackageElement(job,
-            serviceRegistry);
-    assertEquals(element, payloadAsMediaPackageElement.apply(job));
+    assertEquals(element, payloadAsMediaPackageElement(job, serviceRegistry, job));
   }
 
   @Test
   public void testJobFromHttpResponse() throws Exception {
     BasicHttpResponse response = new BasicHttpResponse(
             new BasicStatusLine(new HttpVersion(1, 1), HttpStatus.SC_NO_CONTENT, "No message"));
-    Optional<Job> job = JobUtil.jobFromHttpResponse.apply(response);
+    Optional<Job> job = JobUtil.jobFromHttpResponse(response);
     assertFalse(job.isPresent());
 
     JaxbJob jaxbJob = new JaxbJob(new JobImpl(32));
     response.setEntity(new StringEntity(JobParser.toXml(jaxbJob), StandardCharsets.UTF_8));
 
-    job = JobUtil.jobFromHttpResponse.apply(response);
+    job = JobUtil.jobFromHttpResponse(response);
     assertTrue(job.isPresent());
     assertEquals(jaxbJob.toJob(), job.get());
   }

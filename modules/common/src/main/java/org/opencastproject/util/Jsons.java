@@ -22,7 +22,6 @@
 package org.opencastproject.util;
 
 import org.opencastproject.util.data.Collections;
-import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Prelude;
 
 import org.json.simple.JSONArray;
@@ -39,18 +38,14 @@ public final class Jsons {
   }
 
   /** Check if a value is not {@link #ZERO_VAL}. */
-  public static final Function<Val, Boolean> notZero = new Function<Val, Boolean>() {
-    @Override public Boolean apply(Val val) {
-      return !ZERO_VAL.equals(val);
-    }
-  };
+  public static Boolean notZero(Val val) {
+    return !ZERO_VAL.equals(val);
+  }
 
   /** Get the value from a property. */
-  public static final Function<Prop, Val> getVal = new Function<Prop, Val>() {
-    @Override public Val apply(Prop prop) {
-      return prop.getVal();
-    }
-  };
+  public static Val getVal(Prop prop) {
+    return prop.getVal();
+  }
 
   /** JSON null. */
   public static final Val NULL = new Val() {
@@ -184,7 +179,7 @@ public final class Jsons {
   /** Create an object. */
   public static Obj obj(Prop... ps) {
     List<Prop> filtered = Arrays.stream(ps)
-        .filter(p -> notZero.apply(getVal.apply(p)))
+        .filter(p -> notZero(getVal(p)))
         .toList();
     return new Obj(filtered);
   }
@@ -192,7 +187,7 @@ public final class Jsons {
   /** Create an array. */
   public static Arr arr(Val... vs) {
     List<Val> filtered = Arrays.stream(vs)
-        .filter(notZero::apply)
+        .filter(Jsons::notZero)
         .toList();
     return new Arr(filtered);
   }
@@ -200,7 +195,7 @@ public final class Jsons {
   /** Create an array. */
   public static Arr arr(List<Val> vs) {
     List<Val> filtered = vs.stream()
-        .filter(notZero::apply)
+        .filter(Jsons::notZero)
         .toList();
     return new Arr(filtered);
   }
@@ -213,11 +208,9 @@ public final class Jsons {
     return new SVal(v);
   }
 
-  public static final Function<String, Val> stringVal = new Function<String, Val>() {
-    @Override public Val apply(String s) {
-      return v(s);
-    }
-  };
+  public static Val stringVal(String s) {
+    return v(s);
+  }
 
   public static Val v(Boolean v) {
     return new SVal(v);

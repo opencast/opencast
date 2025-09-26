@@ -2019,7 +2019,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   private Optional<org.w3c.dom.Document> loadSmilDocument(final WorkingFileRepository workingFileRepository,
           MediaPackage mp) {
     return Arrays.stream(mp.getElements())
-        .filter(MediaPackageSupport.Filters.isSmilCatalog::apply)
+        .filter(MediaPackageSupport.Filters::isSmilCatalog)
         .findFirst()
         .map(mpe -> {
           try (InputStream in = workingFileRepository.get(

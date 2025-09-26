@@ -44,16 +44,13 @@ import static org.opencastproject.util.data.Collections.head;
 
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageSerializer;
 import org.opencastproject.metadata.api.MetadataValue;
 import org.opencastproject.metadata.api.StaticMetadata;
 import org.opencastproject.metadata.api.StaticMetadataService;
 import org.opencastproject.metadata.api.util.Interval;
-import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.NonEmptyList;
-import org.opencastproject.util.data.Predicate;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
@@ -71,6 +68,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -89,14 +87,6 @@ import java.util.stream.Collectors;
 public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataService {
 
   private static final Logger logger = LoggerFactory.getLogger(StaticMetadataServiceDublinCoreImpl.class);
-
-  // Catalog loader function
-  private Function<Catalog, Optional<DublinCoreCatalog>> loader = new Function<Catalog, Optional<DublinCoreCatalog>>() {
-    @Override
-    public Optional<DublinCoreCatalog> apply(Catalog catalog) {
-      return load(catalog);
-    }
-  };
 
   protected int priority = 0;
 
@@ -198,35 +188,35 @@ public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataServic
         });
     final NonEmptyList<MetadataValue<String>> titles = new NonEmptyList<>(
         episode.get(PROPERTY_TITLE).stream()
-            .map(dc2mvString(PROPERTY_TITLE.getLocalName())::apply)
+            .map(dc2mvString(PROPERTY_TITLE.getLocalName()))
             .collect(Collectors.toList())
     );
     final List<MetadataValue<String>> subjects = episode.get(PROPERTY_SUBJECT).stream()
-            .map(dc2mvString(PROPERTY_SUBJECT.getLocalName())::apply)
+            .map(dc2mvString(PROPERTY_SUBJECT.getLocalName()))
             .collect(Collectors.toList());
     final List<MetadataValue<String>> creators = episode.get(PROPERTY_CREATOR).stream()
-            .map(dc2mvString(PROPERTY_CREATOR.getLocalName())::apply)
+            .map(dc2mvString(PROPERTY_CREATOR.getLocalName()))
             .collect(Collectors.toList());
     final List<MetadataValue<String>> publishers = episode.get(PROPERTY_PUBLISHER).stream()
-            .map(dc2mvString(PROPERTY_PUBLISHER.getLocalName())::apply)
+            .map(dc2mvString(PROPERTY_PUBLISHER.getLocalName()))
             .collect(Collectors.toList());
     final List<MetadataValue<String>> contributors = episode.get(PROPERTY_CONTRIBUTOR).stream()
-            .map(dc2mvString(PROPERTY_CONTRIBUTOR.getLocalName())::apply)
+            .map(dc2mvString(PROPERTY_CONTRIBUTOR.getLocalName()))
             .collect(Collectors.toList());
     final List<MetadataValue<String>> description = episode.get(PROPERTY_DESCRIPTION).stream()
-            .map(dc2mvString(PROPERTY_DESCRIPTION.getLocalName())::apply)
+            .map(dc2mvString(PROPERTY_DESCRIPTION.getLocalName()))
             .collect(Collectors.toList());
     final List<MetadataValue<String>> rightsHolders = episode.get(PROPERTY_RIGHTS_HOLDER).stream()
-            .map(dc2mvString(PROPERTY_RIGHTS_HOLDER.getLocalName())::apply)
+            .map(dc2mvString(PROPERTY_RIGHTS_HOLDER.getLocalName()))
             .collect(Collectors.toList());
     final List<MetadataValue<String>> spatials = episode.get(PROPERTY_SPATIAL).stream()
-            .map(dc2mvString(PROPERTY_SPATIAL.getLocalName())::apply)
+            .map(dc2mvString(PROPERTY_SPATIAL.getLocalName()))
             .collect(Collectors.toList());
     final List<MetadataValue<String>> accessRights = episode.get(PROPERTY_ACCESS_RIGHTS).stream()
-            .map(dc2mvString(PROPERTY_ACCESS_RIGHTS.getLocalName())::apply)
+            .map(dc2mvString(PROPERTY_ACCESS_RIGHTS.getLocalName()))
             .collect(Collectors.toList());
     final List<MetadataValue<String>> licenses = episode.get(PROPERTY_LICENSE).stream()
-            .map(dc2mvString(PROPERTY_LICENSE.getLocalName())::apply)
+            .map(dc2mvString(PROPERTY_LICENSE.getLocalName()))
             .collect(Collectors.toList());
 
     return new StaticMetadata() {
@@ -386,21 +376,7 @@ public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataServic
    * Return a function that creates a MetadataValue[String] from a DublinCoreValue setting its name to <code>name</code>.
    */
   private static Function<DublinCoreValue, MetadataValue<String>> dc2mvString(final String name) {
-    return new Function<DublinCoreValue, MetadataValue<String>>() {
-      @Override
-      public MetadataValue<String> apply(DublinCoreValue dcv) {
-        return new MetadataValue<String>(dcv.getValue(), name, dcv.getLanguage());
-      }
-    };
-  }
-
-  private static Predicate<Catalog> flavorPredicate(final MediaPackageElementFlavor flavor) {
-    return new Predicate<Catalog>() {
-      @Override
-      public Boolean apply(Catalog catalog) {
-        return flavor.equals(catalog.getFlavor());
-      }
-    };
+    return dcv -> new MetadataValue<>(dcv.getValue(), name, dcv.getLanguage());
   }
 
   private Optional<DublinCoreCatalog> load(Catalog catalog) {

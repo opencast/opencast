@@ -412,7 +412,7 @@ public class SchedulerRestService {
       }
 
       List<Val> presenterVals = metadata.getPresenters().stream()
-          .map(s -> Jsons.stringVal.apply(s))
+          .map(Jsons::stringVal)
           .collect(Collectors.toList());
       Arr presenters = arr(presenterVals);
       List<Prop> wfProperties = new ArrayList<>();

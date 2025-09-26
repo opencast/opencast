@@ -22,10 +22,10 @@
 package org.opencastproject.job.api;
 
 import static org.opencastproject.util.data.Collections.nullToNil;
+import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.serviceregistry.api.IncidentServiceException;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Function;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -53,35 +53,29 @@ public final class JaxbIncidentTree {
 
   public JaxbIncidentTree(IncidentTree tree) throws IncidentServiceException, NotFoundException {
     this.incidents = tree.getIncidents().stream()
-        .map(JaxbIncident.mkFn::apply)
+        .map(JaxbIncident::new)
         .collect(Collectors.toList());
 
     this.descendants = tree.getDescendants().stream()
-        .map(mkFn::apply)
+        .map(t -> {
+          try {
+            return new JaxbIncidentTree(t);
+          } catch (Exception e) {
+            return chuck(e);
+          }
+        })
         .collect(Collectors.toList());
   }
 
-  public static final Function<IncidentTree, JaxbIncidentTree> mkFn = new Function.X<IncidentTree, JaxbIncidentTree>() {
-    @Override public JaxbIncidentTree xapply(IncidentTree tree) throws Exception {
-      return new JaxbIncidentTree(tree);
-    }
-  };
-
   public IncidentTree toIncidentTree() {
     List<Incident> mappedIncidents = nullToNil(incidents).stream()
-        .map(JaxbIncident.toIncidentFn::apply)
+        .map(JaxbIncident::toIncident)
         .collect(Collectors.toList());
 
     List<IncidentTree> mappedDescendants = nullToNil(descendants).stream()
-        .map(toIncidentTreeFn::apply)
+        .map(JaxbIncidentTree::toIncidentTree)
         .collect(Collectors.toList());
 
     return new IncidentTreeImpl(mappedIncidents, mappedDescendants);
   }
-
-  public static final Function<JaxbIncidentTree, IncidentTree> toIncidentTreeFn = new Function<JaxbIncidentTree, IncidentTree>() {
-    @Override public IncidentTree apply(JaxbIncidentTree dto) {
-      return dto.toIncidentTree();
-    }
-  };
 }

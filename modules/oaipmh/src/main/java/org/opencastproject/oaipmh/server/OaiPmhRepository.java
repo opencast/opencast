@@ -25,7 +25,6 @@ import static org.opencastproject.oaipmh.OaiPmhUtil.toOaiRepresentation;
 import static org.opencastproject.oaipmh.OaiPmhUtil.toUtc;
 import static org.opencastproject.oaipmh.persistence.QueryBuilder.queryRepo;
 import static org.opencastproject.oaipmh.server.Functions.addDay;
-import static org.opencastproject.oaipmh.server.Functions.asDate;
 import static org.opencastproject.util.data.Prelude.unexhaustiveMatch;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
@@ -41,8 +40,6 @@ import org.opencastproject.oaipmh.persistence.OaiPmhSetDefinitionImpl;
 import org.opencastproject.oaipmh.persistence.SearchResult;
 import org.opencastproject.oaipmh.persistence.SearchResultItem;
 import org.opencastproject.oaipmh.util.XmlGen;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Function0;
 
 import org.apache.commons.collections4.EnumerationUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -61,6 +58,8 @@ import java.util.Dictionary;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -258,19 +257,12 @@ public abstract class OaiPmhRepository implements ManagedService {
         .findFirst();
   }
 
-  /** {@link #getMetadataProvider(String)} as a function. */
-  private final Function<String, Optional<MetadataProvider>> getMetadataProvider = new Function<String, Optional<MetadataProvider>>() {
-    @Override public Optional<MetadataProvider> apply(String metadataPrefix) {
-      return getMetadataProvider(metadataPrefix);
-    }
-  };
-
   /** Create the "GetRecord" response. */
   private XmlGen handleGetRecord(final Params p) {
     if (p.getIdentifier().isEmpty() || p.getMetadataPrefix().isEmpty()) {
       return createBadArgumentResponse(p);
     } else {
-      for (final MetadataProvider metadataProvider : p.getMetadataPrefix().flatMap(mp -> getMetadataProvider.apply(mp)).stream().toList()) {
+      for (final MetadataProvider metadataProvider : p.getMetadataPrefix().flatMap(mp -> getMetadataProvider(mp)).stream().toList()) {
         if (p.getSet().isPresent() && !sets.stream().anyMatch(
             setDef -> StringUtils.equals(setDef.getSetSpec(), p.getSet().get()))) {
           // If there is no set specification, immediately return a no result response
@@ -357,7 +349,7 @@ public abstract class OaiPmhRepository implements ManagedService {
           @Override
           protected List<Node> createContent(final Optional<String> set) {
             return params.getResult().getItems().stream()
-                .map(new java.util.function.Function<SearchResultItem, Node>() {
+                .map(new Function<SearchResultItem, Node>() {
                   @Override
                   public Node apply(SearchResultItem item) {
                     logger.debug("Requested set: {}", set);
@@ -478,21 +470,9 @@ public abstract class OaiPmhRepository implements ManagedService {
     return toUtc(d, getRepositoryTimeGranularity());
   }
 
-  // CHECKSTYLE:OFF
-  final Function<Date, String> toSupportedGranularity = new Function<Date, String>() {
-    @Override
-    public String apply(Date date) {
-      return toSupportedGranularity(date);
-    }
-  };
-  // CHECKSTYLE:ON
-
-  private final Function<Date, Date> granulate = new Function<Date, Date>() {
-    @Override
-    public Date apply(Date date) {
-      return granulate(getRepositoryTimeGranularity(), date);
-    }
-  };
+  private Date granulate(Date date) {
+    return granulate(getRepositoryTimeGranularity(), date);
+  }
 
   /** "Cut" a date to the repositories supported granularity. Cutting behaves similar to the mathematical floor function. */
   public static Date granulate(Granularity g, Date d) {
@@ -546,11 +526,11 @@ public abstract class OaiPmhRepository implements ManagedService {
 
       if (resumptionTokenExists && otherParamExists || !resumptionTokenExists && !otherParamExists)
         return createBadArgumentResponse(p);
-      final Optional<Date> from = p.getFrom().map(asDate::apply).map(granulate::apply);
-
-      final Function<Date, Date> untilAdjustment = getRepositoryTimeGranularity() == Granularity.DAY ? addDay(1)
-              : org.opencastproject.util.data.functions.Functions.<Date>identity();
-      final Optional<Date> untilGranularity = p.getUntil().map(asDate::apply).map(granulate::apply).map(untilAdjustment::apply);
+      final Optional<Date> from = p.getFrom().map(Functions::asDate).map(d -> granulate(d));
+      final Function<Date, Date> untilAdjustment = getRepositoryTimeGranularity() == Granularity.DAY
+          ? addDay(1)
+          : Function.identity();
+      final Optional<Date> untilGranularity = p.getUntil().map(Functions::asDate).map(d -> granulate(d)).map(untilAdjustment::apply);
       if (from.isPresent() && untilGranularity.isPresent()) {
         Date fromDate = from.get();
         Date untilDate = untilGranularity.get();
@@ -565,8 +545,8 @@ public abstract class OaiPmhRepository implements ManagedService {
       final Optional<Date> until = Optional.of(untilGranularity.orElseGet(() -> currentDate()));
 
       final String metadataPrefix = p.getResumptionToken()
-          .flatMap(getMetadataPrefixFromToken::apply)
-          .orElseGet(() -> getMetadataPrefix(p).apply());
+          .flatMap(t -> getMetadataPrefixFromToken(t))
+          .orElseGet(getMetadataPrefix(p));
 
       final List<MetadataProvider> metadataProviders;
       if (p.getResumptionToken().isPresent()) {
@@ -574,7 +554,7 @@ public abstract class OaiPmhRepository implements ManagedService {
             .map(Collections::singletonList)
             .orElseGet(Collections::emptyList);
       } else {
-        metadataProviders = Collections.singletonList(getMetadataProvider.curry(metadataPrefix).apply().orElseThrow(() ->
+        metadataProviders = Collections.singletonList(getMetadataProvider(metadataPrefix).orElseThrow(() ->
             new IllegalStateException("No MetadataProvider found for fallback")
         ));
       }
@@ -638,12 +618,9 @@ public abstract class OaiPmhRepository implements ManagedService {
     }
 
     /** Get a metadata prefix from a resumption token. */
-    private final Function<String, Optional<String>> getMetadataPrefixFromToken = new Function<String, Optional<String>>() {
-      @Override
-      public Optional<String> apply(String token) {
-        return getSavedQuery(token).map(resumableQuery -> resumableQuery.getMetadataPrefix());
-      }
-    };
+    private Optional<String> getMetadataPrefixFromToken(String token) {
+      return getSavedQuery(token).map(resumableQuery -> resumableQuery.getMetadataPrefix());
+    }
 
     /** Get a metadata provider from a resumption token. */
     private final Function<String, Optional<MetadataProvider>> getMetadataProviderFromToken = new Function<String, Optional<MetadataProvider>>() {
@@ -654,11 +631,13 @@ public abstract class OaiPmhRepository implements ManagedService {
     };
 
     /** Get the metadata prefix lazily. */
-    private Function0<String> getMetadataPrefix(final Params p) {
-      return new Function0<String>() {
-        @Override
-        public String apply() {
-          return p.getMetadataPrefix().orElse(OaiPmhConstants.OAI_DC_METADATA_FORMAT.getPrefix());
+    private Supplier<String> getMetadataPrefix(final Params p) {
+      return () -> {
+        try {
+          return p.getMetadataPrefix()
+              .orElse(OaiPmhConstants.OAI_DC_METADATA_FORMAT.getPrefix());
+        } catch (Exception e) {
+          return chuck(e);
         }
       };
     }
@@ -685,7 +664,7 @@ public abstract class OaiPmhRepository implements ManagedService {
                                     params.getUntil(), params.getSet()));
         return oai(
                 request($a("metadataPrefix", params.getMetadataPrefix()),
-                        $aSome("from", params.getFrom().map(toSupportedGranularity::apply)),
+                        $aSome("from", params.getFrom().map(d -> toSupportedGranularity(d))),
                         $aSome("until", Optional.of(toSupportedGranularity(params.getUntil()))),
                         $aSome("set", params.getSet())), verb(content));
       }

@@ -27,7 +27,6 @@ import org.opencastproject.metadata.dublincore.DublinCoreValue;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.Precision;
-import org.opencastproject.util.data.Function;
 
 import java.util.Date;
 
@@ -44,41 +43,17 @@ public final class OcDublinCoreUtil {
     return EncodingSchemeUtils.encodeDate(a, Precision.Second);
   }
 
-  public static final Function<Date, DublinCoreValue> encodeDate = new Function<Date, DublinCoreValue>() {
-    @Override public DublinCoreValue apply(Date a) {
-      return encodeDate(a);
-    }
-  };
-
   public static DublinCoreValue encodeDateAccepted(Date a) {
     return EncodingSchemeUtils.encodeDate(a, Precision.Second);
   }
-
-  public static final Function<Date, DublinCoreValue> encodeDateAccepted = new Function<Date, DublinCoreValue>() {
-    @Override public DublinCoreValue apply(Date a) {
-      return encodeDateAccepted(a);
-    }
-  };
 
   public static DublinCoreValue encodeDateCopyrighted(Date a) {
     return EncodingSchemeUtils.encodeDate(a, Precision.Second);
   }
 
-  public static final Function<Date, DublinCoreValue> encodeDateCopyrighted = new Function<Date, DublinCoreValue>() {
-    @Override public DublinCoreValue apply(Date a) {
-      return encodeDateCopyrighted(a);
-    }
-  };
-
   public static DublinCoreValue encodeDateSubmitted(Date a) {
     return EncodingSchemeUtils.encodeDate(a, Precision.Second);
   }
-
-  public static final Function<Date, DublinCoreValue> encodeDateSubmitted = new Function<Date, DublinCoreValue>() {
-    @Override public DublinCoreValue apply(Date a) {
-      return encodeDateSubmitted(a);
-    }
-  };
 
   public static DublinCoreValue encodeExtent(Long a) {
     return DublinCoreValue.mk(a.toString());
