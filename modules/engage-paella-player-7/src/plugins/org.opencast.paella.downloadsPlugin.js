@@ -153,11 +153,12 @@ export default class DownloadsPlugin extends PopUpButtonPlugin {
         </div>`);
     const downloadKeys = Object.keys(this._downloads);
     downloadKeys.forEach(k => {
-      const J = createElementWithHtmlText(`
+      const downloadStreamElem = createElementWithHtmlText(`
         <div class="downloadStream">
-          <div class="title">${k}</div>
+          <div class="title"> </div>
         </div>`, container);
-      const list = createElementWithHtmlText('<ul></ul>', J);
+      downloadStreamElem.querySelector('.title').innerText = k;
+      const downloadStreamElemlist = createElementWithHtmlText('<ul></ul>', downloadStreamElem);
       const streamDownloads = this._downloads[k];
       streamDownloads.forEach(d => {
         if (d.mimetype == 'text/vtt') {
@@ -176,15 +177,17 @@ export default class DownloadsPlugin extends PopUpButtonPlugin {
 
           const elm = createElementWithHtmlText(`
             <li>
-              <a href="${d.url}" download target="_blank">
-                <span class="mimetype">[${d.mimetype}]</span><span class="res">${cmeta}</span>
+              <a class="link" download target="_blank">
+                <span class="mimetype"> </span> <span class="res"> </span>
               </a>
               <a href="#">
                 <span class="transcript">[transcript]</span>
               </a>
             </li>
-          `, list);
-
+          `, downloadStreamElemlist);
+          elm.querySelector('.link').href = d.url;
+          elm.querySelector('.mimetype').innerText = `[${d.mimetype}]`;
+          elm.querySelector('.res').innerText = cmeta;
           elm.getElementsByTagName('a')[1].onclick = downloadTranscript(d.url);
         }
         else {
@@ -193,13 +196,16 @@ export default class DownloadsPlugin extends PopUpButtonPlugin {
 
           const meta = vmeta ?? ameta ?? '';
 
-          createElementWithHtmlText(`
+          const elm = createElementWithHtmlText(`
             <li>
-              <a href="${d.url}" download>
-                <span class="mimetype">[${d.mimetype}]</span><span class="res">${meta}</span>
+              <a download>
+                <span class="mimetype">[mimetype]</span><span class="res"></span>
               </a>
             </li>
-          `, list);
+          `, downloadStreamElemlist);
+          elm.querySelector('a').href = d.url;
+          elm.querySelector('.mimetype').innerText = `[${d.mimetype}]`;
+          elm.querySelector('.res').innerText = meta;
         }
       });
     });

@@ -3,6 +3,25 @@ Opencast 17 Changelog
 
 Changes marked with \* were also included in 16.x.
 
+## Opencast 17.8 (2025-09-26)
+
+- [[#7066](https://github.com/opencast/opencast/pull/7066)] -
+  Update r/17.x Editor to 17.x-2025-09-26
+- [[#7067](https://github.com/opencast/opencast/pull/7067)] -
+  Update r/17.x Admin UI to 17.x-2025-09-26
+- [[#7056](https://github.com/opencast/opencast/pull/7056)] -
+  Fix paella download plugins.
+- [[#7060](https://github.com/opencast/opencast/pull/7060)] -
+  Allow `mvnw` to work with symlinks
+- [[#7062](https://github.com/opencast/opencast/pull/7062)] -
+  Run tests on changes to the maven wrapper
+- [[#6787](https://github.com/opencast/opencast/pull/6787)] -
+  Add event access control update mode configuration options: r/17.x
+- [[#7042](https://github.com/opencast/opencast/pull/7042)] -
+  Fix 17.x site build
+- [[#6987](https://github.com/opencast/opencast/pull/6987)] -
+  Fix code coverage tooling
+
 ## Opencast 17.7 (2025-08-29)
 - [[#7002](https://github.com/opencast/opencast/pull/7002)] -
   Update r/17.x Admin UI to 17.x-2025-08-29
