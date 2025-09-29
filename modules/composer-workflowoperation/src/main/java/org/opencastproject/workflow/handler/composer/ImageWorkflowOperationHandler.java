@@ -67,7 +67,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -170,7 +169,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
               MediaPosition position = extraction.positions.get(i);
               adjustMetadata(extraction, image, cfg);
               if (image.getIdentifier() == null) {
-                image.setIdentifier(UUID.randomUUID().toString());
+                image.generateIdentifier();
               }
               mp.addDerived(image, extraction.track);
               String fileName = createFileName(

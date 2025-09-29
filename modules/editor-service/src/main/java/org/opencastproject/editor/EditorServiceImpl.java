@@ -580,13 +580,10 @@ public class EditorServiceImpl implements EditorService {
 
         // If not exists, create new Track
         if (track == null) {
-          MediaPackageElementBuilder mpeBuilder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
           // TODO: Figure out which flavor new subtitles from the editor should have
-          track = (Track) mpeBuilder.elementFromURI(subtitleUri, MediaPackageElement.Type.Track,
-                  new MediaPackageElementFlavor(captionsFlavor.getType(),"source"));
-          mediaPackage.add(track);
-          logger.info("Creating new subtitle track " + track.getIdentifier() + " with tags "
-                  + track.getTags().toString());
+          track = (Track) mediaPackage.add(subtitleUri, MediaPackageElement.Type.Track,
+              new MediaPackageElementFlavor(captionsFlavor.getType(),"source"));
+          logger.info("Creating new subtitle track {}", track.getIdentifier());
         }
 
         track.setURI(subtitleUri);

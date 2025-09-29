@@ -61,7 +61,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * This workflow operation processes a Webvtt into CutMarks
@@ -343,7 +342,7 @@ public class WebvttToCutMarksWorkflowOperationHandler extends AbstractWorkflowOp
 
       MediaPackageElementBuilder mpeBuilder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
       MediaPackageElement mpe = mpeBuilder.newElement(MediaPackageElement.Type.Attachment, targetFlavor);
-      mpe.setIdentifier(UUID.randomUUID().toString());
+      mpe.generateIdentifier();
 
       URI cutMarksURI = workspace.put(mp.getIdentifier().toString(), mpe.getIdentifier(), TARGET_FILENAME, cutMarksOut);
 

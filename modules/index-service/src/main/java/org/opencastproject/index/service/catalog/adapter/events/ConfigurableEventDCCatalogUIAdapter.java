@@ -45,7 +45,6 @@ import java.io.InputStream;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -77,7 +76,7 @@ public class ConfigurableEventDCCatalogUIAdapter extends ConfigurableDCCatalogUI
     if (catalogs.length == 0) {
       catalog = (Catalog) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
               .newElement(org.opencastproject.mediapackage.MediaPackageElement.Type.Catalog, getFlavor());
-      catalog.setIdentifier(UUID.randomUUID().toString());
+      catalog.generateIdentifier();
       mediaPackage.add(catalog);
 
       dc = DublinCores.mkSimple();

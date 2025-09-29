@@ -67,7 +67,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * The workflow definition for handling "theme" operations
@@ -337,7 +336,7 @@ public class ThemeWorkflowOperationHandler extends AbstractWorkflowOperationHand
   private void addElement(MediaPackage mediaPackage, final MediaPackageElementFlavor flavor, final List<String> tags,
           InputStream file, String filename, Type type) throws IOException {
     MediaPackageElement element = elementBuilderFactory.newElementBuilder().newElement(type, flavor);
-    element.setIdentifier(UUID.randomUUID().toString());
+    element.generateIdentifier();
     for (String tag : tags) {
       element.addTag(tag);
     }

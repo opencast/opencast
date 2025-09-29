@@ -1980,7 +1980,7 @@ public class IndexServiceImpl implements IndexService {
       if (c == null) {
         c = (Catalog) MediaPackageElementBuilderFactory.newInstance().newElementBuilder().newElement(Type.Catalog,
                 MediaPackageElements.COMMENTS);
-        c.setIdentifier(UUID.randomUUID().toString());
+        c.generateIdentifier();
         mediaPackage.add(c);
       }
 

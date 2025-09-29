@@ -63,7 +63,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -324,8 +323,6 @@ public class
       String outputLanguage = jobOutput[1];
       String engineType = jobOutput[2];
 
-      String mediaPackageIdentifier = UUID.randomUUID().toString();
-
       MediaPackageElement subtitleMediaPackageElement;
       switch (appendSubtitleAs) {
         case attachment:
@@ -336,9 +333,10 @@ public class
           subtitleMediaPackageElement = new TrackImpl();
       }
 
-      subtitleMediaPackageElement.setIdentifier(mediaPackageIdentifier);
+      subtitleMediaPackageElement.generateIdentifier();
       try (InputStream in = workspace.read(output)) {
-        URI uri = workspace.put(parentMediaPackage.getIdentifier().toString(), mediaPackageIdentifier,
+        URI uri = workspace.put(parentMediaPackage.getIdentifier().toString(),
+                subtitleMediaPackageElement.getIdentifier(),
                 FilenameUtils.getName(output.getPath()), in);
         subtitleMediaPackageElement.setURI(uri);
       }
