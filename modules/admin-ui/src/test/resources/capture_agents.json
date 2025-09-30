@@ -9,7 +9,7 @@
          "inputs":[
             {
                "id":"microphone",
-               "value":"CAPTURE_AGENT.DEVICE.MICROPHONE"
+               "value":"CAPTURE_AGENT.DEVICE.INPUTS.MICROPHONE"
             }
          ],
          "Update":"2016-06-09T06:00:00Z",
@@ -21,7 +21,7 @@
          "inputs":[
             {
                "id":"microphone",
-               "value":"CAPTURE_AGENT.DEVICE.MICROPHONE"
+               "value":"CAPTURE_AGENT.DEVICE.INPUTS.MICROPHONE"
             }
          ],
          "Update":"2016-06-09T18:00:00Z",
@@ -33,7 +33,7 @@
          "inputs":[
             {
                "id":"microphone",
-               "value":"CAPTURE_AGENT.DEVICE.MICROPHONE"
+               "value":"CAPTURE_AGENT.DEVICE.INPUTS.MICROPHONE"
             }
          ],
          "Update":"2016-05-26T07:07:07Z",
@@ -45,7 +45,7 @@
          "inputs":[
             {
                "id":"microphone",
-               "value":"CAPTURE_AGENT.DEVICE.MICROPHONE"
+               "value":"CAPTURE_AGENT.DEVICE.INPUTS.MICROPHONE"
             }
          ],
          "Update":"2014-05-26T15:37:02Z",
