@@ -1372,7 +1372,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    * Update the event in the Elasticsearch index. Fields will only be updated of the corresponding Opt is not none.
    *
    * @param mediaPackageId
-   * @param index
    * @param acl
    * @param dublinCore
    * @param startTime
@@ -1389,48 +1388,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     String organization = getSecurityService().getOrganization().getId();
     User user = getSecurityService().getUser();
 
-    Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
-      Event event = eventOpt.orElse(new Event(mediaPackageId, organization));
-
-      if (acl.isPresent()) {
-        event.setAccessPolicy(AccessControlParser.toJsonSilent(acl.get()));
-      }
-      if (dublinCore.isPresent()) {
-        EventIndexUtils.updateEvent(event, dublinCore.get());
-        if (isBlank(event.getCreator()))
-          event.setCreator(getSecurityService().getUser().getName());
-
-        // Update series name if not already done
-        try {
-          EventIndexUtils.updateSeriesName(event, organization, user, index);
-        } catch (SearchIndexException e) {
-          logger.error("Error updating the series name of the event {} in the {} index.", mediaPackageId,
-                  index.getIndexName(), e);
-        }
-      }
-      if (presenters.isPresent()) {
-        event.setTechnicalPresenters(new ArrayList<>(presenters.get()));
-      }
-      if (agentId.isPresent()) {
-        event.setAgentId(agentId.get());
-      }
-      if (recordingStatus.isPresent() && !recordingStatus.get().equals(RecordingState.UNKNOWN)) {
-        event.setRecordingStatus(recordingStatus.get());
-      }
-      if (properties.isPresent()) {
-        event.setAgentConfiguration(properties.get());
-      }
-      if (startTime.isPresent()) {
-        String startTimeStr = startTime == null ? null : DateTimeSupport.toUTC(startTime.get().getTime());
-        event.setTechnicalStartTime(startTimeStr);
-      }
-      if (endTime.isPresent()) {
-        String endTimeStr = endTime == null ? null : DateTimeSupport.toUTC(endTime.get().getTime());
-        event.setTechnicalEndTime(endTimeStr);
-      }
-
-      return Optional.of(event);
-    };
+    Function<Optional<Event>, Optional<Event>> updateFunction = getEventUpdateFunction(mediaPackageId, acl, dublinCore,
+            startTime, endTime, presenters, agentId, properties, recordingStatus, organization, user);
 
     try {
       index.addOrUpdateEvent(mediaPackageId, updateFunction, organization, user);
@@ -1444,7 +1403,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    * Set recording status to null for this event in the Elasticsearch index.
    *
    * @param mediaPackageId
-   * @param index
    */
   private void removeRecordingStatusFromIndex(String mediaPackageId) {
     String organization = getSecurityService().getOrganization().getId();
@@ -1469,7 +1427,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    * Remove scheduling information for this event from the Elasticsearch index.
    *
    * @param mediaPackageId
-   * @param index
    */
   private void removeSchedulingInfoFromIndex(String mediaPackageId) {
     String orgId = getSecurityService().getOrganization().getId();
@@ -1686,8 +1643,17 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
                       current[0]++;
 
                       var updatedEventData = Optional.of(new Event(event.getMediaPackageId(), organization.getId()));
-                      updatedEventData = getEventUpdateFunction(event, organization.getId(),
-                                  securityService.getUser()).apply(updatedEventData);
+
+                      final Set<String> presenters = getPresenters(
+                              Optional.ofNullable(event.getPresenters()).orElse(""));
+                      final Map<String, String> caMetadata = deserializeExtendedEventProperties(
+                              event.getCaptureAgentProperties());
+
+                      updatedEventData = getEventUpdateFunction(event.getMediaPackageId(), Optional.empty(), Optional.empty(),
+                              Optional.of(event.getStartDate()), Optional.of(event.getEndDate()), Optional.of(presenters),
+                              Optional.of(event.getCaptureAgentId()), Optional.of(caMetadata),
+                              Optional.ofNullable(event.getRecordingState()), organization.getId(),
+                              securityService.getUser()).apply(updatedEventData);
                       updatedEventRange.add(updatedEventData.get());
 
                       if (updatedEventRange.size() >= n || current[0] >= events.size()) {
@@ -1695,6 +1661,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
                         logIndexRebuildProgress(logger, total, current[0], n);
                         updatedEventRange.clear();
                       }
+
                     } catch (SearchIndexException e) {
                       logger.error("Error while updating event '{}' from search index:", event.getMediaPackageId(), e);
                     } catch (Exception e) {
@@ -1717,35 +1684,20 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   public SecurityService getSecurityService() {
     return securityService;
   }
+
   /**
    * Get the function to update a scheduled event in the Elasticsearch index.
    *
-   * @param scheduledEvent
-   *          The theme to update
-   * @param orgId
-   *          The id of the current organization
-   * @param user
-   *          The user
+   * @param orgId          The id of the current organization
+   * @param user           The user
    * @return the function to do the update
    */
-  private Function<Optional<Event>, Optional<Event>> getEventUpdateFunction(ExtendedEventDto scheduledEvent,
-          String orgId, User user) {
+  private Function<Optional<Event>, Optional<Event>> getEventUpdateFunction(String mediaPackageId,
+          Optional<AccessControlList> acl, Optional<DublinCoreCatalog> dublinCore, Optional<Date> startTime,
+          Optional<Date> endTime, Optional<Set<String>> presenters, Optional<String> agentId,
+          Optional<Map<String, String>> properties, Optional<String> recordingStatus, String orgId, User user) {
     return (Optional<Event> eventOpt) -> {
-      Event event = eventOpt.orElse(new Event(scheduledEvent.getMediaPackageId(), orgId));
-      final Set<String> presenters = getPresenters(Optional.ofNullable(scheduledEvent.getPresenters()).orElse(""));
-      final Map<String, String> caMetadata = deserializeExtendedEventProperties(scheduledEvent.
-              getCaptureAgentProperties());
-      Optional<Snapshot> optSnapshot = assetManager.getLatestSnapshot(scheduledEvent.getMediaPackageId());
-      final Snapshot snapshot = optSnapshot.get();
-
-      Optional<AccessControlList> acl = Optional.of(authorizationService.getActiveAcl(snapshot.getMediaPackage()).getA());
-      Optional<DublinCoreCatalog> dublinCore = loadEpisodeDublinCoreFromAsset(snapshot);
-      Optional<Date> startTime = Optional.of(scheduledEvent.getStartDate());
-      Optional<Date> endTime = Optional.of(scheduledEvent.getEndDate());
-      Optional<Set<String>> presentersOpt = Optional.of(presenters);
-      Optional<String> agentId = Optional.of(scheduledEvent.getCaptureAgentId());
-      Optional<Map<String, String>> properties = Optional.of(caMetadata);
-      Optional<String> recordingStatus = Optional.ofNullable(scheduledEvent.getRecordingState());
+      Event event = eventOpt.orElse(new Event(mediaPackageId, orgId));
 
       if (acl.isPresent()) {
         event.setAccessPolicy(AccessControlParser.toJsonSilent(acl.get()));
@@ -1759,12 +1711,12 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         try {
           EventIndexUtils.updateSeriesName(event, orgId, user, index);
         } catch (SearchIndexException e) {
-          logger.error("Error updating the series name of the event {} in the {} index.",
-                  scheduledEvent.getMediaPackageId(), index.getIndexName(), e);
+          logger.error("Error updating the series name of the event {} in the {} index.", mediaPackageId,
+                  index.getIndexName(), e);
         }
       }
-      if (presentersOpt.isPresent()) {
-        event.setTechnicalPresenters(new ArrayList<>(presentersOpt.get()));
+      if (presenters.isPresent()) {
+        event.setTechnicalPresenters(new ArrayList<>(presenters.get()));
       }
       if (agentId.isPresent()) {
         event.setAgentId(agentId.get());

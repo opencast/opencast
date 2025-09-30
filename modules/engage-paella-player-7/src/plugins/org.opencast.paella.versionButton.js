@@ -36,24 +36,35 @@ export default class OpencastPaellaVersionPlugin extends PopUpButtonPlugin {
   async getContent() {
     const pluginVersionsHTML = this.player.version.pluginModules.map(p => {
       const i = p.split(':');
-      return `<div class="row">
-                <div class="component"> ${i[0].trim()} </div>
-                <div class="version"> ${i[1].trim()}</div>
-              </div>`;
+      const c =  createElementWithHtmlText(`<div class="row">
+                <div class="component"> </div>
+                <div class="version"> </div>
+              </div>`);
+      c.querySelector('div.component').innerText = i[0].trim();
+      c.querySelector('div.version').innerText = i[1].trim();
+      return c.outerHTML;
     }).join('');
+
+    const row_oc = createElementWithHtmlText(`<div class="row">
+      <div class="component"> ${translate('Opencast player')} </div>
+      <div class="version"> </div>
+    </div>`);
+    row_oc.querySelector('.version').innerText = this.player.version.player;
+
+    const row_core = createElementWithHtmlText(`<div class="row">
+      <div class="component"> ${translate('Paella core version')} </div>
+      <div class="version"> </div>
+    </div>`);
+    row_core.querySelector('.version').innerText = this.player.version.coreLibrary;
+
+
     const container = createElementWithHtmlText(`
         <div class="OpencastPaellaVersionPlugin">
             <h4>${translate('Opencast player version')}</h4>
             <div class="downloadStream">
-              <div class="row">
-                <div class="component"> ${translate('Opencast player')} </div>
-                <div class="version"> ${this.player.version.player} </div>
-              </div>
+              ${row_oc.outerHTML}
               <div class="paella-plugins">
-                <div class="row">
-                  <div class="component"> ${translate('Paella core version')} </div>
-                  <div class="version"> ${this.player.version.coreLibrary} </div>
-                </div>
+                ${row_core.outerHTML}
                 ${pluginVersionsHTML}
               </div>
             </div>

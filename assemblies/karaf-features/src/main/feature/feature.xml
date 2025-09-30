@@ -536,7 +536,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-caption-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-cover-image-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-cover-image-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-cover-image-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-dictionary-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-dictionary-regexp/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-execute-api/${project.version}</bundle>

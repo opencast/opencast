@@ -202,7 +202,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
         em.remove(eventOpt.get());
         return eventOpt.get();
       });
-      updateIndices(event.getEventId());
+      updateCommentsInIndex(event.getEventId());
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -240,7 +240,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
 
     // send updates only if we actually modified anything
     if (count > 0) {
-      updateIndices(eventId);
+      updateCommentsInIndex(eventId);
     }
   }
 
@@ -249,8 +249,8 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
     try {
       final EventCommentDto commentDto = EventCommentDto.from(comment);
       final EventComment updatedComment = db.execTx(namedQuery.persistOrUpdate(commentDto))
-          .toComment(userDirectoryService, organizationDirectoryService);
-      updateIndices(updatedComment.getEventId());
+              .toComment(userDirectoryService, organizationDirectoryService);
+      updateCommentsInIndex(updatedComment.getEventId());
       return updatedComment;
     } catch (Exception e) {
       throw new EventCommentDatabaseException(e);
@@ -335,49 +335,11 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
     return orgEventsMap;
   }
 
-  private void updateIndices(String eventId) throws EventCommentDatabaseException {
-    List<EventComment> comments = getComments(eventId);
-    boolean hasOpenComments = comments.stream().anyMatch(filterOpenComments::apply);
-    boolean needsCutting = comments.stream().anyMatch(filterNeedsCuttingComment::apply);
-
+  private void updateCommentsInIndex(String eventId) throws EventCommentDatabaseException {
     String organization = securityService.getOrganization().getId();
     User user = securityService.getUser();
 
-    updateIndex(eventId, !comments.isEmpty(), hasOpenComments, comments, needsCutting, organization, user);
-  }
-
-  private void updateIndex(String eventId, boolean hasComments, boolean hasOpenComments, List<EventComment> comments,
-          boolean needsCutting, String organization, User user) {
-    logger.debug("Updating comment status of event {} in the {} index.", eventId, index.getIndexName());
-    if (!hasComments && hasOpenComments) {
-      throw new IllegalStateException(
-              "Invalid comment update request: You can't have open comments without having any comments!");
-    }
-    if (!hasOpenComments && needsCutting) {
-      throw new IllegalStateException(
-              "Invalid comment update request: You can't have an needs cutting comment without having any open "
-                      + "comments!");
-    }
-
-    Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
-      if (eventOpt.isEmpty()) {
-        logger.debug("Event {} not found for comment status updating", eventId);
-        return Optional.empty();
-      }
-      Event event = eventOpt.get();
-      event.setHasComments(hasComments);
-      event.setHasOpenComments(hasOpenComments);
-      List<Comment> indexComments = new ArrayList<Comment>();
-      for (EventComment comment : comments) {
-        indexComments.add(new Comment(
-                comment.getId().get().toString(), comment.getReason(), comment.getText(), comment.isResolvedStatus()
-        ));
-        // Do we want to include replies? Maybe not, no good reason to filter for them?
-      }
-      event.setComments(indexComments);
-      event.setNeedsCutting(needsCutting);
-      return Optional.of(event);
-    };
+    Function<Optional<Event>, Optional<Event>> updateFunction = getEventUpdateFunction(eventId);
 
     try {
       index.addOrUpdateEvent(eventId, updateFunction, organization, user);
@@ -448,6 +410,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   public IndexRebuildService.Service getService() {
     return IndexRebuildService.Service.Comments;
   }
+
   /**
    * Get the function to update a commented event in the Elasticsearch index.
    *
@@ -457,44 +420,40 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
    */
   private Function<Optional<Event>, Optional<Event>> getEventUpdateFunction(String eventId) {
     return (Optional<Event> eventOpt) -> {
+      if (eventOpt.isEmpty()) {
+        logger.debug("Event {} not found for comment status updating", eventId);
+        return Optional.empty();
+      }
+      Event event = eventOpt.get();
       List<EventComment> comments;
       try {
-        if (eventOpt.isEmpty()) {
-          logger.debug("Event {} not found for comment status updating", eventId);
-          return Optional.empty();
-        }
         comments = getComments(eventId);
-        Boolean hasComments = !comments.isEmpty();
-        boolean hasOpenComments = comments.stream().anyMatch(filterOpenComments::apply);
-        boolean needsCutting = comments.stream().anyMatch(filterNeedsCuttingComment::apply);
-
-        logger.debug("Updating comment status of event {} in the {} index.", eventId, index.getIndexName());
-        if (!hasComments && hasOpenComments) {
-          throw new IllegalStateException(
-                  "Invalid comment update request: You can't have open comments without having any comments!");
-        }
-        if (!hasOpenComments && needsCutting) {
-          throw new IllegalStateException(
-                  "Invalid comment update request: You can't have an needs cutting comment without having any open "
-                          + "comments!");
-        }
-        Event event = eventOpt.get();
-        event.setHasComments(hasComments);
-        event.setHasOpenComments(hasOpenComments);
-        List<Comment> indexComments = new ArrayList<Comment>();
-        for (EventComment comment : comments) {
-          indexComments.add(new Comment(
-                  comment.getId().get().toString(), comment.getReason(), comment.getText(), comment.isResolvedStatus()
-          ));
-          // Do we want to include replies? Maybe not, no good reason to filter for them?
-        }
-        event.setComments(indexComments);
-        event.setNeedsCutting(needsCutting);
-        return Optional.of(event);
       } catch (EventCommentDatabaseException e) {
         logger.error("Unable to get comments from event {}", eventId, e);
         return Optional.empty();
       }
+      boolean hasComments = !comments.isEmpty();
+      boolean hasOpenComments = comments.stream().anyMatch(filterOpenComments::apply);
+      boolean needsCutting = comments.stream().anyMatch(filterNeedsCuttingComment::apply);
+
+      logger.debug("Updating comment status of event {} in the {} index.", eventId, index.getIndexName());
+      if (!hasOpenComments && needsCutting) {
+        throw new IllegalStateException(
+                "Invalid comment update request: You can't have an needs cutting comment without having any open "
+                        + "comments!");
+      }
+
+      event.setHasComments(hasComments);
+      event.setHasOpenComments(hasOpenComments);
+      List<Comment> indexComments = new ArrayList<Comment>();
+      for (EventComment comment : comments) {
+        indexComments.add(new Comment(comment.getId().get().toString(), comment.getReason(), comment.getText(),
+                comment.isResolvedStatus()));
+        // Do we want to include replies? Maybe not, no good reason to filter for them?
+      }
+      event.setComments(indexComments);
+      event.setNeedsCutting(needsCutting);
+      return Optional.of(event);
     };
   }
 }

@@ -2240,7 +2240,9 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
                   }
                 }
                 var updatedWorkflowData = index.getEvent(indexData.getMediaPackageId(), orgid, securityService.getUser());
-                updatedWorkflowData = getStateUpdateFunction(indexData).apply(updatedWorkflowData);
+                updatedWorkflowData = getStateUpdateFunction(indexData.getId(),indexData.getState(),
+                        indexData.getMediaPackageId(), indexData.getTemplate(), indexData.getOrganizationId())
+                        .apply(updatedWorkflowData);
                 updatedWorkflowRange.add(updatedWorkflowData.get());
 
                 if (updatedWorkflowRange.size() >= n || current >= total) {
@@ -2274,8 +2276,6 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    *
    * @param workflowInstanceId
    *         the identifier of the workflow instance to remove
-   * @param index
-   *         the index to update
    */
   private void removeWorkflowInstanceFromIndex(long workflowInstanceId) {
     final String orgId = securityService.getOrganization().getId();
@@ -2345,18 +2345,11 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    *         workflow organization id
    */
   private void updateWorkflowInstanceInIndex(long id, int state, String wfDefId, String mpId, String orgId) {
-    final WorkflowState workflowState = WorkflowState.values()[state];
     final User user = securityService.getUser();
 
     logger.debug("Updating workflow instance {} of event {} in the {} index.", id, mpId,
             index.getIndexName());
-    Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
-      Event event = eventOpt.orElse(new Event(mpId, orgId));
-      event.setWorkflowId(id);
-      event.setWorkflowState(workflowState);
-      event.setWorkflowDefinitionId(wfDefId);
-      return Optional.of(event);
-    };
+    Function<Optional<Event>, Optional<Event>> updateFunction = getStateUpdateFunction(id, state, wfDefId, mpId, orgId);
 
     try {
       index.addOrUpdateEvent(mpId, updateFunction, orgId, user);
@@ -2371,15 +2364,16 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
   /**
    * Get the function to update the workflow state for an event in the Elasticsearch index.
    *
-   * @param wfData
-   *          The workflow index data package
    * @return the function to do the update
    */
-  private Function<Optional<Event>, Optional<Event>> getStateUpdateFunction(WorkflowIndexData wfData) {
+  private Function<Optional<Event>, Optional<Event>> getStateUpdateFunction(long workflowId,
+          int workflowState, String workflowDefinitionId, String mediaPackageId,
+          String orgId) {
     return (Optional<Event> eventOpt) -> {
-      Event event = eventOpt.orElse(new Event(wfData.getMediaPackageId(), wfData.getOrganizationId()));
-      event.setWorkflowId(wfData.getId());
-      event.setWorkflowState(WorkflowState.values()[wfData.getState()]);
+      Event event = eventOpt.orElse(new Event(mediaPackageId, orgId));
+      event.setWorkflowId(workflowId);
+      event.setWorkflowState(WorkflowState.values()[workflowState]);
+      event.setWorkflowDefinitionId(workflowDefinitionId);
       return Optional.of(event);
     };
   }

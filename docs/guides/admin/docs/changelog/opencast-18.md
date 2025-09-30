@@ -3,6 +3,26 @@ Opencast 18 Changelog
 
 Changes marked with \* were also included in 17.x.
 
+## Opencast 18.2 (2025-09-29)
+- [[#7071](https://github.com/opencast/opencast/pull/7071)] -
+  Update r/18.x Admin UI to 18.x-2025-09-29
+- [[#7070](https://github.com/opencast/opencast/pull/7070)] -
+  Update r/18.x Editor to 18.x-2025-09-29
+- [[#7061](https://github.com/opencast/opencast/pull/7061)] -
+  Remove workflow operation from worker
+- [[#7038](https://github.com/opencast/opencast/pull/7038)] -
+  Ensure mvnw is used in our github actions workflows
+- [[#7006](https://github.com/opencast/opencast/pull/7006)] -
+  Update installation docs
+- [[#6984](https://github.com/opencast/opencast/pull/6984)] -
+  Fix index rebuild stuff (again)
+- [[#6924](https://github.com/opencast/opencast/pull/6924)] -
+  Don't query for series collection in admin ui event endpoints
+- [[#7056](https://github.com/opencast/opencast/pull/7056)] -
+  Fix paella download plugins.\*
+- [[#7060](https://github.com/opencast/opencast/pull/7060)] -
+  Allow `mvnw` to work with symlinks\*
+
 ## Opencast 18.1 (2025-08-29)
 - [[#7004](https://github.com/opencast/opencast/pull/7004)] -
   Update r/18.x Admin UI to 18.x-2025-08-29
