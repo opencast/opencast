@@ -931,6 +931,7 @@ public class IndexServiceImpl implements IndexService {
       try {
         captureAgentId = (String) sourceMetadata.get("device");
         configuration = captureAgentStateService.getAgentConfiguration((String) sourceMetadata.get("device"));
+        caProperties.putAll(configuration);
       } catch (Exception e) {
         logger.warn("Unable to parse device {}: because:", sourceMetadata.get("device"), e);
         throw new IllegalArgumentException("Unable to parse device");
@@ -957,11 +958,23 @@ public class IndexServiceImpl implements IndexService {
       duration = Long.parseLong(durationString);
       DublinCoreValue period = EncodingSchemeUtils
               .encodePeriod(new DCMIPeriod(start.toDate(), start.plus(duration).toDate()), Precision.Second);
-      String inputs = (String) sourceMetadata.get("inputs");
-
-      caProperties.putAll(configuration);
       dc.set(DublinCore.PROPERTY_TEMPORAL, period);
-      caProperties.put(CaptureParameters.CAPTURE_DEVICE_NAMES, inputs);
+
+      // Extended API fields
+      String inputs = (String) sourceMetadata.get("inputs");
+      if (inputs != null) {
+        caProperties.put(CaptureParameters.CAPTURE_DEVICE_NAMES, inputs);
+      }
+
+      String stream = (String) sourceMetadata.get("stream");
+      if (stream != null) {
+        caProperties.put(CaptureParameters.CAPTURE_DEVICE_STREAM, stream);
+      } else {
+        if (configuration.getProperty(CaptureParameters.CAPTURE_DEVICE_STREAM) != null) {
+          caProperties.put(CaptureParameters.CAPTURE_DEVICE_STREAM, "0");
+        }
+      }
+
     }
 
     if (type.equals(SourceType.SCHEDULE_MULTIPLE)) {

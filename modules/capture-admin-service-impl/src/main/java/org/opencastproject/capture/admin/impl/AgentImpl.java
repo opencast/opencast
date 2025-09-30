@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Properties;
@@ -287,37 +288,54 @@ public class AgentImpl implements Agent {
 
     capabilitiesProperties = new Properties();
 
+    // Parse names
     String names = configuration.getProperty(CaptureParameters.CAPTURE_DEVICE_NAMES);
     if (names == null) {
       log.debug("Capture agent '{}' failed to provide device names ({})", name, CaptureParameters.CAPTURE_DEVICE_NAMES);
-      return;
-    }
-
-    capabilitiesProperties.put(CaptureParameters.CAPTURE_DEVICE_NAMES, names);
-    // Get the names and setup a hash map of them
-    String[] friendlyNames = names.split(",");
-    HashMap<String, Integer> propertyCounts = new HashMap<String, Integer>();
-    for (String name : friendlyNames) {
-      propertyCounts.put(name, 0);
-    }
-
-    // For each key
-    for (String key : configuration.stringPropertyNames()) {
-      // For each device
+    } else {
+      capabilitiesProperties.put(CaptureParameters.CAPTURE_DEVICE_NAMES, names);
+      // Get the names and setup a hash map of them
+      String[] friendlyNames = names.split(",");
+      HashMap<String, Integer> propertyCounts = new HashMap<String, Integer>();
       for (String name : friendlyNames) {
-        String check = CaptureParameters.CAPTURE_DEVICE_PREFIX + name;
-        // If the key looks like a device prefix + the name, copy it
-        if (key.contains(check)) {
-          String property = configuration.getProperty(key);
-          if (property == null) {
-            log.error("Unable to expand variable in value for key {}, returning null!", key);
-            capabilitiesProperties = null;
-            return;
+        propertyCounts.put(name, 0);
+      }
+
+      // For each key
+      for (String key : configuration.stringPropertyNames()) {
+        // For each device
+        for (String name : friendlyNames) {
+          String check = CaptureParameters.CAPTURE_DEVICE_PREFIX + name;
+          // If the key looks like a device prefix + the name, copy it
+          if (key.contains(check)) {
+            String property = configuration.getProperty(key);
+            if (property == null) {
+              log.error("Unable to expand variable in value for key {}, returning null!", key);
+              capabilitiesProperties = null;
+              return;
+            }
+            capabilitiesProperties.setProperty(key, property);
+            propertyCounts.put(name, propertyCounts.get(name) + 1);
           }
-          capabilitiesProperties.setProperty(key, property);
-          propertyCounts.put(name, propertyCounts.get(name) + 1);
         }
       }
+    }
+
+    // Parse stream
+    String stream = configuration.getProperty(CaptureParameters.CAPTURE_DEVICE_STREAM);
+    if (stream == null) {
+      log.debug("Capture agent '{}' failed to provide stream ({})", name, CaptureParameters.CAPTURE_DEVICE_STREAM);
+    } else {
+      // Validate
+      String[] streamOptions = stream.split(",");
+      Set<String> validOptions = Set.of("0", "1");
+      boolean allFound = Arrays.stream(streamOptions)
+          .map(String::trim)
+          .allMatch(validOptions::contains);
+      if (!allFound) {
+        log.error("Capture agent '{}' failed to provide valid options for stream ({})", stream, CaptureParameters.CAPTURE_DEVICE_STREAM);
+      }
+      capabilitiesProperties.put(CaptureParameters.CAPTURE_DEVICE_STREAM, stream);
     }
   }
 

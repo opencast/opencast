@@ -106,7 +106,8 @@ public class CaptureAgentsEndpointTest {
         if (checkInputs) {
           // Check inputs
           JSONObject expectedInputs = (JSONObject) ((JSONArray) expected.get("inputs")).get(0);
-          JSONObject actualInputs = (JSONObject) ((JSONArray) captureAgentJson.get("inputs")).get(0);
+          JSONObject parseCapabilities = (JSONObject) captureAgentJson.get("parsedCapabilities");
+          JSONObject actualInputs = (JSONObject) ((JSONArray) parseCapabilities.get("inputs")).get(0);
           assertEquals(expectedInputs.get("id"), actualInputs.get("id"));
           assertEquals(expectedInputs.get("value"), actualInputs.get("value"));
         }
@@ -123,7 +124,7 @@ public class CaptureAgentsEndpointTest {
     String expectedWithoutInputs = IOUtils.toString(CaptureAgentsEndpointTest.class
             .getResource("/capture_agents_noinputs.json"), "utf-8");
 
-    String result = given().queryParam("inputs", true).expect().statusCode(HttpStatus.SC_OK)
+    String result = given().queryParam("withParsedCapabilities", true).expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON).body("total", equalTo(4)).body("offset", equalTo(0))
             .body("limit", equalTo(0)).body("results", hasSize(4)).when().get(rt.host("/agents.json")).asString();
 
