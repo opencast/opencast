@@ -39,6 +39,9 @@ public interface CaptureParameters {
   /** A comma delimited list of the friendly names for capturing devices */
   String CAPTURE_DEVICE_NAMES = "capture.device.names";
 
+  /** An integer signaling live streaming for capturing devices */
+  String CAPTURE_DEVICE_STREAM = "capture.device.stream";
+
   /** String prefix used when specify capture device properties */
   String CAPTURE_DEVICE_PREFIX = "capture.device.";
 

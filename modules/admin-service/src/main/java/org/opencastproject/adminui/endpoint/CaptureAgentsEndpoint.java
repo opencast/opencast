@@ -59,6 +59,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -139,8 +140,9 @@ public class CaptureAgentsEndpoint {
               isRequired = false, name = "limit", type = RestParameter.Type.STRING),
           @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset",
               type = RestParameter.Type.STRING),
-          @RestParameter(defaultValue = "false", description = "Define if the inputs should or not returned with the "
-              + "capture agent.", isRequired = false, name = "inputs", type = RestParameter.Type.BOOLEAN),
+          @RestParameter(defaultValue = "false", description = "Define if the parsed capabilities should or not "
+              + "returned with the capture agent.", isRequired = false, name = "parsed capabilities",
+              type = RestParameter.Type.BOOLEAN),
           @RestParameter(name = "sort", isRequired = false, description = "The sort order. May include any of the "
               + "following: STATUS, NAME OR LAST_UPDATED.  Add '_DESC' to reverse the sort order (e.g. STATUS_DESC).",
               type = STRING)
@@ -151,7 +153,8 @@ public class CaptureAgentsEndpoint {
       },
       returnDescription = "")
   public Response getAgents(@QueryParam("limit") int limit, @QueryParam("offset") int offset,
-      @QueryParam("inputs") boolean inputs, @QueryParam("filter") String filter, @QueryParam("sort") String sort) {
+      @QueryParam("withParsedCapabilities") boolean withParsedCapabilities, @QueryParam("filter") String filter,
+      @QueryParam("sort") String sort) {
     Optional<String> filterName = Optional.empty();
     Optional<String> filterStatus = Optional.empty();
     Optional<Long> filterLastUpdated = Optional.empty();
@@ -235,7 +238,7 @@ public class CaptureAgentsEndpoint {
     // Run through and build a map of updates (rather than states)
     List<JsonObject> agentsJSON = new ArrayList<>();
     for (Agent agent : filteredAgents) {
-      agentsJSON.add(generateJsonAgent(agent, inputs, false));
+      agentsJSON.add(generateJsonAgent(agent, withParsedCapabilities, false));
     }
 
     return okJsonList(agentsJSON, offset, limit, total);
@@ -308,13 +311,13 @@ public class CaptureAgentsEndpoint {
    *
    * @param agent
    *          The target capture agent
-   * @param withInputs
-   *          Whether the agent has inputs
+   * @param withParsedCapabilities
+   *          Add capabilities as individual fields and pre-parse them
    * @param details
    *          Whether the configuration and capabilities should be serialized
    * @return A {@link JsonObject} representing the capture agent
    */
-  private JsonObject generateJsonAgent(Agent agent, boolean withInputs, boolean details) {
+  private JsonObject generateJsonAgent(Agent agent, boolean withParsedCapabilities, boolean details) {
     JsonObject json = new JsonObject();
     String status = AgentState.TRANSLATION_PREFIX + agent.getState().toUpperCase();
     json.addProperty("Status", safeString(status));
@@ -322,13 +325,30 @@ public class CaptureAgentsEndpoint {
     json.addProperty("Update", safeString(toUTC(agent.getLastHeardFrom())));
     json.addProperty("URL", safeString(agent.getUrl()));
 
-    if (withInputs) {
-      String devices = (String) agent.getCapabilities().get(CaptureParameters.CAPTURE_DEVICE_NAMES);
-      if (devices == null || devices.isEmpty()) {
-        json.add("inputs", new JsonArray());
+    if (withParsedCapabilities) {
+      JsonObject parsedCapabilities = new JsonObject();
+
+      String inputs = (String) agent.getCapabilities().get(CaptureParameters.CAPTURE_DEVICE_NAMES);
+      if (inputs == null || inputs.isEmpty()) {
+        parsedCapabilities.add("inputs", new JsonArray());
       } else {
-        json.add("inputs", generateJsonDevice(devices.split(",")));
+        String[] parsedInputs = Arrays.stream(inputs.split(","))
+            .map(String::trim)
+            .toArray(String[]::new);
+        parsedCapabilities.add("inputs", generateJsonDevice(parsedInputs, TRANSLATION_KEY_PREFIX + "INPUTS."));
       }
+
+      String stream = (String) agent.getCapabilities().get(CaptureParameters.CAPTURE_DEVICE_STREAM);
+      if (stream == null || stream.isEmpty()) {
+        parsedCapabilities.add("stream", new JsonArray());
+      } else {
+        String[] parsedStream = Arrays.stream(stream.split(","))
+            .map(String::trim)
+            .toArray(String[]::new);
+        parsedCapabilities.add("stream", generateJsonDevice(parsedStream, TRANSLATION_KEY_PREFIX + "STREAM."));
+      }
+
+      json.add("parsedCapabilities", parsedCapabilities);
     }
 
     if (details) {
@@ -368,13 +388,13 @@ public class CaptureAgentsEndpoint {
    *          an array of devices String
    * @return A {@link JsonArray} representing the devices
    */
-  private JsonArray generateJsonDevice(String[] devices) {
+  private JsonArray generateJsonDevice(String[] devices, String translationPrefix) {
     JsonArray jsonDevices = new JsonArray();
 
     for (String device : devices) {
       JsonObject jsonDevice = new JsonObject();
       jsonDevice.addProperty("id", device);
-      jsonDevice.addProperty("value", TRANSLATION_KEY_PREFIX + device.toUpperCase());
+      jsonDevice.addProperty("value", translationPrefix + device.toUpperCase());
       jsonDevices.add(jsonDevice);
     }
 
