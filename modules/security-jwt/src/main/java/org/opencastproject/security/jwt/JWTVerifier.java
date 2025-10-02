@@ -28,9 +28,7 @@ import com.nimbusds.jose.crypto.ECDSAVerifier;
 import com.nimbusds.jose.crypto.Ed25519Verifier;
 import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jose.crypto.RSASSAVerifier;
-import com.nimbusds.jose.jwk.ECKey;
 import com.nimbusds.jose.jwk.JWK;
-import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jwt.SignedJWT;
 
 import org.apache.commons.lang3.StringUtils;
@@ -43,6 +41,8 @@ import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.expression.spel.support.StandardEvaluationContext;
 import org.springframework.util.Assert;
 
+import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -76,16 +76,23 @@ public final class JWTVerifier {
 
     List<JWK> jwkSet = retriever.getAll();
 
+    List<JWSVerifier> verifiers = new ArrayList<>();
     if (alg.equals(JWSAlgorithm.RS256) || alg.equals(JWSAlgorithm.RS384) || alg.equals(JWSAlgorithm.RS512)) {
-      RSAKey rsaKey = jwkSet.get(0).toRSAKey();
-      return verify(jwt, claimConstraints, new RSASSAVerifier(rsaKey));
+      for (JWK jwk : jwkSet) {
+        verifiers.add(new RSASSAVerifier(jwk.toRSAKey()));
+      }
+      return verify(jwt, claimConstraints, verifiers.toArray(new JWSVerifier[0]));
     } else if (alg.equals(JWSAlgorithm.ES256) || alg.equals(JWSAlgorithm.ES256K) || alg.equals(JWSAlgorithm.ES384)
         || alg.equals(JWSAlgorithm.ES512)) {
-      ECKey ecKey = jwkSet.get(0).toECKey();
-      return verify(jwt, claimConstraints, new ECDSAVerifier(ecKey));
+      for (JWK jwk : jwkSet) {
+        verifiers.add(new ECDSAVerifier(jwk.toECKey()));
+      }
+      return verify(jwt, claimConstraints, verifiers.toArray(new JWSVerifier[0]));
     } else if (alg.equals(JWSAlgorithm.EdDSA) || alg.equals(JWSAlgorithm.Ed25519)) {
-      JWK jwk = jwkSet.get(0).toPublicJWK();
-      return verify(jwt, claimConstraints, new Ed25519Verifier(jwk.toOctetKeyPair()));
+      for (JWK jwk : jwkSet) {
+        verifiers.add(new Ed25519Verifier(jwk.toPublicJWK().toOctetKeyPair()));
+      }
+      return verify(jwt, claimConstraints, verifiers.toArray(new JWSVerifier[0]));
     } else {
       throw new IllegalArgumentException("Unsupported algorithm '" + alg + "'");
     }
@@ -115,40 +122,50 @@ public final class JWTVerifier {
     }
   }
 
-  public static SignedJWT verify(SignedJWT jwt, List<String> claimConstraints, JWSVerifier verifier)
-          throws JOSEException, java.text.ParseException {
+  public static SignedJWT verify(SignedJWT jwt, List<String> claimConstraints, JWSVerifier... verifiers)
+          throws JOSEException {
     Assert.notNull(jwt, "A decoded JWT must be set");
     Assert.notEmpty(claimConstraints, "Claim constraints must be set");
-    Assert.notNull(verifier, "A verifier must be set");
+    Assert.notNull(verifiers, "Verifiers must be set");
 
-    try {
-      // General verification
-      if (!jwt.verify(verifier)) {
-        throw new JOSEException("JWT could not be verified");
-      }
-
-      // Expiration date verification
-      Date expirationTime = jwt.getJWTClaimsSet().getExpirationTime();
-      if (expirationTime != null && !new Date().before(expirationTime)) {
-        throw new JOSEException("JWT is expired");
-      }
-
-      // Claim constraints verification
-      ExpressionParser parser = new SpelExpressionParser();
-      StandardEvaluationContext ctx = new StandardEvaluationContext();
-      ctx.addPropertyAccessor(new MapAccessor());
-      for (String constraint : claimConstraints) {
-        Expression exp = parser.parseExpression(constraint);
-        if (!exp.getValue(ctx, jwt.getJWTClaimsSet().getClaims(), Boolean.class)) {
-          throw new JOSEException("The claims did not fulfill constraint '" + constraint + "'");
+    boolean verified = false;
+    Exception lastException = new JOSEException("JWT could not be verified");
+    for (JWSVerifier verifier : verifiers) {
+      try {
+        // General verification
+        if (!jwt.verify(verifier)) {
+          throw new JOSEException("JWT could not be verified");
         }
+
+        // Expiration date verification
+        Date expirationTime = jwt.getJWTClaimsSet().getExpirationTime();
+        if (expirationTime != null && !new Date().before(expirationTime)) {
+          throw new JOSEException("JWT is expired");
+        }
+
+        // Claim constraints verification
+        ExpressionParser parser = new SpelExpressionParser();
+        StandardEvaluationContext ctx = new StandardEvaluationContext();
+        ctx.addPropertyAccessor(new MapAccessor());
+        for (String constraint : claimConstraints) {
+          Expression exp = parser.parseExpression(constraint);
+          if (!exp.getValue(ctx, jwt.getJWTClaimsSet().getClaims(), Boolean.class)) {
+            throw new JOSEException("The claims did not fulfill constraint '" + constraint + "'");
+          }
+        }
+
+        // Verification was successful if no exception has been thrown
+        verified = true;
+        break;
+      } catch (JOSEException | ParseException e) {
+        // Ignore for now and try next algorithm
+        lastException = e;
       }
-    } catch (JOSEException e) {
-      logger.error("JWT could not be verified");
-      throw (e);
-    } catch (java.text.ParseException e) {
-      logger.error("JWT claims could not be parsed");
-      throw (e);
+    }
+
+    // If verification was not successful until here, throw last known exception
+    if (!verified) {
+      throw new JOSEException(lastException.getMessage());
     }
 
     return jwt;
