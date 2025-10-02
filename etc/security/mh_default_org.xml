@@ -791,7 +791,6 @@
     <value>ES384</value>
     <value>ES512</value>
     <value>EdDSA</value>
-    <value>Ed25519</value>
   </util:list>-->
 
   <!-- The claim constraints that are expected to be fulfilled by the JWT
