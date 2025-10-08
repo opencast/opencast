@@ -138,7 +138,8 @@ public class WorkflowStateListener implements WorkflowListener {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowListener#operationChanged(org.opencastproject.workflow.api.WorkflowInstance)
+   * @see org.opencastproject.workflow.api.WorkflowListener#operationChanged(
+   *      org.opencastproject.workflow.api.WorkflowInstance)
    */
   @Override
   public void operationChanged(WorkflowInstance workflow) {
@@ -150,18 +151,21 @@ public class WorkflowStateListener implements WorkflowListener {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowListener#stateChanged(org.opencastproject.workflow.api.WorkflowInstance)
+   * @see org.opencastproject.workflow.api.WorkflowListener#stateChanged(
+   *      org.opencastproject.workflow.api.WorkflowInstance)
    */
   @Override
   public void stateChanged(WorkflowInstance workflow) {
     synchronized (this) {
 
-      if (!workflowInstanceIds.isEmpty() && !workflowInstanceIds.contains(workflow.getId()))
+      if (!workflowInstanceIds.isEmpty() && !workflowInstanceIds.contains(workflow.getId())) {
         return;
+      }
 
       WorkflowState currentState = workflow.getState();
-      if (!notifyStates.isEmpty() && !notifyStates.containsKey(currentState))
+      if (!notifyStates.isEmpty() && !notifyStates.containsKey(currentState)) {
         return;
+      }
 
       if (notifyStates.containsKey(currentState)) {
         notifyStates.get(currentState).incrementAndGet();
@@ -192,8 +196,9 @@ public class WorkflowStateListener implements WorkflowListener {
    */
   public int countStateChanges(WorkflowState state) {
     synchronized (this) {
-      if (!notifyStates.containsKey(state))
+      if (!notifyStates.containsKey(state)) {
         throw new IllegalArgumentException("State '" + state + "' is not being monitored");
+      }
       return notifyStates.get(state).get();
     }
   }

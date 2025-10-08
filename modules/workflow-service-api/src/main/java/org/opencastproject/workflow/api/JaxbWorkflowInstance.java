@@ -123,8 +123,8 @@ public class JaxbWorkflowInstance {
   }
 
   public WorkflowInstance toWorkflowInstance() {
-    WorkflowInstance wf = new WorkflowInstance(id, state, template, title, description, creatorName, organizationId, dateCreated,
-            dateCompleted, mediaPackage,
+    WorkflowInstance wf = new WorkflowInstance(id, state, template, title, description, creatorName, organizationId,
+            dateCreated, dateCompleted, mediaPackage,
             Optional.ofNullable(operations).orElseGet(Collections::emptyList)
                     .stream().map(JaxbWorkflowOperationInstance::toWorkflowOperationInstance)
                     .collect(Collectors.toList()),
@@ -139,11 +139,13 @@ public class JaxbWorkflowInstance {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o)
+    if (this == o) {
       return true;
+    }
 
-    if (o == null || getClass() != o.getClass())
+    if (o == null || getClass() != o.getClass()) {
       return false;
+    }
 
     JaxbWorkflowInstance jaxbWorkflow = (JaxbWorkflowInstance) o;
 
