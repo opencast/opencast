@@ -32,7 +32,6 @@
     <suppress checks="LineLength" files="modules/schema/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/serviceregistry/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/usertracking-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/workflow-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/working-file-repository-service-impl/.+\.(java|properties)"/>
 
     <suppress checks="Indentation" files="modules/admin-ui/.+\.java"/>
@@ -53,7 +52,6 @@
     <suppress checks="Indentation" files="modules/oaipmh-persistence/.+\.java"/>
     <suppress checks="Indentation" files="modules/scheduler-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/serviceregistry/.+\.java"/>
-    <suppress checks="Indentation" files="modules/workflow-workflowoperation/.+\.java"/>
     <suppress checks="Indentation" files="modules/working-file-repository-service-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/working-file-repository-service-remote/.+\.java"/>
 
@@ -83,7 +81,6 @@
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/schema/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/serviceregistry/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/usertracking-impl/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/workflow-workflowoperation/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/working-file-repository-service-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/working-file-repository-service-remote/.+\.java"/>
 </suppressions>

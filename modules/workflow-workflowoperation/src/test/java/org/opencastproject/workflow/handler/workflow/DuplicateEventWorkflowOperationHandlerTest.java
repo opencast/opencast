@@ -211,7 +211,7 @@ public class DuplicateEventWorkflowOperationHandlerTest {
   }
 
   private WorkflowOperationResult getWorkflowOperationResult(MediaPackage mp, Map<String, String> configurations)
-      throws WorkflowOperationException {
+          throws WorkflowOperationException {
     // Add the mediapackage to a workflow instance
     WorkflowInstance workflowInstance = new WorkflowInstance();
     workflowInstance.setId(1);

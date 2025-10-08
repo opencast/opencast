@@ -136,8 +136,9 @@ public class CleanupWorkflowOperationHandlerTest {
     MediaPackageElement mpe = mpeBuilder.newElement(elemType, MediaPackageElementFlavor.flavor(
             flavorType, flavorSubtype));
     mpe.setIdentifier(UUID.randomUUID().toString());
-    if (uri != null)
+    if (uri != null) {
       mpe.setURI(uri);
+    }
     mp.add(mpe);
     return mpe;
   }
@@ -314,8 +315,9 @@ public class CleanupWorkflowOperationHandlerTest {
 
     @Override
     public boolean matches(Object arg) {
-      if (!(arg instanceof HttpUriRequest))
+      if (!(arg instanceof HttpUriRequest)) {
         return false;
+      }
       HttpUriRequest req = (HttpUriRequest) arg;
       uriStore.add(req.getURI());
       boolean result = StringUtils.startsWith(req.getURI().toString(), matchBaseUri.toString());

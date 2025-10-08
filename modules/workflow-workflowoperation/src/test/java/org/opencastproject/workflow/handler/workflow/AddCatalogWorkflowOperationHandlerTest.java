@@ -80,10 +80,10 @@ public class AddCatalogWorkflowOperationHandlerTest {
     final Capture<InputStream> inStream = EasyMock.newCapture();
     EasyMock.expect(workspace.put(EasyMock.anyString(), EasyMock.anyString(), EasyMock.eq(catalogName),
                                   EasyMock.capture(inStream))).andAnswer(() -> {
-                                      final File file = temporaryFolder.newFile();
-                                      FileUtils.copyInputStreamToFile(inStream.getValue(), file);
-                                      return file.toURI();
-                                    }).anyTimes();
+                                    final File file = temporaryFolder.newFile();
+                                    FileUtils.copyInputStreamToFile(inStream.getValue(), file);
+                                    return file.toURI();
+                                  }).anyTimes();
     EasyMock.replay(workspace);
 
     operationHandler.setWorkspace(workspace);
