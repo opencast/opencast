@@ -44,7 +44,7 @@ the command runs. The complete list of available placeholders is detailed in the
 |#{id}                  |Execute Once|The Mediapackage ID                                |
 |`#{org_id}`              |Execute Once, Execute Many|The organization ID|
 |#{flavor(some/flavor)} |Execute Once|The absolute path of the element matching the specified flavor. If several elements have the same flavor, the first element is used.
-|`#{tag(download,-delete)}`|Execute Once|A list of tags used for selecting an element. You can exclude elements with certain tags using a minus prefix. If several elements are selected, the first element is used.|
+|`#{tags(download,-delete)}`|Execute Once|A list of tags used for selecting an element. You can exclude elements with certain tags using a minus prefix. If several elements are selected, the first element is used.|
 |#{in}                  |Execute Many|The absolute path of the input element             |
 |#{out}                 |Execute Once, Execute Many|The absolute path of the output element, formed from the output-filename parameter
 
