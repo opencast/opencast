@@ -126,8 +126,8 @@ public class ResumableTestWorkflowOperationHandler extends AbstractWorkflowOpera
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
+   * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#start(
+   *      org.opencastproject.workflow.api.WorkflowInstance, JobContext)
    */
   @Override
   public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
@@ -139,8 +139,8 @@ public class ResumableTestWorkflowOperationHandler extends AbstractWorkflowOpera
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.ResumableWorkflowOperationHandler#resume(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext, java.util.Map)
+   * @see org.opencastproject.workflow.api.ResumableWorkflowOperationHandler#resume(
+   *      org.opencastproject.workflow.api.WorkflowInstance, JobContext, java.util.Map)
    */
   @Override
   public WorkflowOperationResult resume(WorkflowInstance workflowInstance, JobContext context,
@@ -153,7 +153,8 @@ public class ResumableTestWorkflowOperationHandler extends AbstractWorkflowOpera
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.ResumableWorkflowOperationHandler#getHoldStateUserInterfaceURL(org.opencastproject.workflow.api.WorkflowInstance)
+   * @see org.opencastproject.workflow.api.ResumableWorkflowOperationHandler#getHoldStateUserInterfaceURL(
+   *      org.opencastproject.workflow.api.WorkflowInstance)
    */
   @Override
   public String getHoldStateUserInterfaceURL(WorkflowInstance workflowInstance) throws WorkflowOperationException {

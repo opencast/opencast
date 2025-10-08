@@ -200,7 +200,8 @@ public class WorkflowCleanupScanner extends AbstractWorkflowBufferScanner implem
       lock.lock();
       if (bufferForFailedJobs > 0) {
         try {
-          getWorkflowService().cleanupWorkflowInstances(bufferForFailedJobs, WorkflowInstance.WorkflowState.FAILED);
+          getWorkflowService().cleanupWorkflowInstances(bufferForFailedJobs,
+              WorkflowInstance.WorkflowState.FAILED);
         } catch (WorkflowDatabaseException e) {
           logger.error("Unable to cleanup failed jobs:", e);
         } catch (UnauthorizedException e) {
@@ -211,7 +212,8 @@ public class WorkflowCleanupScanner extends AbstractWorkflowBufferScanner implem
 
       if (bufferForSuccessfulJobs > 0) {
         try {
-          getWorkflowService().cleanupWorkflowInstances(bufferForSuccessfulJobs, WorkflowInstance.WorkflowState.SUCCEEDED);
+          getWorkflowService().cleanupWorkflowInstances(bufferForSuccessfulJobs,
+              WorkflowInstance.WorkflowState.SUCCEEDED);
         } catch (WorkflowDatabaseException e) {
           logger.error("Unable to cleanup successful jobs:", e);
         } catch (UnauthorizedException e) {
@@ -222,7 +224,8 @@ public class WorkflowCleanupScanner extends AbstractWorkflowBufferScanner implem
 
       if (bufferForStoppedJobs > 0) {
         try {
-          getWorkflowService().cleanupWorkflowInstances(bufferForStoppedJobs, WorkflowInstance.WorkflowState.STOPPED);
+          getWorkflowService().cleanupWorkflowInstances(bufferForStoppedJobs,
+              WorkflowInstance.WorkflowState.STOPPED);
         } catch (WorkflowDatabaseException e) {
           logger.error("Unable to cleanup stopped jobs:", e);
         } catch (UnauthorizedException e) {

@@ -60,11 +60,11 @@ import java.util.stream.Stream;
  * directories.
  */
 @Component(
-  property = {
-    "service.description=Workflow Definition Scanner"
-  },
-  immediate = true,
-  service = { ArtifactInstaller.class, WorkflowDefinitionScanner.class }
+    property = {
+      "service.description=Workflow Definition Scanner"
+    },
+    immediate = true,
+    service = { ArtifactInstaller.class, WorkflowDefinitionScanner.class }
 )
 public class WorkflowDefinitionScanner implements ArtifactInstaller, OrganizationDirectoryListener {
   private static final Logger logger = LoggerFactory.getLogger(WorkflowDefinitionScanner.class);
@@ -134,7 +134,8 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller, Organizatio
 
       // Once all profiles have been loaded, announce readiness
       if ((filesInDirectory.length - artifactsWithError.size()) == artifactIds.size() && !isWFSinitialized) {
-        logger.info("{} Workflow definitions loaded, activating Workflow service", filesInDirectory.length - artifactsWithError.size());
+        logger.info("{} Workflow definitions loaded, activating Workflow service",
+            filesInDirectory.length - artifactsWithError.size());
         Dictionary<String, String> properties = new Hashtable<>();
         properties.put(ARTIFACT, "workflowdefinition");
         logger.debug("Indicating readiness of workflow definitions");
@@ -202,7 +203,8 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller, Organizatio
   @Override
   public void organizationRegistered(Organization organization) {
     synchronized (artifactsWithError) {
-      logger.info("New organization '{}' registered: check for previously failed workflow definitions", organization.getId());
+      logger.info("New organization '{}' registered: check for previously failed workflow definitions",
+          organization.getId());
       ArrayList<File> artifactsWithErrorCopy = new ArrayList<>(artifactsWithError);
       for (File artifact : artifactsWithErrorCopy) {
         WorkflowDefinition def = parseWorkflowDefinitionFile(artifact);
@@ -238,8 +240,9 @@ public class WorkflowDefinitionScanner implements ArtifactInstaller, Organizatio
       } else {
         def = XmlWorkflowParser.parseWorkflowDefinition(stream);
       }
-      if (def.getOperations().size() == 0)
+      if (def.getOperations().size() == 0) {
         logger.warn("Workflow '{}' has no operations", def.getId());
+      }
       if (def.getOrganization() != null && !organizationExists(def.getOrganization())) {
         throw new RuntimeException("invalid organization '" + def.getOrganization() + "'");
       }
