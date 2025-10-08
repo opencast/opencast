@@ -18,7 +18,7 @@ Commands run by this operation handler must first be included in the `commands.a
 Parameter Table
 ---------------
 
-All parameters are empty by default if not specified. The special parameters `#id`, `#flavor` and `#out` are described
+All parameters are empty by default if not specified. The special parameters `#id`, `#flavor`, `#tags` and `#out` are described
 in [Execute Service: Parameter Substitution](../configuration/execute.md#parameter-substitution)
 
 |Configuration keys|Example    |Description       |Required?|
