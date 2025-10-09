@@ -87,6 +87,7 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.identifier.IdImpl;
+import org.opencastproject.message.broker.api.update.AssetManagerUpdateHandler;
 import org.opencastproject.message.broker.api.update.SchedulerUpdateHandler;
 import org.opencastproject.metadata.dublincore.CatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
@@ -1614,6 +1615,8 @@ public class SchedulerServiceImplTest {
     am.setAuthorizationService(authorizationService);
     am.setSecurityService(securityService);
     am.setIndex(esIndex);
+    am.addEventHandler(EasyMock.createNiceMock(AssetManagerUpdateHandler.class));
+    am.addEventHandler(EasyMock.createNiceMock(AssetManagerUpdateHandler.class));
     return am;
   }
 
