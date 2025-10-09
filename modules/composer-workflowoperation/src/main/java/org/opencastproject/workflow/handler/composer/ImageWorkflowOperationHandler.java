@@ -67,8 +67,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -127,48 +125,37 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
 
   @Override
   public WorkflowOperationResult start(final WorkflowInstance wi, JobContext ctx)
-          throws WorkflowOperationException {
+      throws WorkflowOperationException {
     logger.debug("Running image workflow operation on {}", wi);
     try {
       MediaPackage mp = wi.getMediaPackage();
-      final Extractor e = new Extractor(this, configure(mp, wi));
-      return e.main(MediaPackageSupport.copy(mp));
-    } catch (Exception e) {
-      throw new WorkflowOperationException(e);
-    }
-  }
+      final Cfg cfg = configure(mp, wi);
+      mp = MediaPackageSupport.copy(mp);
 
-  /**
-   * Computation within the context of a {@link Cfg}.
-   */
-  static final class Extractor {
-    private final ImageWorkflowOperationHandler handler;
-    private final Cfg cfg;
-
-    Extractor(ImageWorkflowOperationHandler handler, Cfg cfg) {
-      this.handler = handler;
-      this.cfg = cfg;
-    }
-
-    /** Run the extraction. */
-    WorkflowOperationResult main(final MediaPackage mp) throws WorkflowOperationException {
+      // Extract
       if (cfg.sourceTracks.size() == 0) {
         logger.info("No source tracks found in media package {}, skipping operation", mp.getIdentifier());
-        return handler.createResult(mp, Action.SKIP);
+        return this.createResult(mp, Action.SKIP);
       }
       // start image extraction jobs
       final List<Extraction> extractions = cfg.sourceTracks.stream().flatMap(track -> {
-          final List<MediaPosition> positions = limit(track, cfg.positions);
-          if (positions.size() != cfg.positions.size()) {
-            logger.warn("Could not apply all configured positions to track {}", track);
-          }
-          logger.info("Extracting images from {} at position {}", track, positions);
-          // create one extraction per encoding profile
-          return cfg.profiles.stream()
-                  .map(profile -> new Extraction(extractImages(track, profile, positions), track, profile, positions));
-        }).collect(Collectors.toList());
+        final List<MediaPosition> positions = limit(track, cfg.positions);
+        if (positions.size() != cfg.positions.size()) {
+          logger.warn("Could not apply all configured positions to track {}", track);
+        }
+        logger.info("Extracting images from {} at position {}", track, positions);
+        // create one extraction per encoding profile
+        return cfg.profiles.stream()
+            .map(profile -> {
+              try {
+                return new Extraction(extractImages(this, track, profile, positions, cfg), track, profile, positions);
+              } catch (WorkflowOperationException e) {
+                throw new RuntimeException(e);
+              }
+            });
+      }).collect(Collectors.toList());
       final List<Job> extractionJobs = concatJobs(extractions);
-      final JobBarrier.Result extractionResult = JobUtil.waitForJobs(handler.serviceRegistry, extractionJobs);
+      final JobBarrier.Result extractionResult = JobUtil.waitForJobs(this.serviceRegistry, extractionJobs);
       if (extractionResult.isSuccess()) {
         // all extractions were successful; iterate them
         for (final Extraction extraction : extractions) {
@@ -176,105 +163,110 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
           final int expectedNrOfImages = extraction.positions.size();
           if (images.size() == expectedNrOfImages) {
             // post process images
-            for (int i = 0; i < images.size(); i++) {
+            int size = Math.min(images.size(), extraction.positions.size());
+            for (int i = 0; i < size; i++) {
               Attachment image = images.get(i);
               MediaPosition position = extraction.positions.get(i);
-
-              adjustMetadata(extraction, image);
+              adjustMetadata(extraction, image, cfg);
               if (image.getIdentifier() == null) {
                 image.generateIdentifier();
               }
               mp.addDerived(image, extraction.track);
               String fileName = createFileName(
-                  extraction.profile.getSuffix(),
-                  extraction.track.getURI(),
-                  position
-              );
-              moveToWorkspace(mp, image, fileName);
+                  extraction.profile.getSuffix(), extraction.track.getURI(), position, cfg);
+              moveToWorkspace(this, mp, image, fileName);
             }
           } else {
-            // less images than expected have been extracted
+            // fewer images than expected have been extracted
             throw new WorkflowOperationException(
-                    format("Only %s of %s images have been extracted from track %s",
-                           images.size(), expectedNrOfImages, extraction.track));
+                format("Only %s of %s images have been extracted from track %s",
+                    images.size(), expectedNrOfImages, extraction.track));
           }
         }
-        return handler.createResult(mp, Action.CONTINUE, JobUtil.sumQueueTime(extractionJobs));
+        return this.createResult(mp, Action.CONTINUE, JobUtil.sumQueueTime(extractionJobs));
       } else {
         throw new WorkflowOperationException("Image extraction failed");
       }
+    } catch (Exception e) {
+      throw new WorkflowOperationException(e);
+    }
+  }
+
+  /**
+   * Adjust flavor, tags, mime type of <code>image</code> according to the
+   * configuration and the extraction.
+   */
+  protected void adjustMetadata(Extraction extraction, Attachment image, Cfg cfg) {
+    // Adjust the target flavor. Make sure to account for partial updates
+    for (final MediaPackageElementFlavor flavor : cfg.targetImageFlavor) {
+      final String flavorType = eq("*", flavor.getType())
+          ? extraction.track.getFlavor().getType()
+          : flavor.getType();
+      final String flavorSubtype = eq("*", flavor.getSubtype())
+          ? extraction.track.getFlavor().getSubtype()
+          : flavor.getSubtype();
+      image.setFlavor(new MediaPackageElementFlavor(flavorType, flavorSubtype));
+      logger.debug("Resulting image has flavor '{}'", image.getFlavor());
+    }
+    // Set the mime type
+    try {
+      image.setMimeType(MimeTypes.fromURI(image.getURI()));
+    } catch (UnknownFileTypeException e) {
+      logger.warn("Mime type unknown for file {}. Setting none.", image.getURI(), e);
+    }
+    // Add tags
+    applyTargetTagsToElement(cfg.targetImageTags, image);
+  }
+
+  /** Create a file name for the extracted image. */
+  protected String createFileName(final String suffix, final URI trackUri, final MediaPosition pos, Cfg cfg)
+      throws WorkflowOperationException {
+    final String trackBaseName = FilenameUtils.getBaseName(trackUri.getPath());
+    final String format;
+    switch (pos.type) {
+      case Seconds:
+        format = cfg.targetBaseNameFormatSecond.orElse(trackBaseName + "_%.3fs%s");
+        break;
+      case Percentage:
+        format = cfg.targetBaseNameFormatPercent.orElse(trackBaseName + "_%.1fp%s");
+        break;
+      default:
+        throw new WorkflowOperationException("Unexhaustive match");
+    }
+    return formatFileName(format, pos.position, suffix);
+  }
+
+  /** Move the extracted <code>image</code> to its final location in the workspace and rename it to <code>fileName</code>. */
+  protected void moveToWorkspace(final ImageWorkflowOperationHandler handler, final MediaPackage mp,
+      final Attachment image, final String fileName) throws WorkflowOperationException {
+    try {
+      image.setURI(handler.workspace.moveTo(
+          image.getURI(),
+          mp.getIdentifier().toString(),
+          image.getIdentifier(),
+          fileName));
+    } catch (Exception e) {
+      throw new WorkflowOperationException(e);
+    }
+  }
+
+  /** Start a composer job to extract images from a track at the given positions. */
+  protected Job extractImages(
+      final ImageWorkflowOperationHandler handler,
+      final Track track,
+      final EncodingProfile profile,
+      final List<MediaPosition> positions,
+      Cfg cfg
+  ) throws WorkflowOperationException {
+    List<Double> seconds = new ArrayList<>();
+    for (MediaPosition mediaPosition : positions) {
+      seconds.add(toSeconds(track, mediaPosition, cfg.endMargin));
     }
 
-    /**
-     * Adjust flavor, tags, mime type of <code>image</code> according to the
-     * configuration and the extraction.
-     */
-    void adjustMetadata(Extraction extraction, Attachment image) {
-      // Adjust the target flavor. Make sure to account for partial updates
-      for (final MediaPackageElementFlavor flavor : cfg.targetImageFlavor) {
-        final String flavorType = eq("*", flavor.getType())
-                ? extraction.track.getFlavor().getType()
-                : flavor.getType();
-        final String flavorSubtype = eq("*", flavor.getSubtype())
-                ? extraction.track.getFlavor().getSubtype()
-                : flavor.getSubtype();
-        image.setFlavor(new MediaPackageElementFlavor(flavorType, flavorSubtype));
-        logger.debug("Resulting image has flavor '{}'", image.getFlavor());
-      }
-      // Set the mime type
-      try {
-        image.setMimeType(MimeTypes.fromURI(image.getURI()));
-      } catch (UnknownFileTypeException e) {
-        logger.warn("Mime type unknown for file {}. Setting none.", image.getURI(), e);
-      }
-      // Add tags
-      for (final String tag : cfg.targetImageTags) {
-        logger.trace("Tagging image with '{}'", tag);
-        image.addTag(tag);
-      }
-    }
-
-    /** Create a file name for the extracted image. */
-    String createFileName(final String suffix, final URI trackUri, final MediaPosition pos) {
-      final String trackBaseName = FilenameUtils.getBaseName(trackUri.getPath());
-      final String format;
-      switch (pos.type) {
-        case Seconds:
-          format = cfg.targetBaseNameFormatSecond.orElse(trackBaseName + "_%.3fs%s");
-          break;
-        case Percentage:
-          format = cfg.targetBaseNameFormatPercent.orElse(trackBaseName + "_%.1fp%s");
-          break;
-        default:
-          throw new IllegalArgumentException("Unhandled MediaPosition type: " + pos.type);
-      }
-      return formatFileName(format, pos.position, suffix);
-    }
-
-    /** Move the extracted <code>image</code> to its final location in the workspace and rename it to <code>fileName</code>. */
-    private void moveToWorkspace(final MediaPackage mp, final Attachment image, final String fileName) {
-      try {
-        image.setURI(handler.workspace.moveTo(
-                image.getURI(),
-                mp.getIdentifier().toString(),
-                image.getIdentifier(),
-                fileName));
-      } catch (Exception e) {
-        throw new RuntimeException(new WorkflowOperationException(e));
-      }
-    }
-
-    /** Start a composer job to extract images from a track at the given positions. */
-    private Job extractImages(final Track track, final EncodingProfile profile, final List<MediaPosition> positions) {
-      List<Double> seconds = positions.stream()
-          .map(position -> toSeconds(track, position, cfg.endMargin))
-          .collect(Collectors.toList());
-
-      try {
-        return handler.composerService.image(track, profile.getIdentifier(), Collections.toDoubleArray(seconds));
-      } catch (Exception e) {
-        throw new RuntimeException(new WorkflowOperationException("Error starting image extraction job", e));
-      }
+    try {
+      return handler.composerService.image(track, profile.getIdentifier(), Collections.toDoubleArray(seconds));
+    } catch (Exception e) {
+      throw new WorkflowOperationException("Error starting image extraction job", e);
     }
   }
 
@@ -290,24 +282,22 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
 
   /** Concat the jobs of a list of extraction objects. */
   private static List<Job> concatJobs(List<Extraction> extractions) {
-    return extractions.stream()
-        .map(extraction -> extraction.job)
-        .collect(Collectors.toList());
+    List<Job> jobs = new ArrayList<>();
+    for (Extraction extraction : extractions) {
+      jobs.add(extraction.job);
+    }
+    return jobs;
   }
 
   /** Get the images (payload) from a job. */
   @SuppressWarnings("unchecked")
-  private static List<Attachment> getImages(Job job) {
+  private static List<Attachment> getImages(Job job) throws MediaPackageException, WorkflowOperationException {
     final List<Attachment> images;
-    try {
-      images = (List<Attachment>) MediaPackageElementParser.getArrayFromXml(job.getPayload());
-    } catch (MediaPackageException e) {
-      throw new RuntimeException(e);
-    }
+    images = (List<Attachment>) MediaPackageElementParser.getArrayFromXml(job.getPayload());
     if (!images.isEmpty()) {
       return images;
     } else {
-      throw new RuntimeException(new WorkflowOperationException("Job did not extract any images"));
+      throw new WorkflowOperationException("Job did not extract any images");
     }
   }
 
@@ -317,15 +307,15 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
     // if the video has just one frame (e.g.: MP3-Podcasts) it makes no sense to go to a certain position
     // as the video has only one image at position 0
     if (duration == null || (track.getStreams() != null && Arrays.stream(track.getStreams())
-            .filter(stream -> stream instanceof VideoStream)
-            .map(org.opencastproject.mediapackage.Stream::getFrameCount)
-            .allMatch(frameCount -> frameCount == null || frameCount == 1))) {
+        .filter(stream -> stream instanceof VideoStream)
+        .map(org.opencastproject.mediapackage.Stream::getFrameCount)
+        .allMatch(frameCount -> frameCount == null || frameCount == 1))) {
       return java.util.Collections.singletonList(new MediaPosition(PositionType.Seconds, 0));
     }
 
     return positions.stream()
         .filter(p -> (PositionType.Seconds.equals(p.type) && p.position >= 0 && p.position < duration)
-                || (PositionType.Percentage.equals(p.type) && p.position >= 0 && p.position <= 100))
+            || (PositionType.Percentage.equals(p.type) && p.position >= 0 && p.position <= 100))
         .collect(Collectors.toList());
   }
 
@@ -334,7 +324,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
    * <em>Attention:</em> The function does not check if the calculated absolute position is within
    * the bounds of the tracks length.
    */
-  static double toSeconds(Track track, MediaPosition position, double endMarginMs) {
+  static double toSeconds(Track track, MediaPosition position, double endMarginMs) throws WorkflowOperationException {
     final long durationMs = track.getDuration() == null ? 0 : track.getDuration();
     final double posMs;
     switch (position.type) {
@@ -349,27 +339,23 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
     }
     // limit maximum position to Xms before the end of the video
     return Math.abs(durationMs - posMs) >= endMarginMs
-            ? posMs / 1000.0
-            : Math.max(0, ((double) durationMs - endMarginMs)) / 1000.0;
+        ? posMs / 1000.0
+        : Math.max(0, ((double) durationMs - endMarginMs)) / 1000.0;
   }
 
   // ** ** **
+
   /**
    * Fetch a profile from the composer service. Throw a WorkflowOperationException in case the profile
    * does not exist.
    */
-  public static Function<String, EncodingProfile> fetchProfile(final ComposerService composerService) {
-    return new Function<String, EncodingProfile>() {
-      @Override
-      public EncodingProfile apply(String profileName) {
-        final EncodingProfile profile = composerService.getProfile(profileName);
-        if (profile != null) {
-          return profile;
-        } else {
-          throw new RuntimeException(new WorkflowOperationException("Encoding profile '" + profileName + "' was not found"));
-        }
-      }
-    };
+  public static EncodingProfile fetchProfile(ComposerService composerService, String profileName)
+      throws WorkflowOperationException {
+    EncodingProfile profile = composerService.getProfile(profileName);
+    if (profile == null) {
+      throw new WorkflowOperationException("Encoding profile '" + profileName + "' was not found");
+    }
+    return profile;
   }
 
   /**
@@ -405,7 +391,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
     private final List<MediaPosition> positions;
     private final List<EncodingProfile> profiles;
     private final List<MediaPackageElementFlavor> targetImageFlavor;
-    private final List<String> targetImageTags;
+    private final ConfiguredTagsAndFlavors.TargetTags targetImageTags;
     private final Optional<String> targetBaseNameFormatSecond;
     private final Optional<String> targetBaseNameFormatPercent;
     private final long endMargin;
@@ -414,7 +400,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
         List<MediaPosition> positions,
         List<EncodingProfile> profiles,
         List<MediaPackageElementFlavor> targetImageFlavor,
-        List<String> targetImageTags,
+        ConfiguredTagsAndFlavors.TargetTags targetImageTags,
         Optional<String> targetBaseNameFormatSecond,
         Optional<String> targetBaseNameFormatPercent,
         long endMargin) {
@@ -435,12 +421,20 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(wi,
         Configuration.many, Configuration.many, Configuration.many, Configuration.one);
     final List<EncodingProfile> profiles = getOptConfig(woi, OPT_PROFILES)
-        .map(configString -> asList(configString))
-        .orElseGet(java.util.Collections::emptyList)
+        .map(config -> Arrays.asList(config.split(",")))
+        .orElse(java.util.Collections.emptyList())
         .stream()
-        .map(fetchProfile(composerService))
+        .map(String::trim)
+        .filter(profileName -> !profileName.isEmpty())
+        .map(profileName -> {
+          try {
+            return fetchProfile(composerService, profileName);
+          } catch (WorkflowOperationException e) {
+            throw new RuntimeException(e);
+          }
+        })
         .collect(Collectors.toList());
-    final List<String> targetImageTags = tagsAndFlavors.getTargetTags();
+    final ConfiguredTagsAndFlavors.TargetTags targetImageTags = tagsAndFlavors.getTargetTags();
     final List<MediaPackageElementFlavor> targetImageFlavor = tagsAndFlavors.getTargetFlavors();
     final List<Track> sourceTracks;
     {
@@ -462,49 +456,46 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
           .filter(Track::hasVideo)
           .collect(Collectors.toList());
     }
-    final List<MediaPosition> positions = MediaPositionParser.parsePositions(getConfig(woi, OPT_POSITIONS));
+    final List<MediaPosition> positions = parsePositions(getConfig(woi, OPT_POSITIONS));
     final long endMargin = getOptConfig(woi, OPT_END_MARGIN)
-        .flatMap(s -> {
-          try {
-            return Optional.of(Long.parseLong(s));
-          } catch (NumberFormatException e) {
-            return Optional.empty();
-          }
-        })
+        .map(Long::parseLong)
         .orElse(END_MARGIN_DEFAULT);
-    //
     return new Cfg(sourceTracks,
-                   positions,
-                   profiles,
-                   targetImageFlavor,
-                   targetImageTags,
-                   getTargetBaseNameFormat(woi, OPT_TARGET_BASE_NAME_FORMAT_SECOND),
-                   getTargetBaseNameFormat(woi, OPT_TARGET_BASE_NAME_FORMAT_PERCENT),
-                   endMargin);
+        positions,
+        profiles,
+        targetImageFlavor,
+        targetImageTags,
+        getTargetBaseNameFormat(woi, OPT_TARGET_BASE_NAME_FORMAT_SECOND),
+        getTargetBaseNameFormat(woi, OPT_TARGET_BASE_NAME_FORMAT_PERCENT),
+        endMargin);
   }
 
   /** Validate a target base name format. */
-  private Optional<String> getTargetBaseNameFormat(WorkflowOperationInstance woi, final String formatName) {
-    Optional<String> opt = getOptConfig(woi, formatName);
-    opt.ifPresent(validateTargetBaseNameFormat(formatName));
-    return opt;
+  private Optional<String> getTargetBaseNameFormat(WorkflowOperationInstance woi, final String formatName)
+      throws WorkflowOperationException {
+    Optional<String> baseName = getOptConfig(woi, formatName);
+    if (baseName.isPresent()) {
+      baseName = Optional.ofNullable(validateTargetBaseNameFormat(baseName.get(), formatName));
+    }
+    return baseName;
   }
 
-  static Consumer<String> validateTargetBaseNameFormat(final String formatName) {
-    return format -> {
-      boolean valid;
-      try {
-        final String name = formatFileName(format, 15.11, ".png");
-        valid = name.contains(".") && name.contains(".png");
-      } catch (IllegalFormatException e) {
-        valid = false;
-      }
-      if (!valid) {
-        throw new RuntimeException(new WorkflowOperationException(String.format(
-            "%s is not a valid format string for config option %s",
-            format, formatName)));
-      }
-    };
+  static String validateTargetBaseNameFormat(String format, final String formatName) throws WorkflowOperationException {
+    boolean valid;
+    String name = null;
+    try {
+      name = formatFileName(format, 15.11, ".png");
+      valid = name.contains(".") && name.contains(".png");
+    } catch (IllegalFormatException e) {
+      valid = false;
+    }
+    if (!valid || name == null) {
+      throw new WorkflowOperationException(format(
+          "%s is not a valid format string for config option %s",
+          format, formatName));
+    }
+
+    return name;
   }
 
   // ** ** **
@@ -512,44 +503,67 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
   /**
    * Parse media position parameter strings.
    */
-  public final class MediaPositionParser {
-    private MediaPositionParser() { }
+  static final class MediaPositionParser {
 
-    public static List<MediaPosition> parsePositions(String input) throws WorkflowOperationException {
-      if (input == null || input.trim().isEmpty()) {
-        throw new WorkflowOperationException("Cannot parse empty or blank time string");
-      }
-
+    public static List<MediaPosition> parsePositions(String input) {
       List<MediaPosition> positions = new ArrayList<>();
-      String[] tokens = input.trim().split("[,\\s]+");
+      int index = 0;
+      int length = input.length();
 
-      for (String token : tokens) {
-        MediaPosition position = parseToken(token);
-        if (position == null) {
-          throw new WorkflowOperationException("Cannot parse time string: " + input);
+      while (index < length) {
+        // Skip any separators (whitespace or commas)
+        while (index < length && (Character.isWhitespace(input.charAt(index)) || input.charAt(index) == ',')) {
+          index++;
         }
-        positions.add(position);
+
+        if (index >= length) break;
+
+        // Parse optional minus sign
+        int start = index;
+        if (input.charAt(index) == '-') {
+          index++;
+        }
+
+        boolean dotSeen = false;
+        while (index < length) {
+          char c = input.charAt(index);
+          if (Character.isDigit(c)) {
+            index++;
+          } else if (c == '.' && !dotSeen) {
+            dotSeen = true;
+            index++;
+          } else {
+            break;
+          }
+        }
+
+        if (start == index || (input.charAt(start) == '-' && start + 1 == index)) {
+          throw new IllegalArgumentException("Expected number at position " + start);
+        }
+
+        double value = Double.parseDouble(input.substring(start, index));
+
+        // Check for optional percent sign
+        boolean isPercentage = false;
+        if (index < length && input.charAt(index) == '%') {
+          isPercentage = true;
+          index++;
+        }
+
+        PositionType type = isPercentage ? PositionType.Percentage : PositionType.Seconds;
+        positions.add(new MediaPosition(type, value));
       }
+
       return positions;
     }
+  }
 
-    private static MediaPosition parseToken(String token) {
-      token = token.trim();
-      if (token.endsWith("%")) {
-        try {
-          double value = Double.parseDouble(token.substring(0, token.length() - 1));
-          return new MediaPosition(PositionType.Percentage, value);
-        } catch (NumberFormatException e) {
-          return null;
-        }
-      } else {
-        try {
-          double value = Double.parseDouble(token);
-          return new MediaPosition(PositionType.Seconds, value);
-        } catch (NumberFormatException e) {
-          return null;
-        }
-      }
+  private List<MediaPosition> parsePositions(String time) throws WorkflowOperationException {
+    final List<MediaPosition> r = MediaPositionParser.parsePositions(time);
+    if (!r.isEmpty()) {
+      return r;
+    } else {
+      throw new WorkflowOperationException(format("Cannot parse time string %s.", time));
     }
   }
 
@@ -597,4 +611,3 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
   }
 
 }
-

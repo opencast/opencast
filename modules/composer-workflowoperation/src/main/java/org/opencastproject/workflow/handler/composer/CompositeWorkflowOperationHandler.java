@@ -313,7 +313,7 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
 
     private EncodingProfile profile;
 
-    private List<String> targetTags;
+    private ConfiguredTagsAndFlavors.TargetTags targetTags;
 
     private MediaPackageElementFlavor targetFlavor = null;
 
@@ -514,7 +514,7 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
       return targetFlavor;
     }
 
-    public List<String> getTargetTags() {
+    public ConfiguredTagsAndFlavors.TargetTags getTargetTags() {
       return targetTags;
     }
 
@@ -655,10 +655,7 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
                 "composite." + FilenameUtils.getExtension(compoundTrack.getURI().toString())));
 
         // Adjust the target tags
-        for (String tag : compositeSettings.getTargetTags()) {
-          logger.trace("Tagging compound track with '{}'", tag);
-          compoundTrack.addTag(tag);
-        }
+        applyTargetTagsToElement(compositeSettings.getTargetTags(), compoundTrack);
 
         // Adjust the target flavor.
         compoundTrack.setFlavor(compositeSettings.getTargetFlavor());
@@ -793,10 +790,7 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
                 "composite." + FilenameUtils.getExtension(compoundTrack.getURI().toString())));
 
         // Adjust the target tags
-        for (String tag : compositeSettings.getTargetTags()) {
-          logger.trace("Tagging compound track with '{}'", tag);
-          compoundTrack.addTag(tag);
-        }
+        applyTargetTagsToElement(compositeSettings.getTargetTags(), compoundTrack);
 
         // Adjust the target flavor.
         compoundTrack.setFlavor(compositeSettings.getTargetFlavor());

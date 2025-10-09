@@ -195,7 +195,7 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
         Configuration.many, Configuration.one, Configuration.many, Configuration.one);
     MediaPackageElementFlavor sourceVideoFlavor = tagsAndFlavors.getSingleSrcFlavor();
     List<String> sourceTagSet = tagsAndFlavors.getSrcTags();
-    List<String> targetImageTags = tagsAndFlavors.getTargetTags();
+    ConfiguredTagsAndFlavors.TargetTags targetImageTags = tagsAndFlavors.getTargetTags();
     MediaPackageElementFlavor targetImageFlavor = tagsAndFlavors.getSingleTargetFlavor();
     String encodingProfileName = StringUtils.trimToNull(operation.getConfiguration("encoding-profile"));
     String referenceFlavor = StringUtils.trimToNull(operation.getConfiguration("reference-flavor"));
@@ -320,10 +320,7 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
             }
 
             // Add tags
-            for (String tag : targetImageTags) {
-              logger.trace("Tagging image with '{}'", tag);
-              composedImage.addTag(tag);
-            }
+            applyTargetTagsToElement(targetImageTags, composedImage);
 
             // Refer to the original track including a timestamp
             MediaPackageReferenceImpl ref = new MediaPackageReferenceImpl(referenceMaster);

@@ -169,7 +169,7 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
     }
 
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance, Configuration.none, Configuration.none, Configuration.many, Configuration.one);
-    List<String> targetTagsOption = tagsAndFlavors.getTargetTags();
+    ConfiguredTagsAndFlavors.TargetTags targetTagsOption = tagsAndFlavors.getTargetTags();
     List<MediaPackageElementFlavor> targetFlavorOption = tagsAndFlavors.getTargetFlavors();
 
     // Target flavor
@@ -333,13 +333,11 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
     }
   }
 
-  private void addNewTrack(MediaPackage mediaPackage, Track track, List<String> targetTags,
+  private void addNewTrack(MediaPackage mediaPackage, Track track,
+          ConfiguredTagsAndFlavors.TargetTags targetTags,
           MediaPackageElementFlavor targetFlavor) {
     // Adjust the target tags
-    for (String tag : targetTags) {
-      logger.trace("Tagging compound track with '{}'", tag);
-      track.addTag(tag);
-    }
+    applyTargetTagsToElement(targetTags, track);
 
     // Adjust the target flavor.
     track.setFlavor(targetFlavor);

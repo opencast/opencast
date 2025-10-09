@@ -146,7 +146,7 @@ public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperati
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
         Configuration.none, Configuration.none, Configuration.many, Configuration.many);
     List<MediaPackageElementFlavor> targetFlavorStr = tagsAndFlavors.getTargetFlavors();
-    List<String> targetTags = tagsAndFlavors.getTargetTags();
+    ConfiguredTagsAndFlavors.TargetTags targetTags = tagsAndFlavors.getTargetTags();
     String outputFilename = StringUtils.trimToNull(operation.getConfiguration(OUTPUT_FILENAME_PROPERTY));
     String expectedTypeStr = StringUtils.trimToNull(operation.getConfiguration(EXPECTED_TYPE_PROPERTY));
 
@@ -226,16 +226,8 @@ public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperati
             resultElement.setFlavor(targetFlavor);
 
           // Set new tags
-          if (!targetTags.isEmpty()) {
-            // Assume the tags starting with "-" means we want to eliminate such tags form the result element
-            for (String tag : targetTags) {
-              if (tag.startsWith("-"))
-                // We remove the tag resulting from stripping all the '-' characters at the beginning of the tag
-                resultElement.removeTag(tag.replaceAll("^-+", ""));
-              else
-                resultElement.addTag(tag);
-            }
-          }
+          applyTargetTagsToElement(targetTags, resultElement);
+
           result = createResult(mediaPackage, Action.CONTINUE, job.getQueueTime());
         }
       } else {

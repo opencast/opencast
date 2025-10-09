@@ -52,7 +52,6 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -179,13 +178,11 @@ public class SpeechToTextAttachWorkflowOperationHandler extends AbstractWorkflow
       }
       subtitleElement.setFlavor(tagsAndFlavors.getSingleTargetFlavor());
 
-      List<String> targetTags = tagsAndFlavors.getTargetTags();
-      targetTags.add("lang:" + outputLanguage);
-      targetTags.add("generator-type:auto");
-      targetTags.add("generator:" + engineType.toLowerCase());
-      for (String tag : targetTags) {
-        subtitleElement.addTag(tag);
-      }
+      ConfiguredTagsAndFlavors.TargetTags targetTags = tagsAndFlavors.getTargetTags();
+      targetTags.getOverrideTags().add("lang:" + outputLanguage);
+      targetTags.getOverrideTags().add("generator-type:auto");
+      targetTags.getOverrideTags().add("generator:" + engineType.toLowerCase());
+      applyTargetTagsToElement(targetTags, subtitleElement);
 
       // this is used to set some values automatically, like the correct mimetype
       Job inspection = mediaInspectionService.enrich(subtitleElement, true);

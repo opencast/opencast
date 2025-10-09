@@ -141,7 +141,7 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
     }
 
     MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor();
-    List<String> targetTagList = tagsAndFlavors.getTargetTags();
+    ConfiguredTagsAndFlavors.TargetTags targetTagList = tagsAndFlavors.getTargetTags();
 
 
     int pixelsPerMinute = NumberUtils.toInt(
@@ -241,9 +241,7 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
           targetFlavor = new MediaPackageElementFlavor(targetFlavor.getType(), waveformMpe.getFlavor().getSubtype());
         }
         waveformMpe.setFlavor(targetFlavor);
-        for (String tag : targetTagList) {
-          waveformMpe.addTag(tag);
-        }
+        applyTargetTagsToElement(targetTagList, waveformMpe);
         mediaPackage.add(waveformMpe);
       }
 

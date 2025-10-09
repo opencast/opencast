@@ -106,7 +106,7 @@ public class ExportWorkflowPropertiesWOH extends AbstractWorkflowOperationHandle
     if (targetFlavorList.isEmpty()) {
       targetFlavorList.add(DEFAULT_TARGET_FLAVOR);
     }
-    final List<String> targetTags = tagsAndFlavors.getTargetTags();
+    final ConfiguredTagsAndFlavors.TargetTags targetTags = tagsAndFlavors.getTargetTags();
     final MediaPackageElementFlavor targetFlavor = targetFlavorList.get(0);
 
     // Read optional existing workflow properties from mediapackage
@@ -147,10 +147,7 @@ public class ExportWorkflowPropertiesWOH extends AbstractWorkflowOperationHandle
     }
 
     // Add the target tags
-    for (String tag : targetTags) {
-      logger.trace("Tagging with '{}'", tag);
-      attachment.addTag(tag);
-    }
+    applyTargetTagsToElement(targetTags, attachment);
 
     // Update attachment
     if (existingPropsElem.isPresent())

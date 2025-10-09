@@ -35,6 +35,7 @@ import org.opencastproject.mediapackage.selector.TrackSelector;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.videosegmenter.api.VideoSegmenterService;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
+import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationHandler;
@@ -102,9 +103,11 @@ public class VideoSegmenterWorkflowOperationHandler extends AbstractWorkflowOper
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
 
     // Find movie track to analyze
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
+        Configuration.many, Configuration.many, Configuration.many, Configuration.none);
     String trackTag = StringUtils.trimToNull(operation.getConfiguration(PROP_ANALYSIS_TRACK_TAG));
     String trackFlavor = StringUtils.trimToNull(operation.getConfiguration(PROP_ANALYSIS_TRACK_FLAVOR));
-    List<String> targetTags = asList(operation.getConfiguration(PROP_TARGET_TAGS));
+    ConfiguredTagsAndFlavors.TargetTags targetTags = tagsAndFlavors.getTargetTags();
     List<Track> candidates = new ArrayList<Track>();
     // Allow the combination of flavor and tag to narrow down choice of source
 
@@ -158,9 +161,7 @@ public class VideoSegmenterWorkflowOperationHandler extends AbstractWorkflowOper
               mpeg7Catalog.getIdentifier(), "segments.xml"));
       mpeg7Catalog.setReference(new MediaPackageReferenceImpl(track));
       // Add target tags
-      for (String tag : targetTags) {
-        mpeg7Catalog.addTag(tag);
-      }
+      applyTargetTagsToElement(targetTags, mpeg7Catalog);
     } catch (Exception e) {
       throw new WorkflowOperationException(e);
     }
