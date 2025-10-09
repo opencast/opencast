@@ -37,7 +37,6 @@
     <suppress checks="LineLength" files="modules/workflow-service-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/workflow-service-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/workflow-workflowoperation/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/working-file-repository-service-impl/.+\.(java|properties)"/>
 
     <suppress checks="Indentation" files="modules/admin-ui/.+\.java"/>
     <suppress checks="Indentation" files="modules/capture-admin-service-impl/.+\.java"/>
@@ -60,8 +59,6 @@
     <suppress checks="Indentation" files="modules/workflow-service-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/workflow-service-remote/.+\.java"/>
     <suppress checks="Indentation" files="modules/workflow-workflowoperation/.+\.java"/>
-    <suppress checks="Indentation" files="modules/working-file-repository-service-impl/.+\.java"/>
-    <suppress checks="Indentation" files="modules/working-file-repository-service-remote/.+\.java"/>
 
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/admin-ui/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/caption-impl/.+\.java"/>
@@ -94,6 +91,4 @@
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/workflow-service-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/workflow-service-remote/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/workflow-workflowoperation/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/working-file-repository-service-impl/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/working-file-repository-service-remote/.+\.java"/>
 </suppressions>
