@@ -314,6 +314,16 @@ public class CaptureAgentsEndpoint {
         parsedCapabilities.add("record", generateJsonDevice(parsedRecord, TRANSLATION_KEY_PREFIX + "RECORD."));
       }
 
+      String layout = (String) agent.getCapabilities().get(CaptureParameters.CAPTURE_DEVICE_LAYOUT);
+      if (layout == null || layout.isEmpty()) {
+        parsedCapabilities.add("stream", new JsonArray());
+      } else {
+        String[] parsedLayout = Arrays.stream(layout.split(","))
+            .map(String::trim)
+            .toArray(String[]::new);
+        parsedCapabilities.add("layout", generateJsonDevice(parsedLayout, TRANSLATION_KEY_PREFIX + "LAYOUT."));
+      }
+
       json.add("parsedCapabilities", parsedCapabilities);
     }
 

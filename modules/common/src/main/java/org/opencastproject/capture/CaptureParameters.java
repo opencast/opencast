@@ -45,6 +45,9 @@ public interface CaptureParameters {
   /** An integer signaling live streaming recording and uploading for capturing devices */
   String CAPTURE_DEVICE_RECORD = "capture.device.record";
 
+  /** A comma delimited list of the layouts for capturing devices */
+  String CAPTURE_DEVICE_LAYOUT = "capture.device.layout";
+
   /** String prefix used when specify capture device properties */
   String CAPTURE_DEVICE_PREFIX = "capture.device.";
 

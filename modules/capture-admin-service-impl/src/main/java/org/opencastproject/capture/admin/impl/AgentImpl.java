@@ -354,6 +354,14 @@ public class AgentImpl implements Agent {
       }
       capabilitiesProperties.put(CaptureParameters.CAPTURE_DEVICE_RECORD, record);
     }
+
+    // Parse layout
+    String layout = configuration.getProperty(CaptureParameters.CAPTURE_DEVICE_LAYOUT);
+    if (layout == null) {
+      log.debug("Capture agent '{}' failed to provide layout ({})", name, CaptureParameters.CAPTURE_DEVICE_LAYOUT);
+    } else {
+      capabilitiesProperties.put(CaptureParameters.CAPTURE_DEVICE_LAYOUT, layout);
+    }
   }
 
   /**
