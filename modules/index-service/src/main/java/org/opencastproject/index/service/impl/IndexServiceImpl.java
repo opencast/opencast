@@ -1012,6 +1012,11 @@ public class IndexServiceImpl implements IndexService {
         }
       }
 
+      String layout = (String) sourceMetadata.get("layout");
+      if (layout != null) {
+        caProperties.put(CaptureParameters.CAPTURE_DEVICE_LAYOUT, layout);
+      }
+
     }
 
     if (type.equals(SourceType.SCHEDULE_MULTIPLE)) {
