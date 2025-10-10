@@ -304,6 +304,16 @@ public class CaptureAgentsEndpoint {
         parsedCapabilities.add("stream", generateJsonDevice(parsedStream, TRANSLATION_KEY_PREFIX + "STREAM."));
       }
 
+      String record = (String) agent.getCapabilities().get(CaptureParameters.CAPTURE_DEVICE_RECORD);
+      if (record == null || record.isEmpty()) {
+        parsedCapabilities.add("stream", new JsonArray());
+      } else {
+        String[] parsedRecord = Arrays.stream(record.split(","))
+            .map(String::trim)
+            .toArray(String[]::new);
+        parsedCapabilities.add("record", generateJsonDevice(parsedRecord, TRANSLATION_KEY_PREFIX + "RECORD."));
+      }
+
       json.add("parsedCapabilities", parsedCapabilities);
     }
 

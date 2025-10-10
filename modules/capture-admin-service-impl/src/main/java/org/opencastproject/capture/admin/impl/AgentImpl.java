@@ -337,6 +337,23 @@ public class AgentImpl implements Agent {
       }
       capabilitiesProperties.put(CaptureParameters.CAPTURE_DEVICE_STREAM, stream);
     }
+
+    // Parse record
+    String record = configuration.getProperty(CaptureParameters.CAPTURE_DEVICE_RECORD);
+    if (stream == null) {
+      log.debug("Capture agent '{}' failed to provide record ({})", name, CaptureParameters.CAPTURE_DEVICE_RECORD);
+    } else {
+      // Validate
+      String[] recordOptions = stream.split(",");
+      Set<String> validOptions = Set.of("0", "1");
+      boolean allFound = Arrays.stream(recordOptions)
+          .map(String::trim)
+          .allMatch(validOptions::contains);
+      if (!allFound) {
+        log.error("Capture agent '{}' failed to provide valid options for stream ({})", record, CaptureParameters.CAPTURE_DEVICE_RECORD);
+      }
+      capabilitiesProperties.put(CaptureParameters.CAPTURE_DEVICE_RECORD, record);
+    }
   }
 
   /**

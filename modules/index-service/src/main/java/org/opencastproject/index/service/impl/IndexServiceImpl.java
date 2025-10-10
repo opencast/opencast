@@ -975,6 +975,15 @@ public class IndexServiceImpl implements IndexService {
         }
       }
 
+      String record = (String) sourceMetadata.get("record");
+      if (record != null) {
+        caProperties.put(CaptureParameters.CAPTURE_DEVICE_RECORD, record);
+      } else {
+        if (configuration.getProperty(CaptureParameters.CAPTURE_DEVICE_RECORD) != null) {
+          caProperties.put(CaptureParameters.CAPTURE_DEVICE_RECORD, "0");
+        }
+      }
+
     }
 
     if (type.equals(SourceType.SCHEDULE_MULTIPLE)) {
