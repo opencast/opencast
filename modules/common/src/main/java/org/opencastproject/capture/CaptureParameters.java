@@ -42,6 +42,9 @@ public interface CaptureParameters {
   /** An integer signaling live streaming for capturing devices */
   String CAPTURE_DEVICE_STREAM = "capture.device.stream";
 
+  /** An integer signaling live streaming recording and uploading for capturing devices */
+  String CAPTURE_DEVICE_RECORD = "capture.device.record";
+
   /** String prefix used when specify capture device properties */
   String CAPTURE_DEVICE_PREFIX = "capture.device.";
 
