@@ -989,6 +989,10 @@ public class IndexServiceImpl implements IndexService {
         caProperties.put(CaptureParameters.CAPTURE_DEVICE_LAYOUT, layout);
       }
 
+      String cameraPosition = (String) sourceMetadata.get("cameraPosition");
+      if (cameraPosition != null) {
+        caProperties.put(CaptureParameters.CAPTURE_DEVICE_CAMERA_POSITION, cameraPosition);
+      }
     }
 
     if (type.equals(SourceType.SCHEDULE_MULTIPLE)) {

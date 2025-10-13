@@ -324,6 +324,16 @@ public class CaptureAgentsEndpoint {
         parsedCapabilities.add("layout", generateJsonDevice(parsedLayout, TRANSLATION_KEY_PREFIX + "LAYOUT."));
       }
 
+      String cameraPosition = (String) agent.getCapabilities().get(CaptureParameters.CAPTURE_DEVICE_CAMERA_POSITION);
+      if (cameraPosition == null || cameraPosition.isEmpty()) {
+        parsedCapabilities.add("cameraPosition", new JsonArray());
+      } else {
+        String[] parsedCameraPosition = Arrays.stream(cameraPosition.split(","))
+            .map(String::trim)
+            .toArray(String[]::new);
+        parsedCapabilities.add("cameraPosition", generateJsonDevice(parsedCameraPosition, TRANSLATION_KEY_PREFIX + "CAMERA_POSITION."));
+      }
+
       json.add("parsedCapabilities", parsedCapabilities);
     }
 

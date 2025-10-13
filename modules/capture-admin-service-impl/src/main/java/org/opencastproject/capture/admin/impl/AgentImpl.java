@@ -362,6 +362,14 @@ public class AgentImpl implements Agent {
     } else {
       capabilitiesProperties.put(CaptureParameters.CAPTURE_DEVICE_LAYOUT, layout);
     }
+
+    // Parse camera position
+    String cameraPosition = configuration.getProperty(CaptureParameters.CAPTURE_DEVICE_CAMERA_POSITION);
+    if (cameraPosition == null) {
+      log.debug("Capture agent '{}' failed to provide camera position ({})", name, CaptureParameters.CAPTURE_DEVICE_CAMERA_POSITION);
+    } else {
+      capabilitiesProperties.put(CaptureParameters.CAPTURE_DEVICE_CAMERA_POSITION, cameraPosition);
+    }
   }
 
   /**
