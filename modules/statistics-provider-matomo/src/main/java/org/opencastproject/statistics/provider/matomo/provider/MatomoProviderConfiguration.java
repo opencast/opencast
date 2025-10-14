@@ -32,7 +32,7 @@ import java.util.Set;
 public class MatomoProviderConfiguration extends ProviderConfiguration {
   private static final Gson gson = new Gson();
 
-  public class MatomoProviderSource {
+  public static class MatomoProviderSource {
     private String siteId;
     private String method;
     private String dimensionId;

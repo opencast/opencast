@@ -23,6 +23,7 @@ package org.opencastproject.statistics.provider.matomo;
 
 import org.opencastproject.statistics.api.StatisticsCoordinator;
 import org.opencastproject.statistics.api.StatisticsProvider;
+import org.opencastproject.statistics.provider.matomo.provider.BatchMatomoRequest;
 import org.opencastproject.statistics.provider.matomo.provider.MatomoProviderConfiguration;
 import org.opencastproject.statistics.provider.matomo.provider.MatomoTimeSeriesStatisticsProvider;
 import org.opencastproject.util.ConfigurationException;
@@ -67,6 +68,25 @@ public class StatisticsProviderMatomoService implements ManagedService, Artifact
 
   private StatisticsCoordinator statisticsCoordinator;
   private Map<String, StatisticsProvider> fileNameToProvider = new ConcurrentHashMap<>();
+  private Map<String, BatchMatomoRequest> methodToBatchRequest = new ConcurrentHashMap<>();
+
+  /**
+   * Get an existing batch request for a specific ResourceType and Matomo API method
+   * @param resourceTypeMethod The ResourceType concatenated with the Matomo API method
+   * @return The existing batch request or null if none exists
+   */
+  public BatchMatomoRequest getBatchRequest(String resourceTypeMethod) {
+    return methodToBatchRequest.get(resourceTypeMethod);
+  }
+
+  /**
+   * Register a new batch request for a specific ResourceType and Matomo API method
+   * @param resourceTypeMethod The ResourceType concatenated with the Matomo API method
+   * @param batchRequest The batch request to register
+   */
+  public void registerBatchRequest(String resourceTypeMethod, BatchMatomoRequest batchRequest) {
+    methodToBatchRequest.put(resourceTypeMethod, batchRequest);
+  }
 
   @Reference
   public void setStatisticsCoordinator(StatisticsCoordinator service) {
