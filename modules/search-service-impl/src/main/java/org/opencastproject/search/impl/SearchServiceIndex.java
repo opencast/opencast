@@ -379,6 +379,9 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
   private void checkSearchEntityWritePermission(final String mediaPackageId) throws SearchException {
     User user = securityService.getUser();
     try {
+      if (!persistence.isAvailable(mediaPackageId)) {
+        throw new NotFoundException();
+      }
       AccessControlList acl = persistence.getAccessControlList(mediaPackageId);
       if (!authorizationService.hasPermission(acl, Permissions.Action.WRITE.toString())) {
         boolean isAdmin = user.getRoles().stream()
