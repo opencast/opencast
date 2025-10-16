@@ -92,8 +92,6 @@ import org.opencastproject.workspace.api.Workspace;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.TimeZoneRegistry;
@@ -118,7 +116,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.lang.reflect.Type;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -170,20 +167,6 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   private static final String EMPTY_CALENDAR_ETAG = "mod0";
 
   private static final String SNAPSHOT_OWNER = SchedulerService.JOB_TYPE;
-
-  private static final Gson gson = new Gson();
-  /**
-   * Deserializes properties stored in string columns of the extended event table
-   * @param props Properties as retrieved from the DB
-   * @return deserialized key-value pairs
-   */
-  private static Map<String,String> deserializeExtendedEventProperties(String props) {
-    if (props == null || props.trim().isEmpty()) {
-      return new HashMap<>();
-    }
-    Type type = new TypeToken<Map<String, String>>() { }.getType();
-    return gson.fromJson(props, type);
-  }
 
   /** The last modified cache */
   protected Cache<String, String> lastModifiedCache = CacheBuilder.newBuilder()
@@ -939,7 +922,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       Optional<ExtendedEventDto> record = persistence.getEvent(mediaPackageId);
       if (record.isEmpty())
         throw new NotFoundException();
-      return deserializeExtendedEventProperties(record.get().getWorkflowProperties());
+      return record.get().getWorkflowProperties();
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -957,7 +940,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       Optional<ExtendedEventDto> record = persistence.getEvent(mediaPackageId);
       if (record.isEmpty())
         throw new NotFoundException();
-      return deserializeExtendedEventProperties(record.get().getCaptureAgentProperties());
+      return record.get().getCaptureAgentProperties();
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -1140,7 +1123,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
           continue;
         }
 
-        final Map<String, String> caMetadata = deserializeExtendedEventProperties(searchResult.get(mpId).getCaptureAgentProperties());
+        final Map<String, String> caMetadata = searchResult.get(mpId).getCaptureAgentProperties();
 
         // If the even properties are empty, skip the event
         if (caMetadata.isEmpty()) {
@@ -1581,8 +1564,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     final Set<String> presenters = getPresenters(Optional.ofNullable(extEvt.getPresenters()).orElse(""));
     final Optional<String> recordingStatus = Optional.ofNullable(extEvt.getRecordingState());
     final Optional<Long> lastHeard = Optional.ofNullable(extEvt.getRecordingLastHeard());
-    final Map<String, String> caMetadata = deserializeExtendedEventProperties(extEvt.getCaptureAgentProperties());
-    final Map<String, String> wfProperties = deserializeExtendedEventProperties(extEvt.getWorkflowProperties());
+    final Map<String, String> caMetadata = extEvt.getCaptureAgentProperties();
+    final Map<String, String> wfProperties = extEvt.getWorkflowProperties();
 
     Recording recording = null;
     if (recordingStatus.isPresent() && lastHeard.isPresent())
@@ -1643,8 +1626,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
                       final Set<String> presenters = getPresenters(
                               Optional.ofNullable(event.getPresenters()).orElse(""));
-                      final Map<String, String> caMetadata = deserializeExtendedEventProperties(
-                              event.getCaptureAgentProperties());
+                      final Map<String, String> caMetadata = event.getCaptureAgentProperties();
 
                       updatedEventData = getEventUpdateFunction(event.getMediaPackageId(), Optional.empty(), Optional.empty(),
                               Optional.of(event.getStartDate()), Optional.of(event.getEndDate()), Optional.of(presenters),

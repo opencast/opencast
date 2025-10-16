@@ -30,8 +30,6 @@ import org.opencastproject.scheduler.impl.SchedulerServiceDatabaseException;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.NotFoundException;
 
-import com.google.gson.Gson;
-
 import org.apache.commons.lang3.tuple.Pair;
 import org.joda.time.DateTime;
 import org.osgi.service.component.ComponentContext;
@@ -76,8 +74,6 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
 
   /** The security service */
   private SecurityService securityService;
-
-  private static final Gson gson = new Gson();
 
   /** OSGi DI */
   @Reference(target = "(osgi.unit.name=org.opencastproject.scheduler.impl.persistence)")
@@ -196,10 +192,10 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
           entity.setChecksum(checksum.get());
         }
         if (workflowProperties.isPresent()) {
-          entity.setWorkflowProperties(gson.toJson(workflowProperties.get()));
+          entity.setWorkflowProperties(workflowProperties.get());
         }
         if (caProperties.isPresent()) {
-          entity.setCaptureAgentProperties(gson.toJson(caProperties.get()));
+          entity.setCaptureAgentProperties(caProperties.get());
         }
 
         if (entityOpt.isEmpty()) {
