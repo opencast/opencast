@@ -18,27 +18,24 @@
  * the License.
  *
  */
-package org.opencastproject.liveschedule.api;
+package org.opencastproject.liveschedule.util;
 
-import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.util.NotFoundException;
+import org.opencastproject.mediapackage.MediaPackageElement;
 
-import java.util.Date;
+import org.apache.commons.collections4.Equator;
 
-public interface LiveScheduleService {
+import java.util.Objects;
 
-  String LIVE_CHANNEL_ID = "engage-live";
+public class CatalogAndAttachmentEquator implements Equator<MediaPackageElement> {
+  @Override
+  public boolean equate(MediaPackageElement mpe1, MediaPackageElement mpe2) {
+    return Objects.equals(mpe1.getIdentifier(), mpe2.getIdentifier()) && Objects.equals(mpe1.getElementType(),
+        mpe2.getElementType()) && Objects.equals(mpe1.getChecksum(), mpe2.getChecksum()) && Objects.equals(
+        mpe1.getFlavor(), mpe2.getFlavor());
+  }
 
-  void createLiveEvent(MediaPackage archivedMediaPackage, Date startDate, Date endDate, String agentId)
-          throws LiveScheduleException;
-
-  void updateLiveTracks(String mpId, Date startDate, Date endDate, String agentId) throws LiveScheduleException,
-          NotFoundException;
-
-  void updateLiveEvent(MediaPackage archivedMediaPackage, String version) throws NotFoundException,
-            LiveScheduleException;
-
-  void deleteLiveEvent(String mpId, boolean updateAssetManager) throws LiveScheduleException;
-
-  void handleCaptureError(String mpId);
+  @Override
+  public int hash(MediaPackageElement mpe) {
+    return Objects.hash(mpe.getIdentifier(), mpe.getElementType(), mpe.getChecksum(), mpe.getFlavor());
+  }
 }
