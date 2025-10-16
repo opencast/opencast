@@ -1408,6 +1408,17 @@ public final class MediaPackageImpl implements MediaPackage {
     return Arrays.stream(getTracks()).anyMatch(Track::isLive);
   }
 
+  @Override
+  public void clearElements() {
+    new ArrayList<>(elements).forEach(this::removeElement);
+  }
+
+  @Override
+  public void clearElements(Type type) {
+    new ArrayList<>(elements).stream().filter(e -> e.getElementType().equals(type)).
+        forEach(this::removeElement);
+  }
+
   /**
    * Returns the media package element that matches the given reference.
    *

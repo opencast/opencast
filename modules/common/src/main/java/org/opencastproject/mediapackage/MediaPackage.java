@@ -538,4 +538,15 @@ public interface MediaPackage extends Cloneable {
    */
   boolean isLive();
 
+  /**
+   * Clears all mediapackage elements
+   */
+  void clearElements();
+
+  /**
+   * Clear mediapackage elements of a specific type
+   *
+   * @param type The type of the mediapackage elements to remove
+   */
+  void clearElements(MediaPackageElement.Type type);
 }
