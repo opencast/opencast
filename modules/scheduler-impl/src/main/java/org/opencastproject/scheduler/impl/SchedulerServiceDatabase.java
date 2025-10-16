@@ -98,7 +98,7 @@ public interface SchedulerServiceDatabase {
    *          the capture agent properties
    * @throws SchedulerServiceDatabaseException in case the event cannot be stored.
    */
-  void storeEvent(
+  ExtendedEventDto storeEvent(
       String mediapackageId,
       String organizationId,
       Optional<String> captureAgentId,
@@ -230,7 +230,7 @@ public interface SchedulerServiceDatabase {
    * @throws SchedulerServiceDatabaseException
    *           If the database cannot be queried.
    */
-  void resetRecordingState(String mediapackageId) throws NotFoundException, SchedulerServiceDatabaseException;
+  ExtendedEventDto resetRecordingState(String mediapackageId) throws NotFoundException, SchedulerServiceDatabaseException;
 
   /**
    * Retrieve the number of events.
