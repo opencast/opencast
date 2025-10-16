@@ -184,6 +184,12 @@
       <artifactId>h2</artifactId>
       <scope>test</scope>
     </dependency>
+      <dependency>
+          <groupId>org.opencastproject</groupId>
+          <artifactId>opencast-live-schedule-api</artifactId>
+          <version>19-SNAPSHOT</version>
+          <scope>compile</scope>
+      </dependency>
   </dependencies>
   <build>
     <plugins>
