@@ -66,6 +66,13 @@ public interface AssetManager {
   Optional<MediaPackage> getMediaPackage(String mediaPackageId);
 
   /**
+   * Get all media packages from the latest snapshot.
+   * 
+   * @return all media packages from the latest snapshot
+   */
+  List<Optional<MediaPackage>> getAllMediaPackages(int offset, int limit);
+
+  /**
    * Get the asset that is uniquely identified by the triple {version, media package ID, media package element ID}.
    *
    * @param version the version

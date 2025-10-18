@@ -1,0 +1,154 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>opencast-data-validation-impl</artifactId>
+    <packaging>bundle</packaging>
+    <name>Opencast :: data-validation-impl</name>
+    <parent>
+        <groupId>org.opencastproject</groupId>
+        <artifactId>base</artifactId>
+        <version>18-SNAPSHOT</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+    <properties>
+        <opencast.basedir>${project.basedir}/../..</opencast.basedir>
+        <checkstyle.skip>false</checkstyle.skip>
+    </properties>
+    <dependencies>
+        <!-- Opencast dependencies -->
+        <dependency>
+            <groupId>org.opencastproject</groupId>
+            <artifactId>opencast-data-validation-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.opencastproject</groupId>
+            <artifactId>opencast-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.opencastproject</groupId>
+          <artifactId>opencast-search-service-api</artifactId>
+          <version>${project.version}</version>
+        </dependency> 
+        <dependency>
+          <groupId>org.opencastproject</groupId>
+          <artifactId>opencast-asset-manager-api</artifactId>
+          <version>${project.version}</version>
+        </dependency>
+        <!-- <dependency>
+          <groupId>org.opencastproject</groupId>
+          <artifactId>opencast-elasticsearch-api</artifactId>
+          <version>${project.version}</version>
+        </dependency> -->
+        <dependency>
+          <groupId>org.opencastproject</groupId>
+          <artifactId>opencast-elasticsearch-index</artifactId>
+          <version>${project.version}</version>
+        </dependency>        
+        <dependency>
+            <groupId>jakarta.ws.rs</groupId>
+            <artifactId>jakarta.ws.rs-api</artifactId>
+        </dependency>
+        <!--  Thirdparty dependencies -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>com.entwinemedia.common</groupId>
+          <artifactId>functional</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <!-- <dependency>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-lang3</artifactId>
+        </dependency>         -->
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.service.component.annotations</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.osgi</groupId>
+          <artifactId>osgi.core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.osgi</groupId>
+            <artifactId>org.osgi.service.jaxrs</artifactId>
+        </dependency>
+        <!-- <dependency>
+          <groupId>commons-io</groupId>
+          <artifactId>commons-io</artifactId>
+        </dependency> -->
+        <dependency>
+          <groupId>com.googlecode.json-simple</groupId>
+          <artifactId>json-simple</artifactId>
+        </dependency>        
+        <!-- Testing -->
+        <dependency>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-server</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.easymock</groupId>
+          <artifactId>easymock</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-reload4j</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>com.h2database</groupId>
+          <artifactId>h2</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <!-- Persistence -->
+        <dependency>
+          <groupId>org.eclipse.persistence</groupId>
+          <artifactId>jakarta.persistence</artifactId>
+        </dependency>
+    </dependencies>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <ignoredUnusedDeclaredDependencies>
+            <!-- runtime tests -->
+            <ignoredUnusedDeclaredDependency>org.glassfish.jersey.core:jersey-server</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-reload4j</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>com.h2database:h2</ignoredUnusedDeclaredDependency>
+          </ignoredUnusedDeclaredDependencies>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <extensions>true</extensions>
+        <configuration>
+          <instructions>
+            <Import-Package>
+              javax.persistence,
+              javax.ws.rs;version=2.0.1,
+              javax.ws.rs.core;version=2.0.1,
+              *
+            </Import-Package>
+            <Export-Package>
+              org.opencastproject.datavalidation.impl;version=${project.version},
+              org.opencastproject.datavalidation.impl.endpoint;version=${project.version}
+            </Export-Package>
+          </instructions>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>
