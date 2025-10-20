@@ -55,6 +55,8 @@ import javax.persistence.UniqueConstraint;
 @NamedQueries({
         @NamedQuery(name = "ManagedAcl.findByIdAndOrg",
                     query = "SELECT e FROM ManagedAcl e WHERE e.id = :id AND e.organizationId = :organization"),
+        @NamedQuery(name = "ManagedAcl.findByNameAndOrg",
+            query = "SELECT e FROM ManagedAcl e WHERE e.name = :name AND e.organizationId = :organization"),
         @NamedQuery(name = "ManagedAcl.findAllByOrg",
                     query = "SELECT e FROM ManagedAcl e WHERE e.organizationId = :organization"),
         @NamedQuery(name = "ManagedAcl.deleteByIdAndOrg",
@@ -118,6 +120,17 @@ public class ManagedAclEntity implements ManagedAcl {
         "ManagedAcl.findByIdAndOrg",
         ManagedAclEntity.class,
         Pair.of("id", id),
+        Pair.of("organization", orgId)
+    );
+  }
+
+  /** Find a managed ACL by id. */
+  public static Function<EntityManager, Optional<ManagedAclEntity>> findByNameAndOrgQuery(final String orgId,
+      final String name) {
+    return namedQuery.findOpt(
+        "ManagedAcl.findByNameAndOrg",
+        ManagedAclEntity.class,
+        Pair.of("name", name),
         Pair.of("organization", orgId)
     );
   }

@@ -87,6 +87,11 @@ public final class JpaAclDb implements AclDb {
   }
 
   @Override
+  public Optional<ManagedAcl> getAcl(Organization org, String name) {
+    return Misc.widen(db.execTx(ManagedAclEntity.findByNameAndOrgQuery(org.getId(), name)));
+  }
+
+  @Override
   public boolean updateAcl(final ManagedAcl acl) {
     return db.execTx(em -> {
       Optional<ManagedAclEntity> e = findByIdAndOrgQuery(acl.getOrganizationId(), acl.getId()).apply(em);
