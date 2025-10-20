@@ -487,6 +487,32 @@ function getTextboxes(episode) {
   return textboxes;
 }
 
+function readQuizzes(potentialNewQuizzes, quizzes) {
+  potentialNewQuizzes.forEach((potentialQuiz) => {
+    try {
+      let quizzes_regex = /^quizzes\/([^+]+)(\+(.+))?/g;
+      let quizzes_match = quizzes_regex.exec(potentialQuiz.type);
+
+      if (quizzes_match) {
+        quizzes.push(potentialQuiz);
+      }
+    }
+    catch (err) {/**/}
+  });
+}
+
+function getQuizzes(episode) {
+  var quizzes = [];
+
+  var tracks = episode.mediapackage.media.track;
+  if (!(tracks instanceof Array)) { tracks = tracks ? [tracks] : []; }
+
+  // Read the quizzes from the tracks
+  readQuizzes(tracks, quizzes);
+
+  return quizzes;
+}
+
 function processTranscriptions(episode, manifest) {
   var catalog = episode.mediapackage.metadata.catalog;
   if (!(catalog instanceof Array)) { catalog = catalog ? [catalog] : []; }
@@ -550,13 +576,14 @@ export function episodeToManifest(ocResponse, config) {
     const streams = getStreams(episode, config);
     const captions = getCaptions(episode, config);
     const textboxes = getTextboxes(episode, config);
+    const quizzes = getQuizzes(episode, config);
 
     const result = {
       metadata,
       streams,
-      captions
       captions,
       textboxes,
+      quizzes
     };
 
     processAttachments(episode, result, config);
