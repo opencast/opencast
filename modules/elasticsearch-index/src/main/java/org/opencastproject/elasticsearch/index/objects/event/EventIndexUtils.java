@@ -116,7 +116,10 @@ public final class EventIndexUtils {
    * @return the set of metadata
    */
   public static SearchMetadataCollection toSearchMetadata(Event event, ListProvidersService listProviderService,
-      boolean episodeIdRole) {
+      boolean episodeIdRole) throws SearchIndexException {
+    if (null == listProviderService) {
+      throw new SearchIndexException("BUG: listProviderService is null, see issue 4117");
+    }
     SearchMetadataCollection metadata = new SearchMetadataCollection(
             event.getIdentifier().concat(event.getOrganization()), Event.DOCUMENT_TYPE);
     metadata.addField(EventIndexSchema.UID, event.getIdentifier(), true);
