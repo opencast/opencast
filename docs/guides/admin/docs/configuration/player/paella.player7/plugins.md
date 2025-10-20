@@ -43,5 +43,6 @@ Plugin                                             | Description
 [org.opencast.paella.loginPlugin](plugins/org.opencast.paella.loginPlugin.md)                                         | Adds a button to be able to login.
 [org.opencast.paella.opencast.userTrackingDataPlugin](plugins/org.opencast.paella.opencast.userTrackingDataPlugin.md) | Allows to use Opencast usertracking service to track usage data.
 [org.opencast.paella.matomo.userTrackingDataPlugin](plugins/org.opencast.paella.matomo.userTrackingDataPlugin.md)     | Allows to use Matomo service to track usage data.
+[org.opencast.paella.textboxPlugin](plugins/org.opencast.paella.matomo.textboxPlugin.md) | Allows the display of textboxes
 [org.opencast.paella.transcriptionsPlugin](plugins/org.opencast.paella.transcriptionsPlugin.md)                       | Adds a panel to show the OCR transcriptions.
 [org.opencast.paella.versionButton](plugins/org.opencast.paella.versionButton.md)                                     | Adds a button to show the player version.

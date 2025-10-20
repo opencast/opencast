@@ -461,6 +461,32 @@ function getCaptions(episode) {
   return captions;
 }
 
+function readTextboxes(potentialNewTextboxes, textboxes) {
+  potentialNewTextboxes.forEach((potentialTextbox) => {
+    try {
+      let textboxes_regex = /^textboxes\/([^+]+)(\+(.+))?/g;
+      let textboxes_match = textboxes_regex.exec(potentialTextbox.type);
+
+      if (textboxes_match) {
+        textboxes.push(potentialTextbox);
+      }
+    }
+    catch (err) {/**/}
+  });
+}
+
+function getTextboxes(episode) {
+  var textboxes = [];
+
+  var tracks = episode.mediapackage.media.track;
+  if (!(tracks instanceof Array)) { tracks = tracks ? [tracks] : []; }
+
+  // Read the textboxes from the tracks
+  readTextboxes(tracks, textboxes);
+
+  return textboxes;
+}
+
 function processTranscriptions(episode, manifest) {
   var catalog = episode.mediapackage.metadata.catalog;
   if (!(catalog instanceof Array)) { catalog = catalog ? [catalog] : []; }
@@ -523,11 +549,14 @@ export function episodeToManifest(ocResponse, config) {
     const metadata = getMetadata(episode, config);
     const streams = getStreams(episode, config);
     const captions = getCaptions(episode, config);
+    const textboxes = getTextboxes(episode, config);
 
     const result = {
       metadata,
       streams,
       captions
+      captions,
+      textboxes,
     };
 
     processAttachments(episode, result, config);
