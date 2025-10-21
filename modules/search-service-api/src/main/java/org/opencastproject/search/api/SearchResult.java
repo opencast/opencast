@@ -76,7 +76,7 @@ public class SearchResult {
 
   private String id = null;
 
-  private String live = null;
+  private Boolean live = null;
 
   private Instant modified = null;
 
@@ -94,7 +94,7 @@ public class SearchResult {
 
     if (SearchService.IndexEntryType.Episode.equals(type)) {
       this.id = this.getMediaPackage().getIdentifier().toString();
-      this.live = this.getMediaPackage().isLive() ? "true" : "false";
+      this.live = this.getMediaPackage().isLive();
     } else if (SearchService.IndexEntryType.Series.equals(type)) {
       this.id = this.dublinCore.getFirst(DublinCore.PROPERTY_IDENTIFIER);
     }
@@ -108,7 +108,7 @@ public class SearchResult {
     return this.id;
   }
 
-  public String getLive() {
+  public Boolean getLive() {
     return this.live;
   }
 

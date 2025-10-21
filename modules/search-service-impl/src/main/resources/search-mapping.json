@@ -67,7 +67,7 @@
       "search_analyzer": "whitespace_analyzer"
     },
     "live": {
-      "type": "keyword"
+      "type": "boolean"
     },
     "id": {
       "type": "keyword"

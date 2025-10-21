@@ -408,8 +408,8 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
       );
     }
 
-    if (StringUtils.isNotEmpty(live)) {
-      query.must(QueryBuilders.termQuery("live", live));
+    if (live != null) {
+      query.filter(QueryBuilders.termQuery("live", live));
     }
 
     var user = securityService.getUser();
