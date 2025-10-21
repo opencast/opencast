@@ -137,6 +137,7 @@ class TranslatedSeries extends React.Component<SeriesProps, SeriesState> {
 
     loadCurrentPage(pageNumber: number = 1) {
         const qs = parsedQueryString();
+        console.log(qs);
 
         searchEpisode(
             EPISONDES_PER_PAGE,
@@ -145,6 +146,7 @@ class TranslatedSeries extends React.Component<SeriesProps, SeriesState> {
             typeof qs.series === "string" ? qs.series : undefined,
             typeof qs.series_name === "string" ? qs.series_name : undefined,
             typeof qs.sort === "string" ? qs.sort : undefined,
+            typeof qs.live === "string" ? qs.live : undefined,
         ).then((results) => this.setState({
             ...this.state,
             searchResults: results

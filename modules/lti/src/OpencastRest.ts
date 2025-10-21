@@ -144,8 +144,8 @@ async function getConfig(): Promise<Config> {
     try {
         const response = await axios.get<any>(hostAndPort() + '/ui/config/ltitools/config.json');
         return {
-            excludeLiveStreams: response.data.excludeLiveStreams !== undefined ? response.data.excludeLiveStreams : false,
-            onlyLiveStreams: response.data.onlyLiveStreams !== undefined ? response.data.onlyLiveStreams : false
+            excludeLiveStreams: response.data.series.excludeLiveStreams !== undefined ? response.data.series.excludeLiveStreams : false,
+            onlyLiveStreams: response.data.series.onlyLiveStreams !== undefined ? response.data.series.onlyLiveStreams : false
         }
     } catch (_) {
         return {
@@ -226,7 +226,8 @@ export async function searchEpisode(
     episodeId?: string,
     seriesId?: string,
     seriesName?: string,
-    sort?: string): Promise<SearchEpisodeResults> {
+    sort?: string,
+    live?: string): Promise<SearchEpisodeResults> {
     let urlSuffix = "";
     if (seriesId !== undefined)
         urlSuffix += "&sid=" + seriesId;
@@ -236,9 +237,13 @@ export async function searchEpisode(
         urlSuffix += "&id=" + episodeId;
     if (sort !== undefined)
         urlSuffix += "&sort=" + sort;
-    const live = await parseLiveFromConfig();
-    if (typeof live === "string" && live !== "")
+    if (live !== undefined) {
         urlSuffix += "&live=" + live;
+    } else {
+        const config_live = await parseLiveFromConfig();
+        if (typeof config_live === "string" && config_live !== "")
+            urlSuffix += "&live=" + config_live;
+    }
     const url = `${hostAndPort()}/search/episode.json?limit=${limit}&offset=${offset}${urlSuffix}`;
     const response = await axios.get<any>(url);
     const resultsRaw = response.data["result"];
