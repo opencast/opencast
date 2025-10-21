@@ -359,10 +359,10 @@ as an example:
     If the workflow fails, investigate what was going wrong and either restart the workflow or create the release
     manually in the GitHub user interface.
 
-12. Post a release notification on [opencast.org](https://opencast.org).  You will need to ensure you have the
-    appropriate permissions - talk to the QA Coordinator, or the board if you do not know how or have the rights.
-    Typically we reuse a previous major version's message, altering the version numbers, but the actual content is up to
-    the release manager.
+12. In the case a x.0 release, post a release notification on [opencast.org](https://opencast.org).  You will need to
+    ensure you have the appropriate permissions - talk to the QA Coordinator, or the board if you do not know how or
+    have the rights.  Typically we reuse a previous major version's message, altering the version numbers, but the
+    actual content is up to the release manager.
 
 
 13. Check that the release is published on [Maven Central](https://repo1.maven.org/maven2/org/opencastproject/opencast-common/).
