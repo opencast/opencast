@@ -46,6 +46,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
 
 import java.net.URL;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Pattern;
 
@@ -58,6 +61,8 @@ public final class SecurityUtil {
 
   /** The name of the key used to store the name of the system user in the global config. */
   public static final String PROPERTY_KEY_SYS_USER = "org.opencastproject.security.digest.user";
+
+  public static final String PROPERTY_KEY_ACL_ADDITIONL_ACTIONS = "org.opencastproject.acl.additional.actions.";
 
   /**
    * Run function <code>f</code> in the context described by the given organization and user.
@@ -184,6 +189,23 @@ public final class SecurityUtil {
     if (!user.hasRole(SecurityUtil.getCaptureAgentRole(agentId))) {
       throw new UnauthorizedException(user, "schedule");
     }
+  }
+
+  /**
+   * Get additional ACL actions defined in the organization properties.
+   *
+   * @param organization
+   *          The organization to get the additional actions from
+   * @return A map of additional actions
+   */
+  public static Map<String, String> additionalAclActions(final Organization organization) {
+    Map<String, String> additionalActions = new HashMap<>();
+    organization.getProperties().forEach((key, value) -> {
+      if (key.startsWith(PROPERTY_KEY_ACL_ADDITIONL_ACTIONS)) {
+        additionalActions.put(key.substring(PROPERTY_KEY_ACL_ADDITIONL_ACTIONS.length()), value);
+      }
+    });
+    return Collections.unmodifiableMap(additionalActions);
   }
 
   private static String sanitizeCaName(final String ca) {
