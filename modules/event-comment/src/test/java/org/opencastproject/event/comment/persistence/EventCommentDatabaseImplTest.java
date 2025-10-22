@@ -92,7 +92,8 @@ public class EventCommentDatabaseImplTest {
     EasyMock.expect(index.getIndexName()).andReturn("adminui").anyTimes();
     EasyMock.expect(index.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result).anyTimes();
     EasyMock.expect(index.addOrUpdateEvent(EasyMock.anyString(), EasyMock.anyObject(Function.class),
-            EasyMock.anyString(), EasyMock.anyObject(User.class))).andReturn(Optional.of(event)).atLeastOnce();
+            EasyMock.anyObject(Organization.class), EasyMock.anyObject(User.class)))
+        .andReturn(Optional.of(event)).atLeastOnce();
     EasyMock.replay(index);
 
     persistence = new EventCommentDatabaseServiceImpl();

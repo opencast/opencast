@@ -31,8 +31,6 @@ import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.series.Series;
 import org.opencastproject.elasticsearch.index.objects.series.SeriesIndexSchema;
 import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
-import org.opencastproject.list.api.ListProviderException;
-import org.opencastproject.list.api.ListProvidersService;
 import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.list.impl.ResourceListQueryImpl;
 import org.opencastproject.mediapackage.Attachment;
@@ -115,7 +113,7 @@ public final class EventIndexUtils {
    *          the recording event
    * @return the set of metadata
    */
-  public static SearchMetadataCollection toSearchMetadata(Event event, ListProvidersService listProviderService) {
+  public static SearchMetadataCollection toSearchMetadata(Event event, Map<String, String> additionalActions) {
     SearchMetadataCollection metadata = new SearchMetadataCollection(
             event.getIdentifier().concat(event.getOrganization()), Event.DOCUMENT_TYPE);
     metadata.addField(EventIndexSchema.UID, event.getIdentifier(), false);
@@ -246,7 +244,7 @@ public final class EventIndexUtils {
 
     if (StringUtils.isNotBlank(event.getAccessPolicy())) {
       metadata.addField(EventIndexSchema.ACCESS_POLICY, event.getAccessPolicy(), false);
-      addAuthorization(metadata, event.getAccessPolicy(), event.getIdentifier(), listProviderService);
+      addAuthorization(metadata, event.getAccessPolicy(), event.getIdentifier(), additionalActions);
     }
 
     if (StringUtils.isNotBlank(event.getAgentId())) {
@@ -372,7 +370,7 @@ public final class EventIndexUtils {
    *          the access control list string
    */
   private static void addAuthorization(SearchMetadataCollection doc, String aclString,
-      String eventId, ListProvidersService listProvidersService) {
+      String eventId, Map<String, String> additionalActions) {
     Map<String, List<String>> permissions = new HashMap<>();
 
     // Define containers for common permissions
@@ -386,20 +384,22 @@ public final class EventIndexUtils {
 
     // Add special action roles for episode id roles
     Set<AccessControlEntry> customEntries = new HashSet<>();
-    customEntries.add(new AccessControlEntry(getEpisodeRoleId(eventId, "READ"), "read", true));
-    customEntries.add(new AccessControlEntry(getEpisodeRoleId(eventId, "WRITE"), "write", true));
+    customEntries.add(
+        new AccessControlEntry(getEpisodeRoleId(eventId, Action.READ.toString()),
+          Action.READ.getValue(),
+          true
+        )
+    );
+    customEntries.add(
+        new AccessControlEntry(getEpisodeRoleId(eventId, Action.WRITE.toString()),
+          Action.WRITE.getValue(),
+          true
+        )
+    );
 
     ResourceListQuery query = new ResourceListQueryImpl();
-    if (listProvidersService.hasProvider("ACL.ACTIONS")) {
-      Map<String, String> actions = new HashMap<>();
-      try {
-        actions = listProvidersService.getList("ACL.ACTIONS", query, true);
-      } catch (ListProviderException e) {
-        logger.error("Listproviders not loaded. " + e);
-      }
-      for (String action : actions.keySet()) {
-        customEntries.add(new AccessControlEntry(getEpisodeRoleId(eventId, action), action, true));
-      }
+    for (String action : additionalActions.keySet()) {
+      customEntries.add(new AccessControlEntry(getEpisodeRoleId(eventId, action), action, true));
     }
 
     entries.addAll(customEntries);

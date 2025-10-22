@@ -363,13 +363,13 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
 
     elasticsearchIndex = EasyMock.createMock(ElasticsearchIndex.class);
 
-    EasyMock.expect(elasticsearchIndex.getSeries("1", defaultOrganization.getId(), user))
+    EasyMock.expect(elasticsearchIndex.getSeries("1", defaultOrganization, user))
         .andReturn(Optional.of(series1));
-    EasyMock.expect(elasticsearchIndex.getSeries("2", defaultOrganization.getId(), user))
+    EasyMock.expect(elasticsearchIndex.getSeries("2", defaultOrganization, user))
         .andReturn(Optional.of(series2));
-    EasyMock.expect(elasticsearchIndex.getSeries("3", defaultOrganization.getId(), user))
+    EasyMock.expect(elasticsearchIndex.getSeries("3", defaultOrganization, user))
         .andReturn(Optional.of(series3));
-    EasyMock.expect(elasticsearchIndex.getSeries(anyString(), anyString(), anyObject()))
+    EasyMock.expect(elasticsearchIndex.getSeries(anyString(), anyObject(Organization.class), anyObject()))
         .andReturn(Optional.empty());
 
     final Capture<SeriesSearchQuery> captureSeriesSearchQuery = EasyMock.newCapture();

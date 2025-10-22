@@ -384,7 +384,7 @@ public class SeriesEndpoint {
       })
   public Response getSeriesMetadata(@PathParam("seriesId") String series) throws UnauthorizedException,
           NotFoundException, SearchIndexException {
-    Optional<Series> optSeries = searchIndex.getSeries(series, securityService.getOrganization().getId(),
+    Optional<Series> optSeries = searchIndex.getSeries(series, securityService.getOrganization(),
         securityService.getUser());
     if (optSeries.isEmpty()) {
       return notFound("Cannot find a series with id '%s'.", series);
@@ -1180,7 +1180,7 @@ public class SeriesEndpoint {
   public Response getSeriesTheme(@PathParam("seriesId") String seriesId) {
     Long themeId;
     try {
-      Optional<Series> series = searchIndex.getSeries(seriesId, securityService.getOrganization().getId(),
+      Optional<Series> series = searchIndex.getSeries(seriesId, securityService.getOrganization(),
           securityService.getUser());
       if (series.isEmpty()) {
         return notFound("Cannot find a series with id {}", seriesId);
@@ -1483,7 +1483,7 @@ public Response getSeriesHostPages(@PathParam("seriesId") String seriesId) {
       return badRequest();
     }
 
-    Optional<Series> series = searchIndex.getSeries(seriesId, securityService.getOrganization().getId(),
+    Optional<Series> series = searchIndex.getSeries(seriesId, securityService.getOrganization(),
         securityService.getUser());
     if (series.isEmpty()) {
       return notFound("Cannot find a series with id {}", seriesId);

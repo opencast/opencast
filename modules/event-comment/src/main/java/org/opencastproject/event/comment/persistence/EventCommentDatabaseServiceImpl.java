@@ -336,7 +336,7 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
   }
 
   private void updateCommentsInIndex(String eventId) throws EventCommentDatabaseException {
-    String organization = securityService.getOrganization().getId();
+    Organization organization = securityService.getOrganization();
     User user = securityService.getUser();
 
     Function<Optional<Event>, Optional<Event>> updateFunction = getEventUpdateFunction(eventId);
@@ -385,12 +385,12 @@ public class EventCommentDatabaseServiceImpl extends AbstractIndexProducer imple
                       current[0] += getComments(eventId).size();
                       i++;
 
-                      var updatedEventData = index.getEvent(eventId, orgId, securityService.getUser());
+                      var updatedEventData = index.getEvent(eventId, organization, securityService.getUser());
                       updatedEventData = getEventUpdateFunction(eventId).apply(updatedEventData);
                       updatedEventData.ifPresent(updatedEventRange::add);
 
                       if (updatedEventRange.size() >= n || i >= eventsWithComments.get(orgId).size()) {
-                        index.bulkEventUpdate(updatedEventRange);
+                        index.bulkEventUpdate(updatedEventRange, organization);
                         logIndexRebuildProgress(logger, total, current[0], n);
                         updatedEventRange.clear();
                       }

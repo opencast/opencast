@@ -1432,8 +1432,8 @@ public class SchedulerServiceImplTest {
     EasyMock.reset(index);
     EasyMock.expect(index.getIndexName()).andReturn("index").anyTimes();
     EasyMock.expect(index.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result).anyTimes();
-    EasyMock.expect(index.addOrUpdateEvent(EasyMock.anyString(), EasyMock.anyObject(java.util.function.Function.class),
-            EasyMock.anyString(), EasyMock.anyObject(User.class))).andReturn(Optional.empty()).times(orgList.size());
+    expect(index.addOrUpdateEvent(EasyMock.anyString(), EasyMock.anyObject(java.util.function.Function.class),
+            EasyMock.anyObject(Organization.class), EasyMock.anyObject(User.class))).andReturn(Optional.empty()).times(orgList.size());
     EasyMock.replay(index, result);
     schedSvc.setIndex(index);
 
@@ -1630,8 +1630,9 @@ public class SchedulerServiceImplTest {
 
     ElasticsearchIndex esIndex = EasyMock.createNiceMock(ElasticsearchIndex.class);
     EasyMock.expect(esIndex.addOrUpdateEvent(EasyMock.anyString(),
-            EasyMock.anyObject(java.util.function.Function.class), EasyMock.anyString(),
-            EasyMock.anyObject(User.class))).andReturn(Optional.empty()).atLeastOnce();
+            EasyMock.anyObject(java.util.function.Function.class),
+            EasyMock.anyObject(Organization.class), EasyMock.anyObject(User.class)))
+        .andReturn(Optional.empty()).atLeastOnce();
     EasyMock.replay(esIndex);
 
     AssetManagerImpl am = new AssetManagerImpl();

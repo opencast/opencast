@@ -53,6 +53,7 @@ import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
+import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.IoSupport;
@@ -180,8 +181,8 @@ public class TestTasksEndpoint extends TasksEndpoint {
     EasyMock.replay(authorizationService);
 
     ElasticsearchIndex esIndex = EasyMock.createNiceMock(ElasticsearchIndex.class);
-    EasyMock.expect(esIndex.addOrUpdateEvent(EasyMock.anyString(), EasyMock.anyObject(Function.class),
-            EasyMock.anyString(), EasyMock.anyObject(User.class))).andReturn(Optional.empty()).atLeastOnce();
+    expect(esIndex.addOrUpdateEvent(EasyMock.anyString(), anyObject(Function.class),
+            anyObject(Organization.class), anyObject(User.class))).andReturn(Optional.empty()).atLeastOnce();
     EasyMock.replay(esIndex);
 
     AssetManagerImpl am = new AssetManagerImpl();

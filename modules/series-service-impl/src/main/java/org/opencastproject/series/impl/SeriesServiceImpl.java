@@ -613,11 +613,11 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
    *          The series id
    */
   private void removeSeriesFromIndex(String seriesId) {
-    String orgId = securityService.getOrganization().getId();
+    Organization organization = securityService.getOrganization();
     logger.debug("Removing series {} from the {} index.", seriesId, index.getIndexName());
 
     try {
-      index.deleteSeries(seriesId, orgId);
+      index.deleteSeries(seriesId, organization);
       logger.debug("Series {} removed from the {} index.", seriesId, index.getIndexName());
     } catch (SearchIndexException e) {
       logger.error("Series {} couldn't be removed from the {} index.", seriesId, index.getIndexName(), e);
@@ -633,7 +633,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
    *          The type of extended metadata to remove
    */
   private void removeSeriesExtendedMetadataFromIndex(String seriesId, String type) {
-    String orgId = securityService.getOrganization().getId();
+    Organization organization = securityService.getOrganization();
     logger.debug("Removing extended metadata of series {} from the {} index.", seriesId, index.getIndexName());
 
     // update series
@@ -645,7 +645,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       }
       return Optional.empty();
     };
-    updateSeriesInIndex(seriesId, orgId, updateFunction);
+    updateSeriesInIndex(seriesId, organization, updateFunction);
   }
 
   /**
@@ -660,13 +660,13 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
    */
   private void updateSeriesExtendedMetadataInIndex(String seriesId, DublinCoreCatalog dc,
           String type) {
-    String orgId = securityService.getOrganization().getId();
+    Organization organization = securityService.getOrganization();
     logger.debug("Updating extended metadata of series {} in the {} index.", seriesId, index.getIndexName());
 
     // update series
     Function<Optional<Series>, Optional<Series>> updateFunction =
-            getExtendedMetadataUpdateFunction(seriesId, dc, type, orgId);
-    updateSeriesInIndex(seriesId, orgId, updateFunction);
+            getExtendedMetadataUpdateFunction(seriesId, dc, type, organization.getId());
+    updateSeriesInIndex(seriesId, organization, updateFunction);
   }
 
   /**
@@ -724,12 +724,16 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
    *          The dublin core catalog
    */
   private void updateSeriesMetadataInIndex(String seriesId, DublinCoreCatalog dc) {
-    String orgId = securityService.getOrganization().getId();
+    Organization organization = securityService.getOrganization();
     logger.debug("Updating metadata of series {} in the {} index.", seriesId, index.getIndexName());
 
     // update series
-    Function<Optional<Series>, Optional<Series>> updateFunction = getMetadataUpdateFunction(seriesId, dc, orgId);
-    updateSeriesInIndex(seriesId, orgId, updateFunction);
+    Function<Optional<Series>, Optional<Series>> updateFunction = getMetadataUpdateFunction(
+        seriesId,
+        dc,
+        organization.getId()
+    );
+    updateSeriesInIndex(seriesId, organization, updateFunction);
   }
 
   /**
@@ -773,10 +777,14 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
    *          The acl to update
    */
   private void updateSeriesAclInIndex(String seriesId, AccessControlList acl) {
-    String orgId = securityService.getOrganization().getId();
+    Organization organization = securityService.getOrganization();
     logger.debug("Updating ACL of series {} in the {} index.", seriesId, index.getIndexName());
-    Function<Optional<Series>, Optional<Series>> updateFunction = getAclUpdateFunction(seriesId, acl, orgId);
-    updateSeriesInIndex(seriesId, orgId, updateFunction);
+    Function<Optional<Series>, Optional<Series>> updateFunction = getAclUpdateFunction(
+        seriesId,
+        acl,
+        organization.getId()
+    );
+    updateSeriesInIndex(seriesId, organization, updateFunction);
   }
 
   /**
@@ -815,11 +823,11 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
    *          The value of the property (optional)
    */
   private void updateThemePropertyInIndex(String seriesId, Optional<String> propertyValueOpt) {
-    String orgId = securityService.getOrganization().getId();
+    Organization organization = securityService.getOrganization();
     logger.debug("Updating theme property of series {} in the {} index.", seriesId, index.getIndexName());
     Function<Optional<Series>, Optional<Series>> updateFunction =
-            getThemePropertyUpdateFunction(seriesId, propertyValueOpt, orgId);
-    updateSeriesInIndex(seriesId, orgId, updateFunction);
+            getThemePropertyUpdateFunction(seriesId, propertyValueOpt, organization.getId());
+    updateSeriesInIndex(seriesId, organization, updateFunction);
   }
 
   /**
@@ -853,19 +861,19 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
    *          The series id
    * @param updateFunctions
    *          The function(s) to do the actual updating
-   * @param orgId
+   * @param organization
    *          The id of the current organization
    * @return the updated series (optional)
    */
   @SafeVarargs
-  private  Optional<Series> updateSeriesInIndex(String seriesId, String orgId,
+  private  Optional<Series> updateSeriesInIndex(String seriesId, Organization organization,
           Function<Optional<Series>, Optional<Series>>... updateFunctions) {
     User user = securityService.getUser();
     Function<Optional<Series>, Optional<Series>> updateFunction = Arrays.stream(updateFunctions)
             .reduce(Function.identity(), Function::andThen);
 
     try {
-      Optional<Series> seriesOpt = index.addOrUpdateSeries(seriesId, updateFunction, orgId, user);
+      Optional<Series> seriesOpt = index.addOrUpdateSeries(seriesId, updateFunction, organization, user);
       logger.debug("Series {} updated in the {} index", seriesId, index.getIndexName());
       return seriesOpt;
     } catch (SearchIndexException e) {
