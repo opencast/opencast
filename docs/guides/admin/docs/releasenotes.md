@@ -1,11 +1,19 @@
 # Opencast 17: Release Notes
 
+## Opencast 17.9
+
+This version contains new releases of both the admin ui
+([17.x-2025-10-23](https://github.com/opencast/opencast-admin-interface/releases/tag/17.x-2025-10-23)) and the editor
+([17.x-2025-10-23](https://github.com/opencast/opencast-editor/releases/tag/17.x-2025-10-23)).
+
 ## Opencast 17.8
 
-This version contains two **security fixes**! One of them is a cross-site-scripting vulnerability in the Paella Player.
-The other allowed accidental publishing in the Opencast Editor.
-More detailed security advisories will be published shortly. It is advised to update to this version in a timely
-fashion.
+This version contains two **security fixes**!
+One of them is a cross-site-scripting vulnerability in the
+Paella Player (see [GHSA-m2vg-rmq6-p62r](https://github.com/opencast/opencast/security/advisories/GHSA-m2vg-rmq6-p62r)).
+The other allowed accidental publishing in the Opencast Editor (see
+[GHSA-x6vw-p693-jjhv](https://github.com/opencast/opencast/security/advisories/GHSA-x6vw-p693-jjhv))
+It is advised to update to this version in a timely fashion
 
 This version also contains new releases of both the admin ui
 ([17.x-2025-09-26](https://github.com/opencast/opencast-admin-interface/releases/tag/17.x-2025-09-26)) and the editor
