@@ -33,17 +33,12 @@
     </track>
   </media>
   <metadata>
-    <catalog id="episode-dc-published" type="dublincore/episode">
+    <catalog id="episode-dc" type="dublincore/episode">
       <mimetype>text/xml</mimetype>
       <tags />
       <url>http://10.10.10.50/static/mh_default_org/engage-live/episode.xml</url>
       <checksum type="md5">95f603259144c7635d5ccae75eef433c
       </checksum>
-    </catalog>
-    <catalog id="23113662-1a84-457a-85d5-0b3e32d2413a" type="dublincore/series">
-      <mimetype>text/xml</mimetype>
-      <tags />
-      <url>http://10.10.10.50/static/mh_default_org/engage-live/series.xml</url>
     </catalog>
   </metadata>
   <attachments>

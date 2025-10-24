@@ -20,49 +20,30 @@
  */
 package org.opencastproject.liveschedule.impl;
 
+import static org.opencastproject.liveschedule.api.LiveScheduleService.LIVE_CHANNEL_ID;
+import static org.opencastproject.liveschedule.impl.LiveScheduleServiceImpl.DEFAULT_LIVE_TARGET_FLAVOR;
+import static org.opencastproject.liveschedule.impl.LiveTracksCreator.CA_PROPERTY_RESOLUTION_URL_PREFIX;
+
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Version;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.distribution.api.DownloadDistributionService;
-import org.opencastproject.job.api.Job;
-import org.opencastproject.liveschedule.api.LiveScheduleService;
-import org.opencastproject.mediapackage.Attachment;
-import org.opencastproject.mediapackage.Catalog;
+import org.opencastproject.liveschedule.publication.ArchiveUpdater;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
-import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
-import org.opencastproject.mediapackage.MediaPackageElementFlavor;
-import org.opencastproject.mediapackage.MediaPackageElements;
-import org.opencastproject.mediapackage.Publication;
+import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.VideoStream;
-import org.opencastproject.mediapackage.identifier.IdImpl;
-import org.opencastproject.metadata.dublincore.DublinCore;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
-import org.opencastproject.metadata.dublincore.DublinCoreCatalogService;
-import org.opencastproject.metadata.dublincore.DublinCoreValue;
-import org.opencastproject.metadata.dublincore.DublinCores;
+import org.opencastproject.mediapackage.track.TrackImpl;
 import org.opencastproject.search.api.SearchService;
-import org.opencastproject.security.api.AccessControlEntry;
-import org.opencastproject.security.api.AccessControlList;
-import org.opencastproject.security.api.AclScope;
-import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.Organization;
-import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.util.SecurityUtil;
-import org.opencastproject.series.api.SeriesService;
-import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.ChecksumType;
-import org.opencastproject.util.DateTimeSupport;
-import org.opencastproject.util.MimeType;
-import org.opencastproject.util.MimeTypes;
-import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.easymock.Capture;
@@ -74,803 +55,579 @@ import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentContext;
 
 import java.net.URI;
-import java.net.URISyntaxException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import junit.framework.AssertionFailedError;
 
 public class LiveScheduleServiceImplTest {
 
+  // constants
   private static final String MP_ID = "c3d913f6-9af7-403a-91a9-33b73ee18193";
-  private static final String SERIES_ID = "20170119999";
+  private static final String CACHED_VERSION = "100";
   private static final String CAPTURE_AGENT_NAME = "fake-ca";
-  private static final String MIME_TYPE = "video/x-flv";
+  private static final String NEW_CA = "new-ca";
+  private static final String CA_WITH_PROPERTIES = "ca-with-properties";
   private static final String STREAMING_SERVER_URL = "rtmp://cp999999.live.edgefcs.net/live";
   private static final String STREAM_NAME = "#{id}-#{caName}-#{flavor}-stream-#{resolution}_suffix";
-  private static final long DURATION = 60000L;
   private static final String ORG_ID = "org";
   private static final String ENGAGE_URL = "htttp://engage.server";
+  private static final String MIMETYPE = "video/x-flv";
+  private static final String RESOLUTION = "1920x540,960x270";
+  private static final String FLAVORS = "presenter/delivery,presentation/delivery";
+
+  private static final DateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm", Locale.ENGLISH);
 
   /** The service to test */
   private LiveScheduleServiceImpl service;
 
-  private MimeType mimeType;
+  //private MimeType mimeType;
+
+  // services
+  private ComponentContext cc;
+  private BundleContext bc;
+  private SearchService searchService;
+  private CaptureAgentStateService captureAgentService;
+  private Workspace workspace;
+  private DownloadDistributionService downloadDistributionService;
+  private AssetManager assetManager;
+  private SecurityService securityService;
   private Organization org;
   private Snapshot snapshot;
   private Version version;
 
-  private ComponentContext cc;
-  private SearchService searchService;
-  private SeriesService seriesService;
-  private ServiceRegistry serviceRegistry;
-  private CaptureAgentStateService captureAgentService;
-  private Workspace workspace;
-  private DownloadDistributionService downloadDistributionService;
-  private DublinCoreCatalogService dublinCoreService;
-  private AssetManager assetManager;
-  private AuthorizationService authService;
-  private OrganizationDirectoryService organizationService;
-  private SecurityService securityService;
-
-  private DublinCoreCatalog episodeDC;
-  private DublinCoreCatalog seriesDC;
+  // media packages
+  private MediaPackage archivedMediapackage;
+  private MediaPackage liveArchivedMediapackage;
+  private MediaPackage searchMp;
+  private MediaPackage liveSearchMp;
+  private Properties caProps;
 
   @Before
   public void setUp() throws Exception {
-    mimeType = MimeTypes.parseMimeType(MIME_TYPE);
-    URI catalogURI = LiveScheduleServiceImplTest.class.getResource("/episode.xml").toURI();
-    episodeDC = DublinCores.read(catalogURI.toURL().openStream());
-    catalogURI = LiveScheduleServiceImplTest.class.getResource("/series.xml").toURI();
-    seriesDC = DublinCores.read(catalogURI.toURL().openStream());
 
-    // Osgi Services
-    serviceRegistry = EasyMock.createNiceMock(ServiceRegistry.class);
-    searchService = EasyMock.createNiceMock(SearchService.class);
-    seriesService = EasyMock.createNiceMock(SeriesService.class);
-    captureAgentService = EasyMock.createNiceMock(CaptureAgentStateService.class);
-    EasyMock.expect(captureAgentService.getAgentCapabilities("demo-capture-agent")).andReturn(new Properties());
-    downloadDistributionService = EasyMock.createNiceMock(DownloadDistributionService.class);
-    EasyMock.expect(downloadDistributionService.getDistributionType())
-            .andReturn(LiveScheduleServiceImpl.DEFAULT_LIVE_DISTRIBUTION_SERVICE).anyTimes();
-    workspace = EasyMock.createNiceMock(Workspace.class);
-    dublinCoreService = EasyMock.createNiceMock(DublinCoreCatalogService.class);
-    assetManager = EasyMock.createNiceMock(AssetManager.class);
-    authService = new AuthorizationServiceMock();
-    organizationService = EasyMock.createNiceMock(OrganizationDirectoryService.class);
+    // media packages
+    URI mpURI = LiveScheduleServiceImplTest.class.getResource("/assetmanager-mp-live.xml").toURI();
+    liveArchivedMediapackage = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()
+        .loadFromXml(mpURI.toURL().openStream());
 
+    mpURI = LiveScheduleServiceImplTest.class.getResource("/search-mp-live.xml").toURI();
+    liveSearchMp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().loadFromXml(mpURI.toURL()
+        .openStream());
+
+    archivedMediapackage = (MediaPackage) liveArchivedMediapackage.clone();
+    archivedMediapackage.clearElements(MediaPackageElement.Type.Publication);
+
+    searchMp = (MediaPackage) liveSearchMp.clone();
+    searchMp.clearElements(MediaPackageElement.Type.Track);
+    searchMp.add(TrackImpl.fromURI(new URI("https://opencast.org/test.mp4")));
+
+    //mimeType = MimeTypes.parseMimeType(MIME_TYPE);
+
+    // services
     Organization defOrg = new DefaultOrganization();
     Map<String, String> orgProps = new HashMap<>();
-    orgProps.put(LiveScheduleServiceImpl.ENGAGE_URL_PROPERTY, ENGAGE_URL);
+    orgProps.put(ArchiveUpdater.ENGAGE_URL_PROPERTY, ENGAGE_URL);
     org = new JaxbOrganization(ORG_ID, "Test Organization", defOrg.getServers(), defOrg.getAdminRole(),
-            defOrg.getAnonymousRole(), orgProps);
-    EasyMock.expect(organizationService.getOrganization(ORG_ID)).andReturn(org).anyTimes();
+        defOrg.getAnonymousRole(), orgProps);
+
+    searchService = EasyMock.createNiceMock(SearchService.class);
+    workspace = EasyMock.createNiceMock(Workspace.class);
+
+    assetManager = EasyMock.createNiceMock(AssetManager.class);
+    version = EasyMock.createNiceMock(Version.class);
+    snapshot = EasyMock.createNiceMock(Snapshot.class);
+    EasyMock.expect(snapshot.getOrganizationId()).andReturn(org.getId()).anyTimes();
+    EasyMock.expect(snapshot.getVersion()).andReturn(version);
+    EasyMock.expect(assetManager.getLatestSnapshot(EasyMock.anyString()))
+        .andReturn(Optional.of(snapshot)).anyTimes();
+
+    captureAgentService = EasyMock.createNiceMock(CaptureAgentStateService.class);
+    caProps = new Properties();
+    caProps.put(CA_PROPERTY_RESOLUTION_URL_PREFIX + "960x270", STREAMING_SERVER_URL
+        + "/c3d913f6-9af7-403a-91a9-33b73ee18193-another-capture-agent-presenter-"
+        + "delivery-stream-960x270_suffix_from_ca");
+    caProps.put(CA_PROPERTY_RESOLUTION_URL_PREFIX + "1920x540", STREAMING_SERVER_URL
+        + "/c3d913f6-9af7-403a-91a9-33b73ee18193-another-capture-agent-presenter-"
+        + "delivery-stream-1920x540_suffix_from_ca");
+    EasyMock.expect(captureAgentService.getAgentCapabilities(CA_WITH_PROPERTIES)).andReturn(caProps).anyTimes();
+
+    downloadDistributionService = EasyMock.createNiceMock(DownloadDistributionService.class);
+    EasyMock.expect(downloadDistributionService.getDistributionType())
+        .andReturn(LiveScheduleServiceImpl.DEFAULT_LIVE_DISTRIBUTION_SERVICE).anyTimes();
 
     securityService = EasyMock.createNiceMock(SecurityService.class);
     EasyMock.expect(securityService.getOrganization()).andReturn(org).anyTimes();
     EasyMock.expect(securityService.getUser()).andReturn(null);
 
-    // Live service configuration
-    BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
+    // configuration
+    bc = EasyMock.createNiceMock(BundleContext.class);
     EasyMock.expect(bc.getProperty(SecurityUtil.PROPERTY_KEY_SYS_USER)).andReturn("system-user");
     Dictionary<String, Object> props = new Hashtable<>();
     props.put(LiveScheduleServiceImpl.LIVE_STREAMING_URL, STREAMING_SERVER_URL);
-    props.put(LiveScheduleServiceImpl.LIVE_STREAM_MIME_TYPE, "video/x-flv");
+    props.put(LiveScheduleServiceImpl.LIVE_STREAM_MIME_TYPE, MIMETYPE);
     props.put(LiveScheduleServiceImpl.LIVE_STREAM_NAME, STREAM_NAME);
-    props.put(LiveScheduleServiceImpl.LIVE_STREAM_RESOLUTION, "1920x540,960x270");
-    props.put(LiveScheduleServiceImpl.LIVE_TARGET_FLAVORS, "presenter/delivery");
+    props.put(LiveScheduleServiceImpl.LIVE_STREAM_RESOLUTION, RESOLUTION);
+    props.put(LiveScheduleServiceImpl.LIVE_TARGET_FLAVORS, FLAVORS);
 
     cc = EasyMock.createNiceMock(ComponentContext.class);
     EasyMock.expect(cc.getBundleContext()).andReturn(bc);
     EasyMock.expect(cc.getProperties()).andReturn(props);
-    EasyMock.replay(bc, cc);
+  }
 
+  private void replayAndActivate() {
+    EasyMock.replay(bc, cc, searchService, captureAgentService, downloadDistributionService,
+        workspace, assetManager, securityService, snapshot, version);
+
+    // live service
     service = new LiveScheduleServiceImpl();
-    service.setJobPollingInterval(1L);
     service.setSearchService(searchService);
-    service.setSeriesService(seriesService);
     service.setCaptureAgentService(captureAgentService);
-    service.setServiceRegistry(serviceRegistry);
     service.setWorkspace(workspace);
-    service.setDublinCoreService(dublinCoreService);
     service.setAssetManager(assetManager);
-    service.setAuthorizationService(authService);
-    service.setOrganizationService(organizationService);
     service.setSecurityService(securityService);
+    service.getSnapshotVersionCache().put(MP_ID, CACHED_VERSION);
+    service.setDownloadDistributionService(downloadDistributionService);
     service.activate(cc);
   }
 
-  private void replayServices() {
-    EasyMock.replay(searchService, seriesService, serviceRegistry, captureAgentService, downloadDistributionService,
-            workspace, dublinCoreService, assetManager, organizationService, securityService);
-  }
+  /**
+   * Create
+   */
 
-  private void assertExpectedLiveTracks(Track[] liveTracks, long duration, String caName, String suffix,
-          boolean hasPresentation) {
-    int tracksExpected = hasPresentation ? 4 : 2;
-    Assert.assertEquals(tracksExpected, liveTracks.length);
+  @Test
+  public void testCreate() throws Exception {
+    // capture
+    Capture<MediaPackage> capturedSnapshotMp = Capture.newInstance();
+    Capture<MediaPackage> capturedSearchMp = Capture.newInstance();
+    Capture<Set<String>> capturedDistributedElements = Capture.newInstance();
+    EasyMock.expect(downloadDistributionService.distributeSync(EasyMock.anyString(),
+        EasyMock.anyObject(MediaPackage.class), EasyMock.capture(capturedDistributedElements), EasyMock.anyBoolean()))
+        .andReturn(Stream.concat(Arrays.stream(liveSearchMp.getAttachments()),
+            Arrays.stream(liveSearchMp.getCatalogs())).collect(Collectors.toList()));
+    EasyMock.expect(assetManager.takeSnapshot(EasyMock.capture(capturedSnapshotMp))).andReturn(snapshot);
+    searchService.addSynchronously(EasyMock.capture(capturedSearchMp));
+    EasyMock.expectLastCall().atLeastOnce();
+    Set<String> elementIdsToPublish = Arrays.stream(archivedMediapackage.getElements()).map(
+        MediaPackageElement::getIdentifier).collect(Collectors.toSet());
 
-    boolean[] presenterFound = new boolean[2];
-    boolean[] presentationFound = new boolean[2];
-    // Order may vary so that's why we loop
-    for (Track track : liveTracks) {
-      if (track.getURI().toString().contains("presenter")) {
-        if (((VideoStream) track.getStreams()[0]).getFrameHeight() == 270) {
-          Assert.assertEquals(
-                  STREAMING_SERVER_URL + "/" + MP_ID + "-" + caName + "-presenter-delivery-stream-960x270" + suffix,
-                  track.getURI().toString());
-          assertLiveTrack(track, duration, 270, 960);
-          presenterFound[0] = true;
-        } else {
-          Assert.assertEquals(
-                  STREAMING_SERVER_URL + "/" + MP_ID + "-" + caName + "-presenter-delivery-stream-1920x540" + suffix,
-                  track.getURI().toString());
-          assertLiveTrack(track, duration, 540, 1920);
-          presenterFound[1] = true;
-        }
-      } else {
-        if (((VideoStream) track.getStreams()[0]).getFrameHeight() == 270) {
-          Assert.assertEquals(
-                  STREAMING_SERVER_URL + "/" + MP_ID + "-" + caName + "-presentation-delivery-stream-960x270" + suffix,
-                  track.getURI().toString());
-          assertLiveTrack(track, duration, 270, 960);
-          presentationFound[0] = true;
-        } else {
-          Assert.assertEquals(
-                  STREAMING_SERVER_URL + "/" + MP_ID + "-" + caName + "-presentation-delivery-stream-1920x540" + suffix,
-                  track.getURI().toString());
-          assertLiveTrack(track, duration, 540, 1920);
-          presentationFound[1] = true;
-        }
-      }
+    // replay
+    replayAndActivate();
+
+    Date startDate = format.parse("2023-12-03T10:15");
+    Date endDate = format.parse("2023-12-03T13:15");
+    service.createLiveEvent(archivedMediapackage, startDate, endDate, CAPTURE_AGENT_NAME);
+
+    // check
+    MediaPackage newArchivedMp = capturedSnapshotMp.getValue();
+    MediaPackage newSearchMp = capturedSearchMp.getValue();
+
+    // distribution
+    Set<String> distributedElements = capturedDistributedElements.getValue();
+    Assert.assertEquals(elementIdsToPublish, distributedElements);
+
+    // search
+    Assert.assertEquals(MP_ID, newSearchMp.getIdentifier().toString());
+    Assert.assertEquals(0, newSearchMp.getPublications().length);
+
+    Set<String> newSearchElementIds = Stream.concat(Arrays.stream(newSearchMp.getAttachments()),
+        Arrays.stream(newSearchMp.getCatalogs())).map(MediaPackageElement::getIdentifier).collect(Collectors.toSet());
+    Assert.assertEquals(distributedElements, newSearchElementIds);
+    Assert.assertEquals(liveSearchMp, newSearchMp);
+
+    //check live tracks
+    Assert.assertEquals(4, newSearchMp.getTracks().length); // flavor * resolutions
+    Set<String> trackResolutions = new HashSet<>();
+    for (Track track: newSearchMp.getTracks()) {
+      Assert.assertTrue(FLAVORS.contains(track.getFlavor().toString()));
+      Assert.assertEquals((long) endDate.getTime() - startDate.getTime(), (long) track.getDuration());
+      Assert.assertTrue(track.isLive());
+      Assert.assertEquals(MIMETYPE, track.getMimeType().toString());
+      Assert.assertEquals(1, track.getStreams().length);
+      Assert.assertTrue(track.getStreams()[0] instanceof VideoStream);
+
+      VideoStream stream = (VideoStream) track.getStreams()[0];
+      String resolution = stream.getFrameWidth() + "x" + stream.getFrameHeight();
+      trackResolutions.add(track.getFlavor().toString() + resolution);
+      Assert.assertTrue((RESOLUTION.contains(resolution)));
+      Assert.assertEquals(STREAMING_SERVER_URL + "/" + MP_ID + "-" + CAPTURE_AGENT_NAME + "-"
+              + track.getFlavor().toString().replace("/", "-") + "-stream-" + resolution + "_suffix",
+          track.getURI().toString());
     }
-    // Check if got all expected
-    if (!presenterFound[0] || !presenterFound[1]
-            || (hasPresentation && (!presentationFound[0] || !presentationFound[1]))) {
-      Assert.fail("Didn't get the expected presenter/presentation live tracks");
+    Assert.assertEquals(4, trackResolutions.size()); // different resolutions
+
+    // archive
+    Assert.assertEquals(MP_ID, newArchivedMp.getIdentifier().toString());
+    Assert.assertEquals(1, newArchivedMp.getPublications().length);
+    Assert.assertEquals(LIVE_CHANNEL_ID, newArchivedMp.getPublications()[0].getChannel());
+    Assert.assertArrayEquals(newSearchMp.getElements(), newArchivedMp.getPublications()[0].getElements());
+    Assert.assertArrayEquals(archivedMediapackage.getElements(), newArchivedMp.getElements());
+    Assert.assertEquals(version.toString(), service.getSnapshotVersionCache().getIfPresent(MP_ID));
+    Assert.assertEquals(liveArchivedMediapackage, newArchivedMp);
+  }
+
+  /**
+   * Update
+   */
+
+  @Test
+  public void testUpdateLiveTracks() throws Exception {
+    // setup
+    EasyMock.expect(searchService.get(EasyMock.anyString())).andReturn(liveSearchMp);
+    EasyMock.expect(snapshot.getMediaPackage()).andReturn(liveArchivedMediapackage).anyTimes();
+
+    // capture
+    Capture<MediaPackage> capturedSnapshotMp = Capture.newInstance();
+    Capture<MediaPackage> capturedSearchMp = Capture.newInstance();
+    EasyMock.expect(assetManager.takeSnapshot(EasyMock.capture(capturedSnapshotMp))).andReturn(snapshot);
+    searchService.addSynchronously(EasyMock.capture(capturedSearchMp));
+    EasyMock.expectLastCall().atLeastOnce();
+
+    // replay
+    replayAndActivate();
+
+    // change dates & capture agent
+    Date startDate = format.parse("2011-12-03T10:15");
+    Date endDate = format.parse("2011-12-03T11:45");
+    service.updateLiveTracks(MP_ID, startDate, endDate, NEW_CA);
+
+    // check
+    EasyMock.verify(assetManager, searchService);
+
+    MediaPackage newSearchMp = capturedSearchMp.getValue();
+    MediaPackage newArchivedMp = capturedSnapshotMp.getValue();
+
+    // tracks are the same in search & archive publication
+    Assert.assertArrayEquals(newSearchMp.getTracks(), newArchivedMp.getPublications()[0].getTracks());
+
+    // check duration & ca agent in URL
+    long duration = 90 * 60 * 1000;
+    Assert.assertEquals(liveSearchMp.getTracks().length, newSearchMp.getTracks().length);
+    for (Track track : newSearchMp.getTracks()) {
+      Assert.assertEquals(duration, (long) track.getDuration());
+      Assert.assertTrue(track.getURI().toString().contains(NEW_CA));
     }
   }
 
-  private void assertLiveTrack(Track liveTrack, long duration, int height, int width) {
-    Assert.assertEquals(new Long(duration), liveTrack.getDuration());
-    Assert.assertEquals(mimeType, liveTrack.getMimeType());
-    Assert.assertEquals(true, liveTrack.isLive());
-    Assert.assertEquals(1, liveTrack.getStreams().length);
-    Assert.assertEquals(height, ((VideoStream) liveTrack.getStreams()[0]).getFrameHeight().intValue());
-    Assert.assertEquals(width, ((VideoStream) liveTrack.getStreams()[0]).getFrameWidth().intValue());
-  }
-
-  private Job createJob(long id, String elementId, String payload) {
-    Job job = EasyMock.createNiceMock(Job.class);
-    List<String> args = new ArrayList<>();
-    args.add("anything");
-    args.add("anything");
-    args.add(elementId);
-    EasyMock.expect(job.getId()).andReturn(id).anyTimes();
-    EasyMock.expect(job.getArguments()).andReturn(args).anyTimes();
-    EasyMock.expect(job.getPayload()).andReturn(payload).anyTimes();
-    EasyMock.expect(job.getStatus()).andReturn(Job.Status.FINISHED).anyTimes();
-    EasyMock.expect(job.getDateCreated()).andReturn(new Date()).anyTimes();
-    EasyMock.expect(job.getDateStarted()).andReturn(new Date()).anyTimes();
-    EasyMock.expect(job.getQueueTime()).andReturn(new Long(0)).anyTimes();
-    EasyMock.replay(job);
-    return job;
-  }
 
   @Test
-  public void testReplaceVariables() throws Exception {
-    replayServices();
-
-    MediaPackageElementFlavor flavor = new MediaPackageElementFlavor("presenter", "delivery");
-
-    String expectedStreamName = MP_ID + "-" + CAPTURE_AGENT_NAME + "-presenter-delivery-stream-3840x1080_suffix";
-    String actualStreamName = service.replaceVariables(MP_ID, CAPTURE_AGENT_NAME, STREAM_NAME, flavor, "3840x1080");
-
-    Assert.assertEquals(expectedStreamName, actualStreamName);
-  }
-
-  @Test
-  public void testBuildStreamingTrack() throws Exception {
-    replayServices();
-
-    String uriString = "rtmp://rtmp://streaming.harvard.edu/live/stream";
-    MediaPackageElementFlavor flavor = new MediaPackageElementFlavor("presenter", "delivery");
-
-    assertLiveTrack(service.buildStreamingTrack(uriString, flavor, MIME_TYPE, "16x9", DURATION), DURATION, 9, 16);
-  }
-
-  @Test
-  public void testAddLiveTracksUsingDefaultProperties() throws Exception {
-    replayServices();
-
-    MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
-    mp.setIdentifier(new IdImpl(MP_ID));
-    mp.setDuration(DURATION);
-
-    service.addLiveTracksToMediaPackage(mp, episodeDC);
-    assertExpectedLiveTracks(mp.getTracks(), DURATION, CAPTURE_AGENT_NAME, "_suffix", false);
-  }
-
-  @Test
-  public void testAddLiveTracksUsingCaptureAgentProperties() throws Exception {
-    Properties props = new Properties();
-    props.put(LiveScheduleServiceImpl.CA_PROPERTY_RESOLUTION_URL_PREFIX + "960x270", STREAMING_SERVER_URL
-        + "/c3d913f6-9af7-403a-91a9-33b73ee18193-another-capture-agent-presenter-"
-        + "delivery-stream-960x270_suffix_from_ca");
-    props.put(LiveScheduleServiceImpl.CA_PROPERTY_RESOLUTION_URL_PREFIX + "1920x540", STREAMING_SERVER_URL
-        + "/c3d913f6-9af7-403a-91a9-33b73ee18193-another-capture-agent-presenter-"
-        + "delivery-stream-1920x540_suffix_from_ca");
-    EasyMock.expect(captureAgentService.getAgentCapabilities("another-capture-agent")).andReturn(props).anyTimes();
-    replayServices();
-
-    MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
-    mp.setIdentifier(new IdImpl(MP_ID));
-    mp.setDuration(DURATION);
-
-    episodeDC.set(DublinCore.PROPERTY_SPATIAL, DublinCoreValue.mk("another-capture-agent"));
-    service.addLiveTracksToMediaPackage(mp, episodeDC);
-    assertExpectedLiveTracks(mp.getTracks(), DURATION, "another-capture-agent", "_suffix_from_ca", false);
-  }
-
-  @Test
-  public void testAddAndDistributeElements() throws Exception {
-    EasyMock.expect(seriesService.getSeries(SERIES_ID)).andReturn(seriesDC).anyTimes();
-
-    Job job = createJob(1L, "anything", "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-        + "<catalog id=\"9ad6ebcb-b414-4b15-ab62-5e5ddede447e\" type=\"dublincore/episode\" "
-        + "xmlns=\"http://mediapackage.opencastproject.org\">"
-        + "<mimetype>text/xml</mimetype>"
-        + "<url>http://10.10.10.50/static/mh_default_org/engage-live/episode.xml</url></catalog>"
-        + "###<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-        + "<catalog id=\"23113662-1a84-457a-85d5-0b3e32d2413a\" type=\"dublincore/series\" "
-        + "xmlns=\"http://mediapackage.opencastproject.org\">"
-        + "<mimetype>text/xml</mimetype>"
-        + "<url>http://10.10.10.50/static/mh_default_org/engage-live/series.xml</url></catalog>"
-        + "###<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-        + "<attachment id=\"security-policy-episode\" type=\"security/xacml+episode\" "
-        + "xmlns=\"http://mediapackage.opencastproject.org\">"
-        + "<mimetype>text/xml</mimetype>"
-        + "<url>http://10.10.10.50/static/mh_default_org/engage-live/security_policy_episode.xml</url></attachment>");
-    EasyMock.expect(downloadDistributionService.distribute(EasyMock.anyString(), EasyMock.anyObject(MediaPackage.class),
-            EasyMock.anyObject(Set.class), EasyMock.anyBoolean())).andReturn(job).once();
-    EasyMock.expect(serviceRegistry.getJob(1L)).andReturn(job).anyTimes();
-
-    URI mpURI = LiveScheduleServiceImplTest.class.getResource("/assetmanager-mp.xml").toURI();
-    MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()
-            .loadFromXml(mpURI.toURL().openStream());
-
-    replayServices();
-
-    Snapshot s = EasyMock.createNiceMock(Snapshot.class);
-    EasyMock.expect(s.getMediaPackage()).andReturn(mp);
-    EasyMock.replay(s);
-    service.setDownloadDistributionService(downloadDistributionService);
-
-    MediaPackage mp1 = service.distributeAclsAndCatalogs(s);
-
-    Catalog[] catalogs = mp1.getCatalogs(MediaPackageElements.EPISODE);
-    Assert.assertNotNull(catalogs);
-    Assert.assertEquals(1, catalogs.length);
-    Catalog catalog = catalogs[0];
-    Assert.assertEquals("http://10.10.10.50/static/mh_default_org/engage-live/episode.xml",
-            catalog.getURI().toString());
-    Assert.assertEquals("dublincore/episode", catalog.getFlavor().toString());
-    catalogs = mp1.getCatalogs(MediaPackageElements.SERIES);
-    Assert.assertNotNull(catalogs);
-    Assert.assertEquals(1, catalogs.length);
-    catalog = catalogs[0];
-    Assert.assertEquals("http://10.10.10.50/static/mh_default_org/engage-live/series.xml", catalog.getURI().toString());
-    Assert.assertEquals("dublincore/series", catalog.getFlavor().toString());
-    Attachment[] atts = mp1.getAttachments(MediaPackageElements.XACML_POLICY_EPISODE);
-    Assert.assertNotNull(atts);
-    Assert.assertEquals(1, atts.length);
-    Attachment att = atts[0];
-    Assert.assertEquals("http://10.10.10.50/static/mh_default_org/engage-live/security_policy_episode.xml",
-            att.getURI().toString());
-    Assert.assertEquals("security/xacml+episode", att.getFlavor().toString());
-    EasyMock.verify(downloadDistributionService);
-  }
-
-  @Test
-  public void testReplaceAndDistributeAcl() throws Exception {
-    URI mpURI = LiveScheduleServiceImplTest.class.getResource("/live-mp.xml").toURI();
-    MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()
-            .loadFromXml(mpURI.toURL().openStream());
-
-    Job job = createJob(1L, "anything", "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-        + "<attachment id=\"security-policy-episode\" type=\"security/xacml+episode\" "
-        + "xmlns=\"http://mediapackage.opencastproject.org\">"
-        + "<mimetype>text/xml</mimetype><url>http://host/security-policy-episode.xml</url></attachment>");
-    EasyMock.expect(downloadDistributionService.distribute(EasyMock.anyString(), EasyMock.anyObject(MediaPackage.class),
-            EasyMock.anyObject(String.class), EasyMock.anyBoolean())).andReturn(job).once();
-    EasyMock.expect(serviceRegistry.getJob(1L)).andReturn(job).anyTimes();
-
-    replayServices();
-    service.setDownloadDistributionService(downloadDistributionService);
-
-    AccessControlList acl = new AccessControlList(new AccessControlEntry("user", "read", true));
-
-    MediaPackage mp1 = service.replaceAndDistributeAcl(mp, acl);
-
-    Attachment[] atts = mp1.getAttachments(MediaPackageElements.XACML_POLICY_EPISODE);
-    Assert.assertNotNull(atts);
-    Assert.assertEquals(1, atts.length);
-    Attachment att = atts[0];
-    Assert.assertEquals("http://host/security-policy-episode.xml", att.getURI().toString());
-    Assert.assertEquals("security/xacml+episode", att.getFlavor().toString());
-    EasyMock.verify(downloadDistributionService);
-  }
-
-  private void setUpAssetManager(MediaPackage mp) {
-    version = EasyMock.createNiceMock(Version.class);
-    snapshot = EasyMock.createNiceMock(Snapshot.class);
-    EasyMock.expect(snapshot.getMediaPackage()).andReturn(mp).anyTimes();
-    EasyMock.expect(snapshot.getOrganizationId()).andReturn(org.getId()).anyTimes();
-    EasyMock.expect(snapshot.getVersion()).andReturn(version);
-    EasyMock.expect(assetManager.getLatestSnapshot(EasyMock.anyString()))
-        .andReturn(Optional.of(snapshot)).anyTimes();
-    EasyMock.replay(snapshot);
-  }
-
-  @Test
-  public void testGetSnapshot() throws Exception {
-    URI mpURI = LiveScheduleServiceImplTest.class.getResource("/assetmanager-mp.xml").toURI();
-    MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()
-            .loadFromXml(mpURI.toURL().openStream());
-    setUpAssetManager(mp);
-    replayServices();
-
-    Snapshot s = service.getSnapshotFromArchive(MP_ID);
-
-    Assert.assertNotNull(s);
-    MediaPackage mp1 = s.getMediaPackage();
-    Assert.assertNotNull(mp1);
-    Assert.assertEquals(MP_ID, mp1.getIdentifier().toString());
-    Assert.assertEquals("Live Test", mp1.getTitle());
-    Assert.assertEquals("2017-10-12T18:10:59Z", DateTimeSupport.toUTC(mp1.getDate().getTime()));
-    Assert.assertEquals("20170119999", mp1.getSeries());
-    Assert.assertEquals("Test Fall 2017", mp1.getSeriesTitle());
-  }
-
-  @Test
-  public void testGetMediaPackageFromSearch() throws Exception {
-    var id = new IdImpl(MP_ID);
-    var mediaPackage = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew(id);
-    EasyMock.expect(searchService.get(EasyMock.anyString())).andReturn(mediaPackage).anyTimes();
-    replayServices();
-
-    MediaPackage mp = service.getMediaPackageFromSearch(MP_ID);
-    Assert.assertNotNull(mp);
-    Assert.assertEquals(MP_ID, mp.getIdentifier().toString());
-  }
-
-  @Test
-  public void testGetMediaPackageFromSearchNotFound() throws Exception {
-    EasyMock.expect(searchService.get(EasyMock.anyString())).andThrow(new NotFoundException("")).anyTimes();
-    replayServices();
-
-    MediaPackage mp = service.getMediaPackageFromSearch(MP_ID);
-    Assert.assertNull(mp);
-  }
-
-  @Test
-  public void testIsSameMediaPackageTrue() throws Exception {
-    URI mpURI = LiveScheduleServiceImplTest.class.getResource("/assetmanager-mp.xml").toURI();
-    MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()
-            .loadFromXml(mpURI.toURL().openStream());
-    setUpAssetManager(mp);
-    replayServices();
-
-    MediaPackage mp1 = (MediaPackage) service.getSnapshotFromArchive(MP_ID).getMediaPackage().clone();
-    mp1.setDuration(DURATION);
-    service.addLiveTracksToMediaPackage(mp1, episodeDC);
-    MediaPackage mp2 = (MediaPackage) service.getSnapshotFromArchive(MP_ID).getMediaPackage().clone();
-    mp2.setDuration(DURATION);
-    service.addLiveTracksToMediaPackage(mp2, episodeDC);
-
-    Assert.assertTrue(service.isSameMediaPackage(mp1, mp2));
-  }
-
-  @Test
-  public void testIsSameMediaPackageFalse() throws Exception {
-    URI mpURI = LiveScheduleServiceImplTest.class.getResource("/assetmanager-mp.xml").toURI();
-    MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()
-            .loadFromXml(mpURI.toURL().openStream());
-    setUpAssetManager(mp);
-    replayServices();
-
-    MediaPackage mp1 = (MediaPackage) service.getSnapshotFromArchive(MP_ID).getMediaPackage().clone();
-    mp1.setDuration(DURATION);
-    service.addLiveTracksToMediaPackage(mp1, episodeDC);
-    MediaPackage mp2 = (MediaPackage) service.getSnapshotFromArchive(MP_ID).getMediaPackage().clone();
-    mp2.setDuration(DURATION);
-    service.addLiveTracksToMediaPackage(mp2, episodeDC);
-
-    // Change track uri
-    Track track = mp2.getTracks()[0];
-    URI previousURI = track.getURI();
-    track.setURI(new URI("http://new.url.com"));
-    Assert.assertFalse(service.isSameMediaPackage(mp1, mp2));
-    track.setURI(previousURI);
-    Assert.assertTrue(service.isSameMediaPackage(mp1, mp2));
-
-    // Change number of tracks
-    track = (Track) mp2.getTracks()[0].clone();
-    mp2.remove(track);
-    Assert.assertFalse(service.isSameMediaPackage(mp1, mp2));
-    mp2.add(track);
-    Assert.assertTrue(service.isSameMediaPackage(mp1, mp2));
-
-    // Change catalog checksum
-    Catalog catalog = mp2.getCatalogs()[0];
-    Checksum previousChecksum = catalog.getChecksum();
-    catalog.setChecksum(Checksum.create(ChecksumType.DEFAULT_TYPE, "123456abcd"));
-    Assert.assertFalse(service.isSameMediaPackage(mp1, mp2));
-    catalog.setChecksum(previousChecksum);
-    Assert.assertTrue(service.isSameMediaPackage(mp1, mp2));
-
-    // Change attachment flavor
-    Attachment attachment = mp2.getAttachments()[0];
-    MediaPackageElementFlavor previousFlavor = attachment.getFlavor();
-    attachment.setFlavor(MediaPackageElementFlavor.parseFlavor("test/test"));
-    Assert.assertFalse(service.isSameMediaPackage(mp1, mp2));
-    attachment.setFlavor(previousFlavor);
-    Assert.assertTrue(service.isSameMediaPackage(mp1, mp2));
-  }
-
-  @Test
-  public void testPublish() throws Exception {
-    Job job = createJob(1L, "anything", "anything");
-    Capture<MediaPackage> capturedMp = Capture.newInstance();
-    EasyMock.expect(searchService.add(EasyMock.capture(capturedMp))).andReturn(job);
-    EasyMock.expect(serviceRegistry.getJob(1L)).andReturn(job).anyTimes();
-
-    replayServices();
-
-    MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
-    mp.setIdentifier(new IdImpl(MP_ID));
-    service.publishToSearch(mp);
-    Assert.assertEquals(MP_ID, capturedMp.getValue().getIdentifier().toString());
-  }
-
-  @Test
-  public void testAddLivePublicationChannel() throws Exception {
-    URI mpURI = LiveScheduleServiceImplTest.class.getResource("/assetmanager-mp.xml").toURI();
-    MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()
-            .loadFromXml(mpURI.toURL().openStream());
-
-    replayServices();
-
-    snapshot = EasyMock.createNiceMock(Snapshot.class);
-    EasyMock.expect(snapshot.getMediaPackage()).andReturn(mp).anyTimes();
-    EasyMock.expect(snapshot.getOrganizationId()).andReturn(ORG_ID).anyTimes();
-    EasyMock.replay(snapshot);
-
-    service.addLivePublicationToMediaPackage(snapshot, new HashMap<>());
-    Publication[] publications = mp.getPublications();
-    Assert.assertEquals(1, publications.length);
-    Assert.assertEquals(LiveScheduleService.CHANNEL_ID, publications[0].getChannel());
-    Assert.assertEquals("text/html", publications[0].getMimeType().toString());
-    Assert.assertEquals(ENGAGE_URL + "/play/" + MP_ID, publications[0].getURI().toString());
-  }
-
-  @Test
-  public void testRemoveLivePublicationChannel() throws Exception {
-    URI mpURI = LiveScheduleServiceImplTest.class.getResource("/assetmanager-mp-with-live.xml").toURI();
-    MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()
-            .loadFromXml(mpURI.toURL().openStream());
-
-    replayServices();
-
-    service.removeLivePublicationChannel(mp);
-
-    Publication[] publications = mp.getPublications();
-    Assert.assertEquals(0, publications.length);
-  }
-
-  @Test
-  public void testRetract() throws Exception {
-    URI mpURI = LiveScheduleServiceImplTest.class.getResource("/live-mp.xml").toURI();
-    MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()
-            .loadFromXml(mpURI.toURL().openStream());
-
-    Job job1 = createJob(1L, "anything", "anything");
-    Capture<String> capturedMpId = Capture.newInstance();
-    EasyMock.expect(searchService.delete(EasyMock.capture(capturedMpId))).andReturn(job1);
-    EasyMock.expect(serviceRegistry.getJob(1L)).andReturn(job1).anyTimes();
-    Job job2 = createJob(2L, "anything", "anything");
-    EasyMock.expect(downloadDistributionService.retract(EasyMock.anyString(), EasyMock.anyObject(MediaPackage.class),
-            EasyMock.anyObject(Set.class))).andReturn(job2);
-    EasyMock.expect(serviceRegistry.getJob(2L)).andReturn(job2).anyTimes();
-
-    replayServices();
-    service.setDownloadDistributionService(downloadDistributionService);
-
-    service.retract(mp);
-    Assert.assertEquals(MP_ID, capturedMpId.getValue());
-
-    EasyMock.verify(searchService, downloadDistributionService);
-  }
-
-  @Test
-  public void testRetractPreviousElements() throws Exception {
-    URI mpURI = LiveScheduleServiceImplTest.class.getResource("/live-mp.xml").toURI();
-    MediaPackage previousMp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()
-            .loadFromXml(mpURI.toURL().openStream());
-    MediaPackage newMp = (MediaPackage) previousMp.clone();
-
-    // Change element url
-    Catalog catalog = newMp.getCatalog("episode-dc-published");
-    catalog.setURI(new URI("CHANGED/episode_dublincore.xml"));
-
-    Job job = createJob(1L, "anything", "anything");
-    Capture<Set<String>> capturedElementId = Capture.newInstance();
-    EasyMock.expect(downloadDistributionService.retract(EasyMock.anyString(), EasyMock.anyObject(MediaPackage.class),
-            EasyMock.capture(capturedElementId))).andReturn(job);
-    EasyMock.expect(serviceRegistry.getJob(1L)).andReturn(job).anyTimes();
-
-    replayServices();
-    service.setDownloadDistributionService(downloadDistributionService);
-
-    service.retractPreviousElements(previousMp, newMp);
-    Set<String> ids = capturedElementId.getValue();
-    Assert.assertEquals(1, ids.size());
-    Assert.assertEquals("episode-dc-published", ids.iterator().next());
-
-    EasyMock.verify(downloadDistributionService);
-  }
-
-  @Test
-  public void testCreateLiveEvent() throws Exception {
-    URI mpURI = LiveScheduleServiceImplTest.class.getResource("/assetmanager-mp.xml").toURI();
-    MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()
-            .loadFromXml(mpURI.toURL().openStream());
-    setUpAssetManager(mp);
-
-    EasyMock.expect(seriesService.getSeries(SERIES_ID)).andReturn(seriesDC).anyTimes();
-
-    Job job = createJob(1L, "anything", "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-        + "<catalog id=\"9ad6ebcb-b414-4b15-ab62-5e5ddede447e\" type=\"dublincore/episode\" "
-        + "xmlns=\"http://mediapackage.opencastproject.org\">"
-        + "<mimetype>text/xml</mimetype>"
-        + "<url>http://10.10.10.50/static/mh_default_org/engage-live/episode.xml</url></catalog>"
-        + "###<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-        + "<catalog id=\"23113662-1a84-457a-85d5-0b3e32d2413a\" type=\"dublincore/series\" "
-        + "xmlns=\"http://mediapackage.opencastproject.org\">"
-        + "<mimetype>text/xml</mimetype>"
-        + "<url>http://10.10.10.50/static/mh_default_org/engage-live/series.xml</url></catalog>"
-        + "###<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-        + "<attachment id=\"security-policy-episode\" type=\"security/xacml+episode\" "
-        + "xmlns=\"http://mediapackage.opencastproject.org\">"
-        + "<mimetype>text/xml</mimetype>"
-        + "<url>http://10.10.10.50/static/mh_default_org/engage-live/security_policy_episode.xml</url></attachment>");
-    EasyMock.expect(downloadDistributionService.distribute(EasyMock.anyString(), EasyMock.anyObject(MediaPackage.class),
-            EasyMock.anyObject(Set.class), EasyMock.anyBoolean())).andReturn(job);
-    EasyMock.expect(serviceRegistry.getJob(1L)).andReturn(job).anyTimes();
-
-    Job jobPub = createJob(2L, "anything", "anything");
-    Capture<MediaPackage> capturedMp = Capture.newInstance();
-    EasyMock.expect(searchService.add(EasyMock.capture(capturedMp))).andReturn(jobPub);
-    EasyMock.expect(serviceRegistry.getJob(2L)).andReturn(job).anyTimes();
-
+  public void testUpdateLiveTracksFromCaProperties() throws Exception {
+    // setup
+    EasyMock.expect(searchService.get(EasyMock.anyString())).andReturn(liveSearchMp);
+    EasyMock.expect(snapshot.getMediaPackage()).andReturn(liveArchivedMediapackage).anyTimes();
+
+    // capture
     Capture<MediaPackage> capturedSnapshotMp = Capture.newInstance();
-    Version v = EasyMock.createNiceMock(Version.class);
-    Snapshot s = EasyMock.createNiceMock(Snapshot.class);
-    EasyMock.expect(s.getVersion()).andReturn(v);
-    EasyMock.replay(s, v);
-    EasyMock.expect(
-            assetManager.takeSnapshot(EasyMock.capture(capturedSnapshotMp))).andReturn(s);
+    Capture<MediaPackage> capturedSearchMp = Capture.newInstance();
+    EasyMock.expect(assetManager.takeSnapshot(EasyMock.capture(capturedSnapshotMp))).andReturn(snapshot);
+    searchService.addSynchronously(EasyMock.capture(capturedSearchMp));
+    EasyMock.expectLastCall().atLeastOnce();
 
-    replayServices();
-    service.setDownloadDistributionService(downloadDistributionService);
+    // replay
+    replayAndActivate();
 
-    service.createLiveEvent(MP_ID, episodeDC);
+    // change dates & capture agent
+    Date startDate = format.parse("2011-12-03T10:15");
+    Date endDate = format.parse("2011-12-03T11:45");
+    service.updateLiveTracks(MP_ID, startDate, endDate, CA_WITH_PROPERTIES);
 
-    // Check published live media package
-    MediaPackage searchMp = capturedMp.getValue();
-    Assert.assertEquals(MP_ID, searchMp.getIdentifier().toString());
-    Assert.assertEquals(DURATION, searchMp.getDuration().longValue());
-    Assert.assertEquals(2, searchMp.getCatalogs().length);
-    assertExpectedLiveTracks(searchMp.getTracks(), DURATION, CAPTURE_AGENT_NAME, "_suffix", false);
+    // check
+    EasyMock.verify(assetManager, searchService);
 
-    // Check archived media package
-    MediaPackage archivedMp = capturedSnapshotMp.getValue();
-    Assert.assertEquals(MP_ID, archivedMp.getIdentifier().toString());
-    Assert.assertEquals(1, archivedMp.getPublications().length);
-    Assert.assertEquals(LiveScheduleService.CHANNEL_ID, archivedMp.getPublications()[0].getChannel());
-    // Check that version got into local cache
-    Assert.assertEquals(v, service.getSnapshotVersionCache().getIfPresent(MP_ID));
+    MediaPackage newSearchMp = capturedSearchMp.getValue();
+    MediaPackage newArchivedMp = capturedSnapshotMp.getValue();
+
+    // tracks are the same in search & archive publication
+    Assert.assertArrayEquals(newSearchMp.getTracks(), newArchivedMp.getPublications()[0].getTracks());
+
+    //check live tracks
+    Assert.assertEquals(2, newSearchMp.getTracks().length); // flavor * resolutions
+    Set<String> trackResolutions = new HashSet<>();
+    for (Track track: newSearchMp.getTracks()) {
+      Assert.assertEquals(DEFAULT_LIVE_TARGET_FLAVOR, track.getFlavor().toString());
+
+      VideoStream stream = (VideoStream) track.getStreams()[0];
+      String resolution = stream.getFrameWidth() + "x" + stream.getFrameHeight();
+      Assert.assertTrue(caProps.containsKey(CA_PROPERTY_RESOLUTION_URL_PREFIX + resolution));
+
+      trackResolutions.add(resolution);
+      Assert.assertTrue(RESOLUTION.contains(resolution));
+      Assert.assertEquals(caProps.getProperty(CA_PROPERTY_RESOLUTION_URL_PREFIX + resolution),
+          track.getURI().toString());
+    }
+    Assert.assertEquals(2, trackResolutions.size()); // different resolutions
   }
 
   @Test
-  public void testUpdateLiveEventNoChange() throws Exception {
-    URI mpURI = LiveScheduleServiceImplTest.class.getResource("/assetmanager-mp-with-live.xml").toURI();
-    MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()
-            .loadFromXml(mpURI.toURL().openStream());
-    setUpAssetManager(mp);
+  public void testUpdateFromSnapshot() throws Exception {
+    // replace catalog
+    MediaPackageElement oldCatalog = liveArchivedMediapackage.getCatalogs()[0];
+    liveArchivedMediapackage.remove(oldCatalog);
+    MediaPackageElement newCatalog = (MediaPackageElement) oldCatalog.clone();
+    newCatalog.setIdentifier("new-catalog");
+    liveArchivedMediapackage.add(newCatalog);
+    MediaPackageElement oldSearchCatalog = liveSearchMp.getCatalogs()[0];
 
-    mpURI = LiveScheduleServiceImplTest.class.getResource("/live-mp.xml").toURI();
-    MediaPackage previousMp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()
-            .loadFromXml(mpURI.toURL().openStream());
+    // change content of ACL
+    MediaPackageElement newAttachment = liveArchivedMediapackage.getAttachments()[0];
+    MediaPackageElement oldAttachment = (MediaPackageElement)newAttachment.clone();
+    newAttachment.setChecksum(Checksum.create(ChecksumType.DEFAULT_TYPE, "123456"));
+    MediaPackageElement oldSearchAttachment = liveSearchMp.getAttachments()[0];
 
-    replayServices();
+    EasyMock.expect(searchService.get(EasyMock.anyString())).andReturn(liveSearchMp);
+    EasyMock.expect(snapshot.getMediaPackage()).andReturn(liveArchivedMediapackage).anyTimes();
 
-    service.getSnapshotVersionCache().put(MP_ID, version);
-
-    Assert.assertFalse(service.updateLiveEvent(previousMp, episodeDC));
-  }
-
-  @Test
-  public void testCreateOuUpdateLiveEventAlreadyPast() throws Exception {
-    EasyMock.expect(searchService.get(EasyMock.anyString())).andThrow(new NotFoundException("")).anyTimes();
-    replayServices();
-
-    Assert.assertFalse(service.createOrUpdateLiveEvent(MP_ID, episodeDC));
-  }
-
-  @Test
-  public void testCreateOuUpdateLiveEventAlreadyPublished() throws Exception {
-
-    EasyMock.expect(searchService.get(EasyMock.anyString())).andThrow(new NotFoundException("")).anyTimes();
-    replayServices();
-
-    Assert.assertFalse(service.createOrUpdateLiveEvent(MP_ID, episodeDC));
-  }
-
-  @Test
-  public void testUpdateLiveEvent() throws Exception {
-    URI mpURI = LiveScheduleServiceImplTest.class.getResource("/assetmanager-mp-with-live.xml").toURI();
-    MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()
-            .loadFromXml(mpURI.toURL().openStream());
-    setUpAssetManager(mp);
-
-    mpURI = LiveScheduleServiceImplTest.class.getResource("/live-mp.xml").toURI();
-    MediaPackage previousMp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()
-            .loadFromXml(mpURI.toURL().openStream());
-
-    EasyMock.expect(seriesService.getSeries(SERIES_ID)).andReturn(seriesDC).anyTimes();
-
-    Job job = createJob(1L, "anything", "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-        + "<catalog id=\"9ad6ebcb-b414-4b15-ab62-5e5ddede447e\" type=\"dublincore/episode\" "
-        + "xmlns=\"http://mediapackage.opencastproject.org\">"
-        + "<mimetype>text/xml</mimetype>"
-        + "<url>http://10.10.10.50/static/mh_default_org/engage-live/episode_updated.xml</url></catalog>"
-        + "###<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-        + "<catalog id=\"23113662-1a84-457a-85d5-0b3e32d2413a\" type=\"dublincore/series\" "
-        + "xmlns=\"http://mediapackage.opencastproject.org\">"
-        + "<mimetype>text/xml</mimetype>"
-        + "<url>http://10.10.10.50/static/mh_default_org/engage-live/series.xml</url></catalog>"
-        + "###<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?>"
-        + "<attachment id=\"security-policy-episode\" type=\"security/xacml+episode\" "
-        + "xmlns=\"http://mediapackage.opencastproject.org\">"
-        + "<mimetype>text/xml</mimetype>"
-        + "<url>http://10.10.10.50/static/mh_default_org/engage-live/security_policy_episode.xml</url></attachment>");
-    EasyMock.expect(downloadDistributionService.distribute(EasyMock.anyString(), EasyMock.anyObject(MediaPackage.class),
-            EasyMock.anyObject(Set.class), EasyMock.anyBoolean())).andReturn(job);
-    EasyMock.expect(serviceRegistry.getJob(1L)).andReturn(job).anyTimes();
-
+    // capture
     Capture<MediaPackage> capturedSnapshotMp = Capture.newInstance();
-    Version v = EasyMock.createNiceMock(Version.class);
-    Snapshot s = EasyMock.createNiceMock(Snapshot.class);
-    EasyMock.expect(s.getVersion()).andReturn(v);
-    EasyMock.replay(s, v);
-    EasyMock.expect(
-            assetManager.takeSnapshot(EasyMock.capture(capturedSnapshotMp))).andReturn(s);
+    Capture<MediaPackage> capturedSearchMp = Capture.newInstance();
+    Capture<Set<String>> capturedDistributedElements = Capture.newInstance();
+    Capture<Set<String>> capturedRetractedElements = Capture.newInstance();
 
-    Job jobPub = createJob(2L, "anything", "anything");
-    Capture<MediaPackage> capturedMp = Capture.newInstance();
-    EasyMock.expect(searchService.add(EasyMock.capture(capturedMp))).andReturn(jobPub);
-    EasyMock.expect(serviceRegistry.getJob(2L)).andReturn(job).anyTimes();
+    EasyMock.expect(assetManager.takeSnapshot(EasyMock.capture(capturedSnapshotMp))).andReturn(snapshot);
+    searchService.addSynchronously(EasyMock.capture(capturedSearchMp));
+    EasyMock.expectLastCall().atLeastOnce();
+    EasyMock.expect(downloadDistributionService.distributeSync(EasyMock.anyString(),
+        EasyMock.anyObject(MediaPackage.class), EasyMock.capture(capturedDistributedElements),
+        EasyMock.anyBoolean())).andReturn(List.of(newCatalog, newAttachment));
+    EasyMock.expect(downloadDistributionService.retractSync(EasyMock.anyString(),
+        EasyMock.anyObject(MediaPackage.class), EasyMock.capture(capturedRetractedElements)))
+        .andReturn(List.of(oldSearchCatalog, oldSearchAttachment));
 
-    Job jobRetract = createJob(3L, "anything", "anything");
-    EasyMock.expect(downloadDistributionService.retract(EasyMock.anyString(), EasyMock.anyObject(MediaPackage.class),
-            EasyMock.anyObject(Set.class))).andReturn(jobRetract);
-    EasyMock.expect(serviceRegistry.getJob(3L)).andReturn(jobRetract).anyTimes();
+    // replay
+    replayAndActivate();
 
-    replayServices();
-    service.setDownloadDistributionService(downloadDistributionService);
+    // run
+    service.updateLiveEvent(liveArchivedMediapackage, "1");
 
-    // Capture agent change
-    episodeDC.set(DublinCore.PROPERTY_SPATIAL, DublinCoreValue.mk("another_ca"));
-    // Duration change
-    episodeDC.set(DublinCore.PROPERTY_TEMPORAL,
-            DublinCoreValue.mk("start=2017-10-12T19:00:00Z;end=2017-10-12T19:02:00Z; scheme=W3C-DTF;"));
+    // check
+    EasyMock.verify(downloadDistributionService, assetManager, searchService);
 
-    Assert.assertTrue(service.updateLiveEvent(previousMp, episodeDC));
+    MediaPackage newSearchMp = capturedSearchMp.getValue();
+    MediaPackage newArchivedMp = capturedSnapshotMp.getValue();
+    Set<String> distributedElements = capturedDistributedElements.getValue();
+    Set<String> retractedElements = capturedRetractedElements.getValue();
 
-    // Check published live media package
-    MediaPackage searchMp = capturedMp.getValue();
-    Assert.assertEquals(MP_ID, searchMp.getIdentifier().toString());
-    Assert.assertEquals(120000L, searchMp.getDuration().longValue());
-    Assert.assertEquals(2, searchMp.getCatalogs().length);
-    assertExpectedLiveTracks(searchMp.getTracks(), 120000L, "another_ca", "_suffix", false);
-    Assert.assertEquals(0, searchMp.getPublications().length);
+    // check distribution
+    Assert.assertEquals(2, distributedElements.size());
+    Assert.assertEquals(2, retractedElements.size());
+    Assert.assertEquals(distributedElements,Set.of(newCatalog.getIdentifier(), newAttachment.getIdentifier()));
+    Assert.assertEquals(retractedElements,Set.of(oldCatalog.getIdentifier(), oldAttachment.getIdentifier()));
+
+    // check search
+    Assert.assertArrayEquals(newSearchMp.getTracks(), liveSearchMp.getTracks()); // tracks didn't change
+    Assert.assertEquals(1, newSearchMp.getCatalogs().length);
+    Assert.assertEquals(newSearchMp.getCatalogs()[0], newCatalog);
+    Assert.assertEquals(1, newSearchMp.getAttachments().length);
+    Assert.assertEquals(newSearchMp.getAttachments()[0], newAttachment);
+
+    // check archive
+    Assert.assertArrayEquals(newArchivedMp.getPublications()[0].getTracks(), liveSearchMp.getTracks());
+    Assert.assertEquals(1, newArchivedMp.getPublications()[0].getCatalogs().length);
+    Assert.assertEquals(newArchivedMp.getPublications()[0].getCatalogs()[0], newCatalog);
+    Assert.assertEquals(1, newArchivedMp.getPublications()[0].getAttachments().length);
+    Assert.assertEquals(newArchivedMp.getPublications()[0].getAttachments()[0], newAttachment);
   }
 
   @Test
-  public void testRetractLiveEvent() throws Exception {
-    URI mpURI = LiveScheduleServiceImplTest.class.getResource("/assetmanager-mp-with-live.xml").toURI();
-    MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()
-            .loadFromXml(mpURI.toURL().openStream());
-    setUpAssetManager(mp);
+  public void testUpdateFromUnchangedSnapshot() throws Exception {
+    EasyMock.expect(searchService.get(EasyMock.anyString())).andReturn(liveSearchMp);
 
-    mpURI = LiveScheduleServiceImplTest.class.getResource("/live-mp.xml").toURI();
-    mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().loadFromXml(mpURI.toURL().openStream());
+    // these methods should _not_ get called
+    EasyMock.expect(assetManager.takeSnapshot(EasyMock.anyObject())).andThrow(new AssertionFailedError()).anyTimes();
+    searchService.addSynchronously(EasyMock.anyObject());
+    EasyMock.expectLastCall().andThrow(new AssertionFailedError()).anyTimes();
+    EasyMock.expect(downloadDistributionService.distributeSync(EasyMock.anyString(),
+            EasyMock.anyObject(MediaPackage.class), EasyMock.anyObject(Set.class), EasyMock.anyBoolean()))
+        .andThrow(new AssertionFailedError()).anyTimes();
+    EasyMock.expect(downloadDistributionService.retractSync(EasyMock.anyString(),
+        EasyMock.anyObject(MediaPackage.class), EasyMock.anyObject(Set.class)))
+        .andThrow(new AssertionFailedError()).anyTimes();
 
-    Job job1 = createJob(1L, "anything", "anything");
-    Capture<String> capturedMpId = Capture.newInstance();
-    EasyMock.expect(searchService.delete(EasyMock.capture(capturedMpId))).andReturn(job1);
-    EasyMock.expect(serviceRegistry.getJob(1L)).andReturn(job1).anyTimes();
-    Job job2 = createJob(2L, "anything", "anything");
-    EasyMock.expect(downloadDistributionService.retract(EasyMock.anyString(), EasyMock.anyObject(MediaPackage.class),
-            EasyMock.anyObject(Set.class))).andReturn(job2);
-    EasyMock.expect(serviceRegistry.getJob(2L)).andReturn(job2).anyTimes();
+    // replay
+    replayAndActivate();
 
+    // run without changes
+    service.updateLiveEvent(liveArchivedMediapackage, "1");
+
+    // verify
+    EasyMock.verify(downloadDistributionService, assetManager, searchService);
+  }
+
+  @Test
+  public void testUpdateFromCachedSnapshot() throws Exception {
+    // these methods should _not_ get called
+    EasyMock.expect(assetManager.takeSnapshot(EasyMock.anyObject())).andThrow(new AssertionFailedError()).anyTimes();
+    searchService.addSynchronously(EasyMock.anyObject());
+    EasyMock.expectLastCall().andThrow(new AssertionFailedError()).anyTimes();
+    EasyMock.expect(downloadDistributionService.distributeSync(EasyMock.anyString(),
+            EasyMock.anyObject(MediaPackage.class), EasyMock.anyObject(Set.class), EasyMock.anyBoolean()))
+        .andThrow(new AssertionFailedError()).anyTimes();
+    EasyMock.expect(downloadDistributionService.retractSync(EasyMock.anyString(),
+        EasyMock.anyObject(MediaPackage.class), EasyMock.anyObject(Set.class)))
+        .andThrow(new AssertionFailedError()).anyTimes();
+
+    // replay
+    replayAndActivate();
+
+    // try to update with cached snapshot version
+    service.updateLiveEvent(liveArchivedMediapackage, CACHED_VERSION);
+
+    // check
+    EasyMock.verify(downloadDistributionService, assetManager, searchService);
+  }
+
+  @Test
+  public void testUpdateNonLive() throws Exception {
+    // setup
+    EasyMock.expect(searchService.get(EasyMock.anyString())).andReturn(searchMp).once();
+
+    Set<String> publishedElementIds = Stream.concat(
+            Arrays.stream(liveArchivedMediapackage.getPublications()[0].getAttachments()),
+            Arrays.stream(liveArchivedMediapackage.getPublications()[0].getCatalogs()))
+        .map(MediaPackageElement::getIdentifier).collect(Collectors.toSet());
+
+    // don't update search
+    searchService.addSynchronously(EasyMock.anyObject());
+    EasyMock.expectLastCall().andThrow(new AssertionFailedError()).anyTimes();
+
+    // do remove leftovers from archive
     Capture<MediaPackage> capturedSnapshotMp = Capture.newInstance();
-    Version v = EasyMock.createNiceMock(Version.class);
-    Snapshot s = EasyMock.createNiceMock(Snapshot.class);
-    EasyMock.expect(s.getVersion()).andReturn(v);
-    EasyMock.replay(s, v);
-    EasyMock.expect(assetManager.takeSnapshot(EasyMock.capture(capturedSnapshotMp))).andReturn(s);
+    Capture<Set<String>> capturedElementIds = Capture.newInstance();
+    EasyMock.expect(assetManager.takeSnapshot(EasyMock.capture(capturedSnapshotMp))).andReturn(snapshot);
+    EasyMock.expect(downloadDistributionService.retractSync(EasyMock.anyString(), EasyMock.anyObject(),
+        EasyMock.capture(capturedElementIds))).andReturn(new ArrayList<>());
 
-    replayServices();
-    service.setDownloadDistributionService(downloadDistributionService);
+    // replay
+    replayAndActivate();
 
-    service.retractLiveEvent(mp);
+    // run
+    service.updateLiveEvent(liveArchivedMediapackage, "1");
 
-    // Check archived media package
+    // check publication was removed from archive
     MediaPackage archivedMp = capturedSnapshotMp.getValue();
     Assert.assertEquals(MP_ID, archivedMp.getIdentifier().toString());
     Assert.assertEquals(0, archivedMp.getPublications().length);
 
-    EasyMock.verify(searchService, downloadDistributionService);
+    // check all published elements were retracted
+    Assert.assertEquals(capturedElementIds.getValue(), publishedElementIds);
+
+    // check
+    EasyMock.verify(searchService, downloadDistributionService, assetManager);
   }
 
-  class AuthorizationServiceMock implements AuthorizationService {
-    @Override
-    public Tuple<MediaPackage, Attachment> setAcl(MediaPackage mp, AclScope scope, AccessControlList acl) {
-      try {
-        Attachment attachment = (Attachment) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
-                .elementFromURI(new URI("http://host/episode_auth.xml"), Attachment.TYPE,
-                        MediaPackageElements.XACML_POLICY_EPISODE);
-        attachment.setMimeType(MimeTypes.XML);
-        mp.add(attachment);
-      } catch (URISyntaxException e) {
-      }
-      return null;
-    }
+  /**
+   * Delete
+   */
 
-    @Override
-    public MediaPackage removeAcl(MediaPackage mp, AclScope scope) {
-      return null;
-    }
+  @Test
+  public void testDelete() throws Exception {
+    // setup
+    EasyMock.expect(snapshot.getMediaPackage()).andReturn(liveArchivedMediapackage).anyTimes();
+    EasyMock.expect(searchService.get(EasyMock.anyString())).andReturn(liveSearchMp);
+    Set<String> publishedElementIds = Stream.concat(Arrays.stream(liveSearchMp.getAttachments()),
+        Arrays.stream(liveSearchMp.getCatalogs())).map(MediaPackageElement::getIdentifier).collect(Collectors.toSet());
 
-    @Override
-    public boolean hasPermission(MediaPackage mp, String action) {
-      return false;
-    }
+    // capture - we expect all of these to be called
+    Capture<MediaPackage> capturedSnapshotMp = Capture.newInstance();
+    Capture<Set<String>> capturedElementIds = Capture.newInstance();
+    EasyMock.expect(assetManager.takeSnapshot(EasyMock.capture(capturedSnapshotMp))).andReturn(snapshot);
+    EasyMock.expect(downloadDistributionService.retractSync(EasyMock.anyString(), EasyMock.anyObject(),
+        EasyMock.capture(capturedElementIds))).andReturn(new ArrayList<>());
+    EasyMock.expect(searchService.deleteSynchronously(liveSearchMp.getIdentifier().toString())).andReturn(true);
 
-    @Override
-    public boolean hasPermission(AccessControlList acl, String action) {
-      return false;
-    }
+    // replay & activate
+    replayAndActivate();
 
-    @Override
-    public Tuple<AccessControlList, AclScope> getActiveAcl(MediaPackage mp) {
-      return null;
-    }
+    // run
+    service.deleteLiveEvent(MP_ID, true);
 
-    @Override
-    public Tuple<AccessControlList, AclScope> getAcl(MediaPackage mp, AclScope scope) {
-      return null;
-    }
+    // check
+    EasyMock.verify(searchService, downloadDistributionService, assetManager);
 
+    // check publication was removed from archive
+    MediaPackage archivedMp = capturedSnapshotMp.getValue();
+    Assert.assertEquals(MP_ID, archivedMp.getIdentifier().toString());
+    Assert.assertEquals(0, archivedMp.getPublications().length);
+    Assert.assertEquals(version.toString(), service.getSnapshotVersionCache().getIfPresent(MP_ID));
+
+    // check all published elements were retracted
+    Assert.assertEquals(publishedElementIds, capturedElementIds.getValue());
   }
 
+  @Test
+  public void testDeleteWithoutArchive() throws Exception {
+    // setup
+    EasyMock.expect(searchService.get(EasyMock.anyString())).andReturn(liveSearchMp).once();
+
+    // retract search & distribution
+    EasyMock.expect(downloadDistributionService.retractSync(EasyMock.anyString(), EasyMock.anyObject(),
+        EasyMock.anyObject(Set.class))).andReturn(new ArrayList<>());
+    EasyMock.expect(searchService.deleteSynchronously(liveSearchMp.getIdentifier().toString())).andReturn(true);
+
+    // don't update archive
+    EasyMock.expect(assetManager.takeSnapshot(EasyMock.anyObject())).andThrow(new AssertionFailedError()).anyTimes();
+
+    // replay
+    replayAndActivate();
+
+    // run
+    service.deleteLiveEvent(MP_ID, false);
+
+    // check
+    EasyMock.verify(searchService, downloadDistributionService, assetManager);
+  }
+
+  @Test
+  public void testDeleteNonLive() throws Exception {
+    // setup
+    EasyMock.expect(searchService.get(EasyMock.anyString())).andReturn(searchMp).once();
+    EasyMock.expect(snapshot.getMediaPackage()).andReturn(liveArchivedMediapackage).anyTimes();
+    Set<String> publishedElementIds = Stream.concat(
+        Arrays.stream(liveArchivedMediapackage.getPublications()[0].getAttachments()),
+        Arrays.stream(liveArchivedMediapackage.getPublications()[0].getCatalogs()))
+        .map(MediaPackageElement::getIdentifier).collect(Collectors.toSet());
+
+    // don't remove from search
+    EasyMock.expect(searchService.deleteSynchronously(searchMp.getIdentifier().toString()))
+        .andThrow(new AssertionFailedError()).anyTimes();
+
+    // do remove leftovers from archive
+    Capture<MediaPackage> capturedSnapshotMp = Capture.newInstance();
+    Capture<Set<String>> capturedElementIds = Capture.newInstance();
+    EasyMock.expect(assetManager.takeSnapshot(EasyMock.capture(capturedSnapshotMp))).andReturn(snapshot);
+    EasyMock.expect(downloadDistributionService.retractSync(EasyMock.anyString(), EasyMock.anyObject(),
+        EasyMock.capture(capturedElementIds))).andReturn(new ArrayList<>());
+
+    // replay
+    replayAndActivate();
+
+    // run
+    service.deleteLiveEvent(MP_ID, true);
+
+    // check publication was removed from archive
+    MediaPackage archivedMp = capturedSnapshotMp.getValue();
+    Assert.assertEquals(MP_ID, archivedMp.getIdentifier().toString());
+    Assert.assertEquals(0, archivedMp.getPublications().length);
+
+    // check all published elements were retracted
+    Assert.assertEquals(capturedElementIds.getValue(), publishedElementIds);
+
+    // check
+    EasyMock.verify(searchService, downloadDistributionService, assetManager);
+  }
 }
