@@ -76,7 +76,7 @@ import org.opencastproject.db.DBSession;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
-import org.opencastproject.liveschedule.api.LiveScheduleService;
+import org.opencastproject.livepublication.api.LivePublicationService;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
@@ -188,7 +188,7 @@ public class SchedulerServiceImplTest {
 
   public static final File baseDir = new File(new File(IoSupport.getSystemTmpDir()), "schedulerservicetest");
   public static final File archiveDir = new File(baseDir, "archive");
-  private static LiveScheduleService liveScheduleService;
+  private static LivePublicationService livePublicationService;
 
   private SeriesService seriesService;
   private static UnitTestWorkspace workspace;
@@ -261,7 +261,7 @@ public class SchedulerServiceImplTest {
     EasyMock.expect(index.getIndexName()).andReturn("index").anyTimes();
     EasyMock.expect(index.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result).anyTimes();
 
-    liveScheduleService = EasyMock.createNiceMock(LiveScheduleService.class);
+    livePublicationService = EasyMock.createNiceMock(LivePublicationService.class);
 
     EasyMock.replay(authorizationService, index, result, extendedAdapter, episodeAdapter, orgDirectoryService, componentContext, bundleContext);
 
@@ -273,7 +273,7 @@ public class SchedulerServiceImplTest {
     schedSvc.addCatalogUIAdapter(extendedAdapter);
     schedSvc.setOrgDirectoryService(orgDirectoryService);
     schedSvc.setIndex(index);
-    schedSvc.setLiveScheduleService(liveScheduleService);
+    schedSvc.setLivePublicationService(livePublicationService);
 
     schedSvc.activate(componentContext);
   }

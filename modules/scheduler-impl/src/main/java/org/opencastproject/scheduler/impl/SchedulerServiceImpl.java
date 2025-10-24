@@ -41,8 +41,8 @@ import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
 import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildException;
 import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService;
-import org.opencastproject.liveschedule.api.LiveScheduleException;
-import org.opencastproject.liveschedule.api.LiveScheduleService;
+import org.opencastproject.livepublication.api.LivePublicationException;
+import org.opencastproject.livepublication.api.LivePublicationService;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
@@ -192,7 +192,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   /** The organization directory service */
   private OrganizationDirectoryService orgDirectoryService;
 
-  private LiveScheduleService liveScheduleService;
+  private LivePublicationService livePublicationService;
 
   /** The Elasticsearch indices */
   private ElasticsearchIndex index;
@@ -268,11 +268,11 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   /**
    * OSGi callback to set the live schedule service.
    *
-   * @param liveScheduleService
+   * @param livePublicationService
    */
   @Reference
-  public void setLiveScheduleService(LiveScheduleService liveScheduleService) {
-    this.liveScheduleService = liveScheduleService;
+  public void setLivePublicationService(LivePublicationService livePublicationService) {
+    this.livePublicationService = livePublicationService;
   }
 
   /**
@@ -410,8 +410,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
       if (isLive(finalCaProperties)) {
         try {
-          liveScheduleService.createLiveEvent(snapshot.getMediaPackage(), startDateTime, endDateTime, captureAgentId);
-        } catch (LiveScheduleException e) {
+          livePublicationService.createLiveEvent(snapshot.getMediaPackage(), startDateTime, endDateTime, captureAgentId);
+        } catch (LivePublicationException e) {
           logger.error("Could not create live event {}", mediaPackageId);
         }
       }
@@ -556,8 +556,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         // Create live event?
         if (isLive(finalCaProperties)) {
           try {
-            liveScheduleService.createLiveEvent(snapshot.getMediaPackage(), startDateTime, endDateTime, captureAgentId);
-          } catch (LiveScheduleException e) {
+            livePublicationService.createLiveEvent(snapshot.getMediaPackage(), startDateTime, endDateTime, captureAgentId);
+          } catch (LivePublicationException e) {
             logger.error("Could not create live event {}", id);
           }
         }
@@ -738,15 +738,15 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       // Update live event
       try {
         if ((finalCaProperties.isEmpty() || isLive(finalCaProperties.get())) && isLive(oldCaProperties)) {
-          liveScheduleService.updateLiveTracks(mpId, startDateTime.orElse(start), endDateTime.orElse(end),
+          livePublicationService.updateLiveTracks(mpId, startDateTime.orElse(start), endDateTime.orElse(end),
               captureAgentId.orElse(agentId));
         } else if (finalCaProperties.isPresent() && isLive(finalCaProperties.get()) && !isLive(oldCaProperties)) {
-          liveScheduleService.createLiveEvent(archivedMediaPackage, updatedScheduledEvent.getStartDate(),
+          livePublicationService.createLiveEvent(archivedMediaPackage, updatedScheduledEvent.getStartDate(),
               updatedScheduledEvent.getEndDate(), updatedScheduledEvent.getCaptureAgentId());
         } else if (finalCaProperties.isPresent() && !isLive(finalCaProperties.get()) && isLive(oldCaProperties)) {
-          liveScheduleService.deleteLiveEvent(mpId, true);
+          livePublicationService.deleteLiveEvent(mpId, true);
         }
-      } catch (LiveScheduleException e) {
+      } catch (LivePublicationException e) {
         logger.warn("Could not update live event {}", mpId);
       }
 
@@ -816,7 +816,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
           }
 
           if (isLive(extEvtOpt.get().getCaptureAgentProperties())) {
-            liveScheduleService.deleteLiveEvent(mediaPackageId, false);
+            livePublicationService.deleteLiveEvent(mediaPackageId, false);
           }
         } else {
           notFoundInDatabase = true;
@@ -1241,11 +1241,11 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       if (isLive(extendedEventDto.getCaptureAgentProperties())) {
         if (RecordingState.CAPTURE_FINISHED.equals(state) || RecordingState.UPLOADING.equals(state)
             || RecordingState.UPLOAD_ERROR.equals(state)) {
-          liveScheduleService.deleteLiveEvent(id, true);
+          livePublicationService.deleteLiveEvent(id, true);
         }
 
         if (RecordingState.CAPTURE_ERROR.equals(state)) {
-          liveScheduleService.handleCaptureError(id);
+          livePublicationService.handleCaptureError(id);
         }
       }
 
@@ -1285,7 +1285,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       ExtendedEventDto extendedEventDto = persistence.resetRecordingState(id);
       removeRecordingStatusFromIndex(id);
       if (isLive(extendedEventDto.getCaptureAgentProperties())) {
-        liveScheduleService.deleteLiveEvent(id, true);
+        livePublicationService.deleteLiveEvent(id, true);
       }
     } catch (NotFoundException e) {
       throw e;
