@@ -1,5 +1,13 @@
 # Opencast 18: Release Notes
 
+## Opencast 18.3
+
+This minor release includes a fix for the silence detection with newer FFmpeg versions. [[#7069](https://github.com/opencast/opencast/pull/7069)]
+
+This version also contains new releases of both the admin ui
+([18.x-2025-10-24](https://github.com/opencast/opencast-admin-interface/releases/tag/18.x-2025-10-24)) and the editor
+([18.x-2025-10-24](https://github.com/opencast/opencast-editor/releases/tag/18.x-2025-10-24)).
+
 ## Opencast 18.2
 
 This version contains two **security fixes**!
