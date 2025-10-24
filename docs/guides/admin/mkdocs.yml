@@ -119,7 +119,7 @@ nav:
       - Inbox: "configuration/inbox.md"
       - LTI Module: "configuration/ltimodule.md"
       - List Providers: "configuration/listproviders.md"
-      - Live Schedule: "configuration/liveschedule.md"
+      - Live Schedule: "configuration/livestreaming.md"
       - Load: "configuration/load.md"
       - Logging: "configuration/log.md"
       - Media Module: "configuration/mediamodule.configuration.md"
