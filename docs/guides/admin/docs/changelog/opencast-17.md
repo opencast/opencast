@@ -3,6 +3,13 @@ Opencast 17 Changelog
 
 Changes marked with \* were also included in 16.x.
 
+## Opencast 17.9 (2025-10-23)
+
+- [[#7067](https://github.com/opencast/opencast/pull/7131)] -
+  Update r/17.x Admin UI to 17.x-2025-10-23
+- [[#7066](https://github.com/opencast/opencast/pull/7130)] -
+  Update r/17.x Editor to 17.x-2025-10-23
+
 ## Opencast 17.8 (2025-09-26)
 
 - [[#7066](https://github.com/opencast/opencast/pull/7066)] -
