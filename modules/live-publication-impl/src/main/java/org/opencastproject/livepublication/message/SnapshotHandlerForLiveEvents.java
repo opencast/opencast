@@ -60,7 +60,8 @@ public class SnapshotHandlerForLiveEvents implements AssetManagerUpdateHandler {
         if (Arrays.stream(snapshotItem.getMediapackage().getPublications())
             .anyMatch(p -> p.getChannel().equals(LIVE_CHANNEL_ID))) {
           logger.debug("Updating live event {}", mpId);
-          livePublicationService.updateLiveEvent(snapshotItem.getMediapackage(), Long.toString(snapshotItem.getVersion()));
+          livePublicationService.updateLiveEvent(snapshotItem.getMediapackage(),
+              Long.toString(snapshotItem.getVersion()));
         } else {
           logger.debug("Event {} is not live, not updating.", mpId);
         }

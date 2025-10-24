@@ -306,7 +306,7 @@ public class CaptureAgentsEndpoint {
 
       String record = (String) agent.getCapabilities().get(CaptureParameters.CAPTURE_DEVICE_RECORD);
       if (record == null || record.isEmpty()) {
-        parsedCapabilities.add("stream", new JsonArray());
+        parsedCapabilities.add("record", new JsonArray());
       } else {
         String[] parsedRecord = Arrays.stream(record.split(","))
             .map(String::trim)
@@ -316,7 +316,7 @@ public class CaptureAgentsEndpoint {
 
       String layout = (String) agent.getCapabilities().get(CaptureParameters.CAPTURE_DEVICE_LAYOUT);
       if (layout == null || layout.isEmpty()) {
-        parsedCapabilities.add("stream", new JsonArray());
+        parsedCapabilities.add("layout", new JsonArray());
       } else {
         String[] parsedLayout = Arrays.stream(layout.split(","))
             .map(String::trim)

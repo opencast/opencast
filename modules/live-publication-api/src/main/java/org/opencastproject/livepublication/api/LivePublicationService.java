@@ -36,7 +36,7 @@ public interface LivePublicationService {
           NotFoundException;
 
   void updateLiveEvent(MediaPackage archivedMediaPackage, String version) throws NotFoundException,
-      LivePublicationException;
+          LivePublicationException;
 
   void deleteLiveEvent(String mpId, boolean updateAssetManager) throws LivePublicationException;
 
