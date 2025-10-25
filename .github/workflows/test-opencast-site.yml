@@ -122,7 +122,6 @@ jobs:
           path: site_build
 
       - name: Prepare git
-        if: github.repository_owner == 'opencast'
         run: |
           git config --global user.name "Release Bot"
           git config --global user.email "cloud@opencast.org"
