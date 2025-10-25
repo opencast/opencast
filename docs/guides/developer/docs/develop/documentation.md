@@ -84,6 +84,13 @@ of the Java Development Kit.
 - Are the exceptions documented with `@throws`?
 
 
+### Documentation
+
+The documentation outlined above ends up living
+[here](https://opencast.github.io/coverage-reports/), which is backed by
+[this](https://github.com/opencast/coverage-reports/) repository.
+
+
 REST Endpoints
 --------------
 
