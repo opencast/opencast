@@ -1,4 +1,4 @@
-name: Crowdin » Push keys to crowdin
+name: Crowdin » Push keys to Crowdin
 
 on:
   push:
