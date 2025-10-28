@@ -1,10 +1,11 @@
+name: Maintenance » Update Matrix Room Description
+
 on:
   workflow_dispatch:
   push:
     tags:
       - '*.*'
 
-name: Update Matrix Room Description
 jobs:
   build:
     name: Update Matrix Room

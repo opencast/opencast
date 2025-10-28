@@ -1,4 +1,4 @@
-name: Check ICLA
+name: PRs » Check ICLA
 on:
   pull_request_target:
     types:

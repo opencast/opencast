@@ -1,4 +1,4 @@
-name: Tests Paella 7
+name: Tests » Paella 7
 
 on:
   pull_request:

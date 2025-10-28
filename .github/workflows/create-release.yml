@@ -1,10 +1,11 @@
+name: Release » Create new release
+
 on:
   workflow_dispatch:
   push:
     tags:
       - '*.*'
 
-name: Create new release
 jobs:
   build:
     name: Create release from tag

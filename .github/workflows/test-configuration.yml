@@ -1,4 +1,4 @@
-name: Test configuration
+name: Tests » Extra checkstyle checks
 
 on:
   pull_request:

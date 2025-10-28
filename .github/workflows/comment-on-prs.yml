@@ -1,4 +1,4 @@
-name: Comment on Pull request
+name: PRs » Comment with build URL
 #Cribbed from https://github.com/orgs/community/discussions/51403#discussioncomment-5535167
 
 on:

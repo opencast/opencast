@@ -1,4 +1,4 @@
-name: Merge conflict check
+name: PRs » Merge conflict check
 on:
   push:
   pull_request_target:

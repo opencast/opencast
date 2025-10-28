@@ -1,4 +1,4 @@
-name: Build Maven Cache
+name: Maintenance » Build Maven Cache
 
 on:
   workflow_dispatch:

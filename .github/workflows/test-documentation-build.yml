@@ -1,4 +1,4 @@
-name: Test documentation
+name: Tests » Documentation build
 
 on:
   pull_request:

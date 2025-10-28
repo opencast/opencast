@@ -1,4 +1,4 @@
-name: Test LTI Tools
+name: Tests » LTI Tools
 
 on:
   pull_request:

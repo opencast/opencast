@@ -1,4 +1,4 @@
-name: Update translations
+name: Crowdin » Update translations
 
 # Update every Monday at 5am
 on:
