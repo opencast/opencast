@@ -7,7 +7,7 @@ on:
       - '*.*'
 
 jobs:
-  build:
+  update-room-desc:
     name: Update Matrix Room
     runs-on: ubuntu-latest
     steps:

@@ -8,7 +8,7 @@ on:
       - completed
 
 jobs:
-  comment:
+  comment-build-url:
     if: > 
       github.event.workflow_run.conclusion == 'success'
       && github.repository == 'opencast/opencast'

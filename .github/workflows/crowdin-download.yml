@@ -7,7 +7,7 @@ on:
   - cron: "0 5 * * 1"
 
 jobs:
-  update-translations:
+  download-translations:
     if: github.repository_owner == 'opencast'
     runs-on: ubuntu-latest
     steps:

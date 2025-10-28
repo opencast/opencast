@@ -6,7 +6,7 @@ on:
     - cron: '0 6 * * 6'
 
 jobs:
-  build:
+  mvn-cache:
     name: build maven cache
     runs-on: ubuntu-latest
     if: github.repository == 'opencast/opencast'

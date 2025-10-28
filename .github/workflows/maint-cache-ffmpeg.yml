@@ -6,7 +6,7 @@ on:
     - cron: '0 3 * * 6' # at 03:00 on Saturday
 
 jobs:
-  build:
+  cache-ffmpeg:
     strategy:
       matrix:
         arch:

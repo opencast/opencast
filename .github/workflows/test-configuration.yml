@@ -15,7 +15,7 @@ on:
       - '**/pom.xml'
 
 jobs:
-  main:
+  additional-checks:
     runs-on: ubuntu-24.04
 
     steps:

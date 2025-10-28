@@ -7,7 +7,7 @@ on:
       - synchronize
 
 jobs:
-  main:
+  check-conflicts:
     runs-on: ubuntu-latest
     steps:
       - name: Check for dirty pull requests

@@ -5,7 +5,7 @@ on:
       - opened
 
 jobs:
-  main:
+  check-icla:
     if: github.event.pull_request.user.login != 'dependabot[bot]' && 
         github.event.pull_request.user.login != 'opencastproject'
     runs-on: ubuntu-24.04

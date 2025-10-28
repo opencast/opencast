@@ -17,7 +17,7 @@ on:
 jobs:
 
   # Check documentation with markdownlint and build it using mkdocs
-  documentation:
+  test-documentation:
     runs-on: ubuntu-24.04
 
     steps:

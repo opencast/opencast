@@ -12,7 +12,7 @@ on:
 
 
 jobs:
-  test:
+  test-paella:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     defaults:
