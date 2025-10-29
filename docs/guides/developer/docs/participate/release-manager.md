@@ -4,7 +4,7 @@ Release Manager Guide
 The single most important duty of release managers is to keep an eye on their release, notify the community about
 possible problems in a timely manner and encourage community members to help out if needed. While working on Opencast's
 code is often done as well during the release process, for release managers this is secondary to the communication and
-management role and with few exceptions no requirement for this position.
+management role.  With few exceptions, a release manager should not *need* to be able to code.
 
 The community has a number of expectations for release managers, and their handling of the problems which may arise
 during the release cycle. The core of these expectations are:
@@ -22,13 +22,13 @@ precedence over release manager decisions.
 Recommended practices for release managers
 ------------------------------
 
-This is a recommendation of best practices to help to organize the duties of the release managers after they have been choosen
-these recomendations came from the experience of past release managers.
+This is a recommendation of best practices to help to organize the duties of the release managers after they have been
+chosen.
 
 ### After the election of the release manager
-- Create a draft pull request for the release notes early
-- Create a draft article as a draft opencast.org Wordpress.
-- Create draft slides for presentation in summits and adopters meetings
+- Create a draft pull request for the release notes early, and keep it up to date as development progresses.
+- Create a draft article about the release in the opencast.org Wordpress instance.
+- Create draft slides for presentation in summits and adopters meetings.
 
 ### After the end or begining of each month
 - Check the merged pull requests
@@ -43,8 +43,8 @@ these recomendations came from the experience of past release managers.
 Responsibilities
 ----------------
 
-While a general rule is certainly just to look out for the release, work together with the community to make the release
-work properly and be pragmatic about the process, there are a few tasks which really can only be done by release
+While a general rule is certainly to look out for the release, work together with the community to make the release
+work properly, and be pragmatic about the process, there are a few tasks which really can only be done by release
 managers.
 
 For all of these tasks, it's generally a good idea to look at previous releases and at their solutions for the tasks.
@@ -54,7 +54,9 @@ schedule by six months).
 ### Release Notes
 
 It's usually a good idea to create or clean the release notes page early in the release cycle. This allows for a place
-to put the release schedule, short descriptions of features or noteworthy configuration changes early on.
+to put the release schedule, short descriptions of features or noteworthy configuration changes early on.  It also
+gives developers a clean slate to work from, otherwise there will be constant conflicts as one PR alters the notes file
+underneath a second PR.
 
 ### Upgrade script
 
@@ -75,10 +77,10 @@ list and publish it on the release notes page.
 ### Release Branch
 
 According to the set release schedule, at one point a release branch should be cut, effectively marking a feature freeze
-for a given release.  This branch is split off `develop` and should be named `r/N.x` (e.g. `r/6.x` for the Opencast 6
-release branch).
+for a given release.  This branch is split off `develop` and should be named `r/N.x` (e.g.
+`r/{{ opencast_major_version() }}.x` for the Opencast {{ opencast_major_version() }} release branch).
 
-Example on how to create the Opencast 7 release branch:
+Example on how to create the Opencast {{ opencast_major_version() }} release branch:
 
 
 1. Check out `develop` and make sure it has the latest state (replace `<remote>` with your remote name for the community
@@ -94,13 +96,13 @@ Example on how to create the Opencast 7 release branch:
 
 3. Create and push the new release branch:
 
-        git checkout -b r/7.x
-        git push <remote> r/7.x
+        git checkout -b r/{{ opencast_major_version() }}.x
+        git push <remote> r/{{ opencast_major_version() }}.x
 
 4. That is it for the release branch. Now update the versions in `develop` in preparation for the next release:
 
         git checkout develop
-        ./mvnw versions:set -DnewVersion=8-SNAPSHOT versions:commit
+        ./mvnw versions:set -DnewVersion={{ opencast_major_version() + 1 }}-SNAPSHOT versions:commit
 
 5. Have a look at the changes. Make sure that nothing else was modified:
 
@@ -117,15 +119,25 @@ Example on how to create the Opencast 7 release branch:
 
         git clone -b develop git@github.com:opencast/opencast-admin-interface.git
         cd opencast-admin-interface
-        git checkout -b r/7.x
-        git push origin r/7.x
+        git checkout -b r/{{ opencast_major_version() + 1 }}.x
+        git push origin r/{{ opencast_major_version() + 1 }}.x
 
 8. Create a release branch in the editor repository:
 
         git clone -b develop git@github.com:opencast/opencast-editor.git
         cd opencast-editor
-        git checkout -b r/7.x
-        git push origin r/7.x
+        git checkout -b r/{{ opencast_major_version() + 1 }}.x
+        git push origin r/{{ opencast_major_version() + 1 }}.x
+
+8. Create a release branch in the studio repository:
+
+        git clone -b develop git@github.com:opencast/studio.git
+        cd studio
+        git checkout -b r/{{ opencast_major_version() + 1 }}.x
+        git push origin r/{{ opencast_major_version() + 1 }}.x
+
+If you are unable to create the branches in the last three repositories, please make noise in the Matrix channel so we
+can fix your permissions!
 
 
 ### Status of Translations
@@ -242,10 +254,10 @@ developer list or wherever appropriate.
 ### Merging Release Branches
 
 To not have to merge bug fixes into several branches and create several pull requests, the release branch should be
-merged down on a regular basis. Assuming, for example, that `r/6.x` is the latest release branch, merges should happen
-like this:
+merged down on a regular basis. Assuming, for example, that `r/{{ opencast_major_version() }}.x` is the latest release
+branch, merges should happen like this:
 
-    r/5.x → r/6.x → develop
+    r/{{ opencast_major_version() - 1 }}.x → r/{{ opencast_major_version() }}.x → develop
 
 While any committer may do this at any time, it is good practice for release managers to do this for their release
 branches on a regular basis.
@@ -264,7 +276,7 @@ For example, to merge the latest release branch into `develop`, follow these ste
 3. Merge the release branch. Note that if large merge conflicts arise, you may ask for help from the people creating the
    problematic patches:
 
-        git merge <remote>/r/6.x
+        git merge <remote>/r/{{ opencast_major_version() }}.x
 
 4. Push the updated branch into the community repository:
 
@@ -280,57 +292,80 @@ needs to be done manually.
 
 ### Releasing
 
-The following steps outline the necessary steps for cutting the final release:
+The following steps outline the necessary steps for cutting the final release, using {{ opencast_major_version() }}.0
+as an example:
 
-0. Switch to and update your local release branch.
+0. Switch to and update your local release branch, ensuring your local branch is up to date with the main repo.
 
-1. Add the release notes, and update the changelog. The `create-changelog` [helper script
+1. Cut and merge a [new release of the admin UI](https://github.com/opencast/opencast-admin-interface) if necessary
+
+2. Cut and merge a [new release of the editor](https://github.com/opencast/opencast-editor) if necessary
+
+3. Cut and merge a [new release of studio](https://github.com/opencast/studio) if necessary
+
+4. Update the release notes and changelog
+
+    - First move to the correct directory
+
+            cd docs/guide/admin/docs
+
+    - Update the changelog. The `create-changelog` [helper script
    ](https://github.com/opencast/helper-scripts/tree/master/release-management/create-changelog) is a convenient tool
-   for this. You need to update:
+   for this.  The script can be called a few different ways, please read the documentation and figure our yours.
 
-        cd docs/guides/admin/docs/
-        vim releasenotes.md
-        vim changelog/opencast-<version>.md
-        git commit -S releasenotes.md changelog.md -m 'Updated Release Notes'
-        git push <remote> r/6.x
+            python3 helper-scripts/release-management/create-changelog.py [args] >> changelog/opencast-{{ opencast_major_version() }}.md
+            [ manual check that the doc looks correct ]
+            git add changelog/opencast-{{ opencast_major_version() }}.md
 
-3. Switch to a new branch to create the release (name does not really matter):
+    - The release notes for a major release (x.0) should be built from the various text files in the 
+   `docs/guides/admin/docs/releasenotes` directory.  the release notes for a minor release (x.y) should be a rough
+   summary of the development activity between x.y and x.y-1
 
-        git checkout -b tmp-16.0
+            vim releasenotes.md
+            git commit -s releasenotes.md changelog.md -m 'updated release notes and changelog'
+            git push <remote> r/{{ opencast_major_version() }}.x
 
-4. Make the version changes for the release:
+5. Switch to a new branch to create the release (name does not really matter):
 
-        ./mvnw versions:set -DnewVersion=6.0 versions:commit
+        git checkout -b tmp-{{ opencast_major_version() }}.0
 
-5. Have a look at the changes. Make sure that nothing else was modified:
+6. Make the version changes for the release:
+
+        ./mvnw versions:set -DnewVersion={{ opencast_major_version() }}.0 versions:commit
+
+7. Have a look at the changes. Make sure that nothing else was modified:
 
         git diff
         # The following command should yield no output:
         git status | grep modified: | grep -v pom.xml
 
-6. Commit the changes and create a release tag:
+8. Commit the changes:
 
         git add $(git status | grep 'modified:.*pom.xml' | awk '{print $2;}')
-        git commit -S -m 'Opencast 16.0'
-        git tag -s 16.0 -m 'Opencast 16.0'
+        git commit -S -m 'Opencast {{ opencast_major_version() }}.0'
 
-7. Push the tag to the community repository (you can remove the branch afterwards):
+9. Build and test the distributions.  Start each one and make sure they boot successfully.
 
-        git push <remote> 16.0
+10. Push the tag to the community repository, and remove the local branch:
 
-8. Check the “Create new release” GitHub Actions workflow.
-   It will automatically build and upload the release tarballs and create a new release draft.
-   Once it is finished, review the draft, adjust the description and publish the release.
+        git tag -s {{ opencast_major_version() }}.0 -m 'Opencast {{ opencast_major_version() }}.0'
+        git push <remote> {{ opencast_major_version() }}.0
+        git branch -D tmp-{{ opencast_major_version() }}.0
 
-   If the workflow fails, investigate what was going wrong and either restart the workflow or create the release
-   manually in the GitHub user interface.
+11. Check the “Create new release” GitHub Actions workflow.
+    It will automatically build and upload the release tarballs and create a new release draft.
+    Once it is finished, review the draft, adjust the description and publish the release.
 
-9. Post a release notification on [opencast.org](https://opencast.org).  You will need to ensure you have the appropriate permissions - talk to the
-QA Coordinator, or the board if you do not know how or have the rights.  Typically we reuse a previous major version's
-message, altering the version numbers, but the actual content is up to the release manager.
+    If the workflow fails, investigate what was going wrong and either restart the workflow or create the release
+    manually in the GitHub user interface.
+
+12. In the case a x.0 release, post a release notification on [opencast.org](https://opencast.org).  You will need to
+    ensure you have the appropriate permissions - talk to the QA Coordinator, or the board if you do not know how or
+    have the rights.  Typically we reuse a previous major version's message, altering the version numbers, but the
+    actual content is up to the release manager.
 
 
-10. Check that the release is published on [Maven Central](https://repo1.maven.org/maven2/org/opencastproject/opencast-common/).
+13. Check that the release is published on [Maven Central](https://repo1.maven.org/maven2/org/opencastproject/opencast-common/).
     This can take some time, and is done via [Buildbot](http://ci.opencast.org).  If in doubt, ask the QA Coordinator to
     check.  If you need to do this yourself please read the [infra documentation](infrastructure/maven-repository.md#pushing-to-maven-central).
 
