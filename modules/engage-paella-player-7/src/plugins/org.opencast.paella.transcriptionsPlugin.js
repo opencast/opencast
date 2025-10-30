@@ -120,6 +120,7 @@ export default class TranscriptionsPlugin extends PopUpButtonPlugin {
     searchContainer.addEventListener('click', evt => evt.stopPropagation());
     searchContainer.addEventListener('keyup', evt => {
       this.rebuildList(evt.target.value);
+      evt.stopPropagation();
     });
     const transcriptionsContainer = createElementWithHtmlText(`
         <ul class="transcriptions-list"></ul>`, container);
