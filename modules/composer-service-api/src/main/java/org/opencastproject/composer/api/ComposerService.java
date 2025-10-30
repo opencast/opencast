@@ -27,10 +27,10 @@ import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.smil.entity.api.Smil;
-import org.opencastproject.util.data.Option;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Encodes media and (optionally) periodically alerts a statusService endpoint of the status of this encoding job.
@@ -119,8 +119,8 @@ public interface ComposerService {
    *        if the mediapackage is invalid
    */
 
-  Job composite(Dimension outputDimension, Option<LaidOutElement<Track>> option,
-        LaidOutElement<Track> lowerLaidOutElement, Option<LaidOutElement<Attachment>> watermarkOption,
+  Job composite(Dimension outputDimension, Optional<LaidOutElement<Track>> option,
+        LaidOutElement<Track> lowerLaidOutElement, Optional<LaidOutElement<Attachment>> watermarkOption,
         String identifier, String outputBackground, String sourceAudioName) throws EncoderException, MediaPackageException;
 
   /**

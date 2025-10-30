@@ -30,7 +30,6 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
@@ -156,7 +155,7 @@ public class CommentWorkflowOperationHandler extends AbstractWorkflowOperationHa
     if (optComment.isEmpty()) {
       final User user = userDirectoryService.loadUser(workflowInstance.getCreatorName());
       EventComment comment = EventComment.create(
-          Option.none(), mpId,
+          Optional.empty(), mpId,
           securityService.getOrganization().getId(), description, user, reason, false);
       eventCommentService.updateComment(comment);
     } else {

@@ -172,10 +172,10 @@ public class ContributorsListProvider implements ResourceListProvider {
     // TODO: The search index can handle limit and offset.
     // TODO: We should not request all data.
     if (query != null) {
-      if (query.getLimit().isSome())
+      if (query.getLimit().isPresent())
         limit = query.getLimit().get();
 
-      if (query.getOffset().isSome())
+      if (query.getOffset().isPresent())
         offset = query.getOffset().get();
     }
 

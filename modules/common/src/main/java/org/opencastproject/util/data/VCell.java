@@ -27,6 +27,8 @@ import static org.opencastproject.util.RequireUtil.notNull;
 import static org.opencastproject.util.data.Cells.fcell;
 import static org.opencastproject.util.data.Tuple.tuple;
 
+import java.util.Optional;
+
 /**
  * Value cell, a mutable data container.
  *
@@ -57,8 +59,8 @@ public final class VCell<A> extends Cell<A> {
   }
 
   /** Create a cell containing none. */
-  public static <A> VCell<Option<A>> ocell() {
-    return cell(Option.<A> none());
+  public static <A> VCell<Optional<A>> ocell() {
+    return cell(Optional.<A> empty());
   }
 
   /** Get the cell's value. */
@@ -86,7 +88,7 @@ public final class VCell<A> extends Cell<A> {
     }
   }
 
-  public <B> Cell<B> lift(Function<A, B> f) {
+  public <B> Cell<B> lift(java.util.function.Function<A, B> f) {
     return fcell(this, f);
   }
 }

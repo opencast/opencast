@@ -28,7 +28,6 @@ import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.serviceregistry.api.HostRegistration;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
-import org.opencastproject.util.data.Option;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
@@ -41,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /** Servers list provider. */
 @Component(
@@ -110,9 +110,9 @@ public class ServersListProvider implements ResourceListProvider {
       serversQuery = new ServersListQuery(query);
     }
 
-    Option<String> fHostname = serversQuery.getHostname();
-    Option<String> fNodeName = serversQuery.getNodeName();
-    Option<String> fStatus = serversQuery.getStatus();
+    Optional<String> fHostname = serversQuery.getHostname();
+    Optional<String> fNodeName = serversQuery.getNodeName();
+    Optional<String> fStatus = serversQuery.getStatus();
 
     List<HostRegistration> allServers;
     try {
@@ -127,13 +127,13 @@ public class ServersListProvider implements ResourceListProvider {
       String vHostname = server.getBaseUrl();
       String vNodeName = server.getNodeName();
 
-      if (fHostname.isSome() && !StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(fHostname.get()), vHostname))
+      if (fHostname.isPresent() && !StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(fHostname.get()), vHostname))
         continue;
 
-      if (fNodeName.isSome() && !StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(fNodeName.get()), vNodeName))
+      if (fNodeName.isPresent() && !StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(fNodeName.get()), vNodeName))
         continue;
 
-      if (fStatus.isSome()) {
+      if (fStatus.isPresent()) {
         switch (StringUtils.trimToEmpty(fStatus.get())) {
           case SERVER_STATUS_ONLINE:
             if (!vOnline) continue;

@@ -24,17 +24,16 @@ package org.opencastproject.kernel.bundleinfo;
 import static org.junit.Assert.assertEquals;
 import static org.opencastproject.kernel.bundleinfo.BundleInfoImpl.bundleInfo;
 import static org.opencastproject.util.ReflectionUtil.run;
-import static org.opencastproject.util.data.Option.some;
-
-import org.opencastproject.util.data.Option;
 
 import org.junit.Test;
+
+import java.util.Optional;
 
 public class BundleInfoJpaTest {
   @Test
   public void testTransfer() throws Exception {
     final BundleInfoJpa dto = BundleInfoJpa
-            .create(bundleInfo("host", "bundle", 1L, "version", some("sha"), some("db")));
+            .create(bundleInfo("host", "bundle", 1L, "version", Optional.of("sha"), Optional.of("db")));
     run(BundleInfo.class, new BundleInfo() {
       @Override
       public String getHost() {
@@ -61,7 +60,7 @@ public class BundleInfoJpaTest {
       }
 
       @Override
-      public Option<String> getBuildNumber() {
+      public Optional<String> getBuildNumber() {
         assertEquals("build number transferred", "sha", dto.buildNumber);
         return null;
       }
@@ -101,20 +100,20 @@ public class BundleInfoJpaTest {
       }
 
       @Override
-      public Option<String> getBuildNumber() {
-        assertEquals("build number transferred", some("sha"), info.getBuildNumber());
+      public Optional<String> getBuildNumber() {
+        assertEquals("build number transferred", Optional.of("sha"), info.getBuildNumber());
         return null;
       }
 
       @Override
       public BundleVersion getVersion() {
         assertEquals("bundle version transferred", "version", info.getVersion().getBundleVersion());
-        assertEquals("build number transferred", some("sha"), info.getVersion().getBuildNumber());
+        assertEquals("build number transferred", Optional.of("sha"), info.getVersion().getBuildNumber());
         return null;
       }
     });
     //
-    assertEquals("no build number", Option.<String> none(),
-            BundleInfoJpa.create(bundleInfo("-", "-", 0L, "-", Option.<String> none())).toBundleInfo().getBuildNumber());
+    assertEquals("no build number", Optional.<String> empty(),
+            BundleInfoJpa.create(bundleInfo("-", "-", 0L, "-", Optional.<String> empty())).toBundleInfo().getBuildNumber());
   }
 }

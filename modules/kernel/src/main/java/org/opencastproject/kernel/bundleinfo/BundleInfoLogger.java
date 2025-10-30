@@ -24,13 +24,9 @@ package org.opencastproject.kernel.bundleinfo;
 import static org.opencastproject.kernel.bundleinfo.BundleInfoImpl.bundleInfo;
 import static org.opencastproject.kernel.bundleinfo.BundleInfos.getBuildNumber;
 import static org.opencastproject.util.OsgiUtil.getContextProperty;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.util.data.Option.some;
 
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.UrlSupport;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.functions.Strings;
 
 import org.osgi.framework.Bundle;
@@ -43,6 +39,8 @@ import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Optional;
 
 /**
  * Log information about bundle build versions. The bundle needs to have the manifest header "Build-Number" set.
@@ -60,27 +58,28 @@ public class BundleInfoLogger implements BundleListener {
   //
   // However in a concurrent situation there may still occur exceptions when db methods are called _after_
   // the pool has been closed but _before_ BundleInfoLogger's deactivate method has been called.
-  private Option<BundleInfoDb> db;
+  private Optional<BundleInfoDb> db;
   private String host;
 
   /** OSGi DI */
   @Reference(unbind = "unsetDb")
   public void setDb(BundleInfoDb db) {
-    this.db = some(db);
+    this.db = Optional.of(db);
   }
 
   /** OSGi DI */
   public void unsetDb(BundleInfoDb db) {
-    this.db = none();
+    this.db = Optional.empty();
   }
 
   /** OSGi callback */
   @Activate
   public void activate(ComponentContext cc) {
-    host = option(getContextProperty(cc, OpencastConstants.SERVER_URL_PROPERTY)).bind(Strings.trimToNone).getOrElse(
-            UrlSupport.DEFAULT_BASE_URL);
-    for (BundleInfoDb a : db)
-      a.clear(host);
+    host = Optional.ofNullable(getContextProperty(cc, OpencastConstants.SERVER_URL_PROPERTY))
+        .flatMap(Strings::trimToNone)
+        .orElse(UrlSupport.DEFAULT_BASE_URL);
+    if (db.isPresent())
+      db.get().clear(host);
     cc.getBundleContext().addBundleListener(this);
     for (Bundle b : cc.getBundleContext().getBundles()) {
       logBundle(b);
@@ -90,9 +89,9 @@ public class BundleInfoLogger implements BundleListener {
   /** OSGi callback */
   @Deactivate
   public void deactivate() {
-    for (BundleInfoDb a : db) {
+    if (db.isPresent()) {
       logger.info("Clearing versions");
-      a.clear(host);
+      db.get().clear(host);
     }
   }
 
@@ -104,8 +103,8 @@ public class BundleInfoLogger implements BundleListener {
         break;
       case BundleEvent.STOPPED:
       case BundleEvent.UNINSTALLED:
-        for (BundleInfoDb a : db)
-          a.delete(host, event.getBundle().getBundleId());
+        if (db.isPresent())
+          db.get().delete(host, event.getBundle().getBundleId());
         break;
       default:
         // do nothing
@@ -116,9 +115,9 @@ public class BundleInfoLogger implements BundleListener {
     final BundleInfo info = bundleInfo(host, bundle.getSymbolicName(), bundle.getBundleId(), bundle.getVersion()
             .toString(), getBuildNumber(bundle));
     final String log = String.format("Bundle %s, id %d, version %s, build number %s", info.getBundleSymbolicName(),
-            info.getBundleId(), info.getBundleVersion(), info.getBuildNumber().getOrElse("n/a"));
+            info.getBundleId(), info.getBundleVersion(), info.getBuildNumber().orElse("n/a"));
     logger.info(log);
-    for (BundleInfoDb a : db)
-      a.store(info);
+    if (db.isPresent())
+      db.get().store(info);
   }
 }

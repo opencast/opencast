@@ -38,7 +38,6 @@ import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.XmlSafeParser;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -63,6 +62,7 @@ import org.xml.sax.SAXException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -306,8 +306,8 @@ public class PlaylistRestService {
     }
 
     SortCriterion sortCriterion = new SortCriterion("", SortCriterion.Order.None);
-    Option<String> optSort = Option.option(trimToNull(sort));
-    if (optSort.isSome()) {
+    Optional<String> optSort = Optional.ofNullable(trimToNull(sort));
+    if (optSort.isPresent()) {
       sortCriterion = SortCriterion.parse(optSort.get());
 
       switch (sortCriterion.getFieldName()) {

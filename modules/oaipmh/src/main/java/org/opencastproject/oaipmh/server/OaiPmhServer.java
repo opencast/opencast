@@ -24,16 +24,12 @@ import static org.opencastproject.oaipmh.util.OsgiUtil.checkDictionary;
 import static org.opencastproject.oaipmh.util.OsgiUtil.getCfg;
 import static org.opencastproject.oaipmh.util.OsgiUtil.getContextProperty;
 import static org.opencastproject.util.data.Collections.map;
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.functions.Strings.trimToNil;
 
 import org.opencastproject.oaipmh.util.XmlGen;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.UrlSupport;
-import org.opencastproject.util.data.Option;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.ServiceRegistration;
@@ -50,8 +46,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -184,9 +182,11 @@ public final class OaiPmhServer extends HttpServlet implements OaiPmhServerInfo 
 
   private void dispatch(final HttpServletRequest req, final HttpServletResponse res) throws IOException {
     try {
-      for (String serverUrl : OaiPmhServerInfoUtil.oaiPmhServerUrlOfCurrentOrganization(securityService)) {
-        for (String repoId : repositoryId(req, mountPoint)) {
-          if (runRepo(repoId, serverUrl, req, res)) {
+      Optional<String> serverUrl = OaiPmhServerInfoUtil.oaiPmhServerUrlOfCurrentOrganization(securityService);
+      if (serverUrl.isPresent()) {
+        Optional<String> repositoryId = repositoryId(req, mountPoint);
+        if (repositoryId.isPresent()) {
+          if (runRepo(repositoryId.get(), serverUrl.get(), req, res)) {
             return;
           } else {
             res.sendError(HttpServletResponse.SC_NOT_FOUND);
@@ -194,7 +194,7 @@ public final class OaiPmhServer extends HttpServlet implements OaiPmhServerInfo 
           }
         }
         // no repository id in path, try default repo
-        if (runRepo(defaultRepo, serverUrl, req, res)) {
+        if (runRepo(defaultRepo, serverUrl.get(), req, res)) {
           return;
         }
       }
@@ -212,9 +212,10 @@ public final class OaiPmhServer extends HttpServlet implements OaiPmhServerInfo 
    */
   private boolean runRepo(String repoId, String serverUrl, HttpServletRequest req, HttpServletResponse res)
           throws Exception {
-    for (OaiPmhRepository repo : getRepoById(repoId)) {
+    Optional<OaiPmhRepository> repo = getRepoById(repoId);
+    if (repo.isPresent()) {
       final String repoUrl = UrlSupport.concat(serverUrl, mountPoint, repoId);
-      runRepo(repo, repoUrl, req, res);
+      runRepo(repo.get(), repoUrl, req, res);
       return true;
     }
     return false;
@@ -254,19 +255,22 @@ public final class OaiPmhServer extends HttpServlet implements OaiPmhServerInfo 
    * @param mountPoint
    *          the base path of the OAI-PMH server, e.g. /oaipmh
    */
-  public static Option<String> repositoryId(HttpServletRequest req, String mountPoint) {
-    return mlist(StringUtils.removeStart(UrlSupport.removeDoubleSeparator(req.getRequestURI()), mountPoint).split("/"))
-            .bind(trimToNil).headOpt();
+  public static Optional<String> repositoryId(HttpServletRequest req, String mountPoint) {
+    String[] parts = StringUtils.removeStart(UrlSupport.removeDoubleSeparator(req.getRequestURI()), mountPoint).split("/");
+
+    return Arrays.stream(parts)
+        .flatMap(s -> trimToNil(s).stream())
+        .findFirst();
   }
 
   /** Get a repository by id. */
-  private Option<OaiPmhRepository> getRepoById(String id) {
+  private Optional<OaiPmhRepository> getRepoById(String id) {
     synchronized (repositories) {
       if (hasRepo(id)) {
-        return some(repositories.get(id));
+        return Optional.of(repositories.get(id));
       } else {
         logger.warn("No OAI-PMH repository has been registered with id " + id);
-        return none();
+        return Optional.empty();
       }
     }
   }

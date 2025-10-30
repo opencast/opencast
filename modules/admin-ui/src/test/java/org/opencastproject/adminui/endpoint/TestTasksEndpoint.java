@@ -57,7 +57,6 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
@@ -199,18 +198,18 @@ public class TestTasksEndpoint extends TasksEndpoint {
     return new AssetStore() {
 
       @Override
-      public Option<Long> getUsedSpace() {
-        return Option.none();
+      public Optional<Long> getUsedSpace() {
+        return Optional.empty();
       }
 
       @Override
-      public Option<Long> getUsableSpace() {
-        return Option.none();
+      public Optional<Long> getUsableSpace() {
+        return Optional.empty();
       }
 
       @Override
-      public Option<Long> getTotalSpace() {
-        return Option.none();
+      public Optional<Long> getTotalSpace() {
+        return Optional.empty();
       }
 
       @Override

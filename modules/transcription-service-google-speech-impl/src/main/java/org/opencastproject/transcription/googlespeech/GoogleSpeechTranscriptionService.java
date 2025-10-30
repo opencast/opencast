@@ -51,7 +51,6 @@ import org.opencastproject.transcription.persistence.TranscriptionProviderContro
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.UrlSupport;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.ConfiguredWorkflow;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
@@ -231,8 +230,8 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     storageBucket = OsgiUtil.getComponentContextProperty(cc, GOOGLE_CLOUD_BUCKET);
 
     // access token endpoint
-    Option<String> tokenOpt = OsgiUtil.getOptCfg(cc.getProperties(), GOOGLE_CLOUD_TOKEN_ENDPOINT_URL);
-    if (tokenOpt.isSome()) {
+    Optional<String> tokenOpt = OsgiUtil.getOptCfg(cc.getProperties(), GOOGLE_CLOUD_TOKEN_ENDPOINT_URL);
+    if (tokenOpt.isPresent()) {
       tokenEndpoint = tokenOpt.get();
       logger.info("Access token endpoint is set to {}", tokenEndpoint);
     } else {
@@ -240,40 +239,40 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     }
 
     // profanity filter to use
-    Option<String> profanityOpt = OsgiUtil.getOptCfg(cc.getProperties(), PROFANITY_FILTER);
-    if (profanityOpt.isSome()) {
+    Optional<String> profanityOpt = OsgiUtil.getOptCfg(cc.getProperties(), PROFANITY_FILTER);
+    if (profanityOpt.isPresent()) {
       profanityFilter = Boolean.parseBoolean(profanityOpt.get());
       logger.info("Profanity filter is set to {}", profanityFilter);
     } else {
       logger.info("Default profanity filter will be used");
     }
     // Language model to be used
-    Option<String> languageOpt = OsgiUtil.getOptCfg(cc.getProperties(), GOOGLE_SPEECH_LANGUAGE);
-    if (languageOpt.isSome()) {
+    Optional<String> languageOpt = OsgiUtil.getOptCfg(cc.getProperties(), GOOGLE_SPEECH_LANGUAGE);
+    if (languageOpt.isPresent()) {
       defaultLanguage = languageOpt.get();
       logger.info("Language used is {}", defaultLanguage);
     } else {
       logger.info("Default language will be used");
     }
     // Enable punctuation or not
-    Option<String> punctuationOpt = OsgiUtil.getOptCfg(cc.getProperties(), ENABLE_PUNCTUATION);
-    if (punctuationOpt.isSome()) {
+    Optional<String> punctuationOpt = OsgiUtil.getOptCfg(cc.getProperties(), ENABLE_PUNCTUATION);
+    if (punctuationOpt.isPresent()) {
       enablePunctuation = Boolean.parseBoolean(punctuationOpt.get());
       logger.info("Enable punctuation is set to {}", enablePunctuation);
     } else {
       logger.info("Default punctuation setting will be used");
     }
     // Transription model to be used
-    Option<String> transModel = OsgiUtil.getOptCfg(cc.getProperties(), TRANSCRIPTION_MODEL);
-    if (transModel.isSome()) {
+    Optional<String> transModel = OsgiUtil.getOptCfg(cc.getProperties(), TRANSCRIPTION_MODEL);
+    if (transModel.isPresent()) {
       model = transModel.get();
       logger.info("Transcription model used is {}", model);
     } else {
       logger.info("Default Transcription model will be used");
     }
     // Encoding to be used
-    Option<String> encodingOpt = OsgiUtil.getOptCfg(cc.getProperties(), ENCODING_EXTENSION);
-    if (encodingOpt.isSome()) {
+    Optional<String> encodingOpt = OsgiUtil.getOptCfg(cc.getProperties(), ENCODING_EXTENSION);
+    if (encodingOpt.isPresent()) {
       defaultEncoding = encodingOpt.get();
       logger.info("Encoding used is {}", defaultEncoding);
     } else {
@@ -281,14 +280,14 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     }
 
     // Workflow to execute when getting callback (optional, with default)
-    Option<String> wfOpt = OsgiUtil.getOptCfg(cc.getProperties(), WORKFLOW_CONFIG);
-    if (wfOpt.isSome()) {
+    Optional<String> wfOpt = OsgiUtil.getOptCfg(cc.getProperties(), WORKFLOW_CONFIG);
+    if (wfOpt.isPresent()) {
       workflowDefinitionId = wfOpt.get();
     }
     logger.info("Workflow definition is {}", workflowDefinitionId);
     // Interval to check for completed transcription jobs and start workflows to attach transcripts
-    Option<String> intervalOpt = OsgiUtil.getOptCfg(cc.getProperties(), DISPATCH_WORKFLOW_INTERVAL_CONFIG);
-    if (intervalOpt.isSome()) {
+    Optional<String> intervalOpt = OsgiUtil.getOptCfg(cc.getProperties(), DISPATCH_WORKFLOW_INTERVAL_CONFIG);
+    if (intervalOpt.isPresent()) {
       try {
         workflowDispatchInterval = Long.parseLong(intervalOpt.get());
       } catch (NumberFormatException e) {
@@ -299,8 +298,8 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     }
     logger.info("Workflow dispatch interval is {} seconds", workflowDispatchInterval);
     // How long to wait after a transcription is supposed to finish before starting checking
-    Option<String> bufferOpt = OsgiUtil.getOptCfg(cc.getProperties(), COMPLETION_CHECK_BUFFER_CONFIG);
-    if (bufferOpt.isSome()) {
+    Optional<String> bufferOpt = OsgiUtil.getOptCfg(cc.getProperties(), COMPLETION_CHECK_BUFFER_CONFIG);
+    if (bufferOpt.isPresent()) {
       try {
         completionCheckBuffer = Long.parseLong(bufferOpt.get());
       } catch (NumberFormatException e) {
@@ -311,8 +310,8 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     }
     logger.info("Completion check buffer is {} seconds", completionCheckBuffer);
     // How long to wait after a transcription is supposed to finish before marking the job as canceled in the db
-    Option<String> maxProcessingOpt = OsgiUtil.getOptCfg(cc.getProperties(), MAX_PROCESSING_TIME_CONFIG);
-    if (maxProcessingOpt.isSome()) {
+    Optional<String> maxProcessingOpt = OsgiUtil.getOptCfg(cc.getProperties(), MAX_PROCESSING_TIME_CONFIG);
+    if (maxProcessingOpt.isPresent()) {
       try {
         maxProcessingSeconds = Long.parseLong(maxProcessingOpt.get());
       } catch (NumberFormatException e) {
@@ -323,8 +322,8 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     }
     logger.info("Maximum time a job is checked after it should have ended is {} seconds", maxProcessingSeconds);
     // How long to keep result files in the working file repository
-    Option<String> cleaupOpt = OsgiUtil.getOptCfg(cc.getProperties(), CLEANUP_RESULTS_DAYS_CONFIG);
-    if (cleaupOpt.isSome()) {
+    Optional<String> cleaupOpt = OsgiUtil.getOptCfg(cc.getProperties(), CLEANUP_RESULTS_DAYS_CONFIG);
+    if (cleaupOpt.isPresent()) {
       try {
         cleanupResultDays = Integer.parseInt(cleaupOpt.get());
       } catch (NumberFormatException e) {
@@ -344,13 +343,13 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     scheduledExecutor.scheduleWithFixedDelay(new ResultsFileCleanup(), 1, 1, TimeUnit.DAYS);
 
     // Notification email passed in this service configuration?
-    Option<String> optTo = OsgiUtil.getOptCfg(cc.getProperties(), NOTIFICATION_EMAIL_CONFIG);
-    if (optTo.isSome()) {
+    Optional<String> optTo = OsgiUtil.getOptCfg(cc.getProperties(), NOTIFICATION_EMAIL_CONFIG);
+    if (optTo.isPresent()) {
       toEmailAddress = optTo.get();
     } else {
       // Use admin email informed in custom.properties
       optTo = OsgiUtil.getOptContextProperty(cc, OpencastConstants.ADMIN_EMAIL_PROPERTY);
-      if (optTo.isSome()) {
+      if (optTo.isPresent()) {
         toEmailAddress = optTo.get();
       }
     }
@@ -360,8 +359,8 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
       logger.warn("Email notification disabled");
     }
 
-    Option<String> optCluster = OsgiUtil.getOptContextProperty(cc, OpencastConstants.ENVIRONMENT_NAME_PROPERTY);
-    if (optCluster.isSome()) {
+    Optional<String> optCluster = OsgiUtil.getOptContextProperty(cc, OpencastConstants.ENVIRONMENT_NAME_PROPERTY);
+    if (optCluster.isPresent()) {
       clusterName = optCluster.get();
     }
     logger.info("Environment name is {}", clusterName);

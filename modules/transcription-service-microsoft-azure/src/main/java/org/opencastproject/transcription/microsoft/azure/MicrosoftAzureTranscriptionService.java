@@ -53,7 +53,6 @@ import org.opencastproject.transcription.persistence.TranscriptionJobControl;
 import org.opencastproject.transcription.persistence.TranscriptionProviderControl;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.ConfiguredWorkflow;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
@@ -175,8 +174,8 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
   @Modified
   public void modified(ComponentContext cc) {
     logger.debug("Updating config...");
-    Option<Boolean> enabledOpt = OsgiUtil.getOptCfgAsBoolean(cc.getProperties(), KEY_ENABLED);
-    if (enabledOpt.isSome()) {
+    Optional<Boolean> enabledOpt = OsgiUtil.getOptCfgAsBoolean(cc.getProperties(), KEY_ENABLED);
+    if (enabledOpt.isPresent()) {
       enabled = enabledOpt.get();
     } else {
       deactivate();
@@ -188,9 +187,9 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
       return;
     }
 
-    Option<String> azureStorageAccountNameKeyOpt = OsgiUtil.getOptCfg(cc.getProperties(),
+    Optional<String> azureStorageAccountNameKeyOpt = OsgiUtil.getOptCfg(cc.getProperties(),
         KEY_AZURE_STORAGE_ACCOUNT_NAME);
-    if (azureStorageAccountNameKeyOpt.isSome()) {
+    if (azureStorageAccountNameKeyOpt.isPresent()) {
       azureStorageAccountName = azureStorageAccountNameKeyOpt.get();
     } else {
       logger.warn("Azure storage account name key was not set. Disabling Microsoft Azure transcription service.");
@@ -198,8 +197,8 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
       return;
     }
 
-    Option<String> azureAccountAccessKeyKeyOpt = OsgiUtil.getOptCfg(cc.getProperties(), KEY_AZURE_ACCOUNT_ACCESS_KEY);
-    if (azureAccountAccessKeyKeyOpt.isSome()) {
+    Optional<String> azureAccountAccessKeyKeyOpt = OsgiUtil.getOptCfg(cc.getProperties(), KEY_AZURE_ACCOUNT_ACCESS_KEY);
+    if (azureAccountAccessKeyKeyOpt.isPresent()) {
       azureAccountAccessKey = azureAccountAccessKeyKeyOpt.get();
     } else {
       logger.warn("Azure storage account access key was not set. Disabling Microsoft Azure transcription service.");
@@ -207,9 +206,9 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
       return;
     }
 
-    Option<String> azureSpeechServicesKeyOpt = OsgiUtil.getOptCfg(cc.getProperties(),
+    Optional<String> azureSpeechServicesKeyOpt = OsgiUtil.getOptCfg(cc.getProperties(),
         KEY_AZURE_SPEECH_SERVICES_ENDPOINT);
-    if (azureSpeechServicesKeyOpt.isSome()) {
+    if (azureSpeechServicesKeyOpt.isPresent()) {
       azureSpeechServicesEndpoint = azureSpeechServicesKeyOpt.get();
     } else {
       logger.warn("Azure speech services endpoint was not set. Disabling Microsoft Azure transcription service.");
@@ -217,9 +216,9 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
       return;
     }
 
-    Option<String> azureCognitiveServicesSubscriptionKeyKeyOpt = OsgiUtil.getOptCfg(cc.getProperties(),
+    Optional<String> azureCognitiveServicesSubscriptionKeyKeyOpt = OsgiUtil.getOptCfg(cc.getProperties(),
         KEY_COGNITIVE_SERVICES_SUBSCRIPTION_KEY);
-    if (azureCognitiveServicesSubscriptionKeyKeyOpt.isSome()) {
+    if (azureCognitiveServicesSubscriptionKeyKeyOpt.isPresent()) {
       azureCognitiveServicesSubscriptionKey = azureCognitiveServicesSubscriptionKeyKeyOpt.get();
     } else {
       logger.warn("Azure cognitive services subscription key was not set. "
@@ -229,8 +228,8 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
     }
 
     // optional values
-    Option<String> workflowKeyOpt = OsgiUtil.getOptCfg(cc.getProperties(), KEY_WORKFLOW);
-    if (workflowKeyOpt.isSome()) {
+    Optional<String> workflowKeyOpt = OsgiUtil.getOptCfg(cc.getProperties(), KEY_WORKFLOW);
+    if (workflowKeyOpt.isPresent()) {
       workflowDefinitionId = workflowKeyOpt.get();
       logger.info("Workflow is set to '{}'.", workflowDefinitionId);
     } else {
@@ -238,16 +237,16 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
       logger.info("Default workflow '{}' will be used.", workflowDefinitionId);
     }
 
-    Option<String> azureBlobPathKeyOpt = OsgiUtil.getOptCfg(cc.getProperties(), KEY_AZURE_BOLB_PATH);
-    if (azureBlobPathKeyOpt.isSome()) {
+    Optional<String> azureBlobPathKeyOpt = OsgiUtil.getOptCfg(cc.getProperties(), KEY_AZURE_BOLB_PATH);
+    if (azureBlobPathKeyOpt.isPresent()) {
       azureBlobPath = azureBlobPathKeyOpt.get();
     } else {
       logger.debug("Azure blob path was not set, using default path.");
       azureBlobPath = DEFAULT_AZURE_BLOB_PATH;
     }
 
-    Option<String> languageOpt = OsgiUtil.getOptCfg(cc.getProperties(), KEY_LANGUAGE);
-    if (languageOpt.isSome()) {
+    Optional<String> languageOpt = OsgiUtil.getOptCfg(cc.getProperties(), KEY_LANGUAGE);
+    if (languageOpt.isPresent()) {
       language = languageOpt.get();
       logger.info("Default language is set to '{}'.", language);
     } else {
@@ -256,8 +255,8 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
     }
 
     autodetectLanguages = new ArrayList<>();
-    Option<String> autoDetectLanguagesOpt = OsgiUtil.getOptCfg(cc.getProperties(), KEY_AUTO_DETECT_LANGUAGES);
-    if (languageOpt.isSome()) {
+    Optional<String> autoDetectLanguagesOpt = OsgiUtil.getOptCfg(cc.getProperties(), KEY_AUTO_DETECT_LANGUAGES);
+    if (languageOpt.isPresent()) {
       for (String lang : StringUtils.split(autoDetectLanguagesOpt.get(), ",")) {
         if (StringUtils.isNotBlank(lang)) {
           autodetectLanguages.add(StringUtils.trimToEmpty(lang));
@@ -265,17 +264,17 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
       }
     }
 
-    Option<String> azureContainerNameKeyOpt = OsgiUtil.getOptCfg(cc.getProperties(), KEY_AZURE_CONTAINER_NAME);
-    if (azureContainerNameKeyOpt.isSome()) {
+    Optional<String> azureContainerNameKeyOpt = OsgiUtil.getOptCfg(cc.getProperties(), KEY_AZURE_CONTAINER_NAME);
+    if (azureContainerNameKeyOpt.isPresent()) {
       azureContainerName = azureContainerNameKeyOpt.get();
     } else {
       logger.debug("Azure storage container name was not set, using default path.");
       azureContainerName = DEFAULT_AZURE_CONTAINER_NAME;
     }
 
-    Option<String> azureSpeechRecognitionMinConfidenceKeyOpt = OsgiUtil.getOptCfg(cc.getProperties(),
+    Optional<String> azureSpeechRecognitionMinConfidenceKeyOpt = OsgiUtil.getOptCfg(cc.getProperties(),
         KEY_AZURE_SPEECH_RECOGNITION_MIN_CONFIDENCE);
-    if (azureSpeechRecognitionMinConfidenceKeyOpt.isSome()) {
+    if (azureSpeechRecognitionMinConfidenceKeyOpt.isPresent()) {
       String azureSpeechRecognitionMinConfidenceStr = azureSpeechRecognitionMinConfidenceKeyOpt.get();
       try {
         azureSpeechRecognitionMinConfidence = Float.valueOf(azureSpeechRecognitionMinConfidenceStr);
@@ -291,8 +290,8 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
       azureSpeechRecognitionMinConfidence = DEFAULT_MIN_CONFIDENCE;
     }
 
-    Option<String> splitTextLineLengthOpt = OsgiUtil.getOptCfg(cc.getProperties(), KEY_SPLIT_TEXT_LINE_LENGTH);
-    if (splitTextLineLengthOpt.isSome()) {
+    Optional<String> splitTextLineLengthOpt = OsgiUtil.getOptCfg(cc.getProperties(), KEY_SPLIT_TEXT_LINE_LENGTH);
+    if (splitTextLineLengthOpt.isPresent()) {
       try {
         splitTextLineLength = Integer.parseInt(splitTextLineLengthOpt.get());
       } catch (NumberFormatException e) {
@@ -306,8 +305,8 @@ public class MicrosoftAzureTranscriptionService extends AbstractJobProducer impl
       splitTextLineLength = DEFAULT_SPLIT_TEXT_LINE_LENGTH;
     }
 
-    Option<String> outputFileFormatOpt = OsgiUtil.getOptCfg(cc.getProperties(), KEY_OUTPUT_FILE_FORMAT);
-    if (outputFileFormatOpt.isSome()) {
+    Optional<String> outputFileFormatOpt = OsgiUtil.getOptCfg(cc.getProperties(), KEY_OUTPUT_FILE_FORMAT);
+    if (outputFileFormatOpt.isPresent()) {
       outputFileFormat = outputFileFormatOpt.get();
       switch (outputFileFormat) {
         case "srt":

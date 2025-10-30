@@ -23,11 +23,11 @@ package org.opencastproject.util;
 
 import static org.junit.Assert.assertTrue;
 
-import org.opencastproject.util.data.Function0;
-
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Optional;
 
 public class NeedleEyeTest {
 
@@ -45,34 +45,27 @@ public class NeedleEyeTest {
     final NeedleEye eye = new NeedleEye();
     final boolean[] r1 = new boolean[] {false};
     final boolean[] r2 = new boolean[] {false};
-    final Thread t1 = new Thread(createRunnabe(eye, r1));
-    final Thread t2 = new Thread(createRunnabe(eye, r2));
+    Thread t1 = new Thread(createRunnable(eye, r1));
+    Thread t2 = new Thread(createRunnable(eye, r2));
     t1.start();
     t2.start();
     t1.join();
     t2.join();
+    // Exactly one thread should have executed the critical section
     assertTrue(r1[0] != r2[0]);
   }
 
-  private Runnable createRunnabe(final NeedleEye eye, final boolean[] result) {
-    return new Runnable() {
-      @Override public void run() {
-        for (Boolean ignore : eye.apply(sleep(1000))) {
-          result[0] = true;
-          return;
-        }
-        logger.info("not executed");
-      }
-    };
-  }
-
-  private Function0<Boolean> sleep(final long time) {
-    return new Function0.X<Boolean>() {
-      @Override public Boolean xapply() throws Exception {
-        logger.info(this + " is sleeping for " + time + " ms");
-        Thread.sleep(time);
-        logger.info(this + " awaked");
+  private Runnable createRunnable(final NeedleEye eye, final boolean[] result) {
+    return () -> {
+      // Use Callable<Boolean> with NeedleEye
+      Optional<Boolean> executed = eye.apply(() -> {
+        Thread.sleep(1000); // simulate work
+        result[0] = true;
         return true;
+      });
+
+      if (!executed.isPresent()) {
+        logger.info("Not executed by thread {}", Thread.currentThread().getName());
       }
     };
   }

@@ -31,7 +31,6 @@ import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.UrlSupport;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.jmx.JmxUtil;
 import org.opencastproject.workingfilerepository.api.PathMappable;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
@@ -67,6 +66,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.management.ObjectInstance;
 
@@ -918,9 +918,9 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    *
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getTotalSpace()
    */
-  public Option<Long> getTotalSpace() {
+  public Optional<Long> getTotalSpace() {
     File f = new File(rootDirectory);
-    return Option.some(f.getTotalSpace());
+    return Optional.of(f.getTotalSpace());
   }
 
   /**
@@ -928,9 +928,9 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    *
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getUsableSpace()
    */
-  public Option<Long> getUsableSpace() {
+  public Optional<Long> getUsableSpace() {
     File f = new File(rootDirectory);
-    return Option.some(f.getUsableSpace());
+    return Optional.of(f.getUsableSpace());
   }
 
   /**
@@ -939,8 +939,8 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getUsedSpace()
    */
   @Override
-  public Option<Long> getUsedSpace() {
-    return Option.some(FileUtils.sizeOfDirectory(new File(rootDirectory)));
+  public Optional<Long> getUsedSpace() {
+    return Optional.of(FileUtils.sizeOfDirectory(new File(rootDirectory)));
   }
 
   /**

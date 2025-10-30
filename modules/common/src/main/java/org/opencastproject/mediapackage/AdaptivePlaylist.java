@@ -23,7 +23,6 @@ package org.opencastproject.mediapackage;
 
 
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Function2;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -53,6 +52,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.regex.Matcher;
@@ -709,8 +709,7 @@ public interface AdaptivePlaylist extends Track {
      * @throws MediaPackageException
      *           if bad mp
      */
-
-    public List<Track> rewriteHLS(MediaPackage mp, Function2<File, Track, Track> replaceTrackFileInWS,
+    public List<Track> rewriteHLS(MediaPackage mp, BiFunction<File, Track, Track> replaceTrackFileInWS,
             Function<Track, Void> removeFromWS) throws MediaPackageException {
       /* rewrite variants first, * segments are unchanged */
       List<Rep> variants = playlists.stream().filter(i -> !masters.contains(i)).collect(Collectors.toList());

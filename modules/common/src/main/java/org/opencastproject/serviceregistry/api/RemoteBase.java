@@ -21,15 +21,10 @@
 
 package org.opencastproject.serviceregistry.api;
 
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
-
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.util.UrlSupport;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -49,6 +44,7 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Base class serving as a convenience implementation for remote services.
@@ -104,32 +100,26 @@ public class RemoteBase {
     this.remoteServiceManager = remoteServiceManager;
   }
 
-  protected <A> Option<A> runRequest(HttpRequestBase req, Function<HttpResponse, A> f) {
+  protected <A> Optional<A> runRequest(HttpRequestBase req, java.util.function.Function<HttpResponse, Optional<A>> f) {
     HttpResponse res = null;
     try {
       res = getResponse(req);
-      return res != null ? some(f.apply(res)) : Option.<A> none();
+      return res != null ? f.apply(res) : Optional.empty();
     } finally {
       closeConnection(res);
     }
   }
 
-
-
-  public static final Function<HttpResponse, Option<List<MediaPackageElement>>> elementsFromHttpResponse =
-    new Function<HttpResponse, Option<List<MediaPackageElement>>>() {
-    @Override
-    public Option<List<MediaPackageElement>> apply(HttpResponse response) {
-      try {
-        final String xml = IOUtils.toString(response.getEntity().getContent(), Charset.forName("utf-8"));
-        List<MediaPackageElement> result = new ArrayList<>(MediaPackageElementParser.getArrayFromXml(xml));
-        return some(result);
-      } catch (Exception e) {
-        logger.error("Error parsing Job from HTTP response", e);
-        return none();
-      }
+  public static Optional<List<MediaPackageElement>> elementsFromHttpResponse(HttpResponse response) {
+    try {
+      String xml = IOUtils.toString(response.getEntity().getContent(), Charset.forName("utf-8"));
+      List<MediaPackageElement> result = new ArrayList<>(MediaPackageElementParser.getArrayFromXml(xml));
+      return Optional.of(result);
+    } catch (Exception e) {
+      logger.error("Error parsing MediaPackage elements from HTTP response", e);
+      return Optional.empty();
     }
-  };
+  }
 
   /**
    * Makes a request to all available remote services and returns the response as soon as the first of them returns the

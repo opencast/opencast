@@ -54,7 +54,6 @@ import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.UrlSupport;
-import org.opencastproject.util.data.Effect;
 import org.opencastproject.util.data.functions.Misc;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -895,15 +894,16 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
     final User systemUser = SecurityUtil.createSystemUser(systemUserName, organization);
     SecurityUtil.runAs(getSecurityService(), organization, systemUser, () -> {
       waitForResource(trustedHttpClient, uri, HttpServletResponse.SC_OK, TIMEOUT, INTERVAL)
-          .fold(Misc.chuck(), new Effect.X<Integer>() {
-            @Override
-            public void xrun(Integer status) throws Exception {
-              if (ne(status, HttpServletResponse.SC_OK)) {
-                logger.warn("Attempt to access distributed file {} returned code {}", uri, status);
-                throw new DistributionException("Unable to load distributed file " + uri.toString());
+          .fold(
+              Misc.chuck(),
+              status -> {
+                if (ne(status, HttpServletResponse.SC_OK)) {
+                  logger.warn("Attempt to access distributed file {} returned code {}", uri, status);
+                  Misc.chuck(new DistributionException("Unable to load distributed file " + uri.toString()));
+                }
+                return null;
               }
-            }
-          });
+          );
     });
   }
 

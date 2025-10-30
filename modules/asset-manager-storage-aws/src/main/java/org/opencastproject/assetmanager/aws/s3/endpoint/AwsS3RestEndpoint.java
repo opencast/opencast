@@ -34,7 +34,6 @@ import org.opencastproject.assetmanager.aws.s3.AwsS3AssetStore;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Function0;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -50,6 +49,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.BadRequestException;
@@ -110,41 +110,36 @@ public class AwsS3RestEndpoint {
       },
       returnDescription = "List each assets's Object Key and S3 Storage Class")
   public Response getStorageClass(@PathParam("mediaPackageId") final String mediaPackageId) {
-    return handleException(new Function0<Response>() {
-      private String getMediaPackageId() {
-        return StringUtils.trimToNull(mediaPackageId);
+    return handleException(() -> {
+      String mpId = StringUtils.trimToNull(mediaPackageId);
+
+      Optional<Snapshot> snapshot = assetManager.getLatestSnapshot(mpId);
+      if (snapshot.isEmpty()) {
+        return notFound();
       }
 
-      @Override public Response apply() {
-        Optional<Snapshot> snapshot = assetManager.getLatestSnapshot(mediaPackageId);
-        if (snapshot.isEmpty()) {
-          return notFound();
+      StringBuilder info = new StringBuilder();
+      for (MediaPackageElement e : snapshot.get().getMediaPackage().elements()) {
+        if (e.getElementType() == MediaPackageElement.Type.Publication) {
+          continue;
         }
 
-        StringBuilder info = new StringBuilder();
-        for (MediaPackageElement e : snapshot.get().getMediaPackage().elements()) {
-          if (e.getElementType() == MediaPackageElement.Type.Publication) {
-            continue;
+        StoragePath storagePath = new StoragePath(securityService.getOrganization().getId(),
+            mpId,
+            snapshot.get().getVersion(),
+            e.getIdentifier());
+        if (awsS3AssetStore.contains(storagePath)) {
+          try {
+            info.append(String.format("%s,%s\n", awsS3AssetStore.getAssetObjectKey(storagePath),
+                                                 awsS3AssetStore.getAssetStorageClass(storagePath)));
+          } catch (AssetStoreException ex) {
+            throw new AssetManagerException(ex);
           }
-
-          StoragePath storagePath = new StoragePath(securityService.getOrganization().getId(),
-              getMediaPackageId(),
-              snapshot.get().getVersion(),
-              e.getIdentifier());
-          if (awsS3AssetStore.contains(storagePath)) {
-            try {
-              info.append(String.format("%s,%s\n", awsS3AssetStore.getAssetObjectKey(storagePath),
-                                                   awsS3AssetStore.getAssetStorageClass(storagePath)));
-            } catch (AssetStoreException ex) {
-              throw new AssetManagerException(ex);
-            }
-          } else {
-            info.append(String.format("%s,NONE\n", e.getURI()));
-          }
+        } else {
+          info.append(String.format("%s,NONE\n", e.getURI()));
         }
-        return ok(info.toString());
       }
-
+      return ok(info.toString());
     });
   }
 
@@ -178,45 +173,36 @@ public class AwsS3RestEndpoint {
       returnDescription = "List each asset's Object Key and new S3 Storage Class")
   public Response modifyStorageClass(@PathParam("mediaPackageId") final String mediaPackageId,
                                      @FormParam("storageClass") final String storageClass) {
-    return handleException(new Function0<Response>() {
-      private String getMediaPackageId() {
-        return StringUtils.trimToNull(mediaPackageId);
-      }
+    return handleException(() -> {
+      String mpId = StringUtils.trimToNull(mediaPackageId);
+      String sc = StringUtils.trimToNull(storageClass);
 
-      private String getStorageClass() {
-        return StringUtils.trimToNull(storageClass);
+      Optional<Snapshot> snapshot = assetManager.getLatestSnapshot(mpId);
+      if (snapshot.isEmpty()) {
+        return notFound();
       }
-
-      @Override public Response apply() {
-        Optional<Snapshot> snapshot = assetManager.getLatestSnapshot(mediaPackageId);
-        if (snapshot.isEmpty()) {
-          return notFound();
+      StringBuilder info = new StringBuilder();
+      for (MediaPackageElement e : snapshot.get().getMediaPackage().elements()) {
+        if (e.getElementType() == MediaPackageElement.Type.Publication) {
+          continue;
         }
-        StringBuilder info = new StringBuilder();
-        for (MediaPackageElement e : snapshot.get().getMediaPackage().elements()) {
-          if (e.getElementType() == MediaPackageElement.Type.Publication) {
-            continue;
-          }
 
-          StoragePath storagePath = new StoragePath(securityService.getOrganization().getId(),
-              getMediaPackageId(),
-              snapshot.get().getVersion(),
-              e.getIdentifier());
-          if (awsS3AssetStore.contains(storagePath)) {
-            try {
-              info.append(String.format("%s,%s\n", awsS3AssetStore.getAssetObjectKey(storagePath),
-                                                   awsS3AssetStore.modifyAssetStorageClass(storagePath,
-                                                   getStorageClass())));
-            } catch (AssetStoreException ex) {
-              throw new AssetManagerException(ex);
-            }
-          } else {
-            info.append(String.format("%s,NONE\n", e.getURI()));
+        StoragePath storagePath = new StoragePath(securityService.getOrganization().getId(),
+            mpId,
+            snapshot.get().getVersion(),
+            e.getIdentifier());
+        if (awsS3AssetStore.contains(storagePath)) {
+          try {
+            info.append(String.format("%s,%s\n", awsS3AssetStore.getAssetObjectKey(storagePath),
+                                                 awsS3AssetStore.modifyAssetStorageClass(storagePath, sc)));
+          } catch (AssetStoreException ex) {
+            throw new AssetManagerException(ex);
           }
+        } else {
+          info.append(String.format("%s,NONE\n", e.getURI()));
         }
-        return ok(info.toString());
       }
-
+      return ok(info.toString());
     });
   }
 
@@ -245,43 +231,39 @@ public class AwsS3RestEndpoint {
       },
       returnDescription = "List each glacier asset's restoration status and expiration date")
   public Response getAssetRestoreState(@PathParam("mediaPackageId") final String mediaPackageId) {
-    return handleException(new Function0<Response>() {
-      private String getMediaPackageId() {
-        return StringUtils.trimToNull(mediaPackageId);
+    return handleException(() -> {
+      String mpId = StringUtils.trimToNull(mediaPackageId);
+
+      Optional<Snapshot> snapshot = assetManager.getLatestSnapshot(mpId);
+      if (snapshot.isEmpty()) {
+        return notFound();
       }
 
-      @Override public Response apply() {
-        Optional<Snapshot> snapshot = assetManager.getLatestSnapshot(mediaPackageId);
-        if (snapshot.isEmpty()) {
-          return notFound();
+      StringBuilder info = new StringBuilder();
+      for (MediaPackageElement e : snapshot.get().getMediaPackage().elements()) {
+        if (e.getElementType() == MediaPackageElement.Type.Publication) {
+          continue;
         }
 
-        StringBuilder info = new StringBuilder();
-        for (MediaPackageElement e : snapshot.get().getMediaPackage().elements()) {
-          if (e.getElementType() == MediaPackageElement.Type.Publication) {
-            continue;
+        StoragePath storagePath = new StoragePath(securityService.getOrganization().getId(),
+                                                  mpId,
+                                                  snapshot.get().getVersion(),
+                                                  e.getIdentifier());
+        if (isFrozen(storagePath)) {
+          try {
+            info.append(String.format("%s,%s\n", awsS3AssetStore.getAssetObjectKey(storagePath),
+                                                 awsS3AssetStore.getAssetRestoreStatusString(storagePath)));
+          } catch (AssetStoreException ex) {
+            throw new AssetManagerException(ex);
           }
-
-          StoragePath storagePath = new StoragePath(securityService.getOrganization().getId(),
-                                                    getMediaPackageId(),
-                                                    snapshot.get().getVersion(),
-                                                    e.getIdentifier());
-          if (isFrozen(storagePath)) {
-            try {
-              info.append(String.format("%s,%s\n", awsS3AssetStore.getAssetObjectKey(storagePath),
-                                                   awsS3AssetStore.getAssetRestoreStatusString(storagePath)));
-            } catch (AssetStoreException ex) {
-              throw new AssetManagerException(ex);
-            }
-          } else {
-            info.append(String.format("%s,NONE\n", storagePath));
-          }
+        } else {
+          info.append(String.format("%s,NONE\n", storagePath));
         }
-        if (info.length() == 0) {
-          return noContent();
-        }
-        return ok(info.toString());
       }
+      if (info.length() == 0) {
+        return noContent();
+      }
+      return ok(info.toString());
     });
   }
 
@@ -319,46 +301,38 @@ public class AwsS3RestEndpoint {
       returnDescription = "Restore of assets initiated")
   public Response restoreAssets(@PathParam("mediaPackageId") final String mediaPackageId,
                                 @FormParam("restorePeriod") final Integer restorePeriod) {
-    return handleException(new Function0<Response>() {
-      private String getMediaPackageId() {
-        return StringUtils.trimToNull(mediaPackageId);
+    return handleException(() -> {
+      String mpId = StringUtils.trimToNull(mediaPackageId);
+      Integer rp = restorePeriod != null ? restorePeriod : awsS3AssetStore.getRestorePeriod();
+
+      if (rp < 1) {
+        throw new BadRequestException("Restore period must be greater than zero!");
       }
 
-      private Integer getRestorePeriod() {
-        return restorePeriod != null ? restorePeriod : awsS3AssetStore.getRestorePeriod();
+      Optional<Snapshot> snapshot = assetManager.getLatestSnapshot(mpId);
+      if (snapshot.isEmpty()) {
+        return notFound();
       }
 
-      @Override public Response apply() {
-        Integer restorePeriod = getRestorePeriod();
-        if (restorePeriod < 1) {
-          throw new BadRequestException("Restore period must be greater than zero!");
+      for (MediaPackageElement e : snapshot.get().getMediaPackage().elements()) {
+        if (e.getElementType() == MediaPackageElement.Type.Publication) {
+          continue;
         }
 
-        Optional<Snapshot> snapshot = assetManager.getLatestSnapshot(mediaPackageId);
-        if (snapshot.isEmpty()) {
-          return notFound();
-        }
-
-        for (MediaPackageElement e : snapshot.get().getMediaPackage().elements()) {
-          if (e.getElementType() == MediaPackageElement.Type.Publication) {
-            continue;
-          }
-
-          StoragePath storagePath = new StoragePath(securityService.getOrganization().getId(),
-                                                    getMediaPackageId(),
-                                                    snapshot.get().getVersion(),
-                                                    e.getIdentifier());
-          if (isFrozen(storagePath)) {
-            try {
-              // Initiate restore and return
-              awsS3AssetStore.initiateRestoreAsset(storagePath, getRestorePeriod());
-            } catch (AssetStoreException ex) {
-              throw new AssetManagerException(ex);
-            }
+        StoragePath storagePath = new StoragePath(securityService.getOrganization().getId(),
+                                                  mpId,
+                                                  snapshot.get().getVersion(),
+                                                  e.getIdentifier());
+        if (isFrozen(storagePath)) {
+          try {
+            // Initiate restore and return
+            awsS3AssetStore.initiateRestoreAsset(storagePath, rp);
+          } catch (AssetStoreException ex) {
+            throw new AssetManagerException(ex);
           }
         }
-        return noContent();
       }
+      return noContent();
     });
   }
 
@@ -371,9 +345,9 @@ public class AwsS3RestEndpoint {
 
 
   /** Unify exception handling. */
-  public static <A> A handleException(final Function0<A> f) {
+  public static <A> A handleException(Supplier<A> f) {
     try {
-      return f.apply();
+      return f.get();
     } catch (AssetManagerException e) {
       if (e.isCauseNotAuthorized()) {
         throw new WebApplicationException(e, Response.Status.UNAUTHORIZED);

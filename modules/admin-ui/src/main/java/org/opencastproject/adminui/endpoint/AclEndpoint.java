@@ -53,7 +53,6 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -185,16 +184,16 @@ public class AclEndpoint {
     if (limit < 1)
       limit = 100;
     Optional<String> optSort = Optional.ofNullable(trimToNull(sort));
-    Option<String> filterName = Option.none();
-    Option<String> filterText = Option.none();
+    Optional<String> filterName = Optional.empty();
+    Optional<String> filterText = Optional.empty();
 
     Map<String, String> filters = RestUtils.parseFilter(filter);
     for (String name : filters.keySet()) {
       String value = filters.get(name);
       if (AclsListQuery.FILTER_NAME_NAME.equals(name)) {
-        filterName = Option.some(value);
+        filterName = Optional.of(value);
       } else if ((AclsListQuery.FILTER_TEXT_NAME.equals(name)) && (StringUtils.isNotBlank(value))) {
-        filterText = Option.some(value);
+        filterText = Optional.of(value);
       }
     }
 
@@ -202,8 +201,8 @@ public class AclEndpoint {
     List<ManagedAcl> filteredAcls = new ArrayList<>();
     for (ManagedAcl acl : aclService().getAcls()) {
       // Filter list
-      if ((filterName.isSome() && !filterName.get().equals(acl.getName()))
-              || (filterText.isSome() && !TextFilter.match(filterText.get(), acl.getName()))) {
+      if ((filterName.isPresent() && !filterName.get().equals(acl.getName()))
+              || (filterText.isPresent() && !TextFilter.match(filterText.get(), acl.getName()))) {
         continue;
       }
       filteredAcls.add(acl);

@@ -57,7 +57,6 @@ import org.opencastproject.util.EqualsUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.RestUtil.R;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -328,7 +327,7 @@ public class ThemesEndpoint {
           @FormParam("watermarkPosition") String watermarkPosition) {
     User creator = securityService.getUser();
 
-    Theme theme = new Theme(Option.<Long> none(), new Date(), isDefault, creator, name,
+    Theme theme = new Theme(Optional.<Long> empty(), new Date(), isDefault, creator, name,
             StringUtils.trimToNull(description), BooleanUtils.toBoolean(bumperActive),
             StringUtils.trimToNull(bumperFile), BooleanUtils.toBoolean(trailerActive),
             StringUtils.trimToNull(trailerFile), BooleanUtils.toBoolean(titleSlideActive),
@@ -541,7 +540,7 @@ public class ThemesEndpoint {
 
     JsonObject json = new JsonObject();
 
-    json.addProperty("id",  theme.getId().getOrElse(-1L));
+    json.addProperty("id",  theme.getId().orElse(-1L));
     json.addProperty("creationDate", DateTimeSupport.toUTC(theme.getCreationDate().getTime()));
     json.addProperty("default", theme.isDefault());
     json.addProperty("name", theme.getName());

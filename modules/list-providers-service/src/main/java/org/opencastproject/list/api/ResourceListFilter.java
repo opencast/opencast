@@ -21,7 +21,7 @@
 
 package org.opencastproject.list.api;
 
-import org.opencastproject.util.data.Option;
+import java.util.Optional;
 
 /**
  * Resource list filter interface
@@ -59,14 +59,14 @@ public interface ResourceListFilter<A> {
    * 
    * @return the list name giving the values available for this filter
    */
-  Option<String> getValuesListName();
+  Optional<String> getValuesListName();
 
   /**
    * Returns the value of the filter
    * 
    * @return the filter value
    */
-  Option<A> getValue();
+  Optional<A> getValue();
 
   /**
    * Return the type of the filter

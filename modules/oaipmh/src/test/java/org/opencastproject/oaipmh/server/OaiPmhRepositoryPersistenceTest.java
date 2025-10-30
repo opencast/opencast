@@ -53,7 +53,6 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.series.api.SeriesService;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
@@ -64,6 +63,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.transform.Source;
@@ -325,8 +325,8 @@ public class OaiPmhRepositoryPersistenceTest {
       }
 
       @Override
-      public Option<ResumableQuery> getSavedQuery(String resumptionToken) {
-        return Option.some(new ResumableQuery(FORMAT_PREFIX, new Date(), new Date(), Option.<String> none()));
+      public Optional<ResumableQuery> getSavedQuery(String resumptionToken) {
+        return Optional.of(new ResumableQuery(FORMAT_PREFIX, new Date(), new Date(), Optional.<String> empty()));
       }
 
       @Override

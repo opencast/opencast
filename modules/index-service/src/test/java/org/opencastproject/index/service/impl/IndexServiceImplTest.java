@@ -76,7 +76,6 @@ import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PropertiesUtil;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.data.VCell;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
@@ -208,14 +207,14 @@ public class IndexServiceImplTest {
     return securityService;
   }
 
-  private Tuple<CommonEventCatalogUIAdapter, VCell<Option<DublinCoreMetadataCollection>>> setupCommonCatalogUIAdapter(
+  private Tuple<CommonEventCatalogUIAdapter, VCell<Optional<DublinCoreMetadataCollection>>> setupCommonCatalogUIAdapter(
           Workspace workspace) throws org.osgi.service.cm.ConfigurationException {
     // Create Common Event Catalog UI Adapter
-    final VCell<Option<DublinCoreMetadataCollection>> metadataCell = VCell.ocell();
+    final VCell<Optional<DublinCoreMetadataCollection>> metadataCell = VCell.ocell();
     CommonEventCatalogUIAdapter commonEventCatalogUIAdapter = new CommonEventCatalogUIAdapter() {
       @Override
       public Catalog storeFields(MediaPackage mediaPackage, DublinCoreMetadataCollection metadata) {
-        metadataCell.set(Option.some(metadata));
+        metadataCell.set(Optional.of(metadata));
         return super.storeFields(mediaPackage, metadata);
       }
     };

@@ -21,10 +21,7 @@
 
 package org.opencastproject.util;
 
-import static org.opencastproject.util.data.Option.option;
-
 import org.opencastproject.rest.RestConstants;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.functions.Strings;
 
 import org.apache.commons.lang3.StringUtils;
@@ -40,6 +37,7 @@ import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.servlet.Servlet;
 
@@ -68,8 +66,9 @@ public final class OsgiUtil {
    * @throws RuntimeException
    *           key does not exist or its value is blank
    */
-  public static Option<String> getOptContextProperty(ComponentContext cc, String key) {
-    return option(cc.getBundleContext().getProperty(key)).bind(Strings.trimToNone);
+  public static Optional<String> getOptContextProperty(ComponentContext cc, String key) {
+    return Optional.ofNullable(cc.getBundleContext().getProperty(key))
+        .flatMap(Strings::trimToNone);
   }
 
   /**
@@ -110,13 +109,38 @@ public final class OsgiUtil {
   }
 
   /** Get a value from a dictionary. Return none if the key does either not exist or the value is blank. */
-  public static Option<String> getOptCfg(Dictionary d, String key) {
-    return option(d.get(key)).bind(Strings.asString()).bind(Strings.trimToNone);
+  public static Optional<String> getOptCfg(Dictionary d, String key) {
+    return Optional.ofNullable(d.get(key))
+        .map(Object::toString)
+        .flatMap(Strings::trimToNone);
   }
 
   /** Get a value from a dictionary. Return none if the key does either not exist or the value is blank. */
-  public static Option<Integer> getOptCfgAsInt(Dictionary d, String key) {
-    return option(d.get(key)).bind(Strings.asString()).bind(Strings.toInt);
+  public static Optional<Integer> getOptCfgAsInt(Dictionary d, String key) {
+    return Optional.ofNullable(d.get(key))
+        .map(Object::toString)
+        .flatMap(Strings::trimToNone)
+        .flatMap(s -> {
+          try {
+            return Optional.of(Integer.parseInt(s));
+          } catch (NumberFormatException e) {
+            return Optional.empty();
+          }
+        });
+  }
+
+  /** Get a value from a dictionary. Return none if the key does either not exist or the value is blank. */
+  public static Optional<Double> getOptCfgAsDouble(Dictionary d, String key) {
+    return Optional.ofNullable(d.get(key))
+        .map(Object::toString)
+        .flatMap(Strings::trimToNone)
+        .flatMap(s -> {
+          try {
+            return Optional.of(Double.parseDouble(s));
+          } catch (NumberFormatException e) {
+            return Optional.empty();
+          }
+        });
   }
 
   /**
@@ -140,8 +164,11 @@ public final class OsgiUtil {
   /**
    * Get an optional boolean from a dictionary.
    */
-  public static Option<Boolean> getOptCfgAsBoolean(Dictionary d, String key) {
-    return option(d.get(key)).bind(Strings.asString()).map(Strings.toBool);
+  public static Optional<Boolean> getOptCfgAsBoolean(Dictionary d, String key) {
+    return Optional.ofNullable(d.get(key))
+        .map(Object::toString)
+        .flatMap(Strings::trimToNone)
+        .map(Boolean::valueOf);
   }
 
   /**

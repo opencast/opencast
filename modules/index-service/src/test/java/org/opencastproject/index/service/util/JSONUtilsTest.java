@@ -36,7 +36,6 @@ import org.opencastproject.list.query.StringListFilter;
 import org.opencastproject.list.util.ListProviderUtil;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.util.data.Option;
 
 import com.google.gson.JsonObject;
 
@@ -50,6 +49,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
@@ -162,13 +162,13 @@ public class JSONUtilsTest {
 
     // Prepare mock query
     List<ResourceListFilter<?>> filters = new ArrayList<ResourceListFilter<?>>();
-    filters.add(SeriesListQuery.createContributorsFilter(Option.<String> none()));
+    filters.add(SeriesListQuery.createContributorsFilter(Optional.<String> empty()));
     filters.add(new StringListFilter(""));
     ResourceListQueryImpl query = EasyMock.createNiceMock(ResourceListQueryImpl.class);
     EasyMock.expect(query.getAvailableFilters()).andReturn(filters).anyTimes();
     EasyMock.expect(query.getFilters()).andReturn(new ArrayList<ResourceListFilter<?>>()).anyTimes();
-    EasyMock.expect(query.getLimit()).andReturn(Option.<Integer> none()).anyTimes();
-    EasyMock.expect(query.getOffset()).andReturn(Option.<Integer> none()).anyTimes();
+    EasyMock.expect(query.getLimit()).andReturn(Optional.<Integer> empty()).anyTimes();
+    EasyMock.expect(query.getOffset()).andReturn(Optional.<Integer> empty()).anyTimes();
     EasyMock.replay(query);
 
     JSONUtils.setUserRegex(".*"); //allow all users

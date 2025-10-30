@@ -29,8 +29,6 @@ import static org.opencastproject.util.MimeTypes.getMimeType;
 import static org.opencastproject.util.RestUtil.R.ok;
 import static org.opencastproject.util.RestUtil.fileResponse;
 import static org.opencastproject.util.RestUtil.partialFileResponse;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.FILE;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
@@ -66,6 +64,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DELETE;
@@ -309,7 +308,7 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
         contentType = "application/octet-stream";
       }
       try {
-        return ok(get(mediaPackageID, mediaPackageElementID), contentType, some(file.length()), none(""));
+        return ok(get(mediaPackageID, mediaPackageElementID), contentType, Optional.of(file.length()), Optional.empty());
       } catch (IOException e) {
         throw new NotFoundException();
       }
@@ -348,12 +347,12 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
       if (StringUtils.isNotBlank(range)) {
         logger.debug("trying to retrieve range: {}", range);
         return partialFileResponse(getFile(mediaPackageID, mediaPackageElementID), getMimeType(fileName),
-                some(fileName), range).tag(md5).build();
+                Optional.of(fileName), range).tag(md5).build();
 
       } else {
         // No If-Non-Match header provided, or the file changed in the meantime
         return fileResponse(getFile(mediaPackageID, mediaPackageElementID), getMimeType(fileName),
-                some(fileName)).tag(md5).build();
+                Optional.of(fileName)).tag(md5).build();
       }
     } catch (Exception e) {
       logger.error("Unable to provide element '{}' from mediapackage '{}'", mediaPackageElementID,
@@ -371,7 +370,7 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
           @RestResponse(responseCode = SC_NOT_FOUND, description = "Not found") })
   public Response restGetFromCollection(@PathParam("collectionId") String collectionId,
           @PathParam("fileName") String fileName) throws NotFoundException {
-    return fileResponse(getFileFromCollection(collectionId, fileName), getMimeType(fileName), some(fileName))
+    return fileResponse(getFileFromCollection(collectionId, fileName), getMimeType(fileName), Optional.of(fileName))
             .build();
   }
 

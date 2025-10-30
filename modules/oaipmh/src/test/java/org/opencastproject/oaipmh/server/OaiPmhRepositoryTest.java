@@ -29,7 +29,6 @@ import static org.opencastproject.oaipmh.server.OaiPmhRepositoryTest.OaiPmhRespo
 import static org.opencastproject.util.EqualsUtil.eq;
 import static org.opencastproject.util.IoSupport.withResource;
 import static org.opencastproject.util.data.Collections.list;
-import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 import static org.xmlmatchers.transform.XmlConverters.the;
 import static org.xmlmatchers.xpath.HasXPath.hasXPath;
@@ -56,7 +55,6 @@ import org.opencastproject.util.JsonVal;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.XmlUtil;
 import org.opencastproject.util.data.Collections;
-import org.opencastproject.util.data.Option;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
@@ -79,6 +77,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.TimeZone;
 
 import javax.xml.namespace.NamespaceContext;
@@ -115,7 +114,7 @@ public class OaiPmhRepositoryTest {
     final OaiPmhRepository repo = repo(null, Granularity.DAY);
     runChecks(OaiPmhConstants.VERB_IDENTIFY,
               repo.selectVerb(params("Identify", null, null, null, null, null)),
-              some(IsValid),
+              Optional.of(IsValid),
               list(hasXPath("//oai20:Identify[oai20:deletedRecord='transient']", NS_CTX)));
   }
 
@@ -124,7 +123,7 @@ public class OaiPmhRepositoryTest {
     final OaiPmhRepository repo = repo(null, Granularity.DAY);
     runChecks(OaiPmhConstants.VERB_LIST_IDENTIFIERS,
               repo.selectVerb(params("ListIdentifiers", null, null, null, null, null)),
-              some(IsError),
+              Optional.of(IsError),
               list(hasXPath("//oai20:error[@code='badArgument']", NS_CTX)));
   }
 
@@ -136,7 +135,7 @@ public class OaiPmhRepositoryTest {
                                   searchResultItem("id-2", utcDate(2011, 6, 1), false)), Granularity.DAY);
     runChecks(OaiPmhConstants.VERB_LIST_IDENTIFIERS,
               repo.selectVerb(params("ListIdentifiers", null, "oai_dc", null, null, null)),
-              some(IsValid),
+              Optional.of(IsValid),
               list(hasXPath("//oai20:ListIdentifiers/oai20:header[oai20:identifier='id-1']", NS_CTX),
                    hasXPath("//oai20:ListIdentifiers/oai20:header[oai20:identifier='id-2']", NS_CTX),
                    hasXPath("//oai20:ListIdentifiers/oai20:header[oai20:datestamp='2011-06-01']", NS_CTX),
@@ -152,12 +151,12 @@ public class OaiPmhRepositoryTest {
     runChecks(OaiPmhConstants.VERB_LIST_IDENTIFIERS,
               repo(null, Granularity.DAY)
                       .selectVerb(params("ListIdentifiers", null, "oai_dc", "2011-01-02", "2011-01-01", null)),
-              some(IsError),
+              Optional.of(IsError),
               list(hasXPath("//oai20:error[@code='badArgument']", NS_CTX)));
     runChecks(OaiPmhConstants.VERB_LIST_IDENTIFIERS,
               repo(null, Granularity.SECOND)
                       .selectVerb(params("ListIdentifiers", null, "oai_dc", "2011-01-01T10:20:10Z", "2011-01-01T10:20:00Z", null)),
-              some(IsError),
+              Optional.of(IsError),
               list(hasXPath("//oai20:error[@code='badArgument']", NS_CTX)));
   }
 
@@ -168,7 +167,7 @@ public class OaiPmhRepositoryTest {
               repo(oaiPmhPersistenceMock(searchResultItem("id-1", utcDate(2011, 5, 1), false),
                                          searchResultItem("id-2", utcDate(2011, 6, 1), true)), Granularity.DAY)
                       .selectVerb(params("ListRecords", null, "oai_dc", null, null, null)),
-              some(IsValid),
+              Optional.of(IsValid),
               list(hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:identifier='id-1']", NS_CTX),
                    hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:datestamp='2011-05-01']", NS_CTX),
                    hasXPath("//oai20:ListRecords/oai20:record/oai20:header[@status='deleted']", NS_CTX),
@@ -185,7 +184,7 @@ public class OaiPmhRepositoryTest {
               repo(oaiPmhPersistenceMock(searchResultItem("id-1", utcDate(2011, 6, 1), false)),
                    Granularity.DAY)
                       .selectVerb(params("GetRecord", "id-1", "oai_dc", null, null, null)),
-              Option.<OaiPmhResponseStatus>none(),
+              Optional.<OaiPmhResponseStatus>empty(),
               list(hasXPath("//oai20:GetRecord/oai20:record/oai20:header[oai20:identifier='id-1']", NS_CTX),
                    hasXPath("//oai20:GetRecord/oai20:record/oai20:header[oai20:datestamp='2011-06-01']", NS_CTX),
                    hasXPath("//oai20:GetRecord/oai20:record/oai20:header[not(@status='deleted')]", NS_CTX),
@@ -200,7 +199,7 @@ public class OaiPmhRepositoryTest {
               repo(oaiPmhPersistenceMock(searchResultItem("id-1", utcDate(2011, 5, 1), true)),
                    Granularity.DAY)
                       .selectVerb(params("GetRecord", "id-1", "oai_dc", null, null, null)),
-              Option.<OaiPmhResponseStatus>none(),
+              Optional.<OaiPmhResponseStatus>empty(),
               list(hasXPath("//oai20:GetRecord/oai20:record/oai20:header[oai20:identifier='id-1']", NS_CTX),
                    hasXPath("//oai20:GetRecord/oai20:record/oai20:header[oai20:datestamp='2011-05-01']", NS_CTX),
                    hasXPath("//oai20:GetRecord/oai20:record/oai20:header[@status='deleted']", NS_CTX),
@@ -214,7 +213,7 @@ public class OaiPmhRepositoryTest {
               repo(oaiPmhPersistenceMock(searchResultItem("id-1", utcDate(2011, 5, 1), false),
                                          searchResultItem("id-2", utcDate(2011, 6, 1), true)), Granularity.DAY)
                       .selectVerb(params("ListRecords", null, "matterhorn-inlined", null, null, null)),
-              some(IsValid),
+              Optional.of(IsValid),
               list(hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:identifier='id-1']", NS_CTX),
                    hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:datestamp='2011-05-01']", NS_CTX),
                    hasXPath("//oai20:ListRecords/oai20:record/oai20:header[@status='deleted']", NS_CTX),
@@ -235,10 +234,10 @@ public class OaiPmhRepositoryTest {
 
   // --
 
-  private void runChecks(String verb, XmlGen xmlGen, Option<OaiPmhResponseStatus> status, List<Matcher<Source>> matchers) throws Exception {
+  private void runChecks(String verb, XmlGen xmlGen, Optional<OaiPmhResponseStatus> status, List<Matcher<Source>> matchers) throws Exception {
     if (runValidation) {
-      for (OaiPmhResponseStatus s : status) {
-        assertTrue("http://validator.oaipmh.com/ reports errors", validate(verb, xmlGen, s));
+      if (status.isPresent()) {
+        assertTrue("http://validator.oaipmh.com/ reports errors", validate(verb, xmlGen, status.get()));
       }
     }
     final Document doc = xmlGen.generate();
@@ -275,10 +274,10 @@ public class OaiPmhRepositoryTest {
       boolean ok = true;
       for (JsonVal message : JsonObj.jsonObj(json).obj("json").arr("messages")) {
         if (message.isObj()) {
-          final JsonObj messageObj = message.as(JsonVal.asJsonObj);
+          final JsonObj messageObj = JsonVal.asJsonObj(message.get());
           if (messageObj.has("className")) {
-            final String className = messageObj.val("className").as(JsonVal.asString).trim();
-            final String text = messageObj.val("text").as(JsonVal.asString).trim();
+            final String className = JsonVal.asString(messageObj.val("className").get()).trim();
+            final String text = JsonVal.asString(messageObj.val("text").get()).trim();
             logger.info("[{}] {}", className, text);
             ok = ok && (eq(className, "correct")
                     // since the validator does not validate everything correctly here are some exclusions
@@ -452,8 +451,8 @@ public class OaiPmhRepositoryTest {
       }
 
       @Override
-      public Option<ResumableQuery> getSavedQuery(String resumptionToken) {
-        return some(new ResumableQuery("oai_dc", new Date(), new Date(), Option.<String>none()));
+      public Optional<ResumableQuery> getSavedQuery(String resumptionToken) {
+        return Optional.of(new ResumableQuery("oai_dc", new Date(), new Date(), Optional.<String>empty()));
       }
 
       @Override

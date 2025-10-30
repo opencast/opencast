@@ -20,34 +20,33 @@
  */
 package org.opencastproject.oaipmh.persistence;
 
-import org.opencastproject.util.data.Option;
-
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /** Query the database. */
 public interface Query {
-  Option<String> getMediaPackageId();
+  Optional<String> getMediaPackageId();
 
-  Option<String> getRepositoryId();
+  Optional<String> getRepositoryId();
 
-  Option<String> getSeriesId();
+  Optional<String> getSeriesId();
 
-  Option<Boolean> isDeleted();
-
-  /** The date is inclusive. */
-  Option<Date> getModifiedAfter();
+  Optional<Boolean> isDeleted();
 
   /** The date is inclusive. */
-  Option<Date> getModifiedBefore();
+  Optional<Date> getModifiedAfter();
 
-  Option<Integer> getLimit();
+  /** The date is inclusive. */
+  Optional<Date> getModifiedBefore();
 
-  Option<Integer> getOffset();
+  Optional<Integer> getLimit();
+
+  Optional<Integer> getOffset();
 
   List<OaiPmhSetDefinition> getSetDefinitions();
 
-  Option<String> getSetSpec();
+  Optional<String> getSetSpec();
 
   boolean isSubsequentRequest();
 }

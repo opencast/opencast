@@ -55,7 +55,6 @@ import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Function0.X;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -314,7 +313,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     logger.trace("add media package from url: {} flavor: {} tags: {} mediaPackage: {}", url, flavor, tags, mpx);
     try {
       MediaPackage mp = MP_FACTORY.newMediaPackageBuilder().loadFromXml(mpx);
-      if (MediaPackageSupport.sanityCheck(mp).isSome())
+      if (MediaPackageSupport.sanityCheck(mp).isPresent())
         return Response.serverError().status(Status.BAD_REQUEST).build();
       String[] tagsArray = null;
       if (tags != null) {
@@ -367,7 +366,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
             url, flavor, startTime, mpx);
     try {
       MediaPackage mp = MP_FACTORY.newMediaPackageBuilder().loadFromXml(mpx);
-      if (MediaPackageSupport.sanityCheck(mp).isSome())
+      if (MediaPackageSupport.sanityCheck(mp).isPresent())
         return Response.serverError().status(Status.BAD_REQUEST).build();
 
       mp = ingestService.addPartialTrack(new URI(url), MediaPackageElementFlavor.parseFlavor(flavor), startTime, mp);
@@ -410,7 +409,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     logger.trace("add catalog with url: {} flavor: {} tags: {} mediaPackage: {}", url, flavor, tags, mpx);
     try {
       MediaPackage mp = MP_FACTORY.newMediaPackageBuilder().loadFromXml(mpx);
-      if (MediaPackageSupport.sanityCheck(mp).isSome())
+      if (MediaPackageSupport.sanityCheck(mp).isPresent())
         return Response.serverError().status(Status.BAD_REQUEST).build();
       String[] tagsArray = null;
       if (tags != null) {
@@ -457,7 +456,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     logger.trace("add attachment with url: {} flavor: {} mediaPackage: {}", url, flavor, mpx);
     try {
       MediaPackage mp = MP_FACTORY.newMediaPackageBuilder().loadFromXml(mpx);
-      if (MediaPackageSupport.sanityCheck(mp).isSome())
+      if (MediaPackageSupport.sanityCheck(mp).isPresent())
         return Response.serverError().status(Status.BAD_REQUEST).build();
       String[] tagsArray = null;
       if (tags != null) {
@@ -558,7 +557,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
        * Check if we actually got a valid request including a message body and a valid mediapackage to attach the
        * element to
        */
-      if (in == null || mp == null || MediaPackageSupport.sanityCheck(mp).isSome()) {
+      if (in == null || mp == null || MediaPackageSupport.sanityCheck(mp).isPresent()) {
         return Response.serverError().status(Status.BAD_REQUEST).build();
       }
       switch (type) {
@@ -1203,7 +1202,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     final MediaPackage mp;
     try {
       mp = MP_FACTORY.newMediaPackageBuilder().loadFromXml(formData.getFirst("mediaPackage"));
-      if (MediaPackageSupport.sanityCheck(mp).isSome()) {
+      if (MediaPackageSupport.sanityCheck(mp).isPresent()) {
         logger.warn("Rejected ingest with invalid mediapackage {}", mp);
         return Response.status(Status.BAD_REQUEST).build();
       }
@@ -1219,32 +1218,28 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     final Date ingestDate = startCache.getIfPresent(mp.getIdentifier().toString());
     wfConfig.put(IngestService.START_DATE_KEY, DATE_FORMAT.format(ingestDate != null ? ingestDate : new Date()));
 
-    final X<WorkflowInstance> ingest = new X<WorkflowInstance>() {
-      @Override
-      public WorkflowInstance xapply() throws Exception {
-        /* Legacy support: Try to convert the workflowInstance to integer */
-        Long workflowInstanceId = null;
-        if (StringUtils.isNotBlank(workflowInstance)) {
-          try {
-            workflowInstanceId = Long.parseLong(workflowInstance);
-          } catch (NumberFormatException e) {
-            // The workflowId is not a long value and might be the media package identifier
-            wfConfig.put(IngestServiceImpl.LEGACY_MEDIAPACKAGE_ID_KEY, workflowInstance);
-          }
-        }
-
-        if (workflowInstanceId != null) {
-          return ingestService.ingest(mp, trimToNull(workflowDefinition), wfConfig, workflowInstanceId);
-        } else {
-          return ingestService.ingest(mp, trimToNull(workflowDefinition), wfConfig);
+    try {
+      /* Legacy support: Try to convert the workflowInstance to integer */
+      Long workflowInstanceId = null;
+      if (StringUtils.isNotBlank(workflowInstance)) {
+        try {
+          workflowInstanceId = Long.parseLong(workflowInstance);
+        } catch (NumberFormatException e) {
+          // The workflowId is not a long value and might be the media package identifier
+          wfConfig.put(IngestServiceImpl.LEGACY_MEDIAPACKAGE_ID_KEY, workflowInstance);
         }
       }
-    };
 
-    try {
-      WorkflowInstance workflow = ingest.apply();
+      WorkflowInstance workflow;
+      if (workflowInstanceId != null) {
+        workflow = ingestService.ingest(mp, trimToNull(workflowDefinition), wfConfig, workflowInstanceId);
+      } else {
+        workflow = ingestService.ingest(mp, trimToNull(workflowDefinition), wfConfig);
+      }
+
       startCache.asMap().remove(mp.getIdentifier().toString());
       return Response.ok(XmlWorkflowParser.toXml(workflow)).build();
+
     } catch (Exception e) {
       Throwable cause = e.getCause();
       if (cause instanceof NotFoundException) {
@@ -1301,7 +1296,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     MediaPackage mp = null;
     try {
       mp = MP_FACTORY.newMediaPackageBuilder().loadFromXml(mediaPackageXml);
-      if (MediaPackageSupport.sanityCheck(mp).isSome()) {
+      if (MediaPackageSupport.sanityCheck(mp).isPresent()) {
         throw new MediaPackageException("Insane media package");
       }
     } catch (MediaPackageException e) {
@@ -1365,7 +1360,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     } catch (MediaPackageException e) {
       return Response.serverError().status(Status.BAD_REQUEST).build();
     }
-    if (MediaPackageSupport.sanityCheck(mediaPackage).isSome()) {
+    if (MediaPackageSupport.sanityCheck(mediaPackage).isPresent()) {
       return Response.status(Status.BAD_REQUEST).build();
     }
 

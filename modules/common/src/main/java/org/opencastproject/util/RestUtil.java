@@ -23,11 +23,8 @@ package org.opencastproject.util;
 
 import static org.opencastproject.util.Jsons.obj;
 import static org.opencastproject.util.Jsons.p;
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Option.option;
 import static org.opencastproject.util.data.Tuple.tuple;
 import static org.opencastproject.util.data.functions.Strings.split;
-import static org.opencastproject.util.data.functions.Strings.trimToNil;
 
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
@@ -35,10 +32,8 @@ import org.opencastproject.rest.ErrorCodeException;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.Jsons.Obj;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Monadics;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
+import org.opencastproject.util.data.functions.Strings;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.ComponentContext;
@@ -47,6 +42,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 import javax.ws.rs.core.MediaType;
@@ -87,19 +85,19 @@ public final class RestUtil {
    *           if the service path is not configured for this component
    */
   public static Tuple<String, String> getEndpointUrl(ComponentContext cc, String serverUrlKey, String servicePathKey) {
-    final String serverUrl = option(cc.getBundleContext().getProperty(serverUrlKey)).getOrElse(
+    final String serverUrl = Optional.ofNullable(cc.getBundleContext().getProperty(serverUrlKey)).orElse(
             UrlSupport.DEFAULT_BASE_URL);
-    final String servicePath = option((String) cc.getProperties().get(servicePathKey)).getOrElse(
-            Option.<String> error(RestConstants.SERVICE_PATH_PROPERTY + " property not configured"));
+    final String servicePath = Optional.ofNullable((String) cc.getProperties().get(servicePathKey)).orElseThrow(
+        () -> new Error(RestConstants.SERVICE_PATH_PROPERTY + " property not configured"));
     return tuple(serverUrl, servicePath);
   }
 
   /** Create a file response. */
-  public static Response.ResponseBuilder fileResponse(File f, String contentType, Option<String> fileName) {
+  public static Response.ResponseBuilder fileResponse(File f, String contentType, Optional<String> fileName) {
     final Response.ResponseBuilder b = Response.ok(f).header("Content-Type", contentType)
             .header("Content-Length", f.length());
-    for (String fn : fileName)
-      b.header("Content-Disposition", "attachment; filename=" + fn);
+    if (fileName.isPresent())
+      b.header("Content-Disposition", "attachment; filename=" + fileName.get());
     return b;
   }
 
@@ -118,7 +116,7 @@ public final class RestUtil {
    * @throws IOException
    *           if something goes wrong
    */
-  public static Response.ResponseBuilder partialFileResponse(File f, String contentType, Option<String> fileName,
+  public static Response.ResponseBuilder partialFileResponse(File f, String contentType, Optional<String> fileName,
           String rangeHeader) throws IOException {
 
     String rangeValue = rangeHeader.trim().substring("bytes=".length());
@@ -157,17 +155,17 @@ public final class RestUtil {
    * Create a stream response.
    *
    * @deprecated use
-   *             {@link org.opencastproject.util.RestUtil.R#ok(java.io.InputStream, String, org.opencastproject.util.data.Option, org.opencastproject.util.data.Option)}
+   *             {@link org.opencastproject.util.RestUtil.R#ok(java.io.InputStream, String, java.util.Optional, java.util.Optional)}
    *             instead
    */
   @Deprecated
-  public static Response.ResponseBuilder streamResponse(InputStream in, String contentType, Option<Long> streamLength,
-          Option<String> fileName) {
+  public static Response.ResponseBuilder streamResponse(InputStream in, String contentType, Optional<Long> streamLength,
+          Optional<String> fileName) {
     final Response.ResponseBuilder b = Response.ok(in).header("Content-Type", contentType);
-    for (Long l : streamLength)
-      b.header("Content-Length", l);
-    for (String fn : fileName)
-      b.header("Content-Disposition", "attachment; filename=" + fn);
+    if (streamLength.isPresent())
+      b.header("Content-Length", streamLength.get());
+    if (fileName.isPresent())
+      b.header("Content-Disposition", "attachment; filename=" + fileName.get());
     return b;
   }
 
@@ -186,17 +184,19 @@ public final class RestUtil {
     return "json".equalsIgnoreCase(type) ? MediaType.APPLICATION_JSON_TYPE : MediaType.APPLICATION_XML_TYPE;
   }
 
-  private static final Function<String, String[]> CSV_SPLIT = split(Pattern.compile(","));
+  private static final Pattern CSV_PATTERN = Pattern.compile(",");
 
   /**
    * Split a comma separated request param into a list of trimmed strings discarding any blank parts.
    * <p>
    * x=comma,separated,,%20value -&gt; ["comma", "separated", "value"]
    */
-  public static Monadics.ListMonadic<String> splitCommaSeparatedParam(Option<String> param) {
-    for (String p : param)
-      return mlist(CSV_SPLIT.apply(p)).bind(trimToNil);
-    return mlist();
+  public static List<String> splitCommaSeparatedParam(Optional<String> param) {
+    return param.map(s -> Arrays.stream(split(CSV_PATTERN, s))
+            .map(Strings::trimToNil)
+            .flatMap(List::stream)
+            .toList())
+        .orElse(List.of());
   }
 
   public static String generateErrorResponse(ErrorCodeException e) {
@@ -245,8 +245,8 @@ public final class RestUtil {
      * @param fileName
      *          an optional file name for the Content-Disposition response header
      */
-    public static Response ok(InputStream in, String contentType, Option<Long> streamLength, Option<String> fileName) {
-      return ok(in, option(contentType), streamLength, fileName);
+    public static Response ok(InputStream in, String contentType, Optional<Long> streamLength, Optional<String> fileName) {
+      return ok(in, Optional.ofNullable(contentType), streamLength, fileName);
     }
 
     /**
@@ -261,15 +261,15 @@ public final class RestUtil {
      * @param fileName
      *          an optional file name for the Content-Disposition response header
      */
-    public static Response ok(InputStream in, Option<String> contentType, Option<Long> streamLength,
-            Option<String> fileName) {
+    public static Response ok(InputStream in, Optional<String> contentType, Optional<Long> streamLength,
+          Optional<String> fileName) {
       final Response.ResponseBuilder b = Response.ok(in);
-      for (String t : contentType)
-        b.header("Content-Type", t);
-      for (Long l : streamLength)
-        b.header("Content-Length", l);
-      for (String fn : fileName)
-        b.header("Content-Disposition", "attachment; filename=" + fn);
+      if (contentType.isPresent())
+        b.header("Content-Type", contentType.get());
+      if (streamLength.isPresent())
+        b.header("Content-Length", streamLength.get());
+      if (fileName.isPresent())
+        b.header("Content-Disposition", "attachment; filename=" + fileName.get());
       return b.build();
     }
 

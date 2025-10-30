@@ -36,7 +36,7 @@ public class ArraysTest {
 
   @Test
   public void testSingleton() {
-    final String[] as = singleton(String.class).apply("1");
+    final String[] as = singleton(String.class, "1");
     assertEquals("1", as[0]);
   }
 

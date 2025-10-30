@@ -32,7 +32,6 @@ import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.selector.TrackSelector;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Function2;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -57,6 +56,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
@@ -178,23 +178,19 @@ public class SanitizeAdaptiveWorkflowOperationHandler extends AbstractWorkflowOp
      * Adds new file to Mediapackage to replace old Track, while retaining all properties. Also sets the target flavor
      * and target tags
      */
-    Function2<File, Track, Track> replaceHLSPlaylistInWS = new Function2<File, Track, Track>() {
-      @Override
-      public Track apply(File file, Track track) {
-        try {
-          InputStream inputStream = new FileInputStream(file);
-          // put file into workspace for mp
-          URI uri = workspace.put(mediaPackage.getIdentifier().toString(), track.getIdentifier(), file.getName(),
-                  inputStream);
-          track.setURI(uri); // point track to new URI
-          handleTags(track, targetFlavor, targetTrackTags); // add tags and flavor
-          return track;
-        } catch (Exception e) {
-          logger.error("Cannot add track file to mediapackage in workspace: {} {} ",
-                  mediaPackage.getIdentifier().toString(),
-                  file);
-          return null;
-        }
+    BiFunction<File, Track, Track> replaceHLSPlaylistInWS = (file, track) -> {
+      try (InputStream inputStream = new FileInputStream(file)) {
+        // put file into workspace for mp
+        URI uri = workspace.put(mediaPackage.getIdentifier().toString(), track.getIdentifier(), file.getName(),
+            inputStream);
+        track.setURI(uri); // point track to new URI
+        handleTags(track, targetFlavor, targetTrackTags); // add tags and flavor
+        return track;
+      } catch (Exception e) {
+        logger.error("Cannot add track file to mediapackage in workspace: {} {} ",
+            mediaPackage.getIdentifier().toString(),
+            file);
+        return null;
       }
     };
     // remove old tracks if the entire operation succeeds, or remove new tracks if any of them fails

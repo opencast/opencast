@@ -30,7 +30,7 @@ import org.junit.Test;
 public class MediaPackageSupportTest {
   @Test
   public void testSanityCheck() {
-    assertTrue("Media package must pass check", sanityCheck(loadFromClassPath("/manifest.xml")).isNone());
-    assertTrue("There must be errors", sanityCheck(loadFromClassPath("/manifest-insane.xml")).isSome());
+    assertTrue("Media package must pass check", sanityCheck(loadFromClassPath("/manifest.xml")).isEmpty());
+    assertTrue("There must be errors", sanityCheck(loadFromClassPath("/manifest-insane.xml")).isPresent());
   }
 }

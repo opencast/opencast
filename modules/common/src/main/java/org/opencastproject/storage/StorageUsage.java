@@ -21,7 +21,7 @@
 
 package org.opencastproject.storage;
 
-import org.opencastproject.util.data.Option;
+import java.util.Optional;
 
 /**
  * Provides access to storage usage information
@@ -33,20 +33,20 @@ public interface StorageUsage {
    *
    * @return Number of all bytes in storage
    */
-  Option<Long> getTotalSpace();
+  Optional<Long> getTotalSpace();
 
   /**
    * Gets the available space of storage in Bytes This is free storage that is not reserved
    *
    * @return Number of available bytes in storage
    */
-  Option<Long> getUsableSpace();
+  Optional<Long> getUsableSpace();
 
   /**
    * Gets the used space of storage in Bytes
    *
    * @return Number of used bytes in storage
    */
-  Option<Long> getUsedSpace();
+  Optional<Long> getUsedSpace();
 
 }

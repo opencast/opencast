@@ -38,7 +38,6 @@ import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple3;
 import org.opencastproject.util.function.ThrowingFunction;
 
@@ -67,6 +66,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
@@ -153,9 +153,9 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
     // Set up the agent cache
     int timeoutInMinutes = 120;
 
-    Option<String> timeout = getOptContextProperty(cc, CAPTURE_AGENT_TIMEOUT_KEY);
+    Optional<String> timeout = getOptContextProperty(cc, CAPTURE_AGENT_TIMEOUT_KEY);
 
-    if (timeout.isSome()) {
+    if (timeout.isPresent()) {
       try {
         timeoutInMinutes = Integer.parseInt(timeout.get());
       } catch (NumberFormatException e) {

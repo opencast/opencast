@@ -74,7 +74,6 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.RestUtil.R;
 import org.opencastproject.util.UrlSupport;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -219,7 +218,7 @@ public class SeriesEndpoint {
     try {
       SeriesSearchQuery query = new SeriesSearchQuery(securityService.getOrganization().getId(),
               securityService.getUser());
-      Option<String> optSort = Option.option(trimToNull(sort));
+      Optional<String> optSort = Optional.ofNullable(trimToNull(sort));
 
       if (offset > 0) {
         query.withOffset(offset);
@@ -299,7 +298,7 @@ public class SeriesEndpoint {
         }
       }
 
-      if (optSort.isSome()) {
+      if (optSort.isPresent()) {
         ArrayList<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
         for (SortCriterion criterion : sortCriteria) {
 

@@ -24,12 +24,11 @@ package org.opencastproject.oaipmh.server;
 
 import static org.opencastproject.oaipmh.OaiPmhUtil.fromUtc;
 
-import org.opencastproject.util.data.Function;
-
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
+import java.util.function.Function;
 
 /**
  * Collection of general purpose functions.
@@ -39,26 +38,20 @@ public final class Functions {
   /**
    * Converts a UTC string into a date. May throw a {@link org.opencastproject.oaipmh.server.OaiPmhRepository.BadArgumentException}.
    */
-  public static final Function<String, Date> asDate = new Function<String, Date>() {
-    @Override
-    public Date apply(String s) {
-      try {
-        return fromUtc(s);
-      } catch (ParseException e) {
-        throw new OaiPmhRepository.BadArgumentException();
-      }
+  public static Date asDate(String s) {
+    try {
+      return fromUtc(s);
+    } catch (ParseException e) {
+      throw new OaiPmhRepository.BadArgumentException();
     }
-  };
+  }
 
   public static Function<Date, Date> addDay(final int days) {
-    return new Function<Date, Date>() {
-      @Override public Date apply(Date date) {
-        final Calendar c = Calendar.getInstance();
-        c.setTimeZone(TimeZone.getTimeZone("UTC"));
-        c.setTime(date);
-        c.add(Calendar.DAY_OF_MONTH, days);
-        return c.getTime();
-      }
+    return date -> {
+      Calendar c = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+      c.setTime(date);
+      c.add(Calendar.DAY_OF_MONTH, days);
+      return c.getTime();
     };
   }
 

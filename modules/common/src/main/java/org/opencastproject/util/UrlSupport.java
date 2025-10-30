@@ -22,16 +22,15 @@
 
 package org.opencastproject.util;
 
-import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 import static org.opencastproject.util.data.functions.Strings.asStringNull;
-
-import org.opencastproject.util.data.Function2;
 
 import java.io.File;
 import java.net.URI;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * <code>UrlSupport</code> is a helper class to deal with urls.
@@ -161,17 +160,20 @@ public final class UrlSupport {
       throw new IllegalArgumentException("Argument parts is null");
     if (parts.size() == 0)
       throw new IllegalArgumentException("Array parts is empty");
-    return mlist(parts).reducel(new Function2<String, String, String>() {
-      @Override
-      public String apply(String s, String s1) {
-        return concat(s, s1);
-      }
-    });
+
+    return parts.stream().reduce((s1, s2) -> concat(s1, s2))
+        .orElse(null);
   }
 
   /** Create a URI from the given parts. */
   public static URI uri(Object... parts) {
-    return URI.create(concat(mlist(parts).map(asStringNull()).value()));
+    return URI.create(
+        concat(
+            Arrays.stream(parts)
+                .map(p -> asStringNull(p))
+                .collect(Collectors.toList())
+        )
+    );
   }
 
   /**

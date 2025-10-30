@@ -27,12 +27,9 @@ import static org.opencastproject.util.EqualsUtil.bothNotNull;
 import static org.opencastproject.util.EqualsUtil.eqListUnsorted;
 import static org.opencastproject.util.data.Either.left;
 import static org.opencastproject.util.data.Either.right;
-import static org.opencastproject.util.data.Monadics.mlist;
 
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.data.Either;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Function2;
 import org.opencastproject.util.data.Tuple;
 
 import org.apache.commons.lang3.StringUtils;
@@ -256,21 +253,17 @@ public final class AccessControlUtil {
    */
   public static AccessControlList acl(Either<AccessControlEntry, List<AccessControlEntry>>... entries) {
     // sequence entries
-    final List<AccessControlEntry> seq = mlist(entries)
-            .foldl(new ArrayList<AccessControlEntry>(),
-                    new Function2<List<AccessControlEntry>, Either<AccessControlEntry, List<AccessControlEntry>>, List<AccessControlEntry>>() {
-                      @Override
-                      public List<AccessControlEntry> apply(List<AccessControlEntry> sum,
-                              Either<AccessControlEntry, List<AccessControlEntry>> current) {
-                        if (current.isLeft())
-                          sum.add(current.left().value());
-                        else
-                          sum.addAll(current.right().value());
-                        return sum;
-                      }
-                    });
+    List<AccessControlEntry> seq = new ArrayList<>();
+    for (Either<AccessControlEntry, List<AccessControlEntry>> current : entries) {
+      if (current.isLeft()) {
+        seq.add(current.left().value());
+      } else {
+        seq.addAll(current.right().value());
+      }
+    }
     return new AccessControlList(seq);
   }
+
 
   /** Create a single access control entry. */
   public static Either<AccessControlEntry, List<AccessControlEntry>> entry(String role, String action, boolean allow) {
@@ -279,14 +272,10 @@ public final class AccessControlUtil {
 
   /** Create a list of access control entries for a given role. */
   public static Either<AccessControlEntry, List<AccessControlEntry>> entries(final String role,
-          Tuple<String, Boolean>... actions) {
-    final List<AccessControlEntry> entries = mlist(actions).map(
-            new Function<Tuple<String, Boolean>, AccessControlEntry>() {
-              @Override
-              public AccessControlEntry apply(Tuple<String, Boolean> action) {
-                return new AccessControlEntry(role, action.getA(), action.getB());
-              }
-            }).value();
+      Tuple<String, Boolean>... actions) {
+    List<AccessControlEntry> entries = Arrays.stream(actions)
+        .map(action -> new AccessControlEntry(role, action.getA(), action.getB()))
+        .toList();
     return right(entries);
   }
 

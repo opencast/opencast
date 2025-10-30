@@ -62,7 +62,6 @@ import org.opencastproject.serviceregistry.impl.jpa.ServiceRegistrationJpaImpl;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
-import org.opencastproject.util.data.functions.Strings;
 import org.opencastproject.util.function.ThrowingConsumer;
 import org.opencastproject.util.jmx.JmxUtil;
 
@@ -368,8 +367,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
     // Whether a service accepts a job whose load exceeds the host’s max load
     if (cc != null) {
-      acceptJobLoadsExeedingMaxLoad = getOptContextProperty(cc, ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY).map(Strings.toBool)
-              .getOrElse(DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING);
+      acceptJobLoadsExeedingMaxLoad = getOptContextProperty(cc, ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY)
+              .map(Boolean::valueOf)
+              .orElse(DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING);
     }
 
     localSystemLoad = 0;

@@ -22,7 +22,8 @@
 package org.opencastproject.list.query;
 
 import org.opencastproject.list.api.ResourceListFilter;
-import org.opencastproject.util.data.Option;
+
+import java.util.Optional;
 
 /**
  * Abstract base class for the filter. Only implement the {@code getValue} method
@@ -32,14 +33,14 @@ import org.opencastproject.util.data.Option;
  */
 public abstract class AbstractListFilter<A> implements ResourceListFilter<A> {
 
-  private final Option<A> value;
+  private final Optional<A> value;
 
-  public AbstractListFilter(Option<A> value) {
+  public AbstractListFilter(Optional<A> value) {
     this.value = value;
   }
 
   @Override
-  public Option<A> getValue() {
+  public Optional<A> getValue() {
     return value;
   }
 

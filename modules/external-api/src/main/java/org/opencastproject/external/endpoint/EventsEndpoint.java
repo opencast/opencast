@@ -99,7 +99,6 @@ import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.RestUtil.R;
 import org.opencastproject.util.UrlSupport;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestParameter.Type;
@@ -792,14 +791,14 @@ public class EventsEndpoint implements ManagedService {
       withScheduling = false;
     }
 
-    Option<Integer> optLimit = Option.option(limit);
-    Option<Integer> optOffset = Option.option(offset);
-    Option<String> optSort = Option.option(trimToNull(sort));
+    Optional<Integer> optLimit = Optional.ofNullable(limit);
+    Optional<Integer> optOffset = Optional.ofNullable(offset);
+    Optional<String> optSort = Optional.ofNullable(trimToNull(sort));
     EventSearchQuery query = new EventSearchQuery(getSecurityService().getOrganization().getId(),
             getSecurityService().getUser());
     // If the limit is set to 0, this is not taken into account
-    if (optLimit.isSome() && limit == 0) {
-      optLimit = Option.none();
+    if (optLimit.isPresent() && limit == 0) {
+      optLimit = Optional.empty();
     }
 
     //List of all events from the filters
@@ -896,7 +895,7 @@ public class EventsEndpoint implements ManagedService {
           }
         }
 
-        if (optSort.isSome()) {
+        if (optSort.isPresent()) {
           ArrayList<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
           for (SortCriterion criterion : sortCriteria) {
 
@@ -950,9 +949,9 @@ public class EventsEndpoint implements ManagedService {
           }
         }
 
-        if (optLimit.isSome())
+        if (optLimit.isPresent())
           query.withLimit(optLimit.get());
-        if (optOffset.isSome())
+        if (optOffset.isPresent())
           query.withOffset(offset);
         // TODO: Add other filters to the query
 
@@ -975,7 +974,7 @@ public class EventsEndpoint implements ManagedService {
         allEvents.addAll(events);
       }
     } else {
-      if (optSort.isSome()) {
+      if (optSort.isPresent()) {
         ArrayList<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
         for (SortCriterion criterion : sortCriteria) {
 
@@ -1029,9 +1028,9 @@ public class EventsEndpoint implements ManagedService {
         }
       }
 
-      if (optLimit.isSome())
+      if (optLimit.isPresent())
         query.withLimit(optLimit.get());
-      if (optOffset.isSome())
+      if (optOffset.isPresent())
         query.withOffset(offset);
 
       if (onlyWithWriteAccess != null && onlyWithWriteAccess) {

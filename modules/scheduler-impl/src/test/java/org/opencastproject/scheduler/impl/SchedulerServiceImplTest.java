@@ -58,8 +58,8 @@ import static org.opencastproject.scheduler.api.RecordingState.UPLOAD_FINISHED;
 import static org.opencastproject.util.EqualsUtil.eqObj;
 import static org.opencastproject.util.UrlSupport.uri;
 import static org.opencastproject.util.data.Collections.map;
-import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Tuple.tuple;
+import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Snapshot;
@@ -122,10 +122,6 @@ import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.XmlNamespaceContext;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Monadics;
-import org.opencastproject.util.data.Option;
-import org.opencastproject.util.data.functions.Misc;
 
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
@@ -1508,61 +1504,52 @@ public class SchedulerServiceImplTest {
     for (Object co : cal.getComponents()) {
       final Component c = (Component) co;
       assertEquals("SUMMARY property should contain the DC title", title, c.getProperty(Property.SUMMARY).getValue());
-      final Monadics.ListMonadic<Property> attachments = mlist(c.getProperties(Property.ATTACH))
-              .map(Misc.<Object, Property> cast());
+      final List<Property> attachments = c.getProperties(Property.ATTACH).stream()
+          .map(obj -> (Property) obj)
+          .collect(Collectors.toList());
       // episode dublin core
-      final List<DublinCoreCatalog> dcsIcal = attachments.filter(byParamNameAndValue("X-APPLE-FILENAME", "episode.xml"))
-              .map(parseDc.o(decodeBase64).o(getValue)).value();
+      final List<DublinCoreCatalog> dcsIcal = attachments.stream()
+          .filter(p -> byParamNameAndValue(p,"X-APPLE-FILENAME", "episode.xml"))
+          .map(p -> parseDc(decodeBase64(getValue(p))))
+          .toList();
       assertEquals("number of episode DCs", 1, dcsIcal.size());
       assertEquals("dcterms:title", title, dcsIcal.get(0).getFirst(PROPERTY_TITLE));
       // capture agent properties
-      final List<Properties> caPropsIcal = attachments
-              .filter(byParamNameAndValue("X-APPLE-FILENAME", "org.opencastproject.capture.agent.properties"))
-              .map(parseProperties.o(decodeBase64).o(getValue)).value();
+      final List<Properties> caPropsIcal = attachments.stream()
+          .filter(p -> byParamNameAndValue(p, "X-APPLE-FILENAME", "org.opencastproject.capture.agent.properties"))
+          .map(p -> parseProperties(decodeBase64(getValue(p))))
+          .toList();
       assertEquals("number of CA property sets", 1, caPropsIcal.size());
       assertTrue("CA properties", eqObj(caProps, caPropsIcal.get(0)));
     }
   }
 
-  private Function<Property, Boolean> byParamNameAndValue(final String name, final String value) {
-    return new Function<Property, Boolean>() {
-      @Override
-      public Boolean apply(Property p) {
-        final Parameter param = p.getParameter(name);
-        return param != null && param.getValue().equals(value);
-      }
-    };
+  private Boolean byParamNameAndValue(Property p, final String name, final String value) {
+    final Parameter param = p.getParameter(name);
+    return param != null && param.getValue().equals(value);
   }
 
-  private static Function<Property, String> getValue = new Function<Property, String>() {
-    @Override
-    public String apply(Property property) {
-      return property.getValue();
-    }
-  };
+  private static DublinCoreCatalog parseDc(String s) {
+    return DublinCores.read(IOUtils.toInputStream(s));
+  }
 
-  private static Function<String, String> decodeBase64 = new Function<String, String>() {
-    @Override
-    public String apply(String base64) {
-      return new String(Base64.decodeBase64(base64));
-    }
-  };
+  private static String decodeBase64(String base64) {
+    return new String(Base64.decodeBase64(base64));
+  }
 
-  private static Function<String, DublinCoreCatalog> parseDc = new Function<String, DublinCoreCatalog>() {
-    @Override
-    public DublinCoreCatalog apply(String s) {
-      return DublinCores.read(IOUtils.toInputStream(s));
-    }
-  };
+  private static String getValue(Property property) {
+    return property.getValue();
+  }
 
-  private static Function<String, Properties> parseProperties = new Function.X<String, Properties>() {
-    @Override
-    public Properties xapply(String s) throws Exception {
-      final Properties p = new Properties();
+  private static Properties parseProperties(String s) {
+    final Properties p = new Properties();
+    try {
       p.load(new StringReader(s));
-      return p;
+    } catch (Exception e) {
+      return chuck(e);
     }
-  };
+    return p;
+  }
 
   private static long seconds(int a) {
     return a * 1000L;
@@ -1634,18 +1621,18 @@ public class SchedulerServiceImplTest {
     return new AssetStore() {
 
       @Override
-      public Option<Long> getUsedSpace() {
-        return Option.none();
+      public Optional<Long> getUsedSpace() {
+        return Optional.empty();
       }
 
       @Override
-      public Option<Long> getUsableSpace() {
-        return Option.none();
+      public Optional<Long> getUsableSpace() {
+        return Optional.empty();
       }
 
       @Override
-      public Option<Long> getTotalSpace() {
-        return Option.none();
+      public Optional<Long> getTotalSpace() {
+        return Optional.empty();
       }
 
       /**

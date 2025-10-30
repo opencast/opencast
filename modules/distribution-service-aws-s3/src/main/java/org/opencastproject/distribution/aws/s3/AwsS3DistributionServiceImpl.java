@@ -46,7 +46,6 @@ import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.amazonaws.AmazonClientException;
@@ -105,6 +104,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -263,8 +263,8 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
       }
 
       // AWS S3 default bucket name
-      Option<String> defaultBucketNameOpt = OsgiUtil.getOptCfg(cc.getProperties(), AWS_S3_BUCKET_CONFIG);
-      if (defaultBucketNameOpt.isSome()) {
+      Optional<String> defaultBucketNameOpt = OsgiUtil.getOptCfg(cc.getProperties(), AWS_S3_BUCKET_CONFIG);
+      if (defaultBucketNameOpt.isPresent()) {
         orgBucketNameMap.put(DEFAULT_ORG_KEY, defaultBucketNameOpt.get());
         logger.info("AWS S3 default bucket name is {}", defaultBucketNameOpt.get());
       }
@@ -323,13 +323,13 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
 
       // Explicit credentials are optional.
       AWSCredentialsProvider provider = null;
-      Option<String> accessKeyIdOpt = OsgiUtil.getOptCfg(cc.getProperties(), AWS_S3_ACCESS_KEY_ID_CONFIG);
-      Option<String> accessKeySecretOpt = OsgiUtil.getOptCfg(cc.getProperties(), AWS_S3_SECRET_ACCESS_KEY_CONFIG);
+      Optional<String> accessKeyIdOpt = OsgiUtil.getOptCfg(cc.getProperties(), AWS_S3_ACCESS_KEY_ID_CONFIG);
+      Optional<String> accessKeySecretOpt = OsgiUtil.getOptCfg(cc.getProperties(), AWS_S3_SECRET_ACCESS_KEY_CONFIG);
 
       // Keys not informed so use default credentials provider chain, which
       // will look at the environment variables, java system props, credential files, and instance
       // profile credentials
-      if (accessKeyIdOpt.isNone() && accessKeySecretOpt.isNone()) {
+      if (accessKeyIdOpt.isEmpty() && accessKeySecretOpt.isEmpty()) {
         provider = new DefaultAWSCredentialsProviderChain();
       } else {
         provider = new AWSStaticCredentialsProvider(
@@ -340,17 +340,17 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
       ClientConfiguration clientConfiguration = new ClientConfiguration();
 
       int maxConnections = OsgiUtil.getOptCfgAsInt(cc.getProperties(), AWS_S3_MAX_CONNECTIONS)
-              .getOrElse(DEFAULT_MAX_CONNECTIONS);
+              .orElse(DEFAULT_MAX_CONNECTIONS);
       logger.debug("Max Connections: {}", maxConnections);
       clientConfiguration.setMaxConnections(maxConnections);
 
       int connectionTimeout = OsgiUtil.getOptCfgAsInt(cc.getProperties(), AWS_S3_CONNECTION_TIMEOUT)
-              .getOrElse(DEFAULT_CONNECTION_TIMEOUT);
+              .orElse(DEFAULT_CONNECTION_TIMEOUT);
       logger.debug("Connection Output: {}", connectionTimeout);
       clientConfiguration.setConnectionTimeout(connectionTimeout);
 
       int maxRetries = OsgiUtil.getOptCfgAsInt(cc.getProperties(), AWS_S3_MAX_RETRIES)
-              .getOrElse(DEFAULT_MAX_RETRIES);
+              .orElse(DEFAULT_MAX_RETRIES);
       logger.debug("Max Retry: {}", maxRetries);
       clientConfiguration.setMaxErrorRetry(maxRetries);
 

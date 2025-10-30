@@ -31,13 +31,13 @@ import org.opencastproject.oaipmh.server.MetadataFormat;
 import org.opencastproject.oaipmh.server.MetadataProvider;
 import org.opencastproject.oaipmh.server.OaiPmhRepository;
 import org.opencastproject.oaipmh.util.XmlGen;
-import org.opencastproject.util.data.Option;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import java.net.URI;
 import java.net.URL;
+import java.util.Optional;
 
 /**
  * The Opencast metadata provider provides whole media packages.
@@ -69,9 +69,9 @@ public class MatterhornMetadataProvider implements MetadataProvider {
   }
 
   @Override
-  public Element createMetadata(OaiPmhRepository repository, final SearchResultItem item, Option<String> set) {
+  public Element createMetadata(OaiPmhRepository repository, final SearchResultItem item, Optional<String> set) {
     final Document mp = MediaPackageParser.getAsXmlDocument(item.getMediaPackage());
-    XmlGen xml = new XmlGen(Option.<String>none()) {
+    XmlGen xml = new XmlGen(Optional.<String>empty()) {
       @Override
       public Element create() {
         return (Element) mp.getFirstChild();

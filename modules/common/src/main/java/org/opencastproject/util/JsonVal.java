@@ -23,8 +23,6 @@ package org.opencastproject.util;
 
 import static org.opencastproject.util.data.functions.Misc.cast;
 
-import org.opencastproject.util.data.Function;
-
 import java.util.List;
 import java.util.Map;
 
@@ -33,10 +31,6 @@ public final class JsonVal {
 
   public JsonVal(Object val) {
     this.val = val;
-  }
-
-  public <A> A as(Function<Object, ? extends A> converter) {
-    return converter.apply(val);
   }
 
   public boolean isObj() {
@@ -51,33 +45,31 @@ public final class JsonVal {
     return val;
   }
 
-  public static final Function<Object, String> asString = caster(String.class);
-  public static final Function<Object, Integer> asInteger = caster(Integer.class);
-  public static final Function<Object, Long> asLong = caster(Long.class);
-  public static final Function<Object, Float> asFloat = caster(Float.class);
-  public static final Function<Object, Double> asDouble = caster(Double.class);
-  public static final Function<Object, Boolean> asBoolean = caster(Boolean.class);
-  public static final Function<Object, JsonObj> asJsonObj = new Function<Object, JsonObj>() {
-    @Override public JsonObj apply(Object o) {
-      return JsonObj.jsonObj((Map) o);
-    }
-  };
-  public static final Function<Object, JsonArr> asJsonArr = new Function<Object, JsonArr>() {
-    @Override public JsonArr apply(Object o) {
-      return new JsonArr((List) o);
-    }
-  };
-  public static final Function<Object, JsonVal> asJsonVal = new Function<Object, JsonVal>() {
-    @Override public JsonVal apply(Object o) {
-      return new JsonVal(o);
-    }
-  };
-
-  private static <A> Function<Object, A> caster(final Class<A> ev) {
-    return new Function<Object, A>() {
-      @Override public A apply(Object o) {
-        return cast(o, ev);
-      }
-    };
+  public static String asString(Object o) {
+    return cast(o, String.class);
+  }
+  public static Integer asInteger(Object o) {
+    return cast(o, Integer.class);
+  }
+  public static Long asLong(Object o) {
+    return cast(o, Long.class);
+  }
+  public static Float asFloat(Object o) {
+    return cast(o, Float.class);
+  }
+  public static Double asDouble(Object o) {
+    return cast(o, Double.class);
+  }
+  public static Boolean asBoolean(Object o) {
+    return cast(o, Boolean.class);
+  }
+  public static JsonObj asJsonObj(Object o) {
+    return JsonObj.jsonObj((Map) o);
+  }
+  public static JsonArr asJsonArr(Object o) {
+    return new JsonArr((List) o);
+  }
+  public static JsonVal asJsonVal(Object o) {
+    return new JsonVal(o);
   }
 }

@@ -55,7 +55,6 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.MimeTypes;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FileUtils;
@@ -359,7 +358,7 @@ public abstract class AssetManagerTestBase {
       }
 
       @Override public Optional<InputStream> get(StoragePath path) throws AssetStoreException {
-        return IoSupport.openClassPathResource("/dublincore-a.xml").isSome()
+        return IoSupport.openClassPathResource("/dublincore-a.xml").isPresent()
             ? Optional.of(IoSupport.openClassPathResource("/dublincore-a.xml").get())
             : Optional.empty();
       }
@@ -386,16 +385,16 @@ public abstract class AssetManagerTestBase {
         return deleted;
       }
 
-      @Override public Option<Long> getTotalSpace() {
-        return Option.none();
+      @Override public Optional<Long> getTotalSpace() {
+        return Optional.empty();
       }
 
-      @Override public Option<Long> getUsableSpace() {
-        return Option.none();
+      @Override public Optional<Long> getUsableSpace() {
+        return Optional.empty();
       }
 
-      @Override public Option<Long> getUsedSpace() {
-        return Option.some((long) store.size());
+      @Override public Optional<Long> getUsedSpace() {
+        return Optional.of((long) store.size());
       }
 
       @Override public String getStoreType() {
@@ -431,7 +430,7 @@ public abstract class AssetManagerTestBase {
       }
 
       @Override public Optional<InputStream> get(StoragePath path) throws AssetStoreException {
-        return IoSupport.openClassPathResource("/dublincore-a.xml").isSome()
+        return IoSupport.openClassPathResource("/dublincore-a.xml").isPresent()
             ? Optional.of(IoSupport.openClassPathResource("/dublincore-a.xml").get())
             : Optional.empty();
       }
@@ -458,16 +457,16 @@ public abstract class AssetManagerTestBase {
         return deleted;
       }
 
-      @Override public Option<Long> getTotalSpace() {
-        return Option.none();
+      @Override public Optional<Long> getTotalSpace() {
+        return Optional.empty();
       }
 
-      @Override public Option<Long> getUsableSpace() {
-        return Option.none();
+      @Override public Optional<Long> getUsableSpace() {
+        return Optional.empty();
       }
 
-      @Override public Option<Long> getUsedSpace() {
-        return Option.some((long) store.size());
+      @Override public Optional<Long> getUsedSpace() {
+        return Optional.of((long) store.size());
       }
 
       @Override public String getStoreType() {

@@ -22,9 +22,6 @@ package org.opencastproject.workflow.handler.distribution;
 
 import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.ofChannel;
 import static org.opencastproject.util.data.Collections.list;
-import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.util.data.functions.Strings.toBool;
-import static org.opencastproject.util.data.functions.Strings.trimToNone;
 
 import org.opencastproject.distribution.api.StreamingDistributionService;
 import org.opencastproject.job.api.Job;
@@ -42,6 +39,7 @@ import org.opencastproject.publication.api.PublicationException;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.MimeTypes;
+import org.opencastproject.util.data.functions.Strings;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
@@ -147,8 +145,11 @@ public class PublishOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
             .trimToEmpty(workflowInstance.getCurrentOperation().getConfiguration(STREAMING_TAGS));
     String streamingFlavors = StringUtils
             .trimToEmpty(workflowInstance.getCurrentOperation().getConfiguration(STREAMING_FLAVORS));
-    boolean checkAvailability = option(workflowInstance.getCurrentOperation().getConfiguration(CHECK_AVAILABILITY))
-            .bind(trimToNone).map(toBool).getOrElse(true);
+    boolean checkAvailability = Optional.ofNullable(
+            workflowInstance.getCurrentOperation().getConfiguration(CHECK_AVAILABILITY))
+            .flatMap(Strings::trimToNone)
+            .map(Boolean::valueOf)
+            .orElse(true);
     String repository = StringUtils.trimToNull(workflowInstance.getCurrentOperation().getConfiguration(REPOSITORY));
 
     Optional<String> externalChannel = getOptConfig(workflowInstance.getCurrentOperation(), EXTERNAL_CHANNEL_NAME);
@@ -247,7 +248,7 @@ public class PublishOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
       }
 
       for (Publication existingPublication : mediaPackage.getPublications()) {
-        if (ofChannel(newElement.getChannel()).apply(existingPublication)) {
+        if (ofChannel(existingPublication, newElement.getChannel())) {
           mediaPackage.remove(existingPublication);
         }
       }
@@ -262,7 +263,7 @@ public class PublishOaiPmhWorkflowOperationHandler extends AbstractWorkflowOpera
         Publication externalElement = PublicationImpl.publication(UUID.randomUUID().toString(), externalChannel.get(),
                 URI.create(template), externalMimetype.get());
         for (Publication existingPublication : mediaPackage.getPublications()) {
-          if (ofChannel(externalChannel.get()).apply(existingPublication)) {
+          if (ofChannel(existingPublication, externalChannel.get())) {
             mediaPackage.remove(existingPublication);
           }
         }

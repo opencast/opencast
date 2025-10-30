@@ -22,9 +22,6 @@
 package org.opencastproject.util;
 
 import static org.opencastproject.util.EqualsUtil.eq;
-import static org.opencastproject.util.data.Option.option;
-
-import org.opencastproject.util.data.Function0;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -157,11 +154,8 @@ public final class XmlNamespaceContext implements NamespaceContext {
       }
 
       @Override public String getPrefix(final String uri) {
-        return option(b.getPrefix(uri)).getOrElse(new Function0<String>() {
-          @Override public String apply() {
-            return a.getPrefix(uri);
-          }
-        });
+        return Optional.ofNullable(b.getPrefix(uri))
+            .orElseGet(() -> a.getPrefix(uri));
       }
 
       @Override public Iterator getPrefixes(String uri) {

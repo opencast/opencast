@@ -510,8 +510,9 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     try {
       if (workflowDefinition == null)
         throw new IllegalArgumentException("workflow definition must not be null");
-      for (List<String> errors : MediaPackageSupport.sanityCheck(sourceMediaPackage)) {
-        throw new IllegalArgumentException("Insane media package cannot be processed: " + String.join("; ", errors));
+      Optional<List<String>> errors = MediaPackageSupport.sanityCheck(sourceMediaPackage);
+      if (errors.isPresent()) {
+        throw new IllegalArgumentException("Insane media package cannot be processed: " + String.join("; ", errors.get()));
       }
       if (parentWorkflowId != null) {
         try {

@@ -20,27 +20,24 @@
  */
 package org.opencastproject.oaipmh.persistence;
 
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
-
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.util.data.Option;
 
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 /** Query builder. */
 public class QueryBuilder {
-  private Option<String> mediaPackageId = none();
-  private Option<String> repositoryId = none();
-  private Option<String> seriesId = none();
-  private Option<Boolean> deleted = none();
-  private Option<Date> modifiedAfter = none();
-  private Option<Date> modifiedBefore = none();
-  private Option<Integer> limit = none();
-  private Option<Integer> offset = none();
-  private Option<String> setSpec = none();
+  private Optional<String> mediaPackageId = Optional.empty();
+  private Optional<String> repositoryId = Optional.empty();
+  private Optional<String> seriesId = Optional.empty();
+  private Optional<Boolean> deleted = Optional.empty();
+  private Optional<Date> modifiedAfter = Optional.empty();
+  private Optional<Date> modifiedBefore = Optional.empty();
+  private Optional<Integer> limit = Optional.empty();
+  private Optional<Integer> offset = Optional.empty();
+  private Optional<String> setSpec = Optional.empty();
   private List<OaiPmhSetDefinition> setDefinitions = new LinkedList<>();
   private boolean subsequentRequest = false;
 
@@ -69,82 +66,82 @@ public class QueryBuilder {
     return new QueryBuilder().repositoryId(repositoryId);
   }
 
-  public QueryBuilder mediaPackageId(Option<String> mediaPackageId) {
+  public QueryBuilder mediaPackageId(Optional<String> mediaPackageId) {
     this.mediaPackageId = mediaPackageId;
     return this;
   }
 
   public QueryBuilder mediaPackageId(String mediaPackageId) {
-    this.mediaPackageId = some(mediaPackageId);
+    this.mediaPackageId = Optional.of(mediaPackageId);
     return this;
   }
 
   public QueryBuilder mediaPackageId(MediaPackage mediaPackage) {
-    this.mediaPackageId = some(mediaPackage.getIdentifier().toString().toString());
+    this.mediaPackageId = Optional.of(mediaPackage.getIdentifier().toString().toString());
     return this;
   }
 
-  public QueryBuilder repositoryId(Option<String> repositoryId) {
+  public QueryBuilder repositoryId(Optional<String> repositoryId) {
     this.repositoryId = repositoryId;
     return this;
   }
 
   public QueryBuilder repositoryId(String repositoryId) {
-    this.repositoryId = some(repositoryId);
+    this.repositoryId = Optional.of(repositoryId);
     return this;
   }
 
-  public QueryBuilder seriesId(Option<String> seriesId) {
+  public QueryBuilder seriesId(Optional<String> seriesId) {
     this.seriesId = seriesId;
     return this;
   }
 
   public QueryBuilder seriesId(String seriesId) {
-    this.seriesId = some(seriesId);
+    this.seriesId = Optional.of(seriesId);
     return this;
   }
 
   /** The date is inclusive. */
-  public QueryBuilder modifiedAfter(Option<Date> modifiedAfter) {
+  public QueryBuilder modifiedAfter(Optional<Date> modifiedAfter) {
     this.modifiedAfter = modifiedAfter;
     return this;
   }
 
   /** The date is inclusive. */
   public QueryBuilder modifiedAfter(Date modifiedAfter) {
-    this.modifiedAfter = some(modifiedAfter);
+    this.modifiedAfter = Optional.of(modifiedAfter);
     return this;
   }
 
   /** The date is inclusive. */
-  public QueryBuilder modifiedBefore(Option<Date> modifiedBefore) {
+  public QueryBuilder modifiedBefore(Optional<Date> modifiedBefore) {
     this.modifiedBefore = modifiedBefore;
     return this;
   }
 
   /** The date is inclusive. */
   public QueryBuilder modifiedBefore(Date modifiedBefore) {
-    this.modifiedBefore = some(modifiedBefore);
+    this.modifiedBefore = Optional.of(modifiedBefore);
     return this;
   }
 
   public QueryBuilder isDeleted(boolean deleted) {
-    this.deleted = some(deleted);
+    this.deleted = Optional.of(deleted);
     return this;
   }
 
-  public QueryBuilder limit(Option<Integer> limit) {
+  public QueryBuilder limit(Optional<Integer> limit) {
     this.limit = limit;
     return this;
   }
 
   public QueryBuilder limit(Integer limit) {
-    this.limit = some(limit);
+    this.limit = Optional.of(limit);
     return this;
   }
 
   public QueryBuilder offset(Integer offset) {
-    this.offset = some(offset);
+    this.offset = Optional.of(offset);
     return this;
   }
 
@@ -161,55 +158,55 @@ public class QueryBuilder {
 
   public QueryBuilder setSpec(String setSpec) {
     if (setSpec != null) {
-      this.setSpec = some(setSpec);
+      this.setSpec = Optional.of(setSpec);
     }
     return this;
   }
 
   /** Create the query. */
   public Query build() {
-    final Option<String> mediaPackageId = this.mediaPackageId;
-    final Option<String> repositoryId = this.repositoryId;
-    final Option<String> seriesId = this.seriesId;
-    final Option<Boolean> deleted = this.deleted;
-    final Option<Date> modifiedAfter = this.modifiedAfter;
-    final Option<Date> modifiedBefore = this.modifiedBefore;
-    final Option<Integer> limit = this.limit;
-    final Option<Integer> offset = this.offset;
-    final Option<String> setSpec = this.setSpec;
+    final Optional<String> mediaPackageId = this.mediaPackageId;
+    final Optional<String> repositoryId = this.repositoryId;
+    final Optional<String> seriesId = this.seriesId;
+    final Optional<Boolean> deleted = this.deleted;
+    final Optional<Date> modifiedAfter = this.modifiedAfter;
+    final Optional<Date> modifiedBefore = this.modifiedBefore;
+    final Optional<Integer> limit = this.limit;
+    final Optional<Integer> offset = this.offset;
+    final Optional<String> setSpec = this.setSpec;
     final List<OaiPmhSetDefinition> setDefinitions = this.setDefinitions;
     final boolean subsequentRequest = this.subsequentRequest;
 
     return new Query() {
-      @Override public Option<String> getMediaPackageId() {
+      @Override public Optional<String> getMediaPackageId() {
         return mediaPackageId;
       }
 
-      @Override public Option<String> getRepositoryId() {
+      @Override public Optional<String> getRepositoryId() {
         return repositoryId;
       }
 
-      @Override public Option<String> getSeriesId() {
+      @Override public Optional<String> getSeriesId() {
         return seriesId;
       }
 
-      @Override public Option<Boolean> isDeleted() {
+      @Override public Optional<Boolean> isDeleted() {
         return deleted;
       }
 
-      @Override public Option<Date> getModifiedAfter() {
+      @Override public Optional<Date> getModifiedAfter() {
         return modifiedAfter;
       }
 
-      @Override public Option<Date> getModifiedBefore() {
+      @Override public Optional<Date> getModifiedBefore() {
         return modifiedBefore;
       }
 
-      @Override public Option<Integer> getLimit() {
+      @Override public Optional<Integer> getLimit() {
         return limit;
       }
 
-      @Override public Option<Integer> getOffset() {
+      @Override public Optional<Integer> getOffset() {
         return offset;
       }
 
@@ -219,7 +216,7 @@ public class QueryBuilder {
       }
 
       @Override
-      public Option<String> getSetSpec() {
+      public Optional<String> getSetSpec() {
         return setSpec;
       }
 

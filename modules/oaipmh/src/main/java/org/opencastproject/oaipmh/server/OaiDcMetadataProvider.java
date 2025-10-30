@@ -22,9 +22,10 @@ package org.opencastproject.oaipmh.server;
 
 import org.opencastproject.oaipmh.OaiPmhConstants;
 import org.opencastproject.oaipmh.persistence.SearchResultItem;
-import org.opencastproject.util.data.Option;
 
 import org.w3c.dom.Element;
+
+import java.util.Optional;
 
 /**
  * Metadata provider for the mandatory <code>oai_dc</code> metadata prefix.
@@ -36,7 +37,7 @@ public class OaiDcMetadataProvider implements MetadataProvider {
   }
 
   @Override
-  public Element createMetadata(OaiPmhRepository repository, final SearchResultItem item, final Option<String> set) {
+  public Element createMetadata(OaiPmhRepository repository, final SearchResultItem item, final Optional<String> set) {
     return new OaiXmlGen(repository) {
       @Override
       public Element create() {

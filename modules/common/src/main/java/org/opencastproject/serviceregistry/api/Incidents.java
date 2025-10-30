@@ -21,7 +21,6 @@
 
 package org.opencastproject.serviceregistry.api;
 
-import static org.opencastproject.util.data.Monadics.mlist;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.job.api.Incident;
@@ -29,7 +28,6 @@ import org.opencastproject.job.api.Incident.Severity;
 import org.opencastproject.job.api.IncidentTree;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.Tuple;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -182,21 +180,8 @@ public final class Incidents {
     }
   }
 
-  static boolean findFailure(IncidentTree r) {
-    return mlist(r.getIncidents()).exists(isFailure) || mlist(r.getDescendants()).exists(findFailureFn);
+  static boolean findFailure(IncidentTree tree) {
+    return tree.getIncidents().stream().anyMatch(i -> i.getSeverity() == Severity.FAILURE)
+        || tree.getDescendants().stream().anyMatch(Incidents::findFailure);
   }
-
-  static final Function<IncidentTree, Boolean> findFailureFn = new Function<IncidentTree, Boolean>() {
-    @Override
-    public Boolean apply(IncidentTree r) {
-      return findFailure(r);
-    }
-  };
-
-  static final Function<Incident, Boolean> isFailure = new Function<Incident, Boolean>() {
-    @Override
-    public Boolean apply(Incident i) {
-      return i.getSeverity() == Severity.FAILURE;
-    }
-  };
 }

@@ -39,7 +39,6 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.data.Collections;
-import org.opencastproject.util.data.Option;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
@@ -114,21 +113,21 @@ public class OaiPmhUpdatedEventHandler implements ManagedService {
 
   @Override
   public void updated(Dictionary<String, ?> dictionary) throws ConfigurationException {
-    final Option<Boolean> propagateEpisode = getOptCfgAsBoolean(dictionary, CFG_PROPAGATE_EPISODE);
-    if (propagateEpisode.isSome()) {
+    final Optional<Boolean> propagateEpisode = getOptCfgAsBoolean(dictionary, CFG_PROPAGATE_EPISODE);
+    if (propagateEpisode.isPresent()) {
       this.propagateEpisode = propagateEpisode.get();
     }
 
-    final Option<String> flavorsRaw = getOptCfg(dictionary, CFG_FLAVORS);
-    if (flavorsRaw.isSome()) {
+    final Optional<String> flavorsRaw = getOptCfg(dictionary, CFG_FLAVORS);
+    if (flavorsRaw.isPresent()) {
       final String[] flavorStrings = flavorsRaw.get().split("\\s*,\\s*");
       this.flavors = Collections.set(flavorStrings);
     } else {
       this.flavors = new HashSet<>();
     }
 
-    final Option<String> tagsRaw = getOptCfg(dictionary, CFG_TAGS);
-    if (tagsRaw.isSome()) {
+    final Optional<String> tagsRaw = getOptCfg(dictionary, CFG_TAGS);
+    if (tagsRaw.isPresent()) {
       final String[] tags = tagsRaw.get().split("\\s*,\\s*");
       this.tags = Collections.set(tags);
     } else {

@@ -22,9 +22,6 @@
 
 package org.opencastproject.mediapackage;
 
-import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.presentations;
-import static org.opencastproject.util.data.Monadics.mlist;
-
 import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.mediapackage.identifier.IdImpl;
@@ -784,7 +781,14 @@ public final class MediaPackageImpl implements MediaPackage {
   @XmlElement(name = "publication")
   @Override
   public Publication[] getPublications() {
-    return mlist(elements).bind(presentations).value().toArray(new Publication[0]);
+//    return elements.stream()
+//        .map(presentations::apply)
+//        .flatMap(List::stream)
+//        .toArray(Publication[]::new);
+    return elements.stream()
+        .filter(Publication.class::isInstance)
+        .map(Publication.class::cast)
+        .toArray(Publication[]::new);
   }
 
   void setPublications(Publication[] publications) {

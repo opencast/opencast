@@ -47,8 +47,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.JobUtil;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
 
 import org.apache.http.HttpStatus;
 import org.apache.http.HttpVersion;
@@ -100,16 +98,16 @@ public class JobUtilTest {
     result = waitForJob(job2, serviceRegistry, job3);
     assertTrue(result.isSuccess());
 
-    result = waitForJob(serviceRegistry, Option.some(2000L), job1);
+    result = waitForJob(serviceRegistry, Optional.of(2000L), job1);
     assertTrue(result.isSuccess());
 
-    result = waitForJob(serviceRegistry, Option.<Long> none(), job1);
+    result = waitForJob(serviceRegistry, Optional.<Long> empty(), job1);
     assertTrue(result.isSuccess());
 
-    result = waitForJob(job2, serviceRegistry, Option.some(2000L), job3);
+    result = waitForJob(job2, serviceRegistry, Optional.of(2000L), job3);
     assertTrue(result.isSuccess());
 
-    result = waitForJob(job2, serviceRegistry, Option.some(2000L), job3);
+    result = waitForJob(job2, serviceRegistry, Optional.of(2000L), job3);
     assertTrue(result.isSuccess());
   }
 
@@ -161,13 +159,10 @@ public class JobUtilTest {
     JobImpl job = new JobImpl(20);
     job.setStatus(Status.FAILED);
 
-    Function<Job, Boolean> waitForJobSuccess = waitForJobSuccess(job, serviceRegistry, Option.<Long> none());
-    Boolean isSuccess = waitForJobSuccess.apply(job);
-    assertFalse(isSuccess);
+    assertFalse(waitForJobSuccess(job, serviceRegistry, Optional.empty(), job));
 
     job.setStatus(Status.FINISHED);
-    isSuccess = waitForJobSuccess.apply(job);
-    assertTrue(isSuccess);
+    assertTrue(waitForJobSuccess(job, serviceRegistry, Optional.empty(), job));
   }
 
   @Test
@@ -179,23 +174,21 @@ public class JobUtilTest {
     job.setStatus(Status.FINISHED);
     job.setPayload(MediaPackageElementParser.getAsXml(element));
 
-    Function<Job, MediaPackageElement> payloadAsMediaPackageElement = payloadAsMediaPackageElement(job,
-            serviceRegistry);
-    assertEquals(element, payloadAsMediaPackageElement.apply(job));
+    assertEquals(element, payloadAsMediaPackageElement(job, serviceRegistry, job));
   }
 
   @Test
   public void testJobFromHttpResponse() throws Exception {
     BasicHttpResponse response = new BasicHttpResponse(
             new BasicStatusLine(new HttpVersion(1, 1), HttpStatus.SC_NO_CONTENT, "No message"));
-    Option<Job> job = JobUtil.jobFromHttpResponse.apply(response);
-    assertFalse(job.isSome());
+    Optional<Job> job = JobUtil.jobFromHttpResponse(response);
+    assertFalse(job.isPresent());
 
     JaxbJob jaxbJob = new JaxbJob(new JobImpl(32));
     response.setEntity(new StringEntity(JobParser.toXml(jaxbJob), StandardCharsets.UTF_8));
 
-    job = JobUtil.jobFromHttpResponse.apply(response);
-    assertTrue(job.isSome());
+    job = JobUtil.jobFromHttpResponse(response);
+    assertTrue(job.isPresent());
     assertEquals(jaxbJob.toJob(), job.get());
   }
 

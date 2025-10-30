@@ -30,11 +30,11 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaUser;
-import org.opencastproject.util.data.Option;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -138,7 +138,7 @@ public class EventCommentDto {
   public static EventCommentDto from(EventComment comment) {
     EventCommentDto dto = new EventCommentDto();
 
-    if (comment.getId().isSome()) {
+    if (comment.getId().isPresent()) {
       dto.id = comment.getId().get().longValue();
     }
     dto.organization = comment.getOrganization();
@@ -377,7 +377,7 @@ public class EventCommentDto {
       } catch (Exception ignore) { }
       user = new JpaUser(author, null, org, author, "ghost@localhost", "ghost", false);
     }
-    EventComment comment = EventComment.create(Option.option(id), eventId, organization, text, user, reason,
+    EventComment comment = EventComment.create(Optional.ofNullable(id), eventId, organization, text, user, reason,
             resolvedStatus, creationDate, modificationDate);
     for (EventCommentReplyDto reply : replies) {
       comment.addReply(reply.toCommentReply(userDirectoryService, organizationDirectoryService, organization));

@@ -23,8 +23,6 @@ package org.opencastproject.util;
 
 import static org.opencastproject.util.data.Collections.map;
 import static org.opencastproject.util.data.Collections.toArray;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.job.api.Job;
@@ -33,11 +31,8 @@ import org.opencastproject.job.api.JobBarrier;
 import org.opencastproject.job.api.JobParser;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
-import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
 
 import org.apache.http.HttpResponse;
 import org.slf4j.Logger;
@@ -188,7 +183,7 @@ public final class JobUtil {
   }
 
   /** Check if <code>job</code> is not done yet and wait in case. */
-  public static JobBarrier.Result waitForJob(Job waiter, ServiceRegistry reg, Option<Long> timeout, Job job) {
+  public static JobBarrier.Result waitForJob(Job waiter, ServiceRegistry reg, Optional<Long> timeout, Job job) {
     final Job.Status status = job.getStatus();
     // only create a barrier if the job is not done yet
     switch (status) {
@@ -198,14 +193,14 @@ public final class JobUtil {
       case FINISHED:
         return new JobBarrier.Result(map(tuple(job, status)));
       default:
-        for (Long t : timeout)
-          return waitForJobs(waiter, reg, t, job);
+        if (timeout.isPresent())
+          return waitForJobs(waiter, reg, timeout.get(), job);
         return waitForJobs(waiter, reg, job);
     }
   }
 
   /** Check if <code>job</code> is not done yet and wait in case. */
-  public static JobBarrier.Result waitForJob(ServiceRegistry reg, Option<Long> timeout, Job job) {
+  public static JobBarrier.Result waitForJob(ServiceRegistry reg, Optional<Long> timeout, Job job) {
     return waitForJob(null, reg, timeout, job);
   }
 
@@ -221,12 +216,12 @@ public final class JobUtil {
    * @return the job barrier result
    */
   public static JobBarrier.Result waitForJob(Job waiter, ServiceRegistry reg, Job job) {
-    return waitForJob(waiter, reg, none(0L), job);
+    return waitForJob(waiter, reg, Optional.empty(), job);
   }
 
   /** Check if <code>job</code> is not done yet and wait in case. */
   public static JobBarrier.Result waitForJob(ServiceRegistry reg, Job job) {
-    return waitForJob(null, reg, none(0L), job);
+    return waitForJob(null, reg, Optional.empty(), job);
   }
 
   /**
@@ -259,51 +254,45 @@ public final class JobUtil {
   }
 
   /** Wait for the job to complete and return the success value. */
-  public static Function<Job, Boolean> waitForJobSuccess(final Job waiter, final ServiceRegistry reg,
-          final Option<Long> timeout) {
-    return new Function<Job, Boolean>() {
-      @Override
-      public Boolean apply(Job job) {
-        return waitForJob(waiter, reg, timeout, job).isSuccess();
-      }
-    };
+  public static boolean waitForJobSuccess(final Job waiter, final ServiceRegistry reg,
+      final Optional<Long> timeout, Job job) {
+    return waitForJob(waiter, reg, timeout, job).isSuccess();
   }
+
 
   /**
    * Interpret the payload of a completed {@link Job} as a {@link MediaPackageElement}. Wait for the job to complete if
    * necessary.
    *
    */
-  public static Function<Job, MediaPackageElement> payloadAsMediaPackageElement(final Job waiter,
-          final ServiceRegistry reg) {
-    return new Function.X<Job, MediaPackageElement>() {
-      @Override
-      public MediaPackageElement xapply(Job job) throws MediaPackageException {
-        waitForJob(waiter, reg, none(0L), job);
-        return MediaPackageElementParser.getFromXml(job.getPayload());
-      }
-    };
+  public static MediaPackageElement payloadAsMediaPackageElement(final Job waiter,
+      final ServiceRegistry reg,
+      Job job) {
+    try {
+      waitForJob(waiter, reg, Optional.empty(), job);
+      return MediaPackageElementParser.getFromXml(job.getPayload());
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /**
    * Interpret the payload of a completed {@link Job} as a {@link MediaPackageElement}. Wait for the job to complete if
    * necessary.
    */
-  public static Function<Job, MediaPackageElement> payloadAsMediaPackageElement(final ServiceRegistry reg) {
-    return payloadAsMediaPackageElement(null, reg);
+  public static MediaPackageElement payloadAsMediaPackageElement(final ServiceRegistry reg,
+      Job job) {
+    return payloadAsMediaPackageElement(null, reg, job);
   }
 
-  public static final Function<HttpResponse, Option<Job>> jobFromHttpResponse = new Function<HttpResponse, Option<Job>>() {
-    @Override
-    public Option<Job> apply(HttpResponse response) {
-      try {
-        return some(JobParser.parseJob(response.getEntity().getContent()));
-      } catch (Exception e) {
-        logger.error("Error parsing Job from HTTP response", e);
-        return none();
-      }
+  public static Optional<Job> jobFromHttpResponse(HttpResponse response) {
+    try {
+      return Optional.of(JobParser.parseJob(response.getEntity().getContent()));
+    } catch (Exception e) {
+      logger.error("Error parsing Job from HTTP response", e);
+      return Optional.empty();
     }
-  };
+  }
 
   /** Sum up the queue time of a list of jobs. */
   public static long sumQueueTime(List<Job> jobs) {

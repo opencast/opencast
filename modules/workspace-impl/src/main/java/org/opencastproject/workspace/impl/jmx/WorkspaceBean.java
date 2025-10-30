@@ -21,7 +21,6 @@
 
 package org.opencastproject.workspace.impl.jmx;
 
-import org.opencastproject.util.data.Option.Match;
 import org.opencastproject.workspace.api.Workspace;
 
 public class WorkspaceBean implements WorkspaceMXBean {
@@ -37,17 +36,7 @@ public class WorkspaceBean implements WorkspaceMXBean {
    */
   @Override
   public long getFreeSpace() {
-    return workspace.getUsableSpace().fold(new Match<Long, Long>() {
-      @Override
-      public Long some(Long a) {
-        return a;
-      }
-
-      @Override
-      public Long none() {
-        return -1L;
-      }
-    });
+    return workspace.getUsableSpace().orElse(-1L);
   }
 
   /**
@@ -55,17 +44,7 @@ public class WorkspaceBean implements WorkspaceMXBean {
    */
   @Override
   public long getUsedSpace() {
-    return workspace.getUsedSpace().fold(new Match<Long, Long>() {
-      @Override
-      public Long some(Long a) {
-        return a;
-      }
-
-      @Override
-      public Long none() {
-        return -1L;
-      }
-    });
+    return workspace.getUsedSpace().orElse(-1L);
   }
 
   /**
@@ -73,17 +52,7 @@ public class WorkspaceBean implements WorkspaceMXBean {
    */
   @Override
   public long getTotalSpace() {
-    return workspace.getTotalSpace().fold(new Match<Long, Long>() {
-      @Override
-      public Long some(Long a) {
-        return a;
-      }
-
-      @Override
-      public Long none() {
-        return -1L;
-      }
-    });
+    return workspace.getTotalSpace().orElse(-1L);
   }
 
 }

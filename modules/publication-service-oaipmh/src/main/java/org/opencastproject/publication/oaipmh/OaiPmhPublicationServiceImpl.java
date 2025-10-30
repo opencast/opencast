@@ -843,9 +843,10 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
 
   /** Create a new publication element. */
   protected Publication createPublicationElement(String mpId, String repository) throws PublicationException {
-    for (String hostUrl : OaiPmhServerInfoUtil.oaiPmhServerUrlOfCurrentOrganization(securityService)) {
+    Optional<String> hostUrl = OaiPmhServerInfoUtil.oaiPmhServerUrlOfCurrentOrganization(securityService);
+    if (hostUrl.isPresent()) {
       final URI engageUri = URIUtils.resolve(
-          URI.create(UrlSupport.concat(hostUrl, oaiPmhServerInfo.getMountPoint(), repository)),
+          URI.create(UrlSupport.concat(hostUrl.get(), oaiPmhServerInfo.getMountPoint(), repository)),
           "?verb=ListMetadataFormats&identifier=" + mpId);
       return PublicationImpl.publication(UUID.randomUUID().toString(), getPublicationChannelName(repository), engageUri,
               MimeTypes.parseMimeType(MimeTypes.XML.toString()));

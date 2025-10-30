@@ -52,14 +52,14 @@ public abstract class OaiVerbXmlGen extends OaiXmlGen {
    * Create the verb tag.
    */
   Element verb(Node... nodes) {
-    return $e(p.getVerb().getOrElse("NOVERB"), nodes);
+    return $e(p.getVerb().orElse("NOVERB"), nodes);
   }
 
   /**
    * Create the verb tag.
    */
   Element verb(List<Node> nodes) {
-    return $e(p.getVerb().getOrElse("NOVERB"), nodes);
+    return $e(p.getVerb().orElse("NOVERB"), nodes);
   }
 
 }

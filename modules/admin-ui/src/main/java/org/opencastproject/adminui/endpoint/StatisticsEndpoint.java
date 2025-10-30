@@ -22,7 +22,7 @@
 package org.opencastproject.adminui.endpoint;
 
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
-import static org.opencastproject.util.data.functions.Functions.chuck;
+import static org.opencastproject.util.data.functions.Misc.chuck;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.adminui.impl.ProviderQuery;

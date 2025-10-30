@@ -136,7 +136,6 @@ import org.opencastproject.util.Jsons.Val;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.UrlSupport;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.data.Tuple3;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -953,32 +952,26 @@ public abstract class AbstractEventEndpoint {
       Source eventSource = getIndexService().getEventSource(optEvent.get());
       if (eventSource == Source.ARCHIVE) {
         Optional<MediaPackage> mediaPackage = getAssetManager().getMediaPackage(eventId);
-        Option<AccessControlList> aclOpt = Option.option(accessControlList);
+        Optional<AccessControlList> aclOpt = Optional.ofNullable(accessControlList);
         // the episode service is the source of authority for the retrieval of media packages
         if (mediaPackage.isPresent()) {
           MediaPackage episodeSvcMp = mediaPackage.get();
-          aclOpt.fold(new Option.EMatch<AccessControlList>() {
-            // set the new episode ACL
-            @Override
-            public void esome(final AccessControlList acl) {
-              // update in episode service
-              try {
-                MediaPackage mp = getAuthorizationService().setAcl(episodeSvcMp, AclScope.Episode, acl).getA();
+          aclOpt.ifPresentOrElse(
+              aclPresent -> {
+                try {
+                  MediaPackage mp = getAuthorizationService()
+                      .setAcl(episodeSvcMp, AclScope.Episode, aclPresent)
+                      .getA();
+                  getAssetManager().takeSnapshot(mp);
+                } catch (MediaPackageException e) {
+                  logger.error("Error getting ACL from media package", e);
+                }
+              },
+              () -> {
+                MediaPackage mp = getAuthorizationService().removeAcl(episodeSvcMp, AclScope.Episode);
                 getAssetManager().takeSnapshot(mp);
-              } catch (MediaPackageException e) {
-                logger.error("Error getting ACL from media package", e);
               }
-            }
-
-            // if none EpisodeACLTransition#isDelete returns true so delete the episode ACL
-            @Override
-            public void enone() {
-              // update in episode service
-              MediaPackage mp = getAuthorizationService().removeAcl(episodeSvcMp, AclScope.Episode);
-              getAssetManager().takeSnapshot(mp);
-            }
-
-          });
+          );
           return ok();
         }
         logger.warn("Unable to find the event '{}'", eventId);
@@ -1032,7 +1025,7 @@ public abstract class AbstractEventEndpoint {
 
     User author = getSecurityService().getUser();
     try {
-      EventComment createdComment = EventComment.create(Option.<Long> none(), eventId,
+      EventComment createdComment = EventComment.create(Optional.<Long> empty(), eventId,
               getSecurityService().getOrganization().getId(), text, author, reason, BooleanUtils.toBoolean(reason));
       createdComment = getEventCommentService().updateComment(createdComment);
       List<EventComment> comments = getEventCommentService().getComments(eventId);
@@ -1122,7 +1115,7 @@ public abstract class AbstractEventEndpoint {
     try {
       comment = getEventCommentService().getComment(commentId);
       for (EventCommentReply r : comment.getReplies()) {
-        if (r.getId().isNone() || replyId != r.getId().get().longValue())
+        if (r.getId().isEmpty() || replyId != r.getId().get().longValue())
           continue;
         reply = r;
         break;
@@ -1169,7 +1162,7 @@ public abstract class AbstractEventEndpoint {
     try {
       comment = getEventCommentService().getComment(commentId);
       for (EventCommentReply r : comment.getReplies()) {
-        if (r.getId().isNone() || replyId != r.getId().get().longValue())
+        if (r.getId().isEmpty() || replyId != r.getId().get().longValue())
           continue;
         reply = r;
         break;
@@ -1229,7 +1222,7 @@ public abstract class AbstractEventEndpoint {
       }
 
       User author = getSecurityService().getUser();
-      EventCommentReply reply = EventCommentReply.create(Option.<Long> none(), text, author);
+      EventCommentReply reply = EventCommentReply.create(Optional.<Long> empty(), text, author);
       updatedComment.addReply(reply);
 
       updatedComment = getEventCommentService().updateComment(updatedComment);
@@ -2344,11 +2337,11 @@ public abstract class AbstractEventEndpoint {
     } catch (Exception e) {
       logger.error("Unable to parse access policy", e);
     }
-    Option<ManagedAcl> currentAcl = AccessInformationUtil.matchAclsLenient(acls, activeAcl,
+    Optional<ManagedAcl> currentAcl = AccessInformationUtil.matchAclsLenient(acls, activeAcl,
             getAdminUIConfiguration().getMatchManagedAclRolePrefixes());
 
     JSONObject episodeAccessJson = new JSONObject();
-    episodeAccessJson.put("current_acl", currentAcl.isSome() ? currentAcl.get().getId() : 0L);
+    episodeAccessJson.put("current_acl", currentAcl.isPresent() ? currentAcl.get().getId() : 0L);
     episodeAccessJson.put("acl", transformAccessControList(activeAcl, getUserDirectoryService()));
     episodeAccessJson.put("privileges", AccessInformationUtil.serializePrivilegesByRole(activeAcl));
     if (StringUtils.isNotBlank(optEvent.get().getWorkflowState())
@@ -2453,7 +2446,7 @@ public abstract class AbstractEventEndpoint {
           @RestParameter(name = "tags", isRequired = false, description = "A comma separated list of tags to filter the workflow definitions", type = RestParameter.Type.STRING) }, responses = {
                   @RestResponse(responseCode = SC_OK, description = "Returns all the data related to the event processing tab as JSON") })
   public Response getNewProcessing(@QueryParam("tags") String tagsString) {
-    List<String> tags = RestUtil.splitCommaSeparatedParam(Option.option(tagsString)).value();
+    List<String> tags = RestUtil.splitCommaSeparatedParam(Optional.ofNullable(tagsString));
 
     JsonArray workflowsArray = new JsonArray();
     try {
@@ -2669,10 +2662,10 @@ public abstract class AbstractEventEndpoint {
           @QueryParam("sort") String sort, @QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit,
           @QueryParam("getComments") Boolean getComments) {
 
-    Option<Integer> optLimit = Option.option(limit);
-    Option<Integer> optOffset = Option.option(offset);
-    Option<String> optSort = Option.option(trimToNull(sort));
-    Option<Boolean> optGetComments = Option.option(getComments);
+    Optional<Integer> optLimit = Optional.ofNullable(limit);
+    Optional<Integer> optOffset = Optional.ofNullable(offset);
+    Optional<String> optSort = Optional.ofNullable(trimToNull(sort));
+    Optional<Boolean> optGetComments = Optional.ofNullable(getComments);
     List<JsonObject> eventsList = new ArrayList<>();
     final Organization organization = getSecurityService().getOrganization();
     final User user = getSecurityService().getUser();
@@ -2682,8 +2675,8 @@ public abstract class AbstractEventEndpoint {
     EventSearchQuery query = new EventSearchQuery(organization.getId(), user);
 
     // If the limit is set to 0, this is not taken into account
-    if (optLimit.isSome() && limit == 0) {
-      optLimit = Option.none();
+    if (optLimit.isPresent() && limit == 0) {
+      optLimit = Optional.empty();
     }
 
     Map<String, String> filters = RestUtils.parseFilter(filter);
@@ -2751,7 +2744,7 @@ public abstract class AbstractEventEndpoint {
       }
     }
 
-    if (optSort.isSome()) {
+    if (optSort.isPresent()) {
       ArrayList<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
       for (SortCriterion criterion : sortCriteria) {
         switch (criterion.getFieldName()) {
@@ -2805,9 +2798,9 @@ public abstract class AbstractEventEndpoint {
       query.withAction(Permissions.Action.READ);
     }
 
-    if (optLimit.isSome())
+    if (optLimit.isPresent())
       query.withLimit(optLimit.get());
-    if (optOffset.isSome())
+    if (optOffset.isPresent())
       query.withOffset(offset);
     // TODO: Add other filters to the query
 
@@ -2829,7 +2822,7 @@ public abstract class AbstractEventEndpoint {
       Event source = item.getSource();
       source.updatePreview(getAdminUIConfiguration().getPreviewSubtype());
       List<EventComment> comments = null;
-      if (optGetComments.isSome() && optGetComments.get()) {
+      if (optGetComments.isPresent() && optGetComments.get()) {
         try {
           comments = getEventCommentService().getComments(source.getIdentifier());
         } catch (EventCommentException e) {

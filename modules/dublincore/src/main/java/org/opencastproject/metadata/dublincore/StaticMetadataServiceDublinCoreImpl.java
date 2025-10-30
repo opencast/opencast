@@ -41,24 +41,16 @@ import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TEMPOR
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TITLE;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TYPE;
 import static org.opencastproject.util.data.Collections.head;
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.util.data.Option.some;
 
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
-import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageSerializer;
 import org.opencastproject.metadata.api.MetadataValue;
 import org.opencastproject.metadata.api.StaticMetadata;
 import org.opencastproject.metadata.api.StaticMetadataService;
 import org.opencastproject.metadata.api.util.Interval;
-import org.opencastproject.util.data.Function;
 import org.opencastproject.util.data.NonEmptyList;
-import org.opencastproject.util.data.Option;
-import org.opencastproject.util.data.Predicate;
-import org.opencastproject.util.data.functions.Misc;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
@@ -75,6 +67,9 @@ import java.net.URI;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * This service provides {@link org.opencastproject.metadata.api.StaticMetadata} for a given mediapackage,
@@ -92,14 +87,6 @@ import java.util.Map;
 public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataService {
 
   private static final Logger logger = LoggerFactory.getLogger(StaticMetadataServiceDublinCoreImpl.class);
-
-  // Catalog loader function
-  private Function<Catalog, Option<DublinCoreCatalog>> loader = new Function<Catalog, Option<DublinCoreCatalog>>() {
-    @Override
-    public Option<DublinCoreCatalog> apply(Catalog catalog) {
-      return load(catalog);
-    }
-  };
 
   protected int priority = 0;
 
@@ -160,130 +147,142 @@ public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataServic
 
   private static StaticMetadata newStaticMetadataFromEpisode(DublinCoreCatalog episode) {
     // Ensure that the mandatory properties are present
-    final Option<String> id = option(episode.getFirst(PROPERTY_IDENTIFIER));
-    final Option<Date> created = option(episode.getFirst(PROPERTY_CREATED)).map(new Function<String, Date>() {
-      @Override
-      public Date apply(String a) {
-        final Date date = EncodingSchemeUtils.decodeDate(a);
-        return date != null ? date : Misc.<Date>chuck(new RuntimeException(a + " does not conform to W3C-DTF encoding scheme."));
-      }
-    });
-    final Option temporalOpt = option(episode.getFirstVal(PROPERTY_TEMPORAL)).map(dc2temporalValueOption());
-    final Option<Date> start;
+    final Optional<String> id = Optional.ofNullable(episode.getFirst(PROPERTY_IDENTIFIER));
+    final Optional<Date> created = Optional.ofNullable(episode.getFirst(PROPERTY_CREATED))
+        .map(a -> {
+          Date date = EncodingSchemeUtils.decodeDate(a);
+          if (date == null) {
+            throw new RuntimeException(a + " does not conform to W3C-DTF encoding scheme.");
+          }
+          return date;
+        });
+    final Optional temporalOpt = Optional.ofNullable(episode.getFirstVal(PROPERTY_TEMPORAL)).map(dc2temporalValueOption());
+    final Optional<Date> start;
     if (episode.getFirst(PROPERTY_TEMPORAL) != null) {
       DCMIPeriod period = EncodingSchemeUtils
                   .decodeMandatoryPeriod(episode.getFirst(PROPERTY_TEMPORAL));
-      start = option(period.getStart());
+      start = Optional.ofNullable(period.getStart());
     } else {
       start = created;
     }
-    final Option<String> language = option(episode.getFirst(PROPERTY_LANGUAGE));
-    final Option<Long> extent = head(episode.get(PROPERTY_EXTENT)).map(new Function<DublinCoreValue, Long>() {
-      @Override
-      public Long apply(DublinCoreValue a) {
-        final Long extent = EncodingSchemeUtils.decodeDuration(a);
-        return extent != null ? extent : Misc.<Long>chuck(new RuntimeException(a + " does not conform to ISO8601 encoding scheme for durations."));
-      }
-    });
-    final Option<String> type = option(episode.getFirst(PROPERTY_TYPE));
+    final Optional<String> language = Optional.ofNullable(episode.getFirst(PROPERTY_LANGUAGE));
+    final Optional<Long> extent = head(episode.get(PROPERTY_EXTENT))
+        .map(a -> {
+          Long duration = EncodingSchemeUtils.decodeDuration(a);
+          if (duration == null) {
+            throw new RuntimeException(a + " does not conform to ISO8601 encoding scheme for durations.");
+          }
+          return duration;
+        });
+    final Optional<String> type = Optional.ofNullable(episode.getFirst(PROPERTY_TYPE));
 
-    final Option<String> isPartOf = option(episode.getFirst(PROPERTY_IS_PART_OF));
-    final Option<String> replaces = option(episode.getFirst(PROPERTY_REPLACES));
-    final Option<Interval> available = head(episode.get(PROPERTY_AVAILABLE)).flatMap(
-            new Function<DublinCoreValue, Option<Interval>>() {
-              @Override
-              public Option<Interval> apply(DublinCoreValue v) {
-                final DCMIPeriod p = EncodingSchemeUtils.decodePeriod(v);
-                return p != null
-                        ? some(Interval.fromValues(p.getStart(), p.getEnd()))
-                        : Misc.<Option<Interval>>chuck(new RuntimeException(v + " does not conform to W3C-DTF encoding scheme for periods"));
-              }
-            });
-    final NonEmptyList<MetadataValue<String>> titles = new NonEmptyList<MetadataValue<String>>(
-            mlist(episode.get(PROPERTY_TITLE)).map(dc2mvString(PROPERTY_TITLE.getLocalName())).value());
-    final List<MetadataValue<String>> subjects =
-            mlist(episode.get(PROPERTY_SUBJECT)).map(dc2mvString(PROPERTY_SUBJECT.getLocalName())).value();
-    final List<MetadataValue<String>> creators =
-            mlist(episode.get(PROPERTY_CREATOR)).map(dc2mvString(PROPERTY_CREATOR.getLocalName())).value();
-    final List<MetadataValue<String>> publishers =
-            mlist(episode.get(PROPERTY_PUBLISHER)).map(dc2mvString(PROPERTY_PUBLISHER.getLocalName())).value();
-    final List<MetadataValue<String>> contributors =
-            mlist(episode.get(PROPERTY_CONTRIBUTOR)).map(dc2mvString(PROPERTY_CONTRIBUTOR.getLocalName())).value();
-    final List<MetadataValue<String>> description =
-            mlist(episode.get(PROPERTY_DESCRIPTION)).map(dc2mvString(PROPERTY_DESCRIPTION.getLocalName())).value();
-    final List<MetadataValue<String>> rightsHolders =
-            mlist(episode.get(PROPERTY_RIGHTS_HOLDER)).map(dc2mvString(PROPERTY_RIGHTS_HOLDER.getLocalName())).value();
-    final List<MetadataValue<String>> spatials =
-            mlist(episode.get(PROPERTY_SPATIAL)).map(dc2mvString(PROPERTY_SPATIAL.getLocalName())).value();
-    final List<MetadataValue<String>> accessRights =
-            mlist(episode.get(PROPERTY_ACCESS_RIGHTS)).map(dc2mvString(PROPERTY_ACCESS_RIGHTS.getLocalName())).value();
-    final List<MetadataValue<String>> licenses =
-            mlist(episode.get(PROPERTY_LICENSE)).map(dc2mvString(PROPERTY_LICENSE.getLocalName())).value();
+    final Optional<String> isPartOf = Optional.ofNullable(episode.getFirst(PROPERTY_IS_PART_OF));
+    final Optional<String> replaces = Optional.ofNullable(episode.getFirst(PROPERTY_REPLACES));
+    final Optional<Interval> available = head(episode.get(PROPERTY_AVAILABLE))
+        .flatMap(v -> {
+          DCMIPeriod p = EncodingSchemeUtils.decodePeriod(v);
+          if (p == null) {
+            throw new RuntimeException(v + " does not conform to W3C-DTF encoding scheme for periods");
+          }
+          return Optional.of(Interval.fromValues(p.getStart(), p.getEnd()));
+        });
+    final NonEmptyList<MetadataValue<String>> titles = new NonEmptyList<>(
+        episode.get(PROPERTY_TITLE).stream()
+            .map(dc2mvString(PROPERTY_TITLE.getLocalName()))
+            .collect(Collectors.toList())
+    );
+    final List<MetadataValue<String>> subjects = episode.get(PROPERTY_SUBJECT).stream()
+            .map(dc2mvString(PROPERTY_SUBJECT.getLocalName()))
+            .collect(Collectors.toList());
+    final List<MetadataValue<String>> creators = episode.get(PROPERTY_CREATOR).stream()
+            .map(dc2mvString(PROPERTY_CREATOR.getLocalName()))
+            .collect(Collectors.toList());
+    final List<MetadataValue<String>> publishers = episode.get(PROPERTY_PUBLISHER).stream()
+            .map(dc2mvString(PROPERTY_PUBLISHER.getLocalName()))
+            .collect(Collectors.toList());
+    final List<MetadataValue<String>> contributors = episode.get(PROPERTY_CONTRIBUTOR).stream()
+            .map(dc2mvString(PROPERTY_CONTRIBUTOR.getLocalName()))
+            .collect(Collectors.toList());
+    final List<MetadataValue<String>> description = episode.get(PROPERTY_DESCRIPTION).stream()
+            .map(dc2mvString(PROPERTY_DESCRIPTION.getLocalName()))
+            .collect(Collectors.toList());
+    final List<MetadataValue<String>> rightsHolders = episode.get(PROPERTY_RIGHTS_HOLDER).stream()
+            .map(dc2mvString(PROPERTY_RIGHTS_HOLDER.getLocalName()))
+            .collect(Collectors.toList());
+    final List<MetadataValue<String>> spatials = episode.get(PROPERTY_SPATIAL).stream()
+            .map(dc2mvString(PROPERTY_SPATIAL.getLocalName()))
+            .collect(Collectors.toList());
+    final List<MetadataValue<String>> accessRights = episode.get(PROPERTY_ACCESS_RIGHTS).stream()
+            .map(dc2mvString(PROPERTY_ACCESS_RIGHTS.getLocalName()))
+            .collect(Collectors.toList());
+    final List<MetadataValue<String>> licenses = episode.get(PROPERTY_LICENSE).stream()
+            .map(dc2mvString(PROPERTY_LICENSE.getLocalName()))
+            .collect(Collectors.toList());
 
     return new StaticMetadata() {
       @Override
-      public Option<String> getId() {
+      public Optional<String> getId() {
         return id;
       }
 
       @Override
-      public Option<Date[]> getTemporalPeriod() {
-        if (temporalOpt.isSome()) {
+      public Optional<Date[]> getTemporalPeriod() {
+        if (temporalOpt.isPresent()) {
           if (temporalOpt.get() instanceof DCMIPeriod) {
             DCMIPeriod p = (DCMIPeriod) temporalOpt.get();
-            return option(new Date[] { p.getStart(), p.getEnd() });
+            return Optional.ofNullable(new Date[] { p.getStart(), p.getEnd() });
           }
         }
-        return Option.none();
+        return Optional.empty();
       }
 
       @Override
-      public Option<Date> getTemporalInstant() {
-        if (temporalOpt.isSome()) {
+      public Optional<Date> getTemporalInstant() {
+        if (temporalOpt.isPresent()) {
           if (temporalOpt.get() instanceof Date) {
             return temporalOpt;
           }
         }
-        return Option.none();
+        return Optional.empty();
       }
 
       @Override
-      public Option<Long> getTemporalDuration() {
-        if (temporalOpt.isSome()) {
+      public Optional<Long> getTemporalDuration() {
+        if (temporalOpt.isPresent()) {
           if (temporalOpt.get() instanceof Long) {
             return temporalOpt;
           }
         }
-        return Option.none();
+        return Optional.empty();
       }
 
       @Override
-      public Option<Long> getExtent() {
+      public Optional<Long> getExtent() {
         return extent;
       }
 
       @Override
-      public Option<String> getLanguage() {
+      public Optional<String> getLanguage() {
         return language;
       }
 
       @Override
-      public Option<String> getIsPartOf() {
+      public Optional<String> getIsPartOf() {
         return isPartOf;
       }
 
       @Override
-      public Option<String> getReplaces() {
+      public Optional<String> getReplaces() {
         return replaces;
       }
 
       @Override
-      public Option<String> getType() {
+      public Optional<String> getType() {
         return type;
       }
 
       @Override
-      public Option<Interval> getAvailable() {
+      public Optional<Interval> getAvailable() {
         return available;
       }
 
@@ -353,32 +352,23 @@ public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataServic
   /**
    * Return a function that creates a Option with the value of temporal from a DublinCoreValue.
    */
-  private static Function<DublinCoreValue, Object> dc2temporalValueOption() {
-    return new Function<DublinCoreValue, Object>() {
-      @Override
-      public Object apply(DublinCoreValue dcv) {
-        Temporal temporal = EncodingSchemeUtils.decodeTemporal(dcv);
-        if (temporal != null) {
-          return temporal.fold(new Temporal.Match<Object>() {
-            @Override
-            public Object period(DCMIPeriod period) {
-              return period;
-            }
-
-            @Override
-            public Object instant(Date instant) {
-              return instant;
-            }
-
-            @Override
-            public Object duration(long duration) {
-              return duration;
-            }
-          });
-        }
-        return Misc.<Object>chuck(new RuntimeException(dcv
-                + " does not conform to ISO8601 encoding scheme for temporal."));
+  private static java.util.function.Function<DublinCoreValue, Object> dc2temporalValueOption() {
+    return dcv -> {
+      Temporal temporal = EncodingSchemeUtils.decodeTemporal(dcv);
+      if (temporal == null) {
+        throw new RuntimeException(dcv
+            + " does not conform to ISO8601 encoding scheme for temporal.");
       }
+      return temporal.fold(new Temporal.Match<Object>() {
+        @Override
+        public Object period(DCMIPeriod period) { return period; }
+
+        @Override
+        public Object instant(Date instant) { return instant; }
+
+        @Override
+        public Object duration(long duration) { return duration; }
+      });
     };
   }
 
@@ -386,33 +376,19 @@ public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataServic
    * Return a function that creates a MetadataValue[String] from a DublinCoreValue setting its name to <code>name</code>.
    */
   private static Function<DublinCoreValue, MetadataValue<String>> dc2mvString(final String name) {
-    return new Function<DublinCoreValue, MetadataValue<String>>() {
-      @Override
-      public MetadataValue<String> apply(DublinCoreValue dcv) {
-        return new MetadataValue<String>(dcv.getValue(), name, dcv.getLanguage());
-      }
-    };
+    return dcv -> new MetadataValue<>(dcv.getValue(), name, dcv.getLanguage());
   }
 
-  private static Predicate<Catalog> flavorPredicate(final MediaPackageElementFlavor flavor) {
-    return new Predicate<Catalog>() {
-      @Override
-      public Boolean apply(Catalog catalog) {
-        return flavor.equals(catalog.getFlavor());
-      }
-    };
-  }
-
-  private Option<DublinCoreCatalog> load(Catalog catalog) {
+  private Optional<DublinCoreCatalog> load(Catalog catalog) {
     InputStream in = null;
     try {
       URI uri = catalog.getURI();
       if (serializer != null) uri = serializer.decodeURI(uri);
       in = workspace.read(uri);
-      return some((DublinCoreCatalog) DublinCores.read(in));
+      return Optional.of((DublinCoreCatalog) DublinCores.read(in));
     } catch (Exception e) {
       logger.warn("Unable to load metadata from catalog '{}'", catalog);
-      return Option.none();
+      return Optional.empty();
     } finally {
       IOUtils.closeQuietly(in);
     }

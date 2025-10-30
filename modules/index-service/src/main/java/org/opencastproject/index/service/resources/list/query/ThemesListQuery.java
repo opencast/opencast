@@ -26,7 +26,8 @@ import org.opencastproject.index.service.util.FiltersUtils;
 import org.opencastproject.list.api.ResourceListFilter;
 import org.opencastproject.list.api.ResourceListFilter.SourceType;
 import org.opencastproject.list.impl.ResourceListQueryImpl;
-import org.opencastproject.util.data.Option;
+
+import java.util.Optional;
 
 /**
  * Query for the themes list.
@@ -54,15 +55,15 @@ public class ThemesListQuery extends ResourceListQueryImpl {
    *          the creator to filter for
    */
   public void withCreator(String creator) {
-    this.addFilter(createCreatorFilter(Option.option(creator)));
+    this.addFilter(createCreatorFilter(Optional.ofNullable(creator)));
   }
 
   /**
-   * Returns an {@link Option} containing the creator used to filter if set
+   * Returns an {@link Optional} containing the creator used to filter if set
    *
-   * @return an {@link Option} containing the creator or none.
+   * @return an {@link Optional} containing the creator or none.
    */
-  public Option<String> getCreator() {
+  public Optional<String> getCreator() {
     return getFilterValue(FILTER_CREATOR_NAME);
   }
 
@@ -70,12 +71,12 @@ public class ThemesListQuery extends ResourceListQueryImpl {
    * Create a new {@link ResourceListFilter} based on a creator
    *
    * @param creator
-   *          the creator to filter on wrapped in an {@link Option} or {@link Option#none()}
+   *          the creator to filter on wrapped in an {@link Optional} or {@link Optional#empty()}
    * @return a new {@link ResourceListFilter} for a creator based query
    */
-  public static ResourceListFilter<String> createCreatorFilter(Option<String> creator) {
+  public static ResourceListFilter<String> createCreatorFilter(Optional<String> creator) {
     return FiltersUtils.generateFilter(creator, FILTER_CREATOR_NAME, FILTER_CREATOR_LABEL, SourceType.SELECT,
-            Option.some(UsersListProvider.NAME_ONLY));
+            Optional.of(UsersListProvider.NAME_ONLY));
   }
 
 }

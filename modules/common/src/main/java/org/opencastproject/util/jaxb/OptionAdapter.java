@@ -21,24 +21,24 @@
 
 package org.opencastproject.util.jaxb;
 
-import org.opencastproject.util.data.Option;
+import java.util.Optional;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
- * JAXB Adapter for the {@link org.opencastproject.util.data.Option Option} type
+ * JAXB Adapter for the {@link java.util.Optional Optional} type
  *
  */
-public class OptionAdapter<T> extends XmlAdapter<T, Option<T>> {
+public class OptionAdapter<T> extends XmlAdapter<T, Optional<T>> {
 
   @Override
-  public T marshal(Option<T> option) throws Exception {
-    return option.getOrElse((T) null);
+  public T marshal(Optional<T> option) throws Exception {
+    return option.orElse((T) null);
   }
 
   @Override
-  public Option<T> unmarshal(T o) throws Exception {
-    return Option.option(o);
+  public Optional<T> unmarshal(T o) throws Exception {
+    return Optional.ofNullable(o);
   }
 
 }

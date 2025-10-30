@@ -25,18 +25,15 @@ package org.opencastproject.util.data;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.opencastproject.util.data.Arrays.append;
 import static org.opencastproject.util.data.Arrays.array;
 import static org.opencastproject.util.data.Collections.appendTo;
 import static org.opencastproject.util.data.Collections.concat;
-import static org.opencastproject.util.data.Collections.filter;
 import static org.opencastproject.util.data.Collections.head;
 import static org.opencastproject.util.data.Collections.iterator;
 import static org.opencastproject.util.data.Collections.join;
 import static org.opencastproject.util.data.Collections.list;
-import static org.opencastproject.util.data.Collections.map;
 import static org.opencastproject.util.data.Collections.repeat;
 import static org.opencastproject.util.data.Collections.toArray;
 import static org.opencastproject.util.data.Collections.toList;
@@ -44,7 +41,6 @@ import static org.opencastproject.util.data.Collections.toList;
 import org.junit.Test;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -56,55 +52,12 @@ public class CollectionsTest {
   }
 
   @Test
-  public void testMap() {
-    List<String> list = newTestList();
-    Collection<String> mapped = map(list, new Function<String, String>() {
-      @Override
-      public String apply(String s) {
-        return s + s;
-      }
-    });
-    assertSame(mapped.getClass(), list.getClass());
-    assertTrue(list.contains("one"));
-    assertTrue(list.contains("two"));
-    assertTrue(mapped.contains("oneone"));
-    assertTrue(mapped.contains("twotwo"));
-    assertEquals(2, list.size());
-    assertEquals(2, mapped.size());
-  }
-
-  @Test
-  public void testFilter() {
-    List<String> list = newTestList();
-    Collection<String> filtered = filter(list, new Predicate<String>() {
-      @Override
-      public Boolean apply(String s) {
-        return "one".equals(s);
-      }
-    });
-    assertSame(filtered.getClass(), list.getClass());
-    assertEquals(2, list.size());
-    assertEquals(1, filtered.size());
-    assertTrue(filtered.contains("one"));
-  }
-
-  @Test
   public void testHead() {
     List<String> list = newTestList();
-    Option.Match<String, Boolean> match = new Option.Match<String, Boolean>() {
-      @Override
-      public Boolean some(String s) {
-        return true;
-      }
+    assertTrue(head(list).isPresent());
 
-      @Override
-      public Boolean none() {
-        return false;
-      }
-    };
-    assertTrue(head(list).fold(match));
-    List<String> empty = list();
-    assertFalse(head(empty).fold(match));
+    List<String> empty = List.of();
+    assertFalse(head(empty).isPresent());
   }
 
   @Test

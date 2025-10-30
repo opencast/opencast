@@ -26,7 +26,8 @@ import org.opencastproject.index.service.util.FiltersUtils;
 import org.opencastproject.list.api.ResourceListFilter;
 import org.opencastproject.list.api.ResourceListFilter.SourceType;
 import org.opencastproject.list.impl.ResourceListQueryImpl;
-import org.opencastproject.util.data.Option;
+
+import java.util.Optional;
 
 /**
  * Query for the users list.
@@ -49,7 +50,7 @@ public class GroupsListQuery extends ResourceListQueryImpl {
 
   public GroupsListQuery() {
     super();
-    this.availableFilters.add(createRoleFilter(Option.none()));
+    this.availableFilters.add(createRoleFilter(Optional.empty()));
   }
 
   /**
@@ -59,15 +60,15 @@ public class GroupsListQuery extends ResourceListQueryImpl {
    *          the name to filter for
    */
   public void withName(String name) {
-    this.addFilter(createNameFilter(Option.option(name)));
+    this.addFilter(createNameFilter(Optional.ofNullable(name)));
   }
 
   /**
-   * Returns an {@link Option} containing the name used to filter if set
+   * Returns an {@link Optional} containing the name used to filter if set
    *
-   * @return an {@link Option} containing the name or none.
+   * @return an {@link Optional} containing the name or none.
    */
-  public Option<String> getName() {
+  public Optional<String> getName() {
     return this.getFilterValue(FILTER_NAME_NAME);
   }
 
@@ -78,15 +79,15 @@ public class GroupsListQuery extends ResourceListQueryImpl {
    *          the role to filter for
    */
   public void withRole(String role) {
-    this.addFilter(createRoleFilter(Option.option(role)));
+    this.addFilter(createRoleFilter(Optional.ofNullable(role)));
   }
 
   /**
-   * Returns an {@link Option} containing the role used to filter if set
+   * Returns an {@link Optional} containing the role used to filter if set
    *
-   * @return an {@link Option} containing the role or none.
+   * @return an {@link Optional} containing the role or none.
    */
-  public Option<String> getRole() {
+  public Optional<String> getRole() {
     return this.getFilterValue(FILTER_ROLE_NAME);
   }
 
@@ -94,17 +95,17 @@ public class GroupsListQuery extends ResourceListQueryImpl {
    * Create a new {@link ResourceListFilter} based on a name
    *
    * @param name
-   *          the name to filter on wrapped in an {@link Option} or {@link Option#none()}
+   *          the name to filter on wrapped in an {@link Optional} or {@link Optional#empty()}
    * @return a new {@link ResourceListFilter} for a name based query
    */
-  public static ResourceListFilter<String> createNameFilter(Option<String> name) {
+  public static ResourceListFilter<String> createNameFilter(Optional<String> name) {
     return FiltersUtils.generateFilter(name, FILTER_NAME_NAME, FILTER_NAME_LABEL, SourceType.SELECT,
-            Option.some(GroupsListProvider.NAME));
+            Optional.of(GroupsListProvider.NAME));
   }
 
-  public static ResourceListFilter<String> createRoleFilter(Option<String> role) {
+  public static ResourceListFilter<String> createRoleFilter(Optional<String> role) {
     return FiltersUtils.generateFilter(role, FILTER_ROLE_NAME, FILTER_ROLE_LABEL, SourceType.SELECT,
-        Option.some(GroupsListProvider.ROLE_ONLY));
+        Optional.of(GroupsListProvider.ROLE_ONLY));
   }
 
 }

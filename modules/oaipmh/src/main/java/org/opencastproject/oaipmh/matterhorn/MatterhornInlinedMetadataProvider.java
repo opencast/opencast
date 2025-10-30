@@ -31,7 +31,6 @@ import org.opencastproject.oaipmh.server.OaiPmhRepository;
 import org.opencastproject.oaipmh.util.XmlGen;
 import org.opencastproject.util.XmlUtil;
 import org.opencastproject.util.data.Collections;
-import org.opencastproject.util.data.Option;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -40,6 +39,7 @@ import org.w3c.dom.Node;
 import java.net.URI;
 import java.net.URL;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * The matterhorn-inlined metadata provider provides whole media packages, series and episode DublinCores and series ACLs.
@@ -65,7 +65,7 @@ public class MatterhornInlinedMetadataProvider implements MetadataProvider {
     }
   };
 
-  private static final Option<String> NS_URI = Option.some(NAMESPACE_URI.toString());
+  private static final Optional<String> NS_URI = Optional.of(NAMESPACE_URI.toString());
 
   @Override
   public MetadataFormat getMetadataFormat() {
@@ -73,22 +73,22 @@ public class MatterhornInlinedMetadataProvider implements MetadataProvider {
   }
 
   @Override
-  public Element createMetadata(OaiPmhRepository repository, final SearchResultItem item, Option<String> set) {
-    XmlGen xml = new XmlGen(Option.<String>none()) {
+  public Element createMetadata(OaiPmhRepository repository, final SearchResultItem item, Optional<String> set) {
+    XmlGen xml = new XmlGen(Optional.<String>empty()) {
       @Override
       public Element create() {
-        List<Node> inlinedNodes = Collections.list(parse(Option.option(item.getMediaPackageXml())));
+        List<Node> inlinedNodes = Collections.list(parse(Optional.ofNullable(item.getMediaPackageXml())));
         for (SearchResultElementItem elementItem : item.getElements()) {
           inlinedNodes.add($e(elementItem.getType(), NS_URI,
                   $a("type", elementItem.getFlavor()),
-                  parse(Option.option(elementItem.getXml()))));
+                  parse(Optional.ofNullable(elementItem.getXml()))));
         }
         return $e("inlined", NS_URI, inlinedNodes);
       }
 
-      private Node parse(Option<String> xml) {
-        for (final String a : xml) {
-          for (final Document d : XmlUtil.parseNs(a).right()) {
+      private Node parse(Optional<String> xml) {
+        if (xml.isPresent()) {
+          for (final Document d : XmlUtil.parseNs(xml.get()).right()) {
             return d.getDocumentElement();
           }
         }

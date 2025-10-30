@@ -24,7 +24,6 @@ package org.opencastproject.mediapackage;
 import static org.apache.commons.io.IOUtils.toInputStream;
 
 import org.opencastproject.util.XmlSafeParser;
-import org.opencastproject.util.data.Function;
 
 import org.xml.sax.SAXException;
 
@@ -73,15 +72,6 @@ public final class MediaPackageElementParser {
     } catch (JAXBException e) {
       throw new MediaPackageException(e.getLinkedException() != null ? e.getLinkedException() : e);
     }
-  }
-
-  /** {@link #getAsXml(MediaPackageElement)} as function. */
-  public static <A extends MediaPackageElement> Function<A, String> getAsXml() {
-    return new Function.X<A, String>() {
-      @Override protected String xapply(MediaPackageElement elem) throws Exception {
-        return getAsXml(elem);
-      }
-    };
   }
 
   /**

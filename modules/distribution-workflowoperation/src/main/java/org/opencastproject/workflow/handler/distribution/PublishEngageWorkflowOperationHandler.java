@@ -23,9 +23,6 @@ package org.opencastproject.workflow.handler.distribution;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.opencastproject.systems.OpencastConstants.SERVER_URL_PROPERTY;
-import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.util.data.functions.Strings.toBool;
-import static org.opencastproject.util.data.functions.Strings.trimToNone;
 import static org.opencastproject.workflow.handler.distribution.EngagePublicationChannel.CHANNEL_ID;
 
 import org.opencastproject.distribution.api.DistributionException;
@@ -61,6 +58,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
+import org.opencastproject.util.data.functions.Strings;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
@@ -258,8 +256,10 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
             StringUtils.defaultString(op.getConfiguration(ADD_FORCE_FLAVORS), ADD_FORCE_FLAVORS_DEFAULT));
 
 
-    boolean checkAvailability = option(op.getConfiguration(CHECK_AVAILABILITY)).bind(trimToNone).map(toBool)
-            .getOrElse(true);
+    boolean checkAvailability = Optional.ofNullable(op.getConfiguration(CHECK_AVAILABILITY))
+            .flatMap(Strings::trimToNone)
+            .map(Boolean::valueOf)
+            .orElse(true);
 
     // First check if mp exists in the search index and strategy is merge
     // to avoid leaving distributed elements around.

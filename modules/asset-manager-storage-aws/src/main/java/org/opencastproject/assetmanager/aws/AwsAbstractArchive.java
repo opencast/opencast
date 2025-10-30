@@ -36,7 +36,6 @@ import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
@@ -76,15 +75,15 @@ public abstract class AwsAbstractArchive implements AssetStore {
     }
   }
 
-  public Option<Long> getUsedSpace() {
+  public Optional<Long> getUsedSpace() {
     throw new UnsupportedOperationException("Not implemented");
   }
 
-  public Option<Long> getUsableSpace() {
+  public Optional<Long> getUsableSpace() {
     throw new UnsupportedOperationException("Not implemented");
   }
 
-  public Option<Long> getTotalSpace() {
+  public Optional<Long> getTotalSpace() {
     throw new UnsupportedOperationException("Not implemented");
   }
 

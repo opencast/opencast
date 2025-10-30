@@ -82,8 +82,8 @@ public class ThemesListProvider implements ResourceListProvider {
           throws ListProviderException {
     Map<String, String> list = new HashMap<String, String>();
 
-    int offset = query.getOffset().getOrElse(0);
-    int limit = query.getLimit().getOrElse(Integer.MAX_VALUE - offset);
+    int offset = query.getOffset().orElse(0);
+    int limit = query.getLimit().orElse(Integer.MAX_VALUE - offset);
     SortCriterion sortCriterion = new SortCriterion("name", Order.Ascending);
     ArrayList<SortCriterion> sortCriteria = new ArrayList<>();
     sortCriteria.add(sortCriterion);

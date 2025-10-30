@@ -27,8 +27,6 @@ import static org.opencastproject.util.IoSupport.withResource;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.util.FileSupport;
-import org.opencastproject.util.data.Effect;
-import org.opencastproject.util.data.Function;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -44,6 +42,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.WritableByteChannel;
 import java.util.UUID;
+import java.util.function.Function;
 
 public class FileReadDeleteTest {
   private static final String FILE = "/opencast_header.gif";
@@ -98,13 +97,14 @@ public class FileReadDeleteTest {
 
   /** Create a runnable containing a reader created from a <code>readerMaker</code>. */
   private Runnable mkRunnable(final File file, final Function<FileInputStream, Function<Long, Long>> readerMaker) {
-    return new Runnable() {
-      @Override public void run() {
-        try {
-          withResource(new FileInputStream(file), mkReaderFrom(readerMaker));
-        } catch (FileNotFoundException e) {
-          chuck(e);
-        }
+    return () -> {
+      try {
+        withResource(new FileInputStream(file), in -> {
+          mkReaderFrom(in, readerMaker);
+          return null;
+        });
+      } catch (FileNotFoundException e) {
+        chuck(e);
       }
     };
   }
@@ -113,61 +113,58 @@ public class FileReadDeleteTest {
    * Create a read effect from a <code>readerMaker</code> function.
    * This read effect will be used to consume a file input stream.
    */
-  private Effect<FileInputStream> mkReaderFrom(final Function<FileInputStream, Function<Long, Long>> readerMaker) {
-    return new Effect<FileInputStream>() {
-      @Override public void run(final FileInputStream in) {
-        logger.debug("Start reading");
-        long total = 0L;
-        long read;
-        final Function<Long, Long> readFile = readerMaker.apply(in);
-        try {
-          while ((read = readFile.apply(total)) > 0) {
-            total = total + read;
-            logger.debug("Read " + total);
-            if (total > 3000) {
-              synchronized (start) {
-                start.notifyAll();
-              }
-            }
-            Thread.sleep(100);
+  private void mkReaderFrom(FileInputStream in, Function<FileInputStream, Function<Long, Long>> readerMaker) {
+    logger.debug("Start reading");
+    long total = 0L;
+    long read;
+    final Function<Long, Long> readFile = readerMaker.apply(in);
+    try {
+      while ((read = readFile.apply(total)) > 0) {
+        total = total + read;
+        logger.debug("Read " + total);
+        if (total > 3000) {
+          synchronized (start) {
+            start.notifyAll();
           }
-          totalRead = total;
-          logger.debug("File completely read " + total);
-        } catch (Throwable e) {
-          e.printStackTrace();
         }
+        Thread.sleep(100);
       }
-    };
+      totalRead = total;
+      logger.debug("File completely read " + total);
+    } catch (Throwable e) {
+      e.printStackTrace();
+    }
   }
 
   /** NIO based file reader. */
-  private Function<FileInputStream, Function<Long, Long>> readNio
-      = new Function<FileInputStream, Function<Long, Long>>() {
-        @Override public Function<Long, Long> apply(final FileInputStream in) {
-          final FileChannel channel = in.getChannel();
-          final Sink sink = new Sink();
-          //
-          return new Function.X<Long, Long>() {
-            @Override public Long xapply(Long total) throws Exception {
-              return channel.transferTo(total, 1024, sink);
-            }
-          };
-        }
+  private Function<FileInputStream, Function<Long, Long>> readNio =
+      in -> {
+        final FileChannel channel = in.getChannel();
+        final Sink sink = new Sink();
+        return total -> {
+          try {
+            return channel.transferTo(total, 1024, sink);
+          } catch (Exception e) {
+            return chuck(e);
+          }
+        };
       };
 
+
   /** Normal IO based file reader. */
-  private Function<FileInputStream, Function<Long, Long>> readIo
-      = new Function<FileInputStream, Function<Long, Long>>() {
-        @Override public Function<Long, Long> apply(final FileInputStream in) {
-          final byte[] buffer = new byte[1024];
-          //
-          return new Function.X<Long, Long>() {
-            @Override public Long xapply(Long total) throws Exception {
-              return (long) in.read(buffer);
-            }
-          };
-        }
+  private Function<FileInputStream, Function<Long, Long>> readIo =
+      in -> {
+        final byte[] buffer = new byte[1024];
+        return total -> {
+          try {
+            int read = in.read(buffer);
+            return (long) read;
+          } catch (Exception e) {
+            return chuck(e);
+          }
+        };
       };
+
 
   private File resourceAsFile(String resource) {
     try {
