@@ -134,7 +134,7 @@ public class ImageToVideoWorkflowOperationHandler extends AbstractWorkflowOperat
     }
     final Option<MediaPackageElementFlavor> sourceFlavor = Option.option(sourceFlavors.get(0));
 
-    final List<String> targetTags = tagsAndFlavors.getTargetTags();
+    final ConfiguredTagsAndFlavors.TargetTags targetTags = tagsAndFlavors.getTargetTags();
     List<MediaPackageElementFlavor> targetFlavors = tagsAndFlavors.getTargetFlavors();
     final Option<MediaPackageElementFlavor> targetFlavor = Option.option(targetFlavors.get(0));
     final double duration = getCfg(wi, OPT_DURATION).bind(Strings.toDouble).getOrElse(
@@ -152,9 +152,7 @@ public class ImageToVideoWorkflowOperationHandler extends AbstractWorkflowOperat
           track.setURI(workspace.moveTo(track.getURI(), mp.getIdentifier().toString(), track.getIdentifier(),
                   FilenameUtils.getName(track.getURI().toString())));
           // Adjust the target tags
-          for (String tag : targetTags) {
-            track.addTag(tag);
-          }
+          applyTargetTagsToElement(targetTags, track);
           // Adjust the target flavor.
           for (MediaPackageElementFlavor flavor : targetFlavor) {
             track.setFlavor(flavor);

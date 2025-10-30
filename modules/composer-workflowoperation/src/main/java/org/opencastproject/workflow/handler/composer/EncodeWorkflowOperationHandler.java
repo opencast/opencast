@@ -145,7 +145,7 @@ public class EncodeWorkflowOperationHandler extends AbstractWorkflowOperationHan
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
         Configuration.many, Configuration.many, Configuration.many, Configuration.one);
     List<String> sourceTagsOption = tagsAndFlavors.getSrcTags();
-    List<String> targetTagsOption = tagsAndFlavors.getTargetTags();
+    ConfiguredTagsAndFlavors.TargetTags targetTagsOption = tagsAndFlavors.getTargetTags();
     List<MediaPackageElementFlavor> sourceFlavorsOption = tagsAndFlavors.getSrcFlavors();
     MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor();
 
@@ -242,10 +242,7 @@ public class EncodeWorkflowOperationHandler extends AbstractWorkflowOperationHan
 
         // Adjust the target tags
         for (Track encodedTrack : composedTracks) {
-          for (String tag : targetTagsOption) {
-            logger.trace("Tagging composed track {} with '{}'", encodedTrack.toString(), tag);
-            encodedTrack.addTag(tag);
-          }
+          applyTargetTagsToElement(targetTagsOption, encodedTrack);
         }
 
         // Adjust the target flavor. Make sure to account for partial updates

@@ -9,6 +9,23 @@ The following list contains a list of passed proposals for reference.
 Passed Proposals
 ----------------
 
+### Shift Release Schedule by a Month
+Proposed by Katrin Ihler <ihler@elan-ev.de>, passed on Oct 23, 2025
+```no-highlight
+As discussed during the German-speaking conference in Jena as well as the Dev meeting of 2025-09-23, I propose to shift
+the Release Schedule one month backwards starting with Opencast 20, meaning that all releases from that point onwards
+will happen one month earlier.
+
+That means that Opencast 20 would release in the middle of May instead of June, Opencast
+21 in the middle of November instead of December, and then so on. The exact release date will still be determined by the
+release managers.
+
+The reasons for this are as followed:
+- To give people from countries with an earlier semester start like Switzerland enough time to test before going
+productive.
+- To keep the major releases out of December, as that is a busy time for a lot of people.
+```
+
 ### Require 2FA for all committers
 Proposed by Daniel Ziegenberg <daniel@ziegenberg.at>, passed on Nov 29, 2024
 ```no-highlight

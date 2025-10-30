@@ -208,7 +208,7 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
     }
 
     // Read the target tags
-    List<String> targetTags = tagsAndFlavors.getTargetTags();
+    ConfiguredTagsAndFlavors.TargetTags targetTags = tagsAndFlavors.getTargetTags();
 
     // If the configuration does not specify flavors, just zip them all
     if (flavors == null) {
@@ -265,10 +265,7 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
     attachment.setMimeType(MimeTypes.ZIP);
 
     // Apply the target tags
-    for (String tag : targetTags) {
-      attachment.addTag(tag);
-      logger.trace("Tagging the archive of recording '{}' with '{}'", mediaPackage, tag);
-    }
+    applyTargetTagsToElement(targetTags, attachment);
     attachment.setMimeType(MimeTypes.ZIP);
 
     // The zip file is safely in the archive, so it's now safe to attempt to remove the original zip

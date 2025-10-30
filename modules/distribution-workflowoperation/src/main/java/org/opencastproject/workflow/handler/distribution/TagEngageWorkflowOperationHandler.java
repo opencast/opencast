@@ -107,20 +107,6 @@ public class TagEngageWorkflowOperationHandler extends AbstractWorkflowOperation
             Configuration.many,  // target-tags
             Configuration.many); //target-flavors
 
-    Set<String> removeTags = new HashSet<>();
-    Set<String> addTags = new HashSet<>();
-    Set<String> overrideTags = new HashSet<>();
-
-    for (String tag : config.getTargetTags()) {
-      if (tag.startsWith(MINUS)) {
-        removeTags.add(tag);
-      } else if (tag.startsWith(PLUS)) {
-        addTags.add(tag);
-      } else {
-        overrideTags.add(tag);
-      }
-    }
-
     SimpleElementSelector mpeSelector = new SimpleElementSelector();
     for (MediaPackageElementFlavor flavor : config.getSrcFlavors()) {
       mpeSelector.addFlavor(flavor);
@@ -142,8 +128,7 @@ public class TagEngageWorkflowOperationHandler extends AbstractWorkflowOperation
 
     // update tags & flavors in published mp
     Collection<MediaPackageElement> searchElements = mpeSelector.select(mediaPackageForSearch, false);
-    boolean changedMediaPackageForSearch = updateTagsAndFlavors(searchElements, config, removeTags, addTags,
-            overrideTags);
+    boolean changedMediaPackageForSearch = updateTagsAndFlavors(searchElements, config, config.getTargetTags());
     if (!changedMediaPackageForSearch) {
       logger.info("No element changed, not publishing anything.");
       return createResult(currentMediaPackage, WorkflowOperationResult.Action.SKIP);
@@ -157,7 +142,7 @@ public class TagEngageWorkflowOperationHandler extends AbstractWorkflowOperation
                 Stream.of(publication.getAttachments(), publication.getCatalogs(), publication.getTracks())
                         .flatMap(Stream::of).collect(Collectors.toList());
         Collection<MediaPackageElement> selectedElements = mpeSelector.select(publicationElements, false);
-        changedPublication = updateTagsAndFlavors(selectedElements, config, removeTags, addTags, overrideTags);
+        changedPublication = updateTagsAndFlavors(selectedElements, config, config.getTargetTags());
       }
     }
     if (!changedPublication) {
@@ -179,7 +164,7 @@ public class TagEngageWorkflowOperationHandler extends AbstractWorkflowOperation
   }
 
   private boolean updateTagsAndFlavors(Collection<MediaPackageElement> elements, ConfiguredTagsAndFlavors config,
-          Set<String> removeTags, Set<String> addTags, Set<String> overrideTags) {
+        ConfiguredTagsAndFlavors.TargetTags targetTags) {
 
     boolean changed = false;
     for (MediaPackageElement element : elements) {
@@ -208,19 +193,7 @@ public class TagEngageWorkflowOperationHandler extends AbstractWorkflowOperation
 
       // update tags
       Set<String> currentTags = new HashSet<>(Arrays.asList(element.getTags()));
-      if (overrideTags.size() > 0) {
-        element.clearTags();
-        for (String tag : overrideTags) {
-          element.addTag(tag);
-        }
-      } else {
-        for (String tag : removeTags) {
-          element.removeTag(tag.substring(MINUS.length()));
-        }
-        for (String tag : addTags) {
-          element.addTag(tag.substring(PLUS.length()));
-        }
-      }
+      applyTargetTagsToElement(targetTags, element);
       Set<String> newTags = new HashSet<>(Arrays.asList(element.getTags()));
       if (!currentTags.equals(newTags)) {
         changed = true;

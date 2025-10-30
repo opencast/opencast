@@ -18,7 +18,9 @@ Watch for announcements on list or just check which versions are available in th
 Currently Supported
 -------------------
 
-* Debian 11 and newer amd64
+<!-- EOL 2025-06 -->
+* Debian 12 and newer amd64
+<!-- EOL 2027-05 -->
 * Ubuntu 22.04 and newer amd64
 
 Activate Repository

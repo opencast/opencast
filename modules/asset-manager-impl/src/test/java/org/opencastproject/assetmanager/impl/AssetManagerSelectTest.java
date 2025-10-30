@@ -42,6 +42,7 @@ import org.opencastproject.security.api.DefaultOrganization;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -215,6 +216,7 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
     )).size());
     assertEquals("series-1",
         am.getLatestSnapshots(List.of(mp1.getIdentifier().toString())).get(0).getMediaPackage().getSeries());
+    assertEquals(0, am.getLatestSnapshots(Collections.emptyList()).size());
   }
 
   @Test

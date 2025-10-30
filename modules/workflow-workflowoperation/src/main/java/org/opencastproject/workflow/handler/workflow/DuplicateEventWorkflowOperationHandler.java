@@ -242,7 +242,7 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
     final WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
     final List<MediaPackageElementFlavor> configuredSourceFlavors = tagsAndFlavors.getSrcFlavors();
     final List<String> configuredSourceTags = tagsAndFlavors.getSrcTags();
-    final List<String> configuredTargetTags = tagsAndFlavors.getTargetTags();
+    final ConfiguredTagsAndFlavors.TargetTags configuredTargetTags = tagsAndFlavors.getTargetTags();
     final boolean noSuffix = Boolean.parseBoolean(trimToEmpty(operation.getConfiguration(NO_SUFFIX)));
     final String startDateString = trimToEmpty(operation.getConfiguration(SET_START_DATE));
     final String seriesId = trimToEmpty(operation.getConfiguration(SET_SERIES_ID));
@@ -285,20 +285,6 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
     final SimpleElementSelector elementSelector = new SimpleElementSelector();
     for (MediaPackageElementFlavor flavor : configuredSourceFlavors) {
       elementSelector.addFlavor(flavor);
-    }
-
-    final List<String> removeTags = new ArrayList<>();
-    final List<String> addTags = new ArrayList<>();
-    final List<String> overrideTags = new ArrayList<>();
-
-    for (String tag : configuredTargetTags) {
-      if (tag.startsWith(MINUS)) {
-        removeTags.add(tag);
-      } else if (tag.startsWith(PLUS)) {
-        addTags.add(tag);
-      } else {
-        overrideTags.add(tag);
-      }
     }
 
     for (String tag : configuredSourceTags) {
@@ -401,19 +387,19 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
 
         // Create and add new episode dublin core with changed title
         newMp = copyDublinCore(mediaPackage, originalEpisodeDc[0],
-              newMp, series, removeTags, addTags, overrideTags,
+              newMp, series, configuredTargetTags,
               temporaryFiles, mpDate);
 
         // Clone regular elements
         for (final MediaPackageElement e : elements) {
           final MediaPackageElement element = (MediaPackageElement) e.clone();
-          updateTags(element, removeTags, addTags, overrideTags);
+          updateTags(element, configuredTargetTags);
           newMp.add(element);
         }
 
         // Clone internal publications
         for (final Publication originalPub : internalPublications) {
-         copyPublication(originalPub, mediaPackage, newMp, removeTags, addTags, overrideTags, temporaryFiles);
+         copyPublication(originalPub, mediaPackage, newMp, configuredTargetTags, temporaryFiles);
         }
 
         assetManager.takeSnapshot(AssetManager.DEFAULT_OWNER, newMp);
@@ -459,24 +445,10 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
 
   private void updateTags(
       MediaPackageElement element,
-      List<String> removeTags,
-      List<String> addTags,
-      List<String> overrideTags) {
+      ConfiguredTagsAndFlavors.TargetTags targetTags) {
     element.setIdentifier(null);
 
-    if (overrideTags.size() > 0) {
-      element.clearTags();
-      for (String overrideTag : overrideTags) {
-        element.addTag(overrideTag);
-      }
-    } else {
-      for (String removeTag : removeTags) {
-        element.removeTag(removeTag.substring(MINUS.length()));
-      }
-      for (String tag : addTags) {
-        element.addTag(tag.substring(PLUS.length()));
-      }
-    }
+    applyTargetTagsToElement(targetTags, element);
   }
 
   private MediaPackage copyMediaPackage(
@@ -515,9 +487,7 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
       Publication sourcePublication,
       MediaPackage source,
       MediaPackage destination,
-      List<String> removeTags,
-      List<String> addTags,
-      List<String> overrideTags,
+      ConfiguredTagsAndFlavors.TargetTags targetTags,
       List<URI> temporaryFiles) throws WorkflowOperationException {
     final String newPublicationId = UUID.randomUUID().toString();
     final Publication newPublication = PublicationImpl.publication(newPublicationId,
@@ -548,7 +518,7 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
             JobUtil.payloadAsMediaPackageElement(serviceRegistry).apply(job);
         destination.remove(element);
 
-        updateTags(distributedElement, removeTags, addTags, overrideTags);
+        updateTags(distributedElement, targetTags);
 
         PublicationImpl.addElementToPublication(newPublication, distributedElement);
       } catch (Exception exception) {
@@ -570,9 +540,7 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
       final MediaPackageElement sourceDublinCore,
       final MediaPackage destination,
       final SeriesInformation series,
-      final List<String> removeTags,
-      final List<String> addTags,
-      final List<String> overrideTags,
+      final ConfiguredTagsAndFlavors.TargetTags targetTags,
       final List<URI> temporaryFiles,
       final Date creationDate
   ) throws WorkflowOperationException {
@@ -598,7 +566,7 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
       for (String tag : sourceDublinCore.getTags()) {
         mpe.addTag(tag);
       }
-      updateTags(mpe, removeTags, addTags, overrideTags);
+      updateTags(mpe, targetTags);
       mpe.setIdentifier(elementId);
     } catch (IOException e) {
       throw new WorkflowOperationException(e);

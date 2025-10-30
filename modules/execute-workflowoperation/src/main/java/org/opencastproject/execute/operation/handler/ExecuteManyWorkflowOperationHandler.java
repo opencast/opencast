@@ -171,7 +171,7 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
     String sourceVideo = StringUtils.trimToNull(operation.getConfiguration(SOURCE_VIDEO_PROPERTY));
     String sourceSubtitle = StringUtils.trimToNull(operation.getConfiguration(SOURCE_SUBTITLE_PROPERTY));
     List<MediaPackageElementFlavor> targetFlavorList = tagsAndFlavors.getTargetFlavors();
-    List<String> targetTags = tagsAndFlavors.getTargetTags();
+    ConfiguredTagsAndFlavors.TargetTags targetTags = tagsAndFlavors.getTargetTags();
     String outputFilename = StringUtils.trimToNull(operation.getConfiguration(OUTPUT_FILENAME_PROPERTY));
     String expectedTypeStr = StringUtils.trimToNull(operation.getConfiguration(EXPECTED_TYPE_PROPERTY));
 
@@ -320,16 +320,7 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
         }
 
         // Set new tags
-        if (targetTags != null) {
-          // Assume the tags starting with "-" means we want to eliminate such tags form the result element
-          for (String tag : targetTags) {
-            if (tag.startsWith("-"))
-              // We remove the tag resulting from stripping all the '-' characters at the beginning of the tag
-              resultElements[i].removeTag(tag.replaceAll("^-+", ""));
-            else
-              resultElements[i].addTag(tag);
-          }
-        }
+        applyTargetTagsToElement(targetTags, resultElements[i]);
       }
 
       WorkflowOperationResult result = createResult(mediaPackage, wfProps, Action.CONTINUE, totalTimeInQueue);

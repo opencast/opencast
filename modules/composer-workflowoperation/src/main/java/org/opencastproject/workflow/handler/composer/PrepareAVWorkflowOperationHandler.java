@@ -42,7 +42,6 @@ import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
-import org.opencastproject.workflow.api.WorkflowOperationTagUtil;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.lang3.StringUtils;
@@ -53,7 +52,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.List;
 
 /**
  * The <code>prepare media</code> operation will make sure that media where audio and video track come in separate files
@@ -162,14 +160,12 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
 
     // Read the configuration properties
     MediaPackageElementFlavor sourceFlavor = tagsAndFlavors.getSingleSrcFlavor();
-    List<String> targetTrackTags = tagsAndFlavors.getTargetTags();
+    ConfiguredTagsAndFlavors.TargetTags targetTrackTags = tagsAndFlavors.getTargetTags();
     MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor();
     String muxEncodingProfileName = StringUtils.trimToNull(operation.getConfiguration("mux-encoding-profile"));
     String audioVideoEncodingProfileName = StringUtils.trimToNull(operation.getConfiguration("audio-video-encoding-profile"));
     String videoOnlyEncodingProfileName = StringUtils.trimToNull(operation.getConfiguration("video-encoding-profile"));
     String audioOnlyEncodingProfileName = StringUtils.trimToNull(operation.getConfiguration("audio-encoding-profile"));
-
-    final WorkflowOperationTagUtil.TagDiff tagDiff = WorkflowOperationTagUtil.createTagDiff(targetTrackTags);
 
     // Reencode when there is no need for muxing?
     boolean rewrite = true;
@@ -303,7 +299,9 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
     composedTrack.setFlavor(targetFlavor);
     logger.debug("Composed track has flavor '{}'", composedTrack.getFlavor());
 
-    WorkflowOperationTagUtil.applyTagDiff(tagDiff, composedTrack);
+    // Update the track's tags
+    applyTargetTagsToElement(targetTrackTags, composedTrack);
+
     return createResult(mediaPackage, Action.CONTINUE, timeInQueue);
   }
 

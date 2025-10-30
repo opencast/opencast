@@ -42,7 +42,6 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -96,7 +95,7 @@ public class TagWorkflowOperationHandler extends AbstractWorkflowOperationHandle
     List<MediaPackageElementFlavor> configuredSourceFlavors = tagsAndFlavors.getSrcFlavors();
     List<String> configuredSourceTags = tagsAndFlavors.getSrcTags();
     List<MediaPackageElementFlavor> configuredTargetFlavor = tagsAndFlavors.getTargetFlavors();
-    List<String> configuredTargetTags = tagsAndFlavors.getTargetTags();
+    ConfiguredTagsAndFlavors.TargetTags configuredTargetTags = tagsAndFlavors.getTargetTags();
     boolean copy = BooleanUtils.toBoolean(currentOperation.getConfiguration(COPY_PROPERTY));
 
     if (copy) {
@@ -108,20 +107,6 @@ public class TagWorkflowOperationHandler extends AbstractWorkflowOperationHandle
     SimpleElementSelector elementSelector = new SimpleElementSelector();
     for (MediaPackageElementFlavor flavor : configuredSourceFlavors) {
       elementSelector.addFlavor(flavor);
-    }
-
-    List<String> removeTags = new ArrayList<String>();
-    List<String> addTags = new ArrayList<String>();
-    List<String> overrideTags = new ArrayList<String>();
-
-    for (String tag : configuredTargetTags) {
-      if (tag.startsWith(MINUS)) {
-        removeTags.add(tag);
-      } else if (tag.startsWith(PLUS)) {
-        addTags.add(tag);
-      } else {
-        overrideTags.add(tag);
-      }
     }
 
     for (String tag : configuredSourceTags) {
@@ -159,19 +144,7 @@ public class TagWorkflowOperationHandler extends AbstractWorkflowOperationHandle
         element.setFlavor(MediaPackageElementFlavor.parseFlavor(targetFlavorStr));
       }
 
-      if (overrideTags.size() > 0) {
-        element.clearTags();
-        for (String tag : overrideTags) {
-          element.addTag(tag);
-        }
-      } else {
-        for (String tag : removeTags) {
-          element.removeTag(tag.substring(MINUS.length()));
-        }
-        for (String tag : addTags) {
-          element.addTag(tag.substring(PLUS.length()));
-        }
-      }
+      applyTargetTagsToElement(configuredTargetTags, element);
 
       if (copy)
         mediaPackage.addDerived(element, e);

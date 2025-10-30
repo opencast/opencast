@@ -29,12 +29,10 @@ import static org.opencastproject.workflow.handler.composer.ImageWorkflowOperati
 import static org.opencastproject.workflow.handler.composer.ImageWorkflowOperationHandler.toSeconds;
 import static org.opencastproject.workflow.handler.composer.ImageWorkflowOperationHandler.validateTargetBaseNameFormat;
 
-import org.opencastproject.composer.api.EncodingProfile;
-import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.handler.composer.ImageWorkflowOperationHandler.Cfg;
-import org.opencastproject.workflow.handler.composer.ImageWorkflowOperationHandler.Extractor;
 import org.opencastproject.workflow.handler.composer.ImageWorkflowOperationHandler.MediaPosition;
 import org.opencastproject.workflow.handler.composer.ImageWorkflowOperationHandler.MediaPositionParser;
 import org.opencastproject.workflow.handler.composer.ImageWorkflowOperationHandler.PositionType;
@@ -42,8 +40,7 @@ import org.opencastproject.workflow.handler.composer.ImageWorkflowOperationHandl
 import org.easymock.EasyMock;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -71,64 +68,72 @@ public class ImageWorkflowOperationHandlerTest {
   }
 
   @Test
-  public void testFileNameGeneration() {
+  public void testFileNameGeneration() throws WorkflowOperationException {
     final ImageWorkflowOperationHandler dummy = new ImageWorkflowOperationHandler();
     assertEquals("thumbnail_12.5p_small.jpg",
-            new Extractor(dummy, cfg(Optional.<String> empty(), Optional.of("thumbnail_%.1fp%s"))).createFileName("_small.jpg",
-                    uri("http://localhost/path/filename.mp4"), new MediaPosition(PositionType.Percentage, 12.5)));
+        dummy.createFileName("_small.jpg", uri("http://localhost/path/filename.mp4"),
+            new MediaPosition(PositionType.Percentage, 12.5), cfg(Optional.empty(), Optional.of("thumbnail_%.1fp%s")))
+    );
     assertEquals("thumbnail_0p.jpg",
-            new Extractor(dummy, cfg(Optional.<String> empty(), Optional.of("thumbnail_%.0fp%s"))).createFileName(".jpg",
-                    uri("http://localhost/path/filename.mp4"), new MediaPosition(PositionType.Percentage, 0)));
+        dummy.createFileName(".jpg", uri("http://localhost/path/filename.mp4"),
+            new MediaPosition(PositionType.Percentage, 0), cfg(Optional.empty(), Optional.of("thumbnail_%.0fp%s")))
+    );
     assertEquals("video_14.200s.jpg",
-            new Extractor(dummy, cfg(Optional.<String> empty(), Optional.<String> empty())).createFileName(".jpg",
-                    uri("http://localhost/path/video.mp4"), new MediaPosition(PositionType.Seconds, 14.2)));
+        dummy.createFileName(".jpg", uri("http://localhost/path/video.mp4"),
+            new MediaPosition(PositionType.Seconds, 14.2), cfg(Optional.empty(), Optional.empty()))
+    );
     assertEquals("video_15.110s_medium.jpg",
-            new Extractor(dummy, cfg(Optional.<String> empty(), Optional.<String> empty())).createFileName("_medium.jpg",
-                    uri("http://localhost/path/video.mp4"), new MediaPosition(PositionType.Seconds, 15.1099)));
+        dummy.createFileName("_medium.jpg", uri("http://localhost/path/video.mp4"),
+            new MediaPosition(PositionType.Seconds, 15.1099), cfg(Optional.empty(), Optional.empty()))
+    );
     assertEquals("thumbnail_15.110s_large.jpg",
-            new Extractor(dummy, cfg(Optional.of("thumbnail_%.3fs%s"), Optional.<String> empty())).createFileName("_large.jpg",
-                    uri("http://localhost/path/video.mp4"), new MediaPosition(PositionType.Seconds, 15.1099)));
-    assertEquals("thumbnail", new Extractor(dummy, cfg(Optional.of("thumbnail"), Optional.<String> empty())).createFileName(
-            "_large.jpg", uri("http://localhost/path/video.mp4"), new MediaPosition(PositionType.Seconds, 15.1099)));
+        dummy.createFileName("_large.jpg", uri("http://localhost/path/video.mp4"),
+            new MediaPosition(PositionType.Seconds, 15.1099), cfg(Optional.of("thumbnail_%.3fs%s"), Optional.empty()))
+    );
+    assertEquals("thumbnail",
+        dummy.createFileName("_large.jpg", uri("http://localhost/path/video.mp4"),
+            new MediaPosition(PositionType.Seconds, 15.1099), cfg(Optional.of("thumbnail"), Optional.empty()))
+    );
     assertEquals("thumbnail_large.jpg",
-            new Extractor(dummy, cfg(Optional.of("thumbnail%2$s"), Optional.<String> empty())).createFileName("_large.jpg",
-                    uri("http://localhost/path/video.mp4"), new MediaPosition(PositionType.Seconds, 15.1099)));
+        dummy.createFileName("_large.jpg", uri("http://localhost/path/video.mp4"),
+            new MediaPosition(PositionType.Seconds, 15.1099), cfg(Optional.of("thumbnail%2$s"), Optional.empty()))
+    );
   }
 
   @Test
-  public void testValidateTargetBaseNameFormat() {
-    validateTargetBaseNameFormat("format-a").accept("thumbnail_%.1fs%s");
-    validateTargetBaseNameFormat("format-a").accept("thumbnail_%1$.1fs%2$s");
-    validateTargetBaseNameFormat("format-a").accept("%2$s_thumbnail_%1$.1fs%1$.1fs%2$s");
+  public void testValidateTargetBaseNameFormat() throws WorkflowOperationException {
+    validateTargetBaseNameFormat("thumbnail_%.1fs%s", "format-a");
+    validateTargetBaseNameFormat("thumbnail_%1$.1fs%2$s", "format-a");
+    validateTargetBaseNameFormat("%2$s_thumbnail_%1$.1fs%1$.1fs%2$s", "format-a");
     try {
-      validateTargetBaseNameFormat("format-a").accept("thumbnail_%.1fs%.3f");
+      validateTargetBaseNameFormat("thumbnail_%.1fs%.3f", "format-a");
       fail("Invalid format passed check. Suffix format %s is missing.");
     } catch (Exception ignore) {
     }
     try {
-      validateTargetBaseNameFormat("format-a").accept("thumbnail_%.3f");
+      validateTargetBaseNameFormat("thumbnail_%.3f", "format-a");
       fail("Invalid format passed check. Suffix format %s is missing.");
     } catch (Exception ignore) {
     }
     try {
-      validateTargetBaseNameFormat("format-a").accept("thumbnail_%s");
+      validateTargetBaseNameFormat("thumbnail_%s", "format-a");
       fail("Invalid format passed check. Suffix is missing since %s does not have a positional parameter.");
     } catch (Exception ignore) {
     }
     // omitting the position should pass
-    validateTargetBaseNameFormat("format-a").accept("thumbnail_%2$s");
+    validateTargetBaseNameFormat("thumbnail_%2$s", "format-a");
   }
 
   @Test
   public void testLimit() {
-    assertTrue(limit(track(1511), Arrays.asList(sec(-1), sec(1511), sec(1512))).isEmpty());
-    assertTrue(limit(track(1511), Arrays.asList(percent(-0.2), percent(101))).isEmpty());
-    assertEquals(4, limit(track(1511), Arrays.asList(percent(0), percent(100), sec(0), sec(1510))).size());
-    assertEquals(4, limit(track(1511), Arrays.asList(percent(0), percent(10), sec(10), sec(1500), percent(200))).size());
+    assertTrue(limit(track(1511), List.of(sec(-1), sec(1511), sec(1512))).isEmpty());
+    assertTrue(limit(track(1511), List.of(percent(-0.2), percent(101))).isEmpty());
+    assertEquals(4, limit(track(1511), List.of(percent(0), percent(100), sec(0), sec(1510))).size());
+    assertEquals(4, limit(track(1511), List.of(percent(0), percent(10), sec(10), sec(1500), percent(200))).size());
   }
 
   @Test
-  public void testToSeconds() {
+  public void testToSeconds() throws WorkflowOperationException {
     assertEquals(0.985, toSeconds(track(1970), percent(50), 0), 0);
     assertEquals(0, toSeconds(track(1970), percent(0), 0), 0);
     assertEquals(1.87, toSeconds(track(1970), percent(100), 100), 0);
@@ -142,8 +147,8 @@ public class ImageWorkflowOperationHandlerTest {
   // ** ** **
 
   private Cfg cfg(Optional<String> targetBaseNamePatternSecond, Optional<String> targetBaseNamePatternPercent) {
-    return new Cfg(Collections.<Track> emptyList(), Collections.<MediaPosition> emptyList(), Collections.<EncodingProfile> emptyList(),
-            Collections.<MediaPackageElementFlavor> emptyList(), Collections.<String> emptyList(), targetBaseNamePatternSecond,
+    return new Cfg(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(),
+            new ArrayList<>(), new ConfiguredTagsAndFlavors.TargetTags(), targetBaseNamePatternSecond,
             targetBaseNamePatternPercent, 0);
   }
 
@@ -162,17 +167,17 @@ public class ImageWorkflowOperationHandlerTest {
     return t;
   }
 
-  private void test(String expr, MediaPosition... expected) throws WorkflowOperationException {
-    List<MediaPosition> result = MediaPositionParser.parsePositions(expr);
-    assertEquals(Arrays.asList(expected), result);
+  private void test(String expr, MediaPosition... expected) {
+    final List<MediaPosition> r = MediaPositionParser.parsePositions(expr);
+    assertTrue(r != null);
+    assertEquals(List.of(expected), r);
   }
-
 
   private boolean testSuccess(String expr) {
     try {
-      List<MediaPosition> result = MediaPositionParser.parsePositions(expr);
-      return result != null && !result.isEmpty();
-    } catch (WorkflowOperationException e) {
+      final List<MediaPosition> r = MediaPositionParser.parsePositions(expr);
+      return !r.isEmpty();
+    } catch (IllegalArgumentException e) {
       return false;
     }
   }

@@ -154,7 +154,7 @@ public class AttachTranscriptionOperationHandlerTest {
 
     operation.setConfiguration(AttachTranscriptionOperationHandler.TRANSCRIPTION_JOB_ID, "transcriptionJob");
     operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_FLAVOR, "captions/source");
-    operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_TAGS, "tag1,tag2");
+    operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_TAGS, "+tag1,+tag2");
     operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_CAPTION_FORMAT, "dfxp");
     operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_TYPE, "attachment");
 
@@ -181,7 +181,7 @@ public class AttachTranscriptionOperationHandlerTest {
 
     operation.setConfiguration(AttachTranscriptionOperationHandler.TRANSCRIPTION_JOB_ID, "transcriptionJob");
     operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_FLAVOR, "captions/source");
-    operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_TAGS, "tag1,tag2");
+    operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_TAGS, "+tag1,+tag2");
     operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_CAPTION_FORMAT, "vtt");
     operation.setConfiguration(AttachTranscriptionOperationHandler.TARGET_TYPE, "attachment");
 
