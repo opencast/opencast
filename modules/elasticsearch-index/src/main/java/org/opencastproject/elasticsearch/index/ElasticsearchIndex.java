@@ -53,9 +53,6 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
-import org.osgi.service.component.annotations.ReferencePolicy;
-import org.osgi.service.component.annotations.ReferencePolicyOption;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -116,11 +113,7 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
 
   private ListProvidersService listProvidersService;
 
-  @Reference(
-      cardinality = ReferenceCardinality.OPTIONAL,
-      policy = ReferencePolicy.DYNAMIC,
-      policyOption = ReferencePolicyOption.GREEDY
-  )
+  @Reference
   public void setListProvidersService(ListProvidersService listProvidersService) {
     this.listProvidersService = listProvidersService;
   }
