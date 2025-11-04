@@ -1,0 +1,36 @@
+{
+  "name": "engage-paella-player",
+  "private": true,
+  "version": "2.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build:ghpages": "USE_OC_SERVER_FROM_URL=true OC_PAELLA8_BASE_URL='/paella-opencast' OC_PRESENTATION_URL='https://develop.opencast.org' CONFIG_FOLDER='https://polimediaupv.github.io/paella-opencast/config/' OC_PAELLA8_URL_TEMPLATE='/paella-opencast/watch.html?id={videoId}&ocServer={OC_PRESENTATION_URL}' vite build",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "clean:build": "rimraf .turbo dist",
+    "clean:deps": "rimraf node_modules",
+    "eslint": "eslint src tests",
+    "html-linter": "html-linter --config ../../docs/checkstyle/html-linter.json 'src/**/*.html'",
+    "html-validate": "html-validate 'public/*.html'",
+    "check": "npm run eslint && npm run html-linter && npm run html-validate"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.1.11",
+    "eslint-config-opencast": "file:../../docs/checkstyle/eslint-config",
+    "express": "^5.1.0",
+    "tailwindcss": "^4.1.11",
+    "typescript": "^5.9.3",
+    "vite": "^7.0.1"
+  },
+  "dependencies": {
+    "@asicupv/paella-basic-plugins": "^2.5.0",
+    "@asicupv/paella-extra-plugins": "^2.7.0",
+    "@asicupv/paella-opencast-core": "^2.0.0",
+    "@asicupv/paella-opencast-plugins": "^2.0.0",
+    "@asicupv/paella-slide-plugins": "^2.5.0",
+    "@asicupv/paella-video-plugins": "^2.3.0",
+    "@asicupv/paella-webgl-plugins": "^2.3.0",
+    "@asicupv/paella-zoom-plugin": "^2.4.0"
+  }
+}
