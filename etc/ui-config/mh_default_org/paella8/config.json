@@ -10,7 +10,7 @@
     "accessibility": {
         "clickWithSpacebar": false
     },
-    
+
     "dictionaries": {
         "es": {
             "Summary": "Resumen",
@@ -327,7 +327,7 @@
         "es.upv.paella.playPauseButton": {
             "enabled": true,
             "side": "left",
-            "order": 0,            
+            "order": 0,
             "description": "Play and pause button"
         },
         "es.upv.paella.currentTimeLabel": {
@@ -376,12 +376,12 @@
 
         "org.opencast.paella.loginPlugin": {
             "enabled": true,
-            "side": "right",            
+            "side": "right",
             "order": 92
         },
         "org.opencast.paella.editorPlugin": {
             "enabled": true,
-            "side": "right",            
+            "side": "right",
             "order": 92,
             "showIfAnonymous": false,
             "showIfCanWrite": true,
@@ -403,14 +403,14 @@
         "es.upv.paella.captionsSelectorPlugin": {
             "enabled": true,
             "side": "right",
-            "order": 103            
+            "order": 103
         },
         "es.upv.paella.fileContent": {
             "enabled": true,
             "side": "right",
             "order": 104,
             "dataContext": "file.content"
-        },        
+        },
         "es.upv.paella.relatedVideos": {
             "enabled": true,
             "side": "right",
@@ -476,7 +476,7 @@
                 "CC0"
             ],
             "enableOnWritePermission": true
-        },        
+        },
         "es.upv.paella.keyboardShortcuts": {
             "enabled": true,
             "order": 80,
@@ -518,8 +518,8 @@
             "order": 0
         },
 
-        
-        
+
+
 
 
         "/* other plugins */": "*********************************************************",
@@ -580,7 +580,7 @@
             "enabled": true
         },
 
-        
+
         "es.upv.paella.arrowSlidesNavigator": {
             "enabled": false,
             "target": [
