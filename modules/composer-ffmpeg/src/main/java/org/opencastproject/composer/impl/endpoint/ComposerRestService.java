@@ -67,6 +67,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DefaultValue;
@@ -648,6 +649,51 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
       return Response.ok().entity(new JaxbJob(job)).build();
     } catch (EncoderException e) {
       logger.warn("Unable to concat videos: " + e.getMessage());
+      return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+    }
+  }
+
+  @POST
+  @Path("mergeaudio")
+  @Produces(MediaType.TEXT_XML)
+  @RestQuery(name = "mergeaudio", description = "Starts a audio merging process from multiple audio tracks, based on the specified encoding profile ID, the source tracks and a list of starting times", restParameters = {
+      @RestParameter(description = "The audio tracks to merge as xml", isRequired = true, name = "audioTracks", type = Type.TEXT),
+      @RestParameter(description = "The encoding profile to use", isRequired = true, name = "profileId", type = Type.STRING),
+      @RestParameter(description = "The audio start times as comma seperated list", isRequired = true, name = "audioStartTimes", type = Type.STRING), }, responses = {
+      @RestResponse(description = "Results in an xml document containing the merged audio track", responseCode = HttpServletResponse.SC_OK),
+      @RestResponse(description = "If required parameters aren't set or if sourceTracks aren't from the type Track or not at least two tracks are present", responseCode = HttpServletResponse.SC_BAD_REQUEST) }, returnDescription = "")
+  public Response mergeAudioTracks(@FormParam("audioTracks") String audioTracksXml,
+      @FormParam("profileId") String profileId, @FormParam("audioStartTimes") String audioStartTimesStringified)
+      throws Exception {
+    // Ensure that the POST parameters are present
+    if (StringUtils.isBlank(audioTracksXml) || StringUtils.isBlank(profileId) || StringUtils.isBlank(
+        audioStartTimesStringified)) {
+      return Response.status(Response.Status.BAD_REQUEST)
+          .entity("audioTracks, profileId and audioStartTimes must not be null").build();
+    }
+
+    // Deserialize the audio tracks
+    List<? extends MediaPackageElement> tracks = MediaPackageElementParser.getArrayFromXml(audioTracksXml);
+    if (tracks.size() < 2) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("At least two tracks must be set to merge").build();
+    }
+
+    for (MediaPackageElement elem : tracks) {
+      if (!Track.TYPE.equals(elem.getElementType())) {
+        return Response.status(Response.Status.BAD_REQUEST).entity("Source tracks must be of type 'track'").build();
+      }
+    }
+
+    List<Long> audioStartTimes = Arrays.stream(audioStartTimesStringified.split(","))
+          .mapToLong(Long::parseLong).boxed().collect(Collectors.toList());
+
+    try {
+      // Merge the specified audio tracks together
+      List<Track> tracksAsList = tracks.stream().map(element -> (Track) element).collect(Collectors.toList());
+      Job job = composerService.mergeAudioTracks(profileId, audioStartTimes, tracksAsList);
+      return Response.ok().entity(new JaxbJob(job)).build();
+    } catch (EncoderException e) {
+      logger.warn("Unable to merge audio tracks: " + e.getMessage());
       return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
     }
   }

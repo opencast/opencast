@@ -143,6 +143,22 @@ public interface ComposerService {
           MediaPackageException;
 
   /**
+   * Merge multiple audio tracks together into one audio track.
+   * The audioStartTimes List determines, where the audio snippets begin.
+   * The also can overlap. Silence will be put in front of the audio track if all snippets start after 0.
+   * Silence will also be put between audio snippets.
+   *
+   * @param profileId The encoding profile to use
+   * @param audioStartTimes Start times of the audio tracks in milliseconds. Have to be in the same order like the tracks
+   * @param audioTracks The audio tracks that will be merged into one track.
+   * @return The merged audio track
+   * @throws EncoderException if encoding fails
+   * @throws MediaPackageException if the mediapackage is invalid
+   */
+  Job mergeAudioTracks(String profileId, List<Long> audioStartTimes, List<Track> audioTracks)
+          throws EncoderException, MediaPackageException;
+
+  /**
    * Transforms an image attachment to a video track
    *
    * @param sourceImageAttachment

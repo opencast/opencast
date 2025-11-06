@@ -524,6 +524,35 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
     }
   }
 
+  public Job mergeAudioTracks(String profileId, List<Long> audioStartTimes, List<Track> audioTracks) throws EncoderException, MediaPackageException {
+    HttpPost post = new HttpPost("/mergeaudio");
+    try {
+      List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
+      params.add(new BasicNameValuePair("profileId", profileId));
+      params.add(new BasicNameValuePair("audioTracks", MediaPackageElementParser.getArrayAsXml(audioTracks)));
+      String audioStartsStringified = audioStartTimes.stream().map(String::valueOf).collect(Collectors.joining(","));
+      params.add(new BasicNameValuePair("audioStartTimes", audioStartsStringified));
+      post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
+    } catch (Exception e) {
+      throw new EncoderException(e);
+    }
+    HttpResponse response = null;
+    try {
+      response = getResponse(post);
+      if (response != null) {
+        Job r = JobParser.parseJob(response.getEntity().getContent());
+        logger.info("Audio Merge job {} started on a remote composer", r.getId());
+        return r;
+      }
+    } catch (Exception e) {
+      throw new EncoderException(e);
+    } finally {
+      closeConnection(response);
+    }
+    throw new EncoderException("Unable to merge audio from tracks " + audioTracks
+        + " using the remote composer service proxy");
+  }
+
   @Override
   public Job concat(String profileId, Dimension outputDimension, boolean sameCodec, Track... tracks)
           throws EncoderException, MediaPackageException {
