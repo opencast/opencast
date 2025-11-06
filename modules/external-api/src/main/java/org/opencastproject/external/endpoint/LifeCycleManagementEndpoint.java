@@ -658,9 +658,21 @@ public class LifeCycleManagementEndpoint {
         JsonObject json = new JsonObject();
         json.addProperty("workflowId", parameters.getWorkflowId());
 
-        String jsonString = "{" + parameters.getWorkflowParameters().keySet().stream()
-            .map(key -> "\"" + key + "\"" + ":" + parameters.getWorkflowParameters().get(key))
-            .collect(Collectors.joining(",", "", "")) + "}";
+        String jsonString = "{" + parameters.getWorkflowParameters().entrySet().stream()
+            .map(entry -> {
+                String key = "\"" + entry.getKey() + "\"";
+                String value = entry.getValue();
+
+                if ("true".equals(value) || "false".equals(value) || value.matches("-?\\d+(\\.\\d+)?")) {
+                    return key + ":" + value;
+                }
+
+                String escaped = value.toString()
+                    .replace("\\", "\\\\")
+                    .replace("\"", "\\\"");
+                return key + ":\"" + escaped + "\"";
+            })
+            .collect(Collectors.joining(",")) + "}";
         json.addProperty("workflowParameters", safeString(jsonString));
 
         return json;
