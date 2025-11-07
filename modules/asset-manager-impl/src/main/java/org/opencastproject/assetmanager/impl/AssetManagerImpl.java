@@ -28,6 +28,7 @@ import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.hasNo
 import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.isNotPublication;
 import static org.opencastproject.mediapackage.MediaPackageSupport.getFileName;
 import static org.opencastproject.mediapackage.MediaPackageSupport.getMediaPackageElementId;
+import static org.opencastproject.metadata.dublincore.CatalogUIAdapter.ORGANIZATION_WILDCARD;
 import static org.opencastproject.security.api.SecurityConstants.EPISODE_ROLE_ID_PREFIX;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLE;
@@ -191,6 +192,8 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   private EntityManagerFactory emf;
   private AclServiceFactory aclServiceFactory;
   private ElasticsearchIndex index;
+
+  // careful: org key can be wildcard!
   private Map<String, List<EventCatalogUIAdapter>> extendedEventCatalogUIAdapters = new HashMap<>();
 
   // Settings for role filter
@@ -1585,8 +1588,11 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
       // extended metadata
       event.resetExtendedMetadata();  // getting rid of old data
-      for (EventCatalogUIAdapter extendedCatalogUIAdapter : extendedEventCatalogUIAdapters.getOrDefault(orgId,
-              Collections.emptyList())) {
+
+      List<EventCatalogUIAdapter> orgAdapters = extendedEventCatalogUIAdapters.getOrDefault(orgId,
+          Collections.emptyList());
+      orgAdapters.addAll(extendedEventCatalogUIAdapters.getOrDefault(ORGANIZATION_WILDCARD, Collections.emptyList()));
+      for (EventCatalogUIAdapter extendedCatalogUIAdapter : orgAdapters) {
         for (Catalog catalog: mp.getCatalogs(extendedCatalogUIAdapter.getFlavor())) {
           try (InputStream in = workspace.read(catalog.getURI())) {
             EventIndexUtils.updateEventExtendedMetadata(event, DublinCores.read(in),

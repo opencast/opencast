@@ -1655,7 +1655,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   private List<MediaPackageElementFlavor> getEventCatalogUIAdapterFlavors() {
     String organization = securityService.getOrganization().getId();
     return eventCatalogUIAdapters.stream()
-        .filter(adapter -> adapter.getOrganization().equals(organization))
+        .filter(adapter -> adapter.handlesOrganization(organization))
         .map(EventCatalogUIAdapter::getFlavor)
         .filter(mpe -> !MediaPackageElements.EPISODE.matches(mpe))
         .collect(Collectors.toList());
