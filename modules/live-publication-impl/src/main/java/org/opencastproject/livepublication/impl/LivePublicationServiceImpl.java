@@ -284,7 +284,7 @@ public class LivePublicationServiceImpl implements LivePublicationService {
       try {
         distributionHandler.retractAllElements(archivedMediaPackage, true);
       } catch (DistributionException e) {
-        logger.warn("Distributed elements for live event {} could not be retracted", mpId);
+        logger.warn("Distributed elements for live event {} could not be retracted", mpId, e);
       }
       archiveUpdater.removeLivePublication(archivedMediaPackage);
       snapshotVersionCache.put(mpId, assetManager.takeSnapshot(archivedMediaPackage).getVersion().toString());
@@ -302,9 +302,9 @@ public class LivePublicationServiceImpl implements LivePublicationService {
         retractedFromSearch = true;
       }
     } catch (NotFoundException e) {
-      logger.debug("Live event {} not found in search for retraction", mpId);
+      logger.debug("Live event {} not found in search for retraction", mpId, e);
     } catch (DistributionException e) {
-      logger.warn("Distributed elements for live event {} could not be retracted", mpId);
+      logger.warn("Distributed elements for live event {} could not be retracted", mpId, e);
     }
 
     if (updateAssetManager) {
@@ -319,9 +319,9 @@ public class LivePublicationServiceImpl implements LivePublicationService {
           logger.debug("Removed live pub channel from archived media package {}", mpId);
         }
       } catch (NotFoundException e) {
-        logger.debug("Live event {} not found in archive for removal", mpId);
+        logger.debug("Live event {} not found in archive for removal", mpId, e);
       } catch (DistributionException e) {
-        logger.warn("Distributed elements for live event {} could not be retracted", mpId);
+        logger.warn("Distributed elements for live event {} could not be retracted", mpId, e);
       }
     }
   }

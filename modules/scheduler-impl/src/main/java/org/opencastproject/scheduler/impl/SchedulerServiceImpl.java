@@ -412,7 +412,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         try {
           livePublicationService.createLiveEvent(snapshot.getMediaPackage(), startDateTime, endDateTime, captureAgentId);
         } catch (LivePublicationException e) {
-          logger.error("Could not create live event {}", mediaPackageId);
+          logger.error("Could not create live event {}", mediaPackageId, e);
         }
       }
 
@@ -558,7 +558,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
           try {
             livePublicationService.createLiveEvent(snapshot.getMediaPackage(), startDateTime, endDateTime, captureAgentId);
           } catch (LivePublicationException e) {
-            logger.error("Could not create live event {}", id);
+            logger.error("Could not create live event {}", id, e);
           }
         }
 
@@ -747,7 +747,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
           livePublicationService.deleteLiveEvent(mpId, true);
         }
       } catch (LivePublicationException e) {
-        logger.warn("Could not update live event {}", mpId);
+        logger.warn("Could not update live event {}", mpId, e);
       }
 
       // Update Elasticsearch index
