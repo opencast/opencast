@@ -89,6 +89,15 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
       }
     }
 
+    // filter by extended metadata
+    for (String flavor: query.getExtendedMetadata().keySet()) {
+      for (String name: query.getExtendedMetadata().get(flavor).keySet()) {
+        for (String value: query.getExtendedMetadata().get(flavor).get(name)) {
+          and(EventIndexSchema.EXTENDED_METADATA_PREFIX.concat(flavor + "_" + name), value);
+        }
+      }
+    }
+
     // Presenter
     if (query.getPresenters() != null) {
       for (String presenter : query.getPresenters()) {
