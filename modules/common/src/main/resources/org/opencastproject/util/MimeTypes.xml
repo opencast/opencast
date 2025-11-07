@@ -407,7 +407,7 @@
   <MimeType>
     <Type>video/mpeg</Type>
     <Description>MPEG media</Description>
-    <Extensions>mpeg,mpg,m1s,m75,m15,mpm,mpv</Extensions>
+    <Extensions>mpeg,mpg,m1s,m75,m15,mpm,mpv,vob</Extensions>
   </MimeType>
   <MimeType>
     <Type>video/msvideo</Type>
