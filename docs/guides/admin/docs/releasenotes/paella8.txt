@@ -1,0 +1,13 @@
+Paella Player 8
+===============
+
+This version of Opencast includes a new player (Paella 8) as an alternative player option. This allows users to test and evaluate the new player alongside the existing player.
+
+Activation
+----------
+
+To enable Paella 8, you need to edit the `prop.player` property in the organization configuration file:
+
+    etc/org.opencastproject.organization-mh_default_org.cfg
+
+Set the player property to activate Paella 8 as your video player.
