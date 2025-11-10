@@ -137,7 +137,6 @@ class TranslatedSeries extends React.Component<SeriesProps, SeriesState> {
 
     loadCurrentPage(pageNumber: number = 1) {
         const qs = parsedQueryString();
-        console.log(qs);
 
         searchEpisode(
             EPISONDES_PER_PAGE,

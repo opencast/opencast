@@ -346,7 +346,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
       @QueryParam("limit") String limit,
       @QueryParam("offset") String offset,
       @QueryParam("sign") String sign,
-      @QueryParam("live") String live
+      @QueryParam("live") Boolean live
   ) throws SearchException {
 
     // There can only be one, sid or sname
