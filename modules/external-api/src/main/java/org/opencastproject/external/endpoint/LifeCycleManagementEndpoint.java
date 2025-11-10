@@ -28,6 +28,7 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
 
+import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.index.objects.event.EventSearchQueryField;
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponseBuilder;
@@ -303,6 +304,44 @@ public class LifeCycleManagementEndpoint {
         }
 
         return ApiResponseBuilder.Json.ok(acceptHeader, timingsJson);
+    }
+
+    @GET
+    @Path("policiesForEvent/{eventId}")
+    @RestQuery(
+        name = "policiesForEvent",
+        description = "Get active lifecycle policies that would target the given event were they to be executed now.",
+        returnDescription = "Lifecycle policies",
+        pathParameters = {
+            @RestParameter(name = "eventId", isRequired = true, description = "The lifecycle policy identifier", type = STRING),
+        },
+        responses = {
+            @RestResponse(description = "Returns the lifecycle policies.", responseCode = HttpServletResponse.SC_OK),
+        })
+    public Response getPoliciesForEvent(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String eventId)
+        throws SearchIndexException {
+        // Create a filter with the event id
+        var eventFilter = new EventSearchQueryField(eventId);
+
+        // Get policies
+        var lifeCyclePolicies = service.getActiveLifeCyclePolicies();
+
+        // Run filters
+        List<LifeCyclePolicy> policiesForEvent = new ArrayList<>();
+        for (var policy : lifeCyclePolicies) {
+            var targetFilters = policy.getTargetFilters();
+            targetFilters.put("uid", eventFilter);
+            var events = service.filterForEvents(targetFilters);
+            if (!events.isEmpty()) {
+                policiesForEvent.add(policy);
+            }
+        }
+
+        JsonArray policiesJsonArray = new JsonArray();
+        for (LifeCyclePolicy policy : policiesForEvent) {
+            policiesJsonArray.add(policyToJson(policy));
+        }
+        return ApiResponseBuilder.Json.ok(acceptHeader, policiesJsonArray);
     }
 
     @POST
