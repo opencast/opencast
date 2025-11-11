@@ -44,6 +44,7 @@ Parameter Table
 |**force-encoding-profile**\*|String|Encoding profile to be used when *force-encoding* is set to *true* or a given target track has a file extension not included in *required-extensions*||
 |required-extensions|String , { "," , String }|Comma-separated list of file extension names (case insensitive). All generated target files whose file extensions are not in this list will be encoded using the encoding profile *force-encoding-profile*|"mp4"|
 |enforce-divisible-by-two|Boolean|If set, all video targets will have widths and heights divisible by two. This might be necessary depending since some encoder fail when encountering uneven widths or heights.|false|
+|audio-merge-encoding-profile| String | Encoding profile used for merging audio files.| codec: `-c:a flac`; suffix = `-merged.mkv` |
 
 \* **required keys**
 
@@ -228,12 +229,30 @@ order of occurrences of *video* and *audio* elements are independent from each o
 appearance in the SMIL file is not correct.
 
 
-### Overlapping Partial Tracks
+### Overlapping Partial Tracks (Videos)
 
-The behavior of overlapping partial tracks is unspecified, i.e. for a given element *e* (*video* or *audio*), the value
-of *begin* for the subsequent element *(e+1)* of the same type (*video* or *audio*) within the same sequence must be
+The behavior of overlapping partial tracks is unspecified for videos, i.e. for a given video *e*, the value
+of *begin* for the subsequent element *(e+1)* within the same sequence must be
 equal or greater than *e.begin + e.dur*, i.e. make sure that the following invariant holds: *(e+1).begin >= e.begin +
 e.dur*
+
+### Overlapping Partial Tracks (Audio)
+
+Regarding audio, the workflow operation will use filter_complex to enable overlapping audio tracks.
+The `adelay` filter is used to put silence in front the audio tracks to positioning them on the right place in the timeline.
+Afterward it uses amix to simply merge all the audio snippets into one audio track.
+
+Here is an example:
+```
+ffmpeg -i in1.mp3 -i in2.mp3 -i in3.mp3 -filter_complex \
+"[0:a]adelay=1500:all=1[a0]; \
+[1:a]adelay=2500:all=1[a1]; \
+[2:a]adelay=4000:all=1[a2]; \
+[a0][a1][a2]amix=inputs=3:duration=longest[aout]" \
+-map "[aout]" \
+-c:a flac \
+merged.mkv
+```
 
 Encoding Profiles
 -----------------
