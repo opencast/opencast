@@ -355,6 +355,11 @@
     <Extensions>xml,xsl</Extensions>
   </MimeType>
   <MimeType>
+    <Type>text/markdown</Type>
+    <Description>Markdown document</Description>
+    <Extensions>md, markdown</Extensions>
+  </MimeType>
+  <MimeType>
     <Type>video/3gpp</Type>
     <Description>3GPP media</Description>
     <Extensions>3gp,3gpp</Extensions>
