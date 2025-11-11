@@ -223,7 +223,7 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
     final Opt<String> presentationFlavor = getOptConfig(operation, SOURCE_PRESENTATION_FLAVOR);
     final MediaPackageElementFlavor smilFlavor = MediaPackageElementFlavor.parseFlavor(getConfig(operation, SOURCE_SMIL_FLAVOR));
     final String concatEncodingProfile = getConfig(operation, CONCAT_ENCODING_PROFILE);
-    final String audioMergeEncodingProfile = getConfig(operation, AUDIO_MERGE_ENCODING_PROFILE);
+    final Opt<String> audioMergeEncodingProfile = getOptConfig(operation, AUDIO_MERGE_ENCODING_PROFILE);
     final Opt<String> concatOutputFramerate = getOptConfig(operation, CONCAT_OUTPUT_FRAMERATE);
     final String trimEncodingProfile = getConfig(operation, TRIM_ENCODING_PROFILE);
     final MediaPackageElementFlavor targetPresenterFlavor = parseTargetFlavor(
@@ -254,9 +254,17 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
       throw new WorkflowOperationException("Concat encoding profile '" + concatEncodingProfile + "' was not found");
     }
 
-    final EncodingProfile audioMergeProfile = composerService.getProfile(audioMergeEncodingProfile);
-    if (audioMergeProfile == null)  {
-      throw new WorkflowOperationException("Audio Merge encoding profile '" + audioMergeEncodingProfile + "' was not found");
+    final String audioMergeProfileId;
+    if (audioMergeEncodingProfile.isNone()) {
+      logger.info("Workflow operation config '" + AUDIO_MERGE_ENCODING_PROFILE + "' it not set. Using default.");
+      audioMergeProfileId = "audiomerge.work";
+    } else {
+      EncodingProfile audioMergeProfile = composerService.getProfile(audioMergeEncodingProfile.get());
+      if (audioMergeProfile == null) {
+        throw new WorkflowOperationException("Audio Merge encoding profile '" + audioMergeEncodingProfile + "' was not found");
+      } else {
+        audioMergeProfileId = audioMergeProfile.getIdentifier();
+      }
     }
 
     float outputFramerate = -1.0f;
@@ -331,7 +339,7 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
       if (audioTracks.size() > 1) {
         if (sourceType.get().startsWith(PRESENTER_KEY) || sourceType.get().startsWith(PRESENTATION_KEY)) {
           logger.info("Merging {} audio tracks", sourceType.get());
-          Job audioMergeJob = composerService.mergeAudioTracks(audioMergeProfile.getIdentifier(), audioStartTimes, audioTracks);
+          Job audioMergeJob = composerService.mergeAudioTracks(audioMergeProfileId, audioStartTimes, audioTracks);
           jobs.put(sourceType.get(), audioMergeJob);
         } else {
           logger.warn("Can't handle unknown source type '{}'!", sourceType.get());

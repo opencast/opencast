@@ -31,6 +31,7 @@ import static org.opencastproject.util.data.Tuple.tuple;
 import org.opencastproject.composer.api.ComposerService;
 import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.composer.api.EncodingProfile;
+import org.opencastproject.composer.api.EncodingProfileImpl;
 import org.opencastproject.composer.api.LaidOutElement;
 import org.opencastproject.composer.api.VideoClip;
 import org.opencastproject.composer.layout.Dimension;
@@ -166,6 +167,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   private static final int PROCESS_SMIL_FAILED = 19;
   private static final int MULTI_ENCODE_FAILED = 20;
   private static final int NO_STREAMS = 23;
+  private static final int AUDIO_MERGE_FAILED = 24;
 
   /** The logging instance */
   private static final Logger logger = LoggerFactory.getLogger(ComposerServiceImpl.class);
@@ -254,6 +256,9 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   /** Path to the FFmpeg binary */
   private String ffmpegBinary = FFMPEG_BINARY_DEFAULT;
 
+  /** Default audio-merge encoding profile if no one is set **/
+  private EncodingProfile defaultAudioMergeEncodingProfile;
+
   /** Creates a new composer service instance. */
   public ComposerServiceImpl() {
     super(JOB_TYPE);
@@ -272,6 +277,16 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     ffmpegBinary = StringUtils.defaultString(cc.getBundleContext().getProperty(CONFIG_FFMPEG_PATH),
             FFMPEG_BINARY_DEFAULT);
     logger.debug("ffmpeg binary: {}", ffmpegBinary);
+
+    // creating default encoding profile in case none is set
+    EncodingProfileImpl profile = new EncodingProfileImpl("audiomerge.work", "audiomerge", null);
+    profile.setOutputType(EncodingProfile.MediaType.Audio);
+    profile.setSuffix("-merged.mkv");
+    profile.setApplicableType(EncodingProfile.MediaType.AudioVisual);
+    profile.addExtension("ffmpeg.command", "#{audioMergeCommand} -c:a flac #{out.dir}/#{out.name}#{out.suffix}");
+    this.defaultAudioMergeEncodingProfile = profile;
+    logger.info("Default audio merge encoding profile set: " + profile.getIdentifier());
+
     logger.info("Activating composer service");
   }
 
@@ -974,7 +989,20 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       audioFiles.add(loadTrackIntoWorkspace(job, "audio_merge", t, false));
     }
 
-    EncodingProfile encodingProfile = getProfile(job, profileId);
+    // try to get encoding profile from file, use default as fallback
+    EncodingProfile encodingProfile = profileScanner.getProfile(profileId);
+    if (encodingProfile == null) {
+      final String msg = format("Profile %s is unknown.", profileId);
+      if ("audiomerge.work".equals(profileId)) {
+        logger.info(msg + " Using default");
+        encodingProfile = defaultAudioMergeEncodingProfile;
+      } else {
+        logger.error(msg);
+        incident().recordFailure(job, PROFILE_NOT_FOUND, Collections.map(tuple("profile", profileId)));
+        throw new EncoderException(msg);
+      }
+    }
+
     final EncoderEngine encoderEngine = getEncoderEngine();
 
     String audioMergeCommand = buildAudioMergeCommand(audioStarTimes, audioFiles);
@@ -993,7 +1021,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       params.put("tracks", StringUtils.join(trackList, ","));
       params.put("profile", encodingProfile.getIdentifier());
       params.put("properties", properties.toString());
-      incident().recordFailure(job, CONCAT_FAILED, e, params, detailsFor(e, encoderEngine));
+      incident().recordFailure(job, AUDIO_MERGE_FAILED, e, params, detailsFor(e, encoderEngine));
       throw e;
     } finally {
       activeEncoder.remove(encoderEngine);
