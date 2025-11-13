@@ -525,8 +525,33 @@
   </bean>
 
   <!-- Redirects unauthenticated requests to the login form -->
-  <bean id="userEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
+  <bean id="redirectingEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
     <property name="loginFormUrl" value="/login.html" />
+  </bean>
+
+  <!-- Entry point that redirects to /login for certain paths, replying 403 otherwise -->
+  <bean id="userEntryPoint" class="org.opencastproject.kernel.security.UserEntryPoint">
+    <property name="redirectingEntryPoint" ref="redirectingEntryPoint" />
+    <property name="redirectingPathPatterns">
+      <list>
+        <value>**/index.html</value>
+        <value>/admin-ui/**</value>
+        <value>/admin-ng</value>
+        <value>/admin-ng/</value>
+        <value>/rest_docs.*</value>
+        <value>/rest-docs/**</value>
+        <value>/docs.*</value>
+        <value>/engage/ui/**</value>
+        <value>/studio</value>
+        <value>/studio/</value>
+        <value>/editor-ui</value>
+        <value>/editor-ui/</value>
+        <value>/engage-player</value>
+        <value>/engage-player/</value>
+        <value>/ltitools</value>
+        <value>/ltitools/</value>
+      </list>
+    </property>
   </bean>
 
   <!-- Redirect unauthenticated requests to custom login url with configurable redirect query parameter
