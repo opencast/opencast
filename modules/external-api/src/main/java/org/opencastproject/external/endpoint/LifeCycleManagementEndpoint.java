@@ -32,6 +32,7 @@ import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.index.objects.event.EventSearchQueryField;
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponseBuilder;
+import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.lifecyclemanagement.api.Action;
 import org.opencastproject.lifecyclemanagement.api.LifeCyclePolicy;
 import org.opencastproject.lifecyclemanagement.api.LifeCyclePolicyAccessControlEntry;
@@ -122,12 +123,19 @@ public class LifeCycleManagementEndpoint {
     /** Base URL of this endpoint */
     protected String endpointBaseUrl;
 
-    /** The capture agent service */
+    /** The lifecycle service */
     private LifeCycleService service;
+
+    protected IndexService indexService;
 
     @Reference
     public void setLifeCycleService(LifeCycleService lifeCycleService) {
         this.service = lifeCycleService;
+    }
+
+    @Reference
+    public void setIndexService(IndexService indexService) {
+        this.indexService = indexService;
     }
 
     private final String actionParametersExampleJSON = "{\n"
@@ -319,7 +327,7 @@ public class LifeCycleManagementEndpoint {
             @RestResponse(description = "Returns the lifecycle policies.", responseCode = HttpServletResponse.SC_OK),
         })
     public Response getPoliciesForEvent(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String eventId)
-        throws SearchIndexException {
+        throws SearchIndexException, NotFoundException {
         // Create a filter with the event id
         var eventFilter = new EventSearchQueryField(eventId);
 
@@ -330,7 +338,10 @@ public class LifeCycleManagementEndpoint {
         List<LifeCyclePolicy> policiesForEvent = new ArrayList<>();
         for (var policy : lifeCyclePolicies) {
             var targetFilters = policy.getTargetFilters();
-            targetFilters.put("uid", eventFilter);
+            String catalogFlavor = indexService.getCommonEventCatalogUIAdapter().getFlavor().toString();
+            targetFilters
+                .computeIfAbsent(catalogFlavor, k -> new HashMap<>())
+                .put("uid", eventFilter);
             var events = service.filterForEvents(targetFilters);
             if (!events.isEmpty()) {
                 policiesForEvent.add(policy);
@@ -451,11 +462,11 @@ public class LifeCycleManagementEndpoint {
             }
 
             // Convert filters
-            Map<String, EventSearchQueryField<String>> filtersMap = new HashMap<>();
+            Map<String, Map<String, EventSearchQueryField<String>>> filtersMap = new HashMap<>();
             if (targetFilters != null && !targetFilters.isEmpty()) {
                 try {
                     filtersMap = gson.fromJson(targetFilters,
-                        new TypeToken<Map<String, EventSearchQueryField<String>>>() { }.getType());
+                        new TypeToken<Map<String, Map<String, EventSearchQueryField<String>>> >() { }.getType());
                     if (filtersMap == null) {
                         filtersMap = new HashMap<>();
                     }
@@ -573,11 +584,11 @@ public class LifeCycleManagementEndpoint {
                 policy.setTiming(Timing.valueOf(timing));
             }
             if (targetFilters != null && !targetFilters.isEmpty()) {
-                Map<String, EventSearchQueryField<String>> filtersMap = new HashMap<>();
+                Map<String, Map<String, EventSearchQueryField<String>>>  filtersMap;
                 if (targetFilters != null && !targetFilters.isEmpty()) {
                     try {
                         filtersMap = gson.fromJson(targetFilters,
-                            new TypeToken<Map<String, EventSearchQueryField<String>>>() { }.getType());
+                            new TypeToken<Map<String, Map<String, EventSearchQueryField<String>>>>() { }.getType());
                         if (filtersMap == null) {
                             filtersMap = new HashMap<>();
                         }
@@ -659,10 +670,7 @@ public class LifeCycleManagementEndpoint {
         json.addProperty("isActive", policy.isActive());
         json.addProperty("isCreatedFromConfig", policy.isCreatedFromConfig());
 
-        String jsonString = "{" + policy.getTargetFilters().keySet().stream()
-            .map(key -> "\"" + key + "\"" + ":" + eventSearchQueryFieldToJson(policy.getTargetFilters().get(key)))
-            .collect(Collectors.joining(",", "", "")) + "}";
-        json.addProperty("targetFilters", safeString(jsonString));
+        json.addProperty("targetFilters", gson.toJson(policy.getTargetFilters()));
 
 
         JsonArray accessControlEntries = new JsonArray();

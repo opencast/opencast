@@ -71,9 +71,9 @@ public interface LifeCyclePolicy {
 
   void setCreatedFromConfig(boolean createdFromConfig);
 
-  Map<String, EventSearchQueryField<String>> getTargetFilters();
+  Map<String, Map<String, EventSearchQueryField<String>>> getTargetFilters();
 
-  void setTargetFilters(Map<String, EventSearchQueryField<String>> targetFilters);
+  void setTargetFilters(Map<String, Map<String, EventSearchQueryField<String>>> targetFilters);
 
   List<LifeCyclePolicyAccessControlEntry> getAccessControlEntries();
 

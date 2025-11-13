@@ -245,6 +245,8 @@ public class RepeatingPolicyRunner {
               logger.warn(e.toString());
             } catch (UnauthorizedException e) {
               logger.warn(e.toString());
+            } catch (NotFoundException e) {
+              logger.warn(e.toString());
             }
           });
       logger.info("Finished RepeatingPolicyRunner job for " + repeatingPolicyRunner.getLifeCyclePolicy().getTitle());

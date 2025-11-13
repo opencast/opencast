@@ -203,6 +203,8 @@ public class PolicyCheckRunner {
                     logger.warn(e.toString());
                   } catch (UnauthorizedException e) {
                     logger.warn(e.toString());
+                  } catch (NotFoundException e) {
+                    logger.warn(e.toString());
                   }
                 }
                 // If Always (is new entity eligible NOW? How about NOW?)
@@ -250,6 +252,8 @@ public class PolicyCheckRunner {
                     logger.info("Created task based on policy " + policy.getTitle());
                   }
                 } catch (SearchIndexException e) {
+                  logger.warn(e.toString());
+                } catch (NotFoundException e) {
                   logger.warn(e.toString());
                 }
 

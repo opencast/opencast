@@ -191,6 +191,8 @@ public interface LifeCycleService {
    * @param filters Key value pairs that the events must match.
    * @return The list of events
    * @throws SearchIndexException If something went wrong in the index service
+   * @throws NotFoundException If a targetFilters object contains a metadata catalog flavor unknown to Opencast
    */
-  List<Event> filterForEvents(Map<String, EventSearchQueryField<String>> filters) throws SearchIndexException;
+  List<Event> filterForEvents(Map<String, Map<String, EventSearchQueryField<String>>> filters)
+          throws SearchIndexException, NotFoundException;
 }

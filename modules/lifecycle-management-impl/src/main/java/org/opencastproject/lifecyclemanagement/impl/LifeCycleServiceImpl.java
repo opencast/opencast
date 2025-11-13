@@ -30,6 +30,7 @@ import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.elasticsearch.index.objects.event.EventIndexSchema;
 import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.elasticsearch.index.objects.event.EventSearchQueryField;
+import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.lifecyclemanagement.api.Action;
 import org.opencastproject.lifecyclemanagement.api.LifeCycleDatabaseException;
@@ -41,6 +42,7 @@ import org.opencastproject.lifecyclemanagement.api.LifeCycleTask;
 import org.opencastproject.lifecyclemanagement.api.StartWorkflowParameters;
 import org.opencastproject.lifecyclemanagement.api.Status;
 import org.opencastproject.lifecyclemanagement.api.Timing;
+import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AuthorizationService;
@@ -70,6 +72,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Component(
     property = {
@@ -95,6 +98,8 @@ public class LifeCycleServiceImpl implements LifeCycleService {
 
   protected ElasticsearchIndex index;
 
+  protected IndexService indexService;
+
   @Reference
   public void setPersistence(LifeCycleDatabaseService persistence) {
     this.persistence = persistence;
@@ -113,6 +118,11 @@ public class LifeCycleServiceImpl implements LifeCycleService {
   @Reference
   public void setElasticSearchIndex(ElasticsearchIndex index) {
     this.index = index;
+  }
+
+  @Reference
+  public void setIndexService(IndexService indexService) {
+    this.indexService = indexService;
   }
 
   @Activate
@@ -450,7 +460,8 @@ public class LifeCycleServiceImpl implements LifeCycleService {
    * {@inheritDoc}
    * @see LifeCycleService#filterForEvents(Map)
    */
-  public List<Event> filterForEvents(Map<String, EventSearchQueryField<String>> filters) throws SearchIndexException {
+  public List<Event> filterForEvents(Map<String, Map<String, EventSearchQueryField<String>>> filters)
+          throws SearchIndexException, NotFoundException {
     try {
       SearchResult<Event> results = null;
       List<Event> eventsList = new ArrayList<>();
@@ -458,8 +469,32 @@ public class LifeCycleServiceImpl implements LifeCycleService {
       final User user = securityService.getUser();
       EventSearchQuery query = new EventSearchQuery(organization.getId(), user);
 
-      addFiltersToQuery(query, filters);
+      // Add filters to query
+      List<EventCatalogUIAdapter> extendedCatalogUIAdapters = indexService.getExtendedEventCatalogUIAdapters();
+      EventCatalogUIAdapter commonCatalogUIAdapter = indexService.getCommonEventCatalogUIAdapter();
+      for (String flavor: filters.keySet()) {
+        // Common metadata filter
+        if (commonCatalogUIAdapter.getFlavor().eq(flavor)) {
+          addFiltersToQuery(query, filters.get(flavor));
+          continue;
+        }
 
+        // Extended metadata filter
+        Optional<EventCatalogUIAdapter> extendedOpt = extendedCatalogUIAdapters.stream()
+            .filter(f -> f.getFlavor().eq(flavor))
+            .findFirst();
+
+        if (!extendedOpt.isPresent()) {
+          throw new NotFoundException("Catalog flavor" + flavor + " is not know to Opencast.");
+        }
+
+        for (String name: filters.get(flavor).keySet()) {
+          EventSearchQueryField<String> field = filters.get(flavor).get(name);
+          query.withExtendedMetadata(flavor, name, field.getValue());
+        }
+      }
+
+      // Run query
       results = index.getByQuery(query);
 
       for (SearchResultItem<Event> item : results.getItems()) {

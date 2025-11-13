@@ -145,7 +145,7 @@ public class LifeCyclePolicyImpl implements LifeCyclePolicy {
 
   public LifeCyclePolicyImpl(String title, TargetType targetType, Action action, String actionParameters,
       Date actionDate, String cronTrigger, Timing timing,
-      Map<String, EventSearchQueryField<String>> targetFilters,
+      Map<String, Map<String, EventSearchQueryField<String>>>  targetFilters,
       List<LifeCyclePolicyAccessControlEntryImpl> accessControlEntries) {
     this.title = title;
     this.targetType = targetType;
@@ -246,14 +246,15 @@ public class LifeCyclePolicyImpl implements LifeCyclePolicy {
     isCreatedFromConfig = createdFromConfig;
   }
 
-  public Map<String, EventSearchQueryField<String>> getTargetFilters() {
+  // Map<catalog-flavor, Map<parameter-id, value-and-more>>
+  public Map<String, Map<String, EventSearchQueryField<String>>> getTargetFilters() {
     return gson.fromJson(targetFilters,
-        new TypeToken< Map<String, EventSearchQueryField<String>>>() { }.getType());
+        new TypeToken< Map<String, Map<String, EventSearchQueryField<String>>>>() { }.getType());
   }
 
-  public void setTargetFilters(Map<String, EventSearchQueryField<String>> targetFilters) {
+  public void setTargetFilters(Map<String, Map<String, EventSearchQueryField<String>>> targetFilters) {
     this.targetFilters = gson.toJson(targetFilters,
-        new TypeToken< Map<String, EventSearchQueryField<String>>>() { }.getType());
+        new TypeToken< Map<String, Map<String, EventSearchQueryField<String>>>>() { }.getType());
   }
 
   public List<LifeCyclePolicyAccessControlEntry> getAccessControlEntries() {
