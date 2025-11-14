@@ -21,8 +21,6 @@
 
 package org.opencastproject.security.jwt;
 
-import static org.easymock.EasyMock.anyBoolean;
-import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.anyString;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.createNiceMock;
@@ -38,8 +36,7 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.impl.jpa.JpaUserReference;
 import org.opencastproject.userdirectory.api.UserReferenceProvider;
 
-import com.auth0.jwk.JwkException;
-import com.auth0.jwt.algorithms.Algorithm;
+import com.nimbusds.jose.JOSEException;
 
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.junit.Before;
@@ -67,11 +64,11 @@ public abstract class JWTLoginTest {
   protected DynamicLoginHandler loginHandler;
   protected UserDetailsService userDetailsServiceExistingUser;
   protected UserDetailsService userDetailsServiceNewUser;
-  protected GuavaCachedUrlJwkProvider validJwkProvider;
-  protected GuavaCachedUrlJwkProvider invalidJwkProvider;
+  protected JWKSetProvider validJwkProvider;
+  protected JWKSetProvider invalidJwkProvider;
 
   @Before
-  public void setUp() throws NoSuchAlgorithmException, JwkException {
+  public void setUp() throws NoSuchAlgorithmException, JOSEException {
     generator = JWTGenerator.getInstance();
 
     // Prepare login handler
@@ -117,15 +114,15 @@ public abstract class JWTLoginTest {
     loginHandler.afterPropertiesSet();
 
     // Prepare JWK provider variants
-    validJwkProvider = createMock(GuavaCachedUrlJwkProvider.class);
-    expect(validJwkProvider.getAlgorithms(anyObject(), anyBoolean()))
-        .andReturn(List.of(Algorithm.RSA512(generator.getPublicKey(), null)))
+    validJwkProvider = createMock(JWKSetProvider.class);
+    expect(validJwkProvider.getAll())
+        .andReturn(List.of(generator.getRsaJWK()))
         .atLeastOnce();
     replay(validJwkProvider);
 
-    invalidJwkProvider = createMock(GuavaCachedUrlJwkProvider.class);
-    expect(invalidJwkProvider.getAlgorithms(anyObject(), anyBoolean()))
-        .andReturn(List.of(Algorithm.RSA512(generator.getInvalidPublicKey(), null)))
+    invalidJwkProvider = createMock(JWKSetProvider.class);
+    expect(invalidJwkProvider.getAll())
+        .andReturn(List.of(generator.getInvalidRsaJWK()))
         .atLeastOnce();
     replay(invalidJwkProvider);
   }
@@ -133,7 +130,7 @@ public abstract class JWTLoginTest {
   protected abstract HttpServletRequest mockRequest(String generateValidSymmetricJWT);
 
   @Test
-  public void testLoginExistingUser() {
+  public void testLoginExistingUser() throws JOSEException {
     loginHandler.setUserDetailsService(userDetailsServiceExistingUser);
     Object username = authFilter.getPreAuthenticatedPrincipal(
         mockRequest(generator.generateValidSymmetricJWT())
@@ -142,7 +139,7 @@ public abstract class JWTLoginTest {
   }
 
   @Test
-  public void testLoginNewUser() {
+  public void testLoginNewUser() throws JOSEException {
     loginHandler.setUserDetailsService(userDetailsServiceNewUser);
     Object username = authFilter.getPreAuthenticatedPrincipal(
         mockRequest(generator.generateValidSymmetricJWT())
@@ -151,7 +148,7 @@ public abstract class JWTLoginTest {
   }
 
   @Test
-  public void testLoginWithCache() {
+  public void testLoginWithCache() throws JOSEException {
     Object username;
     String jwt = generator.generateValidSymmetricJWT();
 
@@ -170,7 +167,7 @@ public abstract class JWTLoginTest {
   }
 
   @Test
-  public void testExpiredLoginWithCache() throws InterruptedException {
+  public void testExpiredLoginWithCache() throws InterruptedException, JOSEException {
     Object username;
     String expiringJwt = generator.generateValidSymmetricJWT(1000);
 
@@ -192,7 +189,7 @@ public abstract class JWTLoginTest {
   }
 
   @Test
-  public void testLoginWithInvalidAlgorithm() {
+  public void testLoginWithInvalidAlgorithm() throws JOSEException {
     loginHandler.setExpectedAlgorithms(List.of("XY"));
     Object username = authFilter.getPreAuthenticatedPrincipal(
         mockRequest(generator.generateValidSymmetricJWT())
@@ -201,7 +198,7 @@ public abstract class JWTLoginTest {
   }
 
   @Test
-  public void testLoginWithInvalidClaimConstraints() {
+  public void testLoginWithInvalidClaimConstraints() throws JOSEException {
     loginHandler.setClaimConstraints(generator.generateInvalidClaimConstraints());
     Object username = authFilter.getPreAuthenticatedPrincipal(
         mockRequest(generator.generateValidSymmetricJWT())
@@ -210,7 +207,7 @@ public abstract class JWTLoginTest {
   }
 
   @Test
-  public void testLoginWithInvalidJWT() {
+  public void testLoginWithInvalidJWT() throws JOSEException {
     Object username;
 
     // Expired JWT
@@ -227,7 +224,7 @@ public abstract class JWTLoginTest {
   }
 
   @Test
-  public void testLoginWithInvalidMapping() {
+  public void testLoginWithInvalidMapping() throws JOSEException {
     loginHandler.setRoleMappings(List.of("null"));
     Object username = authFilter.getPreAuthenticatedPrincipal(
         mockRequest(generator.generateExpiredSymmetricJWT())
@@ -236,7 +233,7 @@ public abstract class JWTLoginTest {
   }
 
   @Test
-  public void testLoginWithValidJwks() throws IllegalAccessException {
+  public void testLoginWithValidJwks() throws IllegalAccessException, JOSEException {
     loginHandler.setJwksUrl("https://auth.example.org/.well-known/jwks.json");
     loginHandler.setExpectedAlgorithms(List.of(generator.getAsymmetricAlgorithm().getName()));
     loginHandler.setSecret(null);
@@ -250,7 +247,7 @@ public abstract class JWTLoginTest {
   }
 
   @Test
-  public void testLoginWithInvalidJwks() throws IllegalAccessException {
+  public void testLoginWithInvalidJwks() throws IllegalAccessException, JOSEException {
     loginHandler.setJwksUrl("https://auth.example.org/.well-known/jwks.json");
     loginHandler.setExpectedAlgorithms(List.of(generator.getAsymmetricAlgorithm().getName()));
     loginHandler.setSecret(null);
@@ -264,7 +261,7 @@ public abstract class JWTLoginTest {
   }
 
   @Test
-  public void testNonExpiringLoginWithCache() {
+  public void testNonExpiringLoginWithCache() throws JOSEException {
     Object username;
     String jwt = generator.generateValidNonExpiringSymmetricJWT();
 

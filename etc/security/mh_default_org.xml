@@ -766,13 +766,13 @@
     <property name="securityService" ref="securityService" />
     <property name="userReferenceProvider" ref="userReferenceProvider" />
     <property name="jwksUrl" value="https://auth.example.org/.well-known/jwks.json" />
-    <property name="jwksCacheExpiresIn" value="1440" />
+    <property name="jwksTimeToLive" value="3600000" />
     <property name="secret" value="***" />
     <property name="expectedAlgorithms" ref="jwtExpectedAlgorithms" />
     <property name="claimConstraints" ref="jwtClaimConstraints" />
-    <property name="usernameMapping" value="['sub'].asString()" />
-    <property name="nameMapping" value="['name'].asString()" />
-    <property name="emailMapping" value="['email'].asString()" />
+    <property name="usernameMapping" value="['sub']" />
+    <property name="nameMapping" value="['name']" />
+    <property name="emailMapping" value="['email']" />
     <property name="ocStandardRoleMappings" value="true" />
     <property name="roleMappings" ref="jwtRoleMappings" />
     <property name="jwtCacheSize" value="500" />
@@ -781,7 +781,17 @@
 
   <!-- The signing algorithms expected for the JWT signature
   <util:list id="jwtExpectedAlgorithms" value-type="java.lang.String">
+    <value>HS256</value>
+    <value>HS384</value>
+    <value>HS512</value>
     <value>RS256</value>
+    <value>RS384</value>
+    <value>RS512</value>
+    <value>ES256</value>
+    <value>ES256K</value>
+    <value>ES384</value>
+    <value>ES512</value>
+    <value>EdDSA</value>
   </util:list>-->
 
   <!-- The claim constraints that are expected to be fulfilled by the JWT
@@ -795,21 +805,21 @@
     <value>containsKey('email')</value>
     <value>containsKey('domain')</value>
     <value>containsKey('affiliation')</value>
-    <value>['iss'].asString() eq 'https://auth.example.org'</value>
-    <value>['aud'].asString() eq 'client-id'</value>
-    <value>['username'].asString() matches '.*@example\.org'</value>
-    <value>['domain'].asString() eq 'example.org'</value>
-    <value>['affiliation'].asList(T(String)).contains('faculty@example.org')</value>
+    <value>['iss'] eq 'https://auth.example.org'</value>
+    <value>['aud'] eq 'client-id'</value>
+    <value>['username'] matches '.*@example\.org'</value>
+    <value>['domain'] eq 'example.org'</value>
+    <value>['affiliation'].contains('faculty@example.org')</value>
   </util:list>-->
 
   <!-- The mapping from JWT claims to Opencast roles
   <util:list id="jwtRoleMappings" value-type="java.lang.String">
     <value>'ROLE_JWT_USER'</value>
-    <value>'ROLE_JWT_USER_' + ['sub'].asString()</value>
-    <value>('ROLE_JWT_OWNER_' + ['sub'].asString()).replaceAll("[^a-zA-Z0-9]","_").toUpperCase()</value>
-    <value>['domain'] != null ? 'ROLE_JWT_ORG_' + ['domain'].asString() + '_MEMBER' : null</value>
-    <value>['username'].asString() eq ('j_doe01@example.org') ? 'ROLE_ADMIN' : null</value>
-    <value>['affiliation'].asList(T(String)).contains('faculty@example.org') ? 'ROLE_GROUP_JWT_TRAINER' : null</value>
+    <value>'ROLE_JWT_USER_' + ['sub']</value>
+    <value>('ROLE_JWT_OWNER_' + ['sub']).replaceAll("[^a-zA-Z0-9]","_").toUpperCase()</value>
+    <value>['domain'] != null ? 'ROLE_JWT_ORG_' + ['domain'] + '_MEMBER' : null</value>
+    <value>['username'] eq ('j_doe01@example.org') ? 'ROLE_ADMIN' : null</value>
+    <value>['affiliation'].contains('faculty@example.org') ? 'ROLE_GROUP_JWT_TRAINER' : null</value>
   </util:list>-->
 
   <!-- ################ -->
