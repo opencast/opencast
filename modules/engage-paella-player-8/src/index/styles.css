@@ -1,0 +1,11 @@
+@import "tailwindcss";
+
+/* 3D tilt effect for the preview container (not the image) */
+.preview-container {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+}
+
+.preview-container.tilted {
+    transform: perspective(600px) rotateX(-15deg) scaleY(1.07) scaleX(0.98);
+}

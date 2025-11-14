@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Search Results - Videos</title>
+
+    <script type="module" src="/src/index/index.ts"></script>    
+</head>
+
+<body class="bg-gray-100 text-gray-800 font-sans">
+
+    <!-- Header -->
+    <!-- <header class="bg-white shadow-md z-10">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-2xl font-bold text-blue-600" id="series-title">Video Results</h1>
+            <! -- <span id="total-videos" class="text-gray-500 text-base"></span> -- >
+        </div>
+    </header> -->
+
+    <!-- Loading Skeleton -->
+    <div id="loading" class="max-w-6xl mx-auto px-4 py-10 flex flex-col gap-6">
+        <div id="loading-skeletons" class="flex flex-col gap-6"></div>
+    </div>
+
+    <!-- Results -->
+    <main id="results" class="max-w-6xl mx-auto px-4 py-8 space-y-6">
+        <!-- Dynamically loaded results -->
+    </main>
+
+    <!-- Pagination -->
+    <div class="max-w-6xl mx-auto px-4 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-2" id="pagination-container">
+        <div class="flex justify-center space-x-2" id="pagination"></div>
+        <div id="pagination-info" class="text-gray-500 text-sm text-center md:text-right"></div>
+    </div>
+
+    <!-- Footer -->
+    <!-- <footer class="bg-white mt-12 border-t py-6 text-center text-gray-500">
+        &copy; 2025 Universitat Politècnica de València. All rights reserved.
+    </footer> -->
+</body>
+
+</html>
