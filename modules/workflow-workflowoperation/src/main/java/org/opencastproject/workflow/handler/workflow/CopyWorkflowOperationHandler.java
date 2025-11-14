@@ -134,8 +134,9 @@ public class CopyWorkflowOperationHandler extends AbstractWorkflowOperationHandl
     }
 
     // Make the target filename and directory are provided
-    if (StringUtils.isBlank(targetDirectoryOption))
+    if (StringUtils.isBlank(targetDirectoryOption)) {
       throw new WorkflowOperationException("No target directory has been set for the copy operation!");
+    }
 
     // Select the source flavors
     for (MediaPackageElementFlavor flavor : sourceFlavorsOption) {

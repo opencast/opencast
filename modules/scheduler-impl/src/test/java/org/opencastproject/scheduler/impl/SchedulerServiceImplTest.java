@@ -351,13 +351,14 @@ public class SchedulerServiceImplTest {
 
   protected static MediaPackage generateEvent(Optional<String> id) throws MediaPackageException {
     MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
-    if (id.isPresent())
+    if (id.isPresent()) {
       mp.setIdentifier(new IdImpl(id.get()));
+    }
     return mp;
   }
 
-  protected static DublinCoreCatalog generateEvent(String captureDeviceID, Optional<String> eventId, Optional<String> title,
-          Date startTime, Date endTime) {
+  protected static DublinCoreCatalog generateEvent(String captureDeviceID, Optional<String> eventId,
+          Optional<String> title, Date startTime, Date endTime) {
     DublinCoreCatalog dc = DublinCores.mkOpencastEpisode().getCatalog();
     dc.set(PROPERTY_IDENTIFIER, eventId.orElse("1"));
     dc.set(PROPERTY_TITLE, title.orElse("Demo event"));
@@ -638,8 +639,8 @@ public class SchedulerServiceImplTest {
     Date start = new Date(currentTime);
     Date end = new Date(currentTime + 60 * 60 * 1000);
 
-    List<MediaPackage> events = schedSvc.search(Optional.of("Device A"), Optional.empty(), Optional.of(end), Optional.of(start),
-            Optional.empty());
+    List<MediaPackage> events = schedSvc.search(Optional.of("Device A"), Optional.empty(), Optional.of(end),
+            Optional.of(start), Optional.empty());
     assertEquals(1, events.size());
   }
 
@@ -720,7 +721,8 @@ public class SchedulerServiceImplTest {
     final String seriesId = "TestSeries";
     final MediaPackage mpTemplate = generateEvent(Optional.of(id));
     mpTemplate.setSeries(seriesId);
-    final DublinCoreCatalog dublinCoreCatalog = generateEvent(captureAgentId, Optional.of(mpTemplate.getIdentifier().toString()), Optional.of("Test Title"), start, end);
+    final DublinCoreCatalog dublinCoreCatalog = generateEvent(captureAgentId,
+        Optional.of(mpTemplate.getIdentifier().toString()), Optional.of("Test Title"), start, end);
     addDublinCore(Optional.of(mpTemplate.getIdentifier().toString()), mpTemplate, dublinCoreCatalog);
     final Map<String, String> wfProperties = this.wfProperties;
     final Map<String, String> caProperties = Collections.singletonMap("foo", "bar");
@@ -754,7 +756,8 @@ public class SchedulerServiceImplTest {
     final String seriesId = "TestSeries";
     final MediaPackage mpTemplate = generateEvent(Optional.of(id));
     mpTemplate.setSeries(seriesId);
-    final DublinCoreCatalog dublinCoreCatalog = generateEvent(captureAgentId, Optional.of(mpTemplate.getIdentifier().toString()), Optional.of("Test Title"), start, end);
+    final DublinCoreCatalog dublinCoreCatalog = generateEvent(captureAgentId,
+        Optional.of(mpTemplate.getIdentifier().toString()), Optional.of("Test Title"), start, end);
     addDublinCore(Optional.of(mpTemplate.getIdentifier().toString()), mpTemplate, dublinCoreCatalog);
     final Map<String, String> wfProperties = this.wfProperties;
     final Map<String, String> caProperties = Collections.singletonMap("foo", "bar");
@@ -780,7 +783,8 @@ public class SchedulerServiceImplTest {
         Value.DATE
     ).size();
     assertEquals(expectedEventCount, scheduled.keySet().size());
-    final String randomMpId = scheduled.keySet().stream().findAny().orElseThrow(() -> new RuntimeException("This should never happen"));
+    final String randomMpId = scheduled.keySet().stream().findAny()
+        .orElseThrow(() -> new RuntimeException("This should never happen"));
     final Period period = scheduled.get(randomMpId);
     final MediaPackage mediaPackage = schedSvc.getMediaPackage(randomMpId);
     final DublinCoreCatalog eventLoaded = schedSvc.getDublinCore(randomMpId);
@@ -813,7 +817,7 @@ public class SchedulerServiceImplTest {
       final String id = "Recording" + i;
       final MediaPackage mpTemplate = generateEvent(Optional.of(id));
       final DublinCoreCatalog dublinCoreCatalog = generateEvent(captureAgentId,
-        Optional.of(mpTemplate.getIdentifier().toString()), Optional.of("Test Title"), start, end);
+          Optional.of(mpTemplate.getIdentifier().toString()), Optional.of("Test Title"), start, end);
       addDublinCore(Optional.of(mpTemplate.getIdentifier().toString()), mpTemplate, dublinCoreCatalog);
       final Map<String, String> wfProperties = this.wfProperties;
       final Map<String, String> caProperties = Collections.singletonMap("foo", "bar");
@@ -903,8 +907,8 @@ public class SchedulerServiceImplTest {
     final Date start = new Date(currentTime);
     final Date end = new Date(currentTime + hours(2));
     {
-      List<MediaPackage> events = schedSvc.search(Optional.of("Some Other Device"), Optional.of(start), Optional.empty(),
-              Optional.empty(), Optional.of(end));
+      List<MediaPackage> events = schedSvc.search(Optional.of("Some Other Device"), Optional.of(start),
+              Optional.empty(), Optional.empty(), Optional.of(end));
       assertEquals(0, events.size());
     }
     {
@@ -915,39 +919,54 @@ public class SchedulerServiceImplTest {
     {
       ZonedDateTime startZdt = ZonedDateTime.ofInstant(start.toInstant(), ZoneOffset.UTC);
       List<MediaPackage> events = schedSvc.findConflictingEvents("Device A",
-              new RRule("FREQ=WEEKLY;BYDAY=SU,MO,TU,WE,TH,FR,SA;BYHOUR=" + startZdt.getHour() + ";BYMINUTE=" + startZdt.getMinute()), start, new Date(start.getTime() + hours(48)),
+              new RRule("FREQ=WEEKLY;BYDAY=SU,MO,TU,WE,TH,FR,SA;BYHOUR=" + startZdt.getHour()
+                  + ";BYMINUTE=" + startZdt.getMinute()), start, new Date(start.getTime() + hours(48)),
               new Long(seconds(36)), TimeZone.getTimeZone("America/Chicago"));
       assertEquals(2, events.size());
     }
     {
-      // No events are contained in the RRule and date range: 2019-02-16T16:00:00Z to 2019-02-16T16:55:00Z, FREQ=WEEKLY;BYDAY=WE;BYHOUR=16;BYMINUTE=0
+      // No events are contained in the RRule and date range:
+      // 2019-02-16T16:00:00Z to 2019-02-16T16:55:00Z, FREQ=WEEKLY;BYDAY=WE;BYHOUR=16;BYMINUTE=0
       List<MediaPackage> conflicts = schedSvc.findConflictingEvents("Device A",
-              new RRule("FREQ=WEEKLY;BYDAY=WE;BYHOUR=16;BYMINUTE=0"), new Date(1550332800000L), new Date(1550336100000L), 1000, TimeZone.getTimeZone("Africa/Johannesburg"));
+              new RRule("FREQ=WEEKLY;BYDAY=WE;BYHOUR=16;BYMINUTE=0"), new Date(1550332800000L),
+              new Date(1550336100000L), 1000, TimeZone.getTimeZone("Africa/Johannesburg"));
       assertEquals(0, conflicts.size());
     }
     {
       //Event A starts before event B, and ends during event B
-      List<MediaPackage> conflicts = schedSvc.findConflictingEvents("Device A", new Date(currentTime + hours(23) + minutes(30)), new Date(currentTime + hours(24) + minutes(30)));
+      List<MediaPackage> conflicts = schedSvc.findConflictingEvents("Device A",
+              new Date(currentTime + hours(23) + minutes(30)),
+              new Date(currentTime + hours(24) + minutes(30)));
       assertEquals(1, conflicts.size());
 
       //Event A starts during event B, and ends after event B
-      conflicts = schedSvc.findConflictingEvents("Device A", new Date(currentTime + hours(24) + minutes(30)), new Date(currentTime + hours(25) + minutes(30)));
+      conflicts = schedSvc.findConflictingEvents("Device A",
+              new Date(currentTime + hours(24) + minutes(30)),
+              new Date(currentTime + hours(25) + minutes(30)));
       assertEquals(1, conflicts.size());
 
       //Event A starts at the same time as event B
-      conflicts = schedSvc.findConflictingEvents("Device A", new Date(currentTime + hours(24)), new Date(currentTime + hours(24) + minutes(30)));
+      conflicts = schedSvc.findConflictingEvents("Device A",
+              new Date(currentTime + hours(24)),
+              new Date(currentTime + hours(24) + minutes(30)));
       assertEquals(1, conflicts.size());
 
       //Event A ends at the same time as event B
-      conflicts = schedSvc.findConflictingEvents("Device A", new Date(currentTime + hours(24) + minutes(10)), new Date(currentTime + hours(25)));
+      conflicts = schedSvc.findConflictingEvents("Device A",
+              new Date(currentTime + hours(24) + minutes(10)),
+              new Date(currentTime + hours(25)));
       assertEquals(1, conflicts.size());
 
       //Event A is contained entirely within event B
-      conflicts = schedSvc.findConflictingEvents("Device A", new Date(currentTime + hours(24) + minutes(10)), new Date(currentTime + hours(24) + minutes(50)));
+      conflicts = schedSvc.findConflictingEvents("Device A",
+              new Date(currentTime + hours(24) + minutes(10)),
+              new Date(currentTime + hours(24) + minutes(50)));
       assertEquals(1, conflicts.size());
 
       //Event A contains event B entirely
-      conflicts = schedSvc.findConflictingEvents("Device A", new Date(currentTime + hours(23)), new Date(currentTime + hours(26)));
+      conflicts = schedSvc.findConflictingEvents("Device A",
+              new Date(currentTime + hours(23)),
+              new Date(currentTime + hours(26)));
       assertEquals(1, conflicts.size());
     }
   }
@@ -1022,8 +1041,9 @@ public class SchedulerServiceImplTest {
 
     // do single update
     final String updatedTitle1 = "Recording 2";
-    final DublinCoreCatalog updatedEvent1 = generateEvent("Device A", Optional.of(mediaPackage.getIdentifier().toString()),
-            Optional.of(updatedTitle1), new Date(currentTime + 10 * 1000), new Date(currentTime + 3610000));
+    final DublinCoreCatalog updatedEvent1 = generateEvent("Device A",
+            Optional.of(mediaPackage.getIdentifier().toString()), Optional.of(updatedTitle1),
+            new Date(currentTime + 10 * 1000), new Date(currentTime + 3610000));
     addDublinCore(Optional.of(elementId), mediaPackage, updatedEvent1);
 
     schedSvc.updateEvent(mediaPackage.getIdentifier().toString(), Optional.empty(), Optional.empty(),
@@ -1191,45 +1211,47 @@ public class SchedulerServiceImplTest {
 
   @Test
   public void testGetCurrentRecording() throws Exception {
-        final long nowMillis = System.currentTimeMillis();
-        final long oneHourMillis = 3600_000;
-        final String captureAgentId = "Device A";
-        final Set<String> userIds = Collections.emptySet();
-        final Map<String, String> wfProperties = this.wfProperties;
-        final Map<String, String> caProperties = Collections.singletonMap("foo", "bar");
-        final Optional<String> schedulingSource = Optional.empty();
-        final String id = "Recording";
+    final long nowMillis = System.currentTimeMillis();
+    final long oneHourMillis = 3600_000;
+    final String captureAgentId = "Device A";
+    final Set<String> userIds = Collections.emptySet();
+    final Map<String, String> wfProperties = this.wfProperties;
+    final Map<String, String> caProperties = Collections.singletonMap("foo", "bar");
+    final Optional<String> schedulingSource = Optional.empty();
+    final String id = "Recording";
 
-        // We add 3 recordings here. One is in the past, one is current, one is in the future.
-        // start = now - 4h, end = now - 2h              0
-        // start = now - 1h, end = now + 1h              1
-        // start = now + 2h, end = now + 4h              2
-        for (int i = 0; i < 3; i++) {
-          final long offset = i * 3 * oneHourMillis;
-          final Date start = new Date(nowMillis - 4 * oneHourMillis + offset);
-          final Date end = new Date(nowMillis - 2 * oneHourMillis  + offset);
-          final MediaPackage mp = generateEvent(Optional.of(id + i));
-          final DublinCoreCatalog dublinCoreCatalog = generateEvent(captureAgentId, Optional.of(mp.getIdentifier().toString()), Optional.of("Test Title" + i), start, end);
-          addDublinCore(Optional.of(mp.getIdentifier().toString()), mp, dublinCoreCatalog);
-          schedSvc.addEvent(
-              start,
-              end,
-              captureAgentId,
-              userIds,
-              mp,
-              wfProperties,
-              caProperties,
-              schedulingSource
-          );
-        }
+    // We add 3 recordings here. One is in the past, one is current, one is in the future.
+    // start = now - 4h, end = now - 2h              0
+    // start = now - 1h, end = now + 1h              1
+    // start = now + 2h, end = now + 4h              2
+    for (int i = 0; i < 3; i++) {
+      final long offset = i * 3 * oneHourMillis;
+      final Date start = new Date(nowMillis - 4 * oneHourMillis + offset);
+      final Date end = new Date(nowMillis - 2 * oneHourMillis  + offset);
+      final MediaPackage mp = generateEvent(Optional.of(id + i));
+      final DublinCoreCatalog dublinCoreCatalog = generateEvent(captureAgentId,
+          Optional.of(mp.getIdentifier().toString()), Optional.of("Test Title" + i), start, end);
+      addDublinCore(Optional.of(mp.getIdentifier().toString()), mp, dublinCoreCatalog);
+      schedSvc.addEvent(
+          start,
+          end,
+          captureAgentId,
+          userIds,
+          mp,
+          wfProperties,
+          caProperties,
+          schedulingSource
+      );
+    }
 
-        // We expect the second of the three recordings to be the current one
-        final Optional<MediaPackage> currentRecording = schedSvc.getCurrentRecording(captureAgentId);
-        assertTrue(currentRecording.isPresent());
-        final TechnicalMetadata technicalMetadata = schedSvc.getTechnicalMetadata(currentRecording.get().getIdentifier().toString());
-        assertEquals(id + 1, currentRecording.get().getIdentifier().toString());
-        assertEquals(nowMillis - oneHourMillis, technicalMetadata.getStartDate().getTime());
-        assertEquals(nowMillis + oneHourMillis, technicalMetadata.getEndDate().getTime());
+    // We expect the second of the three recordings to be the current one
+    final Optional<MediaPackage> currentRecording = schedSvc.getCurrentRecording(captureAgentId);
+    assertTrue(currentRecording.isPresent());
+    final TechnicalMetadata technicalMetadata =
+        schedSvc.getTechnicalMetadata(currentRecording.get().getIdentifier().toString());
+    assertEquals(id + 1, currentRecording.get().getIdentifier().toString());
+    assertEquals(nowMillis - oneHourMillis, technicalMetadata.getStartDate().getTime());
+    assertEquals(nowMillis + oneHourMillis, technicalMetadata.getEndDate().getTime());
   }
 
   @Test
@@ -1254,7 +1276,8 @@ public class SchedulerServiceImplTest {
       final Date start = new Date(nowMillis - 4 * oneHourMillis + offset);
       final Date end = new Date(nowMillis - 2 * oneHourMillis  + offset);
       final MediaPackage mp = generateEvent(Optional.of(id + i));
-      final DublinCoreCatalog dublinCoreCatalog = generateEvent(captureAgentId, Optional.of(mp.getIdentifier().toString()), Optional.of("Test Title" + i), start, end);
+      final DublinCoreCatalog dublinCoreCatalog = generateEvent(captureAgentId,
+          Optional.of(mp.getIdentifier().toString()), Optional.of("Test Title" + i), start, end);
       addDublinCore(Optional.of(mp.getIdentifier().toString()), mp, dublinCoreCatalog);
       schedSvc.addEvent(
           start,
@@ -1293,7 +1316,8 @@ public class SchedulerServiceImplTest {
       final Date start = new Date(nowMillis - 4 * oneHourMillis + offset);
       final Date end = new Date(nowMillis - 2 * oneHourMillis  + offset);
       final MediaPackage mp = generateEvent(Optional.of(id + i));
-      final DublinCoreCatalog dublinCoreCatalog = generateEvent(captureAgentId, Optional.of(mp.getIdentifier().toString()), Optional.of("Test Title" + i), start, end);
+      final DublinCoreCatalog dublinCoreCatalog = generateEvent(captureAgentId,
+          Optional.of(mp.getIdentifier().toString()), Optional.of("Test Title" + i), start, end);
       addDublinCore(Optional.of(mp.getIdentifier().toString()), mp, dublinCoreCatalog);
       schedSvc.addEvent(
           start,
@@ -1310,7 +1334,8 @@ public class SchedulerServiceImplTest {
     // We expect the third of the three recordings to be the upcoming one
     final Optional<MediaPackage> currentRecording = schedSvc.getUpcomingRecording(captureAgentId);
     assertTrue(currentRecording.isPresent());
-    final TechnicalMetadata technicalMetadata = schedSvc.getTechnicalMetadata(currentRecording.get().getIdentifier().toString());
+    final TechnicalMetadata technicalMetadata =
+        schedSvc.getTechnicalMetadata(currentRecording.get().getIdentifier().toString());
     assertEquals(id + 2, currentRecording.get().getIdentifier().toString());
     assertEquals(nowMillis + 2 * oneHourMillis, technicalMetadata.getStartDate().getTime());
     assertEquals(nowMillis + 4 * oneHourMillis, technicalMetadata.getEndDate().getTime());
@@ -1335,7 +1360,8 @@ public class SchedulerServiceImplTest {
       final Date start = new Date(nowMillis - 4 * oneHourMillis + offset);
       final Date end = new Date(nowMillis - 2 * oneHourMillis  + offset);
       final MediaPackage mp = generateEvent(Optional.of(id + i));
-      final DublinCoreCatalog dublinCoreCatalog = generateEvent(captureAgentId, Optional.of(mp.getIdentifier().toString()), Optional.of("Test Title" + i), start, end);
+      final DublinCoreCatalog dublinCoreCatalog = generateEvent(captureAgentId,
+          Optional.of(mp.getIdentifier().toString()), Optional.of("Test Title" + i), start, end);
       addDublinCore(Optional.of(mp.getIdentifier().toString()), mp, dublinCoreCatalog);
       schedSvc.addEvent(
           start,
@@ -1451,7 +1477,7 @@ public class SchedulerServiceImplTest {
   }
 
   private List<String> createEvents(String titlePrefix, String agent, int number, SchedulerService schedulerService)
-      throws Exception {
+          throws Exception {
     List<String> events = new ArrayList<>();
     long offset = System.currentTimeMillis();
     for (int i = 0; i < number; i++) {
@@ -1459,8 +1485,8 @@ public class SchedulerServiceImplTest {
       Date startDateTime = new Date(offset + 10 * 1000 + i * Util.EVENT_MINIMUM_SEPARATION_MILLISECONDS);
       Date endDateTime = new Date(offset + 3610000 + i * Util.EVENT_MINIMUM_SEPARATION_MILLISECONDS);
       offset = endDateTime.getTime();
-      final DublinCoreCatalog event = generateEvent(agent, Optional.empty(), Optional.of(titlePrefix + "-" + i),
-              startDateTime, endDateTime);
+      final DublinCoreCatalog event = generateEvent(agent, Optional.empty(),
+              Optional.of(titlePrefix + "-" + i), startDateTime, endDateTime);
       addDublinCore(Optional.empty(), mp, event);
       schedulerService.addEvent(startDateTime, endDateTime, agent, Collections.<String> emptySet(), mp, wfProperties,
               Collections.<String, String> emptyMap(), Optional.empty());
@@ -1602,8 +1628,9 @@ public class SchedulerServiceImplTest {
     EasyMock.replay(authorizationService);
 
     ElasticsearchIndex esIndex = EasyMock.createNiceMock(ElasticsearchIndex.class);
-    EasyMock.expect(esIndex.addOrUpdateEvent(EasyMock.anyString(), EasyMock.anyObject(java.util.function.Function.class),
-            EasyMock.anyString(), EasyMock.anyObject(User.class))).andReturn(Optional.empty()).atLeastOnce();
+    EasyMock.expect(esIndex.addOrUpdateEvent(EasyMock.anyString(),
+            EasyMock.anyObject(java.util.function.Function.class), EasyMock.anyString(),
+            EasyMock.anyObject(User.class))).andReturn(Optional.empty()).atLeastOnce();
     EasyMock.replay(esIndex);
 
     AssetManagerImpl am = new AssetManagerImpl();

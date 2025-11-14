@@ -37,10 +37,13 @@ public class PropertyReplacementTest {
     Map<String, String> properties = new HashMap<>();
     properties.put("foo", "propertyForFoo");
     properties.put("bar", "propertyForBar");
-    String source = "<config key=\"foo\">${foo}</config><config key=\"bar\">${bar}</config><config key=\"baz\">${baz}</config>";
+    String source = "<config key=\"foo\">${foo}</config>"
+                  + "<config key=\"bar\">${bar}</config>"
+                  + "<config key=\"baz\">${baz}</config>";
     String result = WorkflowConditionInterpreter.replaceVariables(source, x -> null, properties, false);
     assertEquals("Variable replacement failed",
-            "<config key=\"foo\">propertyForFoo</config><config key=\"bar\">propertyForBar</config>"
+            "<config key=\"foo\">propertyForFoo</config>"
+                    + "<config key=\"bar\">propertyForBar</config>"
                     + "<config key=\"baz\">${baz}</config>", result);
   }
 
@@ -49,10 +52,13 @@ public class PropertyReplacementTest {
     Map<String, String> properties = new HashMap<>();
     properties.put("foo", "propertyForFoo");
     properties.put("bar", "propertyForBar");
-    String source = "<config key=\"foo\">${foo}</config><config key=\"bar\">${bar}</config><config key=\"baz\">${baz}</config>";
+    String source = "<config key=\"foo\">${foo}</config>"
+                  + "<config key=\"bar\">${bar}</config>"
+                  + "<config key=\"baz\">${baz}</config>";
     String result = WorkflowConditionInterpreter.replaceVariables(source, x -> null, properties, true);
     assertEquals("Variable replacement failed",
-            "<config key=\"foo\">'propertyForFoo'</config><config key=\"bar\">'propertyForBar'</config>"
+            "<config key=\"foo\">'propertyForFoo'</config>"
+                    + "<config key=\"bar\">'propertyForBar'</config>"
                     + "<config key=\"baz\">${baz}</config>", result);
   }
 
@@ -61,10 +67,13 @@ public class PropertyReplacementTest {
     Map<String, String> properties = new HashMap<>();
     properties.put("foo", "1");
     properties.put("bar", "propertyForBar");
-    String source = "<config key=\"foo\">${foo}</config><config key=\"bar\">${bar}</config><config key=\"baz\">${baz}</config>";
+    String source = "<config key=\"foo\">${foo}</config>"
+                  + "<config key=\"bar\">${bar}</config>"
+                  + "<config key=\"baz\">${baz}</config>";
     String result = WorkflowConditionInterpreter.replaceVariables(source, x -> null, properties, true);
     assertEquals("Variable replacement failed",
-            "<config key=\"foo\">1</config><config key=\"bar\">'propertyForBar'</config>"
+            "<config key=\"foo\">1</config>"
+                    + "<config key=\"bar\">'propertyForBar'</config>"
                     + "<config key=\"baz\">${baz}</config>", result);
   }
 
@@ -73,10 +82,13 @@ public class PropertyReplacementTest {
     Map<String, String> properties = new HashMap<>();
     properties.put("foo", "true");
     properties.put("bar", "propertyForBar");
-    String source = "<config key=\"foo\">${foo}</config><config key=\"bar\">${bar}</config><config key=\"baz\">${baz}</config>";
+    String source = "<config key=\"foo\">${foo}</config>"
+                  + "<config key=\"bar\">${bar}</config>"
+                  + "<config key=\"baz\">${baz}</config>";
     String result = WorkflowConditionInterpreter.replaceVariables(source, x -> null, properties, true);
     assertEquals("Variable replacement failed",
-            "<config key=\"foo\">true</config><config key=\"bar\">'propertyForBar'</config>"
+            "<config key=\"foo\">true</config>"
+                    + "<config key=\"bar\">'propertyForBar'</config>"
                     + "<config key=\"baz\">${baz}</config>", result);
   }
 }

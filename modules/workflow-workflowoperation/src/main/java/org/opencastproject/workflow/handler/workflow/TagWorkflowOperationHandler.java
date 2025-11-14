@@ -80,8 +80,8 @@ public class TagWorkflowOperationHandler extends AbstractWorkflowOperationHandle
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(
+   *      org.opencastproject.workflow.api.WorkflowInstance, JobContext)
    */
   @Override
   public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
@@ -146,8 +146,9 @@ public class TagWorkflowOperationHandler extends AbstractWorkflowOperationHandle
 
       applyTargetTagsToElement(configuredTargetTags, element);
 
-      if (copy)
+      if (copy) {
         mediaPackage.addDerived(element, e);
+      }
     }
     return createResult(mediaPackage, Action.CONTINUE);
   }

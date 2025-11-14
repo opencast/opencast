@@ -247,7 +247,8 @@ public final class WorkflowOperationSkippingIntricateTest {
     assertEquals(OperationState.SKIPPED, instanceFromDb.getOperations().get(0).getState());
   }
 
-  private WorkflowInstance startAndWait(WorkflowDefinition definition, MediaPackage mp, Map<String, String> properties) throws Exception {
+  private WorkflowInstance startAndWait(WorkflowDefinition definition, MediaPackage mp, Map<String, String> properties)
+          throws Exception {
 
     WorkflowStateListener stateListener = new WorkflowStateListener(WorkflowState.SUCCEEDED);
     service.addWorkflowListener(stateListener);

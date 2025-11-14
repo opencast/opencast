@@ -65,7 +65,7 @@ public class WorkflowInstanceTest {
     Assert.assertEquals(def.getId(), instance.getTemplate());
     Assert.assertEquals("value1", instance.getConfiguration("key1"));
     def.setTitle("a title");
-  instance = new WorkflowInstance(def, null, null, null, null);
+    instance = new WorkflowInstance(def, null, null, null, null);
     Assert.assertEquals(def.getTitle(), instance.getTitle());
   }
 
@@ -85,7 +85,20 @@ public class WorkflowInstanceTest {
   @Test
   public void testMediaPackageDeserialization() throws Exception {
     WorkflowInstance workflow = new WorkflowInstance();
-    String xml = "<mediapackage xmlns=\"http://mediapackage.opencastproject.org\" start=\"2007-12-05T13:40:00\" duration=\"1004400000\"><media><track id=\"track-1\" type=\"presenter/source\"><mimetype>audio/mp3</mimetype><url>http://localhost:8080/workflow/samples/audio.mp3</url><checksum type=\"md5\">950f9fa49caa8f1c5bbc36892f6fd062</checksum><duration>10472</duration><audio><channels>2</channels><bitdepth>0</bitdepth><bitrate>128004.0</bitrate><samplingrate>44100</samplingrate></audio></track><track id=\"track-2\" type=\"presenter/source\"><mimetype>video/quicktime</mimetype><url>http://localhost:8080/workflow/samples/camera.mpg</url><checksum type=\"md5\">43b7d843b02c4a429b2f547a4f230d31</checksum><duration>14546</duration><video><device type=\"UFG03\" version=\"30112007\" vendor=\"Unigraf\" /><encoder type=\"H.264\" version=\"7.4\" vendor=\"Apple Inc\" /><resolution>640x480</resolution><scanType type=\"progressive\" /><bitrate>540520</bitrate><frameRate>2</frameRate></video></track></media><metadata><catalog id=\"catalog-1\" type=\"dublincore/episode\"><mimetype>text/xml</mimetype><url>http://localhost:8080/workflow/samples/dc-1.xml</url><checksum type=\"md5\">20e466615251074e127a1627fd0dae3e</checksum></catalog></metadata></mediapackage>";
+    String xml = "<mediapackage xmlns=\"http://mediapackage.opencastproject.org\" start=\"2007-12-05T13:40:00\" "
+        + "duration=\"1004400000\"><media><track id=\"track-1\" type=\"presenter/source\">"
+        + "<mimetype>audio/mp3</mimetype><url>http://localhost:8080/workflow/samples/audio.mp3</url>"
+        + "<checksum type=\"md5\">950f9fa49caa8f1c5bbc36892f6fd062</checksum><duration>10472</duration><audio>"
+        + "<channels>2</channels><bitdepth>0</bitdepth><bitrate>128004.0</bitrate><samplingrate>44100</samplingrate>"
+        + "</audio></track><track id=\"track-2\" type=\"presenter/source\"><mimetype>video/quicktime</mimetype>"
+        + "<url>http://localhost:8080/workflow/samples/camera.mpg</url>"
+        + "<checksum type=\"md5\">43b7d843b02c4a429b2f547a4f230d31</checksum><duration>14546</duration><video>"
+        + "<device type=\"UFG03\" version=\"30112007\" vendor=\"Unigraf\" />"
+        + "<encoder type=\"H.264\" version=\"7.4\" vendor=\"Apple Inc\" /><resolution>640x480</resolution>"
+        + "<scanType type=\"progressive\" /><bitrate>540520</bitrate><frameRate>2</frameRate></video></track></media>"
+        + "<metadata><catalog id=\"catalog-1\" type=\"dublincore/episode\"><mimetype>text/xml</mimetype>"
+        + "<url>http://localhost:8080/workflow/samples/dc-1.xml</url>"
+        + "<checksum type=\"md5\">20e466615251074e127a1627fd0dae3e</checksum></catalog></metadata></mediapackage>";
     MediaPackage src = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().loadFromXml(xml);
     workflow.setMediaPackage(src);
     Assert.assertEquals(2, workflow.getMediaPackage().getTracks().length);
@@ -138,7 +151,10 @@ public class WorkflowInstanceTest {
     Assert.assertEquals(workflow.getMediaPackage().getTracks()[0].getFlavor(),
             instance2.getMediaPackage().getTracks()[0].getFlavor());
 
-    String namespaceXml = "<workflow xmlns=\"http://workflow.opencastproject.org\" xmlns:mp=\"http://mediapackage.opencastproject.org\"><parent/><mp:mediapackage><mp:media><mp:track type=\"presentation/source\" id=\"track-1\"><mp:url>http://testing</mp:url></mp:track></mp:media></mp:mediapackage></workflow>";
+    String namespaceXml = "<workflow xmlns=\"http://workflow.opencastproject.org\" "
+        + "xmlns:mp=\"http://mediapackage.opencastproject.org\"><parent/><mp:mediapackage><mp:media>"
+        + "<mp:track type=\"presentation/source\" id=\"track-1\"><mp:url>http://testing</mp:url></mp:track>"
+        + "</mp:media></mp:mediapackage></workflow>";
     WorkflowInstance instance3 = XmlWorkflowParser.parseWorkflowInstance(namespaceXml);
     Assert.assertEquals(workflow.getMediaPackage().getTracks()[0].getFlavor(),
             instance3.getMediaPackage().getTracks()[0].getFlavor());

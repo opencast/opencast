@@ -107,8 +107,8 @@ public class TagByDublinCoreTermWOH extends ResumableWorkflowOperationHandlerBas
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(
+   *      org.opencastproject.workflow.api.WorkflowInstance, JobContext)
    */
   @Override
   public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
@@ -138,7 +138,8 @@ public class TagByDublinCoreTermWOH extends ResumableWorkflowOperationHandlerBas
     }
 
     // Find Catalog
-    Catalog[] catalogs = mediaPackage.getCatalogs(new MediaPackageElementFlavor("dublincore", StringUtils.lowerCase(configuredCatalog)));
+    Catalog[] catalogs = mediaPackage.getCatalogs(new MediaPackageElementFlavor("dublincore",
+        StringUtils.lowerCase(configuredCatalog)));
 
     if (catalogs != null && catalogs.length > 0) {
       Boolean foundValue = false;

@@ -68,7 +68,9 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
   private long jobBarrierPollingInterval = JobBarrier.DEFAULT_POLLING_INTERVAL;
 
   /** Config for Tag Parsing operation */
-  protected enum Configuration { none, one, many };
+  protected enum Configuration {
+    none, one, many
+  };
 
   public static final String TARGET_FLAVORS = "target-flavors";
   public static final String TARGET_FLAVOR = "target-flavor";
@@ -94,8 +96,8 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(
+   *      org.opencastproject.workflow.api.WorkflowInstance, JobContext)
    */
   @Override
   public abstract WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
@@ -104,8 +106,8 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#skip(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#skip(
+   *      org.opencastproject.workflow.api.WorkflowInstance, JobContext)
    */
   @Override
   public WorkflowOperationResult skip(WorkflowInstance workflowInstance, JobContext context)
@@ -116,8 +118,8 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#destroy(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#destroy(
+   *      org.opencastproject.workflow.api.WorkflowInstance, JobContext)
    */
   @Override
   public void destroy(WorkflowInstance workflowInstance, JobContext context) throws WorkflowOperationException {
@@ -304,7 +306,8 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
   /**
    * Get a configuration option.
    *
-   * @deprecated use {@link #getConfig(WorkflowInstance, String)} or {@link #getOptConfig(org.opencastproject.workflow.api.WorkflowInstance, String)}
+   * @deprecated use {@link #getConfig(WorkflowInstance, String)} or
+   *             {@link #getOptConfig(org.opencastproject.workflow.api.WorkflowInstance, String)}
    */
   protected Optional<String> getCfg(WorkflowInstance wi, String key) {
     return Optional.ofNullable(wi.getCurrentOperation().getConfiguration(key));
@@ -369,16 +372,19 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
   }
 
   /**
-   * Returns a ConfiguredTagsAndFlavors instance, which includes all specified source/target tags and flavors if they are valid
-   * Lists can be empty, if no values were specified! This is to enable WOHs to individually check if a given tag/flavor was set.
-   * This also means that you should use Configuration.many as parameter, if a tag/flavor is optional.
+   * Returns a ConfiguredTagsAndFlavors instance, which includes all specified source/target tags and flavors if they
+   * are valid. Lists can be empty, if no values were specified! This is to enable WOHs to individually check if a
+   * given tag/flavor was set. This also means that you should use Configuration.many as parameter, if a tag/flavor is
+   * optional.
    * @param srcTags none, one or many
    * @param srcFlavors none, one or many
    * @param targetFlavors none, one or many
    * @param targetTags none, one or many
    * @return ConfiguredTagsAndFlavors object including lists for the configured tags/flavors
    */
-  protected ConfiguredTagsAndFlavors getTagsAndFlavors(WorkflowInstance workflow, Configuration srcTags, Configuration srcFlavors, Configuration targetTags, Configuration targetFlavors) throws WorkflowOperationException {
+  protected ConfiguredTagsAndFlavors getTagsAndFlavors(WorkflowInstance workflow, Configuration srcTags,
+      Configuration srcFlavors, Configuration targetTags, Configuration targetFlavors)
+          throws WorkflowOperationException {
     WorkflowOperationInstance operation = workflow.getCurrentOperation();
     ConfiguredTagsAndFlavors tagsAndFlavors = new ConfiguredTagsAndFlavors();
     MediaPackageElementFlavor flavor;
@@ -602,10 +608,11 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof WorkflowOperationHandler) {
-      if (id != null)
+      if (id != null) {
         return id.equals(((WorkflowOperationHandler) obj).getId());
-      else
+      } else {
         return this == obj;
+      }
     }
     return false;
   }

@@ -161,6 +161,7 @@ nav:
           - AWS AutoScaling: "configuration/terminationstate.aws.autoscaling.md"
       - Text Extraction: "configuration/textextraction.md"
       - Timeline Previews: "configuration/timelinepreviews.md"
+      - Tobira: "configuration/tobira.md"
       - Transcription configuration:
           - AmberScript: "configuration/transcription.configuration/amberscripttranscripts.md"
           - Google Speech: "configuration/transcription.configuration/googlespeechtranscripts.md"

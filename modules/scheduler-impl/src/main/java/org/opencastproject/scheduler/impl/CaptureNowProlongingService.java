@@ -397,8 +397,9 @@ public class CaptureNowProlongingService implements ManagedService {
 
     List<MediaPackage> events = schedulerService.findConflictingEvents(agentId, period.getStart(), prolongedEndDate);
     for (MediaPackage conflictMediaPackage : events) {
-      if (eventId.equals(conflictMediaPackage.getIdentifier().toString()))
+      if (eventId.equals(conflictMediaPackage.getIdentifier().toString())) {
         continue;
+      }
 
       Optional<DublinCoreCatalog> conflictingDc = DublinCoreUtil.loadEpisodeDublinCore(workspace, conflictMediaPackage);
       if (conflictingDc.isEmpty()) {
@@ -414,7 +415,8 @@ public class CaptureNowProlongingService implements ManagedService {
               EncodingSchemeUtils.encodePeriod(new DCMIPeriod(period.getStart(), prolongedEndDate), Precision.Second));
 
       logger.info(
-              "A scheduled event is preventing the current recording on agent '{}' to be further extended. Extending to one minute before the conflicting event",
+              "A scheduled event is preventing the current recording on agent '{}' to be further extended. "
+                  + "Extending to one minute before the conflicting event",
               agentId);
       stop(agentId);
       break;

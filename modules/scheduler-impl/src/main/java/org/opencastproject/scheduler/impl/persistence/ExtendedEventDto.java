@@ -40,12 +40,36 @@ import javax.persistence.TemporalType;
 @IdClass(EventIdPK.class)
 @Entity(name = "ExtendedEvent")
 @NamedQueries({
-    @NamedQuery(name = "ExtendedEvent.findAll", query = "SELECT e FROM ExtendedEvent e WHERE e.organization = :org"),
-    @NamedQuery(name = "ExtendedEvent.countAll", query = "SELECT COUNT(e) FROM ExtendedEvent e"),
-    @NamedQuery(name = "ExtendedEvent.findEvents", query = "SELECT e.mediaPackageId FROM ExtendedEvent e WHERE e.organization = :org AND e.captureAgentId = :ca AND e.startDate < :end AND e.endDate > :start ORDER BY e.startDate ASC"),
-    @NamedQuery(name = "ExtendedEvent.searchEventsCA", query = "SELECT e FROM ExtendedEvent e WHERE e.organization = :org AND e.captureAgentId = :ca AND e.startDate >= :startFrom AND e.startDate < :startTo AND e.endDate >= :endFrom AND e.endDate < :endTo ORDER BY e.startDate ASC"),
-    @NamedQuery(name = "ExtendedEvent.searchEvents", query = "SELECT e FROM ExtendedEvent e WHERE e.organization = :org AND e.startDate >= :startFrom AND e.startDate < :startTo AND e.endDate >= :endFrom AND e.endDate < :endTo ORDER BY e.startDate ASC"),
-    @NamedQuery(name = "ExtendedEvent.knownRecordings", query = "SELECT e FROM ExtendedEvent e WHERE e.organization = :org AND e.recordingState IS NOT NULL AND e.recordingLastHeard IS NOT NULL")
+    @NamedQuery(
+        name = "ExtendedEvent.findAll",
+        query = "SELECT e FROM ExtendedEvent e WHERE e.organization = :org"
+    ),
+    @NamedQuery(
+        name = "ExtendedEvent.countAll",
+        query = "SELECT COUNT(e) FROM ExtendedEvent e"
+    ),
+    @NamedQuery(
+        name = "ExtendedEvent.findEvents",
+        query = "SELECT e.mediaPackageId FROM ExtendedEvent e WHERE e.organization = :org AND e.captureAgentId = :ca "
+            + "AND e.startDate < :end AND e.endDate > :start ORDER BY e.startDate ASC"
+    ),
+    @NamedQuery(
+        name = "ExtendedEvent.searchEventsCA",
+        query = "SELECT e FROM ExtendedEvent e WHERE e.organization = :org AND e.captureAgentId = :ca "
+            + "AND e.startDate >= :startFrom AND e.startDate < :startTo "
+            + "AND e.endDate >= :endFrom AND e.endDate < :endTo ORDER BY e.startDate ASC"
+    ),
+    @NamedQuery(
+        name = "ExtendedEvent.searchEvents",
+        query = "SELECT e FROM ExtendedEvent e WHERE e.organization = :org "
+            + "AND e.startDate >= :startFrom AND e.startDate < :startTo "
+            + "AND e.endDate >= :endFrom AND e.endDate < :endTo ORDER BY e.startDate ASC"
+    ),
+    @NamedQuery(
+        name = "ExtendedEvent.knownRecordings",
+        query = "SELECT e FROM ExtendedEvent e WHERE e.organization = :org "
+            + "AND e.recordingState IS NOT NULL AND e.recordingLastHeard IS NOT NULL"
+    )
 })
 @Table(name = "oc_scheduled_extended_event", indexes = {
     @Index(name = "IX_oc_scheduled_extended_event_organization", columnList = ("organization")),

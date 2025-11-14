@@ -106,14 +106,16 @@ public class SeriesWorkflowOperationHandlerTest {
 
     SeriesCatalogUIAdapter adapter = EasyMock.createNiceMock(SeriesCatalogUIAdapter.class);
     EasyMock.expect(adapter.getOrganization()).andReturn(new DefaultOrganization().getId()).anyTimes();
-    EasyMock.expect(adapter.handlesOrganization(EasyMock.eq(DefaultOrganization.DEFAULT_ORGANIZATION_ID))).andReturn(true).anyTimes();
+    EasyMock.expect(adapter.handlesOrganization(EasyMock.eq(DefaultOrganization.DEFAULT_ORGANIZATION_ID)))
+            .andReturn(true).anyTimes();
     EasyMock.expect(adapter.getFlavor()).andReturn(MediaPackageElementFlavor.parseFlavor("creativecommons/series"))
             .anyTimes();
     EasyMock.replay(adapter);
 
     SeriesCatalogUIAdapter seriesAdapter = EasyMock.createNiceMock(SeriesCatalogUIAdapter.class);
     EasyMock.expect(seriesAdapter.getOrganization()).andReturn(new DefaultOrganization().getId()).anyTimes();
-    EasyMock.expect(seriesAdapter.handlesOrganization(EasyMock.eq(DefaultOrganization.DEFAULT_ORGANIZATION_ID))).andReturn(true).anyTimes();
+    EasyMock.expect(seriesAdapter.handlesOrganization(EasyMock.eq(DefaultOrganization.DEFAULT_ORGANIZATION_ID)))
+            .andReturn(true).anyTimes();
     EasyMock.expect(seriesAdapter.getFlavor()).andReturn(MediaPackageElementFlavor.parseFlavor("dublincore/series"))
             .anyTimes();
     EasyMock.replay(seriesAdapter);
@@ -218,14 +220,15 @@ public class SeriesWorkflowOperationHandlerTest {
 
     // Prepare "copy metadata" property
     String[] extraMetadata = {
-            // Append a full metadata field, with NS
-            DublinCore.PROPERTY_LANGUAGE.toString(),
-            // Field without namespace
-            DublinCore.PROPERTY_CONTRIBUTOR.getLocalName(),
-            // Field with a namespace different than the default
-            otherProperty.toString(),
-            // Field that does not exist in the series catalog
-            "does-not-exist" };
+        // Append a full metadata field, with NS
+        DublinCore.PROPERTY_LANGUAGE.toString(),
+        // Field without namespace
+        DublinCore.PROPERTY_CONTRIBUTOR.getLocalName(),
+        // Field with a namespace different than the default
+        otherProperty.toString(),
+        // Field that does not exist in the series catalog
+        "does-not-exist"
+    };
 
     WorkflowInstance instance = new WorkflowInstance();
     List<WorkflowOperationInstance> ops = new ArrayList<WorkflowOperationInstance>();

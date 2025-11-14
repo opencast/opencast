@@ -68,7 +68,8 @@ public class ResumableWorkflowOperationHandlerBase extends AbstractWorkflowOpera
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#activate(org.osgi.service.component.ComponentContext)
+   * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#activate(
+   * org.osgi.service.component.ComponentContext)
    */
   public void activate(ComponentContext componentContext) {
     this.componentContext = componentContext;
@@ -80,18 +81,21 @@ public class ResumableWorkflowOperationHandlerBase extends AbstractWorkflowOpera
    * overwriting this class.
    */
   public void deactivate() {
-    if (staticResourceRegistration != null)
+    if (staticResourceRegistration != null) {
       staticResourceRegistration.unregister();
+    }
   }
 
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.ResumableWorkflowOperationHandler#getHoldStateUserInterfaceURL(org.opencastproject.workflow.api.WorkflowInstance)
+   * @see org.opencastproject.workflow.api.ResumableWorkflowOperationHandler#getHoldStateUserInterfaceURL(
+   *      org.opencastproject.workflow.api.WorkflowInstance)
    */
   public String getHoldStateUserInterfaceURL(WorkflowInstance workflowInstance) throws WorkflowOperationException {
-    if (staticResource == null)
+    if (staticResource == null) {
       return null;
+    }
     return staticResource.getDefaultUrl();
   }
 
@@ -127,13 +131,15 @@ public class ResumableWorkflowOperationHandlerBase extends AbstractWorkflowOpera
    */
   protected String registerHoldStateUserInterface(final String resourcePath) {
     String alias = "/workflow/hold/" + getClass().getName().toLowerCase();
-    if (resourcePath == null)
+    if (resourcePath == null) {
       throw new IllegalArgumentException("Classpath must not be null");
+    }
     String path = FilenameUtils.getPathNoEndSeparator(resourcePath);
     String welcomeFile = FilenameUtils.getName(resourcePath);
     staticResource = new StaticResource(getClass().getClassLoader(), path, alias, welcomeFile);
     Dictionary<String, String> props = new Hashtable<>();
-    props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT, "(" + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME + "=" + RestConstants.HTTP_CONTEXT_ID + ")");
+    props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT,
+        "(" + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME + "=" + RestConstants.HTTP_CONTEXT_ID + ")");
     props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_NAME, alias);
     props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, alias + "/*");
     staticResourceRegistration = componentContext.getBundleContext().registerService(Servlet.class.getName(),
@@ -146,8 +152,8 @@ public class ResumableWorkflowOperationHandlerBase extends AbstractWorkflowOpera
    *
    * This default implementation will put the workflow into the hold state.
    *
-   * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
+   * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#start(
+   *      org.opencastproject.workflow.api.WorkflowInstance, JobContext)
    */
   @Override
   public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
@@ -158,8 +164,8 @@ public class ResumableWorkflowOperationHandlerBase extends AbstractWorkflowOpera
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.ResumableWorkflowOperationHandler#resume(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext, java.util.Map)
+   * @see org.opencastproject.workflow.api.ResumableWorkflowOperationHandler#resume(
+   *      org.opencastproject.workflow.api.WorkflowInstance, JobContext, java.util.Map)
    */
   @Override
   public WorkflowOperationResult resume(WorkflowInstance workflowInstance, JobContext context,

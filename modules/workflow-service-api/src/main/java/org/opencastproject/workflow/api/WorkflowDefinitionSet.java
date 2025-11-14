@@ -42,8 +42,9 @@ public class WorkflowDefinitionSet {
 
   public WorkflowDefinitionSet(Collection<WorkflowDefinition> definitions) {
     this.definitions = new ArrayList<WorkflowDefinition>();
-    if (definitions != null)
+    if (definitions != null) {
       this.definitions.addAll(definitions);
+    }
   }
 
   public WorkflowDefinitionSet() {

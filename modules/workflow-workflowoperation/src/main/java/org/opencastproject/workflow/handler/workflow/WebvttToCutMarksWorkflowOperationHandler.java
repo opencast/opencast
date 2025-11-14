@@ -285,10 +285,11 @@ public class WebvttToCutMarksWorkflowOperationHandler extends AbstractWorkflowOp
       cutMarks.add(lastMark);
 
 
-      // handle start and end
-      // crop start and end
-      // (assumes that cropping is only necessary due to the bufferTime, does not include cases like the webvtt having timestamps outside of the videos runtime)
-      // (also assumes that the video starts at 0)
+      // handle start and end.
+      // crop start and end.
+      // (assumes that cropping is only necessary due to the bufferTime, does not include cases like the webvtt having
+      // timestamps outside of the videos runtime).
+      // (also assumes that the video starts at 0).
       Times firstCutMark = cutMarks.get(0);
       if (treatmentStart == Treatment.ALWAYS_INCLUDE) {
         updateTimesBegin(firstCutMark, 0L);
@@ -386,7 +387,8 @@ public class WebvttToCutMarksWorkflowOperationHandler extends AbstractWorkflowOp
           logger.debug("WebVTT InputStream is null (mediapackage {})", mp.getIdentifier().toString());
         }
       } catch (IOException e) {
-        logger.warn("Couldn't close '{}' properly (mediapackage {})", webvttURI.toString(), mp.getIdentifier().toString());
+        logger.warn("Couldn't close '{}' properly (mediapackage {})", webvttURI.toString(),
+            mp.getIdentifier().toString());
       }
     }
 

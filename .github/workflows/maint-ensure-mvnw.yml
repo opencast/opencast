@@ -1,4 +1,4 @@
-name: Ensure mvnw and not mvn
+name: Maintenance » Ensure mvnw and not mvn
 
 on:
   pull_request:

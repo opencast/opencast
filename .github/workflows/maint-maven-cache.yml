@@ -1,4 +1,4 @@
-name: Build Maven Cache
+name: Maintenance » Build Maven Cache
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
     - cron: '0 6 * * 6'
 
 jobs:
-  build:
+  mvn-cache:
     name: build maven cache
     runs-on: ubuntu-latest
     if: github.repository == 'opencast/opencast'

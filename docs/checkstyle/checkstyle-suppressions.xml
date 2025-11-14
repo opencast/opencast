@@ -27,16 +27,9 @@
     <suppress checks="LineLength" files="modules/mpeg7/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/oaipmh/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/oaipmh-persistence/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/scheduler-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/scheduler-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/schema/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/serviceregistry/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/usertracking-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/workflow-condition-parser/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/workflow-service-api/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/workflow-service-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/workflow-service-remote/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/workflow-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/working-file-repository-service-impl/.+\.(java|properties)"/>
 
     <suppress checks="Indentation" files="modules/admin-ui/.+\.java"/>
@@ -55,11 +48,7 @@
     <suppress checks="Indentation" files="modules/metadata/.+\.java"/>
     <suppress checks="Indentation" files="modules/oaipmh/.+\.java"/>
     <suppress checks="Indentation" files="modules/oaipmh-persistence/.+\.java"/>
-    <suppress checks="Indentation" files="modules/scheduler-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/serviceregistry/.+\.java"/>
-    <suppress checks="Indentation" files="modules/workflow-service-impl/.+\.java"/>
-    <suppress checks="Indentation" files="modules/workflow-service-remote/.+\.java"/>
-    <suppress checks="Indentation" files="modules/workflow-workflowoperation/.+\.java"/>
     <suppress checks="Indentation" files="modules/working-file-repository-service-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/working-file-repository-service-remote/.+\.java"/>
 
@@ -84,16 +73,9 @@
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/mpeg7/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/oaipmh-persistence/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/oaipmh/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/scheduler-impl/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/scheduler-remote/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/schema/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/serviceregistry/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/usertracking-impl/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/workflow-condition-parser/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/workflow-service-api/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/workflow-service-impl/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/workflow-service-remote/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/workflow-workflowoperation/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/working-file-repository-service-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/working-file-repository-service-remote/.+\.java"/>
 </suppressions>

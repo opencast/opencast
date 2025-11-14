@@ -308,7 +308,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    */
   private void sendSchedulerUpdate(SchedulerItemList list) {
     while (schedulerUpdateHandlers.size() != 1) {
-      logger.warn("Expecting 1 handler, but {} are registered.  Waiting 10s then retrying...", schedulerUpdateHandlers.size());
+      logger.warn("Expecting 1 handler, but {} are registered.  Waiting 10s then retrying...",
+          schedulerUpdateHandlers.size());
       try {
         Thread.sleep(10000L);
       } catch (InterruptedException e) { /* swallow this, nothing to do */ }
@@ -375,7 +376,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   @Override
   public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
     if (properties != null) {
-      final Optional<Integer> cacheExpireDuration = OsgiUtil.getOptCfgAsInt(properties, CFG_KEY_LAST_MODIFIED_CACHE_EXPIRE);
+      final Optional<Integer> cacheExpireDuration =
+          OsgiUtil.getOptCfgAsInt(properties, CFG_KEY_LAST_MODIFIED_CACHE_EXPIRE);
       if (cacheExpireDuration.isPresent()) {
         lastModifiedCache = CacheBuilder.newBuilder().expireAfterWrite(cacheExpireDuration.get(), TimeUnit.SECONDS)
                 .build();
@@ -414,8 +416,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     notNull(wfProperties, "wfProperties");
     notNull(caMetadata, "caMetadata");
     notNull(schedulingSource, "schedulingSource");
-    if (endDateTime.before(startDateTime))
+    if (endDateTime.before(startDateTime)) {
       throw new IllegalArgumentException("The end date is before the start date");
+    }
 
     final String mediaPackageId = mediaPackage.getIdentifier().toString();
 
@@ -456,8 +459,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
               Optional.of(endDateTime), Optional.of(captureAgentId), Optional.of(finalCaProperties));
 
       // Update Elasticsearch index
-      updateEventInIndex(mediaPackageId, Optional.of(acl), dublinCore, Optional.of(startDateTime), Optional.of(endDateTime),
-          Optional.of(userIds), Optional.of(captureAgentId), Optional.of(finalCaProperties), Optional.empty());
+      updateEventInIndex(mediaPackageId, Optional.of(acl), dublinCore, Optional.of(startDateTime),
+          Optional.of(endDateTime), Optional.of(userIds), Optional.of(captureAgentId), Optional.of(finalCaProperties),
+          Optional.empty());
 
       // Update last modified
       touchLastEntry(captureAgentId);
@@ -550,7 +554,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         mediaPackage.setIdentifier(id);
 
         // Update dublincore title and temporal
-        String newTitle = dc.getFirst(DublinCore.PROPERTY_TITLE) + String.format(" %0" + Integer.toString(periods.size()).length() + "d", currentCounter + 1);
+        String newTitle = dc.getFirst(DublinCore.PROPERTY_TITLE)
+            + String.format(" %0" + Integer.toString(periods.size()).length() + "d", currentCounter + 1);
         dc.set(DublinCore.PROPERTY_TITLE, newTitle);
         DublinCoreValue eventTime = EncodingSchemeUtils.encodePeriod(new DCMIPeriod(startDate, endDate),
                 Precision.Second);
@@ -590,12 +595,13 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         }
 
         // Update live event
-        updateLiveEvent(mediaPackageId, Optional.of(acl), dublinCore, Optional.of(startDateTime), Optional.of(endDateTime),
-                Optional.of(captureAgentId), Optional.of(finalCaProperties));
+        updateLiveEvent(mediaPackageId, Optional.of(acl), dublinCore, Optional.of(startDateTime),
+                Optional.of(endDateTime), Optional.of(captureAgentId), Optional.of(finalCaProperties));
 
         // Update Elasticsearch index
-        updateEventInIndex(mediaPackageId, Optional.of(acl), dublinCore, Optional.of(startDateTime), Optional.of(endDateTime),
-                Optional.of(userIds), Optional.of(captureAgentId), Optional.of(finalCaProperties), Optional.empty());
+        updateEventInIndex(mediaPackageId, Optional.of(acl), dublinCore, Optional.of(startDateTime),
+                Optional.of(endDateTime), Optional.of(userIds), Optional.of(captureAgentId),
+                Optional.of(finalCaProperties), Optional.empty());
 
         scheduledEvents.put(mediaPackageId, event);
         for (MediaPackageElement mediaPackageElement : mediaPackage.getElements()) {
@@ -620,18 +626,18 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   @Override
-  public void updateEvent(final String mpId, Optional<Date> startDateTime, Optional<Date> endDateTime, Optional<String> captureAgentId,
-          Optional<Set<String>> userIds, Optional<MediaPackage> mediaPackage, Optional<Map<String, String>> wfProperties,
-          Optional<Map<String, String>> caMetadata)
+  public void updateEvent(final String mpId, Optional<Date> startDateTime, Optional<Date> endDateTime,
+          Optional<String> captureAgentId, Optional<Set<String>> userIds, Optional<MediaPackage> mediaPackage,
+          Optional<Map<String, String>> wfProperties, Optional<Map<String, String>> caMetadata)
                   throws NotFoundException, UnauthorizedException, SchedulerException {
     updateEventInternal(mpId, startDateTime, endDateTime, captureAgentId, userIds, mediaPackage,
             wfProperties, caMetadata, false);
   }
 
   @Override
-  public void updateEvent(final String mpId, Optional<Date> startDateTime, Optional<Date> endDateTime, Optional<String> captureAgentId,
-          Optional<Set<String>> userIds, Optional<MediaPackage> mediaPackage, Optional<Map<String, String>> wfProperties,
-          Optional<Map<String, String>> caMetadata, boolean allowConflict)
+  public void updateEvent(final String mpId, Optional<Date> startDateTime, Optional<Date> endDateTime,
+          Optional<String> captureAgentId, Optional<Set<String>> userIds, Optional<MediaPackage> mediaPackage,
+          Optional<Map<String, String>> wfProperties, Optional<Map<String, String>> caMetadata, boolean allowConflict)
                 throws NotFoundException, UnauthorizedException, SchedulerException {
     updateEventInternal(mpId, startDateTime, endDateTime, captureAgentId, userIds, mediaPackage,
             wfProperties, caMetadata, allowConflict);
@@ -639,8 +645,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   private void updateEventInternal(final String mpId, Optional<Date> startDateTime,
           Optional<Date> endDateTime, Optional<String> captureAgentId, Optional<Set<String>> userIds,
-          Optional<MediaPackage> mediaPackageOpt, Optional<Map<String, String>> wfProperties, Optional<Map<String, String>> caMetadata,
-          boolean allowConflict) throws NotFoundException, SchedulerException {
+          Optional<MediaPackage> mediaPackageOpt, Optional<Map<String, String>> wfProperties,
+          Optional<Map<String, String>> caMetadata, boolean allowConflict)
+                throws NotFoundException, SchedulerException {
     notEmpty(mpId, "mpId");
     notNull(startDateTime, "startDateTime");
     notNull(endDateTime, "endDateTime");
@@ -653,15 +660,17 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     try {
       Optional<Snapshot> optSnapshot = assetManager.getLatestSnapshot(mpId);
       Optional<ExtendedEventDto> optExtEvent = persistence.getEvent(mpId);
-      if (optSnapshot.isEmpty() || optExtEvent.isEmpty())
+      if (optSnapshot.isEmpty() || optExtEvent.isEmpty()) {
         throw new NotFoundException("No event found while updating event " + mpId);
+      }
 
       Snapshot snapshot = optSnapshot.get();
       MediaPackage archivedMediaPackage = snapshot.getMediaPackage();
 
       Optional<DublinCoreCatalog> archivedDublinCoreOpt = loadEpisodeDublinCoreFromAsset(snapshot);
-      if (archivedDublinCoreOpt.isEmpty())
+      if (archivedDublinCoreOpt.isEmpty()) {
         throw new NotFoundException("No dublincore found while updating event " + mpId);
+      }
       DublinCoreCatalog archivedDublinCore = archivedDublinCoreOpt.get();
       AccessControlList archivedAcl = authorizationService.getActiveAcl(archivedMediaPackage).getA();
 
@@ -669,8 +678,10 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       Date start = extendedEventDto.getStartDate();
       Date end = extendedEventDto.getEndDate();
 
-      if ((startDateTime.isPresent() || endDateTime.isPresent()) && endDateTime.orElse(end).before(startDateTime.orElse(start)))
+      if ((startDateTime.isPresent() || endDateTime.isPresent())
+          && endDateTime.orElse(end).before(startDateTime.orElse(start))) {
         throw new SchedulerException("The end date is before the start date");
+      }
 
       String agentId = extendedEventDto.getCaptureAgentId();
       Optional<String> seriesId = Optional.ofNullable(archivedMediaPackage.getSeries());
@@ -712,8 +723,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         caProperties = caMetadata.get();
       }
 
-      if (captureAgentId.isPresent())
+      if (captureAgentId.isPresent()) {
         propertiesChanged = true;
+      }
 
       Optional<AccessControlList> changedAclOpt = Optional.empty();
       Optional<DublinCoreCatalog> changedDublinCoreOpt = Optional.empty();
@@ -811,18 +823,21 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   private Optional<DublinCoreCatalog> loadEpisodeDublinCoreFromAsset(Snapshot snapshot) {
     Optional<MediaPackageElement> dcCatalog = Arrays.stream(snapshot.getMediaPackage().getElements())
-        .filter(MediaPackageSupport.Filters::isEpisodeDublinCore)
-        .findFirst();
-    if (dcCatalog.isEmpty())
+            .filter(MediaPackageSupport.Filters::isEpisodeDublinCore)
+            .findFirst();
+    if (dcCatalog.isEmpty()) {
       return Optional.empty();
+    }
 
     Optional<Asset> asset = assetManager.getAsset(snapshot.getVersion(),
             snapshot.getMediaPackage().getIdentifier().toString(), dcCatalog.get().getIdentifier());
-    if (asset.isEmpty())
+    if (asset.isEmpty()) {
       return Optional.empty();
+    }
 
-    if (Availability.OFFLINE.equals(asset.get().getAvailability()))
+    if (Availability.OFFLINE.equals(asset.get().getAvailability())) {
       return Optional.empty();
+    }
 
     InputStream inputStream = null;
     try {
@@ -896,12 +911,14 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
     try {
       Optional<Snapshot> optSnapshot = assetManager.getLatestSnapshot(mediaPackageId);
-      if (optSnapshot.isEmpty())
+      if (optSnapshot.isEmpty()) {
         throw new NotFoundException();
+      }
 
       Optional<DublinCoreCatalog> dublinCore = loadEpisodeDublinCoreFromAsset(optSnapshot.get());
-      if (dublinCore.isEmpty())
+      if (dublinCore.isEmpty()) {
         throw new NotFoundException("No dublincore catalog found " + mediaPackageId);
+      }
 
       return dublinCore.get();
     } catch (NotFoundException e) {
@@ -919,8 +936,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
     try {
       final Optional<ExtendedEventDto> extEvt = persistence.getEvent(mediaPackageId);
-      if (extEvt.isEmpty())
+      if (extEvt.isEmpty()) {
         throw new NotFoundException();
+      }
 
       return getTechnicalMetadata(extEvt.get());
     } catch (NotFoundException e) {
@@ -937,8 +955,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
     try {
       Optional<ExtendedEventDto> record = persistence.getEvent(mediaPackageId);
-      if (record.isEmpty())
+      if (record.isEmpty()) {
         throw new NotFoundException();
+      }
       return deserializeExtendedEventProperties(record.get().getWorkflowProperties());
     } catch (NotFoundException e) {
       throw e;
@@ -955,8 +974,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
     try {
       Optional<ExtendedEventDto> record = persistence.getEvent(mediaPackageId);
-      if (record.isEmpty())
+      if (record.isEmpty()) {
         throw new NotFoundException();
+      }
       return deserializeExtendedEventProperties(record.get().getCaptureAgentProperties());
     } catch (NotFoundException e) {
       throw e;
@@ -991,7 +1011,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   public Optional<MediaPackage> getCurrentRecording(String captureAgentId) throws SchedulerException {
     try {
       final Date now = new Date();
-      List<ExtendedEventDto> result = persistence.search(Optional.of(captureAgentId), Optional.empty(), Optional.of(now), Optional.of(now), Optional.empty(), Optional.of(1));
+      List<ExtendedEventDto> result = persistence.search(Optional.of(captureAgentId), Optional.empty(),
+          Optional.of(now), Optional.of(now), Optional.empty(), Optional.of(1));
       if (result.isEmpty()) {
         return Optional.empty();
       }
@@ -1005,7 +1026,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   public Optional<MediaPackage> getUpcomingRecording(String captureAgentId) throws SchedulerException {
     try {
       final Date now = new Date();
-      List<ExtendedEventDto> result = persistence.search(Optional.of(captureAgentId), Optional.of(now), Optional.empty(), Optional.empty(), Optional.empty(), Optional.of(1));
+      List<ExtendedEventDto> result = persistence.search(Optional.of(captureAgentId), Optional.of(now),
+          Optional.empty(), Optional.empty(), Optional.empty(), Optional.of(1));
       if (result.isEmpty()) {
         return Optional.empty();
       }
@@ -1017,7 +1039,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   @Override
   public List<MediaPackage> findConflictingEvents(String captureDeviceID, Date startDate, Date endDate)
-      throws SchedulerException {
+          throws SchedulerException {
     try {
       final Organization organization = securityService.getOrganization();
       final User user = SecurityUtil.createSystemUser(systemUserName, organization);
@@ -1140,7 +1162,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
           continue;
         }
 
-        final Map<String, String> caMetadata = deserializeExtendedEventProperties(searchResult.get(mpId).getCaptureAgentProperties());
+        final Map<String, String> caMetadata = deserializeExtendedEventProperties(
+            searchResult.get(mpId).getCaptureAgentProperties());
 
         // If the even properties are empty, skip the event
         if (caMetadata.isEmpty()) {
@@ -1155,7 +1178,14 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
         // Add the entry to the calendar, skip it with a warning if adding fails
         try {
-          cal.addEvent(snapshot.getMediaPackage(), catalogOpt.get(), agentId, start, end, lastModified, toPropertyString(caMetadata));
+          cal.addEvent(
+              snapshot.getMediaPackage(),
+              catalogOpt.get(),
+              agentId,
+              start,
+              end,
+              lastModified,
+              toPropertyString(caMetadata));
         } catch (Exception e) {
           logger.warn("Error adding event '{}' to calendar, event is not recorded", mpId, e);
         }
@@ -1179,8 +1209,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
     try {
       String lastModified = lastModifiedCache.getIfPresent(captureAgentId);
-      if (lastModified != null)
+      if (lastModified != null) {
         return lastModified;
+      }
 
       populateLastModifiedCache();
 
@@ -1243,8 +1274,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     try {
       final Optional<ExtendedEventDto> optExtEvt = persistence.getEvent(id);
 
-      if (optExtEvt.isEmpty())
+      if (optExtEvt.isEmpty()) {
         throw new NotFoundException();
+      }
 
       final String prevRecordingState = optExtEvt.get().getRecordingState();
       final Recording r = new RecordingImpl(id, state);
@@ -1256,8 +1288,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
                 .updateRecordingStatus(r.getState(), r.getLastCheckinTime()))));
 
         // Update Elasticsearch index
-        updateEventInIndex(r.getID(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
-                Optional.empty(), Optional.empty(), Optional.of(r.getState()));
+        updateEventInIndex(r.getID(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
+                Optional.empty(), Optional.empty(), Optional.empty(), Optional.of(r.getState()));
       } else {
         logger.debug("Recording state not changed");
       }
@@ -1330,7 +1362,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       return persistence.getKnownRecordings().parallelStream()
           .collect(
               Collectors.toMap(ExtendedEventDto::getMediaPackageId,
-              dto -> new RecordingImpl(dto.getMediaPackageId(), dto.getRecordingState(), dto.getRecordingLastHeard()))
+                dto -> new RecordingImpl(dto.getMediaPackageId(), dto.getRecordingState(), dto.getRecordingLastHeard()))
           );
     } catch (Exception e) {
       throw new SchedulerException(e);
@@ -1379,8 +1411,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    * @param recordingStatus
    */
   private void updateEventInIndex(String mediaPackageId, Optional<AccessControlList> acl,
-          Optional<DublinCoreCatalog> dublinCore, Optional<Date> startTime, Optional<Date> endTime, Optional<Set<String>> presenters,
-          Optional<String> agentId, Optional<Map<String, String>> properties, Optional<String> recordingStatus) {
+          Optional<DublinCoreCatalog> dublinCore, Optional<Date> startTime, Optional<Date> endTime,
+          Optional<Set<String>> presenters, Optional<String> agentId, Optional<Map<String, String>> properties,
+          Optional<String> recordingStatus) {
 
     String organization = getSecurityService().getOrganization().getId();
     User user = getSecurityService().getUser();
@@ -1450,7 +1483,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    * @param properties
    */
   private void updateLiveEvent(String mpId, Optional<AccessControlList> acl, Optional<DublinCoreCatalog> dublinCore,
-          Optional<Date> startTime, Optional<Date> endTime, Optional<String> agentId, Optional<Map<String, String>> properties) {
+          Optional<Date> startTime, Optional<Date> endTime, Optional<String> agentId,
+          Optional<Map<String, String>> properties) {
     List<SchedulerItem> items = new ArrayList<>();
     if (acl.isPresent()) {
       items.add(SchedulerItem.updateAcl(acl.get()));
@@ -1480,8 +1514,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
           String captureAgentId, Optional<String> seriesId, Optional<DublinCoreCatalog> dublinCore) {
     Map<String, String> properties = new HashMap<>();
     for (Entry<String, String> entry : caMetadata.entrySet()) {
-      if (entry.getKey().startsWith(WORKFLOW_CONFIG_PREFIX))
+      if (entry.getKey().startsWith(WORKFLOW_CONFIG_PREFIX)) {
         continue;
+      }
       properties.put(entry.getKey(), entry.getValue());
     }
     for (Entry<String, String> entry : wfProperties.entrySet()) {
@@ -1526,16 +1561,18 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
 
   private String toPropertyString(Map<String, String> properties) {
     StringBuilder wfPropertiesString = new StringBuilder();
-    for (Map.Entry<String, String> entry : properties.entrySet())
+    for (Map.Entry<String, String> entry : properties.entrySet()) {
       wfPropertiesString.append(entry.getKey() + "=" + entry.getValue() + "\n");
+    }
     return wfPropertiesString.toString();
   }
 
   private MediaPackage getEventMediaPackage(final String mediaPackageId, boolean checkOwner) {
     Optional<MediaPackage> mediaPackage = assetManager.getMediaPackage(mediaPackageId);
 
-    if (mediaPackage.isEmpty())
+    if (mediaPackage.isEmpty()) {
       throw new RuntimeNotFoundException(new NotFoundException());
+    }
 
     return mediaPackage.get();
   }
@@ -1585,8 +1622,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
     final Map<String, String> wfProperties = deserializeExtendedEventProperties(extEvt.getWorkflowProperties());
 
     Recording recording = null;
-    if (recordingStatus.isPresent() && lastHeard.isPresent())
+    if (recordingStatus.isPresent() && lastHeard.isPresent()) {
       recording = new RecordingImpl(extEvt.getMediaPackageId(), recordingStatus.get(), lastHeard.get());
+    }
 
     return new TechnicalMetadataImpl(extEvt.getMediaPackageId(), agentId, start, end, presenters, wfProperties,
             caMetadata, Optional.ofNullable(recording));
@@ -1646,9 +1684,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
                       final Map<String, String> caMetadata = deserializeExtendedEventProperties(
                               event.getCaptureAgentProperties());
 
-                      updatedEventData = getEventUpdateFunction(event.getMediaPackageId(), Optional.empty(), Optional.empty(),
-                              Optional.of(event.getStartDate()), Optional.of(event.getEndDate()), Optional.of(presenters),
-                              Optional.of(event.getCaptureAgentId()), Optional.of(caMetadata),
+                      updatedEventData = getEventUpdateFunction(event.getMediaPackageId(), Optional.empty(),
+                              Optional.empty(), Optional.of(event.getStartDate()), Optional.of(event.getEndDate()),
+                              Optional.of(presenters), Optional.of(event.getCaptureAgentId()), Optional.of(caMetadata),
                               Optional.ofNullable(event.getRecordingState()), organization.getId(),
                               securityService.getUser()).apply(updatedEventData);
                       updatedEventRange.add(updatedEventData.get());
@@ -1665,7 +1703,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
                       throw new RuntimeException("Fatal error while indexing event " + event.getMediaPackageId(), e);
                     }
                   }
-               });
+                });
       }
     } catch (Exception e) {
       logIndexRebuildError(logger, e);
@@ -1701,8 +1739,9 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       }
       if (dublinCore.isPresent()) {
         EventIndexUtils.updateEvent(event, dublinCore.get());
-        if (isBlank(event.getCreator()))
+        if (isBlank(event.getCreator())) {
           event.setCreator(getSecurityService().getUser().getName());
+        }
 
         // Update series name if not already done
         try {
