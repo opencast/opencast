@@ -29,11 +29,11 @@ import org.opencastproject.statistics.provider.matomo.provider.MatomoTimeSeriesS
 import org.opencastproject.util.ConfigurationException;
 
 import org.apache.felix.fileinstall.ArtifactInstaller;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,7 +41,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.util.Dictionary;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -50,12 +49,12 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @Component(
     immediate = true,
-    service = { ManagedService.class, ArtifactInstaller.class },
+    service = { ArtifactInstaller.class },
     property = {
         "service.description=Statistics Provider Matomo Service"
     }
 )
-public class StatisticsProviderMatomoService implements ManagedService, ArtifactInstaller {
+public class StatisticsProviderMatomoService implements ArtifactInstaller {
 
   /** Logging utility */
   private static final Logger logger = LoggerFactory.getLogger(StatisticsProviderMatomoService.class);
@@ -63,8 +62,8 @@ public class StatisticsProviderMatomoService implements ManagedService, Artifact
   private static final String KEY_MATOMO_API_URL = "matomo.api.url";
   private static final String KEY_MATOMO_API_TOKEN = "matomo.api.token";
 
-  private String matomoApiUrl = "https://your-matomo-instance.org/";
-  private String matomoApiToken = "your-matomo-api-token";
+  private String matomoApiUrl;
+  private String matomoApiToken;
 
   private StatisticsCoordinator statisticsCoordinator;
   private Map<String, StatisticsProvider> fileNameToProvider = new ConcurrentHashMap<>();
@@ -148,18 +147,22 @@ public class StatisticsProviderMatomoService implements ManagedService, Artifact
     install(file);
   }
 
-  @Override
-  public void updated(Dictionary<String, ?> dictionary) {
-    if (dictionary == null) {
+  @Modified
+  public void modified(Map<String, Object> properties) {
+    if (properties == null) {
       logger.info("No configuration available. Not connecting to Matomo API.");
     } else {
-      final Object matomoApiUrlValue = dictionary.get(KEY_MATOMO_API_URL);
+      final Object matomoApiUrlValue = properties.get(KEY_MATOMO_API_URL);
       if (matomoApiUrlValue != null) {
         matomoApiUrl = matomoApiUrlValue.toString();
+      } else {
+        throw new ConfigurationException("Matomo API URL is missing in config file.");
       }
-      final Object matomoApiTokenValue = dictionary.get(KEY_MATOMO_API_TOKEN);
+      final Object matomoApiTokenValue = properties.get(KEY_MATOMO_API_TOKEN);
       if (matomoApiTokenValue != null) {
         matomoApiToken = matomoApiTokenValue.toString();
+      } else {
+        throw new ConfigurationException("Matomo API access token is missing in config file.");
       }
       logger.info("Updated Matomo API URL to '{}'", matomoApiUrl);
     }

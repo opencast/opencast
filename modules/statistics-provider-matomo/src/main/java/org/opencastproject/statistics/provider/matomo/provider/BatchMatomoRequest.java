@@ -293,51 +293,58 @@ public class BatchMatomoRequest {
     DateTimeFormatter inputFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     Map<String, TimeSeries> results = new HashMap<>();
     String url = "";
+    String matomoApiUrl = service.getMatomoApiUrl();
+    String matomoApiToken = service.getMatomoApiToken();
 
     try {
-      url = service.getMatomoApiUrl() + "/index.php?module=API"
-          + "&format=json&filter_limit=-1&expanded=1"
-          + "&idSite=" + siteId
-          + "&method=" + method
-          + "&date="
-          + from.atZone(zoneId).toLocalDate().format(inputFormatter) + ","
-          + to.atZone(zoneId).toLocalDate().format(inputFormatter)
-          + "&period=" + matomoPeriod;
-
-      if (dimensionId != null) {
-        url += "&idDimension=" + dimensionId;
-      }
-
-      if (!providers.isEmpty() && providers.values().iterator().next().getResourceType() != ResourceType.ORGANIZATION) {
-        url += "&label=" + resourceId;
-      }
-
-      String tokenAuth = service.getMatomoApiToken();
-      String requestBody = "token_auth=" + URLEncoder.encode(tokenAuth, StandardCharsets.UTF_8.name());
-      logger.debug("Sending Matomo API requestf or resourceId: {}, method: {}: {}", resourceId, method, url);
-      HttpClient client = HttpClient.newHttpClient();
-      HttpRequest request = HttpRequest.newBuilder()
-          .uri(URI.create(url))
-          .header("Content-Type", "application/x-www-form-urlencoded")
-          .POST(HttpRequest.BodyPublishers.ofString(requestBody))
-          .build();
-
-      HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-      if (response.statusCode() >= 300) {
-        logger.error("Matomo API unexpected status code " + response.statusCode() + ": " + url);
+      if (matomoApiUrl == null || matomoApiUrl.isEmpty() || matomoApiToken == null || matomoApiToken.isEmpty()) {
+        logger.error("Matomo API parameters are missing in config file, skip requesting data from Matomo API.");
       } else {
-        String responseBody = response.body();
+        url = matomoApiUrl + "/index.php?module=API"
+            + "&format=json&filter_limit=-1&expanded=1"
+            + "&idSite=" + siteId
+            + "&method=" + method
+            + "&date="
+            + from.atZone(zoneId).toLocalDate().format(inputFormatter) + ","
+            + to.atZone(zoneId).toLocalDate().format(inputFormatter)
+            + "&period=" + matomoPeriod;
 
-        try {
-          JsonElement rootElement = JsonParser.parseString(responseBody);
-          if (rootElement.isJsonObject()) {
-            apiResponse = rootElement.getAsJsonObject();
-          } else {
-            logger.error("Unexpected JSON format: Root element is not a JSON object.");
+        if (dimensionId != null) {
+          url += "&idDimension=" + dimensionId;
+        }
+
+        if (!providers.isEmpty()
+            && providers.values().iterator().next().getResourceType() != ResourceType.ORGANIZATION
+        ) {
+          url += "&label=" + resourceId;
+        }
+
+        String requestBody = "token_auth=" + URLEncoder.encode(matomoApiToken, StandardCharsets.UTF_8.name());
+        logger.debug("Sending Matomo API request for resourceId: {}, method: {}: {}", resourceId, method, url);
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create(url))
+            .header("Content-Type", "application/x-www-form-urlencoded")
+            .POST(HttpRequest.BodyPublishers.ofString(requestBody))
+            .build();
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() >= 300) {
+          logger.error("Matomo API unexpected status code " + response.statusCode() + ": " + url);
+        } else {
+          String responseBody = response.body();
+
+          try {
+            JsonElement rootElement = JsonParser.parseString(responseBody);
+            if (rootElement.isJsonObject()) {
+              apiResponse = rootElement.getAsJsonObject();
+            } else {
+              logger.error("Unexpected JSON format: Root element is not a JSON object.");
+            }
+          } catch (JsonParseException e) {
+            logger.error("Error parsing Matomo API response {}: {}", url, e.getMessage());
           }
-        } catch (JsonParseException e) {
-          logger.error("Error parsing Matomo API response {}: {}", url, e.getMessage());
         }
       }
     } catch (Exception e) {
