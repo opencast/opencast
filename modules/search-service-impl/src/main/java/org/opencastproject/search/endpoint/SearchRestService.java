@@ -321,6 +321,12 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
               type = RestParameter.Type.BOOLEAN,
               defaultValue = "true",
               description = "If results are to be signed"
+          ),
+          @RestParameter(
+              name = "live",
+              isRequired = false,
+              type = RestParameter.Type.BOOLEAN,
+              description = "If the result should only consist of live episodes (true) or not live episodes (false)"
           )
       },
       responses = {
@@ -339,7 +345,8 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
       @QueryParam("sort") String sort,
       @QueryParam("limit") String limit,
       @QueryParam("offset") String offset,
-      @QueryParam("sign") String sign
+      @QueryParam("sign") String sign,
+      @QueryParam("live") Boolean live
   ) throws SearchException {
 
     // There can only be one, sid or sname
@@ -399,6 +406,10 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
               .fuzziness("AUTO")
               .operator(Operator.AND)
       );
+    }
+
+    if (live != null) {
+      query.filter(QueryBuilders.termQuery("live", live));
     }
 
     var user = securityService.getUser();

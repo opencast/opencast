@@ -65,6 +65,11 @@ export interface LtiData {
     readonly roles: string[];
 }
 
+interface Config {
+    readonly excludeLiveStreams: boolean;
+    readonly onlyLiveStreams: boolean;
+}
+
 export function findField(
     id: string,
     metadata: EventMetadataContainer): EventMetadataField | undefined {
@@ -135,6 +140,22 @@ export async function copyEventToSeries(eventId: string, targetSeries: string): 
     return axios.post(hostAndPort() + "/lti-service-gui/" + eventId + "/copy?target_series=" + targetSeries);
 }
 
+async function getConfig(): Promise<Config> {
+    try {
+        const response = await axios.get<any>(hostAndPort() + '/ui/config/ltitools/config.json');
+        return {
+            excludeLiveStreams: response.data.series.excludeLiveStreams !== undefined ? response.data.series.excludeLiveStreams : false,
+            onlyLiveStreams: response.data.series.onlyLiveStreams !== undefined ? response.data.series.onlyLiveStreams : false
+        }
+    } catch (_) {
+        return {
+            excludeLiveStreams: false,
+            onlyLiveStreams: false
+        }
+    }
+}
+
+
 /**
  * Parse resolution from string to object if possible
  * A resolution is expected to have the format {width}x{height}
@@ -184,13 +205,29 @@ const parseTracksFromResult = (result: any) => {
   return undefined;
 }
 
+async function parseLiveFromConfig() : Promise<String> {
+    try {
+        const config = await getConfig();
+        if (config.excludeLiveStreams && !config.onlyLiveStreams) {
+            return "false";
+        }
+        if (!config.excludeLiveStreams && config.onlyLiveStreams) {
+            return "true";
+        }
+        return "";
+    } catch (_) {
+        return "";
+    }
+}
+
 export async function searchEpisode(
     limit: number,
     offset: number,
     episodeId?: string,
     seriesId?: string,
     seriesName?: string,
-    sort?: string): Promise<SearchEpisodeResults> {
+    sort?: string,
+    live?: string): Promise<SearchEpisodeResults> {
     let urlSuffix = "";
     if (seriesId !== undefined)
         urlSuffix += "&sid=" + seriesId;
@@ -200,6 +237,13 @@ export async function searchEpisode(
         urlSuffix += "&id=" + episodeId;
     if (sort !== undefined)
         urlSuffix += "&sort=" + sort;
+    if (live !== undefined) {
+        urlSuffix += "&live=" + live;
+    } else {
+        const config_live = await parseLiveFromConfig();
+        if (typeof config_live === "string" && config_live !== "")
+            urlSuffix += "&live=" + config_live;
+    }
     const url = `${hostAndPort()}/search/episode.json?limit=${limit}&offset=${offset}${urlSuffix}`;
     const response = await axios.get<any>(url);
     const resultsRaw = response.data["result"];

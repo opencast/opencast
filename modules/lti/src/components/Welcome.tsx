@@ -17,6 +17,7 @@ export function Welcome() {
                 <li>Use the <code>?annotate=true</code> URL parameter to show a annotate button next to each episode. This will open the annotation tool. The annotation tool must be installed and the user must have the proper access rights to use this tool.</li>
                 <li>Use the <code>?download=true</code> URL parameter to show a download button next to each episode.</li>
                 <li>Use the <code>?sort=[sort-parameter]</code> URL parameter to define the sort order. May include any of the following dublin core metadata: identifier, title, contributor, creator, created, modified. Add &quot;asc&quot; or &quot;desc&quot; to specify the sort order (e.g. &quot;title desc&quot;).</li>
+                <li>Use the <code>?live=[true/false]</code> URL parameter to show only or no live events. When not set all events are shown.</li>
             </ul>
             <li>For upload integration, use the <a href="index.html?subtool=upload">Upload LTI Tool</a>. Note that you can specify these parameters:</li>
             <ul>
