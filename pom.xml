@@ -155,8 +155,8 @@
     <module>modules/jacoco-reports</module>
     <module>modules/kernel</module>
     <module>modules/list-providers-service</module>
-    <module>modules/live-schedule-api</module>
-    <module>modules/live-schedule-impl</module>
+    <module>modules/live-publication-api</module>
+    <module>modules/live-publication-impl</module>
     <module>modules/logging-workflowoperation</module>
     <module>modules/lti-service-api</module>
     <module>modules/lti-service-impl</module>

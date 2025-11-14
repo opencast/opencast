@@ -20,7 +20,12 @@
  */
 package org.opencastproject.scheduler.impl.persistence;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+
+import java.lang.reflect.Type;
 import java.util.Date;
+import java.util.Map;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -112,6 +117,9 @@ public class ExtendedEventDto {
 
   @Column(name = "checksum", length = 64)
   private String checksum;
+
+  private static final Gson gson = new Gson();
+  private static final Type type = new TypeToken<Map<String, String>>() { }.getType();
 
   /**
    * Default constructor without any import.
@@ -207,19 +215,19 @@ public class ExtendedEventDto {
     this.checksum = checksum;
   }
 
-  public String getCaptureAgentProperties() {
-    return captureAgentProperties;
+  public Map<String, String> getCaptureAgentProperties() {
+    return gson.fromJson(captureAgentProperties, type);
   }
 
-  public void setCaptureAgentProperties(String captureAgentProperties) {
-    this.captureAgentProperties = captureAgentProperties;
+  public void setCaptureAgentProperties(Map<String, String> captureAgentProperties) {
+    this.captureAgentProperties = gson.toJson(captureAgentProperties, type);
   }
 
-  public String getWorkflowProperties() {
-    return workflowProperties;
+  public Map<String, String> getWorkflowProperties() {
+    return gson.fromJson(workflowProperties, type);
   }
 
-  public void setWorkflowProperties(String workflowProperties) {
-    this.workflowProperties = workflowProperties;
+  public void setWorkflowProperties(Map<String, String> workflowProperties) {
+    this.workflowProperties = gson.toJson(workflowProperties);
   }
 }

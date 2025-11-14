@@ -28,8 +28,6 @@ import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.NotFoundException;
 
-import com.google.gson.Gson;
-
 import org.easymock.EasyMock;
 import org.junit.Assert;
 import org.junit.Before;
@@ -138,8 +136,8 @@ public class SchedulerServiceDatabaseImplTest {
     Assert.assertEquals(presenters, newEvent.get().getPresenters());
     Assert.assertEquals(lastModifiedDate, newEvent.get().getLastModifiedDate());
     Assert.assertEquals(checksum, newEvent.get().getChecksum());
-    Assert.assertEquals(new Gson().toJson(wfProperties), newEvent.get().getWorkflowProperties());
-    Assert.assertEquals(new Gson().toJson(caProperties), newEvent.get().getCaptureAgentProperties());
+    Assert.assertEquals(wfProperties, newEvent.get().getWorkflowProperties());
+    Assert.assertEquals(caProperties, newEvent.get().getCaptureAgentProperties());
   }
 
   @Test
@@ -183,7 +181,7 @@ public class SchedulerServiceDatabaseImplTest {
         put("cabazupdated", "cabazzupdated");
       }
     };
-    schedulerDatabase.storeEvent(
+    final Optional<ExtendedEventDto> updatedEvent = Optional.of(schedulerDatabase.storeEvent(
         mpId,
         orgId,
         Optional.empty(),
@@ -196,9 +194,8 @@ public class SchedulerServiceDatabaseImplTest {
         Optional.empty(),
         Optional.empty(),
         Optional.empty(),
-        Optional.of(updatedCaProperties)
+        Optional.of(updatedCaProperties))
     );
-    final Optional<ExtendedEventDto> updatedEvent = schedulerDatabase.getEvent(mpId);
     Assert.assertTrue(updatedEvent.isPresent());
     Assert.assertEquals(mpId, updatedEvent.get().getMediaPackageId());
     Assert.assertEquals(orgId, updatedEvent.get().getOrganization());
@@ -211,8 +208,8 @@ public class SchedulerServiceDatabaseImplTest {
     Assert.assertEquals(presenters, updatedEvent.get().getPresenters());
     Assert.assertEquals(lastModifiedDate, updatedEvent.get().getLastModifiedDate());
     Assert.assertEquals(checksum, updatedEvent.get().getChecksum());
-    Assert.assertEquals(new Gson().toJson(wfProperties), updatedEvent.get().getWorkflowProperties());
-    Assert.assertEquals(new Gson().toJson(updatedCaProperties), updatedEvent.get().getCaptureAgentProperties());
+    Assert.assertEquals(wfProperties, updatedEvent.get().getWorkflowProperties());
+    Assert.assertEquals(updatedCaProperties, updatedEvent.get().getCaptureAgentProperties());
   }
 
   @Test
@@ -760,8 +757,8 @@ public class SchedulerServiceDatabaseImplTest {
     Assert.assertEquals(presenters, updatedEvent.get().getPresenters());
     Assert.assertEquals(lastModifiedDate, updatedEvent.get().getLastModifiedDate());
     Assert.assertEquals(checksum, updatedEvent.get().getChecksum());
-    Assert.assertEquals(new Gson().toJson(wfProperties), updatedEvent.get().getWorkflowProperties());
-    Assert.assertEquals(new Gson().toJson(caProperties), updatedEvent.get().getCaptureAgentProperties());
+    Assert.assertEquals(wfProperties, updatedEvent.get().getWorkflowProperties());
+    Assert.assertEquals(caProperties, updatedEvent.get().getCaptureAgentProperties());
   }
 
   @Test

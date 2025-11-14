@@ -66,6 +66,7 @@ import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
+import org.opencastproject.message.broker.api.update.AssetManagerUpdateHandler;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.security.api.AccessControlEntry;
@@ -120,6 +121,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -151,6 +153,8 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   public static final String SECURITY_NAMESPACE = "org.opencastproject.assetmanager.security";
 
   private static final String MANIFEST_DEFAULT_NAME = "manifest";
+
+  private CopyOnWriteArrayList<AssetManagerUpdateHandler> handlers = new CopyOnWriteArrayList<>();
 
   private SecurityService securityService;
   private AuthorizationService authorizationService;
@@ -262,8 +266,22 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     this.index = index;
   }
 
+  @Reference(
+      cardinality = ReferenceCardinality.MULTIPLE,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "removeEventHandler"
+  )
+
+  public void addEventHandler(AssetManagerUpdateHandler handler) {
+    this.handlers.add(handler);
+  }
+
+  public void removeEventHandler(AssetManagerUpdateHandler handler) {
+    this.handlers.remove(handler);
+  }
+
   @Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC,
-          target = "(common-metadata=false)")
+      target = "(common-metadata=false)")
   public synchronized void addCatalogUIAdapter(EventCatalogUIAdapter catalogUIAdapter) {
     List<EventCatalogUIAdapter> list = extendedEventCatalogUIAdapters.computeIfAbsent(
             catalogUIAdapter.getOrganization(), k -> new ArrayList());
@@ -437,6 +455,10 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       }
 
       updateEventInIndex(snapshot);
+
+      logger.info("Trigger update handlers for snapshot {}, version {}",
+              snapshot.getMediaPackage().getIdentifier(), snapshot.getVersion());
+      fireEventHandlers(mkTakeSnapshotMessage(snapshot));
 
       return snapshot;
     }
@@ -742,6 +764,10 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
         as.delete(deletionSelector);
       }
     }
+
+    logger.info("Firing event handlers for deleting event {}", mpId);
+    fireEventHandlers(AssetManagerItem.deleteEpisode(mpId, new Date()));
+    removeArchivedVersionFromIndex(mpId);
 
     return numberOfDeletedSnapshots;
   }
@@ -1540,6 +1566,18 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
             snapshot.getStorageId(),
             snapshot.getOwner(),
             mpCopy);
+  }
+
+  public void fireEventHandlers(AssetManagerItem item) {
+    while (handlers.size() != 2) {
+      logger.warn("Expecting 2 handlers, but {} are registered.  Waiting 10s then retrying...", handlers.size());
+      try {
+        Thread.sleep(10000L);
+      } catch (InterruptedException e) { /* swallow this, nothing to do */ }
+    }
+    for (AssetManagerUpdateHandler handler : handlers) {
+      handler.execute(item);
+    }
   }
 
   /**

@@ -440,12 +440,12 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-live-schedule-api</artifactId>
+      <artifactId>opencast-live-publication-api</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-live-schedule-impl</artifactId>
+      <artifactId>opencast-live-publication-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

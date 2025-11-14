@@ -85,4 +85,12 @@ public interface Publication extends MediaPackageElement {
    */
   void addCatalog(Catalog catalog);
 
+  /**
+   * Remove the element (attachment, catalog or track)
+   *
+   * @param element
+   */
+  void removeElement(MediaPackageElement element);
+
+  MediaPackageElement[] getElements();
 }

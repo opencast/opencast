@@ -80,7 +80,7 @@ A list of everything.
 - [Inbox](inbox.md)
 - [LTI Module](ltimodule.md)
 - [List Providers](listproviders.md)
-- [Live Schedule](liveschedule.md)
+- [Live Publication](livestreaming.md)
 - [Load Configuration](load.md)
 - [Logging Configuration](log.md)
 - [Media Module](mediamodule.configuration.md)

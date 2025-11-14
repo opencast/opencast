@@ -1,0 +1,10 @@
+Livestreaming was significantly rewritten. Please test thoroughly if you rely on this feature. Breaking changes:
+
+- Start, end dates & capture agent are pulled from the Scheduler info, not the episode dublincore
+- Config file was renamed to `LivePublicationService.cfg` & reordered
+- `live.publishStreamingFormats` was removed (all published elements are now part of the archived publication that is
+  delivered by the External API)
+- `SchedulerUpdateHandler.cfg` was removed and 'live.deleteOnCapureError` moved to `LivePublicationService.cfg` and
+  typo fixed
+- Workflow parameter `publishLive` no longer does anything, instead activate livestreaming through capture agent config
+  `stream`

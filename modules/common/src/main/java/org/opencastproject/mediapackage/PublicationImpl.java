@@ -25,7 +25,9 @@ import org.opencastproject.util.MimeType;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Stream;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -157,6 +159,31 @@ public class PublicationImpl extends AbstractMediaPackageElement implements Publ
     } else if (MediaPackageElement.Type.Attachment.equals(element.getElementType())) {
       publication.addAttachment((Attachment) element);
     }
+  }
+
+  /**
+   * removes a {@link MediaPackageElement} from this publication by determining its type.
+   *
+   * @param element
+   *          The {@link MediaPackageElement} to remove. If it is not a {@link Attachment}, {@link Catalog} or
+   *          {@link Track} it will not be removed from the {@link Publication}.
+   */
+  @Override
+  public void removeElement(MediaPackageElement element) {
+      if (MediaPackageElement.Type.Track.equals(element.getElementType())) {
+          tracks.remove((Track) element);
+      } else if (MediaPackageElement.Type.Catalog.equals(element.getElementType())) {
+          catalogs.remove((Catalog) element);
+      } else if (MediaPackageElement.Type.Attachment.equals(element.getElementType())) {
+          attachments.remove((Attachment) element);
+      }
+  }
+
+  @Override
+  public MediaPackageElement[] getElements() {
+    List<? extends MediaPackageElement> elements = Stream.of(tracks, attachments, catalogs)
+        .flatMap(Collection::stream).toList();
+    return elements.toArray(new MediaPackageElement[0]);
   }
 
   /** JAXB adapter */
