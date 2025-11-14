@@ -72,7 +72,7 @@ public class PublicationChannelToWorkspace extends AbstractWorkflowOperationHand
 
   @Override
   public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
-      throws WorkflowOperationException {
+          throws WorkflowOperationException {
 
     logger.info("Copying artifacts from published media package {} to workspace", workflowInstance.getId());
     final MediaPackage mediaPackage = workflowInstance.getMediaPackage();

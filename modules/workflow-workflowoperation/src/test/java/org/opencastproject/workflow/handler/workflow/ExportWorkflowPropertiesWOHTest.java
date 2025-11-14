@@ -74,7 +74,8 @@ public class ExportWorkflowPropertiesWOHTest {
               FileUtils.copyInputStreamToFile(in.getValue(), file);
               return file.toURI();
             }).anyTimes();
-    EasyMock.expect(workspace.get(EasyMock.capture(uriCapture))).andAnswer(() -> new File(uriCapture.getValue())).anyTimes();
+    EasyMock.expect(workspace.get(EasyMock.capture(uriCapture))).andAnswer(() -> new File(uriCapture.getValue()))
+        .anyTimes();
     EasyMock.replay(workspace);
     uri = ExportWorkflowPropertiesWOHTest.class.getResource("/workflow-properties.xml").toURI();
   }

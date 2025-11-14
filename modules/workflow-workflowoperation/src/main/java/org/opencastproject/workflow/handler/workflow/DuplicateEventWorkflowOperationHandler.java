@@ -236,7 +236,7 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
 
   @Override
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, final JobContext context)
-      throws WorkflowOperationException {
+          throws WorkflowOperationException {
 
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
         Configuration.many, Configuration.many, Configuration.many, Configuration.none);
@@ -393,7 +393,8 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
 
           if (seriesAccessControl != null) {
             newMp = authorizationService.setAcl(newMp, AclScope.Series, seriesAccessControl).getA();
-            for (MediaPackageElement seriesAclMpe : newMp.getElementsByFlavor(MediaPackageElements.XACML_POLICY_SERIES)) {
+            for (MediaPackageElement seriesAclMpe
+                : newMp.getElementsByFlavor(MediaPackageElements.XACML_POLICY_SERIES)) {
               for (final String tag : seriesAclTags) {
                 seriesAclMpe.addTag(tag);
               }
@@ -415,7 +416,7 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
 
         // Clone internal publications
         for (final Publication originalPub : internalPublications) {
-         copyPublication(originalPub, mediaPackage, newMp, removeTags, addTags, overrideTags, temporaryFiles);
+          copyPublication(originalPub, mediaPackage, newMp, removeTags, addTags, overrideTags, temporaryFiles);
         }
 
         assetManager.takeSnapshot(AssetManager.DEFAULT_OWNER, newMp);
@@ -487,7 +488,7 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
       final String newMpId,
       final String title,
       final Date startDate
-      ) throws WorkflowOperationException {
+  ) throws WorkflowOperationException {
     // We are not using MediaPackage.clone() here, since it does "too much" for us (e.g. copies all the attachments)
     MediaPackage destination;
     try {
@@ -581,10 +582,12 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
     final DublinCoreCatalog destinationDublinCore = DublinCoreUtil.loadEpisodeDublinCore(workspace, source).get();
     destinationDublinCore.setIdentifier(null);
     destinationDublinCore.setURI(sourceDublinCore.getURI());
-    destinationDublinCore.set(DublinCore.PROPERTY_CREATED, OpencastMetadataCodec.encodeDate(creationDate, Precision.Second));
+    destinationDublinCore.set(DublinCore.PROPERTY_CREATED,
+        OpencastMetadataCodec.encodeDate(creationDate, Precision.Second));
     destinationDublinCore.set(DublinCore.PROPERTY_TITLE, destination.getTitle());
     if (StringUtils.isNotBlank(destinationDublinCore.getFirst(DublinCore.PROPERTY_TEMPORAL))) {
-      DublinCoreValue eventTime = EncodingSchemeUtils.encodePeriod(new DCMIPeriod(creationDate, creationDate), Precision.Second);
+      DublinCoreValue eventTime = EncodingSchemeUtils.encodePeriod(
+          new DCMIPeriod(creationDate, creationDate), Precision.Second);
       destinationDublinCore.set(DublinCore.PROPERTY_TEMPORAL, eventTime);
     }
     if (series != null) {

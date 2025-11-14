@@ -144,10 +144,11 @@ public class ZipWorkflowOperationHandlerTest {
     operation.setConfiguration(ZipWorkflowOperationHandler.COMPRESS_PROPERTY, "false");
 
     try {
-        WorkflowOperationResult result = operationHandler.start(instance, null);
-        Assert.assertEquals("workflow result action not CONTINUE: " + result.getAction(), WorkflowOperationResult.Action.CONTINUE, result.getAction());
+      WorkflowOperationResult result = operationHandler.start(instance, null);
+      Assert.assertEquals("workflow result action not CONTINUE: " + result.getAction(),
+          WorkflowOperationResult.Action.CONTINUE, result.getAction());
     } catch (WorkflowOperationException e) {
-        Assert.fail("missing target-flavor and no default value kicked in: " + e);
+      Assert.fail("missing target-flavor and no default value kicked in: " + e);
     }
 
   }

@@ -76,11 +76,11 @@ import java.util.Optional;
  * An implementation of the workflow service that communicates with a remote workflow service via HTTP.
  */
 @Component(
-  property = {
-    "service.description=Workflow Remote Service Proxy"
-  },
-  immediate =  true,
-  service = { WorkflowService.class }
+    property = {
+      "service.description=Workflow Remote Service Proxy"
+    },
+    immediate =  true,
+    service = { WorkflowService.class }
 )
 public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowService {
 
@@ -173,8 +173,9 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     HttpGet get = new HttpGet("/mediaPackage/" + mediaPackageId + "/instances.xml");
     HttpResponse response = getResponse(get);
     try {
-      if (response != null)
+      if (response != null) {
         return XmlWorkflowParser.parseWorkflowSet(response.getEntity().getContent()).getItems();
+      }
     } catch (Exception e) {
       throw new WorkflowDatabaseException(e);
     } finally {
@@ -211,8 +212,9 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     HttpGet get = new HttpGet("/mediaPackage/" + mediaPackageId + "/hasActiveWorkflows");
     HttpResponse response = getResponse(get);
     try {
-      if (response != null)
+      if (response != null) {
         return Boolean.parseBoolean(response.getEntity().getContent().toString());
+      }
     } catch (Exception e) {
       throw new WorkflowDatabaseException(e);
     } finally {
@@ -226,8 +228,9 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     HttpGet get = new HttpGet("/user/" + userId + "/hasActiveWorkflows");
     HttpResponse response = getResponse(get);
     try {
-      if (response != null)
+      if (response != null) {
         return Boolean.parseBoolean(response.getEntity().getContent().toString());
+      }
     } catch (Exception e) {
       throw new WorkflowDatabaseException(e);
     } finally {
@@ -283,13 +286,16 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     HttpPost post = new HttpPost("/start");
     try {
       List<BasicNameValuePair> params = new ArrayList<>();
-      if (workflowDefinition != null)
+      if (workflowDefinition != null) {
         params.add(new BasicNameValuePair("definition", XmlWorkflowParser.toXml(workflowDefinition)));
+      }
       params.add(new BasicNameValuePair("mediapackage", MediaPackageParser.getAsXml(mediaPackage)));
-      if (parentWorkflowId != null)
+      if (parentWorkflowId != null) {
         params.add(new BasicNameValuePair("parent", parentWorkflowId.toString()));
-      if (properties != null)
+      }
+      if (properties != null) {
         params.add(new BasicNameValuePair("properties", mapToString(properties)));
+      }
       post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (Exception e) {
       throw new IllegalStateException("Unable to assemble a remote workflow request", e);
@@ -342,13 +348,15 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowService#countWorkflowInstances(org.opencastproject.workflow.api.WorkflowInstance.WorkflowState)
+   * @see org.opencastproject.workflow.api.WorkflowService#countWorkflowInstances(
+   *      org.opencastproject.workflow.api.WorkflowInstance.WorkflowState)
    */
   @Override
   public long countWorkflowInstances(WorkflowState state) throws WorkflowDatabaseException {
     List<NameValuePair> queryStringParams = new ArrayList<>();
-    if (state != null)
+    if (state != null) {
       queryStringParams.add(new BasicNameValuePair("state", state.toString()));
+    }
 
     StringBuilder url = new StringBuilder("/count");
     if (queryStringParams.size() > 0) {
@@ -469,8 +477,9 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     HttpPost post = new HttpPost("/resume");
     List<BasicNameValuePair> params = new ArrayList<>();
     params.add(new BasicNameValuePair("id", Long.toString(workflowInstanceId)));
-    if (properties != null)
+    if (properties != null) {
       params.add(new BasicNameValuePair("properties", mapToString(properties)));
+    }
     post.setEntity(new UrlEncodedFormEntity(params, StandardCharsets.UTF_8));
     HttpResponse response = getResponse(post, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED, SC_CONFLICT);
     try {
@@ -596,7 +605,8 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowService#addWorkflowListener(org.opencastproject.workflow.api.WorkflowListener)
+   * @see org.opencastproject.workflow.api.WorkflowService#addWorkflowListener(
+ *        org.opencastproject.workflow.api.WorkflowListener)
    */
   @Override
   public void addWorkflowListener(WorkflowListener listener) {
@@ -606,7 +616,8 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowService#removeWorkflowListener(org.opencastproject.workflow.api.WorkflowListener)
+   * @see org.opencastproject.workflow.api.WorkflowService#removeWorkflowListener(
+   *      org.opencastproject.workflow.api.WorkflowListener)
    */
   @Override
   public void removeWorkflowListener(WorkflowListener listener) {
@@ -621,8 +632,9 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
 
     List<BasicNameValuePair> params = new ArrayList<>();
     params.add(new BasicNameValuePair("lifetime", String.valueOf(lifetime)));
-    if (state != null)
+    if (state != null) {
       params.add(new BasicNameValuePair("state", state.toString()));
+    }
     try {
       post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (UnsupportedEncodingException e) {
@@ -651,7 +663,8 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     HttpResponse response = getResponse(get);
     try {
       if (response != null) {
-        return (Map<String, Map<String, String>>) new JSONParser().parse(IOUtils.toString(response.getEntity().getContent(), "utf-8"));
+        return (Map<String, Map<String, String>>) new JSONParser().parse(
+            IOUtils.toString(response.getEntity().getContent(), "utf-8"));
       }
     } catch (Exception e) {
       throw new IllegalStateException("Unable to parse workflow state mappings");

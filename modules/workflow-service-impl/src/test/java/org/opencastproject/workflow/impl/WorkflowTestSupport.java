@@ -39,7 +39,9 @@ public final class WorkflowTestSupport {
       Thread.sleep(WAITTIME);
     }
     if (listener.countStateChanges() != changes) {
-      throw new RuntimeException(String.format("Listener did not have the correct number (%s) of events inside of %s ms, got %s instead", changes, WAITTIME, listener.countStateChanges()));
+      throw new RuntimeException(String.format(
+          "Listener did not have the correct number (%s) of events inside of %s ms, got %s instead",
+          changes, WAITTIME, listener.countStateChanges()));
     }
   }
 }

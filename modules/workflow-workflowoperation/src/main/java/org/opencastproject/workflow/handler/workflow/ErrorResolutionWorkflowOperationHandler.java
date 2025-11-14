@@ -67,7 +67,8 @@ public class ErrorResolutionWorkflowOperationHandler extends ResumableWorkflowOp
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.handler.workflow.ResumableWorkflowOperationHandlerBase#activate(org.osgi.service.component.ComponentContext)
+   * @see org.opencastproject.workflow.handler.workflow.ResumableWorkflowOperationHandlerBase#activate(
+   *      org.osgi.service.component.ComponentContext)
    */
   @Override
   @Activate
@@ -86,8 +87,8 @@ public class ErrorResolutionWorkflowOperationHandler extends ResumableWorkflowOp
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.ResumableWorkflowOperationHandler#resume(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext, java.util.Map)
+   * @see org.opencastproject.workflow.api.ResumableWorkflowOperationHandler#resume(
+   *      org.opencastproject.workflow.api.WorkflowInstance, JobContext, java.util.Map)
    */
   @Override
   public WorkflowOperationResult resume(WorkflowInstance workflowInstance, JobContext context,

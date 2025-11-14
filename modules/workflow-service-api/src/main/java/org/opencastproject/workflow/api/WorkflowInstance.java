@@ -68,8 +68,8 @@ import javax.persistence.Transient;
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 /**
- * Entity object for storing workflows in persistence storage. Workflow ID is stored as primary key, DUBLIN_CORE field is
- * used to store serialized Dublin core and ACCESS_CONTROL field is used to store information about access control
+ * Entity object for storing workflows in persistence storage. Workflow ID is stored as primary key, DUBLIN_CORE field
+ * is used to store serialized Dublin core and ACCESS_CONTROL field is used to store information about access control
  * rules.
  *
  */
@@ -81,7 +81,8 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 @NamedQueries({
         @NamedQuery(
                 name = "Workflow.findAll",
-                query = "select w from WorkflowInstance w where w.organizationId=:organizationId order by w.dateCreated"
+                query = "select w from WorkflowInstance w "
+                    + "where w.organizationId=:organizationId order by w.dateCreated"
         ),
         @NamedQuery(
                 name = "Workflow.countLatest",
@@ -93,7 +94,8 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
         ),
         @NamedQuery(
                 name = "Workflow.workflowById",
-                query = "SELECT w FROM WorkflowInstance as w where w.workflowId=:workflowId and w.organizationId=:organizationId"
+                query = "SELECT w FROM WorkflowInstance as w "
+                    + "where w.workflowId=:workflowId and w.organizationId=:organizationId"
         ),
         @NamedQuery(
             name = "Workflow.workflowByIdOrganizationIndependent",
@@ -111,19 +113,23 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
         ),
 
         // For media packages
-        @NamedQuery(name = "Workflow.byMediaPackage", query = "SELECT w FROM WorkflowInstance w where "
+        @NamedQuery(name = "Workflow.byMediaPackage",
+            query = "SELECT w FROM WorkflowInstance w where "
                 + "w.mediaPackageId = :mediaPackageId and w.organizationId = :organizationId order by w.dateCreated"),
-        @NamedQuery(name = "Workflow.countActiveByMediaPackage", query = "SELECT COUNT(w) FROM WorkflowInstance w where "
+        @NamedQuery(name = "Workflow.countActiveByMediaPackage",
+            query = "SELECT COUNT(w) FROM WorkflowInstance w where "
                 + "w.mediaPackageId = :mediaPackageId and w.organizationId = :organizationId and "
                 + "(w.state = :stateInstantiated or w.state = :statePaused or w.state = :stateRunning "
                 + "or w.state = :stateFailing)"),
-        @NamedQuery(name = "Workflow.byMediaPackageAndActive", query = "SELECT w FROM WorkflowInstance w where "
+        @NamedQuery(name = "Workflow.byMediaPackageAndActive",
+            query = "SELECT w FROM WorkflowInstance w where "
                 + "w.mediaPackageId = :mediaPackageId and w.organizationId = :organizationId and "
                 + "(w.state = :stateInstantiated or w.state = :statePaused or w.state = :stateRunning "
                 + "or w.state = :stateFailing) order by w.dateCreated"),
 
         // For users
-        @NamedQuery(name = "Workflow.countActiveByUser", query = "SELECT COUNT(w) FROM WorkflowInstance w where "
+        @NamedQuery(name = "Workflow.countActiveByUser",
+            query = "SELECT COUNT(w) FROM WorkflowInstance w where "
                 + "w.creatorName = :userId and w.organizationId = :organizationId and "
                 + "(w.state = :stateInstantiated or w.state = :statePaused or w.state = :stateRunning "
                 + "or w.state = :stateFailing)"),
@@ -460,8 +466,9 @@ public class WorkflowInstance {
    * @see org.opencastproject.workflow.api.Configurable#getConfiguration(java.lang.String)
    */
   public String getConfiguration(String key) {
-    if (key == null || configurations == null)
+    if (key == null || configurations == null) {
       return null;
+    }
     return configurations.get(key);
   }
 
@@ -483,8 +490,9 @@ public class WorkflowInstance {
    * @see org.opencastproject.workflow.api.Configurable#removeConfiguration(java.lang.String)
    */
   public void removeConfiguration(String key) {
-    if (key == null || configurations == null)
+    if (key == null || configurations == null) {
       return;
+    }
     configurations.remove(key);
   }
 
@@ -494,10 +502,12 @@ public class WorkflowInstance {
    * @see org.opencastproject.workflow.api.Configurable#setConfiguration(java.lang.String, java.lang.String)
    */
   public void setConfiguration(String key, String value) {
-    if (key == null)
+    if (key == null) {
       return;
-    if (configurations == null)
+    }
+    if (configurations == null) {
       configurations = new TreeMap<>();
+    }
 
     // Adjust already existing values
     configurations.put(key, value);
