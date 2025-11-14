@@ -95,7 +95,7 @@ operations:
     configurations:
       - subtitle-source-flavor: captions/trimmed
       - target-flavor: captions/shifted
-      - video-source-flavor: branding/bumper
+      - video-source-flavors: branding/bumper
 
   - id: tag
     if: NOT ${theme_bumper_active}

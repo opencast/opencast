@@ -21,10 +21,13 @@
 
 package org.opencastproject.workflow.handler.subtitletimeshift;
 
+import static java.lang.String.format;
+
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Track;
+import org.opencastproject.mediapackage.selector.TrackSelector;
 import org.opencastproject.subtitleparser.webvttparser.WebVTTParser;
 import org.opencastproject.subtitleparser.webvttparser.WebVTTSubtitle;
 import org.opencastproject.subtitleparser.webvttparser.WebVTTSubtitleCue;
@@ -42,6 +45,7 @@ import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
@@ -53,6 +57,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Collection;
 import java.util.Objects;
 
 /**
@@ -72,7 +77,7 @@ import java.util.Objects;
 public class SubtitleTimeshiftWorkflowOperationHandler extends AbstractWorkflowOperationHandler {
 
   private static final String SUBTITLE_SOURCE_FLAVOR_CFG_KEY = "subtitle-source-flavor";
-  private static final String VIDEO_SOURCE_FLAVOR_CFG_KEY = "video-source-flavor";
+  private static final String VIDEO_SOURCE_FLAVOR_CFG_KEY = "video-source-flavors";
   private static final String TARGET_FLAVOR_CFG_KEY = "target-flavor";
 
   /** The workspace collection name */
@@ -108,15 +113,18 @@ public class SubtitleTimeshiftWorkflowOperationHandler extends AbstractWorkflowO
     // get flavor from workflow configuration
     final WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
     MediaPackageElementFlavor configuredSubtitleFlavor;
-    MediaPackageElementFlavor configuredVideoFlavor;
+    String configuredVideoFlavors;
     MediaPackageElementFlavor configuredTargetFlavor;
     try {
       configuredSubtitleFlavor = MediaPackageElementFlavor.parseFlavor(
           Objects.toString(operation.getConfiguration(SUBTITLE_SOURCE_FLAVOR_CFG_KEY)));
-      configuredVideoFlavor = MediaPackageElementFlavor.parseFlavor(
-          operation.getConfiguration(VIDEO_SOURCE_FLAVOR_CFG_KEY));
       configuredTargetFlavor = MediaPackageElementFlavor.parseFlavor(
           operation.getConfiguration(TARGET_FLAVOR_CFG_KEY));
+      configuredVideoFlavors = StringUtils
+          .trimToNull(operation.getConfiguration(VIDEO_SOURCE_FLAVOR_CFG_KEY));
+      if (configuredVideoFlavors == null) {
+        throw new WorkflowOperationException(format("Configuration property %s not set", VIDEO_SOURCE_FLAVOR_CFG_KEY));
+      }
     } catch (Exception e) {
       throw new WorkflowOperationException("Couldn't parse subtitle-timeshift workflow configurations.", e);
     }
@@ -124,10 +132,20 @@ public class SubtitleTimeshiftWorkflowOperationHandler extends AbstractWorkflowO
     // In this block we try to get the subtitle and video track for this workflow
     Track[] originalSubtitleTracks;
     Track videoTrack;
+    long totalVideoDuration = 0;
     try {
       // Get the subtitles and videos from the mediapackage
       Track[] subtitleTracks = mediaPackage.getTracks(configuredSubtitleFlavor);
-      Track[] videoTracks = mediaPackage.getTracks(configuredVideoFlavor);
+
+      TrackSelector trackSelector = new TrackSelector();
+      for (String flavor : asList(configuredVideoFlavors)) {
+        trackSelector.addFlavor(flavor);
+      }
+      Collection<Track> videoTracks = trackSelector.select(mediaPackage, false);
+      if (videoTracks.isEmpty()) {
+        throw new WorkflowOperationException(format("No video tracks found in mediapackage %s with flavor %s",
+            mediaPackage.getIdentifier().toString(), configuredVideoFlavors));
+      }
 
       // Check if we found the right amount of subtitles and videos
       // Allowed are exactly 1 video track and at least 1 subtitle track
@@ -136,20 +154,22 @@ public class SubtitleTimeshiftWorkflowOperationHandler extends AbstractWorkflowO
         logger.info("No subtitle track found with flavor {}. Skipping subtitle-timeshift workflow operation "
             + "for mediapackage {}", configuredSubtitleFlavor, mediaPackage.getIdentifier());
         return createResult(mediaPackage, Action.SKIP);
-      } else if (videoTracks.length != 1) {
-        // if the amount of video tracks is not 1, something is configured wrong and we throw an exception
-        throw new IllegalStateException(String.format("Found %d video tracks with flavor %s in mediapackage %s "
-            + "for subtitle-timeshift operation. Expected exactly 1 video track. Please check you workflow "
-            + "configuration.", videoTracks.length, configuredVideoFlavor, mediaPackage.getIdentifier()));
       }
 
       // these subtitle tracks will be used to create the new subtitle tracks with the shifted timestamps
       originalSubtitleTracks = subtitleTracks;
 
       // this video track will be used to determine how much the subtitle tracks should be shifted
-      videoTrack = videoTracks[0];
+      for (Track track : videoTracks) {
+        Long duration = track.getDuration();
+        if (duration != null) {
+          totalVideoDuration += duration;
+        } else {
+          logger.debug("Videotrack {} did not have a duration.", track);
+        }
+      }
 
-      logger.info("Valid tracks found. Start shifting subtitle tracks by duration from video '{}'", videoTrack);
+      logger.info("Valid tracks found. Start shifting subtitle tracks by duration '{}'", totalVideoDuration);
 
     } catch (Exception e) {
       logger.error("Error in subtitle-timeshift workflow while getting tracks for mediapackage {}",
@@ -165,7 +185,7 @@ public class SubtitleTimeshiftWorkflowOperationHandler extends AbstractWorkflowO
         WebVTTSubtitle newSubtitleFile = loadAndParseSubtitleFile(originalSubtitleTrack);
 
         // shift the timestamps of the parsed webvtt object
-        shiftTime(newSubtitleFile, videoTrack.getDuration());
+        shiftTime(newSubtitleFile, totalVideoDuration);
 
         // save the new subtitle file in the workspace to get a URI
         String originalFileName = FilenameUtils.getBaseName(originalSubtitleTrack.getLogicalName());
