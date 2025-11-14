@@ -40,6 +40,17 @@
     </operation>
 
     <operation
+        id="tag"
+        if="NOT(${theme_active})"
+        description="If no shifting was necessary, mark the trimmed captions as shifted">
+      <configurations>
+        <configuration key="source-flavors">captions/trimmed</configuration>
+        <configuration key="target-flavor">captions/shifted</configuration>
+        <configuration key="copy">false</configuration>
+      </configurations>
+    </operation>
+
+    <operation
       id="tag"
       if="NOT(${theme_active})"
       description="Tag elements as themed">
