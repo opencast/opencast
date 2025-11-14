@@ -157,10 +157,11 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
   }
 
   @Override
-  public void storeEvent(String mediapackageId, String organizationId, Optional<String> captureAgentId, Optional<Date> start,
-          Optional<Date> end, Optional<String> source, Optional<String> recordingState, Optional<Long> recordingLastHeard,
-          Optional<String> presenters, Optional<Date> lastModifiedDate, Optional<String> checksum, Optional<Map<String,
-          String>> workflowProperties, Optional<Map<String, String>> caProperties
+  public void storeEvent(String mediapackageId, String organizationId, Optional<String> captureAgentId,
+          Optional<Date> start, Optional<Date> end, Optional<String> source, Optional<String> recordingState,
+          Optional<Long> recordingLastHeard, Optional<String> presenters, Optional<Date> lastModifiedDate,
+          Optional<String> checksum, Optional<Map<String, String>> workflowProperties,
+          Optional<Map<String, String>> caProperties
   ) throws SchedulerServiceDatabaseException {
     try {
       db.execTxChecked(em -> {
@@ -215,7 +216,7 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
 
   @Override
   public List<String> getEvents(String captureAgentId, Date start, Date end, int separationMillis)
-      throws SchedulerServiceDatabaseException {
+          throws SchedulerServiceDatabaseException {
     final Date extendedStart = Date.from(start.toInstant().minusMillis(separationMillis));
     final Date extendedEnd = Date.from(end.toInstant().plusMillis(separationMillis));
     try {
@@ -323,7 +324,7 @@ public class SchedulerServiceDatabaseImpl implements SchedulerServiceDatabase {
 
   @Override
   public Optional<ExtendedEventDto> getEvent(String mediapackageId, String orgId)
-      throws SchedulerServiceDatabaseException {
+          throws SchedulerServiceDatabaseException {
     try {
       return db.exec(getExtendedEventDtoQuery(mediapackageId, orgId));
     } catch (Exception e) {
