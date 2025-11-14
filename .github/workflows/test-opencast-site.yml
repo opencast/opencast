@@ -122,7 +122,6 @@ jobs:
           path: site_build
 
       - name: Prepare git
-        if: github.repository_owner == 'opencast'
         run: |
           git config --global user.name "Release Bot"
           git config --global user.email "cloud@opencast.org"
@@ -147,14 +146,24 @@ jobs:
           export BRANCH="${TEMP#r\/}"
           rm -rf $BRANCH
           mv ../site_build $BRANCH
-          echo '<html><body><ul>' > index.html
+          #Generate an index, in case anyone lands at the root of the test domain
+          echo $'<html><head><link rel=stylesheet type=text/css href=assets/index.css /></head><body><div class="head-container"><img src=assets/opencast-white.svg /></div><div class="navbar-container"></div><div class="text-container"><p>Deployment of Opencast's Maven Site and Code Coverage.  The branches listed here correspond to Opencast\'s own branches.</br><b>Please select a version.</b></p></div><ul>' > index.html
           find . -mindepth 1 -maxdepth 1 -type d \
             | grep '[0-9]*.x\|develop' \
             | sort -r \
             | sed 's/^\(.*\)$/<li><a href=\1>\1<\/a><\/li>/' >> index.html
           echo '</ul></body></html>' >> index.html
-          git add .
-          git commit --amend -m "Maven site build outputs"
+          git add $BRANCH index.html
+          git diff --staged --quiet || git commit --amend -m "Maven site build outputs"
+
+      - name: update CSS and other assets
+        if: github.ref == 'refs/heads/develop'
+        working-directory: opencast
+        run: |
+          rm -rf assets
+          cp -rv ../.github/assets ./assets
+          git add assets
+          git diff --staged --quiet || git commit --amend -m "Maven site build outputs"
 
       - name: Push updates
         working-directory: opencast

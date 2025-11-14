@@ -67,6 +67,7 @@ nav:
    - Debugging: 'develop/debugging.md'
    - Frontends: 'develop/frontends.md'
    - Documentation: 'develop/documentation.md'
+   - Coverage Reports: 'develop/coverage-reports.md'
    - Integrating with Opencast: 'develop/integration.md'
 - Opencast architecture:
    - Overview: 'architecture/overview.md'
