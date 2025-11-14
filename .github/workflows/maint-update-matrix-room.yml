@@ -1,12 +1,13 @@
+name: Maintenance » Update Matrix Room Description
+
 on:
   workflow_dispatch:
   push:
     tags:
       - '*.*'
 
-name: Update Matrix Room Description
 jobs:
-  build:
+  update-room-desc:
     name: Update Matrix Room
     runs-on: ubuntu-latest
     steps:

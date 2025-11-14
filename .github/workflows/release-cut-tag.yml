@@ -1,4 +1,4 @@
-name: Cut Release Tag
+name: Release » Cut Release Tag
 
 on:
   workflow_dispatch:

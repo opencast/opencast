@@ -1,4 +1,4 @@
-name: Test Opencast
+name: Deploy » Opencast
 
 on:
   pull_request:
@@ -25,7 +25,7 @@ on:
       - 'dependabot/**'  # Don't run dependabot branches, as they are already covered by pull requests
 
 jobs:
-  build:
+  test-opencast:
     strategy:
       matrix:
         java:

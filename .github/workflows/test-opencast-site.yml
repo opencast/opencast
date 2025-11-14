@@ -1,4 +1,4 @@
-name: Test Opencast Site
+name: Deploy » Site and Coverage
 
 on:
   pull_request:
@@ -25,7 +25,7 @@ on:
       - 'dependabot/**'  # Don't run dependabot branches, as they are already covered by pull requests
 
 jobs:
-  site:
+  build-mvn-site:
     strategy:
       matrix:
         java:
@@ -103,10 +103,10 @@ jobs:
           name: site_build
           path: target/staging
 
-  pages:
+  deploy-mvn-site:
     name: generate github pages for reports
     runs-on: ubuntu-22.04
-    needs: site
+    needs: build-mvn-site
     concurrency:
       group: opencast-site-build
       cancel-in-progress: false

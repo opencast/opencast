@@ -1,4 +1,4 @@
-name: Tests Paella 7
+name: Tests » Paella 7
 
 on:
   pull_request:
@@ -12,7 +12,7 @@ on:
 
 
 jobs:
-  test:
+  test-paella:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     defaults:

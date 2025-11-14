@@ -1,12 +1,13 @@
+name: Release » Create new release
+
 on:
   workflow_dispatch:
   push:
     tags:
       - '*.*'
 
-name: Create new release
 jobs:
-  build:
+  create-release-from-tag:
     name: Create release from tag
     runs-on: ubuntu-latest
     steps:
