@@ -129,8 +129,8 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
     Assert.notNull(userDirectoryService, "A UserDirectoryService must be set");
     Assert.notNull(userReferenceProvider, "A UserReferenceProvider must be set");
     Assert.notNull(securityService, "A SecurityService must be set");
-    Assert.isTrue(StringUtils.isNotBlank(jwksUrl) ^ StringUtils.isNotBlank(secret),
-        "Either a JWKS URL or a secret must be set");
+    Assert.isTrue(!(StringUtils.isNotBlank(jwksUrl) && StringUtils.isNotBlank(secret)),
+        "A JWKS URL and a secret cannot be set at the same time");
     Assert.notEmpty(expectedAlgorithms, "Expected algorithms must be set");
     Assert.notNull(claimConstraints, "Claim constraints must be set");
     Assert.notNull(usernameMapping, "User name mapping must be set");
@@ -138,6 +138,10 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
     Assert.notNull(emailMapping, "Email mapping must be set");
     Assert.isTrue(roleMappings != null || ocStandardRoleMappings,
             "Role mappings must be set if ocStandardRoleMappings is false");
+
+    if (StringUtils.isBlank(jwksUrl) && StringUtils.isBlank(secret)) {
+      logger.info("JWT login handler disabled as neither 'jwksUrl' nor 'secret' are set");
+    }
 
     if (jwksUrl != null) {
       jwkProvider = new JWKSetProvider(jwksUrl, jwksTimeToLive, jwksRefreshTimeout);
@@ -151,6 +155,11 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
 
   @Override
   public String handleToken(String token) {
+    if (jwkProvider == null && secret == null) {
+      logger.debug("neither jwksURL nor secret set: ignoring JWT");
+      return null;
+    }
+
     try {
       String signature = extractSignature(token);
       CachedJWT cachedJwt = cache.getIfPresent(signature);
