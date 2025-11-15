@@ -886,9 +886,9 @@
   <osgi:reference id="securityService" cardinality="1..1"
                   interface="org.opencastproject.security.api.SecurityService" />
 
-  <!-- Uncomment to enable external users e.g. used together with shibboleth and JWT -->
-  <!-- <osgi:reference id="userReferenceProvider" cardinality="1..1"
-                  interface="org.opencastproject.userdirectory.api.UserReferenceProvider"  /> -->
+  <!-- For enabling external users e.g. used together with shibboleth and JWT -->
+  <osgi:reference id="userReferenceProvider" cardinality="1..1"
+                  interface="org.opencastproject.userdirectory.api.UserReferenceProvider"  />
 
   <osgi:reference id="userDirectoryService" cardinality="1..1"
                   interface="org.opencastproject.security.api.UserDirectoryService" />
@@ -918,8 +918,8 @@
     <sec:authentication-provider ref="rememberMeAuthenticationProvider"/>
     <!-- CAS Auth: Uncomment this if using CAS authentication -->
     <!-- <sec:authentication-provider ref="casAuthenticationProvider" /> -->
-    <!-- Uncomment this if using Shibboleth or JWT authentication -->
-    <!-- <sec:authentication-provider ref="preauthAuthProvider" /> -->
+    <!-- For Shibboleth and JWT authentication -->
+    <sec:authentication-provider ref="preauthAuthProvider" />
     <!-- Uncomment the following line if using LDAP -->
     <!-- <sec:authentication-provider ref="ldapAuthProvider" /> -->
     <sec:authentication-provider user-service-ref="userDetailsService">
