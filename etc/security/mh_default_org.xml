@@ -486,10 +486,10 @@
         <!-- Uncomment the line below to support Shibboleth. -->
         <!-- <ref bean="shibbolethHeaderFilter" /> -->
 
-        <!-- Uncomment the line below to support JWT.
-        <ref bean="jwtHeaderFilter" /> -->
-        <!-- Additionally/alternatively uncomment this to support passing a JWT in a URL parameter.
-        <ref bean="jwtRequestParameterFilter" /> -->
+        <!-- Uncomment the line below to support JWT. -->
+        <ref bean="jwtHeaderFilter" />
+        <!-- Additionally/alternatively uncomment this to support passing a JWT in a URL parameter. -->
+        <ref bean="jwtRequestParameterFilter" />
       </list>
     </property>
   </bean>
@@ -746,32 +746,32 @@
   <!-- # JWT Support # -->
   <!-- ################ -->
 
-  <!-- General JWT header extraction filter
+  <!-- General JWT header extraction filter-->
   <bean id="jwtHeaderFilter" class="org.opencastproject.security.jwt.JWTRequestHeaderAuthenticationFilter">
     <property name="principalRequestHeader" value="Authorization"/>
     <property name="principalPrefix" value="Bearer "/>
     <property name="authenticationManager" ref="authenticationManager" />
     <property name="loginHandler" ref="jwtLoginHandler" />
     <property name="exceptionIfHeaderMissing" value="false" />
-  </bean>-->
+  </bean>
 
-  <!-- General JWT request parameter extraction filter
+  <!-- General JWT request parameter extraction filter-->
   <bean id="jwtRequestParameterFilter" class="org.opencastproject.security.jwt.JWTRequestParameterAuthenticationFilter">
     <property name="parameterName" value="jwt" />
     <property name="authenticationManager" ref="authenticationManager" />
     <property name="loginHandler" ref="jwtLoginHandler" />
     <property name="exceptionIfParameterMissing" value="false" />
-  </bean>-->
+  </bean>
 
-  <!-- JWT login handler
+  <!-- JWT login handler -->
   <bean id="jwtLoginHandler" class="org.opencastproject.security.jwt.DynamicLoginHandler">
     <property name="userDetailsService" ref="userDetailsService" />
     <property name="userDirectoryService" ref="userDirectoryService" />
     <property name="securityService" ref="securityService" />
     <property name="userReferenceProvider" ref="userReferenceProvider" />
-    <property name="jwksUrl" value="https://auth.example.org/.well-known/jwks.json" />
-    <property name="jwksTimeToLive" value="3600000" />
-    <property name="secret" value="***" />
+    <!-- Set either `jwksUrl` or `secret` to enable this login handler -->
+    <!-- <property name="jwksUrl" value="https://replace-me.invalid/.well-known/jwks.json" /> -->
+    <!-- <property name="secret" value="***" /> -->
     <property name="expectedAlgorithms" ref="jwtExpectedAlgorithms" />
     <property name="claimConstraints" ref="jwtClaimConstraints" />
     <property name="usernameMapping" value="['sub']" />
@@ -781,7 +781,8 @@
     <property name="roleMappings" ref="jwtRoleMappings" />
     <property name="jwtCacheSize" value="500" />
     <property name="jwtCacheExpiresIn" value="60" />
-  </bean>-->
+    <property name="jwksTimeToLive" value="3600000" />
+  </bean>
 
   <!-- The signing algorithms expected for the JWT signature -->
   <util:list id="jwtExpectedAlgorithms" value-type="java.lang.String">
