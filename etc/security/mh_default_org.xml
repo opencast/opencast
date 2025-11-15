@@ -776,7 +776,7 @@
     <property name="claimConstraints" ref="jwtClaimConstraints" />
     <property name="usernameMapping" value="['sub']" />
     <property name="nameMapping" value="['name']" />
-    <property name="emailMapping" value="['email']" />
+    <property name="emailMapping" value="['email'] ?: 'no-mail@jwt.invalid'" />
     <property name="ocStandardRoleMappings" value="true" />
     <property name="roleMappings" ref="jwtRoleMappings" />
     <property name="jwtCacheSize" value="500" />
