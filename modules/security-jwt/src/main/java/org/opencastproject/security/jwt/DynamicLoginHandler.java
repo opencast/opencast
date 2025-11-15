@@ -132,7 +132,7 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
     Assert.isTrue(StringUtils.isNotBlank(jwksUrl) ^ StringUtils.isNotBlank(secret),
         "Either a JWKS URL or a secret must be set");
     Assert.notEmpty(expectedAlgorithms, "Expected algorithms must be set");
-    Assert.notEmpty(claimConstraints, "Claim constraints must be set");
+    Assert.notNull(claimConstraints, "Claim constraints must be set");
     Assert.notNull(usernameMapping, "User name mapping must be set");
     Assert.notNull(nameMapping, "Name mapping must be set");
     Assert.notNull(emailMapping, "Email mapping must be set");
