@@ -60,7 +60,7 @@ public class WebVttCaptionConverter implements CaptionConverter {
 
   /** This configuration key defines the mediapackage element type of the captions file (Attachment, Track) */
   static final String MEDIAPACKAGE_ELEMENT_TYPE_CONFIG_KEY = "mediapackage-element-type";
-  static final Type DEFAULT_MEDIAPACKAGE_ELEMENT_TYPE = Type.Attachment;
+  static final Type DEFAULT_MEDIAPACKAGE_ELEMENT_TYPE = Type.Track;
   private static Type mediapackageElementType = DEFAULT_MEDIAPACKAGE_ELEMENT_TYPE;
 
 
