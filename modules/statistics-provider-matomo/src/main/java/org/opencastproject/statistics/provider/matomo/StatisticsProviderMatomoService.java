@@ -29,7 +29,6 @@ import org.opencastproject.statistics.provider.matomo.provider.MatomoTimeSeriesS
 import org.opencastproject.util.ConfigurationException;
 
 import org.apache.felix.fileinstall.ArtifactInstaller;
-import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -93,12 +92,13 @@ public class StatisticsProviderMatomoService implements ArtifactInstaller {
   }
 
   @Activate
-  public void activate(ComponentContext cc) {
+  public void activate(Map<String, Object> properties) {
     logger.info("Activating Statistics Provider Matomo Service");
+    modified(properties);
   }
 
   @Deactivate
-  public void deactivate(ComponentContext cc) {
+  public void deactivate() {
     logger.info("Deactivating Statistics Provider Matomo Service");
   }
 
