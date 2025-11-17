@@ -55,7 +55,7 @@ public class EventSearchQuery extends AbstractSearchQuery {
   private final List<EventSearchQueryField<String>> contributors = new ArrayList<>();
   private EventSearchQueryField<String> subject = new EventSearchQueryField(null);
   private EventSearchQueryField<String> location = new EventSearchQueryField(null);
-  private EventSearchQueryField<String> seriesId = new EventSearchQueryField(null);
+  private List<EventSearchQueryField<String>> seriesId = new ArrayList<>();
   private EventSearchQueryField<String> seriesName = new EventSearchQueryField(null);
   private EventSearchQueryField<String> language = new EventSearchQueryField(null);
   private EventSearchQueryField<String> source = new EventSearchQueryField(null);
@@ -489,7 +489,7 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withSeriesId(String seriesId) {
-    return this.withSeriesId(seriesId, EventQueryType.SEARCH, true);
+    return withSeriesId(seriesId, EventQueryType.SEARCH, true);
   }
 
   /**
@@ -500,9 +500,10 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the enhanced search query
    */
   public EventSearchQuery withSeriesId(String seriesId, EventQueryType type, boolean must) {
-    this.seriesId.setValue(seriesId);
-    this.seriesId.setType(type);
-    this.seriesId.setMust(must);
+    if (StringUtils.isBlank(seriesId)) {
+      throw new IllegalArgumentException("Series id cannot be null");
+    }
+    this.seriesId.add(new EventSearchQueryField<>(seriesId, type, must));
     return this;
   }
 
@@ -511,8 +512,11 @@ public class EventSearchQuery extends AbstractSearchQuery {
    *
    * @return the series identifier
    */
-  public String getSeriesIdValue() {
-    return seriesId.getValue();
+  public String[] getSeriesIdValue() {
+    return seriesId.stream()
+        .map(id -> id.getValue())
+        .toArray(String[]::new);
+//    return seriesId.getValue();
   }
 
   /**
@@ -520,7 +524,10 @@ public class EventSearchQuery extends AbstractSearchQuery {
    *
    * @return the series identifier
    */
-  public EventSearchQueryField<String> getSeriesId() {
+  public List<EventSearchQueryField<String>> getSeriesId() {
+//    return seriesId.stream()
+//        .map(id -> id.getValue())
+//        .toArray(String[]::new);
     return seriesId;
   }
 

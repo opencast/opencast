@@ -30,6 +30,9 @@ import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.elasticsearch.index.objects.event.EventIndexSchema;
 import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.elasticsearch.index.objects.event.EventSearchQueryField;
+import org.opencastproject.elasticsearch.index.objects.series.Series;
+import org.opencastproject.elasticsearch.index.objects.series.SeriesIndexSchema;
+import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.lifecyclemanagement.api.Action;
@@ -43,6 +46,7 @@ import org.opencastproject.lifecyclemanagement.api.StartWorkflowParameters;
 import org.opencastproject.lifecyclemanagement.api.Status;
 import org.opencastproject.lifecyclemanagement.api.Timing;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
+import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AuthorizationService;
@@ -468,10 +472,14 @@ public class LifeCycleServiceImpl implements LifeCycleService {
       final Organization organization = securityService.getOrganization();
       final User user = securityService.getUser();
       EventSearchQuery query = new EventSearchQuery(organization.getId(), user);
-
-      // Add filters to query
       List<EventCatalogUIAdapter> extendedCatalogUIAdapters = indexService.getExtendedEventCatalogUIAdapters();
       EventCatalogUIAdapter commonCatalogUIAdapter = indexService.getCommonEventCatalogUIAdapter();
+
+      // Get filtered series if applicable
+      List<Series> series = filterForSeries(filters);
+      series.forEach(s -> query.withSeriesId(s.getIdentifier()));
+
+      // Add filters to query
       for (String flavor: filters.keySet()) {
         // Common metadata filter
         if (commonCatalogUIAdapter.getFlavor().eq(flavor)) {
@@ -485,7 +493,7 @@ public class LifeCycleServiceImpl implements LifeCycleService {
             .findFirst();
 
         if (!extendedOpt.isPresent()) {
-          throw new NotFoundException("Catalog flavor" + flavor + " is not know to Opencast.");
+          continue;
         }
 
         for (String name: filters.get(flavor).keySet()) {
@@ -565,6 +573,70 @@ public class LifeCycleServiceImpl implements LifeCycleService {
 
         case EventIndexSchema.END_DATE -> query.withEndDate(
             filters.get(name).getValue(), filters.get(name).getType());
+
+        default -> logger.warn("Filter " + name + " is not supported");
+      }
+    }
+  }
+
+  private List<Series> filterForSeries(Map<String, Map<String, EventSearchQueryField<String>>> filters)
+          throws SearchIndexException, NotFoundException {
+    List<Series> seriesList = new ArrayList<>();
+    final Organization organization = securityService.getOrganization();
+    final User user = securityService.getUser();
+    SeriesSearchQuery query = new SeriesSearchQuery(organization.getId(), user);
+    List<SeriesCatalogUIAdapter> extendedCatalogUIAdapters = indexService.getExtendedSeriesCatalogUIAdapters();
+    SeriesCatalogUIAdapter commonCatalogUIAdapter = indexService.getCommonSeriesCatalogUIAdapter();
+
+    // Add filters to query
+    for (String flavor: filters.keySet()) {
+      // Common metadata filter
+      if (commonCatalogUIAdapter.getFlavor().eq(flavor)) {
+        addFiltersToSeriesQuery(query, filters.get(flavor));
+        continue;
+      }
+
+      // Extended metadata filter
+      Optional<SeriesCatalogUIAdapter> extendedOpt = extendedCatalogUIAdapters.stream()
+          .filter(f -> f.getFlavor().eq(flavor))
+          .findFirst();
+
+      if (!extendedOpt.isPresent()) {
+        continue;
+      }
+
+      for (String name: filters.get(flavor).keySet()) {
+        EventSearchQueryField<String> field = filters.get(flavor).get(name);
+        String type = flavor.split("/")[0];
+        query.withExtendedMetadata(type, name, field.getValue());
+      }
+    }
+
+    // Run query
+    SearchResult<Series> results = index.getByQuery(query);
+
+    for (SearchResultItem<Series> item : results.getItems()) {
+      Series source = item.getSource();
+      seriesList.add(source);
+    }
+
+    return seriesList;
+  }
+
+  private void addFiltersToSeriesQuery(SeriesSearchQuery query, Map<String, EventSearchQueryField<String>> filters) {
+    for (String name : filters.keySet()) {
+      switch (name) {
+        case SeriesIndexSchema.UID -> query.withIdentifier(filters.get(name).getValue());
+        case SeriesIndexSchema.TITLE -> query.withTitle(filters.get(name).getValue());
+        case SeriesIndexSchema.DESCRIPTION -> query.withDescription(filters.get(name).getValue());
+        case SeriesIndexSchema.SUBJECT -> query.withSubject(filters.get(name).getValue());
+        case SeriesIndexSchema.LANGUAGE -> query.withLanguage(filters.get(name).getValue());
+        case SeriesIndexSchema.CREATOR -> query.withCreator(filters.get(name).getValue());
+        case SeriesIndexSchema.LICENSE -> query.withLicense(filters.get(name).getValue());
+        case SeriesIndexSchema.ORGANIZERS -> query.withOrganizer(filters.get(name).getValue());
+        case SeriesIndexSchema.CONTRIBUTORS -> query.withContributor(filters.get(name).getValue());
+        case SeriesIndexSchema.PUBLISHERS -> query.withPublisher(filters.get(name).getValue());
+        case SeriesIndexSchema.RIGHTS_HOLDER -> query.withRightsHolder(filters.get(name).getValue());
 
         default -> logger.warn("Filter " + name + " is not supported");
       }

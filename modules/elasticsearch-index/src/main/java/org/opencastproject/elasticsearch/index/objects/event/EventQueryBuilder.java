@@ -121,8 +121,9 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
 
     // Series Id
     if (query.getSeriesIdValue() != null) {
-      addToQuery(EventIndexSchema.SERIES_ID,
-          query.getSeriesId().getValue(), query.getSeriesId().getType(), query.getSeriesId().isMust());
+      for (EventSearchQueryField<String> id : query.getSeriesId()) {
+        addToQuery(EventIndexSchema.SERIES_ID, id.getValue(), id.getType(), id.isMust());
+      }
     }
 
     // Series Name
