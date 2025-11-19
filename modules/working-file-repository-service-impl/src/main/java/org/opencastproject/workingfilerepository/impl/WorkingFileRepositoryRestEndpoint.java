@@ -398,7 +398,11 @@ public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl
         contentType = "application/octet-stream";
       }
       try {
-        return ok(get(mediaPackageID, mediaPackageElementID), contentType, Optional.of(file.length()), Optional.empty());
+        return ok(
+            get(mediaPackageID, mediaPackageElementID),
+            contentType,
+            Optional.of(file.length()),
+            Optional.empty());
       } catch (IOException e) {
         throw new NotFoundException();
       }
