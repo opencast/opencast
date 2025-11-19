@@ -147,7 +147,7 @@ jobs:
           rm -rf $BRANCH
           mv ../site_build $BRANCH
           #Generate an index, in case anyone lands at the root of the test domain
-          echo $'<html><head><link rel=stylesheet type=text/css href=assets/index.css /></head><body><div class="head-container"><img src=assets/opencast-white.svg /></div><div class="navbar-container"></div><div class="text-container"><p>Deployment of Opencast's Maven Site and Code Coverage.  The branches listed here correspond to Opencast\'s own branches.</br><b>Please select a version.</b></p></div><ul>' > index.html
+          echo $'<html><head><link rel=stylesheet type=text/css href=assets/index.css /></head><body><div class="head-container"><img src=assets/opencast-white.svg /></div><div class="navbar-container"></div><div class="text-container"><p>Deployment of Opencast'''s Maven Site and Code Coverage.  The branches listed here correspond to Opencast'''s own branches.</br><b>Please select a version.</b></p></div><ul>' > index.html
           find . -mindepth 1 -maxdepth 1 -type d \
             | grep '[0-9]*.x\|develop' \
             | sort -r \
