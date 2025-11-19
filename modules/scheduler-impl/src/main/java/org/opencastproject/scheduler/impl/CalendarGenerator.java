@@ -209,8 +209,9 @@ public class CalendarGenerator {
    *           if the series cannot be found
    */
   private String getSeriesDublinCoreAsString(String seriesID) throws UnauthorizedException, NotFoundException {
-    if (StringUtils.isBlank(seriesID))
+    if (StringUtils.isBlank(seriesID)) {
       return null;
+    }
     if (seriesService == null) {
       logger.warn("No SeriesService available");
       return null;

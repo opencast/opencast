@@ -190,8 +190,8 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(
+   *      org.opencastproject.workflow.api.WorkflowInstance, JobContext)
    */
   @Override
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
@@ -200,13 +200,18 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
 
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
 
-    Optional<String> optSeries = Optional.ofNullable(getOptConfig(workflowInstance.getCurrentOperation(), SERIES_PROPERTY).orNull());
-    Optional<String> optAttachFlavors = Optional.ofNullable(getOptConfig(workflowInstance.getCurrentOperation(), ATTACH_PROPERTY).orNull());
-    Boolean applyAcl = Optional.ofNullable(getOptConfig(workflowInstance.getCurrentOperation(), APPLY_ACL_PROPERTY).orNull())
+    Optional<String> optSeries = Optional.ofNullable(
+        getOptConfig(workflowInstance.getCurrentOperation(), SERIES_PROPERTY).orNull());
+    Optional<String> optAttachFlavors = Optional.ofNullable(
+        getOptConfig(workflowInstance.getCurrentOperation(), ATTACH_PROPERTY).orNull());
+    Boolean applyAcl = Optional.ofNullable(getOptConfig(workflowInstance.getCurrentOperation(), APPLY_ACL_PROPERTY)
+            .orNull())
         .map(value -> BooleanUtils.toBoolean(value))
         .orElse(false);
-    Optional<String> optCopyMetadata = Optional.ofNullable(getOptConfig(workflowInstance.getCurrentOperation(), COPY_METADATA_PROPERTY).orNull());
-    String defaultNamespace = Optional.ofNullable(getOptConfig(workflowInstance.getCurrentOperation(), DEFAULT_NS_PROPERTY).orNull())
+    Optional<String> optCopyMetadata = Optional.ofNullable(
+        getOptConfig(workflowInstance.getCurrentOperation(), COPY_METADATA_PROPERTY).orNull());
+    String defaultNamespace = Optional.ofNullable(
+        getOptConfig(workflowInstance.getCurrentOperation(), DEFAULT_NS_PROPERTY).orNull())
         .orElse(DublinCore.TERMS_NS_URI);
     logger.debug("Using default namespace: '{}'", defaultNamespace);
 
@@ -241,7 +246,7 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
     // Process extra metadata
     HashSet<EName> extraMetadata = new HashSet<>();
     if (optCopyMetadata.isPresent()) {
-      for (String strEName : optCopyMetadata.get().split(",+\\s*"))
+      for (String strEName : optCopyMetadata.get().split(",+\\s*")) {
         try {
           if (!strEName.isEmpty()) {
             extraMetadata.add(EName.fromString(strEName, defaultNamespace));
@@ -249,6 +254,7 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
         } catch (IllegalArgumentException iae) {
           logger.warn("Ignoring incorrect dublincore metadata property: '{}'", strEName);
         }
+      }
     }
 
     // Update the episode catalog
@@ -312,7 +318,8 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
               addDublinCoreCatalog(series, MediaPackageElements.SERIES, mediaPackage);
             } else {
               try {
-                Optional<byte[]> seriesElementData = seriesService.getSeriesElementData(seriesId, adapterFlavor.getType());
+                Optional<byte[]> seriesElementData = seriesService.getSeriesElementData(seriesId,
+                    adapterFlavor.getType());
                 if (seriesElementData.isPresent()) {
                   DublinCoreCatalog catalog = DublinCores.read(new ByteArrayInputStream(seriesElementData.get()));
                   addDublinCoreCatalog(catalog, adapterFlavor, mediaPackage);
@@ -333,8 +340,9 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
     if (applyAcl) {
       try {
         AccessControlList acl = seriesService.getSeriesAccessControl(seriesId);
-        if (acl != null)
+        if (acl != null) {
           authorizationService.setAcl(mediaPackage, AclScope.Series, acl);
+        }
       } catch (Exception e) {
         logger.error("Unable to update series ACL", e);
         throw new WorkflowOperationException(e);

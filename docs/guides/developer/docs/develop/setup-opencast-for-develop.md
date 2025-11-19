@@ -174,6 +174,22 @@ To fix a NPM access error ([example](https://stackoverflow.com/questions/1615101
 
     $ sudo chown -R $USER:$(id -gn $USER) ~/.config && sudo chown -R $USER:$(id -gn $USER) ~/.npm
 
+### NPM Timeout
+
+To avoid timeout and connection errors when downloading npm packages used in UI modules that are not maintained as dedicated
+projects (`engage-paella-player-7`, `engage-paella-player-8`, `engage-ui`, `graphql-ui`, `lti` and `runtime-info-ui`), you can
+configure an npm cache by setting an environment variable before running Maven. For example: `NPM_CONFIG_CACHE=~/.npm`.
+
+This is especially useful when building inside a container:
+
+```sh
+% docker run -v /path/to/opencast:/opencast -v npm-cache:/root/.npm ...
+
+% cd /opencast
+% export NPM_CONFIG_CACHE=/root/.npm
+% ./mvnv clean install ...
+```
+
 ### JDK Version
 
 Some IDEs attempt to use the most recent version of the JDK. Make sure that your IDE uses JDK 11.

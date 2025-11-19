@@ -3,6 +3,14 @@ Opencast 18 Changelog
 
 Changes marked with \* were also included in 17.x.
 
+## Opencast 18.3 (2025-10-24)
+- [[#7132](https://github.com/opencast/opencast/pull/7132)] -
+  Update r/18.x Admin UI to 18.x-2025-10-24
+- [[#7133](https://github.com/opencast/opencast/pull/7133)] -
+  Update r/18.x Editor to 18.x-2025-10-24
+- [[#7069](https://github.com/opencast/opencast/pull/7069)] -
+  Fix silence detection for newer FFmpeg versions
+
 ## Opencast 18.2 (2025-09-29)
 - [[#7071](https://github.com/opencast/opencast/pull/7071)] -
   Update r/18.x Admin UI to 18.x-2025-09-29

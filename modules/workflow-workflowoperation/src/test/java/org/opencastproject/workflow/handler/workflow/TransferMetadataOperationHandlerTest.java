@@ -62,7 +62,8 @@ public class TransferMetadataOperationHandlerTest {
     Workspace workspace = EasyMock.createMock(Workspace.class);
     EasyMock.expect(workspace.read(EasyMock.anyObject()))
             .andAnswer(() -> getClass().getResourceAsStream("/dublincore.xml")).anyTimes();
-    EasyMock.expect(workspace.put(EasyMock.anyString(), EasyMock.anyString(), EasyMock.anyString(), EasyMock.anyObject()))
+    EasyMock.expect(workspace.put(EasyMock.anyString(), EasyMock.anyString(), EasyMock.anyString(),
+            EasyMock.anyObject()))
             .andAnswer(() -> {
               resultCatalog = DublinCores.read((InputStream) EasyMock.getCurrentArguments()[3]);
               return new URI("http://example.opencast.org/xy");

@@ -184,8 +184,9 @@ public class CloneWorkflowOperationHandler extends AbstractWorkflowOperationHand
 
       toFileName = elementId;
       String extension = FilenameUtils.getExtension(sourceFile.getName());
-      if (!"".equals(extension))
+      if (!"".equals(extension)) {
         toFileName += "." + extension;
+      }
 
       logger.debug("Start copying element {} to target {}.", sourceFile.getPath(), toFileName);
 

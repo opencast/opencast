@@ -98,7 +98,8 @@ public final class WorkflowConditionBooleanInterpreter extends WorkflowCondition
     Atom base = visitAtomProduceAtom(ctx.atom(0));
     for (int i = 1; i < ctx.atom().size(); i++) {
       TerminalNode operator = ctx.NUMERICALOPERATOR(i - 1);
-      base = base.reduce(visitAtomProduceAtom(ctx.atom(i)), NumericalOperator.parseNumericalOperator(operator.getText()));
+      base = base.reduce(visitAtomProduceAtom(ctx.atom(i)),
+          NumericalOperator.parseNumericalOperator(operator.getText()));
     }
     return base;
   }

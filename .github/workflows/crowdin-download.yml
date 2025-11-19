@@ -1,4 +1,4 @@
-name: Update translations
+name: Crowdin » Update translations
 
 # Update every Monday at 5am
 on:
@@ -7,7 +7,7 @@ on:
   - cron: "0 5 * * 1"
 
 jobs:
-  update-translations:
+  download-translations:
     if: github.repository_owner == 'opencast'
     runs-on: ubuntu-latest
     steps:

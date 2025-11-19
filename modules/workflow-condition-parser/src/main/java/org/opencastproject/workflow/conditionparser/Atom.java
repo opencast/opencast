@@ -91,10 +91,12 @@ public final class Atom implements Comparable<Atom> {
 
   @Override
   public boolean equals(Object o) {
-    if (this == o)
+    if (this == o) {
       return true;
-    if (o == null || getClass() != o.getClass())
+    }
+    if (o == null || getClass() != o.getClass()) {
       return false;
+    }
     Atom atom = (Atom) o;
     return Objects.equals(number, atom.number) && Objects.equals(string, atom.string);
   }

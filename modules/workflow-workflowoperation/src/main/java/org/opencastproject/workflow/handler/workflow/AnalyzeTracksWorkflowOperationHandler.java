@@ -82,7 +82,8 @@ public class AnalyzeTracksWorkflowOperationHandler extends AbstractWorkflowOpera
     final MediaPackage mediaPackage = workflowInstance.getMediaPackage();
     Map<String, String> properties = new HashMap<>();
 
-    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance, Configuration.none, Configuration.one, Configuration.none, Configuration.none);
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance, Configuration.none, Configuration.one,
+        Configuration.none, Configuration.none);
     final MediaPackageElementFlavor singleSourceFlavor = tagsAndFlavors.getSingleSrcFlavor();
     TrackSelector trackSelector = new TrackSelector();
     trackSelector.addFlavor(singleSourceFlavor);

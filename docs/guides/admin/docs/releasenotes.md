@@ -1,11 +1,21 @@
 # Opencast 18: Release Notes
 
+## Opencast 18.3
+
+This minor release includes a fix for the silence detection with newer FFmpeg versions. [[#7069](https://github.com/opencast/opencast/pull/7069)]
+
+This version also contains new releases of both the admin ui
+([18.x-2025-10-24](https://github.com/opencast/opencast-admin-interface/releases/tag/18.x-2025-10-24)) and the editor
+([18.x-2025-10-24](https://github.com/opencast/opencast-editor/releases/tag/18.x-2025-10-24)).
+
 ## Opencast 18.2
 
-This version contains two **security fixes**! One of them is a cross-site-scripting vulnerability in the Paella Player.
-The other allowed accidental publishing in the Opencast Editor.
-More detailed security advisories will be published shortly. It is advised to update to this version in a timely
-fashion.
+This version contains two **security fixes**!
+One of them is a cross-site-scripting vulnerability in the
+Paella Player (see [GHSA-m2vg-rmq6-p62r](https://github.com/opencast/opencast/security/advisories/GHSA-m2vg-rmq6-p62r)).
+The other allowed accidental publishing in the Opencast Editor (see
+[GHSA-x6vw-p693-jjhv](https://github.com/opencast/opencast/security/advisories/GHSA-x6vw-p693-jjhv))
+It is advised to update to this version in a timely fashion
 
 This version also contains new releases of both the admin ui
 ([18.x-2025-09-29](https://github.com/opencast/opencast-admin-interface/releases/tag/18.x-2025-09-29)) and the editor

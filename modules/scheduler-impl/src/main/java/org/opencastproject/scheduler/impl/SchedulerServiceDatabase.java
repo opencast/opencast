@@ -132,7 +132,8 @@ public interface SchedulerServiceDatabase {
    * @throws SchedulerServiceDatabaseException
    *           If the database cannot be queried.
    */
-  List<String> getEvents(String captureAgentId, Date start, Date end, int separationMillis) throws SchedulerServiceDatabaseException;
+  List<String> getEvents(String captureAgentId, Date start, Date end, int separationMillis)
+          throws SchedulerServiceDatabaseException;
 
   /**
    * Retrieve all events matching given filter ordered by start time ascending.

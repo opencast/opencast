@@ -7,7 +7,7 @@ on:
       - develop
 
 jobs:
-  build:
+  build-rpm-repo:
     strategy:
       matrix:
         arch:

@@ -176,11 +176,13 @@ public class WorkflowOperationDefinitionImpl implements WorkflowOperationDefinit
    * @see org.opencastproject.workflow.api.WorkflowInstance#getConfiguration(java.lang.String)
    */
   public String getConfiguration(String key) {
-    if (key == null || configurations == null)
+    if (key == null || configurations == null) {
       return null;
+    }
     for (JaxbWorkflowConfiguration config : configurations) {
-      if (config.getKey().equals(key))
+      if (config.getKey().equals(key)) {
         return config.getValue();
+      }
     }
     return null;
   }
@@ -191,8 +193,9 @@ public class WorkflowOperationDefinitionImpl implements WorkflowOperationDefinit
    * @see org.opencastproject.workflow.api.WorkflowInstance#removeConfiguration(java.lang.String)
    */
   public void removeConfiguration(String key) {
-    if (key == null || configurations == null)
+    if (key == null || configurations == null) {
       return;
+    }
     for (Iterator<JaxbWorkflowConfiguration> configIter = configurations.iterator(); configIter.hasNext();) {
       JaxbWorkflowConfiguration config = configIter.next();
       if (config.getKey().equals(key)) {
@@ -208,8 +211,9 @@ public class WorkflowOperationDefinitionImpl implements WorkflowOperationDefinit
    * @see org.opencastproject.workflow.api.WorkflowInstance#setConfiguration(java.lang.String, java.lang.String)
    */
   public void setConfiguration(String key, String value) {
-    if (key == null || configurations == null)
+    if (key == null || configurations == null) {
       return;
+    }
     for (JaxbWorkflowConfiguration config : configurations) {
       if (config.getKey().equals(key)) {
         config.setValue(value);

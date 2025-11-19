@@ -101,7 +101,7 @@ public class AddCatalogWorkflowOperationHandler extends AbstractWorkflowOperatio
 
   @Override
   public WorkflowOperationResult start(WorkflowInstance wInst, JobContext context)
-      throws WorkflowOperationException {
+          throws WorkflowOperationException {
     // get Workflow configuration
     String catalogName = getConfig(wInst, CFG_KEY_CATALOG_NAME);
     String catalogPath = getConfig(wInst, CFG_KEY_CATALOG_PATH);
@@ -165,7 +165,7 @@ public class AddCatalogWorkflowOperationHandler extends AbstractWorkflowOperatio
    * @throws WorkflowOperationException
    */
   private CatalogTypeCollisionBehavior parseCollisionBehavior(String rawBehavior)
-      throws WorkflowOperationException {
+          throws WorkflowOperationException {
     try {
       return CatalogTypeCollisionBehavior.valueOf(rawBehavior.toUpperCase());
     }

@@ -1,4 +1,4 @@
-name: Auto-update npm libraries
+name: Maintenance » Auto-update npm libraries
 
 # Be carefuly for which modules you activate auto-updates.
 # Braking changes *MUST* be caught in the CI or they will cause errors.

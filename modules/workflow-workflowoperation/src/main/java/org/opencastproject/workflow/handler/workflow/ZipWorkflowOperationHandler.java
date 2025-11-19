@@ -110,7 +110,7 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
 
   /** Key for configuring the location of the archive-temp folder */
   public static final String ZIP_ARCHIVE_TEMP_DIR_CFG_KEY =
-    "org.opencastproject.workflow.handler.workflow.ZipWorkflowOperationHandler.tmpdir";
+      "org.opencastproject.workflow.handler.workflow.ZipWorkflowOperationHandler.tmpdir";
 
   /** The default flavor to use for a mediapackage archive */
   public static final MediaPackageElementFlavor DEFAULT_ARCHIVE_FLAVOR = MediaPackageElementFlavor
@@ -147,7 +147,8 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
    *
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#activate(org.osgi.service.component.ComponentContext)
+   * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#activate(
+   *      org.osgi.service.component.ComponentContext)
    */
   @Activate
   protected void activate(ComponentContext cc) {
@@ -175,8 +176,8 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
+   * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#start(
+   *      org.opencastproject.workflow.api.WorkflowInstance, JobContext)
    */
   @Override
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)

@@ -41,7 +41,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public final class WorkflowConditionInterpreter {
-  private static final Pattern PROPERTY_PATTERN = Pattern.compile("\\$\\{(?<varname>([^:}]|\\\\:)+)((?<!\\\\):(?<def>[^}]+))?}");
+  private static final Pattern PROPERTY_PATTERN =
+      Pattern.compile("\\$\\{(?<varname>([^:}]|\\\\:)+)((?<!\\\\):(?<def>[^}]+))?}");
 
   private WorkflowConditionInterpreter() {
   }
@@ -65,8 +66,9 @@ public final class WorkflowConditionInterpreter {
     StringBuilder result = new StringBuilder();
     int cursor = 0;
     boolean matchFound = matcher.find();
-    if (!matchFound)
+    if (!matchFound) {
       return source;
+    }
     while (matchFound) {
       int matchStart = matcher.start();
       int matchEnd = matcher.end();
@@ -105,8 +107,9 @@ public final class WorkflowConditionInterpreter {
       }
       cursor = matchEnd;
       matchFound = matcher.find();
-      if (!matchFound)
+      if (!matchFound) {
         result.append(source.substring(matchEnd));
+      }
     }
     return result.toString();
   }
@@ -126,8 +129,9 @@ public final class WorkflowConditionInterpreter {
       result.append(extractDefault(matcher));
       cursor = matchEnd;
       matchFound = matcher.find();
-      if (!matchFound)
+      if (!matchFound) {
         result.append(source.substring(matchEnd));
+      }
     }
     return result.toString();
   }

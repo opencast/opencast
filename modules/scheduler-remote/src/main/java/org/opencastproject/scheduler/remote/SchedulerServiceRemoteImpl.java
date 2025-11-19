@@ -124,8 +124,9 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     params.add(new BasicNameValuePair("mediaPackage", MediaPackageParser.getAsXml(mediaPackage)));
     params.add(new BasicNameValuePair("wfproperties", toPropertyString(wfProperties)));
     params.add(new BasicNameValuePair("agentparameters", toPropertyString(caMetadata)));
-    if (schedulingSource.isPresent())
+    if (schedulingSource.isPresent()) {
       params.add(new BasicNameValuePair("source", schedulingSource.get()));
+    }
     post.setEntity(new UrlEncodedFormEntity(params, UTF_8));
 
     HttpResponse response = getResponse(post, SC_CREATED, SC_UNAUTHORIZED, SC_CONFLICT);
@@ -178,8 +179,9 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     params.add(new BasicNameValuePair("templateMp", MediaPackageParser.getAsXml(templateMp)));
     params.add(new BasicNameValuePair("wfproperties", toPropertyString(wfProperties)));
     params.add(new BasicNameValuePair("agentparameters", toPropertyString(caMetadata)));
-    if (schedulingSource.isPresent())
+    if (schedulingSource.isPresent()) {
       params.add(new BasicNameValuePair("source", schedulingSource.get()));
+    }
     post.setEntity(new UrlEncodedFormEntity(params, UTF_8));
 
     String eventId = templateMp.getIdentifier().toString();
@@ -216,9 +218,9 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
   }
 
   @Override
-  public void updateEvent(String eventId, Optional<Date> startDateTime, Optional<Date> endDateTime, Optional<String> captureAgentId,
-          Optional<Set<String>> userIds, Optional<MediaPackage> mediaPackage, Optional<Map<String, String>> wfProperties,
-          Optional<Map<String, String>> caMetadata)
+  public void updateEvent(String eventId, Optional<Date> startDateTime, Optional<Date> endDateTime,
+          Optional<String> captureAgentId, Optional<Set<String>> userIds, Optional<MediaPackage> mediaPackage,
+          Optional<Map<String, String>> wfProperties, Optional<Map<String, String>> caMetadata)
                   throws NotFoundException, UnauthorizedException, SchedulerConflictException, SchedulerException {
 
     updateEvent(eventId, startDateTime, endDateTime, captureAgentId, userIds,
@@ -226,29 +228,36 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
   }
 
   @Override
-  public void updateEvent(String eventId, Optional<Date> startDateTime, Optional<Date> endDateTime, Optional<String> captureAgentId,
-          Optional<Set<String>> userIds, Optional<MediaPackage> mediaPackage, Optional<Map<String, String>> wfProperties,
-          Optional<Map<String, String>> caMetadata, boolean allowConflict)
+  public void updateEvent(String eventId, Optional<Date> startDateTime, Optional<Date> endDateTime,
+          Optional<String> captureAgentId, Optional<Set<String>> userIds, Optional<MediaPackage> mediaPackage,
+          Optional<Map<String, String>> wfProperties, Optional<Map<String, String>> caMetadata, boolean allowConflict)
                   throws NotFoundException, UnauthorizedException, SchedulerConflictException, SchedulerException {
 
     logger.debug("Start updating event {}.", eventId);
     HttpPut put = new HttpPut("/" + eventId);
 
     List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
-    if (startDateTime.isPresent())
+    if (startDateTime.isPresent()) {
       params.add(new BasicNameValuePair("start", Long.toString(startDateTime.get().getTime())));
-    if (endDateTime.isPresent())
+    }
+    if (endDateTime.isPresent()) {
       params.add(new BasicNameValuePair("end", Long.toString(endDateTime.get().getTime())));
-    if (captureAgentId.isPresent())
+    }
+    if (captureAgentId.isPresent()) {
       params.add(new BasicNameValuePair("agent", captureAgentId.get()));
-    if (userIds.isPresent())
+    }
+    if (userIds.isPresent()) {
       params.add(new BasicNameValuePair("users", StringUtils.join(userIds.get(), ",")));
-    if (mediaPackage.isPresent())
+    }
+    if (mediaPackage.isPresent()) {
       params.add(new BasicNameValuePair("mediaPackage", MediaPackageParser.getAsXml(mediaPackage.get())));
-    if (wfProperties.isPresent())
+    }
+    if (wfProperties.isPresent()) {
       params.add(new BasicNameValuePair("wfproperties", toPropertyString(wfProperties.get())));
-    if (caMetadata.isPresent())
+    }
+    if (caMetadata.isPresent()) {
       params.add(new BasicNameValuePair("agentparameters", toPropertyString(caMetadata.get())));
+    }
     params.add(new BasicNameValuePair("allowConflict", BooleanUtils.toString(allowConflict, "true", "false", "false")));
     put.setEntity(new UrlEncodedFormEntity(params, UTF_8));
 
@@ -587,7 +596,8 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
   }
 
   @Override
-  public Optional<MediaPackage> getCurrentRecording(String captureAgentId) throws SchedulerException, UnauthorizedException {
+  public Optional<MediaPackage> getCurrentRecording(String captureAgentId)
+          throws SchedulerException, UnauthorizedException {
     HttpGet get = new HttpGet(UrlSupport.concat("currentRecording", captureAgentId));
     HttpResponse response = getResponse(get, SC_OK, SC_NO_CONTENT, SC_UNAUTHORIZED);
     try {
@@ -612,14 +622,16 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
   }
 
   @Override
-  public Optional<MediaPackage> getUpcomingRecording(String captureAgentId) throws SchedulerException, UnauthorizedException {
+  public Optional<MediaPackage> getUpcomingRecording(String captureAgentId)
+          throws SchedulerException, UnauthorizedException {
     HttpGet get = new HttpGet(UrlSupport.concat("upcomingRecording", captureAgentId));
     HttpResponse response = getResponse(get, SC_OK, SC_NO_CONTENT, SC_UNAUTHORIZED);
     try {
       if (SC_OK == response.getStatusLine().getStatusCode()) {
         String mediaPackageXml = EntityUtils.toString(response.getEntity(), UTF_8);
         MediaPackage event = MediaPackageParser.getFromXml(mediaPackageXml);
-        logger.info("Successfully get upcoming recording of agent {} from the remote scheduler service", captureAgentId);
+        logger.info("Successfully get upcoming recording of agent {} from the remote scheduler service",
+            captureAgentId);
         return Optional.of(event);
       } else if (SC_UNAUTHORIZED == response.getStatusLine().getStatusCode()) {
         logger.info("Unauthorized to get upcoming recording of agent {}", captureAgentId);
@@ -887,8 +899,9 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
 
   private String toPropertyString(Map<String, String> properties) {
     StringBuilder wfPropertiesString = new StringBuilder();
-    for (Map.Entry<String, String> entry : properties.entrySet())
+    for (Map.Entry<String, String> entry : properties.entrySet()) {
       wfPropertiesString.append(entry.getKey() + "=" + entry.getValue() + "\n");
+    }
     return wfPropertiesString.toString();
   }
 

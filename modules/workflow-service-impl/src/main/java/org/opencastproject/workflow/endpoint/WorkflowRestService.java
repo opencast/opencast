@@ -107,13 +107,19 @@ import javax.ws.rs.core.Response.Status;
  * A REST endpoint for the {@link WorkflowService}
  */
 @Path("/workflow")
-@RestService(name = "workflowservice", title = "Workflow Service", abstractText = "This service lists available workflows and starts, stops, suspends and resumes workflow instances.", notes = {
+@RestService(name = "workflowservice",
+    title = "Workflow Service",
+    abstractText = "This service lists available workflows and starts, stops, suspends and resumes workflow instances.",
+    notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
         "If the service is down or not working it will return a status 503, this means the the underlying service is "
                 + "not working and is either restarting or has failed",
         "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
-                + "other words, there is a bug! You should file an error report with your server logs from the time when the "
-                + "error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>" })
+                + "other words, there is a bug! You should file an error report with your server logs from the time "
+                + "when the error occurred: "
+                + "<a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>"
+    }
+)
 @Component(
     immediate = true,
     service = WorkflowRestService.class,
@@ -209,9 +215,16 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @GET
   @Produces(MediaType.TEXT_PLAIN)
   @Path("/count")
-  @RestQuery(name = "count", description = "Returns the number of workflow instances in a specific state", returnDescription = "Returns the number of workflow instances in a specific state", restParameters = {
-          @RestParameter(name = "state", isRequired = false, description = "The workflow state", type = STRING)},
-          responses = { @RestResponse(responseCode = SC_OK, description = "The number of workflow instances.") })
+  @RestQuery(name = "count",
+      description = "Returns the number of workflow instances in a specific state",
+      returnDescription = "Returns the number of workflow instances in a specific state",
+      restParameters = {
+          @RestParameter(name = "state", isRequired = false, description = "The workflow state", type = STRING)
+      },
+      responses = {
+          @RestResponse(responseCode = SC_OK, description = "The number of workflow instances.")
+      }
+  )
   public Response getCount(@QueryParam("state") WorkflowInstance.WorkflowState state,
           @QueryParam("operation") String operation) {
     try {
@@ -225,7 +238,13 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @GET
   @Path("definitions.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "definitions", description = "List all available workflow definitions as JSON", returnDescription = "Returns the workflow definitions as JSON", responses = { @RestResponse(responseCode = SC_OK, description = "The workflow definitions.") })
+  @RestQuery(name = "definitions",
+      description = "List all available workflow definitions as JSON",
+      returnDescription = "Returns the workflow definitions as JSON",
+      responses = {
+          @RestResponse(responseCode = SC_OK, description = "The workflow definitions.")
+      }
+  )
   public WorkflowDefinitionSet getWorkflowDefinitionsAsJson() throws Exception {
     return getWorkflowDefinitionsAsXml();
   }
@@ -233,7 +252,13 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @GET
   @Path("definitions.xml")
   @Produces(MediaType.APPLICATION_XML)
-  @RestQuery(name = "definitions", description = "List all available workflow definitions as XML", returnDescription = "Returns the workflow definitions as XML", responses = { @RestResponse(responseCode = SC_OK, description = "The workflow definitions.") })
+  @RestQuery(name = "definitions",
+      description = "List all available workflow definitions as XML",
+      returnDescription = "Returns the workflow definitions as XML",
+      responses = {
+          @RestResponse(responseCode = SC_OK, description = "The workflow definitions.")
+      }
+  )
   public WorkflowDefinitionSet getWorkflowDefinitionsAsXml() throws Exception {
     List<WorkflowDefinition> list = service.listAvailableWorkflowDefinitions();
     return new WorkflowDefinitionSet(list);
@@ -242,9 +267,18 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("definition/{id}.json")
-  @RestQuery(name = "definitionasjson", description = "Returns a single workflow definition", returnDescription = "Returns a JSON representation of the workflow definition with the specified identifier", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "The workflow definition identifier", type = STRING) }, responses = {
+  @RestQuery(name = "definitionasjson",
+      description = "Returns a single workflow definition",
+      returnDescription = "Returns a JSON representation of the workflow definition with the specified identifier",
+      pathParameters = {
+          @RestParameter(name = "id", isRequired = true, description = "The workflow definition identifier",
+              type = STRING)
+      },
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "The workflow definition."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "Workflow definition not found.") })
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "Workflow definition not found.")
+      }
+  )
   public Response getWorkflowDefinitionAsJson(@PathParam("id") String workflowDefinitionId)
           throws NotFoundException {
     WorkflowDefinition def;
@@ -259,9 +293,17 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @GET
   @Produces(MediaType.TEXT_XML)
   @Path("definition/{id}.xml")
-  @RestQuery(name = "definitionasxml", description = "Returns a single workflow definition", returnDescription = "Returns an XML representation of the workflow definition with the specified identifier", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "The workflow definition identifier", type = STRING) }, responses = {
+  @RestQuery(name = "definitionasxml",
+      description = "Returns a single workflow definition",
+      returnDescription = "Returns an XML representation of the workflow definition with the specified identifier",
+      pathParameters = {
+          @RestParameter(name = "id", isRequired = true, description = "The workflow definition identifier",
+              type = STRING)
+      }, responses = {
           @RestResponse(responseCode = SC_OK, description = "The workflow definition."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "Workflow definition not found.") })
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "Workflow definition not found.")
+      }
+  )
   public Response getWorkflowDefinitionAsXml(@PathParam("id") String workflowDefinitionId)
           throws NotFoundException {
     return getWorkflowDefinitionAsJson(workflowDefinitionId);
@@ -276,7 +318,17 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @GET
   @Produces(MediaType.TEXT_HTML)
   @Path("configurationPanel")
-  @RestQuery(name = "configpanel", description = "Get the configuration panel for a specific workflow", returnDescription = "The HTML workflow configuration panel", restParameters = { @RestParameter(name = "definitionId", isRequired = false, description = "The workflow definition identifier", type = STRING) }, responses = { @RestResponse(responseCode = SC_OK, description = "The workflow configuration panel.") })
+  @RestQuery(name = "configpanel",
+      description = "Get the configuration panel for a specific workflow",
+      returnDescription = "The HTML workflow configuration panel",
+      restParameters = {
+          @RestParameter(name = "definitionId", isRequired = false, description = "The workflow definition identifier",
+              type = STRING)
+      },
+      responses = {
+      @RestResponse(responseCode = SC_OK, description = "The workflow configuration panel.")
+      }
+  )
   public Response getConfigurationPanel(@QueryParam("definitionId") String definitionId)
           throws NotFoundException {
     try {
@@ -291,12 +343,16 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("mediaPackage/{id}/hasActiveWorkflows")
-  @RestQuery(name = "hasactiveworkflows", description = "Returns if a media package has active workflows",
-          returnDescription = "Returns wether the media package has active workflows as a boolean.",
-          pathParameters = {
-                  @RestParameter(name = "id", isRequired = true, description = "The media package identifier", type = STRING) },
-          responses = {
-                  @RestResponse(responseCode = SC_OK, description = "Whether the media package has active workflows.")})
+  @RestQuery(name = "hasactiveworkflows",
+      description = "Returns if a media package has active workflows",
+      returnDescription = "Returns wether the media package has active workflows as a boolean.",
+      pathParameters = {
+          @RestParameter(name = "id", isRequired = true, description = "The media package identifier", type = STRING)
+      },
+      responses = {
+          @RestResponse(responseCode = SC_OK, description = "Whether the media package has active workflows.")
+      }
+  )
   public Response mediaPackageHasActiveWorkflows(@PathParam("id") String mediaPackageId) {
     try {
       return Response.ok(Boolean.toString(service.mediaPackageHasActiveWorkflows(mediaPackageId))).build();
@@ -309,12 +365,16 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("mediaPackage/{id}/instances.json")
-  @RestQuery(name = "workflowsofmediapackage", description = "Returns the workflows for a media package",
-          returnDescription = "Returns the workflows that are associated with the media package as JSON.",
-          pathParameters = {
-                  @RestParameter(name = "id", isRequired = true, description = "The media package identifier", type = STRING) },
-          responses = {
-                  @RestResponse(responseCode = SC_OK, description = "Returns the workflows for a media package.")})
+  @RestQuery(name = "workflowsofmediapackage",
+      description = "Returns the workflows for a media package",
+      returnDescription = "Returns the workflows that are associated with the media package as JSON.",
+      pathParameters = {
+          @RestParameter(name = "id", isRequired = true, description = "The media package identifier", type = STRING)
+      },
+      responses = {
+          @RestResponse(responseCode = SC_OK, description = "Returns the workflows for a media package.")
+      }
+  )
   public Response getWorkflowsOfMediaPackage(@PathParam("id") String mediaPackageId) {
     try {
       return Response.ok(new WorkflowSetImpl(service.getWorkflowInstancesByMediaPackage(mediaPackageId))).build();
@@ -328,13 +388,16 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("mediaPackage/{id}/currentInstance.json")
-  @RestQuery(name = "currentworkflowofmediapackage", description = "Returns the current workflow for a media package",
-          returnDescription = "Returns the currentworkflow that are associated with the media package as JSON.",
-          pathParameters = {
-                  @RestParameter(name = "id", isRequired = true, description = "The media package identifier", type = STRING) },
-          responses = {
-                  @RestResponse(responseCode = SC_OK, description = "Returns the workflows for a media package."),
-                  @RestResponse(responseCode = SC_NOT_FOUND, description = "Current workflow not found.") })
+  @RestQuery(name = "currentworkflowofmediapackage",
+      description = "Returns the current workflow for a media package",
+      returnDescription = "Returns the currentworkflow that are associated with the media package as JSON.",
+      pathParameters = {
+          @RestParameter(name = "id", isRequired = true, description = "The media package identifier", type = STRING) },
+      responses = {
+          @RestResponse(responseCode = SC_OK, description = "Returns the workflows for a media package."),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "Current workflow not found.")
+      }
+  )
   public Response getRunningWorkflowOfMediaPackage(@PathParam("id") String mediaPackageId) {
     try {
       Optional<WorkflowInstance> optWorkflowInstance = service.
@@ -353,14 +416,17 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("user/{id}/hasActiveWorkflows")
-  @RestQuery(name = "userhasactiveworkflows", description = "Returns if there are currently workflow(s) running that"
-          + "were started by the given user",
-          returnDescription = "Returns if there are currently workflow(s) running that were started by the given user "
-                  + "as a boolean.",
-          pathParameters = {
-                  @RestParameter(name = "id", isRequired = true, description = "The user identifier", type = STRING) },
-          responses = {
-                  @RestResponse(responseCode = SC_OK, description = "Whether there are active workflow for the user.")})
+  @RestQuery(name = "userhasactiveworkflows",
+      description = "Returns if there are currently workflow(s) running that were started by the given user",
+      returnDescription = "Returns if there are currently workflow(s) running that were started by the given user "
+              + "as a boolean.",
+      pathParameters = {
+              @RestParameter(name = "id", isRequired = true, description = "The user identifier", type = STRING)
+      },
+      responses = {
+              @RestResponse(responseCode = SC_OK, description = "Whether there are active workflow for the user.")
+      }
+  )
   public Response userHasActiveWorkflows(@PathParam("id") String userId) {
     try {
       return Response.ok(Boolean.toString(service.userHasActiveWorkflows(userId))).build();
@@ -373,9 +439,18 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @GET
   @Produces(MediaType.TEXT_XML)
   @Path("instance/{id}.xml")
-  @RestQuery(name = "workflowasxml", description = "Get a specific workflow instance.", returnDescription = "An XML representation of a workflow instance", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "The workflow instance identifier", type = STRING) }, responses = {
+  @RestQuery(name = "workflowasxml",
+      description = "Get a specific workflow instance.",
+      returnDescription = "An XML representation of a workflow instance",
+      pathParameters = {
+          @RestParameter(name = "id", isRequired = true, description = "The workflow instance identifier",
+              type = STRING)
+      },
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "An XML representation of the workflow instance."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "No workflow instance with that identifier exists.") })
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "No workflow instance with that identifier exists.")
+      }
+  )
   public JaxbWorkflowInstance getWorkflowAsXml(@PathParam("id") long id) throws WorkflowDatabaseException,
           NotFoundException, UnauthorizedException {
     return new JaxbWorkflowInstance(service.getWorkflowById(id));
@@ -384,9 +459,18 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("instance/{id}.json")
-  @RestQuery(name = "workflowasjson", description = "Get a specific workflow instance.", returnDescription = "A JSON representation of a workflow instance", pathParameters = { @RestParameter(name = "id", isRequired = true, description = "The workflow instance identifier", type = STRING) }, responses = {
+  @RestQuery(name = "workflowasjson",
+      description = "Get a specific workflow instance.",
+      returnDescription = "A JSON representation of a workflow instance",
+      pathParameters = {
+          @RestParameter(name = "id", isRequired = true, description = "The workflow instance identifier",
+              type = STRING)
+      },
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "A JSON representation of the workflow instance."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "No workflow instance with that identifier exists.") })
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "No workflow instance with that identifier exists.")
+      }
+  )
   public JaxbWorkflowInstance getWorkflowAsJson(@PathParam("id") long id) throws WorkflowDatabaseException,
           NotFoundException, UnauthorizedException {
     return getWorkflowAsXml(id);
@@ -395,19 +479,30 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @POST
   @Path("start")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "start", description = "Start a new workflow instance.", returnDescription = "An XML representation of the new workflow instance", restParameters = {
-          @RestParameter(name = "definition", isRequired = true, description = "The workflow definition ID or an XML representation of a workflow definition", type = TEXT, jaxbClass = WorkflowDefinitionImpl.class),
-          @RestParameter(name = "mediapackage", isRequired = true, description = "The XML representation of a mediapackage", type = TEXT, jaxbClass = MediaPackageImpl.class),
-          @RestParameter(name = "parent", isRequired = false, description = "An optional parent workflow instance identifier", type = STRING),
-          @RestParameter(name = "properties", isRequired = false, description = "An optional set of key=value\\n properties", type = TEXT) }, responses = {
+  @RestQuery(name = "start",
+      description = "Start a new workflow instance.",
+      returnDescription = "An XML representation of the new workflow instance",
+      restParameters = {
+          @RestParameter(name = "definition", isRequired = true, description = "The workflow definition ID or an XML "
+              + "representation of a workflow definition", type = TEXT, jaxbClass = WorkflowDefinitionImpl.class),
+          @RestParameter(name = "mediapackage", isRequired = true, description = "The XML representation of a "
+              + "mediapackage", type = TEXT, jaxbClass = MediaPackageImpl.class),
+          @RestParameter(name = "parent", isRequired = false, description = "An optional parent workflow instance "
+              + "identifier", type = STRING),
+          @RestParameter(name = "properties", isRequired = false, description = "An optional set of key=value\\n "
+              + "properties", type = TEXT) }, responses = {
           @RestResponse(responseCode = SC_OK, description = "An XML representation of the new workflow instance."),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to resume. Maybe you need to authenticate."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "If the parent workflow does not exist") })
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to resume. Maybe you "
+              + "need to authenticate."),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "If the parent workflow does not exist")
+      }
+  )
   public JaxbWorkflowInstance start(@FormParam("definition") String workflowDefinitionXmlOrId,
           @FormParam("mediapackage") MediaPackageImpl mp, @FormParam("parent") String parentWorkflowId,
           @FormParam("properties") LocalHashMap localMap) {
-    if (mp == null || StringUtils.isBlank(workflowDefinitionXmlOrId))
+    if (mp == null || StringUtils.isBlank(workflowDefinitionXmlOrId)) {
       throw new WebApplicationException(Status.BAD_REQUEST);
+    }
 
     WorkflowDefinition workflowDefinition;
     try {
@@ -433,8 +528,9 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   private WorkflowInstance startWorkflow(WorkflowDefinition workflowDefinition, MediaPackageImpl mp,
           String parentWorkflowId, LocalHashMap localMap) throws UnauthorizedException {
     Map<String, String> properties = new HashMap<String, String>();
-    if (localMap != null)
+    if (localMap != null) {
       properties = localMap.getMap();
+    }
 
     Long parentIdAsLong = null;
     if (StringUtils.isNotEmpty(parentWorkflowId)) {
@@ -457,11 +553,21 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @POST
   @Path("stop")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "stop", description = "Stops a workflow instance.", returnDescription = "An XML representation of the stopped workflow instance", restParameters = { @RestParameter(name = "id", isRequired = true, description = "The workflow instance identifier", type = STRING) }, responses = {
+  @RestQuery(name = "stop",
+      description = "Stops a workflow instance.",
+      returnDescription = "An XML representation of the stopped workflow instance",
+      restParameters = {
+          @RestParameter(name = "id", isRequired = true, description = "The workflow instance identifier",
+              type = STRING)
+      },
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "An XML representation of the stopped workflow instance."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "No running workflow instance with that identifier exists.") })
-  public JaxbWorkflowInstance stop(@FormParam("id") long workflowInstanceId) throws WorkflowException, NotFoundException,
-          UnauthorizedException {
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "No running workflow instance with that identifier "
+              + "exists.")
+      }
+  )
+  public JaxbWorkflowInstance stop(@FormParam("id") long workflowInstanceId)
+          throws WorkflowException, NotFoundException, UnauthorizedException {
     WorkflowInstance instance = service.stop(workflowInstanceId);
     return new JaxbWorkflowInstance(instance);
   }
@@ -469,14 +575,28 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @DELETE
   @Path("remove/{id}")
   @Produces(MediaType.TEXT_PLAIN)
-  @RestQuery(name = "remove", description = "Danger! Permenantly removes a workflow instance including all its child jobs. In most circumstances, /stop is what you should use.", returnDescription = "HTTP 204 No Content", pathParameters = {
-          @RestParameter(name = "id", isRequired = true, description = "The workflow instance identifier", type = STRING)}, restParameters = {
-          @RestParameter(name = "force", isRequired = false, description = "If the workflow status should be ignored and the workflow removed anyway", type = Type.BOOLEAN, defaultValue = "false")}, responses = {
-          @RestResponse(responseCode = HttpServletResponse.SC_NO_CONTENT, description = "If workflow instance could be removed successfully, no content is returned"),
+  @RestQuery(name = "remove",
+      description = "Danger! Permenantly removes a workflow instance including all its child jobs. In most "
+          + "circumstances, /stop is what you should use.",
+      returnDescription = "HTTP 204 No Content",
+      pathParameters = {
+          @RestParameter(name = "id", isRequired = true, description = "The workflow instance identifier",
+              type = STRING)
+      },
+      restParameters = {
+          @RestParameter(name = "force", isRequired = false, description = "If the workflow status should be ignored "
+              + "and the workflow removed anyway", type = Type.BOOLEAN, defaultValue = "false")
+      },
+      responses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_NO_CONTENT, description = "If workflow instance could be "
+              + "removed successfully, no content is returned"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "No workflow instance with that identifier exists."),
-          @RestResponse(responseCode = SC_FORBIDDEN, description = "It's not allowed to remove other workflow instance statues than STOPPED, SUCCEEDED and FAILED (use force parameter to override AT YOUR OWN RISK).") })
-  public Response remove(@PathParam("id") long workflowInstanceId, @QueryParam("force") boolean force) throws WorkflowException, NotFoundException,
-          UnauthorizedException {
+          @RestResponse(responseCode = SC_FORBIDDEN, description = "It's not allowed to remove other workflow instance "
+              + "statues than STOPPED, SUCCEEDED and FAILED (use force parameter to override AT YOUR OWN RISK).")
+      }
+  )
+  public Response remove(@PathParam("id") long workflowInstanceId, @QueryParam("force") boolean force)
+          throws WorkflowException, NotFoundException, UnauthorizedException {
     try {
       service.remove(workflowInstanceId, force);
     } catch (WorkflowStateException e) {
@@ -488,9 +608,20 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @POST
   @Path("suspend")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "suspend", description = "Suspends a workflow instance.", returnDescription = "An XML representation of the suspended workflow instance", restParameters = { @RestParameter(name = "id", isRequired = true, description = "The workflow instance identifier", type = STRING) }, responses = {
-          @RestResponse(responseCode = SC_OK, description = "An XML representation of the suspended workflow instance."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "No running workflow instance with that identifier exists.") })
+  @RestQuery(name = "suspend",
+      description = "Suspends a workflow instance.",
+      returnDescription = "An XML representation of the suspended workflow instance",
+      restParameters = {
+          @RestParameter(name = "id", isRequired = true, description = "The workflow instance identifier",
+              type = STRING)
+      },
+      responses = {
+          @RestResponse(responseCode = SC_OK, description = "An XML representation of the suspended workflow "
+              + "instance."),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "No running workflow instance with that identifier "
+              + "exists.")
+      }
+  )
   public Response suspend(@FormParam("id") long workflowInstanceId) throws NotFoundException, UnauthorizedException {
     try {
       WorkflowInstance workflow = service.suspend(workflowInstanceId);
@@ -503,11 +634,22 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @POST
   @Path("resume")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "resume", description = "Resumes a suspended workflow instance.", returnDescription = "An XML representation of the resumed workflow instance", restParameters = { @RestParameter(name = "id", isRequired = true, description = "The workflow instance identifier", type = STRING) }, responses = {
+  @RestQuery(name = "resume",
+      description = "Resumes a suspended workflow instance.",
+      returnDescription = "An XML representation of the resumed workflow instance",
+      restParameters = {
+          @RestParameter(name = "id", isRequired = true, description = "The workflow instance identifier",
+              type = STRING)
+      },
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "An XML representation of the resumed workflow instance."),
           @RestResponse(responseCode = SC_CONFLICT, description = "Can not resume workflow not in paused state"),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "No suspended workflow instance with that identifier exists."),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to resume. Maybe you need to authenticate.") })
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "No suspended workflow instance with that "
+              + "identifier exists."),
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to resume. "
+              + "Maybe you need to authenticate.")
+      }
+  )
   public Response resume(@FormParam("id") long workflowInstanceId, @FormParam("properties") LocalHashMap properties)
           throws NotFoundException, UnauthorizedException {
     return resume(workflowInstanceId, null, properties);
@@ -516,14 +658,24 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @POST
   @Path("replaceAndresume")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "replaceAndresume", description = "Replaces a suspended workflow instance with an updated version, and resumes the workflow.", returnDescription = "An XML representation of the updated and resumed workflow instance", restParameters = {
-          @RestParameter(name = "id", isRequired = true, description = "The workflow instance identifier", type = STRING),
+  @RestQuery(name = "replaceAndresume",
+      description = "Replaces a suspended workflow instance with an updated version, and resumes the workflow.",
+      returnDescription = "An XML representation of the updated and resumed workflow instance",
+      restParameters = {
+          @RestParameter(name = "id", isRequired = true, description = "The workflow instance identifier",
+              type = STRING),
           @RestParameter(name = "mediapackage", isRequired = false, description = "The new Mediapackage", type = TEXT),
-          @RestParameter(name = "properties", isRequired = false, description = "Properties", type = TEXT) }, responses = {
-          @RestResponse(responseCode = SC_OK, description = "An XML representation of the updated and resumed workflow instance."),
+          @RestParameter(name = "properties", isRequired = false, description = "Properties", type = TEXT) },
+      responses = {
+          @RestResponse(responseCode = SC_OK, description = "An XML representation of the updated and resumed "
+              + "workflow instance."),
           @RestResponse(responseCode = SC_CONFLICT, description = "Can not resume workflow not in paused state"),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "No suspended workflow instance with that identifier exists."),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to resume. Maybe you need to authenticate.") })
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "No suspended workflow instance with that "
+              + "identifier exists."),
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to resume. "
+              + "Maybe you need to authenticate.")
+      }
+  )
   public Response resume(@FormParam("id") long workflowInstanceId,
           @FormParam("mediapackage") final String mediaPackage, @FormParam("properties") LocalHashMap properties)
           throws NotFoundException, UnauthorizedException {
@@ -548,8 +700,9 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
 
         // Delete removed elements from workspace
         for (MediaPackageElement elem : oldMp.getElements()) {
-          if (MediaPackageSupport.contains(elem.getIdentifier(), newMp))
+          if (MediaPackageSupport.contains(elem.getIdentifier(), newMp)) {
             continue;
+          }
           try {
             workspace.delete(elem.getURI());
             logger.info("Deleted removed mediapackge element {}", elem);
@@ -584,9 +737,19 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
 
   @POST
   @Path("update")
-  @RestQuery(name = "update", description = "Updates a workflow instance.", returnDescription = "No content.", restParameters = { @RestParameter(name = "workflow", isRequired = true, description = "The XML representation of the workflow instance.", type = TEXT) }, responses = { @RestResponse(responseCode = SC_NO_CONTENT, description = "Workflow instance updated.") })
-  public Response update(@FormParam("workflow") String workflowInstance) throws NotFoundException,
-          UnauthorizedException {
+  @RestQuery(name = "update",
+      description = "Updates a workflow instance.",
+      returnDescription = "No content.",
+      restParameters = {
+          @RestParameter(name = "workflow", isRequired = true, description = "The XML representation of the "
+              + "workflow instance.", type = TEXT)
+      },
+      responses = {
+          @RestResponse(responseCode = SC_NO_CONTENT, description = "Workflow instance updated.")
+      }
+  )
+  public Response update(@FormParam("workflow") String workflowInstance)
+          throws NotFoundException, UnauthorizedException {
     try {
       WorkflowInstance instance = XmlWorkflowParser.parseWorkflowInstance(workflowInstance);
       service.update(instance);
@@ -599,7 +762,14 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @GET
   @Path("handlers.json")
   @SuppressWarnings("unchecked")
-  @RestQuery(name = "handlers", description = "List all registered workflow operation handlers (implementations).", returnDescription = "A JSON representation of the registered workflow operation handlers.", responses = { @RestResponse(responseCode = SC_OK, description = "A JSON representation of the registered workflow operation handlers") })
+  @RestQuery(name = "handlers",
+      description = "List all registered workflow operation handlers (implementations).",
+      returnDescription = "A JSON representation of the registered workflow operation handlers.",
+      responses = {
+          @RestResponse(responseCode = SC_OK, description = "A JSON representation of the registered workflow "
+              + "operation handlers")
+      }
+  )
   public Response getOperationHandlers() {
     JSONArray jsonArray = new JSONArray();
     for (HandlerRegistration reg : ((WorkflowServiceImpl) service).getRegisteredHandlers()) {
@@ -615,22 +785,36 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
   @GET
   @Path("statemappings.json")
   @SuppressWarnings("unchecked")
-  @RestQuery(name = "statemappings", description = "Get all workflow state mappings",
+  @RestQuery(name = "statemappings",
+      description = "Get all workflow state mappings",
       returnDescription = "A JSON representation of the workflow state mappings.",
-      responses = { @RestResponse(responseCode = SC_OK, description = "A JSON representation of the workflow state mappings") })
+      responses = {
+          @RestResponse(responseCode = SC_OK, description = "A JSON representation of the workflow state mappings")
+      }
+  )
   public Response getStateMappings() {
     return Response.ok(new JSONObject(service.getWorkflowStateMappings()).toJSONString())
         .header("Content-Type", MediaType.APPLICATION_JSON).build();
   }
 
   @Path("/cleanup")
-  @RestQuery(name = "cleanup", description = "Cleans up workflow instances", returnDescription = "No return value", responses = {
+  @RestQuery(name = "cleanup",
+      description = "Cleans up workflow instances",
+      returnDescription = "No return value",
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "Cleanup OK"),
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "Couldn't parse given state"),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to cleanup. Maybe you need to authenticate."),
-          @RestResponse(responseCode = SC_FORBIDDEN, description = "It's not allowed to delete other workflow instance statues than STOPPED, SUCCEEDED and FAILED") }, restParameters = {
-          @RestParameter(name = "buffer", type = Type.INTEGER, defaultValue = "30", isRequired = true, description = "Lifetime (buffer) in days a workflow instance should live"),
-          @RestParameter(name = "state", type = Type.STRING, isRequired = true, description = "Workflow instance state, only STOPPED, SUCCEEDED and FAILED are allowed values here") })
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to cleanup. "
+              + "Maybe you need to authenticate."),
+          @RestResponse(responseCode = SC_FORBIDDEN, description = "It's not allowed to delete other workflow "
+              + "instance statues than STOPPED, SUCCEEDED and FAILED")
+      }, restParameters = {
+          @RestParameter(name = "buffer", type = Type.INTEGER, defaultValue = "30", isRequired = true,
+              description = "Lifetime (buffer) in days a workflow instance should live"),
+          @RestParameter(name = "state", type = Type.STRING, isRequired = true,
+              description = "Workflow instance state, only STOPPED, SUCCEEDED and FAILED are allowed values here")
+      }
+  )
   public Response cleanup(@FormParam("buffer") int buffer, @FormParam("state") String stateParam)
           throws UnauthorizedException {
 
@@ -642,8 +826,9 @@ public class WorkflowRestService extends AbstractJobProducerEndpoint {
     }
 
     if (state != WorkflowInstance.WorkflowState.SUCCEEDED && state != WorkflowInstance.WorkflowState.FAILED
-            && state != WorkflowInstance.WorkflowState.STOPPED)
+            && state != WorkflowInstance.WorkflowState.STOPPED) {
       return Response.status(Status.FORBIDDEN).build();
+    }
 
     try {
       service.cleanupWorkflowInstances(buffer, state);

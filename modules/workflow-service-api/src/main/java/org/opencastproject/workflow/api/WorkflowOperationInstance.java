@@ -81,7 +81,8 @@ public class WorkflowOperationInstance implements Configurable {
           name = "oc_workflow_operation_configuration",
           joinColumns = @JoinColumn(name = "workflow_operation_id"),
           indexes = {
-                @Index(name = "IX_oc_workflow_operation_configuration_workflow_operation_id", columnList = ("workflow_operation_id")),
+                @Index(name = "IX_oc_workflow_operation_configuration_workflow_operation_id",
+                    columnList = ("workflow_operation_id")),
           }
   )
   @MapKeyColumn(name = "configuration_key", nullable = false)
@@ -316,8 +317,9 @@ public class WorkflowOperationInstance implements Configurable {
    */
   @Override
   public String getConfiguration(String key) {
-    if (key == null || configurations == null)
+    if (key == null || configurations == null) {
       return null;
+    }
     return configurations.get(key);
   }
 
@@ -328,8 +330,9 @@ public class WorkflowOperationInstance implements Configurable {
    */
   @Override
   public void removeConfiguration(String key) {
-    if (key == null || configurations == null)
+    if (key == null || configurations == null) {
       return;
+    }
     configurations.remove(key);
   }
 
@@ -340,10 +343,12 @@ public class WorkflowOperationInstance implements Configurable {
    */
   @Override
   public void setConfiguration(String key, String value) {
-    if (key == null)
+    if (key == null) {
       return;
-    if (configurations == null)
+    }
+    if (configurations == null) {
       configurations = new TreeMap<>();
+    }
 
     configurations.put(key, value);
   }
