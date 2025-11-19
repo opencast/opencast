@@ -34,6 +34,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +54,7 @@ public class EventSearchQuery extends AbstractSearchQuery {
   private final List<String> presenters = new ArrayList<String>();
   private final List<String> contributors = new ArrayList<String>();
   private String subject = null;
+  private Map<String, Map<String, List<String>>> extendedMetadata = new HashMap<>();
   private String location = null;
   private String seriesId = null;
   private String seriesName = null;
@@ -298,6 +300,33 @@ public class EventSearchQuery extends AbstractSearchQuery {
    */
   public String getSubject() {
     return subject;
+  }
+
+  /**
+   * Selects recording events with the given subject.
+   *
+   * @param flavor
+   *          the flavor of the catalog
+   * @param key
+   *          the metadata field key
+   * @param value
+   *           the metadata field value
+   * @return the enhanced search query
+   */
+  public EventSearchQuery withExtendedMetadata(String flavor, String key, String value) {
+    this.extendedMetadata.computeIfAbsent(flavor, h -> new HashMap<>())
+        .computeIfAbsent(key, a -> new ArrayList<>())
+        .add(value);
+    return this;
+  }
+
+  /**
+   * Returns the subject of the recording.
+   *
+   * @return the subject
+   */
+  public Map<String, Map<String, List<String>>> getExtendedMetadata() {
+    return extendedMetadata;
   }
 
   /**
