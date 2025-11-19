@@ -312,7 +312,9 @@
     <sec:intercept-url pattern="/search/**" method="GET" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/usertracking/**" method="GET" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/usertracking/**" method="PUT" access="ROLE_ANONYMOUS" />
+    <!-- The `/static` route is separately protected, see `StaticResoruceServlet` -->
     <sec:intercept-url pattern="/static/**" method="GET" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/static/**" method="HEAD" access="ROLE_ANONYMOUS" />
     <sec:intercept-url pattern="/export/**" method="GET" access="ROLE_ANONYMOUS" />
 
     <!-- Enable access to Opencast Studio -->
