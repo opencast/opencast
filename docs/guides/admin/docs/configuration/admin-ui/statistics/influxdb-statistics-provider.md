@@ -1,19 +1,6 @@
-Overview
-========
+# InfluxDB Statistics Provider
 
-In Opencast, the "Statistics" feature can be seen as a set of charts which can be displayed in the Admin UI. Currently,
-statistics for three so-called "resource types" are available:
-
-- Statistics for the resource type **EPISODE** are displayed in a tab in the event details dialog.
-- Statistics for the resource type **SERIES** are displayed in a tab in the series details dialog.
-- Statistics for the resource type **ORGANIZATION** are displayed in the "Statistics" menu of Opencast.
-
-These tabs/menus are only visible if the statistics feature is configured. For the statistics to work, you need a data
-source from which Opencast can retrieve the data to display. Currently, [InfluxDB](https://docs.influxdata.com/influxdb)
-is the only supported data source.
-
-Architecture
-============
+## Architecture
 
 A complete setup consists of the following components:
 
@@ -33,11 +20,7 @@ graph LR
 Precisely, the Opencast bundle `opencast-statistics-provider-influx` is the one that needs to be able to connect to
 InfluxDB using http(s). So the node hosting this bundle needs network access to InfluxDB.
 
-Configuration
-=============
-
-To enable the statistics view in the admin interface, set `prop.admin.statisttics.enabled=true`
-in `etc/org.opencastproject.organization-mh_default_org.cfg`.
+## Configuration
 
 Before configuring Opencast, you should have a running InfluxDB instance and should think about how you want your data
 to be written to InfluxDB and what your InfluxDB database schema should look like. Specifically, you should think about
@@ -46,23 +29,13 @@ retention policies, measurement names, field/tag names and how much you want to
 have any data in your InfluxDB, but want to verify your setup is working, there is some test data provided in the
 section [_Verifying Your Setup_](#verify).
 
-InfluxDB Access
----------------
+### InfluxDB Access
 
 Opencast needs to know how to talk to your InfluxDB instance. Therefore, you should edit the configuration file
 `etc/org.opencastproject.statistics.provider.influx.StatisticsProviderInfluxService.cfg` and fill in your influx URI,
 username, password, and database name.
 
-Statistics Providers
---------------------
-
-To support the detailed configuration of the charts to be shown in the Admin UI, Opencast has a concept called
-_Statistics Providers_. Each statistics provider can be configured separately and for each provider, there is one chart
-displayed in the Admin UI.
-
-The configuration files of the providers have to be stored at `etc/statistics` and they have to follow a certain naming
-convention. Configuration files of providers using InfluxDB have to be named starting with `influx.`. All provider
-configurations have to be in json format. So e.g. _influx.views.episode.sum.json_ would be a valid name.
+### InfluxDB Statistics Provider Configuration Files<a name="influxdb-statistics-provider-config"></a>
 
 For each provider, the following properties have to be configured:
 
@@ -113,17 +86,8 @@ Here is an example json configuration for a provider which generates charts for 
 }
 ```
 
-CSV Exports
------------
 
-Statistics can be exported to CSV files by clicking the "download" button in the top right corner of a graph. Per default,
-the export will contain the data which the graph currently displays. For series statistics, it is possible to change this
-behavior in the way that exported series statistics contain the data of all events of a series instead of just the top
-level series data. To enable this, it is necessary to specify which Statistics Provider should be used to get the episode
-data. See the configuration file `org.opencastproject.statistics.export.impl.StatisticsExportServiceImpl.cfg` for details.
-
-Using the `runningtotal` provider
------------
+### Using the `runningtotal` provider
 
 The `runningtotal` statistics provider is a special type of time series statistics provider. To illustrate what it
 can be used for, let’s assume we want to track the number of hours of videos per organization (this is actually
@@ -179,8 +143,7 @@ To _decrement_ the running total of hours in the case of retractions, set the `r
 In the default case, or when the `retract` property is `false` the running total is not decremented when a
 retraction occurs.
 
-Verifying Your Setup<a name="verify"></a>
-====================
+## Verifying Your Setup<a name="verify"></a>
 
 If you want to test your setup, you can put the following test data into InfluxDB and check if Opencast displays all
 charts correctly. First, create a series and an event as part of that series using the Opencast Admin UI. Second, copy
