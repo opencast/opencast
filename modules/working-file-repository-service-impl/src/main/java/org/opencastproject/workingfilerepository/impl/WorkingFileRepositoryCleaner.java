@@ -55,7 +55,7 @@ public class WorkingFileRepositoryCleaner {
   private List<String> collectionIds;
 
   protected WorkingFileRepositoryCleaner(WorkingFileRepository workingFileRepository, int schedulerPeriod, int maxAge,
-    List<String> collectionIds) {
+      List<String> collectionIds) {
     this.workingFileRepository = workingFileRepository;
     this.maxAge = maxAge;
     this.schedulerPeriod = schedulerPeriod;
@@ -160,7 +160,8 @@ public class WorkingFileRepositoryCleaner {
     public void execute(JobExecutionContext jobExecutionContext) throws JobExecutionException {
       logger.debug("Start working file repository cleaner");
       try {
-        execute((WorkingFileRepositoryCleaner) jobExecutionContext.getJobDetail().getJobDataMap().get(JOB_PARAM_PARENT));
+        execute((WorkingFileRepositoryCleaner) jobExecutionContext.getJobDetail().getJobDataMap()
+            .get(JOB_PARAM_PARENT));
       } catch (Exception e) {
         throw new JobExecutionException("An error occurred while cleaning working file repository", e);
       }
@@ -168,7 +169,7 @@ public class WorkingFileRepositoryCleaner {
     }
 
     private void execute(WorkingFileRepositoryCleaner workingFileRepositoryCleaner) {
-        workingFileRepositoryCleaner.cleanup();
+      workingFileRepositoryCleaner.cleanup();
     }
   }
 }
