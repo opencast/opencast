@@ -178,6 +178,16 @@ public class StaticResourceServlet extends HttpServlet {
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
     logger.debug("Looking for static resource '{}'", req.getRequestURI());
+    impl(req, resp, true);
+  }
+
+  @Override
+  protected void doHead(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+    logger.trace("HEAD request '{}'", req.getRequestURI());
+    impl(req, resp, false);
+  }
+
+  private void impl(HttpServletRequest req, HttpServletResponse resp, boolean withBody) throws IOException {
     String path = req.getPathInfo();
     if (path == null || path.contains("..")) {
       resp.sendError(HttpServletResponse.SC_FORBIDDEN);
@@ -221,14 +231,16 @@ public class StaticResourceServlet extends HttpServlet {
     ArrayList<Range> ranges = parseRange(req, resp, eTag, file.lastModified(), file.length());
 
     if ((((ranges == null) || (ranges.isEmpty())) && (req.getHeader("Range") == null)) || (ranges == FULL_RANGE)) {
-      IOException e = copyRange(new FileInputStream(file), resp.getOutputStream(), 0, file.length());
-      if (e != null) {
-        try {
-          resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        } catch (IOException e1) {
-          logger.warn("unable to send http 500 error", e1);
-        } catch (IllegalStateException e2) {
-          logger.trace("unable to send http 500 error. Client side was probably closed during file copy.", e2);
+      if (withBody) {
+        IOException e = copyRange(new FileInputStream(file), resp.getOutputStream(), 0, file.length());
+        if (e != null) {
+          try {
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+          } catch (IOException e1) {
+            logger.warn("unable to send http 500 error", e1);
+          } catch (IllegalStateException e2) {
+            logger.trace("unable to send http 500 error. Client side was probably closed during file copy.", e2);
+          }
         }
       }
       return;
@@ -246,20 +258,22 @@ public class StaticResourceServlet extends HttpServlet {
         // Set the content-length as String to be able to use a long
         resp.setHeader("content-length", "" + length);
       }
-      try {
-        resp.setBufferSize(2048);
-      } catch (IllegalStateException e) {
-        logger.debug(e.getMessage(), e);
-      }
       resp.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
-      IOException e = copyRange(new FileInputStream(file), resp.getOutputStream(), range.start, range.end);
-      if (e != null) {
+      if (withBody) {
         try {
-          resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        } catch (IOException e1) {
-          logger.warn("unable to send http 500 error", e1);
-        } catch (IllegalStateException e2) {
-          logger.trace("unable to send http 500 error. Client side was probably closed during file copy.", e2);
+          resp.setBufferSize(2048);
+        } catch (IllegalStateException e) {
+          logger.debug(e.getMessage(), e);
+        }
+        IOException e = copyRange(new FileInputStream(file), resp.getOutputStream(), range.start, range.end);
+        if (e != null) {
+          try {
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+          } catch (IOException e1) {
+            logger.warn("unable to send http 500 error", e1);
+          } catch (IllegalStateException e2) {
+            logger.trace("unable to send http 500 error. Client side was probably closed during file copy.", e2);
+          }
         }
       }
       return;
@@ -267,12 +281,14 @@ public class StaticResourceServlet extends HttpServlet {
 
     resp.setStatus(HttpServletResponse.SC_PARTIAL_CONTENT);
     resp.setContentType("multipart/byteranges; boundary=" + mimeSeparation);
-    try {
-      resp.setBufferSize(2048);
-    } catch (IllegalStateException e) {
-      logger.debug(e.getMessage(), e);
+    if (withBody) {
+      try {
+        resp.setBufferSize(2048);
+      } catch (IllegalStateException e) {
+        logger.debug(e.getMessage(), e);
+      }
+      copy(file, resp.getOutputStream(), ranges.iterator(), contentType);
     }
-    copy(file, resp.getOutputStream(), ranges.iterator(), contentType);
   }
 
   /**
