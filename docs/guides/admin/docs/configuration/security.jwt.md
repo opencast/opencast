@@ -102,7 +102,7 @@ An external application wants to let a user use Opencast Studio to record and up
 Spring Security Configuration
 -----------------------------
 
-In order to active JWT-based authentication and authorization, you will need to adjust your security config (e.g. `etc/security/mh_default_org.xml`).
+In order to activate JWT-based authentication and authorization, you will need to adjust your security config (e.g. `etc/security/mh_default_org.xml`).
 
 If you just want to be able to accept JWTs from Tobira or LMS, you only have to fill out a single value: `jwksUrl` (just search for that string, it's part of the `jwtLoginHandler` bean configuration). Just set the corresponding Tobira/LMS URL there (check their docs to find the URL). All other JWT configuration can usually be kept as is, as the defaults work fine for most cases.
 (Note: currently you can only easily connect either Tobira or an LMS. Until Opencast supports multiple URLs out of the box, you have to use an external tool for aggregating JWKS.)
