@@ -43,6 +43,7 @@ import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -124,6 +125,8 @@ public final class SecurityFilter implements Filter {
   @Override
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
           throws IOException, ServletException {
+
+    logger.info("#DCE Request: {}", ((HttpServletRequest) request).getRequestURI());
 
     // Make sure we have an organization
     Organization org = securityService.getOrganization();

@@ -153,6 +153,12 @@
       <artifactId>slf4j-reload4j</artifactId>
     </dependency>
     <dependency>
+       <groupId>org.glassfish.jersey.core</groupId>
+       <artifactId>jersey-common</artifactId>
+       <version>${jersey.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.easymock</groupId>
       <artifactId>easymock</artifactId>
       <scope>test</scope>
@@ -200,6 +206,7 @@
             <ignoredUnusedDeclaredDependency>org.mnode.ical4j:ical4j</ignoredUnusedDeclaredDependency>
             <!-- commons-codec -->
             <ignoredUnusedDeclaredDependency>commons-codec:commons-codec</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.glassfish.jersey.core:jersey-common</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>

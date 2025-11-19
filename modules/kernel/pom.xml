@@ -34,6 +34,12 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-userdirectory</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
       <artifactId>opencast-urlsigning-common</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
@@ -41,10 +47,6 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>commons-codec</groupId>
-      <artifactId>commons-codec</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>
@@ -71,6 +73,10 @@
       <artifactId>spring-web</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context</artifactId>
+    </dependency>
+    <dependency>
       <groupId>org.apache.servicemix.bundles</groupId>
       <artifactId>org.apache.servicemix.bundles.quartz</artifactId>
     </dependency>
@@ -80,21 +86,23 @@
     </dependency>
     <dependency>
       <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-config</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
+      <artifactId>spring-security-crypto</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.security</groupId>
       <artifactId>spring-security-web</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.springframework.security.oauth</groupId>
-      <artifactId>spring-security-oauth</artifactId>
-      <exclusions>
-        <exclusion>
-          <groupId>org.apache.httpcomponents</groupId>
-          <artifactId>httpclient</artifactId>
-        </exclusion>
-      </exclusions>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-core</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.springframework.osgi</groupId>
-      <artifactId>org.springframework.osgi.core</artifactId>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-beans</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
@@ -103,6 +111,11 @@
     <dependency>
       <groupId>jakarta.ws.rs</groupId>
       <artifactId>jakarta.ws.rs-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-codec</groupId>
+      <artifactId>commons-codec</artifactId>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.hamcrest</groupId>
@@ -252,6 +265,8 @@
             <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-reload4j</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>com.h2database:h2</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>jakarta.xml.ws:jakarta.xml.ws-api</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>commons-codec:commons-codec</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.springframework.security:spring-security-config</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>
@@ -262,35 +277,36 @@
         <configuration>
           <instructions>
             <Embed-Dependency>
-              spring-security-oauth;inline=true,
-              jboss-xacml;inline=true
+                <!-- spring-security-oauth;inline=true, -->
+                jboss-xacml;inline=true
             </Embed-Dependency>
+            <!-- #DCE When loading the beans, setting the spring application context class
+            loader to this bundle's and explicitly importing the spring classes in the pom fixed
+            the ClassNotFoundExceptions. TODO Is this the best way? Is there more to add? -->
             <Import-Package>
+				org.springframework.security.core.userdetails.cache,
+				org.springframework.security.web,
+				org.springframework.security.web.savedrequest,
+				org.springframework.security.web.util.matcher,
+				org.springframework.web.filter,
+				*
+			</Import-Package>
+			<!--
               !org.springframework.jdbc.core.*,
               !org.springframework.security.core.codec.*,
               !org.w3c.dom.*,
               !sun.net.www.protocol.*,
+              javax.mail.*,
+              javax.servlet.*,
               javax.xml.datatype;version=0.0.0,
               javax.xml.namespace;version=0.0.0,
               javax.xml.parsers;version=0.0.0,
               javax.xml.validation;version=0.0.0,
-              org.apache.cxf.*,
-              org.opencastproject.fsresources,
-              org.springframework.security.access,
-              org.springframework.security.access.hierarchicalroles,
-              org.springframework.security.access.vote,
-              org.springframework.security.core.userdetails.cache,
-              org.springframework.security.core.userdetails.memory,
-              org.springframework.security.ldap,
-              org.springframework.security.ldap.authentication,
-              org.springframework.security.ldap.search,
-              org.springframework.security.ldap.userdetails,
               org.xml.sax;version=0,
               javax.ws.rs;version=2.0.1,
               javax.ws.rs.core;version=2.0.1,
-              javax.ws.rs.ext;version=2.0.1,
-              *
-            </Import-Package>
+              javax.ws.rs.ext;version=2.0.1
+            </Import-Package -->
             <Export-Package>
               org.opencastproject.kernel.http;version=${project.version},
               org.opencastproject.kernel.http.api;version=${project.version},
@@ -305,9 +321,9 @@
               org.opencastproject.kernel.security.persistence;version=${project.version},
               org.opencastproject.kernel.bundleinfo;version=${project.version},
             </Export-Package>
-            <_exportcontents>
+            <!-- _exportcontents>
               org.springframework.security.oauth.*
-            </_exportcontents>
+            <exportcontents -->
             <Meta-Persistence>
               META-INF/persistence.xml
             </Meta-Persistence>

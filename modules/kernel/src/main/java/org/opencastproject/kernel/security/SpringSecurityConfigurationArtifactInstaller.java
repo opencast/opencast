@@ -21,6 +21,10 @@
 
 package org.opencastproject.kernel.security;
 
+import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.userdirectory.api.UserReferenceProvider;
+
 import org.apache.commons.io.FilenameUtils;
 import org.apache.felix.fileinstall.ArtifactInstaller;
 import org.osgi.framework.BundleContext;
@@ -30,7 +34,12 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.osgi.context.support.OsgiBundleXmlApplicationContext;
+import org.springframework.beans.factory.xml.DefaultNamespaceHandlerResolver;
+import org.springframework.beans.factory.xml.XmlBeanDefinitionReader;
+import org.springframework.context.support.GenericApplicationContext;
+import org.springframework.core.io.FileSystemResource;
+import org.springframework.security.config.SecurityNamespaceHandler;
+import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.io.File;
 import java.util.HashMap;
@@ -41,7 +50,7 @@ import javax.servlet.Filter;
 /**
  * Registers a security filter, which delegates to the spring filter chain appropriate for the current request's
  * organization. Organizational security configurations may be added to the security watch directory, and should be
- * named &lt;organization_id&gt;.xml.
+ * named &lt;organization_id&gt;.xml. #DCE OPC-757 Implemented via blueprint vs ArtifactInstaller
  */
 @Component(
     immediate = true,
@@ -58,21 +67,67 @@ public class SpringSecurityConfigurationArtifactInstaller implements ArtifactIns
 
   /** The security filter */
   protected SecurityFilter securityFilter = null;
+  /** The security service reference for Spring beans */
+  protected SecurityService securityService = null;
+  /** The user directory reference for Spring beans */
+  protected UserDirectoryService userDirectory = null;
+  /** The user detail service reference for Spring beans */
+  protected UserDetailsService userDetailsService = null;
+  /** The user reference provider service reference for Spring beans */
+  protected UserReferenceProvider userReferenceProvider = null;
+  /** The OAuthConsumerDetailsService dependency for Spring beans */
+  // protected OAuthConsumerDetailsService oAuthConsumerDetailsService = null;
+  /** The OAuthAuthenticationHandler dependency for Spring beans */
+  // protected OAuth2AuthenticationManager ltiLaunchAuthenticationHandler = null;
 
   /** Spring application contexts */
-  protected Map<String, OsgiBundleXmlApplicationContext> appContexts = null;
+  protected Map<String, GenericApplicationContext> appContexts = null;
 
   /** OSGi DI. */
   @Reference
   public void setSecurityFilter(SecurityFilter securityFilter) {
+    logger.info("Set SecurityFilter");
     this.securityFilter = securityFilter;
   }
+
+  @Reference
+  void setSecurityService(SecurityService securityService) {
+    logger.info("Set SecurityService");
+    this.securityService = securityService;
+  }
+
+  @Reference
+  void setUserDirectory(UserDirectoryService userDirectory) {
+    logger.info("Set UserDirectoryService");
+    this.userDirectory = userDirectory;
+  }
+
+  @Reference
+  public void setUserDetailsService(UserDetailsService userDetailsService) {
+    logger.info("Set UserDetailsService");
+    this.userDetailsService = userDetailsService;
+  }
+
+  @Reference
+  public void setUserReferenceProvider(UserReferenceProvider userReferenceProvider) {
+    logger.info("Set UserReferenceProvider");
+    this.userReferenceProvider = userReferenceProvider;
+  }
+  // @Reference(cardinality = ReferenceCardinality.OPTIONAL)
+  // void setOAuthConsumerDetailsService(OAuthConsumerDetailsService oAuthConsumerDetailsService) {
+  // this.oAuthConsumerDetailsService = oAuthConsumerDetailsService;
+  // }
+  // @Reference
+  // void setLtiLaunchAuthenticationHandler(OAuth2AuthenticationManager ltiLaunchAuthenticationHandler) {
+  // this.ltiLaunchAuthenticationHandler = ltiLaunchAuthenticationHandler;
+  // }
 
   /**
    * OSGI activation callback
    */
   @Activate
   protected void activate(ComponentContext cc) {
+    logger.info("#DCE Activate");
     this.bundleContext = cc.getBundleContext();
     this.appContexts = new HashMap<>();
   }
@@ -94,32 +149,58 @@ public class SpringSecurityConfigurationArtifactInstaller implements ArtifactIns
    */
   @Override
   public void install(File artifact) throws Exception {
+    logger.info("#DCE install");
     // If we already have a registration for this ID, take it out of the security filter and close it
     String orgId = FilenameUtils.getBaseName(artifact.getName());
-    OsgiBundleXmlApplicationContext orgAppContext = appContexts.get(orgId);
+
+    GenericApplicationContext orgAppContext = appContexts.get(orgId);
     if (orgAppContext != null) {
       securityFilter.removeFilter(orgId);
       orgAppContext.close();
     }
 
-    OsgiBundleXmlApplicationContext springContext = new OsgiBundleXmlApplicationContext(
-            new String[] { "file:" + artifact.getAbsolutePath() });
-    springContext.setBundleContext(bundleContext);
-    logger.info("registered {} for {}", springContext, orgId);
+    orgAppContext = new GenericApplicationContext();
+    // this did NOT work orgAppContext.setClassLoader(SecurityNamespaceHandler.class.getClassLoader());
+    // When loading the beans, setting the spring application context class
+    // loader to this bundle's and explicitly importing the spring classes in the pom fixed
+    // the ClassNotFoundExceptions. TODO Is this the best way? Is there more to add?
+    orgAppContext.setClassLoader(this.getClass().getClassLoader());
+
+    // Manually add the OSGI dependencies
+    orgAppContext.getBeanFactory().registerSingleton("securityService", this.securityService);
+    orgAppContext.getBeanFactory().registerSingleton("userDirectoryService", this.userDirectory);
+    orgAppContext.getBeanFactory().registerSingleton("userDetailsService", this.userDetailsService);
+    orgAppContext.getBeanFactory().registerSingleton("userReferenceProvider", this.userReferenceProvider);
+    // orgAppContext.getBeanFactory().registerSingleton("oAuthConsumerDetailsService",
+    // this.oAuthConsumerDetailsService);
+    // orgAppContext.getBeanFactory().registerSingleton("ltiLaunchAuthenticationHandler",
+    // this.ltiLaunchAuthenticationHandler);
+
+    XmlBeanDefinitionReader xmlBeanDefinitionReader = new XmlBeanDefinitionReader(orgAppContext);
+    // So that it finds META-INF/spring.handlers
+    xmlBeanDefinitionReader
+            .setNamespaceHandlerResolver(
+                    new DefaultNamespaceHandlerResolver(SecurityNamespaceHandler.class.getClassLoader()));
+    FileSystemResource beanFile = new FileSystemResource(artifact);
+    xmlBeanDefinitionReader.loadBeanDefinitions(beanFile);
+
+    logger.info("registered {} items in {} for {} from file {}", orgAppContext.getBeanDefinitionCount(),
+            orgAppContext.getBeanDefinitionNames(), orgId, artifact.getAbsolutePath());
 
     // Refresh the spring application context
     try {
-      springContext.refresh();
+      orgAppContext.refresh();
     } catch (Exception e) {
-      logger.error("Unable to refresh spring security configuration file {}", artifact, e);
+      logger.error("Unable to refresh spring security configuration file {}: {}", artifact, e);
+      orgAppContext.close();
       return;
     }
 
     // Keep track of the app context so we can close it later
-    appContexts.put(orgId, springContext);
+    appContexts.put(orgId, orgAppContext);
 
     // Add the filter chain for this org to the security filter
-    securityFilter.addFilter(orgId, (Filter) springContext.getBean("springSecurityFilterChain"));
+    securityFilter.addFilter(orgId, (Filter) orgAppContext.getBean("springSecurityFilterChain"));
   }
 
   /**
@@ -130,7 +211,7 @@ public class SpringSecurityConfigurationArtifactInstaller implements ArtifactIns
   @Override
   public void uninstall(File artifact) throws Exception {
     String orgId = FilenameUtils.getBaseName(artifact.getName());
-    OsgiBundleXmlApplicationContext appContext = appContexts.get(orgId);
+    GenericApplicationContext appContext = appContexts.get(orgId);
     if (appContext != null) {
       securityFilter.removeFilter(orgId);
       appContexts.remove(orgId);

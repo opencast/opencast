@@ -37,7 +37,7 @@ public class ApiResponseBuilderTest {
     Response response = ApiResponseBuilder.Json.ok(ApiVersion.VERSION_1_0_0, "body");
 
     assertEquals(HttpStatus.SC_OK, response.getStatus());
-    assertEquals("application/v1.0.0+json", response.getMetadata().get("Content-Type").get(0));
+    assertEquals("application/v1.0.0+json", response.getMetadata().get("Content-Type").get(0).toString());
   }
 
   @Test
@@ -54,7 +54,7 @@ public class ApiResponseBuilderTest {
     Response response = ApiResponseBuilder.Json.ok(ApiVersion.VERSION_1_0_0, json);
 
     assertEquals(HttpStatus.SC_OK, response.getStatus());
-    assertEquals("application/v1.0.0+json", response.getMetadata().get("Content-Type").get(0));
+    assertEquals("application/v1.0.0+json", response.getMetadata().get("Content-Type").get(0).toString());
   }
 
 }

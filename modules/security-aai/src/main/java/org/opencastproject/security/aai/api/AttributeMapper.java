@@ -27,8 +27,9 @@ import org.springframework.expression.Expression;
 import org.springframework.expression.ExpressionParser;
 import org.springframework.expression.spel.standard.SpelExpressionParser;
 import org.springframework.util.Assert;
-import org.springframework.util.CollectionUtils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -36,6 +37,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
+
 /**
  * Generic AAI Attribute mapper using Spring Expression language mappings.
  *
@@ -60,6 +62,7 @@ public class AttributeMapper implements InitializingBean {
   /** The delimiter for multivalue attributes */
   private String multiValueDelimiter = ";";
 
+  @Override
   public void afterPropertiesSet() throws Exception {
     Assert.notNull(attributeMap, "attributeMap must be set");
   }
@@ -110,7 +113,7 @@ public class AttributeMapper implements InitializingBean {
       }
     }
 
-    return CollectionUtils.arrayToList(mappedAttributes.toArray());
+    return new ArrayList<String>(mappedAttributes);
   }
 
   /**
@@ -148,8 +151,7 @@ public class AttributeMapper implements InitializingBean {
           continue;
         }
       }
-      sourceAttributes.put(aaiAttribute,
-          CollectionUtils.arrayToList(value.split(multiValueDelimiter)));
+      sourceAttributes.put(aaiAttribute, Arrays.asList(value.split(multiValueDelimiter)));
     }
     return this.getMappedAttributes(sourceAttributes, mappingId);
   }
