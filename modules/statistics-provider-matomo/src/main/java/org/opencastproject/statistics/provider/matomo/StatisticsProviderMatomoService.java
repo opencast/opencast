@@ -150,6 +150,8 @@ public class StatisticsProviderMatomoService implements ArtifactInstaller {
   @Modified
   public void modified(Map<String, Object> properties) {
     if (properties == null) {
+      logger.info("Configuration file not found. Not connecting to Matomo API.");
+    } else if (!(properties.containsKey(KEY_MATOMO_API_TOKEN) || properties.containsKey(KEY_MATOMO_API_URL))) {
       logger.info("No configuration available. Not connecting to Matomo API.");
     } else {
       final Object matomoApiUrlValue = properties.get(KEY_MATOMO_API_URL);
