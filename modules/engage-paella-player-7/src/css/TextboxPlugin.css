@@ -1,15 +1,45 @@
-.textbox-plugin-box {
+.textbox-plugin-container {
     position: absolute;
-    top: 0px;
-    right: 0px;
-    width: 10%;
-    height: 10%;
+    top: 1%;
+    right: 1%;
     text-align: center;
-    padding: 1% 1%;
+    gap: 0.5vh;
     z-index: 100;
-    font-size: 20px;
-    overflow-wrap: break-word;
-    background-color: rgba(0,0,0,0.6);
+
+    display: flex;
+    flex-direction: column;
+}
+
+.textbox-plugin-box {
+    width: 12vw;
+    height: 1.5vh;
+    padding: 0.5vw;
+    gap: 0.5vw;
+    border-radius: 0.5vw;
+    font-size: min(1vw, 1vh);
+
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+
     color: white;
-    box-sizing: border-box;
+    fill: white;
+    background-color: rgba(0,0,0,0.7);
+
+    text-decoration: none;
+}
+
+.textbox-plugin-box-text {
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.textbox-plugin-box-icon {
+    flex-shrink: 0;
+    width: 1em;
+    height: 1.1em;
+    font-size: 1em;
 }

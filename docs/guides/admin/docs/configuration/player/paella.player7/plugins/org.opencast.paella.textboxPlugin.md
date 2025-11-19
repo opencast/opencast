@@ -1,22 +1,26 @@
 Paella plugin: org.opencast.paella.textboxPlugin
 =======================================================
 
-This plugin displays textboxes in the player, based on a JSON catalog in the event tracks.  
+This plugin displays textboxes in the player, based on a JSON catalog in the event tracks.
 
-The expected flavor type of the catalog is "textboxes" (i.e. "textboxes/source"). 
+The expected flavor type of the catalog is "textboxes" (i.e. "textboxes/source").
 
-The file is of the form:
+Start time is in seconds. The display duration is fixed at 10 seconds.
+Text should be kept short, or will be cut off. 20 characters max are recommended.
+Optionally, a link can be specified. Clicking on a textbox with a link will
+redirect to the specified resource.
+
+The catalog file is of the form:
 ```json
 [
   {
     "start": 2,
-    "end": 4,
     "text": "My text here"
   },
   {
     "start": 7,
-    "end": 14,
-    "text": "More of my text here"
+    "text": "More of my text here",
+    "link": "https://opencast.org",
   }
 ]
 ```
@@ -34,6 +38,6 @@ You need to enable the `org.opencast.paella.textboxPlugin` plugin.
 {
     "org.opencast.paella.textboxPlugin": {
         "enabled": true
-    }    
+    }
 }
 ```

@@ -19,8 +19,9 @@
  *
  */
 
-import { Events, EventLogPlugin } from 'paella-core';
+import { Events, EventLogPlugin, createElementWithHtmlText } from 'paella-core';
 import '../css/TextboxPlugin.css';
+import infoIcon from '../icons/info.svg';
 
 export default class TextBoxPlugin extends EventLogPlugin {
 
@@ -29,16 +30,21 @@ export default class TextBoxPlugin extends EventLogPlugin {
     this._textboxes = new Map(); // DOM elements
     this._textboxJSON = []; // Infos from the Opencast mediapackage
 
+    // Create textbox container
+    this._container = document.createElement('div');
+    this._container.className = 'textbox-plugin-container';
+    // Append to player-container to not dissappear during fullscreen
+    document.querySelector('.player-container').appendChild(this._container);
+
     const myTestJson = [
       {
         start: 2,
-        end: 4,
         text: 'Samalamadingdong',
       },
       {
         start: 3,
-        end: 6,
         text: 'Get in the comments',
+        link: 'https://opencast.org',
       }
     ];
     this._textboxJSON = myTestJson;
@@ -57,15 +63,18 @@ export default class TextBoxPlugin extends EventLogPlugin {
     if (event === Events.PLAYER_LOADED) {
       // TODO: Handle multiple textbox files
       const box = this.player?._videoManifest?.textboxes?.[0];
-      this._textboxJSON = await this.loadTextboxesFromOpencast(box.url);
+      if (box) {
+        this._textboxJSON = await this.loadTextboxesFromOpencast(box.url);
+      }
     }
 
     // Display/Hide textboxes
     this._textboxJSON.forEach((boxInfo, index) => {
-      if (params.currentTime > boxInfo.start && params.currentTime < boxInfo.end && !this._textboxes.get(index)) {
+      const end = boxInfo.start + 10;
+      if (params.currentTime > boxInfo.start && params.currentTime < end && !this._textboxes.get(index)) {
         this.createBox(boxInfo, index);
       }
-      if (params.currentTime > boxInfo.end && this._textboxes.get(index)) {
+      if ((params.currentTime < boxInfo.start || params.currentTime > end) && this._textboxes.get(index)) {
         this.removeBox(boxInfo, index);
       }
     });
@@ -75,20 +84,33 @@ export default class TextBoxPlugin extends EventLogPlugin {
   // Add a textbox to the DOM
   createBox(info, index) {
     if (!this._textboxes.get(index)) {
-      const textbox = document.createElement('div');
-      textbox.className = 'textbox-plugin-box';
-      textbox.textContent = info.text;
+      let textbox = undefined;
+      if (info.link) {
+        textbox = createElementWithHtmlText(`
+          <a class="textbox-plugin-box" href=${ info.link }></a>
+        `, this._container);
+      } else {
+        textbox = createElementWithHtmlText(`
+          <div class="textbox-plugin-box" href=${ info.link }></div>
+        `, this._container);
+      }
+
+      createElementWithHtmlText(`
+        <i class="textbox-plugin-box-icon">${ infoIcon }</i>
+      `, textbox);
+
+      createElementWithHtmlText(`
+        <span class="textbox-plugin-box-text">${ info.text }</span>
+      `, textbox);
 
       this._textboxes.set(index, textbox);
-      // Append to player-container to not dissappear during fullscreen
-      document.querySelector('.player-container').appendChild(this._textboxes.get(index));
     }
   }
 
   // Remove a textbox from the DOM
   removeBox(info, index) {
     if (this._textboxes.get(index)) {
-      document.querySelector('.player-container').removeChild(this._textboxes.get(index));
+      this._container.removeChild(this._textboxes.get(index));
       this._textboxes.set(index, null);
     }
   }
