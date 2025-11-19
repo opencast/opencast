@@ -125,7 +125,7 @@ public final class JWTVerifier {
   public static SignedJWT verify(SignedJWT jwt, List<String> claimConstraints, JWSVerifier... verifiers)
           throws JOSEException {
     Assert.notNull(jwt, "A decoded JWT must be set");
-    Assert.notEmpty(claimConstraints, "Claim constraints must be set");
+    Assert.notNull(claimConstraints, "Claim constraints must be set");
     Assert.notNull(verifiers, "Verifiers must be set");
 
     boolean verified = false;
