@@ -137,6 +137,14 @@ operations:
       - target-flavor: captions/delivery
       - target-tags: +engage-download
 
+  # Mark chapters for publication
+  - id: tag
+    description: Mark chapters for publication
+    configurations:
+      - source-flavors: chapters/shifted
+      - target-flavor: chapters/delivery
+      - target-tags: +engage-download
+
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # Encode for publication to Engage
 

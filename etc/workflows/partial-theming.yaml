@@ -27,6 +27,14 @@ operations:
 
   - id: tag
     if: NOT(${theme_active})
+    description: If no shifting was necessary, mark the trimmed chapters as shifted
+    configurations:
+      - source-flavors: 'chapters/trimmed'
+      - target-flavor: 'chapters/shifted'
+      - copy: false
+
+  - id: tag
+    if: NOT(${theme_active})
     description: Tag elements as themed
     configurations:
       - source-flavors: '*/trimmed'
@@ -103,3 +111,19 @@ operations:
     configurations:
       - source-flavors: captions/trimmed
       - target-flavor: captions/shifted
+
+  - id: subtitle-timeshift
+    if: ${theme_bumper_active}
+    exception-handler-workflow: partial-error
+    description: Create new chapters with time offset
+    configurations:
+      - subtitle-source-flavor: chapters/trimmed
+      - target-flavor: chapters/shifted
+      - video-source-flavor: branding/bumper
+
+  - id: tag
+    if: NOT ${theme_bumper_active}
+    description: If no shifting was necessary, mark the trimmed chapters as shifted
+    configurations:
+      - source-flavors: chapters/trimmed
+      - target-flavor: chapters/shifted
