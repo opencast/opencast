@@ -69,7 +69,8 @@ export default class QuizPlugin extends EventLogPlugin {
     return [
       Events.PLAYER_LOADED,
       Events.TIMEUPDATE,
-      Events.FULLSCREEN_CHANGED
+      Events.PLAY,
+      Events.SEEK
     ];
   }
 
@@ -79,6 +80,11 @@ export default class QuizPlugin extends EventLogPlugin {
       // TODO: Handle multiple quiz files
       const quiz = this.player?._videoManifest?.quizzes?.[0];
       this._quizJSON = await this.loadQuizzesFromOpencast(quiz.url);
+    }
+
+    // Hide Quiz if user is trying to play the video again
+    if (this._quiz && (event === Events.PLAY || event === Events.SEEK)) {
+      this.removeQuiz();
     }
 
     // Display/Hide quiz
@@ -117,13 +123,21 @@ export default class QuizPlugin extends EventLogPlugin {
       /* HTML */
       const quiz = createElementWithHtmlText('<div class="quiz-plugin-root"> </div>');
 
-      createElementWithHtmlText(`
-        <div class="quiz-plugin-question">${info.question}</div>
+      const quizLeft = createElementWithHtmlText(`
+        <div class="quiz-plugin-left"> </div>
       `, quiz);
+
+      const quizContent = createElementWithHtmlText(`
+        <div class="quiz-plugin-content"> </div>
+      `, quizLeft);
+
+      createElementWithHtmlText(`
+        <h2 class="quiz-plugin-question">${info.question}</h2>
+      `, quizContent);
 
       const answers = createElementWithHtmlText(`
         <div class="quiz-plugin-answers"> </div>
-      `, quiz);
+      `, quizContent);
 
       info.answers?.map((answer) => {
         createElementWithHtmlText(`
@@ -132,16 +146,25 @@ export default class QuizPlugin extends EventLogPlugin {
       });
 
       const submit = createElementWithHtmlText(`
-        <button>Submit</button>
+        <button class="quiz-submit-button">Submit</button>
+      `, quizLeft);
+
+      const quizRight = createElementWithHtmlText(`
+        <div class="quiz-plugin-right"> </div>
       `, quiz);
+
+      createElementWithHtmlText(`
+        <div></div>
+      `, quizRight);
 
       const result = createElementWithHtmlText(`
         <div class="quiz-plugin-result"></div>
-      `, quiz);
+      `, quizRight);
 
       const continueButton = createElementWithHtmlText(`
-        <button>Continue</button>
-      `, quiz);
+        <button class="quiz-submit-button">Continue</button>
+      `, quizRight);
+      continueButton.style.display = 'none';
 
       /* Script */
       const correctAnswers = info.answers
@@ -156,7 +179,7 @@ export default class QuizPlugin extends EventLogPlugin {
         // Reset styles
         checkboxes.forEach(checkbox => {
           const label = checkbox.parentElement;
-          label.classList.remove('quiz-plugin-correct', 'quiz-plugin-wrong');
+          label.classList.remove('quiz-plugin-correct');
         });
 
         // Evaluate answers
@@ -170,12 +193,7 @@ export default class QuizPlugin extends EventLogPlugin {
             if (isCorrect) {
               label.classList.add('quiz-plugin-correct');
               correctCount++;
-            } else {
-              label.classList.add('quiz-plugin-wrong');
             }
-          } else if (!isChecked && isCorrect) {
-            // Missed a correct answer
-            label.classList.add('quiz-plugin-wrong');
           }
         });
 
@@ -191,6 +209,7 @@ export default class QuizPlugin extends EventLogPlugin {
         }
 
         result.innerHTML = resultMsg;
+        continueButton.style.display = 'block';
       });
 
       continueButton.addEventListener('click', () => {
