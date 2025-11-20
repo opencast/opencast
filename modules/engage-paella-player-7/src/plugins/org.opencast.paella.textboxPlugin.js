@@ -36,18 +36,19 @@ export default class TextBoxPlugin extends EventLogPlugin {
     // Append to player-container to not dissappear during fullscreen
     document.querySelector('.player-container').appendChild(this._container);
 
-    const myTestJson = [
-      {
-        start: 2,
-        text: 'Samalamadingdong',
-      },
-      {
-        start: 3,
-        text: 'Get in the comments',
-        link: 'https://opencast.org',
-      }
-    ];
-    this._textboxJSON = myTestJson;
+    /* Demo json for quick developing purposes */
+    // const myTestJson = [
+    //   {
+    //     start: 2,
+    //     text: 'Samalamadingdong',
+    //   },
+    //   {
+    //     start: 3,
+    //     text: 'Get in the comments',
+    //     link: 'https://opencast.org',
+    //   }
+    // ];
+    // this._textboxJSON = myTestJson;
   }
 
   // Define which events we subscribe too

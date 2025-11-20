@@ -29,39 +29,39 @@ export default class QuizPlugin extends EventLogPlugin {
     this._quiz = null; // DOM element
     this._quizJSON = []; // Infos from the Opencast mediapackage
 
-    const myTestJson = [
-      {
-        start: 2,
-        type: 'multipleChoice',
-        question: 'Which is a fruit?',
-        answers: [
-          {
-            text: 'Banana',
-            correct: true
-          },
-          {
-            text: 'Cucumber',
-            correct: false
-          },
-          {
-            text: 'Tomato',
-            correct: true
-          },
-          {
-            text: 'Adjustable side table, walnut',
-            correct: false
-          }
-        ],
-      },
-      {
-        start: 8,
-        type: 'text',
-        question: 'Can we have free form questions as well?',
-        correctAnswers: ['Yes', 'Y', 'If I have to']
-      }
-    ];
-
-    this._quizJSON = myTestJson;
+    /* Demo json for quick developing purposes */
+    // const myTestJson = [
+    //   {
+    //     start: 2,
+    //     type: 'multipleChoice',
+    //     question: 'Which is a fruit?',
+    //     answers: [
+    //       {
+    //         text: 'Banana',
+    //         correct: true
+    //       },
+    //       {
+    //         text: 'Cucumber',
+    //         correct: false
+    //       },
+    //       {
+    //         text: 'Tomato',
+    //         correct: true
+    //       },
+    //       {
+    //         text: 'Adjustable side table, walnut',
+    //         correct: false
+    //       }
+    //     ],
+    //   },
+    //   {
+    //     start: 8,
+    //     type: 'text',
+    //     question: 'Can we have free form questions as well?',
+    //     correctAnswers: ['Yes', 'Y', 'If I have to']
+    //   }
+    // ];
+    // this._quizJSON = myTestJson;
   }
 
   // Define which events we subscribe too
