@@ -36,7 +36,7 @@ public class VideoUpload {
   private final String description;
   private final String metadataLanguage;
   private final String audioLanguage;
-  private final String license;
+  private final License license;
   private final String privacyStatus;
   private final File videoFile;
   private final MediaHttpUploaderProgressListener progressListener;
@@ -58,7 +58,7 @@ public class VideoUpload {
       final String description,
       final String metadataLanguage,
       final String audioLanguage,
-      final String license,
+      final License license,
       final String privacyStatus,
       final File videoFile,
       final MediaHttpUploaderProgressListener progressListener,
@@ -109,9 +109,8 @@ public class VideoUpload {
 
   /**
    * The video's license.
-   * The value may be {@code null}.
    */
-  public String getLicense() {
+  public License getLicense() {
     return license;
   }
 
@@ -145,5 +144,9 @@ public class VideoUpload {
    */
   public String[] getTags() {
     return tags;
+  }
+
+  public enum License {
+    creativeCommon, youtube
   }
 }
