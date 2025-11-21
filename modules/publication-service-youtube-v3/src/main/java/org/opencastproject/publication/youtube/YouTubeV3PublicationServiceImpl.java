@@ -283,9 +283,13 @@ public class YouTubeV3PublicationServiceImpl
       final String episodeName = c.getEpisodeName();
       final UploadProgressListener operationProgressListener = new UploadProgressListener(mediaPackage, file);
       final String privacyStatus = makeVideosPrivate ? "private" : "public";
+      final VideoUpload.License license = ccLicenses.map(
+         p -> p.matcher(c.getEpisodeLicense()).matches()).orElse(false)
+         ? VideoUpload.License.creativeCommon
+         : VideoUpload.License.youtube;
       final VideoUpload videoUpload = new VideoUpload(
           truncateTitleToMaxFieldLength(episodeName, false),
-          c.getEpisodeDescription(), c.getEpisodeLicense(), privacyStatus,
+          c.getEpisodeDescription(), license, privacyStatus,
           file, operationProgressListener, tags);
       final Video video = youTubeService.addVideoToMyChannel(videoUpload);
       final int timeoutMinutes = 60;
