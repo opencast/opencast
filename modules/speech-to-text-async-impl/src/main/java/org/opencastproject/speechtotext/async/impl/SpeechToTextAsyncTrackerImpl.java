@@ -30,8 +30,14 @@ import org.opencastproject.speechtotext.async.persistence.SpeechToTextDatabase;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 
-@Component(property = { "service.description=Speech to Text Async Tracker" }, immediate = true, service = {
-        SpeechToTextAsyncTracker.class })
+@Component(
+    immediate = true,
+    service = {
+        SpeechToTextAsyncTracker.class
+    },
+    property = {
+        "service.description=Speech to Text Async Tracker"
+    })
 public class SpeechToTextAsyncTrackerImpl implements SpeechToTextAsyncTracker {
 
   private SpeechToTextDatabase database;

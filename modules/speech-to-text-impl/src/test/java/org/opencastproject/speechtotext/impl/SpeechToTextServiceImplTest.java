@@ -24,6 +24,7 @@ package org.opencastproject.speechtotext.impl;
 import static org.easymock.EasyMock.capture;
 
 import org.opencastproject.job.api.Job;
+import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.job.api.JobImpl;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.speechtotext.impl.engine.VoskEngine;
@@ -131,7 +132,11 @@ public class SpeechToTextServiceImplTest {
     final Capture<String> type = EasyMock.newCapture();
     final Capture<String> operation = EasyMock.newCapture();
     final Capture<List<String>> args = EasyMock.newCapture();
-    EasyMock.expect(serviceRegistry.createJob(capture(type), capture(operation), capture(args), EasyMock.anyFloat()))
+    Job wohJob = new JobImpl(1);
+    wohJob.setStatus(Status.RUNNING);
+    EasyMock.expect(serviceRegistry.getCurrentJob()).andReturn(wohJob);
+    EasyMock.expect(serviceRegistry.createJob(capture(type), capture(operation), capture(args),
+            EasyMock.anyString(), EasyMock.anyBoolean(), EasyMock.anyObject(Job.class), EasyMock.anyFloat()))
             .andAnswer(() -> {
               Job job = new JobImpl(0);
               job.setJobType(type.getValue());
