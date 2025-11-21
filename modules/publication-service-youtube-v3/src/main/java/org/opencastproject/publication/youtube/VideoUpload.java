@@ -34,6 +34,7 @@ public class VideoUpload {
 
   private final String title;
   private final String description;
+  private final String license;
   private final String privacyStatus;
   private final File videoFile;
   private final MediaHttpUploaderProgressListener progressListener;
@@ -42,6 +43,7 @@ public class VideoUpload {
   /**
    * @param title may not be {@code null}.
    * @param description may be {@code null}.
+   * @param license may be {@code null}.
    * @param privacyStatus may not be {@code null}.
    * @param videoFile may not be {@code null}.
    * @param progressListener may be {@code null}.
@@ -50,6 +52,7 @@ public class VideoUpload {
   public VideoUpload(
       final String title,
       final String description,
+      final String license,
       final String privacyStatus,
       final File videoFile,
       final MediaHttpUploaderProgressListener progressListener,
@@ -57,6 +60,7 @@ public class VideoUpload {
   ) {
     this.title = title;
     this.description = description;
+    this.license = license;
     this.privacyStatus = privacyStatus;
     this.videoFile = videoFile;
     this.progressListener = progressListener;
@@ -77,6 +81,14 @@ public class VideoUpload {
    */
   public String getDescription() {
     return description;
+  }
+
+  /**
+   * The video's license.
+   * The value may be {@code null}.
+   */
+  public String getLicense() {
+    return license;
   }
 
   /**

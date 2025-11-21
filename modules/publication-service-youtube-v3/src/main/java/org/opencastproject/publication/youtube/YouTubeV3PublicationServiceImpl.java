@@ -278,7 +278,7 @@ public class YouTubeV3PublicationServiceImpl
       final String privacyStatus = makeVideosPrivate ? "private" : "public";
       final VideoUpload videoUpload = new VideoUpload(
           truncateTitleToMaxFieldLength(episodeName, false),
-          c.getEpisodeDescription(), privacyStatus,
+          c.getEpisodeDescription(), c.getEpisodeLicense(), privacyStatus,
           file, operationProgressListener, tags);
       final Video video = youTubeService.addVideoToMyChannel(videoUpload);
       final int timeoutMinutes = 60;
