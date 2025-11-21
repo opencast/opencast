@@ -307,7 +307,7 @@ public class YouTubeV3PublicationServiceImpl
           c.getEpisodeDescription(),
           transferMetadataLanguage ? language : null,
           transferAudioLanguage ? language : null,
-          privacyStatus, file, operationProgressListener, tags);
+          c.getEpisodeLicense(), privacyStatus, file, operationProgressListener, tags);
       final Video video = youTubeService.addVideoToMyChannel(videoUpload);
       final int timeoutMinutes = 60;
       final long startUploadMilliseconds = new Date().getTime();

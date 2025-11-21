@@ -36,6 +36,7 @@ public class VideoUpload {
   private final String description;
   private final String metadataLanguage;
   private final String audioLanguage;
+  private final String license;
   private final String privacyStatus;
   private final File videoFile;
   private final MediaHttpUploaderProgressListener progressListener;
@@ -46,6 +47,7 @@ public class VideoUpload {
    * @param description may be {@code null}.
    * @param metadataLanguage may be {@code null}.
    * @param audioLanguage may be {@code null}.
+   * @param license may be {@code null}.
    * @param privacyStatus may not be {@code null}.
    * @param videoFile may not be {@code null}.
    * @param progressListener may be {@code null}.
@@ -56,6 +58,7 @@ public class VideoUpload {
       final String description,
       final String metadataLanguage,
       final String audioLanguage,
+      final String license,
       final String privacyStatus,
       final File videoFile,
       final MediaHttpUploaderProgressListener progressListener,
@@ -65,6 +68,7 @@ public class VideoUpload {
     this.description = description;
     this.metadataLanguage = metadataLanguage;
     this.audioLanguage = audioLanguage;
+    this.license = license;
     this.privacyStatus = privacyStatus;
     this.videoFile = videoFile;
     this.progressListener = progressListener;
@@ -101,6 +105,14 @@ public class VideoUpload {
    */
   public String getAudioLanguage() {
     return audioLanguage;
+  }
+
+  /**
+   * The video's license.
+   * The value may be {@code null}.
+   */
+  public String getLicense() {
+    return license;
   }
 
   /**
