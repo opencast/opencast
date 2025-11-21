@@ -142,6 +142,21 @@ public class YouTubePublicationAdapter {
   }
 
   /**
+   * Gets the language for the episode of the media package
+   *
+   * @return the language of the episode
+   */
+  public String getEpisodeLanguage() {
+    if (dcEpisode != null) {
+      return dcEpisode.getFirst(DublinCore.PROPERTY_LANGUAGE);
+    }
+    if (dcSeries != null) {
+      return dcSeries.getFirst(DublinCore.PROPERTY_LANGUAGE);
+    }
+    return null;
+  }
+
+  /**
    * Parse Dublincore metadata from the workspace
    *
    * @param catalog
