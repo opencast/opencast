@@ -66,7 +66,9 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 /**
  * Publishes media to a YouTube play list.
@@ -144,6 +146,8 @@ public class YouTubeV3PublicationServiceImpl
    */
   private String defaultPlaylist;
 
+  private Optional<Pattern> ccLicenses;
+
   private boolean makeVideosPrivate;
 
   private String[] tags;
@@ -203,6 +207,9 @@ public class YouTubeV3PublicationServiceImpl
           //
           youTubeService.initialize(clientCredentials);
           //
+          ccLicenses = Optional.ofNullable(
+                  YouTubeUtils.get(properties, YouTubeKey.ccLicenses, false))
+                  .map(Pattern::compile);
           tags = StringUtils.split(YouTubeUtils.get(properties, YouTubeKey.keywords), ',');
           defaultPlaylist = YouTubeUtils.get(properties, YouTubeKey.defaultPlaylist);
           makeVideosPrivate = StringUtils

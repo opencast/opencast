@@ -33,6 +33,7 @@ public enum YouTubeKey {
   dataStore,
   keywords,
   defaultPlaylist,
+  ccLicenses,
   makeVideosPrivate,
   maxFieldLength;
 }
