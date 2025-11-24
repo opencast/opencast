@@ -6,15 +6,17 @@ on:
     - cron: '0 3 * * 6' # at 03:00 on Saturday
 
 jobs:
-  build:
+  cache-ffmpeg:
     strategy:
       matrix:
         arch:
           - linuxarm64
           - linux64
-    name: Get FFmpeg (${{ matrix.arch }})
+        release:
+          - latest
+          - autobuild
+    name: Get FFmpeg (${{ matrix.release }} ${{ matrix.arch }})
     runs-on: ubuntu-latest
-    if: github.repository == 'opencast/opencast'
     steps:
       - name: Install s3cmd
         run: |
@@ -30,7 +32,7 @@ jobs:
           https://api.github.com/repos/BtbN/FFmpeg-Builds/releases
           | jq -r '
             [
-              .[1].assets[]
+              .[] | select(.tag_name | contains("${{ matrix.release }}")).assets[]
               | select(.name | contains("${{ matrix.arch }}-gpl-"))
               | select(.name | contains("linux"))
               | select(.name | contains("shared") | not)
