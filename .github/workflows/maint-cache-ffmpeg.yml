@@ -10,31 +10,40 @@ jobs:
     strategy:
       matrix:
         arch:
-          - amd64
-          - arm64
-    name: Get FFmpeg (${{ matrix.arch }})
+          - linuxarm64
+          - linux64
+        release:
+          - latest
+          - autobuild
+    name: Get FFmpeg (${{ matrix.release }} ${{ matrix.arch }})
     runs-on: ubuntu-latest
-    if: github.repository == 'opencast/opencast'
     steps:
       - name: Install s3cmd
         run: |
           set -eu
           sudo apt update -q
-          sudo apt install -y -q s3cmd
+          sudo apt install -y -q jq s3cmd
+
+      - name: Get FFmpeg download URL
+        run: >
+          curl -fL
+          -H "Accept: application/vnd.github+json"
+          -H "X-GitHub-Api-Version: 2022-11-28"
+          https://api.github.com/repos/BtbN/FFmpeg-Builds/releases
+          | jq -r '
+            [
+              .[] | select(.tag_name | contains("${{ matrix.release }}")).assets[]
+              | select(.name | contains("${{ matrix.arch }}-gpl-"))
+              | select(.name | contains("linux"))
+              | select(.name | contains("shared") | not)
+            ]
+            | sort_by(.name)
+            | reverse
+            | .[0].browser_download_url' | tee download.url
 
       - name: Download FFmpeg
         run: |
-          wget https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-${{ matrix.arch }}-static.tar.xz
-
-      - name: Unpack FFmpeg
-        run: |
-          tar xvf ffmpeg-release-${{ matrix.arch }}-static.tar.xz
-
-      - name: Repack FFmpeg
-        run: |
-          set -eu
-          NAME="$(ls -d ffmpeg-*-static)"
-          tar cfJ "${NAME}.tar.xz" "${NAME}"
+          wget "$(cat download.url)"
 
       - name: Configure s3cmd
         uses: lkiesow/configure-s3cmd@v1
@@ -44,5 +53,7 @@ jobs:
           secret_key: ${{ secrets.S3_SECRET_KEY }}
 
       - name: Upload tarball
-        run: |
-          s3cmd put -P *.tar.xz s3://opencast-ffmpeg-static/
+        run: >
+          s3cmd ls "s3://opencast-ffmpeg-static/$(ls ffmpeg-*.tar.xz)"
+          | grep -q ffmpeg
+          || s3cmd put -P ffmpeg-*.tar.xz s3://opencast-ffmpeg-static/
