@@ -63,6 +63,7 @@ import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -79,6 +80,8 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
+import jdk.javadoc.doclet.Reporter;
 
 /**
  * A REST endpoint delegating functionality to the {@link ComposerService}
@@ -682,10 +685,17 @@ public class ComposerRestService extends AbstractJobProducerEndpoint {
       if (!Track.TYPE.equals(elem.getElementType())) {
         return Response.status(Response.Status.BAD_REQUEST).entity("Source tracks must be of type 'track'").build();
       }
+      if (((Track) elem).hasVideo()) {
+        return Response.status(Response.Status.BAD_REQUEST).entity("Just audio-only tracks are allowed. There was at least one video in the track list").build();
+      }
     }
 
     List<Long> audioStartTimes = Arrays.stream(audioStartTimesStringified.split(","))
           .mapToLong(Long::parseLong).boxed().collect(Collectors.toList());
+
+    if (audioStartTimes.size() != tracks.size()) {
+      return Response.status(Response.Status.BAD_REQUEST).entity("The number of tracks must match the number of start times.").build();
+    }
 
     try {
       // Merge the specified audio tracks together

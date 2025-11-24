@@ -972,13 +972,13 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     }
   }
 
-  private Option<Track> mergeAudioTracks(Job job, String profileId, List<Long> audioStarTimes, List<Track> audioTracks) throws EncoderException {
+  private Option<Track> mergeAudioTracks(Job job, String profileId, List<Long> audioStartTimes, List<Track> audioTracks) throws EncoderException {
     if (audioTracks.size() < 2) {
       throw new EncoderException(String.format("The track parameter must at least have two tracks present. Provided tracks: {}", audioTracks.size()));
     }
 
-    if (audioTracks.size() != audioStarTimes.size()) {
-      throw new EncoderException(String.format("Number of audio tracks ({}) and 'audio start times' ({}) are not equal.", audioTracks.size(), audioStarTimes.size()));
+    if (audioTracks.size() != audioStartTimes.size()) {
+      throw new EncoderException(String.format("Number of audio tracks ({}) and 'audio start times' ({}) are not equal.", audioTracks.size(), audioStartTimes.size()));
     }
 
     List<File> audioFiles = new ArrayList<>();
@@ -1005,7 +1005,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
 
     final EncoderEngine encoderEngine = getEncoderEngine();
 
-    String audioMergeCommand = buildAudioMergeCommand(audioStarTimes, audioFiles);
+    String audioMergeCommand = buildAudioMergeCommand(audioStartTimes, audioFiles);
     Map<String, String> properties = new HashMap<>();
     properties.put(CMD_SUFFIX + ".audioMergeCommand", audioMergeCommand);
 
