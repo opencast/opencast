@@ -77,6 +77,8 @@ public class YouTubeAPIVersion3ServiceImpl implements YouTubeAPIVersion3Service 
     final VideoSnippet snippet = new VideoSnippet();
     snippet.setTitle(videoUpload.getTitle());
     snippet.setDescription(videoUpload.getDescription());
+    snippet.setDefaultLanguage(videoUpload.getMetadataLanguage());
+    snippet.setDefaultAudioLanguage(videoUpload.getAudioLanguage());
     final String[] tags = videoUpload.getTags();
     if (ArrayUtils.isNotEmpty(tags)) {
       snippet.setTags(Collections.list(tags));
