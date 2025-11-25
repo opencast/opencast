@@ -1,1 +1,0 @@
-New mux WOH, see [documentation](../workflowoperationhandlers/mux-woh.md).
