@@ -58,6 +58,9 @@ to put the release schedule, short descriptions of features or noteworthy config
 gives developers a clean slate to work from, otherwise there will be constant conflicts as one PR alters the notes file
 underneath a second PR.
 
+Also, once you have processed the release notes text files, please remove them from the history so that future RMs do
+not need to parse out which notes are for their new branch, and which belong to the old one.
+
 ### Upgrade script
 
 In general, everyone assumes someone else is testing the upgrade guides and scripts.  That means it's your job to take
