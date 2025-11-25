@@ -80,6 +80,7 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.util.SecurityUtil;
+import org.opencastproject.userdirectory.UserIdRoleProvider;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.ChecksumType;
 import org.opencastproject.util.MimeTypes;
@@ -427,6 +428,12 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       }
 
       final AccessControlList acl = authorizationService.getActiveAcl(mp).getA();
+      if (acl.getEntries().isEmpty()) {
+        // mediapackage does not contain any ACL, let's put users role to the list
+        final String userRole = UserIdRoleProvider.getUserIdRole(securityService.getUser().getUsername());
+        acl.getEntries().add(new AccessControlEntry(userRole, WRITE_ACTION, true));
+        acl.getEntries().add(new AccessControlEntry(userRole, READ_ACTION, true));
+      }
       // store acl as properties
       // Drop old ACL rules
       deleteProperties(mediaPackageId, SECURITY_NAMESPACE);

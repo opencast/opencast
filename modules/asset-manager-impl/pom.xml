@@ -66,6 +66,11 @@
       <artifactId>opencast-authorization-manager</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-userdirectory</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     <!-- -->
     <dependency>
       <groupId>org.apache.commons</groupId>
