@@ -1,1 +1,0 @@
-Episodes in the search index can be filtered according to whether or not they are live.
