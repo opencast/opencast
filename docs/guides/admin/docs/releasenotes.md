@@ -6,6 +6,7 @@
 - Episodes in the search index can be filtered according to whether or not they are live. [[#7032](https://github.com/opencast/opencast/pull/7032)]
 - Paella 8 is now included in Opencast as an alternative player [[#7166](https://github.com/opencast/opencast/pull/7166)]
 - A Matomo statistics provider has been added [[#7134](https://github.com/opencast/opencast/pull/7134)]
+- Default series ACLs can now be configured [[#7041](https://github.com/opencast/opencast/pull/7041)]
 
 
 ### Breaking Changes
@@ -15,7 +16,10 @@
 
 
 ### Configuration Changes
+- Default workflows are now in yaml [[#6798](https://github.com/opencast/opencast/pull/6798)]
 - The configuration key `video-source-flavor` for the Subtitle Timeshift Workflow Operation Handler changed to `video-source-flavors` (plural). [[#6901](https://github.com/opencast/opencast/pull/6901)]
+- Configuring JWT authentication is now substantially simpler [[#7189](https://github.com/opencast/opencast/pull/7189)]
+- The editor now displays less metadata by default [[#7053](https://github.com/opencast/opencast/pull/7053)]
 - The plugin `opencast-plugin-legacy-annotation` has been removed from `org.opencastproject.plugin.impl.PluginManagerImpl.cfg`. [[#6902](https://github.com/opencast/opencast/pull/6902)]
 - Target tag handling has changed with [[#6648](https://github.com/opencast/opencast/pull/6648)]:
 
