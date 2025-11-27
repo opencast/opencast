@@ -124,7 +124,6 @@
     <module>modules/elasticsearch-index</module>
     <module>modules/email-template-service-api</module>
     <module>modules/email-template-service-impl</module>
-    <module>modules/engage-paella-player-7</module>
     <module>modules/engage-paella-player-8</module>
     <module>modules/engage-ui</module>
     <module>modules/event-comment</module>
