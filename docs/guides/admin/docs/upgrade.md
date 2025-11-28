@@ -23,10 +23,12 @@ git diff origin/r/{{ opencast_major_version() | int - 1 }}.x origin/r/{{ opencas
 The most important changes are:
 
 - Default workflows are now in yaml [[#6798](https://github.com/opencast/opencast/pull/6798)]
-- The configuration key `video-source-flavor` for the Subtitle Timeshift Workflow Operation Handler changed to `video-source-flavors` (plural). [[#6901](https://github.com/opencast/opencast/pull/6901)]
+- The configuration key `video-source-flavor` for the Subtitle Timeshift Workflow Operation Handler changed to
+  `video-source-flavors` (plural). [[#6901](https://github.com/opencast/opencast/pull/6901)]
 - Configuring JWT authentication is now substantially simpler [[#7189](https://github.com/opencast/opencast/pull/7189)]
 - The editor now displays less metadata by default [[#7053](https://github.com/opencast/opencast/pull/7053)]
-- The plugin `opencast-plugin-legacy-annotation` has been removed from `org.opencastproject.plugin.impl.PluginManagerImpl.cfg`. [[#6902](https://github.com/opencast/opencast/pull/6902)]
+- The plugin `opencast-plugin-legacy-annotation` has been removed from `org.opencastproject.plugin.impl.PluginManagerImpl.cfg`.
+  [[#6902](https://github.com/opencast/opencast/pull/6902)]
 - Target tag handling has changed with [[#6648](https://github.com/opencast/opencast/pull/6648)]:
 
 ## Database Upgrade
