@@ -39,11 +39,11 @@ export default class TextBoxPlugin extends EventLogPlugin {
     /* Demo json for quick developing purposes */
     // const myTestJson = [
     //   {
-    //     start: 2,
+    //     start: 2000,
     //     text: 'Samalamadingdong',
     //   },
     //   {
-    //     start: 3,
+    //     start: 3000,
     //     text: 'Get in the comments',
     //     link: 'https://opencast.org',
     //   }
@@ -71,11 +71,12 @@ export default class TextBoxPlugin extends EventLogPlugin {
 
     // Display/Hide textboxes
     this._textboxJSON.forEach((boxInfo, index) => {
-      const end = boxInfo.start + 10;
-      if (params.currentTime > boxInfo.start && params.currentTime < end && !this._textboxes.get(index)) {
+      const start = (boxInfo.start / 1000);
+      const end = (boxInfo.start / 1000) + 10;
+      if (params.currentTime > start && params.currentTime < end && !this._textboxes.get(index)) {
         this.createBox(boxInfo, index);
       }
-      if ((params.currentTime < boxInfo.start || params.currentTime > end) && this._textboxes.get(index)) {
+      if ((params.currentTime < start || params.currentTime > end) && this._textboxes.get(index)) {
         this.removeBox(boxInfo, index);
       }
     });

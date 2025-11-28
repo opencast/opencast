@@ -9,7 +9,7 @@ The expected flavor type of the catalog is "quizzes" (i.e. "quizzes/source").
 The file is of the form:
 ```json
 {
-  "start": 2,
+  "start": 2000,
   "question": "Which is a fruit?",
   "answers": [
     {

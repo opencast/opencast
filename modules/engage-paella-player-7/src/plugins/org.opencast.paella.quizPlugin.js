@@ -32,7 +32,7 @@ export default class QuizPlugin extends EventLogPlugin {
     /* Demo json for quick developing purposes */
     // const myTestJson = [
     //   {
-    //     start: 2,
+    //     start: 2000,
     //     type: 'multipleChoice',
     //     question: 'Which is a fruit?',
     //     answers: [
@@ -54,12 +54,6 @@ export default class QuizPlugin extends EventLogPlugin {
     //       }
     //     ],
     //   },
-    //   {
-    //     start: 8,
-    //     type: 'text',
-    //     question: 'Can we have free form questions as well?',
-    //     correctAnswers: ['Yes', 'Y', 'If I have to']
-    //   }
     // ];
     // this._quizJSON = myTestJson;
   }
@@ -94,13 +88,14 @@ export default class QuizPlugin extends EventLogPlugin {
       }
 
       // TODO: Avoid quizzes overlapping
-      if (!info.shown && params.currentTime >= info.start && !this._quiz) {
+      const start = (info.start / 1000);
+      if (!info.shown && params.currentTime >= start && !this._quiz) {
         this.player.pause();
         this.createQuiz(info, index);
         info.shown = true;
       }
 
-      if (params.currentTime < info.start) {
+      if (params.currentTime < start) {
         info.shown = false; // Reset flag
       }
     });
