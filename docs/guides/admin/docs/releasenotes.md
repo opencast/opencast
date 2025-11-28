@@ -1,5 +1,16 @@
 # Opencast 17: Release Notes
 
+## Opencast 17.10
+
+This version contains a new version of the admin ui
+([17.x-2025-11-28](https://github.com/opencast/opencast-admin-interface/releases/tag/17.x-2025-11-28)).
+
+There are also a few bugfixes like fixing head requests ([#7181](https://github.com/opencast/opencast/pull/7181)),
+a fix for permissions in the search service ([#7120](https://github.com/opencast/opencast/pull/7120)),
+a fix for captions not being published from the editor ([#7167](https://github.com/opencast/opencast/pull/7167)),
+as well as support for more mimetypes (
+[#7174](https://github.com/opencast/opencast/pull/7174)], [#7177](https://github.com/opencast/opencast/pull/7177)).
+
 ## Opencast 17.9
 
 This version contains new releases of both the admin ui
