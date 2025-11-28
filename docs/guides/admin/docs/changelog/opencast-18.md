@@ -3,6 +3,30 @@ Opencast 18 Changelog
 
 Changes marked with \* were also included in 17.x.
 
+## Opencast 18.4 (2025-10-24)
+- [[#7219](https://github.com/opencast/opencast/pull/7219)] -
+  Update r/18.x Editor to 18.x-2025-11-28
+- [[#7218](https://github.com/opencast/opencast/pull/7218)] -
+  Update r/18.x Admin UI to 18.x-2025-11-28
+- [[#7195](https://github.com/opencast/opencast/pull/7195)] -
+  Fix incorrect escaping in site GHA build
+- [[#7173](https://github.com/opencast/opencast/pull/7173)] -
+  docs: Download npm packages to common folder
+- [[#7140](https://github.com/opencast/opencast/pull/7140)] -
+  Cleanup GHA workflows
+- [[#7137](https://github.com/opencast/opencast/pull/7137)] -
+  Add coverage report documentation
+- [[#7118](https://github.com/opencast/opencast/pull/7118)] -
+  Fixes direct publishing of live events
+- [[#7116](https://github.com/opencast/opencast/pull/7116)] -
+  Add brief Tobira "documentation"
+- [[#7112](https://github.com/opencast/opencast/pull/7112)] -
+  Fix checkstyle violations in scheduler modules
+- [[#7111](https://github.com/opencast/opencast/pull/7111)] -
+  Fix checkstyle violations in module working-file-repository-service-impl
+- [[#7109](https://github.com/opencast/opencast/pull/7109)] -
+  Fix checkstyle violations in workflow modules
+
 ## Opencast 18.3 (2025-10-24)
 - [[#7132](https://github.com/opencast/opencast/pull/7132)] -
   Update r/18.x Admin UI to 18.x-2025-10-24
