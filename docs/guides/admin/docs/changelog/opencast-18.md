@@ -3,7 +3,7 @@ Opencast 18 Changelog
 
 Changes marked with \* were also included in 17.x.
 
-## Opencast 18.4 (2025-10-24)
+## Opencast 18.4 (2025-11-28)
 - [[#7219](https://github.com/opencast/opencast/pull/7219)] -
   Update r/18.x Editor to 18.x-2025-11-28
 - [[#7218](https://github.com/opencast/opencast/pull/7218)] -
