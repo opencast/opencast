@@ -87,23 +87,42 @@ export default class TextBoxPlugin extends EventLogPlugin {
   createBox(info, index) {
     if (!this._textboxes.get(index)) {
       let textbox = undefined;
-      if (info.link) {
-        textbox = createElementWithHtmlText(`
-          <a class="textbox-plugin-box" href=${ info.link }></a>
+      // if (info.link) {
+      //   textbox = createElementWithHtmlText(`
+      //     <a class="textbox-plugin-box" href=${ info.link }></a>
+      //   `, this._container);
+      // } else {
+      textbox = createElementWithHtmlText(`
+        <details class="textbox-plugin-box-details">
+          <summary class="textbox-plugin-box-summary">
+            <span class="left">
+              <a href=${ info.link }>${ infoIcon }</a>
+            </span>
+            <span class="middle">${ info.text }</span>
+            <span class="right"></span>
+          </summary>
+          ${ info.text }
+        </details>
         `, this._container);
-      } else {
-        textbox = createElementWithHtmlText(`
-          <div class="textbox-plugin-box" href=${ info.link }></div>
-        `, this._container);
-      }
+      // }
 
-      createElementWithHtmlText(`
-        <i class="textbox-plugin-box-icon">${ infoIcon }</i>
-      `, textbox);
+      // createElementWithHtmlText(`
+      //   <details class="textbox-plugin-box">${ infoIcon }
+      //     <summary class="textbox-plugin-box-text">
+      //       <i class="textbox-plugin-box-icon">${ infoIcon }</i>
+      //       ${ info.text }
+      //     </summary>
+      //     ${ info.text }
+      //   </details>
+      // `, textbox);
 
-      createElementWithHtmlText(`
-        <span class="textbox-plugin-box-text">${ info.text }</span>
-      `, textbox);
+      // createElementWithHtmlText(`
+      //   <i class="textbox-plugin-box-icon">${ infoIcon }</i>
+      // `, textbox);
+
+      // createElementWithHtmlText(`
+      //   <span class="textbox-plugin-box-text">${ info.text }</span>
+      // `, textbox);
 
       this._textboxes.set(index, textbox);
     }

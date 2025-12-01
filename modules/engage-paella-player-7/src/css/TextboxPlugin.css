@@ -30,6 +30,51 @@
     text-decoration: none;
 }
 
+.textbox-plugin-box-details {
+    width: 12vw;
+    min-height: 1.5vh;
+    padding: 0.5vw;
+    gap: 0.5vw;
+    border-radius: 0.5vw;
+    font-size: min(1vw, 1vh);
+
+    color: white;
+    fill: white;
+    background-color: rgba(0,0,0,0.7);
+
+    text-decoration: none;
+}
+
+.textbox-plugin-box-summary {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 0.5vw;
+
+    width: 100%;
+    cursor: pointer;
+}
+
+/* Right-side dropdown arrow */
+.textbox-plugin-box-summary::-webkit-details-marker {
+  display: none;
+}
+.textbox-plugin-box-summary .right::after {
+  content: "◂";
+  font-size: 1em;
+}
+details[open] .textbox-plugin-box-summary .right::after {
+  content: "▾";
+  font-size: 1em;
+}
+
+/* Optional left icon */
+.textbox-plugin-box-summary .left svg {
+  width: 1em;
+  height: 1em;
+  object-fit: contain;
+}
+
 .textbox-plugin-box-text {
     flex: 1;
     white-space: nowrap;
