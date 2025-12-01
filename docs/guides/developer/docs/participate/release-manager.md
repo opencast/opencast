@@ -136,6 +136,15 @@ Example on how to create the Opencast {{ opencast_major_version() }} release bra
         git checkout -b r/{{ opencast_major_version() + 1 }}.x
         git push origin r/{{ opencast_major_version() + 1 }}.x
 
+9. File a PR against the infra repo updating version numbers:
+
+        git clone -b master git@github.com:opencast/opencast-project-infrastructure.git
+        [ Update ansible-demo-machines/deploy.yml ]
+        git commit -m "Updating demo machine versions due to {{ opencast_major_version() + 1 }} branch cut"
+        [ Create pr ]
+        [ Bug QA manager on Matrix/email ]
+
+
 If you are unable to create the branches in the last three repositories, please make noise in the Matrix channel so we
 can fix your permissions!
 
