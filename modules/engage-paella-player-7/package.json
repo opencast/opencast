@@ -23,7 +23,7 @@
     "css-loader": "^7.1.2",
     "eslint": "^9.39.0",
     "eslint-config-opencast": "file:../../docs/checkstyle/eslint-config",
-    "express": "^5.1.0",
+    "express": "^5.2.1",
     "html-linter": "^1.1.1",
     "html-validate": "^10.2.1",
     "http-proxy": "^1.18.1",
