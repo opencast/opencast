@@ -7,7 +7,7 @@ jobs:
   cut-release-tag:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: prepare git
         run: |
