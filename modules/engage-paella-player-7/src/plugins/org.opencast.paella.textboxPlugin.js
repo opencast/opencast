@@ -87,42 +87,54 @@ export default class TextBoxPlugin extends EventLogPlugin {
   createBox(info, index) {
     if (!this._textboxes.get(index)) {
       let textbox = undefined;
-      // if (info.link) {
-      //   textbox = createElementWithHtmlText(`
-      //     <a class="textbox-plugin-box" href=${ info.link }></a>
-      //   `, this._container);
-      // } else {
-      textbox = createElementWithHtmlText(`
-        <details class="textbox-plugin-box-details">
-          <summary class="textbox-plugin-box-summary">
-            <span class="left">
-              <a href=${ info.link }>${ infoIcon }</a>
-            </span>
-            <span class="middle">${ info.text }</span>
-            <span class="right"></span>
-          </summary>
-          ${ info.text }
-        </details>
-        `, this._container);
-      // }
 
-      // createElementWithHtmlText(`
-      //   <details class="textbox-plugin-box">${ infoIcon }
-      //     <summary class="textbox-plugin-box-text">
-      //       <i class="textbox-plugin-box-icon">${ infoIcon }</i>
-      //       ${ info.text }
+      // textbox = createElementWithHtmlText(`
+      //   <details class="textbox-plugin-box-details">
+      //     <summary class="textbox-plugin-box-summary">
+      //       <a href=${ info.link } class="textbox-plugin-box-summary-link">
+      //         <i class="textbox-plugin-box-icon">${ infoIcon }</i>
+      //         <span class="textbox-plugin-box-text">${ info.text }</span>
+      //       </a>
+      //       <span class="right" aria-hidden="true"></span>
       //     </summary>
       //     ${ info.text }
       //   </details>
-      // `, textbox);
+      //   `, this._container);
 
-      // createElementWithHtmlText(`
-      //   <i class="textbox-plugin-box-icon">${ infoIcon }</i>
-      // `, textbox);
+      textbox = createElementWithHtmlText(`
+        <details class="textbox-plugin-box-details"> </details>
+      `, this._container);
 
-      // createElementWithHtmlText(`
-      //   <span class="textbox-plugin-box-text">${ info.text }</span>
-      // `, textbox);
+      let summary = createElementWithHtmlText(`
+          <summary class="textbox-plugin-box-summary"> </summary>
+      `, textbox);
+
+      createElementWithHtmlText(`
+          <div>${ info.text }</div>
+      `, textbox);
+
+      let summaryBox;
+      if (info.link) {
+        summaryBox = createElementWithHtmlText(`
+            <a href=${ info.link } class="textbox-plugin-box-summary-link"> </a>
+        `, summary);
+      } else {
+        summaryBox = createElementWithHtmlText(`
+            <div class="textbox-plugin-box-summary-link"> </div>
+        `, summary);
+      }
+
+      createElementWithHtmlText(`
+        <i class="textbox-plugin-box-icon">${ infoIcon }</i>
+      `, summaryBox);
+
+      createElementWithHtmlText(`
+        <span class="textbox-plugin-box-text">${ info.text }</span>
+      `, summaryBox);
+
+      createElementWithHtmlText(`
+        <span class="right" aria-hidden="true"></span>
+      `, summary);
 
       this._textboxes.set(index, textbox);
     }
