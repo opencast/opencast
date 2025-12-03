@@ -26,9 +26,11 @@ import org.opencastproject.assetmanager.api.Availability;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.impl.SnapshotImpl;
 import org.opencastproject.assetmanager.impl.VersionImpl;
+import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageParser;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
 
 import org.eclipse.persistence.annotations.CascadeOnDelete;
 import org.slf4j.Logger;
@@ -36,6 +38,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 
@@ -218,12 +221,19 @@ import javax.persistence.UniqueConstraint;
                 + "AND s.mediaPackageId = :mediaPackageId"
         ),
         @NamedQuery(
+            name = "Snapshot.updateEpisodeXmlByVersionAndMpId",
+            query = "UPDATE Snapshot s SET s.episodeXml = :episodeXml "
+                + "WHERE s.version = :version "
+                + "AND s.mediaPackageId = :mediaPackageId"
+        ),
+        @NamedQuery(
           name = "Snapshot.getSnapshotVersions",
           query = "SELECT s.version FROM Snapshot s "
                 + "WHERE s.mediaPackageId = :mediaPackageId "
                 + "AND (:organizationId IS NULL OR s.organizationId = :organizationId) "
                 + "ORDER BY s.version ASC"
         ),
+
 })
 // Maintain own generator to support database migrations from Archive to AssetManager
 // The generator's initial value has to be set after the data migration.
@@ -266,12 +276,17 @@ public class SnapshotDto {
   @Column(name = "mediapackage_xml", length = 65535, nullable = false)
   private String mediaPackageXml;
 
+  @Lob
+  @Column(name = "episode_xml", length = 65535, nullable = true)
+  private String episodeXml;
+
   @CascadeOnDelete
   @OneToMany(targetEntity = AssetDto.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "snapshot")
   private Set<AssetDto> assets;
 
   public static SnapshotDto mk(
           MediaPackage mediaPackage,
+          Optional<Catalog> episodeCatalog,
           VersionImpl version,
           String organization,
           Date archivalDate,
@@ -286,6 +301,7 @@ public class SnapshotDto {
       dto.organizationId = organization;
       dto.archivalDate = archivalDate;
       dto.mediaPackageXml = MediaPackageParser.getAsXml(mediaPackage);
+      dto.episodeXml = episodeCatalog.isPresent() ? ((DublinCoreCatalog)episodeCatalog.get()).toXmlString() : null;
       dto.availability = availability.name();
       dto.storageId = storageId;
       dto.owner = owner;
@@ -298,6 +314,7 @@ public class SnapshotDto {
   public static SnapshotDto mk(Snapshot snapshot) {
     try {
       return mk(snapshot.getMediaPackage(),
+              snapshot.getEpisodeCatalog(),
               VersionImpl.mk(Long.parseLong(snapshot.getVersion().toString())),
               snapshot.getOrganizationId(),
               snapshot.getArchivalDate(),
@@ -355,6 +372,8 @@ public class SnapshotDto {
 
   public Snapshot toSnapshot() {
     MediaPackage mediaPackage = Conversions.toMediaPackage(mediaPackageXml);
+    Optional<Catalog> episodeCatalog = Conversions.toDublinCoreCatalog(episodeXml);
+
     // ensure elements are tagged `archive`
     for (MediaPackageElement element: mediaPackage.getElements()) {
       if (!Arrays.asList(element.getTags()).contains("archive")) {
@@ -370,7 +389,8 @@ public class SnapshotDto {
             Availability.valueOf(availability),
             storageId,
             owner,
-            mediaPackage);
+            mediaPackage,
+            episodeCatalog);
   }
 
   /**

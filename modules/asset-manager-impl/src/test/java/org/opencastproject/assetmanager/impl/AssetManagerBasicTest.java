@@ -172,4 +172,11 @@ public class AssetManagerBasicTest extends AssetManagerTestBase {
       assertEquals("Value check", d3, properties.stream().findFirst().get().getValue().get(Value.DATE));
     }
   }
+
+  @Test
+  public void testEpisodeCatalogStoredInSnapshot() throws Exception {
+    final String[] mp = createAndAddMediaPackagesSimple(1, 1, 1);
+    List<Snapshot> snapshot = am.getSnapshotsById(mp[0]);
+    assertTrue(snapshot.get(0).getEpisodeCatalog().isPresent());
+  }
 }

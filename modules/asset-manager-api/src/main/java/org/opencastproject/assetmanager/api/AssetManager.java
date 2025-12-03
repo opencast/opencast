@@ -444,4 +444,12 @@ public interface AssetManager {
    *          The event ID to trigger an index update for
    */
   void triggerIndexUpdate(String mediaPackageId) throws NotFoundException, UnauthorizedException;
+
+  /**
+   * Add missing catalogs to asset database to improve re-indexing performance
+   * by reducing filesystem accesses
+   *
+   * @throws AssetManagerException
+   */
+  void updateCatalogs() throws AssetManagerException;
 }

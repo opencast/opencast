@@ -31,6 +31,7 @@ import org.opencastproject.assetmanager.impl.PartialMediaPackage;
 import org.opencastproject.assetmanager.impl.VersionImpl;
 import org.opencastproject.db.DBSession;
 import org.opencastproject.db.Queries;
+import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 
@@ -143,6 +144,7 @@ public class Database {
   public SnapshotDto saveSnapshot(
           final String orgId,
           final PartialMediaPackage pmp,
+          final Catalog episodeCatalog,
           final Date archivalDate,
           final VersionImpl version,
           final Availability availability,
@@ -150,6 +152,7 @@ public class Database {
           final String owner) {
     final SnapshotDto snapshotDto = SnapshotDto.mk(
             pmp.getMediaPackage(),
+            Optional.ofNullable(episodeCatalog),
             version,
             orgId,
             archivalDate,
@@ -232,6 +235,17 @@ public class Database {
           Pair.of("availability", availability.name()),
           Pair.of("version", version.value()),
           Pair.of("mediaPackageId", mpId)
+      ).apply(em);
+    });
+  }
+
+  public void setDublinCoreXml(final VersionImpl version, final String mpId, final String dublinCoreXml) {
+    db.execTx(em -> {
+      namedQuery.update(
+        "Snapshot.updateEpisodeXmlByVersionAndMpId",
+        Pair.of("episodeXml", dublinCoreXml),
+        Pair.of("version", version.value()),
+        Pair.of("mediaPackageId", mpId)
       ).apply(em);
     });
   }

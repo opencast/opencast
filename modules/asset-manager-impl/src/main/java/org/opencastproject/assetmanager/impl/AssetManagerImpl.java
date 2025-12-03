@@ -68,6 +68,8 @@ import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
 import org.opencastproject.message.broker.api.update.AssetManagerUpdateHandler;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.security.api.AccessControlEntry;
@@ -1407,6 +1409,14 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     storeAssets(pmp, version);
     // store mediapackage in db
     final SnapshotDto snapshotDto;
+
+    // get episodeCatalog before writing URI
+    DublinCoreCatalog episodeCatalog = null;
+
+    for (Catalog catalog : mp.getCatalogs(MediaPackageElements.EPISODE)) {
+      episodeCatalog = DublinCoreUtil.loadDublinCore(workspace, catalog);
+    }
+
     try {
       // rewrite URIs for archival
       for (MediaPackageElement mpe : pmp.getElements()) {
@@ -1421,7 +1431,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
       String currentOrgId = securityService.getOrganization().getId();
       snapshotDto = getDatabase().saveSnapshot(
-              currentOrgId, pmp, now, version,
+              currentOrgId, pmp, episodeCatalog, now, version,
               Availability.ONLINE, getLocalAssetStore().getStoreType(), owner
       );
     } catch (AssetManagerException e) {
@@ -1570,7 +1580,8 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
             snapshot.getAvailability(),
             snapshot.getStorageId(),
             snapshot.getOwner(),
-            mpCopy);
+            mpCopy,
+            snapshot.getEpisodeCatalog());
   }
 
   public void fireEventHandlers(AssetManagerItem item) {
@@ -1595,6 +1606,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
           String orgId, User user) {
     return (Optional<Event> eventOpt) -> {
       MediaPackage mp = snapshot.getMediaPackage();
+      Optional<Catalog> episodeCatalog = snapshot.getEpisodeCatalog();
       String eventId = mp.getIdentifier().toString();
       Event event = eventOpt.orElse(new Event(eventId, orgId));
 
@@ -1606,12 +1618,16 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       }
       EventIndexUtils.updateEvent(event, mp);
 
-      for (Catalog catalog: mp.getCatalogs(MediaPackageElements.EPISODE)) {
-        try (InputStream in = workspace.read(catalog.getURI())) {
-          EventIndexUtils.updateEvent(event, DublinCores.read(in));
-        } catch (IOException | NotFoundException e) {
-          throw new IllegalStateException(String.format("Unable to load dublin core catalog for event '%s'",
-                  mp.getIdentifier()), e);
+      if (episodeCatalog.isPresent()) {
+        EventIndexUtils.updateEvent(event, ((DublinCoreCatalog)episodeCatalog.get()));
+      } else {
+        for (Catalog catalog: mp.getCatalogs(MediaPackageElements.EPISODE)) {
+          try (InputStream in = workspace.read(catalog.getURI())) {
+            EventIndexUtils.updateEvent(event, DublinCores.read(in));
+          } catch (IOException | NotFoundException e) {
+            throw new IllegalStateException(String.format("Unable to load dublin core catalog for event '%s'",
+                    mp.getIdentifier()), e);
+          }
         }
       }
 
@@ -1667,5 +1683,94 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     event.setAccessPolicy(AccessControlParser.toJsonSilent(acl));
 
     return event;
+  }
+
+  /* uses a similar implementation as index repopoluate to loop over latest snapshots */
+  @Override
+  public void updateCatalogs() throws AssetManagerException {
+    final Organization originalOrg = securityService.getOrganization();
+    final User originalUser = (originalOrg != null ? securityService.getUser() : null);
+
+    logger.info("START Repopulation of snapshots with catalogs");
+    try {
+      final Organization defaultOrg = new DefaultOrganization();
+      final User defaultSystemUser = SecurityUtil.createSystemUser(systemUserName, defaultOrg);
+      securityService.setOrganization(defaultOrg);
+      securityService.setUser(defaultSystemUser);
+      int offset = 0;
+      int total = (int) countEvents(null);
+      int errors = 0;
+      int rewritten = 0;
+      int unchanged = 0;
+      int current = 0;
+
+      // Not an index rebuild, just using logging mechanism
+      logIndexRebuildBegin(logger, total,"Snapshot Episode Catalogs");
+      do {
+        List<Snapshot> snapshots = getDatabase().getSnapshotsForIndexRebuild(offset, PAGE_SIZE);
+        offset += PAGE_SIZE;
+        int n = 20;
+
+        final Map<String, List<Snapshot>> byOrg = snapshots.stream()
+            .collect(Collectors.groupingBy(Snapshot::getOrganizationId));
+        for (String orgId : byOrg.keySet()) {
+          final Organization snapshotOrg;
+          try {
+            snapshotOrg = orgDir.getOrganization(orgId);
+            User snapshotSystemUser = SecurityUtil.createSystemUser(systemUserName, snapshotOrg);
+            securityService.setOrganization(snapshotOrg);
+            securityService.setUser(snapshotSystemUser);
+            for (Snapshot snapshot : byOrg.get(orgId)) {
+              try {
+                current++;
+
+                // Check that the snapshot doesn't already have a valid catalog
+                if (snapshot.getEpisodeCatalog().isEmpty()) {
+                  // mediapackage URIs need to be rewritten to concrete URLs
+                  Snapshot snapshotWithUris = httpAssetProvider.prepareForDelivery(snapshot);
+                  MediaPackage mediapackage = snapshotWithUris.getMediaPackage();
+                  Optional<DublinCoreCatalog> episodeCatalog =
+                      DublinCoreUtil.loadEpisodeDublinCore(workspace, mediapackage);
+
+                  if (episodeCatalog.isPresent()) {
+                    db.setDublinCoreXml(RuntimeTypes.convert(snapshot.getVersion()),
+                        mediapackage.getIdentifier().toString(), episodeCatalog.get().toXmlString());
+                    rewritten++;
+                  } else {
+                    logger.warn("Snapshot {} for mediapackage {} has no episode catalog", snapshot.getVersion(),
+                        mediapackage.getIdentifier().toString());
+                    errors++;
+                  }
+                } else {
+                  unchanged++;
+                }
+
+                logIndexRebuildProgress(logger, total, current);
+              } catch (Throwable t) {
+                logSkippingElement(logger, "event", snapshot.getMediaPackage().getIdentifier().toString(),
+                    snapshotOrg, t);
+              }
+            }
+          } catch (Throwable t) {
+            logIndexRebuildError(logger, t, originalOrg);
+            throw new AssetManagerException("Could update missing catalogs", t);
+          } finally {
+            securityService.setOrganization(defaultOrg);
+            securityService.setUser(defaultSystemUser);
+          }
+        }
+      } while (offset < total);
+
+      logger.info("FINISHED Repopulation of snapshots with catalogs, {} episodes, {} unchanged, {} updated,"
+          + " {} failed.", total, unchanged, rewritten, errors);
+      if (errors != 0) {
+        throw new AssetManagerException("Repopulation of snapshots with episode catalogs finished with " + errors
+            + " errors");
+      }
+    } finally {
+      securityService.setOrganization(originalOrg);
+      securityService.setUser(originalUser);
+    }
+
   }
 }

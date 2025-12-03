@@ -1,0 +1,4 @@
+To greatly decrease the time to re-index the Asset Manager, the episode catalog xml is now stored in the snapshot. This is done
+for all snapshots after this update. To store the catalog for previous snapshots run the REST endpoint
+`PUT /asset/snapshot/catalog`. **WARNING**  this could take several hours depending on where the catalog files have been
+stored.
