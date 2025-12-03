@@ -36,6 +36,7 @@
     "xml-loader": "^1.2.1"
   },
   "dependencies": {
+    "@opencast/jwtify": "^0.1.3",
     "paella-basic-plugins": "^1.50.3",
     "paella-core": "^1.50.5",
     "paella-mp4multiquality-plugin": "^1.47.1",

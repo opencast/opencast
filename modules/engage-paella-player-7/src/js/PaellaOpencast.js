@@ -105,7 +105,12 @@ const initParams = {
   repositoryUrl: getUrlFromOpencastServer('/search/episode.json'),
 
   getManifestUrl: (repoUrl, videoId) => {
-    return `${repoUrl}?id=${videoId}`;
+    let out =  `${repoUrl}?id=${videoId}`;
+    const jwt = new URLSearchParams(location.search).get('jwt');
+    if (jwt) {
+      out += `&jwt=${jwt}`;
+    }
+    return out;
   },
 
   getManifestFileUrl: (manifestUrl) => {
