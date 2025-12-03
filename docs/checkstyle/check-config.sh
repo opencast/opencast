@@ -35,7 +35,7 @@ fi
 echo "Checking that all plugins are listed for inclusion in the assembly pom"
 for plugin in $(sed -n 's/^.*<feature.*"\(opencast-plugin-[^"]*\)".*$/\1/p' assemblies/karaf-features/src/main/feature/feature.xml); do
     if ! grep -q "$plugin" assemblies/pom.xml; then
-      echo "ERROR: Plugin $plugin not listed in assemblies/karaf-features/src/main/feature/feature.xml"
+      echo "ERROR: Plugin $plugin not listed in assemblies/pom.xml"
       ret=1
     fi
 done
