@@ -52,3 +52,21 @@ window.onload = async () => {
     paella.log.error(error);
   }
 };
+
+
+// Setup service worker to enable static file auth via JWT. We pass JWT and
+// video ID via query parameters in order to have them available in the SW
+// immediately. I know that typically, you want an unchanging URL for your SWs,
+// but that only applies to service workers that want to have a persistent state
+// as far as I can tell. This query parameter passing method is known and used.
+// Also, the SW is super tiny, so the additional fetches don't really matter.
+const params = new URLSearchParams(window.location.search);
+const swUrl = `sw.js?${new URLSearchParams({
+  jwt: params.get('jwt'),
+  videoId: params.get('id'),
+})}`;
+
+navigator.serviceWorker
+  .register(swUrl, { updateViaCache: 'none' })
+  // eslint-disable-next-line no-console
+  .catch(e => console.error('Failed to register service worker', e));
