@@ -1,1 +1,0 @@
-The configuration key `video-source-flavor` for the Subtitle Timeshift Workflow Operation Handler changed to `video-source-flavors` (plural).

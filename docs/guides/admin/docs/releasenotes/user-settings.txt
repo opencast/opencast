@@ -1,1 +1,0 @@
-PR 6622 added a oc_frontend_user_settings database table, which replaces the oc_user_settings table.  The older stable should be blank in all installs, and the relevant instructions are included in the database upgrade script for 18.0.
