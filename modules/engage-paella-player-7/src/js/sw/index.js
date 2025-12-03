@@ -21,20 +21,73 @@
 
 import { setUpServiceWorker } from '@opencast/jwtify';
 
-// Get initial parameters (containing video ID and JWT)
+// Get initial parameters
 const params = new URLSearchParams(self.location.search);
 const jwt = params.get('jwt');
 const videoId = params.get('videoId');
+const refreshEnabled = params.get('refresh') === 'true';
 
 // Only of those are set do we actually register anything.
 if (jwt && videoId) {
-  const fetchJwts = async (eventIds) => {
-    return new Map(eventIds.has(videoId) ? [[videoId, jwt]] : []);
+  let lastClientId = null;
+  let resolveRefresh = () => {};
+  if (refreshEnabled) {
+    // Remember the last client that sent a request. We will always ask it for
+    // fresh JWTs.
+    self.addEventListener('fetch', event => {
+      lastClientId = event.clientId;
+    });
+
+    // Receive messages from clients, which will send JWTs back.
+    self.addEventListener('message', e => {
+      const d = e.data;
+      if (typeof d === 'object' && d?.type === 'oc-event-jwt' && typeof d?.jwt === 'string') {
+        resolveRefresh(d.jwt);
+      }
+    });
+  }
+
+  const fetchJwts =  async (eventIds) => {
+    if (eventIds.size !== 1 || !eventIds.has(videoId)) {
+      // eslint-disable-next-line no-console
+      console.warn('event IDs requested by jwtify do not match video ID');
+      return new Map();
+    }
+
+    if (!refreshEnabled) {
+      // eslint-disable-next-line no-console
+      console.warn('JWT refresh is not enabled, but jwtify asked for a new JWT, meaning the old one is expired');
+      return new Map();
+    }
+
+    const client = await self.clients.get(lastClientId) ?? self.clients.matchAll()[0];
+    if (!client) {
+      // eslint-disable-next-line no-console
+      console.warn('No client connected to SW, but a JWT is needed for a request... weird');
+      return new Map();
+    }
+
+    // Get fresh JWT by asking the host frame (by first asking the client).
+    const jwt = await new Promise(resolve => {
+      resolveRefresh = resolve;
+      client.postMessage({
+        type: 'oc-event-jwt-request',
+        event: videoId,
+      });
+
+      // After some timeout we give up, as there might not be anyone answering.
+      setTimeout(() => resolve(null), 3000);
+    });
+
+    return new Map(jwt ? [[videoId, jwt]] : []);
   };
 
-  setUpServiceWorker({
+  const handle = setUpServiceWorker({
     getJwts: fetchJwts,
     trustedOcOrigins: ['https://stable.opencast.org', 'http://localhost:8080', 'http://localhost:8081'], // TODO
     debugLog: true, // TODO: remove
   });
+
+  // Add our initial JWT to the cache so that it can be used for immediate requests.
+  handle.cache.add(videoId, jwt);
 }
