@@ -88,7 +88,7 @@ operations:
       - time: 3
 
   - id: cover-image
-    if: NOT (${presenter_work_video} OR $ ${presentation_work_video} OR ${presentation/thumbnail_edited}) AND (${presenter_work_audio} OR ${presentation_work_audio})
+    if: NOT (${presenter_work_video} OR ${presentation_work_video} OR ${presentation/thumbnail_edited}) AND (${presenter_work_audio} OR ${presentation_work_audio})
     description: Create a cover image for audio-only files
     configurations:
       - stylesheet: file://${karaf.etc}/branding/coverimage.xsl
@@ -108,7 +108,7 @@ operations:
 
   # Generate timeline preview images
   - id: timelinepreviews
-    if: (${presenter_work_video} OR $ ${presentation_work_video})
+    if: ${presenter_work_video} OR ${presentation_work_video}
     fail-on-error: false
     exception-handler-workflow: partial-error
     description: Creating timeline preview images
@@ -124,7 +124,7 @@ operations:
   # Add trailer and bumper to the recording prior to publication.
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   - id: include
-    if: (${presenter_work_video} OR $ ${presentation_work_video})
+    if: ${presenter_work_video} OR ${presentation_work_video}
     description: Including theming operations
     configurations:
       - workflow-id: partial-theming
@@ -154,7 +154,7 @@ operations:
   # Encode presenter (camera) and presentation (screen)
   # to Engage player format
   - id: encode
-    if: (${presenter_work_video} OR $ ${presentation_work_video})
+    if: ${presenter_work_video} OR ${presentation_work_video}
     exception-handler-workflow: partial-error
     description: Encoding videos to mp4 delivery format
     configurations:
@@ -164,7 +164,7 @@ operations:
       - encoding-profile: adaptive-parallel.http
 
   - id: encode
-    if: NOT (${presenter_work_video} OR $ ${presentation_work_video}) AND (${presenter_work_audio} OR ${presentation_work_audio})
+    if: NOT (${presenter_work_video} OR ${presentation_work_video}) AND (${presenter_work_audio} OR ${presentation_work_audio})
     exception-handler-workflow: partial-error
     description: Encoding audio-only files to mp3 delivery format
     configurations:

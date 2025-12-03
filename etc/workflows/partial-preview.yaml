@@ -20,7 +20,7 @@ operations:
 
   # Transcode video previews
   - id: encode
-    if: ((${presenter_source_video} OR ${presentation_source_video}))
+    if: ${presenter_source_video} OR ${presentation_source_video}
     exception-handler-workflow: partial-error
     description: Create single-stream video preview
     configurations:
@@ -58,7 +58,7 @@ operations:
       - time: 50%
 
   - id: cover-image
-    if: (NOT(${presenter_source_video} OR $ ${presentation_source_video}))
+    if: NOT (${presenter_source_video} OR ${presentation_source_video})
     description: Create a cover image for audio-only files
     configurations:
       - stylesheet: file://${karaf.etc}/branding/coverimage.xsl
@@ -67,7 +67,7 @@ operations:
       - target-flavor: presenter/image+work
 
   - id: image-to-video
-    if: (NOT(${presenter_source_video} OR $ ${presentation_source_video}))
+    if: NOT (${presenter_source_video} OR ${presentation_source_video})
     description: Composite
     configurations:
       - source-flavor: presenter/image+work
@@ -76,7 +76,7 @@ operations:
       - profile: image-movie.work
 
   - id: prepare-av
-    if: (NOT(${presenter_source_video} OR $ ${presentation_source_video}))
+    if: NOT (${presenter_source_video} OR ${presentation_source_video})
     description: Preparing presenter audio and video work versions
     configurations:
       - source-flavor: presenter/video+work
