@@ -56,9 +56,10 @@ public class OaiPmhElementEntity {
   /** The OAI-PMH entity belongs to this element */
   @ManyToOne(optional = false)
   @JoinColumns({
-    @JoinColumn(name = "mp_id", referencedColumnName = "mp_id", nullable = false, table = "oc_oaipmh_elements"),
-    @JoinColumn(name = "organization", referencedColumnName = "organization", nullable = false, table = "oc_oaipmh_elements"),
-    @JoinColumn(name = "repo_id", referencedColumnName = "repo_id", nullable = false, table = "oc_oaipmh_elements")
+      @JoinColumn(name = "mp_id", referencedColumnName = "mp_id", nullable = false, table = "oc_oaipmh_elements"),
+      @JoinColumn(name = "organization", referencedColumnName = "organization", nullable = false,
+          table = "oc_oaipmh_elements"),
+      @JoinColumn(name = "repo_id", referencedColumnName = "repo_id", nullable = false, table = "oc_oaipmh_elements")
   })
   private OaiPmhEntity oaiPmhEntity;
 

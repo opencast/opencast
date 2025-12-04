@@ -72,11 +72,12 @@ public class SearchResultElementItemImpl implements SearchResultElementItem {
 
   @Override
   public DublinCoreCatalog asDublinCore() throws OaiPmhDatabaseException {
-    if (isEpisodeDublinCore() || isSeriesDublinCore())
+    if (isEpisodeDublinCore() || isSeriesDublinCore()) {
       try {
         return DublinCoreXmlFormat.read(getXml());
-    } catch (Exception ex) {
-      throw new OaiPmhDatabaseException("Can not parse dublincore catalog", ex);
+      } catch (Exception ex) {
+        throw new OaiPmhDatabaseException("Can not parse dublincore catalog", ex);
+      }
     }
 
     throw new OaiPmhDatabaseException("This element isn't a dublincore catalog");

@@ -129,9 +129,10 @@ public final class OaiPmhServer extends HttpServlet implements OaiPmhServerInfo 
     this.componentContext = cc;
     // get mount point
     try {
-        mountPoint = UrlSupport.concat("/", StringUtils.trimToNull(getContextProperty(componentContext, CFG_OAIPMH_MOUNTPOINT)));
+      mountPoint = UrlSupport.concat("/",
+          StringUtils.trimToNull(getContextProperty(componentContext, CFG_OAIPMH_MOUNTPOINT)));
     } catch (RuntimeException e) {
-        mountPoint = CFG_DEFAULT_OAIPMH_MOUNTPOINT;
+      mountPoint = CFG_DEFAULT_OAIPMH_MOUNTPOINT;
     }
     updated(cc.getProperties());
   }
@@ -256,7 +257,8 @@ public final class OaiPmhServer extends HttpServlet implements OaiPmhServerInfo 
    *          the base path of the OAI-PMH server, e.g. /oaipmh
    */
   public static Optional<String> repositoryId(HttpServletRequest req, String mountPoint) {
-    String[] parts = StringUtils.removeStart(UrlSupport.removeDoubleSeparator(req.getRequestURI()), mountPoint).split("/");
+    String[] parts = StringUtils.removeStart(UrlSupport.removeDoubleSeparator(req.getRequestURI()), mountPoint)
+        .split("/");
 
     return Arrays.stream(parts)
         .flatMap(s -> trimToNil(s).stream())
