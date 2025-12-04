@@ -49,9 +49,8 @@ public class MediaLocatorImpl implements MediaLocator {
    *          the media uri
    */
   public MediaLocatorImpl(URI mediaURI) {
-    if (mediaURI == null) {
+    if (mediaURI == null)
       throw new IllegalArgumentException("Argument mediaURI must not be null");
-    }
     this.mediaUri = mediaURI;
   }
 
@@ -69,9 +68,8 @@ public class MediaLocatorImpl implements MediaLocator {
    *          the uri
    */
   public void setMediaURI(URI mediaURI) {
-    if (mediaURI == null) {
+    if (mediaURI == null)
       throw new IllegalArgumentException("Argument mediaURI must not be null");
-    }
     this.mediaUri = mediaURI;
   }
 

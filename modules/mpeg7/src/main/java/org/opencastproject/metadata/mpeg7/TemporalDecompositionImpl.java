@@ -84,9 +84,8 @@ public class TemporalDecompositionImpl<T extends Segment> implements TemporalDec
   @SuppressWarnings("unchecked")
   public T createSegment(String id) {
     T segment = (T) new SegmentImpl(segmentType, id);
-    if (segments.contains(segment)) {
+    if (segments.contains(segment))
       throw new IllegalArgumentException("Duplicate segment id detected: " + id);
-    }
     segments.add(segment);
     return segment;
   }
@@ -106,13 +105,11 @@ public class TemporalDecompositionImpl<T extends Segment> implements TemporalDec
   }
 
   /**
-   * @see org.opencastproject.metadata.mpeg7.TemporalDecomposition#setCriteria(
-   * org.opencastproject.metadata.mpeg7.TemporalDecomposition.DecompositionCriteria)
+   * @see org.opencastproject.metadata.mpeg7.TemporalDecomposition#setCriteria(org.opencastproject.metadata.mpeg7.TemporalDecomposition.DecompositionCriteria)
    */
   public void setCriteria(DecompositionCriteria criteria) {
-    if (criteria == null) {
+    if (criteria == null)
       throw new IllegalArgumentException("Decomposition criteria must not be null");
-    }
     this.criteria = criteria;
   }
 
@@ -135,9 +132,8 @@ public class TemporalDecompositionImpl<T extends Segment> implements TemporalDec
    */
   public T getSegmentById(String segmentId) {
     for (T segment : segments) {
-      if (segmentId.equals(segment.getIdentifier())) {
+      if (segmentId.equals(segment.getIdentifier()))
         return segment;
-      }
     }
     return null;
   }

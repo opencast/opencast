@@ -80,9 +80,8 @@ public class KeywordAnnotationImpl implements KeywordAnnotation {
   public Node toXml(Document document) {
     Element node = document.createElement("Keyword");
     node.setTextContent(keyword);
-    if (type != null) {
+    if (type != null)
       node.setAttribute("type", type.toString());
-    }
     return node;
   }
 

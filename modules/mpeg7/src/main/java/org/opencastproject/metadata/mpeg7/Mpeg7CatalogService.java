@@ -60,9 +60,8 @@ public class Mpeg7CatalogService implements CatalogService<Mpeg7Catalog> {
   }
 
   public Mpeg7Catalog load(InputStream in) throws IOException {
-    if (in == null) {
+    if (in == null)
       throw new IllegalArgumentException("Stream must not be null");
-    }
     return new Mpeg7CatalogImpl(in);
   }
 

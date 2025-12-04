@@ -45,8 +45,7 @@ import org.opencastproject.mediapackage.XmlElement;
  *         &lt;choice minOccurs="0" maxOccurs="unbounded"&gt;
  *           &lt;element name="SpatialDecomposition" type="mpeg7:MovingRegionSpatialDecompositionType"/&gt;
  *           &lt;element name="TemporalDecomposition" type="mpeg7:MovingRegionTemporalDecompositionType"/&gt;
- *           &lt;element name="SpatioTemporalDecomposition"
- *           type="mpeg7:MovingRegionSpatioTemporalDecompositionType"/&gt;
+ *           &lt;element name="SpatioTemporalDecomposition" type="mpeg7:MovingRegionSpatioTemporalDecompositionType"/&gt;
  *           &lt;element name="MediaSourceDecomposition" type="mpeg7:MovingRegionMediaSourceDecompositionType"/&gt;
  *         &lt;/choice&gt;
  *       &lt;/sequence&gt;
