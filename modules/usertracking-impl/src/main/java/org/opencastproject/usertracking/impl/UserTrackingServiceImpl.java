@@ -160,9 +160,15 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
 
   public UserAction addUserFootprint(UserAction action, UserSession session) throws UserTrackingException {
     action.setType(FOOTPRINT_KEY);
-    if (!logIp) session.setUserIp("-omitted-");
-    if (!logUser) session.setUserId("-omitted-");
-    if (!logSession) session.setSessionId("-omitted-");
+    if (!logIp) {
+      session.setUserIp("-omitted-");
+    }
+    if (!logUser) {
+      session.setUserId("-omitted-");
+    }
+    if (!logSession) {
+      session.setSessionId("-omitted-");
+    }
 
     try {
       return db.execTx(em -> {
@@ -203,9 +209,15 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
   }
 
   public UserAction addUserTrackingEvent(UserAction a, UserSession session) throws UserTrackingException {
-    if (!logIp) session.setUserIp("-omitted-");
-    if (!logUser) session.setUserId("-omitted-");
-    if (!logSession) session.setSessionId("-omitted-");
+    if (!logIp) {
+      session.setUserIp("-omitted-");
+    }
+    if (!logUser) {
+      session.setUserId("-omitted-");
+    }
+    if (!logSession) {
+      session.setSessionId("-omitted-");
+    }
 
     try {
       return db.execTx(em -> {
@@ -293,7 +305,8 @@ public class UserTrackingServiceImpl implements UserTrackingService, ManagedServ
     ).andThen(Long::intValue);
   }
 
-  public UserActionList getUserActionsByTypeAndMediapackageId(String type, String mediapackageId, int offset, int limit) {
+  public UserActionList getUserActionsByTypeAndMediapackageId(String type, String mediapackageId,
+      int offset, int limit) {
     UserActionList result = new UserActionListImpl();
 
     db.exec(em -> {
