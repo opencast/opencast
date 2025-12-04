@@ -270,10 +270,12 @@ public class JobsStatistics extends NotificationBroadcasterSupport implements Jo
   private int countJobs(String hostName, Status status) {
     int i = 0;
     for (Entry<Tuple3<String, String, Status>, Long> entry : jobCounts.entrySet()) {
-      if (hostName != null && !hostName.equals(entry.getKey().getA()))
+      if (hostName != null && !hostName.equals(entry.getKey().getA())) {
         continue;
-      if (status != null && !status.equals(entry.getKey().getC()))
+      }
+      if (status != null && !status.equals(entry.getKey().getC())) {
         continue;
+      }
       i += entry.getValue();
     }
     return i;
@@ -282,10 +284,12 @@ public class JobsStatistics extends NotificationBroadcasterSupport implements Jo
   private String[] toJobCountArray(String hostName, Status status) {
     List<String> list = new ArrayList<String>();
     for (Entry<Tuple3<String, String, Status>, Long> entry : jobCounts.entrySet()) {
-      if (hostName != null && !hostName.equals(entry.getKey().getA()))
+      if (hostName != null && !hostName.equals(entry.getKey().getA())) {
         continue;
-      if (status != null && !status.equals(entry.getKey().getC()))
+      }
+      if (status != null && !status.equals(entry.getKey().getC())) {
         continue;
+      }
       list.add(entry.getKey().getA() + DELIMITER + entry.getKey().getB() + DELIMITER + entry.getValue());
     }
     return list.toArray(new String[list.size()]);

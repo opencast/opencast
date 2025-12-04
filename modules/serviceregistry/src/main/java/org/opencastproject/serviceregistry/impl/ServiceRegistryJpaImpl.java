@@ -126,10 +126,12 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** JPA persistence unit name */
   public static final String PERSISTENCE_UNIT = "org.opencastproject.common";
 
-  /** Id of the workflow's start operation operation, need to match the corresponding enum value in WorkflowServiceImpl */
+  /** Id of the workflow's start operation operation, need to match the corresponding enum value in
+   * WorkflowServiceImpl */
   public static final String START_OPERATION = "START_OPERATION";
 
-  /** Id of the workflow's start workflow operation, need to match the corresponding enum value in WorkflowServiceImpl */
+  /** Id of the workflow's start workflow operation, need to match the corresponding enum value in
+   * WorkflowServiceImpl */
   public static final String START_WORKFLOW = "START_WORKFLOW";
 
   /** Id of the workflow's resume operation, need to match the corresponding enum value in WorkflowServiceImpl */
@@ -167,14 +169,17 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** Configuration key for the maximum load */
   protected static final String OPT_MAXLOAD = "org.opencastproject.server.maxload";
 
-  /** Configuration key for the interval to check whether the hosts in the service registry are still alive, in seconds */
+  /** Configuration key for the interval to check whether the hosts in the service registry are still alive,
+   * in seconds */
   protected static final String OPT_HEARTBEATINTERVAL = "heartbeat.interval";
 
   /** Configuration key for the collection of job statistics */
   protected static final String OPT_JOBSTATISTICS = "jobstats.collect";
 
-  /** Configuration key for the retrieval of service statistics: Do not consider jobs older than max_job_age (in days) */
-  protected static final String OPT_SERVICE_STATISTICS_MAX_JOB_AGE = "org.opencastproject.statistics.services.max_job_age";
+  /** Configuration key for the retrieval of service statistics:
+   * Do not consider jobs older than max_job_age (in days) */
+  protected static final String OPT_SERVICE_STATISTICS_MAX_JOB_AGE =
+      "org.opencastproject.statistics.services.max_job_age";
 
   /** Configuration key for the encoding preferred worker nodes */
   protected static final String OPT_ENCODING_WORKERS = "org.opencastproject.encoding.workers";
@@ -735,17 +740,18 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     String encodingWorkersString = (String) properties.get(OPT_ENCODING_WORKERS);
     if (StringUtils.isNotBlank(encodingWorkersString)) {
       encodingWorkers = Arrays.asList(encodingWorkersString.split("\\s*,\\s*"));
-    } else
+    } else {
       encodingWorkers = DEFAULT_ENCODING_WORKERS;
+    }
 
     // get the encoding worker load threshold defined in the configuration file and parse the double
     String encodingThersholdString = StringUtils.trimToNull((String) properties.get(OPT_ENCODING_THRESHOLD));
     if (StringUtils.isNotBlank(encodingThersholdString) && encodingThersholdString != null) {
         try {
           double encodingThresholdTmp = Double.parseDouble(encodingThersholdString);
-          if (encodingThresholdTmp >= 0 && encodingThresholdTmp <= 1)
+          if (encodingThresholdTmp >= 0 && encodingThresholdTmp <= 1) {
             encodingThreshold = encodingThresholdTmp;
-          else {
+          } else {
             encodingThreshold = DEFAULT_ENCODING_THRESHOLD;
             logger.warn("org.opencastproject.encoding.workers.threshold is not between 0 and 1");
           }
@@ -753,9 +759,9 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           logger.warn("Can not set encoding threshold to {}. {} must be an parsable double", encodingThersholdString,
               OPT_ENCODING_THRESHOLD);
         }
-    } else
+    } else {
       encodingThreshold = DEFAULT_ENCODING_THRESHOLD;
-
+    }
 
     String maxJobAgeString = StringUtils.trimToNull((String) properties.get(OPT_SERVICE_STATISTICS_MAX_JOB_AGE));
     if (maxJobAgeString != null) {
@@ -1005,7 +1011,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     if (job.getProcessingHost() != null) {
       ServiceRegistrationJpaImpl processingService = (ServiceRegistrationJpaImpl) getServiceRegistration(
               job.getJobType(), job.getProcessingHost());
-      logger.debug("{} has host '{}': setting processor service to '{}'", job, job.getProcessingHost(), processingService);
+      logger.debug("{} has host '{}': setting processor service to '{}'", job, job.getProcessingHost(),
+          processingService);
       fromDb.setProcessorServiceRegistration(processingService);
     } else {
       logger.debug("Unsetting previous processor service registration for {}", job);
@@ -1258,7 +1265,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
       db.execTxChecked(em -> {
         HostRegistrationJpaImpl hr = fetchHostRegistrationQuery(baseUrl).apply(em).orElseThrow(() -> {
-          logger.info("No associated host registration for '{}' or service '{}' (path '{}')", baseUrl, serviceType,path);
+          logger.info("No associated host registration for '{}' or service '{}' (path '{}')", baseUrl, serviceType,
+              path);
           return new IllegalStateException(
               "A service registration can not be updated when it has no associated host registration");
         });
@@ -2129,7 +2137,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   }
 
   /** OSGi DI. */
-  @Reference(cardinality = ReferenceCardinality.OPTIONAL, policy =  ReferencePolicy.DYNAMIC, unbind = "unsetIncidentService")
+  @Reference(
+      cardinality = ReferenceCardinality.OPTIONAL,
+      policy =  ReferencePolicy.DYNAMIC,
+      unbind = "unsetIncidentService"
+  )
   public void setIncidentService(IncidentService incidentService) {
     this.incidentService = incidentService;
     // Manually resolve the cyclic dependency between the incident service and the service registry
@@ -2459,10 +2471,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     }
 
     // Sort the list by capacity and distinguish between composer jobs and other jobs
-    if ("org.opencastproject.composer".equals(jobType))
+    if ("org.opencastproject.composer".equals(jobType)) {
       Collections.sort(filteredList, new LoadComparatorEncoding(systemLoad));
-    else
+    } else {
       Collections.sort(filteredList, new LoadComparator(systemLoad));
+    }
 
     return filteredList;
   }
@@ -2597,7 +2610,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * Comparator that will sort service registrations depending on their capacity, wich is defined by the number of jobs
-   * the service's host is already running divided by the MaxLoad of the Server. The lower that number, the bigger the capacity.
+   * the service's host is already running divided by the MaxLoad of the Server. The lower that number, the bigger
+   * the capacity.
    */
   private class LoadComparator implements Comparator<ServiceRegistration> {
 
@@ -2632,8 +2646,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * Comparator that will sort service registrations depending on their capacity, which is defined by the number of jobs
-   * the service's host is already running divided by the MaxLoad of the Server. The lower that number, the bigger the capacity.
-   * This Comparator will preferre encoding workers, if none are defined in the configuration file it will act like the LoadComparator.
+   * the service's host is already running divided by the MaxLoad of the Server. The lower that number, the bigger
+   * the capacity.
+   * This Comparator will prefer encoding workers, if none are defined in the configuration file it will act like
+   * the LoadComparator.
    */
   private class LoadComparatorEncoding extends LoadComparator implements Comparator<ServiceRegistration> {
 
