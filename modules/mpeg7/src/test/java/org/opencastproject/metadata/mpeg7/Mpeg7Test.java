@@ -66,8 +66,9 @@ public class Mpeg7Test {
   @Before
   public void setUp() throws Exception {
     catalogFile = new File(this.getClass().getResource(catalogName).toURI());
-    if (!catalogFile.exists() || !catalogFile.canRead())
+    if (!catalogFile.exists() || !catalogFile.canRead()) {
       throw new Exception("Unable to access mpeg-7 test catalog '" + catalogName + "'");
+    }
   }
 
   @After
@@ -76,7 +77,8 @@ public class Mpeg7Test {
   }
 
   /**
-   * Test method for {@link org.opencastproject.metadata.mpeg7.Mpeg7CatalogImpl#getMultimediaContent(MultimediaContent.Type)} .
+   * Test method for
+   * {@link org.opencastproject.metadata.mpeg7.Mpeg7CatalogImpl#getMultimediaContent(MultimediaContent.Type)} .
    */
   @Test
   public void testFromFile() throws Exception {
