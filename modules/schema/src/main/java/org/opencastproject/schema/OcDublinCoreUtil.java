@@ -67,62 +67,167 @@ public final class OcDublinCoreUtil {
   public static DublinCoreCatalog toCatalog(final OcDublinCore source) {
     // completeness assured by unit test
     final DublinCoreCatalog target = DublinCores.mkOpencastEpisode().getCatalog();
-    if (source.getAbstract().isPresent()) target.set(DublinCore.PROPERTY_ABSTRACT, source.getAbstract().get());
-    if (source.getAccessRights().isPresent()) target.set(DublinCore.PROPERTY_ACCESS_RIGHTS, source.getAccessRights().get());
-    if (source.getAccrualMethod().isPresent()) target.set(DublinCore.PROPERTY_ACCRUAL_METHOD, source.getAccrualMethod().get());
-    if (source.getAccrualPeriodicity().isPresent()) target.set(DublinCore.PROPERTY_ACCRUAL_PERIODICITY, source.getAccrualPeriodicity().get());
-    if (source.getAccrualPolicy().isPresent()) target.set(DublinCore.PROPERTY_ACCRUAL_POLICY, source.getAccrualPolicy().get());
-    if (source.getAlternative().isPresent()) target.set(DublinCore.PROPERTY_ALTERNATIVE, source.getAlternative().get());
-    if (source.getAudience().isPresent()) target.set(DublinCore.PROPERTY_AUDIENCE, source.getAudience().get());
-    if (source.getAvailable().isPresent()) target.set(DublinCore.PROPERTY_AVAILABLE, source.getAvailable().get());
-    if (source.getBibliographicCitation().isPresent()) target.set(DublinCore.PROPERTY_BIBLIOGRAPHIC_CITATION, source.getBibliographicCitation().get());
-    if (source.getConformsTo().isPresent()) target.set(DublinCore.PROPERTY_CONFORMS_TO, source.getConformsTo().get());
-    if (source.getContributor().isPresent()) target.set(DublinCore.PROPERTY_CONTRIBUTOR, source.getContributor().get());
-    if (source.getCoverage().isPresent()) target.set(DublinCore.PROPERTY_COVERAGE, source.getCoverage().get());
+    if (source.getAbstract().isPresent()) {
+      target.set(DublinCore.PROPERTY_ABSTRACT, source.getAbstract().get());
+    }
+    if (source.getAccessRights().isPresent()) {
+      target.set(DublinCore.PROPERTY_ACCESS_RIGHTS, source.getAccessRights().get());
+    }
+    if (source.getAccrualMethod().isPresent()) {
+      target.set(DublinCore.PROPERTY_ACCRUAL_METHOD, source.getAccrualMethod().get());
+    }
+    if (source.getAccrualPeriodicity().isPresent()) {
+      target.set(DublinCore.PROPERTY_ACCRUAL_PERIODICITY, source.getAccrualPeriodicity().get());
+    }
+    if (source.getAccrualPolicy().isPresent()) {
+      target.set(DublinCore.PROPERTY_ACCRUAL_POLICY, source.getAccrualPolicy().get());
+    }
+    if (source.getAlternative().isPresent()) {
+      target.set(DublinCore.PROPERTY_ALTERNATIVE, source.getAlternative().get());
+    }
+    if (source.getAudience().isPresent()) {
+      target.set(DublinCore.PROPERTY_AUDIENCE, source.getAudience().get());
+    }
+    if (source.getAvailable().isPresent()) {
+      target.set(DublinCore.PROPERTY_AVAILABLE, source.getAvailable().get());
+    }
+    if (source.getBibliographicCitation().isPresent()) {
+      target.set(DublinCore.PROPERTY_BIBLIOGRAPHIC_CITATION, source.getBibliographicCitation().get());
+    }
+    if (source.getConformsTo().isPresent()) {
+      target.set(DublinCore.PROPERTY_CONFORMS_TO, source.getConformsTo().get());
+    }
+    if (source.getContributor().isPresent()) {
+      target.set(DublinCore.PROPERTY_CONTRIBUTOR, source.getContributor().get());
+    }
+    if (source.getCoverage().isPresent()) {
+      target.set(DublinCore.PROPERTY_COVERAGE, source.getCoverage().get());
+    }
     target.set(DublinCore.PROPERTY_CREATED, encodeCreated(source.getCreated()));
-    if (source.getCreator().isPresent()) target.set(DublinCore.PROPERTY_CREATOR, source.getCreator().get());
-    if (source.getDate().isPresent()) target.set(DublinCore.PROPERTY_DATE, encodeDate(source.getDate().get()));
-    if (source.getDateAccepted().isPresent()) target.set(DublinCore.PROPERTY_DATE_ACCEPTED, encodeDateAccepted(source.getDateAccepted().get()));
-    if (source.getDateCopyrighted().isPresent())
+    if (source.getCreator().isPresent()) {
+      target.set(DublinCore.PROPERTY_CREATOR, source.getCreator().get());
+    }
+    if (source.getDate().isPresent()) {
+      target.set(DublinCore.PROPERTY_DATE, encodeDate(source.getDate().get()));
+    }
+    if (source.getDateAccepted().isPresent()) {
+      target.set(DublinCore.PROPERTY_DATE_ACCEPTED, encodeDateAccepted(source.getDateAccepted().get()));
+    }
+    if (source.getDateCopyrighted().isPresent()) {
       target.set(DublinCore.PROPERTY_DATE_COPYRIGHTED, encodeDateCopyrighted(source.getDateCopyrighted().get()));
-    if (source.getDateSubmitted().isPresent()) target.set(DublinCore.PROPERTY_DATE_SUBMITTED, encodeDateSubmitted(source.getDateSubmitted().get()));
-    if (source.getDescription().isPresent()) target.set(DublinCore.PROPERTY_DESCRIPTION, source.getDescription().get());
-    if (source.getEducationLevel().isPresent()) target.set(DublinCore.PROPERTY_EDUCATION_LEVEL, source.getEducationLevel().get());
-    if (source.getExtent().isPresent()) target.set(DublinCore.PROPERTY_EXTENT, encodeExtent(source.getExtent().get()));
-    if (source.getFormat().isPresent()) target.set(DublinCore.PROPERTY_FORMAT, source.getFormat().get());
-    if (source.getHasFormat().isPresent()) target.set(DublinCore.PROPERTY_HAS_FORMAT, source.getHasFormat().get());
-    if (source.getHasPart().isPresent()) target.set(DublinCore.PROPERTY_HAS_PART, source.getHasPart().get());
-    if (source.getHasVersion().isPresent()) target.set(DublinCore.PROPERTY_HAS_VERSION, source.getHasVersion().get());
-    if (source.getIdentifier().isPresent()) target.set(DublinCore.PROPERTY_IDENTIFIER, source.getIdentifier().get());
-    if (source.getInstructionalMethod().isPresent()) target.set(DublinCore.PROPERTY_INSTRUCTIONAL_METHOD, source.getInstructionalMethod().get());
-    if (source.getIsFormatOf().isPresent()) target.set(DublinCore.PROPERTY_IS_FORMAT_OF, source.getIsFormatOf().get());
-    if (source.getIsPartOf().isPresent()) target.set(DublinCore.PROPERTY_IS_PART_OF, source.getIsPartOf().get());
-    if (source.getIsReferencedBy().isPresent()) target.set(DublinCore.PROPERTY_IS_REFERENCED_BY, source.getIsReferencedBy().get());
-    if (source.getIsReplacedBy().isPresent()) target.set(DublinCore.PROPERTY_IS_REPLACED_BY, source.getIsReplacedBy().get());
-    if (source.getIsRequiredBy().isPresent()) target.set(DublinCore.PROPERTY_IS_REQUIRED_BY, source.getIsRequiredBy().get());
-    if (source.getIssued().isPresent()) target.set(DublinCore.PROPERTY_ISSUED, source.getIssued().get());
-    if (source.getIsVersionOf().isPresent()) target.set(DublinCore.PROPERTY_IS_VERSION_OF, source.getIsVersionOf().get());
-    if (source.getLanguage().isPresent()) target.set(DublinCore.PROPERTY_LANGUAGE, source.getLanguage().get());
-    if (source.getLicense().isPresent()) target.set(DublinCore.PROPERTY_LICENSE, source.getLicense().get());
-    if (source.getMediator().isPresent()) target.set(DublinCore.PROPERTY_MEDIATOR, source.getMediator().get());
-    if (source.getMedium().isPresent()) target.set(DublinCore.PROPERTY_MEDIUM, source.getMedium().get());
-    if (source.getModified().isPresent()) target.set(DublinCore.PROPERTY_MODIFIED, source.getModified().get());
-    if (source.getProvenance().isPresent()) target.set(DublinCore.PROPERTY_PROVENANCE, source.getProvenance().get());
-    if (source.getPublisher().isPresent()) target.set(DublinCore.PROPERTY_PUBLISHER, source.getPublisher().get());
-    if (source.getReferences().isPresent()) target.set(DublinCore.PROPERTY_REFERENCES, source.getReferences().get());
-    if (source.getRelation().isPresent()) target.set(DublinCore.PROPERTY_RELATION, source.getRelation().get());
-    if (source.getReplaces().isPresent()) target.set(DublinCore.PROPERTY_REPLACES, source.getReplaces().get());
-    if (source.getRequires().isPresent()) target.set(DublinCore.PROPERTY_REQUIRES, source.getRequires().get());
-    if (source.getRights().isPresent()) target.set(DublinCore.PROPERTY_RIGHTS, source.getRights().get());
-    if (source.getRightsHolder().isPresent()) target.set(DublinCore.PROPERTY_RIGHTS_HOLDER, source.getRightsHolder().get());
-    if (source.getSource().isPresent()) target.set(DublinCore.PROPERTY_SOURCE, source.getSource().get());
-    if (source.getSpatial().isPresent()) target.set(DublinCore.PROPERTY_SPATIAL, source.getSpatial().get());
-    if (source.getSubject().isPresent()) target.set(DublinCore.PROPERTY_SUBJECT, source.getSubject().get());
-    if (source.getTableOfContents().isPresent()) target.set(DublinCore.PROPERTY_TABLE_OF_CONTENTS, source.getTableOfContents().get());
-    if (source.getTemporal().isPresent()) target.set(DublinCore.PROPERTY_TEMPORAL, source.getTemporal().get());
+    }
+    if (source.getDateSubmitted().isPresent()) {
+      target.set(DublinCore.PROPERTY_DATE_SUBMITTED, encodeDateSubmitted(source.getDateSubmitted().get()));
+    }
+    if (source.getDescription().isPresent()) {
+      target.set(DublinCore.PROPERTY_DESCRIPTION, source.getDescription().get());
+    }
+    if (source.getEducationLevel().isPresent()) {
+      target.set(DublinCore.PROPERTY_EDUCATION_LEVEL, source.getEducationLevel().get());
+    }
+    if (source.getExtent().isPresent()) {
+      target.set(DublinCore.PROPERTY_EXTENT, encodeExtent(source.getExtent().get()));
+    }
+    if (source.getFormat().isPresent()) {
+      target.set(DublinCore.PROPERTY_FORMAT, source.getFormat().get());
+    }
+    if (source.getHasFormat().isPresent()) {
+      target.set(DublinCore.PROPERTY_HAS_FORMAT, source.getHasFormat().get());
+    }
+    if (source.getHasPart().isPresent()) {
+      target.set(DublinCore.PROPERTY_HAS_PART, source.getHasPart().get());
+    }
+    if (source.getHasVersion().isPresent()) {
+      target.set(DublinCore.PROPERTY_HAS_VERSION, source.getHasVersion().get());
+    }
+    if (source.getIdentifier().isPresent()) {
+      target.set(DublinCore.PROPERTY_IDENTIFIER, source.getIdentifier().get());
+    }
+    if (source.getInstructionalMethod().isPresent()) {
+      target.set(DublinCore.PROPERTY_INSTRUCTIONAL_METHOD, source.getInstructionalMethod().get());
+    }
+    if (source.getIsFormatOf().isPresent()) {
+      target.set(DublinCore.PROPERTY_IS_FORMAT_OF, source.getIsFormatOf().get());
+    }
+    if (source.getIsPartOf().isPresent()) {
+      target.set(DublinCore.PROPERTY_IS_PART_OF, source.getIsPartOf().get());
+    }
+    if (source.getIsReferencedBy().isPresent()) {
+      target.set(DublinCore.PROPERTY_IS_REFERENCED_BY, source.getIsReferencedBy().get());
+    }
+    if (source.getIsReplacedBy().isPresent()) {
+      target.set(DublinCore.PROPERTY_IS_REPLACED_BY, source.getIsReplacedBy().get());
+    }
+    if (source.getIsRequiredBy().isPresent()) {
+      target.set(DublinCore.PROPERTY_IS_REQUIRED_BY, source.getIsRequiredBy().get());
+    }
+    if (source.getIssued().isPresent()) {
+      target.set(DublinCore.PROPERTY_ISSUED, source.getIssued().get());
+    }
+    if (source.getIsVersionOf().isPresent()) {
+      target.set(DublinCore.PROPERTY_IS_VERSION_OF, source.getIsVersionOf().get());
+    }
+    if (source.getLanguage().isPresent()) {
+      target.set(DublinCore.PROPERTY_LANGUAGE, source.getLanguage().get());
+    }
+    if (source.getLicense().isPresent()) {
+      target.set(DublinCore.PROPERTY_LICENSE, source.getLicense().get());
+    }
+    if (source.getMediator().isPresent()) {
+      target.set(DublinCore.PROPERTY_MEDIATOR, source.getMediator().get());
+    }
+    if (source.getMedium().isPresent()) {
+      target.set(DublinCore.PROPERTY_MEDIUM, source.getMedium().get());
+    }
+    if (source.getModified().isPresent()) {
+      target.set(DublinCore.PROPERTY_MODIFIED, source.getModified().get());
+    }
+    if (source.getProvenance().isPresent()) {
+      target.set(DublinCore.PROPERTY_PROVENANCE, source.getProvenance().get());
+    }
+    if (source.getPublisher().isPresent()) {
+      target.set(DublinCore.PROPERTY_PUBLISHER, source.getPublisher().get());
+    }
+    if (source.getReferences().isPresent()) {
+      target.set(DublinCore.PROPERTY_REFERENCES, source.getReferences().get());
+    }
+    if (source.getRelation().isPresent()) {
+      target.set(DublinCore.PROPERTY_RELATION, source.getRelation().get());
+    }
+    if (source.getReplaces().isPresent()) {
+      target.set(DublinCore.PROPERTY_REPLACES, source.getReplaces().get());
+    }
+    if (source.getRequires().isPresent()) {
+      target.set(DublinCore.PROPERTY_REQUIRES, source.getRequires().get());
+    }
+    if (source.getRights().isPresent()) {
+      target.set(DublinCore.PROPERTY_RIGHTS, source.getRights().get());
+    }
+    if (source.getRightsHolder().isPresent()) {
+      target.set(DublinCore.PROPERTY_RIGHTS_HOLDER, source.getRightsHolder().get());
+    }
+    if (source.getSource().isPresent()) {
+      target.set(DublinCore.PROPERTY_SOURCE, source.getSource().get());
+    }
+    if (source.getSpatial().isPresent()) {
+      target.set(DublinCore.PROPERTY_SPATIAL, source.getSpatial().get());
+    }
+    if (source.getSubject().isPresent()) {
+      target.set(DublinCore.PROPERTY_SUBJECT, source.getSubject().get());
+    }
+    if (source.getTableOfContents().isPresent()) {
+      target.set(DublinCore.PROPERTY_TABLE_OF_CONTENTS, source.getTableOfContents().get());
+    }
+    if (source.getTemporal().isPresent()) {
+      target.set(DublinCore.PROPERTY_TEMPORAL, source.getTemporal().get());
+    }
     target.set(DublinCore.PROPERTY_TITLE, source.getTitle());
-    if (source.getType().isPresent()) target.set(DublinCore.PROPERTY_TYPE, source.getType().get());
-    if (source.getValid().isPresent()) target.set(DublinCore.PROPERTY_VALID, source.getValid().get());
+    if (source.getType().isPresent()) {
+      target.set(DublinCore.PROPERTY_TYPE, source.getType().get());
+    }
+    if (source.getValid().isPresent()) {
+      target.set(DublinCore.PROPERTY_VALID, source.getValid().get());
+    }
     return target;
   }
 
