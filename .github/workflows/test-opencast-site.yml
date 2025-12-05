@@ -152,7 +152,7 @@ jobs:
 
       - name: clone repository
         run: |
-          git clone -b gh-pages "git@github.com:opencast/coverage-reports.git" coverage-reports
+          git clone -b gh-pages "git@github.com:${{ github.repository_owner }}/coverage-reports.git" coverage-reports
 
       - name: store site and build index
         working-directory: coverage-reports
