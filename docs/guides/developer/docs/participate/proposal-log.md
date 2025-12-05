@@ -9,6 +9,16 @@ The following list contains a list of passed proposals for reference.
 Passed Proposals
 ----------------
 
+### Deprecate Paella 7 in OC 20
+Proposed by Greg Logan <gregorydlogan@gmail.com>, passed on Dec 2, 2025
+```no-highlight
+As of end of November 2025 Paella 7 is in maintenance mode, with new features going only into Paella 8.  Since we have
+already included Paell 8 in Opencast 19, I #propose that we deprecate Paella 7 with Opencast 20, and remove it entirely
+in Opencast 21.
+
+Proposal passes Dec 2, or whenever the relevant PR is merged.
+```
+
 ### Shift Release Schedule by a Month
 Proposed by Katrin Ihler <ihler@elan-ev.de>, passed on Oct 23, 2025
 ```no-highlight
