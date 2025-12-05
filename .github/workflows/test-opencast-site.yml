@@ -137,10 +137,10 @@ jobs:
 
       - name: clone repository
         run: |
-          git clone -b gh-pages "git@github.com:opencast/coverage-reports.git" opencast
+          git clone -b gh-pages "git@github.com:opencast/coverage-reports.git" coverage-reports
 
       - name: store site and build index
-        working-directory: opencast
+        working-directory: coverage-reports
         run: |
           export TEMP=${{ github.ref_name }}
           export BRANCH="${TEMP#r\/}"
@@ -166,5 +166,5 @@ jobs:
           git diff --staged --quiet || git commit --amend -m "Maven site build outputs"
 
       - name: Push updates
-        working-directory: opencast
+        working-directory: coverage-reports
         run: git push origin gh-pages --force
