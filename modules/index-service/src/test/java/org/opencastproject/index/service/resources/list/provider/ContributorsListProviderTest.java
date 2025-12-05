@@ -58,7 +58,8 @@ public class ContributorsListProviderTest {
 
   @Before
   public void setUp() throws Exception {
-    String expectedFormat = "{\"organization\":\"mh_default\",\"username\":\"akm220\",\"presentation\":\"Adam McKenzie\"}";
+    String expectedFormat = "{\"organization\":\"mh_default\",\"username\":\"akm220\","
+        + "\"presentation\":\"Adam McKenzie\"}";
 
     organization = new JpaOrganization(ORG_ID, "name", null, null, null, null);
     users = new ArrayList<User>();

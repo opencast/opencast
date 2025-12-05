@@ -77,17 +77,20 @@ public final class CatalogUIAdapterConfiguration {
    *           if the configuration is not valid
    */
   private void validate() throws ConfigurationException {
-    if (configProperties.get(KEY_XML_ROOT_ELEMENT_NAME) == null)
-      throw new ConfigurationException(
-              format("Value for configuration key '%s' is missing", KEY_XML_ROOT_ELEMENT_NAME));
+    if (configProperties.get(KEY_XML_ROOT_ELEMENT_NAME) == null) {
+      throw new ConfigurationException(format(
+          "Value for configuration key '%s' is missing", KEY_XML_ROOT_ELEMENT_NAME));
+    }
 
-    if (configProperties.get(KEY_XML_ROOT_ELEMENT_NS_URI) == null)
-      throw new ConfigurationException(
-              format("Value for configuration key '%s' is missing", KEY_XML_ROOT_ELEMENT_NS_URI));
+    if (configProperties.get(KEY_XML_ROOT_ELEMENT_NS_URI) == null) {
+      throw new ConfigurationException(format(
+          "Value for configuration key '%s' is missing", KEY_XML_ROOT_ELEMENT_NS_URI));
+    }
 
-    if (xmlNSContext.getPrefix(getCatalogXmlRootNamespace()) == null)
-      throw new ConfigurationException(
-              format("Binding for XML namespace URI '%s' is missing", getCatalogXmlRootNamespace()));
+    if (xmlNSContext.getPrefix(getCatalogXmlRootNamespace()) == null) {
+      throw new ConfigurationException(format(
+          "Binding for XML namespace URI '%s' is missing", getCatalogXmlRootNamespace()));
+    }
   }
 
   /**
@@ -107,10 +110,12 @@ public final class CatalogUIAdapterConfiguration {
         final String nsPrefix = (String) configProperties
                 .get(XML_BINDING_KEY_PREFIX + nsBindingName + XML_BINDING_PREFIX_SUFFIX);
         // Check if URI and the prefix have valid values
-        if (isBlank(nsUri))
+        if (isBlank(nsUri)) {
           throw new ConfigurationException(format("No URI for namespace binding '%s' found", nsBindingName));
-        if (nsPrefix == null)
+        }
+        if (nsPrefix == null) {
           throw new ConfigurationException(format("No prefix for namespace binding '%s' found", nsBindingName));
+        }
         // Add prefix & URI to the intermediate map
         prefixToUri.put(nsPrefix, nsUri);
       }
@@ -127,8 +132,9 @@ public final class CatalogUIAdapterConfiguration {
    * @return the XML namespace binding name
    */
   private static String getXmlBindingNameFromConfigKey(final String key) {
-    if (isBlank(key) || !key.startsWith(XML_BINDING_KEY_PREFIX))
+    if (isBlank(key) || !key.startsWith(XML_BINDING_KEY_PREFIX)) {
       throw new IllegalArgumentException(format("The given key '%s' is not part of a XML binding definition", key));
+    }
     final String keyWithoutPrefix = key.substring(XML_BINDING_KEY_PREFIX.length());
     return keyWithoutPrefix.substring(0, keyWithoutPrefix.indexOf("."));
   }

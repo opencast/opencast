@@ -227,7 +227,8 @@ public class MetadataFieldTest {
     Gson gson = new Gson();
     String expectedJSON = gson.toJson(jsonMap);
 
-    assertThat(expectedJSON, SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(dateField1, true))));
+    assertThat(expectedJSON, SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(dateField1,
+        true))));
   }
 
   @Test
@@ -256,7 +257,8 @@ public class MetadataFieldTest {
 
   @Test
   public void testCreateTextFieldJsonInputNoValueExpectsEmptyString() throws Exception {
-    final String emptyValueJson = IOUtils.toString(getClass().getResource("/catalog-adapter/text/text-empty-value.json"), StandardCharsets.UTF_8);
+    final String emptyValueJson = IOUtils.toString(
+        getClass().getResource("/catalog-adapter/text/text-empty-value.json"), StandardCharsets.UTF_8);
     // Test JSON generated with no value.
     final MetadataField emptyValueTextField = new MetadataField(
             defaultInputID,
@@ -274,8 +276,8 @@ public class MetadataFieldTest {
             null,
             null,
             null);
-    assertThat(emptyValueJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(emptyValueTextField,
-            true))));
+    assertThat(emptyValueJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(
+            MetadataJson.fieldToJson(emptyValueTextField, true))));
   }
 
   @Test
@@ -301,7 +303,8 @@ public class MetadataFieldTest {
             null,
             null);
     textField.setValue(textValue);
-    assertThat(withValueJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(textField, true))));
+    assertThat(withValueJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(textField,
+        true))));
   }
 
   @Test

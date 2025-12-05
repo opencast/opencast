@@ -49,16 +49,18 @@ public final class FiltersUtils {
    * @param type
    *          the {@link ResourceListFilter.SourceType}
    * @param valuesListName
-   *          The name of the list from a list provider providing the possible values wrapped in a {@link Optional}.Can be
-   *          {@link Optional#empty()}
+   *          The name of the list from a list provider providing the possible values wrapped in a {@link Optional}.
+   *          Can be {@link Optional#empty()}
    * @throws IllegalArgumentException
    *           if the name, label or type is null or empty.
    * @return a new {@link ResourceListFilter} with the parameters given
    */
   public static <A> ResourceListFilter<A> generateFilter(final Optional<A> value, final String name, final String label,
-          final ResourceListFilter.SourceType type, final Optional<String> valuesListName) throws IllegalArgumentException {
-    if (StringUtils.isBlank(name) || StringUtils.isBlank(label) || type == null)
+          final ResourceListFilter.SourceType type, final Optional<String> valuesListName)
+          throws IllegalArgumentException {
+    if (StringUtils.isBlank(name) || StringUtils.isBlank(label) || type == null) {
       throw new IllegalArgumentException("The filter label, name or type must not be null!");
+    }
 
     return new AbstractListFilter<A>(value) {
 

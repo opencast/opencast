@@ -80,7 +80,7 @@ public class ServersListProvider implements ResourceListProvider {
 
   /** The names of the different list available through this provider. */
   private static final String[] NAMES = {
-    PROVIDER_PREFIX, LIST_HOSTNAME, LIST_NODE_NAME, LIST_STATUS,
+      PROVIDER_PREFIX, LIST_HOSTNAME, LIST_NODE_NAME, LIST_STATUS,
   };
 
   /** Service registry instance. */
@@ -127,22 +127,30 @@ public class ServersListProvider implements ResourceListProvider {
       String vHostname = server.getBaseUrl();
       String vNodeName = server.getNodeName();
 
-      if (fHostname.isPresent() && !StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(fHostname.get()), vHostname))
+      if (fHostname.isPresent() && !StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(fHostname.get()), vHostname)) {
         continue;
+      }
 
-      if (fNodeName.isPresent() && !StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(fNodeName.get()), vNodeName))
+      if (fNodeName.isPresent() && !StringUtils.equalsIgnoreCase(StringUtils.trimToEmpty(fNodeName.get()), vNodeName)) {
         continue;
+      }
 
       if (fStatus.isPresent()) {
         switch (StringUtils.trimToEmpty(fStatus.get())) {
           case SERVER_STATUS_ONLINE:
-            if (!vOnline) continue;
+            if (!vOnline) {
+              continue;
+            }
             break;
           case SERVER_STATUS_OFFLINE:
-            if (vOnline) continue;
+            if (vOnline) {
+              continue;
+            }
             break;
           case SERVER_STATUS_MAINTENANCE:
-            if (!vMaintenance) continue;
+            if (!vMaintenance) {
+              continue;
+            }
             break;
           default:
             break;
@@ -151,8 +159,9 @@ public class ServersListProvider implements ResourceListProvider {
 
       switch (listName) {
         case LIST_NODE_NAME:
-          if (vNodeName != null)
+          if (vNodeName != null) {
             list.put(vNodeName, vNodeName);
+          }
           break;
         case LIST_HOSTNAME:
         default:

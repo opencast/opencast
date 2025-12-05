@@ -87,14 +87,17 @@ public class ServicesListQuery extends ResourceListQueryImpl {
     this();
     availableFilters.addAll(query.getAvailableFilters());
 
-    for (ResourceListFilter filter : query.getFilters())
+    for (ResourceListFilter filter : query.getFilters()) {
       addFilter(filter);
+    }
 
     sortBy = query.getSortBy();
-    if (query.getOffset().isPresent())
+    if (query.getOffset().isPresent()) {
       setOffset(query.getOffset().get());
-    if (query.getLimit().isPresent())
+    }
+    if (query.getLimit().isPresent()) {
       setLimit(query.getLimit().get());
+    }
   }
 
   /**
@@ -280,7 +283,8 @@ public class ServicesListQuery extends ResourceListQueryImpl {
   /**
    * Create a new {@link ResourceListFilter} based on any actions.
    *
-   * @param value the boolean value for any action to filter on wrapped in an {@link Optional} or {@link Optional#empty()}
+   * @param value the boolean value for any action to filter on wrapped in an {@link Optional} or
+   *        {@link Optional#empty()}
    * @return a new {@link ResourceListFilter} for a any actions based query
    */
   public static <Boolean> ResourceListFilter<Boolean> createActionsFilter(Optional<Boolean> value) {

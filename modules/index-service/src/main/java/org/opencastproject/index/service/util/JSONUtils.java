@@ -55,7 +55,7 @@ public final class JSONUtils {
    * The filter is located in the top right corner in the admin ui. */
   private static String userFilterRegex;
   private static final String[] userListsToReduce = {"CONTRIBUTORS", "PUBLISHER",
-          "ORGANIZERS", "CONTRIBUTORS.USERNAMES", "EVENTS.PUBLISHER", "USERS.NAME"};
+      "ORGANIZERS", "CONTRIBUTORS.USERNAMES", "EVENTS.PUBLISHER", "USERS.NAME"};
 
   private JSONUtils() {
 
@@ -119,12 +119,24 @@ public final class JSONUtils {
   }
 
   private static JsonElement convertToJsonElement(Object item) {
-    if (item == null) return JsonNull.INSTANCE;
-    if (item instanceof JsonElement) return (JsonElement) item;
-    if (item instanceof Number) return new JsonPrimitive((Number) item);
-    if (item instanceof Boolean) return new JsonPrimitive((Boolean) item);
-    if (item instanceof Character) return new JsonPrimitive((Character) item);
-    if (item instanceof String) return new JsonPrimitive((String) item);
+    if (item == null) {
+      return JsonNull.INSTANCE;
+    }
+    if (item instanceof JsonElement) {
+      return (JsonElement) item;
+    }
+    if (item instanceof Number) {
+      return new JsonPrimitive((Number) item);
+    }
+    if (item instanceof Boolean) {
+      return new JsonPrimitive((Boolean) item);
+    }
+    if (item instanceof Character) {
+      return new JsonPrimitive((Character) item);
+    }
+    if (item instanceof String) {
+      return new JsonPrimitive((String) item);
+    }
     return new JsonPrimitive(item.toString());
   }
 
@@ -256,8 +268,9 @@ public final class JSONUtils {
   public static JSONObject fromMap(Map<String, String> map) throws JSONException {
     JSONObject json = new JSONObject();
 
-    if (map == null)
+    if (map == null) {
       return json;
+    }
 
     for (Entry<String, String> entry : map.entrySet()) {
       json.put(entry.getKey(), entry.getValue());
@@ -273,8 +286,9 @@ public final class JSONUtils {
    * @return the map
    */
   public static Map<String, String> toMap(JSONObject json) {
-    if (json == null)
+    if (json == null) {
       return Collections.emptyMap();
+    }
 
     HashMap<String, String> map = new HashMap<String, String>();
     for (Iterator<String> iterator = json.keys(); iterator.hasNext();) {

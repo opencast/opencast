@@ -18,7 +18,6 @@
     <suppress checks="LineLength" files="modules/execute-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/execute-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/external-api/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/index-service/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/ingest-download-service-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/ingest-download-service-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/ingest-service-impl/.+\.(java|properties)"/>
@@ -40,7 +39,6 @@
     <suppress checks="Indentation" files="modules/dublincore/.+\.java"/>
     <suppress checks="Indentation" files="modules/execute-workflowoperation/.+\.java"/>
     <suppress checks="Indentation" files="modules/external-api/.+\.java"/>
-    <suppress checks="Indentation" files="modules/index-service/.+\.java"/>
     <suppress checks="Indentation" files="modules/ingest-service-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/inspection-service-ffmpeg/.+\.java"/>
     <suppress checks="Indentation" files="modules/kernel/.+\.java"/>
@@ -62,7 +60,6 @@
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/execute-remote/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/execute-workflowoperation/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/external-api/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/index-service/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/ingest-download-service-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/ingest-service-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/inspection-service-ffmpeg/.+\.java"/>
