@@ -78,8 +78,9 @@ public class BundleInfoLogger implements BundleListener {
     host = Optional.ofNullable(getContextProperty(cc, OpencastConstants.SERVER_URL_PROPERTY))
         .flatMap(Strings::trimToNone)
         .orElse(UrlSupport.DEFAULT_BASE_URL);
-    if (db.isPresent())
+    if (db.isPresent()) {
       db.get().clear(host);
+    }
     cc.getBundleContext().addBundleListener(this);
     for (Bundle b : cc.getBundleContext().getBundles()) {
       logBundle(b);
@@ -103,8 +104,9 @@ public class BundleInfoLogger implements BundleListener {
         break;
       case BundleEvent.STOPPED:
       case BundleEvent.UNINSTALLED:
-        if (db.isPresent())
+        if (db.isPresent()) {
           db.get().delete(host, event.getBundle().getBundleId());
+        }
         break;
       default:
         // do nothing
@@ -117,7 +119,8 @@ public class BundleInfoLogger implements BundleListener {
     final String log = String.format("Bundle %s, id %d, version %s, build number %s", info.getBundleSymbolicName(),
             info.getBundleId(), info.getBundleVersion(), info.getBuildNumber().orElse("n/a"));
     logger.info(log);
-    if (db.isPresent())
+    if (db.isPresent()) {
       db.get().store(info);
+    }
   }
 }

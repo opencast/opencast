@@ -50,10 +50,15 @@ import javax.persistence.criteria.Root;
 @Table(name = "oc_bundleinfo", uniqueConstraints = { @UniqueConstraint(columnNames = { "host", "bundle_name",
         "bundle_version" }) })
 @NamedQueries({
-        @NamedQuery(name = "BundleInfo.findAll", query = "select a from BundleInfo a order by a.host, a.bundleSymbolicName"),
-        @NamedQuery(name = "BundleInfo.deleteAll", query = "delete from BundleInfo"),
-        @NamedQuery(name = "BundleInfo.deleteByHost", query = "delete from BundleInfo where host = :host"),
-        @NamedQuery(name = "BundleInfo.delete", query = "delete from BundleInfo where host = :host and bundleId = :bundleId") })
+        @NamedQuery(name = "BundleInfo.findAll",
+            query = "select a from BundleInfo a order by a.host, a.bundleSymbolicName"),
+        @NamedQuery(name = "BundleInfo.deleteAll",
+            query = "delete from BundleInfo"),
+        @NamedQuery(name = "BundleInfo.deleteByHost",
+            query = "delete from BundleInfo where host = :host"),
+        @NamedQuery(name = "BundleInfo.delete",
+            query = "delete from BundleInfo where host = :host and bundleId = :bundleId")
+})
 public class BundleInfoJpa {
   @Id
   @Column(name = "id")
@@ -85,13 +90,15 @@ public class BundleInfoJpa {
     dto.bundleId = a.getBundleId();
     dto.bundleVersion = a.getBundleVersion();
     Optional<String> buildNumber = a.getBuildNumber();
-    if (buildNumber.isPresent())
+    if (buildNumber.isPresent()) {
       dto.buildNumber = buildNumber.get();
+    }
     return dto;
   }
 
   public BundleInfo toBundleInfo() {
-    return bundleInfo(host, bundleSymbolicName, bundleId, bundleVersion, Optional.ofNullable(buildNumber), Optional.ofNullable(dbSchemaVersion));
+    return bundleInfo(host, bundleSymbolicName, bundleId, bundleVersion, Optional.ofNullable(buildNumber),
+        Optional.ofNullable(dbSchemaVersion));
   }
 
   /** Find all in database. */

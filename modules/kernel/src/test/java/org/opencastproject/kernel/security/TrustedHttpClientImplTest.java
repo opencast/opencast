@@ -299,7 +299,8 @@ public class TrustedHttpClientImplTest {
     replay(componentContextMock);
     client = new TrustedHttpClientImpl("matterhorn_system_account", "CHANGE_ME");
     client.activate(componentContextMock);
-    Assert.assertEquals(TrustedHttpClientImpl.DEFAULT_RETRY_MAXIMUM_VARIABLE_TIME, client.getRetryMaximumVariableTime());
+    Assert.assertEquals(TrustedHttpClientImpl.DEFAULT_RETRY_MAXIMUM_VARIABLE_TIME,
+        client.getRetryMaximumVariableTime());
 
     setupNonceMaximumVariableDelay(0);
     Assert.assertEquals(0, client.getRetryMaximumVariableTime());
@@ -654,7 +655,8 @@ public class TrustedHttpClientImplTest {
   @Test
   public void testGetSignedUrl() throws IOException, UrlSigningException {
     HttpGet notAccepted = new HttpGet("http://notAccepted.com");
-    HttpGet alreadySigned = new HttpGet("http://alreadySigned.com?signature=thesignature&keyId=theKeyId&policy=thePolicy");
+    HttpGet alreadySigned =
+        new HttpGet("http://alreadySigned.com?signature=thesignature&keyId=theKeyId&policy=thePolicy");
     HttpPost notGetOrHead = new HttpPost("http://notGetOrHead.com");
     HttpGet ok = new HttpGet("http://ok.com");
     String signedOk = "http://ok.com?signature=thesignature&keyId=theKeyId&policy=thePolicy";
@@ -744,17 +746,23 @@ public class TrustedHttpClientImplTest {
     client.execute(new HttpGet("http://tenant-admin.example.org"));
     client.execute(new HttpGet("https://tenant-pres.example.org"));
 
-    assertTrue(Arrays.stream(request.getValues().get(0).getHeaders(DelegatingAuthenticationEntryPoint.REQUESTED_AUTH_HEADER))
+    assertTrue(
+        Arrays.stream(request.getValues().get(0).getHeaders(DelegatingAuthenticationEntryPoint.REQUESTED_AUTH_HEADER))
         .anyMatch(header -> DelegatingAuthenticationEntryPoint.DIGEST_AUTH.equals(header.getValue())));
-    assertFalse(Arrays.stream(request.getValues().get(1).getHeaders(DelegatingAuthenticationEntryPoint.REQUESTED_AUTH_HEADER))
+    assertFalse(
+        Arrays.stream(request.getValues().get(1).getHeaders(DelegatingAuthenticationEntryPoint.REQUESTED_AUTH_HEADER))
         .anyMatch(header -> DelegatingAuthenticationEntryPoint.DIGEST_AUTH.equals(header.getValue())));
-    assertTrue(Arrays.stream(request.getValues().get(2).getHeaders(DelegatingAuthenticationEntryPoint.REQUESTED_AUTH_HEADER))
+    assertTrue(
+        Arrays.stream(request.getValues().get(2).getHeaders(DelegatingAuthenticationEntryPoint.REQUESTED_AUTH_HEADER))
         .anyMatch(header -> DelegatingAuthenticationEntryPoint.DIGEST_AUTH.equals(header.getValue())));
-    assertTrue(Arrays.stream(request.getValues().get(3).getHeaders(DelegatingAuthenticationEntryPoint.REQUESTED_AUTH_HEADER))
+    assertTrue(
+        Arrays.stream(request.getValues().get(3).getHeaders(DelegatingAuthenticationEntryPoint.REQUESTED_AUTH_HEADER))
         .anyMatch(header -> DelegatingAuthenticationEntryPoint.DIGEST_AUTH.equals(header.getValue())));
-    assertTrue(Arrays.stream(request.getValues().get(4).getHeaders(DelegatingAuthenticationEntryPoint.REQUESTED_AUTH_HEADER))
+    assertTrue(
+        Arrays.stream(request.getValues().get(4).getHeaders(DelegatingAuthenticationEntryPoint.REQUESTED_AUTH_HEADER))
         .anyMatch(header -> DelegatingAuthenticationEntryPoint.DIGEST_AUTH.equals(header.getValue())));
-    assertTrue(Arrays.stream(request.getValues().get(5).getHeaders(DelegatingAuthenticationEntryPoint.REQUESTED_AUTH_HEADER))
+    assertTrue(
+        Arrays.stream(request.getValues().get(5).getHeaders(DelegatingAuthenticationEntryPoint.REQUESTED_AUTH_HEADER))
         .anyMatch(header -> DelegatingAuthenticationEntryPoint.DIGEST_AUTH.equals(header.getValue())));
   }
 }

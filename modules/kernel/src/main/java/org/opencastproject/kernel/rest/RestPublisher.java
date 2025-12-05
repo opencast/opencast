@@ -194,7 +194,8 @@ public class RestPublisher implements RestConstants {
     try {
       Dictionary<String, Object> props = new Hashtable<>();
 
-      props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT, "(" + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME + "=" + RestConstants.HTTP_CONTEXT_ID + ")");
+      props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT, "("
+          + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME + "=" + RestConstants.HTTP_CONTEXT_ID + ")");
       props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_NAME, "/");
       props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, "/*");
 
@@ -459,7 +460,8 @@ public class RestPublisher implements RestConstants {
       if (classpath != null && alias != null) {
         Dictionary<String, String> props = new Hashtable<>();
 
-        props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT, "(" + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME + "=" + RestConstants.HTTP_CONTEXT_ID + ")");
+        props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_SELECT, "("
+            + HttpWhiteboardConstants.HTTP_WHITEBOARD_CONTEXT_NAME + "=" + RestConstants.HTTP_CONTEXT_ID + ")");
         props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_NAME, alias);
         if ("/".equals(alias)) {
           props.put(HttpWhiteboardConstants.HTTP_WHITEBOARD_SERVLET_PATTERN, alias);

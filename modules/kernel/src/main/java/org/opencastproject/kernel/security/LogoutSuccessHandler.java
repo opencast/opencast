@@ -37,7 +37,7 @@ import javax.servlet.http.HttpServletResponse;
  * Sends user directory provider to invalidate user cache and logs out.
  */
 public class LogoutSuccessHandler extends
-org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler {
+    org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(LogoutSuccessHandler.class);
