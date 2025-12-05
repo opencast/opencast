@@ -103,6 +103,21 @@ jobs:
           name: site_build
           path: target/staging
 
+      - name: Save assets build
+        uses: actions/upload-artifact@v5
+        if: >
+          github.event_name == 'push'
+          && github.repository_owner == 'opencast'
+          && github.ref == 'refs/heads/develop'
+        with:
+          name: assets
+          path: .github/assets
+
+      # Normally here we would do the uploading, but I'm deliberately breaking the upload from the build so that we can
+      # as committers check more easily if it's the *build* that's broken, or if it's just the upload.  The upload
+      # being broken can happen if there's an issue with github, for example, and it would be unfortunate if that broke
+      # our builds when *our* code is working.
+
   deploy-mvn-site:
     name: generate github pages for reports
     runs-on: ubuntu-22.04
@@ -158,10 +173,17 @@ jobs:
 
       - name: update CSS and other assets
         if: github.ref == 'refs/heads/develop'
-        working-directory: opencast
+        uses: actions/download-artifact@v6
+        with:
+          name: assets
+          path: assets_artifact
+
+      - name: commit CSS and other asset changes
+        if: github.ref == 'refs/heads/develop'
+        working-directory: coverage-reports
         run: |
           rm -rf assets
-          cp -rv ../.github/assets ./assets
+          cp -rv ../assets_artifact/ ./assets
           git add assets
           git diff --staged --quiet || git commit --amend -m "Maven site build outputs"
 
