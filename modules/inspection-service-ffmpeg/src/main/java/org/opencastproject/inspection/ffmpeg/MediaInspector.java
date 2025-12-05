@@ -127,8 +127,9 @@ public class MediaInspector {
         track = (TrackImpl) element;
 
         // Duration
-        if (metadata.getDuration() != null && metadata.getDuration() > 0)
+        if (metadata.getDuration() != null && metadata.getDuration() > 0) {
           track.setDuration(metadata.getDuration());
+        }
 
         // Checksum
         try {
@@ -209,8 +210,8 @@ public class MediaInspector {
    * @return the media package element
    * @throws MediaInspectionException
    */
-  private MediaPackageElement enrichTrack(final Track originalTrack, final boolean override, final Map<String, String> options)
-          throws MediaInspectionException {
+  private MediaPackageElement enrichTrack(final Track originalTrack, final boolean override,
+      final Map<String, String> options) throws MediaInspectionException {
     try {
       URI originalTrackUrl = originalTrack.getURI();
       MediaPackageElementFlavor flavor = originalTrack.getFlavor();
@@ -252,10 +253,11 @@ public class MediaInspector {
         track.setFlavor(flavor);
         track.setIdentifier(originalTrack.getIdentifier());
         // If HLS
-        if (!originalTrack.hasMaster() || override)
+        if (!originalTrack.hasMaster() || override) {
           track.setMaster(metadata.getAdaptiveMaster());
-        else
+        } else {
           track.setMaster(originalTrack.isMaster());
+        }
         track.setMimeType(originalTrack.getMimeType());
         track.setReference(originalTrack.getReference());
         track.setSize(file.length());
@@ -265,8 +267,9 @@ public class MediaInspector {
         }
 
         // enrich the new track with basic info
-        if (track.getDuration() == null || override)
+        if (track.getDuration() == null || override) {
           track.setDuration(metadata.getDuration());
+        }
         if (track.getChecksum() == null || override) {
           try {
             track.setChecksum(Checksum.create(ChecksumType.DEFAULT_TYPE, file));
@@ -277,7 +280,7 @@ public class MediaInspector {
 
         // Add the mime type if it's not already present
         if (track.getMimeType() == null || override) {
-            track.setMimeType(metadata.getMimeType());
+          track.setMimeType(metadata.getMimeType());
         }
 
         // find all streams
@@ -384,9 +387,11 @@ public class MediaInspector {
    * @throws MediaInspectionException
    *           if metadata extraction fails
    */
-  private MediaContainerMetadata getFileMetadata(File file, boolean accurateFrameCount) throws MediaInspectionException {
-    if (file == null)
+  private MediaContainerMetadata getFileMetadata(File file, boolean accurateFrameCount)
+          throws MediaInspectionException {
+    if (file == null) {
       throw new IllegalArgumentException("file to analyze cannot be null");
+    }
     try {
       MediaAnalyzer analyzer = new FFmpegAnalyzer(accurateFrameCount);
       analyzer.setConfig(map(Tuple.<String, Object> tuple(FFmpegAnalyzer.FFPROBE_BINARY_CONFIG, ffprobePath)));

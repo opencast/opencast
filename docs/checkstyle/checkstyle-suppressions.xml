@@ -22,7 +22,6 @@
     <suppress checks="LineLength" files="modules/ingest-download-service-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/ingest-download-service-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/ingest-service-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/inspection-service-ffmpeg/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/kernel/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/mpeg7/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/oaipmh/.+\.(java|properties)"/>
@@ -42,7 +41,6 @@
     <suppress checks="Indentation" files="modules/external-api/.+\.java"/>
     <suppress checks="Indentation" files="modules/index-service/.+\.java"/>
     <suppress checks="Indentation" files="modules/ingest-service-impl/.+\.java"/>
-    <suppress checks="Indentation" files="modules/inspection-service-ffmpeg/.+\.java"/>
     <suppress checks="Indentation" files="modules/kernel/.+\.java"/>
     <suppress checks="Indentation" files="modules/metadata/.+\.java"/>
     <suppress checks="Indentation" files="modules/oaipmh/.+\.java"/>
@@ -65,7 +63,6 @@
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/index-service/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/ingest-download-service-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/ingest-service-impl/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/inspection-service-ffmpeg/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/kernel/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/mpeg7/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/oaipmh-persistence/.+\.java"/>
