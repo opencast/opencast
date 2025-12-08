@@ -153,8 +153,9 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
       String commandString = (String) properties.get(COMMANDS_ALLOWED_PROPERTY);
       if (StringUtils.isNotBlank(commandString)) {
         logger.info("Execute Service permitted commands: {}", commandString);
-        for (String command : commandString.split("\\s+"))
+        for (String command : commandString.split("\\s+")) {
           allowedCommands.add(command);
+        }
       }
     }
 
@@ -178,18 +179,22 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
 
     logger.debug("Creating Execute Job for command: {}", exec);
 
-    if (StringUtils.isBlank(exec))
+    if (StringUtils.isBlank(exec)) {
       throw new IllegalArgumentException("The command to execute cannot be null");
+    }
 
-    if (StringUtils.isBlank(params))
+    if (StringUtils.isBlank(params)) {
       throw new IllegalArgumentException("The command arguments cannot be null");
+    }
 
-    if (inElement == null)
+    if (inElement == null) {
       throw new IllegalArgumentException("The input MediaPackage element cannot be null");
+    }
 
     outFileName = StringUtils.trimToNull(outFileName);
-    if ((outFileName == null) && (expectedType != null) || (outFileName != null) && (expectedType == null))
+    if ((outFileName == null) && (expectedType != null) || (outFileName != null) && (expectedType == null)) {
       throw new IllegalArgumentException("Expected element type and output filename cannot be null");
+    }
 
     try {
       List<String> paramList = new ArrayList<String>(5);
@@ -218,18 +223,22 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
   @Override
   public Job execute(String exec, String params, MediaPackage mp, String outFileName, Type expectedType, float load)
           throws ExecuteException {
-    if (StringUtils.isBlank(exec))
+    if (StringUtils.isBlank(exec)) {
       throw new IllegalArgumentException("The command to execute cannot be null");
+    }
 
-    if (StringUtils.isBlank(params))
+    if (StringUtils.isBlank(params)) {
       throw new IllegalArgumentException("The command arguments cannot be null");
+    }
 
-    if (mp == null)
+    if (mp == null) {
       throw new IllegalArgumentException("The input MediaPackage cannot be null");
+    }
 
     outFileName = StringUtils.trimToNull(outFileName);
-    if ((outFileName == null) && (expectedType != null) || (outFileName != null) && (expectedType == null))
+    if ((outFileName == null) && (expectedType != null) || (outFileName != null) && (expectedType == null)) {
       throw new IllegalArgumentException("Expected element type and output filename cannot be null");
+    }
 
     try {
       List<String> paramList = new ArrayList<String>(5);
@@ -257,8 +266,9 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
     List<String> arguments = new ArrayList<String>(job.getArguments());
 
     // Check this operation is allowed
-    if (!allowedCommands.contains("*") && !allowedCommands.contains(arguments.get(0)))
+    if (!allowedCommands.contains("*") && !allowedCommands.contains(arguments.get(0))) {
       throw new ExecuteException("Command '" + arguments.get(0) + "' is not allowed");
+    }
 
     String outFileName = null;
     String strAux = null;
@@ -357,24 +367,28 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
           matcher.appendReplacement(sb, mp.getIdentifier().toString());
         } else if (matcher.group(1).equals("flavor")) {
           elements = mp.getElementsByFlavor(MediaPackageElementFlavor.parseFlavor(matcher.group(2)));
-          if (elements.length == 0)
+          if (elements.length == 0) {
             throw new ExecuteException("No elements in the MediaPackage match the flavor '" + matcher.group(2) + "'.");
+          }
 
-          if (elements.length > 1)
+          if (elements.length > 1) {
             logger.warn("Found more than one element with flavor '{}'. Using {} by default...", matcher.group(2),
-                    elements[0].getIdentifier());
+                elements[0].getIdentifier());
+          }
 
           File elementFile = workspace.get(elements[0].getURI());
           matcher.appendReplacement(sb, elementFile.getAbsolutePath());
         } else if (matcher.group(1).equals("tags")) {
           elements = mp.getElementsByTags(Arrays.asList(StringUtils.split(matcher.group(2), ",")));
 
-          if (elements.length == 0)
+          if (elements.length == 0) {
             throw new ExecuteException("No elements in the MediaPackage match the tags '" + matcher.group(2) + "'.");
+          }
 
-          if (elements.length > 1)
+          if (elements.length > 1) {
             logger.warn("Found more than one element with matching tags '{}'. Using {} by default...", matcher.group(2),
                 elements[0].getIdentifier());
+          }
 
           File elementFile = workspace.get(elements[0].getURI());
           matcher.appendReplacement(sb, elementFile.getAbsolutePath());
@@ -432,8 +446,9 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
       File trackFile = workspace.get(element.getURI());
 
       // Put the destination file in the same folder as the source file
-      if (outFileName != null)
+      if (outFileName != null) {
         outFile = new File(trackFile.getParentFile(), outFileName);
+      }
 
       // Substitute the appearances of the patterns with the actual absolute paths
       for (int i = 1; i < arguments.size(); i++) {
@@ -454,7 +469,8 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
         }
 
         if (arguments.get(i).contains(MP_ID_PATTERN)) {
-          arguments.set(i, arguments.get(i).replace(MP_ID_PATTERN, element.getMediaPackage().getIdentifier().toString()));
+          arguments.set(i, arguments.get(i).replace(MP_ID_PATTERN,
+              element.getMediaPackage().getIdentifier().toString()));
         }
 
         if (arguments.get(i).contains(ORG_ID_PATTERN)) {
@@ -499,7 +515,8 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
         // Read the command output
         if (outFile != null) {
           if (outFile.isFile()) {
-            URI newURI = workspace.putInCollection(ExecuteService.COLLECTION, outFile.getName(), new FileInputStream(outFile));
+            URI newURI = workspace.putInCollection(ExecuteService.COLLECTION, outFile.getName(),
+                new FileInputStream(outFile));
             if (outFile.delete()) {
               logger.debug("Deleted the local copy of the encoded file at {}", outFile.getAbsolutePath());
             } else {
@@ -550,17 +567,20 @@ public class ExecuteServiceImpl extends AbstractJobProducer implements ExecuteSe
     ArrayList<String> parsedInput = new ArrayList<String>();
     boolean quoted = false;
 
-    for (String token1 : input.split(quoteDelim))
+    for (String token1 : input.split(quoteDelim)) {
       if (quoted) {
         parsedInput.add(token1);
         quoted = false;
       } else {
-        for (String token2 : token1.split(spaceDelim))
+        for (String token2 : token1.split(spaceDelim)) {
           // This ignores empty tokens if quotes are at the beginning or the end of the string
-          if (!token2.isEmpty())
+          if (!token2.isEmpty()) {
             parsedInput.add(token2);
+          }
+        }
         quoted = true;
       }
+    }
 
     return parsedInput;
   }
