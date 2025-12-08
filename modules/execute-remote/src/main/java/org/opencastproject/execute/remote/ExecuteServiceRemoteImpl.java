@@ -73,9 +73,12 @@ public class ExecuteServiceRemoteImpl extends RemoteBase implements ExecuteServi
   }
 
   /**
-   * @see org.opencastproject.execute.api.ExecuteService#execute(java.lang.String, java.lang.String, org.opencastproject.mediapackage.MediaPackageElement, java.lang.String, org.opencastproject.mediapackage.MediaPackageElement.Type, float)
+   * @see org.opencastproject.execute.api.ExecuteService#execute(java.lang.String, java.lang.String,
+   *      org.opencastproject.mediapackage.MediaPackageElement, java.lang.String,
+   *      org.opencastproject.mediapackage.MediaPackageElement.Type, float)
    */
-  public Job execute(String exec, String params, MediaPackageElement inElement, String outFileName, Type type, float load)
+  public Job execute(String exec, String params, MediaPackageElement inElement, String outFileName, Type type,
+      float load)
           throws ExecuteException {
     HttpPost post = null;
     HttpResponse response = null;
@@ -87,10 +90,12 @@ public class ExecuteServiceRemoteImpl extends RemoteBase implements ExecuteServi
       formStringParams.add(new BasicNameValuePair(PARAMS_FORM_PARAM, params));
       formStringParams.add(new BasicNameValuePair(LOAD_FORM_PARAM, String.valueOf(load)));
       formStringParams.add(new BasicNameValuePair(INPUT_ELEM_FORM_PARAM, inElementStr));
-      if (outFileName != null)
+      if (outFileName != null) {
         formStringParams.add(new BasicNameValuePair(OUTPUT_NAME_FORM_PARAMETER, outFileName));
-      if (type != null)
+      }
+      if (type != null) {
         formStringParams.add(new BasicNameValuePair(TYPE_FORM_PARAMETER, type.toString()));
+      }
 
       logger.info("Executing command {} using a remote execute service", exec);
 
@@ -102,8 +107,10 @@ public class ExecuteServiceRemoteImpl extends RemoteBase implements ExecuteServi
         Job job = JobParser.parseJob(response.getEntity().getContent());
         logger.info("Completing execution of command {} using a remote execute service", exec);
         return job;
-      } else
-        throw new ExecuteException(String.format("Failed to execute the command %s using a remote execute service", exec));
+      } else {
+        throw new ExecuteException(String.format("Failed to execute the command %s using a remote execute service",
+            exec));
+      }
 
     } catch (MediaPackageException e) {
       throw new ExecuteException("Error serializing the MediaPackage element", e);
@@ -117,7 +124,9 @@ public class ExecuteServiceRemoteImpl extends RemoteBase implements ExecuteServi
   }
 
   /**
-   * @see org.opencastproject.execute.api.ExecuteService#execute(java.lang.String, java.lang.String, org.opencastproject.mediapackage.MediaPackage, java.lang.String, org.opencastproject.mediapackage.MediaPackageElement.Type, float)
+   * @see org.opencastproject.execute.api.ExecuteService#execute(java.lang.String, java.lang.String,
+   *      org.opencastproject.mediapackage.MediaPackage, java.lang.String,
+   *      org.opencastproject.mediapackage.MediaPackageElement.Type, float)
    */
   @Override
   public Job execute(String exec, String params, MediaPackage mp, String outFileName, Type type, float load)
@@ -132,10 +141,12 @@ public class ExecuteServiceRemoteImpl extends RemoteBase implements ExecuteServi
       formStringParams.add(new BasicNameValuePair(PARAMS_FORM_PARAM, params));
       formStringParams.add(new BasicNameValuePair(LOAD_FORM_PARAM, String.valueOf(load)));
       formStringParams.add(new BasicNameValuePair(INPUT_MP_FORM_PARAM, mpStr));
-      if (outFileName != null)
+      if (outFileName != null) {
         formStringParams.add(new BasicNameValuePair(OUTPUT_NAME_FORM_PARAMETER, outFileName));
-      if (type != null)
+      }
+      if (type != null) {
         formStringParams.add(new BasicNameValuePair(TYPE_FORM_PARAMETER, type.toString()));
+      }
 
       logger.info("Executing command {} using a remote execute service", exec);
 
@@ -149,7 +160,8 @@ public class ExecuteServiceRemoteImpl extends RemoteBase implements ExecuteServi
         return job;
       } else {
         logger.error("Failed to execute the command {} using a remote execute service", exec);
-        throw new ExecuteException(String.format("Failed to execute the command %s using a remote execute service", exec));
+        throw new ExecuteException(String.format("Failed to execute the command %s using a remote execute service",
+            exec));
       }
     } catch (IllegalStateException e) {
       throw new ExecuteException(e);
