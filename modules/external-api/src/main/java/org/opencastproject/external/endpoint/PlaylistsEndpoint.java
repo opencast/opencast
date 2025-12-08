@@ -148,9 +148,12 @@ public class PlaylistsEndpoint {
       },
       responses = {
           @RestResponse(description = "Returns the playlist.", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "The specified playlist instance does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND),
-          @RestResponse(description = "The user doesn't have the rights to make this request.", responseCode = HttpServletResponse.SC_FORBIDDEN),
-          @RestResponse(description = "The request is invalid or inconsistent.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "The specified playlist instance does not exist.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND),
+          @RestResponse(description = "The user doesn't have the rights to make this request.",
+              responseCode = HttpServletResponse.SC_FORBIDDEN),
+          @RestResponse(description = "The request is invalid or inconsistent.",
+              responseCode = HttpServletResponse.SC_BAD_REQUEST),
       })
   public Response getPlaylistAsJson(
       @HeaderParam("Accept") String acceptHeader,
@@ -188,7 +191,8 @@ public class PlaylistsEndpoint {
       },
       responses = {
           @RestResponse(description = "Returns the playlist.", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "The request is invalid or inconsistent.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "The request is invalid or inconsistent.",
+              responseCode = HttpServletResponse.SC_BAD_REQUEST),
       })
   public Response getPlaylistsAsJson(
       @HeaderParam("Accept") String acceptHeader,
@@ -240,8 +244,10 @@ public class PlaylistsEndpoint {
       },
       responses = {
           @RestResponse(description = "Playlist created.", responseCode = HttpServletResponse.SC_CREATED),
-          @RestResponse(description = "The user doesn't have the rights to make this request.", responseCode = HttpServletResponse.SC_FORBIDDEN),
-          @RestResponse(description = "The request is invalid or inconsistent.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "The user doesn't have the rights to make this request.",
+              responseCode = HttpServletResponse.SC_FORBIDDEN),
+          @RestResponse(description = "The request is invalid or inconsistent.",
+              responseCode = HttpServletResponse.SC_BAD_REQUEST),
       })
   public Response createAsJson(
       @HeaderParam("Accept") String acceptHeader,
@@ -280,8 +286,10 @@ public class PlaylistsEndpoint {
       },
       responses = {
           @RestResponse(description = "Playlist updated.", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "The user doesn't have the rights to make this request.", responseCode = HttpServletResponse.SC_FORBIDDEN),
-          @RestResponse(description = "The request is invalid or inconsistent.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "The user doesn't have the rights to make this request.",
+              responseCode = HttpServletResponse.SC_FORBIDDEN),
+          @RestResponse(description = "The request is invalid or inconsistent.",
+              responseCode = HttpServletResponse.SC_BAD_REQUEST),
       })
   public Response updateAsJson(
       @HeaderParam("Accept") String acceptHeader,

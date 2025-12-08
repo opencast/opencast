@@ -119,7 +119,8 @@ public class TestEventsEndpoint extends EventsEndpoint {
     ElasticsearchIndex elasticsearchIndex = new ElasticsearchIndex();
 
     IndexService indexService = EasyMock.createMock(IndexService.class);
-    EasyMock.expect(indexService.getEvent(MISSING_ID, elasticsearchIndex)).andReturn(Optional.<Event> empty()).anyTimes();
+    EasyMock.expect(indexService.getEvent(MISSING_ID, elasticsearchIndex)).andReturn(Optional.<Event> empty())
+        .anyTimes();
 
     SchedulerService schedulerService = EasyMock.createMock(SchedulerService.class);
 
@@ -195,16 +196,18 @@ public class TestEventsEndpoint extends EventsEndpoint {
     // Two Pubs
     Event twoPublicationsEvent = new Event(TWO_PUBLICATIONS, defaultOrg.getId());
     MediaPackage twoPublicationsMP = EasyMock.createMock(MediaPackage.class);
-    Publication paellaPublication = new PublicationImpl(ENGAGE_PUBLICATION_ID, "EVENTS.EVENTS.DETAILS.PUBLICATIONS.ENGAGE",
+    Publication paellaPublication = new PublicationImpl(ENGAGE_PUBLICATION_ID,
+            "EVENTS.EVENTS.DETAILS.PUBLICATIONS.ENGAGE",
             new URI("http://mh-allinone.localdomain/paella/ui/watch.html?id=af1a51ce-fb61-4dae-9d5a-f85b9e4fcc99"),
             MimeType.mimeType("not", "used"));
     Publication oaipmh = new PublicationImpl(OAIPMH_PUBLICATION_ID, "oaipmh",
-            new URI("http://mh-allinone.localdomain/oaipmh/default?verb=ListMetadataFormats&identifier=af1a51ce-fb61-4dae-9d5a-f85b9e4fcc99"),
+            new URI("http://mh-allinone.localdomain/oaipmh/default?verb=ListMetadataFormats&identifier="
+                + "af1a51ce-fb61-4dae-9d5a-f85b9e4fcc99"),
             MimeType.mimeType("not", "used"));
     EasyMock.expect(twoPublicationsMP.getPublications()).andReturn(new Publication[] { paellaPublication, oaipmh })
             .anyTimes();
-    EasyMock.expect(indexService.getEvent(TWO_PUBLICATIONS, elasticsearchIndex)).andReturn(Optional.of(twoPublicationsEvent))
-            .anyTimes();
+    EasyMock.expect(indexService.getEvent(TWO_PUBLICATIONS, elasticsearchIndex))
+            .andReturn(Optional.of(twoPublicationsEvent)).anyTimes();
     EasyMock.expect(indexService.getEventMediapackage(twoPublicationsEvent)).andReturn(twoPublicationsMP).anyTimes();
 
     /**
@@ -212,8 +215,10 @@ public class TestEventsEndpoint extends EventsEndpoint {
      */
     capturedMetadataList1 = Capture.newInstance();
     Event updateEvent = new Event(UPDATE_EVENT, defaultOrg.getId());
-    EasyMock.expect(indexService.getEvent(UPDATE_EVENT, elasticsearchIndex)).andReturn(Optional.of(updateEvent)).anyTimes();
-    EasyMock.expect(indexService.updateEventMetadata(eq(UPDATE_EVENT), capture(capturedMetadataList1), eq(elasticsearchIndex))).andReturn(null).anyTimes();
+    EasyMock.expect(indexService.getEvent(UPDATE_EVENT, elasticsearchIndex)).andReturn(Optional.of(updateEvent))
+        .anyTimes();
+    EasyMock.expect(indexService.updateEventMetadata(eq(UPDATE_EVENT), capture(capturedMetadataList1),
+        eq(elasticsearchIndex))).andReturn(null).anyTimes();
 
     /**
      * Update event metadata external service mocking
@@ -221,8 +226,10 @@ public class TestEventsEndpoint extends EventsEndpoint {
     capturedMetadataList2 = Capture.newInstance();
     Event updateEventMetadata = new Event(METADATA_UPDATE_EVENT, defaultOrg.getId());
     updateEventMetadata.setRecordingStartDate("2017-08-29T00:05:00.000Z");
-    EasyMock.expect(indexService.getEvent(METADATA_UPDATE_EVENT, elasticsearchIndex)).andReturn(Optional.of(updateEventMetadata)).anyTimes();
-    EasyMock.expect(indexService.updateEventMetadata(eq(METADATA_UPDATE_EVENT), capture(capturedMetadataList2), eq(elasticsearchIndex))).andReturn(null).anyTimes();
+    EasyMock.expect(indexService.getEvent(METADATA_UPDATE_EVENT, elasticsearchIndex))
+        .andReturn(Optional.of(updateEventMetadata)).anyTimes();
+    EasyMock.expect(indexService.updateEventMetadata(eq(METADATA_UPDATE_EVENT), capture(capturedMetadataList2),
+        eq(elasticsearchIndex))).andReturn(null).anyTimes();
     EasyMock.expect(indexService.getEventMediapackage(updateEventMetadata)).andReturn(null).anyTimes();
 
     /**
@@ -237,20 +244,24 @@ public class TestEventsEndpoint extends EventsEndpoint {
     MediaPackage mp = builder.loadFromXml(uriMP.toURL().openStream());
     MediaPackage mpUpdated = builder.loadFromXml(uriMPUpdated.toURL().openStream());
 
-    EasyMock.expect(indexService.getEvent(TRACK_UPDATE_EVENT, elasticsearchIndex)).andReturn(Optional.of(updateEventTrack)).anyTimes();
+    EasyMock.expect(indexService.getEvent(TRACK_UPDATE_EVENT, elasticsearchIndex))
+        .andReturn(Optional.of(updateEventTrack)).anyTimes();
     EasyMock.expect(indexService.getEventMediapackage(updateEventTrack)).andReturn(mp).anyTimes();
     EasyMock.expect(ingestService.addTrack((InputStream) EasyMock.anyObject(), (String) EasyMock.anyObject(),
             (MediaPackageElementFlavor) EasyMock.anyObject(), (MediaPackage) EasyMock.anyObject()))
             .andReturn(mpUpdated);
-    EasyMock.expect(assetManager.takeSnapshot(EasyMock.capture(capturedMediaPackage))).andReturn(EasyMock.createNiceMock(Snapshot.class));
-    EasyMock.expect(workflowService.mediaPackageHasActiveWorkflows(mp.getIdentifier().toString())).andReturn(false).anyTimes();
+    EasyMock.expect(assetManager.takeSnapshot(EasyMock.capture(capturedMediaPackage)))
+        .andReturn(EasyMock.createNiceMock(Snapshot.class));
+    EasyMock.expect(workflowService.mediaPackageHasActiveWorkflows(mp.getIdentifier().toString()))
+        .andReturn(false).anyTimes();
 
     /**
      * Get event metadata external service mocking
      */
     Event getEvent = new Event(METADATA_GET_EVENT, defaultOrg.getId());
     getEvent.setRecordingStartDate("2017-08-29T00:05:00.000Z");
-    EasyMock.expect(indexService.getEvent(METADATA_GET_EVENT, elasticsearchIndex)).andReturn(Optional.of(getEvent)).anyTimes();
+    EasyMock.expect(indexService.getEvent(METADATA_GET_EVENT, elasticsearchIndex)).andReturn(Optional.of(getEvent))
+        .anyTimes();
     EasyMock.expect(indexService.getEventMediapackage(getEvent)).andReturn(null).anyTimes();
 
     /**
@@ -271,8 +282,10 @@ public class TestEventsEndpoint extends EventsEndpoint {
     capturedAgentId = Capture.newInstance();
     capturedAgentConfig = Capture.newInstance();
     Event updateEventScheduling = new Event(SCHEDULING_UPDATE_EVENT, defaultOrg.getId());
-    EasyMock.expect(indexService.getEvent(SCHEDULING_UPDATE_EVENT, elasticsearchIndex)).andReturn(Optional.of(updateEventScheduling)).anyTimes();
-    EasyMock.expect(schedulerService.getTechnicalMetadata(SCHEDULING_UPDATE_EVENT)).andReturn(technicalMetadata1).anyTimes();
+    EasyMock.expect(indexService.getEvent(SCHEDULING_UPDATE_EVENT, elasticsearchIndex))
+        .andReturn(Optional.of(updateEventScheduling)).anyTimes();
+    EasyMock.expect(schedulerService.getTechnicalMetadata(SCHEDULING_UPDATE_EVENT))
+        .andReturn(technicalMetadata1).anyTimes();
     schedulerService.updateEvent(
         eq(SCHEDULING_UPDATE_EVENT),
         capture(capturedStartDate),
@@ -300,12 +313,15 @@ public class TestEventsEndpoint extends EventsEndpoint {
         Collections.singletonMap(CaptureParameters.CAPTURE_DEVICE_NAMES, "default1,default2"),
         Optional.empty()
     );
-    EasyMock.expect(indexService.getEvent(SCHEDULING_GET_EVENT, elasticsearchIndex)).andReturn(Optional.of(getEventScheduling)).anyTimes();
-    EasyMock.expect(schedulerService.getTechnicalMetadata(SCHEDULING_GET_EVENT)).andReturn(technicalMetadata2).anyTimes();
+    EasyMock.expect(indexService.getEvent(SCHEDULING_GET_EVENT, elasticsearchIndex))
+        .andReturn(Optional.of(getEventScheduling)).anyTimes();
+    EasyMock.expect(schedulerService.getTechnicalMetadata(SCHEDULING_GET_EVENT))
+        .andReturn(technicalMetadata2).anyTimes();
 
 
     // Replay all mocks
-    EasyMock.replay(deleteMetadataMP, indexService, schedulerService, ingestService, assetManager, workflowService, noPublicationsMP, twoPublicationsMP);
+    EasyMock.replay(deleteMetadataMP, indexService, schedulerService, ingestService, assetManager, workflowService,
+        noPublicationsMP, twoPublicationsMP);
 
     setElasticsearchIndex(elasticsearchIndex);
     setIndexService(indexService);

@@ -122,7 +122,8 @@ public class ExternalGroupLoader {
     logger.debug("Activate external group loader");
 
     Dictionary properties = cc.getProperties();
-    boolean shouldCreateDefaultGroups = BooleanUtils.toBoolean(Objects.toString(properties.get(SHOULD_CREATE_DEFAULT_GROUPS_CONFIG_KEY), "true"));
+    boolean shouldCreateDefaultGroups = BooleanUtils.toBoolean(Objects.toString(
+        properties.get(SHOULD_CREATE_DEFAULT_GROUPS_CONFIG_KEY), "true"));
 
     if (shouldCreateDefaultGroups) {
       createDefaultGroups(cc);
@@ -143,7 +144,8 @@ public class ExternalGroupLoader {
         try {
           Organization testOrg = organizationDirectoryService.getOrganization(organization.getId());
           if (!(testOrg instanceof JpaOrganization)) {
-            logger.info("Note: Ignoring organization with id " + testOrg.getId() + " because it is not a JpaOrganization");
+            logger.info("Note: Ignoring organization with id " + testOrg.getId()
+                + " because it is not a JpaOrganization");
             return;
           }
           JpaOrganization org = (JpaOrganization) testOrg;

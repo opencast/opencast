@@ -56,11 +56,11 @@ import java.util.stream.Stream;
  * The External API role provider.
  */
 @Component(
-  property = {
-    "service.description=Provides the External API roles"
-  },
-  immediate = true,
-  service = { RoleProvider.class }
+    property = {
+        "service.description=Provides the External API roles"
+    },
+    immediate = true,
+    service = { RoleProvider.class }
 )
 public class ExternalApiRoleProvider implements RoleProvider {
 
@@ -83,7 +83,8 @@ public class ExternalApiRoleProvider implements RoleProvider {
 
   @Activate
   protected void activate(ComponentContext cc) {
-    String rolesFile = ExternalGroupLoader.ROLES_PATH_PREFIX + File.separator + ExternalGroupLoader.EXTERNAL_APPLICATIONS_ROLES_FILE;
+    String rolesFile = ExternalGroupLoader.ROLES_PATH_PREFIX + File.separator
+        + ExternalGroupLoader.EXTERNAL_APPLICATIONS_ROLES_FILE;
     try (InputStream in = getClass().getResourceAsStream(rolesFile)) {
       roles = new TreeSet<>(IOUtils.readLines(in, UTF_8));
     } catch (IOException e) {
