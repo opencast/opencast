@@ -7,7 +7,7 @@ You need to modify the `plugins` section of the [paella config file](configurati
 To enable/disable a plugin you need to set the plugin `enable` property to `true`/`false`.
 
 Example:
-```
+```json
 {
   ...
   "plugins": {
