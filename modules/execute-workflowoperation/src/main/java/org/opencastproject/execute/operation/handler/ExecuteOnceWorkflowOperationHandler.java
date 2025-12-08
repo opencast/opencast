@@ -120,10 +120,12 @@ public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperati
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance, JobContext)
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(
+   *      org.opencastproject.workflow.api.WorkflowInstance, JobContext)
    */
   @Override
-  public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context) throws WorkflowOperationException {
+  public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
+          throws WorkflowOperationException {
 
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
     WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
@@ -140,7 +142,8 @@ public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperati
         load = Float.parseFloat(loadPropertyStr);
       } catch (NumberFormatException e) {
         String description = StringUtils.trimToEmpty(operation.getDescription());
-        logger.warn("Ignoring invalid load value '{}' on execute operation with description '{}'", loadPropertyStr, description);
+        logger.warn("Ignoring invalid load value '{}' on execute operation with description '{}'",
+            loadPropertyStr, description);
       }
     }
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
@@ -154,20 +157,22 @@ public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperati
 
     // Unmarshall target flavor
     MediaPackageElementFlavor targetFlavor = null;
-    if (!targetFlavorStr.isEmpty())
+    if (!targetFlavorStr.isEmpty()) {
       targetFlavor = targetFlavorStr.get(0);
+    }
 
     // Unmarshall expected mediapackage element type
     MediaPackageElement.Type expectedType = null;
     if (expectedTypeStr != null) {
-      for (MediaPackageElement.Type type : MediaPackageElement.Type.values())
+      for (MediaPackageElement.Type type : MediaPackageElement.Type.values()) {
         if (type.toString().equalsIgnoreCase(expectedTypeStr)) {
           expectedType = type;
           break;
         }
-
-      if (expectedType == null)
+      }
+      if (expectedType == null) {
         throw new WorkflowOperationException("'" + expectedTypeStr + "' is not a valid element type");
+      }
     }
 
     // Process the result element
@@ -179,8 +184,9 @@ public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperati
       WorkflowOperationResult result = null;
 
       // Wait for all jobs to be finished
-      if (!waitForStatus(job).isSuccess())
+      if (!waitForStatus(job).isSuccess()) {
         throw new WorkflowOperationException("Execute operation failed");
+      }
 
       if (StringUtils.isNotBlank(job.getPayload())) {
 
@@ -190,7 +196,10 @@ public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperati
 
           final Properties properties = new Properties();
           File propertiesFile = workspace.get(resultElement.getURI());
-          try (InputStreamReader reader = new InputStreamReader(new FileInputStream(propertiesFile), StandardCharsets.UTF_8)) {
+          try (InputStreamReader reader = new InputStreamReader(
+              new FileInputStream(propertiesFile),
+              StandardCharsets.UTF_8
+          )) {
             properties.load(reader);
           }
           logger.debug("Loaded {} properties from {}", properties.size(), propertiesFile);
@@ -222,8 +231,9 @@ public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperati
           resultElement.setURI(uri);
 
           // Set new flavor
-          if (targetFlavor != null)
+          if (targetFlavor != null) {
             resultElement.setFlavor(targetFlavor);
+          }
 
           // Set new tags
           applyTargetTagsToElement(targetTags, resultElement);
@@ -256,10 +266,12 @@ public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperati
   /**
    * {@inheritDoc}
    * 
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#skip(org.opencastproject.workflow.api.WorkflowInstance, JobContext)
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#skip(
+   *      org.opencastproject.workflow.api.WorkflowInstance, JobContext)
    */
   @Override
-  public WorkflowOperationResult skip(WorkflowInstance workflowInstance, JobContext context) throws WorkflowOperationException {
+  public WorkflowOperationResult skip(WorkflowInstance workflowInstance, JobContext context)
+          throws WorkflowOperationException {
     return new WorkflowOperationResultImpl(workflowInstance.getMediaPackage(), null, Action.SKIP, 0);
   }
 

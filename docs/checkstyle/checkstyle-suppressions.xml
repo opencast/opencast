@@ -9,12 +9,10 @@
     <suppress checks="LineLength" files="modules/caption-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/capture-admin-service-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/common/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/execute-workflowoperation/.+\.(java|properties)"/>
 
     <suppress checks="Indentation" files="modules/admin-ui/.+\.java"/>
     <suppress checks="Indentation" files="modules/capture-admin-service-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/common/.+\.java"/>
-    <suppress checks="Indentation" files="modules/execute-workflowoperation/.+\.java"/>
     <suppress checks="Indentation" files="modules/metadata/.+\.java"/>
     <suppress checks="Indentation" files="modules/serviceregistry/.+\.java"/>
 
@@ -22,5 +20,4 @@
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/caption-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/capture-admin-service-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/common/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/execute-workflowoperation/.+\.java"/>
 </suppressions>
