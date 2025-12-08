@@ -79,7 +79,8 @@ public final class OpencastMetadataCodec {
   }
 
   /** {@link OpencastMetadataCodec#decodeTemporal(DublinCoreValue)} as a function. */
-  @Nonnull public static final Function<DublinCoreValue, Temporal> decodeTemporal = new Function<DublinCoreValue, Temporal>() {
+  @Nonnull public static final Function<DublinCoreValue, Temporal> decodeTemporal =
+      new Function<DublinCoreValue, Temporal>() {
     @Override public Temporal apply(DublinCoreValue a) {
       return decodeTemporal(a);
     }

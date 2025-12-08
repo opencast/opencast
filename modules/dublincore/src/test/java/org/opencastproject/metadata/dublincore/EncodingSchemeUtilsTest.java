@@ -143,7 +143,7 @@ public class EncodingSchemeUtilsTest {
       @Override
       public Integer period(DCMIPeriod period) {
         return 1;
-  }
+      }
 
       @Override
       public Integer instant(Date instant) {
@@ -174,7 +174,8 @@ public class EncodingSchemeUtilsTest {
     assertSame(1, decodeTemporal(DublinCoreValue.mk("start=2008-10-01; end=2009-01-01;")).fold(match));
     assertSame(2, decodeTemporal(DublinCoreValue.mk("2008-10-01")).fold(match));
     assertSame(2, decodeTemporal(DublinCoreValue.mk("2008-10-01T10:30:05Z")).fold(match));
-    assertSame(1, decodeTemporal(DublinCoreValue.mk("start=2008-10-01T10:20Z; end=2009-01-01; scheme=W3C-DTF")).fold(match));
+    assertSame(1, decodeTemporal(DublinCoreValue.mk("start=2008-10-01T10:20Z; end=2009-01-01; scheme=W3C-DTF"))
+        .fold(match));
     assertSame(3, decodeTemporal(DublinCoreValue.mk("PT10H5M")).fold(match));
     assertEquals(10L * 60 * 60 * 1000 + 5 * 60 * 1000,
             (long) decodeTemporal(DublinCoreValue.mk("PT10H5M")).fold(durationMatch));

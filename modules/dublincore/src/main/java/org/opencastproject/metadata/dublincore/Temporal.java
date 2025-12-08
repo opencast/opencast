@@ -37,8 +37,9 @@ public abstract class Temporal {
    * An instant in time.
    */
   public static Temporal instant(final Date instant) {
-    if (instant == null)
+    if (instant == null) {
       throw new IllegalArgumentException("instant must not be null");
+    }
     return new Temporal() {
       public Date getInstant() {
         return instant;
@@ -55,8 +56,9 @@ public abstract class Temporal {
    * A period in time limited by at least one instant.
    */
   public static Temporal period(final DCMIPeriod period) {
-    if (period == null)
+    if (period == null) {
       throw new IllegalArgumentException("period must not be null");
+    }
     return new Temporal() {
       public DCMIPeriod getPeriod() {
         return period;
@@ -73,8 +75,9 @@ public abstract class Temporal {
    * A time span measured in milliseconds.
    */
   public static Temporal duration(final long duration) {
-    if (duration < 0)
+    if (duration < 0) {
       throw new IllegalArgumentException("duration must be positive or zero");
+    }
     return new Temporal() {
       public long getDuration() {
         return duration;

@@ -72,18 +72,22 @@ public final class EncodingSchemeUtils {
    *          the precision to use
    */
   public static DublinCoreValue encodeDate(Date date, Precision precision) {
-    if (date == null)
+    if (date == null) {
       throw new IllegalArgumentException("The date must not be null");
-    if (precision == null)
+    }
+    if (precision == null) {
       throw new IllegalArgumentException("The precision must not be null");
+    }
 
-    return DublinCoreValue.mk(formatDate(date, precision), DublinCore.LANGUAGE_UNDEFINED, Optional.of(DublinCore.ENC_SCHEME_W3CDTF));
+    return DublinCoreValue.mk(formatDate(date, precision), DublinCore.LANGUAGE_UNDEFINED,
+        Optional.of(DublinCore.ENC_SCHEME_W3CDTF));
   }
 
   public static String formatDate(Date date, Precision precision) {
     SimpleDateFormat f = new SimpleDateFormat(formats.get(precision));
-    if (precision == Precision.Minute || precision == Precision.Second || precision == Precision.Fraction)
+    if (precision == Precision.Minute || precision == Precision.Second || precision == Precision.Fraction) {
       f.setTimeZone(TimeZone.getTimeZone("UTC"));
+    }
     return f.format(date);
   }
 
@@ -104,18 +108,21 @@ public final class EncodingSchemeUtils {
    *          the precision
    */
   public static DublinCoreValue encodePeriod(DCMIPeriod period, Precision precision) {
-    if (period == null)
+    if (period == null) {
       throw new IllegalArgumentException("The period must not be null");
-    if (precision == null)
+    }
+    if (precision == null) {
       throw new IllegalArgumentException("The precision must not be null");
+    }
 
     StringBuilder b = new StringBuilder();
     if (period.hasStart()) {
       b.append("start=").append(formatDate(period.getStart(), precision)).append(";");
     }
     if (period.hasEnd()) {
-      if (b.length() > 0)
+      if (b.length() > 0) {
         b.append(" ");
+      }
       b.append("end=").append(formatDate(period.getEnd(), precision)).append(";");
     }
     if (period.hasName()) {
@@ -160,13 +167,17 @@ public final class EncodingSchemeUtils {
     // also support the legacy format hh:mm:ss
     String[] parts = value.split(":");
     try {
-      if (parts.length == 1)
+      if (parts.length == 1) {
         return Long.parseLong(parts[0]) * 1000;
-      if (parts.length == 2)
+      }
+      if (parts.length == 2) {
         return Long.parseLong(parts[0]) * 1000 * 60 + Long.parseLong(parts[1]) * 1000;
-      if (parts.length == 3)
-        return Long.parseLong(parts[0]) * 1000 * 60 * 60 + Long.parseLong(parts[1]) * 1000 * 60
-                + Long.parseLong(parts[2]) * 1000;
+      }
+      if (parts.length == 3) {
+        return Long.parseLong(parts[0]) * 1000 * 60 * 60
+            + Long.parseLong(parts[1]) * 1000 * 60
+            + Long.parseLong(parts[2]) * 1000;
+      }
     } catch (NumberFormatException ignore) {
     }
     return null;
@@ -188,8 +199,9 @@ public final class EncodingSchemeUtils {
 
   public static Long decodeMandatoryDuration(String value) {
     Long l = decodeDuration(value);
-    if (l == null)
+    if (l == null) {
       throw new IllegalArgumentException("Cannot decode duration: " + value);
+    }
     return l;
   }
 
@@ -250,8 +262,9 @@ public final class EncodingSchemeUtils {
    */
   public static Date decodeMandatoryDate(DublinCoreValue value) {
     Date date = decodeDate(value);
-    if (date == null)
+    if (date == null) {
       throw new IllegalArgumentException("Cannot decode to Date: " + value);
+    }
     return date;
   }
 
@@ -264,8 +277,9 @@ public final class EncodingSchemeUtils {
    */
   public static Date decodeMandatoryDate(String value) {
     Date date = decodeDate(value);
-    if (date == null)
+    if (date == null) {
       throw new IllegalArgumentException("Cannot decode to Date: " + value);
+    }
     return date;
   }
 
@@ -310,21 +324,25 @@ public final class EncodingSchemeUtils {
           String field = m.group(1);
           String fieldValue = m.group(2);
           if ("start".equals(field)) {
-            if (start != null)
+            if (start != null) {
               return null;
+            }
             start = parseW3CDTF(fieldValue);
           } else if ("end".equals(field)) {
-            if (end != null)
+            if (end != null) {
               return null;
+            }
             end = parseW3CDTF(fieldValue);
           } else if ("name".equals(field)) {
-            if (name != null)
+            if (name != null) {
               return null;
+            }
             name = fieldValue;
           }
         }
-        if (start == null && end == null)
+        if (start == null && end == null) {
           return null;
+        }
         return new DCMIPeriod(start, end, name);
       }
     } catch (IllegalArgumentException ignore) {
@@ -354,8 +372,9 @@ public final class EncodingSchemeUtils {
    */
   public static DCMIPeriod decodeMandatoryPeriod(String value) {
     DCMIPeriod period = decodePeriod(value);
-    if (period == null)
+    if (period == null) {
       throw new IllegalArgumentException("Cannot decode to DCMIPeriod: " + value);
+    }
 
     return period;
   }
@@ -371,14 +390,17 @@ public final class EncodingSchemeUtils {
   public static Temporal decodeTemporal(DublinCoreValue value) {
     // First try Date
     Date instant = decodeDate(value);
-    if (instant != null)
+    if (instant != null) {
       return Temporal.instant(instant);
+    }
     DCMIPeriod period = decodePeriod(value);
-    if (period != null)
+    if (period != null) {
       return Temporal.period(period);
+    }
     Long duration = decodeDuration(value);
-    if (duration != null)
+    if (duration != null) {
       return Temporal.duration(duration);
+    }
     return null;
   }
 
@@ -392,8 +414,9 @@ public final class EncodingSchemeUtils {
    */
   public static Temporal decodeMandatoryTemporal(DublinCoreValue value) {
     Temporal temporal = decodeTemporal(value);
-    if (value == null)
+    if (value == null) {
       throw new IllegalArgumentException("Cannot decode to either Date or DCMIPeriod: " + value);
+    }
 
     return temporal;
   }

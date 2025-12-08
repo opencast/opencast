@@ -41,8 +41,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
  * <p>
  * Two forms of Dublin Core exist: <code>Simple Dublin Core</code> and <code>Qualified Dublin Core</code>. Simple Dublin
  * Core expresses properties as literal strings using just the 15 metadata elements from the Dublin Core Metadata
- * Element Sets. Each element can have multiple values, but order is defined. Values may have an associated language. <br>
- * Please see <a href="http://dublincore.org/documents/dces/">http://dublincore.org/documents/dces/</a> for further
+ * Element Sets. Each element can have multiple values, but order is defined. Values may have an associated language.
+ * <br> Please see <a href="http://dublincore.org/documents/dces/">http://dublincore.org/documents/dces/</a> for further
  * information.
  * <p>
  * Qualified Dublin Core increases the specificity of metadata by extending the set of properties (elements) and by
@@ -136,7 +136,8 @@ public interface DublinCore {
 
   /**
    * Dublin Core Property <dfn>bibliographicCitation</dfn> in the /terms/ namespace. See <a
-   * href="http://dublincore.org/documents/dcmi-terms/#terms-bibliographicCitation">DCMI Terms Bibliographic Citation</a>.
+   * href="http://dublincore.org/documents/dcmi-terms/#terms-bibliographicCitation">DCMI Terms Bibliographic Citation
+   * </a>.
    */
   EName PROPERTY_BIBLIOGRAPHIC_CITATION = new EName(TERMS_NS_URI, "bibliographicCitation");
 
@@ -545,8 +546,8 @@ public interface DublinCore {
 
   /**
    * Get the first value of a property, no matter what language it is in. Like a call of
-   * {@link #getFirst(EName, String)} with <code>language = {@link #LANGUAGE_ANY}</code>. Please not that values with an {@link #LANGUAGE_UNDEFINED undefined
-   * language} are returned preferably.
+   * {@link #getFirst(EName, String)} with <code>language = {@link #LANGUAGE_ANY}</code>. Please not that values with an
+   * {@link #LANGUAGE_UNDEFINED undefined language} are returned preferably.
    *
    * @param property
    *         the property's expanded name
@@ -557,8 +558,8 @@ public interface DublinCore {
 
   /**
    * Get the first value of a property, no matter what language it is in. Like a call of
-   * {@link #getFirst(EName, String)} with <code>language = {@link #LANGUAGE_ANY}</code>. Please not that values with an {@link #LANGUAGE_UNDEFINED undefined
-   * language} are returned preferably.
+   * {@link #getFirst(EName, String)} with <code>language = {@link #LANGUAGE_ANY}</code>. Please not that values with an
+   * {@link #LANGUAGE_UNDEFINED undefined language} are returned preferably.
    *
    * @param property
    *         the property's expanded name

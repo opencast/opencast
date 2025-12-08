@@ -111,13 +111,17 @@ public final class MetadataJson {
         return rawValue == null ? new JsonPrimitive("") : new JsonPrimitive(rawValue.toString());
 
       case DATE: {
-        if (rawValue == null) return new JsonPrimitive("");
+        if (rawValue == null) {
+          return new JsonPrimitive("");
+        }
         SimpleDateFormat dateFormat = getSimpleDateFormatter(pattern);
         return new JsonPrimitive(dateFormat.format((Date) rawValue));
       }
 
       case DURATION: {
-        if (rawValue == null) return new JsonPrimitive("");
+        if (rawValue == null) {
+          return new JsonPrimitive("");
+        }
         long returnValue = 0L;
         String value = (String) rawValue;
         DCMIPeriod period = EncodingSchemeUtils.decodePeriod(value);
@@ -138,7 +142,9 @@ public final class MetadataJson {
       case MIXED_TEXT: {
         JsonArray jsonArray = new JsonArray();
 
-        if (rawValue == null) return jsonArray;
+        if (rawValue == null) {
+          return jsonArray;
+        }
 
         if (rawValue instanceof String) {
           for (String entry : ((String) rawValue).split(",")) {
@@ -148,7 +154,9 @@ public final class MetadataJson {
           }
         } else {
           for (Object val : (Iterable<?>) rawValue) {
-            if (val != null) jsonArray.add(safeString(val));
+            if (val != null) {
+              jsonArray.add(safeString(val));
+            }
           }
         }
         return jsonArray;
@@ -164,15 +172,21 @@ public final class MetadataJson {
 
       case START_DATE:
       case START_TIME: {
-        if (rawValue == null) return new JsonPrimitive("");
+        if (rawValue == null) {
+          return new JsonPrimitive("");
+        }
         String value = (String) rawValue;
 
-        if (StringUtils.isBlank(value)) return new JsonPrimitive("");
+        if (StringUtils.isBlank(value)) {
+          return new JsonPrimitive("");
+        }
 
         // Try to parse the metadata as DCIM metadata.
         final DCMIPeriod p = EncodingSchemeUtils.decodePeriod(value);
         final SimpleDateFormat dateFormat = getSimpleDateFormatter(pattern);
-        if (p != null) return new JsonPrimitive(dateFormat.format(p.getStart()));
+        if (p != null) {
+          return new JsonPrimitive(dateFormat.format(p.getStart()));
+        }
 
         // Not DCIM metadata so it might already be formatted (given from the front and is being returned there
         try {
@@ -180,7 +194,8 @@ public final class MetadataJson {
           return new JsonPrimitive(value);
         } catch (Exception e) {
           logger.error(
-              "Unable to parse temporal metadata '{}' as either DCIM data or a formatted date using pattern {} because:",
+              "Unable to parse temporal metadata '{}' as either DCIM data or a formatted date using pattern {} "
+                  + "because:",
               value,
               pattern,
               e);
@@ -222,11 +237,13 @@ public final class MetadataJson {
   private static Object valueFromJson(final Object value, final MetadataField field) {
     switch (field.getType()) {
       case BOOLEAN: {
-        if (value instanceof Boolean)
+        if (value instanceof Boolean) {
           return value;
+        }
         final String stringValue = value.toString();
-        if (StringUtils.isBlank(stringValue))
+        if (StringUtils.isBlank(stringValue)) {
           return null;
+        }
         return Boolean.parseBoolean(stringValue);
       }
       case DATE: {
@@ -234,8 +251,9 @@ public final class MetadataJson {
         try {
           final String date = (String) value;
 
-          if (StringUtils.isBlank(date))
+          if (StringUtils.isBlank(date)) {
             return null;
+          }
 
           return dateFormat.parse(date);
         } catch (final java.text.ParseException e) {
@@ -251,8 +269,9 @@ public final class MetadataJson {
 
         final String duration = (String) value;
         final String[] durationParts = duration.split(":");
-        if (durationParts.length < 3)
+        if (durationParts.length < 3) {
           return null;
+        }
         final long hours = Long.parseLong(durationParts[0]);
         final long minutes = Long.parseLong(durationParts[1]);
         final long seconds = Long.parseLong(durationParts[2]);
@@ -263,11 +282,13 @@ public final class MetadataJson {
       }
       case ITERABLE_TEXT: {
         final JSONArray array = (JSONArray) value;
-        if (array == null)
+        if (array == null) {
           return null;
+        }
         final String[] arrayOut = new String[array.size()];
-        for (int i = 0; i < array.size(); i++)
+        for (int i = 0; i < array.size(); i++) {
           arrayOut[i] = (String) array.get(i);
+        }
         return Arrays.asList(arrayOut);
       }
       case MIXED_TEXT: {
@@ -283,20 +304,24 @@ public final class MetadataJson {
           array = (JSONArray) value;
         }
 
-        if (array == null)
+        if (array == null) {
           return new ArrayList<>();
+        }
         final String[] arrayOut = new String[array.size()];
-        for (int i = 0; i < array.size(); i++)
+        for (int i = 0; i < array.size(); i++) {
           arrayOut[i] = (String) array.get(i);
+        }
         return Arrays.asList(arrayOut);
       }
       case TEXT:
       case TEXT_LONG:
       case ORDERED_TEXT: {
-        if (value == null)
+        if (value == null) {
           return "";
+        }
         if (!(value instanceof String)) {
-          logger.warn("Value cannot be parsed as String. Expecting type 'String', but received type '{}'.", value.getClass().getName());
+          logger.warn("Value cannot be parsed as String. Expecting type 'String', but received type '{}'.",
+              value.getClass().getName());
           return null;
         }
         return value;
@@ -310,12 +335,12 @@ public final class MetadataJson {
         return Long.parseLong(longString);
       }
       case START_DATE:
-      case START_TIME:
-      {
+      case START_TIME: {
         final String date = (String) value;
 
-        if (StringUtils.isBlank(date))
+        if (StringUtils.isBlank(date)) {
           return "";
+        }
 
         try {
           final SimpleDateFormat dateFormat = getSimpleDateFormatter(field.getPattern());
@@ -373,7 +398,8 @@ public final class MetadataJson {
     return copy;
   }
 
-  public static JsonArray collectionToJson(final DublinCoreMetadataCollection collection, final boolean withOrderedText) {
+  public static JsonArray collectionToJson(final DublinCoreMetadataCollection collection,
+      final boolean withOrderedText) {
     JsonArray jsonArray = new JsonArray();
     for (MetadataField field : collection.getFields()) {
       JsonObject fieldJson = fieldToJson(field, withOrderedText);
@@ -391,22 +417,26 @@ public final class MetadataJson {
   }
 
   public static void fillCollectionFromJson(final DublinCoreMetadataCollection collection, final Object json) {
-    if (!(json instanceof  JSONArray))
+    if (!(json instanceof  JSONArray)) {
       throw new IllegalArgumentException("couldn't fill metadata collection, didn't get an array");
+    }
 
     final JSONArray metadataJson = (JSONArray) json;
     for (final JSONObject item : (Iterable<JSONObject>) metadataJson) {
       final String fieldId = (String) item.get(KEY_METADATA_ID);
 
-      if (fieldId == null)
+      if (fieldId == null) {
         continue;
+      }
       final Object value = item.get(KEY_METADATA_VALUE);
-      if (value == null)
+      if (value == null) {
         continue;
+      }
 
       final MetadataField target = collection.getOutputFields().get(fieldId);
-      if (target == null)
+      if (target == null) {
         continue;
+      }
 
       final Object o = valueFromJson(value, target);
       target.setValue(o);
@@ -418,16 +448,19 @@ public final class MetadataJson {
       final MediaPackageElementFlavor flavor = MediaPackageElementFlavor
               .parseFlavor((String) item.get(KEY_METADATA_FLAVOR));
       final String title = (String) item.get(KEY_METADATA_TITLE);
-      if (title == null)
+      if (title == null) {
         continue;
+      }
 
       final JSONArray value = (JSONArray) item.get(KEY_METADATA_FIELDS);
-      if (value == null)
+      if (value == null) {
         continue;
+      }
 
       final DublinCoreMetadataCollection collection = metadataList.getMetadataByFlavor(flavor.toString());
-      if (collection == null)
+      if (collection == null) {
         continue;
+      }
       MetadataJson.fillCollectionFromJson(collection, value);
     }
   }
@@ -435,7 +468,8 @@ public final class MetadataJson {
   public static JsonArray listToJson(final MetadataList metadataList, final boolean withOrderedText) {
     JsonArray catalogs = new JsonArray();
 
-    for (Map.Entry<String, MetadataList.TitledMetadataCollection> metadata : metadataList.getMetadataList().entrySet()) {
+    for (Map.Entry<String, MetadataList.TitledMetadataCollection> metadata
+        : metadataList.getMetadataList().entrySet()) {
       JsonObject catalogJson = new JsonObject();
 
       DublinCoreMetadataCollection metadataCollection = metadata.getValue().getCollection();

@@ -56,7 +56,8 @@ public final class DublinCoreUtil {
    *
    * @return the catalog or none if the media package does not contain an episode DublinCore
    */
-  public static Optional<DublinCoreCatalog> loadEpisodeDublinCore(final Workspace workspace, MediaPackage mediaPackage) {
+  public static Optional<DublinCoreCatalog> loadEpisodeDublinCore(final Workspace workspace,
+      MediaPackage mediaPackage) {
     return Arrays.stream(mediaPackage.getCatalogs(MediaPackageElements.EPISODE))
         .findFirst()
         .map(dc -> loadDublinCore(workspace, dc));
