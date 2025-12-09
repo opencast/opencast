@@ -116,8 +116,9 @@ public class ComplexCmdsEncoderEngineTest {
   public static void testForFFmpeg() {
     try {
       Process p = new ProcessBuilder(FFMPEG_BINARY, "-version").start();
-      if (p.waitFor() != 0)
+      if (p.waitFor() != 0) {
         throw new IllegalStateException();
+      }
     } catch (Throwable t) {
       logger.warn("Skipping composer tests due to missing ffmpeg");
       ffmpegInstalled = false;
@@ -183,16 +184,17 @@ public class ComplexCmdsEncoderEngineTest {
       URI uri = (URI) EasyMock.getCurrentArguments()[0];
       String name = uri.getPath();
       logger.info("workspace Returns " + name);
-      if (name.contains("mux"))
+      if (name.contains("mux")) {
         return sourceMuxed;
-      else if (name.contains("avlarge"))
+      } else if (name.contains("avlarge")) {
         return sourceAudioVideoLarger;
-      else if (name.contains("audiovideo"))
+      } else if (name.contains("audiovideo")) {
         return sourceAudioVideo;
-      else if (name.contains("audio"))
+      } else if (name.contains("audio")) {
         return sourceAudioOnly;
-      else if (name.contains("video"))
+      } else if (name.contains("video")) {
         return sourceVideoOnly;
+      }
       return sourceAudioVideo; // default
     }).anyTimes();
 
@@ -200,14 +202,15 @@ public class ComplexCmdsEncoderEngineTest {
       URI uri = (URI) EasyMock.getCurrentArguments()[0];
       String name = uri.getPath();
       logger.info("workspace Returns " + name);
-      if (name.contains("mux"))
+      if (name.contains("mux")) {
         return sourceMuxed;
-      else if (name.contains("audiovideo"))
+      } else if (name.contains("audiovideo")) {
         return sourceAudioVideo;
-      else if (name.contains("audio"))
+      } else if (name.contains("audio")) {
         return sourceAudioOnly;
-      else if (name.contains("video"))
+      } else if (name.contains("video")) {
         return sourceVideoOnly;
+      }
       return sourceAudioVideo; // default
     }).anyTimes();
 
@@ -240,8 +243,8 @@ public class ComplexCmdsEncoderEngineTest {
       }
 
       @Override
-      public Job enrich(MediaPackageElement original, boolean override) throws MediaInspectionException,
-      MediaPackageException {
+      public Job enrich(MediaPackageElement original, boolean override)
+              throws MediaInspectionException, MediaPackageException {
         return null;
       }
 
@@ -305,7 +308,7 @@ public class ComplexCmdsEncoderEngineTest {
 
   @After
   public void tearDown() throws Exception {
-      return;
+    return;
   }
 
 
@@ -388,8 +391,9 @@ public class ComplexCmdsEncoderEngineTest {
     // into 2 output
     // formats
     assertTrue(outputs.size() == eprofiles.length);
-    for (int i = 0; i < eprofiles.length; i++)
+    for (int i = 0; i < eprofiles.length; i++) {
       assertTrue(outputs.get(i).length() > 0);
+    }
   }
 
   // When edit points are out of order in the SMIL
@@ -422,8 +426,9 @@ public class ComplexCmdsEncoderEngineTest {
     edits.add((long) 5500);
     List<File> outputs = engine.multiTrimConcat(Arrays.asList(files), edits, Arrays.asList(eprofiles), 0);
     assertTrue(outputs.size() == eprofiles.length);
-    for (int i = 0; i < eprofiles.length; i++)
+    for (int i = 0; i < eprofiles.length; i++) {
       assertTrue(outputs.get(i).length() > 0);
+    }
   }
 
   // Single input, Single output, Filter
@@ -434,8 +439,8 @@ public class ComplexCmdsEncoderEngineTest {
     FileUtils.copyURLToFile(sourceUrl, sourceFile1);
 
     EncodingProfile[] eprofiles = { profileScanner.getProfile("h264-low.http") }; // ,
-                                                                                  // profileScanner.getProfile("h264-medium.http")
-                                                                                  // };
+                                                                      // profileScanner.getProfile("h264-medium.http")
+                                                                      // };
 
     File[] files = { sourceFile1 };
 
@@ -461,8 +466,9 @@ public class ComplexCmdsEncoderEngineTest {
             false); // Video
     // Only
     assertTrue(outputs.size() == eprofiles.length);
-    for (int i = 0; i < eprofiles.length; i++)
+    for (int i = 0; i < eprofiles.length; i++) {
       assertTrue(outputs.get(i).length() > 0);
+    }
   }
 
   // Single input, Single output, No Filter
@@ -486,10 +492,12 @@ public class ComplexCmdsEncoderEngineTest {
     edits.add((long) 0);
     edits.add((long) 9000);
     edits.add((long) 17500);
-    List<File> outputs = engine.multiTrimConcat(Arrays.asList(files), edits, Arrays.asList(eprofiles), 0, false, true); // Audio
+    // Audio
+    List<File> outputs = engine.multiTrimConcat(Arrays.asList(files), edits, Arrays.asList(eprofiles), 0, false, true);
     assertTrue(outputs.size() == eprofiles.length);
-    for (int i = 0; i < eprofiles.length; i++)
+    for (int i = 0; i < eprofiles.length; i++) {
       assertTrue(outputs.get(i).length() > 0);
+    }
   }
 
   // Single input, Two outputs, No Edit, No transition
@@ -503,14 +511,16 @@ public class ComplexCmdsEncoderEngineTest {
     File[] files = { sourceFile1 };
     List<File> outputs = engine.multiTrimConcat(Arrays.asList(files), null, Arrays.asList(eprofiles), 0, true, true);
     assertTrue(outputs.size() == eprofiles.length);
-    for (int i = 0; i < eprofiles.length; i++)
+    for (int i = 0; i < eprofiles.length; i++) {
       assertTrue(outputs.get(i).length() > 0);
+    }
   }
 
   @Test
   public void testRawMultiEncode() throws EncoderException {
-    if (!ffmpegInstalled)
+    if (!ffmpegInstalled) {
       return;
+    }
     List<EncodingProfile> profiles = new ArrayList<EncodingProfile>();
     profiles.add(profileScanner.getProfile("h264-low.http"));
     profiles.add(profileScanner.getProfile("flash.rtmp"));
@@ -528,8 +538,9 @@ public class ComplexCmdsEncoderEngineTest {
 
   @Test
   public void testRawMultiEncodeEditsNoTransition() throws EncoderException {
-    if (!ffmpegInstalled)
+    if (!ffmpegInstalled) {
       return;
+    }
     // EncodingProfile profile = profileScanner.getProfile(multiProfile);
     List<EncodingProfile> profiles = new ArrayList<EncodingProfile>();
     profiles.add(profileScanner.getProfile("h264-low.http"));
@@ -554,8 +565,9 @@ public class ComplexCmdsEncoderEngineTest {
   // Test Audio Only
   @Test
   public void testMultiEncodeHLS2ProfilesA() throws Exception {
-    if (!ffmpegInstalled)
+    if (!ffmpegInstalled) {
       return;
+    }
     assertTrue(sourceAudioVideoLarger.isFile());
     // Set up workspace
     List<EncodingProfile> profiles = new ArrayList<EncodingProfile>();
@@ -577,8 +589,9 @@ public class ComplexCmdsEncoderEngineTest {
   // Test Video Only - no video bitrate
   @Test
   public void testMultiEncodeHLS2ProfilesV() throws Exception {
-    if (!ffmpegInstalled)
+    if (!ffmpegInstalled) {
       return;
+    }
     assertTrue(sourceAudioVideoLarger.isFile());
     // Set up workspace
     List<EncodingProfile> profiles = new ArrayList<EncodingProfile>();
@@ -600,8 +613,9 @@ public class ComplexCmdsEncoderEngineTest {
   // Test AudioVideo Only no Video bitrate
   @Test
   public void testMultiEncodeHLS2ProfilesAV() throws Exception {
-    if (!ffmpegInstalled)
+    if (!ffmpegInstalled) {
       return;
+    }
     assertTrue(sourceAudioVideoLarger.isFile());
     // Set up workspace
     List<EncodingProfile> profiles = new ArrayList<EncodingProfile>();
@@ -623,8 +637,9 @@ public class ComplexCmdsEncoderEngineTest {
   // Test AudioVideo Video bitrate
   @Test
   public void testMultiEncodeHLS2ProfilesVBR() throws Exception {
-    if (!ffmpegInstalled)
+    if (!ffmpegInstalled) {
       return;
+    }
     assertTrue(sourceAudioVideoLarger.isFile());
     // Set up workspace
     List<EncodingProfile> profiles = new ArrayList<EncodingProfile>();
@@ -645,8 +660,9 @@ public class ComplexCmdsEncoderEngineTest {
   // Test HLS AudioVideo Video bitrate single stream
   @Test
   public void testMultiEncodeHLS1ProfileAV() throws Exception {
-    if (!ffmpegInstalled)
+    if (!ffmpegInstalled) {
       return;
+    }
     assertTrue(sourceAudioVideoLarger.isFile());
     // Set up workspace
     List<EncodingProfile> profiles = new ArrayList<EncodingProfile>();
@@ -718,10 +734,10 @@ public class ComplexCmdsEncoderEngineTest {
   }
 
   @Test
-  public void testRawMultiEncodeNoAudio() throws EncoderException
-  {
-    if (!ffmpegInstalled)
+  public void testRawMultiEncodeNoAudio() throws EncoderException {
+    if (!ffmpegInstalled) {
       return;
+    }
     // EncodingProfile profile = profileScanner.getProfile(multiProfile);
     List<EncodingProfile> profiles = new ArrayList<EncodingProfile>();
     profiles.add(profileScanner.getProfile("h264-low.http"));
@@ -740,8 +756,9 @@ public class ComplexCmdsEncoderEngineTest {
 
   @Test
   public void testMultiEncodeSingleProfile() throws Exception {
-    if (!ffmpegInstalled)
+    if (!ffmpegInstalled) {
       return;
+    }
     assertTrue(sourceAudioVideo.isFile());
     // Set up workspace
     List<EncodingProfile> profiles = new ArrayList<EncodingProfile>();
@@ -756,8 +773,9 @@ public class ComplexCmdsEncoderEngineTest {
 
   @Test
   public void testMultiEncodeJob() throws Exception {
-    if (!ffmpegInstalled)
+    if (!ffmpegInstalled) {
       return;
+    }
     String[] profiles = { "h264-low.http", "flash.rtmp", "h264-medium.http" };
     Track sourceTrack = (Track) MediaPackageElementParser.getFromXml(
             IOUtils.toString(ComposerServiceTest.class.getResourceAsStream("/composer_test_source_track_video.xml"),
