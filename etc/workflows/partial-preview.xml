@@ -104,7 +104,7 @@
 
     <operation
     id="cover-image"
-    if="(NOT(${presenter_source_video} OR $ ${presentation_source_video}))"
+    if="(NOT(${presenter_source_video} OR ${presentation_source_video}))"
     description="Create a cover image for audio-only files">
       <configurations>
         <configuration key="stylesheet">file://${karaf.etc}/branding/coverimage.xsl</configuration>
@@ -116,7 +116,7 @@
 
     <operation
     id="image-to-video"
-    if="(NOT(${presenter_source_video} OR $ ${presentation_source_video}))"
+    if="(NOT(${presenter_source_video} OR ${presentation_source_video}))"
     description="Composite">
       <configurations>
         <configuration key="source-flavor">presenter/image+work</configuration>
@@ -128,7 +128,7 @@
 
     <operation
     id="prepare-av"
-    if="(NOT(${presenter_source_video} OR $ ${presentation_source_video}))"
+    if="(NOT(${presenter_source_video} OR ${presentation_source_video}))"
     description="Preparing presenter audio and video work versions">
       <configurations>
         <configuration key="source-flavor">presenter/video+work</configuration>
