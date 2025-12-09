@@ -9,7 +9,6 @@
     <suppress checks="LineLength" files="modules/caption-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/capture-admin-service-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/common/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/composer-service-remote/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/composer-workflowoperation/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/execute-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/execute-remote/.+\.(java|properties)"/>
@@ -19,7 +18,6 @@
     <suppress checks="Indentation" files="modules/admin-ui/.+\.java"/>
     <suppress checks="Indentation" files="modules/capture-admin-service-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/common/.+\.java"/>
-    <suppress checks="Indentation" files="modules/composer-service-remote/.+\.java"/>
     <suppress checks="Indentation" files="modules/composer-workflowoperation/.+\.java"/>
     <suppress checks="Indentation" files="modules/execute-workflowoperation/.+\.java"/>
     <suppress checks="Indentation" files="modules/kernel/.+\.java"/>
@@ -30,7 +28,6 @@
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/caption-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/capture-admin-service-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/common/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/composer-service-remote/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/composer-workflowoperation/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/execute-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/execute-remote/.+\.java"/>
