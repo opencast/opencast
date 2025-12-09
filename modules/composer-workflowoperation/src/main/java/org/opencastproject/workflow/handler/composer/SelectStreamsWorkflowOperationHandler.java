@@ -262,7 +262,8 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
 
     final MuxResult result = MuxResult.empty();
 
-    // add non video/audio tracks, like captions, directly to result as only video/audio tracks are relevant for selection
+    // add non video/audio tracks, like captions, directly to result as only video/audio tracks are relevant for
+    // selection
     for (final AugmentedTrack t : augmentedTracksAll) {
       if (t.hasVideo() || t.hasAudio()) {
         augmentedTracks.add(t);
@@ -345,16 +346,16 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
     } else if (allHidden(augmentedTracks, SubTrack.VIDEO)) {
        /* Case 2: No tracks have non-hidden video streams. In this case, simply remove video streams where
           requested or copy the track otherwise */
-       for (final AugmentedTrack t : augmentedTracks) {
-         if (t.hasAudio()) {
-           if (t.hide(SubTrack.VIDEO)) {
-             final TrackJobResult hideVideoResult = hideVideo(t.track, mediaPackage);
-             result.add(hideVideoResult);
-           } else {
-             result.add(copyTrack(t.track));
-           }
-         }
-       }
+      for (final AugmentedTrack t : augmentedTracks) {
+        if (t.hasAudio()) {
+          if (t.hide(SubTrack.VIDEO)) {
+            final TrackJobResult hideVideoResult = hideVideo(t.track, mediaPackage);
+            result.add(hideVideoResult);
+          } else {
+            result.add(copyTrack(t.track));
+          }
+        }
+      }
     } else if (augmentedTracks.size() == 2) {
       /* Case 3: We have two tracks where exactly one track has a non-hidden video stream (implied as this
          logic assumes at most two input tracks).
@@ -387,7 +388,8 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
             .findAny();
   }
 
-  private MuxResult muxSingleVideoTrack(final MediaPackage mediaPackage, final Collection<AugmentedTrack> augmentedTracks)
+  private MuxResult muxSingleVideoTrack(final MediaPackage mediaPackage,
+      final Collection<AugmentedTrack> augmentedTracks)
           throws MediaPackageException, EncoderException, WorkflowOperationException, NotFoundException, IOException {
     long queueTime = 0L;
 
@@ -421,7 +423,8 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
     return new MuxResult(queueTime, resultingTracks);
   }
 
-  private MuxResult muxMultipleVideoTracks(final MediaPackage mediaPackage, final Iterable<AugmentedTrack> augmentedTracks)
+  private MuxResult muxMultipleVideoTracks(final MediaPackage mediaPackage,
+      final Iterable<AugmentedTrack> augmentedTracks)
           throws MediaPackageException, EncoderException, WorkflowOperationException, NotFoundException, IOException {
     long queueTime = 0L;
     final List<Track> resultingTracks = new ArrayList<>(0);
@@ -430,9 +433,9 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
       // clone this track and re-add it to the MP (since it will
       // be a new track with a different flavor)
       if (
-        t.hasVideo() && !t.hideVideo && t.hasAudio() && !t.hideAudio  // non-hidden video and non-hidden audio
-        || t.hasVideo() && !t.hideVideo && !t.hasAudio()  // non-hidden video without audio
-        || !t.hasVideo() && t.hasAudio() && !t.hideAudio  // non-hidden audio without video
+          t.hasVideo() && !t.hideVideo && t.hasAudio() && !t.hideAudio  // non-hidden video and non-hidden audio
+          || t.hasVideo() && !t.hideVideo && !t.hasAudio()  // non-hidden video without audio
+          || !t.hasVideo() && t.hasAudio() && !t.hideAudio  // non-hidden audio without video
       ) {
         logger.debug("Add clone of track {} to mediapackage {}", t.track.getIdentifier(),
             mediaPackage.getIdentifier());
@@ -461,7 +464,8 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
   }
 
   /**
-   * Returns the single track that has audio, or an empty {@code Optional} if either more than one audio track exists, or none exists.
+   * Returns the single track that has audio, or an empty {@code Optional} if either more than one audio track exists,
+   * or none exists.
    * @param augmentedTracks List of tracks
    * @return See above.
    */
