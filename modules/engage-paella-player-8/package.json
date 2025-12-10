@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build:ghpages": "USE_OC_SERVER_FROM_URL=true OC_PAELLA8_BASE_URL='/paella-opencast' OC_PRESENTATION_URL='https://develop.opencast.org' CONFIG_FOLDER='https://polimediaupv.github.io/paella-opencast/config/' OC_PAELLA8_URL_TEMPLATE='/paella-opencast/watch.html?id={videoId}&ocServer={OC_PRESENTATION_URL}' vite build",
-    "build": "tsc && vite build",
+    "build": "tsc && vite build && vite build -c vite.config.embedapi.ts --emptyOutDir false",
     "preview": "vite preview",
     "clean:build": "rimraf .turbo dist",
     "clean:deps": "rimraf node_modules",
@@ -16,12 +16,15 @@
     "check": "npm run eslint && npm run html-linter && npm run html-validate"
   },
   "devDependencies": {
+    "@asicupv/paella-embedapi": "^2.11.1",
+    "@asicupv/paella-opencast-component": "^2.0.1",
     "@tailwindcss/vite": "^4.1.11",
     "eslint-config-opencast": "file:../../docs/checkstyle/eslint-config",
     "express": "^5.1.0",
     "tailwindcss": "^4.1.11",
     "typescript": "^5.9.3",
-    "vite": "^7.0.1"
+    "vite": "^7.0.1",
+    "vite-plugin-static-copy": "^3.1.4"
   },
   "dependencies": {
     "@asicupv/paella-basic-plugins": "^2.5.0",
