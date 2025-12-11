@@ -84,9 +84,9 @@ public final class MediaPackageSupport {
   public static MediaPackage merge(MediaPackage dest, MediaPackage src, MergeMode mode) throws MediaPackageException {
     try {
       for (MediaPackageElement e : src.elements()) {
-        if (dest.getElementById(e.getIdentifier()) == null)
+        if (dest.getElementById(e.getIdentifier()) == null) {
           dest.add(e);
-        else {
+        } else {
           if (MergeMode.Replace == mode) {
             logger.debug("Replacing element " + e.getIdentifier() + " while merging " + dest + " with " + src);
             dest.remove(dest.getElementById(e.getIdentifier()));
@@ -119,8 +119,9 @@ public final class MediaPackageSupport {
    */
   public static boolean contains(String identifier, MediaPackage mp) {
     for (MediaPackageElement element : mp.getElements()) {
-      if (element.getIdentifier().equals(identifier))
+      if (element.getIdentifier().equals(identifier)) {
         return true;
+      }
     }
     return false;
   }

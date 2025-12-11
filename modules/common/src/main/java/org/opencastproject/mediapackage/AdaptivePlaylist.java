@@ -128,8 +128,9 @@ public interface AdaptivePlaylist extends Track {
    *           if bad file
    */
   static boolean checkForMaster(File file) throws IOException {
-    if (!isPlaylist(file))
+    if (!isPlaylist(file)) {
       return false;
+    }
     try (Stream<String> lines = Files.lines(file.toPath())) {
       return lines.map(masterPatt::matcher).anyMatch(Matcher::find);
     }
@@ -145,8 +146,9 @@ public interface AdaptivePlaylist extends Track {
    *           if bad file - can't access or otherwise
    */
   static boolean checkForVariant(File file) throws IOException {
-    if (!isPlaylist(file))
+    if (!isPlaylist(file)) {
       return false;
+    }
     try (Stream<String> lines = Files.lines(file.toPath())) {
       return lines.map(variantPatt::matcher).anyMatch(Matcher::find);
     }
@@ -168,8 +170,9 @@ public interface AdaptivePlaylist extends Track {
       files = (br.lines().map(l -> {
         if (!l.startsWith("#")) {
           Matcher m = filePatt.matcher(l);
-          if (m != null && m.matches())
+          if (m != null && m.matches()) {
             return m.group(0);
+          }
         }
         return null;
       }).collect(Collectors.toSet()));
@@ -195,8 +198,9 @@ public interface AdaptivePlaylist extends Track {
             .collect(Collectors.toSet());
     Set<String> variants = getVariants(file).stream().filter(isPlaylistPred).collect(Collectors.toSet());
 
-    if (!segmentsOnly)
+    if (!segmentsOnly) {
       allFiles.addAll(variants); // include the playlist
+    }
     allFiles.addAll(segments);
 
     for (String f : variants) {
@@ -238,8 +242,9 @@ public interface AdaptivePlaylist extends Track {
     final List<Track> segments = tracks.stream().filter(t -> t.getElementType() != MediaPackageElement.Type.Manifest)
             .collect(Collectors.toList());
     tracks.forEach(track -> setLogicalName(track));
-    if (master.isPresent())
+    if (master.isPresent()) {
       variants.forEach(t -> t.referTo(master.get())); // variants refer to master
+    }
     HashMap<String, Track> map = new HashMap<String, Track>();
     for (Track t : variants) {
       File f = getFileFromURI.apply(t.getURI());
@@ -267,8 +272,9 @@ public interface AdaptivePlaylist extends Track {
     for (Map.Entry<File, File> entry : map.entrySet()) {
       if (entry.getKey().toPath() != entry.getValue().toPath()) { // if different
         logger.debug("Move file from " + entry.getKey() + " to " + entry.getValue());
-        if (entry.getValue().exists())
+        if (entry.getValue().exists()) {
           FileUtils.forceDelete(entry.getValue()); // can redo this
+        }
         FileUtils.moveFile(entry.getKey(), entry.getValue());
       }
     }
@@ -276,8 +282,9 @@ public interface AdaptivePlaylist extends Track {
     HashMap<String, String> nameMap = new HashMap<String, String>();
     map.forEach((k, v) -> nameMap.put(k.getName(), v.getName()));
     for (File f : map.values()) {
-      if (isPlaylist(f))
+      if (isPlaylist(f)) {
         hlsRewriteFileReference(f, nameMap); // fix references
+      }
     }
     return new ArrayList<File>(map.values());
   }
@@ -340,8 +347,9 @@ public interface AdaptivePlaylist extends Track {
                 tmpLine = line.replaceFirst(matcher.group(1), mapNames.get(matcher.group(1)));
               }
               hlsReWriter.write(tmpLine);
-            } else
+            } else {
               hlsReWriter.write(line);
+            }
           } else {
             line = line.trim();
             String filename = FilenameUtils.getName(line);
@@ -350,12 +358,14 @@ public interface AdaptivePlaylist extends Track {
             } else if (mapNames.containsKey(filename)) {
               String newFileName = mapNames.get(FilenameUtils.getName(filename));
               String newPath = FilenameUtils.getPath(line);
-              if (newPath.isEmpty())
+              if (newPath.isEmpty()) {
                 hlsReWriter.write(newFileName);
-              else
+              } else {
                 hlsReWriter.write(FilenameUtils.concat(newPath, newFileName));
-            } else
+              }
+            } else {
               hlsReWriter.write(line);
+            }
           }
         }
         hlsReWriter.write(System.lineSeparator()); // new line
@@ -401,10 +411,11 @@ public interface AdaptivePlaylist extends Track {
     HashMap<String, String> nameMap = new HashMap<String, String>();
     Optional<Track> master = tracks.stream().filter(t -> t.isMaster()).findAny();
     List<Track> others = tracks.stream().filter(t -> !t.isMaster()).collect(Collectors.toList());
-    if (master.isPresent()) // Relativize all the files from the master playlist
+    if (master.isPresent()) { // Relativize all the files from the master playlist
       others.forEach(track -> {
         nameMap.put(track.getLogicalName(), track.getURI().relativize(master.get().getURI()).toString());
       });
+    }
     return nameMap;
   }
 
@@ -536,8 +547,9 @@ public interface AdaptivePlaylist extends Track {
         logger.info("Not a relative path " + p1 + " to " + p2);
         return p2.toFile();
       }
-    } else
+    } else {
       return p2.toFile();
+    }
   }
 
   /**
@@ -573,19 +585,22 @@ public interface AdaptivePlaylist extends Track {
     for (Track track : tracks) {
       Rep rep = new Rep(track, mpDir);
       nameMap.put(track.getLogicalName(), rep); // add all to nameMap
-      if (track.isMaster())
+      if (track.isMaster()) {
         master = rep; // track.getLogicalname();
-      if (!rep.isPlaylist)
+      }
+      if (!rep.isPlaylist) {
         segment = rep; // find any segment
+      }
     }
     if (segment == null) { // must have at least one segment
       throw new MediaPackageException("No playable media segment in mediapackage");
-
     }
+
     // Try to find master or use any playlist, if not found, throw exception
     Optional<Rep> oprep = nameMap.values().stream().filter(r -> r.parseForMaster()).findFirst();
-    if (!oprep.isPresent())
+    if (!oprep.isPresent()) {
       oprep = nameMap.values().parallelStream().filter(r -> r.isPlaylist).findFirst();
+    }
     oprep.orElseThrow(() -> new MediaPackageException("No playlist found, not HLS distribution"));
     master = oprep.get();
 
@@ -604,8 +619,9 @@ public interface AdaptivePlaylist extends Track {
     // on variant playlists, rewrite references to segments
     for (String logName : nameMap.keySet()) {
       Rep rep = nameMap.get(logName);
-      if (rep == master) // deal with master later
+      if (rep == master) { // deal with master later
         continue;
+      }
       if (!rep.isPlaylist) {
         newTracks.add(rep.track); // segments are unchanged
         continue;
@@ -617,8 +633,9 @@ public interface AdaptivePlaylist extends Track {
     // remap logical name to the new id for the variant files from above
     for (String logName : nameMap.keySet()) {
       Rep rep = nameMap.get(logName);
-      if (!rep.isPlaylist || rep == master)
+      if (!rep.isPlaylist || rep == master) {
         continue;
+      }
       String relPath = relativize(segment.origMpuri, rep.newMpuri);
       newNames.put(logName, relPath);
     }
@@ -629,8 +646,9 @@ public interface AdaptivePlaylist extends Track {
     // Update the logical names to keep referential integrity
     for (Track track : newTracks) {
       String newpath = newNames.get(track.getLogicalName());
-      if (newpath != null && track != master) // no file refers to master
+      if (newpath != null && track != master) { // no file refers to master
         track.setLogicalName(newpath);
+      }
     }
     newNames = null;
     return newTracks;
@@ -667,8 +685,9 @@ public interface AdaptivePlaylist extends Track {
     public HLSMediaPackageCheck(List<Track> tracks, Function<URI, File> getFileFromURI)
             throws IOException, MediaPackageException, URISyntaxException {
       this.reps = tracks.stream().map(t -> new Rep(t, getFileFromURI)).collect(Collectors.toList());
-      for (Rep rep : reps)
+      for (Rep rep : reps) {
         repMap.put(rep.name, rep);
+      }
       this.playlists = reps.stream().filter(r -> r.isPlaylist).collect(Collectors.toList());
       for (Rep trackRep : playlists) {
         if (checkForMaster(trackRep.origMpfile)) {
@@ -678,17 +697,20 @@ public interface AdaptivePlaylist extends Track {
         mapTracks(trackRep); // find relationships of playlist segments
       }
       this.segments = reps.stream().filter(r -> !r.isPlaylist).collect(Collectors.toList());
-      if (this.segments.size() < 1)
+      if (this.segments.size() < 1) {
         throw new MediaPackageException("No media segments");
+      }
     }
 
     // File references need to be fixed
     public boolean needsRewriting() {
-      if (this.playlists.size() == 0) // not HLS
+      if (this.playlists.size() == 0) { // not HLS
         return false;
+      }
       for (String s : fileMap.keySet()) { // paths are already corrected
-        if (!s.equals(fileMap.get(s)))
+        if (!s.equals(fileMap.get(s))) {
           return true;
+        }
       }
       return false;
     }
@@ -756,8 +778,9 @@ public interface AdaptivePlaylist extends Track {
       try {
         // Rewrite the variants and masters tracks in order and throw exception if there are any failures
         if (!(variants.stream().map(t -> rewriteTrack.apply(t)).allMatch(Boolean::valueOf)
-                && masters.stream().map(t -> rewriteTrack.apply(t)).allMatch(Boolean::valueOf)))
+                && masters.stream().map(t -> rewriteTrack.apply(t)).allMatch(Boolean::valueOf))) {
           throw new IOException("Cannot rewrite track");
+        }
 
         // if segments are referenced by variant - set the logical name used
         for (Rep segment : segments) {

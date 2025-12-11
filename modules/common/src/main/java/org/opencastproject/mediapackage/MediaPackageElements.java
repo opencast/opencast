@@ -87,7 +87,7 @@ public interface MediaPackageElements {
 
   /** Presentation player preview image flavor */
   MediaPackageElementFlavor PRESENTATION_PLAYER_PREVIEW = new MediaPackageElementFlavor("presentation",
-    "player+preview");
+      "player+preview");
 
   /** Presenter search result preview image flavor */
   MediaPackageElementFlavor PRESENTER_SEARCHRESULT_PREVIEW = new MediaPackageElementFlavor("presenter",

@@ -72,8 +72,9 @@ public final class VCell<A> extends Cell<A> {
   @Override
   protected Tuple<A, Object> change() {
     synchronized (lock) {
-      if (!stable)
+      if (!stable) {
         change += 1;
+      }
       return tuple(a, (Object) change);
     }
   }

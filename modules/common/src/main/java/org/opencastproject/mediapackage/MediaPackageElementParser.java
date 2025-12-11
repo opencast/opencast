@@ -60,8 +60,9 @@ public final class MediaPackageElementParser {
    *         if serialization failed
    */
   public static String getAsXml(MediaPackageElement element) throws MediaPackageException {
-    if (element == null)
+    if (element == null) {
       throw new IllegalArgumentException("Mediapackage element must not be null");
+    }
     StringWriter writer = new StringWriter();
     Marshaller m = null;
     try {
@@ -106,7 +107,9 @@ public final class MediaPackageElementParser {
    */
   public static String getArrayAsXml(Collection<? extends MediaPackageElement> elements) throws MediaPackageException {
     // TODO write real serialization function
-    if (elements == null || elements.isEmpty()) return "";
+    if (elements == null || elements.isEmpty()) {
+      return "";
+    }
     try {
       StringBuilder builder = new StringBuilder();
       Iterator<? extends MediaPackageElement> it = elements.iterator();
@@ -140,7 +143,9 @@ public final class MediaPackageElementParser {
       List<MediaPackageElement> elements = new LinkedList<MediaPackageElement>();
       String[] xmlArray = xml.split("###");
       for (String xmlElement : xmlArray) {
-        if ("".equals(xmlElement.trim())) continue;
+        if ("".equals(xmlElement.trim())) {
+          continue;
+        }
         elements.add(getFromXml(xmlElement.trim()));
       }
       return elements;

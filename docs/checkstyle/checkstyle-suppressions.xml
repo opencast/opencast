@@ -6,12 +6,9 @@
 
 <suppressions>
     <suppress checks="LineLength" files="modules/caption-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/common/.+\.(java|properties)"/>
 
-    <suppress checks="Indentation" files="modules/common/.+\.java"/>
     <suppress checks="Indentation" files="modules/metadata/.+\.java"/>
     <suppress checks="Indentation" files="modules/serviceregistry/.+\.java"/>
 
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/caption-impl/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/common/.+\.java"/>
 </suppressions>

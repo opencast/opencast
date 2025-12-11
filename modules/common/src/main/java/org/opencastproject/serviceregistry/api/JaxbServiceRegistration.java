@@ -223,8 +223,9 @@ public class JaxbServiceRegistration implements ServiceRegistration {
    * @param online
    */
   public void setOnline(boolean online) {
-    if (online && !isOnline())
+    if (online && !isOnline()) {
       setOnlineFrom(new Date());
+    }
     this.online = online;
   }
 
@@ -405,8 +406,9 @@ public class JaxbServiceRegistration implements ServiceRegistration {
    */
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof ServiceRegistration))
+    if (!(obj instanceof ServiceRegistration)) {
       return false;
+    }
     ServiceRegistration registration = (ServiceRegistration) obj;
     return getHost().equals(registration.getHost()) && getServiceType().equals(registration.getServiceType());
   }

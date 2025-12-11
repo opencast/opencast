@@ -173,7 +173,7 @@ public final class SecurityUtil {
    *           If the user doesn't have access.
    */
   public static void checkAgentAccess(final SecurityService securityService, final String agentId)
-      throws UnauthorizedException {
+          throws UnauthorizedException {
     if (isBlank(agentId)) {
       return;
     }

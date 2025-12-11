@@ -55,7 +55,8 @@ public class MediaPackageElementBuilderTest {
   }
 
   /**
-   * Test method for {@link org.opencastproject.mediapackage.MediaPackageElementBuilderImpl#elementFromURI(java.net.URI, org.opencastproject.mediapackage.MediaPackageElement.Type, MediaPackageElementFlavor)}.
+   * Test method for {@link org.opencastproject.mediapackage.MediaPackageElementBuilderImpl#elementFromURI(java.net.URI,
+   *        org.opencastproject.mediapackage.MediaPackageElement.Type, MediaPackageElementFlavor)}.
    */
   @Test
   public void testElementFromFile() {
@@ -72,7 +73,8 @@ public class MediaPackageElementBuilderTest {
 
   /**
    * Test method for
-   * {@link org.opencastproject.mediapackage.MediaPackageElementBuilderImpl#newElement(org.opencastproject.mediapackage.MediaPackageElement.Type type, MediaPackageElementFlavor flavor)}
+   * {@link org.opencastproject.mediapackage.MediaPackageElementBuilderImpl#newElement(
+   *        org.opencastproject.mediapackage.MediaPackageElement.Type type, MediaPackageElementFlavor flavor)}
    * .
    */
   @Test

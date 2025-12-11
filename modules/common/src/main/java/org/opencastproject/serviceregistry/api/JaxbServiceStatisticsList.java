@@ -46,8 +46,9 @@ public class JaxbServiceStatisticsList {
   }
 
   public JaxbServiceStatisticsList(Collection<ServiceStatistics> stats) {
-    for (ServiceStatistics stat : stats)
+    for (ServiceStatistics stat : stats) {
       this.stats.add((JaxbServiceStatistics) stat);
+    }
   }
 
   /**

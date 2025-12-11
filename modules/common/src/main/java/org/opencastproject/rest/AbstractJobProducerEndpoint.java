@@ -55,8 +55,9 @@ public abstract class AbstractJobProducerEndpoint {
   public Response dispatchJob(@FormParam("id") long jobId, @FormParam("operation") String jobOperation)
           throws ServiceRegistryException {
     final JobProducer service = getService();
-    if (service == null)
+    if (service == null) {
       throw new WebApplicationException(Status.SERVICE_UNAVAILABLE);
+    }
 
     // See if the service is ready to accept anything
     if (!service.isReadyToAcceptJobs(jobOperation)) {
