@@ -29,7 +29,6 @@
     <suppress checks="LineLength" files="modules/oaipmh-persistence/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/schema/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/serviceregistry/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/usertracking-impl/.+\.(java|properties)"/>
 
     <suppress checks="Indentation" files="modules/admin-ui/.+\.java"/>
     <suppress checks="Indentation" files="modules/capture-admin-service-impl/.+\.java"/>
@@ -72,5 +71,4 @@
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/oaipmh/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/schema/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/serviceregistry/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/usertracking-impl/.+\.java"/>
 </suppressions>
