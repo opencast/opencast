@@ -41,117 +41,143 @@ public class OcDublinCoreUtilTest {
     final DublinCoreCatalog target = OcDublinCoreUtil.toCatalog(source);
     run(OcDublinCore.class, new OcDublinCore() {
       @Override public Optional<String> getAbstract() {
-        assertEquals("abstract copy", source.getAbstract().orElse(null), target.getFirst(DublinCore.PROPERTY_ABSTRACT));
+        assertEquals("abstract copy", source.getAbstract().orElse(null),
+            target.getFirst(DublinCore.PROPERTY_ABSTRACT));
         return null;
       }
 
       @Override public Optional<String> getAccessRights() {
-        assertEquals("accessRights copy", source.getAccessRights().orElse(null), target.getFirst(DublinCore.PROPERTY_ACCESS_RIGHTS));
+        assertEquals("accessRights copy", source.getAccessRights().orElse(null),
+            target.getFirst(DublinCore.PROPERTY_ACCESS_RIGHTS));
         return null;
       }
 
       @Override public Optional<String> getAccrualMethod() {
-        assertEquals("accrualMethod copy", source.getAccrualMethod().orElse(null), target.getFirst(DublinCore.PROPERTY_ACCRUAL_METHOD));
+        assertEquals("accrualMethod copy", source.getAccrualMethod().orElse(null),
+            target.getFirst(DublinCore.PROPERTY_ACCRUAL_METHOD));
         return null;
       }
 
       @Override public Optional<String> getAccrualPeriodicity() {
-        assertEquals("accrualPeriodicity copy", source.getAccrualPeriodicity().orElse(null), target.getFirst(DublinCore.PROPERTY_ACCRUAL_PERIODICITY));
+        assertEquals("accrualPeriodicity copy", source.getAccrualPeriodicity().orElse(null),
+            target.getFirst(DublinCore.PROPERTY_ACCRUAL_PERIODICITY));
         return null;
       }
 
       @Override public Optional<String> getAccrualPolicy() {
-        assertEquals("accrualPolicy copy", source.getAccrualPolicy().orElse(null), target.getFirst(DublinCore.PROPERTY_ACCRUAL_POLICY));
+        assertEquals("accrualPolicy copy", source.getAccrualPolicy().orElse(null),
+            target.getFirst(DublinCore.PROPERTY_ACCRUAL_POLICY));
         return null;
       }
 
       @Override public Optional<String> getAlternative() {
-        assertEquals("alternative copy", source.getAlternative().orElse(null), target.getFirst(DublinCore.PROPERTY_ALTERNATIVE));
+        assertEquals("alternative copy", source.getAlternative().orElse(null),
+            target.getFirst(DublinCore.PROPERTY_ALTERNATIVE));
         return null;
       }
 
       @Override public Optional<String> getAudience() {
-        assertEquals("audience copy", source.getAudience().orElse(null), target.getFirst(DublinCore.PROPERTY_AUDIENCE));
+        assertEquals("audience copy", source.getAudience().orElse(null),
+            target.getFirst(DublinCore.PROPERTY_AUDIENCE));
         return null;
       }
 
       @Override public Optional<String> getAvailable() {
-        assertEquals("available copy", source.getAvailable().orElse(null), target.getFirst(DublinCore.PROPERTY_AVAILABLE));
+        assertEquals("available copy", source.getAvailable().orElse(null),
+            target.getFirst(DublinCore.PROPERTY_AVAILABLE));
         return null;
       }
 
       @Override public Optional<String> getBibliographicCitation() {
-        assertEquals("bibliographicCitation copy", source.getBibliographicCitation().orElse(null), target.getFirst(DublinCore.PROPERTY_BIBLIOGRAPHIC_CITATION));
+        assertEquals("bibliographicCitation copy", source.getBibliographicCitation().orElse(null),
+            target.getFirst(DublinCore.PROPERTY_BIBLIOGRAPHIC_CITATION));
         return null;
       }
 
       @Override public Optional<String> getConformsTo() {
-        assertEquals("conformsTo copy", source.getConformsTo().orElse(null), target.getFirst(DublinCore.PROPERTY_CONFORMS_TO));
+        assertEquals("conformsTo copy", source.getConformsTo().orElse(null),
+            target.getFirst(DublinCore.PROPERTY_CONFORMS_TO));
         return null;
       }
 
       @Override public Optional<String> getContributor() {
-        assertEquals("contributor copy", source.getContributor().orElse(null), target.getFirst(DublinCore.PROPERTY_CONTRIBUTOR));
+        assertEquals("contributor copy", source.getContributor().orElse(null),
+            target.getFirst(DublinCore.PROPERTY_CONTRIBUTOR));
         return null;
       }
 
       @Override public Optional<String> getCoverage() {
-        assertEquals("coverage copy", source.getCoverage().orElse(null), target.getFirst(DublinCore.PROPERTY_COVERAGE));
+        assertEquals("coverage copy", source.getCoverage().orElse(null),
+            target.getFirst(DublinCore.PROPERTY_COVERAGE));
         return null;
       }
 
       @Override public Date getCreated() {
-        assertEquals("created copy", encodeCreated(source.getCreated()), target.getFirstVal(DublinCore.PROPERTY_CREATED));
+        assertEquals("created copy", encodeCreated(source.getCreated()),
+            target.getFirstVal(DublinCore.PROPERTY_CREATED));
         return null;
       }
 
       @Override public Optional<String> getCreator() {
-        assertEquals("creator copy", source.getCreator().orElse(null), target.getFirst(DublinCore.PROPERTY_CREATOR));
+        assertEquals("creator copy", source.getCreator().orElse(null),
+            target.getFirst(DublinCore.PROPERTY_CREATOR));
         return null;
       }
 
       @Override public Optional<Date> getDate() {
-        assertEquals("date copy", source.getDate().map(OcDublinCoreUtil::encodeDate).orElse(null), target.getFirstVal(DublinCore.PROPERTY_DATE));
+        assertEquals("date copy", source.getDate().map(OcDublinCoreUtil::encodeDate).orElse(null),
+            target.getFirstVal(DublinCore.PROPERTY_DATE));
         return null;
       }
 
       @Override public Optional<Date> getDateAccepted() {
-        assertEquals("dateAccepted copy", source.getDateAccepted().map(OcDublinCoreUtil::encodeDateAccepted).orElse(null), target.getFirstVal(DublinCore.PROPERTY_DATE_ACCEPTED));
+        assertEquals("dateAccepted copy",
+            source.getDateAccepted().map(OcDublinCoreUtil::encodeDateAccepted).orElse(null),
+            target.getFirstVal(DublinCore.PROPERTY_DATE_ACCEPTED));
         return null;
       }
 
       @Override public Optional<Date> getDateCopyrighted() {
-        assertEquals("dateCopyrighted copy", source.getDateCopyrighted().map(OcDublinCoreUtil::encodeDateCopyrighted).orElse(null), target.getFirstVal(DublinCore.PROPERTY_DATE_COPYRIGHTED));
+        assertEquals("dateCopyrighted copy",
+            source.getDateCopyrighted().map(OcDublinCoreUtil::encodeDateCopyrighted).orElse(null),
+            target.getFirstVal(DublinCore.PROPERTY_DATE_COPYRIGHTED));
         return null;
       }
 
       @Override public Optional<Date> getDateSubmitted() {
-        assertEquals("dateSubmitted copy", source.getDateSubmitted().map(OcDublinCoreUtil::encodeDateSubmitted).orElse(null), target.getFirstVal(DublinCore.PROPERTY_DATE_SUBMITTED));
+        assertEquals("dateSubmitted copy",
+            source.getDateSubmitted().map(OcDublinCoreUtil::encodeDateSubmitted).orElse(null),
+            target.getFirstVal(DublinCore.PROPERTY_DATE_SUBMITTED));
         return null;
       }
 
       @Override public Optional<String> getDescription() {
-        assertEquals("description copy", source.getDescription().orElse(null), target.getFirst(DublinCore.PROPERTY_DESCRIPTION));
+        assertEquals("description copy", source.getDescription().orElse(null),
+            target.getFirst(DublinCore.PROPERTY_DESCRIPTION));
         return null;
       }
 
       @Override public Optional<String> getEducationLevel() {
-        assertEquals("educationLevel copy", source.getEducationLevel().orElse(null), target.getFirst(DublinCore.PROPERTY_EDUCATION_LEVEL));
+        assertEquals("educationLevel copy", source.getEducationLevel().orElse(null),
+            target.getFirst(DublinCore.PROPERTY_EDUCATION_LEVEL));
         return null;
       }
 
       @Override public Optional<Long> getExtent() {
-        assertEquals("extent copy", source.getExtent().orElse(null), (Long) Long.parseLong(target.getFirst(DublinCore.PROPERTY_EXTENT)));
+        assertEquals("extent copy", source.getExtent().orElse(null),
+            (Long) Long.parseLong(target.getFirst(DublinCore.PROPERTY_EXTENT)));
         return null;
       }
 
       @Override public Optional<String> getFormat() {
-        assertEquals("format copy", source.getFormat().orElse(null), target.getFirst(DublinCore.PROPERTY_FORMAT));
+        assertEquals("format copy", source.getFormat().orElse(null),
+            target.getFirst(DublinCore.PROPERTY_FORMAT));
         return null;
       }
 
       @Override public Optional<String> getHasFormat() {
-        assertEquals("hasFormat copy", source.getHasFormat().orElse(null), target.getFirst(DublinCore.PROPERTY_HAS_FORMAT));
+        assertEquals("hasFormat copy", source.getHasFormat().orElse(null),
+            target.getFirst(DublinCore.PROPERTY_HAS_FORMAT));
         return null;
       }
 
@@ -161,57 +187,68 @@ public class OcDublinCoreUtilTest {
       }
 
       @Override public Optional<String> getHasVersion() {
-        assertEquals("hasVersion copy", source.getHasVersion().orElse(null), target.getFirst(DublinCore.PROPERTY_HAS_VERSION));
+        assertEquals("hasVersion copy", source.getHasVersion().orElse(null),
+            target.getFirst(DublinCore.PROPERTY_HAS_VERSION));
         return null;
       }
 
       @Override public Optional<String> getIdentifier() {
-        assertEquals("identifier copy", source.getIdentifier().orElse(null), target.getFirst(DublinCore.PROPERTY_IDENTIFIER));
+        assertEquals("identifier copy", source.getIdentifier().orElse(null),
+            target.getFirst(DublinCore.PROPERTY_IDENTIFIER));
         return null;
       }
 
       @Override public Optional<String> getInstructionalMethod() {
-        assertEquals("instructionalMethod copy", source.getInstructionalMethod().orElse(null), target.getFirst(DublinCore.PROPERTY_INSTRUCTIONAL_METHOD));
+        assertEquals("instructionalMethod copy", source.getInstructionalMethod().orElse(null),
+            target.getFirst(DublinCore.PROPERTY_INSTRUCTIONAL_METHOD));
         return null;
       }
 
       @Override public Optional<String> getIsFormatOf() {
-        assertEquals("isFormatOf copy", source.getIsFormatOf().orElse(null), target.getFirst(DublinCore.PROPERTY_IS_FORMAT_OF));
+        assertEquals("isFormatOf copy", source.getIsFormatOf().orElse(null),
+            target.getFirst(DublinCore.PROPERTY_IS_FORMAT_OF));
         return null;
       }
 
       @Override public Optional<String> getIsPartOf() {
-        assertEquals("isPartOf copy", source.getIsPartOf().orElse(null), target.getFirst(DublinCore.PROPERTY_IS_PART_OF));
+        assertEquals("isPartOf copy", source.getIsPartOf().orElse(null),
+            target.getFirst(DublinCore.PROPERTY_IS_PART_OF));
         return null;
       }
 
       @Override public Optional<String> getIsReferencedBy() {
-        assertEquals("isReferencedBy copy", source.getIsReferencedBy().orElse(null), target.getFirst(DublinCore.PROPERTY_IS_REFERENCED_BY));
+        assertEquals("isReferencedBy copy", source.getIsReferencedBy().orElse(null),
+            target.getFirst(DublinCore.PROPERTY_IS_REFERENCED_BY));
         return null;
       }
 
       @Override public Optional<String> getIsReplacedBy() {
-        assertEquals("isReplacedBy copy", source.getIsReplacedBy().orElse(null), target.getFirst(DublinCore.PROPERTY_IS_REPLACED_BY));
+        assertEquals("isReplacedBy copy", source.getIsReplacedBy().orElse(null),
+            target.getFirst(DublinCore.PROPERTY_IS_REPLACED_BY));
         return null;
       }
 
       @Override public Optional<String> getIsRequiredBy() {
-        assertEquals("isRequiredBy copy", source.getIsRequiredBy().orElse(null), target.getFirst(DublinCore.PROPERTY_IS_REQUIRED_BY));
+        assertEquals("isRequiredBy copy", source.getIsRequiredBy().orElse(null),
+            target.getFirst(DublinCore.PROPERTY_IS_REQUIRED_BY));
         return null;
       }
 
       @Override public Optional<String> getIssued() {
-        assertEquals("issued copy", source.getIssued().orElse(null), target.getFirst(DublinCore.PROPERTY_ISSUED));
+        assertEquals("issued copy", source.getIssued().orElse(null),
+            target.getFirst(DublinCore.PROPERTY_ISSUED));
         return null;
       }
 
       @Override public Optional<String> getIsVersionOf() {
-        assertEquals("isVersionOf copy", source.getIsVersionOf().orElse(null), target.getFirst(DublinCore.PROPERTY_IS_VERSION_OF));
+        assertEquals("isVersionOf copy", source.getIsVersionOf().orElse(null),
+            target.getFirst(DublinCore.PROPERTY_IS_VERSION_OF));
         return null;
       }
 
       @Override public Optional<String> getLanguage() {
-        assertEquals("language copy", source.getLanguage().orElse(null), target.getFirst(DublinCore.PROPERTY_LANGUAGE));
+        assertEquals("language copy", source.getLanguage().orElse(null),
+            target.getFirst(DublinCore.PROPERTY_LANGUAGE));
         return null;
       }
 
@@ -236,17 +273,20 @@ public class OcDublinCoreUtilTest {
       }
 
       @Override public Optional<String> getProvenance() {
-        assertEquals("provenance copy", source.getProvenance().orElse(null), target.getFirst(DublinCore.PROPERTY_PROVENANCE));
+        assertEquals("provenance copy", source.getProvenance().orElse(null),
+            target.getFirst(DublinCore.PROPERTY_PROVENANCE));
         return null;
       }
 
       @Override public Optional<String> getPublisher() {
-        assertEquals("publisher copy", source.getPublisher().orElse(null), target.getFirst(DublinCore.PROPERTY_PUBLISHER));
+        assertEquals("publisher copy", source.getPublisher().orElse(null),
+            target.getFirst(DublinCore.PROPERTY_PUBLISHER));
         return null;
       }
 
       @Override public Optional<String> getReferences() {
-        assertEquals("references copy", source.getReferences().orElse(null), target.getFirst(DublinCore.PROPERTY_REFERENCES));
+        assertEquals("references copy", source.getReferences().orElse(null),
+            target.getFirst(DublinCore.PROPERTY_REFERENCES));
         return null;
       }
 
@@ -271,7 +311,8 @@ public class OcDublinCoreUtilTest {
       }
 
       @Override public Optional<String> getRightsHolder() {
-        assertEquals("rightsHolder copy", source.getRightsHolder().orElse(null), target.getFirst(DublinCore.PROPERTY_RIGHTS_HOLDER));
+        assertEquals("rightsHolder copy", source.getRightsHolder().orElse(null),
+            target.getFirst(DublinCore.PROPERTY_RIGHTS_HOLDER));
         return null;
       }
 
@@ -291,7 +332,8 @@ public class OcDublinCoreUtilTest {
       }
 
       @Override public Optional<String> getTableOfContents() {
-        assertEquals("tableOfContents copy", source.getTableOfContents().orElse(null), target.getFirst(DublinCore.PROPERTY_TABLE_OF_CONTENTS));
+        assertEquals("tableOfContents copy", source.getTableOfContents().orElse(null),
+            target.getFirst(DublinCore.PROPERTY_TABLE_OF_CONTENTS));
         return null;
       }
 
@@ -363,7 +405,8 @@ public class OcDublinCoreUtilTest {
       }
 
       @Override public Optional<String> getBibliographicCitation() {
-        assertEquals("bibliographicCitation copy", source.getBibliographicCitation().orElse(null), target.bibliographicCitation);
+        assertEquals("bibliographicCitation copy", source.getBibliographicCitation().orElse(null),
+            target.bibliographicCitation);
         return null;
       }
 
@@ -453,7 +496,8 @@ public class OcDublinCoreUtilTest {
       }
 
       @Override public Optional<String> getInstructionalMethod() {
-        assertEquals("instructionalMethod copy", source.getInstructionalMethod().orElse(null), target.instructionalMethod);
+        assertEquals("instructionalMethod copy", source.getInstructionalMethod().orElse(null),
+            target.instructionalMethod);
         return null;
       }
 

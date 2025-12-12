@@ -100,8 +100,8 @@ public class SpatioTemporalDecompositionImpl implements SpatioTemporalDecomposit
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.metadata.mpeg7.SpatioTemporalDecomposition#addVideoText(org.opencastproject.metadata.mpeg7.Textual,
-   *      java.awt.Rectangle, org.opencastproject.metadata.mpeg7.MediaTime)
+   * @see org.opencastproject.metadata.mpeg7.SpatioTemporalDecomposition#addVideoText(
+   *      org.opencastproject.metadata.mpeg7.Textual, java.awt.Rectangle, org.opencastproject.metadata.mpeg7.MediaTime)
    */
   public VideoText addVideoText(Textual text, Rectangle boundary, MediaTime time) {
     VideoText videoText = new VideoTextImpl("videotext-" + videoTexts.size(), text, boundary, time);
@@ -112,7 +112,8 @@ public class SpatioTemporalDecompositionImpl implements SpatioTemporalDecomposit
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.metadata.mpeg7.SpatioTemporalDecomposition#addVideoText(org.opencastproject.metadata.mpeg7.VideoText)
+   * @see org.opencastproject.metadata.mpeg7.SpatioTemporalDecomposition#addVideoText(
+   *      org.opencastproject.metadata.mpeg7.VideoText)
    */
   @Override
   public void addVideoText(VideoText videoText) {
@@ -137,8 +138,9 @@ public class SpatioTemporalDecompositionImpl implements SpatioTemporalDecomposit
   @Override
   public VideoText getVideoText(String id) {
     for (VideoText videoText : videoTexts) {
-      if (id.equals(videoText.getIdentifier()))
+      if (id.equals(videoText.getIdentifier())) {
         return videoText;
+      }
     }
     return null;
   }

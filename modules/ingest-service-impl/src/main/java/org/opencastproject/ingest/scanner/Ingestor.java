@@ -167,203 +167,204 @@ public class Ingestor implements Runnable {
     @Override
     public RetriableIngestJob call() {
       return secCtx.runInContext(() -> {
-          if (hasFailed()) {
-            logger.warn("This is retry number {} for file {}. We will wait for {} seconds before trying again",
-                    retryCount, artifact.getName(), secondsBetweenTries);
-            throttle.acquire();
-          }
-          try (InputStream in = new FileInputStream(artifact)) {
-            failed = false;
-            ++retryCount;
-            if ("zip".equalsIgnoreCase(FilenameUtils.getExtension(artifact.getName()))) {
-              logger.info("Start ingest inbox file {} as a zipped mediapackage", artifact.getName());
-              WorkflowInstance workflowInstance = ingestService.addZippedMediaPackage(in, workflowDefinition, workflowConfig);
-              logger.info("Ingested {} as a zipped mediapackage from inbox as {}. Started workflow {}.",
-                      artifact.getName(), workflowInstance.getMediaPackage().getIdentifier().toString(),
-                      workflowInstance.getId());
-            } else {
-              /* Create MediaPackage and add Track */
-              logger.info("Start ingest track from file {}", artifact.getName());
+        if (hasFailed()) {
+          logger.warn("This is retry number {} for file {}. We will wait for {} seconds before trying again",
+                  retryCount, artifact.getName(), secondsBetweenTries);
+          throttle.acquire();
+        }
+        try (InputStream in = new FileInputStream(artifact)) {
+          failed = false;
+          ++retryCount;
+          if ("zip".equalsIgnoreCase(FilenameUtils.getExtension(artifact.getName()))) {
+            logger.info("Start ingest inbox file {} as a zipped mediapackage", artifact.getName());
+            WorkflowInstance workflowInstance = ingestService.addZippedMediaPackage(in, workflowDefinition,
+                workflowConfig);
+            logger.info("Ingested {} as a zipped mediapackage from inbox as {}. Started workflow {}.",
+                    artifact.getName(), workflowInstance.getMediaPackage().getIdentifier().toString(),
+                    workflowInstance.getId());
+          } else {
+            /* Create MediaPackage and add Track */
+            logger.info("Start ingest track from file {}", artifact.getName());
 
-              // Try extracting metadata from the file name and path
-              String title = artifact.getName();
-              String spatial = null;
-              Date created = null;
-              Float duration = null;
-              if (metadataPattern.isPresent()) {
-                var matcher = metadataPattern.get().matcher(artifact.getName());
-                if (matcher.find()) {
-                  try {
-                    title = matcher.group("title");
-                  } catch (IllegalArgumentException e) {
-                    logger.debug("{} matches no 'title' in {}", metadataPattern.get(), artifact.getName(), e);
-                  }
-                  try {
-                    spatial = matcher.group("spatial");
-                  } catch (IllegalArgumentException e) {
-                    logger.debug("{} matches no 'spatial' in {}", metadataPattern.get(), artifact.getName(), e);
-                  }
-                  try {
-                    var value = matcher.group("created");
-                    logger.debug("Trying to parse matched date '{}' with formatter {}", value, dateFormatter);
-                    created = Timestamp.valueOf(LocalDateTime.parse(value, dateFormatter));
-                  } catch (DateTimeParseException e) {
-                    logger.warn("Matched date does not match configured date-time format", e);
-                  } catch (IllegalArgumentException e) {
-                    logger.debug("{} matches no 'created' in {}", metadataPattern.get(), artifact.getName(), e);
-                  }
-                } else {
-                  logger.debug("Regular expression {} does not match {}", metadataPattern.get(), artifact.getName());
+            // Try extracting metadata from the file name and path
+            String title = artifact.getName();
+            String spatial = null;
+            Date created = null;
+            Float duration = null;
+            if (metadataPattern.isPresent()) {
+              var matcher = metadataPattern.get().matcher(artifact.getName());
+              if (matcher.find()) {
+                try {
+                  title = matcher.group("title");
+                } catch (IllegalArgumentException e) {
+                  logger.debug("{} matches no 'title' in {}", metadataPattern.get(), artifact.getName(), e);
                 }
+                try {
+                  spatial = matcher.group("spatial");
+                } catch (IllegalArgumentException e) {
+                  logger.debug("{} matches no 'spatial' in {}", metadataPattern.get(), artifact.getName(), e);
+                }
+                try {
+                  var value = matcher.group("created");
+                  logger.debug("Trying to parse matched date '{}' with formatter {}", value, dateFormatter);
+                  created = Timestamp.valueOf(LocalDateTime.parse(value, dateFormatter));
+                } catch (DateTimeParseException e) {
+                  logger.warn("Matched date does not match configured date-time format", e);
+                } catch (IllegalArgumentException e) {
+                  logger.debug("{} matches no 'created' in {}", metadataPattern.get(), artifact.getName(), e);
+                }
+              } else {
+                logger.debug("Regular expression {} does not match {}", metadataPattern.get(), artifact.getName());
               }
-
-              // Try extracting additional metadata via ffprobe
-              if (ffprobe != null) {
-                JsonFormat json = probeMedia(artifact.getAbsolutePath()).format;
-                created = json.tags.getCreationTime() == null ? created : json.tags.getCreationTime();
-                duration = json.getDuration();
-                logger.debug("Extracted metadata from file: {}", json);
-              }
-
-              MediaPackage mediaPackage = null;
-              var currentWorkflowDefinition = workflowDefinition;
-              var currentWorkflowConfig = workflowConfig;
-
-              // Check if we can match this to a scheduled event
-              if (matchSchedule && spatial != null && created != null) {
-                logger.debug("Try finding scheduled event for agent {} at time {}", spatial, created);
-                var end = duration == null ? created : DateUtils.addSeconds(created, duration.intValue());
-                var mediaPackages = schedulerService.findConflictingEvents(spatial, created, end);
-                if (matchThreshold > 0F && mediaPackages.size() > 1) {
-                  var filteredMediaPackages = new ArrayList<MediaPackage>();
-                  for (var mp : mediaPackages) {
-                    var schedule =  schedulerService.getTechnicalMetadata(mp.getIdentifier().toString());
-                    if (overlap(schedule.getStartDate(), schedule.getEndDate(), created, end) > matchThreshold) {
-                      filteredMediaPackages.add(mp);
-                    }
-                  }
-                  mediaPackages = filteredMediaPackages;
-                }
-                if (mediaPackages.size() > 1) {
-                  logger.warn("Metadata match multiple events. Not using any!");
-                } else if (mediaPackages.size() == 1) {
-                  mediaPackage = mediaPackages.get(0);
-                  var id = mediaPackage.getIdentifier().toString();
-                  var eventConfiguration = schedulerService.getCaptureAgentConfiguration(id);
-
-                  // Check if the scheduled event already has a recording associated with it
-                  // If so, ingest the file as a new event
-                  try {
-                    Recording recordingState = schedulerService.getRecordingState(id);
-                    if (recordingState.getState().equals(UPLOAD_FINISHED)) {
-                      var referenceId = mediaPackage.getIdentifier().toString();
-                      mediaPackage = (MediaPackage) mediaPackage.clone();
-                      mediaPackage.setIdentifier(IdImpl.fromUUID());
-
-                      // Drop copied media files. We don't want them in the new event
-                      for (Track track : mediaPackage.getTracks()) {
-                        logger.info("Remove track: " + track);
-                        mediaPackage.remove(track);
-                      }
-
-                      // Update dublincore title and set reference to originally scheduled event
-                      try {
-                        DublinCoreCatalog dc = DublinCoreUtil.loadEpisodeDublinCore(workspace, mediaPackage).get();
-                        var newTitle = dc.get(DublinCore.PROPERTY_TITLE).get(0).getValue()
-                                + " (" + Instant.now().getEpochSecond() + ")";
-                        dc.set(DublinCore.PROPERTY_TITLE, newTitle);
-                        dc.set(DublinCore.PROPERTY_REFERENCES, referenceId);
-                        mediaPackage = updateDublincCoreCatalog(mediaPackage, dc);
-                        mediaPackage.setTitle(newTitle);
-                      } catch (Exception e) {
-                        // Don't fail the ingest if we could not set metadata for some reason
-                      }
-                    }
-                  } catch (NotFoundException e) {
-                    // Occurs if a scheduled event has not started yet
-                  }
-
-                  currentWorkflowDefinition = eventConfiguration.getOrDefault(
-                          "org.opencastproject.workflow.definition",
-                          workflowDefinition);
-                  currentWorkflowConfig = eventConfiguration.entrySet().stream()
-                          .filter(e -> e.getKey().startsWith("org.opencastproject.workflow.config."))
-                          .collect(Collectors.toMap(e -> e.getKey().substring(36), Map.Entry::getValue));
-                  schedulerService.updateRecordingState(id, UPLOAD_FINISHED);
-                  logger.info("Found matching scheduled event {}", mediaPackage);
-                } else {
-                  logger.debug("No matching event found.");
-                }
-              }
-
-              // create new media package and metadata catalog if we have none
-              if (mediaPackage == null) {
-                // create new media package
-                mediaPackage = ingestService.createMediaPackage();
-
-                DublinCoreCatalog dcc = DublinCores.mkOpencastEpisode().getCatalog();
-                if (spatial != null) {
-                  dcc.add(DublinCore.PROPERTY_SPATIAL, spatial);
-                }
-                if (created != null) {
-                  dcc.add(DublinCore.PROPERTY_CREATED, EncodingSchemeUtils.encodeDate(created, Precision.Second));
-                }
-                // fall back to filename for title if matcher did not catch any
-                dcc.add(DublinCore.PROPERTY_TITLE, title);
-
-                /* Check if we have a subdir and if its name matches an existing series */
-                final File dir = artifact.getParentFile();
-                if (FileUtils.directoryContains(inbox, dir)) {
-                  /* cut away inbox path and trailing slash from artifact path */
-                  var seriesID = dir.getName();
-                  if (seriesService.getSeries(seriesID) != null) {
-                    logger.info("Ingest from inbox into series with id {}", seriesID);
-                    dcc.add(DublinCore.PROPERTY_IS_PART_OF, seriesID);
-                  }
-                }
-
-                try (ByteArrayOutputStream dcout = new ByteArrayOutputStream()) {
-                  dcc.toXml(dcout, true);
-                  try (InputStream dcin = new ByteArrayInputStream(dcout.toByteArray())) {
-                    mediaPackage = ingestService.addCatalog(dcin, "dublincore.xml", MediaPackageElements.EPISODE,
-                            mediaPackage);
-                    logger.info("Added DC catalog to media package for ingest from inbox");
-                  }
-                }
-              }
-
-              // Ingest media
-              mediaPackage = ingestService.addTrack(in, artifact.getName(), mediaFlavor, mediaPackage);
-              logger.info("Ingested track from file {} to media package {}",
-                      artifact.getName(), mediaPackage.getIdentifier().toString());
-
-              // Ingest media package
-              WorkflowInstance workflowInstance = ingestService.ingest(mediaPackage, currentWorkflowDefinition,
-                      currentWorkflowConfig);
-              logger.info("Ingested {} from inbox, workflow {} started", artifact.getName(), workflowInstance.getId());
             }
-          } catch (Exception e) {
-            logger.error("Error ingesting inbox file {}", artifact.getName(), e);
-            failed = true;
-            return RetriableIngestJob.this;
+
+            // Try extracting additional metadata via ffprobe
+            if (ffprobe != null) {
+              JsonFormat json = probeMedia(artifact.getAbsolutePath()).format;
+              created = json.tags.getCreationTime() == null ? created : json.tags.getCreationTime();
+              duration = json.getDuration();
+              logger.debug("Extracted metadata from file: {}", json);
+            }
+
+            MediaPackage mediaPackage = null;
+            var currentWorkflowDefinition = workflowDefinition;
+            var currentWorkflowConfig = workflowConfig;
+
+            // Check if we can match this to a scheduled event
+            if (matchSchedule && spatial != null && created != null) {
+              logger.debug("Try finding scheduled event for agent {} at time {}", spatial, created);
+              var end = duration == null ? created : DateUtils.addSeconds(created, duration.intValue());
+              var mediaPackages = schedulerService.findConflictingEvents(spatial, created, end);
+              if (matchThreshold > 0F && mediaPackages.size() > 1) {
+                var filteredMediaPackages = new ArrayList<MediaPackage>();
+                for (var mp : mediaPackages) {
+                  var schedule =  schedulerService.getTechnicalMetadata(mp.getIdentifier().toString());
+                  if (overlap(schedule.getStartDate(), schedule.getEndDate(), created, end) > matchThreshold) {
+                    filteredMediaPackages.add(mp);
+                  }
+                }
+                mediaPackages = filteredMediaPackages;
+              }
+              if (mediaPackages.size() > 1) {
+                logger.warn("Metadata match multiple events. Not using any!");
+              } else if (mediaPackages.size() == 1) {
+                mediaPackage = mediaPackages.get(0);
+                var id = mediaPackage.getIdentifier().toString();
+                var eventConfiguration = schedulerService.getCaptureAgentConfiguration(id);
+
+                // Check if the scheduled event already has a recording associated with it
+                // If so, ingest the file as a new event
+                try {
+                  Recording recordingState = schedulerService.getRecordingState(id);
+                  if (recordingState.getState().equals(UPLOAD_FINISHED)) {
+                    var referenceId = mediaPackage.getIdentifier().toString();
+                    mediaPackage = (MediaPackage) mediaPackage.clone();
+                    mediaPackage.setIdentifier(IdImpl.fromUUID());
+
+                    // Drop copied media files. We don't want them in the new event
+                    for (Track track : mediaPackage.getTracks()) {
+                      logger.info("Remove track: " + track);
+                      mediaPackage.remove(track);
+                    }
+
+                    // Update dublincore title and set reference to originally scheduled event
+                    try {
+                      DublinCoreCatalog dc = DublinCoreUtil.loadEpisodeDublinCore(workspace, mediaPackage).get();
+                      var newTitle = dc.get(DublinCore.PROPERTY_TITLE).get(0).getValue()
+                              + " (" + Instant.now().getEpochSecond() + ")";
+                      dc.set(DublinCore.PROPERTY_TITLE, newTitle);
+                      dc.set(DublinCore.PROPERTY_REFERENCES, referenceId);
+                      mediaPackage = updateDublincCoreCatalog(mediaPackage, dc);
+                      mediaPackage.setTitle(newTitle);
+                    } catch (Exception e) {
+                      // Don't fail the ingest if we could not set metadata for some reason
+                    }
+                  }
+                } catch (NotFoundException e) {
+                  // Occurs if a scheduled event has not started yet
+                }
+
+                currentWorkflowDefinition = eventConfiguration.getOrDefault(
+                        "org.opencastproject.workflow.definition",
+                        workflowDefinition);
+                currentWorkflowConfig = eventConfiguration.entrySet().stream()
+                        .filter(e -> e.getKey().startsWith("org.opencastproject.workflow.config."))
+                        .collect(Collectors.toMap(e -> e.getKey().substring(36), Map.Entry::getValue));
+                schedulerService.updateRecordingState(id, UPLOAD_FINISHED);
+                logger.info("Found matching scheduled event {}", mediaPackage);
+              } else {
+                logger.debug("No matching event found.");
+              }
+            }
+
+            // create new media package and metadata catalog if we have none
+            if (mediaPackage == null) {
+              // create new media package
+              mediaPackage = ingestService.createMediaPackage();
+
+              DublinCoreCatalog dcc = DublinCores.mkOpencastEpisode().getCatalog();
+              if (spatial != null) {
+                dcc.add(DublinCore.PROPERTY_SPATIAL, spatial);
+              }
+              if (created != null) {
+                dcc.add(DublinCore.PROPERTY_CREATED, EncodingSchemeUtils.encodeDate(created, Precision.Second));
+              }
+              // fall back to filename for title if matcher did not catch any
+              dcc.add(DublinCore.PROPERTY_TITLE, title);
+
+              /* Check if we have a subdir and if its name matches an existing series */
+              final File dir = artifact.getParentFile();
+              if (FileUtils.directoryContains(inbox, dir)) {
+                /* cut away inbox path and trailing slash from artifact path */
+                var seriesID = dir.getName();
+                if (seriesService.getSeries(seriesID) != null) {
+                  logger.info("Ingest from inbox into series with id {}", seriesID);
+                  dcc.add(DublinCore.PROPERTY_IS_PART_OF, seriesID);
+                }
+              }
+
+              try (ByteArrayOutputStream dcout = new ByteArrayOutputStream()) {
+                dcc.toXml(dcout, true);
+                try (InputStream dcin = new ByteArrayInputStream(dcout.toByteArray())) {
+                  mediaPackage = ingestService.addCatalog(dcin, "dublincore.xml", MediaPackageElements.EPISODE,
+                          mediaPackage);
+                  logger.info("Added DC catalog to media package for ingest from inbox");
+                }
+              }
+            }
+
+            // Ingest media
+            mediaPackage = ingestService.addTrack(in, artifact.getName(), mediaFlavor, mediaPackage);
+            logger.info("Ingested track from file {} to media package {}",
+                    artifact.getName(), mediaPackage.getIdentifier().toString());
+
+            // Ingest media package
+            WorkflowInstance workflowInstance = ingestService.ingest(mediaPackage, currentWorkflowDefinition,
+                    currentWorkflowConfig);
+            logger.info("Ingested {} from inbox, workflow {} started", artifact.getName(), workflowInstance.getId());
           }
-          try {
-            FileUtils.forceDelete(artifact);
-          } catch (IOException e) {
-            logger.error("Unable to delete file {}", artifact.getAbsolutePath(), e);
-          }
+        } catch (Exception e) {
+          logger.error("Error ingesting inbox file {}", artifact.getName(), e);
+          failed = true;
           return RetriableIngestJob.this;
+        }
+        try {
+          FileUtils.forceDelete(artifact);
+        } catch (IOException e) {
+          logger.error("Unable to delete file {}", artifact.getAbsolutePath(), e);
+        }
+        return RetriableIngestJob.this;
       });
     }
 
     private JsonFFprobe probeMedia(final String file) throws IOException {
 
       final String[] command = new String[] {
-              ffprobe,
-              "-show_format",
-              "-of",
-              "json",
-              file
+          ffprobe,
+          "-show_format",
+          "-of",
+          "json",
+          file
       };
 
       // Execute ffprobe and obtain the result
@@ -445,8 +446,8 @@ public class Ingestor implements Runnable {
    * Create new ingestor.
    *
    * @param ingestService         media packages are passed to the ingest service
-   * @param secCtx                security context needed for ingesting with the IngestService or for putting files into the working file
-   *                              repository
+   * @param secCtx                security context needed for ingesting with the IngestService or for putting files
+   *                              into the working file repository
    * @param workflowDefinition    workflow to apply to ingested media packages
    * @param workflowConfig        the workflow definition configuration
    * @param mediaFlavor           media flavor to use by default
