@@ -42,7 +42,8 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * The matterhorn-inlined metadata provider provides whole media packages, series and episode DublinCores and series ACLs.
+ * The matterhorn-inlined metadata provider provides whole media packages, series and episode DublinCores and
+ * series ACLs.
  */
 public class MatterhornInlinedMetadataProvider implements MetadataProvider {
   private static final URL SCHEMA_URL = url("http://www.opencastproject.org/oai/matterhorn-inlined.xsd");

@@ -140,8 +140,8 @@ public abstract class OaiXmlGen extends XmlGen {
     if (result.size() == result.getLimit()) {
       SearchResultItem lastResult = result.getItems().get((int) (result.size() - 1));
       // more to come...
-      token = Optional.of(Optional.of(repository.saveQuery(new ResumableQuery(metadataPrefix, lastResult.getModificationDate(),
-                                                                until, set))));
+      token = Optional.of(Optional.of(repository.saveQuery(new ResumableQuery(metadataPrefix,
+          lastResult.getModificationDate(), until, set))));
     } else if (resumptionToken.isPresent()) {
       // last page reached
       token = Optional.of(Optional.<String>empty());

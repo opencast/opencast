@@ -20,8 +20,6 @@
     <suppress checks="LineLength" files="modules/external-api/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/inspection-service-ffmpeg/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/kernel/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/oaipmh/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/oaipmh-persistence/.+\.(java|properties)"/>
 
     <suppress checks="Indentation" files="modules/admin-ui/.+\.java"/>
     <suppress checks="Indentation" files="modules/capture-admin-service-impl/.+\.java"/>
@@ -35,8 +33,6 @@
     <suppress checks="Indentation" files="modules/inspection-service-ffmpeg/.+\.java"/>
     <suppress checks="Indentation" files="modules/kernel/.+\.java"/>
     <suppress checks="Indentation" files="modules/metadata/.+\.java"/>
-    <suppress checks="Indentation" files="modules/oaipmh/.+\.java"/>
-    <suppress checks="Indentation" files="modules/oaipmh-persistence/.+\.java"/>
     <suppress checks="Indentation" files="modules/serviceregistry/.+\.java"/>
 
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/admin-ui/.+\.java"/>
@@ -54,6 +50,4 @@
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/external-api/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/inspection-service-ffmpeg/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/kernel/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/oaipmh-persistence/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/oaipmh/.+\.java"/>
 </suppressions>
