@@ -210,13 +210,15 @@ public class JobDispatcher {
       try {
         dispatchInterval = Float.parseFloat(dispatchIntervalString);
       } catch (Exception e) {
-        logger.warn("Dispatch interval '{}' is malformed, setting to {}", dispatchIntervalString, MIN_DISPATCH_INTERVAL);
+        logger.warn("Dispatch interval '{}' is malformed, setting to {}", dispatchIntervalString,
+            MIN_DISPATCH_INTERVAL);
         dispatchInterval = MIN_DISPATCH_INTERVAL;
       }
       if (dispatchInterval == 0) {
         logger.info("Dispatching disabled");
       } else if (dispatchInterval < MIN_DISPATCH_INTERVAL) {
-        logger.warn("Dispatch interval {} seconds is too low, adjusting to {}", dispatchInterval, MIN_DISPATCH_INTERVAL);
+        logger.warn("Dispatch interval {} seconds is too low, adjusting to {}", dispatchInterval,
+            MIN_DISPATCH_INTERVAL);
         dispatchInterval = MIN_DISPATCH_INTERVAL;
       } else {
         logger.info("Dispatch interval set to {} seconds", dispatchInterval);
@@ -233,8 +235,8 @@ public class JobDispatcher {
       long dispatchIntervalMs = Math.round(dispatchInterval * DISPATCH_INTERVAL_MS_FACTOR);
       logger.info("Job dispatching is enabled");
       logger.debug("Starting job dispatching at a custom interval of {}s", dispatchInterval);
-      jdfuture = scheduledExecutor.scheduleWithFixedDelay(getJobDispatcherRunnable(), dispatchIntervalMs, dispatchIntervalMs,
-          TimeUnit.MILLISECONDS);
+      jdfuture = scheduledExecutor.scheduleWithFixedDelay(getJobDispatcherRunnable(), dispatchIntervalMs,
+          dispatchIntervalMs, TimeUnit.MILLISECONDS);
     } else {
       logger.info("Job dispatching is disabled");
     }
@@ -413,7 +415,8 @@ public class JobDispatcher {
           // capacity, i. e. the workflow service is ok dispatching the next workflow or the next workflow operation.
           if (parentJob == null || ServiceRegistryJpaImpl.TYPE_WORKFLOW.equals(jobType) || parentHasRunningChildren) {
             logger.trace("Using available capacity only for dispatching of {} to a service of type '{}'", job, jobType);
-            candidateServices = serviceRegistry.getServiceRegistrationsWithCapacity(jobType, services, hosts, systemLoad);
+            candidateServices = serviceRegistry.getServiceRegistrationsWithCapacity(jobType, services, hosts,
+                systemLoad);
           } else {
             logger.trace("Using full list of services for dispatching of {} to a service of type '{}'", job, jobType);
             candidateServices = serviceRegistry.getServiceRegistrationsByLoad(jobType, services, hosts, systemLoad);
@@ -461,7 +464,8 @@ public class JobDispatcher {
      * @param services a list of service registrations
      * @return the host that accepted the dispatched job, or <code>null</code> if no services took the job.
      * @throws ServiceRegistryException    if the service registrations are unavailable
-     * @throws ServiceUnavailableException if no service is available or if all available services refuse to take on more work
+     * @throws ServiceUnavailableException
+     *    if no service is available or if all available services refuse to take on more work
      * @throws UndispatchableJobException  if the current job cannot be processed
      */
     private String dispatchJob(JpaJob job, List<ServiceRegistration> services)
@@ -484,7 +488,8 @@ public class JobDispatcher {
                                            .get();
 
       if (job.getJobLoad() > highestMaxLoad) {
-        // None of the available hosts is able to accept the job because the largest max load value is less than this job's load value
+        // None of the available hosts is able to accept the job because the largest max load value is less than this
+        // job's load value
         jobLoadExceedsMaximumLoads = true;
       }
 
@@ -492,8 +497,10 @@ public class JobDispatcher {
         job.setProcessorServiceRegistration((ServiceRegistrationJpaImpl) registration);
 
         // Skip registration of host with less max load than highest available max load
-        // Note: This service registration may or may not live on a node which is set to accept jobs exceeding its max load
-        if (jobLoadExceedsMaximumLoads && job.getProcessorServiceRegistration().getHostRegistration().getMaxLoad() != highestMaxLoad) {
+        // Note: This service registration may or may not live on a node which is set to accept jobs exceeding
+        // its max load
+        if (jobLoadExceedsMaximumLoads
+            && job.getProcessorServiceRegistration().getHostRegistration().getMaxLoad() != highestMaxLoad) {
           continue;
         }
 
@@ -536,7 +543,8 @@ public class JobDispatcher {
           if (responseStatusCode == HttpStatus.SC_NO_CONTENT) {
             return registration.getHost();
           } else if (responseStatusCode == HttpStatus.SC_SERVICE_UNAVAILABLE) {
-            logger.debug("Service {} is currently refusing to accept jobs of type {}", registration, job.getOperation());
+            logger.debug("Service {} is currently refusing to accept jobs of type {}", registration,
+                job.getOperation());
             continue;
           } else if (responseStatusCode == HttpStatus.SC_PRECONDITION_FAILED) {
             job.setStatus(Job.Status.FAILED);
@@ -573,7 +581,8 @@ public class JobDispatcher {
         // Workflow type jobs are not set to priority list, because they handle accepting jobs not based on the job load
         // If the system don't accepts jobs whose load exceeds the host's max load we can't make use of the priority
         // list
-        if (serviceRegistry.acceptJobLoadsExeedingMaxLoad && !dispatchPriorityList.containsKey(job.getId()) && !ServiceRegistryJpaImpl.TYPE_WORKFLOW.equals(job.getJobType())
+        if (serviceRegistry.acceptJobLoadsExeedingMaxLoad && !dispatchPriorityList.containsKey(job.getId())
+            && !ServiceRegistryJpaImpl.TYPE_WORKFLOW.equals(job.getJobType())
             && job.getProcessorServiceRegistration() != null) {
           String host = job.getProcessorServiceRegistration().getHost();
           logger.debug("About to add {} to dispatchPriorityList with processor host {}", job, host);
@@ -617,7 +626,8 @@ public class JobDispatcher {
       };
     }
 
-    private final Function<ServiceRegistration, HostRegistration> toHostRegistration = new Function<ServiceRegistration, HostRegistration>() {
+    private final Function<ServiceRegistration, HostRegistration> toHostRegistration =
+        new Function<ServiceRegistration, HostRegistration>() {
       @Override
       public HostRegistration apply(ServiceRegistration s) {
         return ((ServiceRegistrationJpaImpl) s).getHostRegistration();

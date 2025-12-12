@@ -104,10 +104,12 @@ public final class OaiPmhUtil {
    *          oai is not valid representation
    */
   public static Granularity fromOaiRepresentation(String oai) {
-    if (GRANULARITY_DAY.equals(oai))
+    if (GRANULARITY_DAY.equals(oai)) {
       return Granularity.DAY;
-    if (GRANULARITY_SECOND.equals(oai))
+    }
+    if (GRANULARITY_SECOND.equals(oai)) {
       return Granularity.SECOND;
+    }
     throw new IllegalArgumentException(oai + " is not a valid representation");
   }
 

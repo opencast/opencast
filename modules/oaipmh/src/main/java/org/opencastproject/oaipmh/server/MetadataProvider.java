@@ -29,8 +29,8 @@ import java.util.Optional;
 /**
  * A metadata provider provides XML serialized metadata for a certain OAI-PMH metadata prefix. For further information
  * about metadata prefixes see the section
- * <a href="http://www.openarchives.org/OAI/openarchivesprotocol.html#MetadataNamespaces">3.4 metadataPrefix and Metadata
- * Schema</a> of the OAI-PMH specification.
+ * <a href="http://www.openarchives.org/OAI/openarchivesprotocol.html#MetadataNamespaces">3.4 metadataPrefix and
+ * Metadata Schema</a> of the OAI-PMH specification.
  */
 public interface MetadataProvider {
   /**

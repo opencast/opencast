@@ -111,7 +111,9 @@ public class JSONUtilsTest {
 
   /**
    * Test method for
-   * {@link JSONUtils#filtersToJSON(org.opencastproject.list.api.ResourceListQuery, org.opencastproject.list.api.ListProvidersService, org.opencastproject.security.api.Organization)}
+   * {@link JSONUtils#filtersToJSON(org.opencastproject.list.api.ResourceListQuery,
+   *     org.opencastproject.list.api.ListProvidersService,
+   *     org.opencastproject.security.api.Organization)}
    * (filters, listProviderService, query, org)}
    */
   @Test

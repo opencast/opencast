@@ -262,7 +262,8 @@ public abstract class OaiPmhRepository implements ManagedService {
     if (p.getIdentifier().isEmpty() || p.getMetadataPrefix().isEmpty()) {
       return createBadArgumentResponse(p);
     } else {
-      for (final MetadataProvider metadataProvider : p.getMetadataPrefix().flatMap(mp -> getMetadataProvider(mp)).stream().toList()) {
+      var metadataProviders = p.getMetadataPrefix().flatMap(mp -> getMetadataProvider(mp)).stream().toList();
+      for (final MetadataProvider metadataProvider : metadataProviders) {
         if (p.getSet().isPresent() && !sets.stream().anyMatch(
             setDef -> StringUtils.equals(setDef.getSetSpec(), p.getSet().get()))) {
           // If there is no set specification, immediately return a no result response
@@ -326,9 +327,11 @@ public abstract class OaiPmhRepository implements ManagedService {
 
   private XmlGen handleListMetadataFormats(final Params p) {
     if (p.getIdentifier().isPresent()) {
-      final SearchResult res = getPersistence().search(queryRepo(getRepositoryId()).mediaPackageId(p.getIdentifier().get()).build());
-      if (res.getItems().size() != 1)
+      final SearchResult res = getPersistence().search(queryRepo(
+          getRepositoryId()).mediaPackageId(p.getIdentifier().get()).build());
+      if (res.getItems().size() != 1) {
         return createIdDoesNotExistResponse(p);
+      }
     }
     return new OaiVerbXmlGen(this, p) {
       @Override
@@ -353,7 +356,8 @@ public abstract class OaiPmhRepository implements ManagedService {
                   @Override
                   public Node apply(SearchResultItem item) {
                     logger.debug("Requested set: {}", set);
-                    final Element metadata = params.getMetadataProvider().createMetadata(OaiPmhRepository.this, item, set);
+                    final Element metadata = params.getMetadataProvider()
+                        .createMetadata(OaiPmhRepository.this, item, set);
                     return record(item, metadata);
                   }
                 })
@@ -412,7 +416,8 @@ public abstract class OaiPmhRepository implements ManagedService {
   private XmlGen createCannotDisseminateFormatResponse(Params p) {
     return createErrorResponse(
             OaiPmhConstants.ERROR_CANNOT_DISSEMINATE_FORMAT, p.getVerb(), p.getRepositoryUrl(),
-            "The metadata format identified by the value given for the metadataPrefix argument is not supported by the item or by the repository.");
+            "The metadata format identified by the value given for the metadataPrefix argument is not supported by the "
+                + "item or by the repository.");
   }
 
   private XmlGen createIdDoesNotExistResponse(Params p) {
@@ -474,7 +479,9 @@ public abstract class OaiPmhRepository implements ManagedService {
     return granulate(getRepositoryTimeGranularity(), date);
   }
 
-  /** "Cut" a date to the repositories supported granularity. Cutting behaves similar to the mathematical floor function. */
+  /**
+   * "Cut" a date to the repositories supported granularity. Cutting behaves similar to the mathematical floor function.
+   */
   public static Date granulate(Granularity g, Date d) {
     switch (g) {
       case SECOND: {
@@ -521,16 +528,20 @@ public abstract class OaiPmhRepository implements ManagedService {
         return createNoSetHierarchyResponse(p);
       }
       final boolean resumptionTokenExists = p.getResumptionToken().isPresent();
-      final boolean otherParamExists = p.getMetadataPrefix().isPresent() || p.getFrom().isPresent() || p.getUntil().isPresent()
-              || p.getSet().isPresent();
+      final boolean otherParamExists = p.getMetadataPrefix().isPresent() || p.getFrom().isPresent()
+          || p.getUntil().isPresent() || p.getSet().isPresent();
 
-      if (resumptionTokenExists && otherParamExists || !resumptionTokenExists && !otherParamExists)
+      if (resumptionTokenExists && otherParamExists || !resumptionTokenExists && !otherParamExists) {
         return createBadArgumentResponse(p);
+      }
       final Optional<Date> from = p.getFrom().map(Functions::asDate).map(d -> granulate(d));
       final Function<Date, Date> untilAdjustment = getRepositoryTimeGranularity() == Granularity.DAY
           ? addDay(1)
           : Function.identity();
-      final Optional<Date> untilGranularity = p.getUntil().map(Functions::asDate).map(d -> granulate(d)).map(untilAdjustment::apply);
+      final Optional<Date> untilGranularity = p.getUntil()
+          .map(Functions::asDate)
+          .map(d -> granulate(d))
+          .map(untilAdjustment::apply);
       if (from.isPresent() && untilGranularity.isPresent()) {
         Date fromDate = from.get();
         Date untilDate = untilGranularity.get();
@@ -538,8 +549,9 @@ public abstract class OaiPmhRepository implements ManagedService {
           return createBadArgumentResponse(p);
         }
       }
-      if (otherParamExists && p.getMetadataPrefix().isEmpty())
+      if (otherParamExists && p.getMetadataPrefix().isEmpty()) {
         return createBadArgumentResponse(p);
+      }
       // <- params are ok
 
       final Optional<Date> until = Optional.of(untilGranularity.orElseGet(() -> currentDate()));
@@ -623,7 +635,8 @@ public abstract class OaiPmhRepository implements ManagedService {
     }
 
     /** Get a metadata provider from a resumption token. */
-    private final Function<String, Optional<MetadataProvider>> getMetadataProviderFromToken = new Function<String, Optional<MetadataProvider>>() {
+    private final Function<String, Optional<MetadataProvider>> getMetadataProviderFromToken =
+        new Function<String, Optional<MetadataProvider>>() {
       @Override
       public Optional<MetadataProvider> apply(String token) {
         return getSavedQuery(token).flatMap(resumableQuery -> getMetadataProvider(resumableQuery.getMetadataPrefix()));
@@ -658,8 +671,9 @@ public abstract class OaiPmhRepository implements ManagedService {
       @Override
       public Element create() {
         final List<Node> content = new ArrayList<Node>(createContent(params.getSet()));
-        if (content.size() == 0)
+        if (content.size() == 0) {
           return createNoRecordsMatchResponse(params.getParams()).create();
+        }
         content.add(resumptionToken(params.getResumptionToken(), params.getMetadataPrefix(), params.getResult(),
                                     params.getUntil(), params.getSet()));
         return oai(

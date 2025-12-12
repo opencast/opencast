@@ -47,8 +47,9 @@ public final class ConcurrencyUtil {
         // Cancel currently executing tasks
         exe.shutdownNow();
         // Wait a while for tasks to respond to being cancelled
-        if (!exe.awaitTermination(waitSeconds, TimeUnit.SECONDS))
+        if (!exe.awaitTermination(waitSeconds, TimeUnit.SECONDS)) {
           executorDoesNotTerminate.run();
+        }
       }
     } catch (InterruptedException ie) {
       // Forcibly terminate on interruption

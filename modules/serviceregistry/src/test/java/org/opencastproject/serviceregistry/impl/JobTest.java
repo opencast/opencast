@@ -213,10 +213,11 @@ public class JobTest {
       serviceRegistry.updateJob(job);
 
       jobs = serviceRegistry.getActiveJobs();
-      if (status.isActive())
+      if (status.isActive()) {
         assertEquals(2, jobs.size());
-      else
+      } else {
         assertEquals(1, jobs.size());
+      }
     }
   }
 
@@ -500,7 +501,9 @@ public class JobTest {
 
   @Test
   public void testMarshallingWithXmlPayload() throws Exception {
-    final String payload = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<random xmlns:ns2=\"http://mediapackage.opencastproject.org\" xmlns:ns3=\"http://job.opencastproject.org/\">something</random>";
+    final String payload = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+        + "<random xmlns:ns2=\"http://mediapackage.opencastproject.org\" xmlns:ns3=\"http://job.opencastproject.org/\">"
+        + "something</random>";
     Job job = new JobImpl();
     job.setPayload(payload);
 

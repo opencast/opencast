@@ -46,7 +46,10 @@ public class Mpeg7CatalogImpl implements Mpeg7Catalog {
   private static final long serialVersionUID = 5521535164920498997L;
 
   /** The multimedia content list */
-  private HashMap<MultimediaContent.Type, MultimediaContentImpl<? extends MultimediaContentType>> multimediaContent = null;
+  private HashMap<MultimediaContent.Type,
+      MultimediaContentImpl<? extends MultimediaContentType>>
+      multimediaContent = null;
+
 
   /** The default element namespace */
   public static final String NS = "mpeg7";
@@ -97,7 +100,7 @@ public class Mpeg7CatalogImpl implements Mpeg7Catalog {
    * @see org.opencastproject.metadata.mpeg7.Mpeg7#multimediaContent()
    */
   public Iterator<MultimediaContent<? extends MultimediaContentType>> multimediaContent() {
-    List<MultimediaContent<? extends MultimediaContentType>> result = new ArrayList<MultimediaContent<? extends MultimediaContentType>>();
+    List<MultimediaContent<? extends MultimediaContentType>> result = new ArrayList<>();
     for (MultimediaContent<? extends MultimediaContentType> o : multimediaContent.values()) {
       result.add(o);
     }
@@ -105,7 +108,8 @@ public class Mpeg7CatalogImpl implements Mpeg7Catalog {
   }
 
   /**
-   * @see org.opencastproject.metadata.mpeg7.Mpeg7#getMultimediaContent(org.opencastproject.mediapackage.mpeg7.MultimediaContent.Type)
+   * @see org.opencastproject.metadata.mpeg7.Mpeg7#getMultimediaContent(
+   *      org.opencastproject.mediapackage.mpeg7.MultimediaContent.Type)
    */
   public MultimediaContent<? extends MultimediaContentType> getMultimediaContent(MultimediaContent.Type type) {
     return multimediaContent.get(type);
@@ -159,12 +163,14 @@ public class Mpeg7CatalogImpl implements Mpeg7Catalog {
    */
   @SuppressWarnings("unchecked")
   public Audio addAudioContent(String id, MediaTime time, MediaLocator locator) {
-    MultimediaContentImpl<Audio> content = (MultimediaContentImpl<Audio>) getMultimediaContent(MultimediaContent.Type.AudioType);
+    MultimediaContentImpl<Audio> content =
+        (MultimediaContentImpl<Audio>) getMultimediaContent(MultimediaContent.Type.AudioType);
     if (content == null) {
       content = new MultimediaContentImpl<Audio>(MultimediaContent.Type.AudioType);
       multimediaContent.put(MultimediaContent.Type.AudioType, content);
     }
-    MultimediaContentTypeImpl<AudioSegment> audio = new MultimediaContentTypeImpl<AudioSegment>(MultimediaContentType.Type.Audio, id);
+    MultimediaContentTypeImpl<AudioSegment> audio =
+        new MultimediaContentTypeImpl<AudioSegment>(MultimediaContentType.Type.Audio, id);
     audio.setMediaTime(time);
     audio.setMediaLocator(locator);
     content.add(audio);
@@ -176,8 +182,9 @@ public class Mpeg7CatalogImpl implements Mpeg7Catalog {
    */
   public Audio removeAudioContent(String id) {
     MultimediaContentType element = removeContentElement(id, MultimediaContent.Type.AudioType);
-    if (element != null)
+    if (element != null) {
       return (Audio) element;
+    }
     return null;
   }
 
@@ -194,9 +201,11 @@ public class Mpeg7CatalogImpl implements Mpeg7Catalog {
    */
   @SuppressWarnings("unchecked")
   public Iterator<Audio> audioContent() {
-    MultimediaContent<Audio> content = (MultimediaContent<Audio>) getMultimediaContent(MultimediaContent.Type.AudioType);
-    if (content != null)
+    MultimediaContent<Audio> content =
+        (MultimediaContent<Audio>) getMultimediaContent(MultimediaContent.Type.AudioType);
+    if (content != null) {
       return content.elements();
+    }
     return null;
   }
 
@@ -206,12 +215,14 @@ public class Mpeg7CatalogImpl implements Mpeg7Catalog {
    */
   @SuppressWarnings("unchecked")
   public Video addVideoContent(String id, MediaTime time, MediaLocator locator) {
-    MultimediaContentImpl<Video> content = (MultimediaContentImpl<Video>) getMultimediaContent(MultimediaContent.Type.VideoType);
+    MultimediaContentImpl<Video> content =
+        (MultimediaContentImpl<Video>) getMultimediaContent(MultimediaContent.Type.VideoType);
     if (content == null) {
       content = new MultimediaContentImpl<Video>(MultimediaContent.Type.VideoType);
       multimediaContent.put(MultimediaContent.Type.VideoType, content);
     }
-    MultimediaContentTypeImpl<VideoSegment> video = new MultimediaContentTypeImpl<VideoSegment>(MultimediaContentType.Type.Video, id);
+    MultimediaContentTypeImpl<VideoSegment> video =
+        new MultimediaContentTypeImpl<VideoSegment>(MultimediaContentType.Type.Video, id);
     content.add(video);
     video.setMediaTime(time);
     video.setMediaLocator(locator);
@@ -223,8 +234,9 @@ public class Mpeg7CatalogImpl implements Mpeg7Catalog {
    */
   public Video removeVideoContent(String id) {
     MultimediaContentType element = removeContentElement(id, MultimediaContent.Type.VideoType);
-    if (element != null)
+    if (element != null) {
       return (Video) element;
+    }
     return null;
   }
 
@@ -241,9 +253,11 @@ public class Mpeg7CatalogImpl implements Mpeg7Catalog {
    */
   @SuppressWarnings("unchecked")
   public Iterator<Video> videoContent() {
-    MultimediaContent<Video> content = (MultimediaContent<Video>) getMultimediaContent(MultimediaContent.Type.VideoType);
-    if (content != null)
+    MultimediaContent<Video> content =
+        (MultimediaContent<Video>) getMultimediaContent(MultimediaContent.Type.VideoType);
+    if (content != null) {
       return content.elements();
+    }
     return null;
   }
 
@@ -253,12 +267,14 @@ public class Mpeg7CatalogImpl implements Mpeg7Catalog {
    */
   @SuppressWarnings("unchecked")
   public AudioVisual addAudioVisualContent(String id, MediaTime time, MediaLocator locator) {
-    MultimediaContentImpl<AudioVisual> content = (MultimediaContentImpl<AudioVisual>) getMultimediaContent(MultimediaContent.Type.AudioVisualType);
+    MultimediaContentImpl<AudioVisual> content =
+        (MultimediaContentImpl<AudioVisual>) getMultimediaContent(MultimediaContent.Type.AudioVisualType);
     if (content == null) {
       content = new MultimediaContentImpl<AudioVisual>(MultimediaContent.Type.AudioVisualType);
       multimediaContent.put(MultimediaContent.Type.AudioVisualType, content);
     }
-    MultimediaContentTypeImpl<AudioVisualSegment> audioVisual = new MultimediaContentTypeImpl<AudioVisualSegment>(MultimediaContentType.Type.AudioVisual, id);
+    MultimediaContentTypeImpl<AudioVisualSegment> audioVisual =
+        new MultimediaContentTypeImpl<AudioVisualSegment>(MultimediaContentType.Type.AudioVisual, id);
     audioVisual.setMediaTime(time);
     audioVisual.setMediaLocator(locator);
     content.add(audioVisual);
@@ -270,8 +286,9 @@ public class Mpeg7CatalogImpl implements Mpeg7Catalog {
    */
   public AudioVisual removeAudioVisualContent(String id) {
     MultimediaContentType element = removeContentElement(id, MultimediaContent.Type.AudioVisualType);
-    if (element != null)
+    if (element != null) {
       return (AudioVisual) element;
+    }
     return null;
   }
 
@@ -288,9 +305,11 @@ public class Mpeg7CatalogImpl implements Mpeg7Catalog {
    */
   @SuppressWarnings("unchecked")
   public Iterator<AudioVisual> audiovisualContent() {
-    MultimediaContent<AudioVisual> content = (MultimediaContent<AudioVisual>) getMultimediaContent(MultimediaContent.Type.AudioVisualType);
-    if (content != null)
+    MultimediaContent<AudioVisual> content =
+        (MultimediaContent<AudioVisual>) getMultimediaContent(MultimediaContent.Type.AudioVisualType);
+    if (content != null) {
       return content.elements();
+    }
     return null;
   }
 
@@ -299,9 +318,11 @@ public class Mpeg7CatalogImpl implements Mpeg7Catalog {
    */
   @SuppressWarnings("unchecked")
   public Audio getAudioById(String id) {
-    MultimediaContent<Audio> content = (MultimediaContent<Audio>) getMultimediaContent(MultimediaContent.Type.AudioType);
-    if (content == null)
+    MultimediaContent<Audio> content =
+        (MultimediaContent<Audio>) getMultimediaContent(MultimediaContent.Type.AudioType);
+    if (content == null) {
       return null;
+    }
     return content.getElementById(id);
   }
 
@@ -310,9 +331,11 @@ public class Mpeg7CatalogImpl implements Mpeg7Catalog {
    */
   @SuppressWarnings("unchecked")
   public AudioVisual getAudioVisualById(String id) {
-    MultimediaContent<AudioVisual> content = (MultimediaContent<AudioVisual>) getMultimediaContent(MultimediaContent.Type.AudioVisualType);
-    if (content == null)
+    MultimediaContent<AudioVisual> content =
+        (MultimediaContent<AudioVisual>) getMultimediaContent(MultimediaContent.Type.AudioVisualType);
+    if (content == null) {
       return null;
+    }
     return content.getElementById(id);
   }
 
@@ -321,9 +344,11 @@ public class Mpeg7CatalogImpl implements Mpeg7Catalog {
    */
   @SuppressWarnings("unchecked")
   public Video getVideoById(String id) {
-    MultimediaContent<Video> content = (MultimediaContent<Video>) getMultimediaContent(MultimediaContent.Type.VideoType);
-    if (content == null)
+    MultimediaContent<Video> content =
+        (MultimediaContent<Video>) getMultimediaContent(MultimediaContent.Type.VideoType);
+    if (content == null) {
       return null;
+    }
     return content.getElementById(id);
   }
 
@@ -338,8 +363,9 @@ public class Mpeg7CatalogImpl implements Mpeg7Catalog {
    */
   private MultimediaContentType removeContentElement(String id, MultimediaContent.Type type) {
     MultimediaContentImpl<? extends MultimediaContentType> content = multimediaContent.get(type);
-    if (content != null)
+    if (content != null) {
       return content.remove(id);
+    }
     return null;
   }
 
@@ -347,8 +373,9 @@ public class Mpeg7CatalogImpl implements Mpeg7Catalog {
   @Override
   public Mpeg7Catalog clone() {
     Mpeg7CatalogImpl clone = new Mpeg7CatalogImpl();
-    clone.multimediaContent = (HashMap<MultimediaContent.Type, MultimediaContentImpl<? extends MultimediaContentType>>) this.multimediaContent
-            .clone();
+    clone.multimediaContent = (HashMap<
+        MultimediaContent.Type,
+        MultimediaContentImpl<? extends MultimediaContentType>>) this.multimediaContent.clone();
     return clone;
   }
 }

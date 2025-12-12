@@ -154,8 +154,8 @@ public class OaiPmhRepositoryTest {
               Optional.of(IsError),
               list(hasXPath("//oai20:error[@code='badArgument']", NS_CTX)));
     runChecks(OaiPmhConstants.VERB_LIST_IDENTIFIERS,
-              repo(null, Granularity.SECOND)
-                      .selectVerb(params("ListIdentifiers", null, "oai_dc", "2011-01-01T10:20:10Z", "2011-01-01T10:20:00Z", null)),
+              repo(null, Granularity.SECOND).selectVerb(params("ListIdentifiers", null, "oai_dc",
+                      "2011-01-01T10:20:10Z", "2011-01-01T10:20:00Z", null)),
               Optional.of(IsError),
               list(hasXPath("//oai20:error[@code='badArgument']", NS_CTX)));
   }
@@ -174,7 +174,8 @@ public class OaiPmhRepositoryTest {
                    hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:identifier='id-2']", NS_CTX),
                    hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:datestamp='2011-06-01']", NS_CTX),
                    hasXPath("count(//oai20:ListRecords/oai20:record)", NS_CTX, returningANumber(), equalTo(2.0)),
-                   hasXPath("count(//oai20:ListRecords/oai20:record/oai20:metadata)", NS_CTX, returningANumber(), equalTo(1.0))));
+                   hasXPath("count(//oai20:ListRecords/oai20:record/oai20:metadata)", NS_CTX, returningANumber(),
+                       equalTo(1.0))));
   }
 
   @Test
@@ -189,7 +190,8 @@ public class OaiPmhRepositoryTest {
                    hasXPath("//oai20:GetRecord/oai20:record/oai20:header[oai20:datestamp='2011-06-01']", NS_CTX),
                    hasXPath("//oai20:GetRecord/oai20:record/oai20:header[not(@status='deleted')]", NS_CTX),
                    hasXPath("count(//oai20:GetRecord/oai20:record)", NS_CTX, returningANumber(), equalTo(1.0)),
-                   hasXPath("count(//oai20:GetRecord/oai20:record/oai20:metadata)", NS_CTX, returningANumber(), equalTo(1.0))));
+                   hasXPath("count(//oai20:GetRecord/oai20:record/oai20:metadata)", NS_CTX, returningANumber(),
+                       equalTo(1.0))));
   }
 
   @Test
@@ -204,7 +206,8 @@ public class OaiPmhRepositoryTest {
                    hasXPath("//oai20:GetRecord/oai20:record/oai20:header[oai20:datestamp='2011-05-01']", NS_CTX),
                    hasXPath("//oai20:GetRecord/oai20:record/oai20:header[@status='deleted']", NS_CTX),
                    hasXPath("count(//oai20:GetRecord/oai20:record)", NS_CTX, returningANumber(), equalTo(1.0)),
-                   hasXPath("count(//oai20:GetRecord/oai20:record/oai20:metadata)", NS_CTX, returningANumber(), equalTo(0.0))));
+                   hasXPath("count(//oai20:GetRecord/oai20:record/oai20:metadata)", NS_CTX, returningANumber(),
+                       equalTo(0.0))));
   }
 
   @Test
@@ -222,7 +225,8 @@ public class OaiPmhRepositoryTest {
                    hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:datestamp='2011-06-01']", NS_CTX),
                    hasXPath("count(//oai20:ListRecords/oai20:record)", NS_CTX, returningANumber(), equalTo(2.0)),
                    hasXPath("count(//oai20:ListRecords/oai20:record)", NS_CTX, returningANumber(), equalTo(2.0)),
-                   hasXPath("count(//oai20:ListRecords/oai20:record/oai20:metadata)", NS_CTX, returningANumber(), equalTo(1.0))));
+                   hasXPath("count(//oai20:ListRecords/oai20:record/oai20:metadata)", NS_CTX, returningANumber(),
+                       equalTo(1.0))));
   }
 
   @Test
@@ -234,7 +238,12 @@ public class OaiPmhRepositoryTest {
 
   // --
 
-  private void runChecks(String verb, XmlGen xmlGen, Optional<OaiPmhResponseStatus> status, List<Matcher<Source>> matchers) throws Exception {
+  private void runChecks(
+      String verb,
+      XmlGen xmlGen,
+      Optional<OaiPmhResponseStatus> status,
+      List<Matcher<Source>> matchers
+  ) throws Exception {
     if (runValidation) {
       if (status.isPresent()) {
         assertTrue("http://validator.oaipmh.com/ reports errors", validate(verb, xmlGen, status.get()));
@@ -299,18 +308,24 @@ public class OaiPmhRepositoryTest {
                                final String from, final String until, final String resumptionToken) {
     return new Params() {
       @Override String getParameter(String key) {
-        if ("verb".equals(key))
+        if ("verb".equals(key)) {
           return verb;
-        if ("identifier".equals(key))
+        }
+        if ("identifier".equals(key)) {
           return identifier;
-        if ("metadataPrefix".equals(key))
+        }
+        if ("metadataPrefix".equals(key)) {
           return metadataPrefix;
-        if ("from".equals(key))
+        }
+        if ("from".equals(key)) {
           return from;
-        if ("until".equals(key))
+        }
+        if ("until".equals(key)) {
           return until;
-        if ("resumptionToken".equals(key))
+        }
+        if ("resumptionToken".equals(key)) {
           return resumptionToken;
+        }
         return null;
       }
 

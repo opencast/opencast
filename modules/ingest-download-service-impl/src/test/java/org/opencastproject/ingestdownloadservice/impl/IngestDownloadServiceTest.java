@@ -72,7 +72,8 @@ public class IngestDownloadServiceTest {
     Workspace workspace = EasyMock.createMock(Workspace.class);
     EasyMock.expect(workspace.getBaseUri()).andReturn(new URI("http://localhost/")).anyTimes();
     EasyMock.expect(workspace.get(EasyMock.anyObject())).andAnswer(() -> testFolder.newFile()).anyTimes();
-    EasyMock.expect(workspace.put(EasyMock.anyString(), EasyMock.anyString(), EasyMock.anyString(), EasyMock.anyObject()))
+    EasyMock.expect(
+        workspace.put(EasyMock.anyString(), EasyMock.anyString(), EasyMock.anyString(), EasyMock.anyObject()))
             .andReturn(new URI("http://local.opencast/xy")).anyTimes();
     workspace.delete(EasyMock.anyObject());
     EasyMock.expectLastCall().anyTimes();
