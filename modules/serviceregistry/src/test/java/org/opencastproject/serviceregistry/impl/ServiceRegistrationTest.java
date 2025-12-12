@@ -159,8 +159,8 @@ public class ServiceRegistrationTest {
     Assert.assertEquals(3, availableServices.size());
 
     // Create a job and mark it as running.
-    Job job = serviceRegistry.createJob(regType1Localhost.getHost(), regType1Localhost.getServiceType(), OPERATION_NAME_1, null,
-            null, false, null, 1.0f);
+    Job job = serviceRegistry.createJob(regType1Localhost.getHost(), regType1Localhost.getServiceType(),
+        OPERATION_NAME_1, null, null, false, null, 1.0f);
     job.setStatus(Job.Status.RUNNING);
     job = serviceRegistry.updateJob(job);
 

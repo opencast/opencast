@@ -294,8 +294,9 @@ public class IngestDownloadServiceImpl extends AbstractJobProducer implements In
       externalUris.add(originalUri);
     }
 
-    if (!deleteExternal || externalUris.size() == 0)
+    if (!deleteExternal || externalUris.size() == 0) {
       return MediaPackageParser.getAsXml(mediaPackage);
+    }
 
     // Find all external working file repository base Urls
     logger.debug("Assembling list of external working file repositories");

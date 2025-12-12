@@ -47,7 +47,7 @@ public class BooleanListProvider implements ResourceListProvider {
 
   /** The names of the different list available through this provider. */
   private static final String[] NAMES = new String[] {
-    YES_NO, YES, NO
+      YES_NO, YES, NO
   };
 
   @Override
@@ -62,11 +62,13 @@ public class BooleanListProvider implements ResourceListProvider {
     String listNameTrimmed = StringUtils.trimToEmpty(listName);
 
     if (StringUtils.equalsIgnoreCase(YES, listNameTrimmed)
-            || StringUtils.equalsIgnoreCase(YES_NO, listNameTrimmed))
+            || StringUtils.equalsIgnoreCase(YES_NO, listNameTrimmed)) {
       result.put("true", YES);
+    }
     if (StringUtils.equalsIgnoreCase(NO, listNameTrimmed)
-            || StringUtils.equalsIgnoreCase(YES_NO, listNameTrimmed))
+            || StringUtils.equalsIgnoreCase(YES_NO, listNameTrimmed)) {
       result.put("false", NO);
+    }
 
     return result;
   }
@@ -80,12 +82,14 @@ public class BooleanListProvider implements ResourceListProvider {
   public static <Boolean> Optional<Boolean> parseValue(String filterValue) {
     String value = StringUtils.trimToEmpty(filterValue);
     if (StringUtils.equalsIgnoreCase(YES, value)
-            || StringUtils.equalsIgnoreCase("true", value))
+            || StringUtils.equalsIgnoreCase("true", value)) {
       return (Optional<Boolean>) Optional.ofNullable(true);
-    else if (StringUtils.equalsIgnoreCase(NO, value)
-            || StringUtils.equalsIgnoreCase("false", value))
+    } else if (StringUtils.equalsIgnoreCase(NO, value)
+            || StringUtils.equalsIgnoreCase("false", value)) {
       return (Optional<Boolean>) Optional.ofNullable(false);
-    else return Optional.<Boolean> empty();
+    } else {
+      return Optional.<Boolean> empty();
+    }
   }
 
   @Override

@@ -167,7 +167,8 @@ public class EventHttpServletRequest {
           FileItemStream item = iter.next();
           String fieldName = item.getFieldName();
           if (item.isFormField()) {
-            setFormField(eventCatalogUIAdapters, eventHttpServletRequest, item, fieldName, startDatePattern, startTimePattern);
+            setFormField(eventCatalogUIAdapters, eventHttpServletRequest, item, fieldName, startDatePattern,
+                startTimePattern);
           } else {
             if (!item.getName().isBlank()) {
               ingestFile(ingestService, eventHttpServletRequest, item);
@@ -257,11 +258,11 @@ public class EventHttpServletRequest {
         } catch (IllegalArgumentException e) {
           throw e;
         } catch (ParseException e) {
-          throw new IllegalArgumentException(String.format("Unable to parse event metadata because: '%s'", e.toString()));
+          throw new IllegalArgumentException(String.format("Unable to parse event metadata because: '%s'", e));
         } catch (NotFoundException e) {
           throw e;
         } catch (java.text.ParseException e) {
-          throw new IllegalArgumentException(String.format("Unable to parse event metadata because: '%s'", e.toString()));
+          throw new IllegalArgumentException(String.format("Unable to parse event metadata because: '%s'", e));
         }
       }
     } else if ("acl".equals(item.getFieldName())) {
@@ -335,7 +336,8 @@ public class EventHttpServletRequest {
           FileItemStream item = iter.next();
           String fieldName = item.getFieldName();
           if (item.isFormField()) {
-            setFormField(eventCatalogUIAdapters, eventHttpServletRequest, item, fieldName, startDatePattern, startTimePattern);
+            setFormField(eventCatalogUIAdapters, eventHttpServletRequest, item, fieldName, startDatePattern,
+                startTimePattern);
           }
         }
       } catch (IOException e) {
@@ -382,7 +384,8 @@ public class EventHttpServletRequest {
         entries.add(ace);
       } else {
         throw new IllegalArgumentException(String.format(
-                "One of the access control elements is missing a property. The action was '%s', allow was '%s' and the role was '%s'",
+                "One of the access control elements is missing a property. The action was '%s', allow was '%s' and "
+                    + "the role was '%s'",
                 action, allow, role));
       }
     }
@@ -457,29 +460,35 @@ public class EventHttpServletRequest {
                       String.format("Unable to parse the 'subjects' metadata array field because: %s", e.toString()));
             }
           } else if ("startDate".equals(key)) {
-            // Special handling for start date since in API v1 we expect start date and start time to be separate fields.
+            // Special handling for start date since in API v1 we expect start date and start time to be separate
+            // fields.
             MetadataField field = collection.getOutputFields().get(key);
             if (field == null) {
               throw new NotFoundException(String.format(
                       "Cannot find a metadata field with id '%s' from Catalog with Flavor '%s'.", key, flavorString));
             }
-            SimpleDateFormat apiSdf = MetadataField.getSimpleDateFormatter(startDatePattern == null ? field.getPattern() : startDatePattern);
+            SimpleDateFormat apiSdf = MetadataField.getSimpleDateFormatter(startDatePattern == null
+                ? field.getPattern() : startDatePattern);
             SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(field.getPattern());
             DateTime newStartDate = new DateTime(apiSdf.parse(fields.get(key)), DateTimeZone.UTC);
             if (field.getValue() != null) {
               DateTime oldStartDate = new DateTime(sdf.parse((String) field.getValue()), DateTimeZone.UTC);
-              newStartDate = oldStartDate.withDate(newStartDate.year().get(), newStartDate.monthOfYear().get(), newStartDate.dayOfMonth().get());
+              newStartDate = oldStartDate.withDate(newStartDate.year().get(), newStartDate.monthOfYear().get(),
+                  newStartDate.dayOfMonth().get());
             }
             collection.removeField(field);
             collection.addField(MetadataJson.copyWithDifferentJsonValue(field, sdf.format(newStartDate.toDate())));
           } else if ("startTime".equals(key)) {
-            // Special handling for start time since in API v1 we expect start date and start time to be separate fields.
+            // Special handling for start time since in API v1 we expect start date and start time to be separate
+            // fields.
             MetadataField field = collection.getOutputFields().get("startDate");
             if (field == null) {
               throw new NotFoundException(String.format(
-                      "Cannot find a metadata field with id '%s' from Catalog with Flavor '%s'.", "startDate", flavorString));
+                      "Cannot find a metadata field with id '%s' from Catalog with Flavor '%s'.", "startDate",
+                  flavorString));
             }
-            SimpleDateFormat apiSdf = MetadataField.getSimpleDateFormatter(startTimePattern == null ? "HH:mm" : startTimePattern);
+            SimpleDateFormat apiSdf = MetadataField.getSimpleDateFormatter(startTimePattern == null
+                ? "HH:mm" : startTimePattern);
             SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(field.getPattern());
             DateTime newStartDate = new DateTime(apiSdf.parse(fields.get(key)), DateTimeZone.UTC);
             if (field.getValue() != null) {

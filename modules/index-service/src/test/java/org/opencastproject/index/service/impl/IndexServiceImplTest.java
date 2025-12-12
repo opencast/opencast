@@ -174,8 +174,8 @@ public class IndexServiceImplTest {
     IngestService ingestService = EasyMock.createMock(IngestService.class);
     EasyMock.expect(ingestService.createMediaPackage()).andReturn(mediapackage).anyTimes();
     EasyMock.expect(ingestService.addTrack(EasyMock.anyObject(InputStream.class), EasyMock.anyString(),
-            EasyMock.anyObject(MediaPackageElementFlavor.class), EasyMock.anyObject(MediaPackage.class))).andReturn(mediapackage)
-                    .anyTimes();
+            EasyMock.anyObject(MediaPackageElementFlavor.class), EasyMock.anyObject(MediaPackage.class)))
+                    .andReturn(mediapackage).anyTimes();
     EasyMock.expect(ingestService.addCatalog(EasyMock.capture(captureInputStream), EasyMock.anyObject(String.class),
             EasyMock.anyObject(MediaPackageElementFlavor.class), EasyMock.anyObject(MediaPackage.class)))
             .andReturn(mediapackage).anyTimes();
@@ -589,10 +589,10 @@ public class IndexServiceImplTest {
           MediaPackageException, IngestException, NotFoundException {
     MediaPackage mediapackage = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
     JSONArray assetMetadata =  (JSONArray) new JSONParser().parse("[{\"id\":\"attachment_attachment_notes\", "
-      + "\"title\": \"class handout notes\","
-      + "\"flavorType\": \"attachment\","
-      + "\"flavorSubType\": \"notes\","
-      + "\"type\": \"attachment\"}]");
+        + "\"title\": \"class handout notes\","
+        + "\"flavorType\": \"attachment\","
+        + "\"flavorSubType\": \"notes\","
+        + "\"type\": \"attachment\"}]");
 
     // a test asset input stream
     List<String> assetList = new LinkedList<String>();
@@ -609,7 +609,8 @@ public class IndexServiceImplTest {
     IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
     indexServiceImpl.setIngestService(setupIngestService(mediapackage, Capture.<InputStream> newInstance()));
     mediapackage = indexServiceImpl.updateMpAssetFlavor(assetList, mediapackage, assetMetadata);
-    assertTrue("The mediapackage attachment has the updated flavor", mediapackage.getAttachments(newElemflavor).length == 1);
+    assertTrue("The mediapackage attachment has the updated flavor",
+        mediapackage.getAttachments(newElemflavor).length == 1);
   }
 
   @Test
@@ -687,7 +688,8 @@ public class IndexServiceImplTest {
             andAnswer(new IAnswer<Map<String, Period>>() {
               @Override
               public Map<String, Period> answer() throws Throwable {
-                List<Period> periods = calculatePeriods(schedRRule.getValue(), schedStart.getValue(), schedEnd.getValue(), (Long) schedDuration.getValue(), schedTz.getValue());
+                List<Period> periods = calculatePeriods(schedRRule.getValue(), schedStart.getValue(),
+                    schedEnd.getValue(), (Long) schedDuration.getValue(), schedTz.getValue());
                 Map<String, Period> mapping = new LinkedHashMap<>();
                 int counter = 0;
                 for (Period p : periods) {
@@ -711,7 +713,8 @@ public class IndexServiceImplTest {
     String scheduledEvents = indexServiceImpl.createEvent(metadataJson, mediapackage);
     String[] ids = StringUtils.split(scheduledEvents, ",");
     //We should have as many scheduled events as we do periods
-    Assert.assertTrue(ids.length == calculatePeriods(schedRRule.getValue(), schedStart.getValue(), schedEnd.getValue(), (Long) schedDuration.getValue(), schedTz.getValue()).size());
+    Assert.assertTrue(ids.length == calculatePeriods(schedRRule.getValue(), schedStart.getValue(), schedEnd.getValue(),
+        (Long) schedDuration.getValue(), schedTz.getValue()).size());
 
     assertEquals("The catalog should have been added to the correct mediapackage", mpId.toString(),
             mediapackageIdResult.getValue());
@@ -821,7 +824,8 @@ public class IndexServiceImplTest {
     seriesMetadataField.setValue("series-1");
     metadataCollection.addField(seriesMetadataField);
     MetadataList metadataList = new MetadataList();
-    metadataList.getMetadataList().put("dublincore/episode", new MetadataList.TitledMetadataCollection("EVENTS.EVENTS.DETAILS.CATALOG.EPISODE", metadataCollection));
+    metadataList.getMetadataList().put("dublincore/episode",
+        new MetadataList.TitledMetadataCollection("EVENTS.EVENTS.DETAILS.CATALOG.EPISODE", metadataCollection));
     String eventId = "event-1";
     Event event = new Event(eventId, org);
     event.setTitle("Test Event 1");
@@ -997,10 +1001,8 @@ public class IndexServiceImplTest {
   }
 
   private MetadataField createCreatorMetadataField(Iterable<String> value) {
-    final MetadataField creator = new MetadataField(DublinCore.PROPERTY_CREATOR.getLocalName(), null, "creator", false, false, null,
-            null, MetadataField.Type.TEXT, null, null, null, null, null,
-            null,
-            null);
+    final MetadataField creator = new MetadataField(DublinCore.PROPERTY_CREATOR.getLocalName(), null, "creator",
+        false, false, null,  null, MetadataField.Type.TEXT, null, null, null, null, null, null, null);
     creator.setValue(value);
     return creator;
   }

@@ -48,12 +48,14 @@ public class ZipEntryInputStream extends FilterInputStream {
 
   @Override
   public int read() throws IOException {
-    if (bytesToRead == 0)
+    if (bytesToRead == 0) {
       return -1;
+    }
     bytesToRead--;
     int byteContent = in.read();
-    if (byteContent == -1)
+    if (byteContent == -1) {
       throw new IOException("Zip entry is shorter than anticipated");
+    }
     return byteContent;
   }
 

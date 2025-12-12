@@ -44,7 +44,8 @@ import javax.xml.bind.annotation.XmlType;
     @Index(name = "IX_oc_user_session_user_id", columnList = "user_id")
 })
 @NamedQueries({
-    @NamedQuery(name = "findUserSessionBySessionId", query = "SELECT s FROM UserSession s WHERE s.sessionId = :sessionId") })
+    @NamedQuery(name = "findUserSessionBySessionId",
+        query = "SELECT s FROM UserSession s WHERE s.sessionId = :sessionId") })
 @XmlType(name = "session", namespace = "http://usertracking.opencastproject.org")
 @XmlRootElement(name = "session", namespace = "http://usertracking.opencastproject.org")
 @XmlAccessorType(XmlAccessType.FIELD)

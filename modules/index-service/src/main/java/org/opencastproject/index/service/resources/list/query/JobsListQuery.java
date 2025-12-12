@@ -73,14 +73,17 @@ public class JobsListQuery extends ResourceListQueryImpl {
     this();
     availableFilters.addAll(query.getAvailableFilters());
 
-    for (ResourceListFilter filter : query.getFilters())
+    for (ResourceListFilter filter : query.getFilters()) {
       addFilter(filter);
+    }
 
     sortBy = query.getSortBy();
-    if (query.getOffset().isPresent())
+    if (query.getOffset().isPresent()) {
       setOffset(query.getOffset().get());
-    if (query.getLimit().isPresent())
+    }
+    if (query.getLimit().isPresent()) {
       setLimit(query.getLimit().get());
+    }
   }
 
   /**

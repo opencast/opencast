@@ -123,8 +123,9 @@ public class MediaDurationImpl implements MediaDuration {
    */
   public void parse(String text) throws IllegalArgumentException {
     int index = 0;
-    if ((!text.startsWith("P")) || (!text.contains(TimeDelimiter)))
+    if ((!text.startsWith("P")) || (!text.contains(TimeDelimiter))) {
       throw new IllegalArgumentException();
+    }
     if (text.contains(DayDelimiter)) {
       days = Integer.parseInt(text.substring(1, text.indexOf(DayDelimiter)));
     }
@@ -282,8 +283,9 @@ public class MediaDurationImpl implements MediaDuration {
     s += minutes * MS_PER_MINUTE;
     s += hours * MS_PER_HOUR;
     s += days * MS_PER_DAY;
-    if (fractionsPerSecond > 0)
+    if (fractionsPerSecond > 0) {
       s += (fractions * 1000L / fractionsPerSecond);
+    }
     return s;
   }
 
@@ -304,8 +306,9 @@ public class MediaDurationImpl implements MediaDuration {
    */
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof MediaDuration)
+    if (obj instanceof MediaDuration) {
       return ((MediaDuration) obj).getDurationInMilliseconds() == getDurationInMilliseconds();
+    }
     return false;
   }
 

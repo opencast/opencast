@@ -79,8 +79,10 @@ public class DublinCoreCatalogUIAdapterTest {
   private static final Logger logger = LoggerFactory.getLogger(DublinCoreCatalogUIAdapterTest.class);
   private static final String TEMPORAL_DUBLIN_CORE_KEY = "temporal";
   private static final String INPUT_PERIOD = "start=2014-11-04T19:35:19Z; end=2014-11-04T20:48:23Z; scheme=W3C-DTF;";
-  private static final String CHANGED_DURATION_PERIOD = "start=2014-11-04T19:35:19Z; end=2014-11-04T20:18:23Z; scheme=W3C-DTF;";
-  private static final String CHANGED_START_DATE_PERIOD = "start=2013-10-29T19:35:19Z; end=2013-10-29T20:48:23Z; scheme=W3C-DTF;";
+  private static final String CHANGED_DURATION_PERIOD =
+      "start=2014-11-04T19:35:19Z; end=2014-11-04T20:18:23Z; scheme=W3C-DTF;";
+  private static final String CHANGED_START_DATE_PERIOD =
+      "start=2013-10-29T19:35:19Z; end=2013-10-29T20:48:23Z; scheme=W3C-DTF;";
 
   private static final String label = "The Label";
   private static final String title = "title";
@@ -274,7 +276,8 @@ public class DublinCoreCatalogUIAdapterTest {
     String expectedTitle = "New Value for Title";
     String expectedMissing = "New Value for Missing";
 
-    ConfigurableEventDCCatalogUIAdapter configurationDublinCoreCatalogUIAdapter = new ConfigurableEventDCCatalogUIAdapter();
+    ConfigurableEventDCCatalogUIAdapter configurationDublinCoreCatalogUIAdapter =
+        new ConfigurableEventDCCatalogUIAdapter();
     configurationDublinCoreCatalogUIAdapter.setListProvidersService(listProvidersService);
     configurationDublinCoreCatalogUIAdapter.setWorkspace(workspace);
     configurationDublinCoreCatalogUIAdapter.updated(eventProperties);

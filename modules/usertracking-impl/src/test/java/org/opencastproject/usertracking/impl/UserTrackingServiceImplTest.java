@@ -107,7 +107,8 @@ public class UserTrackingServiceImplTest {
     verifyFootprintViewsAndPositions(list, 2, 20, 0);
 
     //Create a different viewer/user event
-    createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session456", "mp", "someone else", "127.0.01", 560, 720);
+    createAndVerifyUserAction(
+        UserTrackingServiceImpl.FOOTPRINT_KEY, "session456", "mp", "someone else", "127.0.01", 560, 720);
 
     //Sanity checks
     Assert.assertEquals(2, service.getViews("mp"));
@@ -153,7 +154,8 @@ public class UserTrackingServiceImplTest {
     verifyFootprintViewsAndPositions(list, 2, 30, 0);
 
     //Skip the second viewer to a new point in the video
-    createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session456", "mp", "someone else", "127.0.01", 950, 960);
+    createAndVerifyUserAction(
+        UserTrackingServiceImpl.FOOTPRINT_KEY, "session456", "mp", "someone else", "127.0.01", 950, 960);
 
     //Sanity checks
     Assert.assertEquals(2, service.getViews("mp"));
@@ -685,12 +687,14 @@ public class UserTrackingServiceImplTest {
    * Wrapper method to test user action reports based on different time formats
    * @throws Exception
    */
-  private void testUserActionsByDayWithFormat(Date yesterdayD, Date todayD, Date tomorrowD, String format) throws Exception {
+  private void testUserActionsByDayWithFormat(Date yesterdayD, Date todayD, Date tomorrowD, String format)
+          throws Exception {
     DateFormat df = new SimpleDateFormat(format);
     String today = df.format(todayD);
 
     //Create an event that happens tomorrow, and check to make sure it does not appear in the stats for today
-    createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session1", "mp", "me", "127.0.0.1", 0, 10, tomorrowD);
+    createAndVerifyUserAction(
+        UserTrackingServiceImpl.FOOTPRINT_KEY, "session1", "mp", "me", "127.0.0.1", 0, 10, tomorrowD);
     Assert.assertEquals(1, service.getViews("mp"));
     Assert.assertEquals(0, service.getViews("other"));
 
@@ -700,7 +704,8 @@ public class UserTrackingServiceImplTest {
     verifyUserActionListsByDay(today, 0, 1, 1, 0);
 
     //Create an event yesterday and check that it appears in the stats for today
-    createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session1", "mp", "me", "127.0.0.1", 10, 20, yesterdayD);
+    createAndVerifyUserAction(
+        UserTrackingServiceImpl.FOOTPRINT_KEY, "session1", "mp", "me", "127.0.0.1", 10, 20, yesterdayD);
     Assert.assertEquals(1, service.getViews("mp"));
     Assert.assertEquals(0, service.getViews("other"));
 
@@ -710,7 +715,8 @@ public class UserTrackingServiceImplTest {
     verifyUserActionListsByDay(today, 0, 1, 1, 0);
 
     //Create an event today and check that it appears today
-    createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session2", "mp", "me", "127.0.0.1", 20, 30, todayD);
+    createAndVerifyUserAction(
+        UserTrackingServiceImpl.FOOTPRINT_KEY, "session2", "mp", "me", "127.0.0.1", 20, 30, todayD);
     Assert.assertEquals(2, service.getViews("mp"));
     Assert.assertEquals(0, service.getViews("other"));
 
@@ -720,7 +726,8 @@ public class UserTrackingServiceImplTest {
     verifyUserActionListsByDay(today, 0, 1, 1, 1);
 
     //Create an event for another user, and check that it appears today
-    createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session3", "other", "someone else", "127.0.01", 20, 30, todayD);
+    createAndVerifyUserAction(
+        UserTrackingServiceImpl.FOOTPRINT_KEY, "session3", "other", "someone else", "127.0.01", 20, 30, todayD);
     Assert.assertEquals(2, service.getViews("mp"));
     Assert.assertEquals(1, service.getViews("other"));
 
@@ -752,7 +759,8 @@ public class UserTrackingServiceImplTest {
     Assert.assertEquals(0, rep.getTotal());
     Assert.assertEquals(0, rep.getViews());
 
-    createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session1", "mp", "me", "127.0.0.1", 20, 30, backHalf);
+    createAndVerifyUserAction(
+        UserTrackingServiceImpl.FOOTPRINT_KEY, "session1", "mp", "me", "127.0.0.1", 20, 30, backHalf);
     Assert.assertEquals(1, service.getViews("mp"));
     Assert.assertEquals(0, service.getViews("other"));
 
@@ -788,7 +796,8 @@ public class UserTrackingServiceImplTest {
     Assert.assertEquals(0, rep.getPlayed());
     Assert.assertEquals(0, rep.getViews());
 
-    createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session2", "mp", "me", "127.0.0.1", 40, 45, forwardHalf);
+    createAndVerifyUserAction(
+        UserTrackingServiceImpl.FOOTPRINT_KEY, "session2", "mp", "me", "127.0.0.1", 40, 45, forwardHalf);
     Assert.assertEquals(2, service.getViews("mp"));
     Assert.assertEquals(0, service.getViews("other"));
 
@@ -824,7 +833,8 @@ public class UserTrackingServiceImplTest {
     Assert.assertEquals(0, rep.getPlayed());
     Assert.assertEquals(0, rep.getViews());
 
-    createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session3", "mp", "someone else", "127.0.01", 50, 55, forwardHalf);
+    createAndVerifyUserAction(
+        UserTrackingServiceImpl.FOOTPRINT_KEY, "session3", "mp", "someone else", "127.0.01", 50, 55, forwardHalf);
     Assert.assertEquals(3, service.getViews("mp"));
     Assert.assertEquals(0, service.getViews("other"));
 
@@ -860,7 +870,8 @@ public class UserTrackingServiceImplTest {
     Assert.assertEquals(0, rep.getPlayed());
     Assert.assertEquals(0, rep.getViews());
 
-    createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session4", "other", "someone else", "127.0.01", 0, 10, forwardHalf);
+    createAndVerifyUserAction(
+        UserTrackingServiceImpl.FOOTPRINT_KEY, "session4", "other", "someone else", "127.0.01", 0, 10, forwardHalf);
     Assert.assertEquals(3, service.getViews("mp"));
     Assert.assertEquals(1, service.getViews("other"));
 
@@ -961,7 +972,13 @@ public class UserTrackingServiceImplTest {
    * Wrapper function which actually tests report generation with date and time restrictions
    * @throws Exception
    */
-  private void testDistinctEpisodeCountWithDateRanges(String minusTwo, Date minusOne, String today, Date plusOne, String plusTwo) throws Exception {
+  private void testDistinctEpisodeCountWithDateRanges(
+      String minusTwo,
+      Date minusOne,
+      String today,
+      Date plusOne,
+      String plusTwo
+  ) throws Exception {
 
     //Check against an empty session list
     Report rep = service.getReport(minusTwo, plusTwo, 0, 1);
@@ -971,7 +988,8 @@ public class UserTrackingServiceImplTest {
     Assert.assertEquals(0, rep.getTotal());
     Assert.assertEquals(0, rep.getViews());
 
-    createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session1", "mp", "me", "127.0.0.1", 20, 30, minusOne);
+    createAndVerifyUserAction(
+        UserTrackingServiceImpl.FOOTPRINT_KEY, "session1", "mp", "me", "127.0.0.1", 20, 30, minusOne);
     Assert.assertEquals(1, service.getViews("mp"));
     Assert.assertEquals(0, service.getViews("other"));
 
@@ -1021,7 +1039,8 @@ public class UserTrackingServiceImplTest {
     Assert.assertEquals(0, rep.getPlayed());
     Assert.assertEquals(0, rep.getViews());
 
-    createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session2", "mp", "me", "127.0.0.1", 40, 45, plusOne);
+    createAndVerifyUserAction(
+        UserTrackingServiceImpl.FOOTPRINT_KEY, "session2", "mp", "me", "127.0.0.1", 40, 45, plusOne);
     Assert.assertEquals(2, service.getViews("mp"));
     Assert.assertEquals(0, service.getViews("other"));
 
@@ -1071,7 +1090,8 @@ public class UserTrackingServiceImplTest {
     Assert.assertEquals(5, rep.getPlayed());
     Assert.assertEquals(1, rep.getViews());
 
-    createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session3", "mp", "someone else", "127.0.01", 50, 55, plusOne);
+    createAndVerifyUserAction(
+        UserTrackingServiceImpl.FOOTPRINT_KEY, "session3", "mp", "someone else", "127.0.01", 50, 55, plusOne);
     Assert.assertEquals(3, service.getViews("mp"));
     Assert.assertEquals(0, service.getViews("other"));
 
@@ -1107,7 +1127,8 @@ public class UserTrackingServiceImplTest {
     Assert.assertEquals(0, rep.getPlayed());
     Assert.assertEquals(0, rep.getViews());
 
-    createAndVerifyUserAction(UserTrackingServiceImpl.FOOTPRINT_KEY, "session4", "other", "someone else", "127.0.01", 0, 10, plusOne);
+    createAndVerifyUserAction(
+        UserTrackingServiceImpl.FOOTPRINT_KEY, "session4", "other", "someone else", "127.0.01", 0, 10, plusOne);
     Assert.assertEquals(3, service.getViews("mp"));
     Assert.assertEquals(1, service.getViews("other"));
 
@@ -1198,7 +1219,14 @@ public class UserTrackingServiceImplTest {
    * Gets the user action list based on type and mediapackage, performs some asserts
    * @throws Exception
    */
-  private void verifyUserActionListsByTypeAndMediapackage(String type, String mp, int count, int offset, int limit, int total) {
+  private void verifyUserActionListsByTypeAndMediapackage(
+      String type,
+      String mp,
+      int count,
+      int offset,
+      int limit,
+      int total
+  ) {
     UserActionList ual = service.getUserActionsByTypeAndMediapackageId(type, mp, offset, limit);
     Assert.assertEquals(limit, ual.getLimit());
     Assert.assertEquals(offset, ual.getOffset());
@@ -1248,7 +1276,15 @@ public class UserTrackingServiceImplTest {
    * Creates and verifies a user action with the current date
    * @throws Exception
    */
-  private UserAction createAndVerifyUserAction(String type, String sessionId, String mediapackageId, String userId, String userIp, int inpoint, int outpoint) throws Exception {
+  private UserAction createAndVerifyUserAction(
+      String type,
+      String sessionId,
+      String mediapackageId,
+      String userId,
+      String userIp,
+      int inpoint,
+      int outpoint
+  ) throws Exception {
     return createAndVerifyUserAction(type, sessionId, mediapackageId, userId, userIp, inpoint, outpoint, new Date());
   }
 
@@ -1256,7 +1292,16 @@ public class UserTrackingServiceImplTest {
    * Creates and verifies a user action with an arbitrary date
    * @throws Exception
    */
-  private UserAction createAndVerifyUserAction(String type, String sessionId, String mediapackageId, String userId, String userIp, int inpoint, int outpoint, Date createdDate) throws Exception {
+  private UserAction createAndVerifyUserAction(
+      String type,
+      String sessionId,
+      String mediapackageId,
+      String userId,
+      String userIp,
+      int inpoint,
+      int outpoint,
+      Date createdDate
+  ) throws Exception {
     UserSession userSession = createUserSession(sessionId, userId, userIp);
     UserAction userAction = createUserAction(type, mediapackageId, inpoint, outpoint, createdDate, userSession);
     if (UserTrackingServiceImpl.FOOTPRINT_KEY.equals(type)) {
@@ -1302,7 +1347,14 @@ public class UserTrackingServiceImplTest {
    * Creates a user action with an arbitrary date
    * @throws Exception
    */
-  private UserAction createUserAction(String type, String mediapackageId, int inpoint, int outpoint, Date createdDate, UserSession userSession) {
+  private UserAction createUserAction(
+      String type,
+      String mediapackageId,
+      int inpoint,
+      int outpoint,
+      Date createdDate,
+      UserSession userSession
+  ) {
     UserAction userAction = new UserActionImpl();
     userAction.setInpoint(inpoint);
     userAction.setOutpoint(outpoint);
