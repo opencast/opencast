@@ -53,12 +53,12 @@ import java.util.Map;
 
 /** Inspects media via ffprobe. */
 @Component(
-  property = {
-    "service.description=Media Inspection Service",
-    "service.pid=org.opencastproject.inspection.ffmpeg.MediaInspectionServiceImpl"
-  },
-  immediate = true,
-  service = { MediaInspectionService.class }
+    property = {
+        "service.description=Media Inspection Service",
+        "service.pid=org.opencastproject.inspection.ffmpeg.MediaInspectionServiceImpl"
+    },
+    immediate = true,
+    service = { MediaInspectionService.class }
 )
 public class MediaInspectionServiceImpl extends AbstractJobProducer implements MediaInspectionService {
 
@@ -199,8 +199,8 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.inspection.api.MediaInspectionService#enrich(org.opencastproject.mediapackage.MediaPackageElement,
-   *      boolean)
+   * @see org.opencastproject.inspection.api.MediaInspectionService#enrich(
+   *      org.opencastproject.mediapackage.MediaPackageElement, boolean)
    */
   @Override
   public Job enrich(final MediaPackageElement element, final boolean override)
@@ -211,8 +211,8 @@ public class MediaInspectionServiceImpl extends AbstractJobProducer implements M
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.inspection.api.MediaInspectionService#enrich(org.opencastproject.mediapackage.MediaPackageElement,
-   *      boolean, java.util.Map)
+   * @see org.opencastproject.inspection.api.MediaInspectionService#enrich(
+   *      org.opencastproject.mediapackage.MediaPackageElement, boolean, java.util.Map)
    */
   @Override
   public Job enrich(final MediaPackageElement element, final boolean override, final Map<String,String> options)

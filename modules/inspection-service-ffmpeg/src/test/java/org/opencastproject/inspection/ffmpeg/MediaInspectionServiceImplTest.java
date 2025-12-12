@@ -61,8 +61,9 @@ public class MediaInspectionServiceImplTest {
   public static void setupClass() {
     try {
       Process p = new ProcessBuilder(FFmpegAnalyzer.FFPROBE_BINARY_DEFAULT, "-version").start();
-      if (p.waitFor() != 0)
+      if (p.waitFor() != 0) {
         throw new IllegalStateException();
+      }
       ffprobePath = Optional.of(FFmpegAnalyzer.FFPROBE_BINARY_DEFAULT);
     } catch (Throwable t) {
       logger.warn("Skipping composer tests due to missing ffprobe binary");
