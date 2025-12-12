@@ -92,7 +92,8 @@ public interface IndexService {
    * @throws UnsupportedAssetException
    *           Thrown if the provided asset file type is not accepted.
    */
-  String createEvent(HttpServletRequest request) throws IndexServiceException, IllegalArgumentException, UnsupportedAssetException;
+  String createEvent(HttpServletRequest request) throws IndexServiceException, IllegalArgumentException,
+          UnsupportedAssetException;
 
   /**
    * Create a new event using a {@link EventHttpServletRequest}.
@@ -125,7 +126,8 @@ public interface IndexService {
    *          The event to remove.
    * @param retractWorkflowId
    *          The id of the workflow to use to retract the event if necessary.
-   * @return A result which tells if the event was removed, removal failed, or the event is being retracted and will be removed later.
+   * @return A result which tells if the event was removed, removal failed, or the event is being retracted and will
+   *         be removed later.
    * @throws UnauthorizedException
    *           Thrown if the action is unauthorized
    * @throws WorkflowDatabaseException
@@ -178,7 +180,8 @@ public interface IndexService {
    *           Thrown if the provided asset file type is not accepted.
    */
   String updateEventAssets(MediaPackage mp, HttpServletRequest request) throws ParseException, IOException,
-          MediaPackageException, NotFoundException, UnauthorizedException, IndexServiceException, UnsupportedAssetException;
+          MediaPackageException, NotFoundException, UnauthorizedException, IndexServiceException,
+          UnsupportedAssetException;
 
   /**
    * Update an event's metadata using a {@link MetadataList}
@@ -311,7 +314,8 @@ public interface IndexService {
    * @throws UnauthorizedException
    *           Thrown if the user cannot create a new series.
    */
-  String createSeries(JSONObject metadata) throws IllegalArgumentException, IndexServiceException, UnauthorizedException;
+  String createSeries(JSONObject metadata) throws IllegalArgumentException, IndexServiceException,
+          UnauthorizedException;
 
   /**
    * Create a series from a set of metadata and options.

@@ -90,6 +90,7 @@
             "segmentPreviewAttachmentsFlavours": ["presentation/segment+preview"],
             "playerPreviewAttachmentsFlavours": ["presenter/player+preview", "presentation/player+preview"],
             "timelineAttachmentsFlavours": ["presentation/timeline+preview", "presenter/timeline+preview"],
+            "chaptersFlavours": ["chapters/source", "chapters/delivery"],
             "tagFor360Video": "video360"
         },
         "hideTimeLineOnLive": false,

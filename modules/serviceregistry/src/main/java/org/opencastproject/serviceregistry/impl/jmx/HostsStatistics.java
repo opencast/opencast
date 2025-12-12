@@ -146,8 +146,9 @@ public class HostsStatistics extends NotificationBroadcasterSupport implements H
   public String[] getOnline() {
     List<String> onlineHosts = new ArrayList<String>();
     for (Entry<String, Integer> entry : hosts.entrySet()) {
-      if (entry.getValue().equals(ONLINE))
+      if (entry.getValue().equals(ONLINE)) {
         onlineHosts.add(entry.getKey());
+      }
     }
     return onlineHosts.toArray(new String[onlineHosts.size()]);
   }
@@ -159,8 +160,9 @@ public class HostsStatistics extends NotificationBroadcasterSupport implements H
   public String[] getOffline() {
     List<String> offlineHosts = new ArrayList<String>();
     for (Entry<String, Integer> entry : hosts.entrySet()) {
-      if (entry.getValue().equals(OFFLINE))
+      if (entry.getValue().equals(OFFLINE)) {
         offlineHosts.add(entry.getKey());
+      }
     }
     return offlineHosts.toArray(new String[offlineHosts.size()]);
   }
@@ -172,8 +174,9 @@ public class HostsStatistics extends NotificationBroadcasterSupport implements H
   public String[] getInMaintenance() {
     List<String> maintenanceHosts = new ArrayList<String>();
     for (Entry<String, Integer> entry : hosts.entrySet()) {
-      if (entry.getValue().equals(MAINTENANCE))
+      if (entry.getValue().equals(MAINTENANCE)) {
         maintenanceHosts.add(entry.getKey());
+      }
     }
     return maintenanceHosts.toArray(new String[maintenanceHosts.size()]);
   }

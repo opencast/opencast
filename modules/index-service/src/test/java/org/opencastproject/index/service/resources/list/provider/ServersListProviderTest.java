@@ -107,6 +107,7 @@ public class ServersListProviderTest {
     Map<String, String> list = serverListProvider.getList(ServersListProvider.LIST_STATUS, query);
     assertEquals(ServersListProvider.SERVER_STATUS_LABEL_ONLINE, list.get(ServersListProvider.SERVER_STATUS_ONLINE));
     assertEquals(ServersListProvider.SERVER_STATUS_LABEL_OFFLINE, list.get(ServersListProvider.SERVER_STATUS_OFFLINE));
-    assertEquals(ServersListProvider.SERVER_STATUS_LABEL_MAINTENANCE, list.get(ServersListProvider.SERVER_STATUS_MAINTENANCE));
+    assertEquals(ServersListProvider.SERVER_STATUS_LABEL_MAINTENANCE,
+        list.get(ServersListProvider.SERVER_STATUS_MAINTENANCE));
   }
 }

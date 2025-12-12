@@ -69,7 +69,7 @@ public class EventsListProvider implements ResourceListProvider {
   }
 
   private static final String[] NAMES = { PROVIDER_PREFIX, CONTRIBUTORS, PRESENTERS_BIBLIOGRAPHIC, PRESENTERS_TECHNICAL,
-          SUBJECT, LOCATION, PROGRESS, STATUS, COMMENTS, PUBLISHER, ISPUBLISHED };
+      SUBJECT, LOCATION, PROGRESS, STATUS, COMMENTS, PUBLISHER, ISPUBLISHED };
 
   private static final Logger logger = LoggerFactory.getLogger(EventsListProvider.class);
 
@@ -95,23 +95,29 @@ public class EventsListProvider implements ResourceListProvider {
     Map<String, String> list = new HashMap<String, String>();
 
     if (CONTRIBUTORS.equals(listName)) {
-      for (String contributor : index.getTermsForField(EventIndexSchema.CONTRIBUTOR, Event.DOCUMENT_TYPE))
+      for (String contributor : index.getTermsForField(EventIndexSchema.CONTRIBUTOR, Event.DOCUMENT_TYPE)) {
         list.put(contributor, contributor);
+      }
     } else if (PRESENTERS_BIBLIOGRAPHIC.equals(listName)) {
-      for (String presenter : index.getTermsForField(EventIndexSchema.PRESENTER, Event.DOCUMENT_TYPE))
+      for (String presenter : index.getTermsForField(EventIndexSchema.PRESENTER, Event.DOCUMENT_TYPE)) {
         list.put(presenter, presenter);
+      }
     } else if (PRESENTERS_TECHNICAL.equals(listName)) {
-      for (String presenter : index.getTermsForField(EventIndexSchema.TECHNICAL_PRESENTERS, Event.DOCUMENT_TYPE))
+      for (String presenter : index.getTermsForField(EventIndexSchema.TECHNICAL_PRESENTERS, Event.DOCUMENT_TYPE)) {
         list.put(presenter, presenter);
+      }
     } else if (LOCATION.equals(listName)) {
-      for (String location : index.getTermsForField(EventIndexSchema.LOCATION, Event.DOCUMENT_TYPE))
+      for (String location : index.getTermsForField(EventIndexSchema.LOCATION, Event.DOCUMENT_TYPE)) {
         list.put(location, location);
+      }
     } else if (SUBJECT.equals(listName)) {
-      for (String subject : index.getTermsForField(EventIndexSchema.SUBJECT, Event.DOCUMENT_TYPE))
+      for (String subject : index.getTermsForField(EventIndexSchema.SUBJECT, Event.DOCUMENT_TYPE)) {
         list.put(subject, subject);
+      }
     } else if (PROGRESS.equals(listName)) {
-      for (WorkflowState progress : WorkflowState.values())
+      for (WorkflowState progress : WorkflowState.values()) {
         list.put(progress.toString(), progress.toString());
+      }
     } else if (STATUS.equals(listName)) {
       list.put("EVENTS.EVENTS.STATUS.SCHEDULED", "EVENTS.EVENTS.STATUS.SCHEDULED");
       list.put("EVENTS.EVENTS.STATUS.RECORDING", "EVENTS.EVENTS.STATUS.RECORDING");
@@ -124,14 +130,17 @@ public class EventsListProvider implements ResourceListProvider {
       list.put("EVENTS.EVENTS.STATUS.PROCESSING_FAILURE", "EVENTS.EVENTS.STATUS.PROCESSING_FAILURE");
       list.put("EVENTS.EVENTS.STATUS.PROCESSING_CANCELLED", "EVENTS.EVENTS.STATUS.PROCESSING_CANCELLED");
     } else if (COMMENTS.equals(listName)) {
-      for (Comments comments : Comments.values())
+      for (Comments comments : Comments.values()) {
         list.put(comments.toString(), "FILTERS.EVENTS.COMMENTS." + comments.toString());
+      }
     } else if (PUBLISHER.equals(listName)) {
-      for (String publisher : index.getTermsForField(EventIndexSchema.PUBLISHER, Event.DOCUMENT_TYPE))
+      for (String publisher : index.getTermsForField(EventIndexSchema.PUBLISHER, Event.DOCUMENT_TYPE)) {
         list.put(publisher, publisher);
+      }
     } else if (ISPUBLISHED.equals(listName)) {
-      for (IsPublished isPublished : IsPublished.values())
+      for (IsPublished isPublished : IsPublished.values()) {
         list.put(isPublished.toString(), "FILTERS.EVENTS.ISPUBLISHED." + isPublished.toString());
+      }
     }
 
     return list;

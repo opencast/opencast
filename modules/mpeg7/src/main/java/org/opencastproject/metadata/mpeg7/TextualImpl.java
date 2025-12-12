@@ -83,8 +83,9 @@ public class TextualImpl implements Textual {
    *           if the text is <code>null</code> or empty
    */
   public TextualImpl(String text, String language) {
-    if (StringUtils.trimToNull(text) == null)
+    if (StringUtils.trimToNull(text) == null) {
       throw new IllegalArgumentException("The text cannot be empty");
+    }
     this.text = text;
     this.language = language;
   }
@@ -172,8 +173,9 @@ public class TextualImpl implements Textual {
    */
   @Override
   public void setPhoneticTranscription(String transcription, String alphabet) {
-    if (transcription != null && alphabet == null)
+    if (transcription != null && alphabet == null) {
       alphabet = DEFAULT_PHONETIC_ALPHABET;
+    }
     this.transcription = transcription;
     this.alphabet = alphabet;
   }
@@ -186,8 +188,9 @@ public class TextualImpl implements Textual {
   @Override
   public Node toXml(Document document) {
     Element node = document.createElement("Text");
-    if (language != null)
+    if (language != null) {
       node.setAttribute("xml:lang", language);
+    }
     if (transcription != null) {
       node.setAttribute("phoneticTranscription", transcription);
       node.setAttribute("phoneticAlphabet", alphabet);

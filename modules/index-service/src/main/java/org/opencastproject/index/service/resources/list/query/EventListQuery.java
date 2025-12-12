@@ -449,7 +449,7 @@ public class EventListQuery extends ResourceListQueryImpl {
    * @return a new {@link ResourceListFilter} for progress based query
    */
   public static ResourceListFilter<String> createIsPublishedFilter(Optional<String> isPublished) {
-    return FiltersUtils.generateFilter(isPublished, FILTER_IS_PUBLISHED_NAME, FILTER_IS_PUBLISHED_LABEL, SourceType.SELECT,
-        Optional.of(EventsListProvider.ISPUBLISHED));
+    return FiltersUtils.generateFilter(isPublished, FILTER_IS_PUBLISHED_NAME, FILTER_IS_PUBLISHED_LABEL,
+        SourceType.SELECT, Optional.of(EventsListProvider.ISPUBLISHED));
   }
 }

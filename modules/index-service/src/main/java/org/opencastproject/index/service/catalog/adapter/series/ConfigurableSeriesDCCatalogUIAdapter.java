@@ -87,7 +87,8 @@ public class ConfigurableSeriesDCCatalogUIAdapter extends ConfigurableDCCatalogU
 
   protected Optional<DublinCoreCatalog> loadDublinCoreCatalog(String seriesId) {
     try {
-      Optional<byte[]> seriesElementData = getSeriesService().getSeriesElementData(requireNonNull(seriesId), flavor.getType());
+      Optional<byte[]> seriesElementData = getSeriesService().getSeriesElementData(requireNonNull(seriesId),
+          flavor.getType());
       if (seriesElementData.isPresent()) {
         final DublinCoreCatalog dc = DublinCoreByteFormat.read(seriesElementData.get());
         // Make sure that the catalog has its flavor set.
