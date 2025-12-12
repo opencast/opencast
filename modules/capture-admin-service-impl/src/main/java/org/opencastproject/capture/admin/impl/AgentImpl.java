@@ -57,8 +57,8 @@ import javax.persistence.UniqueConstraint;
 @Entity @IdClass(AgentImplId.class)
 @Table(name = "oc_capture_agent_state")
 @NamedQueries({
-  @NamedQuery(name = "Agent.get", query = "select a from AgentImpl a where a.name = :id and a.organization = :org"),
-  @NamedQuery(name = "Agent.byOrganization", query = "SELECT a FROM AgentImpl a where a.organization = :org")
+    @NamedQuery(name = "Agent.get", query = "select a from AgentImpl a where a.name = :id and a.organization = :org"),
+    @NamedQuery(name = "Agent.byOrganization", query = "SELECT a FROM AgentImpl a where a.organization = :org")
 })
 public class AgentImpl implements Agent {
 
@@ -99,13 +99,16 @@ public class AgentImpl implements Agent {
   /** The roles allowed to schedule this agent */
   @ElementCollection
   @Column(name = "role", nullable = false)
-  @CollectionTable(name = "oc_capture_agent_role", indexes = {
-      @Index(name = "IX_oc_capture_agent_role_pk", columnList = "id, organization")
-    }, uniqueConstraints = {
-      @UniqueConstraint(name = "UNQ_capture_agent_role_id_org_role", columnNames = {"id", "organization", "role"})
-    }, joinColumns = {
-      @JoinColumn(name = "id", referencedColumnName = "id", nullable = false),
-      @JoinColumn(name = "organization", referencedColumnName = "organization", nullable = false) })
+  @CollectionTable(
+      name = "oc_capture_agent_role",
+      indexes = {
+          @Index(name = "IX_oc_capture_agent_role_pk", columnList = "id, organization")
+      }, uniqueConstraints = {
+          @UniqueConstraint(name = "UNQ_capture_agent_role_id_org_role", columnNames = {"id", "organization", "role"})
+      }, joinColumns = {
+          @JoinColumn(name = "id", referencedColumnName = "id", nullable = false),
+          @JoinColumn(name = "organization", referencedColumnName = "organization", nullable = false)
+      })
   protected Set<String> schedulerRoles = new HashSet<>();
 
   /**
@@ -142,7 +145,8 @@ public class AgentImpl implements Agent {
    * @param configuration
    *          The configuration of the agent.
    */
-  public AgentImpl(String agentName, String organization, String agentState, String agentUrl, Properties configuration) {
+  public AgentImpl(String agentName, String organization, String agentState, String agentUrl,
+      Properties configuration) {
     name = agentName;
     this.setState(agentState);
     this.setUrl(agentUrl);

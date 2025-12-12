@@ -7,7 +7,6 @@
 <suppressions>
     <suppress checks="LineLength" files="modules/admin-ui/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/caption-impl/.+\.(java|properties)"/>
-    <suppress checks="LineLength" files="modules/capture-admin-service-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/common/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/composer-ffmpeg/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/composer-service-api/.+\.(java|properties)"/>
@@ -32,7 +31,6 @@
     <suppress checks="LineLength" files="modules/usertracking-impl/.+\.(java|properties)"/>
 
     <suppress checks="Indentation" files="modules/admin-ui/.+\.java"/>
-    <suppress checks="Indentation" files="modules/capture-admin-service-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/common/.+\.java"/>
     <suppress checks="Indentation" files="modules/composer-ffmpeg/.+\.java"/>
     <suppress checks="Indentation" files="modules/composer-service-remote/.+\.java"/>
@@ -51,7 +49,6 @@
 
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/admin-ui/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/caption-impl/.+\.java"/>
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/capture-admin-service-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/common/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/composer-ffmpeg/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/composer-service-api/.+\.java"/>

@@ -43,11 +43,11 @@ import java.util.stream.Stream;
  * The capture agent admin role provider provides a role for each registered capture agent
  */
 @Component(
-  property = {
-    "service.description=Manages Roles for each capture agent"
-  },
-  immediate = true,
-  service = { RoleProvider.class }
+    property = {
+        "service.description=Manages Roles for each capture agent"
+    },
+    immediate = true,
+    service = { RoleProvider.class }
 )
 public class CaptureAgentAdminRoleProviderImpl implements RoleProvider {
 
