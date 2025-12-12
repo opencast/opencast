@@ -118,7 +118,8 @@ public class CatalogUIAdapterFactory implements ManagedServiceFactory {
   public void updated(String pid, Dictionary<String, ?> properties) throws ConfigurationException {
     final String type = getCfg(properties, CONF_TYPE_KEY);
     Optional<String> optCommonMetadata = getOptCfg(properties, CONF_COMMON_METADATA_KEY);
-    final boolean isCommonMetadata = optCommonMetadata.isPresent() ? Boolean.parseBoolean(optCommonMetadata.get()) : false;
+    final boolean isCommonMetadata = optCommonMetadata.isPresent()
+        ? Boolean.parseBoolean(optCommonMetadata.get()) : false;
     Dictionary serviceProperties = new Properties();
     serviceProperties.put(CONF_COMMON_METADATA_KEY, isCommonMetadata);
 

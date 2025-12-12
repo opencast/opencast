@@ -41,7 +41,8 @@ public final class RetractionListener implements WorkflowListener {
   private final Map<Long, Retraction> retractions;
   private final IndexService indexService;
 
-  public RetractionListener(IndexService indexService, SecurityService securityService, Map<Long, Retraction> retractions) {
+  public RetractionListener(IndexService indexService, SecurityService securityService,
+      Map<Long, Retraction> retractions) {
     this.indexService = indexService;
     this.securityService = securityService;
     this.retractions = retractions;

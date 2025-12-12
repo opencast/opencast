@@ -62,7 +62,8 @@ public class CommonSeriesCatalogUIAdapter extends ConfigurableSeriesDCCatalogUIA
       return Optional.empty();
     } catch (UnauthorizedException e) {
       logger.warn(
-              "The current user does not have sufficient permissions to load the DublinCore metadata catalog of the series '{}'",
+              "The current user does not have sufficient permissions to load the DublinCore metadata catalog of the "
+                  + "series '{}'",
               seriesId);
       return Optional.empty();
     }

@@ -83,11 +83,13 @@ public class GroupsListProvider implements ResourceListProvider {
     int offset = 0;
 
     if (query != null) {
-      if (query.getLimit().isPresent())
+      if (query.getLimit().isPresent()) {
         limit = query.getLimit().get();
+      }
 
-      if (query.getOffset().isPresent())
+      if (query.getOffset().isPresent()) {
         offset = query.getOffset().get();
+      }
     }
 
     try {

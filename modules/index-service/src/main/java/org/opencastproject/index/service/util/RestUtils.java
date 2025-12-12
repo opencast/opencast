@@ -196,7 +196,7 @@ public final class RestUtils {
       responseJson.addProperty("offset", optOffset.get());
     }
     if (optLimit.isPresent()) {
-     responseJson.addProperty("limit", optLimit.get());
+      responseJson.addProperty("limit", optLimit.get());
     }
 
     return okJson(responseJson);
