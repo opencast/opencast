@@ -102,8 +102,9 @@ public class ServicesStatistics extends NotificationBroadcasterSupport implement
   public int getServiceCountByNode() {
     int i = 0;
     for (Tuple<String, String> key : services.keySet()) {
-      if (key.getA().equals(hostName))
+      if (key.getA().equals(hostName)) {
         i++;
+      }
     }
     return i;
   }
@@ -115,8 +116,9 @@ public class ServicesStatistics extends NotificationBroadcasterSupport implement
   public int getNormalServiceCountByNode() {
     int i = 0;
     for (Entry<Tuple<String, String>, ServiceState> entry : services.entrySet()) {
-      if (entry.getKey().getA().equals(hostName) && ServiceState.NORMAL.equals(entry.getValue()))
+      if (entry.getKey().getA().equals(hostName) && ServiceState.NORMAL.equals(entry.getValue())) {
         i++;
+      }
     }
     return i;
   }
@@ -128,8 +130,9 @@ public class ServicesStatistics extends NotificationBroadcasterSupport implement
   public int getWarningServiceCountByNode() {
     int i = 0;
     for (Entry<Tuple<String, String>, ServiceState> entry : services.entrySet()) {
-      if (entry.getKey().getA().equals(hostName) && ServiceState.WARNING.equals(entry.getValue()))
+      if (entry.getKey().getA().equals(hostName) && ServiceState.WARNING.equals(entry.getValue())) {
         i++;
+      }
     }
     return i;
   }
@@ -141,8 +144,9 @@ public class ServicesStatistics extends NotificationBroadcasterSupport implement
   public int getErrorServiceCountByNode() {
     int i = 0;
     for (Entry<Tuple<String, String>, ServiceState> entry : services.entrySet()) {
-      if (entry.getKey().getA().equals(hostName) && ServiceState.ERROR.equals(entry.getValue()))
+      if (entry.getKey().getA().equals(hostName) && ServiceState.ERROR.equals(entry.getValue())) {
         i++;
+      }
     }
     return i;
   }
@@ -190,8 +194,9 @@ public class ServicesStatistics extends NotificationBroadcasterSupport implement
   public String[] getServicesByNode() {
     List<String> serviceList = new ArrayList<String>();
     for (Tuple<String, String> key : services.keySet()) {
-      if (key.getA().equals(hostName))
+      if (key.getA().equals(hostName)) {
         serviceList.add(key.getA() + DELIMITER + key.getB());
+      }
     }
     return serviceList.toArray(new String[serviceList.size()]);
   }
@@ -203,8 +208,9 @@ public class ServicesStatistics extends NotificationBroadcasterSupport implement
   public String[] getNormalServices() {
     List<String> normalServices = new ArrayList<String>();
     for (Entry<Tuple<String, String>, ServiceState> entry : services.entrySet()) {
-      if (ServiceState.NORMAL.equals(entry.getValue()))
+      if (ServiceState.NORMAL.equals(entry.getValue())) {
         normalServices.add(entry.getKey().getA() + DELIMITER + entry.getKey().getB());
+      }
     }
     return normalServices.toArray(new String[normalServices.size()]);
   }
@@ -216,8 +222,9 @@ public class ServicesStatistics extends NotificationBroadcasterSupport implement
   public String[] getNormalServicesByNode() {
     List<String> normalServices = new ArrayList<String>();
     for (Entry<Tuple<String, String>, ServiceState> entry : services.entrySet()) {
-      if (entry.getKey().getA().equals(hostName) && ServiceState.NORMAL.equals(entry.getValue()))
+      if (entry.getKey().getA().equals(hostName) && ServiceState.NORMAL.equals(entry.getValue())) {
         normalServices.add(entry.getKey().getA() + DELIMITER + entry.getKey().getB());
+      }
     }
     return normalServices.toArray(new String[normalServices.size()]);
   }
@@ -229,8 +236,9 @@ public class ServicesStatistics extends NotificationBroadcasterSupport implement
   public String[] getWarningServices() {
     List<String> warningServices = new ArrayList<String>();
     for (Entry<Tuple<String, String>, ServiceState> entry : services.entrySet()) {
-      if (ServiceState.WARNING.equals(entry.getValue()))
+      if (ServiceState.WARNING.equals(entry.getValue())) {
         warningServices.add(entry.getKey().getA() + DELIMITER + entry.getKey().getB());
+      }
     }
     return warningServices.toArray(new String[warningServices.size()]);
   }
@@ -242,8 +250,9 @@ public class ServicesStatistics extends NotificationBroadcasterSupport implement
   public String[] getWarningServicesByNode() {
     List<String> warningServices = new ArrayList<String>();
     for (Entry<Tuple<String, String>, ServiceState> entry : services.entrySet()) {
-      if (entry.getKey().getA().equals(hostName) && ServiceState.WARNING.equals(entry.getValue()))
+      if (entry.getKey().getA().equals(hostName) && ServiceState.WARNING.equals(entry.getValue())) {
         warningServices.add(entry.getKey().getA() + DELIMITER + entry.getKey().getB());
+      }
     }
     return warningServices.toArray(new String[warningServices.size()]);
   }
@@ -255,8 +264,9 @@ public class ServicesStatistics extends NotificationBroadcasterSupport implement
   public String[] getErrorServices() {
     List<String> erroServices = new ArrayList<String>();
     for (Entry<Tuple<String, String>, ServiceState> entry : services.entrySet()) {
-      if (ServiceState.ERROR.equals(entry.getValue()))
+      if (ServiceState.ERROR.equals(entry.getValue())) {
         erroServices.add(entry.getKey().getA() + DELIMITER + entry.getKey().getB());
+      }
     }
     return erroServices.toArray(new String[erroServices.size()]);
   }
@@ -268,8 +278,9 @@ public class ServicesStatistics extends NotificationBroadcasterSupport implement
   public String[] getErrorServicesByNode() {
     List<String> erroServices = new ArrayList<String>();
     for (Entry<Tuple<String, String>, ServiceState> entry : services.entrySet()) {
-      if (entry.getKey().getA().equals(hostName) && ServiceState.ERROR.equals(entry.getValue()))
+      if (entry.getKey().getA().equals(hostName) && ServiceState.ERROR.equals(entry.getValue())) {
         erroServices.add(entry.getKey().getA() + DELIMITER + entry.getKey().getB());
+      }
     }
     return erroServices.toArray(new String[erroServices.size()]);
   }

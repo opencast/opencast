@@ -117,7 +117,8 @@ public abstract class AbstractIncidentService implements IncidentService {
   }
 
   @Override
-  public IncidentTree getIncidentsOfJob(long jobId, boolean cascade) throws NotFoundException, IncidentServiceException {
+  public IncidentTree getIncidentsOfJob(long jobId, boolean cascade)
+          throws NotFoundException, IncidentServiceException {
     List<Incident> incidents = getIncidentsOfJob(jobId);
     List<IncidentTree> childIncidents = new ArrayList<>();
 
@@ -127,11 +128,13 @@ public abstract class AbstractIncidentService implements IncidentService {
         childIncidents = getChildIncidents(jobId);
       } else if (cascade && "START_WORKFLOW".equals(job.getOperation())) {
         for (WorkflowOperationInstance operation : getWorkflowService().getWorkflowById(jobId).getOperations()) {
-          if (operation.getState().equals(OperationState.INSTANTIATED))
+          if (operation.getState().equals(OperationState.INSTANTIATED)) {
             continue;
+          }
           IncidentTree operationResult = getIncidentsOfJob(operation.getId(), true);
-          if (hasIncidents(Collections.list(operationResult)))
+          if (hasIncidents(Collections.list(operationResult))) {
             childIncidents.add(operationResult);
+          }
         }
       }
       return new IncidentTreeImpl(incidents, childIncidents);
@@ -146,8 +149,9 @@ public abstract class AbstractIncidentService implements IncidentService {
 
   private boolean hasIncidents(List<IncidentTree> incidentResults) {
     for (IncidentTree result : incidentResults) {
-      if (result.getIncidents().size() > 0 || hasIncidents(result.getDescendants()))
+      if (result.getIncidents().size() > 0 || hasIncidents(result.getDescendants())) {
         return true;
+      }
     }
     return false;
   }
@@ -225,12 +229,14 @@ public abstract class AbstractIncidentService implements IncidentService {
     List<Job> childJobs = getServiceRegistry().getChildJobs(jobId);
     List<IncidentTree> incidentResults = new ArrayList<>();
     for (Job childJob : childJobs) {
-      if (childJob.getParentJobId() != jobId)
+      if (childJob.getParentJobId() != jobId) {
         continue;
+      }
       List<Incident> incidentsForJob = getIncidentsOfJob(childJob.getId());
       IncidentTree incidentTree = new IncidentTreeImpl(incidentsForJob, getChildIncidents(childJob.getId()));
-      if (hasIncidents(Collections.list(incidentTree)))
+      if (hasIncidents(Collections.list(incidentTree))) {
         incidentResults.add(incidentTree);
+      }
     }
     return incidentResults;
   }

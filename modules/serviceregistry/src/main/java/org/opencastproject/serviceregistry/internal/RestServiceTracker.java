@@ -60,7 +60,8 @@ public class RestServiceTracker extends ServiceTracker<Object, Object> {
     private final ServiceRegistry serviceRegistry;
 
     @Activate
-    public RestServiceTracker(@Reference ServiceRegistry serviceRegistry, BundleContext bundleContext) throws InvalidSyntaxException {
+    public RestServiceTracker(@Reference ServiceRegistry serviceRegistry, BundleContext bundleContext)
+                throws InvalidSyntaxException {
         super(bundleContext, bundleContext.createFilter(FILTER), null);
         this.bundleContext = bundleContext;
         this.serviceRegistry = serviceRegistry;
@@ -89,9 +90,11 @@ public class RestServiceTracker extends ServiceTracker<Object, Object> {
         // Only register services that have the "publish" flag set to "true"
         if (publishFlag) {
             try {
-                serviceRegistry.registerService(serviceType, serviceRegistry.getRegistryHostname(), servicePath, jobProducer);
+                serviceRegistry.registerService(serviceType, serviceRegistry.getRegistryHostname(), servicePath,
+                    jobProducer);
             } catch (ServiceRegistryException e) {
-                logger.warn("Unable to register job producer of type " + serviceType + " on host " + serviceRegistry.getRegistryHostname());
+                logger.warn("Unable to register job producer of type " + serviceType + " on host "
+                    + serviceRegistry.getRegistryHostname());
             }
         } else {
             logger.debug("Not registering service " + serviceType + " in service registry by configuration");
