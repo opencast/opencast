@@ -33,12 +33,12 @@ import java.util.Map;
 import java.util.Objects;
 
 @Component(
-  immediate = true,
-  service = AdminUIConfiguration.class,
-  property = {
-    "service.description=Admin UI - Configuration",
-    "service.pid=org.opencastproject.adminui"
-  }
+    immediate = true,
+    service = AdminUIConfiguration.class,
+    property = {
+        "service.description=Admin UI - Configuration",
+        "service.pid=org.opencastproject.adminui"
+    }
 )
 public class AdminUIConfiguration {
 
@@ -65,7 +65,9 @@ public class AdminUIConfiguration {
     return retractWorkflowId;
   }
 
-  public List<String> getMatchManagedAclRolePrefixes() { return matchManagedAclRolePrefixes; }
+  public List<String> getMatchManagedAclRolePrefixes() {
+    return matchManagedAclRolePrefixes;
+  }
 
   @Activate
   @Modified

@@ -87,14 +87,16 @@ public class UserSettingsServiceTest {
 
   private EntityManager setupUserSettingEntityManager(int signatureCount, int offset, int limit) {
     TypedQuery userSettingsQuery = EasyMock.createMock(TypedQuery.class);
-    EasyMock.expect(userSettingsQuery.setParameter(EasyMock.anyObject(String.class), EasyMock.anyObject())).andReturn(userSettingsQuery).anyTimes();
+    EasyMock.expect(userSettingsQuery.setParameter(EasyMock.anyObject(String.class), EasyMock.anyObject()))
+        .andReturn(userSettingsQuery).anyTimes();
     EasyMock.expect(userSettingsQuery.setFirstResult(offset)).andReturn(userSettingsQuery).anyTimes();
     EasyMock.expect(userSettingsQuery.setMaxResults(limit)).andReturn(userSettingsQuery).anyTimes();
     EasyMock.expect(userSettingsQuery.getResultList()).andReturn(createUserSettingsList(signatureCount));
     EasyMock.replay(userSettingsQuery);
 
     EntityManager findSettings = EasyMock.createMock(EntityManager.class);
-    EasyMock.expect(findSettings.createNamedQuery("UserSettings.findByUserName", UserSettingDto.class)).andReturn(userSettingsQuery);
+    EasyMock.expect(findSettings.createNamedQuery("UserSettings.findByUserName", UserSettingDto.class))
+        .andReturn(userSettingsQuery);
     EasyMock.expect(findSettings.isOpen()).andReturn(true);
     findSettings.close();
     EasyMock.expectLastCall();
@@ -108,12 +110,14 @@ public class UserSettingsServiceTest {
     EasyMock.replay(totalNumber);
 
     TypedQuery userSettingsQuery = EasyMock.createMock(TypedQuery.class);
-    EasyMock.expect(userSettingsQuery.setParameter(EasyMock.anyObject(String.class), EasyMock.anyObject())).andReturn(userSettingsQuery).anyTimes();
+    EasyMock.expect(userSettingsQuery.setParameter(EasyMock.anyObject(String.class), EasyMock.anyObject()))
+        .andReturn(userSettingsQuery).anyTimes();
     EasyMock.expect(userSettingsQuery.getSingleResult()).andReturn(totalNumber);
     EasyMock.replay(userSettingsQuery);
 
     EntityManager findSettings = EasyMock.createMock(EntityManager.class);
-    EasyMock.expect(findSettings.createNamedQuery("UserSettings.countByUserName", Number.class)).andReturn(userSettingsQuery);
+    EasyMock.expect(findSettings.createNamedQuery("UserSettings.countByUserName", Number.class))
+        .andReturn(userSettingsQuery);
     EasyMock.expect(findSettings.isOpen()).andReturn(true);
     findSettings.close();
     EasyMock.expectLastCall();
@@ -121,10 +125,12 @@ public class UserSettingsServiceTest {
     return findSettings;
   }
 
-  private EntityManagerFactory setupEntityManagerFactory(int settingCount, int signatureCount, int settingTotal, int signatureTotal, int offset, int limit) {
+  private EntityManagerFactory setupEntityManagerFactory(int settingCount, int signatureCount, int settingTotal,
+      int signatureTotal, int offset, int limit) {
     EntityManagerFactory emf = EasyMock.createMock(EntityManagerFactory.class);
     EasyMock.expect(emf.createEntityManager()).andReturn(setupUserSettingEntityManager(settingCount, offset, limit));
-    EasyMock.expect(emf.createEntityManager()).andReturn(setupUserSettingCountEntityManager(settingTotal, offset, limit));
+    EasyMock.expect(emf.createEntityManager()).andReturn(setupUserSettingCountEntityManager(settingTotal, offset,
+        limit));
     EasyMock.replay(emf);
     return emf;
   }
@@ -140,7 +146,8 @@ public class UserSettingsServiceTest {
   }
 
   @Test
-  public void findUserSettingsInputNoSettingsNoSignaturesExpectsEmptyUserSettings() throws UserSettingsServiceException {
+  public void findUserSettingsInputNoSettingsNoSignaturesExpectsEmptyUserSettings()
+          throws UserSettingsServiceException {
     int offset = 0;
     int limit = 10;
     EntityManagerFactory emf = setupEntityManagerFactory(0, 0, limit, limit, offset, limit);
@@ -185,9 +192,11 @@ public class UserSettingsServiceTest {
 
     TypedQuery secondQuery = EasyMock.createNiceMock(TypedQuery.class);
     EasyMock.expect(secondQuery.setParameter("key", key)).andReturn(secondQuery);
-    EasyMock.expect(secondQuery.setParameter("username", securityService.getUser().getUsername())).andReturn(secondQuery);
+    EasyMock.expect(secondQuery.setParameter("username", securityService.getUser().getUsername()))
+        .andReturn(secondQuery);
     EasyMock.expect(secondQuery.setParameter("org", securityService.getOrganization().getId())).andReturn(secondQuery);
-    UserSettingDto rval = new UserSettingDto(1, key, firstValue, securityService.getUser().getUsername(), securityService.getOrganization().getId());
+    UserSettingDto rval = new UserSettingDto(1, key, firstValue, securityService.getUser().getUsername(),
+        securityService.getOrganization().getId());
     EasyMock.expect(secondQuery.getResultList()).andReturn(Collections.singletonList(rval));
     EasyMock.replay(query, secondQuery);
 
@@ -199,7 +208,8 @@ public class UserSettingsServiceTest {
     EasyMock.expectLastCall();
     EasyMock.expect(em.createNamedQuery("UserSettings.findByKey", UserSettingDto.class)).andReturn(secondQuery);
     EasyMock.expectLastCall();
-    UserSettingDto rval2 = new UserSettingDto(1, key, secondValue, securityService.getUser().getUsername(), securityService.getOrganization().getId());
+    UserSettingDto rval2 = new UserSettingDto(1, key, secondValue, securityService.getUser().getUsername(),
+        securityService.getOrganization().getId());
     EasyMock.expect(em.merge(EasyMock.capture(initialUserSetting))).andReturn(rval2);
     EasyMock.expect(em.getTransaction()).andReturn(tx).anyTimes();
     EasyMock.replay(em);
@@ -230,7 +240,8 @@ public class UserSettingsServiceTest {
     String value = "newValue";
     String oldValue = "oldValue";
 
-    UserSettingDto userSettingDto = new UserSettingDto(id, key, oldValue, securityService.getUser().getUsername(), securityService.getOrganization().getId());
+    UserSettingDto userSettingDto = new UserSettingDto(id, key, oldValue, securityService.getUser().getUsername(),
+        securityService.getOrganization().getId());
     LinkedList<UserSettingDto> userSettingDtos = new LinkedList<UserSettingDto>();
     userSettingDtos.add(userSettingDto);
 
@@ -274,7 +285,8 @@ public class UserSettingsServiceTest {
     String key = "newKey";
     String oldValue = "oldValue";
 
-    UserSettingDto userSettingDto = new UserSettingDto(id, key, oldValue, securityService.getUser().getUsername(), securityService.getOrganization().getId());
+    UserSettingDto userSettingDto = new UserSettingDto(id, key, oldValue, securityService.getUser().getUsername(),
+        securityService.getOrganization().getId());
     LinkedList<UserSettingDto> userSettingDtos = new LinkedList<UserSettingDto>();
     userSettingDtos.add(userSettingDto);
 

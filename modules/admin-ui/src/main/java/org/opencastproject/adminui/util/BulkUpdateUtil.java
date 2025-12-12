@@ -71,9 +71,9 @@ public final class BulkUpdateUtil {
    * @return An optional holding the event or nothing, if not found.
    */
   public static Optional<Event> getEvent(
-    final IndexService indexSvc,
-    final ElasticsearchIndex index,
-    final String id) {
+      final IndexService indexSvc,
+      final ElasticsearchIndex index,
+      final String id) {
     try {
       return indexSvc.getEvent(id, index);
     } catch (SearchIndexException e) {
@@ -138,9 +138,9 @@ public final class BulkUpdateUtil {
       final String weekdayAbbrev = ((String) result.get("weekday"));
       if (weekdayAbbrev != null) {
         final DayOfWeek newWeekDay = Arrays.stream(DayOfWeek.values())
-          .filter(d -> d.name().startsWith(weekdayAbbrev.toUpperCase()))
-          .findAny()
-          .orElseThrow(() -> new IllegalArgumentException("Cannot parse weekday: " + weekdayAbbrev));
+            .filter(d -> d.name().startsWith(weekdayAbbrev.toUpperCase()))
+            .findAny()
+            .orElseThrow(() -> new IllegalArgumentException("Cannot parse weekday: " + weekdayAbbrev));
         final int daysDiff = newWeekDay.getValue() - startDate.getDayOfWeek().getValue();
         startDate = startDate.plusDays(daysDiff);
         endDate = endDate.plusDays(daysDiff);
@@ -171,8 +171,8 @@ public final class BulkUpdateUtil {
       final JSONObject startDateJson = new JSONObject();
       startDateJson.put("id", "startDate");
       final String startDate = Instant.parse((String) scheduling.get(SCHEDULING_START_KEY))
-        .atOffset(ZoneOffset.UTC)
-        .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) + ".000Z";
+          .atOffset(ZoneOffset.UTC)
+          .format(DateTimeFormatter.ISO_LOCAL_DATE_TIME) + ".000Z";
       startDateJson.put("value", startDate);
       fields.add(startDateJson);
 
@@ -251,10 +251,10 @@ public final class BulkUpdateUtil {
   }
 
   private static ZonedDateTime adjustedSchedulingDate(
-    final JSONObject scheduling,
-    final String dateKey,
-    final ZonedDateTime date,
-    final ZoneId timezone) {
+      final JSONObject scheduling,
+      final String dateKey,
+      final ZonedDateTime date,
+      final ZoneId timezone) {
     final JSONObject time = (JSONObject) scheduling.get(dateKey);
     ZonedDateTime result = date.withZoneSameInstant(timezone);
     if (time.containsKey("hour")) {
@@ -283,7 +283,8 @@ public final class BulkUpdateUtil {
      * @param metadata Metadata for this group
      * @param scheduling Scheduling for this group
      */
-    public BulkUpdateInstructionGroup(final List<String> eventIds, final JSONObject metadata, final JSONObject scheduling) {
+    public BulkUpdateInstructionGroup(final List<String> eventIds, final JSONObject metadata,
+        final JSONObject scheduling) {
       this.eventIds = eventIds;
       this.metadata = metadata;
       this.scheduling = scheduling;

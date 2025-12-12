@@ -68,21 +68,23 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("/admin-ng/services")
-@RestService(name = "ServicesProxyService", title = "UI Services",
-  abstractText = "This service provides the services data for the UI.",
-  notes = { "These Endpoints deliver informations about the services required for the UI.",
-            "<strong>Important:</strong> "
-              + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
-              + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
-              + "DO NOT use this for integration of third-party applications.<em>"})
+@RestService(
+    name = "ServicesProxyService",
+    title = "UI Services",
+    abstractText = "This service provides the services data for the UI.",
+    notes = { "These Endpoints deliver informations about the services required for the UI.",
+              "<strong>Important:</strong> "
+                + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
+                + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
+                + "DO NOT use this for integration of third-party applications.<em>"})
 @Component(
-  immediate = true,
-  service = ServicesEndpoint.class,
-  property = {
-    "service.description=Admin UI - Services facade Endpoint",
-    "opencast.service.type=org.opencastproject.adminui.endpoint.ServicesEndpoint",
-    "opencast.service.path=/admin-ng/services"
-  }
+    immediate = true,
+    service = ServicesEndpoint.class,
+    property = {
+        "service.description=Admin UI - Services facade Endpoint",
+        "opencast.service.type=org.opencastproject.adminui.endpoint.ServicesEndpoint",
+        "opencast.service.path=/admin-ng/services"
+    }
 )
 @JaxrsResource
 public class ServicesEndpoint {
@@ -95,70 +97,94 @@ public class ServicesEndpoint {
   @GET
   @Path("services.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(description = "Returns the list of services", name = "services", restParameters = {
-          @RestParameter(name = "limit", description = "The maximum number of items to return per page", isRequired = false, type = RestParameter.Type.INTEGER),
-          @RestParameter(name = "offset", description = "The offset", isRequired = false, type = RestParameter.Type.INTEGER),
-          @RestParameter(name = "filter", description = "Filter results by name, host, actions, status or free text query", isRequired = false, type = STRING),
+  @RestQuery(
+      description = "Returns the list of services",
+      name = "services",
+      restParameters = {
+          @RestParameter(name = "limit", description = "The maximum number of items to return per page",
+              isRequired = false, type = RestParameter.Type.INTEGER),
+          @RestParameter(name = "offset", description = "The offset", isRequired = false,
+              type = RestParameter.Type.INTEGER),
+          @RestParameter(name = "filter", description = "Filter results by name, host, actions, status or free text "
+              + "query", isRequired = false, type = STRING),
           @RestParameter(name = "sort", description = "The sort order.  May include any "
-                  + "of the following: host, name, running, queued, completed,  meanRunTime, meanQueueTime, "
-                  + "status. The sort suffix must be :asc for ascending sort order and :desc for descending.", isRequired = false, type = STRING)
-  }, responses = { @RestResponse(description = "Returns the list of services from Opencast", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "The list of services")
+              + "of the following: host, name, running, queued, completed,  meanRunTime, meanQueueTime, "
+              + "status. The sort suffix must be :asc for ascending sort order and :desc for descending.",
+              isRequired = false, type = STRING)
+      },
+      responses = {
+          @RestResponse(description = "Returns the list of services from Opencast",
+              responseCode = HttpServletResponse.SC_OK)
+      },
+      returnDescription = "The list of services")
   public Response getServices(@QueryParam("limit") final int limit, @QueryParam("offset") final int offset,
-          @QueryParam("filter") String filter, @QueryParam("sort") String sort) throws Exception {
+      @QueryParam("filter") String filter, @QueryParam("sort") String sort) throws Exception {
 
     Optional<String> sortOpt = Optional.ofNullable(StringUtils.trimToNull(sort));
     ServicesListQuery query = new ServicesListQuery();
     EndpointUtil.addRequestFiltersToQuery(filter, query);
 
     String fName = null;
-    if (query.getName().isPresent())
+    if (query.getName().isPresent()) {
       fName = StringUtils.trimToNull(query.getName().get());
+    }
     String fHostname = null;
-    if (query.getHostname().isPresent())
+    if (query.getHostname().isPresent()) {
       fHostname = StringUtils.trimToNull(query.getHostname().get());
+    }
     String fNodeName = null;
-    if (query.getNodeName().isPresent())
+    if (query.getNodeName().isPresent()) {
       fNodeName = StringUtils.trimToNull(query.getNodeName().get());
+    }
     String fStatus = null;
-    if (query.getStatus().isPresent())
+    if (query.getStatus().isPresent()) {
       fStatus = StringUtils.trimToNull(query.getStatus().get());
+    }
     String fFreeText = null;
-    if (query.getFreeText().isPresent())
+    if (query.getFreeText().isPresent()) {
       fFreeText = StringUtils.trimToNull(query.getFreeText().get());
+    }
 
     List<HostRegistration> servers = serviceRegistry.getHostRegistrations();
     List<Service> services = new ArrayList<Service>();
     for (ServiceStatistics stats : serviceRegistry.getServiceStatistics()) {
       Service service = new Service(stats, findServerByHost(stats.getServiceRegistration().getHost(), servers));
-      if (fName != null && !StringUtils.equalsIgnoreCase(service.getName(), fName))
+      if (fName != null && !StringUtils.equalsIgnoreCase(service.getName(), fName)) {
         continue;
+      }
 
-      if (fHostname != null && !StringUtils.equalsIgnoreCase(service.getHost(), fHostname))
+      if (fHostname != null && !StringUtils.equalsIgnoreCase(service.getHost(), fHostname)) {
         continue;
+      }
 
-      if (fNodeName != null && !StringUtils.equalsIgnoreCase(service.getNodeName(), fNodeName))
+      if (fNodeName != null && !StringUtils.equalsIgnoreCase(service.getNodeName(), fNodeName)) {
         continue;
+      }
 
-      if (fStatus != null && !StringUtils.equalsIgnoreCase(service.getStatus().toString(), fStatus))
+      if (fStatus != null && !StringUtils.equalsIgnoreCase(service.getStatus().toString(), fStatus)) {
         continue;
+      }
 
       if (query.getActions().isPresent()) {
         ServiceState serviceState = service.getStatus();
 
         if (query.getActions().get()) {
-          if (ServiceState.NORMAL == serviceState)
+          if (ServiceState.NORMAL == serviceState) {
             continue;
+          }
         } else {
-          if (ServiceState.NORMAL != serviceState)
+          if (ServiceState.NORMAL != serviceState) {
             continue;
+          }
         }
       }
 
       if (fFreeText != null && !StringUtils.containsIgnoreCase(service.getName(), fFreeText)
-                && !StringUtils.containsIgnoreCase(service.getHost(), fFreeText)
-                && !StringUtils.containsIgnoreCase(service.getNodeName(), fFreeText)
-                && !StringUtils.containsIgnoreCase(service.getStatus().toString(), fFreeText))
+          && !StringUtils.containsIgnoreCase(service.getHost(), fFreeText)
+          && !StringUtils.containsIgnoreCase(service.getNodeName(), fFreeText)
+          && !StringUtils.containsIgnoreCase(service.getStatus().toString(), fFreeText)) {
         continue;
+      }
 
       services.add(service);
     }

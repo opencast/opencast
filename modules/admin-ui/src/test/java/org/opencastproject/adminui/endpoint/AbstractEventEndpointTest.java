@@ -133,8 +133,8 @@ public class AbstractEventEndpointTest {
   public void testUpdateEventComment() throws Exception {
     String eventString = IOUtils.toString(getClass().getResource("/eventComment.json"));
 
-    String result = given().pathParam("eventId", "asdasd").pathParam("commentId", 33).contentType(ContentType.URLENC).expect()
-            .statusCode(HttpStatus.SC_OK).when().put(rt.host("{eventId}/comment/{commentId}")).asString();
+    String result = given().pathParam("eventId", "asdasd").pathParam("commentId", 33).contentType(ContentType.URLENC)
+            .expect().statusCode(HttpStatus.SC_OK).when().put(rt.host("{eventId}/comment/{commentId}")).asString();
 
     assertThat(eventString, SameJSONAs.sameJSONAs(result));
   }
@@ -192,8 +192,9 @@ public class AbstractEventEndpointTest {
 
   @Test
   public void testUpdateEventCommentReply() throws Exception {
-    given().pathParam("eventId", "asdasd").pathParam("commentId", 33).pathParam("replyId", 78).contentType(ContentType.URLENC).expect()
-            .statusCode(HttpStatus.SC_BAD_REQUEST).when().put(rt.host("{eventId}/comment/{commentId}/{replyId}"));
+    given().pathParam("eventId", "asdasd").pathParam("commentId", 33).pathParam("replyId", 78)
+        .contentType(ContentType.URLENC).expect().statusCode(HttpStatus.SC_BAD_REQUEST).when()
+        .put(rt.host("{eventId}/comment/{commentId}/{replyId}"));
 
     given().pathParam("eventId", "asdasd").pathParam("commentId", 33).pathParam("replyId", 77).formParam("text", "Text")
             .expect().statusCode(HttpStatus.SC_NOT_FOUND).when()
@@ -247,8 +248,8 @@ public class AbstractEventEndpointTest {
       .post(rt.host("events/metadata.json"));
 
     String eventMetadataString = IOUtils.toString(getClass().getResource("/eventsMetadata.json"));
-    String result = given().formParam("eventIds", "[\"notExists\", \"exists\", \"exists2\"]").expect().statusCode(HttpStatus.SC_OK)
-      .when().post(rt.host("events/metadata.json")).asString();
+    String result = given().formParam("eventIds", "[\"notExists\", \"exists\", \"exists2\"]").expect()
+        .statusCode(HttpStatus.SC_OK).when().post(rt.host("events/metadata.json")).asString();
 
     assertThat(eventMetadataString, SameJSONAs.sameJSONAs(result));
   }
@@ -275,8 +276,8 @@ public class AbstractEventEndpointTest {
 
     String updateErrors = IOUtils.toString(getClass().getResource("/eventsMetadataUpdateErrors.json"));
     String result = given().formParam("eventIds", "[\"notExists\", \"exists\", \"updateFailure\"]").
-      formParam("metadata", "metadata").expect().statusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR).when()
-      .put(rt.host("events/metadata")).asString();
+        formParam("metadata", "metadata").expect().statusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR).when()
+        .put(rt.host("events/metadata")).asString();
 
     assertThat(updateErrors, SameJSONAs.sameJSONAs(result));
   }
@@ -297,19 +298,20 @@ public class AbstractEventEndpointTest {
   @Test
   public void testGetEventSchedulingBulk() throws Exception {
     final String eventSchedulingBulkString = IOUtils
-      .toString(getClass().getResource("/eventSchedulingBulk.json"), StandardCharsets.UTF_8);
+        .toString(getClass().getResource("/eventSchedulingBulk.json"), StandardCharsets.UTF_8);
 
     // Event that does not exist, and we are not ignoring that fact.
     given().formParam("eventIds", "notExists").expect().statusCode(HttpStatus.SC_NOT_FOUND).when()
-      .post(rt.host("scheduling.json"));
+        .post(rt.host("scheduling.json"));
 
     // Event that does not exist, and we are ignoring that.
-    given().formParam("eventIds", "notExists").formParam("ignoreNonScheduled", "true").expect().statusCode(HttpStatus.SC_OK).when()
-      .post(rt.host("scheduling.json"));
+    given().formParam("eventIds", "notExists").formParam("ignoreNonScheduled", "true").expect()
+        .statusCode(HttpStatus.SC_OK).when()
+        .post(rt.host("scheduling.json"));
 
     // Check if the actual result is what we expect.
     final String result = given().formParam("eventIds", "exists").expect().statusCode(HttpStatus.SC_OK).when()
-      .post(rt.host("scheduling.json")).asString();
+        .post(rt.host("scheduling.json")).asString();
 
     assertThat(eventSchedulingBulkString, SameJSONAs.sameJSONAs(result));
   }
@@ -564,7 +566,8 @@ public class AbstractEventEndpointTest {
             .post(rt.host("asdasd/access"));
 
     // post an acl update
-    String acl = "{\"acl\":{\"ace\":[{\"allow\":true,\"role\":\"ROLE_ADMIN\",\"action\":\"read\"},{\"allow\":true,\"role\":\"ROLE_ADMIN\",\"action\":\"write\"}]}}";
+    String acl = "{\"acl\":{\"ace\":[{\"allow\":true,\"role\":\"ROLE_ADMIN\",\"action\":\"read\"},"
+        + "{\"allow\":true,\"role\":\"ROLE_ADMIN\",\"action\":\"write\"}]}}";
     given().formParam("acl", acl).expect().statusCode(HttpStatus.SC_OK).when().post(rt.host("asdasd/access"));
 
     // post an acl update for an scheduled event
@@ -629,7 +632,8 @@ public class AbstractEventEndpointTest {
     long lastCheckinTime = 1442522772000L;
     Recording recording = createRecording(id, lastCheckinTime, RecordingState.CAPTURING);
     String result = RestUtils.getJsonString(AbstractEventEndpoint.recordingToJson(recording));
-    String expected = "{\"lastCheckInTimeUTC\":\"2015-09-17T20:46:12Z\",\"id\":\"rec-id\",\"state\":\"capturing\",\"lastCheckInTime\":1442522772000}";
+    String expected = "{\"lastCheckInTimeUTC\":\"2015-09-17T20:46:12Z\",\"id\":\"rec-id\",\"state\":\"capturing\","
+        + "\"lastCheckInTime\":1442522772000}";
     assertThat(expected, SameJSONAs.sameJSONAs(result));
 
     recording = createRecording(null, 0L, null);
@@ -668,7 +672,7 @@ public class AbstractEventEndpointTest {
     String expected = IOUtils.toString(getClass().getResource("/publications.json"));
 
     String result = given().pathParam("eventId", "asdasd").expect().statusCode(HttpStatus.SC_OK).when()
-      .get(rt.host("{eventId}/asset/publication/publications.json")).asString();
+        .get(rt.host("{eventId}/asset/publication/publications.json")).asString();
 
     assertThat(expected, SameJSONAs.sameJSONAs(result));
 

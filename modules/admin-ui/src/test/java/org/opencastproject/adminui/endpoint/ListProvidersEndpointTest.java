@@ -79,9 +79,9 @@ public class ListProvidersEndpointTest {
   @Test
   public void testGetWithFilters() throws ParseException {
     Response response = given().pathParam("id", "SERVERS").param("filter", "name=non existing name")
-      .when().get(rt.host("/{id}.json"))
-      .then().statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
-      .extract().response();
+        .when().get(rt.host("/{id}.json"))
+        .then().statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
+        .extract().response();
     ResponseBody body = response.getBody();
     String content = body.asString();
     JSONObject json = (JSONObject) parser.parse(content);

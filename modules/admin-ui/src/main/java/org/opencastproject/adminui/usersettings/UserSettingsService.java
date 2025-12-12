@@ -50,12 +50,12 @@ import javax.persistence.EntityManagerFactory;
  * Finds the user settings and message signatures from the current user.
  */
 @Component(
-  immediate = true,
-  service = UserSettingsService.class,
-  property = {
-    "service.description=Admin UI - Users Settings Service",
-    "opencast.service.type=org.opencastproject.adminui.usersettings.UserSettingsService"
-  }
+    immediate = true,
+    service = UserSettingsService.class,
+    property = {
+        "service.description=Admin UI - Users Settings Service",
+        "opencast.service.type=org.opencastproject.adminui.usersettings.UserSettingsService"
+    }
 )
 public class UserSettingsService {
   public static final String PERSISTENCE_UNIT = "org.opencastproject.adminui";
@@ -313,7 +313,7 @@ public class UserSettingsService {
       });
     } catch (Exception e) {
       logger.error("Could not update user setting username '{}' org: '{}' id: '{}' key: '{}' value: '{}'",
-        username, orgId, id, key, value, e);
+          username, orgId, id, key, value, e);
       throw new UserSettingsServiceException(e);
     }
   }

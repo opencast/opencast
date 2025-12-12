@@ -79,20 +79,22 @@ import javax.ws.rs.core.Response;
 
 
 @Path("/admin-ng/statistics")
-@RestService(name = "statistics", title = "statistics façade service",
-  abstractText = "Provides statistics",
-  notes = {"This service provides statistics."
-    + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
-    + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
-    + "DO NOT use this for integration of third-party applications.<em>"})
+@RestService(
+    name = "statistics",
+    title = "statistics façade service",
+    abstractText = "Provides statistics",
+    notes = {"This service provides statistics."
+      + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
+      + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
+      + "DO NOT use this for integration of third-party applications.<em>"})
 @Component(
-        immediate = true,
-        service = StatisticsEndpoint.class,
-        property = {
-                "service.description=Admin UI - Statistics Endpoint",
-                "opencast.service.type=org.opencastproject.adminui.StatisticsEndpoint",
-                "opencast.service.path=/admin-ng/statistics",
-        }
+    immediate = true,
+    service = StatisticsEndpoint.class,
+    property = {
+        "service.description=Admin UI - Statistics Endpoint",
+        "opencast.service.type=org.opencastproject.adminui.StatisticsEndpoint",
+        "opencast.service.path=/admin-ng/statistics",
+    }
 )
 @JaxrsResource
 public class StatisticsEndpoint {
@@ -136,14 +138,21 @@ public class StatisticsEndpoint {
   @GET
   @Path("providers.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getprovidersbyresourcetype", description = "Returns the available statistics providers for an (optional) resource type", returnDescription = "The available statistics providers as JSON", restParameters = {
-    @RestParameter(name = "resourceType", description = "The resource type: either 'episode', 'series' or 'organization'", isRequired = false, type = STRING)},
-    responses = {
-      @RestResponse(description = "Returns the providers for the given resource type as JSON, or all, if the resource type is missing", responseCode = HttpServletResponse.SC_OK),
-      @RestResponse(description = "If the current user is not authorized to perform this action", responseCode = HttpServletResponse.SC_UNAUTHORIZED)
+  @RestQuery(
+      name = "getprovidersbyresourcetype",
+      description = "Returns the available statistics providers for an (optional) resource type",
+      returnDescription = "The available statistics providers as JSON",
+      restParameters = {
+          @RestParameter(name = "resourceType", description = "The resource type: either 'episode', 'series' or "
+              + "'organization'", isRequired = false, type = STRING)
+      },
+      responses = {
+          @RestResponse(description = "Returns the providers for the given resource type as JSON, or all, if the "
+              + "resource type is missing", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "If the current user is not authorized to perform this action",
+              responseCode = HttpServletResponse.SC_UNAUTHORIZED)
     })
-  public Response getProviders(
-    @QueryParam("resourceType") final String resourceTypeStr) {
+  public Response getProviders(@QueryParam("resourceType") final String resourceTypeStr) {
     ResourceType resourceType;
     try {
       if (resourceTypeStr == null) {
@@ -157,10 +166,10 @@ public class StatisticsEndpoint {
 
     JSONArray result = new JSONArray();
     statisticsService
-      .getProviders(resourceType)
-      .stream()
-      .map(this::providerToJson)
-      .forEach(result::add);
+        .getProviders(resourceType)
+        .stream()
+        .map(this::providerToJson)
+        .forEach(result::add);
     return Response.ok(result.toJSONString()).build();
   }
 
@@ -198,12 +207,21 @@ public class StatisticsEndpoint {
   @POST
   @Path("data.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getproviderdata", description = "Returns the statistical data for a specific provider and a specific resource", returnDescription = "The statistical data as JSON", restParameters = {
-    @RestParameter(name = "data", isRequired = true, description = "A list of statistical data requests, containing a provider id, from, to, the resource id and a resolution - all as JSON", type = RestParameter.Type.TEXT) },
-    responses = {
-      @RestResponse(description = "Returns the statistical data for the given resource type as JSON", responseCode = HttpServletResponse.SC_OK),
-      @RestResponse(description = "If the current user is not authorized to perform this action", responseCode = HttpServletResponse.SC_UNAUTHORIZED)
-    })
+  @RestQuery(
+      name = "getproviderdata",
+      description = "Returns the statistical data for a specific provider and a specific resource",
+      returnDescription = "The statistical data as JSON",
+      restParameters = {
+          @RestParameter(name = "data", isRequired = true, description = "A list of statistical data requests, "
+              + "containing a provider id, from, to, the resource id and a resolution - all as JSON",
+              type = RestParameter.Type.TEXT)
+      },
+      responses = {
+        @RestResponse(description = "Returns the statistical data for the given resource type as JSON",
+            responseCode = HttpServletResponse.SC_OK),
+        @RestResponse(description = "If the current user is not authorized to perform this action",
+            responseCode = HttpServletResponse.SC_UNAUTHORIZED)
+      })
   public Response getProviderData(@FormParam("data") String data) {
     if (StringUtils.isBlank(data)) {
       return RestUtil.R.badRequest("No data set");
@@ -231,7 +249,7 @@ public class StatisticsEndpoint {
               p.getId(),
               statisticsService.getTimeSeriesData(p, q.getResourceId(), q.getFrom(), q.getTo(), q.getDataResolution(),
                 ZoneId.systemDefault()))))
-        .forEach(result::add);
+          .forEach(result::add);
     } catch (IllegalArgumentException e) {
       return RestUtil.R.badRequest(e.getMessage());
     }
@@ -241,29 +259,42 @@ public class StatisticsEndpoint {
   @GET
   @Path("export.csv")
   @Produces(MediaType.TEXT_PLAIN)
-  @RestQuery(name = "getcsvdata", description = "Returns the statistical data for a specific provider and a specific resource as CSV.", returnDescription = "The statistical data as CSV", restParameters = {
-    @RestParameter(name = "providerId", isRequired = true, description = "The provider id", type = RestParameter.Type.TEXT),
-    @RestParameter(name = "resourceId", isRequired = true, description = "The resource id", type = RestParameter.Type.TEXT),
-    @RestParameter(name = "from", isRequired = true, description = "The from date in iso 8601 UTC notation", type = RestParameter.Type.TEXT),
-    @RestParameter(name = "to", isRequired = true, description = "The to date in iso 8601 UTC notation", type = RestParameter.Type.TEXT),
-    @RestParameter(name = "dataResolution", isRequired = true, description = "The data resolution. Valid values are 'HOURLY', 'DAILY', 'WEEKLY', 'MONTHLY', and 'YEARLY'", type = RestParameter.Type.TEXT)},
-    responses = {
-      @RestResponse(description = "Returns the statistical data for the given resource type as csv", responseCode = HttpServletResponse.SC_OK),
-      @RestResponse(description = "If the current user is not authorized to perform this action", responseCode = HttpServletResponse.SC_UNAUTHORIZED)
-    })
+  @RestQuery(
+      name = "getcsvdata",
+      description = "Returns the statistical data for a specific provider and a specific resource as CSV.",
+      returnDescription = "The statistical data as CSV",
+      restParameters = {
+          @RestParameter(name = "providerId", isRequired = true, description = "The provider id",
+              type = RestParameter.Type.TEXT),
+          @RestParameter(name = "resourceId", isRequired = true, description = "The resource id",
+              type = RestParameter.Type.TEXT),
+          @RestParameter(name = "from", isRequired = true, description = "The from date in iso 8601 UTC notation",
+              type = RestParameter.Type.TEXT),
+          @RestParameter(name = "to", isRequired = true, description = "The to date in iso 8601 UTC notation",
+              type = RestParameter.Type.TEXT),
+          @RestParameter(name = "dataResolution", isRequired = true, description = "The data resolution. Valid values "
+              + "are 'HOURLY', 'DAILY', 'WEEKLY', 'MONTHLY', and 'YEARLY'", type = RestParameter.Type.TEXT)
+      },
+      responses = {
+          @RestResponse(description = "Returns the statistical data for the given resource type as csv",
+              responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "If the current user is not authorized to perform this action",
+              responseCode = HttpServletResponse.SC_UNAUTHORIZED)
+      })
   public Response getCSVData(
-    @QueryParam("providerId") String providerId,
-    @QueryParam("resourceId") String resourceId,
-    @QueryParam("from") String fromStr,
-    @QueryParam("to") String toStr,
-    @QueryParam("dataResolution") String dataResolutionStr) {
+      @QueryParam("providerId") String providerId,
+      @QueryParam("resourceId") String resourceId,
+      @QueryParam("from") String fromStr,
+      @QueryParam("to") String toStr,
+      @QueryParam("dataResolution") String dataResolutionStr
+  ) {
     try {
       final ProviderQuery q = new ProviderQuery(providerId, fromStr, toStr, dataResolutionStr, resourceId);
       final StatisticsProvider p = statisticsService
-        .getProvider(providerId).orElseThrow(() -> new IllegalArgumentException("Unknown provider: " + providerId));
+          .getProvider(providerId).orElseThrow(() -> new IllegalArgumentException("Unknown provider: " + providerId));
       checkAccess(q.getResourceId(), p.getResourceType());
-      final String csv = statisticsExportService.getCSV(p, q.getResourceId(), q.getFrom(), q.getTo(), q.getDataResolution(),
-        searchIndex, ZoneId.systemDefault());
+      final String csv = statisticsExportService.getCSV(p, q.getResourceId(), q.getFrom(), q.getTo(),
+          q.getDataResolution(), searchIndex, ZoneId.systemDefault());
       return Response.ok().entity(csv).build();
     } catch (IllegalArgumentException e) {
       return RestUtil.R.badRequest(e.getMessage());
@@ -318,7 +349,8 @@ public class StatisticsEndpoint {
   }
 
   private void checkSeriesAccess(final String seriesId) throws UnauthorizedException, SearchIndexException {
-    final Optional<Series> series = searchIndex.getSeries(seriesId, securityService.getOrganization().getId(), securityService.getUser());
+    final Optional<Series> series = searchIndex.getSeries(seriesId, securityService.getOrganization().getId(),
+        securityService.getUser());
     if (series.isEmpty()) {
       // IndexService checks permissions and returns None if user is unauthorized
       throw new UnauthorizedException(securityService.getUser(), "read");
@@ -334,7 +366,7 @@ public class StatisticsEndpoint {
     final boolean userIsInOrg = currentOrgId.equals(orgId);
 
     boolean userIsAdmin = currentUser.hasRole(GLOBAL_ADMIN_ROLE)
-      || (currentUser.hasRole(currentOrgAdminRole) && userIsInOrg);
+        || (currentUser.hasRole(currentOrgAdminRole) && userIsInOrg);
 
     boolean userIsAuthorized = currentUser.hasRole(STATISTICS_ORGANIZATION_UI_ROLE) && userIsInOrg;
 

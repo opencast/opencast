@@ -93,7 +93,8 @@ public class BulkUpdateUtilTest {
     final JSONArray jsonArray = loadJsonArray("instructions.json");
     assertEquals(jsonArray.size(), 1);
     final JSONObject json = (JSONObject) jsonArray.get(0);
-    final BulkUpdateUtil.BulkUpdateInstructions actual = new BulkUpdateUtil.BulkUpdateInstructions(jsonArray.toJSONString());
+    final BulkUpdateUtil.BulkUpdateInstructions actual = new BulkUpdateUtil.BulkUpdateInstructions(
+        jsonArray.toJSONString());
     final List<String> expectedIds = (JSONArray) json.get("events");
     final JSONObject expectedScheduling = (JSONObject) json.get("scheduling");
     final JSONObject expectedMetadata = (JSONObject) json.get("metadata");

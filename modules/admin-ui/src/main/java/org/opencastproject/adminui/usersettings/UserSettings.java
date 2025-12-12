@@ -62,7 +62,7 @@ public class UserSettings {
   public Collection<UserSetting> getUserSettingsCollection() {
     Collection<UserSetting> userSettingCollection = new ArrayList<UserSetting>();
     for (Collection<UserSetting> collection : userSettings.values()) {
-        userSettingCollection.addAll(collection);
+      userSettingCollection.addAll(collection);
     }
     return userSettingCollection;
   }
@@ -74,7 +74,7 @@ public class UserSettings {
   public void addUserSetting(UserSetting userSetting) {
     Collection<UserSetting> collection = userSettings.get(userSetting.getKey());
     if (collection == null) {
-        collection = new ArrayList<UserSetting>();
+      collection = new ArrayList<UserSetting>();
     }
     collection.add(userSetting);
     userSettings.put(userSetting.getKey(), collection);
@@ -112,6 +112,7 @@ public class UserSettings {
     for (UserSetting userSetting : getUserSettingsCollection()) {
       settingsArr.add(userSetting.toJson());
     }
-    return Jsons.obj(Jsons.p("offset", offset), Jsons.p("limit", limit), Jsons.p("total", total),Jsons.p("results", Jsons.arr(settingsArr)));
+    return Jsons.obj(Jsons.p("offset", offset), Jsons.p("limit", limit), Jsons.p("total", total),
+        Jsons.p("results", Jsons.arr(settingsArr)));
   }
 }

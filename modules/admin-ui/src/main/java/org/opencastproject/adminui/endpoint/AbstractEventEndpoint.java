@@ -299,15 +299,18 @@ public abstract class AbstractEventEndpoint {
   public void activate(ComponentContext cc) {
     if (cc != null) {
       String ccServerUrl = cc.getBundleContext().getProperty(OpencastConstants.SERVER_URL_PROPERTY);
-      if (StringUtils.isNotBlank(ccServerUrl))
+      if (StringUtils.isNotBlank(ccServerUrl)) {
         this.serverUrl = ccServerUrl;
+      }
 
       this.serviceUrl = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
 
-      String ccDefaultWorkflowDefinionId = StringUtils.trimToNull(cc.getBundleContext().getProperty(WORKFLOW_DEFINITION_DEFAULT));
+      String ccDefaultWorkflowDefinionId = StringUtils.trimToNull(cc.getBundleContext()
+          .getProperty(WORKFLOW_DEFINITION_DEFAULT));
 
-      if (StringUtils.isNotBlank(ccDefaultWorkflowDefinionId))
+      if (StringUtils.isNotBlank(ccDefaultWorkflowDefinionId)) {
         this.defaultWorkflowDefinionId = ccDefaultWorkflowDefinionId;
+      }
 
       systemUserName = SecurityUtil.getSystemUserName(cc);
     }
@@ -317,13 +320,19 @@ public abstract class AbstractEventEndpoint {
   @POST
   @Path("workflowProperties")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "workflowProperties", description = "Returns workflow properties for the specified events",
-             returnDescription = "The workflow properties for every event as JSON", restParameters = {
-                @RestParameter(name = "eventIds", description = "A JSON array of ids of the events", isRequired = true, type = RestParameter.Type.STRING)},
-             responses = {
-                @RestResponse(description = "Returns the workflow properties for the events as JSON", responseCode = HttpServletResponse.SC_OK),
-                @RestResponse(description = "The list of ids could not be parsed into a json list.", responseCode = HttpServletResponse.SC_BAD_REQUEST)
-              })
+  @RestQuery(
+      name = "workflowProperties",
+      description = "Returns workflow properties for the specified events",
+      returnDescription = "The workflow properties for every event as JSON",
+      restParameters = {
+          @RestParameter(name = "eventIds", description = "A JSON array of ids of the events", isRequired = true,
+              type = RestParameter.Type.STRING)},
+      responses = {
+          @RestResponse(description = "Returns the workflow properties for the events as JSON",
+              responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "The list of ids could not be parsed into a json list.",
+              responseCode = HttpServletResponse.SC_BAD_REQUEST)
+      })
   public Response getEventWorkflowProperties(@FormParam("eventIds") String eventIds) throws UnauthorizedException {
     if (StringUtils.isBlank(eventIds)) {
       return Response.status(Response.Status.BAD_REQUEST).build();
@@ -361,8 +370,14 @@ public abstract class AbstractEventEndpoint {
   @GET
   @Path("catalogAdapters")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getcataloguiadapters", description = "Returns the available catalog UI adapters as JSON", returnDescription = "The catalog UI adapters as JSON", responses = {
-          @RestResponse(description = "Returns the available catalog UI adapters as JSON", responseCode = HttpServletResponse.SC_OK) })
+  @RestQuery(
+      name = "getcataloguiadapters",
+      description = "Returns the available catalog UI adapters as JSON",
+      returnDescription = "The catalog UI adapters as JSON",
+      responses = {
+          @RestResponse(description = "Returns the available catalog UI adapters as JSON",
+              responseCode = HttpServletResponse.SC_OK)
+      })
   public Response getCatalogAdapters() {
     JsonArray jsonAdapters = new JsonArray();
     for (EventCatalogUIAdapter adapter : getIndexService().getEventCatalogUIAdapters()) {
@@ -378,10 +393,19 @@ public abstract class AbstractEventEndpoint {
   @GET
   @Path("{eventId}")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getevent", description = "Returns the event by the given id as JSON", returnDescription = "The event as JSON", pathParameters = {
-          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING) }, responses = {
-                  @RestResponse(description = "Returns the event as JSON", responseCode = HttpServletResponse.SC_OK),
-                  @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  @RestQuery(
+      name = "getevent",
+      description = "Returns the event by the given id as JSON",
+      returnDescription = "The event as JSON",
+      pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true,
+              type = RestParameter.Type.STRING)
+      },
+      responses = {
+          @RestResponse(description = "Returns the event as JSON", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "No event with this identifier was found.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      })
   public Response getEventResponse(@PathParam("eventId") String id) throws Exception {
     Optional<Event> eventOpt = getIndexService().getEvent(id, getIndex());
     if (eventOpt.isPresent()) {
@@ -396,11 +420,21 @@ public abstract class AbstractEventEndpoint {
   @DELETE
   @Path("{eventId}")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "deleteevent", description = "Delete a single event.", returnDescription = "Ok if the event has been deleted.", pathParameters = {
-          @RestParameter(name = "eventId", isRequired = true, description = "The id of the event to delete.", type = STRING), }, responses = {
-                  @RestResponse(responseCode = SC_OK, description = "The event has been deleted."),
-                  @RestResponse(responseCode = SC_ACCEPTED, description = "The event will be retracted and deleted afterwards."),
-                  @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
+  @RestQuery(
+      name = "deleteevent",
+      description = "Delete a single event.",
+      returnDescription = "Ok if the event has been deleted.",
+      pathParameters = {
+          @RestParameter(name = "eventId", isRequired = true, description = "The id of the event to delete.",
+              type = STRING),
+      },
+      responses = {
+          @RestResponse(responseCode = SC_OK, description = "The event has been deleted."),
+          @RestResponse(responseCode = SC_ACCEPTED, description = "The event will be retracted and deleted "
+              + "afterwards."),
+          @RestResponse(responseCode = HttpServletResponse.SC_UNAUTHORIZED, description = "If the current user is not "
+              + "authorized to perform this action")
+      })
   public Response deleteEvent(@PathParam("eventId") String id) throws UnauthorizedException, SearchIndexException {
     final Optional<Event> event = checkAgentAccessForEvent(id);
     if (event.isEmpty()) {
@@ -433,10 +467,19 @@ public abstract class AbstractEventEndpoint {
   @POST
   @Path("deleteEvents")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "deleteevents", description = "Deletes a json list of events by their given ids e.g. [\"1dbe7255-e17d-4279-811d-a5c7ced689bf\", \"04fae22b-0717-4f59-8b72-5f824f76d529\"]", returnDescription = "Returns a JSON object containing a list of event ids that were deleted, not found or if there was a server error.", responses = {
+  @RestQuery(
+      name = "deleteevents",
+      description = "Deletes a json list of events by their given ids e.g. [\"1dbe7255-e17d-4279-811d-a5c7ced689bf\", "
+          + "\"04fae22b-0717-4f59-8b72-5f824f76d529\"]",
+      returnDescription = "Returns a JSON object containing a list of event ids that were deleted, not found or if "
+          + "there was a server error.",
+      responses = {
           @RestResponse(description = "Events have been deleted", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "The list of ids could not be parsed into a json list.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-          @RestResponse(description = "If the current user is not authorized to perform this action", responseCode = HttpServletResponse.SC_UNAUTHORIZED) })
+          @RestResponse(description = "The list of ids could not be parsed into a json list.",
+              responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "If the current user is not authorized to perform this action",
+              responseCode = HttpServletResponse.SC_UNAUTHORIZED)
+      })
   public Response deleteEvents(String eventIdsContent) throws UnauthorizedException, SearchIndexException {
     if (StringUtils.isBlank(eventIdsContent)) {
       return Response.status(Response.Status.BAD_REQUEST).build();
@@ -498,14 +541,25 @@ public abstract class AbstractEventEndpoint {
   @GET
   @Path("{eventId}/publications.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "geteventpublications", description = "Returns all the data related to the publications tab in the event details modal as JSON", returnDescription = "All the data related to the event publications tab as JSON", pathParameters = {
-          @RestParameter(name = "eventId", description = "The event id (mediapackage id).", isRequired = true, type = RestParameter.Type.STRING) }, responses = {
-                  @RestResponse(description = "Returns all the data related to the event publications tab as JSON", responseCode = HttpServletResponse.SC_OK),
-                  @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  @RestQuery(
+      name = "geteventpublications",
+      description = "Returns all the data related to the publications tab in the event details modal as JSON",
+      returnDescription = "All the data related to the event publications tab as JSON",
+      pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id (mediapackage id).", isRequired = true,
+              type = RestParameter.Type.STRING)
+      },
+      responses = {
+          @RestResponse(description = "Returns all the data related to the event publications tab as JSON",
+              responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "No event with this identifier was found.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      })
   public Response getEventPublicationsTab(@PathParam("eventId") String id) throws Exception {
     Optional<Event> optEvent = getIndexService().getEvent(id, getIndex());
-    if (optEvent.isEmpty())
+    if (optEvent.isEmpty()) {
       return notFound("Cannot find an event with id '%s'.", id);
+    }
 
     // Quick actions have been temporally removed from the publications tab
     // ---------------------------------------------------------------
@@ -621,15 +675,26 @@ public abstract class AbstractEventEndpoint {
   @GET
   @Path("{eventId}/scheduling.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getEventSchedulingMetadata", description = "Returns all of the scheduling metadata for an event", returnDescription = "All the technical metadata related to scheduling as JSON", pathParameters = {
-          @RestParameter(name = "eventId", description = "The event id (mediapackage id).", isRequired = true, type = RestParameter.Type.STRING) }, responses = {
-                  @RestResponse(description = "Returns all the data related to the event scheduling tab as JSON", responseCode = HttpServletResponse.SC_OK),
-                  @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  @RestQuery(
+      name = "getEventSchedulingMetadata",
+      description = "Returns all of the scheduling metadata for an event",
+      returnDescription = "All the technical metadata related to scheduling as JSON",
+      pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id (mediapackage id).", isRequired = true,
+              type = RestParameter.Type.STRING)
+      },
+      responses = {
+          @RestResponse(description = "Returns all the data related to the event scheduling tab as JSON",
+              responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "No event with this identifier was found.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      })
   public Response getEventScheduling(@PathParam("eventId") String eventId)
           throws NotFoundException, UnauthorizedException, SearchIndexException {
     Optional<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
-    if (optEvent.isEmpty())
+    if (optEvent.isEmpty()) {
       return notFound("Cannot find an event with id '%s'.", eventId);
+    }
 
     try {
       TechnicalMetadata technicalMetadata = getSchedulerService().getTechnicalMetadata(eventId);
@@ -643,12 +708,24 @@ public abstract class AbstractEventEndpoint {
   @POST
   @Path("scheduling.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getEventsScheduling", description = "Returns all of the scheduling metadata for a list of events", returnDescription = "All the technical metadata related to scheduling as JSON", restParameters = {
-    @RestParameter(name = "eventIds", description = "An array of event IDs (mediapackage id)", isRequired = true, type = RestParameter.Type.STRING),
-    @RestParameter(name = "ignoreNonScheduled", description = "Whether events that are not really scheduled events should be ignored or produce an error", isRequired = true, type = RestParameter.Type.BOOLEAN) }, responses = {
-    @RestResponse(description = "Returns all the data related to the event scheduling tab as JSON", responseCode = HttpServletResponse.SC_OK),
-    @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
-  public Response getEventsScheduling(@FormParam("eventIds") final List<String> eventIds, @FormParam("ignoreNonScheduled") final boolean ignoreNonScheduled) {
+  @RestQuery(
+      name = "getEventsScheduling",
+      description = "Returns all of the scheduling metadata for a list of events",
+      returnDescription = "All the technical metadata related to scheduling as JSON",
+      restParameters = {
+          @RestParameter(name = "eventIds", description = "An array of event IDs (mediapackage id)", isRequired = true,
+              type = RestParameter.Type.STRING),
+          @RestParameter(name = "ignoreNonScheduled", description = "Whether events that are not really scheduled "
+              + "events should be ignored or produce an error", isRequired = true, type = RestParameter.Type.BOOLEAN)
+      },
+      responses = {
+          @RestResponse(description = "Returns all the data related to the event scheduling tab as JSON",
+              responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "No event with this identifier was found.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      })
+  public Response getEventsScheduling(@FormParam("eventIds") final List<String> eventIds,
+      @FormParam("ignoreNonScheduled") final boolean ignoreNonScheduled) {
     JsonArray fields = new JsonArray();
 
     for (final String eventId : eventIds) {
@@ -672,17 +749,30 @@ public abstract class AbstractEventEndpoint {
 
   @PUT
   @Path("{eventId}/scheduling")
-  @RestQuery(name = "updateEventScheduling", description = "Updates the scheduling information of an event", returnDescription = "The method doesn't return any content", pathParameters = {
-          @RestParameter(name = "eventId", isRequired = true, description = "The event identifier", type = RestParameter.Type.STRING) }, restParameters = {
-                  @RestParameter(name = "scheduling", isRequired = true, description = "The updated scheduling (JSON object)", type = RestParameter.Type.TEXT) }, responses = {
-                          @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required params were missing in the request."),
-                          @RestResponse(responseCode = SC_NOT_FOUND, description = "If the event has not been found."),
-                          @RestResponse(responseCode = SC_NO_CONTENT, description = "The method doesn't return any content") })
+  @RestQuery(
+      name = "updateEventScheduling",
+      description = "Updates the scheduling information of an event",
+      returnDescription = "The method doesn't return any content",
+      pathParameters = {
+          @RestParameter(name = "eventId", isRequired = true, description = "The event identifier",
+              type = RestParameter.Type.STRING)
+      },
+      restParameters = {
+          @RestParameter(name = "scheduling", isRequired = true, description = "The updated scheduling (JSON object)",
+              type = RestParameter.Type.TEXT)
+      },
+      responses = {
+          @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required params were missing in the "
+              + "request."),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "If the event has not been found."),
+          @RestResponse(responseCode = SC_NO_CONTENT, description = "The method doesn't return any content")
+      })
   public Response updateEventScheduling(@PathParam("eventId") String eventId,
           @FormParam("scheduling") String scheduling)
           throws NotFoundException, UnauthorizedException, SearchIndexException, IndexServiceException {
-    if (StringUtils.isBlank(scheduling))
+    if (StringUtils.isBlank(scheduling)) {
       return RestUtil.R.badRequest("Missing parameters");
+    }
 
     try {
       final Event event = getEventOrThrowNotFoundException(eventId);
@@ -701,7 +791,7 @@ public abstract class AbstractEventEndpoint {
   }
 
   private void updateEventScheduling(String scheduling, Event event) throws NotFoundException, UnauthorizedException,
-    SchedulerException, JSONException, ParseException, SearchIndexException, IndexServiceException {
+          SchedulerException, JSONException, ParseException, SearchIndexException, IndexServiceException {
     final TechnicalMetadata technicalMetadata = getSchedulerService().getTechnicalMetadata(event.getIdentifier());
     final org.codehaus.jettison.json.JSONObject schedulingJson = new org.codehaus.jettison.json.JSONObject(
             scheduling);
@@ -723,7 +813,8 @@ public abstract class AbstractEventEndpoint {
       Agent previousAgent = getCaptureAgentStateService().getAgent(previousAgentId.get());
       Agent agent = getCaptureAgentStateService().getAgent(agentId.get());
 
-      previousAgentInputs = Optional.ofNullable(previousAgent.getCapabilities().getProperty(CaptureParameters.CAPTURE_DEVICE_NAMES));
+      previousAgentInputs = Optional.ofNullable(previousAgent.getCapabilities().getProperty(
+          CaptureParameters.CAPTURE_DEVICE_NAMES));
       agentInputs = Optional.ofNullable(agent.getCapabilities().getProperty(CaptureParameters.CAPTURE_DEVICE_NAMES));
     }
 
@@ -737,23 +828,24 @@ public abstract class AbstractEventEndpoint {
     if (schedulingJson.has(SCHEDULING_START_KEY)) {
       start = Optional.of(new Date(DateTimeSupport.fromUTC(schedulingJson.getString(SCHEDULING_START_KEY))));
       logger.trace("Updating start time of event '{}' id from '{}' to '{}'",
-        event.getIdentifier(), DateTimeSupport.toUTC(technicalMetadata.getStartDate().getTime()),
-                      DateTimeSupport.toUTC(start.get().getTime()));
+          event.getIdentifier(), DateTimeSupport.toUTC(technicalMetadata.getStartDate().getTime()),
+          DateTimeSupport.toUTC(start.get().getTime()));
     }
 
     Optional<Date> end = Optional.empty();
     if (schedulingJson.has(SCHEDULING_END_KEY)) {
       end = Optional.of(new Date(DateTimeSupport.fromUTC(schedulingJson.getString(SCHEDULING_END_KEY))));
       logger.trace("Updating end time of event '{}' id from '{}' to '{}'",
-        event.getIdentifier(), DateTimeSupport.toUTC(technicalMetadata.getEndDate().getTime()),
-                      DateTimeSupport.toUTC(end.get().getTime()));
+          event.getIdentifier(), DateTimeSupport.toUTC(technicalMetadata.getEndDate().getTime()),
+          DateTimeSupport.toUTC(end.get().getTime()));
     }
 
     Optional<Map<String, String>> agentConfiguration = Optional.empty();
     if (schedulingJson.has(SCHEDULING_AGENT_CONFIGURATION_KEY)) {
-      agentConfiguration = Optional.of(JSONUtils.toMap(schedulingJson.getJSONObject(SCHEDULING_AGENT_CONFIGURATION_KEY)));
+      agentConfiguration = Optional.of(JSONUtils.toMap(schedulingJson.getJSONObject(
+          SCHEDULING_AGENT_CONFIGURATION_KEY)));
       logger.trace("Updating agent configuration of event '{}' id from '{}' to '{}'",
-        event.getIdentifier(), technicalMetadata.getCaptureAgentConfiguration(), agentConfiguration);
+          event.getIdentifier(), technicalMetadata.getCaptureAgentConfiguration(), agentConfiguration);
     }
 
     Optional<Map<String, String>> previousAgentInputMethods = Optional.empty();
@@ -783,8 +875,8 @@ public abstract class AbstractEventEndpoint {
     }
 
     if (!start.isEmpty() || !end.isEmpty() || !agentId.isEmpty() || !agentConfiguration.isEmpty()) {
-      getSchedulerService()
-        .updateEvent(event.getIdentifier(), start, end, agentId, Optional.empty(), Optional.empty(), Optional.empty(), agentConfiguration);
+      getSchedulerService().updateEvent(event.getIdentifier(), start, end, agentId, Optional.empty(), Optional.empty(),
+          Optional.empty(), agentConfiguration);
     }
   }
 
@@ -800,14 +892,25 @@ public abstract class AbstractEventEndpoint {
   @GET
   @Path("{eventId}/comments")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "geteventcomments", description = "Returns all the data related to the comments tab in the event details modal as JSON", returnDescription = "All the data related to the event comments tab as JSON", pathParameters = {
-          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING) }, responses = {
-                  @RestResponse(description = "Returns all the data related to the event comments tab as JSON", responseCode = HttpServletResponse.SC_OK),
-                  @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  @RestQuery(
+      name = "geteventcomments",
+      description = "Returns all the data related to the comments tab in the event details modal as JSON",
+      returnDescription = "All the data related to the event comments tab as JSON",
+      pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true,
+              type = RestParameter.Type.STRING)
+      },
+      responses = {
+          @RestResponse(description = "Returns all the data related to the event comments tab as JSON",
+              responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "No event with this identifier was found.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      })
   public Response getEventComments(@PathParam("eventId") String eventId) throws Exception {
     Optional<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
-    if (optEvent.isEmpty())
+    if (optEvent.isEmpty()) {
       return notFound("Cannot find an event with id '%s'.", eventId);
+    }
 
     try {
       List<EventComment> comments = getEventCommentService().getComments(eventId);
@@ -826,14 +929,25 @@ public abstract class AbstractEventEndpoint {
   @GET
   @Path("{eventId}/hasActiveTransaction")
   @Produces(MediaType.TEXT_PLAIN)
-  @RestQuery(name = "hasactivetransaction", description = "Returns whether there is currently a transaction in progress for the given event", returnDescription = "Whether there is currently a transaction in progress for the given event", pathParameters = {
-          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING) }, responses = {
-                  @RestResponse(description = "Returns whether there is currently a transaction in progress for the given event", responseCode = HttpServletResponse.SC_OK),
-                  @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  @RestQuery(
+      name = "hasactivetransaction",
+      description = "Returns whether there is currently a transaction in progress for the given event",
+      returnDescription = "Whether there is currently a transaction in progress for the given event",
+      pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true,
+              type = RestParameter.Type.STRING)
+      },
+      responses = {
+          @RestResponse(description = "Returns whether there is currently a transaction in progress for the given "
+              + "event", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "No event with this identifier was found.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      })
   public Response hasActiveTransaction(@PathParam("eventId") String eventId) throws Exception {
     Optional<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
-    if (optEvent.isEmpty())
+    if (optEvent.isEmpty()) {
       return notFound("Cannot find an event with id '%s'.", eventId);
+    }
 
     JSONObject json = new JSONObject();
 
@@ -849,16 +963,26 @@ public abstract class AbstractEventEndpoint {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("{eventId}/comment/{commentId}")
-  @RestQuery(name = "geteventcomment", description = "Returns the comment with the given identifier", returnDescription = "Returns the comment as JSON", pathParameters = {
-          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING),
-          @RestParameter(name = "commentId", isRequired = true, description = "The comment identifier", type = STRING) }, responses = {
-                  @RestResponse(responseCode = SC_OK, description = "The comment as JSON."),
-                  @RestResponse(responseCode = SC_NOT_FOUND, description = "No event or comment with this identifier was found.") })
+  @RestQuery(
+      name = "geteventcomment",
+      description = "Returns the comment with the given identifier",
+      returnDescription = "Returns the comment as JSON",
+      pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true,
+              type = RestParameter.Type.STRING),
+          @RestParameter(name = "commentId", isRequired = true, description = "The comment identifier", type = STRING)
+      },
+      responses = {
+          @RestResponse(responseCode = SC_OK, description = "The comment as JSON."),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "No event or comment with this identifier was "
+              + "found.")
+      })
   public Response getEventComment(@PathParam("eventId") String eventId, @PathParam("commentId") long commentId)
           throws NotFoundException, Exception {
     Optional<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
-    if (optEvent.isEmpty())
+    if (optEvent.isEmpty()) {
       return notFound("Cannot find an event with id '%s'.", eventId);
+    }
 
     try {
       EventComment comment = getEventCommentService().getComment(commentId);
@@ -873,20 +997,33 @@ public abstract class AbstractEventEndpoint {
 
   @PUT
   @Path("{eventId}/comment/{commentId}")
-  @RestQuery(name = "updateeventcomment", description = "Updates an event comment", returnDescription = "The updated comment as JSON.", pathParameters = {
-          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING),
-          @RestParameter(name = "commentId", isRequired = true, description = "The comment identifier", type = STRING) }, restParameters = {
-                  @RestParameter(name = "text", isRequired = false, description = "The comment text", type = TEXT),
-                  @RestParameter(name = "reason", isRequired = false, description = "The comment reason", type = STRING),
-                  @RestParameter(name = "resolved", isRequired = false, description = "The comment resolved status", type = RestParameter.Type.BOOLEAN) }, responses = {
-                          @RestResponse(responseCode = SC_NOT_FOUND, description = "The event or comment to update has not been found."),
-                          @RestResponse(responseCode = SC_OK, description = "The updated comment as JSON.") })
+  @RestQuery(
+      name = "updateeventcomment",
+      description = "Updates an event comment",
+      returnDescription = "The updated comment as JSON.",
+      pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true,
+              type = RestParameter.Type.STRING),
+          @RestParameter(name = "commentId", isRequired = true, description = "The comment identifier", type = STRING)
+      },
+      restParameters = {
+          @RestParameter(name = "text", isRequired = false, description = "The comment text", type = TEXT),
+          @RestParameter(name = "reason", isRequired = false, description = "The comment reason", type = STRING),
+          @RestParameter(name = "resolved", isRequired = false, description = "The comment resolved status",
+              type = RestParameter.Type.BOOLEAN)
+      },
+      responses = {
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "The event or comment to update has not been "
+              + "found."),
+          @RestResponse(responseCode = SC_OK, description = "The updated comment as JSON.")
+      })
   public Response updateEventComment(@PathParam("eventId") String eventId, @PathParam("commentId") long commentId,
           @FormParam("text") String text, @FormParam("reason") String reason, @FormParam("resolved") Boolean resolved)
                   throws Exception {
     Optional<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
-    if (optEvent.isEmpty())
+    if (optEvent.isEmpty()) {
       return notFound("Cannot find an event with id '%s'.", eventId);
+    }
 
     try {
       EventComment dto = getEventCommentService().getComment(commentId);
@@ -903,8 +1040,9 @@ public abstract class AbstractEventEndpoint {
         reason = dto.getReason();
       }
 
-      if (resolved == null)
+      if (resolved == null) {
         resolved = dto.isResolvedStatus();
+      }
 
       EventComment updatedComment = EventComment.create(dto.getId(), eventId,
               getSecurityService().getOrganization().getId(), text, dto.getAuthor(), reason, resolved,
@@ -924,14 +1062,23 @@ public abstract class AbstractEventEndpoint {
 
   @POST
   @Path("{eventId}/access")
-  @RestQuery(name = "applyAclToEvent", description = "Immediate application of an ACL to an event", returnDescription = "Status code", pathParameters = {
-          @RestParameter(name = "eventId", isRequired = true, description = "The event ID", type = STRING) }, restParameters = {
-                  @RestParameter(name = "acl", isRequired = true, description = "The ACL to apply", type = STRING) }, responses = {
-                          @RestResponse(responseCode = SC_OK, description = "The ACL has been successfully applied"),
-                          @RestResponse(responseCode = SC_BAD_REQUEST, description = "Unable to parse the given ACL"),
-                          @RestResponse(responseCode = SC_NOT_FOUND, description = "The the event has not been found"),
-                          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "Not authorized to perform this action"),
-                          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Internal error") })
+  @RestQuery(
+      name = "applyAclToEvent",
+      description = "Immediate application of an ACL to an event",
+      returnDescription = "Status code",
+      pathParameters = {
+          @RestParameter(name = "eventId", isRequired = true, description = "The event ID", type = STRING)
+      },
+      restParameters = {
+          @RestParameter(name = "acl", isRequired = true, description = "The ACL to apply", type = STRING)
+      },
+      responses = {
+          @RestResponse(responseCode = SC_OK, description = "The ACL has been successfully applied"),
+          @RestResponse(responseCode = SC_BAD_REQUEST, description = "Unable to parse the given ACL"),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "The the event has not been found"),
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "Not authorized to perform this action"),
+          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Internal error")
+      })
   public Response applyAclToEvent(@PathParam("eventId") String eventId, @FormParam("acl") String acl)
           throws NotFoundException, UnauthorizedException, SearchIndexException, IndexServiceException {
     final AccessControlList accessControlList;
@@ -987,8 +1134,8 @@ public abstract class AbstractEventEndpoint {
         MediaPackage mediaPackage = getIndexService().getEventMediapackage(optEvent.get());
         mediaPackage = getAuthorizationService().setAcl(mediaPackage, AclScope.Episode, accessControlList).getA();
         // We could check agent access here if we want to forbid updating ACLs for users without access.
-        getSchedulerService().updateEvent(eventId, Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
-                Optional.of(mediaPackage), Optional.empty(), Optional.empty());
+        getSchedulerService().updateEvent(eventId, Optional.empty(), Optional.empty(), Optional.empty(),
+            Optional.empty(), Optional.of(mediaPackage), Optional.empty(), Optional.empty());
         return ok();
       }
     } catch (MediaPackageException e) {
@@ -1006,22 +1153,36 @@ public abstract class AbstractEventEndpoint {
   @POST
   @Path("{eventId}/comment")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "createeventcomment", description = "Creates a comment related to the event given by the identifier", returnDescription = "The comment related to the event as JSON", pathParameters = {
-          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING) }, restParameters = {
-                  @RestParameter(name = "text", isRequired = true, description = "The comment text", type = TEXT),
-                  @RestParameter(name = "resolved", isRequired = false, description = "The comment resolved status", type = RestParameter.Type.BOOLEAN),
-                  @RestParameter(name = "reason", isRequired = false, description = "The comment reason", type = STRING) }, responses = {
-                          @RestResponse(description = "The comment has been created.", responseCode = HttpServletResponse.SC_CREATED),
-                          @RestResponse(description = "If no text ist set.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-                          @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  @RestQuery(
+      name = "createeventcomment",
+      description = "Creates a comment related to the event given by the identifier",
+      returnDescription = "The comment related to the event as JSON",
+      pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true,
+              type = RestParameter.Type.STRING)
+      },
+      restParameters = {
+          @RestParameter(name = "text", isRequired = true, description = "The comment text", type = TEXT),
+          @RestParameter(name = "resolved", isRequired = false, description = "The comment resolved status",
+              type = RestParameter.Type.BOOLEAN),
+          @RestParameter(name = "reason", isRequired = false, description = "The comment reason", type = STRING)
+      },
+      responses = {
+          @RestResponse(description = "The comment has been created.", responseCode = HttpServletResponse.SC_CREATED),
+          @RestResponse(description = "If no text ist set.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "No event with this identifier was found.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      })
   public Response createEventComment(@PathParam("eventId") String eventId, @FormParam("text") String text,
           @FormParam("reason") String reason, @FormParam("resolved") Boolean resolved) throws Exception {
     Optional<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
-    if (optEvent.isEmpty())
+    if (optEvent.isEmpty()) {
       return notFound("Cannot find an event with id '%s'.", eventId);
+    }
 
-    if (StringUtils.isBlank(text))
+    if (StringUtils.isBlank(text)) {
       return Response.status(Status.BAD_REQUEST).build();
+    }
 
     User author = getSecurityService().getUser();
     try {
@@ -1040,16 +1201,26 @@ public abstract class AbstractEventEndpoint {
 
   @POST
   @Path("{eventId}/comment/{commentId}")
-  @RestQuery(name = "resolveeventcomment", description = "Resolves an event comment", returnDescription = "The resolved comment.", pathParameters = {
-          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING),
-          @RestParameter(name = "commentId", isRequired = true, description = "The comment identifier", type = STRING) }, responses = {
-                  @RestResponse(responseCode = SC_NOT_FOUND, description = "The event or comment to resolve has not been found."),
-                  @RestResponse(responseCode = SC_OK, description = "The resolved comment as JSON.") })
+  @RestQuery(
+      name = "resolveeventcomment",
+      description = "Resolves an event comment",
+      returnDescription = "The resolved comment.",
+      pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true,
+              type = RestParameter.Type.STRING),
+          @RestParameter(name = "commentId", isRequired = true, description = "The comment identifier", type = STRING)
+      },
+      responses = {
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "The event or comment to resolve has not been "
+              + "found."),
+          @RestResponse(responseCode = SC_OK, description = "The resolved comment as JSON.")
+      })
   public Response resolveEventComment(@PathParam("eventId") String eventId, @PathParam("commentId") long commentId)
           throws Exception {
     Optional<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
-    if (optEvent.isEmpty())
+    if (optEvent.isEmpty()) {
       return notFound("Cannot find an event with id '%s'.", eventId);
+    }
 
     try {
       EventComment dto = getEventCommentService().getComment(commentId);
@@ -1072,16 +1243,28 @@ public abstract class AbstractEventEndpoint {
   @DELETE
   @Path("{eventId}/comment/{commentId}")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "deleteeventcomment", description = "Deletes a event related comment by its identifier", returnDescription = "No content", pathParameters = {
-          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING),
-          @RestParameter(name = "commentId", description = "The comment id", isRequired = true, type = RestParameter.Type.STRING) }, responses = {
-                  @RestResponse(description = "The event related comment has been deleted.", responseCode = HttpServletResponse.SC_NO_CONTENT),
-                  @RestResponse(description = "No event or comment with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  @RestQuery(
+      name = "deleteeventcomment",
+      description = "Deletes a event related comment by its identifier",
+      returnDescription = "No content",
+      pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true,
+              type = RestParameter.Type.STRING),
+          @RestParameter(name = "commentId", description = "The comment id", isRequired = true,
+              type = RestParameter.Type.STRING)
+      },
+      responses = {
+          @RestResponse(description = "The event related comment has been deleted.",
+              responseCode = HttpServletResponse.SC_NO_CONTENT),
+          @RestResponse(description = "No event or comment with this identifier was found.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      })
   public Response deleteEventComment(@PathParam("eventId") String eventId, @PathParam("commentId") long commentId)
           throws Exception {
     Optional<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
-    if (optEvent.isEmpty())
+    if (optEvent.isEmpty()) {
       return notFound("Cannot find an event with id '%s'.", eventId);
+    }
 
     try {
       getEventCommentService().deleteComment(commentId);
@@ -1098,31 +1281,45 @@ public abstract class AbstractEventEndpoint {
 
   @DELETE
   @Path("{eventId}/comment/{commentId}/{replyId}")
-  @RestQuery(name = "deleteeventreply", description = "Delete an event comment reply", returnDescription = "The updated comment as JSON.", pathParameters = {
-          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING),
-          @RestParameter(name = "commentId", isRequired = true, description = "The comment identifier", type = STRING),
-          @RestParameter(name = "replyId", isRequired = true, description = "The comment reply identifier", type = STRING) }, responses = {
-                  @RestResponse(responseCode = SC_NOT_FOUND, description = "No event comment or reply with this identifier was found."),
-                  @RestResponse(responseCode = SC_OK, description = "The updated comment as JSON.") })
+  @RestQuery(
+      name = "deleteeventreply",
+      description = "Delete an event comment reply",
+      returnDescription = "The updated comment as JSON.",
+      pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true,
+              type = RestParameter.Type.STRING),
+          @RestParameter(name = "commentId", isRequired = true, description = "The comment identifier",
+              type = STRING),
+          @RestParameter(name = "replyId", isRequired = true, description = "The comment reply identifier",
+              type = STRING)
+      },
+      responses = {
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "No event comment or reply with this identifier was "
+              + "found."),
+          @RestResponse(responseCode = SC_OK, description = "The updated comment as JSON.")
+      })
   public Response deleteEventCommentReply(@PathParam("eventId") String eventId, @PathParam("commentId") long commentId,
           @PathParam("replyId") long replyId) throws Exception {
     Optional<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
-    if (optEvent.isEmpty())
+    if (optEvent.isEmpty()) {
       return notFound("Cannot find an event with id '%s'.", eventId);
+    }
 
     EventComment comment = null;
     EventCommentReply reply = null;
     try {
       comment = getEventCommentService().getComment(commentId);
       for (EventCommentReply r : comment.getReplies()) {
-        if (r.getId().isEmpty() || replyId != r.getId().get().longValue())
+        if (r.getId().isEmpty() || replyId != r.getId().get().longValue()) {
           continue;
+        }
         reply = r;
         break;
       }
 
-      if (reply == null)
+      if (reply == null) {
         throw new NotFoundException("Reply with id " + replyId + " not found!");
+      }
 
       comment.removeReply(reply);
 
@@ -1140,36 +1337,53 @@ public abstract class AbstractEventEndpoint {
 
   @PUT
   @Path("{eventId}/comment/{commentId}/{replyId}")
-  @RestQuery(name = "updateeventcommentreply", description = "Updates an event comment reply", returnDescription = "The updated comment as JSON.", pathParameters = {
-          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING),
-          @RestParameter(name = "commentId", isRequired = true, description = "The comment identifier", type = STRING),
-          @RestParameter(name = "replyId", isRequired = true, description = "The comment reply identifier", type = STRING) }, restParameters = {
-                  @RestParameter(name = "text", isRequired = true, description = "The comment reply text", type = TEXT) }, responses = {
-                          @RestResponse(responseCode = SC_NOT_FOUND, description = "The event or comment to extend with a reply or the reply has not been found."),
-                          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "If no text is set."),
-                          @RestResponse(responseCode = SC_OK, description = "The updated comment as JSON.") })
+  @RestQuery(
+      name = "updateeventcommentreply",
+      description = "Updates an event comment reply",
+      returnDescription = "The updated comment as JSON.",
+      pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true,
+              type = RestParameter.Type.STRING),
+          @RestParameter(name = "commentId", isRequired = true, description = "The comment identifier",
+              type = STRING),
+          @RestParameter(name = "replyId", isRequired = true, description = "The comment reply identifier",
+              type = STRING)
+      },
+      restParameters = {
+          @RestParameter(name = "text", isRequired = true, description = "The comment reply text", type = TEXT)
+      },
+      responses = {
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "The event or comment to extend with a reply or the "
+              + "reply has not been found."),
+          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "If no text is set."),
+          @RestResponse(responseCode = SC_OK, description = "The updated comment as JSON.")
+      })
   public Response updateEventCommentReply(@PathParam("eventId") String eventId, @PathParam("commentId") long commentId,
           @PathParam("replyId") long replyId, @FormParam("text") String text) throws Exception {
-    if (StringUtils.isBlank(text))
+    if (StringUtils.isBlank(text)) {
       return Response.status(Status.BAD_REQUEST).build();
+    }
 
     Optional<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
-    if (optEvent.isEmpty())
+    if (optEvent.isEmpty()) {
       return notFound("Cannot find an event with id '%s'.", eventId);
+    }
 
     EventComment comment = null;
     EventCommentReply reply = null;
     try {
       comment = getEventCommentService().getComment(commentId);
       for (EventCommentReply r : comment.getReplies()) {
-        if (r.getId().isEmpty() || replyId != r.getId().get().longValue())
+        if (r.getId().isEmpty() || replyId != r.getId().get().longValue()) {
           continue;
+        }
         reply = r;
         break;
       }
 
-      if (reply == null)
+      if (reply == null) {
         throw new NotFoundException("Reply with id " + replyId + " not found!");
+      }
 
       EventCommentReply updatedReply = EventCommentReply.create(reply.getId(), text.trim(), reply.getAuthor(),
               reply.getCreationDate(), new Date());
@@ -1190,22 +1404,37 @@ public abstract class AbstractEventEndpoint {
 
   @POST
   @Path("{eventId}/comment/{commentId}/reply")
-  @RestQuery(name = "createeventcommentreply", description = "Creates an event comment reply", returnDescription = "The updated comment as JSON.", pathParameters = {
-          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING),
-          @RestParameter(name = "commentId", isRequired = true, description = "The comment identifier", type = STRING) }, restParameters = {
-                  @RestParameter(name = "text", isRequired = true, description = "The comment reply text", type = TEXT),
-                  @RestParameter(name = "resolved", isRequired = false, description = "Flag defining if this reply solve or not the comment.", type = BOOLEAN) }, responses = {
-                          @RestResponse(responseCode = SC_NOT_FOUND, description = "The event or comment to extend with a reply has not been found."),
-                          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "If no text is set."),
-                          @RestResponse(responseCode = SC_OK, description = "The updated comment as JSON.") })
+  @RestQuery(
+      name = "createeventcommentreply",
+      description = "Creates an event comment reply",
+      returnDescription = "The updated comment as JSON.",
+      pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true,
+              type = RestParameter.Type.STRING),
+          @RestParameter(name = "commentId", isRequired = true, description = "The comment identifier",
+              type = STRING)
+      },
+      restParameters = {
+          @RestParameter(name = "text", isRequired = true, description = "The comment reply text", type = TEXT),
+          @RestParameter(name = "resolved", isRequired = false, description = "Flag defining if this reply solve or "
+              + "not the comment.", type = BOOLEAN)
+      },
+      responses = {
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "The event or comment to extend with a reply has "
+              + "not been found."),
+          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "If no text is set."),
+          @RestResponse(responseCode = SC_OK, description = "The updated comment as JSON.")
+      })
   public Response createEventCommentReply(@PathParam("eventId") String eventId, @PathParam("commentId") long commentId,
           @FormParam("text") String text, @FormParam("resolved") Boolean resolved) throws Exception {
-    if (StringUtils.isBlank(text))
+    if (StringUtils.isBlank(text)) {
       return Response.status(Status.BAD_REQUEST).build();
+    }
 
     Optional<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
-    if (optEvent.isEmpty())
+    if (optEvent.isEmpty()) {
       return notFound("Cannot find an event with id '%s'.", eventId);
+    }
 
     EventComment comment = null;
     try {
@@ -1261,14 +1490,25 @@ public abstract class AbstractEventEndpoint {
   @GET
   @Path("{eventId}/metadata.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "geteventmetadata", description = "Returns all the data related to the metadata tab in the event details modal as JSON", returnDescription = "All the data related to the event metadata tab as JSON", pathParameters = {
-          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING) }, responses = {
-                  @RestResponse(description = "Returns all the data related to the event metadata tab as JSON", responseCode = HttpServletResponse.SC_OK),
-                  @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  @RestQuery(
+      name = "geteventmetadata",
+      description = "Returns all the data related to the metadata tab in the event details modal as JSON",
+      returnDescription = "All the data related to the event metadata tab as JSON",
+      pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true,
+              type = RestParameter.Type.STRING)
+      },
+      responses = {
+          @RestResponse(description = "Returns all the data related to the event metadata tab as JSON",
+              responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "No event with this identifier was found.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      })
   public Response getEventMetadata(@PathParam("eventId") String eventId) throws Exception {
     Optional<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
-    if (optEvent.isEmpty())
+    if (optEvent.isEmpty()) {
       return notFound("Cannot find an event with id '%s'.", eventId);
+    }
     Event event = optEvent.get();
     MetadataList metadataList = new MetadataList();
 
@@ -1306,8 +1546,9 @@ public abstract class AbstractEventEndpoint {
 
     // lock metadata?
     final String wfState = event.getWorkflowState();
-    if (wfState != null && WorkflowUtil.isActive(WorkflowInstance.WorkflowState.valueOf(wfState)))
+    if (wfState != null && WorkflowUtil.isActive(WorkflowInstance.WorkflowState.valueOf(wfState))) {
       metadataList.setLocked(Locked.WORKFLOW_RUNNING);
+    }
 
     return okJson(MetadataJson.listToJson(metadataList, true));
   }
@@ -1329,19 +1570,19 @@ public abstract class AbstractEventEndpoint {
   @POST  // use POST instead of GET because of a possibly long list of ids
   @Path("events/metadata.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "geteventsmetadata",
-             description = "Returns all the data related to the edit events metadata modal as JSON",
-             returnDescription = "All the data related to the edit events metadata modal as JSON",
-             restParameters = {
-               @RestParameter(name = "eventIds", description = "The event ids", isRequired = true,
-                              type = RestParameter.Type.STRING)
-             }, responses = {
-               @RestResponse(description = "Returns all the data related to the edit events metadata modal as JSON",
-                             responseCode = HttpServletResponse.SC_OK),
-               @RestResponse(description = "No events to update, either not found or with running workflow, "
-                                         + "details in response body.",
-                             responseCode = HttpServletResponse.SC_NOT_FOUND)
-             })
+  @RestQuery(
+      name = "geteventsmetadata",
+      description = "Returns all the data related to the edit events metadata modal as JSON",
+      returnDescription = "All the data related to the edit events metadata modal as JSON",
+      restParameters = {
+          @RestParameter(name = "eventIds", description = "The event ids", isRequired = true,
+              type = RestParameter.Type.STRING)
+      }, responses = {
+          @RestResponse(description = "Returns all the data related to the edit events metadata modal as JSON",
+              responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "No events to update, either not found or with running workflow, details in "
+              + "response body.", responseCode = HttpServletResponse.SC_NOT_FOUND)
+      })
   public Response getEventsMetadata(@FormParam("eventIds") String eventIds) throws Exception {
     if (StringUtils.isBlank(eventIds)) {
       return badRequest("Event ids can't be empty");
@@ -1434,13 +1675,25 @@ public abstract class AbstractEventEndpoint {
 
   @PUT
   @Path("bulk/update")
-  @RestQuery(name = "bulkupdate", description = "Update all of the given events at once", restParameters = {
-    @RestParameter(name = "update", isRequired = true, type = RestParameter.Type.TEXT, description = "The list of groups with events and fields to update.")}, responses = {
-    @RestResponse(description = "All events have been updated successfully.", responseCode = HttpServletResponse.SC_OK),
-    @RestResponse(description = "Could not parse update instructions.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-    @RestResponse(description = "Field updating metadata or scheduling information. Some events may have been updated. Details are available in the response body.", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR),
-    @RestResponse(description = "The events in the response body were not found. No events were updated.", responseCode = HttpServletResponse.SC_NOT_FOUND)},
-    returnDescription = "In case of success, no content is returned. In case of errors while updating the metadata or scheduling information, the errors are returned. In case events were not found, their ids are returned")
+  @RestQuery(
+      name = "bulkupdate",
+      description = "Update all of the given events at once",
+      restParameters = {
+        @RestParameter(name = "update", isRequired = true, type = RestParameter.Type.TEXT,
+            description = "The list of groups with events and fields to update.")
+      }, responses = {
+        @RestResponse(description = "All events have been updated successfully.",
+            responseCode = HttpServletResponse.SC_OK),
+        @RestResponse(description = "Could not parse update instructions.",
+            responseCode = HttpServletResponse.SC_BAD_REQUEST),
+        @RestResponse(description = "Field updating metadata or scheduling information. Some events may have been "
+            + "updated. Details are available in the response body.",
+            responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR),
+        @RestResponse(description = "The events in the response body were not found. No events were updated.",
+            responseCode = HttpServletResponse.SC_NOT_FOUND)
+      },
+      returnDescription = "In case of success, no content is returned. In case of errors while updating the metadata "
+          + "or scheduling information, the errors are returned. In case events were not found, their ids are returned")
   public Response bulkUpdate(@FormParam("update") String updateJson) {
 
     final BulkUpdateUtil.BulkUpdateInstructions instructions;
@@ -1456,10 +1709,13 @@ public abstract class AbstractEventEndpoint {
     for (final BulkUpdateUtil.BulkUpdateInstructionGroup groupInstructions : instructions.getGroups()) {
       // Get all the events to edit
       final Map<String, Optional<Event>> events = groupInstructions.getEventIds().stream()
-        .collect(Collectors.toMap(id -> id, id -> BulkUpdateUtil.getEvent(getIndexService(), getIndex(), id)));
+          .collect(Collectors.toMap(id -> id, id -> BulkUpdateUtil.getEvent(getIndexService(), getIndex(), id)));
 
       // Check for invalid (non-existing) event ids
-      final Set<String> notFoundIds = events.entrySet().stream().filter(e -> !e.getValue().isPresent()).map(Entry::getKey).collect(Collectors.toSet());
+      final Set<String> notFoundIds = events.entrySet().stream()
+          .filter(e -> !e.getValue().isPresent())
+          .map(Entry::getKey)
+          .collect(Collectors.toSet());
       if (!notFoundIds.isEmpty()) {
         return notFoundJson(collectionToJsonArray(notFoundIds));
       }
@@ -1486,7 +1742,8 @@ public abstract class AbstractEventEndpoint {
         try {
           if (groupInstructions.getMetadata() != null || metadata != null) {
             metadata = BulkUpdateUtil.mergeMetadataFields(metadata, groupInstructions.getMetadata());
-            getIndexService().updateAllEventMetadata(event.getIdentifier(), JSONArray.toJSONString(Collections.singletonList(metadata)), getIndex());
+            getIndexService().updateAllEventMetadata(event.getIdentifier(),
+                JSONArray.toJSONString(Collections.singletonList(metadata)), getIndex());
           }
         } catch (Exception exception) {
           metadataUpdateFailures.put(event.getIdentifier(), exception.getMessage());
@@ -1506,12 +1763,23 @@ public abstract class AbstractEventEndpoint {
 
   @POST
   @Path("bulk/conflicts")
-  @RestQuery(name = "getBulkConflicts", description = "Checks if the current bulk update scheduling settings are in a conflict with another event", returnDescription = "Returns NO CONTENT if no event are in conflict within specified period or list of conflicting recordings in JSON", restParameters = {
-    @RestParameter(name = "update", isRequired = true, type = RestParameter.Type.TEXT, description = "The list of events and fields to update.")}, responses = {
-    @RestResponse(responseCode = HttpServletResponse.SC_NO_CONTENT, description = "No conflicting events found"),
-    @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "The events in the response body were not found. No events were updated."),
-    @RestResponse(responseCode = HttpServletResponse.SC_CONFLICT, description = "There is a conflict"),
-    @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Missing or invalid parameters")})
+  @RestQuery(
+      name = "getBulkConflicts",
+      description = "Checks if the current bulk update scheduling settings are in a conflict with another event",
+      returnDescription = "Returns NO CONTENT if no event are in conflict within specified period or list of "
+          + "conflicting recordings in JSON",
+      restParameters = {
+          @RestParameter(name = "update", isRequired = true, type = RestParameter.Type.TEXT, description = "The list "
+              + "of events and fields to update.")
+      },
+      responses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_NO_CONTENT, description = "No conflicting events found"),
+          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "The events in the response "
+              + "body were not found. No events were updated."),
+          @RestResponse(responseCode = HttpServletResponse.SC_CONFLICT, description = "There is a conflict"),
+          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Missing or invalid "
+              + "parameters")
+      })
   public Response getBulkConflicts(@FormParam("update") final String updateJson) throws NotFoundException {
     final BulkUpdateUtil.BulkUpdateInstructions instructions;
     try {
@@ -1553,7 +1821,8 @@ public abstract class AbstractEventEndpoint {
           eventsWithScheduling.stream()
               .filter(otherEvent -> !otherEvent.getA().getIdentifier().equals(event.getIdentifier()))
               .forEach(otherEvent -> {
-                final JSONObject otherScheduling = BulkUpdateUtil.addSchedulingDates(otherEvent.getA(), otherEvent.getB());
+                final JSONObject otherScheduling = BulkUpdateUtil.addSchedulingDates(otherEvent.getA(),
+                    otherEvent.getB());
                 final Date otherStart = Date.from(Instant.parse((String) otherScheduling.get(SCHEDULING_START_KEY)));
                 final Date otherEnd = Date.from(Instant.parse((String) otherScheduling.get(SCHEDULING_END_KEY)));
                 final String otherAgentId = Optional.ofNullable((String) otherScheduling.get(SCHEDULING_AGENT_ID_KEY))
@@ -1614,17 +1883,30 @@ public abstract class AbstractEventEndpoint {
 
   @PUT
   @Path("{eventId}/metadata")
-  @RestQuery(name = "updateeventmetadata", description = "Update the passed metadata for the event with the given Id", pathParameters = {
-          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING) }, restParameters = {
-                  @RestParameter(name = "metadata", isRequired = true, type = RestParameter.Type.TEXT, description = "The list of metadata to update") }, responses = {
-                          @RestResponse(description = "The metadata have been updated.", responseCode = HttpServletResponse.SC_OK),
-                          @RestResponse(description = "Could not parse metadata.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-                          @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) }, returnDescription = "No content is returned.")
+  @RestQuery(
+      name = "updateeventmetadata",
+      description = "Update the passed metadata for the event with the given Id",
+      pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true,
+              type = RestParameter.Type.STRING)
+      },
+      restParameters = {
+          @RestParameter(name = "metadata", isRequired = true, type = RestParameter.Type.TEXT,
+              description = "The list of metadata to update")
+      },
+      responses = {
+          @RestResponse(description = "The metadata have been updated.", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "Could not parse metadata.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "No event with this identifier was found.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      },
+      returnDescription = "No content is returned.")
   public Response updateEventMetadata(@PathParam("eventId") String id, @FormParam("metadata") String metadataJSON)
           throws Exception {
     Optional<Event> optEvent = getIndexService().getEvent(id, getIndex());
-    if (optEvent.isEmpty())
+    if (optEvent.isEmpty()) {
       return notFound("Cannot find an event with id '%s'.", id);
+    }
 
     try {
       MetadataList metadataList = getIndexService().updateAllEventMetadata(id, metadataJSON, getIndex());
@@ -1636,25 +1918,28 @@ public abstract class AbstractEventEndpoint {
 
   @PUT
   @Path("events/metadata")
-  @RestQuery(name = "updateeventsmetadata",
-    description = "Update the passed metadata for the events with the given ids",
-    restParameters = {
-      @RestParameter(name = "eventIds", isRequired = true, type = RestParameter.Type.STRING,
-        description = "The ids of the events to update"),
-      @RestParameter(name = "metadata", isRequired = true, type = RestParameter.Type.TEXT,
-        description = "The metadata fields to update"),
-    }, responses = {
-    @RestResponse(description = "All events have been updated successfully.",
-      responseCode = HttpServletResponse.SC_NO_CONTENT),
-    @RestResponse(description = "One or multiple errors occured while updating event metadata. "
-      + "Some events may have been updated successfully. "
-      + "Details are available in the response body.",
-      responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)},
-    returnDescription = "In case of complete success, no content is returned. Otherwise, the response content "
-      + "contains the ids of events that couldn't be found and the ids and errors of events where the update failed "
-      + "as well as the ids of the events that were updated successfully.")
+  @RestQuery(
+      name = "updateeventsmetadata",
+      description = "Update the passed metadata for the events with the given ids",
+      restParameters = {
+          @RestParameter(name = "eventIds", isRequired = true, type = RestParameter.Type.STRING,
+              description = "The ids of the events to update"),
+          @RestParameter(name = "metadata", isRequired = true, type = RestParameter.Type.TEXT,
+              description = "The metadata fields to update"),
+      },
+      responses = {
+          @RestResponse(description = "All events have been updated successfully.",
+              responseCode = HttpServletResponse.SC_NO_CONTENT),
+          @RestResponse(description = "One or multiple errors occured while updating event metadata. "
+              + "Some events may have been updated successfully. "
+              + "Details are available in the response body.",
+              responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+      },
+      returnDescription = "In case of complete success, no content is returned. Otherwise, the response content "
+          + "contains the ids of events that couldn't be found and the ids and errors of events where the update "
+          + "failed as well as the ids of the events that were updated successfully.")
   public Response updateEventsMetadata(@FormParam("eventIds") String eventIds, @FormParam("metadata") String metadata)
-    throws Exception {
+          throws Exception {
 
     if (StringUtils.isBlank(eventIds)) {
       return badRequest("Event ids can't be empty");
@@ -1712,13 +1997,25 @@ public abstract class AbstractEventEndpoint {
   @GET
   @Path("{eventId}/asset/assets.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getAssetList", description = "Returns the number of assets from each types as JSON", returnDescription = "The number of assets from each types as JSON", pathParameters = { @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING) }, responses = {
-          @RestResponse(description = "Returns the number of assets from each types as JSON", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  @RestQuery(
+      name = "getAssetList",
+      description = "Returns the number of assets from each types as JSON",
+      returnDescription = "The number of assets from each types as JSON",
+      pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true,
+              type = RestParameter.Type.STRING)
+      },
+      responses = {
+          @RestResponse(description = "Returns the number of assets from each types as JSON",
+              responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "No event with this identifier was found.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      })
   public Response getAssetList(@PathParam("eventId") String id) throws Exception {
     Optional<Event> optEvent = getIndexService().getEvent(id, getIndex());
-    if (optEvent.isEmpty())
+    if (optEvent.isEmpty()) {
       return notFound("Cannot find an event with id '%s'.", id);
+    }
     MediaPackage mp;
     try {
       mp = getIndexService().getEventMediapackage(optEvent.get());
@@ -1748,13 +2045,25 @@ public abstract class AbstractEventEndpoint {
   @GET
   @Path("{eventId}/asset/attachment/attachments.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getAttachmentsList", description = "Returns a list of attachments from the given event as JSON", returnDescription = "The list of attachments from the given event as JSON", pathParameters = { @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING) }, responses = {
-          @RestResponse(description = "Returns a list of attachments from the given event as JSON", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  @RestQuery(
+      name = "getAttachmentsList",
+      description = "Returns a list of attachments from the given event as JSON",
+      returnDescription = "The list of attachments from the given event as JSON",
+      pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true,
+              type = RestParameter.Type.STRING)
+      },
+      responses = {
+          @RestResponse(description = "Returns a list of attachments from the given event as JSON",
+              responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "No event with this identifier was found.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      })
   public Response getAttachmentsList(@PathParam("eventId") String id) throws Exception {
     Optional<Event> optEvent = getIndexService().getEvent(id, getIndex());
-    if (optEvent.isEmpty())
+    if (optEvent.isEmpty()) {
       return notFound("Cannot find an event with id '%s'.", id);
+    }
     MediaPackage mp = getIndexService().getEventMediapackage(optEvent.get());
     return okJson(getEventMediaPackageElements(mp.getAttachments()));
   }
@@ -1762,31 +2071,55 @@ public abstract class AbstractEventEndpoint {
   @GET
   @Path("{eventId}/asset/attachment/{id}.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getAttachment", description = "Returns the details of an attachment from the given event and attachment id as JSON", returnDescription = "The details of an attachment from the given event and attachment id as JSON", pathParameters = {
-          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING),
-          @RestParameter(name = "id", description = "The attachment id", isRequired = true, type = RestParameter.Type.STRING) }, responses = {
-          @RestResponse(description = "Returns the details of an attachment from the given event and attachment id as JSON", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "No event or attachment with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  @RestQuery(
+      name = "getAttachment",
+      description = "Returns the details of an attachment from the given event and attachment id as JSON",
+      returnDescription = "The details of an attachment from the given event and attachment id as JSON",
+      pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true,
+              type = RestParameter.Type.STRING),
+          @RestParameter(name = "id", description = "The attachment id", isRequired = true,
+              type = RestParameter.Type.STRING)
+      },
+      responses = {
+          @RestResponse(description = "Returns the details of an attachment from the given event and attachment id as "
+              + "JSON", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "No event or attachment with this identifier was found.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      })
   public Response getAttachment(@PathParam("eventId") String eventId, @PathParam("id") String id)
           throws NotFoundException, SearchIndexException, IndexServiceException {
     MediaPackage mp = getMediaPackageByEventId(eventId);
 
     Attachment attachment = mp.getAttachment(id);
-    if (attachment == null)
+    if (attachment == null) {
       return notFound("Cannot find an attachment with id '%s'.", id);
+    }
     return okJson(attachmentToJSON(attachment));
   }
 
   @GET
   @Path("{eventId}/asset/catalog/catalogs.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getCatalogList", description = "Returns a list of catalogs from the given event as JSON", returnDescription = "The list of catalogs from the given event as JSON", pathParameters = { @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING) }, responses = {
-          @RestResponse(description = "Returns a list of catalogs from the given event as JSON", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  @RestQuery(
+      name = "getCatalogList",
+      description = "Returns a list of catalogs from the given event as JSON",
+      returnDescription = "The list of catalogs from the given event as JSON",
+      pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true,
+              type = RestParameter.Type.STRING)
+      },
+      responses = {
+          @RestResponse(description = "Returns a list of catalogs from the given event as JSON",
+              responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "No event with this identifier was found.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      })
   public Response getCatalogList(@PathParam("eventId") String id) throws Exception {
     Optional<Event> optEvent = getIndexService().getEvent(id, getIndex());
-    if (optEvent.isEmpty())
+    if (optEvent.isEmpty()) {
       return notFound("Cannot find an event with id '%s'.", id);
+    }
     MediaPackage mp = getIndexService().getEventMediapackage(optEvent.get());
     return okJson(getEventMediaPackageElements(mp.getCatalogs()));
   }
@@ -1794,31 +2127,55 @@ public abstract class AbstractEventEndpoint {
   @GET
   @Path("{eventId}/asset/catalog/{id}.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getCatalog", description = "Returns the details of a catalog from the given event and catalog id as JSON", returnDescription = "The details of a catalog from the given event and catalog id as JSON", pathParameters = {
-          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING),
-          @RestParameter(name = "id", description = "The catalog id", isRequired = true, type = RestParameter.Type.STRING) }, responses = {
-          @RestResponse(description = "Returns the details of a catalog from the given event and catalog id as JSON", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "No event or catalog with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  @RestQuery(
+      name = "getCatalog",
+      description = "Returns the details of a catalog from the given event and catalog id as JSON",
+      returnDescription = "The details of a catalog from the given event and catalog id as JSON",
+      pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true,
+              type = RestParameter.Type.STRING),
+          @RestParameter(name = "id", description = "The catalog id", isRequired = true,
+              type = RestParameter.Type.STRING)
+      },
+      responses = {
+          @RestResponse(description = "Returns the details of a catalog from the given event and catalog id as JSON",
+              responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "No event or catalog with this identifier was found.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      })
   public Response getCatalog(@PathParam("eventId") String eventId, @PathParam("id") String id)
           throws NotFoundException, SearchIndexException, IndexServiceException {
     MediaPackage mp = getMediaPackageByEventId(eventId);
 
     Catalog catalog = mp.getCatalog(id);
-    if (catalog == null)
+    if (catalog == null) {
       return notFound("Cannot find a catalog with id '%s'.", id);
+    }
     return okJson(catalogToJSON(catalog));
   }
 
   @GET
   @Path("{eventId}/asset/media/media.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getMediaList", description = "Returns a list of media from the given event as JSON", returnDescription = "The list of media from the given event as JSON", pathParameters = { @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING) }, responses = {
-          @RestResponse(description = "Returns a list of media from the given event as JSON", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  @RestQuery(
+      name = "getMediaList",
+      description = "Returns a list of media from the given event as JSON",
+      returnDescription = "The list of media from the given event as JSON",
+      pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true,
+              type = RestParameter.Type.STRING)
+      },
+      responses = {
+          @RestResponse(description = "Returns a list of media from the given event as JSON",
+              responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "No event with this identifier was found.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      })
   public Response getMediaList(@PathParam("eventId") String id) throws Exception {
     Optional<Event> optEvent = getIndexService().getEvent(id, getIndex());
-    if (optEvent.isEmpty())
+    if (optEvent.isEmpty()) {
       return notFound("Cannot find an event with id '%s'.", id);
+    }
     MediaPackage mp = getIndexService().getEventMediapackage(optEvent.get());
     return okJson(getEventMediaPackageElements(mp.getTracks()));
   }
@@ -1826,31 +2183,55 @@ public abstract class AbstractEventEndpoint {
   @GET
   @Path("{eventId}/asset/media/{id}.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getMedia", description = "Returns the details of a media from the given event and media id as JSON", returnDescription = "The details of a media from the given event and media id as JSON", pathParameters = {
-          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING),
-          @RestParameter(name = "id", description = "The media id", isRequired = true, type = RestParameter.Type.STRING) }, responses = {
-                  @RestResponse(description = "Returns the media of a catalog from the given event and media id as JSON", responseCode = HttpServletResponse.SC_OK),
-                  @RestResponse(description = "No event or media with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  @RestQuery(
+      name = "getMedia",
+      description = "Returns the details of a media from the given event and media id as JSON",
+      returnDescription = "The details of a media from the given event and media id as JSON",
+      pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true,
+              type = RestParameter.Type.STRING),
+          @RestParameter(name = "id", description = "The media id", isRequired = true, type = RestParameter.Type.STRING)
+      },
+
+      responses = {
+          @RestResponse(description = "Returns the media of a catalog from the given event and media id as JSON",
+              responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "No event or media with this identifier was found.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      })
   public Response getMedia(@PathParam("eventId") String eventId, @PathParam("id") String id)
           throws NotFoundException, SearchIndexException, IndexServiceException {
     MediaPackage mp = getMediaPackageByEventId(eventId);
 
     Track track = mp.getTrack(id);
-    if (track == null)
+    if (track == null) {
       return notFound("Cannot find media with id '%s'.", id);
+    }
     return okJson(trackToJSON(track));
   }
 
   @GET
   @Path("{eventId}/asset/publication/publications.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getPublicationList", description = "Returns a list of publications from the given event as JSON", returnDescription = "The list of publications from the given event as JSON", pathParameters = { @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING) }, responses = {
-          @RestResponse(description = "Returns a list of publications from the given event as JSON", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  @RestQuery(
+      name = "getPublicationList",
+      description = "Returns a list of publications from the given event as JSON",
+      returnDescription = "The list of publications from the given event as JSON",
+      pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true,
+              type = RestParameter.Type.STRING)
+      },
+      responses = {
+          @RestResponse(description = "Returns a list of publications from the given event as JSON",
+              responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "No event with this identifier was found.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      })
   public Response getPublicationList(@PathParam("eventId") String id) throws Exception {
     Optional<Event> optEvent = getIndexService().getEvent(id, getIndex());
-    if (optEvent.isEmpty())
+    if (optEvent.isEmpty()) {
       return notFound("Cannot find an event with id '%s'.", id);
+    }
     MediaPackage mp = getIndexService().getEventMediapackage(optEvent.get());
     return okJson(getEventPublications(mp.getPublications()));
   }
@@ -1858,11 +2239,22 @@ public abstract class AbstractEventEndpoint {
   @GET
   @Path("{eventId}/asset/publication/{id}.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getPublication", description = "Returns the details of a publication from the given event and publication id as JSON", returnDescription = "The details of a publication from the given event and publication id as JSON", pathParameters = {
-          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING),
-          @RestParameter(name = "id", description = "The publication id", isRequired = true, type = RestParameter.Type.STRING) }, responses = {
-          @RestResponse(description = "Returns the publication of a catalog from the given event and publication id as JSON", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "No event or publication with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  @RestQuery(
+      name = "getPublication",
+      description = "Returns the details of a publication from the given event and publication id as JSON",
+      returnDescription = "The details of a publication from the given event and publication id as JSON",
+      pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true,
+              type = RestParameter.Type.STRING),
+          @RestParameter(name = "id", description = "The publication id", isRequired = true,
+              type = RestParameter.Type.STRING)
+      },
+      responses = {
+          @RestResponse(description = "Returns the publication of a catalog from the given event and publication id as "
+              + "JSON", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "No event or publication with this identifier was found.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      })
   public Response getPublication(@PathParam("eventId") String eventId, @PathParam("id") String id)
           throws NotFoundException, SearchIndexException, IndexServiceException {
     MediaPackage mp = getMediaPackageByEventId(eventId);
@@ -1875,39 +2267,40 @@ public abstract class AbstractEventEndpoint {
       }
     }
 
-    if (publication == null)
+    if (publication == null) {
       return notFound("Cannot find publication with id '%s'.", id);
+    }
     return okJson(publicationToJSON(publication));
   }
 
   @GET
   @Path("{eventId}/tobira/pages")
   @RestQuery(
-          name = "getEventHostPages",
-          description = "Returns the pages of a connected Tobira instance that contain the given event",
-          returnDescription = "The Tobira pages that contain the given event",
-          pathParameters = {
-                  @RestParameter(
-                          name = "eventId",
-                          isRequired = true,
-                          description = "The event identifier",
-                          type = STRING
-                  ),
-          },
-          responses = {
-                  @RestResponse(
-                          responseCode = SC_OK,
-                          description = "The Tobira pages containing the given event"
-                  ),
-                  @RestResponse(
-                          responseCode = SC_NOT_FOUND,
-                          description = "Tobira doesn't know about the given event"
-                  ),
-                  @RestResponse(
-                          responseCode = SC_SERVICE_UNAVAILABLE,
-                          description = "Tobira is not configured (correctly)"
-                  ),
-          }
+      name = "getEventHostPages",
+      description = "Returns the pages of a connected Tobira instance that contain the given event",
+      returnDescription = "The Tobira pages that contain the given event",
+      pathParameters = {
+          @RestParameter(
+              name = "eventId",
+              isRequired = true,
+              description = "The event identifier",
+              type = STRING
+          ),
+      },
+      responses = {
+          @RestResponse(
+              responseCode = SC_OK,
+              description = "The Tobira pages containing the given event"
+          ),
+          @RestResponse(
+              responseCode = SC_NOT_FOUND,
+              description = "Tobira doesn't know about the given event"
+          ),
+          @RestResponse(
+              responseCode = SC_SERVICE_UNAVAILABLE,
+              description = "Tobira is not configured (correctly)"
+          ),
+      }
   )
   public Response getEventHostPages(@PathParam("eventId") String eventId) {
     var tobira = TobiraService.getTobira(getSecurityService().getOrganization().getId());
@@ -1932,15 +2325,26 @@ public abstract class AbstractEventEndpoint {
   @GET
   @Path("{eventId}/workflows.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "geteventworkflows", description = "Returns all the data related to the workflows tab in the event details modal as JSON", returnDescription = "All the data related to the event workflows tab as JSON", pathParameters = {
-          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING) }, responses = {
-                  @RestResponse(description = "Returns all the data related to the event workflows tab as JSON", responseCode = HttpServletResponse.SC_OK),
-                  @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  @RestQuery(
+      name = "geteventworkflows",
+      description = "Returns all the data related to the workflows tab in the event details modal as JSON",
+      returnDescription = "All the data related to the event workflows tab as JSON",
+      pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true,
+              type = RestParameter.Type.STRING)
+      },
+      responses = {
+          @RestResponse(description = "Returns all the data related to the event workflows tab as JSON",
+              responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "No event with this identifier was found.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      })
   public Response getEventWorkflows(@PathParam("eventId") String id)
           throws UnauthorizedException, SearchIndexException, JobEndpointException {
     Optional<Event> optEvent = getIndexService().getEvent(id, getIndex());
-    if (optEvent.isEmpty())
+    if (optEvent.isEmpty()) {
       return notFound("Cannot find an event with id '%s'.", id);
+    }
 
     try {
       if (optEvent.get().getEventStatus().equals("EVENTS.EVENTS.STATUS.SCHEDULED")) {
@@ -1952,7 +2356,8 @@ public abstract class AbstractEventEndpoint {
 
         Map<String, String> agentConfiguration = getSchedulerService().getCaptureAgentConfiguration(id);
         JsonObject responseJson = new JsonObject();
-        responseJson.addProperty("workflowId", agentConfiguration.getOrDefault(CaptureParameters.INGEST_WORKFLOW_DEFINITION, ""));
+        responseJson.addProperty("workflowId", agentConfiguration.getOrDefault(
+            CaptureParameters.INGEST_WORKFLOW_DEFINITION, ""));
         responseJson.add("configuration", configJson);
 
         return okJson(responseJson);
@@ -2004,16 +2409,29 @@ public abstract class AbstractEventEndpoint {
 
   @PUT
   @Path("{eventId}/workflows")
-  @RestQuery(name = "updateEventWorkflow", description = "Update the workflow configuration for the scheduled event with the given id", pathParameters = {
-          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING) }, restParameters = {
-                  @RestParameter(name = "configuration", isRequired = true, description = "The workflow configuration as JSON", type = RestParameter.Type.TEXT) }, responses = {
-                          @RestResponse(description = "Request executed succesfully", responseCode = HttpServletResponse.SC_NO_CONTENT),
-                          @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) }, returnDescription = "The method does not retrun any content.")
+  @RestQuery(
+      name = "updateEventWorkflow",
+      description = "Update the workflow configuration for the scheduled event with the given id",
+      pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true,
+              type = RestParameter.Type.STRING)
+      },
+      restParameters = {
+          @RestParameter(name = "configuration", isRequired = true, description = "The workflow configuration as JSON",
+              type = RestParameter.Type.TEXT)
+      },
+      responses = {
+          @RestResponse(description = "Request executed succesfully", responseCode = HttpServletResponse.SC_NO_CONTENT),
+          @RestResponse(description = "No event with this identifier was found.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      },
+      returnDescription = "The method does not retrun any content.")
   public Response updateEventWorkflow(@PathParam("eventId") String id, @FormParam("configuration") String configuration)
           throws SearchIndexException, UnauthorizedException {
     Optional<Event> optEvent = getIndexService().getEvent(id, getIndex());
-    if (optEvent.isEmpty())
+    if (optEvent.isEmpty()) {
       return notFound("Cannot find an event with id '%s'.", id);
+    }
 
     if (optEvent.get().isScheduledEvent() && !optEvent.get().hasRecordingStarted()) {
       try {
@@ -2038,11 +2456,13 @@ public abstract class AbstractEventEndpoint {
 
         Map<String, String> workflowConfig = new HashMap<>((JSONObject) configJSON.get("configuration"));
         Map<String, String> oldWorkflowConfig = new HashMap<>(getSchedulerService().getWorkflowConfig(id));
-        if (!oldWorkflowConfig.equals(workflowConfig))
+        if (!oldWorkflowConfig.equals(workflowConfig)) {
           workflowConfigOpt = Optional.of(workflowConfig);
+        }
 
-        if (caMetadataOpt.isEmpty() && workflowConfigOpt.isEmpty())
+        if (caMetadataOpt.isEmpty() && workflowConfigOpt.isEmpty()) {
           return Response.noContent().build();
+        }
 
         checkAgentAccessForAgent(optEvent.get().getAgentId());
 
@@ -2063,14 +2483,25 @@ public abstract class AbstractEventEndpoint {
   @GET
   @Path("{eventId}/workflows/{workflowId}")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "geteventworkflow", description = "Returns all the data related to the single workflow tab in the event details modal as JSON", returnDescription = "All the data related to the event singe workflow tab as JSON", pathParameters = {
-          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING),
-          @RestParameter(name = "workflowId", description = "The workflow id", isRequired = true, type = RestParameter.Type.STRING) }, responses = {
-                  @RestResponse(description = "Returns all the data related to the event single workflow tab as JSON", responseCode = HttpServletResponse.SC_OK),
-                  @RestResponse(description = "Unable to parse workflowId", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-                  @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  @RestQuery(
+      name = "geteventworkflow",
+      description = "Returns all the data related to the single workflow tab in the event details modal as JSON",
+      returnDescription = "All the data related to the event singe workflow tab as JSON",
+      pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true,
+              type = RestParameter.Type.STRING),
+          @RestParameter(name = "workflowId", description = "The workflow id", isRequired = true,
+              type = RestParameter.Type.STRING)
+      },
+      responses = {
+          @RestResponse(description = "Returns all the data related to the event single workflow tab as JSON",
+              responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "Unable to parse workflowId", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "No event with this identifier was found.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      })
   public Response getEventWorkflow(@PathParam("eventId") String eventId, @PathParam("workflowId") String workflowId)
-      throws SearchIndexException {
+          throws SearchIndexException {
     Optional<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
     if (optEvent.isEmpty()) {
       return notFound("Cannot find an event with id '%s'.", eventId);
@@ -2090,8 +2521,9 @@ public abstract class AbstractEventEndpoint {
       // Retrieve submission date with the workflow instance main job
       Date created = instance.getDateCreated();
       Date completed = instance.getDateCompleted();
-      if (completed == null)
+      if (completed == null) {
         completed = new Date();
+      }
 
       long executionTime = completed.getTime() - created.getTime();
 
@@ -2128,14 +2560,25 @@ public abstract class AbstractEventEndpoint {
   @GET
   @Path("{eventId}/workflows/{workflowId}/operations.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "geteventoperations", description = "Returns all the data related to the workflow/operations tab in the event details modal as JSON", returnDescription = "All the data related to the event workflow/opertations tab as JSON", pathParameters = {
-          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING),
-          @RestParameter(name = "workflowId", description = "The workflow id", isRequired = true, type = RestParameter.Type.STRING) }, responses = {
-                  @RestResponse(description = "Returns all the data related to the event workflow/operations tab as JSON", responseCode = HttpServletResponse.SC_OK),
-                  @RestResponse(description = "Unable to parse workflowId", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-                  @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  @RestQuery(
+      name = "geteventoperations",
+      description = "Returns all the data related to the workflow/operations tab in the event details modal as JSON",
+      returnDescription = "All the data related to the event workflow/opertations tab as JSON",
+      pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true,
+              type = RestParameter.Type.STRING),
+          @RestParameter(name = "workflowId", description = "The workflow id", isRequired = true,
+              type = RestParameter.Type.STRING)
+      },
+      responses = {
+          @RestResponse(description = "Returns all the data related to the event workflow/operations tab as JSON",
+              responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "Unable to parse workflowId", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "No event with this identifier was found.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      })
   public Response getEventOperations(@PathParam("eventId") String eventId, @PathParam("workflowId") String workflowId)
-      throws SearchIndexException {
+          throws SearchIndexException {
     Optional<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
     if (optEvent.isEmpty()) {
       return notFound("Cannot find an event with id '%s'.", eventId);
@@ -2180,13 +2623,26 @@ public abstract class AbstractEventEndpoint {
   @GET
   @Path("{eventId}/workflows/{workflowId}/operations/{operationPosition}")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "geteventoperation", description = "Returns all the data related to the workflow/operation tab in the event details modal as JSON", returnDescription = "All the data related to the event workflow/opertation tab as JSON", pathParameters = {
-          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING),
-          @RestParameter(name = "workflowId", description = "The workflow id", isRequired = true, type = RestParameter.Type.STRING),
-          @RestParameter(name = "operationPosition", description = "The operation position", isRequired = true, type = RestParameter.Type.INTEGER) }, responses = {
-                  @RestResponse(description = "Returns all the data related to the event workflow/operation tab as JSON", responseCode = HttpServletResponse.SC_OK),
-                  @RestResponse(description = "Unable to parse workflowId or operationPosition", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-                  @RestResponse(description = "No operation with these identifiers was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  @RestQuery(
+      name = "geteventoperation",
+      description = "Returns all the data related to the workflow/operation tab in the event details modal as JSON",
+      returnDescription = "All the data related to the event workflow/opertation tab as JSON",
+      pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true,
+              type = RestParameter.Type.STRING),
+          @RestParameter(name = "workflowId", description = "The workflow id", isRequired = true,
+              type = RestParameter.Type.STRING),
+          @RestParameter(name = "operationPosition", description = "The operation position", isRequired = true,
+              type = RestParameter.Type.INTEGER)
+      },
+      responses = {
+          @RestResponse(description = "Returns all the data related to the event workflow/operation tab as JSON",
+              responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "Unable to parse workflowId or operationPosition",
+              responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "No operation with these identifiers was found.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      })
   public Response getEventOperation(@PathParam("eventId") String eventId, @PathParam("workflowId") String workflowId,
       @PathParam("operationPosition") Integer operationPosition) throws SearchIndexException {
     Optional<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
@@ -2244,12 +2700,23 @@ public abstract class AbstractEventEndpoint {
   @GET
   @Path("{eventId}/workflows/{workflowId}/errors.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "geteventerrors", description = "Returns all the data related to the workflow/errors tab in the event details modal as JSON", returnDescription = "All the data related to the event workflow/errors tab as JSON", pathParameters = {
-          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING),
-          @RestParameter(name = "workflowId", description = "The workflow id", isRequired = true, type = RestParameter.Type.STRING) }, responses = {
-                  @RestResponse(description = "Returns all the data related to the event workflow/errors tab as JSON", responseCode = HttpServletResponse.SC_OK),
-                  @RestResponse(description = "Unable to parse workflowId", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-                  @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  @RestQuery(
+      name = "geteventerrors",
+      description = "Returns all the data related to the workflow/errors tab in the event details modal as JSON",
+      returnDescription = "All the data related to the event workflow/errors tab as JSON",
+      pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true,
+              type = RestParameter.Type.STRING),
+          @RestParameter(name = "workflowId", description = "The workflow id", isRequired = true,
+              type = RestParameter.Type.STRING)
+      },
+      responses = {
+          @RestResponse(description = "Returns all the data related to the event workflow/errors tab as JSON",
+              responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "Unable to parse workflowId", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "No event with this identifier was found.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      })
   public Response getEventErrors(@PathParam("eventId") String eventId, @PathParam("workflowId") String workflowId,
           @Context HttpServletRequest req) throws JobEndpointException, SearchIndexException {
     // the call to #getEvent should make sure that the calling user has access rights to the workflow
@@ -2277,13 +2744,26 @@ public abstract class AbstractEventEndpoint {
   @GET
   @Path("{eventId}/workflows/{workflowId}/errors/{errorId}.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "geteventerror", description = "Returns all the data related to the workflow/error tab in the event details modal as JSON", returnDescription = "All the data related to the event workflow/error tab as JSON", pathParameters = {
-          @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING),
-          @RestParameter(name = "workflowId", description = "The workflow id", isRequired = true, type = RestParameter.Type.STRING),
-          @RestParameter(name = "errorId", description = "The error id", isRequired = true, type = RestParameter.Type.STRING) }, responses = {
-                  @RestResponse(description = "Returns all the data related to the event workflow/error tab as JSON", responseCode = HttpServletResponse.SC_OK),
-                  @RestResponse(description = "Unable to parse workflowId", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-                  @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  @RestQuery(
+      name = "geteventerror",
+      description = "Returns all the data related to the workflow/error tab in the event details modal as JSON",
+      returnDescription = "All the data related to the event workflow/error tab as JSON",
+      pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true,
+              type = RestParameter.Type.STRING),
+          @RestParameter(name = "workflowId", description = "The workflow id", isRequired = true,
+              type = RestParameter.Type.STRING),
+          @RestParameter(name = "errorId", description = "The error id", isRequired = true,
+              type = RestParameter.Type.STRING)
+      },
+      responses = {
+          @RestResponse(description = "Returns all the data related to the event workflow/error tab as JSON",
+              responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "Unable to parse workflowId", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "No event with this identifier was found.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      })
+
   public Response getEventError(@PathParam("eventId") String eventId, @PathParam("workflowId") String workflowId,
           @PathParam("errorId") String errorId, @Context HttpServletRequest req)
                   throws JobEndpointException, SearchIndexException {
@@ -2313,15 +2793,25 @@ public abstract class AbstractEventEndpoint {
   @Path("{eventId}/access.json")
   @SuppressWarnings("unchecked")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getEventAccessInformation", description = "Get the access information of an event", returnDescription = "The access information", pathParameters = {
-          @RestParameter(name = "eventId", isRequired = true, description = "The event identifier", type = RestParameter.Type.STRING) }, responses = {
-                  @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required form params were missing in the request."),
-                  @RestResponse(responseCode = SC_NOT_FOUND, description = "If the event has not been found."),
-                  @RestResponse(responseCode = SC_OK, description = "The access information ") })
+  @RestQuery(
+      name = "getEventAccessInformation",
+      description = "Get the access information of an event",
+      returnDescription = "The access information",
+      pathParameters = {
+          @RestParameter(name = "eventId", isRequired = true, description = "The event identifier",
+              type = RestParameter.Type.STRING)
+      },
+      responses = {
+          @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required form params were missing in the "
+              + "request."),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "If the event has not been found."),
+          @RestResponse(responseCode = SC_OK, description = "The access information ")
+      })
   public Response getEventAccessInformation(@PathParam("eventId") String eventId) throws Exception {
     Optional<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
-    if (optEvent.isEmpty())
+    if (optEvent.isEmpty()) {
       return notFound("Cannot find an event with id '%s'.", eventId);
+    }
 
     // Add all available ACLs to the response
     JSONArray systemAclsJson = new JSONArray();
@@ -2332,8 +2822,9 @@ public abstract class AbstractEventEndpoint {
 
     AccessControlList activeAcl = new AccessControlList();
     try {
-      if (optEvent.get().getAccessPolicy() != null)
+      if (optEvent.get().getAccessPolicy() != null) {
         activeAcl = AccessControlParser.parseAcl(optEvent.get().getAccessPolicy());
+      }
     } catch (Exception e) {
       logger.error("Unable to parse access policy", e);
     }
@@ -2345,8 +2836,9 @@ public abstract class AbstractEventEndpoint {
     episodeAccessJson.put("acl", transformAccessControList(activeAcl, getUserDirectoryService()));
     episodeAccessJson.put("privileges", AccessInformationUtil.serializePrivilegesByRole(activeAcl));
     if (StringUtils.isNotBlank(optEvent.get().getWorkflowState())
-            && WorkflowUtil.isActive(WorkflowInstance.WorkflowState.valueOf(optEvent.get().getWorkflowState())))
+            && WorkflowUtil.isActive(WorkflowInstance.WorkflowState.valueOf(optEvent.get().getWorkflowState()))) {
       episodeAccessJson.put("locked", true);
+    }
 
     JSONObject jsonReturnObj = new JSONObject();
     jsonReturnObj.put("episode_access", episodeAccessJson);
@@ -2359,16 +2851,25 @@ public abstract class AbstractEventEndpoint {
   @POST
   @Path("{eventId}/assets")
   @Consumes(MediaType.MULTIPART_FORM_DATA)
-  @RestQuery(name = "updateAssets", description = "Update or create an asset for the eventId by the given metadata as JSON and files in the body",
-  pathParameters = {
-  @RestParameter(name = "eventId", description = "The event id", isRequired = true, type = RestParameter.Type.STRING) },
-  restParameters = {
-  @RestParameter(name = "metadata", isRequired = true, type = RestParameter.Type.TEXT, description = "The list of asset metadata") },
-  responses = {
-  @RestResponse(description = "The asset has been added.", responseCode = HttpServletResponse.SC_OK),
-  @RestResponse(description = "Could not add asset, problem with the metadata or files.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-  @RestResponse(description = "No event with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) },
-  returnDescription = "The workflow identifier")
+  @RestQuery(
+      name = "updateAssets",
+      description = "Update or create an asset for the eventId by the given metadata as JSON and files in the body",
+      pathParameters = {
+          @RestParameter(name = "eventId", description = "The event id", isRequired = true,
+              type = RestParameter.Type.STRING)
+      },
+      restParameters = {
+          @RestParameter(name = "metadata", isRequired = true, type = RestParameter.Type.TEXT,
+              description = "The list of asset metadata")
+      },
+      responses = {
+          @RestResponse(description = "The asset has been added.", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "Could not add asset, problem with the metadata or files.",
+              responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "No event with this identifier was found.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      },
+      returnDescription = "The workflow identifier")
   public Response updateAssets(@PathParam("eventId") final String eventId,
           @Context HttpServletRequest request)  throws Exception {
     try {
@@ -2386,8 +2887,14 @@ public abstract class AbstractEventEndpoint {
 
   @GET
   @Path("new/metadata")
-  @RestQuery(name = "getNewMetadata", description = "Returns all the data related to the metadata tab in the new event modal as JSON", returnDescription = "All the data related to the event metadata tab as JSON", responses = {
-          @RestResponse(responseCode = SC_OK, description = "Returns all the data related to the event metadata tab as JSON") })
+  @RestQuery(
+      name = "getNewMetadata",
+      description = "Returns all the data related to the metadata tab in the new event modal as JSON",
+      returnDescription = "All the data related to the event metadata tab as JSON",
+      responses = {
+          @RestResponse(responseCode = SC_OK, description = "Returns all the data related to the event metadata tab as "
+              + "JSON")
+      })
   public Response getNewMetadata() {
     MetadataList metadataList = new MetadataList();
 
@@ -2403,20 +2910,27 @@ public abstract class AbstractEventEndpoint {
     EventCatalogUIAdapter commonCatalogUiAdapter = getIndexService().getCommonEventCatalogUIAdapter();
     DublinCoreMetadataCollection commonMetadata = commonCatalogUiAdapter.getRawFields(getCollectionQueryDisable());
 
-    if (commonMetadata.getOutputFields().containsKey(DublinCore.PROPERTY_CREATED.getLocalName()))
+    if (commonMetadata.getOutputFields().containsKey(DublinCore.PROPERTY_CREATED.getLocalName())) {
       commonMetadata.removeField(commonMetadata.getOutputFields().get(DublinCore.PROPERTY_CREATED.getLocalName()));
-    if (commonMetadata.getOutputFields().containsKey("duration"))
+    }
+    if (commonMetadata.getOutputFields().containsKey("duration")) {
       commonMetadata.removeField(commonMetadata.getOutputFields().get("duration"));
-    if (commonMetadata.getOutputFields().containsKey(DublinCore.PROPERTY_IDENTIFIER.getLocalName()))
+    }
+    if (commonMetadata.getOutputFields().containsKey(DublinCore.PROPERTY_IDENTIFIER.getLocalName())) {
       commonMetadata.removeField(commonMetadata.getOutputFields().get(DublinCore.PROPERTY_IDENTIFIER.getLocalName()));
-    if (commonMetadata.getOutputFields().containsKey(DublinCore.PROPERTY_SOURCE.getLocalName()))
+    }
+    if (commonMetadata.getOutputFields().containsKey(DublinCore.PROPERTY_SOURCE.getLocalName())) {
       commonMetadata.removeField(commonMetadata.getOutputFields().get(DublinCore.PROPERTY_SOURCE.getLocalName()));
-    if (commonMetadata.getOutputFields().containsKey("startDate"))
+    }
+    if (commonMetadata.getOutputFields().containsKey("startDate")) {
       commonMetadata.removeField(commonMetadata.getOutputFields().get("startDate"));
-    if (commonMetadata.getOutputFields().containsKey("startTime"))
+    }
+    if (commonMetadata.getOutputFields().containsKey("startTime")) {
       commonMetadata.removeField(commonMetadata.getOutputFields().get("startTime"));
-    if (commonMetadata.getOutputFields().containsKey("location"))
+    }
+    if (commonMetadata.getOutputFields().containsKey("location")) {
       commonMetadata.removeField(commonMetadata.getOutputFields().get("location"));
+    }
 
     // Set publisher to user
     if (commonMetadata.getOutputFields().containsKey(DublinCore.PROPERTY_PUBLISHER.getLocalName())) {
@@ -2442,9 +2956,18 @@ public abstract class AbstractEventEndpoint {
 
   @GET
   @Path("new/processing")
-  @RestQuery(name = "getNewProcessing", description = "Returns all the data related to the processing tab in the new event modal as JSON", returnDescription = "All the data related to the event processing tab as JSON", restParameters = {
-          @RestParameter(name = "tags", isRequired = false, description = "A comma separated list of tags to filter the workflow definitions", type = RestParameter.Type.STRING) }, responses = {
-                  @RestResponse(responseCode = SC_OK, description = "Returns all the data related to the event processing tab as JSON") })
+  @RestQuery(
+      name = "getNewProcessing",
+      description = "Returns all the data related to the processing tab in the new event modal as JSON",
+      returnDescription = "All the data related to the event processing tab as JSON",
+      restParameters = {
+          @RestParameter(name = "tags", isRequired = false, description = "A comma separated list of tags to filter "
+              + "the workflow definitions", type = RestParameter.Type.STRING)
+      },
+      responses = {
+          @RestResponse(responseCode = SC_OK, description = "Returns all the data related to the event processing tab "
+              + "as JSON")
+      })
   public Response getNewProcessing(@QueryParam("tags") String tagsString) {
     List<String> tags = RestUtil.splitCommaSeparatedParam(Optional.ofNullable(tagsString));
 
@@ -2479,11 +3002,21 @@ public abstract class AbstractEventEndpoint {
 
   @POST
   @Path("new/conflicts")
-  @RestQuery(name = "checkNewConflicts", description = "Checks if the current scheduler parameters are in a conflict with another event", returnDescription = "Returns NO CONTENT if no event are in conflict within specified period or list of conflicting recordings in JSON", restParameters = {
-          @RestParameter(name = "metadata", isRequired = true, description = "The metadata as JSON", type = RestParameter.Type.TEXT) }, responses = {
-                  @RestResponse(responseCode = HttpServletResponse.SC_NO_CONTENT, description = "No conflicting events found"),
-                  @RestResponse(responseCode = HttpServletResponse.SC_CONFLICT, description = "There is a conflict"),
-                  @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Missing or invalid parameters") })
+  @RestQuery(
+      name = "checkNewConflicts",
+      description = "Checks if the current scheduler parameters are in a conflict with another event",
+      returnDescription = "Returns NO CONTENT if no event are in conflict within specified period or list of "
+          + "conflicting recordings in JSON",
+      restParameters = {
+          @RestParameter(name = "metadata", isRequired = true, description = "The metadata as JSON",
+              type = RestParameter.Type.TEXT)
+      },
+      responses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_NO_CONTENT, description = "No conflicting events found"),
+          @RestResponse(responseCode = HttpServletResponse.SC_CONFLICT, description = "There is a conflict"),
+          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "Missing or invalid "
+              + "parameters")
+      })
   public Response getNewConflicts(@FormParam("metadata") String metadata) throws NotFoundException {
     if (StringUtils.isBlank(metadata)) {
       logger.warn("Metadata is not specified");
@@ -2590,7 +3123,8 @@ public abstract class AbstractEventEndpoint {
     }
   }
 
-  private List<JsonObject> convertToConflictObjects(final String eventId, final List<MediaPackage> events) throws SearchIndexException {
+  private List<JsonObject> convertToConflictObjects(final String eventId, final List<MediaPackage> events)
+          throws SearchIndexException {
     final List<JsonObject> eventsJSON = new ArrayList<>();
     final Organization organization = getSecurityService().getOrganization();
     final User user = SecurityUtil.createSystemUser(systemUserName, organization);
@@ -2604,14 +3138,15 @@ public abstract class AbstractEventEndpoint {
             if (StringUtils.isNotEmpty(eventId) && eventId.equals(e.getIdentifier())) {
               continue;
             }
-            eventsJSON.add(convertEventToConflictingObject(e.getTechnicalStartTime(), e.getTechnicalEndTime(), e.getTitle()));
+            eventsJSON.add(convertEventToConflictingObject(e.getTechnicalStartTime(), e.getTechnicalEndTime(),
+                e.getTitle()));
           } else {
             logger.warn("Index out of sync! Conflicting event catalog {} not found on event index!",
-              event.getIdentifier().toString());
+                event.getIdentifier().toString());
           }
         }
       } catch (Exception e) {
-         logger.error("Failed to get conflicting events", e);
+        logger.error("Failed to get conflicting events", e);
       }
     });
 
@@ -2629,10 +3164,18 @@ public abstract class AbstractEventEndpoint {
   @POST
   @Path("/new")
   @Consumes(MediaType.MULTIPART_FORM_DATA)
-  @RestQuery(name = "createNewEvent", description = "Creates a new event by the given metadata as JSON and the files in the body", returnDescription = "The workflow identifier", restParameters = {
-          @RestParameter(name = "metadata", isRequired = true, description = "The metadata as JSON", type = RestParameter.Type.TEXT) }, responses = {
-                  @RestResponse(responseCode = HttpServletResponse.SC_CREATED, description = "Event sucessfully added"),
-                  @RestResponse(responseCode = SC_BAD_REQUEST, description = "If the metadata is not set or couldn't be parsed") })
+  @RestQuery(
+      name = "createNewEvent",
+      description = "Creates a new event by the given metadata as JSON and the files in the body",
+      returnDescription = "The workflow identifier",
+      restParameters = {
+          @RestParameter(name = "metadata", isRequired = true, description = "The metadata as JSON",
+              type = RestParameter.Type.TEXT)
+      },
+      responses = {
+          @RestResponse(responseCode = HttpServletResponse.SC_CREATED, description = "Event sucessfully added"),
+          @RestResponse(responseCode = SC_BAD_REQUEST, description = "If the metadata is not set or couldn't be parsed")
+      })
   public Response createNewEvent(@Context HttpServletRequest request) {
     try {
       String result = getIndexService().createEvent(request);
@@ -2650,13 +3193,25 @@ public abstract class AbstractEventEndpoint {
   @GET
   @Path("events.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getevents", description = "Returns all the events as JSON", returnDescription = "All the events as JSON", restParameters = {
-          @RestParameter(name = "filter", isRequired = false, description = "The filter used for the query. They should be formated like that: 'filter1:value1,filter2:value2'", type = STRING),
-          @RestParameter(name = "sort", description = "The order instructions used to sort the query result. Must be in the form '<field name>:(ASC|DESC)'", isRequired = false, type = STRING),
-          @RestParameter(name = "limit", description = "The maximum number of items to return per page.", isRequired = false, type = RestParameter.Type.INTEGER),
-          @RestParameter(name = "offset", description = "The page number.", isRequired = false, type = RestParameter.Type.INTEGER),
-          @RestParameter(name = "getComments", description = "If comments should be fetched", isRequired = false, type = RestParameter.Type.BOOLEAN) }, responses = {
-                  @RestResponse(description = "Returns all events as JSON", responseCode = HttpServletResponse.SC_OK) })
+  @RestQuery(
+      name = "getevents",
+      description = "Returns all the events as JSON",
+      returnDescription = "All the events as JSON",
+      restParameters = {
+          @RestParameter(name = "filter", isRequired = false, description = "The filter used for the query. They "
+              + "should be formated like that: 'filter1:value1,filter2:value2'", type = STRING),
+          @RestParameter(name = "sort", description = "The order instructions used to sort the query result. Must be "
+              + "in the form '<field name>:(ASC|DESC)'", isRequired = false, type = STRING),
+          @RestParameter(name = "limit", description = "The maximum number of items to return per page.",
+              isRequired = false, type = RestParameter.Type.INTEGER),
+          @RestParameter(name = "offset", description = "The page number.", isRequired = false,
+              type = RestParameter.Type.INTEGER),
+          @RestParameter(name = "getComments", description = "If comments should be fetched", isRequired = false,
+              type = RestParameter.Type.BOOLEAN)
+      },
+      responses = {
+          @RestResponse(description = "Returns all events as JSON", responseCode = HttpServletResponse.SC_OK)
+      })
   public Response getEvents(@QueryParam("id") String id, @QueryParam("commentReason") String reasonFilter,
           @QueryParam("commentResolution") String resolutionFilter, @QueryParam("filter") String filter,
           @QueryParam("sort") String sort, @QueryParam("offset") Integer offset, @QueryParam("limit") Integer limit,
@@ -2681,24 +3236,33 @@ public abstract class AbstractEventEndpoint {
 
     Map<String, String> filters = RestUtils.parseFilter(filter);
     for (String name : filters.keySet()) {
-      if (EventListQuery.FILTER_PRESENTERS_BIBLIOGRAPHIC_NAME.equals(name))
+      if (EventListQuery.FILTER_PRESENTERS_BIBLIOGRAPHIC_NAME.equals(name)) {
         query.withPresenter(filters.get(name));
-      if (EventListQuery.FILTER_PRESENTERS_TECHNICAL_NAME.equals(name))
+      }
+      if (EventListQuery.FILTER_PRESENTERS_TECHNICAL_NAME.equals(name)) {
         query.withTechnicalPresenters(filters.get(name));
-      if (EventListQuery.FILTER_CONTRIBUTORS_NAME.equals(name))
+      }
+      if (EventListQuery.FILTER_CONTRIBUTORS_NAME.equals(name)) {
         query.withContributor(filters.get(name));
-      if (EventListQuery.FILTER_LOCATION_NAME.equals(name))
+      }
+      if (EventListQuery.FILTER_LOCATION_NAME.equals(name)) {
         query.withLocation(filters.get(name));
-      if (EventListQuery.FILTER_AGENT_NAME.equals(name))
+      }
+      if (EventListQuery.FILTER_AGENT_NAME.equals(name)) {
         query.withAgentId(filters.get(name));
-      if (EventListQuery.FILTER_TEXT_NAME.equals(name))
+      }
+      if (EventListQuery.FILTER_TEXT_NAME.equals(name)) {
         query.withText(filters.get(name));
-      if (EventListQuery.FILTER_SERIES_NAME.equals(name))
+      }
+      if (EventListQuery.FILTER_SERIES_NAME.equals(name)) {
         query.withSeriesId(filters.get(name));
-      if (EventListQuery.FILTER_STATUS_NAME.equals(name))
+      }
+      if (EventListQuery.FILTER_STATUS_NAME.equals(name)) {
         query.withEventStatus(filters.get(name));
-      if (EventListQuery.FILTER_PUBLISHER_NAME.equals(name))
+      }
+      if (EventListQuery.FILTER_PUBLISHER_NAME.equals(name)) {
         query.withPublisher(filters.get(name));
+      }
       if (EventListQuery.FILTER_COMMENTS_NAME.equals(name)) {
         switch (Comments.valueOf(filters.get(name))) {
           case NONE:
@@ -2798,10 +3362,12 @@ public abstract class AbstractEventEndpoint {
       query.withAction(Permissions.Action.READ);
     }
 
-    if (optLimit.isPresent())
+    if (optLimit.isPresent()) {
       query.withLimit(optLimit.get());
-    if (optOffset.isPresent())
+    }
+    if (optOffset.isPresent()) {
       query.withOffset(offset);
+    }
     // TODO: Add other filters to the query
 
     SearchResult<Event> results = null;
@@ -2833,7 +3399,8 @@ public abstract class AbstractEventEndpoint {
       eventsList.add(eventToJSON(source, Optional.ofNullable(comments)));
     }
 
-    return okJsonList(eventsList, Optional.ofNullable(offset).orElse(0), Optional.ofNullable(limit).orElse(0), results.getHitCount());
+    return okJsonList(eventsList, Optional.ofNullable(offset).orElse(0), Optional.ofNullable(limit).orElse(0),
+        results.getHitCount());
   }
 
   // --
@@ -2841,8 +3408,9 @@ public abstract class AbstractEventEndpoint {
   private MediaPackage getMediaPackageByEventId(String eventId)
           throws SearchIndexException, NotFoundException, IndexServiceException {
     Optional<Event> optEvent = getIndexService().getEvent(eventId, getIndex());
-    if (optEvent.isEmpty())
+    if (optEvent.isEmpty()) {
       throw new NotFoundException(format("Cannot find an event with id '%s'.", eventId));
+    }
     return getIndexService().getEventMediapackage(optEvent.get());
   }
 
@@ -2952,7 +3520,8 @@ public abstract class AbstractEventEndpoint {
         videoJson.addProperty("type", safeString(videoStream.getFormat()));
         videoJson.addProperty("bitrate", videoStream.getBitRate());
         videoJson.addProperty("framerate", safeString(videoStream.getFrameRate()));
-        videoJson.addProperty("resolution", safeString(videoStream.getFrameWidth() + "x" + videoStream.getFrameHeight()));
+        videoJson.addProperty("resolution", safeString(videoStream.getFrameWidth() + "x"
+            + videoStream.getFrameHeight()));
         videoJson.addProperty("framecount", safeString(videoStream.getFrameCount()));
         videoJson.addProperty("scantype", safeString(videoStream.getScanType()));
         videoJson.addProperty("scanorder", safeString(videoStream.getScanOrder()));
@@ -3128,7 +3697,8 @@ public abstract class AbstractEventEndpoint {
 
     json.addProperty("id", safeString(recording.getID()));
     json.addProperty("lastCheckInTime", recording.getLastCheckinTime() != null ? recording.getLastCheckinTime() : 0L);
-    json.addProperty("lastCheckInTimeUTC", recording.getLastCheckinTime() != null ? toUTC(recording.getLastCheckinTime()) : "");
+    json.addProperty("lastCheckInTimeUTC", recording.getLastCheckinTime() != null
+        ? toUTC(recording.getLastCheckinTime()) : "");
     json.addProperty("state", safeString(recording.getState()));
 
     return json;
@@ -3136,15 +3706,26 @@ public abstract class AbstractEventEndpoint {
 
   @PUT
   @Path("{eventId}/workflows/{workflowId}/action/{action}")
-  @RestQuery(name = "workflowAction", description = "Performs the given action for the given workflow.", returnDescription = "", pathParameters = {
-          @RestParameter(name = "eventId", description = "The id of the media package", isRequired = true, type = RestParameter.Type.STRING),
-          @RestParameter(name = "workflowId", description = "The id of the workflow", isRequired = true, type = RestParameter.Type.STRING),
-          @RestParameter(name = "action", description = "The action to take: STOP, RETRY or NONE (abort processing)", isRequired = true, type = RestParameter.Type.STRING) }, responses = {
-                  @RestResponse(responseCode = SC_OK, description = "Workflow resumed."),
-                  @RestResponse(responseCode = SC_NOT_FOUND, description = "Event or workflow instance not found."),
-                  @RestResponse(responseCode = SC_BAD_REQUEST, description = "Invalid action entered."),
-                  @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to perform the action. Maybe you need to authenticate."),
-                  @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "An exception occurred.") })
+  @RestQuery(
+      name = "workflowAction",
+      description = "Performs the given action for the given workflow.",
+      returnDescription = "",
+      pathParameters = {
+          @RestParameter(name = "eventId", description = "The id of the media package", isRequired = true,
+              type = RestParameter.Type.STRING),
+          @RestParameter(name = "workflowId", description = "The id of the workflow", isRequired = true,
+              type = RestParameter.Type.STRING),
+          @RestParameter(name = "action", description = "The action to take: STOP, RETRY or NONE (abort processing)",
+              isRequired = true, type = RestParameter.Type.STRING)
+      },
+      responses = {
+          @RestResponse(responseCode = SC_OK, description = "Workflow resumed."),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "Event or workflow instance not found."),
+          @RestResponse(responseCode = SC_BAD_REQUEST, description = "Invalid action entered."),
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "You do not have permission to perform the "
+              + "action. Maybe you need to authenticate."),
+          @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "An exception occurred.")
+      })
   public Response workflowAction(@PathParam("eventId") String id, @PathParam("workflowId") long wfId,
           @PathParam("action") String action) {
     if (StringUtils.isEmpty(id) || StringUtils.isEmpty(action)) {
@@ -3163,7 +3744,7 @@ public abstract class AbstractEventEndpoint {
       }
 
       if (RetryStrategy.NONE.toString().equalsIgnoreCase(action)
-        || RetryStrategy.RETRY.toString().equalsIgnoreCase(action)) {
+          || RetryStrategy.RETRY.toString().equalsIgnoreCase(action)) {
         getWorkflowService().resume(wfId, Collections.singletonMap("retryStrategy", action));
         return ok();
       }
@@ -3187,14 +3768,24 @@ public abstract class AbstractEventEndpoint {
 
   @DELETE
   @Path("{eventId}/workflows/{workflowId}")
-  @RestQuery(name = "deleteWorkflow", description = "Deletes a workflow", returnDescription = "The method doesn't return any content", pathParameters = {
-    @RestParameter(name = "eventId", isRequired = true, description = "The event identifier", type = RestParameter.Type.STRING),
-    @RestParameter(name = "workflowId", isRequired = true, description = "The workflow identifier", type = RestParameter.Type.INTEGER) }, responses = {
-    @RestResponse(responseCode = SC_BAD_REQUEST, description = "When trying to delete the latest workflow of the event."),
-    @RestResponse(responseCode = SC_NOT_FOUND, description = "If the event or the workflow has not been found."),
-    @RestResponse(responseCode = SC_NO_CONTENT, description = "The method does not return any content") })
+  @RestQuery(
+      name = "deleteWorkflow",
+      description = "Deletes a workflow",
+      returnDescription = "The method doesn't return any content",
+      pathParameters = {
+          @RestParameter(name = "eventId", isRequired = true, description = "The event identifier",
+              type = RestParameter.Type.STRING),
+          @RestParameter(name = "workflowId", isRequired = true, description = "The workflow identifier",
+              type = RestParameter.Type.INTEGER)
+      },
+      responses = {
+          @RestResponse(responseCode = SC_BAD_REQUEST, description = "When trying to delete the latest workflow of the "
+              + "event."),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "If the event or the workflow has not been found."),
+          @RestResponse(responseCode = SC_NO_CONTENT, description = "The method does not return any content")
+      })
   public Response deleteWorkflow(@PathParam("eventId") String id, @PathParam("workflowId") long wfId)
-    throws SearchIndexException {
+          throws SearchIndexException {
     final Optional<Event> optEvent = getIndexService().getEvent(id, getIndex());
     try {
       if (optEvent.isEmpty()) {
@@ -3225,7 +3816,8 @@ public abstract class AbstractEventEndpoint {
     }
   }
 
-  private Optional<Event> checkAgentAccessForEvent(final String eventId) throws UnauthorizedException, SearchIndexException {
+  private Optional<Event> checkAgentAccessForEvent(final String eventId)
+          throws UnauthorizedException, SearchIndexException {
     final Optional<Event> event = getIndexService().getEvent(eventId, getIndex());
     if (event.isEmpty() || !event.get().getEventStatus().contains("SCHEDULE")) {
       return event;

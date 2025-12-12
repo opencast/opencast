@@ -88,7 +88,7 @@ public class AclEndpointTest {
     JSONArray expectedArray = (JSONArray) new JSONParser().parse(reader);
 
     JSONArray actualArray = (JSONArray) parser.parse(given().expect().statusCode(HttpStatus.SC_OK)
-      .contentType(ContentType.JSON).when().get(rt.host("/roles.json")).asString());
+        .contentType(ContentType.JSON).when().get(rt.host("/roles.json")).asString());
 
     Assert.assertEquals(expectedArray, actualArray);
   }
@@ -133,8 +133,8 @@ public class AclEndpointTest {
     expectedArray.add(allRoles.get(3));
 
     JSONArray actualArray = (JSONArray) parser.parse(given().queryParam("limit", limit).queryParam("offset", offset)
-      .queryParam("target", target).expect().statusCode(HttpStatus.SC_OK)
-      .contentType(ContentType.JSON).when().get(rt.host("/roles.json")).asString());
+        .queryParam("target", target).expect().statusCode(HttpStatus.SC_OK)
+        .contentType(ContentType.JSON).when().get(rt.host("/roles.json")).asString());
     Assert.assertEquals(expectedArray, actualArray);
   }
 
