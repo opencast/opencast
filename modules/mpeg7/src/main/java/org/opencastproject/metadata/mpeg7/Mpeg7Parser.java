@@ -148,8 +148,9 @@ public class Mpeg7Parser extends DefaultHandler {
    *           if the provided file does not contain mpeg-7 data
    */
   public Mpeg7CatalogImpl parse(InputStream is) throws ParserConfigurationException, SAXException, IOException {
-    if (mpeg7Doc == null)
+    if (mpeg7Doc == null) {
       mpeg7Doc = new Mpeg7CatalogImpl();
+    }
     SAXParserFactory factory = XmlSafeParser.newSAXParserFactory();
     // REPLAY does not use a DTD here
     factory.setValidating(false);
@@ -158,8 +159,9 @@ public class Mpeg7Parser extends DefaultHandler {
     parser.parse(is, this);
 
     // Did we parse an mpeg-7 document?
-    if (!isMpeg7)
+    if (!isMpeg7) {
       throw new IllegalArgumentException("Content of input stream is not mpeg-7");
+    }
     return mpeg7Doc;
   }
 
@@ -176,8 +178,9 @@ public class Mpeg7Parser extends DefaultHandler {
 
     // Make sure this is an mpeg-7 catalog
     // TODO: Improve this test, add namespace awareness
-    if (!isMpeg7 && "Mpeg7".equals(name))
+    if (!isMpeg7 && "Mpeg7".equals(name)) {
       isMpeg7 = true;
+    }
 
     // Handle parser state
     if ("MultimediaContent".equals(localName)) {
@@ -188,12 +191,13 @@ public class Mpeg7Parser extends DefaultHandler {
     if ("Audio".equals(localName) || "Video".equals(localName) || "AudioVisual".equals(localName)) {
       contentType = MultimediaContentType.Type.valueOf(localName);
       contentId = attributes.getValue("id");
-      if (MultimediaContentType.Type.Audio.equals(contentType))
+      if (MultimediaContentType.Type.Audio.equals(contentType)) {
         multimediaContent = mpeg7Doc.addAudioContent(contentId, mediaTime, mediaLocator);
-      else if (MultimediaContentType.Type.Video.equals(contentType))
+      } else if (MultimediaContentType.Type.Video.equals(contentType)) {
         multimediaContent = mpeg7Doc.addVideoContent(contentId, mediaTime, mediaLocator);
-      else if (MultimediaContentType.Type.AudioVisual.equals(contentType))
+      } else if (MultimediaContentType.Type.AudioVisual.equals(contentType)) {
         multimediaContent = mpeg7Doc.addAudioVisualContent(contentId, mediaTime, mediaLocator);
+      }
     }
 
     // Temporal decomposition
@@ -201,15 +205,17 @@ public class Mpeg7Parser extends DefaultHandler {
       String hasGap = attributes.getValue("gap");
       String isOverlapping = attributes.getValue("overlap");
       String criteria = attributes.getValue("criteria");
-      if (!"temporal".equals(criteria))
+      if (!"temporal".equals(criteria)) {
         throw new IllegalStateException("Decompositions other than temporal are not supported");
+      }
       temporalDecomposition = multimediaContent.getTemporalDecomposition();
       temporalDecomposition.setGap("true".equals(hasGap));
       temporalDecomposition.setOverlapping("overlap".equals(isOverlapping));
     }
 
     // Segment
-    if ("AudioSegment".equals(localName) || "VideoSegment".equals(localName) || "AudioVisualSegment".equals(localName)) {
+    if ("AudioSegment".equals(localName) || "VideoSegment".equals(localName)
+        || "AudioVisualSegment".equals(localName)) {
       String segmentId = attributes.getValue("id");
       segment = temporalDecomposition.createSegment(segmentId);
       state = ParserState.Segment;
@@ -237,8 +243,9 @@ public class Mpeg7Parser extends DefaultHandler {
     if ("SpatioTemporalDecomposition".equals(localName)) {
       String hasGap = attributes.getValue("gap");
       String isOverlapping = attributes.getValue("overlap");
-      if (!(segment instanceof VideoSegment))
+      if (!(segment instanceof VideoSegment)) {
         throw new IllegalStateException("Can't have a spatio temporal decomposition outside of a video segment");
+      }
       boolean gap = "true".equalsIgnoreCase(attributes.getValue("gap"));
       boolean overlap = "true".equalsIgnoreCase(attributes.getValue("overlap"));
       spatioTemporalDecomposition = ((VideoSegment) segment).createSpatioTemporalDecomposition(gap, overlap);
@@ -270,11 +277,12 @@ public class Mpeg7Parser extends DefaultHandler {
     super.endElement(uri, localName, name);
 
     // Handle parser state
-    if ("MultimediaContent".equals(localName))
+    if ("MultimediaContent".equals(localName)) {
       state = ParserState.Document;
-    else if ("AudioSegment".equals(localName) || "VideoSegment".equals(localName)
-            || "AudioVisualSegment".equals(localName))
+    } else if ("AudioSegment".equals(localName) || "VideoSegment".equals(localName)
+            || "AudioVisualSegment".equals(localName)) {
       state = ParserState.MultimediaContent;
+    }
 
     // Media locator uri
     if ("MediaUri".equals(localName)) {
@@ -312,9 +320,9 @@ public class Mpeg7Parser extends DefaultHandler {
     if ("MediaRelTimePoint".equals(localName)) {
       MediaRelTimePointImpl tp = MediaRelTimePointImpl.parseTimePoint(getTagContent());
       mediaTimePoint = tp;
-      if (ParserState.MultimediaContent.equals(state))
+      if (ParserState.MultimediaContent.equals(state)) {
         contentTimePoint = tp;
-      else if (ParserState.Segment.equals(state)) {
+      } else if (ParserState.Segment.equals(state)) {
         tp.setReferenceTimePoint(contentTimePoint);
       }
     }
@@ -355,15 +363,17 @@ public class Mpeg7Parser extends DefaultHandler {
     // Videotext bouding box
     if ("Box".equals(localName)) {
       String[] coords = tagContent.toString().trim().split(" ");
-      if (coords.length != 4)
+      if (coords.length != 4) {
         throw new IllegalStateException("Box coordinates '" + tagContent + "' is malformatted");
+      }
       int[] coordsL = new int[4];
-      for (int i = 0; i < 4; i++)
+      for (int i = 0; i < 4; i++) {
         try {
           coordsL[i] = (int) floatFormat.parse(coords[i]).floatValue();
         } catch (ParseException e) {
           throw new SAXException(e);
         }
+      }
       videoText.setBoundary(new Rectangle(coordsL[0], coordsL[1], (coordsL[2] - coordsL[0]), coordsL[3] - coordsL[1]));
     }
 

@@ -187,8 +187,9 @@ public class MediaTimePointImpl implements MediaTimePoint {
     milliseconds += minute * MS_PER_MINUTE;
     milliseconds += hour * MS_PER_HOUR;
     milliseconds += day * MS_PER_DAY;
-    if (fractionsPerSecond > 0)
+    if (fractionsPerSecond > 0) {
       milliseconds += (fractions * 1000L / fractionsPerSecond);
+    }
     return milliseconds;
   }
 
@@ -352,10 +353,11 @@ public class MediaTimePointImpl implements MediaTimePoint {
    */
   public Node toXml(Document document) {
     Element node = null;
-    if (referenceTimePoint != null)
+    if (referenceTimePoint != null) {
       node = document.createElement("MediaRelTimePoint");
-    else
+    } else {
       node = document.createElement("MediaTimePoint");
+    }
     node.setTextContent(toString());
     return node;
   }
