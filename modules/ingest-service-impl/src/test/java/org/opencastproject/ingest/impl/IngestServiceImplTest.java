@@ -423,7 +423,8 @@ public class IngestServiceImplTest {
     }
   }
 
-  private void testAuthWhitelist(String url, String regex, boolean shouldFail, boolean shouldSendAuth, boolean shouldTouchMocks) throws Exception {
+  private void testAuthWhitelist(String url, String regex, boolean shouldFail, boolean shouldSendAuth,
+      boolean shouldTouchMocks) throws Exception {
     customClient = EasyMock.createNiceMock(CloseableHttpClient.class);
     EasyMock.reset(httpClient);
 
@@ -472,22 +473,29 @@ public class IngestServiceImplTest {
 
   @Test
   public void testAuthWhitelist() throws Exception {
-    //Test fetching something from something known to be inside the cluster.  This should use the default service-wide trusted client
+    // Test fetching something from something known to be inside the cluster. This should use the default
+    // service-wide trusted client
     testAuthWhitelist("http://localhost/testfile", "", false, true, false);
 
-    //Clear the whitelist, this should *never* send digest auth when fetching files
+    // Clear the whitelist, this should *never* send digest auth when fetching files
     testAuthWhitelist("http://www.example.org/testfile", "", false, false, true);
-    //Non-matching regex
+    // Non-matching regex
     testAuthWhitelist("http://www.example.org/testfile", "http://localhost.*", true, false, true);
-    //Matching regex
-    testAuthWhitelist("http://www.example.org/testfile", "http://localhost.*|http://www.example.org/.*", false, true, true);
+    // Matching regex
+    testAuthWhitelist("http://www.example.org/testfile", "http://localhost.*|http://www.example.org/.*",
+        false, true, true);
 
-    //Local filesystem should be actively rejected.  This file needs to *not* be in the resources directory (look in the impl for why), and needs to be readable by the user running the test
-    //NB: This is a horrible, horrible hack, but it's the only way I can think of to get *out* of test-classes.  If you try and ../ your way up above that getResource NPEs, as expected.
-    testAuthWhitelist(getClass().getResource("./../../../../").toURI().resolve("../../pom.xml").toString(), ".*", true, false, false);
-    //Test to ensure we can't use '..' to get around filters.  Removing the ".." works as expected, see below
-    testAuthWhitelist(getClass().getResource("./../impl/IngestServiceImplTest.class").toURI().toString(), ".*", true, false, false);
-    testAuthWhitelist(getClass().getResource("./IngestServiceImplTest.class").toURI().toString(), ".*", false, false, false);
+    // Local filesystem should be actively rejected.  This file needs to *not* be in the resources directory
+    // (look in the impl for why), and needs to be readable by the user running the test
+    // NB: This is a horrible, horrible hack, but it's the only way I can think of to get *out* of test-classes.
+    // If you try and ../ your way up above that getResource NPEs, as expected.
+    testAuthWhitelist(getClass().getResource("./../../../../").toURI().resolve("../../pom.xml").toString(), ".*",
+        true, false, false);
+    // Test to ensure we can't use '..' to get around filters.  Removing the ".." works as expected, see below
+    testAuthWhitelist(getClass().getResource("./../impl/IngestServiceImplTest.class").toURI().toString(), ".*",
+        true, false, false);
+    testAuthWhitelist(getClass().getResource("./IngestServiceImplTest.class").toURI().toString(), ".*",
+        false, false, false);
   }
 
 
@@ -831,7 +839,8 @@ public class IngestServiceImplTest {
     if (properties != null) {
       service.updated(properties);
       try {
-        boolean testForValue = Boolean.parseBoolean(properties.get(IngestServiceImpl.MODIFY_OPENCAST_SERIES_KEY).trim());
+        boolean testForValue = Boolean.parseBoolean(properties.get(IngestServiceImpl.MODIFY_OPENCAST_SERIES_KEY)
+            .trim());
         isUpdateSeries = testForValue;
       } catch (Exception e) {
         // If key or value not found or not boolean, use the default overwrite expectation
@@ -852,8 +861,9 @@ public class IngestServiceImplTest {
 
     // Get test series dublin core for the mock return value
     File catalogFile = new File(urlCatalog2);
-    if (!catalogFile.exists() || !catalogFile.canRead())
+    if (!catalogFile.exists() || !catalogFile.canRead()) {
       throw new Exception("Unable to access test catalog " + urlCatalog2.getPath());
+    }
     FileInputStream in = new FileInputStream(catalogFile);
     DublinCoreCatalog series = DublinCores.read(in);
     IOUtils.closeQuietly(in);

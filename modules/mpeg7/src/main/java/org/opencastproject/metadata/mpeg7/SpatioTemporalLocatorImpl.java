@@ -46,12 +46,14 @@ public class SpatioTemporalLocatorImpl implements SpatioTemporalLocator {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.metadata.mpeg7.SpatioTemporalLocator#setMediaTime(org.opencastproject.metadata.mpeg7.MediaTime)
+   * @see org.opencastproject.metadata.mpeg7.SpatioTemporalLocator#setMediaTime(
+   *      org.opencastproject.metadata.mpeg7.MediaTime)
    */
   @Override
   public void setMediaTime(MediaTime time) {
-    if (time == null)
+    if (time == null) {
       throw new IllegalArgumentException("The media time must not be null");
+    }
     this.mediaTime = time;
   }
 

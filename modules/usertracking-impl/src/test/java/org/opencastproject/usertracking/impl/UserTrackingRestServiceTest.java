@@ -76,7 +76,8 @@ public class UserTrackingRestServiceTest {
     EasyMock.expect(ua.getId()).andReturn(4L).anyTimes();
 
     UserTrackingService usertracking = EasyMock.createMock(UserTrackingService.class);
-    EasyMock.expect(usertracking.addUserFootprint(EasyMock.isA(UserAction.class), EasyMock.isA(UserSession.class))).andReturn(ua).anyTimes();
+    EasyMock.expect(usertracking.addUserFootprint(EasyMock.isA(UserAction.class), EasyMock.isA(UserSession.class)))
+        .andReturn(ua).anyTimes();
 
     EasyMock.replay(security, bc, dict, context, ua, usertracking);
 
