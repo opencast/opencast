@@ -44,6 +44,7 @@ Possible values
 The separator between `<start time>` and `<end time>` must be a semicolon `;`
 
 Time in `XhYmZs` format:
+
 * Hours (with value `X`), minutes (with value `Y`) and seconds (with value `Z`)
     * `XhYmZs`
 * Minutes (with value `Y`) and seconds (with value `Z`)
