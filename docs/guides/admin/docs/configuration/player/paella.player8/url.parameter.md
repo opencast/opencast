@@ -64,6 +64,7 @@ logLevel
 The log level parameter allows developers to configure the logging system to show only the log messages at or above a certain level.
 
 Possible values
+
 * `ERROR`
 * `WARN`
 * `INFO`
