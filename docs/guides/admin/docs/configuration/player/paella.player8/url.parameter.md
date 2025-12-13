@@ -40,6 +40,7 @@ Apply a soft trimming to the video.
 The result is that the user will only be able to view the specified video chunk. Useful to put links to parts of the video.
 
 Possible values
+
 * `<start time>;<end time>`
 
 The separator between `<start time>` and `<end time>` must be a semicolon `;`
