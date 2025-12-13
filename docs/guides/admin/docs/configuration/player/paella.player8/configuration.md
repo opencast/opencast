@@ -38,7 +38,7 @@ And, if enabled, the paella user tracking plugin can use cookie to track the use
 
 
 To comply with GDPR, ePrivacy Directive, or any other privacy laws, you can enable the 
-`es.upv.paella.cookieconsent`plugin available in `paella-extra-plugins`.
+`es.upv.paella.cookieconsent` plugin available in `paella-extra-plugins`.
 This plugin uses the [CookieConsent v3](https://cookieconsent.orestbida.com/) library to show the banner.
 
 To Learn more about paella cookie consent you can read paella
