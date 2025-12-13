@@ -21,6 +21,7 @@ Seeks initially automatically to a specified time.
 automatically plays the video from the specified time on
 
 Possible values
+
 * Hours (with value `X`), minutes (with value `Y`) and seconds (with value `Z`)
     * `XhYmZs`
 * Minutes (with value `Y`) and seconds (with value `Z`)
