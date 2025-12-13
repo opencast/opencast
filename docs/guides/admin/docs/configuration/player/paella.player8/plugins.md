@@ -4,7 +4,7 @@ Paella player plugins
 Almost every paella feature is a plugin that can be enabled/disabled by each organization.
 You need to modify the `plugins` section of the [paella config file](configuration.md).
 
-To enable/disable a plugin you need to set the plugin `enable` property to `true`/`false`.
+To enable/disable a plugin you need to set the plugin `enabled` property to `true`/`false`.
 
 Example:
 ```json
