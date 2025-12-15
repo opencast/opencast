@@ -116,7 +116,12 @@ export default class TextBoxPlugin extends EventLogPlugin {
       let summaryBox;
       if (info.link) {
         summaryBox = createElementWithHtmlText(`
-            <a href=${ info.link } class="textbox-plugin-box-summary-link"> </a>
+            <a
+              href=${ info.link }
+              class="textbox-plugin-box-summary-link"
+              target="_blank"
+              rel="noopener noreferrer"
+            > </a>
         `, summary);
       } else {
         summaryBox = createElementWithHtmlText(`
