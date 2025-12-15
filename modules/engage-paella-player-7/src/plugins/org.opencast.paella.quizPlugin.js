@@ -30,32 +30,32 @@ export default class QuizPlugin extends EventLogPlugin {
     this._quizJSON = []; // Infos from the Opencast mediapackage
 
     /* Demo json for quick developing purposes */
-    // const myTestJson = [
-    //   {
-    //     start: 2000,
-    //     type: 'multipleChoice',
-    //     question: 'Which is a fruit?',
-    //     answers: [
-    //       {
-    //         text: 'Banana',
-    //         correct: true
-    //       },
-    //       {
-    //         text: 'Cucumber',
-    //         correct: false
-    //       },
-    //       {
-    //         text: 'Tomato',
-    //         correct: true
-    //       },
-    //       {
-    //         text: 'Adjustable side table, walnut',
-    //         correct: false
-    //       }
-    //     ],
-    //   },
-    // ];
-    // this._quizJSON = myTestJson;
+    const myTestJson = [
+      {
+        start: 2000,
+        type: 'multipleChoice',
+        question: 'Which is a fruit?',
+        answers: [
+          {
+            text: 'Banana',
+            correct: true
+          },
+          {
+            text: 'Cucumber',
+            correct: false
+          },
+          {
+            text: 'Tomato',
+            correct: true
+          },
+          {
+            text: 'Adjustable side table, walnut',
+            correct: false
+          }
+        ],
+      },
+    ];
+    this._quizJSON = myTestJson;
   }
 
   // Define which events we subscribe too
@@ -136,9 +136,18 @@ export default class QuizPlugin extends EventLogPlugin {
         `, answers);
       });
 
+      const bottomButtons = createElementWithHtmlText(`
+        <div class="quiz-bottom-buttons"></div>
+      `, quizLeft);
+
+      // eslint-disable-next-line no-unused-vars
+      const skipButton = createElementWithHtmlText(`
+        <button class="quiz-submit-button">Skip</button>
+      `, bottomButtons);
+
       const submit = createElementWithHtmlText(`
         <button class="quiz-submit-button">Submit</button>
-      `, quizLeft);
+      `, bottomButtons);
 
       const quizRight = createElementWithHtmlText(`
         <div class="quiz-plugin-right"> </div>
@@ -201,6 +210,10 @@ export default class QuizPlugin extends EventLogPlugin {
 
         result.innerHTML = resultMsg;
         continueButton.style.display = 'block';
+      });
+
+      skipButton.addEventListener('click', () => {
+        this.removeQuiz();
       });
 
       continueButton.addEventListener('click', () => {

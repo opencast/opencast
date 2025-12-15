@@ -59,13 +59,20 @@
     background-color: #c8e6c9 !important; /* light green */
 }
 
-.quiz-submit-button {
+.quiz-bottom-buttons {
+    display: flex;
     flex: 1;
+    flexDirection: row;
+    max-height: 50px;
+    gap: 2vh;
+    align-self: flex-end;
+}
+
+.quiz-submit-button {
     padding: 0.5em;
     background-color: rgba(180,180,180,1);
     border: none;
     font-size: inherit;
-    max-height: 50px;
     align-self: flex-end;
 }
 
