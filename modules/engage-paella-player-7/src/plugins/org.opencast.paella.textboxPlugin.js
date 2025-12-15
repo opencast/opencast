@@ -22,6 +22,7 @@
 import { Events, EventLogPlugin, createElementWithHtmlText } from 'paella-core';
 import '../css/TextboxPlugin.css';
 import infoIcon from '../icons/info.svg';
+import externalLinkIcon from '../icons/external-link.svg';
 
 export default class TextBoxPlugin extends EventLogPlugin {
 
@@ -86,6 +87,7 @@ export default class TextBoxPlugin extends EventLogPlugin {
   // Add a textbox to the DOM
   createBox(info, index) {
     if (!this._textboxes.get(index)) {
+      const icon = info.link ? externalLinkIcon : infoIcon;
       let textbox = undefined;
 
       // textbox = createElementWithHtmlText(`
@@ -130,7 +132,7 @@ export default class TextBoxPlugin extends EventLogPlugin {
       }
 
       createElementWithHtmlText(`
-        <i class="textbox-plugin-box-icon">${ infoIcon }</i>
+        <i class="textbox-plugin-box-icon">${ icon }</i>
       `, summaryBox);
 
       createElementWithHtmlText(`
