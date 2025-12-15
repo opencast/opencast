@@ -19,7 +19,7 @@
  *
  */
 
-import { Events, EventLogPlugin, createElementWithHtmlText } from 'paella-core';
+import { Events, EventLogPlugin, createElementWithHtmlText, translate } from 'paella-core';
 import '../css/QuizPlugin.css';
 
 export default class QuizPlugin extends EventLogPlugin {
@@ -30,32 +30,32 @@ export default class QuizPlugin extends EventLogPlugin {
     this._quizJSON = []; // Infos from the Opencast mediapackage
 
     /* Demo json for quick developing purposes */
-    const myTestJson = [
-      {
-        start: 2000,
-        type: 'multipleChoice',
-        question: 'Which is a fruit?',
-        answers: [
-          {
-            text: 'Banana',
-            correct: true
-          },
-          {
-            text: 'Cucumber',
-            correct: false
-          },
-          {
-            text: 'Tomato',
-            correct: true
-          },
-          {
-            text: 'Adjustable side table, walnut',
-            correct: false
-          }
-        ],
-      },
-    ];
-    this._quizJSON = myTestJson;
+    // const myTestJson = [
+    //   {
+    //     start: 2000,
+    //     type: 'multipleChoice',
+    //     question: 'Which is a fruit?',
+    //     answers: [
+    //       {
+    //         text: 'Banana',
+    //         correct: true
+    //       },
+    //       {
+    //         text: 'Cucumber',
+    //         correct: false
+    //       },
+    //       {
+    //         text: 'Tomato',
+    //         correct: true
+    //       },
+    //       {
+    //         text: 'Adjustable side table, walnut',
+    //         correct: false
+    //       }
+    //     ],
+    //   },
+    // ];
+    // this._quizJSON = myTestJson;
   }
 
   // Define which events we subscribe too
@@ -141,11 +141,11 @@ export default class QuizPlugin extends EventLogPlugin {
       `, quizLeft);
 
       const skipButton = createElementWithHtmlText(`
-        <button class="quiz-submit-button">Skip</button>
+        <button class="quiz-submit-button">${translate('Quiz Skip')}</button>
       `, bottomButtons);
 
       const submit = createElementWithHtmlText(`
-        <button class="quiz-submit-button">Submit</button>
+        <button class="quiz-submit-button">${translate('Quiz Submit')}</button>
       `, bottomButtons);
 
       const quizRight = createElementWithHtmlText(`
@@ -165,12 +165,12 @@ export default class QuizPlugin extends EventLogPlugin {
       `, quizRight);
 
       const tryAgainButton = createElementWithHtmlText(`
-        <button class="quiz-submit-button">Try again</button>
+        <button class="quiz-submit-button">${translate('Quiz Try Again')}</button>
       `, bottomButtonsRight);
       tryAgainButton.style.display = 'none';
 
       const continueButton = createElementWithHtmlText(`
-        <button class="quiz-submit-button">Continue</button>
+        <button class="quiz-submit-button">${translate('Quiz Continue')}</button>
       `, bottomButtonsRight);
       continueButton.style.display = 'none';
 
@@ -207,13 +207,14 @@ export default class QuizPlugin extends EventLogPlugin {
 
         // Build result message
         const totalCorrect = correctAnswers.length;
-        let resultMsg = `You got ${correctCount} out of ${totalCorrect} correct.`;
+        let resultMsg = `${translate('Quiz Correct Answers', [correctCount, totalCorrect])}`;
 
         // Show missed answers
         const missed = correctAnswers.filter(answer => !selected.includes(answer));
         if (missed.length > 0) {
           const names = missed.map(a => a[0].toUpperCase() + a.slice(1)).join(', ');
-          resultMsg += `<br><span class="quiz-plugin-correct-list">Correct answers you missed: ${names}</span>`;
+          resultMsg += `<br>
+            <span class="quiz-plugin-correct-list">${translate('Quiz Correct Answers Missed', [names])}</span>`;
         }
 
         result.innerHTML = resultMsg;

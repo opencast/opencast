@@ -151,5 +151,12 @@
 
     "Undefined caption": "Unknown language",
     "Unknown language": "Unknown language",
-    "automatically generated": "automatically generated"
+    "automatically generated": "automatically generated",
+
+    "Quiz Skip": "Skip",
+    "Quiz Submit": "Submit",
+    "Quiz Try Again": "Try Again",
+    "Quiz Continue": "Continue",
+    "Quiz Correct Answers": "You got $1 out of $2 correct.",
+    "Quiz Correct Answers Missed": "Correct answers you missed: $1"
 }
