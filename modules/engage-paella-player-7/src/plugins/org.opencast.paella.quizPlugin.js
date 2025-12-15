@@ -122,17 +122,13 @@ export default class QuizPlugin extends EventLogPlugin {
         <div class="quiz-plugin-left"> </div>
       `, quiz);
 
-      const quizContent = createElementWithHtmlText(`
-        <div class="quiz-plugin-content"> </div>
-      `, quizLeft);
-
       createElementWithHtmlText(`
-        <h2 class="quiz-plugin-question">${info.question}</h2>
-      `, quizContent);
+        <div class="quiz-plugin-question">${info.question}</div>
+      `, quizLeft);
 
       const answers = createElementWithHtmlText(`
         <div class="quiz-plugin-answers"> </div>
-      `, quizContent);
+      `, quizLeft);
 
       info.answers?.map((answer) => {
         createElementWithHtmlText(`
