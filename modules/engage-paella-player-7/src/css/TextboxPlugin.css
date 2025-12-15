@@ -31,13 +31,10 @@
 } */
 
 .textbox-plugin-box-details {
-    width: 14vw;
-    min-height: 1.5vh;
-    padding: 0.5vw 0;
-    padding-left: 0.5vw;
-    gap: 0.5vw;
-    border-radius: 0.5vw;
-    font-size: min(1vw, 1vh);
+    width: clamp(100px, 14vw, 220px);
+    padding: clamp(5px, 0.5vw, 10px);
+    border-radius: clamp(5px, 0.5vw, 10px);
+    font-size: clamp(14px, min(1vw, 1vh), 20px);
 
     color: white;
     fill: white;
@@ -67,12 +64,10 @@
 }
 .textbox-plugin-box-summary .right::after {
   content: "◂";
-  font-size: 1em;
   padding: 0.5vw;
 }
 details[open] .textbox-plugin-box-summary .right::after {
   content: "▾";
-  font-size: 1em;
   padding: 0.5vw;
 }
 
@@ -87,6 +82,5 @@ details[open] .textbox-plugin-box-summary .right::after {
     flex-shrink: 0;
     width: 1em;
     height: 1.1em;
-    font-size: 1em;
     display: block;
 }
