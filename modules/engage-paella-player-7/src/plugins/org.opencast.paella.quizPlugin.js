@@ -140,7 +140,6 @@ export default class QuizPlugin extends EventLogPlugin {
         <div class="quiz-bottom-buttons"></div>
       `, quizLeft);
 
-      // eslint-disable-next-line no-unused-vars
       const skipButton = createElementWithHtmlText(`
         <button class="quiz-submit-button">Skip</button>
       `, bottomButtons);
@@ -161,9 +160,18 @@ export default class QuizPlugin extends EventLogPlugin {
         <div class="quiz-plugin-result"></div>
       `, quizRight);
 
+      const bottomButtonsRight = createElementWithHtmlText(`
+        <div class="quiz-bottom-buttons"></div>
+      `, quizRight);
+
+      const tryAgainButton = createElementWithHtmlText(`
+        <button class="quiz-submit-button">Try again</button>
+      `, bottomButtonsRight);
+      tryAgainButton.style.display = 'none';
+
       const continueButton = createElementWithHtmlText(`
         <button class="quiz-submit-button">Continue</button>
-      `, quizRight);
+      `, bottomButtonsRight);
       continueButton.style.display = 'none';
 
       /* Script */
@@ -210,6 +218,23 @@ export default class QuizPlugin extends EventLogPlugin {
 
         result.innerHTML = resultMsg;
         continueButton.style.display = 'block';
+        tryAgainButton.style.display = 'block';
+      });
+
+      tryAgainButton.addEventListener('click', () => {
+        const checkboxes = answers.querySelectorAll('.quiz-plugin-answers input[type="checkbox"]');
+
+        // Reset
+        checkboxes.forEach(checkbox => {
+          checkbox.checked = false;
+          const label = checkbox.parentElement;
+          label.classList.remove('quiz-plugin-correct');
+        });
+
+
+        result.innerHTML = '';
+        continueButton.style.display = 'none';
+        tryAgainButton.style.display = 'none';
       });
 
       skipButton.addEventListener('click', () => {
