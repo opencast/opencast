@@ -82,9 +82,8 @@ public final class AclUtils {
         AccessControlEntry ace = new AccessControlEntry(role, action, Boolean.parseBoolean(allow));
         entries.add(ace);
       } else {
-        throw new IllegalArgumentException(
-                String.format(
-                        "One of the access control elements is missing a property. The action was '%s', allow was '%s' and the role was '%s'",
+        throw new IllegalArgumentException(String.format("One of the access control elements is missing a property. "
+                + "The action was '%s', allow was '%s' and the role was '%s'",
                         action, allow, role));
       }
     }

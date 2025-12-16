@@ -79,7 +79,11 @@ import io.swagger.v3.oas.annotations.tags.Tag;
             ApiMediaType.VERSION_1_9_0, ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0})
 @RestService(name = "externalapiservice", title = "External API Service", notes = {},
              abstractText = "Provides a location for external apis to query the current server of the API.")
-@Tag(name = "External API", description = "The external service endpoint acts as a location for external apis to query the current server of the external supported API.")
+@Tag(
+    name = "External API",
+    description = "The external service endpoint acts as a location for external apis to query the current server of "
+        + "the external supported API."
+)
 @Component(
     immediate = true,
     service = BaseEndpoint.class,
@@ -120,8 +124,13 @@ public class BaseEndpoint {
 
   @GET
   @Path("")
-  @RestQuery(name = "getendpointinfo", description = "Returns key characteristics of the API such as the server name and the default version.", returnDescription = "", responses = {
-          @RestResponse(description = "The api information is returned.", responseCode = HttpServletResponse.SC_OK) })
+  @RestQuery(
+      name = "getendpointinfo",
+      description = "Returns key characteristics of the API such as the server name and the default version.",
+      returnDescription = "",
+      responses = {
+          @RestResponse(description = "The api information is returned.", responseCode = HttpServletResponse.SC_OK)
+      })
   @Operation(
       summary = "Get API information",
       description = "Returns key characteristics of the API such as the server name and the default version."
@@ -147,8 +156,13 @@ public class BaseEndpoint {
 
   @GET
   @Path("info/me")
-  @RestQuery(name = "getuserinfo", description = "Returns information on the logged in user.", returnDescription = "", responses = {
-          @RestResponse(description = "The user information is returned.", responseCode = HttpServletResponse.SC_OK) })
+  @RestQuery(
+      name = "getuserinfo",
+      description = "Returns information on the logged in user.",
+      returnDescription = "",
+      responses = {
+          @RestResponse(description = "The user information is returned.", responseCode = HttpServletResponse.SC_OK)
+      })
   @Operation(summary = "Get user information", description = "Returns information on the logged in user.")
   @ApiResponse(responseCode = "200", description = "The user information is returned.")
   public Response getUserInfo() {
@@ -166,8 +180,13 @@ public class BaseEndpoint {
 
   @GET
   @Path("info/me/roles")
-  @RestQuery(name = "getuserroles", description = "Returns current user's roles.", returnDescription = "", responses = {
-          @RestResponse(description = "The set of roles is returned.", responseCode = HttpServletResponse.SC_OK) })
+  @RestQuery(
+      name = "getuserroles",
+      description = "Returns current user's roles.",
+      returnDescription = "",
+      responses = {
+          @RestResponse(description = "The set of roles is returned.", responseCode = HttpServletResponse.SC_OK)
+      })
   @Operation(summary = "Get user roles", description = "Returns current user's roles.")
   @ApiResponse(responseCode = "200", description = "The set of roles is returned.")
   public Response getUserRoles() {
@@ -183,8 +202,14 @@ public class BaseEndpoint {
 
   @GET
   @Path("info/organization")
-  @RestQuery(name = "getorganizationinfo", description = "Returns the current organization.", returnDescription = "", responses = {
-          @RestResponse(description = "The organization details are returned.", responseCode = HttpServletResponse.SC_OK) })
+  @RestQuery(
+      name = "getorganizationinfo",
+      description = "Returns the current organization.",
+      returnDescription = "",
+      responses = {
+          @RestResponse(description = "The organization details are returned.",
+              responseCode = HttpServletResponse.SC_OK)
+      })
   @Operation(summary = "Get organization information", description = "Returns the current organization.")
   @ApiResponse(responseCode = "200", description = "The organization details are returned.")
   public Response getOrganizationInfo() {
@@ -201,8 +226,14 @@ public class BaseEndpoint {
 
   @GET
   @Path("info/organization/properties")
-  @RestQuery(name = "getorganizationproperties", description = "Returns the current organization's properties.", returnDescription = "", responses = {
-          @RestResponse(description = "The organization properties are returned.", responseCode = HttpServletResponse.SC_OK) })
+  @RestQuery(
+      name = "getorganizationproperties",
+      description = "Returns the current organization's properties.",
+      returnDescription = "",
+      responses = {
+          @RestResponse(description = "The organization properties are returned.",
+              responseCode = HttpServletResponse.SC_OK)
+      })
   @Operation(summary = "Get organization properties", description = "Returns the current organization's properties.")
   @ApiResponse(responseCode = "200", description = "The organization properties are returned.")
   public Response getOrganizationProperties() {
@@ -218,8 +249,13 @@ public class BaseEndpoint {
 
   @GET
   @Path("info/organization/properties/engageuiurl")
-  @RestQuery(name = "getorganizationpropertiesengageuiurl", description = "Returns the engage ui url property.", returnDescription = "", responses = {
-          @RestResponse(description = "The engage ui url is returned.", responseCode = HttpServletResponse.SC_OK) })
+  @RestQuery(
+      name = "getorganizationpropertiesengageuiurl",
+      description = "Returns the engage ui url property.",
+      returnDescription = "",
+      responses = {
+          @RestResponse(description = "The engage ui url is returned.", responseCode = HttpServletResponse.SC_OK)
+      })
   @Operation(summary = "Get organization properties engage ui url", description = "Returns the engage ui url property.")
   @ApiResponse(responseCode = "200", description = "The engage ui url is returned.")
   public Response getOrganizationPropertiesEngageUiUrl() {
@@ -246,9 +282,17 @@ public class BaseEndpoint {
 
   @GET
   @Path("version")
-  @RestQuery(name = "getversion", description = "Returns a list of available version as well as the default version.", returnDescription = "", responses = {
-          @RestResponse(description = "The default version is returned.", responseCode = HttpServletResponse.SC_OK) })
-  @Operation(summary = "Get available versions", description = "Returns a list of available version as well as the default version.")
+  @RestQuery(
+      name = "getversion",
+      description = "Returns a list of available version as well as the default version.",
+      returnDescription = "",
+      responses = {
+          @RestResponse(description = "The default version is returned.", responseCode = HttpServletResponse.SC_OK)
+      })
+  @Operation(
+      summary = "Get available versions",
+      description = "Returns a list of available version as well as the default version."
+  )
   @ApiResponse(responseCode = "200", description = "The default version is returned.")
   public Response getVersion() throws Exception {
     List<String> versions = new ArrayList<>();
@@ -272,8 +316,13 @@ public class BaseEndpoint {
 
   @GET
   @Path("version/default")
-  @RestQuery(name = "getversiondefault", description = "Returns the default version.", returnDescription = "", responses = {
-          @RestResponse(description = "The default version is returned.", responseCode = HttpServletResponse.SC_OK) })
+  @RestQuery(
+      name = "getversiondefault",
+      description = "Returns the default version.",
+      returnDescription = "",
+      responses = {
+          @RestResponse(description = "The default version is returned.", responseCode = HttpServletResponse.SC_OK)
+      })
   @Operation(summary = "Get default version", description = "Returns the default version.")
   @ApiResponse(responseCode = "200", description = "The default version is returned.")
   @Schema(name = "Version")

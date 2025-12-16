@@ -179,7 +179,8 @@ public class SeriesEndpointTest {
 
   @Test
   public void testGetSeriesMetadataByTypeJson() throws Exception {
-    String expected = IOUtils.toString(getClass().getResource("/series/metadata/series-metadata-dublincore.json"), UTF_8);
+    String expected = IOUtils.toString(getClass().getResource("/series/metadata/series-metadata-dublincore.json"),
+        UTF_8);
     final String response = given().pathParam("seriesId", "4fd0ef66-aea5-4b7a-a62a-a4ada0eafd6f")
             .queryParam("type", "dublincore/series").accept(APP_V1_0_0_JSON).log().all().expect().statusCode(SC_OK)
             .when().get(env.host("/{seriesId}/metadata")).asString();
@@ -301,7 +302,8 @@ public class SeriesEndpointTest {
 
   @Test
   public void testUpdateSeriesAclJson() throws Exception {
-    final String updatedAcl = "[{\"allow\":true,\"action\":\"write\",\"role\": \"ROLE_ADMIN\"},{\"allow\": true,\"action\": \"read\",\"role\": \"ROLE_USER\"}]";
+    final String updatedAcl = "[{\"allow\":true,\"action\":\"write\",\"role\": \"ROLE_ADMIN\"},"
+        + "{\"allow\": true,\"action\": \"read\",\"role\": \"ROLE_USER\"}]";
     final String response = given().pathParam("seriesId", "4fd0ef66-aea5-4b7a-a62a-a4ada0eafd6f")
             .formParam("acl", updatedAcl).accept(APP_V1_0_0_JSON).log().all().expect().statusCode(SC_OK).when()
             .put(env.host("/{seriesId}/acl")).asString();

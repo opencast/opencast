@@ -189,7 +189,8 @@ public class TestWorkflowsEndpoint extends WorkflowsEndpoint {
     Event eWithRunningWorkflow = new Event();
     expect(is.getEvent(eq("missing"), anyObject())).andReturn(Optional.empty());
     expect(is.getEvent(eq("905672ed-181c-4d60-b7cd-02758f61e713"), anyObject())).andReturn(Optional.of(e));
-    expect(is.getEvent(eq("mediapackage-with-running-workflow"), anyObject())).andReturn(Optional.of(eWithRunningWorkflow));
+    expect(is.getEvent(eq("mediapackage-with-running-workflow"), anyObject()))
+        .andReturn(Optional.of(eWithRunningWorkflow));
     expect(is.getEventMediapackage(e)).andReturn(mp);
     expect(is.getEventMediapackage(eWithRunningWorkflow)).andReturn(mpWithRunningWorkflow);
     replay(is);
