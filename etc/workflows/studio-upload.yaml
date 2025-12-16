@@ -20,7 +20,7 @@ operations:
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # Apply default workflow properties
 
-  # The worklfow properties are simplified for a better
+  # The workflow properties are simplified for a better
   # user experience, please preconfigure your defaults here.
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   - id: defaults
