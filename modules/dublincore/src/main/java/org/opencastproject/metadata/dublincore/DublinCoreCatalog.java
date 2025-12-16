@@ -111,8 +111,9 @@ public class DublinCoreCatalog extends XMLCatalogImpl implements DublinCore, Met
         public void execute(Object o) {
           CatalogEntry c = (CatalogEntry) o;
           String lang = c.getAttribute(XML_LANG_ATTR);
-          if ((langUndef && lang == null) || (language.equals(lang)))
+          if ((langUndef && lang == null) || (language.equals(lang))) {
             values.add(c.getValue());
+          }
         }
       });
       return values;
@@ -138,7 +139,8 @@ public class DublinCoreCatalog extends XMLCatalogImpl implements DublinCore, Met
     }
   }
 
-  private final Function<CatalogEntry, DublinCoreValue> toDublinCoreValue = new Function<CatalogEntry, DublinCoreValue>() {
+  private final Function<CatalogEntry, DublinCoreValue> toDublinCoreValue =
+      new Function<CatalogEntry, DublinCoreValue>() {
     @Override
     public DublinCoreValue apply(CatalogEntry e) {
       return toDublinCoreValue(e);
@@ -203,8 +205,9 @@ public class DublinCoreCatalog extends XMLCatalogImpl implements DublinCore, Met
         for (CatalogEntry value : getValuesAsList(property)) {
           entry = value;
           // Prefer values without language information
-          if (!value.hasAttribute(XML_LANG_ATTR))
+          if (!value.hasAttribute(XML_LANG_ATTR)) {
             break;
+          }
         }
         break;
       default:
@@ -244,10 +247,11 @@ public class DublinCoreCatalog extends XMLCatalogImpl implements DublinCore, Met
     Set<String> languages = new HashSet<String>();
     for (CatalogEntry entry : getValuesAsList(property)) {
       String language = entry.getAttribute(XML_LANG_ATTR);
-      if (language != null)
+      if (language != null) {
         languages.add(language);
-      else
+      } else {
         languages.add(LANGUAGE_UNDEFINED);
+      }
     }
     return languages;
   }
@@ -271,10 +275,12 @@ public class DublinCoreCatalog extends XMLCatalogImpl implements DublinCore, Met
     } else {
       int counter = 0;
       for (CatalogEntry entry : getValuesAsList(property)) {
-        if (equalLanguage(language, entry.getAttribute(XML_LANG_ATTR)))
+        if (equalLanguage(language, entry.getAttribute(XML_LANG_ATTR))) {
           counter++;
-        if (counter > 1)
+        }
+        if (counter > 1) {
           return true;
+        }
       }
       return false;
     }
@@ -309,8 +315,9 @@ public class DublinCoreCatalog extends XMLCatalogImpl implements DublinCore, Met
   @Override
   public void set(EName property, @Nullable String value, String language) {
     RequireUtil.notNull(property, "property");
-    if (language == null || LANGUAGE_ANY.equals(language))
+    if (language == null || LANGUAGE_ANY.equals(language)) {
       throw new IllegalArgumentException("Language code may not be null or LANGUAGE_ANY");
+    }
     setValue(property, value, language, null);
   }
 
@@ -363,8 +370,9 @@ public class DublinCoreCatalog extends XMLCatalogImpl implements DublinCore, Met
   public void add(EName property, String value, String language) {
     RequireUtil.notNull(property, "property");
     RequireUtil.notNull(value, "value");
-    if (language == null || LANGUAGE_ANY.equals(language))
+    if (language == null || LANGUAGE_ANY.equals(language)) {
       throw new IllegalArgumentException("Language code may not be null or LANGUAGE_ANY");
+    }
 
     add(property, value, language, null);
   }

@@ -81,7 +81,7 @@ public abstract class OpencastDctermsDublinCore {
     return dc;
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* ---------------------------------------------------------------------------------------------------------------- */
 
   @Nonnull public List<String> getPublishers() {
     return get(PROPERTY_PUBLISHER);
@@ -99,7 +99,7 @@ public abstract class OpencastDctermsDublinCore {
     dc.remove(PROPERTY_PUBLISHER);
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* ---------------------------------------------------------------------------------------------------------------- */
 
   @Nonnull public List<String> getRightsHolders() {
     return get(PROPERTY_RIGHTS_HOLDER);
@@ -117,7 +117,7 @@ public abstract class OpencastDctermsDublinCore {
     dc.remove(PROPERTY_RIGHTS_HOLDER);
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* ---------------------------------------------------------------------------------------------------------------- */
 
   @Nonnull public Optional<String> getLicense() {
     return getFirst(PROPERTY_LICENSE);
@@ -131,7 +131,7 @@ public abstract class OpencastDctermsDublinCore {
     dc.remove(PROPERTY_LICENSE);
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* ---------------------------------------------------------------------------------------------------------------- */
 
   /** Get the {@link DublinCore#PROPERTY_IDENTIFIER} property. */
   @Nonnull public Optional<String> getDcIdentifier() {
@@ -153,7 +153,7 @@ public abstract class OpencastDctermsDublinCore {
     dc.remove(PROPERTY_IDENTIFIER);
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* ---------------------------------------------------------------------------------------------------------------- */
 
   /** Get the {@link DublinCore#PROPERTY_TITLE} property. */
   @Nonnull public Optional<String> getTitle() {
@@ -175,7 +175,7 @@ public abstract class OpencastDctermsDublinCore {
     dc.remove(PROPERTY_TITLE);
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* ---------------------------------------------------------------------------------------------------------------- */
 
   /** Get the {@link DublinCore#PROPERTY_DESCRIPTION} property. */
   @Nonnull public Optional<String> getDescription() {
@@ -197,7 +197,7 @@ public abstract class OpencastDctermsDublinCore {
     dc.remove(PROPERTY_DESCRIPTION);
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* ---------------------------------------------------------------------------------------------------------------- */
 
   /** Get all {@link DublinCore#PROPERTY_AUDIENCE} properties. */
   @Nonnull public List<String> getAudiences() {
@@ -229,14 +229,15 @@ public abstract class OpencastDctermsDublinCore {
     dc.remove(PROPERTY_AUDIENCE);
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* ---------------------------------------------------------------------------------------------------------------- */
 
   /** Get the {@link DublinCore#PROPERTY_CREATED} property. */
   @Nonnull public Optional<Temporal> getCreated() {
     return getFirstVal(PROPERTY_CREATED).map(OpencastMetadataCodec.decodeTemporal);
   }
 
-  /** Set the {@link DublinCore#PROPERTY_CREATED} property. The date is encoded with a precision of {@link Precision#Day}. */
+  /** Set the {@link DublinCore#PROPERTY_CREATED} property. The date is encoded with a precision of
+   * {@link Precision#Day}. */
   public void setCreated(Date date) {
     // only allow to set a created date, if no start date is set. Otherwise DC created will be changed by changing the
     // start date with setTemporal. Synchronization is not vice versa, as setting DC created to arbitraty dates might
@@ -246,7 +247,8 @@ public abstract class OpencastDctermsDublinCore {
     }
   }
 
-  /** Set the {@link DublinCore#PROPERTY_CREATED} property. The date is encoded with a precision of {@link Precision#Day}. */
+  /** Set the {@link DublinCore#PROPERTY_CREATED} property. The date is encoded with a precision of
+   * {@link Precision#Day}. */
   public void setCreated(Temporal t) {
     // only allow to set a created date, if no start date is set. Otherwise DC created will be changed by changing the
     // start date with setTemporal. Synchronization is not vice versa, as setting DC created to arbitraty dates might
@@ -280,7 +282,7 @@ public abstract class OpencastDctermsDublinCore {
     dc.remove(PROPERTY_CREATED);
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* ---------------------------------------------------------------------------------------------------------------- */
 
   /** Get all {@link DublinCore#PROPERTY_CREATOR} properties. */
   @Nonnull public List<String> getCreators() {
@@ -312,7 +314,7 @@ public abstract class OpencastDctermsDublinCore {
     dc.remove(PROPERTY_CREATOR);
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* ---------------------------------------------------------------------------------------------------------------- */
 
   /** Get the {@link DublinCore#PROPERTY_EXTENT} property. */
   @Nonnull public Optional<Long> getExtent() {
@@ -329,7 +331,7 @@ public abstract class OpencastDctermsDublinCore {
     dc.remove(PROPERTY_EXTENT);
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* ---------------------------------------------------------------------------------------------------------------- */
 
   /** Get the {@link DublinCore#PROPERTY_ISSUED} property. */
   @Nonnull public Optional<Date> getIssued() {
@@ -351,7 +353,7 @@ public abstract class OpencastDctermsDublinCore {
     dc.remove(PROPERTY_ISSUED);
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* ---------------------------------------------------------------------------------------------------------------- */
 
   /** Get the {@link DublinCore#PROPERTY_LANGUAGE} property. */
   @Nonnull public Optional<String> getLanguage() {
@@ -381,7 +383,7 @@ public abstract class OpencastDctermsDublinCore {
     dc.remove(PROPERTY_LANGUAGE);
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* ---------------------------------------------------------------------------------------------------------------- */
 
   /** Get the {@link DublinCore#PROPERTY_SPATIAL} property. */
   @Nonnull public Optional<String> getSpatial() {
@@ -403,7 +405,7 @@ public abstract class OpencastDctermsDublinCore {
     dc.remove(PROPERTY_SPATIAL);
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* ---------------------------------------------------------------------------------------------------------------- */
 
   /** Get the {@link DublinCore#PROPERTY_SOURCE} property. */
   @Nonnull public Optional<String> getSource() {
@@ -420,7 +422,7 @@ public abstract class OpencastDctermsDublinCore {
     dc.remove(PROPERTY_SOURCE);
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* ---------------------------------------------------------------------------------------------------------------- */
 
   /** Get all {@link DublinCore#PROPERTY_CONTRIBUTOR} properties. */
   @Nonnull public List<String> getContributors() {
@@ -452,7 +454,7 @@ public abstract class OpencastDctermsDublinCore {
     dc.remove(PROPERTY_CONTRIBUTOR);
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* ---------------------------------------------------------------------------------------------------------------- */
 
   /** Get the {@link DublinCore#PROPERTY_TEMPORAL} property. */
   @Nonnull public Optional<Temporal> getTemporal() {
@@ -475,7 +477,7 @@ public abstract class OpencastDctermsDublinCore {
     dc.remove(PROPERTY_TEMPORAL);
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* ---------------------------------------------------------------------------------------------------------------- */
 
   /** Get the {@link DublinCore#PROPERTY_TYPE} property split into its components. Components are separated by "/". */
   @Nonnull public Optional<Stream<String>> getType() {
@@ -505,7 +507,7 @@ public abstract class OpencastDctermsDublinCore {
     dc.remove(PROPERTY_TYPE);
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* ---------------------------------------------------------------------------------------------------------------- */
 
   public static final class Episode extends OpencastDctermsDublinCore {
 
@@ -535,7 +537,7 @@ public abstract class OpencastDctermsDublinCore {
 
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* ---------------------------------------------------------------------------------------------------------------- */
 
   public static final class Series extends OpencastDctermsDublinCore {
     public Series(DublinCoreCatalog dc) {
@@ -543,7 +545,7 @@ public abstract class OpencastDctermsDublinCore {
     }
   }
 
-  /* ------------------------------------------------------------------------------------------------------------------ */
+  /* ---------------------------------------------------------------------------------------------------------------- */
 
   protected void setDate(EName property, Date date, Precision p) {
     dc.set(property, OpencastMetadataCodec.encodeDate(date, p));

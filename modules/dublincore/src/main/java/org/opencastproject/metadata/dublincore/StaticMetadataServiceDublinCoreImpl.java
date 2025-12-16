@@ -156,7 +156,8 @@ public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataServic
           }
           return date;
         });
-    final Optional temporalOpt = Optional.ofNullable(episode.getFirstVal(PROPERTY_TEMPORAL)).map(dc2temporalValueOption());
+    final Optional temporalOpt = Optional.ofNullable(episode.getFirstVal(PROPERTY_TEMPORAL))
+        .map(dc2temporalValueOption());
     final Optional<Date> start;
     if (episode.getFirst(PROPERTY_TEMPORAL) != null) {
       DCMIPeriod period = EncodingSchemeUtils
@@ -361,19 +362,26 @@ public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataServic
       }
       return temporal.fold(new Temporal.Match<Object>() {
         @Override
-        public Object period(DCMIPeriod period) { return period; }
+        public Object period(DCMIPeriod period) {
+          return period;
+        }
 
         @Override
-        public Object instant(Date instant) { return instant; }
+        public Object instant(Date instant) {
+          return instant;
+        }
 
         @Override
-        public Object duration(long duration) { return duration; }
+        public Object duration(long duration) {
+          return duration;
+        }
       });
     };
   }
 
   /**
-   * Return a function that creates a MetadataValue[String] from a DublinCoreValue setting its name to <code>name</code>.
+   * Return a function that creates a MetadataValue[String] from a DublinCoreValue setting its name to
+   * <code>name</code>.
    */
   private static Function<DublinCoreValue, MetadataValue<String>> dc2mvString(final String name) {
     return dcv -> new MetadataValue<>(dcv.getValue(), name, dcv.getLanguage());
@@ -383,7 +391,9 @@ public class StaticMetadataServiceDublinCoreImpl implements StaticMetadataServic
     InputStream in = null;
     try {
       URI uri = catalog.getURI();
-      if (serializer != null) uri = serializer.decodeURI(uri);
+      if (serializer != null) {
+        uri = serializer.decodeURI(uri);
+      }
       in = workspace.read(uri);
       return Optional.of((DublinCoreCatalog) DublinCores.read(in));
     } catch (Exception e) {
