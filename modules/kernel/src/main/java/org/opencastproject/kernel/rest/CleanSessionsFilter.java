@@ -97,13 +97,15 @@ public class CleanSessionsFilter implements Filter {
     if (request != null && request.getSession(false) != null) {
       if (request.getSession().getMaxInactiveInterval() == NO_MAX_INACTIVE_INTERVAL_SET) {
         // There is no maxInactiveInterval set so we need to set one.
-        logger.trace("Setting maxInactiveInterval to " + RestConstants.MAX_INACTIVE_INTERVAL + " on request @" + request.getRequestURL());
+        logger.trace("Setting maxInactiveInterval to " + RestConstants.MAX_INACTIVE_INTERVAL
+            + " on request @" + request.getRequestURL());
         request.getSession().setMaxInactiveInterval(RestConstants.MAX_INACTIVE_INTERVAL);
       }
     }
     chain.doFilter(req, resp);
 
-    // This has to be run after the chain.doFilter to invalidate the sessions after Spring Security has run as it creates new sessions.
+    // This has to be run after the chain.doFilter to invalidate the sessions after Spring Security has run as it
+    // creates new sessions.
     if (request != null && HttpServletRequest.DIGEST_AUTH.equals(request.getAuthType())) {
       logger.trace("Invalidating digest request.");
       request.getSession().invalidate();

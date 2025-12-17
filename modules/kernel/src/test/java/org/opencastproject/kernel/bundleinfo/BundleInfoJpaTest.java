@@ -114,6 +114,7 @@ public class BundleInfoJpaTest {
     });
     //
     assertEquals("no build number", Optional.<String> empty(),
-            BundleInfoJpa.create(bundleInfo("-", "-", 0L, "-", Optional.<String> empty())).toBundleInfo().getBuildNumber());
+            BundleInfoJpa.create(bundleInfo("-", "-", 0L, "-", Optional.<String> empty()))
+                .toBundleInfo().getBuildNumber());
   }
 }

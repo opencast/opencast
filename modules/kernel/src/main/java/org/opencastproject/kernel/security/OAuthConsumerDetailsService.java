@@ -105,7 +105,8 @@ public class OAuthConsumerDetailsService implements ConsumerDetailsService, User
       // Has the consumer been fully configured
       if (consumerName == null || consumerKey == null || consumerSecret == null) {
         logger.debug(
-                "Unable to configure OAuth consumer with name'{}' because the name, key or secret is missing. Stopping to look for new consumers.",
+                "Unable to configure OAuth consumer with name'{}' because the name, key or secret is missing. "
+                    + "Stopping to look for new consumers.",
                 consumerName);
         break;
       }
