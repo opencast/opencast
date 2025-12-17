@@ -178,8 +178,9 @@ public class EncoderEngine implements AutoCloseable {
           throws EncoderException {
     // Fist, update the parameters
     Map<String, String> params = new HashMap<>();
-    if (properties != null)
+    if (properties != null) {
       params.putAll(properties);
+    }
     // build command
     if (source.isEmpty()) {
       throw new IllegalArgumentException("At least one track must be specified.");
@@ -368,11 +369,11 @@ public class EncoderEngine implements AutoCloseable {
     }
 
     String processedCommandLine = processParameters(commandline, argumentReplacements);
-      try {
-        command.addAll(Arrays.asList(CommandLineUtils.translateCommandline(processedCommandLine)));
-      } catch (Exception e) {
-        throw new EncoderException("Could not process encoding profile command line", e);
-      }
+    try {
+      command.addAll(Arrays.asList(CommandLineUtils.translateCommandline(processedCommandLine)));
+    } catch (Exception e) {
+      throw new EncoderException("Could not process encoding profile command line", e);
+    }
     return command;
   }
 
@@ -382,9 +383,11 @@ public class EncoderEngine implements AutoCloseable {
    * @see EncoderEngine#trim(File,
    *      EncodingProfile, long, long, Map)
    */
-  File trim(File mediaSource, EncodingProfile format, long start, long duration, Map<String, String> properties) throws EncoderException {
-    if (properties == null)
+  File trim(File mediaSource, EncodingProfile format, long start, long duration, Map<String, String> properties)
+          throws EncoderException {
+    if (properties == null) {
       properties = new HashMap<>();
+    }
     double startD = (double) start / 1000;
     double durationD = (double) duration / 1000;
     DecimalFormatSymbols ffmpegFormat = new DecimalFormatSymbols();
@@ -436,8 +439,9 @@ public class EncoderEngine implements AutoCloseable {
    */
   private void handleEncoderOutput(List<File> output, String message) {
     message = message.trim();
-    if ("".equals(message))
+    if ("".equals(message)) {
       return;
+    }
 
     // Others go to trace logging
     if (StringUtils.startsWithAny(message.toLowerCase(),
@@ -480,9 +484,10 @@ public class EncoderEngine implements AutoCloseable {
 
     // Some to debug
     } else if (StringUtils.startsWithAny(message.toLowerCase(),
-          "artist", "compatible_brands", "copyright", "creation_time", "description", "composer", "date", "duration",
-            "encoder", "handler_name", "input #", "last message repeated", "major_brand", "metadata", "minor_version",
-            "output #", "program", "side data:", "stream #", "stream mapping", "title", "video:", "[libx264 @ ", "Press [")) {
+        "artist", "compatible_brands", "copyright", "creation_time", "description", "composer", "date", "duration",
+        "encoder", "handler_name", "input #", "last message repeated", "major_brand", "metadata", "minor_version",
+        "output #", "program", "side data:", "stream #", "stream mapping", "title", "video:", "[libx264 @ ",
+        "Press [")) {
       logger.debug(message);
 
     // And the rest is likely to deserve at least info
@@ -529,11 +534,12 @@ public class EncoderEngine implements AutoCloseable {
   public String joinNonNullString(String[] srlist, String separator) {
     StringBuffer sb = new StringBuffer();
     for (int i = 0; i < srlist.length; i++) {
-      if (srlist[i] == null || srlist[i].isEmpty())
+      if (srlist[i] == null || srlist[i].isEmpty()) {
         continue;
-      else {
-        if (sb.length() > 0)
+      } else {
+        if (sb.length() > 0) {
           sb.append(separator);
+        }
         sb.append(srlist[i]);
       }
     }
@@ -573,16 +579,17 @@ public class EncoderEngine implements AutoCloseable {
           if ("HLS".equalsIgnoreCase(adaptiveType)) {
             groupProfile = ep;
             hasAdaptiveProfile = true;
-          }
-          else
+          } else {
             throw new EncoderException("Only HLS is supported" + ep.getIdentifier() + " ffmpeg command");
+          }
         }
       }
       this.pf = deliveryProfiles;
       int size = this.pf.size();
 
-      if (vInputPad == null && aInputPad == null)
+      if (vInputPad == null && aInputPad == null) {
         throw new EncoderException("At least one of video or audio input must be specified");
+      }
       // Init
       vfilter = new ArrayList<>(Collections.nCopies(size, null));
       afilter = new ArrayList<>(Collections.nCopies(size, null));
@@ -597,10 +604,11 @@ public class EncoderEngine implements AutoCloseable {
       asplit = (size > 1) ? (aInputPad + "asplit=" + size) : null;
       this.vInputPad = vInputPad;
       this.aInputPad = aInputPad;
-      if (groupProfile != null)
+      if (groupProfile != null) {
         outputAggregateReal(deliveryProfiles, groupProfile, params, vInputPad, aInputPad);
-      else
+      } else {
         outputAggregateReal(deliveryProfiles, params, vInputPad, aInputPad);
+      }
     }
 
 
@@ -609,10 +617,11 @@ public class EncoderEngine implements AutoCloseable {
      */
     private void setAudioFilters() {
       if (pf.size() == 1) {
-        if (afilter.get(0) != null)
+        if (afilter.get(0) != null) {
           afilter.set(0, aInputPad + afilter.get(0) + apads.get(0)); // Use audio filter on input directly
-          astream.set(0, apads.get(0));
-      } else
+        }
+        astream.set(0, apads.get(0));
+      } else {
         for (int i = 0; i < pf.size(); i++) {
           if (afilter.get(i) != null) {
             afilter.set(i, "[oa0" + i + "]" + afilter.get(i) + apads.get(i)); // Use audio filter on apad
@@ -623,6 +632,8 @@ public class EncoderEngine implements AutoCloseable {
             astream.set(i, apads.get(i));
           }
         }
+      }
+
       afilter.removeAll(Arrays.asList((String) null));
     }
 
@@ -631,10 +642,11 @@ public class EncoderEngine implements AutoCloseable {
      */
     private void setVideoFilters() {
       if (pf.size() == 1) {
-        if (vfilter.get(0) != null)
+        if (vfilter.get(0) != null) {
           vfilter.set(0, vInputPad + vfilter.get(0) + vpads.get(0)); // send to filter first
-          vstream.set(0, vpads.get(0));
-      } else
+        }
+        vstream.set(0, vpads.get(0));
+      } else {
         for (int i = 0; i < pf.size(); i++) {
           if (vfilter.get(i) != null) {
             vfilter.set(i, "[ov0" + i + "]" + vfilter.get(i) + vpads.get(i)); // send to filter first
@@ -645,6 +657,7 @@ public class EncoderEngine implements AutoCloseable {
             vstream.set(i, vpads.get(i));
           }
         }
+      }
 
       vfilter.removeAll(Arrays.asList((String) null));
     }
@@ -692,14 +705,16 @@ public class EncoderEngine implements AutoCloseable {
     }
 
     public String getVideoFilter() {
-      if (vfilter.isEmpty())
+      if (vfilter.isEmpty()) {
         return null;
+      }
       return StringUtils.join(vfilter, ";");
     }
 
     public String getAudioFilter() {
-      if (afilter.isEmpty())
+      if (afilter.isEmpty()) {
         return null;
+      }
       return StringUtils.join(afilter, ";");
     }
 
@@ -771,8 +786,10 @@ public class EncoderEngine implements AutoCloseable {
       }
       String ffmpgGCmd = groupProfile.getExtension(CMD_SUFFIX); // Get ffmpeg command from profile
 
-      if (ffmpgGCmd == null)
-        throw new EncoderException("Missing ffmpeg Encoding Profile " + groupProfile.getIdentifier() + " ffmpeg command");
+      if (ffmpgGCmd == null) {
+        throw new EncoderException("Missing ffmpeg Encoding Profile " + groupProfile.getIdentifier()
+            + " ffmpeg command");
+      }
       for (Map.Entry<String, String> e : params.entrySet()) { // replace output filenames
         ffmpgGCmd = ffmpgGCmd.replace("#{" + e.getKey() + "}", e.getValue());
       }
@@ -784,8 +801,9 @@ public class EncoderEngine implements AutoCloseable {
         // substitute the output file name
         outputSuffixes.add(processParameters(profile.getSuffix(), params)); // preferred suffixes
         String ffmpgCmd = profile.getExtension(CMD_SUFFIX); // Get ffmpeg command from profile
-        if (ffmpgCmd == null)
+        if (ffmpgCmd == null) {
           throw new EncoderException("Missing Encoding Profile " + profile.getIdentifier() + " ffmpeg command");
+        }
         // Leave this so they will be removed
         params.remove("out.dir");
         params.remove("out.name");
@@ -835,15 +853,15 @@ public class EncoderEngine implements AutoCloseable {
           } else if (opt.startsWith("-c:") || opt.startsWith("-codec:") || opt.contains("-vcodec")
                   || opt.contains("-acodec")) { // cannot copy codec in complex filter
             String str = cmdToken.get(i + 1);
-            if (str.contains("copy")) // c
+            if (str.contains("copy")) { // c
               i++;
-            else if (opt.startsWith("-codec:") || opt.contains("-vcodec")) { // becomes -c:v
+            } else if (opt.startsWith("-codec:") || opt.contains("-vcodec")) { // becomes -c:v
               cmd = cmd + " " + adjustABRVMaps("-c:v", indx);
-            }
-            else if (opt.startsWith("-acodec:"))
+            } else if (opt.startsWith("-acodec:")) {
               cmd = cmd + " " + adjustABRVMaps("-c:a", indx);
-            else
+            } else {
               cmd = cmd + " " + adjustABRVMaps(opt, indx);
+            }
           } else { // keep the rest
             cmd = cmd + " " + adjustABRVMaps(opt, indx);
           }
@@ -854,14 +872,16 @@ public class EncoderEngine implements AutoCloseable {
         cmd = cmd.replaceAll("#\\{.*?\\}", "");
         // Find the output map based on splits and filters
         if (size == 1) { // no split
-          if (afilter.get(indx) == null)
+          if (afilter.get(indx) == null) {
             apads.set(indx, adjustForNoComplexFilter(aInputPad));
-          else
+          } else {
             apads.set(indx, "[oa" + indx + "]");
-          if (vfilter.get(indx) == null)
+          }
+          if (vfilter.get(indx) == null) {
             vpads.set(indx, adjustForNoComplexFilter(vInputPad)); // No split, no filter - straight from input
-          else
+          } else {
             vpads.set(indx, "[ov" + indx + "]");
+          }
 
         } else { // split
           vpads.set(indx, "[ov" + indx + "]"); // name the output pads from split -> input to final format
@@ -936,8 +956,9 @@ public class EncoderEngine implements AutoCloseable {
         return option + ":" + Integer.toString(position);
       } else if (mappableOptions.contains(option)) {
         return option + ":v:" + Integer.toString(position);
-      } else
+      } else {
         return option;
+      }
     }
 
 
@@ -957,7 +978,7 @@ public class EncoderEngine implements AutoCloseable {
      *           - if it fails
      */
     public void outputAggregateReal(List<EncodingProfile> profiles, Map<String, String> params,
-              String vInputPad, String aInputPad) throws EncoderException {
+        String vInputPad, String aInputPad) throws EncoderException {
 
       int size = profiles.size();
       int indx = 0; // profiles
@@ -975,8 +996,9 @@ public class EncoderEngine implements AutoCloseable {
         }
         // substitute the output file name
         String ffmpgCmd = profile.getExtension(CMD_SUFFIX); // Get ffmpeg command from profile
-        if (ffmpgCmd == null)
+        if (ffmpgCmd == null) {
           throw new EncoderException("Missing Encoding Profile " + profile.getIdentifier() + " ffmpeg command");
+        }
         for (Map.Entry<String, String> e : params.entrySet()) { // replace output filenames
           ffmpgCmd = ffmpgCmd.replace("#{" + e.getKey() + "}", e.getValue());
         }
@@ -1009,10 +1031,11 @@ public class EncoderEngine implements AutoCloseable {
           } else if (opt.startsWith("-c:") || opt.startsWith("-codec:") || opt.contains("-vcodec")
                   || opt.contains("-acodec")) { // cannot copy codec in complex filter
             String str = cmdToken.get(i + 1);
-            if (str.contains("copy")) // c
+            if (str.contains("copy")) { // c
               i++;
-            else
+            } else {
               cmd = cmd + " " + opt;
+            }
           } else { // keep the rest
             cmd = cmd + " " + opt;
           }
@@ -1022,14 +1045,16 @@ public class EncoderEngine implements AutoCloseable {
         cmd = cmd.replaceAll("#\\{.*?\\}", "");
         // Find the output map based on splits and filters
         if (size == 1) { // no split
-          if (afilter.get(indx) == null)
+          if (afilter.get(indx) == null) {
             apads.set(indx, adjustForNoComplexFilter(aInputPad));
-          else
+          } else {
             apads.set(indx, "[oa" + indx + "]");
-          if (vfilter.get(indx) == null)
+          }
+          if (vfilter.get(indx) == null) {
             vpads.set(indx, adjustForNoComplexFilter(vInputPad)); // No split, no filter - straight from input
-          else
+          } else {
             vpads.set(indx, "[ov" + indx + "]");
+          }
 
         } else { // split
           vpads.set(indx, "[ov" + indx + "]"); // name the output pads from split -> input to final format
@@ -1131,8 +1156,9 @@ public class EncoderEngine implements AutoCloseable {
     List<String> apads = new ArrayList<>();
     List<String> clauses = new ArrayList<>(); // The clauses are ordered
     int n = 0;
-    if (clips != null)
+    if (clips != null) {
       n = clips.size();
+    }
     String outmap = "o";
     if (n > 1) { // Create the input pads if we have multiple segments
       for (int i = 0; i < n; i++) {
@@ -1170,10 +1196,12 @@ public class EncoderEngine implements AutoCloseable {
         }
       }
       // use unsafe because different files may have different SAR/framerate
-      if (hasVideo)
+      if (hasVideo) {
         clauses.add(StringUtils.join(vpads, "") + "concat=n=" + n + ":unsafe=1[ov]"); // concat video clips
-      if (hasAudio)
+      }
+      if (hasAudio) {
         clauses.add(StringUtils.join(apads, "") + "concat=n=" + n + ":v=0:a=1[oa]"); // concat audio clips in stream 0,
+      }
     } else if (n == 1) { // single segment
       VideoClip vclip = clips.get(0);
       int fileindx = vclip.getSrc(); // get source file by index
@@ -1230,7 +1258,8 @@ public class EncoderEngine implements AutoCloseable {
    * @param inputs
    *          - input tracks as a list of files
    * @param edits
-   *          - edits are a flat list of triplets, each triplet represent one clip: index (int) into input tracks, trim in point(long)
+   *          - edits are a flat list of triplets, each triplet represent one clip: index (int) into input tracks,
+   *            trim in point(long)
    *          in milliseconds and trim out point (long) in milliseconds for each segment
    * @param profiles
    *          - encoding profiles for each delivery target - [optional] one adaptive profile to apply to the outputs to
@@ -1262,10 +1291,11 @@ public class EncoderEngine implements AutoCloseable {
       // When the first clip starts at 0, and there is a fade, lip sync can be off,
       // this adjustment will mitigate the problem
       for (int i = 0; i < edits.size(); i += 3) {
-        if (edits.get(i + 1) < transitionDuration) // If taken from the beginning of video
+        if (edits.get(i + 1) < transitionDuration) { // If taken from the beginning of video
           adjust = transitionDuration / 2000; // add half the fade duration in seconds
-        else
+        } else {
           adjust = 0;
+        }
         clips.add(new VideoClip(edits.get(i).intValue(), (double) edits.get(i + 1) / 1000 + adjust,
               (double) edits.get(i + 2) / 1000));
       }
@@ -1273,7 +1303,7 @@ public class EncoderEngine implements AutoCloseable {
         clips = sortSegments(clips, transitionDuration / 1000); // remove bad edit points
       } catch (Exception e) {
         logger.error("Illegal edits, cannot sort segment", e);
-      throw new EncoderException("Cannot understand the edit points", e);
+        throw new EncoderException("Cannot understand the edit points", e);
       }
     }
     // Set encoding parameters

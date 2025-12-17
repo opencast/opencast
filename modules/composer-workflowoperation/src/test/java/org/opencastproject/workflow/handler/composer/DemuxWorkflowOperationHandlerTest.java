@@ -128,8 +128,7 @@ public class DemuxWorkflowOperationHandlerTest {
     // set up mock composer service
     composerService = EasyMock.createNiceMock(ComposerService.class);
     EasyMock.expect(composerService.getProfile(PROFILE_ID)).andReturn(profile);
-    EasyMock.expect(composerService.demux((Track) EasyMock.anyObject(), (String) EasyMock.anyObject()))
-    .andReturn(job);
+    EasyMock.expect(composerService.demux((Track) EasyMock.anyObject(), (String) EasyMock.anyObject())).andReturn(job);
     EasyMock.replay(composerService);
     operationHandler.setComposerService(composerService);
 
@@ -169,8 +168,7 @@ public class DemuxWorkflowOperationHandlerTest {
     // set up mock composer service
     composerService = EasyMock.createNiceMock(ComposerService.class);
     EasyMock.expect(composerService.listProfiles()).andReturn(profileList);
-    EasyMock.expect(composerService.demux((Track) EasyMock.anyObject(), (String) EasyMock.anyObject()))
-    .andReturn(job);
+    EasyMock.expect(composerService.demux((Track) EasyMock.anyObject(), (String) EasyMock.anyObject())).andReturn(job);
     EasyMock.replay(composerService);
     operationHandler.setComposerService(composerService);
 

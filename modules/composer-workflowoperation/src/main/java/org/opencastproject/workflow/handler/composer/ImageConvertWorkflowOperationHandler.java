@@ -109,7 +109,8 @@ public class ImageConvertWorkflowOperationHandler extends AbstractWorkflowOperat
   }
 
   @Override
-  public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context) throws WorkflowOperationException {
+  public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
+          throws WorkflowOperationException {
     WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
     // Check which tags have been configured
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
@@ -120,8 +121,9 @@ public class ImageConvertWorkflowOperationHandler extends AbstractWorkflowOperat
     ConfiguredTagsAndFlavors.TargetTags targetTagsOption = tagsAndFlavors.getTargetTags();
 
     String encodingProfileOption = StringUtils.trimToNull(operation.getConfiguration(CONFIG_KEY_ENCODING_PROFILE));
-    if (encodingProfileOption == null)
+    if (encodingProfileOption == null) {
       encodingProfileOption = StringUtils.trimToNull(operation.getConfiguration(CONFIG_KEY_ENCODING_PROFILES));
+    }
     String tagsAndFlavorsOption = StringUtils.trimToNull(operation.getConfiguration(CONFIG_KEY_TAGS_AND_FLAVORS));
     boolean tagsAndFlavorsBool = BooleanUtils.toBoolean(tagsAndFlavorsOption);
 
@@ -145,15 +147,17 @@ public class ImageConvertWorkflowOperationHandler extends AbstractWorkflowOperat
     List<String> profiles = new ArrayList<>();
     for (String encodingProfileId : asList(encodingProfileOption)) {
       EncodingProfile profile = composerService.getProfile(encodingProfileId);
-      if (profile == null)
+      if (profile == null) {
         throw new WorkflowOperationException("Encoding profile '" + encodingProfileId + "' was not found");
+      }
       // just test if the profile exists, we only need the profile id for further work
       profiles.add(encodingProfileId);
     }
 
     // Make sure there is at least one profile
-    if (profiles.isEmpty())
+    if (profiles.isEmpty()) {
       throw new WorkflowOperationException("No encoding profile was specified");
+    }
 
     AttachmentSelector attachmentSelector = new AttachmentSelector();
     for (MediaPackageElementFlavor sourceFlavor : sourceFlavorsOption) {
