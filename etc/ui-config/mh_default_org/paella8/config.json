@@ -689,6 +689,10 @@
 
         "org.opencast.paella.data.relatedVideosDataPlugin": {
             "enabled": true
+        },
+
+        "es.upv.paella.embedapi": {
+            "enabled": true
         }
     }
 }
