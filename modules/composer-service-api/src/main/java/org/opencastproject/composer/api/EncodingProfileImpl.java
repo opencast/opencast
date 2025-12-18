@@ -186,7 +186,9 @@ public class EncodingProfileImpl implements EncodingProfile {
    */
   @Override
   public String getSuffix() {
-    if (suffixes.keySet().size() == 0) return null;
+    if (suffixes.keySet().size() == 0) {
+      return null;
+    }
     if (suffixes.containsKey("default")) {
       return suffixes.get("default");
     } else {
@@ -255,12 +257,14 @@ public class EncodingProfileImpl implements EncodingProfile {
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.composer.api.EncodingProfile#isApplicableTo(org.opencastproject.composer.api.EncodingProfile.MediaType)
+   * @see org.opencastproject.composer.api.EncodingProfile#isApplicableTo(
+   *      org.opencastproject.composer.api.EncodingProfile.MediaType)
    */
   @Override
   public boolean isApplicableTo(MediaType type) {
-    if (type == null)
+    if (type == null) {
       throw new IllegalArgumentException("Type must not be null");
+    }
     return type.equals(applicableType);
   }
 
@@ -283,10 +287,12 @@ public class EncodingProfileImpl implements EncodingProfile {
    *          the property value
    */
   public void addExtension(String key, String value) {
-    if (StringUtils.isBlank(key))
+    if (StringUtils.isBlank(key)) {
       throw new IllegalArgumentException("Argument 'key' must not be null");
-    if (value == null)
+    }
+    if (value == null) {
       throw new IllegalArgumentException("Argument 'value' must not be null");
+    }
     removeExtension(key);
     extensions.add(new Extension(key, value));
   }
@@ -334,8 +340,9 @@ public class EncodingProfileImpl implements EncodingProfile {
         break;
       }
     }
-    if (index == -1)
+    if (index == -1) {
       return null;
+    }
     return extensions.remove(index).getValue();
   }
 
@@ -404,8 +411,11 @@ public class EncodingProfileImpl implements EncodingProfile {
 
   @Override
   public String getSuffix(String tag) {
-    if (suffixes.containsKey(tag)) return suffixes.get(tag);
-    else return null;
+    if (suffixes.containsKey(tag)) {
+      return suffixes.get(tag);
+    } else {
+      return null;
+    }
   }
 
   @Override

@@ -129,10 +129,12 @@ public class DublinCoreTest {
     File tmpCatalogFile2 = testFolder.newFile();
     FileUtils.copyFile(catalogFile, tmpCatalogFile2);
     catalogFile2 = new File(this.getClass().getResource(catalogName2).toURI());
-    if (!catalogFile.exists() || !catalogFile.canRead())
+    if (!catalogFile.exists() || !catalogFile.canRead()) {
       throw new Exception("Unable to access test catalog");
-    if (!catalogFile2.exists() || !catalogFile2.canRead())
+    }
+    if (!catalogFile2.exists() || !catalogFile2.canRead()) {
       throw new Exception("Unable to access test catalog 2");
+    }
     Workspace workspace = EasyMock.createNiceMock(Workspace.class);
     EasyMock.expect(workspace.get(EasyMock.anyObject())).andReturn(catalogFile).anyTimes();
     EasyMock.expect(workspace.get(EasyMock.anyObject(), EasyMock.anyBoolean()))

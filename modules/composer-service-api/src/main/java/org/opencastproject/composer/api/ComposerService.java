@@ -121,7 +121,8 @@ public interface ComposerService {
 
   Job composite(Dimension outputDimension, Optional<LaidOutElement<Track>> option,
         LaidOutElement<Track> lowerLaidOutElement, Optional<LaidOutElement<Attachment>> watermarkOption,
-        String identifier, String outputBackground, String sourceAudioName) throws EncoderException, MediaPackageException;
+        String identifier, String outputBackground, String sourceAudioName)
+          throws EncoderException, MediaPackageException;
 
   /**
    * Concat multiple tracks to a single track.
@@ -154,8 +155,8 @@ public interface ComposerService {
    * @throws EncoderException if encoding fails
    * @throws MediaPackageException if the mediapackage is invalid
    */
-  Job concat(String profileId, Dimension outputDimension, float outputFrameRate, boolean sameCodec, Track... tracks) throws EncoderException,
-          MediaPackageException;
+  Job concat(String profileId, Dimension outputDimension, float outputFrameRate, boolean sameCodec, Track... tracks)
+          throws EncoderException, MediaPackageException;
 
   /**
    * Transforms an image attachment to a video track

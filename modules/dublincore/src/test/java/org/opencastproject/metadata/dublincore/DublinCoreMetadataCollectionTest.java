@@ -87,7 +87,7 @@ public class DublinCoreMetadataCollectionTest {
   @Test
   public void testOrderOfFieldsInputFieldOrderZeroExpectsAtFront() {
     DublinCoreMetadataCollection collection = new DublinCoreMetadataCollection(Arrays
-      .asList(unorderedOne, unorderedTwo, unorderedThree, first));
+        .asList(unorderedOne, unorderedTwo, unorderedThree, first));
 
     assertEquals(4, collection.getFields().size());
     assertEquals("A field with an order value of 0 should be first in the list of fields", first, collection
@@ -109,7 +109,7 @@ public class DublinCoreMetadataCollectionTest {
   @Test
   public void testOrderOfFieldsInputFieldOrderTwoExpectsInMiddle() {
     DublinCoreMetadataCollection collection = new DublinCoreMetadataCollection(Arrays
-      .asList(unorderedOne, unorderedTwo, unorderedThree, third));
+        .asList(unorderedOne, unorderedTwo, unorderedThree, third));
 
     assertEquals(4, collection.getFields().size());
     assertEquals("A field with an order value of 2 should be in that position in the list of fields", third, collection
@@ -131,7 +131,7 @@ public class DublinCoreMetadataCollectionTest {
   @Test
   public void testOrderOfFieldsInputMultipleOrderedFieldsExpectsInCorrectPositions() {
     DublinCoreMetadataCollection collection = new DublinCoreMetadataCollection(Arrays
-      .asList(unorderedOne, unorderedTwo, unorderedThree, first, third, seventh));
+        .asList(unorderedOne, unorderedTwo, unorderedThree, first, third, seventh));
 
     assertEquals(6, collection.getFields().size());
     assertEquals("A field with an order value of 0 should be first in the list of fields", first, collection
@@ -168,7 +168,7 @@ public class DublinCoreMetadataCollectionTest {
   public void testOrderOfFieldsInputDuplicateOrderValueExpectsBothInserted() {
     final MetadataField newFirst = createField("New first", 0, null);
     final DublinCoreMetadataCollection collection = new DublinCoreMetadataCollection(Arrays
-      .asList(unorderedOne, unorderedTwo, unorderedThree, first, third, seventh, newFirst));
+        .asList(unorderedOne, unorderedTwo, unorderedThree, first, third, seventh, newFirst));
 
     assertEquals(7, collection.getFields().size());
     assertTrue("A field with an order value of 0 should be first in the list of fields", first == collection
@@ -187,7 +187,7 @@ public class DublinCoreMetadataCollectionTest {
     final MetadataField newFirst = createField("first", 0, value);
 
     final DublinCoreMetadataCollection collection = new DublinCoreMetadataCollection(Arrays
-      .asList(unorderedOne, unorderedTwo, unorderedThree, first, third, seventh, newFirst));
+        .asList(unorderedOne, unorderedTwo, unorderedThree, first, third, seventh, newFirst));
 
     int numberOfFirsts = 0;
     Optional<String> valueFound = Optional.empty();

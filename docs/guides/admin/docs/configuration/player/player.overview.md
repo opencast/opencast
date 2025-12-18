@@ -3,8 +3,7 @@ Opencast Player
 
 Opencast ships with a default video player, the Paella Player.
 
-Currently Opencast ships with two versions of the Paella Player. Version 7 is the "new player" and the recommended
-default.
+Currently Opencast ships with two versions of the Paella Player. Version 7 is the current default version.
 
 Configuration
 ------------------------------

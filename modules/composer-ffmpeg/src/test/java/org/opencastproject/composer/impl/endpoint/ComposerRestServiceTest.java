@@ -108,7 +108,7 @@ public class ComposerRestServiceTest {
             (Track) EasyMock.notNull(), (Track) EasyMock.notNull())).andReturn(job);
     EasyMock.expect(composer.concat(EasyMock.eq(profileId), EasyMock.eq(new Dimension(640, 480)),
             EasyMock.gt(0.0f), EasyMock.anyBoolean(), (Track) EasyMock.notNull(), (Track) EasyMock.notNull()))
-    .andReturn(job);
+            .andReturn(job);
     EasyMock.replay(composer);
 
     // Set up the rest endpoint

@@ -95,7 +95,14 @@ public class ListProviderEndpoint {
   @GET
   @Path("providers.json")
   @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_10_0 })
-  @RestQuery(name = "availableProviders", description = "Provides the list of the available list providers", responses = { @RestResponse(description = "Returns the availables list providers.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
+  @RestQuery(
+      name = "availableProviders",
+      description = "Provides the list of the available list providers",
+      responses = {
+          @RestResponse(description = "Returns the availables list providers.",
+              responseCode = HttpServletResponse.SC_OK)
+      },
+      returnDescription = "")
   public Response getAvailableProviders(@HeaderParam("Accept") String acceptHeader) {
     JSONArray list = new JSONArray();
 
@@ -107,10 +114,26 @@ public class ListProviderEndpoint {
   @GET
   @Path("{source}.json")
   @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_10_0 })
-  @RestQuery(name = "list", description = "Provides key-value list from the given source", pathParameters = { @RestParameter(name = "source", description = "The source for the key-value list", isRequired = true, type = RestParameter.Type.STRING) }, restParameters = {
-          @RestParameter(description = "The maximum number of items to return per page", isRequired = false, name = "limit", type = RestParameter.Type.INTEGER),
-          @RestParameter(description = "The offset", isRequired = false, name = "offset", type = RestParameter.Type.INTEGER),
-          @RestParameter(description = "Filters", isRequired = false, name = "filter", type = RestParameter.Type.STRING) }, responses = { @RestResponse(description = "Returns the key-value list for the given source.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
+  @RestQuery(
+      name = "list",
+      description = "Provides key-value list from the given source",
+      pathParameters = {
+          @RestParameter(name = "source", description = "The source for the key-value list", isRequired = true,
+              type = RestParameter.Type.STRING)
+      },
+      restParameters = {
+          @RestParameter(description = "The maximum number of items to return per page", isRequired = false,
+              name = "limit", type = RestParameter.Type.INTEGER),
+          @RestParameter(description = "The offset", isRequired = false, name = "offset",
+              type = RestParameter.Type.INTEGER),
+          @RestParameter(description = "Filters", isRequired = false, name = "filter",
+              type = RestParameter.Type.STRING)
+      },
+      responses = {
+          @RestResponse(description = "Returns the key-value list for the given source.",
+              responseCode = HttpServletResponse.SC_OK)
+      },
+      returnDescription = "")
   public Response getList(@PathParam("source") final String source, @QueryParam("limit") final int limit,
           @QueryParam("filter") final String filter, @QueryParam("offset") final int offset,
           @HeaderParam("Accept") String acceptHeader) {

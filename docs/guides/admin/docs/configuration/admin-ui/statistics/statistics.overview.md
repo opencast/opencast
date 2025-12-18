@@ -25,8 +25,8 @@ convention. Configuration files of providers using InfluxDB have to be named sta
 for providers using Matomo have to start with `matomo`. All provider configurations have to be in json format. So e.g.
 _influx.views.episode.sum.json_ would be a valid name. For more details on these configuration files, please refer to the
 corresponding section for the statistics provider in question
-([InfluxDB Statistics Provider](/configuration/admin-ui/statistics/influxdb-statistics-provider#influxdb-statistics-provider-config),
-[Matomo Statistics Provider](/configuration/admin-ui/statistics/matomo-statistics-provider#matomo-statistics-provider-config)).
+([InfluxDB Statistics Provider](influxdb-statistics-provider.md#influxdb-statistics-provider-config),
+[Matomo Statistics Provider](matomo-statistics-provider.md#matomo-statistics-provider-config)).
 
 ## CSV Exports
 

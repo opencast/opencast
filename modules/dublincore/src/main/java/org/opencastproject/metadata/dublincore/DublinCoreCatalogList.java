@@ -75,8 +75,9 @@ public class DublinCoreCatalogList {
    *          the total count of catalogs that match the creating query of this list must be &gt;= catalogs.size
    */
   public DublinCoreCatalogList(List<DublinCoreCatalog> catalogs, long totalCount) {
-    if (totalCount < catalogs.size())
+    if (totalCount < catalogs.size()) {
       throw new IllegalArgumentException("total count is less than the number of catalogs passed");
+    }
     catalogList.addAll(catalogs);
     totalCatalogCount = totalCount;
   }

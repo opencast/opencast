@@ -82,10 +82,11 @@ public class PartialImportWorkflowOperationHandlerTest {
   public void trackNeedsTobeEncodedToStandardInputMp4ReturnsFalse() throws URISyntaxException {
     Track track = EasyMock.createMock(Track.class);
     EasyMock.expect(track.getURI())
-            .andReturn(
-                    new URI(
-                            "http://mh-allinone.localdomain/files/mediapackage/4631bade-04ae-4369-a38f-63a9a0f2e5bf/9404c35b-9463-4932-ad88-0f7030c2448e/audio.mp4"))
-            .anyTimes();
+        .andReturn(
+            new URI(
+                "http://mh-allinone.localdomain/files/mediapackage/4631bade-04ae-4369-a38f-63a9a0f2e5bf/"
+                    + "9404c35b-9463-4932-ad88-0f7030c2448e/audio.mp4"))
+        .anyTimes();
     EasyMock.replay(track);
     boolean result = PartialImportWorkflowOperationHandler.trackNeedsTobeEncodedToStandard(track, defaultExtensions);
     assertFalse(result);
@@ -95,10 +96,11 @@ public class PartialImportWorkflowOperationHandlerTest {
   public void trackNeedsTobeEncodedToStandardInputNoExtensionReturnsTrue() throws URISyntaxException {
     Track track = EasyMock.createMock(Track.class);
     EasyMock.expect(track.getURI())
-            .andReturn(
-                    new URI(
-                            "http://mh-allinone.localdomain/files/mediapackage/4631bade-04ae-4369-a38f-63a9a0f2e5bf/9404c35b-9463-4932-ad88-0f7030c2448e/audio"))
-            .anyTimes();
+        .andReturn(
+            new URI(
+                "http://mh-allinone.localdomain/files/mediapackage/4631bade-04ae-4369-a38f-63a9a0f2e5bf/"
+                    + "9404c35b-9463-4932-ad88-0f7030c2448e/audio"))
+        .anyTimes();
     EasyMock.replay(track);
     boolean result = PartialImportWorkflowOperationHandler.trackNeedsTobeEncodedToStandard(track, defaultExtensions);
     assertTrue(result);
@@ -108,10 +110,11 @@ public class PartialImportWorkflowOperationHandlerTest {
   public void trackNeedsTobeEncodedToStandardInputOnlyPeriodExtensionReturnsTrue() throws URISyntaxException {
     Track track = EasyMock.createMock(Track.class);
     EasyMock.expect(track.getURI())
-            .andReturn(
-                    new URI(
-                            "http://mh-allinone.localdomain/files/mediapackage/4631bade-04ae-4369-a38f-63a9a0f2e5bf/9404c35b-9463-4932-ad88-0f7030c2448e/audio."))
-            .anyTimes();
+        .andReturn(
+            new URI(
+                "http://mh-allinone.localdomain/files/mediapackage/4631bade-04ae-4369-a38f-63a9a0f2e5bf/"
+                    + "9404c35b-9463-4932-ad88-0f7030c2448e/audio."))
+        .anyTimes();
     EasyMock.replay(track);
     boolean result = PartialImportWorkflowOperationHandler.trackNeedsTobeEncodedToStandard(track, defaultExtensions);
     assertTrue(result);
@@ -121,10 +124,11 @@ public class PartialImportWorkflowOperationHandlerTest {
   public void trackNeedsTobeEncodedToStandardInputMovExtensionOnlyMp4AllowedReturnsTrue() throws URISyntaxException {
     Track track = EasyMock.createMock(Track.class);
     EasyMock.expect(track.getURI())
-            .andReturn(
-                    new URI(
-                            "http://mh-allinone.localdomain/files/mediapackage/4631bade-04ae-4369-a38f-63a9a0f2e5bf/9404c35b-9463-4932-ad88-0f7030c2448e/audio.mov"))
-            .anyTimes();
+        .andReturn(
+            new URI(
+                "http://mh-allinone.localdomain/files/mediapackage/4631bade-04ae-4369-a38f-63a9a0f2e5bf/"
+                    + "9404c35b-9463-4932-ad88-0f7030c2448e/audio.mov"))
+        .anyTimes();
     EasyMock.replay(track);
     boolean result = PartialImportWorkflowOperationHandler.trackNeedsTobeEncodedToStandard(track, defaultExtensions);
     assertTrue(result);
@@ -134,10 +138,11 @@ public class PartialImportWorkflowOperationHandlerTest {
   public void trackNeedsTobeEncodedToStandardInputMovMp4AndMovAllowedReturnsFalse() throws URISyntaxException {
     Track track = EasyMock.createMock(Track.class);
     EasyMock.expect(track.getURI())
-            .andReturn(
-                    new URI(
-                            "http://mh-allinone.localdomain/files/mediapackage/4631bade-04ae-4369-a38f-63a9a0f2e5bf/9404c35b-9463-4932-ad88-0f7030c2448e/audio.mov"))
-            .anyTimes();
+        .andReturn(
+            new URI(
+                    "http://mh-allinone.localdomain/files/mediapackage/4631bade-04ae-4369-a38f-63a9a0f2e5bf/"
+                        + "9404c35b-9463-4932-ad88-0f7030c2448e/audio.mov"))
+        .anyTimes();
     EasyMock.replay(track);
     boolean result = PartialImportWorkflowOperationHandler.trackNeedsTobeEncodedToStandard(track, moreExtensions);
     assertFalse(result);

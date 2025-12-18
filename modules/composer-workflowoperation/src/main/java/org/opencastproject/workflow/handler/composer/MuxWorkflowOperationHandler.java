@@ -212,8 +212,9 @@ public class MuxWorkflowOperationHandler extends AbstractWorkflowOperationHandle
     }
     String profileId = StringUtils.trim(profileOption);
     EncodingProfile profile = composerService.getProfile(profileId);
-    if (profile == null)
+    if (profile == null) {
       throw new WorkflowOperationException("Encoding profile '" + profileId + "' was not found");
+    }
 
     Map<String, Track> muxSourceTracksMap = new HashMap<>();
     for (String srcType : inputTracks.keySet()) {

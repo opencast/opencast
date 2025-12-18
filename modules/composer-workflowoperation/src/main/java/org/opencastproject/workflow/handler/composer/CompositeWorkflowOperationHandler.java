@@ -158,8 +158,8 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(
+   *      org.opencastproject.workflow.api.WorkflowInstance, JobContext)
    */
   @Override
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
@@ -217,8 +217,9 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
     } else if (watermarkElements.size() == 0 && compositeSettings.getSourceUrlWatermark() == null) {
       logger.info("No watermark to composite");
     } else {
-      for (Attachment a : watermarkElements)
+      for (Attachment a : watermarkElements) {
         watermarkAttachment = Optional.ofNullable(a);
+      }
     }
 
     Collection<Track> upperElements = compositeSettings.getUpperTrackSelector().select(mediaPackage, false);
@@ -227,10 +228,12 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
     // There is only a single track to work with.
     if ((upperElements.size() == 1 && lowerElements.size() == 0)
             || (upperElements.size() == 0 && lowerElements.size() == 1)) {
-      for (Track t : upperElements)
+      for (Track t : upperElements) {
         compositeSettings.setSingleTrack(t);
-      for (Track t : lowerElements)
+      }
+      for (Track t : lowerElements) {
         compositeSettings.setSingleTrack(t);
+      }
       return handleSingleTrack(mediaPackage, compositeSettings, watermarkAttachment);
     } else {
       // Look for upper elements matching the tags and flavor
@@ -362,28 +365,33 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
       }
 
       if (layoutMultipleString != null) {
-        Tuple<List<HorizontalCoverageLayoutSpec>, Optional<AbsolutePositionLayoutSpec>> multipleLayouts = parseMultipleLayouts(layoutMultipleString);
+        Tuple<List<HorizontalCoverageLayoutSpec>, Optional<AbsolutePositionLayoutSpec>> multipleLayouts =
+            parseMultipleLayouts(layoutMultipleString);
         multiSourceLayouts.addAll(multipleLayouts.getA());
         watermarkLayout = multipleLayouts.getB();
       }
 
       if (layoutSingleString != null) {
-        Tuple<HorizontalCoverageLayoutSpec, Optional<AbsolutePositionLayoutSpec>> singleLayouts = parseSingleLayouts(layoutSingleString);
+        Tuple<HorizontalCoverageLayoutSpec, Optional<AbsolutePositionLayoutSpec>> singleLayouts =
+            parseSingleLayouts(layoutSingleString);
         singleSourceLayout = singleLayouts.getA();
         watermarkLayout = singleLayouts.getB();
       }
 
       // Find the encoding profile
-      if (encodingProfile == null)
+      if (encodingProfile == null) {
         throw new WorkflowOperationException("Encoding profile must be set!");
+      }
 
       profile = composerService.getProfile(encodingProfile);
-      if (profile == null)
+      if (profile == null) {
         throw new WorkflowOperationException("Encoding profile '" + encodingProfile + "' was not found");
+      }
 
       // Output resolution
-      if (outputResolution == null)
+      if (outputResolution == null) {
         throw new WorkflowOperationException("Output resolution must be set!");
+      }
 
       if (outputResolution.equals(OUTPUT_RESOLUTION_LOWER) || outputResolution.equals(OUTPUT_RESOLUTION_UPPER)) {
         outputResolutionSource = outputResolution;
@@ -414,8 +422,9 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
       }
 
       try {
-        if ("*".equals(targetFlavor.getType()) || "*".equals(targetFlavor.getSubtype()))
+        if ("*".equals(targetFlavor.getType()) || "*".equals(targetFlavor.getSubtype())) {
           throw new WorkflowOperationException("Target flavor must have a type and a subtype, '*' are not allowed!");
+        }
       } catch (IllegalArgumentException e) {
         throw new WorkflowOperationException("Target flavor '" + targetFlavor + "' is malformed");
       }
@@ -467,17 +476,19 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
             String layoutString) throws WorkflowOperationException {
       try {
         String[] layouts = StringUtils.split(layoutString, ";");
-        if (layouts.length < 2)
+        if (layouts.length < 2) {
           throw new WorkflowOperationException(
-                  "Multiple layout doesn't contain the required layouts for (lower, upper, optional watermark)");
+              "Multiple layout doesn't contain the required layouts for (lower, upper, optional watermark)");
+        }
 
         List<HorizontalCoverageLayoutSpec> multipleLayouts = list(
                 Serializer.horizontalCoverageLayoutSpec(JsonObj.jsonObj(layouts[0])),
                 Serializer.horizontalCoverageLayoutSpec(JsonObj.jsonObj(layouts[1])));
 
         AbsolutePositionLayoutSpec watermarkLayout = null;
-        if (layouts.length > 2)
+        if (layouts.length > 2) {
           watermarkLayout = Serializer.absolutePositionLayoutSpec(JsonObj.jsonObj(layouts[2]));
+        }
 
         return Tuple.tuple(multipleLayouts, Optional.ofNullable(watermarkLayout));
       } catch (Exception e) {
@@ -489,16 +500,18 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
             String layoutString) throws WorkflowOperationException {
       try {
         String[] layouts = StringUtils.split(layoutString, ";");
-        if (layouts.length < 1)
+        if (layouts.length < 1) {
           throw new WorkflowOperationException(
-                  "Single layout doesn't contain the required layouts for (video, optional watermark)");
+              "Single layout doesn't contain the required layouts for (video, optional watermark)");
+        }
 
         HorizontalCoverageLayoutSpec singleLayout = Serializer
                 .horizontalCoverageLayoutSpec(JsonObj.jsonObj(layouts[0]));
 
         AbsolutePositionLayoutSpec watermarkLayout = null;
-        if (layouts.length > 1)
+        if (layouts.length > 1) {
           watermarkLayout = Serializer.absolutePositionLayoutSpec(JsonObj.jsonObj(layouts[1]));
+        }
 
         return Tuple.tuple(singleLayout, Optional.ofNullable(watermarkLayout));
       } catch (Exception e) {
@@ -612,7 +625,8 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
       Dimension videoDimension = Dimension.dimension(videoStreams[0].getFrameWidth(), videoStreams[0].getFrameHeight());
 
       // Create the video layout definitions
-      List<Tuple<Dimension, HorizontalCoverageLayoutSpec>> shapes = new ArrayList<Tuple<Dimension, HorizontalCoverageLayoutSpec>>();
+      List<Tuple<Dimension, HorizontalCoverageLayoutSpec>> shapes =
+          new ArrayList<Tuple<Dimension, HorizontalCoverageLayoutSpec>>();
       shapes.add(0, Tuple.tuple(videoDimension, compositeSettings.getSingleSourceLayout()));
 
       // Determine dimension of output
@@ -643,16 +657,17 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
               .getIdentifier(), compositeSettings.getOutputBackground(), compositeSettings.getSourceAudioName());
 
       // Wait for the jobs to return
-      if (!waitForStatus(compositeJob).isSuccess())
+      if (!waitForStatus(compositeJob).isSuccess()) {
         throw new WorkflowOperationException("The composite job did not complete successfully");
+      }
 
       if (compositeJob.getPayload().length() > 0) {
 
         Track compoundTrack = (Track) MediaPackageElementParser.getFromXml(compositeJob.getPayload());
 
         compoundTrack.setURI(workspace.moveTo(compoundTrack.getURI(), mediaPackage.getIdentifier().toString(),
-                compoundTrack.getIdentifier(),
-                "composite." + FilenameUtils.getExtension(compoundTrack.getURI().toString())));
+            compoundTrack.getIdentifier(),
+            "composite." + FilenameUtils.getExtension(compoundTrack.getURI().toString())));
 
         // Adjust the target tags
         applyTargetTagsToElement(compositeSettings.getTargetTags(), compoundTrack);
@@ -671,11 +686,11 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
         return createResult(mediaPackage, Action.SKIP);
       }
     } finally {
-      if (compositeSettings.getSourceUrlWatermark() != null)
-        workspace.deleteFromCollection(
-                COLLECTION,
-                compositeSettings.getWatermarkIdentifier() + "."
-                        + FilenameUtils.getExtension(compositeSettings.getSourceUrlWatermark()));
+      if (compositeSettings.getSourceUrlWatermark() != null) {
+        workspace.deleteFromCollection(COLLECTION,
+            compositeSettings.getWatermarkIdentifier() + "."
+                + FilenameUtils.getExtension(compositeSettings.getSourceUrlWatermark()));
+      }
     }
   }
 
@@ -698,7 +713,8 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
         throw new WorkflowOperationException("Unable to parse watermark file.  File must be gif, png, jp(e)g, or bmp");
       }
       Dimension imageDimension = Dimension.dimension(image.getWidth(), image.getHeight());
-      List<Tuple<Dimension, AbsolutePositionLayoutSpec>> watermarkShapes = new ArrayList<Tuple<Dimension, AbsolutePositionLayoutSpec>>();
+      List<Tuple<Dimension, AbsolutePositionLayoutSpec>> watermarkShapes =
+          new ArrayList<Tuple<Dimension, AbsolutePositionLayoutSpec>>();
       watermarkShapes.add(0, Tuple.tuple(imageDimension, compositeSettings.getWatermarkLayout().get()));
       MultiShapeLayout watermarkLayout = LayoutManager.absoluteMultiShapeLayout(outputDimension,
               watermarkShapes);
@@ -713,11 +729,12 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
           IOException, NotFoundException, MediaPackageException, WorkflowOperationException {
     if (compositeSettings.getMultiSourceLayouts() == null || compositeSettings.getMultiSourceLayouts().size() == 0) {
       throw new WorkflowOperationException(
-              "Multi video layout must be set! Please verify that you have a "
-                      + LAYOUT_MULTIPLE
-                      + " or "
-                      + LAYOUT
-                      + " property in your composite operation in your workflow definition to be able to handle multiple videos");
+          "Multi video layout must be set! Please verify that you have a "
+              + LAYOUT_MULTIPLE
+              + " or "
+              + LAYOUT
+              + " property in your composite operation in your workflow definition to be able to handle multiple "
+              + "videos");
     }
 
     try {
@@ -755,7 +772,8 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
       }
 
       // Create the video layout definitions
-      List<Tuple<Dimension, HorizontalCoverageLayoutSpec>> shapes = new ArrayList<Tuple<Dimension, HorizontalCoverageLayoutSpec>>();
+      List<Tuple<Dimension, HorizontalCoverageLayoutSpec>> shapes =
+          new ArrayList<Tuple<Dimension, HorizontalCoverageLayoutSpec>>();
       shapes.add(0, Tuple.tuple(lowerDimensions, layouts.get(0)));
       shapes.add(1, Tuple.tuple(upperDimensions, layouts.get(1)));
 
@@ -778,8 +796,9 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
               .getIdentifier(), compositeSettings.getOutputBackground(), compositeSettings.getSourceAudioName());
 
       // Wait for the jobs to return
-      if (!waitForStatus(compositeJob).isSuccess())
+      if (!waitForStatus(compositeJob).isSuccess()) {
         throw new WorkflowOperationException("The composite job did not complete successfully");
+      }
 
       if (compositeJob.getPayload().length() > 0) {
 
@@ -806,11 +825,11 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
         return createResult(mediaPackage, Action.SKIP);
       }
     } finally {
-      if (compositeSettings.getSourceUrlWatermark() != null)
-        workspace.deleteFromCollection(
-                COLLECTION,
-                compositeSettings.getWatermarkIdentifier() + "."
-                        + FilenameUtils.getExtension(compositeSettings.getSourceUrlWatermark()));
+      if (compositeSettings.getSourceUrlWatermark() != null) {
+        workspace.deleteFromCollection(COLLECTION,
+            compositeSettings.getWatermarkIdentifier() + "."
+                + FilenameUtils.getExtension(compositeSettings.getSourceUrlWatermark()));
+      }
     }
   }
 

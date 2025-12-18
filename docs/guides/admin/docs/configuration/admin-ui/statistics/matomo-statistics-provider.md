@@ -14,7 +14,7 @@ Before you can start using the Matomo Statistics Provider, make sure that the fo
 ### Paella Player Configuration
 
 Follow the instructions for the configuration of the
-[Paella Player Matomo user tracking plugin](/configuration/player/paella.player7/plugins/org.opencast.paella.matomo.userTrackingDataPlugin).
+[Paella Player Matomo user tracking plugin](../../player/paella.player7/plugins/org.opencast.paella.matomo.userTrackingDataPlugin.md).
 Make sure that you use the same CustomDimension IDs in the Paella configuration that were assigned to the CustomDimensions
 in Matomo.
 
