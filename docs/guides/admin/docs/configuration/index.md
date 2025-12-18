@@ -53,7 +53,7 @@ A list of everything.
     - [Event Filters](admin-ui/event-filters.md)
     - [Manual Asset Upload](admin-ui/asset-upload.md)
     - [Languages](admin-ui/languages.md)
-    - [Statistics](admin-ui/statistics.md)
+    - [Statistics](admin-ui/statistics/statistics.overview.md)
     - [Thumbnails](admin-ui/thumbnails.md)
 - Amazon Services
     - [Amazon S3 Archive Storage](awss3archive.md)
