@@ -324,4 +324,3 @@ public class LtiServlet extends HttpServlet {
     }
   }
 }
-

@@ -67,6 +67,7 @@
     <rest-assured.version>4.4.0</rest-assured.version>
     <spring.version>5.3.39</spring.version>
     <spring-security.version>5.7.12</spring-security.version>
+    <spring-security-cas.version>5.7.12_4</spring-security-cas.version>
     <xmlsec.version>2.2.6</xmlsec.version>
   </properties>
   <modules>
@@ -1099,9 +1100,9 @@
         <version>${spring-security-oauth.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.springframework.security</groupId>
-        <artifactId>spring-security-cas</artifactId>
-        <version>${spring-security.version}</version>
+        <groupId>org.apache.servicemix.bundles</groupId>
+        <artifactId>org.apache.servicemix.bundles.spring-security-cas</artifactId>
+        <version>${spring-security-cas.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.security</groupId>
@@ -1131,7 +1132,7 @@
       <dependency>
         <groupId>org.jasig.cas.client</groupId>
         <artifactId>cas-client-core</artifactId>
-        <version>3.3.3</version>
+        <version>3.6.4</version>
       </dependency>
       <dependency>
         <groupId>org.apache.servicemix.bundles</groupId>

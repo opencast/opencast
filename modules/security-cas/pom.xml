@@ -20,8 +20,8 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.springframework.security</groupId>
-      <artifactId>spring-security-cas</artifactId>
+      <groupId>org.apache.servicemix.bundles</groupId>
+      <artifactId>org.apache.servicemix.bundles.spring-security-cas</artifactId>
     </dependency>
   </dependencies>
   <build>
@@ -33,7 +33,7 @@
         <configuration>
           <ignoredUnusedDeclaredDependencies>
             <ignoredUnusedDeclaredDependency>org.opencastproject:opencast-security-cas-client-wrapper</ignoredUnusedDeclaredDependency>
-            <ignoredUnusedDeclaredDependency>org.springframework.security:spring-security-cas</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.apache.servicemix.bundles:org.apache.servicemix.bundles.spring-security-cas</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>
@@ -44,13 +44,18 @@
         <configuration>
           <instructions>
             <Import-Package>
-              org.jasig.cas.client.authentication;resolution:=optional,
+			  org.jasig.cas.client;resolution:=optional,
+			  org.jasig.cas.client.authentication;resolution:=optional,
+			  org.jasig.cas.client.configuration;resolution:=optional,
+			  org.jasig.cas.client.jaas;resolution:=optional,
               org.jasig.cas.client.proxy;resolution:=optional,
               org.jasig.cas.client.session;resolution:=optional,
+              org.jasig.cas.client.ssl;resolution:=optional,
               org.jasig.cas.client.util;resolution:=optional,
               org.jasig.cas.client.validation;resolution:=optional,
               org.springframework.security.cas,
               org.springframework.security.cas.authentication,
+              org.springframework.security.cas.jackson2,
               org.springframework.security.cas.userdetails,
               org.springframework.security.cas.web,
               org.springframework.security.cas.web.authentication,
