@@ -46,9 +46,17 @@ That is why patches may only be accepted into releases branches (`r/?.x`) if the
 
 Patches which do not meet these criteria should target the branch `develop` to become part of the next major version.
 
-Note: Patches adding features should target the current stable release (`r/{{ opencast_major_version() }}.x`), or
+### Release Notes
+
+Patches adding features should target the current stable release (`r/{{ opencast_major_version() }}.x`), or
 `develop`, and are strongly discouraged from targetting the legacy release.  Features going into the legacy release
-will need a good reason, and must be highly self contained.
+will need a good reason, and must be highly self contained.  Regardless of branch target, features must include a
+note in the [release notes directory](https://github.com/opencast/opencast/tree/develop/docs/guides/admin/docs/releasenotes)
+which contains:
+
+- A brief description of the feature, as well as a link to the relevant PR(s) and or issue(s).
+- Whether the feature requires a database schema change.
+- Whether the feature requires an index rebuild
 
 To determine the acceptance of patches, all pull requests will be discussed in the technical meeting.
 This protects against inclusion of controversial changes with no broader consent among committers.
