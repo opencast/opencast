@@ -327,13 +327,13 @@ public class EncodingProfileScanner implements ArtifactInstaller {
       bundleCtx.registerService(ReadinessIndicator.class.getName(), new ReadinessIndicator(), properties);
 
       if (filesInDirectory.length == sumInstalledFiles) {
-        logger.info("All {} encoding profiles installed", filesInDirectory.length);
+        logger.info("All {} encoding profiles in {} files installed", profiles.size(), filesInDirectory.length);
       } else {
-        logger.warn("{} encoding profile(s) installed, {} encoding profile(s) could not be installed",
+        logger.warn("{} encoding config files installed, {} encoding config files could not be installed",
                 sumInstalledFiles, sumUnparsableFiles);
       }
     } else {
-      logger.debug("{} of {} encoding profiles installed", sumInstalledFiles, filesInDirectory.length);
+      logger.debug("{} of {} encoding profile config files installed", sumInstalledFiles, filesInDirectory.length);
     }
   }
 
