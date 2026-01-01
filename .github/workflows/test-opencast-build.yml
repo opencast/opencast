@@ -230,7 +230,7 @@ jobs:
         if: >
           matrix.java == 21
           && github.repository == 'opencast/opencast'
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: opencast-allinone
           path: build/opencast-dist-allinone/
