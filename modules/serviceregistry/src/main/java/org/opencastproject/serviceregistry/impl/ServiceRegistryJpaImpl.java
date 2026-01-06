@@ -99,7 +99,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
@@ -169,10 +170,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** Configuration key for the maximum load */
   protected static final String OPT_MAXLOAD = "org.opencastproject.server.maxload";
 
-  /** Configuration key for the interval to check whether the hosts in the service registry are still alive,
-   * in seconds */
-  protected static final String OPT_HEARTBEATINTERVAL = "heartbeat.interval";
-
   /** Configuration key for the collection of job statistics */
   protected static final String OPT_JOBSTATISTICS = "jobstats.collect";
 
@@ -223,9 +220,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** Services for which error state is disabled */
   private List<String> noErrorStateServiceTypes = new ArrayList<>();
 
-  /** Default delay between checking if hosts are still alive in seconds * */
-  static final long DEFAULT_HEART_BEAT = 60;
-
   /** Default job load when not passed by service creating the job * */
   static final float DEFAULT_JOB_LOAD = 0.1f;
 
@@ -252,7 +246,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   protected DBSession db;
 
   /** The thread pool to use for dispatching queued jobs and checking on phantom services. */
-  protected ScheduledExecutorService scheduledExecutor = null;
+  protected ScheduledThreadPoolExecutor scheduledExecutor = null;
+  private ScheduledFuture hbfuture = null;
 
   /** The security service */
   protected SecurityService securityService = null;
@@ -706,25 +701,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       }
     }
 
-    long heartbeatInterval = DEFAULT_HEART_BEAT;
-    String heartbeatIntervalString = StringUtils.trimToNull((String) properties.get(OPT_HEARTBEATINTERVAL));
-    if (StringUtils.isNotBlank(heartbeatIntervalString)) {
-      try {
-        heartbeatInterval = Long.parseLong(heartbeatIntervalString);
-      } catch (Exception e) {
-        logger.warn("Heartbeat interval '{}' is malformed, setting to {}", heartbeatIntervalString, DEFAULT_HEART_BEAT);
-        heartbeatInterval = DEFAULT_HEART_BEAT;
-      }
-      if (heartbeatInterval == 0) {
-        logger.info("Heartbeat disabled");
-      } else if (heartbeatInterval < 0) {
-        logger.warn("Heartbeat interval {} seconds too low, adjusting to {}", heartbeatInterval, DEFAULT_HEART_BEAT);
-        heartbeatInterval = DEFAULT_HEART_BEAT;
-      } else {
-        logger.info("Heartbeat interval set to {} seconds", heartbeatInterval);
-      }
-    }
-
     String jobStatsString = StringUtils.trimToNull((String) properties.get(OPT_JOBSTATISTICS));
     if (StringUtils.isNotBlank(jobStatsString)) {
       try {
@@ -773,14 +749,28 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
                 OPT_SERVICE_STATISTICS_MAX_JOB_AGE);
       }
     }
+  }
 
-    scheduledExecutor = Executors.newScheduledThreadPool(1);
+  private void setupScheduledExecutor() {
+    if (scheduledExecutor == null) {
+      scheduledExecutor = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(1);
+      scheduledExecutor.setRemoveOnCancelPolicy(true);
+    }
+  }
+
+  protected void startHeartbeat(long heartbeatInterval) {
+    setupScheduledExecutor();
 
     // Schedule the service heartbeat if the interval is > 0
     if (heartbeatInterval > 0) {
+      // Stop the current dispatch thread so we can configure a new one
+      if (hbfuture != null) {
+        hbfuture.cancel(true);
+      }
+
       logger.debug("Starting service heartbeat at a custom interval of {}s", heartbeatInterval);
-      scheduledExecutor.scheduleWithFixedDelay(new JobProducerHeartbeat(), heartbeatInterval, heartbeatInterval,
-              TimeUnit.SECONDS);
+      hbfuture = scheduledExecutor.scheduleWithFixedDelay(new JobProducerHeartbeat(), heartbeatInterval,
+          heartbeatInterval, TimeUnit.SECONDS);
     }
   }
 
