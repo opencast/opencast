@@ -57,6 +57,7 @@ import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
@@ -239,6 +240,24 @@ public class JobDispatcher {
           dispatchIntervalMs, TimeUnit.MILLISECONDS);
     } else {
       logger.info("Job dispatching is disabled");
+    }
+  }
+
+  @Deactivate
+  public void deactivate() {
+    logger.info("Deactivate Job Dispatcher");
+
+    // Wait for runnable to stop before stopping
+    if (scheduledExecutor != null) {
+      try {
+        scheduledExecutor.shutdownNow();
+        if (!scheduledExecutor.isShutdown()) {
+          logger.info("Waiting for Job Dispatcher to terminate");
+          scheduledExecutor.awaitTermination(10, TimeUnit.SECONDS);
+        }
+      } catch (InterruptedException e) {
+        logger.error("Error shutting down the Job Dispatcher", e);
+      }
     }
   }
 
