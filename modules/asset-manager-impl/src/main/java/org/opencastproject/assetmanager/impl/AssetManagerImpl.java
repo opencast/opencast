@@ -347,14 +347,14 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   public Optional<Asset> getAsset(Version version, String mpId, String mpElementId) {
     if (isAuthorized(mpId, READ_ACTION)) {
       // try to fetch the asset
-      var asset = getDatabase().getAsset(RuntimeTypes.convert(version), mpId, mpElementId);
-      if (asset.isPresent()) {
+      var assetDto = getDatabase().getAsset(RuntimeTypes.convert(version), mpId, mpElementId);
+      if (assetDto.isPresent()) {
         var storageId = getSnapshotStorageLocation(version, mpId);
         if (storageId.isPresent()) {
           var store = getAssetStore(storageId.get());
           if (store.isPresent()) {
             var assetStream = store.get().get(StoragePath.mk(
-                asset.get().getOrganizationId(),
+                assetDto.get().getSnapshot().getOrganizationId(),
                 mpId,
                 version,
                 mpElementId
@@ -363,7 +363,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
               Checksum checksum = null;
               try {
-                checksum = Checksum.fromString(asset.get().getAssetDto().getChecksum());
+                checksum = Checksum.fromString(assetDto.get().getChecksum());
               } catch (NoSuchAlgorithmException e) {
                 logger.warn("Invalid checksum for asset {} of media package {}", mpElementId, mpId, e);
               }
@@ -371,10 +371,10 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
               final Asset a = new AssetImpl(
                       AssetId.mk(version, mpId, mpElementId),
                       assetStream.get(),
-                      asset.get().getAssetDto().getMimeType(),
-                      asset.get().getAssetDto().getSize(),
-                      asset.get().getStorageId(),
-                      asset.get().getAvailability(),
+                      assetDto.get().getMimeType(),
+                      assetDto.get().getSize(),
+                      assetDto.get().getSnapshot().getStorageId(),
+                      Availability.valueOf(assetDto.get().getSnapshot().getAvailability()),
                       checksum);
               return Optional.of(a);
             }
@@ -1271,10 +1271,10 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
           getDatabase()
           .findAssetByChecksumAndStoreAndOrg(e.getChecksum().toString(), store.getStoreType(), orgId)
           .map(dto -> StoragePath.mk(
-              dto.getOrganizationId(),
-              dto.getMediaPackageId(),
-              dto.getVersion(),
-              dto.getAssetDto().getMediaPackageElementId()
+              dto.getSnapshot().getOrganizationId(),
+              dto.getSnapshot().getMediaPackageId(),
+              dto.getSnapshot().getVersion(),
+              dto.getMediaPackageElementId()
           ));
 
       if (existingAssetOpt.isPresent()) {
@@ -1447,10 +1447,10 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       final Optional<StoragePath> existingAssetOpt = getDatabase()
           .findAssetByChecksumAndStoreAndOrg(e.getChecksum().toString(), getLocalAssetStore().getStoreType(), orgId)
           .map(dto -> StoragePath.mk(
-                  dto.getOrganizationId(),
-                  dto.getMediaPackageId(),
-                  dto.getVersion(),
-                  dto.getAssetDto().getMediaPackageElementId()));
+                  dto.getSnapshot().getOrganizationId(),
+                  dto.getSnapshot().getMediaPackageId(),
+                  dto.getSnapshot().getVersion(),
+                  dto.getMediaPackageElementId()));
 
       if (existingAssetOpt.isPresent()) {
         final StoragePath existingAsset = existingAssetOpt.get();
