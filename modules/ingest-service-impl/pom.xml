@@ -205,7 +205,6 @@
           <instructions>
             <Export-Package>
               org.opencastproject.ingest.impl;version=${project.version},
-              org.opencastproject.ingest.impl.jmx;version=${project.version},
               org.opencastproject.ingest.endpoint;version=${project.version},
               org.opencastproject.ingest.scanner;version=${project.version}
             </Export-Package>

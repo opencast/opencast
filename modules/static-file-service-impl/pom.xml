@@ -86,7 +86,6 @@
           <instructions>
             <Private-Package>
               org.opencastproject.staticfiles.impl;version=${project.version},
-              org.opencastproject.staticfiles.jmx;version=${project.version}
             </Private-Package>
           </instructions>
         </configuration>

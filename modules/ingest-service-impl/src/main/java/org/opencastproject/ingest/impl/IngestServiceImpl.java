@@ -33,7 +33,6 @@ import org.opencastproject.authorization.xacml.XACMLUtils;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.ingest.api.IngestException;
 import org.opencastproject.ingest.api.IngestService;
-import org.opencastproject.ingest.impl.jmx.IngestStatistics;
 import org.opencastproject.inspection.api.MediaInspectionService;
 import org.opencastproject.job.api.AbstractJobProducer;
 import org.opencastproject.job.api.Job;
@@ -87,7 +86,6 @@ import org.opencastproject.util.ProgressInputStream;
 import org.opencastproject.util.XmlSafeParser;
 import org.opencastproject.util.XmlUtil;
 import org.opencastproject.util.data.functions.Misc;
-import org.opencastproject.util.jmx.JmxUtil;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowException;
@@ -128,8 +126,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -152,8 +148,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
-import javax.management.ObjectInstance;
 
 /**
  * Creates and augments Opencast MediaPackages. Stores media into the Working File Repository.
@@ -293,12 +287,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   /** The external source dns name */
   private static String downloadSource = DOWNLOAD_SOURCE;
 
-  /** The JMX business object for ingest statistics */
-  private IngestStatistics ingestStatistics = new IngestStatistics();
-
-  /** The JMX bean object instance */
-  private ObjectInstance registerMXBean;
-
   /** The workflow service */
   private WorkflowService workflowService;
 
@@ -376,7 +364,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
     if (defaultWorkflowDefinionId == null) {
       defaultWorkflowDefinionId = "schedule-and-upload";
     }
-    registerMXBean = JmxUtil.registerMXBean(ingestStatistics, "IngestStatistics");
   }
 
   /**
@@ -384,7 +371,7 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
    */
   @Deactivate
   public void deactivate() {
-    JmxUtil.unregisterMXBean(registerMXBean);
+
   }
 
   /**
@@ -568,7 +555,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
             // Key is the zip entry name as it is
             String key = entry.getName();
             uris.put(key, contentUri);
-            ingestStatistics.add(entry.getSize());
             logger.info("Zip entry {}/{} stored at {}", job.getId(), entry.getName(), contentUri);
             // Figures out if there's a root folder. Does entry name starts with a folder?
             int pos = entry.getName().indexOf('/');
@@ -1279,7 +1265,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       }
 
 
-      ingestStatistics.successful();
       if (workflowDef != null) {
         logger.info("Starting new workflow with ingested mediapackage '{}' using the specified template '{}'",
                 mp.getIdentifier().toString(), workflowDefinitionId);
@@ -1289,7 +1274,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
       }
       return workflowService.start(workflowDef, mp, properties);
     } catch (WorkflowException e) {
-      ingestStatistics.failed();
       throw new IngestException(e);
     }
   }
@@ -1688,7 +1672,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
 
     // Have we been able to find a workflow definition id?
     if (isBlank(workflowDefinitionID)) {
-      ingestStatistics.failed();
       throw new IllegalStateException("Can not ingest a workflow without a workflow definition or an existing "
           + "instance. No default definition is specified");
     }
@@ -1789,14 +1772,6 @@ public class IngestServiceImpl extends AbstractJobProducer implements IngestServ
   private URI addContentToRepo(MediaPackage mp, String elementId, String filename, InputStream file)
           throws IOException {
     ProgressInputStream progressInputStream = new ProgressInputStream(file);
-    progressInputStream.addPropertyChangeListener(new PropertyChangeListener() {
-      @Override
-      public void propertyChange(PropertyChangeEvent evt) {
-        long totalNumBytesRead = (Long) evt.getNewValue();
-        long oldTotalNumBytesRead = (Long) evt.getOldValue();
-        ingestStatistics.add(totalNumBytesRead - oldTotalNumBytesRead);
-      }
-    });
     return workingFileRepository.put(mp.getIdentifier().toString(), elementId, filename, progressInputStream);
   }
 
