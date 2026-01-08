@@ -46,11 +46,9 @@ import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Either;
-import org.opencastproject.util.jmx.JmxUtil;
 import org.opencastproject.workingfilerepository.api.PathMappable;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 import org.opencastproject.workspace.api.Workspace;
-import org.opencastproject.workspace.impl.jmx.WorkspaceBean;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
@@ -90,7 +88,6 @@ import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArraySet;
 import java.util.function.Function;
 
-import javax.management.ObjectInstance;
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.UriBuilder;
 
@@ -124,17 +121,8 @@ public final class WorkspaceImpl implements Workspace {
   /** Configuration key for garbage collection max age. */
   public static final String WORKSPACE_CLEANUP_MAX_AGE_KEY = "org.opencastproject.workspace.cleanup.max.age";
 
-  /** Workspace JMX type */
-  private static final String JMX_WORKSPACE_TYPE = "Workspace";
-
   /** Unknown file name string */
   private static final String UNKNOWN_FILENAME = "unknown";
-
-  /** The JMX workspace bean */
-  private WorkspaceBean workspaceBean = new WorkspaceBean(this);
-
-  /** The JMX bean object instance */
-  private ObjectInstance registeredMXBean;
 
   private final Object lock = new Object();
 
@@ -289,8 +277,6 @@ public final class WorkspaceImpl implements Workspace {
       }
     }
 
-    registeredMXBean = JmxUtil.registerMXBean(workspaceBean, JMX_WORKSPACE_TYPE);
-
     // Start cleanup scheduler if we have sensible cleanup values:
     if (garbageCollectionPeriodInSeconds > 0) {
       workspaceCleaner = new WorkspaceCleaner(this, garbageCollectionPeriodInSeconds, maxAgeInSeconds);
@@ -324,7 +310,6 @@ public final class WorkspaceImpl implements Workspace {
   /** Callback from OSGi on service deactivation. */
   @Deactivate
   public void deactivate() {
-    JmxUtil.unregisterMXBean(registeredMXBean);
     if (workspaceCleaner != null) {
       workspaceCleaner.shutdown();
     }

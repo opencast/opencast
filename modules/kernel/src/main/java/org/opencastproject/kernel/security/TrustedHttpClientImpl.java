@@ -71,7 +71,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.lang.management.ManagementFactory;
 import java.net.URI;
 import java.util.Collection;
 import java.util.Map;
@@ -79,9 +78,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
 
 /**
  * An http client that executes secure (though not necessarily encrypted) http requests.
@@ -93,7 +89,7 @@ import javax.management.ObjectName;
     immediate = true,
     service = { TrustedHttpClient.class }
 )
-public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionMXBean {
+public class TrustedHttpClientImpl implements TrustedHttpClient {
   /** Header name used to request a new nonce from a server a request is sent to. */
   public static final String AUTHORIZATION_HEADER_NAME = "Authorization";
 
@@ -204,19 +200,6 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
     getRetryNumber(cc);
     getRetryBaseTime(cc);
     getRetryMaximumVariableTime(cc);
-
-    // register with jmx
-    try {
-      MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-      ObjectName name;
-      name = new ObjectName("org.opencastproject.security.api.TrustedHttpClient:type=HttpConnections");
-      Object mbean = this;
-      if (!mbs.isRegistered(name)) {
-        mbs.registerMBean(mbean, name);
-      }
-    } catch (Exception e) {
-      logger.warn("Unable to register {} as an mbean", this, e);
-    }
 
     final Long expiration = NumberUtils.createLong(StringUtils.trimToNull(
         cc.getBundleContext().getProperty(INTERNAL_URL_SIGNING_DURATION_KEY)));
@@ -677,11 +660,6 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
     } catch (IOException e) {
       throw new TrustedHttpClientException(e);
     }
-  }
-
-  @Override
-  public int getOpenConnections() {
-    return responseMap.size();
   }
 
   /**
