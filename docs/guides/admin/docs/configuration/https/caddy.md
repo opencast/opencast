@@ -1,8 +1,6 @@
 Enable HTTPS using Caddy
 ========================
 
-> [Using Nginx as reverse proxy for Opencast](nginx.md) is the preferred way of running Opencast.
-> Refer to the [Nginx guide for configuration instructions](nginx.md) for that type of setup.
 
 This guide will help you to configure Caddy 2 to act as HTTP(S) proxy for Opencast.
 
