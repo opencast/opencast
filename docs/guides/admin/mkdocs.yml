@@ -83,7 +83,8 @@ nav:
       - HTTPS:
           - Overview: "configuration/https/index.md"
           - Using Nginx: "configuration/https/nginx.md"
-          - Using Apache httpd: configuration/https/apache-httpd.md
+          - Using Apache httpd: "configuration/https/apache-httpd.md"
+          - Using Caddy: "configuration/https/caddy.md"
           - Internal HTTPS: "configuration/https/opencast.only.md"
           - Self-Signed Certificates: "configuration/https/self-signed-certificates.md"
       - Domain change/HTTPS migration: "configuration/migration-domain-https.md"
