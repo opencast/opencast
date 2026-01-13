@@ -1447,6 +1447,12 @@
     <system>GitHub</system>
     <url>https://github.com/opencast/opencast</url>
   </issueManagement>
+  <developers>
+    <developer>
+      <name>Opencast Committers</name>
+      <email>committers@opencast.org</email>
+    </developer>
+  </developers>
   <!-- Site Report generation settings -->
   <reporting>
     <plugins>

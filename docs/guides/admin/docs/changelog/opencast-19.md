@@ -1,6 +1,14 @@
 Opencast 19 Changelog
 ---------------------
 
+- [[#7288](https://github.com/opencast/opencast/pull/7288)] -
+  Update 19.0 release notes
+- [[#7287](https://github.com/opencast/opencast/pull/7287)] -
+  Update Studio to 19.x-2025-12-17
+- [[#7286](https://github.com/opencast/opencast/pull/7286)] -
+  Update r/19.x Editor to 19.x-2025-12-18
+- [[#7285](https://github.com/opencast/opencast/pull/7285)] -
+  Update r/19.x Admin UI to 19.x-2025-12-18
 - [[#7284](https://github.com/opencast/opencast/pull/7284)] -
   19.0 release notes
 - [[#7283](https://github.com/opencast/opencast/pull/7283)] -

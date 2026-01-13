@@ -289,7 +289,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       target = "(common-metadata=false)")
   public synchronized void addCatalogUIAdapter(EventCatalogUIAdapter catalogUIAdapter) {
     List<EventCatalogUIAdapter> list = extendedEventCatalogUIAdapters.computeIfAbsent(
-            catalogUIAdapter.getOrganization(), k -> new ArrayList());
+            catalogUIAdapter.getOrganization(), k -> new ArrayList<>());
     list.add(catalogUIAdapter);
   }
 
@@ -1618,8 +1618,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       // extended metadata
       event.resetExtendedMetadata();  // getting rid of old data
 
-      List<EventCatalogUIAdapter> orgAdapters = extendedEventCatalogUIAdapters.getOrDefault(orgId,
-          Collections.emptyList());
+      List<EventCatalogUIAdapter> orgAdapters = extendedEventCatalogUIAdapters.getOrDefault(orgId, new ArrayList<>());
       orgAdapters.addAll(extendedEventCatalogUIAdapters.getOrDefault(ORGANIZATION_WILDCARD, Collections.emptyList()));
       for (EventCatalogUIAdapter extendedCatalogUIAdapter : orgAdapters) {
         for (Catalog catalog: mp.getCatalogs(extendedCatalogUIAdapter.getFlavor())) {
