@@ -68,6 +68,8 @@
     <bundle>mvn:org.codehaus.jettison/jettison/${jettison.version}</bundle>
     <bundle>mvn:org.opencastproject/android-mms/1.2</bundle>
     <bundle>wrap:mvn:com.googlecode.json-simple/json-simple/${json-simple.version}</bundle>
+    <!-- Used by the Lti filter -->
+    <bundle>wrap:mvn:org.imsglobal/basiclti-util/1.2.0</bundle>
 
     <!-- AWS Bits -->
     <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/${jackson.version}</bundle>
@@ -110,7 +112,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-runtime-info/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-scheduler-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-security-aai/${project.version}</bundle>
-    <!-- bundle start-level="82">mvn:org.opencastproject/opencast-security-lti/${project.version}</bundle -->
+    <bundle start-level="82">mvn:org.opencastproject/opencast-security-lti/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-security-shibboleth/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-security-ldap/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-series-service-api/${project.version}</bundle>
@@ -183,7 +185,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-live-schedule-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-live-schedule-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-logging-workflowoperation/${project.version}</bundle>
-    <!-- bundle start-level="82">mvn:org.opencastproject/opencast-lti/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-lti/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-lti-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-lti-service-impl/${project.version}</bundle -->
     <bundle start-level="82">mvn:org.opencastproject/opencast-matrix-notification-workflowoperation/${project.version}</bundle>
@@ -295,7 +297,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-live-schedule-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-live-schedule-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-logging-workflowoperation/${project.version}</bundle>
-    <!-- bundle start-level="82">mvn:org.opencastproject/opencast-lti/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-lti/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-lti-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-lti-service-impl/${project.version}</bundle -->
     <bundle start-level="82">mvn:org.opencastproject/opencast-matrix-notification-workflowoperation/${project.version}</bundle>
@@ -422,7 +424,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-live-schedule-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-live-schedule-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-logging-workflowoperation/${project.version}</bundle>
-    <!-- bundle start-level="82">mvn:org.opencastproject/opencast-lti/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-lti/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-lti-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-lti-service-impl/${project.version}</bundle -->
     <bundle start-level="82">mvn:org.opencastproject/opencast-matrix-notification-workflowoperation/${project.version}</bundle>
@@ -589,9 +591,9 @@
     <bundle start-level="83">mvn:org.opencastproject/opencast-editor-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-engage-paella-player-8/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-engage-ui/${project.version}</bundle>
-    <!-- bundle start-level="82">mvn:org.opencastproject/opencast-lti/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-lti/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-lti-service-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-lti-service-remote/${project.version}</bundle -->
+    <bundle start-level="82">mvn:org.opencastproject/opencast-lti-service-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-oaipmh/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-oaipmh-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-oaipmh-persistence/${project.version}</bundle>

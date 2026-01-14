@@ -75,10 +75,9 @@ public class SpringSecurityConfigurationArtifactInstaller implements ArtifactIns
   protected UserDetailsService userDetailsService = null;
   /** The user reference provider service reference for Spring beans */
   protected UserReferenceProvider userReferenceProvider = null;
-  /** The OAuthConsumerDetailsService dependency for Spring beans */
-  // protected OAuthConsumerDetailsService oAuthConsumerDetailsService = null;
-  /** The OAuthAuthenticationHandler dependency for Spring beans */
-  // protected OAuth2AuthenticationManager ltiLaunchAuthenticationHandler = null;
+  /** LTI 1.1. configuration services */
+  protected OAuthConsumerDetailsService oAuthConsumerDetailsService = null;
+  protected LtiLaunchAuthenticationHandler ltiLaunchAuthenticationHandler = null;
 
   /** Spring application contexts */
   protected Map<String, GenericApplicationContext> appContexts = null;
@@ -113,14 +112,18 @@ public class SpringSecurityConfigurationArtifactInstaller implements ArtifactIns
     logger.info("Set UserReferenceProvider");
     this.userReferenceProvider = userReferenceProvider;
   }
-  // @Reference(cardinality = ReferenceCardinality.OPTIONAL)
-  // void setOAuthConsumerDetailsService(OAuthConsumerDetailsService oAuthConsumerDetailsService) {
-  // this.oAuthConsumerDetailsService = oAuthConsumerDetailsService;
-  // }
-  // @Reference
-  // void setLtiLaunchAuthenticationHandler(OAuth2AuthenticationManager ltiLaunchAuthenticationHandler) {
-  // this.ltiLaunchAuthenticationHandler = ltiLaunchAuthenticationHandler;
-  // }
+
+  @Reference
+  void setOAuthConsumerDetailsService(OAuthConsumerDetailsService oAuthConsumerDetailsService) {
+    logger.info("Set setOAuthConsumerDetailsService");
+    this.oAuthConsumerDetailsService = oAuthConsumerDetailsService;
+  }
+
+  @Reference
+  void setLtiLaunchAuthenticationHandler(LtiLaunchAuthenticationHandler ltiLaunchAuthenticationHandler) {
+    logger.info("Set LtiLaunchAuthenticationHandler");
+    this.ltiLaunchAuthenticationHandler = ltiLaunchAuthenticationHandler;
+  }
 
   /**
    * OSGI activation callback
@@ -171,10 +174,9 @@ public class SpringSecurityConfigurationArtifactInstaller implements ArtifactIns
     orgAppContext.getBeanFactory().registerSingleton("userDirectoryService", this.userDirectory);
     orgAppContext.getBeanFactory().registerSingleton("userDetailsService", this.userDetailsService);
     orgAppContext.getBeanFactory().registerSingleton("userReferenceProvider", this.userReferenceProvider);
-    // orgAppContext.getBeanFactory().registerSingleton("oAuthConsumerDetailsService",
-    // this.oAuthConsumerDetailsService);
-    // orgAppContext.getBeanFactory().registerSingleton("ltiLaunchAuthenticationHandler",
-    // this.ltiLaunchAuthenticationHandler);
+    orgAppContext.getBeanFactory().registerSingleton("oAuthConsumerDetailsService", this.oAuthConsumerDetailsService);
+    orgAppContext.getBeanFactory().registerSingleton("ltiLaunchAuthenticationHandler",
+            this.ltiLaunchAuthenticationHandler);
 
     XmlBeanDefinitionReader xmlBeanDefinitionReader = new XmlBeanDefinitionReader(orgAppContext);
     // So that it finds META-INF/spring.handlers

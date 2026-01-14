@@ -52,6 +52,19 @@
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
     </dependency>
+    <!-- LTI 1.1 begin -->
+    <dependency>
+      <groupId>org.imsglobal</groupId>
+	  <artifactId>basiclti-util</artifactId>
+	  <version>1.2.0</version>
+	  <exclusions>
+        <exclusion>
+          <groupId>org.apache.httpcomponents</groupId>
+          <artifactId>httpclient</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <!-- LTI 1.1 end -->  
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
@@ -277,7 +290,6 @@
         <configuration>
           <instructions>
             <Embed-Dependency>
-                <!-- spring-security-oauth;inline=true, -->
                 jboss-xacml;inline=true
             </Embed-Dependency>
             <!-- #DCE When loading the beans, setting the spring application context class
@@ -291,22 +303,6 @@
 				org.springframework.web.filter,
 				*
 			</Import-Package>
-			<!--
-              !org.springframework.jdbc.core.*,
-              !org.springframework.security.core.codec.*,
-              !org.w3c.dom.*,
-              !sun.net.www.protocol.*,
-              javax.mail.*,
-              javax.servlet.*,
-              javax.xml.datatype;version=0.0.0,
-              javax.xml.namespace;version=0.0.0,
-              javax.xml.parsers;version=0.0.0,
-              javax.xml.validation;version=0.0.0,
-              org.xml.sax;version=0,
-              javax.ws.rs;version=2.0.1,
-              javax.ws.rs.core;version=2.0.1,
-              javax.ws.rs.ext;version=2.0.1
-            </Import-Package -->
             <Export-Package>
               org.opencastproject.kernel.http;version=${project.version},
               org.opencastproject.kernel.http.api;version=${project.version},
@@ -321,9 +317,6 @@
               org.opencastproject.kernel.security.persistence;version=${project.version},
               org.opencastproject.kernel.bundleinfo;version=${project.version},
             </Export-Package>
-            <!-- _exportcontents>
-              org.springframework.security.oauth.*
-            <exportcontents -->
             <Meta-Persistence>
               META-INF/persistence.xml
             </Meta-Persistence>
