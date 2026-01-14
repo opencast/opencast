@@ -29,6 +29,7 @@ import com.google.api.services.youtube.model.PlaylistItemListResponse;
 import com.google.api.services.youtube.model.PlaylistListResponse;
 import com.google.api.services.youtube.model.Video;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -85,6 +86,15 @@ public interface YouTubeAPIVersion3Service {
    * @throws IOException when transaction fails.
    */
   Video addVideoToMyChannel(VideoUpload videoUpload) throws IOException;
+
+  /**
+   * Set a thumbnail for a video.
+   * @param videoId the video id
+   * @param thumbnail the thumbnail file
+   * @param mimeType the thumbnail mime type
+   * @throws IOException when transaction fails.
+   */
+  void setThumbnail(String videoId, File thumbnail, String mimeType) throws IOException;
 
   /**
    * Add a previously uploaded video to specified YouTube playlist.
