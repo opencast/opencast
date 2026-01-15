@@ -138,6 +138,7 @@ public abstract class AbstractElasticsearchQueryBuilder<T extends SearchQuery> i
     if (text != null) {
       MultiMatchQueryBuilder queryBuilder = QueryBuilders.multiMatchQuery(text);
       queryBuilder.field(TEXT, 1.2f);
+      queryBuilder.field("text_technical", 0.8f);
       additionalMultiQueryFields.forEach(field -> queryBuilder.field(field, 1.0f));
       queryBuilder.type(MultiMatchQueryBuilder.Type.BEST_FIELDS);
       queryBuilder.operator(Operator.AND);

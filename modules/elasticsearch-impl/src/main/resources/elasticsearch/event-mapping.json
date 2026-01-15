@@ -235,7 +235,13 @@
         "text": {
             "type" : "search_as_you_type",
             "analyzer": "autocomplete_analyzer",
-            "search_analyzer": "whitespace_analyzer"
+            "search_analyzer": "whitespace_analyzer",
+            "copy_to": "text_technical"
+        },
+        "text_technical": {
+            "type" : "search_as_you_type",
+            "analyzer": "autocomplete_analyzer_technical",
+            "search_analyzer": "whitespace_analyzer_technical"
         }
     },
     "dynamic_templates" : [

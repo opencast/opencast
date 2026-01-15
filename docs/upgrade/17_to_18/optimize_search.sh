@@ -7,8 +7,8 @@ set -o pipefail
 ES_HOST="http://localhost:9200"
 
 # Elasticsearch authentication
-ES_USER="your_username"
-ES_PASS="your_password"
+ES_USER=""
+ES_PASS=""
 
 if ! command -v jq &> /dev/null; then
     echo "Error: jq is not installed. Please install it and try again." >&2
