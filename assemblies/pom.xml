@@ -134,6 +134,7 @@
               <feature>opencast-plugin-usertracking</feature>
               <feature>opencast-plugin-graphql</feature>
               <feature>opencast-plugin-paella7</feature>
+              <feature>opencast-plugin-v20-migration</feature>
             </installedFeatures>
           </configuration>
         </plugin>

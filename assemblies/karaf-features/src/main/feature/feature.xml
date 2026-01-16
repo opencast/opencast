@@ -745,6 +745,15 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-crop-ffmpeg/${project.version}</bundle>
   </feature>
 
+  <feature name="opencast-plugin-v20-migration" version="${project.version}">
+    <conditional>
+      <condition>opencast-allinone</condition>
+      <condition>opencast-admin</condition>
+      <condition>opencast-adminpresentation</condition>
+    </conditional>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-asset-manager-migration/${project.version}</bundle>
+  </feature>
+
   <feature name="opencast-pluginmanager" version="${project.version}">
     <feature>opencast-core</feature>
     <bundle start-level="86">mvn:org.opencastproject/opencast-plugin-manager/${project.version}</bundle>

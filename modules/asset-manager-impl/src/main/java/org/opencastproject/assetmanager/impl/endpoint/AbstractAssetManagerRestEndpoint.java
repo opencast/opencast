@@ -70,7 +70,6 @@ import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.HeaderParam;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -505,23 +504,5 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
     }
 
     throw new WebApplicationException(e, Response.Status.INTERNAL_SERVER_ERROR);
-  }
-
-  @PUT
-  @Path("snapshot/catalog")
-  @RestQuery(name = "updateCatalogs",
-      description = "Adds missing episode catalogs to the snapshot Database to allow reindexing without accessing the "
-        + "filesystem.",
-      responses = {
-        @RestResponse(description = "OK if repopulation has started", responseCode = SC_OK)
-      },
-      returnDescription = "OK if repopulation has started.")
-  public Response updateDublincore() {
-    try {
-      getAssetManager().updateCatalogs();
-      return ok();
-    } catch (Exception e) {
-      return handleException(e);
-    }
   }
 }

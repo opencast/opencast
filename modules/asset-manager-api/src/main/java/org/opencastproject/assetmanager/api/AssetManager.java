@@ -202,7 +202,7 @@ public interface AssetManager {
 
   /**
    * Returns a list of {@link Snapshot} filtered by date and mediapackage.
-   * This stream consists of all versions of a mediapackage archived within the 
+   * This stream consists of all versions of a mediapackage archived within the
    * date range ordered by there Version.
    *
    * @param mpId
@@ -444,12 +444,4 @@ public interface AssetManager {
    *          The event ID to trigger an index update for
    */
   void triggerIndexUpdate(String mediaPackageId) throws NotFoundException, UnauthorizedException;
-
-  /**
-   * Add missing catalogs to asset database to improve re-indexing performance
-   * by reducing filesystem accesses
-   *
-   * @throws AssetManagerException
-   */
-  void updateCatalogs() throws AssetManagerException;
 }
