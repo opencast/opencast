@@ -21,14 +21,13 @@
 
 package org.opencastproject.job.api;
 
-import static org.opencastproject.util.data.Monadics.mlist;
-
 import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.IncidentServiceException;
 import org.opencastproject.util.NotFoundException;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -48,7 +47,9 @@ public final class JaxbIncidentFullList {
   }
 
   public JaxbIncidentFullList(IncidentService svc, Locale locale, List<Incident> incidents)
-          throws IncidentServiceException, NotFoundException {
-    this.incidents = mlist(incidents).map(JaxbIncidentFull.mkFn(svc, locale)).value();
+      throws IncidentServiceException, NotFoundException {
+    this.incidents = incidents.stream()
+        .map(JaxbIncidentFull.mkFn(svc, locale))
+        .collect(Collectors.toList());
   }
 }

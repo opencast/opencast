@@ -32,7 +32,6 @@ import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.selector.TrackSelector;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Function2;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -57,6 +56,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 
 /**
@@ -102,8 +102,8 @@ public class SanitizeAdaptiveWorkflowOperationHandler extends AbstractWorkflowOp
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(
+   *      org.opencastproject.workflow.api.WorkflowInstance, JobContext)
    */
   @Override
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
@@ -145,24 +145,8 @@ public class SanitizeAdaptiveWorkflowOperationHandler extends AbstractWorkflowOp
 
     // Read the configuration properties
     MediaPackageElementFlavor sourceFlavor = tagsAndFlavors.getSingleSrcFlavor();
-    List<String> targetTrackTags = tagsAndFlavors.getTargetTags();
+    ConfiguredTagsAndFlavors.TargetTags targetTrackTags = tagsAndFlavors.getTargetTags();
     MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor();
-
-    List<String> removeTags = new ArrayList<String>();
-    List<String> addTags = new ArrayList<String>();
-    List<String> overrideTags = new ArrayList<String>();
-
-    if (!targetTrackTags.isEmpty()) {
-      for (String tag : targetTrackTags) {
-        if (tag.startsWith(MINUS)) {
-          removeTags.add(tag);
-        } else if (tag.startsWith(PLUS)) {
-          addTags.add(tag);
-        } else {
-          overrideTags.add(tag);
-        }
-      }
-    }
 
     // Select those tracks that have matching flavors
     TrackSelector trackSelector = new TrackSelector();
@@ -194,23 +178,19 @@ public class SanitizeAdaptiveWorkflowOperationHandler extends AbstractWorkflowOp
      * Adds new file to Mediapackage to replace old Track, while retaining all properties. Also sets the target flavor
      * and target tags
      */
-    Function2<File, Track, Track> replaceHLSPlaylistInWS = new Function2<File, Track, Track>() {
-      @Override
-      public Track apply(File file, Track track) {
-        try {
-          InputStream inputStream = new FileInputStream(file);
-          // put file into workspace for mp
-          URI uri = workspace.put(mediaPackage.getIdentifier().toString(), track.getIdentifier(), file.getName(),
-                  inputStream);
-          track.setURI(uri); // point track to new URI
-          handleTags(track, targetFlavor, overrideTags, removeTags, addTags); // add tags and flavor
-          return track;
-        } catch (Exception e) {
-          logger.error("Cannot add track file to mediapackage in workspace: {} {} ",
-                  mediaPackage.getIdentifier().toString(),
-                  file);
-          return null;
-        }
+    BiFunction<File, Track, Track> replaceHLSPlaylistInWS = (file, track) -> {
+      try (InputStream inputStream = new FileInputStream(file)) {
+        // put file into workspace for mp
+        URI uri = workspace.put(mediaPackage.getIdentifier().toString(), track.getIdentifier(), file.getName(),
+            inputStream);
+        track.setURI(uri); // point track to new URI
+        handleTags(track, targetFlavor, targetTrackTags); // add tags and flavor
+        return track;
+      } catch (Exception e) {
+        logger.error("Cannot add track file to mediapackage in workspace: {} {} ",
+            mediaPackage.getIdentifier().toString(),
+            file);
+        return null;
       }
     };
     // remove old tracks if the entire operation succeeds, or remove new tracks if any of them fails
@@ -237,13 +217,13 @@ public class SanitizeAdaptiveWorkflowOperationHandler extends AbstractWorkflowOp
       }
       for (Track track : tracks) { // Update the flavor and tags for all non HLS segments
         if (!AdaptivePlaylist.isPlaylist(track.getURI().getPath())) {
-          handleTags(track, targetFlavor, overrideTags, removeTags, addTags);
+          handleTags(track, targetFlavor, targetTrackTags);
           logger.info("Set flavor {} and tags to {} ", track, targetFlavor);
         }
       }
     } else { // change flavor to mark as sanitized
       for (Track track : tracks) {
-        handleTags(track, targetFlavor, overrideTags, removeTags, addTags);
+        handleTags(track, targetFlavor, targetTrackTags);
         logger.info("Set flavor {} and tags to {} ", track, targetFlavor);
       }
     }
@@ -251,33 +231,20 @@ public class SanitizeAdaptiveWorkflowOperationHandler extends AbstractWorkflowOp
   }
 
   // Add the target tags and flavor
-  private void handleTags(Track track, MediaPackageElementFlavor targetFlavor, List<String> overrideTags,
-          List<String> removeTags, List<String> addTags) {
+  private void handleTags(Track track, MediaPackageElementFlavor targetFlavor,
+      ConfiguredTagsAndFlavors.TargetTags targetTags) {
     if (targetFlavor != null) {
       String flavorType = targetFlavor.getType();
       String flavorSubtype = targetFlavor.getSubtype();
-      if ("*".equals(flavorType))
+      if ("*".equals(flavorType)) {
         flavorType = track.getFlavor().getType();
-      if ("*".equals(flavorSubtype))
+      }
+      if ("*".equals(flavorSubtype)) {
         flavorSubtype = track.getFlavor().getSubtype();
+      }
       track.setFlavor(new MediaPackageElementFlavor(flavorType, flavorSubtype));
       logger.debug("Composed track has flavor '{}'", track.getFlavor());
     }
-    if (overrideTags.size() > 0) {
-      track.clearTags();
-      for (String tag : overrideTags) {
-        logger.trace("Tagging composed track with '{}'", tag);
-        track.addTag(tag);
-      }
-    } else {
-      for (String tag : removeTags) {
-        logger.trace("Remove tagging '{}' from composed track", tag);
-        track.removeTag(tag.substring(MINUS.length()));
-      }
-      for (String tag : addTags) {
-        logger.trace("Add tagging '{}' to composed track", tag);
-        track.addTag(tag.substring(PLUS.length()));
-      }
-    }
+    applyTargetTagsToElement(targetTags, track);
   }
 }

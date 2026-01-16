@@ -147,7 +147,8 @@ public class EventCatalogUIAdapterTest {
   public void testGetFields() throws Exception {
     String eventJson = IOUtils.toString(getClass().getResource("/catalog-adapter/event.json"));
 
-    ConfigurableEventDCCatalogUIAdapter configurationDublinCoreCatalogUIAdapter = new ConfigurableEventDCCatalogUIAdapter();
+    ConfigurableEventDCCatalogUIAdapter configurationDublinCoreCatalogUIAdapter =
+        new ConfigurableEventDCCatalogUIAdapter();
     configurationDublinCoreCatalogUIAdapter.setListProvidersService(listProvidersService);
     configurationDublinCoreCatalogUIAdapter.setWorkspace(workspace);
     configurationDublinCoreCatalogUIAdapter.updated(eventProperties);

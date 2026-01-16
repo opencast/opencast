@@ -61,7 +61,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 /**
  * This workflow operation processes a Webvtt into CutMarks
@@ -194,7 +193,7 @@ public class WebvttToCutMarksWorkflowOperationHandler extends AbstractWorkflowOp
       );
     }
 
-    Optional<String> trackFlavor = Optional.ofNullable(getOptConfig(workflowInstance, CFGK_TRACK_FLAVOR).orNull());
+    Optional<String> trackFlavor = getOptConfig(workflowInstance, CFGK_TRACK_FLAVOR);
 
     String treatmentStrStart = getConfig(
             workflowInstance,
@@ -286,10 +285,11 @@ public class WebvttToCutMarksWorkflowOperationHandler extends AbstractWorkflowOp
       cutMarks.add(lastMark);
 
 
-      // handle start and end
-      // crop start and end
-      // (assumes that cropping is only necessary due to the bufferTime, does not include cases like the webvtt having timestamps outside of the videos runtime)
-      // (also assumes that the video starts at 0)
+      // handle start and end.
+      // crop start and end.
+      // (assumes that cropping is only necessary due to the bufferTime, does not include cases like the webvtt having
+      // timestamps outside of the videos runtime).
+      // (also assumes that the video starts at 0).
       Times firstCutMark = cutMarks.get(0);
       if (treatmentStart == Treatment.ALWAYS_INCLUDE) {
         updateTimesBegin(firstCutMark, 0L);
@@ -343,7 +343,7 @@ public class WebvttToCutMarksWorkflowOperationHandler extends AbstractWorkflowOp
 
       MediaPackageElementBuilder mpeBuilder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
       MediaPackageElement mpe = mpeBuilder.newElement(MediaPackageElement.Type.Attachment, targetFlavor);
-      mpe.setIdentifier(UUID.randomUUID().toString());
+      mpe.generateIdentifier();
 
       URI cutMarksURI = workspace.put(mp.getIdentifier().toString(), mpe.getIdentifier(), TARGET_FILENAME, cutMarksOut);
 
@@ -387,7 +387,8 @@ public class WebvttToCutMarksWorkflowOperationHandler extends AbstractWorkflowOp
           logger.debug("WebVTT InputStream is null (mediapackage {})", mp.getIdentifier().toString());
         }
       } catch (IOException e) {
-        logger.warn("Couldn't close '{}' properly (mediapackage {})", webvttURI.toString(), mp.getIdentifier().toString());
+        logger.warn("Couldn't close '{}' properly (mediapackage {})", webvttURI.toString(),
+            mp.getIdentifier().toString());
       }
     }
 

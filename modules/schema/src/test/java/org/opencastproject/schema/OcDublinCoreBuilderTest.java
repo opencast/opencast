@@ -25,11 +25,10 @@ import static org.junit.Assert.assertEquals;
 import static org.opencastproject.schema.test.TestUtil.randomDc;
 import static org.opencastproject.util.ReflectionUtil.run;
 
-import org.opencastproject.util.data.Option;
-
 import org.junit.Test;
 
 import java.util.Date;
+import java.util.Optional;
 
 public class OcDublinCoreBuilderTest {
   @Test
@@ -37,277 +36,277 @@ public class OcDublinCoreBuilderTest {
     final OcDublinCore source = randomDc();
     final OcDublinCoreBuilder target = OcDublinCoreBuilder.create(source);
     run(OcDublinCore.class, new OcDublinCore() {
-      @Override public Option<String> getAbstract() {
+      @Override public Optional<String> getAbstract() {
         assertEquals("abstract copy", source.getAbstract(), target.abstrakt);
         return null;
       }
 
-      @Override public Option<String> getAccessRights() {
+      @Override public Optional<String> getAccessRights() {
         assertEquals("accessRights copy", source.getAccessRights(), target.accessRights);
         return null;
       }
 
-      @Override public Option<String> getAccrualMethod() {
+      @Override public Optional<String> getAccrualMethod() {
         assertEquals("accrualMethod copy", source.getAccrualMethod(), target.accrualMethod);
         return null;
       }
 
-      @Override public Option<String> getAccrualPeriodicity() {
+      @Override public Optional<String> getAccrualPeriodicity() {
         assertEquals("accrualPeriodicity copy", source.getAccrualPeriodicity(), target.accrualPeriodicity);
         return null;
       }
 
-      @Override public Option<String> getAccrualPolicy() {
+      @Override public Optional<String> getAccrualPolicy() {
         assertEquals("accrualPolicy copy", source.getAccrualPolicy(), target.accrualPolicy);
         return null;
       }
 
-      @Override public Option<String> getAlternative() {
+      @Override public Optional<String> getAlternative() {
         assertEquals("alternative copy", source.getAlternative(), target.alternative);
         return null;
       }
 
-      @Override public Option<String> getAudience() {
+      @Override public Optional<String> getAudience() {
         assertEquals("audience copy", source.getAudience(), target.audience);
         return null;
       }
 
-      @Override public Option<String> getAvailable() {
+      @Override public Optional<String> getAvailable() {
         assertEquals("available copy", source.getAvailable(), target.available);
         return null;
       }
 
-      @Override public Option<String> getBibliographicCitation() {
+      @Override public Optional<String> getBibliographicCitation() {
         assertEquals("bibliographicCitation copy", source.getBibliographicCitation(), target.bibliographicCitation);
         return null;
       }
 
-      @Override public Option<String> getConformsTo() {
+      @Override public Optional<String> getConformsTo() {
         assertEquals("conformsTo copy", source.getConformsTo(), target.conformsTo);
         return null;
       }
 
-      @Override public Option<String> getContributor() {
+      @Override public Optional<String> getContributor() {
         assertEquals("contributor copy", source.getContributor(), target.contributor);
         return null;
       }
 
-      @Override public Option<String> getCoverage() {
+      @Override public Optional<String> getCoverage() {
         assertEquals("coverage copy", source.getCoverage(), target.coverage);
         return null;
       }
 
       @Override public Date getCreated() {
-        assertEquals("created copy", source.getCreated(), target.created.getOrElseNull());
+        assertEquals("created copy", source.getCreated(), target.created.orElse(null));
         return null;
       }
 
-      @Override public Option<String> getCreator() {
+      @Override public Optional<String> getCreator() {
         assertEquals("creator copy", source.getCreator(), target.creator);
         return null;
       }
 
-      @Override public Option<Date> getDate() {
+      @Override public Optional<Date> getDate() {
         assertEquals("date copy", source.getDate(), target.date);
         return null;
       }
 
-      @Override public Option<Date> getDateAccepted() {
+      @Override public Optional<Date> getDateAccepted() {
         assertEquals("dateAccepted copy", source.getDateAccepted(), target.dateAccepted);
         return null;
       }
 
-      @Override public Option<Date> getDateCopyrighted() {
+      @Override public Optional<Date> getDateCopyrighted() {
         assertEquals("dateCopyrighted copy", source.getDateCopyrighted(), target.dateCopyrighted);
         return null;
       }
 
-      @Override public Option<Date> getDateSubmitted() {
+      @Override public Optional<Date> getDateSubmitted() {
         assertEquals("dateSubmitted copy", source.getDateSubmitted(), target.dateSubmitted);
         return null;
       }
 
-      @Override public Option<String> getDescription() {
+      @Override public Optional<String> getDescription() {
         assertEquals("description copy", source.getDescription(), target.description);
         return null;
       }
 
-      @Override public Option<String> getEducationLevel() {
+      @Override public Optional<String> getEducationLevel() {
         assertEquals("educationLevel copy", source.getEducationLevel(), target.educationLevel);
         return null;
       }
 
-      @Override public Option<Long> getExtent() {
+      @Override public Optional<Long> getExtent() {
         assertEquals("extent copy", source.getExtent(), target.extent);
         return null;
       }
 
-      @Override public Option<String> getFormat() {
+      @Override public Optional<String> getFormat() {
         assertEquals("format copy", source.getFormat(), target.format);
         return null;
       }
 
-      @Override public Option<String> getHasFormat() {
+      @Override public Optional<String> getHasFormat() {
         assertEquals("hasFormat copy", source.getHasFormat(), target.hasFormat);
         return null;
       }
 
-      @Override public Option<String> getHasPart() {
+      @Override public Optional<String> getHasPart() {
         assertEquals("hasPart copy", source.getHasPart(), target.hasPart);
         return null;
       }
 
-      @Override public Option<String> getHasVersion() {
+      @Override public Optional<String> getHasVersion() {
         assertEquals("hasVersion copy", source.getHasVersion(), target.hasVersion);
         return null;
       }
 
-      @Override public Option<String> getIdentifier() {
+      @Override public Optional<String> getIdentifier() {
         assertEquals("identifier copy", source.getIdentifier(), target.identifier);
         return null;
       }
 
-      @Override public Option<String> getInstructionalMethod() {
+      @Override public Optional<String> getInstructionalMethod() {
         assertEquals("instructionalMethod copy", source.getInstructionalMethod(), target.instructionalMethod);
         return null;
       }
 
-      @Override public Option<String> getIsFormatOf() {
+      @Override public Optional<String> getIsFormatOf() {
         assertEquals("isFormatOf copy", source.getIsFormatOf(), target.isFormatOf);
         return null;
       }
 
-      @Override public Option<String> getIsPartOf() {
+      @Override public Optional<String> getIsPartOf() {
         assertEquals("isPartOf copy", source.getIsPartOf(), target.isPartOf);
         return null;
       }
 
-      @Override public Option<String> getIsReferencedBy() {
+      @Override public Optional<String> getIsReferencedBy() {
         assertEquals("isReferencedBy copy", source.getIsReferencedBy(), target.isReferencedBy);
         return null;
       }
 
-      @Override public Option<String> getIsReplacedBy() {
+      @Override public Optional<String> getIsReplacedBy() {
         assertEquals("isReplacedBy copy", source.getIsReplacedBy(), target.isReplacedBy);
         return null;
       }
 
-      @Override public Option<String> getIsRequiredBy() {
+      @Override public Optional<String> getIsRequiredBy() {
         assertEquals("isRequiredBy copy", source.getIsRequiredBy(), target.isRequiredBy);
         return null;
       }
 
-      @Override public Option<String> getIssued() {
+      @Override public Optional<String> getIssued() {
         assertEquals("issued copy", source.getIssued(), target.issued);
         return null;
       }
 
-      @Override public Option<String> getIsVersionOf() {
+      @Override public Optional<String> getIsVersionOf() {
         assertEquals("isVersionOf copy", source.getIsVersionOf(), target.isVersionOf);
         return null;
       }
 
-      @Override public Option<String> getLanguage() {
+      @Override public Optional<String> getLanguage() {
         assertEquals("language copy", source.getLanguage(), target.language);
         return null;
       }
 
-      @Override public Option<String> getLicense() {
+      @Override public Optional<String> getLicense() {
         assertEquals("license copy", source.getLicense(), target.license);
         return null;
       }
 
-      @Override public Option<String> getMediator() {
+      @Override public Optional<String> getMediator() {
         assertEquals("mediator copy", source.getMediator(), target.mediator);
         return null;
       }
 
-      @Override public Option<String> getMedium() {
+      @Override public Optional<String> getMedium() {
         assertEquals("medium copy", source.getMedium(), target.medium);
         return null;
       }
 
-      @Override public Option<String> getModified() {
+      @Override public Optional<String> getModified() {
         assertEquals("modified copy", source.getModified(), target.modified);
         return null;
       }
 
-      @Override public Option<String> getProvenance() {
+      @Override public Optional<String> getProvenance() {
         assertEquals("provenance copy", source.getProvenance(), target.provenance);
         return null;
       }
 
-      @Override public Option<String> getPublisher() {
+      @Override public Optional<String> getPublisher() {
         assertEquals("publisher copy", source.getPublisher(), target.publisher);
         return null;
       }
 
-      @Override public Option<String> getReferences() {
+      @Override public Optional<String> getReferences() {
         assertEquals("references copy", source.getReferences(), target.references);
         return null;
       }
 
-      @Override public Option<String> getRelation() {
+      @Override public Optional<String> getRelation() {
         assertEquals("relation copy", source.getRelation(), target.relation);
         return null;
       }
 
-      @Override public Option<String> getReplaces() {
+      @Override public Optional<String> getReplaces() {
         assertEquals("replaces copy", source.getReplaces(), target.replaces);
         return null;
       }
 
-      @Override public Option<String> getRequires() {
+      @Override public Optional<String> getRequires() {
         assertEquals("requires copy", source.getRequires(), target.requires);
         return null;
       }
 
-      @Override public Option<String> getRights() {
+      @Override public Optional<String> getRights() {
         assertEquals("rights copy", source.getRights(), target.rights);
         return null;
       }
 
-      @Override public Option<String> getRightsHolder() {
+      @Override public Optional<String> getRightsHolder() {
         assertEquals("rightsHolder copy", source.getRightsHolder(), target.rightsHolder);
         return null;
       }
 
-      @Override public Option<String> getSource() {
+      @Override public Optional<String> getSource() {
         assertEquals("source copy", source.getSource(), target.source);
         return null;
       }
 
-      @Override public Option<String> getSpatial() {
+      @Override public Optional<String> getSpatial() {
         assertEquals("spatial copy", source.getSpatial(), target.spatial);
         return null;
       }
 
-      @Override public Option<String> getSubject() {
+      @Override public Optional<String> getSubject() {
         assertEquals("subject copy", source.getSubject(), target.subject);
         return null;
       }
 
-      @Override public Option<String> getTableOfContents() {
+      @Override public Optional<String> getTableOfContents() {
         assertEquals("tableOfContents copy", source.getTableOfContents(), target.tableOfContents);
         return null;
       }
 
-      @Override public Option<String> getTemporal() {
+      @Override public Optional<String> getTemporal() {
         assertEquals("temporal copy", source.getTemporal(), target.temporal);
         return null;
       }
 
       @Override public String getTitle() {
-        assertEquals("title copy", source.getTitle(), target.title.getOrElseNull());
+        assertEquals("title copy", source.getTitle(), target.title.orElse(null));
         return null;
       }
 
-      @Override public Option<String> getType() {
+      @Override public Optional<String> getType() {
         assertEquals("type copy", source.getType(), target.type);
         return null;
       }
 
-      @Override public Option<String> getValid() {
+      @Override public Optional<String> getValid() {
         assertEquals("valid copy", source.getValid(), target.valid);
         return null;
       }

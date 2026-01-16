@@ -27,6 +27,6 @@
  * components that are not described in the API.
  * <p>
  * Please note that none of the classes and methods accepts or yields null values.
- * Optionality is always indicated by the use of type {@link com.entwinemedia.fn.data.Opt}.
+ * Optionality is always indicated by the use of type {@link java.util.Optional}.
  */
 package org.opencastproject.assetmanager.impl;

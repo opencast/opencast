@@ -126,7 +126,8 @@ public class DefaultsWorkflowOperationHandlerTest {
    *          Whether to provide an event level value for the key
    * @return A {@link WorkflowInstance} ready to run a test of {@link DefaultsWorkflowOperationHandler}
    */
-  private WorkflowInstance setupInstance(String seriesID, Map<String, String> workflowConfiguration, boolean provideEventValue) {
+  private WorkflowInstance setupInstance(String seriesID, Map<String, String> workflowConfiguration,
+      boolean provideEventValue) {
     WorkflowOperationInstance operation = EasyMock.createMock(WorkflowOperationInstance.class);
     EasyMock.expect(operation.getConfigurationKeys()).andReturn(workflowConfiguration.keySet());
     EasyMock.expect(operation.getConfiguration(OPT_KEY)).andReturn(WORKFLOW_PRESET_VALUE);

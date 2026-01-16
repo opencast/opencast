@@ -37,8 +37,8 @@ public interface CatalogUIAdapter {
   String ORGANIZATION_WILDCARD = "*";
 
   /**
-   * Returns the name of the organization (tenant) this catalog UI adapter belongs to or {@value #ORGANIZATION_WILDCARD} if this is a
-   * tenant-agnostic adapter.
+   * Returns the name of the organization (tenant) this catalog UI adapter belongs to or {@value #ORGANIZATION_WILDCARD}
+   * if this is a tenant-agnostic adapter.
    *
    * @return The organization name or {@value #ORGANIZATION_WILDCARD}
    */

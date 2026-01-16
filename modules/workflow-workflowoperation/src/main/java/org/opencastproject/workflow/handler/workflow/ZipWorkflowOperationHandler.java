@@ -110,7 +110,7 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
 
   /** Key for configuring the location of the archive-temp folder */
   public static final String ZIP_ARCHIVE_TEMP_DIR_CFG_KEY =
-    "org.opencastproject.workflow.handler.workflow.ZipWorkflowOperationHandler.tmpdir";
+      "org.opencastproject.workflow.handler.workflow.ZipWorkflowOperationHandler.tmpdir";
 
   /** The default flavor to use for a mediapackage archive */
   public static final MediaPackageElementFlavor DEFAULT_ARCHIVE_FLAVOR = MediaPackageElementFlavor
@@ -147,7 +147,8 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
    *
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#activate(org.osgi.service.component.ComponentContext)
+   * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#activate(
+   *      org.osgi.service.component.ComponentContext)
    */
   @Activate
   protected void activate(ComponentContext cc) {
@@ -175,8 +176,8 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
+   * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#start(
+   *      org.opencastproject.workflow.api.WorkflowInstance, JobContext)
    */
   @Override
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
@@ -208,7 +209,7 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
     }
 
     // Read the target tags
-    List<String> targetTags = tagsAndFlavors.getTargetTags();
+    ConfiguredTagsAndFlavors.TargetTags targetTags = tagsAndFlavors.getTargetTags();
 
     // If the configuration does not specify flavors, just zip them all
     if (flavors == null) {
@@ -265,10 +266,7 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
     attachment.setMimeType(MimeTypes.ZIP);
 
     // Apply the target tags
-    for (String tag : targetTags) {
-      attachment.addTag(tag);
-      logger.trace("Tagging the archive of recording '{}' with '{}'", mediaPackage, tag);
-    }
+    applyTargetTagsToElement(targetTags, attachment);
     attachment.setMimeType(MimeTypes.ZIP);
 
     // The zip file is safely in the archive, so it's now safe to attempt to remove the original zip

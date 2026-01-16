@@ -146,8 +146,8 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(
+   *      org.opencastproject.workflow.api.WorkflowInstance, JobContext)
    */
   @Override
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
@@ -195,7 +195,7 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
         Configuration.many, Configuration.one, Configuration.many, Configuration.one);
     MediaPackageElementFlavor sourceVideoFlavor = tagsAndFlavors.getSingleSrcFlavor();
     List<String> sourceTagSet = tagsAndFlavors.getSrcTags();
-    List<String> targetImageTags = tagsAndFlavors.getTargetTags();
+    ConfiguredTagsAndFlavors.TargetTags targetImageTags = tagsAndFlavors.getTargetTags();
     MediaPackageElementFlavor targetImageFlavor = tagsAndFlavors.getSingleTargetFlavor();
     String encodingProfileName = StringUtils.trimToNull(operation.getConfiguration("encoding-profile"));
     String referenceFlavor = StringUtils.trimToNull(operation.getConfiguration("reference-flavor"));
@@ -203,8 +203,9 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
 
     // Find the encoding profile
     EncodingProfile profile = composerService.getProfile(encodingProfileName);
-    if (profile == null)
+    if (profile == null) {
       throw new IllegalStateException("Encoding profile '" + encodingProfileName + "' was not found");
+    }
 
     // Select the tracks based on the tags and flavors
     TrackSelector trackSelector = new TrackSelector();
@@ -239,9 +240,10 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
         Mpeg7Catalog mpeg7 = null;
         if (segmentCatalogs.length > 0) {
           mpeg7 = loadMpeg7Catalog(segmentCatalogs[0]);
-          if (segmentCatalogs.length > 1)
-            logger.warn("More than one segments catalog found for track {}. Resuming with the first one ({})", t,
-                    mpeg7);
+          if (segmentCatalogs.length > 1) {
+            logger.warn("More than one segments catalog found for track {}. Resuming with the first one ({})",
+                t, mpeg7);
+          }
         } else {
           logger.debug("No segments catalog found for track {}", t);
           continue;
@@ -279,8 +281,9 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
 
           // convert to time array
           double[] timeArray = new double[timePointList.size()];
-          for (int i = 0; i < timePointList.size(); i++)
+          for (int i = 0; i < timePointList.size(); i++) {
             timeArray[i] = (double) timePointList.get(i).getTimeInMilliseconds() / 1000;
+          }
 
           Job job = composerService.image(t, profile.getIdentifier(), timeArray);
           if (!waitForStatus(job).isSuccess()) {
@@ -303,8 +306,9 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
 
           for (MediaPackageElement element : composedImages) {
             Attachment composedImage = (Attachment) element;
-            if (composedImage == null)
+            if (composedImage == null) {
               throw new IllegalStateException("Unable to compose image");
+            }
 
             // Add the flavor, either from the operation configuration or from the composer
             if (targetImageFlavor != null) {
@@ -320,10 +324,7 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
             }
 
             // Add tags
-            for (String tag : targetImageTags) {
-              logger.trace("Tagging image with '{}'", tag);
-              composedImage.addTag(tag);
-            }
+            applyTargetTagsToElement(targetImageTags, composedImage);
 
             // Refer to the original track including a timestamp
             MediaPackageReferenceImpl ref = new MediaPackageReferenceImpl(referenceMaster);
@@ -367,13 +368,15 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
         MediaPackageReference ref = e.getReference();
         while (ref != null) {
           MediaPackageElement tr = mediaPackage.getElementByReference(ref);
-          if (tr == null)
+          if (tr == null) {
             break locateReferenceMaster;
+          }
           if (tr.equals(t)) {
             boolean matches = true;
             for (String tag : referenceTagSet) {
-              if (!e.containsTag(tag))
+              if (!e.containsTag(tag)) {
                 matches = false;
+              }
             }
             if (matches) {
               referenceMaster = e;

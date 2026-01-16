@@ -150,8 +150,9 @@ public class ContributorsListProvider implements ResourceListProvider {
       Iterator<User> users = userDirectoryService.findUsers("%", offset, limit);
       while (users.hasNext()) {
         User u = users.next();
-        if (!excludeUserProvider.contains(u.getProvider()) && StringUtils.isNotBlank(u.getName()))
+        if (!excludeUserProvider.contains(u.getProvider()) && StringUtils.isNotBlank(u.getName())) {
           contributorsList.add(u.getName());
+        }
       }
     }
 
@@ -172,11 +173,13 @@ public class ContributorsListProvider implements ResourceListProvider {
     // TODO: The search index can handle limit and offset.
     // TODO: We should not request all data.
     if (query != null) {
-      if (query.getLimit().isSome())
+      if (query.getLimit().isPresent()) {
         limit = query.getLimit().get();
+      }
 
-      if (query.getOffset().isSome())
+      if (query.getOffset().isPresent()) {
         offset = query.getOffset().get();
+      }
     }
 
     int i = 0;

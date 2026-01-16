@@ -21,7 +21,7 @@
 
 package org.opencastproject.kernel.bundleinfo;
 
-import org.opencastproject.util.data.Option;
+import java.util.Optional;
 
 public interface BundleInfo {
   /** The host where the bundle lives. */
@@ -40,5 +40,5 @@ public interface BundleInfo {
   String getBundleVersion();
 
   /** Get the build number, e.g. the git hash. */
-  Option<String> getBuildNumber();
+  Optional<String> getBuildNumber();
 }

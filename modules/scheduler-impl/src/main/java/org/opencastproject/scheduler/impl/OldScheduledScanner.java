@@ -21,8 +21,6 @@
 
 package org.opencastproject.scheduler.impl;
 
-import static org.opencastproject.util.data.Option.some;
-
 import org.opencastproject.kernel.scanner.AbstractBufferScanner;
 import org.opencastproject.kernel.scanner.AbstractScanner;
 import org.opencastproject.scheduler.api.SchedulerException;
@@ -46,6 +44,8 @@ import org.quartz.Scheduler;
 import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Optional;
 
 @Component(
     immediate = true,
@@ -133,7 +133,9 @@ public class OldScheduledScanner extends AbstractBufferScanner implements Manage
    * @param service
    */
   public void unsetService(SchedulerService service) {
-    this.service = null;
+    if (this.service == service) {
+      this.service = null;
+    }
   }
 
   @Override
@@ -177,7 +179,7 @@ public class OldScheduledScanner extends AbstractBufferScanner implements Manage
     private static final NeedleEye eye = new NeedleEye();
 
     public Runner() {
-      super(some(eye));
+      super(Optional.of(eye));
     }
 
     @Override

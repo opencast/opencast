@@ -101,7 +101,8 @@ public class TextAnnotationImpl implements TextAnnotation {
   }
 
   /**
-   * @see org.opencastproject.metadata.mpeg7.TextAnnotation#addKeywordAnnotation(org.opencastproject.metadata.mpeg7.KeywordAnnotation)
+   * @see org.opencastproject.metadata.mpeg7.TextAnnotation#addKeywordAnnotation(
+   * org.opencastproject.metadata.mpeg7.KeywordAnnotation)
    */
   public void addKeywordAnnotation(KeywordAnnotation keywordAnnotation) {
     keywordAnnotations.add(keywordAnnotation);
@@ -118,7 +119,8 @@ public class TextAnnotationImpl implements TextAnnotation {
   }
 
   /**
-   * @see org.opencastproject.metadata.mpeg7.TextAnnotation#addFreeTextAnnotation(org.opencastproject.metadata.mpeg7.FreeTextAnnotation)
+   * @see org.opencastproject.metadata.mpeg7.TextAnnotation#addFreeTextAnnotation(
+   * org.opencastproject.metadata.mpeg7.FreeTextAnnotation)
    */
   public void addFreeTextAnnotation(FreeTextAnnotation freeTextAnnotation) {
     freeTextAnnotations.add(freeTextAnnotation);
@@ -166,12 +168,15 @@ public class TextAnnotationImpl implements TextAnnotation {
     DecimalFormat format = new DecimalFormat("0.0");
     format.setDecimalFormatSymbols(standardSymbols);
     Element node = document.createElement("TextAnnotation");
-    if (confidence >= 0.0)
+    if (confidence >= 0.0) {
       node.setAttribute("confidence", format.format(confidence));
-    if (relevance >= 0.0)
+    }
+    if (relevance >= 0.0) {
       node.setAttribute("relevance", format.format(relevance));
-    if (language != null)
+    }
+    if (language != null) {
       node.setAttribute("xml:lang", language);
+    }
 
     // Keyword anntiations
     if (keywordAnnotations.size() > 0) {

@@ -29,7 +29,6 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.XmlSafeParser;
-import org.opencastproject.util.data.Option;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -42,6 +41,7 @@ import org.w3c.dom.NodeList;
 import java.io.StringWriter;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Optional;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -128,7 +128,7 @@ public final class EventCommentParser {
       Date modificationDate = new Date(DateTimeSupport.fromUTC(modificationDateString));
 
       // Create comment
-      EventComment comment = EventComment.create(Option.option(id), eventId, organization,
+      EventComment comment = EventComment.create(Optional.ofNullable(id), eventId, organization,
           text.trim(), author, reason, resolved, creationDate, modificationDate);
 
       // Replies
@@ -177,7 +177,7 @@ public final class EventCommentParser {
       Date modificationDate = new Date(DateTimeSupport.fromUTC(modificationDateString));
 
       // Create reply
-      return EventCommentReply.create(Option.option(id), text.trim(), author, creationDate, modificationDate);
+      return EventCommentReply.create(Optional.ofNullable(id), text.trim(), author, creationDate, modificationDate);
     } catch (XPathExpressionException e) {
       throw new UnsupportedElementException("Error while reading comment reply information from manifest", e);
     } catch (Exception e) {
@@ -265,7 +265,7 @@ public final class EventCommentParser {
     commentXml.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", NAMESPACE);
 
     // Identifier
-    if (comment.getId().isSome()) {
+    if (comment.getId().isPresent()) {
       commentXml.setAttribute("id", comment.getId().get().toString());
     }
 
@@ -333,7 +333,7 @@ public final class EventCommentParser {
     replyXml.setAttributeNS("http://www.w3.org/2000/xmlns/", "xmlns", NAMESPACE);
 
     // Identifier
-    if (reply.getId().isSome()) {
+    if (reply.getId().isPresent()) {
       replyXml.setAttribute("id", reply.getId().get().toString());
     }
 

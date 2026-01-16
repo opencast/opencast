@@ -23,9 +23,9 @@ package org.opencastproject.scheduler.api;
 import static org.opencastproject.util.EqualsUtil.eq;
 
 import org.opencastproject.util.EqualsUtil;
-import org.opencastproject.util.data.Option;
 
 import java.util.Date;
+import java.util.Optional;
 
 import javax.annotation.concurrent.ThreadSafe;
 
@@ -33,7 +33,7 @@ import javax.annotation.concurrent.ThreadSafe;
 @ThreadSafe
 public final class Period {
   /** The period identifier */
-  private final Option<Long> id;
+  private final Optional<Long> id;
 
   /** The start date */
   private final Date start;
@@ -42,10 +42,10 @@ public final class Period {
   private final Date end;
 
   /** The purpose */
-  private final Option<String> purpose;
+  private final Optional<String> purpose;
 
   /** The comment */
-  private final Option<String> comment;
+  private final Optional<String> comment;
 
   /**
    * Creates a period
@@ -61,7 +61,7 @@ public final class Period {
    * @param comment
    *          the comment
    */
-  public Period(Option<Long> id, Date start, Date end, Option<String> purpose, Option<String> comment) {
+  public Period(Optional<Long> id, Date start, Date end, Optional<String> purpose, Optional<String> comment) {
     this.id = id;
     this.start = start;
     this.end = end;
@@ -74,7 +74,7 @@ public final class Period {
    *
    * @return the id
    */
-  public Option<Long> getId() {
+  public Optional<Long> getId() {
     return this.id;
   }
 
@@ -101,7 +101,7 @@ public final class Period {
    *
    * @return the purpose
    */
-  public Option<String> getPurpose() {
+  public Optional<String> getPurpose() {
     return purpose;
   }
 
@@ -110,7 +110,7 @@ public final class Period {
    *
    * @return the comment
    */
-  public Option<String> getComment() {
+  public Optional<String> getComment() {
     return comment;
   }
 

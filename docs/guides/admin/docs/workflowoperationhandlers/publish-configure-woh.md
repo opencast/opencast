@@ -89,46 +89,37 @@ Operation Example
 
 Publish to internal channel:
 
-```xml
-<operation
-    id="publish-configure"
-    description="Publish to internal channel">
-  <configurations>
-    <configuration key="download-source-tags">engage</configuration>
-    <configuration key="channel-id">internal</configuration>
-    <configuration key="url-pattern">http://localhost:8080/editor-ui/index.html?id=${event_id}</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: publish-configure
+    description: Publish to internal channel
+    configurations:
+      - download-source-tags: engage
+      - channel-id: internal
+      - url-pattern: http://localhost:8080/editor-ui/index.html?id=${event_id}
 ```
 
 Publish to external API:
 
-```xml
-<operation
-    id="publish-configure"
-    description="Publish to external api publication channel">
-  <configurations>
-    <configuration key="channel-id">api</configuration>
-    <configuration key="mimetype">application/json</configuration>
-    <configuration key="download-source-tags">engage-download,engage-streaming</configuration>
-    <configuration key="url-pattern">http://api.oc.org/api/events/${event_id}</configuration>
-    <configuration key="check-availability">true</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: publish-configure
+    description: Publish to external api publication channel
+    configurations:
+      - channel-id: api
+      - mimetype: application/json
+      - download-source-tags: engage-download,engage-streaming
+      - url-pattern: http://api.oc.org/api/events/${event_id}
+      - check-availability: true
 ```
 
 Create a meta publication.
 A reference to external systems like a media portal:
 
-```xml
-<operation
-    id="publish-configure"
-    description="Publish to meta publication channel">
-  <configurations>
-    <configuration key="channel-id">edu-reference</configuration>
-    <configuration key="mimetype">text/html</configuration>
-    <configuration key="url-pattern">https://org.mediaportal.edu/events/${event_id}</configuration>
-    <configuration key="check-availability">false</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: publish-configure
+    description: Publish to meta publication channel
+    configurations:
+      - channel-id: edu-reference
+      - mimetype: text/html
+      - url-pattern: https://org.mediaportal.edu/events/${event_id}
+      - check-availability: false
 ```

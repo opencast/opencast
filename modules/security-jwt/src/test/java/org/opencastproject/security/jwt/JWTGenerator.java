@@ -21,14 +21,19 @@
 
 package org.opencastproject.security.jwt;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.algorithms.Algorithm;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.JWSSigner;
+import com.nimbusds.jose.KeyLengthException;
+import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jose.crypto.RSASSASigner;
+import com.nimbusds.jose.jwk.RSAKey;
+import com.nimbusds.jose.jwk.gen.RSAKeyGenerator;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
 
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
-import java.security.interfaces.RSAPrivateKey;
-import java.security.interfaces.RSAPublicKey;
 import java.util.Date;
 import java.util.List;
 
@@ -40,13 +45,12 @@ public final class JWTGenerator {
   private static JWTGenerator instance;
 
   // Symmetric Algorithm
-  private final String secret = "t0p$ecret";
+  private final String secret = "t0p$ecrett0p$ecrett0p$ecrett0p$ecrett0p$ecrett0p$ecrett0p$ecrett0p$ecrett0p$ecret"
+      + "t0p$ecrett0p$ecrett0p$ecrett0p$ecrett0p$ecrett0p$ecrett0p$ecrett0p$ecrett0p$ecrett0p$ecrett0p$ecrett0p$ecret";
 
   // Asymmetric Algorithm
-  private final String asymmetricAlgorithm = "RSA";
-  private final int keySize = 1024;
-  private final RSAPublicKey publicKey;
-  private final RSAPrivateKey privateKey;
+  private final int keySize = 2048;
+  private final RSAKey rsaJWK;
 
   // Claims
   private final String issuer = "https://auth.example.org";
@@ -60,103 +64,119 @@ public final class JWTGenerator {
   private final String rolesKey = "roles";
   private final List<String> roles = List.of("member@example.org", "facultly@example.org");
 
-  private JWTGenerator() throws NoSuchAlgorithmException {
-    KeyPairGenerator generator = KeyPairGenerator.getInstance(asymmetricAlgorithm);
-    generator.initialize(keySize);
-    KeyPair keyPair = generator.genKeyPair();
-    publicKey = (RSAPublicKey) keyPair.getPublic();
-    privateKey = (RSAPrivateKey) keyPair.getPrivate();
+  private JWTGenerator() throws JOSEException {
+    rsaJWK = new RSAKeyGenerator(keySize)
+        .keyID("123")
+        .generate();
   }
 
-  public static JWTGenerator getInstance() throws NoSuchAlgorithmException {
+  public static JWTGenerator getInstance() throws NoSuchAlgorithmException, JOSEException {
     if (instance == null) {
       instance = new JWTGenerator();
     }
     return instance;
   }
 
-  public String generateValidSymmetricJWT() {
-    return generateValidJWT(getSymmetricAlgorithm(), 60 * 60 * 1000);
+  public String generateValidSymmetricJWT() throws JOSEException {
+    return generateValidJWT(getSymmetricSigner(), getSymmetricAlgorithm(), 60 * 60 * 1000);
   }
 
-  public String generateValidSymmetricJWT(int expiresInMillis) {
-    return generateValidJWT(getSymmetricAlgorithm(), expiresInMillis);
+  public String generateValidSymmetricJWT(int expiresInMillis) throws JOSEException {
+    return generateValidJWT(getSymmetricSigner(), getSymmetricAlgorithm(), expiresInMillis);
   }
 
-  public String generateValidAsymmetricJWT() {
-    return generateValidJWT(getAsymmetricAlgorithm(), 60 * 60 * 1000);
+  public String generateValidAsymmetricJWT() throws JOSEException {
+    return generateValidJWT(getAsymmetricSigner(), getAsymmetricAlgorithm(), 60 * 60 * 1000);
   }
 
-  private String generateValidJWT(Algorithm algorithm, int expiresInMillis) {
-    return JWT.create()
-        .withIssuer(issuer)
-        .withAudience(clientId)
-        .withClaim(usernameKey, username)
-        .withClaim(nameKey, name)
-        .withClaim(emailKey, email)
-        .withClaim(rolesKey, roles)
-        .withExpiresAt(new Date(System.currentTimeMillis() + expiresInMillis))
-        .sign(algorithm);
+  private String generateValidJWT(JWSSigner signer, JWSAlgorithm algorithm, int expiresInMillis) throws JOSEException {
+    JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
+        .issuer(issuer)
+        .audience(clientId)
+        .claim(usernameKey, username)
+        .claim(nameKey, name)
+        .claim(emailKey, email)
+        .claim(rolesKey, roles)
+        .expirationTime(new Date(System.currentTimeMillis() + expiresInMillis))
+        .build();
+
+    SignedJWT signedJWT = new SignedJWT(new JWSHeader(algorithm), claimsSet);
+
+    signedJWT.sign(signer);
+
+    return signedJWT.serialize();
   }
 
-  public String generateExpiredSymmetricJWT() {
-    return generateExpiredJWT(getSymmetricAlgorithm());
+  public String generateExpiredSymmetricJWT() throws JOSEException {
+    return generateExpiredJWT(getSymmetricSigner(), getSymmetricAlgorithm());
   }
 
-  public String generateExpiredAsymmetricJWT() {
-    return generateExpiredJWT(getAsymmetricAlgorithm());
+  public String generateExpiredAsymmetricJWT() throws JOSEException {
+    return generateExpiredJWT(getAsymmetricSigner(), getAsymmetricAlgorithm());
   }
 
-  private String generateExpiredJWT(Algorithm algorithm) {
-    return JWT.create()
-        .withIssuer(issuer)
-        .withAudience(clientId)
-        .withClaim(usernameKey, username)
-        .withClaim(nameKey, name)
-        .withClaim(emailKey, email)
-        .withClaim(rolesKey, roles)
-        .withExpiresAt(new Date(System.currentTimeMillis() - 60 * 60 * 1000))
-        .sign(algorithm);
+  private String generateExpiredJWT(JWSSigner signer, JWSAlgorithm algorithm) throws JOSEException {
+    JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
+        .issuer(issuer)
+        .audience(clientId)
+        .claim(usernameKey, username)
+        .claim(nameKey, name)
+        .claim(emailKey, email)
+        .claim(rolesKey, roles)
+        .expirationTime(new Date(System.currentTimeMillis() - 60 * 60 * 1000))
+        .build();
+
+    SignedJWT signedJWT = new SignedJWT(new JWSHeader(algorithm), claimsSet);
+
+    signedJWT.sign(signer);
+
+    return signedJWT.serialize();
   }
 
   public List<String> generateValidClaimConstraints() {
     return List.of(
-        "['iss'].asString() eq '" + issuer + "'",
-        "['aud'].asString() eq '" + clientId + "'"
+        "['iss'] eq '" + issuer + "'",
+        "(aud instanceof T(java.lang.String) ? aud == '" + clientId + "' : aud.contains('" + clientId + "'))"
     );
   }
 
   public List<String> generateInvalidClaimConstraints() {
     return List.of(
-        "['aud'].asString() eq 'xyz'"
+        "(aud instanceof T(java.lang.String) ? aud == 'xyz' : aud.contains('xyz'))"
     );
   }
 
-  public String generateValidNonExpiringSymmetricJWT() {
-    return generateValidNonExpiringJWT(getSymmetricAlgorithm());
+  public String generateValidNonExpiringSymmetricJWT() throws JOSEException {
+    return generateValidNonExpiringJWT(getSymmetricSigner(), getSymmetricAlgorithm());
   }
 
-  private String generateValidNonExpiringJWT(Algorithm algorithm) {
-    return JWT.create()
-        .withIssuer(issuer)
-        .withAudience(clientId)
-        .withClaim(usernameKey, username)
-        .withClaim(nameKey, name)
-        .withClaim(emailKey, email)
-        .withClaim(rolesKey, roles)
-        .sign(algorithm);
+  private String generateValidNonExpiringJWT(JWSSigner signer, JWSAlgorithm algorithm) throws JOSEException {
+    JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
+        .issuer(issuer)
+        .audience(clientId)
+        .claim(usernameKey, username)
+        .claim(nameKey, name)
+        .claim(emailKey, email)
+        .claim(rolesKey, roles)
+        .build();
+
+    SignedJWT signedJWT = new SignedJWT(new JWSHeader(algorithm), claimsSet);
+
+    signedJWT.sign(signer);
+
+    return signedJWT.serialize();
   }
 
   public String getUsernameMapping() {
-    return "['" + usernameKey + "'].asString()";
+    return "['" + usernameKey + "']";
   }
 
   public String getNameMapping() {
-    return "['" + nameKey + "'].asString()";
+    return "['" + nameKey + "']";
   }
 
   public String getEmailMapping() {
-    return "['" + emailKey + "'].asString()";
+    return "['" + emailKey + "']";
   }
 
   public List<String> getRolesMappings() {
@@ -164,31 +184,39 @@ public final class JWTGenerator {
         // Static Assignments
         "'ROLE_JWT_USER'",
         // Expressions
-        "'ROLE_JWT_USER_' + ['" + usernameKey + "'].asString()",
-        "['" + rolesKey + "'].asList(T(String)).contains('facultly@example.org') ? 'ROLE_GROUP_JWT_TRAINER' : null"
+        "'ROLE_JWT_USER_' + ['" + usernameKey + "']",
+        "['" + rolesKey + "'].contains('facultly@example.org') ? 'ROLE_GROUP_JWT_TRAINER' : null"
     );
   }
 
-  public Algorithm getSymmetricAlgorithm() {
-    return Algorithm.HMAC256(secret);
+  public JWSAlgorithm getSymmetricAlgorithm() {
+    return JWSAlgorithm.HS256;
   }
 
-  public Algorithm getAsymmetricAlgorithm() {
-    return Algorithm.RSA512(publicKey, privateKey);
+  public JWSAlgorithm getAsymmetricAlgorithm() {
+    return JWSAlgorithm.RS512;
   }
 
-  public RSAPublicKey getInvalidPublicKey() throws NoSuchAlgorithmException {
-    KeyPairGenerator generator = KeyPairGenerator.getInstance(asymmetricAlgorithm);
-    generator.initialize(keySize);
-    return (RSAPublicKey) generator.genKeyPair().getPublic();
+  public JWSSigner getSymmetricSigner() throws KeyLengthException {
+    return new MACSigner(secret);
+  }
+
+  public JWSSigner getAsymmetricSigner() throws JOSEException {
+    return new RSASSASigner(rsaJWK);
+  }
+
+  public RSAKey getInvalidRsaJWK() throws JOSEException {
+    return new RSAKeyGenerator(keySize)
+        .keyID("ABC")
+        .generate();
   }
 
   public String getSecret() {
     return secret;
   }
 
-  public RSAPublicKey getPublicKey() {
-    return publicKey;
+  public RSAKey getRsaJWK() {
+    return rsaJWK;
   }
 
   public String getUsername() {

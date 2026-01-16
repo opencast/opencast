@@ -123,8 +123,9 @@ public class ProcessSmilTest {
   public static void testForFFmpeg() {
     try {
       Process p = new ProcessBuilder(FFMPEG_BINARY, "-version").start();
-      if (p.waitFor() != 0)
+      if (p.waitFor() != 0) {
         throw new IllegalStateException();
+      }
     } catch (Throwable t) {
       logger.warn("Skipping composer tests due to missing ffmpeg");
       ffmpegInstalled = false;
@@ -232,8 +233,8 @@ public class ProcessSmilTest {
       }
 
       @Override
-      public Job enrich(MediaPackageElement original, boolean override) throws MediaInspectionException,
-      MediaPackageException {
+      public Job enrich(MediaPackageElement original, boolean override)
+              throws MediaInspectionException, MediaPackageException {
         return null;
       }
 
@@ -252,8 +253,9 @@ public class ProcessSmilTest {
 
 
     String sourceTrackXml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>"
-            + "<track xmlns=\"http://mediapackage.opencastproject.org\" type=\"presentation/source\" id=\"f1fc0fc4-a926-4ba9-96d9-2fafbcc30d2a\">\n"
-            + "       <mimetype>video/mpeg</mimetype>" + "       <url>video.mp4</url>" + "       </track>";
+        + "<track xmlns=\"http://mediapackage.opencastproject.org\" type=\"presentation/source\" "
+        + "id=\"f1fc0fc4-a926-4ba9-96d9-2fafbcc30d2a\">\n"
+        + "       <mimetype>video/mpeg</mimetype>" + "       <url>video.mp4</url>" + "       </track>";
     inspectedTrack = (Track) MediaPackageElementParser.getFromXml(sourceTrackXml);
 
     // Create and populate the composer service
@@ -284,8 +286,8 @@ public class ProcessSmilTest {
               return job;
             }).anyTimes();
     EasyMock.expect(serviceRegistry.incident()).andAnswer(() -> {
-        Incidents incidents = new Incidents(serviceRegistry, incidentService);
-        return incidents;
+      Incidents incidents = new Incidents(serviceRegistry, incidentService);
+      return incidents;
     }).anyTimes();
     // Finish setting up the mocks
     EasyMock.replay(bc, cc, orgDirectory, userDirectory, securityService, workspace, incidentService, serviceRegistry);
@@ -335,20 +337,30 @@ public class ProcessSmilTest {
     logger.info("testProcessSmilOneSegment");
     assertTrue(sourceAudioVideo1.isFile());
     String smil1 = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>"
-            + "<smil baseProfile='Language' version='3.0' xml:id='s-38f4fa91-c381-4c0e-a51a-e15373428f2d' xmlns='http://www.w3.org/ns/SMIL'>"
-            + "<head xml:id='h-1c58939f-b323-4a1b-af48-1f1c0703f4b0'><meta name='track-duration' content='60000ms' xml:id='meta-4e8ba66c-8c90-47d0-bc8a-174eba1fc91f'/>"
-            + "<paramGroup xml:id='pg-54da9288-36c0-4e9c-87a1-adb30562b814'>"
-            + "<param value='7a9aed12-74a6-4bdb-8fba-f3d8bf6fad22' name='track-id' valuetype='data' xml:id='param-9b377a8f-ceec-412a-a5ea-7ff1d6bd07c9'/>"
-            + "<param value='audiovideo1.mp4' name='track-src' valuetype='data' xml:id='param-b0e82ab6-cec4-40cd-b1dd-8a76507ff318'/>"
-            + "<param value='presenter/work' name='track-flavor' valuetype='data' xml:id='param-7f3cc9eb-cb2a-4611-8099-0ddd25b0d6b9'/>"
-            + "</paramGroup><paramGroup xml:id='pg-54d11c80-f8d1-4911-8e91-fffeb02e727a'>"
-            + "<param value='5354d0e0-87c0-4f5a-a9d9-e9dbb86a9dc6' name='track-id' valuetype='data' xml:id='param-1097ff2d-431f-497c-b186-5d8f2ca6c88f'/>"
-            + "<param value='audiovideo2.mp4' name='track-src' valuetype='data' xml:id='param-c57e9beb-a67a-4a96-96a6-9ede29e653ec'/>"
-            + "<param value='presentation/work' name='track-flavor' valuetype='data' xml:id='param-476ade36-9193-40bb-aae3-0c1028471797'/>"
-            + "</paramGroup></head><body xml:id='b-994529e5-e981-40ed-83cb-b70b7f94ae5f'>"
-            + "<par xml:id='par-3a0e134e-eabe-46d5-8c8d-066127585e78'>"
-            + "<video src='video.mp4' paramGroup='pg-54da9288-36c0-4e9c-87a1-adb30562b814' clipEnd='5000ms' clipBegin='1000ms' xml:id='v-beb9f77e-1ee2-4ad4-a2b2-acd6ab9550a0'/>"
-            + "<video src='video.mp4' paramGroup='pg-54d11c80-f8d1-4911-8e91-fffeb02e727a' clipEnd='5000ms' clipBegin='1000ms' xml:id='v-aa936d8a-11fe-4f70-85eb-e02e95d63d44'/></par></body></smil>";
+        + "<smil baseProfile='Language' version='3.0' xml:id='s-38f4fa91-c381-4c0e-a51a-e15373428f2d' "
+        + "xmlns='http://www.w3.org/ns/SMIL'>"
+        + "<head xml:id='h-1c58939f-b323-4a1b-af48-1f1c0703f4b0'><meta name='track-duration' content='60000ms' "
+        + "xml:id='meta-4e8ba66c-8c90-47d0-bc8a-174eba1fc91f'/>"
+        + "<paramGroup xml:id='pg-54da9288-36c0-4e9c-87a1-adb30562b814'>"
+        + "<param value='7a9aed12-74a6-4bdb-8fba-f3d8bf6fad22' name='track-id' valuetype='data' "
+        + "xml:id='param-9b377a8f-ceec-412a-a5ea-7ff1d6bd07c9'/>"
+        + "<param value='audiovideo1.mp4' name='track-src' valuetype='data' "
+        + "xml:id='param-b0e82ab6-cec4-40cd-b1dd-8a76507ff318'/>"
+        + "<param value='presenter/work' name='track-flavor' valuetype='data' "
+        + "xml:id='param-7f3cc9eb-cb2a-4611-8099-0ddd25b0d6b9'/>"
+        + "</paramGroup><paramGroup xml:id='pg-54d11c80-f8d1-4911-8e91-fffeb02e727a'>"
+        + "<param value='5354d0e0-87c0-4f5a-a9d9-e9dbb86a9dc6' name='track-id' valuetype='data' "
+        + "xml:id='param-1097ff2d-431f-497c-b186-5d8f2ca6c88f'/>"
+        + "<param value='audiovideo2.mp4' name='track-src' valuetype='data' "
+        + "xml:id='param-c57e9beb-a67a-4a96-96a6-9ede29e653ec'/>"
+        + "<param value='presentation/work' name='track-flavor' valuetype='data' "
+        + "xml:id='param-476ade36-9193-40bb-aae3-0c1028471797'/>"
+        + "</paramGroup></head><body xml:id='b-994529e5-e981-40ed-83cb-b70b7f94ae5f'>"
+        + "<par xml:id='par-3a0e134e-eabe-46d5-8c8d-066127585e78'>"
+        + "<video src='video.mp4' paramGroup='pg-54da9288-36c0-4e9c-87a1-adb30562b814' clipEnd='5000ms' "
+        + "clipBegin='1000ms' xml:id='v-beb9f77e-1ee2-4ad4-a2b2-acd6ab9550a0'/>"
+        + "<video src='video.mp4' paramGroup='pg-54d11c80-f8d1-4911-8e91-fffeb02e727a' clipEnd='5000ms' "
+        + "clipBegin='1000ms' xml:id='v-aa936d8a-11fe-4f70-85eb-e02e95d63d44'/></par></body></smil>";
     // build a single media package to test with
     try {
       String paramGroupId = "pg-54da9288-36c0-4e9c-87a1-adb30562b814";
@@ -427,20 +439,30 @@ public class ProcessSmilTest {
     assertTrue(videoOnly.isFile());
     logger.info("testProcessSmilVideoOnly");
     String smil1 = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>"
-            + "<smil baseProfile='Language' version='3.0' xml:id='s-38f4fa91-c381-4c0e-a51a-e15373428f2d' xmlns='http://www.w3.org/ns/SMIL'>"
-            + "<head xml:id='h-1c58939f-b323-4a1b-af48-1f1c0703f4b0'><meta name='track-duration' content='60000ms' xml:id='meta-4e8ba66c-8c90-47d0-bc8a-174eba1fc91f'/>"
-            + "<paramGroup xml:id='pg-54da9288-36c0-4e9c-87a1-adb30562b814'>"
-            + "<param value='7a9aed12-74a6-4bdb-8fba-f3d8bf6fad22' name='track-id' valuetype='data' xml:id='param-9b377a8f-ceec-412a-a5ea-7ff1d6bd07c9'/>"
-            + "<param value='videoonly.mp4' name='track-src' valuetype='data' xml:id='param-b0e82ab6-cec4-40cd-b1dd-8a76507ff318'/>"
-            + "<param value='presenter/work' name='track-flavor' valuetype='data' xml:id='param-7f3cc9eb-cb2a-4611-8099-0ddd25b0d6b9'/>"
-            + "</paramGroup><paramGroup xml:id='pg-54d11c80-f8d1-4911-8e91-fffeb02e727a'>"
-            + "<param value='5354d0e0-87c0-4f5a-a9d9-e9dbb86a9dc6' name='track-id' valuetype='data' xml:id='param-1097ff2d-431f-497c-b186-5d8f2ca6c88f'/>"
-            + "<param value='audio.mp3' name='track-src' valuetype='data' xml:id='param-c57e9beb-a67a-4a96-96a6-9ede29e653ec'/>"
-            + "<param value='presentation/work' name='track-flavor' valuetype='data' xml:id='param-476ade36-9193-40bb-aae3-0c1028471797'/>"
-            + "</paramGroup></head><body xml:id='b-994529e5-e981-40ed-83cb-b70b7f94ae5f'>"
-            + "<par xml:id='par-3a0e134e-eabe-46d5-8c8d-066127585e78'>"
-            + "<video src='videoonly.mp4' paramGroup='pg-54da9288-36c0-4e9c-87a1-adb30562b814' clipEnd='5000ms' clipBegin='1000ms' xml:id='v-beb9f77e-1ee2-4ad4-a2b2-acd6ab9550a0'/>"
-            + "<video src='audio.mp3' paramGroup='pg-54d11c80-f8d1-4911-8e91-fffeb02e727a' clipEnd='5000ms' clipBegin='1000ms' xml:id='v-aa936d8a-11fe-4f70-85eb-e02e95d63d44'/></par></body></smil>";
+        + "<smil baseProfile='Language' version='3.0' xml:id='s-38f4fa91-c381-4c0e-a51a-e15373428f2d' "
+        + "xmlns='http://www.w3.org/ns/SMIL'>"
+        + "<head xml:id='h-1c58939f-b323-4a1b-af48-1f1c0703f4b0'><meta name='track-duration' content='60000ms' "
+        + "xml:id='meta-4e8ba66c-8c90-47d0-bc8a-174eba1fc91f'/>"
+        + "<paramGroup xml:id='pg-54da9288-36c0-4e9c-87a1-adb30562b814'>"
+        + "<param value='7a9aed12-74a6-4bdb-8fba-f3d8bf6fad22' name='track-id' valuetype='data' "
+        + "xml:id='param-9b377a8f-ceec-412a-a5ea-7ff1d6bd07c9'/>"
+        + "<param value='videoonly.mp4' name='track-src' valuetype='data' "
+        + "xml:id='param-b0e82ab6-cec4-40cd-b1dd-8a76507ff318'/>"
+        + "<param value='presenter/work' name='track-flavor' valuetype='data' "
+        + "xml:id='param-7f3cc9eb-cb2a-4611-8099-0ddd25b0d6b9'/>"
+        + "</paramGroup><paramGroup xml:id='pg-54d11c80-f8d1-4911-8e91-fffeb02e727a'>"
+        + "<param value='5354d0e0-87c0-4f5a-a9d9-e9dbb86a9dc6' name='track-id' valuetype='data' "
+        + "xml:id='param-1097ff2d-431f-497c-b186-5d8f2ca6c88f'/>"
+        + "<param value='audio.mp3' name='track-src' valuetype='data' "
+        + "xml:id='param-c57e9beb-a67a-4a96-96a6-9ede29e653ec'/>"
+        + "<param value='presentation/work' name='track-flavor' valuetype='data' "
+        + "xml:id='param-476ade36-9193-40bb-aae3-0c1028471797'/>"
+        + "</paramGroup></head><body xml:id='b-994529e5-e981-40ed-83cb-b70b7f94ae5f'>"
+        + "<par xml:id='par-3a0e134e-eabe-46d5-8c8d-066127585e78'>"
+        + "<video src='videoonly.mp4' paramGroup='pg-54da9288-36c0-4e9c-87a1-adb30562b814' clipEnd='5000ms' "
+        + "clipBegin='1000ms' xml:id='v-beb9f77e-1ee2-4ad4-a2b2-acd6ab9550a0'/>"
+        + "<video src='audio.mp3' paramGroup='pg-54d11c80-f8d1-4911-8e91-fffeb02e727a' clipEnd='5000ms' "
+        + "clipBegin='1000ms' xml:id='v-aa936d8a-11fe-4f70-85eb-e02e95d63d44'/></par></body></smil>";
     // build a single media package to test with
     String paramGroupId1 = "pg-54da9288-36c0-4e9c-87a1-adb30562b814";
     String paramGroupId2 = "pg-54d11c80-f8d1-4911-8e91-fffeb02e727a";
@@ -515,20 +537,30 @@ public class ProcessSmilTest {
     assertTrue(audioOnly.isFile());
     logger.info("testProcessSmilAudioOnly");
     String smil1 = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>"
-            + "<smil baseProfile='Language' version='3.0' xml:id='s-38f4fa91-c381-4c0e-a51a-e15373428f2d' xmlns='http://www.w3.org/ns/SMIL'>"
-            + "<head xml:id='h-1c58939f-b323-4a1b-af48-1f1c0703f4b0'><meta name='track-duration' content='60000ms' xml:id='meta-4e8ba66c-8c90-47d0-bc8a-174eba1fc91f'/>"
-            + "<paramGroup xml:id='pg-54da9288-36c0-4e9c-87a1-adb30562b814'>"
-            + "<param value='7a9aed12-74a6-4bdb-8fba-f3d8bf6fad22' name='track-id' valuetype='data' xml:id='param-9b377a8f-ceec-412a-a5ea-7ff1d6bd07c9'/>"
-            + "<param value='videoonly.mp4' name='track-src' valuetype='data' xml:id='param-b0e82ab6-cec4-40cd-b1dd-8a76507ff318'/>"
-            + "<param value='presenter/work' name='track-flavor' valuetype='data' xml:id='param-7f3cc9eb-cb2a-4611-8099-0ddd25b0d6b9'/>"
-            + "</paramGroup><paramGroup xml:id='pg-54d11c80-f8d1-4911-8e91-fffeb02e727a'>"
-            + "<param value='5354d0e0-87c0-4f5a-a9d9-e9dbb86a9dc6' name='track-id' valuetype='data' xml:id='param-1097ff2d-431f-497c-b186-5d8f2ca6c88f'/>"
-            + "<param value='audio.mp3' name='track-src' valuetype='data' xml:id='param-c57e9beb-a67a-4a96-96a6-9ede29e653ec'/>"
-            + "<param value='presentation/work' name='track-flavor' valuetype='data' xml:id='param-476ade36-9193-40bb-aae3-0c1028471797'/>"
-            + "</paramGroup></head><body xml:id='b-994529e5-e981-40ed-83cb-b70b7f94ae5f'>"
-            + "<par xml:id='par-3a0e134e-eabe-46d5-8c8d-066127585e78'>"
-            + "<video src='videoonly.mp4' paramGroup='pg-54da9288-36c0-4e9c-87a1-adb30562b814' clipEnd='5000ms' clipBegin='1000ms' xml:id='v-beb9f77e-1ee2-4ad4-a2b2-acd6ab9550a0'/>"
-            + "<video src='audio.mp3' paramGroup='pg-54d11c80-f8d1-4911-8e91-fffeb02e727a' clipEnd='5000ms' clipBegin='1000ms' xml:id='v-aa936d8a-11fe-4f70-85eb-e02e95d63d44'/></par></body></smil>";
+        + "<smil baseProfile='Language' version='3.0' xml:id='s-38f4fa91-c381-4c0e-a51a-e15373428f2d' "
+        + "xmlns='http://www.w3.org/ns/SMIL'>"
+        + "<head xml:id='h-1c58939f-b323-4a1b-af48-1f1c0703f4b0'><meta name='track-duration' content='60000ms' "
+        + "xml:id='meta-4e8ba66c-8c90-47d0-bc8a-174eba1fc91f'/>"
+        + "<paramGroup xml:id='pg-54da9288-36c0-4e9c-87a1-adb30562b814'>"
+        + "<param value='7a9aed12-74a6-4bdb-8fba-f3d8bf6fad22' name='track-id' valuetype='data' "
+        + "xml:id='param-9b377a8f-ceec-412a-a5ea-7ff1d6bd07c9'/>"
+        + "<param value='videoonly.mp4' name='track-src' valuetype='data' "
+        + "xml:id='param-b0e82ab6-cec4-40cd-b1dd-8a76507ff318'/>"
+        + "<param value='presenter/work' name='track-flavor' valuetype='data' "
+        + "xml:id='param-7f3cc9eb-cb2a-4611-8099-0ddd25b0d6b9'/>"
+        + "</paramGroup><paramGroup xml:id='pg-54d11c80-f8d1-4911-8e91-fffeb02e727a'>"
+        + "<param value='5354d0e0-87c0-4f5a-a9d9-e9dbb86a9dc6' name='track-id' valuetype='data' "
+        + "xml:id='param-1097ff2d-431f-497c-b186-5d8f2ca6c88f'/>"
+        + "<param value='audio.mp3' name='track-src' valuetype='data' "
+        + "xml:id='param-c57e9beb-a67a-4a96-96a6-9ede29e653ec'/>"
+        + "<param value='presentation/work' name='track-flavor' valuetype='data' "
+        + "xml:id='param-476ade36-9193-40bb-aae3-0c1028471797'/>"
+        + "</paramGroup></head><body xml:id='b-994529e5-e981-40ed-83cb-b70b7f94ae5f'>"
+        + "<par xml:id='par-3a0e134e-eabe-46d5-8c8d-066127585e78'>"
+        + "<video src='videoonly.mp4' paramGroup='pg-54da9288-36c0-4e9c-87a1-adb30562b814' clipEnd='5000ms' "
+        + "clipBegin='1000ms' xml:id='v-beb9f77e-1ee2-4ad4-a2b2-acd6ab9550a0'/>"
+        + "<video src='audio.mp3' paramGroup='pg-54d11c80-f8d1-4911-8e91-fffeb02e727a' clipEnd='5000ms' "
+        + "clipBegin='1000ms' xml:id='v-aa936d8a-11fe-4f70-85eb-e02e95d63d44'/></par></body></smil>";
     // build a single media package to test with
     try {
       String paramGroupId1 = "pg-54da9288-36c0-4e9c-87a1-adb30562b814"; // Pick the presenter flavor
@@ -613,20 +645,30 @@ public class ProcessSmilTest {
   @Test(expected = EncoderException.class)
   public void testProcessSmilBadProfile() throws Exception {
     String smil1 = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>"
-            + "<smil baseProfile='Language' version='3.0' xml:id='s-38f4fa91-c381-4c0e-a51a-e15373428f2d' xmlns='http://www.w3.org/ns/SMIL'>"
-            + "<head xml:id='h-1c58939f-b323-4a1b-af48-1f1c0703f4b0'><meta name='track-duration' content='60000ms' xml:id='meta-4e8ba66c-8c90-47d0-bc8a-174eba1fc91f'/>"
-            + "<paramGroup xml:id='pg-54da9288-36c0-4e9c-87a1-adb30562b814'>"
-            + "<param value='7a9aed12-74a6-4bdb-8fba-f3d8bf6fad22' name='track-id' valuetype='data' xml:id='param-9b377a8f-ceec-412a-a5ea-7ff1d6bd07c9'/>"
-            + "<param value='audiovideo.mp4' name='track-src' valuetype='data' xml:id='param-b0e82ab6-cec4-40cd-b1dd-8a76507ff318'/>"
-            + "<param value='presenter/work' name='track-flavor' valuetype='data' xml:id='param-7f3cc9eb-cb2a-4611-8099-0ddd25b0d6b9'/>"
-            + "</paramGroup><paramGroup xml:id='pg-54d11c80-f8d1-4911-8e91-fffeb02e727a'>"
-            + "<param value='5354d0e0-87c0-4f5a-a9d9-e9dbb86a9dc6' name='track-id' valuetype='data' xml:id='param-1097ff2d-431f-497c-b186-5d8f2ca6c88f'/>"
-            + "<param value='video.mp4' name='track-src' valuetype='data' xml:id='param-c57e9beb-a67a-4a96-96a6-9ede29e653ec'/>"
-            + "<param value='presentation/work' name='track-flavor' valuetype='data' xml:id='param-476ade36-9193-40bb-aae3-0c1028471797'/>"
-            + "</paramGroup></head><body xml:id='b-994529e5-e981-40ed-83cb-b70b7f94ae5f'>"
-            + "<par xml:id='par-3a0e134e-eabe-46d5-8c8d-066127585e78'>"
-            + "<video src='video.mp4' paramGroup='pg-54da9288-36c0-4e9c-87a1-adb30562b814' clipEnd='5000ms' clipBegin='1000ms' xml:id='v-beb9f77e-1ee2-4ad4-a2b2-acd6ab9550a0'/>"
-            + "<video src='video.mp4' paramGroup='pg-54d11c80-f8d1-4911-8e91-fffeb02e727a' clipEnd='5000ms' clipBegin='1000ms' xml:id='v-aa936d8a-11fe-4f70-85eb-e02e95d63d44'/></par></body></smil>";
+        + "<smil baseProfile='Language' version='3.0' xml:id='s-38f4fa91-c381-4c0e-a51a-e15373428f2d' "
+        + "xmlns='http://www.w3.org/ns/SMIL'>"
+        + "<head xml:id='h-1c58939f-b323-4a1b-af48-1f1c0703f4b0'><meta name='track-duration' content='60000ms' "
+        + "xml:id='meta-4e8ba66c-8c90-47d0-bc8a-174eba1fc91f'/>"
+        + "<paramGroup xml:id='pg-54da9288-36c0-4e9c-87a1-adb30562b814'>"
+        + "<param value='7a9aed12-74a6-4bdb-8fba-f3d8bf6fad22' name='track-id' valuetype='data' "
+        + "xml:id='param-9b377a8f-ceec-412a-a5ea-7ff1d6bd07c9'/>"
+        + "<param value='audiovideo.mp4' name='track-src' valuetype='data' "
+        + "xml:id='param-b0e82ab6-cec4-40cd-b1dd-8a76507ff318'/>"
+        + "<param value='presenter/work' name='track-flavor' valuetype='data' "
+        + "xml:id='param-7f3cc9eb-cb2a-4611-8099-0ddd25b0d6b9'/>"
+        + "</paramGroup><paramGroup xml:id='pg-54d11c80-f8d1-4911-8e91-fffeb02e727a'>"
+        + "<param value='5354d0e0-87c0-4f5a-a9d9-e9dbb86a9dc6' name='track-id' valuetype='data' "
+        + "xml:id='param-1097ff2d-431f-497c-b186-5d8f2ca6c88f'/>"
+        + "<param value='video.mp4' name='track-src' valuetype='data' "
+        + "xml:id='param-c57e9beb-a67a-4a96-96a6-9ede29e653ec'/>"
+        + "<param value='presentation/work' name='track-flavor' valuetype='data' "
+        + "xml:id='param-476ade36-9193-40bb-aae3-0c1028471797'/>"
+        + "</paramGroup></head><body xml:id='b-994529e5-e981-40ed-83cb-b70b7f94ae5f'>"
+        + "<par xml:id='par-3a0e134e-eabe-46d5-8c8d-066127585e78'>"
+        + "<video src='video.mp4' paramGroup='pg-54da9288-36c0-4e9c-87a1-adb30562b814' clipEnd='5000ms' "
+        + "clipBegin='1000ms' xml:id='v-beb9f77e-1ee2-4ad4-a2b2-acd6ab9550a0'/>"
+        + "<video src='video.mp4' paramGroup='pg-54d11c80-f8d1-4911-8e91-fffeb02e727a' clipEnd='5000ms' "
+        + "clipBegin='1000ms' xml:id='v-aa936d8a-11fe-4f70-85eb-e02e95d63d44'/></par></body></smil>";
 
     List<String> encodingProfiles = Arrays.asList("player-preview.http", "av.copy"); // Should throw exception
     // Encoding profile must support visual or audiovisual
@@ -693,31 +735,43 @@ public class ProcessSmilTest {
     assertTrue(sourceAudioVideo2.isFile());
     logger.info("testProcessSmilMultiSegment");
     String smil1 = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>"
-            + "<smil baseProfile='Language' version='3.0' xml:id='s-38f4fa91-c381-4c0e-a51a-e15373428f2d' xmlns='http://www.w3.org/ns/SMIL'>"
-            + "<head xml:id='h-1c58939f-b323-4a1b-af48-1f1c0703f4b0'><meta name='track-duration' content='60000ms' xml:id='meta-4e8ba66c-8c90-47d0-bc8a-174eba1fc91f'/>"
-            + "<paramGroup xml:id='pg-54da9288-36c0-4e9c-87a1-adb30562b814'>"
-            + "<param value='7a9aed12-74a6-4bdb-8fba-f3d8bf6fad22' name='track-id' valuetype='data' xml:id='param-9b377a8f-ceec-412a-a5ea-7ff1d6bd07c9'/>"
-            + "<param value='audiovideo1.mp4' name='track-src' valuetype='data' xml:id='param-b0e82ab6-cec4-40cd-b1dd-8a76507ff318'/>"
-            + "<param value='presenter/work' name='track-flavor' valuetype='data' xml:id='param-7f3cc9eb-cb2a-4611-8099-0ddd25b0d6b9'/>"
-            + "</paramGroup><paramGroup xml:id='pg-54d11c80-f8d1-4911-8e91-fffeb02e727a'>"
-            + "<param value='5354d0e0-87c0-4f5a-a9d9-e9dbb86a9dc6' name='track-id' valuetype='data' xml:id='param-1097ff2d-431f-497c-b186-5d8f2ca6c88f'/>"
-            + "<param value='audiovideo2.mp4' name='track-src' valuetype='data' xml:id='param-c57e9beb-a67a-4a96-96a6-9ede29e653ec'/>"
-            + "<param value='presentation/work' name='track-flavor' valuetype='data' xml:id='param-476ade36-9193-40bb-aae3-0c1028471797'/>"
-            + "</paramGroup></head><body xml:id='b-994529e5-e981-40ed-83cb-b70b7f94ae5f'>"
-            + "<par xml:id='par-3a0e134e-eabe-46d5-8c8d-066127585e78'>"
-            + "<video src='audiovideo1.mp4' paramGroup='pg-54da9288-36c0-4e9c-87a1-adb30562b814' clipEnd='1000ms' clipBegin='0ms' xml:id='v-beb9f77e-1ee2-4ad4-a2b2-acd6ab9550a0'/>"
-            + "<video src='audiovideo1.mp4' paramGroup='pg-54d11c80-f8d1-4911-8e91-fffeb02e727a' clipEnd='100"
-            + "0ms' clipBegin='0ms' xml:id='v-aa936d8a-11fe-4f70-85eb-e02e95d63d44'/>"
-            + "</par>"
-            + "<par xml:id='par-3a0e134e-eabe-46d5-8c8d-066127585e77'>"
-            + "<video src='audiovideo1.mp4' paramGroup='pg-54da9288-36c0-4e9c-87a1-adb30562b814' clipEnd='3500ms' clipBegin='2000ms' xml:id='v-beb9f77e-1ee2-4ad4-a2b2-acd6ab9550a0'/>"
-            + "<video src='audiovideo1.mp4' paramGroup='pg-54d11c80-f8d1-4911-8e91-fffeb02e727a' clipEnd='350"
-            + "0ms' clipBegin='2000ms' xml:id='v-aa936d8a-11fe-4f70-85eb-e02e95d63d44'/>"
-            + "</par>"
-            + "<par xml:id='par-3a0e134e-eabe-46d5-8c8d-066127585e79'>"
-            + "<video src='audiovideo2.mov' paramGroup='pg-54da9288-36c0-4e9c-87a1-adb30562b814' clipEnd='7500ms' clipBegin='5000ms' xml:id='v-beb9f77e-1ee2-4ad4-a2b2-acd6ab9550a1'/>"
-            + "<video src='audiovideo2.mov' paramGroup='pg-54d11c80-f8d1-4911-8e91-fffeb02e727a' clipEnd='7500ms' clipBegin='5000ms' xml:id='v-aa936d8a-11fe-4f70-85eb-e02e95d63d42'/>"
-            + "</par></body></smil>";
+        + "<smil baseProfile='Language' version='3.0' xml:id='s-38f4fa91-c381-4c0e-a51a-e15373428f2d' "
+        + "xmlns='http://www.w3.org/ns/SMIL'>"
+        + "<head xml:id='h-1c58939f-b323-4a1b-af48-1f1c0703f4b0'><meta name='track-duration' content='60000ms' "
+        + "xml:id='meta-4e8ba66c-8c90-47d0-bc8a-174eba1fc91f'/>"
+        + "<paramGroup xml:id='pg-54da9288-36c0-4e9c-87a1-adb30562b814'>"
+        + "<param value='7a9aed12-74a6-4bdb-8fba-f3d8bf6fad22' name='track-id' valuetype='data' "
+        + "xml:id='param-9b377a8f-ceec-412a-a5ea-7ff1d6bd07c9'/>"
+        + "<param value='audiovideo1.mp4' name='track-src' valuetype='data' "
+        + "xml:id='param-b0e82ab6-cec4-40cd-b1dd-8a76507ff318'/>"
+        + "<param value='presenter/work' name='track-flavor' valuetype='data' "
+        + "xml:id='param-7f3cc9eb-cb2a-4611-8099-0ddd25b0d6b9'/>"
+        + "</paramGroup><paramGroup xml:id='pg-54d11c80-f8d1-4911-8e91-fffeb02e727a'>"
+        + "<param value='5354d0e0-87c0-4f5a-a9d9-e9dbb86a9dc6' name='track-id' valuetype='data' "
+        + "xml:id='param-1097ff2d-431f-497c-b186-5d8f2ca6c88f'/>"
+        + "<param value='audiovideo2.mp4' name='track-src' valuetype='data' "
+        + "xml:id='param-c57e9beb-a67a-4a96-96a6-9ede29e653ec'/>"
+        + "<param value='presentation/work' name='track-flavor' valuetype='data' "
+        + "xml:id='param-476ade36-9193-40bb-aae3-0c1028471797'/>"
+        + "</paramGroup></head><body xml:id='b-994529e5-e981-40ed-83cb-b70b7f94ae5f'>"
+        + "<par xml:id='par-3a0e134e-eabe-46d5-8c8d-066127585e78'>"
+        + "<video src='audiovideo1.mp4' paramGroup='pg-54da9288-36c0-4e9c-87a1-adb30562b814' clipEnd='1000ms' "
+        + "clipBegin='0ms' xml:id='v-beb9f77e-1ee2-4ad4-a2b2-acd6ab9550a0'/>"
+        + "<video src='audiovideo1.mp4' paramGroup='pg-54d11c80-f8d1-4911-8e91-fffeb02e727a' clipEnd='1000ms' "
+        + "clipBegin='0ms' xml:id='v-aa936d8a-11fe-4f70-85eb-e02e95d63d44'/>"
+        + "</par>"
+        + "<par xml:id='par-3a0e134e-eabe-46d5-8c8d-066127585e77'>"
+        + "<video src='audiovideo1.mp4' paramGroup='pg-54da9288-36c0-4e9c-87a1-adb30562b814' clipEnd='3500ms' "
+        + "clipBegin='2000ms' xml:id='v-beb9f77e-1ee2-4ad4-a2b2-acd6ab9550a0'/>"
+        + "<video src='audiovideo1.mp4' paramGroup='pg-54d11c80-f8d1-4911-8e91-fffeb02e727a' clipEnd='3500ms' "
+        + "clipBegin='2000ms' xml:id='v-aa936d8a-11fe-4f70-85eb-e02e95d63d44'/>"
+        + "</par>"
+        + "<par xml:id='par-3a0e134e-eabe-46d5-8c8d-066127585e79'>"
+        + "<video src='audiovideo2.mov' paramGroup='pg-54da9288-36c0-4e9c-87a1-adb30562b814' clipEnd='7500ms' "
+        + "clipBegin='5000ms' xml:id='v-beb9f77e-1ee2-4ad4-a2b2-acd6ab9550a1'/>"
+        + "<video src='audiovideo2.mov' paramGroup='pg-54d11c80-f8d1-4911-8e91-fffeb02e727a' clipEnd='7500ms' "
+        + "clipBegin='5000ms' xml:id='v-aa936d8a-11fe-4f70-85eb-e02e95d63d42'/>"
+        + "</par></body></smil>";
     List<String> encodingProfiles = Arrays.asList("mp3audio.http", "h264-low.http", "h264-medium.http");
     // Encoding profile must support visual or audiovisual
     String paramGroupId1 = "pg-54da9288-36c0-4e9c-87a1-adb30562b814"; // Pick the presenter flavor
@@ -798,39 +852,52 @@ public class ProcessSmilTest {
     assertTrue(sourceAudioVideo1.isFile());
     assertTrue(sourceAudioVideo2.isFile());
     String sourceTrack1Xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>"
-            + "<track xmlns=\"http://mediapackage.opencastproject.org\" type=\"presenter/source\" id=\"f1fc0fc4-a926-4ba9-96d9-2fafbcc30d2a\">\n"
-            + "<duration>7000</duration>" + "<mimetype>video/mpeg</mimetype>"
-            + "       <url>audiovideo1.mp4</url>"
-            + "<video><device type=\"UFG03\" version=\"30112007\" vendor=\"Unigraf\" />"
-            + "<encoder type=\"H.264\" version=\"7.4\" vendor=\"Apple Inc\" /><resolution>640x480</resolution>"
-            + "<scanType type=\"progressive\" /><bitrate>540520</bitrate><frameRate>2</frameRate></video></track>";
+        + "<track xmlns=\"http://mediapackage.opencastproject.org\" type=\"presenter/source\" "
+        + "id=\"f1fc0fc4-a926-4ba9-96d9-2fafbcc30d2a\">\n"
+        + "<duration>7000</duration>" + "<mimetype>video/mpeg</mimetype>"
+        + "       <url>audiovideo1.mp4</url>"
+        + "<video><device type=\"UFG03\" version=\"30112007\" vendor=\"Unigraf\" />"
+        + "<encoder type=\"H.264\" version=\"7.4\" vendor=\"Apple Inc\" /><resolution>640x480</resolution>"
+        + "<scanType type=\"progressive\" /><bitrate>540520</bitrate><frameRate>2</frameRate></video></track>";
     Track track1 = (Track) MediaPackageElementParser.getFromXml(sourceTrack1Xml);
     String sourceTrack2Xml = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>"
-            + "<track xmlns=\"http://mediapackage.opencastproject.org\" type=\"presenter/source\" id=\"f1fc0fc4-a926-4ba9-96d9-2fafbcc30d2a\">\n"
-            + "<duration>7000</duration>" + "  <mimetype>video/mpeg</mimetype>" + "<url>audiovideo2.mov</url>"
-            + "<video><device type=\"UFG03\" version=\"30112007\" vendor=\"Unigraf\" />"
-            + "<encoder type=\"H.264\" version=\"7.4\" vendor=\"Apple Inc\" /><resolution>640x480</resolution>"
-            + "<scanType type=\"progressive\" /><bitrate>540520</bitrate><frameRate>2</frameRate></video></track>";
+        + "<track xmlns=\"http://mediapackage.opencastproject.org\" type=\"presenter/source\" "
+        + "id=\"f1fc0fc4-a926-4ba9-96d9-2fafbcc30d2a\">\n"
+        + "<duration>7000</duration>" + "  <mimetype>video/mpeg</mimetype>" + "<url>audiovideo2.mov</url>"
+        + "<video><device type=\"UFG03\" version=\"30112007\" vendor=\"Unigraf\" />"
+        + "<encoder type=\"H.264\" version=\"7.4\" vendor=\"Apple Inc\" /><resolution>640x480</resolution>"
+        + "<scanType type=\"progressive\" /><bitrate>540520</bitrate><frameRate>2</frameRate></video></track>";
     Track track2 = (Track) MediaPackageElementParser.getFromXml(sourceTrack2Xml);
     String smil1 = "<?xml version='1.0' encoding='UTF-8' standalone='yes'?>"
-            + "<smil baseProfile='Language' version='3.0' xml:id='s-38f4fa91-c381-4c0e-a51a-e15373428f2d' xmlns='http://www.w3.org/ns/SMIL'>"
-            + "<head xml:id='h-1c58939f-b323-4a1b-af48-1f1c0703f4b0'><meta name='track-duration' content='60000ms' xml:id='meta-4e8ba66c-8c90-47d0-bc8a-174eba1fc91f'/>"
-            + "<paramGroup xml:id='pg-54da9288-36c0-4e9c-87a1-adb30562b814'>"
-            + "<param value='7a9aed12-74a6-4bdb-8fba-f3d8bf6fad22' name='track-id' valuetype='data' xml:id='param-9b377a8f-ceec-412a-a5ea-7ff1d6bd07c9'/>"
-            + "<param value='audiovideo1.mp4' name='track-src' valuetype='data' xml:id='param-b0e82ab6-cec4-40cd-b1dd-8a76507ff318'/>"
-            + "<param value='presenter/work' name='track-flavor' valuetype='data' xml:id='param-7f3cc9eb-cb2a-4611-8099-0ddd25b0d6b9'/>"
-            + "<param value='5354d0e0-87c0-4f5a-a9d9-e9dbb86a9dc6' name='track-id' valuetype='data' xml:id='param-1097ff2d-431f-497c-b186-5d8f2ca6c88f'/>"
-            + "<param value='audiovideo2.mp4' name='track-src' valuetype='data' xml:id='param-c57e9beb-a67a-4a96-96a6-9ede29e653ec'/>"
-            + "<param value='presentation/work' name='track-flavor' valuetype='data' xml:id='param-476ade36-9193-40bb-aae3-0c1028471797'/>"
-            + "</paramGroup></head><body xml:id='b-994529e5-e981-40ed-83cb-b70b7f94ae5f'>"
-            + "<par xml:id='par-3a0e134e-eabe-46d5-8c8d-066127585e78'>"
-            + "<video src='audiovideo1.mp4' paramGroup='pg-54da9288-36c0-4e9c-87a1-adb30562b814' clipEnd='3000ms' clipBegin='0ms' xml:id='v-beb9f77e-1ee2-4ad4-a2b2-acd6ab9550a0'/>"
-            + "<video src='audiovideo1.mp4' paramGroup='pg-54d11c80-f8d1-4911-8e91-fffeb02e727a' clipEnd='300"
-            + "0ms' clipBegin='0ms' xml:id='v-aa936d8a-11fe-4f70-85eb-e02e95d63d44'/>" + "</par>"
-            + "<par xml:id='par-3a0e134e-eabe-46d5-8c8d-066127585e79'>"
-            + "<video src='audiovideo2.mov' paramGroup='pg-54da9288-36c0-4e9c-87a1-adb30562b814' clipEnd='7500ms' clipBegin='5000ms' xml:id='v-beb9f77e-1ee2-4ad4-a2b2-acd6ab9550a1'/>"
-            + "<video src='audiovideo2.mov' paramGroup='pg-54d11c80-f8d1-4911-8e91-fffeb02e727a' clipEnd='7500ms' clipBegin='5000ms' xml:id='v-aa936d8a-11fe-4f70-85eb-e02e95d63d42'/>"
-            + "</par></body></smil>";
+        + "<smil baseProfile='Language' version='3.0' xml:id='s-38f4fa91-c381-4c0e-a51a-e15373428f2d' "
+        + "xmlns='http://www.w3.org/ns/SMIL'>"
+        + "<head xml:id='h-1c58939f-b323-4a1b-af48-1f1c0703f4b0'><meta name='track-duration' content='60000ms' "
+        + "xml:id='meta-4e8ba66c-8c90-47d0-bc8a-174eba1fc91f'/>"
+        + "<paramGroup xml:id='pg-54da9288-36c0-4e9c-87a1-adb30562b814'>"
+        + "<param value='7a9aed12-74a6-4bdb-8fba-f3d8bf6fad22' name='track-id' valuetype='data' "
+        + "xml:id='param-9b377a8f-ceec-412a-a5ea-7ff1d6bd07c9'/>"
+        + "<param value='audiovideo1.mp4' name='track-src' valuetype='data' "
+        + "xml:id='param-b0e82ab6-cec4-40cd-b1dd-8a76507ff318'/>"
+        + "<param value='presenter/work' name='track-flavor' valuetype='data' "
+        + "xml:id='param-7f3cc9eb-cb2a-4611-8099-0ddd25b0d6b9'/>"
+        + "<param value='5354d0e0-87c0-4f5a-a9d9-e9dbb86a9dc6' name='track-id' "
+        + "valuetype='data' xml:id='param-1097ff2d-431f-497c-b186-5d8f2ca6c88f'/>"
+        + "<param value='audiovideo2.mp4' name='track-src' valuetype='data' "
+        + "xml:id='param-c57e9beb-a67a-4a96-96a6-9ede29e653ec'/>"
+        + "<param value='presentation/work' name='track-flavor' valuetype='data' "
+        + "xml:id='param-476ade36-9193-40bb-aae3-0c1028471797'/>"
+        + "</paramGroup></head><body xml:id='b-994529e5-e981-40ed-83cb-b70b7f94ae5f'>"
+        + "<par xml:id='par-3a0e134e-eabe-46d5-8c8d-066127585e78'>"
+        + "<video src='audiovideo1.mp4' paramGroup='pg-54da9288-36c0-4e9c-87a1-adb30562b814' clipEnd='3000ms' "
+        + "clipBegin='0ms' xml:id='v-beb9f77e-1ee2-4ad4-a2b2-acd6ab9550a0'/>"
+        + "<video src='audiovideo1.mp4' paramGroup='pg-54d11c80-f8d1-4911-8e91-fffeb02e727a' clipEnd='3000ms' "
+        + "clipBegin='0ms' xml:id='v-aa936d8a-11fe-4f70-85eb-e02e95d63d44'/>" + "</par>"
+        + "<par xml:id='par-3a0e134e-eabe-46d5-8c8d-066127585e79'>"
+        + "<video src='audiovideo2.mov' paramGroup='pg-54da9288-36c0-4e9c-87a1-adb30562b814' clipEnd='7500ms' "
+        + "clipBegin='5000ms' xml:id='v-beb9f77e-1ee2-4ad4-a2b2-acd6ab9550a1'/>"
+        + "<video src='audiovideo2.mov' paramGroup='pg-54d11c80-f8d1-4911-8e91-fffeb02e727a' clipEnd='7500ms' "
+        + "clipBegin='5000ms' xml:id='v-aa936d8a-11fe-4f70-85eb-e02e95d63d42'/>"
+        + "</par></body></smil>";
     String paramGroupId1 = "pg-54da9288-36c0-4e9c-87a1-adb30562b814"; // Pick the presenter flavor
     // 2 tracks in the same group
     List<SmilMediaParam> params = new ArrayList<>();
@@ -913,22 +980,29 @@ public class ProcessSmilTest {
     assertTrue(sourceAudioVideo1.isFile());
     assertTrue(sourceAudioVideo2.isFile());
     String prodsmil = "<?xml version='1.0' encoding='UTF-8'?>"
-            + "<smil xmlns='http://www.w3.org/ns/SMIL' baseProfile='Language' version='3.0' xml:id='s-aedc52a7-3207-49cf-8a9b-221ee8baba66'>"
-            + "<head xml:id='h-d9ba75ce-2b50-458d-8919-7a92933a75a0'>"
-            + "<meta content='17d14143-5bbf-4c60-b082-fbc401350691' name='media-package-id' xml:id='meta-a9d5fb98-af82-4b9e-abc2-abe5a9dd843c'/>"
-            + "<meta content='300000ms' name='track-duration' xml:id='meta-1950b9b6-cd8f-43ac-9744-f6d8173ca171'/>"
-            + "<paramGroup xml:id='pg-7b7d7eb9-8006-41a4-82b3-3fbc31b08ff1'>"
-            + "<param name='track-id' value='220f90fb-c764-40ac-b308-cd6731d22d2e' valuetype='data' xml:id='param-31a5a322-18ae-4659-b696-b3772d99651d'/>"
-            + "<param name='track-src' value='audiovideo1.mp4' valuetype='data' xml:id='param-aed3f3db-7d68-4a76-9229-557940fb44be'/>"
-            + "<param name='track-flavor' value='presenter/source' valuetype='data' xml:id='param-1c069d4a-23cd-45e3-b951-53de908b2b69'/>"
-            + "</paramGroup></head>"
-            + "<body xml:id='b-de826a33-7858-4172-a4a2-9cf1e9a53183'>"
-            + "<par xml:id='par-c82881e2-f372-4a98-8cd4-97bc145cbfbe'>"
-            + "<video paramGroup='pg-7b7d7eb9-8006-41a4-82b3-3fbc31b08ff1' src='sourceAudioVideo1.mp4' clipBegin='0ms' clipEnd='10000ms' xml:id='v-2fc1b286-d87b-4393-a922-161af39a9f93'/>"
-            + "</par>"
-            + "<par xml:id='par-eb80f89d-0fce-466d-b0c5-48a30006b691'>"
-            + "<video clipBegin='18000ms' clipEnd='30000ms' paramGroup='pg-7b7d7eb9-8006-41a4-82b3-3fbc31b08ff1' src='sourceAudioVideo2.mp4' xml:id='v-d4d19997-f06b-4bdd-8e8c-d23907a971a8'/>"
-            + "</par></body>" + "</smil>";
+        + "<smil xmlns='http://www.w3.org/ns/SMIL' baseProfile='Language' version='3.0' "
+        + "xml:id='s-aedc52a7-3207-49cf-8a9b-221ee8baba66'>"
+        + "<head xml:id='h-d9ba75ce-2b50-458d-8919-7a92933a75a0'>"
+        + "<meta content='17d14143-5bbf-4c60-b082-fbc401350691' name='media-package-id' "
+        + "xml:id='meta-a9d5fb98-af82-4b9e-abc2-abe5a9dd843c'/>"
+        + "<meta content='300000ms' name='track-duration' xml:id='meta-1950b9b6-cd8f-43ac-9744-f6d8173ca171'/>"
+        + "<paramGroup xml:id='pg-7b7d7eb9-8006-41a4-82b3-3fbc31b08ff1'>"
+        + "<param name='track-id' value='220f90fb-c764-40ac-b308-cd6731d22d2e' valuetype='data' "
+        + "xml:id='param-31a5a322-18ae-4659-b696-b3772d99651d'/>"
+        + "<param name='track-src' value='audiovideo1.mp4' valuetype='data' "
+        + "xml:id='param-aed3f3db-7d68-4a76-9229-557940fb44be'/>"
+        + "<param name='track-flavor' value='presenter/source' valuetype='data' "
+        + "xml:id='param-1c069d4a-23cd-45e3-b951-53de908b2b69'/>"
+        + "</paramGroup></head>"
+        + "<body xml:id='b-de826a33-7858-4172-a4a2-9cf1e9a53183'>"
+        + "<par xml:id='par-c82881e2-f372-4a98-8cd4-97bc145cbfbe'>"
+        + "<video paramGroup='pg-7b7d7eb9-8006-41a4-82b3-3fbc31b08ff1' src='sourceAudioVideo1.mp4' clipBegin='0ms' "
+        + "clipEnd='10000ms' xml:id='v-2fc1b286-d87b-4393-a922-161af39a9f93'/>"
+        + "</par>"
+        + "<par xml:id='par-eb80f89d-0fce-466d-b0c5-48a30006b691'>"
+        + "<video clipBegin='18000ms' clipEnd='30000ms' paramGroup='pg-7b7d7eb9-8006-41a4-82b3-3fbc31b08ff1' "
+        + "src='sourceAudioVideo2.mp4' xml:id='v-d4d19997-f06b-4bdd-8e8c-d23907a971a8'/>"
+        + "</par></body>" + "</smil>";
     // SmilResponse smilResponse = smilService.fromXml(prodsmil);
     String paramGroupId = "pg-7b7d7eb9-8006-41a4-82b3-3fbc31b08ff1"; // Pick the presenter flavor
 
@@ -997,22 +1071,29 @@ public class ProcessSmilTest {
     assertTrue(sourceAudioVideo1.isFile());
     assertTrue(sourceAudioVideo2.isFile());
     String prodsmil = "<?xml version='1.0' encoding='UTF-8'?>"
-            + "<smil xmlns='http://www.w3.org/ns/SMIL' baseProfile='Language' version='3.0' xml:id='s-aedc52a7-3207-49cf-8a9b-221ee8baba66'>"
-            + "<head xml:id='h-d9ba75ce-2b50-458d-8919-7a92933a75a0'>"
-            + "<meta content='17d14143-5bbf-4c60-b082-fbc401350691' name='media-package-id' xml:id='meta-a9d5fb98-af82-4b9e-abc2-abe5a9dd843c'/>"
-            + "<meta content='300000ms' name='track-duration' xml:id='meta-1950b9b6-cd8f-43ac-9744-f6d8173ca171'/>"
-            + "<paramGroup xml:id='pg-7b7d7eb9-8006-41a4-82b3-3fbc31b08ff1'>"
-            + "<param name='track-id' value='220f90fb-c764-40ac-b308-cd6731d22d2e' valuetype='data' xml:id='param-31a5a322-18ae-4659-b696-b3772d99651d'/>"
-            + "<param name='track-src' value='audiovideo1.mp4' valuetype='data' xml:id='param-aed3f3db-7d68-4a76-9229-557940fb44be'/>"
-            + "<param name='track-flavor' value='presenter/source' valuetype='data' xml:id='param-1c069d4a-23cd-45e3-b951-53de908b2b69'/>"
-            + "</paramGroup></head>"
-            + "<body xml:id='b-de826a33-7858-4172-a4a2-9cf1e9a53183'>"
-            + "<par xml:id='par-c82881e2-f372-4a98-8cd4-97bc145cbfbe'>"
-            + "<video paramGroup='pg-7b7d7eb9-8006-41a4-82b3-3fbc31b08ff1' src='sourceAudioVideo1.mp4' clipBegin='0ms' clipEnd='10000ms' xml:id='v-2fc1b286-d87b-4393-a922-161af39a9f93'/>"
-            + "</par>"
-            + "<par xml:id='par-eb80f89d-0fce-466d-b0c5-48a30006b691'>"
-            + "<video clipBegin='18000ms' clipEnd='30000ms' paramGroup='pg-7b7d7eb9-8006-41a4-82b3-3fbc31b08ff1' src='sourceAudioVideo2.mp4' xml:id='v-d4d19997-f06b-4bdd-8e8c-d23907a971a8'/>"
-            + "</par></body>" + "</smil>";
+        + "<smil xmlns='http://www.w3.org/ns/SMIL' baseProfile='Language' version='3.0' "
+        + "xml:id='s-aedc52a7-3207-49cf-8a9b-221ee8baba66'>"
+        + "<head xml:id='h-d9ba75ce-2b50-458d-8919-7a92933a75a0'>"
+        + "<meta content='17d14143-5bbf-4c60-b082-fbc401350691' name='media-package-id' "
+        + "xml:id='meta-a9d5fb98-af82-4b9e-abc2-abe5a9dd843c'/>"
+        + "<meta content='300000ms' name='track-duration' xml:id='meta-1950b9b6-cd8f-43ac-9744-f6d8173ca171'/>"
+        + "<paramGroup xml:id='pg-7b7d7eb9-8006-41a4-82b3-3fbc31b08ff1'>"
+        + "<param name='track-id' value='220f90fb-c764-40ac-b308-cd6731d22d2e' valuetype='data' "
+        + "xml:id='param-31a5a322-18ae-4659-b696-b3772d99651d'/>"
+        + "<param name='track-src' value='audiovideo1.mp4' valuetype='data' "
+        + "xml:id='param-aed3f3db-7d68-4a76-9229-557940fb44be'/>"
+        + "<param name='track-flavor' value='presenter/source' valuetype='data' "
+        + "xml:id='param-1c069d4a-23cd-45e3-b951-53de908b2b69'/>"
+        + "</paramGroup></head>"
+        + "<body xml:id='b-de826a33-7858-4172-a4a2-9cf1e9a53183'>"
+        + "<par xml:id='par-c82881e2-f372-4a98-8cd4-97bc145cbfbe'>"
+        + "<video paramGroup='pg-7b7d7eb9-8006-41a4-82b3-3fbc31b08ff1' src='sourceAudioVideo1.mp4' clipBegin='0ms' "
+        + "clipEnd='10000ms' xml:id='v-2fc1b286-d87b-4393-a922-161af39a9f93'/>"
+        + "</par>"
+        + "<par xml:id='par-eb80f89d-0fce-466d-b0c5-48a30006b691'>"
+        + "<video clipBegin='18000ms' clipEnd='30000ms' paramGroup='pg-7b7d7eb9-8006-41a4-82b3-3fbc31b08ff1' "
+        + "src='sourceAudioVideo2.mp4' xml:id='v-d4d19997-f06b-4bdd-8e8c-d23907a971a8'/>"
+        + "</par></body>" + "</smil>";
     // SmilResponse smilResponse = smilService.fromXml(prodsmil);
     String paramGroupId = "pg-7b7d7eb9-8006-41a4-82b3-3fbc31b08ff1"; // Pick the presenter flavor
 

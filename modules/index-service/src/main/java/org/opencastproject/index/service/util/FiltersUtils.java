@@ -23,9 +23,10 @@ package org.opencastproject.index.service.util;
 
 import org.opencastproject.list.api.ResourceListFilter;
 import org.opencastproject.list.query.AbstractListFilter;
-import org.opencastproject.util.data.Option;
 
 import org.apache.commons.lang3.StringUtils;
+
+import java.util.Optional;
 
 /**
  * Utility class providing helpers for all operations related to the filters.
@@ -40,7 +41,7 @@ public final class FiltersUtils {
    * Create a new {@link ResourceListFilter} following the parameters given
    * 
    * @param value
-   *          The value of the filter wrapped in an {@link Option}. Can be {@link Option#none()}
+   *          The value of the filter wrapped in an {@link Optional}. Can be {@link Optional#empty()}
    * @param name
    *          The name of the filter, required.
    * @param label
@@ -48,16 +49,18 @@ public final class FiltersUtils {
    * @param type
    *          the {@link ResourceListFilter.SourceType}
    * @param valuesListName
-   *          The name of the list from a list provider providing the possible values wrapped in a {@link Option}.Can be
-   *          {@link Option#none()}
+   *          The name of the list from a list provider providing the possible values wrapped in a {@link Optional}.
+   *          Can be {@link Optional#empty()}
    * @throws IllegalArgumentException
    *           if the name, label or type is null or empty.
    * @return a new {@link ResourceListFilter} with the parameters given
    */
-  public static <A> ResourceListFilter<A> generateFilter(final Option<A> value, final String name, final String label,
-          final ResourceListFilter.SourceType type, final Option<String> valuesListName) throws IllegalArgumentException {
-    if (StringUtils.isBlank(name) || StringUtils.isBlank(label) || type == null)
+  public static <A> ResourceListFilter<A> generateFilter(final Optional<A> value, final String name, final String label,
+          final ResourceListFilter.SourceType type, final Optional<String> valuesListName)
+          throws IllegalArgumentException {
+    if (StringUtils.isBlank(name) || StringUtils.isBlank(label) || type == null) {
       throw new IllegalArgumentException("The filter label, name or type must not be null!");
+    }
 
     return new AbstractListFilter<A>(value) {
 
@@ -72,8 +75,8 @@ public final class FiltersUtils {
       }
 
       @Override
-      public Option<String> getValuesListName() {
-        return valuesListName != null ? valuesListName : Option.<String> none();
+      public Optional<String> getValuesListName() {
+        return valuesListName != null ? valuesListName : Optional.<String> empty();
       }
 
       @Override

@@ -262,7 +262,7 @@ public class ThemesServiceDatabaseImpl implements ThemesServiceDatabase {
     try {
       Theme newTheme = db.execTxChecked(em -> {
         ThemeDto themeDto = null;
-        if (theme.getId().isSome()) {
+        if (theme.getId().isPresent()) {
           themeDto = getThemeDtoQuery(theme.getId().get()).apply(em).orElse(null);
         }
 
@@ -288,7 +288,7 @@ public class ThemesServiceDatabaseImpl implements ThemesServiceDatabase {
   }
 
   private void updateTheme(Theme theme, ThemeDto themeDto) {
-    if (theme.getId().isSome()) {
+    if (theme.getId().isPresent()) {
       themeDto.setId(theme.getId().get());
     }
     themeDto.setUsername(theme.getCreator().getUsername());

@@ -27,10 +27,10 @@ import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.smil.entity.api.Smil;
-import org.opencastproject.util.data.Option;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Encodes media and (optionally) periodically alerts a statusService endpoint of the status of this encoding job.
@@ -119,9 +119,10 @@ public interface ComposerService {
    *        if the mediapackage is invalid
    */
 
-  Job composite(Dimension outputDimension, Option<LaidOutElement<Track>> option,
-        LaidOutElement<Track> lowerLaidOutElement, Option<LaidOutElement<Attachment>> watermarkOption,
-        String identifier, String outputBackground, String sourceAudioName) throws EncoderException, MediaPackageException;
+  Job composite(Dimension outputDimension, Optional<LaidOutElement<Track>> option,
+        LaidOutElement<Track> lowerLaidOutElement, Optional<LaidOutElement<Attachment>> watermarkOption,
+        String identifier, String outputBackground, String sourceAudioName)
+          throws EncoderException, MediaPackageException;
 
   /**
    * Concat multiple tracks to a single track.
@@ -154,8 +155,8 @@ public interface ComposerService {
    * @throws EncoderException if encoding fails
    * @throws MediaPackageException if the mediapackage is invalid
    */
-  Job concat(String profileId, Dimension outputDimension, float outputFrameRate, boolean sameCodec, Track... tracks) throws EncoderException,
-          MediaPackageException;
+  Job concat(String profileId, Dimension outputDimension, float outputFrameRate, boolean sameCodec, Track... tracks)
+          throws EncoderException, MediaPackageException;
 
   /**
    * Transforms an image attachment to a video track

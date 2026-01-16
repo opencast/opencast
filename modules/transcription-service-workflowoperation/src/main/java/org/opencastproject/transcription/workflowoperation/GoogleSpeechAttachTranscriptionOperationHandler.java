@@ -48,8 +48,6 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-
 @Component(
     immediate = true,
     service = WorkflowOperationHandler.class,
@@ -110,7 +108,7 @@ public class GoogleSpeechAttachTranscriptionOperationHandler extends AbstractWor
     // Check which tags/flavors have been configured
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(
         workflowInstance, Configuration.none, Configuration.none, Configuration.many, Configuration.one);
-    List<String> targetTagOption = tagsAndFlavors.getTargetTags();
+    ConfiguredTagsAndFlavors.TargetTags targetTagOption = tagsAndFlavors.getTargetTags();
     // Target flavor is mandatory
     MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor();
 
@@ -158,9 +156,7 @@ public class GoogleSpeechAttachTranscriptionOperationHandler extends AbstractWor
       transcription.setFlavor(targetFlavor);
 
       // Add tags
-      for (String tag : targetTagOption) {
-        transcription.addTag(tag);
-      }
+      applyTargetTagsToElement(targetTagOption, transcription);
 
       // Add to media package
       mediaPackage.add(transcription);

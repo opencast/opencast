@@ -39,8 +39,6 @@ import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.util.NotFoundException;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
@@ -62,6 +60,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Optional;
 import java.util.TimeZone;
 
 import javax.servlet.http.HttpServletRequest;
@@ -75,58 +74,58 @@ public class EventHttpServletRequest {
   private static final String METADATA_JSON_KEY = "metadata";
   private static final String ROLE_JSON_KEY = "role";
 
-  private Opt<AccessControlList> acl = Opt.none();
-  private Opt<MediaPackage> mediaPackage = Opt.none();
-  private Opt<MetadataList> metadataList = Opt.none();
-  private Opt<JSONObject> processing = Opt.none();
-  private Opt<JSONObject> source = Opt.none();
-  private Opt<JSONObject> scheduling = Opt.none();
+  private Optional<AccessControlList> acl = Optional.empty();
+  private Optional<MediaPackage> mediaPackage = Optional.empty();
+  private Optional<MetadataList> metadataList = Optional.empty();
+  private Optional<JSONObject> processing = Optional.empty();
+  private Optional<JSONObject> source = Optional.empty();
+  private Optional<JSONObject> scheduling = Optional.empty();
 
   public void setAcl(AccessControlList acl) {
-    this.acl = Opt.some(acl);
+    this.acl = Optional.of(acl);
   }
 
   public void setMediaPackage(MediaPackage mediaPackage) {
-    this.mediaPackage = Opt.some(mediaPackage);
+    this.mediaPackage = Optional.of(mediaPackage);
   }
 
   public void setMetadataList(MetadataList metadataList) {
-    this.metadataList = Opt.some(metadataList);
+    this.metadataList = Optional.of(metadataList);
   }
 
   public void setProcessing(JSONObject processing) {
-    this.processing = Opt.some(processing);
+    this.processing = Optional.of(processing);
   }
 
   public void setScheduling(JSONObject scheduling) {
-    this.scheduling = Opt.some(scheduling);
+    this.scheduling = Optional.of(scheduling);
   }
 
   public void setSource(JSONObject source) {
-    this.source = Opt.some(source);
+    this.source = Optional.of(source);
   }
 
-  public Opt<AccessControlList> getAcl() {
+  public Optional<AccessControlList> getAcl() {
     return acl;
   }
 
-  public Opt<MediaPackage> getMediaPackage() {
+  public Optional<MediaPackage> getMediaPackage() {
     return mediaPackage;
   }
 
-  public Opt<MetadataList> getMetadataList() {
+  public Optional<MetadataList> getMetadataList() {
     return metadataList;
   }
 
-  public Opt<JSONObject> getProcessing() {
+  public Optional<JSONObject> getProcessing() {
     return processing;
   }
 
-  public Opt<JSONObject> getScheduling() {
+  public Optional<JSONObject> getScheduling() {
     return scheduling;
   }
 
-  public Opt<JSONObject> getSource() {
+  public Optional<JSONObject> getSource() {
     return source;
   }
 
@@ -160,7 +159,7 @@ public class EventHttpServletRequest {
     try {
       if (ServletFileUpload.isMultipartContent(request)) {
         eventHttpServletRequest.setMediaPackage(ingestService.createMediaPackage());
-        if (eventHttpServletRequest.getMediaPackage().isNone()) {
+        if (eventHttpServletRequest.getMediaPackage().isEmpty()) {
           throw new IndexServiceException("Unable to create a new mediapackage to store the new event's media.");
         }
 
@@ -168,7 +167,8 @@ public class EventHttpServletRequest {
           FileItemStream item = iter.next();
           String fieldName = item.getFieldName();
           if (item.isFormField()) {
-            setFormField(eventCatalogUIAdapters, eventHttpServletRequest, item, fieldName, startDatePattern, startTimePattern);
+            setFormField(eventCatalogUIAdapters, eventHttpServletRequest, item, fieldName, startDatePattern,
+                startTimePattern);
           } else {
             if (!item.getName().isBlank()) {
               ingestFile(ingestService, eventHttpServletRequest, item);
@@ -258,11 +258,11 @@ public class EventHttpServletRequest {
         } catch (IllegalArgumentException e) {
           throw e;
         } catch (ParseException e) {
-          throw new IllegalArgumentException(String.format("Unable to parse event metadata because: '%s'", e.toString()));
+          throw new IllegalArgumentException(String.format("Unable to parse event metadata because: '%s'", e));
         } catch (NotFoundException e) {
           throw e;
         } catch (java.text.ParseException e) {
-          throw new IllegalArgumentException(String.format("Unable to parse event metadata because: '%s'", e.toString()));
+          throw new IllegalArgumentException(String.format("Unable to parse event metadata because: '%s'", e));
         }
       }
     } else if ("acl".equals(item.getFieldName())) {
@@ -336,7 +336,8 @@ public class EventHttpServletRequest {
           FileItemStream item = iter.next();
           String fieldName = item.getFieldName();
           if (item.isFormField()) {
-            setFormField(eventCatalogUIAdapters, eventHttpServletRequest, item, fieldName, startDatePattern, startTimePattern);
+            setFormField(eventCatalogUIAdapters, eventHttpServletRequest, item, fieldName, startDatePattern,
+                startTimePattern);
           }
         }
       } catch (IOException e) {
@@ -383,7 +384,8 @@ public class EventHttpServletRequest {
         entries.add(ace);
       } else {
         throw new IllegalArgumentException(String.format(
-                "One of the access control elements is missing a property. The action was '%s', allow was '%s' and the role was '%s'",
+                "One of the access control elements is missing a property. The action was '%s', allow was '%s' and "
+                    + "the role was '%s'",
                 action, allow, role));
       }
     }
@@ -458,29 +460,35 @@ public class EventHttpServletRequest {
                       String.format("Unable to parse the 'subjects' metadata array field because: %s", e.toString()));
             }
           } else if ("startDate".equals(key)) {
-            // Special handling for start date since in API v1 we expect start date and start time to be separate fields.
+            // Special handling for start date since in API v1 we expect start date and start time to be separate
+            // fields.
             MetadataField field = collection.getOutputFields().get(key);
             if (field == null) {
               throw new NotFoundException(String.format(
                       "Cannot find a metadata field with id '%s' from Catalog with Flavor '%s'.", key, flavorString));
             }
-            SimpleDateFormat apiSdf = MetadataField.getSimpleDateFormatter(startDatePattern == null ? field.getPattern() : startDatePattern);
+            SimpleDateFormat apiSdf = MetadataField.getSimpleDateFormatter(startDatePattern == null
+                ? field.getPattern() : startDatePattern);
             SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(field.getPattern());
             DateTime newStartDate = new DateTime(apiSdf.parse(fields.get(key)), DateTimeZone.UTC);
             if (field.getValue() != null) {
               DateTime oldStartDate = new DateTime(sdf.parse((String) field.getValue()), DateTimeZone.UTC);
-              newStartDate = oldStartDate.withDate(newStartDate.year().get(), newStartDate.monthOfYear().get(), newStartDate.dayOfMonth().get());
+              newStartDate = oldStartDate.withDate(newStartDate.year().get(), newStartDate.monthOfYear().get(),
+                  newStartDate.dayOfMonth().get());
             }
             collection.removeField(field);
             collection.addField(MetadataJson.copyWithDifferentJsonValue(field, sdf.format(newStartDate.toDate())));
           } else if ("startTime".equals(key)) {
-            // Special handling for start time since in API v1 we expect start date and start time to be separate fields.
+            // Special handling for start time since in API v1 we expect start date and start time to be separate
+            // fields.
             MetadataField field = collection.getOutputFields().get("startDate");
             if (field == null) {
               throw new NotFoundException(String.format(
-                      "Cannot find a metadata field with id '%s' from Catalog with Flavor '%s'.", "startDate", flavorString));
+                      "Cannot find a metadata field with id '%s' from Catalog with Flavor '%s'.", "startDate",
+                  flavorString));
             }
-            SimpleDateFormat apiSdf = MetadataField.getSimpleDateFormatter(startTimePattern == null ? "HH:mm" : startTimePattern);
+            SimpleDateFormat apiSdf = MetadataField.getSimpleDateFormatter(startTimePattern == null
+                ? "HH:mm" : startTimePattern);
             SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(field.getPattern());
             DateTime newStartDate = new DateTime(apiSdf.parse(fields.get(key)), DateTimeZone.UTC);
             if (field.getValue() != null) {

@@ -20,8 +20,6 @@
  */
 package org.opencastproject.external.endpoint;
 
-import static com.entwinemedia.fn.data.Opt.none;
-import static com.entwinemedia.fn.data.Opt.some;
 import static org.easymock.EasyMock.anyObject;
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.eq;
@@ -53,6 +51,7 @@ import org.junit.Ignore;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Optional;
 
 import javax.ws.rs.Path;
 
@@ -188,9 +187,10 @@ public class TestWorkflowsEndpoint extends WorkflowsEndpoint {
     IndexService is = createNiceMock(IndexService.class);
     Event e = new Event();
     Event eWithRunningWorkflow = new Event();
-    expect(is.getEvent(eq("missing"), anyObject())).andReturn(none());
-    expect(is.getEvent(eq("905672ed-181c-4d60-b7cd-02758f61e713"), anyObject())).andReturn(some(e));
-    expect(is.getEvent(eq("mediapackage-with-running-workflow"), anyObject())).andReturn(some(eWithRunningWorkflow));
+    expect(is.getEvent(eq("missing"), anyObject())).andReturn(Optional.empty());
+    expect(is.getEvent(eq("905672ed-181c-4d60-b7cd-02758f61e713"), anyObject())).andReturn(Optional.of(e));
+    expect(is.getEvent(eq("mediapackage-with-running-workflow"), anyObject()))
+        .andReturn(Optional.of(eWithRunningWorkflow));
     expect(is.getEventMediapackage(e)).andReturn(mp);
     expect(is.getEventMediapackage(eWithRunningWorkflow)).andReturn(mpWithRunningWorkflow);
     replay(is);

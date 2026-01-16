@@ -72,7 +72,7 @@ public class PublicationChannelToWorkspace extends AbstractWorkflowOperationHand
 
   @Override
   public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
-      throws WorkflowOperationException {
+          throws WorkflowOperationException {
 
     logger.info("Copying artifacts from published media package {} to workspace", workflowInstance.getId());
     final MediaPackage mediaPackage = workflowInstance.getMediaPackage();
@@ -83,7 +83,7 @@ public class PublicationChannelToWorkspace extends AbstractWorkflowOperationHand
         Configuration.many, Configuration.many, Configuration.many);
     List<MediaPackageElementFlavor> configuredSourceFlavors = tagsAndFlavors.getSrcFlavors();
     List<String> configuredSourceTags = tagsAndFlavors.getSrcTags();
-    List <String> configuredTargetTags = tagsAndFlavors.getTargetTags();
+    ConfiguredTagsAndFlavors.TargetTags configuredTargetTags = tagsAndFlavors.getTargetTags();
     String publicationChannel = StringUtils
         .trimToEmpty(currentOperation.getConfiguration(OPT_SOURCE_PUBLICATION_CHANNEL));
     if (publicationChannel.isEmpty()) {
@@ -111,11 +111,10 @@ public class PublicationChannelToWorkspace extends AbstractWorkflowOperationHand
     }
     Collection<Track> tracks = trackSelector.select(mediaPackage, publicationChannel, false);
 
-    if (!configuredTargetTags.isEmpty()) {
-      tracks.forEach(track -> {
-        configuredTargetTags.forEach(targetTag -> track.addTag(targetTag.toString()));
-      });
-    }
+
+    tracks.forEach(track -> {
+      applyTargetTagsToElement(configuredTargetTags, track);
+    });
     tracks.forEach(mediaPackage::add);
 
     //get attachements from publicationchannel with tags and flavors
@@ -128,11 +127,9 @@ public class PublicationChannelToWorkspace extends AbstractWorkflowOperationHand
     }
     Collection<Attachment> attachments = attachmentSelector.select(mediaPackage, publicationChannel, false);
 
-    if (!configuredTargetTags.isEmpty()) {
-      attachments.forEach(attachment -> {
-        configuredTargetTags.forEach(targetTag -> attachment.addTag(targetTag.toString()));
-      });
-    }
+    attachments.forEach(attachment -> {
+      applyTargetTagsToElement(configuredTargetTags, attachment);
+    });
     attachments.forEach(mediaPackage::add);
 
     //get catalogs from publicationchannel with tags and flavors
@@ -145,11 +142,9 @@ public class PublicationChannelToWorkspace extends AbstractWorkflowOperationHand
     }
     Collection<Catalog> catalogs = catalogSelector.select(mediaPackage, publicationChannel, false);
 
-    if (!configuredTargetTags.isEmpty()) {
-      catalogs.forEach(catalog -> {
-        configuredTargetTags.forEach(targetTag -> catalog.addTag(targetTag.toString()));
-      });
-    }
+    catalogs.forEach(catalog -> {
+      applyTargetTagsToElement(configuredTargetTags, catalog);
+    });
     catalogs.forEach(mediaPackage::add);
 
     return createResult(mediaPackage, Action.CONTINUE, 0);

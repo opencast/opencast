@@ -31,11 +31,10 @@ import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.util.data.Collections;
 
-import com.entwinemedia.fn.data.Iterators;
-import com.entwinemedia.fn.data.ListBuilders;
-
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.XMLConstants;
@@ -90,12 +89,32 @@ public class XmlNamespaceContextTest {
   }
 
   private void testGetPrefixes(XmlNamespaceContext ctx, List<String> barPrefixes) {
-    assertTrue(Iterators.eq(asList("foo").iterator(), ctx.getPrefixes("http://foo.org")));
-    assertTrue(EqualsUtil.eqListUnsorted(barPrefixes, ListBuilders.LIA.mk(ctx.getPrefixes("http://bar.org"))));
-    assertTrue(Iterators.eq(asList("xml").iterator(), ctx.getPrefixes(XMLConstants.XML_NS_URI)));
-    assertTrue(Iterators.eq(asList("xmlns").iterator(), ctx.getPrefixes(XMLConstants.XMLNS_ATTRIBUTE_NS_URI)));
+    assertTrue(iteratorsEqual(asList("foo").iterator(), ctx.getPrefixes("http://foo.org")));
+    assertTrue(EqualsUtil.eqListUnsorted(barPrefixes, toList(ctx.getPrefixes("http://bar.org"))));
+    assertTrue(iteratorsEqual(asList("xml").iterator(), ctx.getPrefixes(XMLConstants.XML_NS_URI)));
+    assertTrue(iteratorsEqual(asList("xmlns").iterator(), ctx.getPrefixes(XMLConstants.XMLNS_ATTRIBUTE_NS_URI)));
     assertFalse(ctx.getPrefixes("http://baz.org").hasNext());
   }
+
+  /** Utility: compare two iterators for equality of elements in order */
+  private static <T> boolean iteratorsEqual(Iterator<? extends T> a, Iterator<? extends T> b) {
+    while (a.hasNext() && b.hasNext()) {
+      if (!java.util.Objects.equals(a.next(), b.next())) {
+        return false;
+      }
+    }
+    return !a.hasNext() && !b.hasNext();
+  }
+
+  /** Utility: convert Iterator to List */
+  private static <T> List<T> toList(Iterator<T> it) {
+    List<T> list = new ArrayList<>();
+    while (it.hasNext()) {
+      list.add(it.next());
+    }
+    return list;
+  }
+
 
   @Test
   public void testAdd() {

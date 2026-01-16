@@ -21,15 +21,13 @@
 
 package org.opencastproject.job.api;
 
-import static org.opencastproject.util.data.Monadics.mlist;
-
 import org.opencastproject.serviceregistry.api.IncidentService;
 import org.opencastproject.serviceregistry.api.IncidentServiceException;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Function;
 
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -51,18 +49,22 @@ public final class JaxbIncidentDigestTree {
   public JaxbIncidentDigestTree() {
   }
 
-  public JaxbIncidentDigestTree(IncidentService svc, Locale locale, IncidentTree tree) throws IncidentServiceException,
-          NotFoundException {
-    this.incidents = mlist(tree.getIncidents()).map(JaxbIncidentDigest.mkFn(svc, locale)).value();
-    this.descendants = mlist(tree.getDescendants()).map(mkFn(svc, locale)).value();
+  public JaxbIncidentDigestTree(IncidentService svc, Locale locale, IncidentTree tree)
+      throws IncidentServiceException, NotFoundException {
+    this.incidents = tree.getIncidents().stream()
+        .map(i -> JaxbIncidentDigest.mkFn(svc, locale, i))
+        .collect(Collectors.toList());
+
+    this.descendants = tree.getDescendants().stream()
+        .map(d -> mkFn(svc, locale, d))
+        .collect(Collectors.toList());
   }
 
-  public static Function<IncidentTree, JaxbIncidentDigestTree> mkFn(final IncidentService svc, final Locale locale) {
-    return new Function.X<IncidentTree, JaxbIncidentDigestTree>() {
-      @Override
-      public JaxbIncidentDigestTree xapply(IncidentTree tree) throws Exception {
-        return new JaxbIncidentDigestTree(svc, locale, tree);
-      }
-    };
+  public static JaxbIncidentDigestTree mkFn(final IncidentService svc, final Locale locale, IncidentTree tree) {
+    try {
+      return new JaxbIncidentDigestTree(svc, locale, tree);
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
   }
 }

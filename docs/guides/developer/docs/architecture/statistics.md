@@ -26,6 +26,8 @@ The default implementation of the StatisticsService as an OSGi service.
 The remote implementation of the StatisticsService.
 * `statistics-provider-influx`
 An implementation of the StatisticsProvider for InfluxDB
+* `statistics-provider-matomo`
+An implementation of the StatisticsProvider for Matomo
 * `statistics-provider-random`
 An implementation of the StatisticsProvider for testing and demo purposes.
 
@@ -94,6 +96,3 @@ File                                                                            
 --------------------------------------------------------------------------------------------|------------
 modules/admin-ui/src/main/java/org/opencastproject/adminui/endpoint/StatisticsEndpoint.java | Implementation of the Statistics endpoint for the Admin UI facade
 modules/admin-ui/src/main/webapp/scripts/shared/resources/statisticsResource.js             | Abstracts StatisticsEndpoint for use in the web application
-
-
-

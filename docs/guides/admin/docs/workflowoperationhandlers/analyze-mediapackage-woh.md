@@ -40,15 +40,12 @@ If no mediapackage element matches a configuration key, no workflow instance var
 Operation Example
 -----------------
 
-```xml
-<operation
-  id="analyze-mediapackage"
-  description="Analyze media package and set control variables">
-  <configurations>
-    <configuration key="source-flavors">*/source</configuration>
-    <configuration key="set-publication-variables">true</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: analyze-mediapackage
+    description: Analyze media package and set control variables
+    configurations:
+      - source-flavors: '*/source'
+      - set-publication-variables: true
 ```
 
 The operation will create workflow instance variables like this:

@@ -40,6 +40,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -558,6 +559,9 @@ public class Database {
   }
 
   public List<Snapshot> getLatestSnapshotsByMediaPackageIds(Collection mediaPackageIds, String orgId) {
+    if (mediaPackageIds.isEmpty()) {
+      return Collections.emptyList();
+    }
     return db.execTx(em -> {
       List<SnapshotDto> snapshotDto = namedQuery.findAll(
           "Snapshot.findLatestByMpIds",

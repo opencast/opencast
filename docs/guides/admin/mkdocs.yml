@@ -41,9 +41,10 @@ nav:
   - Upgrade Guide: "upgrade.md"
   - Registration: "registration.md"
   - Changelogs:
+      - Opencast 19: "changelog/opencast-19.md"
       - Opencast 18: "changelog/opencast-18.md"
-      - Opencast 17: "changelog/opencast-17.md"
       - Older Versions:
+          - Opencast 17: "changelog/older-versions/opencast-17.md"
           - Opencast 16: "changelog/older-versions/opencast-16.md"
           - Opencast 15: "changelog/older-versions/opencast-15.md"
           - Opencast 14: "changelog/older-versions/opencast-14.md"
@@ -63,17 +64,17 @@ nav:
       - Overview: "installation/index.md"
       - Hardware Requirements: installation/server-requirements.md
       - Java Versions: installation/java-version.md
-      - Multiple Servers: "installation/multiple-servers.md"
+      - Installation from Package:
+          - Debian/Ubuntu: "installation/debs.md"
+          - RHEL/Rocky/CentOS: "installation/rpm-el.md"
+      - Installation with Docker:
+          - Testing Locally: "installation/docker-local.md"
       - Installation from Source:
           - Linux: "installation/source-linux.md"
           - macOS: "installation/source-macosx.md"
-      - Installation from Package:
-          - Debian/Ubuntu: "installation/debs.md"
-          - RHEL/CentOS Stream 8/9: "installation/rpm-el.md"
       - Installation via script:
           - Ansible: "installation/ansible.md"
-      - Installation with Docker:
-          - Testing Locally: "installation/docker-local.md"
+      - Multiple Servers: "installation/multiple-servers.md"
       - Prerelease Testing: "installation/prereleases.md"
   - Configuration:
       - Overview: "configuration/index.md"
@@ -82,7 +83,8 @@ nav:
       - HTTPS:
           - Overview: "configuration/https/index.md"
           - Using Nginx: "configuration/https/nginx.md"
-          - Using Apache httpd: configuration/https/apache-httpd.md
+          - Using Apache httpd: "configuration/https/apache-httpd.md"
+          - Using Caddy: "configuration/https/caddy.md"
           - Internal HTTPS: "configuration/https/opencast.only.md"
           - Self-Signed Certificates: "configuration/https/self-signed-certificates.md"
       - Domain change/HTTPS migration: "configuration/migration-domain-https.md"
@@ -92,7 +94,10 @@ nav:
           - Languages: "configuration/admin-ui/languages.md"
           - Manual Asset Upload: "configuration/admin-ui/asset-upload.md"
           - Role-based Visibility: "configuration/admin-ui/role-based-visibility.md"
-          - Statistics: "configuration/admin-ui/statistics.md"
+          - Statistics:
+              - Overview: 'configuration/admin-ui/statistics/statistics.overview.md'
+              - InfluxDB Statistics Provider: 'configuration/admin-ui/statistics/influxdb-statistics-provider.md'
+              - Matomo Statistics Provider: 'configuration/admin-ui/statistics/matomo-statistics-provider.md'
           - Thumbnails: "configuration/admin-ui/thumbnails.md"
           - Imprint and Privacy Statement: "configuration/admin-ui/about.md"
           - Terms of Use: "configuration/admin-ui/terms.md"
@@ -145,6 +150,10 @@ nav:
                   - org.opencast.paella.matomo.userTrackingDataPlugin: "configuration/player/paella.player7/plugins/org.opencast.paella.matomo.userTrackingDataPlugin.md"
                   - org.opencast.paella.transcriptionsPlugin: "configuration/player/paella.player7/plugins/org.opencast.paella.transcriptionsPlugin.md"
                   - org.opencast.paella.versionButton.js: "configuration/player/paella.player7/plugins/org.opencast.paella.versionButton.md"
+          - Paella player 8:
+              - Configuration: "configuration/player/paella.player8/configuration.md"
+              - URL Parameters: "configuration/player/paella.player8/url.parameter.md"
+              - Paella plugins: "configuration/player/paella.player8/plugins.md"
       - Playlists: configuration/playlists.md
       - Plugin Management: configuration/plugin-management.md
       - Role Based Event Access: "configuration/episode-id-roles.md"
@@ -162,6 +171,7 @@ nav:
           - AWS AutoScaling: "configuration/terminationstate.aws.autoscaling.md"
       - Text Extraction: "configuration/textextraction.md"
       - Timeline Previews: "configuration/timelinepreviews.md"
+      - Tobira: "configuration/tobira.md"
       - Transcription configuration:
           - AmberScript: "configuration/transcription.configuration/amberscripttranscripts.md"
           - Google Speech: "configuration/transcription.configuration/googlespeechtranscripts.md"

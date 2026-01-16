@@ -21,15 +21,16 @@
 package org.opencastproject.oaipmh.server;
 
 import org.opencastproject.oaipmh.persistence.SearchResultItem;
-import org.opencastproject.util.data.Option;
 
 import org.w3c.dom.Element;
+
+import java.util.Optional;
 
 /**
  * A metadata provider provides XML serialized metadata for a certain OAI-PMH metadata prefix. For further information
  * about metadata prefixes see the section
- * <a href="http://www.openarchives.org/OAI/openarchivesprotocol.html#MetadataNamespaces">3.4 metadataPrefix and Metadata
- * Schema</a> of the OAI-PMH specification.
+ * <a href="http://www.openarchives.org/OAI/openarchivesprotocol.html#MetadataNamespaces">3.4 metadataPrefix and
+ * Metadata Schema</a> of the OAI-PMH specification.
  */
 public interface MetadataProvider {
   /**
@@ -40,6 +41,6 @@ public interface MetadataProvider {
   /**
    * Transform a search result item into a piece of XML metadata.
    */
-  Element createMetadata(OaiPmhRepository repository, SearchResultItem item, Option<String> set);
+  Element createMetadata(OaiPmhRepository repository, SearchResultItem item, Optional<String> set);
 
 }

@@ -22,8 +22,6 @@
 package org.opencastproject.workflow.api;
 
 import static java.lang.String.format;
-import static org.opencastproject.util.data.Option.option;
-import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobBarrier;
@@ -32,13 +30,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Function0;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
-
-import com.entwinemedia.fn.data.Opt;
-import com.entwinemedia.fn.fns.Strings;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -52,6 +44,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * Abstract base implementation for an operation handler, which implements a simple start operation that returns a
@@ -75,7 +68,9 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
   private long jobBarrierPollingInterval = JobBarrier.DEFAULT_POLLING_INTERVAL;
 
   /** Config for Tag Parsing operation */
-  protected enum Configuration { none, one, many };
+  protected enum Configuration {
+    none, one, many
+  };
 
   public static final String TARGET_FLAVORS = "target-flavors";
   public static final String TARGET_FLAVOR = "target-flavor";
@@ -101,8 +96,8 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(
+   *      org.opencastproject.workflow.api.WorkflowInstance, JobContext)
    */
   @Override
   public abstract WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
@@ -111,8 +106,8 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#skip(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#skip(
+   *      org.opencastproject.workflow.api.WorkflowInstance, JobContext)
    */
   @Override
   public WorkflowOperationResult skip(WorkflowInstance workflowInstance, JobContext context)
@@ -123,8 +118,8 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#destroy(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#destroy(
+   *      org.opencastproject.workflow.api.WorkflowInstance, JobContext)
    */
   @Override
   public void destroy(WorkflowInstance workflowInstance, JobContext context) throws WorkflowOperationException {
@@ -148,13 +143,6 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
     }
     return list;
   }
-
-  /** {@link #asList(String)} as a function. */
-  protected Function<String, List<String>> asList = new Function<String, List<String>>() {
-    @Override public List<String> apply(String s) {
-      return asList(s);
-    }
-  };
 
   /**
    * Generates a filename using the base name of a source element and the extension of a derived element.
@@ -318,10 +306,11 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
   /**
    * Get a configuration option.
    *
-   * @deprecated use {@link #getConfig(WorkflowInstance, String)} or {@link #getOptConfig(org.opencastproject.workflow.api.WorkflowInstance, String)}
+   * @deprecated use {@link #getConfig(WorkflowInstance, String)} or
+   *             {@link #getOptConfig(org.opencastproject.workflow.api.WorkflowInstance, String)}
    */
-  protected Option<String> getCfg(WorkflowInstance wi, String key) {
-    return option(wi.getCurrentOperation().getConfiguration(key));
+  protected Optional<String> getCfg(WorkflowInstance wi, String key) {
+    return Optional.ofNullable(wi.getCurrentOperation().getConfiguration(key));
   }
 
   /**
@@ -345,8 +334,9 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
    *        Value to return if key does not exists
    */
   protected String getConfig(WorkflowInstance w, String key, String defaultValue) {
-    for (final String cfg : getOptConfig(w.getCurrentOperation(), key)) {
-      return cfg;
+    Optional<String> cfgOpt = getOptConfig(w.getCurrentOperation(), key);
+    if (cfgOpt.isPresent()) {
+      return cfgOpt.get();
     }
     return defaultValue;
   }
@@ -358,8 +348,9 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
    *         if the configuration key is either missing or empty
    */
   protected String getConfig(WorkflowOperationInstance woi, String key) throws WorkflowOperationException {
-    for (final String cfg : getOptConfig(woi, key)) {
-      return cfg;
+    Optional<String> cfgOpt = getOptConfig(woi, key);
+    if (cfgOpt.isPresent()) {
+      return cfgOpt.get();
     }
     throw new WorkflowOperationException(format("Configuration key '%s' is either missing or empty", key));
   }
@@ -367,28 +358,33 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
   /**
    * Get an optional configuration key. Values are returned trimmed.
    */
-  protected Opt<String> getOptConfig(WorkflowInstance wi, String key) {
+  protected Optional<String> getOptConfig(WorkflowInstance wi, String key) {
     return getOptConfig(wi.getCurrentOperation(), key);
   }
 
   /**
    * Get an optional configuration key. Values are returned trimmed.
    */
-  protected Opt<String> getOptConfig(WorkflowOperationInstance woi, String key) {
-    return Opt.nul(woi.getConfiguration(key)).flatMap(Strings.trimToNone);
+  protected Optional<String> getOptConfig(WorkflowOperationInstance woi, String key) {
+    return Optional.ofNullable(woi.getConfiguration(key))
+        .map(String::trim)
+        .filter(s -> !s.isEmpty());
   }
 
   /**
-   * Returns a ConfiguredTagsAndFlavors instance, which includes all specified source/target tags and flavors if they are valid
-   * Lists can be empty, if no values were specified! This is to enable WOHs to individually check if a given tag/flavor was set.
-   * This also means that you should use Configuration.many as parameter, if a tag/flavor is optional.
+   * Returns a ConfiguredTagsAndFlavors instance, which includes all specified source/target tags and flavors if they
+   * are valid. Lists can be empty, if no values were specified! This is to enable WOHs to individually check if a
+   * given tag/flavor was set. This also means that you should use Configuration.many as parameter, if a tag/flavor is
+   * optional.
    * @param srcTags none, one or many
    * @param srcFlavors none, one or many
    * @param targetFlavors none, one or many
    * @param targetTags none, one or many
    * @return ConfiguredTagsAndFlavors object including lists for the configured tags/flavors
    */
-  protected ConfiguredTagsAndFlavors getTagsAndFlavors(WorkflowInstance workflow, Configuration srcTags, Configuration srcFlavors, Configuration targetTags, Configuration targetFlavors) throws WorkflowOperationException {
+  protected ConfiguredTagsAndFlavors getTagsAndFlavors(WorkflowInstance workflow, Configuration srcTags,
+      Configuration srcFlavors, Configuration targetTags, Configuration targetFlavors)
+          throws WorkflowOperationException {
     WorkflowOperationInstance operation = workflow.getCurrentOperation();
     ConfiguredTagsAndFlavors tagsAndFlavors = new ConfiguredTagsAndFlavors();
     MediaPackageElementFlavor flavor;
@@ -454,7 +450,7 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
     }
     tagsAndFlavors.setSrcFlavors(srcFlavorList);
 
-    List<String> targetTagList = new ArrayList<>();
+    ConfiguredTagsAndFlavors.TargetTags targetTagMap = new ConfiguredTagsAndFlavors.TargetTags();
     String targetTag;
     switch(targetTags) {
       case none:
@@ -464,19 +460,20 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
         if (targetTag == null) {
           throw new WorkflowOperationException("Configuration key '" + TARGET_TAG + "' must be set");
         }
-        targetTagList.add(targetTag);
+        targetTagMap = parseTargetTagsByType(List.of(targetTag));
         break;
       case many:
-        targetTagList = asList(StringUtils.trimToNull(operation.getConfiguration(TARGET_TAGS)));
+        List<String> targetTagList = asList(StringUtils.trimToNull(operation.getConfiguration(TARGET_TAGS)));
+        targetTagMap = parseTargetTagsByType(targetTagList);
         targetTag = StringUtils.trimToNull(operation.getConfiguration(TARGET_TAG));
         if (targetTagList.isEmpty() && targetTag != null) {
-          targetTagList.add(targetTag);
+          targetTagMap = parseTargetTagsByType(List.of(targetTag));
         }
         break;
       default:
         throw new WorkflowOperationException("Couldn't process target-tag configuration option!");
     }
-    tagsAndFlavors.setTargetTags(targetTagList);
+    tagsAndFlavors.setTargetTags(targetTagMap);
 
     List<MediaPackageElementFlavor> targetFlavorList = new ArrayList<>();
     String singleTargetFlavor;
@@ -517,20 +514,61 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
     return tagsAndFlavors;
   }
 
-  /**
-   * Create an error function.
-   * <p>
-   * Example usage: <code>getCfg(wi, "key").getOrElse(this.&lt;String&gt;cfgKeyMissing("key"))</code>
-   *
-   * @see #getCfg(WorkflowInstance, String)
-   * @deprecated see {@link #getCfg(WorkflowInstance, String)} for details
-   */
-  protected <A> Function0<A> cfgKeyMissing(final String key) {
-    return new Function0<A>() {
-      @Override public A apply() {
-        return chuck(new WorkflowOperationException(key + " is missing or malformed"));
+  private ConfiguredTagsAndFlavors.TargetTags parseTargetTagsByType(List<String> tags) {
+    final String plus = "+";
+    final String minus = "-";
+    List<String> overrideTags = new ArrayList();
+    List<String> addTags = new ArrayList();
+    List<String> removeTags = new ArrayList();
+
+    for (String targetTag : tags) {
+      if (!StringUtils.startsWithAny(targetTag, plus, minus)) {
+        if (addTags.size() > 0
+            || removeTags.size() > 0) {
+          logger.warn("You may not mix override tags and tag changes. "
+              + "The list of override tags so far is {}. "
+              + "The tag {} is not prefixed with '{}' or '{}'.", overrideTags, targetTag, plus, minus);
+        }
+        overrideTags.add(targetTag);
+      } else if (StringUtils.startsWith(targetTag, plus)) {
+        addTags.add(StringUtils.substring(targetTag, 1));
+      } else if (StringUtils.startsWith(targetTag, minus)) {
+        removeTags.add(StringUtils.substring(targetTag, 1));
       }
-    };
+    }
+
+    return new ConfiguredTagsAndFlavors.TargetTags(overrideTags, addTags, removeTags);
+  }
+
+  /**
+   * Helper function that applies target tags to the given element, based on the type(s) of the tag(s)
+   * @param targetTags The target tags to apply to the element
+   * @param element The element the target tags are applied to
+   * @return The element with the applied target tags
+   */
+  protected <T extends MediaPackageElement> T applyTargetTagsToElement(
+      ConfiguredTagsAndFlavors.TargetTags targetTags,
+      T element
+  ) {
+    // set tags on target element
+    List<String> overrideTags = targetTags.getOverrideTags();
+    List<String> addTags = targetTags.getAddTags();
+    List<String> removeTags = targetTags.getRemoveTags();
+    if (overrideTags.size() > 0) {
+      element.clearTags();
+      for (String tag : overrideTags) {
+        element.addTag(tag);
+      }
+    } else {
+      for (String tag : removeTags) {
+        element.removeTag(tag);
+      }
+      for (String tag : addTags) {
+        element.addTag(tag);
+      }
+    }
+
+    return element;
   }
 
   /**
@@ -570,10 +608,11 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
   @Override
   public boolean equals(Object obj) {
     if (obj instanceof WorkflowOperationHandler) {
-      if (id != null)
+      if (id != null) {
         return id.equals(((WorkflowOperationHandler) obj).getId());
-      else
+      } else {
         return this == obj;
+      }
     }
     return false;
   }

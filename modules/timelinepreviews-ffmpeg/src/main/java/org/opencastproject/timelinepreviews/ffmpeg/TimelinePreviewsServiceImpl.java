@@ -30,7 +30,6 @@ import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
-import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
@@ -482,7 +481,7 @@ public class TimelinePreviewsServiceImpl extends AbstractJobProducer implements
 
     // set the flavor and an ID
     timelinepreviewsMpe.setFlavor(track.getFlavor());
-    timelinepreviewsMpe.setIdentifier(IdImpl.fromUUID().toString());
+    timelinepreviewsMpe.generateIdentifier();
 
     return timelinepreviewsMpe;
   }

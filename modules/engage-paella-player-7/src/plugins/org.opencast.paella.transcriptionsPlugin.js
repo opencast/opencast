@@ -96,10 +96,15 @@ export default class TranscriptionsPlugin extends PopUpButtonPlugin {
       const instant = t.time - trimmingOffset;
       const transcriptionItem = createElementWithHtmlText(`
         <li>
-          <img id="${id}" src="${t.preview}" alt="${t.text}"/>
-          <span><strong>${utils.secondsToTime(instant)}:</strong> ${t.text}</span>
+          <img id="${id}" src="" alt=""/>
+          <span><strong>hh:mm:ss:</strong> <span class="text"> </span></span>
         </li>`,
       this._transcriptionsContainer);
+      transcriptionItem.querySelector('strong').textContent = `${utils.secondsToTime(instant)}:`;
+      transcriptionItem.querySelector('img').alt = t.text;
+      transcriptionItem.querySelector('img').title = t.text;
+      transcriptionItem.querySelector('img').src = t.preview;
+      transcriptionItem.querySelector('span.text').textContent = t.text;
       transcriptionItem.addEventListener('click', async evt => {
         const trimmingOffset = videoContainer.isTrimEnabled ? videoContainer.trimStart : 0;
         this.player.videoContainer.setCurrentTime(t.time - trimmingOffset);
@@ -115,6 +120,7 @@ export default class TranscriptionsPlugin extends PopUpButtonPlugin {
     searchContainer.addEventListener('click', evt => evt.stopPropagation());
     searchContainer.addEventListener('keyup', evt => {
       this.rebuildList(evt.target.value);
+      evt.stopPropagation();
     });
     const transcriptionsContainer = createElementWithHtmlText(`
         <ul class="transcriptions-list"></ul>`, container);

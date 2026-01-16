@@ -18,19 +18,19 @@ Commands run by this operation handler must first be included in the `commands.a
 Parameter Table
 ---------------
 
-All parameters are empty by default if not specified. The special parameters `#id`, `#flavor` and `#out` are described
+All parameters are empty by default if not specified. The special parameters `#id`, `#flavor`, `#tags` and `#out` are described
 in [Execute Service: Parameter Substitution](../configuration/execute.md#parameter-substitution)
 
-|Configuration keys|Example    |Description       |Required?|
-|------------------|-----------|------------------|---------|
-|exec              |qtfaststart|The command to run|Yes      |
-|params            |-f -t 15 <nobr>#{flavor(presentation/distribute)}</nobr> #{out}|The arguments to the command. This string allows some placeholders for input and output MediaPackage elements (see Parameter Substitution)|Yes|
-|load              |1.5|A floating point estimate of the load imposed on the node by this job|No|
-|set-workflow-properties|true / false|Import workflow properties from the output file|No
-|output-filename   |outfile.mp4|Specifies the name of the file created by the command (if any), without path information. Used as the last part of the #{out} parameter|No|
-|expected-type     |Track|Specifies the type of MediaPackage element produced by the command: Manifest, Timeline, Track, Catalog, Attachment, Publication, Other|Required if output- filename is present|
-|target-flavor     |presentation/processed|Specifies the flavor of the resulting Mediapackage element created by the command. If no new element is created, this parameter is ignored.|Required if output- filename is present|
-|target-tags       |execservice, -trim|List of tags that will be applied to the resulting Mediapackage element. Tags starting with "-" will be deleted from the element instead, if present. The resulting element may be the same as the input element.|No|
+|Configuration keys| Example                                                         |Description       |Required?|
+|------------------|-----------------------------------------------------------------|------------------|---------|
+|exec              | qtfaststart                                                     |The command to run|Yes      |
+|params            | -f -t 15 <nobr>#{flavor(presentation/distribute)}</nobr> #{out} |The arguments to the command. This string allows some placeholders for input and output MediaPackage elements (see Parameter Substitution)|Yes|
+|load              | 1.5                                                             |A floating point estimate of the load imposed on the node by this job|No|
+|set-workflow-properties| true / false                                                    |Import workflow properties from the output file|No
+|output-filename   | outfile.mp4                                                     |Specifies the name of the file created by the command (if any), without path information. Used as the last part of the #{out} parameter|No|
+|expected-type     | Track                                                           |Specifies the type of MediaPackage element produced by the command: Manifest, Timeline, Track, Catalog, Attachment, Publication, Other|Required if output- filename is present|
+|target-flavor     | presentation/processed                                          |Specifies the flavor of the resulting Mediapackage element created by the command. If no new element is created, this parameter is ignored.|Required if output- filename is present|
+|target-tags       | +execservice, -trim                                             |Apply these (comma separated) tags to any media package elements. If a target-tag starts with a '-', it will be removed from preexisting tags, if a target-tag starts with a '+', it will be added to preexisting tags. If there is no prefix, all preexisting tags are removed and replaced by the target-tags.|No|
 
 If `set-workflow-properties` is true, the command should write a plain-text properties file to the location specified by
 `#{out}` in the key-value format supported by the [Java
@@ -46,34 +46,29 @@ Operation Example
 
 Run a command which combines two tracks into a new track:
 
-```xml
-<operation
-    id="execute-once"
-    description="Run command">
-  <configurations>
-    <configuration key="exec">ges-launch</configuration>
-    <configuration key="params">-e #{flavor(presenter/source)} 0 5m14s #{flavor(presentation/source)} 0 14s</configuration>
-    <configuration key="output-filename">result.avi</configuration>
-    <configuration key="target-flavor">output/joined</configuration>
-    <configuration key="target-tags">joined, -tojoin</configuration>
-    <configuration key="expected-type">Track</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: execute-once
+    description: Run command
+    configurations:
+      - exec: ges-launch
+      - params: '-e #{flavor(presenter/source)} 0 5m14s #{flavor(presentation/source)}
+          0 14s'
+      - output-filename: result.avi
+      - target-flavor: output/joined
+      - target-tags: joined, -tojoin
+      - expected-type: Track
 ```
 
 Run a command which inspects a mediapackage and adds new configuration properties to the running workflow, leaving the
 mediapackage unchanged:
 
-```xml
-<operation
-    id="execute-once"
-    description="Inspect media and update workflow properties">
-  <configurations>
-    <configuration key="exec">/usr/local/bin/oc-inspect.sh</configuration>
-    <configuration key="params">#{out} #{id}</configuration>
-    <configuration key="set-workflow-properties">true</configuration>
-    <configuration key="output-filename">wf.properties</configuration>
-    <configuration key="expected-type">Attachment</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: execute-once
+    description: Inspect media and update workflow properties
+    configurations:
+      - exec: /usr/local/bin/oc-inspect.sh
+      - params: '#{out} #{id}'
+      - set-workflow-properties: true
+      - output-filename: wf.properties
+      - expected-type: Attachment
 ```

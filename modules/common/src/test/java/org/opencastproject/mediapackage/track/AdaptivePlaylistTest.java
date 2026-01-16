@@ -42,7 +42,6 @@ import org.opencastproject.util.Checksum;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.XmlSafeParser;
-import org.opencastproject.util.data.Function2;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
@@ -72,6 +71,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -499,19 +499,16 @@ public class AdaptivePlaylistTest {
       }
     };
 
-    Function2<File, Track, Track> replaceHLSPlaylistInWS = new Function2<File, Track, Track>() {
-      @Override
-      public Track apply(File file, Track track) {
-        try {
-          // put file into workspace
-          URI uri = new URI(track.getIdentifier() + "/" + file.getName());
-          track.setURI(uri); // point track to new URI
-          File newFile = new File(srcDir, uri.getPath());
-          FileUtils.copyFile(file, newFile);
-          return track;
-        } catch (Exception e) {
-          return null;
-        }
+    BiFunction<File, Track, Track> replaceHLSPlaylistInWS = (file, track) -> {
+      try {
+        // put file into workspace
+        URI uri = new URI(track.getIdentifier() + "/" + file.getName());
+        track.setURI(uri); // point track to new URI
+        File newFile = new File(srcDir, uri.getPath());
+        FileUtils.copyFile(file, newFile);
+        return track;
+      } catch (Exception e) {
+        return null;
       }
     };
     // Get brand new files from test directory
@@ -675,19 +672,16 @@ public class AdaptivePlaylistTest {
       }
     };
 
-    Function2<File, Track, Track> replaceHLSPlaylistInWS = new Function2<File, Track, Track>() {
-      @Override
-      public Track apply(File file, Track track) {
-        try {
-          // put file into workspace
-          URI uri = new URI(track.getIdentifier() + "/" + file.getName());
-          track.setURI(uri); // point track to new URI
-          File newFile = new File(srcDir, uri.getPath());
-          FileUtils.copyFile(file, newFile);
-          return track;
-        } catch (Exception e) {
-          return null;
-        }
+    BiFunction<File, Track, Track> replaceHLSPlaylistInWS = (file, track) -> {
+      try {
+        // put file into workspace
+        URI uri = new URI(track.getIdentifier() + "/" + file.getName());
+        track.setURI(uri); // point track to new URI
+        File newFile = new File(srcDir, uri.getPath());
+        FileUtils.copyFile(file, newFile);
+        return track;
+      } catch (Exception e) {
+        return null;
       }
     };
 

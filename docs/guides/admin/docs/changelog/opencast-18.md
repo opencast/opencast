@@ -1,6 +1,92 @@
 Opencast 18 Changelog
 ---------------------
 
+Changes marked with \* were also included in 17.x.
+
+## Opencast 18.4 (2025-11-28)
+- [[#7219](https://github.com/opencast/opencast/pull/7219)] -
+  Update r/18.x Editor to 18.x-2025-11-28
+- [[#7218](https://github.com/opencast/opencast/pull/7218)] -
+  Update r/18.x Admin UI to 18.x-2025-11-28
+- [[#7195](https://github.com/opencast/opencast/pull/7195)] -
+  Fix incorrect escaping in site GHA build
+- [[#7173](https://github.com/opencast/opencast/pull/7173)] -
+  docs: Download npm packages to common folder
+- [[#7140](https://github.com/opencast/opencast/pull/7140)] -
+  Cleanup GHA workflows
+- [[#7137](https://github.com/opencast/opencast/pull/7137)] -
+  Add coverage report documentation
+- [[#7118](https://github.com/opencast/opencast/pull/7118)] -
+  Fixes direct publishing of live events
+- [[#7116](https://github.com/opencast/opencast/pull/7116)] -
+  Add brief Tobira "documentation"
+- [[#7112](https://github.com/opencast/opencast/pull/7112)] -
+  Fix checkstyle violations in scheduler modules
+- [[#7111](https://github.com/opencast/opencast/pull/7111)] -
+  Fix checkstyle violations in module working-file-repository-service-impl
+- [[#7109](https://github.com/opencast/opencast/pull/7109)] -
+  Fix checkstyle violations in workflow modules
+
+## Opencast 18.3 (2025-10-24)
+- [[#7132](https://github.com/opencast/opencast/pull/7132)] -
+  Update r/18.x Admin UI to 18.x-2025-10-24
+- [[#7133](https://github.com/opencast/opencast/pull/7133)] -
+  Update r/18.x Editor to 18.x-2025-10-24
+- [[#7069](https://github.com/opencast/opencast/pull/7069)] -
+  Fix silence detection for newer FFmpeg versions
+
+## Opencast 18.2 (2025-09-29)
+- [[#7071](https://github.com/opencast/opencast/pull/7071)] -
+  Update r/18.x Admin UI to 18.x-2025-09-29
+- [[#7070](https://github.com/opencast/opencast/pull/7070)] -
+  Update r/18.x Editor to 18.x-2025-09-29
+- [[#7061](https://github.com/opencast/opencast/pull/7061)] -
+  Remove workflow operation from worker
+- [[#7038](https://github.com/opencast/opencast/pull/7038)] -
+  Ensure mvnw is used in our github actions workflows
+- [[#7006](https://github.com/opencast/opencast/pull/7006)] -
+  Update installation docs
+- [[#6984](https://github.com/opencast/opencast/pull/6984)] -
+  Fix index rebuild stuff (again)
+- [[#6924](https://github.com/opencast/opencast/pull/6924)] -
+  Don't query for series collection in admin ui event endpoints
+- [[#7056](https://github.com/opencast/opencast/pull/7056)] -
+  Fix paella download plugins.\*
+- [[#7060](https://github.com/opencast/opencast/pull/7060)] -
+  Allow `mvnw` to work with symlinks\*
+
+## Opencast 18.1 (2025-08-29)
+- [[#7004](https://github.com/opencast/opencast/pull/7004)] -
+  Update r/18.x Admin UI to 18.x-2025-08-29
+- [[#7003](https://github.com/opencast/opencast/pull/7003)] -
+  Update r/18.x Editor to 18.x-2025-08-29
+- [[#6938](https://github.com/opencast/opencast/pull/6938)] -
+  Reactivate user role filter for admin ui
+- [[#6925](https://github.com/opencast/opencast/pull/6925)] -
+  Add support for source-tags to speechtotext woh
+- [[#6879](https://github.com/opencast/opencast/pull/6879)] -
+  Adds Opencast 18 release notes + upgrade docs
+- [[#6619](https://github.com/opencast/opencast/pull/6619)] -
+  Add tobira auth callback
+- [[#6996](https://github.com/opencast/opencast/pull/6996)] -
+  Split whispercpp args\*
+- [[#6973](https://github.com/opencast/opencast/pull/6973)] -
+  Fix missing `isPresent` check for optional workflow\*
+- [[#6980](https://github.com/opencast/opencast/pull/6980)] -
+  Fix javadoc build\*
+- [[#6983](https://github.com/opencast/opencast/pull/6983)] -
+  Ensure removing the correct reference\*
+- [[#6985](https://github.com/opencast/opencast/pull/6985)] -
+  Fix maven central publication\*
+- [[#6979](https://github.com/opencast/opencast/pull/6979)] -
+  Fix partial path traversal vulnerability in UI config\*
+- [[#6969](https://github.com/opencast/opencast/pull/6969)] -
+  Update Debian package docs\*
+- [[#6966](https://github.com/opencast/opencast/pull/6966)] -
+  Add option to pass additional args to WhisperCpp\*
+- [[#6965](https://github.com/opencast/opencast/pull/6965)] -
+  Remove reencoding to utf-8 of JWTs\*
+
 ## Opencast 18.0 (2025-07-24)
 - [[#6934](https://github.com/opencast/opencast/pull/6934)] -
   Merge sql migrations 17 to 18

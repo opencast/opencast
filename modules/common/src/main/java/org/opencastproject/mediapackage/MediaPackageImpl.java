@@ -22,9 +22,6 @@
 
 package org.opencastproject.mediapackage;
 
-import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.presentations;
-import static org.opencastproject.util.data.Monadics.mlist;
-
 import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.mediapackage.identifier.IdImpl;
@@ -57,7 +54,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.UUID;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -785,7 +781,14 @@ public final class MediaPackageImpl implements MediaPackage {
   @XmlElement(name = "publication")
   @Override
   public Publication[] getPublications() {
-    return mlist(elements).bind(presentations).value().toArray(new Publication[0]);
+//    return elements.stream()
+//        .map(presentations::apply)
+//        .flatMap(List::stream)
+//        .toArray(Publication[]::new);
+    return elements.stream()
+        .filter(Publication.class::isInstance)
+        .map(Publication.class::cast)
+        .toArray(Publication[]::new);
   }
 
   void setPublications(Publication[] publications) {
@@ -1006,7 +1009,7 @@ public final class MediaPackageImpl implements MediaPackage {
     // Check (uniqueness of) catalog identifier
     String id = catalog.getIdentifier();
     if (id == null || contains(id)) {
-      catalog.setIdentifier(createElementIdentifier());
+      catalog.generateIdentifier();
     }
     integrate(catalog);
   }
@@ -1022,7 +1025,7 @@ public final class MediaPackageImpl implements MediaPackage {
     // Check (uniqueness of) track identifier
     String id = track.getIdentifier();
     if (id == null || contains(id)) {
-      track.setIdentifier(createElementIdentifier());
+      track.generateIdentifier();
     }
     integrate(track);
   }
@@ -1038,18 +1041,9 @@ public final class MediaPackageImpl implements MediaPackage {
     // Check (uniqueness of) attachment identifier
     String id = attachment.getIdentifier();
     if (id == null || contains(id)) {
-      attachment.setIdentifier(createElementIdentifier());
+      attachment.generateIdentifier();
     }
     integrate(attachment);
-  }
-
-  /**
-   * Returns a unique media package element identifier.
-   *
-   * @return the element identifier
-   */
-  private String createElementIdentifier() {
-    return UUID.randomUUID().toString();
   }
 
   /**
@@ -1448,10 +1442,7 @@ public final class MediaPackageImpl implements MediaPackage {
 
     // Check if element has an id
     if (element.getIdentifier() == null) {
-      if (element instanceof AbstractMediaPackageElement) {
-        element.setIdentifier(createElementIdentifier());
-      } else
-        throw new UnsupportedElementException(element, "Found unknown element without id");
+      element.generateIdentifier();
     }
   }
 

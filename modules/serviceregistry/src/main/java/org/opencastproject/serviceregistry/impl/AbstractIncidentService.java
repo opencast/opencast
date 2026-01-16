@@ -22,9 +22,7 @@
 package org.opencastproject.serviceregistry.impl;
 
 import static org.opencastproject.db.Queries.namedQuery;
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.option;
+import static org.opencastproject.util.data.functions.Strings.trimToNone;
 
 import org.opencastproject.db.DBSession;
 import org.opencastproject.job.api.Incident;
@@ -39,11 +37,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Collections;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
-import org.opencastproject.util.data.functions.Functions;
-import org.opencastproject.util.data.functions.Strings;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationInstance.OperationState;
 import org.opencastproject.workflow.api.WorkflowService;
@@ -60,6 +54,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public abstract class AbstractIncidentService implements IncidentService {
   public static final String PERSISTENCE_UNIT_NAME = "org.opencastproject.serviceregistry";
@@ -122,7 +117,8 @@ public abstract class AbstractIncidentService implements IncidentService {
   }
 
   @Override
-  public IncidentTree getIncidentsOfJob(long jobId, boolean cascade) throws NotFoundException, IncidentServiceException {
+  public IncidentTree getIncidentsOfJob(long jobId, boolean cascade)
+          throws NotFoundException, IncidentServiceException {
     List<Incident> incidents = getIncidentsOfJob(jobId);
     List<IncidentTree> childIncidents = new ArrayList<>();
 
@@ -132,11 +128,13 @@ public abstract class AbstractIncidentService implements IncidentService {
         childIncidents = getChildIncidents(jobId);
       } else if (cascade && "START_WORKFLOW".equals(job.getOperation())) {
         for (WorkflowOperationInstance operation : getWorkflowService().getWorkflowById(jobId).getOperations()) {
-          if (operation.getState().equals(OperationState.INSTANTIATED))
+          if (operation.getState().equals(OperationState.INSTANTIATED)) {
             continue;
+          }
           IncidentTree operationResult = getIncidentsOfJob(operation.getId(), true);
-          if (hasIncidents(Collections.list(operationResult)))
+          if (hasIncidents(Collections.list(operationResult))) {
             childIncidents.add(operationResult);
+          }
         }
       }
       return new IncidentTreeImpl(incidents, childIncidents);
@@ -151,8 +149,9 @@ public abstract class AbstractIncidentService implements IncidentService {
 
   private boolean hasIncidents(List<IncidentTree> incidentResults) {
     for (IncidentTree result : incidentResults) {
-      if (result.getIncidents().size() > 0 || hasIncidents(result.getDescendants()))
+      if (result.getIncidents().size() > 0 || hasIncidents(result.getDescendants())) {
         return true;
+      }
     }
     return false;
   }
@@ -164,9 +163,10 @@ public abstract class AbstractIncidentService implements IncidentService {
     final List<String> loc = localeToList(locale);
     // check if cache map is empty
     // fill cache from
-    final String title = findText(loc, incident.getCode(), FIELD_TITLE).getOrElse(NO_TITLE);
-    final String description = findText(loc, incident.getCode(), FIELD_DESCRIPTION).map(
-            replaceVarsF(incident.getDescriptionParameters())).getOrElse(NO_DESCRIPTION);
+    final String title = findText(loc, incident.getCode(), FIELD_TITLE).orElse(NO_TITLE);
+    final String description = findText(loc, incident.getCode(), FIELD_DESCRIPTION)
+        .map(text -> replaceVars(text, incident.getDescriptionParameters()))
+        .orElse(NO_DESCRIPTION);
     return new IncidentL10n() {
       @Override
       public String getTitle() {
@@ -190,29 +190,29 @@ public abstract class AbstractIncidentService implements IncidentService {
    *          The incident code. See {@link org.opencastproject.job.api.Incident#getCode()}
    * @param field
    *          The field, e.g. "title" or "description"
-   * @return the found text wrapped in an option
+   * @return the found text wrapped in an Optional
    */
-  private Option<String> findText(List<String> locale, String incidentCode, String field) {
+  private Optional<String> findText(List<String> locale, String incidentCode, String field) {
     final List<String> keys = genDbKeys(locale, incidentCode + "." + field);
     for (String key : keys) {
-      final Option<String> text = getText(key);
-      if (text.isSome()) {
+      final Optional<String> text = getText(key);
+      if (text.isPresent()) {
         return text;
       }
     }
-    return none();
+    return Optional.empty();
   }
 
   private final Map<String, String> textCache = new HashMap<>();
 
   /** Get a text. */
-  private Option<String> getText(String key) {
+  private Optional<String> getText(String key) {
     synchronized (textCache) {
       if (textCache.isEmpty()) {
         textCache.putAll(fetchTextsFromDb());
       }
     }
-    return option(textCache.get(key));
+    return Optional.ofNullable(textCache.get(key));
   }
 
   /** Fetch all localizations from the database. */
@@ -229,12 +229,14 @@ public abstract class AbstractIncidentService implements IncidentService {
     List<Job> childJobs = getServiceRegistry().getChildJobs(jobId);
     List<IncidentTree> incidentResults = new ArrayList<>();
     for (Job childJob : childJobs) {
-      if (childJob.getParentJobId() != jobId)
+      if (childJob.getParentJobId() != jobId) {
         continue;
+      }
       List<Incident> incidentsForJob = getIncidentsOfJob(childJob.getId());
       IncidentTree incidentTree = new IncidentTreeImpl(incidentsForJob, getChildIncidents(childJob.getId()));
-      if (hasIncidents(Collections.list(incidentTree)))
+      if (hasIncidents(Collections.list(incidentTree))) {
         incidentResults.add(incidentTree);
+      }
     }
     return incidentResults;
   }
@@ -287,10 +289,9 @@ public abstract class AbstractIncidentService implements IncidentService {
 
   /** Convert a locale into a list of strings, [language, country, variant] */
   public static List<String> localeToList(Locale locale) {
-    return mlist(Strings.trimToNone(locale.getLanguage()), Strings.trimToNone(locale.getCountry()),
-            Strings.trimToNone(locale.getVariant()))
-    // flatten
-            .bind(Functions.<Option<String>> identity()).value();
+    return Stream.of(locale.getLanguage(), locale.getCountry(), locale.getVariant())
+        .flatMap(s -> trimToNone(s).stream())
+        .collect(Collectors.toList());
   }
 
   /** Replace variables of the form #{xxx} in a string template. */
@@ -300,18 +301,5 @@ public abstract class AbstractIncidentService implements IncidentService {
       s = s.replace("#{" + e.getKey() + "}", e.getValue());
     }
     return s;
-  }
-
-  /**
-   * {@link org.opencastproject.serviceregistry.impl.AbstractIncidentService#replaceVars(String, java.util.Map)} as a
-   * function.
-   */
-  public static Function<String, String> replaceVarsF(final Map<String, String> params) {
-    return new Function<String, String>() {
-      @Override
-      public String apply(String s) {
-        return replaceVars(s, params);
-      }
-    };
   }
 }

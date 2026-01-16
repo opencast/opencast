@@ -25,7 +25,6 @@ import static org.opencastproject.util.EqualsUtil.bothNotNull;
 import static org.opencastproject.util.EqualsUtil.eqListSorted;
 import static org.opencastproject.util.EqualsUtil.eqListUnsorted;
 import static org.opencastproject.util.RequireUtil.notNull;
-import static org.opencastproject.util.data.Option.some;
 
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
@@ -59,7 +58,6 @@ import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.series.impl.persistence.SeriesEntity;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Option;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.simple.parser.ParseException;
@@ -182,7 +180,9 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   @Override
   public DublinCoreCatalog updateSeries(DublinCoreCatalog dc) throws SeriesException, UnauthorizedException {
     try {
-      for (DublinCoreCatalog dublinCore : isNew(notNull(dc, "dc"))) {
+      Optional<DublinCoreCatalog> dublinCoreOpt = isNew(notNull(dc, "dc"));
+      if (dublinCoreOpt.isPresent()) {
+        DublinCoreCatalog dublinCore = dublinCoreOpt.get();
         final String id = dublinCore.getFirst(DublinCore.PROPERTY_IDENTIFIER);
 
         if (!dublinCore.hasValue(DublinCore.PROPERTY_CREATED)) {
@@ -216,18 +216,18 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
   }
 
   /** Check if <code>dc</code> is new and, if so, return an updated version ready to store. */
-  private Option<DublinCoreCatalog> isNew(DublinCoreCatalog dc) throws SeriesServiceDatabaseException {
+  private Optional<DublinCoreCatalog> isNew(DublinCoreCatalog dc) throws SeriesServiceDatabaseException {
     final String id = dc.getFirst(DublinCore.PROPERTY_IDENTIFIER);
     if (id != null) {
       try {
-        return equals(persistence.getSeries(id), dc) ? Option.none() : some(dc);
+        return equals(persistence.getSeries(id), dc) ? Optional.empty() : Optional.of(dc);
       } catch (NotFoundException e) {
-        return some(dc);
+        return Optional.of(dc);
       }
     } else {
       logger.info("Series Dublin Core does not contain identifier, generating one");
       dc.set(DublinCore.PROPERTY_IDENTIFIER, UUID.randomUUID().toString());
-      return some(dc);
+      return Optional.of(dc);
     }
   }
 
@@ -796,8 +796,8 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       Series series = seriesOpt.orElse(new Series(seriesId, orgId));
 
       List<ManagedAcl> acls = aclServiceFactory.serviceFor(securityService.getOrganization()).getAcls();
-      Option<ManagedAcl> managedAcl = AccessInformationUtil.matchAcls(acls, acl);
-      if (managedAcl.isSome()) {
+      Optional<ManagedAcl> managedAcl = AccessInformationUtil.matchAcls(acls, acl);
+      if (managedAcl.isPresent()) {
         series.setManagedAcl(managedAcl.get().getName());
       }
 

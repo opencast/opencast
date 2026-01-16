@@ -24,13 +24,13 @@ package org.opencastproject.kernel.bundleinfo;
 import static org.opencastproject.util.EqualsUtil.eq;
 import static org.opencastproject.util.EqualsUtil.hash;
 
-import org.opencastproject.util.data.Option;
+import java.util.Optional;
 
 public final class BundleVersion {
   private final String bundleVersion;
-  private final Option<String> buildNumber;
+  private final Optional<String> buildNumber;
 
-  public BundleVersion(String bundleVersion, Option<String> buildNumber) {
+  public BundleVersion(String bundleVersion, Optional<String> buildNumber) {
     this.bundleVersion = bundleVersion;
     this.buildNumber = buildNumber;
   }
@@ -39,7 +39,7 @@ public final class BundleVersion {
     return bundleVersion;
   }
 
-  public Option<String> getBuildNumber() {
+  public Optional<String> getBuildNumber() {
     return buildNumber;
   }
 

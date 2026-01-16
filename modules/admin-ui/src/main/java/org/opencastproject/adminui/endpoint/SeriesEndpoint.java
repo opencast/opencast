@@ -95,7 +95,6 @@ import org.opencastproject.themes.persistence.ThemesServiceDatabaseException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.UrlSupport;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestParameter.Type;
@@ -106,7 +105,6 @@ import org.opencastproject.util.requests.SortCriterion;
 import org.opencastproject.util.requests.SortCriterion.Order;
 import org.opencastproject.workflow.api.WorkflowInstance;
 
-import com.entwinemedia.fn.data.Opt;
 import com.google.gson.JsonObject;
 
 import org.apache.commons.lang3.BooleanUtils;
@@ -336,9 +334,9 @@ public class SeriesEndpoint {
     JSONObject seriesAccessJson = new JSONObject();
     try {
       AccessControlList seriesAccessControl = seriesService.getSeriesAccessControl(seriesId);
-      Option<ManagedAcl> currentAcl = AccessInformationUtil.matchAclsLenient(acls, seriesAccessControl,
+      Optional<ManagedAcl> currentAcl = AccessInformationUtil.matchAclsLenient(acls, seriesAccessControl,
               adminUIConfiguration.getMatchManagedAclRolePrefixes());
-      seriesAccessJson.put("current_acl", currentAcl.isSome() ? currentAcl.get().getId() : 0);
+      seriesAccessJson.put("current_acl", currentAcl.isPresent() ? currentAcl.get().getId() : 0);
       seriesAccessJson.put("privileges", AccessInformationUtil.serializePrivilegesByRole(seriesAccessControl));
       seriesAccessJson.put("acl", transformAccessControList(seriesAccessControl, userDirectoryService));
       seriesAccessJson.put("locked", hasProcessingEvents);
@@ -371,8 +369,8 @@ public class SeriesEndpoint {
     List<SeriesCatalogUIAdapter> catalogUIAdapters = indexService.getSeriesCatalogUIAdapters();
     catalogUIAdapters.remove(indexService.getCommonSeriesCatalogUIAdapter());
     for (SeriesCatalogUIAdapter adapter : catalogUIAdapters) {
-      final Opt<DublinCoreMetadataCollection> optSeriesMetadata = adapter.getFields(series);
-      if (optSeriesMetadata.isSome()) {
+      final Optional<DublinCoreMetadataCollection> optSeriesMetadata = adapter.getFields(series);
+      if (optSeriesMetadata.isPresent()) {
         metadataList.add(adapter.getFlavor().toString(), adapter.getUITitle(), optSeriesMetadata.get());
       }
     }
@@ -743,7 +741,7 @@ public class SeriesEndpoint {
       logger.debug("Requested series list");
       SeriesSearchQuery query = new SeriesSearchQuery(securityService.getOrganization().getId(),
               securityService.getUser());
-      Option<String> optSort = Option.option(trimToNull(sort));
+      Optional<String> optSort = Optional.ofNullable(trimToNull(sort));
 
       if (offset != 0) {
         query.withOffset(offset);
@@ -783,7 +781,7 @@ public class SeriesEndpoint {
         }
       }
 
-      if (optSort.isSome()) {
+      if (optSort.isPresent()) {
         ArrayList<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
         for (SortCriterion criterion : sortCriteria) {
 

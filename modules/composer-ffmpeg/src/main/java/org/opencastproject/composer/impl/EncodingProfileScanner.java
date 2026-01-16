@@ -57,11 +57,11 @@ import java.util.Set;
  * This manager class tries to read encoding profiles from the classpath.
  */
 @Component(
-  property = {
-    "service.description=Encoding Profile Scanner"
-  },
-  immediate = true,
-  service = { EncodingProfileScanner.class, ArtifactInstaller.class }
+    property = {
+        "service.description=Encoding Profile Scanner"
+    },
+    immediate = true,
+    service = { EncodingProfileScanner.class, ArtifactInstaller.class }
 )
 public class EncodingProfileScanner implements ArtifactInstaller {
 
@@ -183,8 +183,9 @@ public class EncodingProfileScanner implements ArtifactInstaller {
 
     // Output Type
     String type = getDefaultProperty(profile, PROP_OUTPUT, properties, defaultProperties);
-    if (StringUtils.isBlank(type))
+    if (StringUtils.isBlank(type)) {
       throw new ConfigurationException("Output type (" + PROP_OUTPUT + ") of profile '" + profile + "' is missing");
+    }
     try {
       df.setOutputType(MediaType.parseString(StringUtils.trimToEmpty(type)));
     } catch (IllegalArgumentException e) {
@@ -203,15 +204,17 @@ public class EncodingProfileScanner implements ArtifactInstaller {
     } else {
       // Suffix old stile, without tags
       String suffixObj = getDefaultProperty(profile, PROP_SUFFIX, properties, defaultProperties);
-      if (StringUtils.isBlank(suffixObj))
+      if (StringUtils.isBlank(suffixObj)) {
         throw new ConfigurationException("Suffix (" + PROP_SUFFIX + ") of profile '" + profile + "' is missing");
+      }
       df.setSuffix(StringUtils.trim(suffixObj));
     }
 
     // Applicable to the following track categories
     String applicableObj = getDefaultProperty(profile, PROP_APPLICABLE, properties, defaultProperties);
-    if (StringUtils.isBlank(applicableObj))
+    if (StringUtils.isBlank(applicableObj)) {
       throw new ConfigurationException("Input type (" + PROP_APPLICABLE + ") of profile '" + profile + "' is missing");
+    }
     df.setApplicableType(MediaType.parseString(StringUtils.trimToEmpty(applicableObj)));
 
     String jobLoad = getDefaultProperty(profile, PROP_JOBLOAD, properties, defaultProperties);
@@ -327,13 +330,13 @@ public class EncodingProfileScanner implements ArtifactInstaller {
       bundleCtx.registerService(ReadinessIndicator.class.getName(), new ReadinessIndicator(), properties);
 
       if (filesInDirectory.length == sumInstalledFiles) {
-        logger.info("All {} encoding profiles installed", filesInDirectory.length);
+        logger.info("All {} encoding profiles in {} files installed", profiles.size(), filesInDirectory.length);
       } else {
-        logger.warn("{} encoding profile(s) installed, {} encoding profile(s) could not be installed",
+        logger.warn("{} encoding config files installed, {} encoding config files could not be installed",
                 sumInstalledFiles, sumUnparsableFiles);
       }
     } else {
-      logger.debug("{} of {} encoding profiles installed", sumInstalledFiles, filesInDirectory.length);
+      logger.debug("{} of {} encoding profile config files installed", sumInstalledFiles, filesInDirectory.length);
     }
   }
 

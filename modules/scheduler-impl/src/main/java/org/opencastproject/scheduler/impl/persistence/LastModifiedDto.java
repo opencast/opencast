@@ -37,9 +37,12 @@ import javax.persistence.TemporalType;
  */
 @Entity(name = "LastModified")
 @NamedQueries({
-        @NamedQuery(name = "LastModified.findAll", query = "SELECT e FROM LastModified e "),
-        @NamedQuery(name = "LastModified.findById", query = "SELECT e FROM LastModified e WHERE e.captureAgentId = :agentId"),
-        @NamedQuery(name = "LastModified.countAll", query = "SELECT COUNT(e) FROM LastModified e ") })
+        @NamedQuery(name = "LastModified.findAll",
+            query = "SELECT e FROM LastModified e "),
+        @NamedQuery(name = "LastModified.findById",
+            query = "SELECT e FROM LastModified e WHERE e.captureAgentId = :agentId"),
+        @NamedQuery(name = "LastModified.countAll",
+            query = "SELECT COUNT(e) FROM LastModified e ") })
 @Table(name = "oc_scheduled_last_modified", indexes = {
     @Index(name = "IX_oc_scheduled_last_modified_last_modified", columnList = ("last_modified")) })
 public class LastModifiedDto {

@@ -79,6 +79,11 @@ public final class AclServiceImpl implements AclService {
   }
 
   @Override
+  public Optional<ManagedAcl> getAcl(String name) {
+    return aclDb.getAcl(organization, name);
+  }
+
+  @Override
   public boolean updateAcl(ManagedAcl acl) {
     Optional<ManagedAcl> oldName = getAcl(acl.getId());
     boolean updateAcl = aclDb.updateAcl(acl);

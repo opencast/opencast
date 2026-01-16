@@ -191,8 +191,9 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
    * @see org.opencastproject.workflow.api.WorkflowDefinition#getOperations()
    */
   public List<WorkflowOperationDefinition> getOperations() {
-    if (operations == null)
+    if (operations == null) {
       operations = new ArrayList<>();
+    }
     return operations;
   }
 
@@ -211,45 +212,53 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
    */
   @Override
   public WorkflowOperationDefinition get(int position) throws IndexOutOfBoundsException {
-    if (operations == null)
+    if (operations == null) {
       operations = new ArrayList<>();
-    if (position < 0 || position >= operations.size())
+    }
+    if (position < 0 || position >= operations.size()) {
       throw new IndexOutOfBoundsException();
+    }
     return operations.get(position);
   }
 
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowDefinition#add(org.opencastproject.workflow.api.WorkflowOperationDefinition)
+   * @see org.opencastproject.workflow.api.WorkflowDefinition#add(
+   *      org.opencastproject.workflow.api.WorkflowOperationDefinition)
    */
   @Override
   public void add(WorkflowOperationDefinition operation) {
-    if (operations == null)
+    if (operations == null) {
       operations = new ArrayList<>();
+    }
     add(operation, this.operations.size());
   }
 
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowDefinition#add(org.opencastproject.workflow.api.WorkflowOperationDefinition,
-   *      int)
+   * @see org.opencastproject.workflow.api.WorkflowDefinition#add(
+   *      org.opencastproject.workflow.api.WorkflowOperationDefinition, int)
    */
   @Override
   public void add(WorkflowOperationDefinition operation, int position) {
-    if (operations == null)
+    if (operations == null) {
       operations = new ArrayList<>();
+    }
 
-    if (operation == null)
+    if (operation == null) {
       throw new IllegalArgumentException("Workflow operation cannot be null");
-    if (position < 0 || position > operations.size())
+    }
+    if (position < 0 || position > operations.size()) {
       throw new IndexOutOfBoundsException();
+    }
 
-    if (position == operations.size())
+    if (position == operations.size()) {
       operations.add(operation);
-    else
+    } else {
       operations.add(position, operation);
+    }
   }
 
   /**
@@ -259,8 +268,9 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
    */
   @Override
   public WorkflowOperationDefinition remove(int position) throws IndexOutOfBoundsException {
-    if (operations == null)
+    if (operations == null) {
       operations = new ArrayList<>();
+    }
     return operations.remove(position);
   }
 
@@ -269,8 +279,9 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
    */
   @Override
   public void addTag(String tag) {
-    if (tag == null)
+    if (tag == null) {
       throw new IllegalArgumentException("Tag must not be null");
+    }
     tags.add(tag);
   }
 
@@ -279,8 +290,9 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
    */
   @Override
   public void removeTag(String tag) {
-    if (tag == null)
+    if (tag == null) {
       return;
+    }
     tags.remove(tag);
   }
 
@@ -289,8 +301,9 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
    */
   @Override
   public boolean containsTag(String tag) {
-    if (tag == null || tags == null)
+    if (tag == null || tags == null) {
       return false;
+    }
     return tags.contains(tag);
   }
 
@@ -299,11 +312,13 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
    */
   @Override
   public boolean containsTag(Collection<String> tags) {
-    if (tags.size() == 0)
+    if (tags.size() == 0) {
       return true;
+    }
     for (String tag : tags) {
-      if (containsTag(tag))
+      if (containsTag(tag)) {
         return true;
+      }
     }
     return false;
   }
@@ -321,8 +336,9 @@ public class WorkflowDefinitionImpl implements WorkflowDefinition {
    */
   @Override
   public void clearTags() {
-    if (tags != null)
+    if (tags != null) {
       tags.clear();
+    }
   }
 
   /**

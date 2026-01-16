@@ -26,12 +26,13 @@ import static org.opencastproject.util.Jsons.Val;
 import static org.opencastproject.util.Jsons.arr;
 import static org.opencastproject.util.Jsons.obj;
 import static org.opencastproject.util.Jsons.p;
-import static org.opencastproject.util.data.Monadics.mlist;
 
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
-import org.opencastproject.util.data.Function;
+
+import java.util.List;
+import java.util.function.Function;
 
 /** Converter functions from business objects to JSON structures. */
 public final class JsonConv {
@@ -60,14 +61,13 @@ public final class JsonConv {
                p(KEY_ACL, full(acl.getAcl())));
   }
 
-  public static final Function<ManagedAcl, Val> fullManagedAcl = new Function<ManagedAcl, Val>() {
-    @Override public Val apply(ManagedAcl acl) {
-      return full(acl);
-    }
-  };
+  public static final Function<ManagedAcl, Val> fullManagedAcl = JsonConv::full;
 
   public static Obj full(AccessControlList acl) {
-    return obj(p(KEY_ACE, arr(mlist(acl.getEntries()).map(fullAccessControlEntry))));
+    List<Val> entries = acl.getEntries().stream()
+        .map(fullAccessControlEntry)
+        .toList();
+    return obj(p(KEY_ACE, arr(entries)));
   }
 
   public static Obj full(AccessControlEntry ace) {
@@ -76,11 +76,5 @@ public final class JsonConv {
                p(KEY_ALLOW, ace.isAllow()));
   }
 
-  public static final Function<AccessControlEntry, Val> fullAccessControlEntry
-      = new Function<AccessControlEntry, Val>() {
-        @Override
-        public Val apply(AccessControlEntry ace) {
-          return full(ace);
-        }
-      };
+  public static final Function<AccessControlEntry, Val> fullAccessControlEntry = JsonConv::full;
 }

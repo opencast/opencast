@@ -37,6 +37,7 @@ import org.opencastproject.smil.entity.api.Smil;
 import org.opencastproject.smil.entity.media.container.api.SmilMediaContainer;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
+import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationHandler;
@@ -48,7 +49,6 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
@@ -157,8 +157,9 @@ public class CutMarksToSmilWorkflowOperationHandler extends AbstractWorkflowOper
     }
 
     // Target tags
-    String targetTagsOption = StringUtils.trimToNull(operation.getConfiguration(TARGET_TAGS));
-    List<String> targetTags = asList(targetTagsOption);
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
+        Configuration.none, Configuration.none, Configuration.many, Configuration.none);
+    ConfiguredTagsAndFlavors.TargetTags targetTagsOption = tagsAndFlavors.getTargetTags();
 
     // Is there a catalog?
     MediaPackageElement[] cutMarksElements = mediaPackage.getAttachments(jsonFlavor);
@@ -272,9 +273,7 @@ public class CutMarksToSmilWorkflowOperationHandler extends AbstractWorkflowOper
       Catalog catalog = (Catalog) mpeBuilder
               .elementFromURI(smilURI, MediaPackageElement.Type.Catalog, targetSmilFlavor);
       catalog.setIdentifier(smil.getId());
-      for (String tag : targetTags) {
-        catalog.addTag(tag);
-      }
+      applyTargetTagsToElement(targetTagsOption, catalog);
       mediaPackage.add(catalog);
     } catch (JAXBException | SAXException | IOException e) {
       throw new WorkflowOperationException("Failed to parse crated SMIL Catalog", e);

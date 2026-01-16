@@ -27,8 +27,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.JobCanceledException;
 import org.opencastproject.util.NotFoundException;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,6 +35,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 /**
  * This class is a utility implementation that will wait for all given jobs to change their status to either one of:
@@ -60,7 +59,7 @@ public final class JobBarrier {
   private final long pollingInterval;
 
   /** The job that's waiting */
-  private final Opt<Long> waiterJobId;
+  private final Optional<Long> waiterJobId;
 
   /** The jobs to wait on */
   private final List<Job> jobs;
@@ -139,14 +138,14 @@ public final class JobBarrier {
     this.serviceRegistry = registry;
     this.pollingInterval = pollingInterval;
     if (waiter != null)
-      this.waiterJobId = Opt.some(waiter.getId());
+      this.waiterJobId = Optional.of(waiter.getId());
     else
-      this.waiterJobId = Opt.none();
+      this.waiterJobId = Optional.empty();
     this.jobs = new ArrayList<Job>(Arrays.asList(jobs));
   }
 
   private void suspendWaiterJob() {
-    if (this.waiterJobId.isSome()) {
+    if (this.waiterJobId.isPresent()) {
       try {
         final Job waiter = serviceRegistry.getJob(waiterJobId.get());
         waiter.setStatus(Job.Status.WAITING);
@@ -163,7 +162,7 @@ public final class JobBarrier {
   }
 
   private void wakeWaiterJob() {
-    if (this.waiterJobId.isSome()) {
+    if (this.waiterJobId.isPresent()) {
       try {
         final Job waiter = serviceRegistry.getJob(waiterJobId.get());
         waiter.setStatus(Job.Status.RUNNING);

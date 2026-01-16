@@ -50,11 +50,11 @@ import javax.persistence.EntityManagerFactory;
  * Implements {@link OrganizationDatabase}. Defines permanent storage for series.
  */
 @Component(
-  property = {
-    "service.description=Organization Persistence"
-  },
-  immediate = true,
-  service = { OrganizationDatabase.class }
+    property = {
+        "service.description=Organization Persistence"
+    },
+    immediate = true,
+    service = { OrganizationDatabase.class }
 )
 public class OrganizationDatabaseImpl implements OrganizationDatabase {
 
@@ -128,7 +128,8 @@ public class OrganizationDatabaseImpl implements OrganizationDatabase {
   }
 
   /**
-   * @see org.opencastproject.kernel.security.persistence.OrganizationDatabase#storeOrganization(org.opencastproject.security.api.Organization)
+   * @see org.opencastproject.kernel.security.persistence.OrganizationDatabase#storeOrganization(
+   *      org.opencastproject.security.api.Organization)
    */
   @Override
   public void storeOrganization(Organization org) throws OrganizationDatabaseException {
@@ -180,7 +181,8 @@ public class OrganizationDatabaseImpl implements OrganizationDatabase {
   }
 
   @Override
-  public Organization getOrganizationByHost(String host, int port) throws OrganizationDatabaseException, NotFoundException {
+  public Organization getOrganizationByHost(String host, int port)
+          throws OrganizationDatabaseException, NotFoundException {
     try {
       return db.exec(namedQuery.findOpt(
           "Organization.findByHost",

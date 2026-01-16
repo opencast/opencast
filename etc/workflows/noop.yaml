@@ -1,0 +1,5 @@
+id: noop
+title: Do nothing (mostly for debugging and maintenance purposes)
+operations:
+  # We need at least one operation for this to be considered a valid workflow definition
+  - id: defaults

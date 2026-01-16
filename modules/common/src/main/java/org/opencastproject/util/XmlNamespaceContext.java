@@ -21,24 +21,16 @@
 
 package org.opencastproject.util;
 
-import static com.entwinemedia.fn.Stream.$;
 import static org.opencastproject.util.EqualsUtil.eq;
-import static org.opencastproject.util.data.Option.option;
 
-import org.opencastproject.util.data.Function0;
-
-import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.Fn2;
-import com.entwinemedia.fn.Stream;
-import com.entwinemedia.fn.data.Opt;
-import com.entwinemedia.fn.fns.Booleans;
-
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
+import java.util.Optional;
 
 import javax.xml.XMLConstants;
 import javax.xml.namespace.NamespaceContext;
@@ -65,7 +57,7 @@ public final class XmlNamespaceContext implements NamespaceContext {
   }
 
   public static XmlNamespaceContext mk(XmlNamespaceBinding... bindings) {
-    return mk($(bindings));
+    return mk(Arrays.asList(bindings));
   }
 
   public static XmlNamespaceContext mk(String prefix, String namespaceUri) {
@@ -73,78 +65,77 @@ public final class XmlNamespaceContext implements NamespaceContext {
   }
 
   public static XmlNamespaceContext mk(List<XmlNamespaceBinding> bindings) {
-    return mk($(bindings));
+    Map<String, String> prefixToUri = new HashMap<>();
+    for (XmlNamespaceBinding binding : bindings) {
+      prefixToUri.put(binding.getPrefix(), binding.getNamespaceURI());
+    }
+    return new XmlNamespaceContext(prefixToUri);
   }
 
-  public static XmlNamespaceContext mk(Stream<XmlNamespaceBinding> bindings) {
-    return new XmlNamespaceContext(
-            bindings.foldl(
-                    new HashMap<String, String>(),
-                    new Fn2<HashMap<String, String>, XmlNamespaceBinding, HashMap<String, String>>() {
-                      @Override
-                      public HashMap<String, String> apply(
-                              HashMap<String, String> prefixToUri, XmlNamespaceBinding binding) {
-                        prefixToUri.put(binding.getPrefix(), binding.getNamespaceURI());
-                        return prefixToUri;
-                      }
-                    }));
-  }
 
   @Override
   public String getNamespaceURI(String prefix) {
-    return Opt.nul(prefixToUri.get(prefix)).getOr(XMLConstants.NULL_NS_URI);
+    return Optional.ofNullable(prefixToUri.get(prefix)).orElse(XMLConstants.NULL_NS_URI);
   }
 
   @Override
   public String getPrefix(String uri) {
-    return $(prefixToUri.entrySet()).find(Booleans.eq(RequireUtil.notNull(uri, "uri")).o(value)).map(key).orNull();
+    RequireUtil.notNull(uri, "uri");
+    for (Map.Entry<String, String> entry : prefixToUri.entrySet()) {
+      if (uri.equals(entry.getValue())) {
+        return entry.getKey();
+      }
+    }
+    return null;
   }
 
   @Override
-  public Iterator getPrefixes(String uri) {
-    return $(prefixToUri.entrySet()).filter(Booleans.eq(uri).o(value)).map(key).iterator();
+  public Iterator<String> getPrefixes(String uri) {
+    RequireUtil.notNull(uri, "uri");
+    List<String> matchingPrefixes = new ArrayList<>();
+    for (Map.Entry<String, String> entry : prefixToUri.entrySet()) {
+      if (uri.equals(entry.getValue())) {
+        matchingPrefixes.add(entry.getKey());
+      }
+    }
+    return matchingPrefixes.iterator();
   }
 
+
   public List<XmlNamespaceBinding> getBindings() {
-    return $(prefixToUri.entrySet()).map(toBinding).toList();
+    List<XmlNamespaceBinding> bindings = new ArrayList<>();
+    for (Map.Entry<String, String> entry : prefixToUri.entrySet()) {
+      bindings.add(new XmlNamespaceBinding(entry.getKey(), entry.getValue()));
+    }
+    return bindings;
   }
 
   /** Create a new context with the given bindings added. Existing bindings will not be overwritten. */
   public XmlNamespaceContext add(XmlNamespaceBinding... bindings) {
-    return add($(bindings));
+    return add(Arrays.asList(bindings));
   }
 
   /** Create a new context with the given bindings added. Existing bindings will not be overwritten. */
-  public XmlNamespaceContext add(XmlNamespaceContext bindings) {
-    if (bindings.prefixToUri.size() == DEFAULT_BINDINGS) {
-      // bindings contains only the default bindings
+  public XmlNamespaceContext add(XmlNamespaceContext binding) {
+    if (binding.prefixToUri.size() == DEFAULT_BINDINGS) {
       return this;
     } else {
-      return add($(bindings.getBindings()));
+      return add(binding.getBindings());
     }
   }
 
-  private XmlNamespaceContext add(Stream<XmlNamespaceBinding> bindings) {
-    return mk(bindings.append(getBindings()));
+  private XmlNamespaceContext add(List<XmlNamespaceBinding> newBindings) {
+    Map<String, String> existingMap = new HashMap<>();
+    for (XmlNamespaceBinding b : getBindings()) {
+      existingMap.put(b.getPrefix(), b.getNamespaceURI());
+    }
+    for (XmlNamespaceBinding b : newBindings) {
+      if (!existingMap.containsKey(b.getPrefix())) {
+        existingMap.put(b.getPrefix(), b.getNamespaceURI());
+      }
+    }
+    return mk(existingMap);
   }
-
-  private static final Fn<Entry<String, String>, String> key = new Fn<Entry<String, String>, String>() {
-    @Override public String apply(Entry<String, String> e) {
-      return e.getKey();
-    }
-  };
-
-  private static final Fn<Entry<String, String>, String> value = new Fn<Entry<String, String>, String>() {
-    @Override public String apply(Entry<String, String> e) {
-      return e.getValue();
-    }
-  };
-
-  private static final Fn<Entry<String, String>, XmlNamespaceBinding> toBinding = new Fn<Entry<String, String>, XmlNamespaceBinding>() {
-    @Override public XmlNamespaceBinding apply(Entry<String, String> e) {
-      return new XmlNamespaceBinding(e.getKey(), e.getValue());
-    }
-  };
 
   public NamespaceContext merge(final NamespaceContext precedence) {
     return merge(this, precedence);
@@ -163,11 +154,8 @@ public final class XmlNamespaceContext implements NamespaceContext {
       }
 
       @Override public String getPrefix(final String uri) {
-        return option(b.getPrefix(uri)).getOrElse(new Function0<String>() {
-          @Override public String apply() {
-            return a.getPrefix(uri);
-          }
-        });
+        return Optional.ofNullable(b.getPrefix(uri))
+            .orElseGet(() -> a.getPrefix(uri));
       }
 
       @Override public Iterator getPrefixes(String uri) {

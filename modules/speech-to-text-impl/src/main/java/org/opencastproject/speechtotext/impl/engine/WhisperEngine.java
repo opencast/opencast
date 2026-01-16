@@ -25,10 +25,8 @@ import org.opencastproject.speechtotext.api.SpeechToTextEngine;
 import org.opencastproject.speechtotext.api.SpeechToTextEngineException;
 import org.opencastproject.speechtotext.util.LangCodeUtil;
 import org.opencastproject.util.OsgiUtil;
-import org.opencastproject.util.data.Option;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.osgi.service.component.ComponentContext;
@@ -46,6 +44,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.regex.Pattern;
 
 /** Whisper implementation of the Speech-to-text engine interface. */
@@ -90,7 +89,7 @@ public class WhisperEngine implements SpeechToTextEngine {
   private static final String WHISPER_VAD = "whisper.vad_enabled";
 
   /** Enable Voice Activity Detection for whisper-ctranslate2 */
-  private Option<Boolean> isVADEnabled = Option.none();
+  private Optional<Boolean> isVADEnabled = Optional.empty();
 
   /** Pattern for whisper output. Searches for timestamps like this for example: [00:00.000 --> 00:06.000] */
   private final Pattern outputPattern = Pattern.compile("\\[\\d{2}:\\d{2}.\\d{3} --> \\d{2}:\\d{2}.\\d{3}]");
@@ -121,9 +120,9 @@ public class WhisperEngine implements SpeechToTextEngine {
     logger.debug("Whisper quantization set to {}", quantization);
 
     isVADEnabled = OsgiUtil.getOptCfgAsBoolean(prop, WHISPER_VAD);
-    logger.debug("Whisper Voice Activity Detection set to {}", isVADEnabled.getOrElse(false));
+    logger.debug("Whisper Voice Activity Detection set to {}", isVADEnabled.orElse(false));
 
-    whisperArgs = StringUtils.split(Objects.toString(prop.get(WHISPER_ARGS_CONFIG_KEY), ""));
+    whisperArgs = Objects.toString(prop.get(WHISPER_ARGS_CONFIG_KEY), "").trim().split("\\s+");
     logger.debug("Additional args for Whisper: {}", (Object) whisperArgs);
 
     logger.debug("Finished activating/updating speech-to-text service");
@@ -174,7 +173,7 @@ public class WhisperEngine implements SpeechToTextEngine {
       transcriptionCommand.add(quantization);
     }
 
-    if (isVADEnabled.isSome()) {
+    if (isVADEnabled.isPresent()) {
       logger.debug("Setting VAD to {}", isVADEnabled.get());
       transcriptionCommand.add("--vad_filter");
       transcriptionCommand.add(isVADEnabled.get().toString());

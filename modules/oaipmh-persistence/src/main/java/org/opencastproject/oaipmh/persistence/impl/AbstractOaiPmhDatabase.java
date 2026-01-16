@@ -162,12 +162,14 @@ public abstract class AbstractOaiPmhDatabase implements OaiPmhDatabase {
     }
   }
 
-  private void deleteInternal(String mediaPackageId, String repository) throws OaiPmhDatabaseException, NotFoundException {
+  private void deleteInternal(String mediaPackageId, String repository)
+          throws OaiPmhDatabaseException, NotFoundException {
     try {
       getDBSession().execTxChecked(em -> {
         OaiPmhEntity oaiPmhEntity = getOaiPmhEntity(mediaPackageId, repository, em);
-        if (oaiPmhEntity == null)
+        if (oaiPmhEntity == null) {
           throw new NotFoundException("No media package with id " + mediaPackageId + " exists");
+        }
 
         oaiPmhEntity.setDeleted(true);
         em.merge(oaiPmhEntity);
@@ -183,7 +185,7 @@ public abstract class AbstractOaiPmhDatabase implements OaiPmhDatabase {
   @Override
   public SearchResult search(Query query) {
     try {
-      final int chunkSize = query.getLimit().getOrElse(-1);
+      final int chunkSize = query.getLimit().orElse(-1);
       dbAccessLock.readLock().lock();
       return searchInternal(query, chunkSize);
     } finally {
@@ -192,7 +194,7 @@ public abstract class AbstractOaiPmhDatabase implements OaiPmhDatabase {
   }
 
   private SearchResult searchInternal(Query query, int chunkSize) {
-    final String requestSetSpec = query.getSetSpec().getOrElseNull();
+    final String requestSetSpec = query.getSetSpec().orElse(null);
     Date lastDate = new Date();
     long resultSize;
     long resultOffset;
@@ -207,23 +209,31 @@ public abstract class AbstractOaiPmhDatabase implements OaiPmhDatabase {
       final List<Predicate> predicates = new ArrayList<>();
       predicates.add(cb.equal(c.get("organization"), getSecurityService().getOrganization().getId()));
 
-      for (String p : query.getMediaPackageId())
-        predicates.add(cb.equal(c.get("mediaPackageId"), p));
-      for (String p : query.getRepositoryId())
-        predicates.add(cb.equal(c.get("repositoryId"), p));
-      for (String p : query.getSeriesId())
-        predicates.add(cb.equal(c.get("series"), p));
-      for (Boolean p : query.isDeleted())
-        predicates.add(cb.equal(c.get("deleted"), p));
-      if (query.isSubsequentRequest()) {
-        for (Date p : query.getModifiedAfter())
-          predicates.add(cb.greaterThan(c.get("modificationDate").as(Date.class), p));
-      } else {
-        for (Date p : query.getModifiedAfter())
-          predicates.add(cb.greaterThanOrEqualTo(c.get("modificationDate").as(Date.class), p));
+      if (query.getMediaPackageId().isPresent()) {
+        predicates.add(cb.equal(c.get("mediaPackageId"), query.getMediaPackageId().get()));
       }
-      for (Date p : query.getModifiedBefore())
-        predicates.add(cb.lessThanOrEqualTo(c.get("modificationDate").as(Date.class), p));
+      if (query.getRepositoryId().isPresent()) {
+        predicates.add(cb.equal(c.get("repositoryId"), query.getRepositoryId().get()));
+      }
+      if (query.getSeriesId().isPresent()) {
+        predicates.add(cb.equal(c.get("series"), query.getSeriesId().get()));
+      }
+      if (query.isDeleted().isPresent()) {
+        predicates.add(cb.equal(c.get("deleted"), query.isDeleted().get()));
+      }
+      if (query.isSubsequentRequest()) {
+        if (query.getModifiedAfter().isPresent()) {
+          predicates.add(cb.greaterThan(c.get("modificationDate").as(Date.class), query.getModifiedAfter().get()));
+        }
+      } else {
+        if (query.getModifiedAfter().isPresent()) {
+          predicates.add(cb.greaterThanOrEqualTo(c.get("modificationDate").as(Date.class),
+              query.getModifiedAfter().get()));
+        }
+      }
+      if (query.getModifiedBefore().isPresent()) {
+        predicates.add(cb.lessThanOrEqualTo(c.get("modificationDate").as(Date.class), query.getModifiedBefore().get()));
+      }
 
       q.where(cb.and(predicates.toArray(new Predicate[0])));
       q.orderBy(cb.asc(c.get("modificationDate")));
@@ -232,9 +242,9 @@ public abstract class AbstractOaiPmhDatabase implements OaiPmhDatabase {
       if (chunkSize > 0) {
         typedQuery.setMaxResults(chunkSize);
       }
-      for (int startPosition : query.getOffset()) {
+      if (query.getOffset().isPresent()) {
         logger.warn("I'm pretty sure things break if this is used");
-        typedQuery.setFirstResult(startPosition);
+        typedQuery.setFirstResult(query.getOffset().get());
       }
 
       return createSearchResult(typedQuery);

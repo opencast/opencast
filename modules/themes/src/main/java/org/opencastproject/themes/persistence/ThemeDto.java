@@ -24,9 +24,9 @@ package org.opencastproject.themes.persistence;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.themes.Theme;
-import org.opencastproject.util.data.Option;
 
 import java.util.Date;
+import java.util.Optional;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -128,7 +128,7 @@ public class ThemeDto {
    */
   public Theme toTheme(UserDirectoryService userDirectoryService) {
     User creator = userDirectoryService.loadUser(username);
-    return new Theme(Option.some(id), creationDate, isDefault, creator, name, description, bumperActive, bumperFile,
+    return new Theme(Optional.of(id), creationDate, isDefault, creator, name, description, bumperActive, bumperFile,
             trailerActive, trailerFile, titleSlideActive, titleSlideMetadata, titleSlideBackground, licenseSlideActive,
             licenseSlideBackground, licenseSlideDescription, watermarkActive, watermarkFile, watermarkPosition);
   }

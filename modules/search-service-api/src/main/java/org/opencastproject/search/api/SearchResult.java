@@ -60,6 +60,7 @@ public class SearchResult {
   public static final String DELETED_DATE = "deleted";
   public static final String INDEX_ACL = "searchable_acl";
   public static final String REST_ACL = "acl";
+  public static final String LIVE = "live";
 
   private static final Gson gson = new Gson();
 
@@ -74,6 +75,8 @@ public class SearchResult {
   private String orgId;
 
   private String id = null;
+
+  private Boolean live = null;
 
   private Instant modified = null;
 
@@ -91,6 +94,7 @@ public class SearchResult {
 
     if (SearchService.IndexEntryType.Episode.equals(type)) {
       this.id = this.getMediaPackage().getIdentifier().toString();
+      this.live = this.getMediaPackage().isLive();
     } else if (SearchService.IndexEntryType.Series.equals(type)) {
       this.id = this.dublinCore.getFirst(DublinCore.PROPERTY_IDENTIFIER);
     }
@@ -102,6 +106,10 @@ public class SearchResult {
 
   public String getId() {
     return this.id;
+  }
+
+  public Boolean getLive() {
+    return this.live;
   }
 
   public Date getDeletionDate() {
@@ -252,7 +260,8 @@ public class SearchResult {
         DUBLINCORE, SearchResult.dehydrateDC(this.dublinCore),
         ORG, this.orgId,
         TYPE, this.type.name(),
-        MODIFIED_DATE, DateTimeFormatter.ISO_INSTANT.format(this.modified)));
+        MODIFIED_DATE, DateTimeFormatter.ISO_INSTANT.format(this.modified),
+        LIVE, this.live));
 
     ret.put(DELETED_DATE, null == this.deleted ? null : DateTimeFormatter.ISO_INSTANT.format(this.deleted));
 

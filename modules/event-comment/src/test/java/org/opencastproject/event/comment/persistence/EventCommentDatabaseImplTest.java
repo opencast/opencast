@@ -27,7 +27,6 @@ import static org.junit.Assert.assertTrue;
 import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 import static org.opencastproject.event.comment.persistence.EventCommentDatabaseServiceImpl.PERSISTENCE_UNIT;
-import static org.opencastproject.util.data.Option.none;
 
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.api.SearchResultItem;
@@ -60,7 +59,7 @@ public class EventCommentDatabaseImplTest {
 
   private static final String EVENT_1_ID = "1";
   private static final EventComment COMMENT_1
-      = EventComment.create(none(Long.class), EVENT_1_ID, ORGANIZATION.getId(), "test", USER);
+      = EventComment.create(Optional.<Long>empty(), EVENT_1_ID, ORGANIZATION.getId(), "test", USER);
 
   private EventCommentDatabaseServiceImpl persistence;
 
@@ -117,12 +116,12 @@ public class EventCommentDatabaseImplTest {
     final EventComment persistedComment = persistence.updateComment(COMMENT_1);
     assertEquals(COMMENT_1, persistedComment);
 
-    persistedComment.addReply(EventCommentReply.create(none(Long.class), "comment1", USER));
-    persistedComment.addReply(EventCommentReply.create(none(Long.class), "comment2", USER));
+    persistedComment.addReply(EventCommentReply.create(Optional.<Long>empty(), "comment1", USER));
+    persistedComment.addReply(EventCommentReply.create(Optional.<Long>empty(), "comment2", USER));
 
     final EventComment updatedComment = persistence.updateComment(persistedComment);
     updatedComment.removeReply(updatedComment.getReplies().get(0));
-    updatedComment.addReply(EventCommentReply.create(none(Long.class), "comment3", USER));
+    updatedComment.addReply(EventCommentReply.create(Optional.<Long>empty(), "comment3", USER));
 
     final EventComment modifiedComment = persistence.updateComment(updatedComment);
     assertEquals(2, modifiedComment.getReplies().size());
@@ -144,9 +143,9 @@ public class EventCommentDatabaseImplTest {
     User userOrg1 = new JaxbUser("userOrg1", "default", JaxbOrganization.fromOrganization(org1));
     User userOrg2 = new JaxbUser("userOrg2", "default", JaxbOrganization.fromOrganization(org2));
 
-    EventComment eventComment1 = EventComment.create(none(Long.class), "event1", org1.getId(), "test", userOrg1);
-    EventComment eventComment2 = EventComment.create(none(Long.class), "event2", org1.getId(), "test", userOrg1);
-    EventComment eventComment3 = EventComment.create(none(Long.class), "event3", org2.getId(), "test", userOrg2);
+    EventComment eventComment1 = EventComment.create(Optional.<Long>empty(), "event1", org1.getId(), "test", userOrg1);
+    EventComment eventComment2 = EventComment.create(Optional.<Long>empty(), "event2", org1.getId(), "test", userOrg1);
+    EventComment eventComment3 = EventComment.create(Optional.<Long>empty(), "event3", org2.getId(), "test", userOrg2);
 
     persistence.updateComment(eventComment1);
     persistence.updateComment(eventComment2);

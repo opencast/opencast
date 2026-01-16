@@ -127,7 +127,7 @@ public class TimelinePreviewsWorkflowOperationHandler extends AbstractWorkflowOp
               SOURCE_FLAVOR_PROPERTY, SOURCE_TAGS_PROPERTY));
     }
     MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor();
-    List<String> targetTagsProperty = tagsAndFlavors.getTargetTags();
+    ConfiguredTagsAndFlavors.TargetTags targetTagsProperty = tagsAndFlavors.getTargetTags();
 
     String imageSizeArg = StringUtils.trimToNull(
             workflowInstance.getCurrentOperation().getConfiguration(IMAGE_SIZE_PROPERTY));
@@ -245,11 +245,7 @@ public class TimelinePreviewsWorkflowOperationHandler extends AbstractWorkflowOp
                 targetFlavor.getType(), timelinePreviewsMpe.getFlavor().getSubtype());
           }
           timelinePreviewsMpe.setFlavor(targetFlavor);
-          if (!targetTagsProperty.isEmpty()) {
-            for (String tag : targetTagsProperty) {
-              timelinePreviewsMpe.addTag(tag);
-            }
-          }
+          applyTargetTagsToElement(targetTagsProperty, timelinePreviewsMpe);
 
           mediaPackage.add(timelinePreviewsMpe);
         }

@@ -70,7 +70,6 @@ import org.opencastproject.themes.persistence.ThemesServiceDatabaseImpl;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PropertiesUtil;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.requests.SortCriterion.Order;
 
 import org.easymock.Capture;
@@ -248,7 +247,7 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     themesServiceDatabaseImpl.activate(null);
 
     // We only really care about id, name and description here
-    Theme theme = new Theme(Option.option(1L), new Date(1421064000000L), true, user, "theme-1-name", "theme-1-description",
+    Theme theme = new Theme(Optional.ofNullable(1L), new Date(1421064000000L), true, user, "theme-1-name", "theme-1-description",
         true, "bumper-file", true, "trailer-file", true, "title,room,date", "title-background-file", true,
         "license-background-file", "The license description", true, "watermark-file", "top-left");
     themesServiceDatabaseImpl.updateTheme(theme);

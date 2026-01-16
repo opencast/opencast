@@ -29,7 +29,8 @@ import javax.xml.bind.annotation.XmlType;
 import javax.xml.bind.annotation.XmlValue;
 
 /**
- * JAXB annotated implementation of Map&lt;String, String&gt; for {@link WorkflowInstance} and {@link WorkflowOperationInstance}
+ * JAXB annotated implementation of Map&lt;String, String&gt; for {@link WorkflowInstance} and
+ * {@link WorkflowOperationInstance}
  */
 @XmlType(name = "configuration", namespace = "http://workflow.opencastproject.org")
 @XmlRootElement(name = "configuration", namespace = "http://workflow.opencastproject.org")
@@ -84,18 +85,23 @@ public class JaxbWorkflowConfiguration  {
    */
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
+    if (this == obj) {
       return true;
-    if (obj == null)
+    }
+    if (obj == null) {
       return false;
-    if (getClass() != obj.getClass())
+    }
+    if (getClass() != obj.getClass()) {
       return false;
+    }
     JaxbWorkflowConfiguration other = (JaxbWorkflowConfiguration) obj;
     if (key == null) {
-      if (other.key != null)
+      if (other.key != null) {
         return false;
-    } else if (!key.equals(other.key))
+      }
+    } else if (!key.equals(other.key)) {
       return false;
+    }
     return true;
   }
 

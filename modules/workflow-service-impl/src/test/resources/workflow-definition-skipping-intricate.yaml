@@ -1,0 +1,9 @@
+id: definition-skip
+title: Workflow Definition with skipping
+description: |-
+  Unit testing workflow
+operations:
+  - id: op1
+    if: "'${executecondition}' == 'a'"
+    fail-on-error: true
+    description: operation 1

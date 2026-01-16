@@ -165,7 +165,9 @@ public class SchedulerEventUpdateHandler extends UpdateHandler implements Schedu
   }
 
   public void unsetSchedulerService(SchedulerService service) {
-    this.schedulerService = null;
+    if (this.schedulerService == service) {
+      this.schedulerService = null;
+    }
   }
 
   @Reference

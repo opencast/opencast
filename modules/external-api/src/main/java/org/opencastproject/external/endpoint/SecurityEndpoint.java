@@ -38,7 +38,6 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
-import com.entwinemedia.fn.data.Opt;
 import com.google.gson.JsonObject;
 
 import org.joda.time.DateTime;
@@ -55,6 +54,7 @@ import org.slf4j.LoggerFactory;
 import java.text.ParseException;
 import java.util.Date;
 import java.util.Dictionary;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.FormParam;
@@ -66,11 +66,16 @@ import javax.ws.rs.core.Response;
 
 @Path("/api/security")
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0,
-            ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0,
-            ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0,
-            ApiMediaType.VERSION_1_9_0, ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0,
-            ApiMediaType.VERSION_1_12_0  })
-@RestService(name = "externalapisecurity", title = "External API Security Service", notes = {}, abstractText = "Provides security operations related to the external API")
+    ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0,
+    ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0,
+    ApiMediaType.VERSION_1_9_0, ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0,
+    ApiMediaType.VERSION_1_12_0 })
+@RestService(
+    name = "externalapisecurity",
+    title = "External API Security Service",
+    notes = {},
+    abstractText = "Provides security operations related to the external API"
+)
 @Component(
     immediate = true,
     service = { SecurityEndpoint.class,ManagedService.class },
@@ -115,9 +120,9 @@ public class SecurityEndpoint implements ManagedService {
       return;
     }
 
-    Opt<Long> expiration = OsgiUtil.getOptCfg(properties, URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY).toOpt()
-            .map(com.entwinemedia.fn.fns.Strings.toLongF);
-    if (expiration.isSome()) {
+    Optional<Long> expiration = OsgiUtil.getOptCfg(properties, URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY)
+            .map(Long::parseLong);
+    if (expiration.isPresent()) {
       expireSeconds = expiration.get();
       log.info("The property {} has been configured to expire signed URLs in {}.",
               URL_SIGNING_EXPIRES_DURATION_SECONDS_KEY, DateTimeSupport.humanReadableTime(expireSeconds));
@@ -130,16 +135,28 @@ public class SecurityEndpoint implements ManagedService {
 
   @POST
   @Path("sign")
-  @RestQuery(name = "signurl", description = "Returns a signed URL that can be played back for the indicated period of time, while access is optionally restricted to the specified IP address.", returnDescription = "", restParameters = {
+  @RestQuery(
+      name = "signurl",
+      description = "Returns a signed URL that can be played back for the indicated period of time, while access is "
+          + "optionally restricted to the specified IP address.",
+      returnDescription = "",
+      restParameters = {
           @RestParameter(name = "url", isRequired = true, description = "The linke to encode.", type = STRING),
-          @RestParameter(name = "valid-until", description = "Until when is the signed url valid", isRequired = false, type = STRING),
-          @RestParameter(name = "valid-source", description = "The IP address from which the url can be accessed", isRequired = false, type = STRING) }, responses = {
-                  @RestResponse(description = "The signed URL is returned.", responseCode = HttpServletResponse.SC_OK),
-                  @RestResponse(description = "The caller is not authorized to have the link signed.", responseCode = HttpServletResponse.SC_UNAUTHORIZED) })
+          @RestParameter(name = "valid-until", description = "Until when is the signed url valid", isRequired = false,
+              type = STRING),
+          @RestParameter(name = "valid-source", description = "The IP address from which the url can be accessed",
+              isRequired = false, type = STRING)
+      },
+      responses = {
+          @RestResponse(description = "The signed URL is returned.", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "The caller is not authorized to have the link signed.",
+              responseCode = HttpServletResponse.SC_UNAUTHORIZED)
+      })
   public Response signUrl(@HeaderParam("Accept") String acceptHeader, @FormParam("url") String url,
           @FormParam("valid-until") String validUntilUtc, @FormParam("valid-source") String validSource) {
-    if (isBlank(url))
+    if (isBlank(url)) {
       return R.badRequest("Query parameter 'url' is mandatory");
+    }
 
     final DateTime validUntil;
     if (isNotBlank(validUntilUtc)) {

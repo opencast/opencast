@@ -1,0 +1,55 @@
+id: partial-transcode-studio-tracks
+title: partial-transcode-studio-tracks
+operations:
+  - id: encode
+    exception-handler-workflow: partial-error
+    description: Reencode presenter video to fix framerate and resolution
+    configurations:
+      - source-flavors: '*/source'
+      - target-flavor: '*/source+transcoded'
+      - encoding-profile: scale.fhd.framerate.fix
+
+  # Cut the videos
+  - id: editor
+    exception-handler-workflow: partial-error
+    description: Cut the recording according to the edit decision list
+    configurations:
+      - source-flavors: '*/source+transcoded'
+      - smil-flavors: smil/cutting
+      - target-smil-flavor: smil/cutting
+      - target-flavor-subtype: source+trimmed
+
+  - id: tag
+    exception-handler-workflow: partial-error
+    description: Tagging presenter source video as original and not for archive
+    configurations:
+      - source-flavors: presenter/source
+      - target-flavor: presenter/source+original
+      - target-tags: -archive
+
+  - id: tag
+    exception-handler-workflow: partial-error
+    description: Tagging transcoded and trimmed presenter video as source and
+      for archive
+    configurations:
+      - source-flavors: presenter/source+trimmed
+      - target-flavor: presenter/source
+      - target-tags: archive
+
+  - id: tag
+    exception-handler-workflow: partial-error
+    description: Tagging presentation source video as original and not for
+      archive
+    configurations:
+      - source-flavors: presentation/source
+      - target-flavor: presentation/source+original
+      - target-tags: -archive
+
+  - id: tag
+    exception-handler-workflow: partial-error
+    description: Tagging transcoded and trimmed presentation video as source and
+      for archive
+    configurations:
+      - source-flavors: presentation/source+trimmed
+      - target-flavor: presentation/source
+      - target-tags: archive

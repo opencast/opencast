@@ -23,11 +23,11 @@ package org.opencastproject.kernel.bundleinfo;
 
 import static org.opencastproject.db.Queries.namedQuery;
 import static org.opencastproject.kernel.bundleinfo.BundleInfoImpl.bundleInfo;
-import static org.opencastproject.util.data.Option.option;
 
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
@@ -50,10 +50,15 @@ import javax.persistence.criteria.Root;
 @Table(name = "oc_bundleinfo", uniqueConstraints = { @UniqueConstraint(columnNames = { "host", "bundle_name",
         "bundle_version" }) })
 @NamedQueries({
-        @NamedQuery(name = "BundleInfo.findAll", query = "select a from BundleInfo a order by a.host, a.bundleSymbolicName"),
-        @NamedQuery(name = "BundleInfo.deleteAll", query = "delete from BundleInfo"),
-        @NamedQuery(name = "BundleInfo.deleteByHost", query = "delete from BundleInfo where host = :host"),
-        @NamedQuery(name = "BundleInfo.delete", query = "delete from BundleInfo where host = :host and bundleId = :bundleId") })
+        @NamedQuery(name = "BundleInfo.findAll",
+            query = "select a from BundleInfo a order by a.host, a.bundleSymbolicName"),
+        @NamedQuery(name = "BundleInfo.deleteAll",
+            query = "delete from BundleInfo"),
+        @NamedQuery(name = "BundleInfo.deleteByHost",
+            query = "delete from BundleInfo where host = :host"),
+        @NamedQuery(name = "BundleInfo.delete",
+            query = "delete from BundleInfo where host = :host and bundleId = :bundleId")
+})
 public class BundleInfoJpa {
   @Id
   @Column(name = "id")
@@ -84,13 +89,16 @@ public class BundleInfoJpa {
     dto.bundleSymbolicName = a.getBundleSymbolicName();
     dto.bundleId = a.getBundleId();
     dto.bundleVersion = a.getBundleVersion();
-    for (String x : a.getBuildNumber())
-      dto.buildNumber = x;
+    Optional<String> buildNumber = a.getBuildNumber();
+    if (buildNumber.isPresent()) {
+      dto.buildNumber = buildNumber.get();
+    }
     return dto;
   }
 
   public BundleInfo toBundleInfo() {
-    return bundleInfo(host, bundleSymbolicName, bundleId, bundleVersion, option(buildNumber), option(dbSchemaVersion));
+    return bundleInfo(host, bundleSymbolicName, bundleId, bundleVersion, Optional.ofNullable(buildNumber),
+        Optional.ofNullable(dbSchemaVersion));
   }
 
   /** Find all in database. */

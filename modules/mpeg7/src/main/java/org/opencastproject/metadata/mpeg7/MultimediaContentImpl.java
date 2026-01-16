@@ -59,10 +59,12 @@ public class MultimediaContentImpl<T extends MultimediaContentType> implements M
    *          the content to add
    */
   public void add(T c) {
-    if (c == null)
+    if (c == null) {
       throw new IllegalArgumentException("Multimedia content must not be null");
-    if (content.containsKey(c.getId()))
+    }
+    if (content.containsKey(c.getId())) {
       throw new IllegalStateException("Duplicate content id detected: " + c.getId());
+    }
     content.put(c.getId(), c);
   }
 

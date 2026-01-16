@@ -192,7 +192,7 @@ log() {
   fi
 }
 
-BASE_DIR=$(find_maven_basedir "$(dirname "$0")")
+BASE_DIR=$(find_maven_basedir "$(dirname "$(readlink -f "$0")")")
 if [ -z "$BASE_DIR" ]; then
   exit 1
 fi

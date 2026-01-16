@@ -45,6 +45,14 @@ public interface AclService {
   Optional<ManagedAcl> getAcl(long id);
 
   /**
+   * Return an ACL of an organization by its name.
+   *
+   * @return <code>some</code> if the ACL could be found,
+   *         <code>none</code> if the ACL with the given name does not exist.
+   */
+  Optional<ManagedAcl> getAcl(String name);
+
+  /**
    * Update an existing ACL.
    *
    * @return true on a successful update, false if no ACL exists with the given ID.

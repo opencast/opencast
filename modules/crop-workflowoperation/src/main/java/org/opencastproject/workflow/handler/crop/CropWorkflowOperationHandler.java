@@ -29,7 +29,6 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
-import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
@@ -101,7 +100,7 @@ public class CropWorkflowOperationHandler extends AbstractWorkflowOperationHandl
     // Check which tags have been configured
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
         Configuration.none, Configuration.one, Configuration.many, Configuration.many);
-    List<String> targetTags = tagsAndFlavors.getTargetTags();
+    ConfiguredTagsAndFlavors.TargetTags targetTags = tagsAndFlavors.getTargetTags();
     List<MediaPackageElementFlavor> targetFlavorOption = tagsAndFlavors.getTargetFlavors();
 
     MediaPackageElementFlavor targetFlavor = null;
@@ -151,7 +150,7 @@ public class CropWorkflowOperationHandler extends AbstractWorkflowOperationHandl
       }
 
       // update identifier
-      croppedTrack.setIdentifier(IdImpl.fromUUID().toString());
+      croppedTrack.generateIdentifier();
 
       // move into space for media package in ws/wfr
       try {
@@ -166,7 +165,7 @@ public class CropWorkflowOperationHandler extends AbstractWorkflowOperationHandl
       }
 
       // Add target tags
-      targetTags.forEach(croppedTrack::addTag);
+      applyTargetTagsToElement(targetTags, croppedTrack);
       croppedTrack.setFlavor(targetFlavor);
 
       // add new track to mediapackage

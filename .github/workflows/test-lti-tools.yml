@@ -1,4 +1,4 @@
-name: Test LTI Tools
+name: Tests » LTI Tools
 
 on:
   pull_request:
@@ -11,13 +11,13 @@ on:
       - modules/lti/**
 
 jobs:
-  main:
+  test-lti:
     runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: set up python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@v6
       with:
         python-version: 3.13
 

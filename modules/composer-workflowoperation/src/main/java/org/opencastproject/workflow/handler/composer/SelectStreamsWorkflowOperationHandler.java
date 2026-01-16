@@ -40,7 +40,6 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowOperationException;
 import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
-import org.opencastproject.workflow.api.WorkflowOperationTagUtil;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
@@ -56,7 +55,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -248,7 +246,7 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
 
     final MediaPackageElementFlavor sourceFlavor = tagsAndFlavors.getSingleSrcFlavor();
     final MediaPackageElementFlavor targetTrackFlavor = tagsAndFlavors.getSingleTargetFlavor();
-    final List<String> targetTrackTags = tagsAndFlavors.getTargetTags();
+    final ConfiguredTagsAndFlavors.TargetTags targetTrackTags = tagsAndFlavors.getTargetTags();
 
     TrackSelector trackSelector = new TrackSelector();
     trackSelector.addFlavor(sourceFlavor);
@@ -264,7 +262,8 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
 
     final MuxResult result = MuxResult.empty();
 
-    // add non video/audio tracks, like captions, directly to result as only video/audio tracks are relevant for selection
+    // add non video/audio tracks, like captions, directly to result as only video/audio tracks are relevant for
+    // selection
     for (final AugmentedTrack t : augmentedTracksAll) {
       if (t.hasVideo() || t.hasAudio()) {
         augmentedTracks.add(t);
@@ -347,16 +346,16 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
     } else if (allHidden(augmentedTracks, SubTrack.VIDEO)) {
        /* Case 2: No tracks have non-hidden video streams. In this case, simply remove video streams where
           requested or copy the track otherwise */
-       for (final AugmentedTrack t : augmentedTracks) {
-         if (t.hasAudio()) {
-           if (t.hide(SubTrack.VIDEO)) {
-             final TrackJobResult hideVideoResult = hideVideo(t.track, mediaPackage);
-             result.add(hideVideoResult);
-           } else {
-             result.add(copyTrack(t.track));
-           }
-         }
-       }
+      for (final AugmentedTrack t : augmentedTracks) {
+        if (t.hasAudio()) {
+          if (t.hide(SubTrack.VIDEO)) {
+            final TrackJobResult hideVideoResult = hideVideo(t.track, mediaPackage);
+            result.add(hideVideoResult);
+          } else {
+            result.add(copyTrack(t.track));
+          }
+        }
+      }
     } else if (augmentedTracks.size() == 2) {
       /* Case 3: We have two tracks where exactly one track has a non-hidden video stream (implied as this
          logic assumes at most two input tracks).
@@ -378,8 +377,7 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
     });
 
     // Update Tags here
-    final WorkflowOperationTagUtil.TagDiff tagDiff = WorkflowOperationTagUtil.createTagDiff(targetTrackTags);
-    result.forEachTrack(t -> WorkflowOperationTagUtil.applyTagDiff(tagDiff, t));
+    result.forEachTrack(t -> applyTargetTagsToElement(targetTrackTags, t));
 
     return createResult(mediaPackage, WorkflowOperationResult.Action.CONTINUE, result.queueTime);
   }
@@ -390,7 +388,8 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
             .findAny();
   }
 
-  private MuxResult muxSingleVideoTrack(final MediaPackage mediaPackage, final Collection<AugmentedTrack> augmentedTracks)
+  private MuxResult muxSingleVideoTrack(final MediaPackage mediaPackage,
+      final Collection<AugmentedTrack> augmentedTracks)
           throws MediaPackageException, EncoderException, WorkflowOperationException, NotFoundException, IOException {
     long queueTime = 0L;
 
@@ -424,7 +423,8 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
     return new MuxResult(queueTime, resultingTracks);
   }
 
-  private MuxResult muxMultipleVideoTracks(final MediaPackage mediaPackage, final Iterable<AugmentedTrack> augmentedTracks)
+  private MuxResult muxMultipleVideoTracks(final MediaPackage mediaPackage,
+      final Iterable<AugmentedTrack> augmentedTracks)
           throws MediaPackageException, EncoderException, WorkflowOperationException, NotFoundException, IOException {
     long queueTime = 0L;
     final List<Track> resultingTracks = new ArrayList<>(0);
@@ -433,9 +433,9 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
       // clone this track and re-add it to the MP (since it will
       // be a new track with a different flavor)
       if (
-        t.hasVideo() && !t.hideVideo && t.hasAudio() && !t.hideAudio  // non-hidden video and non-hidden audio
-        || t.hasVideo() && !t.hideVideo && !t.hasAudio()  // non-hidden video without audio
-        || !t.hasVideo() && t.hasAudio() && !t.hideAudio  // non-hidden audio without video
+          t.hasVideo() && !t.hideVideo && t.hasAudio() && !t.hideAudio  // non-hidden video and non-hidden audio
+          || t.hasVideo() && !t.hideVideo && !t.hasAudio()  // non-hidden video without audio
+          || !t.hasVideo() && t.hasAudio() && !t.hideAudio  // non-hidden audio without video
       ) {
         logger.debug("Add clone of track {} to mediapackage {}", t.track.getIdentifier(),
             mediaPackage.getIdentifier());
@@ -464,7 +464,8 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
   }
 
   /**
-   * Returns the single track that has audio, or an empty {@code Optional} if either more than one audio track exists, or none exists.
+   * Returns the single track that has audio, or an empty {@code Optional} if either more than one audio track exists,
+   * or none exists.
    * @param augmentedTracks List of tracks
    * @return See above.
    */
@@ -585,7 +586,7 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
   private TrackJobResult copyTrack(final Track track) throws WorkflowOperationException {
     logger.debug("Create copy of track {}", track);
     final Track copiedTrack = (Track) track.clone();
-    copiedTrack.setIdentifier(UUID.randomUUID().toString());
+    copiedTrack.generateIdentifier();
     try {
       // Generate a new filename
       String targetFilename = copiedTrack.getIdentifier();

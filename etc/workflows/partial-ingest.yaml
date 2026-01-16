@@ -1,0 +1,50 @@
+id: partial-ingest
+title: Ingest asset
+state-mappings:
+  - state: running
+    value: EVENTS.EVENTS.STATE_MAPPING.IMPORTING
+  - state: failing
+    value: EVENTS.EVENTS.STATE_MAPPING.IMPORTING
+operations:
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # Finalize ingest
+
+  # Ingest the external elements, apply access control entries,
+  # inspect the media and tag everything for archival.
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # Ingest elements from external working file repositories and file servers
+  - id: ingest-download
+    exception-handler-workflow: partial-error
+    description: Ingesting external elements
+    configurations:
+      - delete-external: true
+
+  # Inspect the media
+  - id: inspect
+    exception-handler-workflow: partial-error
+    description: Inspecting audio and video streams
+    configurations:
+      - overwrite: false
+      - accept-no-media: false
+
+  # Apply access control lists from series to the mediapackage
+  # Also append the series metadata catalogs
+  - id: series
+    exception-handler-workflow: partial-error
+    description: Applying access control entries
+    configurations:
+      - attach: '*'
+      - apply-acl: true
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # Tag for archival
+
+  # Tag the recording sources, metadata and access control lists for
+  # archival.
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # Tag the incoming source material for archival
+  - id: tag
+    description: Tagging source material for archival
+    configurations:
+      - source-flavors: '*/*'
+      - target-tags: +archive

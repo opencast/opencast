@@ -23,12 +23,9 @@ package org.opencastproject.runtimeinfo;
 
 import static org.opencastproject.rest.RestConstants.SERVICES_FILTER;
 import static org.opencastproject.rest.RestConstants.SERVICE_PATH_PROPERTY;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
 
 import org.opencastproject.runtimeinfo.rest.RestDocData;
 import org.opencastproject.systems.OpencastConstants;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.doc.DocUtil;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestService;
@@ -50,6 +47,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.Servlet;
 import javax.servlet.ServletException;
@@ -131,45 +129,38 @@ public class RestDocsServlet extends HttpServlet {
       docs.append(docPath);
     } else {
       final Object restService = bundleContext.getService(reference);
-      findRestAnnotation(restService.getClass()).fold(new Option.Match<RestService, Void>() {
-        @Override
-        public Void some(RestService annotation) {
-          globalMacro.put("SERVICE_CLASS_SIMPLE_NAME", restService.getClass().getSimpleName());
-          RestDocData data = new RestDocData(annotation.name(), annotation.title(), docPath, annotation.notes());
-          data.setAbstract(annotation.abstractText());
+      findRestAnnotation(restService.getClass()).ifPresentOrElse(
+          annotation -> {
+            globalMacro.put("SERVICE_CLASS_SIMPLE_NAME", restService.getClass().getSimpleName());
+            RestDocData data = new RestDocData(annotation.name(), annotation.title(), docPath, annotation.notes());
+            data.setAbstract(annotation.abstractText());
 
-          Produces producesClass = (Produces) restService.getClass().getAnnotation(Produces.class);
+            Produces producesClass = (Produces) restService.getClass().getAnnotation(Produces.class);
 
-          for (Method m : restService.getClass().getMethods()) {
-            RestQuery rq = (RestQuery) m.getAnnotation(RestQuery.class);
-            String httpMethodString = null;
-            for (Annotation a : m.getAnnotations()) {
-              HttpMethod httpMethod = (HttpMethod) a.annotationType().getAnnotation(HttpMethod.class);
-              if (httpMethod != null) {
-                httpMethodString = httpMethod.value();
+            for (Method m : restService.getClass().getMethods()) {
+              RestQuery rq = (RestQuery) m.getAnnotation(RestQuery.class);
+              String httpMethodString = null;
+              for (Annotation a : m.getAnnotations()) {
+                HttpMethod httpMethod = (HttpMethod) a.annotationType().getAnnotation(HttpMethod.class);
+                if (httpMethod != null) {
+                  httpMethodString = httpMethod.value();
+                }
+              }
+              Produces produces = (Produces) m.getAnnotation(Produces.class);
+              if (produces == null) {
+                produces = producesClass;
+              }
+              Path path = (Path) m.getAnnotation(Path.class);
+              Class<?> returnType = m.getReturnType();
+              if ((rq != null) && (httpMethodString != null) && (path != null)) {
+                data.addEndpoint(rq, returnType, produces, httpMethodString, path);
               }
             }
-            Produces produces = (Produces) m.getAnnotation(Produces.class);
-            if (produces == null) {
-              produces = producesClass;
-            }
-            Path path = (Path) m.getAnnotation(Path.class);
-            Class<?> returnType = m.getReturnType();
-            if ((rq != null) && (httpMethodString != null) && (path != null)) {
-              data.addEndpoint(rq, returnType, produces, httpMethodString, path);
-            }
-          }
-          String template = DocUtil.loadTemplate("/ui/restdocs/template.xhtml");
-          docs.append(DocUtil.generate(data, template));
-          return null;
-        }
-
-        @Override
-        public Void none() {
-          docs.append("No documentation has been found for ").append(restService.getClass().getSimpleName());
-          return null;
-        }
-      });
+            String template = DocUtil.loadTemplate("/ui/restdocs/template.xhtml");
+            docs.append(DocUtil.generate(data, template));
+          },
+          () -> docs.append("No documentation has been found for ").append(restService.getClass().getSimpleName())
+      );
     }
 
     resp.setContentType("text/html");
@@ -186,15 +177,15 @@ public class RestDocsServlet extends HttpServlet {
   }
 
   /** Try to find the RestService annotation starting at <code>endpointClass</code>. */
-  public static Option<RestService> findRestAnnotation(Class<?> endpointClass) {
+  public static Optional<RestService> findRestAnnotation(Class<?> endpointClass) {
     if (endpointClass == null) {
-      return none();
+      return Optional.empty();
     }
     final RestService rs = endpointClass.getAnnotation(RestService.class);
     if (rs == null) {
       return findRestAnnotation(endpointClass.getSuperclass());
     } else {
-      return some(rs);
+      return Optional.of(rs);
     }
   }
 }

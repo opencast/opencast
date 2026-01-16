@@ -23,7 +23,6 @@ package org.opencastproject.serviceregistry.impl;
 
 import static org.opencastproject.db.Queries.namedQuery;
 import static org.opencastproject.util.IoSupport.loadPropertiesFromUrl;
-import static org.opencastproject.util.data.Monadics.mlist;
 
 import org.opencastproject.db.DBSession;
 import org.opencastproject.db.DBSessionFactory;
@@ -44,9 +43,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Properties;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.persistence.EntityManagerFactory;
 
@@ -175,11 +177,14 @@ public class OsgiIncidentService extends AbstractIncidentService implements Bund
       final String[] fullResourceNameParts = fullResourceName.split("_");
       // part 0 contains the key base, e.g. org.opencastproject.composer
       final String keyBase = fullResourceNameParts[0];
-      final List<String> locale = mlist(fullResourceNameParts).drop(1).value();
+      final List<String> locale = Arrays.stream(fullResourceNameParts)
+          .skip(1)
+          .collect(Collectors.toList());
       final Properties texts = loadPropertiesFromUrl(resourceUrl);
       for (String key : texts.stringPropertyNames()) {
         final String text = texts.getProperty(key);
-        final String dbKey = mlist(keyBase, key).concat(locale).mkString(".");
+        final String dbKey = Stream.concat(Stream.of(keyBase, key), locale.stream())
+            .collect(Collectors.joining("."));
         logger.debug("Storing text {}={}", dbKey, text);
         db.execTx(namedQuery.persistOrUpdate(IncidentTextDto.mk(dbKey, text)));
       }

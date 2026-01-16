@@ -22,8 +22,6 @@ package org.opencastproject.oaipmh.server;
 
 import static org.junit.Assert.assertEquals;
 import static org.opencastproject.oaipmh.server.OaiPmhServer.repositoryId;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
 
 import org.opencastproject.util.UrlSupport;
 
@@ -37,6 +35,7 @@ import java.util.Collection;
 import java.util.Enumeration;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.AsyncContext;
 import javax.servlet.DispatcherType;
@@ -56,16 +55,17 @@ import javax.servlet.http.Part;
 public class OaiPmhServerTest {
   @Test
   public void testExtractRepositoryIdFromRequest() {
-    assertEquals(none(""), repositoryId(req("http://localhost:8080/oaipmh"), "/oaipmh"));
-    assertEquals(none(""), repositoryId(req("http://localhost:8080//oaipmh/"), "/oaipmh"));
-    assertEquals(some("default"), repositoryId(req("http://localhost:8080//oaipmh/default"), "/oaipmh"));
-    assertEquals(some("default"), repositoryId(req("http://localhost:8080//oaipmh/default/"), "/oaipmh"));
-    assertEquals(some("oai"), repositoryId(req("http://localhost:8080//oai/default"), "/oaipmh"));
-    assertEquals(some("default"), repositoryId(req("http://localhost:8080//oaipmh/default/more/path"), "/oaipmh"));
-    assertEquals(none(""), repositoryId(req("http://localhost:8080"), "/oaipmh"));
-    assertEquals(none(""), repositoryId(req("http://localhost:8080/"), "/oaipmh"));
-    assertEquals(none(""), repositoryId(req("http://localhost:8080/"), "/"));
-    assertEquals(none(""), repositoryId(req("http://localhost:8080/"), ""));
+    assertEquals(Optional.empty(), repositoryId(req("http://localhost:8080/oaipmh"), "/oaipmh"));
+    assertEquals(Optional.empty(), repositoryId(req("http://localhost:8080//oaipmh/"), "/oaipmh"));
+    assertEquals(Optional.of("default"), repositoryId(req("http://localhost:8080//oaipmh/default"), "/oaipmh"));
+    assertEquals(Optional.of("default"), repositoryId(req("http://localhost:8080//oaipmh/default/"), "/oaipmh"));
+    assertEquals(Optional.of("oai"), repositoryId(req("http://localhost:8080//oai/default"), "/oaipmh"));
+    assertEquals(Optional.of("default"), repositoryId(req("http://localhost:8080//oaipmh/default/more/path"),
+        "/oaipmh"));
+    assertEquals(Optional.empty(), repositoryId(req("http://localhost:8080"), "/oaipmh"));
+    assertEquals(Optional.empty(), repositoryId(req("http://localhost:8080/"), "/oaipmh"));
+    assertEquals(Optional.empty(), repositoryId(req("http://localhost:8080/"), "/"));
+    assertEquals(Optional.empty(), repositoryId(req("http://localhost:8080/"), ""));
   }
 
   private static HttpServletRequest req(final String url) {

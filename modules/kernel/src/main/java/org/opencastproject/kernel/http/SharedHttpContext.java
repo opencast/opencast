@@ -87,7 +87,7 @@ public class SharedHttpContext extends ServletContextHelper {
   @Override
   public String getMimeType(String name) {
     try {
-    return MimeTypes.fromString(name).toString();
+      return MimeTypes.fromString(name).toString();
     } catch (UnknownFileTypeException e) {
       return null;
     }

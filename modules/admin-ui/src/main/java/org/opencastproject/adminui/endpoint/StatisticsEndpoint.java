@@ -22,7 +22,7 @@
 package org.opencastproject.adminui.endpoint;
 
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
-import static org.opencastproject.util.data.functions.Functions.chuck;
+import static org.opencastproject.util.data.functions.Misc.chuck;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.adminui.impl.ProviderQuery;
@@ -50,7 +50,6 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
-import com.entwinemedia.fn.data.Opt;
 import com.google.gson.Gson;
 
 import org.apache.commons.lang3.StringUtils;
@@ -311,8 +310,8 @@ public class StatisticsEndpoint {
   }
 
   private void checkMediapackageAccess(final String mpId) throws UnauthorizedException, SearchIndexException {
-    final Opt<Event> event = indexService.getEvent(mpId, searchIndex);
-    if (event.isNone()) {
+    final Optional<Event> event = indexService.getEvent(mpId, searchIndex);
+    if (event.isEmpty()) {
       // IndexService checks permissions and returns None if user is unauthorized
       throw new UnauthorizedException(securityService.getUser(), "read");
     }

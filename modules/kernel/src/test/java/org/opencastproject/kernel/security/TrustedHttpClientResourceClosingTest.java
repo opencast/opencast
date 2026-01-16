@@ -60,7 +60,8 @@ public class TrustedHttpClientResourceClosingTest {
       UrlSigningService urlSigningService = EasyMock.createMock(UrlSigningService.class);
       EasyMock.expect(urlSigningService.accepts(EasyMock.anyString())).andReturn(true).anyTimes();
       EasyMock.expect(
-              urlSigningService.sign(EasyMock.anyString(), EasyMock.anyLong(), EasyMock.anyLong(), EasyMock.anyString()))
+              urlSigningService.sign(EasyMock.anyString(), EasyMock.anyLong(), EasyMock.anyLong(),
+                  EasyMock.anyString()))
               .andReturn("http://127.0.0.1:" + PORT);
       EasyMock.replay(urlSigningService);
 

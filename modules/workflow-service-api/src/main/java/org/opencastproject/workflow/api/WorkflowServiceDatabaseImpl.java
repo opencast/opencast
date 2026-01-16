@@ -113,7 +113,8 @@ public class WorkflowServiceDatabaseImpl implements WorkflowServiceDatabase {
     return getWorkflow(workflowId, securityService.getOrganization().getId());
   }
 
-  public WorkflowInstance getWorkflow(long workflowId, String orgId) throws NotFoundException, WorkflowDatabaseException {
+  public WorkflowInstance getWorkflow(long workflowId, String orgId)
+          throws NotFoundException, WorkflowDatabaseException {
     try {
       if (null != orgId) {
         return db.exec(namedQuery.find(

@@ -25,7 +25,7 @@ Ensure codebase stability
 Organize community/committers
 
 * Remain active on list
-* Organize Technical meeting
+* Organize Dev meeting
 * Encourage additional committers to join the project
 * Manage crowdin translators - ensure join requests are dealt with
 * Handle (security issue reports)[security.md], and notifications once handled

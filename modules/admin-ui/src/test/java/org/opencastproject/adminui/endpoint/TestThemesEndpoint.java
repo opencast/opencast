@@ -42,7 +42,6 @@ import org.opencastproject.staticfiles.endpoint.StaticFileRestService;
 import org.opencastproject.themes.Theme;
 import org.opencastproject.themes.persistence.ThemesServiceDatabaseException;
 import org.opencastproject.themes.persistence.ThemesServiceDatabaseImpl;
-import org.opencastproject.util.data.Option;
 
 import org.easymock.Capture;
 import org.easymock.EasyMock;
@@ -54,6 +53,7 @@ import java.io.ByteArrayInputStream;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Hashtable;
+import java.util.Optional;
 
 import javax.ws.rs.Path;
 
@@ -75,17 +75,17 @@ public class TestThemesEndpoint extends ThemesEndpoint {
   }
 
   private void addData() throws ThemesServiceDatabaseException {
-    Theme theme = new Theme(Option.none(), creationDate, true, user, "The Theme name", "The Theme description",
+    Theme theme = new Theme(Optional.empty(), creationDate, true, user, "The Theme name", "The Theme description",
             true, "uuid1", true, "trailer-file", true, "title,room,date", "title-background-file", true,
             "license-background-file", "The license description", true, "uuid2", "top-left");
     themesServiceDatabaseImpl.updateTheme(theme);
 
-    Theme theme2 = new Theme(Option.none(), creationDate, false, user, "theme-2-name", "",
+    Theme theme2 = new Theme(Optional.empty(), creationDate, false, user, "theme-2-name", "",
         false, "uuid1", false, "", false, "", "", false,
         "", "", false, "uuid2", "");
     themesServiceDatabaseImpl.updateTheme(theme2);
 
-    Theme theme3 = new Theme(Option.none(), creationDate, false, user, "theme-3-name", "",
+    Theme theme3 = new Theme(Optional.empty(), creationDate, false, user, "theme-3-name", "",
         false, "uuid1", false, "", false, "", "", false,
         "", "", false, "uuid2", "");
     themesServiceDatabaseImpl.updateTheme(theme3);

@@ -45,17 +45,13 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 
-import com.entwinemedia.fn.P1;
-import com.entwinemedia.fn.P1Lazy;
-import com.entwinemedia.fn.Prelude;
-import com.entwinemedia.fn.Unit;
-
 import org.easymock.EasyMock;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.util.HashSet;
 import java.util.Optional;
+import java.util.function.Supplier;
 
 import junitparams.JUnitParamsRunner;
 import junitparams.Parameters;
@@ -108,23 +104,28 @@ public class AssetManagerSecurityTest extends AssetManagerTestBase {
    *     the product that contains the calls to the asset manager
    * @return the result of the evaluation of <code>p</code>
    */
-  private <A> A runWith(User user, boolean assertAccess, P1<A> p) {
+  private <A> A runWith(User user, boolean assertAccess, Supplier<A> p) {
     final User stashedUser = currentUser;
     currentUser = user;
     A result = null;
     try {
-      result = p.get1();
+      result = p.get();
       if (!assertAccess) {
         fail("Access should be prohibited");
       }
     } catch (Exception e) {
-      if ((e instanceof UnauthorizedException) && assertAccess) {
-        fail("Access should be granted");
-      } else if (!(e instanceof UnauthorizedException)) {
-        Prelude.chuck(e);
+      Throwable cause = e;
+      while (cause.getCause() != null && !(cause instanceof UnauthorizedException)) {
+        cause = cause.getCause();
       }
+      if (cause instanceof UnauthorizedException && assertAccess) {
+        fail("Access should be granted");
+      } else if (!(cause instanceof UnauthorizedException)) {
+        throw new RuntimeException(e);
+      }
+    } finally {
+      currentUser = stashedUser;
     }
-    currentUser = stashedUser;
     return result;
   }
 
@@ -164,15 +165,18 @@ public class AssetManagerSecurityTest extends AssetManagerTestBase {
       final AccessControlList acl,
       User user,
       boolean assertGrant) throws Exception {
-    // create a snapshot
+
     final Snapshot snapshot = createSnapshot(acl);
-    runWith(user, assertGrant, new P1Lazy<Unit>() {
-      @Override public Unit get1() {
+
+    runWith(user, assertGrant, new Supplier<Void>() {
+      @Override
+      public Void get() {
         // set availability
         am.setAvailability(
             snapshot.getVersion(),
             snapshot.getMediaPackage().getIdentifier().toString(),
             Availability.OFFLINE);
+
         // set a property
         assertTrue(am.setProperty(Property.mk(
             PropertyId.mk(
@@ -180,7 +184,8 @@ public class AssetManagerSecurityTest extends AssetManagerTestBase {
                 "namespace",
                 "property-name"),
             Value.mk("value"))));
-        return Unit.unit;
+
+        return null;
       }
     });
   }
@@ -217,13 +222,12 @@ public class AssetManagerSecurityTest extends AssetManagerTestBase {
    */
   @Test
   @Parameters
-  public void testGetAsset(final AccessControlList acl, User user,
-      boolean assertAccess) throws Exception {
-    // create a snapshot
+  public void testGetAsset(final AccessControlList acl, User user, boolean assertAccess) throws Exception {
     final Snapshot snapshot = createSnapshot(acl);
     // get an asset of the snapshot
-    runWith(user, assertAccess, new P1Lazy<Unit>() {
-      @Override public Unit get1() {
+    runWith(user, assertAccess, new Supplier<Void>() {
+      @Override
+      public Void get() {
         logger.info(user.toString());
         logger.info(acl.toString());
         logger.info(Boolean.toString(assertAccess));
@@ -231,7 +235,7 @@ public class AssetManagerSecurityTest extends AssetManagerTestBase {
             snapshot.getVersion(),
             snapshot.getMediaPackage().getIdentifier().toString(),
             snapshot.getMediaPackage().getElements()[0].getIdentifier()).isPresent());
-        return Unit.unit;
+        return null;
       }
     });
   }
@@ -264,33 +268,37 @@ public class AssetManagerSecurityTest extends AssetManagerTestBase {
 
 
   /* -------------------------------------------------------------------------------------------------------------- */
-
+  //
   //  @Test
   //  @Parameters
   //  public void testQuery(
   //      AccessControlList acl,
   //      User writeUser, User queryUser,
   //      final boolean assertReadAccess, final boolean assertWriteAccess)
-  //          throws Exception {
+  //      throws Exception {
   //    // create a snapshot -> should always work (set assertAccess to true)
   //    Snapshot snapshot = createSnapshot(acl, writeUser, true);
+  //
   //    // Set assertAccess to true since querying does not yield a security exception.
   //    // Restricted records are simply filtered out.
-  //    runWith(queryUser, true, new P1Lazy<Unit>() {
-  //      @Override public Unit get1() {
+  //    runWith(queryUser, true, new Supplier<Unit>() {
+  //      @Override
+  //      public Unit get() {
   //        // if read access is granted the result contains one record
   //        assertEquals("Snapshot should be retrieved: " + assertReadAccess,
-  //                     assertReadAccess,
-  //                     am.getSnapshotsById(snapshot.getMediaPackage().getIdentifier().toString()).size() == 1);
+  //            assertReadAccess,
+  //            am.getSnapshotsById(snapshot.getMediaPackage().getIdentifier().toString()).size() == 1);
   //        return Unit.unit;
   //      }
   //    });
-  //    runWith(queryUser, true, new P1Lazy<Unit>() {
-  //      @Override public Unit get1() {
+  //
+  //    runWith(queryUser, true, new Supplier<Unit>() {
+  //      @Override
+  //      public Unit get() {
   //        // if write access is granted one snapshot should be deleted
   //        assertEquals("Snapshots should be deleted: " + assertWriteAccess,
-  //                     assertWriteAccess,
-  //               am.deleteSnapshots(snapshot.getMediaPackage().getIdentifier().toString()) == 1);
+  //            assertWriteAccess,
+  //            am.deleteSnapshots(snapshot.getMediaPackage().getIdentifier().toString()) == 1);
   //        return Unit.unit;
   //      }
   //    });
@@ -358,10 +366,10 @@ public class AssetManagerSecurityTest extends AssetManagerTestBase {
     return createSnapshot(acl, mkDefaultOrgAdmin(), true);
   }
 
-  private Snapshot createSnapshot(final AccessControlList acl, final User user,
-      boolean assertAccess) {
-    return runWith(user, assertAccess, new P1Lazy<Snapshot>() {
-      @Override public Snapshot get1() {
+  private Snapshot createSnapshot(final AccessControlList acl, final User user, boolean assertAccess) {
+    return runWith(user, assertAccess, new Supplier<Snapshot>() {
+      @Override
+      public Snapshot get() {
         final AccessControlList stashedAcl = currentMediaPackageAcl;
         currentMediaPackageAcl = acl;
         final Snapshot[] snapshot = createAndAddMediaPackages(1, 1, 1, Optional.empty());

@@ -166,12 +166,15 @@ public class MetadataField {
           final String listprovider,
           final String pattern,
           final String delimiter) throws IllegalArgumentException {
-    if (StringUtils.isBlank(inputID))
+    if (StringUtils.isBlank(inputID)) {
       throw new IllegalArgumentException("The metadata input id must not be null.");
-    if (StringUtils.isBlank(label))
+    }
+    if (StringUtils.isBlank(label)) {
       throw new IllegalArgumentException("The metadata label must not be null.");
-    if (type == null)
+    }
+    if (type == null) {
       throw new IllegalArgumentException("The metadata type must not be null.");
+    }
     this.inputID = inputID;
     this.outputID = outputID;
     this.label = label;
@@ -271,8 +274,9 @@ public class MetadataField {
       }
     }
 
-    if (type == null)
+    if (type == null) {
       throw new IllegalArgumentException("type is null");
+    }
 
     switch (type) {
       case BOOLEAN:

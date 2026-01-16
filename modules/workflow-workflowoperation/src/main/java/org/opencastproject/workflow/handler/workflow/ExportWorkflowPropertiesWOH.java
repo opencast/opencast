@@ -58,7 +58,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -98,7 +97,7 @@ public class ExportWorkflowPropertiesWOH extends AbstractWorkflowOperationHandle
     logger.info("Start exporting workflow properties for workflow {}", workflowInstance);
     final MediaPackage mediaPackage = workflowInstance.getMediaPackage();
     // Parse CSV
-    final Set<String> keys = Optional.ofNullable(getOptConfig(workflowInstance, KEYS_PROPERTY).orNull())
+    final Set<String> keys = getOptConfig(workflowInstance, KEYS_PROPERTY)
         .map(s -> Arrays.stream(s.split("\\s*,\\s*")).collect(Collectors.toSet()))
         .orElse(Collections.emptySet());
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
@@ -107,7 +106,7 @@ public class ExportWorkflowPropertiesWOH extends AbstractWorkflowOperationHandle
     if (targetFlavorList.isEmpty()) {
       targetFlavorList.add(DEFAULT_TARGET_FLAVOR);
     }
-    final List<String> targetTags = tagsAndFlavors.getTargetTags();
+    final ConfiguredTagsAndFlavors.TargetTags targetTags = tagsAndFlavors.getTargetTags();
     final MediaPackageElementFlavor targetFlavor = targetFlavorList.get(0);
 
     // Read optional existing workflow properties from mediapackage
@@ -121,25 +120,31 @@ public class ExportWorkflowPropertiesWOH extends AbstractWorkflowOperationHandle
       workflowProps = loadPropertiesFromXml(workspace, existingPropsElem.get().getURI());
 
       // Remove specified keys
-      for (String key : keys)
+      for (String key : keys) {
         workflowProps.remove(key);
+      }
     }
 
     // Extend with specified properties
     for (String key : workflowInstance.getConfigurationKeys()) {
-      if (keys.isEmpty() || keys.contains(key))
+      if (keys.isEmpty() || keys.contains(key)) {
         workflowProps.put(key, workflowInstance.getConfiguration(key));
+      }
     }
 
     // Store properties as an attachment
     Attachment attachment;
     try (ByteArrayOutputStream out = new ByteArrayOutputStream()) {
       workflowProps.storeToXML(out, null, "UTF-8");
-      String elementId = UUID.randomUUID().toString();
-      URI uri = workspace.put(mediaPackage.getIdentifier().toString(), elementId, EXPORTED_PROPERTIES_FILENAME,
-              new ByteArrayInputStream(out.toByteArray()));
       MediaPackageElementBuilder builder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
-      attachment = (Attachment) builder.elementFromURI(uri, Attachment.TYPE, targetFlavor);
+      attachment = (Attachment) builder.newElement(Attachment.TYPE, targetFlavor);
+      attachment.generateIdentifier();
+      URI uri = workspace.put(
+          mediaPackage.getIdentifier().toString(),
+          attachment.getIdentifier(),
+          EXPORTED_PROPERTIES_FILENAME,
+          new ByteArrayInputStream(out.toByteArray()));
+      attachment.setURI(uri);
       attachment.setMimeType(MimeTypes.XML);
     } catch (IOException e) {
       logger.error("Unable to store workflow properties as Attachment with flavor '{}':", targetFlavorList.get(0), e);
@@ -147,14 +152,12 @@ public class ExportWorkflowPropertiesWOH extends AbstractWorkflowOperationHandle
     }
 
     // Add the target tags
-    for (String tag : targetTags) {
-      logger.trace("Tagging with '{}'", tag);
-      attachment.addTag(tag);
-    }
+    applyTargetTagsToElement(targetTags, attachment);
 
     // Update attachment
-    if (existingPropsElem.isPresent())
+    if (existingPropsElem.isPresent()) {
       mediaPackage.remove(existingPropsElem.get());
+    }
     mediaPackage.add(attachment);
 
     logger.info("Added properties from {} as Attachment with flavor {}", workflowInstance, targetFlavorList.get(0));

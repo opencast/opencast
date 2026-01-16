@@ -25,9 +25,6 @@ import static org.opencastproject.oaipmh.OaiPmhUtil.toOaiRepresentation;
 import static org.opencastproject.oaipmh.OaiPmhUtil.toUtc;
 import static org.opencastproject.oaipmh.persistence.QueryBuilder.queryRepo;
 import static org.opencastproject.oaipmh.server.Functions.addDay;
-import static org.opencastproject.oaipmh.server.Functions.asDate;
-import static org.opencastproject.util.data.Monadics.mlist;
-import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.Prelude.unexhaustiveMatch;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
@@ -43,11 +40,6 @@ import org.opencastproject.oaipmh.persistence.OaiPmhSetDefinitionImpl;
 import org.opencastproject.oaipmh.persistence.SearchResult;
 import org.opencastproject.oaipmh.persistence.SearchResultItem;
 import org.opencastproject.oaipmh.util.XmlGen;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Function0;
-import org.opencastproject.util.data.Option;
-import org.opencastproject.util.data.Predicate;
-import org.opencastproject.util.data.Tuple;
 
 import org.apache.commons.collections4.EnumerationUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -60,11 +52,16 @@ import org.w3c.dom.Node;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * An OAI-PMH protocol compliant repository.
@@ -197,7 +194,7 @@ public abstract class OaiPmhRepository implements ManagedService {
   public abstract String saveQuery(ResumableQuery query);
 
   /** Get a saved query. */
-  public abstract Option<ResumableQuery> getSavedQuery(String resumptionToken);
+  public abstract Optional<ResumableQuery> getSavedQuery(String resumptionToken);
 
   /** Maximum number of items returned by the list queries ListIdentifiers, ListRecords and ListSets. */
   public abstract int getResultLimit();
@@ -217,7 +214,10 @@ public abstract class OaiPmhRepository implements ManagedService {
 
   /** Return a list of all available metadata providers. The <code>oai_dc</code> format is always included. */
   public final List<MetadataProvider> getMetadataProviders() {
-    return mlist(getRepositoryMetadataProviders()).cons(OAI_DC_METADATA_PROVIDER).value();
+    return Stream.concat(
+        Stream.of(OAI_DC_METADATA_PROVIDER),
+        getRepositoryMetadataProviders().stream()
+    ).toList();
   }
 
   /** Add an item to the repository. */
@@ -246,34 +246,25 @@ public abstract class OaiPmhRepository implements ManagedService {
       return handleListSets(p);
     } else {
       return createErrorResponse(
-              "badVerb", Option.<String>none(), p.getRepositoryUrl(), "Illegal OAI verb or verb is missing.");
+              "badVerb", Optional.<String>empty(), p.getRepositoryUrl(), "Illegal OAI verb or verb is missing.");
     }
   }
 
   /** Return the metadata provider for a given metadata prefix. */
-  public Option<MetadataProvider> getMetadataProvider(final String metadataPrefix) {
-    return mlist(getMetadataProviders()).find(new Predicate<MetadataProvider>() {
-      @Override
-      public Boolean apply(MetadataProvider metadataProvider) {
-        return metadataProvider.getMetadataFormat().getPrefix().equals(metadataPrefix);
-      }
-    });
+  public Optional<MetadataProvider> getMetadataProvider(final String metadataPrefix) {
+    return getMetadataProviders().stream()
+        .filter(metadataProvider -> metadataProvider.getMetadataFormat().getPrefix().equals(metadataPrefix))
+        .findFirst();
   }
-
-  /** {@link #getMetadataProvider(String)} as a function. */
-  private final Function<String, Option<MetadataProvider>> getMetadataProvider = new Function<String, Option<MetadataProvider>>() {
-    @Override public Option<MetadataProvider> apply(String metadataPrefix) {
-      return getMetadataProvider(metadataPrefix);
-    }
-  };
 
   /** Create the "GetRecord" response. */
   private XmlGen handleGetRecord(final Params p) {
-    if (p.getIdentifier().isNone() || p.getMetadataPrefix().isNone()) {
+    if (p.getIdentifier().isEmpty() || p.getMetadataPrefix().isEmpty()) {
       return createBadArgumentResponse(p);
     } else {
-      for (final MetadataProvider metadataProvider : p.getMetadataPrefix().bind(getMetadataProvider)) {
-        if (p.getSet().isSome() && !sets.stream().anyMatch(
+      var metadataProviders = p.getMetadataPrefix().flatMap(mp -> getMetadataProvider(mp)).stream().toList();
+      for (final MetadataProvider metadataProvider : metadataProviders) {
+        if (p.getSet().isPresent() && !sets.stream().anyMatch(
             setDef -> StringUtils.equals(setDef.getSetSpec(), p.getSet().get()))) {
           // If there is no set specification, immediately return a no result response
           return createNoRecordsMatchResponse(p);
@@ -281,7 +272,7 @@ public abstract class OaiPmhRepository implements ManagedService {
         final SearchResult res = getPersistence()
                 .search(queryRepo(getRepositoryId()).mediaPackageId(p.getIdentifier())
                                                     .setDefinitions(sets)
-                                                    .setSpec(p.getSet().getOrElseNull()).build());
+                                                    .setSpec(p.getSet().orElse(null)).build());
         final List<SearchResultItem> items = res.getItems();
         switch (items.size()) {
           case 0:
@@ -335,20 +326,19 @@ public abstract class OaiPmhRepository implements ManagedService {
   }
 
   private XmlGen handleListMetadataFormats(final Params p) {
-    for (String id : p.getIdentifier()) {
-      final SearchResult res = getPersistence().search(queryRepo(getRepositoryId()).mediaPackageId(id).build());
-      if (res.getItems().size() != 1)
+    if (p.getIdentifier().isPresent()) {
+      final SearchResult res = getPersistence().search(queryRepo(
+          getRepositoryId()).mediaPackageId(p.getIdentifier().get()).build());
+      if (res.getItems().size() != 1) {
         return createIdDoesNotExistResponse(p);
+      }
     }
     return new OaiVerbXmlGen(this, p) {
       @Override
       public Element create() {
-        final List<Node> metadataFormats = mlist(getMetadataProviders()).map(new Function<MetadataProvider, Node>() {
-          @Override
-          public Node apply(MetadataProvider metadataProvider) {
-            return metadataFormat(metadataProvider.getMetadataFormat());
-          }
-        }).value();
+        final List<Node> metadataFormats = getMetadataProviders().stream()
+            .map(metadataProvider -> (Node) metadataFormat(metadataProvider.getMetadataFormat()))
+            .toList();
         return oai(request($aSome("identifier", p.getIdentifier())), verb(metadataFormats));
       }
     };
@@ -360,15 +350,18 @@ public abstract class OaiPmhRepository implements ManagedService {
       protected ListXmlGen respond(ListGenParams listParams) {
         return new ListXmlGen(listParams) {
           @Override
-          protected List<Node> createContent(final Option<String> set) {
-            return mlist(params.getResult().getItems()).map(new Function<SearchResultItem, Node>() {
-              @Override
-              public Node apply(SearchResultItem item) {
-                logger.debug("Requested set: {}", set);
-                final Element metadata = params.getMetadataProvider().createMetadata(OaiPmhRepository.this, item, set);
-                return record(item, metadata);
-              }
-            }).value();
+          protected List<Node> createContent(final Optional<String> set) {
+            return params.getResult().getItems().stream()
+                .map(new Function<SearchResultItem, Node>() {
+                  @Override
+                  public Node apply(SearchResultItem item) {
+                    logger.debug("Requested set: {}", set);
+                    final Element metadata = params.getMetadataProvider()
+                        .createMetadata(OaiPmhRepository.this, item, set);
+                    return record(item, metadata);
+                  }
+                })
+                .toList();
           }
         };
       }
@@ -382,14 +375,10 @@ public abstract class OaiPmhRepository implements ManagedService {
       protected ListXmlGen respond(ListGenParams listParams) {
         // create XML response
         return new ListXmlGen(listParams) {
-          @Override
-          protected List<Node> createContent(Option<String> set) {
-            return mlist(params.getResult().getItems()).map(new Function<SearchResultItem, Node>() {
-              @Override
-              public Node apply(SearchResultItem item) {
-                return header(item);
-              }
-            }).value();
+          protected List<Node> createContent(Optional<String> set) {
+            return params.getResult().getItems().stream()
+                .map(item -> (Node) header(item))
+                .toList();
           }
         };
       }
@@ -427,14 +416,15 @@ public abstract class OaiPmhRepository implements ManagedService {
   private XmlGen createCannotDisseminateFormatResponse(Params p) {
     return createErrorResponse(
             OaiPmhConstants.ERROR_CANNOT_DISSEMINATE_FORMAT, p.getVerb(), p.getRepositoryUrl(),
-            "The metadata format identified by the value given for the metadataPrefix argument is not supported by the item or by the repository.");
+            "The metadata format identified by the value given for the metadataPrefix argument is not supported by the "
+                + "item or by the repository.");
   }
 
   private XmlGen createIdDoesNotExistResponse(Params p) {
     return createErrorResponse(
             OaiPmhConstants.ERROR_ID_DOES_NOT_EXIST, p.getVerb(), p.getRepositoryUrl(),
             format("The requested id %s does not exist in the repository.",
-                   p.getIdentifier().getOrElse("?")));
+                   p.getIdentifier().orElse("?")));
   }
 
   private XmlGen createBadArgumentResponse(Params p) {
@@ -461,7 +451,7 @@ public abstract class OaiPmhRepository implements ManagedService {
   }
 
   private XmlGen createErrorResponse(
-          final String code, final Option<String> verb, final String repositoryUrl, final String msg) {
+          final String code, final Optional<String> verb, final String repositoryUrl, final String msg) {
     return new OaiXmlGen(this) {
       @Override
       public Element create() {
@@ -485,23 +475,13 @@ public abstract class OaiPmhRepository implements ManagedService {
     return toUtc(d, getRepositoryTimeGranularity());
   }
 
-  // CHECKSTYLE:OFF
-  final Function<Date, String> toSupportedGranularity = new Function<Date, String>() {
-    @Override
-    public String apply(Date date) {
-      return toSupportedGranularity(date);
-    }
-  };
-  // CHECKSTYLE:ON
+  private Date granulate(Date date) {
+    return granulate(getRepositoryTimeGranularity(), date);
+  }
 
-  private final Function<Date, Date> granulate = new Function<Date, Date>() {
-    @Override
-    public Date apply(Date date) {
-      return granulate(getRepositoryTimeGranularity(), date);
-    }
-  };
-
-  /** "Cut" a date to the repositories supported granularity. Cutting behaves similar to the mathematical floor function. */
+  /**
+   * "Cut" a date to the repositories supported granularity. Cutting behaves similar to the mathematical floor function.
+   */
   public static Date granulate(Granularity g, Date d) {
     switch (g) {
       case SECOND: {
@@ -544,90 +524,103 @@ public abstract class OaiPmhRepository implements ManagedService {
     /** Call this method to create the XML. */
     public XmlGen apply(final Params p) {
       // check parameters
-      if (p.getSet().isSome() && sets.isEmpty()) {
+      if (p.getSet().isPresent() && sets.isEmpty()) {
         return createNoSetHierarchyResponse(p);
       }
-      final boolean resumptionTokenExists = p.getResumptionToken().isSome();
-      final boolean otherParamExists = p.getMetadataPrefix().isSome() || p.getFrom().isSome() || p.getUntil().isSome()
-              || p.getSet().isSome();
+      final boolean resumptionTokenExists = p.getResumptionToken().isPresent();
+      final boolean otherParamExists = p.getMetadataPrefix().isPresent() || p.getFrom().isPresent()
+          || p.getUntil().isPresent() || p.getSet().isPresent();
 
-      if (resumptionTokenExists && otherParamExists || !resumptionTokenExists && !otherParamExists)
+      if (resumptionTokenExists && otherParamExists || !resumptionTokenExists && !otherParamExists) {
         return createBadArgumentResponse(p);
-      final Option<Date> from = p.getFrom().map(asDate).map(granulate);
-
-      final Function<Date, Date> untilAdjustment = getRepositoryTimeGranularity() == Granularity.DAY ? addDay(1)
-              : org.opencastproject.util.data.functions.Functions.<Date>identity();
-      final Option<Date> untilGranularity = p.getUntil().map(asDate).map(granulate).map(untilAdjustment);
-      for (Tuple<Date, Date> fromUntil : from.and(untilGranularity)) {
-        if (!fromUntil.getA().before(fromUntil.getB())) {
+      }
+      final Optional<Date> from = p.getFrom().map(Functions::asDate).map(d -> granulate(d));
+      final Function<Date, Date> untilAdjustment = getRepositoryTimeGranularity() == Granularity.DAY
+          ? addDay(1)
+          : Function.identity();
+      final Optional<Date> untilGranularity = p.getUntil()
+          .map(Functions::asDate)
+          .map(d -> granulate(d))
+          .map(untilAdjustment::apply);
+      if (from.isPresent() && untilGranularity.isPresent()) {
+        Date fromDate = from.get();
+        Date untilDate = untilGranularity.get();
+        if (!fromDate.before(untilDate)) {
           return createBadArgumentResponse(p);
         }
       }
-      if (otherParamExists && p.getMetadataPrefix().isNone())
+      if (otherParamExists && p.getMetadataPrefix().isEmpty()) {
         return createBadArgumentResponse(p);
+      }
       // <- params are ok
 
-      final Option<Date> until = untilGranularity.orElse(some(currentDate()));
+      final Optional<Date> until = Optional.of(untilGranularity.orElseGet(() -> currentDate()));
 
-      final String metadataPrefix = p.getResumptionToken().flatMap(getMetadataPrefixFromToken)
-              .getOrElse(getMetadataPrefix(p));
+      final String metadataPrefix = p.getResumptionToken()
+          .flatMap(t -> getMetadataPrefixFromToken(t))
+          .orElseGet(getMetadataPrefix(p));
 
-      for (MetadataProvider metadataProvider : p.getResumptionToken()
-              .flatMap(getMetadataProviderFromToken)
-              .orElse(getMetadataProvider.curry(metadataPrefix))) {
+      final List<MetadataProvider> metadataProviders;
+      if (p.getResumptionToken().isPresent()) {
+        metadataProviders = getMetadataProviderFromToken.apply(p.getResumptionToken().get())
+            .map(Collections::singletonList)
+            .orElseGet(Collections::emptyList);
+      } else {
+        metadataProviders = Collections.singletonList(getMetadataProvider(metadataPrefix).orElseThrow(() ->
+            new IllegalStateException("No MetadataProvider found for fallback")
+        ));
+      }
+
+      for (MetadataProvider metadataProvider : metadataProviders) {
         try {
           final SearchResult result;
           @SuppressWarnings("unchecked")
-          final Option<String>[] set = new Option[]{p.getSet()};
+          final Optional<String>[] set = new Optional[]{p.getSet()};
+
           if (!resumptionTokenExists) {
             // start a new query
-            if (p.getSet().isSome() && !sets.stream().anyMatch(
+            if (p.getSet().isPresent() && !sets.stream().anyMatch(
                 setDef -> StringUtils.equals(setDef.getSetSpec(), p.getSet().get()))) {
               // If there is no set specification, immediately return a no result response
               return createNoRecordsMatchResponse(p);
             }
             result = getPersistence().search(
-                    queryRepo(getRepositoryId())
-                            .setDefinitions(sets)
-                            .setSpec(p.getSet().getOrElseNull())
-                            .modifiedAfter(from)
-                            .modifiedBefore(until)
-                            .limit(getResultLimit()).build());
+                queryRepo(getRepositoryId())
+                    .setDefinitions(sets)
+                    .setSpec(p.getSet().orElse(null))
+                    .modifiedAfter(from)
+                    .modifiedBefore(until)
+                    .limit(getResultLimit()).build());
           } else {
             // resume query
-            result = getSavedQuery(p.getResumptionToken().get()).fold(new Option.Match<ResumableQuery, SearchResult>() {
-              @Override
-              public SearchResult some(ResumableQuery rq) {
-                set[0] = rq.getSet();
-                return getPersistence().search(
-                        queryRepo(getRepositoryId())
-                                .setDefinitions(sets)
-                                .setSpec(rq.getSet().getOrElseNull())
-                                .modifiedAfter(rq.getLastResult())
-                                .modifiedBefore(rq.getUntil())
-                                .limit(getResultLimit())
-                                .subsequentRequest(true).build());
-              }
-
-              @Override
-              public SearchResult none() {
-                // no resumable query found
-                throw new BadResumptionTokenException();
-              }
-            });
+            ResumableQuery rq = getSavedQuery(p.getResumptionToken().get())
+                .orElseThrow(BadResumptionTokenException::new);
+            set[0] = rq.getSet();
+            result = getPersistence().search(
+                queryRepo(getRepositoryId())
+                    .setDefinitions(sets)
+                    .setSpec(rq.getSet().orElse(null))
+                    .modifiedAfter(rq.getLastResult())
+                    .modifiedBefore(rq.getUntil())
+                    .limit(getResultLimit())
+                    .subsequentRequest(true).build());
           }
+
           if (result.size() > 0) {
-            return respond(new ListGenParams(OaiPmhRepository.this,
-                                             result,
-                                             metadataProvider,
-                                             metadataPrefix,
-                                             p.getResumptionToken(),
-                                             from, until.get(),
-                                             set[0],
-                                             p));
+            return respond(new ListGenParams(
+                OaiPmhRepository.this,
+                result,
+                metadataProvider,
+                metadataPrefix,
+                p.getResumptionToken(),
+                from,
+                until.get(),
+                set[0],
+                p));
           } else {
             return createNoRecordsMatchResponse(p);
           }
+
         } catch (BadResumptionTokenException e) {
           return createBadResumptionTokenResponse(p);
         }
@@ -637,37 +630,27 @@ public abstract class OaiPmhRepository implements ManagedService {
     }
 
     /** Get a metadata prefix from a resumption token. */
-    private final Function<String, Option<String>> getMetadataPrefixFromToken = new Function<String, Option<String>>() {
-      @Override
-      public Option<String> apply(String token) {
-        return getSavedQuery(token).map(new Function<ResumableQuery, String>() {
-          @Override
-          public String apply(ResumableQuery resumableQuery) {
-            return resumableQuery.getMetadataPrefix();
-          }
-        });
-      }
-    };
+    private Optional<String> getMetadataPrefixFromToken(String token) {
+      return getSavedQuery(token).map(resumableQuery -> resumableQuery.getMetadataPrefix());
+    }
 
     /** Get a metadata provider from a resumption token. */
-    private final Function<String, Option<MetadataProvider>> getMetadataProviderFromToken = new Function<String, Option<MetadataProvider>>() {
+    private final Function<String, Optional<MetadataProvider>> getMetadataProviderFromToken =
+        new Function<String, Optional<MetadataProvider>>() {
       @Override
-      public Option<MetadataProvider> apply(String token) {
-        return getSavedQuery(token).flatMap(new Function<ResumableQuery, Option<MetadataProvider>>() {
-          @Override
-          public Option<MetadataProvider> apply(ResumableQuery resumableQuery) {
-            return getMetadataProvider(resumableQuery.getMetadataPrefix());
-          }
-        });
+      public Optional<MetadataProvider> apply(String token) {
+        return getSavedQuery(token).flatMap(resumableQuery -> getMetadataProvider(resumableQuery.getMetadataPrefix()));
       }
     };
 
     /** Get the metadata prefix lazily. */
-    private Function0<String> getMetadataPrefix(final Params p) {
-      return new Function0<String>() {
-        @Override
-        public String apply() {
-          return p.getMetadataPrefix().getOrElse(OaiPmhConstants.OAI_DC_METADATA_FORMAT.getPrefix());
+    private Supplier<String> getMetadataPrefix(final Params p) {
+      return () -> {
+        try {
+          return p.getMetadataPrefix()
+              .orElse(OaiPmhConstants.OAI_DC_METADATA_FORMAT.getPrefix());
+        } catch (Exception e) {
+          return chuck(e);
         }
       };
     }
@@ -683,19 +666,20 @@ public abstract class OaiPmhRepository implements ManagedService {
       }
 
       /** Implement to create your content. Gets placed as children of the verb node. */
-      protected abstract List<Node> createContent(Option<String> set);
+      protected abstract List<Node> createContent(Optional<String> set);
 
       @Override
       public Element create() {
         final List<Node> content = new ArrayList<Node>(createContent(params.getSet()));
-        if (content.size() == 0)
+        if (content.size() == 0) {
           return createNoRecordsMatchResponse(params.getParams()).create();
+        }
         content.add(resumptionToken(params.getResumptionToken(), params.getMetadataPrefix(), params.getResult(),
                                     params.getUntil(), params.getSet()));
         return oai(
                 request($a("metadataPrefix", params.getMetadataPrefix()),
-                        $aSome("from", params.getFrom().map(toSupportedGranularity)),
-                        $aSome("until", some(toSupportedGranularity(params.getUntil()))),
+                        $aSome("from", params.getFrom().map(d -> toSupportedGranularity(d))),
+                        $aSome("until", Optional.of(toSupportedGranularity(params.getUntil()))),
                         $aSome("set", params.getSet())), verb(content));
       }
     }
@@ -711,18 +695,18 @@ final class ListGenParams {
   private final SearchResult result;
   private final MetadataProvider metadataProvider;
   private final String metadataPrefix;
-  private final Option<String> resumptionToken;
-  private final Option<Date> from;
+  private final Optional<String> resumptionToken;
+  private final Optional<Date> from;
   private final Date until;
-  private final Option<String> set;
+  private final Optional<String> set;
   private final Params params;
 
   // CHECKSTYLE:OFF
   ListGenParams(OaiPmhRepository repository,
                 SearchResult result, MetadataProvider metadataProvider,
-                String metadataPrefix, Option<String> resumptionToken,
-                Option<Date> from, Date until,
-                Option<String> set,
+                String metadataPrefix, Optional<String> resumptionToken,
+                Optional<Date> from, Date until,
+                Optional<String> set,
                 Params params) {
     this.repository = repository;
     this.result = result;
@@ -748,7 +732,7 @@ final class ListGenParams {
     return metadataProvider;
   }
 
-  public Option<String> getResumptionToken() {
+  public Optional<String> getResumptionToken() {
     return resumptionToken;
   }
 
@@ -756,7 +740,7 @@ final class ListGenParams {
     return metadataPrefix;
   }
 
-  public Option<Date> getFrom() {
+  public Optional<Date> getFrom() {
     return from;
   }
 
@@ -764,7 +748,7 @@ final class ListGenParams {
     return until;
   }
 
-  public Option<String> getSet() {
+  public Optional<String> getSet() {
     return set;
   }
 

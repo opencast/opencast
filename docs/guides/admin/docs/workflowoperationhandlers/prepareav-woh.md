@@ -38,17 +38,14 @@ Parameter Table
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="prepare-av"
-    description="Preparing presenter audio and video work versions">
-  <configurations>
-    <configuration key="source-flavor">presenter/source</configuration>
-    <configuration key="target-flavor">presenter/work</configuration>
-    <configuration key="rewrite">false</configuration>
-    <configuration key="audio-muxing-source-flavors">*/?,*/*</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: prepare-av
+    description: Preparing presenter audio and video work versions
+    configurations:
+      - source-flavor: presenter/source
+      - target-flavor: presenter/work
+      - rewrite: false
+      - audio-muxing-source-flavors: '*/?,*/*'
 ```
 
 
@@ -78,9 +75,9 @@ will just pick any of those tracks that has audio.
 Example
 -------
 
-```xml
-<configuration key="source-flavor">presenter/*</configuration>
-<configuration key="audio-muxing-source-flavors">presenter-audio/?, presentation/?,presentation/*,?/audio,*/*</configuration>
+```yaml
+      - source-flavor: presenter/*
+      - audio-muxing-source-flavors: presenter-audio/?, presentation/?,presentation/*,?/audio,*/*
 ```
 
 Let's assume that exactly one video-only track of flavor presenter/source in the media package and another track of

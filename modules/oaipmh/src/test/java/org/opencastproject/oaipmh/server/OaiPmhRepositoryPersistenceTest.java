@@ -53,7 +53,6 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.series.api.SeriesService;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.IOUtils;
@@ -64,6 +63,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 import javax.xml.namespace.NamespaceContext;
 import javax.xml.transform.Source;
@@ -214,18 +214,24 @@ public class OaiPmhRepositoryPersistenceTest {
     return new Params() {
       @Override
       String getParameter(String key) {
-        if ("verb".equals(key))
+        if ("verb".equals(key)) {
           return verb;
-        if ("identifier".equals(key))
+        }
+        if ("identifier".equals(key)) {
           return identifier;
-        if ("metadataPrefix".equals(key))
+        }
+        if ("metadataPrefix".equals(key)) {
           return metadataPrefix;
-        if ("from".equals(key))
+        }
+        if ("from".equals(key)) {
           return from;
-        if ("until".equals(key))
+        }
+        if ("until".equals(key)) {
           return until;
-        if ("resumptionToken".equals(key))
+        }
+        if ("resumptionToken".equals(key)) {
           return resumptionToken;
+        }
         return null;
       }
 
@@ -259,10 +265,12 @@ public class OaiPmhRepositoryPersistenceTest {
               .getResource("/series-dublincore.xml").toURI());
       expect(workspace.read(EasyMock.anyObject())).andAnswer(() -> {
         final String uri = getCurrentArguments()[0].toString();
-        if ("dublincore.xml".equals(uri))
+        if ("dublincore.xml".equals(uri)) {
           return new FileInputStream(episodeDublinCore);
-        if ("series-dublincore.xml".equals(uri))
+        }
+        if ("series-dublincore.xml".equals(uri)) {
           return new FileInputStream(seriesDublinCore);
+        }
         throw new Error("Workspace mock does not know about file " + uri);
       }).anyTimes();
       EasyMock.replay(workspace);
@@ -284,8 +292,9 @@ public class OaiPmhRepositoryPersistenceTest {
           return workspace;
         }
       };
-      for (MediaPackage mp : mps)
+      for (MediaPackage mp : mps) {
         db.store(mp, REPOSITORY_ID);
+      }
       return db;
     } catch (Exception e) {
       return chuck(e);
@@ -325,8 +334,8 @@ public class OaiPmhRepositoryPersistenceTest {
       }
 
       @Override
-      public Option<ResumableQuery> getSavedQuery(String resumptionToken) {
-        return Option.some(new ResumableQuery(FORMAT_PREFIX, new Date(), new Date(), Option.<String> none()));
+      public Optional<ResumableQuery> getSavedQuery(String resumptionToken) {
+        return Optional.of(new ResumableQuery(FORMAT_PREFIX, new Date(), new Date(), Optional.<String> empty()));
       }
 
       @Override

@@ -7,14 +7,14 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>19-SNAPSHOT</version>
+    <version>20-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
-    <editor.url>https://github.com/opencast/opencast-editor/releases/download/18.x-2025-07-23/oc-editor-18.x-2025-07-23.tar.gz</editor.url>
-    <editor.sha256>44a1059adb47955d9f0e5054ee03b45c4e420ab4299cbed4b7f990adfb6725c9</editor.sha256>
+    <editor.url>https://github.com/opencast/opencast-editor/releases/download/19.x-2025-12-18/oc-editor-19.x-2025-12-18.tar.gz</editor.url>
+    <editor.sha256>e43475defd5f3222c8079271e20758408b998ea947b35ac3f9e3932919e784cb</editor.sha256>
   </properties>
   <build>
     <plugins>

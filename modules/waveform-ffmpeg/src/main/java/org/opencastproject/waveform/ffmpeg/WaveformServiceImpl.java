@@ -29,7 +29,6 @@ import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.Track;
-import org.opencastproject.mediapackage.identifier.IdImpl;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
@@ -420,7 +419,7 @@ public class WaveformServiceImpl extends AbstractJobProducer implements Waveform
     // it is up to the workflow operation handler to set the attachment flavor
     Attachment waveformMpe = (Attachment) mpElementBuilder.elementFromURI(
             waveformFileUri, Type.Attachment, track.getFlavor());
-    waveformMpe.setIdentifier(IdImpl.fromUUID().toString());
+    waveformMpe.generateIdentifier();
     return waveformMpe;
   }
 

@@ -31,7 +31,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceState;
 import org.opencastproject.serviceregistry.api.ServiceStatistics;
 import org.opencastproject.util.SmartIterator;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -107,24 +106,24 @@ public class ServicesEndpoint {
   public Response getServices(@QueryParam("limit") final int limit, @QueryParam("offset") final int offset,
           @QueryParam("filter") String filter, @QueryParam("sort") String sort) throws Exception {
 
-    Option<String> sortOpt = Option.option(StringUtils.trimToNull(sort));
+    Optional<String> sortOpt = Optional.ofNullable(StringUtils.trimToNull(sort));
     ServicesListQuery query = new ServicesListQuery();
     EndpointUtil.addRequestFiltersToQuery(filter, query);
 
     String fName = null;
-    if (query.getName().isSome())
+    if (query.getName().isPresent())
       fName = StringUtils.trimToNull(query.getName().get());
     String fHostname = null;
-    if (query.getHostname().isSome())
+    if (query.getHostname().isPresent())
       fHostname = StringUtils.trimToNull(query.getHostname().get());
     String fNodeName = null;
-    if (query.getNodeName().isSome())
+    if (query.getNodeName().isPresent())
       fNodeName = StringUtils.trimToNull(query.getNodeName().get());
     String fStatus = null;
-    if (query.getStatus().isSome())
+    if (query.getStatus().isPresent())
       fStatus = StringUtils.trimToNull(query.getStatus().get());
     String fFreeText = null;
-    if (query.getFreeText().isSome())
+    if (query.getFreeText().isPresent())
       fFreeText = StringUtils.trimToNull(query.getFreeText().get());
 
     List<HostRegistration> servers = serviceRegistry.getHostRegistrations();
@@ -143,7 +142,7 @@ public class ServicesEndpoint {
       if (fStatus != null && !StringUtils.equalsIgnoreCase(service.getStatus().toString(), fStatus))
         continue;
 
-      if (query.getActions().isSome()) {
+      if (query.getActions().isPresent()) {
         ServiceState serviceState = service.getStatus();
 
         if (query.getActions().get()) {
@@ -165,7 +164,7 @@ public class ServicesEndpoint {
     }
     int total = services.size();
 
-    if (sortOpt.isSome()) {
+    if (sortOpt.isPresent()) {
       ArrayList<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(sortOpt.get());
       if (!sortCriteria.isEmpty()) {
         try {

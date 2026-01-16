@@ -26,7 +26,6 @@ import static org.opencastproject.util.DateTimeSupport.toUTC;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
 
-import com.entwinemedia.fn.data.json.JValue;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
@@ -48,7 +47,7 @@ public final class CaptureAgentUtils {
    *
    * @param agent
    *          The capture agent
-   * @return A {@link JValue} representing the capture agent
+   * @return A {@link JsonObject} representing the capture agent
    */
   public static JsonObject generateJsonAgent(Agent agent) {
     JsonObject json = new JsonObject();

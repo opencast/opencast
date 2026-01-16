@@ -145,7 +145,7 @@ public class MuxWorkflowOperationHandler extends AbstractWorkflowOperationHandle
     // Check which tags have been configured
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
         Configuration.many, Configuration.many, Configuration.many, Configuration.many);
-    List<String> targetTagsOption = tagsAndFlavors.getTargetTags();
+    ConfiguredTagsAndFlavors.TargetTags targetTagsOption = tagsAndFlavors.getTargetTags();
     MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor();
 
     AbstractMediaPackageElementSelector<Track> elementSelector = new TrackSelector();
@@ -212,8 +212,9 @@ public class MuxWorkflowOperationHandler extends AbstractWorkflowOperationHandle
     }
     String profileId = StringUtils.trim(profileOption);
     EncodingProfile profile = composerService.getProfile(profileId);
-    if (profile == null)
+    if (profile == null) {
       throw new WorkflowOperationException("Encoding profile '" + profileId + "' was not found");
+    }
 
     Map<String, Track> muxSourceTracksMap = new HashMap<>();
     for (String srcType : inputTracks.keySet()) {
@@ -231,7 +232,7 @@ public class MuxWorkflowOperationHandler extends AbstractWorkflowOperationHandle
 
     Track encodedTrack = (Track) MediaPackageElementParser.getFromXml(muxJob.getPayload());
     encodedTrack.setFlavor(targetFlavor);
-    encodedTrack.setTags(targetTagsOption.toArray(new String[0]));
+    applyTargetTagsToElement(targetTagsOption, encodedTrack);
     // store new track to mediaPackage
     String fileName = getFileNameFromElements(encodedTrack, encodedTrack);
     encodedTrack.setURI(workspace.moveTo(encodedTrack.getURI(), mediaPackage.getIdentifier().toString(),

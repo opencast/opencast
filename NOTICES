@@ -356,7 +356,6 @@ assemblies
 
 admin-ui
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   com.google.code.gson                   gson                                             Apache 2.0
   com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
   commons-io                             commons-io                                       Apache License, Version 2.0
@@ -402,7 +401,6 @@ animate-workflowoperation
 
 asset-manager-api
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   com.google.code.findbugs               jsr305                                           The Apache Software License, Version 2.0
 
 
@@ -431,7 +429,6 @@ asset-manager-storage-aws
 
 asset-manager-storage-fs
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   commons-io                             commons-io                                       Apache License, Version 2.0
   org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
@@ -439,7 +436,6 @@ asset-manager-storage-fs
 
 asset-manager-util
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   commons-io                             commons-io                                       Apache License, Version 2.0
   org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
@@ -453,7 +449,6 @@ asset-manager-workflowoperation
 
 authorization-manager
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
   commons-io                             commons-io                                       Apache License, Version 2.0
   jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
@@ -511,7 +506,6 @@ capture-admin-service-impl
 
 comments-workflowoperation
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
@@ -523,7 +517,6 @@ common-jpa-impl
 
 common
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   com.google.guava                       guava                                            The Apache Software License, Version 2.0
   com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
   com.mchange                            c3p0                                             GNU Lesser General Public License, Version 2.1-Eclipse Public License, Version 1.0
@@ -576,7 +569,6 @@ composer-service-remote
 
 composer-workflowoperation
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   commons-io                             commons-io                                       Apache License, Version 2.0
   jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
   org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
@@ -585,7 +577,6 @@ composer-workflowoperation
 
 conductor
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   commons-io                             commons-io                                       Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
@@ -739,7 +730,6 @@ distribution-service-streaming-wowza
 
 distribution-workflowoperation
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
@@ -747,7 +737,6 @@ distribution-workflowoperation
 
 dublincore
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   com.google.code.findbugs               jsr305                                           The Apache Software License, Version 2.0
   com.google.guava                       guava                                            The Apache Software License, Version 2.0
   com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
@@ -773,7 +762,6 @@ engage-ui
 
 event-comment
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   commons-io                             commons-io                                       Apache License, Version 2.0
   jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
   javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
@@ -798,7 +786,6 @@ execute-remote
 
 execute-workflowoperation
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
   org.slf4j                              slf4j-log4j12                                    MIT License
@@ -806,7 +793,6 @@ execute-workflowoperation
 
 external-api
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   com.google.guava                       guava                                            The Apache Software License, Version 2.0
   com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
   commons-io                             commons-io                                       Apache License, Version 2.0
@@ -839,7 +825,6 @@ incident-workflowoperation
 
 index-service
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   com.google.guava                       guava                                            The Apache Software License, Version 2.0
   com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
   commons-fileupload                     commons-fileupload                               Apache License, Version 2.0
@@ -897,7 +882,6 @@ inspection-service-api
 
 inspection-service-ffmpeg
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
   commons-io                             commons-io                                       Apache License, Version 2.0
   jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
@@ -920,7 +904,6 @@ inspection-workflowoperation
 
 kernel
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   com.google.guava                       guava                                            The Apache Software License, Version 2.0
   commons-codec                          commons-codec                                    Apache License, Version 2.0
   commons-io                             commons-io                                       Apache License, Version 2.0
@@ -948,7 +931,6 @@ kernel
 
 live-schedule-impl
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   com.google.guava                       guava                                            The Apache Software License, Version 2.0
   org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
@@ -980,7 +962,6 @@ mattermost-notification-workflowoperation
 
 message-broker-api
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   com.google.code.findbugs               jsr305                                           The Apache Software License, Version 2.0
   com.google.code.gson                   gson                                             Apache 2.0
   commons-io                             commons-io                                       Apache License, Version 2.0
@@ -1000,7 +981,6 @@ metadata
 
 migration
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   com.google.code.gson                   gson                                             Apache 2.0
   com.mchange                            c3p0                                             GNU Lesser General Public License, Version 2.1-Eclipse Public License, Version 1.0
   commons-io                             commons-io                                       Apache License, Version 2.0
@@ -1045,7 +1025,6 @@ oaipmh-remote
 
 oaipmh
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   commons-io                             commons-io                                       Apache License, Version 2.0
   jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
   jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
@@ -1079,7 +1058,6 @@ publication-service-configurable
 
 publication-service-oaipmh-remote
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   commons-io                             commons-io                                       Apache License, Version 2.0
   jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
   org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
@@ -1090,7 +1068,6 @@ publication-service-oaipmh-remote
 
 publication-service-oaipmh
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
   org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
@@ -1133,27 +1110,23 @@ runtime-info
 
 scheduler-api
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   com.google.code.findbugs               jsr305                                           The Apache Software License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
 scheduler-conflict-handler
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
 scheduler-conflict-notifier-comment
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
 
 scheduler-conflict-notifier-email
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.sakaiproject.nakamura              javax.activation-mail                            -
   org.slf4j                              slf4j-api                                        MIT License
@@ -1161,7 +1134,6 @@ scheduler-conflict-notifier-email
 
 scheduler-impl
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   com.google.code.gson                   gson                                             Apache 2.0
   commons-io                             commons-io                                       Apache License, Version 2.0
   jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
@@ -1178,7 +1150,6 @@ scheduler-impl
 
 scheduler-remote
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
   org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.apache.httpcomponents              httpclient-osgi                                  Apache License, Version 2.0
@@ -1265,7 +1236,6 @@ security-shibboleth
 
 series-service-api
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
 
 
@@ -1282,7 +1252,6 @@ series-service-impl
 
 series-service-remote
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
   commons-io                             commons-io                                       Apache License, Version 2.0
   jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
@@ -1296,7 +1265,6 @@ series-service-remote
 
 serviceregistry
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
   commons-io                             commons-io                                       Apache License, Version 2.0
   jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
@@ -1334,7 +1302,6 @@ silencedetection-remote
 
 smil-api
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   commons-io                             commons-io                                       Apache License, Version 2.0
   jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
   org.apache.servicemix.bundles          org.apache.servicemix.bundles.commons-httpclient The Apache Software License, Version 2.0
@@ -1378,7 +1345,6 @@ static
 
 statistics-export-service-impl
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   org.apache.commons                     commons-csv                                      Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
@@ -1487,7 +1453,6 @@ themes
 
 themes-workflowoperation
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
   org.slf4j                              slf4j-api                                        MIT License
 
@@ -1520,7 +1485,6 @@ timelinepreviews-workflowoperation
 
 transcription-service-google-speech-impl
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
   jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
   org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
@@ -1530,7 +1494,6 @@ transcription-service-google-speech-impl
 
 transcription-service-ibm-watson-impl
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
   jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
   javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
@@ -1745,7 +1708,6 @@ workflow-condition-parser
 
 workflow-service-api
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   commons-io                             commons-io                                       Apache License, Version 2.0
   jakarta.xml.bind                       jakarta.xml.bind-api                             Eclipse Distribution License - v 1.0
   org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
@@ -1754,7 +1716,6 @@ workflow-service-api
 
 workflow-service-impl
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   com.google.guava                       guava                                            The Apache Software License, Version 2.0
   com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0
   commons-io                             commons-io                                       Apache License, Version 2.0
@@ -1777,7 +1738,6 @@ workflow-service-remote
 
 workflow-workflowoperation
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   com.google.guava                       guava                                            The Apache Software License, Version 2.0
   commons-io                             commons-io                                       Apache License, Version 2.0
   javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception
@@ -1810,7 +1770,6 @@ working-file-repository-service-remote
 
 workspace-impl
   GroupId                                ArtifactId                                       Licenses
-  com.entwinemedia.common                functional                                       Apache License, Version 2.0
   commons-io                             commons-io                                       Apache License, Version 2.0
   jakarta.ws.rs                          jakarta.ws.rs-api                                EPL 2.0-GPL2 w/ CPE
   javax.servlet                          javax.servlet-api                                CDDL + GPLv2 with classpath exception

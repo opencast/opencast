@@ -69,20 +69,17 @@ Parameter Table
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="theme"
-    description="Apply the theme">
-  <configurations>
-    <configuration key="bumper-flavor">branding/bumper</configuration>
-    <configuration key="bumper-tags">archive</configuration>
-    <configuration key="trailer-flavor">branding/trailer</configuration>
-    <configuration key="trailer-tags">archive</configuration>
-    <configuration key="title-slide-flavor">branding/titleslide</configuration>
-    <configuration key="title-slide-tags">archive</configuration>
-    <configuration key="watermark-flavor">branding/titleslide</configuration>
-    <configuration key="watermark-tags">archive</configuration>
-    <configuration key="watermark-layout-variable">theme_watermark_layout</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: theme
+    description: Apply the theme
+    configurations:
+      - bumper-flavor: branding/bumper
+      - bumper-tags: archive
+      - trailer-flavor: branding/trailer
+      - trailer-tags: archive
+      - title-slide-flavor: branding/titleslide
+      - title-slide-tags: archive
+      - watermark-flavor: branding/titleslide
+      - watermark-tags: archive
+      - watermark-layout-variable: theme_watermark_layout
 ```

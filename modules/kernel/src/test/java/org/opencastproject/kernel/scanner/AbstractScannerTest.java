@@ -155,7 +155,8 @@ public class AbstractScannerTest {
     triggerName = TRIGGER_NAME;
     triggerGroupName = TRIGGER_GROUP;
     mockQuartz = EasyMock.createMock(Scheduler.class);
-    EasyMock.expect(mockQuartz.getTriggersOfJob(jobName, jobGroup)).andThrow(new IllegalArgumentException("Mock Quartz Exception"));
+    EasyMock.expect(mockQuartz.getTriggersOfJob(jobName, jobGroup))
+        .andThrow(new IllegalArgumentException("Mock Quartz Exception"));
     EasyMock.replay(mockQuartz);
     abstractScanner.setQuartz(mockQuartz);
     abstractScanner.setEnabled(true);
@@ -188,7 +189,8 @@ public class AbstractScannerTest {
     triggerGroupName = TRIGGER_GROUP;
     mockQuartz = EasyMock.createMock(Scheduler.class);
     EasyMock.expect(mockQuartz.getTriggersOfJob(jobName, jobGroup)).andReturn(triggers);
-    EasyMock.expect(mockQuartz.rescheduleJob(EasyMock.anyObject(String.class), EasyMock.anyObject(String.class), EasyMock.anyObject(Trigger.class))).andReturn(new Date());
+    EasyMock.expect(mockQuartz.rescheduleJob(EasyMock.anyObject(String.class), EasyMock.anyObject(String.class),
+        EasyMock.anyObject(Trigger.class))).andReturn(new Date());
     EasyMock.replay(mockQuartz);
     abstractScanner.setQuartz(mockQuartz);
     abstractScanner.setEnabled(true);
@@ -207,7 +209,8 @@ public class AbstractScannerTest {
   @Test
   public void unscheduleInputSchedulerexceptionExpectsNoExceptionThrow() throws SchedulerException {
     mockQuartz = EasyMock.createMock(Scheduler.class);
-    EasyMock.expect(mockQuartz.unscheduleJob(jobName, jobGroup)).andThrow(new SchedulerException("Mock scheduler exception."));
+    EasyMock.expect(mockQuartz.unscheduleJob(jobName, jobGroup))
+        .andThrow(new SchedulerException("Mock scheduler exception."));
     EasyMock.replay(mockQuartz);
     abstractScanner.setQuartz(mockQuartz);
     abstractScanner.unschedule();

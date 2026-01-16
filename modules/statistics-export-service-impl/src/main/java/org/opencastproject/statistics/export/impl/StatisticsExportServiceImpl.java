@@ -50,8 +50,6 @@ import org.opencastproject.statistics.export.api.StatisticsExportService;
 import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.NotFoundException;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 import org.osgi.service.cm.ManagedService;
@@ -79,7 +77,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
+import java.util.stream.Stream;
 
 @Component(
     immediate = true,
@@ -314,8 +312,8 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
     if (offset != 0) {
       return;
     }
-    final Opt<Event> event = indexService.getEvent(resourceId, index);
-    if (!event.isSome()) {
+    final Optional<Event> event = indexService.getEvent(resourceId, index);
+    if (!event.isPresent()) {
       throw new NotFoundException("Event not found in index: " + resourceId);
     }
     final TimeSeries dataEvent = statisticsService.getTimeSeriesData(
@@ -580,15 +578,14 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
   }
 
   private List<MetadataField> getSeriesMetadata(String resourceId) {
-    final List<DublinCoreMetadataCollection> mdcs = this.indexService.getSeriesCatalogUIAdapters()
-            .stream()
-            .filter(a -> !a.equals(this.indexService.getCommonSeriesCatalogUIAdapter()))
-            .filter(a -> !a.getFlavor().equals(this.indexService.getCommonSeriesCatalogUIAdapter().getFlavor()))
-            .map(adapter -> adapter.getFields(resourceId))
-            .filter(Opt::isSome)
-            .map(Opt::get)
-            .collect(Collectors.toList());
-    if (this.indexService.getCommonSeriesCatalogUIAdapter().getFields(resourceId).isSome()) {
+    List<DublinCoreMetadataCollection> mdcs = this.indexService.getSeriesCatalogUIAdapters()
+        .stream()
+        .filter(a -> !a.equals(this.indexService.getCommonSeriesCatalogUIAdapter()))
+        .filter(a -> !a.getFlavor().equals(this.indexService.getCommonSeriesCatalogUIAdapter().getFlavor()))
+        .map(adapter -> adapter.getFields(resourceId))
+        .flatMap(opt -> opt.map(Stream::of).orElseGet(Stream::empty))
+        .collect(Collectors.toList());
+    if (this.indexService.getCommonSeriesCatalogUIAdapter().getFields(resourceId).isPresent()) {
       mdcs.add(0, this.indexService.getCommonSeriesCatalogUIAdapter().getFields(resourceId).get());
     }
     return mdcs.stream()

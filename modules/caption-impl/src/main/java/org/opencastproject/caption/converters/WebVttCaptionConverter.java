@@ -27,7 +27,6 @@ import org.opencastproject.caption.util.TimeUtil;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.util.OsgiUtil;
-import org.opencastproject.util.data.Option;
 
 import org.apache.commons.lang3.EnumUtils;
 import org.osgi.service.component.ComponentContext;
@@ -42,6 +41,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.util.List;
+import java.util.Optional;
 
 @Component(
     immediate = true,
@@ -60,7 +60,7 @@ public class WebVttCaptionConverter implements CaptionConverter {
 
   /** This configuration key defines the mediapackage element type of the captions file (Attachment, Track) */
   static final String MEDIAPACKAGE_ELEMENT_TYPE_CONFIG_KEY = "mediapackage-element-type";
-  static final Type DEFAULT_MEDIAPACKAGE_ELEMENT_TYPE = Type.Attachment;
+  static final Type DEFAULT_MEDIAPACKAGE_ELEMENT_TYPE = Type.Track;
   private static Type mediapackageElementType = DEFAULT_MEDIAPACKAGE_ELEMENT_TYPE;
 
 
@@ -134,9 +134,9 @@ public class WebVttCaptionConverter implements CaptionConverter {
    * @return the configured mediapackage element type
    */
   private MediaPackageElement.Type getConfiguredMediapackageElementType(ComponentContext cc) {
-    Option<String> mediapackageElementTypeOption = OsgiUtil.getOptCfg(
+    Optional<String> mediapackageElementTypeOption = OsgiUtil.getOptCfg(
         cc.getProperties(), MEDIAPACKAGE_ELEMENT_TYPE_CONFIG_KEY);
-    if (mediapackageElementTypeOption.isNone()) {
+    if (mediapackageElementTypeOption.isEmpty()) {
       return DEFAULT_MEDIAPACKAGE_ELEMENT_TYPE; // returning default if config isn't set
     }
     return convertStringToEnum(mediapackageElementTypeOption.get());

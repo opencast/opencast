@@ -23,7 +23,6 @@ package org.opencastproject.job.api;
 
 import org.opencastproject.serviceregistry.api.IncidentL10n;
 import org.opencastproject.serviceregistry.api.IncidentService;
-import org.opencastproject.util.data.Function;
 
 import java.util.Date;
 import java.util.Locale;
@@ -69,11 +68,11 @@ public final class JaxbIncidentDigest {
     this.description = l10n.getDescription();
   }
 
-  public static Function<Incident, JaxbIncidentDigest> mkFn(final IncidentService svc, final Locale locale) {
-    return new Function.X<Incident, JaxbIncidentDigest>() {
-      @Override public JaxbIncidentDigest xapply(Incident incident) throws Exception {
-        return new JaxbIncidentDigest(incident, svc.getLocalization(incident.getId(), locale));
-      }
-    };
+  public static JaxbIncidentDigest mkFn(final IncidentService svc, final Locale locale, Incident incident) {
+    try {
+      return new JaxbIncidentDigest(incident, svc.getLocalization(incident.getId(), locale));
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
   }
 }

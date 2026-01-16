@@ -1,0 +1,96 @@
+@media (prefers-color-scheme: light) {
+    :root {
+        --header-color: linear-gradient(to bottom,#388ed6,#2075b1);
+        --bg-color: #fafafa;
+        --text-color: #0F0F0F;
+        --container-color: #fafafa;
+        --boxShadow-color: #0000004d;
+        --border-color: #1d3041;
+        --navbar-color: #24425c;
+        --item-color: #ebeef1;
+        --item-border: #c9d0d6;
+        --item-hover: linear-gradient(to bottom, #fafafa, #e8ebef);
+        --item-inner-boxShadow-color: #0000000d;
+        --item-boxShadow-color: #96969626;
+    }
+}
+
+body {
+    margin: 0px;
+    background: var(--bg-color, #F8F4F1);
+    font-family: Roboto Flex Variable, Roboto, -apple-system, BlinkMacSystemFont, Segoe UI, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+}
+
+/* Text Container */
+.text-container {
+    /* Layout */
+    margin: 3% auto;
+    max-width: 75%;
+    padding: 10px 15px 10px 15px;
+
+    /* Styling */
+    border-radius: 5px;
+    background: var(--container-color, #F8F4F1);
+    box-shadow: 0 1px 3px 1px var(--boxShadow-color, #0000004d);
+}
+.text-container > p {
+    color: var(--text-color, #0F0F0F);
+    text-align: center;
+    font-size: 20px;
+    font-weight: 400;
+}
+
+/* Header */
+.head-container { 
+    width: 100%;
+    height: 50px;
+    box-shadow: 0 1px 3px 1px  var(--boxShadow-color, #0000004d);
+    position: relative;
+    border-bottom: 1px solid var(--border-color, #1d3041);
+    background: var(--header-color, linear-gradient(to bottom,#388ed6,#2075b1));
+
+}
+.head-container > img {
+    /*Image Style*/
+    width: 100px;
+    height: 20px;
+    padding: 14px 20px 13px;
+}
+.navbar-container { 
+    width: 100%;
+    min-height: 80px;
+    background: var(--navbar-color, #24425c);
+}
+
+/* Version-List */
+ul {
+    list-style-type: none;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    column-gap: 20px;
+    row-gap: 10px;
+}
+
+li {
+    width: 160px;
+    text-align: center;
+    padding: 15px 10px;
+    border-radius: 4px;
+    border: 1px solid var(--item-border, #c9d0d6);
+    background: var(--item-color, #ebeef1);
+    box-shadow: inset 0 3px 10px 2px var(--item-inner-boxShadow-color, #0000000d),  0px 5px 10px 0px var(--item-boxShadow-color, #96969626);
+}
+
+li:hover {
+    background: var(--item-hover, linear-gradient(to bottom, #fafafa, #e8ebef));
+}
+
+li > a {
+    color: var(--text-color, #0F0F0F);
+    font-size: 18px;
+    font-weight: 400;
+    text-decoration: none;
+    padding:15px 50px;
+}

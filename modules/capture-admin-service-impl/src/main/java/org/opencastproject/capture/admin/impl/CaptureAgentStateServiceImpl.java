@@ -38,7 +38,6 @@ import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple3;
 import org.opencastproject.util.function.ThrowingFunction;
 
@@ -67,6 +66,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
@@ -83,12 +83,12 @@ import javax.persistence.TypedQuery;
  * IMPL for the capture-admin service (MH-1336, MH-1394, MH-1457, MH-1475 and MH-1476).
  */
 @Component(
-  property = {
-    "service.description=Capture-Admin Service",
-    "service.pid=org.opencastproject.capture.agent"
-  },
-  immediate = true,
-  service = { CaptureAgentStateService.class , ManagedServiceFactory.class }
+    property = {
+        "service.description=Capture-Admin Service",
+        "service.pid=org.opencastproject.capture.agent"
+    },
+    immediate = true,
+    service = { CaptureAgentStateService.class , ManagedServiceFactory.class }
 )
 public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, ManagedServiceFactory {
 
@@ -153,9 +153,9 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
     // Set up the agent cache
     int timeoutInMinutes = 120;
 
-    Option<String> timeout = getOptContextProperty(cc, CAPTURE_AGENT_TIMEOUT_KEY);
+    Optional<String> timeout = getOptContextProperty(cc, CAPTURE_AGENT_TIMEOUT_KEY);
 
-    if (timeout.isSome()) {
+    if (timeout.isPresent()) {
       try {
         timeoutInMinutes = Integer.parseInt(timeout.get());
       } catch (NumberFormatException e) {
@@ -208,7 +208,8 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
    *          the organization
    * @return the agent or <code>null</code> if no agent has been found
    */
-  protected ThrowingFunction<EntityManager, AgentImpl, NotFoundException> getAgentEntityQuery(String name, String organization) {
+  protected ThrowingFunction<EntityManager, AgentImpl, NotFoundException> getAgentEntityQuery(String name,
+      String organization) {
     return em -> {
       try {
         TypedQuery<AgentImpl> q = em.createNamedQuery("Agent.get", AgentImpl.class);
@@ -259,12 +260,15 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
    */
   @Override
   public boolean setAgentState(String agentName, String state) {
-    if (StringUtils.isBlank(agentName))
+    if (StringUtils.isBlank(agentName)) {
       throw new IllegalArgumentException("Unable to set agent state, agent name is blank or null.");
-    if (StringUtils.isBlank(state))
+    }
+    if (StringUtils.isBlank(state)) {
       throw new IllegalArgumentException("Unable to set agent state, state is blank or null.");
-    if (!KNOWN_STATES.contains(state))
+    }
+    if (!KNOWN_STATES.contains(state)) {
       throw new IllegalArgumentException("Can not set agent to an invalid state: ".concat(state));
+    }
 
     logger.debug("Agent '{}' state set to '{}'", agentName, state);
     AgentImpl agent;
@@ -357,8 +361,9 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
   @Override
   public boolean setAgentUrl(String agentName, String agentUrl) throws NotFoundException {
     Agent agent = getAgent(agentName);
-    if (agent.getUrl().equals(agentUrl))
+    if (agent.getUrl().equals(agentUrl)) {
       return false;
+    }
     agent.setUrl(agentUrl);
     updateAgentInDatabase((AgentImpl) agent);
     return true;
@@ -464,8 +469,9 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
    */
   @Override
   public boolean setAgentConfiguration(String agentName, Properties configuration) {
-    if (StringUtils.isBlank(agentName))
+    if (StringUtils.isBlank(agentName)) {
       throw new IllegalArgumentException("Unable to set agent state, agent name is blank or null.");
+    }
 
     String orgId = securityService.getOrganization().getId();
     AgentImpl agent;
@@ -507,7 +513,8 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
    *          The Agent you wish to modify or add in the database.
    * @param updateFromCache
    *          True to update the last heard from timestamp from the agentCache, false to avoid this.
-   *          Note that you should nearly always update the cache, this was added to avoid deadlocks when removing agents from the cache.
+   *          Note that you should nearly always update the cache, this was added to avoid deadlocks when removing
+   *          agents from the cache.
    */
   private void updateAgentInDatabase(AgentImpl agent, boolean updateFromCache, int retries) {
     try {
@@ -557,8 +564,9 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
       String org = securityService.getOrganization().getId();
       db.execTxChecked(em -> {
         Agent existing = getAgentEntityQuery(agentName, org).apply(em);
-        if (existing == null)
+        if (existing == null) {
           throw new NotFoundException();
+        }
         em.remove(existing);
       });
       agentCache.invalidate(agentName.concat(DELIMITER).concat(org));
@@ -601,19 +609,20 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
         }
       }
     };
-    agentCache = CacheBuilder.newBuilder().expireAfterWrite(count, unit).removalListener(removalListener).build(new CacheLoader<String, Object>() {
-      @Override
-      public Object load(String id) {
-        String[] key = id.split(DELIMITER);
-        AgentImpl agent;
-        try {
-          agent = getAgent(key[0], key[1]);
-        } catch (NotFoundException e) {
-          return nullToken;
-        }
-        return Tuple3.tuple3(agent.getState(), agent.getConfiguration(), agent.getLastHeardFrom());
-      }
-    });
+    agentCache = CacheBuilder.newBuilder().expireAfterWrite(count, unit).removalListener(removalListener)
+        .build(new CacheLoader<String, Object>() {
+          @Override
+          public Object load(String id) {
+            String[] key = id.split(DELIMITER);
+            AgentImpl agent;
+            try {
+              agent = getAgent(key[0], key[1]);
+            } catch (NotFoundException e) {
+              return nullToken;
+            }
+            return Tuple3.tuple3(agent.getState(), agent.getConfiguration(), agent.getLastHeardFrom());
+          }
+        });
   }
 
   /**
@@ -625,24 +634,28 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
   public void updated(String pid, Dictionary<String, ?> properties) throws ConfigurationException {
     // Get the agent properties
     String nameConfig = (String) properties.get("id");
-    if (isBlank(nameConfig))
+    if (isBlank(nameConfig)) {
       throw new ConfigurationException("id", "must be specified");
+    }
 
     nameConfig = nameConfig.trim();
 
     String urlConfig = (String) properties.get("url");
-    if (isBlank(urlConfig))
+    if (isBlank(urlConfig)) {
       throw new ConfigurationException("url", "must be specified");
+    }
     urlConfig = urlConfig.trim();
 
     String orgConfig = (String) properties.get("organization");
-    if (isBlank(orgConfig))
+    if (isBlank(orgConfig)) {
       throw new ConfigurationException("organization", "must be specified");
+    }
     orgConfig = orgConfig.trim();
 
     String schedulerRolesConfig = (String) properties.get("schedulerRoles");
-    if (isBlank(schedulerRolesConfig))
+    if (isBlank(schedulerRolesConfig)) {
       throw new ConfigurationException("schedulerRoles", "must be specified");
+    }
     String[] schedulerRoles = schedulerRolesConfig.trim().split(",");
 
     // If we don't already have a mapping for this PID, create one

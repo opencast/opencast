@@ -69,7 +69,7 @@ public class ServicesListProvider implements ResourceListProvider {
 
   /** The names of the different list available through this provider. */
   private static final String[] NAMES = {
-    PROVIDER_PREFIX, LIST_NAME, LIST_STATUS,
+      PROVIDER_PREFIX, LIST_NAME, LIST_STATUS,
   };
 
   /** Service registry instance. */
@@ -107,21 +107,23 @@ public class ServicesListProvider implements ResourceListProvider {
     }
 
     for (ServiceRegistration serviceRegistration : serviceRegistrations) {
-      if (servicesQuery.getHostname().isSome()
-              && !StringUtils.equals(servicesQuery.getHostname().get(), serviceRegistration.getHost()))
+      if (servicesQuery.getHostname().isPresent()
+              && !StringUtils.equals(servicesQuery.getHostname().get(), serviceRegistration.getHost())) {
         continue;
+      }
 
-      if (servicesQuery.getActions().isSome()
+      if (servicesQuery.getActions().isPresent()
               && servicesQuery.getActions().get()
-              && serviceRegistration.getServiceState() == ServiceState.NORMAL)
+              && serviceRegistration.getServiceState() == ServiceState.NORMAL) {
         continue;
+      }
 
       result.put(serviceRegistration.getServiceType(), serviceRegistration.getServiceType());
     }
 
-    if (servicesQuery.getLimit().isSome() || servicesQuery.getLimit().isSome()) {
-      int limit = servicesQuery.getLimit().getOrElse(0);
-      int offset = servicesQuery.getOffset().getOrElse(0);
+    if (servicesQuery.getLimit().isPresent() || servicesQuery.getLimit().isPresent()) {
+      int limit = servicesQuery.getLimit().orElse(0);
+      int offset = servicesQuery.getOffset().orElse(0);
       result = new SmartIterator(limit, offset).applyLimitAndOffset(result);
     }
 

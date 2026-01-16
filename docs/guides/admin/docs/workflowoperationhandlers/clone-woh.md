@@ -43,14 +43,11 @@ subtype from the source.
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="clone"
-    exception-handler-workflow="partial-error">
-  <configurations>
-    <configuration key="source-flavor">*/source</configuration>
-    <configuration key="source-tags">archive</configuration>
-    <configuration key="target-flavor">*/target</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: clone
+    exception-handler-workflow: partial-error
+    configurations:
+      - source-flavor: '*/source'
+      - source-tags: archive
+      - target-flavor: '*/target'
 ```

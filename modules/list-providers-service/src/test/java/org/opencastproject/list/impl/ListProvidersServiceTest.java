@@ -66,7 +66,7 @@ public class ListProvidersServiceTest {
         int i = 0;
 
         for (Entry<String, String> e : list.entrySet()) {
-          if ((query.getOffset().isNone() || query.getOffset().get() <= i)
+          if ((query.getOffset().isEmpty() || query.getOffset().get() <= i)
                   && (!query.hasFilter(TEST_FILTER_NAME) || e.getValue().contains(
                           (String) query.getFilter(TEST_FILTER_NAME).getValue().get()))) {
             filteredList.put(e.getKey(), e.getValue());
@@ -74,12 +74,12 @@ public class ListProvidersServiceTest {
 
           i++;
 
-          if ((query.getLimit().isSome() && filteredList.size() >= query.getLimit().get())) {
+          if ((query.getLimit().isPresent() && filteredList.size() >= query.getLimit().get())) {
             break;
           }
         }
 
-        if (query.getSortBy().isSome() && query.getSortBy().get().equals(TEST_SORTBY)) {
+        if (query.getSortBy().isPresent() && query.getSortBy().get().equals(TEST_SORTBY)) {
           return ListProviderUtil.sortMapByValue(filteredList, true);
         } else {
           return filteredList;

@@ -22,19 +22,15 @@
 package org.opencastproject.util;
 
 import static java.lang.String.format;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.functions.Misc.cast;
 import static org.opencastproject.util.data.functions.Misc.chuck;
-
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
 
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 /** Accessor for JSON objects aka maps. */
@@ -56,14 +52,6 @@ public final class JsonObj {
   public static JsonObj jsonObj(String json) {
     return new JsonObj(parse(json));
   }
-
-  /** {@link #jsonObj(java.util.Map)} as a function. */
-  public static final Function<Map, JsonObj> jsonObj = new Function<Map, JsonObj>() {
-    @Override
-    public JsonObj apply(Map json) {
-      return jsonObj(json);
-    }
-  };
 
   private static Map parse(String json) {
     try {
@@ -119,16 +107,16 @@ public final class JsonObj {
    * @return some if the value exists and has the required type, none otherwise
    * @deprecated
    */
-  public <A> Option<A> opt(Class<A> ev, String key) {
+  public <A> Optional<A> opt(Class<A> ev, String key) {
     final Object v = json.get(key);
     if (v != null) {
       try {
-        return some(cast(v, ev));
+        return Optional.of(cast(v, ev));
       } catch (ClassCastException e) {
-        return none();
+        return Optional.empty();
       }
     } else {
-      return none();
+      return Optional.empty();
     }
   }
 
@@ -146,7 +134,7 @@ public final class JsonObj {
    *
    * @deprecated
    */
-  public Option<JsonObj> optObj(String key) {
-    return opt(Map.class, key).map(jsonObj);
+  public Optional<JsonObj> optObj(String key) {
+    return opt(Map.class, key).map(JsonObj::jsonObj);
   }
 }

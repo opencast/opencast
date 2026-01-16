@@ -33,10 +33,7 @@ import org.opencastproject.list.api.ListProvidersService;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
 import org.opencastproject.series.api.SeriesService;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.workspace.api.Workspace;
-
-import com.entwinemedia.fn.Prelude;
 
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -52,6 +49,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Dictionary;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -119,8 +117,9 @@ public class CatalogUIAdapterFactory implements ManagedServiceFactory {
   @Override
   public void updated(String pid, Dictionary<String, ?> properties) throws ConfigurationException {
     final String type = getCfg(properties, CONF_TYPE_KEY);
-    Option<String> optCommonMetadata = getOptCfg(properties, CONF_COMMON_METADATA_KEY);
-    final boolean isCommonMetadata = optCommonMetadata.isSome() ? Boolean.parseBoolean(optCommonMetadata.get()) : false;
+    Optional<String> optCommonMetadata = getOptCfg(properties, CONF_COMMON_METADATA_KEY);
+    final boolean isCommonMetadata = optCommonMetadata.isPresent()
+        ? Boolean.parseBoolean(optCommonMetadata.get()) : false;
     Dictionary serviceProperties = new Properties();
     serviceProperties.put(CONF_COMMON_METADATA_KEY, isCommonMetadata);
 
@@ -187,7 +186,7 @@ public class CatalogUIAdapterFactory implements ManagedServiceFactory {
         break;
       }
       default:
-        Prelude.unexhaustiveMatch(type);
+        throw new IllegalStateException("Illegal catalog type: " + type);
     }
 
   }

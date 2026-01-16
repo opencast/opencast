@@ -50,25 +50,21 @@ Examples
 
 Select version **0** of the media package from the asset manager:
 
-```xml
-<operation id="select-version"
-           description="Select version 0 of media package to use in current workflow">
-	<configurations>
-		<configuration key="version">0</configuration>
-	</configurations>
-</operation>
+```yaml
+  - id: select-version
+    description: Select version 0 of media package to use in current workflow
+    configurations:
+      - version: 0
 ```
 
 ### Example 2
 
 Select the latest version where delivery media do not have the tags *hls-presenter-mp4* and *hls-presentation-mp4*:
 
-```xml
-<operation id="select-version"
-           description="Select version with no hls tags in delivery media to use in current workflow">
-	<configurations>
-		<configuration key="source-flavors">presenter/delivery,presentation/delivery</configuration>
-		<configuration key="no-tags">hls-presenter-mp4,hls-presentation-mp4</configuration>
-	</configurations>
-</operation>
+```yaml
+  - id: select-version
+    description: Select version with no hls tags in delivery media to use in current workflow
+    configurations:
+      - source-flavors: presenter/delivery,presentation/delivery
+      - no-tags: hls-presenter-mp4,hls-presentation-mp4
 ```

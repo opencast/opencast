@@ -21,6 +21,7 @@
 
 package org.opencastproject.search.impl;
 
+import static org.opencastproject.security.api.Permissions.Action.WRITE;
 import static org.opencastproject.security.util.SecurityUtil.getEpisodeRoleId;
 
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
@@ -45,12 +46,10 @@ import org.opencastproject.search.impl.persistence.SearchServiceDatabase;
 import org.opencastproject.search.impl.persistence.SearchServiceDatabaseException;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.AccessControlUtil;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
-import org.opencastproject.security.api.Permissions;
-import org.opencastproject.security.api.Role;
-import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
@@ -280,6 +279,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
           throws SearchException, SearchServiceDatabaseException {
     String mediaPackageId = mediaPackage.getIdentifier().toString();
     String orgId = securityService.getOrganization().getId();
+
     //If the entry has been deleted then there's *probably* no dc file to load.
     DublinCoreCatalog dc = null == delDate
         ? DublinCoreUtil.loadEpisodeDublinCore(workspace, mediaPackage).orElse(DublinCores.mkSimple())
@@ -379,17 +379,13 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
   private void checkSearchEntityWritePermission(final String mediaPackageId) throws SearchException {
     User user = securityService.getUser();
     try {
+      if (!persistence.isAvailable(mediaPackageId)) {
+        throw new NotFoundException();
+      }
       AccessControlList acl = persistence.getAccessControlList(mediaPackageId);
-      if (!authorizationService.hasPermission(acl, Permissions.Action.WRITE.toString())) {
-        boolean isAdmin = user.getRoles().stream()
-            .map(Role::getName)
-            .anyMatch(r -> r.equals(SecurityConstants.GLOBAL_ADMIN_ROLE));
-        if (!isAdmin) {
-          throw new UnauthorizedException(user, "Write permission denied for " + mediaPackageId, acl);
-        } else {
-          logger.debug("Write for {} is not allowed by ACL, but user has {}",
-              mediaPackageId, SecurityConstants.GLOBAL_ADMIN_ROLE);
-        }
+      if (!AccessControlUtil.isAuthorized(acl, user, securityService.getOrganization(), WRITE.toString(),
+          mediaPackageId)) {
+        throw new UnauthorizedException(user, "Write permission denied for " + mediaPackageId, acl);
       }
     } catch (NotFoundException e) {
       logger.debug("Mediapackage {} does not exist or was deleted, allowing writes for user {}", mediaPackageId, user);

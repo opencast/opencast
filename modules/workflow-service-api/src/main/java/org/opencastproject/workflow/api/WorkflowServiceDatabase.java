@@ -134,7 +134,8 @@ public interface WorkflowServiceDatabase {
    * @throws WorkflowDatabaseException
    *           if there is a problem communicating with the underlying data store
    */
-  List<WorkflowInstance> getRunningWorkflowInstancesByMediaPackage(String mediaPackageId) throws WorkflowDatabaseException;
+  List<WorkflowInstance> getRunningWorkflowInstancesByMediaPackage(String mediaPackageId)
+          throws WorkflowDatabaseException;
 
   /**
    * Returns true if the media package with the given identifier currently has a workflow running on it.

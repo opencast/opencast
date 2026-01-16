@@ -36,10 +36,20 @@ export default class DescriptionPlugin extends PopUpButtonPlugin {
     const metadata = this.player.videoManifest.metadata;
 
     const presenters = metadata.presenters
-      ?.map((p) => `<a href="/engage/ui/index.html?q=${p}">${p}</a>`)
+      ?.map((p) => {
+        const elm = createElementWithHtmlText('<a href=""> </a>');
+        elm.href = `/engage/ui/index.html?q=${p}`;
+        elm.innerText = p;
+        return elm.outerHTML;
+      })
       ?.join(', ');
     const contributors = metadata.contributors
-      ?.map((p) => `<a href="/engage/ui/index.html?q=${p}">${p}</a>`)
+      ?.map((p) => {
+        const elm = createElementWithHtmlText('<a href=""> </a>');
+        elm.href = `/engage/ui/index.html?q=${p}`;
+        elm.innerText = p;
+        return elm.outerHTML;
+      })
       ?.join(', ');
     const language = metadata.language
       ? (new Intl.DisplayNames([metadata.language], {type: 'language'}))
@@ -47,97 +57,116 @@ export default class DescriptionPlugin extends PopUpButtonPlugin {
       : '';
 
     const content = createElementWithHtmlText('<div class="description-plugin"></div>');
-    createElementWithHtmlText(`
+    const elm_title = createElementWithHtmlText(`
       <div class="row">
         <div class="key"> ${translate('Title')}: </div>
-        <div class="value"> ${metadata.title || ''} </div>
+        <div class="value">  </div>
       </div>
     `, content);
-    createElementWithHtmlText(`
+    elm_title.querySelector('.value').innerText = metadata.title || '';
+    const elm_subject = createElementWithHtmlText(`
       <div class="row">
         <div class="key">${translate('Subject')}:</div>
         <div class="value">
-          <a href="/engage/ui/index.html?q=${metadata.subject}">${metadata.subject || ''}</a>
+          <a href=""></a>
          </div>
       </div>
     `, content);
-    createElementWithHtmlText(`    
+    elm_subject.querySelector('.value a').innerText = metadata.subject || '';
+    elm_subject.querySelector('.value a').href = `/engage/ui/index.html?q=${metadata.subject}`;
+
+    const elm_description = createElementWithHtmlText(`
       <div class="row">
         <div class="key">${translate('Description')}:</div>
-        <div class="value"> ${metadata.description || ''} </div>
+        <div class="value"> </div>
       </div>
     `, content);
-    createElementWithHtmlText(`    
+    elm_description.querySelector('.value').innerText = metadata.description || '';
+    const elm_language = createElementWithHtmlText(`
       <div class="row">
         <div class="key">${translate('Language')}:</div>
-        <div class="value"> ${language} </div>
+        <div class="value"> </div>
       </div>
     `, content);
-    createElementWithHtmlText(`    
+    elm_language.querySelector('.value').innerText = language || '';
+    const elm_rights = createElementWithHtmlText(`
       <div class="row">
         <div class="key">${translate('Rights')}:</div>
-        <div class="value"> ${metadata.rights || ''} </div>
+        <div class="value"> </div>
       </div>
     `, content);
-    createElementWithHtmlText(`        
+    elm_rights.querySelector('.value').innerText = metadata.rights || '';
+
+    const elm_license = createElementWithHtmlText(`
       <div class="row">
         <div class="key">${translate('License')}:</div>
-        <div class="value"> ${metadata.license || ''} </div>
+        <div class="value"> </div>
       </div>
     `, content);
-    createElementWithHtmlText(`    
+    elm_license.querySelector('.value').innerText = metadata.license || '';
+    const elm_series = createElementWithHtmlText(`
       <div class="row">
         <div class="key">${translate('Series')}:</div>
         <div class="value">
-          <a href="/engage/ui/index.html?epFrom=${metadata.series}">${metadata.seriestitle || ''}</a>
+          <a href=""> </a>
         </div>
       </div>
     `, content);
-    createElementWithHtmlText(`
+    elm_series.querySelector('.value a').href = `/engage/ui/index.html?epFrom=${metadata.series}`;
+    elm_series.querySelector('.value a').innerText = metadata.seriestitle || '';
+    const elm_presenters = createElementWithHtmlText(`
       <div class="row">
         <div class="key">${translate('Presenter(s)')}:</div>
-        <div class="value"> ${presenters || ''} </div>
+        <div class="value"> </div>
       </div>
     `, content);
-    createElementWithHtmlText(`
+    elm_presenters.querySelector('.value').innerHTML = presenters || '';
+    const elm_contributors = createElementWithHtmlText(`
       <div class="row">
         <div class="key">${translate('Contributor(s)')}:</div>
-        <div class="value"> ${contributors || ''} </div>
+        <div class="value"> </div>
       </div>
     `, content);
-    createElementWithHtmlText(`
+    elm_contributors.querySelector('.value').innerHTML = contributors || '';
+    const elm_startDate = createElementWithHtmlText(`
       <div class="row">
         <div class="key">${translate('Start date')}:</div>
-        <div class="value"> ${(new Date(metadata.startDate)).toLocaleDateString()} </div>
+        <div class="value"> </div>
       </div>
     `, content);
-    createElementWithHtmlText(`
+    elm_startDate.querySelector('.value').innerText = (new Date(metadata.startDate)).toLocaleDateString() || '';
+    const elm_duration = createElementWithHtmlText(`
       <div class="row">
         <div class="key">${translate('Duration')}:</div>
-        <div class="value"> ${utils.secondsToTime(metadata.duration) || ''} </div>
+        <div class="value"> </div>
       </div>
     `, content);
-    createElementWithHtmlText(`    
+    elm_duration.querySelector('.value').innerText = utils.secondsToTime(metadata.duration) || '';
+    const elm_location = createElementWithHtmlText(`
       <div class="row">
         <div class="key">${translate('Location')}:</div>
-        <div class="value"> ${metadata.location || ''} </div>
+        <div class="value"> </div>
       </div>
     `, content);
-    createElementWithHtmlText(`    
+    elm_location.querySelector('.value').innerText = metadata.location || '';
+    const elm_uid = createElementWithHtmlText(`
       <div class="row">
         <div class="key">${translate('UID')}:</div>
         <div class="value"> 
-          <a href="?id=${metadata.UID}">${metadata.UID}</a>
+          <a href=""></a>
         </div>
       </div>
     `, content);
+    elm_uid.querySelector('.value a').href = `?id=${metadata.UID}`;
+    elm_uid.querySelector('.value a').innerText = metadata.UID || '';
     if (metadata.views) {
-      createElementWithHtmlText(`    
+      const elm_views = createElementWithHtmlText(`
         <div class="row">
           <div class="key">${translate('Views')}:</div>
-          <div class="value"> ${metadata.views} </div>
+          <div class="value"> </div>
         </div>      
       `, content);
+      elm_views.querySelector('.value').innerText = metadata.views;
     }
 
     return content;

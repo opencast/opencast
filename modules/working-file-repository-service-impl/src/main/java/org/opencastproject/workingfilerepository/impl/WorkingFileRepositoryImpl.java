@@ -31,7 +31,6 @@ import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.UrlSupport;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.jmx.JmxUtil;
 import org.opencastproject.workingfilerepository.api.PathMappable;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
@@ -67,6 +66,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 import javax.management.ObjectInstance;
 
@@ -91,11 +91,14 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
   /** Working file repository JMX type */
   private static final String JMX_WORKING_FILE_REPOSITORY_TYPE = "WorkingFileRepository";
   /** Configuration key for garbage collection period. */
-  public static final String WORKING_FILE_REPOSITORY_CLEANUP_PERIOD_KEY = "org.opencastproject.working.file.repository.cleanup.period";
+  public static final String WORKING_FILE_REPOSITORY_CLEANUP_PERIOD_KEY =
+      "org.opencastproject.working.file.repository.cleanup.period";
   /** Configuration key for garbage collection max age. */
-  public static final String WORKING_FILE_REPOSITORY_CLEANUP_MAX_AGE_KEY = "org.opencastproject.working.file.repository.cleanup.max.age";
+  public static final String WORKING_FILE_REPOSITORY_CLEANUP_MAX_AGE_KEY =
+      "org.opencastproject.working.file.repository.cleanup.max.age";
   /** Configuration key for collections to clean up. */
-  private static final String WORKING_FILE_REPOSITORY_CLEANUP_COLLECTIONS_KEY = "org.opencastproject.working.file.repository.cleanup.collections";
+  private static final String WORKING_FILE_REPOSITORY_CLEANUP_COLLECTIONS_KEY =
+      "org.opencastproject.working.file.repository.cleanup.collections";
 
   /** The JMX working file repository bean */
   private WorkingFileRepositoryBean workingFileRepositoryBean = new WorkingFileRepositoryBean(this);
@@ -135,8 +138,9 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    * Activate the component
    */
   public void activate(ComponentContext cc) throws IOException {
-    if (rootDirectory != null)
+    if (rootDirectory != null) {
       return; // If the root directory was set, respect that setting
+    }
 
     filenameRegex = Objects.toString(
         cc.getProperties().get(FILENAME_REGEX_KEY),
@@ -145,8 +149,9 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
 
     // server url
     serverUrl = cc.getBundleContext().getProperty(OpencastConstants.SERVER_URL_PROPERTY);
-    if (StringUtils.isBlank(serverUrl))
+    if (StringUtils.isBlank(serverUrl)) {
       throw new IllegalStateException("Server URL must be set");
+    }
 
     // working file repository 'facade' configuration
     servicePath = (String) cc.getProperties().get(RestConstants.SERVICE_PATH_PROPERTY);
@@ -260,8 +265,9 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       logger.debug("Attempting to delete {}", parentDirectory.getAbsolutePath());
       FileUtils.forceDelete(parentDirectory);
       File parentsParentDirectory = parentDirectory.getParentFile();
-      if (parentsParentDirectory.isDirectory() && parentsParentDirectory.list().length == 0)
+      if (parentsParentDirectory.isDirectory() && parentsParentDirectory.list().length == 0) {
         FileUtils.forceDelete(parentDirectory.getParentFile());
+      }
       return true;
     } catch (NotFoundException e) {
       logger.info("Unable to delete non existing media package element {}@{}", mediaPackageElementID, mediaPackageID);
@@ -495,8 +501,9 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
   }
 
   protected void checkPathSafe(String id) {
-    if (id == null)
+    if (id == null) {
       throw new NullPointerException("IDs can not be null");
+    }
     if (id.indexOf("..") > -1 || id.indexOf(File.separator) > -1) {
       throw new IllegalArgumentException("Invalid media package, element ID, or file name");
     }
@@ -527,13 +534,15 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       throw new NotFoundException("Element directory " + directory + " does not exist");
     } else if (md5Files.length == 0) {
       logger.debug("There are no complete files in the element directory {}", directory.getAbsolutePath());
-      throw new NotFoundException("There are no complete files in the element directory " + directory.getAbsolutePath());
+      throw new NotFoundException("There are no complete files in the element directory "
+          + directory.getAbsolutePath());
     } else if (md5Files.length == 1) {
       File f = getSourceFile(md5Files[0]);
-      if (f.exists())
+      if (f.exists()) {
         return f;
-      else
+      } else {
         throw new NotFoundException("Unable to locate " + f + " in the working file repository");
+      }
     } else {
       logger.error("Integrity error: Element directory {} contains more than one element", mediaPackageID + "/"
               + mediaPackageElementID);
@@ -570,10 +579,12 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     }
     File sourceFile = new File(directory, toSafeName(fileName));
     File md5File = getMd5File(sourceFile);
-    if (!sourceFile.exists())
+    if (!sourceFile.exists()) {
       throw new NotFoundException(sourceFile.getAbsolutePath());
-    if (!md5File.exists())
+    }
+    if (!md5File.exists()) {
       throw new NotFoundException(md5File.getAbsolutePath());
+    }
     return sourceFile;
   }
 
@@ -597,8 +608,9 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     File collectionDir = new File(
             PathSupport.concat(new String[]{rootDirectory, COLLECTION_PATH_PREFIX, collectionId}));
     if (!collectionDir.exists()) {
-      if (!create)
+      if (!create) {
         return null;
+      }
       try {
         FileUtils.forceMkdir(collectionDir);
         logger.debug("Created collection directory " + collectionId);
@@ -615,22 +627,25 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
 
   void createRootDirectory() throws IOException {
     File f = new File(rootDirectory);
-    if (!f.exists())
+    if (!f.exists()) {
       FileUtils.forceMkdir(f);
+    }
   }
 
   public long getCollectionSize(String id) throws NotFoundException {
     File collectionDir = null;
     try {
       collectionDir = getCollectionDirectory(id, false);
-      if (collectionDir == null || !collectionDir.canRead())
+      if (collectionDir == null || !collectionDir.canRead()) {
         throw new NotFoundException("Can not find collection " + id);
+      }
     } catch (IOException e) {
       // can be ignored, since we don't want the directory to be created, so it will never happen
     }
     File[] files = collectionDir.listFiles(MD5_FINAME_FILTER);
-    if (files == null)
+    if (files == null) {
       throw new IllegalArgumentException("Collection " + id + " is not a directory");
+    }
     return files.length;
   }
 
@@ -709,8 +724,9 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
   public URI copyTo(String fromCollection, String fromFileName, String toMediaPackage, String toMediaPackageElement,
                     String toFileName) throws NotFoundException, IOException {
     File source = getFileFromCollection(fromCollection, fromFileName);
-    if (source == null)
+    if (source == null) {
       throw new IllegalArgumentException("Source file " + fromCollection + "/" + fromFileName + " does not exist");
+    }
     File destDir = getElementDirectory(toMediaPackage, toMediaPackageElement);
     if (!destDir.exists()) {
       // we needed to create the directory, but couldn't
@@ -746,7 +762,7 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     File destDir = getElementDirectory(toMediaPackage, toMediaPackageElement);
 
     logger.debug("Moving {} from {} to {}/{}", new String[]{fromFileName, fromCollection, toMediaPackage,
-            toMediaPackageElement});
+        toMediaPackageElement});
     if (!destDir.exists()) {
       // we needed to create the directory, but couldn't
       try {
@@ -783,7 +799,8 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    * java.lang.String,boolean)
    */
   @Override
-  public boolean deleteFromCollection(String collectionId, String fileName, boolean removeCollection) throws IOException {
+  public boolean deleteFromCollection(String collectionId, String fileName, boolean removeCollection)
+          throws IOException {
     File f = null;
     try {
       f = getFileFromCollection(collectionId, fileName);
@@ -793,14 +810,18 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     }
     File md5File = getMd5File(f);
 
-    if (!f.isFile())
+    if (!f.isFile()) {
       throw new IllegalStateException(f + " is not a regular file");
-    if (!md5File.isFile())
+    }
+    if (!md5File.isFile()) {
       throw new IllegalStateException(md5File + " is not a regular file");
-    if (!md5File.delete())
+    }
+    if (!md5File.delete()) {
       throw new IOException("MD5 hash " + md5File + " cannot be deleted");
-    if (!f.delete())
+    }
+    if (!f.delete()) {
       throw new IOException(f + " cannot be deleted");
+    }
 
     if (removeCollection) {
       File parentDirectory = f.getParentFile();
@@ -838,8 +859,9 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     File collectionDir = null;
     try {
       collectionDir = getCollectionDirectory(collectionId, false);
-      if (collectionDir == null)
+      if (collectionDir == null) {
         throw new NotFoundException(collectionId);
+      }
     } catch (IOException e) {
       // We are not asking for the collection to be created, so this exception is never thrown
     }
@@ -867,8 +889,9 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
   String getMediaPackageElementDigest(String mediaPackageID, String mediaPackageElementID) throws IOException,
           IllegalStateException, NotFoundException {
     File f = getFile(mediaPackageID, mediaPackageElementID);
-    if (f == null)
+    if (f == null) {
       throw new NotFoundException(mediaPackageID + "/" + mediaPackageElementID);
+    }
     return getFileDigest(f);
   }
 
@@ -880,10 +903,12 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    * @return the md5 hash
    */
   private String getFileDigest(File file) throws IOException {
-    if (file == null)
+    if (file == null) {
       throw new IllegalArgumentException("File must not be null");
-    if (!file.exists() || !file.isFile())
+    }
+    if (!file.exists() || !file.isFile()) {
       throw new IllegalArgumentException("File " + file.getAbsolutePath() + " can not be read");
+    }
 
     // Check if there is a precalculated md5 hash
     File md5HashFile = getMd5File(file);
@@ -918,9 +943,9 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    *
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getTotalSpace()
    */
-  public Option<Long> getTotalSpace() {
+  public Optional<Long> getTotalSpace() {
     File f = new File(rootDirectory);
-    return Option.some(f.getTotalSpace());
+    return Optional.of(f.getTotalSpace());
   }
 
   /**
@@ -928,9 +953,9 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    *
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getUsableSpace()
    */
-  public Option<Long> getUsableSpace() {
+  public Optional<Long> getUsableSpace() {
     File f = new File(rootDirectory);
-    return Option.some(f.getUsableSpace());
+    return Optional.of(f.getUsableSpace());
   }
 
   /**
@@ -939,8 +964,8 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    * @see org.opencastproject.workingfilerepository.api.WorkingFileRepository#getUsedSpace()
    */
   @Override
-  public Option<Long> getUsedSpace() {
-    return Option.some(FileUtils.sizeOfDirectory(new File(rootDirectory)));
+  public Optional<Long> getUsedSpace() {
+    return Optional.of(FileUtils.sizeOfDirectory(new File(rootDirectory)));
   }
 
   /**
@@ -971,8 +996,9 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
 
     logger.info("Cleaning up files older than {} days from collection {}", days, collectionId);
 
-    if (!colDir.isDirectory())
+    if (!colDir.isDirectory()) {
       throw new IllegalStateException(colDir + " is not a directory");
+    }
 
     long referenceTime = System.currentTimeMillis() - days * 24 * 3600 * 1000;
     for (File f : colDir.listFiles()) {

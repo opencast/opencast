@@ -21,8 +21,9 @@
 
 package org.opencastproject.security.jwt;
 
-import com.auth0.jwt.interfaces.DecodedJWT;
+import com.nimbusds.jwt.SignedJWT;
 
+import java.text.ParseException;
 import java.util.Date;
 
 /**
@@ -45,9 +46,9 @@ public class CachedJWT {
    * @param jwt The decoded JWT.
    * @param username The username extracted from the JWT.
    */
-  public CachedJWT(DecodedJWT jwt, String username) {
-    this.signature = jwt.getSignature();
-    this.expiresAt = jwt.getExpiresAt();
+  public CachedJWT(SignedJWT jwt, String username) throws ParseException {
+    this.signature = jwt.getSignature().toString();
+    this.expiresAt = jwt.getJWTClaimsSet().getExpirationTime();
     this.username = username;
   }
 

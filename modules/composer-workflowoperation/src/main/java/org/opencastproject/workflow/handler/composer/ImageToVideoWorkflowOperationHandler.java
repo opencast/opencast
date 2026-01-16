@@ -21,10 +21,9 @@
 
 package org.opencastproject.workflow.handler.composer;
 
-import static org.opencastproject.util.data.Monadics.mlist;
+import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.composer.api.ComposerService;
-import org.opencastproject.composer.api.EncoderException;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.Attachment;
@@ -32,17 +31,10 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElementParser;
-import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageSupport.Filters;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.JobUtil;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Function2;
-import org.opencastproject.util.data.Monadics;
-import org.opencastproject.util.data.Option;
-import org.opencastproject.util.data.functions.Booleans;
-import org.opencastproject.util.data.functions.Misc;
 import org.opencastproject.util.data.functions.Strings;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
@@ -59,7 +51,11 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 /**
  * The workflow definition creating a video from a still image.
@@ -132,19 +128,30 @@ public class ImageToVideoWorkflowOperationHandler extends AbstractWorkflowOperat
       logger.warn("No source tags or flavor are given to determine the image to use");
       return createResult(mp, Action.SKIP);
     }
-    final Option<MediaPackageElementFlavor> sourceFlavor = Option.option(sourceFlavors.get(0));
+    final Optional<MediaPackageElementFlavor> sourceFlavor = Optional.ofNullable(sourceFlavors.get(0));
 
-    final List<String> targetTags = tagsAndFlavors.getTargetTags();
+    final ConfiguredTagsAndFlavors.TargetTags targetTags = tagsAndFlavors.getTargetTags();
     List<MediaPackageElementFlavor> targetFlavors = tagsAndFlavors.getTargetFlavors();
-    final Option<MediaPackageElementFlavor> targetFlavor = Option.option(targetFlavors.get(0));
-    final double duration = getCfg(wi, OPT_DURATION).bind(Strings.toDouble).getOrElse(
-            this.<Double> cfgKeyMissing(OPT_DURATION));
-    final String profile = getCfg(wi, OPT_PROFILE).getOrElse(this.<String> cfgKeyMissing(OPT_PROFILE));
+    final Optional<MediaPackageElementFlavor> targetFlavor = Optional.ofNullable(targetFlavors.get(0));
+    final double duration = getCfg(wi, OPT_DURATION)
+        .flatMap(Strings::toDouble)
+        .orElseThrow(() -> new WorkflowOperationException(OPT_DURATION + " is missing or malformed"));
+    final String profile = getCfg(wi, OPT_PROFILE)
+        .orElseThrow(() -> new WorkflowOperationException(OPT_PROFILE + " is missing or malformed"));
+
     // run image to video jobs
-    final List<Job> jobs = Monadics.<MediaPackageElement> mlist(mp.getAttachments())
-            .filter(sourceFlavor.map(Filters.matchesFlavor).getOrElse(Booleans.<MediaPackageElement> yes()))
-            .filter(Filters.hasTagAny(sourceTags)).map(Misc.<MediaPackageElement, Attachment> cast())
-            .map(imageToVideo(profile, duration)).value();
+    final Function<MediaPackageElement, Boolean> flavorFilter;
+    if (sourceFlavor.isPresent()) {
+      flavorFilter = Filters.matchesFlavor(sourceFlavor.get());
+    } else {
+      flavorFilter = alwaysTrue;
+    }
+    final List<Job> jobs = Arrays.stream(mp.getAttachments())
+        .filter(mpe -> flavorFilter.apply(mpe))
+        .filter(mpe -> Filters.hasTagAny(mpe, sourceTags))
+        .map(mpe -> (Attachment) mpe)
+        .map(imageToVideo(profile, duration))
+        .collect(Collectors.toList());
     if (JobUtil.waitForJobs(serviceRegistry, jobs).isSuccess()) {
       for (final Job job : jobs) {
         if (job.getPayload().length() > 0) {
@@ -152,12 +159,10 @@ public class ImageToVideoWorkflowOperationHandler extends AbstractWorkflowOperat
           track.setURI(workspace.moveTo(track.getURI(), mp.getIdentifier().toString(), track.getIdentifier(),
                   FilenameUtils.getName(track.getURI().toString())));
           // Adjust the target tags
-          for (String tag : targetTags) {
-            track.addTag(tag);
-          }
+          applyTargetTagsToElement(targetTags, track);
           // Adjust the target flavor.
-          for (MediaPackageElementFlavor flavor : targetFlavor) {
-            track.setFlavor(flavor);
+          if (targetFlavor.isPresent()) {
+            track.setFlavor(targetFlavor.get());
           }
           // store new tracks to mediaPackage
           mp.add(track);
@@ -167,12 +172,12 @@ public class ImageToVideoWorkflowOperationHandler extends AbstractWorkflowOperat
           return createResult(mp, Action.SKIP);
         }
       }
-      return createResult(mp, Action.CONTINUE, mlist(jobs).foldl(0L, new Function2<Long, Job, Long>() {
-        @Override
-        public Long apply(Long max, Job job) {
-          return Math.max(max, job.getQueueTime());
-        }
-      }));
+      return createResult(mp, Action.CONTINUE,
+          jobs.stream()
+              .mapToLong(Job::getQueueTime)
+              .max()
+              .orElse(0L)
+      );
     } else {
       throw new WorkflowOperationException("The image to video encoding jobs did not return successfully");
     }
@@ -180,14 +185,18 @@ public class ImageToVideoWorkflowOperationHandler extends AbstractWorkflowOperat
 
   /** Returned function may throw exceptions. */
   private Function<Attachment, Job> imageToVideo(final String profile, final double duration) {
-    return new Function.X<Attachment, Job>() {
-      @Override
-      protected Job xapply(Attachment attachment) throws MediaPackageException, EncoderException {
-        logger.info("Converting image {} to a video of {} sec", attachment.getURI().toString(), duration);
+    return attachment -> {
+      try {
+        logger.info("Converting image {} to a video of {} sec", attachment.getURI(), duration);
         return composerService.imageToVideo(attachment, profile, duration);
+      } catch (Exception e) {
+        return chuck(e);
       }
     };
   }
+
+  // Fallback function if sourceFlavor is empty
+  private final Function<MediaPackageElement, Boolean> alwaysTrue = mpe -> true;
 
   @Reference
   @Override  public void setServiceRegistry(ServiceRegistry serviceRegistry) {

@@ -1,0 +1,64 @@
+id: publish-uploaded-assets
+title: Publish uploaded assets
+description: |-
+  Publish uploaded assets
+state-mappings:
+  - state: running
+    value: EVENTS.EVENTS.STATE_MAPPING.PUBLISHING
+  - state: failing
+    value: EVENTS.EVENTS.STATE_MAPPING.PUBLISHING
+operations:
+  # Analyze current state of media package
+  - id: analyze-mediapackage
+    description: Set control variables for captions
+    configurations:
+      - set-tag-variables: true
+
+  # Tag new assets for archival
+  - id: tag
+    description: Tag newly uploaded assets for archival
+    configurations:
+      - source-flavors: '*/*'
+      - target-tags: +archive
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # Special handling for captions
+
+  # Creates captions/delivery.
+  # Sets the following tags:
+  # captions/source     archive, exclude-publish
+  # captions/delivery   engage-download
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  - id: include
+    if: NOT ${captions_source_hastag_archive}
+    description: Include special handling for uploaded captions
+    configurations:
+      - workflow-id: partial-process-uploaded-captions
+
+  # Publish to engage player
+  - id: publish-engage
+    exception-handler-workflow: partial-error
+    description: Update recording in Opencast Media Module
+    configurations:
+      - download-source-flavors:
+          ${download-source-flavors},dublincore/*,security/*
+      - download-source-tags: engage-download,-exclude-publish
+      # exclude necessary bc of download_source_flavors
+      - streaming-source-tags: engage-streaming
+      - strategy: merge
+      - check-availability: false
+
+  # Archive uploaded assets
+  - id: snapshot
+    description: Archiving new assets
+    configurations:
+      - source-tags: archive
+
+  # Clean up work artifacts
+  - id: cleanup
+    fail-on-error: false
+    description: Remove temporary processing artifacts
+    configurations:
+      - delete-external: true
+      # FixMe Don't clean up ACLs until workflow service no longer looks for them in the WFR.
+      - preserve-flavors: security/*

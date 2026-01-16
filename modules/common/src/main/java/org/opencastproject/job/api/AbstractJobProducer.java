@@ -21,8 +21,6 @@
 
 package org.opencastproject.job.api;
 
-import static com.entwinemedia.fn.data.Opt.none;
-import static com.entwinemedia.fn.data.Opt.some;
 import static org.opencastproject.util.OsgiUtil.getOptContextProperty;
 
 import org.opencastproject.job.api.Incident.Severity;
@@ -39,15 +37,13 @@ import org.opencastproject.serviceregistry.api.SystemLoad.NodeLoad;
 import org.opencastproject.serviceregistry.api.UndispatchableJobException;
 import org.opencastproject.util.JobCanceledException;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.functions.Strings;
-
-import com.entwinemedia.fn.data.Opt;
 
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.DecimalFormat;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -89,8 +85,9 @@ public abstract class AbstractJobProducer implements JobProducer {
    *          OSGI component context
    **/
   public void activate(ComponentContext cc) {
-    acceptJobLoadsExeedingMaxLoad = getOptContextProperty(cc, ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY).map(Strings.toBool)
-            .getOrElse(DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING);
+    acceptJobLoadsExeedingMaxLoad = getOptContextProperty(cc, ACCEPT_JOB_LOADS_EXCEEDING_PROPERTY)
+            .map(Boolean::valueOf)
+            .orElse(DEFAULT_ACCEPT_JOB_LOADS_EXCEEDING);
     logger.debug("Job producer {} accepting excessively large jobs: {}", getJobType(), acceptJobLoadsExeedingMaxLoad);
   }
 
@@ -277,7 +274,7 @@ public abstract class AbstractJobProducer implements JobProducer {
     private final long jobId;
 
     /** The current job */
-    private final Opt<Long> currentJobId;
+    private final Optional<Long> currentJobId;
 
     /**
      * Constructs a new job runner
@@ -290,9 +287,9 @@ public abstract class AbstractJobProducer implements JobProducer {
     JobRunner(Job job, Job currentJob) {
       jobId = job.getId();
       if (currentJob != null) {
-        currentJobId = some(currentJob.getId());
+        currentJobId = Optional.of(currentJob.getId());
       } else {
-        currentJobId = none();
+        currentJobId = Optional.empty();
       }
     }
 
@@ -302,7 +299,7 @@ public abstract class AbstractJobProducer implements JobProducer {
       final ServiceRegistry serviceRegistry = getServiceRegistry();
       final Job jobBeforeProcessing = serviceRegistry.getJob(jobId);
 
-      if (currentJobId.isSome())
+      if (currentJobId.isPresent())
         serviceRegistry.setCurrentJob(serviceRegistry.getJob(currentJobId.get()));
 
       final Organization organization = getOrganizationDirectoryService()

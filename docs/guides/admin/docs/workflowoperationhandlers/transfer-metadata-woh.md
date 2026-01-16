@@ -45,16 +45,13 @@ usually uses `dcterms` for elements from the set of DublinCore terms, resulting 
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="transfer-metadata"
-    description="Transfer dcterms:creator to myterms:owner">
-  <configurations>
-    <configuration key="source-flavor">dublincore/episode</configuration>
-    <configuration key="target-flavor">myterms/episode</configuration>
-    <configuration key="source-element">{http://purl.org/dc/terms/}creator</configuration>
-    <configuration key="target-element">{http://my-institution.edu/metadata}owner</configuration>
-    <configuration key="force">true</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: transfer-metadata
+    description: Transfer dcterms:creator to myterms:owner
+    configurations:
+      - source-flavor: dublincore/episode
+      - target-flavor: myterms/episode
+      - source-element: '{http://purl.org/dc/terms/}creator'
+      - target-element: '{http://my-institution.edu/metadata}owner'
+      - force: true
 ```

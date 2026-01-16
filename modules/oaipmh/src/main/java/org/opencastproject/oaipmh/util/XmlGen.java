@@ -21,14 +21,10 @@
 package org.opencastproject.oaipmh.util;
 
 import static org.opencastproject.util.IoSupport.withResource;
-import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.util.XmlSafeParser;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Function0;
-import org.opencastproject.util.data.Option;
 
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
@@ -45,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
@@ -64,12 +61,12 @@ import javax.xml.transform.stream.StreamResult;
  */
 public abstract class XmlGen {
   private final Document document;
-  private final Option<String> defaultNamespace;
+  private final Optional<String> defaultNamespace;
 
   /**
    * Create a new environment.
    */
-  public XmlGen(Option<String> defaultNamespace) {
+  public XmlGen(Optional<String> defaultNamespace) {
     document = createDocument();
     this.defaultNamespace = defaultNamespace;
   }
@@ -123,11 +120,9 @@ public abstract class XmlGen {
 
   /** Generate the document as a string. */
   public String generateAsString() {
-    return withResource(new ByteArrayOutputStream(), new Function<ByteArrayOutputStream, String>() {
-      @Override public String apply(ByteArrayOutputStream out) {
-        generate(out);
-        return out.toString();
-      }
+    return withResource(new ByteArrayOutputStream(), out -> {
+      generate(out);
+      return out.toString();
     });
   }
 
@@ -174,23 +169,17 @@ public abstract class XmlGen {
     }
   }
 
-  protected Node $aSome(final String name, final Option<String> value) {
-    return value.fold(new Option.Match<String, Node>() {
-      @Override
-      public Node some(String value) {
-        Attr a = document.createAttribute(name);
-        a.setValue(value);
-        return a;
-      }
-
-      @Override
-      public Node none() {
-        return nodeZero();
-      }
-    });
+  protected Node $aSome(final String name, final Optional<String> value) {
+    return value
+        .map(v -> {
+          Attr a = document.createAttribute(name);
+          a.setValue(v);
+          return (Node) a;
+        })
+        .orElseGet(this::nodeZero);
   }
 
-  protected Element $e(String qname, Option<String> namespace, List<Node> nodes) {
+  protected Element $e(String qname, Optional<String> namespace, List<Node> nodes) {
     return appendTo(createElemNs(namespace, qname), nodes);
   }
 
@@ -198,11 +187,11 @@ public abstract class XmlGen {
    * Create an element with the qualified name <code>qname</code> -- i.e. <code>prefix:tagname</code> -- in the
    * namespace <code>namespace</code> with children <code>nodes</code>.
    */
-  protected Element $e(String qname, Option<String> namespace, NodeList nodes) {
+  protected Element $e(String qname, Optional<String> namespace, NodeList nodes) {
     return appendTo(createElemNs(namespace, qname), nodes);
   }
 
-  protected Element $e(String qname, Option<String> namespace, Node... nodes) {
+  protected Element $e(String qname, Optional<String> namespace, Node... nodes) {
     return $e(qname, namespace, Arrays.asList(nodes));
   }
 
@@ -219,22 +208,23 @@ public abstract class XmlGen {
    * namespace <code>namespace</code> with children <code>nodes</code>.
    */
   protected Element $e(String qname, String namespace, Node... nodes) {
-    return $e(qname, some(namespace), Arrays.asList(nodes));
+    return $e(qname, Optional.of(namespace), Arrays.asList(nodes));
   }
 
   protected Element $e(String qname, String namespace, List<Node> nodes) {
-    return $e(qname, some(namespace), nodes);
+    return $e(qname, Optional.of(namespace), nodes);
   }
 
   protected Node $eTxtBlank(final String name, String text) {
-    return $txtBlank(text).map(new Function<Node, Node>() {
-      @Override
-      public Node apply(Node text) {
-        final Element e = createElemDefaultNs(name);
-        e.appendChild(text);
-        return e;
-      }
-    }).getOrElse(nodeZero);
+    Optional<Node> txtNodeOpt = $txtBlank(text);
+    if (txtNodeOpt.isPresent()) {
+      Node txtNode = txtNodeOpt.get();
+      final Element e = createElemDefaultNs(name);
+      e.appendChild(txtNode);
+      return e;
+    } else {
+      return nodeZero();
+    }
   }
 
   protected Node $eTxt(final String name, String text) {
@@ -269,8 +259,8 @@ public abstract class XmlGen {
     return createElemNs(defaultNamespace, name);
   }
 
-  private Element createElemNs(Option<String> namespace, String qname) {
-    return createElemNs(namespace.getOrElseNull(), qname);
+  private Element createElemNs(Optional<String> namespace, String qname) {
+    return createElemNs(namespace.orElse(null), qname);
   }
 
   /**
@@ -301,7 +291,7 @@ public abstract class XmlGen {
    * Conditional element. Only created if at least one subnode is present. Subnodes may be attributes, elements, text
    * nodes, etc.
    */
-  protected Node $e(String name, Option<Node>... nodes) {
+  protected Node $e(String name, Optional<Node>... nodes) {
     final List<Node> existing = filter(Arrays.asList(nodes));
     if (!existing.isEmpty()) {
       return $e(name, existing);
@@ -321,32 +311,22 @@ public abstract class XmlGen {
   /**
    * Text blank.
    */
-  protected Option<Node> $txtBlank(String text) {
-    return StringUtils.isNotBlank(text) ? some($txt(text)) : Option.<Node>none();
+  protected Optional<Node> $txtBlank(String text) {
+    return StringUtils.isNotBlank(text) ? Optional.of($txt(text)) : Optional.<Node>empty();
   }
 
   // --
 
   // CHECKSTYLE:ON
 
-  private List<Node> filter(List<Option<Node>> nodes) {
+  private List<Node> filter(List<Optional<Node>> nodes) {
     List<Node> result = new ArrayList<>();
-    for (Option<Node> option : nodes) {
-      option.fold(new Option.Match<Node, Void>() {
-        @Override
-        public Void some(Node node) {
-          result.add(node);
-          return null;
-        }
-
-        @Override
-        public Void none() {
-          return null;
-        }
-      });
+    for (Optional<Node> opt : nodes) {
+      opt.ifPresent(result::add);
     }
     return result;
   }
+
 
   private Element appendNs(Element e, List<Namespace> namespaces) {
     for (Namespace n : namespaces) {
@@ -360,8 +340,9 @@ public abstract class XmlGen {
    * Append <code>nodes</code> to element <code>e</code>. Respects different node types like attributes and elements.
    */
   private Element appendTo(Element e, List<Node> nodes) {
-    for (Node node : nodes)
+    for (Node node : nodes) {
       appendTo(e, node);
+    }
     return e;
   }
 
@@ -369,8 +350,9 @@ public abstract class XmlGen {
    * Like {@link #appendTo(org.w3c.dom.Element, java.util.List)} but with a different signature.
    */
   private Element appendTo(Element e, NodeList nodes) {
-    for (int i = 0; i < nodes.getLength(); i++)
+    for (int i = 0; i < nodes.getLength(); i++) {
       appendTo(e, nodes.item(i));
+    }
     return e;
   }
 
@@ -392,26 +374,6 @@ public abstract class XmlGen {
   protected Node nodeZero() {
     return document.createTextNode("");
   }
-
-  /**
-   * Lazy version of {@link #nodeZero()}.
-   */
-  protected Function0<Node> nodeZero = new Function0<Node>() {
-    @Override
-    public Node apply() {
-      return nodeZero();
-    }
-  };
-
-  /**
-   * Create a text node from a string.
-   */
-  protected Function<String, Node> mkText = new Function<String, Node>() {
-    @Override
-    public Node apply(String token) {
-      return $txt(token);
-    }
-  };
 
   protected class Namespace {
     private final String prefix;

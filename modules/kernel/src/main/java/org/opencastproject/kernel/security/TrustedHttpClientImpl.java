@@ -87,11 +87,11 @@ import javax.management.ObjectName;
  * An http client that executes secure (though not necessarily encrypted) http requests.
  */
 @Component(
-  property = {
-    "service.description=Provides Trusted Http Clients (for use with digest authentication)"
-  },
-  immediate = true,
-  service = { TrustedHttpClient.class }
+    property = {
+        "service.description=Provides Trusted Http Clients (for use with digest authentication)"
+    },
+    immediate = true,
+    service = { TrustedHttpClient.class }
 )
 public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionMXBean {
   /** Header name used to request a new nonce from a server a request is sent to. */
@@ -111,7 +111,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
 
   /** The configuration property specifying the duration a signed url will remain valid for. */
   protected static final String INTERNAL_URL_SIGNING_DURATION_KEY =
-    "org.opencastproject.security.internal.url.signing.duration";
+      "org.opencastproject.security.internal.url.signing.duration";
 
   /**
    * The configuration property specifying the minimum amount of time in seconds wait before retrying a request after a
@@ -124,7 +124,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
    * wait.
    */
   public static final String NONCE_TIMEOUT_RETRY_MAXIMUM_VARIABLE_TIME_KEY =
-    "org.opencastproject.security.digest.nonce.variable.time";
+      "org.opencastproject.security.digest.nonce.variable.time";
 
   /** The default time until a connection attempt fails */
   public static final int DEFAULT_CONNECTION_TIMEOUT = 60 * 1000;
@@ -159,7 +159,9 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
   /** The number of times to retry a request after a nonce timeout. */
   private int nonceTimeoutRetries = DEFAULT_NONCE_TIMEOUT_RETRIES;
 
-  /** The map of open responses to their http clients, which need to be closed after we are finished with the response */
+  /**
+   * The map of open responses to their http clients, which need to be closed after we are finished with the response
+   */
   protected Map<HttpResponse, CloseableHttpClient> responseMap = new ConcurrentHashMap<>();
 
   /** Used to add a random amount of time up to retryMaximumVariableTime to retry a request after a nonce timeout. */
@@ -195,8 +197,9 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
     logger.debug("activate");
     user = cc.getBundleContext().getProperty(DIGEST_AUTH_USER_KEY);
     pass = cc.getBundleContext().getProperty(DIGEST_AUTH_PASS_KEY);
-    if (user == null || pass == null)
+    if (user == null || pass == null) {
       throw new IllegalStateException("trusted communication is not properly configured");
+    }
 
     getRetryNumber(cc);
     getRetryBaseTime(cc);
@@ -253,7 +256,9 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
    *         the serviceRegistry to unset (unused, but needed for OSGI)
    */
   public void unsetServiceRegistry(ServiceRegistry serviceRegistry) {
-    this.serviceRegistry = null;
+    if (this.serviceRegistry == serviceRegistry) {
+      this.serviceRegistry = null;
+    }
   }
 
   /**
@@ -533,7 +538,8 @@ public class TrustedHttpClientImpl implements TrustedHttpClient, HttpConnectionM
     httpUriRequest.removeHeaders(AUTHORIZATION_HEADER_NAME);
 
     for (int i = 0; i < nonceTimeoutRetries; i++) {
-      CloseableHttpClient httpClient = makeHttpClientBuilder(DEFAULT_CONNECTION_TIMEOUT, DEFAULT_SOCKET_TIMEOUT).build();
+      CloseableHttpClient httpClient = makeHttpClientBuilder(DEFAULT_CONNECTION_TIMEOUT, DEFAULT_SOCKET_TIMEOUT)
+          .build();
       int variableDelay = 0;
       // Make sure that we have a variable delay greater than 0.
       if (retryMaximumVariableTime > 0) {

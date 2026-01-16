@@ -109,7 +109,8 @@ public class ImageConvertWorkflowOperationHandler extends AbstractWorkflowOperat
   }
 
   @Override
-  public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context) throws WorkflowOperationException {
+  public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
+          throws WorkflowOperationException {
     WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
     // Check which tags have been configured
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
@@ -117,11 +118,12 @@ public class ImageConvertWorkflowOperationHandler extends AbstractWorkflowOperat
     List<MediaPackageElementFlavor> sourceFlavorsOption = tagsAndFlavors.getSrcFlavors();
     List<String> sourceTagsOption = tagsAndFlavors.getSrcTags();
     List<MediaPackageElementFlavor> targetFlavorsOption = tagsAndFlavors.getTargetFlavors();
-    List<String> targetTagsOption = tagsAndFlavors.getTargetTags();
+    ConfiguredTagsAndFlavors.TargetTags targetTagsOption = tagsAndFlavors.getTargetTags();
 
     String encodingProfileOption = StringUtils.trimToNull(operation.getConfiguration(CONFIG_KEY_ENCODING_PROFILE));
-    if (encodingProfileOption == null)
+    if (encodingProfileOption == null) {
       encodingProfileOption = StringUtils.trimToNull(operation.getConfiguration(CONFIG_KEY_ENCODING_PROFILES));
+    }
     String tagsAndFlavorsOption = StringUtils.trimToNull(operation.getConfiguration(CONFIG_KEY_TAGS_AND_FLAVORS));
     boolean tagsAndFlavorsBool = BooleanUtils.toBoolean(tagsAndFlavorsOption);
 
@@ -141,37 +143,21 @@ public class ImageConvertWorkflowOperationHandler extends AbstractWorkflowOperat
     } else {
       throw new WorkflowOperationException("No target flavor specified");
     }
-    // check target-tags configuration
-    List<String> fixedTags = new ArrayList<>();
-    List<String> additionalTags = new ArrayList<>();
-    List<String> removingTags = new ArrayList<>();
-    for (String targetTag : targetTagsOption) {
-      if (!StringUtils.startsWithAny(targetTag, "+", "-")) {
-        if (additionalTags.size() > 0 || removingTags.size() > 0) {
-          logger.warn("You may not mix fixed tags and tag changes. "
-                  + "Please review target-tags option on image-convert operation of your workflow definition. "
-                  + "The tag {} is not prefixed with '+' or '-'.", targetTag);
-        }
-        fixedTags.add(targetTag);
-      } else if (StringUtils.startsWith(targetTag, "+")) {
-        additionalTags.add(StringUtils.substring(targetTag, 1));
-      } else if (StringUtils.startsWith(targetTag, "-")) {
-        removingTags.add(StringUtils.substring(targetTag, 1));
-      }
-    }
 
     List<String> profiles = new ArrayList<>();
     for (String encodingProfileId : asList(encodingProfileOption)) {
       EncodingProfile profile = composerService.getProfile(encodingProfileId);
-      if (profile == null)
+      if (profile == null) {
         throw new WorkflowOperationException("Encoding profile '" + encodingProfileId + "' was not found");
+      }
       // just test if the profile exists, we only need the profile id for further work
       profiles.add(encodingProfileId);
     }
 
     // Make sure there is at least one profile
-    if (profiles.isEmpty())
+    if (profiles.isEmpty()) {
       throw new WorkflowOperationException("No encoding profile was specified");
+    }
 
     AttachmentSelector attachmentSelector = new AttachmentSelector();
     for (MediaPackageElementFlavor sourceFlavor : sourceFlavorsOption) {
@@ -218,21 +204,8 @@ public class ImageConvertWorkflowOperationHandler extends AbstractWorkflowOperat
             }
           }
           // set tags on target element
-          targetElement.clearTags();
-          if (fixedTags.isEmpty() && (!additionalTags.isEmpty() || !removingTags.isEmpty())) {
-            for (String tag : sourceElement.getTags()) {
-              targetElement.addTag(tag);
-            }
-          }
-          for (String targetTag : fixedTags) {
-            targetElement.addTag(targetTag);
-          }
-          for (String additionalTag : additionalTags) {
-            targetElement.addTag(additionalTag);
-          }
-          for (String removingTag : removingTags) {
-            targetElement.removeTag(removingTag);
-          }
+          applyTargetTagsToElement(targetTagsOption, targetElement);
+
           mediaPackage.addDerived(targetElement, sourceElement);
         }
       }

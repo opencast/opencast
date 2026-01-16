@@ -1,0 +1,29 @@
+name: Crowdin » Push keys to Crowdin
+
+on:
+  push:
+    branches:
+      - develop
+      - 'r/*.x'
+
+concurrency:
+  group: crowdin-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  upload-translations-keys:
+    if: github.repository_owner == 'opencast'
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v5
+
+    - name: prepare crowdin client
+      run: |
+        wget --quiet https://artifacts.crowdin.com/repo/deb/crowdin3.deb
+        sudo dpkg -i crowdin3.deb
+
+    - name: upload translation source
+      env:
+        CROWDIN_TOKEN: ${{ secrets.CROWDIN_TOKEN }}
+      run: |
+        crowdin upload sources --config .crowdin.yaml -b "${GITHUB_REF##*/}"

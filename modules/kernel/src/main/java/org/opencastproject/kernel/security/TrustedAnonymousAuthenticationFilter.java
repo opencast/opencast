@@ -36,8 +36,8 @@ import javax.servlet.http.HttpServletRequest;
 public class TrustedAnonymousAuthenticationFilter extends AnonymousAuthenticationFilter {
 
   /**
-   * @see org.springframework.security.web.authentication.AnonymousAuthenticationFilter#applyAnonymousForThisRequest(javax
-   *      .servlet.http.HttpServletRequest)
+   * @see org.springframework.security.web.authentication.AnonymousAuthenticationFilter#applyAnonymousForThisRequest(
+   *      javax.servlet.http.HttpServletRequest)
    */
   @Override
   @Deprecated

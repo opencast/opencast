@@ -21,72 +21,66 @@
 
 package org.opencastproject.schema;
 
-import static org.opencastproject.util.data.Option.error;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
-
-import org.opencastproject.util.data.Function0;
-import org.opencastproject.util.data.Option;
-
 import java.util.Date;
+import java.util.Optional;
 
 /** Mutable builder for {@link org.opencastproject.schema.OcDublinCore}. */
 public class OcDublinCoreBuilder implements OcDublinCore {
-  protected Option<String> abstrakt = none();
-  protected Option<String> accessRights = none();
-  protected Option<String> accrualMethod = none();
-  protected Option<String> accrualPeriodicity = none();
-  protected Option<String> accrualPolicy = none();
-  protected Option<String> alternative = none();
-  protected Option<String> audience = none();
-  protected Option<String> available = none();
-  protected Option<String> bibliographicCitation = none();
-  protected Option<String> conformsTo = none();
-  protected Option<String> contributor = none();
-  protected Option<String> coverage = none();
-  protected Option<Date> created = none();
-  protected Option<String> creator = none();
-  protected Option<Date> date = none();
-  protected Option<Date> dateAccepted = none();
-  protected Option<Date> dateCopyrighted = none();
-  protected Option<Date> dateSubmitted = none();
-  protected Option<String> description = none();
-  protected Option<String> educationLevel = none();
-  protected Option<Long> extent = none();
-  protected Option<String> format = none();
-  protected Option<String> hasFormat = none();
-  protected Option<String> hasPart = none();
-  protected Option<String> hasVersion = none();
-  protected Option<String> identifier = none();
-  protected Option<String> instructionalMethod = none();
-  protected Option<String> isFormatOf = none();
-  protected Option<String> isPartOf = none();
-  protected Option<String> isReferencedBy = none();
-  protected Option<String> isReplacedBy = none();
-  protected Option<String> isRequiredBy = none();
-  protected Option<String> issued = none();
-  protected Option<String> isVersionOf = none();
-  protected Option<String> language = none();
-  protected Option<String> license = none();
-  protected Option<String> mediator = none();
-  protected Option<String> medium = none();
-  protected Option<String> modified = none();
-  protected Option<String> provenance = none();
-  protected Option<String> publisher = none();
-  protected Option<String> references = none();
-  protected Option<String> relation = none();
-  protected Option<String> replaces = none();
-  protected Option<String> requires = none();
-  protected Option<String> rights = none();
-  protected Option<String> rightsHolder = none();
-  protected Option<String> source = none();
-  protected Option<String> spatial = none();
-  protected Option<String> subject = none();
-  protected Option<String> tableOfContents = none();
-  protected Option<String> temporal = none();
-  protected Option<String> title = none();
-  protected Option<String> type = none();
-  protected Option<String> valid = none();
+  protected Optional<String> abstrakt = Optional.empty();
+  protected Optional<String> accessRights = Optional.empty();
+  protected Optional<String> accrualMethod = Optional.empty();
+  protected Optional<String> accrualPeriodicity = Optional.empty();
+  protected Optional<String> accrualPolicy = Optional.empty();
+  protected Optional<String> alternative = Optional.empty();
+  protected Optional<String> audience = Optional.empty();
+  protected Optional<String> available = Optional.empty();
+  protected Optional<String> bibliographicCitation = Optional.empty();
+  protected Optional<String> conformsTo = Optional.empty();
+  protected Optional<String> contributor = Optional.empty();
+  protected Optional<String> coverage = Optional.empty();
+  protected Optional<Date> created = Optional.empty();
+  protected Optional<String> creator = Optional.empty();
+  protected Optional<Date> date = Optional.empty();
+  protected Optional<Date> dateAccepted = Optional.empty();
+  protected Optional<Date> dateCopyrighted = Optional.empty();
+  protected Optional<Date> dateSubmitted = Optional.empty();
+  protected Optional<String> description = Optional.empty();
+  protected Optional<String> educationLevel = Optional.empty();
+  protected Optional<Long> extent = Optional.empty();
+  protected Optional<String> format = Optional.empty();
+  protected Optional<String> hasFormat = Optional.empty();
+  protected Optional<String> hasPart = Optional.empty();
+  protected Optional<String> hasVersion = Optional.empty();
+  protected Optional<String> identifier = Optional.empty();
+  protected Optional<String> instructionalMethod = Optional.empty();
+  protected Optional<String> isFormatOf = Optional.empty();
+  protected Optional<String> isPartOf = Optional.empty();
+  protected Optional<String> isReferencedBy = Optional.empty();
+  protected Optional<String> isReplacedBy = Optional.empty();
+  protected Optional<String> isRequiredBy = Optional.empty();
+  protected Optional<String> issued = Optional.empty();
+  protected Optional<String> isVersionOf = Optional.empty();
+  protected Optional<String> language = Optional.empty();
+  protected Optional<String> license = Optional.empty();
+  protected Optional<String> mediator = Optional.empty();
+  protected Optional<String> medium = Optional.empty();
+  protected Optional<String> modified = Optional.empty();
+  protected Optional<String> provenance = Optional.empty();
+  protected Optional<String> publisher = Optional.empty();
+  protected Optional<String> references = Optional.empty();
+  protected Optional<String> relation = Optional.empty();
+  protected Optional<String> replaces = Optional.empty();
+  protected Optional<String> requires = Optional.empty();
+  protected Optional<String> rights = Optional.empty();
+  protected Optional<String> rightsHolder = Optional.empty();
+  protected Optional<String> source = Optional.empty();
+  protected Optional<String> spatial = Optional.empty();
+  protected Optional<String> subject = Optional.empty();
+  protected Optional<String> tableOfContents = Optional.empty();
+  protected Optional<String> temporal = Optional.empty();
+  protected Optional<String> title = Optional.empty();
+  protected Optional<String> type = Optional.empty();
+  protected Optional<String> valid = Optional.empty();
 
   public static OcDublinCoreBuilder create(final OcDublinCore source) {
     // traditional copy here: completeness is checked in the corresponding unit test by means of the transfer idiom
@@ -103,7 +97,7 @@ public class OcDublinCoreBuilder implements OcDublinCore {
     target.conformsTo = source.getConformsTo();
     target.contributor = source.getContributor();
     target.coverage = source.getCoverage();
-    target.created = some(source.getCreated());
+    target.created = Optional.of(source.getCreated());
     target.creator = source.getCreator();
     target.date = source.getDate();
     target.dateAccepted = source.getDateAccepted();
@@ -143,783 +137,779 @@ public class OcDublinCoreBuilder implements OcDublinCore {
     target.subject = source.getSubject();
     target.tableOfContents = source.getTableOfContents();
     target.temporal = source.getTemporal();
-    target.title = some(source.getTitle());
+    target.title = Optional.of(source.getTitle());
     target.type = source.getType();
     target.valid = source.getValid();
     return target;
   }
 
-  public OcDublinCoreBuilder setAbstract(Option<String> a) {
+  public OcDublinCoreBuilder setAbstract(Optional<String> a) {
     this.abstrakt = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setAccessRights(Option<String> a) {
+  public OcDublinCoreBuilder setAccessRights(Optional<String> a) {
     this.accessRights = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setAccrualMethod(Option<String> a) {
+  public OcDublinCoreBuilder setAccrualMethod(Optional<String> a) {
     this.accrualMethod = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setAccrualPeriodicity(Option<String> a) {
+  public OcDublinCoreBuilder setAccrualPeriodicity(Optional<String> a) {
     this.accrualPeriodicity = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setAccrualPolicy(Option<String> a) {
+  public OcDublinCoreBuilder setAccrualPolicy(Optional<String> a) {
     this.accrualPolicy = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setAlternative(Option<String> a) {
+  public OcDublinCoreBuilder setAlternative(Optional<String> a) {
     this.alternative = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setAudience(Option<String> a) {
+  public OcDublinCoreBuilder setAudience(Optional<String> a) {
     this.audience = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setAvailable(Option<String> a) {
+  public OcDublinCoreBuilder setAvailable(Optional<String> a) {
     this.available = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setBibliographicCitation(Option<String> a) {
+  public OcDublinCoreBuilder setBibliographicCitation(Optional<String> a) {
     this.bibliographicCitation = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setConformsTo(Option<String> a) {
+  public OcDublinCoreBuilder setConformsTo(Optional<String> a) {
     this.conformsTo = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setContributor(Option<String> a) {
+  public OcDublinCoreBuilder setContributor(Optional<String> a) {
     this.contributor = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setCoverage(Option<String> a) {
+  public OcDublinCoreBuilder setCoverage(Optional<String> a) {
     this.coverage = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setCreated(Option<Date> a) {
+  public OcDublinCoreBuilder setCreated(Optional<Date> a) {
     this.created = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setCreator(Option<String> a) {
+  public OcDublinCoreBuilder setCreator(Optional<String> a) {
     this.creator = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setDate(Option<Date> a) {
+  public OcDublinCoreBuilder setDate(Optional<Date> a) {
     this.date = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setDateAccepted(Option<Date> a) {
+  public OcDublinCoreBuilder setDateAccepted(Optional<Date> a) {
     this.dateAccepted = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setDateCopyrighted(Option<Date> a) {
+  public OcDublinCoreBuilder setDateCopyrighted(Optional<Date> a) {
     this.dateCopyrighted = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setDateSubmitted(Option<Date> a) {
+  public OcDublinCoreBuilder setDateSubmitted(Optional<Date> a) {
     this.dateSubmitted = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setDescription(Option<String> a) {
+  public OcDublinCoreBuilder setDescription(Optional<String> a) {
     this.description = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setEducationLevel(Option<String> a) {
+  public OcDublinCoreBuilder setEducationLevel(Optional<String> a) {
     this.educationLevel = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setExtent(Option<Long> a) {
+  public OcDublinCoreBuilder setExtent(Optional<Long> a) {
     this.extent = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setFormat(Option<String> a) {
+  public OcDublinCoreBuilder setFormat(Optional<String> a) {
     this.format = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setHasFormat(Option<String> a) {
+  public OcDublinCoreBuilder setHasFormat(Optional<String> a) {
     this.hasFormat = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setHasPart(Option<String> a) {
+  public OcDublinCoreBuilder setHasPart(Optional<String> a) {
     this.hasPart = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setHasVersion(Option<String> a) {
+  public OcDublinCoreBuilder setHasVersion(Optional<String> a) {
     this.hasVersion = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setIdentifier(Option<String> a) {
+  public OcDublinCoreBuilder setIdentifier(Optional<String> a) {
     this.identifier = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setInstructionalMethod(Option<String> a) {
+  public OcDublinCoreBuilder setInstructionalMethod(Optional<String> a) {
     this.instructionalMethod = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setIsFormatOf(Option<String> a) {
+  public OcDublinCoreBuilder setIsFormatOf(Optional<String> a) {
     this.isFormatOf = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setIsPartOf(Option<String> a) {
+  public OcDublinCoreBuilder setIsPartOf(Optional<String> a) {
     this.isPartOf = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setIsReferencedBy(Option<String> a) {
+  public OcDublinCoreBuilder setIsReferencedBy(Optional<String> a) {
     this.isReferencedBy = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setIsReplacedBy(Option<String> a) {
+  public OcDublinCoreBuilder setIsReplacedBy(Optional<String> a) {
     this.isReplacedBy = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setIsRequiredBy(Option<String> a) {
+  public OcDublinCoreBuilder setIsRequiredBy(Optional<String> a) {
     this.isRequiredBy = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setIssued(Option<String> a) {
+  public OcDublinCoreBuilder setIssued(Optional<String> a) {
     this.issued = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setIsVersionOf(Option<String> a) {
+  public OcDublinCoreBuilder setIsVersionOf(Optional<String> a) {
     this.isVersionOf = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setLanguage(Option<String> a) {
+  public OcDublinCoreBuilder setLanguage(Optional<String> a) {
     this.language = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setLicense(Option<String> a) {
+  public OcDublinCoreBuilder setLicense(Optional<String> a) {
     this.license = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setMediator(Option<String> a) {
+  public OcDublinCoreBuilder setMediator(Optional<String> a) {
     this.mediator = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setMedium(Option<String> a) {
+  public OcDublinCoreBuilder setMedium(Optional<String> a) {
     this.medium = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setModified(Option<String> a) {
+  public OcDublinCoreBuilder setModified(Optional<String> a) {
     this.modified = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setProvenance(Option<String> a) {
+  public OcDublinCoreBuilder setProvenance(Optional<String> a) {
     this.provenance = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setPublisher(Option<String> a) {
+  public OcDublinCoreBuilder setPublisher(Optional<String> a) {
     this.publisher = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setReferences(Option<String> a) {
+  public OcDublinCoreBuilder setReferences(Optional<String> a) {
     this.references = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setRelation(Option<String> a) {
+  public OcDublinCoreBuilder setRelation(Optional<String> a) {
     this.relation = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setReplaces(Option<String> a) {
+  public OcDublinCoreBuilder setReplaces(Optional<String> a) {
     this.replaces = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setRequires(Option<String> a) {
+  public OcDublinCoreBuilder setRequires(Optional<String> a) {
     this.requires = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setRights(Option<String> a) {
+  public OcDublinCoreBuilder setRights(Optional<String> a) {
     this.rights = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setRightsHolder(Option<String> a) {
+  public OcDublinCoreBuilder setRightsHolder(Optional<String> a) {
     this.rightsHolder = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setSource(Option<String> a) {
+  public OcDublinCoreBuilder setSource(Optional<String> a) {
     this.source = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setSpatial(Option<String> a) {
+  public OcDublinCoreBuilder setSpatial(Optional<String> a) {
     this.spatial = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setSubject(Option<String> a) {
+  public OcDublinCoreBuilder setSubject(Optional<String> a) {
     this.subject = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setTableOfContents(Option<String> a) {
+  public OcDublinCoreBuilder setTableOfContents(Optional<String> a) {
     this.tableOfContents = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setTemporal(Option<String> a) {
+  public OcDublinCoreBuilder setTemporal(Optional<String> a) {
     this.temporal = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setTitle(Option<String> a) {
+  public OcDublinCoreBuilder setTitle(Optional<String> a) {
     this.title = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setType(Option<String> a) {
+  public OcDublinCoreBuilder setType(Optional<String> a) {
     this.type = a;
     return this;
   }
 
-  public OcDublinCoreBuilder setValid(Option<String> a) {
+  public OcDublinCoreBuilder setValid(Optional<String> a) {
     this.valid = a;
     return this;
   }
 
   public OcDublinCoreBuilder setAbstract(String a) {
-    this.abstrakt = some(a);
+    this.abstrakt = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setAccessRights(String a) {
-    this.accessRights = some(a);
+    this.accessRights = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setAccrualMethod(String a) {
-    this.accrualMethod = some(a);
+    this.accrualMethod = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setAccrualPeriodicity(String a) {
-    this.accrualPeriodicity = some(a);
+    this.accrualPeriodicity = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setAccrualPolicy(String a) {
-    this.accrualPolicy = some(a);
+    this.accrualPolicy = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setAlternative(String a) {
-    this.alternative = some(a);
+    this.alternative = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setAudience(String a) {
-    this.audience = some(a);
+    this.audience = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setAvailable(String a) {
-    this.available = some(a);
+    this.available = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setBibliographicCitation(String a) {
-    this.bibliographicCitation = some(a);
+    this.bibliographicCitation = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setConformsTo(String a) {
-    this.conformsTo = some(a);
+    this.conformsTo = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setContributor(String a) {
-    this.contributor = some(a);
+    this.contributor = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setCoverage(String a) {
-    this.coverage = some(a);
+    this.coverage = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setCreated(Date a) {
-    this.created = some(a);
+    this.created = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setCreator(String a) {
-    this.creator = some(a);
+    this.creator = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setDate(Date a) {
-    this.date = some(a);
+    this.date = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setDateAccepted(Date a) {
-    this.dateAccepted = some(a);
+    this.dateAccepted = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setDateCopyrighted(Date a) {
-    this.dateCopyrighted = some(a);
+    this.dateCopyrighted = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setDateSubmitted(Date a) {
-    this.dateSubmitted = some(a);
+    this.dateSubmitted = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setDescription(String a) {
-    this.description = some(a);
+    this.description = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setEducationLevel(String a) {
-    this.educationLevel = some(a);
+    this.educationLevel = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setExtent(Long a) {
-    this.extent = some(a);
+    this.extent = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setFormat(String a) {
-    this.format = some(a);
+    this.format = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setHasFormat(String a) {
-    this.hasFormat = some(a);
+    this.hasFormat = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setHasPart(String a) {
-    this.hasPart = some(a);
+    this.hasPart = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setHasVersion(String a) {
-    this.hasVersion = some(a);
+    this.hasVersion = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setIdentifier(String a) {
-    this.identifier = some(a);
+    this.identifier = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setInstructionalMethod(String a) {
-    this.instructionalMethod = some(a);
+    this.instructionalMethod = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setIsFormatOf(String a) {
-    this.isFormatOf = some(a);
+    this.isFormatOf = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setIsPartOf(String a) {
-    this.isPartOf = some(a);
+    this.isPartOf = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setIsReferencedBy(String a) {
-    this.isReferencedBy = some(a);
+    this.isReferencedBy = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setIsReplacedBy(String a) {
-    this.isReplacedBy = some(a);
+    this.isReplacedBy = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setIsRequiredBy(String a) {
-    this.isRequiredBy = some(a);
+    this.isRequiredBy = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setIssued(String a) {
-    this.issued = some(a);
+    this.issued = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setIsVersionOf(String a) {
-    this.isVersionOf = some(a);
+    this.isVersionOf = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setLanguage(String a) {
-    this.language = some(a);
+    this.language = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setLicense(String a) {
-    this.license = some(a);
+    this.license = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setMediator(String a) {
-    this.mediator = some(a);
+    this.mediator = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setMedium(String a) {
-    this.medium = some(a);
+    this.medium = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setModified(String a) {
-    this.modified = some(a);
+    this.modified = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setProvenance(String a) {
-    this.provenance = some(a);
+    this.provenance = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setPublisher(String a) {
-    this.publisher = some(a);
+    this.publisher = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setReferences(String a) {
-    this.references = some(a);
+    this.references = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setRelation(String a) {
-    this.relation = some(a);
+    this.relation = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setReplaces(String a) {
-    this.replaces = some(a);
+    this.replaces = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setRequires(String a) {
-    this.requires = some(a);
+    this.requires = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setRights(String a) {
-    this.rights = some(a);
+    this.rights = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setRightsHolder(String a) {
-    this.rightsHolder = some(a);
+    this.rightsHolder = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setSource(String a) {
-    this.source = some(a);
+    this.source = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setSpatial(String a) {
-    this.spatial = some(a);
+    this.spatial = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setSubject(String a) {
-    this.subject = some(a);
+    this.subject = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setTableOfContents(String a) {
-    this.tableOfContents = some(a);
+    this.tableOfContents = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setTemporal(String a) {
-    this.temporal = some(a);
+    this.temporal = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setTitle(String a) {
-    this.title = some(a);
+    this.title = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setType(String a) {
-    this.type = some(a);
+    this.type = Optional.of(a);
     return this;
   }
 
   public OcDublinCoreBuilder setValid(String a) {
-    this.valid = some(a);
+    this.valid = Optional.of(a);
     return this;
   }
 
-  @Override public Option<String> getAbstract() {
+  @Override public Optional<String> getAbstract() {
     return abstrakt;
   }
 
-  @Override public Option<String> getAccessRights() {
+  @Override public Optional<String> getAccessRights() {
     return accessRights;
   }
 
-  @Override public Option<String> getAccrualMethod() {
+  @Override public Optional<String> getAccrualMethod() {
     return accrualMethod;
   }
 
-  @Override public Option<String> getAccrualPeriodicity() {
+  @Override public Optional<String> getAccrualPeriodicity() {
     return accrualPeriodicity;
   }
 
-  @Override public Option<String> getAccrualPolicy() {
+  @Override public Optional<String> getAccrualPolicy() {
     return accrualPolicy;
   }
 
-  @Override public Option<String> getAlternative() {
+  @Override public Optional<String> getAlternative() {
     return alternative;
   }
 
-  @Override public Option<String> getAudience() {
+  @Override public Optional<String> getAudience() {
     return audience;
   }
 
-  @Override public Option<String> getAvailable() {
+  @Override public Optional<String> getAvailable() {
     return available;
   }
 
-  @Override public Option<String> getBibliographicCitation() {
+  @Override public Optional<String> getBibliographicCitation() {
     return bibliographicCitation;
   }
 
-  @Override public Option<String> getConformsTo() {
+  @Override public Optional<String> getConformsTo() {
     return conformsTo;
   }
 
-  @Override public Option<String> getContributor() {
+  @Override public Optional<String> getContributor() {
     return contributor;
   }
 
-  @Override public Option<String> getCoverage() {
+  @Override public Optional<String> getCoverage() {
     return coverage;
   }
 
-  private static final Function0<Date> createdNotSet = error("created not set");
-
   @Override public Date getCreated() {
-    return created.getOrElse(createdNotSet);
+    return created.orElseThrow(() -> new Error("created not set"));
   }
 
-  @Override public Option<String> getCreator() {
+  @Override public Optional<String> getCreator() {
     return creator;
   }
 
-  @Override public Option<Date> getDate() {
+  @Override public Optional<Date> getDate() {
     return date;
   }
 
-  @Override public Option<Date> getDateAccepted() {
+  @Override public Optional<Date> getDateAccepted() {
     return dateAccepted;
   }
 
-  @Override public Option<Date> getDateCopyrighted() {
+  @Override public Optional<Date> getDateCopyrighted() {
     return dateCopyrighted;
   }
 
-  @Override public Option<Date> getDateSubmitted() {
+  @Override public Optional<Date> getDateSubmitted() {
     return dateSubmitted;
   }
 
-  @Override public Option<String> getDescription() {
+  @Override public Optional<String> getDescription() {
     return description;
   }
 
-  @Override public Option<String> getEducationLevel() {
+  @Override public Optional<String> getEducationLevel() {
     return educationLevel;
   }
 
-  @Override public Option<Long> getExtent() {
+  @Override public Optional<Long> getExtent() {
     return extent;
   }
 
-  @Override public Option<String> getFormat() {
+  @Override public Optional<String> getFormat() {
     return format;
   }
 
-  @Override public Option<String> getHasFormat() {
+  @Override public Optional<String> getHasFormat() {
     return hasFormat;
   }
 
-  @Override public Option<String> getHasPart() {
+  @Override public Optional<String> getHasPart() {
     return hasPart;
   }
 
-  @Override public Option<String> getHasVersion() {
+  @Override public Optional<String> getHasVersion() {
     return hasVersion;
   }
 
-  @Override public Option<String> getIdentifier() {
+  @Override public Optional<String> getIdentifier() {
     return identifier;
   }
 
-  @Override public Option<String> getInstructionalMethod() {
+  @Override public Optional<String> getInstructionalMethod() {
     return instructionalMethod;
   }
 
-  @Override public Option<String> getIsFormatOf() {
+  @Override public Optional<String> getIsFormatOf() {
     return isFormatOf;
   }
 
-  @Override public Option<String> getIsPartOf() {
+  @Override public Optional<String> getIsPartOf() {
     return isPartOf;
   }
 
-  @Override public Option<String> getIsReferencedBy() {
+  @Override public Optional<String> getIsReferencedBy() {
     return isReferencedBy;
   }
 
-  @Override public Option<String> getIsReplacedBy() {
+  @Override public Optional<String> getIsReplacedBy() {
     return isReplacedBy;
   }
 
-  @Override public Option<String> getIsRequiredBy() {
+  @Override public Optional<String> getIsRequiredBy() {
     return isRequiredBy;
   }
 
-  @Override public Option<String> getIssued() {
+  @Override public Optional<String> getIssued() {
     return issued;
   }
 
-  @Override public Option<String> getIsVersionOf() {
+  @Override public Optional<String> getIsVersionOf() {
     return isVersionOf;
   }
 
-  @Override public Option<String> getLanguage() {
+  @Override public Optional<String> getLanguage() {
     return language;
   }
 
-  @Override public Option<String> getLicense() {
+  @Override public Optional<String> getLicense() {
     return license;
   }
 
-  @Override public Option<String> getMediator() {
+  @Override public Optional<String> getMediator() {
     return mediator;
   }
 
-  @Override public Option<String> getMedium() {
+  @Override public Optional<String> getMedium() {
     return medium;
   }
 
-  @Override public Option<String> getModified() {
+  @Override public Optional<String> getModified() {
     return modified;
   }
 
-  @Override public Option<String> getProvenance() {
+  @Override public Optional<String> getProvenance() {
     return provenance;
   }
 
-  @Override public Option<String> getPublisher() {
+  @Override public Optional<String> getPublisher() {
     return publisher;
   }
 
-  @Override public Option<String> getReferences() {
+  @Override public Optional<String> getReferences() {
     return references;
   }
 
-  @Override public Option<String> getRelation() {
+  @Override public Optional<String> getRelation() {
     return relation;
   }
 
-  @Override public Option<String> getReplaces() {
+  @Override public Optional<String> getReplaces() {
     return replaces;
   }
 
-  @Override public Option<String> getRequires() {
+  @Override public Optional<String> getRequires() {
     return requires;
   }
 
-  @Override public Option<String> getRights() {
+  @Override public Optional<String> getRights() {
     return rights;
   }
 
-  @Override public Option<String> getRightsHolder() {
+  @Override public Optional<String> getRightsHolder() {
     return rightsHolder;
   }
 
-  @Override public Option<String> getSource() {
+  @Override public Optional<String> getSource() {
     return source;
   }
 
-  @Override public Option<String> getSpatial() {
+  @Override public Optional<String> getSpatial() {
     return spatial;
   }
 
-  @Override public Option<String> getSubject() {
+  @Override public Optional<String> getSubject() {
     return subject;
   }
 
-  @Override public Option<String> getTableOfContents() {
+  @Override public Optional<String> getTableOfContents() {
     return tableOfContents;
   }
 
-  @Override public Option<String> getTemporal() {
+  @Override public Optional<String> getTemporal() {
     return temporal;
   }
 
-  private static final Function0<String> titleNotSet = error("title not set");
-
   @Override public String getTitle() {
-    return title.getOrElse(titleNotSet);
+    return title.orElseThrow(() -> new Error("title not set"));
   }
 
-  @Override public Option<String> getType() {
+  @Override public Optional<String> getType() {
     return type;
   }
 
-  @Override public Option<String> getValid() {
+  @Override public Optional<String> getValid() {
     return valid;
   }
 }

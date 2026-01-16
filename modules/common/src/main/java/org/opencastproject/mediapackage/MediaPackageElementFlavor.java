@@ -23,8 +23,6 @@ package org.opencastproject.mediapackage;
 
 import static java.lang.String.format;
 
-import org.opencastproject.util.data.Function;
-
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -214,13 +212,6 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
       throw new IllegalArgumentException(format("Unable to create element flavor from \"%s\"", s));
     return new MediaPackageElementFlavor(parts[0], parts[1]);
   }
-
-  public static final Function<String, MediaPackageElementFlavor> parseFlavor = new Function<String, MediaPackageElementFlavor>() {
-    @Override
-    public MediaPackageElementFlavor apply(String s) {
-      return parseFlavor(s);
-    }
-  };
 
   /**
    * JAXB adapter implementation.

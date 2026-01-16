@@ -27,9 +27,9 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaUser;
-import org.opencastproject.util.data.Option;
 
 import java.util.Date;
+import java.util.Optional;
 
 import javax.persistence.Access;
 import javax.persistence.AccessType;
@@ -88,7 +88,7 @@ public class EventCommentReplyDto {
 
   public static EventCommentReplyDto from(EventCommentReply reply) {
     EventCommentReplyDto dto = new EventCommentReplyDto();
-    if (reply.getId().isSome()) {
+    if (reply.getId().isPresent()) {
       dto.id = reply.getId().get().longValue();
     }
     dto.text = reply.getText();
@@ -208,7 +208,7 @@ public class EventCommentReplyDto {
       } catch (Exception ignore) { }
       user = new JpaUser(author, null, org, author, "ghost@localhost", "ghost", false);
     }
-    return EventCommentReply.create(Option.option(id), text, user, creationDate, modificationDate);
+    return EventCommentReply.create(Optional.ofNullable(id), text, user, creationDate, modificationDate);
   }
 
 }

@@ -25,7 +25,7 @@ import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.replay;
 
-import com.auth0.jwk.JwkException;
+import com.nimbusds.jose.JOSEException;
 
 import org.junit.Before;
 
@@ -41,7 +41,7 @@ public class JWTRequestParameterAuthenticationFilterTest extends JWTLoginTest {
           new JWTRequestParameterAuthenticationFilter();
 
   @Override @Before
-  public void setUp() throws NoSuchAlgorithmException, JwkException {
+  public void setUp() throws NoSuchAlgorithmException, JOSEException {
     super.setUp();
 
     // Prepare authentication filter

@@ -48,7 +48,8 @@ public interface OaiPmhConstants {
   String ERROR_NO_METADATA_FORMATS = "noMetadataFormats";
 
   String OAI_2_0_XML_NS = "http://www.openarchives.org/OAI/2.0/";
-  String OAI_2_0_SCHEMA_LOCATION = "http://www.openarchives.org/OAI/2.0/ http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd";
+  String OAI_2_0_SCHEMA_LOCATION = "http://www.openarchives.org/OAI/2.0/ "
+      + "http://www.openarchives.org/OAI/2.0/OAI-PMH.xsd";
 
   String OAI_DC_XML_NS = "http://www.openarchives.org/OAI/2.0/oai_dc/";
   URI OAI_DC_XML_NS_URI = uri(OAI_DC_XML_NS);

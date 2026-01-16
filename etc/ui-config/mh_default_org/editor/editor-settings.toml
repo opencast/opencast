@@ -66,6 +66,21 @@
 #
 # # This catalog is specified but empty, and as such will not be displayed
 # [metadata.configureFields."NameOfAnExtendedMetadataCatalog"]
+#
+# We disable some metadata by default.
+# Remove or comment out the following block to show all metadata:
+#
+[metadata.configureFields."EVENTS.EVENTS.DETAILS.CATALOG.EPISODE"]
+subject = {show = false}
+rightsHolder = {show = false}
+location = {show = false}
+source = {show = false}
+duration = {show = false}
+publisher = {show = false}
+created = {show = false}
+license = {show = false}
+contributor = {show = false}
+identifier = {show = false}
 
 
 ####

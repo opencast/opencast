@@ -88,12 +88,13 @@ public class MultimediaContentTypeImpl<S extends Segment> implements MultimediaC
    * @return the temporal decomposition
    */
   private TemporalDecomposition<S> createTemporalDecomposition(MultimediaContentType.Type contentType) {
-    if (type.equals(MultimediaContentType.Type.AudioVisual))
+    if (type.equals(MultimediaContentType.Type.AudioVisual)) {
       return new TemporalDecompositionImpl<S>(Segment.Type.AudioVisualSegment);
-    else if (type.equals(MultimediaContentType.Type.Audio))
+    } else if (type.equals(MultimediaContentType.Type.Audio)) {
       return new TemporalDecompositionImpl<S>(Segment.Type.AudioSegment);
-    else if (type.equals(MultimediaContentType.Type.Video))
+    } else if (type.equals(MultimediaContentType.Type.Video)) {
       return new TemporalDecompositionImpl<S>(Segment.Type.VideoSegment);
+    }
     throw new IllegalStateException("Unknown multimedia content type detected: " + contentType.toString());
   }
 
@@ -131,12 +132,15 @@ public class MultimediaContentTypeImpl<S extends Segment> implements MultimediaC
   public Node toXml(Document document) {
     Element node = document.createElement(type.toString());
     node.setAttribute("id", id);
-    if (mediaLocator != null)
+    if (mediaLocator != null) {
       node.appendChild(mediaLocator.toXml(document));
-    if (mediaTime != null)
+    }
+    if (mediaTime != null) {
       node.appendChild(mediaTime.toXml(document));
-    if (temporalDecomposition.hasSegments())
+    }
+    if (temporalDecomposition.hasSegments()) {
       node.appendChild(temporalDecomposition.toXml(document));
+    }
     return node;
   }
 

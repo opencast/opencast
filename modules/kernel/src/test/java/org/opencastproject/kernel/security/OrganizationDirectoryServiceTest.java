@@ -101,8 +101,9 @@ public class OrganizationDirectoryServiceTest {
 
       @Override
       public Organization getOrganization(String orgId) throws OrganizationDatabaseException, NotFoundException {
-        if (organization == null)
+        if (organization == null) {
           throw new NotFoundException();
+        }
         return organization;
       }
 

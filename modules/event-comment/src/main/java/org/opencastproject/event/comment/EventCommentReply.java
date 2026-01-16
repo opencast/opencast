@@ -30,11 +30,11 @@ import org.opencastproject.util.EqualsUtil;
 import org.opencastproject.util.Jsons;
 import org.opencastproject.util.Jsons.Obj;
 import org.opencastproject.util.Jsons.Val;
-import org.opencastproject.util.data.Option;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.Date;
+import java.util.Optional;
 
 /**
  * Business object for comment replies.
@@ -42,7 +42,7 @@ import java.util.Date;
 public final class EventCommentReply {
 
   /** comment reply identifier */
-  private Option<Long> id;
+  private Optional<Long> id;
 
   /** The comment reply text */
   private String text;
@@ -68,7 +68,7 @@ public final class EventCommentReply {
    * @throws IllegalArgumentException
    *           if some of the parameters aren't set
    */
-  public static EventCommentReply create(Option<Long> id, String text, User author) {
+  public static EventCommentReply create(Optional<Long> id, String text, User author) {
     Date creationDate = new Date();
     return create(id, text, author, creationDate, creationDate);
   }
@@ -90,7 +90,7 @@ public final class EventCommentReply {
    *           if some of the parameters aren't set
    */
   public static EventCommentReply create(
-      Option<Long> id,
+      Optional<Long> id,
       String text,
       User author,
       Date creationDate,
@@ -99,7 +99,7 @@ public final class EventCommentReply {
     return new EventCommentReply(id, text, author, creationDate, modificationDate);
   }
 
-  private EventCommentReply(Option<Long> id, String text, User author, Date creationDate, Date modificationDate) {
+  private EventCommentReply(Optional<Long> id, String text, User author, Date creationDate, Date modificationDate) {
     this.id = notNull(id, "id");
     this.text = notEmpty(text, "text");
     this.author = notNull(author, "author");
@@ -112,7 +112,7 @@ public final class EventCommentReply {
    *
    * @return the reply id
    */
-  public Option<Long> getId() {
+  public Optional<Long> getId() {
     return id;
   }
 
@@ -180,7 +180,7 @@ public final class EventCommentReply {
             Jsons.p("email", author.getEmail()));
 
     Val idValue = Jsons.ZERO_VAL;
-    if (id.isSome()) {
+    if (id.isPresent()) {
       idValue = Jsons.v(id.get());
     }
 

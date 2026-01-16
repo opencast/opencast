@@ -45,7 +45,6 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -70,6 +69,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
@@ -148,9 +148,12 @@ public class PlaylistsEndpoint {
       },
       responses = {
           @RestResponse(description = "Returns the playlist.", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "The specified playlist instance does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND),
-          @RestResponse(description = "The user doesn't have the rights to make this request.", responseCode = HttpServletResponse.SC_FORBIDDEN),
-          @RestResponse(description = "The request is invalid or inconsistent.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "The specified playlist instance does not exist.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND),
+          @RestResponse(description = "The user doesn't have the rights to make this request.",
+              responseCode = HttpServletResponse.SC_FORBIDDEN),
+          @RestResponse(description = "The request is invalid or inconsistent.",
+              responseCode = HttpServletResponse.SC_BAD_REQUEST),
       })
   public Response getPlaylistAsJson(
       @HeaderParam("Accept") String acceptHeader,
@@ -188,7 +191,8 @@ public class PlaylistsEndpoint {
       },
       responses = {
           @RestResponse(description = "Returns the playlist.", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "The request is invalid or inconsistent.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "The request is invalid or inconsistent.",
+              responseCode = HttpServletResponse.SC_BAD_REQUEST),
       })
   public Response getPlaylistsAsJson(
       @HeaderParam("Accept") String acceptHeader,
@@ -204,8 +208,8 @@ public class PlaylistsEndpoint {
     }
 
     SortCriterion sortCriterion = new SortCriterion("", SortCriterion.Order.None);
-    Option<String> optSort = Option.option(trimToNull(sort));
-    if (optSort.isSome()) {
+    Optional<String> optSort = Optional.ofNullable(trimToNull(sort));
+    if (optSort.isPresent()) {
       sortCriterion = SortCriterion.parse(optSort.get());
 
       switch (sortCriterion.getFieldName()) {
@@ -240,8 +244,10 @@ public class PlaylistsEndpoint {
       },
       responses = {
           @RestResponse(description = "Playlist created.", responseCode = HttpServletResponse.SC_CREATED),
-          @RestResponse(description = "The user doesn't have the rights to make this request.", responseCode = HttpServletResponse.SC_FORBIDDEN),
-          @RestResponse(description = "The request is invalid or inconsistent.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "The user doesn't have the rights to make this request.",
+              responseCode = HttpServletResponse.SC_FORBIDDEN),
+          @RestResponse(description = "The request is invalid or inconsistent.",
+              responseCode = HttpServletResponse.SC_BAD_REQUEST),
       })
   public Response createAsJson(
       @HeaderParam("Accept") String acceptHeader,
@@ -280,8 +286,10 @@ public class PlaylistsEndpoint {
       },
       responses = {
           @RestResponse(description = "Playlist updated.", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "The user doesn't have the rights to make this request.", responseCode = HttpServletResponse.SC_FORBIDDEN),
-          @RestResponse(description = "The request is invalid or inconsistent.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "The user doesn't have the rights to make this request.",
+              responseCode = HttpServletResponse.SC_FORBIDDEN),
+          @RestResponse(description = "The request is invalid or inconsistent.",
+              responseCode = HttpServletResponse.SC_BAD_REQUEST),
       })
   public Response updateAsJson(
       @HeaderParam("Accept") String acceptHeader,

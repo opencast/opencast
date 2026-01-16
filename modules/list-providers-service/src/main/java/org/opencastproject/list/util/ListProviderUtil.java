@@ -96,14 +96,14 @@ public final class ListProviderUtil {
       return map;
     }
 
-    int limit = query.getLimit().getOrElse(0);
-    int offset = query.getOffset().getOrElse(0);
+    int limit = query.getLimit().orElse(0);
+    int offset = query.getOffset().orElse(0);
     SmartIterator<String> si = new SmartIterator<>(limit, offset);
     return si.applyLimitAndOffset(map);
   }
 
   private static boolean noActionRequired(ResourceListQuery query) {
-    return query == null || (query.getFilters().isEmpty() && query.getOffset().isNone() && query.getLimit().isNone());
+    return query == null || (query.getFilters().isEmpty() && query.getOffset().isEmpty() && query.getLimit().isEmpty());
   }
 
   /**

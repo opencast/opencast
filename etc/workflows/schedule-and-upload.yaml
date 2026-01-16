@@ -1,0 +1,109 @@
+id: schedule-and-upload
+title: Process upon upload and schedule
+tags:
+  - upload
+  - schedule
+displayOrder: 1000
+description: |-
+  The default workflow for processing media.
+
+  If straight to publishing is checked, then the uploaded media will be published without cutting.
+configuration_panel_json: |-
+  [{
+    "fieldset": [
+      {
+        "type": "checkbox",
+        "name": "straightToPublishing",
+        "label": "Straight to publishing",
+        "value": true
+      }
+    ]
+  }]
+operations:
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # Apply default workflow properties
+
+  # The workflow properties are simplified for a better
+  # user experience, please preconfigure your defaults here.
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  - id: defaults
+    description: Applying default configuration values
+    configurations:
+      - straightToPublishing: true
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # Prepare asset
+
+  # Prepare the recording for asset management, including creation of
+  # previews, audio waveforms and storing of the recording data in
+  # the asset area for further processing.
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # Make sure all elements are downloaded from external sources and
+  # inside of Opencast
+  - id: include
+    description: Finalize upload and ingest
+    configurations:
+      - workflow-id: partial-ingest
+
+  # Archive the source material
+  - id: snapshot
+    description: Archive raw recording after ingest
+    configurations:
+      - source-tags: archive
+
+  # Create preview artifacts
+  - id: include
+    description: Prepare preview versions of the recording
+    configurations:
+      - workflow-id: partial-preview
+
+  # Archive generated preview assets
+  - id: snapshot
+    description: Archive preview information
+    configurations:
+      - source-tags: archive
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # Tag for review and cutting
+
+  # Add comments in order to mark the recording for preview and/or
+  # cutting.
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # Mark the recording for cutting
+  - id: comment
+    if: NOT ${straightToPublishing}
+    description: Mark the recording for cutting
+    configurations:
+      - description: Recording has not been cut yet.
+      - reason: EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.CUTTING
+      - action: create
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # Publish
+
+  # Encode and publish the recording to the predefined
+  # publication channels.
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  - id: include
+    if: ${straightToPublishing}
+    description: Publish the recording
+    configurations:
+      - workflow-id: partial-publish
+
+  # Archive the recording
+  - id: snapshot
+    if: ${straightToPublishing}
+    description: Archive publishing information
+    configurations:
+      - source-tags: archive
+
+  # Clean up work artifacts
+  - id: cleanup
+    fail-on-error: false
+    description: Remove temporary processing artifacts
+    configurations:
+      # On systems with shared workspace or working file repository
+      # you want to set this option to false.
+      - delete-external: true
+      # ACLs are required again when working through ActiveMQ messages
+      - preserve-flavors: security/*

@@ -41,8 +41,6 @@ import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.test.rest.RestServiceTestEnv;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.apache.commons.io.IOUtils;
 import org.json.simple.parser.ParseException;
 import org.junit.AfterClass;
@@ -52,21 +50,22 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.util.Map;
+import java.util.Optional;
 
 import uk.co.datumedge.hamcrest.json.SameJSONAs;
 
 public class EventsEndpointTest {
   private static final RestServiceTestEnv env = testEnvForClasses(TestEventsEndpoint.class);
 
-   @BeforeClass
-   public static void oneTimeSetUp() {
-     env.setUpServer();
-   }
+  @BeforeClass
+  public static void oneTimeSetUp() {
+    env.setUpServer();
+  }
 
-   @AfterClass
-   public static void oneTimeTearDown() {
-     env.tearDownServer();
-   }
+  @AfterClass
+  public static void oneTimeTearDown() {
+    env.tearDownServer();
+  }
 
   @Test
   public void testDeserializationOfAcl() throws IOException, ParseException {
@@ -130,14 +129,16 @@ public class EventsEndpointTest {
     given().multiPart("metadata", jsonString).pathParam("event_id", eventId).expect().statusCode(SC_NO_CONTENT)
             .when().post(env.host("{event_id}"));
     MetadataList actualMetadataList = TestEventsEndpoint.getCapturedMetadataList1().getValue();
-    assertThat(MetadataJson.listToJson(actualMetadataList, true).toString(), SameJSONAs.sameJSONAs(expectedJson).allowingAnyArrayOrdering());
+    assertThat(MetadataJson.listToJson(actualMetadataList, true).toString(),
+        SameJSONAs.sameJSONAs(expectedJson).allowingAnyArrayOrdering());
   }
 
   @Test
   public void testGetAllEventMetadata() throws IOException {
     String expectedJson = IOUtils.toString(getClass().getResource("/event-metadata-expected.json"), UTF_8);
     String eventId = TestEventsEndpoint.METADATA_GET_EVENT;
-    String result = given().pathParam("event_id", eventId).expect().statusCode(SC_OK).when().get(env.host("{event_id}/metadata")).asString();
+    String result = given().pathParam("event_id", eventId).expect().statusCode(SC_OK).when()
+        .get(env.host("{event_id}/metadata")).asString();
     assertThat(result, SameJSONAs.sameJSONAs(expectedJson).allowingAnyArrayOrdering());
   }
 
@@ -149,7 +150,8 @@ public class EventsEndpointTest {
     given().formParam("metadata", jsonString).pathParam("event_id", eventId).queryParam("type", "dublincore/episode")
             .expect().statusCode(SC_NO_CONTENT).when().put(env.host("{event_id}/metadata"));
     MetadataList actualMetadataList = TestEventsEndpoint.getCapturedMetadataList2().getValue();
-    assertThat(MetadataJson.collectionToJson(actualMetadataList.getMetadataByFlavor("dublincore/episode"), true).toString(),
+    assertThat(MetadataJson.collectionToJson(
+            actualMetadataList.getMetadataByFlavor("dublincore/episode"), true).toString(),
             SameJSONAs.sameJSONAs(expectedJson).allowingAnyArrayOrdering());
   }
 
@@ -176,11 +178,11 @@ public class EventsEndpointTest {
         .expect().statusCode(SC_NO_CONTENT).when().put(env.host("{event_id}/scheduling"));
 
     SchedulingUtils.SchedulingInfo schedulingInfo = new SchedulingUtils.SchedulingInfo();
-    schedulingInfo.setAgentId(Opt.nul(TestEventsEndpoint.getCapturedAgentId().getValue().get()));
-    schedulingInfo.setStartDate(Opt.nul(TestEventsEndpoint.getCapturedStartDate().getValue().get()));
-    schedulingInfo.setEndDate(Opt.nul(TestEventsEndpoint.getCapturedEndDate().getValue().get()));
+    schedulingInfo.setAgentId(Optional.ofNullable(TestEventsEndpoint.getCapturedAgentId().getValue().get()));
+    schedulingInfo.setStartDate(Optional.ofNullable(TestEventsEndpoint.getCapturedStartDate().getValue().get()));
+    schedulingInfo.setEndDate(Optional.ofNullable(TestEventsEndpoint.getCapturedEndDate().getValue().get()));
     if (TestEventsEndpoint.getCapturedAgentConfig().getValue().isPresent()) {
-      schedulingInfo.setInputs(Opt.some(TestEventsEndpoint.getCapturedAgentConfig()
+      schedulingInfo.setInputs(Optional.of(TestEventsEndpoint.getCapturedAgentConfig()
           .getValue().get().get(CaptureParameters.CAPTURE_DEVICE_NAMES)));
     }
     assertThat(schedulingInfo.toJson().toString(), SameJSONAs.sameJSONAs(jsonString).allowingAnyArrayOrdering());

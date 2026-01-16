@@ -50,7 +50,6 @@ import org.opencastproject.util.requests.SortCriterion;
 import org.opencastproject.util.requests.SortCriterion.Order;
 import org.opencastproject.workflow.api.WorkflowService;
 
-import com.entwinemedia.fn.data.json.SimpleSerializer;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -100,8 +99,6 @@ import javax.ws.rs.core.Response;
 public class JobEndpoint {
 
   private static final Logger logger = LoggerFactory.getLogger(JobEndpoint.class);
-  private static final SimpleSerializer serializer = new SimpleSerializer();
-
   public static final Response NOT_FOUND = Response.status(Response.Status.NOT_FOUND).build();
 
   private enum JobSort {
@@ -164,16 +161,16 @@ public class JobEndpoint {
     query.setOffset(offset);
 
     String fHostname = null;
-    if (query.getHostname().isSome())
+    if (query.getHostname().isPresent())
       fHostname = StringUtils.trimToNull(query.getHostname().get());
     String fNodeName = null;
-    if (query.getNodeName().isSome())
+    if (query.getNodeName().isPresent())
       fNodeName = StringUtils.trimToNull(query.getNodeName().get());
     String fStatus = null;
-    if (query.getStatus().isSome())
+    if (query.getStatus().isPresent())
       fStatus = StringUtils.trimToNull(query.getStatus().get());
     String fFreeText = null;
-    if (query.getFreeText().isSome())
+    if (query.getFreeText().isPresent())
       fFreeText = StringUtils.trimToNull(query.getFreeText().get());
 
     List<JobExtended> jobs = new ArrayList<>();
@@ -238,8 +235,8 @@ public class JobEndpoint {
     JobComparator comparator = new JobComparator(sortKey, ascending);
     Collections.sort(jobs, comparator);
     List<JsonObject> json = getJobsAsJSON(new SmartIterator(
-            query.getLimit().getOrElse(0),
-            query.getOffset().getOrElse(0))
+            query.getLimit().orElse(0),
+            query.getOffset().orElse(0))
             .applyLimitAndOffset(jobs));
 
     return RestUtils.okJsonList(json, offset, limit, jobs.size());

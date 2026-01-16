@@ -164,10 +164,7 @@ public abstract class CoverImageWorkflowOperationHandlerBase extends AbstractWor
       coverImage.setMimeType(MimeTypes.PNG);
 
       // Add tags
-      for (String tag : tagsAndFlavors.getTargetTags()) {
-        logger.trace("Tagging image with '{}'", tag);
-        coverImage.addTag(tag);
-      }
+      applyTargetTagsToElement(tagsAndFlavors.getTargetTags(), coverImage);
 
       mediaPackage.add(coverImage);
     } catch (MediaPackageException | NotFoundException | ServiceRegistryException | CoverImageException

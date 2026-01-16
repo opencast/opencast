@@ -87,8 +87,6 @@ import org.opencastproject.workflow.api.WorkflowUtil;
 import org.opencastproject.workflow.handler.distribution.InternalPublicationChannel;
 import org.opencastproject.workspace.api.Workspace;
 
-import com.entwinemedia.fn.data.Opt;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
@@ -174,6 +172,7 @@ public class EditorServiceImpl implements EditorService {
   private MediaPackageElementFlavor smilSilenceFlavor;
   private ElasticsearchIndex searchIndex;
   private MediaPackageElementFlavor captionsFlavor;
+  private MediaPackageElementFlavor chapterFlavor;
   private String thumbnailWfProperty;
   private List<MediaPackageElementFlavor> thumbnailSourcePrimary;
   private String distributionDirectory;
@@ -187,6 +186,7 @@ public class EditorServiceImpl implements EditorService {
   private static final String DEFAULT_SMIL_SILENCE_FLAVOR = "*/silence";
   private static final String DEFAULT_PREVIEW_VIDEO_SUBTYPE = "video+preview";
   private static final String DEFAULT_CAPTIONS_FLAVOR = "captions/*";
+  private static final String DEFAULT_CHAPTER_FLAVOR = "chapters/*";
   private static final String DEFAULT_THUMBNAIL_SUBTYPE = "player+preview";
   private static final String DEFAULT_THUMBNAIL_WF_PROPERTY = "thumbnail_edited";
   private static final List<MediaPackageElementFlavor> DEFAULT_THUMBNAIL_PRIORITY_FLAVOR = new ArrayList<>();
@@ -201,6 +201,7 @@ public class EditorServiceImpl implements EditorService {
   public static final String OPT_SMIL_SILENCE_FLAVOR = "smil.silence.flavor";
   public static final String OPT_PREVIEW_VIDEO_SUBTYPE = "preview.video.subtype";
   public static final String OPT_CAPTIONS_FLAVOR = "captions.flavor";
+  public static final String OPT_CHAPTER_FLAVOR = "chapter.flavor";
   public static final String OPT_THUMBNAILSUBTYPE = "thumbnail.subtype";
   public static final String OPT_THUMBNAIL_WF_PROPERTY = "thumbnail.workflow.property";
   public static final String OPT_THUMBNAIL_PRIORITY_FLAVOR = "thumbnail.priority.flavor";
@@ -341,6 +342,11 @@ public class EditorServiceImpl implements EditorService {
     captionsFlavor = MediaPackageElementFlavor.parseFlavor(
             StringUtils.defaultString((String) properties.get(OPT_CAPTIONS_FLAVOR), DEFAULT_CAPTIONS_FLAVOR));
     logger.debug("Caption flavor set to '{}'", captionsFlavor);
+
+    // Flavor for chapters
+    chapterFlavor = MediaPackageElementFlavor.parseFlavor(
+        StringUtils.defaultString((String) properties.get(OPT_CHAPTER_FLAVOR), DEFAULT_CHAPTER_FLAVOR));
+    logger.debug("Chapter flavor set to '{}'", chapterFlavor);
 
     thumbnailSubType =  Objects.toString(properties.get(OPT_THUMBNAILSUBTYPE), DEFAULT_THUMBNAIL_SUBTYPE);
     logger.debug("Thumbnail subtype set to '{}'", thumbnailSubType);
@@ -543,8 +549,12 @@ public class EditorServiceImpl implements EditorService {
    *          the subtitles to be added
    * @throws IOException
    */
-  private MediaPackage processSubtitleTrack(MediaPackage mediaPackage, List<EditingData.Subtitle> subtitles)
-          throws IOException, IllegalArgumentException {
+  private MediaPackage processSubtitleTrack(
+      MediaPackage mediaPackage,
+      List<EditingData.Subtitle> subtitles,
+      MediaPackageElementFlavor newTrackFlavor,
+      String newFileName
+  ) throws IOException, IllegalArgumentException {
     for (EditingData.Subtitle subtitle : subtitles) {
       // Generate ID for new tracks
       String subtitleId = UUID.randomUUID().toString();
@@ -553,7 +563,7 @@ public class EditorServiceImpl implements EditorService {
       // Check if subtitle already exists
       for (Track t : mediaPackage.getTracks()) {
         if (t.getIdentifier().matches(subtitle.getId())) {
-          logger.debug("Set Identifier for Subtitle-Track to: {}", t.getIdentifier());
+          logger.debug("Set Identifier for {}-Track to: {}", newTrackFlavor.getType(), t.getIdentifier());
           subtitleId = t.getIdentifier();
           trackId = t.getIdentifier();
           break;
@@ -578,17 +588,14 @@ public class EditorServiceImpl implements EditorService {
 
       // Put updated filename in working file repository and update the track.
       try (InputStream is = IOUtils.toInputStream(subtitle.getSubtitle(), "UTF-8")) {
-        URI subtitleUri = workspace.put(mediaPackage.getIdentifier().toString(), subtitleId, "subtitle.vtt", is);
+        URI subtitleUri = workspace.put(mediaPackage.getIdentifier().toString(), subtitleId, newFileName + ".vtt", is);
 
         // If not exists, create new Track
         if (track == null) {
-          MediaPackageElementBuilder mpeBuilder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
           // TODO: Figure out which flavor new subtitles from the editor should have
-          track = (Track) mpeBuilder.elementFromURI(subtitleUri, MediaPackageElement.Type.Track,
-                  new MediaPackageElementFlavor(captionsFlavor.getType(),"source"));
-          mediaPackage.add(track);
-          logger.info("Creating new subtitle track " + track.getIdentifier() + " with tags "
-                  + track.getTags().toString());
+          track = (Track) mediaPackage.add(subtitleUri, MediaPackageElement.Type.Track,
+              new MediaPackageElementFlavor(newTrackFlavor.getType(),"source"));
+          logger.info("Creating new {} track {}", newTrackFlavor.getType(), track.getIdentifier());
         }
 
         track.setURI(subtitleUri);
@@ -725,8 +732,8 @@ public class EditorServiceImpl implements EditorService {
    */
   private Event getEvent(final String mediaPackageId) throws EditorServiceException {
     try {
-      Opt<Event> optEvent = index.getEvent(mediaPackageId, searchIndex);
-      if (optEvent.isNone()) {
+      Optional<Event> optEvent = index.getEvent(mediaPackageId, searchIndex);
+      if (optEvent.isEmpty()) {
         errorExit("Event not found", mediaPackageId,
                 ErrorStatus.MEDIAPACKAGE_NOT_FOUND);
       } else {
@@ -995,6 +1002,19 @@ public class EditorServiceImpl implements EditorService {
       }
     }
 
+    // Get chapters too
+    Track[] chapterTracks = mp.getTracks(chapterFlavor);
+    List<EditingData.Subtitle> chapters = new ArrayList<>();
+    for (Track t: chapterTracks) {
+      try {
+        File chapterFile = workspace.get(t.getURI());
+        String chapterString = FileUtils.readFileToString(chapterFile, StandardCharsets.UTF_8);
+        chapters.add(new EditingData.Subtitle(t.getIdentifier(), chapterString, t.getTags()));
+      } catch (NotFoundException | IOException e) {
+        errorExit("Could not read chapter from file", mediaPackageId, ErrorStatus.UNKNOWN);
+      }
+    }
+
     // Get tracks from the internal publication because it is a lot faster than getting them from the asset manager
     // for some reason.
     final List<TrackData> tracks = trackList.stream().map(track -> {
@@ -1051,8 +1071,8 @@ public class EditorServiceImpl implements EditorService {
     User user = securityService.getUser();
 
     return new EditingData(segments, tracks, workflows, mp.getDuration(), mp.getTitle(), event.getRecordingStartDate(),
-            event.getSeriesId(), event.getSeriesName(), workflowActive, waveformList, subtitles, localPublication,
-            lockingActive, lockRefresh, user, "");
+            event.getSeriesId(), event.getSeriesName(), workflowActive, waveformList, subtitles, chapters,
+            localPublication, lockingActive, lockRefresh, user, "");
   }
 
 
@@ -1138,7 +1158,17 @@ public class EditorServiceImpl implements EditorService {
 
     try {
       if (editingData.getSubtitles() != null) {
-        mediaPackage = processSubtitleTrack(mediaPackage, editingData.getSubtitles());
+        mediaPackage = processSubtitleTrack(mediaPackage, editingData.getSubtitles(), captionsFlavor, "subtitle");
+      }
+    } catch (IOException e) {
+      errorExit("Unable to add subtitle track to archive", mediaPackageId, ErrorStatus.UNKNOWN, e);
+    } catch (IllegalArgumentException e) {
+      errorExit("Illegal subtitle given", mediaPackageId, ErrorStatus.UNKNOWN, e);
+    }
+
+    try {
+      if (editingData.getChapters() != null) {
+        mediaPackage = processSubtitleTrack(mediaPackage, editingData.getChapters(), chapterFlavor, "chapters");
       }
     } catch (IOException e) {
       errorExit("Unable to add subtitle track to archive", mediaPackageId, ErrorStatus.UNKNOWN, e);

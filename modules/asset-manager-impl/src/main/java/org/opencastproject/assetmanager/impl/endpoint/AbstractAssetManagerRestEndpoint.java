@@ -48,7 +48,6 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.util.Checksum;
 import org.opencastproject.util.ChecksumType;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -344,7 +343,7 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
             String suffix = "unknown";
             if (asset.getMimeType().isPresent()) {
               var mimetype = asset.getMimeType().get();
-              if (mimetype.getSuffix().isSome()) {
+              if (mimetype.getSuffix().isPresent()) {
                 suffix = mimetype.getSuffix().get();
               }
             }
@@ -354,11 +353,13 @@ public abstract class AbstractAssetManagerRestEndpoint extends AbstractJobProduc
           }
 
           // Write the file contents back
-          Option<Long> length = asset.getSize() > 0 ? Option.some(asset.getSize()) : Option.none();
+          Optional<Long> length = asset.getSize() > 0 ? Optional.of(asset.getSize()) : Optional.empty();
           return ok(asset.getInputStream(),
-                  asset.getMimeType().isPresent() ? Option.some(asset.getMimeType().get().toString()) : Option.none(),
+                  asset.getMimeType().isPresent()
+                      ? Optional.of(asset.getMimeType().get().toString())
+                      : Optional.empty(),
                   length,
-                  Option.some(fileName));
+                  Optional.of(fileName));
         }
         // none
         return notFound();

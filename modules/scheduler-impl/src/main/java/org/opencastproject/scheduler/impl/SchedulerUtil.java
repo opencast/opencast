@@ -203,8 +203,9 @@ public final class SchedulerUtil {
     sb.append(CharUtils.LF);
 
     for (Catalog c : event.getMediaPackage().getCatalogs()) {
-      if (!catalogFlavors.contains(c.getFlavor()))
+      if (!catalogFlavors.contains(c.getFlavor())) {
         continue;
+      }
 
       DublinCoreCatalog dublinCore;
       try {
@@ -227,8 +228,9 @@ public final class SchedulerUtil {
             sb.append(" (");
             if (hasLanguageDefined) {
               sb.append("lang:").append(value.getLanguage());
-              if (value.getEncodingScheme().isPresent())
+              if (value.getEncodingScheme().isPresent()) {
                 sb.append("/");
+              }
             }
 
             if (value.getEncodingScheme().isPresent()) {

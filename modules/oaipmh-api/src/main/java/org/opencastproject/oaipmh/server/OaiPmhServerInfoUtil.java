@@ -20,10 +20,9 @@
  */
 package org.opencastproject.oaipmh.server;
 
-import static org.opencastproject.util.data.Option.option;
-
 import org.opencastproject.security.api.SecurityService;
-import org.opencastproject.util.data.Option;
+
+import java.util.Optional;
 
 public final class OaiPmhServerInfoUtil {
   private OaiPmhServerInfoUtil() {
@@ -33,7 +32,7 @@ public final class OaiPmhServerInfoUtil {
   public static final String ORG_CFG_OAIPMH_SERVER_HOSTURL = "org.opencastproject.oaipmh.server.hosturl";
 
   /** Get the OAI-PMH server URL of the current organization. */
-  public static Option<String> oaiPmhServerUrlOfCurrentOrganization(SecurityService secSvc) {
-    return option(secSvc.getOrganization().getProperties().get(ORG_CFG_OAIPMH_SERVER_HOSTURL));
+  public static Optional<String> oaiPmhServerUrlOfCurrentOrganization(SecurityService secSvc) {
+    return Optional.ofNullable(secSvc.getOrganization().getProperties().get(ORG_CFG_OAIPMH_SERVER_HOSTURL));
   }
 }

@@ -50,8 +50,6 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-
 @Component(
     immediate = true,
     service = WorkflowOperationHandler.class,
@@ -96,7 +94,7 @@ public class AmberscriptAttachTranscriptionOperationHandler extends AbstractWork
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(
         workflowInstance, Configuration.none, Configuration.none, Configuration.many, Configuration.one);
     MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor();
-    List<String> targetTagOption = tagsAndFlavors.getTargetTags();
+    ConfiguredTagsAndFlavors.TargetTags targetTagOption = tagsAndFlavors.getTargetTags();
     String captionFormatOption = StringUtils.trimToNull(operation.getConfiguration(TARGET_CAPTION_FORMAT));
     MediaPackageElement.Type type = getTargetType(operation.getConfiguration(TARGET_TYPE));
 
@@ -129,9 +127,7 @@ public class AmberscriptAttachTranscriptionOperationHandler extends AbstractWork
       convertedTranscription.addTag("generator-type:auto");
       convertedTranscription.addTag("generator:amberscript");
       convertedTranscription.setFlavor(targetFlavor);
-      for (String tag : targetTagOption) {
-        convertedTranscription.addTag(tag);
-      }
+      applyTargetTagsToElement(targetTagOption, convertedTranscription);
       mediaPackage.add(convertedTranscription);
       logger.info("Added transcription to the media package {} as {}: {}", mediaPackage,
           convertedTranscription.getElementType(),

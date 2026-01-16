@@ -100,8 +100,9 @@ public class WorkflowOperationResultImpl implements WorkflowOperationResult {
    * @param action
    */
   public void setAction(Action action) {
-    if (action == null)
+    if (action == null) {
       throw new IllegalArgumentException("action must not be null.");
+    }
     this.action = action;
   }
 

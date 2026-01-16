@@ -72,7 +72,7 @@ import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workflow.api.WorkflowServiceDatabaseImpl;
 import org.opencastproject.workflow.api.WorkflowStateException;
 import org.opencastproject.workflow.api.WorkflowStateListener;
-import org.opencastproject.workflow.api.XmlWorkflowParser;
+import org.opencastproject.workflow.api.YamlWorkflowParser;
 import org.opencastproject.workflow.handler.workflow.ErrorResolutionWorkflowOperationHandler;
 import org.opencastproject.workflow.impl.WorkflowServiceImpl.HandlerRegistration;
 import org.opencastproject.workspace.api.Workspace;
@@ -218,8 +218,8 @@ public class WorkflowServiceImplTest {
 
     serviceRegistry = new ServiceRegistryInMemoryImpl(service, securityService, userDirectoryService,
             organizationDirectoryService, incidentService);
-    serviceRegistry.registerHost(REMOTE_HOST, REMOTE_HOST, "remote", Runtime.getRuntime().totalMemory(), Runtime.getRuntime().
-            availableProcessors(), Runtime.getRuntime().availableProcessors());
+    serviceRegistry.registerHost(REMOTE_HOST, REMOTE_HOST, "remote", Runtime.getRuntime().totalMemory(),
+            Runtime.getRuntime().availableProcessors(), Runtime.getRuntime().availableProcessors());
     serviceRegistry.registerService(REMOTE_SERVICE, REMOTE_HOST, "/path", true);
     service.setWorkspace(workspace);
 
@@ -235,8 +235,8 @@ public class WorkflowServiceImplTest {
 
     InputStream is = null;
     try {
-      is = WorkflowServiceImplTest.class.getResourceAsStream("/workflow-definition-exception-handler.xml");
-      WorkflowDefinition exceptionHandler = XmlWorkflowParser.parseWorkflowDefinition(is);
+      is = WorkflowServiceImplTest.class.getResourceAsStream("/workflow-definition-exception-handler.yaml");
+      WorkflowDefinition exceptionHandler = YamlWorkflowParser.parseWorkflowDefinition(is);
       IOUtils.closeQuietly(is);
 
       /* The exception handler workflow definition needs to be registered as the reference to it in
@@ -244,20 +244,20 @@ public class WorkflowServiceImplTest {
       scanner.putWorkflowDefinition(
               new WorkflowIdentifier("exception-handler", securityService.getOrganization().getId()), exceptionHandler);
 
-      is = WorkflowServiceImplTest.class.getResourceAsStream("/workflow-definition-1.xml");
-      workingDefinition = XmlWorkflowParser.parseWorkflowDefinition(is);
+      is = WorkflowServiceImplTest.class.getResourceAsStream("/workflow-definition-1.yaml");
+      workingDefinition = YamlWorkflowParser.parseWorkflowDefinition(is);
       IOUtils.closeQuietly(is);
 
-      is = WorkflowServiceImplTest.class.getResourceAsStream("/workflow-definition-2.xml");
-      failingDefinitionWithoutErrorHandler = XmlWorkflowParser.parseWorkflowDefinition(is);
+      is = WorkflowServiceImplTest.class.getResourceAsStream("/workflow-definition-2.yaml");
+      failingDefinitionWithoutErrorHandler = YamlWorkflowParser.parseWorkflowDefinition(is);
       IOUtils.closeQuietly(is);
 
-      is = WorkflowServiceImplTest.class.getResourceAsStream("/workflow-definition-3.xml");
-      failingDefinitionWithErrorHandler = XmlWorkflowParser.parseWorkflowDefinition(is);
+      is = WorkflowServiceImplTest.class.getResourceAsStream("/workflow-definition-3.yaml");
+      failingDefinitionWithErrorHandler = YamlWorkflowParser.parseWorkflowDefinition(is);
       IOUtils.closeQuietly(is);
 
-      is = WorkflowServiceImplTest.class.getResourceAsStream("/workflow-definition-4.xml");
-      pausingWorkflowDefinition = XmlWorkflowParser.parseWorkflowDefinition(is);
+      is = WorkflowServiceImplTest.class.getResourceAsStream("/workflow-definition-4.yaml");
+      pausingWorkflowDefinition = YamlWorkflowParser.parseWorkflowDefinition(is);
       IOUtils.closeQuietly(is);
 
     } catch (Exception e) {
@@ -351,9 +351,9 @@ public class WorkflowServiceImplTest {
     List<WorkflowInstance> workflowsInDb = service.getWorkflowInstancesByMediaPackage(
         mediapackage1.getIdentifier().toString());
     Assert.assertEquals(1, workflowsInDb.size());
-}
+  }
 
-protected WorkflowInstance startAndWait(WorkflowDefinition definition, MediaPackage mp, WorkflowState stateToWaitFor)
+  protected WorkflowInstance startAndWait(WorkflowDefinition definition, MediaPackage mp, WorkflowState stateToWaitFor)
           throws Exception {
     return startAndWait(definition, mp, null, stateToWaitFor);
   }
@@ -422,16 +422,20 @@ protected WorkflowInstance startAndWait(WorkflowDefinition definition, MediaPack
     def.setTitle("workflow-definition-1");
     def.setDescription("workflow-definition-1");
 
-    WorkflowOperationDefinitionImpl opDef = new WorkflowOperationDefinitionImpl("failOneTime", "fails once", null, true);
+    WorkflowOperationDefinitionImpl opDef = new WorkflowOperationDefinitionImpl("failOneTime", "fails once",
+        null, true);
     def.add(opDef);
 
     MediaPackage mp = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
 
     WorkflowInstance workflow = startAndWait(def, mp, WorkflowState.FAILED);
 
-    Assert.assertTrue(service.getWorkflowById(workflow.getId()).getOperations().get(0).getState() == OperationState.FAILED);
-    Assert.assertTrue(service.getWorkflowById(workflow.getId()).getOperations().get(0).getMaxAttempts() == 1);
-    Assert.assertTrue(service.getWorkflowById(workflow.getId()).getOperations().get(0).getFailedAttempts() == 1);
+    Assert.assertTrue(
+        service.getWorkflowById(workflow.getId()).getOperations().get(0).getState() == OperationState.FAILED);
+    Assert.assertTrue(
+        service.getWorkflowById(workflow.getId()).getOperations().get(0).getMaxAttempts() == 1);
+    Assert.assertTrue(
+        service.getWorkflowById(workflow.getId()).getOperations().get(0).getFailedAttempts() == 1);
   }
 
   @Test
@@ -441,7 +445,8 @@ protected WorkflowInstance startAndWait(WorkflowDefinition definition, MediaPack
     def.setTitle("workflow-definition-1");
     def.setDescription("workflow-definition-1");
 
-    WorkflowOperationDefinitionImpl opDef = new WorkflowOperationDefinitionImpl("failOneTime", "fails once", null, true);
+    WorkflowOperationDefinitionImpl opDef = new WorkflowOperationDefinitionImpl("failOneTime", "fails once",
+        null, true);
     opDef.setRetryStrategy(RetryStrategy.RETRY);
     def.add(opDef);
 
@@ -449,9 +454,12 @@ protected WorkflowInstance startAndWait(WorkflowDefinition definition, MediaPack
 
     WorkflowInstance workflow = startAndWait(def, mp, WorkflowState.SUCCEEDED);
 
-    Assert.assertTrue(service.getWorkflowById(workflow.getId()).getOperations().get(0).getState() == OperationState.SUCCEEDED);
-    Assert.assertTrue(service.getWorkflowById(workflow.getId()).getOperations().get(0).getMaxAttempts() == 2);
-    Assert.assertTrue(service.getWorkflowById(workflow.getId()).getOperations().get(0).getFailedAttempts() == 1);
+    Assert.assertTrue(
+        service.getWorkflowById(workflow.getId()).getOperations().get(0).getState() == OperationState.SUCCEEDED);
+    Assert.assertTrue(
+        service.getWorkflowById(workflow.getId()).getOperations().get(0).getMaxAttempts() == 2);
+    Assert.assertTrue(
+        service.getWorkflowById(workflow.getId()).getOperations().get(0).getFailedAttempts() == 1);
   }
 
   @Test
@@ -461,7 +469,8 @@ protected WorkflowInstance startAndWait(WorkflowDefinition definition, MediaPack
     def.setTitle("workflow-definition-1");
     def.setDescription("workflow-definition-1");
 
-    WorkflowOperationDefinitionImpl opDef = new WorkflowOperationDefinitionImpl("failOneTime", "fails once", null, true);
+    WorkflowOperationDefinitionImpl opDef = new WorkflowOperationDefinitionImpl("failOneTime", "fails once",
+        null, true);
     opDef.setRetryStrategy(RetryStrategy.HOLD);
     opDef.setMaxAttempts(2);
     def.add(opDef);
@@ -490,7 +499,8 @@ protected WorkflowInstance startAndWait(WorkflowDefinition definition, MediaPack
     def.setTitle("workflow-definition-1");
     def.setDescription("workflow-definition-1");
 
-    WorkflowOperationDefinitionImpl opDef = new WorkflowOperationDefinitionImpl("failTwice", "fails twice", null, true);
+    WorkflowOperationDefinitionImpl opDef = new WorkflowOperationDefinitionImpl("failTwice", "fails twice",
+        null, true);
     opDef.setRetryStrategy(RetryStrategy.HOLD);
     opDef.setMaxAttempts(3);
     def.add(opDef);
@@ -545,7 +555,8 @@ protected WorkflowInstance startAndWait(WorkflowDefinition definition, MediaPack
     def.setTitle("workflow-definition-1");
     def.setDescription("workflow-definition-1");
 
-    WorkflowOperationDefinitionImpl opDef = new WorkflowOperationDefinitionImpl("failTwice", "fails twice", null, true);
+    WorkflowOperationDefinitionImpl opDef = new WorkflowOperationDefinitionImpl("failTwice", "fails twice",
+        null, true);
     opDef.setRetryStrategy(RetryStrategy.HOLD);
     opDef.setMaxAttempts(3);
     opDef.setFailWorkflowOnException(true);
@@ -746,8 +757,8 @@ protected WorkflowInstance startAndWait(WorkflowDefinition definition, MediaPack
     /**
      * {@inheritDoc}
      *
-     * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-     *      org.opencastproject.job.api.JobContext)
+     * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#start(
+     *      org.opencastproject.workflow.api.WorkflowInstance, org.opencastproject.job.api.JobContext)
      */
     @Override
     public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
@@ -768,8 +779,8 @@ protected WorkflowInstance startAndWait(WorkflowDefinition definition, MediaPack
     /**
      * {@inheritDoc}
      *
-     * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-     *      org.opencastproject.job.api.JobContext)
+     * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#start(
+     *      org.opencastproject.workflow.api.WorkflowInstance, org.opencastproject.job.api.JobContext)
      */
     @Override
     public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
@@ -791,8 +802,8 @@ protected WorkflowInstance startAndWait(WorkflowDefinition definition, MediaPack
     /**
      * {@inheritDoc}
      *
-     * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-     *      org.opencastproject.job.api.JobContext)
+     * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#start(
+     *      org.opencastproject.workflow.api.WorkflowInstance, org.opencastproject.job.api.JobContext)
      */
     @Override
     public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext jobContext)
@@ -802,9 +813,10 @@ protected WorkflowInstance startAndWait(WorkflowDefinition definition, MediaPack
         throw new WorkflowOperationException("This operation handler fails on the first run on host: "
                 + oldExecutionHost);
       }
-      if (workflowInstance.getCurrentOperation().getExecutionHost().equals(oldExecutionHost))
+      if (workflowInstance.getCurrentOperation().getExecutionHost().equals(oldExecutionHost)) {
         throw new WorkflowOperationException("This operation handler fails on the second run at the same host: "
-                + oldExecutionHost);
+            + oldExecutionHost);
+      }
       return createResult(CONTINUE);
     }
 

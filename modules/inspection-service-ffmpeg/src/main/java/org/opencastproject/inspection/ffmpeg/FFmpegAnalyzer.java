@@ -91,8 +91,9 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
     command.add(binary);
     command.add("-show_format");
     command.add("-show_streams");
-    if (accurateFrameCount)
+    if (accurateFrameCount) {
       command.add("-count_frames");
+    }
     command.add("-of");
     command.add("json");
     command.add(media.getAbsolutePath().replaceAll(" ", "\\ "));

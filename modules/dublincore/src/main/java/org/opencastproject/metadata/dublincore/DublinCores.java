@@ -198,8 +198,8 @@ public final class DublinCores {
             XmlNamespaceBinding.mk(OC_PROPERTY_NS_PREFIX, OC_PROPERTY_NS_URI),
             // Opencast root tag
             XmlNamespaceBinding.mk(XMLConstants.DEFAULT_NS_PREFIX, OC_DC_CATALOG_NS_URI)));
-            //XMLSchema-instance namespace xsi
-            XmlNamespaceBinding.mk(XSI_NS_PREFIX, W3C_XML_SCHEMA_INSTANCE_NS_URI);
+    //XMLSchema-instance namespace xsi
+    XmlNamespaceBinding.mk(XSI_NS_PREFIX, W3C_XML_SCHEMA_INSTANCE_NS_URI);
     dc.setRootTag(OC_DC_CATALOG_ROOT_ELEMENT);
     return dc;
   }

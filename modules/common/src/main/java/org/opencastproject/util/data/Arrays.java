@@ -51,16 +51,11 @@ public final class Arrays {
   }
 
   /** Turn a value into a single element array. */
-  public static <A> Function<A, A[]> singleton(final Class<A> type) {
-    return new Function<A, A[]>() {
-      @Override
-      public A[] apply(A a) {
-        @SuppressWarnings("unchecked")
-        final A[] as = (A[]) Array.newInstance(type, 1);
-        as[0] = a;
-        return as;
-      }
-    };
+  public static <A> A[] singleton(Class<A> type, A a) {
+    @SuppressWarnings("unchecked")
+    A[] as = (A[]) Array.newInstance(type, 1);
+    as[0] = a;
+    return as;
   }
 
   /** Make a string from a collection separating each element by <code>sep</code>. */

@@ -21,21 +21,16 @@
 
 package org.opencastproject.util;
 
-import static org.opencastproject.util.data.Monadics.mlist;
-
 import org.opencastproject.util.data.Collections;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Function2;
-import org.opencastproject.util.data.Monadics;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Prelude;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /** JSON builder based on json-simple. */
 public final class Jsons {
@@ -43,18 +38,14 @@ public final class Jsons {
   }
 
   /** Check if a value is not {@link #ZERO_VAL}. */
-  public static final Function<Val, Boolean> notZero = new Function<Val, Boolean>() {
-    @Override public Boolean apply(Val val) {
-      return !ZERO_VAL.equals(val);
-    }
-  };
+  public static Boolean notZero(Val val) {
+    return !ZERO_VAL.equals(val);
+  }
 
   /** Get the value from a property. */
-  public static final Function<Prop, Val> getVal = new Function<Prop, Val>() {
-    @Override public Val apply(Prop prop) {
-      return prop.getVal();
-    }
-  };
+  public static Val getVal(Prop prop) {
+    return prop.getVal();
+  }
 
   /** JSON null. */
   public static final Val NULL = new Val() {
@@ -154,21 +145,19 @@ public final class Jsons {
   }
 
   private static JSONObject toJsonSimple(Obj obj) {
-    return mlist(obj.getProps()).foldl(new JSONObject(), new Function2<JSONObject, Prop, JSONObject>() {
-      @Override public JSONObject apply(JSONObject jo, Prop prop) {
-        jo.put(prop.getName(), toJsonSimple(prop.getVal()));
-        return jo;
-      }
-    });
+    JSONObject jo = new JSONObject();
+    for (Prop prop : obj.getProps()) {
+      jo.put(prop.getName(), toJsonSimple(prop.getVal()));
+    }
+    return jo;
   }
 
   private static JSONArray toJsonSimple(Arr arr) {
-    return mlist(arr.getVals()).foldl(new JSONArray(), new Function2<JSONArray, Val, JSONArray>() {
-      @Override public JSONArray apply(JSONArray ja, Val val) {
-        ja.add(toJsonSimple(val));
-        return ja;
-      }
-    });
+    JSONArray ja = new JSONArray();
+    for (Val val : arr.getVals()) {
+      ja.add(toJsonSimple(val));
+    }
+    return ja;
   }
 
   private static Object toJsonSimple(Val val) {
@@ -189,22 +178,26 @@ public final class Jsons {
 
   /** Create an object. */
   public static Obj obj(Prop... ps) {
-    return new Obj(mlist(ps).filter(notZero.o(getVal)).value());
+    List<Prop> filtered = Arrays.stream(ps)
+        .filter(p -> notZero(getVal(p)))
+        .toList();
+    return new Obj(filtered);
   }
 
   /** Create an array. */
   public static Arr arr(Val... vs) {
-    return new Arr(mlist(vs).filter(notZero).value());
+    List<Val> filtered = Arrays.stream(vs)
+        .filter(Jsons::notZero)
+        .toList();
+    return new Arr(filtered);
   }
 
   /** Create an array. */
   public static Arr arr(List<Val> vs) {
-    return new Arr(mlist(vs).filter(notZero).value());
-  }
-
-  /** Create an array. */
-  public static Arr arr(Monadics.ListMonadic<Val> vs) {
-    return new Arr(vs.filter(notZero).value());
+    List<Val> filtered = vs.stream()
+        .filter(Jsons::notZero)
+        .toList();
+    return new Arr(filtered);
   }
 
   public static Val v(Number v) {
@@ -215,11 +208,9 @@ public final class Jsons {
     return new SVal(v);
   }
 
-  public static final Function<String, Val> stringVal = new Function<String, Val>() {
-    @Override public Val apply(String s) {
-      return v(s);
-    }
-  };
+  public static Val stringVal(String s) {
+    return v(s);
+  }
 
   public static Val v(Boolean v) {
     return new SVal(v);
@@ -235,8 +226,8 @@ public final class Jsons {
   }
 
   /** Create a property. Passing none is like setting {@link #ZERO_VAL} which erases the property. */
-  public static Prop p(String key, Option<Val> val) {
-    return new Prop(key, val.getOrElse(ZERO_VAL));
+  public static Prop p(String key, Optional<Val> val) {
+    return new Prop(key, val.orElse(ZERO_VAL));
   }
 
   /** Create a property. Convenience. */
@@ -256,23 +247,17 @@ public final class Jsons {
 
   /** Merge a list of objects into one (last one wins). */
   public static Obj append(Obj... os) {
-    final List<Prop> props = mlist(os).foldl(new ArrayList<Prop>(), new Function2<ArrayList<Prop>, Obj, ArrayList<Prop>>() {
-      @Override public ArrayList<Prop> apply(ArrayList<Prop> props, Obj obj) {
-        props.addAll(obj.getProps());
-        return props;
-      }
-    });
+    List<Prop> props = Arrays.stream(os)
+        .flatMap(o -> o.getProps().stream())
+        .toList();
     return new Obj(props);
   }
 
   /** Append a list of arrays into one. */
   public static Arr append(Arr... as) {
-    final List<Val> vals = mlist(as).foldl(new ArrayList<Val>(), new Function2<ArrayList<Val>, Arr, ArrayList<Val>>() {
-      @Override public ArrayList<Val> apply(ArrayList<Val> vals, Arr arr) {
-        vals.addAll(arr.getVals());
-        return vals;
-      }
-    });
+    List<Val> vals = Arrays.stream(as)
+        .flatMap(a -> a.getVals().stream())
+        .toList();
     return new Arr(vals);
   }
 }

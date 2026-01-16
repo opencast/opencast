@@ -31,7 +31,6 @@
     <feature>eclipselink</feature>
 
     <!-- 3rd party libraries -->
-    <bundle>mvn:com.entwinemedia.common/functional/${functional.version}</bundle>
     <bundle>mvn:com.fasterxml.jackson.core/jackson-core/${jackson.version}</bundle>
     <bundle>mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-yaml/${jackson.version}</bundle>
     <bundle>mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-xml/${jackson.version}</bundle>
@@ -93,6 +92,9 @@
     <bundle>mvn:org.springframework/spring-expression/${spring.version}</bundle>
     <bundle>mvn:org.springframework/spring-tx/${spring.version}</bundle>
     <bundle>mvn:org.springframework/spring-web/${spring.version}</bundle>
+
+    <bundle>mvn:com.nimbusds/nimbus-jose-jwt/10.4.2</bundle>
+    <bundle>wrap:mvn:com.google.crypto.tink/tink/1.16.0$Bundle-SymbolicName=com.google.crypto.tink;Bundle-Version=1.16.0</bundle>
   </feature>
 
   <feature name="opencast-core" version="${project.version}">
@@ -175,7 +177,7 @@
     <bundle start-level="83">mvn:org.opencastproject/opencast-editor-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-email-template-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-email-template-service-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-engage-paella-player-7/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-engage-paella-player-8/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-engage-ui/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-event-comment/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-execute-workflowoperation/${project.version}</bundle>
@@ -221,6 +223,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-smil-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-speech-to-text-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-provider-influx/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-provider-matomo/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-export-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-export-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-provider-random/${project.version}</bundle>
@@ -331,6 +334,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-speech-to-text-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-speech-to-text-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-provider-influx/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-provider-matomo/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-export-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-export-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-service-api/${project.version}</bundle>
@@ -405,7 +409,7 @@
     <bundle start-level="83">mvn:org.opencastproject/opencast-editor-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-email-template-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-email-template-service-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-engage-paella-player-7/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-engage-paella-player-8/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-engage-ui/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-event-comment/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-execute-api/${project.version}</bundle>
@@ -457,6 +461,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-speech-to-text-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-speech-to-text-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-provider-influx/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-provider-matomo/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-export-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-export-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-statistics-service-api/${project.version}</bundle>
@@ -542,7 +547,6 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-caption-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-cover-image-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-cover-image-impl/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-cover-image-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-dictionary-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-dictionary-regexp/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-execute-api/${project.version}</bundle>
@@ -589,7 +593,7 @@
     <bundle start-level="83">mvn:org.opencastproject/opencast-editor/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-editor-service-remote/${project.version}</bundle>
     <bundle start-level="83">mvn:org.opencastproject/opencast-editor-service-api/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.opencastproject/opencast-engage-paella-player-7/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-engage-paella-player-8/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-engage-ui/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-lti/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-lti-service-api/${project.version}</bundle>
@@ -687,7 +691,7 @@
     <bundle dependency="true">mvn:com.graphql-java/graphql-java/${graphql.version}</bundle>
     <bundle dependency="true">mvn:io.github.graphql-java/graphql-java-annotations/${graphql-annotations.version}</bundle>
     <bundle dependency="true">wrap:mvn:com.graphql-java/graphql-java-extended-scalars/21.0$Bundle-SymbolicName=graphql-java-extended-scalars&amp;Bundle-Version=21.0</bundle>
-    <bundle dependency="true">mvn:com.github.ben-manes.caffeine/caffeine/3.1.8</bundle>
+    <bundle dependency="true">mvn:com.github.ben-manes.caffeine/caffeine/3.2.2</bundle>
 
     <!-- graphql transitive dependencies -->
     <bundle dependency="true">mvn:org.antlr/antlr4-runtime/4.7.2</bundle>
@@ -708,6 +712,15 @@
     <feature>opencast-graphql-tp</feature>
     <bundle start-level="82">mvn:org.opencastproject/opencast-graphql/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-graphql-ui/${project.version}</bundle>
+  </feature>
+
+  <feature name="opencast-plugin-paella7" version="${project.version}">
+    <conditional>
+      <condition>opencast-presentation</condition>
+      <condition>opencast-allinone</condition>
+      <condition>opencast-adminpresentation</condition>
+    </conditional>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-engage-paella-player-7/${project.version}</bundle>
   </feature>
 
   <feature name="opencast-plugin-crop_allinone" version="${project.version}">

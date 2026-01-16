@@ -38,7 +38,6 @@ import org.opencastproject.mediapackage.Track;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 import org.opencastproject.workflow.api.WorkflowOperationException;
@@ -65,6 +64,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class CompositeWorkflowOperationHandlerTest {
   private CompositeWorkflowOperationHandler operationHandler;
@@ -84,8 +84,16 @@ public class CompositeWorkflowOperationHandlerTest {
   private static final String PROFILE_ID = "composite";
   private static final String COMPOUND_TRACK_ID = "compound-workflow-operation-test-work";
 
-  private static final String TEST_LAYOUT = "{\"horizontalCoverage\":1.0,\"anchorOffset\":{\"referring\":{\"left\":1.0,\"top\":1.0},\"offset\":{\"y\":-20,\"x\":-20},\"reference\":{\"left\":1.0,\"top\":1.0}}};{\"horizontalCoverage\":0.2,\"anchorOffset\":{\"referring\":{\"left\":0.0,\"top\":0.0},\"offset\":{\"y\":-20,\"x\":-20},\"reference\":{\"left\":0.0,\"top\":0.0}}};{\"horizontalCoverage\":1.0,\"anchorOffset\":{\"referring\":{\"left\":1.0,\"top\":0.0},\"offset\":{\"y\":20,\"x\":20},\"reference\":{\"left\":1.0,\"top\":0.0}}}";
-  private static final String TEST_SINGLE_LAYOUT = "{\"horizontalCoverage\":1.0,\"anchorOffset\":{\"referring\": {\"left\":1.0,\"top\":1.0} ,\"offset\": {\"y\":-20,\"x\":-20} ,\"reference\": {\"left\":1.0,\"top\":1.0} }}; {\"horizontalCoverage\":1.0,\"anchorOffset\":{\"referring\": {\"left\":1.0,\"top\":0.0} ,\"offset\": {\"y\":20,\"x\":20} ,\"reference\": {\"left\":1.0,\"top\":0.0} }}";
+  private static final String TEST_LAYOUT = "{\"horizontalCoverage\":1.0,\"anchorOffset\":{\"referring\":{\"left\":1.0,"
+      + "\"top\":1.0},\"offset\":{\"y\":-20,\"x\":-20},\"reference\":{\"left\":1.0,\"top\":1.0}}};"
+      + "{\"horizontalCoverage\":0.2,\"anchorOffset\":{\"referring\":{\"left\":0.0,\"top\":0.0},"
+      + "\"offset\":{\"y\":-20,\"x\":-20},\"reference\":{\"left\":0.0,\"top\":0.0}}};{\"horizontalCoverage\":1.0,"
+      + "\"anchorOffset\":{\"referring\":{\"left\":1.0,\"top\":0.0},\"offset\":{\"y\":20,\"x\":20},"
+      + "\"reference\":{\"left\":1.0,\"top\":0.0}}}";
+  private static final String TEST_SINGLE_LAYOUT = "{\"horizontalCoverage\":1.0,\"anchorOffset\":{\"referring\": "
+      + "{\"left\":1.0,\"top\":1.0} ,\"offset\": {\"y\":-20,\"x\":-20} ,\"reference\": {\"left\":1.0,\"top\":1.0} }}; "
+      + "{\"horizontalCoverage\":1.0,\"anchorOffset\":{\"referring\": {\"left\":1.0,\"top\":0.0} ,"
+      + "\"offset\": {\"y\":20,\"x\":20} ,\"reference\": {\"left\":1.0,\"top\":0.0} }}";
   @Before
   public void setUp() throws Exception {
     MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
@@ -190,34 +198,34 @@ public class CompositeWorkflowOperationHandlerTest {
     Assert.assertTrue(Arrays.asList(targetTags.split("\\W")).containsAll(Arrays.asList(trackEncoded.getTags())));
   }
 
-    @Test
-    public void testBothAudioSourceNoWatermark() throws Exception {
-      setMockups();
+  @Test
+  public void testBothAudioSourceNoWatermark() throws Exception {
+    setMockups();
 
-      // operation configuration
-      String targetTags = "engage,compound";
-      Map<String, String> configurations = new HashMap<String, String>();
-      configurations.put("source-audio-name", ComposerService.BOTH); // equivalent to null
-      configurations.put("source-flavor-upper", "presenter/source");
-      configurations.put("source-flavor-lower", "presentation/source");
-      configurations.put("target-tags", targetTags);
-      configurations.put("target-flavor", "composite/work");
-      configurations.put("encoding-profile", "composite");
-      configurations.put("layout", "test");
-      configurations.put("layout-test", TEST_LAYOUT);
-      configurations.put("layout-single", TEST_SINGLE_LAYOUT);
-      configurations.put("output-resolution", "1900x1080");
-      configurations.put("output-background", "black");
+    // operation configuration
+    String targetTags = "engage,compound";
+    Map<String, String> configurations = new HashMap<String, String>();
+    configurations.put("source-audio-name", ComposerService.BOTH); // equivalent to null
+    configurations.put("source-flavor-upper", "presenter/source");
+    configurations.put("source-flavor-lower", "presentation/source");
+    configurations.put("target-tags", targetTags);
+    configurations.put("target-flavor", "composite/work");
+    configurations.put("encoding-profile", "composite");
+    configurations.put("layout", "test");
+    configurations.put("layout-test", TEST_LAYOUT);
+    configurations.put("layout-single", TEST_SINGLE_LAYOUT);
+    configurations.put("output-resolution", "1900x1080");
+    configurations.put("output-background", "black");
 
-      // run the operation handler
-      WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
+    // run the operation handler
+    WorkflowOperationResult result = getWorkflowOperationResult(mp, configurations);
 
-      // check track metadata
-      MediaPackage mpNew = result.getMediaPackage();
-      Assert.assertEquals(Action.CONTINUE, result.getAction());
-      Track trackEncoded = mpNew.getTrack(COMPOUND_TRACK_ID);
-      Assert.assertEquals("composite/work", trackEncoded.getFlavor().toString());
-      Assert.assertTrue(Arrays.asList(targetTags.split("\\W")).containsAll(Arrays.asList(trackEncoded.getTags())));
+    // check track metadata
+    MediaPackage mpNew = result.getMediaPackage();
+    Assert.assertEquals(Action.CONTINUE, result.getAction());
+    Track trackEncoded = mpNew.getTrack(COMPOUND_TRACK_ID);
+    Assert.assertEquals("composite/work", trackEncoded.getFlavor().toString());
+    Assert.assertTrue(Arrays.asList(targetTags.split("\\W")).containsAll(Arrays.asList(trackEncoded.getTags())));
   }
 
 
@@ -305,7 +313,8 @@ public class CompositeWorkflowOperationHandlerTest {
   }
 
   @Test
-  public void testSingleVideoStream() throws URISyntaxException, MalformedURLException, MediaPackageException, IOException, IllegalArgumentException, NotFoundException, ServiceRegistryException {
+  public void testSingleVideoStream() throws URISyntaxException, MalformedURLException, MediaPackageException,
+          IOException, IllegalArgumentException, NotFoundException, ServiceRegistryException {
     MediaPackageBuilder builder = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder();
 
     // test resources
@@ -357,9 +366,10 @@ public class CompositeWorkflowOperationHandlerTest {
     composerService = EasyMock.createNiceMock(ComposerService.class);
     EasyMock.expect(composerService.getProfile(PROFILE_ID)).andReturn(profile);
     EasyMock.expect(
-            composerService.composite((Dimension) EasyMock.anyObject(), Option.option((LaidOutElement<Track>) EasyMock.anyObject()),
+            composerService.composite((Dimension) EasyMock.anyObject(),
+                Optional.ofNullable((LaidOutElement<Track>) EasyMock.anyObject()),
                     (LaidOutElement<Track>) EasyMock.anyObject(),
-                    (Option<LaidOutElement<Attachment>>) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+                    (Optional<LaidOutElement<Attachment>>) EasyMock.anyObject(), (String) EasyMock.anyObject(),
                     (String) EasyMock.anyObject(),
                     (String) EasyMock.anyObject())).andReturn(job);
     EasyMock.replay(composerService);

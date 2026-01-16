@@ -1,0 +1,59 @@
+name: Maintenance » Cache FFmpeg
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 3 * * 6' # at 03:00 on Saturday
+
+jobs:
+  cache-ffmpeg:
+    strategy:
+      matrix:
+        arch:
+          - linuxarm64
+          - linux64
+        release:
+          - latest
+          - autobuild
+    name: Get FFmpeg (${{ matrix.release }} ${{ matrix.arch }})
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install s3cmd
+        run: |
+          set -eu
+          sudo apt update -q
+          sudo apt install -y -q jq s3cmd
+
+      - name: Get FFmpeg download URL
+        run: >
+          curl -fL
+          -H "Accept: application/vnd.github+json"
+          -H "X-GitHub-Api-Version: 2022-11-28"
+          https://api.github.com/repos/BtbN/FFmpeg-Builds/releases
+          | jq -r '
+            [
+              .[] | select(.tag_name | contains("${{ matrix.release }}")).assets[]
+              | select(.name | contains("${{ matrix.arch }}-gpl-"))
+              | select(.name | contains("linux"))
+              | select(.name | contains("shared") | not)
+            ]
+            | sort_by(.name)
+            | reverse
+            | .[0].browser_download_url' | tee download.url
+
+      - name: Download FFmpeg
+        run: |
+          wget "$(cat download.url)"
+
+      - name: Configure s3cmd
+        uses: lkiesow/configure-s3cmd@v1
+        with:
+          host: ${{ secrets.S3_HOST }}
+          access_key: ${{ secrets.S3_ACCESS_KEY }}
+          secret_key: ${{ secrets.S3_SECRET_KEY }}
+
+      - name: Upload tarball
+        run: >
+          s3cmd ls "s3://opencast-ffmpeg-static/$(ls ffmpeg-*.tar.xz)"
+          | grep -q ffmpeg
+          || s3cmd put -P ffmpeg-*.tar.xz s3://opencast-ffmpeg-static/

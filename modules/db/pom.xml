@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>19-SNAPSHOT</version>
+    <version>20-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -95,6 +95,18 @@
             <ignoredUnusedDeclaredDependency>net.java.dev.jna:jna</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>com.h2database:h2</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <detectJavaApiLink>true</detectJavaApiLink>
+          <maxmemory>512m</maxmemory>
+          <quiet>false</quiet>
+          <!-- This is required to work around checker-qual's changes, which munge the javadoc options file
+                and lead to very misleading errors about not finding classes in the org.osgi.framework.* namespace -->
+          <sourcepath>src/main/java</sourcepath>
         </configuration>
       </plugin>
       <plugin>

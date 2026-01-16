@@ -16,17 +16,17 @@ match the presenter track as intended.
 Parameter Table
 ---------------
 
-| configuration keys     | required | Example          | description                                                                                                  |
-|------------------------|----------|------------------|--------------------------------------------------------------------------------------------------------------|
-| subtitle-source-flavor | yes      | captions/source  | Flavor of the subtitle file(s) that shall be shifted.                                                        |
-| video-source-flavor    | yes      | branding/bumper  | Flavor of the video that will be used to determine the duration for the shifting of the subtitle timestamps. |
-| target-flavor          | yes      | captions/shifted | Flavor of the subtitle file(s) that will be created including the shifted timestamps                         |
+| configuration keys     | required | Example          | description                                                                                                    |
+|------------------------|----------|------------------|----------------------------------------------------------------------------------------------------------------|
+| subtitle-source-flavor | yes      | captions/source  | Flavor of the subtitle file(s) that shall be shifted.                                                          |
+| video-source-flavors   | yes      | branding/bumper  | Flavors of the videos that will be used to determine the duration for the shifting of the subtitle timestamps. |
+| target-flavor          | yes      | captions/shifted | Flavor of the subtitle file(s) that will be created including the shifted timestamps                           |
 
 
 Requirements
 ------------
-Please select a flavor for `video-source-flavor` that will select only a single/unique video. If multiple videos are 
-selected, or (in other words) if it's not clear which video file the operation has to use, the operation will fail.
+The operation will sum over all durations of all tracks in `video-source-flavors`. Please make sure the specified
+flavors only contain tracks by which duration you want the subtitles shifted.
 
 
 Additional Notes
@@ -40,14 +40,11 @@ will not override the old one. The tags of the original subtitle file will be co
 Operation Examples
 ------------------
 
-```XML
-<operation
-    id="subtitle-timeshift"
-    description="Create new subtitle file with shifted timestamps">
-  <configurations>
-    <configuration key="subtitle-source-flavor">captions/source</configuration>
-    <configuration key="target-flavor">captions/shifted</configuration>
-    <configuration key="video-source-flavor">branding/bumper</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: subtitle-timeshift
+    description: Create new subtitle file with shifted timestamps
+    configurations:
+      - subtitle-source-flavor: captions/source
+      - target-flavor: captions/shifted
+      - video-source-flavor: branding/bumper
 ```

@@ -21,11 +21,10 @@
 package org.opencastproject.oaipmh.server;
 
 import static org.apache.commons.lang3.StringUtils.trimToNull;
-import static org.opencastproject.util.data.Option.eq;
-import static org.opencastproject.util.data.Option.option;
 
 import org.opencastproject.oaipmh.OaiPmhConstants;
-import org.opencastproject.util.data.Option;
+
+import java.util.Optional;
 
 /**
  * Helper to encapsulate HTTP parameter handling.
@@ -45,55 +44,55 @@ public abstract class Params {
   abstract String getRepositoryUrl();
 
   boolean isVerbGetRecord() {
-    return getVerb().map(eq(OaiPmhConstants.VERB_GET_RECORD)).getOrElse(false);
+    return getVerb().map(s -> OaiPmhConstants.VERB_GET_RECORD.equals(s)).orElse(false);
   }
 
   boolean isVerbIdentify() {
-    return getVerb().map(eq(OaiPmhConstants.VERB_IDENTIFY)).getOrElse(false);
+    return getVerb().map(s -> OaiPmhConstants.VERB_IDENTIFY.equals(s)).orElse(false);
   }
 
   boolean isVerbListMetadataFormats() {
-    return getVerb().map(eq(OaiPmhConstants.VERB_LIST_METADATA_FORMATS)).getOrElse(false);
+    return getVerb().map(s -> OaiPmhConstants.VERB_LIST_METADATA_FORMATS.equals(s)).orElse(false);
   }
 
   boolean isVerbListSets() {
-    return getVerb().map(eq(OaiPmhConstants.VERB_LIST_SETS)).getOrElse(false);
+    return getVerb().map(s -> OaiPmhConstants.VERB_LIST_SETS.equals(s)).orElse(false);
   }
 
   boolean isVerbListIdentifiers() {
-    return getVerb().map(eq(OaiPmhConstants.VERB_LIST_IDENTIFIERS)).getOrElse(false);
+    return getVerb().map(s -> OaiPmhConstants.VERB_LIST_IDENTIFIERS.equals(s)).orElse(false);
   }
 
   boolean isVerbListRecords() {
-    return getVerb().map(eq(OaiPmhConstants.VERB_LIST_RECORDS)).getOrElse(false);
+    return getVerb().map(s -> OaiPmhConstants.VERB_LIST_RECORDS.equals(s)).orElse(false);
   }
 
-  Option<String> getVerb() {
-    return option(trimToNull(getParameter("verb")));
+  Optional<String> getVerb() {
+    return Optional.ofNullable(trimToNull(getParameter("verb")));
   }
 
-  Option<String> getIdentifier() {
-    return option(trimToNull(getParameter("identifier")));
+  Optional<String> getIdentifier() {
+    return Optional.ofNullable(trimToNull(getParameter("identifier")));
   }
 
-  Option<String> getMetadataPrefix() {
-    return option(trimToNull(getParameter("metadataPrefix")));
+  Optional<String> getMetadataPrefix() {
+    return Optional.ofNullable(trimToNull(getParameter("metadataPrefix")));
   }
 
-  Option<String> getFrom() {
-    return option(trimToNull(getParameter("from")));
+  Optional<String> getFrom() {
+    return Optional.ofNullable(trimToNull(getParameter("from")));
   }
 
-  Option<String> getUntil() {
-    return option(trimToNull(getParameter("until")));
+  Optional<String> getUntil() {
+    return Optional.ofNullable(trimToNull(getParameter("until")));
   }
 
-  Option<String> getSet() {
-    return option(trimToNull(getParameter("set")));
+  Optional<String> getSet() {
+    return Optional.ofNullable(trimToNull(getParameter("set")));
   }
 
-  Option<String> getResumptionToken() {
-    return option(trimToNull(getParameter("resumptionToken")));
+  Optional<String> getResumptionToken() {
+    return Optional.ofNullable(trimToNull(getParameter("resumptionToken")));
   }
 
   @Override

@@ -45,6 +45,7 @@ import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.attachment.AttachmentImpl;
 import org.opencastproject.mediapackage.identifier.IdImpl;
+import org.opencastproject.message.broker.api.update.AssetManagerUpdateHandler;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
@@ -57,7 +58,6 @@ import org.opencastproject.security.api.User;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
@@ -191,7 +191,8 @@ public class TestTasksEndpoint extends TasksEndpoint {
     am.setSecurityService(securityService);
     am.setAuthorizationService(authorizationService);
     am.setIndex(esIndex);
-
+    am.addEventHandler(EasyMock.createNiceMock(AssetManagerUpdateHandler.class));
+    am.addEventHandler(EasyMock.createNiceMock(AssetManagerUpdateHandler.class));
     return am;
   }
 
@@ -199,18 +200,18 @@ public class TestTasksEndpoint extends TasksEndpoint {
     return new AssetStore() {
 
       @Override
-      public Option<Long> getUsedSpace() {
-        return Option.none();
+      public Optional<Long> getUsedSpace() {
+        return Optional.empty();
       }
 
       @Override
-      public Option<Long> getUsableSpace() {
-        return Option.none();
+      public Optional<Long> getUsableSpace() {
+        return Optional.empty();
       }
 
       @Override
-      public Option<Long> getTotalSpace() {
-        return Option.none();
+      public Optional<Long> getTotalSpace() {
+        return Optional.empty();
       }
 
       @Override

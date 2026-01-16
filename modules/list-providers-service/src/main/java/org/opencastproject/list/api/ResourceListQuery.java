@@ -21,9 +21,8 @@
 
 package org.opencastproject.list.api;
 
-import org.opencastproject.util.data.Option;
-
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Query for the resource list
@@ -59,21 +58,21 @@ public interface ResourceListQuery {
    * 
    * @return the list limit
    */
-  Option<Integer> getLimit();
+  Optional<Integer> getLimit();
 
   /**
    * Returns the offset for the resource query
    * 
    * @return the list offset
    */
-  Option<Integer> getOffset();
+  Optional<Integer> getOffset();
 
   /**
    * Returns the name of the field by which the list should be sorted
    * 
    * @return the name of the field to use to sort the list
    */
-  Option<String> getSortBy();
+  Optional<String> getSortBy();
 
   /**
    * Returns if the given filter is or not set

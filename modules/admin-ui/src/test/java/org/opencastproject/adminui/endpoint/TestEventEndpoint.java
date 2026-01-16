@@ -97,7 +97,6 @@ import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PropertiesUtil;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workflow.api.WorkflowDefinition;
 import org.opencastproject.workflow.api.WorkflowDefinitionImpl;
@@ -106,8 +105,6 @@ import org.opencastproject.workflow.api.WorkflowOperationDefinitionImpl;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workflow.api.WorkflowSetImpl;
 import org.opencastproject.workspace.api.Workspace;
-
-import com.entwinemedia.fn.data.Opt;
 
 import net.fortuna.ical4j.model.property.RRule;
 
@@ -370,11 +367,11 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     metadataSvcs.setWorkspace(workspace);
 
     final Date now = DateTime.parse("2014-06-05T09:15:56Z").toDate();
-    EventComment comment = EventComment.create(Option.some(65L), "abc123", "mh_default_org", "Comment 1",
+    EventComment comment = EventComment.create(Optional.of(65L), "abc123", "mh_default_org", "Comment 1",
             userWithPermissions, "Sick", true, now, now);
-    EventComment comment2 = EventComment.create(Option.some(65L), "abc123", "mh_default_org", "Comment 2",
+    EventComment comment2 = EventComment.create(Optional.of(65L), "abc123", "mh_default_org", "Comment 2",
             userWithPermissions, "Defect", false, now, now);
-    EventCommentReply reply = EventCommentReply.create(Option.some(78L), "Cant reproduce", userWithoutPermissions, now,
+    EventCommentReply reply = EventCommentReply.create(Optional.of(78L), "Cant reproduce", userWithoutPermissions, now,
             now);
     comment2.addReply(reply);
 
@@ -389,7 +386,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
       @Override
       public EventComment answer() throws Throwable {
         EventComment current = c.getValue();
-        EventComment result = EventComment.create(Option.some(65L), current.getEventId(), current.getOrganization(),
+        EventComment result = EventComment.create(Optional.of(65L), current.getEventId(), current.getOrganization(),
                 current.getText(), current.getAuthor(), current.getReason(), current.isResolvedStatus(), now, now,
                 current.getReplies());
         return result;
@@ -523,14 +520,14 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     eventCatalogAdapterList.add(createEventCatalogUIAdapter("name 2"));
 
     IndexService indexService = EasyMock.createNiceMock(IndexService.class);
-    EasyMock.expect(indexService.getEvent("asdasd", searchIndex)).andReturn(Opt.some(event)).anyTimes();
-    EasyMock.expect(indexService.getEvent("exists", searchIndex)).andReturn(Opt.some(event)).anyTimes();
-    EasyMock.expect(indexService.getEvent("exists2", searchIndex)).andReturn(Opt.some(event2)).anyTimes();
-    EasyMock.expect(indexService.getEvent("archivedid", searchIndex)).andReturn(Opt.some(event2)).anyTimes();
-    EasyMock.expect(indexService.getEvent("workflowid", searchIndex)).andReturn(Opt.some(event3)).anyTimes();
-    EasyMock.expect(indexService.getEvent("notExists", searchIndex)).andReturn(Opt.<Event> none()).anyTimes();
-    EasyMock.expect(indexService.getEvent("notExists2", searchIndex)).andReturn(Opt.<Event> none()).anyTimes();
-    EasyMock.expect(indexService.getEvent("updateFailure", searchIndex)).andReturn(Opt.some(event3)).anyTimes();
+    EasyMock.expect(indexService.getEvent("asdasd", searchIndex)).andReturn(Optional.of(event)).anyTimes();
+    EasyMock.expect(indexService.getEvent("exists", searchIndex)).andReturn(Optional.of(event)).anyTimes();
+    EasyMock.expect(indexService.getEvent("exists2", searchIndex)).andReturn(Optional.of(event2)).anyTimes();
+    EasyMock.expect(indexService.getEvent("archivedid", searchIndex)).andReturn(Optional.of(event2)).anyTimes();
+    EasyMock.expect(indexService.getEvent("workflowid", searchIndex)).andReturn(Optional.of(event3)).anyTimes();
+    EasyMock.expect(indexService.getEvent("notExists", searchIndex)).andReturn(Optional.<Event> empty()).anyTimes();
+    EasyMock.expect(indexService.getEvent("notExists2", searchIndex)).andReturn(Optional.<Event> empty()).anyTimes();
+    EasyMock.expect(indexService.getEvent("updateFailure", searchIndex)).andReturn(Optional.of(event3)).anyTimes();
     EasyMock.expect(indexService.getEventMediapackage(event)).andReturn(mp1).anyTimes();
     EasyMock.expect(indexService.getEventCatalogUIAdapters()).andReturn(eventCatalogAdapterList).anyTimes();
     EasyMock.expect(indexService.getExtendedEventCatalogUIAdapters()).andReturn(Collections.emptyList()).anyTimes();

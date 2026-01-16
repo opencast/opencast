@@ -30,13 +30,13 @@ import org.opencastproject.util.EqualsUtil;
 import org.opencastproject.util.Jsons;
 import org.opencastproject.util.Jsons.Obj;
 import org.opencastproject.util.Jsons.Val;
-import org.opencastproject.util.data.Option;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Business object for comments.
@@ -47,7 +47,7 @@ public final class EventComment {
   public static final String REASON_NEEDS_CUTTING = "EVENTS.EVENTS.DETAILS.COMMENTS.REASONS.CUTTING";
 
   /** The comment identifier */
-  private Option<Long> id;
+  private Optional<Long> id;
 
   /** The event identifier */
   private String eventId;
@@ -88,7 +88,7 @@ public final class EventComment {
    * @throws IllegalArgumentException
    *           if id, text or author is not set
    */
-  public static EventComment create(Option<Long> id, String eventId, String organization, String text, User author) {
+  public static EventComment create(Optional<Long> id, String eventId, String organization, String text, User author) {
     return create(id, eventId, organization, text, author, null, false);
   }
 
@@ -109,7 +109,7 @@ public final class EventComment {
    *           if id, text, or author is not set
    */
   public static EventComment create(
-      Option<Long> id,
+      Optional<Long> id,
       String eventId,
       String organization,
       String text,
@@ -147,7 +147,7 @@ public final class EventComment {
    *           if id, text, author, creation date or modification date is not set
    */
   public static EventComment create(
-      Option<Long> id,
+      Optional<Long> id,
       String eventId,
       String organization,
       String text,
@@ -187,7 +187,7 @@ public final class EventComment {
    *           if id, text, author, creation date, modification date or replies is not set
    */
   public static EventComment create(
-      Option<Long> id,
+      Optional<Long> id,
       String eventId,
       String organization,
       String text,
@@ -203,7 +203,7 @@ public final class EventComment {
   }
 
   private EventComment(
-      Option<Long> id,
+      Optional<Long> id,
       String eventId,
       String organization,
       String text,
@@ -231,7 +231,7 @@ public final class EventComment {
    *
    * @return the id
    */
-  public Option<Long> getId() {
+  public Optional<Long> getId() {
     return id;
   }
 
@@ -374,7 +374,7 @@ public final class EventComment {
     }
 
     Val idValue = Jsons.ZERO_VAL;
-    if (id.isSome()) {
+    if (id.isPresent()) {
       idValue = Jsons.v(id.get());
     }
 

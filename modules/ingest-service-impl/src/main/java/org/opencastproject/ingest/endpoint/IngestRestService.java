@@ -55,7 +55,6 @@ import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Function0.X;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -123,23 +122,28 @@ import javax.ws.rs.core.Response.Status;
  * Creates and augments Opencast MediaPackages using the api. Stores media into the Working File Repository.
  */
 @Path("/ingest")
-@RestService(name = "ingestservice", title = "Ingest Service", abstractText = "This service creates and augments Opencast media packages that include media tracks, metadata "
-        + "catalogs and attachments.", notes = {
+@RestService(
+    name = "ingestservice",
+    title = "Ingest Service",
+    abstractText = "This service creates and augments Opencast media packages that include media tracks, metadata "
+        + "catalogs and attachments.",
+    notes = {
         "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
         "If the service is down or not working it will return a status 503, this means the the underlying service is "
                 + "not working and is either restarting or has failed",
         "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
-                + "other words, there is a bug! You should file an error report with your server logs from the time when the "
-                + "error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>" })
+                + "other words, there is a bug! You should file an error report with your server logs from the time "
+                + "when the error occurred: "
+                + "<a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>" })
 @Component(
-  immediate = true,
-  service = IngestRestService.class,
-  property = {
-    "service.description=Ingest REST Endpoint",
-    "opencast.service.type=org.opencastproject.ingest",
-    "opencast.service.path=/ingest",
-    "opencast.service.jobproducer=true"
-  }
+    immediate = true,
+    service = IngestRestService.class,
+    property = {
+        "service.description=Ingest REST Endpoint",
+        "opencast.service.type=org.opencastproject.ingest",
+        "opencast.service.path=/ingest",
+        "opencast.service.jobproducer=true"
+    }
 )
 @JaxrsResource
 public class IngestRestService extends AbstractJobProducerEndpoint {
@@ -245,10 +249,18 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @PUT
   @Produces(MediaType.TEXT_XML)
   @Path("createMediaPackageWithID/{id}")
-  @RestQuery(name = "createMediaPackageWithID", description = "Create an empty media package with ID /n Overrides Existing Mediapackage ", pathParameters = {
-          @RestParameter(description = "The Id for the new Mediapackage", isRequired = true, name = "id", type = RestParameter.Type.STRING) }, responses = {
+  @RestQuery(
+      name = "createMediaPackageWithID",
+      description = "Create an empty media package with ID /n Overrides Existing Mediapackage ",
+      pathParameters = {
+          @RestParameter(description = "The Id for the new Mediapackage", isRequired = true, name = "id",
+              type = RestParameter.Type.STRING)
+      },
+      responses = {
           @RestResponse(description = "Returns media package", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
+          @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+      },
+      returnDescription = "")
   public Response createMediaPackage(@PathParam("id") String mediaPackageId) {
     MediaPackage mp;
     try {
@@ -265,10 +277,15 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @GET
   @Produces(MediaType.TEXT_XML)
   @Path("createMediaPackage")
-  @RestQuery(name = "createMediaPackage", description = "Create an empty media package", restParameters = {
-         }, responses = {
+  @RestQuery(
+      name = "createMediaPackage",
+      description = "Create an empty media package",
+      restParameters = {},
+      responses = {
           @RestResponse(description = "Returns media package", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
+          @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+      },
+      returnDescription = "")
   public Response createMediaPackage() {
     MediaPackage mp;
     try {
@@ -283,9 +300,18 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
   @POST
   @Path("discardMediaPackage")
-  @RestQuery(name = "discardMediaPackage", description = "Discard a media package", restParameters = { @RestParameter(description = "Given media package to be destroyed", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) }, responses = {
+  @RestQuery(
+      name = "discardMediaPackage",
+      description = "Discard a media package",
+      restParameters = {
+          @RestParameter(description = "Given media package to be destroyed", isRequired = true, name = "mediaPackage",
+              type = RestParameter.Type.TEXT)
+      },
+      responses = {
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
+          @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+      },
+      returnDescription = "")
   public Response discardMediaPackage(@FormParam("mediaPackage") String mpx) {
     logger.debug("discardMediaPackage(MediaPackage): {}", mpx);
     try {
@@ -301,21 +327,33 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @POST
   @Produces(MediaType.TEXT_XML)
   @Path("addTrack")
-  @RestQuery(name = "addTrackURL", description = "Add a media track to a given media package using an URL", restParameters = {
-          @RestParameter(description = "The location of the media", isRequired = true, name = "url", type = RestParameter.Type.STRING),
-          @RestParameter(description = "The kind of media", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
-          @RestParameter(description = "The tags of the  media track", isRequired = false, name = "tags", type = RestParameter.Type.STRING),
-          @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) }, responses = {
+  @RestQuery(
+      name = "addTrackURL",
+      description = "Add a media track to a given media package using an URL",
+      restParameters = {
+          @RestParameter(description = "The location of the media", isRequired = true, name = "url",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "The kind of media", isRequired = true, name = "flavor",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "The tags of the  media track", isRequired = false, name = "tags",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage",
+              type = RestParameter.Type.TEXT)
+      },
+      responses = {
           @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-          @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
-  public Response addMediaPackageTrack(@FormParam("url") String url, @FormParam("flavor") String flavor,  @FormParam("tags")  String tags,
-          @FormParam("mediaPackage") String mpx) {
+          @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+      },
+      returnDescription = "")
+  public Response addMediaPackageTrack(@FormParam("url") String url, @FormParam("flavor") String flavor,
+      @FormParam("tags")  String tags, @FormParam("mediaPackage") String mpx) {
     logger.trace("add media package from url: {} flavor: {} tags: {} mediaPackage: {}", url, flavor, tags, mpx);
     try {
       MediaPackage mp = MP_FACTORY.newMediaPackageBuilder().loadFromXml(mpx);
-      if (MediaPackageSupport.sanityCheck(mp).isSome())
+      if (MediaPackageSupport.sanityCheck(mp).isPresent()) {
         return Response.serverError().status(Status.BAD_REQUEST).build();
+      }
       String[] tagsArray = null;
       if (tags != null) {
         tagsArray = tags.split(",");
@@ -333,18 +371,22 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @Consumes(MediaType.MULTIPART_FORM_DATA)
   @Path("addTrack")
   @RestQuery(
-    name = "addTrackInputStream",
-    description = "Add a media track to a given media package using an input stream",
-    restParameters = {
-      @RestParameter(description = "The kind of media track", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
-      @RestParameter(description = "The tags of the media track", isRequired = false, name = "tags", type = RestParameter.Type.STRING),
-      @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) },
-    bodyParameter = @RestParameter(description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE),
-    responses = {
-      @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
-      @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-      @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
-    returnDescription = "")
+      name = "addTrackInputStream",
+      description = "Add a media track to a given media package using an input stream",
+      restParameters = {
+          @RestParameter(description = "The kind of media track", isRequired = true, name = "flavor",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "The tags of the media track", isRequired = false, name = "tags",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage",
+              type = RestParameter.Type.TEXT) },
+      bodyParameter = @RestParameter(description = "The media track file", isRequired = true, name = "BODY",
+          type = RestParameter.Type.FILE),
+      responses = {
+          @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
+      returnDescription = "")
   public Response addMediaPackageTrack(@Context HttpServletRequest request) {
     logger.trace("add track as multipart-form-data");
     return addMediaPackageElement(request, MediaPackageElement.Type.Track);
@@ -353,22 +395,34 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @POST
   @Produces(MediaType.TEXT_XML)
   @Path("addPartialTrack")
-  @RestQuery(name = "addPartialTrackURL", description = "Add a partial media track to a given media package using an URL", restParameters = {
-          @RestParameter(description = "The location of the media", isRequired = true, name = "url", type = RestParameter.Type.STRING),
-          @RestParameter(description = "The kind of media", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
-          @RestParameter(description = "The start time in milliseconds", isRequired = true, name = "startTime", type = RestParameter.Type.INTEGER),
-          @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) }, responses = {
+  @RestQuery(
+      name = "addPartialTrackURL",
+      description = "Add a partial media track to a given media package using an URL",
+      restParameters = {
+          @RestParameter(description = "The location of the media", isRequired = true, name = "url",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "The kind of media", isRequired = true, name = "flavor",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "The start time in milliseconds", isRequired = true, name = "startTime",
+              type = RestParameter.Type.INTEGER),
+          @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage",
+              type = RestParameter.Type.TEXT)
+      },
+      responses = {
           @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-          @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
+          @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+      },
+      returnDescription = "")
   public Response addMediaPackagePartialTrack(@FormParam("url") String url, @FormParam("flavor") String flavor,
           @FormParam("startTime") Long startTime, @FormParam("mediaPackage") String mpx) {
     logger.trace("add partial track with url: {} flavor: {} startTime: {} mediaPackage: {}",
             url, flavor, startTime, mpx);
     try {
       MediaPackage mp = MP_FACTORY.newMediaPackageBuilder().loadFromXml(mpx);
-      if (MediaPackageSupport.sanityCheck(mp).isSome())
+      if (MediaPackageSupport.sanityCheck(mp).isPresent()) {
         return Response.serverError().status(Status.BAD_REQUEST).build();
+      }
 
       mp = ingestService.addPartialTrack(new URI(url), MediaPackageElementFlavor.parseFlavor(flavor), startTime, mp);
       return Response.ok(mp).build();
@@ -382,13 +436,25 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @Produces(MediaType.TEXT_XML)
   @Consumes(MediaType.MULTIPART_FORM_DATA)
   @Path("addPartialTrack")
-  @RestQuery(name = "addPartialTrackInputStream", description = "Add a partial media track to a given media package using an input stream", restParameters = {
-          @RestParameter(description = "The kind of media track", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
-          @RestParameter(description = "The start time in milliseconds", isRequired = true, name = "startTime", type = RestParameter.Type.INTEGER),
-          @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) }, bodyParameter = @RestParameter(description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), responses = {
+  @RestQuery(
+      name = "addPartialTrackInputStream",
+      description = "Add a partial media track to a given media package using an input stream",
+      restParameters = {
+          @RestParameter(description = "The kind of media track", isRequired = true, name = "flavor",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "The start time in milliseconds", isRequired = true, name = "startTime",
+              type = RestParameter.Type.INTEGER),
+          @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage",
+              type = RestParameter.Type.TEXT)
+      },
+      bodyParameter = @RestParameter(description = "The media track file", isRequired = true, name = "BODY",
+          type = RestParameter.Type.FILE),
+      responses = {
           @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-          @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
+          @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+      },
+      returnDescription = "")
   public Response addMediaPackagePartialTrack(@Context HttpServletRequest request) {
     logger.trace("add partial track as multipart-form-data");
     return addMediaPackageElement(request, MediaPackageElement.Type.Track);
@@ -397,21 +463,33 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @POST
   @Produces(MediaType.TEXT_XML)
   @Path("addCatalog")
-  @RestQuery(name = "addCatalogURL", description = "Add a metadata catalog to a given media package using an URL", restParameters = {
-          @RestParameter(description = "The location of the catalog", isRequired = true, name = "url", type = RestParameter.Type.STRING),
-          @RestParameter(description = "The kind of catalog", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
-          @RestParameter(description = "The tags of the catalog", isRequired = false, name = "tags", type = RestParameter.Type.STRING),
-          @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) }, responses = {
+  @RestQuery(
+      name = "addCatalogURL",
+      description = "Add a metadata catalog to a given media package using an URL",
+      restParameters = {
+          @RestParameter(description = "The location of the catalog", isRequired = true, name = "url",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "The kind of catalog", isRequired = true, name = "flavor",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "The tags of the catalog", isRequired = false, name = "tags",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage",
+              type = RestParameter.Type.TEXT)
+      },
+      responses = {
           @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-          @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
+          @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+      },
+      returnDescription = "")
   public Response addMediaPackageCatalog(@FormParam("url") String url, @FormParam("flavor") String flavor,
       @FormParam("tags") String tags, @FormParam("mediaPackage") String mpx) {
     logger.trace("add catalog with url: {} flavor: {} tags: {} mediaPackage: {}", url, flavor, tags, mpx);
     try {
       MediaPackage mp = MP_FACTORY.newMediaPackageBuilder().loadFromXml(mpx);
-      if (MediaPackageSupport.sanityCheck(mp).isSome())
+      if (MediaPackageSupport.sanityCheck(mp).isPresent()) {
         return Response.serverError().status(Status.BAD_REQUEST).build();
+      }
       String[] tagsArray = null;
       if (tags != null) {
         tagsArray = tags.split(",");
@@ -429,13 +507,25 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @Produces(MediaType.TEXT_XML)
   @Consumes(MediaType.MULTIPART_FORM_DATA)
   @Path("addCatalog")
-  @RestQuery(name = "addCatalogInputStream", description = "Add a metadata catalog to a given media package using an input stream", restParameters = {
-          @RestParameter(description = "The kind of media catalog", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
-          @RestParameter(description = "The tags of the attachment", isRequired = false, name = "tags", type = RestParameter.Type.STRING),
-          @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) }, bodyParameter = @RestParameter(description = "The metadata catalog file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), responses = {
+  @RestQuery(
+      name = "addCatalogInputStream",
+      description = "Add a metadata catalog to a given media package using an input stream",
+      restParameters = {
+          @RestParameter(description = "The kind of media catalog", isRequired = true, name = "flavor",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "The tags of the attachment", isRequired = false, name = "tags",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage",
+              type = RestParameter.Type.TEXT)
+      },
+      bodyParameter = @RestParameter(description = "The metadata catalog file", isRequired = true, name = "BODY",
+          type = RestParameter.Type.FILE),
+      responses = {
           @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-          @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
+          @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+      },
+      returnDescription = "")
   public Response addMediaPackageCatalog(@Context HttpServletRequest request) {
     logger.trace("add catalog as multipart-form-data");
     return addMediaPackageElement(request, MediaPackageElement.Type.Catalog);
@@ -444,21 +534,33 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @POST
   @Produces(MediaType.TEXT_XML)
   @Path("addAttachment")
-  @RestQuery(name = "addAttachmentURL", description = "Add an attachment to a given media package using an URL", restParameters = {
-          @RestParameter(description = "The location of the attachment", isRequired = true, name = "url", type = RestParameter.Type.STRING),
-          @RestParameter(description = "The kind of attachment", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
-          @RestParameter(description = "The tags of the attachment", isRequired = false, name = "tags", type = RestParameter.Type.STRING),
-          @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) }, responses = {
+  @RestQuery(
+      name = "addAttachmentURL",
+      description = "Add an attachment to a given media package using an URL",
+      restParameters = {
+          @RestParameter(description = "The location of the attachment", isRequired = true, name = "url",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "The kind of attachment", isRequired = true, name = "flavor",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "The tags of the attachment", isRequired = false, name = "tags",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage",
+              type = RestParameter.Type.TEXT)
+      },
+      responses = {
           @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-          @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
+          @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+      },
+      returnDescription = "")
   public Response addMediaPackageAttachment(@FormParam("url") String url, @FormParam("flavor") String flavor,
       @FormParam("tags") String tags, @FormParam("mediaPackage") String mpx) {
     logger.trace("add attachment with url: {} flavor: {} mediaPackage: {}", url, flavor, mpx);
     try {
       MediaPackage mp = MP_FACTORY.newMediaPackageBuilder().loadFromXml(mpx);
-      if (MediaPackageSupport.sanityCheck(mp).isSome())
+      if (MediaPackageSupport.sanityCheck(mp).isPresent()) {
         return Response.serverError().status(Status.BAD_REQUEST).build();
+      }
       String[] tagsArray = null;
       if (tags != null) {
         tagsArray = tags.split(",");
@@ -475,13 +577,25 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @Produces(MediaType.TEXT_XML)
   @Consumes(MediaType.MULTIPART_FORM_DATA)
   @Path("addAttachment")
-  @RestQuery(name = "addAttachmentInputStream", description = "Add an attachment to a given media package using an input stream", restParameters = {
-          @RestParameter(description = "The kind of attachment", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
-          @RestParameter(description = "The tags of the attachment", isRequired = false, name = "tags", type = RestParameter.Type.STRING),
-          @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) }, bodyParameter = @RestParameter(description = "The attachment file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), responses = {
+  @RestQuery(
+      name = "addAttachmentInputStream",
+      description = "Add an attachment to a given media package using an input stream",
+      restParameters = {
+          @RestParameter(description = "The kind of attachment", isRequired = true, name = "flavor",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "The tags of the attachment", isRequired = false, name = "tags",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage",
+              type = RestParameter.Type.TEXT)
+      },
+      bodyParameter = @RestParameter(description = "The attachment file", isRequired = true, name = "BODY",
+          type = RestParameter.Type.FILE),
+      responses = {
           @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-          @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
+          @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+      },
+      returnDescription = "")
   public Response addMediaPackageAttachment(@Context HttpServletRequest request) {
     logger.trace("add attachment as multipart-form-data");
     return addMediaPackageElement(request, MediaPackageElement.Type.Attachment);
@@ -558,7 +672,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
        * Check if we actually got a valid request including a message body and a valid mediapackage to attach the
        * element to
        */
-      if (in == null || mp == null || MediaPackageSupport.sanityCheck(mp).isSome()) {
+      if (in == null || mp == null || MediaPackageSupport.sanityCheck(mp).isPresent()) {
         return Response.serverError().status(Status.BAD_REQUEST).build();
       }
       switch (type) {
@@ -596,17 +710,18 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @Produces(MediaType.TEXT_XML)
   @Consumes(MediaType.MULTIPART_FORM_DATA)
   @Path("addMediaPackage")
-  @RestQuery(name = "addMediaPackage",
+  @RestQuery(
+      name = "addMediaPackage",
       description = "<p>Create and ingest media package from media tracks with additional Dublin Core metadata. It is "
-        + "mandatory to set a title for the recording. This can be done with the 'title' form field or by supplying a DC "
-        + "catalog with a title included.  The identifier of the newly created media package will be taken from the "
+        + "mandatory to set a title for the recording. This can be done with the 'title' form field or by supplying a "
+        + "DC catalog with a title included.  The identifier of the newly created media package will be taken from the "
         + "<em>identifier</em> field or the episode DublinCore catalog (deprecated<sup>*</sup>). If no identifier is "
         + "set, a new random UUIDv4 will be generated. This endpoint is not meant to be used by capture agents for "
         + "scheduled recordings. Its primary use is for manual ingests with command line tools like cURL.</p> "
         + "<p>Multiple tracks can be ingested by using multiple form fields. It is important to always set the "
         + "flavor of the next media file <em>before</em> sending the media file itself.</p>"
-        + "<b>(*)</b> The special treatment of the identifier field is deprecated and may be removed in future versions "
-        + "without further notice in favor of a random UUID generation to ensure uniqueness of identifiers. "
+        + "<b>(*)</b> The special treatment of the identifier field is deprecated and may be removed in future "
+        + "versions without further notice in favor of a random UUID generation to ensure uniqueness of identifiers. "
         + "<h3>Example cURL command:</h3>"
         + "<p>Ingest one video file:</p>"
         + "<p><pre>\n"
@@ -622,48 +737,87 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
         + "    -F 'flavor=presenter/source' -F 'BODY=@test-recording-camera.mp4' \n"
         + "</pre></p>",
       restParameters = {
-          @RestParameter(description = "The kind of media track. This has to be specified prior to each media track", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "abstract", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "accessRights", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "available", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "contributor", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "coverage", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "created", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "creator", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "date", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "description", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "extent", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "format", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "identifier", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "isPartOf", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "isReferencedBy", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "isReplacedBy", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "language", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "license", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "publisher", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "relation", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "replaces", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "rights", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "rightsHolder", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "source", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "spatial", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "subject", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "temporal", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "title", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "type", type = RestParameter.Type.STRING),
-          @RestParameter(description = "URL of episode DublinCore Catalog", isRequired = false, name = "episodeDCCatalogUri", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode DublinCore Catalog", isRequired = false, name = "episodeDCCatalog", type = RestParameter.Type.STRING),
-          @RestParameter(description = "URL of series DublinCore Catalog", isRequired = false, name = "seriesDCCatalogUri", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Series DublinCore Catalog", isRequired = false, name = "seriesDCCatalog", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Access control list in XACML or JSON form", isRequired = false, name = "acl", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Tag of the next media file", isRequired = false, name = "tag", type = RestParameter.Type.STRING),
-          @RestParameter(description = "URL of a media track file", isRequired = false, name = "mediaUri", type = RestParameter.Type.STRING) },
-      bodyParameter = @RestParameter(description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE),
+          @RestParameter(description = "The kind of media track. This has to be specified prior to each media track",
+              isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "abstract",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "accessRights",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "available",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "contributor",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "coverage",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "created",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "creator",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "date",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "description",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "extent",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "format",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "identifier",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "isPartOf",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "isReferencedBy",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "isReplacedBy",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "language",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "license",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "publisher",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "relation",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "replaces",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "rights",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "rightsHolder",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "source",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "spatial",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "subject",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "temporal",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "title",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "type",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "URL of episode DublinCore Catalog", isRequired = false,
+              name = "episodeDCCatalogUri", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode DublinCore Catalog", isRequired = false, name = "episodeDCCatalog",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "URL of series DublinCore Catalog", isRequired = false,
+              name = "seriesDCCatalogUri", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Series DublinCore Catalog", isRequired = false, name = "seriesDCCatalog",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Access control list in XACML or JSON form", isRequired = false, name = "acl",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Tag of the next media file", isRequired = false, name = "tag",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "URL of a media track file", isRequired = false, name = "mediaUri",
+              type = RestParameter.Type.STRING) },
+      bodyParameter = @RestParameter(description = "The media track file", isRequired = true, name = "BODY",
+          type = RestParameter.Type.FILE),
       responses = {
-          @RestResponse(description = "Ingest successful. Returns workflow instance as xml", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "Ingest failed due to invalid requests.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-          @RestResponse(description = "Ingest failed. Something went wrong internally. Please have a look at the log files",
-              responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
+          @RestResponse(description = "Ingest successful. Returns workflow instance as xml",
+              responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "Ingest failed due to invalid requests.",
+              responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "Ingest failed. Something went wrong internally. Please have a look at the "
+              + "log files", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
       returnDescription = "")
   public Response addMediaPackage(@Context HttpServletRequest request) {
     logger.trace("add mediapackage as multipart-form-data");
@@ -676,15 +830,15 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @Path("addMediaPackage/{wdID}")
   @RestQuery(name = "addMediaPackage",
       description = "<p>Create and ingest media package from media tracks with additional Dublin Core metadata. It is "
-        + "mandatory to set a title for the recording. This can be done with the 'title' form field or by supplying a DC "
-        + "catalog with a title included.  The identifier of the newly created media package will be taken from the "
+        + "mandatory to set a title for the recording. This can be done with the 'title' form field or by supplying a "
+        + "DC catalog with a title included.  The identifier of the newly created media package will be taken from the "
         + "<em>identifier</em> field or the episode DublinCore catalog (deprecated<sup>*</sup>). If no identifier is "
         + "set, a newa randumm UUIDv4 will be generated. This endpoint is not meant to be used by capture agents for "
         + "scheduled recordings. It's primary use is for manual ingests with command line tools like cURL.</p> "
-        + "<p>Multiple tracks can be ingested by using multiple form fields. It's important, however, to always set the "
-        + "flavor of the next media file <em>before</em> sending the media file itself.</p>"
-        + "<b>(*)</b> The special treatment of the identifier field is deprecated any may be removed in future versions "
-        + "without further notice in favor of a random UUID generation to ensure uniqueness of identifiers. "
+        + "<p>Multiple tracks can be ingested by using multiple form fields. It's important, however, to always set "
+        + "the flavor of the next media file <em>before</em> sending the media file itself.</p>"
+        + "<b>(*)</b> The special treatment of the identifier field is deprecated any may be removed in future "
+        + "versions without further notice in favor of a random UUID generation to ensure uniqueness of identifiers. "
         + "<h3>Example cURL command:</h3>"
         + "<p>Ingest one video file:</p>"
         + "<p><pre>\n"
@@ -700,51 +854,92 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
         + "    -F 'flavor=presenter/source' -F 'BODY=@test-recording-camera.mp4' \n"
         + "</pre></p>",
       pathParameters = {
-          @RestParameter(description = "Workflow definition id", isRequired = true, name = "wdID", type = RestParameter.Type.STRING) },
+          @RestParameter(description = "Workflow definition id", isRequired = true, name = "wdID",
+              type = RestParameter.Type.STRING) },
       restParameters = {
-          @RestParameter(description = "The kind of media track. This has to be specified prior to each media track", isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "abstract", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "accessRights", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "available", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "contributor", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "coverage", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "created", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "creator", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "date", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "description", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "extent", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "format", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "identifier", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "isPartOf", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "isReferencedBy", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "isReplacedBy", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "language", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "license", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "publisher", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "relation", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "replaces", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "rights", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "rightsHolder", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "source", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "spatial", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "subject", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "temporal", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "title", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode metadata value", isRequired = false, name = "type", type = RestParameter.Type.STRING),
-          @RestParameter(description = "URL of episode DublinCore Catalog", isRequired = false, name = "episodeDCCatalogUri", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Episode DublinCore Catalog", isRequired = false, name = "episodeDCCatalog", type = RestParameter.Type.STRING),
-          @RestParameter(description = "URL of series DublinCore Catalog", isRequired = false, name = "seriesDCCatalogUri", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Series DublinCore Catalog", isRequired = false, name = "seriesDCCatalog", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Access control list in XACML or JSON form", isRequired = false, name = "acl", type = RestParameter.Type.STRING),
-          @RestParameter(description = "Tag of the next media file", isRequired = false, name = "tag", type = RestParameter.Type.STRING),
-          @RestParameter(description = "URL of a media track file", isRequired = false, name = "mediaUri", type = RestParameter.Type.STRING) },
-      bodyParameter = @RestParameter(description = "The media track file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE),
+          @RestParameter(description = "The kind of media track. This has to be specified prior to each media track",
+              isRequired = true, name = "flavor", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "abstract",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "accessRights",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "available",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "contributor",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "coverage",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "created",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "creator",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "date",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "description",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "extent",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "format",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "identifier",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "isPartOf",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "isReferencedBy",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "isReplacedBy",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "language",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "license",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "publisher",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "relation",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "replaces",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "rights",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "rightsHolder",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "source",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "spatial",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "subject",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "temporal",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "title",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode metadata value", isRequired = false, name = "type",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "URL of episode DublinCore Catalog", isRequired = false,
+              name = "episodeDCCatalogUri", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Episode DublinCore Catalog", isRequired = false, name = "episodeDCCatalog",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "URL of series DublinCore Catalog", isRequired = false,
+              name = "seriesDCCatalogUri", type = RestParameter.Type.STRING),
+          @RestParameter(description = "Series DublinCore Catalog", isRequired = false, name = "seriesDCCatalog",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Access control list in XACML or JSON form", isRequired = false, name = "acl",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "Tag of the next media file", isRequired = false, name = "tag",
+              type = RestParameter.Type.STRING),
+          @RestParameter(description = "URL of a media track file", isRequired = false, name = "mediaUri",
+              type = RestParameter.Type.STRING) },
+      bodyParameter = @RestParameter(description = "The media track file", isRequired = true, name = "BODY",
+          type = RestParameter.Type.FILE),
       responses = {
-          @RestResponse(description = "Ingest successful. Returns workflow instance as XML", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "Ingest failed due to invalid requests.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-          @RestResponse(description = "Ingest failed. A workflow is currently active on the media package", responseCode = HttpServletResponse.SC_CONFLICT),
-          @RestResponse(description = "Ingest failed. Something went wrong internally. Please have a look at the log files",
-              responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
+          @RestResponse(description = "Ingest successful. Returns workflow instance as XML",
+              responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "Ingest failed due to invalid requests.",
+              responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "Ingest failed. A workflow is currently active on the media package",
+              responseCode = HttpServletResponse.SC_CONFLICT),
+          @RestResponse(description = "Ingest failed. Something went wrong internally. Please have a look at the "
+              + "log files", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
       returnDescription = "")
   public Response addMediaPackage(@Context HttpServletRequest request, @PathParam("wdID") String wdID) {
     logger.trace("add mediapackage as multipart-form-data with workflow definition id: {}", wdID);
@@ -994,18 +1189,35 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @POST
   @Path("addZippedMediaPackage/{workflowDefinitionId}")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "addZippedMediaPackage", description = "Create media package from a compressed file containing a manifest.xml document and all media tracks, metadata catalogs and attachments", pathParameters = { @RestParameter(description = "Workflow definition id", isRequired = true, name = WORKFLOW_DEFINITION_ID_PARAM, type = RestParameter.Type.STRING) }, restParameters = { @RestParameter(description = "The workflow instance ID to associate with this zipped mediapackage", isRequired = false, name = WORKFLOW_INSTANCE_ID_PARAM, type = RestParameter.Type.STRING) }, bodyParameter = @RestParameter(description = "The compressed (application/zip) media package file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), responses = {
+  @RestQuery(
+      name = "addZippedMediaPackage",
+      description = "Create media package from a compressed file containing a manifest.xml document and all media "
+          + "tracks, metadata catalogs and attachments",
+      pathParameters = {
+          @RestParameter(description = "Workflow definition id", isRequired = true,
+              name = WORKFLOW_DEFINITION_ID_PARAM, type = RestParameter.Type.STRING)
+      },
+      restParameters = {
+          @RestParameter(description = "The workflow instance ID to associate with this zipped mediapackage",
+              isRequired = false, name = WORKFLOW_INSTANCE_ID_PARAM, type = RestParameter.Type.STRING)
+      },
+      bodyParameter = @RestParameter(description = "The compressed (application/zip) media package file",
+          isRequired = true, name = "BODY", type = RestParameter.Type.FILE),
+      responses = {
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_NOT_FOUND),
-          @RestResponse(description = "", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE) }, returnDescription = "")
+          @RestResponse(description = "", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE)
+      },
+      returnDescription = "")
   public Response addZippedMediaPackage(@Context HttpServletRequest request,
           @PathParam("workflowDefinitionId") String wdID, @QueryParam("id") String wiID) {
     logger.trace("add zipped media package with workflow definition id: {} and workflow instance id: {}", wdID, wiID);
     if (!isIngestLimitEnabled() || getIngestLimit() > 0) {
       return ingestZippedMediaPackage(request, wdID, wiID);
     } else {
-      logger.warn("Delaying ingest because we have exceeded the maximum number of ingests this server is setup to do concurrently.");
+      logger.warn("Delaying ingest because we have exceeded the maximum number of ingests this server is setup to do "
+          + "concurrently.");
       return Response.status(Status.SERVICE_UNAVAILABLE).build();
     }
   }
@@ -1013,23 +1225,37 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @POST
   @Path("addZippedMediaPackage")
   @Produces(MediaType.TEXT_XML)
-  @RestQuery(name = "addZippedMediaPackage", description = "Create media package from a compressed file containing a manifest.xml document and all media tracks, metadata catalogs and attachments", restParameters = {
+  @RestQuery(
+      name = "addZippedMediaPackage",
+      description = "Create media package from a compressed file containing a manifest.xml document and all media "
+          + "tracks, metadata catalogs and attachments",
+      restParameters = {
           @RestParameter(description = "The workflow definition ID to run on this mediapackage. "
                   + "This parameter has to be set in the request prior to the zipped mediapackage "
-                  + "(This parameter is deprecated. Please use /addZippedMediaPackage/{workflowDefinitionId} instead)", isRequired = false, name = WORKFLOW_DEFINITION_ID_PARAM, type = RestParameter.Type.STRING),
+                  + "(This parameter is deprecated. Please use /addZippedMediaPackage/{workflowDefinitionId} instead)",
+              isRequired = false, name = WORKFLOW_DEFINITION_ID_PARAM, type = RestParameter.Type.STRING),
           @RestParameter(description = "The workflow instance ID to associate with this zipped mediapackage. "
                   + "This parameter has to be set in the request prior to the zipped mediapackage "
-                  + "(This parameter is deprecated. Please use /addZippedMediaPackage/{workflowDefinitionId} with a path parameter instead)", isRequired = false, name = WORKFLOW_INSTANCE_ID_PARAM, type = RestParameter.Type.STRING) }, bodyParameter = @RestParameter(description = "The compressed (application/zip) media package file", isRequired = true, name = "BODY", type = RestParameter.Type.FILE), responses = {
+                  + "(This parameter is deprecated. Please use /addZippedMediaPackage/{workflowDefinitionId} with a "
+                  + "path parameter instead)",
+              isRequired = false, name = WORKFLOW_INSTANCE_ID_PARAM, type = RestParameter.Type.STRING)
+      },
+      bodyParameter = @RestParameter(description = "The compressed (application/zip) media package file",
+          isRequired = true, name = "BODY", type = RestParameter.Type.FILE),
+      responses = {
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "", responseCode = HttpServletResponse.SC_NOT_FOUND),
-          @RestResponse(description = "", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE) }, returnDescription = "")
+          @RestResponse(description = "", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE)
+      },
+      returnDescription = "")
   public Response addZippedMediaPackage(@Context HttpServletRequest request) {
     logger.trace("add zipped media package");
     if (!isIngestLimitEnabled() || getIngestLimit() > 0) {
       return ingestZippedMediaPackage(request, null, null);
     } else {
-      logger.warn("Delaying ingest because we have exceeded the maximum number of ingests this server is setup to do concurrently.");
+      logger.warn("Delaying ingest because we have exceeded the maximum number of ingests this server is setup to do "
+          + "concurrently.");
       return Response.status(Status.SERVICE_UNAVAILABLE).build();
     }
   }
@@ -1074,8 +1300,9 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
             in = item.openStream();
             isDone = true;
           }
-          if (isDone)
+          if (isDone) {
             break;
+          }
         }
       } else {
         logger.debug("Processing file item");
@@ -1128,17 +1355,23 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @POST
   @Produces(MediaType.TEXT_XML)
   @Path("ingest/{wdID}")
-  @RestQuery(name = "ingest",
-             description = "<p>Ingest the completed media package into the system and start a specified workflow.</p>"
+  @RestQuery(
+      name = "ingest",
+      description = "<p>Ingest the completed media package into the system and start a specified workflow.</p>"
              + "<p>In addition to the documented form parameters, workflow parameters are accepted as well.</p>",
-    pathParameters = {
-      @RestParameter(description = "Workflow definition id", isRequired = true, name = "wdID", type = RestParameter.Type.STRING) },
-    restParameters = {
-      @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) },
-    responses = {
-      @RestResponse(description = "Returns the workflow instance", responseCode = HttpServletResponse.SC_OK),
-      @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST) },
-    returnDescription = "")
+      pathParameters = {
+          @RestParameter(description = "Workflow definition id", isRequired = true, name = "wdID",
+              type = RestParameter.Type.STRING)
+      },
+      restParameters = {
+          @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage",
+              type = RestParameter.Type.TEXT)
+      },
+      responses = {
+          @RestResponse(description = "Returns the workflow instance", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST)
+      },
+      returnDescription = "")
   public Response ingest(@Context HttpServletRequest request, @PathParam("wdID") String wdID) {
     logger.trace("ingest media package with workflow definition id: {}", wdID);
     if (StringUtils.isBlank(wdID)) {
@@ -1150,17 +1383,23 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @POST
   @Produces(MediaType.TEXT_XML)
   @Path("ingest")
-  @RestQuery(name = "ingest",
-             description = "<p>Ingest the completed media package into the system</p>"
+  @RestQuery(
+      name = "ingest",
+      description = "<p>Ingest the completed media package into the system</p>"
              + "<p>In addition to the documented form parameters, workflow parameters are accepted as well.</p>",
-    restParameters = {
-      @RestParameter(description = "The media package", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT),
-      @RestParameter(description = "Workflow definition id", isRequired = false, name = WORKFLOW_DEFINITION_ID_PARAM, type = RestParameter.Type.STRING),
-      @RestParameter(description = "The workflow instance ID to associate this ingest with scheduled events.", isRequired = false, name = WORKFLOW_INSTANCE_ID_PARAM, type = RestParameter.Type.STRING) },
-    responses = {
-      @RestResponse(description = "Returns the workflow instance", responseCode = HttpServletResponse.SC_OK),
-      @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST) },
-    returnDescription = "")
+      restParameters = {
+          @RestParameter(description = "The media package", isRequired = true, name = "mediaPackage",
+              type = RestParameter.Type.TEXT),
+          @RestParameter(description = "Workflow definition id", isRequired = false,
+              name = WORKFLOW_DEFINITION_ID_PARAM, type = RestParameter.Type.STRING),
+          @RestParameter(description = "The workflow instance ID to associate this ingest with scheduled events.",
+              isRequired = false, name = WORKFLOW_INSTANCE_ID_PARAM, type = RestParameter.Type.STRING)
+      },
+      responses = {
+          @RestResponse(description = "Returns the workflow instance", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST)
+      },
+      returnDescription = "")
   public Response ingest(@Context HttpServletRequest request) {
     return ingest(null, request);
   }
@@ -1197,13 +1436,14 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     }
 
     final Map<String, String> wfConfig = getWorkflowConfig(formData);
-    if (StringUtils.isNotBlank(wdID))
+    if (StringUtils.isNotBlank(wdID)) {
       wfConfig.put(WORKFLOW_DEFINITION_ID_PARAM, wdID);
+    }
 
     final MediaPackage mp;
     try {
       mp = MP_FACTORY.newMediaPackageBuilder().loadFromXml(formData.getFirst("mediaPackage"));
-      if (MediaPackageSupport.sanityCheck(mp).isSome()) {
+      if (MediaPackageSupport.sanityCheck(mp).isPresent()) {
         logger.warn("Rejected ingest with invalid mediapackage {}", mp);
         return Response.status(Status.BAD_REQUEST).build();
       }
@@ -1219,32 +1459,28 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     final Date ingestDate = startCache.getIfPresent(mp.getIdentifier().toString());
     wfConfig.put(IngestService.START_DATE_KEY, DATE_FORMAT.format(ingestDate != null ? ingestDate : new Date()));
 
-    final X<WorkflowInstance> ingest = new X<WorkflowInstance>() {
-      @Override
-      public WorkflowInstance xapply() throws Exception {
-        /* Legacy support: Try to convert the workflowInstance to integer */
-        Long workflowInstanceId = null;
-        if (StringUtils.isNotBlank(workflowInstance)) {
-          try {
-            workflowInstanceId = Long.parseLong(workflowInstance);
-          } catch (NumberFormatException e) {
-            // The workflowId is not a long value and might be the media package identifier
-            wfConfig.put(IngestServiceImpl.LEGACY_MEDIAPACKAGE_ID_KEY, workflowInstance);
-          }
-        }
-
-        if (workflowInstanceId != null) {
-          return ingestService.ingest(mp, trimToNull(workflowDefinition), wfConfig, workflowInstanceId);
-        } else {
-          return ingestService.ingest(mp, trimToNull(workflowDefinition), wfConfig);
+    try {
+      /* Legacy support: Try to convert the workflowInstance to integer */
+      Long workflowInstanceId = null;
+      if (StringUtils.isNotBlank(workflowInstance)) {
+        try {
+          workflowInstanceId = Long.parseLong(workflowInstance);
+        } catch (NumberFormatException e) {
+          // The workflowId is not a long value and might be the media package identifier
+          wfConfig.put(IngestServiceImpl.LEGACY_MEDIAPACKAGE_ID_KEY, workflowInstance);
         }
       }
-    };
 
-    try {
-      WorkflowInstance workflow = ingest.apply();
+      WorkflowInstance workflow;
+      if (workflowInstanceId != null) {
+        workflow = ingestService.ingest(mp, trimToNull(workflowDefinition), wfConfig, workflowInstanceId);
+      } else {
+        workflow = ingestService.ingest(mp, trimToNull(workflowDefinition), wfConfig);
+      }
+
       startCache.asMap().remove(mp.getIdentifier().toString());
       return Response.ok(XmlWorkflowParser.toXml(workflow)).build();
+
     } catch (Exception e) {
       Throwable cause = e.getCause();
       if (cause instanceof NotFoundException) {
@@ -1257,13 +1493,18 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
   @POST
   @Path("schedule")
-  @RestQuery(name = "schedule", description = "Schedule an event based on the given media package",
-          restParameters = {
-                  @RestParameter(description = "The media package", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) },
-          responses = {
-                  @RestResponse(description = "Event scheduled", responseCode = HttpServletResponse.SC_CREATED),
-                  @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST) },
-          returnDescription = "")
+  @RestQuery(
+      name = "schedule",
+      description = "Schedule an event based on the given media package",
+      restParameters = {
+          @RestParameter(description = "The media package", isRequired = true, name = "mediaPackage",
+              type = RestParameter.Type.TEXT)
+      },
+      responses = {
+          @RestResponse(description = "Event scheduled", responseCode = HttpServletResponse.SC_CREATED),
+          @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST)
+      },
+      returnDescription = "")
   public Response schedule(MultivaluedMap<String, String> formData) {
     logger.trace("pass schedule with default workflow definition id {}", defaultWorkflowDefinitionId);
     return this.schedule(defaultWorkflowDefinitionId, formData);
@@ -1271,15 +1512,22 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
 
   @POST
   @Path("schedule/{wdID}")
-  @RestQuery(name = "schedule", description = "Schedule an event based on the given media package",
-          pathParameters = {
-          @RestParameter(description = "Workflow definition id", isRequired = true, name = "wdID", type = RestParameter.Type.STRING) },
-          restParameters = {
-          @RestParameter(description = "The media package", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT) },
-          responses = {
+  @RestQuery(
+      name = "schedule",
+      description = "Schedule an event based on the given media package",
+      pathParameters = {
+          @RestParameter(description = "Workflow definition id", isRequired = true, name = "wdID",
+              type = RestParameter.Type.STRING)
+      },
+      restParameters = {
+          @RestParameter(description = "The media package", isRequired = true, name = "mediaPackage",
+              type = RestParameter.Type.TEXT)
+      },
+      responses = {
           @RestResponse(description = "Event scheduled", responseCode = HttpServletResponse.SC_CREATED),
-          @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST) },
-          returnDescription = "")
+          @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST)
+      },
+      returnDescription = "")
   public Response schedule(@PathParam("wdID") String wdID, MultivaluedMap<String, String> formData) {
     if (StringUtils.isBlank(wdID)) {
       logger.trace("workflow definition id is not specified");
@@ -1301,7 +1549,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     MediaPackage mp = null;
     try {
       mp = MP_FACTORY.newMediaPackageBuilder().loadFromXml(mediaPackageXml);
-      if (MediaPackageSupport.sanityCheck(mp).isSome()) {
+      if (MediaPackageSupport.sanityCheck(mp).isPresent()) {
         throw new MediaPackageException("Insane media package");
       }
     } catch (MediaPackageException e) {
@@ -1340,13 +1588,23 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
   @POST
   @Produces(MediaType.TEXT_XML)
   @Path("addDCCatalog")
-  @RestQuery(name = "addDCCatalog", description = "Add a dublincore episode catalog to a given media package using an url", restParameters = {
-          @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage", type = RestParameter.Type.TEXT),
-          @RestParameter(description = "DublinCore catalog as XML", isRequired = true, name = "dublinCore", type = RestParameter.Type.TEXT),
-          @RestParameter(defaultValue = "dublincore/episode", description = "DublinCore Flavor", isRequired = false, name = "flavor", type = RestParameter.Type.STRING) }, responses = {
+  @RestQuery(
+      name = "addDCCatalog",
+      description = "Add a dublincore episode catalog to a given media package using an url",
+      restParameters = {
+          @RestParameter(description = "The media package as XML", isRequired = true, name = "mediaPackage",
+              type = RestParameter.Type.TEXT),
+          @RestParameter(description = "DublinCore catalog as XML", isRequired = true, name = "dublinCore",
+              type = RestParameter.Type.TEXT),
+          @RestParameter(defaultValue = "dublincore/episode", description = "DublinCore Flavor", isRequired = false,
+              name = "flavor", type = RestParameter.Type.STRING)
+      },
+      responses = {
           @RestResponse(description = "Returns augmented media package", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "Media package not valid", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-          @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) }, returnDescription = "")
+          @RestResponse(description = "", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+      },
+      returnDescription = "")
   public Response addDCCatalog(@FormParam("mediaPackage") String mp, @FormParam("dublinCore") String dc,
           @FormParam("flavor") String flavor) {
     logger.trace("add DC catalog: {} with flavor: {} to media package: {}", dc, flavor, mp);
@@ -1365,7 +1623,7 @@ public class IngestRestService extends AbstractJobProducerEndpoint {
     } catch (MediaPackageException e) {
       return Response.serverError().status(Status.BAD_REQUEST).build();
     }
-    if (MediaPackageSupport.sanityCheck(mediaPackage).isSome()) {
+    if (MediaPackageSupport.sanityCheck(mediaPackage).isPresent()) {
       return Response.status(Status.BAD_REQUEST).build();
     }
 

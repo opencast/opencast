@@ -23,10 +23,10 @@ package org.opencastproject.list.impl;
 
 import org.opencastproject.list.api.ResourceListFilter;
 import org.opencastproject.list.api.ResourceListQuery;
-import org.opencastproject.util.data.Option;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * ResourceListQuery that should result in an empty list after execution.
@@ -48,18 +48,18 @@ public class EmptyResourceListQuery implements ResourceListQuery {
   }
 
   @Override
-  public Option<Integer> getLimit() {
-    return Option.some(0);
+  public Optional<Integer> getLimit() {
+    return Optional.of(0);
   }
 
   @Override
-  public Option<Integer> getOffset() {
-    return Option.none();
+  public Optional<Integer> getOffset() {
+    return Optional.empty();
   }
 
   @Override
-  public Option<String> getSortBy() {
-    return Option.none();
+  public Optional<String> getSortBy() {
+    return Optional.empty();
   }
 
   @Override

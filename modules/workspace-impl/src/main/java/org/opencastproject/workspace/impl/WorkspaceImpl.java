@@ -21,7 +21,6 @@
 
 package org.opencastproject.workspace.impl;
 
-import static java.lang.String.format;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.opencastproject.util.EqualsUtil.ne;
@@ -31,9 +30,8 @@ import static org.opencastproject.util.RequireUtil.notNull;
 import static org.opencastproject.util.data.Arrays.cons;
 import static org.opencastproject.util.data.Either.left;
 import static org.opencastproject.util.data.Either.right;
-import static org.opencastproject.util.data.Option.none;
-import static org.opencastproject.util.data.Option.some;
 import static org.opencastproject.util.data.Prelude.sleep;
+import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.assetmanager.util.AssetPathUtils;
 import org.opencastproject.assetmanager.util.DistributionPathUtils;
@@ -47,11 +45,7 @@ import org.opencastproject.util.HttpUtil;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
-import org.opencastproject.util.data.Effect;
 import org.opencastproject.util.data.Either;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Option;
-import org.opencastproject.util.data.functions.Misc;
 import org.opencastproject.util.jmx.JmxUtil;
 import org.opencastproject.workingfilerepository.api.PathMappable;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
@@ -91,8 +85,10 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.function.Function;
 
 import javax.management.ObjectInstance;
 import javax.servlet.http.HttpServletResponse;
@@ -376,7 +372,11 @@ public final class WorkspaceImpl implements Workspace {
           // if the file exists in the workspace, but is older than the wfr copy, replace it
           if (workspaceFileLastModified < wfrCopy.lastModified()) {
             logger.debug("Replacing {} with an updated version from the file repository", inWs.getAbsolutePath());
-            locked(inWs, copyOrLink(wfrCopy));
+//            locked(inWs, copyOrLink(wfrCopy));
+            locked(inWs, f -> {
+              copyOrLink(wfrCopy, f).run();
+              return null;
+            });
           } else {
             logger.debug("{} is up to date", inWs);
           }
@@ -437,21 +437,17 @@ public final class WorkspaceImpl implements Workspace {
   }
 
   /** Copy or link <code>src</code> to <code>dst</code>. */
-  private void copyOrLink(final File src, final File dst) throws IOException {
-    if (linkingEnabled) {
-      FileUtils.deleteQuietly(dst);
-      FileSupport.link(src, dst);
-    } else {
-      FileSupport.copy(src, dst);
-    }
-  }
-
-  /** {@link #copyOrLink(java.io.File, java.io.File)} as an effect. <code>src -> dst -> ()</code> */
-  private Effect<File> copyOrLink(final File src) {
-    return new Effect.X<>() {
-      @Override
-      protected void xrun(File dst) throws IOException {
-        copyOrLink(src, dst);
+  private Runnable copyOrLink(File src, File dst) {
+    return () -> {
+      try {
+        if (linkingEnabled) {
+          FileUtils.deleteQuietly(dst);
+          FileSupport.link(src, dst);
+        } else {
+          FileSupport.copy(src, dst);
+        }
+      } catch (Exception e) {
+        chuck(e);
       }
     };
   }
@@ -463,26 +459,26 @@ public final class WorkspaceImpl implements Workspace {
    * @throws IOException
    *           in case of any IO related issues
    */
-  private Either<String, Option<File>> handleDownloadResponse(HttpResponse response, URI src, File dst)
+  private Either<String, Optional<File>> handleDownloadResponse(HttpResponse response, URI src, File dst)
           throws IOException {
     final String url = src.toString();
     final int status = response.getStatusLine().getStatusCode();
     switch (status) {
       case HttpServletResponse.SC_NOT_FOUND:
-        return right(none(File.class));
+        return right(Optional.empty());
       case HttpServletResponse.SC_NOT_MODIFIED:
         logger.debug("{} has not been modified.", url);
-        return right(some(dst));
+        return right(Optional.of(dst));
       case HttpServletResponse.SC_ACCEPTED:
         logger.debug("{} is not ready, try again later.", url);
         return left(response.getHeaders("token")[0].getValue());
       case HttpServletResponse.SC_OK:
         logger.debug("Downloading {} to {}", url, dst.getAbsolutePath());
-        return right(some(downloadTo(response, dst)));
+        return right(Optional.of(downloadTo(response, dst)));
       default:
         logger.warn("Received unexpected response status {} while trying to download from {}", status, url);
         FileUtils.deleteQuietly(dst);
-        return right(none(File.class));
+        return right(Optional.empty());
     }
   }
 
@@ -516,7 +512,7 @@ public final class WorkspaceImpl implements Workspace {
       // run the http request and handle its response
       try {
         HttpResponse response = null;
-        final Either<String, Option<File>> result;
+        final Either<String, Optional<File>> result;
         try {
           response = trustedHttpClient.execute(get);
           result = handleDownloadResponse(response, src, dst);
@@ -525,9 +521,9 @@ public final class WorkspaceImpl implements Workspace {
             trustedHttpClient.close(response);
           }
         }
-        for (Option<File> ff : result.right()) {
-          for (File f : ff) {
-            return f;
+        for (Optional<File> ff : result.right()) {
+          if (ff.isPresent()) {
+            return ff.get();
           }
           FileUtils.deleteQuietly(dst);
           // none
@@ -550,10 +546,11 @@ public final class WorkspaceImpl implements Workspace {
    * <code>src_uri -&gt; dst_file -&gt; dst_file</code>
    */
   private Function<File, File> downloadIfNecessary(final URI src) {
-    return new Function.X<File, File>() {
-      @Override
-      public File xapply(final File dst) throws Exception {
+    return dst -> {
+      try {
         return downloadIfNecessary(src, dst);
+      } catch (Exception e) {
+        return chuck(e);
       }
     };
   }
@@ -873,18 +870,18 @@ public final class WorkspaceImpl implements Workspace {
   }
 
   @Override
-  public Option<Long> getTotalSpace() {
-    return some(new File(wsRoot).getTotalSpace());
+  public Optional<Long> getTotalSpace() {
+    return Optional.of(new File(wsRoot).getTotalSpace());
   }
 
   @Override
-  public Option<Long> getUsableSpace() {
-    return some(new File(wsRoot).getUsableSpace());
+  public Optional<Long> getUsableSpace() {
+    return Optional.of(new File(wsRoot).getUsableSpace());
   }
 
   @Override
-  public Option<Long> getUsedSpace() {
-    return some(FileUtils.sizeOfDirectory(new File(wsRoot)));
+  public Optional<Long> getUsedSpace() {
+    return Optional.of(FileUtils.sizeOfDirectory(new File(wsRoot)));
   }
 
   @Override
@@ -917,16 +914,17 @@ public final class WorkspaceImpl implements Workspace {
   private void waitForResource(final URI uri, final int expectedStatus, final String errorMsg) throws IOException {
     if (waitForResourceFlag) {
       HttpUtil.waitForResource(trustedHttpClient, uri, expectedStatus, TIMEOUT, INTERVAL)
-              .fold(Misc.<Exception, Void> chuck(), new Effect.X<Integer>() {
-                @Override
-                public void xrun(Integer status) throws Exception {
-                  if (ne(status, expectedStatus)) {
-                    final String msg = format(errorMsg, uri.toString());
-                    logger.warn(msg);
-                    throw new IOException(msg);
-                  }
+          .fold(
+              chuck(),
+              status -> {
+                if (ne(status, expectedStatus)) {
+                  final String msg = String.format(errorMsg, uri.toString());
+                  logger.warn(msg);
+                  chuck(new IOException(msg));
                 }
-              });
+                return null;
+              }
+          );
     }
   }
 

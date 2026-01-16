@@ -166,7 +166,7 @@ public class UIConfigRest {
     File configFile = Paths.get(uiConfigFolder, orgId, component, filename).toFile();
 
     try {
-      final String basePath = new File(uiConfigFolder, orgId).getCanonicalPath();
+      final String basePath = new File(uiConfigFolder, orgId).getCanonicalPath() + File.separator;
       final String configFileCanPath = configFile.getCanonicalPath();
 
       // is configFile a subdirectory of basePath (additional directory traversal protection), if not stop

@@ -173,17 +173,19 @@ public class JaxbWorkflowOperationInstance {
                     .stream()
                     .collect(Collectors.toMap(JaxbWorkflowConfiguration::getKey, JaxbWorkflowConfiguration::getValue)),
         failOnError, executeCondition,
-            exceptionHandlingWorkflow, abortable, continuable, dateStarted, dateCompleted, timeInQueue, maxAttempts, failedAttempts,
-            executionHost, retryStrategy);
+            exceptionHandlingWorkflow, abortable, continuable, dateStarted, dateCompleted, timeInQueue, maxAttempts,
+            failedAttempts, executionHost, retryStrategy);
   }
 
   @Override
   public boolean equals(Object o) {
-    if (this == o)
+    if (this == o) {
       return true;
+    }
 
-    if (o == null || getClass() != o.getClass())
+    if (o == null || getClass() != o.getClass()) {
       return false;
+    }
 
     JaxbWorkflowOperationInstance jaxbWorkflowOperationInstance = (JaxbWorkflowOperationInstance) o;
 

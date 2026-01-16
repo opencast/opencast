@@ -113,7 +113,8 @@ public class CaptureAgentsEndpoint {
       },
       responses = {
           @RestResponse(description = "The agent is returned.", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "The specified agent does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND)
+          @RestResponse(description = "The specified agent does not exist.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
       }
   )
   public Response getAgent(
@@ -135,11 +136,14 @@ public class CaptureAgentsEndpoint {
       description = "Returns a list of agents.",
       returnDescription = "",
       restParameters = {
-          @RestParameter(name = "limit", description = "The maximum number of results to return for a single request.", isRequired = false, type = Type.INTEGER),
-          @RestParameter(name = "offset", description = "The index of the first result to return.", isRequired = false, type = Type.INTEGER)
+          @RestParameter(name = "limit", description = "The maximum number of results to return for a single request.",
+              isRequired = false, type = Type.INTEGER),
+          @RestParameter(name = "offset", description = "The index of the first result to return.",
+              isRequired = false, type = Type.INTEGER)
       },
       responses = {
-          @RestResponse(description = "A (potentially empty) list of agents is returned.", responseCode = HttpServletResponse.SC_OK)
+          @RestResponse(description = "A (potentially empty) list of agents is returned.",
+              responseCode = HttpServletResponse.SC_OK)
       }
   )
   public Response getAgents(

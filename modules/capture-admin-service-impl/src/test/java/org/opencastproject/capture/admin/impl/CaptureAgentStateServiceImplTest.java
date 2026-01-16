@@ -193,8 +193,9 @@ public class CaptureAgentStateServiceImplTest {
       assertEquals(state, agent.getState());
       assertEquals(caps, agent.getCapabilities());
     } catch (NotFoundException e) {
-      if (state != null)
+      if (state != null) {
         fail();
+      }
     }
   }
 

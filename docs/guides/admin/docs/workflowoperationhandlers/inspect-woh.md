@@ -43,14 +43,11 @@ you specify the option `overwrite` as `true`.
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="inspect"
-    description="Inspecting mediapackage track elements">
-  <configurations>
-    <configuration key="overwrite">false</configuration>
-    <configuration key="accept-no-media">false</configuration>
-    <configuration key="accurate-frame-count">false</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: inspect
+    description: Inspecting mediapackage track elements
+    configurations:
+      - overwrite: false
+      - accept-no-media: false
+      - accurate-frame-count: false
 ```

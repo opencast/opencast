@@ -53,7 +53,6 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -61,7 +60,6 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.util.requests.SortCriterion;
 import org.opencastproject.util.requests.SortCriterion.Order;
 
-import com.entwinemedia.fn.data.Opt;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -185,17 +183,17 @@ public class AclEndpoint {
           @QueryParam("offset") int offset, @QueryParam("limit") int limit) throws IOException {
     if (limit < 1)
       limit = 100;
-    Opt<String> optSort = Opt.nul(trimToNull(sort));
-    Option<String> filterName = Option.none();
-    Option<String> filterText = Option.none();
+    Optional<String> optSort = Optional.ofNullable(trimToNull(sort));
+    Optional<String> filterName = Optional.empty();
+    Optional<String> filterText = Optional.empty();
 
     Map<String, String> filters = RestUtils.parseFilter(filter);
     for (String name : filters.keySet()) {
       String value = filters.get(name);
       if (AclsListQuery.FILTER_NAME_NAME.equals(name)) {
-        filterName = Option.some(value);
+        filterName = Optional.of(value);
       } else if ((AclsListQuery.FILTER_TEXT_NAME.equals(name)) && (StringUtils.isNotBlank(value))) {
-        filterText = Option.some(value);
+        filterText = Optional.of(value);
       }
     }
 
@@ -203,8 +201,8 @@ public class AclEndpoint {
     List<ManagedAcl> filteredAcls = new ArrayList<>();
     for (ManagedAcl acl : aclService().getAcls()) {
       // Filter list
-      if ((filterName.isSome() && !filterName.get().equals(acl.getName()))
-              || (filterText.isSome() && !TextFilter.match(filterText.get(), acl.getName()))) {
+      if ((filterName.isPresent() && !filterName.get().equals(acl.getName()))
+              || (filterText.isPresent() && !TextFilter.match(filterText.get(), acl.getName()))) {
         continue;
       }
       filteredAcls.add(acl);
@@ -212,7 +210,7 @@ public class AclEndpoint {
     int total = filteredAcls.size();
 
     // Sort by name, description or role
-    if (optSort.isSome()) {
+    if (optSort.isPresent()) {
       final ArrayList<SortCriterion> sortCriteria = RestUtils.parseSortQueryParameter(optSort.get());
       Collections.sort(filteredAcls, new Comparator<ManagedAcl>() {
         @Override
@@ -374,6 +372,21 @@ public class AclEndpoint {
       return RestUtils.okJson(full(managedAcl.get()));
     }
     logger.info("No ACL with id '{}' could by found", aclId);
+    throw new NotFoundException();
+  }
+
+  @GET
+  @Path("acl/{name}")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(name = "getaclbyname", description = "Return the ACL by the given name", returnDescription = "Return the ACL by the given name", pathParameters = { @RestParameter(name = "name", isRequired = true, description = "The ACL name", type = STRING) }, responses = {
+      @RestResponse(responseCode = SC_OK, description = "The ACL has successfully been returned"),
+      @RestResponse(responseCode = SC_NOT_FOUND, description = "The ACL has not been found") })
+  public Response getAcl(@PathParam("name") String aclName) throws NotFoundException {
+    Optional<ManagedAcl> managedAcl = aclService().getAcl(aclName);
+    if (managedAcl.isPresent()) {
+      return RestUtils.okJson(full(managedAcl.get()));
+    }
+    logger.info("No ACL with name '{}' could by found", aclName);
     throw new NotFoundException();
   }
 

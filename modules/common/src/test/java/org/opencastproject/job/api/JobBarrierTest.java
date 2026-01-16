@@ -24,11 +24,8 @@ package org.opencastproject.job.api;
 import static org.easymock.EasyMock.createNiceMock;
 import static org.junit.Assert.assertTrue;
 import static org.opencastproject.util.data.Collections.toArray;
-import static org.opencastproject.util.data.Monadics.mlist;
 
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.util.data.Function;
-import org.opencastproject.util.data.Function2;
 
 import org.easymock.EasyMock;
 import org.junit.Test;
@@ -37,6 +34,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 public class JobBarrierTest {
 
@@ -73,12 +71,8 @@ public class JobBarrierTest {
     // wait for all jobs to complete
     new JobBarrier(null, sr, 10, toArray(Job.class, jobs.values())).waitForJobs();
     // check if there are still running jobs
-    final boolean noRunningJobs = mlist(jobs.values()).foldl(true, new Function2<Boolean, TestJob, Boolean>() {
-      @Override
-      public Boolean apply(Boolean sum, TestJob job) {
-        return sum && hasJobTerminated(job.getLastReportedStatus());
-      }
-    });
+    final boolean noRunningJobs = jobs.values().stream()
+        .allMatch(job -> hasJobTerminated(job.getLastReportedStatus()));
     assertTrue("There are still some jobs running", noRunningJobs);
   }
 

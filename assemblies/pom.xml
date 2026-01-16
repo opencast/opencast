@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>19-SNAPSHOT</version>
+    <version>20-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <properties>
@@ -133,6 +133,7 @@
               <feature>opencast-plugin-userdirectory-brightspace</feature>
               <feature>opencast-plugin-usertracking</feature>
               <feature>opencast-plugin-graphql</feature>
+              <feature>opencast-plugin-paella7</feature>
             </installedFeatures>
           </configuration>
         </plugin>

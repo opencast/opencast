@@ -47,10 +47,12 @@ public final class DCMIPeriod {
    * Create a new period with an optional name. To create an open interval you may set one of the bounbaries null.
    */
   public DCMIPeriod(Date start, Date end, String name) {
-    if (start == null && end == null)
+    if (start == null && end == null) {
       throw new IllegalStateException("A period must be bounded at least at one end");
-    if (start != null && end != null && end.before(start))
+    }
+    if (start != null && end != null && end.before(start)) {
       throw new IllegalStateException("The end date is before the start date");
+    }
 
     this.start = start;
     this.end = end;

@@ -1,5 +1,12 @@
 import React, { DOMAttributes } from "react";
-import { SearchEpisodeResults, searchEpisode, getLti, SearchEpisodeResult, deleteEvent, Track } from "../OpencastRest";
+import {
+    SearchEpisodeResults,
+    searchEpisode,
+    getLti,
+    SearchEpisodeResult,
+    deleteEvent,
+    Track,
+} from "../OpencastRest";
 import { Loading } from "./Loading";
 import { withTranslation, WithTranslation } from "react-i18next";
 import "../App.css";
@@ -137,7 +144,8 @@ class TranslatedSeries extends React.Component<SeriesProps, SeriesState> {
             undefined,
             typeof qs.series === "string" ? qs.series : undefined,
             typeof qs.series_name === "string" ? qs.series_name : undefined,
-            typeof qs.sort === "string" ? qs.sort : undefined
+            typeof qs.sort === "string" ? qs.sort : undefined,
+            typeof qs.live === "string" ? qs.live : undefined,
         ).then((results) => this.setState({
             ...this.state,
             searchResults: results
@@ -145,6 +153,7 @@ class TranslatedSeries extends React.Component<SeriesProps, SeriesState> {
             ...this.state,
             httpErrors: this.state.httpErrors.concat([error.message])
         }));
+
     }
 
     unsetDeletionState() {

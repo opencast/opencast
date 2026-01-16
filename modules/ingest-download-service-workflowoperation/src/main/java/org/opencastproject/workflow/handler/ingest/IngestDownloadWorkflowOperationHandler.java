@@ -75,8 +75,8 @@ public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOper
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
+   * @see org.opencastproject.workflow.api.AbstractWorkflowOperationHandler#start(
+   *      org.opencastproject.workflow.api.WorkflowInstance, JobContext)
    */
 
   @Reference
@@ -101,7 +101,9 @@ public class IngestDownloadWorkflowOperationHandler extends AbstractWorkflowOper
       sourceTags = String.join(",",sourceTagList);
     }
     if (!sourceFlavorList.isEmpty()) {
-      sourceFlavors = sourceFlavorList.stream().map(MediaPackageElementFlavor::toString).collect(Collectors.joining(","));
+      sourceFlavors = sourceFlavorList.stream()
+          .map(MediaPackageElementFlavor::toString)
+          .collect(Collectors.joining(","));
     }
 
     try {

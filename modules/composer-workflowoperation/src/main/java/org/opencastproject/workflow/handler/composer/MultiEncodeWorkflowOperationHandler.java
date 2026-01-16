@@ -123,8 +123,8 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(
+   *      org.opencastproject.workflow.api.WorkflowInstance, JobContext)
    */
   @Override
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
@@ -215,15 +215,19 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
           String[] targetFlavors, String[] targetTags, String[] profiles) throws WorkflowOperationException {
     int n = 0;
     List<ElementProfileTagFlavor> elementSelectors = new ArrayList<>();
-    if (sourceTags == null && sourceFlavors == null)
+    if (sourceTags == null && sourceFlavors == null) {
       throw new WorkflowOperationException("No source tags or Flavor");
-    if (profiles == null)
+    }
+    if (profiles == null) {
       throw new WorkflowOperationException("Missing profiles");
+    }
     if (sourceTags != null) { // If source tags are used to select tracks
       // If use source and target tags, there should be the same number of them or all map into one target
-      if (targetTags != null && (targetTags.length != 1 && sourceTags.length != targetTags.length))
-        throw new WorkflowOperationException("number of source tags " + sourceTags.length
-                + " does not match number of target tags " + targetTags.length + " (must be the same or one target)");
+      if (targetTags != null && (targetTags.length != 1 && sourceTags.length != targetTags.length)) {
+        throw new WorkflowOperationException(
+            "number of source tags " + sourceTags.length + " does not match number of target tags " + targetTags.length
+                + " (must be the same or one target)");
+      }
       // There should be the same number of source tags or profile groups or all use same group of profiles
       if (profiles.length != 1 && sourceTags.length != profiles.length) {
         throw new WorkflowOperationException(
@@ -259,15 +263,17 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
                 + " does not match number of profiles segments " + profiles.length
                 + " (must be the same or one profile)");
       }
-      if (sourceFlavors.length > n)
+      if (sourceFlavors.length > n) {
         n = sourceFlavors.length; // at least this many tracks
+      }
     }
     int numProfiles = 0;
     // One for each source flavor
     for (int i = 0; i < n; i++) {
       elementSelectors.add(new ElementProfileTagFlavor(profiles[numProfiles]));
-      if (profiles.length > 1)
+      if (profiles.length > 1) {
         numProfiles++; // All source use the same set of profiles or its own
+      }
     }
     // If uses tags to select, but sets target flavor, they must match
     if (sourceTags != null && sourceFlavors != null) {
@@ -294,27 +300,31 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
           for (String tag : asList(sourceTags[st])) {
             ep.addSourceTag(tag);
           }
-          if (sourceTags.length != 1)
+          if (sourceTags.length != 1) {
             st++;
+          }
         }
         if (targetTags != null) {
           ep.setTargetTags(targetTags[tt]);
-          if (targetTags.length != 1)
+          if (targetTags.length != 1) {
             tt++;
+          }
         }
         if (sourceFlavors != null) {
           for (String flavor : asList(sourceFlavors[sf])) {
             ep.addSourceFlavor(flavor);
           }
-          if (sourceFlavors.length != 1)
+          if (sourceFlavors.length != 1) {
             sf++;
+          }
         }
         if (targetFlavors != null) {
           for (String flavor : asList(targetFlavors[tf])) {
             ep.setTargetFlavor(flavor);
           }
-          if (targetFlavors.length != 1)
+          if (targetFlavors.length != 1) {
             tf++;
+          }
         }
       } catch (IllegalArgumentException e) {
         throw new WorkflowOperationException("Set Tags or Flavor " + e.getMessage());
@@ -368,8 +378,9 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
       return createResult(mediaPackage, Action.CONTINUE);
     }
     String[] profiles = getConfigAsArray(operation, "encoding-profiles");
-    if (profiles == null)
+    if (profiles == null) {
       throw new WorkflowOperationException("Missing encoding profiles");
+    }
 
     // Sort out the combinatorics of all the tags and flavors
     List<ElementProfileTagFlavor> selectors = getSrcSelector(sourceFlavors, sourceTags, targetFlavors, targetTags,
@@ -504,10 +515,12 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
         String flavorType = targetFlavor.getType();
         String flavorSubtype = targetFlavor.getSubtype();
         // Adjust the target flavor. Make sure to account for partial updates
-        if ("*".equals(flavorType))
+        if ("*".equals(flavorType)) {
           flavorType = track.getFlavor().getType();
-        if ("*".equals(flavorSubtype))
+        }
+        if ("*".equals(flavorSubtype)) {
           flavorSubtype = track.getFlavor().getSubtype();
+        }
         return (new MediaPackageElementFlavor(flavorType, flavorSubtype));
       } catch (IllegalArgumentException e) {
         throw new WorkflowOperationException("Target flavor '" + flavor + "' is malformed");

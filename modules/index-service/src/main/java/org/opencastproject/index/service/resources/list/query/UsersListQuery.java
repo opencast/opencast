@@ -26,7 +26,8 @@ import org.opencastproject.index.service.util.FiltersUtils;
 import org.opencastproject.list.api.ResourceListFilter;
 import org.opencastproject.list.api.ResourceListFilter.SourceType;
 import org.opencastproject.list.impl.ResourceListQueryImpl;
-import org.opencastproject.util.data.Option;
+
+import java.util.Optional;
 
 /**
  * Query for the users list.
@@ -53,7 +54,8 @@ public class UsersListQuery extends ResourceListQueryImpl {
 
   public UsersListQuery() {
     super();
-    this.availableFilters.add(createProviderFilter(Option.<String> none()));
+    this.availableFilters.add(createRoleFilter(Optional.<String> empty()));
+    this.availableFilters.add(createProviderFilter(Optional.<String> empty()));
   }
 
   /**
@@ -63,15 +65,15 @@ public class UsersListQuery extends ResourceListQueryImpl {
    *          the name to filter for
    */
   public void withName(String name) {
-    this.addFilter(createNameFilter(Option.option(name)));
+    this.addFilter(createNameFilter(Optional.ofNullable(name)));
   }
 
   /**
-   * Returns an {@link Option} containing the name used to filter if set
+   * Returns an {@link Optional} containing the name used to filter if set
    *
-   * @return an {@link Option} containing the name or none.
+   * @return an {@link Optional} containing the name or none.
    */
-  public Option<String> getName() {
+  public Optional<String> getName() {
     return this.getFilterValue(FILTER_NAME_NAME);
   }
 
@@ -82,15 +84,15 @@ public class UsersListQuery extends ResourceListQueryImpl {
    *          the role to filter for
    */
   public void withRole(String role) {
-    this.addFilter(createRoleFilter(Option.option(role)));
+    this.addFilter(createRoleFilter(Optional.ofNullable(role)));
   }
 
   /**
-   * Returns an {@link Option} containing the role used to filter if set
+   * Returns an {@link Optional} containing the role used to filter if set
    *
-   * @return an {@link Option} containing the role or none.
+   * @return an {@link Optional} containing the role or none.
    */
-  public Option<String> getRole() {
+  public Optional<String> getRole() {
     return this.getFilterValue(FILTER_ROLE_NAME);
   }
 
@@ -101,15 +103,15 @@ public class UsersListQuery extends ResourceListQueryImpl {
    *          the provider to filter for
    */
   public void withProvider(String provider) {
-    this.addFilter(createProviderFilter(Option.option(provider)));
+    this.addFilter(createProviderFilter(Optional.ofNullable(provider)));
   }
 
   /**
-   * Returns an {@link Option} containing the provider used to filter if set
+   * Returns an {@link Optional} containing the provider used to filter if set
    *
-   * @return an {@link Option} containing the provider or none.
+   * @return an {@link Optional} containing the provider or none.
    */
-  public Option<String> getProvider() {
+  public Optional<String> getProvider() {
     return this.getFilterValue(FILTER_PROVIDER_NAME);
   }
 
@@ -117,36 +119,36 @@ public class UsersListQuery extends ResourceListQueryImpl {
    * Create a new {@link ResourceListFilter} based on a name
    *
    * @param name
-   *          the name to filter on wrapped in an {@link Option} or {@link Option#none()}
+   *          the name to filter on wrapped in an {@link Optional} or {@link Optional#empty()}
    * @return a new {@link ResourceListFilter} for a name based query
    */
-  public static ResourceListFilter<String> createNameFilter(Option<String> name) {
+  public static ResourceListFilter<String> createNameFilter(Optional<String> name) {
     return FiltersUtils.generateFilter(name, FILTER_NAME_NAME, FILTER_NAME_LABEL, SourceType.SELECT,
-            Option.some(UsersListProvider.NAME_ONLY));
+            Optional.of(UsersListProvider.NAME_ONLY));
   }
 
   /**
    * Create a new {@link ResourceListFilter} based on a role
    *
    * @param role
-   *          the role to filter on wrapped in an {@link Option} or {@link Option#none()}
+   *          the role to filter on wrapped in an {@link Optional} or {@link Optional#empty()}
    * @return a new {@link ResourceListFilter} for a role based query
    */
-  public static ResourceListFilter<String> createRoleFilter(Option<String> role) {
+  public static ResourceListFilter<String> createRoleFilter(Optional<String> role) {
     return FiltersUtils.generateFilter(role, FILTER_ROLE_NAME, FILTER_ROLE_LABEL, SourceType.SELECT,
-            Option.some(UsersListProvider.ROLE_ONLY));
+            Optional.of(UsersListProvider.ROLE_ONLY));
   }
 
   /**
    * Create a new {@link ResourceListFilter} based on a provider
    *
    * @param provider
-   *          the provider to filter on wrapped in an {@link Option} or {@link Option#none()}
+   *          the provider to filter on wrapped in an {@link Optional} or {@link Optional#empty()}
    * @return a new {@link ResourceListFilter} for a provider based query
    */
-  public static ResourceListFilter<String> createProviderFilter(Option<String> provider) {
+  public static ResourceListFilter<String> createProviderFilter(Optional<String> provider) {
     return FiltersUtils.generateFilter(provider, FILTER_PROVIDER_NAME, FILTER_PROVIDER_LABEL, SourceType.SELECT,
-            Option.some(UsersListProvider.USERDIRECTORY_ONLY));
+            Optional.of(UsersListProvider.USERDIRECTORY_ONLY));
   }
 
 }

@@ -21,17 +21,12 @@
 
 package org.opencastproject.util;
 
-import static com.entwinemedia.fn.Prelude.chuck;
-
-import com.entwinemedia.fn.Fn;
-import com.entwinemedia.fn.Fx;
-import com.entwinemedia.fn.Unit;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.concurrent.CountDownLatch;
+import java.util.function.Function;
 
 /**
  * A StreamConsumer helps to asynchronously consume a text input stream line by line.
@@ -42,7 +37,7 @@ public class StreamConsumer implements Runnable {
   private final CountDownLatch ready = new CountDownLatch(1);
   private final CountDownLatch finished = new CountDownLatch(1);
 
-  private final Fn<String, Boolean> consumer;
+  private final Function<String, Boolean> consumer;
 
   private boolean stopped = false;
   private InputStream stream;
@@ -54,7 +49,7 @@ public class StreamConsumer implements Runnable {
    * @param consumer
    *         a predicate function that may stop reading further lines by returning <code>false</code>
    */
-  public StreamConsumer(Fn<String, Boolean> consumer) {
+  public StreamConsumer(Function<String, Boolean> consumer) {
     this.consumer = consumer;
   }
 
@@ -65,10 +60,10 @@ public class StreamConsumer implements Runnable {
       // also save a reference to the reader to able to close it in stopReading
       // otherwise the read loop may continue reading from the buffer
       reader = new BufferedReader(new InputStreamReader(stream));
-      IoSupport.withResource(reader, consumeBuffered);
+      IoSupport.<Void, BufferedReader>withResource(reader, consumeBufferedFunction);
       finished.countDown();
     } catch (InterruptedException e) {
-      chuck(e);
+      throw new RuntimeException(e);
     }
   }
 
@@ -77,7 +72,7 @@ public class StreamConsumer implements Runnable {
     try {
       running.await();
     } catch (InterruptedException e) {
-      chuck(e);
+      throw new RuntimeException(e);
     }
   }
 
@@ -86,7 +81,7 @@ public class StreamConsumer implements Runnable {
     try {
       finished.await();
     } catch (InterruptedException e) {
-      chuck(e);
+      throw new RuntimeException(e);
     }
   }
 
@@ -106,20 +101,27 @@ public class StreamConsumer implements Runnable {
     ready.countDown();
   }
 
-  private final Fn<BufferedReader, Unit> consumeBuffered = new Fx<BufferedReader>() {
-    @Override public void apply(BufferedReader reader) {
+  private final Function<BufferedReader, Void> consumeBufferedFunction = new Function<BufferedReader, Void>() {
+    @Override
+    public Void apply(BufferedReader bufferedReader) {
+      consumeBuffered(bufferedReader);
+      return null; // Void return
+    }
+  };
+
+  private void consumeBuffered(BufferedReader reader) {
+    try {
       String line;
-      try {
-        while ((line = reader.readLine()) != null) {
-          if (!consumer.apply(line)) {
-            stopConsuming();
-          }
-        }
-      } catch (IOException e) {
-        if (!stopped) {
-          chuck(e);
+      while ((line = reader.readLine()) != null) {
+        if (!consumer.apply(line)) {
+          stopConsuming();
+          break;
         }
       }
+    } catch (IOException e) {
+      if (!stopped) {
+        throw new RuntimeException(e);
+      }
     }
-  }.toFn();
+  }
 }

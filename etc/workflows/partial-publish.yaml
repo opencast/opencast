@@ -1,0 +1,225 @@
+id: partial-publish
+title: Publish the recording
+operations:
+  - id: select-tracks
+    exception-handler-workflow: partial-error
+    description: Selecting audio/video streams for processing
+    configurations:
+      - source-flavor: '*/source'
+      - target-flavor: '*/work'
+      - target-tags: -archive
+      - audio-muxing: duplicate
+
+  - id: analyze-tracks
+    exception-handler-workflow: partial-error
+    description: Analyzing tracks in media package and setting control variables
+    configurations:
+      - source-flavor: '*/work'
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # Cut the video according the SMIL file
+
+  # Perform cutting according to the edit decision list.
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  - id: clone
+    exception-handler-workflow: partial-error
+    description: Creating working copy of the cutting information
+    configurations:
+      - source-flavor: smil/cutting
+      - target-flavor: smil/tmp
+
+  - id: editor
+    exception-handler-workflow: partial-error
+    description: Cutting the recording according to the edit decision list
+    configurations:
+      - source-flavors: '*/work'
+      - smil-flavors: smil/tmp
+      - target-smil-flavor: smil/tmp
+      - target-flavor-subtype: trimmed
+      - interactive: false
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # Extract preview images
+
+  # From the edited recording, take preview images for the player,
+  # search results etc.
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # Encode to engage search result thumbnails
+  - id: image
+    exception-handler-workflow: partial-error
+    description: Creating search result default thumbnails
+    configurations:
+      - source-flavor: '*/trimmed'
+      - target-flavor: '*/search+preview'
+      - target-tags: engage-download
+      - encoding-profile: search-cover.http
+      - time: 3
+
+  # Encode to engage player preview images
+  - id: image
+    if: NOT ${presentation/thumbnail_edited}
+    exception-handler-workflow: partial-error
+    description: Creating player preview image for presentation video
+    configurations:
+      - source-flavor: presentation/trimmed
+      - target-flavor: presentation/player+preview
+      - target-tags: engage-download
+      - encoding-profile: player-preview.http
+      - time: 3
+
+  - id: tag
+    if: ${presentation/thumbnail_edited}
+    exception-handler-workflow: partial-error
+    description: Prepare thumbnail for publication
+    configurations:
+      - source-flavor: presentation/player+preview
+      - target-tags: +engage-download
+
+  # Create a cover image
+  - id: image
+    if: NOT ${presenter/thumbnail_edited}
+    exception-handler-workflow: partial-error
+    description: Creating player preview image for presenter video
+    configurations:
+      - source-flavor: presenter/trimmed
+      - target-flavor: presenter/player+preview
+      - target-tags: engage-download
+      - encoding-profile: player-preview.http
+      - time: 3
+
+  - id: cover-image
+    if: NOT (${presenter_work_video} OR ${presentation_work_video} OR ${presentation/thumbnail_edited}) AND (${presenter_work_audio} OR ${presentation_work_audio})
+    description: Create a cover image for audio-only files
+    configurations:
+      - stylesheet: file://${karaf.etc}/branding/coverimage.xsl
+      - width: 1920
+      - height: 1080
+      - posterimage-flavor: presenter/coverbackground
+      - target-flavor: presenter/player+preview
+      - target-tags: archive, engage-download
+
+  - id: tag
+    if: ${presenter/thumbnail_edited}
+    exception-handler-workflow: partial-error
+    description: Prepare thumbnail for publication
+    configurations:
+      - source-flavor: presenter/player+preview
+      - target-tags: +engage-download
+
+  # Generate timeline preview images
+  - id: timelinepreviews
+    if: ${presenter_work_video} OR ${presentation_work_video}
+    fail-on-error: false
+    exception-handler-workflow: partial-error
+    description: Creating timeline preview images
+    configurations:
+      - source-flavor: '*/trimmed'
+      - target-flavor: '*/timeline+preview'
+      - target-tags: engage-download
+      - image-count: 100
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # Apply theming
+
+  # Add trailer and bumper to the recording prior to publication.
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  - id: include
+    if: ${presenter_work_video} OR ${presentation_work_video}
+    description: Including theming operations
+    configurations:
+      - workflow-id: partial-theming
+
+  # Mark captions for publication
+  - id: tag
+    description: Mark captions for publication
+    configurations:
+      - source-flavors: captions/shifted
+      - target-flavor: captions/delivery
+      - target-tags: +engage-download
+
+  # Mark chapters for publication
+  - id: tag
+    description: Mark chapters for publication
+    configurations:
+      - source-flavors: chapters/shifted
+      - target-flavor: chapters/delivery
+      - target-tags: +engage-download
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # Encode for publication to Engage
+
+  # Encode audio and video formats to the distribution formats that
+  # are required by the Engage publication channel.
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # Encode presenter (camera) and presentation (screen)
+  # to Engage player format
+  - id: encode
+    if: ${presenter_work_video} OR ${presentation_work_video}
+    exception-handler-workflow: partial-error
+    description: Encoding videos to mp4 delivery format
+    configurations:
+      - source-flavor: '*/themed'
+      - target-flavor: '*/delivery'
+      - target-tags: engage-download,engage-streaming
+      - encoding-profile: adaptive-parallel.http
+
+  - id: encode
+    if: NOT (${presenter_work_video} OR ${presentation_work_video}) AND (${presenter_work_audio} OR ${presentation_work_audio})
+    exception-handler-workflow: partial-error
+    description: Encoding audio-only files to mp3 delivery format
+    configurations:
+      - source-flavor: '*/trimmed'
+      - target-flavor: '*/delivery'
+      - target-tags: engage-download,engage-streaming
+      - encoding-profile: audio-to-m4a.http
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # Segment video streams and extract metadata
+
+  # Apply the video segmentation algorithm to the presentation tracks
+  # and extract segment preview images and metadata.
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # Run the videosegmentation
+  - id: segment-video
+    fail-on-error: false
+    description: Detecting slide transitions in presentation track
+    configurations:
+      - source-flavor: presentation/themed
+      - target-tags: engage-download
+
+  # Generate segment preview images
+  - id: segmentpreviews
+    fail-on-error: false
+    description: Creating preview images for presentation segments
+    configurations:
+      - source-flavor: presentation/themed
+      - target-flavor: presentation/segment+preview
+      - reference-flavor: presentation/delivery
+      - reference-tags: engage-download
+      - target-tags: engage-download
+      - encoding-profile: player-slides.http
+
+  # Extract text form slide preview images
+  - id: extract-text
+    fail-on-error: false
+    description: Extracting text from presentation segments
+    configurations:
+      - source-flavor: presentation/themed
+      - target-tags: engage-download
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # Publish to publication channels
+
+  # Send the encoded material along with the metadata to the
+  # publication channels.
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # Publish to engage player
+  - id: publish-engage
+    max-attempts: 2
+    exception-handler-workflow: partial-error
+    description: Publishing to Opencast Media Module
+    configurations:
+      - download-source-flavors: dublincore/*,security/*
+      - download-source-tags: engage-download
+      - streaming-source-tags: engage-streaming
+      - check-availability: false

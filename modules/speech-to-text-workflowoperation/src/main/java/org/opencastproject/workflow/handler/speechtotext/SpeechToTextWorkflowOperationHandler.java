@@ -63,7 +63,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -168,13 +167,17 @@ public class
     var async = BooleanUtils.toBoolean(workflowInstance.getCurrentOperation().getConfiguration(ASYNCHRONOUS));
 
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance,
-            Configuration.none, Configuration.one,
+            Configuration.many, Configuration.one,
             Configuration.many, Configuration.one);
     MediaPackageElementFlavor sourceFlavor = tagsAndFlavors.getSingleSrcFlavor();
+    List<String> srcTags = tagsAndFlavors.getSrcTags();
 
     TrackSelector trackSelector = new TrackSelector();
     trackSelector.addFlavor(sourceFlavor);
-    Collection<Track> tracks = trackSelector.select(mediaPackage, false);
+    for (String tag : srcTags) {
+      trackSelector.addTag(tag);
+    }
+    Collection<Track> tracks = trackSelector.select(mediaPackage, true);
 
     if (tracks.isEmpty()) {
       throw new WorkflowOperationException(
@@ -320,8 +323,6 @@ public class
       String outputLanguage = jobOutput[1];
       String engineType = jobOutput[2];
 
-      String mediaPackageIdentifier = UUID.randomUUID().toString();
-
       MediaPackageElement subtitleMediaPackageElement;
       switch (appendSubtitleAs) {
         case attachment:
@@ -332,19 +333,20 @@ public class
           subtitleMediaPackageElement = new TrackImpl();
       }
 
-      subtitleMediaPackageElement.setIdentifier(mediaPackageIdentifier);
+      subtitleMediaPackageElement.generateIdentifier();
       try (InputStream in = workspace.read(output)) {
-        URI uri = workspace.put(parentMediaPackage.getIdentifier().toString(), mediaPackageIdentifier,
+        URI uri = workspace.put(parentMediaPackage.getIdentifier().toString(),
+                subtitleMediaPackageElement.getIdentifier(),
                 FilenameUtils.getName(output.getPath()), in);
         subtitleMediaPackageElement.setURI(uri);
       }
       MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor().applyTo(track.getFlavor());
       subtitleMediaPackageElement.setFlavor(targetFlavor);
 
-      List<String> targetTags = tagsAndFlavors.getTargetTags();
-      targetTags.add("lang:" + outputLanguage);
-      targetTags.add("generator-type:auto");
-      targetTags.add("generator:" + engineType.toLowerCase());
+      ConfiguredTagsAndFlavors.TargetTags targetTags = tagsAndFlavors.getTargetTags();
+      targetTags.getOverrideTags().add("lang:" + outputLanguage);
+      targetTags.getOverrideTags().add("generator-type:auto");
+      targetTags.getOverrideTags().add("generator:" + engineType.toLowerCase());
 
       // this is used to set some values automatically, like the correct mimetype
       Job inspection = mediaInspectionService.enrich(subtitleMediaPackageElement, true);
@@ -355,9 +357,7 @@ public class
 
       subtitleMediaPackageElement = MediaPackageElementParser.getFromXml(inspection.getPayload());
 
-      for (String tag : targetTags) {
-        subtitleMediaPackageElement.addTag(tag);
-      }
+      applyTargetTagsToElement(targetTags, subtitleMediaPackageElement);
 
       parentMediaPackage.add(subtitleMediaPackageElement);
 

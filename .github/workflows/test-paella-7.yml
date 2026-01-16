@@ -1,4 +1,4 @@
-name: Tests Paella 7
+name: Tests » Paella 7
 
 on:
   pull_request:
@@ -12,15 +12,15 @@ on:
 
 
 jobs:
-  test:
+  test-paella:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     defaults:
         run:
           working-directory: ./modules/engage-paella-player-7
     steps:
-    - uses: actions/checkout@v4
-    - uses: actions/setup-node@v4
+    - uses: actions/checkout@v5
+    - uses: actions/setup-node@v6
       with:
         node-version: 20
     - name: Install dependencies
@@ -29,7 +29,7 @@ jobs:
       run: npx playwright install --with-deps
     - name: Run Playwright tests
       run: npx playwright test
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v5
       if: always()
       with:
         name: playwright-report

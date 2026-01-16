@@ -21,21 +21,19 @@
 
 package org.opencastproject.kernel.bundleinfo;
 
-import static org.opencastproject.util.data.Option.none;
-
-import org.opencastproject.util.data.Option;
+import java.util.Optional;
 
 public class BundleInfoImpl implements BundleInfo {
   private final String host;
   private final String bundleSymbolicName;
   private final long bundleId;
   private final String bundleVersion;
-  private final Option<String> buildNumber;
-  private final Option<String> dbSchemaVersion;
+  private final Optional<String> buildNumber;
+  private final Optional<String> dbSchemaVersion;
   private final BundleVersion version;
 
   public BundleInfoImpl(String host, String bundleSymbolicName, long bundleId, String bundleVersion,
-          Option<String> buildNumber, Option<String> dbSchemaVersion) {
+          Optional<String> buildNumber, Optional<String> dbSchemaVersion) {
     this.host = host;
     this.bundleSymbolicName = bundleSymbolicName;
     this.bundleId = bundleId;
@@ -46,12 +44,12 @@ public class BundleInfoImpl implements BundleInfo {
   }
 
   public static BundleInfo bundleInfo(String host, String bundleSymbolicName, long bundleId, String bundleVersion,
-          Option<String> buildNumber) {
-    return new BundleInfoImpl(host, bundleSymbolicName, bundleId, bundleVersion, buildNumber, none(""));
+          Optional<String> buildNumber) {
+    return new BundleInfoImpl(host, bundleSymbolicName, bundleId, bundleVersion, buildNumber, Optional.empty());
   }
 
   public static BundleInfo bundleInfo(String host, String bundleSymbolicName, long bundleId, String bundleVersion,
-          Option<String> buildNumber, Option<String> dbSchemaVersion) {
+          Optional<String> buildNumber, Optional<String> dbSchemaVersion) {
     return new BundleInfoImpl(host, bundleSymbolicName, bundleId, bundleVersion, buildNumber, dbSchemaVersion);
   }
 
@@ -76,7 +74,7 @@ public class BundleInfoImpl implements BundleInfo {
   }
 
   @Override
-  public Option<String> getBuildNumber() {
+  public Optional<String> getBuildNumber() {
     return buildNumber;
   }
 

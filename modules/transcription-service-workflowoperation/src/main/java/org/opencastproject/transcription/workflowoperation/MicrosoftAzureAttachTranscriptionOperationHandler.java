@@ -47,6 +47,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -105,7 +106,7 @@ public class MicrosoftAzureAttachTranscriptionOperationHandler extends AbstractW
 
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(
         workflowInstance, Configuration.none, Configuration.none, Configuration.many, Configuration.one);
-    List<String> targetTagOption = tagsAndFlavors.getTargetTags();
+    ConfiguredTagsAndFlavors.TargetTags targetTagOption = tagsAndFlavors.getTargetTags();
     MediaPackageElementFlavor targetFlavor;
     try {
 
@@ -141,12 +142,31 @@ public class MicrosoftAzureAttachTranscriptionOperationHandler extends AbstractW
       MediaPackageElement transcription
           = service.getGeneratedTranscription(mediaPackage.getIdentifier().toString(), jobId, type);
       transcription.setFlavor(targetFlavor);
-      for (String tag : targetTagOption) {
+
+      List<String> overrideTags = new ArrayList<>();
+      List<String> addTags = new ArrayList<>();
+      List<String> removeTags = new ArrayList<>();
+      for (String tag : targetTagOption.getOverrideTags()) {
         String templatedTag = DocUtil.processTextTemplate("Replacing variables in tag", tag, wfProps);
         if (StringUtils.isNotEmpty(templatedTag)) {
-          transcription.addTag(templatedTag);
+          overrideTags.add(templatedTag);
         }
       }
+      for (String tag : targetTagOption.getAddTags()) {
+        String templatedTag = DocUtil.processTextTemplate("Replacing variables in tag", tag, wfProps);
+        if (StringUtils.isNotEmpty(templatedTag)) {
+          addTags.add(templatedTag);
+        }
+      }
+      for (String tag : targetTagOption.getRemoveTags()) {
+        String templatedTag = DocUtil.processTextTemplate("Replacing variables in tag", tag, wfProps);
+        if (StringUtils.isNotEmpty(templatedTag)) {
+          removeTags.add(templatedTag);
+        }
+      }
+      applyTargetTagsToElement(new ConfiguredTagsAndFlavors.TargetTags(overrideTags, addTags, removeTags),
+          transcription);
+
       mediaPackage.add(transcription);
       logger.info("Added transcription to the media package {}: {}",
           mediaPackage.getIdentifier(), transcription.getURI());

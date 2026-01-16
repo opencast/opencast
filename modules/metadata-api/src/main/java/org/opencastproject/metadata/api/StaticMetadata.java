@@ -24,10 +24,10 @@ package org.opencastproject.metadata.api;
 
 import org.opencastproject.metadata.api.util.Interval;
 import org.opencastproject.util.data.NonEmptyList;
-import org.opencastproject.util.data.Option;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Provides access to a commonly accepted set of metadata.
@@ -42,25 +42,25 @@ import java.util.List;
  */
 public interface StaticMetadata {
 
-  Option<String> getId();
+  Optional<String> getId();
 
-  Option<Long> getExtent();
+  Optional<Long> getExtent();
 
-  Option<String> getLanguage();
+  Optional<String> getLanguage();
 
-  Option<String> getIsPartOf();
+  Optional<String> getIsPartOf();
 
-  Option<String> getReplaces();
+  Optional<String> getReplaces();
 
-  Option<String> getType();
+  Optional<String> getType();
 
-  Option<Interval> getAvailable();
+  Optional<Interval> getAvailable();
 
-  Option<Date[]> getTemporalPeriod();
+  Optional<Date[]> getTemporalPeriod();
 
-  Option<Date> getTemporalInstant();
+  Optional<Date> getTemporalInstant();
 
-  Option<Long> getTemporalDuration();
+  Optional<Long> getTemporalDuration();
 
   NonEmptyList<MetadataValue<String>> getTitles();
 

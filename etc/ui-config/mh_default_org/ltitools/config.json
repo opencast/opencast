@@ -1,0 +1,6 @@
+{
+  "series" : {
+    "excludeLiveStreams" : false,
+    "onlyLiveStreams" : false
+  }
+}

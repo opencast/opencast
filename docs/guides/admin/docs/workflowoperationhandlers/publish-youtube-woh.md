@@ -25,12 +25,9 @@ Parameter Table
 Operation Example
 -----------------
 
-```xml
-<operation
-    id="publish-youtube"
-    description="Publishing to YouTube">
-  <configurations>
-    <configuration key="source-tags">youtube</configuration>
-  </configurations>
-</operation>
+```yaml
+  - id: publish-youtube
+    description: Publishing to YouTube
+    configurations:
+      - source-tags: youtube
 ```

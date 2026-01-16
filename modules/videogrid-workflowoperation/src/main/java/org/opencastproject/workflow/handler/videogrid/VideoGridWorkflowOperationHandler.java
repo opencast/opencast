@@ -446,7 +446,7 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
     logger.info("The background color of the final video: {}", bgColor);
 
     // Target tags
-    List<String> targetTags = tagsAndFlavors.getTargetTags();
+    ConfiguredTagsAndFlavors.TargetTags targetTags = tagsAndFlavors.getTargetTags();
 
     // Define general layout for the final video
     LayoutArea layoutArea = new LayoutArea("webcam", 0, 0, resolution.getLeft(), resolution.getRight(),
@@ -652,9 +652,7 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
       }
       concatTrack.setFlavor(targetPresenterFlavor);
       concatTrack.setURI(concatTrack.getURI());
-      for (String tag : targetTags) {
-        concatTrack.addTag(tag);
-      }
+      applyTargetTagsToElement(targetTags, concatTrack);
 
       mediaPackage.add(concatTrack);
     } else {

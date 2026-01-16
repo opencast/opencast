@@ -28,10 +28,10 @@ import org.opencastproject.index.service.util.FiltersUtils;
 import org.opencastproject.list.api.ResourceListFilter;
 import org.opencastproject.list.api.ResourceListFilter.SourceType;
 import org.opencastproject.list.impl.ResourceListQueryImpl;
-import org.opencastproject.util.data.Option;
 import org.opencastproject.util.data.Tuple;
 
 import java.util.Date;
+import java.util.Optional;
 
 /**
  * Query for the series list.
@@ -86,9 +86,9 @@ public class SeriesListQuery extends ResourceListQueryImpl {
 
   public SeriesListQuery() {
     super();
-    this.availableFilters.add(createCreationDateFilter(Option.<Tuple<Date, Date>> none()));
-    this.availableFilters.add(createOrganizersFilter(Option.none()));
-    this.availableFilters.add(createContributorsFilter(Option.none()));
+    this.availableFilters.add(createCreationDateFilter(Optional.<Tuple<Date, Date>> empty()));
+    this.availableFilters.add(createOrganizersFilter(Optional.empty()));
+    this.availableFilters.add(createContributorsFilter(Optional.empty()));
   }
 
   /**
@@ -98,15 +98,15 @@ public class SeriesListQuery extends ResourceListQueryImpl {
    *          the acl to filter for
    */
   public void withAccessPolicy(String acl) {
-    this.addFilter(createAccessPolicyFilter(Option.option(acl)));
+    this.addFilter(createAccessPolicyFilter(Optional.ofNullable(acl)));
   }
 
   /**
-   * Returns an {@link Option} containing the acl used to filter if set
+   * Returns an {@link Optional} containing the acl used to filter if set
    *
-   * @return an {@link Option} containing the acl or none.
+   * @return an {@link Optional} containing the acl or none.
    */
-  public Option<String> getAccessPolicy() {
+  public Optional<String> getAccessPolicy() {
     return this.getFilterValue(FILTER_ACL_NAME);
   }
 
@@ -122,18 +122,18 @@ public class SeriesListQuery extends ResourceListQueryImpl {
   }
 
   public void withReadPermission(boolean value) {
-    this.addFilter(createReadPermissionFilter(Option.option(value)));
+    this.addFilter(createReadPermissionFilter(Optional.ofNullable(value)));
   }
 
   public void withWritePermission(boolean value) {
-    this.addFilter(createWritePermissionFilter(Option.option(value)));
+    this.addFilter(createWritePermissionFilter(Optional.ofNullable(value)));
   }
 
-  public Option<Boolean> getReadPermission() {
+  public Optional<Boolean> getReadPermission() {
     return this.getFilterValue(FILTER_ACL_PERMISSION_READ_NAME);
   }
 
-  public Option<Boolean> getWritePermission() {
+  public Optional<Boolean> getWritePermission() {
     return this.getFilterValue(FILTER_ACL_PERMISSION_WRITE_NAME);
   }
 
@@ -144,15 +144,15 @@ public class SeriesListQuery extends ResourceListQueryImpl {
    *          the contributor to filter for
    */
   public void withContributor(String contributor) {
-    this.addFilter(createContributorsFilter(Option.option(contributor)));
+    this.addFilter(createContributorsFilter(Optional.ofNullable(contributor)));
   }
 
   /**
-   * Returns an {@link Option} containing the contributor used to filter if set
+   * Returns an {@link Optional} containing the contributor used to filter if set
    *
-   * @return an {@link Option} containing the contributor or none.
+   * @return an {@link Optional} containing the contributor or none.
    */
-  public Option<String> getContributor() {
+  public Optional<String> getContributor() {
     return this.getFilterValue(FILTER_CONTRIBUTORS_NAME);
   }
 
@@ -163,15 +163,15 @@ public class SeriesListQuery extends ResourceListQueryImpl {
    *          the creation date period as {@link Tuple} with two {@link Date}.
    */
   public void withCreationDate(Tuple<Date, Date> creationDate) {
-    this.addFilter(createCreationDateFilter(Option.option(creationDate)));
+    this.addFilter(createCreationDateFilter(Optional.ofNullable(creationDate)));
   }
 
   /**
-   * Returns an {@link Option} containing the creation date period used to filter if set
+   * Returns an {@link Optional} containing the creation date period used to filter if set
    *
-   * @return an {@link Option} containing the creation date period or none.
+   * @return an {@link Optional} containing the creation date period or none.
    */
-  public Option<Tuple<Date, Date>> getCreationDate() {
+  public Optional<Tuple<Date, Date>> getCreationDate() {
     return this.getFilterValue(FILTER_CREATIONDATE_NAME);
   }
 
@@ -182,15 +182,15 @@ public class SeriesListQuery extends ResourceListQueryImpl {
    *          the creator to filter for
    */
   public void withCreator(String creator) {
-    this.addFilter(createCreatorFilter(Option.option(creator)));
+    this.addFilter(createCreatorFilter(Optional.ofNullable(creator)));
   }
 
   /**
-   * Returns an {@link Option} containing the creator used to filter if set
+   * Returns an {@link Optional} containing the creator used to filter if set
    *
-   * @return an {@link Option} containing the creator or none.
+   * @return an {@link Optional} containing the creator or none.
    */
-  public Option<String> getCreator() {
+  public Optional<String> getCreator() {
     return this.getFilterValue(FILTER_CREATOR_NAME);
   }
 
@@ -201,15 +201,15 @@ public class SeriesListQuery extends ResourceListQueryImpl {
    *          the language to filter for
    */
   public void withLanguage(String language) {
-    this.addFilter(createLanguageFilter(Option.option(language)));
+    this.addFilter(createLanguageFilter(Optional.ofNullable(language)));
   }
 
   /**
-   * Returns an {@link Option} containing the language used to filter if set
+   * Returns an {@link Optional} containing the language used to filter if set
    *
-   * @return an {@link Option} containing the language or none.
+   * @return an {@link Optional} containing the language or none.
    */
-  public Option<String> getLanguage() {
+  public Optional<String> getLanguage() {
     return this.getFilterValue(FILTER_LANGUAGE_NAME);
   }
 
@@ -220,15 +220,15 @@ public class SeriesListQuery extends ResourceListQueryImpl {
    *          the license to filter for
    */
   public void withLicense(String license) {
-    this.addFilter(createLicenseFilter(Option.option(license)));
+    this.addFilter(createLicenseFilter(Optional.ofNullable(license)));
   }
 
   /**
-   * Returns an {@link Option} containing the license used to filter if set
+   * Returns an {@link Optional} containing the license used to filter if set
    *
-   * @return an {@link Option} containing the license or none.
+   * @return an {@link Optional} containing the license or none.
    */
-  public Option<String> getLicense() {
+  public Optional<String> getLicense() {
     return this.getFilterValue(FILTER_LICENSE_NAME);
   }
 
@@ -239,15 +239,15 @@ public class SeriesListQuery extends ResourceListQueryImpl {
    *          the organizer to filter for
    */
   public void withOrganizer(String organizer) {
-    this.addFilter(createOrganizersFilter(Option.option(organizer)));
+    this.addFilter(createOrganizersFilter(Optional.ofNullable(organizer)));
   }
 
   /**
-   * Returns an {@link Option} containing the organizer used to filter if set
+   * Returns an {@link Optional} containing the organizer used to filter if set
    *
-   * @return an {@link Option} containing the organizer or none.
+   * @return an {@link Optional} containing the organizer or none.
    */
-  public Option<String> getOrganizer() {
+  public Optional<String> getOrganizer() {
     return this.getFilterValue(FILTER_ORGANIZERS_NAME);
   }
 
@@ -258,15 +258,15 @@ public class SeriesListQuery extends ResourceListQueryImpl {
    *          the subject to filter for
    */
   public void withSubject(String subject) {
-    this.addFilter(createSubjectFilter(Option.option(subject)));
+    this.addFilter(createSubjectFilter(Optional.ofNullable(subject)));
   }
 
   /**
-   * Returns an {@link Option} containing the subject used to filter if set
+   * Returns an {@link Optional} containing the subject used to filter if set
    *
-   * @return an {@link Option} containing the subject or none.
+   * @return an {@link Optional} containing the subject or none.
    */
-  public Option<String> getSubject() {
+  public Optional<String> getSubject() {
     return this.getFilterValue(FILTER_SUBJECT_NAME);
   }
 
@@ -277,15 +277,15 @@ public class SeriesListQuery extends ResourceListQueryImpl {
    *          the subject to filter for
    */
   public void withTitle(String title) {
-    this.addFilter(createTitleFilter(Option.option(title)));
+    this.addFilter(createTitleFilter(Optional.ofNullable(title)));
   }
 
   /**
-   * Returns an {@link Option} containing the title used to filter if set
+   * Returns an {@link Optional} containing the title used to filter if set
    *
-   * @return an {@link Option} containing the title or none.
+   * @return an {@link Optional} containing the title or none.
    */
-  public Option<String> getTitle() {
+  public Optional<String> getTitle() {
     return this.getFilterValue(FILTER_TITLE_NAME);
   }
 
@@ -293,118 +293,118 @@ public class SeriesListQuery extends ResourceListQueryImpl {
    * Create a new {@link ResourceListFilter} based on access policy
    *
    * @param acl
-   *          the acl to filter on wrapped in an {@link Option} or {@link Option#none()}
+   *          the acl to filter on wrapped in an {@link Optional} or {@link Optional#empty()}
    * @return a new {@link ResourceListFilter} for access policy based query
    */
-  public static ResourceListFilter<String> createAccessPolicyFilter(Option<String> acl) {
+  public static ResourceListFilter<String> createAccessPolicyFilter(Optional<String> acl) {
     return FiltersUtils.generateFilter(acl, FILTER_ACL_NAME, FILTER_ACL_LABEL, SourceType.SELECT,
-            Option.some(AclListProvider.NAME));
+            Optional.of(AclListProvider.NAME));
   }
 
-  public static ResourceListFilter<Boolean> createReadPermissionFilter(Option<Boolean> value) {
+  public static ResourceListFilter<Boolean> createReadPermissionFilter(Optional<Boolean> value) {
     return FiltersUtils.generateFilter(value, FILTER_ACL_PERMISSION_READ_NAME, FILTER_ACL_PERMISSION_READ_LABEL,
-        SourceType.SELECT, Option.none());
+        SourceType.SELECT, Optional.empty());
   }
 
-  public static ResourceListFilter<Boolean> createWritePermissionFilter(Option<Boolean> value) {
+  public static ResourceListFilter<Boolean> createWritePermissionFilter(Optional<Boolean> value) {
     return FiltersUtils.generateFilter(value, FILTER_ACL_PERMISSION_WRITE_NAME, FILTER_ACL_PERMISSION_WRITE_LABEL,
-        SourceType.SELECT, Option.none());
+        SourceType.SELECT, Optional.empty());
   }
 
   /**
    * Create a new {@link ResourceListFilter} based on a contributor
    *
    * @param contributor
-   *          the contributor's name to filter on wrapped in an {@link Option} or {@link Option#none()}
+   *          the contributor's name to filter on wrapped in an {@link Optional} or {@link Optional#empty()}
    * @return a new {@link ResourceListFilter} for a contributor based query
    */
-  public static ResourceListFilter<String> createContributorsFilter(Option<String> contributor) {
+  public static ResourceListFilter<String> createContributorsFilter(Optional<String> contributor) {
     return FiltersUtils.generateFilter(contributor, FILTER_CONTRIBUTORS_NAME, FILTER_CONTRIBUTORS_LABEL,
-            SourceType.SELECT, Option.some(ContributorsListProvider.DEFAULT));
+            SourceType.SELECT, Optional.of(ContributorsListProvider.DEFAULT));
   }
 
   /**
    * Create a new {@link ResourceListFilter} based on a creator
    *
    * @param creator
-   *          the creator to filter on wrapped in an {@link Option} or {@link Option#none()}
+   *          the creator to filter on wrapped in an {@link Optional} or {@link Optional#empty()}
    * @return a new {@link ResourceListFilter} for a creator based query
    */
-  public static ResourceListFilter<String> createCreatorFilter(Option<String> creator) {
+  public static ResourceListFilter<String> createCreatorFilter(Optional<String> creator) {
     return FiltersUtils.generateFilter(creator, FILTER_CREATOR_NAME, FILTER_CREATOR_LABEL, SourceType.SELECT,
-            Option.some(ContributorsListProvider.DEFAULT));
+            Optional.of(ContributorsListProvider.DEFAULT));
   }
 
   /**
    * Create a new {@link ResourceListFilter} based on creation date period
    *
    * @param period
-   *          the period to filter on wrapped in an {@link Option} or {@link Option#none()}
+   *          the period to filter on wrapped in an {@link Optional} or {@link Optional#empty()}
    * @return a new {@link ResourceListFilter} for the given period
    */
-  public static ResourceListFilter<Tuple<Date, Date>> createCreationDateFilter(Option<Tuple<Date, Date>> period) {
+  public static ResourceListFilter<Tuple<Date, Date>> createCreationDateFilter(Optional<Tuple<Date, Date>> period) {
     return FiltersUtils.generateFilter(period, FILTER_CREATIONDATE_NAME, FILTER_CREATIONDATE_LABEL, SourceType.PERIOD,
-            Option.none());
+            Optional.empty());
   }
 
   /**
    * Create a new {@link ResourceListFilter} based on a language
    *
    * @param language
-   *          the language to filter on wrapped in an {@link Option} or {@link Option#none()}
+   *          the language to filter on wrapped in an {@link Optional} or {@link Optional#empty()}
    * @return a new {@link ResourceListFilter} for a language based query
    */
-  public static ResourceListFilter<String> createLanguageFilter(Option<String> language) {
+  public static ResourceListFilter<String> createLanguageFilter(Optional<String> language) {
     return FiltersUtils.generateFilter(language, FILTER_LANGUAGE_NAME, FILTER_LANGUAGE_LABEL, SourceType.SELECT,
-            Option.some("LANGUAGES"));
+            Optional.of("LANGUAGES"));
   }
 
   /**
    * Create a new {@link ResourceListFilter} based on a license
    *
    * @param license
-   *          the license to filter on wrapped in an {@link Option} or {@link Option#none()}
+   *          the license to filter on wrapped in an {@link Optional} or {@link Optional#empty()}
    * @return a new {@link ResourceListFilter} for a license based query
    */
-  public static ResourceListFilter<String> createLicenseFilter(Option<String> license) {
+  public static ResourceListFilter<String> createLicenseFilter(Optional<String> license) {
     return FiltersUtils.generateFilter(license, FILTER_LICENSE_NAME, FILTER_LICENSE_LABEL, SourceType.SELECT,
-            Option.some("LICENSES"));
+            Optional.of("LICENSES"));
   }
 
   /**
    * Create a new {@link ResourceListFilter} based on a organizer
    *
    * @param organizer
-   *          the organizer to filter on wrapped in an {@link Option} or {@link Option#none()}
+   *          the organizer to filter on wrapped in an {@link Optional} or {@link Optional#empty()}
    * @return a new {@link ResourceListFilter} for a organizer based query
    */
-  public static ResourceListFilter<String> createOrganizersFilter(Option<String> organizer) {
+  public static ResourceListFilter<String> createOrganizersFilter(Optional<String> organizer) {
     return FiltersUtils.generateFilter(organizer, FILTER_ORGANIZERS_NAME, FILTER_ORGANIZERS_LABEL, SourceType.SELECT,
-            Option.some(ContributorsListProvider.DEFAULT));
+            Optional.of(ContributorsListProvider.DEFAULT));
   }
 
   /**
    * Create a new {@link ResourceListFilter} based on a subject
    *
    * @param subject
-   *          the subject to filter on wrapped in an {@link Option} or {@link Option#none()}
+   *          the subject to filter on wrapped in an {@link Optional} or {@link Optional#empty()}
    * @return a new {@link ResourceListFilter} for a subject based query
    */
-  public static ResourceListFilter<String> createSubjectFilter(Option<String> subject) {
+  public static ResourceListFilter<String> createSubjectFilter(Optional<String> subject) {
     return FiltersUtils.generateFilter(subject, FILTER_SUBJECT_NAME, FILTER_SUBJECT_LABEL, SourceType.SELECT,
-            Option.some(SeriesListProvider.SUBJECT));
+            Optional.of(SeriesListProvider.SUBJECT));
   }
 
   /**
    * Create a new {@link ResourceListFilter} based on a title
    *
    * @param title
-   *          the title to filter on wrapped in an {@link Option} or {@link Option#none()}
+   *          the title to filter on wrapped in an {@link Optional} or {@link Optional#empty()}
    * @return a new {@link ResourceListFilter} for a title based query
    */
-  public static ResourceListFilter<String> createTitleFilter(Option<String> title) {
+  public static ResourceListFilter<String> createTitleFilter(Optional<String> title) {
     return FiltersUtils.generateFilter(title, FILTER_TITLE_NAME, FILTER_TITLE_LABEL, SourceType.SELECT,
-            Option.some(SeriesListProvider.TITLE));
+            Optional.of(SeriesListProvider.TITLE));
   }
 
 }
