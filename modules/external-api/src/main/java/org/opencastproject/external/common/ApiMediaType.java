@@ -54,7 +54,7 @@ public final class ApiMediaType {
     /* MH-12802: The External API does not support content negotiation */
     ApiMediaType mediaType;
     if (acceptHeader == null || acceptHeader.contains(VERSION_1_12_0) || acceptHeader.contains(JSON)
-    || acceptHeader.contains(APPLICATION_ANY) || acceptHeader.contains(ANY)) {
+        || acceptHeader.contains(APPLICATION_ANY) || acceptHeader.contains(ANY)) {
       mediaType = new ApiMediaType(ApiVersion.VERSION_1_12_0, ApiFormat.JSON, VERSION_1_12_0);
     } else if (acceptHeader.contains(VERSION_1_11_0)) {
       mediaType = new ApiMediaType(ApiVersion.VERSION_1_11_0, ApiFormat.JSON, VERSION_1_11_0);

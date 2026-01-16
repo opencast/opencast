@@ -2325,7 +2325,7 @@ public class EventsEndpoint implements ManagedService {
               responseCode = HttpServletResponse.SC_NOT_FOUND)
       })
   public Response getEventScheduling(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id)
-      throws Exception {
+          throws Exception {
     try {
       final Optional<Event> event = indexService.getEvent(id, elasticsearchIndex);
 

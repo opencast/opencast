@@ -57,7 +57,8 @@ public class TestLifeCycleManagementEndpoint extends LifeCycleManagementEndpoint
     String missingPolicyId = "4444";
     String unauthorizedPolicyId = "1";
 
-    LifeCyclePolicyAccessControlEntryImpl accessControlEntry1 = createNiceMock(LifeCyclePolicyAccessControlEntryImpl.class);
+    LifeCyclePolicyAccessControlEntryImpl accessControlEntry1
+        = createNiceMock(LifeCyclePolicyAccessControlEntryImpl.class);
     expect(accessControlEntry1.getId()).andReturn(0L);
     expect(accessControlEntry1.isAllow()).andReturn(true);
     expect(accessControlEntry1.getRole()).andReturn("ROLE_USER_BOB");
