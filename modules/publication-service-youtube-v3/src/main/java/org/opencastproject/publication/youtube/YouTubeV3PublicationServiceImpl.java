@@ -284,9 +284,9 @@ public class YouTubeV3PublicationServiceImpl
       final UploadProgressListener operationProgressListener = new UploadProgressListener(mediaPackage, file);
       final String privacyStatus = makeVideosPrivate ? "private" : "public";
       final VideoUpload.License license = ccLicenses.map(
-         p -> p.matcher(c.getEpisodeLicense()).matches()).orElse(false)
-         ? VideoUpload.License.creativeCommon
-         : VideoUpload.License.youtube;
+          p -> p.matcher(c.getEpisodeLicense()).matches()).orElse(false)
+          ? VideoUpload.License.creativeCommon
+          : VideoUpload.License.youtube;
       final VideoUpload videoUpload = new VideoUpload(
           truncateTitleToMaxFieldLength(episodeName, false),
           c.getEpisodeDescription(), license, privacyStatus,
