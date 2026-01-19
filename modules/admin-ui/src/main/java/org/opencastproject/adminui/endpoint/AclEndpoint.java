@@ -80,9 +80,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -303,9 +305,10 @@ public class AclEndpoint {
     }
 
     List<Role> roles = roleDirectoryService.findRoles(roleQuery, roleTarget, offset, limit);
+    Set<Role> uniqueRoles = new LinkedHashSet<>(roles);
 
     JSONArray jsonRoles = new JSONArray();
-    for (Role role: roles) {
+    for (Role role: uniqueRoles) {
       JSONObject jsonRole = new JSONObject();
       jsonRole.put("name", role.getName());
       jsonRole.put("type", role.getType().toString());
