@@ -180,7 +180,7 @@ public class LifeCycleManagementEndpoint {
     try {
       LifeCyclePolicy policy = service.getLifeCyclePolicyById(id);
 
-      if (!policy.getCronTrigger().isEmpty()) {
+      if (!StringUtils.isEmpty(policy.getCronTrigger())) {
         CronParser unixParser = new CronParser(CronDefinitionBuilder.instanceDefinitionFor(CronType.QUARTZ));
         Cron cron = unixParser.parse(policy.getCronTrigger());
         CronMapper cronMapper = CronMapper.fromQuartzToUnix();
