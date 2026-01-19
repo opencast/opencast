@@ -234,7 +234,7 @@ public class LifeCycleManagementEndpoint {
     }
 
     SortCriterion sortCriterion = new SortCriterion("", SortCriterion.Order.None);
-    Optional<String> optSort = Optional.of(trimToNull(sort));
+    Optional<String> optSort = Optional.ofNullable(trimToNull(sort));
     if (optSort.isPresent()) {
       sortCriterion = SortCriterion.parse(optSort.get());
 
