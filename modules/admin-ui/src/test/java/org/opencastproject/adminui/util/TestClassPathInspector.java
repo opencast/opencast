@@ -34,16 +34,16 @@ import java.util.List;
 @Ignore
 public final class TestClassPathInspector extends ClassPathInspector {
 
-    @Override
-    public List<String> listFiles(String targetFolder) throws IllegalPathException {
-        URL dirURL = getClass().getClassLoader().getResource(targetFolder);
-        if (dirURL != null && "file".equals(dirURL.getProtocol())) {
-            try {
-                return Arrays.asList(new File(dirURL.toURI()).list());
-            } catch (URISyntaxException e) {
-                throw new IllegalPathException("", e);
-            }
-        }
-        throw new IllegalPathException("");
+  @Override
+  public List<String> listFiles(String targetFolder) throws IllegalPathException {
+    URL dirURL = getClass().getClassLoader().getResource(targetFolder);
+    if (dirURL != null && "file".equals(dirURL.getProtocol())) {
+      try {
+        return Arrays.asList(new File(dirURL.toURI()).list());
+      } catch (URISyntaxException e) {
+        throw new IllegalPathException("", e);
+      }
     }
+    throw new IllegalPathException("");
+  }
 }

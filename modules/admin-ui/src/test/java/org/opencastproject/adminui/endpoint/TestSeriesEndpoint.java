@@ -233,7 +233,8 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     indexServiceImpl.setSeriesService(seriesService);
 
     // setup theme database
-    User user = new JaxbUser("test", null, "Test User", "test@test.com", "test", new DefaultOrganization(), new HashSet<>());
+    User user = new JaxbUser("test", null, "Test User", "test@test.com", "test", new DefaultOrganization(),
+        new HashSet<>());
     UserDirectoryService userDirectoryService = EasyMock.createNiceMock(UserDirectoryService.class);
     EasyMock.expect(userDirectoryService.loadUser((String) EasyMock.anyObject())).andReturn(user).anyTimes();
     EasyMock.replay(userDirectoryService);
@@ -247,9 +248,10 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     themesServiceDatabaseImpl.activate(null);
 
     // We only really care about id, name and description here
-    Theme theme = new Theme(Optional.ofNullable(1L), new Date(1421064000000L), true, user, "theme-1-name", "theme-1-description",
-        true, "bumper-file", true, "trailer-file", true, "title,room,date", "title-background-file", true,
-        "license-background-file", "The license description", true, "watermark-file", "top-left");
+    Theme theme = new Theme(Optional.ofNullable(1L), new Date(1421064000000L), true, user, "theme-1-name",
+        "theme-1-description", true, "bumper-file", true, "trailer-file", true, "title,room,date",
+        "title-background-file", true, "license-background-file", "The license description", true, "watermark-file",
+        "top-left");
     themesServiceDatabaseImpl.updateTheme(theme);
 
     this.setIndex(elasticsearchIndex);
@@ -291,7 +293,8 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
   }
 
   @SuppressWarnings({ "unchecked" })
-  private void setupIndex(Organization defaultOrganization, User user) throws SearchIndexException, IOException, IllegalStateException, ParseException {
+  private void setupIndex(Organization defaultOrganization, User user)
+          throws SearchIndexException, IOException, IllegalStateException, ParseException {
     long time = DateTimeSupport.fromUTC("2014-04-27T14:35:50Z");
     Series series1 = createSeries("1", "title 1", "contributor 1", "organizer 1", time, 1L);
 
@@ -360,10 +363,14 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
 
     elasticsearchIndex = EasyMock.createMock(ElasticsearchIndex.class);
 
-    EasyMock.expect(elasticsearchIndex.getSeries("1", defaultOrganization.getId(), user)).andReturn(Optional.of(series1));
-    EasyMock.expect(elasticsearchIndex.getSeries("2", defaultOrganization.getId(), user)).andReturn(Optional.of(series2));
-    EasyMock.expect(elasticsearchIndex.getSeries("3", defaultOrganization.getId(), user)).andReturn(Optional.of(series3));
-    EasyMock.expect(elasticsearchIndex.getSeries(anyString(), anyString(), anyObject())).andReturn(Optional.empty());
+    EasyMock.expect(elasticsearchIndex.getSeries("1", defaultOrganization.getId(), user))
+        .andReturn(Optional.of(series1));
+    EasyMock.expect(elasticsearchIndex.getSeries("2", defaultOrganization.getId(), user))
+        .andReturn(Optional.of(series2));
+    EasyMock.expect(elasticsearchIndex.getSeries("3", defaultOrganization.getId(), user))
+        .andReturn(Optional.of(series3));
+    EasyMock.expect(elasticsearchIndex.getSeries(anyString(), anyString(), anyObject()))
+        .andReturn(Optional.empty());
 
     final Capture<SeriesSearchQuery> captureSeriesSearchQuery = EasyMock.newCapture();
     final Capture<EventSearchQuery> captureEventSearchQuery = EasyMock.newCapture();

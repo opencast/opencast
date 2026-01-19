@@ -72,21 +72,23 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("/admin-ng/resources")
-@RestService(name = "ResourceListsProviders", title = "Admin UI - Resources List",
-  abstractText = "This service provides key-value list from different resources to use in the admin UI.",
-  notes = { "This service offers access to list providers for the admin UI.",
-            "<strong>Important:</strong> "
-              + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
-              + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
-              + "DO NOT use this for integration of third-party applications.<em>"})
+@RestService(
+    name = "ResourceListsProviders",
+    title = "Admin UI - Resources List",
+    abstractText = "This service provides key-value list from different resources to use in the admin UI.",
+    notes = { "This service offers access to list providers for the admin UI.",
+              "<strong>Important:</strong> "
+                + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
+                + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
+                + "DO NOT use this for integration of third-party applications.<em>"})
 @Component(
-        immediate = true,
-        service = ListProvidersEndpoint.class,
-        property = {
-                "service.description=Admin UI - Resource List Provider Endpoint",
-                "opencast.service.type=org.opencastproject.adminui.ListProvidersEndpoint",
-                "opencast.service.path=/admin-ng/resources",
-        }
+    immediate = true,
+    service = ListProvidersEndpoint.class,
+    property = {
+        "service.description=Admin UI - Resource List Provider Endpoint",
+        "opencast.service.type=org.opencastproject.adminui.ListProvidersEndpoint",
+        "opencast.service.path=/admin-ng/resources",
+    }
 )
 @JaxrsResource
 public class ListProvidersEndpoint {
@@ -135,13 +137,29 @@ public class ListProvidersEndpoint {
   @GET
   @Path("{source}.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "list", description = "Provides key-value list from the given source", pathParameters = { @RestParameter(name = "source", description = "The source for the key-value list", isRequired = true, type = RestParameter.Type.STRING) }, restParameters = {
-          @RestParameter(description = "The maximum number of items to return per page", isRequired = false, name = "limit", type = RestParameter.Type.INTEGER),
-          @RestParameter(description = "The offset", isRequired = false, name = "offset", type = RestParameter.Type.INTEGER),
-          @RestParameter(description = "Filters", isRequired = false, name = "filter", type = RestParameter.Type.STRING) }, responses = { @RestResponse(description = "Returns the key-value list for the given source.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
+  @RestQuery(
+      name = "list",
+      description = "Provides key-value list from the given source",
+      pathParameters = {
+          @RestParameter(name = "source", description = "The source for the key-value list", isRequired = true,
+              type = RestParameter.Type.STRING)
+      },
+      restParameters = {
+          @RestParameter(description = "The maximum number of items to return per page", isRequired = false,
+              name = "limit", type = RestParameter.Type.INTEGER),
+          @RestParameter(description = "The offset", isRequired = false, name = "offset",
+              type = RestParameter.Type.INTEGER),
+          @RestParameter(description = "Filters", isRequired = false, name = "filter",
+              type = RestParameter.Type.STRING)
+      },
+      responses = {
+          @RestResponse(description = "Returns the key-value list for the given source.",
+              responseCode = HttpServletResponse.SC_OK)
+      },
+      returnDescription = "")
   public Response getList(@PathParam("source") final String source, @QueryParam("limit") final int limit,
-          @QueryParam("filter") final String filter, @QueryParam("offset") final int offset,
-          @Context HttpHeaders headers) {
+      @QueryParam("filter") final String filter, @QueryParam("offset") final int offset,
+      @Context HttpHeaders headers) {
 
     ResourceListQueryImpl query = new ResourceListQueryImpl();
     query.setLimit(limit);
@@ -172,9 +190,14 @@ public class ListProvidersEndpoint {
   @GET
   @Path("components.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "components", description = "Provides a set of constants lists (right now only eventCommentReasons) for use in the admin UI",
-    responses = { @RestResponse(description = "Returns a set of constants lists (right now only eventCommentReasons) for use in the admin UI",
-    responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
+  @RestQuery(
+      name = "components",
+      description = "Provides a set of constants lists (right now only eventCommentReasons) for use in the admin UI",
+      responses = {
+          @RestResponse(description = "Returns a set of constants lists (right now only eventCommentReasons) for use "
+              + "in the admin UI", responseCode = HttpServletResponse.SC_OK)
+      },
+      returnDescription = "")
   public Response getComponents(@Context HttpHeaders headers) {
     String[] sources = { "eventCommentReasons" };
     ResourceListQuery query = new ResourceListQueryImpl();
@@ -205,7 +228,14 @@ public class ListProvidersEndpoint {
   @GET
   @Path("providers.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "availableProviders", description = "Provides the list of the available list providers", responses = { @RestResponse(description = "Returns the availables list providers.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
+  @RestQuery(
+      name = "availableProviders",
+      description = "Provides the list of the available list providers",
+      responses = {
+          @RestResponse(description = "Returns the availables list providers.",
+              responseCode = HttpServletResponse.SC_OK)
+      },
+      returnDescription = "")
   public Response getAvailablesProviders(@Context HttpHeaders headers) {
     JSONArray list = new JSONArray();
 
@@ -217,7 +247,18 @@ public class ListProvidersEndpoint {
   @GET
   @Path("{page}/filters.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "filters", description = "Provides filters for the given page", pathParameters = { @RestParameter(name = "page", description = "The page for which the filters are required", isRequired = true, type = RestParameter.Type.STRING) }, responses = { @RestResponse(description = "Returns the filters for the given page.", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
+  @RestQuery(
+      name = "filters",
+      description = "Provides filters for the given page",
+      pathParameters = {
+          @RestParameter(name = "page", description = "The page for which the filters are required", isRequired = true,
+              type = RestParameter.Type.STRING)
+      },
+      responses = {
+          @RestResponse(description = "Returns the filters for the given page.",
+              responseCode = HttpServletResponse.SC_OK)
+      },
+      returnDescription = "")
   public Response getFilters(@PathParam("page") final String page, @Context HttpHeaders headers)
           throws ListProviderException {
 
@@ -254,7 +295,8 @@ public class ListProvidersEndpoint {
         return RestUtils.okJson(JSONUtils.filtersToJSONSeriesWriteAccess(query, listProvidersService,
                 seriesWriteAccess));
       } else {
-        return RestUtils.okJson(JSONUtils.filtersToJSON(query, listProvidersService, securityService.getOrganization()));
+        return RestUtils.okJson(JSONUtils.filtersToJSON(query, listProvidersService,
+            securityService.getOrganization()));
       }
     } catch (ListProviderException e) {
       logger.error("Not able to get list of options for the filters for the page {}", page, e);

@@ -101,21 +101,23 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("/admin-ng/users")
-@RestService(name = "users", title = "User service",
-  abstractText = "Provides operations for users",
-  notes = { "This service offers the default users CRUD Operations for the admin UI.",
-            "<strong>Important:</strong> "
-              + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
-              + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
-              + "DO NOT use this for integration of third-party applications.<em>"})
+@RestService(
+    name = "users",
+    title = "User service",
+    abstractText = "Provides operations for users",
+    notes = { "This service offers the default users CRUD Operations for the admin UI.",
+              "<strong>Important:</strong> "
+                + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
+                + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
+                + "DO NOT use this for integration of third-party applications.<em>"})
 @Component(
-  immediate = true,
-  service = UsersEndpoint.class,
-  property = {
-    "service.description=Admin UI - Users facade Endpoint",
-    "opencast.service.type=org.opencastproject.adminui.endpoint.UsersEndpoint",
-    "opencast.service.path=/admin-ng/users"
-  }
+    immediate = true,
+    service = UsersEndpoint.class,
+    property = {
+        "service.description=Admin UI - Users facade Endpoint",
+        "opencast.service.type=org.opencastproject.adminui.endpoint.UsersEndpoint",
+        "opencast.service.path=/admin-ng/users"
+    }
 )
 @JaxrsResource
 public class UsersEndpoint {
@@ -203,15 +205,29 @@ public class UsersEndpoint {
   @GET
   @Path("users.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "allusers", description = "Returns a list of users", returnDescription = "Returns a JSON representation of the list of user accounts", restParameters = {
-          @RestParameter(name = "filter", isRequired = false, description = "The filter used for the query. They should be formated like that: 'filter1:value1,filter2:value2'", type = STRING),
-          @RestParameter(name = "sort", isRequired = false, description = "The sort order. May include any of the following: STATUS, NAME OR LAST_UPDATED.  Add '_DESC' to reverse the sort order (e.g. STATUS_DESC).", type = STRING),
-          @RestParameter(defaultValue = "100", description = "The maximum number of items to return per page.", isRequired = false, name = "limit", type = RestParameter.Type.STRING),
-          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING) }, responses = { @RestResponse(responseCode = SC_OK, description = "The user accounts.") })
+  @RestQuery(
+      name = "allusers",
+      description = "Returns a list of users",
+      returnDescription = "Returns a JSON representation of the list of user accounts",
+      restParameters = {
+          @RestParameter(name = "filter", isRequired = false, description = "The filter used for the query. They "
+              + "should be formated like that: 'filter1:value1,filter2:value2'", type = STRING),
+          @RestParameter(name = "sort", isRequired = false, description = "The sort order. May include any of the "
+              + "following: STATUS, NAME OR LAST_UPDATED.  Add '_DESC' to reverse the sort order (e.g. STATUS_DESC).",
+              type = STRING),
+          @RestParameter(defaultValue = "100", description = "The maximum number of items to return per page.",
+              isRequired = false, name = "limit", type = RestParameter.Type.STRING),
+          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset",
+              type = RestParameter.Type.STRING)
+      },
+      responses = {
+          @RestResponse(responseCode = SC_OK, description = "The user accounts.")
+      })
   public Response getUsers(@QueryParam("filter") String filter, @QueryParam("sort") String sort,
-          @QueryParam("limit") int limit, @QueryParam("offset") int offset) throws IOException {
-    if (limit < 1)
+      @QueryParam("limit") int limit, @QueryParam("offset") int offset) throws IOException {
+    if (limit < 1) {
       limit = 100;
+    }
 
     sort = trimToNull(sort);
     String filterName = null;
@@ -240,11 +256,12 @@ public class UsersEndpoint {
       final String finalFilterRole = filterRole;
       if (filterName != null && !filterName.equals(user.getName())
               || (filterRole != null
-        && user.getRoles().stream().noneMatch((r) -> r.getName().equals(finalFilterRole)))
+          && user.getRoles().stream().noneMatch((r) -> r.getName().equals(finalFilterRole)))
               || (filterProvider != null
                   && !filterProvider.equals(user.getProvider()))
               || (filterText != null
-                  && !TextFilter.match(filterText, user.getUsername(), user.getName(), user.getEmail(), user.getProvider())
+                  && !TextFilter.match(filterText,
+                      user.getUsername(), user.getName(), user.getEmail(), user.getProvider())
                   && !TextFilter.match(filterText,
                       user.getRoles().stream().map(Role::getName).collect(Collectors.joining(" "))))) {
         continue;
@@ -261,29 +278,34 @@ public class UsersEndpoint {
           Order order = criterion.getOrder();
           switch (criterion.getFieldName()) {
             case "name":
-              if (order.equals(Order.Descending))
+              if (order.equals(Order.Descending)) {
                 return CASE_INSENSITIVE_ORDER.compare(trimToEmpty(user2.getName()), trimToEmpty(user1.getName()));
+              }
               return CASE_INSENSITIVE_ORDER.compare(trimToEmpty(user1.getName()), trimToEmpty(user2.getName()));
             case "username":
-              if (order.equals(Order.Descending))
+              if (order.equals(Order.Descending)) {
                 return CASE_INSENSITIVE_ORDER
-                  .compare(trimToEmpty(user2.getUsername()), trimToEmpty(user1.getUsername()));
+                    .compare(trimToEmpty(user2.getUsername()), trimToEmpty(user1.getUsername()));
+              }
               return CASE_INSENSITIVE_ORDER
                 .compare(trimToEmpty(user1.getUsername()), trimToEmpty(user2.getUsername()));
             case "email":
-              if (order.equals(Order.Descending))
+              if (order.equals(Order.Descending)) {
                 return CASE_INSENSITIVE_ORDER.compare(trimToEmpty(user2.getEmail()), trimToEmpty(user1.getEmail()));
+              }
               return CASE_INSENSITIVE_ORDER.compare(trimToEmpty(user1.getEmail()), trimToEmpty(user2.getEmail()));
             case "roles":
               String roles1 = user1.getRoles().stream().map(Role::getName).collect(Collectors.joining(","));
               String roles2 = user1.getRoles().stream().map(Role::getName).collect(Collectors.joining(","));
-              if (order.equals(Order.Descending))
+              if (order.equals(Order.Descending)) {
                 return CASE_INSENSITIVE_ORDER.compare(trimToEmpty(roles2), trimToEmpty(roles1));
+              }
               return CASE_INSENSITIVE_ORDER.compare(trimToEmpty(roles1), trimToEmpty(roles2));
             case "provider":
-              if (order.equals(Order.Descending))
-                return CASE_INSENSITIVE_ORDER
-                  .compare(trimToEmpty(user2.getProvider()), trimToEmpty(user1.getProvider()));
+              if (order.equals(Order.Descending)) {
+                return CASE_INSENSITIVE_ORDER.
+                    compare(trimToEmpty(user2.getProvider()), trimToEmpty(user1.getProvider()));
+              }
               return CASE_INSENSITIVE_ORDER
                 .compare(trimToEmpty(user1.getProvider()), trimToEmpty(user2.getProvider()));
             default:
@@ -321,7 +343,7 @@ public class UsersEndpoint {
       description = "Returns a list of users",
       returnDescription = "Returns a JSON representation of the list of user accounts",
       restParameters = {
-        @RestParameter(name = "roles", isRequired = false, description = "JSON Array", type = STRING),
+          @RestParameter(name = "roles", isRequired = false, description = "JSON Array", type = STRING),
       },
       responses = {
           @RestResponse(responseCode = SC_OK, description = "The user accounts.")
@@ -346,17 +368,25 @@ public class UsersEndpoint {
 
   @POST
   @Path("/")
-  @RestQuery(name = "createUser", description = "Create a new  user", returnDescription = "The location of the new ressource", restParameters = {
+  @RestQuery(
+      name = "createUser",
+      description = "Create a new  user",
+      returnDescription = "The location of the new ressource",
+      restParameters = {
           @RestParameter(description = "The username.", isRequired = true, name = "username", type = STRING),
           @RestParameter(description = "The password.", isRequired = true, name = "password", type = STRING),
           @RestParameter(description = "The name.", isRequired = false, name = "name", type = STRING),
           @RestParameter(description = "The email.", isRequired = false, name = "email", type = STRING),
-          @RestParameter(name = "roles", type = STRING, isRequired = false, description = "The user roles as a json array, e.g. <br>"
-                  + "[{'name': 'ROLE_ADMIN', 'type': 'INTERNAL'}, {'name': 'ROLE_XY', 'type': 'INTERNAL'}]") },
-          responses = {
+          @RestParameter(name = "roles", type = STRING, isRequired = false, description = "The user roles as a json "
+              + "array, e.g. <br>[{'name': 'ROLE_ADMIN', 'type': 'INTERNAL'}, "
+              + "{'name': 'ROLE_XY', 'type': 'INTERNAL'}]")
+      },
+      responses = {
           @RestResponse(responseCode = SC_CREATED, description = "User has been created."),
-          @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to create a user with a admin role."),
-          @RestResponse(responseCode = SC_CONFLICT, description = "An user with this username already exist.")})
+          @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to create a user with a "
+              + "admin role."),
+          @RestResponse(responseCode = SC_CONFLICT, description = "An user with this username already exist.")
+      })
   public Response createUser(@FormParam("username") String username, @FormParam("password") String password,
           @FormParam("name") String name, @FormParam("email") String email, @FormParam("roles") String roles) {
 
@@ -398,9 +428,16 @@ public class UsersEndpoint {
 
   @GET
   @Path("{username}.json")
-  @RestQuery(name = "getUser", description = "Get an user", returnDescription = "Status ok", pathParameters = @RestParameter(name = "username", type = STRING, isRequired = true, description = "The username"), responses = {
+  @RestQuery(
+      name = "getUser",
+      description = "Get an user",
+      returnDescription = "Status ok",
+      pathParameters = @RestParameter(name = "username", type = STRING, isRequired = true, description = "The "
+          + "username"),
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "User has been found."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "User not found.") })
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "User not found.")
+      })
   public Response getUser(@PathParam("username") String username) {
 
     User user = userDirectoryService.loadUser(username);
@@ -413,16 +450,27 @@ public class UsersEndpoint {
 
   @PUT
   @Path("{username}.json")
-  @RestQuery(name = "updateUser", description = "Update an user", returnDescription = "Status ok", restParameters = {
+  @RestQuery(
+      name = "updateUser",
+      description = "Update an user",
+      returnDescription = "Status ok",
+      restParameters = {
           @RestParameter(description = "The password.", isRequired = false, name = "password", type = STRING),
           @RestParameter(description = "The name.", isRequired = false, name = "name", type = STRING),
           @RestParameter(description = "The email.", isRequired = false, name = "email", type = STRING),
-          @RestParameter(name = "roles", type = STRING, isRequired = false, description = "The user roles as a json array") }, pathParameters = @RestParameter(name = "username", type = STRING, isRequired = true, description = "The username"), responses = {
+          @RestParameter(name = "roles", type = STRING, isRequired = false, description = "The user roles as a json "
+              + "array")
+      },
+      pathParameters = @RestParameter(name = "username", type = STRING, isRequired = true, description = "The "
+          + "username"),
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "User has been updated."),
-          @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to update a user with admin role."),
-          @RestResponse(responseCode = SC_BAD_REQUEST, description = "Invalid data provided.")})
+          @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to update a user with admin "
+              + "role."),
+          @RestResponse(responseCode = SC_BAD_REQUEST, description = "Invalid data provided.")
+      })
   public Response updateUser(@PathParam("username") String username, @FormParam("password") String password,
-          @FormParam("name") String name, @FormParam("email") String email, @FormParam("roles") String roles) {
+      @FormParam("name") String name, @FormParam("email") String email, @FormParam("roles") String roles) {
 
     User user = jpaUserAndRoleProvider.loadUser(username);
     if (user == null) {
@@ -448,7 +496,7 @@ public class UsersEndpoint {
 
     try {
       jpaUserAndRoleProvider.updateUser(new JpaUser(username, password, organization, name, email,
-        jpaUserAndRoleProvider.getName(), true, rolesSet));
+          jpaUserAndRoleProvider.getName(), true, rolesSet));
       userDirectoryService.invalidate(username);
       return Response.status(SC_OK).build();
     } catch (UnauthorizedException ex) {
@@ -460,10 +508,18 @@ public class UsersEndpoint {
 
   @DELETE
   @Path("{username}.json")
-  @RestQuery(name = "deleteUser", description = "Deleter a new  user", returnDescription = "Status ok", pathParameters = @RestParameter(name = "username", type = STRING, isRequired = true, description = "The username"), responses = {
+  @RestQuery(
+      name = "deleteUser",
+      description = "Deleter a new  user",
+      returnDescription = "Status ok",
+      pathParameters = @RestParameter(name = "username", type = STRING, isRequired = true, description = "The "
+          + "username"),
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "User has been deleted."),
-          @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to delete a user with admin role."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "User not found.") })
+          @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to delete a user with admin "
+              + "role."),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "User not found.")
+      })
   public Response deleteUser(@PathParam("username") String username) throws NotFoundException {
     Organization organization = securityService.getOrganization();
     boolean userReferenceNotFound = false;
@@ -551,9 +607,9 @@ public class UsersEndpoint {
     userData.put("email", user.getEmail());
     userData.put("provider", user.getProvider());
     userData.put("roles", user.getRoles().stream()
-      .sorted(Comparator.comparing(Role::getName))
-      .map((r) -> new JsonRole(r.getName(), r.getType()))
-      .collect(Collectors.toList()));
+        .sorted(Comparator.comparing(Role::getName))
+        .map((r) -> new JsonRole(r.getName(), r.getType()))
+        .collect(Collectors.toList()));
     return userData;
   }
 

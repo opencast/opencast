@@ -51,17 +51,21 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 @Path("/admin-ng/oc-version")
-@RestService(name = "VersionService", title = "Version service",
-  abstractText = "Provides latest opencast version",
-  notes = { "This service offers the GET method to retrieve the latest opencast version from https://api.github.com ."})
+@RestService(
+    name = "VersionService",
+    title = "Version service",
+    abstractText = "Provides latest opencast version",
+    notes = {
+        "This service offers the GET method to retrieve the latest opencast version from https://api.github.com ."
+    })
 @Component(
-  immediate = true,
-  service = VersionEndpoint.class,
-  property = {
-    "service.description=Admin UI - Latest Version Endpoint",
-    "opencast.service.type=org.opencastproject.adminui.endpoint.VersionEndpoint",
-    "opencast.service.path=/admin-ng/oc-version"
-  }
+    immediate = true,
+    service = VersionEndpoint.class,
+    property = {
+        "service.description=Admin UI - Latest Version Endpoint",
+        "opencast.service.type=org.opencastproject.adminui.endpoint.VersionEndpoint",
+        "opencast.service.path=/admin-ng/oc-version"
+    }
 )
 @JaxrsResource
 public class VersionEndpoint {

@@ -298,7 +298,8 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     wfD2.setDescription("Test description");
     wfD2.setDisplayOrder(100);
     wfD2.setConfigurationPanel("<h2>Test</h2>");
-    wfD2.setConfigurationPanelJson("[{ \"fieldset\": [ { \"type\": \"checkbox\", \"name\": \"straightToPublishing\", \"label\": \"Straight to publishing\", \"value\": true } ] }]");
+    wfD2.setConfigurationPanelJson("[{ \"fieldset\": [ { \"type\": \"checkbox\", \"name\": \"straightToPublishing\", "
+        + "\"label\": \"Straight to publishing\", \"value\": true } ] }]");
 
     MediaPackage mp1 = loadMpFromResource("jobs_mediapackage1");
     // the id is set dynamic - lets force an id so we can get a consistent json respons
@@ -350,7 +351,8 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
                   }
                 }
               }).anyTimes();
-    EasyMock.expect(workflowService.getWorkflowInstancesByMediaPackage(EasyMock.anyString())).andReturn(workflowList).anyTimes();
+    EasyMock.expect(workflowService.getWorkflowInstancesByMediaPackage(EasyMock.anyString()))
+        .andReturn(workflowList).anyTimes();
     EasyMock.expect(workflowService.listAvailableWorkflowDefinitions()).andReturn(Arrays.asList(wfD, wfD2));
     EasyMock.replay(workflowService);
     env.setWorkflowService(workflowService);
@@ -448,9 +450,9 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
             EasyMock.anyObject(TimeZone.class))).andReturn(events).anyTimes();
     EasyMock.expect(schedulerService.findConflictingEvents(EasyMock.anyString(), EasyMock.anyObject(Date.class),
             EasyMock.anyObject(Date.class))).andReturn(events).anyTimes();
-    schedulerService.updateEvent(EasyMock.anyString(), EasyMock.anyObject(Optional.class), EasyMock.anyObject(Optional.class),
-            EasyMock.anyObject(Optional.class), EasyMock.anyObject(Optional.class), EasyMock.anyObject(Optional.class),
-            EasyMock.anyObject(Optional.class), EasyMock.anyObject(Optional.class));
+    schedulerService.updateEvent(EasyMock.anyString(), EasyMock.anyObject(Optional.class),
+        EasyMock.anyObject(Optional.class), EasyMock.anyObject(Optional.class), EasyMock.anyObject(Optional.class),
+        EasyMock.anyObject(Optional.class), EasyMock.anyObject(Optional.class), EasyMock.anyObject(Optional.class));
     EasyMock.expectLastCall().anyTimes();
     EasyMock.expect(schedulerService.getWorkflowConfig("asdasd")).andThrow(new NotFoundException()).anyTimes();
     Map<String, String> workFlowConfig = new HashMap<>();
@@ -566,9 +568,10 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     publist.add(new PublicationImpl("engage", "rest", new URI("engage.html?e=p-1"), MimeType.mimeType("text", "xml")));
     EasyMock.expect(event.getPublications()).andReturn(publist).anyTimes();
     EasyMock.expect(event.getAccessPolicy())
-            .andReturn(
-                    "{\"acl\":{\"ace\":[{\"allow\":true,\"action\":\"read\",\"role\":\"ROLE_ADMIN\"},{\"allow\":true,\"action\":\"write\",\"role\":\"ROLE_ADMIN\"}]}}\"")
-            .anyTimes();
+        .andReturn(
+            "{\"acl\":{\"ace\":[{\"allow\":true,\"action\":\"read\",\"role\":\"ROLE_ADMIN\"},"
+                + "{\"allow\":true,\"action\":\"write\",\"role\":\"ROLE_ADMIN\"}]}}\"")
+        .anyTimes();
 
     EasyMock.expect(event.hasRecordingStarted()).andReturn(true);
 

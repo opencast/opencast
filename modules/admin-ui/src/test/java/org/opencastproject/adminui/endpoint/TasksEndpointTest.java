@@ -79,8 +79,9 @@ public class TasksEndpointTest {
             .expect().statusCode(HttpStatus.SC_INTERNAL_SERVER_ERROR).when().post(rt.host("/new"));
 
     String result = given()
-            .formParam("metadata", "{\"workflow\":\"full\", \"configuration\":{\"id1\": {\"foo\": \"bar\"},\"id2\": {\"baz\": \"qux\"}}}")
-            .expect().statusCode(HttpStatus.SC_CREATED).when().post(rt.host("/new")).asString();
+        .formParam("metadata", "{\"workflow\":\"full\", \"configuration\":{\"id1\": {\"foo\": \"bar\"},"
+            + "\"id2\": {\"baz\": \"qux\"}}}")
+        .expect().statusCode(HttpStatus.SC_CREATED).when().post(rt.host("/new")).asString();
     assertEquals("[5,10]", result);
   }
 

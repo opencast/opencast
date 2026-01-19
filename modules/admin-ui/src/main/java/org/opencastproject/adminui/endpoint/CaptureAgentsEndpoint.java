@@ -79,21 +79,23 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 @Path("/admin-ng/capture-agents")
-@RestService(name = "captureAgents", title = "Capture agents façade service",
-  abstractText = "Provides operations for the capture agents",
-  notes = { "This service offers the default capture agents CRUD Operations for the admin UI.",
-            "<strong>Important:</strong> "
-              + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
-              + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
-              + "DO NOT use this for integration of third-party applications.<em>"})
+@RestService(
+    name = "captureAgents",
+    title = "Capture agents façade service",
+    abstractText = "Provides operations for the capture agents",
+    notes = { "This service offers the default capture agents CRUD Operations for the admin UI.",
+              "<strong>Important:</strong> "
+                + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
+                + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
+                + "DO NOT use this for integration of third-party applications.<em>"})
 @Component(
-  immediate = true,
-  service = CaptureAgentsEndpoint.class,
-  property = {
-    "service.description=Admin UI - Capture agents facade Endpoint",
-    "opencast.service.type=org.opencastproject.adminui.endpoint.UsersEndpoint",
-    "opencast.service.path=/admin-ng/capture-agents"
-  }
+    immediate = true,
+    service = CaptureAgentsEndpoint.class,
+    property = {
+        "service.description=Admin UI - Capture agents facade Endpoint",
+        "opencast.service.type=org.opencastproject.adminui.endpoint.UsersEndpoint",
+        "opencast.service.path=/admin-ng/capture-agents"
+    }
 )
 @JaxrsResource
 public class CaptureAgentsEndpoint {
@@ -127,14 +129,29 @@ public class CaptureAgentsEndpoint {
   @GET
   @Produces({ MediaType.APPLICATION_JSON })
   @Path("agents.json")
-  @RestQuery(name = "getAgents", description = "Return all of the known capture agents on the system", restParameters = {
-          @RestParameter(name = "filter", isRequired = false, description = "The filter used for the query. They should be formated like that: 'filter1:value1,filter2:value2'", type = STRING),
-          @RestParameter(defaultValue = "100", description = "The maximum number of items to return per page.", isRequired = false, name = "limit", type = RestParameter.Type.STRING),
-          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.STRING),
-          @RestParameter(defaultValue = "false", description = "Define if the inputs should or not returned with the capture agent.", isRequired = false, name = "inputs", type = RestParameter.Type.BOOLEAN),
-          @RestParameter(name = "sort", isRequired = false, description = "The sort order. May include any of the following: STATUS, NAME OR LAST_UPDATED.  Add '_DESC' to reverse the sort order (e.g. STATUS_DESC).", type = STRING) }, responses = { @RestResponse(description = "An XML representation of the agent capabilities", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
+  @RestQuery(
+      name = "getAgents",
+      description = "Return all of the known capture agents on the system",
+      restParameters = {
+          @RestParameter(name = "filter", isRequired = false, description = "The filter used for the query. They "
+              + "should be formated like that: 'filter1:value1,filter2:value2'", type = STRING),
+          @RestParameter(defaultValue = "100", description = "The maximum number of items to return per page.",
+              isRequired = false, name = "limit", type = RestParameter.Type.STRING),
+          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset",
+              type = RestParameter.Type.STRING),
+          @RestParameter(defaultValue = "false", description = "Define if the inputs should or not returned with the "
+              + "capture agent.", isRequired = false, name = "inputs", type = RestParameter.Type.BOOLEAN),
+          @RestParameter(name = "sort", isRequired = false, description = "The sort order. May include any of the "
+              + "following: STATUS, NAME OR LAST_UPDATED.  Add '_DESC' to reverse the sort order (e.g. STATUS_DESC).",
+              type = STRING)
+      },
+      responses = {
+          @RestResponse(description = "An XML representation of the agent capabilities",
+              responseCode = HttpServletResponse.SC_OK)
+      },
+      returnDescription = "")
   public Response getAgents(@QueryParam("limit") int limit, @QueryParam("offset") int offset,
-          @QueryParam("inputs") boolean inputs, @QueryParam("filter") String filter, @QueryParam("sort") String sort) {
+      @QueryParam("inputs") boolean inputs, @QueryParam("filter") String filter, @QueryParam("sort") String sort) {
     Optional<String> filterName = Optional.empty();
     Optional<String> filterStatus = Optional.empty();
     Optional<Long> filterLastUpdated = Optional.empty();
@@ -143,10 +160,12 @@ public class CaptureAgentsEndpoint {
 
     Map<String, String> filters = RestUtils.parseFilter(filter);
     for (String name : filters.keySet()) {
-      if (AgentsListQuery.FILTER_NAME_NAME.equals(name))
+      if (AgentsListQuery.FILTER_NAME_NAME.equals(name)) {
         filterName = Optional.of(filters.get(name));
-      if (AgentsListQuery.FILTER_STATUS_NAME.equals(name))
+      }
+      if (AgentsListQuery.FILTER_STATUS_NAME.equals(name)) {
         filterStatus = Optional.of(filters.get(name));
+      }
       if (AgentsListQuery.FILTER_LAST_UPDATED.equals(name)) {
         try {
           filterLastUpdated = Optional.of(Long.parseLong(filters.get(name)));
@@ -155,8 +174,9 @@ public class CaptureAgentsEndpoint {
           return Response.status(Status.BAD_REQUEST).build();
         }
       }
-      if (AgentsListQuery.FILTER_TEXT_NAME.equals(name) && StringUtils.isNotBlank(filters.get(name)))
+      if (AgentsListQuery.FILTER_TEXT_NAME.equals(name) && StringUtils.isNotBlank(filters.get(name))) {
         filterText = Optional.of(filters.get(name));
+      }
     }
 
     // Filter agents by filter criteria
@@ -166,10 +186,11 @@ public class CaptureAgentsEndpoint {
 
       // Filter list
       if ((filterName.isPresent() && !filterName.get().equals(agent.getName()))
-              || (filterStatus.isPresent() && !filterStatus.get().equals(agent.getState()))
-              || (filterLastUpdated.isPresent() && filterLastUpdated.get() != agent.getLastHeardFrom())
-              || (filterText.isPresent() && !TextFilter.match(filterText.get(), agent.getName(), agent.getState())))
+          || (filterStatus.isPresent() && !filterStatus.get().equals(agent.getState()))
+          || (filterLastUpdated.isPresent() && filterLastUpdated.get() != agent.getLastHeardFrom())
+          || (filterText.isPresent() && !TextFilter.match(filterText.get(), agent.getName(), agent.getState()))) {
         continue;
+      }
       filteredAgents.add(agent);
     }
     int total = filteredAgents.size();
@@ -184,16 +205,19 @@ public class CaptureAgentsEndpoint {
             Order order = criterion.getOrder();
             switch (criterion.getFieldName()) {
               case "status":
-                if (order.equals(Order.Descending))
+                if (order.equals(Order.Descending)) {
                   return agent2.getState().compareTo(agent1.getState());
+                }
                 return agent1.getState().compareTo(agent2.getState());
               case "name":
-                if (order.equals(Order.Descending))
+                if (order.equals(Order.Descending)) {
                   return agent2.getName().compareTo(agent1.getName());
+                }
                 return agent1.getName().compareTo(agent2.getName());
               case "updated":
-                if (order.equals(Order.Descending))
+                if (order.equals(Order.Descending)) {
                   return agent2.getLastHeardFrom().compareTo(agent1.getLastHeardFrom());
+                }
                 return agent1.getLastHeardFrom().compareTo(agent2.getLastHeardFrom());
               default:
                 logger.info("Unknown sort type: {}", criterion.getFieldName());
@@ -220,12 +244,24 @@ public class CaptureAgentsEndpoint {
   @DELETE
   @Path("{name}")
   @Produces({ MediaType.APPLICATION_JSON })
-  @RestQuery(name = "removeAgent", description = "Remove record of a given capture agent", pathParameters = { @RestParameter(name = "name", description = "The name of a given capture agent", isRequired = true, type = RestParameter.Type.STRING) }, restParameters = {}, responses = {
+  @RestQuery(
+      name = "removeAgent",
+      description = "Remove record of a given capture agent",
+      pathParameters = {
+          @RestParameter(name = "name", description = "The name of a given capture agent", isRequired = true,
+              type = RestParameter.Type.STRING)
+      },
+      restParameters = {},
+      responses = {
           @RestResponse(description = "{agentName} removed", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "The agent {agentname} does not exist", responseCode = HttpServletResponse.SC_NOT_FOUND) }, returnDescription = "")
+          @RestResponse(description = "The agent {agentname} does not exist",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      },
+      returnDescription = "")
   public Response removeAgent(@PathParam("name") String agentName) throws NotFoundException, UnauthorizedException {
-    if (service == null)
+    if (service == null) {
       return Response.serverError().status(Response.Status.SERVICE_UNAVAILABLE).build();
+    }
 
     SecurityUtil.checkAgentAccess(securityService, agentName);
 
@@ -239,14 +275,20 @@ public class CaptureAgentsEndpoint {
   @Path("{name}")
   @Produces({ MediaType.APPLICATION_JSON })
   @RestQuery(
-    name = "getAgent",
-    description = "Return the capture agent including its configuration and capabilities",
-    pathParameters = {
-      @RestParameter(description = "Name of the capture agent", isRequired = true, name = "name", type = RestParameter.Type.STRING),
-    }, restParameters = {}, responses = {
-      @RestResponse(description = "A JSON representation of the capture agent", responseCode = HttpServletResponse.SC_OK),
-      @RestResponse(description = "The agent {name} does not exist in the system", responseCode = HttpServletResponse.SC_NOT_FOUND)
-    }, returnDescription = "")
+      name = "getAgent",
+      description = "Return the capture agent including its configuration and capabilities",
+      pathParameters = {
+          @RestParameter(description = "Name of the capture agent", isRequired = true, name = "name",
+              type = RestParameter.Type.STRING),
+      },
+      restParameters = {},
+      responses = {
+          @RestResponse(description = "A JSON representation of the capture agent",
+              responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "The agent {name} does not exist in the system",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      },
+      returnDescription = "")
   public Response getAgent(@PathParam("name") String agentName)
           throws NotFoundException {
     if (service != null) {

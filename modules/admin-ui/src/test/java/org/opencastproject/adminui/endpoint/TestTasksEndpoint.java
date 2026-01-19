@@ -99,7 +99,8 @@ public class TestTasksEndpoint extends TasksEndpoint {
     wfD2.setId("full-html5");
     wfD2.setDescription("Test description");
     wfD2.setConfigurationPanel("<h2>Test</h2>");
-    wfD2.setConfigurationPanelJson("[{ \"fieldset\": [ { \"type\": \"checkbox\", \"name\": \"straightToPublishing\", \"label\": \"Straight to publishing\", \"value\": true } ] }]");
+    wfD2.setConfigurationPanelJson("[{ \"fieldset\": [ { \"type\": \"checkbox\", \"name\": \"straightToPublishing\", "
+        + "\"label\": \"Straight to publishing\", \"value\": true } ] }]");
     wfD2.addTag("archive");
 
     WorkflowDefinitionImpl wfD3 = new WorkflowDefinitionImpl();
@@ -119,10 +120,10 @@ public class TestTasksEndpoint extends TasksEndpoint {
     expect(workspace.get(anyObject(URI.class)))
             .andReturn(new File(getClass().getResource("/processing-properties.xml").toURI())).anyTimes();
     expect(workspace.get(anyObject(URI.class), EasyMock.anyBoolean())).andAnswer(() -> {
-        File tmp = new File(baseDir, UUID.randomUUID().toString() + "-processing-properties.xml");
-        FileUtils.copyFile(new File(getClass().getResource("/processing-properties.xml").toURI()), tmp);
-        return tmp;
-      }).anyTimes();
+      File tmp = new File(baseDir, UUID.randomUUID().toString() + "-processing-properties.xml");
+      FileUtils.copyFile(new File(getClass().getResource("/processing-properties.xml").toURI()), tmp);
+      return tmp;
+    }).anyTimes();
 
     WorkflowService workflowService = createNiceMock(WorkflowService.class);
     expect(workflowService.listAvailableWorkflowDefinitions()).andReturn(Arrays.asList(wfD, wfD2, wfD3)).anyTimes();

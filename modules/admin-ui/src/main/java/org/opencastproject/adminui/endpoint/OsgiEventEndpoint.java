@@ -50,21 +50,23 @@ import java.util.Dictionary;
 import java.util.Objects;
 
 /** OSGi bound implementation. */
-@RestService(name = "eventservice", title = "Event Service",
-        abstractText = "Provides resources and operations related to the events",
-        notes = { "This service offers the event CRUD Operations for the admin UI.",
-                "<strong>Important:</strong> "
-                        + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
-                        + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
-                        + "DO NOT use this for integration of third-party applications.<em>"})
+@RestService(
+    name = "eventservice",
+    title = "Event Service",
+    abstractText = "Provides resources and operations related to the events",
+    notes = { "This service offers the event CRUD Operations for the admin UI.",
+            "<strong>Important:</strong> "
+                    + "<em>This service is for exclusive use by the module admin-ui. Its API might change anytime "
+                    + "without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
+                    + "DO NOT use this for integration of third-party applications.<em>"})
 @Component(
-        immediate = true,
-        service = OsgiEventEndpoint.class,
-        property = {
-                "service.description=Admin UI - Event facade Endpoint",
-                "opencast.service.type=org.opencastproject.adminui.OsgiEventEndpoint",
-                "opencast.service.path=/admin-ng/event",
-        }
+    immediate = true,
+    service = OsgiEventEndpoint.class,
+    property = {
+        "service.description=Admin UI - Event facade Endpoint",
+        "opencast.service.type=org.opencastproject.adminui.OsgiEventEndpoint",
+        "opencast.service.path=/admin-ng/event",
+    }
 )
 @JaxrsResource
 public class OsgiEventEndpoint extends AbstractEventEndpoint {
