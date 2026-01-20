@@ -31,6 +31,8 @@ import org.opencastproject.lifecyclemanagement.api.Timing;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import org.eclipse.persistence.annotations.CascadeOnDelete;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -134,6 +136,7 @@ public class LifeCyclePolicyImpl implements LifeCyclePolicy {
   )
   @JoinColumn(name = "lifecyclepolicy_id", nullable = false)
   @OrderColumn(name = "position_policy_access_control_entries")
+  @CascadeOnDelete
   private List<LifeCyclePolicyAccessControlEntryImpl> accessControlEntries = new ArrayList<>();
 
   @Transient
