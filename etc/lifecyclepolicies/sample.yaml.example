@@ -54,7 +54,8 @@ actionDate: 2023-11-30T16:16:47Z
 #cronTrigger:
 
 # Specify on which entities the policy action should be run on.
-# Not required, but very highly recommended.
+# Not technically required, but the policy will only affect entities
+# that match the specified filters.
 # Structure:
 # "catalog flavor":
 #   metadata_field_key:

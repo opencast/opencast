@@ -474,16 +474,21 @@ public class LifeCycleServiceImpl implements LifeCycleService {
       EventSearchQuery query = new EventSearchQuery(organization.getId(), user);
       List<EventCatalogUIAdapter> extendedCatalogUIAdapters = indexService.getExtendedEventCatalogUIAdapters();
       EventCatalogUIAdapter commonCatalogUIAdapter = indexService.getCommonEventCatalogUIAdapter();
+      boolean isFilterPresent = false;
 
       // Get filtered series if applicable
       List<Series> series = filterForSeries(filters);
-      series.forEach(s -> query.withSeriesId(s.getIdentifier()));
+      if (!series.isEmpty()) {
+        isFilterPresent = true;
+        series.forEach(s -> query.withSeriesId(s.getIdentifier()));
+      }
 
       // Add filters to query
       for (String flavor: filters.keySet()) {
         // Common metadata filter
         if (commonCatalogUIAdapter.getFlavor().eq(flavor)) {
           addFiltersToQuery(query, filters.get(flavor));
+          isFilterPresent = true;
           continue;
         }
 
@@ -499,7 +504,13 @@ public class LifeCycleServiceImpl implements LifeCycleService {
         for (String name: filters.get(flavor).keySet()) {
           EventSearchQueryField<String> field = filters.get(flavor).get(name);
           query.withExtendedMetadata(flavor, name, field.getValue());
+          isFilterPresent = true;
         }
+      }
+
+      // Only query if there actually are applicable filters
+      if (!isFilterPresent) {
+        return eventsList;
       }
 
       // Run query
