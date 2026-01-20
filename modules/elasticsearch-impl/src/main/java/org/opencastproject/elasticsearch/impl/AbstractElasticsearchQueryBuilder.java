@@ -275,7 +275,7 @@ public abstract class AbstractElasticsearchQueryBuilder<T extends SearchQuery> i
    *
    * @param fieldName
    *          the field name
-   * @param fieldValues
+   * @param fieldValue
    *          the field value
    */
   protected void andWildcard(String fieldName, String fieldValue) {
@@ -297,7 +297,7 @@ public abstract class AbstractElasticsearchQueryBuilder<T extends SearchQuery> i
    *
    * @param fieldName
    *          the field name
-   * @param fieldValues
+   * @param fieldValue
    *          the field value
    */
   protected void andWildcardNot(String fieldName, String fieldValue) {

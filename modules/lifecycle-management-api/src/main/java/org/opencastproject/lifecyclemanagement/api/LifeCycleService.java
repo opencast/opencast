@@ -123,7 +123,6 @@ public interface LifeCycleService {
    * @return The {@link LifeCyclePolicy} belonging to the id
    * @throws NotFoundException If no life cycle task with the given id could be found
    * @throws IllegalStateException If something went wrong in the database service
-   * @throws UnauthorizedException If the user does not have read access for the life cycle task
    */
   LifeCycleTask getLifeCycleTaskById(String id)
           throws NotFoundException, IllegalStateException;
@@ -134,7 +133,6 @@ public interface LifeCycleService {
    * @return The {@link LifeCyclePolicy} belonging to the id
    * @throws NotFoundException If no life cycle task with the given id could be found
    * @throws IllegalStateException If something went wrong in the database service
-   * @throws UnauthorizedException If the user does not have read access for the life cycle task
    */
   LifeCycleTask getLifeCycleTaskByTargetId(String targetId)
           throws NotFoundException, IllegalStateException;
@@ -151,8 +149,6 @@ public interface LifeCycleService {
    * Creates a new life cycle task in the database
    * @param task The {@link LifeCycleTask} to create
    * @return The created {@link LifeCycleTask}
-   * @throws IllegalStateException If something went wrong in the database service
-   * @throws UnauthorizedException If the user does not have write access for an existing life cycle task
    */
   LifeCycleTask createLifeCycleTask(LifeCycleTask task);
 
@@ -172,7 +168,6 @@ public interface LifeCycleService {
    * @return The removed {@link LifeCycleTask}
    * @throws NotFoundException If no life cycle task with the given id could be found
    * @throws IllegalStateException If something went wrong in the database service
-   * @throws UnauthorizedException If the user does not have write access for the life cycle task
    */
   boolean deleteLifeCycleTask(String id)
           throws NotFoundException, IllegalStateException;

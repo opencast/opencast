@@ -263,7 +263,6 @@ public class LifeCyclePolicyScanner implements ArtifactInstaller {
    *
    * @param identifier
    *          the lifecycle policy identifier
-   * @return the removed lifecycle policy
    */
   public void removeLifeCyclePolicy(String identifier) {
     SecurityUtil.runAs(securityService, defaultOrganization, systemAdminUser, () -> {

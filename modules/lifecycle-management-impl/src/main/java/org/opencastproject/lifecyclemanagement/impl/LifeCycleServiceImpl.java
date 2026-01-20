@@ -172,7 +172,7 @@ public class LifeCycleServiceImpl implements LifeCycleService {
 
   /**
    * {@inheritDoc}
-   * @see LifeCycleService#getLifeCyclePoliciesTotal(String)
+   * @see LifeCycleService#getLifeCyclePoliciesTotal()
    */
   @Override
   public long getLifeCyclePoliciesTotal() throws IllegalStateException {
