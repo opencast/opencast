@@ -587,12 +587,14 @@ public class LifeCycleServiceImpl implements LifeCycleService {
     SeriesSearchQuery query = new SeriesSearchQuery(organization.getId(), user);
     List<SeriesCatalogUIAdapter> extendedCatalogUIAdapters = indexService.getExtendedSeriesCatalogUIAdapters();
     SeriesCatalogUIAdapter commonCatalogUIAdapter = indexService.getCommonSeriesCatalogUIAdapter();
+    boolean isFilterPresent = false;
 
     // Add filters to query
     for (String flavor: filters.keySet()) {
       // Common metadata filter
       if (commonCatalogUIAdapter.getFlavor().eq(flavor)) {
         addFiltersToSeriesQuery(query, filters.get(flavor));
+        isFilterPresent = true;
         continue;
       }
 
@@ -609,7 +611,13 @@ public class LifeCycleServiceImpl implements LifeCycleService {
         EventSearchQueryField<String> field = filters.get(flavor).get(name);
         String type = flavor.split("/")[0];
         query.withExtendedMetadata(type, name, field.getValue());
+        isFilterPresent = true;
       }
+    }
+
+    // Only query if there actually are applicable filters
+    if (!isFilterPresent) {
+      return seriesList;
     }
 
     // Run query
