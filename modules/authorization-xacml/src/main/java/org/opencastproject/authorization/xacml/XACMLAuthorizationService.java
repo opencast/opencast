@@ -39,6 +39,8 @@ import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
+import org.opencastproject.series.api.SeriesException;
+import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.data.Tuple;
@@ -90,6 +92,9 @@ public class XACMLAuthorizationService implements AuthorizationService {
 
   /** The serializer for media pacakge */
   private MediaPackageSerializer serializer;
+
+  /** The series service */
+  private SeriesService seriesService;
 
   private static final String CONFIG_MERGE_MODE = "merge.mode";
 
@@ -196,7 +201,19 @@ public class XACMLAuthorizationService implements AuthorizationService {
       } catch (URISyntaxException e) {
         logger.warn("URI {} syntax error, skip decoding", uri);
       }
-      acl = loadAcl(uri);
+      // Try to get ACLs from database else fall back to url
+      if (xacmlPolicyFlavor == XACML_POLICY_SERIES) {
+        try {
+          acl = Optional.ofNullable(seriesService.getSeriesAccessControl(mp.getSeries()));
+          if (acl.isEmpty()) {
+            throw new NotFoundException("Can't find series in database");
+          }
+        } catch (NotFoundException | SeriesException e) {
+          acl = loadAcl(uri);
+        }
+      } else {
+        acl = loadAcl(uri);
+      }
     }
     return acl;
   }
@@ -366,6 +383,17 @@ public class XACMLAuthorizationService implements AuthorizationService {
   @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
+  }
+
+  /**
+   * Declarative services callback to set the series service.
+   *
+   * @param seriesService
+   *          the series service
+   */
+  @Reference
+  public void setSeriesService(SeriesService seriesService) {
+    this.seriesService = seriesService;
   }
 
 }
