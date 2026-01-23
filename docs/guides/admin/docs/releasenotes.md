@@ -1,9 +1,11 @@
 # Opencast 17: Release Notes
 
-## Opencast 17.10
+## Opencast 17.11
 
 This version contains a new version of the admin ui
 ([17.x-2025-11-28](https://github.com/opencast/opencast-admin-interface/releases/tag/17.x-2025-11-28)).
+
+## Opencast 17.10
 
 There are also a few bugfixes like fixing head requests ([#7181](https://github.com/opencast/opencast/pull/7181)),
 a fix for permissions in the search service ([#7120](https://github.com/opencast/opencast/pull/7120)),

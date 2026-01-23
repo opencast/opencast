@@ -3,9 +3,11 @@ Opencast 17 Changelog
 
 Changes marked with \* were also included in 16.x.
 
-## Opencast 17.10 (2025-11-28)
+## Opencast 17.11 (2026-01-23)
 - [[#7217](https://github.com/opencast/opencast/pull/7217)] -
   Update r/17.x Admin UI to 17.x-2025-11-28
+- 
+## Opencast 17.10 (2025-11-28)
 - [[#7181](https://github.com/opencast/opencast/pull/7181)] -
   Fix HEAD requests to static files returning wrong status codes
 - [[#7120](https://github.com/opencast/opencast/pull/7120)] -
