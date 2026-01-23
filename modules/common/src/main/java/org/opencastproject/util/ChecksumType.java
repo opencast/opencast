@@ -92,8 +92,9 @@ public final class ChecksumType implements Serializable {
    *           if the digest is not supported by the java environment
    */
   public static ChecksumType fromString(String type) throws NoSuchAlgorithmException {
-    if (type == null)
+    if (type == null) {
       throw new IllegalArgumentException("Argument 'type' is null");
+    }
     type = type.toLowerCase();
     ChecksumType checksumType = TYPES.get(type);
     if (checksumType == null) {

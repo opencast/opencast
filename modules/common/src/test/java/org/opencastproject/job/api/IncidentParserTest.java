@@ -51,7 +51,7 @@ public class IncidentParserTest {
     final String marshaled = IncidentParser.I.toXml(new JaxbIncident(incident));
     logger.info(marshaled);
     assertThat(the(marshaled),
-            similarTo(the(loadFileFromClassPathAsString("/org/opencastproject/job/api/expected-incident-1.xml").get())));
+        similarTo(the(loadFileFromClassPathAsString("/org/opencastproject/job/api/expected-incident-1.xml").get())));
     final Incident unmarshaled = IncidentParser.I.parseIncidentFromXml(IOUtils.toInputStream(marshaled)).toIncident();
     assertEquals(incident, unmarshaled);
   }
@@ -68,8 +68,8 @@ public class IncidentParserTest {
     final String marshaled = IncidentParser.I.toXml(new JaxbIncidentTree(tree));
     logger.info(marshaled);
     assertThat(the(marshaled),
-            similarTo(the(loadFileFromClassPathAsString("/org/opencastproject/job/api/expected-incident-tree-1.xml")
-                    .get())));
+        similarTo(the(loadFileFromClassPathAsString("/org/opencastproject/job/api/expected-incident-tree-1.xml")
+            .get())));
     final IncidentTree unmarshaled = IncidentParser.I.parseIncidentTreeFromXml(IOUtils.toInputStream(marshaled))
             .toIncidentTree();
     assertEquals(tree, unmarshaled);

@@ -123,7 +123,8 @@ public final class XmlSafeParser {
         f.setAttribute("http://www.oracle.com/xml/jaxp/properties/entityExpansionLimit", "1");
       }
       else if (f.getClass().getName().equals("net.sf.saxon.TransformerFactoryImpl")) {
-        f.setAttribute("http://saxon.sf.net/feature/parserFeature?uri=http://apache.org/xml/features/disallow-doctype-decl", true);
+        f.setAttribute("http://saxon.sf.net/feature/parserFeature?uri=http://apache.org/xml/features"
+            + "/disallow-doctype-decl", true);
       }
       else {
         throw new AssertionError("Unknown TransformerFactory " + f.getClass().getName());
@@ -156,22 +157,22 @@ public final class XmlSafeParser {
    * therefore we create a DocumentBuilder for each Thread.
    */
   private static ThreadLocal<DocumentBuilder> db = new ThreadLocal<DocumentBuilder>() {
-          @Override
-          protected DocumentBuilder initialValue() {
-            DocumentBuilderFactory dbf = newDocumentBuilderFactory();
-            DocumentBuilder d = null;
-            try {
-              dbf.setNamespaceAware(true);
-              d = dbf.newDocumentBuilder();
-            }
-            catch (Exception e) {
-              // this shouldn't occur
-              logger.error("Failed to configure safe DocumentBuilder to prevent XXE.");
-              throw new AssertionError("Failed to configure safe DocumentBuilder to prevent XXE.", e);
-            }
+      @Override
+      protected DocumentBuilder initialValue() {
+        DocumentBuilderFactory dbf = newDocumentBuilderFactory();
+        DocumentBuilder d = null;
+        try {
+          dbf.setNamespaceAware(true);
+          d = dbf.newDocumentBuilder();
+        }
+        catch (Exception e) {
+          // this shouldn't occur
+          logger.error("Failed to configure safe DocumentBuilder to prevent XXE.");
+          throw new AssertionError("Failed to configure safe DocumentBuilder to prevent XXE.", e);
+        }
 
-            return d;
-          }
+        return d;
+      }
   };
 
   /**

@@ -67,8 +67,9 @@ public final class MediaPackageParser {
    * @return the serialized media package
    */
   public static String getAsXml(MediaPackage mediaPackage) {
-    if (mediaPackage == null)
+    if (mediaPackage == null) {
       throw new IllegalArgumentException("Mediapackage must not be null");
+    }
     try {
       Marshaller marshaller = MediaPackageImpl.context.createMarshaller();
       marshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, false);
@@ -182,16 +183,19 @@ public final class MediaPackageParser {
     doc.appendChild(mpXml);
 
     // Handle
-    if (mediaPackage.getIdentifier() != null)
+    if (mediaPackage.getIdentifier() != null) {
       mpXml.setAttribute("id", mediaPackage.getIdentifier().toString());
+    }
 
     // Start time
-    if (mediaPackage.getDate() != null && mediaPackage.getDate().getTime() > 0)
+    if (mediaPackage.getDate() != null && mediaPackage.getDate().getTime() > 0) {
       mpXml.setAttribute("start", DateTimeSupport.toUTC(mediaPackage.getDate().getTime()));
+    }
 
     // Duration
-    if (mediaPackage.getDuration() != null)
+    if (mediaPackage.getDuration() != null) {
       mpXml.setAttribute("duration", Long.toString(mediaPackage.getDuration()));
+    }
 
     // Separate the media package members
     List<Track> tracks = new ArrayList<Track>();
@@ -201,14 +205,15 @@ public final class MediaPackageParser {
 
     // Sort media package elements
     for (MediaPackageElement e : mediaPackage.elements()) {
-      if (e instanceof Track)
+      if (e instanceof Track) {
         tracks.add((Track) e);
-      else if (e instanceof Attachment)
+      } else if (e instanceof Attachment) {
         attachments.add((Attachment) e);
-      else if (e instanceof Catalog)
+      } else if (e instanceof Catalog) {
         metadata.add((Catalog) e);
-      else
+      } else {
         others.add(e);
+      }
     }
 
     // Tracks
@@ -280,8 +285,9 @@ public final class MediaPackageParser {
   public static String getArrayAsXml(List<MediaPackage> mediaPackages) throws MediaPackageException {
     try {
       StringBuilder builder = new StringBuilder();
-      if (mediaPackages.isEmpty())
+      if (mediaPackages.isEmpty()) {
         return builder.toString();
+      }
       builder.append(getAsXml(mediaPackages.get(0)));
       for (int i = 1; i < mediaPackages.size(); i++) {
         builder.append("###");
@@ -309,8 +315,9 @@ public final class MediaPackageParser {
   public static List<MediaPackage> getArrayFromXml(String xml) throws MediaPackageException {
     try {
       List<MediaPackage> mediaPackages = new LinkedList<MediaPackage>();
-      if (StringUtils.isBlank(xml))
+      if (StringUtils.isBlank(xml)) {
         return mediaPackages;
+      }
       String[] xmlArray = xml.split("###");
       for (String xmlElement : xmlArray) {
         mediaPackages.add(getFromXml(xmlElement.trim()));

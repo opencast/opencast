@@ -87,21 +87,24 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
    */
   private String checkPartSyntax(String part) {
     // Parts may not be null
-    if (part == null)
+    if (part == null) {
       throw new IllegalArgumentException("Flavor parts may not be null!");
+    }
 
     // Parts may not contain the flavor separator character
-    if (part.contains(SEPARATOR))
+    if (part.contains(SEPARATOR)) {
       throw new IllegalArgumentException(
               format("Invalid flavor part \"%s\". Flavor parts may not contain '%s'!", part, SEPARATOR));
+    }
 
     // Parts may not contain leading and trailing blanks, and may only consist of lowercase letters
     String adaptedPart = part.trim().toLowerCase();
 
     // Parts may not be empty
-    if (adaptedPart.isEmpty())
+    if (adaptedPart.isEmpty()) {
       throw new IllegalArgumentException(
-              format("Invalid flavor part \"%s\". Flavor parts may not be blank or empty!", part));
+          format("Invalid flavor part \"%s\". Flavor parts may not be blank or empty!", part));
+    }
 
     return adaptedPart;
   }
@@ -205,11 +208,13 @@ public class MediaPackageElementFlavor implements Cloneable, Comparable<MediaPac
    *           if the string <code>s</code> does not contain a <i>dash</i> to divide the type from subtype.
    */
   public static MediaPackageElementFlavor parseFlavor(String s) throws IllegalArgumentException {
-    if (s == null)
+    if (s == null) {
       throw new IllegalArgumentException("Unable to create element flavor from 'null'");
+    }
     String[] parts = s.split(SEPARATOR);
-    if (parts.length != 2)
+    if (parts.length != 2) {
       throw new IllegalArgumentException(format("Unable to create element flavor from \"%s\"", s));
+    }
     return new MediaPackageElementFlavor(parts[0], parts[1]);
   }
 

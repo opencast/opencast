@@ -129,18 +129,22 @@ public final class JobBarrier {
    *          the job waiting for the other jobs to finish
    */
   public JobBarrier(Job waiter, ServiceRegistry registry, long pollingInterval, Job... jobs) {
-    if (registry == null)
+    if (registry == null) {
       throw new IllegalArgumentException("Service registry must not be null");
-    if (jobs == null)
+    }
+    if (jobs == null) {
       throw new IllegalArgumentException("Jobs must not be null");
-    if (pollingInterval < 0)
+    }
+    if (pollingInterval < 0) {
       throw new IllegalArgumentException("Polling interval must be a positive number");
+    }
     this.serviceRegistry = registry;
     this.pollingInterval = pollingInterval;
-    if (waiter != null)
+    if (waiter != null) {
       this.waiterJobId = Optional.of(waiter.getId());
-    else
+    } else {
       this.waiterJobId = Optional.empty();
+    }
     this.jobs = new ArrayList<Job>(Arrays.asList(jobs));
   }
 
@@ -152,9 +156,11 @@ public final class JobBarrier {
         logger.debug("Job {} set to WAITING state.", waiter.getId());
         this.serviceRegistry.updateJob(waiter);
       } catch (ServiceRegistryException e) {
-        logger.warn("Unable to put {} into a waiting state, this may cause a deadlock: {}", waiterJobId, e.getMessage());
+        logger.warn("Unable to put {} into a waiting state, this may cause a deadlock: {}",
+            waiterJobId, e.getMessage());
       } catch (NotFoundException e) {
-        logger.warn("Unable to put {} into a waiting state, job not found by the service registry.  This may cause a deadlock: {}", waiterJobId, e.getMessage());
+        logger.warn("Unable to put {} into a waiting state, job not found by the service registry. "
+            + "This may cause a deadlock: {}", waiterJobId, e.getMessage());
       }
     } else {
       logger.debug("No waiting job set, unable to put waiting job into waiting state");
@@ -169,9 +175,11 @@ public final class JobBarrier {
         logger.debug("Job {} wakened and set back to RUNNING state.", waiter.getId());
         this.serviceRegistry.updateJob(waiter);
       } catch (ServiceRegistryException e) {
-        logger.warn("Unable to put {} into a waiting state, this may cause a deadlock: {}", waiterJobId, e.getMessage());
+        logger.warn("Unable to put {} into a waiting state, this may cause a deadlock: {}",
+            waiterJobId, e.getMessage());
       } catch (NotFoundException e) {
-        logger.warn("Unable to put {} into a waiting state, job not found by the service registry.  This may cause a deadlock: {}", waiterJobId, e.getMessage());
+        logger.warn("Unable to put {} into a waiting state, job not found by the service registry. "
+            + "This may cause a deadlock: {}", waiterJobId, e.getMessage());
       }
     } else {
       logger.debug("No waiting job set, unable to put waiting job into waiting state");
@@ -200,8 +208,9 @@ public final class JobBarrier {
    *           if one of the jobs was canceled
    */
   public Result waitForJobs(long timeout) throws JobCanceledException, IllegalStateException {
-    if (jobs.size() == 0)
+    if (jobs.size() == 0) {
       return new Result(new HashMap<Job, Status>());
+    }
     this.suspendWaiterJob();
     synchronized (this) {
       JobStatusUpdater updater = new JobStatusUpdater(timeout);
@@ -213,8 +222,9 @@ public final class JobBarrier {
       }
     }
     if (pollingException != null) {
-      if (pollingException instanceof JobCanceledException)
+      if (pollingException instanceof JobCanceledException) {
         throw (JobCanceledException) pollingException;
+      }
       throw new IllegalStateException(pollingException);
     }
     this.wakeWaiterJob();
@@ -231,8 +241,9 @@ public final class JobBarrier {
    *           if the barrier already started waiting
    */
   public void addJob(Job job) throws IllegalStateException {
-    if (job == null)
+    if (job == null) {
       throw new IllegalArgumentException("Job must not be null");
+    }
     jobs.add(job);
   }
 
@@ -397,8 +408,9 @@ public final class JobBarrier {
      */
     public boolean isSuccess() {
       for (final Job.Status state : status.values()) {
-        if (!state.equals(Job.Status.FINISHED))
+        if (!state.equals(Job.Status.FINISHED)) {
           return false;
+        }
       }
       return true;
     }

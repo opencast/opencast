@@ -47,7 +47,8 @@ public class MediaPackageBuilderTest extends AbstractMediaPackageTest {
 
   /**
    * Test method for
-   * {@link org.opencastproject.mediapackage.MediaPackageBuilderImpl#createNew(org.opencastproject.mediapackage.identifier.Id)}
+   * {@link org.opencastproject.mediapackage.MediaPackageBuilderImpl#createNew(
+   *        org.opencastproject.mediapackage.identifier.Id)}
    * .
    */
   @Test

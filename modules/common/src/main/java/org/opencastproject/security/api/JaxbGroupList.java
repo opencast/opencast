@@ -51,8 +51,9 @@ public class JaxbGroupList {
   }
 
   public JaxbGroupList(Collection<JaxbGroup> groups) {
-    for (JaxbGroup group : groups)
+    for (JaxbGroup group : groups) {
       groups.add(group);
+    }
   }
 
   /**

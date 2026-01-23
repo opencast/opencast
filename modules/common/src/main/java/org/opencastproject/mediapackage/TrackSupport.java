@@ -39,8 +39,9 @@ public final class TrackSupport {
   public static <T extends Stream> T[] byType(Stream[] streams, Class<T> streamType) {
     List<Stream> f = new ArrayList<Stream>();
     for (Stream s : streams) {
-      if (streamType.isAssignableFrom(s.getClass()))
+      if (streamType.isAssignableFrom(s.getClass())) {
         f.add(s);
+      }
     }
     return f.toArray((T[]) Array.newInstance(streamType, f.size()));
   }

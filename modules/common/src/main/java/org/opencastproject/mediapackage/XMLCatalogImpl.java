@@ -150,8 +150,9 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
    *          the value
    */
   protected void addElement(EName element, String value) {
-    if (element == null)
+    if (element == null) {
       throw new IllegalArgumentException("Expanded name must not be null");
+    }
 
     addElement(new CatalogEntry(element, value, NO_ATTRIBUTES));
   }
@@ -205,12 +206,15 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
    *          the element type
    */
   protected void addTypedLocalizedElement(EName element, String value, String language, EName type) {
-    if (element == null)
+    if (element == null) {
       throw new IllegalArgumentException("EName name must not be null");
-    if (type == null)
+    }
+    if (type == null) {
       throw new IllegalArgumentException("Type must not be null");
-    if (language == null)
+    }
+    if (language == null) {
       throw new IllegalArgumentException("Language must not be null");
+    }
 
     Map<EName, String> attributes = new HashMap<>(2);
     attributes.put(XML_LANG_ATTR, language);
@@ -229,8 +233,9 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
    *          the attributes. May be null
    */
   protected void addElement(EName element, String value, Attributes attributes) {
-    if (element == null)
+    if (element == null) {
       throw new IllegalArgumentException("Expanded name must not be null");
+    }
 
     Map<EName, String> attributeMap = new HashMap<>();
     if (attributes != null) {
@@ -251,10 +256,12 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
 
     // Option includeEmpty allows marshaling empty elements
     // for deleting existing values during a catalog merge
-    if (element == null)
+    if (element == null) {
       return;
-    if (StringUtils.trimToNull(element.getValue()) == null && !includeEmpty)
+    }
+    if (StringUtils.trimToNull(element.getValue()) == null && !includeEmpty) {
       return;
+    }
     List<CatalogEntry> values = data.get(element.getEName());
     if (values == null) {
       values = new ArrayList<>();
@@ -404,8 +411,9 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
     if (elements != null) {
       for (CatalogEntry entry : elements) {
         String v = entry.getAttribute(attributeEName);
-        if (equal(attributeValue, v))
+        if (equal(attributeValue, v)) {
           return entry;
+        }
       }
     }
     return null;
@@ -483,8 +491,7 @@ public abstract class XMLCatalogImpl extends CatalogImpl implements XMLCatalog {
    * @see org.opencastproject.mediapackage.XMLCatalog#includeEmpty(boolean)
    */
   @Override
-  public
-  void includeEmpty(boolean includeEmpty) {
+  public void includeEmpty(boolean includeEmpty) {
     this.includeEmpty = includeEmpty;
   }
 

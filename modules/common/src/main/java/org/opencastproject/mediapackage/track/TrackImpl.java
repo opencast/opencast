@@ -298,12 +298,15 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
       node.appendChild(nameNode);
     }
 
-    for (Stream s : audio)
+    for (Stream s : audio) {
       node.appendChild(s.toManifest(document, serializer));
-    for (Stream s : video)
+    }
+    for (Stream s : video) {
       node.appendChild(s.toManifest(document, serializer));
-    for (Stream s : subtitle)
+    }
+    for (Stream s : subtitle) {
       node.appendChild(s.toManifest(document, serializer));
+    }
     return node;
   }
 
@@ -329,7 +332,9 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
   }
 
   public StreamingProtocol getTransport() {
-    if (transport == null) return autodetectTransport(getURI());
+    if (transport == null) {
+      return autodetectTransport(getURI());
+    }
     return transport;
   }
 
@@ -364,26 +369,40 @@ public class TrackImpl extends AbstractMediaPackageElement implements Track {
   }
 
   private StreamingProtocol autodetectTransport(URI uri) {
-    if (uri == null || uri.getScheme() == null) return null;
-    if (uri.getScheme().toLowerCase().startsWith("http")) {
-        if (uri.getFragment() == null) return StreamingProtocol.DOWNLOAD;
-        else if (uri.getFragment().toLowerCase().endsWith(".m3u8")) return StreamingProtocol.HLS;
-        else if (uri.getFragment().toLowerCase().endsWith(".mpd")) return StreamingProtocol.DASH;
-        else if (uri.getFragment().toLowerCase().endsWith(".f4m")) return StreamingProtocol.HDS;
-        else setTransport(StreamingProtocol.DOWNLOAD);
+    if (uri == null || uri.getScheme() == null) {
+      return null;
     }
-    else if (uri.getScheme().toLowerCase().startsWith("rtmp")) return StreamingProtocol.RTMP;
-    else if (uri.getScheme().toLowerCase().startsWith("rtmpe")) return StreamingProtocol.RTMPE;
-    else if (uri.getScheme().toLowerCase().startsWith("file")) return StreamingProtocol.FILE;
-    else if (uri.getScheme().toLowerCase().startsWith("rtp")) return StreamingProtocol.RTP;
-    else if (uri.getScheme().toLowerCase().startsWith("rtsp")) return StreamingProtocol.RTSP;
+    if (uri.getScheme().toLowerCase().startsWith("http")) {
+      if (uri.getFragment() == null) {
+        return StreamingProtocol.DOWNLOAD;
+      } else if (uri.getFragment().toLowerCase().endsWith(".m3u8")) {
+        return StreamingProtocol.HLS;
+      } else if (uri.getFragment().toLowerCase().endsWith(".mpd")) {
+        return StreamingProtocol.DASH;
+      } else if (uri.getFragment().toLowerCase().endsWith(".f4m")) {
+        return StreamingProtocol.HDS;
+      } else {
+        setTransport(StreamingProtocol.DOWNLOAD);
+      }
+    } else if (uri.getScheme().toLowerCase().startsWith("rtmp")) {
+      return StreamingProtocol.RTMP;
+    } else if (uri.getScheme().toLowerCase().startsWith("rtmpe")) {
+      return StreamingProtocol.RTMPE;
+    } else if (uri.getScheme().toLowerCase().startsWith("file")) {
+      return StreamingProtocol.FILE;
+    } else if (uri.getScheme().toLowerCase().startsWith("rtp")) {
+      return StreamingProtocol.RTP;
+    } else if (uri.getScheme().toLowerCase().startsWith("rtsp")) {
+      return StreamingProtocol.RTSP;
+    }
     return StreamingProtocol.UNKNOWN;
   }
 
   @Override
   public String getLogicalName() {
-    if (logicalname == null) // default to it's own path
+    if (logicalname == null) { // default to it's own path
       return uri.getPath();
+    }
     return logicalname;
   }
 

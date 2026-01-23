@@ -158,7 +158,8 @@ public class AbstractJobProducerTest extends EasyMockSupport {
 
     // Job load higher than max load but some load on host
     job.setJobLoad(10.0f);
-    assertTrue("Job load >= max load, but accepting oversize jobs is true so accept job", jobProducer.isReadyToAccept(job));
+    assertTrue("Job load >= max load, but accepting oversize jobs is true so accept job",
+        jobProducer.isReadyToAccept(job));
   }
 
   private class JobProducerTest extends AbstractJobProducer {

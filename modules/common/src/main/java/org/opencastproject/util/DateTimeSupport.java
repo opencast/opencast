@@ -52,7 +52,7 @@ public final class DateTimeSupport {
    *           if the date string is malformed
    */
   public static long fromUTC(String s) throws IllegalStateException, ParseException {
-   return fromUTC(s, STANDARD_DATE_FORMAT, HOUR_MINUTE_SECOND_TIME_FORMAT);
+    return fromUTC(s, STANDARD_DATE_FORMAT, HOUR_MINUTE_SECOND_TIME_FORMAT);
   }
 
   /**
@@ -78,8 +78,9 @@ public final class DateTimeSupport {
       s = s.substring(0, s.length() - 1); // cut off the Z
     }
     String[] parts = s.split("T");
-    if (parts.length != 2)
+    if (parts.length != 2) {
       throw new IllegalArgumentException("UTC date string is malformed");
+    }
 
     long utc = 0;
 
