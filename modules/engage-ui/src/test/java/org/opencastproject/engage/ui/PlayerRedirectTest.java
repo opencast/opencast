@@ -59,7 +59,7 @@ public class PlayerRedirectTest extends EasyMockSupport {
 
     try (Response response = playerRedirect.redirect(eventId)) {
       assertEquals(Response.Status.TEMPORARY_REDIRECT.getStatusCode(), response.getStatus());
-      assertEquals("/paella7/ui/watch.html?id=event1", response.getHeaderString("location"));
+      assertEquals("/paella8/ui/watch.html?id=event1", response.getHeaderString("location"));
     }
 
     verifyAll();
@@ -91,7 +91,7 @@ public class PlayerRedirectTest extends EasyMockSupport {
 
     try (Response response = playerRedirect.redirect(eventId)) {
       assertEquals(Response.Status.TEMPORARY_REDIRECT.getStatusCode(), response.getStatus());
-      assertEquals("/paella7/ui/watch.html?id=event%2520with%2520spaces", response.getHeaderString("location"));
+      assertEquals("/paella8/ui/watch.html?id=event%2520with%2520spaces", response.getHeaderString("location"));
     }
 
     verifyAll();
@@ -106,7 +106,7 @@ public class PlayerRedirectTest extends EasyMockSupport {
 
     try (Response response = playerRedirect.redirect(eventId)) {
       assertEquals(Response.Status.TEMPORARY_REDIRECT.getStatusCode(), response.getStatus());
-      assertEquals("/paella7/ui/watch.html?id=%C3%BC%C3%A4%C3%B6%C3%9F%24%25%26%2F%28%29%3D%3F%21%C2%A7",
+      assertEquals("/paella8/ui/watch.html?id=%C3%BC%C3%A4%C3%B6%C3%9F%24%25%26%2F%28%29%3D%3F%21%C2%A7",
           response.getHeaderString("location"));
     }
 
