@@ -18,7 +18,7 @@
   etc with standard bean tags and so all list, maps, etc have to be moved inside
   the <bean> that uses them.
   -->
-  
+
   <!-- ######################################## -->
   <!-- # Open and unsecured url patterns      # -->
   <!-- ######################################## -->
@@ -139,7 +139,7 @@
     <sec:intercept-url pattern="/admin-ng/statistics/*.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
     <sec:intercept-url pattern="/admin-ng/statistics/export.csv" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
     <sec:intercept-url pattern="/assets/assets/**" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW')" />
-    <sec:intercept-url pattern="/admin-ng/adopter/**" method="GET" access="hasRole('ROLE_ADMIN" />
+    <sec:intercept-url pattern="/admin-ng/adopter/**" method="GET" access="hasRole('ROLE_ADMIN')" />
 
     <sec:intercept-url pattern="/admin-ng/acl/*" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_ACLS_EDIT')" />
     <sec:intercept-url pattern="/admin-ng/event/*/metadata" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_METADATA_EDIT')" />
@@ -158,7 +158,7 @@
     <sec:intercept-url pattern="/admin-ng/users/*" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_USERS_EDIT')" />
     <sec:intercept-url pattern="/admin-ng/user-settings/signature/*" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
     <sec:intercept-url pattern="/admin-ng/user-settings/setting/*" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
-    <sec:intercept-url pattern="/admin-ng/adopter/**" method="PUT" access="hasRole('ROLE_ADMIN" />
+    <sec:intercept-url pattern="/admin-ng/adopter/**" method="PUT" access="hasRole('ROLE_ADMIN')" />
 
     <sec:intercept-url pattern="/services/maintenance" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_SERVERS_MAINTENANCE_EDIT')" />
     <sec:intercept-url pattern="/services/sanitize" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_SERVICES_STATUS_EDIT')" />
@@ -187,7 +187,7 @@
     <sec:intercept-url pattern="/admin-ng/users" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_USERS_CREATE')" />
     <sec:intercept-url pattern="/admin-ng/user-settings/signature" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
     <sec:intercept-url pattern="/admin-ng/user-settings/setting" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
-    <sec:intercept-url pattern="/admin-ng/adopter/**" method="POST" access="hasRole('ROLE_ADMIN" />
+    <sec:intercept-url pattern="/admin-ng/adopter/**" method="POST" access="hasRole('ROLE_ADMIN')" />
 
     <sec:intercept-url pattern="/admin-ng/acl/*" method="DELETE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_ACLS_DELETE')" />
     <sec:intercept-url pattern="/admin-ng/capture-agents/*" method="DELETE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_LOCATIONS_DELETE')" />
@@ -201,7 +201,7 @@
     <sec:intercept-url pattern="/admin-ng/themes/*" method="DELETE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_THEMES_DELETE')" />
     <sec:intercept-url pattern="/admin-ng/users/*" method="DELETE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_USERS_DELETE')" />
     <sec:intercept-url pattern="/admin-ng/user-settings/setting/*" method="DELETE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
-    <sec:intercept-url pattern="/admin-ng/adopter/**" method="DELETE" access="hasRole('ROLE_ADMIN" />
+    <sec:intercept-url pattern="/admin-ng/adopter/**" method="DELETE" access="hasRole('ROLE_ADMIN')" />
 
     <!-- Securing the URLs for the external API interface -->
     <!-- External API GET Endpoints -->
@@ -262,9 +262,9 @@
     <sec:intercept-url pattern="/api/events/*/acl/*" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_EVENTS_ACL_EDIT')" />
     <sec:intercept-url pattern="/api/groups" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_GROUPS_CREATE')" />
     <sec:intercept-url pattern="/api/groups/*/members" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_GROUPS_EDIT')" />
-    <sec:intercept-url pattern="/api/clearIndex" method="POST" access="hasRole('ROLE_ADMIN"/>
-    <sec:intercept-url pattern="/api/recreateIndex" method="POST" access="hasRole('ROLE_ADMIN"/>
-    <sec:intercept-url pattern="/api/recreateIndex/*" method="POST" access="hasRole('ROLE_ADMIN"/>
+    <sec:intercept-url pattern="/api/clearIndex" method="POST" access="hasRole('ROLE_ADMIN')"/>
+    <sec:intercept-url pattern="/api/recreateIndex" method="POST" access="hasRole('ROLE_ADMIN')"/>
+    <sec:intercept-url pattern="/api/recreateIndex/*" method="POST" access="hasRole('ROLE_ADMIN')"/>
     <sec:intercept-url pattern="/api/playlists/*" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_PLAYLISTS_CREATE', 'ROLE_API_PLAYLISTS_EDIT')" />
     <sec:intercept-url pattern="/api/playlists/*/entries" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_PLAYLISTS_CREATE', 'ROLE_API_PLAYLISTS_EDIT')" />
     <sec:intercept-url pattern="/api/series" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_SERIES_CREATE')" />
@@ -314,11 +314,11 @@
     <sec:intercept-url pattern="/ui/config/**" access="permitAll" />
 
    <!-- Paella player 7 -->
-    <sec:intercept-url pattern="/paella7/ui/auth.html" access="hasRole('ROLE_USER" />
+    <sec:intercept-url pattern="/paella7/ui/auth.html" access="hasRole('ROLE_USER')" />
     <sec:intercept-url pattern="/paella7/ui/**" access="permitAll" />
 
    <!-- Paella player 8 -->
-    <sec:intercept-url pattern="/paella8/ui/auth.html" access="hasRole('ROLE_USER" />
+    <sec:intercept-url pattern="/paella8/ui/auth.html" access="hasRole('ROLE_USER')" />
     <sec:intercept-url pattern="/paella8/ui/**" access="permitAll" />
 
     <!-- Enable anonymous access to the engage player and the GET endpoints it requires -->
@@ -350,7 +350,7 @@
     <!-- Enable access to the Tobira module -->
     <sec:intercept-url pattern="/tobira/version" access="permitAll" />
     <sec:intercept-url pattern="/tobira/callback/*" method="GET" access="permitAll" />
-    <sec:intercept-url pattern="/tobira/**" access="hasRole('ROLE_ADMIN" />
+    <sec:intercept-url pattern="/tobira/**" access="hasRole('ROLE_ADMIN')" />
 
     <!-- Enable anonymous access to the annotation and the series endpoints -->
     <sec:intercept-url pattern="/series/**" method="GET" access="hasAnyRole('ROLE_ANONYMOUS', 'ROLE_CAPTURE_AGENT')" />
@@ -398,10 +398,9 @@
     <sec:intercept-url pattern="/admin-ng/index.html" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
     <sec:intercept-url pattern="/admin-ng/index.html" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
     <sec:intercept-url pattern="/index.html" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
-    <!-- OC Upstream #3959, #DCE OPC-719 Grant Producers access to "Go to admin" button from Engage -->
     <sec:intercept-url pattern="/index.js" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
     <sec:intercept-url pattern="/**" access="hasRole('ROLE_ADMIN')" />
- 
+
     <!-- ############################# -->
     <!-- # LOGIN / LOGOUT MECHANISMS # -->
     <!-- ############################# -->
@@ -409,10 +408,6 @@
     <!-- Uncomment to enable x509 client certificates for identifying clients -->
     <!-- sec:x509 subject-principal-regex="CN=(.*?)," user-service-ref="userDetailsService" / -->
 
-    <!-- Enable and configure the failure URL for form-based logins -->
-    <!-- CAS Auth: Comment this if using CAS authentication -->
-    <sec:form-login authentication-failure-url="/login.html?error" authentication-success-handler-ref="authSuccessHandler" />
- 
     <!-- Enable and configure the failure URL for form-based logins -->
     <!-- CAS Auth: Comment this if using CAS authentication -->
     <sec:form-login authentication-success-handler-ref="authSuccessHandler"
@@ -827,7 +822,7 @@
         <value>ES384</value>
         <value>ES512</value>
         <value>EdDSA</value>
-  	  </list>
+      </list>
     </property>
     <property name="claimConstraints">
       <!-- The claim constraints that are expected to be fulfilled by the JWT.
@@ -942,7 +937,7 @@
     <sec:authentication-provider user-service-ref="userDetailsService">
       <!-- The JPA user directory stores bcrypt hashed passwords, and does NOT work with legacy md5 hashes anymore -->
       <sec:password-encoder ref="passwordEncoder" />
-    </sec:authentication-provider>    
+    </sec:authentication-provider>
   </sec:authentication-manager>
 
   <!-- Do not use a request cache -->

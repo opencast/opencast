@@ -68,7 +68,7 @@ public class Lti11AuthenticationFilter extends OncePerRequestFilter {
         // Canvas already adds the query string parameters as request parameters and this makes
         // the LtiVerifier verify(request, secret) fail with invalid signature so we use
         // the verifyParameters instead.
-        // #DCE Embedded videos may have a 'custom_start' and 'custom_end' query parameters
+        // DCE's embedded videos may have a 'custom_start' and 'custom_end' query parameters
         // that are added to the POST request parameters by Canvas.
 
         // When converting the Map<String, String[]> from request.getParameterMap() to a
@@ -79,12 +79,12 @@ public class Lti11AuthenticationFilter extends OncePerRequestFilter {
                 .collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue()[0]));
         String urlWithoutQueryString = request.getRequestURL().toString();
 
-        // --- #DCE debug to list all request parameters including the query string added
+        // --- Debug to list all request parameters including the query string added
         // by Canvas
         for (String key : parameterMap.keySet()) {
-          logger.trace("#DCE Request parameter {}: {}", key, parameterMap.get(key));
+          logger.trace("Request parameter {}: {}", key, parameterMap.get(key));
         }
-        // --- #DCE
+        // ---
         LtiVerifier verifier = new LtiOauthVerifier();
 
         LtiVerificationResult result = verifier.verifyParameters(parameterMap, urlWithoutQueryString, HttpMethod.POST,

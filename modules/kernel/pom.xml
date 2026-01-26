@@ -55,16 +55,16 @@
     <!-- LTI 1.1 begin -->
     <dependency>
       <groupId>org.imsglobal</groupId>
-	  <artifactId>basiclti-util</artifactId>
-	  <version>1.2.0</version>
-	  <exclusions>
+      <artifactId>basiclti-util</artifactId>
+      <version>1.2.0</version>
+      <exclusions>
         <exclusion>
           <groupId>org.apache.httpcomponents</groupId>
           <artifactId>httpclient</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
-    <!-- LTI 1.1 end -->  
+    <!-- LTI 1.1 end -->
     <dependency>
       <groupId>javax.servlet</groupId>
       <artifactId>javax.servlet-api</artifactId>
@@ -292,17 +292,18 @@
             <Embed-Dependency>
                 jboss-xacml;inline=true
             </Embed-Dependency>
-            <!-- #DCE When loading the beans, setting the spring application context class
-            loader to this bundle's and explicitly importing the spring classes in the pom fixed
-            the ClassNotFoundExceptions. TODO Is this the best way? Is there more to add? -->
+            <!-- When loading the beans, setting the spring application context class
+            loader to this bundle's and explicitly importing the spring security classes
+            in the pom fixed the ClassNotFoundExceptions.
+            TODO Is this the best way? -->
             <Import-Package>
-				org.springframework.security.core.userdetails.cache,
-				org.springframework.security.web,
-				org.springframework.security.web.savedrequest,
-				org.springframework.security.web.util.matcher,
-				org.springframework.web.filter,
-				*
-			</Import-Package>
+              org.springframework.security.core.userdetails.cache,
+              org.springframework.security.web,
+              org.springframework.security.web.savedrequest,
+              org.springframework.security.web.util.matcher,
+              org.springframework.web.filter,
+              *
+            </Import-Package>
             <Export-Package>
               org.opencastproject.kernel.http;version=${project.version},
               org.opencastproject.kernel.http.api;version=${project.version},

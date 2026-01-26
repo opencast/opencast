@@ -126,10 +126,9 @@ public final class SecurityFilter implements Filter {
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
           throws IOException, ServletException {
 
-    // #DCE Temporary logging
-    HttpServletRequest dceRequest = (HttpServletRequest) request;
-    logger.info("#DCE Request: {}, session id: {}", dceRequest.getRequestURI(),
-            dceRequest.getSession() == null ? "no session" : dceRequest.getSession().getId());
+    HttpServletRequest req = (HttpServletRequest) request;
+    logger.trace("#DCE Request: {}, session id: {}", req.getRequestURI(),
+            req.getSession() == null ? "no session" : req.getSession().getId());
 
     // Make sure we have an organization
     Organization org = securityService.getOrganization();

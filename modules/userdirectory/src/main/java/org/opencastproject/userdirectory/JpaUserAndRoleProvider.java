@@ -110,9 +110,6 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
   protected Object nullToken = new Object();
 
   /** Password encoder for storing user passwords */
-  // #DCE TODO This was done to be able to remove the kernel dependency from the
-  // pom. Probably needs a better solution.
-  // private CustomPasswordEncoder passwordEncoder = new CustomPasswordEncoder();
   private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
   /** The factory used to generate the entity manager */

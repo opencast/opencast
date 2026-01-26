@@ -58,7 +58,8 @@ public class CustomPasswordEncoder implements PasswordEncoder {
   public boolean matches(CharSequence rawPassword, String encodedPassword) {
     // Test old deprecated MD5 encoded hash
     if (encodedPassword.length() == 32) {
-      logger.warn("User has old 32 char MD5 password, hash {}. Forcing user to reset password to use BCrypt.", encodedPassword);
+      logger.warn("User has old 32 char MD5 password, hash {}. Forcing user to reset password to use BCrypt.",
+              encodedPassword);
       // Force user to set a new more secure password by returning false
       return false;
     }

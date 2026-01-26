@@ -46,12 +46,12 @@ public class TrustedAnonymousAuthenticationFilter extends AnonymousAuthenticatio
   }
 
   /**
-   * #DCE Bypass the AnonymousAuthenticationFilter doFilter if the header 'X-Requested-Auth' is present. With Spring
+   * Bypass the AnonymousAuthenticationFilter doFilter if the header 'X-Requested-Auth' is present. With Spring
    * security 3.1, we used the deprecated applyAnonymousForThisRequest to accomplish the same.
    */
   @Override
   public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
-      throws IOException, ServletException {
+          throws IOException, ServletException {
     HttpServletRequest request = (HttpServletRequest) req;
     if (StringUtils.isBlank(request.getHeader(DelegatingAuthenticationEntryPoint.REQUESTED_AUTH_HEADER))) {
       super.doFilter(req, res, chain);

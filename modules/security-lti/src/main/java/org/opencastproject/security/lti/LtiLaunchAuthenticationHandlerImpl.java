@@ -74,8 +74,8 @@ import javax.servlet.http.HttpServletRequest;
 )
 
 /**
- * #DCE Reused former implementation of OAuthAuthenticationHandler to build list of roles. Callback interface for
- * handing authentication details that are used when an authenticated request for a protected resource is received.
+ * Spring security 5: Reused former implementation of OAuthAuthenticationHandler to build list of roles.
+ * Handles authentication details that are used when an authenticated request for a protected resource is received.
  */
 public class LtiLaunchAuthenticationHandlerImpl implements LtiLaunchAuthenticationHandler {
 

@@ -50,7 +50,7 @@ import javax.servlet.Filter;
 /**
  * Registers a security filter, which delegates to the spring filter chain appropriate for the current request's
  * organization. Organizational security configurations may be added to the security watch directory, and should be
- * named &lt;organization_id&gt;.xml. #DCE OPC-757 Implemented via blueprint vs ArtifactInstaller
+ * named &lt;organization_id&gt;.xml.
  */
 @Component(
     immediate = true,
@@ -130,7 +130,6 @@ public class SpringSecurityConfigurationArtifactInstaller implements ArtifactIns
    */
   @Activate
   protected void activate(ComponentContext cc) {
-    logger.info("#DCE Activate");
     this.bundleContext = cc.getBundleContext();
     this.appContexts = new HashMap<>();
   }
@@ -152,7 +151,7 @@ public class SpringSecurityConfigurationArtifactInstaller implements ArtifactIns
    */
   @Override
   public void install(File artifact) throws Exception {
-    logger.info("#DCE install");
+    logger.trace("Install");
     // If we already have a registration for this ID, take it out of the security filter and close it
     String orgId = FilenameUtils.getBaseName(artifact.getName());
 
