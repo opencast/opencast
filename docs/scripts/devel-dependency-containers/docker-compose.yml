@@ -1,6 +1,5 @@
 services:
-  elasticsearch:
-    container_name: opencast-opensearch
+  opensearch:
     image: opencast/opensearch:1
     init: true
     build:
