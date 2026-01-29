@@ -36,6 +36,7 @@ import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.event.comment.EventCommentService;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.util.RestUtils;
+import org.opencastproject.list.api.ListProvidersService;
 import org.opencastproject.scheduler.api.Recording;
 import org.opencastproject.scheduler.api.RecordingState;
 import org.opencastproject.scheduler.api.SchedulerService;
@@ -704,6 +705,7 @@ public class AbstractEventEndpointTest {
     private ElasticsearchIndex index;
     private UrlSigningService urlSigningService;
     private UserDirectoryService userDirectoryService;
+    private ListProvidersService listProvidersService;
 
     public WorkflowService getWorkflowService() {
       return workflowService;
@@ -823,6 +825,14 @@ public class AbstractEventEndpointTest {
 
     public UserDirectoryService getUserDirectoryService() {
       return userDirectoryService;
+    }
+
+    public void setListProvidersService(ListProvidersService listProvidersService) {
+      this.listProvidersService = listProvidersService;
+    }
+
+    public ListProvidersService getListProvidersService() {
+      return listProvidersService;
     }
 
   }

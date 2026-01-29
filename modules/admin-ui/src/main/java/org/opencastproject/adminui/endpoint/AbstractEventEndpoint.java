@@ -90,7 +90,10 @@ import org.opencastproject.index.service.resources.list.query.EventListQuery;
 import org.opencastproject.index.service.resources.list.query.SeriesListQuery;
 import org.opencastproject.index.service.util.JSONUtils;
 import org.opencastproject.index.service.util.RestUtils;
+import org.opencastproject.list.api.ListProviderException;
+import org.opencastproject.list.api.ListProvidersService;
 import org.opencastproject.list.api.ResourceListQuery;
+import org.opencastproject.list.impl.ResourceListQueryImpl;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.AudioStream;
 import org.opencastproject.mediapackage.Catalog;
@@ -277,6 +280,8 @@ public abstract class AbstractEventEndpoint {
 
   public abstract UserDirectoryService getUserDirectoryService();
 
+  public abstract ListProvidersService getListProvidersService();
+
   /** Default server URL */
   protected String serverUrl = "http://localhost:8080";
 
@@ -411,7 +416,7 @@ public abstract class AbstractEventEndpoint {
     if (eventOpt.isPresent()) {
       Event event = eventOpt.get();
       event.updatePreview(getAdminUIConfiguration().getPreviewSubtype());
-      JsonObject json = eventToJSON(event, Optional.empty());
+      JsonObject json = eventToJSON(event, Optional.empty(), Optional.empty());
       return okJson(json);
     }
     return notFound("Cannot find an event with id '%s'.", id);
@@ -3387,6 +3392,14 @@ public abstract class AbstractEventEndpoint {
       return okJsonList(eventsList, Optional.ofNullable(offset).orElse(0), Optional.ofNullable(limit).orElse(0), 0);
     }
 
+    Map<String, String> languages;
+    try {
+      languages = getListProvidersService().getList("LANGUAGES", new ResourceListQueryImpl(), false);
+    } catch (ListProviderException e) {
+      logger.info("Could not get languages from listprovider");
+      throw new WebApplicationException(e);
+    }
+
     for (SearchResultItem<Event> item : results.getItems()) {
       Event source = item.getSource();
       source.updatePreview(getAdminUIConfiguration().getPreviewSubtype());
@@ -3399,7 +3412,7 @@ public abstract class AbstractEventEndpoint {
           throw new WebApplicationException(e);
         }
       }
-      eventsList.add(eventToJSON(source, Optional.ofNullable(comments)));
+      eventsList.add(eventToJSON(source, Optional.ofNullable(comments), Optional.ofNullable(languages)));
     }
 
     return okJsonList(eventsList, Optional.ofNullable(offset).orElse(0), Optional.ofNullable(limit).orElse(0),
@@ -3422,7 +3435,8 @@ public abstract class AbstractEventEndpoint {
   }
 
 
-  private JsonObject eventToJSON(Event event, Optional<List<EventComment>> comments) {
+  private JsonObject eventToJSON(Event event, Optional<List<EventComment>> comments,
+      Optional<Map<String, String>> languages) {
     JsonObject json = new JsonObject();
 
     json.addProperty("id", event.getIdentifier());
@@ -3452,6 +3466,9 @@ public abstract class AbstractEventEndpoint {
     json.addProperty("agent_id", safeString(event.getAgentId()));
     json.addProperty("technical_start", safeString(event.getTechnicalStartTime()));
     json.addProperty("technical_end", safeString(event.getTechnicalEndTime()));
+    json.addProperty("language", safeString(event.getLanguage()));
+    json.addProperty("language_translation_key", languages.isPresent()
+        ? safeString(languages.get().get(event.getLanguage())) : "");
     json.add("technical_presenters", collectionToJsonArray(event.getTechnicalPresenters()));
     json.add("publications", collectionToJsonArray(eventPublicationsToJson(event)));
     if (comments.isPresent()) {

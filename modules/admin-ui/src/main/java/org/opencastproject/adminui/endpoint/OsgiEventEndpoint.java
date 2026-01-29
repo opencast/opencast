@@ -29,6 +29,7 @@ import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.event.comment.EventCommentService;
 import org.opencastproject.index.service.api.IndexService;
+import org.opencastproject.list.api.ListProvidersService;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.SecurityService;
@@ -86,6 +87,7 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint {
   private WorkflowService workflowService;
   private AdminUIConfiguration adminUIConfiguration;
   private UserDirectoryService userDirectoryService;
+  private ListProvidersService listProvidersService;
 
   private long expireSeconds = UrlSigningServiceOsgiUtil.DEFAULT_URL_SIGNING_EXPIRE_DURATION;
   private Boolean signWithClientIP = UrlSigningServiceOsgiUtil.DEFAULT_SIGN_WITH_CLIENT_IP;
@@ -258,6 +260,16 @@ public class OsgiEventEndpoint extends AbstractEventEndpoint {
   @Reference
   public void setUserDirectoryService(UserDirectoryService userDirectoryService) {
     this.userDirectoryService = userDirectoryService;
+  }
+
+  @Override
+  public ListProvidersService getListProvidersService() {
+    return listProvidersService;
+  }
+
+  @Reference
+  public void setListProvidersService(ListProvidersService listProvidersService) {
+    this.listProvidersService = listProvidersService;
   }
 
   @Activate

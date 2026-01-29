@@ -400,11 +400,16 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     Map<String, String> licences = new HashMap<>();
     licences.put("uuid-series1", "Series 1");
     licences.put("uuid-series2", "Series 2");
+    Map<String, String> languages = new HashMap<>();
+    languages.put("ara", "LANGUAGES.ARABIC");
 
     ListProvidersService listProvidersService = EasyMock.createNiceMock(ListProvidersService.class);
+    EasyMock.expect(listProvidersService.getList(EasyMock.eq("LANGUAGES"), EasyMock.anyObject(ResourceListQuery.class),
+        EasyMock.anyBoolean())).andReturn(languages).anyTimes();
     EasyMock.expect(listProvidersService.getList(EasyMock.anyString(), EasyMock.anyObject(ResourceListQuery.class),
       EasyMock.anyBoolean())).andReturn(licences).anyTimes();
     EasyMock.replay(listProvidersService);
+    env.setListProvidersService(listProvidersService);
 
     final IncidentTree r = new IncidentTreeImpl(
             Arrays.asList(mkIncident(Severity.INFO), mkIncident(Severity.INFO), mkIncident(Severity.INFO)),
@@ -771,5 +776,10 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
   @Override
   public UserDirectoryService getUserDirectoryService() {
     return env.getUserDirectoryService();
+  }
+
+  @Override
+  public ListProvidersService getListProvidersService() {
+    return env.getListProvidersService();
   }
 }
