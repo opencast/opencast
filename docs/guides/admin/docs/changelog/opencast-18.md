@@ -2,6 +2,25 @@ Opencast 18 Changelog
 ---------------------
 
 Changes marked with \* were also included in 17.x.
+## Opencast 18.5 (2026-01-29)
+- [[#7341](https://github.com/opencast/opencast/pull/7341)] -
+  Updating studio to 2025-12-17
+- [[#7340](https://github.com/opencast/opencast/pull/7340)] -
+  Update r/18.x Admin UI to 18.x-2026-01-29
+- [[#7339](https://github.com/opencast/opencast/pull/7339)] -
+  Update r/18.x Editor to 18.x-2026-01-29
+- [[#7314](https://github.com/opencast/opencast/pull/7314)] -
+  Fix unsupported operation exception
+- [[#7292](https://github.com/opencast/opencast/pull/7292)] -
+  Clarify encoding profile count logging
+- [[#7291](https://github.com/opencast/opencast/pull/7291)] -
+  Add developers back to the main pom
+- [[#7273](https://github.com/opencast/opencast/pull/7273)] -
+  Fix syntax in partial-publish and partial-preview
+- [[#7213](https://github.com/opencast/opencast/pull/7213)] -
+  Add `?download=1` support for static files
+- [[#7175](https://github.com/opencast/opencast/pull/7175)] -
+  Handle org wildcard for catalog ui adapters
 
 ## Opencast 18.4 (2025-11-28)
 - [[#7219](https://github.com/opencast/opencast/pull/7219)] -

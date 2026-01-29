@@ -1,5 +1,14 @@
 # Opencast 18: Release Notes
 
+## Opencast 18.5
+
+This release includes some minor fixes, as well as an improvement that makes the download of static files easier.[[#7213](https://github.com/opencast/opencast/pull/7213)]
+
+This version also contains new releases of the admin ui
+([18.x-2026-01-29](https://github.com/opencast/opencast-admin-interface/releases/tag/18.x-2026-01-29)) the editor
+([18.x-2026-01-29](https://github.com/opencast/opencast-editor/releases/tag/18.x-2026-01-29)) and studio
+([18.x-2025-12-17](https://github.com/opencast/studio/releases/tag/2025-12-17)).
+
 ## Opencast 18.4
 
 Among other minor fixes, this minor release includes a bug fix related to the direct publication of live events. [[#7118](https://github.com/opencast/opencast/pull/7118)]
