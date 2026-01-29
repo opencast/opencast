@@ -291,6 +291,70 @@ For example, a pull request may be merged into `r/7.x`, `r/7.x` will then be mer
 exists, `r/8.x` and from there into `develop`. That way patches bubble through all newer versions and finally end up in
 `develop`.
 
+Git Submodules
+--------------
+
+Starting in the `r/18.x` branch we changed how we work with submodules.  Prior to this change `admin-ui-interface`,
+`editor`, and `studio` were fetched as release tarballs at build time by Maven.  This came with a
+ [number of drawbacks](https://github.com/orgs/opencast/discussions/7277), which is part of why we have replaced those
+modules with [git submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules).  Submodules are a complex topic,
+but for an Opencast developer they should be relatively simple to manage.
+
+### Initial clone
+
+We all clone `opencast/opencast`, but now there is a suggested additional step to run before cloning:
+
+    git config submodule.recurse true
+
+What this does is tell git that when you check a branch out, that *all* submodules should also check out the appropriate
+revisions specfied in their respective submodule directories.  If you do not do this, then you will need to manually
+run `git submodule update --init --recursive --remote` every time you change branches.  Failure to run this manual step
+does not cause issues, as long as you do not incorrectly commit the wrong submodule hash.
+
+### Updating to a version with submodules
+
+Even if you applied the change above, when you first checkout (or update) a branch to a version which contains
+submodules, those submodules will not automatically clone.  This requires an additional step:
+
+    git submodule update --init --recursive
+
+This step initiates a clone for each submodule, and then checks out the correct versions.
+
+### Manually updating the subproject's commit
+
+Rarely, you may want to locally update the hash of a submodule.  This is accomplished by running the same command as
+above with the addition of `--remote`.  In addition if you only want to update to the latest in the release branch:
+
+    git submodule update --init --remote modules/SUBMODULE_NAME
+
+If you want a specific hash then the command is slightly different.  First enter the submodule's directory, then check
+out the revision you want, fetching a repo update if needed
+
+    cd module/SUBMODULE_NAME
+    git fetch origin -> Remember, origin here is the submodule's repository
+    git checkout HASH/BRANCH
+
+A word of warning:  It is generally better to merge in the release branch you are working from rather than updating
+the hash in your branch directly.  If you absolutely must update the submodule, only do the ones you need specifically,
+and if you commit those changes do them in a separate commit from the rest of your work.  A branch with a changed
+target will almost certainly have conflicts when filed as a PR because git is diffing only the target hashes, with no
+concept of the commit tree, or whether commit A is a child commit of commit B.  In *most* cases, you do not want to
+commit the changed hash, even if you need it for development.  In this case, avoid committing the X submodule so your
+change will not persist.
+
+### Working with older, non-submoduled versions
+
+Git does not nicely handle switching back and forth between non-submoduled versions (ie, earlier 18.x and 19.x, or 17.x
+and older).  It's technically possible, but requires manually removing files from disk *every time youi switch between
+branches*.  In general, we suggest working on older versions in a separate clone.
+
+### Why working directly on a submodule is a bad idea
+
+If you are working directly on one of the submodules (eg: fixing a bug) you should be working in an entirely separate
+clone of *only* that submodule.  While technically possible, working in the `opencast/opencast` clone's copy of the
+submodule can lead to very confusing situations which are easily avoided if you instead work on the code in a separate
+clone and treat the nested submodule from the main codebase as a black box.
+
 
 Release Process
 ---------------
