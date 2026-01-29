@@ -1,6 +1,41 @@
 Opencast 19 Changelog
 ---------------------
 
+## Opencast 19.1 (2026-01-29)
+- [[#7347](https://github.com/opencast/opencast/pull/7347)] -
+  Update 19.1 release notes
+- [[#7318](https://github.com/opencast/opencast/pull/7318)] -
+  Only get unique roles in admin ui
+- [[#7288](https://github.com/opencast/opencast/pull/7288)] -
+  Update 19.0 release notes
+- [[#7287](https://github.com/opencast/opencast/pull/7287)] -
+  Update Studio to 2025-12-17
+- [[#7286](https://github.com/opencast/opencast/pull/7286)] -
+  Update r/19.x Editor to 19.x-2025-12-18
+- [[#7285](https://github.com/opencast/opencast/pull/7285)] -
+  Update r/19.x Admin UI to 19.x-2025-12-18
+- [[#7284](https://github.com/opencast/opencast/pull/7284)] -
+  19.0 release notes
+- [[#7283](https://github.com/opencast/opencast/pull/7283)] -
+  Fix misc markdown bugs
+- [[#7281](https://github.com/opencast/opencast/pull/7281)] -
+  Fix checkstyle violations in admin-ui
+- [[#7278](https://github.com/opencast/opencast/pull/7278)] -
+  Fix checkstyle violations in capture-admin-service-impl
+- [[#7276](https://github.com/opencast/opencast/pull/7276)] -
+  Fix checkstyle violations in common
+- [[#7275](https://github.com/opencast/opencast/pull/7275)] -
+  Add new cutting "mode" to editor for vtt files
+- [[#7274](https://github.com/opencast/opencast/pull/7274)] -
+  Add Paella Player Embed API
+- [[#7272](https://github.com/opencast/opencast/pull/7272)] -
+  Fix checkstyle violations in composer
+- [[#7269](https://github.com/opencast/opencast/pull/7269)] -
+  Fix checkstyle violations in execute
+- [[#7258](https://github.com/opencast/opencast/pull/7258)] -
+  Fix checkstyle violations in kernel
+
+## Opencast 19.0 (2025-12-17)
 - [[#7288](https://github.com/opencast/opencast/pull/7288)] -
   Update 19.0 release notes
 - [[#7287](https://github.com/opencast/opencast/pull/7287)] -
