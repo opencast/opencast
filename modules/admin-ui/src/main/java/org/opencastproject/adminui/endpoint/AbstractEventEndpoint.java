@@ -3248,6 +3248,9 @@ public abstract class AbstractEventEndpoint {
       if (EventListQuery.FILTER_LOCATION_NAME.equals(name)) {
         query.withLocation(filters.get(name));
       }
+      if (EventListQuery.FILTER_LANGUAGE_NAME.equals(name)) {
+        query.withLanguage(filters.get(name));
+      }
       if (EventListQuery.FILTER_AGENT_NAME.equals(name)) {
         query.withAgentId(filters.get(name));
       }
