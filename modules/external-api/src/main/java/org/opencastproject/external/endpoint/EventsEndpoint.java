@@ -1310,12 +1310,7 @@ public class EventsEndpoint implements ManagedService {
       }
     }
 
-    if (StringUtils.trimToNull(event.getSubject()) != null) {
-      json.add("subjects", splitSubjectIntoArray(event.getSubject()));
-    } else {
-      json.add("subjects", new JsonArray());
-    }
-
+    json.add("subjects", collectionToJsonArray(event.getSubjects()));
     json.addProperty("title", safeString(event.getTitle()));
 
     if (withAcl != null && withAcl) {

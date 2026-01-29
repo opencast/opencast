@@ -59,6 +59,7 @@ public class EventTest {
   private static final Object PRESENTER_JSON_KEY = "presenter";
   private static final String PRESENTERS_JSON_KEY = "presenters";
   private static final String SUBJECT_JSON_KEY = "subject";
+  private static final String SUBJECTS_JSON_KEY = "subjects";
   private static final String TITLE_JSON_KEY = "title";
   private static final String ORGANIZATION_JSON_KEY = "organization";
   private static final String IDENTIFIER_JSON_KEY = "identifier";
@@ -68,7 +69,8 @@ public class EventTest {
   private String id = "10.0000-1";
   private String title = "Land and Vegetation: Key players on the Climate Scene";
   private String description = "This is the description for this event.";
-  private String subject = "This is the subject";
+  private List<String> subjects = new ArrayList<>();
+  private String subject1 = "This is the subject";
   private String location = "arts143ca";
 
   private List<String> presenters = new ArrayList<String>();
@@ -97,6 +99,9 @@ public class EventTest {
 
   @Before
   public void setUp() throws IOException {
+    // Setup subject
+    subjects.add(subject1);
+    subjects.add("Another subject");
     // Setup presenter collection
     presenters.add(presenter1);
     presenters.add(presenter2);
@@ -120,7 +125,7 @@ public class EventTest {
     Event event = new Event(id, defaultOrganization);
     event.setTitle(title);
     event.setDescription(description);
-    event.setSubject(subject);
+    event.setSubjects(subjects);
     event.setLocation(location);
     event.setPresenters(presenters);
     event.setContributors(contributors);
@@ -135,7 +140,9 @@ public class EventTest {
     assertEquals(defaultOrganization, eventJsonObject.get(ORGANIZATION_JSON_KEY));
     assertEquals(title, eventJsonObject.get(TITLE_JSON_KEY));
     assertEquals(description, eventJsonObject.get(DESCRIPTION_JSON_KEY));
-    assertEquals(subject, eventJsonObject.get(SUBJECT_JSON_KEY));
+    JSONArray subjectsArray = (JSONArray) ((JSONObject) eventJsonObject.get(SUBJECTS_JSON_KEY))
+        .get(SUBJECT_JSON_KEY);
+    assertEquals(subject1, subjectsArray.getFirst());
     assertEquals(location, eventJsonObject.get(LOCATION_JSON_KEY));
 
     JSONArray presentersArray = (JSONArray) ((JSONObject) eventJsonObject.get(PRESENTERS_JSON_KEY))

@@ -3,7 +3,9 @@
 	<identifier>10.0000-1</identifier>
 	<title>Land and Vegetation: Key players on the Climate Scene</title>
 	<description>This is the description for this event.</description>
-	<subject>This is the subject</subject>
+	<subjects>
+    <subject>This is the subject</subject>
+  </subjects>
 	<presenters>
 		<presenter>presenter-one</presenter>
 		<presenter>presenter-two</presenter>

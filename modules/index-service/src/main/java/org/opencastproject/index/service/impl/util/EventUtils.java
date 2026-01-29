@@ -113,7 +113,7 @@ public final class EventUtils {
         field.setValue(event.getTitle());
       }
       else if (field.getOutputID().equals(DublinCore.PROPERTY_SUBJECT.getLocalName())) {
-        field.setValue(event.getSubject());
+        field.setValue(event.getSubjects());
       }
       else if (field.getOutputID().equals(DublinCore.PROPERTY_DESCRIPTION.getLocalName())) {
         field.setValue(event.getDescription());
