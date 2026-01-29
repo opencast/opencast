@@ -3,6 +3,22 @@ Opencast 17 Changelog
 
 Changes marked with \* were also included in 16.x.
 
+## Opencast 17.11 (2026-01-23)
+- [[#7217](https://github.com/opencast/opencast/pull/7217)] -
+  Update r/17.x Admin UI to 17.x-2025-11-28
+- 
+## Opencast 17.10 (2025-11-28)
+- [[#7181](https://github.com/opencast/opencast/pull/7181)] -
+  Fix HEAD requests to static files returning wrong status codes
+- [[#7120](https://github.com/opencast/opencast/pull/7120)] -
+  Fixed user permission check for search service operations
+- [[#7167](https://github.com/opencast/opencast/pull/7167)] -
+  Fix captions not published from editor
+- [[#7177](https://github.com/opencast/opencast/pull/7177)] -
+  Add mimetype for markdown files
+- [[#7174](https://github.com/opencast/opencast/pull/7174)] -
+  Add support/MimeType for .vob files
+
 ## Opencast 17.9 (2025-10-23)
 
 - [[#7067](https://github.com/opencast/opencast/pull/7131)] -
