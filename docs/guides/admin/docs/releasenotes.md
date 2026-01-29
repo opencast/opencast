@@ -1,5 +1,9 @@
 # Opencast 19: Release Notes
 
+## Opencast 19.1
+
+This version contains updates for both the admin ui, and the editor, along with the usual collection of bug fixes.
+
 ## Opencast 19.0
 
 ### Features
