@@ -100,21 +100,23 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 @Path("/admin-ng/themes")
-@RestService(name = "themes", title = "Themes facade service",
-  abstractText = "Provides operations for the themes",
-  notes = { "This service offers the default themes CRUD Operations for the admin UI.",
-            "<strong>Important:</strong> "
-              + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
-              + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
-              + "DO NOT use this for integration of third-party applications.<em>"})
+@RestService(
+    name = "themes",
+    title = "Themes facade service",
+    abstractText = "Provides operations for the themes",
+    notes = { "This service offers the default themes CRUD Operations for the admin UI.",
+              "<strong>Important:</strong> "
+                + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
+                + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
+                + "DO NOT use this for integration of third-party applications.<em>"})
 @Component(
-        immediate = true,
-        service = ThemesEndpoint.class,
-        property = {
-                "service.description=Admin UI - Themes Endpoint",
-                "opencast.service.type=org.opencastproject.adminui.ThemesEndpoint",
-                "opencast.service.path=/admin-ng/themes",
-        }
+    immediate = true,
+    service = ThemesEndpoint.class,
+    property = {
+        "service.description=Admin UI - Themes Endpoint",
+        "opencast.service.type=org.opencastproject.adminui.ThemesEndpoint",
+        "opencast.service.path=/admin-ng/themes",
+    }
 )
 @JaxrsResource
 public class ThemesEndpoint {
@@ -184,13 +186,25 @@ public class ThemesEndpoint {
   @GET
   @Produces({ MediaType.APPLICATION_JSON })
   @Path("themes.json")
-  @RestQuery(name = "getThemes", description = "Return all of the known themes on the system", restParameters = {
-          @RestParameter(name = "filter", isRequired = false, description = "The filter used for the query. They should be formated like that: 'filter1:value1,filter2:value2'", type = STRING),
-          @RestParameter(defaultValue = "0", description = "The maximum number of items to return per page.", isRequired = false, name = "limit", type = RestParameter.Type.INTEGER),
-          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset", type = RestParameter.Type.INTEGER),
-          @RestParameter(name = "sort", isRequired = false, description = "The sort order. May include any of the following: NAME, CREATOR.  Add '_DESC' to reverse the sort order (e.g. CREATOR_DESC).", type = STRING) }, responses = { @RestResponse(description = "A JSON representation of the themes", responseCode = HttpServletResponse.SC_OK) }, returnDescription = "")
+  @RestQuery(
+      name = "getThemes",
+      description = "Return all of the known themes on the system",
+      restParameters = {
+          @RestParameter(name = "filter", isRequired = false, description = "The filter used for the query. They "
+              + "should be formated like that: 'filter1:value1,filter2:value2'", type = STRING),
+          @RestParameter(defaultValue = "0", description = "The maximum number of items to return per page.",
+              isRequired = false, name = "limit", type = RestParameter.Type.INTEGER),
+          @RestParameter(defaultValue = "0", description = "The page number.", isRequired = false, name = "offset",
+              type = RestParameter.Type.INTEGER),
+          @RestParameter(name = "sort", isRequired = false, description = "The sort order. May include any of the "
+              + "following: NAME, CREATOR.  Add '_DESC' to reverse the sort order (e.g. CREATOR_DESC).", type = STRING)
+      },
+      responses = {
+          @RestResponse(description = "A JSON representation of the themes", responseCode = HttpServletResponse.SC_OK)
+      },
+      returnDescription = "")
   public Response getThemes(@QueryParam("filter") String filter, @QueryParam("limit") int limit,
-          @QueryParam("offset") int offset, @QueryParam("sort") String sort) {
+      @QueryParam("offset") int offset, @QueryParam("sort") String sort) {
     Optional<Integer> optLimit = Optional.ofNullable(limit);
     Optional<Integer> optOffset = Optional.ofNullable(offset);
     Optional<String> optSort = Optional.ofNullable(trimToNull(sort));
@@ -239,9 +253,19 @@ public class ThemesEndpoint {
   @GET
   @Path("{themeId}.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getTheme", description = "Returns the theme by the given id as JSON", returnDescription = "The theme as JSON", pathParameters = { @RestParameter(name = "themeId", description = "The theme id", isRequired = true, type = RestParameter.Type.INTEGER) }, responses = {
+  @RestQuery(
+      name = "getTheme",
+      description = "Returns the theme by the given id as JSON",
+      returnDescription = "The theme as JSON",
+      pathParameters = {
+          @RestParameter(name = "themeId", description = "The theme id", isRequired = true,
+              type = RestParameter.Type.INTEGER)
+      },
+      responses = {
           @RestResponse(description = "Returns the theme as JSON", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "No theme with this identifier was found.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+          @RestResponse(description = "No theme with this identifier was found.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      })
   public Response getThemeResponse(@PathParam("themeId") long id) {
     try {
       Theme theme = themesServiceDatabase.getTheme(id);
@@ -257,9 +281,19 @@ public class ThemesEndpoint {
   @GET
   @Path("{themeId}/usage.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getThemeUsage", description = "Returns the theme usage by the given id as JSON", returnDescription = "The theme usage as JSON", pathParameters = { @RestParameter(name = "themeId", description = "The theme id", isRequired = true, type = RestParameter.Type.INTEGER) }, responses = {
+  @RestQuery(
+      name = "getThemeUsage",
+      description = "Returns the theme usage by the given id as JSON",
+      returnDescription = "The theme usage as JSON",
+      pathParameters = {
+          @RestParameter(name = "themeId", description = "The theme id", isRequired = true,
+              type = RestParameter.Type.INTEGER)
+      },
+      responses = {
           @RestResponse(description = "Returns the theme usage as JSON", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "Theme with the given id does not exist", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+          @RestResponse(description = "Theme with the given id does not exist",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      })
   public Response getThemeUsage(@PathParam("themeId") long themeId) {
     try {
       themesServiceDatabase.getTheme(themeId);
@@ -295,36 +329,59 @@ public class ThemesEndpoint {
 
   @POST
   @Path("")
-  @RestQuery(name = "createTheme", description = "Add a theme", returnDescription = "Return the created theme", restParameters = {
-          @RestParameter(name = "default", description = "Whether the theme is default", isRequired = true, type = Type.BOOLEAN),
-          @RestParameter(name = "name", description = "The theme name", isRequired = true, type = Type.STRING),
-          @RestParameter(name = "description", description = "The theme description", isRequired = false, type = Type.TEXT),
-          @RestParameter(name = "bumperActive", description = "Whether the theme bumper is active", isRequired = false, type = Type.BOOLEAN),
-          @RestParameter(name = "trailerActive", description = "Whether the theme trailer is active", isRequired = false, type = Type.BOOLEAN),
-          @RestParameter(name = "titleSlideActive", description = "Whether the theme title slide is active", isRequired = false, type = Type.BOOLEAN),
-          @RestParameter(name = "licenseSlideActive", description = "Whether the theme license slide is active", isRequired = false, type = Type.BOOLEAN),
-          @RestParameter(name = "watermarkActive", description = "Whether the theme watermark is active", isRequired = false, type = Type.BOOLEAN),
-          @RestParameter(name = "bumperFile", description = "The theme bumper file", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "trailerFile", description = "The theme trailer file", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "watermarkFile", description = "The theme watermark file", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "titleSlideBackground", description = "The theme title slide background file", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "licenseSlideBackground", description = "The theme license slide background file", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "titleSlideMetadata", description = "The theme title slide metadata", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "licenseSlideDescription", description = "The theme license slide description", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "watermarkPosition", description = "The theme watermark position", isRequired = false, type = Type.STRING), }, responses = {
+  @RestQuery(
+      name = "createTheme",
+      description = "Add a theme",
+      returnDescription = "Return the created theme",
+      restParameters = {
+          @RestParameter(name = "default", description = "Whether the theme is default",
+              isRequired = true, type = Type.BOOLEAN),
+          @RestParameter(name = "name", description = "The theme name",
+              isRequired = true, type = Type.STRING),
+          @RestParameter(name = "description", description = "The theme description",
+              isRequired = false, type = Type.TEXT),
+          @RestParameter(name = "bumperActive", description = "Whether the theme bumper is active",
+              isRequired = false, type = Type.BOOLEAN),
+          @RestParameter(name = "trailerActive", description = "Whether the theme trailer is active",
+              isRequired = false, type = Type.BOOLEAN),
+          @RestParameter(name = "titleSlideActive", description = "Whether the theme title slide is active",
+              isRequired = false, type = Type.BOOLEAN),
+          @RestParameter(name = "licenseSlideActive", description = "Whether the theme license slide is active",
+              isRequired = false, type = Type.BOOLEAN),
+          @RestParameter(name = "watermarkActive", description = "Whether the theme watermark is active",
+              isRequired = false, type = Type.BOOLEAN),
+          @RestParameter(name = "bumperFile", description = "The theme bumper file",
+              isRequired = false, type = Type.STRING),
+          @RestParameter(name = "trailerFile", description = "The theme trailer file",
+              isRequired = false, type = Type.STRING),
+          @RestParameter(name = "watermarkFile", description = "The theme watermark file",
+              isRequired = false, type = Type.STRING),
+          @RestParameter(name = "titleSlideBackground", description = "The theme title slide background file",
+              isRequired = false, type = Type.STRING),
+          @RestParameter(name = "licenseSlideBackground", description = "The theme license slide background file",
+              isRequired = false, type = Type.STRING),
+          @RestParameter(name = "titleSlideMetadata", description = "The theme title slide metadata",
+              isRequired = false, type = Type.STRING),
+          @RestParameter(name = "licenseSlideDescription", description = "The theme license slide description",
+              isRequired = false, type = Type.STRING),
+          @RestParameter(name = "watermarkPosition", description = "The theme watermark position",
+              isRequired = false, type = Type.STRING),
+      },
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "Theme created"),
-          @RestResponse(responseCode = SC_BAD_REQUEST, description = "The theme references a non-existing file") })
+          @RestResponse(responseCode = SC_BAD_REQUEST, description = "The theme references a non-existing file")
+      })
   public Response createTheme(@FormParam("default") boolean isDefault, @FormParam("name") String name,
-          @FormParam("description") String description, @FormParam("bumperActive") Boolean bumperActive,
-          @FormParam("trailerActive") Boolean trailerActive, @FormParam("titleSlideActive") Boolean titleSlideActive,
-          @FormParam("licenseSlideActive") Boolean licenseSlideActive,
-          @FormParam("watermarkActive") Boolean watermarkActive, @FormParam("bumperFile") String bumperFile,
-          @FormParam("trailerFile") String trailerFile, @FormParam("watermarkFile") String watermarkFile,
-          @FormParam("titleSlideBackground") String titleSlideBackground,
-          @FormParam("licenseSlideBackground") String licenseSlideBackground,
-          @FormParam("titleSlideMetadata") String titleSlideMetadata,
-          @FormParam("licenseSlideDescription") String licenseSlideDescription,
-          @FormParam("watermarkPosition") String watermarkPosition) {
+      @FormParam("description") String description, @FormParam("bumperActive") Boolean bumperActive,
+      @FormParam("trailerActive") Boolean trailerActive, @FormParam("titleSlideActive") Boolean titleSlideActive,
+      @FormParam("licenseSlideActive") Boolean licenseSlideActive,
+      @FormParam("watermarkActive") Boolean watermarkActive, @FormParam("bumperFile") String bumperFile,
+      @FormParam("trailerFile") String trailerFile, @FormParam("watermarkFile") String watermarkFile,
+      @FormParam("titleSlideBackground") String titleSlideBackground,
+      @FormParam("licenseSlideBackground") String licenseSlideBackground,
+      @FormParam("titleSlideMetadata") String titleSlideMetadata,
+      @FormParam("licenseSlideDescription") String licenseSlideDescription,
+      @FormParam("watermarkPosition") String watermarkPosition) {
     User creator = securityService.getUser();
 
     Theme theme = new Theme(Optional.<Long> empty(), new Date(), isDefault, creator, name,
@@ -357,81 +414,123 @@ public class ThemesEndpoint {
 
   @PUT
   @Path("{themeId}")
-  @RestQuery(name = "updateTheme", description = "Updates a theme", returnDescription = "Return the updated theme", pathParameters = { @RestParameter(name = "themeId", description = "The theme identifier", isRequired = true, type = Type.INTEGER) }, restParameters = {
-          @RestParameter(name = "default", description = "Whether the theme is default", isRequired = false, type = Type.BOOLEAN),
-          @RestParameter(name = "name", description = "The theme name", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "description", description = "The theme description", isRequired = false, type = Type.TEXT),
-          @RestParameter(name = "bumperActive", description = "Whether the theme bumper is active", isRequired = false, type = Type.BOOLEAN),
-          @RestParameter(name = "trailerActive", description = "Whether the theme trailer is active", isRequired = false, type = Type.BOOLEAN),
-          @RestParameter(name = "titleSlideActive", description = "Whether the theme title slide is active", isRequired = false, type = Type.BOOLEAN),
-          @RestParameter(name = "licenseSlideActive", description = "Whether the theme license slide is active", isRequired = false, type = Type.BOOLEAN),
-          @RestParameter(name = "watermarkActive", description = "Whether the theme watermark is active", isRequired = false, type = Type.BOOLEAN),
-          @RestParameter(name = "bumperFile", description = "The theme bumper file", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "trailerFile", description = "The theme trailer file", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "watermarkFile", description = "The theme watermark file", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "titleSlideBackground", description = "The theme title slide background file", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "licenseSlideBackground", description = "The theme license slide background file", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "titleSlideMetadata", description = "The theme title slide metadata", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "licenseSlideDescription", description = "The theme license slide description", isRequired = false, type = Type.STRING),
-          @RestParameter(name = "watermarkPosition", description = "The theme watermark position", isRequired = false, type = Type.STRING), }, responses = {
+  @RestQuery(
+      name = "updateTheme",
+      description = "Updates a theme",
+      returnDescription = "Return the updated theme",
+      pathParameters = {
+          @RestParameter(name = "themeId", description = "The theme identifier", isRequired = true, type = Type.INTEGER)
+      },
+      restParameters = {
+          @RestParameter(name = "default", description = "Whether the theme is default",
+              isRequired = false, type = Type.BOOLEAN),
+          @RestParameter(name = "name", description = "The theme name",
+              isRequired = false, type = Type.STRING),
+          @RestParameter(name = "description", description = "The theme description",
+              isRequired = false, type = Type.TEXT),
+          @RestParameter(name = "bumperActive", description = "Whether the theme bumper is active",
+              isRequired = false, type = Type.BOOLEAN),
+          @RestParameter(name = "trailerActive", description = "Whether the theme trailer is active",
+              isRequired = false, type = Type.BOOLEAN),
+          @RestParameter(name = "titleSlideActive", description = "Whether the theme title slide is active",
+              isRequired = false, type = Type.BOOLEAN),
+          @RestParameter(name = "licenseSlideActive", description = "Whether the theme license slide is active",
+              isRequired = false, type = Type.BOOLEAN),
+          @RestParameter(name = "watermarkActive", description = "Whether the theme watermark is active",
+              isRequired = false, type = Type.BOOLEAN),
+          @RestParameter(name = "bumperFile", description = "The theme bumper file",
+              isRequired = false, type = Type.STRING),
+          @RestParameter(name = "trailerFile", description = "The theme trailer file",
+              isRequired = false, type = Type.STRING),
+          @RestParameter(name = "watermarkFile", description = "The theme watermark file",
+              isRequired = false, type = Type.STRING),
+          @RestParameter(name = "titleSlideBackground", description = "The theme title slide background file",
+              isRequired = false, type = Type.STRING),
+          @RestParameter(name = "licenseSlideBackground", description = "The theme license slide background file",
+              isRequired = false, type = Type.STRING),
+          @RestParameter(name = "titleSlideMetadata", description = "The theme title slide metadata",
+              isRequired = false, type = Type.STRING),
+          @RestParameter(name = "licenseSlideDescription", description = "The theme license slide description",
+              isRequired = false, type = Type.STRING),
+          @RestParameter(name = "watermarkPosition", description = "The theme watermark position",
+              isRequired = false, type = Type.STRING),
+      },
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "Theme updated"),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "If the theme has not been found."), })
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "If the theme has not been found."),
+      })
   public Response updateTheme(@PathParam("themeId") long themeId, @FormParam("default") Boolean isDefault,
-          @FormParam("name") String name, @FormParam("description") String description,
-          @FormParam("bumperActive") Boolean bumperActive, @FormParam("trailerActive") Boolean trailerActive,
-          @FormParam("titleSlideActive") Boolean titleSlideActive,
-          @FormParam("licenseSlideActive") Boolean licenseSlideActive,
-          @FormParam("watermarkActive") Boolean watermarkActive, @FormParam("bumperFile") String bumperFile,
-          @FormParam("trailerFile") String trailerFile, @FormParam("watermarkFile") String watermarkFile,
-          @FormParam("titleSlideBackground") String titleSlideBackground,
-          @FormParam("licenseSlideBackground") String licenseSlideBackground,
-          @FormParam("titleSlideMetadata") String titleSlideMetadata,
-          @FormParam("licenseSlideDescription") String licenseSlideDescription,
-          @FormParam("watermarkPosition") String watermarkPosition) throws NotFoundException {
+      @FormParam("name") String name, @FormParam("description") String description,
+      @FormParam("bumperActive") Boolean bumperActive, @FormParam("trailerActive") Boolean trailerActive,
+      @FormParam("titleSlideActive") Boolean titleSlideActive,
+      @FormParam("licenseSlideActive") Boolean licenseSlideActive,
+      @FormParam("watermarkActive") Boolean watermarkActive, @FormParam("bumperFile") String bumperFile,
+      @FormParam("trailerFile") String trailerFile, @FormParam("watermarkFile") String watermarkFile,
+      @FormParam("titleSlideBackground") String titleSlideBackground,
+      @FormParam("licenseSlideBackground") String licenseSlideBackground,
+      @FormParam("titleSlideMetadata") String titleSlideMetadata,
+      @FormParam("licenseSlideDescription") String licenseSlideDescription,
+      @FormParam("watermarkPosition") String watermarkPosition) throws NotFoundException {
     try {
       Theme origTheme = themesServiceDatabase.getTheme(themeId);
 
-      if (isDefault == null)
+      if (isDefault == null) {
         isDefault = origTheme.isDefault();
-      if (StringUtils.isBlank(name))
+      }
+      if (StringUtils.isBlank(name)) {
         name = origTheme.getName();
-      if (StringUtils.isEmpty(description))
+      }
+      if (StringUtils.isEmpty(description)) {
         description = origTheme.getDescription();
-      if (bumperActive == null)
+      }
+      if (bumperActive == null) {
         bumperActive = origTheme.isBumperActive();
-      if (StringUtils.isEmpty(bumperFile))
+      }
+      if (StringUtils.isEmpty(bumperFile)) {
         bumperFile = origTheme.getBumperFile();
-      if (trailerActive == null)
+      }
+      if (trailerActive == null) {
         trailerActive = origTheme.isTrailerActive();
-      if (StringUtils.isEmpty(trailerFile))
+      }
+      if (StringUtils.isEmpty(trailerFile)) {
         trailerFile = origTheme.getTrailerFile();
-      if (titleSlideActive == null)
+      }
+      if (titleSlideActive == null) {
         titleSlideActive = origTheme.isTitleSlideActive();
-      if (StringUtils.isEmpty(titleSlideMetadata))
+      }
+      if (StringUtils.isEmpty(titleSlideMetadata)) {
         titleSlideMetadata = origTheme.getTitleSlideMetadata();
-      if (StringUtils.isEmpty(titleSlideBackground))
+      }
+      if (StringUtils.isEmpty(titleSlideBackground)) {
         titleSlideBackground = origTheme.getTitleSlideBackground();
-      if (licenseSlideActive == null)
+      }
+      if (licenseSlideActive == null) {
         licenseSlideActive = origTheme.isLicenseSlideActive();
-      if (StringUtils.isEmpty(licenseSlideBackground))
+      }
+      if (StringUtils.isEmpty(licenseSlideBackground)) {
         licenseSlideBackground = origTheme.getLicenseSlideBackground();
-      if (StringUtils.isEmpty(licenseSlideDescription))
+      }
+      if (StringUtils.isEmpty(licenseSlideDescription)) {
         licenseSlideDescription = origTheme.getLicenseSlideDescription();
-      if (watermarkActive == null)
+      }
+      if (watermarkActive == null) {
         watermarkActive = origTheme.isWatermarkActive();
-      if (StringUtils.isEmpty(watermarkFile))
+      }
+      if (StringUtils.isEmpty(watermarkFile)) {
         watermarkFile = origTheme.getWatermarkFile();
-      if (StringUtils.isEmpty(watermarkPosition))
+      }
+      if (StringUtils.isEmpty(watermarkPosition)) {
         watermarkPosition = origTheme.getWatermarkPosition();
+      }
 
       Theme theme = new Theme(origTheme.getId(), origTheme.getCreationDate(), isDefault, origTheme.getCreator(), name,
-              StringUtils.trimToNull(description), BooleanUtils.toBoolean(bumperActive),
-              StringUtils.trimToNull(bumperFile), BooleanUtils.toBoolean(trailerActive),
-              StringUtils.trimToNull(trailerFile), BooleanUtils.toBoolean(titleSlideActive),
-              StringUtils.trimToNull(titleSlideMetadata), StringUtils.trimToNull(titleSlideBackground),
-              BooleanUtils.toBoolean(licenseSlideActive), StringUtils.trimToNull(licenseSlideBackground),
-              StringUtils.trimToNull(licenseSlideDescription), BooleanUtils.toBoolean(watermarkActive),
-              StringUtils.trimToNull(watermarkFile), StringUtils.trimToNull(watermarkPosition));
+          StringUtils.trimToNull(description), BooleanUtils.toBoolean(bumperActive),
+          StringUtils.trimToNull(bumperFile), BooleanUtils.toBoolean(trailerActive),
+          StringUtils.trimToNull(trailerFile), BooleanUtils.toBoolean(titleSlideActive),
+          StringUtils.trimToNull(titleSlideMetadata), StringUtils.trimToNull(titleSlideBackground),
+          BooleanUtils.toBoolean(licenseSlideActive), StringUtils.trimToNull(licenseSlideBackground),
+          StringUtils.trimToNull(licenseSlideDescription), BooleanUtils.toBoolean(watermarkActive),
+          StringUtils.trimToNull(watermarkFile), StringUtils.trimToNull(watermarkPosition));
 
       try {
         updateReferencedFiles(origTheme, theme);
@@ -453,10 +552,20 @@ public class ThemesEndpoint {
 
   @DELETE
   @Path("{themeId}")
-  @RestQuery(name = "deleteTheme", description = "Deletes a theme", returnDescription = "The method doesn't return any content", pathParameters = { @RestParameter(name = "themeId", isRequired = true, description = "The theme identifier", type = RestParameter.Type.INTEGER) }, responses = {
+  @RestQuery(
+      name = "deleteTheme",
+      description = "Deletes a theme",
+      returnDescription = "The method doesn't return any content",
+      pathParameters = {
+          @RestParameter(name = "themeId", isRequired = true, description = "The theme identifier",
+              type = RestParameter.Type.INTEGER)
+      },
+      responses = {
           @RestResponse(responseCode = SC_NOT_FOUND, description = "If the theme has not been found."),
           @RestResponse(responseCode = SC_NO_CONTENT, description = "The method does not return any content"),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to "
+              + "perform this action")
+      })
   public Response deleteTheme(@PathParam("themeId") long themeId) throws NotFoundException, UnauthorizedException {
     try {
       Theme theme = themesServiceDatabase.getTheme(themeId);
@@ -582,16 +691,21 @@ public class ThemesEndpoint {
    *           If there was an error while persisting the file.
    */
   private void persistReferencedFiles(Theme theme) throws NotFoundException, IOException {
-    if (isNotBlank(theme.getBumperFile()))
+    if (isNotBlank(theme.getBumperFile())) {
       staticFileService.persistFile(theme.getBumperFile());
-    if (isNotBlank(theme.getLicenseSlideBackground()))
+    }
+    if (isNotBlank(theme.getLicenseSlideBackground())) {
       staticFileService.persistFile(theme.getLicenseSlideBackground());
-    if (isNotBlank(theme.getTitleSlideBackground()))
+    }
+    if (isNotBlank(theme.getTitleSlideBackground())) {
       staticFileService.persistFile(theme.getTitleSlideBackground());
-    if (isNotBlank(theme.getTrailerFile()))
+    }
+    if (isNotBlank(theme.getTrailerFile())) {
       staticFileService.persistFile(theme.getTrailerFile());
-    if (isNotBlank(theme.getWatermarkFile()))
+    }
+    if (isNotBlank(theme.getWatermarkFile())) {
       staticFileService.persistFile(theme.getWatermarkFile());
+    }
   }
 
   /**
@@ -605,16 +719,21 @@ public class ThemesEndpoint {
    *           If there was an error while persisting the file.
    */
   private void deleteReferencedFiles(Theme theme) throws NotFoundException, IOException {
-    if (isNotBlank(theme.getBumperFile()))
+    if (isNotBlank(theme.getBumperFile())) {
       staticFileService.deleteFile(theme.getBumperFile());
-    if (isNotBlank(theme.getLicenseSlideBackground()))
+    }
+    if (isNotBlank(theme.getLicenseSlideBackground())) {
       staticFileService.deleteFile(theme.getLicenseSlideBackground());
-    if (isNotBlank(theme.getTitleSlideBackground()))
+    }
+    if (isNotBlank(theme.getTitleSlideBackground())) {
       staticFileService.deleteFile(theme.getTitleSlideBackground());
-    if (isNotBlank(theme.getTrailerFile()))
+    }
+    if (isNotBlank(theme.getTrailerFile())) {
       staticFileService.deleteFile(theme.getTrailerFile());
-    if (isNotBlank(theme.getWatermarkFile()))
+    }
+    if (isNotBlank(theme.getWatermarkFile())) {
       staticFileService.deleteFile(theme.getWatermarkFile());
+    }
   }
 
   /**
@@ -652,10 +771,12 @@ public class ThemesEndpoint {
    */
   private void updateReferencedFile(String original, String updated) throws NotFoundException, IOException {
     if (EqualsUtil.ne(original, updated)) {
-      if (isNotBlank(original))
+      if (isNotBlank(original)) {
         staticFileService.deleteFile(original);
-      if (isNotBlank(updated))
+      }
+      if (isNotBlank(updated)) {
         staticFileService.persistFile(updated);
+      }
     }
   }
 

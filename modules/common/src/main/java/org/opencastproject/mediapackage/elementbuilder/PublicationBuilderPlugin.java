@@ -118,19 +118,22 @@ public class PublicationBuilderPlugin extends AbstractElementBuilderPlugin {
 
       // size
       String trackSize = xpath.evaluate("size/text()", elementNode).trim();
-      if (!"".equals(trackSize))
+      if (!"".equals(trackSize)) {
         size = Long.parseLong(trackSize);
+      }
 
       // flavor
       String flavorValue = (String) xpath.evaluate("@type", elementNode, XPathConstants.STRING);
-      if (StringUtils.isNotEmpty(flavorValue))
+      if (StringUtils.isNotEmpty(flavorValue)) {
         flavor = MediaPackageElementFlavor.parseFlavor(flavorValue);
+      }
 
       // checksum
       String checksumValue = (String) xpath.evaluate("checksum/text()", elementNode, XPathConstants.STRING);
       String checksumType = (String) xpath.evaluate("checksum/@type", elementNode, XPathConstants.STRING);
-      if (StringUtils.isNotEmpty(checksumValue) && checksumType != null)
+      if (StringUtils.isNotEmpty(checksumValue) && checksumType != null) {
         checksum = Checksum.create(checksumType.trim(), checksumValue.trim());
+      }
 
       // mimetype
       String mimeTypeValue = (String) xpath.evaluate("mimetype/text()", elementNode, XPathConstants.STRING);
@@ -143,35 +146,42 @@ public class PublicationBuilderPlugin extends AbstractElementBuilderPlugin {
       // Build the publication element
       PublicationImpl publication = new PublicationImpl(id, channel, url, mimeType);
 
-      if (StringUtils.isNotBlank(id))
+      if (StringUtils.isNotBlank(id)) {
         publication.setIdentifier(id);
+      }
 
       // Add url
       publication.setURI(url);
 
       // Add reference
-      if (StringUtils.isNotEmpty(reference))
+      if (StringUtils.isNotEmpty(reference)) {
         publication.referTo(MediaPackageReferenceImpl.fromString(reference));
+      }
 
       // Set size
-      if (size > 0)
+      if (size > 0) {
         publication.setSize(size);
+      }
 
       // Set checksum
-      if (checksum != null)
+      if (checksum != null) {
         publication.setChecksum(checksum);
+      }
 
       // Set mimetpye
-      if (mimeType != null)
+      if (mimeType != null) {
         publication.setMimeType(mimeType);
+      }
 
-      if (flavor != null)
+      if (flavor != null) {
         publication.setFlavor(flavor);
+      }
 
       // description
       String description = (String) xpath.evaluate("description/text()", elementNode, XPathConstants.STRING);
-      if (StringUtils.isNotBlank(description))
+      if (StringUtils.isNotBlank(description)) {
         publication.setElementDescription(description.trim());
+      }
 
       // tags
       NodeList tagNodes = (NodeList) xpath.evaluate("tags/tag", elementNode, XPathConstants.NODESET);

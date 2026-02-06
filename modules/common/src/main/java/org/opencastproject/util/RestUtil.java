@@ -96,8 +96,9 @@ public final class RestUtil {
   public static Response.ResponseBuilder fileResponse(File f, String contentType, Optional<String> fileName) {
     final Response.ResponseBuilder b = Response.ok(f).header("Content-Type", contentType)
             .header("Content-Length", f.length());
-    if (fileName.isPresent())
+    if (fileName.isPresent()) {
       b.header("Content-Disposition", "attachment; filename=" + fileName.get());
+    }
     return b;
   }
 
@@ -155,17 +156,20 @@ public final class RestUtil {
    * Create a stream response.
    *
    * @deprecated use
-   *             {@link org.opencastproject.util.RestUtil.R#ok(java.io.InputStream, String, java.util.Optional, java.util.Optional)}
+   *             {@link org.opencastproject.util.RestUtil.R#ok(java.io.InputStream, String, java.util.Optional,
+ *                      java.util.Optional)}
    *             instead
    */
   @Deprecated
   public static Response.ResponseBuilder streamResponse(InputStream in, String contentType, Optional<Long> streamLength,
           Optional<String> fileName) {
     final Response.ResponseBuilder b = Response.ok(in).header("Content-Type", contentType);
-    if (streamLength.isPresent())
+    if (streamLength.isPresent()) {
       b.header("Content-Length", streamLength.get());
-    if (fileName.isPresent())
+    }
+    if (fileName.isPresent()) {
       b.header("Content-Disposition", "attachment; filename=" + fileName.get());
+    }
     return b;
   }
 
@@ -245,7 +249,8 @@ public final class RestUtil {
      * @param fileName
      *          an optional file name for the Content-Disposition response header
      */
-    public static Response ok(InputStream in, String contentType, Optional<Long> streamLength, Optional<String> fileName) {
+    public static Response ok(InputStream in, String contentType, Optional<Long> streamLength,
+        Optional<String> fileName) {
       return ok(in, Optional.ofNullable(contentType), streamLength, fileName);
     }
 
@@ -264,12 +269,15 @@ public final class RestUtil {
     public static Response ok(InputStream in, Optional<String> contentType, Optional<Long> streamLength,
           Optional<String> fileName) {
       final Response.ResponseBuilder b = Response.ok(in);
-      if (contentType.isPresent())
+      if (contentType.isPresent()) {
         b.header("Content-Type", contentType.get());
-      if (streamLength.isPresent())
+      }
+      if (streamLength.isPresent()) {
         b.header("Content-Length", streamLength.get());
-      if (fileName.isPresent())
+      }
+      if (fileName.isPresent()) {
         b.header("Content-Disposition", "attachment; filename=" + fileName.get());
+      }
       return b.build();
     }
 

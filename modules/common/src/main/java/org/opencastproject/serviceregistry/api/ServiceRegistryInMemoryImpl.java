@@ -75,13 +75,15 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
   protected Map<String, HostRegistrationInMemory> hosts = new HashMap<String, HostRegistrationInMemory>();
 
   /** The service registrations */
-  protected Map<String, List<ServiceRegistrationInMemoryImpl>> services = new HashMap<String, List<ServiceRegistrationInMemoryImpl>>();
+  protected Map<String, List<ServiceRegistrationInMemoryImpl>> services =
+      new HashMap<String, List<ServiceRegistrationInMemoryImpl>>();
 
   /** The serialized jobs */
   protected Map<Long, String> jobs = new HashMap<Long, String>();
 
   /** A mapping of services to jobs */
-  protected Map<ServiceRegistrationInMemoryImpl, Set<Job>> jobHosts = new HashMap<ServiceRegistrationInMemoryImpl, Set<Job>>();
+  protected Map<ServiceRegistrationInMemoryImpl, Set<Job>> jobHosts =
+      new HashMap<ServiceRegistrationInMemoryImpl, Set<Job>>();
 
   /** The thread pool to use for dispatching queued jobs. */
   protected ScheduledExecutorService dispatcher = Executors.newScheduledThreadPool(1);
@@ -121,9 +123,11 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
           UserDirectoryService userDirectoryService, OrganizationDirectoryService organizationDirectoryService,
           IncidentService incidentService) throws ServiceRegistryException {
     //Note: total memory here isn't really the correct value, but we just need something (preferably non-zero)
-    registerHost(LOCALHOST, LOCALHOST, "Admin", Runtime.getRuntime().totalMemory(), Runtime.getRuntime().availableProcessors(), maxLoad);
-    if (service != null)
+    registerHost(LOCALHOST, LOCALHOST, "Admin", Runtime.getRuntime().totalMemory(),
+        Runtime.getRuntime().availableProcessors(), maxLoad);
+    if (service != null) {
       registerService(service, maxLoad);
+    }
     this.securityService = securityService;
     this.userDirectoryService = userDirectoryService;
     this.organizationDirectoryService = organizationDirectoryService;
@@ -136,7 +140,8 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
           UserDirectoryService userDirectoryService, OrganizationDirectoryService organizationDirectoryService,
           IncidentService incidentService)
           throws ServiceRegistryException {
-    this(service, Runtime.getRuntime().availableProcessors(), securityService, userDirectoryService, organizationDirectoryService, incidentService);
+    this(service, Runtime.getRuntime().availableProcessors(), securityService, userDirectoryService,
+        organizationDirectoryService, incidentService);
   }
 
   /**
@@ -311,8 +316,9 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
       Iterator<ServiceRegistrationInMemoryImpl> ri = servicesOnHost.iterator();
       while (ri.hasNext()) {
         ServiceRegistration registration = ri.next();
-        if (serviceType.equals(registration.getServiceType()))
+        if (serviceType.equals(registration.getServiceType())) {
           ri.remove();
+        }
       }
     }
   }
@@ -407,8 +413,9 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
   @Override
   public Job createJob(String type, String operation, List<String> arguments, String payload, boolean queueable,
           Job parentJob, Float jobLoad) throws ServiceRegistryException {
-    if (getServiceRegistrationsByType(type).size() == 0)
+    if (getServiceRegistrationsByType(type).size() == 0) {
       logger.warn("Service " + type + " not available");
+    }
 
     Job job = null;
     synchronized (this) {
@@ -422,12 +429,14 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
       job.setOperation(operation);
       job.setArguments(arguments);
       job.setPayload(payload);
-      if (queueable)
+      if (queueable) {
         job.setStatus(Status.QUEUED);
-      else
+      } else {
         job.setStatus(Status.INSTANTIATED);
-      if (parentJob != null)
+      }
+      if (parentJob != null) {
         job.setParentJobId(parentJob.getId());
+      }
       job.setJobLoad(jobLoad);
     }
 
@@ -443,8 +452,9 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
 
   private void removeJob(long id) throws NotFoundException, ServiceRegistryException {
     synchronized (jobs) {
-      if (!jobs.containsKey(id))
+      if (!jobs.containsKey(id)) {
         throw new NotFoundException("No job with ID '" + id + "' found");
+      }
 
       jobs.remove(id);
     }
@@ -474,8 +484,10 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
   protected boolean dispatchJob(Job job) throws ServiceUnavailableException, ServiceRegistryException,
           UndispatchableJobException {
     List<ServiceRegistration> registrations = getServiceRegistrationsByLoad(job.getJobType());
-    if (registrations.size() == 0)
-      throw new ServiceUnavailableException("No service is available to handle jobs of type '" + job.getJobType() + "'");
+    if (registrations.size() == 0) {
+      throw new ServiceUnavailableException("No service is available to handle jobs of type "
+          + "'" + job.getJobType() + "'");
+    }
     job.setStatus(Status.DISPATCHING);
     try {
       job = updateJob(job);
@@ -532,8 +544,9 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
    */
   @Override
   public Job updateJob(Job job) throws NotFoundException, ServiceRegistryException {
-    if (job == null)
+    if (job == null) {
       throw new IllegalArgumentException("Job cannot be null");
+    }
     Job updatedJob = null;
     synchronized (jobs) {
       try {
@@ -579,8 +592,9 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
           if (jobs != null) {
             Set<Job> updatedJobs = new HashSet<>();
             for (Job savedJob : jobs) {
-              if (savedJob.getId() != job.getId())
+              if (savedJob.getId() != job.getId()) {
                 updatedJobs.add(savedJob);
+              }
             }
             jobHosts.put(srv, updatedJobs);
           }
@@ -599,8 +613,9 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
   public Job getJob(long id) throws NotFoundException, ServiceRegistryException {
     synchronized (jobs) {
       String serializedJob = jobs.get(id);
-      if (serializedJob == null)
+      if (serializedJob == null) {
         throw new NotFoundException(Long.toString(id));
+      }
       try {
         return JobParser.parseJob(serializedJob);
       } catch (IOException e) {
@@ -625,10 +640,12 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
         } catch (IOException e) {
           throw new IllegalStateException("Error unmarshaling job", e);
         }
-        if (job.getParentJobId() == null)
+        if (job.getParentJobId() == null) {
           continue;
-        if (job.getParentJobId().equals(id) || job.getRootJobId().equals(id))
+        }
+        if (job.getParentJobId().equals(id) || job.getRootJobId().equals(id)) {
           result.add(job);
+        }
 
         Long parentJobId = job.getParentJobId();
         while (parentJobId != null && parentJobId > 0) {
@@ -671,8 +688,9 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
         } catch (IOException e) {
           throw new IllegalStateException("Error unmarshaling job", e);
         }
-        if (serviceType.equals(job.getJobType()) && status.equals(job.getStatus()))
+        if (serviceType.equals(job.getJobType()) && status.equals(job.getStatus())) {
           result.add(job);
+        }
       }
     }
     return result;
@@ -720,8 +738,9 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
         } catch (IOException e) {
           throw new IllegalStateException("Error unmarshaling job", e);
         }
-        if (job.getStatus().isActive())
+        if (job.getStatus().isActive()) {
           result.add(job);
+        }
       }
     }
     return result;
@@ -752,8 +771,9 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
     List<ServiceRegistration> result = new ArrayList<ServiceRegistration>();
     for (List<ServiceRegistrationInMemoryImpl> servicesPerHost : services.values()) {
       for (ServiceRegistrationInMemoryImpl r : servicesPerHost) {
-        if (serviceType.equals(r.getServiceType()))
+        if (serviceType.equals(r.getServiceType())) {
           result.add(r);
+        }
       }
     }
     return result;
@@ -785,8 +805,9 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
     List<ServiceRegistrationInMemoryImpl> servicesPerHost = services.get(host);
     if (servicesPerHost != null) {
       for (ServiceRegistrationInMemoryImpl r : servicesPerHost) {
-        if (serviceType.equals(r.getServiceType()))
+        if (serviceType.equals(r.getServiceType())) {
           return r;
+        }
       }
     }
     return null;
@@ -866,14 +887,18 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
         } catch (IOException e) {
           throw new IllegalStateException("Error unmarshaling job", e);
         }
-        if (serviceType != null && !serviceType.equals(job.getJobType()))
+        if (serviceType != null && !serviceType.equals(job.getJobType())) {
           continue;
-        if (host != null && !host.equals(job.getProcessingHost()))
+        }
+        if (host != null && !host.equals(job.getProcessingHost())) {
           continue;
-        if (operation != null && !operation.equals(job.getOperation()))
+        }
+        if (operation != null && !operation.equals(job.getOperation())) {
           continue;
-        if (status != null && !status.equals(job.getStatus()))
+        }
+        if (status != null && !status.equals(job.getStatus())) {
           continue;
+        }
         count++;
       }
     }
@@ -1084,8 +1109,9 @@ public class ServiceRegistryInMemoryImpl implements ServiceRegistry {
         }
 
         Long parentJobId = job.getParentJobId();
-        if (parentJobId == null || parentJobId < 1)
+        if (parentJobId == null || parentJobId < 1) {
           jobs.remove(job.getId());
+        }
       }
     }
   }

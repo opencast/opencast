@@ -79,7 +79,8 @@ public final class MediaPackageElementBuilderFactory {
       } catch (ClassNotFoundException e) {
         throw new ConfigurationException("Class not found while creating element builder: " + e.getMessage(), e);
       } catch (InstantiationException e) {
-        throw new ConfigurationException("Instantiation exception while creating element builder: " + e.getMessage(), e);
+        throw new ConfigurationException("Instantiation exception while creating element builder: " + e.getMessage(),
+            e);
       } catch (IllegalAccessException e) {
         throw new ConfigurationException("Access exception while creating element builder: " + e.getMessage(), e);
       } catch (Exception e) {

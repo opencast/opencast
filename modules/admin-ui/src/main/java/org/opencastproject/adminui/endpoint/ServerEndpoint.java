@@ -69,21 +69,23 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("/admin-ng/server")
-@RestService(name = "ServerProxyService", title = "UI Servers",
-  abstractText = "This service provides the server data for the UI.",
-  notes = { "These Endpoints deliver informations about the server required for the UI.",
-            "<strong>Important:</strong> "
-              + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
-              + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
-              + "DO NOT use this for integration of third-party applications.<em>"})
+@RestService(
+    name = "ServerProxyService",
+    title = "UI Servers",
+    abstractText = "This service provides the server data for the UI.",
+    notes = { "These Endpoints deliver informations about the server required for the UI.",
+              "<strong>Important:</strong> "
+                + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
+                + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
+                + "DO NOT use this for integration of third-party applications.<em>"})
 @Component(
-  immediate = true,
-  service = ServerEndpoint.class,
-  property = {
-    "service.description=Admin UI - Server facade Endpoint",
-    "opencast.service.type=org.opencastproject.adminui.endpoint.ServerEndpoint",
-    "opencast.service.path=/admin-ng/server"
-  }
+    immediate = true,
+    service = ServerEndpoint.class,
+    property = {
+        "service.description=Admin UI - Server facade Endpoint",
+        "opencast.service.type=org.opencastproject.adminui.endpoint.ServerEndpoint",
+        "opencast.service.path=/admin-ng/server"
+    }
 )
 @JaxrsResource
 public class ServerEndpoint {
@@ -183,17 +185,27 @@ public class ServerEndpoint {
   @GET
   @Path("servers.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(description = "Returns the list of servers", name = "servers", restParameters = {
-          @RestParameter(name = "limit", description = "The maximum number of items to return per page", isRequired = false, type = INTEGER),
+  @RestQuery(
+      description = "Returns the list of servers",
+      name = "servers",
+      restParameters = {
+          @RestParameter(name = "limit", description = "The maximum number of items to return per page",
+              isRequired = false, type = INTEGER),
           @RestParameter(name = "offset", description = "The offset", isRequired = false, type = INTEGER),
-          @RestParameter(name = "filter", description = "Filter results by hostname, status or free text query", isRequired = false, type = STRING),
+          @RestParameter(name = "filter", description = "Filter results by hostname, status or free text query",
+              isRequired = false, type = STRING),
           @RestParameter(name = "sort", description = "The sort order.  May include any of the following: "
-                  + "CORES, HOSTNAME, MAINTENANCE, ONLINE, QUEUED (jobs), RUNNING (jobs)."
-                  + "The suffix must be :ASC for ascending or :DESC for descending sort order (e.g. HOSTNAME:DESC).", isRequired = false, type = STRING) },
-          responses = { @RestResponse(description = "Returns the list of jobs from Opencast", responseCode = HttpServletResponse.SC_OK) },
-          returnDescription = "The list of servers")
+              + "CORES, HOSTNAME, MAINTENANCE, ONLINE, QUEUED (jobs), RUNNING (jobs)."
+              + "The suffix must be :ASC for ascending or :DESC for descending sort order (e.g. HOSTNAME:DESC).",
+              isRequired = false, type = STRING)
+      },
+      responses = {
+          @RestResponse(description = "Returns the list of jobs from Opencast",
+              responseCode = HttpServletResponse.SC_OK)
+      },
+      returnDescription = "The list of servers")
   public Response getServers(@QueryParam("limit") int limit, @QueryParam("offset") int offset,
-          @QueryParam("filter") String filter, @QueryParam("sort") String sort)
+      @QueryParam("filter") String filter, @QueryParam("sort") String sort)
           throws Exception {
 
     final Map<String, String> filters;

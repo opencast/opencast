@@ -76,7 +76,9 @@ public interface ThrowingFunction<T, R, E extends Throwable> {
    *
    * @see #andThen(Function)
    */
-  default <V> ThrowingFunction<V, R, ? extends Throwable> compose(ThrowingFunction<? super V, ? extends T, ? extends Throwable> before) {
+  default <V> ThrowingFunction<V, R, ? extends Throwable> compose(
+      ThrowingFunction<? super V, ? extends T, ? extends Throwable> before
+  ) {
     Objects.requireNonNull(before);
     return (V v) -> apply(before.apply(v));
   }
@@ -116,7 +118,9 @@ public interface ThrowingFunction<T, R, E extends Throwable> {
    *
    * @see #compose(Function)
    */
-  default <V> ThrowingFunction<T, V, ? extends Throwable> andThen(ThrowingFunction<? super R, ? extends V, ? extends Throwable> after) {
+  default <V> ThrowingFunction<T, V, ? extends Throwable> andThen(
+      ThrowingFunction<? super R, ? extends V, ? extends Throwable> after
+  ) {
     Objects.requireNonNull(after);
     return (T t) -> after.apply(apply(t));
   }

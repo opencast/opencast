@@ -72,8 +72,9 @@ public class MediaPackageBuilderImpl implements MediaPackageBuilder {
    *           if the temporary directory cannot be created or is not accessible
    */
   public MediaPackageBuilderImpl(MediaPackageSerializer serializer) {
-    if (serializer == null)
+    if (serializer == null) {
       throw new IllegalArgumentException("Serializer may not be null");
+    }
     this.serializer = serializer;
   }
 
@@ -117,7 +118,8 @@ public class MediaPackageBuilderImpl implements MediaPackageBuilder {
   }
 
   /**
-   * @see org.opencastproject.mediapackage.MediaPackageBuilder#setSerializer(org.opencastproject.mediapackage.MediaPackageSerializer)
+   * @see org.opencastproject.mediapackage.MediaPackageBuilder#setSerializer(
+   *      org.opencastproject.mediapackage.MediaPackageSerializer)
    */
   public void setSerializer(MediaPackageSerializer serializer) {
     this.serializer = serializer;
@@ -157,8 +159,8 @@ public class MediaPackageBuilderImpl implements MediaPackageBuilder {
   /**
    * Rewrite the url elements using the serializer. Attention: This method modifies the given DOM!
    */
-  private static void rewriteUrls(Node xml, MediaPackageSerializer serializer) throws XPathExpressionException,
-  URISyntaxException {
+  private static void rewriteUrls(Node xml, MediaPackageSerializer serializer)
+          throws XPathExpressionException, URISyntaxException {
     XPath xPath = XPathFactory.newInstance().newXPath();
     NodeList nodes = (NodeList) xPath.evaluate("//*[local-name() = 'url']", xml, XPathConstants.NODESET);
     for (int i = 0; i < nodes.getLength(); i++) {

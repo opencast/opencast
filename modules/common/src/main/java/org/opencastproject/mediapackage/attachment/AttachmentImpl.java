@@ -85,10 +85,12 @@ public class AttachmentImpl extends AbstractMediaPackageElement implements Attac
   protected AttachmentImpl(String identifier, MediaPackageElementFlavor flavor, URI uri, Long size, Checksum checksum,
           MimeType mimeType) {
     super(identifier, Type.Attachment, flavor, uri, size, checksum, mimeType);
-    if (uri != null)
+    if (uri != null) {
       try {
         this.setMimeType(MimeTypes.fromURI(uri));
-      } catch (UnknownFileTypeException e) { }
+      } catch (UnknownFileTypeException e) {
+      }
+    }
   }
 
   /**
@@ -114,8 +116,9 @@ public class AttachmentImpl extends AbstractMediaPackageElement implements Attac
 
   @Override
   public Map<String, String> getProperties() {
-    if (properties == null)
+    if (properties == null) {
       properties = new HashMap<String, String>();
+    }
 
     return properties;
   }
@@ -138,12 +141,14 @@ public class AttachmentImpl extends AbstractMediaPackageElement implements Attac
 
     @Override
     public PropertiesAdapter marshal(Map<String, String> p) throws Exception {
-      if (p == null || p.size() == 0) return null;
+      if (p == null || p.size() == 0) {
+        return null;
+      }
 
       PropertiesAdapter pa = new PropertiesAdapter();
-        for (String key : p.keySet()) {
-          pa.propertiesList.add(new Property(key, p.get(key)));
-        }
+      for (String key : p.keySet()) {
+        pa.propertiesList.add(new Property(key, p.get(key)));
+      }
       return pa;
     }
   }

@@ -50,7 +50,7 @@ public final class JaxbIncidentFullTree {
   }
 
   public JaxbIncidentFullTree(IncidentService svc, Locale locale, IncidentTree tree)
-      throws IncidentServiceException, NotFoundException {
+          throws IncidentServiceException, NotFoundException {
     this.incidents = tree.getIncidents().stream()
         .map(JaxbIncidentFull.mkFn(svc, locale))
         .collect(Collectors.toList());

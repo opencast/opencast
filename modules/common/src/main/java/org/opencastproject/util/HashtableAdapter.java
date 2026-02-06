@@ -42,8 +42,9 @@ public class HashtableAdapter extends XmlAdapter<HashEntry[], Hashtable<String, 
   public HashEntry[] marshal(Hashtable<String, String> myHashtable) throws Exception {
     String[] keys = myHashtable.keySet().toArray(new String[0]);
     HashEntry[] meta = new HashEntry[keys.length];
-    for (int i = 0; i < keys.length; i++)
+    for (int i = 0; i < keys.length; i++) {
       meta[i] = new HashEntry(keys[i], myHashtable.get(keys[i]));
+    }
     return meta;
   }
 

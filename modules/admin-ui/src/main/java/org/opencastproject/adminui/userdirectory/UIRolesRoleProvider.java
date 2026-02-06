@@ -50,11 +50,11 @@ import java.util.regex.Pattern;
  * The admin UI roles role provider.
  */
 @Component(
-  property = {
-    "service.description=Provides the Admin UI roles"
-  },
-  immediate = true,
-  service = { RoleProvider.class }
+    property = {
+        "service.description=Provides the Admin UI roles"
+    },
+    immediate = true,
+    service = { RoleProvider.class }
 )
 public class UIRolesRoleProvider implements RoleProvider {
 
@@ -106,8 +106,9 @@ public class UIRolesRoleProvider implements RoleProvider {
    */
   @Override
   public Iterator<Role> findRoles(String query, Role.Target target, int offset, int limit) {
-    if (query == null)
+    if (query == null) {
       throw new IllegalArgumentException("Query must be set");
+    }
 
     // These roles are not meaningful for use in ACLs
     if (target == Role.Target.ACL) {

@@ -125,8 +125,9 @@ public final class AccessControlEntry {
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder(role).append(" is ");
-    if (!allow)
+    if (!allow) {
       sb.append("not ");
+    }
     sb.append("allowed to ");
     sb.append(action);
     return sb.toString();

@@ -74,13 +74,16 @@ public class CaptureAgentsEndpointTest {
   private void checkCaptureAgentResults(String expected, String actual, boolean checkInputs) throws ParseException {
     JSONObject expectedJson = (JSONObject) parser.parse(expected);
     JSONObject resultJson = (JSONObject) parser.parse(actual);
-    assertEquals("The expected total should match the result total", expectedJson.get("total"), resultJson.get("total"));
+    assertEquals("The expected total should match the result total", expectedJson.get("total"),
+        resultJson.get("total"));
     assertEquals("The expected offset should match the result offset", expectedJson.get("offset"),
-            resultJson.get("offset"));
-    assertEquals("The expected count should match the result count", expectedJson.get("count"), resultJson.get("count"));
-    assertEquals("The expected limit should match the result limit", expectedJson.get("limit"), resultJson.get("limit"));
+        resultJson.get("offset"));
+    assertEquals("The expected count should match the result count", expectedJson.get("count"),
+        resultJson.get("count"));
+    assertEquals("The expected limit should match the result limit", expectedJson.get("limit"),
+        resultJson.get("limit"));
     checkCaptureAgentResults((JSONArray) expectedJson.get("results"), (JSONArray) resultJson.get("results"),
-            checkInputs);
+        checkInputs);
   }
 
   /**
@@ -119,7 +122,7 @@ public class CaptureAgentsEndpointTest {
   @Test
   public void testGetAllCaptureAgents() throws Exception {
     String expectedWithInputs = IOUtils.toString(CaptureAgentsEndpointTest.class.getResource("/capture_agents.json"),
-      "utf-8");
+        "utf-8");
     String expectedWithoutInputs = IOUtils.toString(CaptureAgentsEndpointTest.class
             .getResource("/capture_agents_noinputs.json"), "utf-8");
 

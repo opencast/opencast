@@ -49,10 +49,12 @@ public final class Tuple<A, B> {
 
   @Override
   public boolean equals(Object that) {
-    if (this == that)
+    if (this == that) {
       return true;
-    if (!eqClasses(this, that))
+    }
+    if (!eqClasses(this, that)) {
       return false;
+    }
     Tuple thatc = (Tuple) that;
     return a.equals(thatc.a) && b.equals(thatc.b);
   }

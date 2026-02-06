@@ -86,7 +86,9 @@ import java.util.Enumeration;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBException;
 
@@ -119,6 +121,10 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
   private static final int DEFAULT_SEGMENTS_MIN_CUT_DURATION = 2000;
 
   private int segmentsMinCutDuration = DEFAULT_SEGMENTS_MIN_CUT_DURATION;
+
+  private static final String VTT_SHORTEN_FLAVOR_TYPES = "vtt.shorten.flavor.types";
+  private static final String DEFAULT_VTT_SHORTEN_FLAVOR_TYPES = "chapters";
+  private List<String> shortenFlavorTypes = new ArrayList<>();
 
   /**
    * The logging instance
@@ -361,28 +367,43 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
             subtitle = parser.parse(fin);
           }
 
-          // Edit
-          List<WebVTTSubtitleCue> cutCues = new ArrayList<>();
-          double removedTime = 0;
-          for (int i = 0; i < cleanclips.size(); i++) {
-            if (i == 0) {
-              removedTime = removedTime
-                  + cleanclips.get(i).getStartInMilliseconds();
-            } else {
-              removedTime = removedTime
-                  + cleanclips.get(i).getStartInMilliseconds()
-                  - cleanclips.get(i - 1).getEndInMilliseconds();
-            }
-            for (WebVTTSubtitleCue cue : subtitle.getCues()) {
-              if ((cleanclips.get(i).getStartInMilliseconds() - SUBTITLE_GRACE_PERIOD) <= cue.getStartTime()
-                      && (cleanclips.get(i).getEndInMilliseconds() + SUBTITLE_GRACE_PERIOD) >= cue.getEndTime()) {
-                cue.setStartTime((long) (cue.getStartTime() - removedTime));
-                cue.setEndTime((long) (cue.getEndTime() - removedTime));
-                cutCues.add(cue);
+          if (shortenFlavorTypes.contains(sourceTrackFlavor.getType())) {
+            // Edit - Shorten
+            List<WebVTTSubtitleCue> result = new ArrayList<>();
+            for (WebVTTSubtitleCue ch :  subtitle.getCues()) {
+              long newStart = totalKeptBefore(ch.getStartTime(), cleanclips);
+              long newEnd   = totalKeptBefore(ch.getEndTime(), cleanclips);
+              if (newEnd > newStart) {
+                ch.setStartTime(newStart);
+                ch.setEndTime(newEnd);
+                result.add(ch);
               }
             }
+            subtitle.setCues(result);
+          } else {
+            // Edit - Remove (Default)
+            List<WebVTTSubtitleCue> cutCues = new ArrayList<>();
+            double removedTime = 0;
+            for (int i = 0; i < cleanclips.size(); i++) {
+              if (i == 0) {
+                removedTime = removedTime
+                    + cleanclips.get(i).getStartInMilliseconds();
+              } else {
+                removedTime = removedTime
+                    + cleanclips.get(i).getStartInMilliseconds()
+                    - cleanclips.get(i - 1).getEndInMilliseconds();
+              }
+              for (WebVTTSubtitleCue cue : subtitle.getCues()) {
+                if ((cleanclips.get(i).getStartInMilliseconds() - SUBTITLE_GRACE_PERIOD) <= cue.getStartTime()
+                    && (cleanclips.get(i).getEndInMilliseconds() + SUBTITLE_GRACE_PERIOD) >= cue.getEndTime()) {
+                  cue.setStartTime((long) (cue.getStartTime() - removedTime));
+                  cue.setEndTime((long) (cue.getEndTime() - removedTime));
+                  cutCues.add(cue);
+                }
+              }
+            }
+            subtitle.setCues(cutCues);
           }
-          subtitle.setCues(cutCues);
 
           // Write
           try (FileOutputStream fos = new FileOutputStream(outputPath)) {
@@ -493,6 +514,27 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
     return clips;
   }
 
+  /*
+   * Compute removed time from segments for cue time
+   */
+  private long totalKeptBefore(long t, List<VideoClip> keepSegments) {
+    long kept = 0;
+    for (VideoClip s : keepSegments) {
+      if (s.getEndInMilliseconds() <= 0) {
+        continue;
+      }
+      if (s.getStartInMilliseconds() >= t) {
+        break; // this and all further segments are after t
+      }
+      long overlapStart = Math.max(s.getStartInMilliseconds(), 0);
+      long overlapEnd = Math.min(s.getEndInMilliseconds(), t);
+      if (overlapEnd > overlapStart) {
+        kept += (overlapEnd - overlapStart);
+      }
+    }
+    return kept;
+  }
+
   /**
    * {@inheritDoc}
    *
@@ -593,6 +635,11 @@ public class VideoEditorServiceImpl extends AbstractJobProducer implements Video
         String.valueOf(DEFAULT_SEGMENTS_MIN_DURATION)));
     segmentsMinCutDuration = Integer.parseInt(this.properties.getProperty(SEGMENTS_MIN_CUT_DURATION_KEY,
         String.valueOf(DEFAULT_SEGMENTS_MIN_CUT_DURATION)));
+    String tmp = Objects.toString(properties.get(VTT_SHORTEN_FLAVOR_TYPES),
+        DEFAULT_VTT_SHORTEN_FLAVOR_TYPES);
+    shortenFlavorTypes = Arrays.stream(tmp.split(","))
+        .map(String::trim)
+        .collect(Collectors.toList());
   }
 
   @Reference

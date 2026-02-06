@@ -79,21 +79,23 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 @Path("/admin-ng/job")
-@RestService(name = "JobProxyService", title = "UI Jobs",
-  abstractText = "This service provides the job data for the UI.",
-  notes = { "These Endpoints deliver informations about the job required for the UI.",
-            "<strong>Important:</strong> "
-              + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
-              + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
-              + "DO NOT use this for integration of third-party applications.<em>"})
+@RestService(
+    name = "JobProxyService",
+    title = "UI Jobs",
+    abstractText = "This service provides the job data for the UI.",
+    notes = { "These Endpoints deliver informations about the job required for the UI.",
+              "<strong>Important:</strong> "
+                + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
+                + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
+                + "DO NOT use this for integration of third-party applications.<em>"})
 @Component(
-  immediate = true,
-  service = JobEndpoint.class,
-  property = {
-    "service.description=Admin UI - Job facade Endpoint",
-    "opencast.service.type=org.opencastproject.adminui.endpoint.JobEndpoint",
-    "opencast.service.path=/admin-ng/job"
-  }
+    immediate = true,
+    service = JobEndpoint.class,
+    property = {
+        "service.description=Admin UI - Job facade Endpoint",
+        "opencast.service.type=org.opencastproject.adminui.endpoint.JobEndpoint",
+        "opencast.service.path=/admin-ng/job"
+    }
 )
 @JaxrsResource
 public class JobEndpoint {
@@ -145,14 +147,26 @@ public class JobEndpoint {
   @GET
   @Path("jobs.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(description = "Returns the list of active jobs", name = "jobs", restParameters = {
-          @RestParameter(name = "limit", description = "The maximum number of items to return per page", isRequired = false, type = RestParameter.Type.INTEGER),
-          @RestParameter(name = "offset", description = "The offset", isRequired = false, type = RestParameter.Type.INTEGER),
-          @RestParameter(name = "filter", description = "Filter results by hostname, status or free text query", isRequired = false, type = RestParameter.Type.STRING),
-          @RestParameter(name = "sort", description = "The sort order. May include any of the following: CREATOR, OPERATION, PROCESSINGHOST, STATUS, STARTED, SUBMITTED or TYPE. "
-                  + "The suffix must be :ASC for ascending or :DESC for descending sort order (e.g. OPERATION:DESC)", isRequired = false, type = RestParameter.Type.STRING)},
-          responses = { @RestResponse(description = "Returns the list of active jobs from Opencast", responseCode = HttpServletResponse.SC_OK) },
-          returnDescription = "The list of jobs as JSON")
+  @RestQuery(
+      description = "Returns the list of active jobs",
+      name = "jobs",
+      restParameters = {
+          @RestParameter(name = "limit", description = "The maximum number of items to return per page",
+              isRequired = false, type = RestParameter.Type.INTEGER),
+          @RestParameter(name = "offset", description = "The offset",
+              isRequired = false, type = RestParameter.Type.INTEGER),
+          @RestParameter(name = "filter", description = "Filter results by hostname, status or free text query",
+              isRequired = false, type = RestParameter.Type.STRING),
+          @RestParameter(name = "sort", description = "The sort order. May include any of the following: CREATOR, "
+              + "OPERATION, PROCESSINGHOST, STATUS, STARTED, SUBMITTED or TYPE. "
+              + "The suffix must be :ASC for ascending or :DESC for descending sort order (e.g. OPERATION:DESC)",
+              isRequired = false, type = RestParameter.Type.STRING)
+      },
+      responses = {
+          @RestResponse(description = "Returns the list of active jobs from Opencast",
+              responseCode = HttpServletResponse.SC_OK)
+      },
+      returnDescription = "The list of jobs as JSON")
   public Response getJobs(@QueryParam("limit") final int limit, @QueryParam("offset") final int offset,
           @QueryParam("filter") final String filter, @QueryParam("sort") final String sort) {
     JobsListQuery query = new JobsListQuery();
@@ -161,17 +175,21 @@ public class JobEndpoint {
     query.setOffset(offset);
 
     String fHostname = null;
-    if (query.getHostname().isPresent())
+    if (query.getHostname().isPresent()) {
       fHostname = StringUtils.trimToNull(query.getHostname().get());
+    }
     String fNodeName = null;
-    if (query.getNodeName().isPresent())
+    if (query.getNodeName().isPresent()) {
       fNodeName = StringUtils.trimToNull(query.getNodeName().get());
+    }
     String fStatus = null;
-    if (query.getStatus().isPresent())
+    if (query.getStatus().isPresent()) {
       fStatus = StringUtils.trimToNull(query.getStatus().get());
+    }
     String fFreeText = null;
-    if (query.getFreeText().isPresent())
+    if (query.getFreeText().isPresent()) {
       fFreeText = StringUtils.trimToNull(query.getFreeText().get());
+    }
 
     List<JobExtended> jobs = new ArrayList<>();
     try {
@@ -181,35 +199,41 @@ public class JobEndpoint {
       for (Job job : serviceRegistry.getActiveJobs()) {
         // filter workflow jobs
         if (StringUtils.equals(WorkflowService.JOB_TYPE, job.getJobType())
-                && StringUtils.equals("START_WORKFLOW", job.getOperation()))
+                && StringUtils.equals("START_WORKFLOW", job.getOperation())) {
           continue;
+        }
 
         // filter by hostname
-        if (fHostname != null && !StringUtils.equalsIgnoreCase(job.getProcessingHost(), fHostname))
+        if (fHostname != null && !StringUtils.equalsIgnoreCase(job.getProcessingHost(), fHostname)) {
           continue;
+        }
 
         server = findServerByHost(job.getProcessingHost(), servers);
         vNodeName = server.isPresent() ? server.get().getNodeName() : "";
 
         // filter by node name
-        if (fNodeName != null && (server.isPresent()) && !StringUtils.equalsIgnoreCase(vNodeName, fNodeName))
+        if (fNodeName != null && (server.isPresent()) && !StringUtils.equalsIgnoreCase(vNodeName, fNodeName)) {
           continue;
+        }
 
         // filter by status
-        if (fStatus != null && !StringUtils.equalsIgnoreCase(job.getStatus().toString(), fStatus))
+        if (fStatus != null && !StringUtils.equalsIgnoreCase(job.getStatus().toString(), fStatus)) {
           continue;
+        }
 
         // fitler by user free text
         if (fFreeText != null
-              && !StringUtils.equalsIgnoreCase(job.getProcessingHost(), fFreeText)
-              && !StringUtils.equalsIgnoreCase(vNodeName, fFreeText)
-              && !StringUtils.equalsIgnoreCase(job.getJobType(), fFreeText)
-              && !StringUtils.equalsIgnoreCase(job.getOperation(), fFreeText)
-              && !StringUtils.equalsIgnoreCase(job.getCreator(), fFreeText)
-              && !StringUtils.equalsIgnoreCase(job.getStatus().toString(), fFreeText)
-              && !StringUtils.equalsIgnoreCase(Long.toString(job.getId()), fFreeText)
-              && (job.getRootJobId() != null && !StringUtils.equalsIgnoreCase(Long.toString(job.getRootJobId()), fFreeText)))
+            && !StringUtils.equalsIgnoreCase(job.getProcessingHost(), fFreeText)
+            && !StringUtils.equalsIgnoreCase(vNodeName, fFreeText)
+            && !StringUtils.equalsIgnoreCase(job.getJobType(), fFreeText)
+            && !StringUtils.equalsIgnoreCase(job.getOperation(), fFreeText)
+            && !StringUtils.equalsIgnoreCase(job.getCreator(), fFreeText)
+            && !StringUtils.equalsIgnoreCase(job.getStatus().toString(), fFreeText)
+            && !StringUtils.equalsIgnoreCase(Long.toString(job.getId()), fFreeText)
+            && (job.getRootJobId() != null && !StringUtils.equalsIgnoreCase(Long.toString(job.getRootJobId()),
+            fFreeText))) {
           continue;
+        }
         jobs.add(new JobExtended(job, vNodeName));
       }
     } catch (ServiceRegistryException ex) {
@@ -272,8 +296,10 @@ public class JobEndpoint {
       jobJson.addProperty("type", job.getJobType());
       jobJson.addProperty("operation", job.getOperation());
       jobJson.addProperty("status", JOB_STATUS_TRANSLATION_PREFIX + job.getStatus().toString());
-      jobJson.addProperty("submitted", job.getDateCreated() != null ? DateTimeSupport.toUTC(job.getDateCreated().getTime()) : "");
-      jobJson.addProperty("started", job.getDateStarted() != null ? DateTimeSupport.toUTC(job.getDateStarted().getTime()) : "");
+      jobJson.addProperty("submitted", job.getDateCreated() != null
+          ? DateTimeSupport.toUTC(job.getDateCreated().getTime()) : "");
+      jobJson.addProperty("started", job.getDateStarted() != null
+          ? DateTimeSupport.toUTC(job.getDateStarted().getTime()) : "");
       jobJson.addProperty("creator", safeString(job.getCreator()));
       jobJson.addProperty("processingHost", safeString(job.getProcessingHost()));
       jobJson.addProperty("processingNode", safeString(jobEx.getNodeName()));
@@ -298,7 +324,7 @@ public class JobEndpoint {
    */
 
   public JsonArray getIncidentsAsJSON(long jobId, final Locale locale, boolean cascade)
-      throws JobEndpointException, NotFoundException {
+          throws JobEndpointException, NotFoundException {
     final List<Incident> incidents;
     try {
       final IncidentTree it = incidentService.getIncidentsOfJob(jobId, cascade);
@@ -454,7 +480,8 @@ public class JobEndpoint {
         case PROCESSINGNODE:
           value1 = jobEx1.getNodeName();
           value2 = jobEx2.getNodeName();
-          break;        case STARTED:
+          break;
+        case STARTED:
           value1 = job1.getDateStarted();
           value2 = job2.getDateStarted();
           break;

@@ -148,21 +148,23 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 @Path("/admin-ng/series")
-@RestService(name = "SeriesProxyService", title = "UI Series",
-  abstractText = "This service provides the series data for the UI.",
-  notes = { "This service offers the series CRUD Operations for the admin UI.",
-            "<strong>Important:</strong> "
-              + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
-              + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
-              + "DO NOT use this for integration of third-party applications.<em>"})
+@RestService(
+    name = "SeriesProxyService",
+    title = "UI Series",
+    abstractText = "This service provides the series data for the UI.",
+    notes = { "This service offers the series CRUD Operations for the admin UI.",
+              "<strong>Important:</strong> "
+                + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
+                + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
+                + "DO NOT use this for integration of third-party applications.<em>"})
 @Component(
-        immediate = true,
-        service = SeriesEndpoint.class,
-        property = {
-                "service.description=Admin UI - SeriesEndpoint Endpoint",
-                "opencast.service.type=org.opencastproject.adminui.SeriesEndpoint",
-                "opencast.service.path=/admin-ng/series",
-        }
+    immediate = true,
+    service = SeriesEndpoint.class,
+    property = {
+        "service.description=Admin UI - SeriesEndpoint Endpoint",
+        "opencast.service.type=org.opencastproject.adminui.SeriesEndpoint",
+        "opencast.service.path=/admin-ng/series",
+    }
 )
 @JaxrsResource
 public class SeriesEndpoint {
@@ -183,7 +185,8 @@ public class SeriesEndpoint {
   public static final String SERIES_HASEVENTS_DELETE_ALLOW_KEY = "series.hasEvents.delete.allow";
   public static final String SERIESTAB_ONLYSERIESWITHWRITEACCESS_KEY = "seriesTab.onlySeriesWithWriteAccess";
   public static final String EVENTSFILTER_ONLYSERIESWITHWRITEACCESS_KEY = "eventsFilter.onlySeriesWithWriteAccess";
-  public static final Pattern TOBIRA_CONFIG = Pattern.compile("^tobira\\.(?<organization>.*)\\.(?<key>origin|trustedKey)$");
+  public static final Pattern TOBIRA_CONFIG =
+      Pattern.compile("^tobira\\.(?<organization>.*)\\.(?<key>origin|trustedKey)$");
 
   private SeriesService seriesService;
   private SecurityService securityService;
@@ -262,8 +265,9 @@ public class SeriesEndpoint {
     if (cc != null) {
       String ccServerUrl = cc.getBundleContext().getProperty(OpencastConstants.SERVER_URL_PROPERTY);
       logger.debug("Configured server url is {}", ccServerUrl);
-      if (ccServerUrl != null)
+      if (ccServerUrl != null) {
         this.serverUrl = ccServerUrl;
+      }
 
       modified(properties);
     }
@@ -314,13 +318,23 @@ public class SeriesEndpoint {
   @Path("{seriesId}/access.json")
   @SuppressWarnings("unchecked")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getseriesaccessinformation", description = "Get the access information of a series", returnDescription = "The access information", pathParameters = { @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = Type.STRING) }, responses = {
-          @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required form params were missing in the request."),
+  @RestQuery(
+      name = "getseriesaccessinformation",
+      description = "Get the access information of a series",
+      returnDescription = "The access information",
+      pathParameters = {
+          @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier",
+              type = Type.STRING)
+      }, responses = {
+          @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required form params were missing in the "
+              + "request."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "If the series has not been found."),
-          @RestResponse(responseCode = SC_OK, description = "The access information ") })
+          @RestResponse(responseCode = SC_OK, description = "The access information ")
+      })
   public Response getSeriesAccessInformation(@PathParam("seriesId") String seriesId) throws NotFoundException {
-    if (StringUtils.isBlank(seriesId))
+    if (StringUtils.isBlank(seriesId)) {
       return RestUtil.R.badRequest("Path parameter series ID is missing");
+    }
 
     boolean hasProcessingEvents = hasProcessingEvents(seriesId);
 
@@ -355,15 +369,26 @@ public class SeriesEndpoint {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("{seriesId}/metadata.json")
-  @RestQuery(name = "getseriesmetadata", description = "Returns the series metadata as JSON", returnDescription = "Returns the series metadata as JSON", pathParameters = { @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = STRING) }, responses = {
+  @RestQuery(
+      name = "getseriesmetadata",
+      description = "Returns the series metadata as JSON",
+      returnDescription = "Returns the series metadata as JSON",
+      pathParameters = {
+          @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = STRING)
+      },
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "The series metadata as JSON."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "The series has not been found"),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to "
+              + "perform this action")
+      })
   public Response getSeriesMetadata(@PathParam("seriesId") String series) throws UnauthorizedException,
           NotFoundException, SearchIndexException {
-    Optional<Series> optSeries = searchIndex.getSeries(series, securityService.getOrganization().getId(), securityService.getUser());
-    if (optSeries.isEmpty())
+    Optional<Series> optSeries = searchIndex.getSeries(series, securityService.getOrganization().getId(),
+        securityService.getUser());
+    if (optSeries.isEmpty()) {
       return notFound("Cannot find a series with id '%s'.", series);
+    }
 
     MetadataList metadataList = new MetadataList();
     List<SeriesCatalogUIAdapter> catalogUIAdapters = indexService.getSeriesCatalogUIAdapters();
@@ -444,21 +469,21 @@ public class SeriesEndpoint {
 
     // Admin UI only field
     MetadataField createdBy = new MetadataField(
-      "createdBy",
-      null,
-      "EVENTS.SERIES.DETAILS.METADATA.CREATED_BY",
-      true,
-      false,
-      null,
-      null,
-      MetadataField.Type.TEXT,
-      null,
-      null,
-      CREATED_BY_UI_ORDER,
-      null,
-      null,
-      null,
-      null);
+        "createdBy",
+        null,
+        "EVENTS.SERIES.DETAILS.METADATA.CREATED_BY",
+        true,
+        false,
+        null,
+        null,
+        MetadataField.Type.TEXT,
+        null,
+        null,
+        CREATED_BY_UI_ORDER,
+        null,
+        null,
+        null,
+        null);
     createdBy.setValue(series.getCreator());
     metadata.addField(createdBy);
 
@@ -473,10 +498,23 @@ public class SeriesEndpoint {
 
   @PUT
   @Path("{seriesId}/metadata")
-  @RestQuery(name = "updateseriesmetadata", description = "Update the series metadata with the one given JSON", returnDescription = "Returns OK if the metadata have been saved.", pathParameters = { @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = STRING) }, restParameters = { @RestParameter(name = "metadata", isRequired = true, type = RestParameter.Type.TEXT, description = "The list of metadata to update") }, responses = {
+  @RestQuery(
+      name = "updateseriesmetadata",
+      description = "Update the series metadata with the one given JSON",
+      returnDescription = "Returns OK if the metadata have been saved.",
+      pathParameters = {
+          @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = STRING)
+      },
+      restParameters = {
+          @RestParameter(name = "metadata", isRequired = true, type = RestParameter.Type.TEXT, description = "The list "
+              + "of metadata to update")
+      },
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "The series metadata as JSON."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "The series has not been found"),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to "
+              + "perform this action")
+      })
   public Response updateSeriesMetadata(@PathParam("seriesId") String seriesID,
           @FormParam("metadata") String metadataJSON) throws UnauthorizedException, NotFoundException,
           SearchIndexException {
@@ -492,7 +530,14 @@ public class SeriesEndpoint {
 
   @GET
   @Path("new/metadata")
-  @RestQuery(name = "getNewMetadata", description = "Returns all the data related to the metadata tab in the new series modal as JSON", returnDescription = "All the data related to the series metadata tab as JSON", responses = { @RestResponse(responseCode = SC_OK, description = "Returns all the data related to the series metadata tab as JSON") })
+  @RestQuery(
+      name = "getNewMetadata",
+      description = "Returns all the data related to the metadata tab in the new series modal as JSON",
+      returnDescription = "All the data related to the series metadata tab as JSON",
+      responses = {
+          @RestResponse(responseCode = SC_OK, description = "Returns all the data related to the series metadata tab "
+              + "as JSON")
+      })
   public Response getNewMetadata() {
     MetadataList metadataList = indexService.getMetadataListWithAllSeriesCatalogUIAdapters();
     final DublinCoreMetadataCollection metadataByAdapter = metadataList
@@ -515,7 +560,14 @@ public class SeriesEndpoint {
   @GET
   @Path("new/themes")
   @SuppressWarnings("unchecked")
-  @RestQuery(name = "getNewThemes", description = "Returns all the data related to the themes tab in the new series modal as JSON", returnDescription = "All the data related to the series themes tab as JSON", responses = { @RestResponse(responseCode = SC_OK, description = "Returns all the data related to the series themes tab as JSON") })
+  @RestQuery(
+      name = "getNewThemes",
+      description = "Returns all the data related to the themes tab in the new series modal as JSON",
+      returnDescription = "All the data related to the series themes tab as JSON",
+      responses = {
+          @RestResponse(responseCode = SC_OK, description = "Returns all the data related to the series themes tab as "
+              + "JSON")
+      })
   public Response getNewThemes() {
     SortCriterion sortCriterion = new SortCriterion("name", Order.Ascending);
     ArrayList<SortCriterion> sortCriteria = new ArrayList<>();
@@ -547,28 +599,31 @@ public class SeriesEndpoint {
   @Path("new/tobira/page")
   @Produces(MediaType.APPLICATION_JSON)
   @RestQuery(
-          name = "getTobiraPage",
-          description = "Returns data about the page tree of a connected Tobira instance for use in the series creation wizard",
-          returnDescription = "Information about a given page in Tobira, and its direct children",
-          restParameters = { @RestParameter(
-                          name = "path",
-                          isRequired = true,
-                          type = STRING,
-                          description = "The path of the page you want information about"
-                  ) },
-          responses = {
-                  @RestResponse(
-                          responseCode = SC_OK,
-                          description = "Data about the given page in Tobira. Note that this does not mean the page exists!"),
-                  @RestResponse(
-                          responseCode = SC_NOT_FOUND,
-                          description = "Nonexistent `path`"),
-                  @RestResponse(
-                          responseCode = SC_BAD_REQUEST,
-                          description = "missing `path`"),
-                  @RestResponse(
-                          responseCode = SC_SERVICE_UNAVAILABLE,
-                          description = "Tobira is not configured (correctly)") })
+      name = "getTobiraPage",
+      description = "Returns data about the page tree of a connected Tobira instance for use in the series creation "
+          + "wizard",
+      returnDescription = "Information about a given page in Tobira, and its direct children",
+      restParameters = {
+          @RestParameter(
+              name = "path",
+              isRequired = true,
+              type = STRING,
+              description = "The path of the page you want information about"
+      )},
+      responses = {
+              @RestResponse(
+                  responseCode = SC_OK,
+                  description = "Data about the given page in Tobira. Note that this does not mean the page exists!"),
+              @RestResponse(
+                  responseCode = SC_NOT_FOUND,
+                  description = "Nonexistent `path`"),
+              @RestResponse(
+                  responseCode = SC_BAD_REQUEST,
+                  description = "missing `path`"),
+              @RestResponse(
+                  responseCode = SC_SERVICE_UNAVAILABLE,
+                  description = "Tobira is not configured (correctly)")
+      })
   public Response getTobiraPage(@QueryParam("path") String path) throws IOException, InterruptedException {
     if (path == null) {
       throw new WebApplicationException("`path` missing", BAD_REQUEST);
@@ -594,10 +649,21 @@ public class SeriesEndpoint {
 
   @POST
   @Path("new")
-  @RestQuery(name = "createNewSeries", description = "Creates a new series by the given metadata as JSON", returnDescription = "The created series id", restParameters = { @RestParameter(name = "metadata", isRequired = true, description = "The metadata as JSON", type = RestParameter.Type.TEXT) }, responses = {
+  @RestQuery(
+      name = "createNewSeries",
+      description = "Creates a new series by the given metadata as JSON",
+      returnDescription = "The created series id",
+      restParameters = {
+          @RestParameter(name = "metadata", isRequired = true, description = "The metadata as JSON",
+              type = RestParameter.Type.TEXT)
+      },
+      responses = {
           @RestResponse(responseCode = HttpServletResponse.SC_CREATED, description = "Returns the created series id"),
-          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "he request could not be fulfilled due to the incorrect syntax of the request"),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If user doesn't have rights to create the series") })
+          @RestResponse(responseCode = HttpServletResponse.SC_BAD_REQUEST, description = "he request could not be "
+              + "fulfilled due to the incorrect syntax of the request"),
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If user doesn't have rights to create the "
+              + "series")
+      })
   public Response createNewSeries(@FormParam("metadata") String metadata) throws UnauthorizedException {
     try {
       JSONObject metadataJson;
@@ -670,9 +736,18 @@ public class SeriesEndpoint {
   @DELETE
   @Path("{seriesId}")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "deleteseries", description = "Delete a series.", returnDescription = "Ok if the series has been deleted.", pathParameters = { @RestParameter(name = "seriesId", isRequired = true, description = "The id of the series to delete.", type = STRING), }, responses = {
+  @RestQuery(
+      name = "deleteseries",
+      description = "Delete a series.",
+      returnDescription = "Ok if the series has been deleted.",
+      pathParameters = {
+          @RestParameter(name = "seriesId", isRequired = true, description = "The id of the series to delete.",
+              type = STRING),
+      },
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "The series has been deleted."),
-          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "The series could not be found.") })
+          @RestResponse(responseCode = HttpServletResponse.SC_NOT_FOUND, description = "The series could not be found.")
+      })
   public Response deleteSeries(@PathParam("seriesId") String id) throws NotFoundException {
     try {
       indexService.removeSeries(id);
@@ -688,9 +763,16 @@ public class SeriesEndpoint {
   @POST
   @Path("deleteSeries")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "deletemultipleseries", description = "Deletes a json list of series by their given ids e.g. [\"Series-1\", \"Series-2\"]", returnDescription = "A JSON object with arrays that show whether a series was deleted, was not found or there was an error deleting it.", responses = {
+  @RestQuery(
+      name = "deletemultipleseries",
+      description = "Deletes a json list of series by their given ids e.g. [\"Series-1\", \"Series-2\"]",
+      returnDescription = "A JSON object with arrays that show whether a series was deleted, was not found or there "
+          + "was an error deleting it.",
+      responses = {
           @RestResponse(description = "Series have been deleted", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "The list of ids could not be parsed into a json list.", responseCode = HttpServletResponse.SC_BAD_REQUEST) })
+          @RestResponse(description = "The list of ids could not be parsed into a json list.",
+              responseCode = HttpServletResponse.SC_BAD_REQUEST)
+      })
   public Response deleteMultipleSeries(String seriesIdsContent) throws NotFoundException {
     if (StringUtils.isBlank(seriesIdsContent)) {
       return Response.status(Status.BAD_REQUEST).build();
@@ -726,16 +808,29 @@ public class SeriesEndpoint {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("series.json")
-  @RestQuery(name = "listSeriesAsJson", description = "Returns the series matching the query parameters", returnDescription = "Returns the series search results as JSON", restParameters = {
-          @RestParameter(name = "sortorganizer", isRequired = false, description = "The sort type to apply to the series organizer or organizers either Ascending or Descending.", type = STRING),
-          @RestParameter(name = "sort", description = "The order instructions used to sort the query result. Must be in the form '<field name>:(ASC|DESC)'", isRequired = false, type = STRING),
-          @RestParameter(name = "filter", isRequired = false, description = "The filter used for the query. They should be formated like that: 'filter1:value1,filter2,value2'", type = STRING),
-          @RestParameter(name = "offset", isRequired = false, description = "The page offset", type = INTEGER, defaultValue = "0"),
-          @RestParameter(name = "limit", isRequired = false, description = "The limit to define the number of returned results (-1 for all)", type = INTEGER, defaultValue = "100") }, responses = {
+  @RestQuery(
+      name = "listSeriesAsJson",
+      description = "Returns the series matching the query parameters",
+      returnDescription = "Returns the series search results as JSON",
+      restParameters = {
+          @RestParameter(name = "sortorganizer", isRequired = false, description = "The sort type to apply to the "
+              + "series organizer or organizers either Ascending or Descending.", type = STRING),
+          @RestParameter(name = "sort", description = "The order instructions used to sort the query result. Must be "
+              + "in the form '<field name>:(ASC|DESC)'", isRequired = false, type = STRING),
+          @RestParameter(name = "filter", isRequired = false, description = "The filter used for the query. They "
+              + "should be formated like that: 'filter1:value1,filter2,value2'", type = STRING),
+          @RestParameter(name = "offset", isRequired = false, description = "The page offset", type = INTEGER,
+              defaultValue = "0"),
+          @RestParameter(name = "limit", isRequired = false, description = "The limit to define the number of "
+              + "returned results (-1 for all)", type = INTEGER, defaultValue = "100")
+      },
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "The access control list."),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to "
+              + "perform this action")
+      })
   public Response getSeries(@QueryParam("filter") String filter, @QueryParam("sort") String sort,
-          @QueryParam("offset") int offset, @QueryParam("limit") int limit)
+      @QueryParam("offset") int offset, @QueryParam("limit") int limit)
           throws UnauthorizedException {
     try {
       logger.debug("Requested series list");
@@ -890,9 +985,18 @@ public class SeriesEndpoint {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("{id}/properties")
-  @RestQuery(name = "getSeriesProperties", description = "Returns the series properties", returnDescription = "Returns the series properties as JSON", pathParameters = { @RestParameter(name = "id", description = "ID of series", isRequired = true, type = Type.STRING) }, responses = {
+  @RestQuery(
+      name = "getSeriesProperties",
+      description = "Returns the series properties",
+      returnDescription = "Returns the series properties as JSON",
+      pathParameters = {
+          @RestParameter(name = "id", description = "ID of series", isRequired = true, type = Type.STRING)
+      },
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "The access control list."),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to "
+              + "perform this action")
+      })
   public Response getSeriesPropertiesAsJson(@PathParam("id") String seriesId) throws UnauthorizedException,
           NotFoundException {
     if (StringUtils.isBlank(seriesId)) {
@@ -921,13 +1025,22 @@ public class SeriesEndpoint {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("{seriesId}/property/{propertyName}.json")
-  @RestQuery(name = "getSeriesProperty", description = "Returns a series property value", returnDescription = "Returns the series property value", pathParameters = {
+  @RestQuery(
+      name = "getSeriesProperty",
+      description = "Returns a series property value",
+      returnDescription = "Returns the series property value",
+      pathParameters = {
           @RestParameter(name = "seriesId", description = "ID of series", isRequired = true, type = Type.STRING),
-          @RestParameter(name = "propertyName", description = "Name of series property", isRequired = true, type = Type.STRING) }, responses = {
+          @RestParameter(name = "propertyName", description = "Name of series property", isRequired = true,
+              type = Type.STRING)
+      },
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "The access control list."),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to "
+              + "perform this action")
+      })
   public Response getSeriesProperty(@PathParam("seriesId") String seriesId,
-          @PathParam("propertyName") String propertyName) throws UnauthorizedException, NotFoundException {
+      @PathParam("propertyName") String propertyName) throws UnauthorizedException, NotFoundException {
     if (StringUtils.isBlank(seriesId)) {
       logger.warn("Series id parameter is blank '{}'.", seriesId);
       return Response.status(BAD_REQUEST).build();
@@ -951,15 +1064,27 @@ public class SeriesEndpoint {
 
   @POST
   @Path("/{seriesId}/property")
-  @RestQuery(name = "updateSeriesProperty", description = "Updates a series property", returnDescription = "No content.", restParameters = {
+  @RestQuery(
+      name = "updateSeriesProperty",
+      description = "Updates a series property",
+      returnDescription = "No content.",
+      restParameters = {
           @RestParameter(name = "name", isRequired = true, description = "The property's name", type = TEXT),
-          @RestParameter(name = "value", isRequired = true, description = "The property's value", type = TEXT) }, pathParameters = { @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = STRING) }, responses = {
+          @RestParameter(name = "value", isRequired = true, description = "The property's value", type = TEXT)
+      },
+      pathParameters = {
+          @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = STRING)
+      },
+      responses = {
           @RestResponse(responseCode = SC_NOT_FOUND, description = "No series with this identifier was found."),
           @RestResponse(responseCode = SC_NO_CONTENT, description = "The access control list has been updated."),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action"),
-          @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required path or form params were missing in the request.") })
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to "
+              + "perform this action"),
+          @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required path or form params were missing "
+              + "in the request.")
+      })
   public Response updateSeriesProperty(@PathParam("seriesId") String seriesId, @FormParam("name") String name,
-          @FormParam("value") String value) throws UnauthorizedException {
+      @FormParam("value") String value) throws UnauthorizedException {
     if (StringUtils.isBlank(seriesId)) {
       logger.warn("Series id parameter is blank '{}'.", seriesId);
       return Response.status(BAD_REQUEST).build();
@@ -985,14 +1110,23 @@ public class SeriesEndpoint {
 
   @DELETE
   @Path("{seriesId}/property/{propertyName}")
-  @RestQuery(name = "deleteSeriesProperty", description = "Deletes a series property", returnDescription = "No Content", pathParameters = {
+  @RestQuery(
+      name = "deleteSeriesProperty",
+      description = "Deletes a series property",
+      returnDescription = "No Content",
+      pathParameters = {
           @RestParameter(name = "seriesId", description = "ID of series", isRequired = true, type = Type.STRING),
-          @RestParameter(name = "propertyName", description = "Name of series property", isRequired = true, type = Type.STRING) }, responses = {
+          @RestParameter(name = "propertyName", description = "Name of series property", isRequired = true,
+              type = Type.STRING)
+      },
+      responses = {
           @RestResponse(responseCode = SC_NO_CONTENT, description = "The series property has been deleted."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "The series or property has not been found."),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to "
+              + "perform this action")
+      })
   public Response deleteSeriesProperty(@PathParam("seriesId") String seriesId,
-          @PathParam("propertyName") String propertyName) throws UnauthorizedException, NotFoundException {
+      @PathParam("propertyName") String propertyName) throws UnauthorizedException, NotFoundException {
     if (StringUtils.isBlank(seriesId)) {
       logger.warn("Series id parameter is blank '{}'.", seriesId);
       return Response.status(BAD_REQUEST).build();
@@ -1028,15 +1162,25 @@ public class SeriesEndpoint {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("{seriesId}/theme.json")
-  @RestQuery(name = "getSeriesTheme", description = "Returns the series theme id and name as JSON", returnDescription = "Returns the series theme name and id as JSON", pathParameters = { @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = STRING) }, responses = {
+  @RestQuery(
+      name = "getSeriesTheme",
+      description = "Returns the series theme id and name as JSON",
+      returnDescription = "Returns the series theme name and id as JSON",
+      pathParameters = {
+          @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = STRING)
+      },
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "The series theme id and name as JSON."),
-          @RestResponse(responseCode = SC_NOT_FOUND, description = "The series or theme has not been found") })
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "The series or theme has not been found")
+      })
   public Response getSeriesTheme(@PathParam("seriesId") String seriesId) {
     Long themeId;
     try {
-      Optional<Series> series = searchIndex.getSeries(seriesId, securityService.getOrganization().getId(), securityService.getUser());
-      if (series.isEmpty())
+      Optional<Series> series = searchIndex.getSeries(seriesId, securityService.getOrganization().getId(),
+          securityService.getUser());
+      if (series.isEmpty()) {
         return notFound("Cannot find a series with id {}", seriesId);
+      }
 
       themeId = series.get().getTheme();
     } catch (SearchIndexException e) {
@@ -1045,8 +1189,9 @@ public class SeriesEndpoint {
     }
 
     // If no theme is set return empty JSON
-    if (themeId == null)
+    if (themeId == null) {
       return okJson(new JsonObject());
+    }
 
     try {
       Theme theme = themesServiceDatabase.getTheme(themeId);
@@ -1061,10 +1206,24 @@ public class SeriesEndpoint {
 
   @PUT
   @Path("{seriesId}/theme")
-  @RestQuery(name = "updateSeriesTheme", description = "Update the series theme id", returnDescription = "Returns the id and name of the theme.", pathParameters = { @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = STRING) }, restParameters = { @RestParameter(name = "themeId", isRequired = true, type = RestParameter.Type.INTEGER, description = "The id of the theme for this series") }, responses = {
-          @RestResponse(responseCode = SC_OK, description = "The series theme has been updated and the theme id and name are returned as JSON."),
+  @RestQuery(
+      name = "updateSeriesTheme",
+      description = "Update the series theme id",
+      returnDescription = "Returns the id and name of the theme.",
+      pathParameters = {
+          @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = STRING)
+      },
+      restParameters = {
+          @RestParameter(name = "themeId", isRequired = true, type = RestParameter.Type.INTEGER, description = "The "
+              + "id of the theme for this series")
+      },
+      responses = {
+          @RestResponse(responseCode = SC_OK, description = "The series theme has been updated and the theme id and "
+              + "name are returned as JSON."),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "The series or theme has not been found"),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to "
+              + "perform this action")
+      })
   public Response updateSeriesTheme(@PathParam("seriesId") String seriesID, @FormParam("themeId") long themeId)
           throws UnauthorizedException, NotFoundException {
     try {
@@ -1082,10 +1241,19 @@ public class SeriesEndpoint {
 
   @DELETE
   @Path("{seriesId}/theme")
-  @RestQuery(name = "deleteSeriesTheme", description = "Removes the theme from the series", returnDescription = "Returns no content", pathParameters = { @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = STRING) }, responses = {
+  @RestQuery(
+      name = "deleteSeriesTheme",
+      description = "Removes the theme from the series",
+      returnDescription = "Returns no content",
+      pathParameters = {
+          @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = STRING)
+      },
+      responses = {
           @RestResponse(responseCode = SC_NO_CONTENT, description = "The series theme has been removed"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "The series has not been found"),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to "
+              + "perform this action")
+      })
   public Response deleteSeriesTheme(@PathParam("seriesId") String seriesID) throws UnauthorizedException,
           NotFoundException {
     try {
@@ -1100,24 +1268,25 @@ public class SeriesEndpoint {
   @GET
   @Path("{seriesId}/tobira/pages")
   @RestQuery(
-          name = "getSeriesHostPages",
-          description = "Returns the pages of a connected Tobira instance that contain the given series",
-          returnDescription = "The Tobira pages that contain the given series",
-          pathParameters = { @RestParameter(
-                  name = "seriesId",
-                  isRequired = true,
-                  description = "The series identifier",
-                  type = STRING) },
-          responses = {
-                  @RestResponse(
-                          responseCode = SC_OK,
-                          description = "The Tobira pages containing the given series"),
-                  @RestResponse(
-                          responseCode = SC_NOT_FOUND,
-                          description = "Tobira doesn't know about the given series"),
-                  @RestResponse(
-                          responseCode = SC_SERVICE_UNAVAILABLE,
-                          description = "Tobira is not configured (correctly)") })
+      name = "getSeriesHostPages",
+      description = "Returns the pages of a connected Tobira instance that contain the given series",
+      returnDescription = "The Tobira pages that contain the given series",
+      pathParameters = {
+          @RestParameter(
+              name = "seriesId",
+              isRequired = true,
+              description = "The series identifier",
+              type = STRING) },
+      responses = {
+          @RestResponse(
+              responseCode = SC_OK,
+              description = "The Tobira pages containing the given series"),
+          @RestResponse(
+              responseCode = SC_NOT_FOUND,
+              description = "Tobira doesn't know about the given series"),
+          @RestResponse(
+              responseCode = SC_SERVICE_UNAVAILABLE,
+              description = "Tobira is not configured (correctly)") })
 public Response getSeriesHostPages(@PathParam("seriesId") String seriesId) {
     var tobira = getTobira();
     if (!tobira.ready()) {
@@ -1141,45 +1310,46 @@ public Response getSeriesHostPages(@PathParam("seriesId") String seriesId) {
   @POST
   @Path("{seriesId}/tobira/path")
   @RestQuery(
-          name = "updateSeriesTobiraPath",
-          description = "Updates the path of the given series in a connected Tobira instance",
-          returnDescription = "Status code",
-          pathParameters = { @RestParameter(
-                  name = "seriesId",
-                  isRequired = true,
-                  description = "The series id",
-                  type = STRING) },
-          restParameters = {
-                  @RestParameter(
-                          name = "pathComponents",
-                          isRequired = true,
-                          description = "List of realms with name and path segment on path to series.",
-                          type = TEXT),
-                  @RestParameter(
-                          name = "currentPath",
-                          isRequired = false,
-                          description = "Path where the series is currently mounted.",
-                          type = STRING),
-                  @RestParameter(
-                          name = "targetPath",
-                          isRequired = true,
-                          description = "Path where the series will be mounted.",
-                          type = STRING) },
-          responses = {
-                  @RestResponse(
-                          responseCode = SC_OK,
-                          description = "The path of the series has successfully been updated in Tobira."),
-                  @RestResponse(
-                          responseCode = SC_NOT_FOUND,
-                          description = "Tobira doesn't know about the given series"),
-                  @RestResponse(
-                          responseCode = SC_SERVICE_UNAVAILABLE,
-                          description = "Tobira is not configured (correctly)") })
+      name = "updateSeriesTobiraPath",
+      description = "Updates the path of the given series in a connected Tobira instance",
+      returnDescription = "Status code",
+      pathParameters = {
+          @RestParameter(
+              name = "seriesId",
+              isRequired = true,
+              description = "The series id",
+              type = STRING) },
+      restParameters = {
+          @RestParameter(
+              name = "pathComponents",
+              isRequired = true,
+              description = "List of realms with name and path segment on path to series.",
+              type = TEXT),
+          @RestParameter(
+              name = "currentPath",
+              isRequired = false,
+              description = "Path where the series is currently mounted.",
+              type = STRING),
+          @RestParameter(
+              name = "targetPath",
+              isRequired = true,
+              description = "Path where the series will be mounted.",
+              type = STRING) },
+      responses = {
+          @RestResponse(
+              responseCode = SC_OK,
+              description = "The path of the series has successfully been updated in Tobira."),
+          @RestResponse(
+              responseCode = SC_NOT_FOUND,
+              description = "Tobira doesn't know about the given series"),
+          @RestResponse(
+              responseCode = SC_SERVICE_UNAVAILABLE,
+              description = "Tobira is not configured (correctly)") })
   public Response updateSeriesTobiraPath(
-    @PathParam("seriesId") String seriesId,
-    @FormParam("pathComponents") String pathComponents,
-    @FormParam("currentPath") String currentPath,
-    @FormParam("targetPath") String targetPath
+      @PathParam("seriesId") String seriesId,
+      @FormParam("pathComponents") String pathComponents,
+      @FormParam("currentPath") String currentPath,
+      @FormParam("targetPath") String targetPath
   ) throws IOException, InterruptedException {
     if (targetPath == null) {
       throw new WebApplicationException("target path is missing", BAD_REQUEST);
@@ -1220,33 +1390,33 @@ public Response getSeriesHostPages(@PathParam("seriesId") String seriesId) {
   @DELETE
   @Path("{seriesId}/tobira/{currentPath}")
   @RestQuery(
-          name = "removeSeriesTobiraPath",
-          description = "Removes the path of the given series in a connected Tobira instance",
-          returnDescription = "Status code",
-          pathParameters = {
-                  @RestParameter(
-                          name = "seriesId",
-                          isRequired = true,
-                          description = "The series id",
-                          type = STRING),
-                  @RestParameter(
-                          name = "currentPath",
-                          isRequired = true,
-                          description = "URL encoded path where the series is currently mounted.",
-                          type = STRING) },
-          responses = {
-                  @RestResponse(
-                          responseCode = SC_OK,
-                          description = "The path of the series has successfully been removed in Tobira."),
-                  @RestResponse(
-                          responseCode = SC_NOT_FOUND,
-                          description = "Tobira doesn't know about the given series"),
-                  @RestResponse(
-                          responseCode = SC_SERVICE_UNAVAILABLE,
-                          description = "Tobira is not configured (correctly)") })
+      name = "removeSeriesTobiraPath",
+      description = "Removes the path of the given series in a connected Tobira instance",
+      returnDescription = "Status code",
+      pathParameters = {
+          @RestParameter(
+              name = "seriesId",
+              isRequired = true,
+              description = "The series id",
+              type = STRING),
+          @RestParameter(
+              name = "currentPath",
+              isRequired = true,
+              description = "URL encoded path where the series is currently mounted.",
+              type = STRING) },
+      responses = {
+          @RestResponse(
+              responseCode = SC_OK,
+              description = "The path of the series has successfully been removed in Tobira."),
+          @RestResponse(
+              responseCode = SC_NOT_FOUND,
+              description = "Tobira doesn't know about the given series"),
+          @RestResponse(
+              responseCode = SC_SERVICE_UNAVAILABLE,
+              description = "Tobira is not configured (correctly)") })
   public Response removeSeriesTobiraPath(
-    @PathParam("seriesId") String seriesId,
-    @PathParam("currentPath") String currentPath
+      @PathParam("seriesId") String seriesId,
+      @PathParam("currentPath") String currentPath
   ) throws IOException, InterruptedException {
     var tobira = getTobira();
     if (!tobira.ready()) {
@@ -1273,16 +1443,28 @@ public Response getSeriesHostPages(@PathParam("seriesId") String seriesId) {
 
   @POST
   @Path("/{seriesId}/access")
-  @RestQuery(name = "applyAclToSeries", description = "Immediate application of an ACL to a series", returnDescription = "Status code", pathParameters = { @RestParameter(name = "seriesId", isRequired = true, description = "The series ID", type = STRING) }, restParameters = {
+  @RestQuery(
+      name = "applyAclToSeries",
+      description = "Immediate application of an ACL to a series",
+      returnDescription = "Status code",
+      pathParameters = {
+          @RestParameter(name = "seriesId", isRequired = true, description = "The series ID", type = STRING)
+      },
+      restParameters = {
           @RestParameter(name = "acl", isRequired = true, description = "The ACL to apply", type = STRING),
-          @RestParameter(name = "override", isRequired = false, defaultValue = "false", description = "If true the series ACL will take precedence over any existing episode ACL", type = BOOLEAN) }, responses = {
+          @RestParameter(name = "override", isRequired = false, defaultValue = "false", description = "If true the "
+              + "series ACL will take precedence over any existing episode ACL", type = BOOLEAN)
+      },
+      responses = {
           @RestResponse(responseCode = SC_OK, description = "The ACL has been successfully applied"),
           @RestResponse(responseCode = SC_BAD_REQUEST, description = "Unable to parse the given ACL"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "The series has not been found"),
           @RestResponse(responseCode = SC_INTERNAL_SERVER_ERROR, description = "Internal error"),
-          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to perform this action") })
+          @RestResponse(responseCode = SC_UNAUTHORIZED, description = "If the current user is not authorized to "
+              + "perform this action")
+      })
   public Response applyAclToSeries(@PathParam("seriesId") String seriesId, @FormParam("acl") String acl,
-          @DefaultValue("false") @FormParam("override") boolean override) throws SearchIndexException {
+      @DefaultValue("false") @FormParam("override") boolean override) throws SearchIndexException {
 
     AccessControlList accessControlList;
     try {
@@ -1297,9 +1479,11 @@ public Response getSeriesHostPages(@PathParam("seriesId") String seriesId) {
       return badRequest();
     }
 
-    Optional<Series> series = searchIndex.getSeries(seriesId, securityService.getOrganization().getId(), securityService.getUser());
-    if (series.isEmpty())
+    Optional<Series> series = searchIndex.getSeries(seriesId, securityService.getOrganization().getId(),
+        securityService.getUser());
+    if (series.isEmpty()) {
       return notFound("Cannot find a series with id {}", seriesId);
+    }
 
     if (hasProcessingEvents(seriesId)) {
       logger.warn("Can not update the ACL from series {}. Events being part of the series are currently processed.",
@@ -1351,19 +1535,30 @@ public Response getSeriesHostPages(@PathParam("seriesId") String seriesId) {
   @GET
   @Path("{seriesId}/hasEvents.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "hasEvents", description = "Check if given series has events", returnDescription = "true if series has events, otherwise false", pathParameters = {
-    @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier", type = Type.STRING) }, responses = {
-    @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required form params were missing in the request."),
-    @RestResponse(responseCode = SC_NOT_FOUND, description = "If the series has not been found."),
-    @RestResponse(responseCode = SC_OK, description = "The access information ") })
+  @RestQuery(
+      name = "hasEvents",
+      description = "Check if given series has events",
+      returnDescription = "true if series has events, otherwise false",
+      pathParameters = {
+          @RestParameter(name = "seriesId", isRequired = true, description = "The series identifier",
+              type = Type.STRING)
+      },
+      responses = {
+          @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required form params were missing in the "
+              + "request."),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "If the series has not been found."),
+          @RestResponse(responseCode = SC_OK, description = "The access information ")
+      })
   public Response getSeriesEvents(@PathParam("seriesId") String seriesId) throws Exception {
-    if (StringUtils.isBlank(seriesId))
+    if (StringUtils.isBlank(seriesId)) {
       return RestUtil.R.badRequest("Path parameter series ID is missing");
+    }
 
     long elementsCount = 0;
 
     try {
-      EventSearchQuery query = new EventSearchQuery(securityService.getOrganization().getId(), securityService.getUser());
+      EventSearchQuery query = new EventSearchQuery(securityService.getOrganization().getId(),
+          securityService.getUser());
       query.withSeriesId(seriesId);
       SearchResult<Event> result = searchIndex.getByQuery(query);
       elementsCount = result.getHitCount();
@@ -1380,10 +1575,16 @@ public Response getSeriesHostPages(@PathParam("seriesId") String seriesId) {
   @GET
   @Path("configuration.json")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getseriesconfiguration", description = "Get the series configuration", returnDescription = "List of configuration keys", responses = {
-    @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required form params were missing in the request."),
-    @RestResponse(responseCode = SC_NOT_FOUND, description = "If the series has not been found."),
-    @RestResponse(responseCode = SC_OK, description = "The access information ") })
+  @RestQuery(
+      name = "getseriesconfiguration",
+      description = "Get the series configuration",
+      returnDescription = "List of configuration keys",
+      responses = {
+          @RestResponse(responseCode = SC_BAD_REQUEST, description = "The required form params were missing in the "
+              + "request."),
+          @RestResponse(responseCode = SC_NOT_FOUND, description = "If the series has not been found."),
+          @RestResponse(responseCode = SC_OK, description = "The access information ")
+      })
   public Response getSeriesOptions() {
     JSONObject jsonReturnObj = new JSONObject();
     jsonReturnObj.put("deleteSeriesWithEventsAllowed", deleteSeriesWithEventsAllowed);

@@ -56,7 +56,9 @@ public interface ThrowingConsumer<T, E extends Throwable> {
    */
   default ThrowingConsumer<T, ? extends Throwable> andThen(ThrowingConsumer<? super T, ? extends Throwable> after) {
     Objects.requireNonNull(after);
-    return (T t) -> { accept(t); after.accept(t); };
+    return (T t) -> {
+      accept(t); after.accept(t);
+    };
   }
 
   /**
@@ -73,6 +75,8 @@ public interface ThrowingConsumer<T, E extends Throwable> {
    */
   default ThrowingConsumer<T, ? extends Throwable> andThen(Consumer<? super T> after) {
     Objects.requireNonNull(after);
-    return (T t) -> { accept(t); after.accept(t); };
+    return (T t) -> {
+      accept(t); after.accept(t);
+    };
   }
 }

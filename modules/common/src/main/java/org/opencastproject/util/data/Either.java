@@ -45,7 +45,10 @@ public abstract class Either<A, B> {
 
   public abstract <X> X fold(Match<A, B, X> visitor);
 
-  public abstract <X> X fold(java.util.function.Function<? super A, ? extends X> left, java.util.function.Function<? super B, ? extends X> right);
+  public abstract <X> X fold(
+      java.util.function.Function<? super A, ? extends X> left,
+      java.util.function.Function<? super B, ? extends X> right
+  );
 
   public abstract boolean isLeft();
 
@@ -165,7 +168,10 @@ public abstract class Either<A, B> {
       }
 
       @Override
-      public <C> C fold(java.util.function.Function<? super A, ? extends C> leftf, java.util.function.Function<? super B, ? extends C> rightf) {
+      public <C> C fold(
+          java.util.function.Function<? super A, ? extends C> leftf,
+          java.util.function.Function<? super B, ? extends C> rightf
+      ) {
         return leftf.apply(left);
       }
 
@@ -256,7 +262,10 @@ public abstract class Either<A, B> {
       }
 
       @Override
-      public <X> X fold(java.util.function.Function<? super A, ? extends X> leftf, java.util.function.Function<? super B, ? extends X> rightf) {
+      public <X> X fold(
+          java.util.function.Function<? super A, ? extends X> leftf,
+          java.util.function.Function<? super B, ? extends X> rightf
+      ) {
         return rightf.apply(right);
       }
 

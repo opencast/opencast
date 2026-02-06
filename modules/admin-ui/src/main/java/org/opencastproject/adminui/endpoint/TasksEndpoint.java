@@ -75,26 +75,29 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 @Path("/admin-ng/tasks")
-@RestService(name = "TasksService", title = "UI Tasks",
-  abstractText = "Provides resources and operations related to the tasks",
-  notes = { "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
-            "If the service is down or not working it will return a status 503, this means the the underlying service is "
-              + "not working and is either restarting or has failed",
-            "A status code 500 means a general failure has occurred which is not recoverable and was not anticipated. In "
-              + "other words, there is a bug! You should file an error report with your server logs from the time when the "
-              + "error occurred: <a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>",
-            "<strong>Important:</strong> "
-              + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
-              + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
-              + "DO NOT use this for integration of third-party applications.<em>"})
+@RestService(
+    name = "TasksService",
+    title = "UI Tasks",
+    abstractText = "Provides resources and operations related to the tasks",
+    notes = { "All paths above are relative to the REST endpoint base (something like http://your.server/files)",
+              "If the service is down or not working it will return a status 503, this means the the underlying "
+                  + "service is not working and is either restarting or has failed",
+              "A status code 500 means a general failure has occurred which is not recoverable and was not "
+                  + "anticipated. In other words, there is a bug! You should file an error report with your server "
+                  + "logs from the time when the error occurred: "
+                  + "<a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>",
+              "<strong>Important:</strong> "
+                  + "<em>This service is for exclusive use by the module admin-ui. Its API might change "
+                  + "anytime without prior notice. Any dependencies other than the admin UI will be strictly ignored. "
+                  + "DO NOT use this for integration of third-party applications.<em>"})
 @Component(
-  immediate = true,
-  service = TasksEndpoint.class,
-  property = {
-    "service.description=Admin UI - Tasks facade Endpoint",
-    "opencast.service.type=org.opencastproject.adminui.endpoint.TasksEndpoint",
-    "opencast.service.path=/admin-ng/tasks"
-  }
+    immediate = true,
+    service = TasksEndpoint.class,
+    property = {
+        "service.description=Admin UI - Tasks facade Endpoint",
+        "opencast.service.type=org.opencastproject.adminui.endpoint.TasksEndpoint",
+        "opencast.service.path=/admin-ng/tasks"
+    }
 )
 @JaxrsResource
 public class TasksEndpoint {
@@ -124,7 +127,18 @@ public class TasksEndpoint {
 
   @GET
   @Path("processing.json")
-  @RestQuery(name = "getProcessing", description = "Returns all the data related to the processing tab in the new tasks modal as JSON", returnDescription = "All the data related to the tasks processing tab as JSON", restParameters = { @RestParameter(name = "tags", isRequired = false, description = "A comma separated list of tags to filter the workflow definitions", type = RestParameter.Type.STRING) }, responses = { @RestResponse(responseCode = SC_OK, description = "Returns all the data related to the tasks processing tab as JSON") })
+  @RestQuery(
+      name = "getProcessing",
+      description = "Returns all the data related to the processing tab in the new tasks modal as JSON",
+      returnDescription = "All the data related to the tasks processing tab as JSON",
+      restParameters = {
+          @RestParameter(name = "tags", isRequired = false, description = "A comma separated list of tags to filter "
+              + "the workflow definitions", type = RestParameter.Type.STRING)
+      },
+      responses = {
+          @RestResponse(responseCode = SC_OK, description = "Returns all the data related to the tasks processing tab "
+              + "as JSON")
+      })
   public Response getProcessing(@QueryParam("tags") String tagsString) {
     List<String> tags = RestUtil.splitCommaSeparatedParam(Optional.ofNullable(tagsString));
 
@@ -165,11 +179,13 @@ public class TasksEndpoint {
                   + "    \"ID-dual-stream-demo\":{\"workflowVar\":\"true\"},\n"
                   + "    \"ID-about-opencast\":{\"workflowVar\":\"true\"}\n"
                   + "  }\n"
-                  + "}</pre></code>", type = RestParameter.Type.TEXT) },
+                  + "}</pre></code>", type = RestParameter.Type.TEXT)
+      },
       responses = {
           @RestResponse(responseCode = HttpServletResponse.SC_CREATED, description = "Task sucessfully added"),
           @RestResponse(responseCode = SC_NOT_FOUND, description = "If the workflow definition is not found"),
-          @RestResponse(responseCode = SC_BAD_REQUEST, description = "If the metadata is not set or couldn't be parsed") })
+          @RestResponse(responseCode = SC_BAD_REQUEST, description = "If the metadata is not set or couldn't be parsed")
+      })
   public Response createNewTask(@FormParam("metadata") String metadata) throws NotFoundException {
     if (StringUtils.isBlank(metadata)) {
       logger.warn("No metadata set");
@@ -185,10 +201,12 @@ public class TasksEndpoint {
     }
 
     String workflowId = (String) metadataJson.get("workflow");
-    if (StringUtils.isBlank(workflowId))
+    if (StringUtils.isBlank(workflowId)) {
       return RestUtil.R.badRequest("No workflow set");
+    }
 
-    Map<String, Map<String, String>> configuration = (Map<String, Map<String, String>>) metadataJson.get("configuration");
+    Map<String, Map<String, String>> configuration = (Map<String, Map<String, String>>) metadataJson
+        .get("configuration");
     if (configuration == null) {
       return RestUtil.R.badRequest("No events set");
     }

@@ -53,9 +53,11 @@ public interface Permissions {
     }
 
     public static Action getEnum(String value) {
-      for (Action v : values())
-        if (v.getValue().equalsIgnoreCase(value))
+      for (Action v : values()) {
+        if (v.getValue().equalsIgnoreCase(value)) {
           return v;
+        }
+      }
       throw new IllegalArgumentException();
     }
 
