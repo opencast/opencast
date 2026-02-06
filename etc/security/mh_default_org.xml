@@ -556,7 +556,7 @@
         <value>/engage-player/</value>
         <value>/ltitools</value>
         <value>/ltitools/</value>
-        <value>/paella7/ui/auth.html</value>
+        <value>/paella*/ui/auth.html</value>
       </list>
     </property>
   </bean>
