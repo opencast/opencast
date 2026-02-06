@@ -32,8 +32,11 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.sql.Connection;
+import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLInvalidAuthorizationSpecException;
+import java.sql.SQLNonTransientConnectionException;
 import java.sql.Statement;
 import java.util.Hashtable;
 
@@ -149,21 +152,11 @@ public class Activator implements BundleActivator {
       pooledDataSource.setIdleConnectionTestPeriod(idleConnectionTestPeriod);
     }
 
-    Connection connection = null;
-    try {
-      logger.info("Testing connectivity to database at {}", jdbcUrl);
-      connection = pooledDataSource.getConnection();
-      Hashtable<String, String> dsProps = new Hashtable<>();
-      dsProps.put("osgi.jndi.service.name", "jdbc/opencast");
-      datasourceRegistration = bundleContext.registerService(DataSource.class.getName(), pooledDataSource, dsProps);
-    } catch (SQLException e) {
-      logger.error("Connection attempt to {} failed", jdbcUrl, e);
-      throw e;
-    } finally {
-      if (connection != null) {
-        connection.close();
-      }
-    }
+    // Tests database connection and retry until database is available
+    waitUntilDatabaseIsAvailable(jdbcDriver, jdbcUrl, jdbcUser, jdbcPass);
+    Hashtable<String, String> dsProps = new Hashtable<>();
+    dsProps.put("osgi.jndi.service.name", "jdbc/opencast");
+    datasourceRegistration = bundleContext.registerService(DataSource.class.getName(), pooledDataSource, dsProps);
 
     logger.info("Database connection pool established at {}", jdbcUrl);
     logger.info("Database connection pool parameters: max.size={}, min.size={}, max.idle.time={}",
@@ -196,6 +189,49 @@ public class Activator implements BundleActivator {
       }
     }
 
+  }
+
+  /**
+   * Attempts to establish a simple connection to the database. This method will retry if the connection attempt fails.
+   *
+   * @param jdbcDriver The JDBC driver class
+   * @param jdbcUrl The JDBC URL
+   * @param jdbcUser The JDBC user
+   * @param jdbcPass The JDBC password
+   */
+  private void waitUntilDatabaseIsAvailable(String jdbcDriver, String jdbcUrl, String jdbcUser, String jdbcPass) {
+    logger.info("Testing connectivity to database at {}", jdbcUrl);
+
+    // Load the JDBC driver for our basic connection test
+    try {
+      Class.forName(jdbcDriver);
+    } catch (ClassNotFoundException e) {
+      logger.error("Couldn't load JDBC Driver {} for initial connection test", jdbcDriver);
+      throw new RuntimeException(e);
+    }
+
+    boolean connectionEstablished = false;
+    try {
+      while (!connectionEstablished) {
+        try (Connection connection = DriverManager.getConnection(jdbcUrl, jdbcUser, jdbcPass)) {
+          connectionEstablished = connection != null && !connection.isClosed();
+        } catch (SQLInvalidAuthorizationSpecException e) {
+          // Invalid credentials
+          throw new RuntimeException(
+              "Couldn't connect to database. Probably invalid database credentials. " + "Check you config.", e);
+        } catch (SQLNonTransientConnectionException e) {
+          // Connection failed, database is not reachable (yet? maybe its just starting up, so we wait)
+          logger.error("Database connection attempt failed, message: {}", e.getMessage());
+          logger.error("Retrying to connect to database in 10 seconds...");
+          Thread.sleep(10000);
+        } catch (SQLException e) {
+          // Unexpected exception
+          throw new RuntimeException("Unexpected SQL exception while connecting to the database", e);
+        }
+      }
+    } catch (Exception e) {
+      throw new RuntimeException("Unexpected exception while connecting to the database", e);
+    }
   }
 
   private void runUpdate(Statement statement, String sql) throws RuntimeException, SQLException {
