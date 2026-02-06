@@ -94,7 +94,7 @@ jobs:
           ./mvnw site:stage -Pnone
 
       - name: Save site build
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         if: >
           github.event_name == 'push'
           && github.repository_owner == 'opencast'
@@ -104,7 +104,7 @@ jobs:
           path: target/staging
 
       - name: Save assets build
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         if: >
           github.event_name == 'push'
           && github.repository_owner == 'opencast'
