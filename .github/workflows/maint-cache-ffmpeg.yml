@@ -17,6 +17,7 @@ jobs:
           - autobuild
     name: Get FFmpeg (${{ matrix.release }} ${{ matrix.arch }})
     runs-on: ubuntu-latest
+    if: github.repository == 'opencast/opencast'
     steps:
       - name: Install s3cmd
         run: |
