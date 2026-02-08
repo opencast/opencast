@@ -376,13 +376,18 @@ public class Database {
   public Optional<AssetDtos.Full> findAssetByChecksumAndStoreAndOrg(final String checksum, final String storeId,
       final String orgId) {
     return db.execTx(em -> {
-      return namedQuery.findOpt(
+      return namedQuery.findSome(
               "Asset.findByChecksumStorageIdAndOrganizationId",
+              // limit to one result (which one doesn't matter as the checksum, storage and org ID are equal)
+              0,
+              1,
               AssetDto.class,
               Pair.of("checksum", checksum),
               Pair.of("storageId", storeId),
               Pair.of("orgId", orgId))
           .apply(em)
+          .stream()
+          .findFirst()
           .map(result -> {
             SnapshotDto snapshot = result.getSnapshot();
             return new AssetDtos.Full(
