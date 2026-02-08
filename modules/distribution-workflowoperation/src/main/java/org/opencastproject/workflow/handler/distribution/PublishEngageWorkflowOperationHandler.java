@@ -452,7 +452,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
 
         // Add published elements
         for (MediaPackageElement element : mediaPackageElements) {
-          element.setIdentifier(null);
+          element.generateIdentifier();
           PublicationImpl.addElementToPublication(publicationElement, element);
         }
 
@@ -582,7 +582,7 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
           MediaPackageElement sourceElement = mp.getElementById(sourceElementId);
 
           // Make sure the mediapackage is prompted to create a new identifier for this element
-          distributedElement.setIdentifier(null);
+          distributedElement.generateIdentifier();
           if (sourceElement != null) {
             // Adjust the flavor and tags for downloadable elements
             if (downloadElementIds.contains(sourceElementId)) {

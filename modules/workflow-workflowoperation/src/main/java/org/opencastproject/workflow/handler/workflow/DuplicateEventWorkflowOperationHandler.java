@@ -441,11 +441,8 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
     });
   }
 
-  private void updateTags(
-      MediaPackageElement element,
-      ConfiguredTagsAndFlavors.TargetTags targetTags) {
-    element.setIdentifier(null);
-
+  private void updateTags(MediaPackageElement element, ConfiguredTagsAndFlavors.TargetTags targetTags) {
+    element.generateIdentifier();
     applyTargetTagsToElement(targetTags, element);
   }
 
@@ -504,7 +501,7 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
           final URI tmpUri = workspace.put(destination.getIdentifier().toString(), element.getIdentifier(),
               FilenameUtils.getName(element.getURI().toString()), inputStream);
           temporaryFiles.add(tmpUri);
-          element.setIdentifier(null);
+          element.generateIdentifier();
           element.setURI(tmpUri);
         }
 
@@ -543,7 +540,7 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
       final Date creationDate
   ) throws WorkflowOperationException {
     final DublinCoreCatalog destinationDublinCore = DublinCoreUtil.loadEpisodeDublinCore(workspace, source).get();
-    destinationDublinCore.setIdentifier(null);
+    destinationDublinCore.generateIdentifier();
     destinationDublinCore.setURI(sourceDublinCore.getURI());
     destinationDublinCore.set(DublinCore.PROPERTY_CREATED,
         OpencastMetadataCodec.encodeDate(creationDate, Precision.Second));

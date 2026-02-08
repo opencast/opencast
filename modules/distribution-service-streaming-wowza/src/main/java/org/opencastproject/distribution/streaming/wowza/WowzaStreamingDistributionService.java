@@ -776,7 +776,7 @@ public class WowzaStreamingDistributionService extends AbstractDistributionServi
     setTransport(track, protocol);
     track.setURI(getStreamingUri(smilUri, protocol));
     track.referTo(element);
-    track.setIdentifier(null);
+    track.generateIdentifier();
     track.setAudio(null);
     track.setVideo(null);
     track.setChecksum(null);
