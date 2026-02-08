@@ -299,9 +299,8 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
       logger.warn("No tracks found for concating operation, skipping concatenation!");
       return createResult(mediaPackage, Action.SKIP);
     } else if (tracks.size() == 1) {
-      Track track = (Track) tracks.get(0).clone();
-      track.setIdentifier(null);
-      addNewTrack(mediaPackage, track, targetTagsOption, targetFlavor);
+      Track copiedTrack = (Track) createDerivedMediaPackageElementFrom(tracks.getFirst());
+      addNewTrack(mediaPackage, copiedTrack, targetTagsOption, targetFlavor);
       logger.info("At least two tracks are needed for the concating operation, skipping concatenation!");
       return createResult(mediaPackage, Action.SKIP);
     }

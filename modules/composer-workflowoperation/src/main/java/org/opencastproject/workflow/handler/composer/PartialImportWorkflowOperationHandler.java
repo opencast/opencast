@@ -59,7 +59,6 @@ import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -76,8 +75,6 @@ import org.w3c.dom.smil.SMILParElement;
 import org.xml.sax.SAXException;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
@@ -841,23 +838,10 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
 
   private void copyPartialToSource(MediaPackage mediaPackage, MediaPackageElementFlavor targetFlavor, Track track)
           throws NotFoundException, IOException {
-    FileInputStream in = null;
-    try {
-      Track copyTrack = (Track) track.clone();
-      File originalFile = workspace.get(copyTrack.getURI());
-      in = new FileInputStream(originalFile);
-
-      copyTrack.generateIdentifier();
-      copyTrack.setURI(workspace.put(mediaPackage.getIdentifier().toString(), copyTrack.getIdentifier(),
-              FilenameUtils.getName(copyTrack.getURI().toString()), in));
-      copyTrack.setFlavor(targetFlavor);
-      copyTrack.referTo(track);
-      mediaPackage.add(copyTrack);
-      logger.info("Copied partial source element {} to {} with target flavor {}", track.toString(),
-              copyTrack.toString(), targetFlavor.toString());
-    } finally {
-      IOUtils.closeQuietly(in);
-    }
+    Track copyTrack = (Track) createDerivedMediaPackageElementFrom(track);
+    copyTrack.setFlavor(targetFlavor);
+    mediaPackage.add(copyTrack);
+    logger.info("Copied partial source element {} to {} with target flavor {}", track, copyTrack, targetFlavor);
   }
 
   /**

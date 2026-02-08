@@ -30,6 +30,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -42,6 +43,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -146,6 +148,21 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
       }
     }
     return list;
+  }
+
+  protected MediaPackageElement createDerivedMediaPackageElementFrom(MediaPackageElement source)
+          throws NotFoundException, IOException {
+    MediaPackageElement derived = (MediaPackageElement) source.clone();
+    derived.generateIdentifier();
+    derived.referTo(source);
+    // copy file
+    derived.setURI(workspace.put(
+        source.getMediaPackage().getIdentifier().toString(),
+        derived.getIdentifier(),
+        getFileNameFromElements(source, derived),
+        workspace.read(source.getURI())
+    ));
+    return derived;
   }
 
   /**

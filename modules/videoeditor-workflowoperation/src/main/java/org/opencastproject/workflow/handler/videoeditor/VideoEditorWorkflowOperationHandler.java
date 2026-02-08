@@ -361,15 +361,18 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
 
     Collection<Track> sourceTracks = trackSelector.select(mp, false);
 
-    for (Track sourceTrack : sourceTracks) {
-      // Set target track flavor
-      Track clonedTrack = (Track) sourceTrack.clone();
-      clonedTrack.setIdentifier(null);
-      // Use the same URI as the original
-      clonedTrack.setURI(sourceTrack.getURI());
-      clonedTrack
-              .setFlavor(new MediaPackageElementFlavor(sourceTrack.getFlavor().getType(), targetFlavorSubTypeProperty));
-      mp.addDerived(clonedTrack, sourceTrack);
+    try {
+      for (Track sourceTrack : sourceTracks) {
+        // Set target track flavor
+        Track clonedTrack = (Track) createDerivedMediaPackageElementFrom(sourceTrack);
+        clonedTrack.setFlavor(new MediaPackageElementFlavor(
+            sourceTrack.getFlavor().getType(),
+            targetFlavorSubTypeProperty
+        ));
+        mp.addDerived(clonedTrack, sourceTrack);
+      }
+    } catch (NotFoundException | IOException e) {
+      throw new WorkflowOperationException(e);
     }
 
     return createResult(mp, Action.SKIP);

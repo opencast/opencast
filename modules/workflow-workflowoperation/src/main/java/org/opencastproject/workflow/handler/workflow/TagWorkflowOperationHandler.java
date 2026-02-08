@@ -27,6 +27,7 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
 import org.opencastproject.workflow.api.WorkflowInstance;
@@ -42,6 +43,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 
@@ -121,9 +123,11 @@ public class TagWorkflowOperationHandler extends AbstractWorkflowOperationHandle
     for (MediaPackageElement e : elements) {
       MediaPackageElement element = e;
       if (copy) {
-        element = (MediaPackageElement) e.clone();
-        element.setIdentifier(null);
-        element.setURI(e.getURI()); // use the same URI as the original
+        try {
+          element = createDerivedMediaPackageElementFrom(e);
+        } catch (NotFoundException | IOException ex) {
+          throw new WorkflowOperationException(ex);
+        }
       }
 
       if (!configuredTargetFlavor.isEmpty()) {

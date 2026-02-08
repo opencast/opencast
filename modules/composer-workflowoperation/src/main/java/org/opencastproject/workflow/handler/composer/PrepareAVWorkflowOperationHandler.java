@@ -228,8 +228,7 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
         }
         composedTrack = prepare(videoTrack, mediaPackage, videoOnlyEncodingProfileName);
       } else {
-        composedTrack = (Track) videoTrack.clone();
-        composedTrack.setIdentifier(null);
+        composedTrack = (Track) createDerivedMediaPackageElementFrom(videoTrack);
         mediaPackage.add(composedTrack);
       }
     } else if (videoTrack == null && audioTrack != null) {
@@ -245,8 +244,7 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
         }
         composedTrack = prepare(audioTrack, mediaPackage, audioOnlyEncodingProfileName);
       } else {
-        composedTrack = (Track) audioTrack.clone();
-        composedTrack.setIdentifier(null);
+        composedTrack = (Track) createDerivedMediaPackageElementFrom(audioTrack);
         mediaPackage.add(composedTrack);
       }
     } else if (audioTrack == videoTrack) {
@@ -262,8 +260,7 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
         }
         composedTrack = prepare(videoTrack, mediaPackage, audioVideoEncodingProfileName);
       } else {
-        composedTrack = (Track) videoTrack.clone();
-        composedTrack.setIdentifier(null);
+        composedTrack = (Track) createDerivedMediaPackageElementFrom(videoTrack);
         mediaPackage.add(composedTrack);
       }
     } else {
