@@ -83,9 +83,6 @@ public class ImageConvertWorkflowOperationHandler extends AbstractWorkflowOperat
   /** The composer service */
   private ComposerService composerService = null;
 
-  /** The workspace */
-  private Workspace workspace = null;
-
   /**
    * Callback for the OSGi declarative services configuration.
    *

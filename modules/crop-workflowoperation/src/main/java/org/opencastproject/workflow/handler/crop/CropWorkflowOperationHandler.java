@@ -79,9 +79,6 @@ public class CropWorkflowOperationHandler extends AbstractWorkflowOperationHandl
   /** The composer service */
   private CropService cropService = null;
 
-  /** The local workspace */
-  private Workspace workspace = null;
-
   /**
    * {@inheritDoc}
    *

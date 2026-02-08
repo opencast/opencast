@@ -31,6 +31,7 @@ import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
+import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -63,6 +64,9 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
 
   /** Optional service registry */
   protected ServiceRegistry serviceRegistry = null;
+
+  /** Optional workspace */
+  protected Workspace workspace = null;
 
   /** The JobBarrier polling interval */
   private long jobBarrierPollingInterval = JobBarrier.DEFAULT_POLLING_INTERVAL;

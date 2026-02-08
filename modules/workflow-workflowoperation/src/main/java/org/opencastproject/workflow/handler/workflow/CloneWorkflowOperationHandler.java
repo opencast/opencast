@@ -79,9 +79,6 @@ public class CloneWorkflowOperationHandler extends AbstractWorkflowOperationHand
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(CloneWorkflowOperationHandler.class);
 
-  /** The workspace reference */
-  protected Workspace workspace = null;
-
   /**
    * Callback for the OSGi environment to set the workspace reference.
    *

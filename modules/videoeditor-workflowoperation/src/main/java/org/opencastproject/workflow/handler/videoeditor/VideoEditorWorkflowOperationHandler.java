@@ -139,10 +139,6 @@ public class VideoEditorWorkflowOperationHandler extends ResumableWorkflowOperat
    * The VideoEditor service to edit files.
    */
   private VideoEditorService videoEditorService;
-  /**
-   * The workspace.
-   */
-  private Workspace workspace;
 
   @Override
   @Activate

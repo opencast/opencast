@@ -81,9 +81,6 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
   /** The composer service */
   private ComposerService composerService = null;
 
-  /** The local workspace */
-  private Workspace workspace = null;
-
   private enum AudioMuxing {
     NONE, FORCE, DUPLICATE;
 

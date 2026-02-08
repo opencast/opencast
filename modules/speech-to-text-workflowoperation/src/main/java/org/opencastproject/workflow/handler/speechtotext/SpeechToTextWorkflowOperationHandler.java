@@ -133,9 +133,6 @@ public class
   /** The speech-to-text service. */
   private SpeechToTextService speechToTextService = null;
 
-  /** The workspace service. */
-  private Workspace workspace;
-
   /** The inspection service. */
   private MediaInspectionService mediaInspectionService;
 

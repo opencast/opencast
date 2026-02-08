@@ -76,9 +76,6 @@ public class ImportWorkflowPropertiesWOH extends AbstractWorkflowOperationHandle
 
   private static final Logger logger = LoggerFactory.getLogger(ImportWorkflowPropertiesWOH.class);
 
-  /* Service references */
-  private Workspace workspace;
-
   /** OSGi DI */
   @Reference
   void setWorkspace(Workspace workspace) {

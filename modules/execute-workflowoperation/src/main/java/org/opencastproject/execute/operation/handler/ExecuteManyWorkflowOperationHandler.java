@@ -131,9 +131,6 @@ public class ExecuteManyWorkflowOperationHandler extends AbstractWorkflowOperati
   /** Reference to the media inspection service */
   private MediaInspectionService inspectionService = null;
 
-  /** The workspace service */
-  protected Workspace workspace;
-
   /**
    * {@inheritDoc}
    *

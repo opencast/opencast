@@ -87,9 +87,6 @@ public class MultiEncodeWorkflowOperationHandler extends AbstractWorkflowOperati
   /** The composer service */
   private ComposerService composerService = null;
 
-  /** The local workspace */
-  private Workspace workspace = null;
-
   @Activate
   public void activate(ComponentContext cc) {
     super.activate(cc);

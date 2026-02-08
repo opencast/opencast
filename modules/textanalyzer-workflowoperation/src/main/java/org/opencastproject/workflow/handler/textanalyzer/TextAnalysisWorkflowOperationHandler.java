@@ -121,9 +121,6 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
   /** The stability threshold */
   private int stabilityThreshold = DEFAULT_STABILITY_THRESHOLD;
 
-  /** The local workspace */
-  private Workspace workspace = null;
-
   /** The mpeg7 catalog service */
   private Mpeg7CatalogService mpeg7CatalogService = null;
 

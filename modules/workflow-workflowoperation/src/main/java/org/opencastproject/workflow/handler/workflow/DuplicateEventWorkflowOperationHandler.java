@@ -169,9 +169,6 @@ public class DuplicateEventWorkflowOperationHandler extends AbstractWorkflowOper
   /** AssetManager to use for creating new media packages. */
   private AssetManager assetManager;
 
-  /** The workspace to use for retrieving and storing files. */
-  protected Workspace workspace;
-
   /** The distribution service */
   protected DistributionService distributionService;
 

@@ -89,9 +89,6 @@ public class TagByDublinCoreTermWOH extends ResumableWorkflowOperationHandlerBas
   /** Name of the configuration option that provides the copy boolean we are looking for */
   public static final String COPY_PROPERTY = "copy";
 
-  /** The local workspace */
-  private Workspace workspace = null;
-
   /**
    * Callback for declarative services configuration that will introduce us to the local workspace service.
    * Implementation assumes that the reference is configured as being static.

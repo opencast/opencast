@@ -149,8 +149,6 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   /** The search service */
   private SearchService searchService = null;
 
-  private Workspace workspace;
-
   /** The server url */
   private URL serverUrl;
 
