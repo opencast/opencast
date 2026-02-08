@@ -190,7 +190,7 @@ public class Database {
           Pair.of("storageId", storageId),
           Pair.of("version", version.value()),
           Pair.of("mediaPackageId", mpId)
-      );
+      ).apply(em);
 
       // Update asset
       Optional<SnapshotDtos.Medium> optSnapshot = getSnapshot(version, mpId);
