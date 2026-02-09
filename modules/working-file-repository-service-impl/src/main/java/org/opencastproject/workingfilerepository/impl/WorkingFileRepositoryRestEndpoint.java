@@ -102,7 +102,12 @@ import javax.ws.rs.core.Response;
       "opencast.service.path=/files"
     },
     immediate = true,
-    service = { WorkingFileRepositoryRestEndpoint.class, WorkingFileRepository.class, PathMappable.class, StorageUsage.class }
+    service = {
+            WorkingFileRepositoryRestEndpoint.class,
+            WorkingFileRepository.class,
+            PathMappable.class,
+            StorageUsage.class
+    }
 )
 @JaxrsResource
 public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl {
