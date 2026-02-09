@@ -23,6 +23,7 @@ package org.opencastproject.assetmanager.storage.impl.fs;
 import static org.opencastproject.util.IoSupport.file;
 
 import org.opencastproject.assetmanager.api.storage.AssetStore;
+import org.opencastproject.storage.StorageUsage;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.google.common.cache.CacheBuilder;
@@ -59,7 +60,7 @@ import javax.naming.ConfigurationException;
     "store.type=local-filesystem"
     },
     immediate = true,
-    service = { AssetStore.class }
+    service = { AssetStore.class, StorageUsage.class }
 )
 public class OsgiFileSystemAssetStore extends AbstractFileSystemAssetStore {
   /** Log facility */

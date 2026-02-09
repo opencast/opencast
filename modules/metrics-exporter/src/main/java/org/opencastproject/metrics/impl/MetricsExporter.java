@@ -28,6 +28,7 @@ import org.opencastproject.serviceregistry.api.ServiceRegistration;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceState;
 import org.opencastproject.serviceregistry.api.SystemLoad;
+import org.opencastproject.storage.StorageUsage;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
@@ -44,8 +45,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
@@ -88,6 +91,8 @@ public class MetricsExporter {
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(MetricsExporter.class);
 
+  private final List<StorageUsage> storageUsageImplementations = new ArrayList<>();
+
   // Prometheus metrics registry for exposing metrics
   private final CollectorRegistry registry = CollectorRegistry.defaultRegistry;
 
@@ -124,6 +129,11 @@ public class MetricsExporter {
       .name("opencast_version")
       .help("Version of Opencast (based on metrics module)")
       .labelNames("part")
+      .register();
+  private final Gauge storageAvailable = Gauge.build()
+      .name("opencast_storage_available")
+      .help("Shows available and used up space of different directories of Opencast.")
+      .labelNames("storage")
       .register();
   private Gauge eventsInAssetManager;
 
@@ -196,6 +206,13 @@ public class MetricsExporter {
       }
     }
 
+    for (StorageUsage storageUsageImplementation : storageUsageImplementations) {
+      String prefix = storageUsageImplementation.getClass().getSimpleName() + "_";
+      storageAvailable.labels(prefix + "totalSpace").set(storageUsageImplementation.getTotalSpace().orElse(-1L));
+      storageAvailable.labels(prefix + "usableSpace").set(storageUsageImplementation.getUsableSpace().orElse(-1L));
+      storageAvailable.labels(prefix + "usedSpace").set(storageUsageImplementation.getUsedSpace().orElse(-1L));
+    }
+
     // collect metrics
     final StringWriter writer = new StringWriter();
     TextFormat.writeOpenMetrics100(writer, registry.metricFamilySamples());
@@ -205,6 +222,19 @@ public class MetricsExporter {
   @Reference
   public void setServiceRegistry(ServiceRegistry service) {
     this.serviceRegistry = service;
+  }
+
+  @Reference(
+      cardinality = ReferenceCardinality.MULTIPLE,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "removeStorageUsage"
+  )
+  protected synchronized void addStorageUsage(StorageUsage storageUsageImplementation) {
+    storageUsageImplementations.add(storageUsageImplementation);
+  }
+
+  protected synchronized void removeStorageUsage(StorageUsage storageUsageImplementation) {
+    storageUsageImplementations.remove(storageUsageImplementation);
   }
 
   @Reference

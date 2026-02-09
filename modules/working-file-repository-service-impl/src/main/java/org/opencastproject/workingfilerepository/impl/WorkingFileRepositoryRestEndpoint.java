@@ -34,6 +34,7 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.storage.StorageUsage;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UnknownFileTypeException;
@@ -101,7 +102,7 @@ import javax.ws.rs.core.Response;
       "opencast.service.path=/files"
     },
     immediate = true,
-    service = { WorkingFileRepositoryRestEndpoint.class, WorkingFileRepository.class, PathMappable.class }
+    service = { WorkingFileRepositoryRestEndpoint.class, WorkingFileRepository.class, PathMappable.class, StorageUsage.class }
 )
 @JaxrsResource
 public class WorkingFileRepositoryRestEndpoint extends WorkingFileRepositoryImpl {
