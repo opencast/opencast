@@ -1433,7 +1433,8 @@ public class SchedulerServiceImplTest {
     EasyMock.expect(index.getIndexName()).andReturn("index").anyTimes();
     EasyMock.expect(index.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result).anyTimes();
     expect(index.addOrUpdateEvent(EasyMock.anyString(), EasyMock.anyObject(java.util.function.Function.class),
-            EasyMock.anyObject(Organization.class), EasyMock.anyObject(User.class))).andReturn(Optional.empty()).times(orgList.size());
+            EasyMock.anyObject(Organization.class), EasyMock.anyObject(User.class))).andReturn(Optional.empty())
+        .times(orgList.size());
     EasyMock.replay(index, result);
     schedSvc.setIndex(index);
 

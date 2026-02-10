@@ -2385,7 +2385,8 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    * @param organization
    *         workflow organization id
    */
-  private void updateWorkflowInstanceInIndex(long id, int state, String wfDefId, String mpId, Organization organization) {
+  private void updateWorkflowInstanceInIndex(long id, int state, String wfDefId, String mpId,
+      Organization organization) {
     final User user = securityService.getUser();
 
     logger.debug("Updating workflow instance {} of event {} in the {} index.", id, mpId,

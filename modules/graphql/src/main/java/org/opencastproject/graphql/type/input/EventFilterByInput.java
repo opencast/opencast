@@ -21,7 +21,7 @@
 
 package org.opencastproject.graphql.type.input;
 
-import org.opencastproject.index.service.resources.list.query.EventListQuery;
+import org.opencastproject.list.common.query.EventListQuery;
 
 import graphql.annotations.annotationTypes.GraphQLDescription;
 import graphql.annotations.annotationTypes.GraphQLField;

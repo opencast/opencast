@@ -31,8 +31,8 @@ import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.series.Series;
 import org.opencastproject.elasticsearch.index.objects.series.SeriesIndexSchema;
 import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
+import org.opencastproject.list.api.DefaultResourceListQuery;
 import org.opencastproject.list.api.ResourceListQuery;
-import org.opencastproject.list.impl.ResourceListQueryImpl;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
@@ -397,7 +397,7 @@ public final class EventIndexUtils {
         )
     );
 
-    ResourceListQuery query = new ResourceListQueryImpl();
+    ResourceListQuery query = new DefaultResourceListQuery();
     for (String action : additionalActions.keySet()) {
       customEntries.add(new AccessControlEntry(getEpisodeRoleId(eventId, action), action, true));
     }

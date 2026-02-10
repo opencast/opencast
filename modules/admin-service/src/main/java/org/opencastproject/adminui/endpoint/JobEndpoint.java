@@ -25,11 +25,11 @@ import static org.opencastproject.index.service.util.JSONUtils.safeString;
 import static org.opencastproject.util.DateTimeSupport.toUTC;
 
 import org.opencastproject.adminui.exception.JobEndpointException;
-import org.opencastproject.index.service.resources.list.query.JobsListQuery;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.job.api.Incident;
 import org.opencastproject.job.api.IncidentTree;
 import org.opencastproject.job.api.Job;
+import org.opencastproject.list.common.query.JobsListQuery;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.serviceregistry.api.HostRegistration;
 import org.opencastproject.serviceregistry.api.IncidentL10n;
