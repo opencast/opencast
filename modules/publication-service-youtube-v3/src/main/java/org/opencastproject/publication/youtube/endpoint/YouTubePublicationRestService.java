@@ -41,11 +41,15 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
@@ -109,6 +113,12 @@ public class YouTubePublicationRestService extends AbstractJobProducerEndpoint {
               isRequired = true,
               description = "The element to publish",
               type = Type.STRING
+          ),
+          @RestParameter(
+              name = "captionIds",
+              isRequired = false,
+              description = "The captions to publish",
+              type = Type.STRING
           )
       },
       responses = {
@@ -118,14 +128,24 @@ public class YouTubePublicationRestService extends AbstractJobProducerEndpoint {
   )
   public Response publish(
       @FormParam("mediapackage") final String mediaPackageXml,
-      @FormParam("elementId") final String elementId
+      @FormParam("elementId") final String elementId,
+      @FormParam("captionIds") final String captionIds
   ) {
     final Job job;
     try {
       final MediaPackage mediapackage = MediaPackageParser.getFromXml(mediaPackageXml);
       final Track track = mediapackage.getTrack(elementId);
       if (track != null) {
-        job = service.publish(mediapackage, track);
+        final List<Track> captions = new ArrayList<>();
+        if (StringUtils.isNotBlank(captionIds)) {
+          for (String captionId : StringUtils.split(captionIds, ",")) {
+            final Track caption = mediapackage.getTrack(captionId.trim());
+            if (caption != null) {
+              captions.add(caption);
+            }
+          }
+        }
+        job = service.publish(mediapackage, track, captions);
       } else {
         return badRequest();
       }

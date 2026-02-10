@@ -33,6 +33,8 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.YouTubeRequest;
+import com.google.api.services.youtube.model.Caption;
+import com.google.api.services.youtube.model.CaptionSnippet;
 import com.google.api.services.youtube.model.Playlist;
 import com.google.api.services.youtube.model.PlaylistItem;
 import com.google.api.services.youtube.model.PlaylistItemListResponse;
@@ -281,4 +283,27 @@ public class YouTubeAPIVersion3ServiceImpl implements YouTubeAPIVersion3Service 
   private <T> T execute(final YouTubeRequest<T> command) throws IOException {
     return command.execute();
   }
+
+  @Override
+  public Caption addCaptions(String videoId, File file, String language, String name) throws IOException {
+    final Caption captionObjectDefiningMetadata = new Caption();
+    final CaptionSnippet snippet = new CaptionSnippet();
+    snippet.setVideoId(videoId);
+    snippet.setLanguage(language);
+    snippet.setName(name);
+    snippet.setIsDraft(false);
+    captionObjectDefiningMetadata.setSnippet(snippet);
+
+    final BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(file));
+    final InputStreamContent mediaContent = new InputStreamContent("application/octet-stream", inputStream);
+    mediaContent.setLength(file.length());
+
+    final YouTube.Captions.Insert captionInsert = youTube.captions()
+            .insert("snippet", captionObjectDefiningMetadata, mediaContent);
+    final MediaHttpUploader uploader = captionInsert.getMediaHttpUploader();
+    uploader.setDirectUploadEnabled(false);
+
+    return execute(captionInsert);
+  }
+
 }
