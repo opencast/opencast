@@ -9,8 +9,7 @@
   </parent>
   <properties>
     <checkstyle.skip>true</checkstyle.skip>
-    <opencast.basedir>${project.basedir}/..</opencast.basedir>
-    <packaging.definition>${opencast.basedir}/assemblies/package.xml</packaging.definition>
+    <packaging.definition>${maven.multiModuleProjectDirectory}/assemblies/package.xml</packaging.definition>
   </properties>
   <groupId>org.opencastproject.assemblies</groupId>
   <artifactId>opencast-assemblies</artifactId>
@@ -61,7 +60,7 @@
         <configuration>
           <filesets>
             <fileset>
-              <directory>${opencast.basedir}/</directory>
+              <directory>${maven.multiModuleProjectDirectory}/</directory>
               <includes>
                 <include>build/</include>
               </includes>
@@ -79,7 +78,7 @@
           <configuration>
             <filesets>
               <fileset>
-                <directory>${opencast.basedir}/build/</directory>
+                <directory>${maven.multiModuleProjectDirectory}/build/</directory>
                 <includes>
                   <include>${project.artifactId}-*.tar.gz</include>
                   <include>${project.artifactId}-*/</include>
@@ -171,7 +170,7 @@
                 <descriptors>
                   <descriptor>${packaging.definition}</descriptor>
                 </descriptors>
-                <outputDirectory>${opencast.basedir}/build/</outputDirectory>
+                <outputDirectory>${maven.multiModuleProjectDirectory}/build/</outputDirectory>
                 <appendAssemblyId>false</appendAssemblyId>
                 <tarLongFileMode>gnu</tarLongFileMode>
                 <attach>false</attach>

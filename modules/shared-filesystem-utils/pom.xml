@@ -30,7 +30,6 @@
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
-    <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
   </properties>
   <dependencies>

@@ -11,7 +11,6 @@
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
-    <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
     <prometheus.version>0.16.0</prometheus.version>
   </properties>

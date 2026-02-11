@@ -10,9 +10,6 @@
     <version>20-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
-  <properties>
-    <opencast.basedir>${project.basedir}/../..</opencast.basedir>
-  </properties>
   <dependencies />
   <profiles>
     <profile>

@@ -11,7 +11,6 @@
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
-    <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
   </properties>
   <dependencies>
@@ -102,7 +101,7 @@
                 <phase>prepare-package</phase>
                 <configuration>
                   <target>
-                    <copy todir="${project.basedir}/target/classes/ui/js/lib/" flatten="true">
+                    <copy todir="${basedir}/target/classes/ui/js/lib/" flatten="true">
                       <resources>
                         <file file="node_modules/bootbox/dist/bootbox.min.js" />
                         <file file="node_modules/jquery/dist/jquery.js" />
@@ -177,7 +176,7 @@
                 <phase>prepare-package</phase>
                 <configuration>
                   <target>
-                    <copy todir="${project.basedir}/target/classes/ui/js/lib/" flatten="true">
+                    <copy todir="${basedir}/target/classes/ui/js/lib/" flatten="true">
                       <resources>
                         <file file="node_modules/bootbox/dist/bootbox.min.js" />
                         <file file="node_modules/jquery/dist/jquery.js" />

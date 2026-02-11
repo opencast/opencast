@@ -8,8 +8,7 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
   <properties>
-    <opencast.basedir>${project.basedir}/../..</opencast.basedir>
-    <packaging.definition>${project.basedir}/target/classes/package.xml</packaging.definition>
+    <packaging.definition>${basedir}/target/classes/package.xml</packaging.definition>
     <enableJobDispatching>true</enableJobDispatching>
     <enableDeveloperMode>true</enableDeveloperMode>
   </properties>

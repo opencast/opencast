@@ -8,7 +8,6 @@
     <relativePath>../pom.xml</relativePath>
   </parent>
   <properties>
-    <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <enableJobDispatching>true</enableJobDispatching>
   </properties>
   <artifactId>opencast-dist-admin</artifactId>

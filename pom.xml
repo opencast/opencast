@@ -12,7 +12,6 @@
   <properties>
     <argLine></argLine>
     <checkstyle.skip>false</checkstyle.skip>
-    <opencast.basedir>${basedir}</opencast.basedir>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
@@ -302,14 +301,14 @@
     <testResources>
       <!-- Add a log4j configuration file to the test resources -->
       <testResource>
-        <directory>${opencast.basedir}/docs/log4j</directory>
+        <directory>${maven.multiModuleProjectDirectory}/docs/log4j</directory>
         <includes>
           <include>log4j.properties</include>
         </includes>
       </testResource>
       <!-- Re-add the test resources as defined by the project -->
       <testResource>
-        <directory>${project.basedir}/src/test/resources</directory>
+        <directory>${basedir}/src/test/resources</directory>
       </testResource>
     </testResources>
     <!-- This defines what plugins run on a global basis.  Plugins defined here run for all child poms without needing
@@ -427,9 +426,9 @@
         </dependencies>
         <configuration>
           <skip>${checkstyle.skip}</skip>
-          <configLocation>${opencast.basedir}/docs/checkstyle/opencast-checkstyle.xml</configLocation>
-          <headerLocation>${opencast.basedir}/docs/checkstyle/opencast-header.txt</headerLocation>
-          <suppressionsLocation>${opencast.basedir}/docs/checkstyle/checkstyle-suppressions.xml</suppressionsLocation>
+          <configLocation>${maven.multiModuleProjectDirectory}/docs/checkstyle/opencast-checkstyle.xml</configLocation>
+          <headerLocation>${maven.multiModuleProjectDirectory}/docs/checkstyle/opencast-header.txt</headerLocation>
+          <suppressionsLocation>${maven.multiModuleProjectDirectory}/docs/checkstyle/checkstyle-suppressions.xml</suppressionsLocation>
           <includeTestSourceDirectory>true</includeTestSourceDirectory>
           <consoleOutput>true</consoleOutput>
           <logViolationsToConsole>true</logViolationsToConsole>
