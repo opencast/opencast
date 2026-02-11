@@ -51,16 +51,23 @@ public interface AuthorizationService {
   /**
    * {@code entityBelongsToOrg} defaults to true.
    *
-   * @see AuthorizationService#hasPermission(MediaPackage, User, Organization, String, boolean)
+   * @see AuthorizationService#hasPermission(MediaPackage, User, Organization, String)
    */
   boolean hasPermission(MediaPackage mp, User user, Organization org, String action);
 
   /**
    * {@code entityBelongsToOrg} defaults to true.
    *
-   * @see AuthorizationService#hasPermission(AccessControlList, User, Organization, String, boolean)
+   * @see AuthorizationService#hasPermission(AccessControlList, User, Organization, String)
    */
   boolean hasPermission(AccessControlList acl, User user, Organization org, String action);
+
+  /**
+   * {@code entityBelongsToOrg} defaults to true.
+   *
+   * @see AuthorizationService#hasPermission(AccessControlList, User, Organization, String, String)
+   */
+  boolean hasPermission(AccessControlList acl, User user, Organization org, String action, String mediaPackageId);
 
   /**
    * Determines whether the user can take the specified action on the media package.

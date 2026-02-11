@@ -873,6 +873,12 @@ public class LiveScheduleServiceImplTest {
     }
 
     @Override
+    public boolean hasPermission(AccessControlList acl, User user, Organization org, String action,
+        String mediaPackageId) {
+      return false;
+    }
+
+    @Override
     public boolean hasPermission(MediaPackage mp, User user, Organization org, String action,
         boolean entityBelongsToOrg)  {
       return false;

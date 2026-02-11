@@ -101,6 +101,15 @@ public class SearchServicePersistenceTest {
                 EasyMock.anyString()
             )
         ).andReturn(true).anyTimes();
+    EasyMock.expect(
+        authorizationService.hasPermission(
+            (AccessControlList) EasyMock.anyObject(),
+            (User) EasyMock.anyObject(),
+            (Organization) EasyMock.anyObject(),
+            EasyMock.anyString(),
+            EasyMock.anyString()
+        )
+    ).andReturn(true).anyTimes();
     EasyMock.replay(authorizationService);
 
     BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
