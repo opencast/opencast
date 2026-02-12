@@ -1730,6 +1730,10 @@ public class SchedulerServiceImplTest {
       public String getStoreType() {
         return "test_store";
       }
+
+      @Override public String getStorageName() {
+        return "Test Store";
+      }
     };
   }
 

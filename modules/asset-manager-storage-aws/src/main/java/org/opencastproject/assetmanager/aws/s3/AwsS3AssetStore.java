@@ -612,4 +612,9 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
   void setBucketName(String orgId, String bucketName) {
     orgBucketNameMap.put(orgId, bucketName);
   }
+
+  @Override
+  public String getStorageName() {
+    return "Amazon S3 Asset Store";
+  }
 }

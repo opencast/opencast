@@ -994,4 +994,9 @@ public final class WorkspaceImpl implements Workspace {
       }
     }
   }
+
+  @Override
+  public String getStorageName() {
+    return "Workspace";
+  }
 }

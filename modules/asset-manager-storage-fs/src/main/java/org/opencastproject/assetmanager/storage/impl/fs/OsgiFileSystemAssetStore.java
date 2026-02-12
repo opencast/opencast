@@ -297,4 +297,8 @@ public class OsgiFileSystemAssetStore extends AbstractFileSystemAssetStore {
     return Optional.of(totalSpace);
   }
 
+  @Override
+  public String getStorageName() {
+    return "File System Asset Store";
+  }
 }

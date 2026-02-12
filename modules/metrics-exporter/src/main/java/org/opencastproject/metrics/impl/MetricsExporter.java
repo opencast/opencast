@@ -130,9 +130,9 @@ public class MetricsExporter {
       .labelNames("part")
       .register();
   private final Gauge storage = Gauge.build()
-      .name("opencast_storage")
-      .help("Shows available and used up space of different directories of Opencast.")
-      .labelNames("part", "kind")
+      .name("opencast_storage_bytes")
+      .help("Disk space statistics (total, used, usable) for Opencast storage components.")
+      .labelNames("name", "kind")
       .register();
   private Gauge eventsInAssetManager;
 
@@ -206,10 +206,10 @@ public class MetricsExporter {
     }
 
     for (StorageUsage storageUsageImplementation : storageUsageImplementations) {
-      String part = storageUsageImplementation.getClass().getSimpleName();
-      storage.labels(part, "total").set(storageUsageImplementation.getTotalSpace().orElse(-1L));
-      storage.labels(part, "usable").set(storageUsageImplementation.getUsableSpace().orElse(-1L));
-      storage.labels(part, "used").set(storageUsageImplementation.getUsedSpace().orElse(-1L));
+      String storageName = storageUsageImplementation.getStorageName();
+      storage.labels(storageName, "total").set(storageUsageImplementation.getTotalSpace().orElse(-1L));
+      storage.labels(storageName, "usable").set(storageUsageImplementation.getUsableSpace().orElse(-1L));
+      storage.labels(storageName, "used").set(storageUsageImplementation.getUsedSpace().orElse(-1L));
     }
 
     // collect metrics
