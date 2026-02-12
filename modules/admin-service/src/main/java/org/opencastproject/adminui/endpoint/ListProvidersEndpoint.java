@@ -25,6 +25,7 @@ import static org.opencastproject.adminui.endpoint.EndpointUtil.addRequestFilter
 import static org.opencastproject.adminui.endpoint.EndpointUtil.generateJSONObject;
 
 import org.opencastproject.adminui.exception.JsonCreationException;
+import org.opencastproject.authorization.xacml.manager.impl.list.AclsListQuery;
 import org.opencastproject.index.service.util.JSONUtils;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.list.api.DefaultResourceListQuery;
@@ -32,7 +33,6 @@ import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ListProviderNotFoundException;
 import org.opencastproject.list.api.ListProvidersService;
 import org.opencastproject.list.api.ResourceListQuery;
-import org.opencastproject.list.common.query.AclsListQuery;
 import org.opencastproject.list.common.query.AgentsListQuery;
 import org.opencastproject.list.common.query.EventListQuery;
 import org.opencastproject.list.common.query.GroupsListQuery;

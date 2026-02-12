@@ -19,7 +19,7 @@
  *
  */
 
-package org.opencastproject.list.common.provider;
+package org.opencastproject.authorization.xacml.manager.impl.list;
 
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;

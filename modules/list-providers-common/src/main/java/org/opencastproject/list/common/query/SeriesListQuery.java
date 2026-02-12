@@ -24,7 +24,6 @@ package org.opencastproject.list.common.query;
 import org.opencastproject.list.api.DefaultResourceListQuery;
 import org.opencastproject.list.api.ResourceListFilter;
 import org.opencastproject.list.api.ResourceListFilter.SourceType;
-import org.opencastproject.list.common.provider.AclListProvider;
 import org.opencastproject.list.common.provider.ContributorsListProvider;
 import org.opencastproject.list.common.provider.SeriesListProvider;
 import org.opencastproject.list.util.FiltersUtils;
@@ -98,25 +97,6 @@ public class SeriesListQuery extends DefaultResourceListQuery {
     this.availableFilters.add(createContributorsFilter(Optional.empty()));
     this.availableFilters.add(createReadAccessFilter(Optional.empty()));
     this.availableFilters.add(createWriteAccessFilter(Optional.empty()));
-  }
-
-  /**
-   * Add a {@link ResourceListFilter} filter to the query with the given acl
-   *
-   * @param acl
-   *          the acl to filter for
-   */
-  public void withAccessPolicy(String acl) {
-    this.addFilter(createAccessPolicyFilter(Optional.ofNullable(acl)));
-  }
-
-  /**
-   * Returns an {@link Optional} containing the acl used to filter if set
-   *
-   * @return an {@link Optional} containing the acl or none.
-   */
-  public Optional<String> getAccessPolicy() {
-    return this.getFilterValue(FILTER_ACL_NAME);
   }
 
   public void withoutPermissions() {
@@ -296,18 +276,6 @@ public class SeriesListQuery extends DefaultResourceListQuery {
    */
   public Optional<String> getTitle() {
     return this.getFilterValue(FILTER_TITLE_NAME);
-  }
-
-  /**
-   * Create a new {@link ResourceListFilter} based on access policy
-   *
-   * @param acl
-   *          the acl to filter on wrapped in an {@link Optional} or {@link Optional#empty()}
-   * @return a new {@link ResourceListFilter} for access policy based query
-   */
-  public static ResourceListFilter<String> createAccessPolicyFilter(Optional<String> acl) {
-    return FiltersUtils.generateFilter(acl, FILTER_ACL_NAME, FILTER_ACL_LABEL, SourceType.SELECT,
-            Optional.of(AclListProvider.NAME));
   }
 
   public static ResourceListFilter<Boolean> createReadPermissionFilter(Optional<Boolean> value) {
