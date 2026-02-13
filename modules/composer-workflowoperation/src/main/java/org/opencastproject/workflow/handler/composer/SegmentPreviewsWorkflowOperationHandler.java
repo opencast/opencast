@@ -225,7 +225,7 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
 
     if (videoTrackSet.size() == 0) {
       logger.debug("Mediapackage {} has no suitable tracks to extract images based on tags {} and flavor {}",
-              mediaPackage, sourceTagSet, sourceVideoFlavor);
+              mediaPackage, sourceTagSet, sourceVideoFlavors);
       return createResult(mediaPackage, Action.CONTINUE);
     } else {
 
