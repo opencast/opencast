@@ -193,7 +193,7 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
     // Read the configuration properties
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(wi,
         Configuration.atLeastOne, Configuration.many, Configuration.one);
-    MediaPackageElementFlavor sourceVideoFlavor = tagsAndFlavors.getSingleSrcFlavor();
+    List<MediaPackageElementFlavor> sourceVideoFlavors = tagsAndFlavors.getSrcFlavors();
     List<String> sourceTagSet = tagsAndFlavors.getSrcTags();
     ConfiguredTagsAndFlavors.TargetTags targetImageTags = tagsAndFlavors.getTargetTags();
     MediaPackageElementFlavor targetImageFlavor = tagsAndFlavors.getSingleTargetFlavor();
@@ -208,7 +208,9 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
 
     // Select the tracks based on the tags and flavors
     TrackSelector trackSelector = new TrackSelector();
-    trackSelector.addFlavor(sourceVideoFlavor);
+    for (MediaPackageElementFlavor flavor : sourceVideoFlavors) {
+      trackSelector.addFlavor(flavor);
+    }
     for (String tag : sourceTagSet) {
       trackSelector.addTag(tag);
     }
