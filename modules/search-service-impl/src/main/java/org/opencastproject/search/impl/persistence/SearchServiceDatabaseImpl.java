@@ -188,7 +188,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
         // allow ca users to retract live publications without putting them into the ACL
         if (!(searchMp.isLive() && currentUser.hasRole(GLOBAL_CAPTURE_AGENT_ROLE)) && accessControlXml != null) {
           AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
-          if (!authorizationService.hasPermission(acl, currentUser, currentOrg, WRITE.toString(),
+          if (!authorizationService.hasPermissionPerformance(acl, currentUser, currentOrg, WRITE.toString(),
               searchMp.getIdentifier().toString())) {
             throw new UnauthorizedException(
                 currentUser + " is not authorized to delete media package " + mediaPackageId);

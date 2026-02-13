@@ -102,7 +102,7 @@ public class SearchServicePersistenceTest {
             )
         ).andReturn(true).anyTimes();
     EasyMock.expect(
-        authorizationService.hasPermission(
+        authorizationService.hasPermissionPerformance(
             (AccessControlList) EasyMock.anyObject(),
             (User) EasyMock.anyObject(),
             (Organization) EasyMock.anyObject(),

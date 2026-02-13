@@ -1151,7 +1151,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     var workflowCreator = creatorName == null ? null : userDirectoryService.loadUser(creatorName);
     boolean authorized = (currentUser.equals(workflowCreator))
             || (authorizationService.hasPermission(
-                mediapackage, currentUser, currentOrg, action, currentOrgId.equals(workflowOrgId)));
+                mediapackage, currentUser, currentOrg, action, workflowOrgId));
 
     if (!authorized) {
       throw new UnauthorizedException(currentUser, action);

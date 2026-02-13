@@ -325,21 +325,21 @@ public class XACMLAuthorizationService implements AuthorizationService {
   }
 
   public boolean hasPermission(final MediaPackage mp, User user, Organization org, String action) {
-    return hasPermission(mp, user, org, action, true);
+    return hasPermission(mp, user, org, action, null);
   }
 
   public boolean hasPermission(AccessControlList acl, User user, Organization org, String action) {
-    return hasPermission(acl, user, org, action, true);
+    return hasPermission(acl, user, org, action, null);
   }
 
-  public boolean hasPermission(AccessControlList acl, User user, Organization org, String action,
+  public boolean hasPermissionPerformance(AccessControlList acl, User user, Organization org, String action,
       String mediaPackageId) {
     // Check special ROLE_EPISODE_<ID>_<ACTION> permissions
     var episodeRole = getEpisodeRoleId(mediaPackageId, action);
     logger.debug("Checking for role: {}", episodeRole);
     var allowed = user.getRoles().stream().map(Role::getName).anyMatch(r -> r.equals(episodeRole));
 
-    return allowed || hasPermission(acl, user, org, action, true);
+    return allowed || hasPermission(acl, user, org, action, null);
   }
 
   public boolean hasPermission(
@@ -347,7 +347,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
       User user,
       Organization org,
       String action,
-      boolean entityBelongsToOrg
+      String entityOrgId
   ) {
     // Check special ROLE_EPISODE_<ID>_<ACTION> permissions
     var episodeRole = getEpisodeRoleId(mp.getIdentifier().toString(), action);
@@ -355,7 +355,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
     var allowed = user.getRoles().stream().map(Role::getName).anyMatch(r -> r.equals(episodeRole));
 
     AccessControlList acl = getActiveAcl(mp).getA();
-    return allowed || hasPermission(acl, user, org, action, entityBelongsToOrg);
+    return allowed || hasPermission(acl, user, org, action, entityOrgId);
   }
 
   public boolean hasPermission(
@@ -363,7 +363,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
       User user,
       Organization org,
       String action,
-      boolean entityBelongsToOrg
+      String entityOrgId
   ) {
     // Check for the global admin role
     if (user.hasRole(GLOBAL_ADMIN_ROLE)) {
@@ -371,7 +371,7 @@ public class XACMLAuthorizationService implements AuthorizationService {
     }
 
     // If it does not belong to the user organization, no access
-    if (!entityBelongsToOrg) {
+    if (entityOrgId != null && !org.getId().equals(entityOrgId)) {
       return false;
     }
 

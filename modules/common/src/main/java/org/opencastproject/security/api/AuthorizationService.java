@@ -64,10 +64,13 @@ public interface AuthorizationService {
 
   /**
    * {@code entityBelongsToOrg} defaults to true.
+   * If you pass a mediapackage, the authorization service has to get the active ACL of the mediapackage. If you
+   * already have that ACL, calling this method might be slightly more performant.
    *
    * @see AuthorizationService#hasPermission(AccessControlList, User, Organization, String, String)
    */
-  boolean hasPermission(AccessControlList acl, User user, Organization org, String action, String mediaPackageId);
+  boolean hasPermissionPerformance(AccessControlList acl, User user, Organization org, String action,
+      String mediaPackageId);
 
   /**
    * Determines whether the user can take the specified action on the media package.
@@ -80,11 +83,11 @@ public interface AuthorizationService {
    *          the current organization
    * @param action
    *          the action (e.g. read, modify, delete)
-   * @param entityBelongsToOrg
-   *          whether the mediapackage belongs to the same organization as the current organization
+   * @param entityOrgId
+   *          organization id of the mediapackage. If not the same organization as "org", permission will be denied
    * @return whether the current user has the correct privileges to take this action
    */
-  boolean hasPermission(MediaPackage mp, User user, Organization org, String action, boolean entityBelongsToOrg);
+  boolean hasPermission(MediaPackage mp, User user, Organization org, String action, String entityOrgId);
 
   /**
    * Determines whether the current user can take the specified action given the access control list.
@@ -99,11 +102,11 @@ public interface AuthorizationService {
    *          the current organization
    * @param action
    *          the action (e.g. read, modify, delete)
-   * @param entityBelongsToOrg
-   *          whether the entity belongs to the same organization as the current organization
+   * @param entityOrgId
+   *          organization id of the entity. If not the same organization as "org", permission will be denied
    * @return whether the current user has the correct privileges to take this action
    */
-  boolean hasPermission(AccessControlList acl, User user, Organization org, String action, boolean entityBelongsToOrg);
+  boolean hasPermission(AccessControlList acl, User user, Organization org, String action, String entityOrgId);
 
   /**
    * Gets the active access control list associated with the given media package, as specified by its XACML

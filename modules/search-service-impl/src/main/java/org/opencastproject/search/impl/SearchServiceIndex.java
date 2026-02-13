@@ -386,7 +386,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
         throw new NotFoundException();
       }
       AccessControlList acl = persistence.getAccessControlList(mediaPackageId);
-      if (!authorizationService.hasPermission(acl, user, securityService.getOrganization(), WRITE.toString(),
+      if (!authorizationService.hasPermissionPerformance(acl, user, securityService.getOrganization(), WRITE.toString(),
           mediaPackageId)) {
         throw new UnauthorizedException(user, "Write permission denied for " + mediaPackageId, acl);
       }

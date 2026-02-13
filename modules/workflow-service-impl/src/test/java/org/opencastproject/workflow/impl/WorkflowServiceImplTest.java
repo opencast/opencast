@@ -199,7 +199,7 @@ public class WorkflowServiceImplTest {
             (User) EasyMock.anyObject(),
             (Organization) EasyMock.anyObject(),
             (String) EasyMock.anyObject(),
-            EasyMock.anyBoolean()
+            (String) EasyMock.anyObject()
         ))
         .andReturn(true).anyTimes();
     replay(authzService);
