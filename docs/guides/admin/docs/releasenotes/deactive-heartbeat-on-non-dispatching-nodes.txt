@@ -1,8 +1,4 @@
-The configuration option "heartbeat.interval" was moved from
-
-etc/org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl.cfg
-
-to
+The configuration option "heartbeat.interval" was removed from
 
 etc/org.opencastproject.serviceregistry.impl.JobDispatcher.cfg
 

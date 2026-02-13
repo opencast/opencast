@@ -110,10 +110,6 @@ public class JobDispatcher {
   /** Multiplicative factor to transform dispatch interval captured in seconds to milliseconds */
   static final long DISPATCH_INTERVAL_MS_FACTOR = 1000;
 
-  /** Configuration key for the interval to check whether the hosts in the service registry are still alive,
-   * in seconds */
-  protected static final String OPT_HEARTBEATINTERVAL = "heartbeat.interval";
-
   /** Default delay between checking if hosts are still alive in seconds * */
   static final long DEFAULT_HEART_BEAT = 60;
 
@@ -232,25 +228,6 @@ public class JobDispatcher {
       }
     }
 
-    long heartbeatInterval = DEFAULT_HEART_BEAT;
-    String heartbeatIntervalString = StringUtils.trimToNull((String) properties.get(OPT_HEARTBEATINTERVAL));
-    if (StringUtils.isNotBlank(heartbeatIntervalString)) {
-      try {
-        heartbeatInterval = Long.parseLong(heartbeatIntervalString);
-      } catch (Exception e) {
-        logger.warn("Heartbeat interval '{}' is malformed, setting to {}", heartbeatIntervalString, DEFAULT_HEART_BEAT);
-        heartbeatInterval = DEFAULT_HEART_BEAT;
-      }
-      if (heartbeatInterval == 0) {
-        logger.info("Heartbeat disabled");
-      } else if (heartbeatInterval < 0) {
-        logger.warn("Heartbeat interval {} seconds too low, adjusting to {}", heartbeatInterval, DEFAULT_HEART_BEAT);
-        heartbeatInterval = DEFAULT_HEART_BEAT;
-      } else {
-        logger.info("Heartbeat interval set to {} seconds", heartbeatInterval);
-      }
-    }
-
     // Stop the current dispatch thread so we can configure a new one
     if (jdfuture != null) {
       jdfuture.cancel(true);
@@ -264,7 +241,7 @@ public class JobDispatcher {
       jdfuture = scheduledExecutor.scheduleWithFixedDelay(getJobDispatcherRunnable(), dispatchIntervalMs,
           dispatchIntervalMs, TimeUnit.MILLISECONDS);
       // Schedule heartbeat for dispatching nodes
-      serviceRegistry.startHeartbeat(heartbeatInterval);
+      serviceRegistry.startHeartbeat(DEFAULT_HEART_BEAT);
     } else {
       logger.info("Job dispatching is disabled");
     }
