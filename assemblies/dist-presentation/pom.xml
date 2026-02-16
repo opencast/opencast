@@ -57,14 +57,12 @@
     <resources>
       <resource>
         <directory>../..</directory>
-        <filtering>false</filtering>
         <includes>
           <include>etc/**/*</include>
         </includes>
       </resource>
       <resource>
         <directory>src/main/resources</directory>
-        <filtering>false</filtering>
         <includes>
           <include>**/*</include>
         </includes>

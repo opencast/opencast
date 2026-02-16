@@ -183,7 +183,6 @@
               <resources>
                 <resource>
                   <directory>build/</directory>
-                  <filtering>false</filtering>
                 </resource>
               </resources>
             </configuration>
