@@ -12,7 +12,6 @@
   </parent>
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
-    <checkstyle.skip>false</checkstyle.skip>
     <java-jwt.version>3.18.1</java-jwt.version>
     <jwks-rsa.version>0.22.1</jwks-rsa.version>
   </properties>

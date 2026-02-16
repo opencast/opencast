@@ -12,7 +12,6 @@
   </parent>
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
-    <checkstyle.skip>false</checkstyle.skip>
     <nodejs.version>v20.10.0</nodejs.version>
   </properties>
   <profiles>

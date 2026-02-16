@@ -12,7 +12,6 @@
   </parent>
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
-    <checkstyle.skip>false</checkstyle.skip>
     <batik.version>1.17</batik.version>
   </properties>
   <dependencies>
