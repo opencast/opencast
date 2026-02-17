@@ -43,6 +43,7 @@ import org.osgi.service.component.annotations.Activate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Dictionary;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -77,7 +78,15 @@ public abstract class BundleInfoRestEndpoint {
 
   @Activate
   public void activate(ComponentContext cc) {
-    lastModified = cc.getBundleContext().getBundle().getLastModified();
+    Dictionary<String, String> headers = cc.getBundleContext().getBundle().getHeaders();
+
+    if (headers != null) {
+      String lastModifiedObj = headers.get("Bnd-LastModified");
+
+      if (lastModifiedObj != null) {
+        lastModified = Long.valueOf(lastModifiedObj);
+      }
+    }
   }
 
   @GET
