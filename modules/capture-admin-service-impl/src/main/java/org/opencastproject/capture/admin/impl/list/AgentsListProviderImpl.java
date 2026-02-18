@@ -19,10 +19,11 @@
  *
  */
 
-package org.opencastproject.list.common.provider;
+package org.opencastproject.capture.admin.impl.list;
 
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.capture.admin.api.AgentState;
+import org.opencastproject.capture.admin.api.AgentsListProvider;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.list.api.ResourceListProvider;
 import org.opencastproject.list.api.ResourceListQuery;
@@ -44,11 +45,8 @@ import java.util.TreeMap;
         "opencast.service.type=org.opencastproject.list.provider.AgentsListProvider"
     }
 )
-public class AgentsListProvider implements ResourceListProvider {
+public class AgentsListProviderImpl implements ResourceListProvider, AgentsListProvider {
 
-  private static final String PROVIDER_PREFIX = "AGENTS";
-  public static final String NAME = PROVIDER_PREFIX + ".NAME";
-  public static final String STATUS = PROVIDER_PREFIX + ".STATUS";
 
   private static final String[] NAMES = { NAME, STATUS };
   private static final Logger logger = LoggerFactory.getLogger(AgentsListProvider.class);

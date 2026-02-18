@@ -19,12 +19,11 @@
  *
  */
 
-package org.opencastproject.list.common.query;
+package org.opencastproject.capture.admin.api;
 
 import org.opencastproject.list.api.DefaultResourceListQuery;
 import org.opencastproject.list.api.ResourceListFilter;
 import org.opencastproject.list.api.ResourceListFilter.SourceType;
-import org.opencastproject.list.common.provider.AgentsListProvider;
 import org.opencastproject.list.util.FiltersUtils;
 
 import java.util.Optional;

@@ -21,10 +21,10 @@
 
 package org.opencastproject.list.common.query;
 
+import org.opencastproject.capture.admin.api.AgentsListProvider;
 import org.opencastproject.list.api.DefaultResourceListQuery;
 import org.opencastproject.list.api.ResourceListFilter;
 import org.opencastproject.list.api.ResourceListFilter.SourceType;
-import org.opencastproject.list.common.provider.AgentsListProvider;
 import org.opencastproject.list.common.provider.ContributorsListProvider;
 import org.opencastproject.list.common.provider.EventsListProvider;
 import org.opencastproject.list.common.provider.SeriesListProvider;
