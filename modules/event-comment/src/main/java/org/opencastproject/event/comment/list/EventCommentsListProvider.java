@@ -19,7 +19,7 @@
  *
  */
 
-package org.opencastproject.list.common.provider;
+package org.opencastproject.event.comment.list;
 
 import org.opencastproject.event.comment.EventCommentException;
 import org.opencastproject.event.comment.EventCommentService;

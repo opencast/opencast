@@ -19,7 +19,7 @@
  *
  */
 
-package org.opencastproject.list.common.provider;
+package org.opencastproject.themes.list;
 
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ResourceListProvider;
@@ -29,7 +29,6 @@ import org.opencastproject.themes.ThemesServiceDatabase;
 import org.opencastproject.util.requests.SortCriterion;
 import org.opencastproject.util.requests.SortCriterion.Order;
 
-import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -62,7 +61,7 @@ public class ThemesListProvider implements ResourceListProvider {
   private ThemesServiceDatabase themesServiceDatabase;
 
   @Activate
-  protected void activate(BundleContext bundleContext) {
+  protected void activate() {
     logger.info("Themes list provider activated!");
   }
 
