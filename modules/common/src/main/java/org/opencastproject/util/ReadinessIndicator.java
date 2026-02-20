@@ -21,7 +21,7 @@
 
 package org.opencastproject.util;
 
-//CHECKSTYLE:OFF
+// CHECKSTYLE:OFF
 
 // This class provides the
 // 'osgi.service;objectClass="[...]ReadinessIndicator"' capability,

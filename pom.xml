@@ -11,7 +11,6 @@
   <inceptionYear>2009</inceptionYear>
   <properties>
     <argLine></argLine>
-    <checkstyle.skip>false</checkstyle.skip>
     <opencast.basedir>${basedir}</opencast.basedir>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -426,7 +425,6 @@
           </dependency>
         </dependencies>
         <configuration>
-          <skip>${checkstyle.skip}</skip>
           <configLocation>${opencast.basedir}/docs/checkstyle/opencast-checkstyle.xml</configLocation>
           <headerLocation>${opencast.basedir}/docs/checkstyle/opencast-header.txt</headerLocation>
           <suppressionsLocation>${opencast.basedir}/docs/checkstyle/checkstyle-suppressions.xml</suppressionsLocation>

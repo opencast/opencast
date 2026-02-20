@@ -25,9 +25,15 @@
   </module>
 
   <!-- Allow to disable checkstyle for sections of the code with `// CHECKSTYLE:OFF`
-       and `// CHECKSTYLE:ON`. Unlike `SuppressionCommentFilter` below, this
-       also works for checks not in "TreeWalker" -->
-  <module name="SuppressWithPlainTextCommentFilter"/>
+       and `// CHECKSTYLE:ON`. -->
+  <module name="SuppressWithPlainTextCommentFilter">
+    <property name="offCommentFormat" value="// CHECKSTYLE:OFF(?! checkstyle:)"/>
+  </module>
+  <module name="SuppressWithPlainTextCommentFilter">
+    <property name="offCommentFormat" value="// CHECKSTYLE:OFF checkstyle:(.*)"/>
+    <property name="onCommentFormat" value="// CHECKSTYLE:ON checkstyle:(.*)"/>
+    <property name="checkFormat" value="$1"/>
+  </module>
 
   <!-- Checks whether files end with a new line.                        -->
   <!-- See http://checkstyle.sf.net/config_misc.html#NewlineAtEndOfFile -->
@@ -41,9 +47,6 @@
   <module name="Translation" />
 
   <module name="TreeWalker">
-    <!-- Allow Java code to suppress checkstyle audits via CHECKSTYLE:OFF and CHECKSTYLE:ON comments -->
-    <module name="SuppressionCommentFilter"/>
-
     <!-- Indentation -->
     <module name="Indentation">
       <property name="basicOffset" value="2"/>

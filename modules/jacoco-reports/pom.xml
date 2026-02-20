@@ -13,7 +13,6 @@
   </parent>
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
-    <checkstyle.skip>false</checkstyle.skip>
   </properties>
   <dependencies>
     <!-- FIXME: This sucks, but because of https://github.com/jacoco/jacoco/wiki/MavenMultiModule we need to

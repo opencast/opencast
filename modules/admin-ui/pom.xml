@@ -12,7 +12,6 @@
   </parent>
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
-    <checkstyle.skip>false</checkstyle.skip>
     <skipTests>false</skipTests>
   </properties>
   <dependencies>
