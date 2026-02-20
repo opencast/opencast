@@ -26,3 +26,4 @@ reviewed and merged.
 * [ ] have a clean commit history
 * [ ] [have proper commit messages (title and body) for all commits](https://medium.com/@steveamaza/e028865e5791)
 * [ ] explain why it needs to be merged into the legacy branch, if it is targeting the legacy branch
+* [ ] include a [release note](https://docs.opencast.org/develop/developer/#participate/development-process/#release-notes) if a feature, or supports a feature (ie, backend part of a frontend feature)
