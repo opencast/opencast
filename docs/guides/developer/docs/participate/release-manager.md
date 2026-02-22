@@ -329,6 +329,12 @@ as an example:
             [ manual check that the doc looks correct ]
             git add changelog/opencast-{{ opencast_major_version() }}.md
 
+    - Check that PRs tagged as features are all listed in the release notes, since sometimes committers miss adding the
+    text files.
+
+    - Ensure you check across the admin, editor, and studio repositories, since PRs in those repositories may not get
+    picked up by the script above!
+
     - The release notes for a major release (x.0) should be built from the various text files in the 
    `docs/guides/admin/docs/releasenotes` directory.  the release notes for a minor release (x.y) should be a rough
    summary of the development activity between x.y and x.y-1
