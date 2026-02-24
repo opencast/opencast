@@ -36,6 +36,7 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
 
+import org.opencastproject.index.service.resources.list.query.PlaylistsListQuery;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.playlists.Playlist;
 import org.opencastproject.playlists.PlaylistAccessControlEntry;
@@ -71,9 +72,11 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import javax.ws.rs.DELETE;
@@ -203,10 +206,12 @@ public class PlaylistsEndpoint {
                   + " Supported Sort Names are 'updated', 'title', and 'creator'.",
               defaultValue = "updated:ASC"),
           @RestParameter(name = "filter", isRequired = false, type = STRING,
-              description = "The filters used for the query. Format: 'key:value' separated by commas. "
-                  + "Supported keys: 'textFilter' (searches title, description, creator), 'title', "
-                  + "'creator', 'description'. Example: 'textFilter:opencast' or "
-                  + "'title:meeting,creator:john'.")
+              description = "Filter the results by the given criteria. The format is 'key:value', "
+                  + "and multiple filters can be combined with commas. Supported filter keys: "
+                  + "'textFilter' (case-insensitive search across title, description, and creator), "
+                  + "'creator' (case-insensitive match on the creator field), "
+                  + "'Updated' (date range in the form 'start/end' using ISO 8601 date-time values).",
+              defaultValue = "textFilter:opencast,creator:john,Updated:2025-01-01/2026-12-31")
       },
       responses = {
           @RestResponse(description = "Returns the playlists.", responseCode = SC_OK),
@@ -229,34 +234,29 @@ public class PlaylistsEndpoint {
       optLimit = Optional.empty();
     }
 
-    Map<String, String> filters = RestUtils.parseFilter(filter);
     List<Predicate<Playlist>> filterPredicates = new ArrayList<>();
-    // Add basic filters.
+
+    // Add filters
+    Map<String, String> filters = RestUtils.parseFilter(filter);
     for (String name : filters.keySet()) {
-      if ("textFilter".equals(name)) {
-        String value = filters.get(name).toLowerCase();
-        filterPredicates.add(p ->
-            (p.getTitle() != null
-                && p.getTitle().toLowerCase().contains(value))
-            || (p.getDescription() != null
-                && p.getDescription().toLowerCase().contains(value))
-            || (p.getCreator() != null
-                && p.getCreator().toLowerCase().contains(value)));
-      }
-      if ("title".equals(name)) {
-        String value = filters.get(name).toLowerCase();
-        filterPredicates.add(p -> p.getTitle() != null
-            && p.getTitle().toLowerCase().contains(value));
-      }
-      if ("creator".equals(name)) {
-        String value = filters.get(name).toLowerCase();
-        filterPredicates.add(p -> p.getCreator() != null
-            && p.getCreator().toLowerCase().contains(value));
-      }
-      if ("description".equals(name)) {
-        String value = filters.get(name).toLowerCase();
-        filterPredicates.add(p -> p.getDescription() != null
-            && p.getDescription().toLowerCase().contains(value));
+      String value = filters.get(name);
+      if (PlaylistsListQuery.FILTER_TEXT_NAME.equals(name)) {
+        filterPredicates.add(containsIgnoreCase(Playlist::getTitle, value)
+            .or(containsIgnoreCase(Playlist::getDescription, value))
+            .or(containsIgnoreCase(Playlist::getCreator, value)));
+      } else if (PlaylistsListQuery.FILTER_CREATOR_NAME.equals(name)) {
+        filterPredicates.add(containsIgnoreCase(Playlist::getCreator, value));
+      } else if (PlaylistsListQuery.FILTER_UPDATED_NAME.equals(name)) {
+        try {
+          Tuple<Date, Date> range = RestUtils.getFromAndToDateRange(value);
+          filterPredicates.add(p -> p.getUpdated() != null
+              && !p.getUpdated().before(range.getA())
+              && !p.getUpdated().after(range.getB()));
+        } catch (IllegalArgumentException e) {
+          logger.warn("Could not parse Updated filter dates: {}", value);
+        }
+      } else {
+        logger.debug("Unknown filter: {}", name);
       }
     }
 
@@ -474,5 +474,14 @@ public class PlaylistsEndpoint {
 
   private String getPlaylistUrl(String playlistId) {
     return UrlSupport.concat(endpointBaseUrl, playlistId);
+  }
+
+  /** Build a case-insensitive contains predicate for a string field of a playlist. */
+  private static Predicate<Playlist> containsIgnoreCase(Function<Playlist, String> getter, String value) {
+    String lower = value.toLowerCase();
+    return p -> {
+      String field = getter.apply(p);
+      return field != null && field.toLowerCase().contains(lower);
+    };
   }
 }
