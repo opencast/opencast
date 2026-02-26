@@ -27,21 +27,8 @@ jobs:
       run: |
         pip install -q -r requirements.txt
 
-    - name: build admin docs
+    - name: build docs
       working-directory: docs/guides/admin/
-      run: |
-        python -m mkdocs build
-
-    - name: generate list of committers
-      working-directory: docs/guides/developer/
-      env:
-        GITHUB_USER: ${{ secrets.GH_USER }}
-        GITHUB_PA_TOKEN: ${{ secrets.GH_PA_TOKEN }}
-      run: |
-        ./.generate-list-of-committers.sh
-
-    - name: build developer docs
-      working-directory: docs/guides/developer/
       run: |
         python -m mkdocs build
 
@@ -103,7 +90,6 @@ jobs:
       run: |
         mkdir -p docs.opencast.org/"${GITHUB_REF#refs/heads/}"
         mv -v docs/guides/admin/site docs.opencast.org/"${GITHUB_REF#refs/heads/}/admin"
-        mv -v docs/guides/developer/site docs.opencast.org/"${GITHUB_REF#refs/heads/}/developer"
         git log -n1 > docs.opencast.org/"${GITHUB_REF#refs/heads/}/commit"
 
     - name: commit new version

@@ -1,4 +1,4 @@
-site_name: Administration Guide
+site_name: Opencast Documentation
 repo_url: https://github.com/opencast/opencast
 edit_uri: edit/develop/docs/guides/admin/docs/
 
@@ -21,6 +21,8 @@ site_dir: "site"
 # The css files in this list will override existing css from the default theme
 extra_css:
   - css/extra.css
+  - developer/css/font-awesome.min.css
+  - developer/css/style-guide.css
 
 # The javascript files in this list will extend the existing javascript from the default theme
 extra_javascript:
@@ -288,3 +290,75 @@ nav:
       - Waveform: "workflowoperationhandlers/waveform-woh.md"
       - WebVTT to CutMarks Operation: "workflowoperationhandlers/webvtt-to-cutmarks.md"
       - Zip: "workflowoperationhandlers/zip-woh.md"
+  - Developer Documentation:
+      - Participate:
+         - Development process: 'developer/participate/development-process.md'
+         - Security Issues: 'developer/participate/security-issues.md'
+         - Committers: 'developer/participate/committer.md'
+         - Release manager: 'developer/participate/release-manager.md'
+         - QA coordinator: 'developer/participate/qa-coordinator.md'
+         - Localization: 'developer/participate/localization.md'
+         - Submit issues:
+            - Overview and How to: 'developer/participate/submit-issues/submit-issues.md'
+            - Security issues: 'developer/participate/submit-issues/security.md'
+         - Decision making:
+            - Overview: 'developer/participate/decision-making/index.md'
+            - Lazy consensus: 'developer/participate/decision-making/lazy-consensus.md'
+            - Consensus building: 'developer/participate/decision-making/consensus-building.md'
+            - Voting: 'developer/participate/decision-making/voting.md'
+         - Governance: 'developer/participate/governance.md'
+         - Services infrastructure:
+            - Overview: 'developer/participate/infrastructure/index.md'
+            - Maven repository: 'developer/participate/infrastructure/maven-repository.md'
+            - Packaging: 'developer/participate/infrastructure/packaging.md'
+         - Proposal log: 'developer/participate/proposal-log.md'
+      - Develop:
+         - Setup dev environment:
+            - General: 'developer/develop/setup-opencast-for-develop.md'
+            - With Docker: 'developer/develop/development-environment-docker.md'
+         - Tips for developing: 'developer/develop/development-tips.md'
+         - Dev ops:
+            - Local cluster for testing: 'developer/develop/devops/local-cluster.md'
+            - Explore H2 database: 'developer/develop/devops/explore-h2-database.md'
+         - Code style: 'developer/develop/code-style.md'
+         - Debugging: 'developer/develop/debugging.md'
+         - Frontends: 'developer/develop/frontends.md'
+         - Documentation: 'developer/develop/documentation.md'
+         - Coverage Reports: 'developer/develop/coverage-reports.md'
+         - Integrating with Opencast: 'developer/develop/integration.md'
+      - Opencast architecture:
+         - Overview: 'developer/architecture/overview.md'
+         - Admin-UI: 'developer/architecture/admin-ui.md'
+         - Asset manager: 'developer/architecture/asset-manager.md'
+         - Capture agent:
+            - Introduction: 'developer/architecture/capture-agent/capture-agent.md'
+            - Input: 'developer/architecture/capture-agent/capture-agent-input.md'
+            - Test Cases for Capture Agents: 'developer/architecture/capture-agent/testcases.md'
+         - External API:
+            - Introduction: 'developer/architecture/api/index.md'
+            - Usage: 'developer/architecture/api/usage.md'
+            - Authentication: 'developer/architecture/api/authentication.md'
+            - Authorization: 'developer/architecture/api/authorization.md'
+            - Base API: 'developer/architecture/api/base-api.md'
+            - Agents API: 'developer/architecture/api/agents-api.md'
+            - Events API: 'developer/architecture/api/events-api.md'
+            - ListProvider API: 'developer/architecture/api/listprovider-api.md'
+            - Playlists API: 'developer/architecture/api/playlists-api.md'
+            - Series API: 'developer/architecture/api/series-api.md'
+            - Statistics API: 'developer/architecture/api/statistics-api.md'
+            - Groups API: 'developer/architecture/api/groups-api.md'
+            - Security API: 'developer/architecture/api/security-api.md'
+            - Workflow API: 'developer/architecture/api/workflow-api.md'
+            - Data Types: 'developer/architecture/api/types.md'
+            - Glossary: 'developer/architecture/api/glossary.md'
+         - GraphQL API:
+            - Introduction: 'developer/architecture/graphql/index.md'
+         - Filesystem: 'developer/architecture/filesystem.md'
+         - Job dispatch: 'developer/architecture/job-dispatch.md'
+         - OAI-PMH: 'developer/architecture/oaipmh.md'
+         - Paella player 7: 'developer/architecture/paella-player-7/index.md'
+         - Scheduler: 'developer/architecture/scheduler.md'
+         - Statistics: 'developer/architecture/statistics.md'
+         - Stream security: 'developer/architecture/stream-security.md'
+      - Licenses and Legal Matters: 'developer/license.md'
+      - Glossary: 'developer/glossary.md'

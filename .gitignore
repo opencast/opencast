@@ -35,6 +35,7 @@ node/
 
 # Ignore mkdocs sites and python virtualenv (docs/guides/readme.md)
 docs/guides/*/site
+docs/guides/*/mkdocs.log
 docs/guides/venv
 
 # Ignore Makefiles

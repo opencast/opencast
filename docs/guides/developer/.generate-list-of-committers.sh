@@ -6,7 +6,7 @@ set -eu
 #GITHUB_USER=<username>
 #GITHUB_PA_TOKEN=<personal-github-access-token>
 
-OUT=docs/participate/list-of-committers.md.include
+OUT=../admin/docs/developer/participate/list-of-committers.md.include
 
 echo 'List of Committers' > "${OUT}"
 echo '------------------' >> "${OUT}"

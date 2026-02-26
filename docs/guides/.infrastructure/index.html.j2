@@ -29,8 +29,9 @@
       <!-- Example row of columns -->
       <div class="row">
         <div class="col-md-6">
-          <h2><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span> Adopters Guide</h2>
-          <p>The Opencast adopters guide contains official release documentation and installation and configuration details.</p>
+          <h2><span class="glyphicon glyphicon-tasks" aria-hidden="true"></span> Opencast Documentation</h2>
+          <p>The Opencast documentation contains official release documentation, installation and configuration details,
+          as well as developer information.</p>
           <div class="dropdown">
             <button class="btn btn-default dropdown-toggle" type="button" id="adminGuideVersions" data-toggle="dropdown" aria-expanded="true">
               Select a version
@@ -42,31 +43,6 @@
                   <a role="menuitem"
                      tabindex="-1"
                      href="//docs.opencast.org/{{ version['branch'] }}/admin"
-                     style="display: flex; justify-content: space-between;">
-                    <span>{{ version['name'] }}</span>
-                    {%- if version['attribute'] -%}
-                    <span style="color: #888; font-size: smaller">({{ version['attribute'] }})</span>
-                    {%- endif %}
-                  </a>
-                </li>
-              {% endfor %}
-            </ul>
-          </div>
-        </div>
-        <div class="col-md-6">
-          <h2><span class="glyphicon glyphicon-wrench" aria-hidden="true"></span> Developer Guide</h2>
-          <p>The Opencast developer guide contains information for active developers and those who want to become involved.</p>
-          <div class="dropdown">
-            <button class="btn btn-default dropdown-toggle" type="button" id="adminGuideVersions" data-toggle="dropdown" aria-expanded="true">
-              Select a version
-              <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu" role="menu" aria-labelledby="dropdownMenu1" id="developerGuides">
-              {% for version in version_info -%}
-                <li role="presentation">
-                  <a role="menuitem"
-                     tabindex="-1"
-                     href="//docs.opencast.org/{{ version['branch'] }}/developer"
                      style="display: flex; justify-content: space-between;">
                     <span>{{ version['name'] }}</span>
                     {%- if version['attribute'] -%}

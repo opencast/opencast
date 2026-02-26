@@ -5,7 +5,7 @@ set -ue
 ret=0
 cd docs/guides
 
-for docs in admin developer; do
+for docs in admin; do
   cd $docs
   if test "$( grep -r 'opencast_major_version[()]*}\|{opencast_major_version' )" != ""; then
     echo "Error, $docs has a syntax error related to opencast_major_version:"
