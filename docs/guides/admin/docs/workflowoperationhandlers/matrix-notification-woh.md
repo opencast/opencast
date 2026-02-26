@@ -1,12 +1,12 @@
 Matrix Notification Workflow Operation
 ================================
 
-ID: `matrix-notification`
+ID: `matrix-notify`
 
 Description
 -----------
 
-The matrix-notification operation sends a message to a specified Matrix room using the Matrix Client-Server API. It is useful to send notifications when some operation(s) have been completed or some error(s) have occurred in a workflow.
+The matrix-notify operation sends a message to a specified Matrix room using the Matrix Client-Server API. It is useful to send notifications when some operation(s) have been completed or some error(s) have occurred in a workflow.
 
 Parameter Table
 -------------
@@ -20,7 +20,7 @@ Operation Example
 -----------
 
 ```yaml
-  - id: matrix-notification
+  - id: matrix-notify
     description: Notify Matrix about workflow completion
     configurations:
       - room-id: !room-id!

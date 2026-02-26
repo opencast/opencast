@@ -76,7 +76,7 @@ import java.util.Objects;
 @Component(
     property = {
         "service.description=Matrix Notification Workflow Operation Handler",
-        "workflow.operation=matrix-notification",
+        "workflow.operation=matrix-notify",
         "service.pid=org.opencastproject.workflow.handler.matrix.MatrixNotificationWorkflowOperationHandler"
     },
     immediate = true,
