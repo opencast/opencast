@@ -27,6 +27,14 @@ jobs:
       run: |
         pip install -q -r requirements.txt
 
+    - name: generate list of committers
+      working-directory: docs/guides/admin/
+      env:
+        GITHUB_USER: ${{ secrets.GH_USER }}
+        GITHUB_PA_TOKEN: ${{ secrets.GH_PA_TOKEN }}
+      run: |
+        ./.generate-list-of-committers.sh
+
     - name: build docs
       working-directory: docs/guides/admin/
       run: |
