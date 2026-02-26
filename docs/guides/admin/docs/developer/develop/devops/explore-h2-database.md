@@ -2,7 +2,7 @@ Explore H2 Database
 ===================
 
 By default, Opencast uses an internal H2 database.
-While this cannot be accessed as easily as PoostgreSQL or MariaDB databases,
+While this cannot be accessed as easily as PostgreSQL or MariaDB databases,
 it can still be accessed for debugging purposes.
 
 <div class=warn>
