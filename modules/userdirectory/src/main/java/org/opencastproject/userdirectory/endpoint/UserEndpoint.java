@@ -27,6 +27,7 @@ import static org.apache.http.HttpStatus.SC_CREATED;
 import static org.apache.http.HttpStatus.SC_FORBIDDEN;
 import static org.apache.http.HttpStatus.SC_INTERNAL_SERVER_ERROR;
 import static org.apache.http.HttpStatus.SC_NOT_FOUND;
+import static org.apache.http.HttpStatus.SC_NO_CONTENT;
 import static org.apache.http.HttpStatus.SC_OK;
 import static org.opencastproject.util.RestUtil.getEndpointUrl;
 import static org.opencastproject.util.UrlSupport.uri;
@@ -49,9 +50,11 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
+import com.google.gson.reflect.TypeToken;
+
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONValue;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -60,10 +63,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
+import javax.persistence.RollbackException;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
@@ -106,6 +117,18 @@ public class UserEndpoint {
   private SecurityService securityService;
 
   private String endpointBaseUrl;
+
+  private static final Gson gson = new Gson();
+
+  private class UserData {
+    private String username;
+    private String password;
+    private String name;
+    private String email;
+    private Set<String> roles;
+  }
+
+  private final Type userListType = new TypeToken<List<User>>() { }.getType();
 
   /** OSGi callback. */
   public void activate(ComponentContext cc) {
@@ -227,7 +250,7 @@ public class UserEndpoint {
   @RestQuery(
       name = "createUser",
       description = "Create a new  user",
-      returnDescription = "Location of the new ressource",
+      returnDescription = "Location of the new resource",
       restParameters = {
       @RestParameter(
         name = "username",
@@ -295,6 +318,40 @@ public class UserEndpoint {
       logger.debug("Request with malformed ROLE data: {}", roles);
       return Response.status(SC_BAD_REQUEST).build();
     }
+  }
+
+  @POST
+  @Path("/users.json")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @RestQuery(
+      name = "createUsers",
+      description = "Create a list of new users",
+      returnDescription = "If the operation succeeded or not",
+      responses = {
+          @RestResponse(
+              responseCode = SC_BAD_REQUEST,
+              description = "Malformed request syntax."),
+          @RestResponse(
+              responseCode = SC_CONFLICT,
+              description = "At least one user already existed."),
+          @RestResponse(
+              responseCode = SC_NO_CONTENT,
+              description = "Users have been created.") })
+  public Response createUsers(String body) throws UnauthorizedException {
+    logger.debug("Provided user JSON: {}", body);
+    try {
+      for (var user: parseUserData(body)) {
+        jpaUserAndRoleProvider.addUser(user);
+        logger.info("Created user {}", user.getUsername());
+      }
+    } catch (RollbackException e) {
+      logger.debug("Error storing user in database", e);
+      return Response.status(Response.Status.CONFLICT).build();
+    } catch (IllegalArgumentException e) {
+      logger.debug("Error parsing the provided JSON body", e);
+      return Response.status(Response.Status.BAD_REQUEST).entity(e.getMessage()).build();
+    }
+    return Response.status(Response.Status.CREATED).build();
   }
 
   @PUT
@@ -414,25 +471,49 @@ public class UserEndpoint {
    *          String representation of JSON array containing roles
    */
   private Set<JpaRole> parseRoles(String roles) throws IllegalArgumentException {
-    JSONArray rolesArray = null;
     /* Try parsing JSON. Return Bad Request if malformed. */
+    final String[] rolesArray;
     try {
-      rolesArray = (JSONArray) JSONValue.parseWithException(StringUtils.isEmpty(roles) ? "[]" : roles);
-    } catch (Exception e) {
+      rolesArray = gson.fromJson(StringUtils.isEmpty(roles) ? "[]" : roles, String[].class);
+    } catch (JsonSyntaxException e) {
       throw new IllegalArgumentException("Error parsing JSON array", e);
     }
 
-    Set<JpaRole> rolesSet = new HashSet<JpaRole>();
+    Set<JpaRole> rolesSet = new HashSet<>();
     /* Add given roles */
-    for (Object role : rolesArray) {
-      try {
-        rolesSet.add(new JpaRole((String) role, (JpaOrganization) securityService.getOrganization()));
-      } catch (ClassCastException e) {
-        throw new IllegalArgumentException("Error parsing array vales as String", e);
-      }
+    for (var role : rolesArray) {
+      rolesSet.add(new JpaRole(role, (JpaOrganization) securityService.getOrganization()));
     }
 
     return rolesSet;
+  }
+
+  private List<JpaUser> parseUserData(String userJson) {
+    final UserData[] userArray;
+    try {
+      userArray = gson.fromJson(userJson, UserData[].class);
+    } catch (JsonSyntaxException e) {
+      throw new IllegalArgumentException("Error parsing JSON array", e);
+    }
+
+    if (Objects.isNull(userArray)) {
+      throw new IllegalArgumentException("The JSON may not be empty or `null`");
+    }
+
+    var users = new ArrayList<JpaUser>(userArray.length);
+    var organization = (JpaOrganization) securityService.getOrganization();
+    var provider = jpaUserAndRoleProvider.getName();
+    for (var u: userArray) {
+      if (Objects.isNull(u.username)) {
+        throw new IllegalArgumentException("Field `username` may not be `null`");
+      }
+      // parse roles
+      Set<JpaRole> roles = Objects.isNull(u.roles)
+          ? Collections.emptySet()
+          : u.roles.stream().map(r -> new JpaRole(r, organization)).collect(Collectors.toSet());
+      users.add(new JpaUser(u.username, u.password, organization, u.name, u.email, provider, true, roles));
+    }
+    return users;
   }
 
 }

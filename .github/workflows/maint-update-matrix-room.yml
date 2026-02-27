@@ -10,6 +10,7 @@ jobs:
   update-room-desc:
     name: Update Matrix Room
     runs-on: ubuntu-latest
+    if: github.repository == 'opencast/opencast'
     steps:
       - name: update room description
         env:
