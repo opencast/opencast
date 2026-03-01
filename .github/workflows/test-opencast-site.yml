@@ -131,7 +131,7 @@ jobs:
       && (github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/r/'))
     steps:
       - name: Download site generation artifact
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: site_build
           path: site_build
@@ -173,7 +173,7 @@ jobs:
 
       - name: update CSS and other assets
         if: github.ref == 'refs/heads/develop'
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: assets
           path: assets_artifact
