@@ -68,6 +68,7 @@
     <spring.version>5.3.39</spring.version>
     <spring-security.version>5.7.12</spring-security.version>
     <spring-security-cas.version>5.7.12_4</spring-security-cas.version>
+    <spring-security-ldap.version>5.8.6_1</spring-security-ldap.version>
     <xmlsec.version>2.2.6</xmlsec.version>
   </properties>
   <modules>

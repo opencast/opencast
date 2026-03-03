@@ -83,7 +83,7 @@
     <feature version="[5.7.12,5.8)">spring-security</feature>
 
     <!-- Spring Security 5: LDAP has NOT been tested -->
-    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.spring-security-ldap/5.8.6_1</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.spring-security-ldap/${spring-security-ldap.version}</bundle>
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.spring-ldap/2.4.1_1</bundle>
 
     <bundle>mvn:com.nimbusds/nimbus-jose-jwt/10.4.2</bundle>

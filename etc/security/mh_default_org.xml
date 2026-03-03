@@ -916,7 +916,9 @@
     <property name="userDetailsContextMapper" ref="userDetailsMapper"/>
     < ! - - Defines how the user attributes are converted to authorities (roles) - - >
     < ! - - Output is ignored if used together with userDetailsMapper - - >
-    < ! - - constructor-arg ref="authoritiesPopulator" /- - >
+    < ! - - Note that <ID> must match one of the LDAP service configurations - - >
+    < ! - - defined in etc/org.opencastproject.userdirectory.ldap-<ID>.cfg - - >
+    < ! - - constructor-arg ref="ldapAuthoritiesPopulator_<ID>" /- - >
   </bean>
   -->
 

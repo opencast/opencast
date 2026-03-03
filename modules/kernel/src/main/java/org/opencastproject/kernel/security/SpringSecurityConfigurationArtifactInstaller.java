@@ -24,6 +24,7 @@ package org.opencastproject.kernel.security;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.userdirectory.api.UserReferenceProvider;
+import org.opencastproject.util.OsgiUtil;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.felix.fileinstall.ArtifactInstaller;
@@ -32,6 +33,8 @@ import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.xml.DefaultNamespaceHandlerResolver;
@@ -40,10 +43,15 @@ import org.springframework.context.support.GenericApplicationContext;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.security.config.SecurityNamespaceHandler;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 
 import java.io.File;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.Filter;
 
@@ -78,9 +86,30 @@ public class SpringSecurityConfigurationArtifactInstaller implements ArtifactIns
   /** LTI 1.1. configuration services */
   protected OAuthConsumerDetailsService oAuthConsumerDetailsService = null;
   protected LtiLaunchAuthenticationHandler ltiLaunchAuthenticationHandler = null;
+  /** LDAP authorities populators, keyed by organization id and, inside each organization, keyed by pid/instanceId */
+  protected Map<String, Map<String, LdapAuthoritiesPopulator>> ldapAuthoritiesPopulators =
+          new HashMap<String, Map<String, LdapAuthoritiesPopulator>>();
+  /** List of expected LDAP instances for each organization */
+  private Map<String, Set<String>> expectedLdapInstances = new HashMap<String, Set<String>>();
+  /**
+   * List of security/ORG_ID.xml files that were waiting for LDAP authorities populator instances, keyed by organization
+   * ID
+   */
+  private Map<String, File> pendingArtifactsToInstall = new HashMap<String, File>();
+
+  private static final String LDAP_AUTH_POPULATOR_BEAN_NAME_PREFIX = "ldapAuthoritiesPopulator_";
 
   /** Spring application contexts */
   protected Map<String, GenericApplicationContext> appContexts = null;
+
+  /**
+   * Configuration listing all expected LDAP authorities populator instances/pid for each organization.
+   * Example:
+   * ldap.instances.mh_default_org=ldap1,ldap2
+   * ldap.instances.dce=ldap3
+   * ldap.instances.manchester=ldap4
+   */
+  private static final String LDAP_INSTANCES_PREFIX = "ldap.instances.";
 
   /** OSGi DI. */
   @Reference
@@ -125,6 +154,39 @@ public class SpringSecurityConfigurationArtifactInstaller implements ArtifactIns
     this.ltiLaunchAuthenticationHandler = ltiLaunchAuthenticationHandler;
   }
 
+  /* These are set as LdapAuthoritiesPopulator service properties when they are registered */
+  private static final String INSTANCE_ID_SERVICE_PROPERTY_KEY = "instanceId";
+  private static final String ORGANIZATION_ID_SERVICE_PROPERTY_KEY = "orgId";
+
+  @Reference(
+      cardinality = ReferenceCardinality.MULTIPLE, // 0..n
+          policy = ReferencePolicy.DYNAMIC, unbind = "unbindLdapAuthoritiesPopulator"
+  )
+  synchronized void bindLdapAuthoritiesPopulator(LdapAuthoritiesPopulator service, Map<String, Object> properties)
+          throws Exception {
+    String orgId = (String) properties.get(ORGANIZATION_ID_SERVICE_PROPERTY_KEY);
+    String instanceId = (String) properties.get(INSTANCE_ID_SERVICE_PROPERTY_KEY);
+    if (ldapAuthoritiesPopulators.get(orgId) == null) {
+      ldapAuthoritiesPopulators.put(orgId, new HashMap<String, LdapAuthoritiesPopulator>());
+    }
+    ldapAuthoritiesPopulators.get(orgId).put(instanceId, service);
+
+    // If all expected LDAP instances ready, process pending artifact if there is one
+    if (allExpectedAlreadyRegistered(orgId) && pendingArtifactsToInstall.containsKey(orgId)) {
+      createSecurityContext(pendingArtifactsToInstall.get(orgId));
+      // Remove from pending list
+      pendingArtifactsToInstall.remove(orgId);
+    }
+  }
+
+  synchronized void unbindLdapAuthoritiesPopulator(LdapAuthoritiesPopulator service, Map<String, Object> properties) {
+    String orgId = (String) properties.get(ORGANIZATION_ID_SERVICE_PROPERTY_KEY);
+    String instanceId = (String) properties.get(INSTANCE_ID_SERVICE_PROPERTY_KEY);
+    if (ldapAuthoritiesPopulators.get(orgId) != null) {
+      ldapAuthoritiesPopulators.get(orgId).remove(instanceId);
+    }
+  }
+
   /**
    * OSGI activation callback
    */
@@ -132,6 +194,13 @@ public class SpringSecurityConfigurationArtifactInstaller implements ArtifactIns
   protected void activate(ComponentContext cc) {
     this.bundleContext = cc.getBundleContext();
     this.appContexts = new HashMap<>();
+
+    Collections.list(cc.getProperties().keys()).stream().filter(s -> s.startsWith(LDAP_INSTANCES_PREFIX)).forEach(s -> {
+      String orgId = s.substring(LDAP_INSTANCES_PREFIX.length());
+      String instanceList = OsgiUtil.getComponentContextProperty(cc, s);
+      expectedLdapInstances.put(orgId, new HashSet(Arrays.asList(instanceList.split(","))));
+    });
+    expectedLdapInstances.forEach((orgId, instances) -> logger.info(orgId + " = " + instances));
   }
 
   /**
@@ -150,10 +219,41 @@ public class SpringSecurityConfigurationArtifactInstaller implements ArtifactIns
    * @see org.apache.felix.fileinstall.ArtifactInstaller#install(java.io.File)
    */
   @Override
-  public void install(File artifact) throws Exception {
-    logger.trace("Install");
+  public synchronized void install(File artifact) throws Exception {
+    logger.trace("Install " + artifact.getAbsolutePath());
+
+    // Are there any expected LDAP authorities populators and have all already registered?
+    String orgId = FilenameUtils.getBaseName(artifact.getName());
+    if (allExpectedAlreadyRegistered(orgId)) {
+      createSecurityContext(artifact);
+    } else {
+      logger.warn("Not all LDAP authorities populators registered so artifact installation is pending.");
+      pendingArtifactsToInstall.put(orgId, artifact);
+    }
+  }
+
+  /**
+   * Returns true if all expected LDAP authorities populators have already registered.
+   *
+   * @param orgId
+   *          The organization ID
+   * @return true if all registered
+   */
+  private boolean allExpectedAlreadyRegistered(String orgId) {
+    Set<String> expected = expectedLdapInstances.get(orgId) != null
+            ? expectedLdapInstances.get(orgId)
+            : new HashSet<String>();
+    Set<String> registered = ldapAuthoritiesPopulators.get(orgId) != null
+            ? ldapAuthoritiesPopulators.get(orgId).keySet()
+            : new HashSet<String>();
+
+    return expected.size() == 0 || registered.containsAll(expected);
+  }
+
+  private void createSecurityContext(File artifact) throws Exception {
     // If we already have a registration for this ID, take it out of the security filter and close it
     String orgId = FilenameUtils.getBaseName(artifact.getName());
+    logger.info("Creating security context for organization {}", orgId);
 
     GenericApplicationContext orgAppContext = appContexts.get(orgId);
     if (orgAppContext != null) {
@@ -176,12 +276,18 @@ public class SpringSecurityConfigurationArtifactInstaller implements ArtifactIns
     orgAppContext.getBeanFactory().registerSingleton("oAuthConsumerDetailsService", this.oAuthConsumerDetailsService);
     orgAppContext.getBeanFactory().registerSingleton("ltiLaunchAuthenticationHandler",
             this.ltiLaunchAuthenticationHandler);
+    if (ldapAuthoritiesPopulators.get(orgId) != null) {
+      for (Map.Entry<String, LdapAuthoritiesPopulator> entry : ldapAuthoritiesPopulators.get(orgId).entrySet()) {
+        logger.trace("Registering bean {}", LDAP_AUTH_POPULATOR_BEAN_NAME_PREFIX + entry.getKey());
+        orgAppContext.getBeanFactory().registerSingleton(LDAP_AUTH_POPULATOR_BEAN_NAME_PREFIX + entry.getKey(),
+                entry.getValue());
+      }
+    }
 
     XmlBeanDefinitionReader xmlBeanDefinitionReader = new XmlBeanDefinitionReader(orgAppContext);
     // So that it finds META-INF/spring.handlers
-    xmlBeanDefinitionReader
-            .setNamespaceHandlerResolver(
-                    new DefaultNamespaceHandlerResolver(SecurityNamespaceHandler.class.getClassLoader()));
+    xmlBeanDefinitionReader.setNamespaceHandlerResolver(
+            new DefaultNamespaceHandlerResolver(SecurityNamespaceHandler.class.getClassLoader()));
     FileSystemResource beanFile = new FileSystemResource(artifact);
     xmlBeanDefinitionReader.loadBeanDefinitions(beanFile);
 
