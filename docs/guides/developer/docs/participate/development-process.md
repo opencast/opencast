@@ -99,6 +99,24 @@ modules/admin-ui/src/main/java | In case the interface of the Admin UI facade ch
 While a committer may accept a patch even if it does not meet these expectations, it is encouraged that anyone filing
 a pull request ensures that they meet these expectations.
 
+#### AI Policy for Pull Requests
+
+Developers contributing to Opencast are free to use whatever tools they wish in their development process.  Opencast's
+committers are still evaluating what, and how we want to accept primarily AI driven contributions.  Until we have more
+expierience with the quality of such contributions, we seek to gather information on how our community uses these
+tools.
+
+With that in mind, when contributing please ensure that your pull request description contains:
+
+- A description which clearly and completely describes which tools, and what they were used for
+- Ideally, the model, size, and/or provider
+
+For the purposes of this description, code completion can be ignored - even if AI powered.  We seek to know if
+significant portions of your PR are generated, or reworked.  Likewise, generated or reworked documentation counts, but
+spell checking obviously does not.
+
+At this time, completely AI generated PRs may be declined at reviewers discretion.
+
 #### Merging Pull Requests
 
 After a pull request has received at least one approving review and passes the automated tests, it is ready for merging.
