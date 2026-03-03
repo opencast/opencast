@@ -211,7 +211,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   static final String NO_ERROR_STATE_SERVICE_TYPES_CONFIG_KEY = "no.error.state.service.types";
 
   /** Default value for {@link #maxAttemptsBeforeErrorState} */
-  private static final int DEFAULT_MAX_ATTEMPTS_BEFORE_ERROR_STATE = 10;
+  private static final int DEFAULT_MAX_ATTEMPTS_BEFORE_ERROR_STATE = -1;
 
   /** Default value for {@link #errorStatesEnabled} */
   private static final boolean DEFAULT_ERROR_STATES_ENABLED = true;
