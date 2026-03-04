@@ -14,10 +14,14 @@
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
     <nodejs.version>v20.10.0</nodejs.version>
+    <ui.include.resource>/ui=-target/classes/</ui.include.resource>
   </properties>
   <profiles>
     <profile>
       <id>frontend-no-prebuild</id>
+      <properties>
+        <ui.include.resource>/ui=target/classes/</ui.include.resource>
+      </properties>
       <build>
         <plugins>
           <plugin>
@@ -63,6 +67,9 @@
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
+      <properties>
+        <ui.include.resource>/ui=target/classes/</ui.include.resource>
+      </properties>
       <build>
         <plugins>
           <plugin>
@@ -134,7 +141,7 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
-            <Include-Resource>/ui=target/classes/</Include-Resource>
+            <Include-Resource>${ui.include.resource}</Include-Resource>
             <Import-Package>!*</Import-Package>
             <Export-Package>!*</Export-Package>
             <Http-Alias>/graphql-ui</Http-Alias>
