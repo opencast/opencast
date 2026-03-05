@@ -46,6 +46,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -66,8 +67,9 @@ import javax.xml.stream.XMLStreamWriter;
  * Object wrapper for a series.
  */
 @XmlType(name = "series", namespace = IndexObject.INDEX_XML_NAMESPACE, propOrder = { "identifier", "title",
-        "description", "subject", "organization", "language", "creator", "license", "extendedMetadata", "accessPolicy",
-        "managedAcl", "createdDateTime", "organizers", "contributors", "publishers", "rightsHolder", "theme" })
+        "description", "subjects", "subject", "organization", "language", "creator", "license", "extendedMetadata",
+        "accessPolicy", "managedAcl", "createdDateTime", "organizers", "contributors", "publishers", "rightsHolder",
+        "theme" })
 @XmlRootElement(name = "series", namespace = IndexObject.INDEX_XML_NAMESPACE)
 @XmlAccessorType(XmlAccessType.NONE)
 public class Series implements IndexObject {
@@ -91,8 +93,8 @@ public class Series implements IndexObject {
   private String description = null;
 
   /** The subject */
-  @XmlElement(name = "subject")
-  private String subject = null;
+  @XmlElement(name = "subjects")
+  private List<String> subjects = new ArrayList<>();
 
   /** The organization for the series */
   @XmlElement(name = "organization")
@@ -251,11 +253,11 @@ public class Series implements IndexObject {
   /**
    * Sets the series subject.
    *
-   * @param subject
+   * @param subjects
    *          the subject
    */
-  public void setSubject(String subject) {
-    this.subject = subject;
+  public void setSubjects(List<String> subjects) {
+    this.subjects = subjects;
   }
 
   /**
@@ -263,8 +265,31 @@ public class Series implements IndexObject {
    *
    * @return the subject
    */
-  public String getSubject() {
-    return subject;
+  public List<String> getSubjects() {
+    return subjects;
+  }
+
+  /**
+   * Returns the series subject.
+   *
+   * @return the subject
+   */
+  @Deprecated
+  private String getSubject() {
+    return String.join(",", this.subjects);
+  }
+
+  /**
+   * Sets the series subject.
+   *
+   * @param subject the subject
+   */
+  @XmlElement(name = "subject")
+  @Deprecated
+  private void setSubject(String subject) {
+    if (this.subjects.isEmpty() && Objects.nonNull(subject)) {
+      this.subjects.addAll(List.of(subject.split(",")));
+    }
   }
 
   /**

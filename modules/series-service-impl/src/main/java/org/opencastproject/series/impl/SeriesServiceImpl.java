@@ -749,7 +749,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
       Series series = seriesOpt.orElse(new Series(seriesId, orgId, securityService.getUser().getName()));
       series.setTitle(dc.getFirst(DublinCoreCatalog.PROPERTY_TITLE));
       series.setDescription(dc.getFirst(DublinCore.PROPERTY_DESCRIPTION));
-      series.setSubject(dc.getFirst(DublinCore.PROPERTY_SUBJECT));
+      series.setSubjects(dc.get(DublinCore.PROPERTY_SUBJECT, DublinCore.LANGUAGE_ANY));
       series.setLanguage(dc.getFirst(DublinCoreCatalog.PROPERTY_LANGUAGE));
       series.setLicense(dc.getFirst(DublinCoreCatalog.PROPERTY_LICENSE));
       series.setRightsHolder(dc.getFirst(DublinCore.PROPERTY_RIGHTS_HOLDER));

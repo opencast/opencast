@@ -62,7 +62,8 @@ public class SeriesTest {
   private String id = "10.0000-1";
   private String title = "Land and Vegetation: Key players on the Climate Scene";
   private String description = "This is the description for this series.";
-  private String subject = "This is the subject";
+  private List<String> subjects = new ArrayList<>();
+  private String subject1 = "This is the subject";
   private String organization = "Organization";
   private String language = "Klingon";
   private String creator = "Creator Name";
@@ -85,6 +86,9 @@ public class SeriesTest {
   @Before
   public void setUp() throws IOException, IllegalStateException, java.text.ParseException {
     createdDateTime = new Date(DateTimeSupport.fromUTC("2011-07-16T20:39:05Z"));
+    // Setup subject collection
+    subjects.add(subject1);
+    subjects.add("This is another subject");
     // Setup presenter collection
     organizers.add(organizer1);
     organizers.add(organizer2);
@@ -100,11 +104,13 @@ public class SeriesTest {
 
   @Test
   public void testToJson() throws ParseException {
+
+
     // Initialize series
     Series series = new Series(id, organization);
     series.setTitle(title);
     series.setDescription(description);
-    series.setSubject(subject);
+    series.setSubjects(subjects);
     series.setLanguage(language);
     series.setCreator(creator);
     series.setLicense(license);
@@ -123,7 +129,7 @@ public class SeriesTest {
     assertEquals(id, seriesJsonObject.get(IDENTIFIER_JSON_KEY));
     assertEquals(title, seriesJsonObject.get(TITLE_JSON_KEY));
     assertEquals(description, seriesJsonObject.get(DESCRIPTION_JSON_KEY));
-    assertEquals(subject, seriesJsonObject.get(SUBJECT_JSON_KEY));
+    assertEquals(subjects, seriesJsonObject.get(SUBJECT_JSON_KEY));
     assertEquals(organization, seriesJsonObject.get(ORGANIZATION_JSON_KEY));
     assertEquals(language, seriesJsonObject.get(LANGUAGE_JSON_KEY));
     assertEquals(creator, seriesJsonObject.get(CREATOR_JSON_KEY));

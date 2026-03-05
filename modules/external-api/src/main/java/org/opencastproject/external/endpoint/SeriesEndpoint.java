@@ -365,12 +365,6 @@ public class SeriesEndpoint {
 
     for (SearchResultItem<Series> item : result.getItems()) {
       final Series s = item.getSource();
-      JsonArray subjects;
-      if (s.getSubject() == null) {
-        subjects = new JsonArray();
-      } else {
-        subjects = splitSubjectIntoArray(s.getSubject());
-      }
 
       Date createdDate = s.getCreatedDateTime();
       JsonObject seriesJson = new JsonObject();
@@ -379,8 +373,8 @@ public class SeriesEndpoint {
       seriesJson.addProperty("title", s.getTitle());
       seriesJson.addProperty("creator", safeString(s.getCreator()));
       seriesJson.addProperty("created", createdDate != null ? toUTC(createdDate.getTime()) : "");
-      seriesJson.add("subjects", subjects);
 
+      seriesJson.add("subjects", collectionToJsonArray(s.getSubjects()));
       seriesJson.add("contributors", collectionToJsonArray(s.getContributors()));
       seriesJson.add("organizers", collectionToJsonArray(s.getOrganizers()));
       seriesJson.add("publishers", collectionToJsonArray(s.getPublishers()));
@@ -452,12 +446,6 @@ public class SeriesEndpoint {
         securityService.getUser());
     if (optSeries.isPresent()) {
       final Series s = optSeries.get();
-      JsonArray subjects;
-      if (s.getSubject() == null) {
-        subjects = new JsonArray();
-      } else {
-        subjects = splitSubjectIntoArray(s.getSubject());
-      }
       Date createdDate = s.getCreatedDateTime();
 
       JsonObject responseContent = new JsonObject();
@@ -467,7 +455,7 @@ public class SeriesEndpoint {
       responseContent.addProperty("title", s.getTitle());
       responseContent.addProperty("description", safeString(s.getDescription()));
       responseContent.addProperty("creator", safeString(s.getCreator()));
-      responseContent.add("subjects", subjects);
+      responseContent.add("subjects", collectionToJsonArray(s.getSubjects()));
       responseContent.addProperty("organization", s.getOrganization());
       responseContent.addProperty("created", createdDate != null ? toUTC(createdDate.getTime()) : "");
       responseContent.add("contributors", collectionToJsonArray(s.getContributors()));
@@ -604,7 +592,7 @@ public class SeriesEndpoint {
     MetadataField subject = metadata.getOutputFields().get(DublinCore.PROPERTY_SUBJECT.getLocalName());
     metadata.removeField(subject);
     MetadataField newSubject = new MetadataField(subject);
-    newSubject.setValue(series.getSubject());
+    newSubject.setValue(series.getSubjects());
     metadata.addField(newSubject);
 
     MetadataField description = metadata.getOutputFields().get(DublinCore.PROPERTY_DESCRIPTION.getLocalName());

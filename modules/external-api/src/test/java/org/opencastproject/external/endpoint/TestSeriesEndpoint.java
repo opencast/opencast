@@ -52,6 +52,7 @@ import org.apache.commons.io.IOUtils;
 import org.easymock.EasyMock;
 import org.junit.Ignore;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -105,7 +106,7 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     Series series1 = new Series("4fd0ef66-aea5-4b7a-a62a-a4ada0eafd6f", "opencast");
     series1.setTitle("Via API");
     series1.setDescription("A series created over the external API");
-    series1.setSubject("Topic");
+    series1.setSubjects(Collections.singletonList("Topic"));
     series1.setCreator("Gracie Walsh");
     series1.setCreatedDateTime(new Date(1429175556000L));
     series1.addContributor("Nu'man Farooq Morcos");

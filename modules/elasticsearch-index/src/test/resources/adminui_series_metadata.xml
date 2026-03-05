@@ -3,7 +3,9 @@
 	<identifier>10.0000-1</identifier>
 	<title>Land and Vegetation: Key players on the Climate Scene</title>
 	<description>This is the description for this series.</description>
-	<subject>This is the subject</subject>
+	<subjects>
+		<subject>This is the subject</subject>
+	</subjects>
 	<organization>Organization</organization>
 	<language>Klingon</language>
 	<creator>Creator Name</creator>
