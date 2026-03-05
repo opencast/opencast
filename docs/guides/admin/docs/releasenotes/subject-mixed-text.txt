@@ -1,0 +1,1 @@
+- [#7462](https://github.com/opencast/opencast/pull/7462/): Changed type of event and series `subject` field from `text` to `mixed_text`. Which allows better handling of keywords and a consistent handling between UI and external API.
