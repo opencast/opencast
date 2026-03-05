@@ -615,6 +615,6 @@ public class AwsS3AssetStore extends AwsAbstractArchive implements RemoteAssetSt
 
   @Override
   public String getStorageName() {
-    return "Amazon S3 Asset Store";
+    return "S3 Asset Store";
   }
 }
