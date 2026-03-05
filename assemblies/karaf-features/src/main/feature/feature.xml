@@ -618,22 +618,12 @@
   <!-- This is included in the etc/org.apache.karaf.features.cfg generated from
        assemblies/dist-xxx/pom.xml -->
   <feature name="opencast-security-cas" version="${project.version}">
-    <!-- Included the bundles below to fix errors like:
-    [caused by: Unable to resolve opencast-security-cas/16.0.0.SNAPSHOT:
-    missing requirement [opencast-security-cas/16.0.0.SNAPSHOT] osgi.identity;
-    osgi.identity=bcpkix; type=osgi.bundle; version="[1.78.1,1.78.1]";
-    resolution:=mandatory [caused by: Unable to resolve bcpkix/1.78.1:
-    missing requirement [bcpkix/1.78.1] osgi.wiring.package;
-    filter:="(&(osgi.wiring.package=org.bouncycastle.asn1)(version>=1.78.1)(!(version>=1.79.0)))"]] -->
     <!-- Picked the same version used by karaf in the 'shell' feature -->
     <bundle start-level="82">mvn:org.bouncycastle/bcutil-jdk18on/1.78.1</bundle>
     <bundle start-level="82">mvn:org.bouncycastle/bcprov-jdk18on/1.78.1</bundle>
     <bundle start-level="82">mvn:org.bouncycastle/bcpkix-jdk18on/1.78.1</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-security-cas-client-wrapper/${project.version}</bundle>
     <bundle start-level="82">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.spring-security-cas/5.7.12_4</bundle>
-    <!-- Added due to karaf error: [caused by: Unable to resolve org.apache.servicemix.bundles.spring-security-cas/5.7.12.4:
-    missing requirement [org.apache.servicemix.bundles.spring-security-cas/5.7.12.4] osgi.wiring.package;
-    filter:="(osgi.wiring.package=net.sf.ehcache)"]]] -->
     <bundle start-level="82">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.ehcache/2.6.11_1</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-security-cas/${project.version}</bundle>
   </feature>
