@@ -123,11 +123,6 @@ respective name of the Shibboleth attribute you use in your Shibboleth Federatio
       </property>
     </bean>
 
-Finally be sure to enable the user reference provider to enable support for externally provided users:
-
-    <osgi:reference id="userReferenceProvider" cardinality="1..1"
-                  interface="org.opencastproject.userdirectory.api.UserReferenceProvider" />
-
 Since the Opencast login page is not used when Shibboleth authentication is in place, there is no point in redirecting
 unauthenticated requests to the Opencast login form. You can redirect them directly to the administrative user
 interface which is supposed to be protected by Shibboleth.
