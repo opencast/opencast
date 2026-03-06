@@ -7,7 +7,10 @@
       },
       "end_date":"2008-03-16T14:00:00Z",
       "title":"Land and Vegetation: Key players on the Climate Scene",
-      "subject":["This is the subject"],
+      "subjects":[
+         "This is the subject",
+         "This is another subject"
+      ],
       "description":"This is the description for this series.",
       "publications":{
          "engage":"engage.html?e=p-1",

@@ -16,7 +16,7 @@
         "readOnly": false,
         "value": ["Topic"],
         "label": "EVENTS.SERIES.DETAILS.METADATA.SUBJECT",
-        "type": "text",
+        "type": "mixed_text",
         "required": false
       },
       {

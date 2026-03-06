@@ -798,8 +798,18 @@ public class SeriesEndpoint {
                 "The series metadata field with id '%s' and the metadata type '%s' is required and can not be empty!.",
                 key, type));
       }
-      collection.removeField(field);
-      collection.addField(MetadataJson.copyWithDifferentJsonValue(field, updatedFields.get(key)));
+      if ("subject".equals(key)) {
+        collection.removeField(field);
+        JsonArray subjects = splitSubjectIntoArray(updatedFields.get(key));
+        collection.addField(MetadataJson.copyWithDifferentJsonValue(
+            field,
+            subjects.toString()
+            )
+        );
+      } else {
+        collection.removeField(field);
+        collection.addField(MetadataJson.copyWithDifferentJsonValue(field, updatedFields.get(key)));
+      }
     }
 
     metadataList.add(adapter, collection);
@@ -1130,12 +1140,20 @@ public class SeriesEndpoint {
             collection.removeField(field);
             try {
               JSONArray subjects = (JSONArray) parser.parse(fields.get(key));
-              collection.addField(
-                      MetadataJson.copyWithDifferentJsonValue(field, StringUtils.join(subjects.iterator(), ",")));
+              collection.addField(MetadataJson.copyWithDifferentJsonValue(field, subjects.toJSONString()));
             } catch (ParseException e) {
               throw new IllegalArgumentException(
-                      String.format("Unable to parse the 'subjects' metadata array field because: %s", e.toString()));
+                      String.format("Unable to parse the 'subjects' metadata array field because: %s", e));
             }
+          } else if ("subject".equals(key)) {
+            MetadataField field = collection.getOutputFields().get("subject");
+            if (field == null) {
+              throw new NotFoundException(String.format(
+                      "Cannot find a metadata field with id '%s' from Catalog with Flavor '%s'.", key, flavorString));
+            }
+            collection.removeField(field);
+            JsonArray subjects = splitSubjectIntoArray(fields.get(key));
+            collection.addField(MetadataJson.copyWithDifferentJsonValue(field, subjects.toString()));
           } else {
             MetadataField field = collection.getOutputFields().get(key);
             if (field == null) {

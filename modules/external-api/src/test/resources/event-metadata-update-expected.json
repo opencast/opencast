@@ -11,8 +11,8 @@
     "readOnly": false,
     "id": "subject",
     "label": "EVENTS.EVENTS.DETAILS.METADATA.SUBJECT",
-    "type": "text",
-    "value": "What this is about - edited",
+    "type": "mixed_text",
+    "value": ["What this is about - edited"],
     "required": false
   },
   {

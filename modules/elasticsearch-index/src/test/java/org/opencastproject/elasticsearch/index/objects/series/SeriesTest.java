@@ -56,7 +56,7 @@ public class SeriesTest {
   private static final String ORGANIZERS_JSON_KEY = "organizers";
   private static final String ORGANIZER_JSON_KEY = "organizer";
   private static final String SERIES_JSON_KEY = "series";
-  private static final String SUBJECT_JSON_KEY = "subject";
+  private static final String SUBJECTS_JSON_KEY = "subjects";
   private static final String TITLE_JSON_KEY = "title";
 
   private String id = "10.0000-1";
@@ -129,7 +129,7 @@ public class SeriesTest {
     assertEquals(id, seriesJsonObject.get(IDENTIFIER_JSON_KEY));
     assertEquals(title, seriesJsonObject.get(TITLE_JSON_KEY));
     assertEquals(description, seriesJsonObject.get(DESCRIPTION_JSON_KEY));
-    assertEquals(subjects, seriesJsonObject.get(SUBJECT_JSON_KEY));
+    assertEquals(subjects, seriesJsonObject.get(SUBJECTS_JSON_KEY));
     assertEquals(organization, seriesJsonObject.get(ORGANIZATION_JSON_KEY));
     assertEquals(language, seriesJsonObject.get(LANGUAGE_JSON_KEY));
     assertEquals(creator, seriesJsonObject.get(CREATOR_JSON_KEY));

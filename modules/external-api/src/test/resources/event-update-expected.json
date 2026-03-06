@@ -15,8 +15,8 @@
         "readOnly": false,
         "id": "subject",
         "label": "EVENTS.EVENTS.DETAILS.METADATA.SUBJECT",
-        "type": "text",
-        "value": "updated subject 1,updated subject 2",
+        "type": "mixed_text",
+        "value": ["updated subject 1","updated subject 2"],
         "required": false
       },
       {
