@@ -15,6 +15,10 @@ the necessary configuration if possible. The easier it is for others to test the
 reviewed and merged.
 -->
 
+### AI Usage
+<!--
+If you used AI in a significant way to create this pull request, please explain how you used it and what you used it for. This is for us to better understand and deal with AI contributions. Your pull request will not be declined just becasue of AI usage.
+-->
 
 ### Your pull request should…
 
@@ -27,4 +31,3 @@ reviewed and merged.
 * [ ] [have proper commit messages (title and body) for all commits](https://medium.com/@steveamaza/e028865e5791)
 * [ ] explain why it needs to be merged into the legacy branch, if it is targeting the legacy branch
 * [ ] include a [release note](https://docs.opencast.org/develop/developer/#participate/development-process/#release-notes) if a feature, or supports a feature (ie, backend part of a frontend feature)
-* [ ] describes any AI use per our [AI use policy](https://docs.opencast.org/develop/#participate/development-process/#ai-policy-for-pull-requests)
