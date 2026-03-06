@@ -21,7 +21,7 @@ delete_indices() {
 	local INDEX="$1"
 	shift  # shift arguments to the left so we can get the rest as an array
 	local SUB_INDICES=("$@")
-	for SUB_INDEX in ${SUB_INDICES[@]}; do
+	for SUB_INDEX in "${SUB_INDICES[@]}"; do
 		DELETE_INDEX="${INDEX}_${SUB_INDEX}"
 		echo -e "Starting to delete ${DELETE_INDEX}.\n"
 
@@ -56,7 +56,7 @@ SUB_INDICES=("${VERSION}" "${EVENT}" "${SERIES}" "${THEME}" "${GROUP}")
 delete_indices $ADMIN_UI_INDEX "${SUB_INDICES[@]}"
 
 # Delete External API sub indices
-SUB_INDICES=($VERSION $EVENT $SERIES $GROUP)
+SUB_INDICES=("$VERSION" "$EVENT" "$SERIES" "$GROUP")
 delete_indices $EXTERNAL_API_INDEX "${SUB_INDICES[@]}"
 
 echo -e "Cleanup done.\n"

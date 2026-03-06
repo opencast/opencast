@@ -10,7 +10,7 @@ ES_HOST="http://localhost:9200"
 ES_USER="your_username"
 ES_PASS="your_password"
 
-if ! command -v jq &> /dev/null; then
+if ! command -v jq > /dev/null 2>&1; then
     echo "Error: jq is not installed. Please install it and try again." >&2
     exit 1
 fi
@@ -65,7 +65,7 @@ reindex() {
     response=$(curl --silent --user "$ES_USER:$ES_PASS" -X GET "$ES_HOST/_tasks/$TASK_ID")
     completed=$(echo "$response" | jq -r '.completed')
 
-    if [[ "$completed" == "true" ]]; then
+    if [ "${completed}" = "true" ]; then
       echo "Task $TASK_ID completed"
       break
     fi
@@ -99,7 +99,7 @@ reindex() {
     response=$(curl --silent --user "$ES_USER:$ES_PASS" -X GET "$ES_HOST/_tasks/$TASK_ID_2")
     completed=$(echo "$response" | jq -r '.completed')
 
-    if [[ "$completed" == "true" ]]; then
+    if [ "${completed}" = "true" ]; then
       echo "Task $TASK_ID_2 completed"
       break
     fi
@@ -124,9 +124,9 @@ update_text_field() {
   echo "Updating text field '$FIELD_NAME' in index '$INDEX_NAME'..."
 
   SCRIPT="
-  ctx._source['$FIELD_NAME'] = [];
-  if (ctx._source.containsKey('"$FIELD_NAME"_fuzzy')) {
-    ctx._source['"$FIELD_NAME"_fuzzy'] = [];
+  ctx._source['${FIELD_NAME}'] = [];
+  if (ctx._source.containsKey('${FIELD_NAME}_fuzzy')) {
+    ctx._source['${FIELD_NAME}_fuzzy'] = [];
   }
   for(c in params.fields) {
     if (ctx._source.containsKey(c) && ctx._source[c] != null) {
