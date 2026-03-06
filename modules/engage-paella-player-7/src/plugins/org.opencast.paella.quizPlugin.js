@@ -137,15 +137,15 @@ export default class QuizPlugin extends EventLogPlugin {
       });
 
       const bottomButtons = createElementWithHtmlText(`
-        <div class="quiz-bottom-buttons"></div>
+        <div class="quiz-plugin-bottom-buttons"></div>
       `, quizLeft);
 
       const skipButton = createElementWithHtmlText(`
-        <button class="quiz-submit-button">${translate('Quiz Skip')}</button>
+        <button class="quiz-plugin-button quiz-plugin-button-secondary">${translate('Quiz Skip')}</button>
       `, bottomButtons);
 
       const submit = createElementWithHtmlText(`
-        <button class="quiz-submit-button">${translate('Quiz Submit')}</button>
+        <button class="quiz-plugin-button quiz-plugin-button-primary">${translate('Quiz Submit')}</button>
       `, bottomButtons);
 
       const quizRight = createElementWithHtmlText(`
@@ -159,18 +159,35 @@ export default class QuizPlugin extends EventLogPlugin {
       const result = createElementWithHtmlText(`
         <div class="quiz-plugin-result"></div>
       `, quizRight);
+      result.style.display = 'none';
+
+      createElementWithHtmlText(`
+        <div class="quiz-plugin-result-title">${translate('Quiz Correct Answers')}</div>
+      `, result);
+
+      const quizBadge = createElementWithHtmlText(`
+        <div class="quiz-plugin-badge">0/2</div>
+      `, result);
+
+      createElementWithHtmlText(`
+        <div>${translate('Quiz Correct Answers Missed')}</div>
+      `, result);
+
+      const missedAnswers = createElementWithHtmlText(`
+        <div class="quiz-plugin-missed-answers"></div>
+      `, result);
 
       const bottomButtonsRight = createElementWithHtmlText(`
-        <div class="quiz-bottom-buttons"></div>
+        <div class="quiz-plugin-bottom-buttons"></div>
       `, quizRight);
 
       const tryAgainButton = createElementWithHtmlText(`
-        <button class="quiz-submit-button">${translate('Quiz Try Again')}</button>
+        <button class="quiz-plugin-button quiz-plugin-button-secondary">${translate('Quiz Try Again')}</button>
       `, bottomButtonsRight);
       tryAgainButton.style.display = 'none';
 
       const continueButton = createElementWithHtmlText(`
-        <button class="quiz-submit-button">${translate('Quiz Continue')}</button>
+        <button class="quiz-plugin-button quiz-plugin-button-secondary">${translate('Quiz Continue')}</button>
       `, bottomButtonsRight);
       continueButton.style.display = 'none';
 
@@ -188,6 +205,7 @@ export default class QuizPlugin extends EventLogPlugin {
         checkboxes.forEach(checkbox => {
           const label = checkbox.parentElement;
           label.classList.remove('quiz-plugin-correct');
+          label.classList.remove('quiz-plugin-wrong');
         });
 
         // Evaluate answers
@@ -201,23 +219,27 @@ export default class QuizPlugin extends EventLogPlugin {
             if (isCorrect) {
               label.classList.add('quiz-plugin-correct');
               correctCount++;
+            } else {
+              label.classList.add('quiz-plugin-wrong');
             }
           }
         });
 
         // Build result message
         const totalCorrect = correctAnswers.length;
-        let resultMsg = `${translate('Quiz Correct Answers', [correctCount, totalCorrect])}`;
+        quizBadge.innerHTML = `${correctCount}/${totalCorrect}`;
 
         // Show missed answers
-        const missed = correctAnswers.filter(answer => !selected.includes(answer));
-        if (missed.length > 0) {
-          const names = missed.map(a => a[0].toUpperCase() + a.slice(1)).join(', ');
-          resultMsg += `<br>
-            <span class="quiz-plugin-correct-list">${translate('Quiz Correct Answers Missed', [names])}</span>`;
-        }
+        let missedAnswersMsg = '';
 
-        result.innerHTML = resultMsg;
+        const missedAnswersList = correctAnswers.filter(answer => !selected.includes(answer));
+        missedAnswersList.forEach(missedAnswer => {
+          const name = missedAnswer[0].toUpperCase() + missedAnswer.slice(1);
+          missedAnswersMsg += `<span class="quiz-plugin-missed-answers-item"> ${name}</span>`;
+        });
+
+        missedAnswers.innerHTML = missedAnswersMsg;
+        result.style.display = 'flex';
         continueButton.style.display = 'block';
         tryAgainButton.style.display = 'block';
       });
@@ -230,10 +252,12 @@ export default class QuizPlugin extends EventLogPlugin {
           checkbox.checked = false;
           const label = checkbox.parentElement;
           label.classList.remove('quiz-plugin-correct');
+          label.classList.remove('quiz-plugin-wrong');
         });
 
 
-        result.innerHTML = '';
+        // result.innerHTML = '';
+        result.style.display = 'none';
         continueButton.style.display = 'none';
         tryAgainButton.style.display = 'none';
       });

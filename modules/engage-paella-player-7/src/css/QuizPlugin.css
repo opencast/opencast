@@ -7,10 +7,9 @@
     padding: 1% 2%;
     z-index: 100;
     font-size: 1.3em;
-    background-color: rgba(245,245,245,1);
-    color: black;
+    background-color: #1f2937;
+    color: #f9fafb;
     border-radius: 2px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
 
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -28,11 +27,26 @@
 
 .quiz-plugin-question {
     flex: 2;
+    display: flex;
+    align-items: center;
     font-weight: bold;
     padding: 1em 0.5em;
     font-size: clamp(12px, 3cqw, 28px);
-    background-color: rgba(180,180,180,1);
+    background-color: #263649;
     overflow: auto;
+    border-radius: 25px;
+}
+
+.quiz-plugin-result {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+}
+
+.quiz-plugin-result-title {
+    font-size: clamp(12px, 3cqw, 28px);
 }
 
 .quiz-plugin-answers {
@@ -45,21 +59,70 @@
 }
 
 .quiz-plugin-answers label {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: 0.5em;
     padding: 0.5em;
-    background-color: rgba(210,210,210,1);
+    background-color: #1f2937;
+    border-radius: 5px;
+    border: 3px solid #2c6fb2;
+    cursor: pointer;
 }
 
-.quiz-plugin-answers label input[type="checkbox"] {
-    width: 2em;
-    height: 1.3em;
+.quiz-plugin-answers label:has(input:checked) {
+    background-color: #2c4766;
+}
+
+.quiz-plugin-answers input[type="checkbox"] {
+    appearance: none;
+    margin: 0;
+
+    font: inherit;
+    color: currentColor;
+    width: 1.15em;
+    height: 1.15em;
+
+    border: 0.15em solid #2c6fb2;
+    border-radius: 999px;
+    transform: translateY(-0.075em);
+
+    display: grid;
+    place-content: center;
+}
+
+.quiz-plugin-answers input[type="checkbox"]:checked {
+    background-color: #2c6fb2;
+}
+
+.quiz-plugin-answers input[type="checkbox"]::before {
+    content: "";
+    width: 0.65em;
+    height: 0.65em;
+
+    transform: scale(0);
+    transition: 120ms transform ease-in-out;
+
+    box-shadow: inset 1em 1em #f9fafb;
+
+    transform-origin: bottom left;
+    clip-path: polygon(14% 44%, 0 59%, 50% 100%, 100% 20%, 85% 5%, 47% 70%);
+}
+
+.quiz-plugin-answers input[type="checkbox"]:checked::before {
+    transform: scale(1);
 }
 
 .quiz-plugin-correct {
-    background-color: #c8e6c9 !important; /* light green */
+    background-color: #2a4b48 !important;
+    border-color: #4bb07b !important;
 }
 
-.quiz-bottom-buttons {
+.quiz-plugin-wrong {
+    background-color: #5d434b !important;
+    border-color: #cd5f5c !important;
+}
+
+.quiz-plugin-bottom-buttons {
     display: flex;
     flex: 1;
     flexDirection: row;
@@ -68,12 +131,33 @@
     align-self: flex-end;
 }
 
-.quiz-submit-button {
+.quiz-plugin-button {
     padding: 0.5em;
+    color: inherit;
     background-color: rgba(180,180,180,1);
     border: none;
+    border-radius: 5px;
     font-size: inherit;
+    font-weight: bold;
     align-self: flex-end;
+}
+
+.quiz-plugin-button-primary {
+    background-color: #2d4766;
+    border: 3px solid #2c6fb2;
+}
+
+.quiz-plugin-button-primary:active {
+    background-color: #2c6fb2
+}
+
+.quiz-plugin-button-secondary {
+    background-color: #3c4653;
+    border: 3px solid #676d78;
+}
+
+.quiz-plugin-button-secondary:active {
+    background-color: #676d78
 }
 
 .quiz-plugin-right {
@@ -82,9 +166,32 @@
     justify-content: space-between;
 }
 
-.quiz-plugin-result {
-    font-weight: bold;
-}
-.quiz-plugin-correct-list {
+.quiz-plugin-missed-answers {
+    display: flex;
+    flex-direction: column;
     margin-top: 0.5em;
+}
+
+.quiz-plugin-missed-answers-item::before {
+    display: inline-block;
+    content: "";
+    width: 0.9em;
+    height: 0.9em;
+    background: #d65b5b;
+    border-radius: 50%;
+    border: 2px solid #9f3c3c;
+}
+
+.quiz-plugin-badge {
+    width: 80px;
+    aspect-ratio: 1;
+    background: #2c4766;
+    border: 2px solid #2c6fb2;
+    border-radius: 50%;
+    font-size: clamp(12px, 3cqw, 28px);
+    font-weight: bold;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }

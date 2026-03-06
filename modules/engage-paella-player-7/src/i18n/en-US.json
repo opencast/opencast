@@ -157,6 +157,6 @@
     "Quiz Submit": "Submit",
     "Quiz Try Again": "Try Again",
     "Quiz Continue": "Continue",
-    "Quiz Correct Answers": "You got $1 out of $2 correct.",
-    "Quiz Correct Answers Missed": "Correct answers you missed: $1"
+    "Quiz Correct Answers": "Correct answers",
+    "Quiz Correct Answers Missed": "Answers you missed"
 }
