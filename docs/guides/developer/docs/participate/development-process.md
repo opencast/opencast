@@ -115,8 +115,6 @@ For the purposes of this description, code completion can be ignored - even if A
 significant portions of your PR are generated, or reworked.  Likewise, generated or reworked documentation counts, but
 spell checking obviously does not.
 
-At this time, completely AI generated PRs may be declined at reviewers discretion.
-
 #### Merging Pull Requests
 
 After a pull request has received at least one approving review and passes the automated tests, it is ready for merging.
