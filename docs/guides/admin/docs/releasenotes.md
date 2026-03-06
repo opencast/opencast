@@ -1,5 +1,9 @@
 # Opencast 19: Release Notes
 
+## Opencast 19.3
+
+This version contains an important fix for the admin UI, which had broken scheduling in 19.1 and 19.2.
+
 ## Opencast 19.2
 
 This version contains updates for the editor, along with the usual collection of bug fixes.
