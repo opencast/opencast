@@ -21,8 +21,6 @@
 
 import { Events, EventLogPlugin, createElementWithHtmlText } from 'paella-core';
 import '../css/TextboxPlugin.css';
-import infoIcon from '../icons/info.svg';
-import externalLinkIcon from '../icons/external-link.svg';
 
 export default class TextBoxPlugin extends EventLogPlugin {
 
@@ -87,60 +85,34 @@ export default class TextBoxPlugin extends EventLogPlugin {
   // Add a textbox to the DOM
   createBox(info, index) {
     if (!this._textboxes.get(index)) {
-      const icon = info.link ? externalLinkIcon : infoIcon;
       let textbox = undefined;
 
-      // textbox = createElementWithHtmlText(`
-      //   <details class="textbox-plugin-box-details">
-      //     <summary class="textbox-plugin-box-summary">
-      //       <a href=${ info.link } class="textbox-plugin-box-summary-link">
-      //         <i class="textbox-plugin-box-icon">${ infoIcon }</i>
-      //         <span class="textbox-plugin-box-text">${ info.text }</span>
-      //       </a>
-      //       <span class="right" aria-hidden="true"></span>
-      //     </summary>
-      //     ${ info.text }
-      //   </details>
-      //   `, this._container);
-
       textbox = createElementWithHtmlText(`
-        <details class="textbox-plugin-box-details"> </details>
+        <details class="textbox-plugin-details"> </details>
       `, this._container);
 
       let summary = createElementWithHtmlText(`
-          <summary class="textbox-plugin-box-summary"> </summary>
+        <summary class="textbox-plugin-summary"> </summary>
       `, textbox);
 
       createElementWithHtmlText(`
-          <div>${ info.text }</div>
+        <div class="textbox-plugin-content">
+          ${ info.text }
+          </br>
+          <a href=${ info.link } target="_blank" rel="noopener noreferrer">${ info.link }</a>
+        </div>
       `, textbox);
 
-      let summaryBox;
-      if (info.link) {
-        summaryBox = createElementWithHtmlText(`
-            <a
-              href=${ info.link }
-              class="textbox-plugin-box-summary-link"
-              target="_blank"
-              rel="noopener noreferrer"
-            > </a>
-        `, summary);
-      } else {
-        summaryBox = createElementWithHtmlText(`
-            <div class="textbox-plugin-box-summary-link"> </div>
-        `, summary);
-      }
+      createElementWithHtmlText(`
+        <div class="textbox-plugin-icon">i</div>
+      `, summary);
 
       createElementWithHtmlText(`
-        <i class="textbox-plugin-box-icon">${ icon }</i>
-      `, summaryBox);
+        <span class="textbox-plugin-title">${ info.text }</span>
+      `, summary);
 
       createElementWithHtmlText(`
-        <span class="textbox-plugin-box-text">${ info.text }</span>
-      `, summaryBox);
-
-      createElementWithHtmlText(`
-        <span class="right" aria-hidden="true"></span>
+        <span class="textbox-plugin-toggle" aria-hidden="true"></span>
       `, summary);
 
       this._textboxes.set(index, textbox);
