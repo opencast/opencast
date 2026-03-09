@@ -733,9 +733,9 @@
     <property name="useHeader" value="true" />
     <property name="multiValueDelimiter" value=";" />
     <property name="attributeMap">
-      <map map-class="java.util.HashMap">
+      <map>
         <entry key="roles">
-          <list value-type="java.lang.String">
+          <list>
             <value>'ROLE_AAI_USER'</value>
             <value>'ROLE_AAI_USER_' + ['eduPersonPrincipalName']</value>
             <value>('ROLE_AAI_OWNER_' + ['eduPersonPrincipalName']).replaceAll("[^a-zA-Z0-9]","_").toUpperCase()</value>
@@ -746,19 +746,19 @@
           </list>
         </entry>
         <entry key="displayName">
-          <list value-type="java.lang.String">
+          <list>
             <value>['givenName'][0] + ' ' + ['sn'][0]</value>
           </list>
         </entry>
         <entry key="mail">
-          <list value-type="java.lang.String">
+          <list>
             <value>['mail'][0]</value>
           </list>
         </entry>
       </map>
     </property>
     <property name="aaiAttributes">
-      <list value-type="java.lang.String">
+      <list>
         <value>sn</value>
         <value>givenName</value>
         <value>mail</value>
@@ -816,7 +816,7 @@
     <!-- <property name="secret" value="***" /> -->
     <property name="expectedAlgorithms">
       <!-- The signing algorithms expected for the JWT signature -->
-      <list value-type="java.lang.String">
+      <list>
         <value>ES256</value>
         <value>ES256K</value>
         <value>ES384</value>
@@ -829,7 +829,7 @@
            The claims `exp` and `nbf` are always verified regardless of this config.
            If you are using JWTs for OpenID Connect, see the specification for claims that must be validated:
            https://openid.net/specs/openid-connect-core-1_0.html#IDTokenValidation-->
-      <list value-type="java.lang.String">
+      <list>
         <!-- The following are just examples if you want to add additional constraints -->
         <!-- <value>containsKey('domain')</value> -->
         <!-- <value>['iss'] eq 'https://auth.example.org'</value> -->
@@ -844,7 +844,7 @@
     <!-- The mapping from JWT claims to Opencast roles. These are in addition to
          ocStandardRoleMappings above. -->
     <property name="roleMappings">
-      <list value-type="java.lang.String">
+      <list>
         <value>'ROLE_JWT_USER'</value>
         <value>'ROLE_JWT_USER_' + ['sub']</value>
         <!-- Some more example -->
