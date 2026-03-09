@@ -83,7 +83,7 @@ public final class SeriesIndexUtils {
   public static SearchMetadataCollection toSearchMetadata(Series series) {
     SearchMetadataCollection metadata = new SearchMetadataCollection(
             series.getIdentifier().concat(series.getOrganization()), Series.DOCUMENT_TYPE);
-    metadata.addField(SeriesIndexSchema.UID, series.getIdentifier(), false);
+    metadata.addField(SeriesIndexSchema.UID, series.getIdentifier(), true);
     metadata.addField(SeriesIndexSchema.ORGANIZATION, series.getOrganization(), false);
     metadata.addField(SeriesIndexSchema.OBJECT, series.toXML(), false);
     metadata.addField(SeriesIndexSchema.TITLE, series.getTitle(), true);

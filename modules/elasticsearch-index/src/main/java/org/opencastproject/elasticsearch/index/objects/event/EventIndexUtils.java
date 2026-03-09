@@ -118,7 +118,7 @@ public final class EventIndexUtils {
   public static SearchMetadataCollection toSearchMetadata(Event event, ListProvidersService listProviderService) {
     SearchMetadataCollection metadata = new SearchMetadataCollection(
             event.getIdentifier().concat(event.getOrganization()), Event.DOCUMENT_TYPE);
-    metadata.addField(EventIndexSchema.UID, event.getIdentifier(), false);
+    metadata.addField(EventIndexSchema.UID, event.getIdentifier(), true);
     metadata.addField(EventIndexSchema.ORGANIZATION, event.getOrganization(), false);
     metadata.addField(EventIndexSchema.OBJECT, event.toXML(), false);
     if (StringUtils.isNotBlank(event.getTitle())) {
@@ -131,7 +131,7 @@ public final class EventIndexUtils {
       metadata.addField(EventIndexSchema.LOCATION, event.getLocation(), true);
     }
     if (StringUtils.isNotBlank(event.getSeriesId())) {
-      metadata.addField(EventIndexSchema.SERIES_ID, event.getSeriesId(), false);
+      metadata.addField(EventIndexSchema.SERIES_ID, event.getSeriesId(), true);
     }
     if (StringUtils.isNotBlank(event.getSeriesName())) {
       metadata.addField(EventIndexSchema.SERIES_NAME, event.getSeriesName(), true);
