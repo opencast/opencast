@@ -22,7 +22,6 @@ package org.opencastproject.external.endpoint;
 
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_11_0;
-import static org.opencastproject.external.common.ApiVersion.VERSION_1_12_0;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_1_0;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_4_0;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_7_0;
@@ -1329,7 +1328,8 @@ public class EventsEndpoint implements ManagedService {
       try {
         Optional<MetadataList> metadata = getEventMetadata(event);
         if (metadata.isPresent()) {
-          json.add("metadata", MetadataJson.listToJson(metadata.get(), true));
+          boolean includeListprovider = !requestedVersion.isSmallerThan(ApiVersion.VERSION_1_12_0);
+          json.add("metadata", MetadataJson.listToJson(metadata.get(), true, includeListprovider));
         }
       } catch (Exception e) {
         logger.error("Unable to get metadata for event '{}'", event.getIdentifier(), e);
@@ -1577,8 +1577,9 @@ public class EventsEndpoint implements ManagedService {
         if (collection != null) {
           convertStartDateTimeToApiV1(collection);
         }
-
-        return ApiResponseBuilder.Json.ok(requestedVersion, MetadataJson.listToJson(actualList, withOrderedText));
+        boolean includeListprovider = !requestedVersion.isSmallerThan(ApiVersion.VERSION_1_12_0);
+        return ApiResponseBuilder.Json.ok(requestedVersion, MetadataJson.listToJson(actualList, withOrderedText,
+            includeListprovider));
       }
       else {
         return ApiResponseBuilder.notFound("Cannot find an event with id '%s'.", id);
@@ -1666,6 +1667,7 @@ public class EventsEndpoint implements ManagedService {
 
   private Response getEventMetadataByType(String id, String type, ApiVersion requestedVersion) throws Exception {
     Optional<Event> eventOpt = indexService.getEvent(id, elasticsearchIndex);
+
     if (eventOpt.isPresent()) {
       Event event = eventOpt.get();
       Optional<MediaPackageElementFlavor> flavor = getFlavor(type);
@@ -1673,6 +1675,8 @@ public class EventsEndpoint implements ManagedService {
         return R.badRequest(
                 String.format("Unable to parse type '%s' as a flavor so unable to find the matching catalog.", type));
       }
+
+      boolean includeListprovider = !requestedVersion.isSmallerThan(ApiVersion.VERSION_1_12_0);
       // Try the main catalog first as we load it from the index.
       EventCatalogUIAdapter eventCatalogUIAdapter = indexService.getCommonEventCatalogUIAdapter();
       if (flavor.get().equals(eventCatalogUIAdapter.getFlavor())) {
@@ -1681,7 +1685,8 @@ public class EventsEndpoint implements ManagedService {
         ExternalMetadataUtils.changeSubjectToSubjects(collection);
         ExternalMetadataUtils.removeCollectionList(collection);
         convertStartDateTimeToApiV1(collection);
-        return ApiResponseBuilder.Json.ok(requestedVersion, MetadataJson.collectionToJson(collection, false));
+        return ApiResponseBuilder.Json.ok(requestedVersion, MetadataJson.collectionToJson(collection, false,
+            includeListprovider));
       }
       // Try the other catalogs
       List<EventCatalogUIAdapter> catalogUIAdapters = getEventCatalogUIAdapters();
@@ -1693,7 +1698,8 @@ public class EventsEndpoint implements ManagedService {
             DublinCoreMetadataCollection fields = catalogUIAdapter.getFields(mediaPackage);
             ExternalMetadataUtils.removeCollectionList(fields);
             convertStartDateTimeToApiV1(fields);
-            return ApiResponseBuilder.Json.ok(requestedVersion, MetadataJson.collectionToJson(fields, false));
+            return ApiResponseBuilder.Json.ok(requestedVersion, MetadataJson.collectionToJson(fields, false,
+                includeListprovider));
           }
         }
       }
