@@ -13,6 +13,8 @@ it needs to go into the legacy and can not go just into stable or develop.
 Explain how to test this patch. If this requires a particular set-up or configuration, explain that as well and provide
 the necessary configuration if possible. The easier it is for others to test the patch, the faster this will get
 reviewed and merged.
+
+For more information, see https://docs.opencast.org/develop/#participate/development-process/#ai-policy-for-pull-requests
 -->
 
 ### AI Usage
