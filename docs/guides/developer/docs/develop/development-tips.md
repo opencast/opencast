@@ -29,9 +29,9 @@ one `allinone` distribution to be created. It is already unpacked and ready to b
 
     ./mvnw clean install -Pdev
 
-The administrative user interface needs nodejs to build and phantomjs for testing purposes. These will be downloaded as
-prebuilt binaries during the maven build process. If there are no prebuilt binaries for your operating system, you can
-build the tools manually and then build opencast using the `frontend-no-prebuilt` maven profile:
+Several frontend modules need Node.js to build. It will be downloaded as a prebuilt binary during the Maven build
+process. If there are no prebuilt binaries for your operating system, you can build the tools manually and then
+build Opencast using the `frontend-no-prebuilt` Maven profile:
 
     ./mvnw clean install -Pdev,frontend-no-prebuilt
 
