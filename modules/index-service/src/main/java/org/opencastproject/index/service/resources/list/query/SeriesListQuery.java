@@ -84,11 +84,20 @@ public class SeriesListQuery extends ResourceListQueryImpl {
   public static final String FILTER_TITLE_NAME = "title";
   private static final String FILTER_TITLE_LABEL = "FILTERS.SERIES.TITLE.LABEL";
 
+  public static final String FILTER_READ_ACCESS_NAME = "readAccess";
+  public static final String FILTER_READ_ACCESS_LABEL = "FILTERS.SERIES.READ_ACCESS.LABEL";
+
+  public static final String FILTER_WRITE_ACCESS_NAME = "writeAccess";
+  public static final String FILTER_WRITE_ACCESS_LABEL = "FILTERS.SERIES.WRITE_ACCESS.LABEL";
+
+
   public SeriesListQuery() {
     super();
     this.availableFilters.add(createCreationDateFilter(Optional.<Tuple<Date, Date>> empty()));
     this.availableFilters.add(createOrganizersFilter(Optional.empty()));
     this.availableFilters.add(createContributorsFilter(Optional.empty()));
+    this.availableFilters.add(createReadAccessFilter(Optional.empty()));
+    this.availableFilters.add(createWriteAccessFilter(Optional.empty()));
   }
 
   /**
@@ -405,6 +414,30 @@ public class SeriesListQuery extends ResourceListQueryImpl {
   public static ResourceListFilter<String> createTitleFilter(Optional<String> title) {
     return FiltersUtils.generateFilter(title, FILTER_TITLE_NAME, FILTER_TITLE_LABEL, SourceType.SELECT,
             Optional.of(SeriesListProvider.TITLE));
+  }
+
+  /**
+   * Create a new {@link ResourceListFilter} based on a read role
+   *
+   * @param readAccess
+   *          the read role to filter on wrapped in an {@link Optional} or {@link Optional#empty()}
+   * @return a new {@link ResourceListFilter} for a read role based query
+   */
+  public static ResourceListFilter<String> createReadAccessFilter(Optional<String> readAccess) {
+    return FiltersUtils.generateFilter(readAccess, FILTER_READ_ACCESS_NAME, FILTER_READ_ACCESS_LABEL,
+        SourceType.FREETEXT, Optional.of("ROLES.TARGET.ACL"));
+  }
+
+  /**
+   * Create a new {@link ResourceListFilter} based on a write role
+   *
+   * @param writeAccess
+   *          the write role to filter on wrapped in an {@link Optional} or {@link Optional#empty()}
+   * @return a new {@link ResourceListFilter} for a write role based query
+   */
+  public static ResourceListFilter<String> createWriteAccessFilter(Optional<String> writeAccess) {
+    return FiltersUtils.generateFilter(writeAccess, FILTER_WRITE_ACCESS_NAME, FILTER_WRITE_ACCESS_LABEL,
+        SourceType.FREETEXT, Optional.of("ROLES.TARGET.ACL"));
   }
 
 }
