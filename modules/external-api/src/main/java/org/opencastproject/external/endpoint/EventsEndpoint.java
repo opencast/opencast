@@ -22,6 +22,7 @@ package org.opencastproject.external.endpoint;
 
 import static org.apache.commons.lang3.StringUtils.trimToNull;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_11_0;
+import static org.opencastproject.external.common.ApiVersion.VERSION_1_12_0;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_1_0;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_4_0;
 import static org.opencastproject.external.common.ApiVersion.VERSION_1_7_0;
@@ -190,7 +191,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0,
             ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0,
             ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0,
-            ApiMediaType.VERSION_1_9_0, ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0 })
+            ApiMediaType.VERSION_1_9_0, ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0,
+            ApiMediaType.VERSION_1_12_0 })
 @RestService(name = "externalapievents", title = "External API Events Service", notes = {},
              abstractText = "Provides resources and operations related to the events")
 @Tag(name = "External API")
@@ -2307,7 +2309,7 @@ public class EventsEndpoint implements ManagedService {
   @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0,
               ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0, ApiMediaType.VERSION_1_6_0,
               ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0, ApiMediaType.VERSION_1_9_0,
-              ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0 })
+              ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0, ApiMediaType.VERSION_1_12_0 })
   @RestQuery(
       name = "geteventscheduling",
       description = "Returns an event's scheduling information.",
@@ -2348,7 +2350,7 @@ public class EventsEndpoint implements ManagedService {
   @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0,
               ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0, ApiMediaType.VERSION_1_6_0,
               ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0, ApiMediaType.VERSION_1_9_0,
-              ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0 })
+              ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0, ApiMediaType.VERSION_1_12_0 })
   @RestQuery(
       name = "updateeventscheduling",
       description = "Update an event's scheduling information.",
