@@ -12,7 +12,7 @@ FIELD_NAME="is_published"
 ES_USER="your_username"
 ES_PASS="your_password"
 
-if ! command -v jq &> /dev/null; then
+if ! command -v jq > /dev/null 2>&1; then
     echo "Error: jq is not installed. Please install it and try again." >&2
     exit 1
 fi

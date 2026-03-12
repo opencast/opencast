@@ -14,13 +14,62 @@
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
     <checkstyle.skip>false</checkstyle.skip>
     <nodejs.version>v20.10.0</nodejs.version>
+    <ui.include.resource>/ui=-target/classes/</ui.include.resource>
   </properties>
   <profiles>
+    <profile>
+      <id>frontend-no-prebuild</id>
+      <properties>
+        <ui.include.resource>/ui=target/classes/</ui.include.resource>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>exec-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>npm ci</id>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <phase>validate</phase>
+                <configuration>
+                  <executable>npm</executable>
+                  <arguments>
+                    <argument>ci</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+
+              <execution>
+                <id>npm run build</id>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <phase>generate-resources</phase>
+                <configuration>
+                  <executable>npm</executable>
+                  <arguments>
+                    <argument>run</argument>
+                    <argument>build</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
     <profile>
       <id>frontend</id>
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
+      <properties>
+        <ui.include.resource>/ui=target/classes/</ui.include.resource>
+      </properties>
       <build>
         <plugins>
           <plugin>
@@ -92,7 +141,7 @@
           <instructions>
             <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
             <Build-Number>${buildNumber}</Build-Number>
-            <Include-Resource>/ui=target/classes/</Include-Resource>
+            <Include-Resource>${ui.include.resource}</Include-Resource>
             <Import-Package>!*</Import-Package>
             <Export-Package>!*</Export-Package>
             <Http-Alias>/graphql-ui</Http-Alias>
