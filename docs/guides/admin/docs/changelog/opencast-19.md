@@ -1,6 +1,12 @@
 Opencast 19 Changelog
 ---------------------
 
+## Opencast 19.3 (2026-03-06)
+- [[#7465](https://github.com/opencast/opencast/pull/7465)] -
+  Opencast 19.2 release notes
+- [[#7463](https://github.com/opencast/opencast/pull/7463)] -
+  Update r/19.x Admin UI to 19.x-2026-03-06
+
 ## Opencast 19.2 (2026-02-27)
 - [[#7419](https://github.com/opencast/opencast/pull/7419)] -
   Opencast 19.2 release notes
