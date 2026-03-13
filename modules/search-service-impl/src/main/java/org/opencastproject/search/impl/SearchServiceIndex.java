@@ -88,6 +88,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -371,6 +372,9 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
             new AccessControlEntry(getEpisodeRoleId(mediaPackageId, action), action, true));
       }
     }
+
+    AccessControlList customRoles = new AccessControlList(new ArrayList<>(customEntries));
+    acl = customRoles.merge(acl);
 
     return acl;
   }
