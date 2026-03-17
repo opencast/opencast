@@ -36,14 +36,20 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.TEXT;
 
-import org.opencastproject.index.service.resources.list.query.PlaylistsListQuery;
+import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.api.SearchResult;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.index.service.util.RestUtils;
+import org.opencastproject.list.common.query.PlaylistsListQuery;
 import org.opencastproject.playlists.Playlist;
 import org.opencastproject.playlists.PlaylistAccessControlEntry;
 import org.opencastproject.playlists.PlaylistEntry;
 import org.opencastproject.playlists.PlaylistRestService;
 import org.opencastproject.playlists.PlaylistService;
 import org.opencastproject.rest.RestConstants;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.NotFoundException;
@@ -73,6 +79,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -132,6 +139,12 @@ public class PlaylistsEndpoint {
   /** The playlists REST service for parsing utilities */
   private PlaylistRestService restService;
 
+  /** The Elasticsearch index for looking up event metadata */
+  private ElasticsearchIndex elasticsearchIndex;
+
+  /** The security service for organization/user context */
+  private SecurityService securityService;
+
   /** OSGi DI */
   @Reference
   public void setPlaylistService(PlaylistService playlistService) {
@@ -141,6 +154,16 @@ public class PlaylistsEndpoint {
   @Reference
   public void setPlaylistRestService(PlaylistRestService playlistRestService) {
     this.restService = playlistRestService;
+  }
+
+  @Reference
+  public void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
+    this.elasticsearchIndex = elasticsearchIndex;
+  }
+
+  @Reference
+  public void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
   }
 
   /** OSGi activation method */
@@ -422,9 +445,12 @@ public class PlaylistsEndpoint {
 
     json.addProperty("id", playlist.getId());
 
+    // Look up event metadata for all entries so the frontend doesn't have to
+    Map<String, Event> eventMap = lookupEntryEvents(playlist.getEntries());
+
     JsonArray entriesArray = new JsonArray();
     for (PlaylistEntry entry : playlist.getEntries()) {
-      entriesArray.add(playlistEntryToJson(entry));
+      entriesArray.add(playlistEntryToJson(entry, eventMap.get(entry.getContentId())));
     }
     json.add("entries", entriesArray);
 
@@ -442,7 +468,7 @@ public class PlaylistsEndpoint {
     return json;
   }
 
-  private JsonObject playlistEntryToJson(PlaylistEntry playlistEntry) {
+  private JsonObject playlistEntryToJson(PlaylistEntry playlistEntry, Event event) {
     JsonObject json = new JsonObject();
 
     json.addProperty("id", playlistEntry.getId());
@@ -454,7 +480,56 @@ public class PlaylistsEndpoint {
 
     json.add("type", enumToJSON(playlistEntry.getType()));
 
+    // Include event metadata if available
+    if (event != null) {
+      json.addProperty("title", safeString(event.getTitle()));
+      json.addProperty("start_date", safeString(event.getRecordingStartDate()));
+
+      if (event.getSeriesName() != null) {
+        JsonObject series = new JsonObject();
+        series.addProperty("id", safeString(event.getSeriesId()));
+        series.addProperty("title", safeString(event.getSeriesName()));
+        json.add("series", series);
+      }
+
+      if (event.getPresenters() != null && !event.getPresenters().isEmpty()) {
+        JsonArray presenters = new JsonArray();
+        for (String presenter : event.getPresenters()) {
+          presenters.add(presenter);
+        }
+        json.add("presenters", presenters);
+      }
+    }
+
     return json;
+  }
+
+  /**
+   * Look up event metadata from search index for all playlist entries.
+   */
+  private Map<String, Event> lookupEntryEvents(List<PlaylistEntry> entries) {
+    Map<String, Event> eventMap = new HashMap<>();
+    String org = securityService.getOrganization().getId();
+    var user = securityService.getUser();
+
+    for (PlaylistEntry entry : entries) {
+      String contentId = entry.getContentId();
+      if (contentId == null || contentId.isEmpty()) {
+        continue;
+      }
+
+      try {
+        SearchResult<Event> result = elasticsearchIndex.getByQuery(
+            new EventSearchQuery(org, user).withIdentifier(contentId));
+        if (result.getPageSize() != 0) {
+          eventMap.put(contentId, result.getItems()[0].getSource());
+        }
+      } catch (SearchIndexException e) {
+        logger.warn("Could not look up event '{}': {}", contentId, e.getMessage());
+      }
+    }
+
+    return eventMap;
   }
 
   private JsonObject playlistAccessControlEntryToJson(PlaylistAccessControlEntry ace) {

@@ -19,7 +19,7 @@
  *
  */
 
-package org.opencastproject.index.service.resources.list.query;
+package org.opencastproject.list.common.query;
 
 import org.opencastproject.list.api.DefaultResourceListQuery;
 import org.opencastproject.list.api.ResourceListFilter;
