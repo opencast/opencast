@@ -16,7 +16,7 @@ Parameter Table
 |------------------|-------|-----------|-------------|
 |series            |`0d06537e-09d3-420c-8314-a21e45c5d032`      |The optional series identifier. If empty the current series of the medipackage will be taken.||
 |attach            |`creativecommons/*,dublincore/*`            |The flavors of the series catalogs to attach to the mediapackage.||
-|apply-acl         |`true`                                      |Whether the ACL should be applied or not. If the mediapackage already has an ACL, this option will have no effect.|`false`|
+|apply-acl         |`true`                                      |Whether the ACL should be applied or not. Note: Existing episode ACLs may still influence the effective permissions depending on merge rules in `etc/org.opencastproject.authorization.xacml.XACMLAuthorizationService.cf`.|`false`|
 |copy-metadata     |`{http://purl.org/dc/terms/}title, isPartOf`|A comma-separated list of metadata fields (possibly "expanded") to be transferred from the series catalog to the episode catalog if they do not exist in the latter.||
 |default-namespace |http://purl.org/dc/elements/1.1/|The default namespace to use when the metadata fields in the `copy-metadata` property are not fully "expanded".|`http://purl.org/dc/terms/` (DublinCore Term namespace)|
 
