@@ -90,6 +90,12 @@ public class EventListQuery extends ResourceListQueryImpl {
   public static final String FILTER_IS_PUBLISHED_NAME = "isPublished";
   public static final String FILTER_IS_PUBLISHED_LABEL = "FILTERS.EVENTS.IS_PUBLISHED.LABEL";
 
+  public static final String FILTER_READ_ACCESS_NAME = "readAccess";
+  public static final String FILTER_READ_ACCESS_LABEL = "FILTERS.EVENTS.READ_ACCESS.LABEL";
+
+  public static final String FILTER_WRITE_ACCESS_NAME = "writeAccess";
+  public static final String FILTER_WRITE_ACCESS_LABEL = "FILTERS.EVENTS.WRITE_ACCESS.LABEL";
+
   public EventListQuery() {
     super();
     this.availableFilters.add(createSeriesFilter(Optional.empty()));
@@ -100,6 +106,8 @@ public class EventListQuery extends ResourceListQueryImpl {
     this.availableFilters.add(createStatusFilter(Optional.empty()));
     this.availableFilters.add(createCommentsFilter(Optional.empty()));
     this.availableFilters.add(createIsPublishedFilter(Optional.empty()));
+    this.availableFilters.add(createReadAccessFilter(Optional.empty()));
+    this.availableFilters.add(createWriteAccessFilter(Optional.empty()));
   }
 
   /**
@@ -453,4 +461,29 @@ public class EventListQuery extends ResourceListQueryImpl {
     return FiltersUtils.generateFilter(isPublished, FILTER_IS_PUBLISHED_NAME, FILTER_IS_PUBLISHED_LABEL,
         SourceType.SELECT, Optional.of(EventsListProvider.ISPUBLISHED));
   }
+
+  /**
+   * Create a new {@link ResourceListFilter} based on a read role
+   *
+   * @param readAccess
+   *          the read role to filter on wrapped in an {@link Optional} or {@link Optional#empty()}
+   * @return a new {@link ResourceListFilter} for a read role based query
+   */
+  public static ResourceListFilter<String> createReadAccessFilter(Optional<String> readAccess) {
+    return FiltersUtils.generateFilter(readAccess, FILTER_READ_ACCESS_NAME, FILTER_READ_ACCESS_LABEL,
+        SourceType.FREETEXT, Optional.of("ROLES.TARGET.ACL"));
+  }
+
+  /**
+   * Create a new {@link ResourceListFilter} based on a write role
+   *
+   * @param writeAccess
+   *          the write role to filter on wrapped in an {@link Optional} or {@link Optional#empty()}
+   * @return a new {@link ResourceListFilter} for a write role based query
+   */
+  public static ResourceListFilter<String> createWriteAccessFilter(Optional<String> writeAccess) {
+    return FiltersUtils.generateFilter(writeAccess, FILTER_WRITE_ACCESS_NAME, FILTER_WRITE_ACCESS_LABEL,
+        SourceType.FREETEXT, Optional.of("ROLES.TARGET.ACL"));
+  }
+
 }

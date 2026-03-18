@@ -873,6 +873,10 @@ public class SeriesEndpoint {
           query.withSubject(filters.get(name));
         } else if (SeriesListQuery.FILTER_TITLE_NAME.equals(name)) {
           query.withTitle(filters.get(name));
+        } else if (SeriesListQuery.FILTER_READ_ACCESS_NAME.equals(name)) {
+          query.withAccessControlEntry(filters.get(name), Permissions.Action.READ);
+        } else if (SeriesListQuery.FILTER_WRITE_ACCESS_NAME.equals(name)) {
+          query.withAccessControlEntry(filters.get(name), Permissions.Action.WRITE);
         }
       }
 

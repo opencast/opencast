@@ -3305,6 +3305,12 @@ public abstract class AbstractEventEndpoint {
           return Response.status(SC_BAD_REQUEST).build();
         }
       }
+      if (EventListQuery.FILTER_READ_ACCESS_NAME.equals(name)) {
+        query.withAccessControlEntry(filters.get(name), Permissions.Action.READ);
+      } else if (EventListQuery.FILTER_WRITE_ACCESS_NAME.equals(name)) {
+        query.withAccessControlEntry(filters.get(name), Permissions.Action.WRITE);
+      }
+
       if (EventListQuery.FILTER_STARTDATE_NAME.equals(name)) {
         try {
           Tuple<Date, Date> fromAndToCreationRange = RestUtils.getFromAndToDateRange(filters.get(name));
