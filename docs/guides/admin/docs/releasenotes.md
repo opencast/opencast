@@ -1,5 +1,12 @@
 # Opencast 19: Release Notes
 
+## Opencast 19.next
+
+This release contains a fix for
+(Episode ID Roles)[https://docs.opencast.org/r/19.x/admin/#configuration/episode-id-roles/#episode-id-roles], which
+were broken in earlier 19.x releases.  Adopters affected by this issue should either reindex their search index or
+republish their recordings.  If you do not use episode id roles then this can safely be ignored.
+
 ## Opencast 19.3
 
 This version contains an important fix for the admin UI, which had broken scheduling in 19.1 and 19.2.
