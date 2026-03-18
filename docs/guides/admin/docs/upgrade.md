@@ -107,3 +107,8 @@ ACLs if you haven't used this feature before. **If this feature was already enab
 If it was not enabled before upgrading, you can start the rebuild by calling the `/index/rebuild/AssetManager/ACL` and
 `/index/rebuild/Search` endpoints. These endpoints will reindex the event ACLs in both the AssetManager index and the
 Search index. For more information, see [here](configuration/episode-id-roles.md).
+
+[[#7477](https://github.com/opencast/opencast/pull/7477)] a fix applied in 18.6 re-enabled
+(Episode ID Roles)[https://docs.opencast.org/r/18.x/admin/#configuration/episode-id-roles/#episode-id-roles].  If your
+site uses these roles, a reindex of the search index or republishing the affected events will resolve the issue.  This
+can be safely ignored if your site does not use episode id roles.
