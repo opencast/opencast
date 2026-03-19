@@ -35,6 +35,7 @@ import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.MatchAllQueryBuilder;
 import org.elasticsearch.index.query.MultiMatchQueryBuilder;
 import org.elasticsearch.index.query.Operator;
+import org.elasticsearch.index.query.PrefixQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.QueryRewriteContext;
@@ -137,8 +138,10 @@ public abstract class AbstractElasticsearchQueryBuilder<T extends SearchQuery> i
     // Text
     if (text != null) {
       MultiMatchQueryBuilder queryBuilder = QueryBuilders.multiMatchQuery(text);
-      queryBuilder.field(TEXT, 1.2f);
-      additionalMultiQueryFields.forEach(field -> queryBuilder.field(field, 1.0f));
+      queryBuilder.field(TEXT, 1.5f);
+      queryBuilder.field(TEXT.concat("._2gram"), 1.3f);
+      queryBuilder.field(TEXT.concat("._3gram"), 1.3f);
+      queryBuilder.field("*", 1.0f);
       queryBuilder.type(MultiMatchQueryBuilder.Type.BEST_FIELDS);
       queryBuilder.operator(Operator.AND);
       if (fuzzy) {
@@ -146,6 +149,12 @@ public abstract class AbstractElasticsearchQueryBuilder<T extends SearchQuery> i
       }
       booleanQuery.minimumShouldMatch(1);
       booleanQuery.should(queryBuilder);
+
+      for (String field : additionalMultiQueryFields) {
+        PrefixQueryBuilder prefixBuilder = QueryBuilders.prefixQuery(field, text);
+        booleanQuery.should(prefixBuilder);
+      }
+
       this.queryBuilder = booleanQuery;
     }
 

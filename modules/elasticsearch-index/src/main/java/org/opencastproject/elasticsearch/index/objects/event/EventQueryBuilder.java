@@ -273,6 +273,7 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
 
         additionalMultiQueryFields.add(EventIndexSchema.UID);
         additionalMultiQueryFields.add(EventIndexSchema.SERIES_ID);
+        additionalMultiQueryFields.add(EventIndexSchema.LOCATION);
 
         fuzzy = query.isFuzzySearch();
 
