@@ -1102,15 +1102,17 @@ public class EditorServiceImpl implements EditorService {
         List<CommentReplyData> replyDataList = new ArrayList<>();
         for (EventCommentReply reply : ec.getReplies()) {
           replyDataList.add(new CommentReplyData(
-                  reply.getId().orElse(0L),
+                  reply.getId().orElseThrow(),
                   DateTimeSupport.toUTC(reply.getCreationDate().getTime()),
                   reply.getAuthor().getUsername(),
+                  reply.getAuthor().getName(),
                   reply.getText()));
         }
         comments.add(new CommentData(
-                ec.getId().orElse(0L),
+                ec.getId().orElseThrow(),
                 DateTimeSupport.toUTC(ec.getCreationDate().getTime()),
                 ec.getAuthor().getUsername(),
+                ec.getAuthor().getName(),
                 ec.getReason(),
                 ec.getText(),
                 ec.isResolvedStatus(),

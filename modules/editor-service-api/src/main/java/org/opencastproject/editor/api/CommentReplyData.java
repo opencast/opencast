@@ -24,12 +24,14 @@ public class CommentReplyData {
   private final long id;
   private final String creationDate;
   private final String author;
+  private final String displayName;
   private final String text;
 
-  public CommentReplyData(long id, String creationDate, String author, String text) {
+  public CommentReplyData(long id, String creationDate, String author, String displayName, String text) {
     this.id = id;
     this.creationDate = creationDate;
     this.author = author;
+    this.displayName = displayName;
     this.text = text;
   }
 
@@ -43,6 +45,10 @@ public class CommentReplyData {
 
   public String getAuthor() {
     return author;
+  }
+
+  public String getDisplayName() {
+    return displayName;
   }
 
   public String getText() {

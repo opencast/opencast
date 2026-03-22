@@ -26,16 +26,18 @@ public class CommentData {
   private final long id;
   private final String creationDate;
   private final String author;
+  private final String displayName;
   private final String reason;
   private final String text;
   private final boolean resolvedStatus;
   private final List<CommentReplyData> replies;
 
-  public CommentData(long id, String creationDate, String author, String reason, String text,
-          boolean resolvedStatus, List<CommentReplyData> replies) {
+  public CommentData(long id, String creationDate, String author, String displayName, String reason, String text,
+      boolean resolvedStatus, List<CommentReplyData> replies) {
     this.id = id;
     this.creationDate = creationDate;
     this.author = author;
+    this.displayName = displayName;
     this.reason = reason;
     this.text = text;
     this.resolvedStatus = resolvedStatus;
@@ -52,6 +54,10 @@ public class CommentData {
 
   public String getAuthor() {
     return author;
+  }
+
+  public String getDisplayName() {
+    return displayName;
   }
 
   public String getReason() {
