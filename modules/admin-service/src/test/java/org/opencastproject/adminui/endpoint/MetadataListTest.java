@@ -92,7 +92,7 @@ public class MetadataListTest {
     metadataList.setLocked(Locked.WORKFLOW_RUNNING);
 
     assertThat(inputJson.toJSONString(),
-      SameJSONAs.sameJSONAs(new Gson().toJson(MetadataJson.listToJson(metadataList, true, false)))
+        SameJSONAs.sameJSONAs(new Gson().toJson(MetadataJson.listToJson(metadataList, true, false)))
         .allowingAnyArrayOrdering());
 
   }
