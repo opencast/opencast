@@ -145,9 +145,9 @@
     <sec:intercept-url pattern="/admin-ng/event/*/metadata" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_METADATA_EDIT')" />
     <sec:intercept-url pattern="/admin-ng/event/*/scheduling" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')" />
     <sec:intercept-url pattern="/admin-ng/event/*/workflows" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT')" />
-    <sec:intercept-url pattern="/admin-ng/event/*/workflows/*/action/stop" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT')" />
-    <sec:intercept-url pattern="/admin-ng/event/*/workflows/*/action/retry" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT')" />
-    <sec:intercept-url pattern="/admin-ng/event/*/workflows/*/action/none" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/workflows/*/action/STOP" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/workflows/*/action/RETRY" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/workflows/*/action/NONE" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT')" />
     <sec:intercept-url pattern="/admin-ng/event/*/comment/*/*" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_COMMENTS_EDIT')" />
     <sec:intercept-url pattern="/admin-ng/event/*/comment/*" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_COMMENTS_EDIT')" />
     <sec:intercept-url pattern="/admin-ng/event/bulk/update" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')" />
