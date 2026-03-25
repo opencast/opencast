@@ -37,14 +37,10 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
 
-      - name: Determine source branch
+      - name: Extract source branch name
         id: source
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
-          else
-            echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
-          fi
+          echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
 
       - name: Determine forward chain
         id: target
