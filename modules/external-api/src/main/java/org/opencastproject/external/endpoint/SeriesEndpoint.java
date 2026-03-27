@@ -365,12 +365,6 @@ public class SeriesEndpoint {
 
     for (SearchResultItem<Series> item : result.getItems()) {
       final Series s = item.getSource();
-      JsonArray subjects;
-      if (s.getSubject() == null) {
-        subjects = new JsonArray();
-      } else {
-        subjects = splitSubjectIntoArray(s.getSubject());
-      }
 
       Date createdDate = s.getCreatedDateTime();
       JsonObject seriesJson = new JsonObject();
@@ -379,8 +373,8 @@ public class SeriesEndpoint {
       seriesJson.addProperty("title", s.getTitle());
       seriesJson.addProperty("creator", safeString(s.getCreator()));
       seriesJson.addProperty("created", createdDate != null ? toUTC(createdDate.getTime()) : "");
-      seriesJson.add("subjects", subjects);
 
+      seriesJson.add("subjects", collectionToJsonArray(s.getSubjects()));
       seriesJson.add("contributors", collectionToJsonArray(s.getContributors()));
       seriesJson.add("organizers", collectionToJsonArray(s.getOrganizers()));
       seriesJson.add("publishers", collectionToJsonArray(s.getPublishers()));
@@ -452,12 +446,6 @@ public class SeriesEndpoint {
         securityService.getUser());
     if (optSeries.isPresent()) {
       final Series s = optSeries.get();
-      JsonArray subjects;
-      if (s.getSubject() == null) {
-        subjects = new JsonArray();
-      } else {
-        subjects = splitSubjectIntoArray(s.getSubject());
-      }
       Date createdDate = s.getCreatedDateTime();
 
       JsonObject responseContent = new JsonObject();
@@ -467,7 +455,7 @@ public class SeriesEndpoint {
       responseContent.addProperty("title", s.getTitle());
       responseContent.addProperty("description", safeString(s.getDescription()));
       responseContent.addProperty("creator", safeString(s.getCreator()));
-      responseContent.add("subjects", subjects);
+      responseContent.add("subjects", collectionToJsonArray(s.getSubjects()));
       responseContent.addProperty("organization", s.getOrganization());
       responseContent.addProperty("created", createdDate != null ? toUTC(createdDate.getTime()) : "");
       responseContent.add("contributors", collectionToJsonArray(s.getContributors()));
@@ -604,7 +592,7 @@ public class SeriesEndpoint {
     MetadataField subject = metadata.getOutputFields().get(DublinCore.PROPERTY_SUBJECT.getLocalName());
     metadata.removeField(subject);
     MetadataField newSubject = new MetadataField(subject);
-    newSubject.setValue(series.getSubject());
+    newSubject.setValue(series.getSubjects());
     metadata.addField(newSubject);
 
     MetadataField description = metadata.getOutputFields().get(DublinCore.PROPERTY_DESCRIPTION.getLocalName());
@@ -810,8 +798,18 @@ public class SeriesEndpoint {
                 "The series metadata field with id '%s' and the metadata type '%s' is required and can not be empty!.",
                 key, type));
       }
-      collection.removeField(field);
-      collection.addField(MetadataJson.copyWithDifferentJsonValue(field, updatedFields.get(key)));
+      if ("subject".equals(key)) {
+        collection.removeField(field);
+        JsonArray subjects = splitSubjectIntoArray(updatedFields.get(key));
+        collection.addField(MetadataJson.copyWithDifferentJsonValue(
+            field,
+            subjects.toString()
+            )
+        );
+      } else {
+        collection.removeField(field);
+        collection.addField(MetadataJson.copyWithDifferentJsonValue(field, updatedFields.get(key)));
+      }
     }
 
     metadataList.add(adapter, collection);
@@ -1142,12 +1140,20 @@ public class SeriesEndpoint {
             collection.removeField(field);
             try {
               JSONArray subjects = (JSONArray) parser.parse(fields.get(key));
-              collection.addField(
-                      MetadataJson.copyWithDifferentJsonValue(field, StringUtils.join(subjects.iterator(), ",")));
+              collection.addField(MetadataJson.copyWithDifferentJsonValue(field, subjects.toJSONString()));
             } catch (ParseException e) {
               throw new IllegalArgumentException(
-                      String.format("Unable to parse the 'subjects' metadata array field because: %s", e.toString()));
+                      String.format("Unable to parse the 'subjects' metadata array field because: %s", e));
             }
+          } else if ("subject".equals(key)) {
+            MetadataField field = collection.getOutputFields().get("subject");
+            if (field == null) {
+              throw new NotFoundException(String.format(
+                      "Cannot find a metadata field with id '%s' from Catalog with Flavor '%s'.", key, flavorString));
+            }
+            collection.removeField(field);
+            JsonArray subjects = splitSubjectIntoArray(fields.get(key));
+            collection.addField(MetadataJson.copyWithDifferentJsonValue(field, subjects.toString()));
           } else {
             MetadataField field = collection.getOutputFields().get(key);
             if (field == null) {

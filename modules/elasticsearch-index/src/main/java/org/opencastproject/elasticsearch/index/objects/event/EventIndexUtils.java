@@ -139,8 +139,9 @@ public final class EventIndexUtils {
     if (StringUtils.isNotBlank(event.getLanguage())) {
       metadata.addField(EventIndexSchema.LANGUAGE, event.getLanguage(), false);
     }
-    if (StringUtils.isNotBlank(event.getSubject())) {
-      metadata.addField(EventIndexSchema.SUBJECT, event.getSubject(), true);
+    if (event.getSubjects() != null) {
+      List<String> subjects = event.getSubjects();
+      metadata.addField(EventIndexSchema.SUBJECT, subjects.toArray(new String[0]), true);
     }
     if (StringUtils.isNotBlank(event.getSource())) {
       metadata.addField(EventIndexSchema.SOURCE, event.getSource(), false);
@@ -461,7 +462,7 @@ public final class EventIndexUtils {
   public static Event updateEvent(Event event, DublinCore dc) {
     event.setTitle(dc.getFirst(DublinCore.PROPERTY_TITLE));
     event.setDescription(dc.getFirst(DublinCore.PROPERTY_DESCRIPTION));
-    event.setSubject(dc.getFirst(DublinCore.PROPERTY_SUBJECT));
+    event.setSubjects(dc.get(DublinCore.PROPERTY_SUBJECT, DublinCore.LANGUAGE_ANY));
     event.setLocation(dc.getFirst(DublinCore.PROPERTY_SPATIAL));
     event.setLanguage(dc.getFirst(DublinCore.PROPERTY_LANGUAGE));
     event.setSource(dc.getFirst(DublinCore.PROPERTY_SOURCE));

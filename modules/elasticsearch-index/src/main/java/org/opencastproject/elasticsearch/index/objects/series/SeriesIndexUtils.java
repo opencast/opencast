@@ -90,8 +90,8 @@ public final class SeriesIndexUtils {
     if (StringUtils.trimToNull(series.getDescription()) != null) {
       metadata.addField(SeriesIndexSchema.DESCRIPTION, series.getDescription(), true);
     }
-    if (StringUtils.trimToNull(series.getSubject()) != null) {
-      metadata.addField(SeriesIndexSchema.SUBJECT, series.getSubject(), true);
+    if (series.getSubjects() != null) {
+      metadata.addField(SeriesIndexSchema.SUBJECT, series.getSubjects().toArray(), true);
     }
     if (StringUtils.trimToNull(series.getLanguage()) != null) {
       metadata.addField(SeriesIndexSchema.LANGUAGE, series.getLanguage(), false);

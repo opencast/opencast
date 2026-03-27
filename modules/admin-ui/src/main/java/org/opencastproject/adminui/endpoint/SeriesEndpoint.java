@@ -422,7 +422,7 @@ public class SeriesEndpoint {
     MetadataField subject = metadata.getOutputFields().get(DublinCore.PROPERTY_SUBJECT.getLocalName());
     metadata.removeField(subject);
     MetadataField newSubject = new MetadataField(subject);
-    newSubject.setValue(series.getSubject());
+    newSubject.setValue(series.getSubjects());
     metadata.addField(newSubject);
 
     MetadataField description = metadata.getOutputFields().get(DublinCore.PROPERTY_DESCRIPTION.getLocalName());

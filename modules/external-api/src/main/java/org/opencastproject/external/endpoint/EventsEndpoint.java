@@ -1310,12 +1310,7 @@ public class EventsEndpoint implements ManagedService {
       }
     }
 
-    if (StringUtils.trimToNull(event.getSubject()) != null) {
-      json.add("subjects", splitSubjectIntoArray(event.getSubject()));
-    } else {
-      json.add("subjects", new JsonArray());
-    }
-
+    json.add("subjects", collectionToJsonArray(event.getSubjects()));
     json.addProperty("title", safeString(event.getTitle()));
 
     if (withAcl != null && withAcl) {
@@ -1792,9 +1787,17 @@ public class EventsEndpoint implements ManagedService {
             return error.get();
           }
           collection.removeField(field);
-          JSONArray subjectArray = (JSONArray) parser.parse(updatedFields.get(key));
-          collection.addField(
-                  MetadataJson.copyWithDifferentJsonValue(field, StringUtils.join(subjectArray.iterator(), ",")));
+          collection.addField(MetadataJson.copyWithDifferentJsonValue(field, updatedFields.get(key)));
+        } else if ("subject".equals(key)) {
+          MetadataField field = collection.getOutputFields().get(DublinCore.PROPERTY_SUBJECT.getLocalName());
+          Optional<Response> error = validateField(field, key, id, type, updatedFields);
+          if (error.isPresent()) {
+            return error.get();
+          }
+          collection.removeField(field);
+          JSONArray a = new JSONArray();
+          a.addAll(List.of(updatedFields.get(key).split(",")));
+          collection.addField(MetadataJson.copyWithDifferentJsonValue(field, a.toJSONString()));
         } else if ("startDate".equals(key)) {
           // Special handling for start date since in API v1 we expect start date and start time to be separate fields.
           MetadataField field = collection.getOutputFields().get(key);

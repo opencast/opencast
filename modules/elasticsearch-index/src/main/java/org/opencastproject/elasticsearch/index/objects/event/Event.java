@@ -49,6 +49,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -72,7 +73,7 @@ import javax.xml.stream.XMLStreamWriter;
     name = "event",
     namespace = IndexObject.INDEX_XML_NAMESPACE,
     propOrder = {
-        "identifier", "organization", "title", "description", "subject", "location", "presenters",
+        "identifier", "organization", "title", "description", "subjects", "subject", "location", "presenters",
         "contributors", "seriesId", "seriesName", "language", "source", "created", "creator",
         "publisher", "license", "rights", "extendedMetadata", "accessPolicy", "managedAcl", "workflowState",
         "workflowId", "workflowDefinitionId", "recordingStartTime", "recordingEndTime", "duration",
@@ -136,8 +137,9 @@ public class Event implements IndexObject {
   private String description = null;
 
   /** The subject */
+  @XmlElementWrapper(name = "subjects")
   @XmlElement(name = "subject")
-  private String subject = null;
+  private List<String> subjects = new ArrayList<>();
 
   /** The location */
   @XmlElement(name = "location")
@@ -366,8 +368,8 @@ public class Event implements IndexObject {
    * @param subject
    *          the subject to set
    */
-  public void setSubject(String subject) {
-    this.subject = subject;
+  public void setSubjects(List<String> subject) {
+    this.subjects = subject;
   }
 
   /**
@@ -375,8 +377,34 @@ public class Event implements IndexObject {
    *
    * @return the subject
    */
-  public String getSubject() {
-    return subject;
+  public List<String> getSubjects() {
+    return subjects;
+  }
+
+  /**
+   * Sets the recording subject
+   *
+   * @param subject
+   *          the subject to set
+   */
+  @XmlElement(name = "subject")
+  @Deprecated
+  private void setSubject(String subject) {
+    if (this.subjects.isEmpty() && Objects.nonNull(subject)) {
+      // The external api is splitting the subject by comma, this mimics that behavior
+      // if the metadata is saved it will be stored as list
+      this.subjects.addAll(List.of(subject.split(",")));
+    }
+  }
+
+  /**
+   * Returns the recording subject.
+   *
+   * @return the subject
+   */
+  @Deprecated
+  private String getSubject() {
+    return String.join(",", this.subjects);
   }
 
   /**

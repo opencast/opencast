@@ -15,7 +15,7 @@
         "readOnly": false,
         "id": "subjects",
         "label": "EVENTS.EVENTS.DETAILS.METADATA.SUBJECT",
-        "type": "text",
+        "type": "mixed_text",
         "value": [],
         "required": false
       },

@@ -43,8 +43,10 @@ public final class ExternalMetadataUtils {
     final MetadataField subject = collection.getOutputFields().get(DublinCore.PROPERTY_SUBJECT.getLocalName());
     collection.removeField(subject);
     final List<String> newValue;
-    if (subject.getValue() != null) {
+    if (subject.getValue() != null && subject.getValue() instanceof String) {
       newValue = Pattern.compile(",").splitAsStream(subject.getValue().toString()).collect(Collectors.toList());
+    } else if (subject.getValue() != null && subject.getValue() instanceof List) {
+      newValue = (List<String>)subject.getValue();
     } else {
       newValue = null;
     }
@@ -56,7 +58,7 @@ public final class ExternalMetadataUtils {
             subject.isRequired(),
             newValue,
             subject.isTranslatable(),
-            MetadataField.Type.ITERABLE_TEXT,
+            MetadataField.Type.MIXED_TEXT,
             subject.getCollection(),
             subject.getCollectionID(),
             subject.getOrder(),

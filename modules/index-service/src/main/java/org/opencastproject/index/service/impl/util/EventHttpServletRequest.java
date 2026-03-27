@@ -451,14 +451,7 @@ public class EventHttpServletRequest {
                       "Cannot find a metadata field with id 'subject' from Catalog with Flavor '%s'.", flavorString));
             }
             collection.removeField(field);
-            try {
-              JSONArray subjects = (JSONArray) parser.parse(fields.get(key));
-              collection.addField(MetadataJson
-                      .copyWithDifferentJsonValue(field, StringUtils.join(subjects.iterator(), ",")));
-            } catch (ParseException e) {
-              throw new IllegalArgumentException(
-                      String.format("Unable to parse the 'subjects' metadata array field because: %s", e.toString()));
-            }
+            collection.addField(MetadataJson.copyWithDifferentJsonValue(field, fields.get(key)));
           } else if ("startDate".equals(key)) {
             // Special handling for start date since in API v1 we expect start date and start time to be separate
             // fields.

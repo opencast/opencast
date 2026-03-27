@@ -13,7 +13,7 @@
     "value": ["Topic"],
     "label": "EVENTS.SERIES.DETAILS.METADATA.SUBJECT",
     "required": false,
-    "type": "text"
+    "type": "mixed_text"
   },
   {
     "id": "description",
