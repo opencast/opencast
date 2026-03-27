@@ -6,7 +6,7 @@ The following is a brief overview.
 
 ### Admin Interface
 - Lives in its [own GitHub repository](https://github.com/opencast/opencast-admin-interface). Builds end up in the
-  `admin-ui-interface` module.
+  `admin` module.
 - Will eventually become and replace the (old) Admin UI.
 
 ### Media Module
