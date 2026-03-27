@@ -7,7 +7,14 @@
 
     "uid": {
       "type": "keyword",
-      "store": true
+      "store": true,
+      "fields": {
+        "search": {
+          "type": "text",
+          "analyzer": "id_search_analyzer",
+          "store": false
+        }
+      }
     },
 
     "organization": {

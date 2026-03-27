@@ -18,10 +18,18 @@
       },
       "whitespace_analyzer": {
         "type": "custom",
-        "tokenizer": "whitespace",
+        "tokenizer": "whitespace_symbol_tokenizer",
         "char_filter": [
           "camel_case_filter"
         ],
+        "filter": [
+          "lowercase",
+          "icu_folding"
+        ]
+      },
+      "id_search_analyzer": {
+        "type": "custom",
+        "tokenizer": "whitespace_symbol_tokenizer",
         "filter": [
           "lowercase",
           "icu_folding"
