@@ -23,171 +23,171 @@ distributed under licenses that are compatible with ECL 2.0.
 List of Included Third-Party Dependencies
 -----------------------------------------
 
-modules/admin-ui/bower_components/angular/.*
+modules/admin-service/bower_components/angular/.*
   angular 1.7.8 (https://github.com/angular/angular.js)
   Copyright (c) 2010-2019 Google, Inc. http://angularjs.org
   Licensed under MIT
 
-modules/admin-ui/bower_components/angular-animate/.*
+modules/admin-service/bower_components/angular-animate/.*
   angular-animate 1.7.8 (https://github.com/angular/angular.js)
   Copyright (c) 2010-2019 Google, Inc. http://angularjs.org
   Licensed under MIT
 
-modules/admin-ui/bower_components/angular-chart-js/.*
+modules/admin-service/bower_components/angular-chart-js/.*
   angular-chart-js 1.1.1 (https://github.com/jtblin/angular-chart.js)
   Copyright (c) Jerome Touffe-Blin ("Author")
   Licensed under BSD
 
-modules/admin-ui/bower_components/angular-hotkeys/.*
+modules/admin-service/bower_components/angular-hotkeys/.*
   angular-hotkeys 1.7.0 (https://github.com/chieffancypants/angular-hotkeys)
   Copyright (c) 2014 Wes Cruver
   Licensed under MIT
 
-modules/admin-ui/bower_components/angular-local-storage/.*
+modules/admin-service/bower_components/angular-local-storage/.*
   angular-local-storage 0.7.1 (https://github.com/grevory/angular-local-storage.git)
   Copyright (c) 2016 Gregory Pike
   Licensed under MIT
 
-modules/admin-ui/bower_components/angular-messages/.*
+modules/admin-service/bower_components/angular-messages/.*
   angular-messages 1.7.8 (https://github.com/angular/angular.js)
   Copyright (c) 2010-2019 Google, Inc. http://angularjs.org
   Licensed under MIT
 
-modules/admin-ui/bower_components/angular-mocks/.*
+modules/admin-service/bower_components/angular-mocks/.*
   angular-mocks 1.7.8 (https://github.com/angular/angular.js)
   Copyright (c) 2010-2019 Google, Inc. http://angularjs.org
   Licensed under MIT
 
-modules/admin-ui/bower_components/angular-resource/.*
+modules/admin-service/bower_components/angular-resource/.*
   angular-resource 1.7.8 (https://github.com/angular/angular.js)
   Copyright (c) 2010-2019 Google, Inc. http://angularjs.org
   Licensed under MIT
 
-modules/admin-ui/bower_components/angular-route/.*
+modules/admin-service/bower_components/angular-route/.*
   angular-route 1.7.8 (https://github.com/angular/angular.js)
   Copyright (c) 2010-2019 Google, Inc. http://angularjs.org
   Licensed under MIT
 
-modules/admin-ui/bower_components/angular-translate/.*
+modules/admin-service/bower_components/angular-translate/.*
   angular-translate 2.18.1 (https://github.com/angular-translate/angular-translate)
   Copyright (c) 2013-2017 The angular-translate team and Pascal Precht
   Licensed under MIT
 
-modules/admin-ui/bower_components/angular-translate-loader-static-files/.*
+modules/admin-service/bower_components/angular-translate-loader-static-files/.*
   angular-translate-loader-static-files 2.18.1 (https://github.com/angular-translate/bower-angular-translate-loader-static-files.git)
   Copyright (c) 2013-2017 The angular-translate team and Pascal Precht
   Licensed under MIT
 
-modules/admin-ui/bower_components/angular-ui-sortable/.*
+modules/admin-service/bower_components/angular-ui-sortable/.*
   angular-ui-sortable - This directive allows you to jQueryUI Sortable.
   @version v0.19.0 - 2018-01-14
   @link http://angular-ui.github.com
   @license MIT
 
-modules/admin-ui/bower_components/angular-wizard/.*
+modules/admin-service/bower_components/angular-wizard/.*
   angular-wizard 1.1.1 (git://github.com/mgonto/angular-wizard.git)
   Copyright (c) 2013-2014 Martin Gontovnikas http://www.gon.to/
   Licensed under MIT
 
-modules/admin-ui/bower_components/chart.js/.*
+modules/admin-service/bower_components/chart.js/.*
   chart.js 2.8.0 (https://github.com/chartjs/Chart.js)
   Copyright (c) 2018 Chart.js Contributors
   Licensed under MIT
 
-modules/admin-ui/bower_components/ng-file-upload/.*
+modules/admin-service/bower_components/ng-file-upload/.*
   angular-file-upload 2.2.2 (https://github.com/danialfarid/angular-file-upload)
   Copyright (c) 2013 danialfarid
   Licensed under MIT
 
-modules/admin-ui/bower_components/jquery/*
+modules/admin-service/bower_components/jquery/*
   jQuery JavaScript Library v3.4.1
   http://jquery.com/
   Copyright JS Foundation and other contributors
   Released under the MIT license
   http://jquery.org/license
 
-modules/admin-ui/bower_components/jquery-ui/*
+modules/admin-service/bower_components/jquery-ui/*
   jQuery UI - v1.12.1 - 2016-09-14
   http://jqueryui.com
   Copyright 2014 jQuery Foundation and other contributors; Licensed MIT */
 
-modules/admin-ui/bower_components/jqueryui-timepicker-addon/*
+modules/admin-service/bower_components/jqueryui-timepicker-addon/*
   jQuery Timepicker Addon - v1.6.3 - 2016-04-20
   http://trentrichardson.com/examples/timepicker
   Copyright (c) 2016 Trent Richardson; Licensed MIT
 
-modules/admin-ui/src/main/webapp/css/vendor/chosen.less
+modules/admin-service/src/main/webapp/css/vendor/chosen.less
   Chosen, a Select Box Enhancer for jQuery and Prototype
   by Patrick Filler for Harvest, http://getharvest.com
   Copyright (c) 2011 - 2016 Harvest http://getharvest.com
   MIT License, https://github.com/harvesthq/chosen/blob/master/LICENSE.md
 
-modules/admin-ui/src/main/webapp/lib/chosen.js
-modules/admin-ui/src/main/webapp/lib/chosen.jquery.*
+modules/admin-service/src/main/webapp/lib/chosen.js
+modules/admin-service/src/main/webapp/lib/chosen.jquery.*
   Chosen, a Select Box Enhancer for jQuery and Prototype
   by Patrick Filler for Harvest, http://getharvest.com
   Version 1.6.2
   Copyright (c) 2011 - 2016 Harvest http://getharvest.com
   MIT License
 
-modules/admin-ui/src/main/webapp/lib/angular-chosen.js
-modules/admin-ui/src/main/webapp/lib/angular-chosen.min.js
+modules/admin-service/src/main/webapp/lib/angular-chosen.js
+modules/admin-service/src/main/webapp/lib/angular-chosen.min.js
   Angular Binding for Harvest Chosen
   Version 1.8.0, 1.8.2
   Copyright (c) 2013 Localytics http://www.localytics.com
   MIT License
 
-modules/admin-ui/src/main/webapp/lib/datepicker/*
+modules/admin-service/src/main/webapp/lib/datepicker/*
   jQuery UI - v1.10.3 - 2013-12-13
   http://jqueryui.com
   Copyright 2013 jQuery Foundation and other contributors; Licensed MIT
 
-modules/admin-ui/src/main/webapp/lib/font-awesome/*
+modules/admin-service/src/main/webapp/lib/font-awesome/*
   Font Awesome 4.2.0 by @davegandy - http://fontawesome.io - @fontawesome
   License - http://fontawesome.io/license (Font: SIL OFL 1.1, CSS: MIT License)
 
-modules/admin-ui/src/main/webapp/lib/google-fonts/*
+modules/admin-service/src/main/webapp/lib/google-fonts/*
   Open Sans
   Steve Matteson
   https://www.google.com/fonts/specimen/Open+Sans
   Apache License, version 2.0
 
-modules/admin-ui/src/main/webapp/lib/moment.min.js
+modules/admin-service/src/main/webapp/lib/moment.min.js
   version : 2.9.0
   authors : Tim Wood, Iskren Chernev, Moment.js contributors
   license : MIT
   momentjs.com
 
-modules/admin-ui/src/main/webapp/lib/underscore-1.5.2.js
+modules/admin-service/src/main/webapp/lib/underscore-1.5.2.js
   Underscore.js 1.5.2
   http://underscorejs.org
   (c) 2009-2013 Jeremy Ashkenas, DocumentCloud and Investigative Reporters & Editors
   Underscore may be freely distributed under the MIT license.
 
-modules/admin-ui/src/main/webapp/lib/video-js/*
+modules/admin-service/src/main/webapp/lib/video-js/*
   Video.js v4.11.2
   Copyright 2014 Brightcove, Inc.
   Licensed under the Apache License, Version 2.0
 
-modules/admin-ui/src/main/webapp/scripts/shared/directives/opencastScrollGlue.js
+modules/admin-service/src/main/webapp/scripts/shared/directives/opencastScrollGlue.js
   Adapted from AngularJS Scroll Glue v2.0.6
   https://github.com/Luegg/angularjs-scroll-glue
   (c) 2013 Lukas Wegmann
   Licensed under the MIT license
 
-modules/admin-ui/src/test/resources/test/lib/angular/angular-scenario.js
+modules/admin-service/src/test/resources/test/lib/angular/angular-scenario.js
   Copyright 2005, 2013 jQuery Foundation, Inc. and other contributors
   Released under the MIT license
   http://jquery.org/license
 
-modules/admin-ui/src/test/resources/test/lib/jasmine-jquery.js
+modules/admin-service/src/test/resources/test/lib/jasmine-jquery.js
   Jasmine-jQuery: a set of jQuery helpers for Jasmine tests.
   Version 2.0.5
   https://github.com/velesin/jasmine-jquery
   Copyright (c) 2010-2014 Wojciech Zawistowski, Travis Jeffery
   MIT License
 
-modules/admin-ui/src/test/resources/test/lib/jquery-deparam.js
+modules/admin-service/src/test/resources/test/lib/jquery-deparam.js
   Deparam is the inverse of jquery's $.param method
   Extracted $.deparam from Ben Alman's jquery-bbq with license info included
   https://github.com/AceMetrix/jquery-deparam
@@ -354,7 +354,7 @@ assemblies
   org.codehaus.mojo                      build-helper-maven-plugin                        MIT License
 
 
-admin-ui
+admin-service
   GroupId                                ArtifactId                                       Licenses
   com.google.code.gson                   gson                                             Apache 2.0
   com.googlecode.json-simple             json-simple                                      The Apache Software License, Version 2.0

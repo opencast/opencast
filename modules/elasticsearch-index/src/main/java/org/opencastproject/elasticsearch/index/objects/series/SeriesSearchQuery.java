@@ -34,6 +34,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -64,6 +65,7 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
   private boolean editOnly = false;
   private String rightsHolder = null;
   private Long theme = null;
+  private final Map<String, String> accessControlEntries = new HashMap<>();
 
   private static final Map<String, String> SORT_FIELDS = Map.of(
       SeriesIndexSchema.TITLE, SeriesIndexSchema.TITLE.concat(IndexSchema.SORT_FIELD_NAME_EXTENSION),
@@ -185,6 +187,39 @@ public class SeriesSearchQuery extends AbstractSearchQuery {
   public String[] getActions() {
     return actions.toArray(new String[actions.size()]);
   }
+
+
+  /**
+   * Filter the series with the given role and action.
+   * <p>
+   * Note that this method may be called multiple times to support filtering by multiple role and action combinations.
+   *
+   * @param role
+   *          the role
+   * @param action
+   *          the action
+   * @return the enhanced search query
+   */
+  public SeriesSearchQuery withAccessControlEntry(String role, Action action) {
+    if (StringUtils.isBlank(role)) {
+      throw new IllegalArgumentException("Role cannot be null");
+    }
+    if (action == null) {
+      throw new IllegalArgumentException("Action cannot be null");
+    }
+    this.accessControlEntries.put(role, action.toString());
+    return this;
+  }
+
+    /**
+    * Returns the list of access control entries or an empty map if no access control entries have been specified.
+    *
+    * @return the access control entries
+    */
+  public Map<String, String> getAccessControlEntries() {
+    return accessControlEntries;
+  }
+
 
   /**
    * Selects series with the given description.

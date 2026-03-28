@@ -5,8 +5,8 @@ Opencast boasts multiple graphical user interfaces for different purposes, livin
 The following is a brief overview.
 
 ### Admin Interface
-- Lives in its [own GitHub repository](https://github.com/opencast/opencast-admin-interface). Builds end up in the
-  `admin-ui-interface` module.
+- Lives in its [own GitHub repository](https://github.com/opencast/admin-interface). Builds end up in the
+  `admin` module.
 - Will eventually become and replace the (old) Admin UI.
 
 ### Media Module
@@ -18,7 +18,7 @@ The following is a brief overview.
 - Provides simple ui for LTI tool consumers.
 
 ### Opencast Editor
-- Lives in its [own GitHub repository](https://github.com/opencast/opencast-editor). Builds end up in the
+- Lives in its [own GitHub repository](https://github.com/opencast/editor). Builds end up in the
   `editor` module.
 - A simple video editor for cutting down videos.
 

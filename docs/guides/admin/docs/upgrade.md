@@ -40,5 +40,10 @@ sure to backup your database before migrating, to be able to easily revert chang
 
 ## Index Rebuild
 
-An index rebuild for for 19.x should not be required if upgrading from an 18.x system.  Upgrading from a version prior
-to 18.x requires an index rebuild, follow the 18.x upgrade guide for details.
+[[#7477](https://github.com/opencast/opencast/pull/7477)] a fix applied in 19.4 re-enabled
+(Episode ID Roles)[https://docs.opencast.org/r/19.x/admin/#configuration/episode-id-roles/#episode-id-roles].  If your
+site uses these roles, a reindex of the search index or republishing the affected events will resolve the issue.  This
+can be safely ignored if your site does not use episode id roles.
+
+An index rebuild for for 19.x should not be required if upgrading from an 18.x system except for the above.  Upgrading
+from a version prior to 18.x requires an index rebuild, follow the 18.x upgrade guide for details.
