@@ -19,7 +19,7 @@ Stand-alone capabilities
 --------------
 
 The editor frontend is also referred to as "stand-alone" since it can be deployed and run outside an Opencast installation.
-Should you wish to do so check its github repository: https://github.com/opencast/opencast-editor
+Should you wish to do so check its github repository: https://github.com/opencast/editor
 However, there is little benefit in doing so, as the editor frontend will not function without a connection to its
 backend in Opencast.
 
