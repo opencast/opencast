@@ -85,8 +85,8 @@ Some changes require special attention:
 
 Folder                         | Description
 :------------------------------|------------
-etc/listproviders              | Changes here might need to be reflected in the static mockup data for the Admin UI facade found in modules/admin-ui/src/test/resources/app/admin-ng/resources
-modules/admin-ui/src/main/java | In case the interface of the Admin UI facade changes, those changes need to be also reflected in the static mockup data for the Admin UI facade found in modules/admin-ui/src/test/resources/app.
+etc/listproviders              | Changes here might need to be reflected in the static mockup data for the Admin UI facade found in modules/admin-service/src/test/resources/app/admin-ng/resources
+modules/admin-service/src/main/java | In case the interface of the Admin UI facade changes, those changes need to be also reflected in the static mockup data for the Admin UI facade found in modules/admin-service/src/test/resources/app.
 
 While a committer may accept a patch even if it does not meet these expectations, it is encouraged that anyone filing
 a pull request ensures that they meet these expectations.

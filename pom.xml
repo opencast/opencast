@@ -70,8 +70,8 @@
     <xmlsec.version>2.2.6</xmlsec.version>
   </properties>
   <modules>
-    <module>modules/admin-ui</module>
-    <module>modules/admin-ui-interface</module>
+    <module>modules/admin-service</module>
+    <module>modules/admin</module>
     <module>modules/adopter-registration-api</module>
     <module>modules/adopter-registration-impl</module>
     <module>modules/analyze-mediapackage-workflowoperation</module>

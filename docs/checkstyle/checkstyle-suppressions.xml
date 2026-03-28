@@ -5,7 +5,7 @@
     "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
 
 <suppressions>
-    <suppress checks="LineLength" files="modules/admin-ui/.+\.(java|properties)"/>
+    <suppress checks="LineLength" files="modules/admin-service/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/caption-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/capture-admin-service-impl/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/common/.+\.(java|properties)"/>
@@ -31,7 +31,7 @@
     <suppress checks="LineLength" files="modules/serviceregistry/.+\.(java|properties)"/>
     <suppress checks="LineLength" files="modules/usertracking-impl/.+\.(java|properties)"/>
 
-    <suppress checks="Indentation" files="modules/admin-ui/.+\.java"/>
+    <suppress checks="Indentation" files="modules/admin-service/.+\.java"/>
     <suppress checks="Indentation" files="modules/capture-admin-service-impl/.+\.java"/>
     <suppress checks="Indentation" files="modules/common/.+\.java"/>
     <suppress checks="Indentation" files="modules/composer-ffmpeg/.+\.java"/>
@@ -49,7 +49,7 @@
     <suppress checks="Indentation" files="modules/oaipmh-persistence/.+\.java"/>
     <suppress checks="Indentation" files="modules/serviceregistry/.+\.java"/>
 
-    <suppress checks="(NeedBraces|LeftCurly)" files="modules/admin-ui/.+\.java"/>
+    <suppress checks="(NeedBraces|LeftCurly)" files="modules/admin-service/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/caption-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/capture-admin-service-impl/.+\.java"/>
     <suppress checks="(NeedBraces|LeftCurly)" files="modules/common/.+\.java"/>
