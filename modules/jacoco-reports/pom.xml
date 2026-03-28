@@ -20,12 +20,12 @@
          manually depend on *every* Opencast module.  A check that we actually do has been added to the docs checks -->
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-admin-ui</artifactId>
+      <artifactId>opencast-admin-service</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-admin-ui-interface</artifactId>
+      <artifactId>opencast-admin</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
