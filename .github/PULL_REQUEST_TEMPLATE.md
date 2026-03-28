@@ -24,5 +24,6 @@ reviewed and merged.
 * [ ] include migration scripts and documentation, if appropriate
 * [ ] pass automated tests
 * [ ] have a clean commit history
+* [ ] does not incorrectly update the submodules
 * [ ] [have proper commit messages (title and body) for all commits](https://medium.com/@steveamaza/e028865e5791)
 * [ ] explain why it needs to be merged into the legacy branch, if it is targeting the legacy branch

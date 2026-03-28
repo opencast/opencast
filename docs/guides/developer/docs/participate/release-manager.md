@@ -95,7 +95,12 @@ Example on how to create the Opencast 7 release branch:
 3. Create and push the new release branch:
 
         git checkout -b r/7.x
+        git submodule foreach git checkout -b r/7.x
+        sed -i 's#branch = develop#branch = r/7.x#g' .gitmodules
+        git add .gitmodules
+        git commit -m "Updating .gitmodules to point at the r/7.x"
         git push <remote> r/7.x
+        git submodule foreach git push <remote> r/7.x
 
 4. That is it for the release branch. Now update the versions in `develop` in preparation for the next release:
 
@@ -105,13 +110,17 @@ Example on how to create the Opencast 7 release branch:
 5. Have a look at the changes. Make sure that nothing else was modified:
 
         git diff
-        git status | grep modified: | grep -v pom.xml   # this should have no output
+        git status | grep modified: | grep -v pom.xml | grep -v "modified content"  # this should have no output
 
 6. If everything looks fine, commit the changes and push it to the community repository:
 
+        git submodule foreach git add pom.xml
+        git submodule foreach git commit -s -m 'Bumping pom.xml Version Nnumbers'
         git add $(git status | grep 'modified:.*pom.xml' | awk '{print $2;}')
+        git add $(git submodule | cut -f 2 -d " ")
         git commit -s -m 'Bumping pom.xml Version Numbers'
         git push <remote> develop
+        git submodule foreach git push origin develop
 
 
 ### Status of Translations
@@ -283,6 +292,7 @@ The following steps outline the necessary steps for cutting the final release:
 3. Switch to a new branch to create the release (name does not really matter):
 
         git checkout -b tmp-16.0
+        git submodule foreach git checkout -b tmp-16.0
 
 4. Make the version changes for the release:
 
@@ -292,16 +302,21 @@ The following steps outline the necessary steps for cutting the final release:
 
         git diff
         # The following command should yield no output:
-        git status | grep modified: | grep -v pom.xml
+        git status | grep modified: | grep -v pom.xml | grep -v "modified content"
 
 6. Commit the changes and create a release tag:
 
+        git submodule foreach git add pom.xml
+        git submodule foreach git commit -S -m 'Opencast 16.0'
+        git submodule foreach git tag -s 16.0 -m 'Opencast 16.0'
         git add $(git status | grep 'modified:.*pom.xml' | awk '{print $2;}')
+        git add $(git submodule | cut -f 2 -d " ")
         git commit -S -m 'Opencast 16.0'
         git tag -s 16.0 -m 'Opencast 16.0'
 
 7. Push the tag to the community repository (you can remove the branch afterwards):
 
+        git submodule foreach git push origin 16.0
         git push <remote> 16.0
 
 8. Check the “Create new release” GitHub Actions workflow.
