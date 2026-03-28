@@ -100,7 +100,12 @@ Example on how to create the Opencast {{ opencast_major_version() }} release bra
 3. Create and push the new release branch:
 
         git checkout -b r/{{ opencast_major_version() }}.x
+        git submodule foreach git checkout -b r/{{ opencast_major_version() }}.x
+        sed -i 's#branch = develop#branch = r/{{ opencast_major_version() }}.x#g' .gitmodules
+        git add .gitmodules
+        git commit -m "Updating .gitmodules to point at the r/{{ opencast_major_version() }}.x"
         git push <remote> r/{{ opencast_major_version() }}.x
+        git submodule foreach git push <remote> r/{{ opencast_major_version() }}.x
 
 4. That is it for the release branch. Now update the versions in `develop` in preparation for the next release:
 
@@ -110,36 +115,19 @@ Example on how to create the Opencast {{ opencast_major_version() }} release bra
 5. Have a look at the changes. Make sure that nothing else was modified:
 
         git diff
-        git status | grep modified: | grep -v pom.xml   # this should have no output
+        git status | grep modified: | grep -v pom.xml | grep -v "modified content"  # this should have no output
 
 6. If everything looks fine, commit the changes and push it to the community repository:
 
+        git submodule foreach git add pom.xml
+        git submodule foreach git commit -s -m 'Bumping pom.xml Version Nnumbers'
         git add $(git status | grep 'modified:.*pom.xml' | awk '{print $2;}')
+        git add $(git submodule | cut -f 2 -d " ")
         git commit -s -m 'Bumping pom.xml Version Numbers'
         git push <remote> develop
+        git submodule foreach git push origin develop
 
-7. Create a release branch in the admin-ui-interface repository:
-
-        git clone -b develop git@github.com:opencast/opencast-admin-interface.git
-        cd opencast-admin-interface
-        git checkout -b r/{{ opencast_major_version() + 1 }}.x
-        git push origin r/{{ opencast_major_version() + 1 }}.x
-
-8. Create a release branch in the editor repository:
-
-        git clone -b develop git@github.com:opencast/opencast-editor.git
-        cd opencast-editor
-        git checkout -b r/{{ opencast_major_version() + 1 }}.x
-        git push origin r/{{ opencast_major_version() + 1 }}.x
-
-8. Create a release branch in the studio repository:
-
-        git clone -b develop git@github.com:opencast/studio.git
-        cd studio
-        git checkout -b r/{{ opencast_major_version() + 1 }}.x
-        git push origin r/{{ opencast_major_version() + 1 }}.x
-
-9. File a PR against the infra repo updating version numbers:
+7. File a PR against the infra repo updating version numbers:
 
         git clone -b master git@github.com:opencast/opencast-project-infrastructure.git
         [ Update ansible-demo-machines/deploy.yml ]
@@ -359,14 +347,19 @@ as an example:
 
 8. Commit the changes:
 
+        git submodule foreach git add pom.xml
+        git submodule foreach git commit -S -m 'Opencast {{ opencast_major_version() }}.0'
         git add $(git status | grep 'modified:.*pom.xml' | awk '{print $2;}')
+        git add $(git submodule | cut -f 2 -d " ")
         git commit -S -m 'Opencast {{ opencast_major_version() }}.0'
 
 9. Build and test the distributions.  Start each one and make sure they boot successfully.
 
 10. Push the tag to the community repository, and remove the local branch:
 
+        git submodule foreach git tag -s {{ opencast_major_version() }}.0 -m 'Opencast {{ opencast_major_version() }}.0'
         git tag -s {{ opencast_major_version() }}.0 -m 'Opencast {{ opencast_major_version() }}.0'
+        git submodule foreach git push origin {{ opencast_major_version() }}.0
         git push <remote> {{ opencast_major_version() }}.0
         git branch -D tmp-{{ opencast_major_version() }}.0
 
