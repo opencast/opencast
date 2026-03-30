@@ -24,6 +24,7 @@ package org.opencastproject.search.endpoint;
 import static javax.servlet.http.HttpServletResponse.SC_FORBIDDEN;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
+import static org.opencastproject.elasticsearch.impl.IndexSchema.SEARCH_FIELD_NAME_EXTENSION;
 import static org.opencastproject.util.RestUtil.R.forbidden;
 import static org.opencastproject.util.RestUtil.R.noContent;
 import static org.opencastproject.util.RestUtil.R.notFound;
@@ -56,6 +57,8 @@ import com.google.gson.Gson;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.elasticsearch.common.unit.Fuzziness;
+import org.elasticsearch.index.query.MultiMatchQueryBuilder;
 import org.elasticsearch.index.query.Operator;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.SearchHit;
@@ -194,25 +197,36 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
     final var org = securityService.getOrganization().getId();
     final var type = SearchService.IndexEntryType.Series.name();
     final var query = QueryBuilders.boolQuery()
-        .must(QueryBuilders.termQuery(SearchResult.ORG, org))
-        .must(QueryBuilders.termQuery(SearchResult.TYPE, type))
-        .mustNot(QueryBuilders.existsQuery(SearchResult.DELETED_DATE));
+        .filter(QueryBuilders.termQuery(SearchResult.ORG, org))
+        .filter(QueryBuilders.termQuery(SearchResult.TYPE, type))
+        .filter(QueryBuilders.boolQuery().mustNot(QueryBuilders.existsQuery(SearchResult.DELETED_DATE)));
+    final var user = securityService.getUser();
+    final var orgAdminRole = securityService.getOrganization().getAdminRole();
+    if (!user.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE) && !user.hasRole(orgAdminRole)) {
+      query.filter(QueryBuilders.termsQuery(
+          SearchResult.INDEX_ACL + ".read",
+          user.getRoles().stream().map(Role::getName).collect(Collectors.toList())
+      ));
+    }
 
     if (StringUtils.isNotEmpty(id)) {
       query.must(QueryBuilders.idsQuery().addIds(id));
     }
 
     if (StringUtils.isNotEmpty(text)) {
-      query.must(QueryBuilders.wildcardQuery("fulltext", "*" + text.toLowerCase() + "*"));
-    }
-
-    var user = securityService.getUser();
-    var orgAdminRole = securityService.getOrganization().getAdminRole();
-    if (!user.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE) && !user.hasRole(orgAdminRole)) {
-      query.must(QueryBuilders.termsQuery(
-              SearchResult.INDEX_ACL + ".read",
-              user.getRoles().stream().map(Role::getName).collect(Collectors.toList())
-      ));
+      MultiMatchQueryBuilder queryBuilder = QueryBuilders.multiMatchQuery(text);
+      queryBuilder.field(SearchResult.DUBLINCORE + ".*" + SEARCH_FIELD_NAME_EXTENSION,  1.2f);
+      // Search-as-you-type generates useful subfields for autocompletion, we should use it
+      // https://docs.opensearch.org/1.3/field-types/supported-field-types/search-as-you-type/
+      queryBuilder.field(SearchResult.DUBLINCORE + ".*" + SEARCH_FIELD_NAME_EXTENSION + "._2gram", 1.2f);
+      queryBuilder.field(SearchResult.DUBLINCORE + ".*" + SEARCH_FIELD_NAME_EXTENSION + "._3gram", 1.2f);
+      queryBuilder.field(SearchResult.DUBLINCORE + ".*" + SEARCH_FIELD_NAME_EXTENSION + "._4gram", 1.2f);
+      queryBuilder.type(MultiMatchQueryBuilder.Type.BOOL_PREFIX);
+      queryBuilder.operator(Operator.AND);
+      queryBuilder.fuzziness(Fuzziness.AUTO);
+      queryBuilder.fuzzyTranspositions(true);
+      query.minimumShouldMatch(1);
+      query.should(queryBuilder);
     }
 
     var size = NumberUtils.toInt(limit, 20);
@@ -368,8 +382,8 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
       var seriesSearchSource = new SearchSourceBuilder().query(QueryBuilders.boolQuery()
           .filter(QueryBuilders.termQuery(SearchResult.ORG, org))
           .filter(QueryBuilders.termQuery(SearchResult.TYPE, SearchService.IndexEntryType.Series))
-          .filter(QueryBuilders.termQuery(SearchResult.DUBLINCORE + ".title", seriesName))
-          .mustNot(QueryBuilders.existsQuery(SearchResult.DELETED_DATE)));
+          .filter(QueryBuilders.boolQuery().mustNot(QueryBuilders.existsQuery(SearchResult.DELETED_DATE)))
+          .must(QueryBuilders.termQuery(SearchResult.DUBLINCORE + ".title", seriesName)));
       series = searchService.search(seriesSearchSource).getHits().stream()
           .map(h -> h.getDublinCore().getFirst(DublinCore.PROPERTY_IDENTIFIER))
           .collect(Collectors.toList());
@@ -379,13 +393,22 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
       }
     }
 
+    var user = securityService.getUser();
+    var orgAdminRole = securityService.getOrganization().getAdminRole();
+    var admin = user.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE) || user.hasRole(orgAdminRole);
     var query = QueryBuilders.boolQuery()
         .filter(QueryBuilders.termQuery(SearchResult.ORG, org))
         .filter(QueryBuilders.termQuery(SearchResult.TYPE, type))
-        .mustNot(QueryBuilders.existsQuery(SearchResult.DELETED_DATE));
+        .filter(QueryBuilders.boolQuery().mustNot(QueryBuilders.existsQuery(SearchResult.DELETED_DATE)));
+    if (!admin) {
+      query.filter(QueryBuilders.termsQuery(
+          SearchResult.INDEX_ACL + ".read",
+          user.getRoles().stream().map(Role::getName).collect(Collectors.toList())
+      ));
+    }
 
     if (StringUtils.isNotEmpty(id)) {
-      query.filter(QueryBuilders.idsQuery().addIds(id));
+      query.must(QueryBuilders.idsQuery().addIds(id));
     }
 
     if (StringUtils.isNotEmpty(seriesId)) {
@@ -403,27 +426,24 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
       }
     }
 
-    if (StringUtils.isNotEmpty(text)) {
-      query.minimumShouldMatch(1);
-      query.should(
-          QueryBuilders.matchQuery("fulltext", text)
-              .fuzziness("AUTO")
-              .operator(Operator.AND)
-      );
-    }
-
     if (live != null) {
-      query.filter(QueryBuilders.termQuery("live", live));
+      query.must(QueryBuilders.termQuery("live", live));
     }
 
-    var user = securityService.getUser();
-    var orgAdminRole = securityService.getOrganization().getAdminRole();
-    var admin = user.hasRole(SecurityConstants.GLOBAL_ADMIN_ROLE) || user.hasRole(orgAdminRole);
-    if (!admin) {
-      query.must(QueryBuilders.termsQuery(
-              SearchResult.INDEX_ACL + ".read",
-              user.getRoles().stream().map(Role::getName).collect(Collectors.toList())
-      ));
+    if (StringUtils.isNotEmpty(text)) {
+      MultiMatchQueryBuilder queryBuilder = QueryBuilders.multiMatchQuery(text);
+      queryBuilder.field(SearchResult.DUBLINCORE + ".*" + SEARCH_FIELD_NAME_EXTENSION,  1.2f);
+      // Search-as-you-type generates useful subfields for autocompletion, we should use it
+      // https://docs.opensearch.org/1.3/field-types/supported-field-types/search-as-you-type/
+      queryBuilder.field(SearchResult.DUBLINCORE + ".*" + SEARCH_FIELD_NAME_EXTENSION + "._2gram", 1.2f);
+      queryBuilder.field(SearchResult.DUBLINCORE + ".*" + SEARCH_FIELD_NAME_EXTENSION + "._3gram", 1.2f);
+      queryBuilder.field(SearchResult.DUBLINCORE + ".*" + SEARCH_FIELD_NAME_EXTENSION + "._4gram", 1.2f);
+      queryBuilder.type(MultiMatchQueryBuilder.Type.BOOL_PREFIX);
+      queryBuilder.operator(Operator.AND);
+      queryBuilder.fuzziness(Fuzziness.AUTO);
+      queryBuilder.fuzzyTranspositions(true);
+      query.minimumShouldMatch(1);
+      query.should(queryBuilder);
     }
 
     logger.debug("limit: {}, offset: {}", limit, offset);

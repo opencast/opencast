@@ -169,7 +169,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
 
   private void createIndex() {
     var mapping = "";
-    try (var in = this.getClass().getResourceAsStream("/search-mapping.json")) {
+    try (var in = this.getClass().getResourceAsStream("/elasticsearch/search-mapping.json")) {
       mapping = IOUtils.toString(in, StandardCharsets.UTF_8);
     } catch (IOException e) {
       throw new SearchException("Could not read mapping.", e);
