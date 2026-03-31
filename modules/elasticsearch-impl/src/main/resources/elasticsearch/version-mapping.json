@@ -1,6 +1,6 @@
 {
   "_source": {
-    "enabled": false
+    "enabled": true
   },
   "properties": {
     "version": {

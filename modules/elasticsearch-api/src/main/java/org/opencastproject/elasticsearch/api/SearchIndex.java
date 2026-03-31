@@ -27,7 +27,7 @@ import java.io.IOException;
 public interface SearchIndex {
 
   /** Version of this index */
-  int INDEX_VERSION = 1000;
+  int INDEX_VERSION = 1;
 
   /**
    * Clears the search index.

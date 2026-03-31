@@ -135,9 +135,6 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
   /** Default scheme of an external Elasticsearch server */
   private static final String ELASTICSEARCH_SERVER_SCHEME_DEFAULT = "http";
 
-  /** Identifier of the root entry */
-  private static final String ROOT_ID = "root";
-
   /** The index identifier */
   private String indexIdentifier = null;
   private static final String INDEX_IDENTIFIER_PROPERTY = "index.identifier";
@@ -147,6 +144,9 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
   private String indexName = null;
   private static final String INDEX_NAME_PROPERTY = "index.name";
   private static final String DEFAULT_INDEX_NAME = "Elasticsearch";
+
+  /** The document types */
+  protected static final String VERSION_DOCUMENT_TYPE = "version";
 
   /** The high level client */
   private RestHighLevelClient client = null;
@@ -568,28 +568,28 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
     // See if the index version exists and check if it matches. The request will
     // fail if there is no version index
     boolean versionIndexExists = false;
-    final GetRequest getRequest = new GetRequest(idxName, ROOT_ID);
+    final GetRequest getRequest = new GetRequest(getSubIndexIdentifier(VERSION_DOCUMENT_TYPE), idxName);
     try {
       final GetResponse getResponse = client.get(getRequest, RequestOptions.DEFAULT);
-      if (getResponse.isExists() && getResponse.getField(IndexSchema.VERSION) != null) {
-        final int actualIndexVersion = Integer.parseInt(getResponse.getField(IndexSchema.VERSION).getValue()
-                .toString());
+      if (getResponse.isExists() && !getResponse.isSourceEmpty()
+          && getResponse.getSource().containsKey(IndexSchema.VERSION)) {
+        final int actualIndexVersion = (Integer) getResponse.getSource().get(IndexSchema.VERSION);
         if (indexVersion != actualIndexVersion) {
-          throw new SearchIndexException(
-                  "Search index is at version " + actualIndexVersion + ", but codebase expects " + indexVersion);
+          throw new SearchIndexException("Search index '" + idxName + "' is at version " + actualIndexVersion
+              + ", but codebase expects version " + indexVersion);
         }
         versionIndexExists = true;
-        logger.debug("Search index version is {}", indexVersion);
+        logger.debug("Search index '{}' is at version {}", idxName, indexVersion);
       }
     } catch (ElasticsearchException e) {
-      logger.debug("Version index has not been created");
+      throw new SearchIndexException("Requesting version of the index '" + idxName + "' failed.", e);
     }
 
     // The index does not exist, let's create it
     if (!versionIndexExists) {
       logger.debug("Creating version index for site '{}'", idxName);
-      final IndexRequest indexRequest = new IndexRequest(idxName).id(ROOT_ID)
-              .source(Collections.singletonMap(IndexSchema.VERSION, indexVersion + ""));
+      final IndexRequest indexRequest = new IndexRequest(getSubIndexIdentifier(VERSION_DOCUMENT_TYPE)).id(idxName)
+              .source(Collections.singletonMap(IndexSchema.VERSION, indexVersion));
       logger.debug("Index version of site '{}' is {}", idxName, indexVersion);
       client.index(indexRequest, RequestOptions.DEFAULT);
     }
