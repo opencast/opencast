@@ -1,0 +1,11 @@
+{
+  "_source": {
+    "enabled": true
+  },
+  "properties": {
+    "version": {
+      "type": "integer",
+      "index": false
+    }
+  }
+}

@@ -1,0 +1,201 @@
+{
+  "_source": {
+    "enabled": true
+  },
+  "dynamic": true,
+  "properties": {
+
+    "uid": {
+      "type": "keyword",
+      "store": true,
+      "fields": {
+        "search": {
+          "type": "text",
+          "analyzer": "id_search_analyzer",
+          "store": false
+        }
+      }
+    },
+
+    "organization": {
+      "type": "keyword",
+      "store": true
+    },
+
+    "object": {
+      "type": "text",
+      "index": false,
+      "store": true
+    },
+
+    "title": {
+      "type": "keyword",
+      "fields": {
+        "sort": {
+          "type": "icu_collation_keyword",
+          "index": false
+        },
+        "search": {
+          "type": "search_as_you_type",
+          "analyzer": "autocomplete_analyzer"
+        }
+      }
+    },
+
+    "series_json": {
+      "type": "keyword"
+    },
+
+    "description": {
+      "type": "keyword",
+      "fields": {
+        "sort": {
+          "type": "icu_collation_keyword",
+          "index": false
+        },
+        "search": {
+          "type": "search_as_you_type",
+          "analyzer": "autocomplete_analyzer"
+        }
+      }
+    },
+
+    "subject": {
+      "type": "keyword",
+      "fields": {
+        "sort": {
+          "type": "icu_collation_keyword",
+          "index": false
+        },
+        "search": {
+          "type": "search_as_you_type",
+          "analyzer": "autocomplete_analyzer"
+        }
+      }
+    },
+
+    "language": {
+      "type": "keyword"
+    },
+
+    "creator": {
+      "type": "keyword",
+      "fields": {
+        "sort": {
+          "type": "icu_collation_keyword",
+          "index": false
+        },
+        "search": {
+          "type": "search_as_you_type",
+          "analyzer": "autocomplete_analyzer"
+        }
+      }
+    },
+
+    "license": {
+      "type": "keyword"
+    },
+
+    "access_policy": {
+      "type": "text"
+    },
+
+    "managed_acl": {
+      "type": "keyword"
+    },
+
+    "createdDateTime": {
+      "type": "date",
+      "format": "yyyy-MM-dd'T'HH:mm:ss'Z'"
+    },
+
+    "organizers": {
+      "copy_to": "organizer",
+      "type": "keyword",
+      "fields": {
+        "sort": {
+          "type": "icu_collation_keyword",
+          "index": false
+        },
+        "search": {
+          "type": "search_as_you_type",
+          "analyzer": "autocomplete_analyzer"
+        }
+      }
+    },
+
+    "contributors": {
+      "copy_to": "contributor",
+      "type": "keyword",
+      "fields": {
+        "sort": {
+          "type": "icu_collation_keyword",
+          "index": false
+        },
+        "search": {
+          "type": "search_as_you_type",
+          "analyzer": "autocomplete_analyzer"
+        }
+      }
+    },
+
+    "publisher": {
+      "type": "keyword",
+      "fields": {
+        "sort": {
+          "type": "icu_collation_keyword",
+          "index": false
+        },
+        "search": {
+          "type": "search_as_you_type",
+          "analyzer": "autocomplete_analyzer"
+        }
+      }
+    },
+
+    "rights_holder": {
+      "type": "keyword",
+      "fields": {
+        "sort": {
+          "type": "icu_collation_keyword",
+          "index": false
+        },
+        "search": {
+          "type": "search_as_you_type",
+          "analyzer": "autocomplete_analyzer"
+        }
+      }
+    },
+
+    "theme": {
+      "type": "long"
+    }
+
+  },
+  "dynamic_templates": [
+    {
+      "permission_template": {
+        "match": "acl_permission_*",
+        "match_mapping_type": "string",
+        "mapping": {
+          "type": "keyword"
+        }
+      }
+    },
+    {
+      "extended_metadata_template": {
+        "match": "extended_metadata_*",
+        "match_mapping_type": "string",
+        "mapping": {
+          "type": "keyword",
+          "fields": {
+            "search": {
+              "type": "search_as_you_type",
+              "analyzer": "autocomplete_analyzer"
+            }
+          }
+        }
+      }
+    }
+  ]
+}
