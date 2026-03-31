@@ -21,12 +21,12 @@
 
 package org.opencastproject.elasticsearch.index.objects.event;
 
+import static org.opencastproject.elasticsearch.impl.IndexSchema.SEARCH_FIELD_NAME_EXTENSION;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 
 import org.opencastproject.elasticsearch.api.SearchTerms;
 import org.opencastproject.elasticsearch.api.SearchTerms.Quantifier;
 import org.opencastproject.elasticsearch.impl.AbstractElasticsearchQueryBuilder;
-import org.opencastproject.elasticsearch.impl.IndexSchema;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.User;
 
@@ -284,21 +284,10 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
     // Text
     if (query.getTerms() != null) {
       for (SearchTerms<String> terms : query.getTerms()) {
-        StringBuilder queryText = new StringBuilder();
-        for (String term : terms.getTerms()) {
-          if (queryText.length() > 0) {
-            queryText.append(" ");
-          }
-          queryText.append(term);
-        }
-
         additionalMultiQueryFields.add(EventIndexSchema.UID);
         additionalMultiQueryFields.add(EventIndexSchema.SERIES_ID);
-
         fuzzy = query.isFuzzySearch();
-
-        this.text = queryText.toString();
-
+        this.text = String.join(" ", terms.getTerms());
         if (Quantifier.All.equals(terms.getQuantifier())) {
           if (groups == null) {
             groups = new ArrayList<>();
@@ -306,7 +295,8 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
           if (query.isFuzzySearch()) {
             logger.warn("All quantifier not supported in conjunction with wildcard text");
           }
-          groups.add(new ValueGroup(IndexSchema.TEXT, (Object[]) terms.getTerms().toArray(new String[terms.size()])));
+          groups.add(new ValueGroup("*" + SEARCH_FIELD_NAME_EXTENSION,
+              (Object[]) terms.getTerms().toArray(new String[terms.size()])));
         }
       }
     }

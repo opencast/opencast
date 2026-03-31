@@ -4,21 +4,16 @@
   "max_result_window": 2147483647,
   "analysis": {
     "analyzer": {
-      "lowercase_space_analyzer": {
-        "type": "custom",
-        "tokenizer": "whitespace",
-        "filter": [
-          "lowercase"
-        ]
-      },
       "autocomplete_analyzer": {
         "type": "custom",
-        "tokenizer": "whitespace",
-        "char_filter":["html_strip", "camel_case_filter"],
+        "tokenizer": "whitespace_symbol_tokenizer",
+        "char_filter": [
+          "html_strip",
+          "camel_case_filter"
+        ],
         "filter": [
           "lowercase",
-          "icu_folding",
-          "autocomplete_filter"
+          "icu_folding"
         ]
       },
       "whitespace_analyzer": {
@@ -40,14 +35,11 @@
         "replacement": " "
       }
     },
-    "filter": {
-      "autocomplete_filter": {
-        "type": "edge_ngram",
-        "min_gram": 1,
-        "max_gram": 20,
-        "token_chars": [
-          "letter",
-          "digit",
+    "tokenizer": {
+      "whitespace_symbol_tokenizer": {
+        "type": "char_group",
+        "tokenize_on_chars": [
+          "whitespace",
           "punctuation",
           "symbol"
         ]

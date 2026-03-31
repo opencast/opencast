@@ -110,11 +110,9 @@ public class SearchMetadataCollection implements Collection<SearchMetadata<?>> {
    *          the field name
    * @param fieldValue
    *          the value
-   * @param addToText
-   *          <code>true</code> to add the contents to the fulltext field as well
    */
   @SuppressWarnings("unchecked")
-  public void addField(String fieldName, Object fieldValue, boolean addToText) {
+  public void addField(String fieldName, Object fieldValue) {
     if (fieldName == null) {
       throw new IllegalArgumentException("Field name cannot be null");
     }
@@ -130,8 +128,6 @@ public class SearchMetadataCollection implements Collection<SearchMetadata<?>> {
       m = new SearchMetadataImpl<Object>(fieldName);
       metadata.put(fieldName, m);
     }
-
-    m.setAddToText(addToText);
 
     if (fieldValue.getClass().isArray()) {
       Object[] fieldValues = (Object[]) fieldValue;

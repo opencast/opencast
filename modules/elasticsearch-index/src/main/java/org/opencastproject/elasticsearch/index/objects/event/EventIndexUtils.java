@@ -116,80 +116,80 @@ public final class EventIndexUtils {
   public static SearchMetadataCollection toSearchMetadata(Event event, Map<String, String> additionalActions) {
     SearchMetadataCollection metadata = new SearchMetadataCollection(
             event.getIdentifier().concat(event.getOrganization()), Event.DOCUMENT_TYPE);
-    metadata.addField(EventIndexSchema.UID, event.getIdentifier(), false);
-    metadata.addField(EventIndexSchema.ORGANIZATION, event.getOrganization(), false);
-    metadata.addField(EventIndexSchema.OBJECT, event.toXML(), false);
+    metadata.addField(EventIndexSchema.UID, event.getIdentifier());
+    metadata.addField(EventIndexSchema.ORGANIZATION, event.getOrganization());
+    metadata.addField(EventIndexSchema.OBJECT, event.toXML());
     if (StringUtils.isNotBlank(event.getTitle())) {
-      metadata.addField(EventIndexSchema.TITLE, event.getTitle(), true);
+      metadata.addField(EventIndexSchema.TITLE, event.getTitle());
     }
     if (StringUtils.isNotBlank(event.getDescription())) {
-      metadata.addField(EventIndexSchema.DESCRIPTION, event.getDescription(), true);
+      metadata.addField(EventIndexSchema.DESCRIPTION, event.getDescription());
     }
     if (StringUtils.isNotBlank(event.getLocation())) {
-      metadata.addField(EventIndexSchema.LOCATION, event.getLocation(), true);
+      metadata.addField(EventIndexSchema.LOCATION, event.getLocation());
     }
     if (StringUtils.isNotBlank(event.getSeriesId())) {
-      metadata.addField(EventIndexSchema.SERIES_ID, event.getSeriesId(), false);
+      metadata.addField(EventIndexSchema.SERIES_ID, event.getSeriesId());
     }
     if (StringUtils.isNotBlank(event.getSeriesName())) {
-      metadata.addField(EventIndexSchema.SERIES_NAME, event.getSeriesName(), true);
+      metadata.addField(EventIndexSchema.SERIES_NAME, event.getSeriesName());
     }
     if (StringUtils.isNotBlank(event.getLanguage())) {
-      metadata.addField(EventIndexSchema.LANGUAGE, event.getLanguage(), false);
+      metadata.addField(EventIndexSchema.LANGUAGE, event.getLanguage());
     }
     if (StringUtils.isNotBlank(event.getSubject())) {
-      metadata.addField(EventIndexSchema.SUBJECT, event.getSubject(), true);
+      metadata.addField(EventIndexSchema.SUBJECT, event.getSubject());
     }
     if (StringUtils.isNotBlank(event.getSource())) {
-      metadata.addField(EventIndexSchema.SOURCE, event.getSource(), false);
+      metadata.addField(EventIndexSchema.SOURCE, event.getSource());
     }
     if (StringUtils.isNotBlank(event.getCreated())) {
-      metadata.addField(EventIndexSchema.CREATED, event.getCreated(), false);
+      metadata.addField(EventIndexSchema.CREATED, event.getCreated());
     }
     if (StringUtils.isNotBlank(event.getCreator())) {
-      metadata.addField(EventIndexSchema.CREATOR, event.getCreator(), true);
+      metadata.addField(EventIndexSchema.CREATOR, event.getCreator());
     }
     if (StringUtils.isNotBlank(event.getPublisher())) {
-      metadata.addField(EventIndexSchema.PUBLISHER, event.getPublisher(), true);
+      metadata.addField(EventIndexSchema.PUBLISHER, event.getPublisher());
     }
     if (StringUtils.isNotBlank(event.getLicense())) {
-      metadata.addField(EventIndexSchema.LICENSE, event.getLicense(), false);
+      metadata.addField(EventIndexSchema.LICENSE, event.getLicense());
     }
     if (StringUtils.isNotBlank(event.getRights())) {
-      metadata.addField(EventIndexSchema.RIGHTS, event.getRights(), true);
+      metadata.addField(EventIndexSchema.RIGHTS, event.getRights());
     }
     if (StringUtils.isNotBlank(event.getManagedAcl())) {
-      metadata.addField(EventIndexSchema.MANAGED_ACL, event.getManagedAcl(), false);
+      metadata.addField(EventIndexSchema.MANAGED_ACL, event.getManagedAcl());
     }
     if (StringUtils.isNotBlank(event.getWorkflowState())) {
-      metadata.addField(EventIndexSchema.WORKFLOW_STATE, event.getWorkflowState(), false);
+      metadata.addField(EventIndexSchema.WORKFLOW_STATE, event.getWorkflowState());
     }
     if (event.getWorkflowId() != null) {
-      metadata.addField(EventIndexSchema.WORKFLOW_ID, event.getWorkflowId(), false);
+      metadata.addField(EventIndexSchema.WORKFLOW_ID, event.getWorkflowId());
     }
     if (StringUtils.isNotBlank(event.getWorkflowDefinitionId())) {
-      metadata.addField(EventIndexSchema.WORKFLOW_DEFINITION_ID, event.getWorkflowDefinitionId(), false);
+      metadata.addField(EventIndexSchema.WORKFLOW_DEFINITION_ID, event.getWorkflowDefinitionId());
     }
     if (StringUtils.isNotBlank(event.getRecordingStartDate())) {
-      metadata.addField(EventIndexSchema.START_DATE, event.getRecordingStartDate(), false);
+      metadata.addField(EventIndexSchema.START_DATE, event.getRecordingStartDate());
     }
     if (StringUtils.isNotBlank(event.getRecordingEndDate())) {
-      metadata.addField(EventIndexSchema.END_DATE, event.getRecordingEndDate(), false);
+      metadata.addField(EventIndexSchema.END_DATE, event.getRecordingEndDate());
     }
     if (event.getDuration() != null) {
-      metadata.addField(EventIndexSchema.DURATION, event.getDuration(), false);
+      metadata.addField(EventIndexSchema.DURATION, event.getDuration());
     }
     if (event.getArchiveVersion() != null) {
-      metadata.addField(EventIndexSchema.ARCHIVE_VERSION, event.getArchiveVersion(), false);
+      metadata.addField(EventIndexSchema.ARCHIVE_VERSION, event.getArchiveVersion());
     }
     if (event.getRecordingStatus() != null) {
-      metadata.addField(EventIndexSchema.RECORDING_STATUS, event.getRecordingStatus(), false);
+      metadata.addField(EventIndexSchema.RECORDING_STATUS, event.getRecordingStatus());
     }
 
-    metadata.addField(EventIndexSchema.EVENT_STATUS, event.getEventStatus(), false);
+    metadata.addField(EventIndexSchema.EVENT_STATUS, event.getEventStatus());
 
-    metadata.addField(EventIndexSchema.HAS_COMMENTS, event.hasComments(), false);
-    metadata.addField(EventIndexSchema.HAS_OPEN_COMMENTS, event.hasOpenComments(), false);
+    metadata.addField(EventIndexSchema.HAS_COMMENTS, event.hasComments());
+    metadata.addField(EventIndexSchema.HAS_OPEN_COMMENTS, event.hasOpenComments());
 
     if (event.comments() != null) {
       List<Comment> comments = event.comments();
@@ -206,10 +206,10 @@ public final class EventIndexUtils {
 //        generatePublicationDoc(comments.get(i).getType());
       }
 
-      metadata.addField(EventIndexSchema.COMMENTS, commentsArray, false);
+      metadata.addField(EventIndexSchema.COMMENTS, commentsArray);
     }
 
-    metadata.addField(EventIndexSchema.NEEDS_CUTTING, event.needsCutting(), false);
+    metadata.addField(EventIndexSchema.NEEDS_CUTTING, event.needsCutting());
 
     if (event.getPublications() != null) {
       List<Publication> publications = event.getPublications();
@@ -219,23 +219,23 @@ public final class EventIndexUtils {
       }
 
       if (publications.size() == 1 && !publications.get(0).getChannel().equals("internal") || publications.size() > 1) {
-        metadata.addField(EventIndexSchema.IS_PUBLISHED, true, false);
+        metadata.addField(EventIndexSchema.IS_PUBLISHED, true);
       } else {
-        metadata.addField(EventIndexSchema.IS_PUBLISHED, false, false);
+        metadata.addField(EventIndexSchema.IS_PUBLISHED, false);
       }
 
-      metadata.addField(EventIndexSchema.PUBLICATION, publicationsArray, false);
+      metadata.addField(EventIndexSchema.PUBLICATION, publicationsArray);
 
     }
 
     if (event.getPresenters() != null) {
       List<String> presenters = event.getPresenters();
-      metadata.addField(EventIndexSchema.PRESENTER, presenters.toArray(new String[presenters.size()]), true);
+      metadata.addField(EventIndexSchema.PRESENTER, presenters.toArray(new String[presenters.size()]));
     }
 
     if (event.getContributors() != null) {
       List<String> contributors = event.getContributors();
-      metadata.addField(EventIndexSchema.CONTRIBUTOR, contributors.toArray(new String[contributors.size()]), true);
+      metadata.addField(EventIndexSchema.CONTRIBUTOR, contributors.toArray(new String[contributors.size()]));
     }
 
     if (!event.getExtendedMetadata().isEmpty()) {
@@ -243,25 +243,25 @@ public final class EventIndexUtils {
     }
 
     if (StringUtils.isNotBlank(event.getAccessPolicy())) {
-      metadata.addField(EventIndexSchema.ACCESS_POLICY, event.getAccessPolicy(), false);
       addAuthorization(metadata, event.getAccessPolicy(), event.getIdentifier(), additionalActions);
+      metadata.addField(EventIndexSchema.ACCESS_POLICY, event.getAccessPolicy());
     }
 
     if (StringUtils.isNotBlank(event.getAgentId())) {
-      metadata.addField(EventIndexSchema.AGENT_ID, event.getAgentId(), false);
+      metadata.addField(EventIndexSchema.AGENT_ID, event.getAgentId());
     }
 
     if (StringUtils.isNotBlank(event.getTechnicalStartTime())) {
-      metadata.addField(EventIndexSchema.TECHNICAL_START, event.getTechnicalStartTime(), false);
+      metadata.addField(EventIndexSchema.TECHNICAL_START, event.getTechnicalStartTime());
     }
 
     if (StringUtils.isNotBlank(event.getTechnicalEndTime())) {
-      metadata.addField(EventIndexSchema.TECHNICAL_END, event.getTechnicalEndTime(), false);
+      metadata.addField(EventIndexSchema.TECHNICAL_END, event.getTechnicalEndTime());
     }
 
     if (event.getTechnicalPresenters() != null) {
       metadata.addField(EventIndexSchema.TECHNICAL_PRESENTERS,
-              event.getTechnicalPresenters().toArray(new String[event.getTechnicalPresenters().size()]), false);
+              event.getTechnicalPresenters().toArray(new String[event.getTechnicalPresenters().size()]));
     }
 
     return metadata;
@@ -356,7 +356,7 @@ public final class EventIndexUtils {
       for (String name: extendedMetadataByType.keySet()) {
         List<String> values = extendedMetadataByType.get(name);
         String fieldName = SeriesIndexSchema.EXTENDED_METADATA_PREFIX.concat(type + "_" + name);
-        doc.addField(fieldName, values, true);
+        doc.addField(fieldName, values);
       }
     }
   }
@@ -421,7 +421,7 @@ public final class EventIndexUtils {
     // Write the permissions to the input document
     for (Map.Entry<String, List<String>> entry : permissions.entrySet()) {
       String fieldName = EventIndexSchema.ACL_PERMISSION_PREFIX.concat(entry.getKey());
-      doc.addField(fieldName, entry.getValue(), false);
+      doc.addField(fieldName, entry.getValue());
     }
   }
 

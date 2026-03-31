@@ -83,43 +83,43 @@ public final class SeriesIndexUtils {
   public static SearchMetadataCollection toSearchMetadata(Series series) {
     SearchMetadataCollection metadata = new SearchMetadataCollection(
             series.getIdentifier().concat(series.getOrganization()), Series.DOCUMENT_TYPE);
-    metadata.addField(SeriesIndexSchema.UID, series.getIdentifier(), false);
-    metadata.addField(SeriesIndexSchema.ORGANIZATION, series.getOrganization(), false);
-    metadata.addField(SeriesIndexSchema.OBJECT, series.toXML(), false);
-    metadata.addField(SeriesIndexSchema.TITLE, series.getTitle(), true);
+    metadata.addField(SeriesIndexSchema.UID, series.getIdentifier());
+    metadata.addField(SeriesIndexSchema.ORGANIZATION, series.getOrganization());
+    metadata.addField(SeriesIndexSchema.OBJECT, series.toXML());
+    metadata.addField(SeriesIndexSchema.TITLE, series.getTitle());
     if (StringUtils.trimToNull(series.getDescription()) != null) {
-      metadata.addField(SeriesIndexSchema.DESCRIPTION, series.getDescription(), true);
+      metadata.addField(SeriesIndexSchema.DESCRIPTION, series.getDescription());
     }
     if (StringUtils.trimToNull(series.getSubject()) != null) {
-      metadata.addField(SeriesIndexSchema.SUBJECT, series.getSubject(), true);
+      metadata.addField(SeriesIndexSchema.SUBJECT, series.getSubject());
     }
     if (StringUtils.trimToNull(series.getLanguage()) != null) {
-      metadata.addField(SeriesIndexSchema.LANGUAGE, series.getLanguage(), false);
+      metadata.addField(SeriesIndexSchema.LANGUAGE, series.getLanguage());
     }
     if (StringUtils.trimToNull(series.getCreator()) != null) {
-      metadata.addField(SeriesIndexSchema.CREATOR, series.getCreator(), true);
+      metadata.addField(SeriesIndexSchema.CREATOR, series.getCreator());
     }
     if (StringUtils.trimToNull(series.getLicense()) != null) {
-      metadata.addField(SeriesIndexSchema.LICENSE, series.getLicense(), false);
+      metadata.addField(SeriesIndexSchema.LICENSE, series.getLicense());
     }
     if (StringUtils.trimToNull(series.getManagedAcl()) != null) {
-      metadata.addField(SeriesIndexSchema.MANAGED_ACL, series.getManagedAcl(), false);
+      metadata.addField(SeriesIndexSchema.MANAGED_ACL, series.getManagedAcl());
     }
     if (series.getCreatedDateTime() != null) {
       metadata.addField(SeriesIndexSchema.CREATED_DATE_TIME,
-              DateTimeSupport.toUTC(series.getCreatedDateTime().getTime()), false);
+              DateTimeSupport.toUTC(series.getCreatedDateTime().getTime()));
     }
     if (series.getOrganizers() != null) {
-      metadata.addField(SeriesIndexSchema.ORGANIZERS, series.getOrganizers().toArray(), true);
+      metadata.addField(SeriesIndexSchema.ORGANIZERS, series.getOrganizers().toArray());
     }
     if (series.getContributors() != null) {
-      metadata.addField(SeriesIndexSchema.CONTRIBUTORS, series.getContributors().toArray(), true);
+      metadata.addField(SeriesIndexSchema.CONTRIBUTORS, series.getContributors().toArray());
     }
     if (series.getPublishers() != null) {
-      metadata.addField(SeriesIndexSchema.PUBLISHERS, series.getPublishers().toArray(), true);
+      metadata.addField(SeriesIndexSchema.PUBLISHERS, series.getPublishers().toArray());
     }
     if (series.getRightsHolder() != null) {
-      metadata.addField(SeriesIndexSchema.RIGHTS_HOLDER, series.getRightsHolder(), true);
+      metadata.addField(SeriesIndexSchema.RIGHTS_HOLDER, series.getRightsHolder());
     }
 
     if (!series.getExtendedMetadata().isEmpty()) {
@@ -127,11 +127,11 @@ public final class SeriesIndexUtils {
     }
 
     if (StringUtils.trimToNull(series.getAccessPolicy()) != null) {
-      metadata.addField(SeriesIndexSchema.ACCESS_POLICY, series.getAccessPolicy(), false);
+      metadata.addField(SeriesIndexSchema.ACCESS_POLICY, series.getAccessPolicy());
       addAuthorization(metadata, series.getAccessPolicy());
     }
     if (series.getTheme() != null) {
-      metadata.addField(SeriesIndexSchema.THEME, series.getTheme(), false);
+      metadata.addField(SeriesIndexSchema.THEME, series.getTheme());
     }
     return metadata;
   }
@@ -151,7 +151,7 @@ public final class SeriesIndexUtils {
       for (String name: extendedMetadataByType.keySet()) {
         List<String> values = extendedMetadataByType.get(name);
         String fieldName = SeriesIndexSchema.EXTENDED_METADATA_PREFIX.concat(type + "_" + name);
-        doc.addField(fieldName, values, true);
+        doc.addField(fieldName, values);
       }
     }
   }
@@ -189,7 +189,7 @@ public final class SeriesIndexUtils {
     // Write the permissions to the input document
     for (Map.Entry<String, List<String>> entry : permissions.entrySet()) {
       String fieldName = SeriesIndexSchema.ACL_PERMISSION_PREFIX.concat(entry.getKey());
-      doc.addField(fieldName, entry.getValue(), false);
+      doc.addField(fieldName, entry.getValue());
     }
   }
 }
