@@ -23,6 +23,12 @@ on:
       - '.mvn'
     branches-ignore:
       - 'dependabot/**'  # Don't run dependabot branches, as they are already covered by pull requests
+      - 'opencast-auto-forward-merge/**' # Don't run on auto forward merges, as they should be triggered by workflow_call.
+  workflow_call:
+    inputs:
+      ref:
+        required: false
+        type: string
 
 jobs:
   build-mvn-site:
@@ -34,6 +40,14 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.ref || github.ref }}
+          fetch-depth: 0
+      - name: (DEBUG-INFO) Print checked-out HEAD commit (child workflow)
+        if: github.event_name == 'workflow_call'
+        run: |
+          echo "CHILD_WORKFLOW_HEAD=$(git rev-parse HEAD)"
+          echo "GITHUB_SHA=${{ github.sha }}"
 
       - name: cache local maven repository
         uses: actions/cache@v5

@@ -13,6 +13,13 @@ on:
       - 'etc/**'
       - 'docs/checkstyle/check-config.sh'
       - '**/pom.xml'
+    branches-ignore:
+      - 'opencast-auto-forward-merge/**' # Don't run on auto forward merges, as they should be triggered by workflow_call.
+  workflow_call:
+    inputs:
+      ref:
+        required: false
+        type: string
 
 jobs:
   additional-checks:
@@ -20,6 +27,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v6
+      with:
+        ref: ${{ inputs.ref || github.ref }}
+        fetch-depth: 0
+    - name: (DEBUG-INFO) Print checked-out HEAD commit (child workflow)
+      if: github.event_name == 'workflow_call'
+      run: |
+        echo "CHILD_WORKFLOW_HEAD=$(git rev-parse HEAD)"
+        echo "GITHUB_SHA=${{ github.sha }}"
 
     - name: check configuration
       run: ./docs/checkstyle/check-config.sh

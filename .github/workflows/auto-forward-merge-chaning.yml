@@ -1,4 +1,4 @@
-name: Auto forward merge Chaining
+name: Auto forward merge Chaining event base
 
 on:
   push:
@@ -21,14 +21,13 @@ jobs:
       github.event_name == 'push'
     runs-on: ubuntu-latest
     env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      GH_TOKEN: ${{secrets.GITHUB_TOKEN }}
     outputs:
-      branches: ${{ steps.target.outputs.branches }}
+      branch: ${{ steps.target.outputs.branch }}
       source_branch: ${{ steps.source.outputs.branch }}
-
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -42,58 +41,63 @@ jobs:
         run: |
           echo "branch=${GITHUB_REF#refs/heads/}" >> $GITHUB_OUTPUT
 
-      - name: Determine forward chain
+      - name: Determine next target branch
         id: target
         run: |
           set -euo pipefail
 
           SOURCE="${{ steps.source.outputs.branch }}"
 
-          if [[ ! "$SOURCE" =~ ^r/([0-9]+)\.x$ ]]; then
-            echo "Unsupported branch: $SOURCE"
-            echo "branches=[]" >> $GITHUB_OUTPUT
+          if [ "$SOURCE" = "develop" ]; then
+            echo "branch=" >> $GITHUB_OUTPUT
             exit 0
           fi
 
+          if [[ ! "$SOURCE" =~ ^r/([0-9]+)\.x$ ]]; then
+            echo "Unsupported branch: $SOURCE"
+            echo "branch=''" >> $GITHUB_OUTPUT
+            exit 1
+          fi
+
           CURRENT_MAJOR="${BASH_REMATCH[1]}"
-          TARGETS=()
+          NEXT_TARGET=""
 
           git fetch origin --prune
 
-          for BR in $(git branch -r | sed 's|origin/||'); do
-            if [[ "$BR" =~ ^r/([0-9]+)\.x$ ]]; then
-              MAJOR="${BASH_REMATCH[1]}"
-              if (( MAJOR > CURRENT_MAJOR )); then
-                TARGETS+=("$BR")
-              fi
-            fi
-          done
+          NEXT_RELEASE=$(
+            git for-each-ref --format='%(refname:short)' refs/remotes/origin \
+            | sed -nE 's|origin/r/([0-9]+)\.x|\1|p' \
+            | awk -v current="$CURRENT_MAJOR" '$1 > current' \
+            | sort -n \
+            | head -n 1 \
+            || true
+          )
 
-          # Sort release branches numerically
-          if [ ${#TARGETS[@]} -gt 0 ]; then
-            mapfile -t TARGETS < <(printf "%s\n" "${TARGETS[@]}" | sort -t/ -k2 -n)
+          echo "Detected release branches:"
+          git for-each-ref --format='%(refname:short)' refs/remotes/origin
+
+          if [ -n "$NEXT_RELEASE" ]; then
+            NEXT_TARGET="r/${NEXT_RELEASE}.x"
+          else
+            NEXT_TARGET="develop"
           fi
 
-          # Always append develop at the end
-          TARGETS+=("develop")
+          echo "branch=$NEXT_TARGET" >> $GITHUB_OUTPUT
+          echo "Found target branch: $NEXT_TARGET"
 
-          # Convert bash array to compact JSON
-          JSON=$(printf '%s\n' "${TARGETS[@]}" | jq -R . | jq -cs .)
-
-          echo "branches=$JSON" >> $GITHUB_OUTPUT
-
-  auto-merge:
+  merge-attempt:
     runs-on: ubuntu-latest
     env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      MATRIX_ROOM_ID: ${{ secrets.MATRIX_ROOM_ID }}
-      MATRIX_BASE_URL: ${{ secrets.MATRIX_BASE_URL }}
-      MATRIX_ACCESS_TOKEN: ${{ secrets.MATRIX_ACCESS_TOKEN }}
+      GH_TOKEN: ${{secrets.GITHUB_TOKEN }}
     needs: target
-    if: needs.target.outputs.branches != '[]'
+    if: needs.target.outputs.branch != ''
+    outputs:
+      temp_ref: ${{ steps.merge.outputs.temp_ref }}
+      result: ${{ steps.merge.outputs.result }}
+      matrix_notify_fail_message: ${{ steps.merge.outputs.matrix_notify_fail_message }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
 
@@ -102,11 +106,11 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y libxml2-utils
 
-      - name: List out targeted branches
+      - name: Next branch discovery
         run: |
-          echo "Branches: ${{ needs.target.outputs.branches }}"
+          echo "Next target branch: ${{ needs.target.outputs.branch }}"
 
-      - name: Configure Git for auto-merge
+      - name: Configure Git for merge
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
@@ -114,122 +118,261 @@ jobs:
       - name: Fetch all branches
         run: git fetch origin --prune
 
-      # This needs the workflow permission:
-      # Settings → Actions → General -> Workflow permissions -> "Allow GitHub Actions to create and approve pull requests"
-      - name: Forward chain merge
+      - name: Assertion and Merging attempt
         id: merge
         run: |
           set +e
 
           SOURCE="${{ needs.target.outputs.source_branch }}"
-          BRANCHES='${{ needs.target.outputs.branches }}'
+          TARGET='${{ needs.target.outputs.branch }}'
           AUTHOR="${{ github.actor }}"
 
-          for TARGET in $(echo "$BRANCHES" | jq -r '.[]'); do
+          echo "==============================="
+          echo "Merging $SOURCE -> $TARGET"
+          echo "==============================="
 
-            echo "==============================="
-            echo "Merging $SOURCE -> $TARGET"
-            echo "==============================="
+          git fetch origin "$SOURCE"
 
-            git fetch origin "$SOURCE"
+          git checkout -B "$TARGET" "origin/$TARGET"
 
-            git checkout -B "$TARGET" "origin/$TARGET"
+          echo "🔎 Assertion: module versions must match..."
 
-            echo "🔎 Assertion: module versions must match..."
+          # Extract versions
+          VERSIONS=$(xmllint --xpath "/*[local-name() = 'project']/*[local-name() = 'parent']//*[local-name() = 'version']" modules/*/pom.xml 2>&1)
+          XML_STATUS=$?
 
-            # Extract versions
-            VERSIONS=$(xmllint --xpath "/*[local-name() = 'project']/*[local-name() = 'parent']//*[local-name() = 'version']" modules/*/pom.xml 2>&1)
-            XML_STATUS=$?
+          if [ $XML_STATUS -ne 0 ]; then
+            echo "❌ xmllint failed while reading module versions:"
+            echo "$VERSIONS"
+            echo "matrix_notify_fail_message=failed module versions reading for $TARGET, Check the CI workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_OUTPUT
+            exit 1
+          fi
 
-            if [ $XML_STATUS -ne 0 ]; then
-              echo "❌ xmllint failed while reading module versions:"
-              echo "$VERSIONS"
-              echo "matrix_notify_fail_message=failed module versions reading for $TARGET, Check the CI workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_OUTPUT
-              exit 0
-            fi
+          # Normalize and count unique versions
+          UNIQUE_COUNT=$(echo "$VERSIONS" | tr ' ' '\n' | sort -u | wc -l)
 
-            # Normalize and count unique versions
-            UNIQUE_COUNT=$(echo "$VERSIONS" | tr ' ' '\n' | sort -u | wc -l)
+          if [ "$UNIQUE_COUNT" -ne 1 ]; then
+            echo "❌ Module version assertion FAILED"
+            echo "Detected versions:"
+            echo "$VERSIONS" | tr ' ' '\n' | sort -u
+            echo "matrix_notify_fail_message=failed module versions check for $TARGET, Check the CI workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_OUTPUT
+            exit 1
+          fi
 
-            if [ "$UNIQUE_COUNT" -ne 1 ]; then
-              echo "❌ Module version assertion FAILED"
-              echo "Detected versions:"
-              echo "$VERSIONS" | tr ' ' '\n' | sort -u
-              echo "matrix_notify_fail_message=failed module versions check for $TARGET, Check the CI workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_OUTPUT
-              exit 0
-            fi
+          echo "✅ Module version assertion passed!"
 
-            echo "✅ Module version assertion passed!"
+          git merge --no-ff "origin/$SOURCE" -m "Auto-forward merge $SOURCE -> $TARGET"
+          STATUS=$?
 
-            git merge --no-ff "origin/$SOURCE" -m "Auto-forward merge $SOURCE -> $TARGET"
-            STATUS=$?
+          if [ $STATUS -ne 0 ]; then
+            echo "❗️ Conflict detected."
 
-            if [ $STATUS -ne 0 ]; then
-              echo "❗️ Conflict detected."
+            EXISTING_PR_URL=$(gh pr list \
+              --base "$TARGET" \
+              --head "$SOURCE" \
+              --state open \
+              --json url \
+              --jq '.[0].url')
 
-              EXISTING_PR_URL=$(gh pr list \
+            if [ -z "$EXISTING_PR_URL" ]; then
+              PR_URL=$(gh pr create \
                 --base "$TARGET" \
                 --head "$SOURCE" \
-                --state open \
-                --json url \
-                --jq '.[0].url')
+                --title "Forward merge conflict: $SOURCE -> $TARGET" \
+                --body "Automatic forward merge failed due to conflicts. Please resolve manually." \
+                --assignee "$AUTHOR")
 
-              if [ -z "$EXISTING_PR_URL" ]; then
-                PR_URL=$(gh pr create \
-                  --base "$TARGET" \
-                  --head "$SOURCE" \
-                  --title "Forward merge conflict: $SOURCE -> $TARGET" \
-                  --body "Automatic forward merge failed due to conflicts. Please resolve manually." \
-                  --assignee "$AUTHOR")
-
-                echo "Created PR: $PR_URL"
-                echo "matrix_notify_fail_message=merge conflict between $SOURCE and $TARGET, A new PR has been created: $PR_URL" >> $GITHUB_OUTPUT
-              else
-                echo "PR already exists: $EXISTING_PR_URL"
-                echo "matrix_notify_fail_message=merge conflict between $SOURCE and $TARGET, PR exists: $EXISTING_PR_URL" >> $GITHUB_OUTPUT
-              fi
-
-              echo "❌ Stopping forward chain due to conflict."
-              exit 0
+              echo "Created PR: $PR_URL"
+              echo "matrix_notify_fail_message=merge conflict between $SOURCE and $TARGET, A new PR has been created: $PR_URL" >> $GITHUB_OUTPUT
+            else
+              echo "PR already exists: $EXISTING_PR_URL"
+              echo "matrix_notify_fail_message=merge conflict between $SOURCE and $TARGET, PR exists: $EXISTING_PR_URL" >> $GITHUB_OUTPUT
             fi
 
-            # Push changes
-            git push origin "$TARGET"
-            PUSH_STATUS=$?
+            echo "❌ Stopping forward chain due to conflict."
+            exit 1
+          fi
 
-            if [ $PUSH_STATUS -ne 0 ]; then
-              echo "❌ Push failed"
-              echo "matrix_notify_fail_message=push failure from $SOURCE to $TARGET, Check the CI workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_OUTPUT
-              exit 0
-            fi
+          # We now need to save the merge changes into a temporary branch, in order to run the tests.
+          TEMP_REF="opencast-auto-forward-merge/${TARGET//\//-}-${{ github.run_id }}-${{ github.run_attempt }}"
+          git push origin HEAD:$TEMP_REF
+          echo "temp_ref=$TEMP_REF" >> $GITHUB_OUTPUT
 
-            echo "🔎 Assertion: branches integrity..."
-            git fetch origin "$TARGET"
-
-            LOCAL_SHA=$(git rev-parse "${TARGET}")
-            REMOTE_SHA=$(git rev-parse "origin/${TARGET}")
-
-            if [ "$LOCAL_SHA" != "$REMOTE_SHA" ]; then
-              echo "❌ Branch integrity check FAILED"
-              echo "Local:  $LOCAL_SHA"
-              echo "Remote: $REMOTE_SHA"
-
-              echo "matrix_notify_fail_message=failed branch integrity check for $TARGET, Check the CI workflow: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}" >> $GITHUB_OUTPUT
-              exit 0
-            fi
-
-            echo "✅ Branch integrity check passed!"
-
-            # Important: next merge should use the updated target
-            SOURCE="$TARGET"
-
-          done
-
-      - name: Notify Matrix on failure
-        if: steps.merge.outputs.matrix_notify_fail_message != null
+      - name: (DEBUG-INFO) Print merged HEAD commit (parent workflow)
         run: |
-          MESSAGE="❌ Automatic merge failed due to ${{ steps.merge.outputs.matrix_notify_fail_message }}"
+          echo "PARENT_WORKFLOW_HEAD=$(git rev-parse HEAD)"
+          echo "GITHUB_SHA=${{ github.sha }}"
 
+  detect-changes:
+    needs: [target, merge-attempt]
+    runs-on: ubuntu-latest
+    outputs:
+      paella: ${{ steps.filter.outputs.paella }}
+      configs: ${{ steps.filter.outputs.configs }}
+      docs: ${{ steps.filter.outputs.docs }}
+      lti: ${{ steps.filter.outputs.lti }}
+      build-site: ${{ steps.filter.outputs.build-site }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          base: ${{ needs.target.outputs.branch }}
+          filters: |
+            paella:
+              - '.github/workflows/test-paella-7.yml'
+              - 'modules/engage-paella-player-7/**'
+            configs:
+              - '.github/workflows/test-configuration.yml'
+              - 'etc/**'
+              - 'docs/checkstyle/check-config.sh'
+              - '**/pom.xml'
+            docs:
+              - '.github/workflows/test-documentation-build.yml'
+              - 'docs/guides/**'
+              - 'docs/checkstyle/check-docs.sh'
+              - '**.md'
+            lti:
+              - .github/workflows/test-lti-tools.yml
+              - modules/lti/**
+            build-site:
+              - 'pom.xml'
+              - 'modules/**'
+              - 'docs/checkstyle/**'
+              - 'docs/log4j/**'
+              - 'assemblies/**'
+              - '.github/**'
+              - 'mvnw'
+              - '.mvn/**'
+
+  tests-paella:
+    needs: [merge-attempt, detect-changes]
+    if: needs.detect-changes.outputs.paella == 'true'
+    uses: ./.github/workflows/test-paella-7.yml
+    with:
+      ref: ${{ needs.merge-attempt.outputs.temp_ref }}
+
+  tests-configs:
+    needs: [merge-attempt, detect-changes]
+    if: needs.detect-changes.outputs.configs == 'true'
+    uses: ./.github/workflows/test-configuration.yml
+    with:
+      ref: ${{ needs.merge-attempt.outputs.temp_ref }}
+
+  tests-docs:
+    needs: [merge-attempt, detect-changes]
+    if: needs.detect-changes.outputs.docs == 'true'
+    uses: ./.github/workflows/test-documentation-build.yml
+    with:
+      ref: ${{ needs.merge-attempt.outputs.temp_ref }}
+
+  tests-lti:
+    needs: [merge-attempt, detect-changes]
+    if: needs.detect-changes.outputs.lti == 'true'
+    uses: ./.github/workflows/test-lti-tools.yml
+    with:
+      ref: ${{ needs.merge-attempt.outputs.temp_ref }}
+
+  tests-build:
+    needs: [merge-attempt, detect-changes]
+    if: needs.detect-changes.outputs.build-site == 'true'
+    uses: ./.github/workflows/test-opencast-build.yml
+    with:
+      ref: ${{ needs.merge-attempt.outputs.temp_ref }}
+
+  tests-site:
+    needs: [merge-attempt, detect-changes]
+    if: needs.detect-changes.outputs.build-site == 'true'
+    uses: ./.github/workflows/test-opencast-site.yml
+    with:
+      ref: ${{ needs.merge-attempt.outputs.temp_ref }}
+
+  # For this to perform chaining admin must create the repository secret called "CHAINING_SYNC_TOKEN",
+  # generated by GitHub Token Generation Page with [no expiration date, scopes: repo, workflow]
+  push-attempt:
+    env:
+      GH_TOKEN: ${{ secrets.CHAINING_SYNC_TOKEN || secrets.GITHUB_TOKEN }}
+    needs: [ # Everything must be good!
+      target,
+      merge-attempt,
+      detect-changes,
+      tests-paella,
+      tests-configs,
+      tests-docs,
+      tests-lti,
+      tests-build,
+      tests-site
+    ]
+    if: always() && !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') && needs.merge-attempt.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout merged state
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ needs.merge-attempt.outputs.temp_ref }}
+          token: ${{ secrets.CHAINING_SYNC_TOKEN || secrets.GITHUB_TOKEN }}
+      - name: Extra info
+        env:
+          SYNC_TOKEN: ${{ secrets.CHAINING_SYNC_TOKEN }}
+        run: |
+          if [ -n "$SYNC_TOKEN" ]; then
+            echo "✅ Using Admin CHAINING PAT: Forward merge chaining is ENABLED."
+          else
+            echo "⚠️ Using Default Token: Forward merge chaining is DISABLED (Loop protection)."
+          fi
+      - name: Push changes to the next branch
+        run: git push origin HEAD:${{ needs.target.outputs.branch }}
+
+  cleanup:
+    needs: [merge-attempt, push-attempt]
+    # Run if merge-attempt created a branch, regardless of push success
+    if: always() && needs.merge-attempt.result == 'success'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository to make git branches known to this job
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Delete temporary branch
+        run: git push origin --delete ${{ needs.merge-attempt.outputs.temp_ref }}
+        env:
+          GH_TOKEN: ${{secrets.GITHUB_TOKEN }}
+
+  matrix-notification:
+    runs-on: ubuntu-latest
+    # We only need to listen to the critical jobs
+    needs: [target, merge-attempt, push-attempt, cleanup]
+    # Trigger if merge-attempt failed OR push-attempt (which implies tests failed) OR cleanup failed
+    if: always() && (needs.merge-attempt.result == 'failure' || needs.push-attempt.result == 'failure' || needs.cleanup.result == 'failure')
+    steps:
+      - name: Notify Matrix on failure
+        env:
+          MATRIX_BASE_URL: ${{ secrets.MATRIX_BASE_URL }}
+          MATRIX_ROOM_ID: ${{ secrets.MATRIX_ROOM_ID }}
+          MATRIX_ACCESS_TOKEN: ${{ secrets.MATRIX_ACCESS_TOKEN }}
+          OVERRIDE_MSG: ${{ needs.merge-attempt.outputs.matrix_notify_fail_message }}
+          SOURCE: ${{ needs.target.outputs.source_branch }}
+          TARGET: ${{ needs.target.outputs.branch }}
+          RUN_URL: "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          CLEAN_FAIL: ${{ needs.cleanup.result == 'failure' }}
+          TEMP_REF_BRANCH: ${{ needs.merge-attempt.outputs.temp_ref }}
+        run: |
+          DEFAULT_MESSAGE="❌ Automatic merge failed ($SOURCE > $TARGET), likely due to failing tests. Check details here: $RUN_URL"
+
+          if [ "$CLEAN_FAIL" = "true" ]; then
+            DEFAULT_MESSAGE="🧹 Automatic merge could not cleanup the temporary branch ($TEMP_REF_BRANCH), you need to manually remove it. Check details here: $RUN_URL"
+          fi
+
+          if [ -n "$OVERRIDE_MSG" ]; then
+            MESSAGE="❌ Automatic merge failed ($SOURCE > $TARGET), due to $OVERRIDE_MSG"
+          else
+            MESSAGE="$DEFAULT_MESSAGE"
+          fi
+
+          # 3. Send to Matrix
           curl -X PUT \
             "$MATRIX_BASE_URL/_matrix/client/v3/rooms/$MATRIX_ROOM_ID/send/m.room.message/$(date +%s)" \
             -H "Content-Type: application/json" \
