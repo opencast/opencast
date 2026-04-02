@@ -58,7 +58,7 @@ public class EventsListProvider implements ResourceListProvider {
   public static final String STATUS = PROVIDER_PREFIX + ".STATUS";
   public static final String COMMENTS = PROVIDER_PREFIX + ".COMMENTS";
   public static final String PUBLISHER = PROVIDER_PREFIX + ".PUBLISHER";
-  public static final String ISPUBLISHED = PROVIDER_PREFIX + ".ISPUBLISHED";
+  public static final String ISPUBLISHED = PROVIDER_PREFIX + ".IS_PUBLISHED";
 
   public enum Comments {
     NONE, OPEN, RESOLVED;
@@ -139,7 +139,7 @@ public class EventsListProvider implements ResourceListProvider {
       }
     } else if (ISPUBLISHED.equals(listName)) {
       for (IsPublished isPublished : IsPublished.values()) {
-        list.put(isPublished.toString(), "FILTERS.EVENTS.ISPUBLISHED." + isPublished.toString());
+        list.put(isPublished.toString(), "FILTERS.EVENTS.IS_PUBLISHED." + isPublished.toString());
       }
     }
 
@@ -148,7 +148,7 @@ public class EventsListProvider implements ResourceListProvider {
 
   @Override
   public boolean isTranslatable(String listName) {
-    return STATUS.equals(listName) || COMMENTS.equals(listName);
+    return STATUS.equals(listName) || COMMENTS.equals(listName) || ISPUBLISHED.equals(listName);
   }
 
   @Override

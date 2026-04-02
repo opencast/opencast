@@ -1,6 +1,8 @@
 Paella Player 8
 ===============
 
+Paella 8 is Opencast's default player.
+
 The Paella `(pronounced 'paeja')` [Player](https://paellaplayer.webs.upv.es) is an Open Source
 JavaScript video player capable of playing an unlimited number of audio & video streams
 synchronously, Live Streaming, Zoom, Captions, contributed user plugins and a lot more.

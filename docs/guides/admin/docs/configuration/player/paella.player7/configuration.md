@@ -1,7 +1,10 @@
 Paella Player 7
 ===============
 
-Paella 7 is Opencast's default player.
+<div class=warn>
+Paella 7 is scheduled for removal in Opencast 21.
+For the new default player, take a look at the Paella Player 8 documentation section.
+</div>
 
 The Paella `(pronounced 'paeja')` [Player](https://paellaplayer.upv.es) is an Open Source
 JavaScript video player capable of playing an unlimited number of audio & video streams

@@ -109,7 +109,7 @@ jobs:
           ./mvnw site:stage -Pnone
 
       - name: Save site build
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: >
           github.event_name == 'push'
           && github.repository_owner == 'opencast'
@@ -119,7 +119,7 @@ jobs:
           path: target/staging
 
       - name: Save assets build
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7
         if: >
           github.event_name == 'push'
           && github.repository_owner == 'opencast'
@@ -146,7 +146,7 @@ jobs:
       && (github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/r/'))
     steps:
       - name: Download site generation artifact
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: site_build
           path: site_build
@@ -188,7 +188,7 @@ jobs:
 
       - name: update CSS and other assets
         if: github.ref == 'refs/heads/develop'
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: assets
           path: assets_artifact

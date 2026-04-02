@@ -1,6 +1,32 @@
 Opencast 19 Changelog
 ---------------------
 
+## Opencast 19.3 (2026-03-06)
+- [[#7465](https://github.com/opencast/opencast/pull/7465)] -
+  Opencast 19.2 release notes
+- [[#7463](https://github.com/opencast/opencast/pull/7463)] -
+  Update r/19.x Admin UI to 19.x-2026-03-06
+
+## Opencast 19.2 (2026-02-27)
+- [[#7419](https://github.com/opencast/opencast/pull/7419)] -
+  Opencast 19.2 release notes
+- [[#7377](https://github.com/opencast/opencast/pull/7377)] -
+  Additional release notes requirements
+- [[#7373](https://github.com/opencast/opencast/pull/7373)] -
+  Fix two Asset Manager Queries
+- [[#7363](https://github.com/opencast/opencast/pull/7363)] -
+  Add paella auth.html path to mh_default_org.xml
+- [[#7345](https://github.com/opencast/opencast/pull/7345)] -
+  Update r/19.x Admin UI to 19.x-2026-01-29
+- [[#7344](https://github.com/opencast/opencast/pull/7344)] -
+  Update r/19.x Editor to 19.x-2026-01-29
+- [[#7329](https://github.com/opencast/opencast/pull/7329)] -
+  Add language to events endpoint for admin ui events table
+- [[#7327](https://github.com/opencast/opencast/pull/7327)] -
+  Bring back language filter for events
+- [[#7279](https://github.com/opencast/opencast/pull/7279)] -
+  Fix checkstyle violations in caption-impl
+
 ## Opencast 19.1 (2026-01-29)
 - [[#7347](https://github.com/opencast/opencast/pull/7347)] -
   Update 19.1 release notes
