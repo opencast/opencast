@@ -42,6 +42,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
         with:
+          submodules: 'recursive'
           ref: ${{ inputs.ref || github.ref }}
           fetch-depth: 0
       - name: (DEBUG-INFO) Print checked-out HEAD commit (child workflow)
