@@ -138,6 +138,7 @@ public final class EndpointUtil {
       jsonEntry.put("write", policy.write);
       jsonEntry.put("actions", policy.actions);
       if (!isSanitize()) {
+        boolean isUserRole = policy.role.startsWith(getUserRolePrefix());
         User user = userDirectoryService.loadUser(policy.role.replaceFirst(getUserRolePrefix(), ""));
         if (user != null) {
           Map<String, Object> userData = new HashMap<>();
@@ -145,6 +146,8 @@ public final class EndpointUtil {
           userData.put("name", user.getName());
           userData.put("email", user.getEmail());
           jsonEntry.put("user", userData);
+        } else if (isUserRole) {
+          jsonEntry.put("user", new HashMap<String, Object>());
         }
       }
       jsonEntryArray.add(jsonEntry);

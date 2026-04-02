@@ -354,9 +354,12 @@ public class UsersEndpoint {
 
     for (String role : rolesList) {
       if (!isSanitize()) {
+        boolean isUserRole = role.startsWith(getUserRolePrefix());
         User user = userDirectoryService.loadUser(role.replaceFirst(getUserRolePrefix(), ""));
         if (user != null) {
           roleUserMap.put(role, generateJsonUser(user));
+        } else if (isUserRole) {
+          roleUserMap.put("user", new HashMap<String, Object>());
         } else {
           roleUserMap.put(role, null);
         }
