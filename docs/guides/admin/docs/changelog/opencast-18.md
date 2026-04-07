@@ -1,5 +1,33 @@
 Opencast 18 Changelog
 ---------------------
+## Opencast 18.6 (2026-04-07)
+- [[#7510](https://github.com/opencast/opencast/pull/7510)] -
+  Document submodule usage
+- [[#7509](https://github.com/opencast/opencast/pull/7509)] -
+  18.x submodules
+- [[#7477](https://github.com/opencast/opencast/pull/7477)] -
+  Reenable Access by Episode ID
+- [[#7475](https://github.com/opencast/opencast/pull/7475)] -
+  Remove redundant @Produces from API methods
+- [[#7461](https://github.com/opencast/opencast/pull/7461)] -
+  Refactor docker compose service configuration
+- [[#7460](https://github.com/opencast/opencast/pull/7460)] -
+  Improve frontend-less and -reduced builds
+- [[#7399](https://github.com/opencast/opencast/pull/7399)] -
+  Add new MIME types for Microsoft Word, Excel, and PowerPoint documents
+- [[#7384](https://github.com/opencast/opencast/pull/7384)] -
+  Fix most POSIX compliance errors in upgrade shell scripts
+- [[#7378](https://github.com/opencast/opencast/pull/7378)] -
+  Prevent build tests from building modules in parallel
+- [[#7372](https://github.com/opencast/opencast/pull/7372)] -
+  Add endpoint for batch-creating users
+- [[#7369](https://github.com/opencast/opencast/pull/7369)] -
+  Switch to bash for upgrade scripts
+- [[#7348](https://github.com/opencast/opencast/pull/7348)] -
+  Add missing GHA checks
+- [[#7338](https://github.com/opencast/opencast/pull/7338)] -
+  Remove internal SSL documentation
+
 
 Changes marked with \* were also included in 17.x.
 ## Opencast 18.5 (2026-01-29)

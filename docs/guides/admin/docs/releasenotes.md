@@ -1,11 +1,13 @@
 # Opencast 18: Release Notes
 
-## Opencast 18.next
+## Opencast 18.6
 
 This release contains a fix for
 (Episode ID Roles)[https://docs.opencast.org/r/18.x/admin/#configuration/episode-id-roles/#episode-id-roles], which
-were broken in earlier 18.x releases.  Adopters affected by this issue should either reindex their search index or
-republish their recordings.  If you do not use episode id roles then this can safely be ignored.
+were broken in earlier 18.x releases. Adopters affected by this issue should either reindex their search index or
+republish their recordings. If you do not use episode id roles then this can safely be ignored.
+
+This release also contains updates to the admin ui and the editor. 
 
 ## Opencast 18.5
 
