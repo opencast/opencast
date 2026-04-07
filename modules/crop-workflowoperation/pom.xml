@@ -6,7 +6,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>18-SNAPSHOT</version>
+    <version>18.6</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
