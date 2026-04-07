@@ -19,7 +19,7 @@
  *
  */
 
-package org.opencastproject.index.service.resources.list.provider;
+package org.opencastproject.list.common.provider;
 
 import org.opencastproject.list.api.ResourceListProvider;
 import org.opencastproject.list.api.ResourceListQuery;
