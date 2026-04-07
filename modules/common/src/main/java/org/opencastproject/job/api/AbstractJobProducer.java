@@ -118,8 +118,9 @@ public abstract class AbstractJobProducer implements JobProducer {
    */
   @Override
   public long countJobs(Status status) throws ServiceRegistryException {
-    if (status == null)
+    if (status == null) {
       throw new IllegalArgumentException("Status must not be null");
+    }
     return getServiceRegistry().count(getJobType(), status);
   }
 
@@ -299,8 +300,9 @@ public abstract class AbstractJobProducer implements JobProducer {
       final ServiceRegistry serviceRegistry = getServiceRegistry();
       final Job jobBeforeProcessing = serviceRegistry.getJob(jobId);
 
-      if (currentJobId.isPresent())
+      if (currentJobId.isPresent()) {
         serviceRegistry.setCurrentJob(serviceRegistry.getJob(currentJobId.get()));
+      }
 
       final Organization organization = getOrganizationDirectoryService()
               .getOrganization(jobBeforeProcessing.getOrganization());
@@ -340,8 +342,9 @@ public abstract class AbstractJobProducer implements JobProducer {
         jobAfterProcessing = getServiceRegistry().updateJob(jobAfterProcessing);
         getServiceRegistry().incident().unhandledException(jobAfterProcessing, Severity.FAILURE, t);
         logger.error("Error handling operation '{}':", jobAfterProcessing.getOperation(), t);
-        if (t instanceof ServiceRegistryException)
+        if (t instanceof ServiceRegistryException) {
           throw (ServiceRegistryException) t;
+        }
       }
     }
 

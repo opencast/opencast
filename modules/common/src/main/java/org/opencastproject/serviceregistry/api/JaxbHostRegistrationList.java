@@ -51,8 +51,9 @@ public class JaxbHostRegistrationList {
   }
 
   public JaxbHostRegistrationList(Collection<JaxbHostRegistration> registrations) {
-    for (JaxbHostRegistration reg : registrations)
+    for (JaxbHostRegistration reg : registrations) {
       this.registrations.add(reg);
+    }
   }
 
   /**

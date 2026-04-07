@@ -175,10 +175,11 @@ public final class EName implements Serializable, Comparable<EName> {
     Matcher m = pattern.matcher(strEName);
 
     if (m.matches()) {
-      if (StringUtils.isNotBlank(defaultNameSpace) && m.group("namespace") == null)
+      if (StringUtils.isNotBlank(defaultNameSpace) && m.group("namespace") == null) {
         return new EName(defaultNameSpace, m.group("localname"));
-      else
+      } else {
         return new EName(StringUtils.trimToEmpty(m.group("namespace")), m.group("localname"));
+      }
     }
     throw new IllegalArgumentException(format("Cannot parse '%s' as EName", strEName));
   }

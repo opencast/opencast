@@ -98,8 +98,8 @@ public class JaxbHostRegistration implements HostRegistration {
    * @param online
    *          whether the host is in maintenance mode
    */
-  public JaxbHostRegistration(String baseUrl, String address, String nodeName, long memory, int cores, float maxLoad, boolean online,
-          boolean maintenance) {
+  public JaxbHostRegistration(String baseUrl, String address, String nodeName, long memory, int cores, float maxLoad,
+      boolean online, boolean maintenance) {
     this.baseUrl = baseUrl;
     this.address = address;
     this.nodeName = nodeName;
@@ -305,8 +305,9 @@ public class JaxbHostRegistration implements HostRegistration {
    */
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof HostRegistration))
+    if (!(obj instanceof HostRegistration)) {
       return false;
+    }
     HostRegistration registration = (HostRegistration) obj;
     return baseUrl.equals(registration.getBaseUrl());
   }

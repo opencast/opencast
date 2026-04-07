@@ -47,8 +47,8 @@ import javax.persistence.TypedQuery;
     @Index(name = "IX_oc_assets_asset_mediapackage_element_id", columnList = ("mediapackage_element_id")) })
 @NamedQueries({
     @NamedQuery(
-        name = "Asset.findMediumByMpIdMpeIdAndVersion",
-        query = "SELECT a, s.availability, s.organizationId FROM Asset a "
+        name = "Asset.findAssetByMpIdMpeIdAndVersion",
+        query = "SELECT a FROM Asset a "
             + "JOIN a.snapshot s "
             + "WHERE s.mediaPackageId = :mpId "
             + "AND a.mediaPackageElementId = :mpeId "

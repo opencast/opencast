@@ -62,7 +62,8 @@ public class TrackBuilderPlugin extends AbstractElementBuilderPlugin {
   private static final Logger logger = LoggerFactory.getLogger(TrackBuilderPlugin.class);
 
   /**
-   * @see org.opencastproject.mediapackage.elementbuilder.MediaPackageElementBuilderPlugin#accept(org.opencastproject.mediapackage.MediaPackageElement.Type,
+   * @see org.opencastproject.mediapackage.elementbuilder.MediaPackageElementBuilderPlugin#accept(
+   *      org.opencastproject.mediapackage.MediaPackageElement.Type,
    *      org.opencastproject.mediapackage.MediaPackageElementFlavor)
    */
   @Override
@@ -103,7 +104,8 @@ public class TrackBuilderPlugin extends AbstractElementBuilderPlugin {
   }
 
   /**
-   * @see org.opencastproject.mediapackage.elementbuilder.MediaPackageElementBuilderPlugin#newElement(org.opencastproject.mediapackage.MediaPackageElement.Type
+   * @see org.opencastproject.mediapackage.elementbuilder.MediaPackageElementBuilderPlugin#newElement(
+   *      org.opencastproject.mediapackage.MediaPackageElement.Type
    *      ,org.opencastproject.mediapackage.MediaPackageElementFlavor)
    */
   @Override
@@ -114,7 +116,8 @@ public class TrackBuilderPlugin extends AbstractElementBuilderPlugin {
   }
 
   /**
-   * @see org.opencastproject.mediapackage.elementbuilder.MediaPackageElementBuilderPlugin#elementFromManifest(org.w3c.dom.Node,
+   * @see org.opencastproject.mediapackage.elementbuilder.MediaPackageElementBuilderPlugin#elementFromManifest(
+   *      org.w3c.dom.Node,
    *      org.opencastproject.mediapackage.MediaPackageSerializer)
    */
   @Override
@@ -142,68 +145,81 @@ public class TrackBuilderPlugin extends AbstractElementBuilderPlugin {
 
       // size
       String trackSize = xpath.evaluate("size/text()", elementNode).trim();
-      if (!"".equals(trackSize))
+      if (!"".equals(trackSize)) {
         size = Long.parseLong(trackSize);
+      }
 
       // flavor
       String flavorValue = (String) xpath.evaluate("@type", elementNode, XPathConstants.STRING);
-      if (StringUtils.isNotEmpty(flavorValue))
+      if (StringUtils.isNotEmpty(flavorValue)) {
         flavor = MediaPackageElementFlavor.parseFlavor(flavorValue);
+      }
 
       // transport
       String transportValue = (String) xpath.evaluate("@transport", elementNode, XPathConstants.STRING);
-      if (StringUtils.isNotEmpty(transportValue))
+      if (StringUtils.isNotEmpty(transportValue)) {
         transport = TrackImpl.StreamingProtocol.valueOf(transportValue);
+      }
 
       // checksum
       String checksumValue = (String) xpath.evaluate("checksum/text()", elementNode, XPathConstants.STRING);
       String checksumType = (String) xpath.evaluate("checksum/@type", elementNode, XPathConstants.STRING);
-      if (StringUtils.isNotEmpty(checksumValue) && checksumType != null)
+      if (StringUtils.isNotEmpty(checksumValue) && checksumType != null) {
         checksum = Checksum.create(checksumType.trim(), checksumValue.trim());
+      }
 
       // mimetype
       String mimeTypeValue = (String) xpath.evaluate("mimetype/text()", elementNode, XPathConstants.STRING);
-      if (StringUtils.isNotEmpty(mimeTypeValue))
+      if (StringUtils.isNotEmpty(mimeTypeValue)) {
         mimeType = MimeTypes.parseMimeType(mimeTypeValue);
+      }
 
       //
       // Build the track
 
       TrackImpl track = TrackImpl.fromURI(url);
 
-      if (StringUtils.isNotBlank(id))
+      if (StringUtils.isNotBlank(id)) {
         track.setIdentifier(id);
+      }
 
       // Add url
       track.setURI(url);
 
       // Add reference
-      if (StringUtils.isNotEmpty(reference))
+      if (StringUtils.isNotEmpty(reference)) {
         track.referTo(MediaPackageReferenceImpl.fromString(reference));
+      }
 
       // Set size
-      if (size > 0)
+      if (size > 0) {
         track.setSize(size);
+      }
 
       // Set checksum
-      if (checksum != null)
+      if (checksum != null) {
         track.setChecksum(checksum);
+      }
 
       // Set mimetpye
-      if (mimeType != null)
+      if (mimeType != null) {
         track.setMimeType(mimeType);
+      }
 
-      if (flavor != null)
+      if (flavor != null) {
         track.setFlavor(flavor);
+      }
 
       //set transport
-      if (transport != null)
+      if (transport != null) {
         track.setTransport(transport);
+      }
 
       // description
       String description = (String) xpath.evaluate("description/text()", elementNode, XPathConstants.STRING);
-      if (StringUtils.isNotBlank(description))
+      if (StringUtils.isNotBlank(description)) {
         track.setElementDescription(description.trim());
+      }
 
       // tags
       NodeList tagNodes = (NodeList) xpath.evaluate("tags/tag", elementNode, XPathConstants.NODESET);

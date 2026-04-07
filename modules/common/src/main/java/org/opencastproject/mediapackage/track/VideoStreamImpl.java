@@ -104,8 +104,9 @@ public class VideoStreamImpl extends AbstractStreamImpl implements VideoStream {
     // bit rate
     try {
       String strBitrate = (String) xpath.evaluate("bitrate/text()", node, XPathConstants.STRING);
-      if (StringUtils.isNotEmpty(strBitrate))
+      if (StringUtils.isNotEmpty(strBitrate)) {
         vs.bitRate = Float.valueOf(strBitrate.trim());
+      }
     } catch (NumberFormatException e) {
       throw new IllegalStateException("Bit rate was malformatted: " + e.getMessage());
     }
@@ -113,8 +114,9 @@ public class VideoStreamImpl extends AbstractStreamImpl implements VideoStream {
     // frame rate
     try {
       String strFrameRate = (String) xpath.evaluate("framerate/text()", node, XPathConstants.STRING);
-      if (StringUtils.isNotEmpty(strFrameRate))
+      if (StringUtils.isNotEmpty(strFrameRate)) {
         vs.frameRate = Float.valueOf(strFrameRate.trim());
+      }
     } catch (NumberFormatException e) {
       throw new IllegalStateException("Frame rate was malformatted: " + e.getMessage());
     }
@@ -128,15 +130,17 @@ public class VideoStreamImpl extends AbstractStreamImpl implements VideoStream {
     // interlacing
     String scanType = (String) xpath.evaluate("scantype/@type", node, XPathConstants.STRING);
     if (StringUtils.isNotEmpty(scanType)) {
-      if (vs.scanType == null)
+      if (vs.scanType == null) {
         vs.scanType = new Scan();
+      }
       vs.scanType.type = ScanType.fromString(scanType);
     }
 
     String scanOrder = (String) xpath.evaluate("interlacing/@order", node, XPathConstants.STRING);
     if (StringUtils.isNotEmpty(scanOrder)) {
-      if (vs.scanType == null)
+      if (vs.scanType == null) {
         vs.scanType = new Scan();
+      }
       vs.scanType.order = ScanOrder.fromString(scanOrder);
     }
 
@@ -161,8 +165,9 @@ public class VideoStreamImpl extends AbstractStreamImpl implements VideoStream {
     if (scanType != null) {
       Element interlacingNode = document.createElement("scantype");
       interlacingNode.setAttribute("type", scanType.toString());
-      if (scanType.order != null)
+      if (scanType.order != null) {
         interlacingNode.setAttribute("order", scanType.order.toString());
+      }
       node.appendChild(interlacingNode);
     }
 
@@ -197,8 +202,9 @@ public class VideoStreamImpl extends AbstractStreamImpl implements VideoStream {
   public Integer getFrameWidth() {
     try {
       String[] s = resolution.trim().split("x");
-      if (s.length != 2)
+      if (s.length != 2) {
         throw new IllegalStateException("video size must be of the form <hsize>x<vsize>, found " + resolution);
+      }
       return Integer.valueOf(s[0].trim());
     } catch (NumberFormatException e) {
       throw new IllegalStateException("Resolution was malformatted: " + e.getMessage());
@@ -209,8 +215,9 @@ public class VideoStreamImpl extends AbstractStreamImpl implements VideoStream {
   public Integer getFrameHeight() {
     try {
       String[] s = resolution.trim().split("x");
-      if (s.length != 2)
+      if (s.length != 2) {
         throw new IllegalStateException("video size must be of the form <hsize>x<vsize>, found " + resolution);
+      }
       return Integer.valueOf(s[1].trim());
     } catch (NumberFormatException e) {
       throw new IllegalStateException("Resolution was malformatted: " + e.getMessage());
@@ -239,14 +246,16 @@ public class VideoStreamImpl extends AbstractStreamImpl implements VideoStream {
 
   public void setFrameWidth(Integer frameWidth) {
     this.frameWidth = frameWidth;
-    if (frameWidth != null && frameHeight != null)
+    if (frameWidth != null && frameHeight != null) {
       updateResolution();
+    }
   }
 
   public void setFrameHeight(Integer frameHeight) {
     this.frameHeight = frameHeight;
-    if (frameWidth != null && frameHeight != null)
+    if (frameWidth != null && frameHeight != null) {
       updateResolution();
+    }
   }
 
   private void updateResolution() {
@@ -254,18 +263,22 @@ public class VideoStreamImpl extends AbstractStreamImpl implements VideoStream {
   }
 
   public void setScanType(ScanType scanType) {
-    if (scanType == null)
+    if (scanType == null) {
       return;
-    if (this.scanType == null)
+    }
+    if (this.scanType == null) {
       this.scanType = new Scan();
+    }
     this.scanType.type = scanType;
   }
 
   public void setScanOrder(ScanOrder scanOrder) {
-    if (scanOrder == null)
+    if (scanOrder == null) {
       return;
-    if (this.scanType == null)
+    }
+    if (this.scanType == null) {
       this.scanType = new Scan();
+    }
     this.scanType.order = scanOrder;
   }
 }

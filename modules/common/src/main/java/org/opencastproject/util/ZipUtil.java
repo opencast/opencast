@@ -38,13 +38,17 @@ import de.schlichtherle.io.archive.zip.ZipDriver;
 
 /*
  * WARNING:
- * Some archivers, such as file-roller in Ubuntu, seem not to be able to uncompress zip archives containg files with special characters.
- * The pure zip standard uses the CP437 encoding which CAN'T represent special characters, but applications have implemented their own methods
- * to overcome this inconvenience. TrueZip also. However, it seems file-roller (and probably others) doesn't "understand" how to restore the
- * original filenames and shows strange (and un-readable) characters in the unzipped filenames
- * However, the inverse process (unzipping zip archives made with file-roller and containing files with special characters) seems to work fine
+ * Some archivers, such as file-roller in Ubuntu, seem not to be able to uncompress zip archives containg files with
+ * special characters.
+ * The pure zip standard uses the CP437 encoding which CAN'T represent special characters, but applications have
+ * implemented their own methods to overcome this inconvenience. TrueZip also. However, it seems file-roller (and
+ * probably others) doesn't "understand" how to restore the original filenames and shows strange (and un-readable)
+ * characters in the unzipped filenames.
+ * However, the inverse process (unzipping zip archives made with file-roller and containing files with special
+ * characters) seems to work fine.
  *
- * N.B. By "special characters" I mean those not present in the original ASCII specification, such as accents, special letters, etc
+ * N.B. By "special characters" I mean those not present in the original ASCII specification, such as accents,
+ * special letters, etc
  *
  * ruben.perez
  */
@@ -155,8 +159,9 @@ public final class ZipUtil {
                 "The destination file does not represent a valid zip archive (.zip extension is required)");
       }
 
-      if (!zipFile.mkdirs())
+      if (!zipFile.mkdirs()) {
         throw new IOException("Couldn't create the destination file");
+      }
 
       for (java.io.File f : sourceFiles) {
 
@@ -177,8 +182,9 @@ public final class ZipUtil {
         if (f.exists()) {
           if (!f.isDirectory() || recursive) {
             success = new File(zipFile, f.getName()).copyAllFrom(f);
-            if (success)
+            if (success) {
               logger.debug("File {} zipped successfuly", f.getAbsolutePath());
+            }
             else {
               logger.error("File {} not zipped", f.getAbsolutePath());
               zipFile.deleteAll();
@@ -260,9 +266,9 @@ public final class ZipUtil {
 
         success = f.copyAllTo(destination);
 
-        if (success)
+        if (success) {
           logger.debug("File {} unzipped successfully", zipFile.getCanonicalPath());
-        else {
+        } else {
           logger.warn("File {} was not correctly unzipped", zipFile.getCanonicalPath());
           throw new IOException("File " + zipFile.getCanonicalPath() + " was not correctly unzipped");
         }

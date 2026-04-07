@@ -10,9 +10,12 @@ jobs:
   create-release-from-tag:
     name: Create release from tag
     runs-on: ubuntu-latest
+    if: github.repository == 'opencast/opencast'
     steps:
       - name: checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
+        with:
+          submodules: 'recursive'
 
       - name: setup java
         uses: actions/setup-java@v5

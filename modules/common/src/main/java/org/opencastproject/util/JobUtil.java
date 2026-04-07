@@ -193,8 +193,9 @@ public final class JobUtil {
       case FINISHED:
         return new JobBarrier.Result(map(tuple(job, status)));
       default:
-        if (timeout.isPresent())
+        if (timeout.isPresent()) {
           return waitForJobs(waiter, reg, timeout.get(), job);
+        }
         return waitForJobs(waiter, reg, job);
     }
   }

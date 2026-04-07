@@ -13,19 +13,18 @@
   </parent>
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
-    <checkstyle.skip>false</checkstyle.skip>
   </properties>
   <dependencies>
     <!-- FIXME: This sucks, but because of https://github.com/jacoco/jacoco/wiki/MavenMultiModule we need to
          manually depend on *every* Opencast module.  A check that we actually do has been added to the docs checks -->
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-admin-ui</artifactId>
+      <artifactId>opencast-admin-service</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-admin-ui-interface</artifactId>
+      <artifactId>opencast-admin</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

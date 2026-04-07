@@ -51,8 +51,9 @@ public class JaxbUserList {
   }
 
   public JaxbUserList(Collection<JaxbUser> users) {
-    for (JaxbUser user : users)
+    for (JaxbUser user : users) {
       this.users.add(user);
+    }
   }
 
   /**

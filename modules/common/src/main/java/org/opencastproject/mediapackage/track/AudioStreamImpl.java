@@ -154,8 +154,9 @@ public class AudioStreamImpl extends AbstractStreamImpl implements AudioStream {
     // bit depth
     try {
       String bd = (String) xpath.evaluate("bitdepth/text()", node, XPathConstants.STRING);
-      if (!StringUtils.isBlank(bd))
+      if (!StringUtils.isBlank(bd)) {
         as.bitdepth = Integer.valueOf(bd.trim());
+      }
     } catch (NumberFormatException e) {
       throw new IllegalStateException("Bit depth was malformatted: " + e.getMessage());
     }
@@ -163,8 +164,9 @@ public class AudioStreamImpl extends AbstractStreamImpl implements AudioStream {
     // channels
     try {
       String strChannels = (String) xpath.evaluate("channels/text()", node, XPathConstants.STRING);
-      if (!StringUtils.isBlank(strChannels))
+      if (!StringUtils.isBlank(strChannels)) {
         as.channels = Integer.valueOf(strChannels.trim());
+      }
     } catch (NumberFormatException e) {
       throw new IllegalStateException("Number of channels was malformatted: " + e.getMessage());
     }
@@ -172,8 +174,9 @@ public class AudioStreamImpl extends AbstractStreamImpl implements AudioStream {
     // sampling rate
     try {
       String sr = (String) xpath.evaluate("framerate/text()", node, XPathConstants.STRING);
-      if (!StringUtils.isBlank(sr))
+      if (!StringUtils.isBlank(sr)) {
         as.samplingrate = Integer.valueOf(sr.trim());
+      }
     } catch (NumberFormatException e) {
       throw new IllegalStateException("Frame rate was malformatted: " + e.getMessage());
     }
@@ -181,8 +184,9 @@ public class AudioStreamImpl extends AbstractStreamImpl implements AudioStream {
     // Bit rate
     try {
       String br = (String) xpath.evaluate("bitrate/text()", node, XPathConstants.STRING);
-      if (!StringUtils.isBlank(br))
+      if (!StringUtils.isBlank(br)) {
         as.bitrate = Float.valueOf(br.trim());
+      }
     } catch (NumberFormatException e) {
       throw new IllegalStateException("Bit rate was malformatted: " + e.getMessage());
     }
@@ -190,8 +194,9 @@ public class AudioStreamImpl extends AbstractStreamImpl implements AudioStream {
     // Pk lev dB
     try {
       String pkLev = (String) xpath.evaluate("peakleveldb/text()", node, XPathConstants.STRING);
-      if (!StringUtils.isBlank(pkLev))
+      if (!StringUtils.isBlank(pkLev)) {
         as.pkLevDb = Float.valueOf(pkLev.trim());
+      }
     } catch (NumberFormatException e) {
       throw new IllegalStateException("Pk lev dB was malformatted: " + e.getMessage());
     }
@@ -199,8 +204,9 @@ public class AudioStreamImpl extends AbstractStreamImpl implements AudioStream {
     // RMS lev dB
     try {
       String rmsLev = (String) xpath.evaluate("rmsleveldb/text()", node, XPathConstants.STRING);
-      if (!StringUtils.isBlank(rmsLev))
+      if (!StringUtils.isBlank(rmsLev)) {
         as.rmsLevDb = Float.valueOf(rmsLev.trim());
+      }
     } catch (NumberFormatException e) {
       throw new IllegalStateException("RMS lev dB was malformatted: " + e.getMessage());
     }
@@ -208,8 +214,9 @@ public class AudioStreamImpl extends AbstractStreamImpl implements AudioStream {
     // RMS Pk dB
     try {
       String rmsPk = (String) xpath.evaluate("rmspeakdb/text()", node, XPathConstants.STRING);
-      if (!StringUtils.isBlank(rmsPk))
+      if (!StringUtils.isBlank(rmsPk)) {
         as.rmsPkDb = Float.valueOf(rmsPk.trim());
+      }
     } catch (NumberFormatException e) {
       throw new IllegalStateException("RMS Pk dB was malformatted: " + e.getMessage());
     }

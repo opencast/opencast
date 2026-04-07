@@ -152,7 +152,7 @@ public abstract class AbstractStreamImpl implements Stream {
   }
 
   protected static void partialFromManifest(AbstractStreamImpl stream, Node node, XPath xpath)
-      throws IllegalStateException, XPathException {
+          throws IllegalStateException, XPathException {
     // Frame count
     try {
       String frameCount = (String) xpath.evaluate("framecount/text()", node, XPathConstants.STRING);
@@ -227,7 +227,8 @@ public abstract class AbstractStreamImpl implements Stream {
       encoderNode.setAttribute("vendor", encoder.vendor);
       addChild = true;
     }
-    if (addChild)
+    if (addChild) {
       node.appendChild(encoderNode);
+    }
   }
 }

@@ -94,7 +94,6 @@ public class ListProviderEndpoint {
 
   @GET
   @Path("providers.json")
-  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_10_0 })
   @RestQuery(
       name = "availableProviders",
       description = "Provides the list of the available list providers",
@@ -113,7 +112,6 @@ public class ListProviderEndpoint {
 
   @GET
   @Path("{source}.json")
-  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_10_0 })
   @RestQuery(
       name = "list",
       description = "Provides key-value list from the given source",

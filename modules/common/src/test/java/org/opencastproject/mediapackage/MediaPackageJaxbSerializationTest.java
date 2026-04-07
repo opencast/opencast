@@ -117,13 +117,19 @@ public class MediaPackageJaxbSerializationTest {
    */
   @Test
   public void testJaxbWithoutXsi() throws Exception {
-    String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><mediapackage start=\"0\" id=\"123\" duration=\"0\" xmlns=\"http://mediapackage.opencastproject.org\"><metadata><catalog type=\"dublincore/episode\"><mimetype>text/xml</mimetype><tags/><checksum type=\"md5\">7891011abcd</checksum><url>http://opencastproject.org/index.html</url></catalog></metadata><attachments><attachment id=\"attachment-1\"><tags/><checksum type=\"md5\">123456abcd</checksum><url>http://opencastproject.org/index.html</url></attachment></attachments></mediapackage>";
+    String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><mediapackage start=\"0\" id=\"123\" "
+        + "duration=\"0\" xmlns=\"http://mediapackage.opencastproject.org\"><metadata>"
+        + "<catalog type=\"dublincore/episode\"><mimetype>text/xml</mimetype><tags/>"
+        + "<checksum type=\"md5\">7891011abcd</checksum><url>http://opencastproject.org/index.html</url></catalog>"
+        + "</metadata><attachments><attachment id=\"attachment-1\"><tags/><checksum type=\"md5\">123456abcd</checksum>"
+        + "<url>http://opencastproject.org/index.html</url></attachment></attachments></mediapackage>";
     MediaPackage deserialized = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder()
             .loadFromXml(IOUtils.toInputStream(xml, "UTF-8"));
     assertEquals(2, deserialized.getElements().length);
 
-    String elementXml = "<track xmlns=\"http://mediapackage.opencastproject.org\" id=\"track-1\" type=\"presentation/source\"><mimetype>video/mpeg</mimetype>"
-            + "<url>http://localhost:8080/workflow/samples/screen.mpg</url></track>";
+    String elementXml = "<track xmlns=\"http://mediapackage.opencastproject.org\" id=\"track-1\" "
+        + "type=\"presentation/source\"><mimetype>video/mpeg</mimetype>"
+        + "<url>http://localhost:8080/workflow/samples/screen.mpg</url></track>";
     MediaPackageElement element = MediaPackageElementParser.getFromXml(elementXml);
     assertEquals("track-1", element.getIdentifier());
     assertEquals(MediaPackageElements.PRESENTATION_SOURCE, element.getFlavor());

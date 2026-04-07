@@ -11,19 +11,18 @@
   <inceptionYear>2009</inceptionYear>
   <properties>
     <argLine></argLine>
-    <checkstyle.skip>false</checkstyle.skip>
     <opencast.basedir>${basedir}</opencast.basedir>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
     <!-- library version specifications -->
     <aws.version>1.12.503_1</aws.version>
-    <commons-codec.version>1.18.0</commons-codec.version>
+    <commons-codec.version>1.21.0</commons-codec.version>
     <commons-collections.version>4.5.0</commons-collections.version>
     <commons-compress.version>1.27.1</commons-compress.version>
     <commons-csv.version>1.9.0</commons-csv.version>
     <commons-fileupload.version>1.6.0</commons-fileupload.version>
-    <commons-io.version>2.20.0</commons-io.version>
+    <commons-io.version>2.21.0</commons-io.version>
     <commons-lang3.version>3.18.0</commons-lang3.version>
     <commons-text.version>1.14.0</commons-text.version>
     <cxf.version>3.6.4</cxf.version>
@@ -47,7 +46,7 @@
     <jettison.version>1.5.4</jettison.version>
     <joda-time.version>2.14.0</joda-time.version>
     <json-simple.version>1.1.1</json-simple.version>
-    <junit5.version>5.12.2</junit5.version>
+    <junit5.version>6.0.1</junit5.version>
     <karaf.version>4.4.7</karaf.version>
     <lucene.version>8.7.0</lucene.version>
     <node.version>v20.12.2</node.version>
@@ -55,7 +54,7 @@
     <osgi.annotation.version>8.1.0</osgi.annotation.version>
     <org.osgi.service.component.version>1.5.1</org.osgi.service.component.version>
     <org.osgi.service.component.annotations.version>1.5.1</org.osgi.service.component.annotations.version>
-    <org.osgi.service.cm.version>1.6.0</org.osgi.service.cm.version>
+    <org.osgi.service.cm.version>1.6.1</org.osgi.service.cm.version>
     <org.osgi.service.log.version>1.5.0</org.osgi.service.log.version>
     <org.osgi.service.http.version>1.2.2</org.osgi.service.http.version>
     <org.osgi.service.http.whiteboard.version>1.1.1</org.osgi.service.http.whiteboard.version>
@@ -68,8 +67,8 @@
     <xmlsec.version>2.2.6</xmlsec.version>
   </properties>
   <modules>
-    <module>modules/admin-ui</module>
-    <module>modules/admin-ui-interface</module>
+    <module>modules/admin-service</module>
+    <module>modules/admin</module>
     <module>modules/adopter-registration-api</module>
     <module>modules/adopter-registration-impl</module>
     <module>modules/analyze-mediapackage-workflowoperation</module>
@@ -428,7 +427,6 @@
           </dependency>
         </dependencies>
         <configuration>
-          <skip>${checkstyle.skip}</skip>
           <configLocation>${opencast.basedir}/docs/checkstyle/opencast-checkstyle.xml</configLocation>
           <headerLocation>${opencast.basedir}/docs/checkstyle/opencast-header.txt</headerLocation>
           <suppressionsLocation>${opencast.basedir}/docs/checkstyle/checkstyle-suppressions.xml</suppressionsLocation>
@@ -623,7 +621,7 @@
         <plugin>
           <groupId>org.apache.felix</groupId>
           <artifactId>maven-bundle-plugin</artifactId>
-          <version>5.1.9</version>
+          <version>6.0.2</version>
           <inherited>true</inherited>
           <configuration>
             <obrRepository>NONE</obrRepository>
@@ -687,7 +685,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
-          <version>3.3.1</version>
+          <version>3.4.0</version>
         </plugin>
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
@@ -814,7 +812,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-gpg-plugin</artifactId>
-            <version>3.1.0</version>
+            <version>3.2.8</version>
             <executions>
               <execution>
                 <id>sign-artifacts</id>
@@ -1128,7 +1126,7 @@
       <dependency>
         <groupId>org.owasp.esapi</groupId>
         <artifactId>esapi</artifactId>
-        <version>2.6.0.0</version>
+        <version>2.7.0.0</version>
       </dependency>
       <dependency>
         <groupId>org.opensaml</groupId>
@@ -1187,7 +1185,7 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>2.0.16</version>
+        <version>2.0.17</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
@@ -1378,7 +1376,7 @@
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-utils</artifactId>
-        <version>4.0.1</version>
+        <version>4.0.3</version>
       </dependency>
       <dependency>
         <groupId>org.opencastproject</groupId>

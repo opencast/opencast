@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * Opencast {@link EventSearchQuery} implementation of the Elasticsearch query builder.
@@ -88,6 +89,12 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
             and(EventIndexSchema.ACL_PERMISSION_PREFIX.concat(action), role.getName());
           }
         }
+      }
+    }
+
+    if (query.getAccessControlEntries() != null && !query.getAccessControlEntries().isEmpty()) {
+      for (Map.Entry<String, String> entry: query.getAccessControlEntries().entrySet()) {
+        and(EventIndexSchema.ACL_PERMISSION_PREFIX.concat(entry.getValue()), entry.getKey());
       }
     }
 

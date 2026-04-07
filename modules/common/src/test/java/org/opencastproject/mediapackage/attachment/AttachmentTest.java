@@ -57,7 +57,8 @@ public class AttachmentTest {
 
   /**
    * Test method for
-   * {@link org.opencastproject.mediapackage.attachment.AttachmentImpl#toManifest(org.w3c.dom.Document, org.opencastproject.mediapackage.MediaPackageSerializer)}
+   * {@link org.opencastproject.mediapackage.attachment.AttachmentImpl#toManifest(org.w3c.dom.Document,
+   *        org.opencastproject.mediapackage.MediaPackageSerializer)}
    * .
    */
   @Test

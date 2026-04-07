@@ -50,7 +50,7 @@ public final class JaxbIncidentDigestTree {
   }
 
   public JaxbIncidentDigestTree(IncidentService svc, Locale locale, IncidentTree tree)
-      throws IncidentServiceException, NotFoundException {
+          throws IncidentServiceException, NotFoundException {
     this.incidents = tree.getIncidents().stream()
         .map(i -> JaxbIncidentDigest.mkFn(svc, locale, i))
         .collect(Collectors.toList());

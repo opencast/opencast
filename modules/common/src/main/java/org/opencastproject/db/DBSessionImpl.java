@@ -103,7 +103,8 @@ public class DBSessionImpl implements DBSession {
   }
 
   @Override
-  public <E extends Throwable> void execTxChecked(int maxTransactionRetries, ThrowingConsumer<EntityManager, E> fn) throws E {
+  public <E extends Throwable> void execTxChecked(int maxTransactionRetries, ThrowingConsumer<EntityManager, E> fn)
+          throws E {
     execTxChecked(maxTransactionRetries, em -> {
       fn.accept(em);
       return null;
@@ -132,7 +133,8 @@ public class DBSessionImpl implements DBSession {
   }
 
   @Override
-  public <T, E extends Throwable> T execTxChecked(int maxTransactionRetries, ThrowingFunction<EntityManager, T, E> fn) throws E {
+  public <T, E extends Throwable> T execTxChecked(int maxTransactionRetries, ThrowingFunction<EntityManager, T, E> fn)
+          throws E {
     EntityManager em = entityManagerStore.get();
 
     if (em != null) {

@@ -89,6 +89,7 @@ public class EventSearchQuery extends AbstractSearchQuery {
   private Date technicalEndTime = null;
   private final List<String> technicalPresenters = new ArrayList<String>();
   private Map<String, Map<String, List<String>>> extendedMetadata = new HashMap<>();
+  private final Map<String, String> accessControlEntries = new HashMap<>();
 
   private static final Map<String, String> SORT_FIELDS = Map.of(
           EventIndexSchema.TITLE, EventIndexSchema.TITLE.concat(IndexSchema.SORT_FIELD_NAME_EXTENSION),
@@ -250,6 +251,33 @@ public class EventSearchQuery extends AbstractSearchQuery {
    */
   public String[] getActions() {
     return actions.toArray(new String[actions.size()]);
+  }
+
+  /**
+   * Filter the recording events with the given access control entry.
+   *
+   * @param role
+   * @param action
+   * @return
+   */
+  public EventSearchQuery withAccessControlEntry(String role, Action action) {
+    if (StringUtils.isBlank(role)) {
+      throw new IllegalArgumentException("Role cannot be null");
+    }
+    if (action == null) {
+      throw new IllegalArgumentException("Action cannot be null");
+    }
+    this.accessControlEntries.put(role, action.toString());
+    return this;
+  }
+
+  /**
+   * Returns the list of access control entries or an empty map if no access control entries have been specified.
+   *
+   * @return the access control entries
+   */
+  public Map<String, String> getAccessControlEntries() {
+    return accessControlEntries;
   }
 
   /**

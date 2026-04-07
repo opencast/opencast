@@ -128,8 +128,9 @@ public class JaxbOrganization implements Organization {
    *          the organization
    */
   public static JaxbOrganization fromOrganization(Organization org) {
-    if (org instanceof JaxbOrganization)
+    if (org instanceof JaxbOrganization) {
       return (JaxbOrganization) org;
+    }
     return new JaxbOrganization(org.getId(), org.getName(), org.getServers(), org.getAdminRole(),
             org.getAnonymousRole(), org.getProperties());
   }
@@ -209,8 +210,9 @@ public class JaxbOrganization implements Organization {
    */
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof Organization))
+    if (!(obj instanceof Organization)) {
       return false;
+    }
     return ((Organization) obj).getId().equals(id);
   }
 

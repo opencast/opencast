@@ -40,6 +40,36 @@
     <Extensions>pdf</Extensions>
   </MimeType>
   <MimeType>
+    <Type>application/msword</Type>
+    <Description>Microsoft Word document</Description>
+    <Extensions>doc,dot</Extensions>
+  </MimeType>
+  <MimeType>
+    <Type>application/vnd.openxmlformats-officedocument.wordprocessingml.document</Type>
+    <Description>Microsoft Word document</Description>
+    <Extensions>docx</Extensions>
+  </MimeType>
+  <MimeType>
+    <Type>application/vnd.ms-excel</Type>
+    <Description>Microsoft Excel document</Description>
+    <Extensions>xls,xlt</Extensions>
+  </MimeType>
+  <MimeType>
+    <Type>application/vnd.openxmlformats-officedocument.spreadsheetml.sheet</Type>
+    <Description>Microsoft Excel document</Description>
+    <Extensions>xlsx</Extensions>
+  </MimeType>
+  <MimeType>
+    <Type>application/vnd.ms-powerpoint</Type>
+    <Description>Microsoft PowerPoint document</Description>
+    <Extensions>ppt,pps,pot</Extensions>
+  </MimeType>
+  <MimeType>
+    <Type>application/vnd.openxmlformats-officedocument.presentationml.presentation</Type>
+    <Description>Microsoft PowerPoint document</Description>
+    <Extensions>pptx</Extensions>
+  </MimeType>
+  <MimeType>
     <Type>application/sdp</Type>
     <Description>SDP stream descriptor</Description>
     <Extensions>sdp</Extensions>

@@ -41,7 +41,8 @@ public class HostRegistrationInMemory implements HostRegistration {
 
   private String nodeName;
 
-  public HostRegistrationInMemory(String baseUrl, String address, String nodeName, float maxLoad, int cores, long memory) {
+  public HostRegistrationInMemory(String baseUrl, String address, String nodeName, float maxLoad, int cores,
+      long memory) {
     this.baseUrl = baseUrl;
     this.address = address;
     this.nodeName = nodeName;
