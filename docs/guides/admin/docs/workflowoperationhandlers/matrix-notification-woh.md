@@ -23,8 +23,8 @@ Operation Example
   - id: matrix-notify
     description: Notify Matrix about workflow completion
     configurations:
-      - room-id: !room-id!
-      - message: Workflow has been completed successfully
+      - room-id: "!room-id!"
+      - message: "Workflow has been completed successfully"
 ```
 
 Configuration
