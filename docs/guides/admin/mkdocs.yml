@@ -233,6 +233,7 @@ nav:
       - Ingest-Download: "workflowoperationhandlers/ingestdownload-woh.md"
       - Inspect: "workflowoperationhandlers/inspect-woh.md"
       - Log: "workflowoperationhandlers/log-woh.md"
+      - Matrix Notification: "workflowoperationhandlers/matrix-notification-woh.md"
       - Mattermost Notification Module: "workflowoperationhandlers/mattermost-notify-woh.md"
       - Metadata to ACL: "workflowoperationhandlers/metadata-to-acl.md"
       - Microsoft Azure Attach Transcription: "workflowoperationhandlers/microsoft-azure-attach-transcription-woh.md"
