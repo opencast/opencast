@@ -22,8 +22,10 @@
 package org.opencastproject.userdirectory.brightspace.client.api;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class BrightspaceUser {
 
   private String orgId;
@@ -39,6 +41,7 @@ public class BrightspaceUser {
   private String displayName;
   private String lastAccessedDate;
   private String pronouns;
+  private String firstLoginDate;
 
   @JsonCreator
   public BrightspaceUser(
@@ -54,7 +57,8 @@ public class BrightspaceUser {
       @JsonProperty("Activation") Activation activation,
       @JsonProperty("DisplayName") String displayName,
       @JsonProperty("LastAccessedDate") String lastAccessedDate,
-      @JsonProperty("Pronouns") String pronouns
+      @JsonProperty("Pronouns") String pronouns,
+      @JsonProperty("FirstLoginDate") String firstLoginDate
   ) {
     this.orgId = orgId;
     this.userId = userId;
@@ -69,6 +73,7 @@ public class BrightspaceUser {
     this.displayName = displayName;
     this.lastAccessedDate = lastAccessedDate;
     this.pronouns = pronouns;
+    this.firstLoginDate = firstLoginDate;
 
   }
 
@@ -122,6 +127,10 @@ public class BrightspaceUser {
 
   public String getPronouns() {
     return this.pronouns;
+  }
+
+  public String getFirstLoginDate() {
+    return this.firstLoginDate;
   }
 
   public String getFullName() {
