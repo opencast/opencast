@@ -21,6 +21,8 @@
 
 package org.opencastproject.graphql.execution;
 
+import org.opencastproject.graphql.exception.GraphQLRuntimeException;
+
 import java.lang.reflect.InvocationTargetException;
 import java.util.concurrent.CompletableFuture;
 
@@ -47,9 +49,11 @@ public class OpencastDataFetcherExceptionHandler implements DataFetcherException
     ResultPath path = handlerParameters.getPath();
 
     GraphQLError error;
-
-    error = new ExceptionWhileDataFetching(path, exception, sourceLocation);
-
+    if (exception instanceof GraphQLRuntimeException) {
+      error = (GraphQLError) exception;
+    } else {
+      error = new ExceptionWhileDataFetching(path, exception, sourceLocation);
+    }
     return DataFetcherExceptionHandlerResult.newResult().error(error).build();
   }
 

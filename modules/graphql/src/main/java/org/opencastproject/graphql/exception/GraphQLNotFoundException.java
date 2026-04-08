@@ -23,15 +23,14 @@ package org.opencastproject.graphql.exception;
 
 import java.util.List;
 
-import graphql.ErrorClassification;
 import graphql.GraphQLError;
 import graphql.language.SourceLocation;
 
-public class GraphQLNotFoundException extends RuntimeException implements GraphQLError {
+public class GraphQLNotFoundException extends GraphQLRuntimeException implements GraphQLError {
   private static final long serialVersionUID = 2925029942004451904L;
 
   public GraphQLNotFoundException(String message) {
-    super(message, null, false, false);
+    super(message, OpencastErrorType.NotFound);
   }
 
   @Override
@@ -39,8 +38,4 @@ public class GraphQLNotFoundException extends RuntimeException implements GraphQ
     return null;
   }
 
-  @Override
-  public ErrorClassification getErrorType() {
-    return null;
-  }
 }
