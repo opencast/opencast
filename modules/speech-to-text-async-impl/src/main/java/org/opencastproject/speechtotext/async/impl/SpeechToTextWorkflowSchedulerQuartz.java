@@ -36,6 +36,7 @@ import org.opencastproject.speechtotext.async.persistence.SpeechToTextControl;
 import org.opencastproject.speechtotext.async.persistence.SpeechToTextDatabase;
 import org.opencastproject.util.NeedleEye;
 import org.opencastproject.util.NotFoundException;
+import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.workflow.api.ConfiguredWorkflow;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowDefinition;
@@ -57,6 +58,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.Dictionary;
@@ -92,6 +94,10 @@ public class SpeechToTextWorkflowSchedulerQuartz extends AbstractScanner impleme
   public static final String ABANDON_AFTER_SECS = "abandon-after-secs";
   /* Workflow definition to use to attach the subtitles */
   public static final String WORKFLOW = "workflow";
+  /* Workflow definition to use to retry transcription when error occurs */
+  public static final String WORKFLOW_RETRY = "retry-workflow";
+  /* Max tries if an error happens */
+  public static final String MAX_TRIES = "max-tries";
 
   // === Default values
   /* Default number of seconds to abandon retrying attaching subtitles. */
@@ -101,6 +107,13 @@ public class SpeechToTextWorkflowSchedulerQuartz extends AbstractScanner impleme
   private String attachWorkflowDef;
   /* If STT jobs not finished after this interval, they won't be tracked anymore. */
   private long abandonAfterMs = DEFAULT_ABANDON_AFTER_SECS * 1000;
+  /*
+   * If STT job fails, maximum number of retries. A retry will start the workflow specified in retry-workflow. Set to 0
+   * or do not specify retry-workflow to disable retries.
+   */
+  private int maxTries = 0;
+
+  private String retryWorkflowDef = null;
 
   private AssetManager assetManager;
   private WorkflowService workflowService;
@@ -159,6 +172,7 @@ public class SpeechToTextWorkflowSchedulerQuartz extends AbstractScanner impleme
       }
       logger.info("Attach workflow definition is {}", attachWorkflowDef);
 
+      abandonAfterMs = DEFAULT_ABANDON_AFTER_SECS * 1000;
       if (properties.get(ABANDON_AFTER_SECS) != null) {
         try {
           abandonAfterMs = Integer.parseInt((String) properties.get(ABANDON_AFTER_SECS)) * 1000;
@@ -168,8 +182,23 @@ public class SpeechToTextWorkflowSchedulerQuartz extends AbstractScanner impleme
         }
       }
       logger.info("Abandon attempts to start attach workflow after {} ms", abandonAfterMs);
-    }
 
+      // Reset values before update
+      retryWorkflowDef = null;
+      maxTries = 0;
+      Optional<String> retryWfOpt = OsgiUtil.getOptCfg(properties, WORKFLOW_RETRY);
+      if (retryWfOpt.isPresent()) {
+        retryWorkflowDef = retryWfOpt.get();
+        logger.info("Retry workflow definition: {}", retryWorkflowDef);
+        Optional<Integer> maxTriesOpt = OsgiUtil.getOptCfgAsInt(properties, MAX_TRIES);
+        if (maxTriesOpt.isPresent()) {
+          maxTries = maxTriesOpt.get();
+          logger.info("If a transcription error occurs, it will be retried for {} times total.", maxTries);
+        } else {
+          logger.info("If a transcription error occurs, it will NOT be retried");
+        }
+      }
+    }
     schedule();
   }
 
@@ -200,7 +229,7 @@ public class SpeechToTextWorkflowSchedulerQuartz extends AbstractScanner impleme
 
   @Override
   public void scan() {
-    logger.trace("Waking up...");
+    logger.debug("Waking up...");
 
     try {
       handleTranscriptionInProgress();
@@ -209,7 +238,7 @@ public class SpeechToTextWorkflowSchedulerQuartz extends AbstractScanner impleme
 
       handleTranscriptionFinished();
 
-    } catch (SpeechToTextAsyncException e) {
+    } catch (Exception e) {
       logger.warn("Could not read/update speech to text database.", e);
     }
   }
@@ -229,8 +258,10 @@ public class SpeechToTextWorkflowSchedulerQuartz extends AbstractScanner impleme
         // deleted because of the cascade delete policy.
         Job job = getServiceRegistry().getJob(stt.getJob().getId());
         // If job failed, set stt control status to error
-        if (job.getStatus() == Job.Status.FAILED || job.getStatus() == Job.Status.FINISHED) {
-          // If job finished (ok or with errors), update state accordingly
+        if (job.getStatus() == Job.Status.FAILED) {
+          database.updateStatusByJob(SpeechToTextControl.Status.TranscriptionError, JpaJob.from(job));
+        } else if (job.getStatus() == Job.Status.FINISHED) {
+          // If job finished ok, update state accordingly
           database.updateStatusByJob(SpeechToTextControl.Status.TranscriptionDone, JpaJob.from(job));
         }
       } catch (Exception e) {
@@ -241,16 +272,16 @@ public class SpeechToTextWorkflowSchedulerQuartz extends AbstractScanner impleme
   }
 
   /**
-   * Mark tracked STT jobs as canceled if their status have not been updated after the configured interval.
+   * Transition tracked STTs after the configured interval: if still in progress, they are changed to error; if in
+   * 'workflow started' state, they are changed to done.
    */
   void expireOldTranscriptionNotDone() {
     Date nowMinusInterval = Date.from(Instant.now().minusMillis(abandonAfterMs));
 
     try {
-      // STTs that are stuck in transcription in progress or transcription done are transitioned to canceled because we
-      // don't know why they got stuck for so long into those states.
-      database.transitionStatusByDate(SpeechToTextControl.Status.Canceled, nowMinusInterval,
-              SpeechToTextControl.Status.InProgress, SpeechToTextControl.Status.TranscriptionDone);
+      // STTs that are stuck in progress for a long time will be transitioned to error so that they will be retried.
+      database.transitionStatusByDate(SpeechToTextControl.Status.TranscriptionError, nowMinusInterval,
+              SpeechToTextControl.Status.InProgress);
 
       // STTs that had a workflow to attach subtitles started are transitioned to done because afaik everything worked
       // as supposed to
@@ -263,42 +294,100 @@ public class SpeechToTextWorkflowSchedulerQuartz extends AbstractScanner impleme
   }
 
   /**
-   * Start a workflow to attach subtitles for all STTs that have finished (one per workflow id that created them).
+   * Apply next action after subtitle generation finishes if Whisper is running asynchronously. If all jobs completed
+   * successfully, start a workflow to attach subtitles for all STTs that have finished (one per workflow id that
+   * created them). If one of the jobs had an error, start a workflow to retry subtitle generation if configured for it.
    *
    * @throws SpeechToTextAsyncException
    */
   void handleTranscriptionFinished() throws SpeechToTextAsyncException {
-    // Get list of all workflows that have STT jobs marked completed
-    List<Long> wfIds = database.findDistinctWorkflowIdByStatus(SpeechToTextControl.Status.TranscriptionDone);
+    if (attachWorkflowDef == null) {
+      logger.info("Workflow to attach subtitles not configured. Skipping.");
+      return;
+    }
+
+    // Get list of all workflows that have STT jobs finished (ok and in error)
+    List<Long> wfIds = database.findDistinctWorkflowIdByStatus(SpeechToTextControl.Status.TranscriptionDone,
+            SpeechToTextControl.Status.TranscriptionError);
     String mpId = "unknown";
     for (long wfId : wfIds) {
-      // From those, double-check if ALL jobs were finished. If not, leave it for the next run when all jobs have
-      // finished. If any jobs failed, the speech-to-text-attach woh will take care of reporting it.
+      // From those, double-check if ALL jobs were finished with no errors.
       try {
         List<SpeechToTextControl> stts = database.findByWorkflowId(wfId);
+        if (stts.isEmpty()) {
+          continue;
+        }
         mpId = stts.get(0).getMediaPackageId();
-        boolean doAttach = stts.stream()
-                .allMatch(stt -> SpeechToTextControl.Status.TranscriptionDone == stt.getStatus());
 
-        if (!doAttach) {
+        boolean allFinished = stts.stream().noneMatch(stt -> SpeechToTextControl.Status.InProgress == stt.getStatus());
+        if (!allFinished) {
           logger.debug(
                   "Will not process media package {} workflow {} this time because not all STT jobs have finished.",
                   mpId, wfId);
           continue;
         }
 
+        // Get list of all jobs pointed by the stt controls (started by the current workflow)
         List<JpaJob> jobs = stts.stream().map(sst -> sst.getJob()).collect(Collectors.toList());
 
-        // Start workflow to attach subtitles to that media package
-        WorkflowInstance wfInstance = startWorkflow(mpId, jobs);
-        if (wfInstance == null) {
-          logger.warn("Could not start workflow for mp {}", mpId);
-          // Will try again in the next run; there may be another workflow in progress for that media package
+        // Check if media package still exists
+        if (!assetManager.snapshotExists(mpId)) {
+          // Are there any workflows for it?
+          if (!workflowService.getWorkflowInstancesByMediaPackage(mpId).isEmpty()) {
+            // Media package exists, but probably has not been archived yet; will try next time
+            logger.info("Media package {} has not been archived yet.", mpId);
+            continue;
+          }
+          logger.info("Media package {} does not exist anymore so marking STTs as canceled.", mpId);
+          database.updateStatusByJob(SpeechToTextControl.Status.Canceled, jobs.toArray(new JpaJob[0]));
           continue;
         }
-        logger.info("Workflow to attach subtitles started for mp: {}, wf instance id: {}", mpId, wfInstance.getId());
-        // If success, update status in database
-        database.updateStatusByJob(SpeechToTextControl.Status.WorkflowInProgress, jobs.toArray(new JpaJob[0]));
+
+        // All successful?
+        boolean doAttach = stts.stream()
+                .allMatch(stt -> SpeechToTextControl.Status.TranscriptionDone == stt.getStatus());
+
+        if (doAttach) {
+          // Start workflow to attach subtitles to that media package
+          WorkflowInstance wfInstance = startWorkflow(mpId, attachWorkflowDef, jobs);
+          if (wfInstance == null) {
+            logger.warn("Could not start workflow to attach subtitles for mp {}", mpId);
+            // Will try again in the next run; there may be another workflow in progress for that media package
+            continue;
+          }
+          logger.info("Workflow to attach subtitles started for mp: {}, wf instance id: {}", mpId, wfInstance.getId());
+          // If success, update status in database
+          database.updateStatusByJob(SpeechToTextControl.Status.WorkflowInProgress, jobs.toArray(new JpaJob[0]));
+        } else {
+          // All jobs finished, but at least one in error
+
+          // Is retry configured?
+          if (retryWorkflowDef != null && maxTries > 1) {
+            // Get all workflows that started subtitle generation for this media package
+            List<Long> mpWfs = database.findDistinctWorkflowIdByMediaPackageId(mpId);
+            // Has maximum already be reached? Check the number of workflows that started subtitle generation
+            if (mpWfs.size() < maxTries) {
+              // Start workflow to retry transcript generation
+
+              WorkflowInstance wfInstance = startWorkflow(mpId, retryWorkflowDef, new ArrayList<JpaJob>());
+              if (wfInstance == null) {
+                logger.warn("Could not start workflow to retry subtitle generation for mp {}", mpId);
+                // Will try again in the next run; there may be another workflow in progress for that media package
+                continue;
+              }
+              logger.info("Workflow to retry subtitle generation started for mp: {}, wf instance id: {}", mpId,
+                      wfInstance.getId());
+            } else {
+              logger.info(
+                      "Media package {} already has {} workflows that started subtitle generation and "
+                              + "max tries is {} so we won't retry automatically anymore.",
+                      mpId, mpWfs.size(), maxTries);
+            }
+          }
+
+          // Update status in database to Canceled so that next time we don't check the same ones
+          database.updateStatusByJob(SpeechToTextControl.Status.Canceled, jobs.toArray(new JpaJob[0]));
+        }
       } catch (Exception e) {
         logger.warn("Error when starting workflow to attach subtitles to media package: {}", mpId, e);
       }
@@ -315,25 +404,22 @@ public class SpeechToTextWorkflowSchedulerQuartz extends AbstractScanner impleme
    *
    * @param mpId
    *          The media package id
-   * @param wfDefId
+   * @param wfDefinitionId
    *          The workflow definition id
+   * @param jobs
+   *          The list of jobs associated to the STT controls
    * @return Workflow instance started
    */
-  WorkflowInstance startWorkflow(String mpId, List<JpaJob> jobs) {
-    // Is there a snapshot?
-    if (!assetManager.snapshotExists(mpId)) {
-      // Media package not archived yet.
-      logger.warn("Media package {} has not been archived yet.", mpId);
-      return null;
-    }
-
+  WorkflowInstance startWorkflow(String mpId, String wfDefinitionId, List<JpaJob> jobs) {
     try {
-      WorkflowDefinition wfDef = workflowService.getWorkflowDefinitionById(attachWorkflowDef);
+      WorkflowDefinition wfDef = workflowService.getWorkflowDefinitionById(wfDefinitionId);
       Workflows workflows = wfUtil != null ? wfUtil : new Workflows(assetManager, workflowService);
       Set<String> mpIds = Collections.singleton(mpId);
       Map<String, String> wfConfig = new HashMap<String, String>();
-      wfConfig.put(JOBS_WORKFLOW_CONFIGURATION,
-              jobs.stream().map(j -> String.valueOf(j.getId())).collect(Collectors.joining(",")));
+      if (jobs.size() > 0) {
+        wfConfig.put(JOBS_WORKFLOW_CONFIGURATION,
+                jobs.stream().map(j -> String.valueOf(j.getId())).collect(Collectors.joining(",")));
+      }
       List<WorkflowInstance> wfList = workflows
               .applyWorkflowToLatestVersion(mpIds, ConfiguredWorkflow.workflow(wfDef, wfConfig));
       WorkflowInstance wf = wfList.size() > 0 ? wfList.get(0) : null;
@@ -344,7 +430,7 @@ public class SpeechToTextWorkflowSchedulerQuartz extends AbstractScanner impleme
       }
       return wf;
     } catch (NotFoundException | WorkflowDatabaseException e) {
-      logger.warn("Could not get workflow definition: {}", attachWorkflowDef);
+      logger.warn("Could not get workflow definition: {}", wfDefinitionId);
     }
 
     return null;

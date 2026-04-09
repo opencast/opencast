@@ -55,7 +55,10 @@ import javax.xml.bind.annotation.XmlAttribute;
                 + "WHERE stt.workflowId = :workflowId"),
         @NamedQuery(name = "SpeechToTextControl.findDistinctWorkflowIdByStatus",
             query = "SELECT DISTINCT stt.workflowId FROM SpeechToTextControl stt "
-                + "WHERE stt.status  = :status"),
+                + "WHERE stt.status IN :status"),
+        @NamedQuery(name = "SpeechToTextControl.findDistinctWorkflowIdByMediaPackage",
+        query = "SELECT DISTINCT stt.workflowId FROM SpeechToTextControl stt "
+            + "WHERE stt.mediaPackageId = :mpId"),
         @NamedQuery(name = "SpeechToTextControl.findByJob",
             query = "SELECT stt FROM SpeechToTextControl stt WHERE stt.job = :job"),
         @NamedQuery(name = "SpeechToTextControl.findByStatus",
@@ -109,9 +112,12 @@ public class SpeechToTextControl {
 
   public enum Status {
     InProgress, // Transcription running or stt job queued
-    TranscriptionDone, // Transcription done (ok or error), captions not attached yet
+    TranscriptionDone, // Transcription done (ok), captions not attached yet
+    TranscriptionError, // Transcription done (error), no action taken yet
     WorkflowInProgress, // Workflow to attach transcripts created by the quartz task
-    Canceled, // Workflow to attach captions could not be started after allotted interval
+    Canceled, // An error occurred e.g. subtitle generation error occurred and generation rescheduled,
+              // subtitle generation error occurred and no retry, subtitle generation never finished,
+              // workflow to attach subtitles could not be started after allotted interval
     Done // Done, transcription attached to media package
   }
 

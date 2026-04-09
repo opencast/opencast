@@ -34,6 +34,7 @@ import org.opencastproject.job.api.Job;
 import org.opencastproject.job.jpa.JpaJob;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
@@ -75,6 +76,7 @@ public class SpeechToTextWorkflowSchedulerQuartzTest {
   private static final long JOB_ID_3 = 3L;
   private static final long JOB_ID_4 = 4L;
   private static final long JOB_ID_5 = 5L;
+  private static final long JOB_ID_6 = 6L;
   private static final long WF_ID_1 = 1L;
   private static final long WF_ID_2 = 2L;
   private static final long WF_ID_3 = 3L;
@@ -84,6 +86,8 @@ public class SpeechToTextWorkflowSchedulerQuartzTest {
   private static final String MP_ID_3 = "mp_id_3";
   private static final String MP_ID_4 = "mp_id_4";
   private static final long OLDER_THAN_REFERENCE_MS = 24 * 60 * 60 * 1000; // 1 day ago
+  private static final String WORKFLOW_DEF = "attach-subtitles-wf";
+  private static final String RETRY_WORKFLOW_DEF = "retry-subtitles-wf";
 
   private User user;
   private SpeechToTextWorkflowSchedulerQuartz service;
@@ -123,7 +127,7 @@ public class SpeechToTextWorkflowSchedulerQuartzTest {
     wfService = EasyMock.createStrictMock(WorkflowService.class);
 
     assetManager = EasyMock.createNiceMock(AssetManager.class);
-    EasyMock.expect(assetManager.snapshotExists(EasyMock.anyString())).andReturn(true);
+    EasyMock.expect(assetManager.snapshotExists(EasyMock.anyString())).andReturn(true).anyTimes();
     EasyMock.replay(assetManager);
 
     serviceRegistry = EasyMock.createNiceMock(ServiceRegistry.class);
@@ -141,7 +145,9 @@ public class SpeechToTextWorkflowSchedulerQuartzTest {
     Dictionary<String, Object> props = new Hashtable<String, Object>();
     props.put(SpeechToTextWorkflowSchedulerQuartz.PARAM_KEY_ENABLED, "true");
     props.put(SpeechToTextWorkflowSchedulerQuartz.PARAM_KEY_CRON_EXPR, "0 0 0 1 1 ? 2200"); // Never execute
-    props.put(SpeechToTextWorkflowSchedulerQuartz.WORKFLOW, "attach-captions-wf");
+    props.put(SpeechToTextWorkflowSchedulerQuartz.WORKFLOW, WORKFLOW_DEF);
+    props.put(SpeechToTextWorkflowSchedulerQuartz.WORKFLOW_RETRY, RETRY_WORKFLOW_DEF);
+    props.put(SpeechToTextWorkflowSchedulerQuartz.MAX_TRIES, "3");
     props.put(SpeechToTextWorkflowSchedulerQuartz.ABANDON_AFTER_SECS, OLDER_THAN_REFERENCE_MS / 1000L); // 24 hours
 
     service.setDatabase(database);
@@ -174,7 +180,7 @@ public class SpeechToTextWorkflowSchedulerQuartzTest {
     SpeechToTextControl stt = database.findByJob(jpaJob1);
     Assert.assertEquals(SpeechToTextControl.Status.TranscriptionDone, stt.getStatus());
     stt = database.findByJob(jpaJob2);
-    Assert.assertEquals(SpeechToTextControl.Status.TranscriptionDone, stt.getStatus());
+    Assert.assertEquals(SpeechToTextControl.Status.TranscriptionError, stt.getStatus());
     // Check that stt status was NOT updated for jobs 3 and 4
     stt = database.findByJob(jpaJob3);
     Assert.assertEquals(SpeechToTextControl.Status.InProgress, stt.getStatus());
@@ -198,7 +204,7 @@ public class SpeechToTextWorkflowSchedulerQuartzTest {
     Assert.assertEquals(SpeechToTextControl.Status.InProgress, stt.getStatus());
     // Check that stt status was updated for job 2
     stt = database.findByJob(jpaJob2);
-    Assert.assertEquals(SpeechToTextControl.Status.TranscriptionDone, stt.getStatus());
+    Assert.assertEquals(SpeechToTextControl.Status.TranscriptionError, stt.getStatus());
   }
 
   @Test
@@ -225,11 +231,11 @@ public class SpeechToTextWorkflowSchedulerQuartzTest {
 
     // Check that stt status was updated for jobs 1, 2, 4, 5
     SpeechToTextControl stt = database.findByJob(jpaJob1);
-    Assert.assertEquals(SpeechToTextControl.Status.Canceled, stt.getStatus());
+    Assert.assertEquals(SpeechToTextControl.Status.TranscriptionError, stt.getStatus());
     stt = database.findByJob(jpaJob2);
-    Assert.assertEquals(SpeechToTextControl.Status.Canceled, stt.getStatus());
+    Assert.assertEquals(SpeechToTextControl.Status.TranscriptionError, stt.getStatus());
     stt = database.findByJob(jpaJob4);
-    Assert.assertEquals(SpeechToTextControl.Status.Canceled, stt.getStatus());
+    Assert.assertEquals(SpeechToTextControl.Status.TranscriptionError, stt.getStatus());
     stt = database.findByJob(jpaJob5);
     Assert.assertEquals(SpeechToTextControl.Status.Done, stt.getStatus());
     // Check that sst status was NOT updated for job 3
@@ -238,18 +244,18 @@ public class SpeechToTextWorkflowSchedulerQuartzTest {
   }
 
   @Test
-  public void testHandleTranscriptionFinishedStartWorkflow() throws Exception {
+  public void testHandleTranscriptionFinishedStartAttachWorkflow() throws Exception {
     // Create jobs and stts in database
-    // 2 jobs for a media package with stt status running, one finished, one failed
+    // 2 jobs for a media package, both finished successfully
     // Workflow will be started
     JpaJob jpaJob1 = createJob(db, new Date(), Job.Status.FINISHED, JOB_ID_1);
     database.storeSpeechToTextControl(MP_ID_1, WF_ID_1, jpaJob1);
     database.updateStatusByJob(SpeechToTextControl.Status.TranscriptionDone, jpaJob1);
-    JpaJob jpaJob2 = createJob(db, new Date(), Job.Status.FAILED, JOB_ID_2);
+    JpaJob jpaJob2 = createJob(db, new Date(), Job.Status.FINISHED, JOB_ID_2);
     database.storeSpeechToTextControl(MP_ID_1, WF_ID_1, jpaJob2);
     database.updateStatusByJob(SpeechToTextControl.Status.TranscriptionDone, jpaJob2);
 
-    mockWorkflowService(true);
+    mockWorkflowService(true, WORKFLOW_DEF);
 
     service.handleTranscriptionFinished();
 
@@ -257,7 +263,7 @@ public class SpeechToTextWorkflowSchedulerQuartzTest {
     Assert.assertEquals(1, capturedMpIds.getValue().size());
     Assert.assertEquals(MP_ID_1, capturedMpIds.getValue().iterator().next());
     // Expect that the job ids were passed as workflow configuration
-    Assert.assertNotNull(capturedWf.getValue());
+    Assert.assertEquals(WORKFLOW_DEF, capturedWf.getValue().getWorkflowDefinition().getId());
     Map<String, String> config = capturedWf.getValue().getParameters();
     Set<String> jobIds = Arrays.stream(config.get(JOBS_WORKFLOW_CONFIGURATION).split(",")).collect(Collectors.toSet());
     Assert.assertEquals(2, jobIds.size());
@@ -272,6 +278,118 @@ public class SpeechToTextWorkflowSchedulerQuartzTest {
   }
 
   @Test
+  public void testHandleTranscriptionFinishedStartRetryWorkflow() throws Exception {
+    // Create jobs and stts in database
+    // 2 jobs for a media package, one finished, one failed
+    // Retry workflow will be started
+    JpaJob jpaJob1 = createJob(db, new Date(), Job.Status.FINISHED, JOB_ID_1);
+    database.storeSpeechToTextControl(MP_ID_1, WF_ID_1, jpaJob1);
+    database.updateStatusByJob(SpeechToTextControl.Status.TranscriptionDone, jpaJob1);
+    JpaJob jpaJob2 = createJob(db, new Date(), Job.Status.FAILED, JOB_ID_2);
+    database.storeSpeechToTextControl(MP_ID_1, WF_ID_1, jpaJob2);
+    database.updateStatusByJob(SpeechToTextControl.Status.TranscriptionError, jpaJob2);
+
+    mockWorkflowService(true, RETRY_WORKFLOW_DEF);
+
+    service.handleTranscriptionFinished();
+
+    // Expect that a workflow was started for that mp
+    Assert.assertEquals(1, capturedMpIds.getValue().size());
+    Assert.assertEquals(MP_ID_1, capturedMpIds.getValue().iterator().next());
+    // Expect that the job ids were not passed as workflow configuration
+    Assert.assertEquals(RETRY_WORKFLOW_DEF, capturedWf.getValue().getWorkflowDefinition().getId());
+    Map<String, String> config = capturedWf.getValue().getParameters();
+    Assert.assertNull(config.get(JOBS_WORKFLOW_CONFIGURATION));
+
+    // Expect that the status was updated in the database
+    SpeechToTextControl stt = database.findByJob(jpaJob1);
+    Assert.assertEquals(SpeechToTextControl.Status.Canceled, stt.getStatus());
+    stt = database.findByJob(jpaJob2);
+    Assert.assertEquals(SpeechToTextControl.Status.Canceled, stt.getStatus());
+  }
+
+  @Test
+  public void testHandleTranscriptionFinishedRetryWorkflowThirdAttempt() throws Exception {
+    // Create jobs and stts in database
+    // 2 jobs for a media package, one finished, one failed
+    // Retry workflow will be started
+    // This was the first attempt
+    JpaJob jpaJob1 = createJob(db, new Date(), Job.Status.FINISHED, JOB_ID_1);
+    database.storeSpeechToTextControl(MP_ID_1, WF_ID_1, jpaJob1);
+    database.updateStatusByJob(SpeechToTextControl.Status.Canceled, jpaJob1);
+    JpaJob jpaJob2 = createJob(db, new Date(), Job.Status.FAILED, JOB_ID_2);
+    database.storeSpeechToTextControl(MP_ID_1, WF_ID_1, jpaJob2);
+    database.updateStatusByJob(SpeechToTextControl.Status.Canceled, jpaJob2);
+
+    // This was the second attempt
+    JpaJob jpaJob3 = createJob(db, new Date(), Job.Status.FINISHED, JOB_ID_3);
+    database.storeSpeechToTextControl(MP_ID_1, WF_ID_2, jpaJob3);
+    database.updateStatusByJob(SpeechToTextControl.Status.TranscriptionDone, jpaJob3);
+    JpaJob jpaJob4 = createJob(db, new Date(), Job.Status.FAILED, JOB_ID_4);
+    database.storeSpeechToTextControl(MP_ID_1, WF_ID_2, jpaJob4);
+    database.updateStatusByJob(SpeechToTextControl.Status.TranscriptionError, jpaJob4);
+
+    mockWorkflowService(true, RETRY_WORKFLOW_DEF);
+
+    service.handleTranscriptionFinished();
+
+    // Expect that a workflow was started for that mp
+    Assert.assertEquals(1, capturedMpIds.getValue().size());
+    Assert.assertEquals(MP_ID_1, capturedMpIds.getValue().iterator().next());
+    // Expect that the job ids were not passed as workflow configuration
+    Assert.assertEquals(RETRY_WORKFLOW_DEF, capturedWf.getValue().getWorkflowDefinition().getId());
+    Map<String, String> config = capturedWf.getValue().getParameters();
+    Assert.assertNull(config.get(JOBS_WORKFLOW_CONFIGURATION));
+
+    // Expect that the status was updated in the database
+    SpeechToTextControl stt = database.findByJob(jpaJob3);
+    Assert.assertEquals(SpeechToTextControl.Status.Canceled, stt.getStatus());
+    stt = database.findByJob(jpaJob4);
+    Assert.assertEquals(SpeechToTextControl.Status.Canceled, stt.getStatus());
+  }
+
+  @Test
+  public void testHandleTranscriptionFinishedRetryWorkflowMaxTriesExceeded() throws Exception {
+    // Create jobs and stts in database
+    // 2 jobs for a media package, one finished, one failed
+    // This was the first attempt
+    JpaJob jpaJob1 = createJob(db, new Date(), Job.Status.FINISHED, JOB_ID_1);
+    database.storeSpeechToTextControl(MP_ID_1, WF_ID_1, jpaJob1);
+    database.updateStatusByJob(SpeechToTextControl.Status.Canceled, jpaJob1);
+    JpaJob jpaJob2 = createJob(db, new Date(), Job.Status.FAILED, JOB_ID_2);
+    database.storeSpeechToTextControl(MP_ID_1, WF_ID_1, jpaJob2);
+    database.updateStatusByJob(SpeechToTextControl.Status.Canceled, jpaJob2);
+
+    // This was the second attempt
+    JpaJob jpaJob3 = createJob(db, new Date(), Job.Status.FINISHED, JOB_ID_3);
+    database.storeSpeechToTextControl(MP_ID_1, WF_ID_2, jpaJob3);
+    database.updateStatusByJob(SpeechToTextControl.Status.TranscriptionDone, jpaJob3);
+    JpaJob jpaJob4 = createJob(db, new Date(), Job.Status.FAILED, JOB_ID_4);
+    database.storeSpeechToTextControl(MP_ID_1, WF_ID_2, jpaJob4);
+    database.updateStatusByJob(SpeechToTextControl.Status.TranscriptionError, jpaJob4);
+
+    // This was the third attempt
+    JpaJob jpaJob5 = createJob(db, new Date(), Job.Status.FINISHED, JOB_ID_5);
+    database.storeSpeechToTextControl(MP_ID_1, WF_ID_3, jpaJob5);
+    database.updateStatusByJob(SpeechToTextControl.Status.TranscriptionDone, jpaJob5);
+    JpaJob jpaJob6 = createJob(db, new Date(), Job.Status.FAILED, JOB_ID_6);
+    database.storeSpeechToTextControl(MP_ID_1, WF_ID_3, jpaJob6);
+    database.updateStatusByJob(SpeechToTextControl.Status.TranscriptionError, jpaJob6);
+
+    mockWorkflowService(false, null);
+
+    service.handleTranscriptionFinished();
+
+    // Expect no workflow service method was called (it's a strict mock)
+
+    // Expect that the status was updated in the database
+    SpeechToTextControl stt = database.findByJob(jpaJob5);
+    Assert.assertEquals(SpeechToTextControl.Status.Canceled, stt.getStatus());
+    stt = database.findByJob(jpaJob6);
+    Assert.assertEquals(SpeechToTextControl.Status.Canceled, stt.getStatus());
+  }
+
+  @Test
   public void testHandleTranscriptionFinishedDoNotStartWorkflow() throws Exception {
     // Create jobs and stts in database
     // 2 jobs for a media package with stt status running, one finished, one still running
@@ -283,7 +401,7 @@ public class SpeechToTextWorkflowSchedulerQuartzTest {
     database.storeSpeechToTextControl(MP_ID_1, WF_ID_1, jpaJob2);
     database.updateStatusByJob(SpeechToTextControl.Status.InProgress, jpaJob2);
 
-    mockWorkflowService(false);
+    mockWorkflowService(false, null);
 
     service.handleTranscriptionFinished();
 
@@ -296,13 +414,15 @@ public class SpeechToTextWorkflowSchedulerQuartzTest {
     Assert.assertEquals(SpeechToTextControl.Status.InProgress, stt.getStatus());
   }
 
-  private void mockWorkflowService(boolean startWf) throws NotFoundException, WorkflowDatabaseException {
+  private void mockWorkflowService(boolean startWf, String wfDefId)
+          throws NotFoundException, WorkflowDatabaseException, UnauthorizedException {
     capturedMpIds = Capture.newInstance();
     capturedWf = Capture.newInstance();
 
     List<WorkflowInstance> wfList = new ArrayList<WorkflowInstance>();
     if (startWf) {
       WorkflowDefinition wfDef = new WorkflowDefinitionImpl();
+      wfDef.setId(wfDefId);
       EasyMock.expect(wfService.getWorkflowDefinitionById(EasyMock.anyObject(String.class))).andReturn(wfDef);
       wfList.add(new WorkflowInstance());
     }

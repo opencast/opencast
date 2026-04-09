@@ -48,6 +48,7 @@ public class SpeechToTextDatabaseTest {
   private static final long WF_ID_2 = 2L;
   private static final long WF_ID_3 = 3L;
   private static final String MP_ID = "media_package_id";
+  private static final String MP_ID_2 = "media_package_id_2";
 
   private static final long REFERENCE_MS = 3 * 24 * 60 * 60 * 1000; // 3 days ago in ms
   private static final long OLDER_THAN_REFERENCE_MS = 4 * 24 * 60 * 60 * 1000; // 4 days ago in ms
@@ -125,6 +126,28 @@ public class SpeechToTextDatabaseTest {
     database.storeSpeechToTextControl(MP_ID, WF_ID_3, jpaJob4);
 
     List<Long> wfIds = database.findDistinctWorkflowIdByStatus(SpeechToTextControl.Status.TranscriptionDone);
+    Assert.assertEquals(2, wfIds.size());
+    Assert.assertTrue(wfIds.contains(WF_ID_1));
+    Assert.assertTrue(wfIds.contains(WF_ID_2));
+  }
+
+  @Test
+  public void testFindDistinctWorkflowIdByMediaPackageId() throws Exception {
+    JpaJob jpaJob1 = createJob(db, new Date(), Job.Status.RUNNING, JOB_ID_1);
+    database.storeSpeechToTextControl(MP_ID, WF_ID_1, jpaJob1);
+    // Same workflow id
+    JpaJob jpaJob2 = createJob(db, new Date(), Job.Status.RUNNING, JOB_ID_2);
+    database.storeSpeechToTextControl(MP_ID, WF_ID_1, jpaJob2);
+    // Another workflow id
+    JpaJob jpaJob3 = createJob(db, new Date(), Job.Status.RUNNING, JOB_ID_3);
+    database.storeSpeechToTextControl(MP_ID, WF_ID_2, jpaJob3);
+    // All above have the same status
+    database.updateStatusByJob(SpeechToTextControl.Status.TranscriptionDone, jpaJob1, jpaJob2, jpaJob3);
+    // Another workflow id, another media package
+    JpaJob jpaJob4 = createJob(db, new Date(), Job.Status.RUNNING, JOB_ID_4);
+    database.storeSpeechToTextControl(MP_ID_2, WF_ID_3, jpaJob4);
+
+    List<Long> wfIds = database.findDistinctWorkflowIdByMediaPackageId(MP_ID);
     Assert.assertEquals(2, wfIds.size());
     Assert.assertTrue(wfIds.contains(WF_ID_1));
     Assert.assertTrue(wfIds.contains(WF_ID_2));

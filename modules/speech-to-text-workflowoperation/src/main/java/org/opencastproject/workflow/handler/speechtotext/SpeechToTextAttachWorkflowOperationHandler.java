@@ -210,7 +210,8 @@ public class SpeechToTextAttachWorkflowOperationHandler extends AbstractWorkflow
     try {
       workspace.cleanup(mediaPackage.getIdentifier());
     } catch (IOException e) {
-      throw new WorkflowOperationException(e);
+      // We shouldn't fail the operation because workspace cleanup failed.
+      logger.error("Could not clean up workspace for media package {}.", mediaPackage.getIdentifier(), e);
     }
   }
 

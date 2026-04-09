@@ -149,12 +149,27 @@ public class SpeechToTextDatabase {
     }
   }
 
-  public List<Long> findDistinctWorkflowIdByStatus(SpeechToTextControl.Status status)
+  public List<Long> findDistinctWorkflowIdByStatus(SpeechToTextControl.Status... status)
           throws SpeechToTextAsyncException {
+    Collection<SpeechToTextControl.Status> statusCol = Arrays.stream(status)
+            .collect(Collectors.toCollection(HashSet::new));
+
     try {
       return db.exec(em -> {
         return namedQuery
-                .findAll("SpeechToTextControl.findDistinctWorkflowIdByStatus", Long.class, Pair.of("status", status))
+                .findAll("SpeechToTextControl.findDistinctWorkflowIdByStatus", Long.class, Pair.of("status", statusCol))
+                .apply(em);
+      });
+    } catch (Exception e) {
+      throw new SpeechToTextAsyncException(e);
+    }
+  }
+
+  public List<Long> findDistinctWorkflowIdByMediaPackageId(String mpId) throws SpeechToTextAsyncException {
+    try {
+      return db.exec(em -> {
+        return namedQuery
+                .findAll("SpeechToTextControl.findDistinctWorkflowIdByMediaPackage", Long.class, Pair.of("mpId", mpId))
                 .apply(em);
       });
     } catch (Exception e) {
@@ -191,6 +206,8 @@ public class SpeechToTextDatabase {
   public int transitionStatusByDate(SpeechToTextControl.Status newStatus, Date olderThan,
           SpeechToTextControl.Status... oldStatus) throws SpeechToTextAsyncException {
     try {
+      logger.debug("Changing status of stt controls older than {} from {} to {}", olderThan, Arrays.toString(oldStatus),
+              newStatus);
       return db.execTx(em -> {
         Query q = em.createNamedQuery("SpeechToTextControl.updateStatusByStatusAndDate");
         q.setParameter("oldStatus", Arrays.asList(oldStatus));

@@ -26,7 +26,8 @@ To enable Whisper as for the `SpeechToText` WoH, follow these steps.
 3. Set the target model to use in `org.opencastproject.speechtotext.impl.engine.WhisperEngine`.
 4. If Whisper jobs are going to run asynchronously, outside the scope of the originating workflow, and subtitles attached by a separate workflow, enable the feature and configure the workflow to attach the subtitles in:
 `org.opencastproject.speechtotext.async.impl.SpeechToTextWorkflowSchedulerQuartz`.
-The workflow should use the` speechtotext-attach` woh to add the subtitles and then republish the media package.
+The workflow should use the `speechtotext-attach` woh to add the subtitles and then republish the media package.
+In the same configuration file, you can also configure a workflow to retry subtitle generation if an error occurs during generation and the maximum number of attempts. The retry workflow should use the `speechtotext` woh to start the process all over again.
 
 
 Additional Notes
