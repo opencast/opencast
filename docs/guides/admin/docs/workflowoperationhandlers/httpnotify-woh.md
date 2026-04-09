@@ -11,8 +11,9 @@ Opencast can through this operation notify any HTTP endpoint about the process o
 Parameter Table
 ---------------
 
-A parameter that is always posted is the workflow instance identifier in the parameter named
-**workflowInstanceId** containing the current workflow’s identifier.
+Parameters that are always posted include the workflow instance identifier in the parameter named
+**workflowInstanceId** containing the current workflow’s identifier, and the mediapackage identifier
+in the parameter named **mediaPackageId** containing the current mediapackage’s identifier.
 
 |Key       |Required |Description                                                                              |Example|
 |----------|---------|-------------------------------------------------------------------------------------------|-----|
