@@ -1,6 +1,41 @@
 Opencast 19 Changelog
 ---------------------
 
+## Opencast 19.4 (2026-04-10)
+- [[#7569](https://github.com/opencast/opencast/pull/7569)] -
+  Opencast 19.4 changelog
+- [[#7556](https://github.com/opencast/opencast/pull/7556)] -
+  Update 19.x Admin Interface
+- [[#7551](https://github.com/opencast/opencast/pull/7551)] -
+  Update 19.x Studio
+- [[#7516](https://github.com/opencast/opencast/pull/7516)] -
+  19.x submodules
+- [[#7498](https://github.com/opencast/opencast/pull/7498)] -
+  Add playlist support to GraphQL API
+- [[#7484](https://github.com/opencast/opencast/pull/7484)] -
+  security-jwt and userdirectory module patch
+- [[#7481](https://github.com/opencast/opencast/pull/7481)] -
+  minor update to series-woh docs
+- [[#7472](https://github.com/opencast/opencast/pull/7472)] -
+  Add read/write access filter
+- [[#7465](https://github.com/opencast/opencast/pull/7465)] -
+  Opencast 19.3 release notes
+- [[#7464](https://github.com/opencast/opencast/pull/7464)] -
+  Opencast 19.3 release notes
+- [[#7463](https://github.com/opencast/opencast/pull/7463)] -
+  Update r/19.x Admin UI to 19.x-2026-03-06
+- [[#7459](https://github.com/opencast/opencast/pull/7459)] -
+  Make "ISPUBLISHED" filter translatable in admin ui
+- [[#7396](https://github.com/opencast/opencast/pull/7396)] -
+  Matrix Notification Workflow Operation
+<details><summary>Dependency updates</summary>
+
+<ul>
+<li>[<a href="https://github.com/opencast/opencast/pull/7507">7507</a>] -
+  Fix Brightspace UDP deserialization failure for API change and handle unknown JSON properties</li>
+</ul>
+</details>
+
 ## Opencast 19.3 (2026-03-06)
 - [[#7465](https://github.com/opencast/opencast/pull/7465)] -
   Opencast 19.2 release notes
