@@ -393,6 +393,7 @@
           <doCheck>false</doCheck>
           <doUpdate>false</doUpdate>
           <shortRevisionLength>7</shortRevisionLength>
+          <getRevisionOnlyOnce>true</getRevisionOnlyOnce>
         </configuration>
       </plugin>
       <!-- Attach sources for all builds -->
