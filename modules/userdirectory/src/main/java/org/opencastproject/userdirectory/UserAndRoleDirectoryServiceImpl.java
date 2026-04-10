@@ -527,6 +527,10 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
 
   @Override
   public void invalidate(String userName) {
+    if (logger.isDebugEnabled()) {
+      logger.debug("Invalidating user '{}' from {} user provider(s): {}", userName, userProviders.size(),
+          userProviders.stream().map(UserProvider::getName).collect(Collectors.joining(", ")));
+    }
     for (UserProvider userProvider : userProviders) {
       userProvider.invalidate(userName);
     }

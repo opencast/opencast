@@ -19,29 +19,27 @@
  *
  */
 
-package org.opencastproject.graphql.exception;
+package org.opencastproject.graphql.playlist;
 
-import java.util.Collections;
-import java.util.List;
+import org.opencastproject.graphql.playlist.type.output.GqlEventPlaylistEntry;
+import org.opencastproject.graphql.playlist.type.output.GqlInaccessiblePlaylistEntry;
+import org.opencastproject.graphql.provider.GraphQLAdditionalTypeProvider;
 
-import graphql.GraphQLError;
-import graphql.language.SourceLocation;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.propertytypes.ServiceDescription;
 
-public class GraphQLUnauthorizedException extends GraphQLRuntimeException implements GraphQLError {
+import java.util.Set;
 
-  private static final long serialVersionUID = 2443180509033453490L;
-
-  public GraphQLUnauthorizedException(String message) {
-    super(
-        message,
-        OpencastErrorType.Unauthorized,
-        Collections.singletonMap("code", OpencastErrorType.Unauthorized.name())
-    );
-  }
+@Component
+@ServiceDescription("Provides additional GraphQL types for Playlists")
+public class PlaylistGraphQLProvider implements GraphQLAdditionalTypeProvider {
 
   @Override
-  public List<SourceLocation> getLocations() {
-    return null;
+  public Set<Class<?>> getAdditionalOutputTypes() {
+    return Set.of(
+        GqlEventPlaylistEntry.class,
+        GqlInaccessiblePlaylistEntry.class
+    );
   }
 
 }

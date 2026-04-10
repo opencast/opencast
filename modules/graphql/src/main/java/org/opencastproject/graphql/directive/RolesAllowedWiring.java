@@ -29,26 +29,42 @@ import org.opencastproject.security.api.SecurityService;
 import graphql.annotations.directives.AnnotationsDirectiveWiring;
 import graphql.annotations.directives.AnnotationsWiringEnvironment;
 import graphql.annotations.processor.util.CodeRegistryUtil;
+import graphql.schema.DataFetcher;
+import graphql.schema.FieldCoordinates;
 import graphql.schema.GraphQLFieldDefinition;
+import graphql.schema.GraphQLNamedSchemaElement;
 
 public class RolesAllowedWiring implements AnnotationsDirectiveWiring {
 
   @Override
   public GraphQLFieldDefinition onField(AnnotationsWiringEnvironment environment) {
     GraphQLFieldDefinition field = (GraphQLFieldDefinition) environment.getElement();
+    String parentName = ((GraphQLNamedSchemaElement)environment.getParentElement()).getName();
     String[] hasRole = environment.getDirective().toAppliedDirective().getArgument("roles").getValue();
-    CodeRegistryUtil.wrapDataFetcher(field, environment, (((dataFetchingEnvironment, value) -> {
+
+    var originalDataFetcher = CodeRegistryUtil.getDataFetcher(
+        environment.getCodeRegistryBuilder(),
+        environment.getParentElement(),
+        field
+    );
+
+    DataFetcher<Object> authDataFetcher = dataFetchingEnvironment -> {
       OpencastContext context = OpencastContextManager.getCurrentContext();
       SecurityService securityService = context.getService(SecurityService.class);
       for (String role : hasRole) {
         if (securityService != null && securityService.getUser().hasRole(role)) {
-          break;
+          return originalDataFetcher.get(dataFetchingEnvironment);
         }
-        throw new GraphQLUnauthorizedException("The current user is not authorized to access this resource.");
       }
+      throw new GraphQLUnauthorizedException("The current user is not authorized to access this resource.");
+    };
 
-      return value;
-    })));
+    environment.getCodeRegistryBuilder().dataFetcher(
+        FieldCoordinates.coordinates(
+            parentName,
+            field.getName()
+        ),
+        authDataFetcher);
     return field;
   }
 

@@ -34,7 +34,22 @@ public class GraphQLRuntimeException extends RuntimeException implements GraphQL
   private final OpencastErrorType errorType;
   private Map<String,Object> extensions;
 
+  public GraphQLRuntimeException(Throwable cause) {
+    super(cause);
+    this.errorType = OpencastErrorType.InternalError;
+  }
+
+  public GraphQLRuntimeException(String message) {
+    super(message);
+    this.errorType = OpencastErrorType.InternalError;
+  }
+
   public GraphQLRuntimeException(OpencastErrorType errorType) {
+    this.errorType = errorType;
+  }
+
+  public GraphQLRuntimeException(OpencastErrorType errorType, Throwable cause) {
+    super(cause);
     this.errorType = errorType;
   }
 
@@ -48,9 +63,9 @@ public class GraphQLRuntimeException extends RuntimeException implements GraphQL
     this.errorType = errorType;
   }
 
-  public GraphQLRuntimeException(String message, Map<String,Object> extensions, Throwable cause) {
-    super(message, cause);
-    this.errorType = OpencastErrorType.Undefined;
+  public GraphQLRuntimeException(String message, OpencastErrorType errorType, Map<String,Object> extensions) {
+    super(message);
+    this.errorType = errorType;
     this.extensions = extensions;
   }
 
@@ -61,14 +76,16 @@ public class GraphQLRuntimeException extends RuntimeException implements GraphQL
     this.extensions = extensions;
   }
 
-  public GraphQLRuntimeException(Throwable cause) {
-    super(cause);
-    this.errorType = OpencastErrorType.InternalError;
+  public GraphQLRuntimeException(String message, Map<String,Object> extensions) {
+    super(message);
+    this.errorType = OpencastErrorType.Undefined;
+    this.extensions = extensions;
   }
 
-  public GraphQLRuntimeException(OpencastErrorType errorType, Throwable cause) {
-    super(cause);
-    this.errorType = errorType;
+  public GraphQLRuntimeException(String message, Map<String,Object> extensions, Throwable cause) {
+    super(message, cause);
+    this.errorType = OpencastErrorType.Undefined;
+    this.extensions = extensions;
   }
 
   @Override

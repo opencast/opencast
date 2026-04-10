@@ -19,15 +19,20 @@
  *
  */
 
-package org.opencastproject.graphql.series;
+package org.opencastproject.graphql.playlist;
 
-import org.opencastproject.graphql.command.CreateSeriesCommand;
-import org.opencastproject.graphql.command.UpdateSeriesAclCommand;
-import org.opencastproject.graphql.command.UpdateSeriesCommand;
+import org.opencastproject.graphql.command.DeletePlaylistCommand;
 import org.opencastproject.graphql.directive.RolesAllowed;
+import org.opencastproject.graphql.playlist.command.CreatePlaylistCommand;
+import org.opencastproject.graphql.playlist.command.UpdatePlaylistCommand;
+import org.opencastproject.graphql.playlist.type.input.PlaylistEntryInput;
+import org.opencastproject.graphql.playlist.type.input.PlaylistMetadataInput;
+import org.opencastproject.graphql.playlist.type.output.GqlDeletePlaylistPayload;
+import org.opencastproject.graphql.playlist.type.output.GqlPlaylist;
 import org.opencastproject.graphql.type.input.AccessControlListInput;
-import org.opencastproject.graphql.type.input.GqlCommonSeriesMetadataInput;
 import org.opencastproject.graphql.type.input.Mutation;
+
+import java.util.List;
 
 import graphql.annotations.annotationTypes.GraphQLDescription;
 import graphql.annotations.annotationTypes.GraphQLField;
@@ -37,47 +42,47 @@ import graphql.annotations.annotationTypes.GraphQLTypeExtension;
 import graphql.schema.DataFetchingEnvironment;
 
 @GraphQLTypeExtension(Mutation.class)
-public final class SeriesMutationExtension {
+public final class PlaylistMutationExtension {
 
-  private SeriesMutationExtension() {
+  private PlaylistMutationExtension() {
   }
 
   @GraphQLField
-  @GraphQLNonNull
-  @GraphQLDescription("Create series with metadata and acl")
+  @GraphQLDescription("Create playlist from metadata, entries and acl")
   @RolesAllowed("ROLE_USER")
-  public static GqlSeries createSeries(
-      @GraphQLName("metadata") @GraphQLNonNull GqlCommonSeriesMetadataInput seriesMetadataInput,
-      @GraphQLName("acl") @GraphQLNonNull AccessControlListInput aclInput,
+  public static GqlPlaylist createPlaylist(
+      @GraphQLName("metadata") @GraphQLNonNull PlaylistMetadataInput metadata,
+      @GraphQLName("entries") List<PlaylistEntryInput> entries,
+      @GraphQLName("acl") @GraphQLNonNull AccessControlListInput acl,
       final DataFetchingEnvironment environment) {
-    return CreateSeriesCommand.create(seriesMetadataInput, aclInput)
+    return CreatePlaylistCommand.create(metadata, entries, acl)
         .environment(environment)
         .build()
         .execute();
   }
 
   @GraphQLField
-  @GraphQLNonNull
-  @GraphQLDescription("Update series metadata and optional the acl")
-  public static GqlSeries updateSeries(
+  @GraphQLDescription("Update playlist with metadata, entries and acl")
+  @RolesAllowed("ROLE_USER")
+  public static GqlPlaylist updatePlaylist(
       @GraphQLName("id") @GraphQLNonNull String id,
-      @GraphQLName("metadata") @GraphQLNonNull GqlCommonSeriesMetadataInput seriesMetadataInput,
-      @GraphQLName("acl") AccessControlListInput aclInput,
+      @GraphQLName("metadata") PlaylistMetadataInput metadata,
+      @GraphQLName("entries") List<PlaylistEntryInput> entries,
+      @GraphQLName("acl") AccessControlListInput acl,
       final DataFetchingEnvironment environment) {
-    return UpdateSeriesCommand.create(id, seriesMetadataInput)
+    return UpdatePlaylistCommand.create(id, metadata, entries, acl)
         .environment(environment)
         .build()
         .execute();
   }
 
   @GraphQLField
-  @GraphQLNonNull
-  @GraphQLDescription("Update series acl")
-  public static GqlSeries updateSeriesAcl(
+  @GraphQLDescription("Delete playlist")
+  @RolesAllowed("ROLE_USER")
+  public static GqlDeletePlaylistPayload deletePlaylist(
       @GraphQLName("id") @GraphQLNonNull String id,
-      @GraphQLName("acl") @GraphQLNonNull AccessControlListInput aclInput,
       final DataFetchingEnvironment environment) {
-    return UpdateSeriesAclCommand.create(id)
+    return DeletePlaylistCommand.create(id)
         .environment(environment)
         .build()
         .execute();

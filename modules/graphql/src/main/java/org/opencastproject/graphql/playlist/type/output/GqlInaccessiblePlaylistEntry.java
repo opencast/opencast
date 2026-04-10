@@ -19,29 +19,28 @@
  *
  */
 
-package org.opencastproject.graphql.exception;
+package org.opencastproject.graphql.playlist.type.output;
 
-import java.util.Collections;
-import java.util.List;
+import org.opencastproject.playlists.PlaylistEntry;
 
-import graphql.GraphQLError;
-import graphql.language.SourceLocation;
+import graphql.annotations.annotationTypes.GraphQLDescription;
+import graphql.annotations.annotationTypes.GraphQLName;
 
-public class GraphQLUnauthorizedException extends GraphQLRuntimeException implements GraphQLError {
+@GraphQLName(GqlInaccessiblePlaylistEntry.TYPE_NAME)
+@GraphQLDescription("An entry in a playlist.")
+public class GqlInaccessiblePlaylistEntry implements GqlPlaylistEntry {
 
-  private static final long serialVersionUID = 2443180509033453490L;
+  public static final String TYPE_NAME = "InaccessiblePlaylistEntry";
 
-  public GraphQLUnauthorizedException(String message) {
-    super(
-        message,
-        OpencastErrorType.Unauthorized,
-        Collections.singletonMap("code", OpencastErrorType.Unauthorized.name())
-    );
+  private final PlaylistEntry entry;
+
+  public GqlInaccessiblePlaylistEntry(PlaylistEntry entry) {
+    this.entry = entry;
   }
 
   @Override
-  public List<SourceLocation> getLocations() {
-    return null;
+  public PlaylistEntry getEntry() {
+    return entry;
   }
 
 }

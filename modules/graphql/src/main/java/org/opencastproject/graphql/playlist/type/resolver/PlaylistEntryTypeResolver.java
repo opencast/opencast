@@ -19,29 +19,24 @@
  *
  */
 
-package org.opencastproject.graphql.exception;
+package org.opencastproject.graphql.playlist.type.resolver;
 
-import java.util.Collections;
-import java.util.List;
+import graphql.TypeResolutionEnvironment;
+import graphql.annotations.annotationTypes.GraphQLName;
+import graphql.schema.GraphQLObjectType;
+import graphql.schema.TypeResolver;
 
-import graphql.GraphQLError;
-import graphql.language.SourceLocation;
-
-public class GraphQLUnauthorizedException extends GraphQLRuntimeException implements GraphQLError {
-
-  private static final long serialVersionUID = 2443180509033453490L;
-
-  public GraphQLUnauthorizedException(String message) {
-    super(
-        message,
-        OpencastErrorType.Unauthorized,
-        Collections.singletonMap("code", OpencastErrorType.Unauthorized.name())
-    );
-  }
-
+public class PlaylistEntryTypeResolver implements TypeResolver {
   @Override
-  public List<SourceLocation> getLocations() {
-    return null;
+  public GraphQLObjectType getType(TypeResolutionEnvironment env) {
+    final Class<?> field = env.getObject().getClass();
+    final GraphQLName graphQLName = field.getAnnotation(GraphQLName.class);
+    String objectTypeName;
+    if (graphQLName == null) {
+      objectTypeName = field.getSimpleName();
+    } else {
+      objectTypeName = graphQLName.value();
+    }
+    return env.getSchema().getObjectType(objectTypeName);
   }
-
 }
