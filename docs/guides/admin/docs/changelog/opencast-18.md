@@ -1,6 +1,24 @@
 Opencast 18 Changelog
 ---------------------
+## Opencast 18.7 (2026-04-13)
+- [[#7562](https://github.com/opencast/opencast/pull/7562)] -
+  Update 18.x Editor
+- [[#7561](https://github.com/opencast/opencast/pull/7561)] -
+  Update 18.x Admin Interface
+- [[#7560](https://github.com/opencast/opencast/pull/7560)] -
+  Update 18.x Studio
+- [[#7559](https://github.com/opencast/opencast/pull/7559)] -
+  Properly detect submodule versions
+- [[#7555](https://github.com/opencast/opencast/pull/7555)] -
+  Update 18.x Admin Interface
+- [[#7553](https://github.com/opencast/opencast/pull/7553)] -
+  Update 18.x Editor
+- [[#7549](https://github.com/opencast/opencast/pull/7549)] -
+  Update 18.x Studio
+
 ## Opencast 18.6 (2026-04-07)
+- [[#7542](https://github.com/opencast/opencast/pull/7542)] -
+  Update 18.x Admin Interface
 - [[#7510](https://github.com/opencast/opencast/pull/7510)] -
   Document submodule usage
 - [[#7509](https://github.com/opencast/opencast/pull/7509)] -

@@ -1,5 +1,9 @@
 # Opencast 18: Release Notes
 
+## Opencast 18.7
+
+This release updates the editor, the admin ui and the studio. It includes a fix for an issue where the [config file would fail to load in the editor](https://github.com/opencast/editor/pull/1695). This fix repairs the broken 18.6 release.
+
 ## Opencast 18.6
 
 This release contains a fix for
