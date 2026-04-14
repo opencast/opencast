@@ -62,7 +62,7 @@ public final class SecurityUtil {
   /** The name of the key used to store the name of the system user in the global config. */
   public static final String PROPERTY_KEY_SYS_USER = "org.opencastproject.security.digest.user";
 
-  public static final String PROPERTY_KEY_ACL_ADDITIONL_ACTIONS = "org.opencastproject.acl.additional.actions.";
+  public static final String PROPERTY_KEY_ACL_ADDITIONAL_ACTIONS = "org.opencastproject.acl.additional.actions.";
 
   /**
    * Run function <code>f</code> in the context described by the given organization and user.
@@ -201,8 +201,8 @@ public final class SecurityUtil {
   public static Map<String, String> additionalAclActions(final Organization organization) {
     Map<String, String> additionalActions = new HashMap<>();
     organization.getProperties().forEach((key, value) -> {
-      if (key.startsWith(PROPERTY_KEY_ACL_ADDITIONL_ACTIONS)) {
-        additionalActions.put(key.substring(PROPERTY_KEY_ACL_ADDITIONL_ACTIONS.length()), value);
+      if (key.startsWith(PROPERTY_KEY_ACL_ADDITIONAL_ACTIONS)) {
+        additionalActions.put(key.substring(PROPERTY_KEY_ACL_ADDITIONAL_ACTIONS.length()), value);
       }
     });
     return Collections.unmodifiableMap(additionalActions);
