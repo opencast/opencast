@@ -30,19 +30,6 @@ operations:
       - encoding-profile: mp4-preview.http
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  # Audio waveform
-
-  # Create the waveform.
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-  - id: waveform
-    exception-handler-workflow: partial-error
-    description: Generating waveform
-    configurations:
-      - source-flavor: '*/source'
-      - target-flavor: '*/waveform'
-      - target-tags: preview
-
-  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # Track previews
 
   # Create track previews for video editor stream selection feature
