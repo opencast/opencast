@@ -113,6 +113,11 @@ identifier = {show = false}
 # Default: "captions"
 #mainFlavor = "captions"
 
+# If set to true, video playback stops when typing in the subtitle fields
+# Type: boolean
+# Default: false
+#stopOnTyping = false
+
 [subtitles.languages]
 ## A list of languages for which new subtitles can be created
 # For each language, various tags can be specified
