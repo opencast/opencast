@@ -143,7 +143,6 @@ public abstract class AbstractElasticsearchQueryBuilder<T extends SearchQuery> i
       queryBuilder.field("*" + SEARCH_FIELD_NAME_EXTENSION + "._2gram", 1.2f);
       queryBuilder.field("*" + SEARCH_FIELD_NAME_EXTENSION + "._3gram", 1.2f);
       queryBuilder.field("*" + SEARCH_FIELD_NAME_EXTENSION + "._4gram", 1.2f);
-      //queryBuilder.field("*" + SEARCH_FIELD_NAME_EXTENSION + "._index_prefix", 1.2f);
       additionalMultiQueryFields.forEach(field -> queryBuilder.field(field, 1.0f));
       queryBuilder.type(MultiMatchQueryBuilder.Type.BOOL_PREFIX);
       queryBuilder.operator(Operator.AND);
