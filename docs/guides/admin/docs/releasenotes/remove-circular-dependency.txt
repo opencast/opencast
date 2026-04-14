@@ -1,0 +1,1 @@
+[#7128](https://github.com/opencast/opencast/pull/7128) Eliminate the circular dependency between index and list providers. The configuration for the ACL additional actions list provider has been moved to the organization configuration.
