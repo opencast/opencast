@@ -116,7 +116,6 @@ public class YouTubeV3PublicationServiceImplTest {
   private Dictionary getServiceProperties() throws IOException {
     final Properties p = new Properties();
     YouTubeUtils.put(p, YouTubeKey.credentialDatastore, "credentialDatastore");
-    YouTubeUtils.put(p, YouTubeKey.scopes, "foo");
     final String absolutePath = UnitTestUtils.getMockClientSecretsFile("clientId",
         testFolder.newFile("client-secrets-youtube-v3.json")).getAbsolutePath();
     YouTubeUtils.put(p, YouTubeKey.clientSecretsV3, absolutePath);
