@@ -1286,8 +1286,8 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
           var template = workflowInstance.getTemplate();
           String mpId = workflowInstance.getMediaPackage().getIdentifier().toString();
           String orgId = workflowInstance.getOrganizationId();
-
-          updateWorkflowInstanceInIndex(id, state, template, mpId, orgId);
+          updateWorkflowInstanceInIndex(id, state, template, mpId,
+              organizationDirectoryService.getOrganization(orgId));
         }
       } catch (ServiceRegistryException e) {
         throw new WorkflowDatabaseException("Update of workflow job " + workflowInstance.getId()
@@ -2254,6 +2254,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
               if (!WorkflowUtil.isActive(WorkflowInstance.WorkflowState.values()[indexData.getState()].toString())
                       || WorkflowState.PAUSED == WorkflowInstance.WorkflowState.values()[indexData.getState()]) {
                 String orgid = indexData.getOrganizationId();
+                Organization organization;
                 if (null == orgid) {
                   String mpId = indexData.getMediaPackageId();
                   //We're assuming here that mediapackages don't change orgs
@@ -2263,6 +2264,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
                     continue;
                   }
                   orgid = snapshots.stream().findFirst().get().getOrganizationId();
+                  organization = organizationDirectoryService.getOrganization(orgid);
                   //We try-catch here since it's possible for the WF to exist in the *index* but not in the *DB*
                   // It probably shouldn't be, but that won't keep it from happening anyway.
                   try {
@@ -2274,8 +2276,10 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
                   } catch (NotFoundException e) {
                     //Technically this should never happen, but getWorkflow throws it.
                   }
+                } else {
+                  organization = organizationDirectoryService.getOrganization(orgid);
                 }
-                var updatedWorkflowData = index.getEvent(indexData.getMediaPackageId(), orgid,
+                var updatedWorkflowData = index.getEvent(indexData.getMediaPackageId(), organization,
                     securityService.getUser());
                 updatedWorkflowData = getStateUpdateFunction(indexData.getId(),indexData.getState(),
                         indexData.getMediaPackageId(), indexData.getTemplate(), indexData.getOrganizationId())
@@ -2283,7 +2287,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
                 updatedWorkflowRange.add(updatedWorkflowData.get());
 
                 if (updatedWorkflowRange.size() >= n || current >= total) {
-                  index.bulkEventUpdate(updatedWorkflowRange);
+                  index.bulkEventUpdate(updatedWorkflowRange, organization);
                   logIndexRebuildProgress(logger, total, current, n);
                   updatedWorkflowRange.clear();
                 }
@@ -2315,13 +2319,13 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    *         the identifier of the workflow instance to remove
    */
   private void removeWorkflowInstanceFromIndex(long workflowInstanceId) {
-    final String orgId = securityService.getOrganization().getId();
+    final Organization organization = securityService.getOrganization();
     final User user = securityService.getUser();
 
     // find events
     SearchResult<Event> results;
     try {
-      results = index.getByQuery(new EventSearchQuery(orgId, user).withWorkflowId(workflowInstanceId));
+      results = index.getByQuery(new EventSearchQuery(organization.getId(), user).withWorkflowId(workflowInstanceId));
     } catch (SearchIndexException e) {
       logger.error("Error retrieving the events for workflow instance {} from the {} index.", workflowInstanceId,
               index.getIndexName(), e);
@@ -2359,7 +2363,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
       };
 
       try {
-        index.addOrUpdateEvent(eventId, updateFunction, orgId, user);
+        index.addOrUpdateEvent(eventId, updateFunction, organization, user);
         logger.debug("Workflow instance {} of event {} removed from the {} index.", workflowInstanceId, eventId,
                 index.getIndexName());
       } catch (SearchIndexException e) {
@@ -2378,18 +2382,25 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
    *         workflow state as int
    * @param mpId
    *         corresponding mediapackage id
-   * @param orgId
+   * @param organization
    *         workflow organization id
    */
-  private void updateWorkflowInstanceInIndex(long id, int state, String wfDefId, String mpId, String orgId) {
+  private void updateWorkflowInstanceInIndex(long id, int state, String wfDefId, String mpId,
+      Organization organization) {
     final User user = securityService.getUser();
 
     logger.debug("Updating workflow instance {} of event {} in the {} index.", id, mpId,
             index.getIndexName());
-    Function<Optional<Event>, Optional<Event>> updateFunction = getStateUpdateFunction(id, state, wfDefId, mpId, orgId);
+    Function<Optional<Event>, Optional<Event>> updateFunction = getStateUpdateFunction(
+        id,
+        state,
+        wfDefId,
+        mpId,
+        organization.getId()
+    );
 
     try {
-      index.addOrUpdateEvent(mpId, updateFunction, orgId, user);
+      index.addOrUpdateEvent(mpId, updateFunction, organization, user);
       logger.debug("Workflow instance {} of event {} updated in the {} index.", id, mpId,
               index.getIndexName());
     } catch (SearchIndexException e) {

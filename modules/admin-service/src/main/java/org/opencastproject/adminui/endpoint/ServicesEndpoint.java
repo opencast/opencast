@@ -24,8 +24,8 @@ package org.opencastproject.adminui.endpoint;
 import static org.opencastproject.index.service.util.JSONUtils.safeString;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
-import org.opencastproject.index.service.resources.list.query.ServicesListQuery;
 import org.opencastproject.index.service.util.RestUtils;
+import org.opencastproject.list.common.query.ServicesListQuery;
 import org.opencastproject.serviceregistry.api.HostRegistration;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceState;

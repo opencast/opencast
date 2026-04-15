@@ -128,9 +128,9 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
 
     ElasticsearchIndex elasticsearchIndex = createMock(ElasticsearchIndex.class);
     expect(elasticsearchIndex.getByQuery(anyObject(SeriesSearchQuery.class))).andStubReturn(searchResult);
-    expect(elasticsearchIndex.getSeries("4fd0ef66-aea5-4b7a-a62a-a4ada0eafd6f", org.getId(), user)).andStubReturn(
+    expect(elasticsearchIndex.getSeries("4fd0ef66-aea5-4b7a-a62a-a4ada0eafd6f", org, user)).andStubReturn(
             Optional.of(series1));
-    expect(elasticsearchIndex.getSeries("unknown-series-id", org.getId(), user)).andStubReturn(Optional.empty());
+    expect(elasticsearchIndex.getSeries("unknown-series-id", org, user)).andStubReturn(Optional.empty());
     replay(elasticsearchIndex);
 
     Map<String, String> series1Props = new HashMap<>();

@@ -29,9 +29,9 @@ import static org.opencastproject.index.service.catalog.adapter.CatalogUIAdapter
 import static org.opencastproject.index.service.catalog.adapter.CatalogUIAdapterFactory.CONF_TITLE_KEY;
 
 import org.opencastproject.index.service.catalog.adapter.events.ConfigurableEventDCCatalogUIAdapter;
+import org.opencastproject.list.api.DefaultResourceListQuery;
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ListProvidersService;
-import org.opencastproject.list.impl.ResourceListQueryImpl;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -166,7 +166,7 @@ public class DublinCoreCatalogUIAdapterTest {
 
     listProvidersService = EasyMock.createMock(ListProvidersService.class);
     EasyMock.expect(
-            listProvidersService.getList(EasyMock.anyString(), EasyMock.anyObject(ResourceListQueryImpl.class),
+            listProvidersService.getList(EasyMock.anyString(), EasyMock.anyObject(DefaultResourceListQuery.class),
                     EasyMock.anyBoolean())).andReturn(collection).anyTimes();
     EasyMock.replay(listProvidersService);
 

@@ -448,7 +448,7 @@ public class SeriesEndpoint {
       withAcl = false;
     }
 
-    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization().getId(),
+    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization(),
         securityService.getUser());
     if (optSeries.isPresent()) {
       final Series s = optSeries.get();
@@ -534,7 +534,7 @@ public class SeriesEndpoint {
   }
 
   private Response getAllMetadata(String id, ApiVersion requestedVersion) throws SearchIndexException {
-    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization().getId(),
+    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization(),
         securityService.getUser());
     if (optSeries.isEmpty()) {
       return ApiResponseBuilder.notFound("Cannot find a series with id '%s'.", id);
@@ -556,7 +556,7 @@ public class SeriesEndpoint {
   }
 
   private Response getMetadataByType(String id, String type, ApiVersion requestedVersion) throws SearchIndexException {
-    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization().getId(),
+    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization(),
         securityService.getUser());
     if (optSeries.isEmpty()) {
       return ApiResponseBuilder.notFound("Cannot find a series with id '%s'.", id);
@@ -760,7 +760,7 @@ public class SeriesEndpoint {
     Optional<DublinCoreMetadataCollection> optCollection = Optional.empty();
     SeriesCatalogUIAdapter adapter = null;
 
-    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization().getId(),
+    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization(),
         securityService.getUser());
     if (optSeries.isEmpty()) {
       return ApiResponseBuilder.notFound("Cannot find a series with id '%s'.", id);
@@ -862,7 +862,7 @@ public class SeriesEndpoint {
               .build();
     }
 
-    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization().getId(),
+    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization(),
         securityService.getUser());
     if (optSeries.isEmpty()) {
       return ApiResponseBuilder.notFound("Cannot find a series with id '%s'.", id);
@@ -895,7 +895,7 @@ public class SeriesEndpoint {
           throws Exception {
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
     JSONParser parser = new JSONParser();
-    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization().getId(),
+    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization(),
         securityService.getUser());
     if (optSeries.isPresent()) {
       Series series = optSeries.get();
@@ -932,7 +932,7 @@ public class SeriesEndpoint {
       })
   public Response getSeriesProperties(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id)
           throws Exception {
-    if (elasticsearchIndex.getSeries(id, securityService.getOrganization().getId(),
+    if (elasticsearchIndex.getSeries(id, securityService.getOrganization(),
         securityService.getUser()).isPresent()) {
       final Map<String, String> properties = seriesService.getSeriesProperties(id);
 
