@@ -21,7 +21,6 @@
 
 package org.opencastproject.userdirectory.studip;
 
-import org.opencastproject.security.api.CachingUserProviderMXBean;
 import org.opencastproject.security.api.Group;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
@@ -54,7 +53,6 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.lang.management.ManagementFactory;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
@@ -68,14 +66,10 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
-
 /**
  * A UserProvider that reads user roles from Studip.
  */
-public class StudipUserProviderInstance implements UserProvider, RoleProvider, CachingUserProviderMXBean {
+public class StudipUserProviderInstance implements UserProvider, RoleProvider {
 
   public static final String PROVIDER_NAME = "studip";
 
@@ -148,36 +142,11 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider, C
             return user == null ? nullToken : user;
           }
         });
-
-    registerMBean(pid);
   }
 
   @Override
   public String getName() {
     return PROVIDER_NAME;
-  }
-
-  /**
-   * Registers an MXBean.
-   */
-  protected void registerMBean(String pid) {
-    // register with jmx
-    requests = new AtomicLong();
-    studipLoads = new AtomicLong();
-    try {
-      ObjectName name;
-      name = StudipUserProviderFactory.getObjectName(pid);
-      Object mbean = this;
-      MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-      try {
-        mbs.unregisterMBean(name);
-      } catch (InstanceNotFoundException e) {
-        logger.debug("{} was not registered before", name);
-      }
-      mbs.registerMBean(mbean, name);
-    } catch (Exception e) {
-      logger.error("Unable to register {} as an mbean", this, e);
-    }
   }
 
   // UserProvider methods
@@ -340,19 +309,6 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider, C
         return jObj;
       }
     }
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.security.api.CachingUserProviderMXBean#getCacheHitRatio()
-   */
-  @Override
-  public float getCacheHitRatio() {
-    if (requests.get() == 0) {
-      return 0;
-    }
-    return (float) (requests.get() - studipLoads.get()) / requests.get();
   }
 
   @Override

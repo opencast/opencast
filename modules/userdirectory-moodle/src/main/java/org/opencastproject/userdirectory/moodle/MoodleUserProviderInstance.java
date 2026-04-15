@@ -21,7 +21,6 @@
 
 package org.opencastproject.userdirectory.moodle;
 
-import org.opencastproject.security.api.CachingUserProviderMXBean;
 import org.opencastproject.security.api.Group;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
@@ -44,7 +43,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -56,14 +54,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.PatternSyntaxException;
 
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
-
 /**
  * A UserProvider that reads user roles from Moodle.
  */
-public class MoodleUserProviderInstance implements UserProvider, RoleProvider, CachingUserProviderMXBean {
+public class MoodleUserProviderInstance implements UserProvider, RoleProvider {
   /**
    * User and role provider name.
    */
@@ -201,47 +195,6 @@ public class MoodleUserProviderInstance implements UserProvider, RoleProvider, C
                 return user == null ? nullToken : user;
               }
             });
-
-    registerMBean(pid);
-  }
-
-  ////////////////////////////
-  // CachingUserProviderMXBean
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.security.api.CachingUserProviderMXBean#getCacheHitRatio()
-   */
-  @Override
-  public float getCacheHitRatio() {
-    if (loadUserRequests.get() == 0) {
-      return 0;
-    }
-    return (float) (loadUserRequests.get() - moodleWebServiceRequests.get()) / loadUserRequests.get();
-  }
-
-  /**
-   * Registers an MXBean.
-   */
-  private void registerMBean(String pid) {
-    // register with jmx
-    loadUserRequests = new AtomicLong();
-    moodleWebServiceRequests = new AtomicLong();
-    try {
-      ObjectName name;
-      name = MoodleUserProviderFactory.getObjectName(pid);
-      Object mbean = this;
-      MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-      try {
-        mbs.unregisterMBean(name);
-      } catch (InstanceNotFoundException e) {
-        logger.debug("{} was not registered", name);
-      }
-      mbs.registerMBean(mbean, name);
-    } catch (Exception e) {
-      logger.error("Unable to register {} as an mbean", this, e);
-    }
   }
 
   ///////////////////////

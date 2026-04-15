@@ -259,12 +259,6 @@ public class JobDispatcher {
 
       undispatchableJobTypes = new ArrayList<>();
       try {
-        //GDLGDL: move collectJobStats to the JD config, then this is reasonable
-        // FIXME: the stats are not currently used and the queries are very expensive in database time.
-        if (serviceRegistry.collectJobstats) {
-          serviceRegistry.updateStatisticsJobData();
-        }
-
         if (!dispatchPriorityList.isEmpty()) {
           logger.trace("Checking for outdated jobs in dispatchPriorityList's '{}' jobs", dispatchPriorityList.size());
           // Remove outdated jobs from priority list

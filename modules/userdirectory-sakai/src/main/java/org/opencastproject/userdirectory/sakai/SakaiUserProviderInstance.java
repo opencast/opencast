@@ -21,7 +21,6 @@
 
 package org.opencastproject.userdirectory.sakai;
 
-import org.opencastproject.security.api.CachingUserProviderMXBean;
 import org.opencastproject.security.api.Group;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
@@ -51,7 +50,6 @@ import org.w3c.dom.NodeList;
 import java.io.BufferedInputStream;
 import java.io.FileNotFoundException;
 import java.io.StringReader;
-import java.lang.management.ManagementFactory;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -66,15 +64,12 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.regex.PatternSyntaxException;
 
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
 import javax.xml.parsers.DocumentBuilder;
 
 /**
  * A UserProvider that reads user roles from Sakai.
  */
-public class SakaiUserProviderInstance implements UserProvider, RoleProvider, CachingUserProviderMXBean {
+public class SakaiUserProviderInstance implements UserProvider, RoleProvider {
 
   private static final String LTI_LEARNER_ROLE = "Learner";
 
@@ -171,36 +166,11 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider, Ca
             return user == null ? nullToken : user;
           }
         });
-
-    registerMBean(pid);
   }
 
   @Override
   public String getName() {
     return PROVIDER_NAME;
-  }
-
-  /**
-   * Registers an MXBean.
-   */
-  protected void registerMBean(String pid) {
-    // register with jmx
-    requests = new AtomicLong();
-    sakaiLoads = new AtomicLong();
-    try {
-      ObjectName name;
-      name = SakaiUserProviderFactory.getObjectName(pid);
-      Object mbean = this;
-      MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-      try {
-        mbs.unregisterMBean(name);
-      } catch (InstanceNotFoundException e) {
-        logger.debug(name + " was not registered");
-      }
-      mbs.registerMBean(mbean, name);
-    } catch (Exception e) {
-      logger.error("Unable to register {} as an mbean", this, e);
-    }
   }
 
   // UserProvider methods
@@ -525,19 +495,6 @@ public class SakaiUserProviderInstance implements UserProvider, RoleProvider, Ca
     }
 
     return null;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
-   * @see org.opencastproject.security.api.CachingUserProviderMXBean#getCacheHitRatio()
-   */
-  @Override
-  public float getCacheHitRatio() {
-    if (requests.get() == 0) {
-      return 0;
-    }
-    return (float) (requests.get() - sakaiLoads.get()) / requests.get();
   }
 
   /**

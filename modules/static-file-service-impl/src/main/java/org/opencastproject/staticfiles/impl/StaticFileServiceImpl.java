@@ -28,11 +28,9 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.staticfiles.api.StaticFileService;
-import org.opencastproject.staticfiles.jmx.UploadStatistics;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.ProgressInputStream;
-import org.opencastproject.util.jmx.JmxUtil;
 
 import com.google.common.util.concurrent.AbstractScheduledService;
 import com.google.common.util.concurrent.MoreExecutors;
@@ -50,8 +48,6 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -62,8 +58,6 @@ import java.nio.file.Paths;
 import java.util.Date;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
-
-import javax.management.ObjectInstance;
 
 /**
  * Stores and retrieves static file resources.
@@ -84,12 +78,6 @@ public class StaticFileServiceImpl implements StaticFileService {
   /** The key to find the root directory for the static file service in the OSGi properties. */
   public static final String STATICFILES_ROOT_DIRECTORY_KEY = "org.opencastproject.staticfiles.rootdir";
 
-  /** The JMX business object for uploaded statistics */
-  private UploadStatistics staticFileStatistics = new UploadStatistics();
-
-  /** The JMX bean object instance */
-  private ObjectInstance registerMXBean;
-
   // OSGi service references
   private SecurityService securityService = null;
   private OrganizationDirectoryService orgDirectory = null;
@@ -108,7 +96,6 @@ public class StaticFileServiceImpl implements StaticFileService {
   @Activate
   public void activate(ComponentContext cc) {
     logger.info("Upload Static Resource Service started.");
-    registerMXBean = JmxUtil.registerMXBean(staticFileStatistics, "UploadStatistics");
     rootDirPath = OsgiUtil.getContextProperty(cc, STATICFILES_ROOT_DIRECTORY_KEY);
 
     final File rootFile = new File(rootDirPath);
@@ -140,8 +127,6 @@ public class StaticFileServiceImpl implements StaticFileService {
    */
   @Deactivate
   public void deactivate() {
-    JmxUtil.unregisterMXBean(registerMXBean);
-
     purgeService.stopAsync();
     purgeService = null;
   }
@@ -167,15 +152,6 @@ public class StaticFileServiceImpl implements StaticFileService {
 
     Path file = getTemporaryStorageDir(org).resolve(Paths.get(uuid, filename));
     try (ProgressInputStream progressInputStream = new ProgressInputStream(inputStream)) {
-      progressInputStream.addPropertyChangeListener(new PropertyChangeListener() {
-        @Override
-        public void propertyChange(PropertyChangeEvent evt) {
-          long totalNumBytesRead = (Long) evt.getNewValue();
-          long oldTotalNumBytesRead = (Long) evt.getOldValue();
-          staticFileStatistics.add(totalNumBytesRead - oldTotalNumBytesRead);
-        }
-      });
-
       Files.createDirectories(file.getParent());
       Files.copy(progressInputStream, file);
     } catch (IOException e) {

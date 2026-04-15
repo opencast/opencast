@@ -41,16 +41,12 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.management.ManagementFactory;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Dictionary;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectName;
 
 /**
  * Moodle implementation of the spring UserDetailsService, taking configuration information from the component context.
@@ -141,18 +137,6 @@ public class MoodleUserProviderFactory implements ManagedServiceFactory {
    * The organization directory service
    */
   private OrganizationDirectoryService orgDirectory;
-
-  /**
-   * Builds a JMX object name for a given PID
-   *
-   * @param pid the PID
-   * @return the object name
-   * @throws NullPointerException
-   * @throws MalformedObjectNameException
-   */
-  public static ObjectName getObjectName(String pid) throws MalformedObjectNameException, NullPointerException {
-    return new ObjectName(pid + ":type=MoodleRequests");
-  }
 
   /**
    * OSGi callback for setting the organization directory service.
@@ -279,11 +263,6 @@ public class MoodleUserProviderFactory implements ManagedServiceFactory {
     ServiceRegistration registration = providerRegistrations.remove(pid);
     if (registration != null) {
       registration.unregister();
-      try {
-        ManagementFactory.getPlatformMBeanServer().unregisterMBean(MoodleUserProviderFactory.getObjectName(pid));
-      } catch (Exception e) {
-        logger.warn("Unable to unregister mbean for pid='{}': {}", pid, e.getMessage());
-      }
     }
   }
 }

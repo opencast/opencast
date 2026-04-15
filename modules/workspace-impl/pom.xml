@@ -125,7 +125,6 @@
             </Import-Package>
             <Private-Package>
               org.opencastproject.workspace.impl;version=${project.version},
-              org.opencastproject.workspace.impl.jmx;version=${project.version}
             </Private-Package>
           </instructions>
         </configuration>
