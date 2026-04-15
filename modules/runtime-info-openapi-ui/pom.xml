@@ -46,7 +46,6 @@
       <resource>
         <directory>${basedir}/src/main/webapp</directory>
         <targetPath>${project.build.directory}/classes/${path.swagger-ui}</targetPath>
-        <filtering>false</filtering>
         <excludes>
           <exclude>**/*.html</exclude>
         </excludes>

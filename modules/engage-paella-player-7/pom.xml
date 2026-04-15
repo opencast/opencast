@@ -159,7 +159,6 @@
                   <includes>
                     <include>**</include>
                   </includes>
-                  <filtering>false</filtering>
                 </resource>
               </resources>
             </configuration>

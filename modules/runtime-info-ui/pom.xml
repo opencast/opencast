@@ -191,7 +191,6 @@
                   <includes>
                     <include>jquery.min.js</include>
                   </includes>
-                  <filtering>false</filtering>
                 </resource>
               </resources>
             </configuration>
