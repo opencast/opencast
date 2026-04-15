@@ -111,6 +111,9 @@ public class JobDispatcher {
   /** Multiplicative factor to transform dispatch interval captured in seconds to milliseconds */
   static final long DISPATCH_INTERVAL_MS_FACTOR = 1000;
 
+  /** Default delay between checking if hosts are still alive in seconds * */
+  static final long DEFAULT_HEART_BEAT = 60;
+
   private static final Logger logger = LoggerFactory.getLogger(JobDispatcher.class);
 
   private ServiceRegistryJpaImpl serviceRegistry;
@@ -238,6 +241,8 @@ public class JobDispatcher {
       logger.debug("Starting job dispatching at a custom interval of {}s", dispatchInterval);
       jdfuture = scheduledExecutor.scheduleWithFixedDelay(getJobDispatcherRunnable(), dispatchIntervalMs,
           dispatchIntervalMs, TimeUnit.MILLISECONDS);
+      // Schedule heartbeat for dispatching nodes
+      serviceRegistry.startHeartbeat(DEFAULT_HEART_BEAT);
     } else {
       logger.info("Job dispatching is disabled");
     }

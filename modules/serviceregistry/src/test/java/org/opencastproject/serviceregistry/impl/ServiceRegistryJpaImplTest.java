@@ -83,6 +83,7 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import javax.persistence.EntityManagerFactory;
@@ -307,7 +308,7 @@ public class ServiceRegistryJpaImplTest {
     if (serviceRegistryJpaImpl.scheduledExecutor != null) {
       serviceRegistryJpaImpl.scheduledExecutor.shutdown();
     }
-    serviceRegistryJpaImpl.scheduledExecutor = Executors.newScheduledThreadPool(1);
+    serviceRegistryJpaImpl.scheduledExecutor = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(1);
     jobDispatcher.scheduledExecutor.schedule(jobDispatcher.getJobDispatcherRunnable(), DISPATCH_START_DELAY,
         TimeUnit.MILLISECONDS);
 
