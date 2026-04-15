@@ -178,7 +178,8 @@ public class SpeechToTextWorkflowSchedulerQuartz extends AbstractScanner impleme
           abandonAfterMs = Integer.parseInt((String) properties.get(ABANDON_AFTER_SECS)) * 1000;
         } catch (Exception e) {
           // Log and use default
-          logger.warn("Invalid configuration for {}: '{}'", ABANDON_AFTER_SECS, properties.get(ABANDON_AFTER_SECS), e);
+          logger.warn("Invalid configuration for {}: '{}', defaulting to '{}'", ABANDON_AFTER_SECS,
+                  properties.get(ABANDON_AFTER_SECS), DEFAULT_ABANDON_AFTER_SECS, e);
         }
       }
       logger.info("Abandon attempts to start attach workflow after {} ms", abandonAfterMs);

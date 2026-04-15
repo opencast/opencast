@@ -213,7 +213,9 @@ public class SpeechToTextDatabase {
         q.setParameter("oldStatus", Arrays.asList(oldStatus));
         q.setParameter("newStatus", newStatus);
         q.setParameter("date", olderThan);
-        return q.executeUpdate();
+        int counter = q.executeUpdate();
+        logger.debug("Changed status of {} rows from {} to {}", counter, Arrays.toString(oldStatus), newStatus);
+        return counter;
       });
     } catch (Exception e) {
       throw new SpeechToTextAsyncException(e);

@@ -103,7 +103,7 @@ public class SpeechToTextServiceRestEndpoint extends AbstractJobProducerEndpoint
               description = "Language of the media file."),
           @RestParameter(name = "translate", isRequired = false, type = BOOLEAN,
               description = "Enable translation to english"),
-          @RestParameter(name = "async", isRequired = false, type = BOOLEAN,
+          @RestParameter(name = "async", isRequired = false, defaultValue = "false", type = BOOLEAN,
               description = "If job will run outside the scope of a workflow") },
       responses = {
           @RestResponse(description = "Subtitles created successfully", responseCode = HttpServletResponse.SC_OK),
