@@ -69,6 +69,7 @@
     <bundle>mvn:org.opencastproject/android-mms/1.2</bundle>
     <bundle>wrap:mvn:com.googlecode.json-simple/json-simple/${json-simple.version}</bundle>
     <!-- Used by the Lti filter -->
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.oauth-provider/20100527_1</bundle>
     <bundle>wrap:mvn:org.imsglobal/basiclti-util/1.2.0</bundle>
 
     <!-- AWS Bits -->
