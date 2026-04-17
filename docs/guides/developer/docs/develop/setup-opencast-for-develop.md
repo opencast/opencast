@@ -177,7 +177,7 @@ To fix a NPM access error ([example](https://stackoverflow.com/questions/1615101
 ### NPM Timeout
 
 To avoid timeout and connection errors when downloading npm packages used in UI modules that are not maintained as dedicated
-projects (`engage-paella-player-7`, `engage-paella-player-8`, `engage-ui`, `graphql-ui`, `lti` and `runtime-info-ui`), you can
+projects (`engage-paella-player-8`, `engage-ui`, `graphql-ui`, `lti` and `runtime-info-ui`), you can
 configure an npm cache by setting an environment variable before running Maven. For example: `NPM_CONFIG_CACHE=~/.npm`.
 
 This is especially useful when building inside a container:
