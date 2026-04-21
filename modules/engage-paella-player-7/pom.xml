@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>20-SNAPSHOT</version>
+    <version>21-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -159,7 +159,6 @@
                   <includes>
                     <include>**</include>
                   </includes>
-                  <filtering>false</filtering>
                 </resource>
               </resources>
             </configuration>

@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.opencastproject</groupId>
   <artifactId>base</artifactId>
-  <version>20-SNAPSHOT</version>
+  <version>21-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>opencast</name>
   <description>Opencast is a media capture, processing, management and distribution system</description>
@@ -138,6 +138,7 @@
     <module>modules/hello-world-api</module>
     <module>modules/hello-world-impl</module>
     <module>modules/hello-world-workflowoperation</module>
+    <module>modules/matrix-notification-workflowoperation</module>
     <module>modules/subtitle-timeshift-workflowoperation</module>
     <module>modules/incident-workflowoperation</module>
     <module>modules/index-service</module>
@@ -155,7 +156,9 @@
     <module>modules/kernel</module>
     <module>modules/lifecycle-management-api</module>
     <module>modules/lifecycle-management-impl</module>
-    <module>modules/list-providers-service</module>
+    <module>modules/list-providers-api</module>
+    <module>modules/list-providers-impl</module>
+    <module>modules/list-providers-common</module>
     <module>modules/live-schedule-api</module>
     <module>modules/live-schedule-impl</module>
     <module>modules/logging-workflowoperation</module>
@@ -391,6 +394,7 @@
           <doCheck>false</doCheck>
           <doUpdate>false</doUpdate>
           <shortRevisionLength>7</shortRevisionLength>
+          <getRevisionOnlyOnce>true</getRevisionOnlyOnce>
         </configuration>
       </plugin>
       <!-- Attach sources for all builds -->

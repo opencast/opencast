@@ -43,6 +43,7 @@ import org.opencastproject.security.api.AccessControlUtil;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
+import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
@@ -116,7 +117,8 @@ public class SeriesServiceImplTest {
     ElasticsearchIndex esIndex = EasyMock.createNiceMock(ElasticsearchIndex.class);
 
     EasyMock.expect(esIndex.addOrUpdateSeries(EasyMock.anyString(), EasyMock.anyObject(Function.class),
-            EasyMock.anyString(), EasyMock.anyObject(User.class))).andReturn(Optional.empty()).atLeastOnce();
+            EasyMock.anyObject(Organization.class), EasyMock.anyObject(User.class)))
+        .andReturn(Optional.empty()).atLeastOnce();
     EasyMock.replay(esIndex);
 
     seriesService = new SeriesServiceImpl();

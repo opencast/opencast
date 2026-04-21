@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>20-SNAPSHOT</version>
+    <version>21-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -187,6 +187,7 @@
             <Export-Package>
               org.opencastproject.authorization.xacml.manager.api;version=${project.version},
               org.opencastproject.authorization.xacml.manager.impl;version=${project.version},
+              org.opencastproject.authorization.xacml.manager.impl.list;version=${project.version},
               org.opencastproject.authorization.xacml.manager.impl.persistence;version=${project.version},
               org.opencastproject.authorization.xacml.manager.endpoint;version=${project.version},
               org.opencastproject.authorization.xacml.manager.util;version=${project.version}

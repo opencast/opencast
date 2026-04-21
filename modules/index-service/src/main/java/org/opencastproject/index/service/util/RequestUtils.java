@@ -20,9 +20,9 @@
  */
 package org.opencastproject.index.service.util;
 
+import org.opencastproject.list.api.DefaultResourceListQuery;
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ListProvidersService;
-import org.opencastproject.list.impl.ResourceListQueryImpl;
 
 import com.google.common.net.MediaType;
 
@@ -110,7 +110,7 @@ public final class RequestUtils {
 
     try {
       final Collection<String> assetUploadJsons = listProvidersService.getList("eventUploadAssetOptions",
-          new ResourceListQueryImpl(),false).values();
+          new DefaultResourceListQuery(),false).values();
       for (String assetUploadJson: assetUploadJsons) {
         if (!assetUploadJson.startsWith("{") || !assetUploadJson.endsWith("}")) {
           // Ignore non-json-values

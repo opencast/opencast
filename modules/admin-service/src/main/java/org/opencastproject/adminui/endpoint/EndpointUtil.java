@@ -26,7 +26,7 @@ import static org.opencastproject.userdirectory.UserIdRoleProvider.isSanitize;
 
 import org.opencastproject.adminui.exception.JsonCreationException;
 import org.opencastproject.index.service.util.RestUtils;
-import org.opencastproject.list.impl.ResourceListQueryImpl;
+import org.opencastproject.list.api.DefaultResourceListQuery;
 import org.opencastproject.list.query.StringListFilter;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
@@ -95,7 +95,7 @@ public final class EndpointUtil {
    * @param query
    *          The query to update with the filters
    */
-  public static void addRequestFiltersToQuery(final String filterString, ResourceListQueryImpl query) {
+  public static void addRequestFiltersToQuery(final String filterString, DefaultResourceListQuery query) {
     for (var filter : RestUtils.parseFilter(filterString).entrySet()) {
       query.addFilter(new StringListFilter(filter.getKey(), filter.getValue()));
     }

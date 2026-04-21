@@ -43,7 +43,6 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.management.ManagementFactory;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Dictionary;
@@ -51,9 +50,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectName;
 
 @Component(
     immediate = true,
@@ -96,18 +92,6 @@ public class BrightspaceUserProviderFactory implements ManagedServiceFactory {
   private OrganizationDirectoryService orgDirectory;
   private int cacheSize;
   private int cacheExpiration;
-
-  /**
-   * Builds a JMX object name for a given PID
-   *
-   * @param pid the PID
-   * @return the object name
-   * @throws NullPointerException
-   * @throws MalformedObjectNameException
-   */
-  public static final ObjectName getObjectName(String pid) throws MalformedObjectNameException, NullPointerException {
-    return new ObjectName(pid + ":type=BrightspaceRequests");
-  }
 
   /**
    * OSGi callback for setting the organization directory service.
@@ -228,12 +212,6 @@ public class BrightspaceUserProviderFactory implements ManagedServiceFactory {
     ServiceRegistration registration = providerRegistrations.remove(pid);
     if (registration != null) {
       registration.unregister();
-
-      try {
-        ManagementFactory.getPlatformMBeanServer().unregisterMBean(getObjectName(pid));
-      } catch (Exception e) {
-        logger.warn("Unable to unregister mbean for pid='{}'", pid, e);
-      }
     }
   }
 

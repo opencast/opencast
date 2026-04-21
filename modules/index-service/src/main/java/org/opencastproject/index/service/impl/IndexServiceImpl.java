@@ -1578,7 +1578,7 @@ public class IndexServiceImpl implements IndexService {
     if ((removedScheduler || notFoundScheduler) && (removedWorkflow || notFoundWorkflow)
             && (removedArchive || notFoundArchive)) {
       try {
-        elasticsearchIndex.deleteEvent(id, securityService.getOrganization().getId());
+        elasticsearchIndex.deleteEvent(id, securityService.getOrganization());
       } catch (SearchIndexException e) {
         logger.error("Removing event {} from the {} index failed", id, elasticsearchIndex.getIndexName(), e);
       }
@@ -2059,7 +2059,7 @@ public class IndexServiceImpl implements IndexService {
   private void checkSeriesExists(String seriesID, ElasticsearchIndex index)
           throws NotFoundException, IndexServiceException {
     try {
-      Optional<Series> optSeries = index.getSeries(seriesID, securityService.getOrganization().getId(),
+      Optional<Series> optSeries = index.getSeries(seriesID, securityService.getOrganization(),
           securityService.getUser());
       if (optSeries.isEmpty()) {
         throw new NotFoundException("Cannot find a series with id " + seriesID);

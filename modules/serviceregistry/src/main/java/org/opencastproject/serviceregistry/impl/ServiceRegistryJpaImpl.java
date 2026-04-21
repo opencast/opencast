@@ -54,16 +54,12 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.serviceregistry.api.ServiceStatistics;
 import org.opencastproject.serviceregistry.api.SystemLoad;
 import org.opencastproject.serviceregistry.api.SystemLoad.NodeLoad;
-import org.opencastproject.serviceregistry.impl.jmx.HostsStatistics;
-import org.opencastproject.serviceregistry.impl.jmx.JobsStatistics;
-import org.opencastproject.serviceregistry.impl.jmx.ServicesStatistics;
 import org.opencastproject.serviceregistry.impl.jpa.HostRegistrationJpaImpl;
 import org.opencastproject.serviceregistry.impl.jpa.ServiceRegistrationJpaImpl;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.function.ThrowingConsumer;
-import org.opencastproject.util.jmx.JmxUtil;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -99,14 +95,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import javax.management.ObjectInstance;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.LockModeType;
@@ -142,36 +138,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   static final Logger logger = LoggerFactory.getLogger(ServiceRegistryJpaImpl.class);
 
-  /** The list of registered JMX beans */
-  protected List<ObjectInstance> jmxBeans = new ArrayList<>();
-
-  /** Hosts statistics JMX type */
-  private static final String JMX_HOSTS_STATISTICS_TYPE = "HostsStatistics";
-
-  /** Services statistics JMX type */
-  private static final String JMX_SERVICES_STATISTICS_TYPE = "ServicesStatistics";
-
-  /** Jobs statistics JMX type */
-  private static final String JMX_JOBS_STATISTICS_TYPE = "JobsStatistics";
-
-  /** The JMX business object for hosts statistics */
-  private HostsStatistics hostsStatistics;
-
-  /** The JMX business object for services statistics */
-  private ServicesStatistics servicesStatistics;
-
-  /** The JMX business object for jobs statistics */
-  private JobsStatistics jobsStatistics;
-
   /** Current job used to process job in the service registry */
   private static final ThreadLocal<Job> currentJob = new ThreadLocal<>();
 
   /** Configuration key for the maximum load */
   protected static final String OPT_MAXLOAD = "org.opencastproject.server.maxload";
-
-  /** Configuration key for the interval to check whether the hosts in the service registry are still alive,
-   * in seconds */
-  protected static final String OPT_HEARTBEATINTERVAL = "heartbeat.interval";
 
   /** Configuration key for the collection of job statistics */
   protected static final String OPT_JOBSTATISTICS = "jobstats.collect";
@@ -223,9 +194,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   /** Services for which error state is disabled */
   private List<String> noErrorStateServiceTypes = new ArrayList<>();
 
-  /** Default delay between checking if hosts are still alive in seconds * */
-  static final long DEFAULT_HEART_BEAT = 60;
-
   /** Default job load when not passed by service creating the job * */
   static final float DEFAULT_JOB_LOAD = 0.1f;
 
@@ -252,7 +220,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   protected DBSession db;
 
   /** The thread pool to use for dispatching queued jobs and checking on phantom services. */
-  protected ScheduledExecutorService scheduledExecutor = null;
+  protected ScheduledThreadPoolExecutor scheduledExecutor = null;
+  private ScheduledFuture hbfuture = null;
 
   /** The security service */
   protected SecurityService securityService = null;
@@ -319,19 +288,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
     // Clean all undispatchable jobs that were orphaned when this host was last deactivated
     cleanUndispatchableJobs(hostName);
-
-    // Register JMX beans with statistics
-    try {
-      List<ServiceStatistics> serviceStatistics = getServiceStatistics();
-      hostsStatistics = new HostsStatistics(serviceStatistics);
-      servicesStatistics = new ServicesStatistics(hostName, serviceStatistics);
-      jobsStatistics = new JobsStatistics(hostName);
-      jmxBeans.add(JmxUtil.registerMXBean(hostsStatistics, JMX_HOSTS_STATISTICS_TYPE));
-      jmxBeans.add(JmxUtil.registerMXBean(servicesStatistics, JMX_SERVICES_STATISTICS_TYPE));
-      jmxBeans.add(JmxUtil.registerMXBean(jobsStatistics, JMX_JOBS_STATISTICS_TYPE));
-    } catch (ServiceRegistryException e) {
-      logger.error("Error registering JMX statistic beans", e);
-    }
 
     // Find the jobs URL
     if (cc == null || StringUtils.isBlank(cc.getBundleContext().getProperty("org.opencastproject.jobs.url"))) {
@@ -406,10 +362,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       } catch (InterruptedException e) {
         logger.error("Error shutting down the Dispatcher", e);
       }
-    }
-
-    for (ObjectInstance mbean : jmxBeans) {
-      JmxUtil.unregisterMXBean(mbean);
     }
 
     try {
@@ -706,25 +658,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       }
     }
 
-    long heartbeatInterval = DEFAULT_HEART_BEAT;
-    String heartbeatIntervalString = StringUtils.trimToNull((String) properties.get(OPT_HEARTBEATINTERVAL));
-    if (StringUtils.isNotBlank(heartbeatIntervalString)) {
-      try {
-        heartbeatInterval = Long.parseLong(heartbeatIntervalString);
-      } catch (Exception e) {
-        logger.warn("Heartbeat interval '{}' is malformed, setting to {}", heartbeatIntervalString, DEFAULT_HEART_BEAT);
-        heartbeatInterval = DEFAULT_HEART_BEAT;
-      }
-      if (heartbeatInterval == 0) {
-        logger.info("Heartbeat disabled");
-      } else if (heartbeatInterval < 0) {
-        logger.warn("Heartbeat interval {} seconds too low, adjusting to {}", heartbeatInterval, DEFAULT_HEART_BEAT);
-        heartbeatInterval = DEFAULT_HEART_BEAT;
-      } else {
-        logger.info("Heartbeat interval set to {} seconds", heartbeatInterval);
-      }
-    }
-
     String jobStatsString = StringUtils.trimToNull((String) properties.get(OPT_JOBSTATISTICS));
     if (StringUtils.isNotBlank(jobStatsString)) {
       try {
@@ -773,14 +706,28 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
                 OPT_SERVICE_STATISTICS_MAX_JOB_AGE);
       }
     }
+  }
 
-    scheduledExecutor = Executors.newScheduledThreadPool(1);
+  private void setupScheduledExecutor() {
+    if (scheduledExecutor == null) {
+      scheduledExecutor = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(1);
+      scheduledExecutor.setRemoveOnCancelPolicy(true);
+    }
+  }
+
+  protected void startHeartbeat(long heartbeatInterval) {
+    setupScheduledExecutor();
 
     // Schedule the service heartbeat if the interval is > 0
     if (heartbeatInterval > 0) {
+      // Stop the current dispatch thread so we can configure a new one
+      if (hbfuture != null) {
+        hbfuture.cancel(true);
+      }
+
       logger.debug("Starting service heartbeat at a custom interval of {}s", heartbeatInterval);
-      scheduledExecutor.scheduleWithFixedDelay(new JobProducerHeartbeat(), heartbeatInterval, heartbeatInterval,
-              TimeUnit.SECONDS);
+      hbfuture = scheduledExecutor.scheduleWithFixedDelay(new JobProducerHeartbeat(), heartbeatInterval,
+          heartbeatInterval, TimeUnit.SECONDS);
     }
   }
 
@@ -953,11 +900,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     return job;
   }
 
-  public void updateStatisticsJobData() {
-    jobsStatistics.updateAvg(db.exec(getAvgOperationsQuery()));
-    jobsStatistics.updateJobCount(db.exec(getCountPerHostServiceQuery()));
-  }
-
   /**
    * Internal method to update the service registration state, throwing unwrapped JPA exceptions.
    *
@@ -977,7 +919,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       fromDb.setErrorStateTrigger(registration.getErrorStateTrigger());
     });
 
-    servicesStatistics.updateService(registration);
     return registration;
   }
 
@@ -1102,8 +1043,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         logger.info("Registering {} with a maximum load of {}", host, maxLoad);
         return hr;
       });
-
-      hostsStatistics.updateHost(hostRegistration);
     } catch (Exception e) {
       throw new ServiceRegistryException(e);
     }
@@ -1132,7 +1071,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       });
 
       logger.info("Host {} unregistered", host);
-      hostsStatistics.updateHost(existingHostRegistration);
     } catch (Exception e) {
       throw new ServiceRegistryException(e);
     }
@@ -1160,11 +1098,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         for (ServiceRegistration serviceRegistration : getServiceRegistrationsByHost(host)) {
           ((ServiceRegistrationJpaImpl) serviceRegistration).setActive(true);
           em.merge(serviceRegistration);
-          servicesStatistics.updateService(serviceRegistration);
         }
       });
-
-      hostsStatistics.updateHost(hostRegistration);
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -1188,15 +1123,12 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         for (ServiceRegistration serviceRegistration : getServiceRegistrationsByHost(host)) {
           ((ServiceRegistrationJpaImpl) serviceRegistration).setActive(false);
           em.merge(serviceRegistration);
-          servicesStatistics.updateService(serviceRegistration);
         }
         em.merge(hr);
 
         logger.info("Disabling {}", host);
         return hr;
       });
-
-      hostsStatistics.updateHost(hostRegistration);
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -1296,9 +1228,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         }
         registration.set(sr);
       });
-
-      hostsStatistics.updateHost(hostRegistration.get());
-      servicesStatistics.updateService(registration.get());
       return registration.get();
     } catch (Exception e) {
       throw new ServiceRegistryException(e);
@@ -1462,7 +1391,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       return hr;
     });
 
-    hostsStatistics.updateHost(reg);
     logger.info("Finished setting maintenance mode on host '{}'", baseUrl);
   }
 
@@ -2534,8 +2462,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         List<ServiceRegistration> serviceRegistrations = getOnlineServiceRegistrations();
 
         for (ServiceRegistration service : serviceRegistrations) {
-          hostsStatistics.updateHost(((ServiceRegistrationJpaImpl) service).getHostRegistration());
-          servicesStatistics.updateService(service);
           if (!service.isJobProducer()) {
             continue;
           }

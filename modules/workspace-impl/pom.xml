@@ -7,7 +7,7 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>20-SNAPSHOT</version>
+    <version>21-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
@@ -125,7 +125,6 @@
             </Import-Package>
             <Private-Package>
               org.opencastproject.workspace.impl;version=${project.version},
-              org.opencastproject.workspace.impl.jmx;version=${project.version}
             </Private-Package>
           </instructions>
         </configuration>

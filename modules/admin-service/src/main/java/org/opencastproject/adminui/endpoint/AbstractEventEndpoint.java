@@ -84,16 +84,16 @@ import org.opencastproject.index.service.api.IndexService.Source;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.exception.UnsupportedAssetException;
 import org.opencastproject.index.service.impl.util.EventUtils;
-import org.opencastproject.index.service.resources.list.provider.EventsListProvider.Comments;
-import org.opencastproject.index.service.resources.list.provider.EventsListProvider.IsPublished;
-import org.opencastproject.index.service.resources.list.query.EventListQuery;
-import org.opencastproject.index.service.resources.list.query.SeriesListQuery;
 import org.opencastproject.index.service.util.JSONUtils;
 import org.opencastproject.index.service.util.RestUtils;
+import org.opencastproject.list.api.DefaultResourceListQuery;
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ListProvidersService;
 import org.opencastproject.list.api.ResourceListQuery;
-import org.opencastproject.list.impl.ResourceListQueryImpl;
+import org.opencastproject.list.common.provider.EventsListProvider.Comments;
+import org.opencastproject.list.common.provider.EventsListProvider.IsPublished;
+import org.opencastproject.list.common.query.EventListQuery;
+import org.opencastproject.list.common.query.SeriesListQuery;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.AudioStream;
 import org.opencastproject.mediapackage.Catalog;
@@ -3400,7 +3400,7 @@ public abstract class AbstractEventEndpoint {
 
     Map<String, String> languages;
     try {
-      languages = getListProvidersService().getList("LANGUAGES", new ResourceListQueryImpl(), false);
+      languages = getListProvidersService().getList("LANGUAGES", new DefaultResourceListQuery(), false);
     } catch (ListProviderException e) {
       logger.info("Could not get languages from listprovider");
       throw new WebApplicationException(e);

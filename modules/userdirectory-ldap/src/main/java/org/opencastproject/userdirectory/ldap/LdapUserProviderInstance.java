@@ -21,7 +21,6 @@
 
 package org.opencastproject.userdirectory.ldap;
 
-import org.opencastproject.security.api.CachingUserProviderMXBean;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
@@ -44,7 +43,6 @@ import org.springframework.security.ldap.DefaultSpringSecurityContextSource;
 import org.springframework.security.ldap.search.FilterBasedLdapUserSearch;
 import org.springframework.security.ldap.userdetails.LdapUserDetailsService;
 
-import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -55,14 +53,10 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
-
 /**
  * A UserProvider that reads user roles from LDAP entries.
  */
-public class LdapUserProviderInstance implements UserProvider, CachingUserProviderMXBean {
+public class LdapUserProviderInstance implements UserProvider {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(LdapUserProviderInstance.class);
@@ -181,36 +175,11 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
                 return user == null ? nullToken : user;
               }
             });
-
-    registerMBean(pid);
   }
 
   @Override
   public String getName() {
     return PROVIDER_NAME;
-  }
-
-  /**
-   * Registers an MXBean.
-   */
-  protected void registerMBean(String pid) {
-    // register with jmx
-    requests = new AtomicLong();
-    ldapLoads = new AtomicLong();
-    try {
-      ObjectName name;
-      name = LdapUserProviderFactory.getObjectName(pid);
-      Object mbean = this;
-      MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-      try {
-        mbs.unregisterMBean(name);
-      } catch (InstanceNotFoundException e) {
-        logger.debug(name + " was not registered");
-      }
-      mbs.registerMBean(mbean, name);
-    } catch (Exception e) {
-      logger.warn("Unable to register {} as an mbean", this, e);
-    }
   }
 
   /**
@@ -291,19 +260,6 @@ public class LdapUserProviderInstance implements UserProvider, CachingUserProvid
     } finally {
       currentThread.setContextClassLoader(originalClassloader);
     }
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.opencastproject.security.api.CachingUserProviderMXBean#getCacheHitRatio()
-   */
-  @Override
-  public float getCacheHitRatio() {
-    if (requests.get() == 0) {
-      return 0;
-    }
-    return (float) (requests.get() - ldapLoads.get()) / requests.get();
   }
 
   @Override

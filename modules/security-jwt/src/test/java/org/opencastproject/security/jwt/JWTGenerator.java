@@ -21,6 +21,9 @@
 
 package org.opencastproject.security.jwt;
 
+import org.opencastproject.security.impl.jpa.JpaOrganization;
+import org.opencastproject.security.impl.jpa.JpaRole;
+
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
@@ -35,7 +38,9 @@ import com.nimbusds.jwt.SignedJWT;
 
 import java.security.NoSuchAlgorithmException;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Helper class generating data for the tests.
@@ -78,18 +83,24 @@ public final class JWTGenerator {
   }
 
   public String generateValidSymmetricJWT() throws JOSEException {
-    return generateValidJWT(getSymmetricSigner(), getSymmetricAlgorithm(), 60 * 60 * 1000);
+    return generateValidJWT(getSymmetricSigner(), getSymmetricAlgorithm(), name, email, roles, 60 * 60 * 1000);
   }
 
   public String generateValidSymmetricJWT(int expiresInMillis) throws JOSEException {
-    return generateValidJWT(getSymmetricSigner(), getSymmetricAlgorithm(), expiresInMillis);
+    return generateValidJWT(getSymmetricSigner(), getSymmetricAlgorithm(), name, email, roles, expiresInMillis);
+  }
+
+  public String generateValidSymmetricJWT(String name, String email, List<String> roles, int expiresInMillis)
+          throws JOSEException {
+    return generateValidJWT(getSymmetricSigner(), getSymmetricAlgorithm(), name, email, roles, expiresInMillis);
   }
 
   public String generateValidAsymmetricJWT() throws JOSEException {
-    return generateValidJWT(getAsymmetricSigner(), getAsymmetricAlgorithm(), 60 * 60 * 1000);
+    return generateValidJWT(getAsymmetricSigner(), getAsymmetricAlgorithm(), name, email, roles, 60 * 60 * 1000);
   }
 
-  private String generateValidJWT(JWSSigner signer, JWSAlgorithm algorithm, int expiresInMillis) throws JOSEException {
+  private String generateValidJWT(JWSSigner signer, JWSAlgorithm algorithm, String name, String email,
+      List<String> roles, int expiresInMillis) throws JOSEException {
     JWTClaimsSet claimsSet = new JWTClaimsSet.Builder()
         .issuer(issuer)
         .audience(clientId)
@@ -221,6 +232,25 @@ public final class JWTGenerator {
 
   public String getUsername() {
     return username;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public String getEmail() {
+    return email;
+  }
+
+  public Set<JpaRole> getJpaRoles(JpaOrganization organization) {
+    Set<JpaRole> mappedRoles = new HashSet<>();
+    mappedRoles.add(new JpaRole("ROLE_JWT_USER", organization));
+    mappedRoles.add(new JpaRole("ROLE_JWT_USER_" + username, organization));
+    mappedRoles.add(new JpaRole("ROLE_GROUP_JWT_TRAINER", organization));
+    for (String role : roles) {
+      mappedRoles.add(new JpaRole(role, organization));
+    }
+    return mappedRoles;
   }
 
 }

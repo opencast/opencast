@@ -54,6 +54,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -165,20 +166,30 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
       CachedJWT cachedJwt = cache.getIfPresent(signature);
 
       if (cachedJwt == null) {
+        logger.debug("JWT cache miss for signature {}, validating token", abbreviateSignature(signature));
+
         // JWT hasn't been cached before, so validate all claims
         SignedJWT jwt = decodeAndValidate(token);
         String username = extractUsername(jwt);
+        boolean invalidateUserDirectory = true;
 
         try {
           if (userDetailsService.loadUserByUsername(username) != null) {
-            existingUserLogin(username, jwt);
+            invalidateUserDirectory = existingUserLogin(username, jwt);
           }
         } catch (UsernameNotFoundException e) {
           newUserLogin(username, jwt);
         }
 
-        userDirectoryService.invalidate(username);
+        if (invalidateUserDirectory) {
+          logger.debug("Invalidating user directory caches for JWT user '{}'", username);
+          userDirectoryService.invalidate(username);
+        } else {
+          logger.debug("Skipping user directory invalidation for JWT user '{}' since effective user data is unchanged",
+              username);
+        }
         cache.put(jwt.getSignature().toString(), new CachedJWT(jwt, username));
+        logger.debug("Cached validated JWT signature {} for user '{}'", abbreviateSignature(signature), username);
         return username;
       } else {
         // JWT has been cached before, so only check if it has expired
@@ -186,7 +197,8 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
           cache.invalidate(signature);
           throw new JOSEException("JWT token is not valid anymore");
         }
-        logger.debug("Using decoded and validated JWT from cache");
+        logger.debug("Using validated JWT from cache for user '{}' and signature {}", cachedJwt.getUsername(),
+            abbreviateSignature(signature));
         return cachedJwt.getUsername();
       }
     } catch (ParseException | JOSEException exception) {
@@ -390,7 +402,7 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
     JpaUserReference userReference = new JpaUserReference(username, extractName(jwt), extractEmail(jwt), MECH_JWT,
         new Date(), fromOrganization(securityService.getOrganization()), extractRoles(jwt));
 
-    logger.debug("JWT user '{}' logged in for the first time", username);
+    logger.debug("JWT user '{}' logged in for the first time, creating a new user reference", username);
     userReferenceProvider.addUserReference(userReference, MECH_JWT);
   }
 
@@ -400,8 +412,11 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
    * @param username The username.
    * @param jwt The decoded JWT.
    */
-  public void existingUserLogin(String username, SignedJWT jwt) throws ParseException {
+  public boolean existingUserLogin(String username, SignedJWT jwt) throws ParseException {
     Organization organization = securityService.getOrganization();
+    String name = extractName(jwt);
+    String email = extractEmail(jwt);
+    Set<JpaRole> roles = extractRoles(jwt);
 
     // Load the user reference
     JpaUserReference userReference = userReferenceProvider.findUserReference(username, organization.getId());
@@ -409,14 +424,50 @@ public class DynamicLoginHandler implements InitializingBean, JWTLoginHandler {
       throw new UsernameNotFoundException("User reference '" + username + "' was not found");
     }
 
+    boolean changed = userReferenceChanged(userReference, name, email, roles);
+    String changedFields = changed ? describeUserReferenceChanges(userReference, name, email, roles) : "";
     // Update the reference
-    userReference.setName(extractName(jwt));
-    userReference.setEmail(extractEmail(jwt));
+    userReference.setName(name);
+    userReference.setEmail(email);
     userReference.setLastLogin(new Date());
-    userReference.setRoles(extractRoles(jwt));
+    userReference.setRoles(roles);
 
-    logger.debug("JWT user '{}' logged in", username);
+    if (changed) {
+      logger.debug("JWT user '{}' logged in with updated user data ({}), refreshing merged user caches", username,
+          changedFields);
+    } else {
+      logger.debug("JWT user '{}' logged in with unchanged name, email, and roles", username);
+    }
     userReferenceProvider.updateUserReference(userReference);
+    return changed;
+  }
+
+  private boolean userReferenceChanged(JpaUserReference userReference, String name, String email, Set<JpaRole> roles) {
+    return !Objects.equals(userReference.getName(), name)
+        || !Objects.equals(userReference.getEmail(), email)
+        || !Objects.equals(userReference.getRoles(), roles);
+  }
+
+  private String describeUserReferenceChanges(JpaUserReference userReference, String name, String email,
+      Set<JpaRole> roles) {
+    List<String> changedFields = new ArrayList<>();
+    if (!Objects.equals(userReference.getName(), name)) {
+      changedFields.add("name");
+    }
+    if (!Objects.equals(userReference.getEmail(), email)) {
+      changedFields.add("email");
+    }
+    if (!Objects.equals(userReference.getRoles(), roles)) {
+      changedFields.add("roles");
+    }
+    return String.join(", ", changedFields);
+  }
+
+  private String abbreviateSignature(String signature) {
+    if (signature == null || signature.length() <= 12) {
+      return signature;
+    }
+    return signature.substring(0, 12) + "...";
   }
 
   /**

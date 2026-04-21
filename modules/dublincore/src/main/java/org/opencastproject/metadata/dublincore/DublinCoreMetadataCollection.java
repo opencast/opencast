@@ -21,10 +21,10 @@
 
 package org.opencastproject.metadata.dublincore;
 
+import org.opencastproject.list.api.DefaultResourceListQuery;
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ListProvidersService;
 import org.opencastproject.list.api.ResourceListQuery;
-import org.opencastproject.list.impl.ResourceListQueryImpl;
 
 import com.google.common.collect.Iterables;
 
@@ -248,7 +248,7 @@ public class DublinCoreMetadataCollection {
             return Collections.emptyMap();
           }
         } else {
-          resourceListQuery = new ResourceListQueryImpl();
+          resourceListQuery = new DefaultResourceListQuery();
         }
 
         return listProvidersService.getList(metadataField.getListprovider(), resourceListQuery, true);

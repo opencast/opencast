@@ -41,7 +41,7 @@ import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.authorization.xacml.manager.endpoint.JsonConv;
 import org.opencastproject.authorization.xacml.manager.impl.ManagedAclImpl;
-import org.opencastproject.index.service.resources.list.query.AclsListQuery;
+import org.opencastproject.authorization.xacml.manager.impl.list.AclsListQuery;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;

@@ -68,11 +68,11 @@ import org.opencastproject.elasticsearch.index.objects.series.SeriesIndexSchema;
 import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.exception.IndexServiceException;
-import org.opencastproject.index.service.resources.list.provider.SeriesListProvider;
-import org.opencastproject.index.service.resources.list.query.SeriesListQuery;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ListProvidersService;
+import org.opencastproject.list.common.provider.SeriesListProvider;
+import org.opencastproject.list.common.query.SeriesListQuery;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.MetadataField;
@@ -384,7 +384,7 @@ public class SeriesEndpoint {
       })
   public Response getSeriesMetadata(@PathParam("seriesId") String series) throws UnauthorizedException,
           NotFoundException, SearchIndexException {
-    Optional<Series> optSeries = searchIndex.getSeries(series, securityService.getOrganization().getId(),
+    Optional<Series> optSeries = searchIndex.getSeries(series, securityService.getOrganization(),
         securityService.getUser());
     if (optSeries.isEmpty()) {
       return notFound("Cannot find a series with id '%s'.", series);
@@ -1180,7 +1180,7 @@ public class SeriesEndpoint {
   public Response getSeriesTheme(@PathParam("seriesId") String seriesId) {
     Long themeId;
     try {
-      Optional<Series> series = searchIndex.getSeries(seriesId, securityService.getOrganization().getId(),
+      Optional<Series> series = searchIndex.getSeries(seriesId, securityService.getOrganization(),
           securityService.getUser());
       if (series.isEmpty()) {
         return notFound("Cannot find a series with id {}", seriesId);
@@ -1483,7 +1483,7 @@ public Response getSeriesHostPages(@PathParam("seriesId") String seriesId) {
       return badRequest();
     }
 
-    Optional<Series> series = searchIndex.getSeries(seriesId, securityService.getOrganization().getId(),
+    Optional<Series> series = searchIndex.getSeries(seriesId, securityService.getOrganization(),
         securityService.getUser());
     if (series.isEmpty()) {
       return notFound("Cannot find a series with id {}", seriesId);

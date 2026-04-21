@@ -4,7 +4,7 @@
   <parent>
     <groupId>org.opencastproject.assemblies</groupId>
     <artifactId>opencast-assemblies</artifactId>
-    <version>20-SNAPSHOT</version>
+    <version>21-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
   <properties>
@@ -58,14 +58,12 @@
     <resources>
       <resource>
         <directory>../..</directory>
-        <filtering>false</filtering>
         <includes>
           <include>etc/**/*</include>
         </includes>
       </resource>
       <resource>
         <directory>src/main/resources</directory>
-        <filtering>false</filtering>
         <includes>
           <include>**/*</include>
         </includes>
