@@ -62,7 +62,7 @@ export default defineConfig({
       '/editor-ui': ocProxyServer,
       // '/play': ocProxyServer,
       // '/ui': ocServer,
-      // '/paella7/ui/default_theme': ocServer
+      // '/paella8/ui/default_theme': ocServer
     }
   },
   plugins: [    

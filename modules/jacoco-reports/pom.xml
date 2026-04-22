@@ -304,11 +304,6 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-engage-paella-player-7</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
       <artifactId>opencast-engage-paella-player-8</artifactId>
       <version>${project.version}</version>
     </dependency>
