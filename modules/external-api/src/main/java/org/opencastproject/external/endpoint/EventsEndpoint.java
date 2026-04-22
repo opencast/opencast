@@ -1637,7 +1637,7 @@ public class EventsEndpoint implements ManagedService {
 
     if (!extendedCatalogUIAdapters.isEmpty()) {
       Map<String, Map<String, List<String>>> extendedMetadata = event.getExtendedMetadata();
-      for (EventCatalogUIAdapter catalogUIAdapter : catalogUIAdapters) {
+      for (EventCatalogUIAdapter catalogUIAdapter : extendedCatalogUIAdapters) {
         if (extendedMetadata.containsKey(catalogUIAdapter.getFlavor().toString())) {
           Map<String, List<String>> extendedMetadataByType = extendedMetadata.get(
               catalogUIAdapter.getFlavor().toString());
