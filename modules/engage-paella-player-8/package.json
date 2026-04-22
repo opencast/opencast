@@ -16,7 +16,7 @@
     "check": "npm run eslint && npm run html-linter && npm run html-validate"
   },
   "devDependencies": {
-    "@asicupv/paella-embedapi": "^2.11.1",
+    "@asicupv/paella-embedapi": "^2.12.0",
     "@asicupv/paella-opencast-component": "^2.0.1",
     "@tailwindcss/vite": "^4.1.11",
     "eslint-config-opencast": "file:../../docs/checkstyle/eslint-config",
