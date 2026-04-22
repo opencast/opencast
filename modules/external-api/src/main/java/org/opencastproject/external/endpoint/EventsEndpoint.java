@@ -1654,7 +1654,7 @@ public class EventsEndpoint implements ManagedService {
               metadataField.setValue(null);
             }
           }
-          metadataList.add(catalogUIAdapter.getFlavor().toString(), catalogUIAdapter.getUITitle(), dublinCoreMetadata);
+          metadataList.add(catalogUIAdapter, dublinCoreMetadata);
         }
       }
     }
