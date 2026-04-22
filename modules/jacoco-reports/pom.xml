@@ -309,6 +309,11 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-engage-paella-player-8</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
       <artifactId>opencast-engage-ui</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -439,6 +444,16 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-list-providers-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-list-providers-impl</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
       <artifactId>opencast-live-schedule-api</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -470,6 +485,11 @@
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-lti-service-remote</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-matrix-notification-workflowoperation</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -775,6 +795,11 @@
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-statistics-provider-influx</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-statistics-provider-matomo</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
