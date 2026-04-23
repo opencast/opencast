@@ -563,6 +563,10 @@ public class LifeCycleManagementEndpoint {
     try {
       LifeCyclePolicy policy = service.getLifeCyclePolicyById(id);
 
+      if (policy.isCreatedFromConfig()) {
+        return Response.status(Response.Status.BAD_REQUEST).build();
+      }
+
       List<String> actionParametersList = new ArrayList<>();
       if (StringUtils.isNotBlank(actionParameters)) {
         for (String actionParameter : StringUtils.split(actionParameters, ",")) {
