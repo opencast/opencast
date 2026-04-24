@@ -91,6 +91,7 @@ public class LifeCycleTaskRunner {
   protected ScheduledExecutorService scheduledExecutor = null;
   private User systemAdminUser;
   private Organization defaultOrganization;
+  private final int maxConcurrentTasks = 1000;
 
 
   @Reference(name = "lifecycle-service")
@@ -164,8 +165,21 @@ public class LifeCycleTaskRunner {
             return;
           }
 
+          // Get number of tasks that are running
+          int numberOfRunningTasks = 0;
+          try {
+            numberOfRunningTasks = lifeCycleService.getLifeCycleTasksWithStatus(Status.STARTED).size();
+          } catch (NullPointerException e) {
+            logger.info("Could not get lifecycle tasks in status 'STARTED' from service: ", e);
+            return;
+          }
+
           // For each task
           for (LifeCycleTask task : tasks) {
+            // Prevent too many tasks from running at the same time to avoid system overload
+            if (numberOfRunningTasks > maxConcurrentTasks) {
+              break;
+            }
             // Check action and do action related things
             // TODO: Limit number of retries in case of error?
             try {
@@ -175,6 +189,7 @@ public class LifeCycleTaskRunner {
                 case START_WORKFLOW -> startWorkflow((LifeCycleTaskStartWorkflow)task, policy);
                 default -> throw new NotImplementedException();
               }
+              numberOfRunningTasks++;
             } catch (NotFoundException e) {
               logger.warn("Could not start action for task with id " + task.getId() + ". Lifecycle Policy with id "
                   + task.getLifeCyclePolicyId() + " was not found.");
