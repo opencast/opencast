@@ -80,6 +80,9 @@ release branch).
 
 Example on how to create the Opencast 7 release branch:
 
+0. Ensure that you have applied a replacement rule set up for github
+
+        git config --global url."git@github.com:opencast/".insteadOf "https://github.com/opencast/"
 
 1. Check out `develop` and make sure it has the latest state (replace `<remote>` with your remote name for the community
    repository):
@@ -276,6 +279,10 @@ needs to be done manually.
 ### Releasing
 
 The following steps outline the necessary steps for cutting the final release:
+
+0. Ensure that you have applied a replacement rule set up for github
+
+        git config --global url."git@github.com:opencast/".insteadOf "https://github.com/opencast/"
 
 0. Switch to and update your local release branch.
 
