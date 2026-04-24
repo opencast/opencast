@@ -17,8 +17,8 @@ permissions:
 jobs:
   target:
     if: >
-      github.event_name == 'workflow_dispatch' ||
-      github.event_name == 'push'
+      (github.event_name == 'workflow_dispatch' || github.event_name == 'push') &&
+      github.repository == 'opencast/opencast'
     runs-on: ubuntu-latest
     env:
       GH_TOKEN: ${{secrets.GITHUB_TOKEN }}
