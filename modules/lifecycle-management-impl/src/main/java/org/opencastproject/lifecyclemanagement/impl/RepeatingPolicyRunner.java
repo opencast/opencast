@@ -46,6 +46,7 @@ import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -212,14 +213,24 @@ public class RepeatingPolicyRunner {
               }
 
               // Filter for entities
-              List<Event> events = repeatingPolicyRunner.getLifeCycleService()
-                  .filterForEvents(policy.getTargetFilters());
+              List<String> eventIds = new ArrayList<>();
+              final int eventQueryLimit = 10000;
+              int offset = 0;
+              List<Event> events;
+              do {
+                events = repeatingPolicyRunner.getLifeCycleService().filterForEvents(policy.getTargetFilters(),
+                    eventQueryLimit, offset);
+                for (Event event : events) {
+                  eventIds.add(event.getIdentifier());
+                }
+                offset += eventQueryLimit;
+              } while (events.size() >= eventQueryLimit);
 
               // For every entity
-              for (Event event : events) {
+              for (String eventId : eventIds) {
                 // If entity does not yet have a task for this policy
                 try {
-                  repeatingPolicyRunner.getLifeCycleService().getLifeCycleTaskByTargetId(event.getIdentifier());
+                  repeatingPolicyRunner.getLifeCycleService().getLifeCycleTaskByTargetId(eventId);
                   // Task does exist, skip creating one
                   continue;
                 } catch (NotFoundException e) {
@@ -235,11 +246,12 @@ public class RepeatingPolicyRunner {
                 }
 
                 task.setLifeCyclePolicyId(policy.getId());
-                task.setTargetId(event.getIdentifier());
+                task.setTargetId(eventId);
                 task.setStatus(Status.SCHEDULED);
 
                 repeatingPolicyRunner.getLifeCycleService().createLifeCycleTask(task);
                 logger.info("Created task based on policy " + policy.getTitle());
+
               }
             } catch (SearchIndexException e) {
               logger.warn(e.toString());

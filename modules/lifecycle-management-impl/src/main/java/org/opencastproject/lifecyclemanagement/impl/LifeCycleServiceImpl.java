@@ -466,6 +466,16 @@ public class LifeCycleServiceImpl implements LifeCycleService {
    */
   public List<Event> filterForEvents(Map<String, Map<String, EventSearchQueryField<String>>> filters)
           throws SearchIndexException, NotFoundException {
+    return filterForEvents(filters, 0, 0);
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see LifeCycleService#filterForEvents(Map)
+   */
+  public List<Event> filterForEvents(Map<String, Map<String, EventSearchQueryField<String>>> filters, int limit,
+      int offset)
+          throws SearchIndexException, NotFoundException {
     try {
       SearchResult<Event> results = null;
       List<Event> eventsList = new ArrayList<>();
@@ -481,6 +491,12 @@ public class LifeCycleServiceImpl implements LifeCycleService {
       if (!series.isEmpty()) {
         isFilterPresent = true;
         series.forEach(s -> query.withSeriesId(s.getIdentifier()));
+      }
+
+      // Apply limit and offset
+      query.withOffset(offset);
+      if (limit > 0) {
+        query.withLimit(limit);
       }
 
       // Add filters to query

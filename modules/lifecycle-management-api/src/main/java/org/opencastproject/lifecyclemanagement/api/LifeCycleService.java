@@ -190,4 +190,6 @@ public interface LifeCycleService {
    */
   List<Event> filterForEvents(Map<String, Map<String, EventSearchQueryField<String>>> filters)
           throws SearchIndexException, NotFoundException;
+  List<Event> filterForEvents(Map<String, Map<String, EventSearchQueryField<String>>> filters, int limit, int offset)
+          throws SearchIndexException, NotFoundException;
 }
