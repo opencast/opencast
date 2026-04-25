@@ -83,10 +83,12 @@ jobs:
             -Dmaven.wagon.http.pool=false \
             -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
 
-        #This has to happen in a separate step or else various service classes aren't visible
+        # This has to happen in a separate step or else various service classes aren't visible
+        # The negated frontend profile here skips the npm builds which both speeds up the already painfully long build
+        # and also prevents issues related to submodules.  NPM related things don't appear in the code coverage reports anyway.
       - name: build maven site
         run: |
-          ./mvnw site -T1C -Pnone \
+          ./mvnw site -T1C -P'none,!frontend' \
             --batch-mode \
             -Dsurefire.rerunFailingTestsCount=2 \
             -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
