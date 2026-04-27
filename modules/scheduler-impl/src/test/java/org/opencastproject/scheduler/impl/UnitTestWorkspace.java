@@ -188,4 +188,8 @@ public class UnitTestWorkspace implements Workspace {
   public String rootDirectory() {
     return null;
   }
+
+  @Override public String getStorageName() {
+    return "Test Store";
+  }
 }

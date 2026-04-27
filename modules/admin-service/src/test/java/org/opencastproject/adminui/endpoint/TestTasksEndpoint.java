@@ -270,6 +270,10 @@ public class TestTasksEndpoint extends TasksEndpoint {
       public String getStoreType() {
         return "test_store";
       }
+
+      @Override public String getStorageName() {
+        return "Test Store";
+      }
     };
   }
 }
