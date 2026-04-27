@@ -51,78 +51,78 @@ import java.util.Objects;
 )
 public class RestServiceTracker extends ServiceTracker<Object, Object> {
 
-    private static final Logger logger = LoggerFactory.getLogger(RestServiceTracker.class);
+  private static final Logger logger = LoggerFactory.getLogger(RestServiceTracker.class);
 
-    protected static final String FILTER = "(" +  JaxrsWhiteboardConstants.JAX_RS_RESOURCE + "=true)";
+  protected static final String FILTER = "(" +  JaxrsWhiteboardConstants.JAX_RS_RESOURCE + "=true)";
 
-    protected BundleContext bundleContext;
+  protected BundleContext bundleContext;
 
-    private final ServiceRegistry serviceRegistry;
+  private final ServiceRegistry serviceRegistry;
 
-    @Activate
-    public RestServiceTracker(@Reference ServiceRegistry serviceRegistry, BundleContext bundleContext)
-                throws InvalidSyntaxException {
-        super(bundleContext, bundleContext.createFilter(FILTER), null);
-        this.bundleContext = bundleContext;
-        this.serviceRegistry = serviceRegistry;
-        this.open(true);
+  @Activate
+  public RestServiceTracker(@Reference ServiceRegistry serviceRegistry, BundleContext bundleContext)
+          throws InvalidSyntaxException {
+    super(bundleContext, bundleContext.createFilter(FILTER), null);
+    this.bundleContext = bundleContext;
+    this.serviceRegistry = serviceRegistry;
+    this.open(true);
+  }
+
+  @Deactivate
+  void deactivate() {
+    this.close();
+  }
+
+  @Override
+  public Object addingService(ServiceReference reference) {
+    String serviceType = (String) reference.getProperty(RestConstants.SERVICE_TYPE_PROPERTY);
+    String servicePath = (String) reference.getProperty(RestConstants.SERVICE_PATH_PROPERTY);
+
+    boolean publishFlag = Boolean.parseBoolean(
+        Objects.requireNonNullElse(
+          reference.getProperty(RestConstants.SERVICE_PUBLISH_PROPERTY), "true").toString()
+    );
+    boolean jobProducer = Boolean.parseBoolean(
+        Objects.requireNonNullElse(
+            reference.getProperty(RestConstants.SERVICE_JOBPRODUCER_PROPERTY), "false").toString()
+    );
+
+    // Only register services that have the "publish" flag set to "true"
+    if (publishFlag) {
+      try {
+        serviceRegistry.registerService(serviceType, serviceRegistry.getRegistryHostname(), servicePath,
+            jobProducer);
+      } catch (ServiceRegistryException e) {
+        logger.warn("Unable to register job producer of type " + serviceType + " on host "
+            + serviceRegistry.getRegistryHostname());
+      }
+    } else {
+      logger.debug("Not registering service " + serviceType + " in service registry by configuration");
     }
 
-    @Deactivate
-    void deactivate() {
-        this.close();
+    return super.addingService(reference);
+  }
+
+  @Override
+  public void removedService(ServiceReference reference, Object service) {
+    String serviceType = (String) reference.getProperty(RestConstants.SERVICE_TYPE_PROPERTY);
+    boolean publishFlag = Boolean.parseBoolean(Objects.toString(
+        reference.getProperty(RestConstants.SERVICE_PUBLISH_PROPERTY),
+        "true"));
+
+    // Services that have the "publish" flag set to "true" have been registered before.
+    if (publishFlag) {
+      try {
+        serviceRegistry.unRegisterService(serviceType, serviceRegistry.getRegistryHostname());
+      } catch (ServiceRegistryException e) {
+        logger.warn("Unable to unregister job producer of type {} on host {}",
+            serviceType, serviceRegistry.getRegistryHostname());
+      }
+    } else {
+      logger.trace("Service {} was never registered", reference);
     }
 
-    @Override
-    public Object addingService(ServiceReference reference) {
-        String serviceType = (String) reference.getProperty(RestConstants.SERVICE_TYPE_PROPERTY);
-        String servicePath = (String) reference.getProperty(RestConstants.SERVICE_PATH_PROPERTY);
-
-        boolean publishFlag = Boolean.parseBoolean(
-            Objects.requireNonNullElse(
-                reference.getProperty(RestConstants.SERVICE_PUBLISH_PROPERTY), "true").toString()
-        );
-        boolean jobProducer = Boolean.parseBoolean(
-            Objects.requireNonNullElse(
-                reference.getProperty(RestConstants.SERVICE_JOBPRODUCER_PROPERTY), "false").toString()
-        );
-
-        // Only register services that have the "publish" flag set to "true"
-        if (publishFlag) {
-            try {
-                serviceRegistry.registerService(serviceType, serviceRegistry.getRegistryHostname(), servicePath,
-                    jobProducer);
-            } catch (ServiceRegistryException e) {
-                logger.warn("Unable to register job producer of type " + serviceType + " on host "
-                    + serviceRegistry.getRegistryHostname());
-            }
-        } else {
-            logger.debug("Not registering service " + serviceType + " in service registry by configuration");
-        }
-
-        return super.addingService(reference);
-    }
-
-    @Override
-    public void removedService(ServiceReference reference, Object service) {
-        String serviceType = (String) reference.getProperty(RestConstants.SERVICE_TYPE_PROPERTY);
-        boolean publishFlag = Boolean.parseBoolean(Objects.toString(
-            reference.getProperty(RestConstants.SERVICE_PUBLISH_PROPERTY),
-            "true"));
-
-        // Services that have the "publish" flag set to "true" have been registered before.
-        if (publishFlag) {
-            try {
-                serviceRegistry.unRegisterService(serviceType, serviceRegistry.getRegistryHostname());
-            } catch (ServiceRegistryException e) {
-                logger.warn("Unable to unregister job producer of type {} on host {}",
-                    serviceType, serviceRegistry.getRegistryHostname());
-            }
-        } else {
-            logger.trace("Service {} was never registered", reference);
-        }
-
-        super.removedService(reference, service);
-    }
+    super.removedService(reference, service);
+  }
 
 }

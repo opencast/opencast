@@ -53,11 +53,11 @@ import java.util.stream.Stream;
 import javax.persistence.EntityManagerFactory;
 
 @Component(
-  property = {
-    "service.description=Incident service"
-  },
-  immediate = true,
-  service = { IncidentService.class }
+    property = {
+      "service.description=Incident service"
+    },
+    immediate = true,
+    service = { IncidentService.class }
 )
 public class OsgiIncidentService extends AbstractIncidentService implements BundleListener {
   /** The logging instance */
