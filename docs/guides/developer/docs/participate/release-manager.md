@@ -85,6 +85,9 @@ for a given release.  This branch is split off `develop` and should be named `r/
 
 Example on how to create the Opencast {{ opencast_major_version() }} release branch:
 
+0. Ensure that you have applied a replacement rule set up for github
+
+        git config --global url."git@github.com:opencast/".insteadOf "https://github.com/opencast/"
 
 1. Check out `develop` and make sure it has the latest state (replace `<remote>` with your remote name for the community
    repository):
@@ -295,27 +298,21 @@ needs to be done manually.
 The following steps outline the necessary steps for cutting the final release, using {{ opencast_major_version() }}.0
 as an example:
 
-0. Switch to and update your local release branch, ensuring your local branch is up to date with the main repo.
+0. Ensure that you have applied a replacement rule set up for github
 
-1. Cut and merge a [new release of the admin UI](https://github.com/opencast/opencast-admin-interface) if necessary
+        git config --global url."git@github.com:opencast/".insteadOf "https://github.com/opencast/"
 
-2. Cut and merge a [new release of the editor](https://github.com/opencast/opencast-editor) if necessary
+1. Switch to and update your local release branch, ensuring your local branch is up to date with the main repo.
 
-3. Cut and merge a [new release of studio](https://github.com/opencast/studio) if necessary
-
-4. Update the release notes and changelog
-
-    - First move to the correct directory
-
-            cd docs/guide/admin/docs
-
-    - Update the changelog. The `create-changelog` [helper script
+2. Add the release notes, and update the changelog. The `create-changelog` [helper script
    ](https://github.com/opencast/helper-scripts/tree/master/release-management/create-changelog) is a convenient tool
    for this.  The script can be called a few different ways, please read the documentation and figure our yours.
 
-            python3 helper-scripts/release-management/create-changelog.py [args] >> changelog/opencast-{{ opencast_major_version() }}.md
-            [ manual check that the doc looks correct ]
-            git add changelog/opencast-{{ opencast_major_version() }}.md
+        cd docs/guides/admin/docs/
+        vim releasenotes.md
+        python3 helper-scripts/release-management/create-changelog.py [args] >> changelog/opencast-{{ opencast_major_version() }}.md
+        [ manual check that the doc looks correct ]
+        git add changelog/opencast-{{ opencast_major_version() }}.md
 
     - Check that PRs tagged as features are all listed in the release notes, since sometimes committers miss adding the
     text files.
@@ -327,25 +324,22 @@ as an example:
    `docs/guides/admin/docs/releasenotes` directory.  the release notes for a minor release (x.y) should be a rough
    summary of the development activity between x.y and x.y-1
 
-            vim releasenotes.md
-            git commit -s releasenotes.md changelog.md -m 'updated release notes and changelog'
-            git push <remote> r/{{ opencast_major_version() }}.x
-
-5. Switch to a new branch to create the release (name does not really matter):
+3. Switch to a new branch to create the release (name does not really matter):
 
         git checkout -b tmp-{{ opencast_major_version() }}.0
+        git submodule foreach git checkout -b tmp-{{ opencast_major_version() }}.0
 
-6. Make the version changes for the release:
+4. Make the version changes for the release:
 
         ./mvnw versions:set -DnewVersion={{ opencast_major_version() }}.0 versions:commit
 
-7. Have a look at the changes. Make sure that nothing else was modified:
+5. Have a look at the changes. Make sure that nothing else was modified:
 
         git diff
         # The following command should yield no output:
-        git status | grep modified: | grep -v pom.xml
+        git status | grep modified: | grep -v pom.xml | grep -v "modified content"
 
-8. Commit the changes:
+6. Commit the changes and create a release tag:
 
         git submodule foreach git add pom.xml
         git submodule foreach git commit -S -m 'Opencast {{ opencast_major_version() }}.0'
@@ -353,30 +347,31 @@ as an example:
         git add $(git submodule | cut -f 2 -d " ")
         git commit -S -m 'Opencast {{ opencast_major_version() }}.0'
 
-9. Build and test the distributions.  Start each one and make sure they boot successfully.
+7. Build and test the distributions.  Start each one and make sure they boot successfully.
 
-10. Push the tag to the community repository, and remove the local branch:
+8. Push the tag to the community repository (you can remove the branch afterwards):
 
         git submodule foreach git tag -s {{ opencast_major_version() }}.0 -m 'Opencast {{ opencast_major_version() }}.0'
         git tag -s {{ opencast_major_version() }}.0 -m 'Opencast {{ opencast_major_version() }}.0'
         git submodule foreach git push origin {{ opencast_major_version() }}.0
         git push <remote> {{ opencast_major_version() }}.0
         git branch -D tmp-{{ opencast_major_version() }}.0
+        git submodule foreach git branch -D tmp-{{ opencast_major_version() }}.0
 
-11. Check the “Create new release” GitHub Actions workflow.
-    It will automatically build and upload the release tarballs and create a new release draft.
-    Once it is finished, review the draft, adjust the description and publish the release.
+9. Check the “Create new release” GitHub Actions workflow.
+   It will automatically build and upload the release tarballs and create a new release draft.
+   Once it is finished, review the draft, adjust the description and publish the release.
 
-    If the workflow fails, investigate what was going wrong and either restart the workflow or create the release
-    manually in the GitHub user interface.
+   If the workflow fails, investigate what was going wrong and either restart the workflow or create the release
+   manually in the GitHub user interface.
 
-12. In the case a x.0 release, post a release notification on [opencast.org](https://opencast.org).  You will need to
+10. In the case a x.0 release, post a release notification on [opencast.org](https://opencast.org).  You will need to
     ensure you have the appropriate permissions - talk to the QA Coordinator, or the board if you do not know how or
     have the rights.  Typically we reuse a previous major version's message, altering the version numbers, but the
     actual content is up to the release manager.
 
 
-13. Check that the release is published on [Maven Central](https://repo1.maven.org/maven2/org/opencastproject/opencast-common/).
+11. Check that the release is published on [Maven Central](https://repo1.maven.org/maven2/org/opencastproject/opencast-common/).
     This can take some time, and is done via [Buildbot](http://ci.opencast.org).  If in doubt, ask the QA Coordinator to
     check.  If you need to do this yourself please read the [infra documentation](infrastructure/maven-repository.md#pushing-to-maven-central).
 
