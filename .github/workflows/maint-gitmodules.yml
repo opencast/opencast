@@ -17,6 +17,6 @@ jobs:
 
       - name: check .gitmodules has correct versions, the correct number of times
         run: |
-          if [ 3 -ne "$(grep 'branch = ${{ github.ref_name }}' .gitmodules | wc -l)" ]; then
+          if [ 3 -ne "$(grep 'branch = ${{ github.base_ref }}' .gitmodules | wc -l)" ]; then
             exit 1
           fi
