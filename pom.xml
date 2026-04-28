@@ -1526,16 +1526,16 @@
           </reportSet>
         </reportSets>
       </plugin>
-      <plugin>
+      <!--<plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-pmd-plugin</artifactId>
         <configuration>
           <aggregate>true</aggregate>
-          <!--<includeTests>true</includeTests>-->
+          <!- -<includeTests>true</includeTests>- ->
           <typeResolution>true</typeResolution>
           <targetJdk>${java.release}</targetJdk>
         </configuration>
-      </plugin>
+      </plugin>-->
     </plugins>
   </reporting>
   <repositories>
