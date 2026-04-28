@@ -110,27 +110,34 @@ Example on how to create the Opencast {{ opencast_major_version() }} release bra
         git push <remote> r/{{ opencast_major_version() }}.x
         git submodule foreach git push <remote> r/{{ opencast_major_version() }}.x
 
-4. That is it for the release branch. Now update the versions in `develop` in preparation for the next release:
+4. Merge the new release branch forward, then fix the submodule versions back to develop
 
         git checkout develop
+        git merge r/{{ opencast_major_version() }}.x
+        sed -i 's#branch = .*#branch = develop#g' .gitmodules
+        git add .gitmodules
+        git commit -m "Reversing forward merge of submodule branches"
+
+5. Now update the pom versions in `develop` in preparation for the next release:
+
         ./mvnw versions:set -DnewVersion={{ opencast_major_version() + 1 }}-SNAPSHOT versions:commit
 
-5. Have a look at the changes. Make sure that nothing else was modified:
+6. Have a look at the changes. Make sure that nothing else was modified:
 
         git diff
         git status | grep modified: | grep -v pom.xml | grep -v "modified content"  # this should have no output
 
-6. If everything looks fine, commit the changes and push it to the community repository:
+7. If everything looks fine, commit the changes and push it to the community repository:
 
         git submodule foreach git add pom.xml
-        git submodule foreach git commit -s -m 'Bumping pom.xml Version Nnumbers'
+        git submodule foreach git commit -s -m 'Bumping pom.xml Version Numbers'
         git add $(git status | grep 'modified:.*pom.xml' | awk '{print $2;}')
         git add $(git submodule | cut -f 2 -d " ")
         git commit -s -m 'Bumping pom.xml Version Numbers'
         git push <remote> develop
         git submodule foreach git push origin develop
 
-7. File a PR against the infra repo updating version numbers:
+8. File a PR against the infra repo updating version numbers:
 
         git clone -b master git@github.com:opencast/opencast-project-infrastructure.git
         [ Update ansible-demo-machines/deploy.yml ]

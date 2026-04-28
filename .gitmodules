@@ -1,12 +1,12 @@
 [submodule "modules/editor"]
 	path = modules/editor
 	url = https://github.com/opencast/editor
-	branch = r/20.x
+	branch = develop
 [submodule "modules/studio"]
 	path = modules/studio
 	url = https://github.com/opencast/studio
-	branch = r/20.x
+	branch = develop
 [submodule "modules/admin"]
 	path = modules/admin
 	url = https://github.com/opencast/admin-interface
-	branch = r/20.x
+	branch = develop
