@@ -487,7 +487,7 @@ public class JobDispatcher {
      * @throws UndispatchableJobException  if the current job cannot be processed
      */
     private String dispatchJob(JpaJob job, List<ServiceRegistration> services)
-        throws ServiceRegistryException, ServiceUnavailableException, UndispatchableJobException {
+            throws ServiceRegistryException, ServiceUnavailableException, UndispatchableJobException {
       if (services.size() == 0) {
         logger.debug("No service is currently available to handle jobs of type '" + job.getJobType() + "'");
         throw new ServiceUnavailableException("No service of type " + job.getJobType() + " available");

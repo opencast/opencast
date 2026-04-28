@@ -43,11 +43,11 @@ import org.slf4j.LoggerFactory;
  * This dummy service just exists for creating jobs for testing purposes.
  */
 @Component(
-  property = {
-    "service.description=No operation service"
-  },
-  immediate = true,
-  service = { NopService.class }
+    property = {
+      "service.description=No operation service"
+    },
+    immediate = true,
+    service = { NopService.class }
 )
 public final class NopServiceImpl extends OsgiAbstractJobProducer implements NopService {
   private static final Logger log = LoggerFactory.getLogger(NopServiceImpl.class);

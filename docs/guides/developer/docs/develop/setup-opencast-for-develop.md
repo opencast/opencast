@@ -243,7 +243,6 @@ To use it in IntelliJ, follow these steps:
     4. Select “Use a local Checkstyle file“
     5. Fill the blanks:
         - checkstyle.header.file: `/docs/checkstyle/checkstyle-header.txt`
-        - checkstyle.supressions.file: `/docs/checkstyle/checkstyle-suppressions.xml`
 
 To use the plugin, you can run manually the check-style plugin through the menu View → Tool Windows → Checkstyle.
 
