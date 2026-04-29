@@ -61,10 +61,12 @@ public final class MetadataJson {
   private static final String JSON_KEY_TRANSLATABLE = "translatable";
   private static final String JSON_KEY_DELIMITER = "delimiter";
   private static final String JSON_KEY_DIFFERENT_VALUES = "differentValues";
+  private static final String JSON_KEY_LISTPROVIDER = "listprovider";
   private static final String KEY_METADATA_TITLE = "title";
   private static final String KEY_METADATA_FLAVOR = "flavor";
   private static final String KEY_METADATA_FIELDS = "fields";
   private static final String KEY_METADATA_LOCKED = "locked";
+
 
   /* Keys for the different properties of the metadata JSON Object */
   private static final String KEY_METADATA_ID = "id";
@@ -357,7 +359,8 @@ public final class MetadataJson {
     }
   }
 
-  public static JsonObject fieldToJson(final MetadataField f, final boolean withOrderedText) {
+  public static JsonObject fieldToJson(final MetadataField f, final boolean withOrderedText,
+      final boolean withListprovider) {
     Objects.requireNonNull(f);
 
     JsonObject json = new JsonObject();
@@ -385,6 +388,10 @@ public final class MetadataJson {
       json.addProperty(JSON_KEY_DIFFERENT_VALUES, f.hasDifferentValues());
     }
 
+    if (f.getListprovider() != null && withListprovider) {
+      json.addProperty(JSON_KEY_LISTPROVIDER, f.getListprovider());
+    }
+
     return json;
   }
 
@@ -399,10 +406,10 @@ public final class MetadataJson {
   }
 
   public static JsonArray collectionToJson(final DublinCoreMetadataCollection collection,
-      final boolean withOrderedText) {
+      final boolean withOrderedText, final boolean withListprovider) {
     JsonArray jsonArray = new JsonArray();
     for (MetadataField field : collection.getFields()) {
-      JsonObject fieldJson = fieldToJson(field, withOrderedText);
+      JsonObject fieldJson = fieldToJson(field, withOrderedText, withListprovider);
       jsonArray.add(fieldJson);
     }
     return jsonArray;
@@ -465,7 +472,8 @@ public final class MetadataJson {
     }
   }
 
-  public static JsonArray listToJson(final MetadataList metadataList, final boolean withOrderedText) {
+  public static JsonArray listToJson(final MetadataList metadataList, final boolean withOrderedText,
+      final boolean withListprovider) {
     JsonArray catalogs = new JsonArray();
 
     for (Map.Entry<String, MetadataList.TitledMetadataCollection> metadata
@@ -481,7 +489,7 @@ public final class MetadataJson {
 
       catalogJson.addProperty(KEY_METADATA_FLAVOR, metadata.getKey());
       catalogJson.addProperty(KEY_METADATA_TITLE, metadata.getValue().getTitle());
-      catalogJson.add(KEY_METADATA_FIELDS, collectionToJson(metadataCollection, withOrderedText));
+      catalogJson.add(KEY_METADATA_FIELDS, collectionToJson(metadataCollection, withOrderedText, withListprovider));
 
       catalogs.add(catalogJson);
     }

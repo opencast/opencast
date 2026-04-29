@@ -1246,6 +1246,6 @@ public class EditorServiceImpl implements EditorService {
       metadataList.setLocked(MetadataList.Locked.WORKFLOW_RUNNING);
     }
 
-    return MetadataJson.listToJson(metadataList, true).toString();
+    return MetadataJson.listToJson(metadataList, true, false).toString();
   }
 }
