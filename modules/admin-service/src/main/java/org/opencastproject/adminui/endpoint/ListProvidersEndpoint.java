@@ -37,6 +37,7 @@ import org.opencastproject.list.api.ResourceListQuery;
 import org.opencastproject.list.common.query.EventListQuery;
 import org.opencastproject.list.common.query.GroupsListQuery;
 import org.opencastproject.list.common.query.JobsListQuery;
+import org.opencastproject.list.common.query.PlaylistsListQuery;
 import org.opencastproject.list.common.query.SeriesListQuery;
 import org.opencastproject.list.common.query.ServersListQuery;
 import org.opencastproject.list.common.query.ServicesListQuery;
@@ -284,6 +285,8 @@ public class ListProvidersEndpoint {
       query = new ServicesListQuery();
     } else if ("themes".equals(page)) {
       query = new ThemesListQuery();
+    } else if ("playlists".equals(page)) {
+      query = new PlaylistsListQuery();
     } else {
       logger.debug("No filters defined for the page {}.", page);
       return NO_CONTENT;
