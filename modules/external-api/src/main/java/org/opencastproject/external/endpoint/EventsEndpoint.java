@@ -53,6 +53,7 @@ import org.opencastproject.external.util.AclUtils;
 import org.opencastproject.external.util.ExternalMetadataUtils;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.catalog.adapter.DublinCoreMetadataUtil;
+import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.impl.util.EventHttpServletRequest;
 import org.opencastproject.index.service.impl.util.EventUtils;
@@ -153,6 +154,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -191,7 +193,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
             ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0,
             ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0,
             ApiMediaType.VERSION_1_9_0, ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0,
-            ApiMediaType.VERSION_1_12_0})
+            ApiMediaType.VERSION_1_12_0 })
 @RestService(name = "externalapievents", title = "External API Events Service", notes = {},
              abstractText = "Provides resources and operations related to the events")
 @Tag(name = "External API")
@@ -1328,7 +1330,8 @@ public class EventsEndpoint implements ManagedService {
       try {
         Optional<MetadataList> metadata = getEventMetadata(event);
         if (metadata.isPresent()) {
-          json.add("metadata", MetadataJson.listToJson(metadata.get(), true));
+          boolean includeListprovider = !requestedVersion.isSmallerThan(ApiVersion.VERSION_1_12_0);
+          json.add("metadata", MetadataJson.listToJson(metadata.get(), true, includeListprovider));
         }
       } catch (Exception e) {
         logger.error("Unable to get metadata for event '{}'", event.getIdentifier(), e);
@@ -1576,8 +1579,9 @@ public class EventsEndpoint implements ManagedService {
         if (collection != null) {
           convertStartDateTimeToApiV1(collection);
         }
-
-        return ApiResponseBuilder.Json.ok(requestedVersion, MetadataJson.listToJson(actualList, withOrderedText));
+        boolean includeListprovider = !requestedVersion.isSmallerThan(ApiVersion.VERSION_1_12_0);
+        return ApiResponseBuilder.Json.ok(requestedVersion, MetadataJson.listToJson(actualList, withOrderedText,
+            includeListprovider));
       }
       else {
         return ApiResponseBuilder.notFound("Cannot find an event with id '%s'.", id);
@@ -1629,20 +1633,37 @@ public class EventsEndpoint implements ManagedService {
 
   protected Optional<MetadataList> getEventMetadata(Event event) throws IndexServiceException, Exception {
     MetadataList metadataList = new MetadataList();
-    List<EventCatalogUIAdapter> catalogUIAdapters = getEventCatalogUIAdapters();
-    EventCatalogUIAdapter eventCatalogUIAdapter = indexService.getCommonEventCatalogUIAdapter();
-    catalogUIAdapters.remove(eventCatalogUIAdapter);
-    if (catalogUIAdapters.size() > 0) {
-      MediaPackage mediaPackage = indexService.getEventMediapackage(event);
-      for (EventCatalogUIAdapter catalogUIAdapter : catalogUIAdapters) {
-        // TODO: This is very slow:
-        DublinCoreMetadataCollection fields = catalogUIAdapter.getFields(mediaPackage);
-        if (fields != null) {
-          ExternalMetadataUtils.removeCollectionList(fields);
-          metadataList.add(catalogUIAdapter, fields);
+
+    // Get configured extended metadata fields & fill with values from index
+    Set<EventCatalogUIAdapter> extendedCatalogUIAdapters = getEventCatalogUIAdapters().stream()
+        .filter(c -> !(c instanceof CommonEventCatalogUIAdapter)).collect(Collectors.toSet());
+
+    if (!extendedCatalogUIAdapters.isEmpty()) {
+      Map<String, Map<String, List<String>>> extendedMetadata = event.getExtendedMetadata();
+      for (EventCatalogUIAdapter catalogUIAdapter : extendedCatalogUIAdapters) {
+        if (extendedMetadata.containsKey(catalogUIAdapter.getFlavor().toString())) {
+          Map<String, List<String>> extendedMetadataByType = extendedMetadata.get(
+              catalogUIAdapter.getFlavor().toString());
+          DublinCoreMetadataCollection dublinCoreMetadata = catalogUIAdapter.getRawFields(new EmptyResourceListQuery());
+          ExternalMetadataUtils.removeCollectionList(dublinCoreMetadata);
+          for (MetadataField metadataField: dublinCoreMetadata.getFields()) {
+            // currently doesn't consider namespaces
+            if (extendedMetadataByType.containsKey(metadataField.getInputID())) {
+              List<String> values = extendedMetadataByType.get(metadataField.getInputID());
+              // values are from index, but same format as in catalog
+              DublinCoreMetadataCollection.setValueFromDCCatalog(values, metadataField);
+            } else {
+              // overwrite any default values contained in raw fields to accurately reflect event state
+              metadataField.setValue(null);
+            }
+          }
+          metadataList.add(catalogUIAdapter, dublinCoreMetadata);
         }
       }
     }
+
+    // Common metadata
+    EventCatalogUIAdapter eventCatalogUIAdapter = indexService.getCommonEventCatalogUIAdapter();
     DublinCoreMetadataCollection collection = EventUtils.getEventMetadata(event, eventCatalogUIAdapter,
         new EmptyResourceListQuery());
     ExternalMetadataUtils.changeSubjectToSubjects(collection);
@@ -1665,6 +1686,7 @@ public class EventsEndpoint implements ManagedService {
 
   private Response getEventMetadataByType(String id, String type, ApiVersion requestedVersion) throws Exception {
     Optional<Event> eventOpt = indexService.getEvent(id, elasticsearchIndex);
+
     if (eventOpt.isPresent()) {
       Event event = eventOpt.get();
       Optional<MediaPackageElementFlavor> flavor = getFlavor(type);
@@ -1672,6 +1694,8 @@ public class EventsEndpoint implements ManagedService {
         return R.badRequest(
                 String.format("Unable to parse type '%s' as a flavor so unable to find the matching catalog.", type));
       }
+
+      boolean includeListprovider = !requestedVersion.isSmallerThan(ApiVersion.VERSION_1_12_0);
       // Try the main catalog first as we load it from the index.
       EventCatalogUIAdapter eventCatalogUIAdapter = indexService.getCommonEventCatalogUIAdapter();
       if (flavor.get().equals(eventCatalogUIAdapter.getFlavor())) {
@@ -1680,7 +1704,8 @@ public class EventsEndpoint implements ManagedService {
         ExternalMetadataUtils.changeSubjectToSubjects(collection);
         ExternalMetadataUtils.removeCollectionList(collection);
         convertStartDateTimeToApiV1(collection);
-        return ApiResponseBuilder.Json.ok(requestedVersion, MetadataJson.collectionToJson(collection, false));
+        return ApiResponseBuilder.Json.ok(requestedVersion, MetadataJson.collectionToJson(collection, false,
+            includeListprovider));
       }
       // Try the other catalogs
       List<EventCatalogUIAdapter> catalogUIAdapters = getEventCatalogUIAdapters();
@@ -1692,7 +1717,8 @@ public class EventsEndpoint implements ManagedService {
             DublinCoreMetadataCollection fields = catalogUIAdapter.getFields(mediaPackage);
             ExternalMetadataUtils.removeCollectionList(fields);
             convertStartDateTimeToApiV1(fields);
-            return ApiResponseBuilder.Json.ok(requestedVersion, MetadataJson.collectionToJson(fields, false));
+            return ApiResponseBuilder.Json.ok(requestedVersion, MetadataJson.collectionToJson(fields, false,
+                includeListprovider));
           }
         }
       }
@@ -2306,9 +2332,9 @@ public class EventsEndpoint implements ManagedService {
   @GET
   @Path("{eventId}/scheduling")
   @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0,
-      ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0, ApiMediaType.VERSION_1_6_0,
-      ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0, ApiMediaType.VERSION_1_9_0,
-      ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0, ApiMediaType.VERSION_1_12_0 })
+              ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0, ApiMediaType.VERSION_1_6_0,
+              ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0, ApiMediaType.VERSION_1_9_0,
+              ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0, ApiMediaType.VERSION_1_12_0 })
   @RestQuery(
       name = "geteventscheduling",
       description = "Returns an event's scheduling information.",
@@ -2347,9 +2373,9 @@ public class EventsEndpoint implements ManagedService {
   @PUT
   @Path("{eventId}/scheduling")
   @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0, ApiMediaType.VERSION_1_3_0,
-      ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0, ApiMediaType.VERSION_1_6_0,
-      ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0, ApiMediaType.VERSION_1_9_0,
-      ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0, ApiMediaType.VERSION_1_12_0 })
+              ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0, ApiMediaType.VERSION_1_6_0,
+              ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0, ApiMediaType.VERSION_1_9_0,
+              ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0, ApiMediaType.VERSION_1_12_0 })
   @RestQuery(
       name = "updateeventscheduling",
       description = "Update an event's scheduling information.",

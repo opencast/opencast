@@ -119,7 +119,8 @@ public class MetadataFieldTest {
             .getResource("/catalog-adapter/text/text-with-different-values.json"), StandardCharsets.UTF_8);
     assertThat(
             withDifferentValuesJson,
-            SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(textField, true))));
+            SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(textField, true,
+                true))));
   }
 
 
@@ -191,7 +192,8 @@ public class MetadataFieldTest {
             StringUtils.isNotBlank(dateTimePattern) ? dateTimePattern : null,
             null);
     dateField1.setValue(testDate);
-    assertThat(dateJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(dateField1, true))));
+    assertThat(dateJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(dateField1, true,
+        true))));
   }
 
   @Test
@@ -228,7 +230,7 @@ public class MetadataFieldTest {
     String expectedJSON = gson.toJson(jsonMap);
 
     assertThat(expectedJSON, SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(dateField1,
-        true))));
+        true, true))));
   }
 
   @Test
@@ -252,7 +254,8 @@ public class MetadataFieldTest {
             null,
             StringUtils.isNotBlank(datePattern) ? datePattern : null,
             null);
-    assertThat(dateJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(dateField1, true))));
+    assertThat(dateJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(dateField1, true,
+        true))));
   }
 
   @Test
@@ -277,7 +280,7 @@ public class MetadataFieldTest {
             null,
             null);
     assertThat(emptyValueJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(
-            MetadataJson.fieldToJson(emptyValueTextField, true))));
+            MetadataJson.fieldToJson(emptyValueTextField, true, true))));
   }
 
   @Test
@@ -304,7 +307,7 @@ public class MetadataFieldTest {
             null);
     textField.setValue(textValue);
     assertThat(withValueJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(textField,
-        true))));
+        true, true))));
   }
 
   @Test
@@ -330,7 +333,8 @@ public class MetadataFieldTest {
             null);
     assertThat(
             withCollectionJson,
-            SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(textFieldWithCollection, true))));
+            SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(textFieldWithCollection, true,
+                true))));
   }
 
   @Test
@@ -356,7 +360,8 @@ public class MetadataFieldTest {
             null);
     assertThat(
             withCollectionIDJson,
-            SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(textFieldWithCollectionID, true))));
+            SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(textFieldWithCollectionID, true,
+                true))));
   }
 
   @Test
@@ -383,6 +388,7 @@ public class MetadataFieldTest {
     textLongField.setValue("This is the text value");
     assertThat(
             withCollectionIDJson,
-            SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(textLongField, true))));
+            SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.fieldToJson(textLongField, true,
+                true))));
   }
 }

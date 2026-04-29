@@ -20,6 +20,8 @@
  */
 package org.opencastproject.external.common;
 
+import static org.opencastproject.external.common.ApiVersion.VERSION_1_12_0;
+
 public final class ApiMediaType {
 
   public static final String VERSION_1_12_0 = "application/v1.12.0+json";

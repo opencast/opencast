@@ -129,10 +129,10 @@ import javax.ws.rs.core.Response.Status;
 
 @Path("/api/series")
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0,
-    ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0,
-    ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0,
-    ApiMediaType.VERSION_1_9_0, ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0,
-    ApiMediaType.VERSION_1_12_0 })
+            ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0,
+            ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0,
+            ApiMediaType.VERSION_1_9_0, ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0,
+            ApiMediaType.VERSION_1_12_0 })
 @RestService(
     name = "externalapiseries",
     title = "External API Series Service",
@@ -553,7 +553,9 @@ public class SeriesEndpoint {
     DublinCoreMetadataCollection collection = getSeriesMetadata(optSeries.get());
     ExternalMetadataUtils.changeSubjectToSubjects(collection);
     metadataList.add(indexService.getCommonSeriesCatalogUIAdapter(), collection);
-    return ApiResponseBuilder.Json.ok(requestedVersion, MetadataJson.listToJson(metadataList, false));
+    boolean includeListprovider = !requestedVersion.isSmallerThan(ApiVersion.VERSION_1_12_0);
+    return ApiResponseBuilder.Json.ok(requestedVersion, MetadataJson.listToJson(metadataList, false,
+        includeListprovider));
   }
 
   private Response getMetadataByType(String id, String type, ApiVersion requestedVersion) throws SearchIndexException {
@@ -563,11 +565,13 @@ public class SeriesEndpoint {
       return ApiResponseBuilder.notFound("Cannot find a series with id '%s'.", id);
     }
 
+    boolean includeListprovider = !requestedVersion.isSmallerThan(ApiVersion.VERSION_1_12_0);
     // Try the main catalog first as we load it from the index.
     if (typeMatchesSeriesCatalogUIAdapter(type, indexService.getCommonSeriesCatalogUIAdapter())) {
       DublinCoreMetadataCollection collection = getSeriesMetadata(optSeries.get());
       ExternalMetadataUtils.changeSubjectToSubjects(collection);
-      return ApiResponseBuilder.Json.ok(requestedVersion, MetadataJson.collectionToJson(collection, false));
+      return ApiResponseBuilder.Json.ok(requestedVersion, MetadataJson.collectionToJson(collection, false,
+          includeListprovider));
     }
 
     // Try the other catalogs
@@ -579,7 +583,7 @@ public class SeriesEndpoint {
         final Optional<DublinCoreMetadataCollection> optSeriesMetadata = adapter.getFields(id);
         if (optSeriesMetadata.isPresent()) {
           return ApiResponseBuilder.Json.ok(requestedVersion, MetadataJson.collectionToJson(optSeriesMetadata.get(),
-              true));
+              true, includeListprovider));
         }
       }
     }
@@ -1001,7 +1005,10 @@ public class SeriesEndpoint {
           throws UnauthorizedException, NotFoundException, SearchIndexException {
     try {
       MetadataList metadataList = indexService.updateAllSeriesMetadata(seriesID, metadataJSON, elasticsearchIndex);
-      return ApiResponseBuilder.Json.ok(acceptHeader, MetadataJson.listToJson(metadataList, true));
+      final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
+      boolean includeListprovider = !requestedVersion.isSmallerThan(ApiVersion.VERSION_1_12_0);
+      return ApiResponseBuilder.Json.ok(acceptHeader, MetadataJson.listToJson(metadataList, true,
+          includeListprovider));
     } catch (IllegalArgumentException e) {
       logger.debug("Unable to update series '{}' with metadata '{}'", seriesID, metadataJSON, e);
       return RestUtil.R.badRequest(e.getMessage());

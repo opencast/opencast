@@ -40,6 +40,7 @@ import org.opencastproject.mediapackage.identifier.Id;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.security.api.TrustedHttpClientException;
+import org.opencastproject.storage.StorageUsage;
 import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.HttpUtil;
 import org.opencastproject.util.IoSupport;
@@ -106,7 +107,7 @@ import javax.ws.rs.core.UriBuilder;
     "service.description=Workspace"
     },
     immediate = true,
-    service = { Workspace.class }
+    service = { Workspace.class, StorageUsage.class }
 )
 public final class WorkspaceImpl implements Workspace {
   /** The logging facility */
@@ -977,5 +978,10 @@ public final class WorkspaceImpl implements Workspace {
         }
       }
     }
+  }
+
+  @Override
+  public String getStorageName() {
+    return "Workspace";
   }
 }

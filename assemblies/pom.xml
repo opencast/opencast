@@ -133,7 +133,6 @@
               <feature>opencast-plugin-userdirectory-brightspace</feature>
               <feature>opencast-plugin-usertracking</feature>
               <feature>opencast-plugin-graphql</feature>
-              <feature>opencast-plugin-paella7</feature>
             </installedFeatures>
           </configuration>
         </plugin>

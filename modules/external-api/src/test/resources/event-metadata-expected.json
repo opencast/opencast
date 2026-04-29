@@ -33,7 +33,8 @@
         "label": "EVENTS.EVENTS.DETAILS.METADATA.LANGUAGE",
         "type": "text",
         "value": "",
-        "required": false
+        "required": false,
+        "listprovider": "LANGUAGES"
       },
       {
         "readOnly": false,
@@ -49,7 +50,8 @@
         "label": "EVENTS.EVENTS.DETAILS.METADATA.LICENSE",
         "type": "text",
         "value": "",
-        "required": false
+        "required": false,
+        "listprovider": "LICENSES"
       },
       {
         "readOnly": false,
@@ -57,7 +59,8 @@
         "label": "EVENTS.EVENTS.DETAILS.METADATA.SERIES",
         "type": "text",
         "value": "",
-        "required": false
+        "required": false,
+        "listprovider": "SERIES"
       },
       {
         "readOnly": false,
@@ -65,7 +68,8 @@
         "label": "EVENTS.EVENTS.DETAILS.METADATA.PRESENTERS",
         "type": "mixed_text",
         "value": [],
-        "required": false
+        "required": false,
+        "listprovider": "CONTRIBUTORS"
       },
       {
         "readOnly": false,
@@ -73,7 +77,8 @@
         "label": "EVENTS.EVENTS.DETAILS.METADATA.CONTRIBUTORS",
         "type": "mixed_text",
         "value": [],
-        "required": false
+        "required": false,
+        "listprovider":"CONTRIBUTORS"
       },
       {
         "readOnly": false,

@@ -103,13 +103,13 @@ import javax.ws.rs.core.Response.Status;
     abstractText = "Provides registration and management functions for servers and services in this Opencast instance "
         + "or cluster.")
 @Component(
-  property = {
-    "service.description=Service Registry REST Endpoint",
-    "opencast.service.type=org.opencastproject.serviceregistry",
-    "opencast.service.path=/services"
-  },
-  immediate = true,
-  service = { ServiceRegistryEndpoint.class }
+    property = {
+      "service.description=Service Registry REST Endpoint",
+      "opencast.service.type=org.opencastproject.serviceregistry",
+      "opencast.service.path=/services"
+    },
+    immediate = true,
+    service = { ServiceRegistryEndpoint.class }
 )
 @JaxrsResource
 public class ServiceRegistryEndpoint {
@@ -522,7 +522,7 @@ public class ServiceRegistryEndpoint {
         } else if (ServiceState.ERROR == reg.getServiceState()) {
           error++;
         } else {
-           error++;
+          error++;
         }
       }
       JaxbServiceHealth stats = new JaxbServiceHealth(healthy, warning, error);

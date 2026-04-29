@@ -111,11 +111,11 @@ import javax.persistence.TypedQuery;
 
 /** JPA implementation of the {@link ServiceRegistry} */
 @Component(
-  property = {
-    "service.description=Service registry"
-  },
-  immediate = true,
-  service = { ManagedService.class, ServiceRegistry.class, ServiceRegistryJpaImpl.class }
+    property = {
+      "service.description=Service registry"
+    },
+    immediate = true,
+    service = { ManagedService.class, ServiceRegistry.class, ServiceRegistryJpaImpl.class }
 )
 public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
@@ -680,18 +680,18 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     // get the encoding worker load threshold defined in the configuration file and parse the double
     String encodingThersholdString = StringUtils.trimToNull((String) properties.get(OPT_ENCODING_THRESHOLD));
     if (StringUtils.isNotBlank(encodingThersholdString) && encodingThersholdString != null) {
-        try {
-          double encodingThresholdTmp = Double.parseDouble(encodingThersholdString);
-          if (encodingThresholdTmp >= 0 && encodingThresholdTmp <= 1) {
-            encodingThreshold = encodingThresholdTmp;
-          } else {
-            encodingThreshold = DEFAULT_ENCODING_THRESHOLD;
-            logger.warn("org.opencastproject.encoding.workers.threshold is not between 0 and 1");
-          }
-        } catch (NumberFormatException e) {
-          logger.warn("Can not set encoding threshold to {}. {} must be an parsable double", encodingThersholdString,
-              OPT_ENCODING_THRESHOLD);
+      try {
+        double encodingThresholdTmp = Double.parseDouble(encodingThersholdString);
+        if (encodingThresholdTmp >= 0 && encodingThresholdTmp <= 1) {
+          encodingThreshold = encodingThresholdTmp;
+        } else {
+          encodingThreshold = DEFAULT_ENCODING_THRESHOLD;
+          logger.warn("org.opencastproject.encoding.workers.threshold is not between 0 and 1");
         }
+      } catch (NumberFormatException e) {
+        logger.warn("Can not set encoding threshold to {}. {} must be an parsable double", encodingThersholdString,
+            OPT_ENCODING_THRESHOLD);
+      }
     } else {
       encodingThreshold = DEFAULT_ENCODING_THRESHOLD;
     }
@@ -1383,7 +1383,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     logger.info("Setting maintenance mode on host '{}'", baseUrl);
     HostRegistrationJpaImpl reg = db.execTxChecked(em -> {
       HostRegistrationJpaImpl hr = fetchHostRegistrationQuery(baseUrl).apply(em).orElseThrow(() -> {
-            logger.warn("Can not set maintenance mode because host '{}' was not registered", baseUrl);
+        logger.warn("Can not set maintenance mode because host '{}' was not registered", baseUrl);
         return new NotFoundException("Can not set maintenance mode on a host that has not been registered");
       });
       hr.setMaintenanceMode(maintenance);
@@ -1864,7 +1864,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
       // Make sure we also include the services that have no processing history so far
       namedQuery.findAll("ServiceRegistration.getAll", ServiceRegistrationJpaImpl.class).apply(em).forEach(s ->
-        statsMap.put(s.getId(), new JaxbServiceStatistics(s))
+          statsMap.put(s.getId(), new JaxbServiceStatistics(s))
       );
 
       if (collectJobstats) {
@@ -2327,7 +2327,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       // Is this host suited for processing?
       if (hostLoad == null || hostLoadMax == null || hostLoad < hostLoadMax) {
         logger.debug("Adding candidate service {} for processing of jobs of type '{}' (host load is {} of max {})",
-           service, jobType, hostLoad, hostLoadMax);
+            service, jobType, hostLoad, hostLoadMax);
         filteredList.add(service);
       }
     }
@@ -2609,7 +2609,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           return Float.compare(nodeA.getLoadFactor(), nodeB.getLoadFactor());
         }
       }
-        return super.compare(serviceA, serviceB);
+      return super.compare(serviceA, serviceB);
     }
   }
 }

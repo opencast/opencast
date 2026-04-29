@@ -1355,7 +1355,7 @@ public class IndexServiceImpl implements IndexService {
           updateWorkflowInstance(instance);
         } catch (WorkflowException e) {
           throw new IndexServiceException("Unable to update workflow event " + id + " with metadata "
-              + RestUtils.getJsonStringSilent(MetadataJson.listToJson(metadataList, true)), e);
+              + RestUtils.getJsonStringSilent(MetadataJson.listToJson(metadataList, true, false)), e);
         }
         break;
       case ARCHIVE:
@@ -1369,7 +1369,7 @@ public class IndexServiceImpl implements IndexService {
               Optional.of(mediaPackage), Optional.empty(), Optional.empty());
         } catch (SchedulerException e) {
           throw new IndexServiceException("Unable to update scheduled event " + id + " with metadata "
-              + RestUtils.getJsonStringSilent(MetadataJson.listToJson(metadataList, true)), e);
+              + RestUtils.getJsonStringSilent(MetadataJson.listToJson(metadataList, true, false)), e);
         }
         break;
       default:

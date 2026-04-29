@@ -400,7 +400,7 @@ public class SeriesEndpoint {
       }
     }
     metadataList.add(indexService.getCommonSeriesCatalogUIAdapter(), getSeriesMetadata(optSeries.get()));
-    return okJson(MetadataJson.listToJson(metadataList, true));
+    return okJson(MetadataJson.listToJson(metadataList, true, false));
   }
 
   /**
@@ -520,7 +520,7 @@ public class SeriesEndpoint {
           SearchIndexException {
     try {
       MetadataList metadataList = indexService.updateAllSeriesMetadata(seriesID, metadataJSON, searchIndex);
-      return okJson(MetadataJson.listToJson(metadataList, true));
+      return okJson(MetadataJson.listToJson(metadataList, true, false));
     } catch (IllegalArgumentException e) {
       return RestUtil.R.badRequest(e.getMessage());
     } catch (IndexServiceException e) {
@@ -547,7 +547,7 @@ public class SeriesEndpoint {
       safelyRemoveField(collection, "identifier");
       metadataList.add(indexService.getCommonSeriesCatalogUIAdapter(), collection);
     }
-    return okJson(MetadataJson.listToJson(metadataList, true));
+    return okJson(MetadataJson.listToJson(metadataList, true, false));
   }
 
   private void safelyRemoveField(DublinCoreMetadataCollection collection, String fieldName) {

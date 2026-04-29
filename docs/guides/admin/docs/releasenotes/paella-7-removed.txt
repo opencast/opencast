@@ -1,0 +1,1 @@
+#7589: Paella 7 has been removed, after being deprecated with Opencast 20.
