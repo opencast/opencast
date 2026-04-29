@@ -53,6 +53,7 @@ import org.opencastproject.external.util.AclUtils;
 import org.opencastproject.external.util.ExternalMetadataUtils;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.catalog.adapter.DublinCoreMetadataUtil;
+import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.impl.util.EventHttpServletRequest;
 import org.opencastproject.index.service.impl.util.EventUtils;
@@ -153,6 +154,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -1631,20 +1633,37 @@ public class EventsEndpoint implements ManagedService {
 
   protected Optional<MetadataList> getEventMetadata(Event event) throws IndexServiceException, Exception {
     MetadataList metadataList = new MetadataList();
-    List<EventCatalogUIAdapter> catalogUIAdapters = getEventCatalogUIAdapters();
-    EventCatalogUIAdapter eventCatalogUIAdapter = indexService.getCommonEventCatalogUIAdapter();
-    catalogUIAdapters.remove(eventCatalogUIAdapter);
-    if (catalogUIAdapters.size() > 0) {
-      MediaPackage mediaPackage = indexService.getEventMediapackage(event);
-      for (EventCatalogUIAdapter catalogUIAdapter : catalogUIAdapters) {
-        // TODO: This is very slow:
-        DublinCoreMetadataCollection fields = catalogUIAdapter.getFields(mediaPackage);
-        if (fields != null) {
-          ExternalMetadataUtils.removeCollectionList(fields);
-          metadataList.add(catalogUIAdapter, fields);
+
+    // Get configured extended metadata fields & fill with values from index
+    Set<EventCatalogUIAdapter> extendedCatalogUIAdapters = getEventCatalogUIAdapters().stream()
+        .filter(c -> !(c instanceof CommonEventCatalogUIAdapter)).collect(Collectors.toSet());
+
+    if (!extendedCatalogUIAdapters.isEmpty()) {
+      Map<String, Map<String, List<String>>> extendedMetadata = event.getExtendedMetadata();
+      for (EventCatalogUIAdapter catalogUIAdapter : extendedCatalogUIAdapters) {
+        if (extendedMetadata.containsKey(catalogUIAdapter.getFlavor().toString())) {
+          Map<String, List<String>> extendedMetadataByType = extendedMetadata.get(
+              catalogUIAdapter.getFlavor().toString());
+          DublinCoreMetadataCollection dublinCoreMetadata = catalogUIAdapter.getRawFields(new EmptyResourceListQuery());
+          ExternalMetadataUtils.removeCollectionList(dublinCoreMetadata);
+          for (MetadataField metadataField: dublinCoreMetadata.getFields()) {
+            // currently doesn't consider namespaces
+            if (extendedMetadataByType.containsKey(metadataField.getInputID())) {
+              List<String> values = extendedMetadataByType.get(metadataField.getInputID());
+              // values are from index, but same format as in catalog
+              DublinCoreMetadataCollection.setValueFromDCCatalog(values, metadataField);
+            } else {
+              // overwrite any default values contained in raw fields to accurately reflect event state
+              metadataField.setValue(null);
+            }
+          }
+          metadataList.add(catalogUIAdapter, dublinCoreMetadata);
         }
       }
     }
+
+    // Common metadata
+    EventCatalogUIAdapter eventCatalogUIAdapter = indexService.getCommonEventCatalogUIAdapter();
     DublinCoreMetadataCollection collection = EventUtils.getEventMetadata(event, eventCatalogUIAdapter,
         new EmptyResourceListQuery());
     ExternalMetadataUtils.changeSubjectToSubjects(collection);
