@@ -313,11 +313,7 @@
     <!-- anonymous access to user interface configuration -->
     <sec:intercept-url pattern="/ui/config/**" access="permitAll" />
 
-   <!-- Paella player 7 -->
-    <sec:intercept-url pattern="/paella7/ui/auth.html" access="hasRole('ROLE_USER')" />
-    <sec:intercept-url pattern="/paella7/ui/**" access="permitAll" />
-
-   <!-- Paella player 8 -->
+    <!-- Paella player 8 -->
     <sec:intercept-url pattern="/paella8/ui/auth.html" access="hasRole('ROLE_USER')" />
     <sec:intercept-url pattern="/paella8/ui/**" access="permitAll" />
 

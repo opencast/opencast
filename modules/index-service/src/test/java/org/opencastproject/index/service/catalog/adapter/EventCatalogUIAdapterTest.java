@@ -155,7 +155,7 @@ public class EventCatalogUIAdapterTest {
 
     DublinCoreMetadataCollection abstractMetadata = configurationDublinCoreCatalogUIAdapter.getFields(mediapackage);
     assertThat(eventJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.collectionToJson(abstractMetadata,
-            true)))
+            true, false)))
             .allowingAnyArrayOrdering());
   }
 

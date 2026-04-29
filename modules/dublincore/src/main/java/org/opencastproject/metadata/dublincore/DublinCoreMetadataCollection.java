@@ -143,7 +143,7 @@ public class DublinCoreMetadataCollection {
   /**
    * Set value to a metadata field of unknown type
    */
-  private static void setValueFromDCCatalog(
+  public static void setValueFromDCCatalog(
           final List<String> filteredValues,
           final MetadataField metadataField) {
     if (filteredValues.isEmpty()) {

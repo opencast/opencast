@@ -466,7 +466,7 @@ public class LtiServiceImpl implements LtiService {
     if (wfState != null && WorkflowUtil.isActive(WorkflowInstance.WorkflowState.valueOf(wfState))) {
       metadataList.setLocked(MetadataList.Locked.WORKFLOW_RUNNING);
     }
-    return new Gson().toJson(MetadataJson.listToJson(metadataList, true));
+    return new Gson().toJson(MetadataJson.listToJson(metadataList, true, false));
   }
 
   @Override
@@ -511,7 +511,7 @@ public class LtiServiceImpl implements LtiService {
 
       metadataList.add(this.indexService.getCommonEventCatalogUIAdapter(), collection);
     }
-    return new Gson().toJson(MetadataJson.listToJson(metadataList, true));
+    return new Gson().toJson(MetadataJson.listToJson(metadataList, true, false));
   }
 
   @Override

@@ -1061,4 +1061,8 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     this.securityService = securityService;
   }
 
+  @Override
+  public String getStorageName() {
+    return "Working File Repository";
+  }
 }

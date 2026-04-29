@@ -1555,7 +1555,7 @@ public abstract class AbstractEventEndpoint {
       metadataList.setLocked(Locked.WORKFLOW_RUNNING);
     }
 
-    return okJson(MetadataJson.listToJson(metadataList, true));
+    return okJson(MetadataJson.listToJson(metadataList, true, false));
   }
 
   /**
@@ -1670,7 +1670,7 @@ public abstract class AbstractEventEndpoint {
     }
 
     JsonObject result = new JsonObject();
-    result.add("metadata", MetadataJson.collectionToJson(mergedMetadata, true));
+    result.add("metadata", MetadataJson.collectionToJson(mergedMetadata, true, false));
     result.add("notFound", collectionToJsonArray(eventsNotFound));
     result.add("runningWorkflow", collectionToJsonArray(eventsWithRunningWorkflow));
     result.add("merged", collectionToJsonArray(eventsMerged));
@@ -1915,7 +1915,7 @@ public abstract class AbstractEventEndpoint {
 
     try {
       MetadataList metadataList = getIndexService().updateAllEventMetadata(id, metadataJSON, getIndex());
-      return okJson(MetadataJson.listToJson(metadataList, true));
+      return okJson(MetadataJson.listToJson(metadataList, true, false));
     } catch (IllegalArgumentException e) {
       return badRequest(String.format("Event %s metadata can't be updated.: %s", id, e.getMessage()));
     }
@@ -2956,7 +2956,7 @@ public abstract class AbstractEventEndpoint {
     // remove series with empty titles from the collection of the isPartOf field as these can't be converted to json
     removeSeriesWithNullTitlesFromFieldCollection(metadataList);
 
-    return okJson(MetadataJson.listToJson(metadataList, true));
+    return okJson(MetadataJson.listToJson(metadataList, true, false));
   }
 
   @GET

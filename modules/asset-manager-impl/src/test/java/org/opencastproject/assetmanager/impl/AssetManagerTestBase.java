@@ -404,6 +404,10 @@ public abstract class AssetManagerTestBase {
       @Override public String getStoreType() {
         return storeType;
       }
+
+      @Override public String getStorageName() {
+        return "Test Store";
+      }
     };
   }
 
@@ -475,6 +479,10 @@ public abstract class AssetManagerTestBase {
 
       @Override public String getStoreType() {
         return storeType;
+      }
+
+      @Override public String getStorageName() {
+        return "Test Store";
       }
     };
   }
