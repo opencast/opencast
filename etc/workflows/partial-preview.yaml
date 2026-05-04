@@ -30,6 +30,19 @@ operations:
       - encoding-profile: mp4-preview.http
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  # Audio waveform
+
+  # Create the waveform.
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+  - id: waveform
+    exception-handler-workflow: partial-error
+    description: Generating waveform
+    configurations:
+      - source-flavor: '*/source'
+      - target-flavor: '*/waveform'
+      - target-tags: preview
+
+  # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # Track previews
 
   # Create track previews for video editor stream selection feature
@@ -77,17 +90,6 @@ operations:
       - source-flavors: presenter/preview
       - target-tags: preview
       - copy: false
-
-  - id: waveform
-    fail-on-error: false
-    description: Generating audio preview waveform
-    configurations:
-      - source-flavor: '*/source'
-      - target-flavor: '*/audio+preview'
-      - target-tags: preview
-      - min-width: 688
-      - max-width: 688
-      - height: 58
 
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # Silence detection
