@@ -86,11 +86,6 @@ public class CleanupWorkflowOperationHandler extends AbstractWorkflowOperationHa
   /** Time to wait in seconds before removing files */
   public static final String DELAY = "delay";
 
-  /**
-   * The workspace to use in retrieving and storing files.
-   */
-  protected Workspace workspace;
-
   /** The http client to use when connecting to remote servers */
   protected TrustedHttpClient client = null;
 

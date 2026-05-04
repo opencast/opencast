@@ -42,7 +42,6 @@ import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workspace.api.Workspace;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -50,7 +49,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -80,9 +78,6 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
 
   /** The composer service */
   private ComposerService composerService = null;
-
-  /** The local workspace */
-  private Workspace workspace = null;
 
   private enum AudioMuxing {
     NONE, FORCE, DUPLICATE;
@@ -411,8 +406,7 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
     } else if (!nonHiddenAudio.isPresent() || nonHiddenAudio.get() == nonHiddenVideo) {
       // It could be the case that the non-hidden video stream is also the non-hidden audio stream. In that
       // case, we don't have to mux. But have to clone it.
-      final Track clonedTrack = (Track) nonHiddenVideo.track.clone();
-      clonedTrack.setIdentifier(null);
+      final Track clonedTrack = (Track) createDerivedMediaPackageElementFrom(nonHiddenVideo.track);
       resultingTracks.add(clonedTrack);
     } else {
       // Otherwise, we mux!
@@ -439,8 +433,7 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
       ) {
         logger.debug("Add clone of track {} to mediapackage {}", t.track.getIdentifier(),
             mediaPackage.getIdentifier());
-        final Track clonedTrack = (Track) t.track.clone();
-        clonedTrack.setIdentifier(null);
+        final Track clonedTrack = (Track) createDerivedMediaPackageElementFrom(t.track);
         resultingTracks.add(clonedTrack);
       } else if (t.hasVideo() && !t.hideVideo && t.hasAudio() && t.hideAudio) {
         // If track has non-hidden video and hidden audio, hide audio and add it to the MP
@@ -585,24 +578,11 @@ public class SelectStreamsWorkflowOperationHandler extends AbstractWorkflowOpera
 
   private TrackJobResult copyTrack(final Track track) throws WorkflowOperationException {
     logger.debug("Create copy of track {}", track);
-    final Track copiedTrack = (Track) track.clone();
-    copiedTrack.generateIdentifier();
     try {
-      // Generate a new filename
-      String targetFilename = copiedTrack.getIdentifier();
-      final String extension = FilenameUtils.getExtension(track.getURI().getPath());
-      if (!extension.isEmpty()) {
-        targetFilename += "." + extension;
-      }
-
-      // Copy the files on dis and put them into the working file repository
-      final URI newUri = workspace.put(track.getMediaPackage().getIdentifier().toString(), copiedTrack.getIdentifier(),
-              targetFilename, workspace.read(track.getURI()));
-      copiedTrack.setURI(newUri);
+      final Track copiedTrack = (Track) createDerivedMediaPackageElementFrom(track);
+      return new TrackJobResult(copiedTrack, 0);
     } catch (IOException | NotFoundException e) {
       throw new WorkflowOperationException(String.format("Error while copying track %s", track.getIdentifier()), e);
     }
-
-    return new TrackJobResult(copiedTrack, 0);
   }
 }

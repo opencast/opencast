@@ -114,9 +114,6 @@ public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperati
   /** Reference to the media inspection service */
   private MediaInspectionService inspectionService = null;
 
-  /** The workspace service */
-  protected Workspace workspace;
-
   /**
    * {@inheritDoc}
    *
@@ -265,7 +262,7 @@ public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperati
 
   /**
    * {@inheritDoc}
-   * 
+   *
    * @see org.opencastproject.workflow.api.WorkflowOperationHandler#skip(
    *      org.opencastproject.workflow.api.WorkflowInstance, JobContext)
    */
@@ -292,7 +289,7 @@ public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperati
 
   /**
    * Sets the service
-   * 
+   *
    * @param service
    */
   @Reference
@@ -302,7 +299,7 @@ public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperati
 
   /**
    * Sets a reference to the workspace service.
-   * 
+   *
    * @param workspace
    */
   @Reference
@@ -312,7 +309,7 @@ public class ExecuteOnceWorkflowOperationHandler extends AbstractWorkflowOperati
 
   /**
    * Sets the media inspection service
-   * 
+   *
    * @param mediaInspectionService
    *          an instance of the media inspection service
    */

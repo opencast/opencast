@@ -100,9 +100,6 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
   /** The mpeg7 catalog service */
   private Mpeg7CatalogService mpeg7CatalogService = null;
 
-  /** The local workspace */
-  private Workspace workspace = null;
-
   /**
    * Callback for the OSGi declarative services configuration.
    *

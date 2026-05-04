@@ -96,7 +96,7 @@ public final class MediaPackageSupport {
             continue;
           } else if (MergeMode.Merge == mode) {
             logger.debug("Renaming element " + e.getIdentifier() + " while merging " + dest + " with " + src);
-            e.setIdentifier(null);
+            e.generateIdentifier();
             dest.add(e);
           } else if (MergeMode.Fail == mode) {
             throw new MediaPackageException("Target media package " + dest + " already contains element with id "

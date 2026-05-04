@@ -120,11 +120,6 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
   protected File tempStorageDir = null;
 
   /**
-   * The workspace to use in retrieving and storing files.
-   */
-  protected Workspace workspace;
-
-  /**
    * Sets the workspace to use.
    *
    * @param workspace

@@ -191,11 +191,17 @@ public class VideoEditorWorkflowOperationHandlerTest {
   }
 
   @Test
-  public void testEditorOperationSkip() throws WorkflowOperationException {
+  public void testEditorOperationSkip() throws WorkflowOperationException, NotFoundException, IOException {
+    EasyMock.expect(workspaceMock.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+        (String) EasyMock.anyObject(), (InputStream) EasyMock.anyObject()))
+        .andReturn(URI.create("http://localhost:8080/foo/presenter.mp4"));
+    EasyMock.replay(workspaceMock);
+
     WorkflowInstance workflowInstance = getWorkflowInstance(mp, getDefaultConfiguration(true));
     WorkflowOperationResult result = videoEditorWorkflowOperationHandler.skip(workflowInstance, null);
     Assert.assertNotNull(
         "VideoEditor workflow operation returns null but should be an instantiated WorkflowOperationResult", result);
+    EasyMock.verify(workspaceMock);
 
     // mediapackage should contain new derived track with flavor given by "target-flavor-subtype" configuration
     WorkflowOperationInstance worflowOperationInstance = workflowInstance.getCurrentOperation();
@@ -218,11 +224,17 @@ public class VideoEditorWorkflowOperationHandlerTest {
   }
 
   @Test
-  public void testEditorOperationInteractiveSkip() throws WorkflowOperationException {
+  public void testEditorOperationInteractiveSkip() throws WorkflowOperationException, NotFoundException, IOException {
+    EasyMock.expect(workspaceMock.put((String) EasyMock.anyObject(), (String) EasyMock.anyObject(),
+            (String) EasyMock.anyObject(), (InputStream) EasyMock.anyObject()))
+        .andReturn(URI.create("http://localhost:8080/foo/presenter.mp4"));
+    EasyMock.replay(workspaceMock);
+
     WorkflowInstance workflowInstance = getWorkflowInstance(mp, getDefaultConfiguration(false));
     WorkflowOperationResult result = videoEditorWorkflowOperationHandler.start(workflowInstance, null);
     Assert.assertNotNull(
         "VideoEditor workflow operation returns null but should be an instantiated WorkflowOperationResult", result);
+    EasyMock.verify(workspaceMock);
 
     // mediapackage should contain new derived track with flavor given by "target-flavor-subtype" configuration
     WorkflowOperationInstance worflowOperationInstance = workflowInstance.getCurrentOperation();

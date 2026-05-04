@@ -84,8 +84,6 @@ public class MicrosoftAzureStartTranscriptionOperationHandler extends AbstractWo
   private TranscriptionService service = null;
   /** The composer service. */
   private ComposerService composerService;
-  /** The workspace. */
-  private Workspace workspace;
 
   /** The configuration options for this handler */
   private static final SortedMap<String, String> CONFIG_OPTIONS;

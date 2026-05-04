@@ -333,7 +333,7 @@ public class ConfigurablePublishWorkflowOperationHandler extends ConfigurableWor
       if (elements.size() > 0) {
         for (MediaPackageElement element : elements) {
           // Make sure the mediapackage is prompted to create a new identifier for this element
-          element.setIdentifier(null);
+          element.generateIdentifier();
           PublicationImpl.addElementToPublication(publication, element);
         }
       } else {
