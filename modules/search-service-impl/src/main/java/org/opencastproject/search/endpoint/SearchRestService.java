@@ -245,6 +245,10 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
       }
     }
 
+    searchSource.sort("_score", SortOrder.DESC);
+    // Used to stabilize the sort order of results with the same score.
+    searchSource.sort("_doc", SortOrder.ASC);
+
     var hits = searchIndex.search(searchSource).getHits();
     var result = Arrays.stream(hits.getHits())
         .map(SearchHit::getSourceAsMap)
@@ -458,6 +462,10 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
         searchSource.sort(SearchResult.DUBLINCORE + "." + sortParam[0], order);
       }
     }
+
+    searchSource.sort("_score", SortOrder.DESC);
+    // Used to stabilize the sort order of results with the same score.
+    searchSource.sort("_doc", SortOrder.ASC);
 
     List<Map<String, Object>> result = null;
     long total = 0;
