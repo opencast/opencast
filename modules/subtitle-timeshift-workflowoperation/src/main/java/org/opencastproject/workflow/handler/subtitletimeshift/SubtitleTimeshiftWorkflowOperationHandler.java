@@ -87,12 +87,6 @@ public class SubtitleTimeshiftWorkflowOperationHandler extends AbstractWorkflowO
   private static final Logger logger = LoggerFactory.getLogger(SubtitleTimeshiftWorkflowOperationHandler.class);
 
   /**
-   * Reference to the workspace service
-   */
-  private Workspace workspace = null;
-
-
-  /**
    * OSGi setter for the workspace class
    *
    * @param workspace an instance of the workspace
