@@ -71,6 +71,7 @@ import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
+import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
@@ -1461,11 +1462,11 @@ public class IndexServiceImpl implements IndexService {
   @Override
   public EventRemovalResult removeEvent(Event event, String retractWorkflowId)
           throws UnauthorizedException, WorkflowDatabaseException, NotFoundException {
-    final boolean hasOnlyEngageLive = event.getPublications().size() == 1
-        && EventUtils.ENGAGE_LIVE_CHANNEL_ID.equals(event.getPublications().get(0).getChannel());
-    final boolean retract = event.hasPreview()
-        || (!event.getPublications().isEmpty()  && !hasOnlyEngageLive && this.hasSnapshots(event.getIdentifier()));
-    if (retract) {
+    Set<Publication> filteredPublications = event.getPublications().stream()
+        .filter(pub -> !pub.getChannel().equals(EventUtils.ENGAGE_LIVE_CHANNEL_ID))
+        .collect(Collectors.toSet());
+
+    if (!filteredPublications.isEmpty() && this.hasSnapshots(event.getIdentifier())) {
       retractAndRemoveEvent(event.getIdentifier(), retractWorkflowId);
       return EventRemovalResult.RETRACTING;
     } else {
