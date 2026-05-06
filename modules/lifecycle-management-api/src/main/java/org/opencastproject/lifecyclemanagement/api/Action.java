@@ -21,7 +21,7 @@
 package org.opencastproject.lifecyclemanagement.api;
 
 public enum Action {
-  START_WORKFLOW;
+  START_WORKFLOW, DELETE_EVENT;
 
   private String code;
 

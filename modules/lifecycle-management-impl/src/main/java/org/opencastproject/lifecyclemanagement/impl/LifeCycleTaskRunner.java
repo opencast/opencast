@@ -22,6 +22,10 @@ package org.opencastproject.lifecyclemanagement.impl;
 
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.util.WorkflowPropertiesUtil;
+import org.opencastproject.elasticsearch.api.SearchIndexException;
+import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
+import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.lifecyclemanagement.api.LifeCyclePolicy;
 import org.opencastproject.lifecyclemanagement.api.LifeCycleService;
 import org.opencastproject.lifecyclemanagement.api.LifeCycleServiceException;
@@ -48,7 +52,10 @@ import org.opencastproject.workflow.api.WorkflowService;
 import com.google.gson.Gson;
 
 import org.apache.commons.lang3.NotImplementedException;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.framework.BundleContext;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
@@ -56,6 +63,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Dictionary;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -70,13 +78,13 @@ import java.util.concurrent.TimeUnit;
  */
 @Component(
     immediate = true,
-    service = LifeCycleTaskRunner.class,
+    service = { LifeCycleTaskRunner.class, ManagedService.class},
     property = {
         "service.description=LifeCycle Management Task Runner",
         "service.pid=org.opencastproject.lifecyclemanagement.LifeCycleTaskRunner"
     }
 )
-public class LifeCycleTaskRunner {
+public class LifeCycleTaskRunner implements ManagedService {
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(LifeCycleTaskRunner.class);
   private static final Gson gson = new Gson();
@@ -86,12 +94,18 @@ public class LifeCycleTaskRunner {
   protected AssetManager assetManager;
   protected SecurityService securityService;
   protected OrganizationDirectoryService organizationDirectoryService;
+  private IndexService indexService;
+  private ElasticsearchIndex elasticsearchIndex;
 
   /** The thread pool to use for dispatching queued jobs and checking on phantom services. */
   protected ScheduledExecutorService scheduledExecutor = null;
   private User systemAdminUser;
   private Organization defaultOrganization;
   private final int maxConcurrentTasks = 1000;
+  /** Default ID of the workflow used to retract published events */
+  private static final String DEFAULT_RETRACT_WORKFLOW = "delete";
+  private static final String RETRACT_WORKFLOW = "retract.workflow.id";
+  private String retractWorkflowId = DEFAULT_RETRACT_WORKFLOW;
 
 
   @Reference(name = "lifecycle-service")
@@ -119,6 +133,16 @@ public class LifeCycleTaskRunner {
     this.organizationDirectoryService = orgDirServ;
   }
 
+  @Reference
+  public void setIndexService(IndexService indexService) {
+    this.indexService = indexService;
+  }
+
+  @Reference
+  void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
+    this.elasticsearchIndex = elasticsearchIndex;
+  }
+
   @Activate
   public void activate(BundleContext ctx) {
     logger.info("Activating LifeCycle Management Task Runner.");
@@ -129,6 +153,15 @@ public class LifeCycleTaskRunner {
     scheduledExecutor = Executors.newScheduledThreadPool(1);
     scheduledExecutor.scheduleWithFixedDelay(new LifeCycleTaskRunner.Runner(), 10, 5,
         TimeUnit.SECONDS);
+  }
+
+  @Override
+  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+    if (properties == null) {
+      return;
+    }
+    retractWorkflowId = StringUtils.defaultString((String) properties.get(RETRACT_WORKFLOW), DEFAULT_RETRACT_WORKFLOW);
+    logger.debug("Retract Workflow is '{}'", retractWorkflowId);
   }
 
   @Deactivate
@@ -187,6 +220,7 @@ public class LifeCycleTaskRunner {
               LifeCyclePolicy policy = lifeCycleService.getLifeCyclePolicyById(task.getLifeCyclePolicyId());
               switch(policy.getAction()) {
                 case START_WORKFLOW -> startWorkflow((LifeCycleTaskStartWorkflow)task, policy);
+                case DELETE_EVENT -> deleteEvent(task, policy);
                 default -> throw new NotImplementedException();
               }
               numberOfRunningTasks++;
@@ -197,7 +231,7 @@ public class LifeCycleTaskRunner {
               logger.warn("Could not start action for task with id " + task.getId() + ". User "
                   + securityService.getUser().getUsername() + " was not authorized to access "
                   + "lifecycle policy " + task.getLifeCyclePolicyId());
-            } catch (LifeCycleServiceException e) {
+            } catch (LifeCycleServiceException | RuntimeException e) {
               logger.warn("Could not start action for task with id " + task.getId() + " based of policy "
                   + task.getLifeCyclePolicyId());
               logger.warn(e.toString());
@@ -347,6 +381,50 @@ public class LifeCycleTaskRunner {
       throw new RuntimeException(e);
     } catch (UnauthorizedException e) {
       throw new RuntimeException(e);
+    }
+  }
+
+  /**
+   */
+  private void deleteEvent(LifeCycleTask task, LifeCyclePolicy policy) throws LifeCycleServiceException {
+    String mediaPackageId = task.getTargetId();
+
+    if (policy.getTargetType() != TargetType.EVENT) {
+      throw new IllegalArgumentException(
+          "The action DELETE_EVENT is only supported for the targetType EVENT. Given target type was: "
+              + policy.getAction()
+      );
+    }
+
+    final Optional<Event> event;
+    try {
+      event = indexService.getEvent(mediaPackageId, elasticsearchIndex);
+
+      if (event.isEmpty()) {
+        throw new IllegalArgumentException("Event for given id " + mediaPackageId + " does not exist.");
+      }
+
+      IndexService.EventRemovalResult result = indexService.removeEvent(event.get(), retractWorkflowId);
+      if (result.SUCCESS == IndexService.EventRemovalResult.SUCCESS) {
+        task.setStatus(Status.FINISHED);
+      } else {
+        task.setStatus(Status.FAILED);
+      }
+    } catch (SearchIndexException | WorkflowDatabaseException e) {
+      task.setStatus(Status.FAILED);
+      throw new LifeCycleServiceException(
+          "Unable to find event for mediapackage " + mediaPackageId + ". An error occured",
+          e);
+    } catch (UnauthorizedException e) {
+      task.setStatus(Status.FAILED);
+      throw new LifeCycleServiceException(
+          "Not authorized to remove event with id " + mediaPackageId,
+          e);
+    } catch (NotFoundException e) {
+      task.setStatus(Status.FAILED);
+      throw new LifeCycleServiceException(
+          "Unable to find event " + mediaPackageId,
+          e);
     }
   }
 }
