@@ -690,10 +690,16 @@ public class LifeCycleServiceImpl implements LifeCycleService {
     String currentOrgAdminRole = currentOrg.getAdminRole();
     String currentOrgId = currentOrg.getId();
 
+    // Restrict permission to admins until to do is fixed
+    // TODO: Figure out better permission management
+    // Allowing non-admins to create policies would allow them to affect entities that they may not have
+    // write rights on. That is not okay.
     return currentUser.hasRole(GLOBAL_ADMIN_ROLE)
-        || (currentUser.hasRole(currentOrgAdminRole) && currentOrgId.equals(policy.getOrganization()))
-        || authorizationService.hasPermission(getAccessControlList(policy), action.toString())
-           && currentOrgId.equals(policy.getOrganization());
+        || (currentUser.hasRole(currentOrgAdminRole) && currentOrgId.equals(policy.getOrganization()));
+//    return currentUser.hasRole(GLOBAL_ADMIN_ROLE)
+//        || (currentUser.hasRole(currentOrgAdminRole) && currentOrgId.equals(policy.getOrganization()))
+//        || authorizationService.hasPermission(getAccessControlList(policy), action.toString())
+//           && currentOrgId.equals(policy.getOrganization());
   }
 
   /**

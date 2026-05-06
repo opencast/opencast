@@ -72,6 +72,8 @@ targetFilters:
 #      value: "banana"
 
 # Which user have what permissions on this policy.
+# WARNING: Currently only admins are allowed access to policies. Granting other roles access rights will not allow
+# users with those roles to do anything!
 accessControlEntries:
   - allow: true
     action: "write"
