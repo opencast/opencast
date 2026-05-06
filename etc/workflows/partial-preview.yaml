@@ -91,17 +91,6 @@ operations:
       - target-tags: preview
       - copy: false
 
-  - id: waveform
-    fail-on-error: false
-    description: Generating audio preview waveform
-    configurations:
-      - source-flavor: '*/source'
-      - target-flavor: '*/audio+preview'
-      - target-tags: preview
-      - min-width: 688
-      - max-width: 688
-      - height: 58
-
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   # Silence detection
 
