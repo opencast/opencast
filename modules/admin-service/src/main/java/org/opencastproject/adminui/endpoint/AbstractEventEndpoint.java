@@ -86,6 +86,7 @@ import org.opencastproject.index.service.exception.UnsupportedAssetException;
 import org.opencastproject.index.service.impl.util.EventUtils;
 import org.opencastproject.index.service.resources.list.provider.EventsListProvider.Comments;
 import org.opencastproject.index.service.resources.list.provider.EventsListProvider.IsPublished;
+import org.opencastproject.index.service.resources.list.provider.EventsListProvider.NeedsCutting;
 import org.opencastproject.index.service.resources.list.query.EventListQuery;
 import org.opencastproject.index.service.resources.list.query.SeriesListQuery;
 import org.opencastproject.index.service.util.JSONUtils;
@@ -3309,6 +3310,23 @@ public abstract class AbstractEventEndpoint {
         query.withAccessControlEntry(filters.get(name), Permissions.Action.READ);
       } else if (EventListQuery.FILTER_WRITE_ACCESS_NAME.equals(name)) {
         query.withAccessControlEntry(filters.get(name), Permissions.Action.WRITE);
+      }
+      if (EventListQuery.FILTER_NEEDS_CUTTING_NAME.equals(name)) {
+        if (filters.containsKey(name)) {
+          switch (NeedsCutting.valueOf(filters.get(name))) {
+            case YES:
+              query.withNeedsCutting(true);
+              break;
+            case NO:
+              query.withNeedsCutting(false);
+              break;
+            default:
+              break;
+          }
+        } else {
+          logger.info("Query for invalid needs cutting status: {}", filters.get(name));
+          return Response.status(SC_BAD_REQUEST).build();
+        }
       }
 
       if (EventListQuery.FILTER_STARTDATE_NAME.equals(name)) {
