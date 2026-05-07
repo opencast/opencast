@@ -1,0 +1,39 @@
+name: Maintenance » Auto-update git submodules
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 1 * * *' #1AM UTC, before the QA boxes reboot, but after everyone's done for the day
+
+jobs:
+  update-git-submodules:
+    name: update git submodules
+    runs-on: ubuntu-latest
+    if: github.repository == 'opencast/opencast'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: 'recursive'
+
+      - name: prepare git
+        run: |
+          git config --global user.email 'update-bot@opencast.org'
+          git config --global user.name 'Update Bot'
+
+      - name: prepare github ssh key
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+        run: |
+          install -dm 700 ~/.ssh/
+          echo "${DEPLOY_KEY}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+      - name: update the submodules locally
+        run: |
+          git submodule update --remote --recursive
+
+      - name: Committing changes
+        run: |
+          git commit -a -m "Updating submodules" || true
+          git push origin 
