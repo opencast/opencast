@@ -506,6 +506,49 @@ public class UsersEndpoint {
     }
   }
 
+  @PUT
+  @Path("self")
+  @RestQuery(
+      name = "selfUpdate",
+      description = "Allow the user to update their own user data. Currently only changing password is allowed",
+      returnDescription = "Status ok",
+      restParameters = {
+          @RestParameter(description = "The password.", isRequired = false, name = "password", type = STRING),
+      },
+      responses = {
+          @RestResponse(responseCode = SC_OK, description = "User password has been updated."),
+          @RestResponse(responseCode = SC_FORBIDDEN, description = "Not enough permissions to change password."),
+          @RestResponse(responseCode = SC_BAD_REQUEST, description = "Invalid data provided.")
+      })
+  public Response selfUpdatePassword(@FormParam("password") String password) {
+
+    User currentUser = securityService.getUser();
+    if (!currentUser.isManageable()) {
+      return Response.status(Response.Status.FORBIDDEN).build();
+    }
+
+    User user = jpaUserAndRoleProvider.loadUser(currentUser.getUsername());
+    if (user == null) {
+      return Response.status(Response.Status.FORBIDDEN).build();
+    }
+
+    try {
+      jpaUserAndRoleProvider.updateUser(new JpaUser(user.getUsername(), password,
+          (JpaOrganization) user.getOrganization(), user.getName(), user.getEmail(), jpaUserAndRoleProvider.getName(),
+          true, user.getRoles()
+          .stream()
+          .map(role -> new JpaRole(role.getName(), (JpaOrganization) user.getOrganization(), role.getDescription(),
+              role.getType()))
+          .collect(Collectors.toSet())));
+      userDirectoryService.invalidate(user.getUsername());
+      return Response.status(SC_OK).build();
+    } catch (UnauthorizedException ex) {
+      return Response.status(Response.Status.FORBIDDEN).build();
+    } catch (NotFoundException e) {
+      return Response.serverError().build();
+    }
+  }
+
   @DELETE
   @Path("{username}.json")
   @RestQuery(
