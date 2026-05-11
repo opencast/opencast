@@ -13,8 +13,14 @@ it needs to go into the legacy and can not go just into stable or develop.
 Explain how to test this patch. If this requires a particular set-up or configuration, explain that as well and provide
 the necessary configuration if possible. The easier it is for others to test the patch, the faster this will get
 reviewed and merged.
+
+For more information, see https://docs.opencast.org/develop/#participate/development-process/#ai-policy-for-pull-requests
 -->
 
+### AI Usage
+<!--
+If you used AI in a significant way to create this pull request, please explain how you used it and what you used it for. This is for us to better understand and deal with AI contributions. Your pull request will not be declined just becasue of AI usage.
+-->
 
 ### Your pull request should…
 
