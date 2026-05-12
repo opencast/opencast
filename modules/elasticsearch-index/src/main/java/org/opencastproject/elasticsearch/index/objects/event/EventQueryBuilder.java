@@ -276,6 +276,11 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
       and(EventIndexSchema.TECHNICAL_PRESENTERS, query.getTechnicalPresenters());
     }
 
+    // Is published
+    if (query.getNeedsCutting() != null) {
+      and(EventIndexSchema.NEEDS_CUTTING, query.getNeedsCutting());
+    }
+
     // Text
     if (query.getTerms() != null) {
       for (SearchTerms<String> terms : query.getTerms()) {

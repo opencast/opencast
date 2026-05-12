@@ -96,6 +96,9 @@ public class EventListQuery extends ResourceListQueryImpl {
   public static final String FILTER_WRITE_ACCESS_NAME = "writeAccess";
   public static final String FILTER_WRITE_ACCESS_LABEL = "FILTERS.EVENTS.WRITE_ACCESS.LABEL";
 
+  public static final String FILTER_NEEDS_CUTTING_NAME = "needsCutting";
+  public static final String FILTER_NEEDS_CUTTING_LABEL = "FILTERS.EVENTS.NEEDS_CUTTING.LABEL";
+
   public EventListQuery() {
     super();
     this.availableFilters.add(createSeriesFilter(Optional.empty()));
@@ -108,6 +111,7 @@ public class EventListQuery extends ResourceListQueryImpl {
     this.availableFilters.add(createIsPublishedFilter(Optional.empty()));
     this.availableFilters.add(createReadAccessFilter(Optional.empty()));
     this.availableFilters.add(createWriteAccessFilter(Optional.empty()));
+    this.availableFilters.add(createNeedsCuttingFilter(Optional.empty()));
   }
 
   /**
@@ -484,6 +488,18 @@ public class EventListQuery extends ResourceListQueryImpl {
   public static ResourceListFilter<String> createWriteAccessFilter(Optional<String> writeAccess) {
     return FiltersUtils.generateFilter(writeAccess, FILTER_WRITE_ACCESS_NAME, FILTER_WRITE_ACCESS_LABEL,
         SourceType.FREETEXT, Optional.of("ROLES.TARGET.ACL"));
+  }
+
+  /**
+   * Create a new {@link ResourceListFilter} based on if the event has open comment that it needs cutting
+   *
+   * @param needsCutting
+   *          open comment that it needs cutting wrapped in an {@link Optional} or {@link Optional#empty()}
+   * @return a new {@link ResourceListFilter} for needs cutting
+   */
+  public static ResourceListFilter<String> createNeedsCuttingFilter(Optional<String> needsCutting) {
+    return FiltersUtils.generateFilter(needsCutting, FILTER_NEEDS_CUTTING_NAME, FILTER_NEEDS_CUTTING_LABEL,
+        SourceType.SELECT, Optional.of(EventsListProvider.NEEDS_CUTTING));
   }
 
 }
