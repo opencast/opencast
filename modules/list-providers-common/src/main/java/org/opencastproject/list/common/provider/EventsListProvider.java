@@ -59,6 +59,7 @@ public class EventsListProvider implements ResourceListProvider {
   public static final String COMMENTS = PROVIDER_PREFIX + ".COMMENTS";
   public static final String PUBLISHER = PROVIDER_PREFIX + ".PUBLISHER";
   public static final String ISPUBLISHED = PROVIDER_PREFIX + ".IS_PUBLISHED";
+  public static final String NEEDS_CUTTING = PROVIDER_PREFIX + ".NEEDS_CUTTING";
 
   public enum Comments {
     NONE, OPEN, RESOLVED;
@@ -68,8 +69,12 @@ public class EventsListProvider implements ResourceListProvider {
     YES, NO;
   }
 
+  public enum NeedsCutting {
+    YES, NO;
+  }
+
   private static final String[] NAMES = { PROVIDER_PREFIX, CONTRIBUTORS, PRESENTERS_BIBLIOGRAPHIC, PRESENTERS_TECHNICAL,
-      SUBJECT, LOCATION, PROGRESS, STATUS, COMMENTS, PUBLISHER, ISPUBLISHED };
+      SUBJECT, LOCATION, PROGRESS, STATUS, COMMENTS, PUBLISHER, ISPUBLISHED, NEEDS_CUTTING };
 
   private static final Logger logger = LoggerFactory.getLogger(EventsListProvider.class);
 
@@ -141,6 +146,10 @@ public class EventsListProvider implements ResourceListProvider {
       for (IsPublished isPublished : IsPublished.values()) {
         list.put(isPublished.toString(), "FILTERS.EVENTS.IS_PUBLISHED." + isPublished.toString());
       }
+    } else if (NEEDS_CUTTING.equals(listName)) {
+      for (NeedsCutting needsCutting : NeedsCutting.values()) {
+        list.put(needsCutting.toString(), "FILTERS.EVENTS.NEEDS_CUTTING." + needsCutting.toString());
+      }
     }
 
     return list;
@@ -148,7 +157,10 @@ public class EventsListProvider implements ResourceListProvider {
 
   @Override
   public boolean isTranslatable(String listName) {
-    return STATUS.equals(listName) || COMMENTS.equals(listName) || ISPUBLISHED.equals(listName);
+    return STATUS.equals(listName)
+        || COMMENTS.equals(listName)
+        || ISPUBLISHED.equals(listName)
+        || NEEDS_CUTTING.equals(listName);
   }
 
   @Override

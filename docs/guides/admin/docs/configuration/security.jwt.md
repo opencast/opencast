@@ -41,7 +41,7 @@ This schema is designed to be flexible and support all current and conceivable f
     // Authorization, i.e. privileges the request/user should have
     "roles": ["ROLE_STUDIO", "ROLE_API_EVENTS_VIEW"],
     "oc": {
-        "e:d622b861-4264-4947-8db1-c754c5956433": ["read, "annotate"],
+        "e:d622b861-4264-4947-8db1-c754c5956433": ["read", "annotate"],
         "s:4ed02421-144c-42a1-b98a-22e84f3ac691": ["write"]
     }
 }

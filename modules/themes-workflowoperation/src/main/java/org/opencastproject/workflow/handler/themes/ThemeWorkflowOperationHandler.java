@@ -124,9 +124,6 @@ public class ThemeWorkflowOperationHandler extends AbstractWorkflowOperationHand
   /** The static file service */
   private StaticFileService staticFileService;
 
-  /** The workspace */
-  private Workspace workspace;
-
   /** OSGi callback for the series service. */
   @Reference
   public void setSeriesService(SeriesService seriesService) {

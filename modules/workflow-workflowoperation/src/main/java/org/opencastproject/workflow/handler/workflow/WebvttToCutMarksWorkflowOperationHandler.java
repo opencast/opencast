@@ -126,9 +126,6 @@ public class WebvttToCutMarksWorkflowOperationHandler extends AbstractWorkflowOp
     ALWAYS_INCLUDE
   }
 
-  /** The workspace. */
-  private Workspace workspace;
-
   @Override
   public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {

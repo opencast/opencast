@@ -70,8 +70,6 @@ public class AmberscriptAttachTranscriptionOperationHandler extends AbstractWork
   private TranscriptionService service = null;
   private CaptionService captionService;
 
-  private Workspace workspace;
-
   @Override
   @Activate
   protected void activate(ComponentContext cc) {
