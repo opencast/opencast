@@ -90,6 +90,7 @@ import org.opencastproject.list.api.DefaultResourceListQuery;
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ListProvidersService;
 import org.opencastproject.list.api.ResourceListQuery;
+import org.opencastproject.list.common.provider.EventsListProvider;
 import org.opencastproject.list.common.provider.EventsListProvider.Comments;
 import org.opencastproject.list.common.provider.EventsListProvider.IsPublished;
 import org.opencastproject.list.common.query.EventListQuery;
@@ -3309,6 +3310,23 @@ public abstract class AbstractEventEndpoint {
         query.withAccessControlEntry(filters.get(name), Permissions.Action.READ);
       } else if (EventListQuery.FILTER_WRITE_ACCESS_NAME.equals(name)) {
         query.withAccessControlEntry(filters.get(name), Permissions.Action.WRITE);
+      }
+      if (EventListQuery.FILTER_NEEDS_CUTTING_NAME.equals(name)) {
+        if (filters.containsKey(name)) {
+          switch (EventsListProvider.NeedsCutting.valueOf(filters.get(name))) {
+            case YES:
+              query.withNeedsCutting(true);
+              break;
+            case NO:
+              query.withNeedsCutting(false);
+              break;
+            default:
+              break;
+          }
+        } else {
+          logger.info("Query for invalid needs cutting status: {}", filters.get(name));
+          return Response.status(SC_BAD_REQUEST).build();
+        }
       }
 
       if (EventListQuery.FILTER_STARTDATE_NAME.equals(name)) {
