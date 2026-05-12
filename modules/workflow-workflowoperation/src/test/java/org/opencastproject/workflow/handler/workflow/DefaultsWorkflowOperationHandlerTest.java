@@ -21,6 +21,8 @@
 
 package org.opencastproject.workflow.handler.workflow;
 
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilder;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
@@ -112,7 +114,7 @@ public class DefaultsWorkflowOperationHandlerTest {
     String configurationValue = workflowOperationResult.getProperties().get(OPT_KEY);
 
     // Make sure the default value has been applied
-    Assert.assertNotEquals(DEFAULT_VALUE, configurationValue);
+    assertNotEquals(DEFAULT_VALUE, configurationValue);
   }
 
   /**

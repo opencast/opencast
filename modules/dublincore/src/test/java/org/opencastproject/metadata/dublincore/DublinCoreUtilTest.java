@@ -21,7 +21,7 @@
 package org.opencastproject.metadata.dublincore;
 
 import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertThat;
 import static org.opencastproject.metadata.dublincore.TestUtil.read;
 
@@ -71,7 +71,7 @@ public class DublinCoreUtilTest {
   public void testUtf8CodePointsDoNotContainNullByte() throws Exception {
     for (int i = Character.MIN_VALUE + 1; i <= Character.MAX_VALUE; i++) {
       for (byte b : Character.valueOf((char) i).toString().getBytes(StandardCharsets.UTF_8)) {
-        assertNotEquals(0, b);
+        assertNotSame(0, b);
       }
     }
   }
