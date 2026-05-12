@@ -30,7 +30,7 @@ jobs:
       matrix:
         java:
           - 21
-          - 23
+          - 25
     name: build (java ${{ matrix.java }})
     runs-on: ubuntu-24.04
     steps:
