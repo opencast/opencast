@@ -285,7 +285,11 @@ public final class JobUtil {
 
   public static Optional<Job> jobFromHttpResponse(ClassicHttpResponse response) {
     try {
-      return Optional.of(JobParser.parseJob(response.getEntity().getContent()));
+      if (null != response.getEntity()) {
+        return Optional.of(JobParser.parseJob(response.getEntity().getContent()));
+      } else {
+        return Optional.empty();
+      }
     } catch (Exception e) {
       logger.error("Error parsing Job from HTTP response", e);
       return Optional.empty();
