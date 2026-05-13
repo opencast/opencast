@@ -99,8 +99,6 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
   private ComposerService composerService = null;
   /** The smil service to parse the smil */
   private SmilService smilService;
-  /** The local workspace */
-  private Workspace workspace = null;
 
   private Predicate<EncodingProfile> isManifestEP = p -> p.getOutputType() == EncodingProfile.MediaType.Manifest;
 
@@ -490,7 +488,7 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
 
   /**
    * Find the matching encoding profile for this track and tag by name
-   * 
+   *
    * @param track
    * @param profiles
    *          - profiles used to encode a track to multiple formats

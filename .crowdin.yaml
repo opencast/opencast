@@ -9,10 +9,6 @@ files:
     translation: '/modules/engage-ui/src/main/resources/ui/language/%locale%.json'
 
   -
-    source: '/modules/engage-paella-player-7/src/i18n/en-US.json'
-    translation: '/modules/engage-paella-player-7/src/i18n/%locale%.json'
-
-  -
     source: '/modules/engage-paella-player-8/src/i18n/en-US.json'
     translation: '/modules/engage-paella-player-8/src/i18n/%locale%.json'
 

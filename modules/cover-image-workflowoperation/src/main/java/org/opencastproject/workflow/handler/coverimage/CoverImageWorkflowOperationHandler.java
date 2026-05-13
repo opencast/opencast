@@ -49,9 +49,6 @@ public class CoverImageWorkflowOperationHandler extends CoverImageWorkflowOperat
   /** The cover image service */
   private CoverImageService coverImageService;
 
-  /** The workspace service */
-  private Workspace workspace;
-
   /** Reference to the static metadata service */
   private StaticMetadataService metadataService;
 

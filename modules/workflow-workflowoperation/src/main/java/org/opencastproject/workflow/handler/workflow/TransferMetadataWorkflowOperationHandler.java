@@ -68,9 +68,6 @@ public class TransferMetadataWorkflowOperationHandler extends AbstractWorkflowOp
 
   private static Logger logger = LoggerFactory.getLogger(TransferMetadataWorkflowOperationHandler.class);
 
-  /** Reference to the workspace */
-  private Workspace workspace = null;
-
   /**
    * {@inheritDoc}
    *

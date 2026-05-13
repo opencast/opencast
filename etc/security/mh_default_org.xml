@@ -63,6 +63,7 @@
     <!-- Protect admin UI facade -->
     <sec:intercept-url pattern="/workflow/definitions.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_CREATE')" />
     <sec:intercept-url pattern="/admin-ng/acl/acls.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_ACLS_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/acl/acl/*" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_ACLS_VIEW')" />
     <sec:intercept-url pattern="/admin-ng/acl/*" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_ACLS_VIEW')" />
     <sec:intercept-url pattern="/acl-manager/acl/*" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_ACLS_VIEW')" />
     <sec:intercept-url pattern="/admin-ng/capture-agents/agents.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_LOCATIONS_VIEW', 'ROLE_UI_EVENTS_CREATE')" />
