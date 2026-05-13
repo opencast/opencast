@@ -103,9 +103,6 @@ public class InspectWorkflowOperationHandler extends AbstractWorkflowOperationHa
   /** The dublin core catalog service */
   private DublinCoreCatalogService dcService;
 
-  /** The local workspace */
-  private Workspace workspace;
-
   @Reference
   public void setDublincoreService(DublinCoreCatalogService dcService) {
     this.dcService = dcService;

@@ -139,9 +139,6 @@ public class
   /** Service to tracker asynchrnous requests to the speech-to-text service */
   private SpeechToTextAsyncTracker speechToTextTracker;
 
-  /** The workspace service. */
-  private Workspace workspace;
-
   /** The inspection service. */
   private MediaInspectionService mediaInspectionService;
 

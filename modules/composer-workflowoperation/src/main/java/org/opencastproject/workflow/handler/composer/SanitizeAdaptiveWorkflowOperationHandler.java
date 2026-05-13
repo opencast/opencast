@@ -78,9 +78,6 @@ public class SanitizeAdaptiveWorkflowOperationHandler extends AbstractWorkflowOp
   private static final String PLUS = "+";
   private static final String MINUS = "-";
 
-  /** The local workspace */
-  private Workspace workspace = null;
-
   /**
    * Callback for declarative services configuration that will introduce us to the local workspace service.
    * Implementation assumes that the reference is configured as being static.
@@ -102,8 +99,8 @@ public class SanitizeAdaptiveWorkflowOperationHandler extends AbstractWorkflowOp
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(
+   *      org.opencastproject.workflow.api.WorkflowInstance, JobContext)
    */
   @Override
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
@@ -236,10 +233,12 @@ public class SanitizeAdaptiveWorkflowOperationHandler extends AbstractWorkflowOp
     if (targetFlavor != null) {
       String flavorType = targetFlavor.getType();
       String flavorSubtype = targetFlavor.getSubtype();
-      if ("*".equals(flavorType))
+      if ("*".equals(flavorType)) {
         flavorType = track.getFlavor().getType();
-      if ("*".equals(flavorSubtype))
+      }
+      if ("*".equals(flavorSubtype)) {
         flavorSubtype = track.getFlavor().getSubtype();
+      }
       track.setFlavor(new MediaPackageElementFlavor(flavorType, flavorSubtype));
       logger.debug("Composed track has flavor '{}'", track.getFlavor());
     }

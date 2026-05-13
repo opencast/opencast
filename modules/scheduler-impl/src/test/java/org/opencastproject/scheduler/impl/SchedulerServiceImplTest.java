@@ -87,6 +87,7 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.identifier.IdImpl;
+import org.opencastproject.message.broker.api.update.AssetManagerUpdateHandler;
 import org.opencastproject.message.broker.api.update.SchedulerUpdateHandler;
 import org.opencastproject.metadata.dublincore.CatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
@@ -1431,8 +1432,9 @@ public class SchedulerServiceImplTest {
     EasyMock.reset(index);
     EasyMock.expect(index.getIndexName()).andReturn("index").anyTimes();
     EasyMock.expect(index.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(result).anyTimes();
-    EasyMock.expect(index.addOrUpdateEvent(EasyMock.anyString(), EasyMock.anyObject(java.util.function.Function.class),
-            EasyMock.anyString(), EasyMock.anyObject(User.class))).andReturn(Optional.empty()).times(orgList.size());
+    expect(index.addOrUpdateEvent(EasyMock.anyString(), EasyMock.anyObject(java.util.function.Function.class),
+            EasyMock.anyObject(Organization.class), EasyMock.anyObject(User.class))).andReturn(Optional.empty())
+        .times(orgList.size());
     EasyMock.replay(index, result);
     schedSvc.setIndex(index);
 
@@ -1629,8 +1631,9 @@ public class SchedulerServiceImplTest {
 
     ElasticsearchIndex esIndex = EasyMock.createNiceMock(ElasticsearchIndex.class);
     EasyMock.expect(esIndex.addOrUpdateEvent(EasyMock.anyString(),
-            EasyMock.anyObject(java.util.function.Function.class), EasyMock.anyString(),
-            EasyMock.anyObject(User.class))).andReturn(Optional.empty()).atLeastOnce();
+            EasyMock.anyObject(java.util.function.Function.class),
+            EasyMock.anyObject(Organization.class), EasyMock.anyObject(User.class)))
+        .andReturn(Optional.empty()).atLeastOnce();
     EasyMock.replay(esIndex);
 
     AssetManagerImpl am = new AssetManagerImpl();
@@ -1641,6 +1644,8 @@ public class SchedulerServiceImplTest {
     am.setAuthorizationService(authorizationService);
     am.setSecurityService(securityService);
     am.setIndex(esIndex);
+    am.addEventHandler(EasyMock.createNiceMock(AssetManagerUpdateHandler.class));
+    am.addEventHandler(EasyMock.createNiceMock(AssetManagerUpdateHandler.class));
     return am;
   }
 
@@ -1726,6 +1731,10 @@ public class SchedulerServiceImplTest {
       @Override
       public String getStoreType() {
         return "test_store";
+      }
+
+      @Override public String getStorageName() {
+        return "Test Store";
       }
     };
   }

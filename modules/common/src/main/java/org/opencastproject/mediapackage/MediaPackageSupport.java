@@ -84,9 +84,9 @@ public final class MediaPackageSupport {
   public static MediaPackage merge(MediaPackage dest, MediaPackage src, MergeMode mode) throws MediaPackageException {
     try {
       for (MediaPackageElement e : src.elements()) {
-        if (dest.getElementById(e.getIdentifier()) == null)
+        if (dest.getElementById(e.getIdentifier()) == null) {
           dest.add(e);
-        else {
+        } else {
           if (MergeMode.Replace == mode) {
             logger.debug("Replacing element " + e.getIdentifier() + " while merging " + dest + " with " + src);
             dest.remove(dest.getElementById(e.getIdentifier()));
@@ -96,7 +96,7 @@ public final class MediaPackageSupport {
             continue;
           } else if (MergeMode.Merge == mode) {
             logger.debug("Renaming element " + e.getIdentifier() + " while merging " + dest + " with " + src);
-            e.setIdentifier(null);
+            e.generateIdentifier();
             dest.add(e);
           } else if (MergeMode.Fail == mode) {
             throw new MediaPackageException("Target media package " + dest + " already contains element with id "
@@ -119,8 +119,9 @@ public final class MediaPackageSupport {
    */
   public static boolean contains(String identifier, MediaPackage mp) {
     for (MediaPackageElement element : mp.getElements()) {
-      if (element.getIdentifier().equals(identifier))
+      if (element.getIdentifier().equals(identifier)) {
         return true;
+      }
     }
     return false;
   }

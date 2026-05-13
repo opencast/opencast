@@ -25,6 +25,7 @@ operations:
     configurations:
       - source-flavors: captions/delivery
       - target-tags: -archive,+generator:unknown,+engage-download
+
   - id: tag
     description: Don't publish captions/source
     configurations:

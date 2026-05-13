@@ -103,11 +103,13 @@ public final class MimeType implements Comparable<MimeType>, Serializable {
   }
 
   public static MimeType mimeType(String type, String subtype, String suffix) {
-    return new MimeType(type, subtype, list(suffix), Collections.<MimeType>nil(), Optional.empty(), Optional.empty(), Optional.empty());
+    return new MimeType(type, subtype, list(suffix), Collections.<MimeType>nil(), Optional.empty(), Optional.empty(),
+        Optional.empty());
   }
 
   public static MimeType mimeType(String type, String subtype) {
-    return new MimeType(type, subtype, Collections.<String>nil(), Collections.<MimeType>nil(), Optional.empty(), Optional.empty(), Optional.empty());
+    return new MimeType(type, subtype, Collections.<String>nil(), Collections.<MimeType>nil(), Optional.empty(),
+        Optional.empty(), Optional.empty());
   }
 
   /**
@@ -205,8 +207,9 @@ public final class MimeType implements Comparable<MimeType>, Serializable {
    * @return <code>true</code> if the file has that flavor
    */
   public boolean hasFlavor(String flavor) {
-    if (flavor == null)
+    if (flavor == null) {
       return false;
+    }
     return flavor.equalsIgnoreCase(flavor);
   }
 

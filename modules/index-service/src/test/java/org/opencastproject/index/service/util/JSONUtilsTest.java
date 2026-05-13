@@ -24,16 +24,12 @@ package org.opencastproject.index.service.util;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 
-import org.opencastproject.index.service.resources.list.provider.ContributorsListProvider;
-import org.opencastproject.index.service.resources.list.query.SeriesListQuery;
-import org.opencastproject.list.api.ListProviderException;
+
+import org.opencastproject.list.api.DefaultResourceListQuery;
+import org.opencastproject.list.api.ListProvidersService;
 import org.opencastproject.list.api.ResourceListFilter;
-import org.opencastproject.list.api.ResourceListProvider;
 import org.opencastproject.list.api.ResourceListQuery;
-import org.opencastproject.list.impl.ListProvidersServiceImpl;
-import org.opencastproject.list.impl.ResourceListQueryImpl;
 import org.opencastproject.list.query.StringListFilter;
-import org.opencastproject.list.util.ListProviderUtil;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 
@@ -57,6 +53,9 @@ import uk.co.datumedge.hamcrest.json.SameJSONAs;
  * Unit tests for {@link JSONUtils}
  */
 public class JSONUtilsTest {
+
+  private static final String CONTRIBUTORS_PROVIDER = "CONTRIBUTORS";
+
 
   /**
    * Test method for {@link JSONUtils#fromMap(Map)}
@@ -111,7 +110,7 @@ public class JSONUtilsTest {
 
   /**
    * Test method for
-   * {@link JSONUtils#filtersToJSON(org.opencastproject.list.api.ResourceListQuery, org.opencastproject.list.api.ListProvidersService, org.opencastproject.security.api.Organization)}
+   * {@link JSONUtils#filtersToJSON(ResourceListQuery, org.opencastproject.list.api.ListProvidersService, Organization)}
    * (filters, listProviderService, query, org)}
    */
   @Test
@@ -126,49 +125,59 @@ public class JSONUtilsTest {
     EasyMock.replay(organization);
     EasyMock.replay(securityService);
 
-    ListProvidersServiceImpl listProvidersService = new ListProvidersServiceImpl();
-
-    listProvidersService.setSecurityService(securityService);
-
-    final Map<String, String> license = new HashMap<String, String>();
+    final Map<String, String> license = new HashMap<>();
     license.put("contributor1", "My first contributor");
     license.put("contributor2", "My second contributor");
     license.put("contributor3", "My third contributor");
 
-    // Create test list provider
-    listProvidersService.addProvider(ContributorsListProvider.DEFAULT, new ResourceListProvider() {
-
-      @Override
-      public String[] getListNames() {
-        return new String[] { ContributorsListProvider.DEFAULT };
-      }
-
-      @Override
-      public Map<String, String> getList(String listName, ResourceListQuery query)
-              throws ListProviderException {
-        return ListProviderUtil.filterMap(license, query);
-      }
-
-        @Override
-        public boolean isTranslatable(String listName) {
-          return false;
-        }
-
-      @Override
-      public String getDefault() {
-        return null;
-      }
-    }, organization.getId());
+    // Use a mock ListProvidersService instead of a concrete implementation
+    ListProvidersService listProvidersService = EasyMock.createNiceMock(ListProvidersService.class);
+    // Expect that the provider exists for the organization
+    EasyMock.expect(listProvidersService.hasProvider(CONTRIBUTORS_PROVIDER, organization.getId()))
+            .andReturn(true).anyTimes();
+    // Return the license map for any ResourceListQuery and inverseValueKey == false
+    EasyMock.expect(listProvidersService.getList(EasyMock.eq(CONTRIBUTORS_PROVIDER),
+            EasyMock.anyObject(ResourceListQuery.class), EasyMock.eq(false))).andReturn(license).anyTimes();
+    // Not translatable
+    EasyMock.expect(listProvidersService.isTranslatable(CONTRIBUTORS_PROVIDER)).andReturn(false).anyTimes();
+    EasyMock.replay(listProvidersService);
 
     // Prepare mock query
-    List<ResourceListFilter<?>> filters = new ArrayList<ResourceListFilter<?>>();
-    filters.add(SeriesListQuery.createContributorsFilter(Optional.<String> empty()));
+    List<ResourceListFilter<?>> filters = new ArrayList<>();
+    // Create a simple contributors filter that points to the CONTRIBUTORS provider
+    ResourceListFilter<String> contributorsFilter = new ResourceListFilter<>() {
+      @Override
+      public String getName() {
+        return "contributors";
+      }
+
+      @Override
+      public Optional<String> getValue() {
+        return Optional.empty();
+      }
+
+      @Override
+      public ResourceListFilter.SourceType getSourceType() {
+        return ResourceListFilter.SourceType.SELECT;
+      }
+
+      @Override
+      public String getLabel() {
+        return "FILTERS.SERIES.CONTRIBUTORS.LABEL";
+      }
+
+      @Override
+      public Optional<String> getValuesListName() {
+        return Optional.of(CONTRIBUTORS_PROVIDER);
+      }
+    };
+    filters.add(contributorsFilter);
     filters.add(new StringListFilter(""));
-    ResourceListQueryImpl query = EasyMock.createNiceMock(ResourceListQueryImpl.class);
+    DefaultResourceListQuery query = EasyMock.createNiceMock(DefaultResourceListQuery.class);
     EasyMock.expect(query.getAvailableFilters()).andReturn(filters).anyTimes();
-    EasyMock.expect(query.getFilters()).andReturn(new ArrayList<ResourceListFilter<?>>()).anyTimes();
-    EasyMock.expect(query.getLimit()).andReturn(Optional.<Integer> empty()).anyTimes();
-    EasyMock.expect(query.getOffset()).andReturn(Optional.<Integer> empty()).anyTimes();
+    EasyMock.expect(query.getFilters()).andReturn(new ArrayList<>()).anyTimes();
+    EasyMock.expect(query.getLimit()).andReturn(Optional.empty()).anyTimes();
+    EasyMock.expect(query.getOffset()).andReturn(Optional.empty()).anyTimes();
     EasyMock.replay(query);
 
     JSONUtils.setUserRegex(".*"); //allow all users

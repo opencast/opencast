@@ -131,9 +131,14 @@ import javax.ws.rs.core.Response.Status;
 @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_0_0, ApiMediaType.VERSION_1_1_0, ApiMediaType.VERSION_1_2_0,
             ApiMediaType.VERSION_1_3_0, ApiMediaType.VERSION_1_4_0, ApiMediaType.VERSION_1_5_0,
             ApiMediaType.VERSION_1_6_0, ApiMediaType.VERSION_1_7_0, ApiMediaType.VERSION_1_8_0,
-            ApiMediaType.VERSION_1_9_0, ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0 })
-@RestService(name = "externalapiseries", title = "External API Series Service", notes = {},
-             abstractText = "Provides resources and operations related to the series")
+            ApiMediaType.VERSION_1_9_0, ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0,
+            ApiMediaType.VERSION_1_12_0 })
+@RestService(
+    name = "externalapiseries",
+    title = "External API Series Service",
+    notes = {},
+    abstractText = "Provides resources and operations related to the series"
+)
 @Component(
     immediate = true,
     service = SeriesEndpoint.class,
@@ -197,15 +202,32 @@ public class SeriesEndpoint {
 
   @GET
   @Path("")
-  @RestQuery(name = "getseries", description = "Returns a list of series.", returnDescription = "", restParameters = {
-          @RestParameter(name = "onlyWithWriteAccess", isRequired = false, description = "Whether only to get the series to which we have write access.", type = RestParameter.Type.BOOLEAN),
-          @RestParameter(name = "filter", isRequired = false, description = "Usage <Filter Name>:<Value to Filter With>. Filters can combine using a comma \",\". Available Filters: managedAcl, contributors, CreationDate, Creator, textFilter, language, license, organizers, subject, title. If API ver > 1.1.0 also: identifier, description, creator, publishers, rightsholder.", type = STRING),
-          @RestParameter(name = "sort", description = "Sort the results based upon a list of comma seperated sorting criteria. In the comma seperated list each type of sorting is specified as a pair such as: <Sort Name>:ASC or <Sort Name>:DESC. Adding the suffix ASC or DESC sets the order as ascending or descending order and is mandatory.", isRequired = false, type = STRING),
-          @RestParameter(name = "limit", description = "The maximum number of results to return for a single request.", isRequired = false, type = RestParameter.Type.INTEGER),
-          @RestParameter(name = "offset", description = "The index of the first result to return.", isRequired = false, type = RestParameter.Type.INTEGER),
-          @RestParameter(name = "withacl", isRequired = false, description = "Whether the acl should be included in the response.", type = RestParameter.Type.BOOLEAN)
-        }, responses = {
-          @RestResponse(description = "A (potentially empty) list of series is returned.", responseCode = HttpServletResponse.SC_OK) })
+  @RestQuery(
+      name = "getseries",
+      description = "Returns a list of series.",
+      returnDescription = "",
+      restParameters = {
+          @RestParameter(name = "onlyWithWriteAccess", isRequired = false, description = "Whether only to get the "
+              + "series to which we have write access.", type = RestParameter.Type.BOOLEAN),
+          @RestParameter(name = "filter", isRequired = false, description = "Usage <Filter Name>:<Value to Filter "
+              + "With>. Filters can combine using a comma \",\". Available Filters: managedAcl, contributors, "
+              + "CreationDate, Creator, textFilter, language, license, organizers, subject, title. If API ver > 1.1.0 "
+              + "also: identifier, description, creator, publishers, rightsholder.", type = STRING),
+          @RestParameter(name = "sort", description = "Sort the results based upon a list of comma seperated sorting "
+              + "criteria. In the comma seperated list each type of sorting is specified as a pair such as: <Sort "
+              + "Name>:ASC or <Sort Name>:DESC. Adding the suffix ASC or DESC sets the order as ascending or "
+              + "descending order and is mandatory.", isRequired = false, type = STRING),
+          @RestParameter(name = "limit", description = "The maximum number of results to return for a single request.",
+              isRequired = false, type = RestParameter.Type.INTEGER),
+          @RestParameter(name = "offset", description = "The index of the first result to return.", isRequired = false,
+              type = RestParameter.Type.INTEGER),
+          @RestParameter(name = "withacl", isRequired = false, description = "Whether the acl should be included in "
+              + "the response.", type = RestParameter.Type.BOOLEAN)
+      },
+      responses = {
+          @RestResponse(description = "A (potentially empty) list of series is returned.",
+              responseCode = HttpServletResponse.SC_OK)
+      })
   public Response getSeriesList(@HeaderParam("Accept") String acceptHeader, @QueryParam("filter") String filter,
           @QueryParam("sort") String sort, @QueryParam("order") String order, @QueryParam("offset") int offset,
           @QueryParam("limit") int limit, @QueryParam("onlyWithWriteAccess") Boolean onlyWithWriteAccess,
@@ -250,20 +272,20 @@ public class SeriesEndpoint {
           } else if ("contributors".equals(name)) {
             query.withContributor(value);
           } else if ("CreationDate".equals(name)) {
-              try {
-                Tuple<Date, Date> fromAndToCreationRange = getFromAndToCreationRange(value.split("/")[0],
-                        value.split("/")[1]);
-                query.withCreatedFrom(fromAndToCreationRange.getA());
-                query.withCreatedTo(fromAndToCreationRange.getB());
-              } catch (IllegalArgumentException e) {
-                return RestUtil.R.badRequest(e.getMessage());
-              } catch (ArrayIndexOutOfBoundsException e) {
-                String dateErrorMsg = String.format("Filter Series API error: Malformed date period. "
-                    + "Correct UTC time period format: yyyy-MM-ddTHH:mm:ssZ/yyyy-MM-ddTHH:mm:ssZ, "
-                    + "stated date period string: \"%s\"", value);
-                logger.warn(dateErrorMsg);
-                return RestUtil.R.badRequest(dateErrorMsg);
-              }
+            try {
+              Tuple<Date, Date> fromAndToCreationRange = getFromAndToCreationRange(value.split("/")[0],
+                      value.split("/")[1]);
+              query.withCreatedFrom(fromAndToCreationRange.getA());
+              query.withCreatedTo(fromAndToCreationRange.getB());
+            } catch (IllegalArgumentException e) {
+              return RestUtil.R.badRequest(e.getMessage());
+            } catch (ArrayIndexOutOfBoundsException e) {
+              String dateErrorMsg = String.format("Filter Series API error: Malformed date period. "
+                  + "Correct UTC time period format: yyyy-MM-ddTHH:mm:ssZ/yyyy-MM-ddTHH:mm:ssZ, "
+                  + "stated date period string: \"%s\"", value);
+              logger.warn(dateErrorMsg);
+              return RestUtil.R.badRequest(dateErrorMsg);
+            }
           } else if ("Creator".equals(name)) {
             query.withCreator(value);
           } else if ("textFilter".equals(name)) {
@@ -403,16 +425,21 @@ public class SeriesEndpoint {
 
   @GET
   @Path("{seriesId}")
-  @RestQuery(name = "getseries", description = "Returns a single series.", returnDescription = "",
-  pathParameters = {
+  @RestQuery(
+      name = "getseries",
+      description = "Returns a single series.",
+      returnDescription = "",
+      pathParameters = {
           @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING)
-  }, restParameters = {
+      },
+      restParameters = {
           @RestParameter(name = "withacl", isRequired = false, type = RestParameter.Type.BOOLEAN,
-                         description = "Whether the acl should be included in the response.")
-  }, responses = {
+                             description = "Whether the acl should be included in the response.")
+      },
+      responses = {
           @RestResponse(description = "The series is returned.", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND),
-  })
+          @RestResponse(description = "The specified series does not exist.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND), })
   public Response getSeries(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id,
                             @QueryParam("withacl") Boolean withAcl)
           throws Exception {
@@ -422,7 +449,8 @@ public class SeriesEndpoint {
       withAcl = false;
     }
 
-    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization().getId(), securityService.getUser());
+    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization(),
+        securityService.getUser());
     if (optSeries.isPresent()) {
       final Series s = optSeries.get();
       JsonArray subjects;
@@ -477,11 +505,25 @@ public class SeriesEndpoint {
 
   @GET
   @Path("{seriesId}/metadata")
-  @RestQuery(name = "getseriesmetadata", description = "Returns a series' metadata of all types or returns a series' metadata collection of the given type when the query string parameter type is specified. For each metadata catalog there is a unique property called the flavor such as dublincore/series so the type in this example would be 'dublincore/series'", returnDescription = "", pathParameters = {
-          @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING) }, restParameters = {
-                  @RestParameter(name = "type", isRequired = false, description = "The type of metadata to return", type = STRING) }, responses = {
-                          @RestResponse(description = "The series' metadata are returned.", responseCode = HttpServletResponse.SC_OK),
-                          @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  @RestQuery(
+      name = "getseriesmetadata",
+      description = "Returns a series' metadata of all types or returns a series' metadata collection of the given "
+          + "type when the query string parameter type is specified. For each metadata catalog there is a unique "
+          + "property called the flavor such as dublincore/series so the type in this example would be "
+          + "'dublincore/series'",
+      returnDescription = "",
+      pathParameters = {
+          @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING)
+      },
+      restParameters = {
+          @RestParameter(name = "type", isRequired = false, description = "The type of metadata to return",
+              type = STRING)
+      },
+      responses = {
+          @RestResponse(description = "The series' metadata are returned.", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "The specified series does not exist.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      })
   public Response getSeriesMetadata(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id,
           @QueryParam("type") String type) throws Exception {
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
@@ -493,9 +535,11 @@ public class SeriesEndpoint {
   }
 
   private Response getAllMetadata(String id, ApiVersion requestedVersion) throws SearchIndexException {
-    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization().getId(), securityService.getUser());
-    if (optSeries.isEmpty())
+    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization(),
+        securityService.getUser());
+    if (optSeries.isEmpty()) {
       return ApiResponseBuilder.notFound("Cannot find a series with id '%s'.", id);
+    }
 
     MetadataList metadataList = new MetadataList();
     List<SeriesCatalogUIAdapter> catalogUIAdapters = indexService.getSeriesCatalogUIAdapters();
@@ -509,19 +553,25 @@ public class SeriesEndpoint {
     DublinCoreMetadataCollection collection = getSeriesMetadata(optSeries.get());
     ExternalMetadataUtils.changeSubjectToSubjects(collection);
     metadataList.add(indexService.getCommonSeriesCatalogUIAdapter(), collection);
-    return ApiResponseBuilder.Json.ok(requestedVersion, MetadataJson.listToJson(metadataList, false));
+    boolean includeListprovider = !requestedVersion.isSmallerThan(ApiVersion.VERSION_1_12_0);
+    return ApiResponseBuilder.Json.ok(requestedVersion, MetadataJson.listToJson(metadataList, false,
+        includeListprovider));
   }
 
   private Response getMetadataByType(String id, String type, ApiVersion requestedVersion) throws SearchIndexException {
-    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization().getId(), securityService.getUser());
-    if (optSeries.isEmpty())
+    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization(),
+        securityService.getUser());
+    if (optSeries.isEmpty()) {
       return ApiResponseBuilder.notFound("Cannot find a series with id '%s'.", id);
+    }
 
+    boolean includeListprovider = !requestedVersion.isSmallerThan(ApiVersion.VERSION_1_12_0);
     // Try the main catalog first as we load it from the index.
     if (typeMatchesSeriesCatalogUIAdapter(type, indexService.getCommonSeriesCatalogUIAdapter())) {
       DublinCoreMetadataCollection collection = getSeriesMetadata(optSeries.get());
       ExternalMetadataUtils.changeSubjectToSubjects(collection);
-      return ApiResponseBuilder.Json.ok(requestedVersion, MetadataJson.collectionToJson(collection, false));
+      return ApiResponseBuilder.Json.ok(requestedVersion, MetadataJson.collectionToJson(collection, false,
+          includeListprovider));
     }
 
     // Try the other catalogs
@@ -532,7 +582,8 @@ public class SeriesEndpoint {
       if (typeMatchesSeriesCatalogUIAdapter(type, adapter)) {
         final Optional<DublinCoreMetadataCollection> optSeriesMetadata = adapter.getFields(id);
         if (optSeriesMetadata.isPresent()) {
-          return ApiResponseBuilder.Json.ok(requestedVersion, MetadataJson.collectionToJson(optSeriesMetadata.get(), true));
+          return ApiResponseBuilder.Json.ok(requestedVersion, MetadataJson.collectionToJson(optSeriesMetadata.get(),
+              true, includeListprovider));
         }
       }
     }
@@ -667,13 +718,28 @@ public class SeriesEndpoint {
 
   @PUT
   @Path("{seriesId}/metadata")
-  @RestQuery(name = "updateseriesmetadata", description = "Update a series' metadata of the given type. For a metadata catalog there is the flavor such as 'dublincore/series' and this is the unique type.", returnDescription = "", pathParameters = {
-          @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING) }, restParameters = {
-                  @RestParameter(name = "type", isRequired = true, description = "The type of metadata to update", type = STRING),
-                  @RestParameter(name = "metadata", description = "Series metadata as Form param", isRequired = true, type = STRING) }, responses = {
-                          @RestResponse(description = "The series' metadata have been updated.", responseCode = HttpServletResponse.SC_OK),
-                          @RestResponse(description = "The request is invalid or inconsistent.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-                          @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  @RestQuery(
+      name = "updateseriesmetadata",
+      description = "Update a series' metadata of the given type. For a metadata catalog there is the flavor such as "
+          + "'dublincore/series' and this is the unique type.",
+      returnDescription = "",
+      pathParameters = {
+          @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING)
+      },
+      restParameters = {
+          @RestParameter(name = "type", isRequired = true, description = "The type of metadata to update",
+              type = STRING),
+          @RestParameter(name = "metadata", description = "Series metadata as Form param", isRequired = true,
+              type = STRING)
+      },
+      responses = {
+          @RestResponse(description = "The series' metadata have been updated.",
+              responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "The request is invalid or inconsistent.",
+              responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "The specified series does not exist.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      })
   public Response updateSeriesMetadata(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id,
           @QueryParam("type") String type, @FormParam("metadata") String metadataJSON) throws Exception {
     if (StringUtils.trimToNull(metadataJSON) == null) {
@@ -699,9 +765,11 @@ public class SeriesEndpoint {
     Optional<DublinCoreMetadataCollection> optCollection = Optional.empty();
     SeriesCatalogUIAdapter adapter = null;
 
-    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization().getId(), securityService.getUser());
-    if (optSeries.isEmpty())
+    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization(),
+        securityService.getUser());
+    if (optSeries.isEmpty()) {
       return ApiResponseBuilder.notFound("Cannot find a series with id '%s'.", id);
+    }
 
     MetadataList metadataList = new MetadataList();
 
@@ -758,12 +826,26 @@ public class SeriesEndpoint {
 
   @DELETE
   @Path("{seriesId}/metadata")
-  @RestQuery(name = "deleteseriesmetadata", description = "Deletes a series' metadata catalog of the given type. All fields and values of that catalog will be deleted.", returnDescription = "", pathParameters = {
-          @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING) }, restParameters = {
-                  @RestParameter(name = "type", isRequired = true, description = "The type of metadata to delete", type = STRING) }, responses = {
-                          @RestResponse(description = "The metadata have been deleted.", responseCode = HttpServletResponse.SC_NO_CONTENT),
-                          @RestResponse(description = "The main metadata catalog dublincore/series cannot be deleted as it has mandatory fields.", responseCode = HttpServletResponse.SC_FORBIDDEN),
-                          @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  @RestQuery(
+      name = "deleteseriesmetadata",
+      description = "Deletes a series' metadata catalog of the given type. All fields and values of that catalog will "
+          + "be deleted.",
+      returnDescription = "",
+      pathParameters = {
+          @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING)
+      },
+      restParameters = {
+          @RestParameter(name = "type", isRequired = true, description = "The type of metadata to delete",
+              type = STRING)
+      },
+      responses = {
+          @RestResponse(description = "The metadata have been deleted.",
+              responseCode = HttpServletResponse.SC_NO_CONTENT),
+          @RestResponse(description = "The main metadata catalog dublincore/series cannot be deleted as it has "
+              + "mandatory fields.", responseCode = HttpServletResponse.SC_FORBIDDEN),
+          @RestResponse(description = "The specified series does not exist.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      })
   public Response deleteSeriesMetadataByType(@HeaderParam("Accept") String acceptHeader,
           @PathParam("seriesId") String id, @QueryParam("type") String type) throws Exception {
     if (StringUtils.trimToNull(type) == null) {
@@ -785,9 +867,11 @@ public class SeriesEndpoint {
               .build();
     }
 
-    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization().getId(), securityService.getUser());
-    if (optSeries.isEmpty())
+    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization(),
+        securityService.getUser());
+    if (optSeries.isEmpty()) {
       return ApiResponseBuilder.notFound("Cannot find a series with id '%s'.", id);
+    }
 
     try {
       indexService.removeCatalogByFlavor(optSeries.get(), MediaPackageElementFlavor.parseFlavor(type));
@@ -799,14 +883,25 @@ public class SeriesEndpoint {
 
   @GET
   @Path("{seriesId}/acl")
-  @RestQuery(name = "getseriesacl", description = "Returns a series' access policy.", returnDescription = "", pathParameters = {
-          @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING) }, responses = {
-                  @RestResponse(description = "The series' access policy is returned.", responseCode = HttpServletResponse.SC_OK),
-                  @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
-  public Response getSeriesAcl(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id) throws Exception {
+  @RestQuery(
+      name = "getseriesacl",
+      description = "Returns a series' access policy.",
+      returnDescription = "",
+      pathParameters = {
+          @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING)
+      },
+      responses = {
+          @RestResponse(description = "The series' access policy is returned.",
+              responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "The specified series does not exist.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      })
+  public Response getSeriesAcl(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id)
+          throws Exception {
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
     JSONParser parser = new JSONParser();
-    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization().getId(), securityService.getUser());
+    Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization(),
+        securityService.getUser());
     if (optSeries.isPresent()) {
       Series series = optSeries.get();
       // The ACL is stored as JSON string in the index. Parse it and extract the part we want to have in the API.
@@ -818,7 +913,8 @@ public class SeriesEndpoint {
       if (!((JSONObject) acl.get("acl")).containsKey("ace")) {
         return ApiResponseBuilder.notFound("Cannot find acl for series with id '%s'.", id);
       } else {
-        return ApiResponseBuilder.Json.ok(requestedVersion, ((JSONArray) ((JSONObject) acl.get("acl")).get("ace")).toJSONString());
+        return ApiResponseBuilder.Json.ok(requestedVersion, ((JSONArray) ((JSONObject) acl.get("acl")).get("ace"))
+            .toJSONString());
       }
     }
 
@@ -827,12 +923,22 @@ public class SeriesEndpoint {
 
   @GET
   @Path("{seriesId}/properties")
-  @RestQuery(name = "getseriesproperties", description = "Returns a series' properties", returnDescription = "", pathParameters = {
-          @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING) }, responses = {
-                  @RestResponse(description = "The series' properties are returned.", responseCode = HttpServletResponse.SC_OK),
-                  @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
-  public Response getSeriesProperties(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id) throws Exception {
-    if (elasticsearchIndex.getSeries(id, securityService.getOrganization().getId(), securityService.getUser()).isPresent()) {
+  @RestQuery(
+      name = "getseriesproperties",
+      description = "Returns a series' properties",
+      returnDescription = "",
+      pathParameters = {
+          @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING)
+      },
+      responses = {
+          @RestResponse(description = "The series' properties are returned.", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "The specified series does not exist.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      })
+  public Response getSeriesProperties(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id)
+          throws Exception {
+    if (elasticsearchIndex.getSeries(id, securityService.getOrganization(),
+        securityService.getUser()).isPresent()) {
       final Map<String, String> properties = seriesService.getSeriesProperties(id);
 
       JsonObject json = new JsonObject();
@@ -848,10 +954,18 @@ public class SeriesEndpoint {
 
   @DELETE
   @Path("{seriesId}")
-  @RestQuery(name = "deleteseries", description = "Deletes a series.", returnDescription = "", pathParameters = {
-          @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING) }, responses = {
-                  @RestResponse(description = "The series has been deleted.", responseCode = HttpServletResponse.SC_NO_CONTENT),
-                  @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  @RestQuery(
+      name = "deleteseries",
+      description = "Deletes a series.",
+      returnDescription = "",
+      pathParameters = {
+          @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING)
+      },
+      responses = {
+          @RestResponse(description = "The series has been deleted.", responseCode = HttpServletResponse.SC_NO_CONTENT),
+          @RestResponse(description = "The specified series does not exist.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      })
   public Response deleteSeries(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id)
           throws NotFoundException {
     try {
@@ -867,18 +981,34 @@ public class SeriesEndpoint {
 
   @PUT
   @Path("{seriesId}")
-  @RestQuery(name = "updateallseriesmetadata", description = "Update all series metadata.", returnDescription = "", pathParameters = {
-          @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING) }, restParameters = {
-                  @RestParameter(name = "metadata", description = "Series metadata as Form param", isRequired = true, type = STRING) }, responses = {
-                          @RestResponse(description = "The series' metadata have been updated.", responseCode = HttpServletResponse.SC_OK),
-                          @RestResponse(description = "The request is invalid or inconsistent.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-                          @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
-  public Response updateSeriesMetadata(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String seriesID,
-          @FormParam("metadata") String metadataJSON)
+  @RestQuery(
+      name = "updateallseriesmetadata",
+      description = "Update all series metadata.",
+      returnDescription = "",
+      pathParameters = {
+          @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING)
+      },
+      restParameters = {
+          @RestParameter(name = "metadata", description = "Series metadata as Form param", isRequired = true,
+              type = STRING)
+      },
+      responses = {
+          @RestResponse(description = "The series' metadata have been updated.",
+              responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "The request is invalid or inconsistent.",
+              responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "The specified series does not exist.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      })
+  public Response updateSeriesMetadata(@HeaderParam("Accept") String acceptHeader,
+      @PathParam("seriesId") String seriesID, @FormParam("metadata") String metadataJSON)
           throws UnauthorizedException, NotFoundException, SearchIndexException {
     try {
       MetadataList metadataList = indexService.updateAllSeriesMetadata(seriesID, metadataJSON, elasticsearchIndex);
-      return ApiResponseBuilder.Json.ok(acceptHeader, MetadataJson.listToJson(metadataList, true));
+      final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
+      boolean includeListprovider = !requestedVersion.isSmallerThan(ApiVersion.VERSION_1_12_0);
+      return ApiResponseBuilder.Json.ok(acceptHeader, MetadataJson.listToJson(metadataList, true,
+          includeListprovider));
     } catch (IllegalArgumentException e) {
       logger.debug("Unable to update series '{}' with metadata '{}'", seriesID, metadataJSON, e);
       return RestUtil.R.badRequest(e.getMessage());
@@ -890,21 +1020,35 @@ public class SeriesEndpoint {
 
   @POST
   @Path("")
-  @RestQuery(name = "createseries", description = "Creates a series.", returnDescription = "", restParameters = {
+  @RestQuery(
+      name = "createseries",
+      description = "Creates a series.",
+      returnDescription = "",
+      restParameters = {
           @RestParameter(name = "metadata", isRequired = true, description = "Series metadata", type = STRING),
-          @RestParameter(name = "acl", description = "A collection of roles with their possible action", isRequired = true, type = STRING),
-          @RestParameter(name = "theme", description = "The theme ID to be applied to the series", isRequired = false, type = STRING) }, responses = {
-                  @RestResponse(description = "A new series is created and its identifier is returned in the Location header.", responseCode = HttpServletResponse.SC_CREATED),
-                  @RestResponse(description = "The request is invalid or inconsistent..", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-                  @RestResponse(description = "The user doesn't have the rights to create the series.", responseCode = HttpServletResponse.SC_UNAUTHORIZED) })
+          @RestParameter(name = "acl", description = "A collection of roles with their possible action",
+              isRequired = true, type = STRING),
+          @RestParameter(name = "theme", description = "The theme ID to be applied to the series", isRequired = false,
+              type = STRING)
+      },
+      responses = {
+          @RestResponse(description = "A new series is created and its identifier is returned in the Location header.",
+              responseCode = HttpServletResponse.SC_CREATED),
+          @RestResponse(description = "The request is invalid or inconsistent..",
+              responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "The user doesn't have the rights to create the series.",
+              responseCode = HttpServletResponse.SC_UNAUTHORIZED)
+      })
   public Response createNewSeries(@HeaderParam("Accept") String acceptHeader,
           @FormParam("metadata") String metadataParam, @FormParam("acl") String aclParam,
           @FormParam("theme") String themeIdParam) throws UnauthorizedException, NotFoundException {
-    if (isBlank(metadataParam))
+    if (isBlank(metadataParam)) {
       return R.badRequest("Required parameter 'metadata' is missing or invalid");
+    }
 
-    if (isBlank(aclParam))
+    if (isBlank(aclParam)) {
       return R.badRequest("Required parameter 'acl' is missing or invalid");
+    }
 
     MetadataList metadataList;
     try {
@@ -1030,17 +1174,30 @@ public class SeriesEndpoint {
 
   @PUT
   @Path("{seriesId}/acl")
-  @RestQuery(name = "updateseriesacl", description = "Updates a series' access policy.", returnDescription = "", pathParameters = {
-          @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING) }, restParameters = {
-                  @RestParameter(name = "acl", isRequired = true, description = "Access policy", type = STRING),
-                  @RestParameter(name = "override", isRequired = false, description = "If true the series ACL will take precedence over any existing episode ACL", type = STRING)}, responses = {
-                          @RestResponse(description = "The access control list for the specified series is updated.", responseCode = HttpServletResponse.SC_OK),
-                          @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  @RestQuery(
+      name = "updateseriesacl",
+      description = "Updates a series' access policy.",
+      returnDescription = "",
+      pathParameters = {
+          @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING)
+      },
+      restParameters = {
+          @RestParameter(name = "acl", isRequired = true, description = "Access policy", type = STRING),
+          @RestParameter(name = "override", isRequired = false, description = "If true the series ACL will take "
+              + "precedence over any existing episode ACL", type = STRING)
+      },
+      responses = {
+          @RestResponse(description = "The access control list for the specified series is updated.",
+              responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "The specified series does not exist.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      })
   public Response updateSeriesAcl(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String seriesID,
           @FormParam("acl") String aclJson, @DefaultValue("false") @FormParam("override") boolean override)
           throws NotFoundException, SeriesException, UnauthorizedException {
-    if (isBlank(aclJson))
+    if (isBlank(aclJson)) {
       return R.badRequest("Missing form parameter 'acl'");
+    }
 
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
     if (requestedVersion.isSmallerThan(VERSION_1_2_0)) {
@@ -1058,15 +1215,15 @@ public class SeriesEndpoint {
     }
 
     List<AccessControlEntry> accessControlEntries = ((List<?>) acl).stream()
-      .map(a -> {
-        JSONObject ace = (JSONObject) a;
-        return new AccessControlEntry(
-            (String) ace.get("role"),
-            (String) ace.get("action"),
-            (Boolean) ace.get("allow")
-        );
-      })
-      .collect(Collectors.toList());
+        .map(a -> {
+          JSONObject ace = (JSONObject) a;
+          return new AccessControlEntry(
+              (String) ace.get("role"),
+              (String) ace.get("action"),
+              (Boolean) ace.get("allow")
+          );
+        })
+        .collect(Collectors.toList());
 
     seriesService.updateAccessControl(seriesID, new AccessControlList(accessControlEntries), override);
     return ApiResponseBuilder.Json.ok(acceptHeader, aclJson);
@@ -1075,16 +1232,28 @@ public class SeriesEndpoint {
   @SuppressWarnings("unchecked")
   @PUT
   @Path("{seriesId}/properties")
-  @RestQuery(name = "updateseriesproperties", description = "Updates a series' properties", returnDescription = "", pathParameters = {
-          @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING) }, restParameters = {
-                  @RestParameter(name = "properties", isRequired = true, description = "Series properties", type = STRING) }, responses = {
-                          @RestResponse(description = "Successfully updated the series' properties.", responseCode = HttpServletResponse.SC_OK),
-                          @RestResponse(description = "The specified series does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND) })
+  @RestQuery(
+      name = "updateseriesproperties",
+      description = "Updates a series' properties",
+      returnDescription = "",
+      pathParameters = {
+          @RestParameter(name = "seriesId", description = "The series id", isRequired = true, type = STRING)
+      },
+      restParameters = {
+          @RestParameter(name = "properties", isRequired = true, description = "Series properties", type = STRING)
+      },
+      responses = {
+          @RestResponse(description = "Successfully updated the series' properties.",
+              responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "The specified series does not exist.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND)
+      })
   public Response updateSeriesProperties(@HeaderParam("Accept") String acceptHeader,
           @PathParam("seriesId") String seriesID, @FormParam("properties") String propertiesJson)
           throws NotFoundException, SeriesException, UnauthorizedException {
-    if (StringUtils.isBlank(propertiesJson))
+    if (StringUtils.isBlank(propertiesJson)) {
       return R.badRequest("Missing form parameter 'acl'");
+    }
 
     JSONParser parser = new JSONParser();
     JSONObject props;
@@ -1107,132 +1276,132 @@ public class SeriesEndpoint {
   @Produces(MediaType.APPLICATION_JSON)
   @Path("series.json")
   @RestQuery(
-          name = "listSeriesAsJson",
-          description = "Returns the series matching the query parameters",
-          returnDescription = "Returns the series search results as JSON",
-          restParameters = {
-                  @RestParameter(
-                          name = "q",
-                          isRequired = false,
-                          description = "Free text search",
-                          type = STRING
-                  ),
-                  @RestParameter(
-                          name = "edit",
-                          isRequired = false,
-                          description = "Whether this query should return only series that are editable",
-                          type = BOOLEAN
-                  ),
-                  @RestParameter(
-                          name = "fuzzyMatch",
-                          isRequired = false,
-                          description = "Whether a partial match on series id is allowed, default is false",
-                          type = BOOLEAN
-                  ),
-                  @RestParameter(
-                          name = "seriesId",
-                          isRequired = false,
-                          description = "The series identifier",
-                          type = STRING
-                  ),
-                  @RestParameter(
-                          name = "seriesTitle",
-                          isRequired = false,
-                          description = "The series title",
-                          type = STRING
-                  ),
-                  @RestParameter(
-                          name = "creator",
-                          isRequired = false,
-                          description = "The series creator",
-                          type = STRING
-                  ),
-                  @RestParameter(
-                          name = "contributor",
-                          isRequired = false,
-                          description = "The series contributor",
-                          type = STRING
-                  ),
-                  @RestParameter(
-                          name = "publisher",
-                          isRequired = false,
-                          description = "The series publisher",
-                          type = STRING
-                  ),
-                  @RestParameter(
-                          name = "rightsholder",
-                          isRequired = false,
-                          description = "The series rights holder",
-                          type = STRING
-                  ),
-                  @RestParameter(
-                          name = "createdfrom",
-                          isRequired = false,
-                          description = "Filter results by created from (yyyy-MM-dd'T'HH:mm:ss'Z')",
-                          type = STRING
-                  ),
-                  @RestParameter(
-                          name = "createdto",
-                          isRequired = false,
-                          description = "Filter results by created to (yyyy-MM-dd'T'HH:mm:ss'Z')",
-                          type = STRING
-                  ),
-                  @RestParameter(
-                          name = "language",
-                          isRequired = false,
-                          description = "The series language",
-                          type = STRING
-                  ),
-                  @RestParameter(
-                          name = "license",
-                          isRequired = false,
-                          description = "The series license",
-                          type = STRING
-                  ),
-                  @RestParameter(
-                          name = "subject",
-                          isRequired = false,
-                          description = "The series subject",
-                          type = STRING
-                  ),
-                  @RestParameter(
-                          name = "description",
-                          isRequired = false,
-                          description = "The series description",
-                          type = STRING
-                  ),
-                  @RestParameter(
-                          name = "sort",
-                          isRequired = false,
-                          description = "The sort order. May include any of the following: TITLE, SUBJECT, "
-                                  + "CREATOR, PUBLISHERS, CONTRIBUTORS, DESCRIPTION, CREATED_DATE_TIME, "
-                                  + "LANGUAGE, RIGHTS_HOLDER, MANAGED_ACL, LICENCE. "
-                                  + "Add '_DESC' to reverse the sort order (e.g. TITLE_DESC).",
-                          type = STRING
-                  ),
-                  @RestParameter(
-                          name = "offset",
-                          isRequired = false,
-                          description = "The offset",
-                          type = STRING
-                  ),
-                  @RestParameter(
-                          name = "count",
-                          isRequired = false,
-                          description = "Results per page (max 100)",
-                          type = STRING
-                  )
-          },
-          responses = {
-                  @RestResponse(
-                          responseCode = SC_OK,
-                          description = "The access control list."
-                  ),
-                  @RestResponse(
-                          responseCode = SC_UNAUTHORIZED,
-                          description = "If the current user is not authorized to perform this action"
-                  )
-          }
+      name = "listSeriesAsJson",
+      description = "Returns the series matching the query parameters",
+      returnDescription = "Returns the series search results as JSON",
+      restParameters = {
+          @RestParameter(
+              name = "q",
+              isRequired = false,
+              description = "Free text search",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "edit",
+              isRequired = false,
+              description = "Whether this query should return only series that are editable",
+              type = BOOLEAN
+          ),
+          @RestParameter(
+              name = "fuzzyMatch",
+              isRequired = false,
+              description = "Whether a partial match on series id is allowed, default is false",
+              type = BOOLEAN
+          ),
+          @RestParameter(
+              name = "seriesId",
+              isRequired = false,
+              description = "The series identifier",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "seriesTitle",
+              isRequired = false,
+              description = "The series title",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "creator",
+              isRequired = false,
+              description = "The series creator",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "contributor",
+              isRequired = false,
+              description = "The series contributor",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "publisher",
+              isRequired = false,
+              description = "The series publisher",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "rightsholder",
+              isRequired = false,
+              description = "The series rights holder",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "createdfrom",
+              isRequired = false,
+              description = "Filter results by created from (yyyy-MM-dd'T'HH:mm:ss'Z')",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "createdto",
+              isRequired = false,
+              description = "Filter results by created to (yyyy-MM-dd'T'HH:mm:ss'Z')",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "language",
+              isRequired = false,
+              description = "The series language",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "license",
+              isRequired = false,
+              description = "The series license",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "subject",
+              isRequired = false,
+              description = "The series subject",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "description",
+              isRequired = false,
+              description = "The series description",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "sort",
+              isRequired = false,
+              description = "The sort order. May include any of the following: TITLE, SUBJECT, "
+                      + "CREATOR, PUBLISHERS, CONTRIBUTORS, DESCRIPTION, CREATED_DATE_TIME, "
+                      + "LANGUAGE, RIGHTS_HOLDER, MANAGED_ACL, LICENCE. "
+                      + "Add '_DESC' to reverse the sort order (e.g. TITLE_DESC).",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "offset",
+              isRequired = false,
+              description = "The offset",
+              type = STRING
+          ),
+          @RestParameter(
+              name = "count",
+              isRequired = false,
+              description = "Results per page (max 100)",
+              type = STRING
+          )
+      },
+      responses = {
+          @RestResponse(
+              responseCode = SC_OK,
+              description = "The access control list."
+          ),
+          @RestResponse(
+              responseCode = SC_UNAUTHORIZED,
+              description = "If the current user is not authorized to perform this action"
+          )
+      }
   )
   public Response getSeriesAsJson(
           @QueryParam("q") String text,

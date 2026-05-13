@@ -162,12 +162,14 @@ public abstract class AbstractOaiPmhDatabase implements OaiPmhDatabase {
     }
   }
 
-  private void deleteInternal(String mediaPackageId, String repository) throws OaiPmhDatabaseException, NotFoundException {
+  private void deleteInternal(String mediaPackageId, String repository)
+          throws OaiPmhDatabaseException, NotFoundException {
     try {
       getDBSession().execTxChecked(em -> {
         OaiPmhEntity oaiPmhEntity = getOaiPmhEntity(mediaPackageId, repository, em);
-        if (oaiPmhEntity == null)
+        if (oaiPmhEntity == null) {
           throw new NotFoundException("No media package with id " + mediaPackageId + " exists");
+        }
 
         oaiPmhEntity.setDeleted(true);
         em.merge(oaiPmhEntity);
@@ -207,23 +209,31 @@ public abstract class AbstractOaiPmhDatabase implements OaiPmhDatabase {
       final List<Predicate> predicates = new ArrayList<>();
       predicates.add(cb.equal(c.get("organization"), getSecurityService().getOrganization().getId()));
 
-      if (query.getMediaPackageId().isPresent())
+      if (query.getMediaPackageId().isPresent()) {
         predicates.add(cb.equal(c.get("mediaPackageId"), query.getMediaPackageId().get()));
-      if (query.getRepositoryId().isPresent())
-        predicates.add(cb.equal(c.get("repositoryId"), query.getRepositoryId().get()));
-      if (query.getSeriesId().isPresent())
-        predicates.add(cb.equal(c.get("series"), query.getSeriesId().get()));
-      if (query.isDeleted().isPresent())
-        predicates.add(cb.equal(c.get("deleted"), query.isDeleted().get()));
-      if (query.isSubsequentRequest()) {
-        if (query.getModifiedAfter().isPresent())
-          predicates.add(cb.greaterThan(c.get("modificationDate").as(Date.class), query.getModifiedAfter().get()));
-      } else {
-        if (query.getModifiedAfter().isPresent())
-          predicates.add(cb.greaterThanOrEqualTo(c.get("modificationDate").as(Date.class), query.getModifiedAfter().get()));
       }
-      if (query.getModifiedBefore().isPresent())
+      if (query.getRepositoryId().isPresent()) {
+        predicates.add(cb.equal(c.get("repositoryId"), query.getRepositoryId().get()));
+      }
+      if (query.getSeriesId().isPresent()) {
+        predicates.add(cb.equal(c.get("series"), query.getSeriesId().get()));
+      }
+      if (query.isDeleted().isPresent()) {
+        predicates.add(cb.equal(c.get("deleted"), query.isDeleted().get()));
+      }
+      if (query.isSubsequentRequest()) {
+        if (query.getModifiedAfter().isPresent()) {
+          predicates.add(cb.greaterThan(c.get("modificationDate").as(Date.class), query.getModifiedAfter().get()));
+        }
+      } else {
+        if (query.getModifiedAfter().isPresent()) {
+          predicates.add(cb.greaterThanOrEqualTo(c.get("modificationDate").as(Date.class),
+              query.getModifiedAfter().get()));
+        }
+      }
+      if (query.getModifiedBefore().isPresent()) {
         predicates.add(cb.lessThanOrEqualTo(c.get("modificationDate").as(Date.class), query.getModifiedBefore().get()));
+      }
 
       q.where(cb.and(predicates.toArray(new Predicate[0])));
       q.orderBy(cb.asc(c.get("modificationDate")));

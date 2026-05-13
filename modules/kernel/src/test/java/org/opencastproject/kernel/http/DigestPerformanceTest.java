@@ -50,14 +50,16 @@ public class DigestPerformanceTest {
       long start = System.currentTimeMillis();
       DigestUtils.md5Hex(in);
       long elapsed = (System.currentTimeMillis() - start);
-      if (elapsed > stats.getMax())
+      if (elapsed > stats.getMax()) {
         stats.setMax(elapsed);
-      if (elapsed < stats.getMin())
+      }
+      if (elapsed < stats.getMin()) {
         stats.setMin(elapsed);
+      }
       stats.setTotalElapsed(stats.getTotalElapsed() + elapsed);
     }
     logger.info("One thread running {} md5 hashes of InfusionAll.js took min {}ms, max {}ms, mean {}ms", new Long[] {
-            count, stats.getMin(), stats.getMax(), (stats.getTotalElapsed() / count) });
+        count, stats.getMin(), stats.getMax(), (stats.getTotalElapsed() / count) });
   }
 
   @Test
@@ -74,10 +76,12 @@ public class DigestPerformanceTest {
             long start = System.currentTimeMillis();
             DigestUtils.md5Hex(in);
             long elapsed = (System.currentTimeMillis() - start);
-            if (elapsed > stats.getMax())
+            if (elapsed > stats.getMax()) {
               stats.setMax(elapsed);
-            if (elapsed < stats.getMin())
+            }
+            if (elapsed < stats.getMin()) {
               stats.setMin(elapsed);
+            }
             stats.setTotalElapsed(stats.getTotalElapsed() + elapsed);
           } catch (Exception e) {
             throw new RuntimeException(e);
@@ -90,7 +94,7 @@ public class DigestPerformanceTest {
     logger.info(
             "{} threads running ({} max concurrent) md5 hashes of InfusionAll.js took min {}ms, max {}ms, mean {}ms",
             new Long[] { count, stats.getMaxConcurrentThreads(), stats.getMin(), stats.getMax(),
-                    (stats.getTotalElapsed() / count) });
+                (stats.getTotalElapsed() / count) });
   }
 }
 
@@ -131,8 +135,9 @@ class Statistics {
 
   void addThread() {
     this.concurrentThreads++;
-    if (this.concurrentThreads > maxConcurrentThreads)
+    if (this.concurrentThreads > maxConcurrentThreads) {
       maxConcurrentThreads = concurrentThreads;
+    }
   }
 
   void removeThread() {

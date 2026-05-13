@@ -30,14 +30,14 @@ public class MicrosoftAzureSpeechTranscriptions {
   // Documentation:
   // https://eastus.dev.cognitive.microsoft.com/docs/services/speech-to-text-api-v3-1/operations/Transcriptions_List
 
-  //CHECKSTYLE:OFF checkstyle:VisibilityModifier
+  // CHECKSTYLE:OFF checkstyle:VisibilityModifier
 
   public List<MicrosoftAzureSpeechTranscription> values;
 
   @SerializedName("@nextLink")
   public String nextLink;
 
-  //CHECKSTYLE:ON checkstyle:VisibilityModifier
+  // CHECKSTYLE:ON checkstyle:VisibilityModifier
 
   /** Default constructor. */
   public MicrosoftAzureSpeechTranscriptions() { }

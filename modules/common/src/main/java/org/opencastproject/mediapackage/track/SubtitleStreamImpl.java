@@ -60,7 +60,7 @@ public class SubtitleStreamImpl extends AbstractStreamImpl implements SubtitleSt
    *          manifest.
    */
   public static SubtitleStreamImpl fromManifest(String streamIdHint, Node node, XPath xpath)
-      throws IllegalStateException, XPathException {
+          throws IllegalStateException, XPathException {
     // Create stream
     String sid = (String) xpath.evaluate("@id", node, XPathConstants.STRING);
     if (StringUtils.isEmpty(sid)) {

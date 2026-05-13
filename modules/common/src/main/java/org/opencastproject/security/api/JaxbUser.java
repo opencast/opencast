@@ -189,10 +189,12 @@ public final class JaxbUser implements User {
    */
   public JaxbUser(String userName, String password, String name, String email, String provider,
           JaxbOrganization organization, Set<JaxbRole> roles) throws IllegalArgumentException {
-    if (StringUtils.isBlank(userName))
+    if (StringUtils.isBlank(userName)) {
       throw new IllegalArgumentException("Username must be set");
-    if (organization == null)
+    }
+    if (organization == null) {
       throw new IllegalArgumentException("Organization must be set");
+    }
     this.userName = userName;
     this.password = password;
     this.name = name;
@@ -219,8 +221,9 @@ public final class JaxbUser implements User {
    * @return the JAXB user
    */
   public static JaxbUser fromUser(User user) {
-    if (user instanceof JaxbUser)
+    if (user instanceof JaxbUser) {
       return (JaxbUser) user;
+    }
     return fromUser(user, Collections.<JaxbRole> emptySet());
   }
 
@@ -284,8 +287,9 @@ public final class JaxbUser implements User {
   @Override
   public boolean hasRole(String roleName) {
     for (Role role : roles) {
-      if (role.getName().equals(roleName))
+      if (role.getName().equals(roleName)) {
         return true;
+      }
     }
     return false;
   }
@@ -297,8 +301,9 @@ public final class JaxbUser implements User {
    */
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof User))
+    if (!(obj instanceof User)) {
       return false;
+    }
     User other = (User) obj;
     return userName.equals(other.getUsername()) && organization.equals(other.getOrganization());
   }

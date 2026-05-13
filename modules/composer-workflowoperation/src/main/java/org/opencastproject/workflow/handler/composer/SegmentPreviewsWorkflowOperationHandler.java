@@ -100,9 +100,6 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
   /** The mpeg7 catalog service */
   private Mpeg7CatalogService mpeg7CatalogService = null;
 
-  /** The local workspace */
-  private Workspace workspace = null;
-
   /**
    * Callback for the OSGi declarative services configuration.
    *
@@ -146,8 +143,8 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(
+   *      org.opencastproject.workflow.api.WorkflowInstance, JobContext)
    */
   @Override
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
@@ -192,8 +189,8 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
 
     // Read the configuration properties
     ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(wi,
-        Configuration.many, Configuration.one, Configuration.many, Configuration.one);
-    MediaPackageElementFlavor sourceVideoFlavor = tagsAndFlavors.getSingleSrcFlavor();
+        Configuration.atLeastOne, Configuration.many, Configuration.one);
+    List<MediaPackageElementFlavor> sourceVideoFlavors = tagsAndFlavors.getSrcFlavors();
     List<String> sourceTagSet = tagsAndFlavors.getSrcTags();
     ConfiguredTagsAndFlavors.TargetTags targetImageTags = tagsAndFlavors.getTargetTags();
     MediaPackageElementFlavor targetImageFlavor = tagsAndFlavors.getSingleTargetFlavor();
@@ -203,12 +200,15 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
 
     // Find the encoding profile
     EncodingProfile profile = composerService.getProfile(encodingProfileName);
-    if (profile == null)
+    if (profile == null) {
       throw new IllegalStateException("Encoding profile '" + encodingProfileName + "' was not found");
+    }
 
     // Select the tracks based on the tags and flavors
     TrackSelector trackSelector = new TrackSelector();
-    trackSelector.addFlavor(sourceVideoFlavor);
+    for (MediaPackageElementFlavor flavor : sourceVideoFlavors) {
+      trackSelector.addFlavor(flavor);
+    }
     for (String tag : sourceTagSet) {
       trackSelector.addTag(tag);
     }
@@ -223,7 +223,7 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
 
     if (videoTrackSet.size() == 0) {
       logger.debug("Mediapackage {} has no suitable tracks to extract images based on tags {} and flavor {}",
-              mediaPackage, sourceTagSet, sourceVideoFlavor);
+              mediaPackage, sourceTagSet, sourceVideoFlavors);
       return createResult(mediaPackage, Action.CONTINUE);
     } else {
 
@@ -239,9 +239,10 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
         Mpeg7Catalog mpeg7 = null;
         if (segmentCatalogs.length > 0) {
           mpeg7 = loadMpeg7Catalog(segmentCatalogs[0]);
-          if (segmentCatalogs.length > 1)
-            logger.warn("More than one segments catalog found for track {}. Resuming with the first one ({})", t,
-                    mpeg7);
+          if (segmentCatalogs.length > 1) {
+            logger.warn("More than one segments catalog found for track {}. Resuming with the first one ({})",
+                t, mpeg7);
+          }
         } else {
           logger.debug("No segments catalog found for track {}", t);
           continue;
@@ -279,8 +280,9 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
 
           // convert to time array
           double[] timeArray = new double[timePointList.size()];
-          for (int i = 0; i < timePointList.size(); i++)
+          for (int i = 0; i < timePointList.size(); i++) {
             timeArray[i] = (double) timePointList.get(i).getTimeInMilliseconds() / 1000;
+          }
 
           Job job = composerService.image(t, profile.getIdentifier(), timeArray);
           if (!waitForStatus(job).isSuccess()) {
@@ -303,8 +305,9 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
 
           for (MediaPackageElement element : composedImages) {
             Attachment composedImage = (Attachment) element;
-            if (composedImage == null)
+            if (composedImage == null) {
               throw new IllegalStateException("Unable to compose image");
+            }
 
             // Add the flavor, either from the operation configuration or from the composer
             if (targetImageFlavor != null) {
@@ -364,13 +367,15 @@ public class SegmentPreviewsWorkflowOperationHandler extends AbstractWorkflowOpe
         MediaPackageReference ref = e.getReference();
         while (ref != null) {
           MediaPackageElement tr = mediaPackage.getElementByReference(ref);
-          if (tr == null)
+          if (tr == null) {
             break locateReferenceMaster;
+          }
           if (tr.equals(t)) {
             boolean matches = true;
             for (String tag : referenceTagSet) {
-              if (!e.containsTag(tag))
+              if (!e.containsTag(tag)) {
                 matches = false;
+              }
             }
             if (matches) {
               referenceMaster = e;

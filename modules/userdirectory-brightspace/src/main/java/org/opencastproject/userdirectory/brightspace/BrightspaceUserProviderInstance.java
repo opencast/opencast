@@ -22,7 +22,6 @@
 
 package org.opencastproject.userdirectory.brightspace;
 
-import org.opencastproject.security.api.CachingUserProviderMXBean;
 import org.opencastproject.security.api.Group;
 import org.opencastproject.security.api.JaxbOrganization;
 import org.opencastproject.security.api.JaxbRole;
@@ -47,7 +46,6 @@ import com.google.common.util.concurrent.UncheckedExecutionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -57,11 +55,7 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 
-import javax.management.InstanceNotFoundException;
-import javax.management.MBeanServer;
-import javax.management.ObjectName;
-
-public class BrightspaceUserProviderInstance implements UserProvider, RoleProvider, CachingUserProviderMXBean {
+public class BrightspaceUserProviderInstance implements UserProvider, RoleProvider {
 
   private static final Logger logger = LoggerFactory.getLogger(BrightspaceUserProviderInstance.class);
 
@@ -115,37 +109,6 @@ public class BrightspaceUserProviderInstance implements UserProvider, RoleProvid
                 return user == null ? nullToken : user;
               }
             });
-
-    this.registerMBean(pid);
-  }
-
-  @Override
-  public float getCacheHitRatio() {
-    if (loadUserRequests.get() == 0) {
-      return 0;
-    }
-    return (float) (loadUserRequests.get() - brightspaceWebServiceRequests.get()) / loadUserRequests.get();
-  }
-
-  private void registerMBean(String pid) {
-    this.loadUserRequests = new AtomicLong();
-    this.brightspaceWebServiceRequests = new AtomicLong();
-
-    try {
-      ObjectName name = BrightspaceUserProviderFactory.getObjectName(pid);
-      MBeanServer mbs = ManagementFactory.getPlatformMBeanServer();
-
-      try {
-        mbs.unregisterMBean(name);
-      } catch (InstanceNotFoundException ife) {
-        logger.debug("{} was not registered", name);
-      }
-
-      mbs.registerMBean(this, name);
-    } catch (Exception e) {
-      logger.error("Unable to register {} as an mbean", this, e);
-    }
-
   }
 
   /**

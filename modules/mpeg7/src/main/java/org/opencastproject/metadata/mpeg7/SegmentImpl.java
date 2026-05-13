@@ -116,8 +116,9 @@ public class SegmentImpl implements Segment, AudioSegment, VideoSegment, AudioVi
     for (TextAnnotation annotation : annotations) {
       if (annotation.getRelevance() >= relevance && annotation.getConfidence() >= confidence) {
         if (language != null) {
-          if (language.equals(annotation.getLanguage()))
+          if (language.equals(annotation.getLanguage())) {
             return true;
+          }
         } else {
           return true;
         }
@@ -139,10 +140,11 @@ public class SegmentImpl implements Segment, AudioSegment, VideoSegment, AudioVi
   public Iterator<TextAnnotation> textAnnotationsByConfidence() {
     SortedSet<TextAnnotation> set = new TreeSet<TextAnnotation>(new Comparator<TextAnnotation>() {
       public int compare(TextAnnotation a1, TextAnnotation a2) {
-        if (a1.getConfidence() > a2.getConfidence())
+        if (a1.getConfidence() > a2.getConfidence()) {
           return 1;
-        else if (a1.getConfidence() > a2.getConfidence())
+        } else if (a1.getConfidence() > a2.getConfidence()) {
           return -1;
+        }
         return 0;
       }
     });
@@ -156,10 +158,11 @@ public class SegmentImpl implements Segment, AudioSegment, VideoSegment, AudioVi
   public Iterator<TextAnnotation> textAnnotationsByRelevance() {
     SortedSet<TextAnnotation> set = new TreeSet<TextAnnotation>(new Comparator<TextAnnotation>() {
       public int compare(TextAnnotation a1, TextAnnotation a2) {
-        if (a1.getRelevance() > a2.getRelevance())
+        if (a1.getRelevance() > a2.getRelevance()) {
           return 1;
-        else if (a1.getRelevance() > a2.getRelevance())
+        } else if (a1.getRelevance() > a2.getRelevance()) {
           return -1;
+        }
         return 0;
       }
     });
@@ -191,8 +194,9 @@ public class SegmentImpl implements Segment, AudioSegment, VideoSegment, AudioVi
   @Override
   public SpatioTemporalDecomposition createSpatioTemporalDecomposition(boolean gap, boolean overlap)
           throws IllegalStateException {
-    if (spatioTemporalDecomposition != null)
+    if (spatioTemporalDecomposition != null) {
       throw new IllegalStateException("A spatio temporal decomposition has already been created");
+    }
     spatioTemporalDecomposition = new SpatioTemporalDecompositionImpl(true, false);
     return spatioTemporalDecomposition;
   }
@@ -243,8 +247,9 @@ public class SegmentImpl implements Segment, AudioSegment, VideoSegment, AudioVi
     Element node = document.createElement(type.toString());
     node.setAttribute("id", id);
     node.appendChild(mediaTime.toXml(document));
-    if (spatioTemporalDecomposition != null)
+    if (spatioTemporalDecomposition != null) {
       node.appendChild(spatioTemporalDecomposition.toXml(document));
+    }
     for (TextAnnotation annotation : annotations) {
       node.appendChild(annotation.toXml(document));
     }

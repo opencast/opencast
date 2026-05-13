@@ -47,7 +47,6 @@ import org.opencastproject.serviceregistry.api.SystemLoad;
 import org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl.JobProducerHeartbeat;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.jmx.JmxUtil;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
@@ -84,9 +83,9 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import javax.management.ObjectInstance;
 import javax.persistence.EntityManagerFactory;
 
 public class ServiceRegistryJpaImplTest {
@@ -135,13 +134,10 @@ public class ServiceRegistryJpaImplTest {
   @Before
   public void cleanBeforeEach() throws ServiceRegistryException, NotFoundException, ConfigurationException {
     logger.debug("start clean before each");
-    // remove the activate beans, so this can be reactivated
-    for (ObjectInstance mbean : serviceRegistryJpaImpl.jmxBeans) {
-      JmxUtil.unregisterMXBean(mbean);
-    }
     // reset the scheduledExecutor
-    if (serviceRegistryJpaImpl.scheduledExecutor != null)
+    if (serviceRegistryJpaImpl.scheduledExecutor != null) {
       serviceRegistryJpaImpl.scheduledExecutor.shutdown();
+    }
     if (!serviceRegistryJpaImpl.getActiveJobs().isEmpty()) {
       List<Long> jobIds = new ArrayList();
       for (Job job : serviceRegistryJpaImpl.getActiveJobs()) {
@@ -167,9 +163,6 @@ public class ServiceRegistryJpaImplTest {
 
   @AfterClass
   public static void tearDownAfterAll() throws ServiceRegistryException {
-    for (ObjectInstance mbean : serviceRegistryJpaImpl.jmxBeans) {
-      JmxUtil.unregisterMXBean(mbean);
-    }
     logger.debug("About to deactivate after all tests");
     serviceRegistryJpaImpl.deactivate();
   }
@@ -227,15 +220,15 @@ public class ServiceRegistryJpaImplTest {
     EasyMock.expect(trustedHttpClient.execute(EasyMock.capture(request))).andAnswer(new IAnswer<HttpResponse>() {
       @Override
       public HttpResponse answer() throws Throwable {
-        if (!request.hasCaptured())
+        if (!request.hasCaptured()) {
           return unavailableResponse;
-
-        if (request.getValue().getURI().toString().contains(TEST_PATH))
+        }
+        if (request.getValue().getURI().toString().contains(TEST_PATH)) {
           return unavailableResponse;
-
-        if (request.getValue().getURI().toString().contains(TEST_PATH_3))
+        }
+        if (request.getValue().getURI().toString().contains(TEST_PATH_3)) {
           return unavailableResponse;
-
+        }
         return successResponse;
       }
     }).anyTimes();
@@ -315,8 +308,9 @@ public class ServiceRegistryJpaImplTest {
     if (serviceRegistryJpaImpl.scheduledExecutor != null) {
       serviceRegistryJpaImpl.scheduledExecutor.shutdown();
     }
-    serviceRegistryJpaImpl.scheduledExecutor = Executors.newScheduledThreadPool(1);
-    jobDispatcher.scheduledExecutor.schedule(jobDispatcher.getJobDispatcherRunnable(), DISPATCH_START_DELAY, TimeUnit.MILLISECONDS);
+    serviceRegistryJpaImpl.scheduledExecutor = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(1);
+    jobDispatcher.scheduledExecutor.schedule(jobDispatcher.getJobDispatcherRunnable(), DISPATCH_START_DELAY,
+        TimeUnit.MILLISECONDS);
 
     if (withProducerHeartBeat) {
       JobProducerHeartbeat jph = serviceRegistryJpaImpl.new JobProducerHeartbeat();
@@ -337,11 +331,6 @@ public class ServiceRegistryJpaImplTest {
     assertEquals(Status.RUNNING, undispatchableJob1.getStatus());
     undispatchableJob2 = serviceRegistryJpaImpl.getJob(undispatchableJob2.getId());
     assertEquals(Status.RUNNING, undispatchableJob2.getStatus());
-
-    // remove the activate beans, so this can be reactivated
-    for (ObjectInstance mbean : serviceRegistryJpaImpl.jmxBeans) {
-      JmxUtil.unregisterMXBean(mbean);
-    }
 
     // reactivate and expect local undispatchable job to be canceled, but not the remote job
     serviceRegistryJpaImpl.activate(null);
@@ -417,13 +406,15 @@ public class ServiceRegistryJpaImplTest {
       }
       // Mock http client always returns 503 for this path so it won't be dispatched anyway
       testJob = serviceRegistryJpaImpl.getJob(testJob.getId());
-      Assert.assertTrue("First job should not have a processing host", StringUtils.isBlank(testJob.getProcessingHost()));
+      Assert.assertTrue("First job should not have a processing host",
+          StringUtils.isBlank(testJob.getProcessingHost()));
       Assert.assertEquals("First job is queued", Job.Status.QUEUED, testJob.getStatus());
 
       // Mock http client always returns 204 for this path, but it should not be dispatched
       // because the host is in the dispatchPriorityList
       testJob2 = serviceRegistryJpaImpl.getJob(testJob2.getId());
-      Assert.assertTrue("Second job should not have a processing host", StringUtils.isBlank(testJob2.getProcessingHost()));
+      Assert.assertTrue("Second job should not have a processing host",
+          StringUtils.isBlank(testJob2.getProcessingHost()));
       Assert.assertEquals("Second job is queued", Job.Status.QUEUED, testJob2.getStatus());
 
       Assert.assertEquals(1, jobDispatcher.dispatchPriorityList.size());
@@ -442,35 +433,46 @@ public class ServiceRegistryJpaImplTest {
     k.setStatus(Status.RUNNING);
     serviceRegistryJpaImpl.updateJob(k);
     SystemLoad hostloads = serviceRegistryJpaImpl.getHostLoadsQuery().apply(emf.createEntityManager());
-    Assert.assertTrue(String.format("Host load is incorrect, should be %f, is %f", a, hostloads.get(TEST_HOST).getCurrentLoad()),
-            hostloads.get(TEST_HOST).getCurrentLoad() - a >= 0.0f);
-    Assert.assertTrue(String.format("Host load is incorrect, should be %f, is %f", a, hostloads.get(TEST_HOST).getCurrentLoad()),
-            hostloads.get(TEST_HOST).getCurrentLoad() - a < 0.1f);
-    Assert.assertTrue(String.format("Host load is incorrect, should be %f, is %f", b, hostloads.get(TEST_HOST_OTHER).getCurrentLoad()),
+    Assert.assertTrue(String.format("Host load is incorrect, should be %f, is %f", a,
+            hostloads.get(TEST_HOST).getCurrentLoad()), hostloads.get(TEST_HOST).getCurrentLoad() - a >= 0.0f);
+    Assert.assertTrue(String.format("Host load is incorrect, should be %f, is %f", a,
+            hostloads.get(TEST_HOST).getCurrentLoad()), hostloads.get(TEST_HOST).getCurrentLoad() - a < 0.1f);
+    Assert.assertTrue(String.format("Host load is incorrect, should be %f, is %f", b,
+            hostloads.get(TEST_HOST_OTHER).getCurrentLoad()),
             hostloads.get(TEST_HOST_OTHER).getCurrentLoad() - b >= 0.0f);
-    Assert.assertTrue(String.format("Host load is incorrect, should be %f, is %f", b, hostloads.get(TEST_HOST_OTHER).getCurrentLoad()),
+    Assert.assertTrue(String.format("Host load is incorrect, should be %f, is %f", b,
+            hostloads.get(TEST_HOST_OTHER).getCurrentLoad()),
             hostloads.get(TEST_HOST_OTHER).getCurrentLoad() - b < 0.1f);
-    Assert.assertTrue(String.format("Host load is incorrect, should be %f, is %f", c, hostloads.get(TEST_HOST_THIRD).getCurrentLoad()),
+    Assert.assertTrue(String.format("Host load is incorrect, should be %f, is %f", c,
+            hostloads.get(TEST_HOST_THIRD).getCurrentLoad()),
             hostloads.get(TEST_HOST_THIRD).getCurrentLoad() - c >= 0.0f);
-    Assert.assertTrue(String.format("Host load is incorrect, should be %f, is %f", c, hostloads.get(TEST_HOST_THIRD).getCurrentLoad()),
+    Assert.assertTrue(String.format("Host load is incorrect, should be %f, is %f", c,
+            hostloads.get(TEST_HOST_THIRD).getCurrentLoad()),
             hostloads.get(TEST_HOST_THIRD).getCurrentLoad() - c < 0.1f);
   }
 
   @Test
   public void testJobDispatchingFairness() throws Exception {
-    Job j = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_FAIRNESS, TEST_OPERATION, null, null, true, null, 1.0f);
+    Job j = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_FAIRNESS, TEST_OPERATION,
+        null, null, true, null, 1.0f);
     assertHostloads(j, 0.0f, 0.0f, 1.0f);
-    j = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_FAIRNESS, TEST_OPERATION, null, null, true, null, 1.0f);
+    j = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_FAIRNESS, TEST_OPERATION,
+        null, null, true, null, 1.0f);
     assertHostloads(j, 0.0f, 1.0f, 1.0f);
-    j = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_FAIRNESS, TEST_OPERATION, null, null, true, null, 1.0f);
+    j = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_FAIRNESS, TEST_OPERATION,
+        null, null, true, null, 1.0f);
     assertHostloads(j, 1.0f, 1.0f, 1.0f);
-    j = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_FAIRNESS, TEST_OPERATION, null, null, true, null, 1.0f);
+    j = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_FAIRNESS, TEST_OPERATION,
+        null, null, true, null, 1.0f);
     assertHostloads(j,1.0f, 1.0f, 2.0f);
-    j = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_FAIRNESS, TEST_OPERATION, null, null, true, null, 1.0f);
+    j = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_FAIRNESS, TEST_OPERATION,
+        null, null, true, null, 1.0f);
     assertHostloads(j, 1.0f, 1.0f, 3.0f);
-    j = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_FAIRNESS, TEST_OPERATION, null, null, true, null, 1.0f);
+    j = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_FAIRNESS, TEST_OPERATION,
+        null, null, true, null, 1.0f);
     assertHostloads(j, 1.0f, 2.0f, 3.0f);
-    j = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_FAIRNESS, TEST_OPERATION, null, null, true, null, 1.0f);
+    j = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_FAIRNESS, TEST_OPERATION,
+        null, null, true, null, 1.0f);
     assertHostloads(j,1.0f, 2.0f, 4.0f);
   }
 
@@ -478,8 +480,8 @@ public class ServiceRegistryJpaImplTest {
   @Test
   public void testDispatchingJobsHigherMaxLoad() throws Exception {
     logger.debug("KHD start of testDispatchingJobsHigherMaxLoad");
-    Job testJob = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_FAIRNESS, TEST_OPERATION, null, null, true, null,
-            10.0f);
+    Job testJob = serviceRegistryJpaImpl.createJob(TEST_HOST, TEST_SERVICE_FAIRNESS, TEST_OPERATION,
+        null, null, true, null, 10.0f);
     JobBarrier barrier = new JobBarrier(null, serviceRegistryJpaImpl, testJob);
     launchDispatcherOnce(false);
     assertThrows(IllegalStateException.class, () -> barrier.waitForJobs(JOB_BARRIER_TIMEOUT));
@@ -563,7 +565,8 @@ public class ServiceRegistryJpaImplTest {
     // disable error states for one service
     Dictionary<String, String> properties = new Hashtable<>();
     properties.put(ServiceRegistryJpaImpl.MAX_ATTEMPTS_CONFIG_KEY, "1");
-    properties.put(ServiceRegistryJpaImpl.NO_ERROR_STATE_SERVICE_TYPES_CONFIG_KEY, TEST_SERVICE_2 + ", " + TEST_SERVICE_3);
+    properties.put(ServiceRegistryJpaImpl.NO_ERROR_STATE_SERVICE_TYPES_CONFIG_KEY,
+        TEST_SERVICE_2 + ", " + TEST_SERVICE_3);
     serviceRegistryJpaImpl.updated(properties);
 
     serviceRegistryJpaImpl.sanitize(TEST_SERVICE, TEST_HOST);

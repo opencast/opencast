@@ -53,7 +53,7 @@ A list of everything.
     - [Event Filters](admin-ui/event-filters.md)
     - [Manual Asset Upload](admin-ui/asset-upload.md)
     - [Languages](admin-ui/languages.md)
-    - [Statistics](admin-ui/statistics.md)
+    - [Statistics](admin-ui/statistics/statistics.overview.md)
     - [Thumbnails](admin-ui/thumbnails.md)
 - Amazon Services
     - [Amazon S3 Archive Storage](awss3archive.md)
@@ -89,7 +89,6 @@ A list of everything.
 - [Multi Tenancy Configuration](multi.tenancy.md)
 - [OAI-PMH Configuration](oaipmh.md)
 - [Player Configuration](player/player.overview.md)
-    - [Paella player 7 Configuration](player/paella.player7/configuration.md)
 - [Plugin Management](plugin-management.md)
 - [Search Index Overview](searchindex/index.md)
     - [Elasticsearch](searchindex/elasticsearch.md)

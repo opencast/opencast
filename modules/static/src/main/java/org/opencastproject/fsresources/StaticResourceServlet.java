@@ -227,6 +227,13 @@ public class StaticResourceServlet extends HttpServlet {
     resp.setHeader("Content-Length", Long.toString(file.length()));
     resp.setDateHeader("Last-Modified", file.lastModified());
 
+    // Set Content-Disposition header based on query parameter (`?download=1`).
+    // With this, passing that parameter will allow download links to trigger the download directly
+    // instead of opening files in the browser.
+    if ("1".equals(req.getParameter("download"))) {
+      resp.setHeader("Content-Disposition", "attachment");
+    }
+
     resp.setHeader("Accept-Ranges", "bytes");
     ArrayList<Range> ranges = parseRange(req, resp, eTag, file.lastModified(), file.length());
 

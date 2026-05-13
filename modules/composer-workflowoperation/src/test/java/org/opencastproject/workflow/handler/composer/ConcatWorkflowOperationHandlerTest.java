@@ -335,7 +335,7 @@ public class ConcatWorkflowOperationHandlerTest {
   }
 
 
-@Test
+  @Test
   public void testConcatNumberedFiles() throws Exception {
     setMockups();
 

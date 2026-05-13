@@ -85,7 +85,7 @@ public class UpdateSeriesAclCommand extends AbstractCommand<GqlSeries> {
     try {
       ElasticsearchIndex index = context.getService(ElasticsearchIndex.class);
       return new GqlSeries(
-          index.getSeries(seriesId, context.getOrganization().getId(), context.getUser()).get()
+          index.getSeries(seriesId, context.getOrganization(), context.getUser()).get()
       );
     } catch (SearchIndexException e) {
       throw new GraphQLRuntimeException(e);

@@ -53,6 +53,7 @@
     <sec:intercept-url pattern="/workflow/definitions.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_CREATE" />
     <sec:intercept-url pattern="/admin-ng/acl/acls.json" method="GET" access="ROLE_ADMIN, ROLE_UI_ACLS_VIEW" />
     <sec:intercept-url pattern="/admin-ng/acl/*" method="GET" access="ROLE_ADMIN, ROLE_UI_ACLS_VIEW" />
+    <sec:intercept-url pattern="/admin-ng/acl/acl/*" method="GET" access="ROLE_ADMIN, ROLE_UI_ACLS_VIEW" />
     <sec:intercept-url pattern="/acl-manager/acl/*" method="GET" access="ROLE_ADMIN, ROLE_UI_ACLS_VIEW" />
     <sec:intercept-url pattern="/admin-ng/capture-agents/agents.json" method="GET" access="ROLE_ADMIN, ROLE_UI_LOCATIONS_VIEW, ROLE_UI_EVENTS_CREATE" />
     <sec:intercept-url pattern="/admin-ng/capture-agents/*" method="GET" access="ROLE_ADMIN, ROLE_UI_LOCATIONS_DETAILS_CAPABILITIES_VIEW, ROLE_UI_LOCATIONS_DETAILS_CONFIGURATION_VIEW, ROLE_UI_LOCATIONS_DETAILS_GENERAL_VIEW" />
@@ -302,11 +303,7 @@
     <!-- anonymous access to user interface configuration -->
     <sec:intercept-url pattern="/ui/config/**" access="ROLE_ANONYMOUS" />
 
-   <!-- Paella player 7 -->
-    <sec:intercept-url pattern="/paella7/ui/auth.html" access="ROLE_USER" />
-    <sec:intercept-url pattern="/paella7/ui/**" access="ROLE_ANONYMOUS" />
-
-   <!-- Paella player 8 -->
+    <!-- Paella player 8 -->
     <sec:intercept-url pattern="/paella8/ui/auth.html" access="ROLE_USER" />
     <sec:intercept-url pattern="/paella8/ui/**" access="ROLE_ANONYMOUS" />
 
@@ -556,6 +553,7 @@
         <value>/engage-player/</value>
         <value>/ltitools</value>
         <value>/ltitools/</value>
+        <value>/paella*/ui/auth.html</value>
       </list>
     </property>
   </bean>

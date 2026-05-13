@@ -81,15 +81,15 @@ import java.util.regex.Pattern;
  * @see Ingestor
  */
 @Component(
-  immediate = true,
-  service = {
-    ArtifactInstaller.class,
-    ManagedService.class
-  },
-  property = {
-    "service.pid=org.opencastproject.ingest.scanner.InboxScannerService",
-    "service.description=Inbox Scanner"
-  }
+    immediate = true,
+    service = {
+        ArtifactInstaller.class,
+        ManagedService.class
+    },
+    property = {
+        "service.pid=org.opencastproject.ingest.scanner.InboxScannerService",
+        "service.description=Inbox Scanner"
+    }
 )
 public class InboxScannerService implements ArtifactInstaller, ManagedService {
 
@@ -348,18 +348,22 @@ public class InboxScannerService implements ArtifactInstaller, ManagedService {
    */
   private static String getCfg(Dictionary d, String key) throws ConfigurationException {
     Object p = d.get(key);
-    if (p == null)
+    if (p == null) {
       throw new ConfigurationException(key, "does not exist");
+    }
     String ps = p.toString();
-    if (StringUtils.isBlank(ps))
+    if (StringUtils.isBlank(ps)) {
       throw new ConfigurationException(key, "is blank");
+    }
     return ps;
   }
 
   private static Map<String, String> getCfgAsMap(final Dictionary d, final String key) {
 
     HashMap<String, String> config = new HashMap<>();
-    if (d == null) return config;
+    if (d == null) {
+      return config;
+    }
     for (Enumeration e = d.keys(); e.hasMoreElements();) {
       final String dKey = Objects.toString(e.nextElement());
       if (dKey.startsWith(key)) {

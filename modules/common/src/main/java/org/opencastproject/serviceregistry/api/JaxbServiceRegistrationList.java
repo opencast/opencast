@@ -50,8 +50,9 @@ public class JaxbServiceRegistrationList {
   }
 
   public JaxbServiceRegistrationList(Collection<JaxbServiceRegistration> registrations) {
-    for (JaxbServiceRegistration stat : registrations)
+    for (JaxbServiceRegistration stat : registrations) {
       this.registrations.add((JaxbServiceRegistration) stat);
+    }
   }
 
   /**

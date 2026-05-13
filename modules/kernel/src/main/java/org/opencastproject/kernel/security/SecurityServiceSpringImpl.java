@@ -50,10 +50,10 @@ import java.util.Set;
  * A Spring Security implementation of {@link SecurityService}.
  */
 @Component(
-  property = {
-    "service.description=Provides username and role information for the current user"
-  },
-  service = { SecurityService.class }
+    property = {
+        "service.description=Provides username and role information for the current user"
+    },
+    service = { SecurityService.class }
 )
 public class SecurityServiceSpringImpl implements SecurityService {
 
@@ -100,8 +100,9 @@ public class SecurityServiceSpringImpl implements SecurityService {
   @Override
   public User getUser() throws IllegalStateException {
     Organization org = getOrganization();
-    if (org == null)
+    if (org == null) {
       throw new IllegalStateException("No organization is set in security context");
+    }
 
     User delegatedUser = delegatedUserHolder.get();
 
@@ -187,7 +188,11 @@ public class SecurityServiceSpringImpl implements SecurityService {
    * @param userDirectory
    *          the user directory
    */
-  @Reference(cardinality = ReferenceCardinality.OPTIONAL, policy = ReferencePolicy.DYNAMIC, unbind = "removeUserDirectory")
+  @Reference(
+      cardinality = ReferenceCardinality.OPTIONAL,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "removeUserDirectory"
+  )
   void setUserDirectory(UserDirectoryService userDirectory) {
     this.userDirectory = userDirectory;
   }

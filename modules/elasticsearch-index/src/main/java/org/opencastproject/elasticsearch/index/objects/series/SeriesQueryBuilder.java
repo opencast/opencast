@@ -27,6 +27,7 @@ import org.opencastproject.elasticsearch.api.SearchTerms;
 import org.opencastproject.elasticsearch.api.SearchTerms.Quantifier;
 import org.opencastproject.elasticsearch.impl.AbstractElasticsearchQueryBuilder;
 import org.opencastproject.elasticsearch.impl.IndexSchema;
+import org.opencastproject.elasticsearch.index.objects.event.EventIndexSchema;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.User;
 
@@ -34,6 +35,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * Opencast {@link SeriesSearchQuery} implementation of the Elasticsearch query builder.
@@ -81,6 +83,12 @@ public class SeriesQueryBuilder extends AbstractElasticsearchQueryBuilder<Series
             and(SeriesIndexSchema.ACL_PERMISSION_PREFIX.concat(action), role.getName());
           }
         }
+      }
+    }
+
+    if (query.getAccessControlEntries() != null && !query.getAccessControlEntries().isEmpty()) {
+      for (Map.Entry<String, String> entry: query.getAccessControlEntries().entrySet()) {
+        and(EventIndexSchema.ACL_PERMISSION_PREFIX.concat(entry.getValue()), entry.getKey());
       }
     }
 

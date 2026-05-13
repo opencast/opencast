@@ -33,10 +33,12 @@ jobs:
     name: build (java ${{ matrix.java }})
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
+        with:
+          submodules: 'recursive'
 
       - name: cache local maven repository
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: ~/.m2/repository
           key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
@@ -81,10 +83,12 @@ jobs:
             -Dmaven.wagon.http.pool=false \
             -Dmaven.wagon.httpconnectionManager.ttlSeconds=120
 
-        #This has to happen in a separate step or else various service classes aren't visible
+        # This has to happen in a separate step or else various service classes aren't visible
+        # The negated frontend profile here skips the npm builds which both speeds up the already painfully long build
+        # and also prevents issues related to submodules.  NPM related things don't appear in the code coverage reports anyway.
       - name: build maven site
         run: |
-          ./mvnw site -T1C -Pnone \
+          ./mvnw site -T1C -P'none,!frontend' \
             --batch-mode \
             -Dsurefire.rerunFailingTestsCount=2 \
             -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
@@ -94,7 +98,7 @@ jobs:
           ./mvnw site:stage -Pnone
 
       - name: Save site build
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         if: >
           github.event_name == 'push'
           && github.repository_owner == 'opencast'
@@ -102,6 +106,21 @@ jobs:
         with:
           name: site_build
           path: target/staging
+
+      - name: Save assets build
+        uses: actions/upload-artifact@v7
+        if: >
+          github.event_name == 'push'
+          && github.repository_owner == 'opencast'
+          && github.ref == 'refs/heads/develop'
+        with:
+          name: assets
+          path: .github/assets
+
+      # Normally here we would do the uploading, but I'm deliberately breaking the upload from the build so that we can
+      # as committers check more easily if it's the *build* that's broken, or if it's just the upload.  The upload
+      # being broken can happen if there's an issue with github, for example, and it would be unfortunate if that broke
+      # our builds when *our* code is working.
 
   deploy-mvn-site:
     name: generate github pages for reports
@@ -116,7 +135,7 @@ jobs:
       && (github.ref == 'refs/heads/develop' || startsWith(github.ref, 'refs/heads/r/'))
     steps:
       - name: Download site generation artifact
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v8
         with:
           name: site_build
           path: site_build
@@ -137,17 +156,17 @@ jobs:
 
       - name: clone repository
         run: |
-          git clone -b gh-pages "git@github.com:opencast/coverage-reports.git" opencast
+          git clone -b gh-pages "git@github.com:${{ github.repository_owner }}/coverage-reports.git" coverage-reports
 
       - name: store site and build index
-        working-directory: opencast
+        working-directory: coverage-reports
         run: |
           export TEMP=${{ github.ref_name }}
           export BRANCH="${TEMP#r\/}"
           rm -rf $BRANCH
           mv ../site_build $BRANCH
           #Generate an index, in case anyone lands at the root of the test domain
-          echo $'<html><head><link rel=stylesheet type=text/css href=assets/index.css /></head><body><div class="head-container"><img src=assets/opencast-white.svg /></div><div class="navbar-container"></div><div class="text-container"><p>Deployment of Opencast'''s Maven Site and Code Coverage.  The branches listed here correspond to Opencast'''s own branches.</br><b>Please select a version.</b></p></div><ul>' > index.html
+          echo $'<html><head><link rel=stylesheet type=text/css href=assets/index.css /></head><body><div class="head-container"><img src=assets/opencast-white.svg /></div><div class="navbar-container"></div><div class="text-container"><p>Deployment of Opencast\'s Maven Site and Code Coverage.  The branches listed here correspond to Opencast\'s own branches.</br><b>Please select a version.</b></p></div><ul>' > index.html
           find . -mindepth 1 -maxdepth 1 -type d \
             | grep '[0-9]*.x\|develop' \
             | sort -r \
@@ -158,13 +177,20 @@ jobs:
 
       - name: update CSS and other assets
         if: github.ref == 'refs/heads/develop'
-        working-directory: opencast
+        uses: actions/download-artifact@v8
+        with:
+          name: assets
+          path: assets_artifact
+
+      - name: commit CSS and other asset changes
+        if: github.ref == 'refs/heads/develop'
+        working-directory: coverage-reports
         run: |
           rm -rf assets
-          cp -rv ../.github/assets ./assets
+          cp -rv ../assets_artifact/ ./assets
           git add assets
           git diff --staged --quiet || git commit --amend -m "Maven site build outputs"
 
       - name: Push updates
-        working-directory: opencast
+        working-directory: coverage-reports
         run: git push origin gh-pages --force

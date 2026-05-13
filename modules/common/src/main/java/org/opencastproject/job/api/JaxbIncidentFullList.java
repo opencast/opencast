@@ -47,7 +47,7 @@ public final class JaxbIncidentFullList {
   }
 
   public JaxbIncidentFullList(IncidentService svc, Locale locale, List<Incident> incidents)
-      throws IncidentServiceException, NotFoundException {
+          throws IncidentServiceException, NotFoundException {
     this.incidents = incidents.stream()
         .map(JaxbIncidentFull.mkFn(svc, locale))
         .collect(Collectors.toList());

@@ -24,6 +24,7 @@ import static java.lang.String.format;
 import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.hasNoChecksum;
 import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.isNotPublication;
 import static org.opencastproject.mediapackage.MediaPackageSupport.getFileName;
+import static org.opencastproject.metadata.dublincore.CatalogUIAdapter.ORGANIZATION_WILDCARD;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLE;
 import static org.opencastproject.security.util.SecurityUtil.getEpisodeRoleId;
@@ -66,6 +67,7 @@ import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
+import org.opencastproject.message.broker.api.update.AssetManagerUpdateHandler;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.security.api.AccessControlEntry;
@@ -120,6 +122,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -150,7 +153,11 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   public static final String READ_ACTION = "read";
   public static final String SECURITY_NAMESPACE = "org.opencastproject.assetmanager.security";
 
+  private static final int EXPEXTED_HANDLERS_COUNT = 2;
+
   private static final String MANIFEST_DEFAULT_NAME = "manifest";
+
+  private CopyOnWriteArrayList<AssetManagerUpdateHandler> handlers = new CopyOnWriteArrayList<>();
 
   private SecurityService securityService;
   private AuthorizationService authorizationService;
@@ -164,6 +171,8 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   private EntityManagerFactory emf;
   private AclServiceFactory aclServiceFactory;
   private ElasticsearchIndex index;
+
+  // careful: org key can be wildcard!
   private Map<String, List<EventCatalogUIAdapter>> extendedEventCatalogUIAdapters = new HashMap<>();
 
   // Settings for role filter
@@ -262,11 +271,25 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     this.index = index;
   }
 
+  @Reference(
+      cardinality = ReferenceCardinality.MULTIPLE,
+      policy = ReferencePolicy.DYNAMIC,
+      unbind = "removeEventHandler"
+  )
+
+  public void addEventHandler(AssetManagerUpdateHandler handler) {
+    this.handlers.add(handler);
+  }
+
+  public void removeEventHandler(AssetManagerUpdateHandler handler) {
+    this.handlers.remove(handler);
+  }
+
   @Reference(cardinality = ReferenceCardinality.MULTIPLE, policy = ReferencePolicy.DYNAMIC,
-          target = "(common-metadata=false)")
+      target = "(common-metadata=false)")
   public synchronized void addCatalogUIAdapter(EventCatalogUIAdapter catalogUIAdapter) {
     List<EventCatalogUIAdapter> list = extendedEventCatalogUIAdapters.computeIfAbsent(
-            catalogUIAdapter.getOrganization(), k -> new ArrayList());
+            catalogUIAdapter.getOrganization(), k -> new ArrayList<>());
     list.add(catalogUIAdapter);
   }
 
@@ -324,14 +347,14 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
   public Optional<Asset> getAsset(Version version, String mpId, String mpElementId) {
     if (isAuthorized(mpId, READ_ACTION)) {
       // try to fetch the asset
-      var asset = getDatabase().getAsset(RuntimeTypes.convert(version), mpId, mpElementId);
-      if (asset.isPresent()) {
+      var assetDto = getDatabase().getAsset(RuntimeTypes.convert(version), mpId, mpElementId);
+      if (assetDto.isPresent()) {
         var storageId = getSnapshotStorageLocation(version, mpId);
         if (storageId.isPresent()) {
           var store = getAssetStore(storageId.get());
           if (store.isPresent()) {
             var assetStream = store.get().get(StoragePath.mk(
-                asset.get().getOrganizationId(),
+                assetDto.get().getSnapshot().getOrganizationId(),
                 mpId,
                 version,
                 mpElementId
@@ -340,7 +363,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
               Checksum checksum = null;
               try {
-                checksum = Checksum.fromString(asset.get().getAssetDto().getChecksum());
+                checksum = Checksum.fromString(assetDto.get().getChecksum());
               } catch (NoSuchAlgorithmException e) {
                 logger.warn("Invalid checksum for asset {} of media package {}", mpElementId, mpId, e);
               }
@@ -348,10 +371,10 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
               final Asset a = new AssetImpl(
                       AssetId.mk(version, mpId, mpElementId),
                       assetStream.get(),
-                      asset.get().getAssetDto().getMimeType(),
-                      asset.get().getAssetDto().getSize(),
-                      asset.get().getStorageId(),
-                      asset.get().getAvailability(),
+                      assetDto.get().getMimeType(),
+                      assetDto.get().getSize(),
+                      assetDto.get().getSnapshot().getStorageId(),
+                      Availability.valueOf(assetDto.get().getSnapshot().getAvailability()),
                       checksum);
               return Optional.of(a);
             }
@@ -438,6 +461,10 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
       updateEventInIndex(snapshot);
 
+      logger.info("Trigger update handlers for snapshot {}, version {}",
+              snapshot.getMediaPackage().getIdentifier(), snapshot.getVersion());
+      fireEventHandlers(mkTakeSnapshotMessage(snapshot));
+
       return snapshot;
     }
     throw new RuntimeException(new UnauthorizedException(
@@ -523,14 +550,18 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
    */
   private void updateEventInIndex(Snapshot snapshot) {
     final String eventId = snapshot.getMediaPackage().getIdentifier().toString();
-    final String orgId = securityService.getOrganization().getId();
+    final Organization organization = securityService.getOrganization();
     final User user = securityService.getUser();
 
     logger.debug("Updating event {} in the {} index.", eventId, index.getIndexName());
-    Function<Optional<Event>, Optional<Event>> updateFunction = getEventUpdateFunction(snapshot, orgId, user);
+    Function<Optional<Event>, Optional<Event>> updateFunction = getEventUpdateFunction(
+        snapshot,
+        organization.getId(),
+        user
+    );
 
     try {
-      index.addOrUpdateEvent(eventId, updateFunction, orgId, user);
+      index.addOrUpdateEvent(eventId, updateFunction, organization, user);
       logger.debug("Event {} updated in the {} index.", eventId, index.getIndexName());
     } catch (SearchIndexException e) {
       logger.error("Error updating the event {} in the {} index.", eventId, index.getIndexName(), e);
@@ -544,7 +575,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
    *         The id of the event to remove
    */
   private void removeArchivedVersionFromIndex(String eventId) {
-    final String orgId = securityService.getOrganization().getId();
+    final Organization organization = securityService.getOrganization();
     final User user = securityService.getUser();
     logger.debug("Received AssetManager delete episode message {}", eventId);
 
@@ -559,7 +590,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     };
 
     try {
-      index.addOrUpdateEvent(eventId, updateFunction, orgId, user);
+      index.addOrUpdateEvent(eventId, updateFunction, organization, user);
       logger.debug("Event {} removed from the {} index", eventId, index.getIndexName());
     } catch (SearchIndexException e) {
       logger.error("Error deleting the event {} from the {} index.", eventId, index.getIndexName(), e);
@@ -742,6 +773,10 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
         as.delete(deletionSelector);
       }
     }
+
+    logger.info("Firing event handlers for deleting event {}", mpId);
+    fireEventHandlers(AssetManagerItem.deleteEpisode(mpId, new Date()));
+    removeArchivedVersionFromIndex(mpId);
 
     return numberOfDeletedSnapshots;
   }
@@ -1071,8 +1106,11 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
               try {
                 current++;
 
-                var updatedEventData = index.getEvent(snapshot.getMediaPackage().getIdentifier().toString(), orgId,
-                    snapshotSystemUser);
+                var updatedEventData = index.getEvent(
+                    snapshot.getMediaPackage().getIdentifier().toString(),
+                    securityService.getOrganization(),
+                    snapshotSystemUser
+                );
                 if (dataType == DataType.ALL) {
                   // Reindex everything (default)
                   updatedEventData = getEventUpdateFunction(snapshot, orgId, snapshotSystemUser)
@@ -1088,7 +1126,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
                 updatedEventRange.add(updatedEventData.get());
 
                 if (updatedEventRange.size() >= n || current >= total) {
-                  index.bulkEventUpdate(updatedEventRange);
+                  index.bulkEventUpdate(updatedEventRange, securityService.getOrganization());
                   logIndexRebuildProgress(logger, total, current, n);
                   updatedEventRange.clear();
                 }
@@ -1240,10 +1278,10 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
           getDatabase()
           .findAssetByChecksumAndStoreAndOrg(e.getChecksum().toString(), store.getStoreType(), orgId)
           .map(dto -> StoragePath.mk(
-              dto.getOrganizationId(),
-              dto.getMediaPackageId(),
-              dto.getVersion(),
-              dto.getAssetDto().getMediaPackageElementId()
+              dto.getSnapshot().getOrganizationId(),
+              dto.getSnapshot().getMediaPackageId(),
+              dto.getSnapshot().getVersion(),
+              dto.getMediaPackageElementId()
           ));
 
       if (existingAssetOpt.isPresent()) {
@@ -1416,10 +1454,10 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       final Optional<StoragePath> existingAssetOpt = getDatabase()
           .findAssetByChecksumAndStoreAndOrg(e.getChecksum().toString(), getLocalAssetStore().getStoreType(), orgId)
           .map(dto -> StoragePath.mk(
-                  dto.getOrganizationId(),
-                  dto.getMediaPackageId(),
-                  dto.getVersion(),
-                  dto.getAssetDto().getMediaPackageElementId()));
+                  dto.getSnapshot().getOrganizationId(),
+                  dto.getSnapshot().getMediaPackageId(),
+                  dto.getSnapshot().getVersion(),
+                  dto.getMediaPackageElementId()));
 
       if (existingAssetOpt.isPresent()) {
         final StoragePath existingAsset = existingAssetOpt.get();
@@ -1542,6 +1580,19 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
             mpCopy);
   }
 
+  public void fireEventHandlers(AssetManagerItem item) {
+    while (handlers.size() != EXPEXTED_HANDLERS_COUNT) {
+      logger.warn("Expecting {} handlers, but {} are registered.  Waiting 10s then retrying...",
+          EXPEXTED_HANDLERS_COUNT, handlers.size());
+      try {
+        Thread.sleep(10000L); // 10 seconds
+      } catch (InterruptedException e) { /* swallow this, nothing to do */ }
+    }
+    for (AssetManagerUpdateHandler handler : handlers) {
+      handler.execute(item);
+    }
+  }
+
   /**
    * Get the function to update a commented event in the Elasticsearch index.
    *
@@ -1573,8 +1624,10 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
       // extended metadata
       event.resetExtendedMetadata();  // getting rid of old data
-      for (EventCatalogUIAdapter extendedCatalogUIAdapter : extendedEventCatalogUIAdapters.getOrDefault(orgId,
-              Collections.emptyList())) {
+
+      List<EventCatalogUIAdapter> orgAdapters = extendedEventCatalogUIAdapters.getOrDefault(orgId, new ArrayList<>());
+      orgAdapters.addAll(extendedEventCatalogUIAdapters.getOrDefault(ORGANIZATION_WILDCARD, Collections.emptyList()));
+      for (EventCatalogUIAdapter extendedCatalogUIAdapter : orgAdapters) {
         for (Catalog catalog: mp.getCatalogs(extendedCatalogUIAdapter.getFlavor())) {
           try (InputStream in = workspace.read(catalog.getURI())) {
             EventIndexUtils.updateEventExtendedMetadata(event, DublinCores.read(in),

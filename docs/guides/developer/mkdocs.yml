@@ -99,7 +99,6 @@ nav:
    - Filesystem: 'architecture/filesystem.md'
    - Job dispatch: 'architecture/job-dispatch.md'
    - OAI-PMH: 'architecture/oaipmh.md'
-   - Paella player 7: 'architecture/paella-player-7/index.md'
    - Scheduler: 'architecture/scheduler.md'
    - Statistics: 'architecture/statistics.md'
    - Stream security: 'architecture/stream-security.md'

@@ -43,6 +43,7 @@ import org.osgi.service.component.annotations.Activate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Dictionary;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -61,10 +62,10 @@ import javax.ws.rs.core.Response;
 
 /** Bundle information via REST. */
 @RestService(
-  name = "systemInfo",
-  title = "System Bundle Info",
-  notes = { "This is used to display the version information on the login page." },
-  abstractText = "The system bundle info endpoint yields information about the running OSGi bundles of Opencast.")
+    name = "systemInfo",
+    title = "System Bundle Info",
+    notes = { "This is used to display the version information on the login page." },
+    abstractText = "The system bundle info endpoint yields information about the running OSGi bundles of Opencast.")
 public abstract class BundleInfoRestEndpoint {
 
   private static final Logger logger = LoggerFactory.getLogger(BundleInfoRestEndpoint.class);
@@ -77,7 +78,15 @@ public abstract class BundleInfoRestEndpoint {
 
   @Activate
   public void activate(ComponentContext cc) {
-    lastModified = cc.getBundleContext().getBundle().getLastModified();
+    Dictionary<String, String> headers = cc.getBundleContext().getBundle().getHeaders();
+
+    if (headers != null) {
+      String lastModifiedObj = headers.get("Bnd-LastModified");
+
+      if (lastModifiedObj != null) {
+        lastModified = Long.valueOf(lastModifiedObj);
+      }
+    }
   }
 
   @GET
@@ -86,11 +95,11 @@ public abstract class BundleInfoRestEndpoint {
   @Path("bundles/list")
   @Produces(APPLICATION_JSON)
   @RestQuery(
-    name = "list",
-    description = "Return a list of all running bundles on the whole cluster.",
-    responses = {
-      @RestResponse(description = "A list of bundles.", responseCode = HttpServletResponse.SC_OK) },
-    returnDescription = "The search results, expressed as xml or json.")
+      name = "list",
+      description = "Return a list of all running bundles on the whole cluster.",
+      responses = {
+          @RestResponse(description = "A list of bundles.", responseCode = HttpServletResponse.SC_OK) },
+      returnDescription = "The search results, expressed as xml or json.")
   public Response getVersions() {
     List<Jsons.Val> bundleInfos = getDb().getBundles().stream()
         .map(b -> (Jsons.Val) bundleInfo(b))
@@ -103,26 +112,28 @@ public abstract class BundleInfoRestEndpoint {
   @GET
   @Path("bundles/check")
   @RestQuery(
-    name = "check",
-    description = "Check if all bundles throughout the cluster have the same OSGi bundle version and build number.",
-    restParameters = {
-      @RestParameter(
-        name = "prefix",
-        description = "The bundle name prefixes to check. Defaults to '" + DEFAULT_BUNDLE_PREFIX + "'.",
-        isRequired = false,
-        defaultValue = DEFAULT_BUNDLE_PREFIX,
-        type = RestParameter.Type.STRING) },
-    responses = {
-      @RestResponse(description = "true/false", responseCode = HttpServletResponse.SC_OK),
-      @RestResponse(description = "cannot find any bundles with the given prefix", responseCode = HttpServletResponse.SC_NOT_FOUND) },
-    returnDescription = "The search results, expressed as xml or json.")
+      name = "check",
+      description = "Check if all bundles throughout the cluster have the same OSGi bundle version and build number.",
+      restParameters = {
+          @RestParameter(
+              name = "prefix",
+              description = "The bundle name prefixes to check. Defaults to '" + DEFAULT_BUNDLE_PREFIX + "'.",
+              isRequired = false,
+              defaultValue = DEFAULT_BUNDLE_PREFIX,
+              type = RestParameter.Type.STRING) },
+      responses = {
+          @RestResponse(description = "true/false", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "cannot find any bundles with the given prefix",
+              responseCode = HttpServletResponse.SC_NOT_FOUND) },
+      returnDescription = "The search results, expressed as xml or json.")
   public Response checkBundles(@DefaultValue(DEFAULT_BUNDLE_PREFIX) @QueryParam("prefix") List<String> prefixes) {
     return withBundles(prefixes, infos -> {
       final String bundleVersion = infos.get(0).getBundleVersion();
       final Optional<String> buildNumber = infos.get(0).getBuildNumber();
       for (BundleInfo a : infos) {
-        if (ne(a.getBundleVersion(), bundleVersion) || ne(a.getBuildNumber(), buildNumber))
+        if (ne(a.getBundleVersion(), bundleVersion) || ne(a.getBuildNumber(), buildNumber)) {
           return ok(TEXT_PLAIN_TYPE, "false");
+        }
       }
       return ok(TEXT_PLAIN_TYPE, "true");
     });
@@ -133,19 +144,20 @@ public abstract class BundleInfoRestEndpoint {
   @Path("bundles/version")
   @Produces(APPLICATION_JSON)
   @RestQuery(
-    name = "bundleVersion",
-    description = "Return the common OSGi build version and build number of all bundles matching the given prefix.",
-    restParameters = {
-      @RestParameter(
-        name = "prefix",
-        description = "The bundle name prefixes to check. Defaults to '" + DEFAULT_BUNDLE_PREFIX + "'.",
-        isRequired = false,
-        defaultValue = DEFAULT_BUNDLE_PREFIX,
-        type = RestParameter.Type.STRING) },
-    responses = {
-      @RestResponse(description = "Version structure", responseCode = HttpServletResponse.SC_OK),
-      @RestResponse(description = "No bundles with the given prefix", responseCode = HttpServletResponse.SC_NOT_FOUND) },
-    returnDescription = "The search results as json.")
+      name = "bundleVersion",
+      description = "Return the common OSGi build version and build number of all bundles matching the given prefix.",
+      restParameters = {
+          @RestParameter(
+              name = "prefix",
+              description = "The bundle name prefixes to check. Defaults to '" + DEFAULT_BUNDLE_PREFIX + "'.",
+              isRequired = false,
+              defaultValue = DEFAULT_BUNDLE_PREFIX,
+              type = RestParameter.Type.STRING) },
+      responses = {
+          @RestResponse(description = "Version structure", responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "No bundles with the given prefix",
+              responseCode = HttpServletResponse.SC_NOT_FOUND) },
+      returnDescription = "The search results as json.")
   public Response getBundleVersion(@DefaultValue(DEFAULT_BUNDLE_PREFIX) @QueryParam("prefix") List<String> prefixes) {
     return withBundles(prefixes, infos -> {
       final Set<BundleVersion> versions = set();
@@ -200,7 +212,9 @@ public abstract class BundleInfoRestEndpoint {
   }
 
   public static final Jsons.Obj fullVersionJson(BundleVersion version) {
-    return obj(p("version", version.getBundleVersion()), p("buildNumber", version.getBuildNumber().map(Jsons::stringVal)));
+    return obj(
+        p("version", version.getBundleVersion()),
+        p("buildNumber", version.getBuildNumber().map(Jsons::stringVal)));
   }
 
   public static Jsons.Obj bundleInfoJson(BundleInfo bundle) {

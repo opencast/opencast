@@ -111,8 +111,10 @@ public class ProcessSmilWorkflowOperationHandlerTest {
   private static final String PROFILE_HLS = "hls";
   private static final String SOURCE_PRESENTER_TRACK_ID = "compose-workflow-operation-test-source-presenter-track-id";
   private static final String ENCODED_PRESENTER_TRACK_ID = "compose-workflow-operation-test-trimmed-presenter-track-id";
-  private static final String SOURCE_PRESENTATION_TRACK_ID = "compose-workflow-operation-test-source-presentation-track-id";
-  private static final String ENCODED_PRESENTATION_TRACK_ID = "compose-workflow-operation-test-trimmed-presentation-track-id";
+  private static final String SOURCE_PRESENTATION_TRACK_ID =
+      "compose-workflow-operation-test-source-presentation-track-id";
+  private static final String ENCODED_PRESENTATION_TRACK_ID =
+      "compose-workflow-operation-test-trimmed-presentation-track-id";
   private static final String ENCODED_MASTER_ID = "multiencode-workflow-operation-test-encode-track-id1";
   private static final String ENCODED_VARIANT_ID = "multiencode-workflow-operation-test-encode-track-id2";
   private static final String ENCODED_X264_ID = "multiencode-workflow-operation-test-encode-track-id3";
@@ -327,8 +329,9 @@ public class ProcessSmilWorkflowOperationHandlerTest {
       try {
         URI uri = (URI) EasyMock.getCurrentArguments()[0];
         name = uri.getPath();
-        if (name.contains("smil.smil"))
+        if (name.contains("smil.smil")) {
           return smilfile;
+        }
       } catch (Exception e) {
         name = uriMP.getPath();
       }
@@ -411,8 +414,9 @@ public class ProcessSmilWorkflowOperationHandlerTest {
           try {
             URI uri = (URI) EasyMock.getCurrentArguments()[0];
             name = uri.getPath();
-            if (name.contains("smil.smil"))
+            if (name.contains("smil.smil")) {
               return smilfile;
+            }
           } catch (Exception e) {
             name = uriMP.getPath();
           }

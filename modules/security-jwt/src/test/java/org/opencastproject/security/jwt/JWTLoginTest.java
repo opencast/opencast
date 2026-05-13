@@ -25,14 +25,18 @@ import static org.easymock.EasyMock.anyString;
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.createNiceMock;
 import static org.easymock.EasyMock.expect;
+import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.easymock.EasyMock.reset;
+import static org.easymock.EasyMock.verify;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNull;
 
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.security.impl.jpa.JpaOrganization;
 import org.opencastproject.security.impl.jpa.JpaUserReference;
 import org.opencastproject.userdirectory.api.UserReferenceProvider;
 
@@ -46,6 +50,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.security.NoSuchAlgorithmException;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -59,6 +64,7 @@ import javax.servlet.http.HttpServletRequest;
 public abstract class JWTLoginTest {
 
   protected UserReferenceProvider userReferenceProvider;
+  protected UserDirectoryService userDirectoryService;
   protected JWTGenerator generator;
   protected TestAbstractPreAuthenticatedProcessingFilter authFilter;
   protected DynamicLoginHandler loginHandler;
@@ -73,7 +79,11 @@ public abstract class JWTLoginTest {
 
     // Prepare login handler
     loginHandler = new DynamicLoginHandler();
-    loginHandler.setUserDirectoryService(createNiceMock(UserDirectoryService.class));
+    userDirectoryService = createMock(UserDirectoryService.class);
+    userDirectoryService.invalidate(anyString());
+    expectLastCall().anyTimes();
+    replay(userDirectoryService);
+    loginHandler.setUserDirectoryService(userDirectoryService);
     loginHandler.setUsernameMapping(generator.getUsernameMapping());
     loginHandler.setNameMapping(generator.getNameMapping());
     loginHandler.setEmailMapping(generator.getEmailMapping());
@@ -82,16 +92,22 @@ public abstract class JWTLoginTest {
     loginHandler.setSecret(generator.getSecret());
     loginHandler.setClaimConstraints(generator.generateValidClaimConstraints());
 
+    DefaultOrganization defaultOrganization = new DefaultOrganization();
     SecurityService securityService = createNiceMock(SecurityService.class);
     expect(securityService.getOrganization())
-        .andReturn(new DefaultOrganization())
+        .andReturn(defaultOrganization)
         .atLeastOnce();
     replay(securityService);
     loginHandler.setSecurityService(securityService);
 
+    JpaOrganization jpaOrganization = new JpaOrganization(defaultOrganization.getId(), defaultOrganization.getName(),
+        defaultOrganization.getServers(), defaultOrganization.getAdminRole(), defaultOrganization.getAnonymousRole(),
+        defaultOrganization.getProperties());
+    JpaUserReference existingUserReference = new JpaUserReference(generator.getUsername(), generator.getName(),
+        generator.getEmail(), "jwt", new Date(), jpaOrganization, generator.getJpaRoles(jpaOrganization));
     userReferenceProvider = createNiceMock(UserReferenceProvider.class);
     expect(userReferenceProvider.findUserReference(anyString(), anyString()))
-        .andReturn(createNiceMock(JpaUserReference.class))
+        .andReturn(existingUserReference)
         .atLeastOnce();
     replay(userReferenceProvider);
     loginHandler.setUserReferenceProvider(userReferenceProvider);
@@ -186,6 +202,45 @@ public abstract class JWTLoginTest {
         mockRequest(expiringJwt)
     );
     assertNull(username);
+  }
+
+  @Test
+  public void testRefreshedTokenWithSameUserDataDoesNotInvalidateUserDirectory() throws JOSEException {
+    String firstJwt = generator.generateValidSymmetricJWT(60 * 60 * 1000);
+    String refreshedJwt = generator.generateValidSymmetricJWT(60 * 60 * 1000 + 1000);
+
+    assertNotEquals(firstJwt, refreshedJwt);
+
+    Object username = authFilter.getPreAuthenticatedPrincipal(mockRequest(firstJwt));
+    assertEquals(generator.getUsername(), username);
+
+    reset(userDirectoryService);
+    replay(userDirectoryService);
+
+    username = authFilter.getPreAuthenticatedPrincipal(mockRequest(refreshedJwt));
+    assertEquals(generator.getUsername(), username);
+    verify(userDirectoryService);
+  }
+
+  @Test
+  public void testRefreshedTokenWithChangedUserDataInvalidatesUserDirectory() throws JOSEException {
+    String firstJwt = generator.generateValidSymmetricJWT(60 * 60 * 1000);
+    String refreshedJwt = generator.generateValidSymmetricJWT("John Refresh", "john.refresh@example.org",
+        List.of("member@example.org", "trainer@example.org"), 60 * 60 * 1000 + 1000);
+
+    assertNotEquals(firstJwt, refreshedJwt);
+
+    Object username = authFilter.getPreAuthenticatedPrincipal(mockRequest(firstJwt));
+    assertEquals(generator.getUsername(), username);
+
+    reset(userDirectoryService);
+    userDirectoryService.invalidate(generator.getUsername());
+    expectLastCall().once();
+    replay(userDirectoryService);
+
+    username = authFilter.getPreAuthenticatedPrincipal(mockRequest(refreshedJwt));
+    assertEquals(generator.getUsername(), username);
+    verify(userDirectoryService);
   }
 
   @Test

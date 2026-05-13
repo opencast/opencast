@@ -36,19 +36,19 @@ public class MediaPackageElementFlavorTest {
   public void testInvalidConstructorArguments() {
 
     String[][] inputArguments = new String[][] {
-      new String[] { null, null },
-      new String[] { "valid", null },
-      new String[] { null, "valid" },
-      new String[] { "", "" },
-      new String[] { "valid", "" },
-      new String[] { "", "valid" },
-      new String[] { " \t \n \r ", " \t \n \r " },
-      new String[] { " \t \n \r ", "" },
-      new String[] { "", " \t \n \r " },
-      new String[] { "valid", " \t \n \r " },
-      new String[] { " \t \n \r ", "valid" },
-      new String[] { "invalid/type", "valid_subtype" },
-      new String[] { "valid_type", "invalid/subtype" }
+        new String[] { null, null },
+        new String[] { "valid", null },
+        new String[] { null, "valid" },
+        new String[] { "", "" },
+        new String[] { "valid", "" },
+        new String[] { "", "valid" },
+        new String[] { " \t \n \r ", " \t \n \r " },
+        new String[] { " \t \n \r ", "" },
+        new String[] { "", " \t \n \r " },
+        new String[] { "valid", " \t \n \r " },
+        new String[] { " \t \n \r ", "valid" },
+        new String[] { "invalid/type", "valid_subtype" },
+        new String[] { "valid_type", "invalid/subtype" }
     };
 
     for (String[] arguments : inputArguments) {
@@ -104,18 +104,18 @@ public class MediaPackageElementFlavorTest {
   public void testParse() {
 
     String[] invalidFlavors = new String[] {
-            null,
-            "",
-            "/",
-            "valid/",
-            "/valid",
-            " \r \n \t /",
-            " \r \n \t /valid",
-            "/ \r \n \t ",
-            "valid/ \r \n \t ",
-            " \r \n \t / \r \n \t ",
-            "too/many/slashes",
-            "/ \r \n \t too \r / \r many   / \t \r \n slashes \t"
+        null,
+        "",
+        "/",
+        "valid/",
+        "/valid",
+        " \r \n \t /",
+        " \r \n \t /valid",
+        "/ \r \n \t ",
+        "valid/ \r \n \t ",
+        " \r \n \t / \r \n \t ",
+        "too/many/slashes",
+        "/ \r \n \t too \r / \r many   / \t \r \n slashes \t"
     };
 
     for (String invalid : invalidFlavors) {

@@ -57,15 +57,15 @@ import uk.co.datumedge.hamcrest.json.SameJSONAs;
 public class EventsEndpointTest {
   private static final RestServiceTestEnv env = testEnvForClasses(TestEventsEndpoint.class);
 
-   @BeforeClass
-   public static void oneTimeSetUp() {
-     env.setUpServer();
-   }
+  @BeforeClass
+  public static void oneTimeSetUp() {
+    env.setUpServer();
+  }
 
-   @AfterClass
-   public static void oneTimeTearDown() {
-     env.tearDownServer();
-   }
+  @AfterClass
+  public static void oneTimeTearDown() {
+    env.tearDownServer();
+  }
 
   @Test
   public void testDeserializationOfAcl() throws IOException, ParseException {
@@ -129,14 +129,16 @@ public class EventsEndpointTest {
     given().multiPart("metadata", jsonString).pathParam("event_id", eventId).expect().statusCode(SC_NO_CONTENT)
             .when().post(env.host("{event_id}"));
     MetadataList actualMetadataList = TestEventsEndpoint.getCapturedMetadataList1().getValue();
-    assertThat(MetadataJson.listToJson(actualMetadataList, true).toString(), SameJSONAs.sameJSONAs(expectedJson).allowingAnyArrayOrdering());
+    assertThat(MetadataJson.listToJson(actualMetadataList, true, true).toString(),
+        SameJSONAs.sameJSONAs(expectedJson).allowingAnyArrayOrdering());
   }
 
   @Test
   public void testGetAllEventMetadata() throws IOException {
     String expectedJson = IOUtils.toString(getClass().getResource("/event-metadata-expected.json"), UTF_8);
     String eventId = TestEventsEndpoint.METADATA_GET_EVENT;
-    String result = given().pathParam("event_id", eventId).expect().statusCode(SC_OK).when().get(env.host("{event_id}/metadata")).asString();
+    String result = given().pathParam("event_id", eventId).expect().statusCode(SC_OK).when()
+        .get(env.host("{event_id}/metadata")).asString();
     assertThat(result, SameJSONAs.sameJSONAs(expectedJson).allowingAnyArrayOrdering());
   }
 
@@ -148,7 +150,8 @@ public class EventsEndpointTest {
     given().formParam("metadata", jsonString).pathParam("event_id", eventId).queryParam("type", "dublincore/episode")
             .expect().statusCode(SC_NO_CONTENT).when().put(env.host("{event_id}/metadata"));
     MetadataList actualMetadataList = TestEventsEndpoint.getCapturedMetadataList2().getValue();
-    assertThat(MetadataJson.collectionToJson(actualMetadataList.getMetadataByFlavor("dublincore/episode"), true).toString(),
+    assertThat(MetadataJson.collectionToJson(
+            actualMetadataList.getMetadataByFlavor("dublincore/episode"), true, true).toString(),
             SameJSONAs.sameJSONAs(expectedJson).allowingAnyArrayOrdering());
   }
 

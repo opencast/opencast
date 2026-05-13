@@ -36,7 +36,7 @@ updates:
     interval: monthly
   open-pull-requests-limit: 10
 - package-ecosystem: npm
-  directory: "/modules/engage-paella-player-7"
+  directory: "/modules/engage-paella-player-8"
   schedule:
     interval: monthly
   open-pull-requests-limit: 10

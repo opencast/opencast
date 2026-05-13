@@ -92,9 +92,6 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
   /** The composer service */
   private ComposerService composerService = null;
 
-  /** The local workspace */
-  private Workspace workspace = null;
-
   /**
    * Callback for the OSGi declarative services configuration.
    *
@@ -121,8 +118,8 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(
+   *      org.opencastproject.workflow.api.WorkflowInstance, JobContext)
    */
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
@@ -163,7 +160,8 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
     ConfiguredTagsAndFlavors.TargetTags targetTrackTags = tagsAndFlavors.getTargetTags();
     MediaPackageElementFlavor targetFlavor = tagsAndFlavors.getSingleTargetFlavor();
     String muxEncodingProfileName = StringUtils.trimToNull(operation.getConfiguration("mux-encoding-profile"));
-    String audioVideoEncodingProfileName = StringUtils.trimToNull(operation.getConfiguration("audio-video-encoding-profile"));
+    String audioVideoEncodingProfileName = StringUtils.trimToNull(operation.getConfiguration(
+        "audio-video-encoding-profile"));
     String videoOnlyEncodingProfileName = StringUtils.trimToNull(operation.getConfiguration("video-encoding-profile"));
     String audioOnlyEncodingProfileName = StringUtils.trimToNull(operation.getConfiguration("audio-encoding-profile"));
 
@@ -173,7 +171,8 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
       rewrite = Boolean.parseBoolean(operation.getConfiguration(OPT_REWRITE));
     }
 
-    String audioMuxingSourceFlavors = StringUtils.trimToNull(operation.getConfiguration(OPT_AUDIO_MUXING_SOURCE_FLAVORS));
+    String audioMuxingSourceFlavors = StringUtils.trimToNull(operation.getConfiguration(
+        OPT_AUDIO_MUXING_SOURCE_FLAVORS));
 
     // Select those tracks that have matching flavors
     TrackSelector trackSelector = new TrackSelector();
@@ -219,46 +218,49 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
     if (audioTrack == null && videoTrack != null) {
       if (rewrite) {
         logger.info("Encoding video only track {} to prepared version", videoTrack);
-        if (videoOnlyEncodingProfileName == null)
+        if (videoOnlyEncodingProfileName == null) {
           videoOnlyEncodingProfileName = PREPARE_VONLY_PROFILE;
+        }
         // Find the encoding profile to make sure the given profile exists
         EncodingProfile profile = composerService.getProfile(videoOnlyEncodingProfileName);
-        if (profile == null)
-        throw new IllegalStateException("Encoding profile '" + videoOnlyEncodingProfileName + "' was not found");
+        if (profile == null) {
+          throw new IllegalStateException("Encoding profile '" + videoOnlyEncodingProfileName + "' was not found");
+        }
         composedTrack = prepare(videoTrack, mediaPackage, videoOnlyEncodingProfileName);
       } else {
-        composedTrack = (Track) videoTrack.clone();
-        composedTrack.setIdentifier(null);
+        composedTrack = (Track) createDerivedMediaPackageElementFrom(videoTrack);
         mediaPackage.add(composedTrack);
       }
     } else if (videoTrack == null && audioTrack != null) {
       if (rewrite) {
         logger.info("Encoding audio only track {} to prepared version", audioTrack);
-        if (audioOnlyEncodingProfileName == null)
+        if (audioOnlyEncodingProfileName == null) {
           audioOnlyEncodingProfileName = PREPARE_AONLY_PROFILE;
+        }
         // Find the encoding profile to make sure the given profile exists
         EncodingProfile profile = composerService.getProfile(audioOnlyEncodingProfileName);
-        if (profile == null)
-        throw new IllegalStateException("Encoding profile '" + audioOnlyEncodingProfileName + "' was not found");
+        if (profile == null) {
+          throw new IllegalStateException("Encoding profile '" + audioOnlyEncodingProfileName + "' was not found");
+        }
         composedTrack = prepare(audioTrack, mediaPackage, audioOnlyEncodingProfileName);
       } else {
-        composedTrack = (Track) audioTrack.clone();
-        composedTrack.setIdentifier(null);
+        composedTrack = (Track) createDerivedMediaPackageElementFrom(audioTrack);
         mediaPackage.add(composedTrack);
       }
     } else if (audioTrack == videoTrack) {
       if (rewrite) {
         logger.info("Encoding audiovisual track {} to prepared version", videoTrack);
-        if (audioVideoEncodingProfileName == null)
+        if (audioVideoEncodingProfileName == null) {
           audioVideoEncodingProfileName = PREPARE_AV_PROFILE;
+        }
         // Find the encoding profile to make sure the given profile exists
         EncodingProfile profile = composerService.getProfile(audioVideoEncodingProfileName);
-        if (profile == null)
-        throw new IllegalStateException("Encoding profile '" + audioVideoEncodingProfileName + "' was not found");
+        if (profile == null) {
+          throw new IllegalStateException("Encoding profile '" + audioVideoEncodingProfileName + "' was not found");
+        }
         composedTrack = prepare(videoTrack, mediaPackage, audioVideoEncodingProfileName);
       } else {
-        composedTrack = (Track) videoTrack.clone();
-        composedTrack.setIdentifier(null);
+        composedTrack = (Track) createDerivedMediaPackageElementFrom(videoTrack);
         mediaPackage.add(composedTrack);
       }
     } else {
@@ -269,13 +271,15 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
         audioTrack = prepare(audioTrack, null, PREPARE_AONLY_PROFILE);
       }
 
-      if (muxEncodingProfileName == null)
+      if (muxEncodingProfileName == null) {
         muxEncodingProfileName = MUX_AV_PROFILE;
+      }
 
       // Find the encoding profile
       EncodingProfile profile = composerService.getProfile(muxEncodingProfileName);
-      if (profile == null)
-      throw new IllegalStateException("Encoding profile '" + muxEncodingProfileName + "' was not found");
+      if (profile == null) {
+        throw new IllegalStateException("Encoding profile '" + muxEncodingProfileName + "' was not found");
+      }
 
       job = composerService.mux(videoTrack, audioTrack, profile.getIdentifier());
       if (!waitForStatus(job).isSuccess()) {
@@ -367,7 +371,8 @@ public class PrepareAVWorkflowOperationHandler extends AbstractWorkflowOperation
             throw e;
           }
           type = (QUESTION_MARK.equals(flavor.getType())) ? videoTrack.getFlavor().getType() : flavor.getType();
-          subtype = (QUESTION_MARK.equals(flavor.getSubtype())) ? videoTrack.getFlavor().getSubtype() : flavor.getSubtype();
+          subtype = (QUESTION_MARK.equals(flavor.getSubtype()))
+              ? videoTrack.getFlavor().getSubtype() : flavor.getSubtype();
           // Recreate the (possibly) modified flavor
           flavor = new MediaPackageElementFlavor(type, subtype);
           for (Track track : mediaPackage.getTracks(flavor)) {

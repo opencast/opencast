@@ -113,9 +113,6 @@ public class SeriesWorkflowOperationHandler extends AbstractWorkflowOperationHan
   /** The series service */
   private SeriesService seriesService;
 
-  /** The workspace */
-  private Workspace workspace;
-
   /** The security service */
   private SecurityService securityService;
 

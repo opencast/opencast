@@ -36,7 +36,8 @@ import java.util.function.Function;
 public final class Functions {
 
   /**
-   * Converts a UTC string into a date. May throw a {@link org.opencastproject.oaipmh.server.OaiPmhRepository.BadArgumentException}.
+   * Converts a UTC string into a date. May throw a
+   * {@link org.opencastproject.oaipmh.server.OaiPmhRepository.BadArgumentException}.
    */
   public static Date asDate(String s) {
     try {

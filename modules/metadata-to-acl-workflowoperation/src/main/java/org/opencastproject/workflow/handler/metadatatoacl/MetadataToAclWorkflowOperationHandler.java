@@ -77,7 +77,6 @@ public class MetadataToAclWorkflowOperationHandler extends AbstractWorkflowOpera
 
   private AuthorizationService authorizationService;
   private UserDirectoryService userDirectory;
-  private Workspace workspace;
 
   @Override
   public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)

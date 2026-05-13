@@ -103,20 +103,24 @@ public final class UrlSupport {
    * @return the concatenated url of the two arguments
    */
   public static String concat(String prefix, String suffix, boolean close) {
-    if (prefix == null)
+    if (prefix == null) {
       throw new IllegalArgumentException("Argument prefix is null");
-    if (suffix == null)
+    }
+    if (suffix == null) {
       throw new IllegalArgumentException("Argument suffix is null");
+    }
 
     prefix = checkSeparator(prefix);
     suffix = checkSeparator(suffix);
     prefix = removeDoubleSeparator(prefix);
     suffix = removeDoubleSeparator(suffix);
 
-    if (!prefix.endsWith("/") && !suffix.startsWith("/"))
+    if (!prefix.endsWith("/") && !suffix.startsWith("/")) {
       prefix += "/";
-    if (prefix.endsWith("/") && suffix.startsWith("/"))
+    }
+    if (prefix.endsWith("/") && suffix.startsWith("/")) {
       suffix = suffix.substring(1);
+    }
 
     prefix += suffix;
 
@@ -135,10 +139,12 @@ public final class UrlSupport {
    * @return the concatenated url
    */
   public static String concat(String... parts) {
-    if (parts == null)
+    if (parts == null) {
       throw new IllegalArgumentException("Argument parts is null");
-    if (parts.length == 0)
+    }
+    if (parts.length == 0) {
       throw new IllegalArgumentException("Array parts is empty");
+    }
     String path = parts[0];
     for (int i = 1; i < parts.length; i++) {
       if (parts[i] != null) {
@@ -156,10 +162,12 @@ public final class UrlSupport {
    * @return the concatenated url
    */
   public static String concat(List<String> parts) {
-    if (parts == null)
+    if (parts == null) {
       throw new IllegalArgumentException("Argument parts is null");
-    if (parts.size() == 0)
+    }
+    if (parts.size() == 0) {
       throw new IllegalArgumentException("Array parts is empty");
+    }
 
     return parts.stream().reduce((s1, s2) -> concat(s1, s2))
         .orElse(null);
@@ -181,8 +189,9 @@ public final class UrlSupport {
    */
   private static String checkSeparator(String path) {
     String sp = File.separator;
-    if ("\\".equals(sp))
+    if ("\\".equals(sp)) {
       sp = "\\\\";
+    }
     return path.replaceAll(sp, "/");
   }
 

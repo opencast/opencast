@@ -690,6 +690,9 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
           break;
       }
     }
+    searchSource.sort("_score", SortOrder.DESC);
+    // Used to stabilize the sort order of results with the same score.
+    searchSource.sort("_doc", SortOrder.ASC);
     return new SearchRequest(Arrays.stream(query.getTypes()).map(this::getSubIndexIdentifier).toArray(String[]::new))
             .searchType(SearchType.QUERY_THEN_FETCH).preference("_local").source(searchSource);
   }

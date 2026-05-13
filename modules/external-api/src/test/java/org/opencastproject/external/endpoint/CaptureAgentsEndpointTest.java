@@ -49,25 +49,25 @@ public class CaptureAgentsEndpointTest {
 
   private static List<Agent> allAgents;
 
-   @BeforeClass
-   public static void oneTimeSetUp() throws ParseException, IOException, URISyntaxException {
-     env.setUpServer();
-     allAgents = loadAgents();
-   }
+  @BeforeClass
+  public static void oneTimeSetUp() throws ParseException, IOException, URISyntaxException {
+    env.setUpServer();
+    allAgents = loadAgents();
+  }
 
-   @AfterClass
-   public static void oneTimeTearDown() {
-     env.tearDownServer();
-   }
+  @AfterClass
+  public static void oneTimeTearDown() {
+    env.tearDownServer();
+  }
 
-   @Test
-   public void testGetAgent() throws Exception {
-     final Agent expectedAgent = allAgents.stream().findAny().get();
-     final String expectedJson = toJson(expectedAgent).toJSONString();
-     String result = given().pathParam("agentId", expectedAgent.getName()).expect().statusCode(SC_OK).when()
-         .get(env.host("{agentId}")).asString();
-     assertThat(result, SameJSONAs.sameJSONAs(expectedJson).allowingAnyArrayOrdering());
-   }
+  @Test
+  public void testGetAgent() throws Exception {
+    final Agent expectedAgent = allAgents.stream().findAny().get();
+    final String expectedJson = toJson(expectedAgent).toJSONString();
+    String result = given().pathParam("agentId", expectedAgent.getName()).expect().statusCode(SC_OK).when()
+        .get(env.host("{agentId}")).asString();
+    assertThat(result, SameJSONAs.sameJSONAs(expectedJson).allowingAnyArrayOrdering());
+  }
 
   @Test
   public void testGetNonExistingAgent() {

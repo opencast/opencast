@@ -21,10 +21,10 @@
 
 package org.opencastproject.metadata.dublincore;
 
+import org.opencastproject.list.api.DefaultResourceListQuery;
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ListProvidersService;
 import org.opencastproject.list.api.ResourceListQuery;
-import org.opencastproject.list.impl.ResourceListQueryImpl;
 
 import com.google.common.collect.Iterables;
 
@@ -73,8 +73,9 @@ public class DublinCoreMetadataCollection {
   }
 
   public void addField(final MetadataField metadata) {
-    if (metadata == null)
+    if (metadata == null) {
       throw new IllegalArgumentException("The metadata must not be null.");
+    }
     addFieldInOrder(metadata);
     this.outputFields.put(metadata.getOutputID(), metadata);
   }
@@ -130,7 +131,7 @@ public class DublinCoreMetadataCollection {
   }
 
   public void addField(final MetadataField metadataField, final Optional<String> valueOpt, final
-    Optional<ResourceListQuery> collectionQueryOverrideOpt, final ListProvidersService listProvidersService) {
+      Optional<ResourceListQuery> collectionQueryOverrideOpt, final ListProvidersService listProvidersService) {
     if (valueOpt.isPresent()) {
       addField(metadataField, Collections.singletonList(valueOpt.get()), collectionQueryOverrideOpt,
               listProvidersService);
@@ -142,7 +143,7 @@ public class DublinCoreMetadataCollection {
   /**
    * Set value to a metadata field of unknown type
    */
-  private static void setValueFromDCCatalog(
+  public static void setValueFromDCCatalog(
           final List<String> filteredValues,
           final MetadataField metadataField) {
     if (filteredValues.isEmpty()) {
@@ -169,8 +170,9 @@ public class DublinCoreMetadataCollection {
       case DURATION:
         final String value = Iterables.getLast(filteredValues);
         final DCMIPeriod period = EncodingSchemeUtils.decodePeriod(value);
-        if (period == null)
+        if (period == null) {
           throw new IllegalArgumentException("period couldn't be parsed: " + value);
+        }
         final long longValue = period.getEnd().getTime() - period.getStart().getTime();
         metadataField.setValue(Long.toString(longValue), false);
         break;
@@ -246,7 +248,7 @@ public class DublinCoreMetadataCollection {
             return Collections.emptyMap();
           }
         } else {
-          resourceListQuery = new ResourceListQueryImpl();
+          resourceListQuery = new DefaultResourceListQuery();
         }
 
         return listProvidersService.getList(metadataField.getListprovider(), resourceListQuery, true);
@@ -279,8 +281,9 @@ public class DublinCoreMetadataCollection {
   }
 
   public void removeField(final MetadataField metadata) {
-    if (metadata == null)
+    if (metadata == null) {
       throw new IllegalArgumentException("The metadata must not be null.");
+    }
     this.fieldsInOrder.remove(metadata);
     this.outputFields.remove(metadata.getOutputID());
   }

@@ -85,7 +85,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 @Path("/api/playlists")
-@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_11_0 })
+@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_11_0, ApiMediaType.VERSION_1_12_0 })
 @RestService(
     name = "externalapiplaylists",
     title = "External API Playlists Service",
@@ -138,7 +138,6 @@ public class PlaylistsEndpoint {
 
   @GET
   @Path("{id}")
-  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_11_0 })
   @RestQuery(
       name = "playlist",
       description = "Get a playlist.",
@@ -148,9 +147,12 @@ public class PlaylistsEndpoint {
       },
       responses = {
           @RestResponse(description = "Returns the playlist.", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "The specified playlist instance does not exist.", responseCode = HttpServletResponse.SC_NOT_FOUND),
-          @RestResponse(description = "The user doesn't have the rights to make this request.", responseCode = HttpServletResponse.SC_FORBIDDEN),
-          @RestResponse(description = "The request is invalid or inconsistent.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "The specified playlist instance does not exist.",
+              responseCode = HttpServletResponse.SC_NOT_FOUND),
+          @RestResponse(description = "The user doesn't have the rights to make this request.",
+              responseCode = HttpServletResponse.SC_FORBIDDEN),
+          @RestResponse(description = "The request is invalid or inconsistent.",
+              responseCode = HttpServletResponse.SC_BAD_REQUEST),
       })
   public Response getPlaylistAsJson(
       @HeaderParam("Accept") String acceptHeader,
@@ -169,7 +171,6 @@ public class PlaylistsEndpoint {
   }
 
   @GET
-  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_11_0 })
   @Path("")
   @RestQuery(
       name = "playlists",
@@ -188,7 +189,8 @@ public class PlaylistsEndpoint {
       },
       responses = {
           @RestResponse(description = "Returns the playlist.", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "The request is invalid or inconsistent.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "The request is invalid or inconsistent.",
+              responseCode = HttpServletResponse.SC_BAD_REQUEST),
       })
   public Response getPlaylistsAsJson(
       @HeaderParam("Accept") String acceptHeader,
@@ -228,7 +230,6 @@ public class PlaylistsEndpoint {
   }
 
   @POST
-  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_11_0 })
   @Path("")
   @RestQuery(
       name = "create",
@@ -240,8 +241,10 @@ public class PlaylistsEndpoint {
       },
       responses = {
           @RestResponse(description = "Playlist created.", responseCode = HttpServletResponse.SC_CREATED),
-          @RestResponse(description = "The user doesn't have the rights to make this request.", responseCode = HttpServletResponse.SC_FORBIDDEN),
-          @RestResponse(description = "The request is invalid or inconsistent.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "The user doesn't have the rights to make this request.",
+              responseCode = HttpServletResponse.SC_FORBIDDEN),
+          @RestResponse(description = "The request is invalid or inconsistent.",
+              responseCode = HttpServletResponse.SC_BAD_REQUEST),
       })
   public Response createAsJson(
       @HeaderParam("Accept") String acceptHeader,
@@ -265,7 +268,6 @@ public class PlaylistsEndpoint {
   }
 
   @PUT
-  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_11_0 })
   @Path("{id}")
   @RestQuery(
       name = "update",
@@ -280,8 +282,10 @@ public class PlaylistsEndpoint {
       },
       responses = {
           @RestResponse(description = "Playlist updated.", responseCode = HttpServletResponse.SC_OK),
-          @RestResponse(description = "The user doesn't have the rights to make this request.", responseCode = HttpServletResponse.SC_FORBIDDEN),
-          @RestResponse(description = "The request is invalid or inconsistent.", responseCode = HttpServletResponse.SC_BAD_REQUEST),
+          @RestResponse(description = "The user doesn't have the rights to make this request.",
+              responseCode = HttpServletResponse.SC_FORBIDDEN),
+          @RestResponse(description = "The request is invalid or inconsistent.",
+              responseCode = HttpServletResponse.SC_BAD_REQUEST),
       })
   public Response updateAsJson(
       @HeaderParam("Accept") String acceptHeader,
@@ -298,7 +302,6 @@ public class PlaylistsEndpoint {
   }
 
   @DELETE
-  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_11_0 })
   @Path("{id}")
   @RestQuery(
       name = "remove",

@@ -27,10 +27,10 @@ import org.opencastproject.graphql.exception.GraphQLRuntimeException;
 import org.opencastproject.graphql.execution.context.OpencastContext;
 import org.opencastproject.graphql.execution.context.OpencastContextManager;
 import org.opencastproject.graphql.type.output.Query;
+import org.opencastproject.list.api.DefaultResourceListQuery;
 import org.opencastproject.list.api.ListProviderException;
+import org.opencastproject.list.api.ListProviderNotFoundException;
 import org.opencastproject.list.api.ListProvidersService;
-import org.opencastproject.list.impl.ListProviderNotFoundException;
-import org.opencastproject.list.impl.ResourceListQueryImpl;
 import org.opencastproject.list.query.StringListFilter;
 
 import graphql.annotations.annotationTypes.GraphQLDefaultValue;
@@ -59,7 +59,7 @@ public final class ListProviderQueryExtension {
     final OpencastContext context = OpencastContextManager.enrichContext(environment);
 
     var listProvider = context.getService(ListProvidersService.class);
-    var resourceListQuery = new ResourceListQueryImpl();
+    var resourceListQuery = new DefaultResourceListQuery();
     resourceListQuery.setLimit(limit);
     resourceListQuery.setOffset(offset);
     addRequestFiltersToQuery(filter, resourceListQuery);
@@ -74,7 +74,7 @@ public final class ListProviderQueryExtension {
     }
   }
 
-  private static void addRequestFiltersToQuery(String filterString, ResourceListQueryImpl query) {
+  private static void addRequestFiltersToQuery(String filterString, DefaultResourceListQuery query) {
     if (filterString == null) {
       return;
     }

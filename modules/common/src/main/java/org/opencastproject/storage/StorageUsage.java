@@ -49,4 +49,11 @@ public interface StorageUsage {
    */
   Optional<Long> getUsedSpace();
 
+  /**
+   * Gets the name of the storage
+   *
+   * @return Name of the storage
+   */
+  String getStorageName();
+
 }

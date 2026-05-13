@@ -70,11 +70,11 @@ import java.util.stream.Collectors;
  * Proxies a set of remote composer services for use as a JVM-local service. Remote services are selected at random.
  */
 @Component(
-  property = {
-    "service.description=Composer (Encoder) Remote Service Proxy"
-  },
-  immediate = true,
-  service = { ComposerService.class }
+    property = {
+        "service.description=Composer (Encoder) Remote Service Proxy"
+    },
+    immediate = true,
+    service = { ComposerService.class }
 )
 public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerService {
 
@@ -339,7 +339,8 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
   }
 
   @Override
-  public List<Attachment> imageSync(Track sourceTrack, String profileId, double... times) throws EncoderException, MediaPackageException {
+  public List<Attachment> imageSync(Track sourceTrack, String profileId, double... times)
+          throws EncoderException, MediaPackageException {
     HttpPost post = new HttpPost("/imagesync");
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
@@ -381,8 +382,9 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
       params.add(new BasicNameValuePair("sourceTrack", MediaPackageElementParser.getAsXml(sourceTrack)));
       params.add(new BasicNameValuePair("profileId", profileId));
-      if (properties != null)
+      if (properties != null) {
         params.add(new BasicNameValuePair("properties", mapToString(properties)));
+      }
       post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (Exception e) {
       throw new EncoderException(e);
@@ -444,7 +446,8 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
    *      org.opencastproject.mediapackage.Attachment, java.lang.String...)
    */
   @Override
-  public List<Attachment> convertImageSync(Attachment image, String... profileIds) throws EncoderException, MediaPackageException {
+  public List<Attachment> convertImageSync(Attachment image, String... profileIds)
+          throws EncoderException, MediaPackageException {
     HttpPost post = new HttpPost("/convertimagesync");
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
@@ -459,7 +462,9 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
       response = getResponse(post);
       if (response != null) {
         final String xml = IOUtils.toString(response.getEntity().getContent(), Charset.forName("utf-8"));
-        return MediaPackageElementParser.getArrayFromXml(xml).stream().map(a -> (Attachment) a).collect(Collectors.toList());
+        return MediaPackageElementParser.getArrayFromXml(xml).stream()
+            .map(a -> (Attachment) a)
+            .collect(Collectors.toList());
       }
     } catch (Exception e) {
       throw new EncoderException(e);
@@ -492,7 +497,8 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
     } finally {
       closeConnection(response);
     }
-    throw new RuntimeException("Unable to list the encoding profiles registered with the remote composer service proxy");
+    throw new RuntimeException("Unable to list the encoding profiles registered with the remote composer service "
+        + "proxy");
   }
 
   /**
@@ -503,8 +509,9 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
    * @return string represented specified time array
    */
   protected String buildTimeArray(double[] times) {
-    if (times.length == 0)
+    if (times.length == 0) {
       return "";
+    }
 
     StringBuilder builder = new StringBuilder();
     builder.append(Double.toString(times[0]));
@@ -578,12 +585,15 @@ public class ComposerServiceRemoteImpl extends RemoteBase implements ComposerSer
     try {
       List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
       params.add(new BasicNameValuePair("profileId", profileId));
-      if (outputDimension != null)
+      if (outputDimension != null) {
         params.add(new BasicNameValuePair("outputDimension", Serializer.json(outputDimension).toJson()));
+      }
       params.add(new BasicNameValuePair("outputFrameRate", String.format(Locale.US, "%f", outputFrameRate)));
-      params.add(new BasicNameValuePair("sourceTracks", MediaPackageElementParser.getArrayAsXml(Arrays.asList(tracks))));
-      if (sameCodec)
+      params.add(new BasicNameValuePair("sourceTracks", MediaPackageElementParser.getArrayAsXml(
+          Arrays.asList(tracks))));
+      if (sameCodec) {
         params.add(new BasicNameValuePair("sameCodec", "true"));
+      }
       post.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (Exception e) {
       throw new EncoderException(e);

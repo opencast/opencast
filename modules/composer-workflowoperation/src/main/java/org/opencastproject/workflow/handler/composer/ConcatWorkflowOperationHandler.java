@@ -106,9 +106,6 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
   /** The composer service */
   private ComposerService composerService = null;
 
-  /** The local workspace */
-  private Workspace workspace = null;
-
   /**
    * Callback for the OSGi declarative services configuration.
    *
@@ -135,8 +132,8 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(
+   *      org.opencastproject.workflow.api.WorkflowInstance, JobContext)
    */
   @Override
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
@@ -168,25 +165,30 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
       return createResult(mediaPackage, Action.SKIP);
     }
 
-    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance, Configuration.none, Configuration.none, Configuration.many, Configuration.one);
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance, Configuration.none,
+        Configuration.none, Configuration.many, Configuration.one);
     ConfiguredTagsAndFlavors.TargetTags targetTagsOption = tagsAndFlavors.getTargetTags();
     List<MediaPackageElementFlavor> targetFlavorOption = tagsAndFlavors.getTargetFlavors();
 
     // Target flavor
-    if (targetFlavorOption.isEmpty())
+    if (targetFlavorOption.isEmpty()) {
       throw new WorkflowOperationException("Target flavor must be set!");
+    }
 
     // Find the encoding profile
-    if (encodingProfile == null)
+    if (encodingProfile == null) {
       throw new WorkflowOperationException("Encoding profile must be set!");
+    }
 
     EncodingProfile profile = composerService.getProfile(encodingProfile);
-    if (profile == null)
+    if (profile == null) {
       throw new WorkflowOperationException("Encoding profile '" + encodingProfile + "' was not found");
+    }
 
     // Output resolution - if not keeping dimensions the same, it must be set
-    if (!sameCodec && outputResolution == null)
-        throw new WorkflowOperationException("Output resolution must be set!");
+    if (!sameCodec && outputResolution == null) {
+      throw new WorkflowOperationException("Output resolution must be set!");
+    }
 
     Dimension outputDimension = null;
     if (!sameCodec) { // Ignore resolution if same Codec - no scaling
@@ -230,8 +232,9 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
     MediaPackageElementFlavor targetFlavor = null;
     try {
       targetFlavor = targetFlavorOption.get(0);
-      if ("*".equals(targetFlavor.getType()) || "*".equals(targetFlavor.getSubtype()))
+      if ("*".equals(targetFlavor.getType()) || "*".equals(targetFlavor.getSubtype())) {
         throw new WorkflowOperationException("Target flavor must have a type and a subtype, '*' are not allowed!");
+      }
     } catch (IllegalArgumentException e) {
       throw new WorkflowOperationException("Target flavor '" + targetFlavorOption + "' is malformed");
     }
@@ -248,10 +251,11 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
         // NUMBERED FILES will have one trackSelector only and multiple sorted files in it
         List<Track> list = new ArrayList<>(tracksForSelector);
         list.sort((left, right) -> {
-            String l = (new File(left.getURI().getPath())).getName(); // Get and compare basename only, getPath() for mock
-            String r = (new File(right.getURI().getPath())).getName();
-            return (l.compareTo(r));
-          });
+          // Get and compare basename only, getPath() for mock
+          String l = (new File(left.getURI().getPath())).getName();
+          String r = (new File(right.getURI().getPath())).getName();
+          return (l.compareTo(r));
+        });
         tracksForSelector = list;
       } else if (tracksForSelector.size() > 1) {
         logger.warn("More than one track has been found with flavor '{}' and/or tag '{}' for concat operation, "
@@ -275,8 +279,8 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
           return createResult(mediaPackage, Action.SKIP);
         }
         if (StringUtils.startsWith(outputResolution, OUTPUT_PART_PREFIX)
-                && NumberUtils.isCreatable(outputResolution.substring(OUTPUT_PART_PREFIX.length()))
-                && trackSelector.getKey() == Integer.parseInt(outputResolution.substring(OUTPUT_PART_PREFIX.length()))) {
+            && NumberUtils.isCreatable(outputResolution.substring(OUTPUT_PART_PREFIX.length()))
+            && trackSelector.getKey() == Integer.parseInt(outputResolution.substring(OUTPUT_PART_PREFIX.length()))) {
           outputDimension = new Dimension(videoStreams[0].getFrameWidth(), videoStreams[0].getFrameHeight());
           if (!trackSelector.getValue().getB()) {
             logger.warn("Output resolution track {} must be mandatory, skipping concatenation!", outputResolution);
@@ -295,9 +299,8 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
       logger.warn("No tracks found for concating operation, skipping concatenation!");
       return createResult(mediaPackage, Action.SKIP);
     } else if (tracks.size() == 1) {
-      Track track = (Track) tracks.get(0).clone();
-      track.setIdentifier(null);
-      addNewTrack(mediaPackage, track, targetTagsOption, targetFlavor);
+      Track copiedTrack = (Track) createDerivedMediaPackageElementFrom(tracks.getFirst());
+      addNewTrack(mediaPackage, copiedTrack, targetTagsOption, targetFlavor);
       logger.info("At least two tracks are needed for the concating operation, skipping concatenation!");
       return createResult(mediaPackage, Action.SKIP);
     }
@@ -312,8 +315,9 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
     }
 
     // Wait for the jobs to return
-    if (!waitForStatus(concatJob).isSuccess())
+    if (!waitForStatus(concatJob).isSuccess()) {
       throw new WorkflowOperationException("The concat job did not complete successfully");
+    }
 
     if (concatJob.getPayload().length() > 0) {
 
@@ -404,8 +408,9 @@ public class ConcatWorkflowOperationHandler extends AbstractWorkflowOperationHan
                 Integer.toString(number)).concat(MANDATORY_SUFFIX)));
       }
 
-      if (number < 0)
+      if (number < 0) {
         continue;
+      }
 
       Tuple<TrackSelector, Boolean> selectorTuple = trackSelectors.get(number);
       if (selectorTuple == null) {

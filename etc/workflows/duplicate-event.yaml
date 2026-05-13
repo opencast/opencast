@@ -9,51 +9,49 @@ state-mappings:
   - state: failing
     value: EVENTS.EVENTS.STATE_MAPPING.DUPLICATING
 configuration_panel_json: |-
-  [
-    {
-      "description": "Title of Duplicate:",
-      "fieldset": [
-        {
-          "name": "mpTitle",
-          "type": "text",
-          "value": " "
-        }
-      ]
-    },
-    {
-      "description": "Series Id:",
-      "fieldset": [
-          {
-          "name": "seriesId",
-          "type": "text",
-          "value": " "
-        }
-      ]
-    },
-    {
-      "description": "Insert the number of duplicated events",
-      "fieldset": [
-        {
-          "name": "numberOfEvents",
-          "type": "number",
-          "label": "Number of Events",
-          "min": "1",
-          "max": "25",
-          "value": "1"
-        }
-      ]
-    },
-    {
-      "fieldset": [
-        {
-          "name": "noCopySuffix",
-          "type": "checkbox",
-          "label": "Do not use copy suffix",
-          "value": false
-        }
-      ]
-    }
-  ]
+  [{
+    "description": "Title of Duplicate:",
+    "fieldset": [
+      {
+        "name": "mpTitle",
+        "type": "text",
+        "value": " "
+      }
+    ]
+  },
+  {
+    "description": "Series Id:",
+    "fieldset": [
+      {
+        "name": "seriesId",
+        "type": "text",
+        "value": " "
+      }
+    ]
+  },
+  {
+    "description": "Insert the number of duplicated events",
+    "fieldset": [
+      {
+        "name": "numberOfEvents",
+        "type": "number",
+        "label": "Number of Events",
+        "min": "1",
+        "max": "25",
+        "value": "1"
+      }
+    ]
+  },
+  {
+    "fieldset": [
+      {
+        "name": "noCopySuffix",
+        "type": "checkbox",
+        "label": "Do not use copy suffix",
+        "value": false
+      }
+    ]
+  }]
 operations:
   # Create the new events
   - id: duplicate-event

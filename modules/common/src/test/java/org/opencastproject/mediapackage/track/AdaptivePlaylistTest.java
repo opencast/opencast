@@ -153,9 +153,10 @@ public class AdaptivePlaylistTest {
   }
 
   public Track makeTrack(URI uri, String logicalName) throws JAXBException, IOException, SAXException {
-    String xml = "<oc:track xmlns:oc=\"http://mediapackage.opencastproject.org\" type=\"presentation/source\"><oc:tags/><oc:url>"
-            + uri + "</oc:url><oc:duration>1</oc:duration><oc:logicalname>" + logicalName
-            + "</oc:logicalname></oc:track>";
+    String xml = "<oc:track xmlns:oc=\"http://mediapackage.opencastproject.org\" "
+        + "type=\"presentation/source\"><oc:tags/><oc:url>"
+        + uri + "</oc:url><oc:duration>1</oc:duration><oc:logicalname>" + logicalName
+        + "</oc:logicalname></oc:track>";
     InputStream inputStream = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
     TrackImpl track;
     try {
@@ -316,7 +317,8 @@ public class AdaptivePlaylistTest {
 
   /**
    * Test method for
-   * {@link TrackBuilderPlugin#accept(URI, org.opencastproject.mediapackage.MediaPackageElement.Type, org.opencastproject.mediapackage.MediaPackageElementFlavor)}
+   * {@link TrackBuilderPlugin#accept(URI, org.opencastproject.mediapackage.MediaPackageElement.Type,
+ *          org.opencastproject.mediapackage.MediaPackageElementFlavor)}
    *
    * @throws Exception
    */
@@ -346,8 +348,9 @@ public class AdaptivePlaylistTest {
     }
 
     // Now again without namespaces
-    String xml = "<oc:track xmlns:oc=\"http://mediapackage.opencastproject.org\" type=\"presentation/source\"><oc:tags/><oc:url>"
-            + hlsUrl.toString() + "</oc:url><oc:master>true</oc:master><oc:duration>-1</oc:duration></oc:track>";
+    String xml = "<oc:track xmlns:oc=\"http://mediapackage.opencastproject.org\" "
+        + "type=\"presentation/source\"><oc:tags/><oc:url>"
+        + hlsUrl.toString() + "</oc:url><oc:master>true</oc:master><oc:duration>-1</oc:duration></oc:track>";
     inputStream = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
     try {
       TrackImpl t2 = unmarshaller.unmarshal(XmlSafeParser.parse(inputStream), TrackImpl.class).getValue();
@@ -394,9 +397,10 @@ public class AdaptivePlaylistTest {
     }
 
     // Now again without namespaces
-    String xml = "<oc:track xmlns:oc=\"http://mediapackage.opencastproject.org\" type=\"presentation/source\"><oc:tags/><oc:url>"
-            + fmp4Url + "</oc:url><oc:duration>-1</oc:duration><oc:logicalname>" + logicalName
-            + "</oc:logicalname></oc:track>";
+    String xml = "<oc:track xmlns:oc=\"http://mediapackage.opencastproject.org\" "
+        + "type=\"presentation/source\"><oc:tags/><oc:url>"
+        + fmp4Url + "</oc:url><oc:duration>-1</oc:duration><oc:logicalname>" + logicalName
+        + "</oc:logicalname></oc:track>";
     inputStream = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
     try {
       TrackImpl t2 = unmarshaller.unmarshal(XmlSafeParser.parse(inputStream), TrackImpl.class).getValue();
@@ -447,9 +451,10 @@ public class AdaptivePlaylistTest {
     }
 
     // Now again without namespaces
-    String xml = "<oc:track xmlns:oc=\"http://mediapackage.opencastproject.org\" type=\"presentation/source\"><oc:tags/><oc:url>http://downloads.opencastproject.org/media/movie.m3u8</oc:url><oc:logicalname>"
-            + logicalName
-            + "</oc:logicalname><oc:master>true</oc:master><oc:duration>-1</oc:duration><oc:live>true</oc:live></oc:track>";
+    String xml = "<oc:track xmlns:oc=\"http://mediapackage.opencastproject.org\" type=\"presentation/source\">"
+        + "<oc:tags/><oc:url>http://downloads.opencastproject.org/media/movie.m3u8</oc:url><oc:logicalname>"
+        + logicalName
+        + "</oc:logicalname><oc:master>true</oc:master><oc:duration>-1</oc:duration><oc:live>true</oc:live></oc:track>";
     inputStream = new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
     try {
       TrackImpl t2 = unmarshaller.unmarshal(XmlSafeParser.parse(inputStream), TrackImpl.class)

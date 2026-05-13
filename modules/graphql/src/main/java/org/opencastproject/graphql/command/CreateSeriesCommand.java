@@ -92,7 +92,7 @@ public class CreateSeriesCommand extends AbstractCommand<GqlSeries> {
 
     try {
       return new GqlSeries(
-          index.getSeries(seriesId, context.getOrganization().getId(), context.getUser()).get()
+          index.getSeries(seriesId, context.getOrganization(), context.getUser()).get()
       );
     } catch (SearchIndexException e) {
       throw new GraphQLRuntimeException(e);

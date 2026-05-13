@@ -50,16 +50,16 @@ public interface EncodingProfile {
      * @return a track type
      */
     public static MediaType parseString(String type) {
-      if (type == null || type.length() == 0)
-        throw new IllegalArgumentException(type
-                + " is not a valid track type definition");
-      if ("audiovisual".equalsIgnoreCase(type))
+      if (type == null || type.length() == 0) {
+        throw new IllegalArgumentException(type + " is not a valid track type definition");
+      }
+      if ("audiovisual".equalsIgnoreCase(type)) {
         return AudioVisual;
-      else if ("enhancedaudio".equalsIgnoreCase(type))
+      } else if ("enhancedaudio".equalsIgnoreCase(type)) {
         return EnhancedAudio;
-      else if ("imagesequence".equalsIgnoreCase(type))
+      } else if ("imagesequence".equalsIgnoreCase(type)) {
         return ImageSequence;
-      else {
+      } else {
         type = type.substring(0, 1).toUpperCase()
                 + type.substring(1).toLowerCase();
       }

@@ -51,8 +51,9 @@ public class JaxbRoleList {
   }
 
   public JaxbRoleList(Collection<JaxbRole> roles) {
-    for (JaxbRole role : roles)
+    for (JaxbRole role : roles) {
       this.roles.add(role);
+    }
   }
 
   /**

@@ -76,9 +76,6 @@ public class DemuxWorkflowOperationHandler extends AbstractWorkflowOperationHand
   /** The composer service */
   private ComposerService composerService = null;
 
-  /** The local workspace */
-  private Workspace workspace = null;
-
   /**
    * Callback for the OSGi declarative services configuration.
    *
@@ -105,8 +102,8 @@ public class DemuxWorkflowOperationHandler extends AbstractWorkflowOperationHand
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(
+   *      org.opencastproject.workflow.api.WorkflowInstance, JobContext)
    */
   @Override
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
@@ -143,7 +140,8 @@ public class DemuxWorkflowOperationHandler extends AbstractWorkflowOperationHand
     WorkflowOperationInstance operation = workflowInstance.getCurrentOperation();
     final String sectionSeparator = ";";
     // Check which tags have been configured
-    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance, Configuration.many, Configuration.many, Configuration.many, Configuration.many);
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(workflowInstance, Configuration.many,
+        Configuration.many, Configuration.many, Configuration.many);
 
     List<String> sourceTagsOption = tagsAndFlavors.getSrcTags();
     List<MediaPackageElementFlavor> sourceFlavorsOption = tagsAndFlavors.getSrcFlavors();
@@ -257,10 +255,12 @@ public class DemuxWorkflowOperationHandler extends AbstractWorkflowOperationHand
       String flavorType = targetFlavor.getType();
       String flavorSubtype = targetFlavor.getSubtype();
       // Adjust the target flavor. Make sure to account for partial updates
-      if ("*".equals(flavorType))
+      if ("*".equals(flavorType)) {
         flavorType = track.getFlavor().getType();
-      if ("*".equals(flavorSubtype))
+      }
+      if ("*".equals(flavorSubtype)) {
         flavorSubtype = track.getFlavor().getSubtype();
+      }
       return (new MediaPackageElementFlavor(flavorType, flavorSubtype));
     } catch (IllegalArgumentException e) {
       throw new WorkflowOperationException(String.format("Target flavor '%s' is malformed", flavor));

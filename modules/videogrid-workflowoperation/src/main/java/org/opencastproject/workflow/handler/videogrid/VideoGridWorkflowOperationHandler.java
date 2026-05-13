@@ -131,7 +131,6 @@ public class VideoGridWorkflowOperationHandler extends AbstractWorkflowOperation
   };
 
   /** Services */
-  private Workspace workspace = null;
   private VideoGridService videoGridService = null;
   private MediaInspectionService inspectionService = null;
   private ComposerService composerService = null;

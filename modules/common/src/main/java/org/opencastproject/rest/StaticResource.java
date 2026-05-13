@@ -89,7 +89,8 @@ public class StaticResource extends HttpServlet {
    * @param spaRedirect
    *          enable spa redirects
    */
-  public StaticResource(ClassLoader classloader, String classpath, String alias, String welcomeFile, boolean spaRedirect) {
+  public StaticResource(ClassLoader classloader, String classpath, String alias, String welcomeFile,
+      boolean spaRedirect) {
     this.classpath = classpath;
     this.alias = alias;
     this.welcomeFile = welcomeFile;
@@ -105,17 +106,20 @@ public class StaticResource extends HttpServlet {
    */
   @SuppressWarnings("unchecked")
   public void activate(Map componentProperties) {
-    if (welcomeFile == null)
+    if (welcomeFile == null) {
       welcomeFile = (String) componentProperties.get("welcome.file");
+    }
     boolean welcomeFileSpecified = true;
     if (welcomeFile == null) {
       welcomeFileSpecified = false;
       welcomeFile = "index.html";
     }
-    if (alias == null)
+    if (alias == null) {
       alias = (String) componentProperties.get("alias");
-    if (classpath == null)
+    }
+    if (classpath == null) {
       classpath = (String) componentProperties.get("classpath");
+    }
     logger.info("registering classpath:{} at {} with welcome file {} {}", classpath, alias, welcomeFile,
             welcomeFileSpecified ? "" : "(via default)");
   }
@@ -164,8 +168,9 @@ public class StaticResource extends HttpServlet {
     }
 
     // Make sure we are using an absolute path
-    if (!classpathToResource.startsWith("/"))
+    if (!classpathToResource.startsWith("/")) {
       classpathToResource = "/" + classpathToResource;
+    }
 
     // Try to load the resource from the classloader
     URL url = classloader.getResource(classpathToResource);

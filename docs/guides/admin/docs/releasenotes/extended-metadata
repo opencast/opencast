@@ -1,0 +1,2 @@
+To get extended metadata from the External API, it is now required for that metadata to be indexed. If you experience
+any issues with this, you might need to run the index rebuild for the Asset Manager again.

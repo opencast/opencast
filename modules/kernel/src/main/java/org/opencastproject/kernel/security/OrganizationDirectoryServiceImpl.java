@@ -60,12 +60,12 @@ import java.util.concurrent.Executors;
  * directory will contain the default organization as the only instance.
  */
 @Component(
-  property = {
-    "service.pid=org.opencastproject.organization",
-    "service.description=Organization Directory Service"
-  },
-  immediate = true,
-  service = { OrganizationDirectoryService.class, ManagedServiceFactory.class }
+    property = {
+        "service.pid=org.opencastproject.organization",
+        "service.description=Organization Directory Service"
+    },
+    immediate = true,
+    service = { OrganizationDirectoryService.class, ManagedServiceFactory.class }
 )
 public class OrganizationDirectoryServiceImpl implements OrganizationDirectoryService, ManagedServiceFactory {
 
@@ -132,16 +132,18 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
   @Override
   public Organization getOrganization(final String id) throws NotFoundException {
     Organization org = cache.get(id);
-    if (org == null)
+    if (org == null) {
       throw new NotFoundException();
+    }
     return org;
   }
 
   @Override
   public Organization getOrganization(final URL url) throws NotFoundException {
     Organization org = cache.get(url);
-    if (org == null)
+    if (org == null) {
       throw new NotFoundException();
+    }
     return org;
   }
 
@@ -158,9 +160,10 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
    */
   public void addOrganization(Organization organization) {
     boolean contains = persistence.containsOrganization(organization.getId());
-    if (contains)
+    if (contains) {
       throw new IllegalStateException("Can not add an organization with id '" + organization.getId()
-              + "' since an organization with that identifier has already been registered");
+          + "' since an organization with that identifier has already been registered");
+    }
     persistence.storeOrganization(organization);
     cache.invalidate();
     fireOrganizationRegistered(organization);
@@ -181,8 +184,9 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
     final String name = (String) properties.get(ORG_NAME_KEY);
 
     // Make sure the configuration meets the minimum requirements
-    if (StringUtils.isBlank(id))
+    if (StringUtils.isBlank(id)) {
       throw new ConfigurationException(ORG_ID_KEY, ORG_ID_KEY + " must be set");
+    }
 
     final String adminRole = (String) properties.get(ORG_ADMIN_ROLE_KEY);
     final String anonRole = (String) properties.get(ORG_ANONYMOUS_ROLE_KEY);
@@ -214,7 +218,8 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
     }
 
     if (servers.isEmpty()) {
-      logger.debug("No server URL configured for organization {}, setting default {}:{}", name, DEFAULT_SERVER_HOST, DEFAULT_SERVER_PORT);
+      logger.debug("No server URL configured for organization {}, setting default {}:{}",
+          name, DEFAULT_SERVER_HOST, DEFAULT_SERVER_PORT);
       servers.put(DEFAULT_SERVER_HOST, DEFAULT_SERVER_PORT);
     }
 
@@ -260,16 +265,19 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
 
   @Override
   public void addOrganizationDirectoryListener(OrganizationDirectoryListener listener) {
-    if (listener == null)
+    if (listener == null) {
       return;
-    if (!listeners.contains(listener))
+    }
+    if (!listeners.contains(listener)) {
       listeners.add(listener);
+    }
   }
 
   @Override
   public void removeOrganizationDirectoryListener(OrganizationDirectoryListener listener) {
-    if (listener == null)
+    if (listener == null) {
       return;
+    }
     listeners.remove(listener);
   }
 

@@ -99,8 +99,6 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
   private ComposerService composerService = null;
   /** The smil service to parse the smil */
   private SmilService smilService;
-  /** The local workspace */
-  private Workspace workspace = null;
 
   private Predicate<EncodingProfile> isManifestEP = p -> p.getOutputType() == EncodingProfile.MediaType.Manifest;
 
@@ -134,10 +132,12 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
       boolean hasAudio = true;
       this.sourceTracks = sourceTracks;
       for (Track track : sourceTracks) {
-        if (!track.hasVideo())
+        if (!track.hasVideo()) {
           hasVideo = false;
-        if (!track.hasAudio())
+        }
+        if (!track.hasAudio()) {
           hasAudio = false;
+        }
       }
       if (!hasVideo) {
         mediaType = ComposerService.AUDIO_ONLY;
@@ -232,8 +232,8 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(org.opencastproject.workflow.api.WorkflowInstance,
-   *      JobContext)
+   * @see org.opencastproject.workflow.api.WorkflowOperationHandler#start(
+   *      org.opencastproject.workflow.api.WorkflowInstance, JobContext)
    */
   @Override
   public WorkflowOperationResult start(final WorkflowInstance workflowInstance, JobContext context)
@@ -333,9 +333,10 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
       targetFlavors = collapseConfig(operation, "target-flavors");
       targetTags = collapseConfig(operation, "target-tags");
       profilesSections = collapseConfig(operation, "encoding-profiles");
-      if (profilesSections.length != 1)
+      if (profilesSections.length != 1) {
         throw new WorkflowOperationException(
-                "No matching src flavors " + srcFlavors + " for encoding profiles sections " + profilesSections);
+            "No matching src flavors " + srcFlavors + " for encoding profiles sections " + profilesSections);
+      }
 
       logger.debug("Single input flavor: output= " + Arrays.toString(targetFlavors) + " tag: "
               + Arrays.toString(targetTags) + " profile:" + Arrays.toString(profilesSections));
@@ -437,19 +438,20 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
     Set<String> profileNames = new HashSet<String>();
     // Find all the encoding profiles
     // Check that the profiles support the media source types
-    for (TrackSection ts : smilgroups)
+    for (TrackSection ts : smilgroups) {
       for (Track track : ts.getSourceTracks()) {
         // Check that the profile is supported
         for (String profileName : asList(encodingProfiles)) {
           EncodingProfile profile = composerService.getProfile(profileName);
-          if (profile == null)
+          if (profile == null) {
             throw new WorkflowOperationException("Encoding profile '" + profileName + "' was not found");
+          }
           MediaType outputType = profile.getOutputType();
           // Check if the track supports the output type of the profile MediaType outputType = profile.getOutputType();
           // Omit if needed
           if (outputType.equals(MediaType.Audio) && !track.hasAudio()) {
             logger.info("Skipping encoding of '{}' with " + profileName + ", since the track lacks an audio stream",
-                    track);
+                track);
             continue;
           } else if (outputType.equals(MediaType.Visual) && !track.hasVideo()) {
             logger.info("Skipping encoding of '{}' " + profileName + ", since the track lacks a video stream", track);
@@ -463,9 +465,11 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
           profileNames.add(profileName);
         }
       }
+    }
     // Make sure there is at least one profile
-    if (profiles.isEmpty())
+    if (profiles.isEmpty()) {
       throw new WorkflowOperationException("No encoding profile was specified");
+    }
 
     List<String> tags = (targetTags != null) ? asList(targetTags) : null;
     // Encode all tracks found in each param group
@@ -484,7 +488,7 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
 
   /**
    * Find the matching encoding profile for this track and tag by name
-   * 
+   *
    * @param track
    * @param profiles
    *          - profiles used to encode a track to multiple formats
@@ -524,7 +528,8 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
    */
   @SuppressWarnings("unchecked")
   private ResultTally parseResults(Map<Job, JobInformation> encodingJobs, MediaPackage mediaPackage)
-          throws IllegalArgumentException, NotFoundException, IOException, MediaPackageException, WorkflowOperationException {
+          throws IllegalArgumentException, NotFoundException, IOException, MediaPackageException,
+          WorkflowOperationException {
     // Process the result
     long totalTimeInQueue = 0;
     for (Map.Entry<Job, JobInformation> entry : encodingJobs.entrySet()) {
@@ -553,10 +558,12 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
           if (targetFlavor != null) {
             String flavorType = targetFlavor.getType();
             String flavorSubtype = targetFlavor.getSubtype();
-            if ("*".equals(flavorType))
+            if ("*".equals(flavorType)) {
               flavorType = track.getFlavor().getType();
-            if ("*".equals(flavorSubtype))
+            }
+            if ("*".equals(flavorSubtype)) {
               flavorSubtype = track.getFlavor().getSubtype();
+            }
             composedTrack.setFlavor(new MediaPackageElementFlavor(flavorType, flavorSubtype));
             logger.debug("Composed track has flavor '{}'", composedTrack.getFlavor());
           }
@@ -569,8 +576,9 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
 
           if (!isHLS || composedTrack.isMaster()) {
             fileName = getFileNameFromElements(track, composedTrack);
-          } else // preserve name from profile - should we do this?
+          } else { // preserve name from profile - should we do this?
             fileName = FilenameUtils.getName(composedTrack.getURI().getPath());
+          }
 
           composedTrack.setURI(workspace.moveTo(composedTrack.getURI(), mediaPackage.getIdentifier().toString(),
                   composedTrack.getIdentifier(), fileName));
@@ -609,11 +617,11 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
    */
   private boolean trackMatchesFlavor(MediaPackageElementFlavor trackFlavor, MediaPackageElementFlavor sourceFlavor) {
     return ((trackFlavor.getType().equals(sourceFlavor.getType()) && trackFlavor.getSubtype() // exact match
-            .equals(sourceFlavor.getSubtype()))
-            || ("*".equals(sourceFlavor.getType()) && trackFlavor.getSubtype().equals(sourceFlavor.getSubtype())) // same
-                                                                                                                  // subflavor
-            || (trackFlavor.getType().equals(sourceFlavor.getType()) && "*".equals(sourceFlavor.getSubtype()))); // same
-                                                                                                                 // flavor
+        .equals(sourceFlavor.getSubtype()))
+        // same subflavor
+        || ("*".equals(sourceFlavor.getType()) && trackFlavor.getSubtype().equals(sourceFlavor.getSubtype()))
+        // same flavor
+        || (trackFlavor.getType().equals(sourceFlavor.getType()) && "*".equals(sourceFlavor.getSubtype())));
   }
 
   /**
@@ -637,8 +645,9 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
 
       for (String f : StringUtils.split(srcFlavors, ",")) { // Look for all source Flavors
         String sourceFlavorStr = StringUtils.trimToNull(f);
-        if (sourceFlavorStr == null)
+        if (sourceFlavorStr == null) {
           continue;
+        }
         MediaPackageElementFlavor sourceFlavor = MediaPackageElementFlavor.parseFlavor(sourceFlavorStr);
         MediaPackageElementFlavor trackFlavor = MediaPackageElementFlavor.parseFlavor(ts.getFlavor());
 
@@ -649,10 +658,11 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
           elements = mediaPackage.getTracks(sourceFlavor);
           for (String t : ts.getSmilTrackList()) { // Look thru all the tracks referenced by the smil
             URI turi = new URI(t);
-            for (Track e : elements)
+            for (Track e : elements) {
               if (e.getURI().equals(turi)) { // find it in the mp
                 sourceTracks.add(e); // add the track from mp containing inspection info
               }
+            }
           }
           if (sourceTracks.isEmpty()) {
             logger.info("ProcessSmil - No tracks in mediapackage matching the URI in the smil- cannot process");
@@ -717,8 +727,9 @@ public class ProcessSmilWorkflowOperationHandler extends AbstractWorkflowOperati
           src.add(param.getValue());
         }
       }
-      if (ts != null)
+      if (ts != null) {
         ts.setSmilTrackList(src);
+      }
     }
     return trackGroups;
   }

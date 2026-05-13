@@ -28,49 +28,49 @@ import java.lang.reflect.Modifier;
 
 /** Reflection utils. */
 public final class ReflectionUtil {
-    private ReflectionUtil() {
-    }
+  private ReflectionUtil() {
+  }
 
-    /**
-     * Simple helper to avoid unnecessary <code>return null;</code> statements when using {@link #run(Object)},
-     * {@link #run(Class, Object)}.
-     * Just wrap your expression like this <code>return call(expr)</code>.
-     */
-    public static <A> A call(Object expression) {
-        return null;
-    }
+  /**
+   * Simple helper to avoid unnecessary <code>return null;</code> statements when using {@link #run(Object)},
+   * {@link #run(Class, Object)}.
+   * Just wrap your expression like this <code>return call(expr)</code>.
+   */
+  public static <A> A call(Object expression) {
+    return null;
+  }
 
-    /**
-     * Call all parameterless methods of <code>c</code> on object <code>o</code>.
-     * <p>
-     * Does not call any bridge, synthetic or native methods and also no methods declared in Object.
-     */
-    public static <A, B extends A> void run(Class<A> c, B o) {
-        runInternal(c.getMethods(), o);
-    }
+  /**
+   * Call all parameterless methods of <code>c</code> on object <code>o</code>.
+   * <p>
+   * Does not call any bridge, synthetic or native methods and also no methods declared in Object.
+   */
+  public static <A, B extends A> void run(Class<A> c, B o) {
+    runInternal(c.getMethods(), o);
+  }
 
-    /**
-     * Call all parameterless methods of object <code>a</code>.
-     * <p>
-     * Does not call any bridge, synthetic or native methods and also no methods declared in Object.
-     */
-    public static <A> void run(A a) {
-        runInternal(a.getClass().getMethods(), a);
-    }
+  /**
+   * Call all parameterless methods of object <code>a</code>.
+   * <p>
+   * Does not call any bridge, synthetic or native methods and also no methods declared in Object.
+   */
+  public static <A> void run(A a) {
+    runInternal(a.getClass().getMethods(), a);
+  }
 
-    private static <A> void runInternal(Method[] ms, A a) {
-        try {
-            for (Method m : ms) {
-                if (m.getParameterTypes().length == 0
-                        && !m.getDeclaringClass().equals(Object.class)
-                        && !m.isBridge() && !m.isSynthetic()
-                        && !Modifier.isNative(m.getModifiers())) {
-                    m.invoke(a);
-                }
-            }
-        } catch (Exception e) {
-            chuck(e);
+  private static <A> void runInternal(Method[] ms, A a) {
+    try {
+      for (Method m : ms) {
+        if (m.getParameterTypes().length == 0
+            && !m.getDeclaringClass().equals(Object.class)
+            && !m.isBridge() && !m.isSynthetic()
+            && !Modifier.isNative(m.getModifiers())) {
+          m.invoke(a);
         }
+      }
+    } catch (Exception e) {
+      chuck(e);
     }
+  }
 
 }

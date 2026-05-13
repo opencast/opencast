@@ -24,6 +24,7 @@ package org.opencastproject.graphql.series;
 import org.opencastproject.graphql.command.CreateSeriesCommand;
 import org.opencastproject.graphql.command.UpdateSeriesAclCommand;
 import org.opencastproject.graphql.command.UpdateSeriesCommand;
+import org.opencastproject.graphql.directive.RolesAllowed;
 import org.opencastproject.graphql.type.input.AccessControlListInput;
 import org.opencastproject.graphql.type.input.GqlCommonSeriesMetadataInput;
 import org.opencastproject.graphql.type.input.Mutation;
@@ -44,6 +45,7 @@ public final class SeriesMutationExtension {
   @GraphQLField
   @GraphQLNonNull
   @GraphQLDescription("Create series with metadata and acl")
+  @RolesAllowed("ROLE_USER")
   public static GqlSeries createSeries(
       @GraphQLName("metadata") @GraphQLNonNull GqlCommonSeriesMetadataInput seriesMetadataInput,
       @GraphQLName("acl") @GraphQLNonNull AccessControlListInput aclInput,

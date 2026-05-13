@@ -97,9 +97,6 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
   /** The composer service */
   private ComposerService composerService = null;
 
-  /** The local workspace */
-  private Workspace workspace = null;
-
   /**
    * Callback for the OSGi declarative services configuration.
    *
@@ -125,7 +122,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
 
   @Override
   public WorkflowOperationResult start(final WorkflowInstance wi, JobContext ctx)
-      throws WorkflowOperationException {
+          throws WorkflowOperationException {
     logger.debug("Running image workflow operation on {}", wi);
     try {
       MediaPackage mp = wi.getMediaPackage();
@@ -220,7 +217,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
 
   /** Create a file name for the extracted image. */
   protected String createFileName(final String suffix, final URI trackUri, final MediaPosition pos, Cfg cfg)
-      throws WorkflowOperationException {
+          throws WorkflowOperationException {
     final String trackBaseName = FilenameUtils.getBaseName(trackUri.getPath());
     final String format;
     switch (pos.type) {
@@ -236,7 +233,8 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
     return formatFileName(format, pos.position, suffix);
   }
 
-  /** Move the extracted <code>image</code> to its final location in the workspace and rename it to <code>fileName</code>. */
+  /** Move the extracted <code>image</code> to its final location in the workspace and rename it to
+   * <code>fileName</code>. */
   protected void moveToWorkspace(final ImageWorkflowOperationHandler handler, final MediaPackage mp,
       final Attachment image, final String fileName) throws WorkflowOperationException {
     try {
@@ -350,7 +348,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
    * does not exist.
    */
   public static EncodingProfile fetchProfile(ComposerService composerService, String profileName)
-      throws WorkflowOperationException {
+          throws WorkflowOperationException {
     EncodingProfile profile = composerService.getProfile(profileName);
     if (profile == null) {
       throw new WorkflowOperationException("Encoding profile '" + profileName + "' was not found");
@@ -472,7 +470,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
 
   /** Validate a target base name format. */
   private Optional<String> getTargetBaseNameFormat(WorkflowOperationInstance woi, final String formatName)
-      throws WorkflowOperationException {
+          throws WorkflowOperationException {
     Optional<String> baseName = getOptConfig(woi, formatName);
     if (baseName.isPresent()) {
       baseName = Optional.ofNullable(validateTargetBaseNameFormat(baseName.get(), formatName));
@@ -516,7 +514,9 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
           index++;
         }
 
-        if (index >= length) break;
+        if (index >= length) {
+          break;
+        }
 
         // Parse optional minus sign
         int start = index;

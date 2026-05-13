@@ -49,8 +49,9 @@ public final class NonEmptyList<A> implements List<A> {
    *           collection is empty
    */
   public NonEmptyList(Collection<A> as) throws IllegalArgumentException {
-    if (as.isEmpty())
+    if (as.isEmpty()) {
       throw new IllegalArgumentException("Collection must not be empty");
+    }
     lst = new ArrayList<A>();
     lst.addAll(as);
   }

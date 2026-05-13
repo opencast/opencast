@@ -59,7 +59,12 @@ import javax.ws.rs.core.Response;
  */
 @Path("/execute")
 // Endpoint to the execute service, that runs CLI commands using MediaPackageElement's as parameters
-@RestService(name = "execute", title = "Execute Service", notes = {"" }, abstractText = "Runs CLI commands with MediaPackageElement's as parameters")
+@RestService(
+    name = "execute",
+    title = "Execute Service",
+    notes = {"" },
+    abstractText = "Runs CLI commands with MediaPackageElement's as parameters"
+)
 @Component(
     immediate = true,
     service = ExecuteRestEndpoint.class,
@@ -85,24 +90,36 @@ public class ExecuteRestEndpoint extends AbstractJobProducerEndpoint {
   @POST
   @Produces(MediaType.TEXT_XML)
   @Path(ExecuteService.ENDPOINT_NAME)
-  @RestQuery(name = "name", description = "Executes the given command", restParameters = {
-          @RestParameter(description = "The command to execute", isRequired = true, name = ExecuteService.EXEC_FORM_PARAM, type = RestParameter.Type.STRING),
-          @RestParameter(description = "The arguments to the command", isRequired = true, name = ExecuteService.PARAMS_FORM_PARAM, type = RestParameter.Type.STRING),
-          @RestParameter(description = "The estimated load placed on the system by this command", isRequired = false, name = ExecuteService.LOAD_FORM_PARAM, type = RestParameter.Type.FLOAT),
-          @RestParameter(description = "The mediapackage to apply the command to. Either this or " + ExecuteService.INPUT_ELEM_FORM_PARAM + " are required",
-          isRequired = false, name = ExecuteService.INPUT_MP_FORM_PARAM, type = RestParameter.Type.TEXT),
-          @RestParameter(description = "The mediapackage element to apply the command to. Either this or " + ExecuteService.INPUT_MP_FORM_PARAM + " are required",
-          isRequired = false, name = ExecuteService.INPUT_ELEM_FORM_PARAM, type = RestParameter.Type.TEXT),
-          @RestParameter(description = "The mediapackage element produced by the command", isRequired = false, name = ExecuteService.OUTPUT_NAME_FORM_PARAMETER,
-          type = RestParameter.Type.STRING),
-          @RestParameter(description = "The type of the returned element", isRequired = false, name = ExecuteService.TYPE_FORM_PARAMETER, type = RestParameter.Type.STRING) },
-          responses = {
+  @RestQuery(
+      name = "name",
+      description = "Executes the given command",
+      restParameters = {
+          @RestParameter(description = "The command to execute", isRequired = true,
+              name = ExecuteService.EXEC_FORM_PARAM, type = RestParameter.Type.STRING),
+          @RestParameter(description = "The arguments to the command", isRequired = true,
+              name = ExecuteService.PARAMS_FORM_PARAM, type = RestParameter.Type.STRING),
+          @RestParameter(description = "The estimated load placed on the system by this command", isRequired = false,
+              name = ExecuteService.LOAD_FORM_PARAM, type = RestParameter.Type.FLOAT),
+          @RestParameter(description = "The mediapackage to apply the command to. Either this or "
+              + ExecuteService.INPUT_ELEM_FORM_PARAM + " are required", isRequired = false,
+              name = ExecuteService.INPUT_MP_FORM_PARAM, type = RestParameter.Type.TEXT),
+          @RestParameter(description = "The mediapackage element to apply the command to. Either this or "
+              + ExecuteService.INPUT_MP_FORM_PARAM + " are required", isRequired = false,
+              name = ExecuteService.INPUT_ELEM_FORM_PARAM, type = RestParameter.Type.TEXT),
+          @RestParameter(description = "The mediapackage element produced by the command", isRequired = false,
+              name = ExecuteService.OUTPUT_NAME_FORM_PARAMETER, type = RestParameter.Type.STRING),
+          @RestParameter(description = "The type of the returned element", isRequired = false,
+              name = ExecuteService.TYPE_FORM_PARAMETER, type = RestParameter.Type.STRING)
+      },
+      responses = {
           @RestResponse(description = "XML-encoded Job is returned.", responseCode = HttpServletResponse.SC_NO_CONTENT),
-          @RestResponse(description = "Service unavailabe or not currently present", responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE),
+          @RestResponse(description = "Service unavailabe or not currently present",
+              responseCode = HttpServletResponse.SC_SERVICE_UNAVAILABLE),
           @RestResponse(description = "Incorrect parameters", responseCode = HttpServletResponse.SC_BAD_REQUEST),
-          @RestResponse(description = "Problem executing the command or serializing the arguments/results", responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
-          },
-          returnDescription = "")
+          @RestResponse(description = "Problem executing the command or serializing the arguments/results",
+              responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
+      },
+      returnDescription = "")
   public Response execute(@FormParam(ExecuteService.EXEC_FORM_PARAM) String exec,
           @FormParam(ExecuteService.PARAMS_FORM_PARAM) String params,
           @FormParam(ExecuteService.LOAD_FORM_PARAM) Float loadParam,
@@ -116,11 +133,12 @@ public class ExecuteRestEndpoint extends AbstractJobProducerEndpoint {
 
       MediaPackageElement.Type expectedType = null;
       if (StringUtils.isNotBlank(elementTypeStr)) {
-        for (MediaPackageElement.Type candidateType : MediaPackageElement.Type.values())
+        for (MediaPackageElement.Type candidateType : MediaPackageElement.Type.values()) {
           if (candidateType.toString().equalsIgnoreCase(elementTypeStr)) {
             expectedType = candidateType;
             break;
           }
+        }
         if (expectedType == null) {
           logger.error("Wrong element type specified: {}", elementTypeStr);
           return Response.status(Response.Status.BAD_REQUEST).build();
@@ -179,10 +197,11 @@ public class ExecuteRestEndpoint extends AbstractJobProducerEndpoint {
    */
   @Override
   public JobProducer getService() {
-    if (service instanceof JobProducer)
+    if (service instanceof JobProducer) {
       return (JobProducer) service;
-    else
+    } else {
       return null;
+    }
   }
 
   /**

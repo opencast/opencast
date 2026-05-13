@@ -69,7 +69,7 @@ public class ChunkedFileInputStream extends FileInputStream {
    * @throws FileNotFoundException if the requested file was not found
    */
   public ChunkedFileInputStream(File file, long offset, long endOffset)
-      throws FileNotFoundException {
+          throws FileNotFoundException {
     super(file);
     this.offset = offset;
     this.currentOffset = offset;

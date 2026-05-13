@@ -54,16 +54,12 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.serviceregistry.api.ServiceStatistics;
 import org.opencastproject.serviceregistry.api.SystemLoad;
 import org.opencastproject.serviceregistry.api.SystemLoad.NodeLoad;
-import org.opencastproject.serviceregistry.impl.jmx.HostsStatistics;
-import org.opencastproject.serviceregistry.impl.jmx.JobsStatistics;
-import org.opencastproject.serviceregistry.impl.jmx.ServicesStatistics;
 import org.opencastproject.serviceregistry.impl.jpa.HostRegistrationJpaImpl;
 import org.opencastproject.serviceregistry.impl.jpa.ServiceRegistrationJpaImpl;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.function.ThrowingConsumer;
-import org.opencastproject.util.jmx.JmxUtil;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -99,14 +95,14 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import javax.management.ObjectInstance;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.LockModeType;
@@ -115,21 +111,23 @@ import javax.persistence.TypedQuery;
 
 /** JPA implementation of the {@link ServiceRegistry} */
 @Component(
-  property = {
-    "service.description=Service registry"
-  },
-  immediate = true,
-  service = { ManagedService.class, ServiceRegistry.class, ServiceRegistryJpaImpl.class }
+    property = {
+      "service.description=Service registry"
+    },
+    immediate = true,
+    service = { ManagedService.class, ServiceRegistry.class, ServiceRegistryJpaImpl.class }
 )
 public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /** JPA persistence unit name */
   public static final String PERSISTENCE_UNIT = "org.opencastproject.common";
 
-  /** Id of the workflow's start operation operation, need to match the corresponding enum value in WorkflowServiceImpl */
+  /** Id of the workflow's start operation operation, need to match the corresponding enum value in
+   * WorkflowServiceImpl */
   public static final String START_OPERATION = "START_OPERATION";
 
-  /** Id of the workflow's start workflow operation, need to match the corresponding enum value in WorkflowServiceImpl */
+  /** Id of the workflow's start workflow operation, need to match the corresponding enum value in
+   * WorkflowServiceImpl */
   public static final String START_WORKFLOW = "START_WORKFLOW";
 
   /** Id of the workflow's resume operation, need to match the corresponding enum value in WorkflowServiceImpl */
@@ -140,41 +138,19 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   static final Logger logger = LoggerFactory.getLogger(ServiceRegistryJpaImpl.class);
 
-  /** The list of registered JMX beans */
-  protected List<ObjectInstance> jmxBeans = new ArrayList<>();
-
-  /** Hosts statistics JMX type */
-  private static final String JMX_HOSTS_STATISTICS_TYPE = "HostsStatistics";
-
-  /** Services statistics JMX type */
-  private static final String JMX_SERVICES_STATISTICS_TYPE = "ServicesStatistics";
-
-  /** Jobs statistics JMX type */
-  private static final String JMX_JOBS_STATISTICS_TYPE = "JobsStatistics";
-
-  /** The JMX business object for hosts statistics */
-  private HostsStatistics hostsStatistics;
-
-  /** The JMX business object for services statistics */
-  private ServicesStatistics servicesStatistics;
-
-  /** The JMX business object for jobs statistics */
-  private JobsStatistics jobsStatistics;
-
   /** Current job used to process job in the service registry */
   private static final ThreadLocal<Job> currentJob = new ThreadLocal<>();
 
   /** Configuration key for the maximum load */
   protected static final String OPT_MAXLOAD = "org.opencastproject.server.maxload";
 
-  /** Configuration key for the interval to check whether the hosts in the service registry are still alive, in seconds */
-  protected static final String OPT_HEARTBEATINTERVAL = "heartbeat.interval";
-
   /** Configuration key for the collection of job statistics */
   protected static final String OPT_JOBSTATISTICS = "jobstats.collect";
 
-  /** Configuration key for the retrieval of service statistics: Do not consider jobs older than max_job_age (in days) */
-  protected static final String OPT_SERVICE_STATISTICS_MAX_JOB_AGE = "org.opencastproject.statistics.services.max_job_age";
+  /** Configuration key for the retrieval of service statistics:
+   * Do not consider jobs older than max_job_age (in days) */
+  protected static final String OPT_SERVICE_STATISTICS_MAX_JOB_AGE =
+      "org.opencastproject.statistics.services.max_job_age";
 
   /** Configuration key for the encoding preferred worker nodes */
   protected static final String OPT_ENCODING_WORKERS = "org.opencastproject.encoding.workers";
@@ -206,7 +182,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   static final String NO_ERROR_STATE_SERVICE_TYPES_CONFIG_KEY = "no.error.state.service.types";
 
   /** Default value for {@link #maxAttemptsBeforeErrorState} */
-  private static final int DEFAULT_MAX_ATTEMPTS_BEFORE_ERROR_STATE = 10;
+  private static final int DEFAULT_MAX_ATTEMPTS_BEFORE_ERROR_STATE = -1;
 
   /** Default value for {@link #errorStatesEnabled} */
   private static final boolean DEFAULT_ERROR_STATES_ENABLED = true;
@@ -217,9 +193,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /** Services for which error state is disabled */
   private List<String> noErrorStateServiceTypes = new ArrayList<>();
-
-  /** Default delay between checking if hosts are still alive in seconds * */
-  static final long DEFAULT_HEART_BEAT = 60;
 
   /** Default job load when not passed by service creating the job * */
   static final float DEFAULT_JOB_LOAD = 0.1f;
@@ -247,7 +220,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   protected DBSession db;
 
   /** The thread pool to use for dispatching queued jobs and checking on phantom services. */
-  protected ScheduledExecutorService scheduledExecutor = null;
+  protected ScheduledThreadPoolExecutor scheduledExecutor = null;
+  private ScheduledFuture hbfuture = null;
 
   /** The security service */
   protected SecurityService securityService = null;
@@ -314,19 +288,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
     // Clean all undispatchable jobs that were orphaned when this host was last deactivated
     cleanUndispatchableJobs(hostName);
-
-    // Register JMX beans with statistics
-    try {
-      List<ServiceStatistics> serviceStatistics = getServiceStatistics();
-      hostsStatistics = new HostsStatistics(serviceStatistics);
-      servicesStatistics = new ServicesStatistics(hostName, serviceStatistics);
-      jobsStatistics = new JobsStatistics(hostName);
-      jmxBeans.add(JmxUtil.registerMXBean(hostsStatistics, JMX_HOSTS_STATISTICS_TYPE));
-      jmxBeans.add(JmxUtil.registerMXBean(servicesStatistics, JMX_SERVICES_STATISTICS_TYPE));
-      jmxBeans.add(JmxUtil.registerMXBean(jobsStatistics, JMX_JOBS_STATISTICS_TYPE));
-    } catch (ServiceRegistryException e) {
-      logger.error("Error registering JMX statistic beans", e);
-    }
 
     // Find the jobs URL
     if (cc == null || StringUtils.isBlank(cc.getBundleContext().getProperty("org.opencastproject.jobs.url"))) {
@@ -401,10 +362,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       } catch (InterruptedException e) {
         logger.error("Error shutting down the Dispatcher", e);
       }
-    }
-
-    for (ObjectInstance mbean : jmxBeans) {
-      JmxUtil.unregisterMXBean(mbean);
     }
 
     try {
@@ -701,25 +658,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       }
     }
 
-    long heartbeatInterval = DEFAULT_HEART_BEAT;
-    String heartbeatIntervalString = StringUtils.trimToNull((String) properties.get(OPT_HEARTBEATINTERVAL));
-    if (StringUtils.isNotBlank(heartbeatIntervalString)) {
-      try {
-        heartbeatInterval = Long.parseLong(heartbeatIntervalString);
-      } catch (Exception e) {
-        logger.warn("Heartbeat interval '{}' is malformed, setting to {}", heartbeatIntervalString, DEFAULT_HEART_BEAT);
-        heartbeatInterval = DEFAULT_HEART_BEAT;
-      }
-      if (heartbeatInterval == 0) {
-        logger.info("Heartbeat disabled");
-      } else if (heartbeatInterval < 0) {
-        logger.warn("Heartbeat interval {} seconds too low, adjusting to {}", heartbeatInterval, DEFAULT_HEART_BEAT);
-        heartbeatInterval = DEFAULT_HEART_BEAT;
-      } else {
-        logger.info("Heartbeat interval set to {} seconds", heartbeatInterval);
-      }
-    }
-
     String jobStatsString = StringUtils.trimToNull((String) properties.get(OPT_JOBSTATISTICS));
     if (StringUtils.isNotBlank(jobStatsString)) {
       try {
@@ -735,27 +673,28 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     String encodingWorkersString = (String) properties.get(OPT_ENCODING_WORKERS);
     if (StringUtils.isNotBlank(encodingWorkersString)) {
       encodingWorkers = Arrays.asList(encodingWorkersString.split("\\s*,\\s*"));
-    } else
+    } else {
       encodingWorkers = DEFAULT_ENCODING_WORKERS;
+    }
 
     // get the encoding worker load threshold defined in the configuration file and parse the double
     String encodingThersholdString = StringUtils.trimToNull((String) properties.get(OPT_ENCODING_THRESHOLD));
     if (StringUtils.isNotBlank(encodingThersholdString) && encodingThersholdString != null) {
-        try {
-          double encodingThresholdTmp = Double.parseDouble(encodingThersholdString);
-          if (encodingThresholdTmp >= 0 && encodingThresholdTmp <= 1)
-            encodingThreshold = encodingThresholdTmp;
-          else {
-            encodingThreshold = DEFAULT_ENCODING_THRESHOLD;
-            logger.warn("org.opencastproject.encoding.workers.threshold is not between 0 and 1");
-          }
-        } catch (NumberFormatException e) {
-          logger.warn("Can not set encoding threshold to {}. {} must be an parsable double", encodingThersholdString,
-              OPT_ENCODING_THRESHOLD);
+      try {
+        double encodingThresholdTmp = Double.parseDouble(encodingThersholdString);
+        if (encodingThresholdTmp >= 0 && encodingThresholdTmp <= 1) {
+          encodingThreshold = encodingThresholdTmp;
+        } else {
+          encodingThreshold = DEFAULT_ENCODING_THRESHOLD;
+          logger.warn("org.opencastproject.encoding.workers.threshold is not between 0 and 1");
         }
-    } else
+      } catch (NumberFormatException e) {
+        logger.warn("Can not set encoding threshold to {}. {} must be an parsable double", encodingThersholdString,
+            OPT_ENCODING_THRESHOLD);
+      }
+    } else {
       encodingThreshold = DEFAULT_ENCODING_THRESHOLD;
-
+    }
 
     String maxJobAgeString = StringUtils.trimToNull((String) properties.get(OPT_SERVICE_STATISTICS_MAX_JOB_AGE));
     if (maxJobAgeString != null) {
@@ -767,14 +706,28 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
                 OPT_SERVICE_STATISTICS_MAX_JOB_AGE);
       }
     }
+  }
 
-    scheduledExecutor = Executors.newScheduledThreadPool(1);
+  private void setupScheduledExecutor() {
+    if (scheduledExecutor == null) {
+      scheduledExecutor = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(1);
+      scheduledExecutor.setRemoveOnCancelPolicy(true);
+    }
+  }
+
+  protected void startHeartbeat(long heartbeatInterval) {
+    setupScheduledExecutor();
 
     // Schedule the service heartbeat if the interval is > 0
     if (heartbeatInterval > 0) {
+      // Stop the current dispatch thread so we can configure a new one
+      if (hbfuture != null) {
+        hbfuture.cancel(true);
+      }
+
       logger.debug("Starting service heartbeat at a custom interval of {}s", heartbeatInterval);
-      scheduledExecutor.scheduleWithFixedDelay(new JobProducerHeartbeat(), heartbeatInterval, heartbeatInterval,
-              TimeUnit.SECONDS);
+      hbfuture = scheduledExecutor.scheduleWithFixedDelay(new JobProducerHeartbeat(), heartbeatInterval,
+          heartbeatInterval, TimeUnit.SECONDS);
     }
   }
 
@@ -947,11 +900,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     return job;
   }
 
-  public void updateStatisticsJobData() {
-    jobsStatistics.updateAvg(db.exec(getAvgOperationsQuery()));
-    jobsStatistics.updateJobCount(db.exec(getCountPerHostServiceQuery()));
-  }
-
   /**
    * Internal method to update the service registration state, throwing unwrapped JPA exceptions.
    *
@@ -971,7 +919,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       fromDb.setErrorStateTrigger(registration.getErrorStateTrigger());
     });
 
-    servicesStatistics.updateService(registration);
     return registration;
   }
 
@@ -1005,7 +952,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     if (job.getProcessingHost() != null) {
       ServiceRegistrationJpaImpl processingService = (ServiceRegistrationJpaImpl) getServiceRegistration(
               job.getJobType(), job.getProcessingHost());
-      logger.debug("{} has host '{}': setting processor service to '{}'", job, job.getProcessingHost(), processingService);
+      logger.debug("{} has host '{}': setting processor service to '{}'", job, job.getProcessingHost(),
+          processingService);
       fromDb.setProcessorServiceRegistration(processingService);
     } else {
       logger.debug("Unsetting previous processor service registration for {}", job);
@@ -1095,8 +1043,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         logger.info("Registering {} with a maximum load of {}", host, maxLoad);
         return hr;
       });
-
-      hostsStatistics.updateHost(hostRegistration);
     } catch (Exception e) {
       throw new ServiceRegistryException(e);
     }
@@ -1125,7 +1071,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       });
 
       logger.info("Host {} unregistered", host);
-      hostsStatistics.updateHost(existingHostRegistration);
     } catch (Exception e) {
       throw new ServiceRegistryException(e);
     }
@@ -1153,11 +1098,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         for (ServiceRegistration serviceRegistration : getServiceRegistrationsByHost(host)) {
           ((ServiceRegistrationJpaImpl) serviceRegistration).setActive(true);
           em.merge(serviceRegistration);
-          servicesStatistics.updateService(serviceRegistration);
         }
       });
-
-      hostsStatistics.updateHost(hostRegistration);
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -1181,15 +1123,12 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         for (ServiceRegistration serviceRegistration : getServiceRegistrationsByHost(host)) {
           ((ServiceRegistrationJpaImpl) serviceRegistration).setActive(false);
           em.merge(serviceRegistration);
-          servicesStatistics.updateService(serviceRegistration);
         }
         em.merge(hr);
 
         logger.info("Disabling {}", host);
         return hr;
       });
-
-      hostsStatistics.updateHost(hostRegistration);
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -1258,7 +1197,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
       db.execTxChecked(em -> {
         HostRegistrationJpaImpl hr = fetchHostRegistrationQuery(baseUrl).apply(em).orElseThrow(() -> {
-          logger.info("No associated host registration for '{}' or service '{}' (path '{}')", baseUrl, serviceType,path);
+          logger.info("No associated host registration for '{}' or service '{}' (path '{}')", baseUrl, serviceType,
+              path);
           return new IllegalStateException(
               "A service registration can not be updated when it has no associated host registration");
         });
@@ -1288,9 +1228,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         }
         registration.set(sr);
       });
-
-      hostsStatistics.updateHost(hostRegistration.get());
-      servicesStatistics.updateService(registration.get());
       return registration.get();
     } catch (Exception e) {
       throw new ServiceRegistryException(e);
@@ -1446,7 +1383,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     logger.info("Setting maintenance mode on host '{}'", baseUrl);
     HostRegistrationJpaImpl reg = db.execTxChecked(em -> {
       HostRegistrationJpaImpl hr = fetchHostRegistrationQuery(baseUrl).apply(em).orElseThrow(() -> {
-            logger.warn("Can not set maintenance mode because host '{}' was not registered", baseUrl);
+        logger.warn("Can not set maintenance mode because host '{}' was not registered", baseUrl);
         return new NotFoundException("Can not set maintenance mode on a host that has not been registered");
       });
       hr.setMaintenanceMode(maintenance);
@@ -1454,7 +1391,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       return hr;
     });
 
-    hostsStatistics.updateHost(reg);
     logger.info("Finished setting maintenance mode on host '{}'", baseUrl);
   }
 
@@ -1928,7 +1864,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
       // Make sure we also include the services that have no processing history so far
       namedQuery.findAll("ServiceRegistration.getAll", ServiceRegistrationJpaImpl.class).apply(em).forEach(s ->
-        statsMap.put(s.getId(), new JaxbServiceStatistics(s))
+          statsMap.put(s.getId(), new JaxbServiceStatistics(s))
       );
 
       if (collectJobstats) {
@@ -2129,7 +2065,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   }
 
   /** OSGi DI. */
-  @Reference(cardinality = ReferenceCardinality.OPTIONAL, policy =  ReferencePolicy.DYNAMIC, unbind = "unsetIncidentService")
+  @Reference(
+      cardinality = ReferenceCardinality.OPTIONAL,
+      policy =  ReferencePolicy.DYNAMIC,
+      unbind = "unsetIncidentService"
+  )
   public void setIncidentService(IncidentService incidentService) {
     this.incidentService = incidentService;
     // Manually resolve the cyclic dependency between the incident service and the service registry
@@ -2387,7 +2327,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
       // Is this host suited for processing?
       if (hostLoad == null || hostLoadMax == null || hostLoad < hostLoadMax) {
         logger.debug("Adding candidate service {} for processing of jobs of type '{}' (host load is {} of max {})",
-           service, jobType, hostLoad, hostLoadMax);
+            service, jobType, hostLoad, hostLoadMax);
         filteredList.add(service);
       }
     }
@@ -2459,10 +2399,11 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
     }
 
     // Sort the list by capacity and distinguish between composer jobs and other jobs
-    if ("org.opencastproject.composer".equals(jobType))
+    if ("org.opencastproject.composer".equals(jobType)) {
       Collections.sort(filteredList, new LoadComparatorEncoding(systemLoad));
-    else
+    } else {
       Collections.sort(filteredList, new LoadComparator(systemLoad));
+    }
 
     return filteredList;
   }
@@ -2521,8 +2462,6 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         List<ServiceRegistration> serviceRegistrations = getOnlineServiceRegistrations();
 
         for (ServiceRegistration service : serviceRegistrations) {
-          hostsStatistics.updateHost(((ServiceRegistrationJpaImpl) service).getHostRegistration());
-          servicesStatistics.updateService(service);
           if (!service.isJobProducer()) {
             continue;
           }
@@ -2597,7 +2536,8 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * Comparator that will sort service registrations depending on their capacity, wich is defined by the number of jobs
-   * the service's host is already running divided by the MaxLoad of the Server. The lower that number, the bigger the capacity.
+   * the service's host is already running divided by the MaxLoad of the Server. The lower that number, the bigger
+   * the capacity.
    */
   private class LoadComparator implements Comparator<ServiceRegistration> {
 
@@ -2632,8 +2572,10 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /**
    * Comparator that will sort service registrations depending on their capacity, which is defined by the number of jobs
-   * the service's host is already running divided by the MaxLoad of the Server. The lower that number, the bigger the capacity.
-   * This Comparator will preferre encoding workers, if none are defined in the configuration file it will act like the LoadComparator.
+   * the service's host is already running divided by the MaxLoad of the Server. The lower that number, the bigger
+   * the capacity.
+   * This Comparator will prefer encoding workers, if none are defined in the configuration file it will act like
+   * the LoadComparator.
    */
   private class LoadComparatorEncoding extends LoadComparator implements Comparator<ServiceRegistration> {
 
@@ -2667,7 +2609,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
           return Float.compare(nodeA.getLoadFactor(), nodeB.getLoadFactor());
         }
       }
-        return super.compare(serviceA, serviceB);
+      return super.compare(serviceA, serviceB);
     }
   }
 }

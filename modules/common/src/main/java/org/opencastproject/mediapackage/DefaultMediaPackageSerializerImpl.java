@@ -68,8 +68,9 @@ public class DefaultMediaPackageSerializerImpl implements MediaPackageSerializer
    *           if the file cannot be converted to a url
    */
   public DefaultMediaPackageSerializerImpl(File packageRoot) throws MalformedURLException {
-    if (packageRoot != null)
+    if (packageRoot != null) {
       this.packageRoot = packageRoot.toURI().toURL();
+    }
   }
 
   /**
@@ -103,14 +104,16 @@ public class DefaultMediaPackageSerializerImpl implements MediaPackageSerializer
    */
   @Override
   public URI encodeURI(URI uri) throws URISyntaxException {
-    if (uri == null)
+    if (uri == null) {
       throw new IllegalArgumentException("Argument url is null");
+    }
 
     String path = uri.toString();
 
     // Has a package root been set? If not, no relative paths!
-    if (packageRoot == null)
+    if (packageRoot == null) {
       return uri;
+    }
 
     // A package root has been set
     String rootPath = packageRoot.toExternalForm();
@@ -133,8 +136,9 @@ public class DefaultMediaPackageSerializerImpl implements MediaPackageSerializer
    */
   @Override
   public URI decodeURI(URI uri) throws URISyntaxException {
-    if (uri == null)
+    if (uri == null) {
       throw new IllegalArgumentException("Argument uri is null");
+    }
 
     // If the path starts with neither a protocol nor a path separator, the packageRoot is used to
     // create the url relative to the root
@@ -143,8 +147,9 @@ public class DefaultMediaPackageSerializerImpl implements MediaPackageSerializer
     try {
       uri = new URI(path);
       isRelative = !uri.getPath().startsWith("/");
-      if (!isRelative)
+      if (!isRelative) {
         return uri;
+      }
     } catch (URISyntaxException e) {
       // this may happen, we're still fine
       isRelative = !path.startsWith("/");

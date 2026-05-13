@@ -58,8 +58,10 @@ public final class EqualsUtil {
   /**
    * Compare the (distinct) elements of two lists for equality treating the lists as sets.
    * <p>
-   * Sets by definition do not allow multiplicity of elements; a set is a (possibly empty) collection of distinct elements.
-   * As Lists may contain non-unique entries, this method removes duplicates before continuing with the comparison check.
+   * Sets by definition do not allow multiplicity of elements; a set is a (possibly empty) collection of distinct
+   * elements.
+   * As Lists may contain non-unique entries, this method removes duplicates before continuing with the comparison
+   * check.
    *
    * Examples of
    * 1. equality: {1, 2} = {2, 1} = {1, 1, 2} = {1, 2, 2, 1, 2}, null = null
@@ -95,8 +97,9 @@ public final class EqualsUtil {
       final Iterator<?> asi = as.iterator();
       final Iterator<?> bsi = bs.iterator();
       while (asi.hasNext() && bsi.hasNext()) {
-        if (!asi.next().equals(bsi.next()))
+        if (!asi.next().equals(bsi.next())) {
           return false;
+        }
       }
       return true;
     } else {
@@ -112,8 +115,9 @@ public final class EqualsUtil {
   public static boolean eqMap(Map<?, ?> as, Map<?, ?> bs) {
     for (Map.Entry<?, ?> ae : as.entrySet()) {
       final Object bv = bs.get(ae.getKey());
-      if (bv == null || !eqObj(ae.getValue(), bv))
+      if (bv == null || !eqObj(ae.getValue(), bv)) {
         return false;
+      }
     }
     return true;
   }

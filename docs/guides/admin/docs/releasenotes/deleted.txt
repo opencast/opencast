@@ -1,3 +1,0 @@
-To be removed in Opencast 18:
-
-- The animate service and workflow operation

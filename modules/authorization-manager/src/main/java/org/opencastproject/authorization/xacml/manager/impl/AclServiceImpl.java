@@ -90,7 +90,7 @@ public final class AclServiceImpl implements AclService {
     if (updateAcl) {
       if (oldName.isPresent() && !(oldName.get().getName().equals(acl.getName()))) {
         User user = securityService.getUser();
-        updateAclInIndex(oldName.get().getName(), acl.getName(), index, organization.getId(), user);
+        updateAclInIndex(oldName.get().getName(), acl.getName(), index, organization, user);
       }
     }
     return updateAcl;
@@ -108,7 +108,7 @@ public final class AclServiceImpl implements AclService {
     if (aclDb.deleteAcl(organization, id)) {
       if (deletedAcl.isPresent()) {
         User user = securityService.getUser();
-        removeAclFromIndex(deletedAcl.get().getName(), index, organization.getId(), user);
+        removeAclFromIndex(deletedAcl.get().getName(), index, organization, user);
       }
       return true;
     }
@@ -124,18 +124,18 @@ public final class AclServiceImpl implements AclService {
    *         the new name of the managed acl
    * @param index
    *         the index to update
-   * @param orgId
+   * @param organization
    *         the organization the managed acl belongs to
    * @param user
    *         the current user
    */
-  private void updateAclInIndex(String currentAclName, String newAclName, ElasticsearchIndex index, String orgId,
-          User user) {
+  private void updateAclInIndex(String currentAclName, String newAclName, ElasticsearchIndex index,
+      Organization organization, User user) {
     logger.debug("Update the events to change the managed acl name from '{}' to '{}'.", currentAclName, newAclName);
-    updateManagedAclForEvents(currentAclName, Optional.of(newAclName), index, orgId, user);
+    updateManagedAclForEvents(currentAclName, Optional.of(newAclName), index, organization, user);
 
     logger.debug("Update the series to change the managed acl name from '{}' to '{}'.", currentAclName, newAclName);
-    updateManagedAclForSeries(currentAclName, Optional.of(newAclName), index, orgId, user);
+    updateManagedAclForSeries(currentAclName, Optional.of(newAclName), index, organization, user);
   }
 
   /**
@@ -145,18 +145,18 @@ public final class AclServiceImpl implements AclService {
    *         the current name of the managed acl
    * @param index
    *         the index to update
-   * @param orgId
+   * @param organization
    *         the organization the managed acl belongs to
    * @param user
    *         the current user
    */
-  private void removeAclFromIndex(String currentAclName, ElasticsearchIndex index, String orgId,
+  private void removeAclFromIndex(String currentAclName, ElasticsearchIndex index, Organization organization,
           User user) {
     logger.debug("Update the events to remove the managed acl name '{}'.", currentAclName);
-    updateManagedAclForEvents(currentAclName, Optional.empty(), index, orgId, user);
+    updateManagedAclForEvents(currentAclName, Optional.empty(), index, organization, user);
 
     logger.debug("Update the series to remove the managed acl name '{}'.", currentAclName);
-    updateManagedAclForSeries(currentAclName, Optional.empty(), index, orgId, user);
+    updateManagedAclForSeries(currentAclName, Optional.empty(), index, organization, user);
   }
 
   /**
@@ -167,19 +167,20 @@ public final class AclServiceImpl implements AclService {
    * @param newAclNameOpt
    * @param index
    *         the index to update
-   * @param orgId
+   * @param organization
    *         the organization the managed acl belongs to
    * @param user
    *         the current user
    */
   private void updateManagedAclForSeries(String currentAclName, Optional<String> newAclNameOpt,
-          ElasticsearchIndex index, String orgId, User user) {
+          ElasticsearchIndex index, Organization organization, User user) {
     SearchResult<Series> result;
     try {
-      result = index.getByQuery(new SeriesSearchQuery(orgId, user).withoutActions()
+      result = index.getByQuery(new SeriesSearchQuery(organization.getId(), user).withoutActions()
               .withManagedAcl(currentAclName));
     } catch (SearchIndexException e) {
-      logger.error("Unable to find the series in org '{}' with current managed acl name '{}'", orgId, currentAclName,
+      logger.error("Unable to find the series in org '{}' with current managed acl name '{}'", organization.getId(),
+          currentAclName,
               e);
       return;
     }
@@ -197,7 +198,7 @@ public final class AclServiceImpl implements AclService {
       };
 
       try {
-        index.addOrUpdateSeries(seriesId, updateFunction, orgId, user);
+        index.addOrUpdateSeries(seriesId, updateFunction, organization, user);
       } catch (SearchIndexException e) {
         if (newAclNameOpt.isPresent()) {
           logger.warn("Unable to update series'{}' from current managed acl '{}' to new managed acl name '{}'",
@@ -217,20 +218,20 @@ public final class AclServiceImpl implements AclService {
    * @param newAclNameOpt
    * @param index
    *         the index to update
-   * @param orgId
+   * @param organization
    *         the organization the managed acl belongs to
    * @param user
    *         the current user
    */
   private void updateManagedAclForEvents(String currentAclName, Optional<String> newAclNameOpt,
-          ElasticsearchIndex index, String orgId, User user) {
+          ElasticsearchIndex index, Organization organization, User user) {
     SearchResult<Event> result;
     try {
-      result = index.getByQuery(new EventSearchQuery(orgId, user).withoutActions()
+      result = index.getByQuery(new EventSearchQuery(organization.getId(), user).withoutActions()
               .withManagedAcl(currentAclName));
     } catch (SearchIndexException e) {
       logger.error("Unable to find the events in org '{}' with current managed acl name '{}' for event",
-              orgId, currentAclName, e);
+          organization.getId(), currentAclName, e);
       return;
     }
 
@@ -247,7 +248,7 @@ public final class AclServiceImpl implements AclService {
       };
 
       try {
-        index.addOrUpdateEvent(eventId, updateFunction, orgId, user);
+        index.addOrUpdateEvent(eventId, updateFunction, organization, user);
       } catch (SearchIndexException e) {
         if (newAclNameOpt.isPresent()) {
           logger.warn(

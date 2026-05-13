@@ -39,16 +39,12 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.management.ManagementFactory;
 import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectName;
 
 /**
  * Sakai implementation of the spring UserDetailsService, taking configuration information from the component context.
@@ -235,25 +231,7 @@ public class SakaiUserProviderFactory implements ManagedServiceFactory {
     ServiceRegistration registration = providerRegistrations.remove(pid);
     if (registration != null) {
       registration.unregister();
-      try {
-        ManagementFactory.getPlatformMBeanServer().unregisterMBean(SakaiUserProviderFactory.getObjectName(pid));
-      } catch (Exception e) {
-        logger.warn("Unable to unregister mbean for pid='{}': {}", pid, e.getMessage());
-      }
     }
-  }
-
-  /**
-   * Builds a JMX object name for a given PID
-   *
-   * @param pid
-   *          the PID
-   * @return the object name
-   * @throws NullPointerException
-   * @throws MalformedObjectNameException
-   */
-  public static final ObjectName getObjectName(String pid) throws MalformedObjectNameException, NullPointerException {
-    return new ObjectName(pid + ":type=SakaiRequests");
   }
 
 }

@@ -96,21 +96,24 @@ public class SmtpService extends BaseSmtpService implements ManagedService {
 
     // Mail transport protocol
     String optMailTransport = StringUtils.trimToNull((String) properties.get(OPT_MAIL_TRANSPORT));
-    if (StringUtils.isNotBlank(optMailTransport))
+    if (StringUtils.isNotBlank(optMailTransport)) {
       setMailTransport(optMailTransport);
+    }
 
     // The mail host is mandatory
     String propName = OPT_MAIL_PREFIX + mailTransport + OPT_MAIL_HOST_SUFFIX;
     String mailHost = (String) properties.get(propName);
-    if (StringUtils.isBlank(mailHost))
+    if (StringUtils.isBlank(mailHost)) {
       throw new ConfigurationException(propName, "is not set");
+    }
     setHost(mailHost);
 
     // Mail port
     propName = OPT_MAIL_PREFIX + mailTransport + OPT_MAIL_PORT_SUFFIX;
     String mailPort = (String) properties.get(propName);
-    if (StringUtils.isNotBlank(mailPort))
+    if (StringUtils.isNotBlank(mailPort)) {
       setPort(Integer.parseInt(mailPort));
+    }
 
     // TSL over SMTP support
     propName = OPT_MAIL_PREFIX + mailTransport + OPT_MAIL_TLS_ENABLE_SUFFIX;
@@ -118,18 +121,21 @@ public class SmtpService extends BaseSmtpService implements ManagedService {
 
     // Mail user
     String mailUser = (String) properties.get(OPT_MAIL_USER);
-    if (StringUtils.isNotBlank(mailUser))
+    if (StringUtils.isNotBlank(mailUser)) {
       setUser(mailUser);
+    }
 
     // Mail password
     String mailPassword = (String) properties.get(OPT_MAIL_PASSWORD);
-    if (StringUtils.isNotBlank(mailPassword))
+    if (StringUtils.isNotBlank(mailPassword)) {
       setPassword(mailPassword);
+    }
 
     // Mail sender
     String mailFrom = (String) properties.get(OPT_MAIL_FROM);
-    if (StringUtils.isNotBlank(mailFrom))
+    if (StringUtils.isNotBlank(mailFrom)) {
       setSender(mailFrom);
+    }
 
     // Mail debugging
     setDebug(BooleanUtils.toBoolean((String) properties.get(OPT_MAIL_DEBUG)));
@@ -147,10 +153,11 @@ public class SmtpService extends BaseSmtpService implements ManagedService {
         while (e.getNextException() != null) {
           Exception ne = e.getNextException();
           logger.error("Error sending test message to " + mailFrom + ": " + ne.getMessage());
-          if (ne instanceof MessagingException)
+          if (ne instanceof MessagingException) {
             e = (MessagingException) ne;
-          else
+          } else {
             break;
+          }
         }
         throw new ConfigurationException(OPT_MAIL_PREFIX + mailTransport + OPT_MAIL_HOST_SUFFIX,
                 "Failed to send test message to " + mailFrom);
@@ -241,19 +248,21 @@ public class SmtpService extends BaseSmtpService implements ManagedService {
    * @throws MessagingException
    *           if sending the message failed
    */
-  public void send(String to, String cc, String bcc, String subject, String bodyText, String bodyHTML) throws MessagingException {
+  public void send(String to, String cc, String bcc, String subject, String bodyText, String bodyHTML)
+          throws MessagingException {
     String[] toArray = null;
     String[] ccArray = null;
     String[] bccArray = null;
 
-    if (to != null)
+    if (to != null) {
       toArray = to.trim().split(SPLIT_PATTERN, 0);
-
-    if (cc != null)
+    }
+    if (cc != null) {
       ccArray = cc.trim().split(SPLIT_PATTERN, 0);
-
-    if (bcc != null)
+    }
+    if (bcc != null) {
       bccArray = bcc.trim().split(SPLIT_PATTERN, 0);
+    }
 
     send(toArray, ccArray, bccArray, subject, bodyText, bodyHTML);
   }
@@ -298,7 +307,8 @@ public class SmtpService extends BaseSmtpService implements ManagedService {
    * @throws IllegalArgumentException
    *          if both bodyText and bodyHTML are null
    */
-  public void send(String[] to, String[] cc, String[] bcc, String subject, String bodyText, String bodyHTML) throws MessagingException {
+  public void send(String[] to, String[] cc, String[] bcc, String subject, String bodyText, String bodyHTML)
+          throws MessagingException {
     if (bodyText == null && bodyHTML == null) {
       throw new IllegalArgumentException("bodyText and bodyHTML cannot both be empty");
     }
@@ -343,8 +353,9 @@ public class SmtpService extends BaseSmtpService implements ManagedService {
           throws MessagingException {
     if (strAddresses != null) {
       InternetAddress[] addresses = new InternetAddress[strAddresses.length];
-      for (int i = 0; i < strAddresses.length; i++)
+      for (int i = 0; i < strAddresses.length; i++) {
         addresses[i] = new InternetAddress(strAddresses[i]);
+      }
       message.addRecipients(type, addresses);
     }
   }

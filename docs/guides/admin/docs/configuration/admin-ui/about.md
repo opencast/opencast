@@ -9,7 +9,7 @@ imprint.%{language_code}.html
 privacy.%{language_code}.html
 ```
 
-Currently supported language codes can be found here: <https://github.com/opencast/opencast-admin-interface/blob/main/src/i18n/i18n.ts>.
+Currently supported language codes can be found here: <https://github.com/opencast/admin-interface/blob/develop/src/i18n/i18n.ts>.
 Also see available translations in the [Opencast Crowdin project](https://crowdin.com/project/opencast-community).
 
 If a language is not provided, the english version will be displayed.

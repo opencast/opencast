@@ -169,7 +169,8 @@ public interface DBSession extends AutoCloseable {
    * @param <E> Exception type that could be thrown by fn.
    * @throws E Exception thrown by fn.
    */
-  <T, E extends Throwable> T execTxChecked(int maxTransactionRetries, ThrowingFunction<EntityManager, T, E> fn) throws E;
+  <T, E extends Throwable> T execTxChecked(int maxTransactionRetries, ThrowingFunction<EntityManager, T, E> fn)
+          throws E;
 
   /**
    * Closes this DBSession and cleans up related objects.

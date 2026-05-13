@@ -197,8 +197,9 @@ public class SanitizeAdaptiveWorkflowOperationHandlerTest {
     for (Track track : mpNew.getTracks()) {
       Assert.assertEquals("dessert/delivery", track.getFlavor().toString());
       Assert.assertTrue(Arrays.asList(track.getTags()).contains("cupcake"));
-      if (!SEGMENT_TRACK_ID.equals(track.getIdentifier()))
+      if (!SEGMENT_TRACK_ID.equals(track.getIdentifier())) {
         Assert.assertTrue(track.getTags().length == 1);
+      }
     }
     // Tag should not be overriden
     Assert.assertTrue(Arrays.asList(mpNew.getTrack(SEGMENT_TRACK_ID).getTags()).contains("archive"));
@@ -221,8 +222,9 @@ public class SanitizeAdaptiveWorkflowOperationHandlerTest {
     // check track metadata
     for (Track track : mpNew.getTracks()) {
       Assert.assertEquals("dessert/delivery", track.getFlavor().toString());
-      if (!SEGMENT_TRACK_ID.equals(track.getIdentifier()))
+      if (!SEGMENT_TRACK_ID.equals(track.getIdentifier())) {
         Assert.assertTrue(track.getTags().length == 0);
+      }
     }
     Assert.assertEquals(mpNew.getTrack(SEGMENT_TRACK_ID).getTags().length, 3);
     Assert.assertTrue(
@@ -244,8 +246,9 @@ public class SanitizeAdaptiveWorkflowOperationHandlerTest {
     // check track metadata
     for (Track track : mpNew.getTracks()) {
       Assert.assertEquals("presentation/delivery", track.getFlavor().toString());
-      if (!SEGMENT_TRACK_ID.equals(track.getIdentifier()))
+      if (!SEGMENT_TRACK_ID.equals(track.getIdentifier())) {
         Assert.assertTrue(track.getTags().length == 0);
+      }
     }
     Assert.assertArrayEquals(mpNew.getTrack(SEGMENT_TRACK_ID).getTags(), expectedTags);
   }
@@ -263,8 +266,9 @@ public class SanitizeAdaptiveWorkflowOperationHandlerTest {
     // check track metadata
     for (Track track : mpNew.getTracks()) {
       Assert.assertEquals("presentation/source", track.getFlavor().toString());
-      if (!SEGMENT_TRACK_ID.equals(track.getIdentifier()))
+      if (!SEGMENT_TRACK_ID.equals(track.getIdentifier())) {
         Assert.assertTrue(track.getTags().length == 0);
+      }
     }
     Assert.assertTrue(
             Arrays.asList(mpNew.getTrack(SEGMENT_TRACK_ID).getTags()).containsAll(Arrays.asList(expectedTags)));

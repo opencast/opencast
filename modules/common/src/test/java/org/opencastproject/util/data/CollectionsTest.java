@@ -92,10 +92,31 @@ public class CollectionsTest {
 
   @Test
   public void testJoin() {
-    assertArrayEquals(array(1, 2, 3, 4, 5, 6), toArray(Integer.class, toList(join(list(1, 2, 3).iterator(), list(4, 5, 6).iterator()))));
-    assertArrayEquals(array(1, 2, 3), toArray(Integer.class, toList(join(list(1, 2, 3).iterator(), java.util.Collections.<Integer>emptyList().iterator()))));
-    assertArrayEquals(array(1, 2, 3), toArray(Integer.class, toList(join(java.util.Collections.<Integer>emptyList().iterator(), list(1, 2, 3).iterator()))));
-    assertEquals(0, toArray(Object.class, toList(join(java.util.Collections.emptyList().iterator(), java.util.Collections.emptyList().iterator()))).length);
+    assertArrayEquals(
+        array(1, 2, 3, 4, 5, 6),
+        toArray(Integer.class, toList(join(
+            list(1, 2, 3).iterator(),
+            list(4, 5, 6).iterator()
+        ))));
+    assertArrayEquals(
+        array(1, 2, 3),
+        toArray(Integer.class, toList(join(
+            list(1, 2, 3).iterator(),
+            java.util.Collections.<Integer>emptyList().iterator()
+        ))));
+    assertArrayEquals(
+        array(1, 2, 3),
+        toArray(Integer.class, toList(join(
+            java.util.Collections.<Integer>emptyList().iterator(),
+            list(1, 2, 3).iterator()
+        ))));
+    assertEquals(
+        0,
+        toArray(Object.class, toList(join(
+            java.util.Collections.emptyList().iterator(),
+            java.util.Collections.emptyList().iterator()
+        ))).length
+    );
   }
 
   @Test(expected = NoSuchElementException.class)

@@ -26,15 +26,15 @@ operations:
       - accept-no-media: false
 
   - id: tag
-    if: NOT(${theme_active})
+    if: NOT ${theme_active}
     description: If no shifting was necessary, mark the trimmed chapters as shifted
     configurations:
-      - source-flavors: 'chapters/trimmed'
-      - target-flavor: 'chapters/shifted'
+      - source-flavors: chapters/trimmed
+      - target-flavor: chapters/shifted
       - copy: false
 
   - id: tag
-    if: NOT(${theme_active})
+    if: NOT ${theme_active}
     description: Tag elements as themed
     configurations:
       - source-flavors: '*/trimmed'

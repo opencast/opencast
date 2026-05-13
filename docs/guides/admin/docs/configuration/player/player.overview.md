@@ -1,10 +1,7 @@
 Opencast Player
 ===============================
 
-Opencast ships with a default video player, the Paella Player.
-
-Currently Opencast ships with two versions of the Paella Player. Version 7 is the "new player" and the recommended
-default.
+Opencast ships with a default video player, the Paella Player 8.
 
 Configuration
 ------------------------------
@@ -17,4 +14,4 @@ The default tenant for opencast is `mh_default_org`
 
 To change the default player for a tenant, set the following key in `.../etc/org.opencastproject.organization-<tenant>.cfg`.
 
-    prop.player=/paella7/ui/watch.html?id=#{id}
+    prop.player=/paella8/ui/watch.html?id=#{id}

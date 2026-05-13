@@ -55,7 +55,7 @@ public final class JSONUtils {
    * The filter is located in the top right corner in the admin ui. */
   private static String userFilterRegex;
   private static final String[] userListsToReduce = {"CONTRIBUTORS", "PUBLISHER",
-          "ORGANIZERS", "CONTRIBUTORS.USERNAMES", "EVENTS.PUBLISHER", "USERS.NAME"};
+      "ORGANIZERS", "CONTRIBUTORS.USERNAMES", "EVENTS.PUBLISHER", "USERS.NAME"};
 
   private JSONUtils() {
 
@@ -119,15 +119,72 @@ public final class JSONUtils {
   }
 
   private static JsonElement convertToJsonElement(Object item) {
-    if (item == null) return JsonNull.INSTANCE;
-    if (item instanceof JsonElement) return (JsonElement) item;
-    if (item instanceof Number) return new JsonPrimitive((Number) item);
-    if (item instanceof Boolean) return new JsonPrimitive((Boolean) item);
-    if (item instanceof Character) return new JsonPrimitive((Character) item);
-    if (item instanceof String) return new JsonPrimitive((String) item);
+    if (item == null) {
+      return JsonNull.INSTANCE;
+    }
+    if (item instanceof JsonElement) {
+      return (JsonElement) item;
+    }
+    if (item instanceof Number) {
+      return new JsonPrimitive((Number) item);
+    }
+    if (item instanceof Boolean) {
+      return new JsonPrimitive((Boolean) item);
+    }
+    if (item instanceof Character) {
+      return new JsonPrimitive((Character) item);
+    }
+    if (item instanceof String) {
+      return new JsonPrimitive((String) item);
+    }
     return new JsonPrimitive(item.toString());
   }
 
+  /**
+   * Returns a JSON object with key-value from given map
+   *
+   * @param map
+   *          The source list for the JSON object
+   * @return a JSON object containing the all the key-value as parameter
+   * @throws JSONException
+   */
+  public static JSONObject fromMap(Map<String, String> map) throws JSONException {
+    JSONObject json = new JSONObject();
+
+    if (map == null) {
+      return json;
+    }
+
+    for (Entry<String, String> entry : map.entrySet()) {
+      json.put(entry.getKey(), entry.getValue());
+    }
+    return json;
+  }
+
+  /**
+   * Converts a JSON object to a map. All values are of type {@link String}
+   *
+   * @param json
+   *          the JSON object to convert
+   * @return the map
+   */
+  public static Map<String, String> toMap(JSONObject json) {
+    if (json == null) {
+      return Collections.emptyMap();
+    }
+
+    HashMap<String, String> map = new HashMap<String, String>();
+    for (Iterator<String> iterator = json.keys(); iterator.hasNext();) {
+      String key = iterator.next();
+      map.put(key, json.optString(key));
+    }
+
+    return map;
+  }
+
+  public static void setUserRegex(String regex) {
+    userFilterRegex = regex;
+  }
 
   /**
    * Generate JSON presentation of the given filters
@@ -244,49 +301,4 @@ public final class JSONUtils {
 
     return filtersJson;
   }
-
-  /**
-   * Returns a JSON object with key-value from given map
-   *
-   * @param map
-   *          The source list for the JSON object
-   * @return a JSON object containing the all the key-value as parameter
-   * @throws JSONException
-   */
-  public static JSONObject fromMap(Map<String, String> map) throws JSONException {
-    JSONObject json = new JSONObject();
-
-    if (map == null)
-      return json;
-
-    for (Entry<String, String> entry : map.entrySet()) {
-      json.put(entry.getKey(), entry.getValue());
-    }
-    return json;
-  }
-
-  /**
-   * Converts a JSON object to a map. All values are of type {@link String}
-   *
-   * @param json
-   *          the JSON object to convert
-   * @return the map
-   */
-  public static Map<String, String> toMap(JSONObject json) {
-    if (json == null)
-      return Collections.emptyMap();
-
-    HashMap<String, String> map = new HashMap<String, String>();
-    for (Iterator<String> iterator = json.keys(); iterator.hasNext();) {
-      String key = iterator.next();
-      map.put(key, json.optString(key));
-    }
-
-    return map;
-  }
-
-  public static void setUserRegex(String regex) {
-    userFilterRegex = regex;
-  }
-
 }

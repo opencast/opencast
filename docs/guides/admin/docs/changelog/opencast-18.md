@@ -1,7 +1,96 @@
 Opencast 18 Changelog
 ---------------------
+## Opencast 18.7 (2026-04-13)
+- [[#7562](https://github.com/opencast/opencast/pull/7562)] -
+  Update 18.x Editor
+- [[#7561](https://github.com/opencast/opencast/pull/7561)] -
+  Update 18.x Admin Interface
+- [[#7560](https://github.com/opencast/opencast/pull/7560)] -
+  Update 18.x Studio
+- [[#7559](https://github.com/opencast/opencast/pull/7559)] -
+  Properly detect submodule versions
+- [[#7555](https://github.com/opencast/opencast/pull/7555)] -
+  Update 18.x Admin Interface
+- [[#7553](https://github.com/opencast/opencast/pull/7553)] -
+  Update 18.x Editor
+- [[#7549](https://github.com/opencast/opencast/pull/7549)] -
+  Update 18.x Studio
+
+## Opencast 18.6 (2026-04-07)
+- [[#7542](https://github.com/opencast/opencast/pull/7542)] -
+  Update 18.x Admin Interface
+- [[#7510](https://github.com/opencast/opencast/pull/7510)] -
+  Document submodule usage
+- [[#7509](https://github.com/opencast/opencast/pull/7509)] -
+  18.x submodules
+- [[#7477](https://github.com/opencast/opencast/pull/7477)] -
+  Reenable Access by Episode ID
+- [[#7475](https://github.com/opencast/opencast/pull/7475)] -
+  Remove redundant @Produces from API methods
+- [[#7461](https://github.com/opencast/opencast/pull/7461)] -
+  Refactor docker compose service configuration
+- [[#7460](https://github.com/opencast/opencast/pull/7460)] -
+  Improve frontend-less and -reduced builds
+- [[#7399](https://github.com/opencast/opencast/pull/7399)] -
+  Add new MIME types for Microsoft Word, Excel, and PowerPoint documents
+- [[#7384](https://github.com/opencast/opencast/pull/7384)] -
+  Fix most POSIX compliance errors in upgrade shell scripts
+- [[#7378](https://github.com/opencast/opencast/pull/7378)] -
+  Prevent build tests from building modules in parallel
+- [[#7372](https://github.com/opencast/opencast/pull/7372)] -
+  Add endpoint for batch-creating users
+- [[#7369](https://github.com/opencast/opencast/pull/7369)] -
+  Switch to bash for upgrade scripts
+- [[#7348](https://github.com/opencast/opencast/pull/7348)] -
+  Add missing GHA checks
+- [[#7338](https://github.com/opencast/opencast/pull/7338)] -
+  Remove internal SSL documentation
+
 
 Changes marked with \* were also included in 17.x.
+## Opencast 18.5 (2026-01-29)
+- [[#7341](https://github.com/opencast/opencast/pull/7341)] -
+  Updating studio to 2025-12-17
+- [[#7340](https://github.com/opencast/opencast/pull/7340)] -
+  Update r/18.x Admin UI to 18.x-2026-01-29
+- [[#7339](https://github.com/opencast/opencast/pull/7339)] -
+  Update r/18.x Editor to 18.x-2026-01-29
+- [[#7314](https://github.com/opencast/opencast/pull/7314)] -
+  Fix unsupported operation exception
+- [[#7292](https://github.com/opencast/opencast/pull/7292)] -
+  Clarify encoding profile count logging
+- [[#7291](https://github.com/opencast/opencast/pull/7291)] -
+  Add developers back to the main pom
+- [[#7273](https://github.com/opencast/opencast/pull/7273)] -
+  Fix syntax in partial-publish and partial-preview
+- [[#7213](https://github.com/opencast/opencast/pull/7213)] -
+  Add `?download=1` support for static files
+- [[#7175](https://github.com/opencast/opencast/pull/7175)] -
+  Handle org wildcard for catalog ui adapters
+
+## Opencast 18.4 (2025-11-28)
+- [[#7219](https://github.com/opencast/opencast/pull/7219)] -
+  Update r/18.x Editor to 18.x-2025-11-28
+- [[#7218](https://github.com/opencast/opencast/pull/7218)] -
+  Update r/18.x Admin UI to 18.x-2025-11-28
+- [[#7195](https://github.com/opencast/opencast/pull/7195)] -
+  Fix incorrect escaping in site GHA build
+- [[#7173](https://github.com/opencast/opencast/pull/7173)] -
+  docs: Download npm packages to common folder
+- [[#7140](https://github.com/opencast/opencast/pull/7140)] -
+  Cleanup GHA workflows
+- [[#7137](https://github.com/opencast/opencast/pull/7137)] -
+  Add coverage report documentation
+- [[#7118](https://github.com/opencast/opencast/pull/7118)] -
+  Fixes direct publishing of live events
+- [[#7116](https://github.com/opencast/opencast/pull/7116)] -
+  Add brief Tobira "documentation"
+- [[#7112](https://github.com/opencast/opencast/pull/7112)] -
+  Fix checkstyle violations in scheduler modules
+- [[#7111](https://github.com/opencast/opencast/pull/7111)] -
+  Fix checkstyle violations in module working-file-repository-service-impl
+- [[#7109](https://github.com/opencast/opencast/pull/7109)] -
+  Fix checkstyle violations in workflow modules
 
 ## Opencast 18.3 (2025-10-24)
 - [[#7132](https://github.com/opencast/opencast/pull/7132)] -

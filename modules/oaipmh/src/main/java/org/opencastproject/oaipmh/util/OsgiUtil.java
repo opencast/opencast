@@ -44,8 +44,9 @@ public final class OsgiUtil {
    */
   public static String getContextProperty(ComponentContext cc, String key) {
     String p = cc.getBundleContext().getProperty(key);
-    if (StringUtils.isBlank(p))
+    if (StringUtils.isBlank(p)) {
       throw new RuntimeException("Please provide bundle context property " + key);
+    }
     return p;
   }
 
@@ -57,11 +58,13 @@ public final class OsgiUtil {
    */
   public static String getCfg(Dictionary d, String key) throws ConfigurationException {
     Object p = d.get(key);
-    if (p == null)
+    if (p == null) {
       throw new ConfigurationException(key, "does not exist");
+    }
     String ps = p.toString();
-    if (StringUtils.isBlank(ps))
+    if (StringUtils.isBlank(ps)) {
       throw new ConfigurationException(key, "is blank");
+    }
     return ps;
   }
 
@@ -82,7 +85,8 @@ public final class OsgiUtil {
   /**
    * Check the existence of the given dictionary. Throw an exception if null.
    */
-  public static void checkDictionary(Dictionary properties, ComponentContext componentContext) throws ConfigurationException {
+  public static void checkDictionary(Dictionary properties, ComponentContext componentContext)
+          throws ConfigurationException {
     if (properties == null) {
       String dicName = componentContext.getProperties().get("service.pid").toString();
       throw new ConfigurationException("*", "Dictionary for " + dicName + " does not exist");

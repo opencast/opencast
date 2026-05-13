@@ -7,12 +7,11 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>20-SNAPSHOT</version>
+    <version>21-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
-    <checkstyle.skip>false</checkstyle.skip>
   </properties>
   <dependencies>
     <dependency>
@@ -128,6 +127,7 @@
           <instructions>
             <Export-Package>
               org.opencastproject.event.comment;version=${project.version},
+              org.opencastproject.event.comment.list;version=${project.version},
               org.opencastproject.event.comment.persistence;version=${project.version}
             </Export-Package>
             <Import-Package>

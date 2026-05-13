@@ -106,9 +106,6 @@ public class WaveformWorkflowOperationHandler extends AbstractWorkflowOperationH
   /** The waveform service. */
   private WaveformService waveformService = null;
 
-  /** The workspace service. */
-  private Workspace workspace = null;
-
   @Override
   public void activate(ComponentContext cc) {
     super.activate(cc);

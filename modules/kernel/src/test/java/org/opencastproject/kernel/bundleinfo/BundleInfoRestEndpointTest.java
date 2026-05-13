@@ -87,7 +87,8 @@ public class BundleInfoRestEndpointTest {
 
   @Test
   public void testBundleInfoJsonSerialization() {
-    final JsonPath p = JsonPath.from(bundleInfoJson(bundleInfo("host", "bundle", 1L, "version", Optional.of("sha"))).toJson());
+    final JsonPath p = JsonPath.from(bundleInfoJson(bundleInfo("host", "bundle", 1L, "version", Optional.of("sha")))
+        .toJson());
     run(BundleInfo.class, new BundleInfo() {
       @Override
       public String getHost() {

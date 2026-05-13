@@ -30,7 +30,9 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
+import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -41,6 +43,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -64,12 +67,15 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
   /** Optional service registry */
   protected ServiceRegistry serviceRegistry = null;
 
+  /** Optional workspace */
+  protected Workspace workspace = null;
+
   /** The JobBarrier polling interval */
   private long jobBarrierPollingInterval = JobBarrier.DEFAULT_POLLING_INTERVAL;
 
   /** Config for Tag Parsing operation */
   protected enum Configuration {
-    none, one, many
+    none, one, atLeastOne, many
   };
 
   public static final String TARGET_FLAVORS = "target-flavors";
@@ -142,6 +148,21 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
       }
     }
     return list;
+  }
+
+  protected MediaPackageElement createDerivedMediaPackageElementFrom(MediaPackageElement source)
+          throws NotFoundException, IOException {
+    MediaPackageElement derived = (MediaPackageElement) source.clone();
+    derived.generateIdentifier();
+    derived.referTo(source);
+    // copy file
+    derived.setURI(workspace.put(
+        source.getMediaPackage().getIdentifier().toString(),
+        derived.getIdentifier(),
+        getFileNameFromElements(source, derived),
+        workspace.read(source.getURI())
+    ));
+    return derived;
   }
 
   /**
@@ -372,14 +393,60 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
   }
 
   /**
+   * Uses one {@code configuration} for both source tags and flavors, in case the WOH does not care whether the source
+   * entities are identified by tags or flavors.
+   *
+   * @see AbstractWorkflowOperationHandler#getTagsAndFlavors(WorkflowInstance, Configuration, Configuration,
+   *      Configuration, Configuration)
+   */
+  protected ConfiguredTagsAndFlavors getTagsAndFlavors(WorkflowInstance workflow, Configuration srcTagsAndFlavors,
+      Configuration targetTags, Configuration targetFlavors) throws WorkflowOperationException {
+    ConfiguredTagsAndFlavors tagsAndFlavors = getTagsAndFlavors(
+        workflow,
+        Configuration.many,
+        Configuration.many,
+        targetTags,
+        targetFlavors);
+
+    switch(srcTagsAndFlavors) {
+      case none:
+        if (!tagsAndFlavors.getSrcFlavors().isEmpty() || !tagsAndFlavors.getSrcTags().isEmpty()) {
+          throw new WorkflowOperationException("No source tags or flavors may be set.");
+        }
+        break;
+      case one:
+        if (tagsAndFlavors.getSrcFlavors().size() + tagsAndFlavors.getSrcTags().size() != 1) {
+          throw new WorkflowOperationException("Exactly one source tag or flavor must be set.");
+        }
+        break;
+      case atLeastOne:
+        if (tagsAndFlavors.getSrcFlavors().size() + tagsAndFlavors.getSrcTags().size() < 1) {
+          throw new WorkflowOperationException("At least one source tag or flavor must be set.");
+        }
+        break;
+      case many:
+        break;
+      default:
+        throw new WorkflowOperationException("Couldn't process srcTagsAndFlavors configuration option!");
+    }
+
+    return tagsAndFlavors;
+  }
+
+  /**
    * Returns a ConfiguredTagsAndFlavors instance, which includes all specified source/target tags and flavors if they
-   * are valid. Lists can be empty, if no values were specified! This is to enable WOHs to individually check if a
-   * given tag/flavor was set. This also means that you should use Configuration.many as parameter, if a tag/flavor is
-   * optional.
-   * @param srcTags none, one or many
-   * @param srcFlavors none, one or many
-   * @param targetFlavors none, one or many
-   * @param targetTags none, one or many
+   * are valid.
+   * Lists can be empty, if no values were specified! This is to enable WOHs to individually check if a given tag/flavor
+   * was set.
+   * This also means that you should use Configuration.many as parameter, if a tag/flavor is optional.
+   * None: Must not be specified
+   * One: Exactly one must be specified
+   * AtLeastOne: At least one must be specified
+   * Many: An arbitrary amount may be specified
+   * @param srcTags none, one, atLeastOne or many
+   * @param srcFlavors none, one, atLeastOne or many
+   * @param targetFlavors none, one, atLeastOne or many
+   * @param targetTags none, one, atLeastOne or many
    * @return ConfiguredTagsAndFlavors object including lists for the configured tags/flavors
    */
   protected ConfiguredTagsAndFlavors getTagsAndFlavors(WorkflowInstance workflow, Configuration srcTags,
@@ -390,23 +457,25 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
     MediaPackageElementFlavor flavor;
 
     List<String> srcTagList = new ArrayList<>();
-    String srcTag;
     switch(srcTags) {
       case none:
         break;
       case one:
-        srcTag = StringUtils.trimToNull(operation.getConfiguration(SOURCE_TAG));
+        String srcTag = StringUtils.trimToNull(operation.getConfiguration(SOURCE_TAG));
         if (srcTag == null) {
           throw new WorkflowOperationException("Configuration key '" + SOURCE_TAG + "' must be set");
         }
         srcTagList.add(srcTag);
         break;
-      case many:
-        srcTagList = asList(StringUtils.trimToNull(operation.getConfiguration(SOURCE_TAGS)));
-        srcTag = StringUtils.trimToNull(operation.getConfiguration(SOURCE_TAG));
-        if (srcTagList.isEmpty() && srcTag != null) {
-          srcTagList.add(srcTag);
+      case atLeastOne:
+        srcTagList = getTags(operation, SOURCE_TAGS, SOURCE_TAG);
+        if (srcTagList.isEmpty()) {
+          throw new WorkflowOperationException("Configuration key '" + SOURCE_TAGS + "' or '" + SOURCE_TAG
+              + "' must be set");
         }
+        break;
+      case many:
+        srcTagList = getTags(operation, SOURCE_TAGS, SOURCE_TAG);
         break;
       default:
         throw new WorkflowOperationException("Couldn't process srcTags configuration option!");
@@ -414,12 +483,11 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
     tagsAndFlavors.setSrcTags(srcTagList);
 
     List<MediaPackageElementFlavor> srcFlavorList = new ArrayList<>();
-    String singleSourceFlavor;
     switch(srcFlavors) {
       case none:
         break;
       case one:
-        singleSourceFlavor = StringUtils.trimToNull(operation.getConfiguration(SOURCE_FLAVOR));
+        String singleSourceFlavor = StringUtils.trimToNull(operation.getConfiguration(SOURCE_FLAVOR));
         if (singleSourceFlavor == null) {
           throw new WorkflowOperationException("Configuration key '" + SOURCE_FLAVOR + "' must be set");
         }
@@ -430,20 +498,15 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
         }
         srcFlavorList.add(flavor);
         break;
+      case atLeastOne:
+        srcFlavorList = getFlavors(operation, SOURCE_FLAVORS, SOURCE_FLAVOR);
+        if (srcFlavorList.isEmpty()) {
+          throw new WorkflowOperationException("Configuration key '" + SOURCE_FLAVORS + "' or '" + SOURCE_FLAVOR
+              + "' must be set");
+        }
+        break;
       case many:
-        List<String> srcFlavorString = asList(StringUtils.trimToNull(operation.getConfiguration(SOURCE_FLAVORS)));
-        singleSourceFlavor = StringUtils.trimToNull(operation.getConfiguration(SOURCE_FLAVOR));
-        if (srcFlavorString.isEmpty() && singleSourceFlavor != null) {
-          srcFlavorString.add(singleSourceFlavor);
-        }
-        for (String elem : srcFlavorString) {
-          try {
-            flavor = MediaPackageElementFlavor.parseFlavor(elem);
-            srcFlavorList.add(flavor);
-          } catch (IllegalArgumentException e) {
-            throw new WorkflowOperationException(elem + " is not a valid flavor!");
-          }
-        }
+        srcFlavorList = getFlavors(operation, SOURCE_FLAVORS, SOURCE_FLAVOR);
         break;
       default:
         throw new WorkflowOperationException("Couldn't process srcFlavors configuration option!");
@@ -451,24 +514,28 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
     tagsAndFlavors.setSrcFlavors(srcFlavorList);
 
     ConfiguredTagsAndFlavors.TargetTags targetTagMap = new ConfiguredTagsAndFlavors.TargetTags();
-    String targetTag;
+    List<String> targetTagList = new ArrayList<>();
     switch(targetTags) {
       case none:
         break;
       case one:
-        targetTag = StringUtils.trimToNull(operation.getConfiguration(TARGET_TAG));
+        String targetTag = StringUtils.trimToNull(operation.getConfiguration(TARGET_TAG));
         if (targetTag == null) {
           throw new WorkflowOperationException("Configuration key '" + TARGET_TAG + "' must be set");
         }
         targetTagMap = parseTargetTagsByType(List.of(targetTag));
         break;
-      case many:
-        List<String> targetTagList = asList(StringUtils.trimToNull(operation.getConfiguration(TARGET_TAGS)));
-        targetTagMap = parseTargetTagsByType(targetTagList);
-        targetTag = StringUtils.trimToNull(operation.getConfiguration(TARGET_TAG));
-        if (targetTagList.isEmpty() && targetTag != null) {
-          targetTagMap = parseTargetTagsByType(List.of(targetTag));
+      case atLeastOne:
+        targetTagList = getTags(operation, TARGET_TAGS, TARGET_TAG);
+        if (targetTagList.isEmpty()) {
+          throw new WorkflowOperationException("Configuration key '" + TARGET_TAGS + "' or '" + TARGET_TAG
+              + "' must be set");
         }
+        targetTagMap = parseTargetTagsByType(targetTagList);
+        break;
+      case many:
+        targetTagList = getTags(operation, TARGET_TAGS, TARGET_TAG);
+        targetTagMap = parseTargetTagsByType(targetTagList);
         break;
       default:
         throw new WorkflowOperationException("Couldn't process target-tag configuration option!");
@@ -476,12 +543,11 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
     tagsAndFlavors.setTargetTags(targetTagMap);
 
     List<MediaPackageElementFlavor> targetFlavorList = new ArrayList<>();
-    String singleTargetFlavor;
     switch(targetFlavors) {
       case none:
         break;
       case one:
-        singleTargetFlavor = StringUtils.trimToNull(operation.getConfiguration(TARGET_FLAVOR));
+        String singleTargetFlavor = StringUtils.trimToNull(operation.getConfiguration(TARGET_FLAVOR));
         if (singleTargetFlavor == null) {
           throw new WorkflowOperationException("Configuration key '" + TARGET_FLAVOR + "' must be set");
         }
@@ -492,20 +558,15 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
         }
         targetFlavorList.add(flavor);
         break;
+      case atLeastOne:
+        targetFlavorList = getFlavors(operation, TARGET_FLAVORS, TARGET_FLAVOR);
+        if (targetTagList.isEmpty()) {
+          throw new WorkflowOperationException("Configuration key '" + TARGET_FLAVORS + "' or '" + TARGET_FLAVOR
+              + "' must be set");
+        }
+        break;
       case many:
-        List<String> targetFlavorString = asList(StringUtils.trimToNull(operation.getConfiguration(TARGET_FLAVORS)));
-        singleTargetFlavor = StringUtils.trimToNull(operation.getConfiguration(TARGET_FLAVOR));
-        if (targetFlavorString.isEmpty() && singleTargetFlavor != null) {
-          targetFlavorString.add(singleTargetFlavor);
-        }
-        for (String elem : targetFlavorString) {
-          try {
-            flavor = MediaPackageElementFlavor.parseFlavor(elem);
-          } catch (IllegalArgumentException e) {
-            throw new WorkflowOperationException(elem + " is not a valid flavor!");
-          }
-          targetFlavorList.add(flavor);
-        }
+        targetFlavorList = getFlavors(operation, TARGET_FLAVORS, TARGET_FLAVOR);
         break;
       default:
         throw new WorkflowOperationException("Couldn't process targetFlavors configuration option!");
@@ -569,6 +630,34 @@ public abstract class AbstractWorkflowOperationHandler implements WorkflowOperat
     }
 
     return element;
+  }
+
+  private List<String> getTags(WorkflowOperationInstance operation, String multipleTagsKey, String singleTagKey) {
+    List<String> tagList = asList(StringUtils.trimToNull(operation.getConfiguration(multipleTagsKey)));
+    String singleTag = StringUtils.trimToNull(operation.getConfiguration(singleTagKey));
+    if (tagList.isEmpty() && singleTag != null) {
+      tagList.add(singleTag);
+    }
+    return tagList;
+  }
+
+  private List<MediaPackageElementFlavor> getFlavors(WorkflowOperationInstance operation, String multipleFlavorsKey,
+      String singleFlavorKey) throws WorkflowOperationException {
+    List<MediaPackageElementFlavor> flavorList = new ArrayList<>();
+    List<String> singleFlavorString = asList(StringUtils.trimToNull(operation.getConfiguration(multipleFlavorsKey)));
+    String singleSourceFlavor = StringUtils.trimToNull(operation.getConfiguration(singleFlavorKey));
+    if (singleFlavorString.isEmpty() && singleSourceFlavor != null) {
+      singleFlavorString.add(singleSourceFlavor);
+    }
+    for (String elem : singleFlavorString) {
+      try {
+        MediaPackageElementFlavor flavor = MediaPackageElementFlavor.parseFlavor(elem);
+        flavorList.add(flavor);
+      } catch (IllegalArgumentException e) {
+        throw new WorkflowOperationException(elem + " is not a valid flavor!");
+      }
+    }
+    return flavorList;
   }
 
   /**

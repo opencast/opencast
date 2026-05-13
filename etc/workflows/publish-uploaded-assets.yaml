@@ -1,6 +1,5 @@
 id: publish-uploaded-assets
 title: Publish uploaded assets
-tags: [] # Only launched from add asset in admin interface, not available for selection by end users via the Admin UI
 description: |-
   Publish uploaded assets
 state-mappings:
@@ -31,7 +30,7 @@ operations:
   # captions/delivery   engage-download
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
   - id: include
-    if: NOT(${captions_source_hastag_archive})
+    if: NOT ${captions_source_hastag_archive}
     description: Include special handling for uploaded captions
     configurations:
       - workflow-id: partial-process-uploaded-captions

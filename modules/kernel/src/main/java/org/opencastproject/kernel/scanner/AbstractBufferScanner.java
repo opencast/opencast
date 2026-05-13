@@ -33,7 +33,10 @@ import java.util.Dictionary;
 public abstract class AbstractBufferScanner extends AbstractScanner {
   private static final Logger logger = LoggerFactory.getLogger(AbstractBufferScanner.class);
 
-  /** The key that will be used to find the amount of buffer time to search for scheduled recordings to remove before now. */
+  /**
+   * The key that will be used to find the amount of buffer time to search for scheduled recordings to remove
+   * before now.
+   */
   protected static final String PARAM_KEY_BUFFER = "buffer";
 
   protected long buffer = -1;
@@ -52,8 +55,9 @@ public abstract class AbstractBufferScanner extends AbstractScanner {
       logger.debug("enabled = " + enabled);
 
       cronExpression = (String) properties.get(PARAM_KEY_CRON_EXPR);
-      if (StringUtils.isBlank(cronExpression) || !CronExpression.isValidExpression(cronExpression))
+      if (StringUtils.isBlank(cronExpression) || !CronExpression.isValidExpression(cronExpression)) {
         throw new ConfigurationException(PARAM_KEY_CRON_EXPR, "Cron expression must be valid");
+      }
       setCronExpression(cronExpression);
       logger.debug("cronExpression = '" + cronExpression + "'");
 

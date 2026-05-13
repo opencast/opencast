@@ -226,7 +226,7 @@ public final class SchedulingUtils {
      * {@link TechnicalMetadata} if they are not present in this instance.
      *
      * @param metadata
-     *          The {@link TechnicalMetadata} of which to use start date, end date, and agent id in case they are missing.
+     *        The {@link TechnicalMetadata} of which to use start date, end date, and agent id in case they are missing.
      *
      * @return The new SchedulingInfo with start date, end date, and agent id set.
      */
@@ -297,7 +297,8 @@ public final class SchedulingUtils {
           throw new IllegalArgumentException("Invalid RRule: " + rrule);
         }
         if (isBlank(durationString) || isBlank(startDate) || isBlank(endDate)) {
-          throw new IllegalArgumentException("'start', 'end' and 'duration' must be specified when 'rrule' is specified");
+          throw new IllegalArgumentException("'start', 'end' and 'duration' must be specified when 'rrule' is "
+              + "specified");
         }
       }
       return schedulingInfo;
@@ -319,7 +320,7 @@ public final class SchedulingUtils {
      *          In case internal errors occur within the {@link SchedulerService}.
      */
     public static SchedulingInfo of(String eventId, SchedulerService schedulerService)
-        throws UnauthorizedException, SchedulerException {
+            throws UnauthorizedException, SchedulerException {
       final SchedulingInfo result = new SchedulingInfo();
       try {
         final TechnicalMetadata technicalMetadata = schedulerService.getTechnicalMetadata(eventId);
@@ -370,10 +371,12 @@ public final class SchedulingUtils {
         }
 
         JsonObject eventJson = new JsonObject();
-        if (event.getTechnicalStartTime() != null)
+        if (event.getTechnicalStartTime() != null) {
           eventJson.addProperty("start", event.getTechnicalStartTime().toString());
-        if (event.getTechnicalEndTime() != null)
+        }
+        if (event.getTechnicalEndTime() != null) {
           eventJson.addProperty("end", event.getTechnicalEndTime().toString());
+        }
         eventJson.addProperty("title", event.getTitle());
 
         result.add(eventJson);

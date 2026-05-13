@@ -7,12 +7,11 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>20-SNAPSHOT</version>
+    <version>21-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
-    <checkstyle.skip>false</checkstyle.skip>
   </properties>
   <dependencies>
     <dependency>
@@ -35,7 +34,6 @@
           <instructions>
             <Export-Package>
               org.opencastproject.workingfilerepository.api;version=${project.version},
-              org.opencastproject.workingfilerepository.jmx;version=${project.version}
             </Export-Package>
           </instructions>
         </configuration>

@@ -29,10 +29,10 @@ import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
 import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
 import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildException;
 import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService;
+import org.opencastproject.list.api.DefaultResourceListQuery;
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ListProvidersService;
 import org.opencastproject.list.api.ResourceListQuery;
-import org.opencastproject.list.impl.ResourceListQueryImpl;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
@@ -88,6 +88,7 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -359,7 +360,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
     customEntries.add(new AccessControlEntry(getEpisodeRoleId(mediaPackageId, "READ"), "read", true));
     customEntries.add(new AccessControlEntry(getEpisodeRoleId(mediaPackageId, "WRITE"), "write", true));
 
-    ResourceListQuery query = new ResourceListQueryImpl();
+    ResourceListQuery query = new DefaultResourceListQuery();
     if (listProvidersService.hasProvider("ACL.ACTIONS")) {
       Map<String, String> actions = new HashMap<>();
       try {
@@ -372,6 +373,9 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
             new AccessControlEntry(getEpisodeRoleId(mediaPackageId, action), action, true));
       }
     }
+
+    AccessControlList customRoles = new AccessControlList(new ArrayList<>(customEntries));
+    acl = customRoles.merge(acl);
 
     return acl;
   }

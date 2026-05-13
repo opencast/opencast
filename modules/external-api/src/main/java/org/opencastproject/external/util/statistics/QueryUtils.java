@@ -127,7 +127,7 @@ public final class QueryUtils {
     void validate() { }
   }
 
-   public static class TimeSeriesParameters extends Parameters {
+  public static class TimeSeriesParameters extends Parameters {
 
     private Instant from;
     private Instant to;
@@ -219,8 +219,8 @@ public final class QueryUtils {
     List<Query> queries = new ArrayList<>();
 
     queriesJson.forEach(item -> {
-        Query query = parseQuery((JSONObject) item, statisticsService);
-        queries.add(query);
+      Query query = parseQuery((JSONObject) item, statisticsService);
+      queries.add(query);
     });
 
     return queries;
@@ -271,7 +271,8 @@ public final class QueryUtils {
       TimeSeriesParameters p;
       if (parametersJson.containsKey("detailLevel")) {
         p = new ExportParameters(resourceId, parametersJson);
-        ((ExportParameters)p).setDetailLevel(getField(parametersJson, "detailLevel", "Parameter 'detailLevel' is misisng"));
+        ((ExportParameters)p).setDetailLevel(getField(parametersJson, "detailLevel",
+            "Parameter 'detailLevel' is missing"));
       } else {
         p = new TimeSeriesParameters(resourceId, parametersJson);
       }

@@ -80,7 +80,8 @@ public class EncodingProfileTest {
   public void testInstall() throws Exception {
     ServiceRegistration service = EasyMock.createNiceMock(ServiceRegistration.class);
     BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
-    EasyMock.expect(bc.registerService(EasyMock.anyString(), EasyMock.anyObject(), EasyMock.anyObject())).andReturn(service).anyTimes();
+    EasyMock.expect(bc.registerService(EasyMock.anyString(), EasyMock.anyObject(), EasyMock.anyObject()))
+        .andReturn(service).anyTimes();
     EasyMock.replay(service, bc);
 
     URL url = EncodingProfileTest.class.getResource("/encodingtestprofiles.properties");
