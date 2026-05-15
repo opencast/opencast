@@ -185,7 +185,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
   private static final int DEFAULT_MAX_ATTEMPTS_BEFORE_ERROR_STATE = -1;
 
   /** Default value for {@link #errorStatesEnabled} */
-  private static final boolean DEFAULT_ERROR_STATES_ENABLED = true;
+  private static final boolean DEFAULT_ERROR_STATES_ENABLED = false;
 
   /** Number of failed jobs on a service before to set it in error state. -1 will disable error states completely. */
   protected int maxAttemptsBeforeErrorState = DEFAULT_MAX_ATTEMPTS_BEFORE_ERROR_STATE;
