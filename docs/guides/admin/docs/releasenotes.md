@@ -1,6 +1,10 @@
 # Opencast 19: Release Notes
 
-## Opencast 19.next
+## Opencast 19.5
+
+This version contains updates for the admin,editor, and studio submodules, along with the usual collection of bug fixes.
+
+## Opencast 19.4
 
 This release contains a fix for
 (Episode ID Roles)[https://docs.opencast.org/r/19.x/admin/#configuration/episode-id-roles/#episode-id-roles], which
