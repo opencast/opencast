@@ -82,9 +82,6 @@ public class ExportWorkflowPropertiesWOH extends AbstractWorkflowOperationHandle
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(ExportWorkflowPropertiesWOH.class);
 
-  /** The workspace */
-  private Workspace workspace;
-
   /** OSGi DI */
   @Reference
   void setWorkspace(Workspace workspace) {

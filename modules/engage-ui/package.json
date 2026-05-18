@@ -13,7 +13,7 @@
     "underscore": "^1.13.8"
   },
   "devDependencies": {
-    "eslint": "^10.2.1",
+    "eslint": "^10.4.0",
     "eslint-config-opencast": "file:../../docs/checkstyle/eslint-config"
   }
 }

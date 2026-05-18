@@ -101,9 +101,6 @@ public class TimelinePreviewsWorkflowOperationHandler extends AbstractWorkflowOp
   /** The timeline previews service. */
   private TimelinePreviewsService timelinePreviewsService = null;
 
-  /** The workspace service. */
-  private Workspace workspace = null;
-
   @Override
   @Activate
   public void activate(ComponentContext cc) {

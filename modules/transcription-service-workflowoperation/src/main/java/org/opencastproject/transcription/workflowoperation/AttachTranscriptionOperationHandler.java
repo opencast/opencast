@@ -69,7 +69,6 @@ public class AttachTranscriptionOperationHandler extends AbstractWorkflowOperati
 
   /** The transcription service */
   private TranscriptionService service = null;
-  private Workspace workspace;
   private CaptionService captionService;
 
   @Override

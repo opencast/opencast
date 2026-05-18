@@ -70,9 +70,6 @@ public class RenameFilesWorkflowOperationHandler extends AbstractWorkflowOperati
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(RenameFilesWorkflowOperationHandler.class);
 
-  /** The local workspace */
-  private Workspace workspace = null;
-
   /**
    * Callback for declarative services configuration that will introduce us to the local workspace service.
    * Implementation assumes that the reference is configured as being static.

@@ -1229,6 +1229,15 @@ public class EventSearchQuery extends AbstractSearchQuery {
   }
 
   /**
+   * Returns if the event needs cutting
+   *
+   * @return if the event needs cutting
+   */
+  public Boolean getNeedsCutting() {
+    return needsCutting;
+  }
+
+  /**
    * Returns the has comments status of the recording.
    *
    * @return the recording has comments status
