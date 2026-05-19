@@ -1,6 +1,41 @@
 Opencast 19 Changelog
 ---------------------
 
+## Opencast 19.5 (2026-05-14)
+- [[#7657](https://github.com/opencast/opencast/pull/7657)] -
+  19.5 release notes
+- [[#7656](https://github.com/opencast/opencast/pull/7656)] -
+  Update 19.x submodules
+- [[#7646](https://github.com/opencast/opencast/pull/7646)] -
+  Add admin ui endpoint for users to self update
+- [[#7641](https://github.com/opencast/opencast/pull/7641)] -
+  Fix about page names for admin ui
+- [[#7638](https://github.com/opencast/opencast/pull/7638)] -
+  Make "Needs cutting" filter available in admin ui
+- [[#7634](https://github.com/opencast/opencast/pull/7634)] -
+  Improve retract check upon event deletion
+- [[#7631](https://github.com/opencast/opencast/pull/7631)] -
+  Update 19.x Admin Interface
+- [[#7624](https://github.com/opencast/opencast/pull/7624)] -
+  Adding paella 8 to the translation file
+- [[#7615](https://github.com/opencast/opencast/pull/7615)] -
+  Fix default ACL template for non-admin users
+- [[#7591](https://github.com/opencast/opencast/pull/7591)] -
+  Update 19.x Admin Interface
+- [[#7569](https://github.com/opencast/opencast/pull/7569)] -
+  Opencast 19.4 changelog
+- [[#7565](https://github.com/opencast/opencast/pull/7565)] -
+  Update 19.x Editor
+- [[#7564](https://github.com/opencast/opencast/pull/7564)] -
+  Update 19.x Studio
+- [[#7563](https://github.com/opencast/opencast/pull/7563)] -
+  Update 19.x Admin Interface
+- [[#7489](https://github.com/opencast/opencast/pull/7489)] -
+  Order by _score and _doc
+- [[#7374](https://github.com/opencast/opencast/pull/7374)] -
+  Force a file copy when cloning mediapackage elements
+
+
 ## Opencast 19.4 (2026-04-10)
 - [[#7569](https://github.com/opencast/opencast/pull/7569)] -
   Opencast 19.4 changelog
