@@ -1,0 +1,49 @@
+{
+    "categories": [
+      {
+        "title": "### 🚀 Features",
+        "labels": [
+          "type:enhancement",
+          "type:feature"
+        ]
+      },
+      {
+        "title": "### 🐛 Fixes",
+        "labels": [
+          "type:bug"
+        ]
+      },
+      {
+        "empty_content": "- no matching PRs",
+        "title": "### Accessibility",
+        "labels": [
+          "type:usability",
+          "type:accessibility",
+          "type:visual-clarity"
+        ]
+      },
+      {
+        "key": "security",
+        "title": "### Security",
+        "labels": [
+          "type:security"
+        ]
+      },
+      {
+        "title": "### Dependencies",
+        "labels": [
+          "type:dependencies"
+        ]
+      }
+    ],
+    "sort": {
+      "order": "ASC",
+      "on_property": "mergedAt"
+    },
+    "template": "#{{CHANGELOG}}\n\n<details>\n<summary>Uncategorized</summary>\n\n#{{UNCATEGORIZED}}\n</details>",
+    "pr_template": "- #{{TITLE}}\n   - PR: ##{{NUMBER}}",
+    "empty_template": "- no changes",
+    "trim_values": false,
+    "max_tags_to_fetch": 200,
+    "max_pull_requests": 200
+}
