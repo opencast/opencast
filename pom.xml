@@ -46,7 +46,7 @@
     <jettison.version>1.5.4</jettison.version>
     <joda-time.version>2.14.0</joda-time.version>
     <json-simple.version>1.1.1</json-simple.version>
-    <junit5.version>6.0.1</junit5.version>
+    <junit5.version>6.0.3</junit5.version>
     <karaf.version>4.4.7</karaf.version>
     <lucene.version>8.7.0</lucene.version>
     <node.version>v24.15.0</node.version>
@@ -1156,7 +1156,7 @@
       <dependency>
         <groupId>org.easymock</groupId>
         <artifactId>easymock</artifactId>
-        <version>5.5.0</version>
+        <version>5.6.0</version>
         <scope>test</scope>
       </dependency>
       <dependency>
@@ -1289,12 +1289,6 @@
         <groupId>org.hamcrest</groupId>
         <artifactId>hamcrest-core</artifactId>
         <version>3.0</version>
-      </dependency>
-      <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <version>4.13.2</version>
-        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.junit.jupiter</groupId>
