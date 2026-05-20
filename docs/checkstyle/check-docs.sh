@@ -34,6 +34,13 @@ for docs in admin developer; do
   cd ..
 done
 
+export PATH="node_modules/.bin:$PATH"
+
+if ! command -v markdownlint &> /dev/null; then
+  echo "Markdownlint missing, installing..."
+  npm install 2>&1 > /dev/null
+fi
+
 if ! npm test; then
   echo "npm test failed!"
   ret=1
