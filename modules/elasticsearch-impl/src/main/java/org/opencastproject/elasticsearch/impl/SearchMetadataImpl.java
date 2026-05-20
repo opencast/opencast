@@ -152,22 +152,6 @@ public class SearchMetadataImpl<T> implements SearchMetadata<T> {
   /**
    * {@inheritDoc}
    * 
-   * @see SearchMetadata#setAddToText(boolean)
-   */
-  public void setAddToText(boolean addToText) {
-    this.addToText = addToText;
-  }
-
-  /**
-   * {@inheritDoc}
-   */
-  public boolean addToText() {
-    return addToText;
-  }
-
-  /**
-   * {@inheritDoc}
-   * 
    * @see SearchMetadata#clear()
    */
   public void clear() {
