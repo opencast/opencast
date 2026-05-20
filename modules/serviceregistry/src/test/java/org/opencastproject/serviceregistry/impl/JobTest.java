@@ -142,7 +142,7 @@ public class JobTest {
 
     Job jobFromDb = serviceRegistry.getJob(job.getId());
     assertEquals(Status.INSTANTIATED, jobFromDb.getStatus());
-    assertEquals(new Float(4.0f), job.getJobLoad());
+    assertEquals(Float.valueOf(4.0f), job.getJobLoad());
 
     // Simulate starting the job
     job.setStatus(Status.RUNNING);
@@ -207,7 +207,7 @@ public class JobTest {
     List<Job> jobs = serviceRegistry.getActiveJobs();
     assertEquals(2, jobs.size());
 
-    long jobId = jobs.get(0).getId();
+    long jobId = jobs.getFirst().getId();
     for (Status status : Status.values()) {
       job = serviceRegistry.getJob(jobId);
       job.setStatus(status);
@@ -462,7 +462,7 @@ public class JobTest {
     serviceRegistry.registerService(jobType, url, PATH);
     hosts = serviceRegistry.getServiceRegistrationsByLoad(jobType);
     assertEquals(1, hosts.size());
-    assertEquals(url, hosts.get(0).getHost());
+    assertEquals(url, hosts.getFirst().getHost());
 
     // set the handler to be in maintenance mode
     serviceRegistry.setMaintenanceStatus(url, true);
@@ -494,7 +494,7 @@ public class JobTest {
     serviceRegistry.registerService(receiptType, url, PATH);
     hosts = serviceRegistry.getServiceRegistrationsByLoad("type1");
     assertEquals(1, hosts.size());
-    assertEquals(url, hosts.get(0).getHost());
+    assertEquals(url, hosts.getFirst().getHost());
 
     // set the host to be in maintenance mode
     serviceRegistry.setMaintenanceStatus(url, true);
