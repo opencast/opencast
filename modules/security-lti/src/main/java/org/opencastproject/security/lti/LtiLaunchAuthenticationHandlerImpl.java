@@ -21,6 +21,7 @@
 
 package org.opencastproject.security.lti;
 
+import org.opencastproject.kernel.security.LtiLaunchAuthenticationHandler;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityConstants;
 import org.opencastproject.security.api.SecurityService;
@@ -38,18 +39,14 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.oauth.provider.ConsumerAuthentication;
-import org.springframework.security.oauth.provider.OAuthAuthenticationHandler;
-import org.springframework.security.oauth.provider.token.OAuthAccessProviderToken;
-import org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationToken;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -73,17 +70,17 @@ import javax.servlet.http.HttpServletRequest;
                 "service.description=Lti User Login"
         },
         immediate = true,
-        service = { LtiLaunchAuthenticationHandler.class, OAuthAuthenticationHandler.class }
+        service = { LtiLaunchAuthenticationHandler.class }
 )
 
 /**
- * Callback interface for handing authentication details that are used when an authenticated request for a protected
- * resource is received.
+ * Spring security 5: Reused former implementation of OAuthAuthenticationHandler to build list of roles.
+ * Handles authentication details that are used when an authenticated request for a protected resource is received.
  */
-public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandler {
+public class LtiLaunchAuthenticationHandlerImpl implements LtiLaunchAuthenticationHandler {
 
   /** The logger */
-  private static final Logger logger = LoggerFactory.getLogger(LtiLaunchAuthenticationHandler.class);
+  private static final Logger logger = LoggerFactory.getLogger(LtiLaunchAuthenticationHandlerImpl.class);
 
   /** The Http request parameter, sent by the LTI consumer, containing the user ID. */
   private static final String LTI_USER_ID_PARAM = "user_id";
@@ -293,17 +290,8 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
 
   }
 
-  /**
-   * {@inheritDoc}
-   *
-   * @see org.springframework.security.oauth.provider.OAuthAuthenticationHandler#createAuthentication(
-   *      javax.servlet.http.HttpServletRequest,
-   *      org.springframework.security.oauth.provider.ConsumerAuthentication,
-   *      org.springframework.security.oauth.provider.token.OAuthAccessProviderToken)
-   */
   @Override
-  public Authentication createAuthentication(HttpServletRequest request, ConsumerAuthentication authentication,
-          OAuthAccessProviderToken authToken) {
+  public Authentication createAuthentication(HttpServletRequest request) {
     // The User ID must be provided by the LTI consumer
     String userIdFromConsumer = request.getParameter(LTI_USER_ID_PARAM);
 
@@ -358,6 +346,7 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
     UserDetails userDetails;
     Collection<GrantedAuthority> userAuthorities;
     try {
+      logger.debug("Calling loadUserByUsername: {}", username);
       userDetails = userDetailsService.loadUserByUsername(username);
 
       // userDetails returns a Collection<? extends GrantedAuthority>, which cannot be directly casted to a
@@ -446,9 +435,7 @@ public class LtiLaunchAuthenticationHandler implements OAuthAuthenticationHandle
     }
     //Create/Update UserReference End
 
-    Authentication ltiAuth = new PreAuthenticatedAuthenticationToken(userDetails, authentication.getCredentials(),
-            userAuthorities);
-    SecurityContextHolder.getContext().setAuthentication(ltiAuth);
+    Authentication ltiAuth = new UsernamePasswordAuthenticationToken(userDetails, null, userAuthorities);
     return ltiAuth;
   }
 

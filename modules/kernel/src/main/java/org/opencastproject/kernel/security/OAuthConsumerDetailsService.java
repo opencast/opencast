@@ -23,27 +23,14 @@ package org.opencastproject.kernel.security;
 
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.oauth.common.OAuthException;
-import org.springframework.security.oauth.common.signature.SharedConsumerSecretImpl;
-import org.springframework.security.oauth.provider.BaseConsumerDetails;
-import org.springframework.security.oauth.provider.ConsumerDetails;
-import org.springframework.security.oauth.provider.ConsumerDetailsService;
-import org.springframework.security.oauth.provider.ExtraTrustConsumerDetails;
 
-import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -52,12 +39,12 @@ import java.util.Map;
  */
 @Component(
     immediate = true,
-    service = { ManagedService.class,ConsumerDetailsService.class },
+        service = { OAuthConsumerDetailsService.class },
     property = {
         "service.description=OAuth consumer details service"
     }
 )
-public class OAuthConsumerDetailsService implements ConsumerDetailsService, UserDetailsService, ManagedService {
+public class OAuthConsumerDetailsService {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(OAuthConsumerDetailsService.class);
@@ -71,25 +58,16 @@ public class OAuthConsumerDetailsService implements ConsumerDetailsService, User
   /** The prefix of the key to look up a consumer secret. */
   private static final String CONSUMER_SECRET_PREFIX = "oauth.consumer.secret.";
 
-  /** The user details service to use as a delegate for user lookups */
-  private UserDetailsService delegate;
+  /** A map associating consumer keys to secrets. */
+  private Map<String, String> consumers = new HashMap<>();
 
-  /** A map associating consumer keys to OAuth consumers. */
-  private Map<String, ConsumerDetails> consumers = new HashMap<>();
-
-  /**
-   * OSGi DI
-   */
-  @Reference
-  public void setDelegate(UserDetailsService delegate) {
-    this.delegate = delegate;
-  }
-
-  @Override
-  public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+  @Activate
+  public void activate(ComponentContext cc) throws ConfigurationException {
     logger.debug("Updating OAuthConsumerDetailsService");
 
     consumers.clear();
+
+    Dictionary<String, Object> properties = cc.getProperties();
 
     if (properties == null) {
       logger.warn("OAuthConsumerDetailsService has no configured OAuth consumers");
@@ -105,55 +83,18 @@ public class OAuthConsumerDetailsService implements ConsumerDetailsService, User
       // Has the consumer been fully configured
       if (consumerName == null || consumerKey == null || consumerSecret == null) {
         logger.debug(
-                "Unable to configure OAuth consumer with name'{}' because the name, key or secret is missing. "
-                    + "Stopping to look for new consumers.",
+                "Unable to configure OAuth consumer with name'{}' because the name, "
+                        + "key or secret is missing. Stopping to look for new consumers.",
                 consumerName);
         break;
       }
 
-      consumers.put(consumerKey, createConsumerDetails(consumerName, consumerKey, consumerSecret));
+      consumers.put(consumerKey, consumerSecret);
     }
   }
 
-  /**
-   * Creates a spring security consumer details object, suitable to achieve two-legged OAuth.
-   *
-   * @param consumerName
-   *          the consumer name
-   * @param consumerKey
-   *          the consumer key
-   * @param consumerSecret
-   *          the consumer secret
-   * @return the consumer details
-   */
-  private ExtraTrustConsumerDetails createConsumerDetails(String consumerName, String consumerKey,
-          String consumerSecret) {
-    SharedConsumerSecretImpl secret = new SharedConsumerSecretImpl(consumerSecret);
-    BaseConsumerDetails bcd = new BaseConsumerDetails();
-    bcd.setConsumerKey(consumerKey);
-    bcd.setConsumerName(consumerName);
-    bcd.setSignatureSecret(secret);
-    List<GrantedAuthority> authorities = new ArrayList<>();
-    authorities.add(new SimpleGrantedAuthority("ROLE_OAUTH_USER"));
-    bcd.setAuthorities(authorities);
-    bcd.setRequiredToObtainAuthenticatedToken(false); // false for 2 legged OAuth
-    return bcd;
+  public String getConsumerSecret(String consumerKey) {
+    return consumers.get(consumerKey);
   }
 
-  @Override
-  public ConsumerDetails loadConsumerByConsumerKey(String key) throws OAuthException {
-    logger.debug("Request received to find consumer for consumerKey=[" + key + "]");
-    ConsumerDetails consumer = consumers.get(key);
-    if (consumer == null) {
-      logger.debug("Result: No consumer found for [" + key + "]");
-      throw new OAuthException("No consumer found for key " + key);
-    }
-    logger.debug("Result: Found consumer [" + consumer.getConsumerName() + "]");
-    return consumer;
-  }
-
-  @Override
-  public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-    return delegate.loadUserByUsername(username);
-  }
 }

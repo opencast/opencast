@@ -23,7 +23,7 @@ package org.opencastporject.security.aai.utils;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertThrows;
 
 import org.opencastproject.security.aai.api.AttributeMapper;
 
@@ -31,8 +31,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.util.CollectionUtils;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +51,7 @@ public class AttributeMapperTest {
   public void testAttributeMapping() {
     Map<String, List<String>> attributes = new HashMap<String, List<String>>();
     attributes.put("eduPersonEntitlement",
-        CollectionUtils.arrayToList("octest1;octest2;urn:mace:wurst".split(";")));
+            Arrays.asList("octest1;octest2;urn:mace:wurst".split(";")));
     List<String> roles = attributeMapper.getMappedAttributes(attributes,
         "roles");
     assertNotNull(roles);
@@ -114,17 +114,13 @@ public class AttributeMapperTest {
     mockRequest.addHeader("eduPersonPrincipalName",
         "john.doe@example.org;ron.smith@example.org");
 
-    boolean thrown = false;
     List<String> displayName = attributeMapper.getMappedAttributes(mockRequest, "displayName");
     assertNotNull(displayName);
     assertEquals(1, displayName.size());
     assertEquals("John Doe", displayName.get(0));
     assertNotEquals("Charles", displayName.get(0));
-    try {
-      assertEquals("Charles", displayName.get(1));
-    } catch (ArrayIndexOutOfBoundsException e) {
-      thrown = true;
-    }
-    assertTrue(thrown);
+    assertThrows(IndexOutOfBoundsException.class, () -> {
+      displayName.get(1);
+    });
   }
 }
