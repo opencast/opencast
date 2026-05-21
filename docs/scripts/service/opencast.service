@@ -2,8 +2,10 @@
 Description=Opencast
 Documentation=https://docs.opencast.org
 
+Wants=network-online.target
+
 After=local-fs.target
-After=network.target
+After=network-online.target
 After=remote-fs.target
 
 [Service]
