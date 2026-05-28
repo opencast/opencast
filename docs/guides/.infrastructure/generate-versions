@@ -9,6 +9,13 @@ from jinja2 import Template
 RELEASE_URL = 'https://api.github.com/repos/opencast/opencast/releases'
 BRANCH_URL = 'https://api.github.com/repos/opencast/opencast/branches?per_page=100'
 
+def get_release_branches(page):
+    branches = requests.get(f"{BRANCH_URL}&page={page}").json()
+    branch_names = map(lambda x: x['name'], branches)
+    release_branches = filter(lambda x: x.startswith('r/') and x.endswith('.x') and not x.startswith('r/1.'),
+                             branch_names)
+    return len(branches), sorted(release_branches, reverse=True, key=lambda x: float(x.strip('r/.x')))
+
 
 def main():
     releases = requests.get(RELEASE_URL).json()
@@ -16,17 +23,22 @@ def main():
     stable = int(max(versions))
     stable_branch = f'r/{stable}.x'
 
-    branches = requests.get(BRANCH_URL).json()
-    branch_names = map(lambda x: x['name'], branches)
-    release_branchs = filter(lambda x: x.startswith('r/') and x.endswith('.x') and not x.startswith('r/1.'),
-                             branch_names)
-    release_branchs = sorted(release_branchs, reverse=True, key=lambda x: float(x.strip('r/.x')))
+    count = 100
+    page = 1
+    release_branches = []
+    while count == 100:
+        print(f"Getting page {page}")
+        unfiltered_count, current_page = get_release_branches(page)
+        count = unfiltered_count
+        release_branches = release_branches + current_page
+        print(f"Page is {current_page}")
+        page += 1
 
     version_info = [{
         'name': 'develop',
         'branch': 'develop',
         'attribute': ''}]
-    for branch in release_branchs:
+    for branch in release_branches:
         name = branch.split('/')[-1]
         attribute = None
         if branch == stable_branch:
