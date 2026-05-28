@@ -24,7 +24,8 @@
   workflows tagged with either "upload" or "schedule". Now if you are uploading, you only get workflows tagged with
   "upload". And if you are scheduling, you only get workflows tagged with "schedule". [[Admin Interface #1567](https://github.com/opencast/admin-interface/issues/1567)]
 - A new config option to filter available roles in the Admin UI access policy dropdowns was added. Allows you to
-  effectively remove catgories of roles (like ROLE_GROUP) from the dropdowns to make them more usable. [[Admin Interface #1561](https://github.com/opencast/admin-interface/issues/1561)]
+  effectively remove catgories of roles (like ROLE_GROUP) from the dropdowns to make them more usable.
+  [[Admin Interface #1561](https://github.com/opencast/admin-interface/issues/1561)]
   [[#7541](https://github.com/opencast/opencast/pull/7541)]
 - The editor thumbnail view has been improved. [[Editor #1663](https://github.com/opencast/editor/pull/1663)]
 
