@@ -23,6 +23,7 @@ package org.opencastproject.index.service.impl.util;
 
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.util.SecurityUtil;
@@ -33,7 +34,11 @@ import org.opencastproject.workflow.api.WorkflowListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public final class RetractionListener implements WorkflowListener {
   private final Logger logger = LoggerFactory.getLogger(RetractionListener.class);
@@ -60,27 +65,36 @@ public final class RetractionListener implements WorkflowListener {
     if (mediaPackage == null) {
       logger.warn("The retract workflow \"{}\" (id: {}, created by: {}) does not have a media package.",
               workflow.getTitle(), workflow.getId(), workflow.getCreatorName());
-    } else if (mediaPackage.getPublications() != null && mediaPackage.getPublications().length > 0) {
-      logger.warn("The retract workflow \"{}\" (id: {}, created by: {}, media package {}) "
-              + "has some non-retracted publications, refusing to orphan them. Remaining publications: {}",
-          workflow.getTitle(), workflow.getId(), workflow.getCreatorName(), mediaPackage.getIdentifier(),
-          mediaPackage.getPublications());
+
     } else {
-      final Retraction retraction = retractions.get(workflow.getId());
-      SecurityUtil.runAs(securityService, retraction.getOrganization(), retraction.getUser(), () -> {
-        final String mpId = mediaPackage.getIdentifier().toString();
-        try {
-          if (!indexService.removeEvent(mpId)) {
-            logger.warn("Could not delete retracted media package {}. removeEvent returned false.", mpId);
+      Set<Publication> filteredPublications = new HashSet<>();
+      if (mediaPackage.getPublications() != null) {
+        filteredPublications = Arrays.stream(mediaPackage.getPublications())
+            .filter(pub -> !pub.getChannel().equals(EventUtils.ENGAGE_LIVE_CHANNEL_ID))
+            .collect(Collectors.toSet());
+      }
+      if (!filteredPublications.isEmpty()) {
+        logger.warn("The retract workflow \"{}\" (id: {}, created by: {}, media package {}) "
+                + "has some non-retracted publications, refusing to orphan them. Remaining publications: {}",
+            workflow.getTitle(), workflow.getId(), workflow.getCreatorName(), mediaPackage.getIdentifier(),
+            filteredPublications);
+      } else {
+        final Retraction retraction = retractions.get(workflow.getId());
+        SecurityUtil.runAs(securityService, retraction.getOrganization(), retraction.getUser(), () -> {
+          final String mpId = mediaPackage.getIdentifier().toString();
+          try {
+            if (!indexService.removeEvent(mpId)) {
+              logger.warn("Could not delete retracted media package {}. removeEvent returned false.", mpId);
+            }
+          } catch (UnauthorizedException e) {
+            logger.warn("Not authorized to delete retracted media package {}", mpId);
+          } catch (NotFoundException e) {
+            logger.warn("Unable to delete retracted media package {} because it could not be found", mpId);
+          } catch (Exception e) {
+            logger.warn("Unable to delete retracted media package {}:", mpId, e);
           }
-        } catch (UnauthorizedException e) {
-          logger.warn("Not authorized to delete retracted media package {}", mpId);
-        } catch (NotFoundException e) {
-          logger.warn("Unable to delete retracted media package {} because it could not be found", mpId);
-        } catch (Exception e) {
-          logger.warn("Unable to delete retracted media package {}:", mpId, e);
-        }
-      });
+        });
+      }
     }
     retractions.remove(workflow.getId());
   }

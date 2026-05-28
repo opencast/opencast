@@ -1,4 +1,0 @@
-Remove jmx beans
-
-JMX beans seem to go unused and there are performance concerns surrounding the jmx statistics. Therefore they are removed, to make our code a little bit simpler.
-PR [[#7317](https://github.com/opencast/opencast/pull/7317)]

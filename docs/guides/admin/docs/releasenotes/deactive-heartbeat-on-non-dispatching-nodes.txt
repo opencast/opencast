@@ -1,5 +1,0 @@
-The configuration option "heartbeat.interval" was removed from
-
-etc/org.opencastproject.serviceregistry.impl.JobDispatcher.cfg
-
-Furthermore, only dispatching nodes will have a heartbeat from now on.

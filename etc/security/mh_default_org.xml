@@ -3,6 +3,10 @@
        xmlns:sec="http://www.springframework.org/schema/security"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd
+                           http://www.springframework.org/schema/util
+                           http://www.springframework.org/schema/util/spring-util-3.1.xsd
+                           http://www.springframework.org/schema/osgi
+                           http://www.springframework.org/schema/osgi/spring-osgi.xsd
                            http://www.springframework.org/schema/security
                            http://www.springframework.org/schema/security/spring-security.xsd">
 
@@ -157,6 +161,7 @@
     <sec:intercept-url pattern="/admin-ng/series/*/theme" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_SERIES_DETAILS_THEMES_EDIT')" />
     <sec:intercept-url pattern="/admin-ng/themes/*" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_THEMES_EDIT')" />
     <sec:intercept-url pattern="/admin-ng/users/*" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_USERS_EDIT')" />
+    <sec:intercept-url pattern="/admin-ng/users/password/*" method="PUT" access=hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
     <sec:intercept-url pattern="/admin-ng/user-settings/signature/*" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
     <sec:intercept-url pattern="/admin-ng/user-settings/setting/*" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
     <sec:intercept-url pattern="/admin-ng/adopter/**" method="PUT" access="hasRole('ROLE_ADMIN')" />
