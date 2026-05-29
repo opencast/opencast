@@ -1,5 +1,18 @@
 Opencast 18 Changelog
 ---------------------
+
+## Opencast 18.8 (2026-05-29)
+- [[#7637](https://github.com/opencast/opencast/pull/7637)] -
+  Automatically update the git submodules
+- [[#7626](https://github.com/opencast/opencast/pull/7626)] -
+  Fixing scale encoding profile
+- [[#7621](https://github.com/opencast/opencast/pull/7621)] -
+  Disable PMD in site reports
+- [[#7617](https://github.com/opencast/opencast/pull/7617)] -
+  Remove NPM builds from site builds.
+- [[#7616](https://github.com/opencast/opencast/pull/7616)] -
+  Switch to https submodules
+
 ## Opencast 18.7 (2026-04-13)
 - [[#7562](https://github.com/opencast/opencast/pull/7562)] -
   Update 18.x Editor

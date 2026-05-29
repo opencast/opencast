@@ -1,5 +1,11 @@
 # Opencast 18: Release Notes
 
+## Opencast 18.8
+
+This release includes a fix for an encoding profile used by [Opencast Studio](https://github.com/opencast/opencast/pull/7626) as well as some changes to how the editor, admin-ui and studio submodules are handled. 
+
+This release may mark the end of the Opencast 18 release schedule. If you haven't yet, consider updating to Opencast 19.x or 20.x for continuous support.
+
 ## Opencast 18.7
 
 This release updates the editor, the admin ui and the studio. It includes a fix for an issue where the
