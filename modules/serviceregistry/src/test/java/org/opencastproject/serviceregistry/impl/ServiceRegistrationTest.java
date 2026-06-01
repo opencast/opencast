@@ -218,7 +218,7 @@ public class ServiceRegistrationTest {
   }
 
   @Test
-  public void testScenarioManyJobsManyServices() throws Exception {
+  public void testScenarioManyJobsManyServicesWithErrorStates() throws Exception {
     Job job1Try1 = serviceRegistry.createJob(regType1Localhost.getHost(),
             regType1Localhost.getServiceType(), OPERATION_NAME_1, null, null, true, null);
     Job job1Try2 = serviceRegistry.createJob(regType1Localhost.getHost(),
@@ -236,6 +236,8 @@ public class ServiceRegistrationTest {
     Job job2Try3 = serviceRegistry.createJob(regType1Localhost.getHost(),
             regType1Localhost.getServiceType(), OPERATION_NAME_2, list, null, true, null);
     serviceRegistry.maxAttemptsBeforeErrorState = 0;
+    // With https://github.com/opencast/opencast/pull/7450, we disabled error states by default, so re-enable them
+    serviceRegistry.errorStatesEnabled = true;
     ServiceRegistrationJpaImpl updatedService1;
     ServiceRegistrationJpaImpl updatedService2;
     ServiceRegistrationJpaImpl updatedService3;
