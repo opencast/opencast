@@ -13,7 +13,7 @@ jobs:
     outputs:
       matrix: ${{ steps.generate.outputs.matrix }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - id: generate
         env:
@@ -34,7 +34,7 @@ jobs:
     strategy:
       matrix: ${{ fromJson(needs.determine-current-branches.outputs.matrix) }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: '${{ matrix.branch }}'
           submodules: 'recursive'
