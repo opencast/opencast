@@ -57,7 +57,7 @@ operations:
 
   # Encode to engage player preview images
   - id: image
-    if: NOT ${presentation/thumbnail_edited}
+    if: (NOT ${presentation/thumbnail_edited}) AND (NOT ${presentation_thumbnail_time_set})
     exception-handler-workflow: partial-error
     description: Creating player preview image for presentation video
     configurations:
@@ -66,6 +66,18 @@ operations:
       - target-tags: engage-download
       - encoding-profile: player-preview.http
       - time: 3
+
+  # Encode to engage player preview image but with timestamp from editor
+  - id: image
+    if: (NOT ${presentation/thumbnail_edited}) AND ${presentation_thumbnail_time_set}
+    exception-handler-workflow: partial-error
+    description: Creating player preview image for presentation video from editor timestamp
+    configurations:
+      - source-flavor: presentation/source
+      - target-flavor: presentation/player+preview
+      - target-tags: engage-download
+      - encoding-profile: player-preview.http
+      - time: ${presentation_thumbnail_time}
 
   - id: tag
     if: ${presentation/thumbnail_edited}
@@ -77,7 +89,7 @@ operations:
 
   # Create a cover image
   - id: image
-    if: NOT ${presenter/thumbnail_edited}
+    if: (NOT ${presenter/thumbnail_edited}) AND (NOT ${presenter_thumbnail_time_set})
     exception-handler-workflow: partial-error
     description: Creating player preview image for presenter video
     configurations:
@@ -86,6 +98,18 @@ operations:
       - target-tags: engage-download
       - encoding-profile: player-preview.http
       - time: 3
+
+  # Create a cover image but with timestamp from editor
+  - id: image
+    if: (NOT ${presenter/thumbnail_edited}) AND ${presenter_thumbnail_time_set}
+    exception-handler-workflow: partial-error
+    description: Creating player preview image for presenter video from editor timestamp
+    configurations:
+      - source-flavor: presenter/source
+      - target-flavor: presenter/player+preview
+      - target-tags: engage-download
+      - encoding-profile: player-preview.http
+      - time: ${presenter_thumbnail_time}
 
   - id: cover-image
     if: NOT (${presenter_work_video} OR ${presentation_work_video} OR ${presentation/thumbnail_edited}) AND (${presenter_work_audio} OR ${presentation_work_audio})

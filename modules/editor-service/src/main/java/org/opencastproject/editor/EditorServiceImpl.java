@@ -638,6 +638,22 @@ public class EditorServiceImpl implements EditorService {
               getThumbnailSubtype());
       String uri = track.getThumbnailURI();
 
+      // If thumbnail times, add workflow properties and be done
+      String time = track.getThumbnailTime();
+      if (time != null) {
+        WorkflowPropertiesUtil
+            .storeProperty(assetManager, mediaPackage,
+                flavor.getType() + "_thumbnail_time_set", "true");
+        WorkflowPropertiesUtil
+            .storeProperty(assetManager, mediaPackage,
+                flavor.getType() + "_thumbnail_time", time);
+        continue;
+      } else {
+        WorkflowPropertiesUtil
+            .storeProperty(assetManager, mediaPackage,
+                flavor.getType() + "_thumbnail_time_set", "false");
+      }
+
       // If no uri, what do?
       if (uri == null || uri.isEmpty()) {
         continue;
@@ -979,6 +995,18 @@ public class EditorServiceImpl implements EditorService {
             .map(property -> tuple(property.getA()[1], property.getA()[2]))
             .collect(Collectors.toSet());
 
+    final Map<String, String> thumbnailTimes = latestWfProperties.entrySet()
+        .stream()
+        .map(property -> tuple(property.getKey().split("_"), property.getValue()))
+        .filter(property -> property.getA().length == 3)
+        .filter(property -> property.getA()[1].equals("thumbnail"))
+        .filter(property -> property.getA()[2].equals("time"))
+        .map(property -> tuple(property.getA()[0], property.getB()))
+        .collect(Collectors.toMap(
+            property -> property.getA(),
+            property -> property.getB()
+        ));
+
     List<Track> trackList = Arrays.stream(internalPub.getTracks()).filter(this::elementHasPreviewTag)
             .collect(Collectors.toList());
     if (trackList.isEmpty()) {
@@ -1060,7 +1088,7 @@ public class EditorServiceImpl implements EditorService {
       }
 
       return new TrackData(track.getFlavor().getType(), track.getFlavor().getSubtype(), audio, video, uri,
-          track.getIdentifier(), thumbnailURI, priority);
+          track.getIdentifier(), thumbnailURI, priority, thumbnailTimes.get(track.getFlavor().getType()));
     }).collect(Collectors.toList());
 
     List<String> waveformList = Arrays.stream(internalPub.getAttachments())
