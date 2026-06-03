@@ -32,9 +32,9 @@
       "on_property": "mergedAt"
     },
     "template": "#{{CHANGELOG}}\n\n<details>\n<summary>Uncategorized</summary>\n\n#{{UNCATEGORIZED}}\n</details>",
-    "pr_template": "- #{{TITLE}}\n   - PR: ##{{NUMBER}}",
+    "pr_template": "- opencast/studio##{{NUMBER}} - #{{TITLE}}",
     "empty_template": "- no changes",
     "trim_values": false,
     "max_tags_to_fetch": 200,
-    "max_pull_requests": 200
+    "max_pull_requests": 500
 }
