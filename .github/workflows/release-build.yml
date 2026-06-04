@@ -50,6 +50,20 @@ jobs:
           echo "VERSION_MAIN=$GITHUB_REF"     | sed 's_refs/tags/\([0-9]*\).\([0-9]*\)$_\1_' >> $GITHUB_OUTPUT
           echo "VERSION_COMBINED=$GITHUB_REF" | sed 's_refs/tags/\([0-9]*\).\([0-9]*\)$_\1\2_' >> $GITHUB_OUTPUT
 
+      - name: Get the last tag version
+        id: get_last_version
+        run: |
+          #If this not an N.0 release
+          # Uses string comparison here because bash doesn't like 0.6 -ne 0
+          # complains about integer expressions being expected
+          if [ "$(echo ${{ steps.get_version.outputs.VERSION }} % 1 | bc)" != "0" ]; then
+            echo "LAST_VERSION=$( echo ${{ steps.get_version.outputs.VERSION }} - 0.1 | bc)"
+            echo "LAST_VERSION=$( echo ${{ steps.get_version.outputs.VERSION }} - 0.1 | bc)" >> $GITHUB_OUTPUT
+          else
+            echo "LAST_VERSION=$( echo ${{ steps.get_version.outputs.VERSION }} - 1 | bc)"
+            echo "LAST_VERSION=$( echo ${{ steps.get_version.outputs.VERSION }} - 1 | bc)" >> $GITHUB_OUTPUT
+          fi
+
       - name: changelog
         id: opencast_changelog
         uses: mikepenz/release-changelog-builder-action@348e88fab4c37338b1e803ceb2d4a7a5db6c0833 #6.2.2
@@ -57,6 +71,7 @@ jobs:
           configuration: ".github/changelog/opencast.json"
           owner: opencast
           repo: opencast
+          fromTag: ${{ steps.get_last_version.outputs.LAST_VERSION }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: changelog
@@ -66,6 +81,7 @@ jobs:
           configuration: ".github/changelog/admin-interface.json"
           owner: opencast
           repo: admin-interface
+          fromTag: ${{ steps.get_last_version.outputs.LAST_VERSION }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: changelog
@@ -75,6 +91,7 @@ jobs:
           configuration: ".github/changelog/editor.json"
           owner: opencast
           repo: editor
+          fromTag: ${{ steps.get_last_version.outputs.LAST_VERSION }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: changelog
@@ -84,6 +101,7 @@ jobs:
           configuration: ".github/changelog/studio.json"
           owner: opencast
           repo: studio
+          fromTag: ${{ steps.get_last_version.outputs.LAST_VERSION }}
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: create new release
