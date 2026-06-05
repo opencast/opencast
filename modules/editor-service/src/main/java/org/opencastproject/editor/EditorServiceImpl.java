@@ -128,7 +128,6 @@ import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import javax.ws.rs.HEAD;
 import javax.ws.rs.WebApplicationException;
 import javax.xml.bind.JAXBException;
 
