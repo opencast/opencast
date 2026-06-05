@@ -33,8 +33,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import javax.ws.rs.HEAD;
-
 /**
  * Provides access to the parsed editing information
  */
