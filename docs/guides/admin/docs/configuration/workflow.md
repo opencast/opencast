@@ -239,20 +239,50 @@ The attribute `if` specifies the execution condition in means of the operation o
 evaluates to true. You can find more details on conditional execution in the next section.
 
 Once the operation is configured to accept a variable, we need to describe how to gather the value from the
-administrative user. The `<configuration_panel_json>` element of a workflow definitions describes this user interface
+administrative user. The `configuration_panel_json` element of a workflow definitions describes this user interface
 snippet.  A simple configuration panel could look like this:
 
     configuration_panel_json: |-
-      <input id="someaction" name="someaction" type="checkbox" value="true" />
-      <label for="someaction">Execute some operation?</label>
+      [{
+        "fieldset": [{
+          "type": "checkbox",
+          "name": "someaction",
+          "label": "Execute some operation?",
+          "value": true
+        }]
+      }]
 
 
-The checkbox in this `<configuration_panel_json>` will now be displayed in the administrative tools, and the user's
+The checkbox in this `configuration_panel_json` will now be displayed in the administrative tools, and the user's
 selection will be used to replace the `${someaction}` variable in the workflow.
+
+The configuration panel json is an array of objects with these properties:
+- legend - title for the fieldset (optional)
+- fieldset - and array of user inputs
+
+The `fieldset` object can contain these properties:
+- type - input type, `checkbox|radiobox|text|number|datetime`
+- name - the variable name that will available to the workflow
+- label - the text displayed for this input
+- value - the intial value for this variable, if not defined some type will create a sensible default. Each input type uses different value types:
+  - checkbox - `true|false`
+  - radio - `"option"`, see options below
+  - text - `"any string"`
+  - number - `any number`, see min and max below
+  - datetime - `"YY-MM-DDTHH:MM:SS"`
+- min - define lower value limits for type `number`
+- max - define upper value limits for type `number`
+- options - define values for type `radio`
+  - label - display name
+  - value - option value
 
 This input can also be sent by capture agents, using the ingest endpoints. Please note that capture agents usually do
 not load the configuration panel. Hence defaults set in the user interface will not apply to ingests. To circumvent
 this, the [defaults operation](../workflowoperationhandlers/defaults-woh.md) can be used.
+
+NOTE: The old `configuration_panel` element defined the user input using HTML but is ignored by the new Admin UI. The
+old Admin UI was removed completely in v17.x and you will need to rewrite user input as JSON if updating from an earlier
+version.
 
 ## Organisation Properties
 
@@ -373,6 +403,11 @@ As an alternative to YAML workflow configuration files, it is possible to use XM
   <state-mappings>
     <state-mapping state=""></state-mapping>
   </state-mappings>
+
+  <!-- User Input -->
+  <configuration_panel_json>
+    ...
+  </configuration_panel_json>
 
   <!-- Operations -->
   <operations>
