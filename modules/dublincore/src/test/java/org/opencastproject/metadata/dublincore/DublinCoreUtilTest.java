@@ -20,9 +20,9 @@
  */
 package org.opencastproject.metadata.dublincore;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertThat;
 import static org.opencastproject.metadata.dublincore.TestUtil.read;
 
 import org.hamcrest.CustomTypeSafeMatcher;

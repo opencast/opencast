@@ -24,8 +24,8 @@ package org.opencastproject.index.service.catalog.adapter;
 import static junit.framework.TestCase.assertNotNull;
 import static junit.framework.TestCase.assertNull;
 import static junit.framework.TestCase.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.list.api.ListProviderException;

@@ -21,7 +21,7 @@
 
 package org.opencastproject.adminui.endpoint;
 
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;

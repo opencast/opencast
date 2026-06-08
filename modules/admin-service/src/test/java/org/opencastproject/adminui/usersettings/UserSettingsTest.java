@@ -21,7 +21,7 @@
 
 package org.opencastproject.adminui.usersettings;
 
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import org.opencastproject.adminui.endpoint.SeriesEndpointTest;
 import org.opencastproject.kernel.mail.EmailAddress;
