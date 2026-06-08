@@ -218,7 +218,7 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
 
   /** Number of failed jobs on a service before to set it in error state. -1 will disable error states completely. */
   protected int maxAttemptsBeforeErrorState = DEFAULT_MAX_ATTEMPTS_BEFORE_ERROR_STATE;
-  private boolean errorStatesEnabled = DEFAULT_ERROR_STATES_ENABLED;
+  protected boolean errorStatesEnabled = DEFAULT_ERROR_STATES_ENABLED;
 
   /** Services for which error state is disabled */
   private List<String> noErrorStateServiceTypes = new ArrayList<>();
@@ -2212,25 +2212,23 @@ public class ServiceRegistryJpaImpl implements ServiceRegistry, ManagedService {
         }
       }
 
-      // This is the first job with this signature failing on any service
-      else {
-        // Set the current service to WARNING state
-        if (currentService.getServiceState() == NORMAL) {
-          logger.info("State set to WARNING for current service {} on host {}", currentService.getServiceType(),
-                  currentService.getHost());
-          currentService.setServiceState(WARNING, job.toJob().getSignature());
-          updateServiceState(currentService);
-        }
-
-        // The current service already is in WARNING state and max attempts is reached
-        else if (errorStatesEnabled && !noErrorStateServiceTypes.contains(currentService.getServiceType())
-                && getHistorySize(currentService) >= maxAttemptsBeforeErrorState) {
-          logger.info("State set to ERROR for current service {} on host {}", currentService.getServiceType(),
-                  currentService.getHost());
-          currentService.setServiceState(ERROR, job.toJob().getSignature());
-          updateServiceState(currentService);
-        }
+      // Set the current service to WARNING state
+      if (currentService.getServiceState() == NORMAL) {
+        logger.info("State set to WARNING for current service {} on host {}", currentService.getServiceType(),
+                currentService.getHost());
+        currentService.setServiceState(WARNING, job.toJob().getSignature());
+        updateServiceState(currentService);
       }
+
+      // The current service already is in WARNING state and max attempts is reached
+      else if (errorStatesEnabled && !noErrorStateServiceTypes.contains(currentService.getServiceType())
+              && getHistorySize(currentService) >= maxAttemptsBeforeErrorState) {
+        logger.info("State set to ERROR for current service {} on host {}", currentService.getServiceType(),
+                currentService.getHost());
+        currentService.setServiceState(ERROR, job.toJob().getSignature());
+        updateServiceState(currentService);
+      }
+
     }
 
     // Job is finished without failure
