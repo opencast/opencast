@@ -26,6 +26,7 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler;
 
 import java.io.IOException;
 
@@ -36,8 +37,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Sends user directory provider to invalidate user cache and logs out.
  */
-public class LogoutSuccessHandler extends
-    org.springframework.security.web.authentication.logout.SimpleUrlLogoutSuccessHandler {
+public class LogoutSuccessHandler extends SimpleUrlLogoutSuccessHandler {
 
   /** The logger */
   private static final Logger logger = LoggerFactory.getLogger(LogoutSuccessHandler.class);

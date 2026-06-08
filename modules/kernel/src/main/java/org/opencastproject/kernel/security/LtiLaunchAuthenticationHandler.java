@@ -18,18 +18,12 @@
  * the License.
  *
  */
-
 package org.opencastproject.kernel.security;
 
-import org.springframework.security.authentication.RememberMeAuthenticationProvider;
+import org.springframework.security.core.Authentication;
 
-/**
- * Authentication provider based on the remember-me cookie.
- */
-public class SystemTokenBasedRememberMeAuthenticationProvider extends RememberMeAuthenticationProvider {
+import javax.servlet.http.HttpServletRequest;
 
-  public SystemTokenBasedRememberMeAuthenticationProvider(String key) {
-    super(SystemTokenRememberMeUtils.augmentKey(key));
-  }
-
+public interface LtiLaunchAuthenticationHandler {
+  Authentication createAuthentication(HttpServletRequest request);
 }

@@ -25,7 +25,6 @@ import static org.opencastproject.db.Queries.namedQuery;
 
 import org.opencastproject.db.DBSession;
 import org.opencastproject.db.DBSessionFactory;
-import org.opencastproject.kernel.security.CustomPasswordEncoder;
 import org.opencastproject.security.api.Group;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.RoleProvider;
@@ -51,6 +50,7 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -110,7 +110,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
   protected Object nullToken = new Object();
 
   /** Password encoder for storing user passwords */
-  private CustomPasswordEncoder passwordEncoder = new CustomPasswordEncoder();
+  private BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
 
   /** The factory used to generate the entity manager */
   protected EntityManagerFactory emf = null;
@@ -348,7 +348,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
     // Create a JPA user with an encoded password.
     String encodedPassword = passwordEncoded
         ? user.getPassword()
-        : passwordEncoder.encodePassword(user.getPassword());
+        : passwordEncoder.encode(user.getPassword());
 
     db.execTx(em -> {
       // Only save internal roles
@@ -418,7 +418,7 @@ public class JpaUserAndRoleProvider implements UserProvider, RoleProvider {
           if (passwordEncoded) {
             encodedPassword = user.getPassword();
           } else {
-            encodedPassword = passwordEncoder.encodePassword(user.getPassword());
+            encodedPassword = passwordEncoder.encode(user.getPassword());
           }
         }
 

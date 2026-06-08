@@ -8,6 +8,15 @@ LDAP Authentication and Authorization
 Security Configuration
 ----------------------
 
+
+Edit the `etc/org.opencastproject.kernel.security.SpringSecurityConfigurationArtifactInstaller.cfg`, adding all the expected ldap service configurations for each organization:
+
+```
+# ldap.instances.<organization_id>=<comma_separated_ldap_configuration_list>
+ldap.instances.mh_default_org=ldapinstance1,ldapinstance2
+```
+In the example above, _ldapinstance1_ and _ldapinstance1_ correspond to LDAP service instances configured in `etc/org.opencastproject.userdirectory.ldap-<ID>.cfg` (see _LDAP Service Configuration_ below).
+
 Edit the security configuration file at `etc/security/mh_default_org.xml`. In a multi-tenant set-up, you will have one
 configuration file for each tenant at `etc/security/<organization_id>.xml`.
 
@@ -78,14 +87,10 @@ Both methods are not mutually exclusive – i.e. both can be activated at the sa
 is uncommented in the sample file because it is the most usual.
 
 
-Next, uncomment the reference to Opencast's LDAP OSGI service, making sure to set the correct `instanceId` which needs
-to match the one used later in the LDAP service configuration.
+Next, make sure to name the LDAP authorities populator(s) passed to the
+LdapAuthenticationProvider(s) as a constructor parameter following this
+convention: `ldapAuthoritiesPopulator_<ID>`, where ID needs to match the one used later in the LDAP service configuration.
 
-```xml
-<osgi:reference id="authoritiesPopulator" cardinality="1..1"
-                interface="org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator"
-                filter="(instanceId=theId)"/>
-```
 
 Finally, enable the authentication provider by uncommenting:
 
@@ -172,7 +177,10 @@ at the bottom of the file. Please see the example below:
     </bean>
   </constructor-arg>
   <!-- Defines how the user attributes are converted to authorities (roles) -->
-  <constructor-arg ref="authoritiesPopulator" />
+  <!-- Note that <ID> must match one of the LDAP service configurations -->
+  <!-- defined in etc/org.opencastproject.userdirectory.ldap-<ID>.cfg -->
+  <!-- constructor-arg ref="ldapAuthoritiesPopulator_<ID>" /-->
+  <constructor-arg ref="ldapAuthoritiesPopulator_theId" />
 </bean>
 
 <!-- PLEASE NOTE: The ID below must be changed for each context source instance -->
@@ -200,7 +208,7 @@ at the bottom of the file. Please see the example below:
       <bean name="filterUserSearch" class="org.springframework.security.ldap.search.FilterBasedLdapUserSearch">
         <constructor-arg index="0" value="ou=OtherGroup,dc=my-other-institution,dc=other-country" />
         <constructor-arg index="1" value="(uid={0})" />
-             <!-- PLEASE NOTE: the ref below must match the corresponding context source ID -->
+        <!-- PLEASE NOTE: the ref below must match the corresponding context source ID -->
         <constructor-arg ref="contextSource2" />
          </bean>
        </property>
@@ -208,17 +216,11 @@ at the bottom of the file. Please see the example below:
   </constructor-arg>
   <!-- Defines how the user attributes are converted to authorities (roles) -->
   <!-- PLEASE NOTE: the ref below must match the corresponding authoritiesPopulator -->
-  <constructor-arg ref="authoritiesPopulator2" />
+  <!-- Note that <ID> must match one of the LDAP service configurations -->
+  <!-- defined in etc/org.opencastproject.userdirectory.ldap-<ID>.cfg -->
+  <!-- constructor-arg ref="ldapAuthoritiesPopulator_<ID>" /-->
+  <constructor-arg ref="ldapAuthoritiesPopulator_theId2" />
 </bean>
-
-<!-- [ ... SKIPPED LINES ... ] -->
-
-<osgi:reference id="authoritiesPopulator" cardinality="1..1"
-                interface="org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator"
-                filter="(instanceId=theId)"/>
-<osgi:reference id="authoritiesPopulator2" cardinality="1..1"
-                interface="org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator"
-                filter="(instanceId=theId2)"/>
 
 <!-- [ ... SKIPPED LINES ... ] -->
 

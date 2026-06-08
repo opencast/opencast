@@ -2,6 +2,7 @@
 <features name="opencast-${project.version}" xmlns="http://karaf.apache.org/xmlns/features/v1.3.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://karaf.apache.org/xmlns/features/v1.3.0">
 
   <repository>mvn:org.apache.aries.jax.rs/org.apache.aries.jax.rs.features/2.0.2/xml</repository>
+  <repository>mvn:org.apache.karaf.features/spring-legacy/4.4.7/xml/features</repository>
 
   <feature name="opencast-jax-rs-whiteboard" description="Aries JAX-RS Whiteboard" version="${project.version}">
     <feature>cxf-rs-description-openapi-v3</feature>
@@ -15,6 +16,7 @@
     <feature>http-whiteboard</feature>
     <feature>pax-web-http-whiteboard</feature>
     <feature>scr</feature>
+    <feature>cxf</feature>
     <feature>cxf-jaxrs</feature>
     <feature>cxf-http-jetty</feature>
     <feature>opencast-jax-rs-whiteboard</feature>
@@ -68,6 +70,10 @@
     <bundle>wrap:mvn:com.googlecode.json-simple/json-simple/${json-simple.version}</bundle>
     <bundle>wrap:mvn:com.cronutils/cron-utils/9.2.1</bundle>
 
+    <!-- Used by the Lti filter -->
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.oauth-provider/20100527_1</bundle>
+    <bundle>wrap:mvn:org.imsglobal/basiclti-util/1.2.0</bundle>
+
     <!-- AWS Bits -->
     <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/${jackson.version}</bundle>
     <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/${jackson.version}</bundle>
@@ -75,23 +81,13 @@
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.aws-java-sdk/${aws.version}</bundle>
 
     <!-- Spring Framework / Security -->
-    <bundle>mvn:org.springframework.ldap/org.springframework.ldap/1.3.1.RELEASE</bundle>
-    <bundle>mvn:org.springframework.osgi/spring-osgi-core/1.2.1</bundle>
-    <bundle>mvn:org.springframework.osgi/spring-osgi-extender/1.2.1</bundle>
-    <bundle>mvn:org.springframework.osgi/spring-osgi-io/1.2.1</bundle>
-    <bundle>mvn:org.springframework.security/spring-security-config/${spring-security.version}</bundle>
-    <bundle>mvn:org.springframework.security/spring-security-core/${spring-security.version}</bundle>
-    <bundle>mvn:org.springframework.security/spring-security-ldap/${spring-security.version}</bundle>
-    <bundle>mvn:org.springframework.security/spring-security-web/${spring-security.version}</bundle>
-    <bundle>mvn:org.springframework/spring-aop/${spring.version}</bundle>
-    <bundle>mvn:org.springframework/spring-asm/${spring.version}</bundle>
-    <bundle>mvn:org.springframework/spring-beans/${spring.version}</bundle>
-    <bundle>mvn:org.springframework/spring-context-support/${spring.version}</bundle>
-    <bundle>mvn:org.springframework/spring-context/${spring.version}</bundle>
-    <bundle>mvn:org.springframework/spring-core/${spring.version}</bundle>
-    <bundle>mvn:org.springframework/spring-expression/${spring.version}</bundle>
-    <bundle>mvn:org.springframework/spring-tx/${spring.version}</bundle>
-    <bundle>mvn:org.springframework/spring-web/${spring.version}</bundle>
+    <!-- Karaf 4.4.7 loads Spring 6 by default so we get Spring 5 from the legacy repo. -->
+    <feature version="[5.3.39,5.4)">spring</feature>
+    <feature version="[5.7.12,5.8)">spring-security</feature>
+
+    <!-- Spring Security 5: LDAP has NOT been tested -->
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.spring-security-ldap/${spring-security-ldap.version}</bundle>
+    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.spring-ldap/2.4.1_1</bundle>
 
     <bundle>mvn:com.nimbusds/nimbus-jose-jwt/10.4.2</bundle>
     <bundle>wrap:mvn:com.google.crypto.tink/tink/1.16.0$Bundle-SymbolicName=com.google.crypto.tink;Bundle-Version=1.16.0</bundle>
@@ -626,15 +622,16 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-workflow-service-remote/${project.version}</bundle>
   </feature>
 
+  <!-- This is included in the etc/org.apache.karaf.features.cfg generated from
+       assemblies/dist-xxx/pom.xml -->
   <feature name="opencast-security-cas" version="${project.version}">
-    <bundle start-level="82">mvn:commons-collections/commons-collections/3.2.1</bundle>
-    <bundle start-level="82">mvn:org.apache.velocity/velocity/1.7</bundle>
-    <bundle start-level="82">mvn:org.apache.santuario/xmlsec/${xmlsec.version}</bundle>
-    <bundle start-level="82">mvn:org.bouncycastle/bcprov-jdk15on/1.51</bundle>
+    <!-- Picked the same version used by karaf in the 'shell' feature -->
+    <bundle start-level="82">mvn:org.bouncycastle/bcutil-jdk18on/1.78.1</bundle>
+    <bundle start-level="82">mvn:org.bouncycastle/bcprov-jdk18on/1.78.1</bundle>
+    <bundle start-level="82">mvn:org.bouncycastle/bcpkix-jdk18on/1.78.1</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-security-cas-client-wrapper/${project.version}</bundle>
-    <bundle start-level="82">mvn:org.springframework.security/spring-security-core/3.1.7.RELEASE</bundle>
-    <bundle start-level="82">mvn:org.springframework.security/spring-security-web/3.1.7.RELEASE</bundle>
-    <bundle start-level="82">mvn:org.springframework.security/spring-security-cas/3.1.7.RELEASE</bundle>
+    <bundle start-level="82">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.spring-security-cas/5.7.12_4</bundle>
+    <bundle start-level="82">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.ehcache/2.6.11_1</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-security-cas/${project.version}</bundle>
   </feature>
 

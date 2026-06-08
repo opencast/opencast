@@ -42,6 +42,9 @@
     <jackson.version>2.17.2</jackson.version>
     <jakarta.mail.version>1.6.7</jakarta.mail.version>
     <java.release>21</java.release>
+    <jakarta.activation.version>1.2.1</jakarta.activation.version>
+    <jakarta.annotation.version>1.3.5</jakarta.annotation.version>
+    <jakarta.xml-bind.version>2.3.3</jakarta.xml-bind.version>
     <jersey.version>2.29.1</jersey.version>
     <jettison.version>1.5.4</jettison.version>
     <joda-time.version>2.14.0</joda-time.version>
@@ -62,8 +65,10 @@
     <org.osgi.service.configurator.version>1.0.1</org.osgi.service.configurator.version>
     <org.osgi.service.metatype.annotations.version>1.4.1</org.osgi.service.metatype.annotations.version>
     <rest-assured.version>4.4.0</rest-assured.version>
-    <spring.version>3.1.4.RELEASE</spring.version>
-    <spring-security.version>3.1.7.RELEASE</spring-security.version>
+    <spring.version>5.3.39</spring.version>
+    <spring-security.version>5.7.12</spring-security.version>
+    <spring-security-cas.version>5.7.12_4</spring-security-cas.version>
+    <spring-security-ldap.version>5.8.6_1</spring-security-ldap.version>
     <xmlsec.version>2.2.6</xmlsec.version>
   </properties>
   <modules>
@@ -945,7 +950,7 @@
       <dependency>
         <groupId>jakarta.xml.bind</groupId>
         <artifactId>jakarta.xml.bind-api</artifactId>
-        <version>2.3.3</version>
+        <version>${jakarta.xml-bind.version}</version>
       </dependency>
       <dependency>
         <groupId>jakarta.xml.ws</groupId>
@@ -965,12 +970,12 @@
       <dependency>
         <groupId>jakarta.activation</groupId>
         <artifactId>jakarta.activation-api</artifactId>
-        <version>1.2.1</version>
+        <version>${jakarta.activation.version}</version>
       </dependency>
       <dependency>
         <groupId>jakarta.annotation</groupId>
         <artifactId>jakarta.annotation-api</artifactId>
-        <version>1.3.5</version>
+        <version>${jakarta.annotation.version}</version>
       </dependency>
       <dependency>
         <groupId>com.sun.mail</groupId>
@@ -1067,27 +1072,22 @@
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
+        <artifactId>spring-jcl</artifactId>
+        <version>${spring.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
         <artifactId>spring-web</artifactId>
         <version>${spring.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.springframework.osgi</groupId>
-        <artifactId>org.springframework.osgi.io</artifactId>
-        <version>1.2.1</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework.osgi</groupId>
-        <artifactId>org.springframework.osgi.core</artifactId>
-        <version>1.2.1</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework.osgi</groupId>
-        <artifactId>org.springframework.osgi.extender</artifactId>
-        <version>1.2.1</version>
+        <groupId>org.springframework.security</groupId>
+        <artifactId>spring-security-core</artifactId>
+        <version>${spring-security.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.security</groupId>
-        <artifactId>spring-security-core</artifactId>
+        <artifactId>spring-security-crypto</artifactId>
         <version>${spring-security.version}</version>
       </dependency>
       <dependency>
@@ -1101,14 +1101,9 @@
         <version>${spring-security.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.springframework.security.oauth</groupId>
-        <artifactId>spring-security-oauth</artifactId>
-        <version>2.3.7.RELEASE</version>
-      </dependency>
-      <dependency>
-        <groupId>org.springframework.security</groupId>
-        <artifactId>spring-security-cas</artifactId>
-        <version>${spring-security.version}</version>
+        <groupId>org.apache.servicemix.bundles</groupId>
+        <artifactId>org.apache.servicemix.bundles.spring-security-cas</artifactId>
+        <version>${spring-security-cas.version}</version>
       </dependency>
       <dependency>
         <groupId>org.springframework.security</groupId>
@@ -1116,19 +1111,9 @@
         <version>${spring-security.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.apache.velocity</groupId>
-        <artifactId>velocity</artifactId>
-        <version>1.7</version>
-      </dependency>
-      <dependency>
         <groupId>org.apache.santuario</groupId>
         <artifactId>xmlsec</artifactId>
         <version>${xmlsec.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.owasp.esapi</groupId>
-        <artifactId>esapi</artifactId>
-        <version>2.7.0.0</version>
       </dependency>
       <dependency>
         <groupId>org.opensaml</groupId>
@@ -1138,7 +1123,7 @@
       <dependency>
         <groupId>org.jasig.cas.client</groupId>
         <artifactId>cas-client-core</artifactId>
-        <version>3.3.3</version>
+        <version>3.6.4</version>
       </dependency>
       <dependency>
         <groupId>org.apache.servicemix.bundles</groupId>
@@ -1324,11 +1309,6 @@
         <groupId>com.mchange</groupId>
         <artifactId>c3p0</artifactId>
         <version>0.9.5.5</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.servicemix.bundles</groupId>
-        <artifactId>org.apache.servicemix.bundles.xalan</artifactId>
-        <version>2.7.3_3</version>
       </dependency>
       <dependency>
         <groupId>com.google.code.gson</groupId>
