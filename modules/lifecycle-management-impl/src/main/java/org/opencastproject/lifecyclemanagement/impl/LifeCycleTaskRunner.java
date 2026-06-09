@@ -53,12 +53,12 @@ import com.google.gson.Gson;
 
 import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
-import org.osgi.framework.BundleContext;
 import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
+import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,13 +78,13 @@ import java.util.concurrent.TimeUnit;
  */
 @Component(
     immediate = true,
-    service = { LifeCycleTaskRunner.class, ManagedService.class},
+    service = { LifeCycleTaskRunner.class},
     property = {
         "service.description=LifeCycle Management Task Runner",
         "service.pid=org.opencastproject.lifecyclemanagement.LifeCycleTaskRunner"
     }
 )
-public class LifeCycleTaskRunner implements ManagedService {
+public class LifeCycleTaskRunner {
   /** Logging facility */
   private static final Logger logger = LoggerFactory.getLogger(LifeCycleTaskRunner.class);
   private static final Gson gson = new Gson();
@@ -144,18 +144,24 @@ public class LifeCycleTaskRunner implements ManagedService {
   }
 
   @Activate
-  public void activate(BundleContext ctx) {
+  public void activate(ComponentContext cc) throws ConfigurationException {
     logger.info("Activating LifeCycle Management Task Runner.");
     this.defaultOrganization = new DefaultOrganization();
-    String systemAdminUserName = ctx.getProperty(SecurityUtil.PROPERTY_KEY_SYS_USER);
+    String systemAdminUserName = cc.getBundleContext().getProperty(SecurityUtil.PROPERTY_KEY_SYS_USER);
     this.systemAdminUser = SecurityUtil.createSystemUser(systemAdminUserName, defaultOrganization);
 
     scheduledExecutor = Executors.newScheduledThreadPool(1);
     scheduledExecutor.scheduleWithFixedDelay(new LifeCycleTaskRunner.Runner(), 10, 5,
         TimeUnit.SECONDS);
+
+    updated(cc.getProperties());
   }
 
-  @Override
+  @Modified
+  public void modified(ComponentContext cc) throws ConfigurationException {
+    updated(cc.getProperties());
+  }
+
   public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
     if (properties == null) {
       return;
