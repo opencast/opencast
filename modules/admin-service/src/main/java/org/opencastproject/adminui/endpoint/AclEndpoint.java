@@ -316,9 +316,12 @@ public class AclEndpoint {
       jsonRole.put("organization", role.getOrganizationId());
       jsonRole.put("isSanitize", isSanitize());
       if (!isSanitize()) {
+        boolean isUserRole = role.getName().startsWith(getUserRolePrefix());
         User user = userDirectoryService.loadUser(role.getName().replaceFirst(getUserRolePrefix(), ""));
         if (user != null) {
           jsonRole.put("user", generateJsonUser(user));
+        } else if (isUserRole) {
+          jsonRole.put("user", new HashMap<String, Object>());
         }
       }
       jsonRoles.add(jsonRole);
