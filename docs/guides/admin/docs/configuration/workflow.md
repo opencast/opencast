@@ -259,17 +259,18 @@ selection will be used to replace the `${someaction}` variable in the workflow.
 The configuration panel json is an array of objects with these properties:
 - legend - title for the fieldset (optional)
 - fieldset - and array of user inputs
+- description - additional information (optional)
 
 The `fieldset` object can contain these properties:
-- type - input type, `checkbox|radiobox|text|number|datetime`
-- name - the variable name that will available to the workflow
+- type - input type, `checkbox|radio|text|number|datetime`
+- name - the variable name that will be available to the workflow
 - label - the text displayed for this input
-- value - the intial value for this variable, if not defined some type will create a sensible default. Each input type uses different value types:
+- value - the initial value for this variable, if not defined some type will create a sensible default. Each input type uses different value types:
   - checkbox - `true|false`
   - radio - `"option"`, see options below
   - text - `"any string"`
   - number - `any number`, see min and max below
-  - datetime - `"YY-MM-DDTHH:MM:SS"`
+  - datetime-local - `"YY-MM-DDTHH:MM:SS"`
 - min - define lower value limits for type `number`
 - max - define upper value limits for type `number`
 - options - define values for type `radio`
