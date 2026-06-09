@@ -142,12 +142,7 @@ directly in the Opencast administrative user interface.
 
 **LifeCycle Management API**
 
-| ROLE                             | METHOD | URL                       |
-|----------------------------------|--------|---------------------------|
-| ROLE_API_LIFECYCLE_POLICY_CREATE | POST   | /api/lifecyclemanagement  |
-| ROLE_API_LIFECYCLE_POLICY_VIEW   | GET    | /api/lifecyclemanagement  |
-| ROLE_API_LIFECYCLE_POLICY_EDIT   | POST   | /api/lifecyclemanagement  |
-| ROLE_API_LIFECYCLE_POLICY_DELETE | DELETE | /api/lifecyclemanagement  |
+Currently restricted to administrators only.
 
 **User- and Role-switching**
 

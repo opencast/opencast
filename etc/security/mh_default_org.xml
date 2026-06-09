@@ -257,7 +257,7 @@
     <sec:intercept-url pattern="/api/events/*/scheduling" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_EVENTS_SCHEDULING_EDIT')" />
     <sec:intercept-url pattern="/api/events/*/track" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_EVENTS_TRACK_EDIT')" />
     <sec:intercept-url pattern="/api/groups/*" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_GROUPS_EDIT')" />
-    <sec:intercept-url pattern="/api/lifecyclemanagement/policies/*" method="PUT" access="hasAnyRole(ROLE_ADMIN, ROLE_API_LIFECYCLE_POLICY_EDIT)"/>
+    <sec:intercept-url pattern="/api/lifecyclemanagement/policies/*" method="PUT" access="hasAnyRole(ROLE_ADMIN)"/>
     <sec:intercept-url pattern="/api/playlists/*" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_PLAYLISTS_CREATE', 'ROLE_API_PLAYLISTS_EDIT')" />
     <sec:intercept-url pattern="/api/series/*" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_SERIES_EDIT')" />
     <sec:intercept-url pattern="/api/series/*/acl" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_SERIES_ACL_EDIT')" />
@@ -272,7 +272,7 @@
     <sec:intercept-url pattern="/api/groups" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_GROUPS_CREATE')" />
     <sec:intercept-url pattern="/api/groups/*/members" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_GROUPS_EDIT')" />
     <sec:intercept-url pattern="/api/clearIndex" method="POST" access="hasRole('ROLE_ADMIN')"/>
-    <sec:intercept-url pattern="/api/lifecyclemanagement/policies/*" method="POST" access="hasAnyRole(ROLE_ADMIN, ROLE_API_LIFECYCLE_POLICY_CREATE)"/>
+    <sec:intercept-url pattern="/api/lifecyclemanagement/policies/*" method="POST" access="hasAnyRole(ROLE_ADMIN)"/>
     <sec:intercept-url pattern="/api/recreateIndex" method="POST" access="hasRole('ROLE_ADMIN')"/>
     <sec:intercept-url pattern="/api/recreateIndex/*" method="POST" access="hasRole('ROLE_ADMIN')"/>
     <sec:intercept-url pattern="/api/playlists/*" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_PLAYLISTS_CREATE', 'ROLE_API_PLAYLISTS_EDIT')" />
@@ -289,7 +289,7 @@
     <sec:intercept-url pattern="/api/events/*/metadata/*" method="DELETE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_EVENTS_METADATA_DELETE')" />
     <sec:intercept-url pattern="/api/groups/*" method="DELETE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_GROUPS_DELETE')" />
     <sec:intercept-url pattern="/api/groups/*/members/*" method="DELETE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_GROUPS_EDIT')" />
-    <sec:intercept-url pattern="/api/lifecyclemanagement/policies/*" method="DELETE" access="hasAnyRole(ROLE_ADMIN, ROLE_API_LIFECYCLE_POLICY_DELETE)"/>
+    <sec:intercept-url pattern="/api/lifecyclemanagement/policies/*" method="DELETE" access="hasAnyRole(ROLE_ADMIN)"/>
     <sec:intercept-url pattern="/api/playlists/*" method="DELETE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_PLAYLISTS_DELETE')" />
     <sec:intercept-url pattern="/api/series/*" method="DELETE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_SERIES_DELETE')" />
     <sec:intercept-url pattern="/api/series/*/metadata" method="DELETE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_SERIES_METADATA_DELETE')" />
