@@ -462,16 +462,7 @@ public class LifeCycleServiceImpl implements LifeCycleService {
 
   /**
    * {@inheritDoc}
-   * @see LifeCycleService#filterForEvents(Map)
-   */
-  public List<Event> filterForEvents(Map<String, Map<String, EventSearchQueryField<String>>> filters)
-          throws SearchIndexException, NotFoundException {
-    return filterForEvents(filters, 0, 0);
-  }
-
-  /**
-   * {@inheritDoc}
-   * @see LifeCycleService#filterForEvents(Map)
+   * @see LifeCycleService#filterForEvents(Map, int, int)
    */
   public List<Event> filterForEvents(Map<String, Map<String, EventSearchQueryField<String>>> filters, int limit,
       int offset)

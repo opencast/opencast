@@ -331,12 +331,22 @@ public class LifeCycleManagementEndpoint {
       pathParameters = {
           @RestParameter(name = "eventId", isRequired = true, description = "The lifecycle policy identifier",
               type = STRING),
+          @RestParameter(name = "limit", description = "The maximum number of results to return for a single request.",
+              isRequired = false, type = RestParameter.Type.INTEGER),
+          @RestParameter(name = "offset", description = "The index of the first result to return.", isRequired = false,
+              type = RestParameter.Type.INTEGER)
       },
       responses = {
           @RestResponse(description = "Returns the lifecycle policies.", responseCode = HttpServletResponse.SC_OK),
       })
-  public Response getPoliciesForEvent(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String eventId)
+  public Response getPoliciesForEvent(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String eventId,
+      @QueryParam("limit") int limit, @QueryParam("offset") int offset)
           throws SearchIndexException, NotFoundException {
+    // Set default limit if necessary
+    if (limit < 1) {
+      limit = 100;
+    }
+
     // Create a filter with the event id
     var eventFilter = new EventSearchQueryField(eventId);
 
@@ -351,7 +361,7 @@ public class LifeCycleManagementEndpoint {
       targetFilters
           .computeIfAbsent(catalogFlavor, k -> new HashMap<>())
           .put("uid", eventFilter);
-      var events = service.filterForEvents(targetFilters);
+      var events = service.filterForEvents(targetFilters, limit, offset);
       if (!events.isEmpty()) {
         policiesForEvent.add(policy);
       }
