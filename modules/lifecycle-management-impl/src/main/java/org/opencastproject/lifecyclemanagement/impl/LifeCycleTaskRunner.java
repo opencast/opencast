@@ -194,7 +194,7 @@ public class LifeCycleTaskRunner implements ManagedService {
           try {
             tasks = lifeCycleService.getLifeCycleTasksWithStatus(Status.SCHEDULED);
           } catch (NullPointerException e) {
-            logger.info("Could not get lifecycle tasks in status 'SCHEDULED' from service: ", e);
+            logger.warn("Could not get lifecycle tasks in status 'SCHEDULED' from service: ", e);
             return;
           }
 
@@ -203,7 +203,7 @@ public class LifeCycleTaskRunner implements ManagedService {
           try {
             numberOfRunningTasks = lifeCycleService.getLifeCycleTasksWithStatus(Status.STARTED).size();
           } catch (NullPointerException e) {
-            logger.info("Could not get lifecycle tasks in status 'STARTED' from service: ", e);
+            logger.warn("Could not get lifecycle tasks in status 'STARTED' from service: ", e);
             return;
           }
 
@@ -211,6 +211,8 @@ public class LifeCycleTaskRunner implements ManagedService {
           for (LifeCycleTask task : tasks) {
             // Prevent too many tasks from running at the same time to avoid system overload
             if (numberOfRunningTasks > maxConcurrentTasks) {
+              logger.debug("The number of running tasks is too high at " + numberOfRunningTasks + ". Not starting more "
+                  + "tasks until it lowers below " + maxConcurrentTasks + ".");
               break;
             }
             // Check action and do action related things
@@ -242,7 +244,7 @@ public class LifeCycleTaskRunner implements ManagedService {
           try {
             tasks = lifeCycleService.getLifeCycleTasksWithStatus(Status.STARTED);
           } catch (NullPointerException e) {
-            logger.info("Could not get lifecycle tasks in status 'STARTED' from service: ", e);
+            logger.warn("Could not get lifecycle tasks in status 'STARTED' from service: ", e);
             return;
           }
 
@@ -401,11 +403,12 @@ public class LifeCycleTaskRunner implements ManagedService {
       event = indexService.getEvent(mediaPackageId, elasticsearchIndex);
 
       if (event.isEmpty()) {
-        throw new IllegalArgumentException("Event for given id " + mediaPackageId + " does not exist.");
+        logger.info("Event for given id " + mediaPackageId + " does not exist.");
+        return;
       }
 
       IndexService.EventRemovalResult result = indexService.removeEvent(event.get(), retractWorkflowId);
-      if (result.SUCCESS == IndexService.EventRemovalResult.SUCCESS) {
+      if (result.SUCCESS != IndexService.EventRemovalResult.GENERAL_FAILURE) {
         task.setStatus(Status.FINISHED);
       } else {
         task.setStatus(Status.FAILED);

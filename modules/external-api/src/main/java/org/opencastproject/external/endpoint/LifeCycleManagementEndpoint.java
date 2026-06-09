@@ -544,7 +544,8 @@ public class LifeCycleManagementEndpoint {
           @RestResponse(description = "Policy updated.", responseCode = HttpServletResponse.SC_OK),
           @RestResponse(description = "The user doesn't have the rights to make this request.",
               responseCode = HttpServletResponse.SC_FORBIDDEN),
-          @RestResponse(description = "The request is invalid or inconsistent.",
+          @RestResponse(description = "The request is invalid or inconsistent. Will also occur if the policy was "
+              + "created from configuration.",
               responseCode = HttpServletResponse.SC_BAD_REQUEST),
       })
   public Response updateAsJson(

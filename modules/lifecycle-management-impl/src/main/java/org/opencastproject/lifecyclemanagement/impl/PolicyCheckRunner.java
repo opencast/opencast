@@ -171,7 +171,7 @@ public class PolicyCheckRunner {
                             entityIds.add(event.getIdentifier());
                           }
                           offset += eventQueryLimit;
-                        } while (events.size() >= eventQueryLimit);
+                        } while (!(events.size() < eventQueryLimit));
                       }
                       default -> throw new NotImplementedException();
                     }
