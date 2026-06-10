@@ -21,8 +21,8 @@
 
 package org.opencastproject.job.api;
 
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertThat;
 import static org.opencastproject.util.IoSupport.loadFileFromClassPathAsString;
 import static org.opencastproject.util.data.Tuple.tuple;
 import static org.xmlmatchers.XmlMatchers.similarTo;

@@ -26,7 +26,7 @@ import static org.easymock.EasyMock.expect;
 import static org.easymock.EasyMock.getCurrentArguments;
 import static org.hamcrest.CoreMatchers.allOf;
 import static org.hamcrest.CoreMatchers.equalTo;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.opencastproject.db.DBTestEnv.newDBSession;
 import static org.opencastproject.metadata.dublincore.EncodingSchemeUtils.encodeDate;
 import static org.opencastproject.security.util.SecurityUtil.createSystemUser;
