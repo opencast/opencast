@@ -150,18 +150,20 @@ The LiveScheduleService will generate a media package with two live tracks havin
 
 When scheduling a live event via the admin UI, the workflow needs to have the _publishLive_ configuration set to true
 (this is already included in the sample workflows).
-If not using the sample Opencast workflows, add to the `<configuration_panel_json>`:
+If not using the sample Opencast workflows, add to the `configuration_panel_json`:
 
-```
-        <fieldset>
-          <legend>Publish live stream:</legend>
-          <ul>
-            <li>
-              <input id="publishLive" name="publishLive" type="checkbox" class="configField" value="false" />
-              <label for="publishLive">Add live event to Opencast Media Module</label>
-            </li>
-          </ul>
-        </fieldset>
+```json
+  {
+    "legend": "Publish live stream",
+    "fieldset": [
+      {
+        "type": "checkbox",
+        "name": "publishLive",
+        "label": "Add live event to Opencast Media Module",
+        "value": false
+      }
+    ]
+  }
 ```
 
 And to the _defaults_ operation:
