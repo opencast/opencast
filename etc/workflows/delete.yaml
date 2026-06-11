@@ -24,6 +24,8 @@ operations:
   - id: snapshot
     exception-handler-workflow: partial-error
     description: Archiving state of retracted recording
+    configurations:
+      - source-tags: nonexisting-tag # only update publication info
 
   - id: cleanup
     fail-on-error: false
