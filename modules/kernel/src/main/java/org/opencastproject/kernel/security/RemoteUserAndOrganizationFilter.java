@@ -125,7 +125,7 @@ public class RemoteUserAndOrganizationFilter implements Filter {
 
       // See if there is an organization provided in the request
       String organizationHeader = httpRequest.getHeader(ORGANIZATION_HEADER);
-      if (StringUtils.isNotBlank(organizationHeader)) {
+      if (StringUtils.isNotBlank(organizationHeader) && !organizationHeader.equals(originalOrganization.getId())) {
 
         // Organization switching is only allowed if the request is coming in with the global admin role enabled
         if (!originalUser.hasRole(GLOBAL_ADMIN_ROLE)) {

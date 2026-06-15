@@ -118,7 +118,7 @@ public class RemoteUserAndOrganizationFilterTest {
     userResponder.setResponse(switchingUser);
 
     HttpServletRequest request = EasyMock.createNiceMock(HttpServletRequest.class);
-    EasyMock.expect(request.getHeader(SecurityConstants.ORGANIZATION_HEADER)).andReturn("mh_default_org").anyTimes();
+    EasyMock.expect(request.getHeader(SecurityConstants.ORGANIZATION_HEADER)).andReturn("other_org").anyTimes();
     EasyMock.replay(request);
 
     HttpServletResponse response = EasyMock.createNiceMock(HttpServletResponse.class);
@@ -146,7 +146,7 @@ public class RemoteUserAndOrganizationFilterTest {
     EasyMock.replay(securityService);
 
     HttpServletRequest request = EasyMock.createNiceMock(HttpServletRequest.class);
-    EasyMock.expect(request.getHeader(SecurityConstants.ORGANIZATION_HEADER)).andReturn("mh_default_org").anyTimes();
+    EasyMock.expect(request.getHeader(SecurityConstants.ORGANIZATION_HEADER)).andReturn("other_org").anyTimes();
     EasyMock.replay(request);
 
     HttpServletResponse response = EasyMock.createNiceMock(HttpServletResponse.class);
