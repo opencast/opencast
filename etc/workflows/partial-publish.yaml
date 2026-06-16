@@ -69,7 +69,7 @@ operations:
 
   # Encode to engage player preview image but with timestamp from editor
   - id: image
-    if: (NOT ${presentation/thumbnail_edited}) AND ${presentation_thumbnail_time_set}
+    if: ${presentation_thumbnail_time_set}
     exception-handler-workflow: partial-error
     description: Creating player preview image for presentation video from editor timestamp
     configurations:
@@ -80,7 +80,7 @@ operations:
       - time: ${presentation_thumbnail_time}
 
   - id: tag
-    if: ${presentation/thumbnail_edited}
+    if: ${presentation/thumbnail_edited} AND (NOT ${presentation_thumbnail_time_set})
     exception-handler-workflow: partial-error
     description: Prepare thumbnail for publication
     configurations:
@@ -101,7 +101,7 @@ operations:
 
   # Create a cover image but with timestamp from editor
   - id: image
-    if: (NOT ${presenter/thumbnail_edited}) AND ${presenter_thumbnail_time_set}
+    if: ${presenter_thumbnail_time_set}
     exception-handler-workflow: partial-error
     description: Creating player preview image for presenter video from editor timestamp
     configurations:
@@ -123,7 +123,7 @@ operations:
       - target-tags: archive, engage-download
 
   - id: tag
-    if: ${presenter/thumbnail_edited}
+    if: ${presenter/thumbnail_edited} AND (NOT ${presenter_thumbnail_time_set})
     exception-handler-workflow: partial-error
     description: Prepare thumbnail for publication
     configurations:
@@ -243,7 +243,7 @@ operations:
     exception-handler-workflow: partial-error
     description: Publishing to Opencast Media Module
     configurations:
-      - download-source-flavors: dublincore/*,security/*
+      - download-source-flavors: dublincore/*,security/*,textboxes/source,quizzes/source
       - download-source-tags: engage-download
       - streaming-source-tags: engage-streaming
       - check-availability: false

@@ -641,6 +641,9 @@ public class EditorServiceImpl implements EditorService {
       // If thumbnail times, add workflow properties and be done
       String time = track.getThumbnailTime();
       if (time != null) {
+        // Remove old thumbnails
+        Arrays.stream(mediaPackage.getElementsByFlavor(flavor)).forEach(mediaPackage::remove);
+
         WorkflowPropertiesUtil
             .storeProperty(assetManager, mediaPackage,
                 flavor.getType() + "_thumbnail_time_set", "true");
