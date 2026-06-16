@@ -1,6 +1,27 @@
 Opencast 19 Changelog
 ---------------------
 
+## Opencast 19.6 (2026-06-16)
+- [[#7725](https://github.com/opencast/opencast/pull/7725)] -
+  19.6 release notes and changelog
+- [[#7703](https://github.com/opencast/opencast/pull/7703)] -
+  Correct and expand configuration panel json documentation
+- [[#7697](https://github.com/opencast/opencast/pull/7697)] -
+  Fix missed subtitle-timeshift configuration key
+- [[#7692](https://github.com/opencast/opencast/pull/7692)] -
+  Service error states incorrectly cleared
+- [[#7685](https://github.com/opencast/opencast/pull/7685)] -
+  Make `/play` preserve query parameters
+- [[#7670](https://github.com/opencast/opencast/pull/7670)] -
+  Only switch org if orgs are different
+- [[#7669](https://github.com/opencast/opencast/pull/7669)] -
+  Install markdownlint if needed
+- [[#7666](https://github.com/opencast/opencast/pull/7666)] -
+  Properly update git submodules
+- [[#7665](https://github.com/opencast/opencast/pull/7665)] -
+  Opencast 19.5 changelogs
+
+
 ## Opencast 19.5 (2026-05-14)
 - [[#7657](https://github.com/opencast/opencast/pull/7657)] -
   19.5 release notes
