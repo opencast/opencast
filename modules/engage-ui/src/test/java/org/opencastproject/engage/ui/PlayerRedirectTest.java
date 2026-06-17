@@ -141,7 +141,7 @@ public class PlayerRedirectTest extends EasyMockSupport {
       assertEquals(Response.Status.TEMPORARY_REDIRECT.getStatusCode(), response.getStatus());
       String location = response.getHeaderString("location");
       // id=event1 should stay, and t=10, foo=bar, and id=something-else should be appended (at the end)
-      assertEquals("/paella7/ui/watch.html?id=event1&t=10&foo=bar&id=something-else", location);
+      assertEquals("/paella8/ui/watch.html?id=event1&t=10&foo=bar&id=something-else", location);
     }
 
     verifyAll();
