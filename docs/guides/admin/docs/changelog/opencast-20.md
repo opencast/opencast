@@ -1,6 +1,24 @@
 Opencast 20 Changelog
 ---------------------
 
+## Opencast 20.1 (2026-06-17)
+- [[#7708](https://github.com/opencast/opencast/pull/7708)] -
+  Test used workflow definition element, configuration_panel
+- [[#7707](https://github.com/opencast/opencast/pull/7707)] -
+  Replace deprecated assert function
+- [[#7688](https://github.com/opencast/opencast/pull/7688)] -
+  Shorten line lengths in develop release notes and upgrade docs
+- [[#7658](https://github.com/opencast/opencast/pull/7658)] -
+  Update submodules in r/20.x
+- [[#7612](https://github.com/opencast/opencast/pull/7612)] -
+  Update 20.x Admin Interface
+- [[#7590](https://github.com/opencast/opencast/pull/7590)] -
+  Add missing modules to jacoco pom
+- [[#7585](https://github.com/opencast/opencast/pull/7585)] -
+  Move ContributorsListProvider configuration
+- [[#7685](https://github.com/opencast/opencast/pull/7685)] -
+  Make `/play` preserve query parameters
+
 ## Opencast 20.0 (2026-05-15)
 
 - [[#7612](https://github.com/opencast/opencast/pull/7612)] -
