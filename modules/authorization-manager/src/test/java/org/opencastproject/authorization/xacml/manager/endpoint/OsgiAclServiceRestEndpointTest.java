@@ -38,6 +38,8 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
+import java.util.Collections;
+
 import javax.ws.rs.core.Response;
 
 public class OsgiAclServiceRestEndpointTest {
@@ -238,9 +240,7 @@ public class OsgiAclServiceRestEndpointTest {
         .body("[0].acl.ace[0].allow", equalTo(true))
         .body("[0].acl.ace[0].role", equalTo("SERIES_10_INSTRUCTOR"))
         .body("[1].name", equalTo("Private"))
-        .body("[1].acl.ace[0].action", equalTo("read"))
-        .body("[1].acl.ace[0].allow", equalTo(false))
-        .body("[1].acl.ace[0].role", equalTo("SERIES_10_INSTRUCTOR"))
+        .body("[1].ace", equalTo(null))
         .when().get(host("/acl/acls.json"));
 
     // POST
@@ -278,9 +278,7 @@ public class OsgiAclServiceRestEndpointTest {
         .formParam("acl", publicAclWrite2)
         .expect()
         .body("name", equalTo(aclName))
-        .body("acl.ace[0].action", equalTo("write"))
-        .body("acl.ace[0].allow", equalTo(false))
-        .body("acl.ace[0].role", equalTo("SERIES_10_INSTRUCTOR"))
+        .body("acl.ace", equalTo(Collections.emptyList()))
         .statusCode(OK)
         .when().put(host("/acl/{aclId}"));
     given()
