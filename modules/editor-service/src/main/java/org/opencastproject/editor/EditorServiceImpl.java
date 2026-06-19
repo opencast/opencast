@@ -35,6 +35,7 @@ import org.opencastproject.editor.api.EditorServiceException;
 import org.opencastproject.editor.api.ErrorStatus;
 import org.opencastproject.editor.api.LockData;
 import org.opencastproject.editor.api.SegmentData;
+import org.opencastproject.editor.api.ThumbnailTime;
 import org.opencastproject.editor.api.TrackData;
 import org.opencastproject.editor.api.TrackSubData;
 import org.opencastproject.editor.api.WorkflowData;
@@ -639,7 +640,7 @@ public class EditorServiceImpl implements EditorService {
       String uri = track.getThumbnailURI();
 
       // If thumbnail times, add workflow properties and be done
-      String time = track.getThumbnailTime();
+      var time = track.getThumbnailTime();
       if (time != null) {
         // Remove old thumbnails
         Arrays.stream(mediaPackage.getElementsByFlavor(flavor)).forEach(mediaPackage::remove);
@@ -649,7 +650,10 @@ public class EditorServiceImpl implements EditorService {
                 flavor.getType() + "_thumbnail_time_set", "true");
         WorkflowPropertiesUtil
             .storeProperty(assetManager, mediaPackage,
-                flavor.getType() + "_thumbnail_time", time);
+                flavor.getType() + "_thumbnail_time_time", time.getTime());
+        WorkflowPropertiesUtil
+            .storeProperty(assetManager, mediaPackage,
+                flavor.getType() + "_thumbnail_time_flavor", time.getFlavorType() + "/source");
         continue;
       } else {
         WorkflowPropertiesUtil
@@ -998,17 +1002,24 @@ public class EditorServiceImpl implements EditorService {
             .map(property -> tuple(property.getA()[1], property.getA()[2]))
             .collect(Collectors.toSet());
 
-    final Map<String, String> thumbnailTimes = latestWfProperties.entrySet()
-        .stream()
-        .map(property -> tuple(property.getKey().split("_"), property.getValue()))
-        .filter(property -> property.getA().length == 3)
-        .filter(property -> property.getA()[1].equals("thumbnail"))
-        .filter(property -> property.getA()[2].equals("time"))
-        .map(property -> tuple(property.getA()[0], property.getB()))
-        .collect(Collectors.toMap(
-            property -> property.getA(),
-            property -> property.getB()
-        ));
+    Map<String, ThumbnailTime> thumbnailTimes = new HashMap<>();
+    latestWfProperties.forEach((key, value) -> {
+      String[] parts = key.split("_");
+      if (parts.length == 4
+          && "thumbnail".equals(parts[1])
+          && "time".equals(parts[2])
+          && ("time".equals(parts[3]) || "flavor".equals(parts[3]))
+      ) {
+
+        ThumbnailTime tt = thumbnailTimes.computeIfAbsent(parts[0], k -> new ThumbnailTime());
+
+        if (parts.length == 4 && "time".equals(parts[3])) {
+          tt.setTime(value);
+        } else if (parts.length == 4 && "flavor".equals(parts[3])) {
+          tt.setFlavorType(value.split("/")[0]);
+        }
+      }
+    });
 
     List<Track> trackList = Arrays.stream(internalPub.getTracks()).filter(this::elementHasPreviewTag)
             .collect(Collectors.toList());

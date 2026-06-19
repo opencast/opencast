@@ -73,11 +73,11 @@ operations:
     exception-handler-workflow: partial-error
     description: Creating player preview image for presentation video from editor timestamp
     configurations:
-      - source-flavor: presentation/source
+      - source-flavor: ${presentation_thumbnail_time_flavor}
       - target-flavor: presentation/player+preview
       - target-tags: engage-download
       - encoding-profile: player-preview.http
-      - time: ${presentation_thumbnail_time}
+      - time: ${presentation_thumbnail_time_time}
 
   - id: tag
     if: ${presentation/thumbnail_edited} AND (NOT ${presentation_thumbnail_time_set})
@@ -105,11 +105,11 @@ operations:
     exception-handler-workflow: partial-error
     description: Creating player preview image for presenter video from editor timestamp
     configurations:
-      - source-flavor: presenter/source
+      - source-flavor: ${presenter_thumbnail_time_flavor}
       - target-flavor: presenter/player+preview
       - target-tags: engage-download
       - encoding-profile: player-preview.http
-      - time: ${presenter_thumbnail_time}
+      - time: ${presenter_thumbnail_time_time}
 
   - id: cover-image
     if: NOT (${presenter_work_video} OR ${presentation_work_video} OR ${presentation/thumbnail_edited}) AND (${presenter_work_audio} OR ${presentation_work_audio})

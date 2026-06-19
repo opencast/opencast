@@ -39,7 +39,7 @@ public final class TrackData {
   private final String id;
   private final String thumbnailUri;
   private final int thumbnailPriority;
-  private final String thumbnailTime;
+  private final ThumbnailTime thumbnailTime;
 
   public MediaPackageElementFlavor getFlavor() {
     if (flavor == null) {
@@ -50,7 +50,7 @@ public final class TrackData {
 
   public TrackData(final String flavorType, final String flavorSubtype, final TrackSubData audio,
           final TrackSubData video, String uri, String id, String thumbnailUri, int thumbnailPriority,
-          final String thumbnailTime) {
+          final ThumbnailTime thumbnailTime) {
     this.flavor = new MediaPackageElementFlavor(flavorType, flavorSubtype);
     this.audio = audio;
     this.video = video;
@@ -76,7 +76,7 @@ public final class TrackData {
   public String getThumbnailURI() {
     return this.thumbnailUri; }
 
-  public String getThumbnailTime() {
+  public ThumbnailTime getThumbnailTime() {
     return thumbnailTime;
   }
 }
