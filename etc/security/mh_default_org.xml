@@ -19,7 +19,7 @@
   <sec:http pattern="/favicon.ico" security="none" />
 
   <sec:http create-session="ifRequired" servlet-api-provision="true" realm="Opencast"
-            entry-point-ref="opencastEntryPoint">
+            entry-point-ref="opencastEntryPoint" disable-url-rewriting="true">
 
     <sec:access-denied-handler error-page="/403.html"/>
 
