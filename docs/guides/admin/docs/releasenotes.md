@@ -1,5 +1,11 @@
 # Opencast 19: Release Notes
 
+## Opencast 19.next
+
+[other things]
+
+This version also includes a security fix for ghsa-6f53-jp7x-gg7p.
+
 ## Opencast 19.6
 
 This version contains addition updates for the admin,editor, and studio submodules, along with the usual collection of
