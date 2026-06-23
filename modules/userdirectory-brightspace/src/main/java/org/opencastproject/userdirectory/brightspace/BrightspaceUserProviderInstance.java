@@ -42,7 +42,6 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.ExecutionError;
 import com.google.common.util.concurrent.UncheckedExecutionException;
 
-//import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +52,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 
 public class BrightspaceUserProviderInstance implements UserProvider, RoleProvider {
 
@@ -67,8 +65,6 @@ public class BrightspaceUserProviderInstance implements UserProvider, RoleProvid
   private Organization organization;
   private LoadingCache<String, Object> cache;
   private Object nullToken = new Object();
-  private AtomicLong loadUserRequests;
-  private AtomicLong brightspaceWebServiceRequests;
   private final Set<String> instructorRoles;
   private final Set<String> ignoredUsernames;
 
@@ -138,7 +134,6 @@ public class BrightspaceUserProviderInstance implements UserProvider, RoleProvid
    */
   @Override
   public User loadUser(String userName) {
-    this.loadUserRequests.incrementAndGet();
     logger.debug("getting user from cache");
 
     try {
@@ -218,7 +213,6 @@ public class BrightspaceUserProviderInstance implements UserProvider, RoleProvid
       logger.debug("In loadUserFromBrightspace, currently processing user: {}", username);
       JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
 
-      this.brightspaceWebServiceRequests.incrementAndGet();
       Thread currentThread = Thread.currentThread();
       ClassLoader originalClassloader = currentThread.getContextClassLoader();
       BrightspaceUser brightspaceUser;

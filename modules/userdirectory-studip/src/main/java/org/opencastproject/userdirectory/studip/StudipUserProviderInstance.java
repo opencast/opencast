@@ -64,7 +64,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * A UserProvider that reads user roles from Studip.
@@ -81,12 +80,6 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider {
 
   /** The organization */
   private Organization organization = null;
-
-  /** Total number of requests made to load users */
-  private AtomicLong requests = null;
-
-  /** The number of requests made to Studip */
-  private AtomicLong studipLoads = null;
 
   /** A cache of users, which lightens the load on Studip */
   private LoadingCache<String, Object> cache = null;
@@ -170,7 +163,6 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider {
   public User loadUser(String userName) {
     logger.debug("loaduser({})", userName);
 
-    requests.incrementAndGet();
     try {
       Object user = cache.getUnchecked(userName);
       if (user == nullToken) {
@@ -208,9 +200,6 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider {
     logger.debug("In loadUserFromStudip, currently processing user : {}", userName);
 
     JaxbOrganization jaxbOrganization = JaxbOrganization.fromOrganization(organization);
-
-    // update cache statistics
-    studipLoads.incrementAndGet();
 
     Thread currentThread = Thread.currentThread();
     ClassLoader originalClassloader = currentThread.getContextClassLoader();
