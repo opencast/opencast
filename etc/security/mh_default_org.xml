@@ -271,6 +271,7 @@
     <sec:intercept-url pattern="/api/clearIndex" method="POST" access="hasRole('ROLE_ADMIN')"/>
     <sec:intercept-url pattern="/api/recreateIndex" method="POST" access="hasRole('ROLE_ADMIN')"/>
     <sec:intercept-url pattern="/api/recreateIndex/*" method="POST" access="hasRole('ROLE_ADMIN')"/>
+    <sec:intercept-url pattern="/api/playlists" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_PLAYLISTS_CREATE', 'ROLE_API_PLAYLISTS_EDIT')" />
     <sec:intercept-url pattern="/api/playlists/*" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_PLAYLISTS_CREATE', 'ROLE_API_PLAYLISTS_EDIT')" />
     <sec:intercept-url pattern="/api/playlists/*/entries" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_PLAYLISTS_CREATE', 'ROLE_API_PLAYLISTS_EDIT')" />
     <sec:intercept-url pattern="/api/series" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_SERIES_CREATE')" />
