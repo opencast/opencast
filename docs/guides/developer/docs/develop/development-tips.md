@@ -13,7 +13,7 @@ Every development environment has its quirks, so here are a few which have been 
 * If your IDE stubbornly refuses to acknowledge that a class exists, even when you're sure it's there, try closing your
   IDE, then running `git clean -fdx`, then building.  This will ensure everything in your clone is up-to-date.  Also
   ensure you find your project workspace to make sure your IDE isn't keeping a cache of things.
-* Check if you have selected the correct java version in your IDE. Opencast requires Java 11 or 17, but your IDE might have
+* Check if you have selected the correct java version in your IDE. Opencast requires Java 21, but your IDE might have
   selected a different version.
 * Absolute worst case, remove your Maven cache (typically ~/.m2), and possibly your Node cache (typically ~/.npm) and
   repeat the above steps.  This is completely starting from scratch.
@@ -73,7 +73,7 @@ Specific development environments tips
 --------------------------------------
 
 
-### Ubuntu (Using JDK 11)
+### Ubuntu (Using JDK 21)
 
 #### Update System
 
@@ -85,7 +85,7 @@ $ apt upgrade -y
 #### Install Packages via APT
 
 ```sh
-$ apt install -y git openjdk-17-jdk maven gcc g++ build-essential cmake curl hunspell synfig ffmpeg
+$ apt install -y git openjdk-21-jdk maven gcc g++ build-essential cmake curl hunspell synfig ffmpeg
 ```
 
 #### Install NodeJS (optional)
@@ -127,9 +127,9 @@ $ update-alternatives --config java
 
 Try to install all updates via the App Store or system settings.
 
-#### Java JDK 11
+#### Java JDK 21
 
-Install the JDK 11
+Install the JDK 21
 It's recommended to use [SDKMAN](https://sdkman.io/) to install and manage Java versions.
 
 #### XCode

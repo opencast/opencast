@@ -16,6 +16,7 @@ Warning: This probably won´t work with Windows.
 ```sh
 $ git clone https://github.com/opencast/opencast.git
 $ cd opencast
+$ git submodule update --init --recursive
 $ ./mvnw clean install -Pdev
 $ cd build/opencast-dist-develop-*
 $ ./bin/start-opencast
@@ -41,6 +42,16 @@ Cloning the Git repository:
 $ git clone https://github.com/opencast/opencast.git
 ```
 
+Some frontend modules (`admin`, `editor` and `studio`) are included as Git submodules. They need to be initialized
+before building, otherwise the build fails with an error about missing child modules:
+
+```sh
+$ git submodule update --init --recursive
+```
+
+For more details on working with submodules, see the
+[development process documentation](../participate/development-process.md#git-submodules).
+
 
 ## Install Dependencies
 
@@ -49,7 +60,7 @@ Please make sure to install the following dependencies.
 
 Required:
 
-    java-17-openjdk-devel
+    java-21-openjdk-devel
     ffmpeg >= 3.2.4
     maven >= 3.6
     python
@@ -61,7 +72,7 @@ Required:
 
 Required as a service for running Opencast:
 
-    elasticsearch = 7.9.x and analysis-icu plugin
+    OpenSearch 1.x and analysis-icu plugin
 
 Required for some services. Some tests may be skipped and some features
 may not be usable if they are not installed. Hence, it's generally a good idea to
@@ -192,7 +203,7 @@ This is especially useful when building inside a container:
 
 ### JDK Version
 
-Some IDEs attempt to use the most recent version of the JDK. Make sure that your IDE uses JDK 11.
+Some IDEs attempt to use the most recent version of the JDK. Make sure that your IDE uses JDK 21.
 
 ## Recommended Development Tools
 
@@ -214,7 +225,7 @@ Follow the next steps, if you want to import opencast correctly
 - Search for projects recursively
 - Uncheck all listed profiles
 - Check all projects to import
-- Select JDK 17, it should be somewhere around `/usr/lib/jvm/java-17-openjdk` depending on your current system
+- Select JDK 21, it should be somewhere around `/usr/lib/jvm/java-21-openjdk` depending on your current system
 
 Now Idea should import the projects, it could take some time, you can make it faster by following [this](#slow-intellij-idea-fix).
 
