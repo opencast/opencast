@@ -37,6 +37,22 @@ extra:
 nav:
   - Home: "index.md"
   - Version Support: "version-support.md"
+  - Installation:
+      - Overview: "installation/index.md"
+      - Hardware Requirements: installation/server-requirements.md
+      - Java Versions: installation/java-version.md
+      - Installation from Package:
+          - Debian/Ubuntu: "installation/debs.md"
+          - RHEL/Rocky/CentOS: "installation/rpm-el.md"
+      - Installation with Docker:
+          - Testing Locally: "installation/docker-local.md"
+      - Installation from Source:
+          - Linux: "installation/source-linux.md"
+          - macOS: "installation/source-macosx.md"
+      - Installation via script:
+          - Ansible: "installation/ansible.md"
+      - Multiple Servers: "installation/multiple-servers.md"
+      - Prerelease Testing: "installation/prereleases.md"
   - Release Notes: "releasenotes.md"
   - Upgrade Guide: "upgrade.md"
   - Registration: "registration.md"
@@ -61,22 +77,6 @@ nav:
           - Opencast 4: "changelog/older-versions/opencast-4.md"
           - Opencast 3: "changelog/older-versions/opencast-3.md"
           - Opencast 2.x: "changelog/older-versions/opencast-2.x.md"
-  - Installation:
-      - Overview: "installation/index.md"
-      - Hardware Requirements: installation/server-requirements.md
-      - Java Versions: installation/java-version.md
-      - Installation from Package:
-          - Debian/Ubuntu: "installation/debs.md"
-          - RHEL/Rocky/CentOS: "installation/rpm-el.md"
-      - Installation with Docker:
-          - Testing Locally: "installation/docker-local.md"
-      - Installation from Source:
-          - Linux: "installation/source-linux.md"
-          - macOS: "installation/source-macosx.md"
-      - Installation via script:
-          - Ansible: "installation/ansible.md"
-      - Multiple Servers: "installation/multiple-servers.md"
-      - Prerelease Testing: "installation/prereleases.md"
   - Configuration:
       - Overview: "configuration/index.md"
       - Basic: "configuration/basic.md"
