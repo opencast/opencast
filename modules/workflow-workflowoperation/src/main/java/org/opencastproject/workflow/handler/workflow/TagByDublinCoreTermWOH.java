@@ -52,6 +52,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Take look in specified catalog for specified term, if the value matches the specified value add the target-tags
@@ -78,6 +79,9 @@ public class TagByDublinCoreTermWOH extends ResumableWorkflowOperationHandlerBas
 
   /** Name of the configuration option that provides the catalog to examine */
   public static final String DCCATALOG_PROPERTY = "dccatalog";
+
+  /** Flavor type of the catalog in case it is not dublincore */
+  public static final String DCCATALOG_TYPE_PROPERTY = "dccatalog-type";
 
   /** Name of the configuration option that provides Dublin Core term/element */
   public static final String DCTERM_PROPERTY = "dcterm";
@@ -121,6 +125,9 @@ public class TagByDublinCoreTermWOH extends ResumableWorkflowOperationHandlerBas
     List<MediaPackageElementFlavor> configuredSourceFlavors = tagsAndFlavors.getSrcFlavors();
     List<String> configuredSourceTags = tagsAndFlavors.getSrcTags();
     String configuredCatalog = StringUtils.trimToEmpty(currentOperation.getConfiguration(DCCATALOG_PROPERTY));
+    Optional<String> optConfiguredCatalogType = Optional.ofNullable(StringUtils.trimToNull(
+        currentOperation.getConfiguration(DCCATALOG_TYPE_PROPERTY)));
+    String catalogType = optConfiguredCatalogType.isPresent() ? optConfiguredCatalogType.get() : "dublincore";
     String configuredDCTerm = StringUtils.trimToEmpty(currentOperation.getConfiguration(DCTERM_PROPERTY));
     String configuredDefaultValue = StringUtils.trimToNull(currentOperation.getConfiguration(DEFAULT_VALUE_PROPERTY));
     String configuredMatchValue = StringUtils.trimToEmpty(currentOperation.getConfiguration(MATCH_VALUE_PROPERTY));
@@ -137,7 +144,7 @@ public class TagByDublinCoreTermWOH extends ResumableWorkflowOperationHandlerBas
     }
 
     // Find Catalog
-    Catalog[] catalogs = mediaPackage.getCatalogs(new MediaPackageElementFlavor("dublincore",
+    Catalog[] catalogs = mediaPackage.getCatalogs(new MediaPackageElementFlavor(catalogType,
         StringUtils.lowerCase(configuredCatalog)));
 
     if (catalogs != null && catalogs.length > 0) {

@@ -20,17 +20,23 @@ Parameter Table
 
 Tags and flavors can be used in combination.
 
-|configuration keys|example|description|default value|
-|------------------|-------|-----------|-------------|
-|dccatalog         |"episode" or "series"|the type of catalog in which to search for `dcterm`|EMPTY|
-|dcterm            |"creator"            |the name of the Dublin Core term which to check|EMPTY|
-|match-value       |"Joe Bloggs"         |the Dublin Core term value to check for|EMPTY|
-|default-value     |"Anon"               |the implied value if the dubincore term is not present in the catalog|EMPTY|
-|*configProperty*  |true / false         |a configuration property and the value it will be given if a match is found|EMPTY|
+| configuration keys | example               | description                                                                 | default value |
+|--------------------|-----------------------|-----------------------------------------------------------------------------|---------------|
+| dccatalog          | "episode" or "series" | the subtype of catalog in which to search for `dcterm`                      | EMPTY         |
+| dccatalog-type     | "dublincore"          | the type of catalog in which to search for `dcterm`                         | "dublincore"  |
+| dcterm             | "creator"             | the name of the Dublin Core term which to check                             | EMPTY         |
+| match-value        | "Joe Bloggs"          | the Dublin Core term value to check for                                     | EMPTY         |
+| default-value      | "Anon"                | the implied value if the dubincore term is not present in the catalog       | EMPTY         |
+| *configProperty*   | true / false          | a configuration property and the value it will be given if a match is found | EMPTY         |
 
 ### dccatalog
 
-The type of Dublin Core catalog in which to look for the `dcterm`. This will usually be `episode` or `series`.
+The flavor subtype of Dublin Core catalog in which to look for the `dcterm`. This will usually be `episode` or `series`.
+
+### dccatalog
+
+The flavor type of Dublin Core catalog in which to look for the `dcterm`. This will usually be `episode` or `series`.
+Will default to 'dublincore'.
 
 ### dcterm
 
