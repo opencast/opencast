@@ -21,7 +21,7 @@
 
 package org.opencastproject.event.comment;
 
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.opencastproject.util.IoSupport.loadFileFromClassPathAsString;
 import static org.xmlmatchers.XmlMatchers.similarTo;
 import static org.xmlmatchers.transform.XmlConverters.the;

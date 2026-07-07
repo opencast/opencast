@@ -1,0 +1,150 @@
+{
+  "properties": {
+    "searchable_acl": {
+      "properties": {
+        "read": {
+          "type": "keyword"
+        },
+        "write": {
+          "type": "keyword"
+        }
+      }
+    },
+    "dc": {
+      "properties": {
+        "abstract": {
+          "type": "keyword",
+          "fields": {
+            "sort": {
+              "type": "icu_collation_keyword",
+              "index": false
+            },
+            "search": {
+              "type": "search_as_you_type",
+              "analyzer": "autocomplete_analyzer"
+            }
+          }
+        },
+        "contributor": {
+          "type": "keyword",
+          "fields": {
+            "sort": {
+              "type": "icu_collation_keyword",
+              "index": false
+            },
+            "search": {
+              "type": "search_as_you_type",
+              "analyzer": "autocomplete_analyzer"
+            }
+          }
+        },
+        "created": {
+          "type": "date"
+        },
+        "creator": {
+          "type": "keyword",
+          "fields": {
+            "sort": {
+              "type": "icu_collation_keyword",
+              "index": false
+            },
+            "search": {
+              "type": "search_as_you_type",
+              "analyzer": "autocomplete_analyzer"
+            }
+          }
+        },
+        "description": {
+          "type": "keyword",
+          "fields": {
+            "sort": {
+              "type": "icu_collation_keyword",
+              "index": false
+            },
+            "search": {
+              "type": "search_as_you_type",
+              "analyzer": "autocomplete_analyzer"
+            }
+          }
+        },
+        "extent": {
+          "type": "keyword"
+        },
+        "identifier": {
+          "type": "keyword"
+        },
+        "isPartOf": {
+          "type": "keyword"
+        },
+        "publisher": {
+          "type": "keyword",
+          "fields": {
+            "sort": {
+              "type": "icu_collation_keyword",
+              "index": false
+            },
+            "search": {
+              "type": "search_as_you_type",
+              "analyzer": "autocomplete_analyzer"
+            }
+          }
+        },
+        "subject": {
+          "type": "keyword",
+          "fields": {
+            "sort": {
+              "type": "icu_collation_keyword",
+              "index": false
+            },
+            "search": {
+              "type": "search_as_you_type",
+              "analyzer": "autocomplete_analyzer"
+            }
+          }
+        },
+        "temporal": {
+          "type": "keyword"
+        },
+        "title": {
+          "type": "keyword",
+          "fields": {
+            "sort": {
+              "type": "icu_collation_keyword",
+              "index": false
+            },
+            "search": {
+              "type": "search_as_you_type",
+              "analyzer": "autocomplete_analyzer"
+            }
+          }
+        }
+      }
+    },
+    "deleted": {
+      "type": "date",
+      "null_value": "null"
+    },
+    "live": {
+      "type": "boolean"
+    },
+    "id": {
+      "type": "keyword"
+    },
+    "mediapackage": {
+      "type": "object",
+      "enabled": false
+    },
+    "mediapackage_xml": {
+      "type": "text"
+    },
+    "modified": {
+      "type": "date"
+    },
+    "org": {
+      "type": "keyword"
+    },
+    "type": {
+      "type": "keyword"
+    }
+  }
+}

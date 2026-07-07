@@ -21,7 +21,7 @@
 
 package org.opencastproject.elasticsearch.impl;
 
-import static org.opencastproject.elasticsearch.impl.IndexSchema.TEXT;
+import static org.opencastproject.elasticsearch.impl.IndexSchema.SEARCH_FIELD_NAME_EXTENSION;
 
 import org.opencastproject.elasticsearch.api.SearchQuery;
 import org.opencastproject.util.DateTimeSupport;
@@ -188,9 +188,14 @@ public abstract class AbstractElasticsearchQueryBuilder<T extends SearchQuery> i
     // Text
     if (text != null) {
       MultiMatchQueryBuilder queryBuilder = QueryBuilders.multiMatchQuery(text);
-      queryBuilder.field(TEXT, 1.2f);
+      queryBuilder.field("*" + SEARCH_FIELD_NAME_EXTENSION, 1.2f);
+      // Search-as-you-type generates useful subfields for autocompletion, we should use it
+      // https://docs.opensearch.org/1.3/field-types/supported-field-types/search-as-you-type/
+      queryBuilder.field("*" + SEARCH_FIELD_NAME_EXTENSION + "._2gram", 1.2f);
+      queryBuilder.field("*" + SEARCH_FIELD_NAME_EXTENSION + "._3gram", 1.2f);
+      queryBuilder.field("*" + SEARCH_FIELD_NAME_EXTENSION + "._4gram", 1.2f);
       additionalMultiQueryFields.forEach(field -> queryBuilder.field(field, 1.0f));
-      queryBuilder.type(MultiMatchQueryBuilder.Type.BEST_FIELDS);
+      queryBuilder.type(MultiMatchQueryBuilder.Type.BOOL_PREFIX);
       queryBuilder.operator(Operator.AND);
       if (fuzzy) {
         queryBuilder.fuzziness(Fuzziness.AUTO);
@@ -211,7 +216,7 @@ public abstract class AbstractElasticsearchQueryBuilder<T extends SearchQuery> i
 
     // Filter expressions
     if (filter != null) {
-      filters.add(QueryBuilders.termQuery(IndexSchema.TEXT, filter));
+      filters.add(QueryBuilders.termQuery("*" + SEARCH_FIELD_NAME_EXTENSION, filter));
     }
 
     // Apply the filters

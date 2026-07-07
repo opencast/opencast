@@ -30,10 +30,10 @@ public interface IndexSchema {
   /** Version field name */
   String VERSION = "version";
 
-  /** Accumulative text field */
-  String TEXT = "text";
-
   /** Extension for sort field names */
   String SORT_FIELD_NAME_EXTENSION = ".sort";
+
+  /** Extension for search field names */
+  String SEARCH_FIELD_NAME_EXTENSION = ".search";
 
 }

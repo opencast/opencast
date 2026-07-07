@@ -96,15 +96,14 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
   private static final int DEFAULT_RETRY_WAITING_PERIOD_UPDATE = 1000;
 
   /** The required index version */
-  private static final int INDEX_VERSION = 101;
-
-  /** The document types */
-  private static final String VERSION_DOCUMENT_TYPE = "version";
+  private static final int INDEX_VERSION = 1;
 
   private static final String[] DOCUMENT_TYPES = new String[] {
+      // Version document type should be processed first.
+      // It will be used as storage for index versions of all other indexes.
+      VERSION_DOCUMENT_TYPE,
       Event.DOCUMENT_TYPE,
-      Series.DOCUMENT_TYPE,
-      VERSION_DOCUMENT_TYPE
+      Series.DOCUMENT_TYPE
   };
 
   private static final Logger logger = LoggerFactory.getLogger(ElasticsearchIndex.class);

@@ -6,8 +6,8 @@ tags:
   - tag1
   - tag2
 displayOrder: 100
-configuration_panel: |-
-  <div></div>
+configuration_panel_json: |-
+  []
 operations:
   - id: op1
     fail-on-error: true

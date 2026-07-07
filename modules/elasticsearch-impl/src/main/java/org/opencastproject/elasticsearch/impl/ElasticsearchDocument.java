@@ -63,11 +63,6 @@ public final class ElasticsearchDocument extends HashMap<String, Object> {
     for (SearchMetadata<?> entry : resource) {
       String metadataKey = entry.getName();
       put(metadataKey, entry.getValues());
-
-      // TODO Not sure what to use for localizedFulltextFieldName
-      if (entry.addToText()) {
-        addToFulltext(entry, IndexSchema.TEXT, IndexSchema.TEXT);
-      }
     }
   }
 

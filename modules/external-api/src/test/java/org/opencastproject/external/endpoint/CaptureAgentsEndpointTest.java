@@ -23,7 +23,7 @@ package org.opencastproject.external.endpoint;
 import static io.restassured.RestAssured.given;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.opencastproject.external.endpoint.TestCaptureAgentsEndpoint.UNKNOWN_AGENT;
 import static org.opencastproject.external.endpoint.TestCaptureAgentsEndpoint.loadAgents;
 import static org.opencastproject.external.endpoint.TestCaptureAgentsEndpoint.toJson;
