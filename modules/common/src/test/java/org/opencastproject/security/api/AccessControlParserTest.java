@@ -85,4 +85,23 @@ public class AccessControlParserTest {
     }
   }
 
+  @Test
+  public void testDenyRuleParsing() throws Exception {
+    AccessControlEntry denyRule = new AccessControlEntry("ANY", "READ", false);
+    AccessControlList deny = new AccessControlList(denyRule);
+
+    acl.merge(deny);
+
+    //Ensure that after the merge the deny rule is still present
+    Assert.assertTrue(acl.getEntries().contains(denyRule));
+
+    String json = AccessControlParser.toJson(acl);
+    AccessControlList jsonAfter =  AccessControlParser.parseAcl(json);
+    Assert.assertFalse(jsonAfter.getEntries().stream().anyMatch(e -> e.getAction().equals("DENY")));
+
+    String xml = AccessControlParser.toXml(acl);
+    AccessControlList xmlAfter =  AccessControlParser.parseAcl(json);
+    Assert.assertFalse(xmlAfter.getEntries().stream().anyMatch(e -> e.getAction().equals("DENY")));
+  }
+
 }
