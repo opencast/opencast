@@ -36,6 +36,7 @@ import org.opencastproject.workflow.api.WorkflowOperationHandler;
 import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
+import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.osgi.service.component.annotations.Component;
@@ -78,6 +79,17 @@ public class TagWorkflowOperationHandler extends AbstractWorkflowOperationHandle
 
   /** Name of the configuration option that provides the copy boolean we are looking for */
   public static final String COPY_PROPERTY = "copy";
+
+  /**
+   * Callback for the OSGi environment to set the workspace reference.
+   *
+   * @param workspace
+   *          the workspace
+   */
+  @Reference
+  protected void setWorkspace(Workspace workspace) {
+    this.workspace = workspace;
+  }
 
   /**
    * {@inheritDoc}
