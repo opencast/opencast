@@ -93,12 +93,16 @@ public final class AccessControlParser {
    *           if the format is invalid
    */
   public static AccessControlList parseAcl(String serializedForm) throws IOException, AccessControlParsingException {
+    AccessControlList parsed = null;
     // Determine whether to parse this as XML or JSON
     if (serializedForm.startsWith("{")) {
-      return parseJson(serializedForm);
+      parsed = parseJson(serializedForm);
     } else {
-      return parseXml(IOUtils.toInputStream(serializedForm, ENCODING));
+      parsed = parseXml(IOUtils.toInputStream(serializedForm, ENCODING));
     }
+    //Filter the parsed list of anything that's not an allow rule.  This matches the behaviour from the API endpoints.
+    parsed = new AccessControlList(parsed.getEntries().stream().filter(AccessControlEntry::isAllow).toList());
+    return parsed;
   }
 
   /** Same like {@link #parseAcl(String)} but throws runtime exceptions in case of an error. */
