@@ -33,18 +33,32 @@ class MockRequestHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         file = self.path[1:].split('?')[0]
-        self.send_response(200)
-        self.end_headers()
+
         if file in self.MOCK_FILES:
             print(f'Serving file {file}')
             with open('./mock-server-api-data/' + file, 'rb') as f:
-                self.wfile.write(f.read())
+                data = f.read()
+
+            self.send_response(200)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Content-Length', str(len(data)))
+            self.end_headers()
+
+            self.wfile.write(data)
+
         else:
-            url = 'http://127.0.0.1:3000/' + self.path[1:]
+            url = 'http://localhost:3000/' + self.path[1:]
             http = urllib3.PoolManager()
             print(f'Sending proxy request to {url}')
-            request = http.request('GET', url)
-            self.wfile.write(request.data)
+            response = http.request('GET', url)
+
+            self.send_response(response.status)
+            for key, value in response.headers.items():
+                if key.lower() not in ('transfer-encoding', 'connection'):
+                    self.send_header(key, value)
+            self.end_headers()
+
+            self.wfile.write(response.data)
 
 
 def header(message):
@@ -70,7 +84,7 @@ def react_start():
     # Wait for server
     http = urllib3.PoolManager()
     retries = urllib3.Retry(10, backoff_factor=0.2)
-    request = http.request('GET', 'http://127.0.0.1:3000/', retries=retries)
+    request = http.request('GET', 'http://localhost:3000/', retries=retries)
     if request.status != 200:
         raise Exception('Server not ready after wait')
 
