@@ -2,12 +2,12 @@
 
 ## Opencast 19.6
 
-This version contains addition updates for the admin,editor, and studio submodules, along with the usual collection of
+This version contains addition updates for the admin, editor, and studio submodules, along with the usual collection of
 bug fixes.
 
 ## Opencast 19.5
 
-This version contains updates for the admin,editor, and studio submodules, along with the usual collection of bug fixes.
+This version contains updates for the admin, editor, and studio submodules, along with the usual collection of bug fixes.
 
 ## Opencast 19.4
 
