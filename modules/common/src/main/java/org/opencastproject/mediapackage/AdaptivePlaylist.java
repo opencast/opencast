@@ -626,7 +626,9 @@ public interface AdaptivePlaylist extends Track {
         newTracks.add(rep.track); // segments are unchanged
         continue;
       }
-      replaceTrackFileInPlace(rep.origMpfile, newNames);
+      File f = replaceTrackFileInPlace(rep.origMpfile, newNames);
+      rep.track.setSize(f.length());
+      rep.track.setChecksum(null);
       rep.newMpuri = rep.origMpuri;
       newTracks.add(rep.track); // add changed variants
     }
@@ -640,7 +642,9 @@ public interface AdaptivePlaylist extends Track {
       newNames.put(logName, relPath);
     }
     // on master, fix references to variant playlists
-    replaceTrackFileInPlace(master.origMpfile, newNames);
+    File f = replaceTrackFileInPlace(master.origMpfile, newNames);
+    master.track.setSize(f.length());
+    master.track.setChecksum(null);
     master.newMpuri = master.track.getURI();
     newTracks.add(master.track);
     // Update the logical names to keep referential integrity
@@ -755,7 +759,9 @@ public interface AdaptivePlaylist extends Track {
         }
         newFiles.add(destFile);
         oldTracks.add(trackRep.track);
-        Track copyTrack = (Track) trackRep.track.clone(); // get all the properties, id, etc
+        Track copyTrack = (Track) trackRep.track.clone();
+        copyTrack.setSize(destFile.length());
+        copyTrack.setChecksum(null);
         mp.add(copyTrack); // add to mp and get new elementID
         Track newTrack = replaceTrackFileInWS.apply(destFile, copyTrack);
         if (newTrack == null) {
