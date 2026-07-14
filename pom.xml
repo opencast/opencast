@@ -275,6 +275,7 @@
     <module>modules/userdirectory</module>
     <module>modules/usertracking-api</module>
     <module>modules/usertracking-impl</module>
+    <module>modules/basic-statistics</module>
     <module>modules/videoeditor-api</module>
     <module>modules/videoeditor-ffmpeg-impl</module>
     <module>modules/videoeditor-remote</module>
