@@ -1,19 +1,27 @@
 # Opencast 19: Release Notes
 
-## Opencast 19.next
+## Opencast 19.7
 
-[other things]
+This version contains addition updates for the admin, editor, and studio submodules, along with the usual collection of
+bug fixes.  There are three things worthy of special attention:
 
-This version also includes a security fix for ghsa-6f53-jp7x-gg7p.
+- [#7752](https://github.com/opencast/opencast/pull/7752) makes a change to a workflow, which will need to be manually
+  applied by adopters if they are using the `output-background` configuration key.
+- [GHSA-m6c8-jcw2-5r25](https://github.com/opencast/opencast/security/advisories/GHSA-m6c8-jcw2-5r25) resolves a XSS
+  issue in Paella.
+- [GHSA-6f53-jp7x-gg7p](https://github.com/opencast/opencast/security/advisories/GHSA-6f53-jp7x-gg7p) resolves a
+  session fixation issue which allowed for account takeovers via malicious links.
+
+Neither security issue requires any changes by adopters, and they are both dropin compatible with existing 19.x installs.
 
 ## Opencast 19.6
 
-This version contains addition updates for the admin,editor, and studio submodules, along with the usual collection of
+This version contains addition updates for the admin, editor, and studio submodules, along with the usual collection of
 bug fixes.
 
 ## Opencast 19.5
 
-This version contains updates for the admin,editor, and studio submodules, along with the usual collection of bug fixes.
+This version contains updates for the admin, editor, and studio submodules, along with the usual collection of bug fixes.
 
 ## Opencast 19.4
 
