@@ -1,6 +1,5 @@
-import { getHashParameter, getUrlParameter } from "@asicupv/paella-opencast-core";
+import { getHashParameter, getUrlParameter } from '@asicupv/paella-opencast-core';
 import type { Paella, TrimmingParams } from '@asicupv/paella-core';
-
 
 /**
  * Converts a human-readable time string (e.g., "1h2m3s") into seconds.
@@ -30,16 +29,15 @@ function humanTimeToSeconds(humanTime: string): number {
  */
 async function setTrimming(player: Paella, trimmingData: Required<TrimmingParams>): Promise<void> {
     const { start, end, enabled } = trimmingData;
-    if (enabled && start > 0 && start < end ) {
-        await player.videoContainer.setTrimming(trimmingData);
+    if (enabled && start > 0 && start < end) {
+        await player.videoContainer?.setTrimming(trimmingData);
     }
-};
-
+}
 
 async function applyTrimmingFromQueryParams(paella: Paella): Promise<void> {
     // Enable trimming
     // Retrieve video duration in case a default trim end time is needed
-    const videoDuration = await paella.duration();    
+    const videoDuration = (await paella.duration()) ?? 0;
     let trimmingData = { start: 0, end: videoDuration, enabled: false };
 
     // Retrieve trimming data in URL param: ?trimming=1m2s;2m
@@ -57,31 +55,39 @@ async function applyTrimmingFromQueryParams(paella: Paella): Promise<void> {
             const trimmingSplit = trimming.split(';');
             if (trimmingSplit.length == 2) {
                 startTrimming = trimmingData.start + humanTimeToSeconds(trimmingSplit[0]);
-                endTrimming = (trimmingData.end == 0)
-                    ? trimmingData.start + humanTimeToSeconds(trimmingSplit[1])
-                    : Math.min(trimmingData.start + humanTimeToSeconds(trimmingSplit[1]), trimmingData.end);
+                endTrimming =
+                    trimmingData.end == 0
+                        ? trimmingData.start + humanTimeToSeconds(trimmingSplit[1])
+                        : Math.min(
+                              trimmingData.start + humanTimeToSeconds(trimmingSplit[1]),
+                              trimmingData.end,
+                          );
             }
-        }
-        else {
+        } else {
             if (startTrimVal) {
                 startTrimming = trimmingData.start + Math.floor(parseInt(startTrimVal));
             }
             if (endTrimVal) {
-                endTrimming = Math.min(trimmingData.start + Math.floor(parseInt(endTrimVal)), videoDuration);
+                endTrimming = Math.min(
+                    trimmingData.start + Math.floor(parseInt(endTrimVal)),
+                    videoDuration,
+                );
             }
         }
         if (startTrimming < endTrimming && endTrimming > 0 && startTrimming >= 0) {
             trimmingData = {
                 start: startTrimming,
                 end: endTrimming,
-                enabled: true
+                enabled: true,
             };
         }
-        paella.log.debug(`Setting trim to ${JSON.stringify(trimmingData)}`, 'engage-paella-player');
+        paella.log.debug(
+            `Setting trim to ${JSON.stringify(trimmingData)}`,
+            'opencast-engage-paella-player',
+        );
         await setTrimming(paella, trimmingData);
     }
 }
-
 
 async function applyInitialSeekFromQueryParams(paella: Paella): Promise<void> {
     // Check time param in URL and seek:  ?time=1m2s
@@ -89,15 +95,17 @@ async function applyInitialSeekFromQueryParams(paella: Paella): Promise<void> {
     // Check t param, which is seek time in seconds, to be passed as a query or hash: #t=12002
     const timeStringInSecs = getHashParameter('t') ?? getUrlParameter('t');
 
-    if ((timeString != null) || (timeStringInSecs != null)) {
+    if (timeString != null || timeStringInSecs != null) {
         let totalTime = 0;
         if (timeString) {
             totalTime = humanTimeToSeconds(timeString);
-        }
-        else if (timeStringInSecs) {
+        } else if (timeStringInSecs) {
             totalTime = Math.floor(parseInt(timeStringInSecs));
         }
-        paella.log.debug(`Setting initial seek to '${totalTime}' seconds`, 'engage-paella-player');
+        paella.log.debug(
+            `Setting initial seek to '${totalTime}' seconds`,
+            'opencast-engage-paella-player',
+        );
         await paella.setCurrentTime(totalTime);
     }
 }
@@ -118,8 +126,11 @@ async function applyCaptionsFromQueryParams(paella: Paella): Promise<void> {
         }
         const captionSelected = paella.captions[captionsIndex];
         if (captionSelected) {
-            paella.log.info(`Enabling captions: ${captionSelected?.label} (${captionSelected?.language})`, 'engage-paella-player');
-            paella.captionsCanvas.enableCaptions({ index: captionsIndex });
+            paella.log.info(
+                `Enabling captions: ${captionSelected?.label} (${captionSelected?.language})`,
+                'opencast-engage-paella-player',
+            );
+            paella.captionsCanvas?.enableCaptions({ index: captionsIndex });
         }
     }
 }
@@ -128,8 +139,8 @@ async function applyCaptionsFromQueryParams(paella: Paella): Promise<void> {
  * Applies query parameters from the URL to configure the Paella player.
  * Handles trimming, seek time, and captions settings.
  */
-export async function applyQueryParams(paella: Paella): Promise<void> {    
+export async function applyQueryParams(paella: Paella): Promise<void> {
     await applyTrimmingFromQueryParams(paella);
-    await applyInitialSeekFromQueryParams(paella);    
-    await applyCaptionsFromQueryParams(paella);    
-};
+    await applyInitialSeekFromQueryParams(paella);
+    await applyCaptionsFromQueryParams(paella);
+}
