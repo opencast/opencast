@@ -104,6 +104,9 @@ public class HttpNotificationWorkflowOperationHandler extends AbstractWorkflowOp
   /** Name of the workflow instance id HTTP parameter */
   public static final String HTTP_PARAM_WORKFLOW = "workflowInstanceId";
 
+  /** Name of the mediapackage id HTTP parameter */
+  public static final String HTTP_PARAM_MEDIAPACKAGE = "mediaPackageId";
+
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(HttpNotificationWorkflowOperationHandler.class);
 
@@ -178,6 +181,10 @@ public class HttpNotificationWorkflowOperationHandler extends AbstractWorkflowOp
 
       // Add the workflow instance id
       params.add(new BasicNameValuePair(HTTP_PARAM_WORKFLOW, Long.toString(workflowInstance.getId())));
+
+      // Add the mediapackage id
+      params.add(new BasicNameValuePair(HTTP_PARAM_MEDIAPACKAGE,
+              workflowInstance.getMediaPackage().getIdentifier().toString()));
 
       request.setEntity(new UrlEncodedFormEntity(params, "UTF-8"));
     } catch (UnsupportedEncodingException e) {
