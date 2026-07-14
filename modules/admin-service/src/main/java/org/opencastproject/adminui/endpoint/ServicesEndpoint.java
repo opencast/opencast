@@ -21,6 +21,7 @@
 
 package org.opencastproject.adminui.endpoint;
 
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static org.opencastproject.index.service.util.JSONUtils.safeString;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
@@ -30,6 +31,7 @@ import org.opencastproject.serviceregistry.api.HostRegistration;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.serviceregistry.api.ServiceState;
 import org.opencastproject.serviceregistry.api.ServiceStatistics;
+import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.SmartIterator;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -114,7 +116,8 @@ public class ServicesEndpoint {
       },
       responses = {
           @RestResponse(description = "Returns the list of services from Opencast",
-              responseCode = HttpServletResponse.SC_OK)
+              responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(responseCode = SC_BAD_REQUEST, description = "If sorting failed")
       },
       returnDescription = "The list of services")
   public Response getServices(@QueryParam("limit") final int limit, @QueryParam("offset") final int offset,
@@ -199,7 +202,9 @@ public class ServicesEndpoint {
                   sortCriterion.getFieldName(),
                   sortCriterion.getOrder() == Order.Ascending));
         } catch (Exception ex) {
-          logger.warn("Failed to sort services collection.", ex);
+          final String msg = String.format("Failed to sort services collection with %s", sortOpt.get());
+          logger.warn(msg, ex);
+          return RestUtil.R.badRequest(msg);
         }
       }
     }
