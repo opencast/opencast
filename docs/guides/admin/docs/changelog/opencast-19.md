@@ -1,6 +1,18 @@
 Opencast 19 Changelog
 ---------------------
 
+## Opencast 19.7 (2026-07-14)
+- [[#7764](https://github.com/opencast/opencast/pull/7764)] -
+  19.7 release notes
+- [[#7753](https://github.com/opencast/opencast/pull/7753)] -
+  Fix tag operation by adding missing callback
+- [[#7752](https://github.com/opencast/opencast/pull/7752)] -
+  Changing output-background color code in partial-theming-watermark WF to a string
+- [[#7736](https://github.com/opencast/opencast/pull/7736)] -
+  Upgrade paella 8
+- [[#7730](https://github.com/opencast/opencast/pull/7730)] -
+  Enforce absense of ACL deny rules
+
 ## Opencast 19.6 (2026-06-16)
 - [[#7725](https://github.com/opencast/opencast/pull/7725)] -
   19.6 release notes and changelog
