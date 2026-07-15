@@ -1,9 +1,12 @@
-# Opencast 20: Release Notes
+- [GHSA-6f53-jp7x-gg7p](https://github.com/opencast/opencast/security/advisories/GHSA-6f53-jp7x-gg7p) resolves a
+  session fixation issue which allowed for account takeovers via malicious links.- [GHSA-6f53-jp7x-gg7p](https://github.com/opencast/opencast/security/advisories/GHSA-6f53-jp7x-gg7p) resolves a
+    session fixation issue which allowed for account takeovers via malicious links.- [GHSA-6f53-jp7x-gg7p](https://github.com/opencast/opencast/security/advisories/GHSA-6f53-jp7x-gg7p) resolves a
+      session fixation issue which allowed for account takeovers via malicious links.# Opencast 20: Release Notes
 
 ## Opencast 20.2
 
 This version contains addition updates for the admin, editor, and studio submodules, along with the usual collection of
-bug fixes.  There are three things worthy of special attention:
+bug fixes. There are three things worthy of special attention:
 
 - [#7752](https://github.com/opencast/opencast/pull/7752) makes a change to a workflow, which will need to be manually
   applied by adopters if they are using the `output-background` configuration key.
@@ -12,7 +15,7 @@ bug fixes.  There are three things worthy of special attention:
 - [GHSA-6f53-jp7x-gg7p](https://github.com/opencast/opencast/security/advisories/GHSA-6f53-jp7x-gg7p) resolves a
   session fixation issue which allowed for account takeovers via malicious links.
 
-Neither security issue requires any changes by adopters, and they are both dropin compatible with existing 19.x installs.
+Neither security issue requires any changes by adopters, and they are both dropin compatible with existing 20.x installs.
 
 ## Opencast 20.1
 
