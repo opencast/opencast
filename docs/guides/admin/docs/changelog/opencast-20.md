@@ -1,7 +1,26 @@
 Opencast 20 Changelog
 ---------------------
 
+## Opencast 20.2 (2026-07-15)
+
+- [[#7733](https://github.com/opencast/opencast/pull/7733)] -
+  Remove dangling statistics gathering components from user providers
+- [[#7727](https://github.com/opencast/opencast/pull/7727)] -
+  engage-ui: Fix test after previous merge from r19
+
+### Admin Interface
+
+- [[#1624](https://github.com/opencast/admin-interface/pull/1624)] -
+  Make "Create User" dialog similar to other create dialogs
+- [[#1623](https://github.com/opencast/admin-interface/pull/1623)] -
+  Color variables everywhere
+- [[#1618](https://github.com/opencast/admin-interface/pull/1618)] -
+  Fix various color contrast issues
+- [[#1612](https://github.com/opencast/admin-interface/pull/1612)] -
+  Fix workflow displayOrder not being respected
+
 ## Opencast 20.1 (2026-06-17)
+
 - [[#7708](https://github.com/opencast/opencast/pull/7708)] -
   Test used workflow definition element, configuration_panel
 - [[#7707](https://github.com/opencast/opencast/pull/7707)] -
