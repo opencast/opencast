@@ -1,7 +1,4 @@
-- [GHSA-6f53-jp7x-gg7p](https://github.com/opencast/opencast/security/advisories/GHSA-6f53-jp7x-gg7p) resolves a
-  session fixation issue which allowed for account takeovers via malicious links.- [GHSA-6f53-jp7x-gg7p](https://github.com/opencast/opencast/security/advisories/GHSA-6f53-jp7x-gg7p) resolves a
-    session fixation issue which allowed for account takeovers via malicious links.- [GHSA-6f53-jp7x-gg7p](https://github.com/opencast/opencast/security/advisories/GHSA-6f53-jp7x-gg7p) resolves a
-      session fixation issue which allowed for account takeovers via malicious links.# Opencast 20: Release Notes
+# Opencast 20: Release Notes
 
 ## Opencast 20.2
 
