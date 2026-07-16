@@ -25,6 +25,7 @@ import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 
+import org.opencastproject.basicstatistics.BasicStatisticsSecretService;
 import org.opencastproject.basicstatistics.BasicStatisticsService;
 import org.opencastproject.basicstatistics.EventType;
 import org.opencastproject.basicstatistics.ItemType;
@@ -38,6 +39,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
@@ -46,6 +48,8 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.format.DateTimeParseException;
@@ -108,7 +112,12 @@ public class BasicStatisticsRestEndpoint {
   /** The service */
   protected BasicStatisticsService basicStatisticsService;
 
+  /** Daily secret service */
+  protected BasicStatisticsSecretService secretService;
+
   private static final Gson GSON = new Gson();
+
+  private static final String X_FORWARDED_FOR = "X-Forwarded-For";
 
   @GET
   @Path("")
@@ -167,33 +176,62 @@ public class BasicStatisticsRestEndpoint {
     ).build();
   }
 
-  /**
-   * the client (user browser) directly sends a request to that API, authentication is not required.
-   *
-   * @return The Hello World statement
-   * @throws Exception
-   */
   @POST
-  @Path("clientpush")
+  @Path("client-push")
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.TEXT_PLAIN)
   @RestQuery(
       name = "clientpush",
-      description = "example service call",
+      description = "Unauthenticated request for clients, i.e. user browers",
       responses = {
           @RestResponse(
               responseCode = HttpServletResponse.SC_OK,
-              description = "Hello World"
+              description = "The server was able to process the request"
+          ),
+          @RestResponse(
+              responseCode = SC_BAD_REQUEST,
+              description = "The request could not be accepted for some reason"
           ),
           @RestResponse(
               responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
               description = "The underlying service could not output something."
           )
       },
-      returnDescription = "The text that the service returns."
+      returnDescription = "Returns an object of the form { int accepted, List<RejectedEvent> rejected }. \n"
+          + "accepted: number of events stored in the database \n"
+          + "rejected: { index: index of the invalid item in the request array (0 indexed) \n"
+          + "error: string with short, developer focussed error message }"
   )
   public Response clientPush(@Context HttpServletRequest request) {
+    // Parse request header
+    // Parse client IP
+    InetAddress ip;
+    String ipString;
+    if (StringUtils.isNotBlank(request.getHeader(X_FORWARDED_FOR))) {
+      logger.trace("Found '{}' header for client IP '{}'", X_FORWARDED_FOR, request.getHeader(X_FORWARDED_FOR));
+      ipString = request.getHeader(X_FORWARDED_FOR);
+      ipString = ipString.split(",")[0].trim();
+    } else {
+      logger.trace("Using client IP from request '{}'", request.getRemoteAddr());
+      ipString = request.getRemoteAddr();
+    }
+    try {
+      ip = InetAddress.getByName(ipString);
+    } catch (UnknownHostException e) {
+      return Response.status(Response.Status.BAD_REQUEST)
+          .entity("no IP address for the host could be found")
+          .build();
+    }
 
+    // Parse user agent
+    String userAgent = request.getHeader("User-Agent");
+    if (userAgent == null) {
+      return Response.status(Response.Status.BAD_REQUEST)
+          .entity("Could not find User-Agent header")
+          .build();
+    }
+
+    // Parse request body
     try {
       String json = readInputStream(request);
 
@@ -210,59 +248,34 @@ public class BasicStatisticsRestEndpoint {
       for (int index = 0; index < pushRequest.getEvents().size(); index++) {
         ClientEventDto dto = pushRequest.getEvents().get(index);
 
+        // Parsing dto into event
+        RawEvent event;
+        try {
+          event = parseDto(dto);
+        } catch (IllegalArgumentException e) {
+          rejected.add(new RejectedEvent(index, e.getMessage()));
+          continue;
+        }
+
         // Validation
-        if (dto.getItemId() == null) {
-          rejected.add(new RejectedEvent(index, "Item id was not specified"));
+        RejectedEvent rejectedEvent = validate(event, index, now);
+        if (rejectedEvent != null) {
+          rejected.add(rejectedEvent);
           continue;
         }
-        ItemType itemType;
-        try {
-          itemType = ItemType.valueOf(dto.getItemType());
-        } catch (IllegalArgumentException e) {
-          rejected.add(new RejectedEvent(index, "Unknown itemType '" + dto.getItemType() + "'"));
-          continue;
-        }
-        EventType eventType;
-        try {
-          eventType = EventType.valueOf(dto.getEventType());
-        } catch (IllegalArgumentException e) {
-          rejected.add(new RejectedEvent(index, "Unknown eventType '" + dto.getEventType() + "'"));
-          continue;
-        }
-        if (eventType.equals(EventType.FETCH_FILE)) {
+        // Additional Validation
+        if (event.getEventType().equals(EventType.FETCH_FILE)) {
           rejected.add(new RejectedEvent(index, "EventType 'FETCH_FILE' is disallowed on client-push"));
           continue;
         }
-        if (!RawEvent.payloadValidator(eventType, dto.getEventPayload())) {
-          rejected.add(new RejectedEvent(index, "Event payload is malformed"));
-          continue;
-        }
-        Instant timestamp;
-        try {
-          timestamp = Instant.parse(dto.getTimestamp());
-        } catch (DateTimeParseException e) {
-          rejected.add(new RejectedEvent(index, "Invalid timestamp '" + dto.getTimestamp() + "'. "
-              + "Expected RFC3339 format, e.g. 2026-04-27T14:56:38.415Z."));
-          continue;
-        }
-        if (timestamp.isAfter(now.plus(ALLOWED_CLOCK_SKEW))) {
-          rejected.add(new RejectedEvent(index, "Timestamp is too far in the future."));
-          continue;
-        }
-        if (timestamp.isBefore(now.minus(MAX_CLIENT_PUSH_DELAY))) {
+        if (event.getTimestamp().isBefore(now.minus(MAX_CLIENT_PUSH_DELAY))) {
           rejected.add(new RejectedEvent(index, "Timestamp is too old."));
           continue;
         }
 
-        // Create event
-        RawEvent event = new RawEvent();
-        event.setTimestamp(timestamp);
-        event.setItemType(itemType);
-        event.setItemId(dto.getItemId());
-        event.setEventType(eventType);
-        event.setEventPayload(dto.getEventPayload());
-
-        // TODO: Calculate/Add session hash here?
+        // Calculate/Add session hash
+        String sessionHash = basicStatisticsService.generateSessionHash(dto.getItemId(), ip, userAgent);
+        event.setSession(sessionHash);
 
         accepted.add(event);
       }
@@ -280,6 +293,151 @@ public class BasicStatisticsRestEndpoint {
     }
   }
 
+  @POST
+  @Path("trusted-push")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.TEXT_PLAIN)
+  @RestQuery(
+      name = "trustedpush",
+      description = "Authenticated request for servers/nodes i.e. octoka",
+      responses = {
+          @RestResponse(
+              responseCode = HttpServletResponse.SC_OK,
+              description = "The server was able to process the request"
+          ),
+          @RestResponse(
+              responseCode = SC_BAD_REQUEST,
+              description = "The request could not be accepted for some reason"
+          ),
+          @RestResponse(
+              responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
+              description = "The underlying service could not output something."
+          )
+      },
+      returnDescription = "Returns an object of the form { int accepted, List<RejectedEvent> rejected }. \n"
+          + "accepted: number of events stored in the database \n"
+          + "rejected: { index: index of the invalid item in the request array (0 indexed) \n"
+          + "error: string with short, developer focussed error message }"
+  )
+  public Response trustedPush(@Context HttpServletRequest request) {
+    try {
+      String json = readInputStream(request);
+
+      TrustedPushRequest pushRequest = GSON.fromJson(json, TrustedPushRequest.class);
+
+      for (TrustedEventDto event : pushRequest.getEvents()) {
+        logger.info(event.getTimestamp().toString());
+      }
+
+      List<RawEvent> accepted = new ArrayList<>();
+      List<RejectedEvent> rejected = new ArrayList<>();
+      Instant now = Instant.now();
+      byte[] dailySecret = secretService.getCurrentSecret();
+
+      for (int index = 0; index < pushRequest.getEvents().size(); index++) {
+        TrustedEventDto dto = pushRequest.getEvents().get(index);
+
+        // Parsing dto into event
+        RawEvent event;
+        try {
+          event = parseDto(dto);
+        } catch (IllegalArgumentException e) {
+          rejected.add(new RejectedEvent(index, e.getMessage()));
+          continue;
+        }
+        // Additional parsing
+        InetAddress ip;
+        try {
+          ip = InetAddress.getByName(dto.getAddr());
+        } catch (UnknownHostException e) {
+          return Response.status(Response.Status.BAD_REQUEST)
+              .entity("no IP address for the host could be found")
+              .build();
+        }
+
+        // Validation
+        RejectedEvent rejectedEvent = validate(event, index, now);
+        if (rejectedEvent != null) {
+          rejected.add(rejectedEvent);
+          continue;
+        }
+        // Additional Validation
+        if (dto.getUa() == null) {
+          rejected.add((new RejectedEvent(index, "ua (user agent) field must be set on trusted push")));
+          continue;
+        }
+
+        // Calculate/Add session hash
+        String sessionHash = basicStatisticsService.generateSessionHash(
+            dailySecret,
+            dto.getItemId(),
+            ip,
+            dto.getUa()
+        );
+        event.setSession(sessionHash);
+
+        accepted.add(event);
+      }
+
+      basicStatisticsService.create(accepted);
+
+      ClientPushResponse response = new ClientPushResponse(accepted.size(), rejected);
+
+      return Response.ok(GSON.toJson(response), MediaType.APPLICATION_JSON).build();
+    } catch (JsonSyntaxException e) {
+      return Response.status(Response.Status.BAD_REQUEST)
+          .entity(e.getMessage())
+          .build();
+    }
+  }
+
+  private RawEvent parseDto(ClientEventDto dto) throws IllegalArgumentException {
+    ItemType itemType;
+    try {
+      itemType = ItemType.valueOf(dto.getItemType());
+    } catch (IllegalArgumentException e) {
+      throw new IllegalArgumentException("Unknown itemType '" + dto.getItemType() + "'");
+    }
+
+    EventType eventType;
+    try {
+      eventType = EventType.valueOf(dto.getEventType());
+    } catch (IllegalArgumentException e) {
+      throw new IllegalArgumentException("Unknown eventType '" + dto.getEventType() + "'");
+    }
+
+    Instant timestamp;
+    try {
+      timestamp = Instant.parse(dto.getTimestamp());
+    } catch (DateTimeParseException e) {
+      throw new IllegalArgumentException("Invalid timestamp '" + dto.getTimestamp() + "'. "
+          + "Expected RFC3339 format, e.g. 2026-04-27T14:56:38.415Z.");
+    }
+
+    RawEvent event = new RawEvent();
+    event.setTimestamp(timestamp);
+    event.setItemType(itemType);
+    event.setItemId(dto.getItemId());
+    event.setEventType(eventType);
+    event.setEventPayload(dto.getEventPayload());
+
+    return event;
+  }
+
+  private RejectedEvent validate(RawEvent event, int index, Instant now) {
+    if (event.getItemId() == null) {
+      return new RejectedEvent(index, "Item id was not specified");
+    }
+    if (!RawEvent.payloadValidator(event.getEventType(), event.getEventPayload())) {
+      return new RejectedEvent(index, "Event payload is malformed");
+    }
+    if (event.getTimestamp().isAfter(now.plus(ALLOWED_CLOCK_SKEW))) {
+      return new RejectedEvent(index, "Timestamp is too far in the future.");
+    }
+
+    return null;
+  }
+
   protected String readInputStream(HttpServletRequest request) {
     String details;
     try (InputStream is = request.getInputStream()) {
@@ -294,5 +452,9 @@ public class BasicStatisticsRestEndpoint {
   @Reference
   public void setBasicStatisticsService(BasicStatisticsService service) {
     this.basicStatisticsService = service;
+  }
+  @Reference()
+  public void setBasicStatisticsSecretService(BasicStatisticsSecretService secretService) {
+    this.secretService = secretService;
   }
 }
