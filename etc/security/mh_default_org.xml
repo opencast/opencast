@@ -391,6 +391,10 @@
     <sec:intercept-url pattern="/transcripts/watson/results*" method="GET" access="permitAll" />
     <sec:intercept-url pattern="/transcripts/watson/results*" method="POST" access="permitAll" />
 
+    <!-- Enable access to basic statistics -->
+    <sec:intercept-url pattern="/basicstatistics/client-push" method="POST" access="permitAll" />
+    <sec:intercept-url pattern="/basicstatistics/trusted-push" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" />
+
     <!-- Enable access to the redirect routes -->
     <sec:intercept-url pattern="/redirect/**" access="permitAll" />
 

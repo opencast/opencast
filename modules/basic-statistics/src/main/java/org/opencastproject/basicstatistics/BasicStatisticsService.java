@@ -26,6 +26,8 @@ import org.opencastproject.basicstatistics.persistence.BasicStatisticsDatabaseSe
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.requests.SortCriterion;
 
+import org.apache.commons.codec.digest.HmacAlgorithms;
+import org.apache.commons.codec.digest.HmacUtils;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Modified;
@@ -33,6 +35,9 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.ByteArrayOutputStream;
+import java.net.InetAddress;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 
@@ -58,6 +63,9 @@ public class BasicStatisticsService {
   /** The security service */
   protected SecurityService securityService;
 
+  /** Daily secret service */
+  protected BasicStatisticsSecretService secretService;
+
   /** Callback to set the basic statistics database */
   @Reference(name = "basicstatistics-persistence")
   public void setPersistence(BasicStatisticsDatabaseService persistence) {
@@ -68,6 +76,12 @@ public class BasicStatisticsService {
   @Reference(name = "security-service")
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
+  }
+
+  /** OSGi callback to set the secret service */
+  @Reference(name = "basicstatistics-secret")
+  public void setBasicStatisticsSecretService(BasicStatisticsSecretService secretService) {
+    this.secretService = secretService;
   }
 
   @Activate
@@ -109,5 +123,29 @@ public class BasicStatisticsService {
     } catch (BasicStatisticsDatabaseException e) {
       throw new IllegalStateException();
     }
+  }
+
+  public String generateSessionHash(
+      String itemId,
+      InetAddress ip,
+      String userAgent) {
+    byte[] dailySecret = secretService.getCurrentSecret();
+
+    return generateSessionHash(dailySecret, itemId, ip, userAgent);
+  }
+
+  public String generateSessionHash(
+      byte[] dailySecret,
+      String itemId,
+      InetAddress ip,
+      String userAgent) {
+    ByteArrayOutputStream message = new ByteArrayOutputStream();
+
+    message.writeBytes(itemId.getBytes(StandardCharsets.UTF_8));
+    message.writeBytes(ip.getAddress());          // raw IPv4/IPv6 bytes
+    message.writeBytes(userAgent.getBytes(StandardCharsets.UTF_8));
+
+    return new HmacUtils(HmacAlgorithms.HMAC_SHA_256, dailySecret)
+        .hmacHex(message.toByteArray());
   }
 }
