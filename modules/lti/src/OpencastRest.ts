@@ -1,4 +1,5 @@
 import axios from "axios";
+import { parsedQueryString } from "./utils";
 
 export interface Attachment {
     readonly type: string;
@@ -124,7 +125,7 @@ export function collectionToPairs(c: EventMetadataCollection): [string, string][
     return Object.keys(c).map((k) => [k, c[k]]);
 }
 
-const debug = window.location.search.includes("&debug=true");
+const debug = parsedQueryString().debug === "true";
 
 function hostAndPort() {
     return debug ? "http://localhost:7878" : "";
