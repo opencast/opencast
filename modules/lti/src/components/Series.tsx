@@ -11,8 +11,7 @@ import { Loading } from "./Loading";
 import { withTranslation, WithTranslation } from "react-i18next";
 import "../App.css";
 import 'bootstrap/dist/css/bootstrap.css';
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faTrash, faEdit, faComments, faDownload, faChevronLeft, faChevronRight, faAnglesLeft, faAnglesRight } from "@fortawesome/free-solid-svg-icons";
+import { LuTrash2, LuPencil, LuMessageSquare, LuDownload, LuChevronLeft, LuChevronRight, LuChevronsLeft, LuChevronsRight } from "react-icons/lu";
 import * as i18next from "i18next";
 import { parsedQueryString, capitalize } from "../utils";
 import { sortByType } from "../trackUtils";
@@ -80,20 +79,20 @@ const SeriesEpisode: React.FC<EpisodeProps> = ({episode, deleteCallback, editCal
             <div className="ms-auto">
                 {deleteCallback !== undefined &&
                     <button onClick={(e) => { deleteCallback(episode.id); e.stopPropagation(); }}>
-                        <FontAwesomeIcon icon={faTrash} />
+                        <LuTrash2 />
                     </button>}
                 {editCallback !== undefined &&
                     <button onClick={(e) => { editCallback(episode.id); e.stopPropagation(); }}>
-                        <FontAwesomeIcon icon={faEdit} />
+                        <LuPencil />
                     </button>}
                 {annotateCallback !== undefined &&
                                     <button onClick={(e) => { annotateCallback(episode.id); e.stopPropagation(); }}>
-                                        <FontAwesomeIcon icon={faComments} />
+                                        <LuMessageSquare />
                                     </button>}
                 {downloadCallback !== undefined && Array.isArray(episode.mediapackage.tracks) && episode.mediapackage.tracks.length > 0 &&
                   <Dropdown style={{display: 'inline-block'}}>
                     <Dropdown.Toggle as={dropdownCustomToggle} >
-                      <FontAwesomeIcon icon={faDownload}/>
+                      <LuDownload/>
                     </Dropdown.Toggle>
                     <DropdownMenu>
                       {sortByType(episode.mediapackage.tracks).map((track) => {
@@ -337,7 +336,7 @@ const Pagination = ({
                 }}
                 aria-label="Go to first page"
             >
-                <FontAwesomeIcon icon={faAnglesLeft} />
+                <LuChevronsLeft />
             </button>
             <button
                 className={isNavigatePrevious() ? "page-link" : "page-link disabled"}
@@ -347,7 +346,7 @@ const Pagination = ({
                 }}
                 aria-label="Go to Previous page"
             >
-                <FontAwesomeIcon icon={faChevronLeft} />
+                <LuChevronLeft />
             </button>
             {accessiblePages.map((page, key) =>
                 page === activePage ? (
@@ -376,7 +375,7 @@ const Pagination = ({
                 }}
                 aria-label="Go to next page"
             >
-                <FontAwesomeIcon icon={faChevronRight} />
+                <LuChevronRight />
             </button>
             <button
                 className={isNavigateNext() ? "page-link" : "page-link disabled"}
@@ -386,7 +385,7 @@ const Pagination = ({
                 }}
                 aria-label="Go to last page"
             >
-                <FontAwesomeIcon icon={faAnglesRight} />
+                <LuChevronsRight />
             </button>
         </div>
     );
