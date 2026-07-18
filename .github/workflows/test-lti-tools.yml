@@ -25,6 +25,10 @@ jobs:
       working-directory: modules/lti/
       run: npm ci
 
+    - name: type check
+      working-directory: modules/lti/
+      run: npx tsc --noEmit -p tsconfig.json
+
     - name: install selenium
       working-directory: modules/lti/
       run: pip install -r requirements.txt
