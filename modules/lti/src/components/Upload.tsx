@@ -88,22 +88,15 @@ class TranslatedUpload extends React.Component<UploadProps, UploadState> {
             if (metadataCollection.length > 0) {
                 const metadata = metadataCollection.find(col => col.flavor === "dublincore/episode");
                 if (metadata === undefined) { throw Error("Could not find episode metadata catalog")}
-                const seriesId = this.resolveSeries(metadata)
-                if (seriesId === undefined) {
-                    this.setState({
-                        ...this.state,
-                        metadata: "error"
-                    });
-                } else {
-                    this.setState({
-                        ...this.state,
-                        metadata: {
-                            initial: metadata,
-                            edited: metadata,
-                            seriesId: seriesId
-                        },
-                    });
-                }
+                const seriesId = this.resolveSeries(metadata) ?? "";
+                this.setState({
+                    ...this.state,
+                    metadata: {
+                        initial: metadata,
+                        edited: metadata,
+                        seriesId: seriesId
+                    },
+                });
             }
         }).catch((_) => this.setState({
             ...this.state,
