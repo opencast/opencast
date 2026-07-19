@@ -1,0 +1,27 @@
+meta {
+  name: post_group_invalid
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{baseUrl}}/api/groups
+  body: formUrlEncoded
+  auth: inherit
+}
+
+body:form-urlencoded {
+  ~name:
+}
+
+assert {
+  res.status: eq 400
+}
+
+tests {
+  test("Creating a group without the mandatory name should be rejected", function() {
+    // Currently fails: Opencast returns 500 (NullPointerException) instead of
+    // the documented 400 when the mandatory 'name' parameter is missing.
+    expect(res.status).to.equal(400);
+  });
+}

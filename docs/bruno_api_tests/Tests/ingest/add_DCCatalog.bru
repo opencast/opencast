@@ -1,0 +1,35 @@
+meta {
+  name: add_DCCatalog
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{baseUrl}}/ingest/addDCCatalog
+  body: multipartForm
+  auth: inherit
+}
+
+body:multipart-form {
+  mediaPackage: {{mediaPackage_A}}
+  dublinCore: <?xml version="1.0" encoding="UTF-8"?><dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/" xmlns:dcterms="http://purl.org/dc/terms/"><dcterms:title>Dublin Core Ingest</dcterms:title><dcterms:creator>Bruno Test Suite</dcterms:creator></dublincore>
+  flavor: dublincore/episode
+}
+
+assert {
+  res.status: eq 200
+  res.headers["content-type"]: contains xml
+}
+
+tests {
+  test("Add Dublin Core catalog should return augmented mediapackage", function() {
+    const body = res.getBody();
+    expect(body).to.be.a('string');
+    expect(body).to.include("<mediapackage");
+  });
+}
+
+script:post-response {
+  const body = res.getBody();
+  bru.setVar("mediaPackage_A", body);
+}

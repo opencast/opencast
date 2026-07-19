@@ -1,0 +1,23 @@
+meta {
+  name: put_series_acl_invalid
+  type: http
+  seq: 12
+}
+
+put {
+  url: {{baseUrl}}/api/series/:seriesId/acl
+  body: formUrlEncoded
+  auth: inherit
+}
+
+params:path {
+  seriesId: {{identifier}}
+}
+
+body:form-urlencoded {
+  acl: malformed_acl_json
+}
+
+assert {
+  res.status: eq 400
+}

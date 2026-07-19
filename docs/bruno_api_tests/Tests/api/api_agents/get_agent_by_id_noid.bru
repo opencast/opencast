@@ -1,0 +1,36 @@
+meta {
+  name: get_agent_by_id_noid
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/agents/:agentId
+  body: none
+  auth: inherit
+}
+
+params:path {
+  agentId:
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Missing agent ID should fall back to the agents list", function() {
+    const body = res.getBody();
+    expect(body).to.be.an('array');
+    if (body.length > 0) {
+      const agent = body[0];
+      expect(agent.agent_id).to.be.a('string');
+      expect(agent.status).to.be.a('string');
+      expect(agent.inputs).to.be.an('array');
+      if (agent.update) {
+        expect(agent.update).to.be.a('string');
+      }
+      expect(agent.url).to.be.a('string');
+    }
+  });
+}

@@ -1,0 +1,35 @@
+meta {
+  name: add_Attachment_URL
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/ingest/addAttachment
+  body: formUrlEncoded
+  auth: inherit
+}
+
+body:form-urlencoded {
+  flavor: attachment/url-notes
+  url: https://www.uni-osnabrueck.de/fileadmin/_processed_/1/3/csm_2026-5-8_Bewerbung_WS_klein_01_76d6c5efc8.jpg
+  mediaPackage: {{mediaPackage_A}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+script:post-response {
+  const body = res.getBody();
+  bru.setVar("mediaPackage_A", body);
+}
+
+tests {
+  test("Add attachment by URL should return augmented mediapackage", function() {
+    const body = res.getBody();
+    expect(body).to.be.a('string');
+    expect(body).to.include("<mediapackage");
+    expect(body).to.include("type=\"attachment/url-notes\"");
+  });
+}

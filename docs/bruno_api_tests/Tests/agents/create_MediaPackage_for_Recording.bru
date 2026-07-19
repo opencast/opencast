@@ -1,0 +1,29 @@
+meta {
+  name: create_MediaPackage_for_Recording
+  type: http
+  seq: 14
+}
+
+get {
+  url: {{baseUrl}}/ingest/createMediaPackage
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Create MediaPackage should return XML package", function() {
+    const body = res.getBody();
+    expect(body).to.be.a('string');
+    expect(body).to.include("<mediapackage");
+    
+    const idMatch = body.match(/id="([^"]+)"/);
+    expect(idMatch).to.not.be.null;
+    
+    bru.setVar("recordingMpId", idMatch[1]);
+    bru.setVar("recordingMpXml", body);
+  });
+}

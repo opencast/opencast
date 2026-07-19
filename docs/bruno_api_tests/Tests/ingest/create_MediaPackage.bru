@@ -1,0 +1,38 @@
+meta {
+  name: create_MediaPackage
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/ingest/createMediaPackage
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.headers["content-type"]: contains xml
+}
+
+script:post-response {
+  const body = res.getBody();
+  const idMatch = body.match(/id="([^"]+)"/);
+  if (idMatch) {
+    bru.setVar("mediaPackage_A", body);
+    bru.setVar("mediaPackageId_A", idMatch[1]);
+  }
+}
+
+tests {
+  test("Create MediaPackage should return a valid XML mediapackage", function() {
+    const body = res.getBody();
+    expect(body).to.be.a('string');
+    expect(body).to.include("<mediapackage");
+    
+    const idMatch = body.match(/id="([^"]+)"/);
+    expect(idMatch).to.not.be.null;
+    const id = idMatch[1];
+    expect(id).to.match(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
+  });
+}

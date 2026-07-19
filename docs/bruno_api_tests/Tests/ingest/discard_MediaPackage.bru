@@ -1,0 +1,29 @@
+meta {
+  name: discard_MediaPackage
+  type: http
+  seq: 18
+}
+
+post {
+  url: {{baseUrl}}/ingest/discardMediaPackage
+  body: multipartForm
+  auth: inherit
+}
+
+body:multipart-form {
+  mediaPackage: {{mediaPackage_A}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Discard media package should return 200 and be empty", function() {
+    const body = res.getBody();
+    // Usually returns empty body on success
+    if (body) {
+      expect(body.trim()).to.equal('');
+    }
+  });
+}

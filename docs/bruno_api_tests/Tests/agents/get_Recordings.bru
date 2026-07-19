@@ -1,0 +1,23 @@
+meta {
+  name: get_Recordings
+  type: http
+  seq: 13
+}
+
+get {
+  url: {{baseUrl}}/capture-admin/recordings
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Get recordings XML list should return valid root", function() {
+    const body = res.getBody();
+    expect(body).to.be.a('string');
+    expect(body).to.match(/<(ns1:)?recording-state-updates/);
+  });
+}

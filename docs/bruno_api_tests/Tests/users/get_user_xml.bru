@@ -1,0 +1,24 @@
+meta {
+  name: get_user_xml
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/users/{{uUsername}}.xml
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.headers["content-type"]: contains xml
+}
+
+tests {
+  test("User XML response should contain the username", function() {
+    const body = res.getBody();
+    expect(body).to.be.a('string');
+    expect(body).to.include("<username>" + bru.getVar("uUsername") + "</username>");
+  });
+}

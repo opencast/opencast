@@ -1,0 +1,23 @@
+meta {
+  name: delete_agent_for_scheduling
+  type: http
+  seq: 27
+}
+
+delete {
+  url: {{baseUrl}}/capture-admin/agents/bruno-sched-agent
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Removing the capture agent for scheduling should succeed", function() {
+    const body = res.getBody();
+    expect(body).to.be.a('string');
+    expect(body).to.include("bruno-sched-agent removed");
+  });
+}

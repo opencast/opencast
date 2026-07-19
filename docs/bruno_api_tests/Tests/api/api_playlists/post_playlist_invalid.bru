@@ -1,0 +1,25 @@
+meta {
+  name: post_playlist_invalid
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/api/playlists
+  body: formUrlEncoded
+  auth: inherit
+}
+
+body:form-urlencoded {
+  playlist: malformed_json_body
+}
+
+assert {
+  res.status: eq 400
+}
+
+tests {
+  test("Creating a playlist from malformed JSON should be rejected", function() {
+    expect(res.status).to.equal(400);
+  });
+}

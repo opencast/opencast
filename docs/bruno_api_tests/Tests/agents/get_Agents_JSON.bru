@@ -1,0 +1,23 @@
+meta {
+  name: get_Agents_JSON
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/capture-admin/agents.json
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Get capture agents JSON should return valid structure", function() {
+    const body = res.getBody();
+    expect(body).to.be.an('object');
+    expect(body).to.have.property('agents');
+  });
+}

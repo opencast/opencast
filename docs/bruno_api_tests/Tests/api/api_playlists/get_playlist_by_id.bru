@@ -1,0 +1,45 @@
+meta {
+  name: get_playlist_by_id
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/api/playlists/:playlistId
+  body: none
+  auth: inherit
+}
+
+params:path {
+  playlistId: {{playlistID}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Playlist by ID structure should have correct types", function() {
+    const body = res.getBody();
+    const pl = body.playlist || body;
+    expect(pl).to.be.an('object');
+    expect(pl.title).to.be.a('string');
+    expect(pl.description).to.be.a('string');
+    expect(pl.id).to.satisfy(val => typeof val === 'string' || typeof val === 'number');
+    if (pl.organization !== undefined) expect(pl.organization).to.be.a('string');
+    if (pl.creator !== undefined) expect(pl.creator).to.be.a('string');
+    expect(pl.updated).to.satisfy(val => typeof val === 'string' || typeof val === 'number');
+    expect(pl.entries).to.be.an('array');
+    pl.entries.forEach(function(entry) {
+      expect(entry.id).to.satisfy(val => typeof val === 'string' || typeof val === 'number');
+      expect(entry.contentId).to.be.a('string');
+      expect(entry.type).to.be.a('string');
+    });
+    expect(pl.accessControlEntries).to.be.an('array');
+    pl.accessControlEntries.forEach(function(ace) {
+      expect(ace.allow).to.be.a('boolean');
+      expect(ace.action).to.be.a('string');
+      expect(ace.role).to.be.a('string');
+    });
+  });
+}

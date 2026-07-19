@@ -1,0 +1,24 @@
+meta {
+  name: put_event_metadata
+  type: http
+  seq: 17
+}
+
+put {
+  url: {{baseUrl}}/api/events/:eventId/metadata?type=dublincore/episode
+  body: formUrlEncoded
+  auth: inherit
+}
+
+params:path {
+  eventId: {{eventId}}
+}
+
+body:form-urlencoded {
+  metadata: [{"id":"title","value":"Captivating title - edited"}]
+}
+
+assert {
+  res.status: eq 204
+}
+

@@ -1,0 +1,33 @@
+meta {
+  name: get_statistics_providers
+  type: http
+  seq: 2
+}
+
+get {
+  url: {{baseUrl}}/api/statistics/providers?filter=resourceType:episode
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Statistics providers list should have correct types", function() {
+    // Note: develop.opencast.org has no statistics backend configured, so the
+    // element checks only run against servers with statistics providers.
+    if (res.status === 200) {
+      const body = res.getBody();
+      expect(body).to.be.an('array');
+      body.forEach(function(prov) {
+        expect(prov.identifier).to.be.a('string');
+        expect(prov.title).to.be.a('string');
+        expect(prov.description).to.be.a('string');
+        expect(prov.type).to.be.a('string');
+        expect(prov.resourceType).to.be.a('string');
+      });
+    }
+  });
+}

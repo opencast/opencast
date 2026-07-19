@@ -1,0 +1,38 @@
+meta {
+  name: add_DCCatalog_for_ScheduleWD
+  type: http
+  seq: 27
+}
+
+post {
+  url: {{baseUrl}}/ingest/addDCCatalog
+  body: formUrlEncoded
+  auth: inherit
+}
+
+body:form-urlencoded {
+  mediaPackage: {{mediaPackage_E}}
+  dublinCore: <?xml version="1.0" encoding="UTF-8"?><dublincore xmlns="http://www.opencastproject.org/xsd/1.0/dublincore/" xmlns:dcterms="http://purl.org/dc/terms/"><dcterms:title>Scheduled Event E</dcterms:title><dcterms:creator>Bruno Test Suite</dcterms:creator><dcterms:spatial>{{randomRoomE}}</dcterms:spatial><dcterms:temporal>start=2026-06-05T10:00:00Z; end=2026-06-05T11:00:00Z; scheme=W3C-DTF</dcterms:temporal></dublincore>
+  flavor: dublincore/episode
+}
+
+assert {
+  res.status: eq 200
+}
+
+script:pre-request {
+  const randomSuffix = Math.floor(Math.random() * 10000000);
+  bru.setVar("randomRoomE", "room-e-" + randomSuffix);
+}
+
+tests {
+  test("Add Dublin Core catalog for scheduling with workflow ID should succeed", function() {
+    const body = res.getBody();
+    expect(body).to.be.a('string');
+  });
+}
+
+script:post-response {
+  const body = res.getBody();
+  bru.setVar("mediaPackage_E", body);
+}

@@ -1,0 +1,19 @@
+meta {
+  name: post_series_invalid
+  type: http
+  seq: 17
+}
+
+post {
+  url: {{baseUrl}}/api/series
+  body: formUrlEncoded
+  auth: inherit
+}
+
+body:form-urlencoded {
+  metadata: malformed_json_metadata
+}
+
+assert {
+  res.status: eq 400
+}

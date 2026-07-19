@@ -1,0 +1,25 @@
+meta {
+  name: create_MediaPackageWithID
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{baseUrl}}/ingest/createMediaPackageWithID/test-ingest-custom-id
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.headers["content-type"]: contains xml
+}
+
+tests {
+  test("Create MediaPackage with ID should return the package with the custom ID", function() {
+    const body = res.getBody();
+    expect(body).to.be.a('string');
+    expect(body).to.include("<mediapackage");
+    expect(body).to.include("id=\"test-ingest-custom-id\"");
+  });
+}

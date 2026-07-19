@@ -1,0 +1,31 @@
+meta {
+  name: get_series_properties
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/api/series/:seriesId/properties
+  body: none
+  auth: inherit
+}
+
+params:path {
+  seriesId: {{identifier}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Series properties key-values should be strings", function() {
+    if (res.status === 200) {
+      const body = res.getBody();
+      expect(body).to.be.an('object');
+      for (const key in body) {
+        expect(body[key]).to.be.a('string');
+      }
+    }
+  });
+}

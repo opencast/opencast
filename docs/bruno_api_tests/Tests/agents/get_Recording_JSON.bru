@@ -1,0 +1,25 @@
+meta {
+  name: get_Recording_JSON
+  type: http
+  seq: 19
+}
+
+get {
+  url: {{baseUrl}}/capture-admin/recordings/{{recordingMpId}}.json
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Get recording status JSON should return valid details", function() {
+    const body = res.getBody();
+    expect(body).to.be.an('object');
+    expect(body['recording-state-update']).to.be.an('object');
+    expect(body['recording-state-update'].name).to.equal(bru.getVar('recordingMpId'));
+    expect(body['recording-state-update'].state).to.equal('capturing');
+  });
+}

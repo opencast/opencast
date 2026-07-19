@@ -1,0 +1,30 @@
+meta {
+  name: add_ZippedMediaPackage_wdID
+  type: http
+  seq: 17
+}
+
+post {
+  url: {{baseUrl}}/ingest/addZippedMediaPackage/noop
+  body: multipartForm
+  auth: inherit
+}
+
+body:multipart-form {
+  BODY: @file(mediapackage.zip)
+}
+
+assert {
+  res.status: eq 200
+  res.headers["content-type"]: contains xml
+}
+
+tests {
+  test("Zipped ingest with workflow ID should return noop workflow XML", function() {
+    const body = res.getBody();
+    expect(body).to.be.a('string');
+    expect(body).to.match(/<(wf:)?workflow/);
+    expect(body).to.include("state=\"INSTANTIATED\"");
+    expect(body).to.include("<wf:template>noop</wf:template>");
+  });
+}

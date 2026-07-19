@@ -1,0 +1,46 @@
+meta {
+  name: add_PartialTrack_Upload
+  type: http
+  seq: 12
+}
+
+post {
+  url: {{baseUrl}}/ingest/addPartialTrack
+  body: multipartForm
+  auth: inherit
+}
+
+body:multipart-form {
+  flavor: presentation/source
+  startTime: 5000
+  mediaPackage: {{mediaPackage_A}}
+  BODY: @file(track.mp4)
+}
+
+assert {
+  res.status: eq 200
+  res.headers["content-type"]: contains xml
+}
+
+tests {
+  test("Add partial track by upload should return augmented mediapackage", function() {
+    const body = res.getBody();
+    expect(body).to.be.a('string');
+    expect(body).to.include("<mediapackage");
+    expect(body).to.include("<track");
+    
+    // Extract the track URL
+    const urlMatch = body.match(/<url>([^<]+?\/track\.mp4)<\/url>/);
+    expect(urlMatch).to.not.be.null;
+  });
+}
+
+script:post-response {
+  const body = res.getBody();
+  const urlMatch = body.match(/<url>([^<]+?\/track\.mp4)<\/url>/);
+  if (urlMatch) {
+    const partialTrackUrl = urlMatch[1];
+    bru.setVar("partialTrackUrl_A", partialTrackUrl);
+    bru.setVar("mediaPackage_A", body);
+  }
+}

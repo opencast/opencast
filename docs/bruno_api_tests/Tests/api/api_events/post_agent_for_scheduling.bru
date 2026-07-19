@@ -1,0 +1,27 @@
+meta {
+  name: post_agent_for_scheduling
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/capture-admin/agents/bruno-sched-agent
+  body: formUrlEncoded
+  auth: inherit
+}
+
+body:form-urlencoded {
+  state: idle
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Registering the capture agent for scheduling should succeed", function() {
+    const body = res.getBody();
+    expect(body).to.be.a('string');
+    expect(body).to.include("bruno-sched-agent set to idle");
+  });
+}

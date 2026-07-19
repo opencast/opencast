@@ -1,0 +1,37 @@
+meta {
+  name: add_Attachment_Upload
+  type: http
+  seq: 4
+}
+
+post {
+  url: {{baseUrl}}/ingest/addAttachment
+  body: multipartForm
+  auth: inherit
+}
+
+body:multipart-form {
+  flavor: attachment/notes
+  mediaPackage: {{mediaPackage_A}}
+  BODY: @file(track.mp4)
+}
+
+assert {
+  res.status: eq 200
+  res.headers["content-type"]: contains xml
+}
+
+tests {
+  test("Add attachment by upload should return augmented mediapackage", function() {
+    const body = res.getBody();
+    expect(body).to.be.a('string');
+    expect(body).to.include("<mediapackage");
+    expect(body).to.include("type=\"attachment/notes\"");
+    expect(body).to.include("<attachment");
+  });
+}
+
+script:post-response {
+  const body = res.getBody();
+  bru.setVar("mediaPackage_A", body);
+}

@@ -1,0 +1,46 @@
+meta {
+  name: add_Catalog_Upload
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/ingest/addCatalog
+  body: multipartForm
+  auth: inherit
+}
+
+body:multipart-form {
+  flavor: dublincore/episode
+  mediaPackage: {{mediaPackage_A}}
+  BODY: @file(catalog.xml)
+}
+
+assert {
+  res.status: eq 200
+  res.headers["content-type"]: contains xml
+}
+
+tests {
+  test("Add catalog by upload should return augmented mediapackage", function() {
+    const body = res.getBody();
+    expect(body).to.be.a('string');
+    expect(body).to.include("<mediapackage");
+    expect(body).to.include("type=\"dublincore/episode\"");
+    expect(body).to.include("<catalog");
+    
+    // Extract the catalog URL
+    const urlMatch = body.match(/<url>([^<]+?\/catalog\.xml)<\/url>/);
+    expect(urlMatch).to.not.be.null;
+  });
+}
+
+script:post-response {
+  const body = res.getBody();
+  const urlMatch = body.match(/<url>([^<]+?\/catalog\.xml)<\/url>/);
+  if (urlMatch) {
+    const catalogUrl = urlMatch[1];
+    bru.setVar("catalogUrl_A", catalogUrl);
+    bru.setVar("mediaPackage_A", body);
+  }
+}
