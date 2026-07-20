@@ -740,7 +740,7 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-crop-ffmpeg/${project.version}</bundle>
   </feature>
 
-  <feature name="opencast-plugin-v20-migration" version="${project.version}">
+  <feature name="opencast-plugin-v21-migration" version="${project.version}">
     <conditional>
       <condition>opencast-allinone</condition>
       <condition>opencast-admin</condition>

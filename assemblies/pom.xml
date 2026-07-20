@@ -132,7 +132,7 @@
               <feature>opencast-plugin-userdirectory-brightspace</feature>
               <feature>opencast-plugin-usertracking</feature>
               <feature>opencast-plugin-graphql</feature>
-              <feature>opencast-plugin-v20-migration</feature>
+              <feature>opencast-plugin-v21-migration</feature>
             </installedFeatures>
           </configuration>
         </plugin>
