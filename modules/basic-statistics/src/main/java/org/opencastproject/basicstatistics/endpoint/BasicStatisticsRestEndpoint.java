@@ -25,11 +25,12 @@ import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 
-import org.opencastproject.basicstatistics.BasicStatisticsSecretService;
 import org.opencastproject.basicstatistics.BasicStatisticsService;
 import org.opencastproject.basicstatistics.EventType;
 import org.opencastproject.basicstatistics.ItemType;
 import org.opencastproject.basicstatistics.RawEvent;
+import org.opencastproject.basicstatisticssecret.api.BasicStatisticsSecretService;
+import org.opencastproject.basicstatisticssecret.api.BasicStatisticsSecretServiceException;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
@@ -177,7 +178,7 @@ public class BasicStatisticsRestEndpoint {
   }
 
   @POST
-  @Path("client-push")
+  @Path("clientpush")
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.TEXT_PLAIN)
   @RestQuery(
@@ -244,6 +245,14 @@ public class BasicStatisticsRestEndpoint {
       List<RawEvent> accepted = new ArrayList<>();
       List<RejectedEvent> rejected = new ArrayList<>();
       Instant now = Instant.now();
+      byte[] dailySecret;
+      try {
+        dailySecret = secretService.getCurrentSecret();
+      } catch (BasicStatisticsSecretServiceException e) {
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+            .entity(e.getMessage())
+            .build();
+      }
 
       for (int index = 0; index < pushRequest.getEvents().size(); index++) {
         ClientEventDto dto = pushRequest.getEvents().get(index);
@@ -274,7 +283,7 @@ public class BasicStatisticsRestEndpoint {
         }
 
         // Calculate/Add session hash
-        String sessionHash = basicStatisticsService.generateSessionHash(dto.getItemId(), ip, userAgent);
+        String sessionHash = basicStatisticsService.generateSessionHash(dailySecret, dto.getItemId(), ip, userAgent);
         event.setSession(sessionHash);
 
         accepted.add(event);
@@ -294,7 +303,7 @@ public class BasicStatisticsRestEndpoint {
   }
 
   @POST
-  @Path("trusted-push")
+  @Path("trustedpush")
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.TEXT_PLAIN)
   @RestQuery(
@@ -332,7 +341,14 @@ public class BasicStatisticsRestEndpoint {
       List<RawEvent> accepted = new ArrayList<>();
       List<RejectedEvent> rejected = new ArrayList<>();
       Instant now = Instant.now();
-      byte[] dailySecret = secretService.getCurrentSecret();
+      byte[] dailySecret;
+      try {
+        dailySecret = secretService.getCurrentSecret();
+      } catch (BasicStatisticsSecretServiceException e) {
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
+            .entity(e.getMessage())
+            .build();
+      }
 
       for (int index = 0; index < pushRequest.getEvents().size(); index++) {
         TrustedEventDto dto = pushRequest.getEvents().get(index);
