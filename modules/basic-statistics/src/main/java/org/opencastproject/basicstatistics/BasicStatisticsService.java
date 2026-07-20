@@ -23,6 +23,7 @@ package org.opencastproject.basicstatistics;
 
 import org.opencastproject.basicstatistics.persistence.BasicStatisticsDatabaseException;
 import org.opencastproject.basicstatistics.persistence.BasicStatisticsDatabaseService;
+import org.opencastproject.basicstatisticssecret.api.BasicStatisticsSecretService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.util.requests.SortCriterion;
 
@@ -114,8 +115,6 @@ public class BasicStatisticsService {
   public void create(List<RawEvent> events) {
     for (RawEvent event : events) {
       event.setOrganization(securityService.getOrganization().getId());
-      // TODO: Calculate sessions
-      event.setSession("1");
     }
 
     try {
@@ -123,15 +122,6 @@ public class BasicStatisticsService {
     } catch (BasicStatisticsDatabaseException e) {
       throw new IllegalStateException();
     }
-  }
-
-  public String generateSessionHash(
-      String itemId,
-      InetAddress ip,
-      String userAgent) {
-    byte[] dailySecret = secretService.getCurrentSecret();
-
-    return generateSessionHash(dailySecret, itemId, ip, userAgent);
   }
 
   public String generateSessionHash(

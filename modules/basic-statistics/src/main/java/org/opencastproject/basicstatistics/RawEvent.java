@@ -157,7 +157,7 @@ public class RawEvent {
       return false;
     }
 
-    return false;
+    return true;
   }
 
   public String getId() {

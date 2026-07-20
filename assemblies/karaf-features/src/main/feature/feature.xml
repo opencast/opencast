@@ -154,6 +154,8 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-asset-manager-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-authorization-manager/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-basic-statistics/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-basic-statistics-secret-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-basic-statistics-secret-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-capture-admin-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-capture-admin-service-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-comments-workflowoperation/${project.version}</bundle>
@@ -258,6 +260,8 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-asset-manager-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-authorization-manager/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-basic-statistics/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-basic-statistics-secret-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-basic-statistics-secret-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-caption-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-caption-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-capture-admin-service-api/${project.version}</bundle>
@@ -384,6 +388,8 @@
     <bundle start-level="82">mvn:org.opencastproject/opencast-asset-manager-workflowoperation/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-authorization-manager/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-basic-statistics/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-basic-statistics-secret-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-basic-statistics-secret-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-caption-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-caption-impl/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-capture-admin-service-api/${project.version}</bundle>
@@ -586,6 +592,8 @@
 
     <bundle start-level="82">mvn:org.opencastproject/opencast-adopter-registration-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-basic-statistics/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-basic-statistics-secret-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-basic-statistics-secret-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-aws-s3-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-distribution-service-aws-s3/${project.version}</bundle>
