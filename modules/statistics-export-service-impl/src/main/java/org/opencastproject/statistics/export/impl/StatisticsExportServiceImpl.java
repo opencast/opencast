@@ -333,7 +333,7 @@ public class StatisticsExportServiceImpl implements StatisticsExportService, Man
       return;
     }
     final Optional<Series> series = index.getSeries(
-            resourceId, securityService.getOrganization().getId(), securityService.getUser());
+            resourceId, securityService.getOrganization(), securityService.getUser());
     if (!series.isPresent()) {
       throw new NotFoundException("Series not found in index: " + resourceId);
     }

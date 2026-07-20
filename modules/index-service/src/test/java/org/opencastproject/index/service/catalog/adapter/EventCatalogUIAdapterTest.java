@@ -21,16 +21,16 @@
 
 package org.opencastproject.index.service.catalog.adapter;
 
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.opencastproject.index.service.catalog.adapter.CatalogUIAdapterFactory.CONF_FLAVOR_KEY;
 import static org.opencastproject.index.service.catalog.adapter.CatalogUIAdapterFactory.CONF_ORGANIZATION_KEY;
 import static org.opencastproject.index.service.catalog.adapter.CatalogUIAdapterFactory.CONF_TITLE_KEY;
 
 import org.opencastproject.index.service.catalog.adapter.events.ConfigurableEventDCCatalogUIAdapter;
 import org.opencastproject.index.service.util.RestUtils;
+import org.opencastproject.list.api.DefaultResourceListQuery;
 import org.opencastproject.list.api.ListProviderException;
 import org.opencastproject.list.api.ListProvidersService;
-import org.opencastproject.list.impl.ResourceListQueryImpl;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
@@ -92,7 +92,7 @@ public class EventCatalogUIAdapterTest {
 
     listProvidersService = EasyMock.createMock(ListProvidersService.class);
     EasyMock.expect(
-            listProvidersService.getList(EasyMock.anyString(), EasyMock.anyObject(ResourceListQueryImpl.class),
+            listProvidersService.getList(EasyMock.anyString(), EasyMock.anyObject(DefaultResourceListQuery.class),
                     EasyMock.anyBoolean())).andReturn(collection).anyTimes();
     EasyMock.expect(
             listProvidersService.isTranslatable(EasyMock.anyString()))
@@ -155,7 +155,7 @@ public class EventCatalogUIAdapterTest {
 
     DublinCoreMetadataCollection abstractMetadata = configurationDublinCoreCatalogUIAdapter.getFields(mediapackage);
     assertThat(eventJson, SameJSONAs.sameJSONAs(RestUtils.getJsonString(MetadataJson.collectionToJson(abstractMetadata,
-            true)))
+            true, false)))
             .allowingAnyArrayOrdering());
   }
 

@@ -121,9 +121,6 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
   /** The stability threshold */
   private int stabilityThreshold = DEFAULT_STABILITY_THRESHOLD;
 
-  /** The local workspace */
-  private Workspace workspace = null;
-
   /** The mpeg7 catalog service */
   private Mpeg7CatalogService mpeg7CatalogService = null;
 
@@ -363,7 +360,7 @@ public class TextAnalysisWorkflowOperationHandler extends AbstractWorkflowOperat
         // Put the catalog into the workspace and add it to the media package
         MediaPackageElementBuilder builder = MediaPackageElementBuilderFactory.newInstance().newElementBuilder();
         Catalog catalog = (Catalog) builder.newElement(MediaPackageElement.Type.Catalog, MediaPackageElements.TEXTS);
-        catalog.setIdentifier(null);
+        catalog.generateIdentifier();
         catalog.setReference(segmentCatalog.getReference());
         mediaPackage.add(catalog); // the catalog now has an ID, so we can store the file properly
         InputStream in = mpeg7CatalogService.serialize(textCatalog);

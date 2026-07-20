@@ -79,9 +79,6 @@ public class SpeechToTextAttachWorkflowOperationHandler extends AbstractWorkflow
     attachment, track
   }
 
-  /** The workspace service. */
-  private Workspace workspace;
-
   /** The inspection service. */
   private MediaInspectionService mediaInspectionService;
 

@@ -1,0 +1,64 @@
+name: Maintenance » Auto-update git submodules
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 1 * * *' #1AM UTC, before the QA boxes reboot, but after everyone's done for the day
+
+jobs:
+  determine-current-branches:
+    name: determine which opencast branches to update submodules on
+    runs-on: ubuntu-latest
+    if: github.repository == 'opencast/opencast'
+    outputs:
+      matrix: ${{ steps.generate.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - id: generate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # This gets us a list like develop, r/20.x, r/19.x, r/18.x, which we enclose in a bash array with the ()
+          branches=($(echo develop; gh api repos/opencast/opencast/branches --paginate --jq '.[].name' | grep 'r\/[0-9]*.x' | sort -nk 1.3 | tail -n 3))
+          # This creates a *string* of "develop","r/20.x","r/19.x","r/18.x"
+          joined=\"$(IFS=','; echo "${branches[*]}" | sed 's/,/","/g')\"
+          # This set the matrix value used down below to determine which branches get updated
+          echo "matrix={\"branch\":[${joined}]}" >> $GITHUB_OUTPUT
+
+  update-git-submodules:
+    name: update git submodules
+    needs: determine-current-branches
+    runs-on: ubuntu-latest
+    if: github.repository == 'opencast/opencast'
+    strategy:
+      matrix: ${{ fromJson(needs.determine-current-branches.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          ref: '${{ matrix.branch }}'
+          submodules: 'recursive'
+          fetch-depth: 0
+
+      - name: prepare git
+        run: |
+          git config --global user.email 'update-bot@opencast.org'
+          git config --global user.name 'Update Bot'
+
+      - name: prepare github ssh key
+        env:
+          DEPLOY_KEY: ${{ secrets.DEPLOY_KEY }}
+        run: |
+          install -dm 700 ~/.ssh/
+          echo "${DEPLOY_KEY}" > ~/.ssh/id_ed25519
+          chmod 600 ~/.ssh/id_ed25519
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
+
+      - name: update the submodules locally
+        run: |
+          git submodule update --remote --recursive
+
+      - name: Committing changes
+        run: |
+          git commit -a -m "Updating submodules" || true
+          git push origin

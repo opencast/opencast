@@ -69,15 +69,17 @@ public class IBMWatsonCaptionConverter implements CaptionConverter {
     try {
       JSONObject resultsObj = (JSONObject) jsonParser.parse(new InputStreamReader(inputStream));
       String jobId = "Unknown";
-      if (resultsObj.get("id") != null)
+      if (resultsObj.get("id") != null) {
         jobId = (String) resultsObj.get("id");
+      }
 
       // Log warnings
       if (resultsObj.get("warnings") != null) {
         JSONArray warningsArray = (JSONArray) resultsObj.get("warnings");
         if (warningsArray != null) {
-          for (Object w : warningsArray)
+          for (Object w : warningsArray) {
             logger.warn("Warning from Speech-To-Text service: {}", w);
+          }
         }
       }
 
@@ -89,8 +91,9 @@ public class IBMWatsonCaptionConverter implements CaptionConverter {
       for (int i = 0; i < resultsArray.size(); i++) {
         JSONObject resultElement = (JSONObject) resultsArray.get(i);
         // Ignore results that are not final
-        if (!(Boolean) resultElement.get("final"))
+        if (!(Boolean) resultElement.get("final")) {
           continue;
+        }
 
         JSONArray alternativesArray = (JSONArray) resultElement.get("alternatives");
         if (alternativesArray != null && alternativesArray.size() > 0) {
@@ -109,8 +112,9 @@ public class IBMWatsonCaptionConverter implements CaptionConverter {
             int indexFirst = -1;
             int indexLast = -1;
             for (int j = 0; j < words.length; j++) {
-              if (indexFirst == -1)
+              if (indexFirst == -1) {
                 indexFirst = j;
+              }
               line.append(words[j]);
               line.append(" ");
               if (line.length() >= LINE_SIZE || j == words.length - 1) {
@@ -121,14 +125,16 @@ public class IBMWatsonCaptionConverter implements CaptionConverter {
                 if (indexLast < timestampsArray.size()) {
                   // Get start time of first element
                   JSONArray wordTsArray = (JSONArray) timestampsArray.get(indexFirst);
-                  if (wordTsArray.size() == 3)
-                    start = NumberFormat.getInstance(Locale.US).parse(removeEndCharacter((wordTsArray.get(1).toString()),
-                            "s")).doubleValue();
+                  if (wordTsArray.size() == 3) {
+                    start = NumberFormat.getInstance(Locale.US)
+                        .parse(removeEndCharacter((wordTsArray.get(1).toString()), "s")).doubleValue();
+                  }
                   // Get end time of last element
                   wordTsArray = (JSONArray) timestampsArray.get(indexLast);
-                  if (wordTsArray.size() == 3)
-                    end = NumberFormat.getInstance(Locale.US).parse(removeEndCharacter((wordTsArray.get(2).toString()),
-                            "s")).doubleValue();
+                  if (wordTsArray.size() == 3) {
+                    end = NumberFormat.getInstance(Locale.US)
+                        .parse(removeEndCharacter((wordTsArray.get(2).toString()), "s")).doubleValue();
+                  }
                 }
                 if (start == -1 || end == -1) {
                   logger.warn("Could not build caption object for job {}, result index {}: start/end times not found",

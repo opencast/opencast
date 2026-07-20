@@ -41,9 +41,10 @@ nav:
   - Upgrade Guide: "upgrade.md"
   - Registration: "registration.md"
   - Changelogs:
+      - Opencast 20: "changelog/opencast-20.md"
       - Opencast 19: "changelog/opencast-19.md"
-      - Opencast 18: "changelog/opencast-18.md"
       - Older Versions:
+          - Opencast 18: "changelog/older-versions/opencast-18.md"
           - Opencast 17: "changelog/older-versions/opencast-17.md"
           - Opencast 16: "changelog/older-versions/opencast-16.md"
           - Opencast 15: "changelog/older-versions/opencast-15.md"
@@ -85,7 +86,6 @@ nav:
           - Using Nginx: "configuration/https/nginx.md"
           - Using Apache httpd: "configuration/https/apache-httpd.md"
           - Using Caddy: "configuration/https/caddy.md"
-          - Internal HTTPS: "configuration/https/opencast.only.md"
           - Self-Signed Certificates: "configuration/https/self-signed-certificates.md"
       - Domain change/HTTPS migration: "configuration/migration-domain-https.md"
       - Admin UI Configuration:
@@ -134,21 +134,6 @@ nav:
       - OAI-PMH: "configuration/oaipmh.md"
       - Player:
           - Overview: "configuration/player/player.overview.md"
-          - Paella player 7:
-              - Configuration: "configuration/player/paella.player7/configuration.md"
-              - URL Parameters: "configuration/player/paella.player7/url.parameter.md"
-              - Paella plugins:
-                  - Overview: "configuration/player/paella.player7/plugins.md"
-                  - org.opencast.paella.cookieconsent: "configuration/player/paella.player7/plugins/org.opencast.paella.cookieconsent.md"
-                  - org.opencast.paella.descriptionPlugin: "configuration/player/paella.player7/plugins/org.opencast.paella.descriptionPlugin.md"
-                  - org.opencast.paella.downloadsPlugin: "configuration/player/paella.player7/plugins/org.opencast.paella.downloadsPlugin.md"
-                  - org.opencast.paella.editorPlugin: "configuration/player/paella.player7/plugins/org.opencast.paella.editorPlugin.md"
-                  - org.opencast.paella.episodesFromSeries: "configuration/player/paella.player7/plugins/org.opencast.paella.episodesFromSeries.md"
-                  - org.opencast.paella.loginPlugin: "configuration/player/paella.player7/plugins/org.opencast.paella.loginPlugin.md"
-                  - org.opencast.paella.opencast.userTrackingDataPlugin: "configuration/player/paella.player7/plugins/org.opencast.paella.opencast.userTrackingDataPlugin.md"
-                  - org.opencast.paella.matomo.userTrackingDataPlugin: "configuration/player/paella.player7/plugins/org.opencast.paella.matomo.userTrackingDataPlugin.md"
-                  - org.opencast.paella.transcriptionsPlugin: "configuration/player/paella.player7/plugins/org.opencast.paella.transcriptionsPlugin.md"
-                  - org.opencast.paella.versionButton.js: "configuration/player/paella.player7/plugins/org.opencast.paella.versionButton.md"
           - Paella player 8:
               - Configuration: "configuration/player/paella.player8/configuration.md"
               - URL Parameters: "configuration/player/paella.player8/url.parameter.md"
@@ -235,6 +220,7 @@ nav:
       - Ingest-Download: "workflowoperationhandlers/ingestdownload-woh.md"
       - Inspect: "workflowoperationhandlers/inspect-woh.md"
       - Log: "workflowoperationhandlers/log-woh.md"
+      - Matrix Notification: "workflowoperationhandlers/matrix-notification-woh.md"
       - Mattermost Notification Module: "workflowoperationhandlers/mattermost-notify-woh.md"
       - Metadata to ACL: "workflowoperationhandlers/metadata-to-acl.md"
       - Microsoft Azure Attach Transcription: "workflowoperationhandlers/microsoft-azure-attach-transcription-woh.md"

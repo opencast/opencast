@@ -1,0 +1,22 @@
+name: Maintenance » Ensure correct module versions in .gitmodules
+
+on:
+  pull_request:
+    paths:
+      - '.gitmodules'
+  push:
+    paths:
+      - '.gitmodules'
+
+jobs:
+  mvn-check:
+    name: Ensure correct module versions in .gitmodules
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: check .gitmodules has correct versions, the correct number of times
+        run: |
+          if [ 3 -ne "$(grep 'branch = ${{ github.base_ref }}' .gitmodules | wc -l)" ]; then
+            exit 1
+          fi

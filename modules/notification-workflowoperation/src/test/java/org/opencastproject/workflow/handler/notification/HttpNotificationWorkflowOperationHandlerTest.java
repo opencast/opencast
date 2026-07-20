@@ -44,11 +44,17 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class HttpNotificationWorkflowOperationHandlerTest {
 
@@ -107,6 +113,56 @@ public class HttpNotificationWorkflowOperationHandlerTest {
       Assert.assertTrue("Exception thrown as expected by the operation handler", true);
     }
 
+  }
+
+  @Test
+  public void testMediaPackageIdIsIncludedInRequest() throws Exception {
+    AtomicReference<String> capturedBody = new AtomicReference<>();
+
+    // Start a simple HTTP server that captures the request body and returns 200 OK
+    try (ServerSocket serverSocket = new ServerSocket(0)) {
+      int port = serverSocket.getLocalPort();
+
+      Thread serverThread = new Thread(() -> {
+        try (Socket socket = serverSocket.accept();
+             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+             OutputStream out = socket.getOutputStream()) {
+          String line;
+          int contentLength = 0;
+          while ((line = reader.readLine()) != null && !line.isEmpty()) {
+            if (line.toLowerCase().startsWith("content-length:")) {
+              contentLength = Integer.parseInt(line.split(":")[1].trim());
+            }
+          }
+          char[] body = new char[contentLength];
+          reader.read(body);
+          capturedBody.set(new String(body));
+
+          out.write("HTTP/1.1 200 OK\r\nContent-Length: 0\r\n\r\n".getBytes("UTF-8"));
+          out.flush();
+        } catch (Exception e) {
+          // ignore
+        }
+      });
+      serverThread.setDaemon(true);
+      serverThread.start();
+
+      Map<String, String> configurations = new HashMap<String, String>();
+      configurations.put(HttpNotificationWorkflowOperationHandler.OPT_URL_PATH,
+              "http://127.0.0.1:" + port);
+      configurations.put(HttpNotificationWorkflowOperationHandler.OPT_MAX_RETRY, "0");
+
+      getWorkflowOperationResult(mp, configurations);
+
+      serverThread.join(5000);
+
+      String body = capturedBody.get();
+      Assert.assertNotNull("Request body should have been captured", body);
+      Assert.assertTrue("Request body should contain mediaPackageId parameter",
+              body.contains(HttpNotificationWorkflowOperationHandler.HTTP_PARAM_MEDIAPACKAGE + "="));
+      Assert.assertTrue("Request body should contain the mediapackage identifier",
+              body.contains(mp.getIdentifier().toString()));
+    }
   }
 
   private WorkflowOperationResult getWorkflowOperationResult(MediaPackage mp, Map<String, String> configurations)

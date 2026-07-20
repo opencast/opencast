@@ -61,7 +61,9 @@ public final class Arrays {
   /** Make a string from a collection separating each element by <code>sep</code>. */
   public static <A> String mkString(A[] as, String sep) {
     final StringBuilder b = new StringBuilder();
-    for (Object a : as) b.append(a).append(sep);
+    for (Object a : as) {
+      b.append(a).append(sep);
+    }
     return b.substring(0, Math.max(b.length() - sep.length(), 0));
   }
 }

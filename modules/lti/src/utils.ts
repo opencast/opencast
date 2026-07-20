@@ -1,8 +1,8 @@
-import { parse as parseQuery } from "query-string";
+import queryString from 'query-string';
 
 
 export function parsedQueryString() {
-    return parseQuery(window.location.search);
+    return queryString.parse(window.location.search);
 }
 
 /**

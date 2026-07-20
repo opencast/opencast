@@ -28,7 +28,6 @@ package org.opencastproject.publication.youtube;
  */
 public enum YouTubeKey {
   credentialDatastore,
-  scopes,
   clientSecretsV3,
   dataStore,
   keywords,

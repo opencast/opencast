@@ -112,9 +112,6 @@ public class SilenceDetectionWorkflowOperationHandler extends AbstractWorkflowOp
   /** The smil service for smil parsing. */
   private SmilService smilService;
 
-  /** The workspace. */
-  private Workspace workspace;
-
   @Override
   public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {

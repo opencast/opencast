@@ -37,8 +37,9 @@ import org.opencastproject.elasticsearch.index.objects.series.Series;
 import org.opencastproject.elasticsearch.index.objects.series.SeriesIndexUtils;
 import org.opencastproject.elasticsearch.index.objects.series.SeriesQueryBuilder;
 import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
-import org.opencastproject.list.api.ListProvidersService;
+import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.User;
+import org.opencastproject.security.util.SecurityUtil;
 
 import com.google.common.util.concurrent.Striped;
 
@@ -52,7 +53,6 @@ import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Modified;
-import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -96,33 +96,19 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
   private static final int DEFAULT_RETRY_WAITING_PERIOD_UPDATE = 1000;
 
   /** The required index version */
-  private static final int INDEX_VERSION = 101;
-
-  /** The document types */
-  private static final String VERSION_DOCUMENT_TYPE = "version";
+  private static final int INDEX_VERSION = 1;
 
   private static final String[] DOCUMENT_TYPES = new String[] {
+      // Version document type should be processed first.
+      // It will be used as storage for index versions of all other indexes.
+      VERSION_DOCUMENT_TYPE,
       Event.DOCUMENT_TYPE,
-      Series.DOCUMENT_TYPE,
-      VERSION_DOCUMENT_TYPE
+      Series.DOCUMENT_TYPE
   };
 
   private static final Logger logger = LoggerFactory.getLogger(ElasticsearchIndex.class);
 
   private final Striped<Lock> locks = Striped.lazyWeakLock(1024);
-
-  private ListProvidersService listProvidersService;
-
-  @Reference
-  public void setListProvidersService(ListProvidersService listProvidersService) {
-    this.listProvidersService = listProvidersService;
-  }
-
-  public void unsetListProvidersService(ListProvidersService listProvidersService) {
-    if (this.listProvidersService == listProvidersService) {
-      this.listProvidersService = null;
-    }
-  }
 
   /**
    * OSGi callback to activate this component instance.
@@ -216,7 +202,8 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
    * @throws IllegalStateException
    *          If multiple events with the same identifier are found
    */
-  public Optional<Event> getEvent(String mediaPackageId, String organization, User user) throws SearchIndexException {
+  public Optional<Event> getEvent(String mediaPackageId, Organization organization, User user)
+          throws SearchIndexException {
     return getEvent(mediaPackageId, organization, user, maxRetryAttemptsGet, retryWaitingPeriodGet);
   }
 
@@ -240,9 +227,11 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
    * @throws IllegalStateException
    *           If multiple events with the same identifier are found
    */
-  private Optional<Event> getEvent(String mediaPackageId, String organization, User user, int maxRetryAttempts,
+  private Optional<Event> getEvent(String mediaPackageId, Organization organization, User user, int maxRetryAttempts,
           int retryWaitingPeriod) throws SearchIndexException {
-    EventSearchQuery query = new EventSearchQuery(organization, user).withoutActions().withIdentifier(mediaPackageId);
+    EventSearchQuery query = new EventSearchQuery(organization.getId(), user)
+        .withoutActions()
+        .withIdentifier(mediaPackageId);
     SearchResult<Event> searchResult = getByQuery(query, maxRetryAttempts, retryWaitingPeriod);
     if (searchResult.getDocumentCount() == 0) {
       return Optional.empty();
@@ -270,7 +259,7 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
    * @throws IllegalStateException
    *          If multiple series with the same identifier are found
    */
-  public Optional<Series> getSeries(String seriesId, String organization, User user)
+  public Optional<Series> getSeries(String seriesId, Organization organization, User user)
           throws SearchIndexException {
     return getSeries(seriesId, organization, user, maxRetryAttemptsGet, retryWaitingPeriodGet);
   }
@@ -295,9 +284,11 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
    * @throws IllegalStateException
    *           If multiple series with the same identifier are found
    */
-  private Optional<Series> getSeries(String seriesId, String organization, User user, int maxRetryAttempts,
+  private Optional<Series> getSeries(String seriesId, Organization organization, User user, int maxRetryAttempts,
           int retryWaitingPeriod) throws SearchIndexException {
-    SeriesSearchQuery query = new SeriesSearchQuery(organization, user).withoutActions().withIdentifier(seriesId);
+    SeriesSearchQuery query = new SeriesSearchQuery(organization.getId(), user)
+        .withoutActions()
+        .withIdentifier(seriesId);
     SearchResult<Series> searchResult = getByQuery(query, maxRetryAttempts, retryWaitingPeriod);
     if (searchResult.getDocumentCount() == 0) {
       return Optional.empty();
@@ -319,7 +310,7 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
    *          The id of the event to update
    * @param updateFunction
    *          The function that does the actual updating
-   * @param orgId
+   * @param organization
    *          The organization the event belongs to
    * @param user
    *          The user
@@ -328,17 +319,17 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
    *          Thrown if unable to update the event.
    */
   public Optional<Event> addOrUpdateEvent(String id, Function<Optional<Event>, Optional<Event>> updateFunction,
-          String orgId, User user) throws SearchIndexException {
+          Organization organization, User user) throws SearchIndexException {
     final Lock lock = this.locks.get(id);
     lock.lock();
     logger.debug("Locked event '{}'", id);
 
     try {
-      Optional<Event> eventOpt = getEvent(id, orgId, user, maxRetryAttemptsUpdate, retryWaitingPeriodUpdate);
+      Optional<Event> eventOpt = getEvent(id, organization, user, maxRetryAttemptsUpdate, retryWaitingPeriodUpdate);
       Optional<Event> updatedEventOpt = updateFunction.apply(eventOpt);
 
       if (updatedEventOpt.isPresent()) {
-        update(updatedEventOpt.get());
+        update(updatedEventOpt.get(), organization);
       }
       return updatedEventOpt;
     } finally {
@@ -356,11 +347,16 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
    * @throws SearchIndexException
    *          If the event cannot be added or updated
    */
-  private void update(Event event) throws SearchIndexException {
+  private void update(Event event, Organization organization) throws SearchIndexException {
     logger.debug("Adding event {} to search index", event.getIdentifier());
 
+
+
     // Add the resource to the index
-    SearchMetadataCollection inputDocument = EventIndexUtils.toSearchMetadata(event, listProvidersService);
+    SearchMetadataCollection inputDocument = EventIndexUtils.toSearchMetadata(
+        event,
+        SecurityUtil.additionalAclActions(organization)
+    );
     List<SearchMetadata<?>> resourceMetadata = inputDocument.getMetadata();
     ElasticsearchDocument doc = new ElasticsearchDocument(inputDocument.getIdentifier(),
             inputDocument.getDocumentType(), resourceMetadata);
@@ -381,12 +377,15 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
    * @throws SearchIndexException
    *          If the events cannot be added or updated
    */
-  public void bulkEventUpdate(List<Event> eventList) throws SearchIndexException {
+  public void bulkEventUpdate(List<Event> eventList, Organization organization) throws SearchIndexException {
     List<ElasticsearchDocument> docs = new ArrayList<>();
     for (Event event: eventList) {
       logger.debug("Adding event {} to search index", event.getIdentifier());
       // Add the resource to the index
-      SearchMetadataCollection inputDocument = EventIndexUtils.toSearchMetadata(event, listProvidersService);
+      SearchMetadataCollection inputDocument = EventIndexUtils.toSearchMetadata(
+          event,
+          SecurityUtil.additionalAclActions(organization)
+      );
       List<SearchMetadata<?>> resourceMetadata = inputDocument.getMetadata();
       docs.add(new ElasticsearchDocument(inputDocument.getIdentifier(),
               inputDocument.getDocumentType(), resourceMetadata));
@@ -405,7 +404,7 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
    *          The id of the series to add
    * @param updateFunction
    *          The function that does the actual updating
-   * @param orgId
+   * @param organization
    *          The organization the series belongs to
    * @param user
    *          The user
@@ -414,13 +413,13 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
    *          Thrown if unable to add or update the series.
    */
   public Optional<Series> addOrUpdateSeries(String id, Function<Optional<Series>, Optional<Series>> updateFunction,
-          String orgId, User user) throws SearchIndexException {
+          Organization organization, User user) throws SearchIndexException {
     final Lock lock = this.locks.get(id);
     lock.lock();
     logger.debug("Locked series '{}'", id);
 
     try {
-      Optional<Series> seriesOpt = getSeries(id, orgId, user, maxRetryAttemptsUpdate, retryWaitingPeriodUpdate);
+      Optional<Series> seriesOpt = getSeries(id, organization, user, maxRetryAttemptsUpdate, retryWaitingPeriodUpdate);
       Optional<Series> updatedSeriesOpt = updateFunction.apply(seriesOpt);
       if (updatedSeriesOpt.isPresent()) {
         update(updatedSeriesOpt.get());
@@ -492,15 +491,15 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
    *
    * @param eventId
    *         The event identifier
-   * @param orgId
+   * @param organization
    *         The organization id
    * @return
    *         true if it was deleted, false if it couldn't be found
    * @throws SearchIndexException
    *         If there was an error during deletion
    */
-  public boolean deleteEvent(String eventId, String orgId) throws SearchIndexException {
-    return delete(Event.DOCUMENT_TYPE, eventId, orgId);
+  public boolean deleteEvent(String eventId, Organization organization) throws SearchIndexException {
+    return delete(Event.DOCUMENT_TYPE, eventId, organization);
   }
 
   /**
@@ -508,15 +507,15 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
    *
    * @param seriesId
    *         The series identifier
-   * @param orgId
+   * @param organization
    *         The organization id
    * @return
    *         true if it was deleted, false if it couldn't be found
    * @throws SearchIndexException
    *         If there was an error during deletion
    */
-  public boolean deleteSeries(String seriesId, String orgId) throws SearchIndexException {
-    return delete(Series.DOCUMENT_TYPE, seriesId, orgId);
+  public boolean deleteSeries(String seriesId, Organization organization) throws SearchIndexException {
+    return delete(Series.DOCUMENT_TYPE, seriesId, organization);
   }
 
   /**
@@ -526,7 +525,7 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
    *         The type of object we want to delete
    * @param id
    *         The identifier of this object
-   * @param orgId
+   * @param organization
    *         The organization id
    * @return
    *         True if it was deleted, false if it couldn't be found
@@ -534,12 +533,12 @@ public class ElasticsearchIndex extends AbstractElasticsearchIndex {
    * @throws SearchIndexException
    *         If deleting from the index fails
    */
-  private boolean delete(String type, String id, String orgId) throws SearchIndexException {
+  private boolean delete(String type, String id, Organization organization) throws SearchIndexException {
     final Lock lock = this.locks.get(id);
     lock.lock();
     logger.debug("Locked {} '{}'.", type, id);
     try {
-      String idWithOrgId = id.concat(orgId);
+      String idWithOrgId = id.concat(organization.getId());
       logger.debug("Removing element with id '{}' from search index '{}'", idWithOrgId, getSubIndexIdentifier(type));
 
       DeleteResponse deleteResponse = delete(type, idWithOrgId, maxRetryAttemptsUpdate, retryWaitingPeriodUpdate);

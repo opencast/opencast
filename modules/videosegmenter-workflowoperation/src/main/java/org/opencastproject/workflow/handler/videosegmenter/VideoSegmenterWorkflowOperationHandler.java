@@ -85,9 +85,6 @@ public class VideoSegmenterWorkflowOperationHandler extends AbstractWorkflowOper
   /** The composer service */
   private VideoSegmenterService videosegmenter = null;
 
-  /** The local workspace */
-  private Workspace workspace = null;
-
   /**
    * {@inheritDoc}
    *

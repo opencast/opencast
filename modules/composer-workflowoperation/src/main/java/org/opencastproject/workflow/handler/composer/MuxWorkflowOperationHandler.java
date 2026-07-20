@@ -79,9 +79,6 @@ public class MuxWorkflowOperationHandler extends AbstractWorkflowOperationHandle
   /** The composer service */
   private ComposerService composerService = null;
 
-  /** The local workspace */
-  private Workspace workspace = null;
-
   /**
    * Callback for the OSGi declarative services configuration.
    *

@@ -17,7 +17,7 @@ jobs:
     name: Ensure mvn isn't being used
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - name: check mvn isn't being used
         run: |

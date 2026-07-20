@@ -8,24 +8,23 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>20-SNAPSHOT</version>
+    <version>21-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
-    <checkstyle.skip>false</checkstyle.skip>
   </properties>
   <dependencies>
     <!-- FIXME: This sucks, but because of https://github.com/jacoco/jacoco/wiki/MavenMultiModule we need to
          manually depend on *every* Opencast module.  A check that we actually do has been added to the docs checks -->
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-admin-ui</artifactId>
+      <artifactId>opencast-admin-service</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-admin-ui-interface</artifactId>
+      <artifactId>opencast-admin</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -305,7 +304,7 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-engage-paella-player-7</artifactId>
+      <artifactId>opencast-engage-paella-player-8</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -435,7 +434,17 @@
     </dependency>
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-list-providers-service</artifactId>
+      <artifactId>opencast-list-providers-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-list-providers-common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-list-providers-impl</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -471,6 +480,11 @@
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-lti-service-remote</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-matrix-notification-workflowoperation</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -776,6 +790,11 @@
     <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-statistics-provider-influx</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.opencastproject</groupId>
+      <artifactId>opencast-statistics-provider-matomo</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

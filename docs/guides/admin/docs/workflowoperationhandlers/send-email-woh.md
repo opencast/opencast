@@ -14,8 +14,8 @@ The email body, if not specified by body or body-template-file, will consist of 
 `<Recording Title> (<Mediapackage ID>)`.
 
 Freemarker templates can be used in the following fields to allow replacement with values obtained from the workflow or
-media package: to, cc, bcc, subject, and body. If body-template-file is specified, the operation will use a Freemarker 
-template file located in `<config_dir>/etc/email` to generate the email body. A more in deep explanation of how to use 
+media package: to, cc, bcc, subject, and body. If body-template-file is specified, the operation will use a Freemarker
+template file located in `<config_dir>/etc/email` to generate the email body. A more in deep explanation of how to use
 Freemarker variables can be found in the [Appendix](#appendix-freemarker-variable-usage-guide).
 
 Usernames can be provided in `to`, `cc`, or `bcc` in lieu of email addresses so that the user directory is searched
@@ -121,7 +121,7 @@ In your email template:
 
 Use `${catalogs['FLAVOR']['FIELD']}`
 
-Deprecation notice: Opencast versions before 13 used `${catalogs['SUBFLAVOR']['FIELD']}` for `dublincore/SUBFLAVOR` 
+Deprecation notice: Opencast versions before 13 used `${catalogs['SUBFLAVOR']['FIELD']}` for `dublincore/SUBFLAVOR`
 catalogs. This syntax is still accepted but deprecation. Future versions might remove support.
 
 #### Examples
@@ -214,51 +214,19 @@ Email address entered via admin UI as a workflow configuration parameter:
 
 Workflow Configuration Panel:
 
-```yaml
-  configuration_panel_json: |-
-    <!-- Add after the other configuration fields (Holds, Archive, etc) -->
-    <fieldset>
-      <legend>Notification</legend>
-      <ul class="oc-ui-form-list">
-        <li class="ui-helper-clearfix">
-          <label class="scheduler-label">
-            <span class="color-red">* </span><span id="i18n_email_label">Email Address</span>:
-          </label>
-          <span id="emailconfig">
-            <input id="emailAddress" name="emailAddress" type="text" class="configField"
-                    value="my-email-account@my-email-domain.org"/>
-          </span>
-        </li>
-      </ul>
-    </fieldset>
-
-    <script type="text/javascript">
-
-      // Add email variable
-      var emailAddress = $('input#emailAddress');
-
-      // Register email configuration property
-      ocWorkflowPanel.registerComponents = function(components){
-        /* components with keys that begin with 'org.opencastproject.workflow.config' will be passed
-          * into the workflow. The component's nodeKey must match the components array key.
-          *
-          * Example:'org.opencastproject.workflow.config.myProperty' will be available at ${my.property}
-          */
-        // After the other components (Hold, Archive, etc), add:
-        components['org.opencastproject.workflow.config.emailAddress'] = new ocAdmin.Component(
-          ['emailAddress'],
-          {key: 'org.opencastproject.workflow.config.emailAddress'},
-          {getValue: function(){ return this.fields.emailAddress.value;}
-          });
-
-          //etc...
+After the other configuration fields (Holds, Archive, etc) add to the `configuration_panel_json`:
+```json
+  {
+    "legend": "Notification",
+    "fieldset": [
+      {
+        "type": "text",
+        "name": "emailAddresses",
+        "label": "Email Address",
+        "value": "my-email-account@my-email-domain.org"
       }
-      ocWorkflowPanel.setComponentValues = function(values, components){
-        // After the other components (Hold, Archive, etc), add:
-        components['org.opencastproject.workflow.config.emailAddress'].setValue(
-          values['org.opencastproject.workflow.config.emailAddress']);
-      }
-    </script>
+    ]
+  }
 ```
 
 ### Example 4
@@ -360,13 +328,13 @@ Requires the user account to have a valid email address.
 Appendix: Freemarker Variable Usage Guide
 ---------------------------
 
-Freemarker is a powerful template engine that allows you to embed dynamic content in your templates. 
-One of the key features is its ability to handle variables. This guide will walk you through the basics of using 
+Freemarker is a powerful template engine that allows you to embed dynamic content in your templates.
+One of the key features is its ability to handle variables. This guide will walk you through the basics of using
 variables in Freemarker templates.
 
 ### Declaring Variables
 
-In Freemarker, you don't explicitly declare variables. You usually pass them from your application code to the template. 
+In Freemarker, you don't explicitly declare variables. You usually pass them from your application code to the template.
 However, you can also set local variables using the `<#assign>` directive:
 
 ```freemarker
@@ -488,5 +456,5 @@ You can define reusable pieces of code using `<#macro>`:
 <@greet name="John"/>
 ```
 
-This guide provides a quick overview of how to use variables in Freemarker. For more advanced topics and complete 
+This guide provides a quick overview of how to use variables in Freemarker. For more advanced topics and complete
 documentation, you can refer to the [official Freemarker documentation](https://freemarker.apache.org/docs/).

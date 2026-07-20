@@ -62,7 +62,7 @@ Field                 | Type                                                    
 `title`               | [`string`](types.md#basic)                                 | The title of this workflow instance
 `description`         | [`string`](types.md#basic)                                 | The description of this workflow instance
 `tags`                | [`array[string]`](types.md#array)                          | The (potentially empty) list of workflow tags of this workflow instance
-`configuration_panel` | [`string`](types.md#basic)                                 | The configuration panel of this workflow instance
+`configuration`       | [`string`](types.md#basic)                                 | The configuration of this workflow instance
 `operations`          | [`array[operation_instance]`](types.md#operation_instance) | The list of operations of this workflow instance
 
 `400 (BAD REQUEST)`: The request is invalid or inconsistent.<br/>
@@ -89,7 +89,7 @@ Field                 | Type                                                    
 `title`               | [`string`](types.md#basic)                                 | The title of this workflow instance
 `description`         | [`string`](types.md#basic)                                 | The description of this workflow instance
 `tags`                | [`array[string]`](types.md#array)                          | The (potentially empty) list of workflow tags of this workflow instance
-`configuration_panel` | [`string`](types.md#basic)                                 | The configuration panel of this workflow instance
+`configuration`       | [`string`](types.md#basic)                                 | The configuration of this workflow instance
 `operations`          | [`array[operation_instance]`](types.md#operation_instance) | The list of operations of this workflow instance
 
 `403 (FORBIDDEN)`: The user doesn't have the rights to make this request.<br/>
@@ -274,10 +274,11 @@ Sort Criteria       | Description
 This request additionally supports the following query string parameters to include additional information directly in
 the response:
 
-Query String Parameter     | Type                        | Description
-:--------------------------|:----------------------------|:-----------
-`withoperations`           | [`boolean`](types.md#basic) | Whether the workflow operations should be included in the response
-`withconfigurationpanel`   | [`boolean`](types.md#basic) | Whether the workflow configuration panel should be included in the response
+Query String Parameter      | Type                        | Description
+:---------------------------|:----------------------------|:-----------
+`withoperations`            | [`boolean`](types.md#basic) | Whether the workflow operations should be included in the response
+`withconfigurationpaneljson`| [`boolean`](types.md#basic) | Whether the workflow configuration panel in JSON should be included in the response
+`withconfigurationpanel`    | [`boolean`](types.md#basic) | Whether the workflow configuration panel should be included in the response
 
 __Sample request__
 
@@ -290,14 +291,15 @@ __Response__
 `200 (OK)`: A (potentially empty) list of workflow definitions is returned. The list is represented as JSON array where
 each element is a JSON object with the following fields:
 
-Field                 | Type                                                           | Description
-:---------------------|:---------------------------------------------------------------|:-----------
-`identifier`          | [`string`](types.md#basic)                                     | The unique identifier of this workflow definition
-`title`               | [`string`](types.md#basic)                                     | The title of this workflow definition
-`description`         | [`string`](types.md#basic)                                     | The description of this workflow definition
-`tags`                | [`array[string]`](types.md#array)                              | The (potentially empty) list of workflow tags of this workflow definition
-`configuration_panel` | [`string`](types.md#basic)                                     | The configuration panel of this workflow definition
-`operations`          | [`array[operation_definition]`](types.md#operation_definition) | The list of operations of this workflow definition
+Field                      | Type                                                           | Description
+:--------------------------|:---------------------------------------------------------------|:-----------
+`identifier`               | [`string`](types.md#basic)                                     | The unique identifier of this workflow definition
+`title`                    | [`string`](types.md#basic)                                     | The title of this workflow definition
+`description`              | [`string`](types.md#basic)                                     | The description of this workflow definition
+`tags`                     | [`array[string]`](types.md#array)                              | The (potentially empty) list of workflow tags of this workflow definition
+`configuration_panel_json` | [`string`](types.md#basic)                                     | The configuration panel defined JSON of this workflow definition
+`configuration_panel`      | [`string`](types.md#basic)                                     | The configuration panel of this workflow definition
+`operations`               | [`array[operation_definition]`](types.md#operation_definition) | The list of operations of this workflow definition
 
 `400 (BAD REQUEST)`: The request is invalid or inconsistent.
 
@@ -313,7 +315,7 @@ __Example__
       "schedule",
       "upload"
     ],
-    "configuration_panel": "\n    \n      <div id=\"workflow-configuration\">\n        <fieldset>\n          <legend>Add a comment that the recording needs:</legend>\n          <ul>\n            <li>\n              <input id=\"comment\" name=\"comment\" type=\"checkbox\" class=\"configField\" value=\"true\" />\n              <label for=\"comment\">Review / Cutting</label>\n            </li>\n          </ul>\n        </fieldset>\n        <fieldset>\n          <legend>Immediately distribute the recording to:</legend>\n          <ul>\n            <li>\n              <input id=\"publishToMediaModule\" name=\"publishToMediaModule\" type=\"checkbox\" class=\"configField\" value=\"true\" checked=checked />\n              <label for=\"publishToMediaModule\">Opencast Media Module</label>\n            </li>\n            <li>\n              <input id=\"publishToOaiPmh\" name=\"publishToOaiPmh\" type=\"checkbox\" class=\"configField\" value=\"true\" checked=checked />\n              <label for=\"publishToOaiPmh\">Default OAI-PMH Repository</label>\n            </li>\n          </ul>\n        </fieldset>\n        <fieldset>\n          <legend>Publish live stream:</legend>\n          <ul>\n            <li>\n              <input id=\"publishLive\" name=\"publishLive\" type=\"checkbox\" class=\"configField\" value=\"false\" />\n              <label for=\"publishLive\">Add live event to Opencast Media Module</label>\n            </li>\n          </ul>\n        </fieldset>\n      </div>\n    \n  ",
+    "configuration_panel_json": "[{\n  \"fieldset\": [\n    {\n      \"type\": \"checkbox\",\n      \"name\": \"straightToPublishing\",\n      \"label\": \"Straight to publishing\",\n      \"value\": true\n    }\n  ]\n}]",
     "operations": [
       {
         "id": "defaults",
@@ -389,7 +391,7 @@ __Example__
     "schedule",
     "upload"
   ],
-  "configuration_panel": "\n    \n      <div id=\"workflow-configuration\">\n        <fieldset>\n          <legend>Add a comment that the recording needs:</legend>\n          <ul>\n            <li>\n              <input id=\"comment\" name=\"comment\" type=\"checkbox\" class=\"configField\" value=\"true\" />\n              <label for=\"comment\">Review / Cutting</label>\n            </li>\n          </ul>\n        </fieldset>\n        <fieldset>\n          <legend>Immediately distribute the recording to:</legend>\n          <ul>\n            <li>\n              <input id=\"publishToMediaModule\" name=\"publishToMediaModule\" type=\"checkbox\" class=\"configField\" value=\"true\" checked=checked />\n              <label for=\"publishToMediaModule\">Opencast Media Module</label>\n            </li>\n            <li>\n              <input id=\"publishToOaiPmh\" name=\"publishToOaiPmh\" type=\"checkbox\" class=\"configField\" value=\"true\" checked=checked />\n              <label for=\"publishToOaiPmh\">Default OAI-PMH Repository</label>\n            </li>\n          </ul>\n        </fieldset>\n        <fieldset>\n          <legend>Publish live stream:</legend>\n          <ul>\n            <li>\n              <input id=\"publishLive\" name=\"publishLive\" type=\"checkbox\" class=\"configField\" value=\"false\" />\n              <label for=\"publishLive\">Add live event to Opencast Media Module</label>\n            </li>\n          </ul>\n        </fieldset>\n      </div>\n    \n  ",
+  "configuration_panel_json": "[{\n  \"fieldset\": [\n    {\n      \"type\": \"checkbox\",\n      \"name\": \"straightToPublishing\",\n      \"label\": \"Straight to publishing\",\n      \"value\": true\n    }\n  ]\n}]",
   "operations": [
     {
       "id": "defaults",

@@ -6,8 +6,9 @@ on:
 jobs:
   cut-release-tag:
     runs-on: ubuntu-24.04
+    if: github.repository == 'opencast/opencast'
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
 
       - name: prepare git
         run: |

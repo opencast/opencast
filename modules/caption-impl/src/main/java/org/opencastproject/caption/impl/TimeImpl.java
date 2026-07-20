@@ -90,8 +90,9 @@ public class TimeImpl implements Time {
    *           if argument is less than 0 or more than 99.
    */
   private void setHours(int h) throws IllegalTimeFormatException {
-    if (h < 0 || h > 99)
+    if (h < 0 || h > 99) {
       throw new IllegalTimeFormatException("Invalid hour time: " + h);
+    }
     this.hours = h;
   }
 
@@ -104,8 +105,9 @@ public class TimeImpl implements Time {
    *           if argument is less than 0 or more than 59.
    */
   private void setMinutes(int m) throws IllegalTimeFormatException {
-    if (m < 0 || m > 59)
+    if (m < 0 || m > 59) {
       throw new IllegalTimeFormatException("Invalid minute time: " + m);
+    }
     this.minutes = m;
   }
 
@@ -118,8 +120,9 @@ public class TimeImpl implements Time {
    *           if argument is less than 0 or more than 59.
    */
   private void setSeconds(int s) throws IllegalTimeFormatException {
-    if (s < 0 || s > 59)
+    if (s < 0 || s > 59) {
       throw new IllegalTimeFormatException("Invalid second time: " + s);
+    }
     this.seconds = s;
   }
 
@@ -132,8 +135,9 @@ public class TimeImpl implements Time {
    *           if argument is less than 0 or more than 999.
    */
   private void setMilliseconds(int ms) throws IllegalTimeFormatException {
-    if (ms < 0 || ms > 999)
+    if (ms < 0 || ms > 999) {
       throw new IllegalTimeFormatException("Invalid milisecond time: " + ms);
+    }
     this.milliseconds = ms;
   }
 

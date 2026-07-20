@@ -95,20 +95,23 @@ public class Mpeg7CaptionConverter implements CaptionConverter {
     List<Caption> captions = new ArrayList<Caption>();
     Mpeg7Catalog catalog = new Mpeg7CatalogImpl(inputStream);
     Iterator<Audio> audioContentIterator = catalog.audioContent();
-    if (audioContentIterator == null)
+    if (audioContentIterator == null) {
       return captions;
+    }
     content: while (audioContentIterator.hasNext()) {
       Audio audioContent = audioContentIterator.next();
       TemporalDecomposition<AudioSegment> audioSegments = (TemporalDecomposition<AudioSegment>) audioContent
               .getTemporalDecomposition();
       Iterator<AudioSegment> audioSegmentIterator = audioSegments.segments();
-      if (audioSegmentIterator == null)
+      if (audioSegmentIterator == null) {
         continue content;
+      }
       while (audioSegmentIterator.hasNext()) {
         AudioSegment segment = audioSegmentIterator.next();
         Iterator<TextAnnotation> annotationIterator = segment.textAnnotations();
-        if (annotationIterator == null)
+        if (annotationIterator == null) {
           continue content;
+        }
         while (annotationIterator.hasNext()) {
           TextAnnotation annotation = annotationIterator.next();
           if (!annotation.getLanguage().equals(language)) {
@@ -118,8 +121,9 @@ public class Mpeg7CaptionConverter implements CaptionConverter {
 
           List<String> captionLines = new ArrayList<String>();
           Iterator<FreeTextAnnotation> freeTextAnnotationIterator = annotation.freeTextAnnotations();
-          if (freeTextAnnotationIterator == null)
+          if (freeTextAnnotationIterator == null) {
             continue;
+          }
 
           while (freeTextAnnotationIterator.hasNext()) {
             FreeTextAnnotation freeTextAnnotation = freeTextAnnotationIterator.next();
@@ -150,7 +154,8 @@ public class Mpeg7CaptionConverter implements CaptionConverter {
             Time startTime = new TimeImpl(stp.getHour(), stp.getMinutes(), stp.getSeconds(), millisAtStart);
             Time endTime = new TimeImpl(startCalendar.get(Calendar.HOUR), startCalendar.get(Calendar.MINUTE),
                     startCalendar.get(Calendar.SECOND), startCalendar.get(Calendar.MILLISECOND));
-            Caption caption = new CaptionImpl(startTime, endTime, captionLines.toArray(new String[captionLines.size()]));
+            Caption caption = new CaptionImpl(startTime, endTime, captionLines.toArray(
+                new String[captionLines.size()]));
             captions.add(caption);
           } catch (IllegalTimeFormatException e) {
             logger.warn("Error setting caption time: {}", e.getMessage());
@@ -178,8 +183,9 @@ public class Mpeg7CaptionConverter implements CaptionConverter {
 
       // Get all the words/parts for the transcript
       String[] words = caption.getCaption();
-      if (words.length == 0)
+      if (words.length == 0) {
         continue;
+      }
 
       // Create a new segment
       AudioSegment segment = captionDecomposition.createSegment("segment-" + segmentCount++);
@@ -216,8 +222,9 @@ public class Mpeg7CaptionConverter implements CaptionConverter {
 
       // Add each words/parts as segment to the catalog
       for (String word : words) {
-        if (captionLine.length() > 0)
+        if (captionLine.length() > 0) {
           captionLine.append(' ');
+        }
         captionLine.append(word);
       }
 
@@ -256,25 +263,29 @@ public class Mpeg7CaptionConverter implements CaptionConverter {
 
     Mpeg7Catalog catalog = new Mpeg7CatalogImpl(inputStream);
     Iterator<Audio> audioContentIterator = catalog.audioContent();
-    if (audioContentIterator == null)
+    if (audioContentIterator == null) {
       return languages.toArray(new String[languages.size()]);
+    }
     content: while (audioContentIterator.hasNext()) {
       Audio audioContent = audioContentIterator.next();
       TemporalDecomposition<AudioSegment> audioSegments = (TemporalDecomposition<AudioSegment>) audioContent
               .getTemporalDecomposition();
       Iterator<AudioSegment> audioSegmentIterator = audioSegments.segments();
-      if (audioSegmentIterator == null)
+      if (audioSegmentIterator == null) {
         continue content;
+      }
       while (audioSegmentIterator.hasNext()) {
         AudioSegment segment = audioSegmentIterator.next();
         Iterator<TextAnnotation> annotationIterator = segment.textAnnotations();
-        if (annotationIterator == null)
+        if (annotationIterator == null) {
           continue content;
+        }
         while (annotationIterator.hasNext()) {
           TextAnnotation annotation = annotationIterator.next();
           String language = annotation.getLanguage();
-          if (language != null)
+          if (language != null) {
             languages.add(language);
+          }
         }
       }
     }

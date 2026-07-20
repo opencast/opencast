@@ -146,8 +146,9 @@ public class IBMWatsonCaptionConverterTest {
     text = caption.getCaption();
     Assert.assertEquals(1, text.length);
     Assert.assertEquals(
-            "a computer science course called CS 15 see if it is up to become the largest undergraduate course herpetological ",
-            text[0]);
+        "a computer science course called CS 15 see if it is up to become the largest undergraduate course "
+            + "herpetological ",
+        text[0]);
     time = caption.getStartTime();
     Assert.assertEquals(0, time.getHours());
     Assert.assertEquals(0, time.getMinutes());

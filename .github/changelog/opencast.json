@@ -1,0 +1,65 @@
+{
+    "categories": [
+      {
+        "title": "### 🚀 Features, Enhancements, and API changes",
+        "labels": [
+          "feature", 
+          "enhancement"
+        ]
+      },
+      {
+        "title": "### 🐛 Fixes",
+        "labels": [
+          "bug"
+        ]
+      },
+      {
+        "key": "security",
+        "title": "### Security",
+        "labels": [
+          "security"
+        ]
+      },
+      {
+        "title": "### Tests and Performance",
+        "labels": [
+          "performance",
+          "tests"
+        ]
+      },
+      {
+        "title": "### Submodule",
+        "labels": [
+          "admin-ui",
+          "editor",
+          "studio"
+        ]
+      },
+      {
+        "title": "### Maintenance",
+        "labels": [
+          "maintenance",
+          "configuration",
+          "documentation",
+          "packaging",
+          "javascript"
+        ]
+      },
+      {
+        "title": "### Dependencies",
+        "labels": [
+          "dependencies"
+        ]
+      }
+    ],
+    "sort": {
+      "order": "ASC",
+      "on_property": "mergedAt"
+    },
+    "template": "#{{CHANGELOG}}\n\n<details>\n<summary>Uncategorized</summary>\n\n#{{UNCATEGORIZED}}\n</details>",
+    "pr_template": "- ##{{NUMBER}} - #{{TITLE}}",
+    "empty_template": "- no changes",
+    "trim_values": false,
+    "max_tags_to_fetch": 200,
+    "max_pull_requests": 500
+}

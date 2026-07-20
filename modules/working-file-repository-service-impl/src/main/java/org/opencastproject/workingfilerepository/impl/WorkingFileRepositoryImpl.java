@@ -31,10 +31,8 @@ import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.UrlSupport;
-import org.opencastproject.util.jmx.JmxUtil;
 import org.opencastproject.workingfilerepository.api.PathMappable;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
-import org.opencastproject.workingfilerepository.jmx.WorkingFileRepositoryBean;
 
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
@@ -68,8 +66,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
-import javax.management.ObjectInstance;
-
 /**
  * A very simple (read: inadequate) implementation that stores all files under a root directory using the media package
  * ID as a subdirectory and the media package element ID as the file name.
@@ -88,8 +84,6 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     }
   };
 
-  /** Working file repository JMX type */
-  private static final String JMX_WORKING_FILE_REPOSITORY_TYPE = "WorkingFileRepository";
   /** Configuration key for garbage collection period. */
   public static final String WORKING_FILE_REPOSITORY_CLEANUP_PERIOD_KEY =
       "org.opencastproject.working.file.repository.cleanup.period";
@@ -99,12 +93,6 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
   /** Configuration key for collections to clean up. */
   private static final String WORKING_FILE_REPOSITORY_CLEANUP_COLLECTIONS_KEY =
       "org.opencastproject.working.file.repository.cleanup.collections";
-
-  /** The JMX working file repository bean */
-  private WorkingFileRepositoryBean workingFileRepositoryBean = new WorkingFileRepositoryBean(this);
-
-  /** The JMX bean object instance */
-  private ObjectInstance registeredMXBean;
 
   /** The remote service manager */
   protected ServiceRegistry remoteServiceManager;
@@ -173,8 +161,6 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
       throw e;
     }
 
-    registeredMXBean = JmxUtil.registerMXBean(workingFileRepositoryBean, JMX_WORKING_FILE_REPOSITORY_TYPE);
-
     // Determine garbage collection period
     int garbageCollectionPeriodInSeconds = -1;
     String period = StringUtils.trimToNull(
@@ -222,7 +208,6 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
    * Callback from OSGi on service deactivation.
    */
   public void deactivate() {
-    JmxUtil.unregisterMXBean(registeredMXBean);
     if (workingFileRepositoryCleaner != null) {
       workingFileRepositoryCleaner.shutdown();
     }
@@ -1076,4 +1061,8 @@ public class WorkingFileRepositoryImpl implements WorkingFileRepository, PathMap
     this.securityService = securityService;
   }
 
+  @Override
+  public String getStorageName() {
+    return "Working File Repository";
+  }
 }

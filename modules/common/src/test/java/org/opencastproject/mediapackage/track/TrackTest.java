@@ -101,7 +101,8 @@ public class TrackTest {
 
   /**
    * Test method for
-   * {@link TrackBuilderPlugin#accept(URI, org.opencastproject.mediapackage.MediaPackageElement.Type, org.opencastproject.mediapackage.MediaPackageElementFlavor)}
+   * {@link TrackBuilderPlugin#accept(URI, org.opencastproject.mediapackage.MediaPackageElement.Type,
+   *        org.opencastproject.mediapackage.MediaPackageElementFlavor)}
    *
    * @throws Exception
    */
@@ -129,7 +130,9 @@ public class TrackTest {
     }
 
     // Now again without namespaces
-    String xml = "<oc:track xmlns:oc=\"http://mediapackage.opencastproject.org\" type=\"presentation/source\"><oc:tags/><oc:url>http://downloads.opencastproject.org/media/movie.m4v</oc:url><oc:duration>-1</oc:duration></oc:track>";
+    String xml = "<oc:track xmlns:oc=\"http://mediapackage.opencastproject.org\" type=\"presentation/source\">"
+        + "<oc:tags/><oc:url>http://downloads.opencastproject.org/media/movie.m4v</oc:url><oc:duration>-1</oc:duration>"
+        + "</oc:track>";
     inputStream = IOUtils.toInputStream(xml);
     try {
       TrackImpl t2 = unmarshaller.unmarshal(XmlSafeParser.parse(inputStream), TrackImpl.class).getValue();
@@ -174,7 +177,9 @@ public class TrackTest {
     }
 
     // Now again without namespaces
-    String xml = "<oc:track xmlns:oc=\"http://mediapackage.opencastproject.org\" type=\"presentation/source\"><oc:tags/><oc:url>http://downloads.opencastproject.org/media/movie.m4v</oc:url><oc:duration>-1</oc:duration><oc:live>true</oc:live></oc:track>";
+    String xml = "<oc:track xmlns:oc=\"http://mediapackage.opencastproject.org\" type=\"presentation/source\">"
+        + "<oc:tags/><oc:url>http://downloads.opencastproject.org/media/movie.m4v</oc:url><oc:duration>-1</oc:duration>"
+        + "<oc:live>true</oc:live></oc:track>";
     inputStream = IOUtils.toInputStream(xml);
     try {
       TrackImpl t2 = unmarshaller.unmarshal(XmlSafeParser.parse(inputStream), TrackImpl.class).getValue();

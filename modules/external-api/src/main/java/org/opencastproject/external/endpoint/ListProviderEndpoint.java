@@ -22,10 +22,10 @@ package org.opencastproject.external.endpoint;
 
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponseBuilder;
+import org.opencastproject.list.api.DefaultResourceListQuery;
 import org.opencastproject.list.api.ListProviderException;
+import org.opencastproject.list.api.ListProviderNotFoundException;
 import org.opencastproject.list.api.ListProvidersService;
-import org.opencastproject.list.impl.ListProviderNotFoundException;
-import org.opencastproject.list.impl.ResourceListQueryImpl;
 import org.opencastproject.list.query.StringListFilter;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -55,7 +55,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 @Path("/api/listproviders")
-@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0 })
+@Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_10_0, ApiMediaType.VERSION_1_11_0, ApiMediaType.VERSION_1_12_0 })
 @RestService(
         name = "externalapilistproviders",
         title = "External API List Providers Service",
@@ -94,7 +94,6 @@ public class ListProviderEndpoint {
 
   @GET
   @Path("providers.json")
-  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_10_0 })
   @RestQuery(
       name = "availableProviders",
       description = "Provides the list of the available list providers",
@@ -113,7 +112,6 @@ public class ListProviderEndpoint {
 
   @GET
   @Path("{source}.json")
-  @Produces({ ApiMediaType.JSON, ApiMediaType.VERSION_1_10_0 })
   @RestQuery(
       name = "list",
       description = "Provides key-value list from the given source",
@@ -138,7 +136,7 @@ public class ListProviderEndpoint {
           @QueryParam("filter") final String filter, @QueryParam("offset") final int offset,
           @HeaderParam("Accept") String acceptHeader) {
 
-    ResourceListQueryImpl query = new ResourceListQueryImpl();
+    DefaultResourceListQuery query = new DefaultResourceListQuery();
     query.setLimit(limit);
     query.setOffset(offset);
     addRequestFiltersToQuery(filter, query);
@@ -166,7 +164,7 @@ public class ListProviderEndpoint {
    * @param query
    *          The query to update with the filters
    */
-  private void addRequestFiltersToQuery(final String filterString, ResourceListQueryImpl query) {
+  private void addRequestFiltersToQuery(final String filterString, DefaultResourceListQuery query) {
     if (filterString != null) {
       String[] filters = filterString.split(",");
       for (String filter : filters) {

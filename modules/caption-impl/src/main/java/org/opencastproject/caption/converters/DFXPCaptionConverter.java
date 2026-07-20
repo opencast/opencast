@@ -296,7 +296,8 @@ public class DFXPCaptionConverter implements CaptionConverter {
       // create handler
       DefaultHandler handler = new DefaultHandler() {
         @Override
-        public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+        public void startElement(String uri, String localName, String qName, Attributes attributes)
+                throws SAXException {
           if ("div".equals(qName)) {
             // we found div tag - let's make a lookup for language
             String lang = attributes.getValue("xml:lang");

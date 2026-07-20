@@ -72,7 +72,7 @@ public class CommonEventMetadataDataFetcher implements ContextDataFetcher<Map<St
 
   private GqlEvent getEvent(ElasticsearchIndex searchIndex, String eventId, SecurityService securityService)
           throws SearchIndexException {
-    return searchIndex.getEvent(eventId, securityService.getOrganization().toString(), securityService.getUser())
+    return searchIndex.getEvent(eventId, securityService.getOrganization(), securityService.getUser())
         .map(GqlEvent::new).orElseThrow(() -> new GraphQLNotFoundException(
                 String.format("Could not resolve to a %s with the id of %s", GqlEvent.TYPE_NAME, eventId)));
   }

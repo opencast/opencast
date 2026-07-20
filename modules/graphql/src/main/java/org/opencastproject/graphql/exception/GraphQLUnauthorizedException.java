@@ -21,18 +21,22 @@
 
 package org.opencastproject.graphql.exception;
 
+import java.util.Collections;
 import java.util.List;
 
-import graphql.ErrorClassification;
 import graphql.GraphQLError;
 import graphql.language.SourceLocation;
 
-public class GraphQLUnauthorizedException extends RuntimeException implements GraphQLError {
+public class GraphQLUnauthorizedException extends GraphQLRuntimeException implements GraphQLError {
 
   private static final long serialVersionUID = 2443180509033453490L;
 
   public GraphQLUnauthorizedException(String message) {
-    super(message);
+    super(
+        message,
+        OpencastErrorType.Unauthorized,
+        Collections.singletonMap("code", OpencastErrorType.Unauthorized.name())
+    );
   }
 
   @Override
@@ -40,8 +44,4 @@ public class GraphQLUnauthorizedException extends RuntimeException implements Gr
     return null;
   }
 
-  @Override
-  public ErrorClassification getErrorType() {
-    return OpencastErrorType.Unauthorized;
-  }
 }

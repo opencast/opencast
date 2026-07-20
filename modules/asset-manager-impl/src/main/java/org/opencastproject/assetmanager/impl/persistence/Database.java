@@ -193,7 +193,7 @@ public class Database {
           Pair.of("storageId", storageId),
           Pair.of("version", version.value()),
           Pair.of("mediaPackageId", mpId)
-      );
+      ).apply(em);
 
       // Update asset
       Optional<SnapshotDtos.Medium> optSnapshot = getSnapshot(version, mpId);
@@ -255,22 +255,16 @@ public class Database {
    *
    * @return the asset or none, if no asset can be found
    */
-  public Optional<AssetDtos.Medium> getAsset(final VersionImpl version, final String mpId, final String mpeId) {
+  public Optional<AssetDto> getAsset(final VersionImpl version, final String mpId, final String mpeId) {
     return db.execTx(em -> {
       return Queries.namedQuery
           .findOpt(
-              "Asset.findMediumByMpIdMpeIdAndVersion",
-              Object[].class,
+              "Asset.findAssetByMpIdMpeIdAndVersion",
+              AssetDto.class,
               Pair.of("mpId", mpId),
               Pair.of("mpeId", mpeId),
               Pair.of("version", version.value()))
-          .apply(em)
-          .map(result -> {
-            AssetDto assetDto = (AssetDto) result[0];
-            String availability = (String) result[1];
-            String organizationId = (String) result[2];
-            return new AssetDtos.Medium(assetDto, Availability.valueOf(availability), organizationId);
-          });
+          .apply(em);
     });
   }
 
@@ -387,28 +381,21 @@ public class Database {
     return db.exec(PropertyDto.countPropertiesQuery());
   }
 
-  public Optional<AssetDtos.Full> findAssetByChecksumAndStoreAndOrg(final String checksum, final String storeId,
+  public Optional<AssetDto> findAssetByChecksumAndStoreAndOrg(final String checksum, final String storeId,
       final String orgId) {
     return db.execTx(em -> {
-      return namedQuery.findOpt(
+      return namedQuery.findSome(
               "Asset.findByChecksumStorageIdAndOrganizationId",
+              // limit to one result (which one doesn't matter as the checksum, storage and org ID are equal)
+              0,
+              1,
               AssetDto.class,
               Pair.of("checksum", checksum),
               Pair.of("storageId", storeId),
               Pair.of("orgId", orgId))
           .apply(em)
-          .map(result -> {
-            SnapshotDto snapshot = result.getSnapshot();
-            return new AssetDtos.Full(
-                result,
-                Availability.valueOf(snapshot.getAvailability()),
-                snapshot.getStorageId(),
-                snapshot.getOrganizationId(),
-                snapshot.getOwner(),
-                snapshot.getMediaPackageId(),
-                snapshot.getVersion()
-            );
-          });
+          .stream()
+          .findFirst();
     });
   }
 

@@ -110,13 +110,13 @@ import javax.ws.rs.core.Response.Status;
                 + "<a href=\"https://github.com/opencast/opencast/issues\">Opencast Issue Tracker</a>"
     })
 @Component(
-  property = {
-    "service.description=Incident Service REST Endpoint",
-    "opencast.service.type=org.opencastproject.incident",
-    "opencast.service.path=/incidents"
-  },
-  immediate = true,
-  service = { IncidentServiceEndpoint.class }
+    property = {
+      "service.description=Incident Service REST Endpoint",
+      "opencast.service.type=org.opencastproject.incident",
+      "opencast.service.path=/incidents"
+    },
+    immediate = true,
+    service = { IncidentServiceEndpoint.class }
 )
 @JaxrsResource
 public class IncidentServiceEndpoint {

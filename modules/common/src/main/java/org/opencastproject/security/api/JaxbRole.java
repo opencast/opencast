@@ -102,7 +102,8 @@ public final class JaxbRole implements Role {
    * @param type
    *          the role {@link type}
    */
-  public JaxbRole(String name, JaxbOrganization organization, String description, Type type) throws IllegalArgumentException {
+  public JaxbRole(String name, JaxbOrganization organization, String description, Type type)
+          throws IllegalArgumentException {
     this(name, organization, description);
     this.type = type;
   }
@@ -129,8 +130,9 @@ public final class JaxbRole implements Role {
   }
 
   public static JaxbRole fromRole(Role role) {
-    if (role instanceof JaxbRole)
+    if (role instanceof JaxbRole) {
       return (JaxbRole) role;
+    }
     return new JaxbRole(role.getName(), role.getOrganizationId(), role.getDescription(), role.getType());
   }
 
@@ -193,8 +195,9 @@ public final class JaxbRole implements Role {
    */
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof Role))
+    if (!(obj instanceof Role)) {
       return false;
+    }
     Role other = (Role) obj;
     return name.equals(other.getName())
             && Objects.equals(getOrganizationId(), other.getOrganizationId());

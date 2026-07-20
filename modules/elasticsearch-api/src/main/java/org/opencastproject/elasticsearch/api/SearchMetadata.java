@@ -93,22 +93,4 @@ public interface SearchMetadata<T> {
    * Removes all values currently in the metadata container.
    */
   void clear();
-
-  /**
-   * Adds the metadata values to the user facing fulltext index.
-   * 
-   * @param addToFulltext
-   *          <code>true</code> to add the values to the fulltext index
-   */
-  void setAddToText(boolean addToFulltext);
-
-  /**
-   * Returns <code>true</code> if the values should be added to the user facing
-   * fulltext search index.
-   * 
-   * @return <code>true</code> if the metadata values should be added to the
-   *         fulltext index
-   */
-  boolean addToText();
-
 }

@@ -47,7 +47,6 @@ import org.opencastproject.serviceregistry.api.SystemLoad;
 import org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl.JobProducerHeartbeat;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.jmx.JmxUtil;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
@@ -84,9 +83,9 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import javax.management.ObjectInstance;
 import javax.persistence.EntityManagerFactory;
 
 public class ServiceRegistryJpaImplTest {
@@ -135,10 +134,6 @@ public class ServiceRegistryJpaImplTest {
   @Before
   public void cleanBeforeEach() throws ServiceRegistryException, NotFoundException, ConfigurationException {
     logger.debug("start clean before each");
-    // remove the activate beans, so this can be reactivated
-    for (ObjectInstance mbean : serviceRegistryJpaImpl.jmxBeans) {
-      JmxUtil.unregisterMXBean(mbean);
-    }
     // reset the scheduledExecutor
     if (serviceRegistryJpaImpl.scheduledExecutor != null) {
       serviceRegistryJpaImpl.scheduledExecutor.shutdown();
@@ -168,9 +163,6 @@ public class ServiceRegistryJpaImplTest {
 
   @AfterClass
   public static void tearDownAfterAll() throws ServiceRegistryException {
-    for (ObjectInstance mbean : serviceRegistryJpaImpl.jmxBeans) {
-      JmxUtil.unregisterMXBean(mbean);
-    }
     logger.debug("About to deactivate after all tests");
     serviceRegistryJpaImpl.deactivate();
   }
@@ -316,7 +308,7 @@ public class ServiceRegistryJpaImplTest {
     if (serviceRegistryJpaImpl.scheduledExecutor != null) {
       serviceRegistryJpaImpl.scheduledExecutor.shutdown();
     }
-    serviceRegistryJpaImpl.scheduledExecutor = Executors.newScheduledThreadPool(1);
+    serviceRegistryJpaImpl.scheduledExecutor = (ScheduledThreadPoolExecutor) Executors.newScheduledThreadPool(1);
     jobDispatcher.scheduledExecutor.schedule(jobDispatcher.getJobDispatcherRunnable(), DISPATCH_START_DELAY,
         TimeUnit.MILLISECONDS);
 
@@ -339,11 +331,6 @@ public class ServiceRegistryJpaImplTest {
     assertEquals(Status.RUNNING, undispatchableJob1.getStatus());
     undispatchableJob2 = serviceRegistryJpaImpl.getJob(undispatchableJob2.getId());
     assertEquals(Status.RUNNING, undispatchableJob2.getStatus());
-
-    // remove the activate beans, so this can be reactivated
-    for (ObjectInstance mbean : serviceRegistryJpaImpl.jmxBeans) {
-      JmxUtil.unregisterMXBean(mbean);
-    }
 
     // reactivate and expect local undispatchable job to be canceled, but not the remote job
     serviceRegistryJpaImpl.activate(null);

@@ -81,8 +81,9 @@ public class MediaPackageElementBuilderImpl implements MediaPackageElementBuilde
       MediaPackageElementBuilderPlugin plugin = null;
       for (Class<? extends MediaPackageElementBuilderPlugin> pluginClass : plugins) {
         plugin = createPlugin(pluginClass);
-        if (plugin.accept(uri, type, flavor))
+        if (plugin.accept(uri, type, flavor)) {
           candidates.add(plugin);
+        }
       }
     }
 
@@ -92,8 +93,9 @@ public class MediaPackageElementBuilderImpl implements MediaPackageElementBuilde
     } else if (candidates.size() > 1) {
       StringBuffer buf = new StringBuffer();
       for (MediaPackageElementBuilderPlugin plugin : candidates) {
-        if (buf.length() > 0)
+        if (buf.length() > 0) {
           buf.append(", ");
+        }
         buf.append(plugin.toString());
       }
       logger.debug("More than one element builder plugin with the same priority claims responsibilty for " + uri + ": "
@@ -128,8 +130,9 @@ public class MediaPackageElementBuilderImpl implements MediaPackageElementBuilde
     } else if (candidates.size() > 1) {
       StringBuffer buf = new StringBuffer();
       for (MediaPackageElementBuilderPlugin plugin : candidates) {
-        if (buf.length() > 0)
+        if (buf.length() > 0) {
           buf.append(", ");
+        }
         buf.append(plugin.toString());
       }
       XPath xpath = XPathFactory.newInstance().newXPath();
@@ -152,7 +155,8 @@ public class MediaPackageElementBuilderImpl implements MediaPackageElementBuilde
   }
 
   /**
-   * @see org.opencastproject.mediapackage.MediaPackageElementBuilder#newElement(org.opencastproject.mediapackage.MediaPackageElement.Type
+   * @see org.opencastproject.mediapackage.MediaPackageElementBuilder#newElement(
+   *      org.opencastproject.mediapackage.MediaPackageElement.Type
    *      , org.opencastproject.mediapackage.MediaPackageElementFlavor)
    */
   public MediaPackageElement newElement(MediaPackageElement.Type type, MediaPackageElementFlavor flavor) {
@@ -165,13 +169,15 @@ public class MediaPackageElementBuilderImpl implements MediaPackageElementBuilde
     }
 
     // Check the plugins
-    if (candidates.size() == 0)
+    if (candidates.size() == 0) {
       return null;
+    }
     else if (candidates.size() > 1) {
       StringBuffer buf = new StringBuffer();
       for (MediaPackageElementBuilderPlugin plugin : candidates) {
-        if (buf.length() > 0)
+        if (buf.length() > 0) {
           buf.append(", ");
+        }
         buf.append(plugin.toString());
       }
       logger.debug("More than one element builder plugin claims responsibilty for " + flavor + ": " + buf.toString());

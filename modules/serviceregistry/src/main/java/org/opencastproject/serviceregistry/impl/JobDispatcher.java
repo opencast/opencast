@@ -57,6 +57,7 @@ import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
@@ -109,6 +110,9 @@ public class JobDispatcher {
 
   /** Multiplicative factor to transform dispatch interval captured in seconds to milliseconds */
   static final long DISPATCH_INTERVAL_MS_FACTOR = 1000;
+
+  /** Default delay between checking if hosts are still alive in seconds * */
+  static final long DEFAULT_HEART_BEAT = 60;
 
   private static final Logger logger = LoggerFactory.getLogger(JobDispatcher.class);
 
@@ -237,8 +241,28 @@ public class JobDispatcher {
       logger.debug("Starting job dispatching at a custom interval of {}s", dispatchInterval);
       jdfuture = scheduledExecutor.scheduleWithFixedDelay(getJobDispatcherRunnable(), dispatchIntervalMs,
           dispatchIntervalMs, TimeUnit.MILLISECONDS);
+      // Schedule heartbeat for dispatching nodes
+      serviceRegistry.startHeartbeat(DEFAULT_HEART_BEAT);
     } else {
       logger.info("Job dispatching is disabled");
+    }
+  }
+
+  @Deactivate
+  public void deactivate() {
+    logger.info("Deactivate Job Dispatcher");
+
+    // Wait for runnable to stop before stopping
+    if (scheduledExecutor != null) {
+      try {
+        scheduledExecutor.shutdownNow();
+        if (!scheduledExecutor.isShutdown()) {
+          logger.info("Waiting for Job Dispatcher to terminate");
+          scheduledExecutor.awaitTermination(10, TimeUnit.SECONDS);
+        }
+      } catch (InterruptedException e) {
+        logger.error("Error shutting down the Job Dispatcher", e);
+      }
     }
   }
 
@@ -259,12 +283,6 @@ public class JobDispatcher {
 
       undispatchableJobTypes = new ArrayList<>();
       try {
-        //GDLGDL: move collectJobStats to the JD config, then this is reasonable
-        // FIXME: the stats are not currently used and the queries are very expensive in database time.
-        if (serviceRegistry.collectJobstats) {
-          serviceRegistry.updateStatisticsJobData();
-        }
-
         if (!dispatchPriorityList.isEmpty()) {
           logger.trace("Checking for outdated jobs in dispatchPriorityList's '{}' jobs", dispatchPriorityList.size());
           // Remove outdated jobs from priority list
@@ -469,7 +487,7 @@ public class JobDispatcher {
      * @throws UndispatchableJobException  if the current job cannot be processed
      */
     private String dispatchJob(JpaJob job, List<ServiceRegistration> services)
-        throws ServiceRegistryException, ServiceUnavailableException, UndispatchableJobException {
+            throws ServiceRegistryException, ServiceUnavailableException, UndispatchableJobException {
       if (services.size() == 0) {
         logger.debug("No service is currently available to handle jobs of type '" + job.getJobType() + "'");
         throw new ServiceUnavailableException("No service of type " + job.getJobType() + " available");

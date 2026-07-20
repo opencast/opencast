@@ -21,12 +21,12 @@
 
 package org.opencastproject.elasticsearch.index.objects.event;
 
+import static org.opencastproject.elasticsearch.impl.IndexSchema.SEARCH_FIELD_NAME_EXTENSION;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 
 import org.opencastproject.elasticsearch.api.SearchTerms;
 import org.opencastproject.elasticsearch.api.SearchTerms.Quantifier;
 import org.opencastproject.elasticsearch.impl.AbstractElasticsearchQueryBuilder;
-import org.opencastproject.elasticsearch.impl.IndexSchema;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.User;
 
@@ -34,6 +34,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * Opencast {@link EventSearchQuery} implementation of the Elasticsearch query builder.
@@ -86,6 +87,12 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
             and(EventIndexSchema.ACL_PERMISSION_PREFIX.concat(action), role.getName());
           }
         }
+      }
+    }
+
+    if (query.getAccessControlEntries() != null && !query.getAccessControlEntries().isEmpty()) {
+      for (Map.Entry<String, String> entry: query.getAccessControlEntries().entrySet()) {
+        and(EventIndexSchema.ACL_PERMISSION_PREFIX.concat(entry.getValue()), entry.getKey());
       }
     }
 
@@ -269,24 +276,18 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
       and(EventIndexSchema.TECHNICAL_PRESENTERS, query.getTechnicalPresenters());
     }
 
+    // Is published
+    if (query.getNeedsCutting() != null) {
+      and(EventIndexSchema.NEEDS_CUTTING, query.getNeedsCutting());
+    }
+
     // Text
     if (query.getTerms() != null) {
       for (SearchTerms<String> terms : query.getTerms()) {
-        StringBuilder queryText = new StringBuilder();
-        for (String term : terms.getTerms()) {
-          if (queryText.length() > 0) {
-            queryText.append(" ");
-          }
-          queryText.append(term);
-        }
-
         additionalMultiQueryFields.add(EventIndexSchema.UID);
         additionalMultiQueryFields.add(EventIndexSchema.SERIES_ID);
-
         fuzzy = query.isFuzzySearch();
-
-        this.text = queryText.toString();
-
+        this.text = String.join(" ", terms.getTerms());
         if (Quantifier.All.equals(terms.getQuantifier())) {
           if (groups == null) {
             groups = new ArrayList<>();
@@ -294,7 +295,8 @@ public class EventQueryBuilder extends AbstractElasticsearchQueryBuilder<EventSe
           if (query.isFuzzySearch()) {
             logger.warn("All quantifier not supported in conjunction with wildcard text");
           }
-          groups.add(new ValueGroup(IndexSchema.TEXT, (Object[]) terms.getTerms().toArray(new String[terms.size()])));
+          groups.add(new ValueGroup("*" + SEARCH_FIELD_NAME_EXTENSION,
+              (Object[]) terms.getTerms().toArray(new String[terms.size()])));
         }
       }
     }

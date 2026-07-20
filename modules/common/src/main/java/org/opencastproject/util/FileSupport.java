@@ -135,8 +135,9 @@ public final class FileSupport {
       // If dest is not an "absolute file", getParentFile may return null, even if there *is* a parent file.
       // That's why "getAbsoluteFile" is used here
       dest.getAbsoluteFile().getParentFile().mkdirs();
-      if (dest.exists())
+      if (dest.exists()) {
         delete(dest);
+      }
 
       FileChannel sourceChannel = null;
       FileChannel targetChannel = null;
@@ -159,8 +160,9 @@ public final class FileSupport {
           if ((sourceChannel != null) && (targetChannel != null) && (size < sourceFile.length())) {
             // Failing back to using FileChannels *but* with chunks and not altogether
             logger.info("Trying to copy the file in chunks using Channels");
-            while (size < sourceFile.length())
+            while (size < sourceFile.length()) {
               size += targetChannel.transferFrom(sourceChannel, size, chunk);
+            }
           }
         }
       } catch (IOException ioe) {
@@ -168,19 +170,25 @@ public final class FileSupport {
           logger.warn("Got IOException using Channels for copying in chunks. Trying to use stream copy instead...");
           int copied = 0;
           byte[] buffer = new byte[bufferSize];
-          while ((copied = sourceStream.read(buffer, 0, buffer.length)) != -1)
+          while ((copied = sourceStream.read(buffer, 0, buffer.length)) != -1) {
             targetStream.write(buffer, 0, copied);
-        } else
+          }
+        } else {
           throw ioe;
+        }
       } finally {
-        if (sourceChannel != null)
+        if (sourceChannel != null) {
           sourceChannel.close();
-        if (sourceStream != null)
+        }
+        if (sourceStream != null) {
           sourceStream.close();
-        if (targetChannel != null)
+        }
+        if (targetChannel != null) {
           targetChannel.close();
-        if (targetStream != null)
+        }
+        if (targetStream != null) {
           targetStream.close();
+        }
       }
 
       if (sourceFile.length() != dest.length()) {
@@ -248,7 +256,8 @@ public final class FileSupport {
 
       try {
         createLink(targetPath, sourcePath);
-        targetPath.toFile().length(); // this forces a stat call which is a quickfix for a bug in ceph (https://www.mail-archive.com/ceph-users@lists.ceph.com/msg53368.html)
+        targetPath.toFile().length(); // this forces a stat call which is a quickfix for a bug in ceph
+                                      // (https://www.mail-archive.com/ceph-users@lists.ceph.com/msg53368.html)
       } catch (UnsupportedOperationException e) {
         logger.debug("Copy file because creating hard-links is not supported by the current file system: {}",
                 ExceptionUtils.getMessage(e));
@@ -284,14 +293,16 @@ public final class FileSupport {
     final Path sourcePath = requireNonNull(sourceLocation).toPath();
     final Path targetPath = requireNonNull(targetLocation).toPath();
 
-    if (!exists(sourcePath))
+    if (!exists(sourcePath)) {
       throw new IllegalArgumentException(format("Source %s does not exist", sourcePath));
+    }
 
     logger.debug("Creating hard link from {} to {}", sourcePath, targetPath);
     try {
       deleteIfExists(targetPath);
       createLink(targetPath, sourcePath);
-      targetPath.toFile().length(); // this forces a stat call which is a quickfix for a bug in ceph (https://www.mail-archive.com/ceph-users@lists.ceph.com/msg53368.html)
+      targetPath.toFile().length(); // this forces a stat call which is a quickfix for a bug in ceph
+                                    // (https://www.mail-archive.com/ceph-users@lists.ceph.com/msg53368.html)
     } catch (Exception e) {
       logger.debug("Unable to create a link from {} to {}", sourcePath, targetPath, e);
       return false;
@@ -358,8 +369,9 @@ public final class FileSupport {
    */
   public static boolean deleteHierarchyIfEmpty(File limit, File start) {
     return limit.isDirectory()
-            && start.isDirectory()
-            && (isEqual(limit, start) || (isParent(limit, start) && start.list().length == 0 && start.delete() && deleteHierarchyIfEmpty(
+        && start.isDirectory()
+        && (isEqual(limit, start)
+            || (isParent(limit, start) && start.list().length == 0 && start.delete() && deleteHierarchyIfEmpty(
                     limit, start.getParentFile())));
   }
 
@@ -435,18 +447,21 @@ public final class FileSupport {
    *          <code>true</code> to do a recursive deletes for directories
    */
   public static boolean delete(File f, boolean recurse) throws IOException {
-    if (f == null)
+    if (f == null) {
       return false;
-    if (!f.exists())
+    }
+    if (!f.exists()) {
       return false;
+    }
     if (f.isDirectory()) {
       String[] children = f.list();
       if (children == null) {
         throw new IOException("Cannot list content of directory " + f.getAbsolutePath());
       }
       if (children != null) {
-        if (children.length > 0 && !recurse)
+        if (children.length > 0 && !recurse) {
           return false;
+        }
         for (String child : children) {
           delete(new File(f, child), true);
         }
@@ -505,10 +520,12 @@ public final class FileSupport {
    *           if the directory is write protected
    */
   public static void setTempDirectory(File tmpDir) throws IllegalArgumentException, IllegalStateException {
-    if (tmpDir == null || !tmpDir.isDirectory())
+    if (tmpDir == null || !tmpDir.isDirectory()) {
       throw new IllegalArgumentException(tmpDir + " is not a directory");
-    if (!tmpDir.canWrite())
+    }
+    if (!tmpDir.canWrite()) {
       throw new IllegalStateException(tmpDir + " is not writable");
+    }
     FileSupport.tmpDir = tmpDir;
   }
 
@@ -533,14 +550,18 @@ public final class FileSupport {
    */
   public static File getTempDirectory(String subdir) {
     File tmp = new File(getTempDirectory(), subdir);
-    if (!tmp.exists())
+    if (!tmp.exists()) {
       tmp.mkdirs();
-    if (!tmp.isDirectory())
+    }
+    if (!tmp.isDirectory()) {
       throw new IllegalStateException(tmp + " is not a directory!");
-    if (!tmp.canRead())
+    }
+    if (!tmp.canRead()) {
       throw new IllegalStateException("Temp directory " + tmp + " is not readable!");
-    if (!tmp.canWrite())
+    }
+    if (!tmp.canWrite()) {
       throw new IllegalStateException("Temp directory " + tmp + " is not writable!");
+    }
     return tmp;
   }
 

@@ -123,7 +123,7 @@ public final class AccessControlUtil {
 
     // Check for episode role ids, if activated
     if (mediaPackageId != null && user.hasRole(getEpisodeRoleId(mediaPackageId, action.toString()))) {
-        return true;
+      return true;
     }
 
     Set<Role> userRoles = user.getRoles();
@@ -141,10 +141,12 @@ public final class AccessControlUtil {
   }
 
   /**
-   * {@link AccessControlUtil#isAuthorized(org.opencastproject.security.api.AccessControlList, org.opencastproject.security.api.User, org.opencastproject.security.api.Organization, Object)}
+   * {@link AccessControlUtil#isAuthorized(org.opencastproject.security.api.AccessControlList,
+   *        org.opencastproject.security.api.User, org.opencastproject.security.api.Organization, Object)}
    * as a predicate function.
    */
-  private static Predicate<Object> isAuthorizedFn(final AccessControlList acl, final User user, final Organization org) {
+  private static Predicate<Object> isAuthorizedFn(final AccessControlList acl, final User user,
+      final Organization org) {
     return action -> isAuthorized(acl, user, org, action);
   }
 
@@ -218,8 +220,9 @@ public final class AccessControlUtil {
         newAcl.getEntries().add(ace);
       }
     }
-    if (!foundAce)
+    if (!foundAce) {
       newAcl.getEntries().add(new AccessControlEntry(role, action, allow));
+    }
 
     return newAcl;
   }
@@ -336,13 +339,15 @@ public final class AccessControlUtil {
     public int compare(AccessControlEntry o1, AccessControlEntry o2) {
       // compare role
       int compareTo = StringUtils.trimToEmpty(o1.getRole()).compareTo(StringUtils.trimToEmpty(o2.getRole()));
-      if (compareTo != 0)
+      if (compareTo != 0) {
         return compareTo;
+      }
 
       // compare action
       compareTo = StringUtils.trimToEmpty(o1.getAction()).compareTo(StringUtils.trimToEmpty(o2.getAction()));
-      if (compareTo != 0)
+      if (compareTo != 0) {
         return compareTo;
+      }
 
       // compare allow
       return Boolean.valueOf(o1.isAllow()).compareTo(o2.isAllow());

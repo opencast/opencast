@@ -1,8 +1,6 @@
 <beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:sec="http://www.springframework.org/schema/security"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:osgi="http://www.springframework.org/schema/osgi"
-       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:sec="http://www.springframework.org/schema/security"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans.xsd
                            http://www.springframework.org/schema/util
@@ -10,7 +8,20 @@
                            http://www.springframework.org/schema/osgi
                            http://www.springframework.org/schema/osgi/spring-osgi.xsd
                            http://www.springframework.org/schema/security
-                           http://www.springframework.org/schema/security/spring-security-3.1.xsd">
+                           http://www.springframework.org/schema/security/spring-security.xsd">
+
+  <!--
+  Spring 5:
+  The ‘util’ namespace, despite being part of spring-beans, cannot be parsed. The
+  error is: “Configuration problem: Unable to locate Spring NamespaceHandler for
+  XML schema namespace [http://www.springframework.org/schema/util]”. This is
+  because, even if the namespace handler is defined in the ‘spring.handlers’
+  resource located in the spring beans jar, the handlers need to be registered
+  with osgi, which used to be supported via an extender spring-dm (but which has a
+  dependency on spring 3.1.x). The suggestion is to replace the util list, map,
+  etc with standard bean tags and so all list, maps, etc have to be moved inside
+  the <bean> that uses them.
+  -->
 
   <!-- ######################################## -->
   <!-- # Open and unsecured url patterns      # -->
@@ -19,375 +30,379 @@
   <sec:http pattern="/favicon.ico" security="none" />
 
   <sec:http create-session="ifRequired" servlet-api-provision="true" realm="Opencast"
-            entry-point-ref="opencastEntryPoint">
+    entry-point-ref="opencastEntryPoint">
 
     <sec:access-denied-handler error-page="/403.html"/>
+
+    <sec:csrf disabled="true"/>
 
     <!-- ################ -->
     <!-- # URL SECURITY # -->
     <!-- ################ -->
 
     <!-- Allow anonymous access to the login form -->
-    <sec:intercept-url pattern="/" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/login.html" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/sysinfo/bundles/version" method="GET" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/" access="permitAll" />
+    <sec:intercept-url pattern="/cas" access="permitAll" />
+    <sec:intercept-url pattern="/cas/**" access="permitAll" />
+    <sec:intercept-url pattern="/login.html" access="permitAll" />
+    <sec:intercept-url pattern="/sysinfo/bundles/version" method="GET" access="permitAll" />
 
     <!-- Allow anonymous access to resources from runtime info ui -->
-    <sec:intercept-url pattern="/img/**" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/js/**" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/scripts/**" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/styles/**" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/docs.*" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/rest_docs.*" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/img/**" access="permitAll" />
+    <sec:intercept-url pattern="/js/**" access="permitAll" />
+    <sec:intercept-url pattern="/scripts/**" access="permitAll" />
+    <sec:intercept-url pattern="/styles/**" access="permitAll" />
+    <sec:intercept-url pattern="/docs.*" access="permitAll" />
+    <sec:intercept-url pattern="/rest_docs.*" access="permitAll" />
 
     <!-- Protect access to the REST API documentation -->
-    <sec:intercept-url pattern="/rest-docs/**" access="ROLE_ADMIN, ROLE_USER" />
+    <sec:intercept-url pattern="/rest-docs/**" access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" />
 
     <!-- Allow anonymous access to the player redirect -->
-    <sec:intercept-url pattern="/play/*" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/play/*" access="permitAll" />
 
     <!-- Define roles for metrics endpoint -->
-    <sec:intercept-url pattern="/metrics" access="ROLE_ADMIN, ROLE_METRICS" />
+    <sec:intercept-url pattern="/metrics" access="hasAnyRole('ROLE_ADMIN', 'ROLE_METRICS')" />
 
     <!-- Protect admin UI facade -->
-    <sec:intercept-url pattern="/workflow/definitions.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_CREATE" />
-    <sec:intercept-url pattern="/admin-ng/acl/acls.json" method="GET" access="ROLE_ADMIN, ROLE_UI_ACLS_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/acl/*" method="GET" access="ROLE_ADMIN, ROLE_UI_ACLS_VIEW" />
-    <sec:intercept-url pattern="/acl-manager/acl/*" method="GET" access="ROLE_ADMIN, ROLE_UI_ACLS_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/capture-agents/agents.json" method="GET" access="ROLE_ADMIN, ROLE_UI_LOCATIONS_VIEW, ROLE_UI_EVENTS_CREATE" />
-    <sec:intercept-url pattern="/admin-ng/capture-agents/*" method="GET" access="ROLE_ADMIN, ROLE_UI_LOCATIONS_DETAILS_CAPABILITIES_VIEW, ROLE_UI_LOCATIONS_DETAILS_CONFIGURATION_VIEW, ROLE_UI_LOCATIONS_DETAILS_GENERAL_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/event/*/asset/assets.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/event/*/asset/attachment/*.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/event/*/asset/catalog/*.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/event/*/asset/media/*.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/event/*/asset/publication/*.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/event/catalogAdapters" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_METADATA_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/event/events.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/event/workflowProperties" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_CREATE, ROLE_UI_TASKS_CREATE, ROLE_UI_EVENTS_EDITOR_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/event/new/metadata" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_METADATA_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/event/new/processing" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_CREATE, ROLE_UI_TASKS_CREATE" />
-    <sec:intercept-url pattern="/admin-ng/event/*/attachments.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_ATTACHMENTS_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/event/*/comments" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_VIEW"/>
-    <sec:intercept-url pattern="/admin-ng/event/*/comment/*" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_VIEW"/>
-    <sec:intercept-url pattern="/admin-ng/event/*/publications.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_PUBLICATIONS_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/event/*/hasActiveTransaction" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/event/*/hasSnapshots.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DELETE" />
-    <sec:intercept-url pattern="/admin-ng/event/*/media.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_MEDIA_VIEW"/>
-    <sec:intercept-url pattern="/admin-ng/event/*/media/*.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_MEDIA_VIEW"/>
-    <sec:intercept-url pattern="/admin-ng/event/*/metadata.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_METADATA_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/event/*/scheduling.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_SCHEDULING_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/event/*/workflows.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_WORKFLOWS_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/event/*/workflows/*/operations.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_WORKFLOWS_VIEW"/>
-    <sec:intercept-url pattern="/admin-ng/event/*/workflows/*/operations/*" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_WORKFLOWS_VIEW"/>
-    <sec:intercept-url pattern="/admin-ng/event/*/workflows/*/errors.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_WORKFLOWS_VIEW"/>
-    <sec:intercept-url pattern="/admin-ng/event/*/workflows/*/errors/*.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_WORKFLOWS_VIEW"/>
-    <sec:intercept-url pattern="/admin-ng/event/*/workflows/*" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_WORKFLOWS_VIEW"/>
-    <sec:intercept-url pattern="/admin-ng/event/*/access.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_ACL_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/event/*" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/groups/groups.json" method="GET" access="ROLE_ADMIN, ROLE_UI_GROUPS_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/groups/*" method="GET" access="ROLE_ADMIN, ROLE_UI_GROUPS_EDIT" />
-    <sec:intercept-url pattern="/admin-ng/index/rebuild/states.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERVICES_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/job/jobs.json" method="GET" access="ROLE_ADMIN, ROLE_UI_JOBS_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/series/series.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/series/new/metadata" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_DETAILS_METADATA_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/series/new/themes" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_DETAILS_THEMES_EDIT" />
-    <sec:intercept-url pattern="/admin-ng/series/new/tobira/page" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_DETAILS_TOBIRA_EDIT" />
-    <sec:intercept-url pattern="/admin-ng/series/*/access.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_DETAILS_ACL_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/series/*/metadata.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_DETAILS_METADATA_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/series/*/theme.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_DETAILS_THEMES_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/series/*/tobira/pages" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_DETAILS_TOBIRA_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/event/*/tobira/pages" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_TOBIRA_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/server/servers.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERVERS_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/series/*/hasEvents.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/series/configuration.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/services/services.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERVICES_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/tasks/processing.json" method="GET" access="ROLE_ADMIN, ROLE_UI_TASKS_CREATE" />
-    <sec:intercept-url pattern="/admin-ng/themes/themes.json" method="GET" access="ROLE_ADMIN, ROLE_UI_THEMES_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/themes/*/usage.json" method="GET" access="ROLE_ADMIN, ROLE_UI_THEMES_DETAILS_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/themes/*.json" method="GET" access="ROLE_ADMIN, ROLE_UI_THEMES_DETAILS_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/tools/*/editor.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_EDITOR_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/tools/*/thumbnail.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_EDITOR_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/tools/*.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_EDITOR_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/users/users.json" method="GET" access="ROLE_ADMIN, ROLE_UI_USERS_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/users/*.json" method="GET" access="ROLE_ADMIN, ROLE_UI_USERS_EDIT, ROLE_UI_EVENTS_DETAILS_ACL_USER_ROLES_VIEW, ROLE_UI_SERIES_DETAILS_ACL_USER_ROLES_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/user-settings/signature" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
-    <sec:intercept-url pattern="/admin-ng/user-settings/settings.json" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
-    <sec:intercept-url pattern="/admin-ng/resources/events/filters.json" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/resources/jobs/filters.json" method="GET" access="ROLE_ADMIN, ROLE_UI_JOBS_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/resources/series/filters.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERIES_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/resources/servers/filters.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERVERS_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/resources/services/filters.json" method="GET" access="ROLE_ADMIN, ROLE_UI_SERVICES_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/resources/themes/filters.json" method="GET" access="ROLE_ADMIN, ROLE_UI_THEMES_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/resources/recordings/filters.json" method="GET" access="ROLE_ADMIN, ROLE_UI_LOCATIONS_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/resources/users/filters.json" method="GET" access="ROLE_ADMIN, ROLE_UI_USERS_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/resources/groups/filters.json" method="GET" access="ROLE_ADMIN, ROLE_UI_GROUPS_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/resources/components.json" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
-    <sec:intercept-url pattern="/admin-ng/resources/providers.json" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
-    <sec:intercept-url pattern="/admin-ng/resources/THEMES.json" method="GET" access="ROLE_ADMIN, ROLE_UI_THEMES_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/resources/*.json" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
-    <sec:intercept-url pattern="/admin-ng/statistics/*.json" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
-    <sec:intercept-url pattern="/admin-ng/statistics/export.csv" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
-    <sec:intercept-url pattern="/assets/assets/**" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/adopter/**" method="GET" access="ROLE_ADMIN" />
+    <sec:intercept-url pattern="/workflow/definitions.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_CREATE')" />
+    <sec:intercept-url pattern="/admin-ng/acl/acls.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_ACLS_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/acl/acl/*" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_ACLS_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/acl/*" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_ACLS_VIEW')" />
+    <sec:intercept-url pattern="/acl-manager/acl/*" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_ACLS_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/capture-agents/agents.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_LOCATIONS_VIEW', 'ROLE_UI_EVENTS_CREATE')" />
+    <sec:intercept-url pattern="/admin-ng/capture-agents/*" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_LOCATIONS_DETAILS_CAPABILITIES_VIEW', 'ROLE_UI_LOCATIONS_DETAILS_CONFIGURATION_VIEW', 'ROLE_UI_LOCATIONS_DETAILS_GENERAL_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/asset/assets.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/asset/attachment/*.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/asset/catalog/*.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/asset/media/*.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/asset/publication/*.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/event/catalogAdapters" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_METADATA_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/event/events.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/event/workflowProperties" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_CREATE', 'ROLE_UI_TASKS_CREATE', 'ROLE_UI_EVENTS_EDITOR_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/event/new/metadata" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_METADATA_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/event/new/processing" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_CREATE', 'ROLE_UI_TASKS_CREATE')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/attachments.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_ATTACHMENTS_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/comments" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_COMMENTS_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/comment/*" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_COMMENTS_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/publications.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_PUBLICATIONS_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/hasActiveTransaction" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/hasSnapshots.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DELETE')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/media.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_MEDIA_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/media/*.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_MEDIA_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/metadata.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_METADATA_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/scheduling.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_SCHEDULING_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/workflows.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_WORKFLOWS_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/workflows/*/operations.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_WORKFLOWS_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/workflows/*/operations/*" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_WORKFLOWS_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/workflows/*/errors.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_WORKFLOWS_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/workflows/*/errors/*.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_WORKFLOWS_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/workflows/*" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_WORKFLOWS_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/access.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_ACL_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/event/*" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/groups/groups.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_GROUPS_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/groups/*" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_GROUPS_EDIT')" />
+    <sec:intercept-url pattern="/admin-ng/index/rebuild/states.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_SERVICES_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/job/jobs.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_JOBS_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/series/series.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_SERIES_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/series/new/metadata" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_SERIES_DETAILS_METADATA_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/series/new/themes" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_SERIES_DETAILS_THEMES_EDIT')" />
+    <sec:intercept-url pattern="/admin-ng/series/new/tobira/page" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_SERIES_DETAILS_TOBIRA_EDIT')" />
+    <sec:intercept-url pattern="/admin-ng/series/*/access.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_SERIES_DETAILS_ACL_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/series/*/metadata.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_SERIES_DETAILS_METADATA_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/series/*/theme.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_SERIES_DETAILS_THEMES_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/series/*/tobira/pages" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_SERIES_DETAILS_TOBIRA_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/tobira/pages" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_TOBIRA_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/server/servers.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_SERVERS_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/series/*/hasEvents.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_SERIES_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/series/configuration.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_SERIES_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/services/services.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_SERVICES_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/tasks/processing.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_TASKS_CREATE')" />
+    <sec:intercept-url pattern="/admin-ng/themes/themes.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_THEMES_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/themes/*/usage.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_THEMES_DETAILS_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/themes/*.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_THEMES_DETAILS_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/tools/*/editor.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_EDITOR_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/tools/*/thumbnail.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_EDITOR_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/tools/*.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_EDITOR_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/users/users.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_USERS_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/users/*.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_USERS_EDIT', 'ROLE_UI_EVENTS_DETAILS_ACL_USER_ROLES_VIEW', 'ROLE_UI_SERIES_DETAILS_ACL_USER_ROLES_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/user-settings/signature" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
+    <sec:intercept-url pattern="/admin-ng/user-settings/settings.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
+    <sec:intercept-url pattern="/admin-ng/resources/events/filters.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/resources/jobs/filters.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_JOBS_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/resources/series/filters.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_SERIES_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/resources/servers/filters.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_SERVERS_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/resources/services/filters.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_SERVICES_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/resources/themes/filters.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_THEMES_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/resources/recordings/filters.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_LOCATIONS_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/resources/users/filters.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_USERS_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/resources/groups/filters.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_GROUPS_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/resources/components.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
+    <sec:intercept-url pattern="/admin-ng/resources/providers.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
+    <sec:intercept-url pattern="/admin-ng/resources/THEMES.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_THEMES_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/resources/*.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
+    <sec:intercept-url pattern="/admin-ng/statistics/*.json" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
+    <sec:intercept-url pattern="/admin-ng/statistics/export.csv" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
+    <sec:intercept-url pattern="/assets/assets/**" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_ASSETS_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/adopter/**" method="GET" access="hasRole('ROLE_ADMIN')" />
 
-    <sec:intercept-url pattern="/admin-ng/acl/*" method="PUT" access="ROLE_ADMIN, ROLE_UI_ACLS_EDIT" />
-    <sec:intercept-url pattern="/admin-ng/event/*/metadata" method="PUT" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_METADATA_EDIT" />
-    <sec:intercept-url pattern="/admin-ng/event/*/scheduling" method="PUT" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT" />
-    <sec:intercept-url pattern="/admin-ng/event/*/workflows" method="PUT" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT" />
-    <sec:intercept-url pattern="/admin-ng/event/*/workflows/*/action/stop" method="PUT" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT" />
-    <sec:intercept-url pattern="/admin-ng/event/*/workflows/*/action/retry" method="PUT" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT" />
-    <sec:intercept-url pattern="/admin-ng/event/*/workflows/*/action/none" method="PUT" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT" />
-    <sec:intercept-url pattern="/admin-ng/event/*/comment/*/*" method="PUT" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_EDIT" />
-    <sec:intercept-url pattern="/admin-ng/event/*/comment/*" method="PUT" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_EDIT"/>
-    <sec:intercept-url pattern="/admin-ng/event/bulk/update" method="PUT" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT" />
-    <sec:intercept-url pattern="/admin-ng/groups/*" method="PUT" access="ROLE_ADMIN, ROLE_UI_GROUPS_EDIT" />
-    <sec:intercept-url pattern="/admin-ng/series/*/metadata" method="PUT" access="ROLE_ADMIN, ROLE_UI_SERIES_DETAILS_METADATA_EDIT" />
-    <sec:intercept-url pattern="/admin-ng/series/*/theme" method="PUT" access="ROLE_ADMIN, ROLE_UI_SERIES_DETAILS_THEMES_EDIT" />
-    <sec:intercept-url pattern="/admin-ng/themes/*" method="PUT" access="ROLE_ADMIN, ROLE_UI_THEMES_EDIT" />
-    <sec:intercept-url pattern="/admin-ng/users/*" method="PUT" access="ROLE_ADMIN, ROLE_UI_USERS_EDIT" />
-    <sec:intercept-url pattern="/admin-ng/user-settings/signature/*" method="PUT" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
-    <sec:intercept-url pattern="/admin-ng/user-settings/setting/*" method="PUT" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
-    <sec:intercept-url pattern="/admin-ng/adopter/**" method="PUT" access="ROLE_ADMIN" />
+    <sec:intercept-url pattern="/admin-ng/acl/*" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_ACLS_EDIT')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/metadata" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_METADATA_EDIT')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/scheduling" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/workflows" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/workflows/*/action/STOP" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/workflows/*/action/RETRY" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/workflows/*/action/NONE" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_WORKFLOWS_EDIT')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/comment/*/*" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_COMMENTS_EDIT')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/comment/*" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_COMMENTS_EDIT')" />
+    <sec:intercept-url pattern="/admin-ng/event/bulk/update" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')" />
+    <sec:intercept-url pattern="/admin-ng/groups/*" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_GROUPS_EDIT')" />
+    <sec:intercept-url pattern="/admin-ng/series/*/metadata" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_SERIES_DETAILS_METADATA_EDIT')" />
+    <sec:intercept-url pattern="/admin-ng/series/*/theme" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_SERIES_DETAILS_THEMES_EDIT')" />
+    <sec:intercept-url pattern="/admin-ng/themes/*" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_THEMES_EDIT')" />
+    <sec:intercept-url pattern="/admin-ng/users/*" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_USERS_EDIT')" />
+    <sec:intercept-url pattern="/admin-ng/users/password/*" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
+    <sec:intercept-url pattern="/admin-ng/user-settings/signature/*" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
+    <sec:intercept-url pattern="/admin-ng/user-settings/setting/*" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
+    <sec:intercept-url pattern="/admin-ng/adopter/**" method="PUT" access="hasRole('ROLE_ADMIN')" />
 
-    <sec:intercept-url pattern="/services/maintenance" method="POST" access="ROLE_ADMIN, ROLE_UI_SERVERS_MAINTENANCE_EDIT" />
-    <sec:intercept-url pattern="/services/sanitize" method="POST" access="ROLE_ADMIN, ROLE_UI_SERVICES_STATUS_EDIT" />
-    <sec:intercept-url pattern="/staticfiles" method="POST" access="ROLE_ADMIN, ROLE_UI_THEMES_CREATE, ROLE_UI_THEMES_EDIT" />
-    <sec:intercept-url pattern="/admin-ng/acl" method="POST" access="ROLE_ADMIN, ROLE_UI_ACLS_CREATE" />
-    <sec:intercept-url pattern="/admin-ng/event/bulk/conflicts" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT" />
-    <sec:intercept-url pattern="/admin-ng/event/deleteEvents" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_DELETE" />
-    <sec:intercept-url pattern="/admin-ng/event/events/metadata.json" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_METADATA_EDIT" />
-    <sec:intercept-url pattern="/admin-ng/event/new" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_CREATE" />
-    <sec:intercept-url pattern="/admin-ng/event/new/conflicts" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_CREATE" />
-    <sec:intercept-url pattern="/admin-ng/event/scheduling.json" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_SCHEDULING_VIEW" />
-    <sec:intercept-url pattern="/admin-ng/event/*/access" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_ACL_EDIT" />
-    <sec:intercept-url pattern="/admin-ng/event/*/assets" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_ASSETS_EDIT" />
-    <sec:intercept-url pattern="/admin-ng/event/*/comment" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_CREATE" />
-    <sec:intercept-url pattern="/admin-ng/event/*/comment/*/reply" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_CREATE" />
-    <sec:intercept-url pattern="/admin-ng/event/*/comment/*" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_CREATE" />
-    <sec:intercept-url pattern="/admin-ng/groups" method="POST" access="ROLE_ADMIN, ROLE_UI_GROUPS_CREATE" />
-    <sec:intercept-url pattern="/admin-ng/series/deleteSeries" method="POST" access="ROLE_ADMIN, ROLE_UI_SERIES_DELETE" />
-    <sec:intercept-url pattern="/admin-ng/series/new" method="POST" access="ROLE_ADMIN, ROLE_UI_SERIES_CREATE" />
-    <sec:intercept-url pattern="/admin-ng/series/*/access" method="POST" access="ROLE_ADMIN, ROLE_UI_SERIES_DETAILS_ACL_EDIT" />
-    <sec:intercept-url pattern="/admin-ng/statistics/data.json" method="POST" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
-    <sec:intercept-url pattern="/admin-ng/tasks/new" method="POST" access="ROLE_ADMIN, ROLE_UI_TASKS_CREATE" />
-    <sec:intercept-url pattern="/admin-ng/themes" method="POST" access="ROLE_ADMIN, ROLE_UI_THEMES_CREATE" />
-    <sec:intercept-url pattern="/admin-ng/tools/*/editor.json" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_EDITOR_EDIT" />
-    <sec:intercept-url pattern="/admin-ng/tools/*/thumbnail.json" method="POST" access="ROLE_ADMIN, ROLE_UI_EVENTS_EDITOR_EDIT" />
-    <sec:intercept-url pattern="/admin-ng/users" method="POST" access="ROLE_ADMIN, ROLE_UI_USERS_CREATE" />
-    <sec:intercept-url pattern="/admin-ng/user-settings/signature" method="POST" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
-    <sec:intercept-url pattern="/admin-ng/user-settings/setting" method="POST" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
-    <sec:intercept-url pattern="/admin-ng/adopter/**" method="POST" access="ROLE_ADMIN" />
+    <sec:intercept-url pattern="/services/maintenance" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_SERVERS_MAINTENANCE_EDIT')" />
+    <sec:intercept-url pattern="/services/sanitize" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_SERVICES_STATUS_EDIT')" />
+    <sec:intercept-url pattern="/staticfiles" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_THEMES_CREATE', 'ROLE_UI_THEMES_EDIT')" />
+    <sec:intercept-url pattern="/admin-ng/acl" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_ACLS_CREATE')" />
+    <sec:intercept-url pattern="/admin-ng/event/bulk/conflicts" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_SCHEDULING_EDIT')" />
+    <sec:intercept-url pattern="/admin-ng/event/deleteEvents" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DELETE')" />
+    <sec:intercept-url pattern="/admin-ng/event/events/metadata.json" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_METADATA_EDIT')" />
+    <sec:intercept-url pattern="/admin-ng/event/new" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_CREATE')" />
+    <sec:intercept-url pattern="/admin-ng/event/new/conflicts" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_CREATE')" />
+    <sec:intercept-url pattern="/admin-ng/event/scheduling.json" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_SCHEDULING_VIEW')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/access" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_ACL_EDIT')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/assets" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_ASSETS_EDIT')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/comment" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_COMMENTS_CREATE')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/comment/*/reply" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_COMMENTS_CREATE')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/comment/*" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_COMMENTS_CREATE')" />
+    <sec:intercept-url pattern="/admin-ng/groups" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_GROUPS_CREATE')" />
+    <sec:intercept-url pattern="/admin-ng/series/deleteSeries" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_SERIES_DELETE')" />
+    <sec:intercept-url pattern="/admin-ng/series/new" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_SERIES_CREATE')" />
+    <sec:intercept-url pattern="/admin-ng/series/*/access" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_SERIES_DETAILS_ACL_EDIT')" />
+    <sec:intercept-url pattern="/admin-ng/statistics/data.json" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
+    <sec:intercept-url pattern="/admin-ng/tasks/new" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_TASKS_CREATE')" />
+    <sec:intercept-url pattern="/admin-ng/themes" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_THEMES_CREATE')" />
+    <sec:intercept-url pattern="/admin-ng/tools/*/editor.json" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_EDITOR_EDIT')" />
+    <sec:intercept-url pattern="/admin-ng/tools/*/thumbnail.json" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_EDITOR_EDIT')" />
+    <sec:intercept-url pattern="/admin-ng/users" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_USERS_CREATE')" />
+    <sec:intercept-url pattern="/admin-ng/user-settings/signature" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
+    <sec:intercept-url pattern="/admin-ng/user-settings/setting" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
+    <sec:intercept-url pattern="/admin-ng/adopter/**" method="POST" access="hasRole('ROLE_ADMIN')" />
 
-    <sec:intercept-url pattern="/admin-ng/acl/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_ACLS_DELETE" />
-    <sec:intercept-url pattern="/admin-ng/capture-agents/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_LOCATIONS_DELETE" />
-    <sec:intercept-url pattern="/admin-ng/event/*/comment/*/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_DELETE" />
-    <sec:intercept-url pattern="/admin-ng/event/*/comment/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_COMMENTS_DELETE" />
-    <sec:intercept-url pattern="/admin-ng/event/*/workflows/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_EVENTS_DETAILS_WORKFLOWS_DELETE" />
-    <sec:intercept-url pattern="/admin-ng/event/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_EVENTS_DELETE" />
-    <sec:intercept-url pattern="/admin-ng/groups/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_GROUPS_DELETE" />
-    <sec:intercept-url pattern="/admin-ng/series/*/theme" method="DELETE" access="ROLE_ADMIN, ROLE_UI_SERIES_DETAILS_THEMES_EDIT" />
-    <sec:intercept-url pattern="/admin-ng/series/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_SERIES_DELETE" />
-    <sec:intercept-url pattern="/admin-ng/themes/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_THEMES_DELETE" />
-    <sec:intercept-url pattern="/admin-ng/users/*" method="DELETE" access="ROLE_ADMIN, ROLE_UI_USERS_DELETE" />
-    <sec:intercept-url pattern="/admin-ng/user-settings/setting/*" method="DELETE" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
-    <sec:intercept-url pattern="/admin-ng/adopter/**" method="DELETE" access="ROLE_ADMIN" />
+    <sec:intercept-url pattern="/admin-ng/acl/*" method="DELETE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_ACLS_DELETE')" />
+    <sec:intercept-url pattern="/admin-ng/capture-agents/*" method="DELETE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_LOCATIONS_DELETE')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/comment/*/*" method="DELETE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_COMMENTS_DELETE')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/comment/*" method="DELETE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_COMMENTS_DELETE')" />
+    <sec:intercept-url pattern="/admin-ng/event/*/workflows/*" method="DELETE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DETAILS_WORKFLOWS_DELETE')" />
+    <sec:intercept-url pattern="/admin-ng/event/*" method="DELETE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_DELETE')" />
+    <sec:intercept-url pattern="/admin-ng/groups/*" method="DELETE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_GROUPS_DELETE')" />
+    <sec:intercept-url pattern="/admin-ng/series/*/theme" method="DELETE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_SERIES_DETAILS_THEMES_EDIT')" />
+    <sec:intercept-url pattern="/admin-ng/series/*" method="DELETE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_SERIES_DELETE')" />
+    <sec:intercept-url pattern="/admin-ng/themes/*" method="DELETE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_THEMES_DELETE')" />
+    <sec:intercept-url pattern="/admin-ng/users/*" method="DELETE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_USERS_DELETE')" />
+    <sec:intercept-url pattern="/admin-ng/user-settings/setting/*" method="DELETE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
+    <sec:intercept-url pattern="/admin-ng/adopter/**" method="DELETE" access="hasRole('ROLE_ADMIN')" />
 
     <!-- Securing the URLs for the external API interface -->
     <!-- External API GET Endpoints -->
-    <sec:intercept-url pattern="/api" method="GET" access="ROLE_ADMIN, ROLE_API"/>
-    <sec:intercept-url pattern="/api/agents" method="GET" access="ROLE_ADMIN, ROLE_API_CAPTURE_AGENTS_VIEW"/>
-    <sec:intercept-url pattern="/api/agents/*" method="GET" access="ROLE_ADMIN, ROLE_API_CAPTURE_AGENTS_VIEW"/>
-    <sec:intercept-url pattern="/api/events" method="GET" access="ROLE_ADMIN, ROLE_API_EVENTS_VIEW"/>
-    <sec:intercept-url pattern="/api/events/*" method="GET" access="ROLE_ADMIN, ROLE_API_EVENTS_VIEW"/>
-    <sec:intercept-url pattern="/api/events/*/acl" method="GET" access="ROLE_ADMIN, ROLE_API_EVENTS_ACL_VIEW"/>
-    <sec:intercept-url pattern="/api/events/*/media" method="GET" access="ROLE_ADMIN, ROLE_API_EVENTS_MEDIA_VIEW"/>
-    <sec:intercept-url pattern="/api/events/*/media/*" method="GET" access="ROLE_ADMIN, ROLE_API_EVENTS_MEDIA_VIEW"/>
-    <sec:intercept-url pattern="/api/events/*/metadata" method="GET" access="ROLE_ADMIN, ROLE_API_EVENTS_METADATA_VIEW"/>
-    <sec:intercept-url pattern="/api/events/*/metadata/*" method="GET" access="ROLE_ADMIN, ROLE_API_EVENTS_METADATA_VIEW"/>
-    <sec:intercept-url pattern="/api/events/*/publications" method="GET" access="ROLE_ADMIN, ROLE_API_EVENTS_PUBLICATIONS_VIEW"/>
-    <sec:intercept-url pattern="/api/events/*/publications/*" method="GET" access="ROLE_ADMIN, ROLE_API_EVENTS_PUBLICATIONS_VIEW"/>
-    <sec:intercept-url pattern="/api/events/*/scheduling" method="GET" access="ROLE_ADMIN, ROLE_API_EVENTS_SCHEDULING_VIEW"/>
-    <sec:intercept-url pattern="/api/groups" method="GET" access="ROLE_ADMIN, ROLE_API_GROUPS_VIEW"/>
-    <sec:intercept-url pattern="/api/groups/*" method="GET" access="ROLE_ADMIN, ROLE_API_GROUPS_VIEW"/>
-    <sec:intercept-url pattern="/api/info/*" method="GET" access="ROLE_ADMIN, ROLE_API" />
-    <sec:intercept-url pattern="/api/info/me/*" method="GET" access="ROLE_ADMIN, ROLE_API" />
-    <sec:intercept-url pattern="/api/info/organization/properties/engageuiurl" method="GET" access="ROLE_ADMIN, ROLE_UI_EVENTS_EMBEDDING_CODE_VIEW" />
-    <sec:intercept-url pattern="/api/listproviders" method="GET" access="ROLE_ADMIN, ROLE_API_LISTPROVIDERS_VIEW"/>
-    <sec:intercept-url pattern="/api/listproviders/*" method="GET" access="ROLE_ADMIN, ROLE_API_LISTPROVIDERS_VIEW"/>
-    <sec:intercept-url pattern="/api/playlists" method="GET" access="ROLE_ADMIN, ROLE_API_PLAYLISTS_VIEW"/>
-    <sec:intercept-url pattern="/api/playlists/*" method="GET" access="ROLE_ADMIN, ROLE_API_PLAYLISTS_VIEW"/>
-    <sec:intercept-url pattern="/api/series" method="GET" access="ROLE_ADMIN, ROLE_API_SERIES_VIEW"/>
-    <sec:intercept-url pattern="/api/series/*" method="GET" access="ROLE_ADMIN, ROLE_API_SERIES_VIEW"/>
-    <sec:intercept-url pattern="/api/series/*/acl" method="GET" access="ROLE_ADMIN, ROLE_API_SERIES_ACL_VIEW"/>
-    <sec:intercept-url pattern="/api/series/*/metadata" method="GET" access="ROLE_ADMIN, ROLE_API_SERIES_METADATA_VIEW"/>
-    <sec:intercept-url pattern="/api/series/*/metadata/*" method="GET" access="ROLE_ADMIN, ROLE_API_SERIES_METADATA_VIEW"/>
-    <sec:intercept-url pattern="/api/series/*/properties" method="GET" access="ROLE_ADMIN, ROLE_API_SERIES_PROPERTIES_VIEW"/>
-    <sec:intercept-url pattern="/api/statistics/providers" method="GET" access="ROLE_ADMIN, ROLE_API_STATISTICS_VIEW"/>
-    <sec:intercept-url pattern="/api/statistics/providers/*" method="GET" access="ROLE_ADMIN, ROLE_API_STATISTICS_VIEW"/>
-    <sec:intercept-url pattern="/api/version" method="GET" access="ROLE_ADMIN, ROLE_API"/>
-    <sec:intercept-url pattern="/api/version/*" method="GET" access="ROLE_ADMIN, ROLE_API"/>
-    <sec:intercept-url pattern="/api/workflows" method="GET" access="ROLE_ADMIN, ROLE_API_WORKFLOW_INSTANCE_VIEW"/>
-    <sec:intercept-url pattern="/api/workflows/*" method="GET" access="ROLE_ADMIN, ROLE_API_WORKFLOW_INSTANCE_VIEW"/>
-    <sec:intercept-url pattern="/api/workflow-definitions" method="GET" access="ROLE_ADMIN, ROLE_API_WORKFLOW_DEFINITION_VIEW"/>
-    <sec:intercept-url pattern="/api/workflow-definitions/*" method="GET" access="ROLE_ADMIN, ROLE_API_WORKFLOW_DEFINITION_VIEW"/>
+    <sec:intercept-url pattern="/api" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API')" />
+    <sec:intercept-url pattern="/api/agents" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_CAPTURE_AGENTS_VIEW')" />
+    <sec:intercept-url pattern="/api/agents/*" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_CAPTURE_AGENTS_VIEW')" />
+    <sec:intercept-url pattern="/api/events" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_EVENTS_VIEW')" />
+    <sec:intercept-url pattern="/api/events/*" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_EVENTS_VIEW')" />
+    <sec:intercept-url pattern="/api/events/*/acl" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_EVENTS_ACL_VIEW')" />
+    <sec:intercept-url pattern="/api/events/*/media" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_EVENTS_MEDIA_VIEW')" />
+    <sec:intercept-url pattern="/api/events/*/media/*" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_EVENTS_MEDIA_VIEW')" />
+    <sec:intercept-url pattern="/api/events/*/metadata" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_EVENTS_METADATA_VIEW')" />
+    <sec:intercept-url pattern="/api/events/*/metadata/*" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_EVENTS_METADATA_VIEW')" />
+    <sec:intercept-url pattern="/api/events/*/publications" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_EVENTS_PUBLICATIONS_VIEW')" />
+    <sec:intercept-url pattern="/api/events/*/publications/*" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_EVENTS_PUBLICATIONS_VIEW')" />
+    <sec:intercept-url pattern="/api/events/*/scheduling" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_EVENTS_SCHEDULING_VIEW')" />
+    <sec:intercept-url pattern="/api/groups" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_GROUPS_VIEW')" />
+    <sec:intercept-url pattern="/api/groups/*" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_GROUPS_VIEW')" />
+    <sec:intercept-url pattern="/api/info/*" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API')" />
+    <sec:intercept-url pattern="/api/info/me/*" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API')" />
+    <sec:intercept-url pattern="/api/info/organization/properties/engageuiurl" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_UI_EVENTS_EMBEDDING_CODE_VIEW')" />
+    <sec:intercept-url pattern="/api/listproviders" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_LISTPROVIDERS_VIEW')" />
+    <sec:intercept-url pattern="/api/listproviders/*" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_LISTPROVIDERS_VIEW')" />
+    <sec:intercept-url pattern="/api/playlists" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_PLAYLISTS_VIEW')" />
+    <sec:intercept-url pattern="/api/playlists/*" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_PLAYLISTS_VIEW')" />
+    <sec:intercept-url pattern="/api/series" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_SERIES_VIEW')" />
+    <sec:intercept-url pattern="/api/series/*" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_SERIES_VIEW')" />
+    <sec:intercept-url pattern="/api/series/*/acl" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_SERIES_ACL_VIEW')" />
+    <sec:intercept-url pattern="/api/series/*/metadata" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_SERIES_METADATA_VIEW')" />
+    <sec:intercept-url pattern="/api/series/*/metadata/*" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_SERIES_METADATA_VIEW')" />
+    <sec:intercept-url pattern="/api/series/*/properties" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_SERIES_PROPERTIES_VIEW')" />
+    <sec:intercept-url pattern="/api/statistics/providers" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_STATISTICS_VIEW')" />
+    <sec:intercept-url pattern="/api/statistics/providers/*" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_STATISTICS_VIEW')" />
+    <sec:intercept-url pattern="/api/version" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API')" />
+    <sec:intercept-url pattern="/api/version/*" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API')" />
+    <sec:intercept-url pattern="/api/workflows" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_WORKFLOW_INSTANCE_VIEW')" />
+    <sec:intercept-url pattern="/api/workflows/*" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_WORKFLOW_INSTANCE_VIEW')" />
+    <sec:intercept-url pattern="/api/workflow-definitions" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_WORKFLOW_DEFINITION_VIEW')" />
+    <sec:intercept-url pattern="/api/workflow-definitions/*" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_WORKFLOW_DEFINITION_VIEW')" />
     <!-- External API PUT Endpoints -->
-    <sec:intercept-url pattern="/api/events/*" method="PUT" access="ROLE_ADMIN, ROLE_API_EVENTS_EDIT"/>
-    <sec:intercept-url pattern="/api/events/*/acl" method="PUT" access="ROLE_ADMIN, ROLE_API_EVENTS_ACL_EDIT"/>
-    <sec:intercept-url pattern="/api/events/*/metadata" method="PUT" access="ROLE_ADMIN, ROLE_API_EVENTS_METADATA_EDIT"/>
-    <sec:intercept-url pattern="/api/events/*/metadata/*" method="PUT" access="ROLE_ADMIN, ROLE_API_EVENTS_METADATA_EDIT"/>
-    <sec:intercept-url pattern="/api/events/*/scheduling" method="PUT" access="ROLE_ADMIN, ROLE_API_EVENTS_SCHEDULING_EDIT"/>
-    <sec:intercept-url pattern="/api/events/*/track" method="POST" access="ROLE_ADMIN, ROLE_API_EVENTS_TRACK_EDIT"/>
-    <sec:intercept-url pattern="/api/groups/*" method="PUT" access="ROLE_ADMIN, ROLE_API_GROUPS_EDIT"/>
-    <sec:intercept-url pattern="/api/playlists/*" method="PUT" access="ROLE_ADMIN, ROLE_API_PLAYLISTS_CREATE, ROLE_API_PLAYLISTS_EDIT"/>
-    <sec:intercept-url pattern="/api/series/*" method="PUT" access="ROLE_ADMIN, ROLE_API_SERIES_EDIT"/>
-    <sec:intercept-url pattern="/api/series/*/acl" method="PUT" access="ROLE_ADMIN, ROLE_API_SERIES_ACL_EDIT"/>
-    <sec:intercept-url pattern="/api/series/*/metadata" method="PUT" access="ROLE_ADMIN, ROLE_API_SERIES_METADATA_EDIT"/>
-    <sec:intercept-url pattern="/api/series/*/metadata/*" method="PUT" access="ROLE_ADMIN, ROLE_API_SERIES_METADATA_EDIT"/>
-    <sec:intercept-url pattern="/api/series/*/properties" method="PUT" access="ROLE_ADMIN, ROLE_API_SERIES_PROPERTIES_EDIT"/>
-    <sec:intercept-url pattern="/api/workflows/*" method="PUT" access="ROLE_ADMIN, ROLE_API_WORKFLOW_INSTANCE_EDIT"/>
+    <sec:intercept-url pattern="/api/events/*" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_EVENTS_EDIT')" />
+    <sec:intercept-url pattern="/api/events/*/acl" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_EVENTS_ACL_EDIT')" />
+    <sec:intercept-url pattern="/api/events/*/metadata" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_EVENTS_METADATA_EDIT')" />
+    <sec:intercept-url pattern="/api/events/*/metadata/*" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_EVENTS_METADATA_EDIT')" />
+    <sec:intercept-url pattern="/api/events/*/scheduling" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_EVENTS_SCHEDULING_EDIT')" />
+    <sec:intercept-url pattern="/api/events/*/track" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_EVENTS_TRACK_EDIT')" />
+    <sec:intercept-url pattern="/api/groups/*" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_GROUPS_EDIT')" />
+    <sec:intercept-url pattern="/api/playlists/*" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_PLAYLISTS_CREATE', 'ROLE_API_PLAYLISTS_EDIT')" />
+    <sec:intercept-url pattern="/api/series/*" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_SERIES_EDIT')" />
+    <sec:intercept-url pattern="/api/series/*/acl" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_SERIES_ACL_EDIT')" />
+    <sec:intercept-url pattern="/api/series/*/metadata" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_SERIES_METADATA_EDIT')" />
+    <sec:intercept-url pattern="/api/series/*/metadata/*" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_SERIES_METADATA_EDIT')" />
+    <sec:intercept-url pattern="/api/series/*/properties" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_SERIES_PROPERTIES_EDIT')" />
+    <sec:intercept-url pattern="/api/workflows/*" method="PUT" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_WORKFLOW_INSTANCE_EDIT')" />
     <!-- External API POST Endpoints -->
-    <sec:intercept-url pattern="/api/events" method="POST" access="ROLE_ADMIN, ROLE_API_EVENTS_CREATE"/>
-    <sec:intercept-url pattern="/api/events/*" method="POST" access="ROLE_ADMIN, ROLE_API_EVENTS_EDIT"/>
-    <sec:intercept-url pattern="/api/events/*/acl/*" method="POST" access="ROLE_ADMIN, ROLE_API_EVENTS_ACL_EDIT"/>
-    <sec:intercept-url pattern="/api/groups" method="POST" access="ROLE_ADMIN, ROLE_API_GROUPS_CREATE"/>
-    <sec:intercept-url pattern="/api/groups/*/members" method="POST" access="ROLE_ADMIN, ROLE_API_GROUPS_EDIT"/>
-    <sec:intercept-url pattern="/api/clearIndex" method="POST" access="ROLE_ADMIN"/>
-    <sec:intercept-url pattern="/api/recreateIndex" method="POST" access="ROLE_ADMIN"/>
-    <sec:intercept-url pattern="/api/recreateIndex/*" method="POST" access="ROLE_ADMIN"/>
-    <sec:intercept-url pattern="/api/playlists/*" method="POST" access="ROLE_ADMIN, ROLE_API_PLAYLISTS_CREATE, ROLE_API_PLAYLISTS_EDIT"/>
-    <sec:intercept-url pattern="/api/playlists/*/entries" method="POST" access="ROLE_ADMIN, ROLE_API_PLAYLISTS_CREATE, ROLE_API_PLAYLISTS_EDIT"/>
-    <sec:intercept-url pattern="/api/series" method="POST" access="ROLE_ADMIN, ROLE_API_SERIES_CREATE"/>
-    <sec:intercept-url pattern="/api/security/sign" method="POST" access="ROLE_ADMIN, ROLE_API_SECURITY_EDIT"/>
-    <sec:intercept-url pattern="/api/statistics/data/query" method="POST" access="ROLE_ADMIN, ROLE_API_STATISTICS_VIEW"/>
-    <sec:intercept-url pattern="/api/statistics/data/export.csv" method="POST" access="ROLE_ADMIN, ROLE_API_STATISTICS_VIEW"/>
-    <sec:intercept-url pattern="/api/workflows" method="POST" access="ROLE_ADMIN, ROLE_API_WORKFLOW_INSTANCE_CREATE"/>
+    <sec:intercept-url pattern="/api/events" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_EVENTS_CREATE')" />
+    <sec:intercept-url pattern="/api/events/*" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_EVENTS_EDIT')" />
+    <sec:intercept-url pattern="/api/events/*/acl/*" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_EVENTS_ACL_EDIT')" />
+    <sec:intercept-url pattern="/api/groups" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_GROUPS_CREATE')" />
+    <sec:intercept-url pattern="/api/groups/*/members" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_GROUPS_EDIT')" />
+    <sec:intercept-url pattern="/api/clearIndex" method="POST" access="hasRole('ROLE_ADMIN')"/>
+    <sec:intercept-url pattern="/api/recreateIndex" method="POST" access="hasRole('ROLE_ADMIN')"/>
+    <sec:intercept-url pattern="/api/recreateIndex/*" method="POST" access="hasRole('ROLE_ADMIN')"/>
+    <sec:intercept-url pattern="/api/playlists" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_PLAYLISTS_CREATE', 'ROLE_API_PLAYLISTS_EDIT')" />
+    <sec:intercept-url pattern="/api/playlists/*" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_PLAYLISTS_CREATE', 'ROLE_API_PLAYLISTS_EDIT')" />
+    <sec:intercept-url pattern="/api/playlists/*/entries" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_PLAYLISTS_CREATE', 'ROLE_API_PLAYLISTS_EDIT')" />
+    <sec:intercept-url pattern="/api/series" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_SERIES_CREATE')" />
+    <sec:intercept-url pattern="/api/security/sign" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_SECURITY_EDIT')" />
+    <sec:intercept-url pattern="/api/statistics/data/query" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_STATISTICS_VIEW')" />
+    <sec:intercept-url pattern="/api/statistics/data/export.csv" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_STATISTICS_VIEW')" />
+    <sec:intercept-url pattern="/api/workflows" method="POST" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_WORKFLOW_INSTANCE_CREATE')" />
     <!-- External API DELETE Endpoints -->
-    <sec:intercept-url pattern="/api/events/*" method="DELETE" access="ROLE_ADMIN, ROLE_API_EVENTS_DELETE"/>
-    <sec:intercept-url pattern="/api/events/*/acl/*/*" method="DELETE" access="ROLE_ADMIN, ROLE_API_EVENTS_ACL_DELETE"/>
-    <sec:intercept-url pattern="/api/events/*/metadata" method="DELETE" access="ROLE_ADMIN, ROLE_API_EVENTS_METADATA_DELETE"/>
-    <sec:intercept-url pattern="/api/events/*/metadata/*" method="DELETE" access="ROLE_ADMIN, ROLE_API_EVENTS_METADATA_DELETE"/>
-    <sec:intercept-url pattern="/api/groups/*" method="DELETE" access="ROLE_ADMIN, ROLE_API_GROUPS_DELETE"/>
-    <sec:intercept-url pattern="/api/groups/*/members/*" method="DELETE" access="ROLE_ADMIN, ROLE_API_GROUPS_EDIT"/>
-    <sec:intercept-url pattern="/api/playlists/*" method="DELETE" access="ROLE_ADMIN, ROLE_API_PLAYLISTS_DELETE"/>
-    <sec:intercept-url pattern="/api/series/*" method="DELETE" access="ROLE_ADMIN, ROLE_API_SERIES_DELETE"/>
-    <sec:intercept-url pattern="/api/series/*/metadata" method="DELETE" access="ROLE_ADMIN, ROLE_API_SERIES_METADATA_DELETE"/>
-    <sec:intercept-url pattern="/api/series/*/metadata/*" method="DELETE" access="ROLE_ADMIN, ROLE_API_SERIES_METADATA_DELETE"/>
-    <sec:intercept-url pattern="/api/workflows/*" method="DELETE" access="ROLE_ADMIN, ROLE_API_WORKFLOW_INSTANCE_DELETE"/>
+    <sec:intercept-url pattern="/api/events/*" method="DELETE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_EVENTS_DELETE')" />
+    <sec:intercept-url pattern="/api/events/*/acl/*/*" method="DELETE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_EVENTS_ACL_DELETE')" />
+    <sec:intercept-url pattern="/api/events/*/metadata" method="DELETE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_EVENTS_METADATA_DELETE')" />
+    <sec:intercept-url pattern="/api/events/*/metadata/*" method="DELETE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_EVENTS_METADATA_DELETE')" />
+    <sec:intercept-url pattern="/api/groups/*" method="DELETE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_GROUPS_DELETE')" />
+    <sec:intercept-url pattern="/api/groups/*/members/*" method="DELETE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_GROUPS_EDIT')" />
+    <sec:intercept-url pattern="/api/playlists/*" method="DELETE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_PLAYLISTS_DELETE')" />
+    <sec:intercept-url pattern="/api/series/*" method="DELETE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_SERIES_DELETE')" />
+    <sec:intercept-url pattern="/api/series/*/metadata" method="DELETE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_SERIES_METADATA_DELETE')" />
+    <sec:intercept-url pattern="/api/series/*/metadata/*" method="DELETE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_SERIES_METADATA_DELETE')" />
+    <sec:intercept-url pattern="/api/workflows/*" method="DELETE" access="hasAnyRole('ROLE_ADMIN', 'ROLE_API_WORKFLOW_INSTANCE_DELETE')" />
 
     <!-- GraphQL -->
-    <sec:intercept-url pattern="/graphql" method="POST" access="ROLE_ANONYMOUS"/>
-    <sec:intercept-url pattern="/graphql" method="GET" access="ROLE_ANONYMOUS"/>
-    <sec:intercept-url pattern="/graphql" method="OPTIONS" access="ROLE_ANONYMOUS"/>
-    <sec:intercept-url pattern="/graphql/schema.json" method="GET" access="ROLE_ANONYMOUS"/>
+    <sec:intercept-url pattern="/graphql" method="POST" access="permitAll"/>
+    <sec:intercept-url pattern="/graphql" method="GET" access="permitAll"/>
+    <sec:intercept-url pattern="/graphql" method="OPTIONS" access="permitAll"/>
+    <sec:intercept-url pattern="/graphql/schema.json" method="GET" access="permitAll"/>
 
     <!-- GraphQL UI -->
-    <sec:intercept-url pattern="/graphql-ui/*" access="ROLE_ANONYMOUS"/>
+    <sec:intercept-url pattern="/graphql-ui/*" access="permitAll"/>
 
     <!-- Enable anonymous access to the admin ui -->
-    <sec:intercept-url pattern="/admin-ng/fonts/**" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/admin-ng/img/**" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/admin-ng/lib/**" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/admin-ng/modules/**" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/admin-ng/public/**" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/admin-ng/scripts/**" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/admin-ng/shared/**" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/admin-ng/styles/**" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/admin-ng/fonts/**" access="permitAll" />
+    <sec:intercept-url pattern="/admin-ng/img/**" access="permitAll" />
+    <sec:intercept-url pattern="/admin-ng/lib/**" access="permitAll" />
+    <sec:intercept-url pattern="/admin-ng/modules/**" access="permitAll" />
+    <sec:intercept-url pattern="/admin-ng/public/**" access="permitAll" />
+    <sec:intercept-url pattern="/admin-ng/scripts/**" access="permitAll" />
+    <sec:intercept-url pattern="/admin-ng/shared/**" access="permitAll" />
+    <sec:intercept-url pattern="/admin-ng/styles/**" access="permitAll" />
 
-    <sec:intercept-url pattern="/admin-ui/assets/**" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/admin-ui/assets/**" access="permitAll" />
 
     <!-- Enable anonymous access to the /info/** resource -->
-    <sec:intercept-url pattern="/info/**" method="GET" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/i18n/languages.json" method="GET" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/info/**" method="GET" access="permitAll" />
+    <sec:intercept-url pattern="/i18n/languages.json" method="GET" access="permitAll" />
 
     <!-- anonymous access to user interface configuration -->
-    <sec:intercept-url pattern="/ui/config/**" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/ui/config/**" access="permitAll" />
 
-   <!-- Paella player 7 -->
-    <sec:intercept-url pattern="/paella7/ui/auth.html" access="ROLE_USER" />
-    <sec:intercept-url pattern="/paella7/ui/**" access="ROLE_ANONYMOUS" />
-
-   <!-- Paella player 8 -->
-    <sec:intercept-url pattern="/paella8/ui/auth.html" access="ROLE_USER" />
-    <sec:intercept-url pattern="/paella8/ui/**" access="ROLE_ANONYMOUS" />
+    <!-- Paella player 8 -->
+    <sec:intercept-url pattern="/paella8/ui/auth.html" access="hasRole('ROLE_USER')" />
+    <sec:intercept-url pattern="/paella8/ui/**" access="permitAll" />
 
     <!-- Enable anonymous access to the engage player and the GET endpoints it requires -->
-    <sec:intercept-url pattern="/engage/ui/**" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/engage/**" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/engage-player/**" method="GET" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/search/**" method="GET" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/usertracking/**" method="GET" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/usertracking/**" method="PUT" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/engage/ui/**" access="permitAll" />
+    <sec:intercept-url pattern="/engage/**" access="permitAll" />
+    <sec:intercept-url pattern="/engage-player/**" method="GET" access="permitAll" />
+    <sec:intercept-url pattern="/search/**" method="GET" access="permitAll" />
+    <sec:intercept-url pattern="/usertracking/**" method="GET" access="permitAll" />
+    <sec:intercept-url pattern="/usertracking/**" method="PUT" access="permitAll" />
     <!-- The `/static` route is separately protected, see `StaticResoruceServlet` -->
-    <sec:intercept-url pattern="/static/**" method="GET" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/static/**" method="HEAD" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/export/**" method="GET" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/static/**" method="GET" access="permitAll" />
+    <sec:intercept-url pattern="/static/**" method="HEAD" access="permitAll" />
+    <sec:intercept-url pattern="/export/**" method="GET" access="permitAll" />
 
     <!-- Enable access to Opencast Studio -->
     <!-- Admins can access it, as can users with 'ROLE_STUDIO'. A few static -->
     <!-- files are also accessible to everyone: 'manifest.json' and source maps -->
     <!-- are requested without cookies by most browsers. To prevent random -->
     <!-- errors, we make those files public. They do not contain any secrets. -->
-    <sec:intercept-url pattern="/studio/manifest.json" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/studio/static/js/**" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/studio/**" access="ROLE_ADMIN, ROLE_STUDIO" />
-    <sec:intercept-url pattern="/studio-api/**" access="ROLE_ADMIN, ROLE_STUDIO" />
+    <sec:intercept-url pattern="/studio/manifest.json" access="permitAll" />
+    <sec:intercept-url pattern="/studio/static/js/**" access="permitAll" />
+    <sec:intercept-url pattern="/studio/**" access="hasAnyRole('ROLE_ADMIN', 'ROLE_STUDIO')" />
+    <sec:intercept-url pattern="/studio-api/**" access="hasAnyRole('ROLE_ADMIN', 'ROLE_STUDIO')" />
 
     <!-- Enable access to Opencast Editor -->
-    <sec:intercept-url pattern="/editor/**" access="ROLE_ADMIN, ROLE_USER" />
-    <sec:intercept-url pattern="/editor-ui/**" access="ROLE_ADMIN, ROLE_USER" />
+    <sec:intercept-url pattern="/editor/**" access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" />
+    <sec:intercept-url pattern="/editor-ui/**" access="hasAnyRole('ROLE_ADMIN', 'ROLE_USER')" />
 
     <!-- Enable access to the Tobira module -->
-    <sec:intercept-url pattern="/tobira/version" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/tobira/callback/*" method="GET" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/tobira/**" access="ROLE_ADMIN" />
+    <sec:intercept-url pattern="/tobira/version" access="permitAll" />
+    <sec:intercept-url pattern="/tobira/callback/*" method="GET" access="permitAll" />
+    <sec:intercept-url pattern="/tobira/**" access="hasRole('ROLE_ADMIN')" />
 
     <!-- Enable anonymous access to the annotation and the series endpoints -->
-    <sec:intercept-url pattern="/series/**" method="GET" access="ROLE_ANONYMOUS, ROLE_CAPTURE_AGENT" />
-    <sec:intercept-url pattern="/annotation/**" method="GET" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/annotation/**" method="PUT" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/playlists/**" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/series/**" method="GET" access="hasAnyRole('ROLE_ANONYMOUS', 'ROLE_CAPTURE_AGENT')" />
+    <sec:intercept-url pattern="/annotation/**" method="GET" access="permitAll" />
+    <sec:intercept-url pattern="/annotation/**" method="PUT" access="permitAll" />
+    <sec:intercept-url pattern="/playlists/**" access="permitAll" />
 
     <!-- Secure the system management URLs for admins only -->
-    <sec:intercept-url pattern="/services/available.*" method="GET" access="ROLE_ADMIN, ROLE_CAPTURE_AGENT" />
-    <sec:intercept-url pattern="/services/**" access="ROLE_ADMIN"/>
-    <sec:intercept-url pattern="/signing/**" access="ROLE_ADMIN" />
-    <sec:intercept-url pattern="/system/**" access="ROLE_ADMIN" />
-    <sec:intercept-url pattern="/config/**" access="ROLE_ADMIN" />
+    <sec:intercept-url pattern="/services/available.*" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_CAPTURE_AGENT')" />
+    <sec:intercept-url pattern="/services/**" access="hasRole('ROLE_ADMIN')" />
+    <sec:intercept-url pattern="/signing/**" access="hasRole('ROLE_ADMIN')" />
+    <sec:intercept-url pattern="/system/**" access="hasRole('ROLE_ADMIN')" />
+    <sec:intercept-url pattern="/config/**" access="hasRole('ROLE_ADMIN')" />
 
     <!-- Enable capture agent updates and ingest -->
-    <sec:intercept-url pattern="/capture-admin/**" access="ROLE_ADMIN, ROLE_CAPTURE_AGENT" />
-    <sec:intercept-url pattern="/recordings/**" method="GET" access="ROLE_ADMIN, ROLE_CAPTURE_AGENT" />
-    <sec:intercept-url pattern="/ingest/**" access="ROLE_ADMIN, ROLE_CAPTURE_AGENT, ROLE_STUDIO" />
-    <sec:intercept-url pattern="/workflow/definitions.xml" method="GET" access="ROLE_ADMIN, ROLE_CAPTURE_AGENT" />
+    <sec:intercept-url pattern="/capture-admin/**" access="hasAnyRole('ROLE_ADMIN', 'ROLE_CAPTURE_AGENT')" />
+    <sec:intercept-url pattern="/recordings/**" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_CAPTURE_AGENT')" />
+    <sec:intercept-url pattern="/ingest/**" access="hasAnyRole('ROLE_ADMIN', 'ROLE_CAPTURE_AGENT', 'ROLE_STUDIO')" />
+    <sec:intercept-url pattern="/workflow/definitions.xml" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_CAPTURE_AGENT')" />
 
     <!-- Secure the user management URLs for admins only -->
-    <sec:intercept-url pattern="/users/**" access="ROLE_ADMIN" />
-    <sec:intercept-url pattern="/admin/users.html" access="ROLE_ADMIN" />
+    <sec:intercept-url pattern="/users/**" access="hasRole('ROLE_ADMIN')" />
+    <sec:intercept-url pattern="/admin/users.html" access="hasRole('ROLE_ADMIN')" />
 
     <!-- Enable 2-legged OAuth access ("signed fetch") to the LTI launch servlet -->
-    <sec:intercept-url pattern="/lti/**" access="ROLE_OAUTH_USER" />
+    <sec:intercept-url pattern="/lti/**" access="hasRole('ROLE_OAUTH_USER')" />
 
     <!-- Enable access to the LTI tools -->
-    <sec:intercept-url pattern="/ltitools/**" access="ROLE_OAUTH_USER" />
+    <sec:intercept-url pattern="/ltitools/**" access="hasRole('ROLE_OAUTH_USER')" />
 
     <!-- Enable access to the LTI service -->
-    <sec:intercept-url pattern="/lti-service-gui/**" access="ROLE_OAUTH_USER" />
-    <sec:intercept-url pattern="/lti-service/**" access="ROLE_ADMIN, ROLE_OAUTH_USER" />
+    <sec:intercept-url pattern="/lti-service-gui/**" access="hasRole('ROLE_OAUTH_USER')" />
+    <sec:intercept-url pattern="/lti-service/**" access="hasAnyRole('ROLE_ADMIN', 'ROLE_OAUTH_USER')" />
 
-    <sec:intercept-url pattern="/transcripts/watson/results*" method="GET" access="ROLE_ANONYMOUS" />
-    <sec:intercept-url pattern="/transcripts/watson/results*" method="POST" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/transcripts/watson/results*" method="GET" access="permitAll" />
+    <sec:intercept-url pattern="/transcripts/watson/results*" method="POST" access="permitAll" />
 
     <!-- Enable access to the redirect routes -->
-    <sec:intercept-url pattern="/redirect/**" access="ROLE_ANONYMOUS" />
+    <sec:intercept-url pattern="/redirect/**" access="permitAll" />
 
     <!-- Everything else is for the admin users -->
-    <sec:intercept-url pattern="/admin-ui" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
-    <sec:intercept-url pattern="/admin-ui/" method="GET" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
-    <sec:intercept-url pattern="/admin-ui/index.html" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
-    <sec:intercept-url pattern="/admin-ng/index.html" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
-    <sec:intercept-url pattern="/index.html" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
-    <sec:intercept-url pattern="/index.js" access="ROLE_ADMIN, ROLE_ADMIN_UI" />
-    <sec:intercept-url pattern="/**" access="ROLE_ADMIN" />
+    <sec:intercept-url pattern="/admin-ui" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
+    <sec:intercept-url pattern="/admin-ui/" method="GET" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
+    <sec:intercept-url pattern="/admin-ui/index.html" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
+    <sec:intercept-url pattern="/admin-ng/index.html" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
+    <sec:intercept-url pattern="/admin-ng/index.html" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
+    <sec:intercept-url pattern="/index.html" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
+    <sec:intercept-url pattern="/index.js" access="hasAnyRole('ROLE_ADMIN', 'ROLE_ADMIN_UI')" />
+    <sec:intercept-url pattern="/**" access="hasRole('ROLE_ADMIN')" />
 
     <!-- ############################# -->
     <!-- # LOGIN / LOGOUT MECHANISMS # -->
@@ -398,7 +413,11 @@
 
     <!-- Enable and configure the failure URL for form-based logins -->
     <!-- CAS Auth: Comment this if using CAS authentication -->
-    <sec:form-login authentication-failure-url="/login.html?error" authentication-success-handler-ref="authSuccessHandler" />
+    <sec:form-login authentication-success-handler-ref="authSuccessHandler"
+      authentication-failure-url="/login.html?error"
+      username-parameter="j_username"
+      password-parameter="j_password"
+      login-processing-url="/j_spring_security_check" />
 
     <!-- (Pre-)Authentication filter chain(s) -->
     <sec:custom-filter position="BASIC_AUTH_FILTER" ref="authenticationFilters" />
@@ -424,13 +443,14 @@
 
     <!-- CAS Auth:  Uncomment this if using CAS authentication  -->
     <!-- Enables CAS Single Sign Out
-    <sec:logout logout-success-url="/cas-logout.jsp"/>
+    <sec:logout logout-url="/j_spring_security_logout" />
     <sec:custom-filter ref="requestSingleLogoutFilter" before="LOGOUT_FILTER"/>
-    <sec:custom-filter ref="singleLogoutFilter" before="FORM_LOGIN_FILTER"/>
+    <sec:custom-filter ref="singleLogoutFilter" before="CAS_FILTER"/>
     -->
 
     <!-- Enables log out -->
-    <sec:logout success-handler-ref="logoutSuccessHandler" />
+    <sec:logout success-handler-ref="logoutSuccessHandler"
+      logout-url="/j_spring_security_logout" />
 
     <!-- JWT single log out
          Please specify the URL to return to after logging out. Comment out the logoutSuccessHandler above.
@@ -440,21 +460,21 @@
   </sec:http>
 
   <bean id="rememberMeServices" class="org.opencastproject.kernel.security.SystemTokenBasedRememberMeService">
-    <property name="userDetailsService" ref="userDetailsService"/>
+    <constructor-arg name="key" value="opencast"/>
+    <constructor-arg name="userDetailsService" ref="userDetailsService"/>
     <!-- All following settings are optional -->
     <property name="tokenValiditySeconds" value="1209600"/>
-    <property name="cookieName" value="oc-remember-me"/>
     <!-- The following key will be augmented by system properties if left at the default value.
          Thus, leaving this untouched is okay. This key must be equal to the key passed to
          rememberMeAuthenticationProvider (s. below). To generate cookies which are valid for the whole cluster,
          set this manually. The key won't be augmented/randomized if you use something different than 'opencast'. -->
-    <property name="key" value="opencast"/>
+    <property name="cookieName" value="oc-remember-me"/>
   </bean>
 
   <bean id="rememberMeAuthenticationProvider"
         class="org.opencastproject.kernel.security.SystemTokenBasedRememberMeAuthenticationProvider">
     <!-- This key must be equal to the key passed to rememberMeServices (s. above) -->
-    <property name="key" value="opencast"/>
+    <constructor-arg value="opencast"/>
   </bean>
 
   <!-- ############################# -->
@@ -473,7 +493,7 @@
 
         <!-- 2-legged OAuth is used by trusted 3rd party applications, including LTI. -->
         <!-- Uncomment the line below to support LTI or other OAuth clients.          -->
-        <!-- <ref bean="oauthProtectedResourceFilter" /> -->
+        <!-- ref bean="lti11AuthenticationFilter" /> -->
       </list>
     </property>
   </bean>
@@ -507,13 +527,7 @@
   <!-- ######################################## -->
 
   <bean id="anonymousFilter" class="org.opencastproject.kernel.security.TrustedAnonymousAuthenticationFilter">
-    <property name="userAttribute" ref="anonymousUserAttributes" />
-    <property name="key" value="anonymousKey" />
-  </bean>
-
-  <bean id="anonymousUserAttributes" class="org.springframework.security.core.userdetails.memory.UserAttribute">
-    <property name="authoritiesAsString" value="ROLE_ANONYMOUS"/>
-    <property name="password" value="empty"/>
+    <constructor-arg name="key" value="anonymousKey" />
   </bean>
 
   <!-- ######################################## -->
@@ -532,7 +546,7 @@
 
   <!-- Redirects unauthenticated requests to the login form -->
   <bean id="redirectingEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
-    <property name="loginFormUrl" value="/login.html" />
+    <constructor-arg value="/login.html" />
   </bean>
 
   <!-- Entry point that redirects to /login for certain paths, replying 403 otherwise -->
@@ -556,6 +570,7 @@
         <value>/engage-player/</value>
         <value>/ltitools</value>
         <value>/ltitools/</value>
+        <value>/paella*/ui/auth.html</value>
       </list>
     </property>
   </bean>
@@ -617,23 +632,17 @@
 
   <!-- Handles the details of the basic authentication dance -->
   <bean id="basicAuthenticationFilter" class="org.springframework.security.web.authentication.www.BasicAuthenticationFilter">
-    <property name="authenticationManager" ref="authenticationManager"/>
-    <property name="authenticationEntryPoint" ref="basicEntryPoint"/>
+    <constructor-arg ref="authenticationManager"/>
+    <constructor-arg ref="basicEntryPoint"/>
   </bean>
 
   <!-- ####################### -->
   <!-- # OAuth (LTI) Support # -->
   <!-- ####################### -->
 
-  <bean name="oauthProtectedResourceFilter" class="org.opencastproject.kernel.security.LtiProcessingFilter">
-    <property name="consumerDetailsService" ref="oAuthConsumerDetailsService" />
-    <property name="tokenServices">
-      <bean class="org.springframework.security.oauth.provider.token.InMemoryProviderTokenServices" />
-    </property>
-    <property name="nonceServices">
-      <bean class="org.springframework.security.oauth.provider.nonce.InMemoryNonceServices" />
-    </property>
-    <property name="authHandler" ref="ltiLaunchAuthenticationHandler" />
+  <bean name="lti11AuthenticationFilter" class="org.opencastproject.kernel.security.Lti11AuthenticationFilter">
+    <property name="ltiLaunchAuthenticationHandler" ref="ltiLaunchAuthenticationHandler" />
+    <property name="oAuthConsumerDetailsService" ref="oAuthConsumerDetailsService" />
   </bean>
 
   <!-- ############### -->
@@ -645,8 +654,11 @@
     <property name="authenticationManager" ref="authenticationManager"/>
     <property name="authenticationSuccessHandler" ref="authSuccessHandler" />
     <property name="serviceProperties" ref="serviceProperties" />
+    <property name="filterProcessesUrl" value="/cas"/>
     <property name="authenticationDetailsSource">
-      <bean class="org.springframework.security.cas.web.authentication.ServiceAuthenticationDetailsSource"/>
+      <bean class="org.springframework.security.cas.web.authentication.ServiceAuthenticationDetailsSource">
+        <constructor-arg ref="serviceProperties"/>
+      </bean>
     </property>
   </bean>
 
@@ -671,7 +683,7 @@
       </bean>
     </property>
     <property name="ticketValidator">
-      <bean class="org.jasig.cas.client.validation.Cas20ServiceTicketValidator">
+      <bean class="org.jasig.cas.client.validation.Cas30ServiceTicketValidator">
         <constructor-arg index="0" value="https://auth-test.berkeley.edu/cas" />
       </bean>
     </property>
@@ -693,7 +705,10 @@
   <!-- # Shibboleth Support # -->
   <!-- ###################### -->
 
+  <!-- Spring 5: Shibboleth has not been tested! -->
+
   <!-- General Shibboleth header extration filter
+
   <bean id="shibbolethHeaderFilter"
         class="org.opencastproject.security.shibboleth.ShibbolethRequestHeaderAuthenticationFilter">
     <property name="principalRequestHeader" value="<this need to be configured>"/>
@@ -720,43 +735,43 @@
   <bean id="attributeMapper" class="org.opencastproject.security.aai.api.AttributeMapper">
     <property name="useHeader" value="true" />
     <property name="multiValueDelimiter" value=";" />
-    <property name="attributeMap" ref="attributeMap" />
-    <property name="aaiAttributes" ref="aaiAttributes" />
+    <property name="attributeMap">
+      <map>
+        <entry key="roles">
+          <list>
+            <value>'ROLE_AAI_USER'</value>
+            <value>'ROLE_AAI_USER_' + ['eduPersonPrincipalName']</value>
+            <value>('ROLE_AAI_OWNER_' + ['eduPersonPrincipalName']).replaceAll("[^a-zA-Z0-9]","_").toUpperCase()</value>
+            <value>['homeOrganization'] != null ? 'ROLE_AAI_ORG_' + ['homeOrganization'] + '_MEMBER' : null</value>
+            <value>['eduPersonEntitlement'].contains('urn:mace:opencast.org:permission:shibboleth:opencast_admin') ? 'ROLE_ADMIN' : null</value>
+            <value>['eduPersonPrincipalName'].contains('john.doe@example.org') ? 'ROLE_ADMIN' : null</value>
+            <value>['eduPersonScopedAffiliation'].contains('faculty@example.org') ? 'ROLE_GROUP_AAI_TRAINER' : null</value>
+          </list>
+        </entry>
+        <entry key="displayName">
+          <list>
+            <value>['givenName'][0] + ' ' + ['sn'][0]</value>
+          </list>
+        </entry>
+        <entry key="mail">
+          <list>
+            <value>['mail'][0]</value>
+          </list>
+        </entry>
+      </map>
+    </property>
+    <property name="aaiAttributes">
+      <list>
+        <value>sn</value>
+        <value>givenName</value>
+        <value>mail</value>
+        <value>homeOrganization</value>
+        <value>eduPersonEntitlement</value>
+        <value>eduPersonPrincipalName</value>
+        <value>homeOrganization</value>
+      </list>
+    </property>
   </bean>
-
-  <util:list id="aaiAttributes" value-type="java.lang.String">
-    <value>sn</value>
-    <value>givenName</value>
-    <value>mail</value>
-    <value>homeOrganization</value>
-    <value>eduPersonEntitlement</value>
-    <value>eduPersonPrincipalName</value>
-    <value>homeOrganization</value>
-  </util:list>
-
-  <util:map id="attributeMap" map-class="java.util.HashMap">
-    <entry key="roles" value-ref="roleMapping" />
-    <entry key="displayName" value-ref="displayNameMapping" />
-    <entry key="mail" value-ref="mailMapping" />
-  </util:map>
-
-  <util:list id="displayNameMapping" value-type="java.lang.String">
-    <value>['givenName'][0] + ' ' + ['sn'][0]</value>
-  </util:list>
-
-  <util:list id="mailMapping" value-type="java.lang.String">
-    <value>['mail'][0]</value>
-  </util:list>
-
-  <util:list id="roleMapping" value-type="java.lang.String">
-    <value>'ROLE_AAI_USER'</value>
-    <value>'ROLE_AAI_USER_' + ['eduPersonPrincipalName']</value>
-    <value>('ROLE_AAI_OWNER_' + ['eduPersonPrincipalName']).replaceAll("[^a-zA-Z0-9]","_").toUpperCase()</value>
-    <value>['homeOrganization'] != null ? 'ROLE_AAI_ORG_' + ['homeOrganization'] + '_MEMBER' : null</value>
-    <value>['eduPersonEntitlement'].contains('urn:mace:opencast.org:permission:shibboleth:opencast_admin') ? 'ROLE_ADMIN' : null</value>
-    <value>['eduPersonPrincipalName'].contains('john.doe@example.org') ? 'ROLE_ADMIN' : null</value>
-    <value>['eduPersonScopedAffiliation'].contains('faculty@example.org') ? 'ROLE_GROUP_AAI_TRAINER' : null</value>
-  </util:list>
 
    -->
 
@@ -775,10 +790,13 @@
 
   <!-- General JWT header extraction filter-->
   <bean id="jwtHeaderFilter" class="org.opencastproject.security.jwt.JWTRequestHeaderAuthenticationFilter">
+    <!-- Name of the HTTP request header that contains the JWT (default: SM_USER) -->
     <property name="principalRequestHeader" value="Authorization"/>
+    <!-- Prefix string occurring before the JWT value within the configured header (default: null) -->
     <property name="principalPrefix" value="Bearer "/>
     <property name="authenticationManager" ref="authenticationManager" />
     <property name="loginHandler" ref="jwtLoginHandler" />
+    <!-- Throws an exception if a request is missing the configured header (default: true) -->
     <property name="exceptionIfHeaderMissing" value="false" />
   </bean>
 
@@ -799,50 +817,52 @@
     <!-- Set either `jwksUrl` or `secret` to enable this login handler -->
     <!-- <property name="jwksUrl" value="https://replace-me.invalid/.well-known/jwks.json" /> -->
     <!-- <property name="secret" value="***" /> -->
-    <property name="expectedAlgorithms" ref="jwtExpectedAlgorithms" />
-    <property name="claimConstraints" ref="jwtClaimConstraints" />
+    <property name="expectedAlgorithms">
+      <!-- The signing algorithms expected for the JWT signature -->
+      <list>
+        <value>ES256</value>
+        <value>ES256K</value>
+        <value>ES384</value>
+        <value>ES512</value>
+        <value>EdDSA</value>
+      </list>
+    </property>
+    <property name="claimConstraints">
+      <!-- The claim constraints that are expected to be fulfilled by the JWT.
+           The claims `exp` and `nbf` are always verified regardless of this config.
+           If you are using JWTs for OpenID Connect, see the specification for claims that must be validated:
+           https://openid.net/specs/openid-connect-core-1_0.html#IDTokenValidation-->
+      <list>
+        <!-- The following are just examples if you want to add additional constraints -->
+        <!-- <value>containsKey('domain')</value> -->
+        <!-- <value>['iss'] eq 'https://auth.example.org'</value> -->
+        <!-- <value>['username'] matches '.*@example\.org'</value> -->
+        <!-- <value>['affiliation'].contains('faculty@example.org')</value> -->
+      </list>
+    </property>
     <property name="usernameMapping" value="['sub']" />
     <property name="nameMapping" value="['name']" />
     <property name="emailMapping" value="['email'] ?: 'no-mail@jwt.invalid'" />
     <property name="ocStandardRoleMappings" value="true" />
-    <property name="roleMappings" ref="jwtRoleMappings" />
+    <!-- The mapping from JWT claims to Opencast roles. These are in addition to
+         ocStandardRoleMappings above. -->
+    <property name="roleMappings">
+      <list>
+        <value>'ROLE_JWT_USER'</value>
+        <value>'ROLE_JWT_USER_' + ['sub']</value>
+        <!-- Some more example -->
+        <!-- <value>('ROLE_JWT_OWNER_' + ['sub']).replaceAll("[^a-zA-Z0-9]","_").toUpperCase()</value> -->
+        <!-- <value>['domain'] != null ? 'ROLE_JWT_ORG_' + ['domain'] + '_MEMBER' : null</value> -->
+        <!-- <value>['username'] eq ('j_doe01@example.org') ? 'ROLE_ADMIN' : null</value> -->
+        <!-- <value>['affiliation'].contains('faculty@example.org') ? 'ROLE_GROUP_JWT_TRAINER' : null</value> -->
+      </list>
+    </property>
     <property name="jwtCacheSize" value="500" />
     <property name="jwtCacheExpiresIn" value="60" />
     <property name="jwksTimeToLive" value="3600000" />
   </bean>
 
-  <!-- The signing algorithms expected for the JWT signature -->
-  <util:list id="jwtExpectedAlgorithms" value-type="java.lang.String">
-    <value>ES256</value>
-    <value>ES256K</value>
-    <value>ES384</value>
-    <value>ES512</value>
-    <value>EdDSA</value>
-  </util:list>
-
-  <!-- The claim constraints that are expected to be fulfilled by the JWT.
-       The claims `exp` and `nbf` are always verified regardless of this config.
-       If you are using JWTs for OpenID Connect, see the specification for claims that must be validated:
-       https://openid.net/specs/openid-connect-core-1_0.html#IDTokenValidation-->
-  <util:list id="jwtClaimConstraints" value-type="java.lang.String">
-    <!-- The following are just examples if you want to add additional constraints -->
-    <!-- <value>containsKey('domain')</value> -->
-    <!-- <value>['iss'] eq 'https://auth.example.org'</value> -->
-    <!-- <value>['username'] matches '.*@example\.org'</value> -->
-    <!-- <value>['affiliation'].contains('faculty@example.org')</value> -->
-  </util:list>
-
-  <!-- The mapping from JWT claims to Opencast roles. These are in addition to
-       ocStandardRoleMappings above. -->
-  <util:list id="jwtRoleMappings" value-type="java.lang.String">
-    <value>'ROLE_JWT_USER'</value>
-    <value>'ROLE_JWT_USER_' + ['sub']</value>
-    <!-- Some more example -->
-    <!-- <value>('ROLE_JWT_OWNER_' + ['sub']).replaceAll("[^a-zA-Z0-9]","_").toUpperCase()</value> -->
-    <!-- <value>['domain'] != null ? 'ROLE_JWT_ORG_' + ['domain'] + '_MEMBER' : null</value> -->
-    <!-- <value>['username'] eq ('j_doe01@example.org') ? 'ROLE_ADMIN' : null</value> -->
-    <!-- <value>['affiliation'].contains('faculty@example.org') ? 'ROLE_GROUP_JWT_TRAINER' : null</value> -->
-  </util:list>
+  <!-- Spring 5: LDAP has not been tested! -->
 
   <!-- ################ -->
   <!-- # LDAP Support # -->
@@ -899,42 +919,11 @@
     <property name="userDetailsContextMapper" ref="userDetailsMapper"/>
     < ! - - Defines how the user attributes are converted to authorities (roles) - - >
     < ! - - Output is ignored if used together with userDetailsMapper - - >
-    < ! - - constructor-arg ref="authoritiesPopulator" /- - >
+    < ! - - Note that <ID> must match one of the LDAP service configurations - - >
+    < ! - - defined in etc/org.opencastproject.userdirectory.ldap-<ID>.cfg - - >
+    < ! - - constructor-arg ref="ldapAuthoritiesPopulator_<ID>" /- - >
   </bean>
   -->
-
-  <!-- #################### -->
-  <!-- # OSGI Integration # -->
-  <!-- #################### -->
-
-  <!-- Obtain services from the OSGI service registry -->
-  <osgi:reference id="userDetailsService" cardinality="1..1"
-                  interface="org.springframework.security.core.userdetails.UserDetailsService" />
-
-  <osgi:reference id="securityService" cardinality="1..1"
-                  interface="org.opencastproject.security.api.SecurityService" />
-
-  <!-- For enabling external users e.g. used together with shibboleth and JWT -->
-  <osgi:reference id="userReferenceProvider" cardinality="1..1"
-                  interface="org.opencastproject.userdirectory.api.UserReferenceProvider"  />
-
-  <osgi:reference id="userDirectoryService" cardinality="1..1"
-                  interface="org.opencastproject.security.api.UserDirectoryService" />
-
-  <!-- Uncomment this as an alternative to the userDetailsMapper -->
-  <!-- Make sure you provide the same instanceId you used in org.opencastproject.userdirectory.ldap-….cfg -->
-  <!--
-  <osgi:reference id="authoritiesPopulator" cardinality="1..1"
-                  interface="org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator"
-                  filter="(instanceId=theId)"/>
-  -->
-
-  <osgi:reference id="oAuthConsumerDetailsService" cardinality="1..1"
-                  interface="org.springframework.security.oauth.provider.ConsumerDetailsService" />
-
-  <osgi:reference id="ltiLaunchAuthenticationHandler" cardinality="1..1"
-                  interface="org.springframework.security.oauth.provider.OAuthAuthenticationHandler" />
-
 
   <!-- ############################# -->
   <!-- # Spring Security Internals # -->
@@ -951,11 +940,8 @@
     <!-- Uncomment the following line if using LDAP -->
     <!-- <sec:authentication-provider ref="ldapAuthProvider" /> -->
     <sec:authentication-provider user-service-ref="userDetailsService">
-      <!-- The JPA user directory stores bcrypt hashed passwords, but still works with legacy md5 hashes -->
-      <sec:password-encoder ref="passwordEncoder">
-        <!-- This salt is used only for decoding legacy MD5 hased passwords -->
-        <sec:salt-source user-property="username" />
-      </sec:password-encoder>
+      <!-- The JPA user directory stores bcrypt hashed passwords, and does NOT work with legacy md5 hashes anymore -->
+      <sec:password-encoder ref="passwordEncoder" />
     </sec:authentication-provider>
   </sec:authentication-manager>
 

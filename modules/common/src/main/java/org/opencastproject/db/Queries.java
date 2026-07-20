@@ -161,7 +161,8 @@ public final class Queries {
      * @return A list of entities.
      * @param <T> Entity type.
      */
-    public <T> Function<EntityManager, List<T>> findSome(String q, int firstResult, int maxResults, Class<T> clazz, Object... params) {
+    public <T> Function<EntityManager, List<T>> findSome(String q, int firstResult, int maxResults, Class<T> clazz,
+        Object... params) {
       return em -> createTypedQuery(em, q, clazz, params)
           .setFirstResult(firstResult)
           .setMaxResults(maxResults)

@@ -44,7 +44,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 
-import java.lang.management.ManagementFactory;
 import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.Enumeration;
@@ -55,9 +54,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
-
-import javax.management.MalformedObjectNameException;
-import javax.management.ObjectName;
 
 /**
  * LDAP implementation of the spring UserDetailsService, taking configuration information from the component context.
@@ -157,6 +153,9 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
 
   /** The key to setup an LDAP connection ID as an OSGI service property */
   private static final String INSTANCE_ID_SERVICE_PROPERTY_KEY = "instanceId";
+
+  /** The key to setup the organization ID as an OSGI service property */
+  private static final String ORGANIZATION_ID_SERVICE_PROPERTY_KEY = "orgId";
 
   /** A map of pid to ldap user provider instance */
   private Map<String, ServiceRegistration> providerRegistrations = new ConcurrentHashMap<>();
@@ -373,6 +372,7 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
           throw new NotFoundException("Multiple organizations exist but none is specified");
         }
         org = orgDirectory.getOrganizations().get(0);
+        organization = org.getId();
       }
     } catch (NotFoundException e) {
       throw new ConfigurationException(ORGANIZATION_KEY, "no organization with configured id", e);
@@ -381,6 +381,7 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
     // Dictionary to include a property to identify this LDAP instance in the security.xml file
     Hashtable<String, String> dict = new Hashtable<>();
     dict.put(INSTANCE_ID_SERVICE_PROPERTY_KEY, instanceId);
+    dict.put(ORGANIZATION_ID_SERVICE_PROPERTY_KEY, organization);
 
     // Instantiate this LDAP instance and register it as such
 
@@ -419,13 +420,6 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
     try {
       providerRegistration = providerRegistrations.remove(pid);
       authoritiesPopulatorRegistration = authoritiesPopulatorRegistrations.remove(pid);
-      if ((providerRegistration != null) || (authoritiesPopulatorRegistration != null)) {
-        try {
-          ManagementFactory.getPlatformMBeanServer().unregisterMBean(LdapUserProviderFactory.getObjectName(pid));
-        } catch (Exception e) {
-          logger.warn("Unable to unregister mbean for pid='{}': {}", pid, e.getMessage());
-        }
-      }
     } finally {
       if (providerRegistration != null) {
         providerRegistration.unregister();
@@ -434,19 +428,6 @@ public class LdapUserProviderFactory implements ManagedServiceFactory {
         authoritiesPopulatorRegistration.unregister();
       }
     }
-  }
-
-  /**
-   * Builds a JMX object name for a given PID
-   *
-   * @param pid
-   *          the PID
-   * @return the object name
-   * @throws NullPointerException
-   * @throws MalformedObjectNameException
-   */
-  public static final ObjectName getObjectName(String pid) throws MalformedObjectNameException, NullPointerException {
-    return new ObjectName(pid + ":type=LDAPRequests");
   }
 
 }

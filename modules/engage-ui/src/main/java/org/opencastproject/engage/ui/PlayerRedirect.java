@@ -39,12 +39,17 @@ import org.slf4j.LoggerFactory;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriBuilder;
+import javax.ws.rs.core.UriInfo;
 
 /**
  * This REST endpoint redirects users to the currently configured default player, allowing the default to be changed
@@ -70,7 +75,7 @@ public class PlayerRedirect {
 
   private static final Logger logger = LoggerFactory.getLogger(PlayerRedirect.class);
 
-  private static final String PLAYER_DEFAULT = "/paella7/ui/watch.html?id=#{id}";
+  private static final String PLAYER_DEFAULT = "/paella8/ui/watch.html?id=#{id}";
 
   private SecurityService securityService;
 
@@ -92,14 +97,21 @@ public class PlayerRedirect {
       },
       returnDescription = ""
   )
-  public Response redirect(@PathParam("id") String id) {
+  public Response redirect(@PathParam("id") String id, @Context UriInfo uriInfo) {
     final Organization org = securityService.getOrganization();
     final String playerPath = Objects.toString(org.getProperties().get("player"), PLAYER_DEFAULT)
             .replace("#{id}", URLEncoder.encode(id, StandardCharsets.UTF_8));
-    logger.debug("redirecting to player: {}", playerPath);
+
+    final UriBuilder uriBuilder = UriBuilder.fromUri(playerPath);
+    for (Map.Entry<String, List<String>> entry : uriInfo.getQueryParameters().entrySet()) {
+      uriBuilder.queryParam(entry.getKey(), entry.getValue().toArray());
+    }
+
+    final String finalPath = uriBuilder.build().toString();
+    logger.debug("redirecting to player: {}", finalPath);
     return Response
             .status(Response.Status.TEMPORARY_REDIRECT)
-            .header("location", playerPath)
+            .header("location", finalPath)
             .build();
   }
 }

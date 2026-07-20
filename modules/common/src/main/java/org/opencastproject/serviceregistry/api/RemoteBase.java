@@ -75,8 +75,9 @@ public class RemoteBase {
    *          the service type
    */
   protected RemoteBase(String type) {
-    if (type == null)
+    if (type == null) {
       throw new IllegalArgumentException("Service type must not be null");
+    }
     this.serviceType = type;
   }
 
@@ -266,12 +267,13 @@ public class RemoteBase {
    * Closes any http connections kept open by this http response.
    */
   protected void closeConnection(HttpResponse response) {
-    if (response != null)
+    if (response != null) {
       try {
         client.close(response);
       } catch (IOException e) {
         // ignore
       }
+    }
   }
 
   /**

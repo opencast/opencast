@@ -22,6 +22,8 @@ package org.opencastproject.external.endpoint;
 
 import static io.restassured.RestAssured.given;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -66,7 +68,7 @@ public class WorkflowDefinitionsEndpointTest {
     assertEquals("Example workflow", wd1.get("title"));
     assertEquals("Example workflow definition", wd1.get("description"));
     assertArrayEquals(new String[] { "archive", "my-tag" }, ((JSONArray) wd1.get("tags")).toArray());
-    assertFalse(wd1.containsKey("configuration_panel"));
+    assertFalse(wd1.containsKey("configuration_panel_json"));
     assertFalse(wd1.containsKey("operations"));
 
     // Workflow Definition 2
@@ -75,14 +77,14 @@ public class WorkflowDefinitionsEndpointTest {
     assertEquals("Another workflow", wd2.get("title"));
     assertEquals("Example workflow definition", wd2.get("description"));
     assertArrayEquals(new String[] {}, ((JSONArray) wd2.get("tags")).toArray());
-    assertFalse(wd2.containsKey("configuration_panel"));
+    assertFalse(wd2.containsKey("configuration_panel_json"));
     assertFalse(wd2.containsKey("operations"));
   }
 
   @Test
   public void testGetWorkflowDefinitionsIncludingOptionalValues() throws Exception {
     final String response = given().queryParam("withoperations", "true")
-                                   .queryParam("withconfigurationpanel", "true")
+                                   .queryParam("withconfigurationpaneljson", "true")
                                    .expect()
                                    .statusCode(SC_OK)
                                    .when()
@@ -94,7 +96,7 @@ public class WorkflowDefinitionsEndpointTest {
 
     // Workflow Definition 1
     final JSONObject wd1 = (JSONObject) json.get(0);
-    assertEquals("<h3>Config</h3>", wd1.get("configuration_panel"));
+    assertThat((String)wd1.get("configuration_panel_json"), startsWith("[{ \"legend\": \"Config\""));
     final JSONArray ops1 = (JSONArray) wd1.get("operations");
     assertEquals(1, ops1.size());
 
@@ -114,7 +116,7 @@ public class WorkflowDefinitionsEndpointTest {
 
     // Workflow Definition 2
     final JSONObject wd2 = (JSONObject) json.get(1);
-    assertEquals("<h3>Config2</h3>", wd2.get("configuration_panel"));
+    assertThat((String)wd2.get("configuration_panel_json"), startsWith("[{ \"legend\": \"Config2\""));
     final JSONArray ops2 = (JSONArray) wd2.get("operations");
     assertEquals(1, ops2.size());
 
@@ -135,7 +137,7 @@ public class WorkflowDefinitionsEndpointTest {
   @Test
   public void testGetWorkflowDefinitionIncludingOptionalValues() throws Exception {
     final String response = given().queryParam("withoperations", "true")
-                                   .queryParam("withconfigurationpanel", "true")
+                                   .queryParam("withconfigurationpaneljson", "true")
                                    .expect()
                                    .statusCode(SC_OK)
                                    .when()
@@ -147,7 +149,7 @@ public class WorkflowDefinitionsEndpointTest {
     assertEquals("Example workflow", wd.get("title"));
     assertEquals("Example workflow definition", wd.get("description"));
     assertArrayEquals(new String[] { "archive", "my-tag" }, ((JSONArray) wd.get("tags")).toArray());
-    assertEquals("<h3>Config</h3>", wd.get("configuration_panel"));
+    assertThat((String)wd.get("configuration_panel_json"), startsWith("[{ \"legend\": \"Config\""));
     final JSONArray ops = (JSONArray) wd.get("operations");
     assertEquals(1, ops.size());
 

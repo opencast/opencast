@@ -28,8 +28,6 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSelector;
 import org.opencastproject.mediapackage.selector.SimpleElementSelector;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.util.Checksum;
-import org.opencastproject.util.ChecksumType;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
 import org.opencastproject.workflow.api.ConfiguredTagsAndFlavors;
@@ -41,16 +39,13 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URI;
 import java.util.Collection;
 import java.util.List;
 
@@ -78,9 +73,6 @@ public class CloneWorkflowOperationHandler extends AbstractWorkflowOperationHand
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(CloneWorkflowOperationHandler.class);
-
-  /** The workspace reference */
-  protected Workspace workspace = null;
 
   /**
    * Callback for the OSGi environment to set the workspace reference.
@@ -171,36 +163,22 @@ public class CloneWorkflowOperationHandler extends AbstractWorkflowOperationHand
   }
 
   private MediaPackageElement copyElement(MediaPackageElement element) throws WorkflowOperationException {
-    MediaPackageElement newElement = (MediaPackageElement) element.clone();
-    newElement.generateIdentifier();
+    MediaPackageElement derivedElement;
+    String sourceFilePath = null;
+    String derivedFilePath;
 
-    File sourceFile = null;
-    String toFileName = null;
     try {
-      URI sourceURI = element.getURI();
-      sourceFile = workspace.get(sourceURI);
-
-      toFileName = newElement.getIdentifier();
-      String extension = FilenameUtils.getExtension(sourceFile.getName());
-      if (!"".equals(extension)) {
-        toFileName += "." + extension;
-      }
-
-      logger.debug("Start copying element {} to target {}.", sourceFile.getPath(), toFileName);
-
-      URI newUri = workspace.put(element.getMediaPackage().getIdentifier().toString(), newElement.getIdentifier(),
-              toFileName, workspace.read(sourceURI));
-      newElement.setURI(newUri);
-      newElement.setChecksum(Checksum.create(ChecksumType.DEFAULT_TYPE, workspace.get(newUri)));
-
-      logger.debug("Element {} copied to target {}.", sourceFile.getPath(), toFileName);
+      derivedElement = createDerivedMediaPackageElementFrom(element);
+      sourceFilePath = workspace.get(element.getURI()).getPath();
+      derivedFilePath = workspace.get(derivedElement.getURI()).getPath();
+      logger.debug("Element {} copied to target {}.", sourceFilePath, derivedFilePath);
     } catch (IOException e) {
-      throw new WorkflowOperationException("Unable to copy " + sourceFile.getPath() + " to " + toFileName + ".", e);
+      throw new WorkflowOperationException("Unable to copy " + sourceFilePath, e);
     } catch (NotFoundException e) {
       throw new WorkflowOperationException("Unable to find " + element.getURI() + " in the workspace", e);
     }
 
-    return newElement;
+    return derivedElement;
   }
 
   @Reference

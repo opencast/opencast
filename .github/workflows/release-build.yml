@@ -10,9 +10,12 @@ jobs:
   create-release-from-tag:
     name: Create release from tag
     runs-on: ubuntu-latest
+    if: github.repository == 'opencast/opencast'
     steps:
       - name: checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v7
+        with:
+          submodules: 'recursive'
 
       - name: setup java
         uses: actions/setup-java@v5
@@ -47,15 +50,75 @@ jobs:
           echo "VERSION_MAIN=$GITHUB_REF"     | sed 's_refs/tags/\([0-9]*\).\([0-9]*\)$_\1_' >> $GITHUB_OUTPUT
           echo "VERSION_COMBINED=$GITHUB_REF" | sed 's_refs/tags/\([0-9]*\).\([0-9]*\)$_\1\2_' >> $GITHUB_OUTPUT
 
+      - name: Get the last tag version
+        id: get_last_version
+        run: |
+          #If this not an N.0 release
+          # Uses string comparison here because bash doesn't like 0.6 -ne 0
+          # complains about integer expressions being expected
+          if [ "$(echo ${{ steps.get_version.outputs.VERSION }} % 1 | bc)" != "0" ]; then
+            echo "LAST_VERSION=$( echo ${{ steps.get_version.outputs.VERSION }} - 0.1 | bc)"
+            echo "LAST_VERSION=$( echo ${{ steps.get_version.outputs.VERSION }} - 0.1 | bc)" >> $GITHUB_OUTPUT
+          else
+            echo "LAST_VERSION=$( echo ${{ steps.get_version.outputs.VERSION }} - 1 | bc)"
+            echo "LAST_VERSION=$( echo ${{ steps.get_version.outputs.VERSION }} - 1 | bc)" >> $GITHUB_OUTPUT
+          fi
+
+      - name: changelog
+        id: opencast_changelog
+        uses: mikepenz/release-changelog-builder-action@c9bcd8238b6f41e05561348339429d360b1c0247 #6.2.3
+        with:
+          configuration: ".github/changelog/opencast.json"
+          owner: opencast
+          repo: opencast
+          fromTag: ${{ steps.get_last_version.outputs.LAST_VERSION }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: changelog
+        id: admin_changelog
+        uses: mikepenz/release-changelog-builder-action@c9bcd8238b6f41e05561348339429d360b1c0247 #6.2.3
+        with:
+          configuration: ".github/changelog/admin-interface.json"
+          owner: opencast
+          repo: admin-interface
+          fromTag: ${{ steps.get_last_version.outputs.LAST_VERSION }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: changelog
+        id: editor_changelog
+        uses: mikepenz/release-changelog-builder-action@c9bcd8238b6f41e05561348339429d360b1c0247 #6.2.3
+        with:
+          configuration: ".github/changelog/editor.json"
+          owner: opencast
+          repo: editor
+          fromTag: ${{ steps.get_last_version.outputs.LAST_VERSION }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: changelog
+        id: studio_changelog
+        uses: mikepenz/release-changelog-builder-action@c9bcd8238b6f41e05561348339429d360b1c0247 #6.2.3
+        with:
+          configuration: ".github/changelog/studio.json"
+          owner: opencast
+          repo: studio
+          fromTag: ${{ steps.get_last_version.outputs.LAST_VERSION }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: create new release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           files: build/opencast-dist-*.tar.gz
           fail_on_unmatched_files: true
           name: Opencast ${{ steps.get_version.outputs.VERSION }}
           body: |
-            This is an Opencast ${{ steps.get_version.outputs.VERSION_MAIN }} release.
-            For further information, please take a look at:
+            # Opencast Core changes
+            ${{ steps.opencast_changelog.outputs.changelog }}
 
-            - [Release notes](https://docs.opencast.org/r/${{ steps.get_version.outputs.VERSION_MAIN }}.x/admin/#releasenotes/#opencast-${{ steps.get_version.outputs.VERSION_COMBINED }})
-            - [Changelog](https://docs.opencast.org/r/${{ steps.get_version.outputs.VERSION_MAIN }}.x/admin/#changelog/opencast-${{ steps.get_version.outputs.VERSION_MAIN }})
+            # Admin Interface submodule changes
+            ${{ steps.admin_changelog.outputs.changelog }}
+
+            # Editor submodules changes
+            ${{ steps.editor_changelog.outputs.changelog }}
+
+            # Studio submodule changes
+            ${{ steps.studio_changelog.outputs.changelog }}

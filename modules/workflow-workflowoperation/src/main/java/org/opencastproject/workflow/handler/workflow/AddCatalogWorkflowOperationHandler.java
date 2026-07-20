@@ -85,9 +85,6 @@ public class AddCatalogWorkflowOperationHandler extends AbstractWorkflowOperatio
   /** The mimetype of the added catalogs */
   private static final MimeType CATALOG_MIME_TYPE = MimeType.mimeType("text", "xml");
 
-  /** The workspace, where the catalog files are put. */
-  private Workspace workspace;
-
   /**
    * Sets the workspace to use.
    *

@@ -7,12 +7,11 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>20-SNAPSHOT</version>
+    <version>21-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
-    <checkstyle.skip>false</checkstyle.skip>
   </properties>
   <dependencies>
     <dependency>
@@ -26,7 +25,7 @@
     <dependency>
       <groupId>org.springframework.ldap</groupId>
       <artifactId>spring-ldap-core</artifactId>
-      <version>1.3.1.RELEASE</version>
+      <version>2.4.1</version>
     </dependency>
   </dependencies>
   <build>
@@ -42,7 +41,7 @@
         <configuration>
           <instructions>
             <Import-Package>
-              org.springframework.ldap.core;version=1.3.1.RELEASE,
+              org.springframework.ldap.core;version=2.4.1,
               org.springframework.security.ldap;version=${spring-security.version},
               org.springframework.security.ldap.authentication;version=${spring-security.version},
               org.springframework.security.ldap.ppolicy;version=${spring-security.version},

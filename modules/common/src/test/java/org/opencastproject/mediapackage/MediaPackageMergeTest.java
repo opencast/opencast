@@ -189,8 +189,9 @@ public class MediaPackageMergeTest {
   private void testMediaPackageConsistency(MediaPackage mediaPackage) throws MediaPackageException {
     List<String> ids = new ArrayList<>();
     for (MediaPackageElement e : mediaPackage.elements()) {
-      if (ids.contains(e.getIdentifier()))
+      if (ids.contains(e.getIdentifier())) {
         throw new MediaPackageException("Duplicate id " + e.getIdentifier() + "' found");
+      }
       ids.add(e.getIdentifier());
     }
   }

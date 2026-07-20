@@ -151,10 +151,11 @@ public abstract class AbstractMediaPackageTest {
    */
   @After
   public void tearDown() throws Exception {
-    if (packageDir.getParentFile().getName().equals(identifier.toString()))
+    if (packageDir.getParentFile().getName().equals(identifier.toString())) {
       FileSupport.delete(packageDir.getParentFile(), true);
-    else
+    } else {
       FileSupport.delete(packageDir, true);
+    }
   }
 
 }

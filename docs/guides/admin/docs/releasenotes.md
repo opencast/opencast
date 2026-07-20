@@ -1,62 +1,67 @@
-# Opencast 19: Release Notes
+# Opencast 20: Release Notes
 
-## Opencast 19.0
+## Opencast 20.1
+
+This release contains minor admin ui fixes and code cleanups. Also it adds `/play` route enhancements described below.
+
+### Preserve query parameters on `/play` redirect
+
+  The `/play` route now passes through query parameters to the target player URL.
+  This allows parameters like `jwt=...` or `t=10` to be preserved
+  when redirecting to the configured player.
+
+  This is particularly useful for third-party integrations
+  where authentication tokens (like JWTs) or specific player settings
+  need to be passed through the redirect to the actual player interface,
+  while preserving the ability to configure the exact player on the Opencast side.
+
+  If a parameter with the same name already exists in the configured player path,
+  the value from the request will be appended, creating a multi-valued parameter.
+  This behavior ensures that parameters are never lost,
+  though player implementations may need to handle multiple values if they occur.
+
+
+## Opencast 20.0
 
 ### Features
-- Episodes in the search index can be filtered according to whether or not they are live. [[#7032](https://github.com/opencast/opencast/pull/7032)]
-- Paella 8 is now included in Opencast as an alternative player [[#7166](https://github.com/opencast/opencast/pull/7166)]
-- A Matomo statistics provider has been added [[#7134](https://github.com/opencast/opencast/pull/7134)]
-- Default series ACLs can now be configured [[#7041](https://github.com/opencast/opencast/pull/7041)]
-
+- Opencast now supports chapters in videos. You can use the Editor to add, modify and publish chapters. [[Editor #1647](https://github.com/opencast/editor/pull/1647)]
+  [[#7142](https://github.com/opencast/opencast/pull/7142)]
 
 ### Breaking Changes
-- Target tag behaviour has been unified across all workflow operation handlers. [[#6648](https://github.com/opencast/opencast/pull/6648)]
-- The Opencast presets module has been removed.  This previously allowed for org, and system wide presets to be
-  defined, but was undocumented and untested.  This change was discussed in [5615](https://github.com/opencast/opencast/issues/5615).
-  [[#6903](https://github.com/opencast/opencast/pull/6903)]
-- The Opencast annotation service has been removed.  If you had `opencast-plugin-legacy-annotation` enabled in
-  `org.opencastproject.plugin.impl.PluginManagerImpl.cfg` then this affects you, otherwise it should not.  This change
-  was discussed in [5615](https://github.com/opencast/opencast/issues/5615).  The relevant database tables will be
-  automatically removed from your database systems by the upgrade script.  [[#6902](https://github.com/opencast/opencast/pull/6902)]
-
+- no breaking changes in this release
 
 ### Configuration Changes
-- Default workflows are now in yaml [[#6798](https://github.com/opencast/opencast/pull/6798)]
-- The configuration key `video-source-flavor` for the Subtitle Timeshift Workflow Operation Handler changed to
-  `video-source-flavors` (plural). [[#6901](https://github.com/opencast/opencast/pull/6901)]
-- Configuring JWT authentication is now substantially simpler [[#7189](https://github.com/opencast/opencast/pull/7189)]
-- The editor now displays less metadata by default [[#7053](https://github.com/opencast/opencast/pull/7053)]
-- The plugin `opencast-plugin-legacy-annotation` has been removed from `org.opencastproject.plugin.impl.PluginManagerImpl.cfg`.
-  [[#6902](https://github.com/opencast/opencast/pull/6902)]
-- Target tag handling has changed with [[#6648](https://github.com/opencast/opencast/pull/6648)]:
+- Paella 8 is now the default Paella version.  Paella 7 is scheduled for removal in Opencast 21. [[#7214](https://github.com/opencast/opencast/pull/7214)]
+- The circular dependency between index and list providers has been eliminated. The configuration for the ACL additional
+  actions list provider has been moved to the organization configuration. [#7128](https://github.com/opencast/opencast/pull/7128)
+- JMX beans appear to be unused, and there are performance concerns surrounding JMX statistics. Therefore, they have
+  been removed to simplify our code. [[#7317](https://github.com/opencast/opencast/pull/7317)]
+- Disable service states by default. These tended to cause more issues in modern systems.  Functionality is still
+  present, just disabled by default. [[#7450](https://github.com/opencast/opencast/pull/7450)]
+- The configuration option "heartbeat.interval" was removed from `etc/org.opencastproject.serviceregistry.impl.JobDispatcher.cfg`
+  Furthermore, only dispatching nodes will have a heartbeat from now on. [[#7311](https://github.com/opencast/opencast/issues/7311)]
+- All capture agent inputs are now preselected when scheduling a new event in the Admin UI [[Admin Interface #1566](https://github.com/opencast/opencast/issues/1566)]
+- Whether you were uploading or scheduling a new event in the Admin UI, the "Create Event" modal would always offer you
+  workflows tagged with either "upload" or "schedule". Now if you are uploading, you only get workflows tagged with
+  "upload". And if you are scheduling, you only get workflows tagged with "schedule". [[Admin Interface #1567](https://github.com/opencast/admin-interface/issues/1567)]
+- A new config option to filter available roles in the Admin UI access policy dropdowns was added. Allows you to
+  effectively remove catgories of roles (like ROLE_GROUP) from the dropdowns to make them more usable.
+  [[Admin Interface #1561](https://github.com/opencast/admin-interface/issues/1561)]
+  [[#7541](https://github.com/opencast/opencast/pull/7541)]
+- The editor thumbnail view has been improved. [[Editor #1663](https://github.com/opencast/editor/pull/1663)]
 
-    All workflow operation handlers adapt the same method of
-    handling target tags (if they support target tags).
-
-    The chosen behaviour is that of the tag WOH:
-    "If a target-tag starts with a '-', it will be removed from
-    preexisting tags, if a target-tag starts with a '+', it will
-    be added to preexisting tags. If there is no prefix, all
-    preexisting tags are removed and replaced by the target-tags."
-
-    This means that all WOH that did not support "+" and "-" now do.
-    THIS CONSTITUTES A BEHAVIOUR CHANGE FOR SOME WORKFLOW OPERATION HANDLERS!
-    In particular, some WOH were adding tags instead of replacing them,
-    even though they were not prefaced with a "+". Adopters are advised
-    to check their workflows.
-
-For more details, please take a look at the [full changelog](changelog/opencast-19.md). If you want to update Opencast
+For more details, please take a look at the [full changelog](changelog/opencast-20.md). If you want to update Opencast
 from a previous version, you should also read the [upgrade guide](upgrade.md).
 
 ## Release Schedule
 
-| Date              | Phase                    |
-|-------------------|--------------------------|
-| November 19, 2025 | Release Branch Cut       |
-| December 17, 2025 | Release of Opencast 18.0 |
+| Date           | Phase                    |
+|----------------|--------------------------|
+| April 15, 2026 | Release Branch Cut       |
+| Mai 15, 2026   | Release of Opencast 20.0 |
 
 
 ## Release Managers
 
-- Greg Logan (Logan IT Enterprises)
-- Lukas Gehrlein (ssystems Gmbh.)
+- Martin Wygas (elan e.V.)
+- Sascha Nösberger (University of Bern)

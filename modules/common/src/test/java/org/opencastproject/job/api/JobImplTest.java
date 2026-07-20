@@ -171,8 +171,8 @@ public class JobImplTest {
 
   @Test
   public void testEquals() throws Exception {
-    Job equalJob = new JobImpl(3L, "test", "test_org", 0L, "simple", "do", arguments, DISPATCHING, "localhost", "remotehost",
-            created, started, completed, 100L, 200L, "result", 3L, 1L, true, uri, 1.5F);
+    Job equalJob = new JobImpl(3L, "test", "test_org", 0L, "simple", "do", arguments, DISPATCHING, "localhost",
+        "remotehost", created, started, completed, 100L, 200L, "result", 3L, 1L, true, uri, 1.5F);
 
     assertEquals(job, equalJob);
   }

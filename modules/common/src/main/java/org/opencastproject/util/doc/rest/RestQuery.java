@@ -67,5 +67,11 @@ public @interface RestQuery {
   /**
    * @return a body parameter for this query.
    */
-  RestParameter bodyParameter() default @RestParameter(defaultValue = "", description = "", isRequired = false, name = "", type = RestParameter.Type.NO_PARAMETER);
+  RestParameter bodyParameter() default @RestParameter(
+      defaultValue = "",
+      description = "",
+      isRequired = false,
+      name = "",
+      type = RestParameter.Type.NO_PARAMETER
+  );
 }

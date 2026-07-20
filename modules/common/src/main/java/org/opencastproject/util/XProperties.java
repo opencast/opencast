@@ -115,10 +115,11 @@ public class XProperties extends Properties {
       replacement = System.getenv(subkey);
     }
 
-    if (replacement != null)
+    if (replacement != null) {
       return p.matcher(value).replaceAll(Matcher.quoteReplacement(replacement));
-    else
+    } else {
       return null;
+    }
   }
 
   /**

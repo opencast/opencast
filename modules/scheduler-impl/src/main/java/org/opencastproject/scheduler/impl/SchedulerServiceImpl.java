@@ -1415,11 +1415,11 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
           Optional<Set<String>> presenters, Optional<String> agentId, Optional<Map<String, String>> properties,
           Optional<String> recordingStatus) {
 
-    String organization = getSecurityService().getOrganization().getId();
+    Organization organization = getSecurityService().getOrganization();
     User user = getSecurityService().getUser();
 
     Function<Optional<Event>, Optional<Event>> updateFunction = getEventUpdateFunction(mediaPackageId, acl, dublinCore,
-            startTime, endTime, presenters, agentId, properties, recordingStatus, organization, user);
+            startTime, endTime, presenters, agentId, properties, recordingStatus, organization.getId(), user);
 
     try {
       index.addOrUpdateEvent(mediaPackageId, updateFunction, organization, user);
@@ -1435,11 +1435,11 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    * @param mediaPackageId
    */
   private void removeRecordingStatusFromIndex(String mediaPackageId) {
-    String organization = getSecurityService().getOrganization().getId();
+    Organization organization = getSecurityService().getOrganization();
     User user = getSecurityService().getUser();
 
     Function<Optional<Event>, Optional<Event>> updateFunction = (Optional<Event> eventOpt) -> {
-      Event event = eventOpt.orElse(new Event(mediaPackageId, organization));
+      Event event = eventOpt.orElse(new Event(mediaPackageId, organization.getId()));
       event.setRecordingStatus(null);
       return Optional.of(event);
     };
@@ -1459,10 +1459,10 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
    * @param mediaPackageId
    */
   private void removeSchedulingInfoFromIndex(String mediaPackageId) {
-    String orgId = getSecurityService().getOrganization().getId();
+    Organization organization = getSecurityService().getOrganization();
 
     try {
-      index.deleteEvent(mediaPackageId, orgId);
+      index.deleteEvent(mediaPackageId, organization);
       logger.debug("Scheduling information of event {} removed from the {} index.", mediaPackageId,
               index.getIndexName());
     } catch (SearchIndexException e) {
@@ -1692,7 +1692,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
                       updatedEventRange.add(updatedEventData.get());
 
                       if (updatedEventRange.size() >= n || current[0] >= events.size()) {
-                        index.bulkEventUpdate(updatedEventRange);
+                        index.bulkEventUpdate(updatedEventRange, organization);
                         logIndexRebuildProgress(logger, total, current[0], n);
                         updatedEventRange.clear();
                       }

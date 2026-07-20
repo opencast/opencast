@@ -7,12 +7,11 @@
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
-    <version>20-SNAPSHOT</version>
+    <version>21-SNAPSHOT</version>
     <relativePath>../../pom.xml</relativePath>
   </parent>
   <properties>
     <opencast.basedir>${project.basedir}/../..</opencast.basedir>
-    <checkstyle.skip>false</checkstyle.skip>
     <java-jwt.version>3.18.1</java-jwt.version>
     <jwks-rsa.version>0.22.1</jwks-rsa.version>
   </properties>
@@ -36,13 +35,11 @@
     <!-- External -->
     <dependency>
       <groupId>org.springframework</groupId>
-      <artifactId>org.springframework.beans</artifactId>
-      <version>${spring.version}</version>
+      <artifactId>spring-beans</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
-      <artifactId>org.springframework.core</artifactId>
-      <version>${spring.version}</version>
+      <artifactId>spring-core</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
@@ -51,6 +48,10 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-expression</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-jcl</artifactId>
     </dependency>
     <dependency>
       <groupId>org.springframework.security</groupId>
@@ -75,6 +76,11 @@
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-lang3</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
+      <version>1.2</version>
     </dependency>
     <dependency>
       <groupId>org.slf4j</groupId>
@@ -118,6 +124,7 @@
           <ignoredUnusedDeclaredDependencies>
             <ignoredUnusedDeclaredDependencies>org.springframework:spring-core</ignoredUnusedDeclaredDependencies>
             <ignoredUnusedDeclaredDependencies>com.google.crypto.tink:tink</ignoredUnusedDeclaredDependencies>
+            <ignoredUnusedDeclaredDependencies>commons-logging:commons-logging</ignoredUnusedDeclaredDependencies>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>

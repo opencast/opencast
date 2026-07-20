@@ -52,8 +52,12 @@ public final class Tuple3<A, B, C> {
 
   @Override
   public boolean equals(Object that) {
-    if (this == that) return true;
-    if (!eqClasses(this, that)) return false;
+    if (this == that) {
+      return true;
+    }
+    if (!eqClasses(this, that)) {
+      return false;
+    }
     Tuple3 thatc = (Tuple3) that;
     return a.equals(thatc.a) && b.equals(thatc.b) && c.equals(thatc.c);
   }

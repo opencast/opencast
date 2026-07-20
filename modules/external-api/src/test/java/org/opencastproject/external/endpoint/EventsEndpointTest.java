@@ -24,9 +24,9 @@ import static io.restassured.RestAssured.given;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses;
@@ -129,7 +129,7 @@ public class EventsEndpointTest {
     given().multiPart("metadata", jsonString).pathParam("event_id", eventId).expect().statusCode(SC_NO_CONTENT)
             .when().post(env.host("{event_id}"));
     MetadataList actualMetadataList = TestEventsEndpoint.getCapturedMetadataList1().getValue();
-    assertThat(MetadataJson.listToJson(actualMetadataList, true).toString(),
+    assertThat(MetadataJson.listToJson(actualMetadataList, true, true).toString(),
         SameJSONAs.sameJSONAs(expectedJson).allowingAnyArrayOrdering());
   }
 
@@ -151,7 +151,7 @@ public class EventsEndpointTest {
             .expect().statusCode(SC_NO_CONTENT).when().put(env.host("{event_id}/metadata"));
     MetadataList actualMetadataList = TestEventsEndpoint.getCapturedMetadataList2().getValue();
     assertThat(MetadataJson.collectionToJson(
-            actualMetadataList.getMetadataByFlavor("dublincore/episode"), true).toString(),
+            actualMetadataList.getMetadataByFlavor("dublincore/episode"), true, true).toString(),
             SameJSONAs.sameJSONAs(expectedJson).allowingAnyArrayOrdering());
   }
 

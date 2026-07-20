@@ -159,7 +159,8 @@ public abstract class AssetManagerTestBase {
 
     ElasticsearchIndex esIndex = EasyMock.createNiceMock(ElasticsearchIndex.class);
     EasyMock.expect(esIndex.addOrUpdateEvent(EasyMock.anyString(), EasyMock.anyObject(Function.class),
-            EasyMock.anyString(), EasyMock.anyObject(User.class))).andReturn(Optional.empty()).atLeastOnce();
+            EasyMock.anyObject(Organization.class), EasyMock.anyObject(User.class)))
+        .andReturn(Optional.empty()).atLeastOnce();
     EasyMock.replay(esIndex);
 
     AssetManagerImpl am = new AssetManagerImpl();
@@ -403,6 +404,10 @@ public abstract class AssetManagerTestBase {
       @Override public String getStoreType() {
         return storeType;
       }
+
+      @Override public String getStorageName() {
+        return "Test Store";
+      }
     };
   }
 
@@ -474,6 +479,10 @@ public abstract class AssetManagerTestBase {
 
       @Override public String getStoreType() {
         return storeType;
+      }
+
+      @Override public String getStorageName() {
+        return "Test Store";
       }
     };
   }

@@ -60,7 +60,7 @@ public class BaseEndpointTest {
 
     JSONObject json = (JSONObject) parser.parse(response);
     assertEquals("https://api.opencast.org", json.get("url"));
-    assertEquals("v1.11.0", json.get("version"));
+    assertEquals("v1.12.0", json.get("version"));
   }
 
   /** Test case for {@link BaseEndpoint#getUserInfo()} */
@@ -121,7 +121,7 @@ public class BaseEndpointTest {
 
     JSONObject json = (JSONObject) parser.parse(response);
     JSONArray version = (JSONArray) json.get("versions");
-    assertEquals("v1.11.0", json.get("default"));
+    assertEquals("v1.12.0", json.get("default"));
     assertTrue(version.contains("v1.0.0"));
     assertTrue(version.contains("v1.1.0"));
     assertTrue(version.contains("v1.2.0"));
@@ -134,7 +134,8 @@ public class BaseEndpointTest {
     assertTrue(version.contains("v1.9.0"));
     assertTrue(version.contains("v1.10.0"));
     assertTrue(version.contains("v1.11.0"));
-    assertEquals(12, version.size());
+    assertTrue(version.contains("v1.12.0"));
+    assertEquals(13, version.size());
   }
 
   /** Test case for {@link BaseEndpoint#getVersionDefault()} */
@@ -144,7 +145,7 @@ public class BaseEndpointTest {
             .asString();
 
     JSONObject json = (JSONObject) parser.parse(response);
-    assertEquals("v1.11.0", json.get("default"));
+    assertEquals("v1.12.0", json.get("default"));
   }
 
 }

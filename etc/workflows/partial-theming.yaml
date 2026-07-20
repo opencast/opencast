@@ -119,7 +119,7 @@ operations:
     configurations:
       - subtitle-source-flavor: chapters/trimmed
       - target-flavor: chapters/shifted
-      - video-source-flavor: branding/bumper
+      - video-source-flavors: branding/bumper
 
   - id: tag
     if: NOT ${theme_bumper_active}

@@ -71,6 +71,7 @@ import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
+import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
@@ -1348,7 +1349,7 @@ public class IndexServiceImpl implements IndexService {
           updateWorkflowInstance(instance);
         } catch (WorkflowException e) {
           throw new IndexServiceException("Unable to update workflow event " + id + " with metadata "
-              + RestUtils.getJsonStringSilent(MetadataJson.listToJson(metadataList, true)), e);
+              + RestUtils.getJsonStringSilent(MetadataJson.listToJson(metadataList, true, false)), e);
         }
         break;
       case ARCHIVE:
@@ -1362,7 +1363,7 @@ public class IndexServiceImpl implements IndexService {
               Optional.of(mediaPackage), Optional.empty(), Optional.empty());
         } catch (SchedulerException e) {
           throw new IndexServiceException("Unable to update scheduled event " + id + " with metadata "
-              + RestUtils.getJsonStringSilent(MetadataJson.listToJson(metadataList, true)), e);
+              + RestUtils.getJsonStringSilent(MetadataJson.listToJson(metadataList, true, false)), e);
         }
         break;
       default:
@@ -1461,11 +1462,11 @@ public class IndexServiceImpl implements IndexService {
   @Override
   public EventRemovalResult removeEvent(Event event, String retractWorkflowId)
           throws UnauthorizedException, WorkflowDatabaseException, NotFoundException {
-    final boolean hasOnlyEngageLive = event.getPublications().size() == 1
-        && EventUtils.ENGAGE_LIVE_CHANNEL_ID.equals(event.getPublications().get(0).getChannel());
-    final boolean retract = event.hasPreview()
-        || (!event.getPublications().isEmpty()  && !hasOnlyEngageLive && this.hasSnapshots(event.getIdentifier()));
-    if (retract) {
+    Set<Publication> filteredPublications = event.getPublications().stream()
+        .filter(pub -> !pub.getChannel().equals(EventUtils.ENGAGE_LIVE_CHANNEL_ID))
+        .collect(Collectors.toSet());
+
+    if (!filteredPublications.isEmpty() && this.hasSnapshots(event.getIdentifier())) {
       retractAndRemoveEvent(event.getIdentifier(), retractWorkflowId);
       return EventRemovalResult.RETRACTING;
     } else {
@@ -1571,7 +1572,7 @@ public class IndexServiceImpl implements IndexService {
     if ((removedScheduler || notFoundScheduler) && (removedWorkflow || notFoundWorkflow)
             && (removedArchive || notFoundArchive)) {
       try {
-        elasticsearchIndex.deleteEvent(id, securityService.getOrganization().getId());
+        elasticsearchIndex.deleteEvent(id, securityService.getOrganization());
       } catch (SearchIndexException e) {
         logger.error("Removing event {} from the {} index failed", id, elasticsearchIndex.getIndexName(), e);
       }
@@ -2052,7 +2053,7 @@ public class IndexServiceImpl implements IndexService {
   private void checkSeriesExists(String seriesID, ElasticsearchIndex index)
           throws NotFoundException, IndexServiceException {
     try {
-      Optional<Series> optSeries = index.getSeries(seriesID, securityService.getOrganization().getId(),
+      Optional<Series> optSeries = index.getSeries(seriesID, securityService.getOrganization(),
           securityService.getUser());
       if (optSeries.isEmpty()) {
         throw new NotFoundException("Cannot find a series with id " + seriesID);

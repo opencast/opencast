@@ -68,10 +68,12 @@ public final class Checksum implements Serializable {
    *          the type
    */
   private Checksum(String value, ChecksumType type) {
-    if (value == null)
+    if (value == null) {
       throw new IllegalArgumentException("Checksum value is null");
-    if (type == null)
+    }
+    if (type == null) {
       throw new IllegalArgumentException("Checksum type is null");
+    }
     this.value = value;
     this.type = type;
   }
@@ -107,10 +109,11 @@ public final class Checksum implements Serializable {
       int halfbyte = (data[i] >>> 4) & 0x0F;
       int twoHalfs = 0;
       do {
-        if ((0 <= halfbyte) && (halfbyte <= 9))
+        if ((0 <= halfbyte) && (halfbyte <= 9)) {
           buf.append((char) ('0' + halfbyte));
-        else
+        } else {
           buf.append((char) ('a' + (halfbyte - 10)));
+        }
         halfbyte = data[i] & 0x0F;
       } while (twoHalfs++ < 1);
     }
