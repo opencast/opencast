@@ -18,9 +18,10 @@
  * the License.
  *
  */
-package org.opencastproject.basicstatistics.endpoint;
+package org.opencastproject.basicstatisticssecret.endpoint;
 
-import org.opencastproject.basicstatistics.BasicStatisticsSecretService;
+import org.opencastproject.basicstatisticssecret.api.BasicStatisticsSecretService;
+import org.opencastproject.basicstatisticssecret.api.BasicStatisticsSecretServiceException;
 import org.opencastproject.util.doc.rest.RestService;
 
 import org.osgi.service.component.annotations.Component;
@@ -44,14 +45,14 @@ import javax.ws.rs.core.Response;
 @Component(
     property = {
         "service.description=Basic Statistics Internal REST Endpoint",
-        "opencast.service.type=org.opencastproject.basicstatistics",
+        "opencast.service.type=org.opencastproject.basicstatisticssecret",
         "opencast.service.path=/basicstatistics-internal",
         "opencast.service.jobproducer=false"
     },
     immediate = true,
-    service = BasicStatisticsInternalRestEndpoint.class
+    service = BasicStatisticsSecretRestEndpoint.class
 )
-@Path("/basicstatistics-internal")
+@Path("/basicstatistics-secret")
 @RestService(
     name = "BasicStatisticsInternalEndpoint",
     title = "Basic Statistics Internal Endpoint",
@@ -67,9 +68,9 @@ import javax.ws.rs.core.Response;
     }
 )
 @JaxrsResource
-public class BasicStatisticsInternalRestEndpoint {
+public class BasicStatisticsSecretRestEndpoint {
   /** The logger */
-  private static final Logger logger = LoggerFactory.getLogger(BasicStatisticsInternalRestEndpoint.class);
+  private static final Logger logger = LoggerFactory.getLogger(BasicStatisticsSecretRestEndpoint.class);
 
   /** The service */
   protected BasicStatisticsSecretService basicStatisticsSecretService;
@@ -77,7 +78,7 @@ public class BasicStatisticsInternalRestEndpoint {
   @GET
   @Path("daily-secret")
   @Produces(MediaType.TEXT_PLAIN)
-  public Response getDailySecret() {
+  public Response getDailySecret() throws BasicStatisticsSecretServiceException {
     return Response.ok(Base64.getEncoder().encodeToString(basicStatisticsSecretService.getCurrentSecret()))
       .build();
   }
