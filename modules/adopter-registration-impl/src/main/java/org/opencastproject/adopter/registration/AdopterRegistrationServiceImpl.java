@@ -292,6 +292,7 @@ public class AdopterRegistrationServiceImpl extends TimerTask {
         sender.deleteStatistics(sd.jsonify());
         sender.deleteGeneralData(gd.jsonify());
         markForDeletion();
+        delete();
       } catch (IOException e) {
         logger.warn("Error occurred while deleting registration data, will retry", e);
       }
