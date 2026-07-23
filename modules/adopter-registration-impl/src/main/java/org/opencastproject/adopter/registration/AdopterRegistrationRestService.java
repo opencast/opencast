@@ -108,9 +108,9 @@ public class AdopterRegistrationRestService {
   }
 
   @GET
-  @Path("summary")
+  @Path("statistics")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getsummary", description = "GETs the adopter registration statistics data.",
+  @RestQuery(name = "getstatistics", description = "GETs the adopter registration statistics data.",
       responses = {
           @RestResponse(description = "Retrieved statistic data.",
               responseCode = HttpServletResponse.SC_OK),
@@ -121,7 +121,7 @@ public class AdopterRegistrationRestService {
   public Response getAdopterStatistics() {
     logger.debug("Retrieving adopter registration statistics data.");
     try {
-      return Response.ok(registrationService.getRegistrationDataAsString()).build();
+      return Response.ok(registrationService.getStatsDataAsString()).build();
     } catch (Exception e) {
       return Response.serverError().build();
     }

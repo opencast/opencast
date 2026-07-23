@@ -336,13 +336,12 @@ public class AdopterRegistrationServiceImpl extends TimerTask {
     }
   }
 
-  public String getRegistrationDataAsString() throws Exception {
+  public String getStatsDataAsString() throws Exception {
     Adopter adopter = get();
     if (null == adopter) {
       adopter = new Adopter();
     }
     Map<String, Object> map = new LinkedHashMap<>();
-    map.put("general", new GeneralData(adopter));
     map.put("statistics", collectStatisticData(adopter.getAdopterKey(), adopter.getStatisticKey()));
     db.exec(em -> {
       TypedQuery<AdopterRegistrationExtra> q =
