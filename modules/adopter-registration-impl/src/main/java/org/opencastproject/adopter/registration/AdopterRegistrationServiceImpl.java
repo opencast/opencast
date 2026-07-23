@@ -253,7 +253,11 @@ public class AdopterRegistrationServiceImpl extends TimerTask {
   }
 
   public Adopter get() throws AdopterRegistrationException {
-    return db.exec(namedQuery.findOpt("Adopter.findAll", Adopter.class)).orElse(null);
+    Adopter a = db.exec(namedQuery.findOpt("Adopter.findAll", Adopter.class)).orElse(null);
+    if (a != null && a.getTermsVersionAgreed() != Adopter.getLatestTermsOfUse()) {
+      a.setAgreedToPolicy(false);
+    }
+    return a;
   }
 
   /**
