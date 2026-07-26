@@ -13,12 +13,17 @@ post {
 body:multipart-form {
   flavor: attachment/notes
   mediaPackage: {{mediaPackage_A}}
-  BODY: @file(track.mp4)
+  BODY: @file(test.mp4) @contentType(video/mp4)
 }
 
 assert {
   res.status: eq 200
   res.headers["content-type"]: contains xml
+}
+
+script:post-response {
+  const body = res.getBody();
+  bru.setVar("mediaPackage_A", body);
 }
 
 tests {
@@ -29,9 +34,4 @@ tests {
     expect(body).to.include("type=\"attachment/notes\"");
     expect(body).to.include("<attachment");
   });
-}
-
-script:post-response {
-  const body = res.getBody();
-  bru.setVar("mediaPackage_A", body);
 }

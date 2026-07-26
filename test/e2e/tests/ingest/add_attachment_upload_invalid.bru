@@ -13,7 +13,7 @@ post {
 body:multipart-form {
   flavor: attachment/notes
   mediaPackage: invalid-xml-string
-  BODY: @file(track.mp4)
+  BODY: @file(test.mp4) @contentType(video/mp4)
 }
 
 assert {

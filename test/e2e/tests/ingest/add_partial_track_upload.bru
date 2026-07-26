@@ -14,12 +14,22 @@ body:multipart-form {
   flavor: presentation/source
   startTime: 5000
   mediaPackage: {{mediaPackage_A}}
-  BODY: @file(track.mp4)
+  BODY: @file(test.mp4) @contentType(video/mp4)
 }
 
 assert {
   res.status: eq 200
   res.headers["content-type"]: contains xml
+}
+
+script:post-response {
+  const body = res.getBody();
+  const urlMatch = body.match(/<url>([^<]+?\/test\.mp4)<\/url>/);
+  if (urlMatch) {
+    const partialTrackUrl = urlMatch[1];
+    bru.setVar("partialTrackUrl_A", partialTrackUrl);
+    bru.setVar("mediaPackage_A", body);
+  }
 }
 
 tests {
@@ -30,17 +40,7 @@ tests {
     expect(body).to.include("<track");
     
     // Extract the track URL
-    const urlMatch = body.match(/<url>([^<]+?\/track\.mp4)<\/url>/);
+    const urlMatch = body.match(/<url>([^<]+?\/test\.mp4)<\/url>/);
     expect(urlMatch).to.not.be.null;
   });
-}
-
-script:post-response {
-  const body = res.getBody();
-  const urlMatch = body.match(/<url>([^<]+?\/track\.mp4)<\/url>/);
-  if (urlMatch) {
-    const partialTrackUrl = urlMatch[1];
-    bru.setVar("partialTrackUrl_A", partialTrackUrl);
-    bru.setVar("mediaPackage_A", body);
-  }
 }
