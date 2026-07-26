@@ -190,8 +190,8 @@ jobs:
         with:
           name: bruno-test-reports
           path: |
-            docs/bruno_api_tests/results.html
-            docs/bruno_api_tests/results.xml
+            test/e2e/results.html
+            test/e2e/results.xml
 
       - name: show admin logs
         if: always()
