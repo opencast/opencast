@@ -174,10 +174,10 @@ jobs:
       - name: run bruno tests
         if: matrix.java == 21
         continue-on-error: true
-        working-directory: docs/bruno_api_tests
+        working-directory: test/e2e
         run: |
           npx -y @usebruno/cli run Tests -r \
-            --env Opencast-Develop \
+            --env opencast_develop \
             --env-var baseUrl=http://localhost:8080 \
             --env-var searchBaseUrl=http://localhost:8081 \
             --env-var password=opencast \

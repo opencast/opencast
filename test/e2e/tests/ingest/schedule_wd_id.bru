@@ -1,0 +1,25 @@
+meta {
+  name: schedule_wd_id
+  type: http
+  seq: 28
+}
+
+post {
+  url: {{baseUrl}}/ingest/schedule/noop
+  body: multipartForm
+  auth: inherit
+}
+
+body:multipart-form {
+  mediaPackage: {{mediaPackage_E}}
+}
+
+assert {
+  res.status: in [200, 201]
+}
+
+tests {
+  test("Schedule media package with workflow ID should succeed", function() {
+    expect(res.status).to.be.oneOf([200, 201]);
+  });
+}

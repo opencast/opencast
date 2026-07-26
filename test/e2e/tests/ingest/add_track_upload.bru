@@ -1,0 +1,46 @@
+meta {
+  name: add_track_upload
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{baseUrl}}/ingest/addTrack
+  body: multipartForm
+  auth: inherit
+}
+
+body:multipart-form {
+  flavor: presentation/source
+  mediaPackage: {{mediaPackage_A}}
+  BODY: @file(track.mp4)
+}
+
+assert {
+  res.status: eq 200
+  res.headers["content-type"]: contains xml
+}
+
+tests {
+  test("Add track by upload should return augmented mediapackage", function() {
+    const body = res.getBody();
+    expect(body).to.be.a('string');
+    expect(body).to.include("<mediapackage");
+    expect(body).to.include("type=\"presentation/source\"");
+    expect(body).to.include("<track");
+    
+    // Extract the track URL
+    const urlMatch = body.match(/<url>([^<]+?\/track\.mp4)<\/url>/);
+    expect(urlMatch).to.not.be.null;
+  });
+}
+
+script:post-response {
+  const body = res.getBody();
+  const urlMatch = body.match(/<url>([^<]+?\/track\.mp4)<\/url>/);
+  if (urlMatch) {
+    const trackUrl = urlMatch[1];
+    bru.setVar("trackUrl_A", trackUrl);
+    bru.setVar("mediaPackage_A", body);
+  }
+}
