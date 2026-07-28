@@ -21,10 +21,17 @@
 
 package org.opencastproject.fsresources;
 
+import org.opencastproject.basicstatistics.BasicStatisticsService;
+import org.opencastproject.basicstatistics.EventType;
+import org.opencastproject.basicstatistics.FetchFileParameters;
+import org.opencastproject.basicstatistics.ItemType;
+import org.opencastproject.basicstatistics.RawEvent;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.StaticFileAuthorization;
 import org.opencastproject.util.ConfigurationException;
 import org.opencastproject.util.MimeTypes;
+
+import com.google.gson.Gson;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -44,7 +51,9 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.UnknownHostException;
 import java.nio.file.Paths;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -100,6 +109,15 @@ public class StaticResourceServlet extends HttpServlet {
   private SecurityService securityService = null;
 
   private List<StaticFileAuthorization> authorizations = new ArrayList<>();
+
+  private static final Gson GSON = new Gson();
+
+  private BasicStatisticsService statisticsService;
+
+  @Reference
+  public void setBasicStatisticsService(BasicStatisticsService service) {
+    this.statisticsService = service;
+  }
 
   /**
    * No-arg constructor
@@ -239,7 +257,18 @@ public class StaticResourceServlet extends HttpServlet {
 
     if ((((ranges == null) || (ranges.isEmpty())) && (req.getHeader("Range") == null)) || (ranges == FULL_RANGE)) {
       if (withBody) {
+        Instant requestTimestamp = Instant.now();
         IOException e = copyRange(new FileInputStream(file), resp.getOutputStream(), 0, file.length());
+        if (e == null) {
+          recordFileFetched(
+              contentType,
+              req,
+              requestTimestamp,
+              path,
+              0,
+              file.length()
+          );
+        }
         if (e != null) {
           try {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -272,7 +301,18 @@ public class StaticResourceServlet extends HttpServlet {
         } catch (IllegalStateException e) {
           logger.debug(e.getMessage(), e);
         }
+        Instant requestTimestamp = Instant.now();
         IOException e = copyRange(new FileInputStream(file), resp.getOutputStream(), range.start, range.end);
+        if (e == null) {
+          recordFileFetched(
+              contentType,
+              req,
+              requestTimestamp,
+              path,
+              range.start,
+              range.end
+          );
+        }
         if (e != null) {
           try {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
@@ -294,7 +334,18 @@ public class StaticResourceServlet extends HttpServlet {
       } catch (IllegalStateException e) {
         logger.debug(e.getMessage(), e);
       }
+      Instant requestTimestamp = Instant.now();
       copy(file, resp.getOutputStream(), ranges.iterator(), contentType);
+      for (Range range : ranges) {
+        recordFileFetched(
+            contentType,
+            req,
+            requestTimestamp,
+            path,
+            range.start,
+            range.end
+        );
+      }
     }
   }
 
@@ -537,6 +588,55 @@ public class StaticResourceServlet extends HttpServlet {
       start = 0;
       end = 0;
       length = 0;
+    }
+  }
+
+  /**
+   * Sends statistic events to the basic statistic service
+   * @param contentType Mimetype string for determining item type
+   * @param request http request to parse ip and user agent from
+   * @param timestamp time of the response
+   * @param path request path to parse mp id and element id from
+   * @param from range start
+   * @param to range end
+   */
+  private void recordFileFetched(
+      String contentType,
+      HttpServletRequest request,
+      Instant timestamp,
+      String path,
+      long from,
+      long to
+  ) {
+    // We only care about request that fetch "video" files for now
+    if (!contentType.startsWith("video/")
+        && !contentType.startsWith(MimeTypes.HLS.toString())
+        && !contentType.startsWith(MimeTypes.DASH.toString())) {
+      return;
+    }
+
+    String[] parts = path.split("/");
+
+    // TODO: Find a less brittle way to determine these
+    String mediaPackageId = parts[3];
+    String elementId = parts[4];
+
+    FetchFileParameters payload = new FetchFileParameters();
+    payload.setElem(elementId);
+    payload.setFrom(from);
+    payload.setTo(to);
+
+    RawEvent event = new RawEvent();
+    event.setTimestamp(timestamp);
+    event.setItemType(ItemType.VIDEO);
+    event.setItemId(mediaPackageId);
+    event.setEventType(EventType.FETCH_FILE);
+    event.setEventPayload(GSON.toJson(payload));
+
+    try {
+      statisticsService.recordFileFetched(event, request);
+    } catch (UnknownHostException | InternalError e) {
+      logger.warn("Cannot report statistics to basic statistics service", e);
     }
   }
 }

@@ -22,8 +22,8 @@ package org.opencastproject.basicstatistics;
 
 public class FetchFileParameters {
   private String elem; // (file) element ID, which is the path segment after the video ID
-  private Integer from; // start of byte range of what was downloaded. Non-range-request specify 0.
-  private Integer to; // end of byte range of what was downloaded. null if the request does not specify an end and the
+  private Long from; // start of byte range of what was downloaded. Non-range-request specify 0.
+  private Long to; // end of byte range of what was downloaded. null if the request does not specify an end and the
           // file server has no way to check what bytes were actually sent to the client.
 
   public String getElem() {
@@ -34,19 +34,19 @@ public class FetchFileParameters {
     this.elem = elem;
   }
 
-  public Integer getFrom() {
+  public Long getFrom() {
     return from;
   }
 
-  public void setFrom(Integer from) {
+  public void setFrom(Long from) {
     this.from = from;
   }
 
-  public Integer getTo() {
+  public Long getTo() {
     return to;
   }
 
-  public void setTo(Integer to) {
+  public void setTo(Long to) {
     this.to = to;
   }
 }
