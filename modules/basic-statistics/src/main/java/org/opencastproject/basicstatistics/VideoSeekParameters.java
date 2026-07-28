@@ -20,16 +20,14 @@
  */
 package org.opencastproject.basicstatistics;
 
-import java.time.Instant;
-
 public class VideoSeekParameters {
-  private Instant to; // time in the video that was jumped to
+  private long to; // time in the video that was jumped to
 
-  public Instant getTo() {
+  public long getTo() {
     return to;
   }
 
-  public void setTo(Instant to) {
+  public void setTo(long to) {
     this.to = to;
   }
 }

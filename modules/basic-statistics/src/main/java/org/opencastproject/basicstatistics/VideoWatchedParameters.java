@@ -20,25 +20,23 @@
  */
 package org.opencastproject.basicstatistics;
 
-import java.time.Instant;
-
 public class VideoWatchedParameters {
-  private Instant from;
-  private Instant to;
+  private long from;
+  private long to;
 
-  public Instant getFrom() {
+  public long getFrom() {
     return from;
   }
 
-  public void setFrom(Instant from) {
+  public void setFrom(long from) {
     this.from = from;
   }
 
-  public Instant getTo() {
+  public long getTo() {
     return to;
   }
 
-  public void setTo(Instant to) {
+  public void setTo(long to) {
     this.to = to;
   }
 }
