@@ -81,9 +81,7 @@ public class BasicStatisticsSecretServiceImpl implements BasicStatisticsSecretSe
 
       CronTrigger trigger = new CronTrigger();
       trigger.setName("basicstatistics-secret-rotation-trigger");
-      // TODO: Change this back
-      trigger.setCronExpression("0/10 * * * * ?");
-      //trigger.setCronExpression("0 0 4 * * ?");
+      trigger.setCronExpression("0 0 4 * * ?");
 
       quartz.scheduleJob(job, trigger);
 

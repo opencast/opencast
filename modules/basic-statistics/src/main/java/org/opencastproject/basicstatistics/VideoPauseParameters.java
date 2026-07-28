@@ -20,16 +20,14 @@
  */
 package org.opencastproject.basicstatistics;
 
-import java.time.Instant;
-
 public class VideoPauseParameters {
-  private Instant at; // when the user paused or resumed playback
+  private long at; // when the user paused or resumed playback
 
-  public Instant getAt() {
+  public long getAt() {
     return at;
   }
 
-  public void setAt(Instant at) {
+  public void setAt(long at) {
     this.at = at;
   }
 }

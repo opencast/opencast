@@ -578,6 +578,9 @@
     <feature>opencast-services-processing-heavy-load</feature>
     <feature>opencast-services-processing-light-load</feature>
 
+    <bundle start-level="82">mvn:org.opencastproject/opencast-basic-statistics/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-basic-statistics-secret-api/${project.version}</bundle>
+    <bundle start-level="82">mvn:org.opencastproject/opencast-basic-statistics-secret-remote/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-publication-service-api/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-publication-service-youtube-v3/${project.version}</bundle>
     <bundle start-level="82">mvn:org.opencastproject/opencast-runtime-info-ui/${project.version}</bundle>
