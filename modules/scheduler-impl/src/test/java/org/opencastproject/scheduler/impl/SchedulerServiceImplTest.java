@@ -805,7 +805,7 @@ public class SchedulerServiceImplTest {
     assertTrue(schedSvc.getCaptureAgentConfiguration(randomMpId).size() >= caProperties.size());
   }
 
-  @Test(expected = SchedulerConflictException.class)
+  @Test(expected = SchedulerException.class)
   public void testAddMultipleEventsConflict() throws Exception {
     for (int i = 0; i < 2; i++) {
       final RRule rrule = new RRule("FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR;BYHOUR=7;BYMINUTE=30");

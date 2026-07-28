@@ -872,6 +872,12 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         notFoundInDatabase = true;
       }
 
+      // If the mediapackage has been processed, don't remove it elsewhere
+      Optional<Snapshot> latestSnapshot = assetManager.getLatestSnapshot(mediaPackageId);
+      if (latestSnapshot.get().getOwner() != SNAPSHOT_OWNER) {
+        return;
+      }
+
       // Delete scheduler snapshot
       long deletedSnapshots = assetManager.deleteSnapshots(mediaPackageId);
       notFoundInAssetManager = deletedSnapshots == 0;
