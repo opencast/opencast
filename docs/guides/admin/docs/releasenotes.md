@@ -1,5 +1,14 @@
 # Opencast 18: Release Notes
 
+## Opencast 18.9
+
+This release includes two security fixes:
+
+- [GHSA-m6c8-jcw2-5r25](https://github.com/opencast/opencast/security/advisories/GHSA-m6c8-jcw2-5r25) resolves a XSS
+  issue in Paella.
+- [GHSA-6f53-jp7x-gg7p](https://github.com/opencast/opencast/security/advisories/GHSA-6f53-jp7x-gg7p) resolves a
+  session fixation issue which allowed for account takeovers via malicious links.
+
 ## Opencast 18.8
 
 This release includes a fix for an encoding profile used by

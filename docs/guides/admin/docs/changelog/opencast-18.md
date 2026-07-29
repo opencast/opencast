@@ -1,6 +1,10 @@
 Opencast 18 Changelog
 ---------------------
 
+## Opencast 18.9 (2026-07-29)
+- [[#7739](https://github.com/opencast/opencast/pull/7739)] -
+  Update paella player 7
+
 ## Opencast 18.8 (2026-05-29)
 - [[#7637](https://github.com/opencast/opencast/pull/7637)] -
   Automatically update the git submodules
