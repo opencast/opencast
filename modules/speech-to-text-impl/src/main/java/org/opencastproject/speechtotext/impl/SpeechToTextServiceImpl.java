@@ -145,6 +145,7 @@ public class SpeechToTextServiceImpl extends AbstractJobProducer implements Spee
       translate = false;
     }
     URI subtitleFilesURI;
+    URI jsonURI;
     var name = String.format("job-%d", job.getId());
     var jobDir  = Path.of(workspace.rootDirectory(), "collection", COLLECTION, name).toFile();
 
@@ -161,12 +162,23 @@ public class SpeechToTextServiceImpl extends AbstractJobProducer implements Spee
       try (FileInputStream in = new FileInputStream(result.getSubtitleFile())) {
         subtitleFilesURI = workspace.putInCollection(COLLECTION, outputName, in);
       }
+
+      // also put json in collection
+      final var jsonOutputName = String.format("%d-%s.json", job.getId(),
+                                  FilenameUtils.getBaseName(mediaFile.getPath()));
+      final var jsonFile = FilenameUtils.removeExtension(result.getSubtitleFile().getAbsolutePath()) + ".json";
+
+      try (FileInputStream in = new FileInputStream(jsonFile)) {
+        jsonURI = workspace.putInCollection(COLLECTION, jsonOutputName, in);
+      }
     } catch (Exception e) {
       throw new SpeechToTextServiceException("Error while generating subtitle from " + mediaFile, e);
     } finally {
       FileUtils.deleteQuietly(jobDir);
     }
-    return subtitleFilesURI.toString() + "," + language + "," + speechToTextEngine.getEngineName();
+
+    return subtitleFilesURI.toString() + "," + language + "," + speechToTextEngine.getEngineName()
+                            + "," + jsonURI.toString();
   }
 
 
