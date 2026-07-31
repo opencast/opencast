@@ -11,34 +11,30 @@ npm ci
 npm run start
 ```
 
-To provide the necessary REST endpoints for testing while proxying requests to the tool itself, a mock server listening
-on [127.0.0.1:7878](http://127.0.0.1:7878) can be started. For this runn in addition to the command above:
+
+End-to-End Tests
+----------------
+
+The module comes with a suite of Playwright based integration tests under `tests/`.
+They start the React app themselves, serve the LTI REST endpoints from the JSON
+fixtures in `mock-server-api-data/` via a small mock/proxy server (`tests/mock-server.ts`),
+and run against that mocked data. The tests should usually suffice in determining
+if e.g. a library update works.
+
+Install the Playwright browser binaries once:
 
 ```sh
-npm run mock-proxy
+npx playwright install firefox
 ```
 
-
-Selenium Tests
---------------
-
-The module comes with a suite of basic Selenium based integration tests.
-The tests require Firefox and geckodriver to be installed.
-They automatically launch the React app and mock proxy and run against the mocked data.
-The tests should usually suffice in determining if e.g. a library update works.
-
-You can run them like this:
+Then run the tests:
 
 ```sh
-python -m venv venv
-. ./venv/bin/activate
-pip install -r requirements.txt
-
-./selenium-tests
+npm run test:e2e
 ```
 
-You can also run them with Firefoy in graphical mode:
+You can also run them interactively via Playwright's UI mode:
 
 ```sh
-./selenium-tests gui
+npm run test:e2e:ui
 ```
