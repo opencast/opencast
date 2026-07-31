@@ -20,11 +20,8 @@
  */
 package org.opencastproject.workflow.handler.workflow;
 
-import static org.opencastproject.metadata.dublincore.DublinCore.TERMS_NS_URI;
-
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.Catalog;
-import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
@@ -149,13 +146,15 @@ public class TagByDublinCoreTermWOH extends ResumableWorkflowOperationHandlerBas
 
     if (catalogs != null && catalogs.length > 0) {
       Boolean foundValue = false;
-      EName dcterm = new EName(TERMS_NS_URI, configuredDCTerm);
 
       // Find DCTerm
       for (Catalog catalog : catalogs) {
         DublinCoreCatalog dc = DublinCoreUtil.loadDublinCore(workspace, catalog);
         // Match Value
-        List<DublinCoreValue> values = dc.get(dcterm);
+        List<DublinCoreValue> values = dc.getProperties().stream()
+            .filter(property -> property.getLocalName().equals(configuredDCTerm))
+            .flatMap(property -> dc.get(property).stream())
+            .toList();
         if (values.isEmpty()) {
           // Use default
           if (configuredDefaultValue != null) {
