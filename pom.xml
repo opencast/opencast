@@ -31,7 +31,7 @@
     <elasticsearch.version>7.10.2</elasticsearch.version>
     <failureaccess.version>1.0.1</failureaccess.version>
     <freemarker.version>2.3.32</freemarker.version>
-    <graphql.version>21.5</graphql.version>
+    <graphql.version>26.0</graphql.version>
     <graphql-annotations.version>21.5</graphql-annotations.version>
     <graphql-java-extended-scalars.version>21.0</graphql-java-extended-scalars.version>
     <gson.version>2.13.2</gson.version>
