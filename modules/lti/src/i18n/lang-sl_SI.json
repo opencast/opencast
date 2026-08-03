@@ -47,10 +47,10 @@
     "EVENTS": {
       "DETAILS": {
         "METADATA": {
-          "LANGUAGE": "Language",
-          "LICENSE": "License",
-          "PRESENTERS": "Presenter(s)",
-          "TITLE": "Title"
+          "LANGUAGE": "Jezik",
+          "LICENSE": "Licenca",
+          "PRESENTERS": "Predavatelj(-i)",
+          "TITLE": "Naslov"
         }
       }
     }
