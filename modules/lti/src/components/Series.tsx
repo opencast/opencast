@@ -11,7 +11,7 @@ import { Loading } from "./Loading";
 import { withTranslation, WithTranslation } from "react-i18next";
 import "../App.css";
 import 'bootstrap/dist/css/bootstrap.css';
-import { LuTrash2, LuPencil, LuMessageSquare, LuDownload, LuChevronLeft, LuChevronRight, LuChevronsLeft, LuChevronsRight } from "react-icons/lu";
+import { LuTrash, LuPencil, LuMessageCircle, LuDownload, LuChevronLeft, LuChevronRight, LuChevronsLeft, LuChevronsRight } from "react-icons/lu";
 import * as i18next from "i18next";
 import { parsedQueryString, capitalize } from "../utils";
 import { sortByType } from "../trackUtils";
@@ -79,7 +79,7 @@ const SeriesEpisode: React.FC<EpisodeProps> = ({episode, deleteCallback, editCal
             <div className="ms-auto">
                 {deleteCallback !== undefined &&
                     <button onClick={(e) => { deleteCallback(episode.id); e.stopPropagation(); }}>
-                        <LuTrash2 />
+                        <LuTrash />
                     </button>}
                 {editCallback !== undefined &&
                     <button onClick={(e) => { editCallback(episode.id); e.stopPropagation(); }}>
@@ -87,7 +87,7 @@ const SeriesEpisode: React.FC<EpisodeProps> = ({episode, deleteCallback, editCal
                     </button>}
                 {annotateCallback !== undefined &&
                                     <button onClick={(e) => { annotateCallback(episode.id); e.stopPropagation(); }}>
-                                        <LuMessageSquare />
+                                        <LuMessageCircle />
                                     </button>}
                 {downloadCallback !== undefined && Array.isArray(episode.mediapackage.tracks) && episode.mediapackage.tracks.length > 0 &&
                   <Dropdown style={{display: 'inline-block'}}>
