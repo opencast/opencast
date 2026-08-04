@@ -104,8 +104,8 @@ the present files `event_mapping.json`, `series_mapping.json`, `theme_mapping.js
 
 [[#6696](https://github.com/opencast/opencast/pull/6696)] only requires an update to the indexed Elasticsearch/Opensearch
 ACLs if you haven't used this feature before. **If this feature was already enabled, no further actions are required.**
-If it was not enabled before upgrading, you can start the rebuild by calling the `/index/rebuild/AssetManager/ACL` and
-`/index/rebuild/Search` endpoints. These endpoints will reindex the event ACLs in both the AssetManager index and the
+If it was not enabled before upgrading, you can start the rebuild by calling the `/index/rebuild/AssetManager` and
+`/index/rebuild/Search` endpoints. These endpoints will reindex the events in both the AssetManager index and the
 Search index. For more information, see [here](configuration/episode-id-roles.md).
 
 [[#7477](https://github.com/opencast/opencast/pull/7477)] a fix applied in 18.6 re-enabled
