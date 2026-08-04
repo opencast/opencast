@@ -4,7 +4,7 @@
   "private": true,
   "homepage": "/ltitools",
   "dependencies": {
-    "@vitejs/plugin-react": "^6.0.0",
+    "@vitejs/plugin-react": "^6.0.5",
     "axios": "^1.13.6",
     "bootstrap": "^5.3.8",
     "i18next": "^26.3.6",
