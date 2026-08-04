@@ -359,28 +359,6 @@ Some workflow operation handlers can generate or import variables during a workf
 - [analyze-mediapackage](../workflowoperationhandlers/analyze-mediapackage-woh.md)
 - [import-wf-properties](../workflowoperationhandlers/import-wf-properties-woh.md)
 
-## Thumbnail Support
-
-The Admin UI comes with explicit support for thumbnails that are supposed to represent events visually, e.g. in lists
-of events as commonly used in video portals and other similar systems.
-To make it possible to implement the required processing and retain flexibility, the Admin UI will store the following
-information in variables of workflow instances:
-
-Variable          | Description
-:-----------------|:-----------
-thumbnailType     | The type of the thumbnail as number (see table below)
-thumbnailPosition | The time position in case of snapshot thumbnails
-thumbnailTrack    | The source track in case of snapshot thumbnails
-
-Thumbnail Type | Description
-:--------------|:-----------
-0              | The default thumbnail shall be extracted at a configured time position
-1              | The thumbnail has been uploaded and is stored in the asset manager as media package attachment
-2              | The thumbnail shall be extracted at a given time position from a given track
-
-To fully support the thumbnail feature, your workflows should take care of creating the different types of thumbnails
-and be consistent to the Admin UI thumbnail configuration (see [Thumbnail Configuration](admin-ui/thumbnails.md))
-
 ## Test the Workflow
 
 The easiest way to test a workflow is to just put it into the workflows folder where it will be picked up by Opencast
