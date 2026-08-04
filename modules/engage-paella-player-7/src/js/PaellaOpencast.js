@@ -105,7 +105,12 @@ const initParams = {
   repositoryUrl: getUrlFromOpencastServer('/search/episode.json'),
 
   getManifestUrl: (repoUrl, videoId) => {
-    return `${repoUrl}?id=${videoId}`;
+    let out =  `${repoUrl}?id=${videoId}`;
+    const jwt = new URLSearchParams(location.search).get('jwt');
+    if (jwt) {
+      out += `&jwt=${jwt}`;
+    }
+    return out;
   },
 
   getManifestFileUrl: (manifestUrl) => {
@@ -158,7 +163,7 @@ const initParams = {
       const data = await fetch(getUrlFromOpencastServer('/info/me.json'));
       const me = await data.json();
 
-      if (!me.roles.includes('ROLE_USER')) {
+      if (!me.roles.includes('ROLE_USER') && !new URLSearchParams(location.search).get('jwt')) {
         player.log.info('Video not found and user is not authenticated. Try to log in.');
         await redirectToAuthPage();
         // This Error should not happen, as the user is redirected to the auth page.

@@ -52,3 +52,56 @@ window.onload = async () => {
     paella.log.error(error);
   }
 };
+
+
+// Setup service worker to enable static file auth via JWT. We pass JWT and
+// video ID via query parameters in order to have them available in the SW
+// immediately. I know that typically, you want an unchanging URL for your SWs,
+// but that only applies to service workers that want to have a persistent state
+// as far as I can tell. This query parameter passing method is known and used.
+// Also, the SW is super tiny, so the additional fetches don't really matter.
+const params = new URLSearchParams(window.location.search);
+let refreshEnabled = params.get('jwtRefresh') === 'true';
+if (refreshEnabled && window.self === window.top) {
+  // eslint-disable-next-line no-console
+  console.warn('jwtRefresh=true given, but not running in iframe');
+  refreshEnabled = false;
+}
+const swUrl = `sw.js?${new URLSearchParams({
+  jwt: params.get('jwt'),
+  videoId: params.get('id'),
+  refresh: refreshEnabled,
+})}`;
+
+navigator.serviceWorker
+  .register(swUrl, { updateViaCache: 'none' })
+  // eslint-disable-next-line no-console
+  .catch(e => console.error('Failed to register service worker', e));
+
+
+
+// If JWT refresh is enabled, we need to forward messages between the host of
+// this iframe and the SW (as they cannot communicate directly).
+if (refreshEnabled) {
+  // Forward messages coming from the iframe host to the SW.
+  window.addEventListener('message', ev => {
+    if (ev.source !== window.parent) {
+      return;
+    }
+
+    const d = ev.data;
+    if (typeof d === 'object' && d?.type === 'oc-event-jwt' && typeof d?.jwt === 'string') {
+      const { type, jwt } = d;
+      navigator.serviceWorker.controller?.postMessage({ type, jwt });
+    }
+  });
+
+  // Forward messages coming from the SW to the iframe host.
+  navigator.serviceWorker.addEventListener('message', ev => {
+    const d = ev.data;
+    if (typeof d === 'object' && d?.type === 'oc-event-jwt-request' && typeof d?.event === 'string') {
+      const { type, event } = d;
+      window.parent.postMessage({ type, event }, '*');
+    }
+  });
+}
