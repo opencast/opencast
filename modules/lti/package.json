@@ -10,7 +10,7 @@
     "i18next": "^26.3.6",
     "i18next-browser-languagedetector": "^8.2.1",
     "query-string": "^9.3.1",
-    "react": "^19.2.6",
+    "react": "^19.2.8",
     "react-bootstrap": "^2.10.10",
     "react-dom": "^19.2.6",
     "react-i18next": "^17.0.9",
@@ -44,7 +44,7 @@
   "devDependencies": {
     "@playwright/test": "^1.62.0",
     "@types/node": "25.9.1",
-    "@types/react": "19.2.15",
+    "@types/react": "19.2.18",
     "@types/react-dom": "19.2.3",
     "vite": "^8.0.0"
   }
