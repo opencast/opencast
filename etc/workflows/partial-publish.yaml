@@ -213,6 +213,18 @@ operations:
   # Send the encoded material along with the metadata to the
   # publication channels.
   # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+
+  # Publish to internal
+  - id: publish-configure
+    exception-handler-workflow: partial-error
+    description: Publish to preview publication channel
+    configurations:
+      - download-source-tags: preview,editor
+      - download-source-flavors: '*/player+preview'
+      - channel-id: internal
+      - url-pattern: ${org_org_opencastproject_admin_ui_url!'http://localhost:8080'}/editor-ui/index.html?id=${event_id}
+      - check-availability: false
+
   # Publish to engage player
   - id: publish-engage
     max-attempts: 2
