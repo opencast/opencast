@@ -17,11 +17,6 @@
     <!-- Opencast dependencies -->
     <dependency>
       <groupId>org.opencastproject</groupId>
-      <artifactId>opencast-basic-statistics-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.opencastproject</groupId>
       <artifactId>opencast-basic-statistics-secret-api</artifactId>
       <version>${project.version}</version>
     </dependency>
