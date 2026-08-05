@@ -20,8 +20,6 @@
  */
 package org.opencastproject.workflow.handler.workflow;
 
-import static org.opencastproject.metadata.dublincore.DublinCore.TERMS_NS_URI;
-
 import org.opencastproject.job.api.JobContext;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.EName;
@@ -128,7 +126,7 @@ public class TagByDublinCoreTermWOH extends ResumableWorkflowOperationHandlerBas
     Optional<String> optConfiguredCatalogType = Optional.ofNullable(StringUtils.trimToNull(
         currentOperation.getConfiguration(DCCATALOG_TYPE_PROPERTY)));
     String catalogType = optConfiguredCatalogType.isPresent() ? optConfiguredCatalogType.get() : "dublincore";
-    String configuredDCTerm = StringUtils.trimToEmpty(currentOperation.getConfiguration(DCTERM_PROPERTY));
+    EName configuredDCTerm = EName.fromString(currentOperation.getConfiguration(DCTERM_PROPERTY));
     String configuredDefaultValue = StringUtils.trimToNull(currentOperation.getConfiguration(DEFAULT_VALUE_PROPERTY));
     String configuredMatchValue = StringUtils.trimToEmpty(currentOperation.getConfiguration(MATCH_VALUE_PROPERTY));
     List<MediaPackageElementFlavor> configuredTargetFlavor = tagsAndFlavors.getTargetFlavors();
@@ -149,13 +147,12 @@ public class TagByDublinCoreTermWOH extends ResumableWorkflowOperationHandlerBas
 
     if (catalogs != null && catalogs.length > 0) {
       Boolean foundValue = false;
-      EName dcterm = new EName(TERMS_NS_URI, configuredDCTerm);
 
       // Find DCTerm
       for (Catalog catalog : catalogs) {
         DublinCoreCatalog dc = DublinCoreUtil.loadDublinCore(workspace, catalog);
         // Match Value
-        List<DublinCoreValue> values = dc.get(dcterm);
+        List<DublinCoreValue> values = dc.get(configuredDCTerm);
         if (values.isEmpty()) {
           // Use default
           if (configuredDefaultValue != null) {

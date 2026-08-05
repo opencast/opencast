@@ -77,7 +77,7 @@ public class TagByDublinCoreTermWOHTest {
   public void testMatchPresentDCTerm() throws Exception {
     operation.setConfiguration(TagByDublinCoreTermWOH.SOURCE_FLAVORS_PROPERTY, "dublincore/*");
     operation.setConfiguration(TagByDublinCoreTermWOH.DCCATALOG_PROPERTY, "episode");
-    operation.setConfiguration(TagByDublinCoreTermWOH.DCTERM_PROPERTY, "publisher");
+    operation.setConfiguration(TagByDublinCoreTermWOH.DCTERM_PROPERTY, "{http://purl.org/dc/terms/}publisher");
     operation.setConfiguration(TagByDublinCoreTermWOH.MATCH_VALUE_PROPERTY, "University of Opencast");
     operation.setConfiguration(TagByDublinCoreTermWOH.TARGET_TAGS_PROPERTY, "tag1,tag2");
     operation.setConfiguration(TagByDublinCoreTermWOH.COPY_PROPERTY, "false");
@@ -95,7 +95,7 @@ public class TagByDublinCoreTermWOHTest {
     // Match == Default Value
     operation.setConfiguration(TagByDublinCoreTermWOH.SOURCE_FLAVORS_PROPERTY, "dublincore/*");
     operation.setConfiguration(TagByDublinCoreTermWOH.DCCATALOG_PROPERTY, "episode");
-    operation.setConfiguration(TagByDublinCoreTermWOH.DCTERM_PROPERTY, "source");
+    operation.setConfiguration(TagByDublinCoreTermWOH.DCTERM_PROPERTY, "{http://purl.org/dc/terms/}source");
     operation.setConfiguration(TagByDublinCoreTermWOH.DEFAULT_VALUE_PROPERTY, "Timbuktu");
     operation.setConfiguration(TagByDublinCoreTermWOH.MATCH_VALUE_PROPERTY, "Timbuktu");
     operation.setConfiguration(TagByDublinCoreTermWOH.TARGET_TAGS_PROPERTY, "tag1,tag2");
@@ -115,7 +115,7 @@ public class TagByDublinCoreTermWOHTest {
     // Match != Default Value
     operation.setConfiguration(TagByDublinCoreTermWOH.SOURCE_FLAVORS_PROPERTY, "dublincore/*");
     operation.setConfiguration(TagByDublinCoreTermWOH.DCCATALOG_PROPERTY, "episode");
-    operation.setConfiguration(TagByDublinCoreTermWOH.DCTERM_PROPERTY, "source");
+    operation.setConfiguration(TagByDublinCoreTermWOH.DCTERM_PROPERTY, "{http://purl.org/dc/terms/}source");
     operation.setConfiguration(TagByDublinCoreTermWOH.DEFAULT_VALUE_PROPERTY, "Cairo");
     operation.setConfiguration(TagByDublinCoreTermWOH.MATCH_VALUE_PROPERTY, "Timbuktu");
     operation.setConfiguration(TagByDublinCoreTermWOH.TARGET_TAGS_PROPERTY, "tag1,tag2");
@@ -134,7 +134,7 @@ public class TagByDublinCoreTermWOHTest {
     // No Default Value
     operation.setConfiguration(TagByDublinCoreTermWOH.SOURCE_FLAVORS_PROPERTY, "dublincore/*");
     operation.setConfiguration(TagByDublinCoreTermWOH.DCCATALOG_PROPERTY, "episode");
-    operation.setConfiguration(TagByDublinCoreTermWOH.DCTERM_PROPERTY, "source");
+    operation.setConfiguration(TagByDublinCoreTermWOH.DCTERM_PROPERTY, "{http://purl.org/dc/terms/}source");
     operation.setConfiguration(TagByDublinCoreTermWOH.MATCH_VALUE_PROPERTY, "Timbuktu");
     operation.setConfiguration(TagByDublinCoreTermWOH.TARGET_TAGS_PROPERTY, "tag1,tag2");
     operation.setConfiguration(TagByDublinCoreTermWOH.COPY_PROPERTY, "false");
@@ -153,7 +153,7 @@ public class TagByDublinCoreTermWOHTest {
     // without dcterm or default the match should always fail
     operation.setConfiguration(TagByDublinCoreTermWOH.SOURCE_FLAVORS_PROPERTY, "dublincore/*");
     operation.setConfiguration(TagByDublinCoreTermWOH.DCCATALOG_PROPERTY, "episode");
-    operation.setConfiguration(TagByDublinCoreTermWOH.DCTERM_PROPERTY, "source");
+    operation.setConfiguration(TagByDublinCoreTermWOH.DCTERM_PROPERTY, "{http://purl.org/dc/terms/}source");
     operation.setConfiguration(TagByDublinCoreTermWOH.TARGET_TAGS_PROPERTY, "tag1,tag2");
     operation.setConfiguration(TagByDublinCoreTermWOH.COPY_PROPERTY, "false");
 

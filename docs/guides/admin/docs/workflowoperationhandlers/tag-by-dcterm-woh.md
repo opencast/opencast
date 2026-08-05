@@ -27,7 +27,7 @@ Tags and flavors can be used in combination.
 |source-flavors    | "presentation/trimmed"                | Tag any media package elements with one of these (comma separated) flavors.                                                                                                                                                                                                                                      |EMPTY|
 |dccatalog         | "episode" or "series"                 | the subtype of catalog in which to search for dcterm                                                                                                                                                                                                                                                             |EMPTY|
 | dccatalog-type   | "dublincore"                          | the type of catalog in which to search for `dcterm`                                                                                                                                                                                                                                                              | "dublincore"  |
-|dcterm            | "creator"                             | the name of the Dublin Core term which to check                                                                                                                                                                                                                                                                  |EMPTY|
+|dcterm            | "{http://purl.org/dc/terms/}creator"  | the XML Expanded Name, consists of a namespace and the name of the Dublin Core term which to check                                                                                                                                                                                                                                                                  |EMPTY|
 |match-value       | "Joe Bloggs"                          | the Dublin Core term value to check for                                                                                                                                                                                                                                                                          |EMPTY|
 |default-value"    | "Anon"                                | the implied value if the dublincore term is not present in the catalog                                                                                                                                                                                                                                           |EMPTY|
 |target-tags       | "tagged,+engage" / "-engaged,+tagged" | Apply these (comma separated) tags to any media package elements. If a target-tag starts with a '-', it will be removed from preexisting tags, if a target-tag starts with a '+', it will be added to preexisting tags. If there is no prefix, all preexisting tags are removed and replaced by the target-tags. |EMPTY|
@@ -47,8 +47,10 @@ Will default to 'dublincore'.
 
 ### dcterm
 
-The name of the Dublin Core term to look for in the `dccatalog`. This could be one of the terms set by Opencast or an
-additional term adding to the catalog.
+The expanded name is a pair consisting of a namespace name and a local name.
+The local name is the name of the Dublin Core term to look for in the `dccatalog` and the namespace name is the name of
+the namespace it belongs to.
+The Dublin Core term could be one of the terms set by Opencast or an additional term adding to the catalog.
 
 ### match-value
 
@@ -71,7 +73,7 @@ Operation Example
     configurations:
       - source-flavors: dublincore/*,security/*
       - dccatalog: episode
-      - dcterm: audience
+      - dcterm: "{http://purl.org/dc/terms/}audience"
       - match-value: learning-difficulties
       - default-value: all-enrolled
       - target-tags: +publishBeforeEditing
