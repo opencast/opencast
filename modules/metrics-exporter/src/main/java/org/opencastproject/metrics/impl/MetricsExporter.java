@@ -44,8 +44,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.StringWriter;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletResponse;
@@ -132,6 +133,10 @@ public class MetricsExporter {
   private OrganizationDirectoryService organizationDirectoryService;
   private AssetManager assetManager;
 
+  private final Set<String> previousWorkflowOrganizations = new HashSet<>();
+  private final Set<JobLabel> previousJobLabels = new HashSet<>();
+  private record JobLabel(String host, String organization) { }
+
   @Activate
   public void activate(BundleContext bundleContext) {
     final Version version = bundleContext.getBundle().getVersion();
@@ -168,19 +173,44 @@ public class MetricsExporter {
     }
 
     // set workflows by organization
-    for (var entry: serviceRegistry.countActiveTypeByOrganization("START_WORKFLOW").entrySet()) {
+    final var workflows = serviceRegistry.countActiveTypeByOrganization("START_WORKFLOW");
+    for (var entry : workflows.entrySet()) {
       workflowsActive.labels(entry.getKey()).set(entry.getValue());
     }
 
-    // set jobs by organization and host
-    for (var entry: serviceRegistry.countActiveByOrganizationAndHost().entrySet()) {
-      final var org = entry.getKey();
-      for (Map.Entry<String, Long> orgEntry: entry.getValue().entrySet()) {
-        final var host = orgEntry.getKey();
-        final var count = orgEntry.getValue();
-        jobsActive.labels(host, org).set(count);
+    for (var organization : previousWorkflowOrganizations) {
+      if (!workflows.containsKey(organization)) {
+        workflowsActive.labels(organization).set(0);
       }
     }
+
+    previousWorkflowOrganizations.clear();
+    previousWorkflowOrganizations.addAll(workflows.keySet());
+
+    // set jobs by organization and host
+    final var jobs = serviceRegistry.countActiveByOrganizationAndHost();
+    final var currentJobLabels = new HashSet<JobLabel>();
+
+    for (var entry : jobs.entrySet()) {
+      final var organization = entry.getKey();
+
+      for (var orgEntry : entry.getValue().entrySet()) {
+        final var host = orgEntry.getKey();
+        final var count = orgEntry.getValue();
+
+        jobsActive.labels(host, organization).set(count);
+        currentJobLabels.add(new JobLabel(host, organization));
+      }
+    }
+
+    for (var label : previousJobLabels) {
+      if (!currentJobLabels.contains(label)) {
+        jobsActive.labels(label.host(), label.organization()).set(0);
+      }
+    }
+
+    previousJobLabels.clear();
+    previousJobLabels.addAll(currentJobLabels);
 
     // Get numbers from asset manager
     if (assetManager != null && organizationDirectoryService.getOrganizations().size() == 1) {
