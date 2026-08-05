@@ -47,6 +47,8 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * Take look in specified catalog for specified term, if the value matches the specified value add the target-tags
@@ -126,6 +128,17 @@ public class ConfigureByDublinCoreTermWOH extends ResumableWorkflowOperationHand
           if (configuredDefaultValue != null) {
             foundValue = configuredDefaultValue.equals(configuredMatchValue);
           }
+        } else if (isMatchValueValidRegex(configuredMatchValue)) { // When the match value is a Regex.
+          // We need to check each value to ensure it matches the Regex.
+          for (int i = 0; i < values.size(); i++) {
+            String valueString = values.get(i).getValue();
+            // If any of the values match the Regex, we consider it as found.
+            // We don't care about those that don't match here!
+            if (valueString.matches(configuredMatchValue)) {
+              foundValue = true;
+              break;
+            }
+          }
         } else {
           foundValue = values.contains(DublinCoreValue.mk(configuredMatchValue));
         }
@@ -153,5 +166,22 @@ public class ConfigureByDublinCoreTermWOH extends ResumableWorkflowOperationHand
     } // if catalogs
 
     return createResult(mediaPackage, Action.CONTINUE);
+  }
+
+  /**
+   * Ensures that the match value is a valid regex to check each dublin core values against.
+   * @param configuredMatchValue
+   * @return
+   */
+  private Boolean isMatchValueValidRegex(String configuredMatchValue) {
+    if (configuredMatchValue == null || configuredMatchValue.isBlank()) {
+      return false;
+    }
+    try {
+      Pattern.compile(configuredMatchValue);
+      return true;
+    } catch (PatternSyntaxException e) {
+      return false;
+    }
   }
 }
