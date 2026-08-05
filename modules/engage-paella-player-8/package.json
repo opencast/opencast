@@ -17,7 +17,7 @@
   },
   "devDependencies": {
     "@asicupv/paella-embedapi": "^2.12.1",
-    "@asicupv/paella-opencast-component": "^2.0.4",
+    "@asicupv/paella-opencast-component": "^2.0.5",
     "@tailwindcss/vite": "^4.1.11",
     "eslint-config-opencast": "file:../../docs/checkstyle/eslint-config",
     "express": "^5.1.0",
@@ -29,8 +29,8 @@
   "dependencies": {
     "@asicupv/paella-basic-plugins": "^2.6.2",
     "@asicupv/paella-extra-plugins": "^2.9.2",
-    "@asicupv/paella-opencast-core": "^2.0.5",
-    "@asicupv/paella-opencast-plugins": "^2.0.5",
+    "@asicupv/paella-opencast-core": "^2.0.6",
+    "@asicupv/paella-opencast-plugins": "^2.0.6",
     "@asicupv/paella-slide-plugins": "^2.6.2",
     "@asicupv/paella-video-plugins": "^2.5.3",
     "@asicupv/paella-webgl-plugins": "^2.4.2",
