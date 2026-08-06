@@ -99,12 +99,19 @@ public class AdopterRegistrationRestService {
   @RestQuery(name = "getregistrationform", description = "GETs the adopter registration data.", responses = {
           @RestResponse(description = "Retrieved registration data.",
                         responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "No registration data found.",
+                        responseCode = HttpServletResponse.SC_NOT_FOUND),
           @RestResponse(description = "Error while retrieving adopter registration data.",
                         responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
                         returnDescription = "GETs the adopter registration data.")
-  public String getRegistrationForm() {
+  public Response getRegistrationForm() {
     logger.debug("Retrieving adopter registration data.");
-    return gson.toJson(registrationService.get());
+    Adopter a = registrationService.get();
+    if (null != a) {
+      return Response.ok(gson.toJson(a)).build();
+    } else {
+      return Response.status(HttpServletResponse.SC_NOT_FOUND).build();
+    }
   }
 
   @GET
