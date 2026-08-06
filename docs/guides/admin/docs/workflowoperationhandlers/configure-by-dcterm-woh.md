@@ -33,9 +33,9 @@ Tags and flavors can be used in combination.
 
 The flavor subtype of Dublin Core catalog in which to look for the `dcterm`. This will usually be `episode` or `series`.
 
-### dccatalog
+### dccatalog-type
 
-The flavor type of Dublin Core catalog in which to look for the `dcterm`. This will usually be `episode` or `series`.
+The flavor type of Dublin Core catalog in which to look for the `dcterm`. This will usually be `dublincore`.
 Will default to 'dublincore'.
 
 ### dcterm

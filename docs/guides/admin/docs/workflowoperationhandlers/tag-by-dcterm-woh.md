@@ -40,9 +40,9 @@ Note: see [`tag` operation](tag-woh.md) for further explanation of the source/ta
 
 The flavor subtype of Dublin Core catalog in which to look for the `dcterm`. This will usually be `episode` or `series`.
 
-### dccatalog
+### dccatalog-type
 
-The flavor type of Dublin Core catalog in which to look for the `dcterm`. This will usually be `episode` or `series`.
+The flavor type of Dublin Core catalog in which to look for the `dcterm`. This will usually be `dublincore`.
 Will default to 'dublincore'.
 
 ### dcterm
