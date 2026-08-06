@@ -1,6 +1,22 @@
 Opencast 19 Changelog
 ---------------------
 
+## Opencast 19.8 (2026-08-12)
+- [[#7912](https://github.com/opencast/opencast/pull/7912)] -
+  19.8 changelog
+- [[#7872](https://github.com/opencast/opencast/pull/7872)] -
+  Fix duplicate userEntryPoint bean id for Shibboleth auth
+- [[#7802](https://github.com/opencast/opencast/pull/7802)] -
+  Update the paella-opencast-component and paella-opencast-core dependencies to their latest versions
+- [[#7790](https://github.com/opencast/opencast/pull/7790)] -
+  Fix captions not being published
+- [[#7788](https://github.com/opencast/opencast/pull/7788)] -
+  Fix timelinepreview error for events with captions track
+- [[#7752](https://github.com/opencast/opencast/pull/7752)] -
+  Changing `output-background` color code in partial-theming-watermark WF to a string
+- [[#7736](https://github.com/opencast/opencast/pull/7736)] -
+  Upgrade paella 8
+
 ## Opencast 19.7 (2026-07-14)
 - [[#7764](https://github.com/opencast/opencast/pull/7764)] -
   19.7 release notes
