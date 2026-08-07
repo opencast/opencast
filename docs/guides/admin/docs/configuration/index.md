@@ -54,7 +54,6 @@ A list of everything.
     - [Manual Asset Upload](admin-ui/asset-upload.md)
     - [Languages](admin-ui/languages.md)
     - [Statistics](admin-ui/statistics/statistics.overview.md)
-    - [Thumbnails](admin-ui/thumbnails.md)
 - Amazon Services
     - [Amazon S3 Archive Storage](awss3archive.md)
     - [Amazon S3 Distribution](awss3distribution.md)
@@ -102,6 +101,7 @@ A list of everything.
     - [Basic](terminationstate.md)
       - [AWS AutoScaling](terminationstate.aws.autoscaling.md)
 - [Text Extraction](textextraction.md)
+- [Thumbnails](thumbnails.md)
 - [Timeline Previews](timelinepreviews.md)
 - Transcription configuration:
     - [AmberScript](transcription.configuration/amberscripttranscripts.md)

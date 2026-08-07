@@ -98,7 +98,6 @@ nav:
               - Overview: 'configuration/admin-ui/statistics/statistics.overview.md'
               - InfluxDB Statistics Provider: 'configuration/admin-ui/statistics/influxdb-statistics-provider.md'
               - Matomo Statistics Provider: 'configuration/admin-ui/statistics/matomo-statistics-provider.md'
-          - Thumbnails: "configuration/admin-ui/thumbnails.md"
           - Imprint and Privacy Statement: "configuration/admin-ui/about.md"
           - Terms of Use: "configuration/admin-ui/terms.md"
       - Amazon Services:
@@ -169,6 +168,7 @@ nav:
           - Basic: "configuration/terminationstate.md"
           - AWS AutoScaling: "configuration/terminationstate.aws.autoscaling.md"
       - Text Extraction: "configuration/textextraction.md"
+      - Thumbnails: "configuration/thumbnails.md"
       - Timeline Previews: "configuration/timelinepreviews.md"
       - Tobira: "configuration/tobira.md"
       - Transcription configuration:
