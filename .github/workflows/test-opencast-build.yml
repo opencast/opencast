@@ -176,7 +176,7 @@ jobs:
         continue-on-error: true
         working-directory: test/e2e
         run: |
-          npx -y @usebruno/cli run Tests -r \
+          npx -y @usebruno/cli run tests -r \
             --env opencast_develop \
             --env-var baseUrl=http://localhost:8080 \
             --env-var searchBaseUrl=http://localhost:8081 \
