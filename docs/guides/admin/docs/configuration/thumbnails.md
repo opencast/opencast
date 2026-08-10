@@ -54,8 +54,8 @@ If a media package contains preview thumbnails for more than one flavor type (e.
 `presenter/search+preview` and `presentation/search+preview`), which one gets shown is decided
 independently by each UI component and is not currently consistent across Opencast:
 
-- The Engage UI search results view and Paella Player 8 prefer `presentation/*+preview` over
-  `presenter/*+preview` when both exist.
+- The Engage UI search results view and Paella Player 8 prefer `presentation/search+preview` over
+  `presenter/search+preview` when both exist.
 - The LTI series list and the Tobira integration do not distinguish between flavor types at all
   and will pick whichever matching attachment happens to come first in the media package.
 
