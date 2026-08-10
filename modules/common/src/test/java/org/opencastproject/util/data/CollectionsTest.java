@@ -25,7 +25,6 @@ package org.opencastproject.util.data;
 import static org.junit.Assert.assertArrayEquals;
 import static org.opencastproject.util.data.Arrays.append;
 import static org.opencastproject.util.data.Arrays.array;
-import static org.opencastproject.util.data.Collections.list;
 
 import org.junit.Test;
 
@@ -33,14 +32,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class CollectionsTest {
-
-  @Test
-  public void testList() {
-    // compile test
-    list(1, new Object(), "hallo");
-    // does not compile
-    // List<String> y = list(1, new Object(), "hallo");
-  }
 
   @Test
   public void testArray() {
@@ -63,7 +54,7 @@ public class CollectionsTest {
 
   @Test
   public void testConcat() {
-    final List<List<Integer>> l = list(list(1), list(2, 3), List.<Integer>of(), list(9, 2, 1));
+    final List<List<Integer>> l = List.of(List.of(1), List.of(2, 3), List.<Integer>of(), List.of(9, 2, 1));
     final List<Integer> c = l.stream().flatMap(List::stream).collect(Collectors.toList());
     assertArrayEquals(array(1, 2, 3, 9, 2, 1), c.toArray(Integer[]::new));
   }

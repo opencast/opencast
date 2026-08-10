@@ -26,7 +26,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.opencastproject.util.data.Collections.list;
 
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.XMLCatalogImpl.CatalogEntry;
@@ -193,7 +192,7 @@ public class DublinCoreCatalogTest {
     List<Map<EName, String>> attributes = dc1.getEntriesSorted().stream()
         .map(CatalogEntry::getAttributes)
         .collect(Collectors.toList());
-    assertEquals("Attribute order", attributes, list(
+    assertEquals("Attribute order", attributes, List.of(
         Map.of(),
         Map.of(EName.mk(XMLConstants.XML_NS_URI, "lang"), "de"),
         Map.of(EName.mk(XMLConstants.XML_NS_URI, "lang"), "de",

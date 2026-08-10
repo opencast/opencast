@@ -46,7 +46,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
 import org.opencastproject.serviceregistry.api.UndispatchableJobException;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Collections;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -78,7 +77,7 @@ public class OaiPmhPublicationServiceImplTest {
   public void setUp() throws Exception {
     mp = MediaPackageSupport.loadFromClassPath("/mediapackage.xml");
     mp2 = MediaPackageSupport.loadFromClassPath("/mediapackage2.xml");
-    validOaiPmhRepositories = Collections.list("default");
+    validOaiPmhRepositories = List.of("default");
 
     OaiPmhServerInfo oaiPmhServerInfo = EasyMock.createNiceMock(OaiPmhServerInfo.class);
     EasyMock.expect(oaiPmhServerInfo.hasRepo(anyString()))

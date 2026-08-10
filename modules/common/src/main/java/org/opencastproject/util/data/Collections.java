@@ -21,11 +21,6 @@
 
 package org.opencastproject.util.data;
 
-import org.checkerframework.checker.units.qual.A;
-
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * This class provides functions to ease and secure the handling of collections by supporting a type safe -- at least to
  * the extent Java's type system allows -- immutable and more functional style.
@@ -37,14 +32,6 @@ import java.util.List;
 @Deprecated
 public final class Collections {
   private Collections() {
-  }
-
-  /** Create a list from an array. */
-  @SafeVarargs
-  public static <A> List<A> list(A... as) {
-    final List<A> t = new ArrayList<>();
-    java.util.Collections.addAll(t, as);
-    return t;
   }
 
 }

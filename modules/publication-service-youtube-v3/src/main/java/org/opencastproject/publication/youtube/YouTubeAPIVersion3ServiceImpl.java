@@ -24,7 +24,6 @@ package org.opencastproject.publication.youtube;
 import org.opencastproject.publication.youtube.auth.ClientCredentials;
 import org.opencastproject.publication.youtube.auth.OAuth2CredentialFactory;
 import org.opencastproject.publication.youtube.auth.OAuth2CredentialFactoryImpl;
-import org.opencastproject.util.data.Collections;
 
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.googleapis.media.MediaHttpUploader;
@@ -53,6 +52,7 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -79,7 +79,7 @@ public class YouTubeAPIVersion3ServiceImpl implements YouTubeAPIVersion3Service 
     snippet.setDescription(videoUpload.getDescription());
     final String[] tags = videoUpload.getTags();
     if (ArrayUtils.isNotEmpty(tags)) {
-      snippet.setTags(Collections.list(tags));
+      snippet.setTags(Arrays.asList(tags));
     }
     // Attach metadata to video object.
     videoObjectDefiningMetadata.setSnippet(snippet);
@@ -105,7 +105,7 @@ public class YouTubeAPIVersion3ServiceImpl implements YouTubeAPIVersion3Service 
     playlistSnippet.setTitle(title);
     playlistSnippet.setDescription(description);
     if (tags.length > 0) {
-      playlistSnippet.setTags(Collections.list(tags));
+      playlistSnippet.setTags(Arrays.asList(tags));
     }
     // Playlists are always public. The videos therein might be private.
     final PlaylistStatus playlistStatus = new PlaylistStatus();

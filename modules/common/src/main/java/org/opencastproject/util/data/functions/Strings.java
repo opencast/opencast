@@ -22,8 +22,6 @@
 
 package org.opencastproject.util.data.functions;
 
-import static org.opencastproject.util.data.Collections.list;
-
 import java.text.Format;
 import java.util.List;
 import java.util.Optional;
@@ -85,7 +83,7 @@ public final class Strings {
   public static List<String> trimToNil(String a) {
     if (a != null) {
       final String trimmed = a.trim();
-      return trimmed.length() > 0 ? list(trimmed) : NIL;
+      return trimmed.length() > 0 ? List.of(trimmed) : NIL;
     } else {
       return NIL;
     }
