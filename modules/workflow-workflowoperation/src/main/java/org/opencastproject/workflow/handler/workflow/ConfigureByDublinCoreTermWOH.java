@@ -38,6 +38,7 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -80,6 +81,9 @@ public class ConfigureByDublinCoreTermWOH extends ResumableWorkflowOperationHand
   /** Name of the configuration option that provides the copy boolean we are looking for */
   public static final String COPY_PROPERTY = "copy";
 
+  /** Name of the configuration option that enables regex matching. */
+  public static final String CHECK_REGEX = "check-regex";
+
   /**
    * Callback for declarative services configuration that will introduce us to the local workspace service.
    * Implementation assumes that the reference is configured as being static.
@@ -109,6 +113,7 @@ public class ConfigureByDublinCoreTermWOH extends ResumableWorkflowOperationHand
     String configuredDCTerm = StringUtils.trimToEmpty(currentOperation.getConfiguration(DCTERM_PROPERTY));
     String configuredDefaultValue = StringUtils.trimToNull(currentOperation.getConfiguration(DEFAULT_VALUE_PROPERTY));
     String configuredMatchValue = StringUtils.trimToEmpty(currentOperation.getConfiguration(MATCH_VALUE_PROPERTY));
+    boolean configuredCheckRegex = BooleanUtils.toBoolean(currentOperation.getConfiguration(CHECK_REGEX));
 
     // Find Catalog
     Catalog[] catalogs = mediaPackage
@@ -128,7 +133,7 @@ public class ConfigureByDublinCoreTermWOH extends ResumableWorkflowOperationHand
           if (configuredDefaultValue != null) {
             foundValue = configuredDefaultValue.equals(configuredMatchValue);
           }
-        } else if (isMatchValueValidRegex(configuredMatchValue)) { // When the match value is a Regex.
+        } else if (configuredCheckRegex && isMatchValueValidRegex(configuredMatchValue)) { // Checking regex.
           // We need to check each value to ensure it matches the Regex.
           for (int i = 0; i < values.size(); i++) {
             String valueString = values.get(i).getValue();
