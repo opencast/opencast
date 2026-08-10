@@ -20,8 +20,6 @@
  */
 package org.opencastproject.playlists;
 
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
-
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.api.SearchResult;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
@@ -39,6 +37,7 @@ import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
+import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.requests.SortCriterion;
 
@@ -170,8 +169,7 @@ public class PlaylistService {
   public List<Playlist> getAllForAdministrativeRead(Date from, Date to, int limit)
           throws IllegalStateException, UnauthorizedException {
     final var user = securityService.getUser();
-    final var orgAdminRole = securityService.getOrganization().getAdminRole();
-    if (!user.hasRole(GLOBAL_ADMIN_ROLE) && !user.hasRole(orgAdminRole)) {
+    if (!SecurityUtil.isAdmin(user, securityService.getOrganization())) {
       throw new UnauthorizedException("Only (org-)admins can call this method");
     }
 
@@ -456,11 +454,10 @@ public class PlaylistService {
   private boolean checkPermission(Playlist playlist, Permissions.Action action) {
     User currentUser = securityService.getUser();
     Organization currentOrg = securityService.getOrganization();
-    String currentOrgAdminRole = currentOrg.getAdminRole();
-    String currentOrgId = currentOrg.getId();
 
-    return currentUser.hasRole(GLOBAL_ADMIN_ROLE)
-        || (currentUser.hasRole(currentOrgAdminRole) && currentOrgId.equals(playlist.getOrganization()))
+    return SecurityUtil.isGlobalAdmin(currentUser)
+        || (currentOrg.getId().equals(playlist.getOrganization())
+            && SecurityUtil.isOrganizationAdmin(currentUser, currentOrg))
         || authorizationService.hasPermission(getAccessControlList(playlist), action.toString());
   }
 

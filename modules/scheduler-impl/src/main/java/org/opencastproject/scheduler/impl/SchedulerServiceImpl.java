@@ -22,7 +22,6 @@ package org.opencastproject.scheduler.impl;
 
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.opencastproject.scheduler.impl.SchedulerUtil.calculateChecksum;
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.util.EqualsUtil.ne;
 import static org.opencastproject.util.RequireUtil.notEmpty;
 import static org.opencastproject.util.RequireUtil.notNull;
@@ -817,8 +816,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   private boolean isAdmin() {
-    return (securityService.getUser().hasRole(GLOBAL_ADMIN_ROLE)
-            || securityService.getUser().hasRole(securityService.getOrganization().getAdminRole()));
+    return SecurityUtil.isAdmin(securityService.getUser(), securityService.getOrganization());
   }
 
   private Optional<DublinCoreCatalog> loadEpisodeDublinCoreFromAsset(Snapshot snapshot) {
