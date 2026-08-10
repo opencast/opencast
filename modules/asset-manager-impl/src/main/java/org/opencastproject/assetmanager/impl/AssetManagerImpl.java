@@ -33,6 +33,7 @@ import org.opencastproject.assetmanager.api.Asset;
 import org.opencastproject.assetmanager.api.AssetId;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.AssetManagerException;
+import org.opencastproject.assetmanager.api.AssetManagerSecurityUtils;
 import org.opencastproject.assetmanager.api.Availability;
 import org.opencastproject.assetmanager.api.Property;
 import org.opencastproject.assetmanager.api.PropertyId;
@@ -150,7 +151,6 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
   public static final String WRITE_ACTION = "write";
   public static final String READ_ACTION = "read";
-  public static final String SECURITY_NAMESPACE = "org.opencastproject.assetmanager.security";
 
   private static final int EXPEXTED_HANDLERS_COUNT = 2;
 
@@ -451,11 +451,13 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       final AccessControlList acl = authorizationService.getActiveAcl(mp).getA();
       // store acl as properties
       // Drop old ACL rules
-      deleteProperties(mediaPackageId, SECURITY_NAMESPACE);
+      deleteProperties(mediaPackageId, AssetManagerSecurityUtils.SECURITY_NAMESPACE);
       // Set new ACL rules
       for (final AccessControlEntry ace : acl.getEntries()) {
-        getDatabase().saveProperty(Property.mk(PropertyId.mk(mediaPackageId, SECURITY_NAMESPACE,
-                mkPropertyName(ace.getRole(), ace.getAction())), Value.mk(ace.isAllow())));
+        String propertyName = AssetManagerSecurityUtils.mkPropertyName(ace.getRole(), ace.getAction());
+        PropertyId propertyId = PropertyId.mk(mediaPackageId, AssetManagerSecurityUtils.SECURITY_NAMESPACE,
+                propertyName);
+        getDatabase().saveProperty(Property.mk(propertyId, Value.mk(ace.isAllow())));
       }
 
       updateEventInIndex(snapshot);
@@ -1205,9 +1207,10 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
         // return authorizationService.hasPermission(getDatabase().getMediaPackage(mediaPackageId).get(), action);
         final List<String> roles = user.getRoles().parallelStream()
                 .filter(roleFilter)
-                .map((role) -> mkPropertyName(role.getName(), action))
+                .map((role) -> AssetManagerSecurityUtils.mkPropertyName(role.getName(), action))
                 .collect(Collectors.toList());
-        return getDatabase().selectProperties(mediaPackageId, SECURITY_NAMESPACE).parallelStream()
+        return getDatabase().selectProperties(mediaPackageId, AssetManagerSecurityUtils.SECURITY_NAMESPACE)
+                .parallelStream()
                 .map(p -> p.getId().getName())
                 .filter(p -> p.endsWith(action))
                 .anyMatch(p -> roles.stream().anyMatch(r -> r.equals(p)));
@@ -1234,19 +1237,11 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     }
   }
 
-  private String mkPropertyName(String role, String action) {
-    return role + " | " + action;
-  }
-
   /**
    * Configurable filter for roles
    */
-  private final java.util.function.Predicate<Role> roleFilter = (role) -> {
-    final String name = role.getName();
-    return (includeAPIRoles || !name.startsWith("ROLE_API_"))
-            && (includeCARoles  || !name.startsWith("ROLE_CAPTURE_AGENT_"))
-            && (includeUIRoles  || !name.startsWith("ROLE_UI_"));
-  };
+  private final java.util.function.Predicate<Role> roleFilter = (role) ->
+      AssetManagerSecurityUtils.isRoleAllowed(role.getName(), includeAPIRoles, includeCARoles, includeUIRoles);
 
   /*
    * Utility
