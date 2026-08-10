@@ -54,6 +54,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.regex.Pattern;
 
 /** WhisperC++ implementation of the Speech-to-text engine interface. */
 @Component(
@@ -69,6 +70,13 @@ public class WhisperCppEngine implements SpeechToTextEngine {
 
   /** Name of the engine. */
   private static final String engineName = "WhisperC++";
+
+  /**
+   * Matches WhisperC++ output reporting that a result file could not be written, e.g.
+   * {@code output_vtt: failed to open '/path/to/file.vtt' for writing}. WhisperC++ still exits
+   * with status 0 in that case, so its output is the only indication that something went wrong.
+   */
+  private static final Pattern OUTPUT_FAILURE_PATTERN = Pattern.compile("^output_\\w+: failed to open ");
 
   /** Config key for setting the path to WhisperC++. */
   private static final String WHISPERCPP_EXECUTABLE_PATH_CONFIG_KEY = "whispercpp.root.path";
@@ -581,10 +589,16 @@ public class WhisperCppEngine implements SpeechToTextEngine {
           .redirectOutput(ProcessBuilder.Redirect.PIPE);
       process = processBuilder.start();
 
+      // WhisperC++ reports failures to write its output files on stdout while still exiting
+      // successfully, so keep the lines that look like such a failure to report them later.
+      List<String> outputErrors = new ArrayList<>();
       try (BufferedReader in = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
         String line;
         while ((line = in.readLine()) != null) { // consume process output
           logger.debug(line);
+          if (OUTPUT_FAILURE_PATTERN.matcher(line).find()) {
+            outputErrors.add(line.trim());
+          }
         }
       }
 
@@ -599,6 +613,12 @@ public class WhisperCppEngine implements SpeechToTextEngine {
         }
         throw new SpeechToTextEngineException(
             String.format("Process exited abnormally with status %d (command: %s) %s", exitCode, command, error));
+      }
+
+      if (!outputErrors.isEmpty()) {
+        throw new SpeechToTextEngineException(
+            String.format("WhisperC++ failed to write its output (command: %s): %s",
+                command, String.join("; ", outputErrors)));
       }
     } finally {
       IoSupport.closeQuietly(process);
