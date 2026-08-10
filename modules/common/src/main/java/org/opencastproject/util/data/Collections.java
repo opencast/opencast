@@ -28,11 +28,9 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 /**
  * This class provides functions to ease and secure the handling of collections by supporting a type safe -- at least to
@@ -91,15 +89,6 @@ public final class Collections {
   @SuppressWarnings("unchecked")
   public static <A> List<A> nil(Class<A> type) {
     return java.util.Collections.EMPTY_LIST;
-  }
-
-  /** Create a set from a list. */
-  public static <A> Set<A> toSet(List<A> as) {
-    Set<A> r = new HashSet<>(as.size());
-    for (A a : as) {
-      r.add(a);
-    }
-    return r;
   }
 
   /** Create a map from a list of tuples (K, V). */

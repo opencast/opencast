@@ -133,9 +133,9 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
         break;
       case Replace:
         final Set<? extends MediaPackageElement> downloadElements =
-            Collections.toSet(MediaPackageElementParser.getArrayFromXml(job.getArguments().get(2)));
+            new HashSet<>(MediaPackageElementParser.getArrayFromXml(job.getArguments().get(2)));
         final Set<? extends MediaPackageElement> streamingElements =
-            Collections.toSet(MediaPackageElementParser.getArrayFromXml(job.getArguments().get(3)));
+            new HashSet<>(MediaPackageElementParser.getArrayFromXml(job.getArguments().get(3)));
         final Set<MediaPackageElementFlavor> retractDownloadFlavors = Arrays.stream(
             StringUtils.split(job.getArguments().get(4), SEPARATOR))
             .filter(s -> !s.isEmpty())
@@ -147,7 +147,7 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
             .map(MediaPackageElementFlavor::parseFlavor)
             .collect(Collectors.toSet());
         final Set<? extends MediaPackageElement> publications =
-            Collections.toSet(MediaPackageElementParser.getArrayFromXml(job.getArguments().get(6)));
+            new HashSet<>(MediaPackageElementParser.getArrayFromXml(job.getArguments().get(6)));
         checkAvailability = BooleanUtils.toBoolean(job.getArguments().get(7));
         publication = replace(job, mediaPackage, repository, downloadElements, streamingElements,
             retractDownloadFlavors, retractStreamingFlavors, publications, checkAvailability);
