@@ -23,7 +23,6 @@ package org.opencastproject.kernel.security;
 
 import static org.opencastproject.security.util.SecurityUtil.hostAndPort;
 import static org.opencastproject.util.data.Collections.map;
-import static org.opencastproject.util.data.Collections.toList;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.kernel.security.persistence.OrganizationDatabase;
@@ -366,7 +365,7 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
     public List<Organization> getAll() {
       synchronized (lock) {
         refresh();
-        return toList(byId.values());
+        return new ArrayList<>(byId.values());
       }
     }
 

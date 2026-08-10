@@ -23,29 +23,16 @@
 package org.opencastproject.util.data;
 
 import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.opencastproject.util.data.Arrays.append;
 import static org.opencastproject.util.data.Arrays.array;
 import static org.opencastproject.util.data.Collections.concat;
 import static org.opencastproject.util.data.Collections.list;
-import static org.opencastproject.util.data.Collections.toList;
 
 import org.junit.Test;
 
 import java.util.List;
 
 public class CollectionsTest {
-
-  @Test
-  public void testToList() {
-    List<Integer> i1 = toList(java.util.Collections.<Integer>emptyList().iterator());
-    assertTrue(i1.isEmpty());
-    List<Integer> i2 = toList(list(1, 2, 3).iterator());
-    assertEquals(3, i2.size());
-    List<Object> i3 = toList(list("1", 2, new Object()).iterator());
-    assertEquals(3, i3.size());
-  }
 
   @Test
   public void testList() {

@@ -57,7 +57,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
-import org.opencastproject.util.data.Collections;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -184,11 +183,11 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
       return serviceRegistry.createJob(JOB_TYPE, Operation.Replace.name(),
           Arrays.asList(MediaPackageParser.getAsXml(mediaPackage), // 0
               repository, // 1
-              MediaPackageElementParser.getArrayAsXml(Collections.toList(downloadElements)), // 2
-              MediaPackageElementParser.getArrayAsXml(Collections.toList(streamingElements)), // 3
+              MediaPackageElementParser.getArrayAsXml(new ArrayList<>(downloadElements)), // 2
+              MediaPackageElementParser.getArrayAsXml(new ArrayList<>(streamingElements)), // 3
               StringUtils.join(retractDownloadFlavors, SEPARATOR), // 4
               StringUtils.join(retractStreamingFlavors, SEPARATOR), // 5
-              MediaPackageElementParser.getArrayAsXml(Collections.toList(publications)), // 6
+              MediaPackageElementParser.getArrayAsXml(new ArrayList<>(publications)), // 6
               Boolean.toString(checkAvailability))); // 7
     } catch (ServiceRegistryException e) {
       throw new PublicationException("Unable to create job", e);

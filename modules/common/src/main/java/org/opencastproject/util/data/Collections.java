@@ -27,7 +27,6 @@ import org.checkerframework.checker.units.qual.K;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -54,20 +53,6 @@ public final class Collections {
       x.add(b);
     }
     return x;
-  }
-
-  /** Drain all elements of <code>as</code> into a list. */
-  public static <A> List<A> toList(Iterator<? extends A> as) {
-    final List<A> t = new ArrayList<>();
-    while (as.hasNext()) {
-      t.add(as.next());
-    }
-    return t;
-  }
-
-  /** Drain all elements of <code>as</code> into a list. */
-  public static <A> List<A> toList(Collection<A> as) {
-    return new ArrayList<>(as);
   }
 
   /** Create a list from an array. */
