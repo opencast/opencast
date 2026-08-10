@@ -23,7 +23,6 @@
 package org.opencastproject.util.data.functions;
 
 import static org.opencastproject.util.data.Collections.list;
-import static org.opencastproject.util.data.Collections.nil;
 
 import java.text.Format;
 import java.util.List;
@@ -36,7 +35,7 @@ public final class Strings {
   private Strings() {
   }
 
-  private static final List<String> NIL = nil();
+  private static final List<String> NIL = List.of();
   private static final Optional<String> NONE = Optional.empty();
 
   /**

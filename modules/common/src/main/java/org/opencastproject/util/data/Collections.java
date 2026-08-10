@@ -63,18 +63,6 @@ public final class Collections {
     return t;
   }
 
-  /** The empty list. */
-  @SuppressWarnings("unchecked")
-  public static <A> List<A> nil() {
-    return java.util.Collections.EMPTY_LIST;
-  }
-
-  /** The empty list. */
-  @SuppressWarnings("unchecked")
-  public static <A> List<A> nil(Class<A> type) {
-    return java.util.Collections.EMPTY_LIST;
-  }
-
   /** Create a map from a list of tuples (K, V). */
   @SafeVarargs
   public static <K, V> Map<K, V> map(Tuple<? extends K, ? extends V>... ts) {

@@ -63,7 +63,7 @@ public class CollectionsTest {
 
   @Test
   public void testConcat() {
-    final List<List<Integer>> l = list(list(1), list(2, 3), Collections.<Integer>nil(), list(9, 2, 1));
+    final List<List<Integer>> l = list(list(1), list(2, 3), List.<Integer>of(), list(9, 2, 1));
     final List<Integer> c = concat(l);
     assertArrayEquals(array(1, 2, 3, 9, 2, 1), c.toArray(Integer[]::new));
   }
