@@ -128,7 +128,8 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
         String[] streamingElementIds = StringUtils.split(job.getArguments().get(3), SEPARATOR);
         checkAvailability = BooleanUtils.toBoolean(job.getArguments().get(4));
         publication = publish(job, mediaPackage, repository,
-                Collections.set(downloadElementIds), Collections.set(streamingElementIds), checkAvailability);
+                new HashSet<>(Arrays.asList(downloadElementIds)), new HashSet<>(Arrays.asList(streamingElementIds)),
+                checkAvailability);
         break;
       case Replace:
         final Set<? extends MediaPackageElement> downloadElements =
@@ -159,7 +160,7 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
         String[] flavors = StringUtils.split(job.getArguments().get(2), SEPARATOR);
         String[] tags = StringUtils.split(job.getArguments().get(3), SEPARATOR);
         publication = updateMetadata(job, mediaPackage, repository,
-                Collections.set(flavors), Collections.set(tags), checkAvailability);
+                new HashSet<>(Arrays.asList(flavors)), new HashSet<>(Arrays.asList(tags)), checkAvailability);
         break;
       default:
         throw new IllegalArgumentException("Can not handle this type of operation: " + job.getOperation());

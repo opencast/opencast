@@ -24,7 +24,6 @@ package org.opencastproject.kernel.security;
 import static org.opencastproject.kernel.rest.CurrentJobFilter.CURRENT_JOB_HEADER;
 import static org.opencastproject.kernel.security.DelegatingAuthenticationEntryPoint.DIGEST_AUTH;
 import static org.opencastproject.kernel.security.DelegatingAuthenticationEntryPoint.REQUESTED_AUTH_HEADER;
-import static org.opencastproject.util.data.Collections.set;
 
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
@@ -73,6 +72,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
@@ -693,7 +693,7 @@ public class TrustedHttpClientImpl implements TrustedHttpClient {
     // A simple hash map is sufficient here.
     // No need to deal with soft references or an LRU map since the number of organizations
     // will be quite low.
-    private final Set<String> hosts = set();
+    private final Set<String> hosts = new HashSet<>();
     private final long refreshInterval;
     private long lastRefresh;
 

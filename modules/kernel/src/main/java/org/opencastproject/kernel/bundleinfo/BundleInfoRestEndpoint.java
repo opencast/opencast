@@ -29,7 +29,6 @@ import static org.opencastproject.util.Jsons.obj;
 import static org.opencastproject.util.Jsons.p;
 import static org.opencastproject.util.RestUtil.R.notFound;
 import static org.opencastproject.util.RestUtil.R.ok;
-import static org.opencastproject.util.data.Collections.set;
 import static org.opencastproject.util.data.Collections.toArray;
 
 import org.opencastproject.util.Jsons;
@@ -44,6 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Dictionary;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -160,7 +160,7 @@ public abstract class BundleInfoRestEndpoint {
       returnDescription = "The search results as json.")
   public Response getBundleVersion(@DefaultValue(DEFAULT_BUNDLE_PREFIX) @QueryParam("prefix") List<String> prefixes) {
     return withBundles(prefixes, infos -> {
-      final Set<BundleVersion> versions = set();
+      final Set<BundleVersion> versions = new HashSet<>();
       for (BundleInfo bundle : infos) {
         versions.add(bundle.getVersion());
       }

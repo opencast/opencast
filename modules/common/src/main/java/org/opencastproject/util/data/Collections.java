@@ -198,14 +198,6 @@ public final class Collections {
     return target;
   }
 
-  /** Create a set from an array. */
-  @SafeVarargs
-  public static <A> Set<A> set(A... as) {
-    final Set<A> t = new HashSet<>(as.length);
-    java.util.Collections.addAll(t, as);
-    return t;
-  }
-
   /** Create a set from a list. */
   public static <A> Set<A> toSet(List<A> as) {
     Set<A> r = new HashSet<>(as.size());
