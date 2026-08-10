@@ -73,11 +73,6 @@ public final class Collections {
     return new ArrayList<>(as);
   }
 
-  /** Return the list as is or nil, if <code>as</code> is null. */
-  public static <A> List<A> nullToNil(List<A> as) {
-    return as != null ? as : Collections.<A> nil();
-  }
-
   /** Create a list from an array. */
   @SafeVarargs
   public static <A> List<A> list(A... as) {
