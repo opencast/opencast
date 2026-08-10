@@ -27,10 +27,8 @@ import org.checkerframework.checker.units.qual.K;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -117,16 +115,6 @@ public final class Collections {
       map.put(t.getA(), t.getB());
     }
     return map;
-  }
-
-  /** Create a dictionary from a list of tuples (K, V). */
-  @SafeVarargs
-  public static <K, V> Dictionary<K, V> dict(Tuple<? extends K, ? extends V>... ts) {
-    final Dictionary<K, V> dict = new Hashtable<>(ts.length);
-    for (Tuple<? extends K, ? extends V> t : ts) {
-      dict.put(t.getA(), t.getB());
-    }
-    return dict;
   }
 
   /** Create an array from a collection. */
