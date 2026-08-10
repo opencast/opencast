@@ -24,12 +24,10 @@ package org.opencastproject.util.data;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.opencastproject.util.data.Arrays.append;
 import static org.opencastproject.util.data.Arrays.array;
 import static org.opencastproject.util.data.Collections.concat;
-import static org.opencastproject.util.data.Collections.head;
 import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.data.Collections.toArray;
 import static org.opencastproject.util.data.Collections.toList;
@@ -39,19 +37,6 @@ import org.junit.Test;
 import java.util.List;
 
 public class CollectionsTest {
-
-  private List<String> newTestList() {
-    return list("one", "two");
-  }
-
-  @Test
-  public void testHead() {
-    List<String> list = newTestList();
-    assertTrue(head(list).isPresent());
-
-    List<String> empty = List.of();
-    assertFalse(head(empty).isPresent());
-  }
 
   @Test
   public void mkString() {

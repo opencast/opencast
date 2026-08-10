@@ -34,7 +34,6 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 
 /**
@@ -48,15 +47,6 @@ import java.util.Set;
 @Deprecated
 public final class Collections {
   private Collections() {
-  }
-
-  /** Return the head of list <code>as</code> or <code>none</code>. */
-  public static <A> Optional<A> head(List<A> as) {
-    if (!as.isEmpty()) {
-      return Optional.of(as.get(0));
-    } else {
-      return Optional.empty();
-    }
   }
 
   /** Make a string from a collection separating each element by <code>sep</code>. */
