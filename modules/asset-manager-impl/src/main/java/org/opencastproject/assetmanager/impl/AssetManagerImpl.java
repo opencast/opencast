@@ -25,7 +25,6 @@ import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.hasNo
 import static org.opencastproject.mediapackage.MediaPackageSupport.Filters.isNotPublication;
 import static org.opencastproject.mediapackage.MediaPackageSupport.getFileName;
 import static org.opencastproject.metadata.dublincore.CatalogUIAdapter.ORGANIZATION_WILDCARD;
-import static org.opencastproject.security.api.SecurityConstants.GLOBAL_ADMIN_ROLE;
 import static org.opencastproject.security.api.SecurityConstants.GLOBAL_CAPTURE_AGENT_ROLE;
 import static org.opencastproject.security.util.SecurityUtil.getEpisodeRoleId;
 import static org.opencastproject.util.data.functions.Misc.chuck;
@@ -1223,9 +1222,9 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
   private AdminRole isAdmin() {
     final User user = securityService.getUser();
-    if (user.hasRole(GLOBAL_ADMIN_ROLE)) {
+    if (SecurityUtil.isGlobalAdmin(user)) {
       return AdminRole.GLOBAL;
-    } else if (user.hasRole(securityService.getOrganization().getAdminRole())
+    } else if (SecurityUtil.isOrganizationAdmin(user, securityService.getOrganization())
             || user.hasRole(GLOBAL_CAPTURE_AGENT_ROLE)) {
       // In this context, we treat capture agents the same way as organization admins, allowing them access so that
       // they can ingest new media without requiring them to be explicitly specified in the ACLs.
