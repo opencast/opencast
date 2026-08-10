@@ -24,7 +24,6 @@ package org.opencastproject.util.data;
 import org.checkerframework.checker.units.qual.A;
 import org.checkerframework.checker.units.qual.K;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -99,12 +98,6 @@ public final class Collections {
       map.put(t.getA(), t.getB());
     }
     return map;
-  }
-
-  /** Create an array from a collection. */
-  @SuppressWarnings("unchecked")
-  public static <A, B extends A> A[] toArray(Class<A> elemType, Collection<B> a) {
-    return a.toArray((A[]) Array.newInstance(elemType, a.size()));
   }
 
   /** Concat (aka flatten) a collection of collections by concatenating them all. [[a]] -&gt; [a] */

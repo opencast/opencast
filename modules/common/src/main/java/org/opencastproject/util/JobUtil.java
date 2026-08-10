@@ -22,7 +22,6 @@
 package org.opencastproject.util;
 
 import static org.opencastproject.util.data.Collections.map;
-import static org.opencastproject.util.data.Collections.toArray;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.job.api.Job;
@@ -165,7 +164,7 @@ public final class JobUtil {
    * @return the job barrier result
    */
   public static JobBarrier.Result waitForJobs(Job waiter, ServiceRegistry reg, Collection<Job> jobs) {
-    return waitForJobs(waiter, reg, toArray(Job.class, jobs));
+    return waitForJobs(waiter, reg, jobs.toArray(Job[]::new));
   }
 
   /**

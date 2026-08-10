@@ -29,7 +29,6 @@ import static org.opencastproject.util.data.Arrays.append;
 import static org.opencastproject.util.data.Arrays.array;
 import static org.opencastproject.util.data.Collections.concat;
 import static org.opencastproject.util.data.Collections.list;
-import static org.opencastproject.util.data.Collections.toArray;
 import static org.opencastproject.util.data.Collections.toList;
 
 import org.junit.Test;
@@ -79,12 +78,6 @@ public class CollectionsTest {
   public void testConcat() {
     final List<List<Integer>> l = list(list(1), list(2, 3), Collections.<Integer>nil(), list(9, 2, 1));
     final List<Integer> c = concat(l);
-    assertArrayEquals(array(1, 2, 3, 9, 2, 1), toArray(Integer.class, c));
-  }
-
-  @Test
-  public void testToArray() {
-    final String[] a = toArray(String.class, Collections.<String>list());
-    assertEquals(0, a.length);
+    assertArrayEquals(array(1, 2, 3, 9, 2, 1), c.toArray(Integer[]::new));
   }
 }

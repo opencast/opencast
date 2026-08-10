@@ -29,7 +29,6 @@ import static org.opencastproject.util.Jsons.obj;
 import static org.opencastproject.util.Jsons.p;
 import static org.opencastproject.util.RestUtil.R.notFound;
 import static org.opencastproject.util.RestUtil.R.ok;
-import static org.opencastproject.util.data.Collections.toArray;
 
 import org.opencastproject.util.Jsons;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -228,7 +227,7 @@ public abstract class BundleInfoRestEndpoint {
 
   /** Run <code>f</code> if there is at least one bundle matching the given prefixes. */
   private Response withBundles(List<String> prefixes, Function<List<BundleInfo>, Response> f) {
-    final List<BundleInfo> info = getDb().getBundles(toArray(String.class, prefixes));
+    final List<BundleInfo> info = getDb().getBundles(prefixes.toArray(String[]::new));
     if (info.size() > 0) {
       return f.apply(info);
     } else {
