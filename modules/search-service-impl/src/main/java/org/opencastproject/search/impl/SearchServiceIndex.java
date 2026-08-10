@@ -46,7 +46,6 @@ import org.opencastproject.search.impl.persistence.SearchServiceDatabase;
 import org.opencastproject.search.impl.persistence.SearchServiceDatabaseException;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
-import org.opencastproject.security.api.AccessControlUtil;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
@@ -387,8 +386,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
         throw new NotFoundException();
       }
       AccessControlList acl = persistence.getAccessControlList(mediaPackageId);
-      if (!AccessControlUtil.isAuthorized(acl, user, securityService.getOrganization(), WRITE.toString(),
-          mediaPackageId)) {
+      if (!authorizationService.hasPermission(acl, mediaPackageId, WRITE.toString())) {
         throw new UnauthorizedException(user, "Write permission denied for " + mediaPackageId, acl);
       }
     } catch (NotFoundException e) {

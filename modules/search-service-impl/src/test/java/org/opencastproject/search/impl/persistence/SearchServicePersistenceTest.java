@@ -28,6 +28,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
+import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
@@ -86,6 +87,13 @@ public class SearchServicePersistenceTest {
     EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
     EasyMock.replay(securityService);
 
+    // Mock up an authorization service that always grants access, mirroring the real service's admin bypass
+    // for the global admin user used throughout this test
+    AuthorizationService authorizationService = EasyMock.createNiceMock(AuthorizationService.class);
+    EasyMock.expect(authorizationService.hasPermission(EasyMock.anyObject(AccessControlList.class),
+        EasyMock.anyString(), EasyMock.anyString())).andReturn(true).anyTimes();
+    EasyMock.replay(authorizationService);
+
     BundleContext bc = EasyMock.createNiceMock(BundleContext.class);
     ComponentContext cc = EasyMock.createNiceMock(ComponentContext.class);
     EasyMock.expect(cc.getBundleContext()).andReturn(bc).anyTimes();
@@ -95,6 +103,7 @@ public class SearchServicePersistenceTest {
     searchDatabase.setEntityManagerFactory(emf);
     searchDatabase.setDBSessionFactory(getDbSessionFactory());
     searchDatabase.setSecurityService(securityService);
+    searchDatabase.setAuthorizationService(authorizationService);
     searchDatabase.activate(cc);
 
     mediaPackage = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
