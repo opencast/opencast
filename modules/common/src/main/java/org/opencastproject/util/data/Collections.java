@@ -49,15 +49,6 @@ public final class Collections {
   private Collections() {
   }
 
-  /** Make a string from a collection separating each element by <code>sep</code>. */
-  public static String mkString(Collection<?> as, String sep) {
-    final StringBuilder b = new StringBuilder();
-    for (Object a : as) {
-      b.append(a).append(sep);
-    }
-    return b.substring(0, Math.max(b.length() - sep.length(), 0));
-  }
-
   /** Concatenates two iterables into a new list. */
   public static <A, M extends Iterable<? extends A>> List<A> concat(M as, M bs) {
     List<A> x = new ArrayList<>();

@@ -39,12 +39,6 @@ import java.util.List;
 public class CollectionsTest {
 
   @Test
-  public void mkString() {
-    List<Integer> l = list(1, 2, 3);
-    assertEquals("1-2-3", Collections.mkString(l, "-"));
-  }
-
-  @Test
   public void testToList() {
     List<Integer> i1 = toList(java.util.Collections.<Integer>emptyList().iterator());
     assertTrue(i1.isEmpty());
