@@ -34,7 +34,6 @@ import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.Set;
 
@@ -49,16 +48,6 @@ import java.util.Set;
 @Deprecated
 public final class Collections {
   private Collections() {
-  }
-
-  // TODO check all clients of this method since it potentially breaks!
-  @SuppressWarnings("unchecked")
-  private static <A, B> Collection<A> buildFrom(Collection<B> as) {
-    try {
-      return as.getClass().newInstance();
-    } catch (Exception e) {
-      throw new IllegalArgumentException("Type " + as.getClass() + " needs a parameterless constructor");
-    }
   }
 
   /** Return the head of list <code>as</code> or <code>none</code>. */
@@ -79,32 +68,6 @@ public final class Collections {
     return b.substring(0, Math.max(b.length() - sep.length(), 0));
   }
 
-  /** Append source collection <code>as</code> to <code>target</code>. */
-  public static <A, T extends Collection<A>, S extends Iterable<? extends A>> T appendTo(T target, S as) {
-    for (A a : as) {
-      target.add(a);
-    }
-    return target;
-  }
-
-  /** Append source collections <code>as</code> to <code>target</code>. */
-  @SafeVarargs
-  public static <A, T extends Collection<A>, S extends Iterable<? extends A>> T appendToM(T target, S... as) {
-    for (S s : as) {
-      for (A a : s) {
-        target.add(a);
-      }
-    }
-    return target;
-  }
-
-  /** Append source collections <code>as</code> to <code>target</code>. */
-  @SafeVarargs
-  public static <A, T extends Collection<A>, X extends A> T appendToA(T target, X... as) {
-    java.util.Collections.addAll(target, as);
-    return target;
-  }
-
   /** Concatenates two iterables into a new list. */
   public static <A, M extends Iterable<? extends A>> List<A> concat(M as, M bs) {
     List<A> x = new ArrayList<>();
@@ -115,18 +78,6 @@ public final class Collections {
       x.add(b);
     }
     return x;
-  }
-
-  /**
-   * Merge two maps where <code>b</code> takes precedence.
-   *
-   * @return a new immutable map
-   */
-  public static <A, B> Map<A, B> merge(Map<? extends A, ? extends B> a, Map<? extends A, ? extends B> b) {
-    final Map<A, B> x = new HashMap<>();
-    x.putAll(a);
-    x.putAll(b);
-    return java.util.Collections.unmodifiableMap(x);
   }
 
   /** Drain all elements of <code>as</code> into a list. */
@@ -141,16 +92,6 @@ public final class Collections {
   /** Drain all elements of <code>as</code> into a list. */
   public static <A> List<A> toList(Collection<A> as) {
     return new ArrayList<>(as);
-  }
-
-  /**
-   * Return the list as is or nil, if <code>as</code> is null.
-   * 
-   * @deprecated use {@link #nullToNil(java.util.List)}
-   */
-  @Deprecated
-  public static <A> List<A> mkList(List<A> as) {
-    return as != null ? as : Collections.<A> nil();
   }
 
   /** Return the list as is or nil, if <code>as</code> is null. */
@@ -242,95 +183,6 @@ public final class Collections {
       i++;
     }
     return target;
-  }
-
-  /** Create an iterator form an array. */
-  @SafeVarargs
-  public static <A> Iterator<A> iterator(final A... as) {
-    return new Iterator<A>() {
-      private int i = 0;
-
-      @Override
-      public boolean hasNext() {
-        return as.length > i;
-      }
-
-      @Override
-      public A next() {
-        if (i < as.length) {
-          return as[i++];
-        } else {
-          throw new NoSuchElementException();
-        }
-      }
-
-      @Override
-      public void remove() {
-        throw new UnsupportedOperationException();
-      }
-    };
-  }
-
-  /** Create an iterator that repeats <code>a</code> for the said times. */
-  public static <A, X extends A> Iterator<A> repeat(final X a, final int times) {
-    return new Iterator<A>() {
-      private int count = times;
-
-      @Override
-      public boolean hasNext() {
-        return count > 0;
-      }
-
-      @Override
-      public A next() {
-        count--;
-        return a;
-      }
-
-      @Override
-      public void remove() {
-        throw new UnsupportedOperationException();
-      }
-    };
-  }
-
-  /** Join two iterators. */
-  public static <A> Iterator<A> join(final Iterator<A> a, final Iterator<A> b) {
-    return new Iterator<A>() {
-      @Override
-      public boolean hasNext() {
-        return a.hasNext() || b.hasNext();
-      }
-
-      @Override
-      public A next() {
-        return a.hasNext() ? a.next() : b.next();
-      }
-
-      @Override
-      public void remove() {
-        throw new UnsupportedOperationException();
-      }
-    };
-  }
-
-  /**
-   * Make an Iterator usable in a for comprehension like this:
-   *
-   * <pre>
-   *   Iterator&lt;A&gt; as = ...
-   *   for (A a : forc(as)) {
-   *     ...
-   *   }
-   * </pre>
-   */
-  public static <A> Iterable<A> forc(final Iterator<A> as) {
-    return new Iterable<A>() {
-      @Override
-      public Iterator<A> iterator() {
-        return as;
-      }
-    };
   }
 
   /** Concat (aka flatten) a collection of collections by concatenating them all. [[a]] -&gt; [a] */

@@ -28,22 +28,15 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.opencastproject.util.data.Arrays.append;
 import static org.opencastproject.util.data.Arrays.array;
-import static org.opencastproject.util.data.Collections.appendTo;
 import static org.opencastproject.util.data.Collections.concat;
 import static org.opencastproject.util.data.Collections.head;
-import static org.opencastproject.util.data.Collections.iterator;
-import static org.opencastproject.util.data.Collections.join;
 import static org.opencastproject.util.data.Collections.list;
-import static org.opencastproject.util.data.Collections.repeat;
 import static org.opencastproject.util.data.Collections.toArray;
 import static org.opencastproject.util.data.Collections.toList;
 
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 public class CollectionsTest {
 
@@ -85,57 +78,6 @@ public class CollectionsTest {
   }
 
   @Test
-  public void testRepeat() {
-    assertTrue(toList(repeat(1, 0)).isEmpty());
-    assertEquals(3, toList(repeat(1, 3)).size());
-  }
-
-  @Test
-  public void testJoin() {
-    assertArrayEquals(
-        array(1, 2, 3, 4, 5, 6),
-        toArray(Integer.class, toList(join(
-            list(1, 2, 3).iterator(),
-            list(4, 5, 6).iterator()
-        ))));
-    assertArrayEquals(
-        array(1, 2, 3),
-        toArray(Integer.class, toList(join(
-            list(1, 2, 3).iterator(),
-            java.util.Collections.<Integer>emptyList().iterator()
-        ))));
-    assertArrayEquals(
-        array(1, 2, 3),
-        toArray(Integer.class, toList(join(
-            java.util.Collections.<Integer>emptyList().iterator(),
-            list(1, 2, 3).iterator()
-        ))));
-    assertEquals(
-        0,
-        toArray(Object.class, toList(join(
-            java.util.Collections.emptyList().iterator(),
-            java.util.Collections.emptyList().iterator()
-        ))).length
-    );
-  }
-
-  @Test(expected = NoSuchElementException.class)
-  public void testIterator1() {
-    Iterator<Integer> i = iterator(new Integer[0]);
-    assertFalse(i.hasNext());
-    i.next();
-  }
-
-  @Test(expected = NoSuchElementException.class)
-  public void testIterator2() {
-    Iterator<Integer> i = iterator(new Integer[] {1});
-    assertTrue(i.hasNext());
-    i.next();
-    assertFalse(i.hasNext());
-    i.next();
-  }
-
-  @Test
   public void testArray() {
     assertArrayEquals(new Integer[]{1, 2, 3}, array(1, 2, 3));
     assertArrayEquals(new String[]{"1", "2", "3"}, array("1", "2", "3"));
@@ -159,14 +101,6 @@ public class CollectionsTest {
     final List<List<Integer>> l = list(list(1), list(2, 3), Collections.<Integer>nil(), list(9, 2, 1));
     final List<Integer> c = concat(l);
     assertArrayEquals(array(1, 2, 3, 9, 2, 1), toArray(Integer.class, c));
-  }
-
-  @Test
-  public void testAppendTo() {
-    final List<Object> a = new ArrayList<Object>();
-    // compile check
-    appendTo(a, list(1));
-    appendTo(a, list("a"));
   }
 
   @Test
