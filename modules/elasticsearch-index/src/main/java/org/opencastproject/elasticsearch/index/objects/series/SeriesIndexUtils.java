@@ -175,7 +175,7 @@ public final class SeriesIndexUtils {
     AccessControlList acl = AccessControlParser.parseAclSilent(aclString);
     for (AccessControlEntry entry : acl.getEntries()) {
       if (!entry.isAllow()) {
-        logger.info("Series index does not support denial via ACL, ignoring {}", entry);
+        logger.debug("Series index does not support denial via ACL, ignoring {}", entry);
         continue;
       }
       List<String> actionPermissions = permissions.get(entry.getAction());
