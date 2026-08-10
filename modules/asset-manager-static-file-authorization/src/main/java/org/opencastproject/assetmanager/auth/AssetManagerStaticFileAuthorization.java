@@ -21,6 +21,7 @@
 
 package org.opencastproject.assetmanager.auth;
 
+import org.opencastproject.assetmanager.api.AssetManagerSecurityUtils;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.StaticFileAuthorization;
@@ -144,7 +145,7 @@ public class AssetManagerStaticFileAuthorization implements StaticFileAuthorizat
     final List<String> roles = user.getRoles().parallelStream()
         .map(Role::getName)
         .filter(roleFilter)
-        .map((role) -> role + " | read")
+        .map((role) -> AssetManagerSecurityUtils.mkPropertyName(role, "read"))
         .collect(Collectors.toList());  // ["ROLE_XY | read", ...]
 
     StringBuilder properties = new StringBuilder("property_name = ?");
@@ -158,7 +159,7 @@ public class AssetManagerStaticFileAuthorization implements StaticFileAuthorizat
         + "and (" + properties + ")";
     EntityManager entityManager = entityManagerFactory.createEntityManager();
     Query q = entityManager.createNativeQuery(sql);
-    q.setParameter(1, "org.opencastproject.assetmanager.security");
+    q.setParameter(1, AssetManagerSecurityUtils.SECURITY_NAMESPACE);
     q.setParameter(2, m.group(2));
     for (int i = 0; i < roles.size(); i++) {
       q.setParameter(i + 3, roles.get(i));
@@ -183,8 +184,6 @@ public class AssetManagerStaticFileAuthorization implements StaticFileAuthorizat
   /**
    * Filter for removing user interface roles from access control
    */
-  private final java.util.function.Predicate<String> roleFilter = (name) -> (
-      includeAPIRoles || !name.startsWith("ROLE_API_"))
-      && (includeCARoles  || !name.startsWith("ROLE_CAPTURE_AGENT_"))
-      && (includeUIRoles  || !name.startsWith("ROLE_UI_"));
+  private final java.util.function.Predicate<String> roleFilter = (name) ->
+      AssetManagerSecurityUtils.isRoleAllowed(name, includeAPIRoles, includeCARoles, includeUIRoles);
 }
