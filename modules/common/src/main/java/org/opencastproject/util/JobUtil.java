@@ -21,9 +21,6 @@
 
 package org.opencastproject.util;
 
-import static org.opencastproject.util.data.Collections.map;
-import static org.opencastproject.util.data.Tuple.tuple;
-
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.Job.Status;
 import org.opencastproject.job.api.JobBarrier;
@@ -39,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -190,7 +188,7 @@ public final class JobUtil {
       case DELETED:
       case FAILED:
       case FINISHED:
-        return new JobBarrier.Result(map(tuple(job, status)));
+        return new JobBarrier.Result(Map.of(job, status));
       default:
         if (timeout.isPresent()) {
           return waitForJobs(waiter, reg, timeout.get(), job);

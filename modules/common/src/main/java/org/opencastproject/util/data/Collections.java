@@ -22,12 +22,9 @@
 package org.opencastproject.util.data;
 
 import org.checkerframework.checker.units.qual.A;
-import org.checkerframework.checker.units.qual.K;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * This class provides functions to ease and secure the handling of collections by supporting a type safe -- at least to
@@ -48,16 +45,6 @@ public final class Collections {
     final List<A> t = new ArrayList<>();
     java.util.Collections.addAll(t, as);
     return t;
-  }
-
-  /** Create a map from a list of tuples (K, V). */
-  @SafeVarargs
-  public static <K, V> Map<K, V> map(Tuple<? extends K, ? extends V>... ts) {
-    final Map<K, V> map = new HashMap<>(ts.length);
-    for (Tuple<? extends K, ? extends V> t : ts) {
-      map.put(t.getA(), t.getB());
-    }
-    return map;
   }
 
 }

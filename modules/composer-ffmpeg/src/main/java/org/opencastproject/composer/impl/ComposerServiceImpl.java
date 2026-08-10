@@ -70,7 +70,6 @@ import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.ReadinessIndicator;
 import org.opencastproject.util.UnknownFileTypeException;
-import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.workspace.api.Workspace;
 
@@ -709,7 +708,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
    */
   @Override
   public Job mux(Track videoTrack, Track audioTrack, String profileId) throws EncoderException, MediaPackageException {
-    return mux(Collections.map(Tuple.tuple("video", videoTrack), Tuple.tuple("audio", audioTrack)), profileId);
+    return mux(Map.of("video", videoTrack, "audio", audioTrack), profileId);
   }
 
   /**
@@ -1541,7 +1540,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
       switch (op) {
         case Encode:
           firstTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(1));
-          serialized = serializeOrEmpty(encode(job, Collections.map(tuple("video", firstTrack)), encodingProfile));
+          serialized = serializeOrEmpty(encode(job, Map.of("video", firstTrack), encodingProfile));
           break;
         case ParallelEncode:
           firstTrack = (Track) MediaPackageElementParser.getFromXml(arguments.get(1));
@@ -1792,16 +1791,16 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     if (profile == null) {
       final String msg = format("Profile %s is unknown", profileId);
       logger.error(msg);
-      incident().recordFailure(job, PROFILE_NOT_FOUND, Collections.map(tuple("profile", profileId)));
+      incident().recordFailure(job, PROFILE_NOT_FOUND, Map.of("profile", profileId));
       throw new EncoderException(msg);
     }
     return profile;
   }
 
   private Map<String, String> getWorkspaceMediapackageParams(String description, MediaPackageElement element) {
-    return Collections.map(tuple("description", description),
-            tuple("type", element.getElementType().toString()),
-            tuple("url", element.getURI().toString()));
+    return Map.of("description", description,
+            "type", element.getElementType().toString(),
+            "url", element.getURI().toString());
   }
 
   private Map<String, String> getWorkspaceCollectionParams(String description, String collectionId, URI url) {
