@@ -48,6 +48,10 @@ public interface AuthorizationService {
    * This is not restricted to access control lists in media packages, but works regardless of which entity the
    * access control list belongs to.
    *
+   * Global and organization admins are always granted permission. Otherwise, the access control list entries are
+   * evaluated in order, and the first entry matching both the action and one of the current user's roles decides
+   * the outcome.
+   *
    * @param acl
    *          the access control list
    * @param action
@@ -55,6 +59,22 @@ public interface AuthorizationService {
    * @return whether the current user has the correct privileges to take this action
    */
   boolean hasPermission(AccessControlList acl, String action);
+
+  /**
+   * Determines whether the current user can take the specified action given the access control list, additionally
+   * granting access if the user has the special per-mediapackage
+   * <code>ROLE_EPISODE_&lt;mediaPackageId&gt;_&lt;action&gt;</code> role.
+   *
+   * @param acl
+   *          the access control list
+   * @param mediaPackageId
+   *          the id of the media package the access control list belongs to
+   * @param action
+   *          the action (e.g. read, modify, delete)
+   * @return whether the current user has the correct privileges to take this action
+   * @see #hasPermission(AccessControlList, String)
+   */
+  boolean hasPermission(AccessControlList acl, String mediaPackageId, String action);
 
   /**
    * Gets the active access control list associated with the given media package, as specified by its XACML
