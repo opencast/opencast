@@ -52,6 +52,8 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * Take look in specified catalog for specified term, if the value matches the specified value add the target-tags
@@ -91,6 +93,9 @@ public class TagByDublinCoreTermWOH extends ResumableWorkflowOperationHandlerBas
   /** Name of the configuration option that provides the copy boolean we are looking for */
   public static final String COPY_PROPERTY = "copy";
 
+  /** Name of the configuration option that enables regex matching. */
+  public static final String CHECK_REGEX = "check-regex";
+
   /**
    * Callback for declarative services configuration that will introduce us to the local workspace service.
    * Implementation assumes that the reference is configured as being static.
@@ -127,6 +132,7 @@ public class TagByDublinCoreTermWOH extends ResumableWorkflowOperationHandlerBas
     List<MediaPackageElementFlavor> configuredTargetFlavor = tagsAndFlavors.getTargetFlavors();
     ConfiguredTagsAndFlavors.TargetTags configuredTargetTags = tagsAndFlavors.getTargetTags();
     boolean copy = BooleanUtils.toBoolean(currentOperation.getConfiguration(COPY_PROPERTY));
+    boolean configuredCheckRegex = BooleanUtils.toBoolean(currentOperation.getConfiguration(CHECK_REGEX));
 
     SimpleElementSelector elementSelector = new SimpleElementSelector();
     for (MediaPackageElementFlavor flavor : configuredSourceFlavors) {
@@ -153,6 +159,17 @@ public class TagByDublinCoreTermWOH extends ResumableWorkflowOperationHandlerBas
           // Use default
           if (configuredDefaultValue != null) {
             foundValue = configuredDefaultValue.equals(configuredMatchValue);
+          }
+        } else if (configuredCheckRegex && isMatchValueValidRegex(configuredMatchValue)) { // Checking regex.
+          // We need to check each value to ensure it matches the Regex.
+          for (int i = 0; i < values.size(); i++) {
+            String valueString = values.get(i).getValue();
+            // If any of the values match the Regex, we consider it as found.
+            // We don't care about those that don't match here!
+            if (valueString.matches(configuredMatchValue)) {
+              foundValue = true;
+              break;
+            }
           }
         } else {
           foundValue = values.contains(DublinCoreValue.mk(configuredMatchValue));
@@ -191,5 +208,22 @@ public class TagByDublinCoreTermWOH extends ResumableWorkflowOperationHandlerBas
     } // if catalogs
 
     return createResult(mediaPackage, Action.CONTINUE);
+  }
+
+  /**
+   * Ensures that the match value is a valid regex to check each dublin core values against.
+   * @param configuredMatchValue
+   * @return
+   */
+  private Boolean isMatchValueValidRegex(String configuredMatchValue) {
+    if (configuredMatchValue == null || configuredMatchValue.isBlank()) {
+      return false;
+    }
+    try {
+      Pattern.compile(configuredMatchValue);
+      return true;
+    } catch (PatternSyntaxException e) {
+      return false;
+    }
   }
 }
