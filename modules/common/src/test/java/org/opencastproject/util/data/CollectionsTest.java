@@ -25,12 +25,12 @@ package org.opencastproject.util.data;
 import static org.junit.Assert.assertArrayEquals;
 import static org.opencastproject.util.data.Arrays.append;
 import static org.opencastproject.util.data.Arrays.array;
-import static org.opencastproject.util.data.Collections.concat;
 import static org.opencastproject.util.data.Collections.list;
 
 import org.junit.Test;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CollectionsTest {
 
@@ -64,7 +64,7 @@ public class CollectionsTest {
   @Test
   public void testConcat() {
     final List<List<Integer>> l = list(list(1), list(2, 3), List.<Integer>of(), list(9, 2, 1));
-    final List<Integer> c = concat(l);
+    final List<Integer> c = l.stream().flatMap(List::stream).collect(Collectors.toList());
     assertArrayEquals(array(1, 2, 3, 9, 2, 1), c.toArray(Integer[]::new));
   }
 }

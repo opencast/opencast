@@ -25,7 +25,6 @@ import org.checkerframework.checker.units.qual.A;
 import org.checkerframework.checker.units.qual.K;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,18 +40,6 @@ import java.util.Map;
 @Deprecated
 public final class Collections {
   private Collections() {
-  }
-
-  /** Concatenates two iterables into a new list. */
-  public static <A, M extends Iterable<? extends A>> List<A> concat(M as, M bs) {
-    List<A> x = new ArrayList<>();
-    for (A a : as) {
-      x.add(a);
-    }
-    for (A b : bs) {
-      x.add(b);
-    }
-    return x;
   }
 
   /** Create a list from an array. */
@@ -71,15 +58,6 @@ public final class Collections {
       map.put(t.getA(), t.getB());
     }
     return map;
-  }
-
-  /** Concat (aka flatten) a collection of collections by concatenating them all. [[a]] -&gt; [a] */
-  public static <A, M extends Collection<? extends Collection<A>>> List<A> concat(M as) {
-    final List<A> target = new ArrayList<>(as.size());
-    for (Collection<A> a : as) {
-      target.addAll(a);
-    }
-    return target;
   }
 
 }
