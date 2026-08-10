@@ -147,17 +147,6 @@ public final class Collections {
     return a.toArray((A[]) Array.newInstance(elemType, a.size()));
   }
 
-  /** Convert a collection of {@link Double}s into an array of primitive type. */
-  public static double[] toDoubleArray(Collection<Double> as) {
-    final double[] target = new double[as.size()];
-    int i = 0;
-    for (Double a : as) {
-      target[i] = a;
-      i++;
-    }
-    return target;
-  }
-
   /** Concat (aka flatten) a collection of collections by concatenating them all. [[a]] -&gt; [a] */
   public static <A, M extends Collection<? extends Collection<A>>> List<A> concat(M as) {
     final List<A> target = new ArrayList<>(as.size());
