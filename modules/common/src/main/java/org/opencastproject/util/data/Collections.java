@@ -112,14 +112,6 @@ public final class Collections {
     return java.util.Collections.EMPTY_LIST;
   }
 
-  /** Construct a new list by prepending an element to a given list. */
-  public static <A> List<A> cons(A a, List<? extends A> as) {
-    final List<A> target = new ArrayList<>(as.size() + 1);
-    target.add(a);
-    target.addAll(as);
-    return target;
-  }
-
   /** Create a set from a list. */
   public static <A> Set<A> toSet(List<A> as) {
     Set<A> r = new HashSet<>(as.size());

@@ -83,12 +83,6 @@ public class CollectionsTest {
   }
 
   @Test
-  public void testCons() {
-    // compile check
-    Collections.<Object>cons("1", list(1, 3));
-  }
-
-  @Test
   public void testToArray() {
     final String[] a = toArray(String.class, Collections.<String>list());
     assertEquals(0, a.length);
