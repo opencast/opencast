@@ -178,11 +178,11 @@ public class BasicStatisticsRestEndpoint {
   }
 
   @POST
-  @Path("clientpush")
+  @Path("clientPush")
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.TEXT_PLAIN)
   @RestQuery(
-      name = "clientpush",
+      name = "clientPush",
       description = "Unauthenticated request for clients, i.e. user browers",
       responses = {
           @RestResponse(
@@ -274,7 +274,7 @@ public class BasicStatisticsRestEndpoint {
         }
         // Additional Validation
         if (event.getEventType().equals(EventType.FETCH_FILE)) {
-          rejected.add(new RejectedEvent(index, "EventType 'FETCH_FILE' is disallowed on client-push"));
+          rejected.add(new RejectedEvent(index, "EventType 'FETCH_FILE' is disallowed on clientPush"));
           continue;
         }
         if (event.getTimestamp().isBefore(now.minus(MAX_CLIENT_PUSH_DELAY))) {
@@ -303,11 +303,11 @@ public class BasicStatisticsRestEndpoint {
   }
 
   @POST
-  @Path("trustedpush")
+  @Path("trustedPush")
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.TEXT_PLAIN)
   @RestQuery(
-      name = "trustedpush",
+      name = "trustedPush",
       description = "Authenticated request for servers/nodes i.e. octoka",
       responses = {
           @RestResponse(
