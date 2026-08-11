@@ -36,6 +36,7 @@ import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
+import org.opencastproject.index.service.catalog.adapter.series.CommonSeriesCatalogUIAdapter;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.ingest.api.IngestException;
 import org.opencastproject.ingest.api.IngestService;
@@ -233,6 +234,64 @@ public class IndexServiceImplTest {
     commonEventCatalogUIAdapter.updated(PropertiesUtil.toDictionary(episodeCatalogProperties));
     commonEventCatalogUIAdapter.setWorkspace(workspace);
     return Tuple.tuple(commonEventCatalogUIAdapter, metadataCell);
+  }
+
+  private CommonSeriesCatalogUIAdapter setupCommonSeriesCatalogUIAdapter()
+          throws org.osgi.service.cm.ConfigurationException {
+    CommonSeriesCatalogUIAdapter commonSeriesCatalogUIAdapter = new CommonSeriesCatalogUIAdapter();
+
+    Properties seriesCatalogProperties = new Properties();
+    InputStream in = null;
+    try {
+      in = getClass().getResourceAsStream("/series-catalog.properties");
+      seriesCatalogProperties.load(in);
+    } catch (IOException e) {
+      throw new ComponentException(e);
+    } finally {
+      IoSupport.closeQuietly(in);
+    }
+
+    commonSeriesCatalogUIAdapter.updated(PropertiesUtil.toDictionary(seriesCatalogProperties));
+    return commonSeriesCatalogUIAdapter;
+  }
+
+  /**
+   *
+   *
+   * Test Create Series
+   *
+   *
+   */
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testCreateSeriesWithoutMetadataExpectsIllegalArgumentException() throws Exception {
+    IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
+    indexServiceImpl.setSecurityService(setupSecurityService("akm220", "mh_default_org"));
+    indexServiceImpl.addCatalogUIAdapter(setupCommonSeriesCatalogUIAdapter());
+
+    // No metadata for the required title field was submitted at all (e.g. the "dublincore/series" catalog was
+    // omitted from the request), so this must be rejected instead of silently creating a series without a title.
+    indexServiceImpl.createSeries(new MetadataList(), new LinkedHashMap<>(), Optional.empty(), Optional.empty());
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testCreateSeriesWithBlankTitleExpectsIllegalArgumentException() throws Exception {
+    IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
+    indexServiceImpl.setSecurityService(setupSecurityService("akm220", "mh_default_org"));
+    CommonSeriesCatalogUIAdapter commonSeriesCatalogUIAdapter = setupCommonSeriesCatalogUIAdapter();
+    indexServiceImpl.addCatalogUIAdapter(commonSeriesCatalogUIAdapter);
+
+    DublinCoreMetadataCollection seriesMetadata = commonSeriesCatalogUIAdapter.getRawFields();
+    MetadataField title = seriesMetadata.getOutputFields().get("title");
+    seriesMetadata.removeField(title);
+    MetadataField newTitle = new MetadataField(title);
+    newTitle.setValue("");
+    seriesMetadata.addField(newTitle);
+
+    MetadataList metadataList = new MetadataList();
+    metadataList.add(commonSeriesCatalogUIAdapter, seriesMetadata);
+
+    indexServiceImpl.createSeries(metadataList, new LinkedHashMap<>(), Optional.empty(), Optional.empty());
   }
 
   /**
