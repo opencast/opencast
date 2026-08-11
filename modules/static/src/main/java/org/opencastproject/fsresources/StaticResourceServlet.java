@@ -618,6 +618,10 @@ public class StaticResourceServlet extends HttpServlet {
     String[] parts = path.split("/");
 
     // TODO: Find a less brittle way to determine these
+    if (parts.length < 5) {
+      logger.warn("Cannot determine media package and element id from path '{}', skipping statistics", path);
+      return;
+    }
     String mediaPackageId = parts[3];
     String elementId = parts[4];
 
