@@ -229,6 +229,13 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
       throw new WorkflowOperationException("Unable to create a zip archive from mediapackage " + mediaPackage, e);
     }
 
+    Checksum checksum;
+    try {
+      checksum = Checksum.create(ChecksumType.DEFAULT_TYPE, zip);
+    } catch (IOException e) {
+      throw new WorkflowOperationException("Unable to calculate checksum for zip file " + zip, e);
+    }
+
     // Get the collection for storing the archived mediapackage
     String configuredCollectionId = currentOperation.getConfiguration(ZIP_COLLECTION_PROPERTY);
     String collectionId = configuredCollectionId == null ? DEFAULT_ZIP_COLLECTION : configuredCollectionId;
@@ -253,11 +260,7 @@ public class ZipWorkflowOperationHandler extends AbstractWorkflowOperationHandle
 
     Attachment attachment = (Attachment) MediaPackageElementBuilderFactory.newInstance().newElementBuilder()
             .elementFromURI(uri, Type.Attachment, targetFlavor);
-    try {
-      attachment.setChecksum(Checksum.create(ChecksumType.DEFAULT_TYPE, zip));
-    } catch (IOException e) {
-      throw new WorkflowOperationException(e);
-    }
+    attachment.setChecksum(checksum);
     attachment.setMimeType(MimeTypes.ZIP);
 
     // Apply the target tags
