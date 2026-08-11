@@ -61,7 +61,6 @@ jobs:
             hunspell \
             hunspell-de-de \
             procps \
-            s3cmd \
             sox \
             tar \
             tesseract-ocr \
