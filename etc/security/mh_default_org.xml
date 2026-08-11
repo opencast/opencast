@@ -525,9 +525,15 @@
   <!-- Differentiates between "normal" user requests and those requesting digest auth -->
   <bean id="opencastEntryPoint" class="org.opencastproject.kernel.security.DelegatingAuthenticationEntryPoint">
     <!-- CAS Auth:  Comment this if using CAS authentication -->
+    <!-- Shibboleth Auth:  Comment this if using Shibboleth authentication -->
+    <!-- Custom Auth:  Comment this if using a custom authentication entry point -->
     <property name="userEntryPoint" ref="userEntryPoint" />
     <!-- CAS Auth:  Uncomment this if using CAS authentication -->
     <!-- <property name="userEntryPoint" ref="casEntryPoint" /> -->
+    <!-- Shibboleth Auth:  Uncomment this if using Shibboleth authentication -->
+    <!-- <property name="userEntryPoint" ref="shibbolethEntryPoint" /> -->
+    <!-- Custom Auth:  Uncomment this if using a custom authentication entry point -->
+    <!-- <property name="userEntryPoint" ref="customUserEntryPoint" /> -->
     <property name="digestAuthenticationEntryPoint" ref="digestEntryPoint" />
     <property name="basicAuthenticationEntryPoint" ref="basicEntryPoint" />
   </bean>
@@ -564,9 +570,9 @@
   </bean>
 
   <!-- Redirect unauthenticated requests to custom login url with configurable redirect query parameter
-       Example: http://localhost/Shibboleth.sso/Login?target=<RELATIVE_REQUEST_URL> -->
-  <!--bean id="userEntryPoint" class="org.opencastproject.kernel.security.RedirectQueryParamAuthenticationEntryPoint">
-    <constructor-arg index="0" value="/Shibboleth.sso/Login" />
+       Example: http://localhost/sso/login?target=<RELATIVE_REQUEST_URL> -->
+  <!--bean id="customUserEntryPoint" class="org.opencastproject.kernel.security.RedirectQueryParamAuthenticationEntryPoint">
+    <constructor-arg index="0" value="/sso/login" />
     <constructor-arg index="1" value="target" />
   </bean-->
 
@@ -695,6 +701,12 @@
   <!-- ###################### -->
   <!-- # Shibboleth Support # -->
   <!-- ###################### -->
+
+  <!--
+  <bean id="shibbolethEntryPoint" class="org.opencastproject.kernel.security.RedirectQueryParamAuthenticationEntryPoint">
+    <constructor-arg index="0" value="/Shibboleth.sso/Login" />
+    <constructor-arg index="1" value="target" />
+  </bean>-->
 
   <!-- General Shibboleth header extration filter
   <bean id="shibbolethHeaderFilter"
