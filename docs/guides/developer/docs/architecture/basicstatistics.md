@@ -27,7 +27,7 @@ The request must contain a body containing a JSON object with the following fiel
 Request (JS):
 
 ```js
-await fetch("https://opencast.tld/api/stats/clientPush", {
+await fetch("https://opencast.tld/basicstatistics/clientPush", {
     method: "POST",
     headers: {
         "Content-Type": "application/json",
@@ -100,7 +100,7 @@ Apart from authentication and API path, there are the following differences:
 Request (JS just for demonstration purposes, likely not sent by JS):
 
 ```js
-await fetch("https://opencast.tld/api/stats/trustedPush", {
+await fetch("https://opencast.tld/basicstatistics/trustedPush", {
     method: "POST",
     headers: {
         "Content-Type": "application/json",
