@@ -21,19 +21,13 @@
 
 package org.opencastproject.event.handler;
 
-import static org.opencastproject.job.api.Job.Status.FINISHED;
-import static org.opencastproject.mediapackage.MediaPackageElementParser.getFromXml;
 import static org.opencastproject.mediapackage.MediaPackageElements.XACML_POLICY_EPISODE;
 import static org.opencastproject.workflow.handler.distribution.EngagePublicationChannel.CHANNEL_ID;
 
 import org.opencastproject.distribution.api.DistributionException;
-import org.opencastproject.distribution.api.DistributionService;
-import org.opencastproject.job.api.Job;
-import org.opencastproject.job.api.JobBarrier;
-import org.opencastproject.job.api.JobBarrier.Result;
+import org.opencastproject.distribution.api.DownloadDistributionService;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
-import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.mediapackage.MediaPackageException;
@@ -47,20 +41,19 @@ import org.opencastproject.search.api.SearchService;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Organization;
-import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.util.SecurityUtil;
-import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workspace.api.Workspace;
 
 import org.apache.commons.io.FilenameUtils;
-import org.osgi.framework.BundleContext;
+import org.apache.commons.lang3.BooleanUtils;
+import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Modified;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,6 +61,7 @@ import org.slf4j.LoggerFactory;
 import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+import java.util.Objects;
 
 /** Responds to series events by re-distributing metadata and security policy files for published mediapackages. */
 @Component(
@@ -185,7 +179,7 @@ public class SearchUpdatedEventHandler {
   }
 
   public void handleEvent(final SeriesItem seriesItem) {
-    // A series or its ACL has been updated. Find any mediapackages with that series, and update them.
+    // A series or its ACL has been updated. Find any media packages with that series, and update them.
     logger.debug("Handling {}", seriesItem);
     String seriesId = seriesItem.getSeriesId();
 
@@ -249,7 +243,8 @@ public class SearchUpdatedEventHandler {
               c.setChecksum(null);
 
               // Distribute the updated series dc
-              List<MediaPackageElement> mpes = downloadDistributionService.distributeSync(CHANNEL_ID, mp, c.getIdentifier(), checkAvailability);
+              List<MediaPackageElement> mpes = downloadDistributionService.distributeSync(
+                  CHANNEL_ID, mp, c.getIdentifier(), checkAvailability);
               if (mpes != null && mpes.size() == 1) {
                 mp.remove(c);
                 mp.add(mpes.getFirst());

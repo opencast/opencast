@@ -51,8 +51,7 @@ public interface DownloadDistributionService extends DistributionService {
           throws DistributionException;
 
   List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, String elementId,
-      boolean checkAvailability)
-          throws DistributionException;
+      boolean checkAvailability) throws DistributionException;
 
   /**
    * Distributes the given elements synchronously. This should be used rarely since load balancing will be unavailable.
