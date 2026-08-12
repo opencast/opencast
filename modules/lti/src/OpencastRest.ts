@@ -1,4 +1,3 @@
-import axios from "axios";
 import { parsedQueryString } from "./utils";
 
 export interface Attachment {
@@ -131,22 +130,39 @@ function hostAndPort() {
     return debug ? "http://localhost:7878" : "";
 }
 
-export async function getEventMetadata(eventId?: string): Promise<EventMetadataContainer[]> {
-    const useEventId = eventId === undefined ? "new" : eventId;
-    const response = await axios.get(hostAndPort() + "/lti-service-gui/" + useEventId + "/metadata");
-    return response.data;
+async function fetchJson<T>(url: string, init?: RequestInit): Promise<T> {
+    const response = await fetch(url, init);
+    if (!response.ok) {
+        throw new Error(`Request to ${url} failed: ${response.status} ${response.statusText}`);
+    }
+    return response.json();
 }
 
-export async function copyEventToSeries(eventId: string, targetSeries: string): Promise<{}> {
-    return axios.post(hostAndPort() + "/lti-service-gui/" + eventId + "/copy?target_series=" + targetSeries);
+async function fetchNoContent(url: string, init?: RequestInit): Promise<void> {
+    const response = await fetch(url, init);
+    if (!response.ok) {
+        throw new Error(`Request to ${url} failed: ${response.status} ${response.statusText}`);
+    }
+}
+
+export async function getEventMetadata(eventId?: string): Promise<EventMetadataContainer[]> {
+    const useEventId = eventId === undefined ? "new" : eventId;
+    return fetchJson<EventMetadataContainer[]>(hostAndPort() + "/lti-service-gui/" + useEventId + "/metadata");
+}
+
+export async function copyEventToSeries(eventId: string, targetSeries: string): Promise<void> {
+    return fetchNoContent(
+        hostAndPort() + "/lti-service-gui/" + eventId + "/copy?target_series=" + targetSeries,
+        { method: "POST" }
+    );
 }
 
 async function getConfig(): Promise<Config> {
     try {
-        const response = await axios.get<any>(hostAndPort() + '/ui/config/ltitools/config.json');
+        const config = await fetchJson<any>(hostAndPort() + '/ui/config/ltitools/config.json');
         return {
-            excludeLiveStreams: response.data.series.excludeLiveStreams !== undefined ? response.data.series.excludeLiveStreams : false,
-            onlyLiveStreams: response.data.series.onlyLiveStreams !== undefined ? response.data.series.onlyLiveStreams : false
+            excludeLiveStreams: config.series.excludeLiveStreams !== undefined ? config.series.excludeLiveStreams : false,
+            onlyLiveStreams: config.series.onlyLiveStreams !== undefined ? config.series.onlyLiveStreams : false
         }
     } catch (_) {
         return {
@@ -246,8 +262,8 @@ export async function searchEpisode(
             urlSuffix += "&live=" + config_live;
     }
     const url = `${hostAndPort()}/search/episode.json?limit=${limit}&offset=${offset}${urlSuffix}`;
-    const response = await axios.get<any>(url);
-    const resultsRaw = response.data["result"];
+    const searchResult = await fetchJson<any>(url);
+    const resultsRaw = searchResult["result"];
     const results = Array.isArray(resultsRaw) ? resultsRaw : resultsRaw !== undefined ? [resultsRaw] : [];
     return {
         results: results.map((result: any) => ({
@@ -274,26 +290,26 @@ export async function searchEpisode(
                 tracks: parseTracksFromResult(result)
             }
         })),
-        total: response.data.total,
-        limit: response.data.limit,
-        offset: response.data.offset
+        total: searchResult.total,
+        limit: searchResult.limit,
+        offset: searchResult.offset
     }
 }
 
 export async function deleteEvent(eventId: string): Promise<void> {
-    return axios.delete(hostAndPort() + "/lti-service-gui/" + eventId);
+    return fetchNoContent(hostAndPort() + "/lti-service-gui/" + eventId, { method: "DELETE" });
 }
 
 export async function getLti(): Promise<LtiData> {
-    const response = await axios.get<any>(hostAndPort() + "/lti");
+    const lti = await fetchJson<any>(hostAndPort() + "/lti");
     return {
-        roles: response.data.roles !== undefined ? response.data.roles.split(",") : [],
+        roles: lti.roles !== undefined ? lti.roles.split(",") : [],
     }
 }
 
 export async function getJobs(seriesId: string): Promise<JobResult[]> {
-    const response = await axios.get<any>(hostAndPort() + "/lti-service-gui/jobs?seriesId=" + seriesId);
-    return response.data.map((r: any) => ({ title: r.title, status: r.status }));
+    const jobs = await fetchJson<any>(hostAndPort() + "/lti-service-gui/jobs?seriesId=" + seriesId);
+    return jobs.map((r: any) => ({ title: r.title, status: r.status }));
 }
 
 export async function uploadFile(
@@ -319,11 +335,21 @@ export async function uploadFile(
         data.append("captions", captionFile);
     if (presenterFile !== undefined)
         data.append("presenter", presenterFile);
-    return axios.post(
-        hostAndPort() + "/lti-service-gui",
-        data,
-        setUploadPogress !== undefined ? {
-            onUploadProgress: progressEvent => setUploadPogress(Math.round(progressEvent.loaded * percentage / (progressEvent.total ?? 1)))
-        } : {}
-    );
+    return new Promise((resolve, reject) => {
+        const request = new XMLHttpRequest();
+        request.open("POST", hostAndPort() + "/lti-service-gui");
+        if (setUploadPogress !== undefined) {
+            request.upload.onprogress = (event) =>
+                setUploadPogress(Math.round(event.loaded * percentage / (event.total || 1)));
+        }
+        request.onload = () => {
+            if (request.status >= 200 && request.status < 300) {
+                resolve({});
+            } else {
+                reject(new Error(`Upload failed: ${request.status} ${request.statusText}`));
+            }
+        };
+        request.onerror = () => reject(new Error("Upload failed"));
+        request.send(data);
+    });
 }
