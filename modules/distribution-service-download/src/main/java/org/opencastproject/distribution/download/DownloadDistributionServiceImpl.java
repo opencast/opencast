@@ -545,43 +545,36 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
     return distributeSync(channelId, mediapackage, elementIds, true, false);
   }
 
+  @Override
+  public List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, String elementId,
+      boolean checkAvailability)
+      throws DistributionException, MediaPackageException {
+    Set<String> elementIds = new HashSet<String>();
+    elementIds.add(elementId);
+    return distributeSync(channelId, mediapackage, elementIds, checkAvailability, false);
+  }
+
+  @Override
+  public List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, Set<String> elementIds,
+                                                  boolean checkAvailability)
+      throws DistributionException, MediaPackageException {
+    return distributeSync(channelId, mediapackage, elementIds, checkAvailability, false);
+  }
+
   public List<MediaPackageElement> distributeSync(
-          String channelId,
-          MediaPackage mediapackage,
-          Set<String> elementIds,
-          boolean checkAvailability,
-          boolean preserveReference
+      String channelId,
+      MediaPackage mediapackage,
+      Set<String> elementIds,
+      boolean checkAvailability,
+      boolean preserveReference
   ) throws DistributionException, MediaPackageException {
     notNull(mediapackage, "mediapackage");
     notNull(elementIds, "elementIds");
     notNull(channelId, "channelId");
 
     MediaPackageElement[] distributedElements = distributeElements(channelId, mediapackage, elementIds,
-            checkAvailability, preserveReference);
+        checkAvailability, preserveReference);
     return Arrays.asList(distributedElements);
-  }
-
-  @Override
-  public List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, Set<String> elementIds,
-                                                  boolean checkAvailability) throws DistributionException {
-    Job job = null;
-    try {
-      job = serviceRegistry
-          .createJob(
-              JOB_TYPE, Operation.Distribute.toString(), null, null, false, distributeJobLoad);
-      job.setStatus(Job.Status.RUNNING);
-      job = serviceRegistry.updateJob(job);
-      final MediaPackageElement[] mediaPackageElements
-          = this.distributeElements(channelId, mediapackage, elementIds, checkAvailability);
-      job.setStatus(Job.Status.FINISHED);
-      return Arrays.asList(mediaPackageElements);
-    } catch (ServiceRegistryException e) {
-      throw new DistributionException(e);
-    } catch (NotFoundException e) {
-      throw new DistributionException("Unable to update distribution job", e);
-    } finally {
-      finallyUpdateJob(job);
-    }
   }
 
   @Override
