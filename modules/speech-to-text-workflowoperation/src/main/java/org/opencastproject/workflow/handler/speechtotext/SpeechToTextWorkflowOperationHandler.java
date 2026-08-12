@@ -319,6 +319,7 @@ public class
       URI output = new URI(jobOutput[0]);
       String outputLanguage = jobOutput[1];
       String engineType = jobOutput[2];
+      URI jsonOutput = new URI(jobOutput[3]);
 
       MediaPackageElement subtitleMediaPackageElement;
       switch (appendSubtitleAs) {
@@ -357,6 +358,30 @@ public class
       applyTargetTagsToElement(targetTags, subtitleMediaPackageElement);
 
       parentMediaPackage.add(subtitleMediaPackageElement);
+
+      // attach json
+      try {
+        AttachmentImpl jsonAttachment = new AttachmentImpl();
+        jsonAttachment.generateIdentifier();
+
+        try (InputStream jsonIn = workspace.read(jsonOutput)) {
+          URI jsonUri = workspace.put(
+              parentMediaPackage.getIdentifier().toString(),
+              jsonAttachment.getIdentifier(),
+              FilenameUtils.getName(jsonOutput.getPath()),
+              jsonIn
+          );
+          jsonAttachment.setURI(jsonUri);
+        }
+
+        jsonAttachment.setFlavor(MediaPackageElementFlavor.parseFlavor("captions/json"));
+        jsonAttachment.addTag("archive");
+        parentMediaPackage.add(jsonAttachment);
+
+        workspace.delete(jsonOutput);
+      } catch (Exception e) {
+        throw new WorkflowOperationException("No JSON URI in speech-to-text payload {}", e);
+      }
 
       workspace.delete(output);
     } catch (Exception e) {
