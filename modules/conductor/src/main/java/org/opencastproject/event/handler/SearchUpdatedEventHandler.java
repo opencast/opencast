@@ -99,9 +99,6 @@ public class SearchUpdatedEventHandler {
   /** The authorization service */
   protected AuthorizationService authorizationService = null;
 
-  /** The organization directory */
-  protected OrganizationDirectoryService organizationDirectoryService = null;
-
   /** Dublin core catalog service */
   protected DublinCoreCatalogService dublinCoreService = null;
 
@@ -183,15 +180,6 @@ public class SearchUpdatedEventHandler {
   @Reference
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
-  }
-
-  /**
-   * @param organizationDirectoryService
-   *          the organizationDirectoryService to set
-   */
-  @Reference
-  public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
-    this.organizationDirectoryService = organizationDirectoryService;
   }
 
   public void handleEvent(final SeriesItem seriesItem) {
