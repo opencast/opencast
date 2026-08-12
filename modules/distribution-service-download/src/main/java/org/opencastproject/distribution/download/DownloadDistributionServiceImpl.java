@@ -190,13 +190,13 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
 
   @Override
   public Job distribute(String channelId, MediaPackage mediapackage, String elementId)
-          throws DistributionException, MediaPackageException {
+          throws DistributionException {
     return distribute(channelId, mediapackage, elementId, true);
   }
 
   @Override
   public Job distribute(String channelId, MediaPackage mediapackage, String elementId, boolean checkAvailability)
-          throws DistributionException, MediaPackageException {
+          throws DistributionException {
     Set<String> elementIds = new HashSet<String>();
     elementIds.add(elementId);
     return distribute(channelId, mediapackage, elementIds, checkAvailability, false);
@@ -204,7 +204,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
 
   @Override
   public Job distribute(String channelId, MediaPackage mediapackage, Set<String> elementIds, boolean checkAvailability)
-          throws DistributionException, MediaPackageException {
+          throws DistributionException {
     return distribute(channelId, mediapackage, elementIds, checkAvailability, false);
   }
 
@@ -215,7 +215,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
       Set<String> elementIds,
       boolean checkAvailability,
       boolean preserveReference
-  ) throws DistributionException, MediaPackageException {
+  ) throws DistributionException {
     notNull(mediapackage, "mediapackage");
     notNull(elementIds, "elementIds");
     notNull(channelId, "channelId");
@@ -538,7 +538,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
 
   @Override
   public List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, String elementId)
-          throws DistributionException, MediaPackageException {
+          throws DistributionException {
     Set<String> elementIds = new HashSet<String>();
     elementIds.add(elementId);
     return distributeSync(channelId, mediapackage, elementIds, true, false);
@@ -547,7 +547,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
   @Override
   public List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, String elementId,
       boolean checkAvailability)
-      throws DistributionException, MediaPackageException {
+          throws DistributionException {
     Set<String> elementIds = new HashSet<String>();
     elementIds.add(elementId);
     return distributeSync(channelId, mediapackage, elementIds, checkAvailability, false);
@@ -556,7 +556,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
   @Override
   public List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, Set<String> elementIds,
                                                   boolean checkAvailability)
-      throws DistributionException, MediaPackageException {
+          throws DistributionException {
     return distributeSync(channelId, mediapackage, elementIds, checkAvailability, false);
   }
 
@@ -566,7 +566,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
       Set<String> elementIds,
       boolean checkAvailability,
       boolean preserveReference
-  ) throws DistributionException, MediaPackageException {
+  ) throws DistributionException {
     notNull(mediapackage, "mediapackage");
     notNull(elementIds, "elementIds");
     notNull(channelId, "channelId");
@@ -578,7 +578,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
 
   @Override
   public List<MediaPackageElement> retractSync(String channelId, MediaPackage mediapackage, String elementId)
-          throws DistributionException, MediaPackageException {
+          throws DistributionException {
     Set<String> elementIds = new HashSet();
     elementIds.add(elementId);
     return retractSync(channelId, mediapackage, elementIds);
