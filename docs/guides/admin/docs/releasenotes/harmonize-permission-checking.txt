@@ -1,0 +1,12 @@
+PR #7873 changed two permission-checking behaviors as part of harmonizing Opencast's ACL evaluation:
+
+- `WorkflowService.start()` now requires the caller to be a global/organization admin, hold the capture agent
+  role, or have WRITE permission on the media package's ACL. Previously no permission was checked at all when
+  starting a workflow. If you have deployed XACML policies that rely on `start()` being unrestricted for some
+  role, that role now needs an explicit WRITE (or admin/capture-agent) grant.
+- `AuthorizationService.hasPermission(AccessControlList, String)` (used by, among others, the Workflow, Editor,
+  and Playlist services) now stops at the first ACL entry matching both the action and one of the current user's
+  roles, instead of always letting an explicit `deny` entry win regardless of entry order. If a deployed XACML
+  file mixes `allow` and `deny` entries for the same action across different roles held by the same user, the
+  outcome can change: a `deny` entry no longer automatically overrides an `allow` entry for a different role that
+  appears later in the file.
