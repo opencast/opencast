@@ -862,11 +862,6 @@ public class LiveScheduleServiceImplTest {
     }
 
     @Override
-    public boolean hasPermission(AccessControlList acl, String mediaPackageId, String action) {
-      return false;
-    }
-
-    @Override
     public Tuple<AccessControlList, AclScope> getActiveAcl(MediaPackage mp) {
       return null;
     }

@@ -112,8 +112,8 @@ public final class AccessControlUtil {
    * @return whether this action should be allowed
    * @throws IllegalArgumentException
    *           if any of the arguments are null
-   * @deprecated use {@link AuthorizationService#hasPermission(AccessControlList, String, String)} instead, which
-   *             checks against the current user rather than an explicitly passed one
+   * @deprecated use {@link AuthorizationService#hasPermissionForMediaPackage(AccessControlList, String, String)}
+   *             instead, which checks against the current user rather than an explicitly passed one
    */
   @Deprecated
   public static boolean isAuthorized(AccessControlList acl, User user, Organization org, Object action,

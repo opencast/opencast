@@ -74,7 +74,9 @@ public interface AuthorizationService {
    * @return whether the current user has the correct privileges to take this action
    * @see #hasPermission(AccessControlList, String)
    */
-  boolean hasPermission(AccessControlList acl, String mediaPackageId, String action);
+  default boolean hasPermissionForMediaPackage(AccessControlList acl, String mediaPackageId, String action) {
+    return hasPermission(acl, action);
+  }
 
   /**
    * Gets the active access control list associated with the given media package, as specified by its XACML
