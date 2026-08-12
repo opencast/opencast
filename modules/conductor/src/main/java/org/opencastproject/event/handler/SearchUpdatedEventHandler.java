@@ -257,7 +257,7 @@ public class SearchUpdatedEventHandler {
                 throw new DistributionException("Unable to distribute series catalog " + c.getIdentifier());
               }
             }
-          } catch (DistributionException | IOException | MediaPackageException e) {
+          } catch (DistributionException | IOException e) {
             logger.error("Could not update series catalog in search for event {} of series {}", mp.getIdentifier(),
                 seriesId, e);
             continue;
@@ -299,7 +299,7 @@ public class SearchUpdatedEventHandler {
                     "Unable to distribute episode catalog " + episodeCatalog.getIdentifier());
               }
             }
-          } catch (DistributionException | IOException | MediaPackageException e) {
+          } catch (DistributionException | IOException e) {
             logger.error("Could remove series {} from search for event {}", seriesId, mp.getIdentifier(), e);
             continue;
           }
