@@ -158,6 +158,14 @@ public class DownloadDistributionServiceRemoteImpl extends RemoteBase
   }
 
   @Override
+  public List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, String elementId,
+      boolean checkAvailability) throws DistributionException {
+    Set<String> elementIds = new HashSet<String>();
+    elementIds.add(elementId);
+    return distributeSync(channelId, mediapackage, elementIds, checkAvailability);
+  }
+
+  @Override
   public List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, String elementId)
           throws DistributionException, MediaPackageException {
     Set<String> elementIds = new HashSet<String>();

@@ -51,6 +51,10 @@ public interface DownloadDistributionService extends DistributionService {
   Job retract(String channelId, MediaPackage mediaPackage, Set<String> elementIds)
           throws DistributionException;
 
+  List<MediaPackageElement> distributeSync(String channelId, MediaPackage mediapackage, String elementId,
+      boolean checkAvailability)
+      throws DistributionException, MediaPackageException;
+
   /**
    * Distributes the given elements synchronously. This should be used rarely since load balancing will be unavailable.
    * However, since the dispatching logic is bypassed, synchronous execution is much faster. It is useful in interactive
@@ -70,7 +74,7 @@ public interface DownloadDistributionService extends DistributionService {
       MediaPackage mediapackage,
       Set<String> elementIds,
       boolean checkAvailability
-  ) throws DistributionException;
+  ) throws DistributionException, MediaPackageException;
 
   /**
    * Retracts the given elements synchronously. This should be used rarely since load balancing will be unavailable.
