@@ -311,11 +311,11 @@ public class XACMLAuthorizationService implements AuthorizationService {
 
   public boolean hasPermission(final MediaPackage mp, final String action) {
     AccessControlList acl = getActiveAcl(mp).getA();
-    return hasPermission(acl, mp.getIdentifier().toString(), action);
+    return hasPermissionForMediaPackage(acl, mp.getIdentifier().toString(), action);
   }
 
   @Override
-  public boolean hasPermission(AccessControlList acl, String mediaPackageId, final String action) {
+  public boolean hasPermissionForMediaPackage(AccessControlList acl, String mediaPackageId, final String action) {
     // Check special ROLE_EPISODE_<ID>_<ACTION> permissions
     final User user = securityService.getUser();
     var episodeRole = getEpisodeRoleId(mediaPackageId, action);

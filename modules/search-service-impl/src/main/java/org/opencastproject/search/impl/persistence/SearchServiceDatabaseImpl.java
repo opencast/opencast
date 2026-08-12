@@ -187,7 +187,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
         // allow ca users to retract live publications without putting them into the ACL
         if (!(searchMp.isLive() && currentUser.hasRole(GLOBAL_CAPTURE_AGENT_ROLE)) && accessControlXml != null) {
           AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
-          if (!authorizationService.hasPermission(acl, mediaPackageId, WRITE.toString())) {
+          if (!authorizationService.hasPermissionForMediaPackage(acl, mediaPackageId, WRITE.toString())) {
             throw new UnauthorizedException(
                 currentUser + " is not authorized to delete media package " + mediaPackageId);
           }
@@ -368,7 +368,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
           if (accessControlXml != null && entity.get().getDeletionDate() == null) {
             AccessControlList accessList = AccessControlParser.parseAcl(accessControlXml);
             User currentUser = securityService.getUser();
-            if (!authorizationService.hasPermission(accessList, mediaPackageId, WRITE.toString())) {
+            if (!authorizationService.hasPermissionForMediaPackage(accessList, mediaPackageId, WRITE.toString())) {
               throw new UnauthorizedException(currentUser + " is not authorized to update media package "
                   + mediaPackageId);
             }
@@ -411,9 +411,9 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
           AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
           User currentUser = securityService.getUser();
           // There are several reasons a user may need to load a episode: to read content, to edit it, or add content
-          if (!authorizationService.hasPermission(acl, mediaPackageId, READ.toString())
-                  && !authorizationService.hasPermission(acl, mediaPackageId, CONTRIBUTE.toString())
-                  && !authorizationService.hasPermission(acl, mediaPackageId, WRITE.toString())) {
+          if (!authorizationService.hasPermissionForMediaPackage(acl, mediaPackageId, READ.toString())
+                  && !authorizationService.hasPermissionForMediaPackage(acl, mediaPackageId, CONTRIBUTE.toString())
+                  && !authorizationService.hasPermissionForMediaPackage(acl, mediaPackageId, WRITE.toString())) {
             throw new UnauthorizedException(currentUser + " is not authorized to see episode " + mediaPackageId);
           }
         }
@@ -445,7 +445,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
         if (accessControlXml != null) {
           AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
           User currentUser = securityService.getUser();
-          if (!authorizationService.hasPermission(acl, mediaPackageId, READ.toString())) {
+          if (!authorizationService.hasPermissionForMediaPackage(acl, mediaPackageId, READ.toString())) {
             throw new UnauthorizedException(
                 currentUser + " is not authorized to read media package " + mediaPackageId);
           }
@@ -478,7 +478,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
         if (accessControlXml != null) {
           AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
           User currentUser = securityService.getUser();
-          if (!authorizationService.hasPermission(acl, mediaPackageId, READ.toString())) {
+          if (!authorizationService.hasPermissionForMediaPackage(acl, mediaPackageId, READ.toString())) {
             throw new UnauthorizedException(
                 currentUser + " is not authorized to read media package " + mediaPackageId);
           }
@@ -528,7 +528,7 @@ public class SearchServiceDatabaseImpl implements SearchServiceDatabase {
         if (accessControlXml != null) {
           AccessControlList acl = AccessControlParser.parseAcl(accessControlXml);
           User currentUser = securityService.getUser();
-          if (!authorizationService.hasPermission(acl, mediaPackageId, READ.toString())) {
+          if (!authorizationService.hasPermissionForMediaPackage(acl, mediaPackageId, READ.toString())) {
             throw new UnauthorizedException(
                 currentUser + " is not authorized to read media package " + mediaPackageId);
           }
