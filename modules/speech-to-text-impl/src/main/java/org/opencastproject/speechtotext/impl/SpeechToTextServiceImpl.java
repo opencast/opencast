@@ -115,6 +115,7 @@ public class SpeechToTextServiceImpl extends AbstractJobProducer implements Spee
   }
 
 
+  @Override
   @Activate
   @Modified
   public void activate(ComponentContext cc) {
@@ -166,26 +167,31 @@ public class SpeechToTextServiceImpl extends AbstractJobProducer implements Spee
     } finally {
       FileUtils.deleteQuietly(jobDir);
     }
-    return subtitleFilesURI.toString() + "," + language + "," + speechToTextEngine.getEngineName();
+    // Added input url so that attach operation can clean it up if necessary
+    return subtitleFilesURI.toString() + "," + language + "," + speechToTextEngine.getEngineName() + ","
+            + mediaFile.toString();
   }
 
 
   /**
    * {@inheritDoc}
    *
-   * @see org.opencastproject.speechtotext.api.SpeechToTextService#transcribe(URI, String, Boolean)
+   * @see org.opencastproject.speechtotext.api.SpeechToTextService#transcribe(URI, String, Boolean, Boolean)
    */
   @Override
-  public Job transcribe(URI mediaFile, String language, Boolean translate) throws SpeechToTextServiceException {
+  public Job transcribe(URI mediaFile, String language, Boolean translate, Boolean async)
+          throws SpeechToTextServiceException {
     try {
       logger.debug("Creating speechToText service job");
       List<String> jobArguments = Arrays.asList(mediaFile.toString(), language, translate.toString());
-      return serviceRegistry.createJob(JOB_TYPE, OPERATION, jobArguments, jobLoad);
+      // If async i.e. job can run outside the scope of a workflow, set parent to null so that
+      // job arguments are not deleted by the cleanup woh.
+      Job parent = async ? null : serviceRegistry.getCurrentJob();
+      return serviceRegistry.createJob(JOB_TYPE, OPERATION, jobArguments, null, true, parent, jobLoad);
     } catch (ServiceRegistryException e) {
       throw new SpeechToTextServiceException(e);
     }
   }
-
 
   //================================================================================
   // OSGi - Getter and Setter

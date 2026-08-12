@@ -1,0 +1,1 @@
+[#7040](https://github.com/opencast/opencast/pull/7040) Whisper can optionally run fully asynchronously i.e. a workflow starts the subtitle generation and finishes execution; the generated subtitles are attached later by another workflow.

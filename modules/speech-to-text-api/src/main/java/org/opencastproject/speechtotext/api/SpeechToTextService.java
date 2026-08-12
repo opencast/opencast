@@ -38,11 +38,16 @@ public interface SpeechToTextService {
   /**
    * Generates a subtitles file for a media package with an audio track.
    *
-   * @param mediaFile Location of the media file to generate subtitles for.
-   * @param language The language of the audio.
+   * @param mediaFile
+   *          Location of the media file to generate subtitles for.
+   * @param language
+   *          The language of the audio.
+   * @param async
+   *          If the job will run outside the scope of a workflow
    * @return SpeechToText service job.
-   * @throws SpeechToTextServiceException If something went wrong during the subtitle's generation.
+   * @throws SpeechToTextServiceException
+   *           If something went wrong during the subtitle's generation.
    */
-  Job transcribe(URI mediaFile, String language, Boolean translate) throws SpeechToTextServiceException;
+  Job transcribe(URI mediaFile, String language, Boolean translate, Boolean async) throws SpeechToTextServiceException;
 
 }
