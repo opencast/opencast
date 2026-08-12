@@ -381,6 +381,13 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
     }
     roles.addAll(derivedRoles);
 
+    // Every user has the anonymous role: being logged in does not stop you from also being part of
+    // the anonymous audience. It is already granted to the Spring authorities in
+    // loadUserByUsername(), so without adding it here the roles of a User would disagree with the
+    // authorities actually being evaluated, and it would be missing from /info/me.json.
+    roles.add(new JaxbRole(user.getOrganization().getAnonymousRole(),
+            JaxbOrganization.fromOrganization(user.getOrganization()), "", Role.Type.SYSTEM));
+
     // Create and return the final user
     JaxbUser mergedUser = new JaxbUser(user.getUsername(), user.getPassword(), user.getName(), user.getEmail(),
             user.getProvider(), JaxbOrganization.fromOrganization(user.getOrganization()), roles);
