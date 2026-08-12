@@ -84,8 +84,14 @@ public class SearchUpdatedEventHandler {
   /** The logger */
   protected static final Logger logger = LoggerFactory.getLogger(SearchUpdatedEventHandler.class);
 
+  // config keys
+  protected static final String DISTRIBUTION_CHECK_AVAILABILITY = "distribution.check.availability";
+
+  /** Whether to propagate episode meta data changes to OAI-PMH or not */
+  private boolean checkAvailability;
+
   /** The distribution service */
-  protected DistributionService distributionService = null;
+  protected DownloadDistributionService downloadDistributionService = null;
 
   /** The search service */
   protected SearchService searchService = null;
@@ -108,12 +114,20 @@ public class SearchUpdatedEventHandler {
   /**
    * OSGI callback for component activation.
    *
-   * @param bundleContext
-   *          the OSGI bundle context
+   * @param componentContext
+   *          the OSGI component context
    */
   @Activate
-  protected void activate(BundleContext bundleContext) {
-    this.systemAccount = bundleContext.getProperty("org.opencastproject.security.digest.user");
+  protected void activate(ComponentContext componentContext) {
+    this.systemAccount = componentContext.getBundleContext().getProperty("org.opencastproject.security.digest.user");
+    updated(componentContext);
+  }
+
+  @Modified
+  protected void updated(ComponentContext componentContext) {
+    checkAvailability = BooleanUtils.toBoolean(Objects.toString(componentContext.getProperties()
+            .get(DISTRIBUTION_CHECK_AVAILABILITY), "true"));
+    logger.info("Check-availability flag set to {}", checkAvailability);
   }
 
   /**
@@ -135,12 +149,12 @@ public class SearchUpdatedEventHandler {
   }
 
   /**
-   * @param distributionService
-   *          the distributionService to set
+   * @param downloadDistributionService
+   *          the downloadDstributionService to set
    */
   @Reference(target = "(distribution.channel=download)")
-  public void setDistributionService(DistributionService distributionService) {
-    this.distributionService = distributionService;
+  public void setDownloadDistributionService(DownloadDistributionService downloadDistributionService) {
+    this.downloadDistributionService = downloadDistributionService;
   }
 
   /**
@@ -194,7 +208,7 @@ public class SearchUpdatedEventHandler {
 
               MediaPackageElement[] distributedEpisodeAcls = mp.getElementsByFlavor(XACML_POLICY_EPISODE);
               for (MediaPackageElement distributedEpisodeAcl : distributedEpisodeAcls) {
-                distributionService.retractSync(CHANNEL_ID, mp, distributedEpisodeAcl.getIdentifier());
+                downloadDistributionService.retractSync(CHANNEL_ID, mp, distributedEpisodeAcl.getIdentifier());
                 authorizationService.removeAcl(mp, AclScope.Episode);
               }
             }
@@ -202,8 +216,8 @@ public class SearchUpdatedEventHandler {
             Attachment fileRepoCopy = authorizationService.setAcl(mp, AclScope.Series, seriesItem.getAcl()).getB();
 
             // Distribute the updated XACML file
-            List<MediaPackageElement> mpes = distributionService.distributeSync(CHANNEL_ID, mp,
-                fileRepoCopy.getIdentifier());
+            List<MediaPackageElement> mpes = downloadDistributionService.distributeSync(CHANNEL_ID, mp,
+                fileRepoCopy.getIdentifier(), checkAvailability);
             if (mpes != null && mpes.size() == 1) {
               mp.remove(fileRepoCopy);
               mp.add(mpes.getFirst());
@@ -235,7 +249,7 @@ public class SearchUpdatedEventHandler {
               c.setChecksum(null);
 
               // Distribute the updated series dc
-              List<MediaPackageElement> mpes = distributionService.distributeSync(CHANNEL_ID, mp, c.getIdentifier());
+              List<MediaPackageElement> mpes = downloadDistributionService.distributeSync(CHANNEL_ID, mp, c.getIdentifier(), checkAvailability);
               if (mpes != null && mpes.size() == 1) {
                 mp.remove(c);
                 mp.add(mpes.getFirst());
@@ -258,7 +272,7 @@ public class SearchUpdatedEventHandler {
 
             // retract the series catalog
             for (Catalog c : mp.getCatalogs(MediaPackageElements.SERIES)) {
-              distributionService.retractSync(CHANNEL_ID, mp, c.getIdentifier());
+              downloadDistributionService.retractSync(CHANNEL_ID, mp, c.getIdentifier());
               mp.remove(c);
             }
 
@@ -274,8 +288,8 @@ public class SearchUpdatedEventHandler {
               episodeCatalog.setChecksum(null);
 
               // Distribute the updated episode dublincore
-              List<MediaPackageElement> mpes = distributionService.distributeSync(CHANNEL_ID, mp,
-                  episodeCatalog.getIdentifier());
+              List<MediaPackageElement> mpes = downloadDistributionService.distributeSync(CHANNEL_ID, mp,
+                  episodeCatalog.getIdentifier(), checkAvailability);
 
               if (mpes != null && mpes.size() == 1) {
                 mp.remove(episodeCatalog);
