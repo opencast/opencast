@@ -8,25 +8,30 @@ a public repo.
 
 Please feel free to contribute your workflows when you have Opencast in production!
 
-This document will help you get started with creating your own Opencast workflows. For a list of available workflow
-operations, see:
+For a list of available workflow operations, see:
 
 > [List of Workflow Operation Handler](../workflowoperationhandlers/index.md)
 
 For a video introduction to workflow, take a look at this [workflow workshop](https://explore.opencast.org/conferences/2020/summit/v/CQeYQie869O).
 Or for longer session, check out this [in-depth webinar on workflows](https://explore.opencast.org/webinars/v/CjqLfpgeTVW).
 
+This page is split into two parts:
+
+* [Creating a Simple Workflow](#creating-a-simple-workflow) is a step-by-step guide that walks you through building a
+  small but complete workflow from scratch.
+* [Workflow Reference](#workflow-reference) documents features you can use in any workflow, such as accepting user
+  input or executing operations conditionally.
+
 ## Overview
 
-A Opencast workflow is an ordered list of operations. There is no limit to the number of operations or their
+An Opencast workflow is an ordered list of operations. There is no limit to the number of operations or their
 repetition in a given workflow.
 
 Workflow operations can be configured using configuration elements. The use of string replacement in configuration
 values allows workflows to dynamically adapt to a given input or user decision.
 
-### Document
-
-Opencast workflows are defined in YAML, or alternatively in [XML](workflow.md#using-xml-files-with-workflows) .  The structure of a Opencast workflow looks like this:
+Opencast workflows are defined in YAML, or alternatively in [XML](#xml-workflow-definitions). The structure of an
+Opencast workflow looks like this:
 
 ```yaml
 # Description
@@ -40,12 +45,12 @@ operations:
   ...
 ```
 
-## Create a Workflow
+## Creating a Simple Workflow
 
 This section will walk you through creating a custom workflow, which will encode ingested tracks to defined output
 format.
 
-### Step 1: Encoding Profiles
+### Step 1: Choose Encoding Profiles
 
 First create or select the encoding profiles you want to use. For more details on this, have a look at the [Encoding
 Profile Configuration Guide](encoding.md). For this guide we assume that we have an encoding profile `mov-low.http`
@@ -102,7 +107,6 @@ operations: []
 * The `description` allows you to describe the workflow in detail. Blank lines are formatted as newlines, while single
   line breaks are ignored so that the XML remains compact and readable even with long paragraphs.
 
-
 ### Step 3: Inspect the Media
 
 The first operation will be to inspect the media for technical metadata, such as format and length:
@@ -123,7 +127,7 @@ operations:
 The *fail-on-error* attribute is a boolean determining whether the workflow will throw an error to the
 exception-handler-workflow or simply proceed with the remaining operations.
 
-### Step 4: Encoding
+### Step 4: Encode the Media
 
 The next operations will encode the media to the Mp4 format:
 
@@ -158,13 +162,11 @@ operations:
       - encoding-profile: mov-low.http
 ```
 
-
 * The `target-tags` attribute causes the resulting media to be tagged. For example, this could be used to define these
   media as input for other operations, using their `source-tags` attribute.
 * The `encoding-profile` attribute refers to an encoding profile defined in `etc/encoding`.
 
-
-### Step 5: Encode to Thumbnail
+### Step 5: Create Thumbnails
 
 The next operations will create thumbnails from the media:
 
@@ -220,8 +222,17 @@ operations:
 
 * The publish-engage operation uses all media tagged as *publish* as input.
 
-<!-- _Are the next sections still part of Creating a Custom Workflow? -->
-## Accept User Input
+### Step 7: Test the Workflow
+
+The easiest way to test a workflow is to just put it into the workflows folder where it will be picked up by Opencast
+automatically and will be available in Opencast a few seconds later.
+
+## Workflow Reference
+
+The following sections document workflow features that are not specific to the example above and can be used in any
+workflow.
+
+### Accepting User Input
 
 Workflow definitions may optionally include variables to be replaced by user input. For instance, this may be used to
 select optional parts of a workflow. To enable user control of individual workflow instances, the workflow definition
@@ -236,7 +247,8 @@ Here is an example of a configurable operation:
       if: "${somevar}"
 
 The attribute `if` specifies the execution condition in means of the operation only being executed if that condition
-evaluates to true. You can find more details on conditional execution in the next section.
+evaluates to true. You can find more details on conditional execution in the [Conditional
+Execution](#conditional-execution) section below.
 
 Once the operation is configured to accept a variable, we need to describe how to gather the value from the
 administrative user. The `configuration_panel_json` element of a workflow definitions describes this user interface
@@ -285,14 +297,14 @@ NOTE: The old `configuration_panel` element defined the user input using HTML bu
 old Admin UI was removed completely in v17.x and you will need to rewrite user input as JSON if updating from an earlier
 version.
 
-## Organisation Properties
+### Organisation Properties
 
 Workflows can access organisation properties stored as `prop.*` in the organisation configuration
 (`etc/org.opencastproject.organization-mh_default_org.cfg` for the default organisation `mh_default_org`). This allows
 for organisation specific configuration of your workflow. To access the property use the `org_` prefix, e.g.
 `prop.my.var` can be access using `${org_my.var}`.
 
-## Conditional Execution
+### Conditional Execution
 
 The attribute `if` of the `operation` element can be used to specify a condition to control whether the workflow
 operation should be executed. This so-called execution condition is a boolean expression of the following form:
@@ -359,7 +371,7 @@ Some workflow operation handlers can generate or import variables during a workf
 - [analyze-mediapackage](../workflowoperationhandlers/analyze-mediapackage-woh.md)
 - [import-wf-properties](../workflowoperationhandlers/import-wf-properties-woh.md)
 
-## Thumbnail Support
+### Thumbnail Support
 
 The Admin UI comes with explicit support for thumbnails that are supposed to represent events visually, e.g. in lists
 of events as commonly used in video portals and other similar systems.
@@ -381,16 +393,11 @@ Thumbnail Type | Description
 To fully support the thumbnail feature, your workflows should take care of creating the different types of thumbnails
 and be consistent to the Admin UI thumbnail configuration (see [Thumbnail Configuration](admin-ui/thumbnails.md))
 
-## Test the Workflow
-
-The easiest way to test a workflow is to just put it into the workflows folder where it will be picked up by Opencast
-automatically and will be available in Opencast a few seconds later.
-
-## Using XML Files with Workflows
+### XML Workflow Definitions
 
 As an alternative to YAML workflow configuration files, it is possible to use XML files with the following structure.
 
-### XML Workflow Definition Structure
+#### XML Workflow Definition Structure
 
 ```xml
 <definition xmlns="http://workflow.opencastproject.org">
@@ -419,7 +426,7 @@ As an alternative to YAML workflow configuration files, it is possible to use XM
 </definition>
 ```
 
-### XML Operation Structure
+#### XML Operation Structure
 
 ```xml
     <operation
