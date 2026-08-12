@@ -611,7 +611,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
    *          the mediapackage
    * @param elementIds
    *          the element identifiers
-   * @return the retracted element or <code>null</code> if the element was not retracted
+   * @return the retracted elements
    * @throws org.opencastproject.distribution.api.DistributionException
    *           in case of an error
    */
@@ -642,7 +642,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
    *          the mediapackage
    * @param element
    *          the element
-   * @return the retracted element or <code>null</code> if the element was not retracted
+   * @return the retracted element
    * @throws org.opencastproject.distribution.api.DistributionException
    *           in case of an error
    */
