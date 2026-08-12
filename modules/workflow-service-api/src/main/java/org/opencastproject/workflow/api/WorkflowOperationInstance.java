@@ -21,6 +21,9 @@
 
 package org.opencastproject.workflow.api;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.Collections;
 import java.util.Date;
 import java.util.Map;
@@ -57,6 +60,11 @@ public class WorkflowOperationInstance implements Configurable {
   public enum OperationState {
     INSTANTIATED, RUNNING, PAUSED, SUCCEEDED, FAILED, SKIPPED, RETRY
   }
+
+  private static final Logger logger = LoggerFactory.getLogger(WorkflowOperationInstance.class);
+
+  /** Value of maxAttempts denoting that an operation may be retried without limit. */
+  public static final int UNLIMITED_ATTEMPTS = -1;
 
   @Id
   @GeneratedValue
@@ -165,8 +173,15 @@ public class WorkflowOperationInstance implements Configurable {
       }
     }
 
-    if ((retryStrategy == RetryStrategy.RETRY || retryStrategy == RetryStrategy.HOLD) && maxAttempts < 2) {
-      maxAttempts = 2;
+    if (retryStrategy == RetryStrategy.RETRY || retryStrategy == RetryStrategy.HOLD) {
+      if (maxAttempts != UNLIMITED_ATTEMPTS && maxAttempts < 2) {
+        maxAttempts = 2;
+      }
+    } else if (maxAttempts != 1) {
+      logger.warn(
+          "Operation '{}' sets max-attempts to {} but no retry-strategy, so it will never be retried. "
+              + "Add a retry-strategy of 'retry' or 'hold' for max-attempts to take effect.",
+          getTemplate(), maxAttempts);
     }
   }
 
@@ -495,13 +510,13 @@ public class WorkflowOperationInstance implements Configurable {
 
   /**
    * @param maxAttempts
-   *          the maxAttempts to set
+   *          the maxAttempts to set, either a positive number of attempts or {@link #UNLIMITED_ATTEMPTS}
    * @throws IllegalArgumentException
-   *           if maxAttempts is less than one.
+   *           if maxAttempts is neither greater than zero nor {@link #UNLIMITED_ATTEMPTS}.
    */
   private void setMaxAttempts(int maxAttempts) {
-    if (maxAttempts < 1) {
-      throw new IllegalArgumentException("maxAttempts must be >=1");
+    if (maxAttempts < 1 && maxAttempts != UNLIMITED_ATTEMPTS) {
+      throw new IllegalArgumentException("maxAttempts must be >=1 or " + UNLIMITED_ATTEMPTS + " (unlimited)");
     }
     this.maxAttempts = maxAttempts;
   }

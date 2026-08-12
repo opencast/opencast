@@ -8,6 +8,14 @@ An operation can have a retry-strategy specified to define what will happen if t
 |**retry**| If the operation fails, it will be re-tried until the number of attempts reaches max-attempts, which defaults to 2.|
 |**hold**|If the operation fails, the workflow will be paused, until the user takes an action. The user can choose to *Retry* the operation or *Abort* it. The user can retry the operation many times, until the number of attempts reaches max-attempts. If the user aborts the operation, the behavior will depend on the fail-on-error parameter as described above.|
 
+## max-attempts
+
+`max-attempts` limits how often an operation is attempted. It only takes effect together with a
+`retry-strategy` of `retry` or `hold`: with the default strategy `none` a failed operation is never
+retried, so setting `max-attempts` on its own has no effect and is logged as a warning.
+
+Setting `max-attempts: -1` means the operation is retried without limit.
+
 **Example 1**: No retry
 
 If the operation1 fails, the workflow will fail because fail-on-error="true".
