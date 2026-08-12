@@ -314,9 +314,8 @@ public class AgentImpl implements Agent {
         if (key.startsWith(check)) {
           String property = configuration.getProperty(key);
           if (property == null) {
-            log.error("Unable to expand variable in value for key {}, returning null!", key);
-            capabilitiesProperties = null;
-            return;
+            log.warn("Capture agent '{}': ignoring capability key '{}' because its value is null", this.name, key);
+            continue;
           }
           capabilitiesProperties.setProperty(key, property);
           propertyCounts.put(name, propertyCounts.get(name) + 1);
