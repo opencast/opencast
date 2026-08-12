@@ -455,9 +455,15 @@ public class PlaylistService {
     User currentUser = securityService.getUser();
     Organization currentOrg = securityService.getOrganization();
 
-    return SecurityUtil.isGlobalAdmin(currentUser)
-        || (currentOrg.getId().equals(playlist.getOrganization())
-            && SecurityUtil.isOrganizationAdmin(currentUser, currentOrg))
+    if (SecurityUtil.isGlobalAdmin(currentUser)) {
+      return true;
+    }
+    // authorizationService.hasPermission() grants any org admin of the *current* organization, so if the playlist
+    // belongs to a different organization it must be rejected here rather than falling through to that check.
+    if (!currentOrg.getId().equals(playlist.getOrganization())) {
+      return false;
+    }
+    return SecurityUtil.isOrganizationAdmin(currentUser, currentOrg)
         || authorizationService.hasPermission(getAccessControlList(playlist), action.toString());
   }
 
