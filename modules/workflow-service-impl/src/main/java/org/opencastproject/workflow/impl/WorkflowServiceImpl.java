@@ -1419,7 +1419,7 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
         currentOperation.setState(OperationState.FAILED);
       }
       handleFailedOperation(workflow, currentOperation);
-    } else if (currentOperation.getMaxAttempts() != -1 && failedAttempt == currentOperation.getMaxAttempts()) {
+    } else if (failedAttempt == currentOperation.getMaxAttempts()) {
       handleFailedOperation(workflow, currentOperation);
     } else {
       switch (currentOperation.getRetryStrategy()) {
