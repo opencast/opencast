@@ -78,6 +78,7 @@ jobs:
           ./mvnw install -DskipTests -T1C -Pnone \
             --batch-mode \
             -Dcheckstyle.skip=true \
+            -Dspotless.apply.skip=true \
             -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
             -Dhttp.keepAlive=false \
             -Dmaven.wagon.http.pool=false \
@@ -90,12 +91,13 @@ jobs:
         run: |
           ./mvnw site -T1C -P'none,!frontend' \
             --batch-mode \
+            -Dspotless.apply.skip=true \
             -Dsurefire.rerunFailingTestsCount=2 \
             -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn \
             -Dhttp.keepAlive=false \
             -Dmaven.wagon.http.pool=false \
             -Dmaven.wagon.httpconnectionManager.ttlSeconds=120 && \
-          ./mvnw site:stage -Pnone
+          ./mvnw site:stage -Pnone -Dspotless.apply.skip=true
 
       - name: Save site build
         uses: actions/upload-artifact@v7
