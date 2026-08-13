@@ -449,6 +449,8 @@ public abstract class AbstractEventEndpoint {
     final IndexService.EventRemovalResult result;
     try {
       result = getIndexService().removeEvent(event.get(), getAdminUIConfiguration().getRetractWorkflowId());
+    } catch (UnauthorizedException e) {
+      return Response.status(Response.Status.UNAUTHORIZED).build();
     } catch (WorkflowDatabaseException e) {
       logger.error("Workflow database is not reachable. This may be a temporary problem.");
       return RestUtil.R.serverError();

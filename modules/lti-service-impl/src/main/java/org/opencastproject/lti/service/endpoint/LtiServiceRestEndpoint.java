@@ -394,7 +394,11 @@ public class LtiServiceRestEndpoint {
       }
   )
   public Response deleteEvent(@PathParam("eventId") final String id) {
-    service.delete(id);
-    return Response.noContent().build();
+    try {
+      service.delete(id);
+      return Response.noContent().build();
+    } catch (UnauthorizedException e) {
+      return Response.status(Status.UNAUTHORIZED).build();
+    }
   }
 }

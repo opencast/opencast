@@ -77,6 +77,23 @@ public class AbstractEventEndpointTest {
     return new TestEnv();
   }
 
+  /**
+   * The write-access check for deleting an event lives in the index service, so the admin UI is covered by it too. A
+   * caller who is not allowed to delete must be told so rather than getting a server error, and above all the event
+   * must not be removed.
+   */
+  @Test
+  public void testDeleteEventWithoutWriteAccess() {
+    given().pathParam("eventId", "undeletableid").expect().statusCode(HttpStatus.SC_UNAUTHORIZED).when()
+            .delete(rt.host("/{eventId}"));
+  }
+
+  @Test
+  public void testDeleteEvent() {
+    given().pathParam("eventId", "deletableid").expect().statusCode(HttpStatus.SC_OK).when()
+            .delete(rt.host("/{eventId}"));
+  }
+
   @Test
   public void testGetEvent() throws Exception {
     given().pathParam("eventId", "asdasd").expect().statusCode(HttpStatus.SC_OK)

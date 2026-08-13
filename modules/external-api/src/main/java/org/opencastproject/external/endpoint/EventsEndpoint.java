@@ -592,7 +592,7 @@ public class EventsEndpoint implements ManagedService {
               responseCode = HttpServletResponse.SC_NOT_FOUND)
       })
   public Response deleteEvent(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id)
-          throws SearchIndexException, UnauthorizedException {
+          throws SearchIndexException {
     final Optional<Event> event = indexService.getEvent(id, elasticsearchIndex);
     if (event.isEmpty()) {
       return RestUtil.R.notFound(id);
@@ -600,6 +600,8 @@ public class EventsEndpoint implements ManagedService {
     final IndexService.EventRemovalResult result;
     try {
       result = indexService.removeEvent(event.get(), retractWorkflowId);
+    } catch (UnauthorizedException e) {
+      return Response.status(Status.UNAUTHORIZED).build();
     } catch (WorkflowDatabaseException e) {
       logger.error("Workflow database is not reachable. This may be a temporary problem.");
       return RestUtil.R.serverError();

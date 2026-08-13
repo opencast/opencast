@@ -91,6 +91,8 @@ public class TestEventsEndpoint extends EventsEndpoint {
   public static final String SCHEDULING_GET_EVENT = "schedulinggetevent";
   public static final String SCHEDULING_UPDATE_EVENT = "schedulingupdateevent";
   public static final String TRACK_UPDATE_EVENT = "trackupdateevent";
+  public static final String DELETE_AUTHORIZED_EVENT = "deleteauthorizedevent";
+  public static final String DELETE_UNAUTHORIZED_EVENT = "deleteunauthorizedevent";
 
   private static Capture<MetadataList> capturedMetadataList1;
   private static Capture<MetadataList> capturedMetadataList2;
@@ -318,6 +320,21 @@ public class TestEventsEndpoint extends EventsEndpoint {
     EasyMock.expect(schedulerService.getTechnicalMetadata(SCHEDULING_GET_EVENT))
         .andReturn(technicalMetadata2).anyTimes();
 
+    /**
+     * Delete event external service mocking. The write-access check itself lives in the index service, so the endpoint
+     * is expected to simply pass an UnauthorizedException on to the caller as a 401.
+     */
+    Event deleteAuthorizedEvent = new Event(DELETE_AUTHORIZED_EVENT, defaultOrg.getId());
+    EasyMock.expect(indexService.getEvent(DELETE_AUTHORIZED_EVENT, elasticsearchIndex))
+            .andReturn(Optional.of(deleteAuthorizedEvent)).anyTimes();
+    EasyMock.expect(indexService.removeEvent(EasyMock.eq(deleteAuthorizedEvent), EasyMock.anyString()))
+            .andReturn(IndexService.EventRemovalResult.SUCCESS).anyTimes();
+
+    Event deleteUnauthorizedEvent = new Event(DELETE_UNAUTHORIZED_EVENT, defaultOrg.getId());
+    EasyMock.expect(indexService.getEvent(DELETE_UNAUTHORIZED_EVENT, elasticsearchIndex))
+            .andReturn(Optional.of(deleteUnauthorizedEvent)).anyTimes();
+    EasyMock.expect(indexService.removeEvent(EasyMock.eq(deleteUnauthorizedEvent), EasyMock.anyString()))
+            .andThrow(new UnauthorizedException("Not authorized to remove event")).anyTimes();
 
     // Replay all mocks
     EasyMock.replay(deleteMetadataMP, indexService, schedulerService, ingestService, assetManager, workflowService,
