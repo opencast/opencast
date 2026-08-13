@@ -23,6 +23,7 @@ package org.opencastproject.index.service.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Property;
@@ -65,6 +66,7 @@ import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
@@ -81,6 +83,7 @@ import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.data.VCell;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowInstance;
+import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
 
 import net.fortuna.ical4j.model.Period;
@@ -1212,5 +1215,114 @@ public class IndexServiceImplTest {
   public List<Period<ZonedDateTime>> calculatePeriods(RRule<ZonedDateTime> rrule, Date start, Date end,
           long duration, TimeZone tz) {
     return Util.calculatePeriods(start, end, duration, rrule, tz);
+  }
+
+  /** Security service whose user may be asked for repeatedly, unlike {@link #setupSecurityService(String, String)}. */
+  private SecurityService setupSecurityServiceForDelete(String org) {
+    Organization organization = EasyMock.createNiceMock(Organization.class);
+    EasyMock.expect(organization.getId()).andReturn(org).anyTimes();
+    EasyMock.replay(organization);
+
+    User user = EasyMock.createNiceMock(User.class);
+    EasyMock.expect(user.getOrganization()).andReturn(organization).anyTimes();
+    EasyMock.expect(user.getUsername()).andReturn("user").anyTimes();
+    EasyMock.replay(user);
+
+    SecurityService securityService = EasyMock.createNiceMock(SecurityService.class);
+    EasyMock.expect(securityService.getOrganization()).andReturn(organization).anyTimes();
+    EasyMock.expect(securityService.getUser()).andReturn(user).anyTimes();
+    EasyMock.replay(securityService);
+    return securityService;
+  }
+
+  /**
+   * A caller without write access must not have anything deleted. This pins the vulnerability where the deletion was
+   * carried out first and the authorization failure only reported afterwards, so the event was gone despite the error.
+   */
+  @Test
+  public void testRemoveEventWithoutWriteAccessDeletesNothing() throws Exception {
+    final String mpId = "event-without-write-access";
+    MediaPackage mediaPackage = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
+
+    AssetManager assetManager = EasyMock.createMock(AssetManager.class);
+    EasyMock.expect(assetManager.getMediaPackage(mpId)).andReturn(Optional.of(mediaPackage)).anyTimes();
+    EasyMock.replay(assetManager);
+
+    AuthorizationService authorizationService = EasyMock.createMock(AuthorizationService.class);
+    EasyMock.expect(authorizationService.hasPermission(mediaPackage, Permissions.Action.WRITE.toString()))
+            .andReturn(false).anyTimes();
+    EasyMock.replay(authorizationService);
+
+    // No expectations at all: these strict mocks fail the test if anything is removed.
+    SchedulerService schedulerService = EasyMock.createMock(SchedulerService.class);
+    EasyMock.replay(schedulerService);
+    WorkflowService workflowService = EasyMock.createMock(WorkflowService.class);
+    EasyMock.replay(workflowService);
+
+    IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
+    indexServiceImpl.setSecurityService(setupSecurityServiceForDelete("org"));
+    indexServiceImpl.setAssetManager(assetManager);
+    indexServiceImpl.setAuthorizationService(authorizationService);
+    indexServiceImpl.setSchedulerService(schedulerService);
+    indexServiceImpl.setWorkflowService(workflowService);
+
+    try {
+      indexServiceImpl.removeEvent(mpId);
+      fail("Removing an event without write access should throw an UnauthorizedException");
+    } catch (UnauthorizedException e) {
+      // expected
+    }
+
+    // Nothing may have been deleted anywhere.
+    EasyMock.verify(assetManager, schedulerService, workflowService);
+  }
+
+  /** An event which does not exist at all must be reported as not found rather than as unauthorized. */
+  @Test
+  public void testRemoveEventWithoutSnapshotIsNotFound() throws Exception {
+    final String mpId = "event-which-does-not-exist";
+
+    AssetManager assetManager = EasyMock.createMock(AssetManager.class);
+    EasyMock.expect(assetManager.getMediaPackage(mpId)).andReturn(Optional.empty()).anyTimes();
+    EasyMock.expect(assetManager.snapshotExists(mpId, "org")).andReturn(false).anyTimes();
+    EasyMock.replay(assetManager);
+
+    IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
+    indexServiceImpl.setSecurityService(setupSecurityServiceForDelete("org"));
+    indexServiceImpl.setAssetManager(assetManager);
+
+    try {
+      indexServiceImpl.removeEvent(mpId);
+      fail("Removing an event which does not exist should throw a NotFoundException");
+    } catch (NotFoundException e) {
+      // expected
+    }
+  }
+
+  /**
+   * An event the caller may not read, but which does exist, must be refused rather than deleted. Otherwise the missing
+   * read access would end up granting the deletion.
+   */
+  @Test
+  public void testRemoveEventWhichCannotBeReadIsUnauthorized() throws Exception {
+    final String mpId = "event-which-cannot-be-read";
+
+    AssetManager assetManager = EasyMock.createMock(AssetManager.class);
+    EasyMock.expect(assetManager.getMediaPackage(mpId)).andReturn(Optional.empty()).anyTimes();
+    EasyMock.expect(assetManager.snapshotExists(mpId, "org")).andReturn(true).anyTimes();
+    EasyMock.replay(assetManager);
+
+    IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
+    indexServiceImpl.setSecurityService(setupSecurityServiceForDelete("org"));
+    indexServiceImpl.setAssetManager(assetManager);
+
+    try {
+      indexServiceImpl.removeEvent(mpId);
+      fail("Removing an event which cannot be read should throw an UnauthorizedException");
+    } catch (UnauthorizedException e) {
+      // expected
+    }
+
+    EasyMock.verify(assetManager);
   }
 }
