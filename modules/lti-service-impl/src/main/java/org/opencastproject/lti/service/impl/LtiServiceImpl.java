@@ -530,7 +530,7 @@ public class LtiServiceImpl implements LtiService {
   }
 
   @Override
-  public void delete(String id) {
+  public void delete(String id) throws UnauthorizedException {
     try {
       final Optional<Event> event = indexService.getEvent(id, searchIndex);
       if (event.isEmpty()) {
@@ -541,7 +541,7 @@ public class LtiServiceImpl implements LtiService {
       if (eventRemovalResult == IndexService.EventRemovalResult.GENERAL_FAILURE) {
         throw new RuntimeException("Error deleting event: " + eventRemovalResult);
       }
-    } catch (WorkflowDatabaseException | SearchIndexException | UnauthorizedException | NotFoundException e) {
+    } catch (WorkflowDatabaseException | SearchIndexException | NotFoundException e) {
       throw new RuntimeException("Error deleting event", e);
     }
   }

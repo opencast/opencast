@@ -114,6 +114,7 @@ import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
+import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.util.FileSupport;
@@ -205,6 +206,8 @@ public class SchedulerServiceImplTest {
 
   private static AccessControlList acl;
 
+  private static AuthorizationService authorizationService;
+
   private static Map<String, String> wfProperties = new HashMap<>();
   private static Map<String, String> wfPropertiesUpdated = new HashMap<>();
 
@@ -219,12 +222,16 @@ public class SchedulerServiceImplTest {
 
     workspace = new UnitTestWorkspace();
 
-    AuthorizationService authorizationService = EasyMock.createNiceMock(AuthorizationService.class);
+    authorizationService = EasyMock.createNiceMock(AuthorizationService.class);
     acl = new AccessControlList(new AccessControlEntry("ROLE_ADMIN", "write", true),
             new AccessControlEntry("ROLE_ADMIN", "read", true), new AccessControlEntry("ROLE_USER", "read", true));
     EasyMock.expect(
             authorizationService.getActiveAcl(EasyMock.anyObject(MediaPackage.class)))
             .andReturn(tuple(acl, AclScope.Episode)).anyTimes();
+    // The tests run as an administrator, who the above ACL grants write access to.
+    EasyMock.expect(
+            authorizationService.hasPermission(EasyMock.anyObject(MediaPackage.class), EasyMock.anyString()))
+            .andReturn(true).anyTimes();
 
 
     orgDirectoryService = EasyMock.createNiceMock(OrganizationDirectoryService.class);
@@ -1213,6 +1220,50 @@ public class SchedulerServiceImplTest {
       Assert.fail("No media package should be found since it has been deleted before");
     } catch (NotFoundException ignore) {
     }
+  }
+
+  /**
+   * A user without write access must not be able to remove a scheduled event, and nothing may be deleted while finding
+   * that out.
+   */
+  @Test
+  public void testRemoveEventWithoutWriteAccess() throws Exception {
+    final Date start = new Date(System.currentTimeMillis() - 160000);
+    final Date end = new Date(System.currentTimeMillis() - 60000);
+    final String captureDeviceID = "demo";
+    final MediaPackage mp = generateEvent(Optional.empty());
+    final String mpId = mp.getIdentifier().toString();
+    final DublinCoreCatalog event = generateEvent(captureDeviceID, start, end);
+    addDublinCore(Optional.empty(), mp, event);
+    schedSvc.addEvent(start, end, captureDeviceID, Collections.<String> emptySet(), mp, wfProperties,
+            generateCaptureAgentMetadata(captureDeviceID), Optional.empty());
+
+    // Deny write access for the duration of this test only. The scheduler service is shared between tests, so the
+    // permissive mock has to be put back afterwards.
+    AuthorizationService denyingAuthorizationService = EasyMock.createNiceMock(AuthorizationService.class);
+    EasyMock.expect(denyingAuthorizationService.getActiveAcl(EasyMock.anyObject(MediaPackage.class)))
+            .andReturn(tuple(acl, AclScope.Episode)).anyTimes();
+    EasyMock.expect(
+            denyingAuthorizationService.hasPermission(EasyMock.anyObject(MediaPackage.class), EasyMock.anyString()))
+            .andReturn(false).anyTimes();
+    EasyMock.replay(denyingAuthorizationService);
+
+    try {
+      schedSvc.setAuthorizationService(denyingAuthorizationService);
+      schedSvc.removeEvent(mpId);
+      Assert.fail("Removing an event without write access should throw an UnauthorizedException");
+    } catch (UnauthorizedException ignore) {
+      // expected
+    } finally {
+      schedSvc.setAuthorizationService(authorizationService);
+    }
+
+    // The event must still be there
+    assertTrue("The event must not have been removed", assetManager.snapshotExists(mpId));
+    assertNotNull("The event must still be scheduled", schedSvc.getMediaPackage(mpId));
+
+    // Clean up, the scheduler database is shared between the tests of this class
+    schedSvc.removeEvent(mpId);
   }
 
   @Test

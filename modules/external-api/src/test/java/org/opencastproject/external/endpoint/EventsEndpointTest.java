@@ -26,6 +26,7 @@ import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
+import static javax.servlet.http.HttpServletResponse.SC_UNAUTHORIZED;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -66,6 +67,24 @@ public class EventsEndpointTest {
   @AfterClass
   public static void oneTimeTearDown() {
     env.tearDownServer();
+  }
+
+  @Test
+  public void testDeleteEventAuthorized() {
+    given().pathParam("eventId", TestEventsEndpoint.DELETE_AUTHORIZED_EVENT)
+           .expect()
+           .statusCode(SC_NO_CONTENT)
+           .when()
+           .delete(env.host("/{eventId}"));
+  }
+
+  @Test
+  public void testDeleteEventUnauthorized() {
+    given().pathParam("eventId", TestEventsEndpoint.DELETE_UNAUTHORIZED_EVENT)
+           .expect()
+           .statusCode(SC_UNAUTHORIZED)
+           .when()
+           .delete(env.host("/{eventId}"));
   }
 
   @Test

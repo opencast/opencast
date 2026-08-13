@@ -89,6 +89,7 @@ public interface LtiService {
   /**
    * Deletes the specified event
    * @param eventId ID of the event
+   * @throws UnauthorizedException if the current user is not allowed to delete the event
    */
-  void delete(String eventId);
+  void delete(String eventId) throws UnauthorizedException;
 }
