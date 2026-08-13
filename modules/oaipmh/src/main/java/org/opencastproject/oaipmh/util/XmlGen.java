@@ -26,7 +26,6 @@ import static org.opencastproject.util.data.functions.Misc.chuck;
 import org.opencastproject.metadata.dublincore.DublinCore;
 import org.opencastproject.util.XmlSafeParser;
 
-
 import org.apache.commons.io.output.ByteArrayOutputStream;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;

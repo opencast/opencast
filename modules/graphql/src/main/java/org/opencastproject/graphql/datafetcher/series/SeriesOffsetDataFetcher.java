@@ -127,4 +127,3 @@ public class SeriesOffsetDataFetcher extends ElasticsearchDataFetcher<GqlSeriesL
   }
 
 }
-

@@ -24,4 +24,3 @@ package org.opencastproject.external.util;
 
 import javax.xml.bind.annotation.XmlNsForm;
 import javax.xml.bind.annotation.XmlSchema;
-
