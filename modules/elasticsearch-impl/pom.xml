@@ -286,31 +286,21 @@
               org.opencastproject.elasticsearch.impl;version=${project.version}
             </Export-Package>
             <Embed-Dependency>
-              opensearch-rest-high-level-client,
-              opensearch-rest-client,
-              opensearch,
-              opensearch-core,
-              opensearch-x-content,
-              opensearch-common,
-              lang-mustache-client,
+              groupId=org.opensearch;scope=compile,
+              groupId=org.opensearch.client;scope=compile,
+              groupId=org.opensearch.plugin;scope=compile,
+              groupId=org.apache.httpcomponents.client5;scope=compile,
+              groupId=org.apache.httpcomponents.core5;scope=compile,
+              groupId=tools.jackson.core;scope=compile,
+              groupId=tools.jackson.dataformat;scope=compile,
+              reactor-core,
+              reactive-streams,
+              snakeyaml-engine,
+              hppc,
               lucene-core,
               lucene-join,
               lucene-queryparser,
-              lucene-queries,
-              rank-eval-client,
-              httpclient5,
-              httpcore5,
-              httpcore5-h2,
-              httpcore5-reactive,
-              reactor-core,
-              hppc,
-              reactive-streams,
-              snakeyaml-engine,
-              jackson-core,
-              jackson-databind,
-              jackson-dataformat-smile,
-              jackson-dataformat-yaml,
-              jackson-dataformat-cbor
+              lucene-queries
             </Embed-Dependency>
             <_exportcontents>
               org.opensearch,
