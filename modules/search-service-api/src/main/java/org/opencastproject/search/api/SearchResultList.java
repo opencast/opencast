@@ -22,8 +22,8 @@
 
 package org.opencastproject.search.api;
 
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
+import org.opensearch.search.SearchHit;
+import org.opensearch.search.SearchHits;
 
 import java.util.Arrays;
 import java.util.List;

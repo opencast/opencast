@@ -50,8 +50,9 @@
     <json-simple.version>1.1.1</json-simple.version>
     <junit5.version>6.0.1</junit5.version>
     <karaf.version>4.4.7</karaf.version>
-    <lucene.version>8.7.0</lucene.version>
+    <lucene.version>9.12.3</lucene.version>
     <node.version>v24.15.0</node.version>
+    <opensearch.version>2.19.6</opensearch.version>
     <osgi.core.version>8.0.0</osgi.core.version>
     <osgi.annotation.version>8.1.0</osgi.annotation.version>
     <org.osgi.service.component.version>1.5.1</org.osgi.service.component.version>
