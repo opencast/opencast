@@ -48,7 +48,7 @@ public class UserSettingsTest {
     JSONObject expected = (JSONObject) new JSONParser().parse(reader);
 
     UserSettings userSetting = new UserSettings();
-    assertThat(expected.toJSONString(), SameJSONAs.sameJSONAs(userSetting.toJson().toJson()));
+    assertThat(expected.toJSONString(), SameJSONAs.sameJSONAs(userSetting.toJson().toString()));
   }
 
   @Test
@@ -71,6 +71,6 @@ public class UserSettingsTest {
     UserSettings userSettings = new UserSettings();
     userSettings.setTotal(1);
     userSettings.addUserSetting(userSetting);
-    assertThat(expected.toJSONString(), SameJSONAs.sameJSONAs(userSettings.toJson().toJson()));
+    assertThat(expected.toJSONString(), SameJSONAs.sameJSONAs(userSettings.toJson().toString()));
   }
 }

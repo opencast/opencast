@@ -22,16 +22,13 @@
 package org.opencastproject.serviceregistry.impl;
 
 import static org.opencastproject.db.Queries.namedQuery;
-import static org.opencastproject.util.Jsons.obj;
-import static org.opencastproject.util.Jsons.p;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.job.api.Incident.Severity;
-import org.opencastproject.util.JsonObj;
-import org.opencastproject.util.JsonVal;
-import org.opencastproject.util.Jsons;
-import org.opencastproject.util.Jsons.Prop;
 import org.opencastproject.util.data.Tuple;
+
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -106,17 +103,17 @@ public class IncidentDto {
     dto.code = code;
     dto.severity = severity.ordinal();
 
-    List<Prop> props = new ArrayList<Jsons.Prop>();
+    JsonObject parametersJson = new JsonObject();
     for (Entry<String, String> entry : parameters.entrySet()) {
-      props.add(p(entry.getKey(), entry.getValue()));
+      parametersJson.addProperty(entry.getKey(), entry.getValue());
     }
-    dto.parameters = obj(props.toArray(new Prop[props.size()])).toJson();
+    dto.parameters = parametersJson.toString();
 
-    props = new ArrayList<Jsons.Prop>();
+    JsonObject detailsJson = new JsonObject();
     for (Tuple<String, String> t : details) {
-      props.add(p(t.getA(), t.getB()));
+      detailsJson.addProperty(t.getA(), t.getB());
     }
-    dto.details = obj(props.toArray(new Prop[props.size()])).toJson();
+    dto.details = detailsJson.toString();
     return dto;
   }
 
@@ -146,11 +143,9 @@ public class IncidentDto {
   /** @see org.opencastproject.job.api.Incident#getDetails() */
   public List<Tuple<String, String>> getTechnicalInformation() {
     final List<Tuple<String, String>> list = new ArrayList<Tuple<String, String>>();
-    JsonObj messageJson = JsonObj.jsonObj(details);
-    for (Object k : messageJson.keySet()) {
-      String title = JsonVal.asString(k);
-      String content = JsonVal.asString(messageJson.val(title).get());
-      list.add(tuple(title, content));
+    JsonObject messageJson = JsonParser.parseString(details).getAsJsonObject();
+    for (String title : messageJson.keySet()) {
+      list.add(tuple(title, messageJson.get(title).getAsString()));
     }
     return list;
   }
@@ -158,11 +153,9 @@ public class IncidentDto {
   /** @see org.opencastproject.job.api.Incident#getDescriptionParameters() */
   public Map<String, String> getParameters() {
     Map<String, String> param = new HashMap<String, String>();
-    JsonObj paramJson = JsonObj.jsonObj(parameters);
-    for (Object k : paramJson.keySet()) {
-      String key = JsonVal.asString(k);
-      String value = JsonVal.asString(paramJson.val(key).get());
-      param.put(key, value);
+    JsonObject paramJson = JsonParser.parseString(parameters).getAsJsonObject();
+    for (String key : paramJson.keySet()) {
+      param.put(key, paramJson.get(key).getAsString());
     }
     return param;
   }
