@@ -25,11 +25,13 @@ import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.util.XmlSafeParser;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
+
 import org.apache.commons.io.IOUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -141,29 +143,27 @@ public final class AccessControlParser {
   private static AccessControlList parseJson(String content) throws AccessControlParsingException {
     try {
       AccessControlList acl = new AccessControlList();
-      JSONObject json = (JSONObject) new JSONParser().parse(content);
-      JSONObject jsonAcl = (JSONObject) json.get(ACL);
-      if (jsonAcl == null) {
+      JsonElement jsonAclElement = JsonParser.parseString(content).getAsJsonObject().get(ACL);
+      if (jsonAclElement == null || jsonAclElement.isJsonNull()) {
         return acl;
       }
-      Object jsonAceObj = jsonAcl.get(ACE);
+      JsonElement jsonAceObj = jsonAclElement.getAsJsonObject().get(ACE);
 
-      if (jsonAceObj == null) {
+      if (jsonAceObj == null || jsonAceObj.isJsonNull()) {
         return acl;
       }
 
-      if (jsonAceObj instanceof JSONObject) {
-        JSONObject jsonAce = (JSONObject) jsonAceObj;
-        acl.getEntries().add(getAce(jsonAce));
+      // A single entry may arrive as a bare object rather than a one element array, since that is
+      // how the JAXB based JSON serialization renders it.
+      if (jsonAceObj.isJsonObject()) {
+        acl.getEntries().add(getAce(jsonAceObj.getAsJsonObject()));
       } else {
-        JSONArray jsonAceArray = (JSONArray) jsonAceObj;
-        for (Object element : jsonAceArray) {
-          JSONObject jsonAce = (JSONObject) element;
-          acl.getEntries().add(getAce(jsonAce));
+        for (JsonElement element : jsonAceObj.getAsJsonArray()) {
+          acl.getEntries().add(getAce(element.getAsJsonObject()));
         }
       }
       return acl;
-    } catch (ParseException e) {
+    } catch (JsonParseException e) {
       throw new AccessControlParsingException(e);
     }
   }
@@ -175,11 +175,19 @@ public final class AccessControlParser {
    *          the json object
    * @return the access control entry
    */
-  private static AccessControlEntry getAce(JSONObject jsonAce) {
-    String role = (String) jsonAce.get(ROLE);
-    String action = (String) jsonAce.get(ACTION);
-    Boolean allow = (Boolean) jsonAce.getOrDefault(ALLOW, Boolean.TRUE);
+  private static AccessControlEntry getAce(JsonObject jsonAce) {
+    String role = getStringOrNull(jsonAce, ROLE);
+    String action = getStringOrNull(jsonAce, ACTION);
+    boolean allow = jsonAce.has(ALLOW) && !jsonAce.get(ALLOW).isJsonNull()
+        ? jsonAce.get(ALLOW).getAsBoolean()
+        : true;
     return new AccessControlEntry(role, action, allow);
+  }
+
+  /** Read a string member, returning null when it is absent or JSON null. */
+  private static String getStringOrNull(JsonObject json, String key) {
+    JsonElement value = json.get(key);
+    return value == null || value.isJsonNull() ? null : value.getAsString();
   }
 
   /**
@@ -226,24 +234,23 @@ public final class AccessControlParser {
     }
   }
 
-  @SuppressWarnings("unchecked")
   public static String toJson(AccessControlList acl) throws IOException {
-    JSONObject json = new JSONObject();
-    JSONObject jsonAcl = new JSONObject();
+    JsonObject jsonAcl = new JsonObject();
     List<AccessControlEntry> entries = acl.getEntries();
     if (entries.size() > 0) {
-      JSONArray jsonEntryArray = new JSONArray();
-      jsonAcl.put(ACE, jsonEntryArray);
+      JsonArray jsonEntryArray = new JsonArray();
       for (AccessControlEntry entry : entries) {
-        JSONObject jsonEntry = new JSONObject();
-        jsonEntry.put(ACTION, entry.getAction());
-        jsonEntry.put(ROLE, entry.getRole());
-        jsonEntry.put(ALLOW, entry.isAllow());
+        JsonObject jsonEntry = new JsonObject();
+        jsonEntry.addProperty(ACTION, entry.getAction());
+        jsonEntry.addProperty(ROLE, entry.getRole());
+        jsonEntry.addProperty(ALLOW, entry.isAllow());
         jsonEntryArray.add(jsonEntry);
       }
+      jsonAcl.add(ACE, jsonEntryArray);
     }
-    json.put(ACL, jsonAcl);
-    return json.toJSONString();
+    JsonObject json = new JsonObject();
+    json.add(ACL, jsonAcl);
+    return json.toString();
   }
 
   public static String toJsonSilent(AccessControlList acl) {
