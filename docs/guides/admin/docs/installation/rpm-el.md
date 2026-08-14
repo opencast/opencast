@@ -63,7 +63,7 @@ Install OpenSearch
 ------------------
 
 Opencast uses OpenSearch as a search index and a cache for quick access to some data from user interfaces.
-Opencast requires OpenSearch 2.x. Version 1.x will not work.
+Opencast requires OpenSearch 3.x. Versions 1.x and 2.x will not work.
 It also requires `analysis-icu` plugin.
 The repository provides both:
 
