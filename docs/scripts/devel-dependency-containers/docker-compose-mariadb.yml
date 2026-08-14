@@ -1,6 +1,6 @@
 services:
   opensearch:
-    image: opencast/opensearch:2
+    image: opencast/opensearch:3
     init: true
     build:
       context: .

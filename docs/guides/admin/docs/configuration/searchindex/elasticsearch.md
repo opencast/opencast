@@ -10,7 +10,7 @@ Version
 Opencast requires a specific version of OpenSearch.
 Please make sure to install the correct version:
 
-- OpenSearch 2.x
+- OpenSearch 3.x
 
 Additional Plug-ins
 -------------------
@@ -45,7 +45,7 @@ more complicated since you want to require authentication and TLS.
 
 <!-- While this links to the RPM guide, the steps are identical for other installation types: -->
 To set-up HTTP Basic authentication and TLS within OpenSearch, follow the [Set up OpenSearch in your environment
-](https://docs.opensearch.org/2.19/install-and-configure/install-opensearch/rpm/#step-3-set-up-opensearch-in-your-environment)
+](https://docs.opensearch.org/latest/install-and-configure/install-opensearch/rpm/#step-3-set-up-opensearch-in-your-environment)
 guide from OpenSearch.
 
 Alternatively, use a reverse proxy like Nginx or Caddy to terminate TLS and require HTTP Basic authentication.
