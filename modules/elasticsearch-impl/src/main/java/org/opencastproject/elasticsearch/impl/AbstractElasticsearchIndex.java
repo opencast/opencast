@@ -41,45 +41,45 @@ import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.elasticsearch.ElasticsearchException;
-import org.elasticsearch.ElasticsearchStatusException;
-import org.elasticsearch.action.admin.cluster.health.ClusterHealthRequest;
-import org.elasticsearch.action.admin.cluster.health.ClusterHealthResponse;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.bulk.BulkRequest;
-import org.elasticsearch.action.bulk.BulkResponse;
-import org.elasticsearch.action.delete.DeleteRequest;
-import org.elasticsearch.action.delete.DeleteResponse;
-import org.elasticsearch.action.get.GetRequest;
-import org.elasticsearch.action.get.GetResponse;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.index.IndexResponse;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.search.SearchType;
-import org.elasticsearch.action.support.WriteRequest;
-import org.elasticsearch.action.support.master.AcknowledgedResponse;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestClientBuilder;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.client.indices.CreateIndexRequest;
-import org.elasticsearch.client.indices.CreateIndexResponse;
-import org.elasticsearch.cluster.health.ClusterHealthStatus;
-import org.elasticsearch.common.document.DocumentField;
-import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.index.query.QueryBuilder;
-import org.elasticsearch.rest.RestStatus;
-import org.elasticsearch.script.Script;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.search.SearchHits;
-import org.elasticsearch.search.aggregations.AggregationBuilder;
-import org.elasticsearch.search.aggregations.AggregationBuilders;
-import org.elasticsearch.search.aggregations.bucket.terms.Terms;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
-import org.elasticsearch.search.sort.ScriptSortBuilder;
-import org.elasticsearch.search.sort.SortBuilders;
-import org.elasticsearch.search.sort.SortOrder;
+import org.opensearch.OpenSearchException;
+import org.opensearch.OpenSearchStatusException;
+import org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
+import org.opensearch.action.admin.cluster.health.ClusterHealthResponse;
+import org.opensearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.opensearch.action.bulk.BulkRequest;
+import org.opensearch.action.bulk.BulkResponse;
+import org.opensearch.action.delete.DeleteRequest;
+import org.opensearch.action.delete.DeleteResponse;
+import org.opensearch.action.get.GetRequest;
+import org.opensearch.action.get.GetResponse;
+import org.opensearch.action.index.IndexRequest;
+import org.opensearch.action.index.IndexResponse;
+import org.opensearch.action.search.SearchRequest;
+import org.opensearch.action.search.SearchResponse;
+import org.opensearch.action.search.SearchType;
+import org.opensearch.action.support.WriteRequest;
+import org.opensearch.action.support.master.AcknowledgedResponse;
+import org.opensearch.client.RequestOptions;
+import org.opensearch.client.RestClient;
+import org.opensearch.client.RestClientBuilder;
+import org.opensearch.client.RestHighLevelClient;
+import org.opensearch.client.indices.CreateIndexRequest;
+import org.opensearch.client.indices.CreateIndexResponse;
+import org.opensearch.cluster.health.ClusterHealthStatus;
+import org.opensearch.common.document.DocumentField;
+import org.opensearch.common.xcontent.XContentType;
+import org.opensearch.core.rest.RestStatus;
+import org.opensearch.index.query.QueryBuilder;
+import org.opensearch.script.Script;
+import org.opensearch.search.SearchHit;
+import org.opensearch.search.SearchHits;
+import org.opensearch.search.aggregations.AggregationBuilder;
+import org.opensearch.search.aggregations.AggregationBuilders;
+import org.opensearch.search.aggregations.bucket.terms.Terms;
+import org.opensearch.search.builder.SearchSourceBuilder;
+import org.opensearch.search.sort.ScriptSortBuilder;
+import org.opensearch.search.sort.SortBuilders;
+import org.opensearch.search.sort.SortOrder;
 import org.osgi.framework.BundleContext;
 import org.osgi.service.component.ComponentException;
 import org.slf4j.Logger;
@@ -252,7 +252,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
         logger.error("Index '{}' could not be deleted", getIndexName());
       }
       createIndex();
-    } catch (ElasticsearchException exception) {
+    } catch (OpenSearchException exception) {
       if (exception.status() == RestStatus.NOT_FOUND) {
         logger.error("Cannot clear non-existing index '{}'", exception.getIndex().getName());
       }
@@ -265,7 +265,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
    * Posts the input document to the search index.
    *
    * @param maxRetryAttempts
-   *          How often to retry update in case of ElasticsearchStatusException
+   *          How often to retry update in case of OpenSearchStatusException
    * @param retryWaitingPeriod
    *          How long to wait (in ms) between retries
    * @param document
@@ -288,7 +288,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
     do {
       try {
         indexResponse = client.index(indexRequest, RequestOptions.DEFAULT);
-      } catch (ElasticsearchStatusException e) {
+      } catch (OpenSearchStatusException e) {
         retryAttempts++;
 
         if (retryAttempts <= maxRetryAttempts) {
@@ -312,7 +312,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
    * Posts the input documents to the search index.
    *
    * @param maxRetryAttempts
-   *          How often to retry update in case of ElasticsearchStatusException
+   *          How often to retry update in case of OpenSearchStatusException
    * @param retryWaitingPeriod
    *          How long to wait (in ms) between retries
    * @param documents
@@ -339,7 +339,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
     do {
       try {
         bulkResponse = client.bulk(bulkRequest, RequestOptions.DEFAULT);
-      } catch (ElasticsearchStatusException e) {
+      } catch (OpenSearchStatusException e) {
         retryAttempts++;
 
         if (retryAttempts <= maxRetryAttempts) {
@@ -383,7 +383,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
     do {
       try {
         deleteResponse = getClient().delete(deleteRequest, RequestOptions.DEFAULT);
-      } catch (ElasticsearchStatusException e) {
+      } catch (OpenSearchStatusException e) {
         retryAttempts++;
 
         if (retryAttempts <= maxRetryAttempts) {
@@ -464,7 +464,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
    *
    * @return true if OpenSearch is reachable, false otherwise
    *
-   * @throws ElasticsearchException if an ElasticsearchException occurs, e.g. if the server returns a 4xx or 5xx error
+   * @throws OpenSearchException if an OpenSearchException occurs, e.g. if the server returns a 4xx or 5xx error
    *
    * @throws RuntimeException if an unexpected exception occurs
    */
@@ -498,13 +498,13 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
       }
       // something different triggered an ioexception, so we fail
       throw new RuntimeException("Couldn't connect to opensearch due to IOExceptionError", ioException);
-    } catch (ElasticsearchException elasticsearchException) {
+    } catch (OpenSearchException elasticsearchException) {
       if (elasticsearchException.status().getStatus() >= 500) {
         logger.debug("OpenSearch health request ended with HTTP status code {}. Is OpenSearch service running?",
             elasticsearchException.status().getStatus());
         return false;
       }
-      // An ElasticsearchException is usually thrown in case where the server returns a 4xx or 5xx error code.
+      // An OpenSearchException is usually thrown in case where the server returns a 4xx or 5xx error code.
       // So for example for an HTTP 401 Unauthorized: In this case we want the startup to fail, so
       // we get an error and have the chance to change the configuration
       logger.error("Error while testing OpenSearch connection", elasticsearchException);
@@ -557,7 +557,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
       if (!siteIdxResponse.isAcknowledged()) {
         throw new SearchIndexException("Unable to create index for '" + idxName + "'");
       }
-    } catch (ElasticsearchStatusException e) {
+    } catch (OpenSearchStatusException e) {
       if (e.getDetailedMessage().contains("already_exists_exception")) {
         logger.info("Detected existing index '{}'", idxName);
       } else {
@@ -581,7 +581,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
         versionIndexExists = true;
         logger.debug("Search index '{}' is at version {}", idxName, indexVersion);
       }
-    } catch (ElasticsearchException e) {
+    } catch (OpenSearchException e) {
       throw new SearchIndexException("Requesting version of the index '" + idxName + "' failed.", e);
     }
 
@@ -726,6 +726,19 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
     return this.indexIdentifier + "_" + type;
   }
 
+  /**
+   * Returns the document type for the given sub index name, reversing {@link #getSubIndexIdentifier(String)}.
+   * OpenSearch no longer exposes a per-document mapping type (removed in OpenSearch 2.0), so the type has to be
+   * recovered from the physical index a hit was found in.
+   *
+   * @param subIndexIdentifier
+   *          The sub index name to get the type for.
+   * @return the document type
+   */
+  private String getTypeFromSubIndexIdentifier(String subIndexIdentifier) {
+    return subIndexIdentifier.substring(this.indexIdentifier.length() + 1);
+  }
+
   public RestHighLevelClient getClient() {
     return client;
   }
@@ -740,7 +753,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
    * @param toSearchResult
    *          The function to convert the results to a {@link SearchResult}
    * @param maxRetryAttempts
-   *          How often to retry query in case of ElasticsearchStatusException
+   *          How often to retry query in case of OpenSearchStatusException
    * @param retryWaitingPeriod
    *          How long to wait (in ms) between retries
    * @return A {@link SearchResult} containing the relevant objects.
@@ -759,7 +772,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
     do {
       try {
         searchResponse = getClient().search(request, RequestOptions.DEFAULT);
-      } catch (ElasticsearchStatusException e) {
+      } catch (OpenSearchStatusException e) {
         retryAttempts++;
 
         if (retryAttempts <= maxRetryAttempts) {
@@ -786,7 +799,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
     for (SearchHit doc : searchResponse.getHits()) {
 
       // Wrap the search resulting metadata
-      SearchMetadataCollection metadata = new SearchMetadataCollection(doc.getType());
+      SearchMetadataCollection metadata = new SearchMetadataCollection(getTypeFromSubIndexIdentifier(doc.getIndex()));
       metadata.setIdentifier(doc.getId());
 
       for (DocumentField field : doc.getFields().values()) {

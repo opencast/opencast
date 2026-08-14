@@ -81,11 +81,11 @@
       <version>${project.version}</version>
       <scope>compile</scope>
     </dependency>
-    <!-- elasticsearch -->
+    <!-- opensearch -->
     <dependency>
-      <groupId>org.elasticsearch</groupId>
-      <artifactId>elasticsearch</artifactId>
-      <version>${elasticsearch.version}</version>
+      <groupId>org.opensearch</groupId>
+      <artifactId>opensearch</artifactId>
+      <version>${opensearch.version}</version>
     </dependency>
     <dependency>
       <groupId>org.codehaus.jettison</groupId>

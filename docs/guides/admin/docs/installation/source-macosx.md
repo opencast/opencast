@@ -57,7 +57,7 @@ Required:
 
 Required (not necessarily on the same machine):
 
-    OpenSearch 1.x and analysis-icu plugin
+    OpenSearch 2.x and analysis-icu plugin
 
 Required for text extraction:
 
@@ -85,7 +85,7 @@ Homebrew is a package manager for OS X. For installation instruction see [their 
 
 If you want to install OpenSearch in the same machine run OpenSearch as a Docker container
 
-    docker run -d --name opensearch -p 9200:9200 -p 9300:9300 -e 'discovery.type=single-node' opensearchproject/opensearch:1
+    docker run -d --name opensearch -p 9200:9200 -p 9300:9300 -e 'discovery.type=single-node' opensearchproject/opensearch:2
 
 #### Using pre-built binaries
 
