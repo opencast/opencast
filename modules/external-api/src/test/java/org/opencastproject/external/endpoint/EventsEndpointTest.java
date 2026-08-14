@@ -22,6 +22,8 @@ package org.opencastproject.external.endpoint;
 
 import static io.restassured.RestAssured.given;
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
+import static javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
 import static javax.servlet.http.HttpServletResponse.SC_NO_CONTENT;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -153,6 +155,44 @@ public class EventsEndpointTest {
     assertThat(MetadataJson.collectionToJson(
             actualMetadataList.getMetadataByFlavor("dublincore/episode"), true, true).toString(),
             SameJSONAs.sameJSONAs(expectedJson).allowingAnyArrayOrdering());
+  }
+
+  /**
+   * A value sent by the client which does not pass validation is the client's fault and has to result in a bad request.
+   */
+  @Test
+  public void testUpdateEventMetadataByTypeWithInvalidClientValue() throws IOException {
+    String jsonString = IOUtils.toString(getClass().getResource("/event-metadata-update.json"), UTF_8);
+    String eventId = TestEventsEndpoint.METADATA_VALIDATION_EVENT;
+    String result = given().formParam("metadata", jsonString).pathParam("event_id", eventId)
+            .queryParam("type", "dublincore/episode")
+            .expect().statusCode(SC_BAD_REQUEST).when().put(env.host("{event_id}/metadata")).asString();
+    assertTrue(result.contains("'title'"));
+  }
+
+  /**
+   * If a field the client did not touch is invalid in the stored catalog, there is nothing the client can do about it.
+   * That is a server side problem and must not be reported as a bad request.
+   */
+  @Test
+  public void testUpdateEventMetadataByTypeWithIncompleteStoredCatalog() throws IOException {
+    String jsonString = IOUtils.toString(getClass().getResource("/event-metadata-update-subject-only.json"), UTF_8);
+    String eventId = TestEventsEndpoint.METADATA_VALIDATION_EVENT;
+    given().formParam("metadata", jsonString).pathParam("event_id", eventId)
+            .queryParam("type", "dublincore/episode")
+            .expect().statusCode(SC_INTERNAL_SERVER_ERROR).when().put(env.host("{event_id}/metadata"));
+  }
+
+  /**
+   * A start date which does not match the expected pattern is a bad request instead of an unhandled exception.
+   */
+  @Test
+  public void testUpdateEventMetadataByTypeWithInvalidStartDate() throws IOException {
+    String jsonString = IOUtils.toString(getClass().getResource("/event-metadata-update-invalid-date.json"), UTF_8);
+    String eventId = TestEventsEndpoint.METADATA_UPDATE_EVENT;
+    given().formParam("metadata", jsonString).pathParam("event_id", eventId)
+            .queryParam("type", "dublincore/episode")
+            .expect().statusCode(SC_BAD_REQUEST).when().put(env.host("{event_id}/metadata"));
   }
 
   /**

@@ -55,6 +55,7 @@ import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.catalog.adapter.DublinCoreMetadataUtil;
 import org.opencastproject.index.service.catalog.adapter.events.CommonEventCatalogUIAdapter;
 import org.opencastproject.index.service.exception.IndexServiceException;
+import org.opencastproject.index.service.exception.MetadataValidationException;
 import org.opencastproject.index.service.impl.util.EventHttpServletRequest;
 import org.opencastproject.index.service.impl.util.EventUtils;
 import org.opencastproject.index.service.util.RequestUtils;
@@ -149,6 +150,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
@@ -1745,11 +1747,14 @@ public class EventsEndpoint implements ManagedService {
       },
       responses = {
           @RestResponse(description = "The metadata of the given namespace has been updated.",
-              responseCode = HttpServletResponse.SC_OK),
+              responseCode = HttpServletResponse.SC_NO_CONTENT),
           @RestResponse(description = "The request is invalid or inconsistent.",
               responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "The specified event does not exist.",
-              responseCode = HttpServletResponse.SC_NOT_FOUND)
+              responseCode = HttpServletResponse.SC_NOT_FOUND),
+          @RestResponse(description = "The metadata stored for the specified event is incomplete or invalid and needs "
+              + "to be fixed before it can be updated.",
+              responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
       })
   public Response updateEventMetadataByType(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @QueryParam("type") String type, @FormParam("metadata") String metadataJSON) throws Exception {
@@ -1811,6 +1816,10 @@ public class EventsEndpoint implements ManagedService {
         return ApiResponseBuilder.notFound("Cannot find a catalog with type '%s' for event with id '%s'.", type, id);
       }
 
+      // Remember which fields the client actually modified. If storing the metadata fails later on, this tells us
+      // whether the offending field is one the client sent or one which was already invalid in the stored catalog.
+      Set<String> updatedFieldIds = new HashSet<>();
+
       for (String key : updatedFields.keySet()) {
         if ("subjects".equals(key)) {
           MetadataField field = collection.getOutputFields().get(DublinCore.PROPERTY_SUBJECT.getLocalName());
@@ -1818,8 +1827,17 @@ public class EventsEndpoint implements ManagedService {
           if (error.isPresent()) {
             return error.get();
           }
+          JSONArray subjectArray;
+          try {
+            subjectArray = (JSONArray) parser.parse(updatedFields.get(key));
+          } catch (ParseException | ClassCastException e) {
+            logger.debug("Unable to update event '{}' as the subjects '{}' are no json array",
+                    id, updatedFields.get(key), e);
+            return R.badRequest(
+                    String.format("Unable to parse subjects '%s' as a json array.", updatedFields.get(key)));
+          }
+          updatedFieldIds.add(field.getInputID());
           collection.removeField(field);
-          JSONArray subjectArray = (JSONArray) parser.parse(updatedFields.get(key));
           collection.addField(
                   MetadataJson.copyWithDifferentJsonValue(field, StringUtils.join(subjectArray.iterator(), ",")));
         } else if ("startDate".equals(key)) {
@@ -1834,15 +1852,11 @@ public class EventsEndpoint implements ManagedService {
             final String startDate = configuredMetadataFields.get("startDate").getPattern();
             apiPattern = startDate == null ? apiPattern : startDate;
           }
-          SimpleDateFormat apiSdf = MetadataField.getSimpleDateFormatter(apiPattern);
-          SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(field.getPattern());
-          DateTime oldStartDate = new DateTime(sdf.parse((String) field.getValue()), DateTimeZone.UTC);
-          DateTime newStartDate = new DateTime(apiSdf.parse(updatedFields.get(key)), DateTimeZone.UTC);
-          DateTime updatedStartDate = oldStartDate.withDate(newStartDate.year().get(), newStartDate.monthOfYear().get(),
-              newStartDate.dayOfMonth().get());
-          collection.removeField(field);
-          collection.addField(
-                  MetadataJson.copyWithDifferentJsonValue(field, sdf.format(updatedStartDate.toDate())));
+          updatedFieldIds.add(field.getInputID());
+          error = updateStartDate(collection, field, id, apiPattern, updatedFields.get(key), false);
+          if (error.isPresent()) {
+            return error.get();
+          }
         } else if ("startTime".equals(key)) {
           // Special handling for start time since in API v1 we expect start date and start time to be separate fields.
           MetadataField field = collection.getOutputFields().get("startDate");
@@ -1855,24 +1869,18 @@ public class EventsEndpoint implements ManagedService {
             final String startTime = configuredMetadataFields.get("startTime").getPattern();
             apiPattern = startTime == null ? apiPattern : startTime;
           }
-          SimpleDateFormat apiSdf = MetadataField.getSimpleDateFormatter(apiPattern);
-          SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(field.getPattern());
-          DateTime oldStartDate = new DateTime(sdf.parse((String) field.getValue()), DateTimeZone.UTC);
-          DateTime newStartDate = new DateTime(apiSdf.parse(updatedFields.get(key)), DateTimeZone.UTC);
-          DateTime updatedStartDate = oldStartDate.withTime(
-                  newStartDate.hourOfDay().get(),
-                  newStartDate.minuteOfHour().get(),
-                  newStartDate.secondOfMinute().get(),
-                  newStartDate.millisOfSecond().get());
-          collection.removeField(field);
-          collection.addField(
-                  MetadataJson.copyWithDifferentJsonValue(field, sdf.format(updatedStartDate.toDate())));
+          updatedFieldIds.add(field.getInputID());
+          error = updateStartDate(collection, field, id, apiPattern, updatedFields.get(key), true);
+          if (error.isPresent()) {
+            return error.get();
+          }
         } else {
           MetadataField field = collection.getOutputFields().get(key);
           Optional<Response> error = validateField(field, key, id, type, updatedFields);
           if (error.isPresent()) {
             return error.get();
           }
+          updatedFieldIds.add(field.getInputID());
           collection.removeField(field);
           collection.addField(
                   MetadataJson.copyWithDifferentJsonValue(field, updatedFields.get(key)));
@@ -1880,10 +1888,93 @@ public class EventsEndpoint implements ManagedService {
       }
 
       metadataList.add(adapter, collection);
-      indexService.updateEventMetadata(id, metadataList, elasticsearchIndex);
+      try {
+        indexService.updateEventMetadata(id, metadataList, elasticsearchIndex);
+      } catch (MetadataValidationException e) {
+        if (updatedFieldIds.contains(e.getFieldId())) {
+          logger.debug("Client sent an invalid value for field '{}' of event '{}'", e.getFieldId(), id, e);
+          return R.badRequest(e.getMessage());
+        }
+        // The client did not touch this field. Its value was already invalid in the stored catalog, so there is
+        // nothing the client can do about this.
+        logger.error("Cannot update metadata of event '{}' since the required field '{}' is empty in the stored "
+                + "catalog. The event needs to be fixed before its metadata can be updated.", id, e.getFieldId());
+        return ApiResponseBuilder.serverError(
+                "Cannot update metadata of event '%s' because its stored metadata is incomplete: %s",
+                id, e.getMessage());
+      } catch (IllegalArgumentException e) {
+        logger.error("Cannot update metadata of event '{}'", id, e);
+        return ApiResponseBuilder.serverError("Cannot update metadata of event '%s': %s", id, e.getMessage());
+      }
       return Response.noContent().build();
     }
     return ApiResponseBuilder.notFound("Cannot find an event with id '%s'.", id);
+  }
+
+  /**
+   * Update the start date field of a metadata collection with a new date or time.
+   * <p>
+   * In API v1 start date and start time are separate fields while the catalog holds a single date. Hence the new value
+   * is merged into the date which is already stored.
+   *
+   * @param collection
+   *          The metadata collection to update.
+   * @param field
+   *          The start date field of that collection.
+   * @param id
+   *          The identifier of the event, used for logging and error messages.
+   * @param apiPattern
+   *          The date pattern the client is expected to use.
+   * @param value
+   *          The new date or time as sent by the client.
+   * @param timeOnly
+   *          If only the time of day shall be updated instead of the date.
+   * @return An error response if either the stored or the new value could not be parsed, empty otherwise.
+   */
+  private Optional<Response> updateStartDate(DublinCoreMetadataCollection collection, MetadataField field, String id,
+          String apiPattern, String value, boolean timeOnly) {
+    final SimpleDateFormat sdf = MetadataField.getSimpleDateFormatter(field.getPattern());
+    final String storedValue = Objects.toString(field.getValue(), null);
+    final DateTime oldStartDate;
+    try {
+      if (storedValue == null) {
+        throw new java.text.ParseException("No start date stored", 0);
+      }
+      oldStartDate = new DateTime(sdf.parse(storedValue), DateTimeZone.UTC);
+    } catch (java.text.ParseException e) {
+      logger.error("Cannot update metadata of event '{}' since its stored start date '{}' does not match the "
+              + "pattern '{}'. The event needs to be fixed before its metadata can be updated.",
+              id, storedValue, field.getPattern());
+      return Optional.of(ApiResponseBuilder.serverError(
+              "Cannot update metadata of event '%s' because its stored start date '%s' cannot be parsed.",
+              id, storedValue));
+    }
+
+    final DateTime newStartDate;
+    try {
+      newStartDate = new DateTime(MetadataField.getSimpleDateFormatter(apiPattern).parse(value), DateTimeZone.UTC);
+    } catch (java.text.ParseException e) {
+      logger.debug("Unable to update event '{}' as '{}' does not match the pattern '{}'", id, value, apiPattern, e);
+      return Optional.of(R.badRequest(
+              String.format("Unable to parse '%s' as a date matching the pattern '%s'.", value, apiPattern)));
+    }
+
+    final DateTime updatedStartDate;
+    if (timeOnly) {
+      updatedStartDate = oldStartDate.withTime(
+              newStartDate.hourOfDay().get(),
+              newStartDate.minuteOfHour().get(),
+              newStartDate.secondOfMinute().get(),
+              newStartDate.millisOfSecond().get());
+    } else {
+      updatedStartDate = oldStartDate.withDate(
+              newStartDate.year().get(),
+              newStartDate.monthOfYear().get(),
+              newStartDate.dayOfMonth().get());
+    }
+    collection.removeField(field);
+    collection.addField(MetadataJson.copyWithDifferentJsonValue(field, sdf.format(updatedStartDate.toDate())));
+    return Optional.empty();
   }
 
   private Optional<Response> validateField(MetadataField field, String key, String id, String type,

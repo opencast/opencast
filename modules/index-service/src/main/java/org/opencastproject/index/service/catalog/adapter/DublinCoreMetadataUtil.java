@@ -21,6 +21,7 @@
 
 package org.opencastproject.index.service.catalog.adapter;
 
+import org.opencastproject.index.service.exception.MetadataValidationException;
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.metadata.dublincore.DCMIPeriod;
 import org.opencastproject.metadata.dublincore.DublinCore;
@@ -88,14 +89,14 @@ public final class DublinCoreMetadataUtil {
           setIterableString(dc, field, ename);
         } else {
           if (field.isRequired() && StringUtils.isBlank(field.getValue().toString())) {
-            throw new IllegalArgumentException(String.format(
+            throw new MetadataValidationException(field.getInputID(), String.format(
                 "The event metadata field with id '%s' and the metadata type '%s' is required and can not be empty!.",
                 field.getInputID(), field.getType()));
           }
           dc.set(ename, field.getValue().toString());
         }
       } else if (field.getValue() == null && field.isRequired()) {
-        throw new IllegalArgumentException(String.format(
+        throw new MetadataValidationException(field.getInputID(), String.format(
                 "The event metadata field with id '%s' and the metadata type '%s' is required and can not be empty!.",
                 field.getInputID(), field.getType()));
       }

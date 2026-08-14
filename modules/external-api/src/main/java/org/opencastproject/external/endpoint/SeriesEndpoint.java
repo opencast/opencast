@@ -50,6 +50,7 @@ import org.opencastproject.external.util.AclUtils;
 import org.opencastproject.external.util.ExternalMetadataUtils;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.exception.IndexServiceException;
+import org.opencastproject.index.service.exception.MetadataValidationException;
 import org.opencastproject.index.service.util.RequestUtils;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
@@ -102,11 +103,13 @@ import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
@@ -738,7 +741,10 @@ public class SeriesEndpoint {
           @RestResponse(description = "The request is invalid or inconsistent.",
               responseCode = HttpServletResponse.SC_BAD_REQUEST),
           @RestResponse(description = "The specified series does not exist.",
-              responseCode = HttpServletResponse.SC_NOT_FOUND)
+              responseCode = HttpServletResponse.SC_NOT_FOUND),
+          @RestResponse(description = "The metadata stored for the specified series is incomplete or invalid and needs "
+              + "to be fixed before it can be updated.",
+              responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR)
       })
   public Response updateSeriesMetadata(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id,
           @QueryParam("type") String type, @FormParam("metadata") String metadataJSON) throws Exception {
@@ -804,6 +810,10 @@ public class SeriesEndpoint {
 
     DublinCoreMetadataCollection collection = optCollection.get();
 
+    // Remember which fields the client actually modified. If storing the metadata fails later on, this tells us
+    // whether the offending field is one the client sent or one which was already invalid in the stored catalog.
+    Set<String> updatedFieldIds = new HashSet<>();
+
     for (String key : updatedFields.keySet()) {
       MetadataField field = collection.getOutputFields().get(key);
       if (field == null) {
@@ -815,12 +825,30 @@ public class SeriesEndpoint {
                 "The series metadata field with id '%s' and the metadata type '%s' is required and can not be empty!.",
                 key, type));
       }
+      updatedFieldIds.add(field.getInputID());
       collection.removeField(field);
       collection.addField(MetadataJson.copyWithDifferentJsonValue(field, updatedFields.get(key)));
     }
 
     metadataList.add(adapter, collection);
-    indexService.updateAllSeriesMetadata(id, metadataList, elasticsearchIndex);
+    try {
+      indexService.updateAllSeriesMetadata(id, metadataList, elasticsearchIndex);
+    } catch (MetadataValidationException e) {
+      if (updatedFieldIds.contains(e.getFieldId())) {
+        logger.debug("Client sent an invalid value for field '{}' of series '{}'", e.getFieldId(), id, e);
+        return R.badRequest(e.getMessage());
+      }
+      // The client did not touch this field. Its value was already invalid in the stored catalog, so there is
+      // nothing the client can do about this.
+      logger.error("Cannot update metadata of series '{}' since the required field '{}' is empty in the stored "
+              + "catalog. The series needs to be fixed before its metadata can be updated.", id, e.getFieldId());
+      return ApiResponseBuilder.serverError(
+              "Cannot update metadata of series '%s' because its stored metadata is incomplete: %s",
+              id, e.getMessage());
+    } catch (IllegalArgumentException e) {
+      logger.error("Cannot update metadata of series '{}'", id, e);
+      return ApiResponseBuilder.serverError("Cannot update metadata of series '%s': %s", id, e.getMessage());
+    }
     return ApiResponseBuilder.Json.ok(acceptHeader, "");
   }
 
