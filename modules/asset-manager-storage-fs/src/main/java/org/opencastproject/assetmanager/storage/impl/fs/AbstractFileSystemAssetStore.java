@@ -146,8 +146,10 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
 
   @Override
   public boolean delete(DeletionSelector sel) throws AssetStoreException {
-    File dir = getDeletionSelectorDir(sel);
-    if (dir == null) {
+    // Resolve the root directory once, before anything is deleted. Deleting the directory below may remove the very
+    // directory a second lookup would search for, so the result must not be resolved again afterwards.
+    final String rootPath = getRootDirectory(sel.getOrganizationId(), sel.getMediaPackageId());
+    if (rootPath == null) {
       // MediaPackage could not be found locally. This could mean
       //   - all snapshots live in a remote asset store
       //   - mount failed and files are temporary not available
@@ -156,34 +158,31 @@ public abstract class AbstractFileSystemAssetStore implements AssetStore {
       // In any case, we cannot continue and return "false" to indicate that the files could not be found.
       return false;
     }
+    final File dir = getDeletionSelectorDir(rootPath, sel);
     try {
       FileUtils.deleteDirectory(dir);
       // also delete the media package directory if all versions have been deleted
-      boolean mpDirDeleted = FileSupport.deleteHierarchyIfEmpty(file(path(
-              getRootDirectory(sel.getOrganizationId(), sel.getMediaPackageId()), sel.getOrganizationId())),
-              dir.getParentFile());
+      boolean mpDirDeleted = FileSupport.deleteHierarchyIfEmpty(
+              file(path(rootPath, sel.getOrganizationId())), dir.getParentFile());
       if (mpDirDeleted) {
         onDeleteMediaPackage(sel.getOrganizationId(), sel.getMediaPackageId());
       }
       return true;
     } catch (IOException e) {
-      logger.error("Error deleting directory from archive {}", dir);
-      throw new AssetStoreException(e);
+      throw new AssetStoreException("Error deleting directory from archive " + dir, e);
     }
   }
 
   /**
    * Returns the directory file from a deletion selector
    *
+   * @param rootPath
+   *          the root directory of the media package the selector refers to
    * @param sel
    *          the deletion selector
-   * @return the directory file or null if it does not exist (e.g. MediaPackage does not exist locally)
+   * @return the directory file
    */
-  private File getDeletionSelectorDir(DeletionSelector sel) {
-    final String rootPath = getRootDirectory(sel.getOrganizationId(), sel.getMediaPackageId());
-    if (rootPath == null) {
-      return null;
-    }
+  private File getDeletionSelectorDir(String rootPath, DeletionSelector sel) {
     final String basePath = path(rootPath, sel.getOrganizationId(), sel.getMediaPackageId());
     if (sel.getVersion().isPresent()) {
       return file(basePath, sel.getVersion().get().toString());

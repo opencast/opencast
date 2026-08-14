@@ -227,6 +227,38 @@ public class AbstractFileSystemAssetStoreTest {
     assertFalse(file.exists());
   }
 
+  /**
+   * The root directory has to be resolved before the deletion, not after. Deleting the media package directory removes
+   * exactly what a repeated lookup would search for, so that lookup may legitimately return null and must not be used
+   * unchecked.
+   */
+  @Test
+  public void testDeleteNoneVersionWithStaleRootDirectoryCache() throws Exception {
+    final OsgiFileSystemAssetStore store = new OsgiFileSystemAssetStore() {
+      @Override protected Workspace getWorkspace() {
+        return null;
+      }
+
+      @Override protected String getRootDirectory(String orgId, String mpId) {
+        final String rootDirectory = super.getRootDirectory(orgId, mpId);
+        // drop the cached entry so that every further lookup is resolved from disk again, just like it would be
+        // after the cache entry expired
+        onDeleteMediaPackage(orgId, mpId);
+        return rootDirectory;
+      }
+    };
+    Field rootDirectories = OsgiFileSystemAssetStore.class.getDeclaredField("rootDirectories");
+    rootDirectories.setAccessible(true);
+    rootDirectories.set(store, new ArrayList(Arrays.asList(tmpRoot.getAbsolutePath(), tmpRoot2.getAbsolutePath())));
+    store.setupCache();
+
+    assertTrue(store.delete(DeletionSelector.deleteAll(ORG_ID, MP_ID)));
+    assertFalse(sampleElemDir.exists());
+
+    File file = new File(PathSupport.concat(new String[] { tmpRoot.toString(), ORG_ID, MP_ID }));
+    assertFalse(file.exists());
+  }
+
   @Test
   public void testDeleteWrongVersion() throws Exception {
     DeletionSelector versionSelector = DeletionSelector.delete(ORG_ID, MP_ID, VERSION_1);

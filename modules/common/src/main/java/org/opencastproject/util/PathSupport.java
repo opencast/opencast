@@ -91,6 +91,11 @@ public final class PathSupport {
     if (parts.length == 0) {
       throw new IllegalArgumentException("Array parts is empty");
     }
+    for (int i = 0; i < parts.length; i++) {
+      if (parts[i] == null) {
+        throw new IllegalArgumentException("Element " + i + " of argument parts is null");
+      }
+    }
     String path = removeDoubleSeparator(adjustSeparator(parts[0]));
     for (int i = 1; i < parts.length; i++) {
       path = concat(path, removeDoubleSeparator(adjustSeparator(parts[i])));
