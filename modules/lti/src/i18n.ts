@@ -5,6 +5,7 @@ import daJson from "./i18n/lang-da_DK.json";
 import deJson from "./i18n/lang-de_DE.json";
 import elJson from "./i18n/lang-el_GR.json";
 import enJson from "./i18n/lang-en_US.json";
+import enGbJson from "./i18n/lang-en_GB.json";
 import esJson from "./i18n/lang-es_ES.json";
 import frJson from "./i18n/lang-fr_FR.json";
 import glJson from "./i18n/lang-gl_ES.json";
@@ -16,6 +17,7 @@ import slJson from "./i18n/lang-sl_SI.json";
 import svJson from "./i18n/lang-sv_SE.json";
 import trJson from "./i18n/lang-tr_TR.json";
 import zhJson from "./i18n/lang-zh_CN.json";
+import zhTwJson from "./i18n/lang-zh_TW.json";
 
 i18n
     .use(LanguageDetector)
@@ -25,6 +27,9 @@ i18n
         resources: {
             en: {
                 translations: enJson
+            },
+            "en-GB": {
+                translations: enGbJson
             },
             da: {
                 translations: daJson
@@ -67,6 +72,9 @@ i18n
             },
             zh: {
                 translations: zhJson
+            },
+            "zh-TW": {
+                translations: zhTwJson
             }
         },
         fallbackLng: "en",

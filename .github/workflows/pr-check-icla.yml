@@ -10,7 +10,7 @@ jobs:
         github.event.pull_request.user.login != 'opencastproject'
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/setup-python@v6
+      - uses: actions/setup-python@v7
 
       - name: Install Python module
         run: pip install --break-system-packages apereocla

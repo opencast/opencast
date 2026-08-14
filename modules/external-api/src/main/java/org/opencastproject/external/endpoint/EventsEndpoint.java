@@ -226,7 +226,7 @@ public class EventsEndpoint implements ManagedService {
   private static final String RETRACT_WORKFLOW = "retract.workflow.id";
 
   /** Default ID of the workflow used to retract published events */
-  private static final String DEFAULT_RETRACT_WORKFLOW = "delete";
+  private static final String DEFAULT_RETRACT_WORKFLOW = "retract-for-deletion";
 
   /** The logging facility */
   private static final Logger logger = LoggerFactory.getLogger(EventsEndpoint.class);

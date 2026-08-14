@@ -4,9 +4,6 @@
   "private": true,
   "homepage": "/ltitools",
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^7.2.0",
-    "@fortawesome/free-solid-svg-icons": "^7.2.0",
-    "@fortawesome/react-fontawesome": "^3.2.0",
     "@vitejs/plugin-react": "^6.0.0",
     "axios": "^1.13.6",
     "bootstrap": "^5.3.8",
@@ -17,8 +14,9 @@
     "react-bootstrap": "^2.10.10",
     "react-dom": "^19.2.6",
     "react-i18next": "^17.0.9",
+    "react-icons": "^5.7.0",
     "react-select": "^5.10.2",
-    "typescript": "6.0.3"
+    "typescript": "7.0.2"
   },
   "overrides": {
     "autoprefixer": "10.4.5"
@@ -26,7 +24,10 @@
   "scripts": {
     "start": "vite",
     "build": "vite build",
-    "serve": "vite preview"
+    "serve": "vite preview",
+    "test:e2e": "playwright test",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:ui": "playwright test --ui"
   },
   "browserslist": {
     "production": [
@@ -41,6 +42,7 @@
     ]
   },
   "devDependencies": {
+    "@playwright/test": "^1.62.0",
     "@types/node": "25.9.1",
     "@types/react": "19.2.15",
     "@types/react-dom": "19.2.3",

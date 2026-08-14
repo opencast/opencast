@@ -41,16 +41,16 @@
     "SELECT_COPY_TARGET": "Select destination series",
     "COPY": "Copy",
     "COPY_IN_PROGRESS": "Starting copy…",
-    "CREATOR": "by {{creator}}"
+    "CREATOR": "da {{{creator}}}"
   },
   "EVENTS": {
     "EVENTS": {
       "DETAILS": {
         "METADATA": {
-          "LANGUAGE": "Language",
-          "LICENSE": "License",
-          "PRESENTERS": "Presenter(s)",
-          "TITLE": "Title"
+          "LANGUAGE": "Lingua",
+          "LICENSE": "Licenza",
+          "PRESENTERS": "Presentatore(i)",
+          "TITLE": "Titolo"
         }
       }
     }

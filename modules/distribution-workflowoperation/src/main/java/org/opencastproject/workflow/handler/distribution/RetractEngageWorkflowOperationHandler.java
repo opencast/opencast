@@ -32,6 +32,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.Publication;
 import org.opencastproject.search.api.SearchService;
+import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
@@ -160,50 +161,57 @@ public class RetractEngageWorkflowOperationHandler extends AbstractWorkflowOpera
   public WorkflowOperationResult start(WorkflowInstance workflowInstance, JobContext context)
           throws WorkflowOperationException {
     MediaPackage mediaPackage = workflowInstance.getMediaPackage();
-    List<Job> jobs;
     try {
-      MediaPackage searchMediaPackage = null;
-      try {
-        searchMediaPackage = searchService.get(mediaPackage.getIdentifier().toString());
-      } catch (NotFoundException e) {
-        logger.info("The search service doesn't know media package {}", mediaPackage);
-        return createResult(mediaPackage, Action.SKIP);
+      if (removeFromEngage(mediaPackage.getIdentifier().toString()) || removeFromArchive(mediaPackage)) {
+        return createResult(mediaPackage, Action.CONTINUE);
       }
-      logger.info("Retracting media package {} from download/streaming distribution channel", searchMediaPackage);
-      var retractElementIds = Arrays.stream(searchMediaPackage.getElements())
-          .map(MediaPackageElement::getIdentifier)
-          .collect(Collectors.toSet());
-      jobs = retractElements(retractElementIds, searchMediaPackage);
-
-      // Wait for retraction to finish
-      if (!waitForStatus(jobs.toArray(new Job[0])).isSuccess()) {
-        throw new WorkflowOperationException("One of the download/streaming retract job did not complete successfully");
-      }
-
-      logger.debug("Retraction operation complete");
-
-      logger.info("Removing media package {} from the search index", mediaPackage);
-      Job deleteFromSearch = searchService.delete(mediaPackage.getIdentifier().toString());
-      if (!waitForStatus(deleteFromSearch).isSuccess()) {
-        throw new WorkflowOperationException("Removing media package from search did not complete successfully");
-      }
-
-      logger.debug("Remove from search operation complete");
-
-      // Remove publication element
-      logger.info("Removing engage publication element from media package {}", mediaPackage);
-      Publication[] publications = mediaPackage.getPublications();
-      for (Publication publication : publications) {
-        if (CHANNEL_ID.equals(publication.getChannel())) {
-          mediaPackage.remove(publication);
-          logger.debug("Remove engage publication element '{}' complete", publication);
-        }
-      }
-
-      return createResult(mediaPackage, Action.CONTINUE);
-    } catch (Throwable t) {
+      return createResult(mediaPackage, Action.SKIP);
+    }
+    catch (Throwable t) {
       throw new WorkflowOperationException(t);
     }
   }
 
+  private boolean removeFromEngage(String mpId) throws UnauthorizedException, NotFoundException,
+          WorkflowOperationException, DistributionException {
+    MediaPackage searchMediaPackage;
+    try {
+      searchMediaPackage = searchService.get(mpId);
+    } catch (NotFoundException e) {
+      logger.info("The search service doesn't know media package {}", mpId);
+      return false;
+    }
+
+    logger.info("Retracting media package {} from download/streaming distribution channel", searchMediaPackage);
+    var retractElementIds = Arrays.stream(searchMediaPackage.getElements())
+        .map(MediaPackageElement::getIdentifier)
+        .collect(Collectors.toSet());
+    List<Job> jobs = retractElements(retractElementIds, searchMediaPackage);
+    if (!waitForStatus(jobs.toArray(new Job[0])).isSuccess()) {
+      throw new WorkflowOperationException("One of the download/streaming retract job did not complete successfully");
+    }
+    logger.debug("Retraction operation complete");
+
+    logger.info("Removing media package {} from the search index", mpId);
+    Job deleteFromSearch = searchService.delete(mpId);
+    if (!waitForStatus(deleteFromSearch).isSuccess()) {
+      throw new WorkflowOperationException("Removing media package from search did not complete successfully");
+    }
+    logger.debug("Remove from search operation complete");
+    return true;
+  }
+
+  private boolean removeFromArchive(MediaPackage mediaPackage) {
+    // Remove publication element
+    logger.info("Removing engage publication element from media package {}", mediaPackage);
+    Publication[] publications = mediaPackage.getPublications();
+    for (Publication publication : publications) {
+      if (CHANNEL_ID.equals(publication.getChannel())) {
+        mediaPackage.remove(publication);
+        logger.debug("Remove engage publication element '{}' complete", publication);
+        return true;
+      }
+    }
+    return false;
+  }
 }

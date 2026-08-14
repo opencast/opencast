@@ -3,7 +3,7 @@
   ":configurator:symbolic-name" : "org.opencastproject.graphql.config",
   "org.opencastproject.graphql": {
     "event.preview.subtype:String": "preview",
-    "event.retract.workflow.id:String": "delete"
+    "event.retract.workflow.id:String": "retract-for-deletion"
   },
   "org.opencastproject.graphql.execution.ExecutionService": {
     "execution.max.query.complexity:Integer": 1000,
