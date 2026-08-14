@@ -21,8 +21,11 @@
 
 package org.opencastproject.rest;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * This class is used to store the results of a bulk operation on an endpoint and to easily return those results.
@@ -35,34 +38,29 @@ public class BulkOperationResult {
   public static final String NOT_FOUND_KEY = "notFound";
   public static final String ERROR_KEY = "error";
 
-  private JSONArray ok = new JSONArray();
-  private JSONArray accepted = new JSONArray();
-  private JSONArray badRequest = new JSONArray();
-  private JSONArray unauthorized = new JSONArray();
-  private JSONArray notFound = new JSONArray();
-  private JSONArray serverError = new JSONArray();
+  private final List<String> ok = new ArrayList<>();
+  private final List<String> accepted = new ArrayList<>();
+  private final List<String> badRequest = new ArrayList<>();
+  private final List<String> unauthorized = new ArrayList<>();
+  private final List<String> notFound = new ArrayList<>();
+  private final List<String> serverError = new ArrayList<>();
 
-  @SuppressWarnings("unchecked")
   public void addOk(String id) {
     ok.add(id);
   }
 
-  @SuppressWarnings("unchecked")
   public void addAccepted(String id) {
     accepted.add(id);
   }
 
-  @SuppressWarnings("unchecked")
   public void addBadRequest(String id) {
     badRequest.add(id);
   }
 
-  @SuppressWarnings("unchecked")
   public void addNotFound(String id) {
     notFound.add(id);
   }
 
-  @SuppressWarnings("unchecked")
   public void addServerError(String id) {
     serverError.add(id);
   }
@@ -87,40 +85,20 @@ public class BulkOperationResult {
     addServerError(Long.toString(id));
   }
 
-  public JSONArray getOks() {
-    return ok;
-  }
-
-  public JSONArray getAccepted() {
-    return accepted;
-  }
-
-  public JSONArray getBadRequests() {
-    return badRequest;
-  }
-
-  public JSONArray getUnauthorized() {
-    return unauthorized;
-  }
-
-  public JSONArray getNotFound() {
-    return notFound;
-  }
-
-  public JSONArray getServerError() {
-    return serverError;
-  }
-
-  @SuppressWarnings("unchecked")
   public String toJson() {
-    JSONObject bulkOperationResult = new JSONObject();
-    bulkOperationResult.put(OK_KEY, ok);
-    bulkOperationResult.put(ACCEPTED_KEY, accepted);
-    bulkOperationResult.put(BAD_REQUEST_KEY, badRequest);
-    bulkOperationResult.put(NOT_FOUND_KEY, notFound);
-    bulkOperationResult.put(UNAUTHORIZED_KEY, unauthorized);
-    bulkOperationResult.put(ERROR_KEY, serverError);
-    return bulkOperationResult.toJSONString();
+    JsonObject bulkOperationResult = new JsonObject();
+    bulkOperationResult.add(OK_KEY, toJsonArray(ok));
+    bulkOperationResult.add(ACCEPTED_KEY, toJsonArray(accepted));
+    bulkOperationResult.add(BAD_REQUEST_KEY, toJsonArray(badRequest));
+    bulkOperationResult.add(NOT_FOUND_KEY, toJsonArray(notFound));
+    bulkOperationResult.add(UNAUTHORIZED_KEY, toJsonArray(unauthorized));
+    bulkOperationResult.add(ERROR_KEY, toJsonArray(serverError));
+    return bulkOperationResult.toString();
   }
 
+  private static JsonArray toJsonArray(List<String> ids) {
+    JsonArray array = new JsonArray();
+    ids.forEach(array::add);
+    return array;
+  }
 }
