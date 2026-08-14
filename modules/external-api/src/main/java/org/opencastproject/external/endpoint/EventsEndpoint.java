@@ -1425,7 +1425,7 @@ public class EventsEndpoint implements ManagedService {
       try {
         accessControlList = indexService.updateEventAcl(id, accessControlList, elasticsearchIndex);
       } catch (IllegalArgumentException e) {
-        logger.error("Unable to update event '{}' acl with '{}'", id, acl, e);
+        logger.debug("Unable to update event '{}' acl with '{}'", id, acl, e);
         return Response.status(Status.FORBIDDEN).build();
       }
       return Response.noContent().build();
@@ -1487,7 +1487,7 @@ public class EventsEndpoint implements ManagedService {
       try {
         withNewAce = indexService.updateEventAcl(id, withNewAce, elasticsearchIndex);
       } catch (IllegalArgumentException e) {
-        logger.error("Unable to update event '{}' acl entry with action '{}' and role '{}'", id, action, role, e);
+        logger.debug("Unable to update event '{}' acl entry with action '{}' and role '{}'", id, action, role, e);
         return Response.status(Status.FORBIDDEN).build();
       }
       return Response.noContent().build();
@@ -1538,7 +1538,7 @@ public class EventsEndpoint implements ManagedService {
       try {
         withoutDeleted = indexService.updateEventAcl(id, withoutDeleted, elasticsearchIndex);
       } catch (IllegalArgumentException e) {
-        logger.error("Unable to delete event's '{}' acl entry with action '{}' and role '{}'", id, action, role, e);
+        logger.debug("Unable to delete event's '{}' acl entry with action '{}' and role '{}'", id, action, role, e);
         return Response.status(Status.FORBIDDEN).build();
       }
       return Response.noContent().build();
