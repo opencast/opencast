@@ -35,7 +35,7 @@ import org.opencastproject.security.api.AccessControlList;
 
 import com.google.gson.Gson;
 
-import org.elasticsearch.index.mapper.DateFieldMapper;
+import org.opensearch.index.mapper.DateFieldMapper;
 
 import java.time.Instant;
 import java.time.ZoneOffset;

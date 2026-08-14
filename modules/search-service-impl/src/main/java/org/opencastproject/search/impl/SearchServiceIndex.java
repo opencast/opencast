@@ -64,20 +64,20 @@ import com.google.gson.Gson;
 import com.google.gson.JsonElement;
 
 import org.apache.commons.io.IOUtils;
-import org.elasticsearch.ElasticsearchStatusException;
-import org.elasticsearch.action.DocWriteResponse;
-import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
-import org.elasticsearch.action.index.IndexRequest;
-import org.elasticsearch.action.search.SearchRequest;
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.action.support.master.AcknowledgedResponse;
-import org.elasticsearch.action.update.UpdateRequest;
-import org.elasticsearch.action.update.UpdateResponse;
-import org.elasticsearch.client.RequestOptions;
-import org.elasticsearch.client.indices.CreateIndexRequest;
-import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.rest.RestStatus;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
+import org.opensearch.OpenSearchStatusException;
+import org.opensearch.action.DocWriteResponse;
+import org.opensearch.action.admin.indices.delete.DeleteIndexRequest;
+import org.opensearch.action.index.IndexRequest;
+import org.opensearch.action.search.SearchRequest;
+import org.opensearch.action.search.SearchResponse;
+import org.opensearch.action.support.master.AcknowledgedResponse;
+import org.opensearch.action.update.UpdateRequest;
+import org.opensearch.action.update.UpdateResponse;
+import org.opensearch.client.RequestOptions;
+import org.opensearch.client.indices.CreateIndexRequest;
+import org.opensearch.common.xcontent.XContentType;
+import org.opensearch.core.rest.RestStatus;
+import org.opensearch.search.builder.SearchSourceBuilder;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -187,7 +187,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
       if (!response.isAcknowledged()) {
         throw new SearchException("Unable to create index for '" + INDEX_NAME + "'");
       }
-    } catch (ElasticsearchStatusException e) {
+    } catch (OpenSearchStatusException e) {
       if (e.getDetailedMessage().contains("already_exists_exception")) {
         logger.info("Detected existing index '{}'", INDEX_NAME);
       } else {
@@ -211,7 +211,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
       if (!response.isAcknowledged()) {
         logger.error("Index '{}' could not be deleted", INDEX_NAME);
       }
-    } catch (ElasticsearchStatusException e) {
+    } catch (OpenSearchStatusException e) {
       if (e.status() != RestStatus.NOT_FOUND) {
         throw e;
       }
@@ -439,7 +439,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
       var updateRequst = new UpdateRequest(INDEX_NAME, mediaPackageId)
           .doc(gson.toJson(json), XContentType.JSON);
       esIndex.getClient().update(updateRequst, RequestOptions.DEFAULT);
-    } catch (ElasticsearchStatusException e) {
+    } catch (OpenSearchStatusException e) {
       if (e.status().getStatus() != RestStatus.NOT_FOUND.getStatus()) {
         throw e;
       }
@@ -480,7 +480,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
             var updateRequest = new UpdateRequest(INDEX_NAME, seriesId).doc(gson.toJson(json), XContentType.JSON);
             try {
               esIndex.getClient().update(updateRequest, RequestOptions.DEFAULT);
-            } catch (ElasticsearchStatusException e) {
+            } catch (OpenSearchStatusException e) {
               if (RestStatus.NOT_FOUND == e.status()) {
                 logger.warn("Attempted to modify {}, but that series does not exist in the index.", seriesId);
               }
@@ -519,7 +519,7 @@ public final class SearchServiceIndex extends AbstractIndexProducer implements I
         UpdateResponse response = esIndex.getClient().update(updateRequest, RequestOptions.DEFAULT);
         //NB: We're marking things as deleted but *not actually deleting them**
         return DocWriteResponse.Result.UPDATED == response.getResult();
-      } catch (ElasticsearchStatusException e) {
+      } catch (OpenSearchStatusException e) {
         if (RestStatus.NOT_FOUND == e.status()) {
           logger.debug("Attempted to delete {}, but that series does not exist in the index.", seriesId);
           return true;
