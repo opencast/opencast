@@ -124,11 +124,6 @@
     <!-- REST test environment -->
     <dependency>
       <groupId>io.rest-assured</groupId>
-      <artifactId>json-path</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>io.rest-assured</groupId>
       <artifactId>xml-path</artifactId>
       <scope>test</scope>
     </dependency>

@@ -148,7 +148,7 @@ public class UserSettingsEndpoint {
       return (Response.serverError().build());
     }
 
-    return Response.ok(userSettings.toJson().toJson()).build();
+    return Response.ok(userSettings.toJson().toString()).build();
   }
 
   @POST
@@ -173,7 +173,7 @@ public class UserSettingsEndpoint {
     String username = securityService.getUser().getUsername();
     try {
       UserSetting newUserSetting = userSettingsService.addUserSetting(key, value);
-      return Response.ok(newUserSetting.toJson().toJson(), MediaType.APPLICATION_JSON).build();
+      return Response.ok(newUserSetting.toJson().toString(), MediaType.APPLICATION_JSON).build();
     } catch (UserSettingsServiceException e) {
       logger.error("Could not add user setting username '{}' org: '{}' key: '{}' value: '{}'", username, orgId,
           key, value);
@@ -205,7 +205,7 @@ public class UserSettingsEndpoint {
           @FormParam("value") String value) throws NotFoundException {
     try {
       UserSetting updatedUserSetting = userSettingsService.updateUserSetting(id, key, value);
-      return Response.ok(updatedUserSetting.toJson().toJson(), MediaType.APPLICATION_JSON).build();
+      return Response.ok(updatedUserSetting.toJson().toString(), MediaType.APPLICATION_JSON).build();
     } catch (UserSettingsServiceException e) {
       logger.error("Unable to update user setting", e);
       return Response.serverError().build();

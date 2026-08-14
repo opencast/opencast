@@ -61,7 +61,7 @@ public final class JsonConvTest {
 
   @Test
   public void testManagedAclFull() {
-    String json = JsonConv.full(macl).toJson();
+    String json = JsonConv.full(macl).toString();
     logger.info(json);
     JsonPath jp = from(json);
     assertEquals(4, ((Map) jp.get()).size());
@@ -73,7 +73,7 @@ public final class JsonConvTest {
 
   @Test
   public void testManagedAclDigest() {
-    String json = JsonConv.digest(macl).toJson();
+    String json = JsonConv.digest(macl).toString();
     JsonPath jp = from(json);
     logger.info(json);
     assertEquals(2, ((Map) jp.get()).size());
