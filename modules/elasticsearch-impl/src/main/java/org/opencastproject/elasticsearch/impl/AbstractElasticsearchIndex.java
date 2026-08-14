@@ -35,12 +35,11 @@ import org.opencastproject.util.requests.SortCriterion;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.http.ConnectionClosedException;
-import org.apache.http.HttpHost;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
+import org.apache.hc.core5.http.ConnectionClosedException;
+import org.apache.hc.core5.http.HttpHost;
 import org.opensearch.OpenSearchException;
 import org.opensearch.OpenSearchStatusException;
 import org.opensearch.action.admin.cluster.health.ClusterHealthRequest;
@@ -58,7 +57,7 @@ import org.opensearch.action.search.SearchRequest;
 import org.opensearch.action.search.SearchResponse;
 import org.opensearch.action.search.SearchType;
 import org.opensearch.action.support.WriteRequest;
-import org.opensearch.action.support.master.AcknowledgedResponse;
+import org.opensearch.action.support.clustermanager.AcknowledgedResponse;
 import org.opensearch.client.RequestOptions;
 import org.opensearch.client.RestClient;
 import org.opensearch.client.RestClientBuilder;
@@ -420,12 +419,13 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
     this.indexVersion = version;
 
     if (client == null) {
-      final RestClientBuilder builder = RestClient
-          .builder(new HttpHost(externalServerHostname, externalServerPort, externalServerScheme));
+      final HttpHost host = new HttpHost(externalServerScheme, externalServerHostname, externalServerPort);
+      final RestClientBuilder builder = RestClient.builder(host);
 
       if (username != null && password != null) {
-        final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-        credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(username, password));
+        final BasicCredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+        credentialsProvider.setCredentials(new AuthScope(host),
+            new UsernamePasswordCredentials(username, password.toCharArray()));
         builder.setHttpClientConfigCallback(
             httpClientBuilder -> httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider));
       }
@@ -712,7 +712,7 @@ public abstract class AbstractElasticsearchIndex implements SearchIndex {
    * class.
    */
   protected long getTotalHits(SearchHits hits) {
-    return hits.getTotalHits().value;
+    return hits.getTotalHits().value();
   }
 
   /**

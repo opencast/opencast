@@ -269,7 +269,7 @@ public class SearchRestService extends AbstractJobProducerEndpoint {
         .peek(hit -> hit.remove(SearchResult.TYPE))
         .collect(Collectors.toList());
 
-    var total = hits.getTotalHits().value;
+    var total = hits.getTotalHits().value();
     var json = gson.toJsonTree(Map.of(
         "offset", from,
         "total", total,

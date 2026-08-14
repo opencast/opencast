@@ -39,7 +39,7 @@ public class SearchResultList {
         .map(SearchHit::getSourceAsMap)
         .map(SearchResult::rehydrate)
         .collect(Collectors.toUnmodifiableList());
-    totalhits = hits.getTotalHits().value;
+    totalhits = hits.getTotalHits().value();
   }
 
   public List<SearchResult> getHits() {
