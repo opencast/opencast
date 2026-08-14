@@ -88,22 +88,29 @@
       <version>${opensearch.version}</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpasyncclient</artifactId>
-      <version>4.1.4</version>
+      <groupId>org.apache.httpcomponents.client5</groupId>
+      <artifactId>httpclient5</artifactId>
+      <version>5.6.1</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpcore</artifactId>
-      <version>${httpcomponents-httpcore.version}</version>
+      <groupId>org.apache.httpcomponents.core5</groupId>
+      <artifactId>httpcore5</artifactId>
+      <version>5.4</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpcore-osgi</artifactId>
+      <groupId>org.apache.httpcomponents.core5</groupId>
+      <artifactId>httpcore5-h2</artifactId>
+      <version>5.4</version>
     </dependency>
     <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpclient-osgi</artifactId>
+      <groupId>org.apache.httpcomponents.core5</groupId>
+      <artifactId>httpcore5-reactive</artifactId>
+      <version>5.4</version>
+    </dependency>
+    <dependency>
+      <groupId>io.projectreactor</groupId>
+      <artifactId>reactor-core</artifactId>
+      <version>3.8.6</version>
     </dependency>
     <dependency>
       <groupId>org.apache.lucene</groupId>
@@ -134,6 +141,36 @@
       <groupId>org.reactivestreams</groupId>
       <artifactId>reactive-streams</artifactId>
       <version>1.0.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.snakeyaml</groupId>
+      <artifactId>snakeyaml-engine</artifactId>
+      <version>3.0.1</version>
+    </dependency>
+    <dependency>
+      <groupId>tools.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>3.2.1</version>
+    </dependency>
+    <dependency>
+      <groupId>tools.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>3.2.1</version>
+    </dependency>
+    <dependency>
+      <groupId>tools.jackson.dataformat</groupId>
+      <artifactId>jackson-dataformat-smile</artifactId>
+      <version>3.2.1</version>
+    </dependency>
+    <dependency>
+      <groupId>tools.jackson.dataformat</groupId>
+      <artifactId>jackson-dataformat-yaml</artifactId>
+      <version>3.2.1</version>
+    </dependency>
+    <dependency>
+      <groupId>tools.jackson.dataformat</groupId>
+      <artifactId>jackson-dataformat-cbor</artifactId>
+      <version>3.2.1</version>
     </dependency>
 
     <!-- thirdparty -->
@@ -168,19 +205,21 @@
             <ignoredUnusedDeclaredDependency>org.opensearch.plugin:rank-eval-client</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.opensearch:opensearch-common</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.reactivestreams:reactive-streams</ignoredUnusedDeclaredDependency>
-            <ignoredUnusedDeclaredDependency>org.apache.httpcomponents:httpasyncclient</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.snakeyaml:snakeyaml-engine</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>tools.jackson.core:jackson-core</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>tools.jackson.core:jackson-databind</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>tools.jackson.dataformat:jackson-dataformat-smile</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>tools.jackson.dataformat:jackson-dataformat-yaml</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>tools.jackson.dataformat:jackson-dataformat-cbor</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.lucene:lucene-join</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.lucene:lucene-queryparser</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.lucene:lucene-queries</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>com.carrotsearch:hppc</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.slf4j:slf4j-reload4j</ignoredUnusedDeclaredDependency>
-            <ignoredUnusedDeclaredDependency>org.apache.httpcomponents:httpcore</ignoredUnusedDeclaredDependency>
-            <ignoredUnusedDeclaredDependency>org.apache.httpcomponents:httpcore-osgi</ignoredUnusedDeclaredDependency>
-            <ignoredUnusedDeclaredDependency>org.apache.httpcomponents:httpclient-osgi</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.apache.httpcomponents.core5:httpcore5-h2</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.apache.httpcomponents.core5:httpcore5-reactive</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>io.projectreactor:reactor-core</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
-          <ignoredUsedUndeclaredDependencies>
-            <ignoredUsedUndeclaredDependency>org.apache.httpcomponents:httpclient</ignoredUsedUndeclaredDependency>
-          </ignoredUsedUndeclaredDependencies>
         </configuration>
       </plugin>
       <plugin>
@@ -190,7 +229,11 @@
         <configuration>
           <instructions>
             <Import-Package>
+              !com.aayushatharva.brotli4j.*,
               !com.carrotsearch.randomizedtesting,
+              !com.github.luben.zstd,
+              !org.apache.commons.compress.compressors,
+              !org.brotli.dec,
               !com.conversantmedia.util.*,
               !com.fasterxml.jackson.dataformat.smile,
               !com.fasterxml.jackson.dataformat.xml.*,
@@ -205,16 +248,26 @@
               !joptsimple.*,
               !org.HdrHistogram.*,
               !org.apache.kafka.clients.producer.*,
+              !org.bouncycastle.crypto.*,
+              !org.conscrypt,
+              !org.newsclub.net.unix,
               !org.apache.logging.log4j.util.internal,
               !org.apache.logging.log4j.core*,
               !org.apache.lucene.*,
               !javax.activation.*,
               !javax.annotation,
+              !javax.annotation.meta,
               !jdk.net,
+              !jdk.incubator.vector,
+              !java.lang.foreign,
               !java.nio.file.spi.*,
               !com.sun.nio.file,
+              !org.opensearch.arrow.spi,
               !org.opensearch.cli.*,
+              !org.opensearch.common.queue,
               !org.opensearch.geometry.*,
+              !org.opensearch.javaagent.bootstrap,
+              !org.opensearch.plugin.classloader,
               !org.opensearch.secure_sm.*,
               !org.opensearch.task.commons.*,
               !org.opensearch.telemetry.*,
@@ -225,7 +278,6 @@
               !org.roaringbitmap.*,
               !org.tartarus.*,
               !org.zeromq.*,
-              !reactor.*,
               !com.github.mustachejava.*,
               *
             </Import-Package>
@@ -246,9 +298,19 @@
               lucene-queryparser,
               lucene-queries,
               rank-eval-client,
-              httpasyncclient,
+              httpclient5,
+              httpcore5,
+              httpcore5-h2,
+              httpcore5-reactive,
+              reactor-core,
               hppc,
-              reactive-streams
+              reactive-streams,
+              snakeyaml-engine,
+              jackson-core,
+              jackson-databind,
+              jackson-dataformat-smile,
+              jackson-dataformat-yaml,
+              jackson-dataformat-cbor
             </Embed-Dependency>
             <_exportcontents>
               org.opensearch,
@@ -261,7 +323,7 @@
               org.opensearch.action.index,
               org.opensearch.action.search,
               org.opensearch.action.support,
-              org.opensearch.action.support.master,
+              org.opensearch.action.support.clustermanager,
               org.opensearch.action.update,
               org.opensearch.client,
               org.opensearch.client.indices,
