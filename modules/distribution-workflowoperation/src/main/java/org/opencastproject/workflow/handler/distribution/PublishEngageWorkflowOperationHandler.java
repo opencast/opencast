@@ -718,27 +718,27 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     MediaPackage mergedMediaPackage = (MediaPackage) updatedMp.clone();
     for (MediaPackageElement element : publishedMp.elements()) {
       String type = element.getElementType().toString().toLowerCase();
-      boolean elementHasFlavorThatAlreadyExists = updatedMp.getElementsByFlavor(element.getFlavor()).length > 0;
+      MediaPackageElement[] existingElements = updatedMp.getElementsByFlavor(element.getFlavor());
+      boolean elementHasFlavorThatAlreadyExists = existingElements.length > 0;
       boolean elementHasForceMergeFlavor = mergeForceFlavors.stream().anyMatch((f) -> element.getFlavor().matches(f));
       boolean elementHasForceAddFlavor = addForceFlavors.stream().anyMatch((f) -> element.getFlavor().matches(f));
 
       if (elementHasForceAddFlavor) {
-        logger.info("Adding {} '{}' into the updated mediapackage", type, element.getIdentifier());
+        logger.debug("Adding {} '{}' into the updated mediapackage", type, element.getIdentifier());
         mergedMediaPackage.add((MediaPackageElement) element.clone());
         continue;
       }
       if (!elementHasFlavorThatAlreadyExists) {
         if (elementHasForceMergeFlavor) {
-          logger.info("Forcing removal of {} {} due to the absence of a new element with flavor {}",
+          logger.debug("Forcing removal of {} {} due to the absence of a new element with flavor {}",
                   type, element.getIdentifier(), element.getFlavor().toString());
           continue;
         }
-        logger.info("Merging {} '{}' into the updated mediapackage", type, element.getIdentifier());
+        logger.debug("Merging {} '{}' into the updated mediapackage", type, element.getIdentifier());
         mergedMediaPackage.add((MediaPackageElement) element.clone());
       } else {
-        logger.info("Overwriting existing {} '{}' with '{}' in the updated mediapackage",
-                type, element.getIdentifier(), updatedMp.getElementsByFlavor(element.getFlavor())[0].getIdentifier());
-
+        logger.debug("Overwriting existing {} '{}' with '{}' in the updated mediapackage",
+                type, element.getIdentifier(), existingElements[0].getIdentifier());
       }
     }
 
