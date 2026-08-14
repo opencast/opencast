@@ -50,11 +50,13 @@ import org.opencastproject.oaipmh.persistence.SearchResultItem;
 import org.opencastproject.oaipmh.util.XmlGen;
 import org.opencastproject.util.HttpUtil;
 import org.opencastproject.util.IoSupport;
-import org.opencastproject.util.JsonObj;
-import org.opencastproject.util.JsonVal;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.XmlUtil;
 import org.opencastproject.util.data.Collections;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
@@ -281,12 +283,13 @@ public class OaiPmhRepositoryTest {
       logger.info("--- RESPONSE ---");
       logger.info(json);
       boolean ok = true;
-      for (JsonVal message : JsonObj.jsonObj(json).obj("json").arr("messages")) {
-        if (message.isObj()) {
-          final JsonObj messageObj = JsonVal.asJsonObj(message.get());
+      for (JsonElement message : JsonParser.parseString(json).getAsJsonObject()
+              .getAsJsonObject("json").getAsJsonArray("messages")) {
+        if (message.isJsonObject()) {
+          final JsonObject messageObj = message.getAsJsonObject();
           if (messageObj.has("className")) {
-            final String className = JsonVal.asString(messageObj.val("className").get()).trim();
-            final String text = JsonVal.asString(messageObj.val("text").get()).trim();
+            final String className = messageObj.get("className").getAsString().trim();
+            final String text = messageObj.get("text").getAsString().trim();
             logger.info("[{}] {}", className, text);
             ok = ok && (eq(className, "correct")
                     // since the validator does not validate everything correctly here are some exclusions

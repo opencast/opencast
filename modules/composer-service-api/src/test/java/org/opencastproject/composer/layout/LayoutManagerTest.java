@@ -30,8 +30,9 @@ import static org.opencastproject.composer.layout.Offset.offset;
 import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.data.Tuple.tuple;
 
-import org.opencastproject.util.JsonObj;
 import org.opencastproject.util.data.Tuple;
+
+import com.google.gson.JsonParser;
 
 import org.junit.Test;
 
@@ -246,7 +247,8 @@ public class LayoutManagerTest {
             tuple(offset(1340, 340), "{\"anchorOffset\":{\"referring\":{\"left\":1.0,\"top\":1.0},"
                 + "\"offset\":{\"y\":-20,\"x\":-20},\"reference\":{\"left\":1.0,\"top\":1.0}}}"));
     for (final Tuple<Offset, String> fixture : fixtures) {
-      final AbsolutePositionLayoutSpec spec = Serializer.absolutePositionLayoutSpec(JsonObj.jsonObj(fixture.getB()));
+      final AbsolutePositionLayoutSpec spec = Serializer.absolutePositionLayoutSpec(
+              JsonParser.parseString(fixture.getB()).getAsJsonObject());
       final MultiShapeLayout layout = LayoutManager.absoluteMultiShapeLayout(
               Dimension.dimension(1900, 1080),
               list(tuple(Dimension.dimension(540, 720), spec)));

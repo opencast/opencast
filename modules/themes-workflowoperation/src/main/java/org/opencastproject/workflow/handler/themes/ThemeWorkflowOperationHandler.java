@@ -298,7 +298,7 @@ public class ThemeWorkflowOperationHandler extends AbstractWorkflowOperationHand
         }
 
         AbsolutePositionLayoutSpec watermarkLayout = parseLayout(theme.getWatermarkPosition());
-        layoutList.set(layoutList.size() - 1, Serializer.json(watermarkLayout).toJson());
+        layoutList.set(layoutList.size() - 1, Serializer.json(watermarkLayout).toString());
         layoutStringOpt = Optional.of(String.join(";", layoutList));
       }
 

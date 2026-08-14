@@ -43,9 +43,14 @@ import org.opencastproject.security.api.AccessControlParser;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.series.api.Series;
-import org.opencastproject.util.Jsons;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.workspace.api.Workspace;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonNull;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +59,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -71,18 +75,17 @@ class Item {
   private static final Logger logger = LoggerFactory.getLogger(Item.class);
 
   private Date modifiedDate;
-  private Jsons.Val obj;
+  private JsonObject obj;
 
   /** Converts a event into the corresponding JSON representation */
   Item(SearchResult event, AuthorizationService authorizationService, Workspace workspace) {
     this.modifiedDate = event.getModifiedDate();
 
     if (event.getDeletionDate() != null) {
-      this.obj = Jsons.obj(
-          Jsons.p("kind", "event-deleted"),
-          Jsons.p("id", event.getId()),
-          Jsons.p("updated", event.getModifiedDate().getTime())
-      );
+      this.obj = new JsonObject();
+      this.obj.addProperty("kind", "event-deleted");
+      this.obj.addProperty("id", event.getId());
+      this.obj.addProperty("updated", event.getModifiedDate().getTime());
     } else {
       final var mp = event.getMediaPackage();
       final var dccs = getDccsFromMp(mp, workspace);
@@ -92,11 +95,14 @@ class Item {
 
       // Obtain creators. We first try to obtain it from the DCCs. We collect
       // into `LinkedHashSet` to deduplicate entries.
-      final var creators = dccs.stream()
+      // NB: this used to collect into a LinkedHashSet "to deduplicate entries", but the values were
+      // wrapped in objects without equals(), so nothing was ever deduplicated. Keep the previous
+      // behaviour here; deduplicating would be a change in what we report, not part of this port.
+      final var creators = new JsonArray();
+      dccs.stream()
               .flatMap(dcc -> dcc.get(DublinCore.PROPERTY_CREATOR).stream())
               .filter(Objects::nonNull)
-              .map(creator -> Jsons.v(creator.getValue()))
-              .collect(Collectors.toCollection(LinkedHashSet::new));
+              .forEach(creator -> creators.add(creator.getValue()));
 
       // Get start and end time
       final var period = dccs.stream()
@@ -148,30 +154,29 @@ class Item {
             return Math.max(0L, EncodingSchemeUtils.decodeMandatoryDuration(dcExtent));
           });
 
-      this.obj = Jsons.obj(
-          Jsons.p("kind", "event"),
-          Jsons.p("id", event.getId()),
-          Jsons.p("title", title),
-          Jsons.p("partOf", event.getDublinCore().getFirst(DublinCore.PROPERTY_IS_PART_OF)),
-          Jsons.p("description", event.getDublinCore().getFirst(PROPERTY_DESCRIPTION)),
-          Jsons.p("created", event.getCreatedDate().toEpochMilli()),
-          Jsons.p("startTime", period.map(p -> p.getStart().getTime()).orElse(null)),
-          Jsons.p("endTime", period.map(p -> p.getEnd().getTime()).orElse(null)),
-          Jsons.p("creators", Jsons.arr(new ArrayList<>(creators))),
-          Jsons.p("duration", duration),
-          Jsons.p("thumbnail", findThumbnail(mp)),
-          Jsons.p("timelinePreview", findTimelinePreview(mp)),
-          Jsons.p("tracks", Jsons.arr(assembleTracks(event, mp))),
-          Jsons.p("acl", assembleAcl(authorizationService.getAcl(mp, AclScope.Merged).getA().getEntries())),
-          Jsons.p("isLive", isLive),
-          Jsons.p("metadata", dccToMetadata(dccs, Set.of(new String[] {
-              "created", "creator", "title", "extent", "isPartOf", "description", "identifier",
-          }))),
-          Jsons.p("captions", Jsons.arr(captions)),
-          Jsons.p("slideText", slideText.map(t -> t.toString()).orElse(null)),
-          Jsons.p("segments", Jsons.arr(findSegments(mp))),
-          Jsons.p("updated", event.getModifiedDate().getTime())
-      );
+      this.obj = new JsonObject();
+      this.obj.addProperty("kind", "event");
+      this.obj.addProperty("id", event.getId());
+      this.obj.addProperty("title", title);
+      this.obj.addProperty("partOf", event.getDublinCore().getFirst(DublinCore.PROPERTY_IS_PART_OF));
+      this.obj.addProperty("description", event.getDublinCore().getFirst(PROPERTY_DESCRIPTION));
+      this.obj.addProperty("created", event.getCreatedDate().toEpochMilli());
+      this.obj.addProperty("startTime", period.map(p -> p.getStart().getTime()).orElse(null));
+      this.obj.addProperty("endTime", period.map(p -> p.getEnd().getTime()).orElse(null));
+      this.obj.add("creators", creators);
+      this.obj.addProperty("duration", duration);
+      this.obj.addProperty("thumbnail", findThumbnail(mp));
+      this.obj.add("timelinePreview", findTimelinePreview(mp));
+      this.obj.add("tracks", assembleTracks(event, mp));
+      this.obj.add("acl", assembleAcl(authorizationService.getAcl(mp, AclScope.Merged).getA().getEntries()));
+      this.obj.addProperty("isLive", isLive);
+      this.obj.add("metadata", dccToMetadata(dccs, Set.of(new String[] {
+          "created", "creator", "title", "extent", "isPartOf", "description", "identifier",
+      })));
+      this.obj.add("captions", captions);
+      this.obj.addProperty("slideText", slideText.map(t -> t.toString()).orElse(null));
+      this.obj.add("segments", findSegments(mp));
+      this.obj.addProperty("updated", event.getModifiedDate().getTime());
     }
   }
 
@@ -197,8 +202,8 @@ class Item {
    * The second argument is a list of dcterms metadata fields that is already included elsewhere in
    * the response. They will be ignored here.
    */
-  private static Jsons.Obj dccToMetadata(List<DublinCoreCatalog> dccs, Set<String> ignoredDcFields) {
-    final var namespaces = new HashMap<String, ArrayList<Jsons.Prop>>();
+  private static JsonObject dccToMetadata(List<DublinCoreCatalog> dccs, Set<String> ignoredDcFields) {
+    final var namespaces = new HashMap<String, JsonObject>();
 
     for (final var dcc : (Iterable<DublinCoreCatalog>) dccs::iterator) {
       for (final var e : dcc.getValues().entrySet()) {
@@ -215,52 +220,46 @@ class Item {
           continue;
         }
 
-        final var fields = namespaces.computeIfAbsent(ns, k -> new ArrayList<>());
-        final var values = e.getValue().stream()
-            .map(v -> Jsons.v(v.getValue()))
-            .collect(Collectors.toCollection(ArrayList::new));
-        final var field = Jsons.p(e.getKey().getLocalName(), Jsons.arr(values));
-        fields.add(field);
+        final var fields = namespaces.computeIfAbsent(ns, k -> new JsonObject());
+        final var values = new JsonArray();
+        e.getValue().forEach(v -> values.add(v.getValue()));
+        fields.add(e.getKey().getLocalName(), values);
       }
     }
 
-    final var fields = namespaces.entrySet().stream()
-        .map(e -> {
-          final var obj = Jsons.obj(e.getValue().toArray(new Jsons.Prop[0]));
-          return Jsons.p(e.getKey(), obj);
-        })
-        .toArray(Jsons.Prop[]::new);
-
-    return Jsons.obj(fields);
+    final var metadata = new JsonObject();
+    namespaces.forEach(metadata::add);
+    return metadata;
   }
 
-  private static Jsons.Obj assembleAcl(List<AccessControlEntry> acl) {
+  private static JsonObject assembleAcl(List<AccessControlEntry> acl) {
     // We just transform the ACL into a map with one field per action, and the
     // value being a list of roles, e.g.
     // `{ "read": ["ROLE_USER", "ROLE_FOO"], "write": [...] }`
-    final var actionToRoles = new HashMap<String, ArrayList<Jsons.Val>>();
+    final var actionToRoles = new HashMap<String, JsonArray>();
     acl.stream().filter(AccessControlEntry::isAllow).forEach(entry -> {
       final var action = entry.getAction();
-      actionToRoles.putIfAbsent(action, new ArrayList<>());
-      actionToRoles.get(action).add(Jsons.v(entry.getRole()));
+      actionToRoles.computeIfAbsent(action, k -> new JsonArray()).add(entry.getRole());
     });
 
-    final var props = actionToRoles.entrySet().stream()
-        .map(e -> Jsons.p(e.getKey(), Jsons.arr(e.getValue())))
-        .toArray(Jsons.Prop[]::new);
-
-    return Jsons.obj(props);
+    final var json = new JsonObject();
+    actionToRoles.forEach(json::add);
+    return json;
   }
 
-  private static List<Jsons.Val> assembleTracks(SearchResult event, MediaPackage mp) {
-    return Arrays.stream(mp.getTracks())
+  private static JsonArray assembleTracks(SearchResult event, MediaPackage mp) {
+    final var tracks = new JsonArray();
+    Arrays.stream(mp.getTracks())
         .filter(track -> track.hasAudio() || track.hasVideo())
-        .map(track -> {
+        .forEach(track -> {
           var videoStreams = TrackSupport.byType(track.getStreams(), VideoStream.class);
-          var resolution = Jsons.NULL;
+          JsonElement resolution = JsonNull.INSTANCE;
           if (videoStreams.length > 0) {
             final var stream = videoStreams[0];
-            resolution = Jsons.arr(Jsons.v(stream.getFrameWidth()), Jsons.v(stream.getFrameHeight()));
+            final var res = new JsonArray();
+            res.add(stream.getFrameWidth());
+            res.add(stream.getFrameHeight());
+            resolution = res;
 
             if (videoStreams.length > 1) {
               logger.warn(
@@ -270,19 +269,20 @@ class Item {
             }
           }
 
-          return Jsons.obj(
-              Jsons.p("uri", track.getURI().toString()),
-              Jsons.p("mimetype", track.getMimeType().toString()),
-              Jsons.p("flavor", track.getFlavor().toString()),
-              Jsons.p("resolution", resolution),
-              Jsons.p("isMaster", track.isMaster())
-          );
-        })
-        .collect(Collectors.toCollection(ArrayList::new));
+          final var json = new JsonObject();
+          json.addProperty("uri", track.getURI().toString());
+          json.addProperty("mimetype", track.getMimeType().toString());
+          json.addProperty("flavor", track.getFlavor().toString());
+          json.add("resolution", resolution);
+          json.addProperty("isMaster", track.isMaster());
+          tracks.add(json);
+        });
+    return tracks;
   }
 
-  private static List<Jsons.Val> findCaptions(MediaPackage mp) {
-    return Arrays.stream(mp.getElements())
+  private static JsonArray findCaptions(MediaPackage mp) {
+    final var captions = new JsonArray();
+    Arrays.stream(mp.getElements())
         .filter(element -> {
           final var isVTT = element.getFlavor().toString().startsWith("captions/vtt")
                 || element.getMimeType().eq("text", "vtt");
@@ -312,15 +312,16 @@ class Item {
             }
           }
 
-          return Jsons.obj(
-            Jsons.p("uri", track.getURI().toString()),
-            Jsons.p("lang", lang.orElse(null)),
-            Jsons.p("generatorType", findTag.apply("generator-type").orElse(null)),
-            Jsons.p("generator", findTag.apply("generator").orElse(null)),
-            Jsons.p("type", findTag.apply("type").orElse(null))
-          );
+          final var json = new JsonObject();
+          json.addProperty("uri", track.getURI().toString());
+          json.addProperty("lang", lang.orElse(null));
+          json.addProperty("generatorType", findTag.apply("generator-type").orElse(null));
+          json.addProperty("generator", findTag.apply("generator").orElse(null));
+          json.addProperty("type", findTag.apply("type").orElse(null));
+          return json;
         })
-        .collect(Collectors.toCollection(ArrayList::new));
+        .forEach(captions::add);
+    return captions;
   }
 
   private static String findThumbnail(MediaPackage mp) {
@@ -333,19 +334,22 @@ class Item {
         .orElse(null);
   }
 
-  private static List<Jsons.Val> findSegments(MediaPackage mp) {
-    return Arrays.stream(mp.getAttachments())
-      .filter(a -> a.getFlavor().getSubtype().equals("segment+preview"))
-      .map(s -> Jsons.obj(
-          Jsons.p("uri", s.getURI().toString()),
-          Jsons.p("startTime", MediaTimePointImpl.parseTimePoint(
+  private static JsonArray findSegments(MediaPackage mp) {
+    final var segments = new JsonArray();
+    Arrays.stream(mp.getAttachments())
+        .filter(a -> a.getFlavor().getSubtype().equals("segment+preview"))
+        .forEach(s -> {
+          final var json = new JsonObject();
+          json.addProperty("uri", s.getURI().toString());
+          json.addProperty("startTime", MediaTimePointImpl.parseTimePoint(
               s.getReference().getProperty("time")
-          ).getTimeInMilliseconds())
-      ))
-      .collect(Collectors.toCollection(ArrayList::new));
+          ).getTimeInMilliseconds());
+          segments.add(json);
+        });
+    return segments;
   }
 
-  private static Jsons.Val findTimelinePreview(MediaPackage mp) {
+  private static JsonElement findTimelinePreview(MediaPackage mp) {
     return Arrays.stream(mp.getAttachments())
         .filter(a -> a.getFlavor().getSubtype().equals("timeline+preview"))
         .map(a -> {
@@ -364,17 +368,17 @@ class Item {
             return null;
           }
 
-          return (Jsons.Val) Jsons.obj(
-            Jsons.p("url", a.getURI().toString()),
-            Jsons.p("imageCountX", imageCountX),
-            Jsons.p("imageCountY", imageCountY),
-            Jsons.p("resolutionX", resolutionX),
-            Jsons.p("resolutionY", resolutionY)
-          );
+          final var json = new JsonObject();
+          json.addProperty("url", a.getURI().toString());
+          json.addProperty("imageCountX", imageCountX);
+          json.addProperty("imageCountY", imageCountY);
+          json.addProperty("resolutionX", resolutionX);
+          json.addProperty("resolutionY", resolutionY);
+          return (JsonElement) json;
         })
         .filter(o -> o != null)
         .findFirst()
-        .orElse(Jsons.NULL);
+        .orElse(JsonNull.INSTANCE);
   }
 
   /** Converts a series into the corresponding JSON representation */
@@ -392,18 +396,17 @@ class Item {
     }
 
     if (series.isDeleted()) {
-      this.obj = Jsons.obj(
-        Jsons.p("kind", "series-deleted"),
-        Jsons.p("id", series.getId()),
-        Jsons.p("updated", series.getModifiedDate().getTime())
-      );
+      this.obj = new JsonObject();
+      this.obj.addProperty("kind", "series-deleted");
+      this.obj.addProperty("id", series.getId());
+      this.obj.addProperty("updated", series.getModifiedDate().getTime());
     } else {
       // Created date
       var createdDateString = series.getDublinCore().getFirst(PROPERTY_CREATED);
-      var created = Jsons.NULL;
+      JsonElement created = JsonNull.INSTANCE;
       var date = EncodingSchemeUtils.decodeDate(createdDateString);
       if (date != null) {
-        created = Jsons.v(date.getTime());
+        created = new JsonPrimitive(date.getTime());
       } else {
         logger.warn("Series {} has unparsable created-date: {}", series.getId(), createdDateString);
       }
@@ -412,16 +415,15 @@ class Item {
           "created", "title", "description", "identifier",
       }));
 
-      this.obj = Jsons.obj(
-        Jsons.p("kind", "series"),
-        Jsons.p("id", series.getId()),
-        Jsons.p("title", series.getDublinCore().getFirst(PROPERTY_TITLE)),
-        Jsons.p("description", series.getDublinCore().getFirst(PROPERTY_DESCRIPTION)),
-        Jsons.p("acl", assembleAcl(acl.getEntries())),
-        Jsons.p("metadata", additionalMetadata),
-        Jsons.p("created", created),
-        Jsons.p("updated", series.getModifiedDate().getTime())
-      );
+      this.obj = new JsonObject();
+      this.obj.addProperty("kind", "series");
+      this.obj.addProperty("id", series.getId());
+      this.obj.addProperty("title", series.getDublinCore().getFirst(PROPERTY_TITLE));
+      this.obj.addProperty("description", series.getDublinCore().getFirst(PROPERTY_DESCRIPTION));
+      this.obj.add("acl", assembleAcl(acl.getEntries()));
+      this.obj.add("metadata", additionalMetadata);
+      this.obj.add("created", created);
+      this.obj.addProperty("updated", series.getModifiedDate().getTime());
     }
   }
 
@@ -437,29 +439,30 @@ class Item {
     );
 
     // Assemble entries
-    final List<Jsons.Val> entries = playlist.getEntries().stream().map(entry -> Jsons.obj(
-          Jsons.p("id", entry.getId()),
-          Jsons.p("contentId", entry.getContentId()),
-          Jsons.p("type", entry.getType().getCode())
-    )).collect(Collectors.toCollection(ArrayList::new));
+    final var entries = new JsonArray();
+    playlist.getEntries().forEach(entry -> {
+      final var json = new JsonObject();
+      json.addProperty("id", entry.getId());
+      json.addProperty("contentId", entry.getContentId());
+      json.addProperty("type", entry.getType().getCode());
+      entries.add(json);
+    });
 
     if (playlist.isDeleted()) {
-      this.obj = Jsons.obj(
-        Jsons.p("kind", "playlist-deleted"),
-        Jsons.p("id", playlist.getId()),
-        Jsons.p("updated", playlist.getUpdated().getTime())
-      );
+      this.obj = new JsonObject();
+      this.obj.addProperty("kind", "playlist-deleted");
+      this.obj.addProperty("id", playlist.getId());
+      this.obj.addProperty("updated", playlist.getUpdated().getTime());
     } else {
-      this.obj = Jsons.obj(
-        Jsons.p("kind", "playlist"),
-        Jsons.p("id", playlist.getId()),
-        Jsons.p("title", playlist.getTitle()),
-        Jsons.p("description", playlist.getDescription()),
-        Jsons.p("creator", playlist.getCreator()),
-        Jsons.p("entries", Jsons.arr(entries)),
-        Jsons.p("acl", acl),
-        Jsons.p("updated", this.modifiedDate.getTime())
-      );
+      this.obj = new JsonObject();
+      this.obj.addProperty("kind", "playlist");
+      this.obj.addProperty("id", playlist.getId());
+      this.obj.addProperty("title", playlist.getTitle());
+      this.obj.addProperty("description", playlist.getDescription());
+      this.obj.addProperty("creator", playlist.getCreator());
+      this.obj.add("entries", entries);
+      this.obj.add("acl", acl);
+      this.obj.addProperty("updated", this.modifiedDate.getTime());
     }
   }
 
@@ -467,7 +470,7 @@ class Item {
     return this.modifiedDate;
   }
 
-  Jsons.Val getJson() {
+  JsonObject getJson() {
     return this.obj;
   }
 }

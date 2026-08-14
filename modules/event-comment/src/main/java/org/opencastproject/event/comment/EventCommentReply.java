@@ -27,9 +27,8 @@ import static org.opencastproject.util.RequireUtil.notNull;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.EqualsUtil;
-import org.opencastproject.util.Jsons;
-import org.opencastproject.util.Jsons.Obj;
-import org.opencastproject.util.Jsons.Val;
+
+import com.google.gson.JsonObject;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -175,17 +174,21 @@ public final class EventCommentReply {
     return "Comment reply:" + id + "|" + StringUtils.abbreviate(text, 25);
   }
 
-  public Obj toJson() {
-    Obj authorObj = Jsons.obj(Jsons.p("name", author.getName()), Jsons.p("username", author.getUsername()),
-            Jsons.p("email", author.getEmail()));
+  public JsonObject toJson() {
+    JsonObject authorObj = new JsonObject();
+    authorObj.addProperty("name", author.getName());
+    authorObj.addProperty("username", author.getUsername());
+    authorObj.addProperty("email", author.getEmail());
 
-    Val idValue = Jsons.ZERO_VAL;
+    JsonObject json = new JsonObject();
+    // an absent id is left out entirely rather than serialized as null
     if (id.isPresent()) {
-      idValue = Jsons.v(id.get());
+      json.addProperty("id", id.get());
     }
-
-    return Jsons.obj(Jsons.p("id", idValue), Jsons.p("text", text), Jsons.p("author", authorObj),
-            Jsons.p("creationDate", DateTimeSupport.toUTC(creationDate.getTime())),
-            Jsons.p("modificationDate", DateTimeSupport.toUTC(modificationDate.getTime())));
+    json.addProperty("text", text);
+    json.add("author", authorObj);
+    json.addProperty("creationDate", DateTimeSupport.toUTC(creationDate.getTime()));
+    json.addProperty("modificationDate", DateTimeSupport.toUTC(modificationDate.getTime()));
+    return json;
   }
 }

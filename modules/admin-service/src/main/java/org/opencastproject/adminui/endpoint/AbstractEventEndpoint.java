@@ -136,7 +136,6 @@ import org.opencastproject.security.urlsigning.service.UrlSigningService;
 import org.opencastproject.security.util.SecurityUtil;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.DateTimeSupport;
-import org.opencastproject.util.Jsons.Val;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.UrlSupport;
@@ -920,11 +919,11 @@ public abstract class AbstractEventEndpoint {
 
     try {
       List<EventComment> comments = getEventCommentService().getComments(eventId);
-      List<Val> commentArr = new ArrayList<>();
+      JsonArray commentArr = new JsonArray();
       for (EventComment c : comments) {
         commentArr.add(c.toJson());
       }
-      return Response.ok(org.opencastproject.util.Jsons.arr(commentArr).toJson(), MediaType.APPLICATION_JSON_TYPE)
+      return Response.ok(commentArr.toString(), MediaType.APPLICATION_JSON_TYPE)
               .build();
     } catch (EventCommentException e) {
       logger.error("Unable to get comments from event {}", eventId, e);
@@ -992,7 +991,7 @@ public abstract class AbstractEventEndpoint {
 
     try {
       EventComment comment = getEventCommentService().getComment(commentId);
-      return Response.ok(comment.toJson().toJson()).build();
+      return Response.ok(comment.toJson().toString()).build();
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -1057,7 +1056,7 @@ public abstract class AbstractEventEndpoint {
       updatedComment = getEventCommentService().updateComment(updatedComment);
       List<EventComment> comments = getEventCommentService().getComments(eventId);
       getIndexService().updateCommentCatalog(optEvent.get(), comments);
-      return Response.ok(updatedComment.toJson().toJson()).build();
+      return Response.ok(updatedComment.toJson().toString()).build();
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -1198,7 +1197,7 @@ public abstract class AbstractEventEndpoint {
       List<EventComment> comments = getEventCommentService().getComments(eventId);
       getIndexService().updateCommentCatalog(optEvent.get(), comments);
       return Response.created(getCommentUrl(eventId, createdComment.getId().get()))
-              .entity(createdComment.toJson().toJson()).build();
+              .entity(createdComment.toJson().toString()).build();
     } catch (Exception e) {
       logger.error("Unable to create a comment on the event {}", eventId, e);
       throw new WebApplicationException(e);
@@ -1237,7 +1236,7 @@ public abstract class AbstractEventEndpoint {
       updatedComment = getEventCommentService().updateComment(updatedComment);
       List<EventComment> comments = getEventCommentService().getComments(eventId);
       getIndexService().updateCommentCatalog(optEvent.get(), comments);
-      return Response.ok(updatedComment.toJson().toJson()).build();
+      return Response.ok(updatedComment.toJson().toString()).build();
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -1332,7 +1331,7 @@ public abstract class AbstractEventEndpoint {
       EventComment updatedComment = getEventCommentService().updateComment(comment);
       List<EventComment> comments = getEventCommentService().getComments(eventId);
       getIndexService().updateCommentCatalog(optEvent.get(), comments);
-      return Response.ok(updatedComment.toJson().toJson()).build();
+      return Response.ok(updatedComment.toJson().toString()).build();
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -1399,7 +1398,7 @@ public abstract class AbstractEventEndpoint {
       EventComment updatedComment = getEventCommentService().updateComment(comment);
       List<EventComment> comments = getEventCommentService().getComments(eventId);
       getIndexService().updateCommentCatalog(optEvent.get(), comments);
-      return Response.ok(updatedComment.toJson().toJson()).build();
+      return Response.ok(updatedComment.toJson().toString()).build();
     } catch (NotFoundException e) {
       throw e;
     } catch (Exception e) {
@@ -1463,7 +1462,7 @@ public abstract class AbstractEventEndpoint {
       updatedComment = getEventCommentService().updateComment(updatedComment);
       List<EventComment> comments = getEventCommentService().getComments(eventId);
       getIndexService().updateCommentCatalog(optEvent.get(), comments);
-      return Response.ok(updatedComment.toJson().toJson()).build();
+      return Response.ok(updatedComment.toJson().toString()).build();
     } catch (Exception e) {
       logger.warn("Could not create event comment reply on comment {}", comment, e);
       throw new WebApplicationException(e);
