@@ -122,7 +122,7 @@ public final class RecursiveDirectoryCleaner implements FileVisitor<Path> {
       Files.walkFileTree(startingDir, fileFilter);
       return true;
     } catch (IOException e) {
-      logger.error("Cleanup of directory {} failed", startingDir);
+      logger.error("Cleanup of directory {} failed", startingDir, e);
       return false;
     }
   }

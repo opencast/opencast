@@ -141,13 +141,13 @@ public class WorkingFileRepositoryCleaner {
       try {
         workingFileRepository.cleanupOldFilesFromCollection(collectionId, maxAge);
       } catch (IOException e) {
-        logger.error("Cleaning of collection with id:{} failed", collectionId);
+        logger.error("Cleaning of collection with id:{} failed", collectionId, e);
       }
     }
     try {
       workingFileRepository.cleanupOldFilesFromMediaPackage(maxAge);
     } catch (IOException e) {
-      logger.error("Cleaning of mediapackages failed");
+      logger.error("Cleaning of mediapackages failed", e);
     }
   }
 
