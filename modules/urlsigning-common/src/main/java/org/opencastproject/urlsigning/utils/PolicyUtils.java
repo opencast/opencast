@@ -22,16 +22,14 @@ package org.opencastproject.urlsigning.utils;
 
 import org.opencastproject.urlsigning.common.Policy;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.apache.commons.codec.binary.Base64;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Map;
-import java.util.TreeMap;
 
 /**
  * A Utility class to encode / decode Policy files from and to Base 64 and Json.
@@ -84,61 +82,113 @@ public final class PolicyUtils {
    * @return A new {@link Policy} object populated from the JSON.
    */
   public static Policy fromJson(String policyJson) {
-    JSONObject jsonPolicy = null;
-    JSONParser jsonParser = new JSONParser();
-    try {
-      jsonPolicy = (JSONObject) jsonParser.parse(policyJson);
-    } catch (ParseException e) {
-      e.printStackTrace();
-    }
-    JSONObject statement = (JSONObject) jsonPolicy.get(STATEMENT_KEY);
-    String resource = statement.get(RESOURCE_KEY).toString();
-    JSONObject condition = (JSONObject) statement.get(CONDITION_KEY);
+    JsonObject jsonPolicy = JsonParser.parseString(policyJson).getAsJsonObject();
 
-    final String lessThanString = condition.get(DATE_LESS_THAN_KEY).toString();
+    JsonObject statement = jsonPolicy.getAsJsonObject(STATEMENT_KEY);
+    String resource = statement.get(RESOURCE_KEY).getAsString();
+    JsonObject condition = statement.getAsJsonObject(CONDITION_KEY);
+
+    final String lessThanString = condition.get(DATE_LESS_THAN_KEY).getAsString();
     final DateTime dateLessThan = new DateTime(Long.parseLong(lessThanString), DateTimeZone.UTC);
 
     final DateTime dateGreaterThan;
-    Object greaterThanString = condition.get(DATE_GREATER_THAN_KEY);
-    if (greaterThanString != null) {
-      dateGreaterThan = new DateTime(Long.parseLong(greaterThanString.toString()), DateTimeZone.UTC);
+    if (condition.has(DATE_GREATER_THAN_KEY)) {
+      dateGreaterThan = new DateTime(Long.parseLong(condition.get(DATE_GREATER_THAN_KEY).getAsString()),
+              DateTimeZone.UTC);
     } else {
       dateGreaterThan = null;
     }
 
-    return Policy.mkPolicyValidFromWithIP(resource, dateLessThan, dateGreaterThan,
-            (String) condition.get(IP_ADDRESS_KEY));
+    final String ipAddress = condition.has(IP_ADDRESS_KEY) ? condition.get(IP_ADDRESS_KEY).getAsString() : null;
+
+    return Policy.mkPolicyValidFromWithIP(resource, dateLessThan, dateGreaterThan, ipAddress);
   }
 
   /**
    * Render a {@link Policy} into JSON.
+   * <p>
+   * The exact bytes of this output are part of Opencast's contract with anything that has ever signed a URL:
+   * {@link #getPolicySignature(Policy, String)} takes a digest of this string, and
+   * <code>ResourceRequestUtil</code> verifies a request by re-rendering the decoded policy and comparing digests.
+   * Re-ordering a key or changing how a character is escaped therefore invalidates every signed URL already in
+   * circulation, and breaks third-party signers that reproduce this format.
+   * <p>
+   * That is why this is written out by hand rather than handed to a JSON library: the format is a fixed contract, so
+   * it should not be able to drift when a library is upgraded or replaced. <code>PolicyUtilsTest</code> pins the
+   * result.
    *
    * @param policy
    *          The {@link Policy} to render into JSON.
-   * @return The {@link JSONObject} representation of the {@link Policy}.
+   * @return The JSON representation of the {@link Policy}.
    */
-  @SuppressWarnings("unchecked")
-  public static JSONObject toJson(Policy policy) {
-    JSONObject policyJSON = new JSONObject();
+  public static String toJson(Policy policy) {
+    StringBuilder json = new StringBuilder(128);
 
-    Map<String, Object> conditions = new TreeMap<String, Object>();
-    conditions.put(DATE_LESS_THAN_KEY, new Long(policy.getValidUntil().getMillis()));
+    json.append("{\"").append(STATEMENT_KEY).append("\":{\"").append(CONDITION_KEY).append("\":{");
     if (policy.getValidFrom().isPresent()) {
-      conditions.put(DATE_GREATER_THAN_KEY, new Long(policy.getValidFrom().get().getMillis()));
+      json.append('"').append(DATE_GREATER_THAN_KEY).append("\":")
+          .append(policy.getValidFrom().get().getMillis()).append(',');
     }
+    json.append('"').append(DATE_LESS_THAN_KEY).append("\":").append(policy.getValidUntil().getMillis());
     if (policy.getClientIpAddress().isPresent()) {
-      conditions.put(IP_ADDRESS_KEY, policy.getClientIpAddress().get().getHostAddress());
+      json.append(",\"").append(IP_ADDRESS_KEY).append("\":\"")
+          .append(escape(policy.getClientIpAddress().get().getHostAddress())).append('"');
     }
-    JSONObject conditionsJSON = new JSONObject();
-    conditionsJSON.putAll(conditions);
+    json.append("},\"").append(RESOURCE_KEY).append("\":\"").append(escape(policy.getResource())).append("\"}}");
 
-    JSONObject statement = new JSONObject();
-    statement.put(RESOURCE_KEY, policy.getResource());
-    statement.put(CONDITION_KEY, conditions);
+    return json.toString();
+  }
 
-    policyJSON.put(STATEMENT_KEY, statement);
-
-    return policyJSON;
+  /**
+   * Escape a string for inclusion in the policy JSON.
+   * <p>
+   * This deliberately reproduces the escaping Opencast has emitted since the signing format was introduced, which
+   * includes escaping the forward slash and the U+2000-U+20FF block. Both are optional per the JSON specification,
+   * but they are part of the signed bytes, so they cannot be dropped. See {@link #toJson(Policy)}.
+   *
+   * @param value
+   *          The string to escape.
+   * @return The escaped string, without surrounding quotes.
+   */
+  private static String escape(String value) {
+    StringBuilder escaped = new StringBuilder(value.length() + 16);
+    for (int i = 0; i < value.length(); i++) {
+      char ch = value.charAt(i);
+      switch (ch) {
+        case '"':
+          escaped.append("\\\"");
+          break;
+        case '\\':
+          escaped.append("\\\\");
+          break;
+        case '/':
+          escaped.append("\\/");
+          break;
+        case '\b':
+          escaped.append("\\b");
+          break;
+        case '\f':
+          escaped.append("\\f");
+          break;
+        case '\n':
+          escaped.append("\\n");
+          break;
+        case '\r':
+          escaped.append("\\r");
+          break;
+        case '\t':
+          escaped.append("\\t");
+          break;
+        default:
+          if (ch <= 0x1F || (ch >= 0x7F && ch <= 0x9F) || (ch >= 0x2000 && ch <= 0x20FF)) {
+            escaped.append(String.format("\\u%04X", (int) ch));
+          } else {
+            escaped.append(ch);
+          }
+          break;
+      }
+    }
+    return escaped.toString();
   }
 
   /**
@@ -161,7 +211,7 @@ public final class PolicyUtils {
    * @return The {@link Policy} data
    */
   public static String toBase64EncodedPolicy(Policy policy) {
-    return base64Encode(PolicyUtils.toJson(policy).toJSONString());
+    return base64Encode(PolicyUtils.toJson(policy));
   }
 
   /**
@@ -177,6 +227,6 @@ public final class PolicyUtils {
    *           Thrown if there is a problem encrypting or encoding the {@link Policy}
    */
   public static String getPolicySignature(Policy policy, String encryptionKey) throws Exception {
-    return SHA256Util.digest(PolicyUtils.toJson(policy).toJSONString(), encryptionKey);
+    return SHA256Util.digest(PolicyUtils.toJson(policy), encryptionKey);
   }
 }
