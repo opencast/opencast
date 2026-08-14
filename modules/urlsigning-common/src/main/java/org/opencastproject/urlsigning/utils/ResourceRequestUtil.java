@@ -243,14 +243,14 @@ public final class ResourceRequestUtil {
         resourceRequest.setRejectionReason(String.format(
             "Forbidden because policy and signature do not match. Policy: '%s' created Signature "
                 + "from this policy '%s' and query string Signature: '%s'.",
-            PolicyUtils.toJson(resourceRequest.getPolicy()).toJSONString(),
+            PolicyUtils.toJson(resourceRequest.getPolicy()),
             policySignature,
             resourceRequest.getSignature()));
       } catch (Exception e) {
         resourceRequest.setRejectionReason(String.format(
             "Forbidden because policy and signature do not match. Policy: '%s' and query string "
                 + "Signature: '%s'. Unable to sign policy because: %s",
-            PolicyUtils.toJson(resourceRequest.getPolicy()).toJSONString(),
+            PolicyUtils.toJson(resourceRequest.getPolicy()),
             resourceRequest.getSignature(),
             ExceptionUtils.getStackTrace(e)));
       }
