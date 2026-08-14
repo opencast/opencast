@@ -498,8 +498,9 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       Snapshot archived = addInternal(owner, MediaPackageSupport.copy(mp)).toSnapshot();
       return getHttpAssetProvider().prepareForDelivery(archived);
     } catch (Exception e) {
-      logger.error("An error occurred", e);
-      throw unwrapExceptionUntil(AssetManagerException.class, e).orElse(new AssetManagerException(e));
+      throw unwrapExceptionUntil(AssetManagerException.class, e)
+          .orElseGet(() -> new AssetManagerException(
+              format("Failed to take snapshot of media package %s", mp.getIdentifier()), e));
     }
   }
 
@@ -1412,29 +1413,23 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     calcChecksumsForMediaPackageElements(pmp);
     // download and archive elements
     storeAssets(pmp, version);
-    // store mediapackage in db
-    final SnapshotDto snapshotDto;
-    try {
-      // rewrite URIs for archival
-      for (MediaPackageElement mpe : pmp.getElements()) {
-        String fileName = getFileName(mpe).orElse("unknown");
-        URI archiveUri = new URI(
-            "urn",
-            "matterhorn:" + mpId + ":" + version + ":" + mpe.getIdentifier() + ":" + fileName,
-            null
-        );
-        mpe.setURI(archiveUri);
-      }
-
-      String currentOrgId = securityService.getOrganization().getId();
-      snapshotDto = getDatabase().saveSnapshot(
-              currentOrgId, pmp, now, version,
-              Availability.ONLINE, getLocalAssetStore().getStoreType(), owner
+    // rewrite URIs for archival
+    for (MediaPackageElement mpe : pmp.getElements()) {
+      String fileName = getFileName(mpe).orElse("unknown");
+      URI archiveUri = new URI(
+          "urn",
+          "matterhorn:" + mpId + ":" + version + ":" + mpe.getIdentifier() + ":" + fileName,
+          null
       );
-    } catch (AssetManagerException e) {
-      logger.error("Could not take snapshot {}", mpId, e);
-      throw new AssetManagerException(e);
+      mpe.setURI(archiveUri);
     }
+
+    // store mediapackage in db
+    String currentOrgId = securityService.getOrganization().getId();
+    final SnapshotDto snapshotDto = getDatabase().saveSnapshot(
+            currentOrgId, pmp, now, version,
+            Availability.ONLINE, getLocalAssetStore().getStoreType(), owner
+    );
     // save manifest to element store
     // this is done at the end after the media package element ids have been rewritten to neutral URNs
     storeManifest(pmp, version);
