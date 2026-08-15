@@ -26,11 +26,11 @@ import static org.junit.Assert.fail;
 
 import org.opencastproject.util.DateTimeSupport;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.apache.commons.io.IOUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -99,7 +99,7 @@ public class SeriesTest {
   }
 
   @Test
-  public void testToJson() throws ParseException {
+  public void testToJson() {
     // Initialize series
     Series series = new Series(id, organization);
     series.setTitle(title);
@@ -115,40 +115,41 @@ public class SeriesTest {
     logger.info(series.toJSON());
 
     // Check that generated JSON has proper values
-    JSONObject parse = (JSONObject) new JSONParser().parse(series.toJSON());
-    if (parse.get(SERIES_JSON_KEY) == null || !(parse.get(SERIES_JSON_KEY) instanceof JSONObject)) {
+    JsonObject parse = JsonParser.parseString(series.toJSON()).getAsJsonObject();
+    if (parse.get(SERIES_JSON_KEY) == null || !parse.get(SERIES_JSON_KEY).isJsonObject()) {
       fail("There must be an series object returned.");
     }
-    JSONObject seriesJsonObject = (JSONObject) parse.get(SERIES_JSON_KEY);
-    assertEquals(id, seriesJsonObject.get(IDENTIFIER_JSON_KEY));
-    assertEquals(title, seriesJsonObject.get(TITLE_JSON_KEY));
-    assertEquals(description, seriesJsonObject.get(DESCRIPTION_JSON_KEY));
-    assertEquals(subject, seriesJsonObject.get(SUBJECT_JSON_KEY));
-    assertEquals(organization, seriesJsonObject.get(ORGANIZATION_JSON_KEY));
-    assertEquals(language, seriesJsonObject.get(LANGUAGE_JSON_KEY));
-    assertEquals(creator, seriesJsonObject.get(CREATOR_JSON_KEY));
-    assertEquals(license, seriesJsonObject.get(LICENSE_JSON_KEY));
-    assertEquals(accessPolicy, seriesJsonObject.get(ACCESS_POLICY_KEY));
-    assertEquals(DateTimeSupport.toUTC(createdDateTime.getTime()), seriesJsonObject.get(CREATED_DATE_TIME));
+    JsonObject seriesJsonObject = parse.getAsJsonObject(SERIES_JSON_KEY);
+    assertEquals(id, seriesJsonObject.get(IDENTIFIER_JSON_KEY).getAsString());
+    assertEquals(title, seriesJsonObject.get(TITLE_JSON_KEY).getAsString());
+    assertEquals(description, seriesJsonObject.get(DESCRIPTION_JSON_KEY).getAsString());
+    assertEquals(subject, seriesJsonObject.get(SUBJECT_JSON_KEY).getAsString());
+    assertEquals(organization, seriesJsonObject.get(ORGANIZATION_JSON_KEY).getAsString());
+    assertEquals(language, seriesJsonObject.get(LANGUAGE_JSON_KEY).getAsString());
+    assertEquals(creator, seriesJsonObject.get(CREATOR_JSON_KEY).getAsString());
+    assertEquals(license, seriesJsonObject.get(LICENSE_JSON_KEY).getAsString());
+    assertEquals(accessPolicy, seriesJsonObject.get(ACCESS_POLICY_KEY).getAsString());
+    assertEquals(DateTimeSupport.toUTC(createdDateTime.getTime()),
+            seriesJsonObject.get(CREATED_DATE_TIME).getAsString());
 
-    JSONObject organizersJsonObject = (JSONObject) seriesJsonObject.get(ORGANIZERS_JSON_KEY);
-    if (organizersJsonObject == null || !(organizersJsonObject.get(ORGANIZER_JSON_KEY) instanceof JSONArray)) {
+    JsonObject organizersJsonObject = seriesJsonObject.getAsJsonObject(ORGANIZERS_JSON_KEY);
+    if (organizersJsonObject == null || !organizersJsonObject.get(ORGANIZER_JSON_KEY).isJsonArray()) {
       fail("There should be an array of organizers returned.");
     }
-    JSONArray organizersArray = (JSONArray) organizersJsonObject.get(ORGANIZER_JSON_KEY);
+    JsonArray organizersArray = organizersJsonObject.getAsJsonArray(ORGANIZER_JSON_KEY);
     // Ordering not important, just a convenient shorthand.
-    assertEquals(organizer1, organizersArray.get(0));
-    assertEquals(organizer2, organizersArray.get(1));
-    assertEquals(organizer3, organizersArray.get(2));
+    assertEquals(organizer1, organizersArray.get(0).getAsString());
+    assertEquals(organizer2, organizersArray.get(1).getAsString());
+    assertEquals(organizer3, organizersArray.get(2).getAsString());
 
-    JSONObject contributorsJsonObject = (JSONObject) seriesJsonObject.get(CONTRIBUTORS_JSON_KEY);
-    if (contributorsJsonObject == null || !(contributorsJsonObject.get(CONTRIBUTOR_JSON_KEY) instanceof JSONArray)) {
+    JsonObject contributorsJsonObject = seriesJsonObject.getAsJsonObject(CONTRIBUTORS_JSON_KEY);
+    if (contributorsJsonObject == null || !contributorsJsonObject.get(CONTRIBUTOR_JSON_KEY).isJsonArray()) {
       fail("There should be an array of contributors returned.");
     }
-    JSONArray contributorsArray = (JSONArray) contributorsJsonObject.get(CONTRIBUTOR_JSON_KEY);
+    JsonArray contributorsArray = contributorsJsonObject.getAsJsonArray(CONTRIBUTOR_JSON_KEY);
     // Ordering not important, just a convenient shorthand.
-    assertEquals(contributor1, contributorsArray.get(0));
-    assertEquals(contributor2, contributorsArray.get(1));
-    assertEquals(contributor3, contributorsArray.get(2));
+    assertEquals(contributor1, contributorsArray.get(0).getAsString());
+    assertEquals(contributor2, contributorsArray.get(1).getAsString());
+    assertEquals(contributor3, contributorsArray.get(2).getAsString());
   }
 }
