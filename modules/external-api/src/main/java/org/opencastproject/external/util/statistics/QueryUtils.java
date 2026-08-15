@@ -26,12 +26,13 @@ import org.opencastproject.statistics.api.StatisticsService;
 import org.opencastproject.statistics.api.TimeSeries;
 import org.opencastproject.statistics.api.TimeSeriesProvider;
 import org.opencastproject.statistics.export.api.DetailLevel;
+import org.opencastproject.util.GsonUtil;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import java.time.Instant;
 import java.time.ZoneId;
@@ -65,31 +66,31 @@ public final class QueryUtils {
 
   public static class QueryResult {
     private Query query;
-    protected JSONObject data;
+    protected JsonObject data;
 
     QueryResult(Query query) {
       this.query = query;
-      this.data = new JSONObject();
+      this.data = new JsonObject();
     }
 
-    public JSONObject getData() {
+    public JsonObject getData() {
       return data;
     }
 
-    public JSONObject get() {
-      JSONObject result = new JSONObject();
+    public JsonObject get() {
+      JsonObject result = new JsonObject();
       // Add provider information
-      JSONObject providerObj = new JSONObject();
-      providerObj.put("identifier", query.getProvider().getId());
-      providerObj.put("type", StatisticsProviderUtils.typeOf(query.getProvider()));
-      providerObj.put("resourceType", ResourceTypeUtils.toString(query.getProvider().getResourceType()));
-      result.put("provider", providerObj);
+      JsonObject providerObj = new JsonObject();
+      providerObj.addProperty("identifier", query.getProvider().getId());
+      providerObj.addProperty("type", StatisticsProviderUtils.typeOf(query.getProvider()));
+      providerObj.addProperty("resourceType", ResourceTypeUtils.toString(query.getProvider().getResourceType()));
+      result.add("provider", providerObj);
 
       // Add parameter information
-      result.put("parameters", query.getParameters().get());
+      result.add("parameters", query.getParameters().get());
 
       // Add query result data
-      result.put("data", getData());
+      result.add("data", getData());
       return result;
     }
   }
@@ -98,10 +99,14 @@ public final class QueryUtils {
 
     QueryResultTimeSeries(Query query, TimeSeries timeseries) {
       super(query);
-      data.put("labels", timeseries.getLabels());
-      data.put("values", timeseries.getValues());
+      JsonArray labels = new JsonArray();
+      timeseries.getLabels().forEach(labels::add);
+      JsonArray values = new JsonArray();
+      timeseries.getValues().forEach(values::add);
+      data.add("labels", labels);
+      data.add("values", values);
       if (timeseries.getTotal().isPresent()) {
-        data.put("total", timeseries.getTotal().getAsDouble());
+        data.addProperty("total", timeseries.getTotal().getAsDouble());
       }
     }
   }
@@ -109,9 +114,9 @@ public final class QueryUtils {
   public static class Parameters {
 
     private String resourceId;
-    private JSONObject raw;
+    private JsonObject raw;
 
-    Parameters(String resourceId, JSONObject raw) {
+    Parameters(String resourceId, JsonObject raw) {
       this.resourceId = resourceId;
       this.raw = raw;
     }
@@ -120,7 +125,7 @@ public final class QueryUtils {
       return resourceId;
     }
 
-    public JSONObject get() {
+    public JsonObject get() {
       return raw;
     }
 
@@ -133,7 +138,7 @@ public final class QueryUtils {
     private Instant to;
     private DataResolution dataResolution;
 
-    TimeSeriesParameters(String resourceId, JSONObject raw) {
+    TimeSeriesParameters(String resourceId, JsonObject raw) {
       super(resourceId, raw);
     }
 
@@ -185,7 +190,7 @@ public final class QueryUtils {
 
     private DetailLevel detailLevel;
 
-    ExportParameters(String resourceId, JSONObject raw) {
+    ExportParameters(String resourceId, JsonObject raw) {
       super(resourceId, raw);
     }
 
@@ -208,18 +213,17 @@ public final class QueryUtils {
       throw new IllegalArgumentException("No query data provided");
     }
 
-    JSONParser parser = new JSONParser();
-    JSONArray queriesJson;
+    JsonArray queriesJson;
     try {
-      queriesJson = (JSONArray) parser.parse(queryString);
-    } catch (ParseException e) {
+      queriesJson = GsonUtil.gson().fromJson(queryString, JsonArray.class);
+    } catch (JsonParseException e) {
       throw new IllegalArgumentException("JSON malformed");
     }
 
     List<Query> queries = new ArrayList<>();
 
     queriesJson.forEach(item -> {
-      Query query = parseQuery((JSONObject) item, statisticsService);
+      Query query = parseQuery(item.getAsJsonObject(), statisticsService);
       queries.add(query);
     });
 
@@ -231,21 +235,20 @@ public final class QueryUtils {
       throw new IllegalArgumentException("No query data provided");
     }
 
-    JSONParser parser = new JSONParser();
-    JSONObject queryJson;
+    JsonObject queryJson;
     try {
-      queryJson = (JSONObject) parser.parse(queryString);
-    } catch (ParseException e) {
+      queryJson = GsonUtil.gson().fromJson(queryString, JsonObject.class);
+    } catch (JsonParseException e) {
       throw new IllegalArgumentException("JSON malformed");
     }
     return parseQuery(queryJson, statisticsService);
 
   }
 
-  private static Query parseQuery(JSONObject queryJson, StatisticsService statisticsService) {
+  private static Query parseQuery(JsonObject queryJson, StatisticsService statisticsService) {
 
     // Get the mandatory provider identifier
-    JSONObject providerJson = (JSONObject) queryJson.get("provider");
+    JsonObject providerJson = queryJson.getAsJsonObject("provider");
     String providerId = getField(providerJson, "identifier", "Identifier of provider is missing");
 
     Optional<StatisticsProvider> provider = statisticsService.getProvider(providerId);
@@ -254,13 +257,13 @@ public final class QueryUtils {
     }
 
     // Get the query parameters
-    JSONObject parametersJson = (JSONObject) queryJson.get("parameters");
+    JsonObject parametersJson = queryJson.getAsJsonObject("parameters");
     Parameters parameters = parseParameters(parametersJson, provider.get());
 
     return new Query(provider.get(), parameters);
   }
 
-  public static Parameters parseParameters(JSONObject parametersJson, StatisticsProvider provider) {
+  public static Parameters parseParameters(JsonObject parametersJson, StatisticsProvider provider) {
 
     Parameters result;
 
@@ -269,7 +272,7 @@ public final class QueryUtils {
     // The other parameters are specific to statistics provider implementations
     if (provider instanceof TimeSeriesProvider) {
       TimeSeriesParameters p;
-      if (parametersJson.containsKey("detailLevel")) {
+      if (parametersJson.has("detailLevel")) {
         p = new ExportParameters(resourceId, parametersJson);
         ((ExportParameters)p).setDetailLevel(getField(parametersJson, "detailLevel",
             "Parameter 'detailLevel' is missing"));
@@ -288,10 +291,10 @@ public final class QueryUtils {
     return result;
   }
 
-  private static String getField(JSONObject object, String field, String exceptionMessage) {
+  private static String getField(JsonObject object, String field, String exceptionMessage) {
     String value;
     try {
-      value = (String) object.get(field);
+      value = GsonUtil.getStringOrNull(object, field);
     } catch (Exception e) {
       throw new IllegalArgumentException(exceptionMessage);
     }
@@ -301,7 +304,7 @@ public final class QueryUtils {
     return value;
   }
 
-  public static JSONObject execute(Query query) {
+  public static JsonObject execute(Query query) {
     QueryResult result;
     StatisticsProvider provider = query.getProvider();
     if (provider instanceof TimeSeriesProvider) {
