@@ -974,8 +974,13 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
 
     // if no reasonable segmentation could be found, instead return a uniform segmentation
     if (tmpSegments.size() < absoluteMinLocal || tmpSegments.size() > absoluteMaxLocal) {
-      mpeg7 = uniformSegmentation(track, tmpSegments, prefNumberLocal);
+      //NB: run these log lines first!  The uniformSegmentation below *overwrites* tmpSegments!
       logger.info("Since no reasonable segmentation could be found, a uniform segmentation was created");
+      logger.debug("{}, too few segments? {}, {} < {}",
+          track.getIdentifier(), tmpSegments.size() < absoluteMinLocal, tmpSegments.size(), absoluteMinLocal);
+      logger.debug("{} too many segments? {}, {} > {}",
+          track.getIdentifier(), tmpSegments.size() > absoluteMaxLocal, tmpSegments.size(), absoluteMaxLocal);
+      mpeg7 = uniformSegmentation(track, tmpSegments, prefNumberLocal);
     }
 
     return mpeg7;
