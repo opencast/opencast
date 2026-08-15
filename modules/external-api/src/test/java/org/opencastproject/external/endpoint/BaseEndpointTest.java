@@ -28,9 +28,11 @@ import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses
 
 import org.opencastproject.test.rest.RestServiceTestEnv;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -41,7 +43,6 @@ public class BaseEndpointTest {
   /** The REST test environment */
   private static final RestServiceTestEnv env = testEnvForClasses(TestBaseEndpoint.class);
 
-  private static final JSONParser parser = new JSONParser();
 
   @BeforeClass
   public static void oneTimeSetUp() {
@@ -58,9 +59,9 @@ public class BaseEndpointTest {
   public void testGetApiInfo() throws Exception {
     final String response = given().log().all().expect().statusCode(SC_OK).when().get(env.host("/")).asString();
 
-    JSONObject json = (JSONObject) parser.parse(response);
-    assertEquals("https://api.opencast.org", json.get("url"));
-    assertEquals("v1.12.0", json.get("version"));
+    JsonObject json = JsonParser.parseString(response).getAsJsonObject();
+    assertEquals("https://api.opencast.org", json.get("url").getAsString());
+    assertEquals("v1.12.0", json.get("version").getAsString());
   }
 
   /** Test case for {@link BaseEndpoint#getUserInfo()} */
@@ -68,12 +69,12 @@ public class BaseEndpointTest {
   public void testGetUserInfo() throws Exception {
     final String response = given().log().all().expect().statusCode(SC_OK).when().get(env.host("/info/me")).asString();
 
-    JSONObject json = (JSONObject) parser.parse(response);
-    assertEquals("nowhere@opencast.org", json.get("email"));
-    assertEquals("Opencast Student", json.get("name"));
-    assertEquals("opencast", json.get("provider"));
-    assertEquals("ROLE_USER_92623987_OPENCAST_ORG", json.get("userrole"));
-    assertEquals("92623987@opencast.org", json.get("username"));
+    JsonObject json = JsonParser.parseString(response).getAsJsonObject();
+    assertEquals("nowhere@opencast.org", json.get("email").getAsString());
+    assertEquals("Opencast Student", json.get("name").getAsString());
+    assertEquals("opencast", json.get("provider").getAsString());
+    assertEquals("ROLE_USER_92623987_OPENCAST_ORG", json.get("userrole").getAsString());
+    assertEquals("92623987@opencast.org", json.get("username").getAsString());
   }
 
   /** Test case for {@link BaseEndpoint#getUserRoles()} */
@@ -82,10 +83,10 @@ public class BaseEndpointTest {
     final String response = given().log().all().expect().statusCode(SC_OK).when().get(env.host("/info/me/roles"))
             .asString();
 
-    JSONArray json = (JSONArray) parser.parse(response);
+    JsonArray json = JsonParser.parseString(response).getAsJsonArray();
     assertTrue("User does not have role 'ROLE_USER_92623987_OPENCAST_ORG'",
-            json.contains("ROLE_USER_92623987_OPENCAST_ORG"));
-    assertTrue("User does not have role 'ROLE_STUDENT'", json.contains("ROLE_STUDENT"));
+            json.contains(new JsonPrimitive("ROLE_USER_92623987_OPENCAST_ORG")));
+    assertTrue("User does not have role 'ROLE_STUDENT'", json.contains(new JsonPrimitive("ROLE_STUDENT")));
     assertEquals(2, json.size());
   }
 
@@ -95,11 +96,11 @@ public class BaseEndpointTest {
     final String response = given().log().all().expect().statusCode(SC_OK).when().get(env.host("/info/organization"))
             .asString();
 
-    JSONObject json = (JSONObject) parser.parse(response);
-    assertEquals("ROLE_ADMIN", json.get("adminRole"));
-    assertEquals("ROLE_ANONYMOUS", json.get("anonymousRole"));
-    assertEquals("opencast", json.get("id"));
-    assertEquals("Opencast", json.get("name"));
+    JsonObject json = JsonParser.parseString(response).getAsJsonObject();
+    assertEquals("ROLE_ADMIN", json.get("adminRole").getAsString());
+    assertEquals("ROLE_ANONYMOUS", json.get("anonymousRole").getAsString());
+    assertEquals("opencast", json.get("id").getAsString());
+    assertEquals("Opencast", json.get("name").getAsString());
   }
 
   /** Test case for {@link BaseEndpoint#getOrganizationProperties()} */
@@ -108,10 +109,11 @@ public class BaseEndpointTest {
     final String response = given().log().all().expect().statusCode(SC_OK).when()
             .get(env.host("/info/organization/properties")).asString();
 
-    JSONObject json = (JSONObject) parser.parse(response);
-    assertEquals("https://feeds.opencast.org", json.get("org.opencastproject.feed.url"));
-    assertEquals("https://documentation.opencast.org", json.get("org.opencastproject.admin.documentation.url"));
-    assertEquals("https://api.opencast.org", json.get("org.opencastproject.external.api.url"));
+    JsonObject json = JsonParser.parseString(response).getAsJsonObject();
+    assertEquals("https://feeds.opencast.org", json.get("org.opencastproject.feed.url").getAsString());
+    assertEquals("https://documentation.opencast.org",
+            json.get("org.opencastproject.admin.documentation.url").getAsString());
+    assertEquals("https://api.opencast.org", json.get("org.opencastproject.external.api.url").getAsString());
   }
 
   /** Test case for {@link BaseEndpoint#getVersion()} */
@@ -119,22 +121,22 @@ public class BaseEndpointTest {
   public void testGetVersion() throws Exception {
     final String response = given().log().all().expect().statusCode(SC_OK).when().get(env.host("/version")).asString();
 
-    JSONObject json = (JSONObject) parser.parse(response);
-    JSONArray version = (JSONArray) json.get("versions");
-    assertEquals("v1.12.0", json.get("default"));
-    assertTrue(version.contains("v1.0.0"));
-    assertTrue(version.contains("v1.1.0"));
-    assertTrue(version.contains("v1.2.0"));
-    assertTrue(version.contains("v1.3.0"));
-    assertTrue(version.contains("v1.4.0"));
-    assertTrue(version.contains("v1.5.0"));
-    assertTrue(version.contains("v1.6.0"));
-    assertTrue(version.contains("v1.7.0"));
-    assertTrue(version.contains("v1.8.0"));
-    assertTrue(version.contains("v1.9.0"));
-    assertTrue(version.contains("v1.10.0"));
-    assertTrue(version.contains("v1.11.0"));
-    assertTrue(version.contains("v1.12.0"));
+    JsonObject json = JsonParser.parseString(response).getAsJsonObject();
+    JsonArray version = json.getAsJsonArray("versions");
+    assertEquals("v1.12.0", json.get("default").getAsString());
+    assertTrue(version.contains(new JsonPrimitive("v1.0.0")));
+    assertTrue(version.contains(new JsonPrimitive("v1.1.0")));
+    assertTrue(version.contains(new JsonPrimitive("v1.2.0")));
+    assertTrue(version.contains(new JsonPrimitive("v1.3.0")));
+    assertTrue(version.contains(new JsonPrimitive("v1.4.0")));
+    assertTrue(version.contains(new JsonPrimitive("v1.5.0")));
+    assertTrue(version.contains(new JsonPrimitive("v1.6.0")));
+    assertTrue(version.contains(new JsonPrimitive("v1.7.0")));
+    assertTrue(version.contains(new JsonPrimitive("v1.8.0")));
+    assertTrue(version.contains(new JsonPrimitive("v1.9.0")));
+    assertTrue(version.contains(new JsonPrimitive("v1.10.0")));
+    assertTrue(version.contains(new JsonPrimitive("v1.11.0")));
+    assertTrue(version.contains(new JsonPrimitive("v1.12.0")));
     assertEquals(13, version.size());
   }
 
@@ -144,8 +146,8 @@ public class BaseEndpointTest {
     final String response = given().log().all().expect().statusCode(SC_OK).when().get(env.host("/version/default"))
             .asString();
 
-    JSONObject json = (JSONObject) parser.parse(response);
-    assertEquals("v1.12.0", json.get("default"));
+    JsonObject json = JsonParser.parseString(response).getAsJsonObject();
+    assertEquals("v1.12.0", json.get("default").getAsString());
   }
 
 }

@@ -32,8 +32,8 @@ import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.test.rest.RestServiceTestEnv;
 
-import org.json.simple.JSONArray;
-import org.json.simple.parser.ParseException;
+import com.google.gson.JsonArray;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -50,7 +50,7 @@ public class CaptureAgentsEndpointTest {
   private static List<Agent> allAgents;
 
   @BeforeClass
-  public static void oneTimeSetUp() throws ParseException, IOException, URISyntaxException {
+  public static void oneTimeSetUp() throws IOException, URISyntaxException {
     env.setUpServer();
     allAgents = loadAgents();
   }
@@ -63,7 +63,7 @@ public class CaptureAgentsEndpointTest {
   @Test
   public void testGetAgent() throws Exception {
     final Agent expectedAgent = allAgents.stream().findAny().get();
-    final String expectedJson = toJson(expectedAgent).toJSONString();
+    final String expectedJson = toJson(expectedAgent).toString();
     String result = given().pathParam("agentId", expectedAgent.getName()).expect().statusCode(SC_OK).when()
         .get(env.host("{agentId}")).asString();
     assertThat(result, SameJSONAs.sameJSONAs(expectedJson).allowingAnyArrayOrdering());
@@ -77,7 +77,7 @@ public class CaptureAgentsEndpointTest {
 
   @Test
   public void testGetAgents() {
-    final String expectedJson = toJson(allAgents).toJSONString();
+    final String expectedJson = toJson(allAgents).toString();
     String result = given().expect().statusCode(SC_OK).when().get(env.host("")).asString();
     assertThat(result, SameJSONAs.sameJSONAs(expectedJson).allowingAnyArrayOrdering());
   }
@@ -85,7 +85,7 @@ public class CaptureAgentsEndpointTest {
   @Test
   public void testGetAgentsWithOffset() {
     final int offset = 1;
-    final String expectedJson = toJson(allAgents.subList(offset, allAgents.size())).toJSONString();
+    final String expectedJson = toJson(allAgents.subList(offset, allAgents.size())).toString();
     String result = given().queryParam("offset", offset).expect().statusCode(SC_OK).when().get(env.host(""))
         .asString();
     assertThat(result, SameJSONAs.sameJSONAs(expectedJson).allowingAnyArrayOrdering());
@@ -94,7 +94,7 @@ public class CaptureAgentsEndpointTest {
   @Test
   public void testGetAgentsWithLimit() {
     final int limit = 1;
-    final String expectedJson = toJson(allAgents.subList(0, limit)).toJSONString();
+    final String expectedJson = toJson(allAgents.subList(0, limit)).toString();
     String result = given().queryParam("limit", limit).expect().statusCode(SC_OK).when().get(env.host(""))
         .asString();
     assertThat(result, SameJSONAs.sameJSONAs(expectedJson).allowingAnyArrayOrdering());
@@ -103,7 +103,7 @@ public class CaptureAgentsEndpointTest {
   @Test
   public void testGetAgentsWithInvalidOffset() {
     final int offset = allAgents.size();
-    final String expectedJson = new JSONArray().toJSONString();
+    final String expectedJson = new JsonArray().toString();
     String result = given().queryParam("offset", offset).expect().statusCode(SC_OK).when().get(env.host(""))
         .asString();
     assertThat(result, SameJSONAs.sameJSONAs(expectedJson).allowingAnyArrayOrdering());
@@ -112,7 +112,7 @@ public class CaptureAgentsEndpointTest {
   @Test
   public void testGetAgentsWithInvalidLimit() {
     final int limit = 0;
-    final String expectedJson = toJson(allAgents).toJSONString();
+    final String expectedJson = toJson(allAgents).toString();
     String result = given().queryParam("limit", limit).expect().statusCode(SC_OK).when().get(env.host(""))
         .asString();
     assertThat(result, SameJSONAs.sameJSONAs(expectedJson).allowingAnyArrayOrdering());

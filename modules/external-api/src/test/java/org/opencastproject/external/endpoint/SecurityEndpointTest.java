@@ -31,8 +31,9 @@ import static org.opencastproject.util.DateTimeSupport.toUTC;
 
 import org.opencastproject.test.rest.RestServiceTestEnv;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -49,7 +50,6 @@ public class SecurityEndpointTest {
   private static final RestServiceTestEnv env = testEnvForClasses(TestSecurityEndpoint.class);
 
   /** The json parser */
-  private static final JSONParser parser = new JSONParser();
 
   @BeforeClass
   public static void oneTimeSetUp() {
@@ -68,9 +68,9 @@ public class SecurityEndpointTest {
             .formParam("valid-until", toUTC(validUntil.getTime())).accept(APP_V1_0_0_JSON).log().all().expect()
             .statusCode(SC_OK).when().post(env.host("/sign")).asString();
 
-    final JSONObject json = (JSONObject) parser.parse(response);
-    assertEquals("http://mycdn.com/path/movie.mp4?signature", json.get("url"));
-    assertEquals(validUntil.getTime(), fromUTC((String) json.get("valid-until")));
+    final JsonObject json = JsonParser.parseString(response).getAsJsonObject();
+    assertEquals("http://mycdn.com/path/movie.mp4?signature", json.get("url").getAsString());
+    assertEquals(validUntil.getTime(), fromUTC(json.get("valid-until").getAsString()));
   }
 
   @Test
@@ -86,9 +86,9 @@ public class SecurityEndpointTest {
     final String response = given().formParam("url", "http://mycdn.com/path/movie.mp4").accept(APP_V1_0_0_JSON).log()
             .all().expect().statusCode(SC_OK).when().post(env.host("/sign")).asString();
 
-    final JSONObject json = (JSONObject) parser.parse(response);
-    assertEquals("http://mycdn.com/path/movie.mp4?signature", json.get("url"));
-    assertTrue(new Date().getTime() < fromUTC((String) json.get("valid-until")));
+    final JsonObject json = JsonParser.parseString(response).getAsJsonObject();
+    assertEquals("http://mycdn.com/path/movie.mp4?signature", json.get("url").getAsString());
+    assertTrue(new Date().getTime() < fromUTC(json.get("valid-until").getAsString()));
   }
 
   @Test
@@ -96,8 +96,8 @@ public class SecurityEndpointTest {
     final String response = given().formParam("url", "http://otherhost.com/path/file.txt").accept(APP_V1_0_0_JSON).log()
             .all().expect().statusCode(SC_OK).when().post(env.host("/sign")).asString();
 
-    final JSONObject json = (JSONObject) parser.parse(response);
-    assertEquals("Given URL cannot be signed", json.get("error"));
+    final JsonObject json = JsonParser.parseString(response).getAsJsonObject();
+    assertEquals("Given URL cannot be signed", json.get("error").getAsString());
   }
 
 }
