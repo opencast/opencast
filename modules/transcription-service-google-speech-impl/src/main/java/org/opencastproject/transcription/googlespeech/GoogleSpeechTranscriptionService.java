@@ -48,6 +48,7 @@ import org.opencastproject.transcription.persistence.TranscriptionDatabase;
 import org.opencastproject.transcription.persistence.TranscriptionDatabaseException;
 import org.opencastproject.transcription.persistence.TranscriptionJobControl;
 import org.opencastproject.transcription.persistence.TranscriptionProviderControl;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.UrlSupport;
@@ -58,6 +59,10 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 import org.opencastproject.workspace.api.Workspace;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -72,9 +77,6 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -396,7 +398,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
 
   @Override
   public void transcriptionDone(String mpId, Object obj) throws TranscriptionServiceException {
-    JSONObject jsonObj = null;
+    JsonObject jsonObj = null;
     String jobId = null;
     String token = INVALID_TOKEN;
     try {
@@ -408,10 +410,10 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
       throw new TranscriptionServiceException("Invalid access token");
     }
     try {
-      jsonObj = (JSONObject) obj;
-      jobId = (String) jsonObj.get("name");
+      jsonObj = (JsonObject) obj;
+      jobId = getString(jsonObj, "name");
       logger.info("Transcription done for mpId {}, jobId {}", mpId, jobId);
-      JSONArray resultsArray = getTranscriptionResult(jsonObj);
+      JsonArray resultsArray = getTranscriptionResult(jsonObj);
 
       // Update state in database
       // If there's an optimistic lock exception here, it's ok because the workflow dispatcher
@@ -431,7 +433,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
                 mpId, jobId);
       } else {
         logger.warn("Could not save transcription results file for mpId {}, jobId {}: {}",
-                mpId, jobId, jsonObj.toJSONString());
+                mpId, jobId, jsonObj.toString());
       }
       throw new TranscriptionServiceException("Could not save transcription results file", e);
     } catch (TranscriptionDatabaseException e) {
@@ -453,11 +455,11 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
 
   @Override
   public void transcriptionError(String mpId, Object obj) throws TranscriptionServiceException {
-    JSONObject jsonObj = null;
+    JsonObject jsonObj = null;
     String jobId = null;
     try {
-      jsonObj = (JSONObject) obj;
-      jobId = (String) jsonObj.get("name");
+      jsonObj = (JsonObject) obj;
+      jobId = getString(jsonObj, "name");
       // Update state in database
       database.updateJobControl(jobId, TranscriptionJobControl.Status.Error.name());
       TranscriptionJobControl jobControl = database.findByJob(jobId);
@@ -513,22 +515,22 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     }
 
     // Create json for configuration and audio file 
-    JSONObject configValues = new JSONObject();
-    JSONObject audioValues = new JSONObject();
-    JSONObject container = new JSONObject();
-    configValues.put("languageCode", languageCode);
-    configValues.put("enableWordTimeOffsets", true);
-    configValues.put("profanityFilter", profanityFilter);
-    configValues.put("enableAutomaticPunctuation", enablePunctuation);
-    configValues.put("model", model);
-    audioValues.put("uri", audioUrl);
-    container.put("config", configValues);
-    container.put("audio", audioValues);
+    JsonObject configValues = new JsonObject();
+    JsonObject audioValues = new JsonObject();
+    JsonObject container = new JsonObject();
+    configValues.addProperty("languageCode", languageCode);
+    configValues.addProperty("enableWordTimeOffsets", true);
+    configValues.addProperty("profanityFilter", profanityFilter);
+    configValues.addProperty("enableAutomaticPunctuation", enablePunctuation);
+    configValues.addProperty("model", model);
+    audioValues.addProperty("uri", audioUrl);
+    container.add("config", configValues);
+    container.add("audio", audioValues);
 
     try {
       HttpPost httpPost = new HttpPost(UrlSupport.concat(GOOGLE_SPEECH_URL, REQUEST_METHOD));
       logger.debug("Url to invoke Google speech service: {}", httpPost.getURI().toString());
-      StringEntity params = new StringEntity(container.toJSONString());
+      StringEntity params = new StringEntity(container.toString());
       httpPost.addHeader("Authorization", "Bearer " + token); // add the authorization header to the request;
       httpPost.addHeader(HttpHeaders.CONTENT_TYPE, "application/json; charset=utf-8");
       httpPost.setEntity(params);
@@ -536,8 +538,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
       int code = response.getStatusLine().getStatusCode();
       HttpEntity entity = response.getEntity();
       String jsonString = EntityUtils.toString(response.getEntity());
-      JSONParser jsonParser = new JSONParser();
-      JSONObject jsonObject = (JSONObject) jsonParser.parse(jsonString);
+      JsonObject jsonObject = GsonUtil.gson().fromJson(jsonString, JsonObject.class);
 
       switch (code) {
         case HttpStatus.SC_OK: // 200
@@ -550,7 +551,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
            * "progressPercent": 90, "startTime": "2017-07-20T16:36:55.033650Z",
            * "lastUpdateTime": "2017-07-20T16:37:17.158630Z" } }
            */
-          String jobId = (String) jsonObject.get("name");
+          String jobId = getString(jsonObject, "name");
           logger.info(
                   "Transcription for mp {} has been submitted. Job id: {}", mpId,
                   jobId);
@@ -560,8 +561,8 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
           EntityUtils.consume(entity);
           return;
         default:
-          JSONObject errorObj = (JSONObject) jsonObject.get("error");
-          logger.warn("Invalid argument returned, status: {} with message: {}", code, (String) errorObj.get("message"));
+          JsonObject errorObj = jsonObject.getAsJsonObject("error");
+          logger.warn("Invalid argument returned, status: {} with message: {}", code, getString(errorObj, "message"));
           break;
       }
       throw new TranscriptionServiceException("Could not create recognition job. Status returned: " + code);
@@ -595,7 +596,7 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     CloseableHttpClient httpClient = makeHttpClient();
     CloseableHttpResponse response = null;
     String mpId = "unknown";
-    JSONArray resultsArray = null;
+    JsonArray resultsArray = null;
     String token = getRefreshAccessToken();
     if (token.equals(INVALID_TOKEN)) {
       return false;
@@ -613,9 +614,8 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
           HttpEntity entity = response.getEntity();
           // Response returned is a json object described above
           String jsonString = EntityUtils.toString(entity);
-          JSONParser jsonParser = new JSONParser();
-          JSONObject jsonObject = (JSONObject) jsonParser.parse(jsonString);
-          Boolean jobDone = (Boolean) jsonObject.get("done");
+          JsonObject jsonObject = GsonUtil.gson().fromJson(jsonString, JsonObject.class);
+          Boolean jobDone = jsonObject.get("done").getAsBoolean();
           TranscriptionJobControl jc = database.findByJob(jobId);
           if (jc != null) {
             mpId = jc.getMediaPackageId();
@@ -719,12 +719,12 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     return "No results found";
   }
 
-  private void saveResults(String jobId, JSONObject jsonObj) throws IOException {
-    JSONArray resultsArray = getTranscriptionResult(jsonObj);
+  private void saveResults(String jobId, JsonObject jsonObj) throws IOException {
+    JsonArray resultsArray = getTranscriptionResult(jsonObj);
     if (resultsArray != null) {
       // Save the results into a collection
       workspace.putInCollection(TRANSCRIPT_COLLECTION, jobId + ".json",
-              new ByteArrayInputStream(jsonObj.toJSONString().getBytes()));
+              new ByteArrayInputStream(jsonObj.toString().getBytes()));
     }
   }
 
@@ -808,12 +808,11 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
       response = httpClient.execute(httpPost);
       int code = response.getStatusLine().getStatusCode();
       String jsonString = EntityUtils.toString(response.getEntity());
-      JSONParser jsonParser = new JSONParser();
-      JSONObject jsonObject = (JSONObject) jsonParser.parse(jsonString);
+      JsonObject jsonObject = GsonUtil.gson().fromJson(jsonString, JsonObject.class);
       switch (code) {
         case HttpStatus.SC_OK: // 200
-          accessToken = (String) jsonObject.get(ACCESS_TOKEN_NAME);
-          long duration = (long) jsonObject.get(ACCESS_TOKEN_EXPIRY_NAME); // Duration in second
+          accessToken = getString(jsonObject, ACCESS_TOKEN_NAME);
+          long duration = jsonObject.get(ACCESS_TOKEN_EXPIRY_NAME).getAsLong(); // Duration in second
           tokenExpiryTime = (System.currentTimeMillis() + (duration * 1000)); // time in millisecond
           if (!INVALID_TOKEN.equals(accessToken)) {
             logger.info("Google Cloud Service access token created");
@@ -823,8 +822,8 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
               String.format("Created token is invalid. Status returned: %d", code), code);
         case HttpStatus.SC_BAD_REQUEST: // 400
         case HttpStatus.SC_UNAUTHORIZED: // 401
-          String error = (String) jsonObject.get("error");
-          String errorDetails = (String) jsonObject.get("error_description");
+          String error = getString(jsonObject, "error");
+          String errorDetails = getString(jsonObject, "error_description");
           logger.warn("Invalid argument returned, status: {}", code);
           logger.warn("Unable to refresh Google Cloud Service token, error: {}, error details: {}",
               error, errorDetails);
@@ -887,10 +886,15 @@ public class GoogleSpeechTranscriptionService extends AbstractJobProducer implem
     }
   }
 
-  private JSONArray getTranscriptionResult(JSONObject jsonObj) {
-    JSONObject responseObj = (JSONObject) jsonObj.get("response");
-    JSONArray resultsArray = (JSONArray) responseObj.get("results");
-    return resultsArray;
+  private JsonArray getTranscriptionResult(JsonObject jsonObj) {
+    JsonObject responseObj = jsonObj.getAsJsonObject("response");
+    return responseObj.getAsJsonArray("results");
+  }
+
+  /** Read a string member, returning null when it is absent or JSON null. */
+  private static String getString(JsonObject json, String key) {
+    JsonElement value = json.get(key);
+    return value == null || value.isJsonNull() ? null : value.getAsString();
   }
 
   protected void deleteStorageFile(String mpId, String token) throws IOException {
