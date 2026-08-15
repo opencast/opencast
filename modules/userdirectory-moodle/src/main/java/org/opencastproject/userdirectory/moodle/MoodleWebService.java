@@ -21,7 +21,6 @@
 
 package org.opencastproject.userdirectory.moodle;
 
-import org.json.simple.parser.ParseException;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -45,10 +44,9 @@ public interface MoodleWebService {
    * @throws URISyntaxException        In case the URL cannot be constructed.
    * @throws IOException               In case of an IO error.
    * @throws MoodleWebServiceException In case Moodle returns an error.
-   * @throws ParseException            In case the Moodle response cannot be parsed.
    */
   List<MoodleUser> coreUserGetUsersByField(CoreUserGetUserByFieldFilters filter, List<String> values)
-          throws URISyntaxException, IOException, MoodleWebServiceException, ParseException;
+          throws URISyntaxException, IOException, MoodleWebServiceException;
 
   /**
    * Returns the list of Moodle course IDs the given user has the instructor capability.
@@ -58,10 +56,9 @@ public interface MoodleWebService {
    * @throws URISyntaxException        In case the URL cannot be constructed.
    * @throws IOException               In case of an IO error.
    * @throws MoodleWebServiceException In case Moodle returns an error.
-   * @throws ParseException            In case the Moodle response cannot be parsed.
    */
   List<String> toolOpencastGetCoursesForInstructor(String username)
-          throws URISyntaxException, IOException, MoodleWebServiceException, ParseException;
+          throws URISyntaxException, IOException, MoodleWebServiceException;
 
   /**
    * Returns the list of Moodle course IDs the given user has the learner capability.
@@ -71,10 +68,9 @@ public interface MoodleWebService {
    * @throws URISyntaxException        In case the URL cannot be constructed.
    * @throws IOException               In case of an IO error.
    * @throws MoodleWebServiceException In case Moodle returns an error.
-   * @throws ParseException            In case the Moodle response cannot be parsed.
    */
   List<String> toolOpencastGetCoursesForLearner(String username)
-          throws URISyntaxException, IOException, MoodleWebServiceException, ParseException;
+          throws URISyntaxException, IOException, MoodleWebServiceException;
 
   /**
    * Returns the list of Moodle group IDs where the given user has the learner capability.
@@ -84,10 +80,9 @@ public interface MoodleWebService {
    * @throws URISyntaxException        In case the URL cannot be constructed.
    * @throws IOException               In case of an IO error.
    * @throws MoodleWebServiceException In case Moodle returns an error.
-   * @throws ParseException            In case the Moodle response cannot be parsed.
    */
   List<String> toolOpencastGetGroupsForLearner(String username)
-          throws URISyntaxException, IOException, MoodleWebServiceException, ParseException;
+          throws URISyntaxException, IOException, MoodleWebServiceException;
 
   /**
    * Returns the URL to the Moodle web service.

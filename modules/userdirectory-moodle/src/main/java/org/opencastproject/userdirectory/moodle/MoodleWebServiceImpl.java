@@ -21,6 +21,12 @@
 
 package org.opencastproject.userdirectory.moodle;
 
+import org.opencastproject.util.GsonUtil;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+
 import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -28,10 +34,6 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -85,7 +87,7 @@ public class MoodleWebServiceImpl implements MoodleWebService {
    */
   @Override
   public List<MoodleUser> coreUserGetUsersByField(CoreUserGetUserByFieldFilters filter, List<String> values)
-          throws URISyntaxException, IOException, MoodleWebServiceException, ParseException {
+          throws URISyntaxException, IOException, MoodleWebServiceException {
     logger.debug("coreUserGetUsersByField(({}, {}))", filter, values);
 
     List<NameValuePair> params = new ArrayList<>();
@@ -95,41 +97,41 @@ public class MoodleWebServiceImpl implements MoodleWebService {
       params.add(new BasicNameValuePair("values[" + i + "]", values.get(i)));
     }
 
-    Object resp = executeMoodleRequest(MOODLE_FUNCTION_CORE_USER_GET_USERS_BY_FIELD, params);
+    JsonElement resp = executeMoodleRequest(MOODLE_FUNCTION_CORE_USER_GET_USERS_BY_FIELD, params);
 
     // Parse response
-    if (resp == null || !(resp instanceof JSONArray)) {
+    if (resp == null || !resp.isJsonArray()) {
       throw new MoodleWebServiceException("Moodle responded in unexpected format");
     }
 
-    JSONArray respArray = (JSONArray) resp;
+    JsonArray respArray = resp.getAsJsonArray();
     List<MoodleUser> users = new ArrayList<>(respArray.size());
 
-    for (Object userObj : respArray) {
-      if (!(userObj instanceof JSONObject)) {
+    for (JsonElement userObj : respArray) {
+      if (!userObj.isJsonObject()) {
         throw new MoodleWebServiceException("Moodle responded in unexpected format");
       }
 
-      JSONObject userJsonObj = (JSONObject) userObj;
+      JsonObject userJsonObj = userObj.getAsJsonObject();
       MoodleUser user = new MoodleUser();
 
-      if (userJsonObj.containsKey("id")) {
-        user.setId(userJsonObj.get("id").toString());
+      if (userJsonObj.has("id")) {
+        user.setId(GsonUtil.asText(userJsonObj.get("id")));
       }
-      if (userJsonObj.containsKey("username")) {
-        user.setUsername(userJsonObj.get("username").toString());
+      if (userJsonObj.has("username")) {
+        user.setUsername(GsonUtil.asText(userJsonObj.get("username")));
       }
-      if (userJsonObj.containsKey("fullname")) {
-        user.setFullname(userJsonObj.get("fullname").toString());
+      if (userJsonObj.has("fullname")) {
+        user.setFullname(GsonUtil.asText(userJsonObj.get("fullname")));
       }
-      if (userJsonObj.containsKey("idnumber")) {
-        user.setIdnumber(userJsonObj.get("idnumber").toString());
+      if (userJsonObj.has("idnumber")) {
+        user.setIdnumber(GsonUtil.asText(userJsonObj.get("idnumber")));
       }
-      if (userJsonObj.containsKey("email")) {
-        user.setEmail(userJsonObj.get("email").toString());
+      if (userJsonObj.has("email")) {
+        user.setEmail(GsonUtil.asText(userJsonObj.get("email")));
       }
-      if (userJsonObj.containsKey("auth")) {
-        user.setAuth(userJsonObj.get("auth").toString());
+      if (userJsonObj.has("auth")) {
+        user.setAuth(GsonUtil.asText(userJsonObj.get("auth")));
       }
 
       users.add(user);
@@ -145,7 +147,7 @@ public class MoodleWebServiceImpl implements MoodleWebService {
    */
   @Override
   public List<String> toolOpencastGetCoursesForInstructor(String username)
-          throws URISyntaxException, IOException, MoodleWebServiceException, ParseException {
+          throws URISyntaxException, IOException, MoodleWebServiceException {
     logger.debug("toolOpencastGetCoursesForInstructor({})", username);
 
     List<NameValuePair> params = Collections
@@ -161,7 +163,7 @@ public class MoodleWebServiceImpl implements MoodleWebService {
    */
   @Override
   public List<String> toolOpencastGetCoursesForLearner(String username)
-          throws URISyntaxException, IOException, MoodleWebServiceException, ParseException {
+          throws URISyntaxException, IOException, MoodleWebServiceException {
     logger.debug("toolOpencastGetCoursesForLearner({})", username);
 
     List<NameValuePair> params = Collections
@@ -172,7 +174,7 @@ public class MoodleWebServiceImpl implements MoodleWebService {
 
   @Override
   public List<String> toolOpencastGetGroupsForLearner(String username)
-          throws URISyntaxException, IOException, MoodleWebServiceException, ParseException {
+          throws URISyntaxException, IOException, MoodleWebServiceException {
     logger.debug("toolOpencastGetGroupsForLearner({})", username);
 
     List<NameValuePair> params = Collections
@@ -198,24 +200,24 @@ public class MoodleWebServiceImpl implements MoodleWebService {
    * @return A list of Moodle IDs.
    * @throws MoodleWebServiceException If the parsing failed because the response format was unexpected.
    */
-  private List<String> parseIdList(Object resp) throws MoodleWebServiceException {
-    if (resp == null) {
+  private List<String> parseIdList(JsonElement resp) throws MoodleWebServiceException {
+    if (resp == null || resp.isJsonNull()) {
       return new LinkedList<>();
     }
 
-    if (!(resp instanceof JSONArray)) {
+    if (!resp.isJsonArray()) {
       throw new MoodleWebServiceException("Moodle responded in unexpected format");
     }
 
-    JSONArray respArray = (JSONArray) resp;
+    JsonArray respArray = resp.getAsJsonArray();
     List<String> ids = new ArrayList<>(respArray.size());
 
-    for (Object courseObj : respArray) {
-      if (!(courseObj instanceof JSONObject) || ((JSONObject) courseObj).get("id") == null) {
+    for (JsonElement courseObj : respArray) {
+      if (!courseObj.isJsonObject() || courseObj.getAsJsonObject().get("id") == null) {
         throw new MoodleWebServiceException("Moodle responded in unexpected format");
       }
 
-      ids.add(((JSONObject) courseObj).get("id").toString());
+      ids.add(GsonUtil.asText(courseObj.getAsJsonObject().get("id")));
     }
 
     return ids;
@@ -230,10 +232,9 @@ public class MoodleWebServiceImpl implements MoodleWebService {
    * @throws URISyntaxException        In case the URL cannot be constructed.
    * @throws IOException               In case of an IO error.
    * @throws MoodleWebServiceException In case Moodle returns an error.
-   * @throws ParseException            In case the Moodle response cannot be parsed.
    */
-  private Object executeMoodleRequest(String function, List<NameValuePair> params)
-          throws URISyntaxException, IOException, MoodleWebServiceException, ParseException {
+  private JsonElement executeMoodleRequest(String function, List<NameValuePair> params)
+          throws URISyntaxException, IOException, MoodleWebServiceException {
     // Build URL
     URIBuilder url = new URIBuilder(this.url);
     url.addParameters(params);
@@ -249,14 +250,13 @@ public class MoodleWebServiceImpl implements MoodleWebService {
       try (CloseableHttpResponse resp = client.execute(get)) {
         // Parse response
         BufferedReader reader = new BufferedReader(new InputStreamReader(resp.getEntity().getContent()));
-        JSONParser parser = new JSONParser();
-        Object obj = parser.parse(reader);
+        JsonElement obj = GsonUtil.gson().fromJson(reader, JsonElement.class);
 
         // Check for errors
-        if (obj instanceof JSONObject) {
-          JSONObject jObj = (JSONObject) obj;
-          if (jObj.containsKey("exception") || jObj.containsKey("errorcode")) {
-            throw new MoodleWebServiceException("Moodle returned an error: " + jObj.toJSONString());
+        if (obj != null && obj.isJsonObject()) {
+          JsonObject jObj = obj.getAsJsonObject();
+          if (jObj.has("exception") || jObj.has("errorcode")) {
+            throw new MoodleWebServiceException("Moodle returned an error: " + jObj);
           }
         }
 
