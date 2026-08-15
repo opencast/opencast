@@ -27,10 +27,10 @@ import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses
 
 import org.opencastproject.test.rest.RestServiceTestEnv;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonParser;
+
 import org.apache.http.HttpStatus;
-import org.json.simple.JSONArray;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -46,22 +46,22 @@ public class TasksEndpointTest {
 
   private static final RestServiceTestEnv rt = testEnvForClasses(TestTasksEndpoint.class);
 
-  private JSONParser parser;
 
   @Test
-  public void testGetProcessing() throws ParseException, IOException {
+  public void testGetProcessing() throws IOException {
     InputStream stream = TasksEndpointTest.class.getResourceAsStream("/taskProcessing.json");
     InputStreamReader reader = new InputStreamReader(stream);
-    JSONArray expected = (JSONArray) new JSONParser().parse(reader);
-    JSONArray actual = (JSONArray) parser
-            .parse(given().queryParam("tags", "archive").expect().statusCode(HttpStatus.SC_OK)
-                    .contentType(ContentType.JSON).when().get(rt.host("/processing.json")).asString());
+    JsonArray expected = JsonParser.parseReader(reader).getAsJsonArray();
+    JsonArray actual = JsonParser.parseString(
+            given().queryParam("tags", "archive").expect().statusCode(HttpStatus.SC_OK)
+                    .contentType(ContentType.JSON).when().get(rt.host("/processing.json")).asString())
+            .getAsJsonArray();
 
     assertEquals(expected, actual);
   }
 
   @Test
-  public void testCreateTask() throws ParseException, IOException {
+  public void testCreateTask() throws IOException {
     given().expect().statusCode(HttpStatus.SC_BAD_REQUEST).when().post(rt.host("/new"));
 
     given().formParam("metadata", "empty").expect().statusCode(HttpStatus.SC_BAD_REQUEST).when().post(rt.host("/new"));
@@ -87,7 +87,6 @@ public class TasksEndpointTest {
 
   @Before
   public void setUp() {
-    parser = new JSONParser();
   }
 
   @BeforeClass
