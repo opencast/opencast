@@ -47,8 +47,13 @@ import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.util.DateTimeSupport;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.property.RRule;
@@ -65,9 +70,6 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
@@ -101,7 +103,6 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
   private static final Logger logger = LoggerFactory.getLogger(SchedulerServiceRemoteImpl.class);
 
   /** A parser for handling JSON documents inside the body of a request. **/
-  private final JSONParser parser = new JSONParser();
 
   public SchedulerServiceRemoteImpl() {
     super(JOB_TYPE);
@@ -136,9 +137,9 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
         return;
       } else if (response != null && SC_CONFLICT == response.getStatusLine().getStatusCode()) {
         String errorJson = EntityUtils.toString(response.getEntity(), UTF_8);
-        JSONObject json = (JSONObject) parser.parse(errorJson);
-        JSONObject error = (JSONObject) json.get("error");
-        String errorCode = (String) error.get("code");
+        JsonObject json = GsonUtil.gson().fromJson(errorJson, JsonObject.class);
+        JsonObject error = json.getAsJsonObject("error");
+        String errorCode = GsonUtil.getStringOrNull(error, "code");
         if (SchedulerConflictException.ERROR_CODE.equals(errorCode)) {
           logger.info("Conflicting events found when adding event {}", eventId);
           throw new SchedulerConflictException("Conflicting events found when adding event " + eventId);
@@ -193,9 +194,9 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
         return null;
       } else if (response != null && SC_CONFLICT == response.getStatusLine().getStatusCode()) {
         String errorJson = EntityUtils.toString(response.getEntity(), UTF_8);
-        JSONObject json = (JSONObject) parser.parse(errorJson);
-        JSONObject error = (JSONObject) json.get("error");
-        String errorCode = (String) error.get("code");
+        JsonObject json = GsonUtil.gson().fromJson(errorJson, JsonObject.class);
+        JsonObject error = json.getAsJsonObject("error");
+        String errorCode = GsonUtil.getStringOrNull(error, "code");
         if (SchedulerConflictException.ERROR_CODE.equals(errorCode)) {
           logger.info("Conflicting events found when adding event based on {}", eventId);
           throw new SchedulerConflictException("Conflicting events found when adding event based on" + eventId);
@@ -272,9 +273,9 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
           return;
         } else if (response != null && SC_CONFLICT == response.getStatusLine().getStatusCode()) {
           String errorJson = EntityUtils.toString(response.getEntity(), UTF_8);
-          JSONObject json = (JSONObject) parser.parse(errorJson);
-          JSONObject error = (JSONObject) json.get("error");
-          String errorCode = (String) error.get("code");
+          JsonObject json = GsonUtil.gson().fromJson(errorJson, JsonObject.class);
+          JsonObject error = json.getAsJsonObject("error");
+          String errorCode = GsonUtil.getStringOrNull(error, "code");
           if (SchedulerConflictException.ERROR_CODE.equals(errorCode)) {
             logger.info("Conflicting events found when updating event {}", eventId);
             throw new SchedulerConflictException("Conflicting events found when updating event " + eventId);
@@ -400,34 +401,22 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
           throw new UnauthorizedException("Unauthorized to get the technical metadata of the event " + eventId);
         } else {
           String technicalMetadataJson = EntityUtils.toString(response.getEntity(), UTF_8);
-          JSONObject json = (JSONObject) parser.parse(technicalMetadataJson);
-          final String recordingId = (String) json.get("id");
-          final Date start = new Date(DateTimeSupport.fromUTC((String) json.get("start")));
-          final Date end = new Date(DateTimeSupport.fromUTC((String) json.get("end")));
-          final String location = (String) json.get("location");
+          JsonObject json = GsonUtil.gson().fromJson(technicalMetadataJson, JsonObject.class);
+          final String recordingId = GsonUtil.getStringOrNull(json, "id");
+          final Date start = new Date(DateTimeSupport.fromUTC(GsonUtil.getStringOrNull(json, "start")));
+          final Date end = new Date(DateTimeSupport.fromUTC(GsonUtil.getStringOrNull(json, "end")));
+          final String location = GsonUtil.getStringOrNull(json, "location");
 
           final Set<String> presenters = new HashSet<>();
-          JSONArray presentersArr = (JSONArray) json.get("presenters");
-          for (int i = 0; i < presentersArr.size(); i++) {
-            presenters.add((String) presentersArr.get(i));
+          for (JsonElement presenter : json.getAsJsonArray("presenters")) {
+            presenters.add(presenter.getAsString());
           }
 
-          final Map<String, String> wfProperties = new HashMap<>();
-          JSONObject wfPropertiesObj = (JSONObject) json.get("wfProperties");
-          Set<Entry<String, String>> entrySet = wfPropertiesObj.entrySet();
-          for (Entry<String, String> entry : entrySet) {
-            wfProperties.put(entry.getKey(), entry.getValue());
-          }
+          final Map<String, String> wfProperties = toStringMap(json.getAsJsonObject("wfProperties"));
+          final Map<String, String> agentConfig = toStringMap(json.getAsJsonObject("agentConfig"));
 
-          final Map<String, String> agentConfig = new HashMap<>();
-          JSONObject agentConfigObj = (JSONObject) json.get("agentConfig");
-          entrySet = agentConfigObj.entrySet();
-          for (Entry<String, String> entry : entrySet) {
-            agentConfig.put(entry.getKey(), entry.getValue());
-          }
-
-          String status = (String) json.get("state");
-          String lastHeard = (String) json.get("lastHeardFrom");
+          String status = GsonUtil.getStringOrNull(json, "state");
+          String lastHeard = GsonUtil.getStringOrNull(json, "lastHeardFrom");
           Recording recording = null;
           if (StringUtils.isNotBlank(status) && StringUtils.isNotBlank(lastHeard)) {
             recording = new RecordingImpl(recordingId, status, DateTimeSupport.fromUTC(lastHeard));
@@ -815,6 +804,15 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
     throw new SchedulerException("Unable to update recording state of event with mediapackage id " + mediapackageId);
   }
 
+  /** Read an object of string members into a plain Map, which JSONObject used to be already. */
+  private static Map<String, String> toStringMap(JsonObject json) {
+    Map<String, String> map = new HashMap<>();
+    for (Entry<String, JsonElement> entry : json.entrySet()) {
+      map.put(entry.getKey(), GsonUtil.asText(entry.getValue()));
+    }
+    return map;
+  }
+
   @Override
   public Recording getRecordingState(String id) throws NotFoundException, SchedulerException {
     HttpGet get = new HttpGet(UrlSupport.concat(id, "recordingStatus"));
@@ -823,10 +821,10 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
       if (response != null) {
         if (SC_OK == response.getStatusLine().getStatusCode()) {
           String recordingStateJson = EntityUtils.toString(response.getEntity(), UTF_8);
-          JSONObject json = (JSONObject) parser.parse(recordingStateJson);
-          String recordingId = (String) json.get("id");
-          String status = (String) json.get("state");
-          Long lastHeard = (Long) json.get("lastHeardFrom");
+          JsonObject json = GsonUtil.gson().fromJson(recordingStateJson, JsonObject.class);
+          String recordingId = GsonUtil.getStringOrNull(json, "id");
+          String status = GsonUtil.getStringOrNull(json, "state");
+          Long lastHeard = json.get("lastHeardFrom").getAsLong();
           logger.info("Successfully get calendar of agent with id {} from the remote scheduler service", id);
           return new RecordingImpl(recordingId, status, lastHeard);
         } else if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
@@ -876,13 +874,13 @@ public class SchedulerServiceRemoteImpl extends RemoteBase implements SchedulerS
       if (response != null) {
         if (SC_OK == response.getStatusLine().getStatusCode()) {
           String recordingStates = EntityUtils.toString(response.getEntity(), UTF_8);
-          JSONArray recordings = (JSONArray) parser.parse(recordingStates);
+          JsonArray recordings = GsonUtil.gson().fromJson(recordingStates, JsonArray.class);
           Map<String, Recording> recordingsMap = new HashMap<String, Recording>();
-          for (int i = 0; i < recordings.size(); i++) {
-            JSONObject recording = (JSONObject) recordings.get(i);
-            String recordingId = (String) recording.get("id");
-            String status = (String) recording.get("state");
-            Long lastHeard = (Long) recording.get("lastHeardFrom");
+          for (JsonElement element : recordings) {
+            JsonObject recording = element.getAsJsonObject();
+            String recordingId = GsonUtil.getStringOrNull(recording, "id");
+            String status = GsonUtil.getStringOrNull(recording, "state");
+            Long lastHeard = recording.get("lastHeardFrom").getAsLong();
             recordingsMap.put(recordingId, new RecordingImpl(recordingId, status, lastHeard));
           }
           logger.info("Successfully get recording states from the remote scheduler service");

@@ -62,6 +62,7 @@ import org.opencastproject.scheduler.impl.CaptureNowProlongingService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.DateTimeSupport;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.UrlSupport;
@@ -76,6 +77,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializer;
 
@@ -85,9 +87,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -2024,23 +2023,20 @@ public class SchedulerRestService {
    *           if parsing list into JSON format fails
    */
   public String getEventListAsJsonString(List<MediaPackage> mpList) throws SchedulerException {
-    JSONParser parser = new JSONParser();
-    JSONObject jsonObj = new JSONObject();
-    JSONArray jsonArray = new JSONArray();
+    JsonObject jsonObj = new JsonObject();
+    JsonArray jsonArray = new JsonArray();
     for (MediaPackage mp: mpList) {
-      JSONObject mpJson;
       try {
-        mpJson = (JSONObject) parser.parse(MediaPackageParser.getAsJSON(mp));
-        mpJson = (JSONObject) mpJson.get("mediapackage");
-        jsonArray.add(mpJson);
-      } catch (org.json.simple.parser.ParseException e) {
+        JsonObject mpJson = GsonUtil.gson().fromJson(MediaPackageParser.getAsJSON(mp), JsonObject.class);
+        jsonArray.add(mpJson.getAsJsonObject("mediapackage"));
+      } catch (JsonParseException e) {
         logger.warn("Unexpected JSON parse exception for getAsJSON on mp {}", mp.getIdentifier().toString(), e);
         throw new SchedulerException(e);
       }
     }
-    jsonObj.put("totalCount", String.valueOf(mpList.size()));
-    jsonObj.put("events", jsonArray);
-    return jsonObj.toJSONString();
+    jsonObj.addProperty("totalCount", String.valueOf(mpList.size()));
+    jsonObj.add("events", jsonArray);
+    return jsonObj.toString();
   }
 }
 
