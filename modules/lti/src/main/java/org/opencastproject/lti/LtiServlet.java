@@ -21,8 +21,9 @@
 
 package org.opencastproject.lti;
 
+import org.opencastproject.util.GsonUtil;
+
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.JSONObject;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardContextSelect;
 import org.osgi.service.http.whiteboard.propertytypes.HttpWhiteboardServletName;
@@ -320,7 +321,7 @@ public class LtiServlet extends HttpServlet {
         ltiAttributes.put("roles", "Instructor");
       }
       resp.setContentType("application/json");
-      JSONObject.writeJSONString(ltiAttributes, resp.getWriter());
+      GsonUtil.gson().toJson(ltiAttributes, resp.getWriter());
     }
   }
 }

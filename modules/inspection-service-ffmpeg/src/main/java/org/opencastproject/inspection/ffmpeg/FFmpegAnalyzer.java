@@ -26,12 +26,14 @@ import org.opencastproject.inspection.ffmpeg.api.MediaAnalyzerException;
 import org.opencastproject.inspection.ffmpeg.api.MediaContainerMetadata;
 import org.opencastproject.inspection.ffmpeg.api.SubtitleStreamMetadata;
 import org.opencastproject.inspection.ffmpeg.api.VideoStreamMetadata;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.IoSupport;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -130,61 +132,60 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
       IoSupport.closeQuietly(encoderProcess);
     }
 
-    JSONParser parser = new JSONParser();
-
     try {
-      JSONObject jsonObject = (JSONObject) parser.parse(sb.toString());
-      Object obj;
+      JsonObject jsonObject = GsonUtil.gson().fromJson(sb.toString(), JsonObject.class);
+      JsonElement obj;
       Double duration;
 
       /* Get format specific stuff */
-      JSONObject jsonFormat = (JSONObject) jsonObject.get("format");
+      JsonObject jsonFormat = jsonObject.getAsJsonObject("format");
 
       /* File Name */
-      obj = jsonFormat.get("filename");
+      obj = member(jsonFormat, "filename");
       if (obj != null) {
-        metadata.setFileName((String) obj);
+        metadata.setFileName(obj.getAsString());
       }
 
       /* Format */
-      obj = jsonFormat.get("format_long_name");
+      obj = member(jsonFormat, "format_long_name");
       if (obj != null) {
-        metadata.setFormat((String) obj);
+        metadata.setFormat(obj.getAsString());
       }
 
       /*
        * Mediainfo does not return a duration if there is no stream but FFprobe will return 0. For compatibility
        * reasons, check if there are any streams before reading the duration:
        */
-      obj = jsonFormat.get("nb_streams");
-      if (obj != null && (Long) obj > 0) {
-        obj = jsonFormat.get("duration");
+      obj = member(jsonFormat, "nb_streams");
+      if (obj != null && obj.getAsLong() > 0) {
+        obj = member(jsonFormat, "duration");
         if (obj != null) {
-          duration = Double.parseDouble((String) obj) * 1000;
+          duration = Double.parseDouble(obj.getAsString()) * 1000;
           metadata.setDuration(duration.longValue());
         }
       }
 
       /* File Size */
-      obj = jsonFormat.get("size");
+      obj = member(jsonFormat, "size");
       if (obj != null) {
-        metadata.setSize(Long.parseLong((String) obj));
+        metadata.setSize(Long.parseLong(obj.getAsString()));
       }
 
       /* Bitrate */
-      obj = jsonFormat.get("bit_rate");
+      obj = member(jsonFormat, "bit_rate");
       if (obj != null) {
-        metadata.setBitRate(Float.parseFloat((String) obj));
+        metadata.setBitRate(Float.parseFloat(obj.getAsString()));
       }
 
       /* Loop through streams */
       /*
        * FFprobe will return an empty stream array if there are no streams. Thus we do not need to check.
        */
-      JSONArray streams = (JSONArray) jsonObject.get("streams");
-      for (JSONObject stream : (Iterable<JSONObject>) streams) {
+      JsonArray streams = jsonObject.getAsJsonArray("streams");
+      for (JsonElement streamElement : streams) {
+        JsonObject stream = streamElement.getAsJsonObject();
         /* Check type of string */
-        String codecType = (String) stream.get("codec_type");
+        String codecType = GsonUtil.getStringOrNull(stream, "codec_type");
 
         /* Handle audio streams ----------------------------- */
 
@@ -193,15 +194,15 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
           AudioStreamMetadata aMetadata = new AudioStreamMetadata();
 
           /* Codec */
-          obj = stream.get("codec_long_name");
+          obj = member(stream, "codec_long_name");
           if (obj != null) {
-            aMetadata.setFormat((String) obj);
+            aMetadata.setFormat(obj.getAsString());
           }
 
           /* Duration */
-          obj = stream.get("duration");
+          obj = member(stream, "duration");
           if (obj != null) {
-            duration = new Double((String) obj) * 1000;
+            duration = new Double(obj.getAsString()) * 1000;
             aMetadata.setDuration(duration.longValue());
           } else {
             /*
@@ -211,33 +212,33 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
           }
 
           /* Bitrate */
-          obj = stream.get("bit_rate");
+          obj = member(stream, "bit_rate");
           if (obj != null) {
-            aMetadata.setBitRate(new Float((String) obj));
+            aMetadata.setBitRate(new Float(obj.getAsString()));
           }
 
           /* Channels */
-          obj = stream.get("channels");
+          obj = member(stream, "channels");
           if (obj != null) {
-            aMetadata.setChannels(((Long) obj).intValue());
+            aMetadata.setChannels(obj.getAsInt());
           }
 
           /* Sample Rate */
-          obj = stream.get("sample_rate");
+          obj = member(stream, "sample_rate");
           if (obj != null) {
-            aMetadata.setSamplingRate(Integer.parseInt((String) obj));
+            aMetadata.setSamplingRate(Integer.parseInt(obj.getAsString()));
           }
 
           /* Frame Count */
-          obj = stream.get("nb_read_frames");
+          obj = member(stream, "nb_read_frames");
           if (obj != null) {
-            aMetadata.setFrames(Long.parseLong((String) obj));
+            aMetadata.setFrames(Long.parseLong(obj.getAsString()));
           } else {
 
             /* alternate JSON element if accurate frame count is not requested from ffmpeg */
-            obj = stream.get("nb_frames");
+            obj = member(stream, "nb_frames");
             if (obj != null) {
-              aMetadata.setFrames(Long.parseLong((String) obj));
+              aMetadata.setFrames(Long.parseLong(obj.getAsString()));
             }
           }
 
@@ -251,15 +252,15 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
           VideoStreamMetadata vMetadata = new VideoStreamMetadata();
 
           /* Codec */
-          obj = stream.get("codec_long_name");
+          obj = member(stream, "codec_long_name");
           if (obj != null) {
-            vMetadata.setFormat((String) obj);
+            vMetadata.setFormat(obj.getAsString());
           }
 
           /* Duration */
-          obj = stream.get("duration");
+          obj = member(stream, "duration");
           if (obj != null) {
-            duration = new Double((String) obj) * 1000;
+            duration = new Double(obj.getAsString()) * 1000;
             vMetadata.setDuration(duration.longValue());
           } else {
             /*
@@ -269,51 +270,51 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
           }
 
           /* Bitrate */
-          obj = stream.get("bit_rate");
+          obj = member(stream, "bit_rate");
           if (obj != null) {
-            vMetadata.setBitRate(new Float((String) obj));
+            vMetadata.setBitRate(new Float(obj.getAsString()));
           }
 
           /* Width */
-          obj = stream.get("width");
+          obj = member(stream, "width");
           if (obj != null) {
-            vMetadata.setFrameWidth(((Long) obj).intValue());
+            vMetadata.setFrameWidth(obj.getAsInt());
           }
 
           /* Height */
-          obj = stream.get("height");
+          obj = member(stream, "height");
           if (obj != null) {
-            vMetadata.setFrameHeight(((Long) obj).intValue());
+            vMetadata.setFrameHeight(obj.getAsInt());
           }
 
           /* Profile */
-          obj = stream.get("profile");
+          obj = member(stream, "profile");
           if (obj != null) {
-            vMetadata.setFormatProfile((String) obj);
+            vMetadata.setFormatProfile(obj.getAsString());
           }
 
           /* Aspect Ratio */
-          obj = stream.get("sample_aspect_ratio");
+          obj = member(stream, "sample_aspect_ratio");
           if (obj != null) {
-            vMetadata.setPixelAspectRatio(parseFloat((String) obj));
+            vMetadata.setPixelAspectRatio(parseFloat(obj.getAsString()));
           }
 
           /* Frame Rate */
-          obj = stream.get("avg_frame_rate");
+          obj = member(stream, "avg_frame_rate");
           if (obj != null) {
-            vMetadata.setFrameRate(parseFloat((String) obj));
+            vMetadata.setFrameRate(parseFloat(obj.getAsString()));
           }
 
           /* Frame Count */
-          obj = stream.get("nb_read_frames");
+          obj = member(stream, "nb_read_frames");
           if (obj != null) {
-            vMetadata.setFrames(Long.parseLong((String) obj));
+            vMetadata.setFrames(Long.parseLong(obj.getAsString()));
           } else {
 
             /* alternate JSON element if accurate frame count is not requested from ffmpeg */
-            obj = stream.get("nb_frames");
+            obj = member(stream, "nb_frames");
             if (obj != null) {
-              vMetadata.setFrames(Long.parseLong((String) obj));
+              vMetadata.setFrames(Long.parseLong(obj.getAsString()));
             } else if (vMetadata.getDuration() != null && vMetadata.getFrameRate() != null) {
               long framesEstimation = Double.valueOf(vMetadata.getDuration() / 1000.0 * vMetadata.getFrameRate())
                   .longValue();
@@ -333,16 +334,16 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
           SubtitleStreamMetadata sMetadata = new SubtitleStreamMetadata();
 
           /* Codec */
-          obj = stream.get("codec_long_name");
+          obj = member(stream, "codec_long_name");
           if (obj != null) {
-            sMetadata.setFormat((String) obj);
+            sMetadata.setFormat(obj.getAsString());
           }
 
           metadata.getSubtitleStreamMetadata().add(sMetadata);
         }
       }
 
-    } catch (ParseException e) {
+    } catch (JsonParseException e) {
       logger.error("Error parsing ffprobe output: {}", e.getMessage());
     }
 
@@ -363,6 +364,12 @@ public class FFmpegAnalyzer implements MediaAnalyzer {
         logger.debug("FFmpegAnalyzer config binary: " + binary);
       }
     }
+  }
+
+  /** Read a member, returning null when it is absent or JSON null, as json-simple's get() did. */
+  private static JsonElement member(JsonObject json, String key) {
+    JsonElement value = json.get(key);
+    return value == null || value.isJsonNull() ? null : value;
   }
 
   private float parseFloat(String val) {
