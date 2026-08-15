@@ -52,6 +52,7 @@ import org.opencastproject.security.api.RoleDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
@@ -65,8 +66,6 @@ import com.google.gson.JsonObject;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -309,14 +308,14 @@ public class AclEndpoint {
 
     List<Role> roles = roleDirectoryService.findRoles(roleQuery, roleTarget, offset, limit, hasUser);
 
-    JSONArray jsonRoles = new JSONArray();
+    JsonArray jsonRoles = new JsonArray();
     for (Role role: roles) {
-      JSONObject jsonRole = new JSONObject();
-      jsonRole.put("name", role.getName());
-      jsonRole.put("type", role.getType().toString());
-      jsonRole.put("description", role.getDescription());
-      jsonRole.put("organization", role.getOrganizationId());
-      jsonRole.put("isSanitize", isSanitize());
+      JsonObject jsonRole = new JsonObject();
+      jsonRole.addProperty("name", role.getName());
+      jsonRole.addProperty("type", role.getType().toString());
+      jsonRole.addProperty("description", role.getDescription());
+      jsonRole.addProperty("organization", role.getOrganizationId());
+      jsonRole.addProperty("isSanitize", isSanitize());
       // If the caller already asked findRoles() to only return roles without a user (hasUser=false), every role
       // here is guaranteed to have none -- skip the redundant loadUser() lookup, which findRoles() already paid
       // for once per role, and which is never cache-backed for misses (see UserAndRoleDirectoryServiceImpl#loadUser).
@@ -324,15 +323,15 @@ public class AclEndpoint {
         boolean isUserRole = role.getName().startsWith(getUserRolePrefix());
         User user = userDirectoryService.loadUser(role.getName().replaceFirst(getUserRolePrefix(), ""));
         if (user != null) {
-          jsonRole.put("user", generateJsonUser(user));
+          jsonRole.add("user", GsonUtil.gson().toJsonTree(generateJsonUser(user)));
         } else if (isUserRole) {
-          jsonRole.put("user", new HashMap<String, Object>());
+          jsonRole.add("user", new JsonObject());
         }
       }
       jsonRoles.add(jsonRole);
     }
 
-    return Response.ok(jsonRoles.toJSONString()).build();
+    return Response.ok(jsonRoles.toString()).build();
   }
 
   @DELETE
