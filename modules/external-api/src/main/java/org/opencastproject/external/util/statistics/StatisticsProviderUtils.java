@@ -25,8 +25,8 @@ import org.opencastproject.statistics.api.TimeSeriesProvider;
 import org.opencastproject.statistics.export.api.DetailLevel;
 import org.opencastproject.util.data.Collections;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 public final class StatisticsProviderUtils {
 
@@ -49,15 +49,15 @@ public final class StatisticsProviderUtils {
     }
   }
 
-  public static JSONObject toJson(StatisticsProvider provider, Boolean withParameters) {
-    final JSONObject result = new JSONObject();
-    result.put("identifier", provider.getId());
-    result.put("title", provider.getTitle());
-    result.put("description", provider.getDescription());
-    result.put("type", typeOf(provider));
-    result.put("resourceType", ResourceTypeUtils.toString(provider.getResourceType()));
+  public static JsonObject toJson(StatisticsProvider provider, Boolean withParameters) {
+    final JsonObject result = new JsonObject();
+    result.addProperty("identifier", provider.getId());
+    result.addProperty("title", provider.getTitle());
+    result.addProperty("description", provider.getDescription());
+    result.addProperty("type", typeOf(provider));
+    result.addProperty("resourceType", ResourceTypeUtils.toString(provider.getResourceType()));
     if (withParameters != null && withParameters && provider instanceof TimeSeriesProvider) {
-      JSONArray parameters = new JSONArray();
+      JsonArray parameters = new JsonArray();
       addParameter(parameters, "resourceId", PARAMETER_TYPE_STRING, false);
       addParameter(parameters, "from", PARAMETER_TYPE_DATETIME, false);
       addParameter(parameters, "to", PARAMETER_TYPE_DATETIME, false);
@@ -65,26 +65,26 @@ public final class StatisticsProviderUtils {
           DataResolutionUtils.toJson(((TimeSeriesProvider) provider).getDataResolutions()), false);
       addEnumParameter(parameters, "detailLevel",
               DetailLevelUtils.toJson(Collections.set(DetailLevel.values())), true);
-      result.put("parameters", parameters);
+      result.add("parameters", parameters);
     }
     return result;
   }
 
-  private static JSONObject createParameter(String name, String type, Boolean optional) {
-    JSONObject paramJson = new JSONObject();
-    paramJson.put("name", name);
-    paramJson.put("type", type);
-    paramJson.put("optional", optional);
+  private static JsonObject createParameter(String name, String type, Boolean optional) {
+    JsonObject paramJson = new JsonObject();
+    paramJson.addProperty("name", name);
+    paramJson.addProperty("type", type);
+    paramJson.addProperty("optional", optional);
     return paramJson;
   }
 
-  private static void addParameter(JSONArray parameters, String name, String type, Boolean optional) {
+  private static void addParameter(JsonArray parameters, String name, String type, Boolean optional) {
     parameters.add(createParameter(name, type, optional));
   }
 
-  private static void addEnumParameter(JSONArray parameters, String name, JSONArray values, Boolean optional) {
-    JSONObject enumJson = createParameter(name, PARAMETER_TYPE_ENUMERATION, optional);
-    enumJson.put("values", values);
+  private static void addEnumParameter(JsonArray parameters, String name, JsonArray values, Boolean optional) {
+    JsonObject enumJson = createParameter(name, PARAMETER_TYPE_ENUMERATION, optional);
+    enumJson.add("values", values);
     parameters.add(enumJson);
   }
 }
