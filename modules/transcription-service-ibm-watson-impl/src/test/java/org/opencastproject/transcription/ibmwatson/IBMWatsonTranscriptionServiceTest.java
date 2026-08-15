@@ -59,6 +59,9 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.StatusLine;
@@ -69,8 +72,6 @@ import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -114,7 +115,6 @@ public class IBMWatsonTranscriptionServiceTest {
 
   private CloseableHttpClient httpClient;
   private MediaPackage mediaPackage;
-  private JSONParser jsonParser = new JSONParser();
   private File audioFile;
 
   private IBMWatsonTranscriptionService service;
@@ -342,7 +342,7 @@ public class IBMWatsonTranscriptionServiceTest {
 
     database.storeJobControl(MP_ID, TRACK_ID, JOB_ID,
         TranscriptionJobControl.Status.InProgress.name(), TRACK_DURATION, DATE_EXPECTED, PROVIDER);
-    JSONObject obj = (JSONObject) jsonParser.parse(new InputStreamReader(stream));
+    JsonObject obj = JsonParser.parseReader(new InputStreamReader(stream)).getAsJsonObject();
 
     Capture<String> capturedCollection = Capture.newInstance();
     Capture<String> capturedFileName = Capture.newInstance();
@@ -372,7 +372,7 @@ public class IBMWatsonTranscriptionServiceTest {
 
     database.storeJobControl(MP_ID, TRACK_ID, JOB_ID,
         TranscriptionJobControl.Status.InProgress.name(), TRACK_DURATION, DATE_EXPECTED, PROVIDER);
-    JSONObject obj = (JSONObject) jsonParser.parse(new InputStreamReader(stream));
+    JsonObject obj = JsonParser.parseReader(new InputStreamReader(stream)).getAsJsonObject();
 
     service.transcriptionError(MP_ID, obj);
     // Check if status and date in db was updated
@@ -394,7 +394,7 @@ public class IBMWatsonTranscriptionServiceTest {
 
     database.storeJobControl(MP_ID, TRACK_ID, JOB_ID,
         TranscriptionJobControl.Status.InProgress.name(), TRACK_DURATION, DATE_EXPECTED, PROVIDER);
-    JSONObject obj = (JSONObject) jsonParser.parse(new InputStreamReader(stream));
+    JsonObject obj = JsonParser.parseReader(new InputStreamReader(stream)).getAsJsonObject();
 
     service.transcriptionError(MP_ID, obj);
     // Check if status and date in db was updated
@@ -416,7 +416,7 @@ public class IBMWatsonTranscriptionServiceTest {
             TRACK_DURATION, DATE_EXPECTED, PROVIDER);
     database.storeJobControl(MP_ID, TRACK_ID, JOB_ID,
         TranscriptionJobControl.Status.InProgress.name(), TRACK_DURATION, DATE_EXPECTED, PROVIDER);
-    JSONObject obj = (JSONObject) jsonParser.parse(new InputStreamReader(stream));
+    JsonObject obj = JsonParser.parseReader(new InputStreamReader(stream)).getAsJsonObject();
 
     service.transcriptionError(MP_ID, obj);
     // Check if status and date in db was updated
@@ -436,7 +436,7 @@ public class IBMWatsonTranscriptionServiceTest {
 
     database.storeJobControl(MP_ID, TRACK_ID, JOB_ID,
         TranscriptionJobControl.Status.InProgress.name(), TRACK_DURATION, DATE_EXPECTED, PROVIDER);
-    JSONObject obj = (JSONObject) jsonParser.parse(new InputStreamReader(stream));
+    JsonObject obj = JsonParser.parseReader(new InputStreamReader(stream)).getAsJsonObject();
 
     service.transcriptionDone(MP_ID, obj);
     // Check if status and date in db was updated
