@@ -70,12 +70,11 @@ import org.opencastproject.workflow.api.WorkflowUtil;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonParser;
 import com.google.gson.JsonSyntaxException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -316,9 +315,9 @@ public class LtiServiceImpl implements LtiService {
 
       final DublinCoreMetadataCollection collection = adapter.getRawFields();
 
-      JSONArray metadataJsonArray = (JSONArray) new JSONParser().parse(metadataJson);
+      JsonArray metadataJsonArray = JsonParser.parseString(metadataJson).getAsJsonArray();
 
-      JSONArray collectionJsonArray = MetadataJson.extractSingleCollectionfromListJson(metadataJsonArray);
+      JsonArray collectionJsonArray = MetadataJson.extractSingleCollectionfromListJson(metadataJsonArray);
       MetadataJson.fillCollectionFromJson(collection, collectionJsonArray);
 
       replaceField(collection, "isPartOf", seriesId);
@@ -398,10 +397,10 @@ public class LtiServiceImpl implements LtiService {
     try {
       final MetadataList metadataList = new MetadataList();
       metadataList.add(adapter, collection);
-      MetadataJson.fillListFromJson(metadataList, (JSONArray) new JSONParser().parse(metadata));
+      MetadataJson.fillListFromJson(metadataList, JsonParser.parseString(metadata).getAsJsonArray());
       this.indexService.updateEventMetadata(eventId, metadataList, searchIndex);
       republishMetadata(eventId);
-    } catch (IndexServiceException | SearchIndexException | ParseException e) {
+    } catch (IndexServiceException | SearchIndexException e) {
       throw new RuntimeException(e);
     }
   }

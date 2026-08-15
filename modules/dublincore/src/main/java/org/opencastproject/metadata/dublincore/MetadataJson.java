@@ -28,21 +28,19 @@ import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TimeZone;
@@ -75,10 +73,10 @@ public final class MetadataJson {
   private static final String PATTERN_DURATION = "HH:mm:ss";
 
   /**
-   * Turn a map into a {@link JSONObject} object
+   * Turn a map into a JSON object
    *
    * @param map the source map
-   * @return a new {@link JSONObject} generated with the map values
+   * @return a new JSON object generated with the map values
    */
   private static JsonObject mapToJson(final Map<String, String> map) {
     Objects.requireNonNull(map);
@@ -236,13 +234,13 @@ public final class MetadataJson {
     }
   }
 
-  private static Object valueFromJson(final Object value, final MetadataField field) {
+  private static Object valueFromJson(final JsonElement value, final MetadataField field) {
     switch (field.getType()) {
       case BOOLEAN: {
-        if (value instanceof Boolean) {
-          return value;
+        if (value.isJsonPrimitive() && value.getAsJsonPrimitive().isBoolean()) {
+          return value.getAsBoolean();
         }
-        final String stringValue = value.toString();
+        final String stringValue = value.getAsString();
         if (StringUtils.isBlank(stringValue)) {
           return null;
         }
@@ -251,7 +249,7 @@ public final class MetadataJson {
       case DATE: {
         final SimpleDateFormat dateFormat = getSimpleDateFormatter(field.getPattern());
         try {
-          final String date = (String) value;
+          final String date = value.getAsString();
 
           if (StringUtils.isBlank(date)) {
             return null;
@@ -264,12 +262,12 @@ public final class MetadataJson {
         }
       }
       case DURATION: {
-        if (!(value instanceof String)) {
+        if (!isJsonString(value)) {
           logger.warn("The given value for duration can not be parsed.");
           return "";
         }
 
-        final String duration = (String) value;
+        final String duration = value.getAsString();
         final String[] durationParts = duration.split(":");
         if (durationParts.length < 3) {
           return null;
@@ -283,62 +281,49 @@ public final class MetadataJson {
         return Long.toString(returnValue);
       }
       case ITERABLE_TEXT: {
-        final JSONArray array = (JSONArray) value;
-        if (array == null) {
+        if (value == null || value.isJsonNull()) {
           return null;
         }
-        final String[] arrayOut = new String[array.size()];
-        for (int i = 0; i < array.size(); i++) {
-          arrayOut[i] = (String) array.get(i);
-        }
-        return Arrays.asList(arrayOut);
+        return toStringList(value.getAsJsonArray());
       }
       case MIXED_TEXT: {
-        final JSONParser parser = new JSONParser();
-        final JSONArray array;
-        if (value instanceof String) {
+        final JsonArray array;
+        if (value != null && value.isJsonPrimitive() && value.getAsJsonPrimitive().isString()) {
           try {
-            array = (JSONArray) parser.parse((String) value);
-          } catch (final ParseException e) {
-            throw new IllegalArgumentException("Unable to parse Mixed Iterable value into a JSONArray:", e);
+            array = JsonParser.parseString(value.getAsString()).getAsJsonArray();
+          } catch (final JsonParseException | IllegalStateException e) {
+            throw new IllegalArgumentException("Unable to parse Mixed Iterable value into a JSON array:", e);
           }
+        } else if (value == null || value.isJsonNull()) {
+          return new ArrayList<>();
         } else {
-          array = (JSONArray) value;
+          array = value.getAsJsonArray();
         }
 
-        if (array == null) {
-          return new ArrayList<>();
-        }
-        final String[] arrayOut = new String[array.size()];
-        for (int i = 0; i < array.size(); i++) {
-          arrayOut[i] = (String) array.get(i);
-        }
-        return Arrays.asList(arrayOut);
+        return toStringList(array);
       }
       case TEXT:
       case TEXT_LONG:
       case ORDERED_TEXT: {
-        if (value == null) {
+        if (value == null || value.isJsonNull()) {
           return "";
         }
-        if (!(value instanceof String)) {
-          logger.warn("Value cannot be parsed as String. Expecting type 'String', but received type '{}'.",
-              value.getClass().getName());
+        if (!isJsonString(value)) {
+          logger.warn("Value cannot be parsed as String. Expecting type 'String', but received '{}'.", value);
           return null;
         }
-        return value;
+        return value.getAsString();
       }
       case LONG: {
-        if (!(value instanceof String)) {
+        if (!isJsonString(value)) {
           logger.warn("The given value for Long can not be parsed.");
           return 0L;
         }
-        final String longString = (String) value;
-        return Long.parseLong(longString);
+        return Long.parseLong(value.getAsString());
       }
       case START_DATE:
       case START_TIME: {
-        final String date = (String) value;
+        final String date = value == null || value.isJsonNull() ? null : value.getAsString();
 
         if (StringUtils.isBlank(date)) {
           return "";
@@ -357,6 +342,25 @@ public final class MetadataJson {
       default:
         throw new IllegalArgumentException("invalid field type '" + field.getType() + "'");
     }
+  }
+
+  /** Read a string member, returning null when it is absent or JSON null. */
+  private static String getStringOrNull(final JsonObject json, final String key) {
+    final JsonElement value = json.get(key);
+    return value == null || value.isJsonNull() ? null : value.getAsString();
+  }
+
+  /** True if the element is a JSON string, matching the previous instanceof String checks. */
+  private static boolean isJsonString(final JsonElement value) {
+    return value != null && value.isJsonPrimitive() && value.getAsJsonPrimitive().isString();
+  }
+
+  private static List<String> toStringList(final JsonArray array) {
+    final List<String> out = new ArrayList<>(array.size());
+    for (final JsonElement element : array) {
+      out.add(element.isJsonNull() ? null : element.getAsString());
+    }
+    return out;
   }
 
   public static JsonObject fieldToJson(final MetadataField f, final boolean withOrderedText,
@@ -401,7 +405,7 @@ public final class MetadataJson {
 
   public static MetadataField copyWithDifferentJsonValue(final MetadataField t, final String v) {
     final MetadataField copy = new MetadataField(t);
-    copy.setValue(valueFromJson(v, copy));
+    copy.setValue(valueFromJson(new JsonPrimitive(v), copy));
     return copy;
   }
 
@@ -415,28 +419,28 @@ public final class MetadataJson {
     return jsonArray;
   }
 
-  public static JSONArray extractSingleCollectionfromListJson(JSONArray json) {
+  public static JsonArray extractSingleCollectionfromListJson(JsonArray json) {
     if (json == null || json.size() != 1) {
-      throw new IllegalArgumentException("Input has to be a JSONArray with one entry");
+      throw new IllegalArgumentException("Input has to be a JSON array with one entry");
     }
 
-    return (JSONArray) ((JSONObject) json.get(0)).get(KEY_METADATA_FIELDS);
+    return json.get(0).getAsJsonObject().getAsJsonArray(KEY_METADATA_FIELDS);
   }
 
-  public static void fillCollectionFromJson(final DublinCoreMetadataCollection collection, final Object json) {
-    if (!(json instanceof  JSONArray)) {
+  public static void fillCollectionFromJson(final DublinCoreMetadataCollection collection, final JsonElement json) {
+    if (json == null || !json.isJsonArray()) {
       throw new IllegalArgumentException("couldn't fill metadata collection, didn't get an array");
     }
 
-    final JSONArray metadataJson = (JSONArray) json;
-    for (final JSONObject item : (Iterable<JSONObject>) metadataJson) {
-      final String fieldId = (String) item.get(KEY_METADATA_ID);
+    for (final JsonElement element : json.getAsJsonArray()) {
+      final JsonObject item = element.getAsJsonObject();
+      final String fieldId = getStringOrNull(item, KEY_METADATA_ID);
 
       if (fieldId == null) {
         continue;
       }
-      final Object value = item.get(KEY_METADATA_VALUE);
-      if (value == null) {
+      final JsonElement value = item.get(KEY_METADATA_VALUE);
+      if (value == null || value.isJsonNull()) {
         continue;
       }
 
@@ -450,17 +454,18 @@ public final class MetadataJson {
     }
   }
 
-  public static void fillListFromJson(final MetadataList metadataList, final JSONArray json) {
-    for (final JSONObject item : (Iterable<JSONObject>) json) {
+  public static void fillListFromJson(final MetadataList metadataList, final JsonArray json) {
+    for (final JsonElement element : json) {
+      final JsonObject item = element.getAsJsonObject();
       final MediaPackageElementFlavor flavor = MediaPackageElementFlavor
-              .parseFlavor((String) item.get(KEY_METADATA_FLAVOR));
-      final String title = (String) item.get(KEY_METADATA_TITLE);
+              .parseFlavor(getStringOrNull(item, KEY_METADATA_FLAVOR));
+      final String title = getStringOrNull(item, KEY_METADATA_TITLE);
       if (title == null) {
         continue;
       }
 
-      final JSONArray value = (JSONArray) item.get(KEY_METADATA_FIELDS);
-      if (value == null) {
+      final JsonElement value = item.get(KEY_METADATA_FIELDS);
+      if (value == null || value.isJsonNull()) {
         continue;
       }
 

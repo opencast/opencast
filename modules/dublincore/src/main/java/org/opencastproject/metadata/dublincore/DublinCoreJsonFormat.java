@@ -25,10 +25,10 @@ import static org.opencastproject.metadata.dublincore.DublinCore.LANGUAGE_UNDEFI
 
 import org.opencastproject.mediapackage.EName;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import java.util.List;
 import java.util.Map.Entry;
@@ -56,16 +56,15 @@ public final class DublinCoreJsonFormat {
    * Read a JSON encoded catalog from a string.
    */
   @Nonnull
-  public static DublinCoreCatalog read(String json) throws ParseException {
-    return read((JSONObject) new JSONParser().parse(json));
+  public static DublinCoreCatalog read(String json) {
+    return read(JsonParser.parseString(json).getAsJsonObject());
   }
 
   /**
    * Reads values from a JSON object into a new DublinCore catalog.
    */
-  @SuppressWarnings("unchecked")
   @Nonnull
-  public static DublinCoreCatalog read(JSONObject json) {
+  public static DublinCoreCatalog read(JsonObject json) {
     // Use a standard catalog to get the required namespace bindings in order to be able
     // to parse standard DublinCore encoding schemes.
     // See http://dublincore.org/documents/dc-xml-guidelines/, section 5.2, recommendation 7 for details.
@@ -73,28 +72,25 @@ public final class DublinCoreJsonFormat {
     //   reconstruct a catalog from the serialization alone without the need to rely on bindings, registered
     //   before.
     final DublinCoreCatalog dc = DublinCores.mkStandard();
-    final Set<Entry<String, JSONObject>> namespaceEntrySet = json.entrySet();
-    for (Entry<String, JSONObject> namespaceEntry : namespaceEntrySet) { // e.g. http://purl.org/dc/terms/
+    for (Entry<String, JsonElement> namespaceEntry : json.entrySet()) { // e.g. http://purl.org/dc/terms/
       final String namespace = namespaceEntry.getKey();
-      final JSONObject namespaceObj = namespaceEntry.getValue();
-      final Set<Entry<String, JSONArray>> entrySet = namespaceObj.entrySet();
-      for (final Entry<String, JSONArray> entry : entrySet) { // e.g. title
+      final JsonObject namespaceObj = namespaceEntry.getValue().getAsJsonObject();
+      for (final Entry<String, JsonElement> entry : namespaceObj.entrySet()) { // e.g. title
         final String key = entry.getKey();
-        final JSONArray values = entry.getValue();
-        for (final Object valueObject : values) {
-          final JSONObject value = (JSONObject) valueObject;
+        for (final JsonElement valueObject : entry.getValue().getAsJsonArray()) {
+          final JsonObject value = valueObject.getAsJsonObject();
           // the value
-          final String valueString = (String) value.get("value");
+          final String valueString = getStringOrNull(value, "value");
           // the language
           final String lang;
           {
-            final String l = (String) value.get("lang");
+            final String l = getStringOrNull(value, "lang");
             lang = l != null ? l : LANGUAGE_UNDEFINED;
           }
           // the encoding scheme
           final EName encodingScheme;
           {
-            final String s = (String) value.get("type");
+            final String s = getStringOrNull(value, "type");
             encodingScheme = s != null ? dc.toEName(s) : null;
           }
           // add the new value to this DC document
@@ -105,16 +101,21 @@ public final class DublinCoreJsonFormat {
     return dc;
   }
 
+  /** Read a string member, returning null when it is absent or JSON null. */
+  private static String getStringOrNull(JsonObject json, String key) {
+    final JsonElement value = json.get(key);
+    return value == null || value.isJsonNull() ? null : value.getAsString();
+  }
+
   /**
    * Converts the catalog to JSON object.
    *
    * @return JSON object
    */
-  @SuppressWarnings("unchecked")
   @Nonnull
-  public static JSONObject writeJsonObject(DublinCoreCatalog dc) {
+  public static JsonObject writeJsonObject(DublinCoreCatalog dc) {
     // The top-level json object
-    final JSONObject json = new JSONObject();
+    final JsonObject json = new JsonObject();
     // First collect all namespaces
     final SortedSet<String> namespaces = new TreeSet<String>();
     final Set<Entry<EName, List<DublinCoreValue>>> values = dc.getValues().entrySet();
@@ -123,34 +124,34 @@ public final class DublinCoreJsonFormat {
     }
     // Add a json object for each namespace
     for (String namespace : namespaces) {
-      json.put(namespace, new JSONObject());
+      json.add(namespace, new JsonObject());
     }
     // Add the data into the appropriate array
     for (final Entry<EName, List<DublinCoreValue>> entry : values) {
       final EName ename = entry.getKey();
       final String namespace = ename.getNamespaceURI();
       final String localName = ename.getLocalName();
-      final JSONObject namespaceObject = (JSONObject) json.get(namespace);
-      final JSONArray localNameArray;
+      final JsonObject namespaceObject = json.getAsJsonObject(namespace);
+      final JsonArray localNameArray;
       {
-        final JSONArray ns = (JSONArray) namespaceObject.get(localName);
+        final JsonArray ns = namespaceObject.getAsJsonArray(localName);
         if (ns != null) {
           localNameArray = ns;
         } else {
-          localNameArray = new JSONArray();
-          namespaceObject.put(localName, localNameArray);
+          localNameArray = new JsonArray();
+          namespaceObject.add(localName, localNameArray);
         }
       }
       for (DublinCoreValue value : entry.getValue()) {
         final String lang = value.getLanguage();
         final Optional<EName> encScheme = value.getEncodingScheme();
-        final JSONObject v = new JSONObject();
-        v.put("value", value.getValue());
+        final JsonObject v = new JsonObject();
+        v.addProperty("value", value.getValue());
         if (!DublinCore.LANGUAGE_UNDEFINED.equals(lang)) {
-          v.put("lang", lang);
+          v.addProperty("lang", lang);
         }
         if (encScheme.isPresent()) {
-          v.put("type", dc.toQName(encScheme.get()));
+          v.addProperty("type", dc.toQName(encScheme.get()));
         }
         localNameArray.add(v);
       }

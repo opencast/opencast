@@ -92,6 +92,7 @@ import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.themes.Theme;
 import org.opencastproject.themes.ThemesServiceDatabase;
 import org.opencastproject.themes.persistence.ThemesServiceDatabaseException;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.UrlSupport;
@@ -105,7 +106,9 @@ import org.opencastproject.util.requests.SortCriterion;
 import org.opencastproject.util.requests.SortCriterion.Order;
 import org.opencastproject.workflow.api.WorkflowInstance;
 
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -130,6 +133,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.stream.StreamSupport;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
@@ -666,9 +670,9 @@ public class SeriesEndpoint {
       })
   public Response createNewSeries(@FormParam("metadata") String metadata) throws UnauthorizedException {
     try {
-      JSONObject metadataJson;
+      JsonObject metadataJson;
       try {
-        metadataJson = (JSONObject) new JSONParser().parse(metadata);
+        metadataJson = JsonParser.parseString(metadata).getAsJsonObject();
       } catch (Exception e) {
         throw new IllegalArgumentException("Unable to parse metadata " + metadata, e);
       }
@@ -694,38 +698,36 @@ public class SeriesEndpoint {
     }
   }
 
-  private boolean mountSeriesInTobira(String seriesId, JSONObject params) {
+  private boolean mountSeriesInTobira(String seriesId, JsonObject params) {
     var tobira = getTobira();
     if (!tobira.ready()) {
       return false;
     }
 
     var tobiraParams = params.get("tobira");
-    if (tobiraParams == null) {
+    if (tobiraParams == null || !tobiraParams.isJsonObject()) {
       return false;
     }
-    if (!(tobiraParams instanceof JSONObject)) {
-      return false;
-    }
-    var tobiraParamsObject = (JSONObject) tobiraParams;
+    var tobiraParamsObject = tobiraParams.getAsJsonObject();
 
-    var metadataCatalogs = (JSONArray) params.get("metadata");
-    var firstCatalog = (JSONObject) metadataCatalogs.get(0);
-    var metadataFields = (List<JSONObject>) firstCatalog.get("fields");
-    var title = metadataFields.stream()
-            .filter(field -> field.get("id").equals("title"))
+    var metadataCatalogs = params.getAsJsonArray("metadata");
+    var firstCatalog = metadataCatalogs.get(0).getAsJsonObject();
+    var metadataFields = firstCatalog.getAsJsonArray("fields");
+    var title = StreamSupport.stream(metadataFields.spliterator(), false)
+            .map(JsonElement::getAsJsonObject)
+            .filter(field -> field.has("id") && "title".equals(field.get("id").getAsString()))
             .findAny()
-            .map(field -> field.get("value"))
-            .map(String.class::cast)
+            .map(field -> field.get("value").getAsString())
             .get();
 
-    var series = new JSONObject(Map.of(
-            "opencastId", seriesId,
-            "title", title));
-    tobiraParamsObject.put("series", series);
+    var series = new JsonObject();
+    series.addProperty("opencastId", seriesId);
+    series.addProperty("title", title);
+    tobiraParamsObject.add("series", series);
 
     try {
-      tobira.mount(tobiraParamsObject);
+      // TobiraService speaks plain collections, so hand it the tree converted into one
+      tobira.mount(GsonUtil.gson().fromJson(tobiraParamsObject, Map.class));
     } catch (TobiraException e) {
       return false;
     }
