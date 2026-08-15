@@ -32,9 +32,11 @@ import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses
 
 import org.opencastproject.test.rest.RestServiceTestEnv;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -43,7 +45,6 @@ public class WorkflowDefinitionsEndpointTest {
 
   private static final RestServiceTestEnv env = testEnvForClasses(TestWorkflowDefinitionsEndpoint.class);
 
-  private static final JSONParser parser = new JSONParser();
 
   @BeforeClass
   public static void oneTimeSetUp() {
@@ -59,26 +60,28 @@ public class WorkflowDefinitionsEndpointTest {
   public void testGetWorkflowDefinitions() throws Exception {
     final String response = given().expect().statusCode(SC_OK).when().get(env.host("/")).asString();
 
-    final JSONArray json = (JSONArray) parser.parse(response);
+    final JsonArray json = JsonParser.parseString(response).getAsJsonArray();
     assertEquals(2, json.size());
 
     // Workflow Definition 1
-    final JSONObject wd1 = (JSONObject) json.get(0);
-    assertEquals("example1", wd1.get("identifier"));
-    assertEquals("Example workflow", wd1.get("title"));
-    assertEquals("Example workflow definition", wd1.get("description"));
-    assertArrayEquals(new String[] { "archive", "my-tag" }, ((JSONArray) wd1.get("tags")).toArray());
-    assertFalse(wd1.containsKey("configuration_panel_json"));
-    assertFalse(wd1.containsKey("operations"));
+    final JsonObject wd1 = json.get(0).getAsJsonObject();
+    assertEquals("example1", wd1.get("identifier").getAsString());
+    assertEquals("Example workflow", wd1.get("title").getAsString());
+    assertEquals("Example workflow definition", wd1.get("description").getAsString());
+    assertArrayEquals(new String[] { "archive", "my-tag" }, wd1.getAsJsonArray("tags").asList().stream()
+            .map(JsonElement::getAsString).toArray(String[]::new));
+    assertFalse(wd1.has("configuration_panel_json"));
+    assertFalse(wd1.has("operations"));
 
     // Workflow Definition 2
-    final JSONObject wd2 = (JSONObject) json.get(1);
-    assertEquals("example2", wd2.get("identifier"));
-    assertEquals("Another workflow", wd2.get("title"));
-    assertEquals("Example workflow definition", wd2.get("description"));
-    assertArrayEquals(new String[] {}, ((JSONArray) wd2.get("tags")).toArray());
-    assertFalse(wd2.containsKey("configuration_panel_json"));
-    assertFalse(wd2.containsKey("operations"));
+    final JsonObject wd2 = json.get(1).getAsJsonObject();
+    assertEquals("example2", wd2.get("identifier").getAsString());
+    assertEquals("Another workflow", wd2.get("title").getAsString());
+    assertEquals("Example workflow definition", wd2.get("description").getAsString());
+    assertArrayEquals(new String[] {}, wd2.getAsJsonArray("tags").asList().stream()
+            .map(JsonElement::getAsString).toArray(String[]::new));
+    assertFalse(wd2.has("configuration_panel_json"));
+    assertFalse(wd2.has("operations"));
   }
 
   @Test
@@ -91,47 +94,47 @@ public class WorkflowDefinitionsEndpointTest {
                                    .get(env.host("/"))
                                    .asString();
 
-    final JSONArray json = (JSONArray) parser.parse(response);
+    final JsonArray json = JsonParser.parseString(response).getAsJsonArray();
     assertEquals(2, json.size());
 
     // Workflow Definition 1
-    final JSONObject wd1 = (JSONObject) json.get(0);
-    assertThat((String)wd1.get("configuration_panel_json"), startsWith("[{ \"legend\": \"Config\""));
-    final JSONArray ops1 = (JSONArray) wd1.get("operations");
+    final JsonObject wd1 = json.get(0).getAsJsonObject();
+    assertThat(wd1.get("configuration_panel_json").getAsString(), startsWith("[{ \"legend\": \"Config\""));
+    final JsonArray ops1 = wd1.getAsJsonArray("operations");
     assertEquals(1, ops1.size());
 
     // Workflow Operation Definition 1
-    final JSONObject wod1 = (JSONObject) ops1.get(0);
-    assertEquals("my-op", wod1.get("operation"));
-    assertEquals("Example Operation", wod1.get("description"));
-    assertTrue((Boolean) wod1.get("fail_workflow_on_error"));
-    assertEquals("${letfail}", wod1.get("if"));
-    assertEquals("", wod1.get("unless"));
-    assertEquals("fail", wod1.get("error_handler_workflow"));
-    assertEquals(42L, wod1.get("max_attempts"));
-    assertEquals("hold", wod1.get("retry_strategy"));
-    final JSONObject cfg1 = (JSONObject) wod1.get("configuration");
-    assertEquals("value", cfg1.get("key"));
-    assertEquals("bar", cfg1.get("foo"));
+    final JsonObject wod1 = ops1.get(0).getAsJsonObject();
+    assertEquals("my-op", wod1.get("operation").getAsString());
+    assertEquals("Example Operation", wod1.get("description").getAsString());
+    assertTrue(wod1.get("fail_workflow_on_error").getAsBoolean());
+    assertEquals("${letfail}", wod1.get("if").getAsString());
+    assertEquals("", wod1.get("unless").getAsString());
+    assertEquals("fail", wod1.get("error_handler_workflow").getAsString());
+    assertEquals(42L, wod1.get("max_attempts").getAsLong());
+    assertEquals("hold", wod1.get("retry_strategy").getAsString());
+    final JsonObject cfg1 = wod1.getAsJsonObject("configuration");
+    assertEquals("value", cfg1.get("key").getAsString());
+    assertEquals("bar", cfg1.get("foo").getAsString());
 
     // Workflow Definition 2
-    final JSONObject wd2 = (JSONObject) json.get(1);
-    assertThat((String)wd2.get("configuration_panel_json"), startsWith("[{ \"legend\": \"Config2\""));
-    final JSONArray ops2 = (JSONArray) wd2.get("operations");
+    final JsonObject wd2 = json.get(1).getAsJsonObject();
+    assertThat(wd2.get("configuration_panel_json").getAsString(), startsWith("[{ \"legend\": \"Config2\""));
+    final JsonArray ops2 = wd2.getAsJsonArray("operations");
     assertEquals(1, ops2.size());
 
     // Workflow Operation Definition 1
-    final JSONObject wod2 = (JSONObject) ops2.get(0);
-    assertEquals("my-op2", wod2.get("operation"));
-    assertEquals("Example Operation2", wod2.get("description"));
-    assertFalse((Boolean) wod2.get("fail_workflow_on_error"));
-    assertEquals("", wod2.get("if"));
-    assertEquals("${letfail}", wod2.get("unless"));
-    assertEquals("", wod2.get("error_handler_workflow"));
-    assertEquals(0L, wod2.get("max_attempts"));
-    assertEquals("retry", wod2.get("retry_strategy"));
-    final JSONObject cfg2 = (JSONObject) wod2.get("configuration");
-    assertEquals("1234", cfg2.get("abcd"));
+    final JsonObject wod2 = ops2.get(0).getAsJsonObject();
+    assertEquals("my-op2", wod2.get("operation").getAsString());
+    assertEquals("Example Operation2", wod2.get("description").getAsString());
+    assertFalse(wod2.get("fail_workflow_on_error").getAsBoolean());
+    assertEquals("", wod2.get("if").getAsString());
+    assertEquals("${letfail}", wod2.get("unless").getAsString());
+    assertEquals("", wod2.get("error_handler_workflow").getAsString());
+    assertEquals(0L, wod2.get("max_attempts").getAsLong());
+    assertEquals("retry", wod2.get("retry_strategy").getAsString());
+    final JsonObject cfg2 = wod2.getAsJsonObject("configuration");
+    assertEquals("1234", cfg2.get("abcd").getAsString());
   }
 
   @Test
@@ -144,27 +147,28 @@ public class WorkflowDefinitionsEndpointTest {
                                    .get(env.host("/example1"))
                                    .asString();
 
-    final JSONObject wd = (JSONObject) parser.parse(response);
-    assertEquals("example1", wd.get("identifier"));
-    assertEquals("Example workflow", wd.get("title"));
-    assertEquals("Example workflow definition", wd.get("description"));
-    assertArrayEquals(new String[] { "archive", "my-tag" }, ((JSONArray) wd.get("tags")).toArray());
-    assertThat((String)wd.get("configuration_panel_json"), startsWith("[{ \"legend\": \"Config\""));
-    final JSONArray ops = (JSONArray) wd.get("operations");
+    final JsonObject wd = JsonParser.parseString(response).getAsJsonObject();
+    assertEquals("example1", wd.get("identifier").getAsString());
+    assertEquals("Example workflow", wd.get("title").getAsString());
+    assertEquals("Example workflow definition", wd.get("description").getAsString());
+    assertArrayEquals(new String[] { "archive", "my-tag" }, wd.getAsJsonArray("tags").asList().stream()
+            .map(JsonElement::getAsString).toArray(String[]::new));
+    assertThat(wd.get("configuration_panel_json").getAsString(), startsWith("[{ \"legend\": \"Config\""));
+    final JsonArray ops = wd.getAsJsonArray("operations");
     assertEquals(1, ops.size());
 
     // Workflow Operation Definition
-    final JSONObject wod = (JSONObject) ops.get(0);
-    assertEquals("my-op", wod.get("operation"));
-    assertEquals("Example Operation", wod.get("description"));
-    assertTrue((Boolean) wod.get("fail_workflow_on_error"));
-    assertEquals("${letfail}", wod.get("if"));
-    assertEquals("", wod.get("unless"));
-    assertEquals("fail", wod.get("error_handler_workflow"));
-    assertEquals(42L, wod.get("max_attempts"));
-    assertEquals("hold", wod.get("retry_strategy"));
-    final JSONObject cfg = (JSONObject) wod.get("configuration");
-    assertEquals("value", cfg.get("key"));
-    assertEquals("bar", cfg.get("foo"));
+    final JsonObject wod = ops.get(0).getAsJsonObject();
+    assertEquals("my-op", wod.get("operation").getAsString());
+    assertEquals("Example Operation", wod.get("description").getAsString());
+    assertTrue(wod.get("fail_workflow_on_error").getAsBoolean());
+    assertEquals("${letfail}", wod.get("if").getAsString());
+    assertEquals("", wod.get("unless").getAsString());
+    assertEquals("fail", wod.get("error_handler_workflow").getAsString());
+    assertEquals(42L, wod.get("max_attempts").getAsLong());
+    assertEquals("hold", wod.get("retry_strategy").getAsString());
+    final JsonObject cfg = wod.getAsJsonObject("configuration");
+    assertEquals("value", cfg.get("key").getAsString());
+    assertEquals("bar", cfg.get("foo").getAsString());
   }
 }
