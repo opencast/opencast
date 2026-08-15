@@ -23,6 +23,8 @@ package org.opencastproject.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.google.gson.Strictness;
 import com.google.gson.ToNumberPolicy;
 
@@ -65,5 +67,39 @@ public final class GsonUtil {
    */
   public static Gson gson() {
     return GSON;
+  }
+
+  /**
+   * Reads a string member from a JSON object.
+   * <p>
+   * json-simple returned <code>null</code> from <code>get()</code> for an absent key and for an explicit JSON null
+   * alike, and the surrounding code was written against that. Gson distinguishes the two and answers with a
+   * {@link com.google.gson.JsonNull} in the second case, which {@link JsonElement#getAsString()} would then fail on.
+   * This collapses both back to <code>null</code>.
+   *
+   * @param json
+   *          the object to read from
+   * @param key
+   *          the member name
+   * @return the member as a string, or <code>null</code> if it is absent or JSON null
+   */
+  public static String getStringOrNull(JsonObject json, String key) {
+    JsonElement value = json.get(key);
+    return value == null || value.isJsonNull() ? null : value.getAsString();
+  }
+
+  /**
+   * Renders a JSON value as plain text.
+   * <p>
+   * json-simple handed back bare Java objects, so <code>toString()</code> on a parsed member gave the string itself.
+   * A {@link JsonElement}'s <code>toString()</code> is its JSON text, which would wrap a string in quotes. This
+   * returns the raw string for primitives and the JSON text for objects and arrays, matching the old behaviour.
+   *
+   * @param value
+   *          the value to render
+   * @return the value as plain text
+   */
+  public static String asText(JsonElement value) {
+    return value.isJsonPrimitive() ? value.getAsString() : value.toString();
   }
 }

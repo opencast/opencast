@@ -22,6 +22,7 @@
 package org.opencastproject.util;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import com.google.gson.JsonNull;
@@ -90,5 +91,30 @@ public class GsonUtilTest {
 
     assertTrue(parsed.get("obj") instanceof Map);
     assertTrue(parsed.get("arr") instanceof List);
+  }
+
+  /** An absent member and an explicit JSON null both have to read as null, as they did with json-simple. */
+  @Test
+  public void testGetStringOrNull() {
+    JsonObject json = new JsonObject();
+    json.addProperty("set", "value");
+    json.add("null", JsonNull.INSTANCE);
+
+    assertEquals("value", GsonUtil.getStringOrNull(json, "set"));
+    assertNull(GsonUtil.getStringOrNull(json, "null"));
+    assertNull(GsonUtil.getStringOrNull(json, "absent"));
+  }
+
+  /** Primitives render as their plain value, containers as JSON. */
+  @Test
+  public void testAsText() {
+    JsonObject json = new JsonObject();
+    json.addProperty("string", "1.300s");
+    json.addProperty("number", 1.5d);
+    json.add("object", new JsonObject());
+
+    assertEquals("1.300s", GsonUtil.asText(json.get("string")));
+    assertEquals("1.5", GsonUtil.asText(json.get("number")));
+    assertEquals("{}", GsonUtil.asText(json.get("object")));
   }
 }
