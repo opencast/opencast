@@ -34,9 +34,10 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
 import org.apache.commons.lang3.EnumUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -287,18 +288,18 @@ public class IndexEndpoint {
     })
   public Response getRebuildStates() {
     Map<String, String> states = indexRebuildService.getRebuildStates();
-    JSONArray statesAsJson = new JSONArray();
+    JsonArray statesAsJson = new JsonArray();
     for (Map.Entry<String, String> entry : states.entrySet()) {
-      JSONObject data = new JSONObject();
-      data.put("type", entry.getKey());
-      data.put("state", entry.getValue());
-      data.put("executionOrder", IndexRebuildService.Service.valueOf(entry.getKey()).ordinal());
+      JsonObject data = new JsonObject();
+      data.addProperty("type", entry.getKey());
+      data.addProperty("state", entry.getValue());
+      data.addProperty("executionOrder", IndexRebuildService.Service.valueOf(entry.getKey()).ordinal());
       statesAsJson.add(data);
     }
-    JSONObject service = new JSONObject();
-    service.put("service", statesAsJson);
-    JSONObject services = new JSONObject();
-    services.put("services", service);
-    return Response.ok(services.toJSONString()).build();
+    JsonObject service = new JsonObject();
+    service.add("service", statesAsJson);
+    JsonObject services = new JsonObject();
+    services.add("services", service);
+    return Response.ok(services.toString()).build();
   }
 }
