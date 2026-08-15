@@ -33,10 +33,6 @@
       <artifactId>jakarta.xml.bind-api</artifactId>
     </dependency>
     <dependency>
-      <groupId>com.googlecode.json-simple</groupId>
-      <artifactId>json-simple</artifactId>
-    </dependency>
-    <dependency>
       <groupId>org.opencastproject</groupId>
       <artifactId>opencast-workflow-service-api</artifactId>
       <version>${project.version}</version>
