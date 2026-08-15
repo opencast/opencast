@@ -21,14 +21,18 @@
 
 package org.opencastproject.adminui.tobira;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import org.opencastproject.util.GsonUtil;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.reflect.TypeToken;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.http.HttpClient;
@@ -40,7 +44,10 @@ import java.util.Map;
 
 public final class TobiraService {
 
-  public JSONObject getPage(String path) throws TobiraException {
+  /** The shape TobiraException wants its errors in; JSONArray used to satisfy it by being a raw List. */
+  private static final Type ERRORS_TYPE = new TypeToken<List<Map<String, Object>>>() { }.getType();
+
+  public JsonObject getPage(String path) throws TobiraException {
     return request(
             "query AdminUiPage($path: String!) {"
                     + "  page: realmByPath(path: $path) {"
@@ -62,8 +69,8 @@ public final class TobiraService {
             Map.of("path", path));
   }
 
-  public JSONObject getHostPages(String seriesId) throws TobiraException {
-    return (JSONObject) request(
+  public JsonObject getHostPages(String seriesId) throws TobiraException {
+    return asObject(request(
             "query AdminUIHostPages($seriesId: String!) {"
                     + "  series: seriesByOpencastId(id: $seriesId) {"
                     + "    id"
@@ -82,11 +89,11 @@ public final class TobiraService {
                     + "  path"
                     + "}",
             Map.of("seriesId", seriesId))
-            .get("series");
+            .get("series"));
   }
 
-  public JSONObject getEventHostPages(String eventId) throws TobiraException {
-    return (JSONObject) request(
+  public JsonObject getEventHostPages(String eventId) throws TobiraException {
+    return asObject(request(
             "query AdminUIEventHostPages($eventId: String!) {"
                     + "  event: eventByOpencastId(id: $eventId) {"
                     + "    ...on AuthorizedEvent {"
@@ -100,7 +107,7 @@ public final class TobiraService {
                     + "  }"
                     + "}",
             Map.of("eventId", eventId))
-            .get("event");
+            .get("event"));
   }
 
   public void mount(Map<String, Object> variables) throws TobiraException {
@@ -114,52 +121,51 @@ public final class TobiraService {
         variables);
   }
 
-  public Integer createRealmLineage(List<JSONObject> pathComponents) throws TobiraException {
-    return (Integer) request(
+  public Integer createRealmLineage(List<JsonObject> pathComponents) throws TobiraException {
+    return request(
             "mutation AdminUICreateRealmLineage($realms: [RealmLineageComponent!]!) {"
                     + "  createRealmLineage(realms: $realms) { numCreated }"
                     + "}",
             Map.of("realms", pathComponents))
-            .get("numCreated");
+            .get("numCreated").getAsInt();
   }
 
   public String addSeriesMountPoint(Map<String, Object> variables) throws TobiraException {
-    return (String) request(
+    return GsonUtil.getStringOrNull(request(
             "mutation AdminUIAddSeriesMountPoint($seriesId: String!, $targetPath: String!) {"
                     + "  addSeriesMountPoint(seriesOcId: $seriesId, targetPath: $targetPath) {"
                     + "    id"
                     + "  }"
                     + "}",
-            variables)
-            .get("id");
+            variables), "id");
   }
 
-  public JSONObject removeSeriesMountPoint(Map<String, Object> variables) throws TobiraException {
-    return (JSONObject) request(
+  public JsonObject removeSeriesMountPoint(Map<String, Object> variables) throws TobiraException {
+    return asObject(request(
             "mutation AdminUIRemoveSeriesMountPoint($seriesId: String!, $currentPath: String!) {"
                     + "  outcome: removeSeriesMountPoint(seriesOcId: $seriesId, path: $currentPath) {"
                     + "    __typename"
                     + "  }"
                     + "}",
             variables)
-            .get("outcome");
+            .get("outcome"));
   }
 
   public boolean ready() {
     return this.endpoint != null && this.trustedKey != null;
   }
 
-  private JSONObject request(String query, Map<String, Object> variables) throws TobiraException {
+  private JsonObject request(String query, Map<String, Object> variables) throws TobiraException {
 
-    var queryObject = new JSONObject(Map.of(
-            "query", query,
-            "variables", new JSONObject(variables)));
+    var queryObject = new JsonObject();
+    queryObject.addProperty("query", query);
+    queryObject.add("variables", GsonUtil.gson().toJsonTree(variables));
 
     var request = HttpRequest.newBuilder()
             .uri(endpoint)
             .header("content-type", "application/json")
             .header("x-tobira-trusted-external-key", trustedKey)
-            .POST(HttpRequest.BodyPublishers.ofString(queryObject.toJSONString()))
+            .POST(HttpRequest.BodyPublishers.ofString(queryObject.toString()))
             .build();
 
     try {
@@ -167,15 +173,20 @@ public final class TobiraService {
       if (response.statusCode() != 200) {
         throw new TobiraException(response);
       }
-      var responseObject = (JSONObject) new JSONParser().parse(response.body());
-      var errors = (JSONArray) responseObject.get("errors");
+      var responseObject = GsonUtil.gson().fromJson(response.body(), JsonObject.class);
+      var errors = responseObject.getAsJsonArray("errors");
       if (errors != null) {
-        throw new TobiraException(response, errors);
+        throw new TobiraException(response, GsonUtil.gson().fromJson(errors, ERRORS_TYPE));
       }
-      return (JSONObject) responseObject.get("data");
-    } catch (IOException | InterruptedException | ParseException e) {
+      return responseObject.getAsJsonObject("data");
+    } catch (IOException | InterruptedException | JsonParseException e) {
       throw new TobiraException(e);
     }
+  }
+
+  /** Read a member as an object, answering null when it is absent or JSON null. */
+  private static JsonObject asObject(JsonElement value) {
+    return value == null || value.isJsonNull() ? null : value.getAsJsonObject();
   }
 
   public String getOrigin() {

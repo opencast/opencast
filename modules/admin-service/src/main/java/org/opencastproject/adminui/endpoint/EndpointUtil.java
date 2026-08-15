@@ -24,7 +24,6 @@ package org.opencastproject.adminui.endpoint;
 import static org.opencastproject.userdirectory.UserIdRoleProvider.getUserRolePrefix;
 import static org.opencastproject.userdirectory.UserIdRoleProvider.isSanitize;
 
-import org.opencastproject.adminui.exception.JsonCreationException;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.list.api.DefaultResourceListQuery;
 import org.opencastproject.list.query.StringListFilter;
@@ -32,12 +31,16 @@ import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserDirectoryService;
+import org.opencastproject.util.GsonUtil;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
+import org.codehaus.jettison.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -51,40 +54,35 @@ public final class EndpointUtil {
   /**
    * Returns a generated JSON object with key-value from given list.
    *
-   * Note that JSONObject (and JSON in general) does not preserve key ordering,
-   * so while the Map passed to this function may have ordered keys, the resulting
-   * JSONObject is not ordered.
+   * The members appear in the order the map iterates, so a map with ordered keys yields an ordered object.
    *
    * @param list
    *          The source list for the JSON object
    * @return a JSON object containing the all the key-value as parameter
-   * @throws JsonCreationException
    */
-  public static <T> JSONObject generateJSONObject(Map<String, T> list) throws JsonCreationException {
+  public static JsonObject generateJSONObject(Map<String, String> list) {
 
-    if (list == null) {
-      throw new JsonCreationException("List is null");
-    }
+    JsonObject jsonList = new JsonObject();
 
-    JSONObject jsonList = new JSONObject();
-
-    for (Entry<String, T> entry : list.entrySet()) {
-      Object value = entry.getValue();
-      if (value instanceof String) {
-        jsonList.put(entry.getKey(), value);
-      } else if (value instanceof JSONObject) {
-        jsonList.put(entry.getKey(), value);
-      } else if (value instanceof List) {
-        Collection collection = (Collection) value;
-        JSONArray jsonArray = new JSONArray();
-        jsonArray.addAll(collection);
-        jsonList.put(entry.getKey(), jsonArray);
-      } else {
-        throw new JsonCreationException("Could not deal with " + value);
-      }
+    for (Entry<String, String> entry : list.entrySet()) {
+      jsonList.addProperty(entry.getKey(), entry.getValue());
     }
 
     return jsonList;
+  }
+
+  /**
+   * Re-parses a document built with jettison into a Gson tree.
+   * <p>
+   * AccessInformationUtil speaks jettison, and json-simple used to splice its output into a response by falling back
+   * to toString() for any type it did not recognise. Gson has no such fallback, so the conversion is explicit.
+   *
+   * @param json
+   *          the jettison object to convert
+   * @return the same document as a Gson tree
+   */
+  public static JsonElement fromJettison(JSONObject json) {
+    return JsonParser.parseString(json.toString());
   }
 
   /**
@@ -105,7 +103,7 @@ public final class EndpointUtil {
    * Transform ACL into the format the admin ui frontend uses.
    * We do this in the backend so we can attach information about users to user roles.
    */
-  public static JSONArray transformAccessControList(AccessControlList acl, UserDirectoryService userDirectoryService) {
+  public static JsonArray transformAccessControList(AccessControlList acl, UserDirectoryService userDirectoryService) {
     class TransformedAcl {
       protected String role;
       protected boolean read = false;
@@ -113,7 +111,7 @@ public final class EndpointUtil {
       protected List<String> actions = new ArrayList();
     }
     Map<String, TransformedAcl> newPolicies = new HashMap();
-    JSONArray jsonEntryArray = new JSONArray();
+    JsonArray jsonEntryArray = new JsonArray();
 
     for (AccessControlEntry entry : acl.getEntries()) {
       if (!newPolicies.containsKey(entry.getRole())) {
@@ -132,11 +130,13 @@ public final class EndpointUtil {
     }
 
     for (TransformedAcl policy : newPolicies.values()) {
-      JSONObject jsonEntry = new JSONObject();
-      jsonEntry.put("role", policy.role);
-      jsonEntry.put("read", policy.read);
-      jsonEntry.put("write", policy.write);
-      jsonEntry.put("actions", policy.actions);
+      JsonObject jsonEntry = new JsonObject();
+      jsonEntry.addProperty("role", policy.role);
+      jsonEntry.addProperty("read", policy.read);
+      jsonEntry.addProperty("write", policy.write);
+      JsonArray actions = new JsonArray();
+      policy.actions.forEach(actions::add);
+      jsonEntry.add("actions", actions);
       if (!isSanitize()) {
         boolean isUserRole = policy.role.startsWith(getUserRolePrefix());
         User user = userDirectoryService.loadUser(policy.role.replaceFirst(getUserRolePrefix(), ""));
@@ -145,9 +145,9 @@ public final class EndpointUtil {
           userData.put("username", user.getUsername());
           userData.put("name", user.getName());
           userData.put("email", user.getEmail());
-          jsonEntry.put("user", userData);
+          jsonEntry.add("user", GsonUtil.gson().toJsonTree(userData));
         } else if (isUserRole) {
-          jsonEntry.put("user", new HashMap<String, Object>());
+          jsonEntry.add("user", new JsonObject());
         }
       }
       jsonEntryArray.add(jsonEntry);
