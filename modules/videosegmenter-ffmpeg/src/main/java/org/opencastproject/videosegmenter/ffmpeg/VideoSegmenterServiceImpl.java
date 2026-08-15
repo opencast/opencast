@@ -1066,7 +1066,8 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
               .createSegment("segment-" + segmentcount);
           segment.setMediaTime(new MediaRelTimeImpl(starttime,
               endtime - starttime));
-          logger.debug("Created segment {} at start time {} with duration {}", segmentcount, starttime, endtime);
+          logger.debug("Created segment {} at start time {} with duration {}", segmentcount,
+              starttime, endtime - starttime);
           segments.add(segment);
           segmentcount++;
           starttime = endtime;
