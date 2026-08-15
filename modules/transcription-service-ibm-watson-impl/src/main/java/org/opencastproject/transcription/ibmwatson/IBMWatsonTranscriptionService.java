@@ -50,6 +50,7 @@ import org.opencastproject.transcription.persistence.TranscriptionDatabase;
 import org.opencastproject.transcription.persistence.TranscriptionDatabaseException;
 import org.opencastproject.transcription.persistence.TranscriptionJobControl;
 import org.opencastproject.transcription.persistence.TranscriptionProviderControl;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.LoadUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
@@ -61,6 +62,10 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 import org.opencastproject.workspace.api.Workspace;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
@@ -84,9 +89,6 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.DefaultHttpRequestRetryHandler;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -425,11 +427,11 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
 
   @Override
   public void transcriptionDone(String mpId, Object obj) throws TranscriptionServiceException {
-    JSONObject jsonObj = null;
+    JsonObject jsonObj = null;
     String jobId = null;
     try {
-      jsonObj = (JSONObject) obj;
-      jobId = (String) jsonObj.get("id");
+      jsonObj = (JsonObject) obj;
+      jobId = getString(jsonObj, "id");
 
       // Check for errors inside the results object. Sometimes we get a status completed, but
       // the transcription failed e.g.
@@ -439,10 +441,10 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
       // "event":"recognitions.completed_with_results",
       // "user_token":"66c6c9b0-b6a2-4c9a-92c8-55f953ab3d38",
       // "created":"2019-02-11T05:04:29.283Z"}' http://ADMIN/transcripts/watson/results
-      if (jsonObj.get("results") instanceof JSONArray) {
-        JSONArray resultsArray = (JSONArray) jsonObj.get("results");
-        if (resultsArray != null && resultsArray.size() > 0) {
-          String error = (String) ((JSONObject) resultsArray.get(0)).get("error");
+      if (jsonObj.get("results") instanceof JsonArray) {
+        JsonArray resultsArray = jsonObj.getAsJsonArray("results");
+        if (resultsArray.size() > 0) {
+          String error = getString(resultsArray.get(0).getAsJsonObject(), "error");
           if (!StringUtils.isEmpty(error)) {
             retryOrError(jobId, mpId,
                 String.format("Transcription completed with error for mpId %s, jobId %s: %s", mpId, jobId, error));
@@ -459,12 +461,12 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
       database.updateJobControl(jobId, TranscriptionJobControl.Status.TranscriptionComplete.name());
 
       // Save results in file system if there
-      if (jsonObj.get("results") != null) {
+      if (has(jsonObj, "results")) {
         saveResults(jobId, jsonObj);
       }
     } catch (IOException e) {
       logger.warn("Could not save transcription results file for mpId {}, jobId {}: {}",
-              mpId, jobId, jsonObj == null ? "null" : jsonObj.toJSONString());
+              mpId, jobId, jsonObj == null ? "null" : jsonObj.toString());
       throw new TranscriptionServiceException("Could not save transcription results file", e);
     } catch (TranscriptionDatabaseException e) {
       logger.warn("Error when updating state in database for mpId {}, jobId {}", mpId, jobId);
@@ -474,8 +476,8 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
 
   @Override
   public void transcriptionError(String mpId, Object obj) throws TranscriptionServiceException {
-    JSONObject jsonObj = (JSONObject) obj;
-    String jobId = (String) jsonObj.get("id");
+    JsonObject jsonObj = (JsonObject) obj;
+    String jobId = getString(jsonObj, "id");
     try {
       retryOrError(jobId, mpId, String.format("Transcription error for media package %s, job id %s", mpId, jobId));
     } catch (TranscriptionDatabaseException e) {
@@ -651,11 +653,10 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
           // "http://stream.watsonplatform.net/speech-to-text/api/v1/recognitions/4bd734c0-e575-21f3-de03-f932aa0468a0"
           // }
           String jsonString = EntityUtils.toString(response.getEntity());
-          JSONParser jsonParser = new JSONParser();
-          JSONObject jsonObject = (JSONObject) jsonParser.parse(jsonString);
-          String jobId = (String) jsonObject.get("id");
-          String jobStatus = (String) jsonObject.get("status");
-          String jobUrl = (String) jsonObject.get("url");
+          JsonObject jsonObject = GsonUtil.gson().fromJson(jsonString, JsonObject.class);
+          String jobId = getString(jsonObject, "id");
+          String jobStatus = getString(jsonObject, "status");
+          String jobUrl = getString(jsonObject, "url");
           logger.info("Transcription for mp {} has been submitted. Job id: {}, job status: {}, job url: {}", mpId,
                   jobId, jobStatus, jobUrl);
 
@@ -717,10 +718,9 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
 
           // Response returned is a json object described above
           String jsonString = EntityUtils.toString(entity);
-          JSONParser jsonParser = new JSONParser();
-          JSONObject jsonObject = (JSONObject) jsonParser.parse(jsonString);
-          String jobStatus = (String) jsonObject.get("status");
-          mpId = (String) jsonObject.get("user_token");
+          JsonObject jsonObject = GsonUtil.gson().fromJson(jsonString, JsonObject.class);
+          String jobStatus = getString(jsonObject, "status");
+          mpId = getString(jsonObject, "user_token");
           // user_token doesn't come back if this is not in the context of a callback so get the mpId from the db
           if (mpId == null) {
             TranscriptionJobControl jc = database.findByJob(jobId);
@@ -731,7 +731,7 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
           logger.info("Recognitions job {} has been found, status {}", jobId, jobStatus);
           EntityUtils.consume(entity);
 
-          if (jobStatus.indexOf(RecognitionJobStatus.COMPLETED) > -1 && jsonObject.get("results") != null) {
+          if (jobStatus.indexOf(RecognitionJobStatus.COMPLETED) > -1 && has(jsonObject, "results")) {
             transcriptionDone(mpId, jsonObject);
           }
           return jobStatus;
@@ -767,12 +767,24 @@ public class IBMWatsonTranscriptionService extends AbstractJobProducer implement
     }
   }
 
-  private void saveResults(String jobId, JSONObject jsonObj) throws IOException {
-    if (jsonObj.get("results") != null) {
+  private void saveResults(String jobId, JsonObject jsonObj) throws IOException {
+    if (has(jsonObj, "results")) {
       // Save the results into a collection
       workspace.putInCollection(TRANSCRIPT_COLLECTION, jobId + ".json",
-              new ByteArrayInputStream(jsonObj.toJSONString().getBytes()));
+              new ByteArrayInputStream(jsonObj.toString().getBytes()));
     }
+  }
+
+  /** Read a string member, returning null when it is absent or JSON null. */
+  private static String getString(JsonObject json, String key) {
+    JsonElement value = json.get(key);
+    return value == null || value.isJsonNull() ? null : value.getAsString();
+  }
+
+  /** True when the member is present and not JSON null. */
+  private static boolean has(JsonObject json, String key) {
+    JsonElement value = json.get(key);
+    return value != null && !value.isJsonNull();
   }
 
   @Override
