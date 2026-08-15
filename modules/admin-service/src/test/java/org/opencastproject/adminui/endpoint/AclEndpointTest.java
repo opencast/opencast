@@ -30,11 +30,11 @@ import org.opencastproject.adminui.util.ServiceEndpointTestsUtil;
 import org.opencastproject.test.rest.NotFoundExceptionMapper;
 import org.opencastproject.test.rest.RestServiceTestEnv;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.apache.commons.httpclient.HttpStatus;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
@@ -51,7 +51,6 @@ public class AclEndpointTest {
 
   private static final RestServiceTestEnv rt = testEnvForClasses(TestAclEndpoint.class, NotFoundExceptionMapper.class);
 
-  private JSONParser parser;
 
   @BeforeClass
   public static void oneTimeSetUp() {
@@ -65,36 +64,36 @@ public class AclEndpointTest {
 
   @Before
   public void setUp() {
-    parser = new JSONParser();
   }
 
   @Test
-  public void testGetAllAcls() throws IOException, ParseException {
+  public void testGetAllAcls() throws IOException {
     InputStream stream = AclEndpointTest.class.getResourceAsStream("/acls.json");
     InputStreamReader reader = new InputStreamReader(stream);
-    JSONObject expected = (JSONObject) new JSONParser().parse(reader);
+    JsonObject expected = JsonParser.parseReader(reader).getAsJsonObject();
 
-    JSONObject actual = (JSONObject) parser.parse(given().expect().statusCode(HttpStatus.SC_OK)
+    JsonObject actual = JsonParser.parseString(given().expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON).body("total", equalTo(2)).body("offset", equalTo(0))
-            .body("limit", equalTo(100)).body("results", hasSize(2)).when().get(rt.host("/acls.json")).asString());
+            .body("limit", equalTo(100)).body("results", hasSize(2)).when().get(rt.host("/acls.json")).asString()
+                ).getAsJsonObject();
 
     ServiceEndpointTestsUtil.testJSONObjectEquality(expected, actual);
   }
 
   @Test
-  public void testGetAllRoles() throws IOException, ParseException {
+  public void testGetAllRoles() throws IOException {
     InputStream stream = AclEndpointTest.class.getResourceAsStream("/roles.json");
     InputStreamReader reader = new InputStreamReader(stream);
-    JSONArray expectedArray = (JSONArray) new JSONParser().parse(reader);
+    JsonArray expectedArray = JsonParser.parseReader(reader).getAsJsonArray();
 
-    JSONArray actualArray = (JSONArray) parser.parse(given().expect().statusCode(HttpStatus.SC_OK)
-        .contentType(ContentType.JSON).when().get(rt.host("/roles.json")).asString());
+    JsonArray actualArray = JsonParser.parseString(given().expect().statusCode(HttpStatus.SC_OK)
+        .contentType(ContentType.JSON).when().get(rt.host("/roles.json")).asString()).getAsJsonArray();
 
     Assert.assertEquals(expectedArray, actualArray);
   }
 
   @Test
-  public void testGetAllAclsWithParams() throws ParseException, IOException {
+  public void testGetAllAclsWithParams() throws IOException {
     int limit = 100;
     int offset = 1;
 
@@ -118,23 +117,23 @@ public class AclEndpointTest {
   }
 
   @Test
-  public void testGetAllRolesWithParams() throws ParseException, IOException {
+  public void testGetAllRolesWithParams() throws IOException {
 
     InputStream stream = AclEndpointTest.class.getResourceAsStream("/roles.json");
     InputStreamReader reader = new InputStreamReader(stream);
-    JSONArray allRoles = (JSONArray) new JSONParser().parse(reader);
+    JsonArray allRoles = JsonParser.parseReader(reader).getAsJsonArray();
 
     int limit = 2;
     int offset = 1;
     String target = "ACL";
 
-    JSONArray expectedArray = new JSONArray();
+    JsonArray expectedArray = new JsonArray();
     expectedArray.add(allRoles.get(1));
     expectedArray.add(allRoles.get(3));
 
-    JSONArray actualArray = (JSONArray) parser.parse(given().queryParam("limit", limit).queryParam("offset", offset)
+    JsonArray actualArray = JsonParser.parseString(given().queryParam("limit", limit).queryParam("offset", offset)
         .queryParam("target", target).expect().statusCode(HttpStatus.SC_OK)
-        .contentType(ContentType.JSON).when().get(rt.host("/roles.json")).asString());
+        .contentType(ContentType.JSON).when().get(rt.host("/roles.json")).asString()).getAsJsonArray();
     Assert.assertEquals(expectedArray, actualArray);
   }
 
