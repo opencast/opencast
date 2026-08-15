@@ -31,7 +31,6 @@ import org.opencastproject.publication.youtube.UnitTestUtils;
 import com.google.api.client.googleapis.auth.oauth2.GoogleCredential;
 import com.google.api.client.util.store.DataStore;
 
-import org.json.simple.parser.ParseException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -45,12 +44,12 @@ public class GoogleAPICredentialRequestorTest {
   public TemporaryFolder testFolder = new TemporaryFolder();
 
   @Test(expected = IllegalArgumentException.class)
-  public void testInvalidArgs() throws IOException, ParseException {
+  public void testInvalidArgs() throws IOException {
     GoogleAPICredentialRequestor.main(new String[0]);
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void testFileDoesNotExist() throws IOException, ParseException {
+  public void testFileDoesNotExist() throws IOException {
     GoogleAPICredentialRequestor.main(new String[] {
         "/this/path/does/exist",
         "credentialDataStore",
@@ -59,7 +58,7 @@ public class GoogleAPICredentialRequestorTest {
   }
 
   @Test
-  public void testClientSecrets() throws IOException, ParseException {
+  public void testClientSecrets() throws IOException {
     final String clientId = "clientId";
     final String credentialDataStore = "credentialDataStore";
     final String dataStoreDirectory = "dataStoreDirectory";
