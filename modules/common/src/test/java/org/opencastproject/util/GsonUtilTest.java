@@ -26,6 +26,7 @@ import static org.junit.Assert.assertTrue;
 
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 
 import org.junit.Test;
 
@@ -63,6 +64,12 @@ public class GsonUtilTest {
 
     assertEquals(Long.valueOf(1L), parsed.get("small"));
     assertEquals(Long.valueOf(9007199254740993L), parsed.get("large"));
+  }
+
+  /** Input the JSON specification does not allow must be rejected, as the previous parser rejected it. */
+  @Test(expected = JsonSyntaxException.class)
+  public void testLenientInputIsRejected() {
+    GsonUtil.gson().fromJson("{key: value}", JsonObject.class);
   }
 
   /** Decimals must still come back as Double. */
