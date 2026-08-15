@@ -30,9 +30,11 @@ import org.opencastproject.caption.impl.TimeImpl;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElement.Type;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.osgi.service.component.annotations.Component;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,7 +70,6 @@ public class GoogleSpeechCaptionConverter implements CaptionConverter {
   public List<Caption> importCaption(InputStream inputStream, String languageLineSize)
           throws CaptionConverterException {
     List<Caption> captionList = new ArrayList<Caption>();
-    JSONParser jsonParser = new JSONParser();
     int transcriptionLineSize = 0;
     try {
       // No language to specify so define size of a transcripts line
@@ -80,26 +81,26 @@ public class GoogleSpeechCaptionConverter implements CaptionConverter {
     }
 
     try {
-      JSONObject outputObj = (JSONObject) jsonParser.parse(new InputStreamReader(inputStream));
+      JsonObject outputObj = JsonParser.parseReader(new InputStreamReader(inputStream)).getAsJsonObject();
       String jobId = "Unknown";
       if (outputObj.get("name") != null) {
-        jobId = (String) outputObj.get("name");
+        jobId = outputObj.get("name").getAsString();
       }
 
-      JSONObject responseObj = (JSONObject) outputObj.get("response");
-      JSONArray resultsArray = (JSONArray) responseObj.get("results");
+      JsonObject responseObj = outputObj.getAsJsonObject("response");
+      JsonArray resultsArray = responseObj.getAsJsonArray("results");
 
       resultsLoop:
       for (int i = 0; i < resultsArray.size(); i++) {
-        JSONObject resultElement = (JSONObject) resultsArray.get(i);
-        JSONArray alternativesArray = (JSONArray) resultElement.get("alternatives");
+        JsonObject resultElement = resultsArray.get(i).getAsJsonObject();
+        JsonArray alternativesArray = resultElement.getAsJsonArray("alternatives");
         if (alternativesArray != null && alternativesArray.size() > 0) {
-          JSONObject alternativeElement = (JSONObject) alternativesArray.get(0);
+          JsonObject alternativeElement = alternativesArray.get(0).getAsJsonObject();
           if (!alternativeElement.isEmpty()) {
             // remove trailing space in order to have correct transcript length
-            String transcript = ((String) alternativeElement.get("transcript")).trim();
+            String transcript = alternativeElement.get("transcript").getAsString().trim();
             if (transcript != null) {
-              JSONArray timestampsArray = (JSONArray) alternativeElement.get("words");
+              JsonArray timestampsArray = alternativeElement.getAsJsonArray("words");
               if (timestampsArray == null || timestampsArray.isEmpty()) {
                 logger.warn("Could not build caption object for job {}, result index {}: timestamp data not found",
                     jobId, i);
@@ -123,18 +124,18 @@ public class GoogleSpeechCaptionConverter implements CaptionConverter {
                   double end = -1;
                   if (indexLast < timestampsArray.size()) {
                     // Get start time of first element
-                    JSONObject wordTSList = (JSONObject) timestampsArray.get(indexFirst);
+                    JsonObject wordTSList = timestampsArray.get(indexFirst).getAsJsonObject();
                     if (wordTSList.size() == 3) {
                       // Remove 's' at the end
                       Number startNumber = NumberFormat.getInstance(Locale.US)
-                          .parse(removeEndCharacter((wordTSList.get("startTime").toString()), "s"));
+                          .parse(removeEndCharacter(asText(wordTSList.get("startTime")), "s"));
                       start = startNumber.doubleValue();
                     }
                     // Get end time of last element
-                    wordTSList = (JSONObject) timestampsArray.get(indexLast);
+                    wordTSList = timestampsArray.get(indexLast).getAsJsonObject();
                     if (wordTSList.size() == 3) {
                       Number endNumber = NumberFormat.getInstance(Locale.US)
-                          .parse(removeEndCharacter((wordTSList.get("endTime").toString()), "s"));
+                          .parse(removeEndCharacter(asText(wordTSList.get("endTime")), "s"));
                       end = endNumber.doubleValue();
                     }
                   }
@@ -183,6 +184,11 @@ public class GoogleSpeechCaptionConverter implements CaptionConverter {
   @Override
   public Type getElementType() {
     return MediaPackageElement.Type.Attachment;
+  }
+
+  /** Render a value as plain text: the raw string for primitives, JSON otherwise. */
+  private static String asText(JsonElement value) {
+    return value.isJsonPrimitive() ? value.getAsString() : value.toString();
   }
 
   private Time buildTime(long ms) throws IllegalTimeFormatException {
