@@ -51,7 +51,6 @@ import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationModule;
 
 import org.apache.commons.io.IOUtils;
-import org.json.simple.parser.ParseException;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
@@ -637,10 +636,9 @@ public class PlaylistRestService {
    * parse JSON to JAXB when accepting a request is not that automatic. This functions takes care of that.
    * @param json Valid JSON as a string
    * @return A Playlist containing the information from the JSON
-   * @throws ParseException
    * @throws IOException
    */
-  public Playlist parseJsonToPlaylist(String json) throws ParseException, IOException {
+  public Playlist parseJsonToPlaylist(String json) throws IOException {
     JaxbAnnotationModule module = new JaxbAnnotationModule();
     ObjectMapper objectMapper = new ObjectMapper();
     objectMapper.registerModule(module);

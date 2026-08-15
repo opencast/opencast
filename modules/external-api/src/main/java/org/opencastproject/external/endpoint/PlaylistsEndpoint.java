@@ -57,7 +57,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
-import org.json.simple.parser.ParseException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -262,7 +261,7 @@ public class PlaylistsEndpoint {
       );
     } catch (UnauthorizedException e) {
       return Response.status(Response.Status.FORBIDDEN).build();
-    } catch (ParseException | IOException | IllegalArgumentException e) {
+    } catch (IOException | IllegalArgumentException e) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
   }

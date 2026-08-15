@@ -39,9 +39,9 @@ import org.opencastproject.util.requests.SortCriterion;
 import com.google.common.collect.Lists;
 
 import org.easymock.EasyMock;
-import org.json.simple.parser.ParseException;
 import org.junit.Ignore;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -110,7 +110,7 @@ public class TestPlaylistsEndpoint extends PlaylistsEndpoint {
     replay(service);
 
     PlaylistRestService restService = createNiceMock(PlaylistRestService.class);
-    expect(restService.parseJsonToPlaylist(invalidPlaylistJson)).andThrow(new ParseException(0));
+    expect(restService.parseJsonToPlaylist(invalidPlaylistJson)).andThrow(new IOException("invalid playlist"));
     expect(restService.parseJsonToPlaylist(anyObject(String.class))).andReturn(playlist);
     replay(restService);
 
