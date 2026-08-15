@@ -814,13 +814,18 @@ public class VideoSegmenterServiceImpl extends AbstractJobProducer implements
       // calculate errors for "normal" and filtered segmentation
       // and compare them to find better optimization.
       // "normal"
-      OptimizationStep currentStep = new OptimizationStep(changesThresholdLocal, segments.size(), prefNumberLocal,
-              mpeg7, segments);
+      OptimizationStep currentStep = new OptimizationStep(
+          changesThresholdLocal,
+          segments.size(),
+          prefNumberLocal,
+          mpeg7, segments);
       // filtered
       LinkedList<Segment> segmentsNew = new LinkedList<Segment>();
       OptimizationStep currentStepFiltered = new OptimizationStep(
-              changesThresholdLocal, 0,
-              prefNumberLocal, filterSegmentation(segments, track, segmentsNew, stabilityThreshold * 1000), segments);
+          changesThresholdLocal,
+          0,
+          prefNumberLocal,
+          filterSegmentation(segments, track, segmentsNew, stabilityThreshold * 1000), segments);
       currentStepFiltered.setSegmentNumAndRecalcErrors(segmentsNew.size());
 
       logger.info("Segmentation yields {} segments after filtering", segmentsNew.size());
