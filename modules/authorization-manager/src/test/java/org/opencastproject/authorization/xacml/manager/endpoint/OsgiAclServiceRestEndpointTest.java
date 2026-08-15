@@ -30,8 +30,9 @@ import org.opencastproject.security.api.Permissions.Action;
 import org.opencastproject.test.rest.RestServiceTestEnv;
 import org.opencastproject.util.UrlSupport;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -333,8 +334,8 @@ public class OsgiAclServiceRestEndpointTest {
   }
 
   public static Long extractAclId(io.restassured.response.Response r) throws Exception {
-    JSONObject json = (JSONObject) new JSONParser().parse(r.asString());
-    return (Long) json.get("id");
+    JsonObject json = JsonParser.parseString(r.asString()).getAsJsonObject();
+    return json.get("id").getAsLong();
   }
 
 }
