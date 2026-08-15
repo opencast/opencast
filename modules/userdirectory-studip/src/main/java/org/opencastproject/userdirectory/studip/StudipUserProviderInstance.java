@@ -30,12 +30,17 @@ import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.RoleProvider;
 import org.opencastproject.security.api.User;
 import org.opencastproject.security.api.UserProvider;
+import org.opencastproject.util.GsonUtil;
 
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.util.concurrent.ExecutionError;
 import com.google.common.util.concurrent.UncheckedExecutionException;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -43,10 +48,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +62,6 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
@@ -216,16 +216,16 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider {
     ClassLoader originalClassloader = currentThread.getContextClassLoader();
     try {
       // Stud.IP userId (internal id), email address and display name
-      JSONObject userJsonObj = getStudipUser(userName);
+      JsonObject userJsonObj = getStudipUser(userName);
       if (userJsonObj == null) {
         return null;
       }
 
       Set<JaxbRole> roles = new HashSet<>();
-      if (userJsonObj.containsKey("roles")) {
-        JSONArray rolesArray = (JSONArray) userJsonObj.get("roles");
-        for (Object r : rolesArray) {
-          roles.add(new JaxbRole(r.toString(), jaxbOrganization, "Studip external role", Role.Type.EXTERNAL));
+      if (userJsonObj.has("roles")) {
+        JsonArray rolesArray = userJsonObj.getAsJsonArray("roles");
+        for (JsonElement r : rolesArray) {
+          roles.add(new JaxbRole(GsonUtil.asText(r), jaxbOrganization, "Studip external role", Role.Type.EXTERNAL));
         }
       }
 
@@ -234,8 +234,8 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider {
       logger.debug("Returning JaxbRoles: {}", roles);
 
       // Email address
-      var email = Objects.toString(userJsonObj.get("email"), null);
-      var name = Objects.toString(userJsonObj.get("fullname"), null);
+      var email = GsonUtil.getStringOrNull(userJsonObj, "email");
+      var name = GsonUtil.getStringOrNull(userJsonObj, "fullname");
 
       User user = new JaxbUser(userName, null, name, email, PROVIDER_NAME, jaxbOrganization, roles);
 
@@ -244,7 +244,7 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider {
 
       return user;
 
-    } catch (ParseException e) {
+    } catch (JsonParseException e) {
       logger.error("Exception while parsing response from provider for user {}", userName, e);
       return null;
     } catch (IOException e) {
@@ -264,7 +264,7 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider {
    * @param uid Identifier of the user to look for
    * @return JSON object containing user information
    */
-  private JSONObject getStudipUser(String uid) throws URISyntaxException, IOException, ParseException {
+  private JsonObject getStudipUser(String uid) throws URISyntaxException, IOException {
     // Build URL
     var apiPath = new URIBuilder().setPathSegments("opencast", "user", uid).getPath();
     var url = new URIBuilder(studipUrl)
@@ -293,17 +293,16 @@ public class StudipUserProviderInstance implements UserProvider, RoleProvider {
 
         // Parse response
         BufferedReader reader = new BufferedReader(new InputStreamReader(resp.getEntity().getContent()));
-        JSONParser parser = new JSONParser();
-        Object obj = parser.parse(reader);
+        JsonElement obj = GsonUtil.gson().fromJson(reader, JsonElement.class);
 
         // Check for errors
-        if (!(obj instanceof JSONObject)) {
+        if (obj == null || !obj.isJsonObject()) {
           throw new IOException("StudIP responded in unexpected format");
         }
 
-        JSONObject jObj = (JSONObject) obj;
-        if (jObj.containsKey("errors")) {
-          throw new IOException("Stud.IP returned an error: " + jObj.toJSONString());
+        JsonObject jObj = obj.getAsJsonObject();
+        if (jObj.has("errors")) {
+          throw new IOException("Stud.IP returned an error: " + jObj);
         }
 
         return jObj;
