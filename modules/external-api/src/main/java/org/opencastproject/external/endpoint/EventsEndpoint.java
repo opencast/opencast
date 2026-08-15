@@ -115,6 +115,8 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonNull;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 import com.google.gson.JsonPrimitive;
 
 import org.apache.commons.fileupload.FileItemIterator;
@@ -125,10 +127,6 @@ import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.ComponentContext;
@@ -159,6 +157,7 @@ import java.util.TreeMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -684,19 +683,17 @@ public class EventsEndpoint implements ManagedService {
           if (!event.isScheduledEvent() || event.hasRecordingStarted()) {
             return RestUtil.R.badRequest("Processing can't be updated for events that are already uploaded.");
           }
-          JSONObject processing = eventHttpServletRequest.getProcessing().get();
+          JsonObject processing = eventHttpServletRequest.getProcessing().get();
 
-          String workflowId = (String) processing.get("workflow");
+          String workflowId = processing.has("workflow") ? processing.get("workflow").getAsString() : null;
           if (workflowId == null) {
             throw new IllegalArgumentException("No workflow template in metadata");
           }
 
           Map<String, String> configuration = new HashMap<>();
           if (eventHttpServletRequest.getProcessing().get().get("configuration") != null) {
-            configuration = new HashMap<>(
-                (JSONObject) eventHttpServletRequest
-                    .getProcessing().get()
-                    .get("configuration"));
+            configuration = toStringMap(
+                eventHttpServletRequest.getProcessing().get().getAsJsonObject("configuration"));
           }
 
           Optional<Map<String, String>> caMetadataOpt = Optional.empty();
@@ -797,8 +794,8 @@ public class EventsEndpoint implements ManagedService {
             requestedVersion);
       }
 
-      JSONObject source = new JSONObject();
-      source.put("type", "UPLOAD");
+      JsonObject source = new JsonObject();
+      source.addProperty("type", "UPLOAD");
       eventHttpServletRequest.setSource(source);
       String eventId = indexService.createEvent(eventHttpServletRequest);
       JsonObject json = new JsonObject();
@@ -822,12 +819,29 @@ public class EventsEndpoint implements ManagedService {
     }
   }
 
-  private Response scheduleNewEvent(EventHttpServletRequest request, JSONObject scheduling, ApiVersion requestedVersion)
+  /** Flatten a JSON object of scalars into a string map. */
+  private static Map<String, String> toStringMap(JsonObject json) {
+    Map<String, String> map = new HashMap<>();
+    for (String key : json.keySet()) {
+      JsonElement value = json.get(key);
+      map.put(key, value.isJsonNull() ? null : (value.isJsonPrimitive() ? value.getAsString() : value.toString()));
+    }
+    return map;
+  }
+
+  /** Join array entries with commas using their plain text rather than their JSON representation. */
+  private static String joinAsPlainText(JsonArray array) {
+    return StreamSupport.stream(array.spliterator(), false)
+        .map(e -> e.isJsonPrimitive() ? e.getAsString() : e.toString())
+        .collect(Collectors.joining(","));
+  }
+
+  private Response scheduleNewEvent(EventHttpServletRequest request, JsonObject scheduling, ApiVersion requestedVersion)
           throws MediaPackageException, IOException, IngestException, SchedulerException,
           NotFoundException, UnauthorizedException, SearchIndexException, java.text.ParseException {
 
     final SchedulingInfo schedulingInfo = SchedulingInfo.of(scheduling);
-    final JSONObject source = schedulingInfo.toSource();
+    final JsonObject source = schedulingInfo.toSource();
     request.setSource(source);
 
     try {
@@ -1415,7 +1429,7 @@ public class EventsEndpoint implements ManagedService {
       AccessControlList accessControlList;
       try {
         accessControlList = AclUtils.deserializeJsonToAcl(acl, false);
-      } catch (ParseException e) {
+      } catch (JsonParseException | IllegalStateException e) {
         logger.debug("Unable to update event acl to '{}'", acl, e);
         return R.badRequest(String.format("Unable to parse acl '%s' because '%s'", acl, e.getMessage()));
       } catch (IllegalArgumentException e) {
@@ -1754,10 +1768,9 @@ public class EventsEndpoint implements ManagedService {
   public Response updateEventMetadataByType(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String id,
           @QueryParam("type") String type, @FormParam("metadata") String metadataJSON) throws Exception {
     Map<String, String> updatedFields;
-    JSONParser parser = new JSONParser();
     try {
       updatedFields = RequestUtils.getKeyValueMap(metadataJSON);
-    } catch (ParseException e) {
+    } catch (JsonParseException e) {
       logger.debug("Unable to update event '{}' with metadata type '{}' and content '{}'", id, type, metadataJSON, e);
       return RestUtil.R.badRequest(String.format("Unable to parse metadata fields as json from '%s'", metadataJSON));
     } catch (IllegalArgumentException e) {
@@ -1819,9 +1832,9 @@ public class EventsEndpoint implements ManagedService {
             return error.get();
           }
           collection.removeField(field);
-          JSONArray subjectArray = (JSONArray) parser.parse(updatedFields.get(key));
+          JsonArray subjectArray = JsonParser.parseString(updatedFields.get(key)).getAsJsonArray();
           collection.addField(
-                  MetadataJson.copyWithDifferentJsonValue(field, StringUtils.join(subjectArray.iterator(), ",")));
+                  MetadataJson.copyWithDifferentJsonValue(field, joinAsPlainText(subjectArray)));
         } else if ("startDate".equals(key)) {
           // Special handling for start date since in API v1 we expect start date and start time to be separate fields.
           MetadataField field = collection.getOutputFields().get(key);
@@ -2411,11 +2424,10 @@ public class EventsEndpoint implements ManagedService {
     if (event.isEmpty()) {
       return ApiResponseBuilder.notFound(String.format("Unable to find event with id '%s'", id));
     }
-    final JSONParser parser = new JSONParser();
-    JSONObject parsedJson;
+    JsonObject parsedJson;
     try {
-      parsedJson = (JSONObject) parser.parse(scheduling);
-    } catch (ParseException e) {
+      parsedJson = JsonParser.parseString(scheduling).getAsJsonObject();
+    } catch (JsonParseException | IllegalStateException e) {
       logger.debug("Client sent unparsable scheduling information for event {}: {}", id, scheduling);
       return RestUtil.R.badRequest("Unparsable scheduling information");
     }
@@ -2424,7 +2436,7 @@ public class EventsEndpoint implements ManagedService {
   }
 
   private Optional<Response> updateSchedulingInformation(
-      JSONObject parsedScheduling,
+      JsonObject parsedScheduling,
       String id,
       ApiVersion requestedVersion,
       boolean allowConflict) throws Exception {

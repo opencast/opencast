@@ -39,6 +39,12 @@ import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.util.NotFoundException;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
+
 import org.apache.commons.fileupload.FileItemIterator;
 import org.apache.commons.fileupload.FileItemStream;
 import org.apache.commons.fileupload.FileUploadException;
@@ -47,10 +53,6 @@ import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,10 +60,11 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TimeZone;
+import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -77,9 +80,9 @@ public class EventHttpServletRequest {
   private Optional<AccessControlList> acl = Optional.empty();
   private Optional<MediaPackage> mediaPackage = Optional.empty();
   private Optional<MetadataList> metadataList = Optional.empty();
-  private Optional<JSONObject> processing = Optional.empty();
-  private Optional<JSONObject> source = Optional.empty();
-  private Optional<JSONObject> scheduling = Optional.empty();
+  private Optional<JsonObject> processing = Optional.empty();
+  private Optional<JsonObject> source = Optional.empty();
+  private Optional<JsonObject> scheduling = Optional.empty();
 
   public void setAcl(AccessControlList acl) {
     this.acl = Optional.of(acl);
@@ -93,15 +96,15 @@ public class EventHttpServletRequest {
     this.metadataList = Optional.of(metadataList);
   }
 
-  public void setProcessing(JSONObject processing) {
+  public void setProcessing(JsonObject processing) {
     this.processing = Optional.of(processing);
   }
 
-  public void setScheduling(JSONObject scheduling) {
+  public void setScheduling(JsonObject scheduling) {
     this.scheduling = Optional.of(scheduling);
   }
 
-  public void setSource(JSONObject source) {
+  public void setSource(JsonObject source) {
     this.source = Optional.of(source);
   }
 
@@ -117,15 +120,15 @@ public class EventHttpServletRequest {
     return metadataList;
   }
 
-  public Optional<JSONObject> getProcessing() {
+  public Optional<JsonObject> getProcessing() {
     return processing;
   }
 
-  public Optional<JSONObject> getScheduling() {
+  public Optional<JsonObject> getScheduling() {
     return scheduling;
   }
 
-  public Optional<JSONObject> getSource() {
+  public Optional<JsonObject> getSource() {
     return source;
   }
 
@@ -257,7 +260,7 @@ public class EventHttpServletRequest {
           eventHttpServletRequest.setMetadataList(metadataList);
         } catch (IllegalArgumentException e) {
           throw e;
-        } catch (ParseException e) {
+        } catch (JsonParseException e) {
           throw new IllegalArgumentException(String.format("Unable to parse event metadata because: '%s'", e));
         } catch (NotFoundException e) {
           throw e;
@@ -279,9 +282,8 @@ public class EventHttpServletRequest {
     } else if ("processing".equals(item.getFieldName())) {
       String processing = Streams.asString(item.openStream());
       if (StringUtils.isNotEmpty(processing)) {
-        JSONParser parser = new JSONParser();
         try {
-          eventHttpServletRequest.setProcessing((JSONObject) parser.parse(processing));
+          eventHttpServletRequest.setProcessing(JsonParser.parseString(processing).getAsJsonObject());
         } catch (Exception e) {
           logger.warn("Unable to parse processing configuration {}", processing);
           throw new IllegalArgumentException("Unable to parse processing configuration");
@@ -290,9 +292,8 @@ public class EventHttpServletRequest {
     } else if ("scheduling".equals(item.getFieldName())) {
       String scheduling = Streams.asString(item.openStream());
       if (StringUtils.isNotEmpty(scheduling)) {
-        JSONParser parser = new JSONParser();
         try {
-          eventHttpServletRequest.setScheduling((JSONObject) parser.parse(scheduling));
+          eventHttpServletRequest.setScheduling(JsonParser.parseString(scheduling).getAsJsonObject());
         } catch (Exception e) {
           logger.warn("Unable to parse scheduling information {}", scheduling);
           throw new IllegalArgumentException("Unable to parse scheduling information");
@@ -359,25 +360,40 @@ public class EventHttpServletRequest {
    * @param assumeAllow
    *          Assume that all entries are allows.
    * @return An {@link AccessControlList} representation of the Json
-   * @throws ParseException
+   * @throws JsonParseException
    */
-  protected static AccessControlList deserializeJsonToAcl(String json, boolean assumeAllow) throws ParseException {
-    JSONParser parser = new JSONParser();
-    JSONArray aclJson = (JSONArray) parser.parse(json);
-    @SuppressWarnings("unchecked")
-    ListIterator<Object> iterator = aclJson.listIterator();
-    JSONObject aceJson;
+  /**
+   * Render a value as plain text rather than as JSON, i.e. without the quotes a JsonElement's toString() would add,
+   * and as the empty string when the member is absent or null. This matches how the previous parser, which handed
+   * back bare Java values, was used here.
+   */
+  private static String asPlainString(JsonElement value) {
+    if (value == null || value.isJsonNull()) {
+      return "";
+    }
+    return value.isJsonPrimitive() ? value.getAsString() : value.toString();
+  }
+
+  /** Join subject values with commas, using the plain text of each entry rather than its JSON representation. */
+  private static String joinSubjects(JsonArray subjects) {
+    return StreamSupport.stream(subjects.spliterator(), false)
+        .map(EventHttpServletRequest::asPlainString)
+        .collect(Collectors.joining(","));
+  }
+
+  protected static AccessControlList deserializeJsonToAcl(String json, boolean assumeAllow) {
+    JsonArray aclJson = JsonParser.parseString(json).getAsJsonArray();
     List<AccessControlEntry> entries = new ArrayList<AccessControlEntry>();
-    while (iterator.hasNext()) {
-      aceJson = (JSONObject) iterator.next();
-      String action = aceJson.get(ACTION_JSON_KEY) != null ? aceJson.get(ACTION_JSON_KEY).toString() : "";
+    for (JsonElement element : aclJson) {
+      JsonObject aceJson = element.getAsJsonObject();
+      String action = asPlainString(aceJson.get(ACTION_JSON_KEY));
       String allow;
       if (assumeAllow) {
         allow = "true";
       } else {
-        allow = aceJson.get(ALLOW_JSON_KEY) != null ? aceJson.get(ALLOW_JSON_KEY).toString() : "";
+        allow = asPlainString(aceJson.get(ALLOW_JSON_KEY));
       }
-      String role = aceJson.get(ROLE_JSON_KEY) != null ? aceJson.get(ROLE_JSON_KEY).toString() : "";
+      String role = asPlainString(aceJson.get(ROLE_JSON_KEY));
       if (StringUtils.trimToNull(action) != null && StringUtils.trimToNull(allow) != null
               && StringUtils.trimToNull(role) != null) {
         AccessControlEntry ace = new AccessControlEntry(role, action, Boolean.parseBoolean(allow));
@@ -402,7 +418,7 @@ public class EventHttpServletRequest {
    * @param startTimePattern
    *          The pattern to use to parse the start time from the json payload.
    * @return A {@link MetadataList} with the fields populated with the values provided.
-   * @throws ParseException
+   * @throws JsonParseException
    *           Thrown if unable to parse the json string.
    * @throws NotFoundException
    *           Thrown if unable to find the catalog or field that the json refers to.
@@ -412,17 +428,16 @@ public class EventHttpServletRequest {
           List<EventCatalogUIAdapter> catalogAdapters,
           String startDatePattern,
           String startTimePattern)
-          throws ParseException, NotFoundException, java.text.ParseException {
+          throws NotFoundException, java.text.ParseException {
     MetadataList metadataList = new MetadataList();
-    JSONParser parser = new JSONParser();
-    JSONArray jsonCatalogs = (JSONArray) parser.parse(json);
-    for (int i = 0; i < jsonCatalogs.size(); i++) {
-      JSONObject catalog = (JSONObject) jsonCatalogs.get(i);
-      if (catalog.get("flavor") == null || StringUtils.isBlank(catalog.get("flavor").toString())) {
+    JsonArray jsonCatalogs = JsonParser.parseString(json).getAsJsonArray();
+    for (JsonElement catalogElement : jsonCatalogs) {
+      JsonObject catalog = catalogElement.getAsJsonObject();
+      if (StringUtils.isBlank(asPlainString(catalog.get("flavor")))) {
         throw new IllegalArgumentException(
                 "Unable to create new event as no flavor was given for one of the metadata collections");
       }
-      String flavorString = catalog.get("flavor").toString();
+      String flavorString = asPlainString(catalog.get("flavor"));
       MediaPackageElementFlavor flavor = MediaPackageElementFlavor.parseFlavor(flavorString);
 
       DublinCoreMetadataCollection collection = null;
@@ -439,7 +454,7 @@ public class EventHttpServletRequest {
                 String.format("Unable to find an EventCatalogUIAdapter with Flavor '%s'", flavorString));
       }
 
-      String fieldsJson = catalog.get("fields").toString();
+      String fieldsJson = asPlainString(catalog.get("fields"));
       if (StringUtils.trimToNull(fieldsJson) != null) {
         Map<String, String> fields = RequestUtils.getKeyValueMap(fieldsJson);
         for (String key : fields.keySet()) {
@@ -452,10 +467,10 @@ public class EventHttpServletRequest {
             }
             collection.removeField(field);
             try {
-              JSONArray subjects = (JSONArray) parser.parse(fields.get(key));
+              JsonArray subjects = JsonParser.parseString(fields.get(key)).getAsJsonArray();
               collection.addField(MetadataJson
-                      .copyWithDifferentJsonValue(field, StringUtils.join(subjects.iterator(), ",")));
-            } catch (ParseException e) {
+                      .copyWithDifferentJsonValue(field, joinSubjects(subjects)));
+            } catch (JsonParseException e) {
               throw new IllegalArgumentException(
                       String.format("Unable to parse the 'subjects' metadata array field because: %s", e.toString()));
             }

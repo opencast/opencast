@@ -83,6 +83,7 @@ import org.opencastproject.util.requests.SortCriterion;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 
 import org.apache.commons.lang3.StringUtils;
@@ -748,7 +749,7 @@ public class SeriesEndpoint {
     Map<String, String> updatedFields;
     try {
       updatedFields = RequestUtils.getKeyValueMap(metadataJSON);
-    } catch (ParseException e) {
+    } catch (JsonParseException | IllegalStateException e) {
       logger.debug("Unable to update series '{}' with metadata type '{}' and content '{}'", id, type, metadataJSON, e);
       return RestUtil.R.badRequest(String.format("Unable to parse metadata fields as json from '%s' because '%s'",
               metadataJSON, e.getMessage()));
@@ -1076,7 +1077,7 @@ public class SeriesEndpoint {
     AccessControlList acl;
     try {
       acl = AclUtils.deserializeJsonToAcl(aclParam, false);
-    } catch (ParseException e) {
+    } catch (JsonParseException | IllegalStateException e) {
       logger.debug("Unable to parse acl '{}'", aclParam, e);
       return R.badRequest(String.format("Unable to parse acl '%s' because '%s'", aclParam, e.getMessage()));
     } catch (IllegalArgumentException e) {

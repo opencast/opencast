@@ -23,12 +23,13 @@ package org.opencastproject.util;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.Strictness;
 import com.google.gson.ToNumberPolicy;
 
 /**
  * Provides the {@link Gson} instance Opencast uses for reading and writing JSON.
  * <p>
- * Gson's defaults are unsuitable for Opencast in three ways, which is why this shared instance exists instead of
+ * Gson's defaults are unsuitable for Opencast in four ways, which is why this shared instance exists instead of
  * every call site building its own:
  * <ul>
  * <li>By default Gson escapes <code>&lt;</code>, <code>&gt;</code>, <code>&amp;</code>, <code>=</code> and
@@ -39,6 +40,8 @@ import com.google.gson.ToNumberPolicy;
  * <li>By default Gson reads every JSON number into a <code>Double</code> when the target type is unknown, which
  * silently loses precision for large integers. <code>LONG_OR_DOUBLE</code> keeps integral values as
  * <code>Long</code>.</li>
+ * <li>By default Gson parses leniently and accepts input the JSON specification does not allow, such as unquoted
+ * keys. Requests carrying such input used to be rejected, so parsing is set to strict.</li>
  * </ul>
  * <p>
  * {@link Gson} is thread safe, so the single instance can be shared freely.
@@ -49,6 +52,7 @@ public final class GsonUtil {
       .disableHtmlEscaping()
       .serializeNulls()
       .setObjectToNumberStrategy(ToNumberPolicy.LONG_OR_DOUBLE)
+      .setStrictness(Strictness.STRICT)
       .create();
 
   private GsonUtil() {

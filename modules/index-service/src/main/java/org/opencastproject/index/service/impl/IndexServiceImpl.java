@@ -120,6 +120,11 @@ import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workspace.api.Workspace;
 
 import com.google.common.net.MediaType;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.JsonParser;
 
 import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.property.RRule;
@@ -133,9 +138,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jettison.json.JSONException;
 import org.joda.time.DateTimeZone;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -195,7 +197,6 @@ public class IndexServiceImpl implements IndexService {
   private final List<SeriesCatalogUIAdapter> seriesCatalogUIAdapters = new ArrayList<>();
 
   /** A parser for handling JSON documents inside the body of a request. **/
-  private static final JSONParser parser = new JSONParser();
 
   private String attachmentRegex = "^attachment.*";
   private String catalogRegex = "^catalog.*";
@@ -521,7 +522,7 @@ public class IndexServiceImpl implements IndexService {
 
   @Override
   public String createEvent(HttpServletRequest request) throws IndexServiceException, UnsupportedAssetException {
-    JSONObject metadataJson = null;
+    JsonObject metadataJson = null;
     MediaPackage mp = null;
     // regex for form field name matching an attachment or a catalog
     // The first sub items identifies if the file is an attachment or catalog
@@ -541,14 +542,14 @@ public class IndexServiceImpl implements IndexService {
             if ("metadata".equals(fieldName)) {
               String metadata = Streams.asString(item.openStream());
               try {
-                metadataJson = (JSONObject) new JSONParser().parse(metadata);
+                metadataJson = JsonParser.parseString(metadata).getAsJsonObject();
                 // in case of scheduling: Check if user has access to the CA
-                if (metadataJson.containsKey("source")) {
-                  final JSONObject sourceJson = (JSONObject) metadataJson.get("source");
-                  if (sourceJson.containsKey("metadata")) {
-                    final JSONObject sourceMetadataJson = (JSONObject) sourceJson.get("metadata");
-                    if (sourceMetadataJson.containsKey("device")) {
-                      SecurityUtil.checkAgentAccess(securityService, (String) sourceMetadataJson.get("device"));
+                if (metadataJson.has("source")) {
+                  final JsonObject sourceJson = metadataJson.getAsJsonObject("source");
+                  if (sourceJson.has("metadata")) {
+                    final JsonObject sourceMetadataJson = sourceJson.getAsJsonObject("metadata");
+                    if (sourceMetadataJson.has("device")) {
+                      SecurityUtil.checkAgentAccess(securityService, getString(sourceMetadataJson, "device"));
                     }
                   }
                 }
@@ -596,7 +597,7 @@ public class IndexServiceImpl implements IndexService {
         }
         // MH-12085 update the flavors of any newly added assets.
         try {
-          JSONArray assetMetadata = (JSONArray)((JSONObject) metadataJson.get("assets")).get("options");
+          JsonArray assetMetadata = metadataJson.getAsJsonObject("assets").getAsJsonArray("options");
           if (assetMetadata != null) {
             mp = updateMpAssetFlavor(assetList, mp, assetMetadata);
           }
@@ -630,7 +631,7 @@ public class IndexServiceImpl implements IndexService {
   @Override
   public String updateEventAssets(MediaPackage mp, HttpServletRequest request)
           throws IndexServiceException, UnsupportedAssetException {
-    JSONObject metadataJson = null;
+    JsonObject metadataJson = null;
     // regex for form field name matching an attachment or a catalog
     // The first sub items identifies if the file is an attachment or catalog
     // The second is the item flavor
@@ -651,7 +652,7 @@ public class IndexServiceImpl implements IndexService {
           if ("metadata".equals(fieldName)) {
             String metadata = Streams.asString(item.openStream());
             try {
-              metadataJson = (JSONObject) parser.parse(metadata);
+              metadataJson = JsonParser.parseString(metadata).getAsJsonObject();
             } catch (Exception e) {
               logger.warn("Unable to parse metadata {}", metadata);
               throw new IllegalArgumentException("Unable to parse metadata");
@@ -689,7 +690,7 @@ public class IndexServiceImpl implements IndexService {
       // 2. remove existing assets of the new flavor
       // and correct the temporary flavor to the new flavor.
       try {
-        JSONArray assetMetadata = (JSONArray)((JSONObject) metadataJson.get("assets")).get("options");
+        JsonArray assetMetadata = metadataJson.getAsJsonObject("assets").getAsJsonArray("options");
         if (assetMetadata != null) {
           mp = updateMpAssetFlavor(assetList, mp, assetMetadata);
         } else {
@@ -721,31 +722,29 @@ public class IndexServiceImpl implements IndexService {
    * @return the created workflow instance id
    * @throws IndexServiceException
    */
-  private String startAddAssetWorkflow(JSONObject metadataJson, MediaPackage mediaPackage)
+  private String startAddAssetWorkflow(JsonObject metadataJson, MediaPackage mediaPackage)
           throws IndexServiceException {
     String wfId = null;
     String mpId = mediaPackage.getIdentifier().toString();
 
-    JSONObject processing = (JSONObject) metadataJson.get("processing");
+    JsonObject processing = metadataJson.getAsJsonObject("processing");
     if (processing == null) {
       throw new IllegalArgumentException("No processing field in metadata");
     }
 
-    String workflowDefId = (String) processing.get("workflow");
+    String workflowDefId = getString(processing, "workflow");
     if (workflowDefId == null) {
       throw new IllegalArgumentException("No workflow definition field in processing metadata");
     }
 
-    JSONObject configJson = (JSONObject) processing.get("configuration");
+    JsonObject configJson = processing.getAsJsonObject("configuration");
 
     try {
       // Start the new workflow on the snapshot
       // Workflow params are assumed to be String (not mixed with Number)
       Map<String, String> params = new HashMap<String, String>();
       if (configJson != null) {
-        for (Object key: configJson.keySet()) {
-          params.put((String)key, (String) configJson.get(key));
-        }
+        params.putAll(toStringMap(configJson));
       }
 
       WorkflowInstance workflowInstance = workflowService.start(
@@ -770,10 +769,26 @@ public class IndexServiceImpl implements IndexService {
    * @throws IllegalArgumentException
    *           Thrown if unable to get the source from the json object.
    */
-  private SourceType getSourceType(JSONObject source) {
+  /** Read a string member, returning null when it is absent or JSON null. */
+  private static String getString(JsonObject json, String key) {
+    JsonElement value = json == null ? null : json.get(key);
+    return value == null || value.isJsonNull() ? null : value.getAsString();
+  }
+
+  /** Flatten a JSON object of scalars into a string map, as the old JSONObject-as-Map cast produced. */
+  private static Map<String, String> toStringMap(JsonObject json) {
+    Map<String, String> map = new HashMap<>();
+    for (String key : json.keySet()) {
+      JsonElement value = json.get(key);
+      map.put(key, value.isJsonNull() ? null : (value.isJsonPrimitive() ? value.getAsString() : value.toString()));
+    }
+    return map;
+  }
+
+  private SourceType getSourceType(JsonObject source) {
     SourceType type;
     try {
-      type = SourceType.valueOf((String) source.get("type"));
+      type = SourceType.valueOf(getString(source, "type"));
     } catch (Exception e) {
       logger.error("Unknown source type '{}'", source.get("type"));
       throw new IllegalArgumentException("Unknown source type");
@@ -785,41 +800,41 @@ public class IndexServiceImpl implements IndexService {
    * Get the access control list from a JSON representation
    *
    * @param metadataJson
-   *          The {@link JSONObject} that has the access json
+   *          The JSON object that has the access json
    * @return An {@link AccessControlList}
    * @throws IllegalArgumentException
    *           Thrown if unable to parse the access control list
    */
-  private AccessControlList getAccessControlList(JSONObject metadataJson) {
+  private AccessControlList getAccessControlList(JsonObject metadataJson) {
     AccessControlList acl = new AccessControlList();
-    JSONObject accessJson = (JSONObject) metadataJson.get("access");
+    JsonObject accessJson = metadataJson.getAsJsonObject("access");
     if (accessJson != null) {
       try {
-        acl = AccessControlParser.parseAcl(accessJson.toJSONString());
+        acl = AccessControlParser.parseAcl(accessJson.toString());
       } catch (Exception e) {
-        throw new IllegalArgumentException("Unable to parse access control list: " + accessJson.toJSONString());
+        throw new IllegalArgumentException("Unable to parse access control list: " + accessJson.toString());
       }
     }
     return acl;
   }
 
-  public String createEvent(JSONObject metadataJson, MediaPackage mp) throws ParseException, IOException,
+  public String createEvent(JsonObject metadataJson, MediaPackage mp) throws ParseException, IOException,
           MediaPackageException, IngestException, NotFoundException, SchedulerException, UnauthorizedException {
     if (metadataJson == null) {
       throw new IllegalArgumentException("No metadata set");
     }
 
-    JSONObject source = (JSONObject) metadataJson.get("source");
+    JsonObject source = metadataJson.getAsJsonObject("source");
     if (source == null) {
       throw new IllegalArgumentException("No source field in metadata");
     }
 
-    JSONObject processing = (JSONObject) metadataJson.get("processing");
+    JsonObject processing = metadataJson.getAsJsonObject("processing");
     if (processing == null) {
       throw new IllegalArgumentException("No processing field in metadata");
     }
 
-    JSONArray allEventMetadataJson = (JSONArray) metadataJson.get("metadata");
+    JsonArray allEventMetadataJson = metadataJson.getAsJsonArray("metadata");
     if (allEventMetadataJson == null) {
       throw new IllegalArgumentException("No metadata field in metadata");
     }
@@ -860,7 +875,7 @@ public class IndexServiceImpl implements IndexService {
     }
 
     // Get Workflow
-    String workflowTemplate = (String) eventHttpServletRequest.getProcessing().get().get("workflow");
+    String workflowTemplate = getString(eventHttpServletRequest.getProcessing().get(), "workflow");
     if (workflowTemplate == null) {
       throw new IllegalArgumentException("No workflow template in metadata");
     }
@@ -872,18 +887,18 @@ public class IndexServiceImpl implements IndexService {
             .getMetadataByAdapter(getCommonEventCatalogUIAdapter());
 
     Date currentStartDate = null;
-    JSONObject sourceMetadata = (JSONObject) eventHttpServletRequest.getSource().get().get("metadata");
+    JsonObject sourceMetadata = eventHttpServletRequest.getSource().get().getAsJsonObject("metadata");
     if (sourceMetadata != null
             && (type.equals(SourceType.SCHEDULE_SINGLE) || type.equals(SourceType.SCHEDULE_MULTIPLE))) {
       try {
         MetadataField current = eventMetadata.getOutputFields().get("location");
-        eventMetadata.updateStringField(current, (String) sourceMetadata.get("device"));
+        eventMetadata.updateStringField(current, getString(sourceMetadata, "device"));
       } catch (Exception e) {
         logger.warn("Unable to parse device {}", sourceMetadata.get("device"));
         throw new IllegalArgumentException("Unable to parse device");
       }
-      if (StringUtils.isNotEmpty((String) sourceMetadata.get("start"))) {
-        currentStartDate = EncodingSchemeUtils.decodeDate((String) sourceMetadata.get("start"));
+      if (StringUtils.isNotEmpty(getString(sourceMetadata, "start"))) {
+        currentStartDate = EncodingSchemeUtils.decodeDate(getString(sourceMetadata, "start"));
       }
     }
 
@@ -938,14 +953,14 @@ public class IndexServiceImpl implements IndexService {
             && (type.equals(SourceType.SCHEDULE_SINGLE) || type.equals(SourceType.SCHEDULE_MULTIPLE))) {
       Properties configuration;
       try {
-        captureAgentId = (String) sourceMetadata.get("device");
-        configuration = captureAgentStateService.getAgentConfiguration((String) sourceMetadata.get("device"));
+        captureAgentId = getString(sourceMetadata, "device");
+        configuration = captureAgentStateService.getAgentConfiguration(getString(sourceMetadata, "device"));
       } catch (Exception e) {
         logger.warn("Unable to parse device {}: because:", sourceMetadata.get("device"), e);
         throw new IllegalArgumentException("Unable to parse device");
       }
 
-      String durationString = (String) sourceMetadata.get("duration");
+      String durationString = getString(sourceMetadata, "duration");
       if (StringUtils.isBlank(durationString)) {
         throw new IllegalArgumentException("No duration in source metadata");
       }
@@ -962,12 +977,12 @@ public class IndexServiceImpl implements IndexService {
       }
 
       org.joda.time.DateTime now = new org.joda.time.DateTime(DateTimeZone.UTC);
-      start = now.withMillis(DateTimeSupport.fromUTC((String) sourceMetadata.get("start")));
-      end = now.withMillis(DateTimeSupport.fromUTC((String) sourceMetadata.get("end")));
+      start = now.withMillis(DateTimeSupport.fromUTC(getString(sourceMetadata, "start")));
+      end = now.withMillis(DateTimeSupport.fromUTC(getString(sourceMetadata, "end")));
       duration = Long.parseLong(durationString);
       DublinCoreValue period = EncodingSchemeUtils
               .encodePeriod(new DCMIPeriod(start.toDate(), start.plus(duration).toDate()), Precision.Second);
-      String inputs = (String) sourceMetadata.get("inputs");
+      String inputs = getString(sourceMetadata, "inputs");
 
       caProperties.putAll(configuration);
       dc.set(DublinCore.PROPERTY_TEMPORAL, period);
@@ -975,13 +990,12 @@ public class IndexServiceImpl implements IndexService {
     }
 
     if (type.equals(SourceType.SCHEDULE_MULTIPLE)) {
-      rRule = new RRule((String) sourceMetadata.get("rrule"));
+      rRule = new RRule(getString(sourceMetadata, "rrule"));
     }
 
     Map<String, String> configuration = new HashMap<>();
     if (eventHttpServletRequest.getProcessing().get().get("configuration") != null) {
-      configuration = new HashMap<>((JSONObject) eventHttpServletRequest.getProcessing().get().get("configuration"));
-
+      configuration = toStringMap(eventHttpServletRequest.getProcessing().get().getAsJsonObject("configuration"));
     }
     for (Entry<String, String> entry : configuration.entrySet()) {
       caProperties.put(WORKFLOW_CONFIG_PREFIX.concat(entry.getKey()), entry.getValue());
@@ -1117,13 +1131,13 @@ public class IndexServiceImpl implements IndexService {
    *          a set of mapping metadata for the asset list
    * @return mediapackage updated with assets
    */
-  @SuppressWarnings("unchecked")
-  protected MediaPackage updateMpAssetFlavor(List<String> assetList, MediaPackage mp, JSONArray assetMetadata) {
-    // Create JSONObject data map
-    JSONObject assetDataMap = new JSONObject();
-    for (int i = 0; i < assetMetadata.size(); i++) {
+  protected MediaPackage updateMpAssetFlavor(List<String> assetList, MediaPackage mp, JsonArray assetMetadata) {
+    // Index the asset descriptions by their id
+    Map<String, JsonObject> assetDataMap = new HashMap<>();
+    for (JsonElement element : assetMetadata) {
       try {
-        assetDataMap.put(((JSONObject) assetMetadata.get(i)).get("id"), assetMetadata.get(i));
+        JsonObject asset = element.getAsJsonObject();
+        assetDataMap.put(getString(asset, "id"), asset);
       } catch (Exception e) {
         throw new IllegalArgumentException("Unable to parse metadata", e);
       }
@@ -1140,10 +1154,11 @@ public class IndexServiceImpl implements IndexService {
       }
       try {
         if ((assetMetadata != null) && (assetDataMap.get(asset) != null)) {
-          String type = (String)((JSONObject) assetDataMap.get(asset)).get("type");
-          String flavorType = (String)((JSONObject) assetDataMap.get(asset)).get("flavorType");
-          String flavorSubType = (String)((JSONObject) assetDataMap.get(asset)).get("flavorSubType");
-          String tags = (String)((JSONObject) assetDataMap.get(asset)).get("tags");
+          JsonObject assetData = assetDataMap.get(asset);
+          String type = getString(assetData, "type");
+          String flavorType = getString(assetData, "flavorType");
+          String flavorSubType = getString(assetData, "flavorSubType");
+          String tags = getString(assetData, "tags");
           String[] tagsArray = null;
           // Captions may have lang:LANG_CODE tag set.
           String langTag = null;
@@ -1157,7 +1172,7 @@ public class IndexServiceImpl implements IndexService {
             }
           }
           // Use 'multiple' setting to allow multiple elements with same flavor or not.
-          boolean overwriteExisting = !(Boolean) ((JSONObject) assetDataMap.get(asset)).getOrDefault("multiple", false);
+          boolean overwriteExisting = !(assetData.has("multiple") && assetData.get("multiple").getAsBoolean());
           if (patternNumberedAsset.matcher(flavorSubType).matches() && (assetNumber != null)) {
             flavorSubType = assetNumber;
           }
@@ -1235,7 +1250,7 @@ public class IndexServiceImpl implements IndexService {
         }
       } catch (Exception e) {
         // Assuming a parse error versus a file error and logging the error type
-        throw new IllegalArgumentException("Unable to parse metadata: " + assetMetadata.toJSONString(), e);
+        throw new IllegalArgumentException("Unable to parse metadata: " + assetMetadata.toString(), e);
       }
     }
     return mp;
@@ -1249,8 +1264,8 @@ public class IndexServiceImpl implements IndexService {
     final MetadataList metadataList;
     try {
       metadataList = getMetadataListWithAllEventCatalogUIAdapters();
-      MetadataJson.fillListFromJson(metadataList, (JSONArray) new JSONParser().parse(metadataJSON));
-    } catch (final org.json.simple.parser.ParseException e) {
+      MetadataJson.fillListFromJson(metadataList, JsonParser.parseString(metadataJSON).getAsJsonArray());
+    } catch (final JsonParseException e) {
       throw new IllegalArgumentException("Not able to parse the event metadata " + metadataJSON, e);
     }
     return updateEventMetadata(id, metadataList, index);
@@ -1876,28 +1891,28 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
-  public String createSeries(JSONObject metadata)
+  public String createSeries(JsonObject metadata)
           throws IllegalArgumentException, IndexServiceException, UnauthorizedException {
 
-    JSONArray seriesMetadataJson = (JSONArray) metadata.get("metadata");
+    JsonArray seriesMetadataJson = metadata.getAsJsonArray("metadata");
     if (seriesMetadataJson == null) {
       throw new IllegalArgumentException("No metadata field in metadata");
     }
 
-    JSONObject options = (JSONObject) metadata.get("options");
+    JsonObject options = metadata.getAsJsonObject("options");
     if (options == null) {
       throw new IllegalArgumentException("No options field in metadata");
     }
 
     Optional<Long> themeId = Optional.empty();
-    Long theme = (Long) metadata.get("theme");
-    if (theme != null) {
-      themeId = Optional.of(theme);
+    JsonElement theme = metadata.get("theme");
+    if (theme != null && !theme.isJsonNull()) {
+      themeId = Optional.of(theme.getAsLong());
     }
 
     Map<String, String> optionsMap;
     try {
-      optionsMap = JSONUtils.toMap(new org.codehaus.jettison.json.JSONObject(options.toJSONString()));
+      optionsMap = JSONUtils.toMap(new org.codehaus.jettison.json.JSONObject(options.toString()));
     } catch (JSONException e) {
       throw new IllegalArgumentException("Unable to parse options to map", e);
     }
@@ -2071,8 +2086,8 @@ public class IndexServiceImpl implements IndexService {
           throws IllegalArgumentException, IndexServiceException, NotFoundException {
     checkSeriesExists(seriesID, index);
     try {
-      MetadataJson.fillListFromJson(metadataList, (JSONArray) new JSONParser().parse(metadataJSON));
-    } catch (final org.json.simple.parser.ParseException e) {
+      MetadataJson.fillListFromJson(metadataList, JsonParser.parseString(metadataJSON).getAsJsonArray());
+    } catch (final JsonParseException e) {
       throw new IllegalArgumentException("Not able to parse the event metadata: " + metadataJSON, e);
     }
 

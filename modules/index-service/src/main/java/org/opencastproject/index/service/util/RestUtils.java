@@ -30,7 +30,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.JSONValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -290,8 +289,8 @@ public final class RestUtils {
     return filters;
   }
 
-  public static String getJsonString(Object jsonObject) {
-    return JSONValue.toJSONString(jsonObject);
+  public static String getJsonString(JsonElement json) {
+    return json.toString();
   }
 
   /**

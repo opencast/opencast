@@ -82,6 +82,10 @@ import org.opencastproject.workflow.api.WorkflowDatabaseException;
 import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workspace.api.Workspace;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.Period;
 import net.fortuna.ical4j.model.property.RRule;
@@ -91,9 +95,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.easymock.Capture;
 import org.easymock.EasyMock;
 import org.easymock.IAnswer;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -123,7 +124,6 @@ import java.util.UUID;
 
 public class IndexServiceImplTest {
 
-  private static final JSONParser parser = new JSONParser();
   private static final Logger logger = LoggerFactory.getLogger(IndexServiceImplTest.class);
 
   /**
@@ -255,9 +255,8 @@ public class IndexServiceImplTest {
   @Test(expected = IllegalArgumentException.class)
   public void testCreateEventInputEmptyJsonExpectsIllegalArgumentException()
           throws IllegalArgumentException, ConfigurationException, MediaPackageException, IOException,
-          IngestException, ParseException, NotFoundException, SchedulerException, UnauthorizedException,
-          org.json.simple.parser.ParseException {
-    JSONObject metadataJson = (JSONObject) parser.parse("{}");
+          IngestException, ParseException, NotFoundException, SchedulerException, UnauthorizedException {
+    JsonObject metadataJson = JsonParser.parseString("{}").getAsJsonObject();
 
     IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
     indexServiceImpl.setIngestService(setupIngestServiceWithMediaPackage());
@@ -267,11 +266,10 @@ public class IndexServiceImplTest {
   @Test(expected = IllegalArgumentException.class)
   public void testCreateEventInputNoSourceExpectsIllegalArgumentException()
           throws IllegalArgumentException, ConfigurationException, MediaPackageException, IOException,
-          IngestException, ParseException, NotFoundException, SchedulerException, UnauthorizedException,
-          org.json.simple.parser.ParseException {
+          IngestException, ParseException, NotFoundException, SchedulerException, UnauthorizedException {
     String testResourceLocation = "/events/create-event-no-source.json";
-    JSONObject metadataJson = (JSONObject) parser
-            .parse(IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation)));
+    JsonObject metadataJson = JsonParser.parseString(
+        IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation))).getAsJsonObject();
 
     IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
     indexServiceImpl.setIngestService(setupIngestServiceWithMediaPackage());
@@ -281,11 +279,10 @@ public class IndexServiceImplTest {
   @Test(expected = IllegalArgumentException.class)
   public void testCreateEventInputNoProcessingExpectsIllegalArgumentException()
           throws IllegalArgumentException, ConfigurationException, MediaPackageException, IOException,
-          IngestException, ParseException, NotFoundException, SchedulerException, UnauthorizedException,
-          org.json.simple.parser.ParseException {
+          IngestException, ParseException, NotFoundException, SchedulerException, UnauthorizedException {
     String testResourceLocation = "/events/create-event-no-processing.json";
-    JSONObject metadataJson = (JSONObject) parser
-            .parse(IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation)));
+    JsonObject metadataJson = JsonParser.parseString(
+        IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation))).getAsJsonObject();
 
     IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
     indexServiceImpl.setIngestService(setupIngestServiceWithMediaPackage());
@@ -295,11 +292,10 @@ public class IndexServiceImplTest {
   @Test(expected = IllegalArgumentException.class)
   public void testCreateEventInputNoMetadataExpectsIllegalArgumentException()
           throws IllegalArgumentException, ConfigurationException, MediaPackageException, IOException,
-          IngestException, ParseException, NotFoundException, SchedulerException, UnauthorizedException,
-          org.json.simple.parser.ParseException {
+          IngestException, ParseException, NotFoundException, SchedulerException, UnauthorizedException {
     String testResourceLocation = "/events/create-event-no-metadata.json";
-    JSONObject metadataJson = (JSONObject) parser
-            .parse(IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation)));
+    JsonObject metadataJson = JsonParser.parseString(
+        IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation))).getAsJsonObject();
 
     IndexServiceImpl indexServiceImpl = new IndexServiceImpl();
     indexServiceImpl.setIngestService(setupIngestServiceWithMediaPackage());
@@ -314,8 +310,8 @@ public class IndexServiceImplTest {
     String[] creators = new String[] {};
     Id mpId = new IdImpl("mp-id");
     String testResourceLocation = "/events/create-event-no-workflow-configuration.json";
-    JSONObject metadataJson = (JSONObject) parser
-            .parse(IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation)));
+    JsonObject metadataJson = JsonParser.parseString(
+        IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation))).getAsJsonObject();
     Capture<Catalog> result = EasyMock.newCapture();
     Capture<String> mediapackageIdResult = EasyMock.newCapture();
     Capture<String> catalogIdResult = EasyMock.newCapture();
@@ -393,8 +389,8 @@ public class IndexServiceImplTest {
     String[] creators = new String[] {};
     Id mpId = new IdImpl("mp-id");
     String testResourceLocation = "/events/create-event.json";
-    JSONObject metadataJson = (JSONObject) parser
-            .parse(IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation)));
+    JsonObject metadataJson = JsonParser.parseString(
+        IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation))).getAsJsonObject();
     Capture<Catalog> result = EasyMock.newCapture();
     Capture<String> mediapackageIdResult = EasyMock.newCapture();
     Capture<String> catalogIdResult = EasyMock.newCapture();
@@ -479,8 +475,8 @@ public class IndexServiceImplTest {
     String[] creators = new String[] {};
     Id mpId = new IdImpl("mp-id");
     String testResourceLocation = "/events/create-scheduled-event.json";
-    JSONObject metadataJson = (JSONObject) parser
-            .parse(IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation)));
+    JsonObject metadataJson = JsonParser.parseString(
+        IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation))).getAsJsonObject();
     Capture<Catalog> result = EasyMock.newCapture();
     Capture<String> mediapackageIdResult = EasyMock.newCapture();
     Capture<String> catalogIdResult = EasyMock.newCapture();
@@ -585,14 +581,14 @@ public class IndexServiceImplTest {
   }
 
   @Test
-  public void testAddAssetsToMp() throws org.json.simple.parser.ParseException, IOException, ConfigurationException,
+  public void testAddAssetsToMp() throws IOException, ConfigurationException,
           MediaPackageException, IngestException, NotFoundException {
     MediaPackage mediapackage = MediaPackageBuilderFactory.newInstance().newMediaPackageBuilder().createNew();
-    JSONArray assetMetadata =  (JSONArray) new JSONParser().parse("[{\"id\":\"attachment_attachment_notes\", "
+    JsonArray assetMetadata = JsonParser.parseString("[{\"id\":\"attachment_attachment_notes\", "
         + "\"title\": \"class handout notes\","
         + "\"flavorType\": \"attachment\","
         + "\"flavorSubType\": \"notes\","
-        + "\"type\": \"attachment\"}]");
+        + "\"type\": \"attachment\"}]").getAsJsonArray();
 
     // a test asset input stream
     List<String> assetList = new LinkedList<String>();
@@ -621,8 +617,8 @@ public class IndexServiceImplTest {
     String[] creators = new String[] {};
     Id mpId = new IdImpl("mp-id");
     String testResourceLocation = "/events/create-recurring-event.json";
-    JSONObject metadataJson = (JSONObject) parser
-            .parse(IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation)));
+    JsonObject metadataJson = JsonParser.parseString(
+        IOUtils.toString(IndexServiceImplTest.class.getResourceAsStream(testResourceLocation))).getAsJsonObject();
     Capture<String> mediapackageIdResult = EasyMock.newCapture();
     Capture<String> catalogIdResult = EasyMock.newCapture();
     Capture<String> filenameResult = EasyMock.newCapture();
