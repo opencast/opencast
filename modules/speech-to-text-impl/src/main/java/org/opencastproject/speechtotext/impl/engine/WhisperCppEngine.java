@@ -24,16 +24,17 @@ package org.opencastproject.speechtotext.impl.engine;
 import org.opencastproject.speechtotext.api.SpeechToTextEngine;
 import org.opencastproject.speechtotext.api.SpeechToTextEngineException;
 import org.opencastproject.speechtotext.util.LangCodeUtil;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.OsgiUtil;
+
+import com.google.gson.JsonObject;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -547,14 +548,11 @@ public class WhisperCppEngine implements SpeechToTextEngine {
 
     // Detect language if not set
     if (subtitleLanguage.isBlank()) {
-      JSONParser jsonParser = new JSONParser();
       File json = new File(workingDirectory, outputName + ".json");
-      try {
-        FileReader reader = new FileReader(json);
-        Object obj = jsonParser.parse(reader);
-        JSONObject jsonObject = (JSONObject) obj;
-        JSONObject result = (JSONObject) jsonObject.get("result");
-        subtitleLanguage = (String) result.get("language");
+      try (FileReader reader = new FileReader(json)) {
+        JsonObject jsonObject = GsonUtil.gson().fromJson(reader, JsonObject.class);
+        JsonObject result = jsonObject.getAsJsonObject("result");
+        subtitleLanguage = GsonUtil.getStringOrNull(result, "language");
         // convert language name to iso3 if necessary or take default
         subtitleLanguage = LangCodeUtil.getIso2FromLang(subtitleLanguage, subtitleLanguage);
         logger.info("Language detected by WhisperC++: {}", subtitleLanguage);
