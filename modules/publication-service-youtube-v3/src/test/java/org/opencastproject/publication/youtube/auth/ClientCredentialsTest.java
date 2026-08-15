@@ -27,7 +27,6 @@ import static org.junit.Assert.fail;
 
 import org.opencastproject.publication.youtube.UnitTestUtils;
 
-import org.json.simple.parser.ParseException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -46,7 +45,7 @@ public class ClientCredentialsTest {
   }
 
   @Test
-  public void testParsingJSON() throws IOException, ParseException {
+  public void testParsingJSON() throws IOException {
     final String clientId = "652137994117.apps.googleusercontent.com";
     final File clientSecretsFile = UnitTestUtils.getMockClientSecretsFile(clientId,
         testFolder.newFile("client-secrets-youtube-v3.json"));

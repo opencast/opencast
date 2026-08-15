@@ -22,12 +22,12 @@
 
 package org.opencastproject.publication.youtube.auth;
 
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.data.Collections;
 
+import com.google.gson.JsonObject;
+
 import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 import java.io.File;
 import java.io.FileReader;
@@ -66,7 +66,7 @@ public final class ClientCredentials {
     return clientSecrets;
   }
 
-  public void setClientSecrets(final File clientSecrets) throws IOException, ParseException {
+  public void setClientSecrets(final File clientSecrets) throws IOException {
     this.clientSecrets = clientSecrets;
     this.clientId = getValueFromArray(clientSecrets);
   }
@@ -96,21 +96,22 @@ public final class ClientCredentials {
    * @throws java.io.IOException
    * @throws java.lang.IllegalArgumentException
    */
-  private String getValueFromArray(final File file) throws IOException, ParseException, IllegalArgumentException {
-    final JSONParser parser = new JSONParser();
-    final FileReader reader = new FileReader(file);
-    final JSONObject jsonObject = (JSONObject) parser.parse(reader);
+  private String getValueFromArray(final File file) throws IOException, IllegalArgumentException {
+    final JsonObject jsonObject;
+    try (FileReader reader = new FileReader(file)) {
+      jsonObject = GsonUtil.gson().fromJson(reader, JsonObject.class);
+    }
 
-    if (!jsonObject.containsKey("installed")) {
+    if (jsonObject == null || !jsonObject.has("installed")) {
       throw new IllegalArgumentException("client_secret file does not contain \"installed\" as a top level key. Did you"
           + "set the type for your 'OAuth 2.0-Client-ID' correctly?");
     }
-    final JSONObject array = (JSONObject) jsonObject.get("installed");
+    final JsonObject array = jsonObject.getAsJsonObject("installed");
 
-    if (!array.containsKey("client_id")) {
+    if (!array.has("client_id")) {
       throw new IllegalArgumentException("client_secret file does not contain \"client_id\".");
     }
-    return (String) array.get("client_id");
+    return array.get("client_id").getAsString();
   }
 
 }
