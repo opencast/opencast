@@ -66,6 +66,11 @@
           <groupId>org.apache.httpcomponents</groupId>
           <artifactId>httpclient</artifactId>
         </exclusion>
+        <!-- Declared by basiclti-util but referenced by none of its classes -->
+        <exclusion>
+          <groupId>com.googlecode.json-simple</groupId>
+          <artifactId>json-simple</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>
     <!-- LTI 1.1 end -->

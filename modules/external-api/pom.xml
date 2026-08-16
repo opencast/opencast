@@ -265,8 +265,6 @@
               javax.servlet.http,
               org.apache.commons.lang3,
               org.osgi.service.component,
-              org.json.simple,
-              org.json.simple.parser,
               org.osgi.framework,
               org.slf4j,
               javax.ws.rs;version=2.0.1,
