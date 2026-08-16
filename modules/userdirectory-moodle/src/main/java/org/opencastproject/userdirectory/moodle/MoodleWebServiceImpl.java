@@ -196,7 +196,7 @@ public class MoodleWebServiceImpl implements MoodleWebService {
   /**
    * Parses the returned Moodle response for a list of IDs.
    *
-   * @param resp The Moodle response. It should be of type {@link JSONArray}.
+   * @param resp The Moodle response. It should be of type {@link JsonArray}.
    * @return A list of Moodle IDs.
    * @throws MoodleWebServiceException If the parsing failed because the response format was unexpected.
    */
