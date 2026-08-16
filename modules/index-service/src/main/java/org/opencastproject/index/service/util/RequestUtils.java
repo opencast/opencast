@@ -54,7 +54,7 @@ public final class RequestUtils {
    * @param json
    *          The json input.
    * @return A {@link Map} of the metadata fields ids and values.
-   * @throws JsonSyntaxException
+   * @throws com.google.gson.JsonSyntaxException
    *           Thrown if the json is malformed.
    */
   public static Map<String, String> getKeyValueMap(String json) {
