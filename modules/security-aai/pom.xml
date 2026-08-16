@@ -83,6 +83,11 @@
       <artifactId>spring-security-core</artifactId>
     </dependency>
     <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>org.hamcrest</groupId>
       <artifactId>hamcrest</artifactId>
       <scope>test</scope>
@@ -102,7 +107,6 @@
             <configuration>
               <failOnWarning>true</failOnWarning>
               <ignoredUsedUndeclaredDependencies>
-                <ignoredUsedUndeclaredDependency>junit:junit</ignoredUsedUndeclaredDependency>
                 <ignoredUsedUndeclaredDependency>org.springframework:spring-expression</ignoredUsedUndeclaredDependency>
                 <ignoredUsedUndeclaredDependency>org.springframework:spring-core</ignoredUsedUndeclaredDependency>
                 <ignoredUsedUndeclaredDependency>org.springframework.security:spring-security-core</ignoredUsedUndeclaredDependency>
