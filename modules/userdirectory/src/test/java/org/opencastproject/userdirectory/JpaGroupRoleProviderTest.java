@@ -205,6 +205,12 @@ public class JpaGroupRoleProviderTest {
   }
 
   @Test
+  public void testCreateGroupWithoutName() throws Exception {
+    thrown.expect(IllegalArgumentException.class);
+    provider.createGroup(null, "Test group", null, null);
+  }
+
+  @Test
   public void testRolesForUser() throws UnauthorizedException {
     Set<JpaRole> authorities = new HashSet<JpaRole>();
     authorities.add(new JpaRole("ROLE_ASTRO_101_SPRING_2011_STUDENT", org1));
