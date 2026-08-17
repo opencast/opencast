@@ -4,7 +4,7 @@
   <meta http-equiv=content-type content="text/html; charset=utf-8" />
   <meta name=viewport content="width=device-width, initial-scale=1">
 
-  <title>${meta.title} REST Documentation</title>
+  <title>${meta.title?html} REST Documentation</title>
   <link rel=stylesheet type=text/css href=styles/docs.css />
 </head>
 <body>
@@ -14,14 +14,14 @@
   </a>
 </header>
 
-<h1><div class=center>${meta.title} REST Documentation</div></h1>
+<h1><span class=center>${meta.title?html} REST Documentation</span></h1>
 
-<summary>
+<div class=abstract>
   <div class=center>
-    <div>${meta.url}</div>
+    <div>${meta.url?html}</div>
     <div>${(meta.abstract)!}</div>
   </div>
-</summary>
+</div>
 
 <main class=center>
 
@@ -52,8 +52,8 @@
 <#list endpointHolder.endpoints>
 <h2>${endpointHolder.title} methods</h2>
 <#items as endpoint>
-<table id="${endpoint.name}-${endpoint?counter}" class="method" cellpadding="0px" cellspacing="0px"
-  summary="${endpointHolder.title} function for the ${endpoint.method} ${endpoint.path} REST endpoint, Name of the attribute followed by the value">
+<#assign formId = "${endpoint.name}-${endpoint?counter}">
+<table id="${formId}" class="method">
   <thead>
     <tr>
       <th>Method / Path:</th>
@@ -84,15 +84,12 @@
         <tt>
           ${param.name}: ${param.description!""}
           <#if param.xmlSchema??>
-            <div>
-              <a href="#" class="show_form_link">XML Schema</a>
-              <div class="hidden_form hidden">
-                <#if param.escapedXmlSchema??><pre>${param.escapedXmlSchema}</pre></#if>
-              </div>
-              <a href="#" class="hide_form_link hidden">Hide</a>
-            </div>
+            <details>
+              <summary>XML Schema</summary>
+              <#if param.escapedXmlSchema??><pre>${param.escapedXmlSchema}</pre></#if>
+            </details>
           </#if>
-        </tt><#if param_has_next> <br/></#if>
+        </tt><#sep><br/></#sep>
         </#list>
       </td>
     </tr>
@@ -133,25 +130,22 @@
       <th scope="row">Status codes:</th>
       <td>
         <#list endpoint.statuses as status>
-        <tt>${status.code}: ${status.name}</tt>, ${status.description!"<em>NONE</em>"}<#if status_has_next> <br/></#if>
+        <tt>${status.code}: ${status.name}</tt>, ${status.description!"<em>NONE</em>"}<#sep> <br/></#sep>
         <#else>
         <em>NONE</em>
         </#list>
       </td>
     </tr>
     <#if (endpoint.returnTypeSchema??)>
-      <tr class="method">
-        <th scope="row">Returned Entity Schema:</th>
-        <td>
-          <div>
-            <a href="#" class="show_form_link">Click to view</a>
-            <div class="hidden_form hidden">
-              <#if endpoint.escapedReturnTypeSchema??><pre>${endpoint.escapedReturnTypeSchema}</pre></#if>
-            </div>
-            <a href="#" class="hide_form_link hidden">Hide</a>
-          </div>
-        </td>
-      </tr>
+    <tr class="method">
+      <th scope="row">Returned Entity Schema:</th>
+      <td>
+        <details>
+          <summary>Click to view</summary>
+          <#if endpoint.escapedReturnTypeSchema??><pre>${endpoint.escapedReturnTypeSchema}</pre></#if>
+        </details>
+      </td>
+    </tr>
     </#if>
     <#if (endpoint.notes?size > 0)>
     <tr class="method">
@@ -169,104 +163,83 @@
       <th scope="row">Testing:</th>
       <td>
         <div class="spaced"><strong>Sample:</strong>
-        <tt class="sample_url">${endpoint.path}${endpoint.queryString!}</tt>
-        </div>
-        <#if endpoint.form??>
-        <#if (endpoint.form.basic)><#-- link to the basic endpoint path -->
-        <a href="${meta.url}${endpoint.path}${endpoint.queryString!}">${meta.url}${endpoint.path}${endpoint.queryString!}</a>
+        <#if endpoint.method == "GET">
+        <a href="${meta.url}${endpoint.path}${endpoint.queryString!}"><tt>${endpoint.path}${endpoint.queryString!}</tt></a>
         <#else>
-        <a href="#" class="show_form_link">Testing form (click to reveal)</a>
-        <div class="hidden_form hidden">
-          <form id="form_${endpoint.name}-${endpoint?counter}"
-                class="form_test_form"
-                action="${meta.url}${endpoint.path}"
-                method="${endpoint.method?lower_case}"<#if endpoint.form.fileUpload> enctype="multipart/form-data"</#if>>
-            <input class="form_action_holder" type="hidden" value="${meta.url}${endpoint.path}" />
-            <input class="form_endpoint_name" type="hidden" value="${endpoint.name}-${endpoint?counter}" />
+        <tt>${endpoint.path}${endpoint.queryString!}</tt>
+        </#if>
+        </div>
+        <details>
+          <summary>Testing form</summary>
+          <form id="form_${formId}" class="form_test_form" action="${meta.url?html}${endpoint.path?html}">
             <input class="form_method" type="hidden" value="${endpoint.method}" />
-            <#if (endpoint.form.ajaxSubmit)>
-            <input class="form_ajax_submit" type="hidden" value="1" />
-            </#if>
             <div class="spaced">
-                <strong>Form action:</strong> <tt class="form_path">${meta.url}${endpoint.path}</tt>
+              <strong>Form action:</strong> <tt class="form_path">${meta.url?html}${endpoint.path?html}</tt>
             </div>
-            <table class="testing" cellpadding="0" cellspacing="0">
+            <#if (endpoint.form.items?size > 0)>
+            <table class="testing">
               <#list endpoint.form.items as item>
-              <tr class="form_field <#if item.required>form_required<#else>form_optional</#if>">
+              <tr>
                 <#if item.type == "text">
-                <td class="form_textarea" colspan="3">
-                  <label for="${endpoint.name}-${endpoint?counter}_${item.name}">${item.name}</label>:<br/>
-                  <textarea id="${endpoint.name}-${endpoint?counter}_${item.name}"
+                <#if (item.attributes.rows)??>
+                  <#assign rows = item.attributes.rows>
+                <#elseif item.name == "BODY">
+                  <#assign rows = "8">
+                <#else>
+                  <#assign rows = "3">
+                </#if>
+                <td colspan="3">
+                  <label for="${formId}_${item.name}">${item.name}</label>:<br/>
+                  <textarea id="${formId}_${item.name}"
                             name="${item.name}"
-                            class="form_field_text form_param_submit<#if item.required> form_param_required</#if>"
-                            rows="<#if item.attributes.rows??>${item.attributes.rows}<#else><#if item.name == "BODY">8<#else>3</#if></#if>"
-                            cols="${(item.attributes.cols)!'80'}">${item.defaultValue!}</textarea>
+                            class="form_param_submit"<#if item.required> required</#if>
+                            rows="${rows?html}"
+                            cols="${((item.attributes.cols)!'80')?html}">${(item.defaultValue!"")?html}</textarea>
                   <div class="form_field_description">${item.description!}</div>
                 </td>
-                <#elseif item.type == "boolean">
-                <td class="form_label">
-                  <#if item.required><span title="required">*</span>&nbsp;</#if><label for="${endpoint.name}-${endpoint?counter}_${item.name}">${item.name}</label>:
-                </td>
-                <td>
-                  <input id="${endpoint.name}-${endpoint?counter}_${item.name}"
-                         name="${item.name}"
-                         class="form_field <#if item.path>form_param_path<#else>form_param_submit</#if><#if item.required> form_param_required</#if>"
-                         type="checkbox"
-                         value="true"
-                         <#if item.defaultValue?? && item.defaultValue == "true">checked</#if> />
-                </td>
-                <td class="form_field_description">${item.description!}</td>
-                <#elseif item.type == "file">
-                <td class="form_label">
-                  <#if item.required><span title="required">*</span>&nbsp;</#if><label for="${endpoint.name}-${endpoint?counter}_${item.name}">${item.name}</label>:
-                </td>
-                <td>
-                  <input id="${endpoint.name}-${endpoint?counter}_${item.name}"
-                         name="${item.name}"
-                         class="form_field_file"
-                         class="form_field form_param_upload<#if item.required> form_param_required</#if>"
-                         type="file" />
-                </td>
-                <td class="form_field_description">${item.description!}</td>
                 <#else>
                 <td class="form_label">
-                  <#if item.required><span title="required">*</span>&nbsp;</#if><label for="${endpoint.name}-${endpoint?counter}_${item.name}">${item.name}</label>:
+                  <#if item.required><span title="required">*</span>&nbsp;</#if><label for="${formId}_${item.name}">${item.name}</label>:
                 </td>
                 <td>
-                  <input id="${endpoint.name}-${endpoint?counter}_${item.name}"
-                         class="form_field <#if item.path>form_param_path<#else>form_param_submit</#if><#if item.required> form_param_required</#if>"
+                  <#if item.type == "boolean">
+                  <input id="${formId}_${item.name}"
                          name="${item.name}"
-                         type="text"
-                         value="${item.defaultValue!}"
-                         size="${(item.attributes.size)!'30'}" />
+                         class="<#if item.path>form_param_path<#else>form_param_submit</#if>"
+                         type="checkbox"
+                         value="true"<#if (item.defaultValue!"") == "true"> checked</#if> />
+                  <#elseif item.type == "file">
+                  <input id="${formId}_${item.name}"
+                         name="${item.name}"
+                         class="form_param_submit"<#if item.required> required</#if>
+                         type="file" />
+                  <#else>
+                  <input id="${formId}_${item.name}"
+                         name="${item.name}"
+                         class="<#if item.path>form_param_path<#else>form_param_submit</#if>"<#if item.required> required</#if>
+                         type="<#if item.type == "integer" || item.type == "float" || item.type == "long">number<#else>text</#if>"<#if item.type == "float"> step="any"</#if>
+                         value="${(item.defaultValue!"")?html}"
+                         size="${((item.attributes.size)!'30')?html}" />
+                  </#if>
                 </td>
                 <td class="form_field_description">${item.description!}</td>
                 </#if>
               </tr>
               </#list>
-              <tr>
-                <td colspan="3">
-                  <div class="form_submit">
-                    <input type="submit" value="SUBMIT" />
-                    <input type="button" value="CANCEL" />
-                  </div>
-                </td>
-              </tr>
             </table>
+            </#if>
+            <div class="form_submit">
+              <button type="submit">SUBMIT</button>
+            </div>
           </form>
-          <#if (endpoint.form.ajaxSubmit)>
           <div class="test_form_working hidden">... WORKING ...</div>
           <div class="test_form_response hidden">
             <div>Response:</div>
-            <pre style="width: 100%; border-left: 4px solid #999; padding-left: 10px;"></pre>
+            <pre></pre>
           </div>
-          </#if>
-        </div>
-        <a href="#" class="hide_form_link hidden">Hide</a>
-        </#if>
+        </details>
       </td>
     </tr>
-    </#if>
   </tbody>
 </table>
 
@@ -277,7 +250,6 @@
 </main>
 
 <!-- JAVASCRIPT below here -->
-<script type=text/javascript src=scripts/jquery.min.js></script>
 <script type=text/javascript src=scripts/docs.js></script>
 
 </body>
