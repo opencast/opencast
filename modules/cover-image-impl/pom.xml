@@ -223,6 +223,7 @@
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-dom</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-ext</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-gvt</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-i18n</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-js</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-parser</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-script</ignoredUnusedDeclaredDependency>
