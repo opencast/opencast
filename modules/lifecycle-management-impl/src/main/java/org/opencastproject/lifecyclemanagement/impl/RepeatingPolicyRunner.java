@@ -21,11 +21,11 @@
 
 package org.opencastproject.lifecyclemanagement.impl;
 
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.lifecyclemanagement.api.LifeCyclePolicy;
 import org.opencastproject.lifecyclemanagement.api.LifeCycleService;
 import org.opencastproject.lifecyclemanagement.api.LifeCycleServiceException;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.index.objects.event.Event;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;

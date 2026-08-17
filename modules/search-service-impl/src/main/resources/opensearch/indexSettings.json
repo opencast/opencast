@@ -1,0 +1,50 @@
+{
+  //Copied verbatim from opensearch-impl
+  "number_of_shards": 1,
+  "number_of_replicas": 0,
+  "max_result_window": 2147483647,
+  "analysis": {
+    "analyzer": {
+      "autocomplete_analyzer": {
+        "type": "custom",
+        "tokenizer": "whitespace_symbol_tokenizer",
+        "char_filter": [
+          "html_strip",
+          "camel_case_filter"
+        ],
+        "filter": [
+          "lowercase",
+          "icu_folding"
+        ]
+      },
+      "whitespace_analyzer": {
+        "type": "custom",
+        "tokenizer": "whitespace",
+        "char_filter": [
+          "camel_case_filter"
+        ],
+        "filter": [
+          "lowercase",
+          "icu_folding"
+        ]
+      }
+    },
+    "char_filter": {
+      "camel_case_filter": {
+        "type": "pattern_replace",
+        "pattern": "(?<=\\p{Lower})(?=\\p{Upper})",
+        "replacement": " "
+      }
+    },
+    "tokenizer": {
+      "whitespace_symbol_tokenizer": {
+        "type": "char_group",
+        "tokenize_on_chars": [
+          "whitespace",
+          "punctuation",
+          "symbol"
+        ]
+      }
+    }
+  }
+}

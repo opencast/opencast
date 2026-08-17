@@ -13,9 +13,9 @@ Setup
 --------------------
 
 When updating from an Opencast that did not have this feature, to make this work for the Admin UI and External API,
-the Elasticsearch Index needs to be updated with modified ACLs.
+the OpenSearch Index needs to be updated with modified ACLs.
 You can achieve this by calling the `/index/rebuild/AssetManager/ACL` and `/index/rebuild/Search` endpoints.
 These endpoints will reindex the event ACLs in both the AssetManager index and the Search index.
 
 In case you have custom actions configured, this will only work for the actions that were configured during the
-reindex of the Elasticsearch index. If you later add custom actions, you will have to reindex again.
+reindex of the OpenSearch index. If you later add custom actions, you will have to reindex again.

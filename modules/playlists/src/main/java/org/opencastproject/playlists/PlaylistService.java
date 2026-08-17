@@ -20,11 +20,11 @@
  */
 package org.opencastproject.playlists;
 
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.Event;
-import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.api.SearchResult;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.Event;
+import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.playlists.persistence.PlaylistDatabaseException;
 import org.opencastproject.playlists.persistence.PlaylistDatabaseService;
 import org.opencastproject.playlists.serialization.JaxbPlaylist;
@@ -79,7 +79,7 @@ public class PlaylistService {
   /** The authorization service */
   protected AuthorizationService authorizationService = null;
 
-  private ElasticsearchIndex elasticsearchIndex;
+  private OpenSearchIndex opensearchIndex;
 
   /**
    * Callback to set the playlist database
@@ -115,8 +115,8 @@ public class PlaylistService {
   }
 
   @Reference
-  void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
-    this.elasticsearchIndex = elasticsearchIndex;
+  void setOpenSearchIndex(OpenSearchIndex opensearchIndex) {
+    this.opensearchIndex = opensearchIndex;
   }
 
   @Activate
@@ -427,7 +427,7 @@ public class PlaylistService {
         if (entry.getType() == PlaylistEntryType.EVENT) {
 
           // We only get an event from the index if we have permission to do so (and if it exists ofc)
-          SearchResult<Event> result = elasticsearchIndex.getByQuery(
+          SearchResult<Event> result = opensearchIndex.getByQuery(
               new EventSearchQuery(org, user).withIdentifier(contentId));
           if (result.getPageSize() != 0) {
             Event event = result.getItems()[0].getSource();

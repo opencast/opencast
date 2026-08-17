@@ -31,19 +31,19 @@ import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.impl.AclDb;
 import org.opencastproject.authorization.xacml.manager.impl.AclServiceImpl;
 import org.opencastproject.authorization.xacml.manager.impl.persistence.JpaAclDb;
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.impl.SearchResultImpl;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.Event;
-import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
-import org.opencastproject.elasticsearch.index.objects.series.Series;
-import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderImpl;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.attachment.AttachmentImpl;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.api.SearchResultItem;
+import org.opencastproject.opensearch.impl.SearchResultImpl;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.Event;
+import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
+import org.opencastproject.opensearch.index.objects.series.Series;
+import org.opencastproject.opensearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
@@ -78,7 +78,7 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
   public static final AuthorizationService authorizationService;
   public static final AssetManager assetManager;
   public static final Workspace workspace;
-  public static final ElasticsearchIndex index;
+  public static final OpenSearchIndex index;
   public static final EntityManagerFactory authorizationEMF = newEntityManagerFactory(
           "org.opencastproject.authorization.xacml.manager");
 
@@ -99,7 +99,7 @@ public class TestRestService extends AbstractAclServiceRestEndpoint {
     SearchResultImpl<Series> seriesSearchResult = EasyMock.createNiceMock(SearchResultImpl.class);
     EasyMock.expect(seriesSearchResult.getItems()).andReturn(new SearchResultItem[] {}).anyTimes();
 
-    index = EasyMock.createNiceMock(ElasticsearchIndex.class);
+    index = EasyMock.createNiceMock(OpenSearchIndex.class);
 
     try {
       EasyMock.expect(index.getByQuery(EasyMock.anyObject(EventSearchQuery.class)))

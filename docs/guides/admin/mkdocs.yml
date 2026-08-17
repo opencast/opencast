@@ -143,7 +143,7 @@ nav:
       - Role Based Event Access: "configuration/episode-id-roles.md"
       - Search Index:
           - Overview: "configuration/searchindex/index.md"
-          - Elasticsearch: "configuration/searchindex/elasticsearch.md"
+          - OpenSearch: "configuration/searchindex/opensearch.md"
       - Serving Static Files: "configuration/serving-static-files.md"
       - Stream Security:
           - Overview: "configuration/stream-security/stream-security-overview.md"

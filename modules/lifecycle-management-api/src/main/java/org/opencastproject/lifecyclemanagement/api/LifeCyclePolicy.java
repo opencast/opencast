@@ -20,7 +20,7 @@
  */
 package org.opencastproject.lifecyclemanagement.api;
 
-import org.opencastproject.elasticsearch.index.objects.event.EventSearchQueryField;
+import org.opencastproject.opensearch.index.objects.event.EventSearchQueryField;
 
 import java.util.Date;
 import java.util.List;

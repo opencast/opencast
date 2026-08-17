@@ -21,16 +21,16 @@
 
 package org.opencastproject.graphql.datafetcher.event;
 
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.Event;
-import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.graphql.datafetcher.ContextDataFetcher;
 import org.opencastproject.graphql.event.GqlEvent;
 import org.opencastproject.graphql.exception.GraphQLRuntimeException;
 import org.opencastproject.graphql.exception.OpencastErrorType;
 import org.opencastproject.graphql.execution.context.OpencastContext;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.api.SearchResult;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.Event;
+import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.security.api.SecurityService;
 
 import java.util.Objects;
@@ -55,7 +55,7 @@ public class EventDataFetcher implements ContextDataFetcher<GqlEvent> {
   @Override
   public GqlEvent get(OpencastContext opencastContext, DataFetchingEnvironment dataFetchingEnvironment) {
     SecurityService securityService = opencastContext.getService(SecurityService.class);
-    ElasticsearchIndex searchIndex = opencastContext.getService(ElasticsearchIndex.class);
+    OpenSearchIndex searchIndex = opencastContext.getService(OpenSearchIndex.class);
     var config = opencastContext.getConfiguration();
     try {
       SearchResult<Event> result = searchIndex.getByQuery(

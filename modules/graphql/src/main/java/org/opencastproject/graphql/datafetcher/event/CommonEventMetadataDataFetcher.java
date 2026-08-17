@@ -21,9 +21,6 @@
 
 package org.opencastproject.graphql.datafetcher.event;
 
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.graphql.datafetcher.ContextDataFetcher;
 import org.opencastproject.graphql.event.GqlEvent;
 import org.opencastproject.graphql.exception.GraphQLNotFoundException;
@@ -36,6 +33,9 @@ import org.opencastproject.index.service.impl.util.EventUtils;
 import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.MetadataField;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.Event;
 import org.opencastproject.security.api.SecurityService;
 
 import java.text.DateFormat;
@@ -55,7 +55,7 @@ public class CommonEventMetadataDataFetcher implements ContextDataFetcher<Map<St
   public Map<String, Object> get(OpencastContext opencastContext, DataFetchingEnvironment dataFetchingEnvironment) {
     String eventId = ((GqlEvent)dataFetchingEnvironment.getSource()).id();
     SecurityService securityService = opencastContext.getService(SecurityService.class);
-    ElasticsearchIndex searchIndex = opencastContext.getService(ElasticsearchIndex.class);
+    OpenSearchIndex searchIndex = opencastContext.getService(OpenSearchIndex.class);
     IndexService indexService = opencastContext.getService(IndexService.class);
 
     try {
@@ -70,14 +70,14 @@ public class CommonEventMetadataDataFetcher implements ContextDataFetcher<Map<St
     }
   }
 
-  private GqlEvent getEvent(ElasticsearchIndex searchIndex, String eventId, SecurityService securityService)
+  private GqlEvent getEvent(OpenSearchIndex searchIndex, String eventId, SecurityService securityService)
           throws SearchIndexException {
     return searchIndex.getEvent(eventId, securityService.getOrganization(), securityService.getUser())
         .map(GqlEvent::new).orElseThrow(() -> new GraphQLNotFoundException(
                 String.format("Could not resolve to a %s with the id of %s", GqlEvent.TYPE_NAME, eventId)));
   }
 
-  private Event getEventFromIndexService(IndexService indexService, String eventId, ElasticsearchIndex searchIndex)
+  private Event getEventFromIndexService(IndexService indexService, String eventId, OpenSearchIndex searchIndex)
           throws IndexServiceException, SearchIndexException {
     Optional<Event> opt = indexService.getEvent(eventId, searchIndex);
     if (opt.isEmpty()) {

@@ -21,12 +21,12 @@
 
 package org.opencastproject.lifecyclemanagement.impl;
 
-import org.opencastproject.elasticsearch.index.objects.event.EventSearchQueryField;
 import org.opencastproject.lifecyclemanagement.api.Action;
 import org.opencastproject.lifecyclemanagement.api.LifeCyclePolicy;
 import org.opencastproject.lifecyclemanagement.api.LifeCyclePolicyAccessControlEntry;
 import org.opencastproject.lifecyclemanagement.api.TargetType;
 import org.opencastproject.lifecyclemanagement.api.Timing;
+import org.opencastproject.opensearch.index.objects.event.EventSearchQueryField;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;

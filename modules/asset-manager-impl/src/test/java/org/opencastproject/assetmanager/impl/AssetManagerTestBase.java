@@ -38,7 +38,6 @@ import org.opencastproject.assetmanager.api.storage.StoragePath;
 import org.opencastproject.assetmanager.impl.persistence.Database;
 import org.opencastproject.assetmanager.impl.util.TestUser;
 import org.opencastproject.db.DBTestEnv;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageBuilderFactory;
@@ -47,6 +46,7 @@ import org.opencastproject.mediapackage.MediaPackageElement.Type;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElements;
 import org.opencastproject.message.broker.api.update.AssetManagerUpdateHandler;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
 import org.opencastproject.security.api.AuthorizationService;
@@ -157,7 +157,7 @@ public abstract class AssetManagerTestBase {
             .anyTimes();
     EasyMock.replay(authorizationService);
 
-    ElasticsearchIndex esIndex = EasyMock.createNiceMock(ElasticsearchIndex.class);
+    OpenSearchIndex esIndex = EasyMock.createNiceMock(OpenSearchIndex.class);
     EasyMock.expect(esIndex.addOrUpdateEvent(EasyMock.anyString(), EasyMock.anyObject(Function.class),
             EasyMock.anyObject(Organization.class), EasyMock.anyObject(User.class)))
         .andReturn(Optional.empty()).atLeastOnce();
