@@ -57,9 +57,6 @@
          selects them as the JAXP TransformerFactory, DocumentBuilderFactory and SAXParserFactory,
          and etc/branding/coverimage.xsl uses Xalan's extension namespace. -->
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.xalan/2.7.2_3</bundle>
-    <!-- cover-image-impl inlines Batik 1.17, but not batik-i18n, so its bundle still imports
-         org.apache.batik.i18n and this is the only exporter. -->
-    <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.batik/1.7_3</bundle>
     <!-- cglib and wsdl4j have no Opencast users; both are optional imports of CXF
          (net.sf.cglib.proxy from cxf-core, javax.wsdl from cxf-rt-transports-http). -->
     <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.cglib/3.2.4_1</bundle>
