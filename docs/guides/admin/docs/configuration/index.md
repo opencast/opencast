@@ -91,7 +91,7 @@ A list of everything.
 - [Player Configuration](player/player.overview.md)
 - [Plugin Management](plugin-management.md)
 - [Search Index Overview](searchindex/index.md)
-    - [Elasticsearch](searchindex/elasticsearch.md)
+    - [OpenSearch](searchindex/opensearch.md)
 - [Serving Static Files](serving-static-files.md)
 - [Stream Security Overview](stream-security/stream-security-overview.md)
     -  [Configuration](stream-security/stream-security-config.md)

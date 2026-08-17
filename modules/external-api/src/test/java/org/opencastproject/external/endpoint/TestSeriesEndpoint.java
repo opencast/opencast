@@ -29,16 +29,16 @@ import static org.easymock.EasyMock.expectLastCall;
 import static org.easymock.EasyMock.replay;
 import static org.opencastproject.index.service.util.CatalogAdapterUtil.getCatalogProperties;
 
-import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.series.Series;
-import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.catalog.adapter.series.CommonSeriesCatalogUIAdapter;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
+import org.opencastproject.opensearch.api.SearchResult;
+import org.opencastproject.opensearch.api.SearchResultItem;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.series.Series;
+import org.opencastproject.opensearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.SecurityService;
@@ -126,12 +126,12 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     expect(searchResult.getItems()).andStubReturn(searchResultItems);
     replay(searchResult);
 
-    ElasticsearchIndex elasticsearchIndex = createMock(ElasticsearchIndex.class);
-    expect(elasticsearchIndex.getByQuery(anyObject(SeriesSearchQuery.class))).andStubReturn(searchResult);
-    expect(elasticsearchIndex.getSeries("4fd0ef66-aea5-4b7a-a62a-a4ada0eafd6f", org, user)).andStubReturn(
+    OpenSearchIndex opensearchIndex = createMock(OpenSearchIndex.class);
+    expect(opensearchIndex.getByQuery(anyObject(SeriesSearchQuery.class))).andStubReturn(searchResult);
+    expect(opensearchIndex.getSeries("4fd0ef66-aea5-4b7a-a62a-a4ada0eafd6f", org, user)).andStubReturn(
             Optional.of(series1));
-    expect(elasticsearchIndex.getSeries("unknown-series-id", org, user)).andStubReturn(Optional.empty());
-    replay(elasticsearchIndex);
+    expect(opensearchIndex.getSeries("unknown-series-id", org, user)).andStubReturn(Optional.empty());
+    replay(opensearchIndex);
 
     Map<String, String> series1Props = new HashMap<>();
     series1Props.put("live", "false");
@@ -150,7 +150,7 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
             .createSeries(EasyMock.anyObject(), EasyMock.anyObject(), EasyMock.anyObject(), EasyMock.anyObject()))
             .andStubReturn("4fd0ef66-aea5-4b7a-a62a-a4ada0eafd6f");
     expect(indexService.updateAllSeriesMetadata(EasyMock.anyString(), EasyMock.anyString(),
-            EasyMock.anyObject(ElasticsearchIndex.class))).andStubReturn(new MetadataList());
+            EasyMock.anyObject(OpenSearchIndex.class))).andStubReturn(new MetadataList());
     indexService.removeCatalogByFlavor(series1, MediaPackageElementFlavor.parseFlavor("missing/series"));
     expectLastCall().andThrow(new NotFoundException("Missing catalog"));
     indexService.removeCatalogByFlavor(series1, MediaPackageElementFlavor.parseFlavor("othercatalog/series"));
@@ -161,7 +161,7 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     expect(seriesService.getSeriesProperties("4fd0ef66-aea5-4b7a-a62a-a4ada0eafd6f")).andStubReturn(series1Props);
     replay(seriesService);
 
-    setElasticsearchIndex(elasticsearchIndex);
+    setOpenSearchIndex(opensearchIndex);
     setIndexService(indexService);
     setSecurityService(securityService);
     setSeriesService(seriesService);

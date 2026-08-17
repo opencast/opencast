@@ -38,9 +38,6 @@ import org.opencastproject.editor.api.SegmentData;
 import org.opencastproject.editor.api.TrackData;
 import org.opencastproject.editor.api.TrackSubData;
 import org.opencastproject.editor.api.WorkflowData;
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.impl.util.EventUtils;
@@ -58,6 +55,9 @@ import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.MetadataJson;
 import org.opencastproject.metadata.dublincore.MetadataList;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.Event;
 import org.opencastproject.security.api.AuthorizationService;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityConstants;
@@ -170,7 +170,7 @@ public class EditorServiceImpl implements EditorService {
   private String waveformSubtype;
   private String thumbnailSubType;
   private MediaPackageElementFlavor smilSilenceFlavor;
-  private ElasticsearchIndex searchIndex;
+  private OpenSearchIndex searchIndex;
   private MediaPackageElementFlavor captionsFlavor;
   private MediaPackageElementFlavor chapterFlavor;
   private String thumbnailWfProperty;
@@ -247,8 +247,8 @@ public class EditorServiceImpl implements EditorService {
   }
 
   @Reference
-  public void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
-    this.searchIndex = elasticsearchIndex;
+  public void setOpenSearchIndex(OpenSearchIndex opensearchIndex) {
+    this.searchIndex = opensearchIndex;
   }
 
   @Reference

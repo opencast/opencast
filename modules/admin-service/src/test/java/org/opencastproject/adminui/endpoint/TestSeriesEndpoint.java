@@ -31,14 +31,6 @@ import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.authorization.xacml.manager.impl.ManagedAclImpl;
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.Event;
-import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
-import org.opencastproject.elasticsearch.index.objects.series.Series;
-import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.index.service.catalog.adapter.series.CommonSeriesCatalogUIAdapter;
 import org.opencastproject.index.service.impl.IndexServiceImpl;
 import org.opencastproject.list.api.ListProvidersService;
@@ -52,6 +44,14 @@ import org.opencastproject.metadata.dublincore.DublinCoreXmlFormat;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.Precision;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.api.SearchResult;
+import org.opencastproject.opensearch.api.SearchResultItem;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.Event;
+import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
+import org.opencastproject.opensearch.index.objects.series.Series;
+import org.opencastproject.opensearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.DefaultOrganization;
@@ -100,7 +100,7 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
   private static final Logger logger = LoggerFactory.getLogger(TestSeriesEndpoint.class);
 
   private SeriesService seriesService;
-  private ElasticsearchIndex elasticsearchIndex;
+  private OpenSearchIndex opensearchIndex;
   private ListProvidersService listProvidersService;
   private ThemesServiceDatabaseImpl themesServiceDatabaseImpl;
 
@@ -254,7 +254,7 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
         "top-left");
     themesServiceDatabaseImpl.updateTheme(theme);
 
-    this.setIndex(elasticsearchIndex);
+    this.setIndex(opensearchIndex);
     this.setSeriesService(seriesService);
     this.setThemesServiceDatabase(themesServiceDatabaseImpl);
     this.setSecurityService(securityService);
@@ -361,21 +361,21 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
     EasyMock.expect(twoSearchResult.getDocumentCount()).andReturn(2L);
     EasyMock.expect(twoSearchResult.getSearchTime()).andReturn(0L);
 
-    elasticsearchIndex = EasyMock.createMock(ElasticsearchIndex.class);
+    opensearchIndex = EasyMock.createMock(OpenSearchIndex.class);
 
-    EasyMock.expect(elasticsearchIndex.getSeries("1", defaultOrganization, user))
+    EasyMock.expect(opensearchIndex.getSeries("1", defaultOrganization, user))
         .andReturn(Optional.of(series1));
-    EasyMock.expect(elasticsearchIndex.getSeries("2", defaultOrganization, user))
+    EasyMock.expect(opensearchIndex.getSeries("2", defaultOrganization, user))
         .andReturn(Optional.of(series2));
-    EasyMock.expect(elasticsearchIndex.getSeries("3", defaultOrganization, user))
+    EasyMock.expect(opensearchIndex.getSeries("3", defaultOrganization, user))
         .andReturn(Optional.of(series3));
-    EasyMock.expect(elasticsearchIndex.getSeries(anyString(), anyObject(Organization.class), anyObject()))
+    EasyMock.expect(opensearchIndex.getSeries(anyString(), anyObject(Organization.class), anyObject()))
         .andReturn(Optional.empty());
 
     final Capture<SeriesSearchQuery> captureSeriesSearchQuery = EasyMock.newCapture();
     final Capture<EventSearchQuery> captureEventSearchQuery = EasyMock.newCapture();
 
-    EasyMock.expect(elasticsearchIndex.getByQuery(EasyMock.capture(captureSeriesSearchQuery)))
+    EasyMock.expect(opensearchIndex.getByQuery(EasyMock.capture(captureSeriesSearchQuery)))
             .andAnswer(new IAnswer<SearchResult<Series>>() {
 
               @Override
@@ -421,7 +421,7 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
 
             });
 
-    EasyMock.expect(elasticsearchIndex.getByQuery(EasyMock.capture(captureEventSearchQuery)))
+    EasyMock.expect(opensearchIndex.getByQuery(EasyMock.capture(captureEventSearchQuery)))
             .andAnswer(new IAnswer<SearchResult<Event>>() {
 
               @Override
@@ -476,7 +476,7 @@ public class TestSeriesEndpoint extends SeriesEndpoint {
               }
             }).anyTimes();
 
-    EasyMock.replay(elasticsearchIndex, item1, item2, item3, ascSeriesSearchResult, descSeriesSearchResult,
+    EasyMock.replay(opensearchIndex, item1, item2, item3, ascSeriesSearchResult, descSeriesSearchResult,
             emptySearchResult, oneSearchResult, twoSearchResult);
   }
 

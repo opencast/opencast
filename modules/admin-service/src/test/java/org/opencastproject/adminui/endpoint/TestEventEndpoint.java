@@ -38,13 +38,6 @@ import org.opencastproject.authorization.xacml.manager.impl.ManagedAclImpl;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
-import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.impl.SearchResultImpl;
-import org.opencastproject.elasticsearch.impl.SearchResultItemImpl;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.Event;
-import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
-import org.opencastproject.elasticsearch.index.objects.series.Series;
 import org.opencastproject.event.comment.EventComment;
 import org.opencastproject.event.comment.EventCommentReply;
 import org.opencastproject.event.comment.EventCommentService;
@@ -73,6 +66,13 @@ import org.opencastproject.metadata.dublincore.DublinCoreMetadataCollection;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.metadata.dublincore.StaticMetadataServiceDublinCoreImpl;
+import org.opencastproject.opensearch.api.SearchResultItem;
+import org.opencastproject.opensearch.impl.SearchResultImpl;
+import org.opencastproject.opensearch.impl.SearchResultItemImpl;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.Event;
+import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
+import org.opencastproject.opensearch.index.objects.series.Series;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.scheduler.api.TechnicalMetadata;
 import org.opencastproject.scheduler.api.TechnicalMetadataImpl;
@@ -516,7 +516,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     EasyMock.expect(eventSearchResult.getItems()).andReturn(list).anyTimes();
     EasyMock.replay(eventSearchResult);
 
-    ElasticsearchIndex searchIndex = EasyMock.createNiceMock(ElasticsearchIndex.class);
+    OpenSearchIndex searchIndex = EasyMock.createNiceMock(OpenSearchIndex.class);
     EasyMock.expect(searchIndex.getByQuery(EasyMock.anyObject(EventSearchQuery.class))).andReturn(eventSearchResult)
             .anyTimes();
     EasyMock.replay(searchIndex);
@@ -544,9 +544,9 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     EasyMock.expect(indexService.getEventSource(event3)).andReturn(Source.WORKFLOW).anyTimes();
     MetadataList metaDataList = new MetadataList();
     EasyMock.expect(indexService.updateAllEventMetadata(EasyMock.eq("updateFailure"), EasyMock.anyString(),
-      EasyMock.anyObject(ElasticsearchIndex.class))).andThrow(new IllegalArgumentException());
+      EasyMock.anyObject(OpenSearchIndex.class))).andThrow(new IllegalArgumentException());
     EasyMock.expect(indexService.updateAllEventMetadata(EasyMock.anyString(), EasyMock.anyString(),
-      EasyMock.anyObject(ElasticsearchIndex.class))).andReturn(metaDataList).anyTimes();
+      EasyMock.anyObject(OpenSearchIndex.class))).andReturn(metaDataList).anyTimes();
     EasyMock.replay(indexService);
     env.setIndexService(indexService);
 
@@ -739,7 +739,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
   }
 
   @Override
-  public ElasticsearchIndex getIndex() {
+  public OpenSearchIndex getIndex() {
     return env.getIndex();
   }
 

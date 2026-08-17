@@ -21,7 +21,7 @@
 
 package org.opencastproject.studio.endpoint.dto;
 
-import org.opencastproject.elasticsearch.index.objects.series.Series;
+import org.opencastproject.opensearch.index.objects.series.Series;
 
 public class SeriesDto {
 

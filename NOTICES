@@ -1188,20 +1188,33 @@ search
   GroupId                                ArtifactId                                       Licenses
   com.carrotsearch                       hppc                                             The Apache Software License, Version 2.0
   commons-io                             commons-io                                       Apache License, Version 2.0
+  io.projectreactor                      reactor-core                                     Apache License, Version 2.0
   org.apache.commons                     commons-lang3                                    Apache License, Version 2.0
-  org.apache.httpcomponents              httpasyncclient                                  Apache License, Version 2.0
+  org.apache.httpcomponents.client5      httpclient5                                      Apache License, Version 2.0
+  org.apache.httpcomponents.core5        httpcore5                                        Apache License, Version 2.0
+  org.apache.httpcomponents.core5        httpcore5-h2                                     Apache License, Version 2.0
+  org.apache.httpcomponents.core5        httpcore5-reactive                               Apache License, Version 2.0
   org.apache.logging.log4j               log4j-core                                       Apache License, Version 2.0
   org.apache.lucene                      lucene-core                                      Apache 2
   org.apache.lucene                      lucene-join                                      Apache 2
+  org.apache.lucene                      lucene-queries                                   Apache 2
   org.apache.lucene                      lucene-queryparser                               Apache 2
-  org.elasticsearch                      elasticsearch                                    The Apache Software License, Version 2.0
-  org.elasticsearch                      elasticsearch-core                               The Apache Software License, Version 2.0
-  org.elasticsearch                      elasticsearch-x-content                          The Apache Software License, Version 2.0
-  org.elasticsearch.client               elasticsearch-rest-client                        The Apache Software License, Version 2.0
-  org.elasticsearch.client               elasticsearch-rest-high-level-client             The Apache Software License, Version 2.0
-  org.elasticsearch.plugin               lang-mustache-client                             The Apache Software License, Version 2.0
-  org.elasticsearch.plugin               rank-eval-client                                 The Apache Software License, Version 2.0
+  org.opensearch                         opensearch                                       The Apache Software License, Version 2.0
+  org.opensearch                         opensearch-common                                The Apache Software License, Version 2.0
+  org.opensearch                         opensearch-core                                  The Apache Software License, Version 2.0
+  org.opensearch                         opensearch-x-content                             The Apache Software License, Version 2.0
+  org.opensearch.client                  opensearch-rest-client                           The Apache Software License, Version 2.0
+  org.opensearch.client                  opensearch-rest-high-level-client                The Apache Software License, Version 2.0
+  org.opensearch.plugin                  lang-mustache-client                             The Apache Software License, Version 2.0
+  org.opensearch.plugin                  rank-eval-client                                 The Apache Software License, Version 2.0
+  org.reactivestreams                    reactive-streams                                 CC0
   org.slf4j                              slf4j-api                                        MIT License
+  org.snakeyaml                          snakeyaml-engine                                 Apache License, Version 2.0
+  tools.jackson.core                     jackson-core                                     Apache License, Version 2.0
+  tools.jackson.core                     jackson-databind                                 Apache License, Version 2.0
+  tools.jackson.dataformat               jackson-dataformat-cbor                          Apache License, Version 2.0
+  tools.jackson.dataformat               jackson-dataformat-smile                         Apache License, Version 2.0
+  tools.jackson.dataformat               jackson-dataformat-yaml                          Apache License, Version 2.0
 
 
 security-aai

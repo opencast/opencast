@@ -95,9 +95,9 @@ $ curl -sL https://deb.nodesource.com/setup_10.x | sudo -E bash -
 $ sudo apt-get install -y nodejs
 ```
 
-#### Install and start Elasticsearch with Docker
+#### Install and start OpenSearch with Docker
 
-You can use `docker compose` to easily run Elasticsearch:
+You can use `docker compose` to easily run OpenSearch:
 
 ```sh
 $ cd docs/scripts/devel-dependency-containers

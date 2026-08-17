@@ -8,4 +8,4 @@ A separate OpenSearch installation is required since Opencast version 9.0. Openc
 Elasticsearch was previously supported as an alternative to OpenSearch, but that support has been dropped as of
 Opencast 21.
 
-[OpenSearch Configuration Guide](elasticsearch.md)
+[OpenSearch Configuration Guide](opensearch.md)

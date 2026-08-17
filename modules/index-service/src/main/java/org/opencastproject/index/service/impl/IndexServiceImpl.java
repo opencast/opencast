@@ -34,12 +34,6 @@ import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.authorization.xacml.manager.api.AclServiceFactory;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.Event;
-import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
-import org.opencastproject.elasticsearch.index.objects.series.Series;
 import org.opencastproject.event.comment.EventComment;
 import org.opencastproject.event.comment.EventCommentException;
 import org.opencastproject.event.comment.EventCommentParser;
@@ -87,6 +81,12 @@ import org.opencastproject.metadata.dublincore.MetadataJson;
 import org.opencastproject.metadata.dublincore.MetadataList;
 import org.opencastproject.metadata.dublincore.Precision;
 import org.opencastproject.metadata.dublincore.SeriesCatalogUIAdapter;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.api.SearchResult;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.Event;
+import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
+import org.opencastproject.opensearch.index.objects.series.Series;
 import org.opencastproject.scheduler.api.SchedulerException;
 import org.opencastproject.scheduler.api.SchedulerService;
 import org.opencastproject.security.api.AccessControlList;
@@ -220,7 +220,7 @@ public class IndexServiceImpl implements IndexService {
   private UserDirectoryService userDirectoryService;
   private WorkflowService workflowService;
   private Workspace workspace;
-  private ElasticsearchIndex elasticsearchIndex;
+  private OpenSearchIndex opensearchIndex;
 
   /** The single thread executor service */
   private ExecutorService executorService = Executors.newSingleThreadExecutor();
@@ -239,8 +239,8 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Reference
-  public void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
-    this.elasticsearchIndex = elasticsearchIndex;
+  public void setOpenSearchIndex(OpenSearchIndex opensearchIndex) {
+    this.opensearchIndex = opensearchIndex;
   }
 
   /**
@@ -1243,7 +1243,7 @@ public class IndexServiceImpl implements IndexService {
 
   @Override
   public MetadataList updateAllEventMetadata(
-          final String id, final String metadataJSON, final ElasticsearchIndex index)
+          final String id, final String metadataJSON, final OpenSearchIndex index)
           throws IllegalArgumentException, IndexServiceException, NotFoundException, SearchIndexException,
           UnauthorizedException {
     final MetadataList metadataList;
@@ -1326,7 +1326,7 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
-  public MetadataList updateEventMetadata(String id, MetadataList metadataList, ElasticsearchIndex index)
+  public MetadataList updateEventMetadata(String id, MetadataList metadataList, OpenSearchIndex index)
           throws IndexServiceException, SearchIndexException, NotFoundException, UnauthorizedException {
     Optional<Event> optEvent = getEvent(id, index);
     if (optEvent.isEmpty()) {
@@ -1400,7 +1400,7 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
-  public AccessControlList updateEventAcl(String id, AccessControlList acl, ElasticsearchIndex index)
+  public AccessControlList updateEventAcl(String id, AccessControlList acl, OpenSearchIndex index)
           throws IllegalArgumentException, IndexServiceException, SearchIndexException, NotFoundException,
           UnauthorizedException {
     Optional<Event> optEvent = getEvent(id, index);
@@ -1447,7 +1447,7 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
-  public Optional<Event> getEvent(String id, ElasticsearchIndex index) throws SearchIndexException {
+  public Optional<Event> getEvent(String id, OpenSearchIndex index) throws SearchIndexException {
     SearchResult<Event> result = index
             .getByQuery(new EventSearchQuery(securityService.getOrganization().getId(), securityService.getUser())
                     .withIdentifier(id));
@@ -1572,9 +1572,9 @@ public class IndexServiceImpl implements IndexService {
     if ((removedScheduler || notFoundScheduler) && (removedWorkflow || notFoundWorkflow)
             && (removedArchive || notFoundArchive)) {
       try {
-        elasticsearchIndex.deleteEvent(id, securityService.getOrganization());
+        opensearchIndex.deleteEvent(id, securityService.getOrganization());
       } catch (SearchIndexException e) {
-        logger.error("Removing event {} from the {} index failed", id, elasticsearchIndex.getIndexName(), e);
+        logger.error("Removing event {} from the {} index failed", id, opensearchIndex.getIndexName(), e);
       }
     }
 
@@ -1943,14 +1943,14 @@ public class IndexServiceImpl implements IndexService {
   }
 
   @Override
-  public MetadataList updateAllSeriesMetadata(String id, String metadataJSON, ElasticsearchIndex index)
+  public MetadataList updateAllSeriesMetadata(String id, String metadataJSON, OpenSearchIndex index)
           throws IllegalArgumentException, IndexServiceException, NotFoundException {
     MetadataList metadataList = getMetadataListWithAllSeriesCatalogUIAdapters();
     return updateSeriesMetadata(id, metadataJSON, index, metadataList);
   }
 
   @Override
-  public MetadataList updateAllSeriesMetadata(String id, MetadataList metadataList, ElasticsearchIndex index)
+  public MetadataList updateAllSeriesMetadata(String id, MetadataList metadataList, OpenSearchIndex index)
           throws IndexServiceException, NotFoundException {
     checkSeriesExists(id, index);
     updateSeriesMetadata(id, metadataList);
@@ -2050,7 +2050,7 @@ public class IndexServiceImpl implements IndexService {
    * @throws IndexServiceException
    *           Thrown if unable to access the index to get the series.
    */
-  private void checkSeriesExists(String seriesID, ElasticsearchIndex index)
+  private void checkSeriesExists(String seriesID, OpenSearchIndex index)
           throws NotFoundException, IndexServiceException {
     try {
       Optional<Series> optSeries = index.getSeries(seriesID, securityService.getOrganization(),
@@ -2066,7 +2066,7 @@ public class IndexServiceImpl implements IndexService {
   private MetadataList updateSeriesMetadata(
           final String seriesID,
           final String metadataJSON,
-          final ElasticsearchIndex index,
+          final OpenSearchIndex index,
           final MetadataList metadataList)
           throws IllegalArgumentException, IndexServiceException, NotFoundException {
     checkSeriesExists(seriesID, index);

@@ -26,12 +26,6 @@ import static org.opencastproject.workflow.api.WorkflowInstance.WorkflowState.SU
 
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.util.Workflows;
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.Event;
-import org.opencastproject.elasticsearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.impl.util.EventUtils;
@@ -51,6 +45,12 @@ import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.MetadataField;
 import org.opencastproject.metadata.dublincore.MetadataJson;
 import org.opencastproject.metadata.dublincore.MetadataList;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.api.SearchResult;
+import org.opencastproject.opensearch.api.SearchResultItem;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.Event;
+import org.opencastproject.opensearch.index.objects.event.EventSearchQuery;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 import org.opencastproject.security.api.AclScope;
@@ -124,7 +124,7 @@ public class LtiServiceImpl implements LtiService {
   private WorkflowService workflowService;
   private AssetManager assetManager;
   private Workspace workspace;
-  private ElasticsearchIndex searchIndex;
+  private OpenSearchIndex searchIndex;
   private AuthorizationService authorizationService;
   private SeriesService seriesService;
   private String workflow;
@@ -166,7 +166,7 @@ public class LtiServiceImpl implements LtiService {
 
   /** OSGi DI */
   @Reference
-  public void setSearchIndex(ElasticsearchIndex searchIndex) {
+  public void setSearchIndex(OpenSearchIndex searchIndex) {
     this.searchIndex = searchIndex;
   }
 

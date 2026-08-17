@@ -71,7 +71,7 @@ Configure OpenSearch
 After installing OpenSearch please make sure to install all necessary plugins and update the configuration.
 For details, please follow:
 
-* [Opencast OpenSearch Documentation](../configuration/searchindex/elasticsearch.md)
+* [Opencast OpenSearch Documentation](../configuration/searchindex/opensearch.md)
 
 When the configuration is done, start and enable OpenSearch:
 

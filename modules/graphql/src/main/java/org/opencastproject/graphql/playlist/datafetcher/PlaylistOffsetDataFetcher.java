@@ -21,7 +21,7 @@
 
 package org.opencastproject.graphql.playlist.datafetcher;
 
-import org.opencastproject.graphql.datafetcher.ElasticsearchDataFetcher;
+import org.opencastproject.graphql.datafetcher.OpenSearchDataFetcher;
 import org.opencastproject.graphql.execution.context.OpencastContext;
 import org.opencastproject.graphql.playlist.type.output.GqlPlaylistList;
 import org.opencastproject.playlists.Playlist;
@@ -37,7 +37,7 @@ import java.util.List;
 
 import graphql.schema.DataFetchingEnvironment;
 
-public class PlaylistOffsetDataFetcher extends ElasticsearchDataFetcher<GqlPlaylistList> {
+public class PlaylistOffsetDataFetcher extends OpenSearchDataFetcher<GqlPlaylistList> {
 
   private User user;
   private boolean writeOnly;

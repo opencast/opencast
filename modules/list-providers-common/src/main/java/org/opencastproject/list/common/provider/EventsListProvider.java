@@ -21,11 +21,11 @@
 
 package org.opencastproject.list.common.provider;
 
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.Event;
-import org.opencastproject.elasticsearch.index.objects.event.EventIndexSchema;
 import org.opencastproject.list.api.ResourceListProvider;
 import org.opencastproject.list.api.ResourceListQuery;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.Event;
+import org.opencastproject.opensearch.index.objects.event.EventIndexSchema;
 import org.opencastproject.workflow.api.WorkflowInstance.WorkflowState;
 
 import org.osgi.framework.BundleContext;
@@ -78,7 +78,7 @@ public class EventsListProvider implements ResourceListProvider {
 
   private static final Logger logger = LoggerFactory.getLogger(EventsListProvider.class);
 
-  private ElasticsearchIndex index;
+  private OpenSearchIndex index;
 
   @Activate
   protected void activate(BundleContext bundleContext) {
@@ -86,7 +86,7 @@ public class EventsListProvider implements ResourceListProvider {
   }
 
   @Reference
-  public void setIndex(ElasticsearchIndex index) {
+  public void setIndex(OpenSearchIndex index) {
     this.index = index;
   }
 

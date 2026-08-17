@@ -28,13 +28,13 @@ import static org.opencastproject.util.doc.rest.RestParameter.Type.BOOLEAN;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.INTEGER;
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.external.common.ApiMediaType;
 import org.opencastproject.external.common.ApiResponseBuilder;
 import org.opencastproject.external.common.ApiVersion;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.mediapackage.MediaPackage;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.Event;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.systems.OpencastConstants;
@@ -115,7 +115,7 @@ public class WorkflowsEndpoint {
 
   /* OSGi service references */
   private WorkflowService workflowService;
-  private ElasticsearchIndex elasticsearchIndex;
+  private OpenSearchIndex opensearchIndex;
   private IndexService indexService;
 
   /** OSGi DI */
@@ -126,8 +126,8 @@ public class WorkflowsEndpoint {
 
   /** OSGi DI */
   @Reference
-  public void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
-    this.elasticsearchIndex = elasticsearchIndex;
+  public void setOpenSearchIndex(OpenSearchIndex opensearchIndex) {
+    this.opensearchIndex = opensearchIndex;
   }
 
   /** OSGi DI */
@@ -190,7 +190,7 @@ public class WorkflowsEndpoint {
 
     try {
       // Media Package
-      Optional<Event> event = indexService.getEvent(eventId, elasticsearchIndex);
+      Optional<Event> event = indexService.getEvent(eventId, opensearchIndex);
       if (event.isEmpty()) {
         return ApiResponseBuilder.notFound("Cannot find an event with id '%s'.", eventId);
       }

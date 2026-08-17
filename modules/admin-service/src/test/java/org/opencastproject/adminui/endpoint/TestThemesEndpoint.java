@@ -24,12 +24,12 @@ package org.opencastproject.adminui.endpoint;
 import static org.opencastproject.db.DBTestEnv.getDbSessionFactory;
 import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
-import org.opencastproject.elasticsearch.api.SearchResult;
-import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.impl.SearchResultImpl;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.series.Series;
-import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
+import org.opencastproject.opensearch.api.SearchResult;
+import org.opencastproject.opensearch.api.SearchResultItem;
+import org.opencastproject.opensearch.impl.SearchResultImpl;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.series.Series;
+import org.opencastproject.opensearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
@@ -107,12 +107,12 @@ public class TestThemesEndpoint extends ThemesEndpoint {
     EasyMock.replay(seriesService);
 
     // Create AdminUI Search Index
-    ElasticsearchIndex elasticsearchIndex = EasyMock.createNiceMock(ElasticsearchIndex.class);
+    OpenSearchIndex opensearchIndex = EasyMock.createNiceMock(OpenSearchIndex.class);
     final Capture<SeriesSearchQuery> seriesQueryCapture = EasyMock.newCapture();
-    EasyMock.expect(elasticsearchIndex.getByQuery(EasyMock.capture(seriesQueryCapture)))
+    EasyMock.expect(opensearchIndex.getByQuery(EasyMock.capture(seriesQueryCapture)))
             .andAnswer(() -> createSeriesCaptureResult(seriesQueryCapture));
-    EasyMock.expect(elasticsearchIndex.getIndexName()).andReturn("adminui").anyTimes();
-    EasyMock.replay(elasticsearchIndex);
+    EasyMock.expect(opensearchIndex.getIndexName()).andReturn("adminui").anyTimes();
+    EasyMock.replay(opensearchIndex);
 
     themesServiceDatabaseImpl = new ThemesServiceDatabaseImpl();
     themesServiceDatabaseImpl
@@ -147,7 +147,7 @@ public class TestThemesEndpoint extends ThemesEndpoint {
     this.setSeriesService(seriesService);
     this.setStaticFileService(staticFileService);
     this.setStaticFileRestService(staticFileRestService);
-    this.setIndex(elasticsearchIndex);
+    this.setIndex(opensearchIndex);
   }
 
   private SearchResult<Series> createSeriesCaptureResult(Capture<SeriesSearchQuery> myCapture) {

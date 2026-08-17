@@ -23,10 +23,10 @@ package org.opencastproject.studio.endpoint;
 
 import static org.opencastproject.util.doc.rest.RestParameter.Type.STRING;
 
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.api.SearchResultItem;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.series.SeriesSearchQuery;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.api.SearchResultItem;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.series.SeriesSearchQuery;
 import org.opencastproject.security.api.Permissions;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.studio.endpoint.dto.SeriesDto;
@@ -87,7 +87,7 @@ public class StudioEndpoint {
 
   private final Gson gson;
 
-  private ElasticsearchIndex elasticsearchIndex;
+  private OpenSearchIndex opensearchIndex;
   private SecurityService securityService;
 
   {
@@ -149,7 +149,7 @@ public class StudioEndpoint {
     }
 
     try {
-      var items = Arrays.stream(elasticsearchIndex.getByQuery(query).getItems())
+      var items = Arrays.stream(opensearchIndex.getByQuery(query).getItems())
               .map(SearchResultItem::getSource)
               .map(SeriesDto::create)
               .collect(Collectors.toList());
@@ -161,8 +161,8 @@ public class StudioEndpoint {
   }
 
   @Reference
-  public void setElasticsearchIndex(ElasticsearchIndex elasticsearchIndex) {
-    this.elasticsearchIndex = elasticsearchIndex;
+  public void setOpenSearchIndex(OpenSearchIndex opensearchIndex) {
+    this.opensearchIndex = opensearchIndex;
   }
 
   @Reference

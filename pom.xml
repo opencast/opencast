@@ -127,9 +127,6 @@
     <module>modules/editor-service-remote</module>
     <module>modules/editor-service</module>
     <module>modules/editor</module>
-    <module>modules/elasticsearch-api</module>
-    <module>modules/elasticsearch-impl</module>
-    <module>modules/elasticsearch-index</module>
     <module>modules/email-template-service-api</module>
     <module>modules/email-template-service-impl</module>
     <module>modules/engage-paella-player-8</module>
@@ -183,6 +180,9 @@
     <module>modules/oaipmh-persistence</module>
     <module>modules/oaipmh-remote</module>
     <module>modules/oaipmh</module>
+    <module>modules/opensearch-api</module>
+    <module>modules/opensearch-impl</module>
+    <module>modules/opensearch-index</module>
     <module>modules/runtime-info-openapi-ui</module>
     <module>modules/playlists</module>
     <module>modules/plugin-manager</module>

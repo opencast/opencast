@@ -32,11 +32,11 @@ import org.opencastproject.adminui.impl.AdminUIConfiguration;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.authorization.xacml.manager.api.AclService;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.event.comment.EventCommentService;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.util.RestUtils;
 import org.opencastproject.list.api.ListProvidersService;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
 import org.opencastproject.scheduler.api.Recording;
 import org.opencastproject.scheduler.api.RecordingState;
 import org.opencastproject.scheduler.api.SchedulerService;
@@ -702,7 +702,7 @@ public class AbstractEventEndpointTest {
     private AuthorizationService authorizationService;
     private SchedulerService schedulerService;
     private CaptureAgentStateService captureAgentStateService;
-    private ElasticsearchIndex index;
+    private OpenSearchIndex index;
     private UrlSigningService urlSigningService;
     private UserDirectoryService userDirectoryService;
     private ListProvidersService listProvidersService;
@@ -795,11 +795,11 @@ public class AbstractEventEndpointTest {
       this.captureAgentStateService = captureAgentStateService;
     }
 
-    public void setIndex(ElasticsearchIndex index) {
+    public void setIndex(OpenSearchIndex index) {
       this.index = index;
     }
 
-    public ElasticsearchIndex getIndex() {
+    public OpenSearchIndex getIndex() {
       return index;
     }
 

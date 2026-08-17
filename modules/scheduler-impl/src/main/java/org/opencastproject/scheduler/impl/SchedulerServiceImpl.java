@@ -32,14 +32,6 @@ import org.opencastproject.assetmanager.api.Asset;
 import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.Availability;
 import org.opencastproject.assetmanager.api.Snapshot;
-import org.opencastproject.elasticsearch.api.SearchIndexException;
-import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
-import org.opencastproject.elasticsearch.index.objects.event.Event;
-import org.opencastproject.elasticsearch.index.objects.event.EventIndexUtils;
-import org.opencastproject.elasticsearch.index.rebuild.AbstractIndexProducer;
-import org.opencastproject.elasticsearch.index.rebuild.IndexProducer;
-import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildException;
-import org.opencastproject.elasticsearch.index.rebuild.IndexRebuildService;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageElement;
@@ -61,6 +53,14 @@ import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.EncodingSchemeUtils;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.metadata.dublincore.Precision;
+import org.opencastproject.opensearch.api.SearchIndexException;
+import org.opencastproject.opensearch.index.OpenSearchIndex;
+import org.opencastproject.opensearch.index.objects.event.Event;
+import org.opencastproject.opensearch.index.objects.event.EventIndexUtils;
+import org.opencastproject.opensearch.index.rebuild.AbstractIndexProducer;
+import org.opencastproject.opensearch.index.rebuild.IndexProducer;
+import org.opencastproject.opensearch.index.rebuild.IndexRebuildException;
+import org.opencastproject.opensearch.index.rebuild.IndexRebuildService;
 import org.opencastproject.scheduler.api.Recording;
 import org.opencastproject.scheduler.api.RecordingImpl;
 import org.opencastproject.scheduler.api.RecordingState;
@@ -210,8 +210,8 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   /** The organization directory service */
   private OrganizationDirectoryService orgDirectoryService;
 
-  /** The Elasticsearch indices */
-  private ElasticsearchIndex index;
+  /** The OpenSearch indices */
+  private OpenSearchIndex index;
 
   /** The list of registered event catalog UI adapters */
   private List<EventCatalogUIAdapter> eventCatalogUIAdapters = new ArrayList<>();
@@ -333,13 +333,13 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   /**
-   * OSgi callback to set the Elasticsearch index.
+   * OSgi callback to set the OpenSearch index.
    *
    * @param index
-   *          the Elasticsearch index.
+   *          the OpenSearch index.
    */
   @Reference
-  public void setIndex(ElasticsearchIndex index) {
+  public void setIndex(OpenSearchIndex index) {
     this.index = index;
   }
 
@@ -458,7 +458,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       updateLiveEvent(mediaPackageId, Optional.of(acl), dublinCore, Optional.of(startDateTime),
               Optional.of(endDateTime), Optional.of(captureAgentId), Optional.of(finalCaProperties));
 
-      // Update Elasticsearch index
+      // Update OpenSearch index
       updateEventInIndex(mediaPackageId, Optional.of(acl), dublinCore, Optional.of(startDateTime),
           Optional.of(endDateTime), Optional.of(userIds), Optional.of(captureAgentId), Optional.of(finalCaProperties),
           Optional.empty());
@@ -598,7 +598,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         updateLiveEvent(mediaPackageId, Optional.of(acl), dublinCore, Optional.of(startDateTime),
                 Optional.of(endDateTime), Optional.of(captureAgentId), Optional.of(finalCaProperties));
 
-        // Update Elasticsearch index
+        // Update OpenSearch index
         updateEventInIndex(mediaPackageId, Optional.of(acl), dublinCore, Optional.of(startDateTime),
                 Optional.of(endDateTime), Optional.of(userIds), Optional.of(captureAgentId),
                 Optional.of(finalCaProperties), Optional.empty());
@@ -798,7 +798,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       updateLiveEvent(mpId, changedAclOpt, changedDublinCoreOpt, startDateTime, endDateTime, Optional.of(agentId),
               finalCaProperties);
 
-      // Update Elasticsearch index
+      // Update OpenSearch index
       updateEventInIndex(mpId, changedAclOpt, changedDublinCoreOpt, startDateTime, endDateTime, userIds,
               Optional.of(agentId), finalCaProperties, Optional.empty());
 
@@ -879,7 +879,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       // Update live event
       sendSchedulerUpdate(new SchedulerItemList(mediaPackageId, SchedulerItem.delete()));
 
-      // Update Elasticsearch index
+      // Update OpenSearch index
       removeSchedulingInfoFromIndex(mediaPackageId);
     } catch (Exception e) {
       logger.error("Could not remove event '{}' from persistent storage", mediaPackageId, e);
@@ -1287,7 +1287,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
         sendSchedulerUpdate(new SchedulerItemList(r.getID(), Collections.singletonList(SchedulerItem
                 .updateRecordingStatus(r.getState(), r.getLastCheckinTime()))));
 
-        // Update Elasticsearch index
+        // Update OpenSearch index
         updateEventInIndex(r.getID(), Optional.empty(), Optional.empty(), Optional.empty(), Optional.empty(),
                 Optional.empty(), Optional.empty(), Optional.empty(), Optional.of(r.getState()));
       } else {
@@ -1347,7 +1347,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
       // Update live event
       sendSchedulerUpdate(new SchedulerItemList(id, SchedulerItem.deleteRecordingState()));
 
-      // Update Elasticsearch index
+      // Update OpenSearch index
       removeRecordingStatusFromIndex(id);
     } catch (NotFoundException e) {
       throw e;
@@ -1398,7 +1398,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   /**
-   * Update the event in the Elasticsearch index. Fields will only be updated of the corresponding Opt is not none.
+   * Update the event in the OpenSearch index. Fields will only be updated of the corresponding Opt is not none.
    *
    * @param mediaPackageId
    * @param acl
@@ -1430,7 +1430,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   /**
-   * Set recording status to null for this event in the Elasticsearch index.
+   * Set recording status to null for this event in the OpenSearch index.
    *
    * @param mediaPackageId
    */
@@ -1454,7 +1454,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   /**
-   * Remove scheduling information for this event from the Elasticsearch index.
+   * Remove scheduling information for this event from the OpenSearch index.
    *
    * @param mediaPackageId
    */
@@ -1721,7 +1721,7 @@ public class SchedulerServiceImpl extends AbstractIndexProducer implements Sched
   }
 
   /**
-   * Get the function to update a scheduled event in the Elasticsearch index.
+   * Get the function to update a scheduled event in the OpenSearch index.
    *
    * @param orgId          The id of the current organization
    * @param user           The user
