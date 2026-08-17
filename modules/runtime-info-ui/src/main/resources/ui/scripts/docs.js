@@ -19,221 +19,200 @@
  *
  */
 
-/* TODO: We don't want alerts but we are stuck with them for now: */
-/* eslint-disable no-alert */
-/* global $ */
+/** Methods which carry their parameters in the query string rather than in a request body. */
+const QUERY_METHODS = ['GET', 'HEAD', 'DELETE'];
 
-/**
- * Try to prettify JSON data. In case it fails, just return the original data.
- */
-function tryPretty(data) {
-  try {
-    var obj = JSON.parse(data);
-    return JSON.stringify(obj, undefined, 2).toString();
-  } catch(err) {
-    return data;
+const CLOSERS = {'{': '}', '[': ']'};
+
+/** Index just past the closing quote of the JSON string literal starting at `start`. */
+function stringEnd(src, start) {
+  for (let i = start + 1; i < src.length; i++) {
+    if (src[i] === '\\') {
+      i += 1;
+    } else if (src[i] === '"') {
+      return i + 1;
+    }
   }
+  return src.length;
 }
 
 /**
- * Takes a path and integrates the pathParams values into it
- * @param {String} path the path with keys (e.g. /my/{thing}/{stuff})
- * @param {Array} params the params to put into the path (e.g. {'thing':'apple'})
+ * Re-indent a JSON document without parsing it. A JSON.parse()/JSON.stringify() round trip would
+ * round every number above 2^53, and Opencast payloads do contain such identifiers. Input that does
+ * not look like JSON (XML, plain text, an error page) is returned unchanged.
  */
-function updatePath(path, params) {
-  var newPath = path;
-  for (var key in params) {
-    if (Object.prototype.hasOwnProperty.call(params, key)) {
-      var value = params[key];
-      if (value !== undefined && value !== null && value !== '') {
-        // The Regex here handles syntax like /episode.{format:xml|json}.
-        // In this case, the {format:xml|json} part is extracted, then
-        // the xml|json part is used as the second regex to verify user's input.
-        // If the input is valid, the path /episode.{format:xml|json} would be
-        // replaced by /episode.xml for example.
-        var regex = new RegExp( '{' + key + '(:[^}]*|)}', '');
-        if (regex.test(newPath))
-        {
-          var pat = regex.exec(newPath)[1].substring(1);
-          var regex2 = new RegExp(pat, '');
-          if (regex2.test(value))
-          {
-            newPath = newPath.replace(regex, value);
-          } else
-          {
-            alert('The value for ' + key + ' is invalid.');
-          }
-        } else
-        {
-          alert('wrong syntax');
-        }
+function prettify(text) {
+  const src = text.trim();
+  if (src[0] !== '{' && src[0] !== '[') {
+    return text;
+  }
+  let out = '';
+  let depth = 0;
+  for (let i = 0; i < src.length; i++) {
+    const char = src[i];
+    if (char === '"') {
+      // copy string literals verbatim so their contents are never reformatted
+      const end = stringEnd(src, i);
+      out += src.slice(i, end);
+      i = end - 1;
+    } else if (/\s/.test(char)) {
+      continue;
+    } else if (CLOSERS[char] !== undefined) {
+      let next = i + 1;
+      while (next < src.length && /\s/.test(src[next])) {
+        next += 1;
       }
+      if (src[next] === CLOSERS[char]) {
+        // keep empty objects and arrays on a single line
+        out += char + CLOSERS[char];
+        i = next;
+      } else {
+        depth += 1;
+        out += char + '\n' + '  '.repeat(depth);
+      }
+    } else if (char === '}' || char === ']') {
+      depth -= 1;
+      out += '\n' + '  '.repeat(depth) + char;
+    } else if (char === ',') {
+      out += char + '\n' + '  '.repeat(depth);
+    } else if (char === ':') {
+      out += ': ';
+    } else {
+      out += char;
     }
   }
-  return newPath;
+  return out;
 }
 
-function checkPath($form) {
-  var params = [];
-  $form.find('.form_param_path').each( function() {
-    var $param = $(this);
-    params[$param.attr('name')] = $param.val();
-  });
-  var form_path = $form.find('input.form_action_holder').val();
-  var path = updatePath(form_path, params);
-  // update form and display
-  $form.attr('action', path);
-  $form.find('.form_path').html(path);
-  return path.indexOf('{') < 0 && path.indexOf('}') < 0;
+function escapeRegExp(text) {
+  return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-function checkRequired($form) {
-  // check all required items
-  var $required = $form.find('.form_param_required');
-  var total = $required.length;
-  var counter = 0;
-  $required.each( function() {
-    var $this = $(this);
-    if ($this.val() !== null && $this.val() !== '') {
-      counter++;
+/** The value a form field contributes to the request. */
+function fieldValue(input) {
+  return input.type === 'checkbox' ? String(input.checked) : input.value;
+}
+
+/**
+ * Percent-encode a path parameter value. Slashes are left alone so that values for catch-all path
+ * parameters such as {path: .*} keep working.
+ */
+function encodePathValue(value) {
+  return encodeURIComponent(value).replace(/%2F/g, '/');
+}
+
+/**
+ * Substitute the path parameter values into the endpoint path. Placeholders whose field is empty or
+ * whose value violates the parameter's pattern are left in place, and the offending field is marked
+ * invalid so that the browser reports it on submit.
+ */
+function resolvePath(form) {
+  let path = form.getAttribute('action');
+  for (const input of form.querySelectorAll('.form_param_path')) {
+    input.setCustomValidity('');
+    const value = fieldValue(input);
+    if (value === '') {
+      continue;
     }
-  });
-  var $formInputs = $form.find('div.form_submit input');
-  if (counter >= total) {
-    // submit is ok
-    $formInputs.removeAttr('disabled');
-    return true;
+    // A path may constrain a parameter with a regular expression, as in /episode.{format:xml|json}.
+    const placeholder = new RegExp('\\{' + escapeRegExp(input.name) + '(?::([^}]*))?\\}');
+    const match = placeholder.exec(path);
+    if (match === null) {
+      continue;
+    }
+    if (match[1] !== undefined && !new RegExp('^(?:' + match[1] + ')$').test(value)) {
+      input.setCustomValidity('This value does not match the expected pattern: ' + match[1]);
+      continue;
+    }
+    // a replacer function keeps $-sequences in the value from being expanded
+    path = path.replace(placeholder, () => encodePathValue(value));
+  }
+  return path;
+}
+
+/** Resolve the request URL and show it below the form. */
+function refreshPath(form) {
+  const path = resolvePath(form);
+  form.querySelector('.form_path').textContent = path;
+  return path;
+}
+
+/** The parameters to send, as [name, value] pairs. Untouched optional fields are left out. */
+function collectParams(form) {
+  const params = [];
+  for (const input of form.querySelectorAll('.form_param_submit')) {
+    if (input.type === 'file') {
+      for (const file of input.files) {
+        params.push([input.name, file]);
+      }
+    } else if (input.type === 'checkbox' || input.value !== '') {
+      params.push([input.name, fieldValue(input)]);
+    }
+  }
+  return params;
+}
+
+function hasUpload(params) {
+  return params.some(([, value]) => value instanceof File);
+}
+
+async function submitForm(event, form) {
+  event.preventDefault();
+
+  const path = refreshPath(form);
+  if (!form.reportValidity()) {
+    return;
+  }
+
+  const method = form.querySelector('.form_method').value;
+  const url = new URL(path, window.location.href);
+  const params = collectParams(form);
+  let body;
+  if (QUERY_METHODS.includes(method)) {
+    for (const [name, value] of params) {
+      url.searchParams.append(name, value);
+    }
   } else {
-    // disable form submit until required options at set
-    $formInputs.attr('disabled', 'disabled');
-    return false;
+    body = hasUpload(params) ? new FormData() : new URLSearchParams();
+    for (const [name, value] of params) {
+      body.append(name, value);
+    }
+  }
+
+  const working = form.parentElement.querySelector('.test_form_working');
+  const response = form.parentElement.querySelector('.test_form_response');
+  const output = response.querySelector('pre');
+  output.textContent = '';
+  response.classList.add('hidden');
+  working.classList.remove('hidden');
+
+  let message;
+  try {
+    // FormData sets its own Content-Type, including the multipart boundary. Never set it by hand.
+    const result = await fetch(url, {method: method, body: body, credentials: 'same-origin'});
+    const text = await result.text();
+    message = `Status: ${result.status} (${result.statusText})\n\n${prettify(text)}`;
+  } catch (error) {
+    message = `The request failed: ${error.message}\n\n`
+      + 'Note that the form submits to the server URL Opencast is configured with. If you are '
+      + 'browsing these docs through a different host or port, the request is cross-origin and '
+      + 'will be blocked.';
+  }
+
+  working.classList.add('hidden');
+  output.textContent = message;
+  response.classList.remove('hidden');
+}
+
+function init() {
+  for (const form of document.querySelectorAll('form.form_test_form')) {
+    for (const input of form.querySelectorAll('.form_param_path')) {
+      input.addEventListener('input', () => refreshPath(form));
+      input.addEventListener('change', () => refreshPath(form));
+    }
+    refreshPath(form);
+    form.addEventListener('submit', (event) => submitForm(event, form));
   }
 }
 
-$(document).ready(function() {
-
-  $('a.show_form_link').click(
-    function() {
-      var $this = $(this);
-      var $form = $this.parent().find('div.hidden_form');
-      var $hidectrl = $this.parent().find('a.hide_form_link');
-      $form.toggle(400);
-      $hidectrl.show();
-      $this.parent().find('div.form_submit input[type=\'button\']').click(
-        function() {
-          $form.hide(200);
-          $this.show();
-        }
-      );
-      $this.hide();
-      return false;
-    }
-  );
-
-  $('a.hide_form_link').click(
-    function() {
-      var $this = $(this);
-      var $form = $this.parent().find('div.hidden_form');
-      var $show_form_ctrl = $this.parent().find('a.show_form_link');
-      $form.hide(200);
-      $show_form_ctrl.show();
-      $this.hide();
-      return false;
-    }
-  );
-
-  // do operation on all testing forms
-  $('form.form_test_form').each( function() {
-    var $form = $(this);
-    if ($form.find('input.form_action_holder').length >= 1) {
-      // now find and put the event handler on all path params
-      $form.find('.form_param_path').change( function() {
-        checkPath($form);
-      });
-      // run the checkPath method
-      checkPath($form);
-      var $reqParams = $form.find('.form_param_required');
-      if ($reqParams.length > 0) {
-        // add required options checks
-        $reqParams.change( function(){
-          checkRequired($form);
-        }).keyup( function(){
-          checkRequired($form);
-        });
-      }
-      // run the check required
-      checkRequired($form);
-      // handle the ajax submissions
-      if ($form.find('input.form_ajax_submit').length >= 1) {
-        // the form will use ajax submit
-        //var form_key = $form.find("input.form_endpoint_name").val();
-        // add an event handler to the form submit
-        $form.bind('submit', function() {
-          if ( checkRequired($form) ) {
-            var submitParams = {};
-            $form.find('.form_param_submit').each( function() {
-              var $param = $(this);
-              var $value = $param.val();
-              if (this.type == 'checkbox' && !this.checked) {
-                $value = 'false';
-              }
-              submitParams[$param.attr('name')] = $value;
-            });
-            var method = $form.find('.form_method').val();
-            var url = $form.attr('action');
-            $form.parent().find('.test_form_working').show();
-            $form.parent().find('.test_form_response input').click(function(){
-              $(this).parent.hide();
-            });
-
-            // clear previous responses
-            var responseBody = $form.parent().find('.test_form_response');
-            responseBody.hide();
-            responseBody.find('pre').text('');
-
-            var queryString = '';
-            if (method === 'DELETE') {
-              queryString = $.param(submitParams);
-            }
-
-            if (queryString !== '') {
-              url = url + '?' + queryString;
-            }
-
-            var request = {
-              type: method,
-              url: url,
-              processData: true,
-              dataType: 'text',
-              success: function(data, textStatus, request) {
-                $form.parent().find('.test_form_working').hide();
-                var responseBody = $form.parent().find('.test_form_response');
-                data = tryPretty(data);
-                responseBody.show();
-                var msg = 'Status: ' + request.status + ' (' + request.statusText + ')\n\n' + data;
-                responseBody.find('pre').text(msg);
-              },
-              error: function(request) {
-                $form.parent().find('.test_form_working').hide();
-                var responseBody = $form.parent().find('.test_form_response');
-                var msg = 'Status: ' + request.status + ' (' + request.statusText + ')';
-                responseBody.show();
-                responseBody.find('pre').text(msg);
-              }
-            };
-
-            if (method !== 'DELETE') {
-              request.data = submitParams;
-            }
-
-            // make the request
-            $.ajax(request);
-          } else {
-            alert('Fill out all required fields first');
-          }
-          return false;
-        });
-      }
-    }
-  });
-});
+addEventListener('DOMContentLoaded', init);
