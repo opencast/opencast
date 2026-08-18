@@ -10,10 +10,8 @@ permissions:
 
 jobs:
   check-icla:
-    if: (github.event.pull_request.user.login == 'Copilot' &&
-        github.event.sender.login || github.event.pull_request.user.login) != 'dependabot[bot]' &&
-        (github.event.pull_request.user.login == 'Copilot' &&
-        github.event.sender.login || github.event.pull_request.user.login) != 'opencastproject'
+    if: github.event.pull_request.user.login != 'dependabot[bot]' &&
+        github.event.pull_request.user.login != 'opencastproject'
     runs-on: ubuntu-24.04
     steps:
       - name: Determine ICLA user
