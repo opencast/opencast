@@ -860,7 +860,9 @@ public class WorkflowServiceImpl extends AbstractIndexProducer implements Workfl
     try {
       WorkflowInstance instance = getWorkflowById(workflowInstanceId);
 
-      if (instance.getState() != STOPPED) {
+      // Only workflows which have not yet terminated can be stopped. Overwriting the state of an already terminated
+      // workflow would discard how it actually ended, turning e.g. a SUCCEEDED workflow into a STOPPED one.
+      if (!instance.getState().isTerminated()) {
         // Update the workflow instance
         instance.setState(STOPPED);
         update(instance);
