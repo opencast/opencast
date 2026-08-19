@@ -4,16 +4,16 @@
   "private": true,
   "homepage": "/ltitools",
   "dependencies": {
-    "@vitejs/plugin-react": "^6.0.0",
-    "axios": "^1.13.6",
+    "@vitejs/plugin-react": "^6.0.5",
+    "axios": "^1.19.0",
     "bootstrap": "^5.3.8",
     "i18next": "^26.3.6",
     "i18next-browser-languagedetector": "^8.2.1",
-    "query-string": "^9.3.1",
-    "react": "^19.2.6",
+    "query-string": "^9.5.0",
+    "react": "^19.2.8",
     "react-bootstrap": "^2.10.10",
-    "react-dom": "^19.2.6",
-    "react-i18next": "^17.0.9",
+    "react-dom": "^19.2.8",
+    "react-i18next": "^17.0.11",
     "react-icons": "^5.7.0",
     "react-select": "^5.10.2",
     "typescript": "7.0.2"
@@ -42,10 +42,10 @@
     ]
   },
   "devDependencies": {
-    "@playwright/test": "^1.62.0",
+    "@playwright/test": "^1.62.1",
     "@types/node": "25.9.1",
-    "@types/react": "19.2.15",
-    "@types/react-dom": "19.2.3",
-    "vite": "^8.0.0"
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.4",
+    "vite": "^8.2.1"
   }
 }
