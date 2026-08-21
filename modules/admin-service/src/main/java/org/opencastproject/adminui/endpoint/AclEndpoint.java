@@ -272,7 +272,8 @@ public class AclEndpoint {
       returnDescription = "Returns a JSON representation of the roles with the given parameters under the "
           + "current user's organization.",
       restParameters = {
-          @RestParameter(name = "query", isRequired = false, description = "The query.", type = STRING),
+          @RestParameter(name = "query", isRequired = false,
+              description = "Only return roles whose name contains this string (case-insensitive).", type = STRING),
           @RestParameter(name = "target", isRequired = false, description = "The target of the roles.",
               type = STRING),
           @RestParameter(name = "limit", defaultValue = "100",
@@ -293,7 +294,7 @@ public class AclEndpoint {
 
     String roleQuery = "%";
     if (StringUtils.isNotBlank(query)) {
-      roleQuery = query.trim() + "%";
+      roleQuery = "%" + query.trim() + "%";
     }
 
     Role.Target roleTarget = Role.Target.ALL;
