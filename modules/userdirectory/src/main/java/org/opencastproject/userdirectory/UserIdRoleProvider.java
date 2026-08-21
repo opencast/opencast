@@ -181,16 +181,18 @@ public class UserIdRoleProvider implements RoleProvider, ManagedService {
       ));
     }
 
-    // Include user id roles only if wildcard search or query matches user id role prefix
-    // (iterating through users may be slow)
-    if (!"%".equals(query) && !query.startsWith(userRolePrefix)) {
+    // Include user id roles if there is no real search text to filter by (a wildcard-only query), this is a
+    // bounded request (a bounded findUsers() call below is cheap regardless of the query; an unbounded one may
+    // not be, which is what this guard originally protected against), or the query specifically targets the
+    // user id role prefix.
+    if (!"%".equals(query) && limit <= 0 && !query.startsWith(userRolePrefix)) {
       return foundRoles.iterator();
     }
 
-    String userQuery = "%";
-    if (query.startsWith(userRolePrefix)) {
-      userQuery = query.substring(userRolePrefix.length());
-    }
+    // The query is already a properly-shaped search pattern (e.g. "%adm%"), so reuse it as-is to search
+    // usernames, unless it's anchored with the user id role prefix, in which case strip that prefix first to
+    // get the username pattern it actually refers to.
+    String userQuery = query.startsWith(userRolePrefix) ? query.substring(userRolePrefix.length()) : query;
 
     Iterator<User> users = userDirectoryService.findUsers(userQuery, offset, limit);
     while (users.hasNext()) {
