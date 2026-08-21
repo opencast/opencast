@@ -113,9 +113,12 @@ public class UserAndRoleDirectoryServiceImplTest {
     RoleProvider roleProvider1 = EasyMock.createNiceMock(RoleProvider.class);
     EasyMock.expect(roleProvider1.getOrganization()).andReturn(org.getId()).anyTimes();
     EasyMock.expect(roleProvider1.getRolesForUser((String) EasyMock.anyObject())).andReturn(rolesForUser1).anyTimes();
-    EasyMock.expect(roleProvider1.findRoles("%", Role.Target.ALL, 0, 0)).andReturn(roles1.iterator()).anyTimes();
-    EasyMock.expect(roleProvider1.findRoles("%2012%", Role.Target.ALL, 0, 0)).andReturn(findRoles1.iterator()).once();
-    EasyMock.expect(roleProvider1.findRoles("%2012%", Role.Target.ALL, 0, 0)).andReturn(findRoles1.iterator()).once();
+    EasyMock.expect(roleProvider1.findRoles(EasyMock.eq("%"), EasyMock.eq(Role.Target.ALL), EasyMock.eq(0),
+        EasyMock.eq(0), EasyMock.isNull(Boolean.class))).andReturn(roles1.iterator()).anyTimes();
+    EasyMock.expect(roleProvider1.findRoles(EasyMock.eq("%2012%"), EasyMock.eq(Role.Target.ALL), EasyMock.eq(0),
+        EasyMock.eq(0), EasyMock.isNull(Boolean.class))).andReturn(findRoles1.iterator()).once();
+    EasyMock.expect(roleProvider1.findRoles(EasyMock.eq("%2012%"), EasyMock.eq(Role.Target.ALL), EasyMock.eq(0),
+        EasyMock.eq(0), EasyMock.isNull(Boolean.class))).andReturn(findRoles1.iterator()).once();
 
     List<Role> roles2 = new ArrayList<Role>();
     roles2.add(new JaxbRole("ROLE_MATH_2011", org));
@@ -130,19 +133,24 @@ public class UserAndRoleDirectoryServiceImplTest {
     RoleProvider roleProvider2 = EasyMock.createNiceMock(RoleProvider.class);
     EasyMock.expect(roleProvider2.getOrganization()).andReturn(org.getId()).anyTimes();
     EasyMock.expect(roleProvider2.getRolesForUser((String) EasyMock.anyObject())).andReturn(rolesForUser2).anyTimes();
-    EasyMock.expect(roleProvider2.findRoles("%", Role.Target.ALL, 0, 0)).andReturn(roles2.iterator()).anyTimes();
-    EasyMock.expect(roleProvider2.findRoles("%2012%", Role.Target.ALL, 0, 0)).andReturn(findRoles2.iterator()).once();
-    EasyMock.expect(roleProvider2.findRoles("%2012%", Role.Target.ALL, 0, 0)).andReturn(findRoles2.iterator()).once();
+    EasyMock.expect(roleProvider2.findRoles(EasyMock.eq("%"), EasyMock.eq(Role.Target.ALL), EasyMock.eq(0),
+        EasyMock.eq(0), EasyMock.isNull(Boolean.class))).andReturn(roles2.iterator()).anyTimes();
+    EasyMock.expect(roleProvider2.findRoles(EasyMock.eq("%2012%"), EasyMock.eq(Role.Target.ALL), EasyMock.eq(0),
+        EasyMock.eq(0), EasyMock.isNull(Boolean.class))).andReturn(findRoles2.iterator()).once();
+    EasyMock.expect(roleProvider2.findRoles(EasyMock.eq("%2012%"), EasyMock.eq(Role.Target.ALL), EasyMock.eq(0),
+        EasyMock.eq(0), EasyMock.isNull(Boolean.class))).andReturn(findRoles2.iterator()).once();
 
     RoleProvider otherOrgRoleProvider = EasyMock.createNiceMock(RoleProvider.class);
     EasyMock.expect(otherOrgRoleProvider.getOrganization()).andReturn("otherOrg").anyTimes();
     EasyMock.expect(otherOrgRoleProvider.getRolesForUser((String) EasyMock.anyObject())).andReturn(rolesForUser2)
             .anyTimes();
 
-    EasyMock.expect(otherOrgRoleProvider.findRoles("%", Role.Target.ALL, 0, 0))
+    EasyMock.expect(otherOrgRoleProvider.findRoles(EasyMock.eq("%"), EasyMock.eq(Role.Target.ALL), EasyMock.eq(0),
+        EasyMock.eq(0), EasyMock.isNull(Boolean.class)))
         .andReturn(roles2.iterator())
         .anyTimes();
-    EasyMock.expect(otherOrgRoleProvider.findRoles("%2012%", Role.Target.ALL, 0, 0))
+    EasyMock.expect(otherOrgRoleProvider.findRoles(EasyMock.eq("%2012%"), EasyMock.eq(Role.Target.ALL),
+        EasyMock.eq(0), EasyMock.eq(0), EasyMock.isNull(Boolean.class)))
         .andReturn(new ArrayList<Role>().iterator())
         .anyTimes();
 
@@ -258,7 +266,8 @@ public class UserAndRoleDirectoryServiceImplTest {
     EasyMock.expect(roleProvider.getOrganization()).andReturn(org.getId()).anyTimes();
     // Use andAnswer (not andReturn) so each call gets a fresh iterator: findRoles() is called multiple times
     // below, and a single shared iterator would be exhausted after the first call.
-    EasyMock.expect(roleProvider.findRoles("%", Role.Target.ALL, 0, 0))
+    EasyMock.expect(roleProvider.findRoles(EasyMock.eq("%"), EasyMock.eq(Role.Target.ALL), EasyMock.eq(0),
+        EasyMock.eq(0), EasyMock.anyObject()))
         .andAnswer(allRoles::iterator).anyTimes();
     EasyMock.expect(roleProvider.getRolesForUser((String) EasyMock.anyObject()))
         .andReturn(new ArrayList<Role>()).anyTimes();

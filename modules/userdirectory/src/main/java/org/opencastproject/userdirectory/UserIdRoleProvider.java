@@ -157,6 +157,14 @@ public class UserIdRoleProvider implements RoleProvider, ManagedService {
    */
   @Override
   public Iterator<Role> findRoles(String query, Role.Target target, int offset, int limit) {
+    return findRoles(query, target, offset, limit, null);
+  }
+
+  /**
+   * @see org.opencastproject.security.api.RoleProvider#findRoles(String, Role.Target, int, int, Boolean)
+   */
+  @Override
+  public Iterator<Role> findRoles(String query, Role.Target target, int offset, int limit, Boolean hasUser) {
     if (query == null) {
       throw new IllegalArgumentException("Query must be set");
     }
@@ -166,13 +174,14 @@ public class UserIdRoleProvider implements RoleProvider, ManagedService {
       return Collections.emptyIterator();
     }
 
-    logger.debug("findRoles(query={} offset={} limit={})", query, offset, limit);
+    logger.debug("findRoles(query={} offset={} limit={} hasUser={})", query, offset, limit, hasUser);
 
     HashSet<Role> foundRoles = new HashSet<Role>();
     Organization organization = securityService.getOrganization();
 
-    // Return authenticated user role if it matches the query pattern
-    if (like(ROLE_USER, query)) {
+    // ROLE_USER never resolves to an actual user account, so it's irrelevant to a hasUser=true request -- the
+    // aggregator would filter it out anyway, but there's no reason to add it just to have it discarded.
+    if (!Boolean.TRUE.equals(hasUser) && like(ROLE_USER, query)) {
       foundRoles.add(new JaxbRole(
           ROLE_USER,
           JaxbOrganization.fromOrganization(organization),
@@ -181,11 +190,20 @@ public class UserIdRoleProvider implements RoleProvider, ManagedService {
       ));
     }
 
-    // Include user id roles if there is no real search text to filter by (a wildcard-only query), this is a
-    // bounded request (a bounded findUsers() call below is cheap regardless of the query; an unbounded one may
-    // not be, which is what this guard originally protected against), or the query specifically targets the
-    // user id role prefix.
-    if (!"%".equals(query) && limit <= 0 && !query.startsWith(userRolePrefix)) {
+    // This provider is the only one that can ever produce a role satisfying hasUser=false -- skip the
+    // (potentially expensive) user enumeration below entirely for that case, we already know none of it applies.
+    if (Boolean.FALSE.equals(hasUser)) {
+      return foundRoles.iterator();
+    }
+
+    // Include user id roles if the caller explicitly wants them (hasUser=true, regardless of the query's shape --
+    // we were told this search is about users), or -- when hasUser is unset, preserving the original behaviour
+    // for callers that don't know about hasUser -- only if there is no real search text to filter by (a
+    // wildcard-only query) or the query specifically targets the user id role prefix (iterating through users
+    // may be slow, so this guard avoids doing so for general, not-obviously-user-related searches).
+    if (!Boolean.TRUE.equals(hasUser)
+        && !"%".equals(query)
+        && !query.startsWith(userRolePrefix)) {
       return foundRoles.iterator();
     }
 

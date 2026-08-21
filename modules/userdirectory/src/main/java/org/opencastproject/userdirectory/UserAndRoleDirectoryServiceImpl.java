@@ -519,7 +519,7 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
     for (RoleProvider roleProvider : roleProviders) {
       final String providerOrgId = roleProvider.getOrganization();
       if (ALL_ORGANIZATIONS.equals(providerOrgId) || org.getId().equals(providerOrgId)) {
-        roleProvider.findRoles(query, target, 0, 0).forEachRemaining(roles::add);
+        roleProvider.findRoles(query, target, 0, 0, hasUser).forEachRemaining(roles::add);
       }
     }
     Stream<Role> stream = roles.stream().sorted(Comparator.comparing(Role::getName));
