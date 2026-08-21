@@ -45,9 +45,9 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * Tests {@link UserIdRoleProvider#findRoles(String, Role.Target, int, int)}, in particular its handling of
- * bounded, contains-style ("%text%") search queries -- the path exercised by the admin-ui's role picker once
- * it stopped fetching every role up front and started searching the backend directly.
+ * Tests {@link UserIdRoleProvider#findRoles(String, Role.Target, int, int, Boolean)}, in particular its handling
+ * of hasUser=true/false and contains-style ("%text%") search queries -- the path exercised by the admin-ui's role
+ * picker once it stopped fetching every role up front and started searching the backend directly.
  */
 public class UserIdRoleProviderTest {
 
@@ -81,24 +81,42 @@ public class UserIdRoleProviderTest {
   }
 
   @Test
-  public void findRolesWithBoundedContainsQueryStillSearchesUsers() {
-    // This is exactly the shape of query AclEndpoint now sends for a real, non-blank search
-    // ("%" + query + "%"), and the frontend always sends a bounded limit.
+  public void findRolesWithHasUserTrueSearchesUsersRegardlessOfLimitOrQueryShape() {
+    // This is exactly the shape of query AclEndpoint now sends for a real, non-blank search ("%" + query + "%"),
+    // with hasUser=true (the "Users" table). Deliberately using limit=0 here: hasUser=true must be enough on its
+    // own to trigger the search, independent of whether a caller also bounds the request (e.g. via
+    // fix/acl-roles-provider-pagination, a separate, independently-mergeable change).
     Capture<String> userQueryCapture = Capture.newInstance();
-    EasyMock.expect(userDirectoryService.findUsers(EasyMock.capture(userQueryCapture), EasyMock.eq(0), EasyMock.eq(50)))
+    EasyMock.expect(userDirectoryService.findUsers(EasyMock.capture(userQueryCapture), EasyMock.eq(0), EasyMock.eq(0)))
         .andReturn(List.of(user("admin")).iterator());
     EasyMock.replay(userDirectoryService);
 
-    Iterator<Role> result = provider.findRoles("%adm%", Role.Target.ALL, 0, 50);
+    Iterator<Role> result = provider.findRoles("%adm%", Role.Target.ALL, 0, 0, true);
 
     assertEquals("%adm%", userQueryCapture.getValue());
     assertTrue(roleNames(result).contains("ROLE_USER_ADMIN"));
   }
 
   @Test
-  public void findRolesWithUnboundedNonPrefixedQuerySkipsUserEnumeration() {
-    // Legacy/unbounded callers (limit <= 0) with a general, non-wildcard, non-prefixed query should not trigger
-    // a full user directory scan -- this preserves the original guard's intent.
+  public void findRolesWithHasUserFalseSkipsUserEnumerationButKeepsRoleUser() {
+    // hasUser=false (the "Groups & other roles" table): the (potentially expensive) user enumeration should be
+    // skipped entirely, since none of it could ever satisfy hasUser=false -- but the generic ROLE_USER role,
+    // which itself never resolves to a user account, should still be included if it matches the query.
+    EasyMock.replay(userDirectoryService);
+
+    Iterator<Role> result = provider.findRoles("%", Role.Target.ALL, 0, 0, false);
+
+    Set<String> names = roleNames(result);
+    assertTrue(names.contains("ROLE_USER"));
+    assertFalse(names.contains("ROLE_USER_ADMIN"));
+    EasyMock.verify(userDirectoryService);
+  }
+
+  @Test
+  public void findRolesWithNoHasUserFilterAndUnboundedNonPrefixedQuerySkipsUserEnumeration() {
+    // Legacy callers that don't know about hasUser (hasUser=null) and make an unbounded, general,
+    // non-wildcard, non-prefixed query should not trigger a full user directory scan -- this preserves the
+    // original guard's intent for callers like RoleEndpoint that have nothing to do with hasUser filtering.
     EasyMock.replay(userDirectoryService);
 
     Iterator<Role> result = provider.findRoles("%adm%", Role.Target.ALL, 0, 0);
