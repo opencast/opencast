@@ -42,5 +42,28 @@ public interface RoleDirectoryService {
    * @throws IllegalArgumentException
    *           if the query is <code>null</code>
    */
-  List<Role> findRoles(String query, Role.Target target, int offset, int limit);
+  default List<Role> findRoles(String query, Role.Target target, int offset, int limit) {
+    return findRoles(query, target, offset, limit, null);
+  }
+
+  /**
+   * Return the found roles as a list, optionally filtered by whether or not each role corresponds to an actual
+   * user account.
+   *
+   * @param query
+   *          the query. Use the wildcards "_" to match any single character and "%" to match an arbitrary number of
+   *          characters (including zero characters).
+   * @param offset
+   *          the offset.
+   * @param limit
+   *          the limit. 0 means no limit
+   * @param hasUser
+   *          if <code>null</code>, roles are not filtered by this criterion. If <code>true</code>, only roles that
+   *          resolve to an actual user account are returned. If <code>false</code>, only roles that do not resolve
+   *          to a user account are returned. The filter, if any, is applied before the offset/limit are applied.
+   * @return a list of roles
+   * @throws IllegalArgumentException
+   *           if the query is <code>null</code>
+   */
+  List<Role> findRoles(String query, Role.Target target, int offset, int limit, Boolean hasUser);
 }
