@@ -544,7 +544,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
     return seriesId.stream()
         .map(id -> id.getValue())
         .toArray(String[]::new);
-//    return seriesId.getValue();
   }
 
   /**
@@ -553,9 +552,6 @@ public class EventSearchQuery extends AbstractSearchQuery {
    * @return the series identifier
    */
   public List<EventSearchQueryField<String>> getSeriesId() {
-//    return seriesId.stream()
-//        .map(id -> id.getValue())
-//        .toArray(String[]::new);
     return seriesId;
   }
 
