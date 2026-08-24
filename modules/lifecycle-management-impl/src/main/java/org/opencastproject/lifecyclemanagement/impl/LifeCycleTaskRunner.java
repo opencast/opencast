@@ -313,8 +313,9 @@ public class LifeCycleTaskRunner {
     Map<String, String> workflowParameters;
     if (actionParametersParsed.getWorkflowParameters() == null) {
       workflowParameters = WorkflowPropertiesUtil.getLatestWorkflowProperties(assetManager, mediaPackageId);
+    } else {
+      workflowParameters = actionParametersParsed.getWorkflowParameters();
     }
-    workflowParameters = actionParametersParsed.getWorkflowParameters();
 
     // Get mediapackage
     Optional<MediaPackage> optMediaPackage = assetManager.getMediaPackage(mediaPackageId);
