@@ -287,10 +287,12 @@ public class LifeCycleTaskRunner {
    * For a given task based on the START_WORKFLOW action, start a workflow
    * @param task the life cycle task
    * @param policy the life cycle policy
+   * @throws NotFoundException If the workflow definition, or the persisted task, could not be found
    * @throws LifeCycleServiceException If something went wrong
+   * @throws UnauthorizedException If not authorized to start the workflow, or to persist the task
    */
   private void startWorkflow(LifeCycleTaskStartWorkflow task, LifeCyclePolicy policy)
-          throws LifeCycleServiceException {
+          throws NotFoundException, LifeCycleServiceException, UnauthorizedException {
     String mediaPackageId = task.getTargetId();
     String actionParameters = policy.getActionParameters();
 
@@ -305,6 +307,7 @@ public class LifeCycleTaskRunner {
     StartWorkflowParameters actionParametersParsed = gson.fromJson(actionParameters, StartWorkflowParameters.class);
     if (actionParametersParsed.getWorkflowId() == null) {
       task.setStatus(Status.FAILED);
+      lifeCycleService.updateLifeCycleTask(task);
       throw new IllegalArgumentException(
           "No workflowId found. Should have been at least the workflowId."
       );
@@ -349,22 +352,26 @@ public class LifeCycleTaskRunner {
       lifeCycleService.updateLifeCycleTask(task);
     } catch (WorkflowDatabaseException | WorkflowParsingException e) {
       task.setStatus(Status.FAILED);
+      lifeCycleService.updateLifeCycleTask(task);
       throw new LifeCycleServiceException(
           "Unable to load workflow" + workflowId + " for mediapackage " + mediaPackageId + ". An error occurred.",
           e);
     } catch (NotFoundException e) {
       task.setStatus(Status.FAILED);
+      lifeCycleService.updateLifeCycleTask(task);
       throw new LifeCycleServiceException(
           "Unable to load workflow" + workflowId + " for mediapackage " + mediaPackageId
               + ". Workflow could not be found.",
           e);
     } catch (UnauthorizedException e) {
       task.setStatus(Status.FAILED);
+      lifeCycleService.updateLifeCycleTask(task);
       throw new LifeCycleServiceException(
           "Not authorized to start workflow with id " + workflowId + " for mediapackage " + mediaPackageId,
           e);
     } catch (WorkflowException e) {
       task.setStatus(Status.FAILED);
+      lifeCycleService.updateLifeCycleTask(task);
       throw new LifeCycleServiceException(
           "Unable to check if there is currently a workflow running on mediapackage " + mediaPackageId,
           e);
@@ -426,6 +433,7 @@ public class LifeCycleTaskRunner {
       } else {
         task.setStatus(Status.FAILED);
       }
+      lifeCycleService.updateLifeCycleTask(task);
     } catch (SearchIndexException | WorkflowDatabaseException e) {
       task.setStatus(Status.FAILED);
       throw new LifeCycleServiceException(
