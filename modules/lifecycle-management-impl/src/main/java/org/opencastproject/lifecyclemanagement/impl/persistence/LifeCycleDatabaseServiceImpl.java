@@ -393,7 +393,7 @@ public class LifeCycleDatabaseServiceImpl implements LifeCycleDatabaseService {
         throw new LifeCycleDatabaseException("Id must not be set when creating new task");
       }
       return db.execTx(em -> {
-        task.setOrganization(securityService.getOrganization().getId());
+        task.setOrganization(orgId);
         em.persist(task);
         return task;
       });
