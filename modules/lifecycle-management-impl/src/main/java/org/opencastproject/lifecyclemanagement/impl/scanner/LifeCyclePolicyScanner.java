@@ -29,6 +29,7 @@ import org.opencastproject.lifecyclemanagement.impl.LifeCyclePolicyAccessControl
 import org.opencastproject.lifecyclemanagement.impl.LifeCyclePolicyImpl;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
+import org.opencastproject.security.api.OrganizationDirectoryService;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.security.api.User;
@@ -89,6 +90,7 @@ public class LifeCyclePolicyScanner implements ArtifactInstaller {
 
   private LifeCycleService lifeCycleService;
   protected SecurityService securityService;
+  protected OrganizationDirectoryService organizationDirectoryService;
 
   private PolicyFileNameFilter policyFilenameFilter;
 
@@ -103,6 +105,11 @@ public class LifeCyclePolicyScanner implements ArtifactInstaller {
   @Reference
   public void setSecurityService(SecurityService securityService) {
     this.securityService = securityService;
+  }
+
+  @Reference
+  public void setOrganizationDirectoryService(OrganizationDirectoryService organizationDirectoryService) {
+    this.organizationDirectoryService = organizationDirectoryService;
   }
 
   @Activate
@@ -120,7 +127,9 @@ public class LifeCyclePolicyScanner implements ArtifactInstaller {
     om.registerModule(sm);
     mapper = om;
 
-    lifeCycleService.deleteAllLifeCyclePoliciesCreatedByConfig(defaultOrganization.getId());
+    for (Organization org : organizationDirectoryService.getOrganizations()) {
+      lifeCycleService.deleteAllLifeCyclePoliciesCreatedByConfig(org.getId());
+    }
   }
 
   /**
