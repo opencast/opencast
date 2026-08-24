@@ -91,6 +91,9 @@ public class LifeCycleServiceImpl implements LifeCycleService {
   private static final Logger logger = LoggerFactory.getLogger(LifeCycleServiceImpl.class);
   private static final Gson gson = new Gson();
 
+  /** Max number of events to fetch at a time in {@link #filterForEvents(Map)} */
+  private static final int EVENT_QUERY_LIMIT = 10000;
+
   /** Persistent storage */
   protected LifeCycleDatabaseService persistence;
 
@@ -533,6 +536,23 @@ public class LifeCycleServiceImpl implements LifeCycleService {
       logger.error("The Search Index was not able to get the events list:", e);
       throw e;
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see LifeCycleService#filterForEvents(Map)
+   */
+  public List<Event> filterForEvents(Map<String, Map<String, EventSearchQueryField<String>>> filters)
+          throws SearchIndexException, NotFoundException {
+    List<Event> allEvents = new ArrayList<>();
+    List<Event> page;
+    int offset = 0;
+    do {
+      page = filterForEvents(filters, EVENT_QUERY_LIMIT, offset);
+      allEvents.addAll(page);
+      offset += EVENT_QUERY_LIMIT;
+    } while (page.size() >= EVENT_QUERY_LIMIT);
+    return allEvents;
   }
 
   /**

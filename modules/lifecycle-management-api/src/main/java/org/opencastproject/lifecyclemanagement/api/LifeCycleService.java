@@ -179,6 +179,19 @@ public interface LifeCycleService {
    */
   boolean checkValidity(LifeCyclePolicy policy);
 
+
+  /**
+   * Get a list of *all* events based on a set of filters.
+   * Currently only runs on metadata.
+   * Events are returned from the index.
+   * @param filters Key value pairs that the events must match.
+   * @return The list of all matching events
+   * @throws SearchIndexException If something went wrong in the index service
+   * @throws NotFoundException If a targetFilters object contains a metadata catalog flavor unknown to Opencast
+   */
+  List<Event> filterForEvents(Map<String, Map<String, EventSearchQueryField<String>>> filters)
+          throws SearchIndexException, NotFoundException;
+
   /**
    * Get a list of events based on a set of filters.
    * Currently only runs on metadata.

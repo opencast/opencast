@@ -211,17 +211,10 @@ public class RepeatingPolicyRunner {
 
               // Filter for entities
               List<String> eventIds = new ArrayList<>();
-              final int eventQueryLimit = 10000;
-              int offset = 0;
-              List<Event> events;
-              do {
-                events = repeatingPolicyRunner.getLifeCycleService().filterForEvents(policy.getTargetFilters(),
-                    eventQueryLimit, offset);
-                for (Event event : events) {
-                  eventIds.add(event.getIdentifier());
-                }
-                offset += eventQueryLimit;
-              } while (events.size() >= eventQueryLimit);
+              for (Event event : repeatingPolicyRunner.getLifeCycleService()
+                  .filterForEvents(policy.getTargetFilters())) {
+                eventIds.add(event.getIdentifier());
+              }
 
               // For every entity, create a task if it doesn't already have one for this policy
               for (String eventId : eventIds) {

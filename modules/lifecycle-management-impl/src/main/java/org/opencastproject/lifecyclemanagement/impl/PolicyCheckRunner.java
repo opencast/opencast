@@ -80,8 +80,6 @@ public class PolicyCheckRunner {
 
   private Set<RepeatingPolicyRunner> repeatingPolicyRunners = new HashSet<>();
 
-  private final int eventQueryLimit = 10000;
-
   @Reference
   public void setLifeCycleService(LifeCycleService lifeCycleService) {
     this.lifeCycleService = lifeCycleService;
@@ -160,15 +158,9 @@ public class PolicyCheckRunner {
                     List<String> entityIds = new ArrayList<>();
                     switch(policy.getTargetType()) {
                       case EVENT -> {
-                        int offset = 0;
-                        List<Event> events;
-                        do {
-                          events = lifeCycleService.filterForEvents(policy.getTargetFilters(), eventQueryLimit, offset);
-                          for (Event event : events) {
-                            entityIds.add(event.getIdentifier());
-                          }
-                          offset += eventQueryLimit;
-                        } while (!(events.size() < eventQueryLimit));
+                        for (Event event : lifeCycleService.filterForEvents(policy.getTargetFilters())) {
+                          entityIds.add(event.getIdentifier());
+                        }
                       }
                       default -> throw new NotImplementedException();
                     }
@@ -198,15 +190,9 @@ public class PolicyCheckRunner {
                   List<String> entityIds = new ArrayList<>();
                   switch(policy.getTargetType()) {
                     case EVENT -> {
-                      int offset = 0;
-                      List<Event> events;
-                      do {
-                        events = lifeCycleService.filterForEvents(policy.getTargetFilters(), eventQueryLimit, offset);
-                        for (Event event : events) {
-                          entityIds.add(event.getIdentifier());
-                        }
-                        offset += eventQueryLimit;
-                      } while (events.size() >= eventQueryLimit);
+                      for (Event event : lifeCycleService.filterForEvents(policy.getTargetFilters())) {
+                        entityIds.add(event.getIdentifier());
+                      }
                     }
                     default -> throw new NotImplementedException();
                   }
