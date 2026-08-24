@@ -22,11 +22,8 @@ package org.opencastproject.lifecyclemanagement.impl;
 
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.index.objects.event.Event;
-import org.opencastproject.lifecyclemanagement.api.Action;
 import org.opencastproject.lifecyclemanagement.api.LifeCyclePolicy;
 import org.opencastproject.lifecyclemanagement.api.LifeCycleService;
-import org.opencastproject.lifecyclemanagement.api.LifeCycleTask;
-import org.opencastproject.lifecyclemanagement.api.Status;
 import org.opencastproject.lifecyclemanagement.api.Timing;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
@@ -176,31 +173,9 @@ public class PolicyCheckRunner {
                       default -> throw new NotImplementedException();
                     }
 
-                    // and create tasks
+                    // and create tasks (if not already exists)
                     for (String entityId : entityIds) {
-                      // If entity does not yet have a task for this policy
-                      try {
-                        LifeCycleTask task = lifeCycleService.getLifeCycleTaskByTargetId(entityId);
-                        if (task.getLifeCyclePolicyId() == policy.getId()) {
-                          // Task does exist, skip creating one
-                          continue;
-                        }
-                      } catch (NotFoundException e) {
-                        // Task does not exist yet, so create one
-                      }
-
-                      LifeCycleTask task;
-                      if (policy.getAction() == Action.START_WORKFLOW) {
-                        task = new LifeCycleTaskStartWorkflow();
-                      } else {
-                        task = new LifeCycleTaskImpl();
-                      }
-                      task.setLifeCyclePolicyId(policy.getId());
-                      task.setTargetId(entityId);
-                      task.setStatus(Status.SCHEDULED);
-
-                      lifeCycleService.createLifeCycleTask(task);
-                      logger.info("Created task based on policy " + policy.getTitle());
+                      LifeCycleTaskUtils.createTaskIfNotExists(lifeCycleService, policy, entityId);
                     }
 
                     // Deactivate policy
@@ -235,33 +210,9 @@ public class PolicyCheckRunner {
                     }
                     default -> throw new NotImplementedException();
                   }
-                  // For every entity
+                  // For every entity, create a task if it doesn't already have one for this policy
                   for (String entityId : entityIds) {
-                    // If entity does not yet have a task for this policy
-                    try {
-                      LifeCycleTask task = lifeCycleService.getLifeCycleTaskByTargetId(entityId);
-                      if (task.getLifeCyclePolicyId() == policy.getId()) {
-                        // Task does exist, skip creating one
-                        continue;
-                      }
-                    } catch (NotFoundException e) {
-                      // Task does not exist yet, so create one
-                    }
-
-                    // Create task
-                    LifeCycleTask task;
-                    if (policy.getAction() == Action.START_WORKFLOW) {
-                      task = new LifeCycleTaskStartWorkflow();
-                    } else {
-                      task = new LifeCycleTaskImpl();
-                    }
-
-                    task.setLifeCyclePolicyId(policy.getId());
-                    task.setTargetId(entityId);
-                    task.setStatus(Status.SCHEDULED);
-
-                    lifeCycleService.createLifeCycleTask(task);
-                    logger.info("Created task based on policy " + policy.getTitle());
+                    LifeCycleTaskUtils.createTaskIfNotExists(lifeCycleService, policy, entityId);
                   }
                 } catch (SearchIndexException e) {
                   logger.warn(e.toString());

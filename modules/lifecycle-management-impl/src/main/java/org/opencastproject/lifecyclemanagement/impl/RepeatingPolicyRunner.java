@@ -23,11 +23,8 @@ package org.opencastproject.lifecyclemanagement.impl;
 
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.index.objects.event.Event;
-import org.opencastproject.lifecyclemanagement.api.Action;
 import org.opencastproject.lifecyclemanagement.api.LifeCyclePolicy;
 import org.opencastproject.lifecyclemanagement.api.LifeCycleService;
-import org.opencastproject.lifecyclemanagement.api.LifeCycleTask;
-import org.opencastproject.lifecyclemanagement.api.Status;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
@@ -226,32 +223,10 @@ public class RepeatingPolicyRunner {
                 offset += eventQueryLimit;
               } while (events.size() >= eventQueryLimit);
 
-              // For every entity
+              // For every entity, create a task if it doesn't already have one for this policy
               for (String eventId : eventIds) {
-                // If entity does not yet have a task for this policy
-                try {
-                  repeatingPolicyRunner.getLifeCycleService().getLifeCycleTaskByTargetId(eventId);
-                  // Task does exist, skip creating one
-                  continue;
-                } catch (NotFoundException e) {
-                  // Task does not exist yet, so create one
-                }
-
-                // Create task
-                LifeCycleTask task;
-                if (policy.getAction() == Action.START_WORKFLOW) {
-                  task = new LifeCycleTaskStartWorkflow();
-                } else {
-                  task = new LifeCycleTaskImpl();
-                }
-
-                task.setLifeCyclePolicyId(policy.getId());
-                task.setTargetId(eventId);
-                task.setStatus(Status.SCHEDULED);
-
-                repeatingPolicyRunner.getLifeCycleService().createLifeCycleTask(task);
-                logger.info("Created task based on policy " + policy.getTitle());
-
+                LifeCycleTaskUtils.createTaskIfNotExists(repeatingPolicyRunner.getLifeCycleService(), policy,
+                    eventId);
               }
             } catch (SearchIndexException e) {
               logger.warn(e.toString());
