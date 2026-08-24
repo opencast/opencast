@@ -376,7 +376,7 @@ public class LifeCycleDatabaseServiceImpl implements LifeCycleDatabaseService {
         return lifeCycleTasks;
       });
     } catch (Exception e) {
-      logger.error("Could not find lifecycle tasks with status: ", status, e);
+      logger.error("Could not find lifecycle tasks with status: {}", status, e);
       throw new LifeCycleDatabaseException(e);
     }
   }
