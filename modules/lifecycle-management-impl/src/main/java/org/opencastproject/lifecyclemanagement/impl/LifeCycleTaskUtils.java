@@ -24,6 +24,7 @@ package org.opencastproject.lifecyclemanagement.impl;
 import org.opencastproject.lifecyclemanagement.api.Action;
 import org.opencastproject.lifecyclemanagement.api.LifeCyclePolicy;
 import org.opencastproject.lifecyclemanagement.api.LifeCycleService;
+import org.opencastproject.lifecyclemanagement.api.LifeCycleServiceException;
 import org.opencastproject.lifecyclemanagement.api.LifeCycleTask;
 import org.opencastproject.lifecyclemanagement.api.Status;
 import org.opencastproject.util.NotFoundException;
@@ -46,8 +47,10 @@ final class LifeCycleTaskUtils {
    * @param lifeCycleService the service used to look up and persist tasks
    * @param policy the policy the task is created for
    * @param entityId the id of the entity the task will act on
+   * @throws LifeCycleServiceException If something went wrong in the lifecycle service
    */
-  static void createTaskIfNotExists(LifeCycleService lifeCycleService, LifeCyclePolicy policy, String entityId) {
+  static void createTaskIfNotExists(LifeCycleService lifeCycleService, LifeCyclePolicy policy, String entityId)
+          throws LifeCycleServiceException {
     try {
       LifeCycleTask existingTask = lifeCycleService.getLifeCycleTaskByTargetId(entityId);
       if (existingTask.getLifeCyclePolicyId().equals(policy.getId())) {

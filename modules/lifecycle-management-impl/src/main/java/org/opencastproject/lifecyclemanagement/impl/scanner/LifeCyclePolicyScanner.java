@@ -25,6 +25,7 @@ import static org.opencastproject.util.ReadinessIndicator.ARTIFACT;
 import org.opencastproject.lifecyclemanagement.api.LifeCyclePolicy;
 import org.opencastproject.lifecyclemanagement.api.LifeCyclePolicyAccessControlEntry;
 import org.opencastproject.lifecyclemanagement.api.LifeCycleService;
+import org.opencastproject.lifecyclemanagement.api.LifeCycleServiceException;
 import org.opencastproject.lifecyclemanagement.impl.LifeCyclePolicyAccessControlEntryImpl;
 import org.opencastproject.lifecyclemanagement.impl.LifeCyclePolicyImpl;
 import org.opencastproject.security.api.DefaultOrganization;
@@ -128,7 +129,11 @@ public class LifeCyclePolicyScanner implements ArtifactInstaller {
     mapper = om;
 
     for (Organization org : organizationDirectoryService.getOrganizations()) {
-      lifeCycleService.deleteAllLifeCyclePoliciesCreatedByConfig(org.getId());
+      try {
+        lifeCycleService.deleteAllLifeCyclePoliciesCreatedByConfig(org.getId());
+      } catch (LifeCycleServiceException e) {
+        logger.warn("Could not delete policies created from config for organization '{}'", org.getId(), e);
+      }
     }
   }
 
@@ -258,10 +263,16 @@ public class LifeCyclePolicyScanner implements ArtifactInstaller {
           logger.error("System admin user not authorized to add lifecycle policy to database. By all accounts "
               + "this should not have happened");
           throw new RuntimeException(e);
+        } catch (LifeCycleServiceException ex) {
+          logger.error("Could not add lifecycle policy to database", ex);
+          throw new RuntimeException(ex);
         }
       } catch (UnauthorizedException e) {
         logger.error("System admin user not authorized to add lifecycle policy to database. By all accounts "
             + "this should not have happened");
+        throw new RuntimeException(e);
+      } catch (LifeCycleServiceException e) {
+        logger.error("Could not add lifecycle policy to database", e);
         throw new RuntimeException(e);
       }
     });
@@ -283,6 +294,9 @@ public class LifeCyclePolicyScanner implements ArtifactInstaller {
       } catch (UnauthorizedException e) {
         logger.error("System admin user not authorized to add lifecycle policy to database. By all accounts "
             + "this should not have happened");
+        throw new RuntimeException(e);
+      } catch (LifeCycleServiceException e) {
+        logger.error("Could not delete lifecycle policy with id " + identifier + " from database", e);
         throw new RuntimeException(e);
       }
     });

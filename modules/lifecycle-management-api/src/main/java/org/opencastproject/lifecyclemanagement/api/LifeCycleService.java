@@ -37,11 +37,11 @@ public interface LifeCycleService {
    * @param id life cycle policy id
    * @return The {@link LifeCyclePolicy} belonging to the id
    * @throws NotFoundException If no life cycle policy with the given id could be found
-   * @throws IllegalStateException If something went wrong in the database service
+   * @throws LifeCycleServiceException If something went wrong in the database service
    * @throws UnauthorizedException If the user does not have read access for the life cycle policy
    */
   LifeCyclePolicy getLifeCyclePolicyById(String id)
-          throws NotFoundException, IllegalStateException, UnauthorizedException;
+          throws NotFoundException, LifeCycleServiceException, UnauthorizedException;
 
   /**
    * Returns a life cycle policy from the database by its id
@@ -49,17 +49,18 @@ public interface LifeCycleService {
    * @param orgId life cycle policy organization
    * @return The {@link LifeCyclePolicy} belonging to the id
    * @throws NotFoundException If no life cycle policy with the given id could be found
-   * @throws IllegalStateException If something went wrong in the database service
+   * @throws LifeCycleServiceException If something went wrong in the database service
    * @throws UnauthorizedException If the user does not have read access for the life cycle policy
    */
   LifeCyclePolicy getLifeCyclePolicyById(String id, String orgId)
-          throws NotFoundException, IllegalStateException, UnauthorizedException;
+          throws NotFoundException, LifeCycleServiceException, UnauthorizedException;
 
   /**
    * Get the total number of policies
    * @return the total number of policies
+   * @throws LifeCycleServiceException If something went wrong in the database service
    */
-  long getLifeCyclePoliciesTotal() throws IllegalStateException;
+  long getLifeCyclePoliciesTotal() throws LifeCycleServiceException;
 
   /**
    * Get multiple life cycle policies from the database
@@ -67,110 +68,114 @@ public interface LifeCycleService {
    * @param offset The index of the first result to return.
    * @param sortCriterion In what manner results should be sorted
    * @return A list of {@link LifeCyclePolicy}s
-   * @throws IllegalStateException If something went wrong in the database service
+   * @throws LifeCycleServiceException If something went wrong in the database service
    */
   List<LifeCyclePolicy> getLifeCyclePolicies(int limit, int offset, SortCriterion sortCriterion)
-          throws IllegalStateException;
+          throws LifeCycleServiceException;
 
   /**
    * Get currently active life cycle policies
    * @return A list of {@link LifeCyclePolicy}s
-   * @throws IllegalStateException If something went wrong in the database service
+   * @throws LifeCycleServiceException If something went wrong in the database service
    */
   List<LifeCyclePolicy> getActiveLifeCyclePolicies()
-          throws IllegalStateException;
+          throws LifeCycleServiceException;
 
   /**
    * Creates a single life cycle policy in the database.
    * @param policy The {@link LifeCyclePolicy} to create
    * @return The created {@link LifeCyclePolicy}
-   * @throws IllegalStateException If something went wrong in the database service
+   * @throws LifeCycleServiceException If something went wrong in the database service
    * @throws UnauthorizedException If the user does not have write access for an existing life cycle policy
    */
-  LifeCyclePolicy createLifeCyclePolicy(LifeCyclePolicy policy) throws UnauthorizedException;
+  LifeCyclePolicy createLifeCyclePolicy(LifeCyclePolicy policy) throws LifeCycleServiceException, UnauthorizedException;
 
   /**
    * Updates a single life cycle policy in the database.
    * @param policy The {@link LifeCyclePolicy} to create or update with
    * @return The updated {@link LifeCyclePolicy}
-   * @throws IllegalStateException If something went wrong in the database service
+   * @throws NotFoundException If no life cycle policy with the given id could be found
+   * @throws LifeCycleServiceException If something went wrong in the database service
    * @throws UnauthorizedException If the user does not have write access for an existing life cycle policy
    */
   boolean updateLifeCyclePolicy(LifeCyclePolicy policy)
-          throws IllegalStateException, UnauthorizedException, IllegalArgumentException;
+          throws NotFoundException, LifeCycleServiceException, UnauthorizedException, IllegalArgumentException;
 
   /**
    * Deletes a life cycle policy from the database
    * @param id The life cycle policy identifier
    * @return The removed {@link LifeCyclePolicy}
    * @throws NotFoundException If no life cycle policy with the given id could be found
-   * @throws IllegalStateException If something went wrong in the database service
+   * @throws LifeCycleServiceException If something went wrong in the database service
    * @throws UnauthorizedException If the user does not have write access for the life cycle policy
    */
   boolean deleteLifeCyclePolicy(String id)
-          throws NotFoundException, IllegalStateException, UnauthorizedException;
+          throws NotFoundException, LifeCycleServiceException, UnauthorizedException;
 
   /**
    * Delete all policies created from configuration files from the database.
    * Only to be called as admin from the policy scanner.
    * @param orgId
+   * @throws LifeCycleServiceException If something went wrong in the database service
    */
-  void deleteAllLifeCyclePoliciesCreatedByConfig(String orgId);
+  void deleteAllLifeCyclePoliciesCreatedByConfig(String orgId) throws LifeCycleServiceException;
 
   /**
    * Returns a life cycle task from the database by its id
    * @param id life cycle task id
    * @return The {@link LifeCyclePolicy} belonging to the id
    * @throws NotFoundException If no life cycle task with the given id could be found
-   * @throws IllegalStateException If something went wrong in the database service
+   * @throws LifeCycleServiceException If something went wrong in the database service
    */
   LifeCycleTask getLifeCycleTaskById(String id)
-          throws NotFoundException, IllegalStateException;
+          throws NotFoundException, LifeCycleServiceException;
 
   /**
    * Returns a life cycle task from the database by its target identifier
    * @param targetId the id of the entity the task will act on
    * @return The {@link LifeCyclePolicy} belonging to the id
    * @throws NotFoundException If no life cycle task with the given id could be found
-   * @throws IllegalStateException If something went wrong in the database service
+   * @throws LifeCycleServiceException If something went wrong in the database service
    */
   LifeCycleTask getLifeCycleTaskByTargetId(String targetId)
-          throws NotFoundException, IllegalStateException;
+          throws NotFoundException, LifeCycleServiceException;
 
   /**
    * Get multiple life cycle tasks based on their status
    * @param status The state the tasks should be in
    * @return A list of {@link LifeCycleTask}s
-   * @throws IllegalStateException If something went wrong in the database service
+   * @throws LifeCycleServiceException If something went wrong in the database service
    */
-  List<LifeCycleTask> getLifeCycleTasksWithStatus(Status status) throws IllegalStateException;
+  List<LifeCycleTask> getLifeCycleTasksWithStatus(Status status) throws LifeCycleServiceException;
 
   /**
    * Creates a new life cycle task in the database
    * @param task The {@link LifeCycleTask} to create
    * @return The created {@link LifeCycleTask}
+   * @throws LifeCycleServiceException If something went wrong in the database service
    */
-  LifeCycleTask createLifeCycleTask(LifeCycleTask task);
+  LifeCycleTask createLifeCycleTask(LifeCycleTask task) throws LifeCycleServiceException;
 
   /**
    * Updates a life cycle task
    * @param task The {@link LifeCycleTask} to create or update with
    * @return The updated {@link LifeCycleTask}
-   * @throws IllegalStateException If something went wrong in the database service
+   * @throws NotFoundException If no life cycle task with the given id could be found
+   * @throws LifeCycleServiceException If something went wrong in the database service
    * @throws UnauthorizedException If the user does not have write access for an existing life cycle task
    */
   boolean updateLifeCycleTask(LifeCycleTask task)
-          throws IllegalStateException, UnauthorizedException, IllegalArgumentException;
+          throws NotFoundException, LifeCycleServiceException, UnauthorizedException, IllegalArgumentException;
 
   /**
    * Deletes a life cycle task from the database
    * @param id The life cycle task identifier
    * @return The removed {@link LifeCycleTask}
    * @throws NotFoundException If no life cycle task with the given id could be found
-   * @throws IllegalStateException If something went wrong in the database service
+   * @throws LifeCycleServiceException If something went wrong in the database service
    */
   boolean deleteLifeCycleTask(String id)
-          throws NotFoundException, IllegalStateException;
+          throws NotFoundException, LifeCycleServiceException;
 
   /**
    * Checks if the given policy has all required fields filled in

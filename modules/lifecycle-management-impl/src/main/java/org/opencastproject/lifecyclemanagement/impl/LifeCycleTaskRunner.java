@@ -199,7 +199,7 @@ public class LifeCycleTaskRunner {
           List<LifeCycleTask> tasks;
           try {
             tasks = lifeCycleService.getLifeCycleTasksWithStatus(Status.SCHEDULED);
-          } catch (NullPointerException e) {
+          } catch (NullPointerException | LifeCycleServiceException e) {
             logger.warn("Could not get lifecycle tasks in status 'SCHEDULED' from service: ", e);
             return;
           }
@@ -208,7 +208,7 @@ public class LifeCycleTaskRunner {
           int numberOfRunningTasks = 0;
           try {
             numberOfRunningTasks = lifeCycleService.getLifeCycleTasksWithStatus(Status.STARTED).size();
-          } catch (NullPointerException e) {
+          } catch (NullPointerException | LifeCycleServiceException e) {
             logger.warn("Could not get lifecycle tasks in status 'STARTED' from service: ", e);
             return;
           }
@@ -249,7 +249,7 @@ public class LifeCycleTaskRunner {
           // Get tasks that are running
           try {
             tasks = lifeCycleService.getLifeCycleTasksWithStatus(Status.STARTED);
-          } catch (NullPointerException e) {
+          } catch (NullPointerException | LifeCycleServiceException e) {
             logger.warn("Could not get lifecycle tasks in status 'STARTED' from service: ", e);
             return;
           }
@@ -271,6 +271,10 @@ public class LifeCycleTaskRunner {
               logger.warn("Could not check on running task with id " + task.getId() + ". User "
                   + securityService.getUser().getUsername() + " was not authorized to access "
                   + "lifecycle policy " + task.getLifeCyclePolicyId());
+            } catch (LifeCycleServiceException e) {
+              logger.warn("Could not check on running task with id " + task.getId() + " based of policy "
+                  + task.getLifeCyclePolicyId());
+              logger.warn(e.toString());
             }
           }
 
@@ -388,6 +392,8 @@ public class LifeCycleTaskRunner {
     } catch (NotFoundException e) {
       throw new RuntimeException(e);
     } catch (UnauthorizedException e) {
+      throw new RuntimeException(e);
+    } catch (LifeCycleServiceException e) {
       throw new RuntimeException(e);
     }
   }

@@ -37,6 +37,7 @@ import org.opencastproject.lifecyclemanagement.api.Action;
 import org.opencastproject.lifecyclemanagement.api.LifeCyclePolicy;
 import org.opencastproject.lifecyclemanagement.api.LifeCyclePolicyAccessControlEntry;
 import org.opencastproject.lifecyclemanagement.api.LifeCycleService;
+import org.opencastproject.lifecyclemanagement.api.LifeCycleServiceException;
 import org.opencastproject.lifecyclemanagement.api.StartWorkflowParameters;
 import org.opencastproject.lifecyclemanagement.api.TargetType;
 import org.opencastproject.lifecyclemanagement.api.Timing;
@@ -193,8 +194,8 @@ public class LifeCycleManagementEndpoint {
       return ApiResponseBuilder.notFound("Cannot find playlist instance with id '%s'.", id);
     } catch (UnauthorizedException e) {
       return Response.status(Response.Status.FORBIDDEN).build();
-    } catch (IllegalStateException e) {
-      return Response.status(Response.Status.BAD_REQUEST).build();
+    } catch (LifeCycleServiceException e) {
+      return Response.serverError().build();
     }
   }
 
@@ -224,7 +225,7 @@ public class LifeCycleManagementEndpoint {
       @HeaderParam("Accept") String acceptHeader,
       @QueryParam("limit") int limit,
       @QueryParam("offset") int offset,
-      @QueryParam("sort") String sort) {
+      @QueryParam("sort") String sort) throws LifeCycleServiceException {
     if (offset < 0) {
       return Response.status(Response.Status.BAD_REQUEST).build();
     }
@@ -341,7 +342,7 @@ public class LifeCycleManagementEndpoint {
       })
   public Response getPoliciesForEvent(@HeaderParam("Accept") String acceptHeader, @PathParam("eventId") String eventId,
       @QueryParam("limit") int limit, @QueryParam("offset") int offset)
-          throws SearchIndexException, NotFoundException {
+          throws SearchIndexException, NotFoundException, LifeCycleServiceException {
     // Set default limit if necessary
     if (limit < 1) {
       limit = 100;
@@ -520,6 +521,8 @@ public class LifeCycleManagementEndpoint {
       return Response.status(Response.Status.FORBIDDEN).build();
     } catch (IllegalArgumentException e) {
       return Response.status(Response.Status.BAD_REQUEST).build();
+    } catch (LifeCycleServiceException e) {
+      return Response.serverError().build();
     }
   }
 
@@ -661,6 +664,8 @@ public class LifeCycleManagementEndpoint {
       return Response.status(Response.Status.FORBIDDEN).build();
     } catch (IllegalArgumentException e) {
       return Response.status(Response.Status.BAD_REQUEST).build();
+    } catch (LifeCycleServiceException e) {
+      return Response.serverError().build();
     }
   }
 
@@ -690,6 +695,8 @@ public class LifeCycleManagementEndpoint {
       return ApiResponseBuilder.notFound("Cannot find policy instance with id '%s'.", id);
     } catch (UnauthorizedException e) {
       return Response.status(Response.Status.FORBIDDEN).build();
+    } catch (LifeCycleServiceException e) {
+      return Response.serverError().build();
     }
   }
 

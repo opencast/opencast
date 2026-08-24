@@ -25,6 +25,7 @@ import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.lifecyclemanagement.api.LifeCyclePolicy;
 import org.opencastproject.lifecyclemanagement.api.LifeCycleService;
+import org.opencastproject.lifecyclemanagement.api.LifeCycleServiceException;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
@@ -207,6 +208,9 @@ public class RepeatingPolicyRunner {
                 logger.info("Unschedule " + repeatingPolicyRunner.getLifeCyclePolicy().getTitle());
                 repeatingPolicyRunner.unschedule();
                 return;
+              } catch (LifeCycleServiceException e) {
+                logger.warn(e.toString());
+                return;
               }
 
               // Filter for entities
@@ -226,6 +230,8 @@ public class RepeatingPolicyRunner {
             } catch (UnauthorizedException e) {
               logger.warn(e.toString());
             } catch (NotFoundException e) {
+              logger.warn(e.toString());
+            } catch (LifeCycleServiceException e) {
               logger.warn(e.toString());
             }
           });

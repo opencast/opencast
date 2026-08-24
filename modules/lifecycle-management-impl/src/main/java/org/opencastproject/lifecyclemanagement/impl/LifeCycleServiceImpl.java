@@ -41,6 +41,7 @@ import org.opencastproject.lifecyclemanagement.api.LifeCycleDatabaseService;
 import org.opencastproject.lifecyclemanagement.api.LifeCyclePolicy;
 import org.opencastproject.lifecyclemanagement.api.LifeCyclePolicyAccessControlEntry;
 import org.opencastproject.lifecyclemanagement.api.LifeCycleService;
+import org.opencastproject.lifecyclemanagement.api.LifeCycleServiceException;
 import org.opencastproject.lifecyclemanagement.api.LifeCycleTask;
 import org.opencastproject.lifecyclemanagement.api.StartWorkflowParameters;
 import org.opencastproject.lifecyclemanagement.api.Status;
@@ -143,7 +144,7 @@ public class LifeCycleServiceImpl implements LifeCycleService {
    */
   @Override
   public LifeCyclePolicy getLifeCyclePolicyById(String id)
-          throws NotFoundException, IllegalStateException, UnauthorizedException {
+          throws NotFoundException, LifeCycleServiceException, UnauthorizedException {
     try {
       LifeCyclePolicy policy = persistence.getLifeCyclePolicy(id);
       if (!checkPermission(policy, Permissions.Action.READ)) {
@@ -151,7 +152,7 @@ public class LifeCycleServiceImpl implements LifeCycleService {
       }
       return policy;
     } catch (LifeCycleDatabaseException e) {
-      throw new IllegalStateException(e);
+      throw new LifeCycleServiceException(e);
     }
   }
 
@@ -161,7 +162,7 @@ public class LifeCycleServiceImpl implements LifeCycleService {
    */
   @Override
   public LifeCyclePolicy getLifeCyclePolicyById(String id, String orgId)
-          throws NotFoundException, IllegalStateException, UnauthorizedException {
+          throws NotFoundException, LifeCycleServiceException, UnauthorizedException {
     try {
       LifeCyclePolicy policy = persistence.getLifeCyclePolicy(id, orgId);
       if (!checkPermission(policy, Permissions.Action.READ)) {
@@ -169,7 +170,7 @@ public class LifeCycleServiceImpl implements LifeCycleService {
       }
       return policy;
     } catch (LifeCycleDatabaseException e) {
-      throw new IllegalStateException(e);
+      throw new LifeCycleServiceException(e);
     }
   }
 
@@ -178,11 +179,11 @@ public class LifeCycleServiceImpl implements LifeCycleService {
    * @see LifeCycleService#getLifeCyclePoliciesTotal()
    */
   @Override
-  public long getLifeCyclePoliciesTotal() throws IllegalStateException {
+  public long getLifeCyclePoliciesTotal() throws LifeCycleServiceException {
     try {
       return persistence.getLifeCyclePoliciesTotal(securityService.getOrganization().getId());
     } catch (LifeCycleDatabaseException e) {
-      throw new IllegalStateException(e);
+      throw new LifeCycleServiceException(e);
     }
   }
 
@@ -192,13 +193,13 @@ public class LifeCycleServiceImpl implements LifeCycleService {
    */
   @Override
   public List<LifeCyclePolicy> getLifeCyclePolicies(int limit, int offset, SortCriterion sortCriterion)
-          throws IllegalStateException {
+          throws LifeCycleServiceException {
     try {
       List<LifeCyclePolicy> policies = persistence.getLifeCyclePolicies(limit, offset, sortCriterion);
       policies.removeIf(policy -> !checkPermission(policy, Permissions.Action.READ));
       return policies;
     } catch (LifeCycleDatabaseException e) {
-      throw new IllegalStateException(e);
+      throw new LifeCycleServiceException(e);
     }
   }
 
@@ -207,14 +208,14 @@ public class LifeCycleServiceImpl implements LifeCycleService {
    * @see LifeCycleService#getActiveLifeCyclePolicies
    */
   @Override
-  public List<LifeCyclePolicy> getActiveLifeCyclePolicies() throws IllegalStateException {
+  public List<LifeCyclePolicy> getActiveLifeCyclePolicies() throws LifeCycleServiceException {
     try {
       String orgId = securityService.getOrganization().getId();
       List<LifeCyclePolicy> policies = persistence.getActiveLifeCyclePolicies(orgId);
       policies.removeIf(policy -> !checkPermission(policy, Permissions.Action.READ));
       return policies;
     } catch (LifeCycleDatabaseException e) {
-      throw new IllegalStateException(e);
+      throw new LifeCycleServiceException(e);
     }
   }
 
@@ -223,7 +224,8 @@ public class LifeCycleServiceImpl implements LifeCycleService {
    * @see LifeCycleService#createLifeCyclePolicy(LifeCyclePolicy)
    */
   @Override
-  public LifeCyclePolicy createLifeCyclePolicy(LifeCyclePolicy policy) throws UnauthorizedException {
+  public LifeCyclePolicy createLifeCyclePolicy(LifeCyclePolicy policy)
+          throws LifeCycleServiceException, UnauthorizedException {
     try {
       if (policy.getOrganization() != null) {
         policy = persistence.createLifeCyclePolicy(policy, policy.getOrganization());
@@ -232,7 +234,7 @@ public class LifeCycleServiceImpl implements LifeCycleService {
       }
       return policy;
     } catch (LifeCycleDatabaseException e) {
-      throw new IllegalStateException(e);
+      throw new LifeCycleServiceException(e);
     }
   }
 
@@ -242,14 +244,15 @@ public class LifeCycleServiceImpl implements LifeCycleService {
    */
   @Override
   public boolean updateLifeCyclePolicy(LifeCyclePolicy policy)
-          throws IllegalStateException, UnauthorizedException, IllegalArgumentException {
+          throws NotFoundException, LifeCycleServiceException, UnauthorizedException, IllegalArgumentException {
+    LifeCyclePolicy existingPolicy;
     try {
-      LifeCyclePolicy existingPolicy = persistence.getLifeCyclePolicy(policy.getId());
-      if (!checkPermission(existingPolicy, Permissions.Action.WRITE)) {
-        throw new UnauthorizedException("User does not have write permissions");
-      }
-    } catch (NotFoundException | LifeCycleDatabaseException e) {
-      throw new IllegalStateException("Could not get policy from database with id ");
+      existingPolicy = persistence.getLifeCyclePolicy(policy.getId());
+    } catch (LifeCycleDatabaseException e) {
+      throw new LifeCycleServiceException("Could not get policy from database with id " + policy.getId(), e);
+    }
+    if (!checkPermission(existingPolicy, Permissions.Action.WRITE)) {
+      throw new UnauthorizedException("User does not have write permissions");
     }
 
     if (policy.getOrganization() == null) {
@@ -259,7 +262,7 @@ public class LifeCycleServiceImpl implements LifeCycleService {
     try {
       return persistence.updateLifeCyclePolicy(policy, securityService.getOrganization().getId());
     } catch (LifeCycleDatabaseException e) {
-      throw new IllegalStateException(e);
+      throw new LifeCycleServiceException(e);
     }
   }
 
@@ -269,7 +272,7 @@ public class LifeCycleServiceImpl implements LifeCycleService {
    */
   @Override
   public boolean deleteLifeCyclePolicy(String id)
-          throws NotFoundException, IllegalStateException, UnauthorizedException {
+          throws NotFoundException, LifeCycleServiceException, UnauthorizedException {
     try {
       LifeCyclePolicy policy = persistence.getLifeCyclePolicy(id);
       if (!checkPermission(policy, Permissions.Action.WRITE)) {
@@ -277,7 +280,7 @@ public class LifeCycleServiceImpl implements LifeCycleService {
       }
       return persistence.deleteLifeCyclePolicy(policy, securityService.getOrganization().getId());
     } catch (LifeCycleDatabaseException e) {
-      throw new IllegalStateException("Could not delete policy from database with id " + id);
+      throw new LifeCycleServiceException("Could not delete policy from database with id " + id, e);
     }
   }
 
@@ -286,11 +289,11 @@ public class LifeCycleServiceImpl implements LifeCycleService {
    * @see LifeCycleService#deleteLifeCyclePolicy(String)
    */
   public void deleteAllLifeCyclePoliciesCreatedByConfig(String orgId)
-          throws IllegalStateException {
+          throws LifeCycleServiceException {
     try {
       persistence.deleteAllLifeCyclePoliciesCreatedByConfig(orgId);
     } catch (LifeCycleDatabaseException e) {
-      throw new IllegalStateException("Could not delete policies created from config from database. ");
+      throw new LifeCycleServiceException("Could not delete policies created from config from database. ", e);
     }
   }
 
@@ -300,12 +303,12 @@ public class LifeCycleServiceImpl implements LifeCycleService {
    */
   @Override
   public LifeCycleTask getLifeCycleTaskById(String id)
-          throws NotFoundException, IllegalStateException {
+          throws NotFoundException, LifeCycleServiceException {
     try {
       LifeCycleTask task = persistence.getLifeCycleTask(id);
       return task;
     } catch (LifeCycleDatabaseException e) {
-      throw new IllegalStateException(e);
+      throw new LifeCycleServiceException(e);
     }
   }
 
@@ -315,41 +318,41 @@ public class LifeCycleServiceImpl implements LifeCycleService {
    */
   @Override
   public LifeCycleTask getLifeCycleTaskByTargetId(String targetId)
-          throws NotFoundException, IllegalStateException {
+          throws NotFoundException, LifeCycleServiceException {
     try {
       LifeCycleTask task = persistence.getLifeCycleTaskByTargetId(targetId);
       return task;
     } catch (LifeCycleDatabaseException e) {
-      throw new IllegalStateException(e);
+      throw new LifeCycleServiceException(e);
     }
   }
 
   /**
    * {@inheritDoc}
-   * @see LifeCycleService#getLifeCycleTasksWithStatus(Status) 
+   * @see LifeCycleService#getLifeCycleTasksWithStatus(Status)
    */
   @Override
-  public List<LifeCycleTask> getLifeCycleTasksWithStatus(Status status) throws IllegalStateException {
+  public List<LifeCycleTask> getLifeCycleTasksWithStatus(Status status) throws LifeCycleServiceException {
     try {
       String orgId = securityService.getOrganization().getId();
       List<LifeCycleTask> tasks = persistence.getLifeCycleTasksWithStatus(status, orgId);
       return tasks;
     } catch (LifeCycleDatabaseException e) {
-      throw new IllegalStateException(e);
+      throw new LifeCycleServiceException(e);
     }
   }
 
   /**
    * {@inheritDoc}
-   * @see LifeCycleService#createLifeCycleTask(LifeCycleTask) 
+   * @see LifeCycleService#createLifeCycleTask(LifeCycleTask)
    */
   @Override
-  public LifeCycleTask createLifeCycleTask(LifeCycleTask task) throws IllegalStateException {
+  public LifeCycleTask createLifeCycleTask(LifeCycleTask task) throws LifeCycleServiceException {
     try {
       task = persistence.createLifeCycleTask(task, securityService.getOrganization().getId());
       return task;
     } catch (LifeCycleDatabaseException e) {
-      throw new IllegalStateException(e);
+      throw new LifeCycleServiceException(e);
     }
   }
 
@@ -359,11 +362,11 @@ public class LifeCycleServiceImpl implements LifeCycleService {
    */
   @Override
   public boolean updateLifeCycleTask(LifeCycleTask task)
-          throws IllegalStateException, IllegalArgumentException {
+          throws NotFoundException, LifeCycleServiceException, IllegalArgumentException {
     try {
       persistence.getLifeCycleTask(task.getId());
-    } catch (NotFoundException | LifeCycleDatabaseException e) {
-      throw new IllegalStateException(e);
+    } catch (LifeCycleDatabaseException e) {
+      throw new LifeCycleServiceException("Could not get task from database with id " + task.getId(), e);
     }
 
     if (task.getOrganization() == null) {
@@ -373,22 +376,22 @@ public class LifeCycleServiceImpl implements LifeCycleService {
     try {
       return persistence.updateLifeCycleTask(task, securityService.getOrganization().getId());
     } catch (LifeCycleDatabaseException e) {
-      throw new IllegalStateException(e);
+      throw new LifeCycleServiceException(e);
     }
   }
 
   /**
    * {@inheritDoc}
-   * @see LifeCycleService#deleteLifeCycleTask(String) 
+   * @see LifeCycleService#deleteLifeCycleTask(String)
    */
   @Override
   public boolean deleteLifeCycleTask(String id)
-          throws NotFoundException, IllegalStateException {
+          throws NotFoundException, LifeCycleServiceException {
     try {
       LifeCycleTask task = persistence.getLifeCycleTask(id);
       return persistence.deleteLifeCycleTask(task, securityService.getOrganization().getId());
     } catch (LifeCycleDatabaseException e) {
-      throw new IllegalStateException("Could not delete task from database with id " + id);
+      throw new LifeCycleServiceException("Could not delete task from database with id " + id, e);
     }
   }
 

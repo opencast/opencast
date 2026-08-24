@@ -24,6 +24,7 @@ import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.index.objects.event.Event;
 import org.opencastproject.lifecyclemanagement.api.LifeCyclePolicy;
 import org.opencastproject.lifecyclemanagement.api.LifeCycleService;
+import org.opencastproject.lifecyclemanagement.api.LifeCycleServiceException;
 import org.opencastproject.lifecyclemanagement.api.Timing;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.Organization;
@@ -137,7 +138,7 @@ public class PolicyCheckRunner {
             List<LifeCyclePolicy> policies;
             try {
               policies = lifeCycleService.getActiveLifeCyclePolicies();
-            } catch (NullPointerException e) {
+            } catch (NullPointerException | LifeCycleServiceException e) {
               logger.info("NPE: ", e);
               return;
             }
@@ -179,6 +180,8 @@ public class PolicyCheckRunner {
                     logger.warn(e.toString());
                   } catch (NotFoundException e) {
                     logger.warn(e.toString());
+                  } catch (LifeCycleServiceException e) {
+                    logger.warn(e.toString());
                   }
                 }
                 // If Always (is new entity eligible NOW? How about NOW?)
@@ -203,6 +206,8 @@ public class PolicyCheckRunner {
                 } catch (SearchIndexException e) {
                   logger.warn(e.toString());
                 } catch (NotFoundException e) {
+                  logger.warn(e.toString());
+                } catch (LifeCycleServiceException e) {
                   logger.warn(e.toString());
                 }
 
