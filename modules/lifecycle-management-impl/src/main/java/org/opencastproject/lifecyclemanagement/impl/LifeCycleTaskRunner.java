@@ -414,7 +414,7 @@ public class LifeCycleTaskRunner {
       }
 
       IndexService.EventRemovalResult result = indexService.removeEvent(event.get(), retractWorkflowId);
-      if (result.SUCCESS != IndexService.EventRemovalResult.GENERAL_FAILURE) {
+      if (result != IndexService.EventRemovalResult.GENERAL_FAILURE) {
         task.setStatus(Status.FINISHED);
       } else {
         task.setStatus(Status.FAILED);
