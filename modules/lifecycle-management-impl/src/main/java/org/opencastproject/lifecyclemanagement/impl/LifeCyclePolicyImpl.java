@@ -46,6 +46,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.Lob;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
@@ -106,6 +107,7 @@ public class LifeCyclePolicyImpl implements LifeCyclePolicy {
   private Action action;
 
   // JSON
+  @Lob
   @Column(name = "action_parameters")
   private String actionParameters;
 
@@ -126,6 +128,7 @@ public class LifeCyclePolicyImpl implements LifeCyclePolicy {
   private boolean isCreatedFromConfig = false;
 
   // JSON
+  @Lob
   @Column(name = "targetFilters")
   private String targetFilters;
 
