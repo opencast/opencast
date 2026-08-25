@@ -276,6 +276,7 @@
     <module>modules/usertracking-api</module>
     <module>modules/usertracking-impl</module>
     <module>modules/basic-statistics</module>
+    <module>modules/basic-statistics-aggregation</module>
     <module>modules/basic-statistics-secret-api</module>
     <module>modules/basic-statistics-secret-impl</module>
     <module>modules/basic-statistics-secret-remote</module>
