@@ -42,6 +42,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -173,6 +174,22 @@ public class UserAndRoleDirectoryServiceImplTest {
     assertEquals("matterhorn,test", mergedUser.getProvider());
     assertTrue(mergedUser.isManageable());
     assertTrue(((JaxbUser) mergedUser).isManageable());
+  }
+
+  /**
+   * Every user carries the organization's anonymous role, matching the Spring authorities granted
+   * in loadUserByUsername(). Without it the roles reported by a User disagree with the authorities
+   * actually evaluated, which is what made ROLE_ANONYMOUS missing from /info/me.json under HTTP
+   * basic auth.
+   */
+  @Test
+  public void testUserHasAnonymousRole() throws Exception {
+    User user = directory.loadUser(userName);
+    Set<String> roleNames = new HashSet<>();
+    for (Role role : user.getRoles()) {
+      roleNames.add(role.getName());
+    }
+    assertTrue(roleNames.contains(org.getAnonymousRole()));
   }
 
   @Test

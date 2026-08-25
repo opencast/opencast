@@ -238,7 +238,9 @@ public class GroupsEndpoint {
         }
         comparators.add(comparator);
       }
-      Collections.sort(results, ComparatorUtils.chainedComparator(comparators));
+      if (!comparators.isEmpty()) {
+        Collections.sort(results, ComparatorUtils.chainedComparator(comparators));
+      }
     }
 
     List<JsonObject> groupsJson = new ArrayList<>();
