@@ -187,20 +187,20 @@ public class MediaInspector {
    *
    * @param element
    *          the element to enrich
-   * @param override
-   *          <code>true</code> to override existing metadata
+   * @param overwrite
+   *          <code>true</code> to overwrite existing metadata
    * @return the enriched element
    * @throws MediaInspectionException
    *           if enriching fails
    */
-  public MediaPackageElement enrich(MediaPackageElement element, boolean override, final Map<String, String> options)
+  public MediaPackageElement enrich(MediaPackageElement element, boolean overwrite, final Map<String, String> options)
           throws MediaInspectionException {
     throwExceptionIfInvalid(options);
     if (element instanceof Track) {
       final Track originalTrack = (Track) element;
-      return enrichTrack(originalTrack, override, options);
+      return enrichTrack(originalTrack, overwrite, options);
     } else {
-      return enrichElement(element, override, options);
+      return enrichElement(element, overwrite, options);
     }
   }
 
@@ -209,12 +209,12 @@ public class MediaInspector {
    *
    * @param originalTrack
    *          the original track
-   * @param override
-   *          <code>true</code> to override existing metadata
+   * @param overwrite
+   *          <code>true</code> to overwrite existing metadata
    * @return the media package element
    * @throws MediaInspectionException
    */
-  private MediaPackageElement enrichTrack(final Track originalTrack, final boolean override,
+  private MediaPackageElement enrichTrack(final Track originalTrack, final boolean overwrite,
       final Map<String, String> options) throws MediaInspectionException {
     try {
       URI originalTrackUrl = originalTrack.getURI();
@@ -257,7 +257,7 @@ public class MediaInspector {
         track.setFlavor(flavor);
         track.setIdentifier(originalTrack.getIdentifier());
         // If HLS
-        if (!originalTrack.hasMaster() || override) {
+        if (!originalTrack.hasMaster() || overwrite) {
           track.setMaster(metadata.getAdaptiveMaster());
         } else {
           track.setMaster(originalTrack.isMaster());
@@ -271,10 +271,10 @@ public class MediaInspector {
         }
 
         // enrich the new track with basic info
-        if (track.getDuration() == null || override) {
+        if (track.getDuration() == null || overwrite) {
           track.setDuration(metadata.getDuration());
         }
-        if (track.getChecksum() == null || override) {
+        if (track.getChecksum() == null || overwrite) {
           try {
             track.setChecksum(Checksum.create(ChecksumType.DEFAULT_TYPE, file));
           } catch (IOException e) {
@@ -283,7 +283,7 @@ public class MediaInspector {
         }
 
         // Add the mime type if it's not already present
-        if (track.getMimeType() == null || override) {
+        if (track.getMimeType() == null || overwrite) {
           track.setMimeType(metadata.getMimeType());
         }
 
@@ -295,21 +295,21 @@ public class MediaInspector {
 
         // audio list
         try {
-          enrichAudioStreamMetadata(track, originalTrack, metadata, override);
+          enrichAudioStreamMetadata(track, originalTrack, metadata, overwrite);
         } catch (Exception e) {
           throw new MediaInspectionException("Unable to extract audio metadata from " + file, e);
         }
 
         // video list
         try {
-          enrichVideoStreamMetadata(track, originalTrack, metadata, override);
+          enrichVideoStreamMetadata(track, originalTrack, metadata, overwrite);
         } catch (Exception e) {
           throw new MediaInspectionException("Unable to extract video metadata from " + file, e);
         }
 
         // Subtitle metadata
         try {
-          enrichSubtitleStreamMetadata(track, originalTrack, metadata, override);
+          enrichSubtitleStreamMetadata(track, originalTrack, metadata, overwrite);
         } catch (Exception e) {
           throw new MediaInspectionException("Unable to extract subtitle metadata from " + file, e);
         }
@@ -333,13 +333,13 @@ public class MediaInspector {
    *
    * @param element
    *          the media package element
-   * @param override
+   * @param overwrite
    *          <code>true</code> to overwrite existing metadata
    * @return the enriched element
    * @throws MediaInspectionException
    *           if enriching fails
    */
-  private MediaPackageElement enrichElement(final MediaPackageElement element, final boolean override,
+  private MediaPackageElement enrichElement(final MediaPackageElement element, final boolean overwrite,
           final Map<String, String> options) throws MediaInspectionException {
     try {
       File file;
@@ -352,7 +352,7 @@ public class MediaInspector {
       }
 
       // Checksum
-      if (element.getChecksum() == null || override) {
+      if (element.getChecksum() == null || overwrite) {
         try {
           element.setChecksum(Checksum.create(ChecksumType.DEFAULT_TYPE, file));
         } catch (IOException e) {
@@ -361,7 +361,7 @@ public class MediaInspector {
       }
 
       // Mimetype
-      if (element.getMimeType() == null || override) {
+      if (element.getMimeType() == null || overwrite) {
         try {
           element.setMimeType(MimeTypes.fromString(file.getPath()));
         } catch (UnknownFileTypeException e) {
@@ -703,7 +703,7 @@ public class MediaInspector {
     }
   }
 
-  /* Helper for merging values according to our override definition */
+  /* Helper for merging values according to our overwrite definition */
   private static <T> T merge(T original, T inspected, boolean overwrite) {
     if (overwrite) {
       return inspected;
