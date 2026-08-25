@@ -99,18 +99,25 @@ public class AdopterRegistrationRestService {
   @RestQuery(name = "getregistrationform", description = "GETs the adopter registration data.", responses = {
           @RestResponse(description = "Retrieved registration data.",
                         responseCode = HttpServletResponse.SC_OK),
+          @RestResponse(description = "No registration data found.",
+                        responseCode = HttpServletResponse.SC_NOT_FOUND),
           @RestResponse(description = "Error while retrieving adopter registration data.",
                         responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR) },
                         returnDescription = "GETs the adopter registration data.")
-  public String getRegistrationForm() {
+  public Response getRegistrationForm() {
     logger.debug("Retrieving adopter registration data.");
-    return gson.toJson(registrationService.get());
+    Adopter a = registrationService.get();
+    if (null != a) {
+      return Response.ok(gson.toJson(a)).build();
+    } else {
+      return Response.status(HttpServletResponse.SC_NOT_FOUND).build();
+    }
   }
 
   @GET
-  @Path("summary")
+  @Path("statistics")
   @Produces(MediaType.APPLICATION_JSON)
-  @RestQuery(name = "getsummary", description = "GETs the adopter registration statistics data.",
+  @RestQuery(name = "getstatistics", description = "GETs the adopter registration statistics data.",
       responses = {
           @RestResponse(description = "Retrieved statistic data.",
               responseCode = HttpServletResponse.SC_OK),
@@ -121,7 +128,7 @@ public class AdopterRegistrationRestService {
   public Response getAdopterStatistics() {
     logger.debug("Retrieving adopter registration statistics data.");
     try {
-      return Response.ok(registrationService.getRegistrationDataAsString()).build();
+      return Response.ok(registrationService.getStatsDataAsString()).build();
     } catch (Exception e) {
       return Response.serverError().build();
     }
