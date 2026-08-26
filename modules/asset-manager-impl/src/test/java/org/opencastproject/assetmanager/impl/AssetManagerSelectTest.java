@@ -79,13 +79,13 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
     mp1.add(mpe);
     am.takeSnapshot(OWNER, mp1);
     assertEquals("No properties should be found",
-        0, am.selectProperties(mp1.getIdentifier().toString(), null).size());
+        0, nonSecurityProperties(am.selectProperties(mp1.getIdentifier().toString(), null)).size());
 
     logger.info("Set property on first episode");
     am.setProperty(Property.mk(PropertyId.mk(mp1.getIdentifier().toString(), "org.opencastproject.service", "count"),
         Value.mk(10L)));
     assertEquals("One property should be found",
-        1, am.selectProperties(mp1.getIdentifier().toString(), null).size());
+        1, nonSecurityProperties(am.selectProperties(mp1.getIdentifier().toString(), null)).size());
 
     logger.info("Add another media package with some properties of the same namespace");
     final MediaPackage mp2 = mkMediaPackage(mkCatalog());
@@ -98,9 +98,9 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
 
 
     assertEquals("One property should be found",
-        1, am.selectProperties(mp1.getIdentifier().toString(), null).size());
+        1, nonSecurityProperties(am.selectProperties(mp1.getIdentifier().toString(), null)).size());
     assertEquals("Three properties should be found",
-        3, am.selectProperties(mp2.getIdentifier().toString(), null).size());
+        3, nonSecurityProperties(am.selectProperties(mp2.getIdentifier().toString(), null)).size());
 
     assertEquals("One property should be found",
         1, am.selectProperties(mp1.getIdentifier().toString(), "org.opencastproject.service").size());
@@ -131,7 +131,7 @@ public class AssetManagerSelectTest extends AssetManagerTestBase {
     am.takeSnapshot(OWNER, mp1);
 
     List<Snapshot> snapshots = am.getSnapshotsById(mp1.getIdentifier().toString());
-    List<Property> properties = am.selectProperties(mp1.getIdentifier().toString(), null);
+    List<Property> properties = nonSecurityProperties(am.selectProperties(mp1.getIdentifier().toString(), null));
     assertEquals("One snapshot should be found", 1, snapshots.size());
     assertEquals("No properties should be found", 0, properties.size());
 
