@@ -1,5 +1,17 @@
 # Opencast 20: Release Notes
 
+## Opencast 20.3
+
+This version contains addition updates for the admin, editor, and studio submodules, along with the usual collection of
+bug fixes.  There are two things worthy of special attention:
+
+- [#7788](https://github.com/opencast/opencast/pull/7788) and [#7790](https://github.com/opencast/opencast/pull/7790),
+  which fix several issues regarding captions and their processing.  If you are using the default workflows and
+  captions were not working, these will fix it.  Remember to ensure that your workflow definitions are updated!
+- Patches for [GHSA-m6c8-jcw2-5r25](https://github.com/opencast/opencast/security/advisories/GHSA-m6c8-jcw2-5r25) and
+  [GHSA-6f53-jp7x-gg7p](https://github.com/opencast/opencast/security/advisories/GHSA-6f53-jp7x-gg7p), both from 20.2
+  are now applied in Paella 7.  The original fixes were present in Paella 8, but not Paella 7.
+
 ## Opencast 20.2
 
 This version contains addition updates for the admin, editor, and studio submodules, along with the usual collection of

@@ -1,6 +1,21 @@
 Opencast 20 Changelog
 ---------------------
 
+## Opencast 20.3 (2026-08-26)
+
+- [[#7875](https://github.com/opencast/opencast/pull/7875)] -
+  Remove unused config key from acl.default.create.properties
+- [[#7842](https://github.com/opencast/opencast/pull/7842)] -
+  Avoid failing ZipWOH at inopportune time
+- [[#7841](https://github.com/opencast/opencast/pull/7841)] -
+  Fix some metrics in MetricsExporter not going back to 0
+- [[#7835](https://github.com/opencast/opencast/pull/7835)] -
+  Update documentation for thumbnail configuration
+- [[#7833](https://github.com/opencast/opencast/pull/7833)] -
+  Add "Required" column to the manual asset upload config options
+- [[#7754](https://github.com/opencast/opencast/pull/7754)] -
+  Allow configuring flavor type for configure-by-dcterm
+
 ## Opencast 20.2 (2026-07-15)
 
 - [[#7733](https://github.com/opencast/opencast/pull/7733)] -
