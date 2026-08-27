@@ -21,6 +21,9 @@
 package org.opencastproject.basicstatisticsaggregation.persistence;
 
 import org.opencastproject.basicstatistics.ItemType;
+import org.opencastproject.basicstatisticsaggregation.AggregatedEvent;
+import org.opencastproject.basicstatisticsaggregation.AggregatedTotal;
+import org.opencastproject.basicstatisticsaggregation.AggregationCursor;
 import org.opencastproject.db.DBSession;
 import org.opencastproject.db.DBSessionFactory;
 
@@ -31,6 +34,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -152,6 +156,36 @@ public class BasicStatisticsAggregationDatabaseServiceImpl implements BasicStati
       });
     } catch (Exception e) {
       throw new BasicStatisticsAggregationDatabaseException("Could not update aggregated total", e);
+    }
+  }
+
+  @Override
+  public Instant getCursor() throws BasicStatisticsAggregationDatabaseException {
+    try {
+      return db.exec(em -> {
+        AggregationCursor cursor = em.find(AggregationCursor.class, AggregationCursor.SINGLETON_ID);
+        return cursor != null ? cursor.getScannedUntil() : Instant.EPOCH;
+      });
+    } catch (Exception e) {
+      throw new BasicStatisticsAggregationDatabaseException("Could not fetch aggregation cursor", e);
+    }
+  }
+
+  @Override
+  public void setCursor(Instant scannedUntil) throws BasicStatisticsAggregationDatabaseException {
+    try {
+      db.execTx(em -> {
+        AggregationCursor cursor = em.find(AggregationCursor.class, AggregationCursor.SINGLETON_ID);
+        if (cursor == null) {
+          cursor = new AggregationCursor();
+          cursor.setScannedUntil(scannedUntil);
+          em.persist(cursor);
+        } else {
+          cursor.setScannedUntil(scannedUntil);
+        }
+      });
+    } catch (Exception e) {
+      throw new BasicStatisticsAggregationDatabaseException("Could not update aggregation cursor", e);
     }
   }
 
