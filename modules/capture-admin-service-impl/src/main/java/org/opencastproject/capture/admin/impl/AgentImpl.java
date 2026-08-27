@@ -35,6 +35,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
@@ -344,13 +345,12 @@ public class AgentImpl implements Agent {
       CaptureParameters.VENDOR_FIRMWARE,
       CaptureParameters.VENDOR_HARDWARE);
 
-    boolean hasRequired2xKeys = configuration.stringPropertyNames().stream()
-        .filter(requiredKeys2x::contains)
-        .map(String::length)
-        .allMatch(i -> i < 256);
+    Set<String> configs = configuration.stringPropertyNames().stream()
+        .filter(requiredKeys2x::contains).collect(Collectors.toSet());
+    boolean hasRequired2xKeys = configs.size() == 4 && configs.stream().map(String::length).allMatch(i -> i < 256);
 
     if (hasRequired2xKeys) {
-      //set2xAgentConfiguration(configuration);
+      set2xAgentConfiguration(configuration);
     } else {
       set1xAgentConfiguration(configuration);
     }
@@ -423,6 +423,33 @@ public class AgentImpl implements Agent {
     } else {
       capabilitiesProperties.put(CaptureParameters.CAPTURE_DEVICE_CAMERA_POSITION, cameraPosition);
     }
+  }
+
+  private void set2xAgentConfiguration(Properties configuration) {
+    // Figure out the capabilities variables
+
+    capabilitiesProperties = new Properties();
+
+    // Parse names
+    String names = configuration.getProperty(CaptureParameters.CAPTURE_DEVICE_NAMES);
+    if (names == null) {
+      log.debug("Capture agent '{}' failed to provide device names ({})", name, CaptureParameters.CAPTURE_DEVICE_NAMES);
+    } else if (names.length() > 256) {
+      log.debug("Capture agent '{}' device names too long ({})", name, CaptureParameters.CAPTURE_DEVICE_NAMES);
+    } else {
+      capabilitiesProperties.put(CaptureParameters.CAPTURE_DEVICE_NAMES, names);
+
+      Properties devices = parseCapabilities(configuration);
+      for (String key : devices.stringPropertyNames()) {
+        capabilitiesProperties.put(key, devices.getProperty(key));
+      }
+    }
+
+    boolean supportLocalPausedStart = getKeyBinary(configuration, CaptureParameters.CAPTURE_LOCAL_STARTPAUSED);
+    boolean supportStreaming = getKeyBinary(configuration, CaptureParameters.CAPTURE_STREAM_CAPABLE);
+    boolean supportStreamingPaused =
+        supportStreaming && getKeyBinary(configuration, CaptureParameters.CAPTURE_STREAM_STARTPAUSED);
+
   }
 
   /**
