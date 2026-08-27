@@ -53,6 +53,16 @@ import javax.persistence.Transient;
         name = "RawEvent.findById",
         query = "SELECT p FROM RawEvent p WHERE p.id = :id and p.organization = :organizationId"
     ),
+    @NamedQuery(
+        name = "RawEvent.findSince",
+        query = "SELECT p FROM RawEvent p WHERE p.itemType = :itemType AND p.timestamp > :since "
+            + "ORDER BY p.timestamp ASC"
+    ),
+    @NamedQuery(
+        name = "RawEvent.findByItemDay",
+        query = "SELECT p FROM RawEvent p WHERE p.organization = :organization AND p.itemType = :itemType "
+            + "AND p.itemId = :itemId AND p.timestamp >= :dayStart AND p.timestamp < :dayEnd ORDER BY p.timestamp ASC"
+    ),
 })
 public class RawEvent {
 

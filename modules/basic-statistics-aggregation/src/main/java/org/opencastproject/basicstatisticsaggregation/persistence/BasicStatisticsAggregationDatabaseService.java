@@ -21,7 +21,10 @@
 package org.opencastproject.basicstatisticsaggregation.persistence;
 
 import org.opencastproject.basicstatistics.ItemType;
+import org.opencastproject.basicstatisticsaggregation.AggregatedEvent;
+import org.opencastproject.basicstatisticsaggregation.AggregatedTotal;
 
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -60,4 +63,15 @@ public interface BasicStatisticsAggregationDatabaseService {
    */
   void addToTotal(String organization, ItemType itemType, String itemId, long viewsDelta, long watchtimeDelta)
           throws BasicStatisticsAggregationDatabaseException;
+
+  /**
+   * Get the timestamp up to which the raw event log has already been scanned for new activity.
+   * Returns {@link Instant} if the job has never run before.
+   */
+  Instant getCursor() throws BasicStatisticsAggregationDatabaseException;
+
+  /**
+   * Advance the cursor to the given timestamp.
+   */
+  void setCursor(Instant scannedUntil) throws BasicStatisticsAggregationDatabaseException;
 }

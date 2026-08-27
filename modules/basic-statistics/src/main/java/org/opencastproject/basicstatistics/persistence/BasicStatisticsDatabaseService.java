@@ -20,6 +20,7 @@
  */
 package org.opencastproject.basicstatistics.persistence;
 
+import org.opencastproject.basicstatistics.ItemType;
 import org.opencastproject.basicstatistics.RawEvent;
 import org.opencastproject.util.requests.SortCriterion;
 
@@ -40,6 +41,20 @@ public interface BasicStatisticsDatabaseService {
    * @throws BasicStatisticsDatabaseException if there is a problem communicating with the underlying data store
    */
   List<RawEvent> getRawEvents(String organizationId, int limit, int offset, SortCriterion sortCriterion)
+          throws BasicStatisticsDatabaseException;
+
+  /**
+   * Get all raw events of the given item type that happened after {@code since}, in chronological order. Used to
+   * discover which items have new activity that needs (re-)aggregating.
+   */
+  List<RawEvent> getRawEventsSince(ItemType itemType, Instant since)
+          throws BasicStatisticsDatabaseException;
+
+  /**
+   * Get all raw events for one item within the given (inclusive/exclusive) time range, in chronological order.
+   * Used to (re-)compute a full day's aggregate for one item from scratch.
+   */
+  List<RawEvent> getRawEvents(String organization, ItemType itemType, String itemId, Instant from, Instant to)
           throws BasicStatisticsDatabaseException;
 
   /**

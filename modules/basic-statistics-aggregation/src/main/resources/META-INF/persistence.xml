@@ -8,10 +8,12 @@
   <persistence-unit name="org.opencastproject.basicstatisticsaggregation" transaction-type="RESOURCE_LOCAL">
     <provider>org.eclipse.persistence.jpa.PersistenceProvider</provider>
     <non-jta-data-source>osgi:service/javax.sql.DataSource/(osgi.jndi.service.name=jdbc/opencast)</non-jta-data-source>
-    <class>org.opencastproject.basicstatisticsaggregation.persistence.AggregatedEvent</class>
-    <class>org.opencastproject.basicstatisticsaggregation.persistence.AggregatedTotal</class>
+    <class>org.opencastproject.basicstatisticsaggregation.AggregatedEvent</class>
+    <class>org.opencastproject.basicstatisticsaggregation.AggregatedTotal</class>
+    <class>org.opencastproject.basicstatisticsaggregation.AggregationCursor</class>
     <class>org.opencastproject.basicstatisticsaggregation.persistence.IntArrayConverter</class>
     <class>org.opencastproject.basicstatisticsaggregation.persistence.LongArrayConverter</class>
+    <class>org.opencastproject.basicstatistics.persistence.InstantConverter</class>
     <class>org.opencastproject.basicstatistics.persistence.ItemTypeConverter</class>
     <shared-cache-mode>NONE</shared-cache-mode>
     <properties>

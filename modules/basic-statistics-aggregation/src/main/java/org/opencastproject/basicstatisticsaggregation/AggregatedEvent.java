@@ -18,10 +18,12 @@
  * the License.
  *
  */
-package org.opencastproject.basicstatisticsaggregation.persistence;
+package org.opencastproject.basicstatisticsaggregation;
 
 import org.opencastproject.basicstatistics.ItemType;
 import org.opencastproject.basicstatistics.persistence.ItemTypeConverter;
+import org.opencastproject.basicstatisticsaggregation.persistence.IntArrayConverter;
+import org.opencastproject.basicstatisticsaggregation.persistence.LongArrayConverter;
 
 import java.time.LocalDate;
 
@@ -38,6 +40,11 @@ import javax.persistence.UniqueConstraint;
 
 /**
  * A single day's worth of hourly view/watchtime buckets for one item. Only days with at least one view are stored.
+ *
+ * {@link #day} and the hour buckets in {@link #views}/{@link #watchtime} are all in UTC (see
+ * {@code ViewCorrelator.hourOf}). A caller that wants stats for a non-UTC calendar day will generally need to read
+ * two adjacent rows and splice the hour arrays by the relevant offset; this isn't exact for non-whole-hour offsets
+ * or across DST transitions.
  */
 @Entity(name = "AggregatedEvent")
 @Table(name = "oc_basic_statistics_aggregation", uniqueConstraints = {
