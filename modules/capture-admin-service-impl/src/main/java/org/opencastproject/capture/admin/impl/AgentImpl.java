@@ -286,6 +286,37 @@ public class AgentImpl implements Agent {
     return value;
   }
 
+  private Properties parseCapabilities(Properties configuration) {
+    Properties deviceCaps = new Properties();
+    String names = configuration.getProperty(CaptureParameters.CAPTURE_DEVICE_NAMES);
+    deviceCaps.put(CaptureParameters.CAPTURE_DEVICE_NAMES, names);
+    // Get the names and setup a hash map of them
+    String[] friendlyNames = deviceCaps.getProperty(CaptureParameters.CAPTURE_DEVICE_NAMES).split(",");
+    HashMap<String, Integer> propertyCounts = new HashMap<String, Integer>();
+    for (String name : friendlyNames) {
+      propertyCounts.put(name, 0);
+    }
+
+    // For each key
+    for (String key : configuration.stringPropertyNames()) {
+      // For each device
+      for (String name : friendlyNames) {
+        String check = CaptureParameters.CAPTURE_DEVICE_PREFIX + name;
+        // If the key looks like a device prefix + the name, copy it
+        if (key.startsWith(check)) {
+          String property = configuration.getProperty(key);
+          if (property == null) {
+            log.warn("Capture agent '{}': ignoring capability key '{}' because its value is null", this.name, key);
+            continue;
+          }
+          deviceCaps.setProperty(key, property);
+          propertyCounts.put(name, propertyCounts.get(name) + 1);
+        }
+      }
+    }
+    return deviceCaps;
+  }
+
 
   /**
    * {@inheritDoc}
@@ -336,30 +367,9 @@ public class AgentImpl implements Agent {
     if (names == null) {
       log.debug("Capture agent '{}' failed to provide device names ({})", name, CaptureParameters.CAPTURE_DEVICE_NAMES);
     } else {
-      capabilitiesProperties.put(CaptureParameters.CAPTURE_DEVICE_NAMES, names);
-      // Get the names and setup a hash map of them
-      String[] friendlyNames = names.split(",");
-      HashMap<String, Integer> propertyCounts = new HashMap<String, Integer>();
-      for (String name : friendlyNames) {
-        propertyCounts.put(name, 0);
-      }
-
-      // For each key
-      for (String key : configuration.stringPropertyNames()) {
-        // For each device
-        for (String name : friendlyNames) {
-          String check = CaptureParameters.CAPTURE_DEVICE_PREFIX + name;
-          // If the key looks like a device prefix + the name, copy it
-          if (key.startsWith(check)) {
-            String property = configuration.getProperty(key);
-            if (property == null) {
-              log.warn("Capture agent '{}': ignoring capability key '{}' because its value is null", this.name, key);
-              continue;
-            }
-            capabilitiesProperties.setProperty(key, property);
-            propertyCounts.put(name, propertyCounts.get(name) + 1);
-          }
-        }
+      Properties devices = parseCapabilities(configuration);
+      for (String key : devices.stringPropertyNames()) {
+        capabilitiesProperties.put(key, devices.getProperty(key));
       }
     }
 
