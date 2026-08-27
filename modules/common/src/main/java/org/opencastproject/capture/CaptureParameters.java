@@ -36,6 +36,39 @@ public interface CaptureParameters {
   /** The key for the workflow definition, if any, in the capture properties attached to the iCal event */
   String INGEST_WORKFLOW_DEFINITION = "org.opencastproject.workflow.definition";
 
+  /** The key for the capture agent vendor's name */
+  String VENDOR_NAME = "vendor.name";
+
+  /** The key for the capture agent's model */
+  String VENDOR_MODEL = "vendor.model";
+
+  /** The key for the capture agent's firmware information */
+  String VENDOR_FIRMWARE = "vendor.firmware";
+
+  /** The key for the capture agent's hardware information */
+  String VENDOR_HARDWARE = "vendor.hardware";
+
+  /** A binary flag indicating that the device supports starting a recording paused (ie, without actually capturing) */
+  String CAPTURE_LOCAL_STARTPAUSED = "capture.local.startpaused";
+
+  /** A binary flag indicating that whether the device supports streaming as it captures */
+  String CAPTURE_STREAM_CAPABLE = "capture.stream.capable";
+
+  /** A binary flag indicating that whether the device supports starting the stream but not sending data initially */
+  String CAPTURE_STREAM_STARTPAUSED = "capture.stream.startpaused";
+
+  /** A comma delimited list of bitrates and frame sizes supported by the CA's streaming system */
+  String CAPTURE_STREAM_CONFIGURATION = "capture.stream.configuration";
+
+  /** A command delimited list of PTZ positions supported by the CA */
+  String CAPTURE_DEVICE_POSITIONS = "capture.device.positions";
+
+  /** A comma delimited list of frame composition options supported by the CA */
+  String CAPTURE_DEVICE_CONTENT = "capture.device.content";
+
+  /** The vendor specific extension prefix for anything a CA might need that's not otherwise defined */
+  String CAPTURE_EXTENSION_PREFIX = "X-";
+
   /** A comma delimited list of the friendly names for capturing devices */
   String CAPTURE_DEVICE_NAMES = "capture.device.names";
 

@@ -268,6 +268,25 @@ public class AgentImpl implements Agent {
     this.organization = organization;
   }
 
+
+  private boolean getKeyBinary(Properties properties, String key) {
+    // This is a binary 1/0, so max length is 1.  More than one character is incorrect and should throw an error.
+    return "1".equals(getKey(properties, key, 1));
+  }
+
+  private String getKey(Properties properties, String key) {
+    return getKey(properties, key, 256);
+  }
+
+  private String getKey(Properties properties, String key, int maxLength) {
+    String value = properties.getProperty(key);
+    if (value != null && value.length() > maxLength) {
+      throw new RuntimeException("Maximum length of " + maxLength + " exceeded for key " + key);
+    }
+    return value;
+  }
+
+
   /**
    * {@inheritDoc}
    *
@@ -288,6 +307,26 @@ public class AgentImpl implements Agent {
       log.warn("Unable to store agent " + "'s capabilities to the database, IO exception occurred.", e);
     }
 
+    Set<String> requiredKeys2x = Set.of(
+      CaptureParameters.VENDOR_NAME,
+      CaptureParameters.VENDOR_MODEL,
+      CaptureParameters.VENDOR_FIRMWARE,
+      CaptureParameters.VENDOR_HARDWARE);
+
+    boolean hasRequired2xKeys = configuration.stringPropertyNames().stream()
+        .filter(requiredKeys2x::contains)
+        .map(String::length)
+        .allMatch(i -> i < 256);
+
+    if (hasRequired2xKeys) {
+      //set2xAgentConfiguration(configuration);
+    } else {
+      set1xAgentConfiguration(configuration);
+    }
+
+  }
+
+  private void set1xAgentConfiguration(Properties configuration) {
     // Figure out the capabilities variables
 
     capabilitiesProperties = new Properties();
