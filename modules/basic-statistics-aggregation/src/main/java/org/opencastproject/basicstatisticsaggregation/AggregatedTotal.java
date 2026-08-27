@@ -18,7 +18,7 @@
  * the License.
  *
  */
-package org.opencastproject.basicstatisticsaggregation.persistence;
+package org.opencastproject.basicstatisticsaggregation;
 
 import org.opencastproject.basicstatistics.ItemType;
 import org.opencastproject.basicstatistics.persistence.ItemTypeConverter;

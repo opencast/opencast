@@ -20,6 +20,7 @@
  */
 package org.opencastproject.basicstatistics.persistence;
 
+import org.opencastproject.basicstatistics.ItemType;
 import org.opencastproject.basicstatistics.RawEvent;
 import org.opencastproject.basicstatistics.StatisticsVersion;
 import org.opencastproject.db.DBSession;
@@ -109,6 +110,46 @@ public class BasicStatisticsDatabaseServiceImpl implements BasicStatisticsDataba
       });
     } catch (Exception e) {
       throw new BasicStatisticsDatabaseException("Error fetching raw events from database", e);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see BasicStatisticsDatabaseServiceImpl#getRawEventsSince(ItemType, Instant)
+   */
+  @Override
+  public List<RawEvent> getRawEventsSince(ItemType itemType, Instant since) throws BasicStatisticsDatabaseException {
+    try {
+      return db.exec(em -> {
+        TypedQuery<RawEvent> query = em.createNamedQuery("RawEvent.findSince", RawEvent.class);
+        query.setParameter("itemType", itemType);
+        query.setParameter("since", since);
+        return query.getResultList();
+      });
+    } catch (Exception e) {
+      throw new BasicStatisticsDatabaseException("Error fetching raw events since " + since, e);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see BasicStatisticsDatabaseServiceImpl#getRawEvents(String, ItemType, String, Instant, Instant)
+   */
+  @Override
+  public List<RawEvent> getRawEvents(String organization, ItemType itemType, String itemId, Instant from,
+      Instant to) throws BasicStatisticsDatabaseException {
+    try {
+      return db.exec(em -> {
+        TypedQuery<RawEvent> query = em.createNamedQuery("RawEvent.findByItemDay", RawEvent.class);
+        query.setParameter("organization", organization);
+        query.setParameter("itemType", itemType);
+        query.setParameter("itemId", itemId);
+        query.setParameter("dayStart", from);
+        query.setParameter("dayEnd", to);
+        return query.getResultList();
+      });
+    } catch (Exception e) {
+      throw new BasicStatisticsDatabaseException("Error fetching raw events for " + itemId, e);
     }
   }
 
