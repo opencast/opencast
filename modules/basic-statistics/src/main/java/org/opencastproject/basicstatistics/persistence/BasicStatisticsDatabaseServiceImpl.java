@@ -21,6 +21,7 @@
 package org.opencastproject.basicstatistics.persistence;
 
 import org.opencastproject.basicstatistics.RawEvent;
+import org.opencastproject.basicstatistics.StatisticsVersion;
 import org.opencastproject.db.DBSession;
 import org.opencastproject.db.DBSessionFactory;
 import org.opencastproject.security.api.SecurityService;
@@ -33,6 +34,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
 import java.util.List;
 
 import javax.persistence.EntityManager;
@@ -89,6 +91,11 @@ public class BasicStatisticsDatabaseServiceImpl implements BasicStatisticsDataba
   public void activate(ComponentContext cc) {
     logger.info("Activating persistence manager for basic statistics");
     db = dbSessionFactory.createSession(emf);
+    try {
+      ensureVersionRecorded();
+    } catch (BasicStatisticsDatabaseException e) {
+      logger.warn("Could not record statistics version", e);
+    }
   }
 
   /**
@@ -137,6 +144,46 @@ public class BasicStatisticsDatabaseServiceImpl implements BasicStatisticsDataba
       });
     } catch (Exception e) {
       throw new BasicStatisticsDatabaseException("Could not persist raw events", e);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see BasicStatisticsDatabaseServiceImpl#ensureVersionRecorded()
+   */
+  @Override
+  public void ensureVersionRecorded() throws BasicStatisticsDatabaseException {
+    try {
+      db.execTx(em -> {
+        TypedQuery<StatisticsVersion> query = em.createNamedQuery("StatisticsVersion.findLatest",
+            StatisticsVersion.class);
+        query.setMaxResults(1);
+        List<StatisticsVersion> latest = query.getResultList();
+        if (latest.isEmpty() || latest.get(0).getVersion() != StatisticsVersion.CURRENT_VERSION) {
+          em.persist(new StatisticsVersion(StatisticsVersion.CURRENT_VERSION, Instant.now()));
+        }
+      });
+    } catch (Exception e) {
+      throw new BasicStatisticsDatabaseException("Could not record statistics version", e);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   * @see BasicStatisticsDatabaseServiceImpl#getVersion1Timestamp()
+   */
+  @Override
+  public Instant getVersion1Timestamp() throws BasicStatisticsDatabaseException {
+    try {
+      return db.exec(em -> {
+        TypedQuery<StatisticsVersion> query = em.createNamedQuery("StatisticsVersion.findByVersion",
+            StatisticsVersion.class);
+        query.setParameter("version", 1);
+        List<StatisticsVersion> results = query.getResultList();
+        return results.isEmpty() ? null : results.get(0).getActivatedAt();
+      });
+    } catch (Exception e) {
+      throw new BasicStatisticsDatabaseException("Could not fetch statistics version history", e);
     }
   }
 }
