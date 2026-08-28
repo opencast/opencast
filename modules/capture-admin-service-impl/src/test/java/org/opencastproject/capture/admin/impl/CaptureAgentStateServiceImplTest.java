@@ -74,6 +74,7 @@ public class CaptureAgentStateServiceImplTest {
     capabilities.setProperty(CaptureParameters.CAPTURE_DEVICE_PREFIX + "SCREEN", "/dev/video1");
     capabilities.setProperty(CaptureParameters.CAPTURE_DEVICE_PREFIX + "AUDIO", "hw:0");
     capabilities.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "CAMERA,SCREEN,AUDIO");
+    capabilities.setProperty(CaptureParameters.AGENT_VERSION, "1");
   }
 
   private void setupCC() {
@@ -201,17 +202,20 @@ public class CaptureAgentStateServiceImplTest {
 
   @Test
   public void oneAgentState() {
+    Properties bare1xAgent = new Properties();
+    bare1xAgent.put(CaptureParameters.AGENT_VERSION, "1");
+
     service.setAgentState("agent1", IDLE);
     assertEquals(1, service.getKnownAgents().size());
 
     verifyAgent("notAgent1", null, null);
-    verifyAgent("agent1", IDLE, new Properties());
+    verifyAgent("agent1", IDLE, bare1xAgent);
 
     service.setAgentState("agent1", CAPTURING);
     assertEquals(1, service.getKnownAgents().size());
 
     verifyAgent("notAgent1", null, null);
-    verifyAgent("agent1", CAPTURING, new Properties());
+    verifyAgent("agent1", CAPTURING, bare1xAgent);
   }
 
   @Test
@@ -231,8 +235,10 @@ public class CaptureAgentStateServiceImplTest {
     service.setAgentConfiguration("agent1", new Properties());
     assertEquals(1, service.getKnownAgents().size());
 
+    Properties bare1xAgent = new Properties();
+    bare1xAgent.put(CaptureParameters.AGENT_VERSION, "1");
     verifyAgent("notAnAgent", null, null);
-    verifyAgent("agent1", IDLE, new Properties());
+    verifyAgent("agent1", IDLE, bare1xAgent);
   }
 
   @Test
@@ -306,12 +312,15 @@ public class CaptureAgentStateServiceImplTest {
     Properties cap1 = new Properties();
     cap1.put(CaptureParameters.CAPTURE_DEVICE_PREFIX + "key", "value");
     cap1.put(CaptureParameters.CAPTURE_DEVICE_NAMES, "key");
+    cap1.put(CaptureParameters.AGENT_VERSION, "1");
     Properties cap2 = new Properties();
     cap2.put(CaptureParameters.CAPTURE_DEVICE_PREFIX + "foo", "bar");
     cap2.put(CaptureParameters.CAPTURE_DEVICE_NAMES, "foo");
+    cap2.put(CaptureParameters.AGENT_VERSION, "1");
     Properties cap3 = new Properties();
     cap3.put(CaptureParameters.CAPTURE_DEVICE_PREFIX + "bam", "bam");
     cap3.put(CaptureParameters.CAPTURE_DEVICE_NAMES, "bam");
+    cap3.put(CaptureParameters.AGENT_VERSION, "1");
 
     // Setup the two agents and persist them
     service.setAgentState("sticky1", IDLE);

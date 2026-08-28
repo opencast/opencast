@@ -361,6 +361,7 @@ public class AgentImpl implements Agent {
     // Figure out the capabilities variables
 
     capabilitiesProperties = new Properties();
+    capabilitiesProperties.put(CaptureParameters.AGENT_VERSION, "1");
 
     // Parse names
     String names = configuration.getProperty(CaptureParameters.CAPTURE_DEVICE_NAMES);
@@ -429,6 +430,7 @@ public class AgentImpl implements Agent {
     // Figure out the capabilities variables
 
     capabilitiesProperties = new Properties();
+    capabilitiesProperties.put(CaptureParameters.AGENT_VERSION, "2");
 
     // Parse names
     String names = configuration.getProperty(CaptureParameters.CAPTURE_DEVICE_NAMES);

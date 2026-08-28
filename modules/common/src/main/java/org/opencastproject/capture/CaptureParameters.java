@@ -27,6 +27,11 @@ package org.opencastproject.capture;
  */
 public interface CaptureParameters {
 
+  /** Added by Opencast internally, this will appear in your agent properties and tell you which agent version
+   * Opencast thinks you are running.  This will be a '1' for pre-CA API 2.x agents, and '2' for CA API 2.x agents.
+   */
+  String AGENT_VERSION = "opencast.agent.version";
+
   /** Agent configuration property indicating how the agent was registered */
   String AGENT_REGISTRATION_TYPE = "org.opencastproject.registration.type";
 
