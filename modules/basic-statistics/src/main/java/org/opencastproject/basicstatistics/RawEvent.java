@@ -33,6 +33,7 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Table;
@@ -44,9 +45,11 @@ import javax.persistence.Transient;
  */
 @Entity(name = "RawEvent")
 @Table(name = "oc_basic_statistics_raw_event", indexes = {
-    // TODO: indices for faster lookup
-    // Lookup by item ID (potentially together with item type)
-    // Range queries for timestamp
+    // For RawEvent.findSince
+    @Index(name = "IX_oc_basic_statistics_raw_event_item_type_timestamp", columnList = "item_type, timestamp"),
+    // For RawEvent.findByItemDay
+    @Index(name = "IX_oc_basic_statistics_raw_event_item_timestamp",
+        columnList = "organization, item_type, item_id, timestamp"),
 })
 @NamedQueries({
     @NamedQuery(
