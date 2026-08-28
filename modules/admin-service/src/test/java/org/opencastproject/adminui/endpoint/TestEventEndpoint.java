@@ -37,6 +37,7 @@ import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.authorization.xacml.manager.impl.ManagedAclImpl;
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
+import org.opencastproject.capture.admin.api.AgentVersion;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.event.comment.EventComment;
 import org.opencastproject.event.comment.EventCommentReply;
@@ -661,6 +662,11 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
       @Override
       public String getName() {
         return "testagent";
+      }
+
+      @Override
+      public AgentVersion getVersion() {
+        return AgentVersion.VERSION_1;
       }
 
       @Override

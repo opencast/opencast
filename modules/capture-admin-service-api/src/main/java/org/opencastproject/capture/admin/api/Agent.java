@@ -106,4 +106,11 @@ public interface Agent {
    *          The agent's configuration.
    */
   void setConfiguration(Properties configuration);
+
+  /**
+   * Gets the agent's CA API version.
+   *
+   * @return The agent's version as an Enum member
+   */
+  AgentVersion getVersion();
 }

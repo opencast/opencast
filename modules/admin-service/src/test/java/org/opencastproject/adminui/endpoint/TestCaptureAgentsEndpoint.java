@@ -26,6 +26,7 @@ import static org.easymock.EasyMock.replay;
 
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
+import org.opencastproject.capture.admin.api.AgentVersion;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.security.api.User;
 import org.opencastproject.util.DateTimeSupport;
@@ -100,6 +101,11 @@ public class TestCaptureAgentsEndpoint extends CaptureAgentsEndpoint {
     @Override
     public String getState() {
       return state;
+    }
+
+    @Override
+    public AgentVersion getVersion() {
+      return AgentVersion.VERSION_1;
     }
 
     @Override

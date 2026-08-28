@@ -35,6 +35,7 @@ import static org.opencastproject.db.DBTestEnv.newEntityManagerFactory;
 
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
+import org.opencastproject.capture.admin.api.AgentVersion;
 import org.opencastproject.security.api.DefaultOrganization;
 import org.opencastproject.security.api.JaxbRole;
 import org.opencastproject.security.api.JaxbUser;
@@ -61,7 +62,12 @@ import java.util.concurrent.TimeUnit;
 
 public class CaptureAgentStateServiceImplTest {
   private CaptureAgentStateServiceImpl service = null;
-  private Properties capabilities;
+  /* This is what a 1.x agent would return from any of the config endpoints when fully populated with data. */
+  private Properties agentConfig1x;
+  /* This is what a 2.x agent would return from any of the config endpoints. */
+  private Properties agentConfig2x;
+  /* This is what a 2.x agent needs to register. */
+  private Properties agentRegistration2x;
   private static BundleContext bundleContext;
   private static ComponentContext cc;
 
@@ -69,12 +75,25 @@ public class CaptureAgentStateServiceImplTest {
   public void setUp() throws Exception {
     setupService();
 
-    capabilities = new Properties();
-    capabilities.setProperty(CaptureParameters.CAPTURE_DEVICE_PREFIX + "CAMERA", "/dev/video0");
-    capabilities.setProperty(CaptureParameters.CAPTURE_DEVICE_PREFIX + "SCREEN", "/dev/video1");
-    capabilities.setProperty(CaptureParameters.CAPTURE_DEVICE_PREFIX + "AUDIO", "hw:0");
-    capabilities.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "CAMERA,SCREEN,AUDIO");
-    capabilities.setProperty(CaptureParameters.AGENT_VERSION, "1");
+    agentConfig1x = new Properties();
+    agentConfig1x.setProperty(CaptureParameters.CAPTURE_DEVICE_PREFIX + "CAMERA", "/dev/video0");
+    agentConfig1x.setProperty(CaptureParameters.CAPTURE_DEVICE_PREFIX + "SCREEN", "/dev/video1");
+    agentConfig1x.setProperty(CaptureParameters.CAPTURE_DEVICE_PREFIX + "AUDIO", "hw:0");
+    agentConfig1x.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "CAMERA,SCREEN,AUDIO");
+    agentConfig1x.setProperty(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_1.toString());
+
+    agentConfig2x = new Properties();
+    agentConfig2x.setProperty(CaptureParameters.VENDOR_NAME, "Mock Vendor");
+    agentConfig2x.setProperty(CaptureParameters.VENDOR_MODEL, "Mock Model");
+    agentConfig2x.setProperty(CaptureParameters.VENDOR_HARDWARE, "Mock Hardware");
+    agentConfig2x.setProperty(CaptureParameters.VENDOR_FIRMWARE, "Mock Firmware");
+    agentConfig2x.setProperty(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_2.toString());
+
+    agentRegistration2x = new Properties();
+    agentRegistration2x.setProperty(CaptureParameters.VENDOR_NAME, "Mock Vendor");
+    agentRegistration2x.setProperty(CaptureParameters.VENDOR_MODEL, "Mock Model");
+    agentRegistration2x.setProperty(CaptureParameters.VENDOR_HARDWARE, "Mock Hardware");
+    agentRegistration2x.setProperty(CaptureParameters.VENDOR_FIRMWARE, "Mock Firmware");
   }
 
   private void setupCC() {
@@ -163,7 +182,7 @@ public class CaptureAgentStateServiceImplTest {
   @Test
   public void badAgentCapabilities() {
     try {
-      service.setAgentConfiguration(null, capabilities);
+      service.setAgentConfiguration(null, agentConfig1x);
       fail("Null agent name accepted");
     } catch (IllegalArgumentException e) {
       assertNotNull(e);
@@ -171,7 +190,7 @@ public class CaptureAgentStateServiceImplTest {
     assertEquals(0, service.getKnownAgents().size());
 
     try {
-      service.setAgentConfiguration("", capabilities);
+      service.setAgentConfiguration("", agentConfig1x);
       fail("Empty agent name accepted");
     } catch (IllegalArgumentException e) {
       assertNotNull(e);
@@ -192,7 +211,7 @@ public class CaptureAgentStateServiceImplTest {
       Agent agent = service.getAgent(name);
       assertEquals(name, agent.getName());
       assertEquals(state, agent.getState());
-      assertEquals(caps, agent.getCapabilities());
+      assertEquals(caps.toString(), agent.getCapabilities().toString());
     } catch (NotFoundException e) {
       if (state != null) {
         fail();
@@ -203,7 +222,7 @@ public class CaptureAgentStateServiceImplTest {
   @Test
   public void oneAgentState() {
     Properties bare1xAgent = new Properties();
-    bare1xAgent.put(CaptureParameters.AGENT_VERSION, "1");
+    bare1xAgent.put(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_1);
 
     service.setAgentState("agent1", IDLE);
     assertEquals(1, service.getKnownAgents().size());
@@ -220,44 +239,44 @@ public class CaptureAgentStateServiceImplTest {
 
   @Test
   public void oneAgentCapabilities() {
-    service.setAgentConfiguration("agent1", capabilities);
+    service.setAgentConfiguration("agent1", agentConfig1x);
     assertEquals(1, service.getKnownAgents().size());
 
-    verifyAgent("notAgent1", null, null);
-    verifyAgent("agent1", UNKNOWN, capabilities);
+    verifyAgent("notAgent1", null, new Properties());
+    verifyAgent("agent1", UNKNOWN, agentConfig1x);
 
     service.setAgentState("agent1", IDLE);
     assertEquals(1, service.getKnownAgents().size());
 
-    verifyAgent("notAgent1", null, null);
-    verifyAgent("agent1", IDLE, capabilities);
+    verifyAgent("notAgent1", null, new Properties());
+    verifyAgent("agent1", IDLE, agentConfig1x);
 
     service.setAgentConfiguration("agent1", new Properties());
     assertEquals(1, service.getKnownAgents().size());
 
-    Properties bare1xAgent = new Properties();
-    bare1xAgent.put(CaptureParameters.AGENT_VERSION, "1");
-    verifyAgent("notAnAgent", null, null);
-    verifyAgent("agent1", IDLE, bare1xAgent);
+    verifyAgent("notAnAgent", null, new Properties());
+    Properties bareConfig1x = new Properties();
+    bareConfig1x.setProperty(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_1.toString());
+    verifyAgent("agent1", IDLE, bareConfig1x);
   }
 
   @Test
   public void removeAgent() {
-    service.setAgentConfiguration("agent1", capabilities);
+    service.setAgentConfiguration("agent1", agentConfig1x);
     assertEquals(1, service.getKnownAgents().size());
-    service.setAgentConfiguration("agent2", capabilities);
+    service.setAgentConfiguration("agent2", agentConfig1x);
     service.setAgentState("agent2", UPLOADING);
 
-    verifyAgent("notAnAgent", null, capabilities);
-    verifyAgent("agent1", UNKNOWN, capabilities);
-    verifyAgent("agent2", UPLOADING, capabilities);
+    verifyAgent("notAnAgent", null, agentConfig1x);
+    verifyAgent("agent1", UNKNOWN, agentConfig1x);
+    verifyAgent("agent2", UPLOADING, agentConfig1x);
 
     try {
       service.removeAgent("agent1");
       assertEquals(1, service.getKnownAgents().size());
-      verifyAgent("notAnAgent", null, capabilities);
-      verifyAgent("agent1", null, capabilities);
-      verifyAgent("agent2", UPLOADING, capabilities);
+      verifyAgent("notAnAgent", null, agentConfig1x);
+      verifyAgent("agent1", null, agentConfig1x);
+      verifyAgent("agent2", UPLOADING, agentConfig1x);
     } catch (NotFoundException e) {
       fail();
     }
@@ -269,9 +288,9 @@ public class CaptureAgentStateServiceImplTest {
       assertNotNull(e);
     }
     assertEquals(1, service.getKnownAgents().size());
-    verifyAgent("notAnAgent", null, capabilities);
-    verifyAgent("agent1", null, capabilities);
-    verifyAgent("agent2", UPLOADING, capabilities);
+    verifyAgent("notAnAgent", null, agentConfig1x);
+    verifyAgent("agent1", null, agentConfig1x);
+    verifyAgent("agent2", UPLOADING, agentConfig1x);
   }
 
   @Test
@@ -289,11 +308,11 @@ public class CaptureAgentStateServiceImplTest {
       assertNotNull(e);
     }
 
-    service.setAgentConfiguration("agent", capabilities);
+    service.setAgentConfiguration("agent", agentConfig1x);
     Properties agentCapabilities;
     try {
       agentCapabilities = service.getAgentCapabilities("agent");
-      assertEquals(capabilities, agentCapabilities);
+      assertEquals(agentConfig1x.toString(), agentCapabilities.toString());
     } catch (NotFoundException e) {
       fail();
     }
@@ -310,17 +329,17 @@ public class CaptureAgentStateServiceImplTest {
     assertEquals(0, service.getKnownAgents().size());
 
     Properties cap1 = new Properties();
-    cap1.put(CaptureParameters.CAPTURE_DEVICE_PREFIX + "key", "value");
-    cap1.put(CaptureParameters.CAPTURE_DEVICE_NAMES, "key");
-    cap1.put(CaptureParameters.AGENT_VERSION, "1");
+    cap1.setProperty(CaptureParameters.CAPTURE_DEVICE_PREFIX + "key", "value");
+    cap1.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "key");
+    cap1.setProperty(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_1.toString());
     Properties cap2 = new Properties();
-    cap2.put(CaptureParameters.CAPTURE_DEVICE_PREFIX + "foo", "bar");
-    cap2.put(CaptureParameters.CAPTURE_DEVICE_NAMES, "foo");
-    cap2.put(CaptureParameters.AGENT_VERSION, "1");
+    cap2.setProperty(CaptureParameters.CAPTURE_DEVICE_PREFIX + "foo", "bar");
+    cap2.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "foo");
+    cap2.setProperty(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_1.toString());
     Properties cap3 = new Properties();
-    cap3.put(CaptureParameters.CAPTURE_DEVICE_PREFIX + "bam", "bam");
-    cap3.put(CaptureParameters.CAPTURE_DEVICE_NAMES, "bam");
-    cap3.put(CaptureParameters.AGENT_VERSION, "1");
+    cap3.setProperty(CaptureParameters.CAPTURE_DEVICE_PREFIX + "bam", "bam");
+    cap3.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "bam");
+    cap3.setProperty(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_1.toString());
 
     // Setup the two agents and persist them
     service.setAgentState("sticky1", IDLE);
@@ -331,11 +350,11 @@ public class CaptureAgentStateServiceImplTest {
     service.setAgentConfiguration("sticky3", cap3);
 
     // Make sure they're set right
-    assertEquals(cap1, service.getAgentCapabilities("sticky1"));
+    assertEquals(cap1.toString(), service.getAgentCapabilities("sticky1").toString());
     assertEquals(IDLE, service.getAgent("sticky1").getState());
-    assertEquals(cap2, service.getAgentCapabilities("sticky2"));
+    assertEquals(cap2.toString(), service.getAgentCapabilities("sticky2").toString());
     assertEquals(CAPTURING, service.getAgent("sticky2").getState());
-    assertEquals(cap3, service.getAgentCapabilities("sticky3"));
+    assertEquals(cap3.toString(), service.getAgentCapabilities("sticky3").toString());
     assertEquals(UPLOADING, service.getAgent("sticky3").getState());
     try {
       service.getAgentCapabilities("sticky4");
@@ -353,11 +372,11 @@ public class CaptureAgentStateServiceImplTest {
     assertEquals(3, service.getKnownAgents().size());
 
     // The agents should still be there
-    assertEquals(cap1, service.getAgentCapabilities("sticky1"));
+    assertEquals(cap1.toString(), service.getAgentCapabilities("sticky1").toString());
     assertEquals(IDLE, service.getAgent("sticky1").getState());
-    assertEquals(cap2, service.getAgentCapabilities("sticky2"));
+    assertEquals(cap2.toString(), service.getAgentCapabilities("sticky2").toString());
     assertEquals(CAPTURING, service.getAgent("sticky2").getState());
-    assertEquals(cap3, service.getAgentCapabilities("sticky3"));
+    assertEquals(cap3.toString(), service.getAgentCapabilities("sticky3").toString());
     assertEquals(UPLOADING, service.getAgent("sticky3").getState());
     try {
       service.getAgentCapabilities("sticky4");
