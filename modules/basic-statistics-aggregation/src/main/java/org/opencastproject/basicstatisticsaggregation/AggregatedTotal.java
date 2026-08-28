@@ -50,7 +50,7 @@ import javax.persistence.UniqueConstraint;
 public class AggregatedTotal {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @GeneratedValue(strategy = GenerationType.AUTO)
   @Column(name = "id")
   private long id;
 
