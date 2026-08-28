@@ -79,6 +79,7 @@
     <module>modules/analyze-mediapackage-workflowoperation</module>
     <module>modules/asset-manager-api</module>
     <module>modules/asset-manager-impl</module>
+    <module>modules/asset-manager-migration</module>
     <module>modules/asset-manager-static-file-authorization</module>
     <module>modules/asset-manager-storage-aws</module>
     <module>modules/asset-manager-storage-fs</module>

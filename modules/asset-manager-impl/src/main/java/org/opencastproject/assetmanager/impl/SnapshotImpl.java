@@ -23,9 +23,11 @@ package org.opencastproject.assetmanager.impl;
 import org.opencastproject.assetmanager.api.Availability;
 import org.opencastproject.assetmanager.api.Snapshot;
 import org.opencastproject.assetmanager.api.Version;
+import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 
 import java.util.Date;
+import java.util.Optional;
 
 public class SnapshotImpl implements Snapshot {
   private final Long id;
@@ -36,6 +38,7 @@ public class SnapshotImpl implements Snapshot {
   private final String storageId;
   private final String owner;
   private final MediaPackage mediaPackage;
+  private final Optional<Catalog> episodeCatalog;
 
   public SnapshotImpl(
           Version version,
@@ -44,13 +47,15 @@ public class SnapshotImpl implements Snapshot {
           Availability availability,
           String storageId,
           String owner,
-          MediaPackage mediaPackage) {
+          MediaPackage mediaPackage,
+          Optional<Catalog> episodeCatalog) {
     this.id = null;
     this.version = version;
     this.organizationId = organizationId;
     this.archivalDate = archivalDate;
     this.availability = availability;
     this.mediaPackage = mediaPackage;
+    this.episodeCatalog = episodeCatalog;
     this.owner = owner;
     this.storageId = storageId;
   }
@@ -63,13 +68,15 @@ public class SnapshotImpl implements Snapshot {
           Availability availability,
           String storageId,
           String owner,
-          MediaPackage mediaPackage) {
+          MediaPackage mediaPackage,
+          Optional<Catalog> episodeCatalog) {
     this.id = id;
     this.version = version;
     this.organizationId = organizationId;
     this.archivalDate = archivalDate;
     this.availability = availability;
     this.mediaPackage = mediaPackage;
+    this.episodeCatalog = episodeCatalog;
     this.owner = owner;
     this.storageId = storageId;
   }
@@ -92,6 +99,10 @@ public class SnapshotImpl implements Snapshot {
 
   @Override public MediaPackage getMediaPackage() {
     return mediaPackage;
+  }
+
+  @Override public Optional<Catalog> getEpisodeCatalog() {
+    return episodeCatalog;
   }
 
   @Override public String getOwner() {

@@ -1,0 +1,5 @@
+To greatly decrease the time to re-index the Asset Manager, the episode catalog xml is now stored in the snapshot. This is done
+for all snapshots from this update. You MUST first apply the appropriate sql modification script from `docs/upgrade/20_to_21`.
+To store the catalog for previous snapshots enable the plugin `opencast-plugin-v21-migration`.
+It will start populating the snapshots on startup. Once complete the plugin should be disabled.
+**WARNING** this could take several hours depending on where the catalog files have been stored.

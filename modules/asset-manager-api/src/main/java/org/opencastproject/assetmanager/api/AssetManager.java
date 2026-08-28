@@ -202,7 +202,7 @@ public interface AssetManager {
 
   /**
    * Returns a list of {@link Snapshot} filtered by date and mediapackage.
-   * This stream consists of all versions of a mediapackage archived within the 
+   * This stream consists of all versions of a mediapackage archived within the
    * date range ordered by there Version.
    *
    * @param mpId

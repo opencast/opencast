@@ -20,9 +20,11 @@
  */
 package org.opencastproject.assetmanager.api;
 
+import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 
 import java.util.Date;
+import java.util.Optional;
 
 /**
  * A versioned snapshot of a {@link MediaPackage} under the control of the {@link AssetManager}.
@@ -52,4 +54,7 @@ public interface Snapshot {
    * Implementations are required to provide media package element URIs that point to some valid HTTP endpoint.
    */
   MediaPackage getMediaPackage();
+
+  /** Get the episode catalog */
+  Optional<Catalog> getEpisodeCatalog();
 }

@@ -23,9 +23,11 @@ package org.opencastproject.assetmanager.impl.persistence;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.assetmanager.impl.VersionImpl;
+import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageException;
 import org.opencastproject.mediapackage.MediaPackageParser;
+import org.opencastproject.metadata.dublincore.DublinCoreXmlFormat;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.MimeTypes;
 
@@ -51,6 +53,18 @@ public final class Conversions {
       return MediaPackageParser.getFromXml(xml);
     } catch (MediaPackageException e) {
       return chuck(e);
+    }
+  }
+
+  public static Optional<Catalog> toDublinCoreCatalog(@Nullable String xml) {
+    if (xml != null) {
+      try {
+        return Optional.of(DublinCoreXmlFormat.read(xml));
+      } catch (Exception e) {
+        return Optional.empty();
+      }
+    } else {
+      return Optional.empty();
     }
   }
 

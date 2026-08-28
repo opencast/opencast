@@ -68,6 +68,8 @@ import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.MediaPackageSupport;
 import org.opencastproject.message.broker.api.assetmanager.AssetManagerItem;
 import org.opencastproject.message.broker.api.update.AssetManagerUpdateHandler;
+import org.opencastproject.metadata.dublincore.DublinCoreCatalog;
+import org.opencastproject.metadata.dublincore.DublinCoreUtil;
 import org.opencastproject.metadata.dublincore.DublinCores;
 import org.opencastproject.metadata.dublincore.EventCatalogUIAdapter;
 import org.opencastproject.security.api.AccessControlEntry;
@@ -1414,6 +1416,14 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
     storeAssets(pmp, version);
     // store mediapackage in db
     final SnapshotDto snapshotDto;
+
+    // get episodeCatalog before writing URI
+    DublinCoreCatalog episodeCatalog = null;
+
+    for (Catalog catalog : mp.getCatalogs(MediaPackageElements.EPISODE)) {
+      episodeCatalog = DublinCoreUtil.loadDublinCore(workspace, catalog);
+    }
+
     try {
       // rewrite URIs for archival
       for (MediaPackageElement mpe : pmp.getElements()) {
@@ -1428,7 +1438,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
 
       String currentOrgId = securityService.getOrganization().getId();
       snapshotDto = getDatabase().saveSnapshot(
-              currentOrgId, pmp, now, version,
+              currentOrgId, pmp, episodeCatalog, now, version,
               Availability.ONLINE, getLocalAssetStore().getStoreType(), owner
       );
     } catch (AssetManagerException e) {
@@ -1577,7 +1587,8 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
             snapshot.getAvailability(),
             snapshot.getStorageId(),
             snapshot.getOwner(),
-            mpCopy);
+            mpCopy,
+            snapshot.getEpisodeCatalog());
   }
 
   public void fireEventHandlers(AssetManagerItem item) {
@@ -1602,6 +1613,7 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
           String orgId, User user) {
     return (Optional<Event> eventOpt) -> {
       MediaPackage mp = snapshot.getMediaPackage();
+      Optional<Catalog> episodeCatalog = snapshot.getEpisodeCatalog();
       String eventId = mp.getIdentifier().toString();
       Event event = eventOpt.orElse(new Event(eventId, orgId));
 
@@ -1613,12 +1625,16 @@ public class AssetManagerImpl extends AbstractIndexProducer implements AssetMana
       }
       EventIndexUtils.updateEvent(event, mp);
 
-      for (Catalog catalog: mp.getCatalogs(MediaPackageElements.EPISODE)) {
-        try (InputStream in = workspace.read(catalog.getURI())) {
-          EventIndexUtils.updateEvent(event, DublinCores.read(in));
-        } catch (IOException | NotFoundException e) {
-          throw new IllegalStateException(String.format("Unable to load dublin core catalog for event '%s'",
-                  mp.getIdentifier()), e);
+      if (episodeCatalog.isPresent()) {
+        EventIndexUtils.updateEvent(event, ((DublinCoreCatalog)episodeCatalog.get()));
+      } else {
+        for (Catalog catalog: mp.getCatalogs(MediaPackageElements.EPISODE)) {
+          try (InputStream in = workspace.read(catalog.getURI())) {
+            EventIndexUtils.updateEvent(event, DublinCores.read(in));
+          } catch (IOException | NotFoundException e) {
+            throw new IllegalStateException(String.format("Unable to load dublin core catalog for event '%s'",
+                    mp.getIdentifier()), e);
+          }
         }
       }
 
