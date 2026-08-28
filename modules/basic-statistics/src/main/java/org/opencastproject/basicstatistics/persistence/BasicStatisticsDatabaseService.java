@@ -23,6 +23,7 @@ package org.opencastproject.basicstatistics.persistence;
 import org.opencastproject.basicstatistics.RawEvent;
 import org.opencastproject.util.requests.SortCriterion;
 
+import java.time.Instant;
 import java.util.List;
 
 /**
@@ -47,4 +48,15 @@ public interface BasicStatisticsDatabaseService {
    */
   void createRawEvents(List<RawEvent> events)
           throws BasicStatisticsDatabaseException;
+
+  /**
+   * Record that {@code StatisticsVersion.CURRENT_VERSION} is now active, unless the most recently recorded
+   * version already matches it.
+   */
+  void ensureVersionRecorded() throws BasicStatisticsDatabaseException;
+
+  /**
+   * @return when statistics version 1 first became active, or {@code null} if it has never been recorded
+   */
+  Instant getVersion1Timestamp() throws BasicStatisticsDatabaseException;
 }
