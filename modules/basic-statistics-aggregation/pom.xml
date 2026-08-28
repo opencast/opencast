@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>opencast-basic-statistics-aggregration</artifactId>
+  <artifactId>opencast-basic-statistics-aggregation</artifactId>
   <packaging>bundle</packaging>
-  <name>Opencast :: basic-statistics-aggregration</name>
+  <name>Opencast :: basic-statistics-aggregation</name>
   <parent>
     <groupId>org.opencastproject</groupId>
     <artifactId>base</artifactId>
@@ -84,8 +84,7 @@
             <Export-Package>
               org.opencastproject.basicstatisticsaggregation;version=${project.version},
               org.opencastproject.basicstatisticsaggregation.endpoint;version=${project.version},
-              org.opencastproject.basicstatisticsaggregation.persistence;version=${project.version},
-              org.opencastproject.basicstatisticsaggregation.correlation;version=${project.version}
+              org.opencastproject.basicstatisticsaggregation.persistence;version=${project.version}
             </Export-Package>
             <Meta-Persistence>
               META-INF/persistence.xml
