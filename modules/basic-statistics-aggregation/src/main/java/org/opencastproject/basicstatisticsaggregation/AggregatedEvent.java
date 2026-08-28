@@ -48,7 +48,7 @@ import javax.persistence.UniqueConstraint;
  */
 @Entity(name = "AggregatedEvent")
 @Table(name = "oc_basic_statistics_aggregation", uniqueConstraints = {
-    @UniqueConstraint(columnNames = { "organization", "item_type", "item_id", "day" })
+    @UniqueConstraint(columnNames = { "organization", "item_type", "item_id", "stat_day" })
 })
 @NamedQueries({
     @NamedQuery(
@@ -65,7 +65,7 @@ import javax.persistence.UniqueConstraint;
 public class AggregatedEvent {
 
   @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  @GeneratedValue(strategy = GenerationType.AUTO)
   @Column(name = "id")
   private long id;
 
@@ -79,8 +79,9 @@ public class AggregatedEvent {
   @Column(name = "item_id", nullable = false)
   private String itemId;
 
-  /** the calendar day these hourly buckets cover */
-  @Column(name = "day", nullable = false)
+  /** the calendar day these hourly buckets cover.
+   * Called "stat_day" instead of "day" — because DAY(...) function is reserved in H2. */
+  @Column(name = "stat_day", nullable = false)
   private LocalDate day;
 
   /** views[h] = number of views that started in hour h (0-23) of {@link #day} */

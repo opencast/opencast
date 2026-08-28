@@ -28,6 +28,7 @@ import org.opencastproject.basicstatisticsaggregation.persistence.BasicStatistic
 import org.opencastproject.basicstatisticsaggregation.persistence.BasicStatisticsAggregationDatabaseService;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.security.api.OrganizationDirectoryService;
+import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.util.SecurityUtil;
 
 import org.osgi.service.component.ComponentContext;
@@ -50,6 +51,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneOffset;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -82,6 +84,7 @@ public class BasicStatisticsAggregationService {
   private BasicStatisticsAggregationDatabaseService aggregationDatabase;
   private ElasticsearchIndex elasticsearchIndex;
   private OrganizationDirectoryService organizationDirectoryService;
+  private SecurityService securityService;
 
   private DurationLookup durationLookup;
 
@@ -106,6 +109,11 @@ public class BasicStatisticsAggregationService {
     this.organizationDirectoryService = organizationDirectoryService;
   }
 
+  @Reference
+  public void setSecurityService(SecurityService securityService) {
+    this.securityService = securityService;
+  }
+
   @Activate
   public void activate(ComponentContext cc) {
     try {
@@ -122,6 +130,7 @@ public class BasicStatisticsAggregationService {
 
       SimpleTrigger trigger = new SimpleTrigger();
       trigger.setName("basicstatistics-aggregation-tick-trigger");
+      trigger.setStartTime(new Date());
       trigger.setRepeatInterval(TICK_INTERVAL_MILLIS);
       trigger.setRepeatCount(SimpleTrigger.REPEAT_INDEFINITELY);
 
@@ -140,6 +149,52 @@ public class BasicStatisticsAggregationService {
         logger.warn("Unable to shut down Quartz scheduler", e);
       }
     }
+  }
+
+  /**
+   * Get the all-time view/watchtime total for an item, scoped to the current request's organization.
+   */
+  public AggregatedTotal getTotal(ItemType itemType, String itemId)
+          throws BasicStatisticsAggregationDatabaseException {
+    return aggregationDatabase.getTotal(securityService.getOrganization().getId(), itemType, itemId);
+  }
+
+  /**
+   * Get the hourly view/watchtime buckets for an item over the given (inclusive) day range, scoped to the current
+   * request's organization. Only days with at least one recorded view are included.
+   */
+  public List<AggregatedEvent> getAggregatedEvents(ItemType itemType, String itemId, LocalDate from, LocalDate to)
+          throws BasicStatisticsAggregationDatabaseException {
+    return aggregationDatabase.getAggregatedEvents(securityService.getOrganization().getId(), itemType, itemId,
+        from, to);
+  }
+
+  /**
+   * Re-aggregate one item over the given day range (or, if {@code from}/{@code to} are null, all recorded
+   * history), scoped to the current request's organization.
+   *
+   * @return the number of days recomputed
+   */
+  public int reaggregate(String itemId, LocalDate from, LocalDate to)
+          throws BasicStatisticsDatabaseException, BasicStatisticsAggregationDatabaseException {
+    String organization = securityService.getOrganization().getId();
+    Instant rangeStart = from != null ? from.atStartOfDay(ZoneOffset.UTC).toInstant() : Instant.EPOCH;
+    Instant rangeEnd = to != null ? to.plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant() : Instant.now();
+
+    List<RawEvent> events = rawEventDatabase.getRawEvents(organization, ItemType.VIDEO, itemId, rangeStart,
+        rangeEnd);
+
+    Set<ItemDay> touched = new HashSet<>();
+    for (RawEvent event : events) {
+      touched.add(new ItemDay(organization, ItemType.VIDEO, itemId,
+          event.getTimestamp().atZone(ZoneOffset.UTC).toLocalDate()));
+    }
+
+    for (ItemDay day : touched) {
+      reaggregateDay(day);
+    }
+
+    return touched.size();
   }
 
   /**
