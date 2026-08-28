@@ -21,6 +21,7 @@
 package org.opencastproject.basicstatisticssecret.impl;
 
 import org.opencastproject.basicstatisticssecret.api.BasicStatisticsSecretService;
+import org.opencastproject.basicstatisticssecret.api.BasicStatisticsSecretServiceException;
 
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -30,7 +31,6 @@ import org.quartz.CronTrigger;
 import org.quartz.Job;
 import org.quartz.JobDetail;
 import org.quartz.JobExecutionContext;
-import org.quartz.JobExecutionException;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.impl.StdSchedulerFactory;
@@ -84,9 +84,9 @@ public class BasicStatisticsSecretServiceImpl implements BasicStatisticsSecretSe
       trigger.setCronExpression("0 0 4 * * ?");
 
       quartz.scheduleJob(job, trigger);
-
-      // TODO: Error handling
     } catch (SchedulerException | ParseException e) {
+      logger.error("Could not schedule the daily secret rotation; "
+          + "the basic statistics secret service will not start", e);
       throw new RuntimeException(e);
     }
   }
@@ -106,8 +106,12 @@ public class BasicStatisticsSecretServiceImpl implements BasicStatisticsSecretSe
     }
   }
 
-  public byte[] getCurrentSecret() {
-    return currentSecret;
+  public byte[] getCurrentSecret() throws BasicStatisticsSecretServiceException {
+    byte[] secret = currentSecret;
+    if (secret == null) {
+      throw new BasicStatisticsSecretServiceException("No secret has been generated yet");
+    }
+    return secret;
   }
 
   private void rotateSecret() {
@@ -125,11 +129,15 @@ public class BasicStatisticsSecretServiceImpl implements BasicStatisticsSecretSe
   public static class SecretRotationJob implements Job {
 
     @Override
-    public void execute(JobExecutionContext context) throws JobExecutionException {
-      BasicStatisticsSecretServiceImpl service =
-          (BasicStatisticsSecretServiceImpl) context.getMergedJobDataMap().get("service");
-
-      service.rotateSecret();
+    public void execute(JobExecutionContext context) {
+      try {
+        BasicStatisticsSecretServiceImpl service =
+            (BasicStatisticsSecretServiceImpl) context.getMergedJobDataMap().get("service");
+        service.rotateSecret();
+      } catch (Exception e) {
+        logger.error("Failed to rotate the daily secret; it will keep using the previous one until the next "
+            + "scheduled rotation", e);
+      }
     }
   }
 }
