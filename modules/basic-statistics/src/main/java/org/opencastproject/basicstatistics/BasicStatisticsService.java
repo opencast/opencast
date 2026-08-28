@@ -42,6 +42,10 @@ import java.io.ByteArrayOutputStream;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -65,6 +69,11 @@ public class BasicStatisticsService {
   private static final Logger logger = LoggerFactory.getLogger(BasicStatisticsService.class);
 
   private static final String X_FORWARDED_FOR = "X-Forwarded-For";
+
+  /** Config key for an administrator-set override of the data-completeness threshold date (an ISO date). */
+  private static final String COMPLETENESS_THRESHOLD_DATE_KEY = "completeness.threshold.date";
+
+  private LocalDate configuredCompletenessThreshold;
 
   /** Persistent storage */
   protected BasicStatisticsDatabaseService persistence;
@@ -97,6 +106,38 @@ public class BasicStatisticsService {
   @Modified
   void activate(Map<String, Object> properties) {
     logger.info("Activating Basic Statistics Service");
+    configuredCompletenessThreshold = parseCompletenessThreshold(properties);
+  }
+
+  private LocalDate parseCompletenessThreshold(Map<String, Object> properties) {
+    Object value = properties.get(COMPLETENESS_THRESHOLD_DATE_KEY);
+    if (value == null) {
+      return null;
+    }
+    try {
+      return LocalDate.parse(value.toString());
+    } catch (DateTimeParseException e) {
+      logger.warn("Invalid {} '{}', ignoring", COMPLETENESS_THRESHOLD_DATE_KEY, value);
+      return null;
+    }
+  }
+
+  /**
+   * The date before which statistical data may be incomplete or missing entirely
+   * — either an administrator-configured override, or, by default, when statistics tracking first started
+   * recording any data at all. {@code null} if neither is available yet.
+   */
+  public LocalDate getCompletenessThreshold() {
+    if (configuredCompletenessThreshold != null) {
+      return configuredCompletenessThreshold;
+    }
+    try {
+      Instant version1 = persistence.getVersion1Timestamp();
+      return version1 != null ? version1.atZone(ZoneOffset.UTC).toLocalDate() : null;
+    } catch (BasicStatisticsDatabaseException e) {
+      logger.warn("Could not determine the statistics completeness threshold", e);
+      return null;
+    }
   }
 
   /**

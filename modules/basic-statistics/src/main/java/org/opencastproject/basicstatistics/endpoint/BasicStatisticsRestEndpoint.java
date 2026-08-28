@@ -53,6 +53,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -452,6 +453,25 @@ public class BasicStatisticsRestEndpoint {
     }
 
     return null;
+  }
+
+  @GET
+  @Path("completenessThreshold")
+  @Produces(MediaType.APPLICATION_JSON)
+  @RestQuery(
+      name = "getCompletenessThreshold",
+      description = "Get the date before which statistical data may be incomplete or missing entirely.",
+      returnDescription = "The threshold as a string containing an ISO date, or null if it could not "
+          + "yet be determined.",
+      responses = {
+          @RestResponse(description = "Returns the threshold.", responseCode = SC_OK),
+      })
+  public Response getCompletenessThreshold() {
+    LocalDate threshold = basicStatisticsService.getCompletenessThreshold();
+    return Response.ok(
+        GSON.toJson(threshold != null ? threshold.toString() : null),
+        MediaType.APPLICATION_JSON
+    ).build();
   }
 
   protected String readInputStream(HttpServletRequest request) {
