@@ -23,6 +23,7 @@ package org.opencastproject.capture.admin.impl;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThrows;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.opencastproject.capture.admin.api.AgentState.CAPTURING;
@@ -83,11 +84,9 @@ public class CaptureAgentStateServiceImplTest {
     agentConfig1x.setProperty(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_1.toString());
 
     agentConfig2x = new Properties();
-    agentConfig2x.setProperty(CaptureParameters.VENDOR_NAME, "Mock Vendor");
-    agentConfig2x.setProperty(CaptureParameters.VENDOR_MODEL, "Mock Model");
-    agentConfig2x.setProperty(CaptureParameters.VENDOR_HARDWARE, "Mock Hardware");
-    agentConfig2x.setProperty(CaptureParameters.VENDOR_FIRMWARE, "Mock Firmware");
     agentConfig2x.setProperty(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_2.toString());
+    agentConfig2x.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, "0");
+    agentConfig2x.setProperty(CaptureParameters.CAPTURE_LOCAL_STARTPAUSED, "0");
 
     agentRegistration2x = new Properties();
     agentRegistration2x.setProperty(CaptureParameters.VENDOR_NAME, "Mock Vendor");
@@ -235,6 +234,117 @@ public class CaptureAgentStateServiceImplTest {
 
     verifyAgent("notAgent1", null, null);
     verifyAgent("agent1", CAPTURING, bare1xAgent);
+  }
+
+  @Test
+  public void agentRegistration2x() {
+    Properties bare1xAgent = new Properties();
+    bare1xAgent.put(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_1);
+
+    Properties bare2xAgent = new Properties();
+    bare2xAgent.put(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_2);
+
+    // We're going to make agent2 a 2.x agent.  These *must* register with more info, but this one didn't
+    // What happens now?
+    service.setAgentState("agent2", IDLE);
+    assertEquals(1, service.getKnownAgents().size());
+    // That's right, it shows up as a *1.x* agent.
+    verifyAgent("agent2", IDLE, bare1xAgent);
+
+    // Note: *just* setting the config, but not the state does not finalize the registration process!
+    service.setAgentConfiguration("agent2", agentRegistration2x);
+    // Now, with the configuration, it's a 2.x agent!
+    verifyAgent("agent2", IDLE, agentConfig2x);
+
+    // Now we do agent 3 to demonstrate that you don't need to register the state first
+    // Order of operation here *does not* matter
+    service.setAgentConfiguration("agent3", agentRegistration2x);
+    service.setAgentState("agent3", IDLE);
+    verifyAgent("agent3", IDLE, agentConfig2x);
+  }
+
+  @Test
+  public void agent2xBasic() {
+    // This is what the CA is sending to the core
+    Properties sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "alpha");
+
+    // This is what the core should respond with in terms of configuration data
+    Properties returnedConfig = new Properties();
+    returnedConfig.putAll(agentConfig2x);
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "alpha");
+
+    service.setAgentState("test", IDLE);
+    service.setAgentConfiguration("test", sentConfig);
+
+    verifyAgent("test", IDLE, returnedConfig);
+  }
+
+  @Test
+  public void agent2xStartPaused() {
+    /*
+    capture.device.names=alpha,beta,gamma
+    capture.local.startpaused=0/1
+    capture.stream.capable=0/1
+    capture.stream.startpaused=0/1
+    capture.stream.configuration=[not-more-than-32] -> what does this look like?, must not be empty
+    capture.device.positions=[not-more-than-256] -> what does this look like?, must not be empty
+    X-VENDOR_NAME, key name validated agains [A-Za-z0-9]{0,256}
+    */
+
+    // Case 1: starting paused is *not* supported
+    // This is what the CA is sending to the core
+    Properties sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "alpha");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_LOCAL_STARTPAUSED, "0");
+
+    // This is what the core should respond with in terms of configuration data
+    Properties returnedConfig = new Properties();
+    returnedConfig.putAll(agentConfig2x);
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "alpha");
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_LOCAL_STARTPAUSED, "0");
+
+    service.setAgentState("test", IDLE);
+    service.setAgentConfiguration("test", sentConfig);
+
+    verifyAgent("test", IDLE, returnedConfig);
+
+    // Case 2: starting paused *is* supported
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_LOCAL_STARTPAUSED, "1");
+    returnedConfig = new Properties();
+    returnedConfig.putAll(agentConfig2x);
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_LOCAL_STARTPAUSED, "1");
+
+    service.setAgentState("test", IDLE);
+    service.setAgentConfiguration("test", sentConfig);
+
+    verifyAgent("test", IDLE, returnedConfig);
+
+    // Case 3: invalid data is sent to the core
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_LOCAL_STARTPAUSED, "banana");
+    returnedConfig = new Properties();
+    returnedConfig.putAll(agentConfig2x);
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_LOCAL_STARTPAUSED, "0");
+
+    service.setAgentState("test", IDLE);
+    Properties finalSentConfig = sentConfig;
+    assertThrows(RuntimeException.class, () -> service.setAgentConfiguration("test", finalSentConfig));
+
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_LOCAL_STARTPAUSED, "3");
+    returnedConfig = new Properties();
+    returnedConfig.putAll(agentConfig2x);
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_LOCAL_STARTPAUSED, "0");
+
+    service.setAgentState("test", IDLE);
+    assertThrows(RuntimeException.class, () -> service.setAgentConfiguration("test", finalSentConfig));
   }
 
   @Test

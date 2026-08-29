@@ -29,6 +29,7 @@ import static org.opencastproject.util.OsgiUtil.getOptContextProperty;
 
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.capture.admin.api.AgentState;
+import org.opencastproject.capture.admin.api.AgentVersion;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 import org.opencastproject.db.DBSession;
 import org.opencastproject.db.DBSessionFactory;
@@ -485,10 +486,15 @@ public class CaptureAgentStateServiceImpl implements CaptureAgentStateService, M
       agent = (AgentImpl) getAgent(agentName);
       logger.debug("Setting Agent {}'s capabilities", agentName);
       agent.setConfiguration(configuration);
+      if (AgentVersion.VERSION_2.equals(agent.getVersion())) {
+        //We reset the state here, which
+        agent.setState(agent.getState());
+      }
     } catch (NotFoundException e) {
       // If the agent doesn't exists, but the name is not null nor empty, create a new one.
       logger.debug("Creating Agent {} with state {}.", agentName, UNKNOWN);
       agent = new AgentImpl(agentName, orgId, UNKNOWN, "", configuration);
+
     }
 
     updateAgentInDatabase(agent);
