@@ -88,6 +88,11 @@ public class BasicStatisticsAggregationService {
 
   private DurationLookup durationLookup;
 
+  /** Test seam: {@link #durationLookup} is otherwise only ever built internally, in {@link #activate}. */
+  void setDurationLookupForTesting(DurationLookup durationLookup) {
+    this.durationLookup = durationLookup;
+  }
+
   @Reference
   public void setBasicStatisticsDatabaseService(BasicStatisticsDatabaseService rawEventDatabase) {
     this.rawEventDatabase = rawEventDatabase;
