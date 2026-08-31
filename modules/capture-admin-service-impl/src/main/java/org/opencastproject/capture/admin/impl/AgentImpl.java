@@ -455,6 +455,11 @@ public class AgentImpl implements Agent {
     boolean supportStreamingPaused =
         supportStreaming && getKeyBinary(configuration, CaptureParameters.CAPTURE_STREAM_STARTPAUSED);
 
+    capabilitiesProperties.setProperty(CaptureParameters.CAPTURE_LOCAL_STARTPAUSED, supportLocalPausedStart ? "1" : "0");
+    capabilitiesProperties.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, supportStreaming ? "1" : "0");
+    if (supportStreaming) {
+      capabilitiesProperties.setProperty(CaptureParameters.CAPTURE_STREAM_STARTPAUSED, supportStreamingPaused ? "1" : "0");
+    }
   }
 
   public AgentVersion getVersion() {

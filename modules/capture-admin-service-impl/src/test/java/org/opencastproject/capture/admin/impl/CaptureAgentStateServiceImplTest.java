@@ -312,17 +312,7 @@ public class CaptureAgentStateServiceImplTest {
   }
 
   @Test
-  public void agent2xStartPaused() {
-    /*
-    capture.device.names=alpha,beta,gamma
-    capture.local.startpaused=0/1
-    capture.stream.capable=0/1
-    capture.stream.startpaused=0/1
-    capture.stream.configuration=[not-more-than-32] -> what does this look like?, must not be empty
-    capture.device.positions=[not-more-than-256] -> what does this look like?, must not be empty
-    X-VENDOR_NAME, key name validated agains [A-Za-z0-9]{0,256}
-    */
-
+  public void agent2xLocalStartPaused() {
     // Case 1: starting paused is *not* supported
     // This is what the CA is sending to the core
     Properties sentConfig = new Properties();
@@ -358,9 +348,6 @@ public class CaptureAgentStateServiceImplTest {
     sentConfig = new Properties();
     sentConfig.putAll(agentRegistration2x);
     sentConfig.setProperty(CaptureParameters.CAPTURE_LOCAL_STARTPAUSED, "banana");
-    returnedConfig = new Properties();
-    returnedConfig.putAll(agentConfig2x);
-    returnedConfig.setProperty(CaptureParameters.CAPTURE_LOCAL_STARTPAUSED, "0");
 
     service.setAgentState("test", IDLE);
     Properties finalSentConfig = sentConfig;
@@ -369,15 +356,134 @@ public class CaptureAgentStateServiceImplTest {
     sentConfig = new Properties();
     sentConfig.putAll(agentRegistration2x);
     sentConfig.setProperty(CaptureParameters.CAPTURE_LOCAL_STARTPAUSED, "3");
-    returnedConfig = new Properties();
-    returnedConfig.putAll(agentConfig2x);
-    returnedConfig.setProperty(CaptureParameters.CAPTURE_LOCAL_STARTPAUSED, "0");
 
     service.setAgentState("test", IDLE);
     assertThrows(RuntimeException.class, () -> service.setAgentConfiguration("test", finalSentConfig));
   }
 
   @Test
+  public void agent2xStreamCapable() {
+    // Case 1: streaming is *not* supported
+    // This is what the CA is sending to the core
+    Properties sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "alpha");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, "0");
+
+    // This is what the core should respond with in terms of configuration data
+    Properties returnedConfig = new Properties();
+    returnedConfig.putAll(agentConfig2x);
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "alpha");
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, "0");
+
+    service.setAgentState("test", IDLE);
+    service.setAgentConfiguration("test", sentConfig);
+
+    verifyAgent("test", IDLE, returnedConfig);
+
+    // Case 2: streaming *is* supported
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, "1");
+    returnedConfig = new Properties();
+    returnedConfig.putAll(agentConfig2x);
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, "1");
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_STARTPAUSED, "0");
+
+    service.setAgentState("test", IDLE);
+    service.setAgentConfiguration("test", sentConfig);
+
+    verifyAgent("test", IDLE, returnedConfig);
+
+    // Case 3: invalid data is sent to the core
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, "banana");
+
+    service.setAgentState("test", IDLE);
+    Properties finalSentConfig = sentConfig;
+    assertThrows(RuntimeException.class, () -> service.setAgentConfiguration("test", finalSentConfig));
+
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, "3");
+
+    service.setAgentState("test", IDLE);
+    assertThrows(RuntimeException.class, () -> service.setAgentConfiguration("test", finalSentConfig));
+  }
+
+  @Test
+  public void agent2xStreamStartPaused() {
+    // Case 1: streaming is *not* supported, but we (erroneously) say we support starting paused
+    // This is technically an error case, though the core should just silently ignore the flag
+    // This is what the CA is sending to the core
+    Properties sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "alpha");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, "0");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_STARTPAUSED, "1");
+
+    // This is what the core should respond with in terms of configuration data
+    Properties returnedConfig = new Properties();
+    returnedConfig.putAll(agentConfig2x);
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "alpha");
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, "0");
+
+    service.setAgentState("test", IDLE);
+    service.setAgentConfiguration("test", sentConfig);
+
+    verifyAgent("test", IDLE, returnedConfig);
+
+    // Case 2: streaming *is* supported, starting paused is not
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, "1");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_STARTPAUSED, "0");
+    returnedConfig = new Properties();
+    returnedConfig.putAll(agentConfig2x);
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, "1");
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_STARTPAUSED, "0");
+
+    service.setAgentState("test", IDLE);
+    service.setAgentConfiguration("test", sentConfig);
+
+    verifyAgent("test", IDLE, returnedConfig);
+
+    // Case 3: streaming and starting paused are both supported
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, "1");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_STARTPAUSED, "1");
+    returnedConfig = new Properties();
+    returnedConfig.putAll(agentConfig2x);
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, "1");
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_STARTPAUSED, "1");
+
+    service.setAgentState("test", IDLE);
+    service.setAgentConfiguration("test", sentConfig);
+
+    verifyAgent("test", IDLE, returnedConfig);
+
+    // Case 4: bad data passed to the core
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, "1");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_STARTPAUSED, "banana");
+
+    service.setAgentState("test", IDLE);
+    Properties finalSentConfig = sentConfig;
+    assertThrows(RuntimeException.class, () -> service.setAgentConfiguration("test", finalSentConfig));
+
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, "1");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_STARTPAUSED, "3");
+
+    service.setAgentState("test", IDLE);
+    assertThrows(RuntimeException.class, () -> service.setAgentConfiguration("test", finalSentConfig));
+  }
+
+    @Test
   public void oneAgentCapabilities() {
     service.setAgentConfiguration("agent1", agentConfig1x);
     assertEquals(1, service.getKnownAgents().size());
