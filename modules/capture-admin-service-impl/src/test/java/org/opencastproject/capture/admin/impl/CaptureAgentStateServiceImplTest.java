@@ -265,6 +265,7 @@ public class CaptureAgentStateServiceImplTest {
 
   @Test
   public void agent2xBasic() {
+    // Case 1: Happy path
     // This is what the CA is sending to the core
     Properties sentConfig = new Properties();
     sentConfig.putAll(agentRegistration2x);
@@ -279,6 +280,35 @@ public class CaptureAgentStateServiceImplTest {
     service.setAgentConfiguration("test", sentConfig);
 
     verifyAgent("test", IDLE, returnedConfig);
+
+    // Case 2: Still happy, fixed inputs so no devices
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+
+    // This is what the core should respond with in terms of configuration data
+    returnedConfig = new Properties();
+    returnedConfig.putAll(agentConfig2x);
+
+    service.setAgentState("test2", IDLE);
+    service.setAgentConfiguration("test2", sentConfig);
+
+    verifyAgent("test2", IDLE, returnedConfig);
+
+    // Case 3: Devices string is too long (> 256 char)
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "a".repeat(257));
+
+    assert2xAgentException("test3", IDLE, sentConfig);
+
+    // Case 4: Provide the key, but no devices
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "");
+
+    service.setAgentState("test3", IDLE);
+    Properties finalSentConfig = sentConfig;
+    assertThrows(RuntimeException.class, () -> service.setAgentConfiguration("test", finalSentConfig));
   }
 
   @Test

@@ -437,8 +437,10 @@ public class AgentImpl implements Agent {
     String names = configuration.getProperty(CaptureParameters.CAPTURE_DEVICE_NAMES);
     if (names == null) {
       log.debug("Capture agent '{}' failed to provide device names ({})", name, CaptureParameters.CAPTURE_DEVICE_NAMES);
+    } else if (names.isBlank()) {
+      throw new RuntimeException("Agent provided devices key, but no devices");
     } else if (names.length() > 256) {
-      log.debug("Capture agent '{}' device names too long ({})", name, CaptureParameters.CAPTURE_DEVICE_NAMES);
+      throw new RuntimeException("Agent device names too long");
     } else {
       capabilitiesProperties.put(CaptureParameters.CAPTURE_DEVICE_NAMES, names);
 
