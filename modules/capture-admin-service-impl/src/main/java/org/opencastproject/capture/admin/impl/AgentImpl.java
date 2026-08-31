@@ -21,6 +21,9 @@
 
 package org.opencastproject.capture.admin.impl;
 
+import static org.opencastproject.capture.admin.api.CaptureAgentStateService.BOOLEAN_OFF;
+import static org.opencastproject.capture.admin.api.CaptureAgentStateService.BOOLEAN_ON;
+
 import org.opencastproject.capture.CaptureParameters;
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.capture.admin.api.AgentVersion;
@@ -270,10 +273,17 @@ public class AgentImpl implements Agent {
     this.organization = organization;
   }
 
-
   private boolean getKeyBinary(Properties properties, String key) {
     // This is a binary 1/0, so max length is 1.  More than one character is incorrect and should throw an error.
-    return "1".equals(getKey(properties, key, 1));
+    if (!properties.containsKey(key)) {
+      return false;
+    }
+    String value = getKey(properties, key, 1);
+    // If the key is defined, it *must* have a value, and it *must* be one of the two things
+    if (value.isEmpty() || !(BOOLEAN_ON.equals(value) || BOOLEAN_OFF.equals(value))) {
+      throw new RuntimeException("Invalid value for " + key);
+    }
+    return BOOLEAN_ON.equals(value);
   }
 
   private String getKey(Properties properties, String key) {
@@ -455,10 +465,10 @@ public class AgentImpl implements Agent {
     boolean supportStreamingPaused =
         supportStreaming && getKeyBinary(configuration, CaptureParameters.CAPTURE_STREAM_STARTPAUSED);
 
-    capabilitiesProperties.setProperty(CaptureParameters.CAPTURE_LOCAL_STARTPAUSED, supportLocalPausedStart ? "1" : "0");
-    capabilitiesProperties.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, supportStreaming ? "1" : "0");
+    capabilitiesProperties.setProperty(CaptureParameters.CAPTURE_LOCAL_STARTPAUSED, supportLocalPausedStart ? BOOLEAN_ON : BOOLEAN_OFF);
+    capabilitiesProperties.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, supportStreaming ? BOOLEAN_ON : BOOLEAN_OFF);
     if (supportStreaming) {
-      capabilitiesProperties.setProperty(CaptureParameters.CAPTURE_STREAM_STARTPAUSED, supportStreamingPaused ? "1" : "0");
+      capabilitiesProperties.setProperty(CaptureParameters.CAPTURE_STREAM_STARTPAUSED, supportStreamingPaused ? BOOLEAN_ON : BOOLEAN_OFF);
     }
   }
 

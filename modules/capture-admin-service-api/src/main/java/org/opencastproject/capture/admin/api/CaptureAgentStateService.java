@@ -31,6 +31,9 @@ import java.util.Properties;
  */
 public interface CaptureAgentStateService {
 
+  String BOOLEAN_ON = "1";
+  String BOOLEAN_OFF = "0";
+
   /**
    * Returns an agent by its name
    *
