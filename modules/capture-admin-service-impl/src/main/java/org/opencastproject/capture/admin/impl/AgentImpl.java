@@ -485,6 +485,21 @@ public class AgentImpl implements Agent {
       capabilitiesProperties.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION,
           String.join(",", agentStreamConfigs));
     }
+
+    if (configuration.containsKey(CaptureParameters.CAPTURE_DEVICE_POSITIONS)) {
+      //GDLGDL: Do we want to define a maximum number of options here?
+      Set<String> agentDevicePositions =
+          Arrays.stream(configuration.getProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS, "")
+              .split(",")).sorted().map(String::trim).collect(Collectors.toSet());
+      // If someone passes a blank string, the length here is still 1...
+      if (agentDevicePositions.stream().anyMatch(String::isEmpty)) {
+        throw new RuntimeException("Position configs have a configuration which is empty");
+      } else if (agentDevicePositions.stream().anyMatch(s -> s.length() > 256)) {
+        throw new RuntimeException("Position configs have a configuration which is too long");
+      }
+      capabilitiesProperties.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS,
+          String.join(",", agentDevicePositions));
+    }
   }
 
   public AgentVersion getVersion() {

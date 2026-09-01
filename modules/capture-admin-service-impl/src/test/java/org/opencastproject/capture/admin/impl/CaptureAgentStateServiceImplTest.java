@@ -530,6 +530,64 @@ public class CaptureAgentStateServiceImplTest {
   }
 
   @Test
+  public void agent2xDevicePositions() {
+    // Case 1: The happy path
+    Properties sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS, "my positions with spaces");
+    Properties returnedConfig = new Properties();
+    returnedConfig.putAll(agentConfig2x);
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS, "my positions with spaces");
+
+    assert2xAgent("test", IDLE, sentConfig, returnedConfig);
+
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    // NOTE: There's an extra space here after the comma!
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS, "b position,  a position");
+    returnedConfig = new Properties();
+    returnedConfig.putAll(agentConfig2x);
+    // NOTE: The extra space above has been trimmed, and the configs sorted
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS, "a position,b position");
+
+    assert2xAgent("test", IDLE, sentConfig, returnedConfig);
+
+    // Case 2: An empty list, this is an error case and should be rejected
+    // This is what the CA is sending to the core
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS, "");
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    // Case 3: bad length config items
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS, "a".repeat(257));
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS, "b," + "A".repeat(257));
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS, "A".repeat(257) + ", b");
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    // Note: There's a double comma here, so three items but one of them is blank
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS, "a,,b");
+
+    assert2xAgentException("test", IDLE, sentConfig);
+  }
+
+  @Test
   public void oneAgentCapabilities() {
     service.setAgentConfiguration("agent1", agentConfig1x);
     assertEquals(1, service.getKnownAgents().size());
