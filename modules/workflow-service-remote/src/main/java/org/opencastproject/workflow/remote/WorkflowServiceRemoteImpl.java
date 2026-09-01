@@ -213,7 +213,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     HttpResponse response = getResponse(get);
     try {
       if (response != null) {
-        return Boolean.parseBoolean(response.getEntity().getContent().toString());
+        return Boolean.parseBoolean(EntityUtils.toString(response.getEntity()).trim());
       }
     } catch (Exception e) {
       throw new WorkflowDatabaseException(e);
@@ -229,7 +229,7 @@ public class WorkflowServiceRemoteImpl extends RemoteBase implements WorkflowSer
     HttpResponse response = getResponse(get);
     try {
       if (response != null) {
-        return Boolean.parseBoolean(response.getEntity().getContent().toString());
+        return Boolean.parseBoolean(EntityUtils.toString(response.getEntity()).trim());
       }
     } catch (Exception e) {
       throw new WorkflowDatabaseException(e);
