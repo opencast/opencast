@@ -274,6 +274,7 @@
     <module>modules/userdirectory-moodle</module>
     <module>modules/userdirectory-sakai</module>
     <module>modules/userdirectory-studip</module>
+    <module>modules/userdirectory-tobira</module>
     <module>modules/userdirectory</module>
     <module>modules/usertracking-api</module>
     <module>modules/usertracking-impl</module>

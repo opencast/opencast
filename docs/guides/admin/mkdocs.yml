@@ -116,6 +116,7 @@ nav:
           - Sakai User Provider: "configuration/security.user.sakai.md"
           - Brightspace User Provider: "configuration/security.user.brightspace.md"
           - Canvas User Provider: "configuration/security.user.canvas.md"
+          - Tobira User Provider: "configuration/security.user.tobira.md"
       - Encoding: "configuration/encoding.md"
       - Execute Service: "configuration/execute.md"
       - External API: "configuration/external-api.md"

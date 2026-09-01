@@ -129,6 +129,7 @@
               <feature>opencast-plugin-userdirectory-moodle</feature>
               <feature>opencast-plugin-userdirectory-sakai</feature>
               <feature>opencast-plugin-userdirectory-studip</feature>
+              <feature>opencast-plugin-userdirectory-tobira</feature>
               <feature>opencast-plugin-userdirectory-brightspace</feature>
               <feature>opencast-plugin-usertracking</feature>
               <feature>opencast-plugin-graphql</feature>

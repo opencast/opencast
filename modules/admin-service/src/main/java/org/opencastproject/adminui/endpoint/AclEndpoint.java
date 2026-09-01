@@ -80,11 +80,11 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.FormParam;
@@ -305,10 +305,17 @@ public class AclEndpoint {
     }
 
     List<Role> roles = roleDirectoryService.findRoles(roleQuery, roleTarget, offset, limit);
-    Set<Role> uniqueRoles = new LinkedHashSet<>(roles);
+    Map<String, Role> uniqueRolesByName = new LinkedHashMap<>();
+    for (Role role : roles) {
+      // Multiple providers may return the same role name with different metadata.
+      // This became visible with Tobira users where the ACL picker could show duplicate
+      // entries for the same logical user (e.g. ROLE_USER_ADMINISTRATOR and
+      // ROLE_USER_administrator). Keep the first role per normalized key.
+      uniqueRolesByName.putIfAbsent(normalizeRoleDedupKey(role.getName()), role);
+    }
 
     JSONArray jsonRoles = new JSONArray();
-    for (Role role: uniqueRoles) {
+    for (Role role: uniqueRolesByName.values()) {
       JSONObject jsonRole = new JSONObject();
       jsonRole.put("name", role.getName());
       jsonRole.put("type", role.getType().toString());
@@ -328,6 +335,19 @@ public class AclEndpoint {
     }
 
     return Response.ok(jsonRoles.toJSONString()).build();
+  }
+
+  /* Normalizes user role keys to prevent duplicates caused by case variants across providers. */
+  private String normalizeRoleDedupKey(String roleName) {
+    String normalizedName = StringUtils.defaultString(roleName).trim();
+    String prefix = getUserRolePrefix();
+    if (StringUtils.isNotBlank(prefix)
+        && normalizedName.regionMatches(true, 0, prefix, 0, prefix.length())) {
+      String userName = normalizedName.substring(prefix.length()).trim();
+      return "user:" + userName.toLowerCase(Locale.ROOT);
+    }
+
+    return "role:" + normalizedName;
   }
 
   @DELETE
