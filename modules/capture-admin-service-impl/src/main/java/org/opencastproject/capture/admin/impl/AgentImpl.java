@@ -39,6 +39,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import javax.persistence.CollectionTable;
@@ -473,9 +474,11 @@ public class AgentImpl implements Agent {
 
     if (configuration.containsKey(CaptureParameters.CAPTURE_STREAM_CONFIGURATION)) {
       //GDLGDL: Do we want to define a maximum number of options here?
-      Set<String> agentStreamConfigs =
+      TreeSet<String> agentStreamConfigs =
           Arrays.stream(configuration.getProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION, "")
-              .split(",")).sorted().map(String::trim).collect(Collectors.toSet());
+              .split(","))
+              .map(String::trim)
+              .collect(Collectors.toCollection(TreeSet::new));
       // If someone passes a blank string, the length here is still 1...
       if (agentStreamConfigs.stream().anyMatch(String::isEmpty)) {
         throw new RuntimeException("Stream configs have a configuration which is empty");
@@ -488,9 +491,11 @@ public class AgentImpl implements Agent {
 
     if (configuration.containsKey(CaptureParameters.CAPTURE_DEVICE_POSITIONS)) {
       //GDLGDL: Do we want to define a maximum number of options here?
-      Set<String> agentDevicePositions =
+      TreeSet<String> agentDevicePositions =
           Arrays.stream(configuration.getProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS, "")
-              .split(",")).sorted().map(String::trim).collect(Collectors.toSet());
+              .split(","))
+              .map(String::trim)
+              .collect(Collectors.toCollection(TreeSet::new));
       // If someone passes a blank string, the length here is still 1...
       if (agentDevicePositions.stream().anyMatch(String::isEmpty)) {
         throw new RuntimeException("Position configs have a configuration which is empty");
