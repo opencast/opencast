@@ -505,6 +505,21 @@ public class AgentImpl implements Agent {
       capabilitiesProperties.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS,
           String.join(",", agentDevicePositions));
     }
+
+    // These, assuming they match the regex, are passed through unmodified since they're vendor tools
+    Set<String> vendorKeys = configuration.stringPropertyNames().stream()
+        .filter(s -> s.startsWith(CaptureParameters.CAPTURE_EXTENSION_PREFIX))
+        .filter(s -> s.matches("X-[A-Za-z0-9_-]{1,256}"))
+        .collect(Collectors.toSet());
+    for (String key : vendorKeys) {
+      String value = configuration.getProperty(key);
+      if (value.isEmpty()) {
+        throw new RuntimeException("Vendor extension keys have an empty value");
+      } else if (value.length() > 256) {
+        throw new RuntimeException("Vendor extension key value is too long");
+      }
+      capabilitiesProperties.setProperty(key, value.trim());
+    }
   }
 
   public AgentVersion getVersion() {

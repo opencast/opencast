@@ -588,6 +588,61 @@ public class CaptureAgentStateServiceImplTest {
   }
 
   @Test
+  public void agent2xVendorExtensions() {
+    // Case 1: The happy path
+    Properties sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_EXTENSION_PREFIX + "opencast", "with commas, my vendor extension");
+    Properties returnedConfig = new Properties();
+    returnedConfig.putAll(agentConfig2x);
+    // Note: We don't touch the contents, so this *does not* get split, trimmed, and/or sorted
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_EXTENSION_PREFIX + "opencast",
+        "with commas, my vendor extension");
+
+    assert2xAgent("test", IDLE, sentConfig, returnedConfig);
+
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_EXTENSION_PREFIX + "opencast", " we do trim spaces ");
+    returnedConfig = new Properties();
+    returnedConfig.putAll(agentConfig2x);
+    // Note: We do, however, trim the overall string
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_EXTENSION_PREFIX + "opencast", "we do trim spaces");
+
+    assert2xAgent("test", IDLE, sentConfig, returnedConfig);
+
+    // Case 2: An empty list, this is an error case and should be rejected
+    // This is what the CA is sending to the core
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_EXTENSION_PREFIX + "opencast", "");
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    // Case 3: bad length config items
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_EXTENSION_PREFIX + "opencast", "a".repeat(257));
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    // Case 4: The *key* is too long
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_EXTENSION_PREFIX + "o".repeat(257), "does not matter");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_EXTENSION_PREFIX + "not matching", "does not matter");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_EXTENSION_PREFIX + "diacritics-like-ümlauts-no-bueno", "does not matter");
+    // This next one has the prefix, but nothing else
+    sentConfig.setProperty(CaptureParameters.CAPTURE_EXTENSION_PREFIX, "does not matter");
+    returnedConfig = new Properties();
+    returnedConfig.putAll(agentConfig2x);
+    // None of the extensions above match the vendor key requirements, so they are *silently* stripped!
+
+    assert2xAgent("test", IDLE, sentConfig, returnedConfig);
+
+  }
+
+  @Test
   public void oneAgentCapabilities() {
     service.setAgentConfiguration("agent1", agentConfig1x);
     assertEquals(1, service.getKnownAgents().size());
