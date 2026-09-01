@@ -470,6 +470,21 @@ public class AgentImpl implements Agent {
     if (supportStreaming) {
       capabilitiesProperties.setProperty(CaptureParameters.CAPTURE_STREAM_STARTPAUSED, supportStreamingPaused ? BOOLEAN_ON : BOOLEAN_OFF);
     }
+
+    if (configuration.containsKey(CaptureParameters.CAPTURE_STREAM_CONFIGURATION)) {
+      //GDLGDL: Do we want to define a maximum number of options here?
+      Set<String> agentStreamConfigs =
+          Arrays.stream(configuration.getProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION, "")
+              .split(",")).sorted().map(String::trim).collect(Collectors.toSet());
+      // If someone passes a blank string, the length here is still 1...
+      if (agentStreamConfigs.stream().anyMatch(String::isEmpty)) {
+        throw new RuntimeException("Stream configs have a configuration which is empty");
+      } else if (agentStreamConfigs.stream().anyMatch(s -> s.length() > 32)) {
+        throw new RuntimeException("Stream configs have a configuration which is too long");
+      }
+      capabilitiesProperties.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION,
+          String.join(",", agentStreamConfigs));
+    }
   }
 
   public AgentVersion getVersion() {

@@ -460,6 +460,76 @@ public class CaptureAgentStateServiceImplTest {
   }
 
   @Test
+  public void agent2xStreamConfigs() {
+    // Case 1: The happy path
+    Properties sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION, "my config with spaces");
+    Properties returnedConfig = new Properties();
+    returnedConfig.putAll(agentConfig2x);
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_STARTPAUSED, BOOLEAN_OFF);
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION, "my config with spaces");
+
+    assert2xAgent("test", IDLE, sentConfig, returnedConfig);
+
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
+    // NOTE: There's an extra space here after the comma!
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION, "b config,  a config");
+    returnedConfig = new Properties();
+    returnedConfig.putAll(agentConfig2x);
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_STARTPAUSED, BOOLEAN_OFF);
+    // NOTE: The extra space above has been trimmed, and the configs sorted
+    returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION, "a config,b config");
+
+    assert2xAgent("test", IDLE, sentConfig, returnedConfig);
+
+    // Case 2: An empty list, this is an error case and should be rejected
+    // This is what the CA is sending to the core
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "alpha");
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION, "");
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    // Case 3: bad length config items
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION, "a".repeat(33));
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION, "b," + "A".repeat(33));
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION, "A".repeat(33) + ", b");
+
+    assert2xAgentException("test", IDLE, sentConfig);
+
+    sentConfig = new Properties();
+    sentConfig.putAll(agentRegistration2x);
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
+    // Note: There's a double comma here, so three items but one of them is blank
+    sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION, "a,,b");
+
+    assert2xAgentException("test", IDLE, sentConfig);
+  }
+
+  @Test
   public void oneAgentCapabilities() {
     service.setAgentConfiguration("agent1", agentConfig1x);
     assertEquals(1, service.getKnownAgents().size());
