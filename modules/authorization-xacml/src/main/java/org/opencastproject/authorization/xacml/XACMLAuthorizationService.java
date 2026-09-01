@@ -56,6 +56,7 @@ import org.osgi.service.component.annotations.ReferencePolicy;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
@@ -285,8 +286,11 @@ public class XACMLAuthorizationService implements AuthorizationService {
       attachment = (Attachment) a.clone();
       try {
         workspace.delete(a.getURI());
+      } catch (NotFoundException | FileNotFoundException e) {
+        // The file is not in the local workspace. That is the desired end state anyway, so there is nothing to do.
+        logger.debug("XACML file {} was not in the workspace, nothing to delete", a.getURI());
       } catch (Exception e) {
-        logger.warn("Unable to delete XACML file:", e);
+        logger.warn("Unable to delete XACML file {}", a.getURI(), e);
       }
       mp.remove(a);
     }
