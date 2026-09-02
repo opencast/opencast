@@ -25,7 +25,9 @@ package org.opencastproject.util;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
 
 /**
  * <code>PathSupport</code> is a helper class to deal with filesystem paths.
@@ -57,21 +59,7 @@ public final class PathSupport {
     if (suffix == null) {
       throw new IllegalArgumentException("Argument suffix is null");
     }
-
-    prefix = adjustSeparator(prefix);
-    suffix = adjustSeparator(suffix);
-    prefix = removeDoubleSeparator(prefix);
-    suffix = removeDoubleSeparator(suffix);
-
-    if (!prefix.endsWith(File.separator) && !suffix.startsWith(File.separator)) {
-      prefix += File.separator;
-    }
-    if (prefix.endsWith(File.separator) && suffix.startsWith(File.separator)) {
-      suffix = suffix.substring(1);
-    }
-
-    prefix += suffix;
-    return prefix;
+    return Paths.get(prefix, suffix).toString();
   }
 
   /**
@@ -96,50 +84,13 @@ public final class PathSupport {
         throw new IllegalArgumentException("Element " + i + " of argument parts is null");
       }
     }
-    String path = removeDoubleSeparator(adjustSeparator(parts[0]));
-    for (int i = 1; i < parts.length; i++) {
-      path = concat(path, removeDoubleSeparator(adjustSeparator(parts[i])));
-    }
-    return path;
+    Path path = Paths.get(parts[0], Arrays.copyOfRange(parts, 1, parts.length));
+    return path.toString();
   }
 
   @Deprecated
   public static String path(String... parts) {
     return concat(parts);
-  }
-
-  /**
-   * Checks that the path only contains the system path separator. If not, wrong ones are replaced.
-   */
-  private static String adjustSeparator(String path) {
-    String sp = File.separator;
-    if ("\\".equals(sp)) {
-      sp = "\\\\";
-    }
-    return path.replaceAll("/", sp);
-  }
-
-  /**
-   * Removes any occurrence of double file separators and replaces it with a single one.
-   *
-   * @param path
-   *          the path to check
-   * @return the corrected path
-   * @deprecated
-   *          This implements built-in Java functionality. Use instead:
-   *            <ul>
-   *              <li><pre>Paths.get("/a/b//c")</pre></li>
-   *              <li><pre>new File("/a/b//c")</pre></li>
-   *            </ul>
-   */
-  @Deprecated
-  private static String removeDoubleSeparator(String path) {
-    int index = 0;
-    String s = File.separator + File.separatorChar;
-    while ((index = path.indexOf(s, index)) != -1) {
-      path = path.substring(0, index) + path.substring(index + 1);
-    }
-    return path;
   }
 
 }
