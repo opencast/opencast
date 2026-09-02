@@ -67,6 +67,8 @@ public class CaptureAgentStateServiceImplTest {
   private CaptureAgentStateServiceImpl service = null;
   /* This is what a 1.x agent would return from any of the config endpoints when fully populated with data. */
   private Properties agentConfig1x;
+  /* This is what a 2.x agent would return from any of the capabilities endpoints. */
+  private Properties agentCaps2x;
   /* This is what a 2.x agent would return from any of the config endpoints. */
   private Properties agentConfig2x;
   /* This is what a 2.x agent needs to register. */
@@ -85,16 +87,20 @@ public class CaptureAgentStateServiceImplTest {
     agentConfig1x.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "CAMERA,SCREEN,AUDIO");
     agentConfig1x.setProperty(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_1.toString());
 
-    agentConfig2x = new Properties();
-    agentConfig2x.setProperty(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_2.toString());
-    agentConfig2x.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_OFF);
-    agentConfig2x.setProperty(CaptureParameters.CAPTURE_LOCAL_STARTPAUSED, BOOLEAN_OFF);
+    agentCaps2x = new Properties();
+    agentCaps2x.setProperty(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_2.toString());
+    agentCaps2x.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_OFF);
+    agentCaps2x.setProperty(CaptureParameters.CAPTURE_LOCAL_STARTPAUSED, BOOLEAN_OFF);
 
     agentRegistration2x = new Properties();
     agentRegistration2x.setProperty(CaptureParameters.VENDOR_NAME, "Mock Vendor");
     agentRegistration2x.setProperty(CaptureParameters.VENDOR_MODEL, "Mock Model");
     agentRegistration2x.setProperty(CaptureParameters.VENDOR_HARDWARE, "Mock Hardware");
     agentRegistration2x.setProperty(CaptureParameters.VENDOR_FIRMWARE, "Mock Firmware");
+
+    agentConfig2x = new Properties();
+    agentConfig2x.putAll(agentCaps2x);
+    agentConfig2x.putAll(agentRegistration2x);
   }
 
   private void setupCC() {
@@ -220,6 +226,19 @@ public class CaptureAgentStateServiceImplTest {
     }
   }
 
+  private void verifyAgentConfiguration(String name, String state, Properties caps) {
+    try {
+      Agent agent = service.getAgent(name);
+      assertEquals(name, agent.getName());
+      assertEquals(state, agent.getState());
+      assertEquals(caps.toString(), agent.getCapabilities().toString());
+      assertEquals(caps.toString(), agent.getConfiguration().toString());
+    } catch (NotFoundException e) {
+      if (state != null)
+        fail();
+    }
+  }
+
   @Test
   public void oneAgentState() {
     Properties bare1xAgent = new Properties();
@@ -256,21 +275,31 @@ public class CaptureAgentStateServiceImplTest {
     // Note: *just* setting the config, but not the state does not finalize the registration process!
     service.setAgentConfiguration("agent2", agentRegistration2x);
     // Now, with the configuration, it's a 2.x agent!
-    verifyAgent("agent2", IDLE, agentConfig2x);
+    verifyAgent("agent2", IDLE, agentCaps2x);
 
     // Now we do agent 3 to demonstrate that you don't need to register the state first
     // Order of operation here *does not* matter
     service.setAgentConfiguration("agent3", agentRegistration2x);
     service.setAgentState("agent3", IDLE);
-    verifyAgent("agent3", IDLE, agentConfig2x);
+    verifyAgent("agent3", IDLE, agentCaps2x);
   }
 
+  // This verifies the *configuration* of the agent.  This is the config data + the capabilities
   private void assert2xAgent(String agentName, String agentState, Properties sentConfig, Properties returnedConfig) {
+    service.setAgentState(agentName, agentState);
+    service.setAgentConfiguration(agentName, sentConfig);
+
+    verifyAgentConfiguration(agentName, agentState, returnedConfig);
+  }
+
+  // This verifies the *capabilities* of the agent, which is a subset of the full configuration above
+  private void assert2xAgentCaps(String agentName, String agentState, Properties sentConfig, Properties returnedConfig) {
     service.setAgentState(agentName, agentState);
     service.setAgentConfiguration(agentName, sentConfig);
 
     verifyAgent(agentName, agentState, returnedConfig);
   }
+
 
   private void assert2xAgentException(String agentName, String agentState, Properties sentConfig) {
     service.setAgentState(agentName, agentState);
@@ -287,10 +316,10 @@ public class CaptureAgentStateServiceImplTest {
 
     // This is what the core should respond with in terms of configuration data
     Properties returnedConfig = new Properties();
-    returnedConfig.putAll(agentConfig2x);
+    returnedConfig.putAll(agentCaps2x);
     returnedConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "alpha");
 
-    assert2xAgent("test", IDLE, sentConfig, returnedConfig);
+    assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
 
     // Case 2: Still happy, fixed inputs so no devices
     sentConfig = new Properties();
@@ -298,9 +327,9 @@ public class CaptureAgentStateServiceImplTest {
 
     // This is what the core should respond with in terms of configuration data
     returnedConfig = new Properties();
-    returnedConfig.putAll(agentConfig2x);
+    returnedConfig.putAll(agentCaps2x);
 
-    assert2xAgent("test2", IDLE, sentConfig, returnedConfig);
+    assert2xAgentCaps("test2", IDLE, sentConfig, returnedConfig);
 
     // Case 3: Devices string is too long (> 256 char)
     sentConfig = new Properties();
@@ -328,21 +357,21 @@ public class CaptureAgentStateServiceImplTest {
 
     // This is what the core should respond with in terms of configuration data
     Properties returnedConfig = new Properties();
-    returnedConfig.putAll(agentConfig2x);
+    returnedConfig.putAll(agentCaps2x);
     returnedConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "alpha");
     returnedConfig.setProperty(CaptureParameters.CAPTURE_LOCAL_STARTPAUSED, BOOLEAN_OFF);
 
-    assert2xAgent("test", IDLE, sentConfig, returnedConfig);
+    assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
 
     // Case 2: starting paused *is* supported
     sentConfig = new Properties();
     sentConfig.putAll(agentRegistration2x);
     sentConfig.setProperty(CaptureParameters.CAPTURE_LOCAL_STARTPAUSED, BOOLEAN_ON);
     returnedConfig = new Properties();
-    returnedConfig.putAll(agentConfig2x);
+    returnedConfig.putAll(agentCaps2x);
     returnedConfig.setProperty(CaptureParameters.CAPTURE_LOCAL_STARTPAUSED, BOOLEAN_ON);
 
-    assert2xAgent("test", IDLE, sentConfig, returnedConfig);
+    assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
 
     // Case 3: invalid data is sent to the core
     sentConfig = new Properties();
@@ -369,22 +398,22 @@ public class CaptureAgentStateServiceImplTest {
 
     // This is what the core should respond with in terms of configuration data
     Properties returnedConfig = new Properties();
-    returnedConfig.putAll(agentConfig2x);
+    returnedConfig.putAll(agentCaps2x);
     returnedConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "alpha");
     returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_OFF);
 
-    assert2xAgent("test", IDLE, sentConfig, returnedConfig);
+    assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
 
     // Case 2: streaming *is* supported
     sentConfig = new Properties();
     sentConfig.putAll(agentRegistration2x);
     sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
     returnedConfig = new Properties();
-    returnedConfig.putAll(agentConfig2x);
+    returnedConfig.putAll(agentCaps2x);
     returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
     returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_STARTPAUSED, BOOLEAN_OFF);
 
-    assert2xAgent("test", IDLE, sentConfig, returnedConfig);
+    assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
 
     // Case 3: invalid data is sent to the core
     sentConfig = new Properties();
@@ -413,11 +442,11 @@ public class CaptureAgentStateServiceImplTest {
 
     // This is what the core should respond with in terms of configuration data
     Properties returnedConfig = new Properties();
-    returnedConfig.putAll(agentConfig2x);
+    returnedConfig.putAll(agentCaps2x);
     returnedConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_NAMES, "alpha");
     returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_OFF);
 
-    assert2xAgent("test", IDLE, sentConfig, returnedConfig);
+    assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
 
     // Case 2: streaming *is* supported, starting paused is not
     sentConfig = new Properties();
@@ -425,11 +454,11 @@ public class CaptureAgentStateServiceImplTest {
     sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
     sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_STARTPAUSED, BOOLEAN_OFF);
     returnedConfig = new Properties();
-    returnedConfig.putAll(agentConfig2x);
+    returnedConfig.putAll(agentCaps2x);
     returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
     returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_STARTPAUSED, BOOLEAN_OFF);
 
-    assert2xAgent("test", IDLE, sentConfig, returnedConfig);
+    assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
 
     // Case 3: streaming and starting paused are both supported
     sentConfig = new Properties();
@@ -437,11 +466,11 @@ public class CaptureAgentStateServiceImplTest {
     sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
     sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_STARTPAUSED, BOOLEAN_ON);
     returnedConfig = new Properties();
-    returnedConfig.putAll(agentConfig2x);
+    returnedConfig.putAll(agentCaps2x);
     returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
     returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_STARTPAUSED, BOOLEAN_ON);
 
-    assert2xAgent("test", IDLE, sentConfig, returnedConfig);
+    assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
 
     // Case 4: bad data passed to the core
     sentConfig = new Properties();
@@ -467,12 +496,12 @@ public class CaptureAgentStateServiceImplTest {
     sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
     sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION, "my config with spaces");
     Properties returnedConfig = new Properties();
-    returnedConfig.putAll(agentConfig2x);
+    returnedConfig.putAll(agentCaps2x);
     returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
     returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_STARTPAUSED, BOOLEAN_OFF);
     returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION, "my config with spaces");
 
-    assert2xAgent("test", IDLE, sentConfig, returnedConfig);
+    assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
 
     sentConfig = new Properties();
     sentConfig.putAll(agentRegistration2x);
@@ -480,13 +509,13 @@ public class CaptureAgentStateServiceImplTest {
     // NOTE: There's an extra space here after the comma!
     sentConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION, "b config,  a config");
     returnedConfig = new Properties();
-    returnedConfig.putAll(agentConfig2x);
+    returnedConfig.putAll(agentCaps2x);
     returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CAPABLE, BOOLEAN_ON);
     returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_STARTPAUSED, BOOLEAN_OFF);
     // NOTE: The extra space above has been trimmed, and the configs sorted
     returnedConfig.setProperty(CaptureParameters.CAPTURE_STREAM_CONFIGURATION, "a config,b config");
 
-    assert2xAgent("test", IDLE, sentConfig, returnedConfig);
+    assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
 
     // Case 2: An empty list, this is an error case and should be rejected
     // This is what the CA is sending to the core
@@ -536,21 +565,21 @@ public class CaptureAgentStateServiceImplTest {
     sentConfig.putAll(agentRegistration2x);
     sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS, "my positions with spaces");
     Properties returnedConfig = new Properties();
-    returnedConfig.putAll(agentConfig2x);
+    returnedConfig.putAll(agentCaps2x);
     returnedConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS, "my positions with spaces");
 
-    assert2xAgent("test", IDLE, sentConfig, returnedConfig);
+    assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
 
     sentConfig = new Properties();
     sentConfig.putAll(agentRegistration2x);
     // NOTE: There's an extra space here after the comma!
     sentConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS, "b position,  a position");
     returnedConfig = new Properties();
-    returnedConfig.putAll(agentConfig2x);
+    returnedConfig.putAll(agentCaps2x);
     // NOTE: The extra space above has been trimmed, and the configs sorted
     returnedConfig.setProperty(CaptureParameters.CAPTURE_DEVICE_POSITIONS, "a position,b position");
 
-    assert2xAgent("test", IDLE, sentConfig, returnedConfig);
+    assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
 
     // Case 2: An empty list, this is an error case and should be rejected
     // This is what the CA is sending to the core
@@ -594,22 +623,22 @@ public class CaptureAgentStateServiceImplTest {
     sentConfig.putAll(agentRegistration2x);
     sentConfig.setProperty(CaptureParameters.CAPTURE_EXTENSION_PREFIX + "opencast", "with commas, my vendor extension");
     Properties returnedConfig = new Properties();
-    returnedConfig.putAll(agentConfig2x);
+    returnedConfig.putAll(agentCaps2x);
     // Note: We don't touch the contents, so this *does not* get split, trimmed, and/or sorted
     returnedConfig.setProperty(CaptureParameters.CAPTURE_EXTENSION_PREFIX + "opencast",
         "with commas, my vendor extension");
 
-    assert2xAgent("test", IDLE, sentConfig, returnedConfig);
+    assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
 
     sentConfig = new Properties();
     sentConfig.putAll(agentRegistration2x);
     sentConfig.setProperty(CaptureParameters.CAPTURE_EXTENSION_PREFIX + "opencast", " we do trim spaces ");
     returnedConfig = new Properties();
-    returnedConfig.putAll(agentConfig2x);
+    returnedConfig.putAll(agentCaps2x);
     // Note: We do, however, trim the overall string
     returnedConfig.setProperty(CaptureParameters.CAPTURE_EXTENSION_PREFIX + "opencast", "we do trim spaces");
 
-    assert2xAgent("test", IDLE, sentConfig, returnedConfig);
+    assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
 
     // Case 2: An empty list, this is an error case and should be rejected
     // This is what the CA is sending to the core
@@ -635,10 +664,10 @@ public class CaptureAgentStateServiceImplTest {
     // This next one has the prefix, but nothing else
     sentConfig.setProperty(CaptureParameters.CAPTURE_EXTENSION_PREFIX, "does not matter");
     returnedConfig = new Properties();
-    returnedConfig.putAll(agentConfig2x);
+    returnedConfig.putAll(agentCaps2x);
     // None of the extensions above match the vendor key requirements, so they are *silently* stripped!
 
-    assert2xAgent("test", IDLE, sentConfig, returnedConfig);
+    assert2xAgentCaps("test", IDLE, sentConfig, returnedConfig);
 
   }
 
