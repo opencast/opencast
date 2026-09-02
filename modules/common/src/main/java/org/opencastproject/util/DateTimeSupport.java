@@ -23,9 +23,13 @@
 package org.opencastproject.util;
 
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
-import java.util.TimeZone;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
@@ -34,8 +38,7 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
  */
 public final class DateTimeSupport {
 
-  private static final String HOUR_MINUTE_SECOND_TIME_FORMAT = "HH:mm:ss";
-  private static final String STANDARD_DATE_FORMAT = "yyyy-MM-dd";
+  private static final DateTimeFormatter UTC_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
   /** Disable construction of this utility class */
   private DateTimeSupport() {
@@ -52,46 +55,15 @@ public final class DateTimeSupport {
    *           if the date string is malformed
    */
   public static long fromUTC(String s) throws IllegalStateException, ParseException {
-    return fromUTC(s, STANDARD_DATE_FORMAT, HOUR_MINUTE_SECOND_TIME_FORMAT);
-  }
-
-  /**
-   * This methods reads a utc date string and returns it's unix time equivalent in milliseconds.
-   *
-   * @param s
-   *          the utc string
-   * @param dateFormat
-   *          The format to parse the date with
-   * @param timeFormat
-   *          The format to parse the time portion with
-   * @return the date/time in milliseconds
-   * @throws IllegalStateException
-   * @throws ParseException
-   *           if the date string is malformed
-   */
-  private static long fromUTC(String s, String dateFormat, String timeFormat) throws IllegalStateException,
-          ParseException {
     if (s == null) {
       throw new IllegalArgumentException("UTC date string is null");
     }
-    if (s.endsWith("Z")) {
-      s = s.substring(0, s.length() - 1); // cut off the Z
+    String withoutZone = s.endsWith("Z") ? s.substring(0, s.length() - 1) : s;
+    try {
+      return LocalDateTime.parse(withoutZone, UTC_FORMAT).toInstant(ZoneOffset.UTC).toEpochMilli();
+    } catch (DateTimeParseException e) {
+      throw new ParseException(e.getMessage(), e.getErrorIndex());
     }
-    String[] parts = s.split("T");
-    if (parts.length != 2) {
-      throw new IllegalArgumentException("UTC date string is malformed");
-    }
-
-    long utc = 0;
-
-    // Parse date and time
-    SimpleDateFormat df = new SimpleDateFormat(dateFormat);
-    df.setTimeZone(TimeZone.getTimeZone("UTC"));
-    utc = df.parse(parts[0]).getTime();
-    SimpleDateFormat tf = new SimpleDateFormat(timeFormat);
-    tf.setTimeZone(TimeZone.getTimeZone("UTC"));
-    utc += tf.parse(parts[1]).getTime();
-    return utc;
   }
 
   /**
@@ -102,22 +74,7 @@ public final class DateTimeSupport {
    * @return the local time
    */
   public static String toUTC(long time) {
-    StringBuffer utc = new StringBuffer();
-    Date d = new Date(time);
-
-    // Format the date
-    SimpleDateFormat df = new SimpleDateFormat(STANDARD_DATE_FORMAT);
-    df.setTimeZone(TimeZone.getTimeZone("UTC"));
-    utc.append(df.format(d));
-    utc.append("T");
-
-    // Format the time
-    SimpleDateFormat tf = new SimpleDateFormat(HOUR_MINUTE_SECOND_TIME_FORMAT);
-    tf.setTimeZone(TimeZone.getTimeZone("UTC"));
-    utc.append(tf.format(d));
-    utc.append("Z");
-
-    return utc.toString();
+    return Instant.ofEpochMilli(time).truncatedTo(ChronoUnit.SECONDS).toString();
   }
 
   /**
