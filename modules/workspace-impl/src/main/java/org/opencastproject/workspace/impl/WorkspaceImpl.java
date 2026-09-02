@@ -25,9 +25,7 @@ import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static org.opencastproject.util.EqualsUtil.ne;
 import static org.opencastproject.util.IoSupport.locked;
-import static org.opencastproject.util.PathSupport.path;
 import static org.opencastproject.util.RequireUtil.notNull;
-import static org.opencastproject.util.data.Arrays.cons;
 import static org.opencastproject.util.data.Either.left;
 import static org.opencastproject.util.data.Either.right;
 import static org.opencastproject.util.data.Prelude.sleep;
@@ -45,7 +43,6 @@ import org.opencastproject.util.FileSupport;
 import org.opencastproject.util.HttpUtil;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.PathSupport;
 import org.opencastproject.util.data.Either;
 import org.opencastproject.workingfilerepository.api.PathMappable;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
@@ -202,7 +199,7 @@ public final class WorkspaceImpl implements Workspace {
         logger.info("CONFIG " + WORKSPACE_DIR_KEY + ": " + this.wsRoot);
       } else if (ensureContextProp(cc, STORAGE_DIR_KEY)) {
         // create rootDir by adding "workspace" to the default data directory
-        this.wsRoot = PathSupport.concat(cc.getBundleContext().getProperty(STORAGE_DIR_KEY), "workspace");
+        this.wsRoot = Paths.get(cc.getBundleContext().getProperty(STORAGE_DIR_KEY), "workspace").toString();
         logger.warn("CONFIG " + WORKSPACE_DIR_KEY + " is missing: falling back to " + this.wsRoot);
       } else {
         throw new IllegalStateException("Configuration '" + WORKSPACE_DIR_KEY + "' is missing");
@@ -803,7 +800,7 @@ public final class WorkspaceImpl implements Workspace {
     } else {
       serverPath = serverPath.replaceAll(":/*", "_");
     }
-    String wsDirectoryPath = PathSupport.concat(wsRoot, serverPath);
+    String wsDirectoryPath = Paths.get(wsRoot, serverPath).toString();
     File wsDirectory = new File(wsDirectoryPath);
     wsDirectory.mkdirs();
 
@@ -816,12 +813,12 @@ public final class WorkspaceImpl implements Workspace {
 
   /** Return a file object pointing into the workspace. */
   private File workspaceFile(String... path) {
-    return new File(path(cons(String.class, wsRoot, path)));
+    return Paths.get(wsRoot, path).toFile();
   }
 
   /** Return a file object pointing into the working file repository. */
   private File workingFileRepositoryFile(String... path) {
-    return new File(path(cons(String.class, pathMappable.getPathPrefix(), path)));
+    return Paths.get(pathMappable.getPathPrefix(), path).toFile();
   }
 
   /**
