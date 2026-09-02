@@ -27,7 +27,9 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
+import java.time.temporal.ChronoField;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
@@ -38,7 +40,13 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
  */
 public final class DateTimeSupport {
 
-  private static final DateTimeFormatter UTC_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+  /** Fractional seconds are optional on parsing since some callers pass timestamps with millisecond precision. */
+  private static final DateTimeFormatter UTC_FORMAT = new DateTimeFormatterBuilder()
+          .appendPattern("yyyy-MM-dd'T'HH:mm:ss")
+          .optionalStart()
+          .appendFraction(ChronoField.NANO_OF_SECOND, 1, 9, true)
+          .optionalEnd()
+          .toFormatter();
 
   /** Disable construction of this utility class */
   private DateTimeSupport() {
