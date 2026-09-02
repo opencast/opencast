@@ -213,7 +213,7 @@ public class CaptureAgentStateServiceImplTest {
     assertEquals(0, service.getKnownAgents().size());
   }
 
-  private void verifyAgent(String name, String state, Properties caps) {
+  private void verifyAgentCapabilities(String name, String state, Properties caps) {
     try {
       Agent agent = service.getAgent(name);
       assertEquals(name, agent.getName());
@@ -247,14 +247,14 @@ public class CaptureAgentStateServiceImplTest {
     service.setAgentState("agent1", IDLE);
     assertEquals(1, service.getKnownAgents().size());
 
-    verifyAgent("notAgent1", null, null);
-    verifyAgent("agent1", IDLE, bare1xAgent);
+    verifyAgentCapabilities("notAgent1", null, null);
+    verifyAgentCapabilities("agent1", IDLE, bare1xAgent);
 
     service.setAgentState("agent1", CAPTURING);
     assertEquals(1, service.getKnownAgents().size());
 
-    verifyAgent("notAgent1", null, null);
-    verifyAgent("agent1", CAPTURING, bare1xAgent);
+    verifyAgentCapabilities("notAgent1", null, null);
+    verifyAgentCapabilities("agent1", CAPTURING, bare1xAgent);
   }
 
   @Test
@@ -270,18 +270,18 @@ public class CaptureAgentStateServiceImplTest {
     service.setAgentState("agent2", IDLE);
     assertEquals(1, service.getKnownAgents().size());
     // That's right, it shows up as a *1.x* agent.
-    verifyAgent("agent2", IDLE, bare1xAgent);
+    verifyAgentCapabilities("agent2", IDLE, bare1xAgent);
 
     // Note: *just* setting the config, but not the state does not finalize the registration process!
     service.setAgentConfiguration("agent2", agentRegistration2x);
     // Now, with the configuration, it's a 2.x agent!
-    verifyAgent("agent2", IDLE, agentCaps2x);
+    verifyAgentCapabilities("agent2", IDLE, agentCaps2x);
 
     // Now we do agent 3 to demonstrate that you don't need to register the state first
     // Order of operation here *does not* matter
     service.setAgentConfiguration("agent3", agentRegistration2x);
     service.setAgentState("agent3", IDLE);
-    verifyAgent("agent3", IDLE, agentCaps2x);
+    verifyAgentCapabilities("agent3", IDLE, agentCaps2x);
   }
 
   // This verifies the *configuration* of the agent.  This is the config data + the capabilities
@@ -297,7 +297,7 @@ public class CaptureAgentStateServiceImplTest {
     service.setAgentState(agentName, agentState);
     service.setAgentConfiguration(agentName, sentConfig);
 
-    verifyAgent(agentName, agentState, returnedConfig);
+    verifyAgentCapabilities(agentName, agentState, returnedConfig);
   }
 
 
@@ -676,22 +676,22 @@ public class CaptureAgentStateServiceImplTest {
     service.setAgentConfiguration("agent1", agentConfig1x);
     assertEquals(1, service.getKnownAgents().size());
 
-    verifyAgent("notAgent1", null, new Properties());
-    verifyAgent("agent1", UNKNOWN, agentConfig1x);
+    verifyAgentCapabilities("notAgent1", null, new Properties());
+    verifyAgentCapabilities("agent1", UNKNOWN, agentConfig1x);
 
     service.setAgentState("agent1", IDLE);
     assertEquals(1, service.getKnownAgents().size());
 
-    verifyAgent("notAgent1", null, new Properties());
-    verifyAgent("agent1", IDLE, agentConfig1x);
+    verifyAgentCapabilities("notAgent1", null, new Properties());
+    verifyAgentCapabilities("agent1", IDLE, agentConfig1x);
 
     service.setAgentConfiguration("agent1", new Properties());
     assertEquals(1, service.getKnownAgents().size());
 
-    verifyAgent("notAnAgent", null, new Properties());
+    verifyAgentCapabilities("notAnAgent", null, new Properties());
     Properties bareConfig1x = new Properties();
     bareConfig1x.setProperty(CaptureParameters.AGENT_VERSION, AgentVersion.VERSION_1.toString());
-    verifyAgent("agent1", IDLE, bareConfig1x);
+    verifyAgentCapabilities("agent1", IDLE, bareConfig1x);
   }
 
   @Test
@@ -701,16 +701,16 @@ public class CaptureAgentStateServiceImplTest {
     service.setAgentConfiguration("agent2", agentConfig1x);
     service.setAgentState("agent2", UPLOADING);
 
-    verifyAgent("notAnAgent", null, agentConfig1x);
-    verifyAgent("agent1", UNKNOWN, agentConfig1x);
-    verifyAgent("agent2", UPLOADING, agentConfig1x);
+    verifyAgentCapabilities("notAnAgent", null, agentConfig1x);
+    verifyAgentCapabilities("agent1", UNKNOWN, agentConfig1x);
+    verifyAgentCapabilities("agent2", UPLOADING, agentConfig1x);
 
     try {
       service.removeAgent("agent1");
       assertEquals(1, service.getKnownAgents().size());
-      verifyAgent("notAnAgent", null, agentConfig1x);
-      verifyAgent("agent1", null, agentConfig1x);
-      verifyAgent("agent2", UPLOADING, agentConfig1x);
+      verifyAgentCapabilities("notAnAgent", null, agentConfig1x);
+      verifyAgentCapabilities("agent1", null, agentConfig1x);
+      verifyAgentCapabilities("agent2", UPLOADING, agentConfig1x);
     } catch (NotFoundException e) {
       fail();
     }
@@ -722,9 +722,9 @@ public class CaptureAgentStateServiceImplTest {
       assertNotNull(e);
     }
     assertEquals(1, service.getKnownAgents().size());
-    verifyAgent("notAnAgent", null, agentConfig1x);
-    verifyAgent("agent1", null, agentConfig1x);
-    verifyAgent("agent2", UPLOADING, agentConfig1x);
+    verifyAgentCapabilities("notAnAgent", null, agentConfig1x);
+    verifyAgentCapabilities("agent1", null, agentConfig1x);
+    verifyAgentCapabilities("agent2", UPLOADING, agentConfig1x);
   }
 
   @Test
