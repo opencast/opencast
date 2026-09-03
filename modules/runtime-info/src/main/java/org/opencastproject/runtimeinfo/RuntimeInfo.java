@@ -56,6 +56,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -206,8 +207,8 @@ public class RuntimeInfo {
     final String orgEngageBaseUrl = organization.getProperties().get(ENGAGE_URL_PROPERTY);
     if (StringUtils.isNotBlank(orgEngageBaseUrl)) {
       try {
-        targetEngageBaseUrl = new URL(orgEngageBaseUrl);
-      } catch (MalformedURLException e) {
+        targetEngageBaseUrl = URI.create(orgEngageBaseUrl).toURL();
+      } catch (MalformedURLException | IllegalArgumentException e) {
         logger.warn("Engage url '{}' of organization '{}' is malformed", orgEngageBaseUrl, organization.getId());
       }
     }
@@ -225,8 +226,8 @@ public class RuntimeInfo {
     final String orgAdminBaseUrl = organization.getProperties().get(ADMIN_URL_PROPERTY);
     if (StringUtils.isNotBlank(orgAdminBaseUrl)) {
       try {
-        targetAdminBaseUrl = new URL(orgAdminBaseUrl);
-      } catch (MalformedURLException e) {
+        targetAdminBaseUrl = URI.create(orgAdminBaseUrl).toURL();
+      } catch (MalformedURLException | IllegalArgumentException e) {
         logger.warn("Admin url '{}' of organization '{}' is malformed", orgAdminBaseUrl, organization.getId());
       }
     }

@@ -68,6 +68,7 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Collections;
@@ -410,7 +411,7 @@ public class ServiceRegistryEndpoint {
     try {
       for (ServiceRegistration reg : serviceRegistry.getServiceRegistrationsByLoad(serviceType)) {
         JaxbServiceRegistration jaxbReg = new JaxbServiceRegistration(reg);
-        URL internalHostUrl = new URL(jaxbReg.getHost());
+        URL internalHostUrl = URI.create(jaxbReg.getHost()).toURL();
         String tenantSpecificHost = StringUtils.trimToNull(properties.get("org.opencastproject.host."
             + internalHostUrl.getHost()));
         if (StringUtils.isNotBlank(tenantSpecificHost)) {
@@ -419,7 +420,7 @@ public class ServiceRegistryEndpoint {
         registrations.add(jaxbReg);
       }
       return Response.ok(registrations).build();
-    } catch (ServiceRegistryException | MalformedURLException e) {
+    } catch (ServiceRegistryException | MalformedURLException | IllegalArgumentException e) {
       throw new WebApplicationException(e);
     }
   }

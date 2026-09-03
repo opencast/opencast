@@ -45,6 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Dictionary;
@@ -206,9 +207,9 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
         String tenantSpecificHost = StringUtils.trimToNull((String) properties.get(key));
         if (tenantSpecificHost != null) {
           try {
-            Tuple<String, Integer> hostPort = hostAndPort(new URL(tenantSpecificHost));
+            Tuple<String, Integer> hostPort = hostAndPort(URI.create(tenantSpecificHost).toURL());
             servers.put(hostPort.getA(), hostPort.getB());
-          } catch (MalformedURLException malformedURLException) {
+          } catch (MalformedURLException | IllegalArgumentException malformedURLException) {
             logger.error("{} is not a URL", tenantSpecificHost);
           }
         }
