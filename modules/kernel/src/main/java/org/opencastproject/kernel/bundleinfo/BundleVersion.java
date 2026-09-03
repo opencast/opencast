@@ -21,9 +21,9 @@
 
 package org.opencastproject.kernel.bundleinfo;
 
-import static org.opencastproject.util.EqualsUtil.eq;
 import static org.opencastproject.util.EqualsUtil.hash;
 
+import java.util.Objects;
 import java.util.Optional;
 
 public final class BundleVersion {
@@ -48,7 +48,7 @@ public final class BundleVersion {
   }
 
   private boolean eqFields(BundleVersion that) {
-    return eq(this.bundleVersion, that.bundleVersion) && eq(this.buildNumber, that.buildNumber);
+    return Objects.equals(this.bundleVersion, that.bundleVersion) && Objects.equals(this.buildNumber, that.buildNumber);
   }
 
   @Override public int hashCode() {
