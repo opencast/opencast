@@ -22,9 +22,7 @@
 
 package org.opencastproject.util;
 
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
@@ -72,41 +70,6 @@ public final class EqualsUtil {
       }
     }
 
-    return true;
-  }
-
-  /**
-   * Compare the elements of two lists one by one.
-   *
-   * @deprecated use {@link Objects#equals(Object, Object)} or {@link java.util.List#equals(Object)}
-   */
-  public static boolean eqListSorted(List<?> as, List<?> bs) {
-    if (as != null && bs != null && as.size() == bs.size()) {
-      final Iterator<?> asi = as.iterator();
-      final Iterator<?> bsi = bs.iterator();
-      while (asi.hasNext() && bsi.hasNext()) {
-        if (!asi.next().equals(bsi.next())) {
-          return false;
-        }
-      }
-      return true;
-    } else {
-      return Objects.equals(as, bs);
-    }
-  }
-
-  /**
-   * Compare two maps.
-   *
-   * @deprecated use {@link Objects#equals(Object, Object)} or {@link java.util.Map#equals(Object)}
-   */
-  public static boolean eqMap(Map<?, ?> as, Map<?, ?> bs) {
-    for (Map.Entry<?, ?> ae : as.entrySet()) {
-      final Object bv = bs.get(ae.getKey());
-      if (bv == null || !Objects.equals(ae.getValue(), bv)) {
-        return false;
-      }
-    }
     return true;
   }
 
