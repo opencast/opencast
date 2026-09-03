@@ -21,8 +21,9 @@
 
 package org.opencastproject.kernel.mail;
 
-import static org.opencastproject.util.EqualsUtil.eqObj;
 import static org.opencastproject.util.EqualsUtil.hash;
+
+import java.util.Objects;
 
 /** An email address. */
 public final class EmailAddress {
@@ -45,7 +46,7 @@ public final class EmailAddress {
   }
 
   private boolean eqFields(EmailAddress that) {
-    return eqObj(this.address, that.address) && eqObj(this.name, that.name);
+    return Objects.equals(this.address, that.address) && Objects.equals(this.name, that.name);
   }
 
   @Override
