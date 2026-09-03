@@ -21,8 +21,6 @@
 
 package org.opencastproject.util;
 
-import static org.opencastproject.util.EqualsUtil.hash;
-
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -69,7 +67,7 @@ public final class XmlNamespaceBinding implements Serializable {
   }
 
   @Override public int hashCode() {
-    return hash(prefix, namespaceURI);
+    return Objects.hash(prefix, namespaceURI);
   }
 
   @Override public boolean equals(Object that) {

@@ -21,8 +21,6 @@
 
 package org.opencastproject.composer.layout;
 
-import static org.opencastproject.util.EqualsUtil.hash;
-
 import java.util.Objects;
 
 /** The layout of a rectangular shape on a rectangular canvas. */
@@ -64,6 +62,6 @@ public final class Layout {
 
   @Override
   public int hashCode() {
-    return hash(dim, offset);
+    return Objects.hash(dim, offset);
   }
 }

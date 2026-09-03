@@ -21,8 +21,6 @@
 
 package org.opencastproject.job.api;
 
-import static org.opencastproject.util.EqualsUtil.hash;
-
 import org.opencastproject.util.data.Tuple;
 
 import java.util.Collections;
@@ -109,7 +107,7 @@ public final class IncidentImpl implements Incident {
 
   @Override
   public int hashCode() {
-    return hash(id, jobId, serviceType, processingHost, timestamp, severity, code, details, parameters);
+    return Objects.hash(id, jobId, serviceType, processingHost, timestamp, severity, code, details, parameters);
   }
 
   @Override
