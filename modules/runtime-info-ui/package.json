@@ -5,13 +5,9 @@
     "eslint": "eslint src/main/resources/",
     "html-linter": "html-linter --config ../../docs/checkstyle/html-linter.json 'src/main/resources/**/*.html'"
   },
-  "dependencies": {
-    "jquery": "^4.0.0"
-  },
   "devDependencies": {
     "eslint": "^10.9.1",
     "eslint-config-opencast": "file:../../docs/checkstyle/eslint-config",
-    "eslint-plugin-header": "^3.1.1",
     "html-linter": "^1.1.1"
   }
 }

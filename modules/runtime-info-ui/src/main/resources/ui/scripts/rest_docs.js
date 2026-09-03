@@ -21,7 +21,7 @@
 
 function search() {
   const value = document.getElementById('search').value.toLowerCase();
-  for (const li of document.getElementsByTagName('li')) {
+  for (const li of document.querySelectorAll('#docs li')) {
     li.style.display = li.innerText.toLowerCase().indexOf(value) >= 0 ? 'block' : 'none';
   }
 }
@@ -33,21 +33,32 @@ async function init() {
 
   const docs = document.getElementById('docs');
 
-  const response = await fetch('/info/components.json');
-  const rest = (await response.json()).rest;
-  rest.sort((a,b) => a.path > b.path ? 1 : -1);
+  let rest;
+  try {
+    const response = await fetch('/info/components.json');
+    if (!response.ok) {
+      throw new Error(`${response.status} ${response.statusText}`);
+    }
+    rest = (await response.json()).rest;
+  } catch (error) {
+    const li = document.createElement('li');
+    li.innerText = `Could not load the list of services: ${error.message}`;
+    docs.appendChild(li);
+    return;
+  }
+  rest.sort((a, b) => a.path > b.path ? 1 : -1);
 
   for (const endpoint of rest) {
     const li = document.createElement('li');
     const a = document.createElement('a');
-    a.href = '/docs.html?path=' + endpoint.path;
+    a.href = '/docs.html?path=' + encodeURIComponent(endpoint.path);
     li.appendChild(a);
     const path = document.createElement('span');
-    path.classList = ['path'];
+    path.className = 'path';
     path.innerText = endpoint.path;
     a.appendChild(path);
     const desc = document.createElement('span');
-    desc.classList = ['desc'];
+    desc.className = 'desc';
     desc.innerText = endpoint.description;
     a.appendChild(desc);
     docs.appendChild(li);
