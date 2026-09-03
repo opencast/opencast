@@ -131,6 +131,7 @@ import org.apache.commons.fileupload.servlet.ServletFileUpload;
 import org.apache.commons.fileupload.util.Streams;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.codehaus.jettison.json.JSONException;
 import org.joda.time.DateTimeZone;
 import org.json.simple.JSONArray;
@@ -1150,7 +1151,7 @@ public class IndexServiceImpl implements IndexService {
           if (tags != null) {
             tagsArray = tags.split(",");
             for (String tag : tagsArray) {
-              if (StringUtils.startsWith(StringUtils.trimToEmpty(tag), "lang:")) {
+              if (Strings.CS.startsWith(StringUtils.trimToEmpty(tag), "lang:")) {
                 langTag = StringUtils.trimToEmpty(tag);
                 break;
               }
@@ -1683,7 +1684,7 @@ public class IndexServiceImpl implements IndexService {
     }
 
     // update series catalogs
-    if (!StringUtils.equals(oldSeriesId, mp.getSeries())) {
+    if (!Strings.CS.equals(oldSeriesId, mp.getSeries())) {
       List<String> seriesDcTags = new ArrayList<>();
       List<String> seriesAclTags = new ArrayList<>();
       Map<String, List<String>> seriesExtDcTags = new HashMap<>();

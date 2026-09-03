@@ -164,6 +164,7 @@ import net.fortuna.ical4j.model.property.RRule;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.codehaus.jettison.json.JSONException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -2515,7 +2516,7 @@ public abstract class AbstractEventEndpoint {
 
     long workflowInstanceId;
     try {
-      workflowId = StringUtils.remove(workflowId, ".json");
+      workflowId = Strings.CS.remove(workflowId, ".json");
       workflowInstanceId = Long.parseLong(workflowId);
     } catch (Exception e) {
       logger.warn("Unable to parse workflow id {}", workflowId);

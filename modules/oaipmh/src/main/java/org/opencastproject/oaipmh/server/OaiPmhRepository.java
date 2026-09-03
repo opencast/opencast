@@ -43,6 +43,7 @@ import org.opencastproject.oaipmh.util.XmlGen;
 
 import org.apache.commons.collections4.EnumerationUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.slf4j.Logger;
@@ -265,7 +266,7 @@ public abstract class OaiPmhRepository implements ManagedService {
       var metadataProviders = p.getMetadataPrefix().flatMap(mp -> getMetadataProvider(mp)).stream().toList();
       for (final MetadataProvider metadataProvider : metadataProviders) {
         if (p.getSet().isPresent() && !sets.stream().anyMatch(
-            setDef -> StringUtils.equals(setDef.getSetSpec(), p.getSet().get()))) {
+            setDef -> Strings.CS.equals(setDef.getSetSpec(), p.getSet().get()))) {
           // If there is no set specification, immediately return a no result response
           return createNoRecordsMatchResponse(p);
         }
@@ -580,7 +581,7 @@ public abstract class OaiPmhRepository implements ManagedService {
           if (!resumptionTokenExists) {
             // start a new query
             if (p.getSet().isPresent() && !sets.stream().anyMatch(
-                setDef -> StringUtils.equals(setDef.getSetSpec(), p.getSet().get()))) {
+                setDef -> Strings.CS.equals(setDef.getSetSpec(), p.getSet().get()))) {
               // If there is no set specification, immediately return a no result response
               return createNoRecordsMatchResponse(p);
             }

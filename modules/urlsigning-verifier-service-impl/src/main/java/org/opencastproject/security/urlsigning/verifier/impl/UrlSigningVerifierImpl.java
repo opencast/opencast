@@ -25,6 +25,7 @@ import org.opencastproject.urlsigning.common.ResourceRequest;
 import org.opencastproject.urlsigning.utils.ResourceRequestUtil;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.annotations.Component;
@@ -81,7 +82,7 @@ public class UrlSigningVerifierImpl implements UrlSigningVerifier, ManagedServic
     Enumeration<String> ids = properties.keys();
     while (ids.hasMoreElements()) {
       String propertyKey = ids.nextElement();
-      String id = StringUtils.removeStart(propertyKey, KEY_PREFIX);
+      String id = Strings.CS.removeStart(propertyKey, KEY_PREFIX);
       if (id != propertyKey) {
         String key = StringUtils.trimToNull(Objects.toString(properties.get(propertyKey), null));
         if (key == null) {

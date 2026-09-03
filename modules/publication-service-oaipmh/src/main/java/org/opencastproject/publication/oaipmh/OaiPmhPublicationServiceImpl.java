@@ -61,6 +61,7 @@ import org.opencastproject.util.data.Collections;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.http.client.utils.URIUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -114,7 +115,7 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
 
   @Override
   protected String process(Job job) throws Exception {
-    if (!StringUtils.equalsIgnoreCase(JOB_TYPE, job.getJobType())) {
+    if (!Strings.CI.equals(JOB_TYPE, job.getJobType())) {
       throw new IllegalArgumentException("Can not handle job type " + job.getJobType());
     }
 
@@ -657,7 +658,7 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
 
     String publicationChannel = getPublicationChannelName(repository);
     for (Publication p : mediaPackage.getPublications()) {
-      if (StringUtils.equals(publicationChannel, p.getChannel())) {
+      if (Strings.CS.equals(publicationChannel, p.getChannel())) {
         return p;
       }
     }
@@ -818,7 +819,7 @@ public class OaiPmhPublicationServiceImpl extends AbstractJobProducer implements
     // return the publication
     String publicationChannel = getPublicationChannelName(repository);
     for (Publication p : mediaPackage.getPublications()) {
-      if (StringUtils.equals(publicationChannel, p.getChannel())) {
+      if (Strings.CS.equals(publicationChannel, p.getChannel())) {
         return p;
       }
     }

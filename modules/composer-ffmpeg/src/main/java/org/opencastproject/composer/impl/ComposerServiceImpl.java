@@ -81,6 +81,7 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.LocaleUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
@@ -423,7 +424,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
     // Handle lang:<LOCALE> tags
     tracks.entrySet().stream()
         .map(e -> new Tuple<>(e.getKey(), Arrays.stream(e.getValue().getTags())
-            .filter(t -> StringUtils.startsWith(t, "lang:"))
+            .filter(t -> Strings.CS.startsWith(t, "lang:"))
             .map(t -> StringUtils.substring(t, 5))
             .filter(StringUtils::isNotBlank)
             .findFirst()))

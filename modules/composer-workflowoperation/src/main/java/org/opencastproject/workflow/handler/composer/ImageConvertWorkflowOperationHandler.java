@@ -45,6 +45,7 @@ import org.opencastproject.workspace.api.Workspace;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.Logger;
@@ -191,11 +192,11 @@ public class ImageConvertWorkflowOperationHandler extends AbstractWorkflowOperat
           // set flavor on target element
           if (targetFlavor != null) {
             targetElement.setFlavor(targetFlavor);
-            if (StringUtils.equalsAny("*", targetFlavor.getType())) {
+            if (Strings.CS.equalsAny("*", targetFlavor.getType())) {
               targetElement.setFlavor(MediaPackageElementFlavor.flavor(
                       sourceElement.getFlavor().getType(), targetElement.getFlavor().getSubtype()));
             }
-            if (StringUtils.equalsAny("*", targetFlavor.getSubtype())) {
+            if (Strings.CS.equalsAny("*", targetFlavor.getSubtype())) {
               targetElement.setFlavor(MediaPackageElementFlavor.flavor(
                       targetElement.getFlavor().getType(), sourceElement.getFlavor().getSubtype()));
             }

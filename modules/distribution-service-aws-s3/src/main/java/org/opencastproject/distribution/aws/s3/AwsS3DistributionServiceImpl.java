@@ -74,6 +74,7 @@ import com.google.gson.reflect.TypeToken;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpHead;
@@ -296,7 +297,7 @@ public class AwsS3DistributionServiceImpl extends AbstractDistributionService
 
       // AWS presigned URL
       String presignedUrlConfigValue = OsgiUtil.getComponentContextProperty(cc, AWS_S3_PRESIGNED_URL_CONFIG, "false");
-      presignedUrl = StringUtils.equalsIgnoreCase("true", presignedUrlConfigValue);
+      presignedUrl = Strings.CI.equals("true", presignedUrlConfigValue);
       logger.info("AWS use presigned URL: {}", presignedUrl);
 
       // AWS presigned URL expiration time in millis

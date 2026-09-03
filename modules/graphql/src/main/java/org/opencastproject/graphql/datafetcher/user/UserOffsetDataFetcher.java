@@ -29,6 +29,7 @@ import org.opencastproject.security.api.UserDirectoryService;
 import org.opencastproject.util.SmartIterator;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,7 +74,7 @@ public class UserOffsetDataFetcher extends ParameterDataFetcher<GqlUserList> {
   public static boolean match(String searchStrings, String... text) {
     for (String searchString : StringUtils.split(searchStrings)) {
       for (String word : text) {
-        if (StringUtils.indexOfIgnoreCase(word, searchString) >= 0) {
+        if (Strings.CI.indexOf(word, searchString) >= 0) {
           return true;
         }
       }

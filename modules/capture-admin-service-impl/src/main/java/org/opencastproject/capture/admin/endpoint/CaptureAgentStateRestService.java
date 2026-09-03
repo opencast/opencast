@@ -48,6 +48,7 @@ import com.google.gson.JsonSyntaxException;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -384,7 +385,7 @@ public class CaptureAgentStateRestService {
 
     Properties caps;
 
-    if (StringUtils.startsWith(configuration, "{")) {
+    if (Strings.CS.startsWith(configuration, "{")) {
       // JSON
       Gson gson = new Gson();
       try {
