@@ -400,12 +400,12 @@ public class EventsEndpoint implements ManagedService {
 
     // Read preview subtype configuration
     // Default to DEFAULT_PREVIEW_SUBTYPE
-    previewSubtype = StringUtils.defaultString((String) properties.get(PREVIEW_SUBTYPE), DEFAULT_PREVIEW_SUBTYPE);
+    previewSubtype = Objects.toString(properties.get(PREVIEW_SUBTYPE), DEFAULT_PREVIEW_SUBTYPE);
     logger.debug("Preview subtype is '{}'", previewSubtype);
 
     configuredMetadataFields = DublinCoreMetadataUtil.getDublinCoreProperties(properties);
 
-    retractWorkflowId = StringUtils.defaultString((String) properties.get(RETRACT_WORKFLOW), DEFAULT_RETRACT_WORKFLOW);
+    retractWorkflowId = Objects.toString(properties.get(RETRACT_WORKFLOW), DEFAULT_RETRACT_WORKFLOW);
     logger.debug("Retract Workflow is '{}'", retractWorkflowId);
   }
 

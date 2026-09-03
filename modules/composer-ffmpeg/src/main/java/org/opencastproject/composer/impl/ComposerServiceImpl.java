@@ -114,6 +114,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
@@ -269,7 +270,7 @@ public class ComposerServiceImpl extends AbstractJobProducer implements Composer
   @Activate
   public void activate(ComponentContext cc) {
     super.activate(cc);
-    ffmpegBinary = StringUtils.defaultString(cc.getBundleContext().getProperty(CONFIG_FFMPEG_PATH),
+    ffmpegBinary = Objects.toString(cc.getBundleContext().getProperty(CONFIG_FFMPEG_PATH),
             FFMPEG_BINARY_DEFAULT);
     logger.debug("ffmpeg binary: {}", ffmpegBinary);
     logger.info("Activating composer service");
