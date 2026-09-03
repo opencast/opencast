@@ -213,14 +213,6 @@ public final class MimeType implements Comparable<MimeType>, Serializable {
     return flavor.equalsIgnoreCase(flavor);
   }
 
-  /**
-   * Returns the MimeType as a string of the form <code>type/subtype</code>
-   * @deprecated use {@link #toString()} instead
-   */
-  public String asString() {
-    return toString();
-  }
-
   /** Two mime types are considered equal if type and subtype are equal. */
   public boolean eq(MimeType other) {
     return eq(other.getType(), other.getSubtype());
