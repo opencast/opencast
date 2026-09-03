@@ -63,6 +63,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -512,8 +513,9 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
       throw new IllegalStateException("No organization is set");
     }
 
-    // Find all roles from the role providers
-    final List<Role> roles = new ArrayList<>();
+    // Multiple providers can return the same role (e.g.built-in system roles), so deduplicate them using a
+    // LinkedHashSet, before limit is applied.
+    final Set<Role> roles = new LinkedHashSet<>();
     for (RoleProvider roleProvider : roleProviders) {
       final String providerOrgId = roleProvider.getOrganization();
       if (ALL_ORGANIZATIONS.equals(providerOrgId) || org.getId().equals(providerOrgId)) {
