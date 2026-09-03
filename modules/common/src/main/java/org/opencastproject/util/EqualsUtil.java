@@ -31,11 +31,6 @@ public final class EqualsUtil {
   private EqualsUtil() {
   }
 
-  /** Check if <code>a</code> and <code>b</code> are not equal. Each of them may be null. */
-  public static boolean ne(Object a, Object b) {
-    return !Objects.equals(a, b);
-  }
-
   /** Check if <code>a</code> and <code>b</code> have the same class ({@link Object#getClass()}). Each may be null. */
   public static boolean eqClasses(Object a, Object b) {
     return bothNotNull(a, b) && a.getClass().equals(b.getClass());
