@@ -307,7 +307,8 @@ public class YouTubeV3PublicationServiceImpl
       }
       youTubeService.addPlaylistItem(playlist.getId(), video.getId());
       // Create new publication element
-      final URL url = URI.create("http://www.youtube.com/watch?v=" + video.getId() + "&list=" + playlist.getId()).toURL();
+      final URL url = URI.create("http://www.youtube.com/watch?v=" + video.getId() + "&list=" + playlist.getId())
+          .toURL();
       return PublicationImpl.publication(
           UUID.randomUUID().toString(), CHANNEL_NAME, url.toURI(), MimeTypes.parseMimeType(MIME_TYPE));
     } catch (Exception e) {
