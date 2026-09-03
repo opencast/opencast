@@ -59,6 +59,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.net.URI;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -306,7 +307,7 @@ public class YouTubeV3PublicationServiceImpl
       }
       youTubeService.addPlaylistItem(playlist.getId(), video.getId());
       // Create new publication element
-      final URL url = new URL("http://www.youtube.com/watch?v=" + video.getId() + "&list=" + playlist.getId());
+      final URL url = URI.create("http://www.youtube.com/watch?v=" + video.getId() + "&list=" + playlist.getId()).toURL();
       return PublicationImpl.publication(
           UUID.randomUUID().toString(), CHANNEL_NAME, url.toURI(), MimeTypes.parseMimeType(MIME_TYPE));
     } catch (Exception e) {
