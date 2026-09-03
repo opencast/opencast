@@ -306,41 +306,5 @@ public final class RestUtil {
       return Response.status(Response.Status.CONFLICT).entity(msg).build();
     }
 
-    /**
-     * create a partial file response
-     *
-     * @param f
-     *          the requested file
-     * @param contentType
-     *          the contentType to send
-     * @param fileName
-     *          the filename to send
-     * @param rangeHeader
-     *          the range header
-     * @return the Responsebuilder
-     * @throws IOException
-     *           if something goes wrong
-     */
-
-    /**
-     * Creates a precondition failed status response
-     *
-     * @return a precondition failed status response
-     */
-    public static Response preconditionFailed() {
-      return Response.status(Response.Status.PRECONDITION_FAILED).build();
-    }
-
-    /**
-     * Creates a precondition failed status response with a message
-     *
-     * @param message
-     *          The message body
-     * @return a precondition failed status response with a message
-     */
-    public static Response preconditionFailed(String message) {
-      return Response.status(Response.Status.PRECONDITION_FAILED).entity(message).build();
-    }
-
   }
 }
