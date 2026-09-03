@@ -22,6 +22,7 @@
 package org.opencastproject.adminui.util;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 
 /**
  * Utility class to simplify the implementation of the filter 'text' in case no search index is available.
@@ -52,7 +53,7 @@ public final class TextFilter {
 
     for (String searchString : StringUtils.split(searchStrings)) {
       for (String word : text) {
-        if (StringUtils.indexOfIgnoreCase(word, searchString) >= 0) {
+        if (Strings.CI.indexOf(word, searchString) >= 0) {
           return true;
         }
       }
