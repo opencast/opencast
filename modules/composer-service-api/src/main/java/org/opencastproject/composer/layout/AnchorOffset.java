@@ -22,7 +22,6 @@
 package org.opencastproject.composer.layout;
 
 import static java.lang.String.format;
-import static org.opencastproject.util.EqualsUtil.hash;
 
 import java.util.Objects;
 
@@ -79,7 +78,7 @@ public final class AnchorOffset {
 
   @Override
   public int hashCode() {
-    return hash(offset, referenceAnchor, referringAnchor);
+    return Objects.hash(offset, referenceAnchor, referringAnchor);
   }
 
   @Override

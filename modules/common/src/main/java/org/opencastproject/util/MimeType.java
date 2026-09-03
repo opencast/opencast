@@ -261,7 +261,7 @@ public final class MimeType implements Comparable<MimeType>, Serializable {
 
   @Override
   public int hashCode() {
-    return EqualsUtil.hash(type, subtype);
+    return Objects.hash(type, subtype);
   }
 
   @Override

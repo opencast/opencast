@@ -22,9 +22,10 @@
 package org.opencastproject.composer.layout;
 
 import static java.lang.String.format;
-import static org.opencastproject.util.EqualsUtil.hash;
 
 import org.opencastproject.util.RequireUtil;
+
+import java.util.Objects;
 
 /** Anchor point of a rectangular shape, expressed relatively to its width and height. */
 public final class Anchor {
@@ -63,7 +64,7 @@ public final class Anchor {
 
   @Override
   public int hashCode() {
-    return hash(left, top);
+    return Objects.hash(left, top);
   }
 
   @Override

@@ -21,8 +21,6 @@
 
 package org.opencastproject.kernel.mail;
 
-import static org.opencastproject.util.EqualsUtil.hash;
-
 import java.util.Objects;
 
 /** An email address. */
@@ -37,7 +35,7 @@ public final class EmailAddress {
 
   @Override
   public int hashCode() {
-    return hash(address, name);
+    return Objects.hash(address, name);
   }
 
   @Override

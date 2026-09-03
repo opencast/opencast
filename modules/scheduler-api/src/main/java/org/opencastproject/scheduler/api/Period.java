@@ -20,9 +20,6 @@
  */
 package org.opencastproject.scheduler.api;
 
-
-import org.opencastproject.util.EqualsUtil;
-
 import java.util.Date;
 import java.util.Objects;
 import java.util.Optional;
@@ -127,7 +124,7 @@ public final class Period {
 
   @Override
   public int hashCode() {
-    return EqualsUtil.hash(id, start, end, purpose, comment);
+    return Objects.hash(id, start, end, purpose, comment);
   }
 
 }

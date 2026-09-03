@@ -21,8 +21,6 @@
 
 package org.opencastproject.composer.layout;
 
-import static org.opencastproject.util.EqualsUtil.hash;
-
 import java.util.Objects;
 
 /** Layout of two shapes on a common canvas. */
@@ -64,6 +62,6 @@ public final class TwoShapeLayout {
 
   @Override
   public int hashCode() {
-    return hash(upper, lower, canvas);
+    return Objects.hash(upper, lower, canvas);
   }
 }

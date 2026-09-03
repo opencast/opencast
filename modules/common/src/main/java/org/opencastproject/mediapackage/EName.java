@@ -22,7 +22,6 @@
 package org.opencastproject.mediapackage;
 
 import static java.lang.String.format;
-import static org.opencastproject.util.EqualsUtil.hash;
 
 import org.opencastproject.util.RequireUtil;
 
@@ -110,7 +109,7 @@ public final class EName implements Serializable, Comparable<EName> {
 
   @Override
   public int hashCode() {
-    return hash(namespaceURI, localName);
+    return Objects.hash(namespaceURI, localName);
   }
 
   @Override

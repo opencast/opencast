@@ -114,13 +114,4 @@ public final class EqualsUtil {
     return a != null && b != null;
   }
 
-  /**
-   * Create a hash code for a list of objects. Each of them may be null.
-   * Algorithm adapted from "Programming in Scala, Second Edition", p670.
-   */
-  @Deprecated
-  public static int hash(Object... as) {
-    return Objects.hash(as);
-  }
-
 }

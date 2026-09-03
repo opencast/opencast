@@ -21,8 +21,6 @@
 
 package org.opencastproject.kernel.bundleinfo;
 
-import static org.opencastproject.util.EqualsUtil.hash;
-
 import java.util.Objects;
 import java.util.Optional;
 
@@ -52,6 +50,6 @@ public final class BundleVersion {
   }
 
   @Override public int hashCode() {
-    return hash(bundleVersion, buildNumber);
+    return Objects.hash(bundleVersion, buildNumber);
   }
 }
