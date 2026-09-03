@@ -21,8 +21,6 @@
 
 package org.opencastproject.composer.layout;
 
-import static org.opencastproject.util.EqualsUtil.hash;
-
 import java.util.Objects;
 
 /**
@@ -61,6 +59,6 @@ public final class AbsolutePositionLayoutSpec {
 
   @Override
   public int hashCode() {
-    return hash(anchorOffset);
+    return Objects.hash(anchorOffset);
   }
 }

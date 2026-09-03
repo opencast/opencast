@@ -26,7 +26,6 @@ import org.opencastproject.security.api.JaxbUser;
 import org.opencastproject.security.api.Organization;
 import org.opencastproject.security.api.Role;
 import org.opencastproject.security.api.User;
-import org.opencastproject.util.EqualsUtil;
 
 import java.util.Date;
 import java.util.HashSet;
@@ -263,7 +262,7 @@ public class JpaUserReference {
    */
   @Override
   public int hashCode() {
-    return EqualsUtil.hash(username, organization);
+    return Objects.hash(username, organization);
   }
 
   /**

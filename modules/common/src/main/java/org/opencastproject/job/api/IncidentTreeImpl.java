@@ -21,8 +21,6 @@
 
 package org.opencastproject.job.api;
 
-import static org.opencastproject.util.EqualsUtil.hash;
-
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
@@ -50,7 +48,7 @@ public final class IncidentTreeImpl implements IncidentTree {
   }
 
   @Override public int hashCode() {
-    return hash(incidents, descendants);
+    return Objects.hash(incidents, descendants);
   }
 
   @Override public boolean equals(Object that) {

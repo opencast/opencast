@@ -24,7 +24,6 @@ package org.opencastproject.metadata.dublincore;
 import static java.lang.String.format;
 
 import org.opencastproject.mediapackage.EName;
-import org.opencastproject.util.EqualsUtil;
 import org.opencastproject.util.RequireUtil;
 
 import java.io.Serializable;
@@ -154,7 +153,7 @@ public final class DublinCoreValue implements Serializable {
 
   @Override
   public int hashCode() {
-    return EqualsUtil.hash(value, language, encodingScheme);
+    return Objects.hash(value, language, encodingScheme);
   }
 
   @Override public String toString() {

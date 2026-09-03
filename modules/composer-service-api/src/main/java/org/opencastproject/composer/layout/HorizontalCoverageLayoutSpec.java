@@ -21,8 +21,6 @@
 
 package org.opencastproject.composer.layout;
 
-import static org.opencastproject.util.EqualsUtil.hash;
-
 import org.opencastproject.util.RequireUtil;
 
 import java.util.Objects;
@@ -71,6 +69,6 @@ public final class HorizontalCoverageLayoutSpec {
 
   @Override
   public int hashCode() {
-    return hash(anchorOffset, horizontalCoverage);
+    return Objects.hash(anchorOffset, horizontalCoverage);
   }
 }
