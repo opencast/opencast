@@ -37,7 +37,6 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -205,8 +204,8 @@ public interface AdaptivePlaylist extends Track {
 
     for (String f : variants) {
       try {
-        new URL(f); // ignore external paths
-      } catch (MalformedURLException e) {
+        URI.create(f).toURL(); // ignore external paths
+      } catch (MalformedURLException | IllegalArgumentException e) {
         // is relative path - read the variant playlist
         String name = FilenameUtils.concat(FilenameUtils.getFullPath(file.getAbsolutePath()), f);
         allFiles.addAll(getReferencedFiles(new File(name), true));
