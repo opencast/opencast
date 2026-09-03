@@ -23,7 +23,6 @@ package org.opencastproject.kernel.bundleinfo;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN_TYPE;
-import static org.opencastproject.util.EqualsUtil.ne;
 import static org.opencastproject.util.Jsons.arr;
 import static org.opencastproject.util.Jsons.obj;
 import static org.opencastproject.util.Jsons.p;
@@ -45,6 +44,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Dictionary;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
@@ -131,7 +131,7 @@ public abstract class BundleInfoRestEndpoint {
       final String bundleVersion = infos.get(0).getBundleVersion();
       final Optional<String> buildNumber = infos.get(0).getBuildNumber();
       for (BundleInfo a : infos) {
-        if (ne(a.getBundleVersion(), bundleVersion) || ne(a.getBuildNumber(), buildNumber)) {
+        if (!Objects.equals(a.getBundleVersion(), bundleVersion) || !Objects.equals(a.getBuildNumber(), buildNumber)) {
           return ok(TEXT_PLAIN_TYPE, "false");
         }
       }
