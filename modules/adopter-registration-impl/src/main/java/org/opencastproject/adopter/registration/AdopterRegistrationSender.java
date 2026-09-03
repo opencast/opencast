@@ -34,8 +34,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URI;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -141,7 +141,12 @@ public class AdopterRegistrationSender {
    */
   private void send(String json, String urlSuffix, String method) throws IOException {
     try (CloseableHttpClient client = HttpClientBuilder.create().useSystemProperties().build()) {
-      String url = new URL(baseUrl + urlSuffix).toString();
+      String url;
+      try {
+        url = URI.create(baseUrl + urlSuffix).toURL().toString();
+      } catch (IllegalArgumentException e) {
+        throw new MalformedURLException(baseUrl + urlSuffix + " is not a valid URL");
+      }
       HttpEntityEnclosingRequestBase request = null;
       if ("DELETE".equals(method)) {
         request = new HttpDeleteWithEntity(url);
