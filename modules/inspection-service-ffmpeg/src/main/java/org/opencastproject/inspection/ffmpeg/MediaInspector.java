@@ -32,13 +32,16 @@ import org.opencastproject.inspection.ffmpeg.api.MediaContainerMetadata;
 import org.opencastproject.inspection.ffmpeg.api.SubtitleStreamMetadata;
 import org.opencastproject.inspection.ffmpeg.api.VideoStreamMetadata;
 import org.opencastproject.mediapackage.AdaptivePlaylist;
+import org.opencastproject.mediapackage.AudioStream;
 import org.opencastproject.mediapackage.MediaPackageElement;
 import org.opencastproject.mediapackage.MediaPackageElementBuilder;
 import org.opencastproject.mediapackage.MediaPackageElementBuilderFactory;
 import org.opencastproject.mediapackage.MediaPackageElementFlavor;
 import org.opencastproject.mediapackage.Stream;
+import org.opencastproject.mediapackage.SubtitleStream;
 import org.opencastproject.mediapackage.Track;
 import org.opencastproject.mediapackage.UnsupportedElementException;
+import org.opencastproject.mediapackage.VideoStream;
 import org.opencastproject.mediapackage.track.AudioStreamImpl;
 import org.opencastproject.mediapackage.track.SubtitleStreamImpl;
 import org.opencastproject.mediapackage.track.TrackImpl;
@@ -60,6 +63,7 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
@@ -183,20 +187,20 @@ public class MediaInspector {
    *
    * @param element
    *          the element to enrich
-   * @param override
-   *          <code>true</code> to override existing metadata
+   * @param overwrite
+   *          <code>true</code> to overwrite existing metadata
    * @return the enriched element
    * @throws MediaInspectionException
    *           if enriching fails
    */
-  public MediaPackageElement enrich(MediaPackageElement element, boolean override, final Map<String, String> options)
+  public MediaPackageElement enrich(MediaPackageElement element, boolean overwrite, final Map<String, String> options)
           throws MediaInspectionException {
     throwExceptionIfInvalid(options);
     if (element instanceof Track) {
       final Track originalTrack = (Track) element;
-      return enrichTrack(originalTrack, override, options);
+      return enrichTrack(originalTrack, overwrite, options);
     } else {
-      return enrichElement(element, override, options);
+      return enrichElement(element, overwrite, options);
     }
   }
 
@@ -205,12 +209,12 @@ public class MediaInspector {
    *
    * @param originalTrack
    *          the original track
-   * @param override
-   *          <code>true</code> to override existing metadata
+   * @param overwrite
+   *          <code>true</code> to overwrite existing metadata
    * @return the media package element
    * @throws MediaInspectionException
    */
-  private MediaPackageElement enrichTrack(final Track originalTrack, final boolean override,
+  private MediaPackageElement enrichTrack(final Track originalTrack, final boolean overwrite,
       final Map<String, String> options) throws MediaInspectionException {
     try {
       URI originalTrackUrl = originalTrack.getURI();
@@ -253,7 +257,7 @@ public class MediaInspector {
         track.setFlavor(flavor);
         track.setIdentifier(originalTrack.getIdentifier());
         // If HLS
-        if (!originalTrack.hasMaster() || override) {
+        if (!originalTrack.hasMaster() || overwrite) {
           track.setMaster(metadata.getAdaptiveMaster());
         } else {
           track.setMaster(originalTrack.isMaster());
@@ -267,10 +271,10 @@ public class MediaInspector {
         }
 
         // enrich the new track with basic info
-        if (track.getDuration() == null || override) {
+        if (track.getDuration() == null || overwrite) {
           track.setDuration(metadata.getDuration());
         }
-        if (track.getChecksum() == null || override) {
+        if (track.getChecksum() == null || overwrite) {
           try {
             track.setChecksum(Checksum.create(ChecksumType.DEFAULT_TYPE, file));
           } catch (IOException e) {
@@ -279,7 +283,7 @@ public class MediaInspector {
         }
 
         // Add the mime type if it's not already present
-        if (track.getMimeType() == null || override) {
+        if (track.getMimeType() == null || overwrite) {
           track.setMimeType(metadata.getMimeType());
         }
 
@@ -291,21 +295,21 @@ public class MediaInspector {
 
         // audio list
         try {
-          addAudioStreamMetadata(track, metadata);
+          enrichAudioStreamMetadata(track, originalTrack, metadata, overwrite);
         } catch (Exception e) {
           throw new MediaInspectionException("Unable to extract audio metadata from " + file, e);
         }
 
         // video list
         try {
-          addVideoStreamMetadata(track, metadata);
+          enrichVideoStreamMetadata(track, originalTrack, metadata, overwrite);
         } catch (Exception e) {
           throw new MediaInspectionException("Unable to extract video metadata from " + file, e);
         }
 
         // Subtitle metadata
         try {
-          addSubtitleStreamMetadata(track, metadata);
+          enrichSubtitleStreamMetadata(track, originalTrack, metadata, overwrite);
         } catch (Exception e) {
           throw new MediaInspectionException("Unable to extract subtitle metadata from " + file, e);
         }
@@ -329,13 +333,13 @@ public class MediaInspector {
    *
    * @param element
    *          the media package element
-   * @param override
+   * @param overwrite
    *          <code>true</code> to overwrite existing metadata
    * @return the enriched element
    * @throws MediaInspectionException
    *           if enriching fails
    */
-  private MediaPackageElement enrichElement(final MediaPackageElement element, final boolean override,
+  private MediaPackageElement enrichElement(final MediaPackageElement element, final boolean overwrite,
           final Map<String, String> options) throws MediaInspectionException {
     try {
       File file;
@@ -348,7 +352,7 @@ public class MediaInspector {
       }
 
       // Checksum
-      if (element.getChecksum() == null || override) {
+      if (element.getChecksum() == null || overwrite) {
         try {
           element.setChecksum(Checksum.create(ChecksumType.DEFAULT_TYPE, file));
         } catch (IOException e) {
@@ -357,7 +361,7 @@ public class MediaInspector {
       }
 
       // Mimetype
-      if (element.getMimeType() == null || override) {
+      if (element.getMimeType() == null || overwrite) {
         try {
           element.setMimeType(MimeTypes.fromString(file.getPath()));
         } catch (UnknownFileTypeException e) {
@@ -471,6 +475,59 @@ public class MediaInspector {
   }
 
   /**
+   * Adds the video related metadata to the track.
+   * Uses new or old metadata according to @param overwrite
+   *
+   * @param track
+   *          the track
+   * @param originalTrack
+   *          the original track
+   * @param metadata
+   *          the container metadata
+   * @param overwrite
+   *          If true, use @metadata values. If false, use @originalTrack fields, except if those fields are empty
+   * @throws Exception
+   *           Media analysis is fragile, and may throw any kind of runtime exceptions due to inconsistencies in the
+   *           media's metadata
+   */
+  private Track enrichVideoStreamMetadata(
+      TrackImpl track,
+      Track originalTrack,
+      MediaContainerMetadata metadata,
+      boolean overwrite
+  ) throws Exception {
+    List<VideoStreamMetadata> videoList = metadata.getVideoStreamMetadata();
+    List<VideoStream> originalVideos = Arrays.stream(originalTrack.getStreams())
+        .filter(VideoStream.class::isInstance)
+        .map(VideoStream.class::cast)
+        .toList();
+
+    if (videoList.size() != originalVideos.size()) {
+      return addVideoStreamMetadata(track, metadata);
+    }
+
+    if (videoList != null && !videoList.isEmpty()) {
+      for (int i = 0; i < videoList.size(); i++) {
+        VideoStreamImpl video = new VideoStreamImpl("video-" + (i + 1));
+        VideoStreamMetadata v = videoList.get(i);
+        VideoStream original = originalVideos.get(i);
+
+        video.setBitRate(merge(original.getBitRate(), v.getBitRate(), overwrite));
+        video.setFormat(merge(original.getFormat(), v.getFormat(), overwrite));
+        video.setFormatVersion(merge(original.getFormatVersion(), v.getFormatVersion(), overwrite));
+        video.setFrameCount(merge(original.getFrameCount(), v.getFrames(), overwrite));
+        video.setFrameHeight(merge(original.getFrameHeight(), v.getFrameHeight(), overwrite));
+        video.setFrameRate(merge(original.getFrameRate(), v.getFrameRate(), overwrite));
+        video.setFrameWidth(merge(original.getFrameWidth(), v.getFrameWidth(), overwrite));
+        video.setScanOrder(merge(original.getScanOrder(), v.getScanOrder(), overwrite));
+        video.setScanType(merge(original.getScanType(), v.getScanType(), overwrite));
+        track.addStream(video);
+      }
+    }
+    return track;
+  }
+
+  /**
    * Adds the audio related metadata to the track.
    *
    * @param track
@@ -495,6 +552,56 @@ public class MediaInspector {
         audio.setBitDepth(a.getResolution());
         audio.setSamplingRate(a.getSamplingRate());
         // TODO: retain the original audio metadata
+        track.addStream(audio);
+      }
+    }
+    return track;
+  }
+  /**
+   * Adds the audio related metadata to the track.
+   * Uses new or old metadata according to @param overwrite
+   *
+   * @param track
+   *          the track
+   * @param originalTrack
+   *          the original track
+   * @param metadata
+   *          the container metadata
+   * @param overwrite
+   *          If true, use @metadata values. If false, use @originalTrack fields, except if those fields are empty
+   * @throws Exception
+   *           Media analysis is fragile, and may throw any kind of runtime exceptions due to inconsistencies in the
+   *           media's metadata
+   */
+  private Track enrichAudioStreamMetadata(
+      TrackImpl track,
+      Track originalTrack,
+      MediaContainerMetadata metadata,
+      boolean overwrite
+  ) throws Exception {
+    List<AudioStreamMetadata> audioList = metadata.getAudioStreamMetadata();
+    List<AudioStream> originalAudios = Arrays.stream(originalTrack.getStreams())
+        .filter(AudioStream.class::isInstance)
+        .map(AudioStream.class::cast)
+        .toList();
+
+    if (audioList.size() != originalAudios.size()) {
+      return addAudioStreamMetadata(track, metadata);
+    }
+
+    if (audioList != null && !audioList.isEmpty()) {
+      for (int i = 0; i < audioList.size(); i++) {
+        AudioStreamImpl audio = new AudioStreamImpl("audio-" + (i + 1));
+        AudioStreamMetadata a = audioList.get(i);
+        AudioStream original = originalAudios.get(i);
+
+        audio.setBitRate(merge(original.getBitRate(), a.getBitRate(), overwrite));
+        audio.setChannels(merge(original.getChannels(), a.getChannels(), overwrite));
+        audio.setFormat(merge(original.getFormat(), a.getFormat(), overwrite));
+        audio.setFormatVersion(merge(original.getFormatVersion(), a.getFormatVersion(), overwrite));
+        audio.setFrameCount(merge(original.getFrameCount(), a.getFrames(), overwrite));
+        audio.setBitDepth(merge(original.getBitDepth(), a.getResolution(), overwrite));
+        audio.setSamplingRate(merge(original.getSamplingRate(), a.getSamplingRate(), overwrite));
         track.addStream(audio);
       }
     }
@@ -529,6 +636,53 @@ public class MediaInspector {
     return track;
   }
 
+  /**
+   * Adds the subtitle related metadata to the track.
+   * Uses new or old metadata according to @param overwrite
+   *
+   * @param track
+   *          the track
+   * @param originalTrack
+   *          the original track
+   * @param metadata
+   *          the container metadata
+   * @param overwrite
+   *          If true, use @metadata values. If false, use @originalTrack fields, except if those fields are empty
+   * @throws Exception
+   *           Media analysis is fragile, and may throw any kind of runtime exceptions due to inconsistencies in the
+   *           media's metadata
+   */
+  private Track enrichSubtitleStreamMetadata(
+      TrackImpl track,
+      Track originalTrack,
+      MediaContainerMetadata metadata,
+      boolean overwrite
+  ) throws Exception {
+    List<SubtitleStreamMetadata> subtitleList = metadata.getSubtitleStreamMetadata();
+    List<SubtitleStream> originalSubtitles = Arrays.stream(originalTrack.getStreams())
+        .filter(SubtitleStream.class::isInstance)
+        .map(SubtitleStream.class::cast)
+        .toList();
+
+    if (subtitleList.size() != originalSubtitles.size()) {
+      return addSubtitleStreamMetadata(track, metadata);
+    }
+
+    if (subtitleList != null && !subtitleList.isEmpty()) {
+      for (int i = 0; i < subtitleList.size(); i++) {
+        SubtitleStreamImpl subtitle = new SubtitleStreamImpl("subtitle-" + (i + 1));
+        SubtitleStreamMetadata s = subtitleList.get(i);
+        SubtitleStream original = originalSubtitles.get(i);
+
+        subtitle.setFormat(merge(original.getFormat(), s.getFormat(), overwrite));
+        subtitle.setFormatVersion(merge(original.getFormatVersion(), s.getFormatVersion(), overwrite));
+        subtitle.setFrameCount(merge(original.getFrameCount(), s.getFrames(), overwrite));
+        track.addStream(subtitle);
+      }
+    }
+    return track;
+  }
+
   /* Return true if OPTION_ACCURATE_FRAME_COUNT is set to true, false otherwise */
   private boolean getAccurateFrameCount(final Map<String, String> options) {
     return BooleanUtils.toBoolean(options.get(OPTION_ACCURATE_FRAME_COUNT));
@@ -547,5 +701,13 @@ public class MediaInspector {
     } else {
       throw new MediaInspectionException("Options must not be null");
     }
+  }
+
+  /* Helper for merging values according to our overwrite definition */
+  private static <T> T merge(T original, T inspected, boolean overwrite) {
+    if (overwrite) {
+      return inspected;
+    }
+    return original != null ? original : inspected;
   }
 }
