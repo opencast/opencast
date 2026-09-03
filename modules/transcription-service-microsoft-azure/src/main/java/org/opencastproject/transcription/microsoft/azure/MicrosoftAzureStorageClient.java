@@ -40,6 +40,8 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -147,7 +149,12 @@ public class MicrosoftAzureStorageClient {
     String containerUrl = getContainerUrl(azureContainerName);
     String blobPath = Paths.get(StringUtils.trimToEmpty(azureBlobPath), StringUtils.trimToEmpty(azureBlobName))
         .normalize().toString();
-    URL blobUrl = new URL(containerUrl + "/" + blobPath);
+    URL blobUrl;
+    try {
+      blobUrl = URI.create(containerUrl + "/" + blobPath).toURL();
+    } catch (IllegalArgumentException e) {
+      throw new MalformedURLException(containerUrl + "/" + blobPath + " is not a valid URL");
+    }
     int blockSize = 100000000; // 100MB
     String sasToken = azureAuthorization.generateServiceSasToken("w", null, null, blobUrl.getPath(), "b");
     try (FileInputStream trackStream = new FileInputStream(trackFile)) {

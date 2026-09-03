@@ -173,7 +173,12 @@ public class RuntimeInfo {
   public void activate(ComponentContext cc) throws MalformedURLException {
     logger.debug("start()");
     this.bundleContext = cc.getBundleContext();
-    serverUrl = new URL(bundleContext.getProperty(OpencastConstants.SERVER_URL_PROPERTY));
+    String serverUrlProperty = bundleContext.getProperty(OpencastConstants.SERVER_URL_PROPERTY);
+    try {
+      serverUrl = URI.create(serverUrlProperty).toURL();
+    } catch (IllegalArgumentException e) {
+      throw new MalformedURLException(serverUrlProperty + " is not a valid URL");
+    }
   }
 
   @GET
