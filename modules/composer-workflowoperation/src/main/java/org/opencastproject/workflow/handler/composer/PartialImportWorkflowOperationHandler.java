@@ -243,7 +243,7 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
 
     float outputFramerate = -1.0f;
     if (concatOutputFramerate.isPresent()) {
-      if (NumberUtils.isNumber(concatOutputFramerate.get())) {
+      if (NumberUtils.isCreatable(concatOutputFramerate.get())) {
         logger.info("Using concat output framerate");
         outputFramerate = NumberUtils.toFloat(concatOutputFramerate.get());
       } else {

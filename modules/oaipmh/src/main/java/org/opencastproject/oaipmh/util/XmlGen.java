@@ -28,7 +28,6 @@ import org.opencastproject.util.XmlSafeParser;
 
 
 import org.apache.commons.io.output.ByteArrayOutputStream;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -41,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.xml.XMLConstants;
@@ -360,7 +360,7 @@ public abstract class XmlGen {
    * Append node <code>n</code> to element <code>e</code> respecting different node types like attributes and elements.
    */
   private void appendTo(Element e, Node n) {
-    Node toAppend = ObjectUtils.equals(n.getOwnerDocument(), document) ? n : document.importNode(n, true);
+    Node toAppend = Objects.equals(n.getOwnerDocument(), document) ? n : document.importNode(n, true);
     if (toAppend instanceof Attr) {
       e.setAttributeNode((Attr) toAppend);
     } else {
