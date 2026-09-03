@@ -24,6 +24,8 @@ package org.opencastproject.mediapackage;
 
 import org.opencastproject.util.ConfigurationException;
 
+import java.lang.reflect.InvocationTargetException;
+
 /**
  * Factory to retrieve instances of a media package builder. Use the static method {@link #newInstance()} to obtain a
  * reference to a concrete implementation of a <code>MediaPackageBuilderFactory</code>. This instance can then be used
@@ -86,14 +88,17 @@ public final class MediaPackageBuilderFactory {
     MediaPackageBuilder builder = null;
     try {
       Class<?> builderClass = Class.forName(builderClassName);
-      builder = (MediaPackageBuilder) builderClass.newInstance();
+      builder = (MediaPackageBuilder) builderClass.getDeclaredConstructor().newInstance();
     } catch (ClassNotFoundException e) {
       throw new ConfigurationException("Class not found while creating media package builder: " + e.getMessage(), e);
-    } catch (InstantiationException e) {
+    } catch (InstantiationException | InvocationTargetException e) {
       throw new ConfigurationException("Instantiation exception while creating media package builder: "
               + e.getMessage(), e);
     } catch (IllegalAccessException e) {
       throw new ConfigurationException("Access exception while creating media package builder: " + e.getMessage(), e);
+    } catch (NoSuchMethodException e) {
+      throw new ConfigurationException("No parameterless constructor while creating media package builder: "
+              + e.getMessage(), e);
     }
     return builder;
   }
