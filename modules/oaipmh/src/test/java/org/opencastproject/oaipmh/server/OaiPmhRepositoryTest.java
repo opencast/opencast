@@ -26,7 +26,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.opencastproject.oaipmh.server.OaiPmhRepositoryTest.OaiPmhResponseStatus.IsError;
 import static org.opencastproject.oaipmh.server.OaiPmhRepositoryTest.OaiPmhResponseStatus.IsValid;
-import static org.opencastproject.util.EqualsUtil.eq;
 import static org.opencastproject.util.IoSupport.withResource;
 import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.data.functions.Misc.chuck;
@@ -77,6 +76,7 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.TimeZone;
 
@@ -288,11 +288,13 @@ public class OaiPmhRepositoryTest {
             final String className = JsonVal.asString(messageObj.val("className").get()).trim();
             final String text = JsonVal.asString(messageObj.val("text").get()).trim();
             logger.info("[{}] {}", className, text);
-            ok = ok && (eq(className, "correct")
+            ok = ok && (Objects.equals(className, "correct")
                     // since the validator does not validate everything correctly here are some exclusions
-                    || (status == IsError && eq(text, "Could not find a valid OAI-PMH command.")))
-                    || (eq(verb, OaiPmhConstants.VERB_IDENTIFY) && eq(text, "Invalid OAI-PMH protocol version ."))
-                    || (eq(verb, OaiPmhConstants.VERB_IDENTIFY) && eq(text, "Invalid adminEmail ."));
+                    || (status == IsError && Objects.equals(text, "Could not find a valid OAI-PMH command.")))
+                    || (Objects.equals(verb, OaiPmhConstants.VERB_IDENTIFY)
+                            && Objects.equals(text, "Invalid OAI-PMH protocol version ."))
+                    || (Objects.equals(verb, OaiPmhConstants.VERB_IDENTIFY)
+                            && Objects.equals(text, "Invalid adminEmail ."));
           }
         }
       }

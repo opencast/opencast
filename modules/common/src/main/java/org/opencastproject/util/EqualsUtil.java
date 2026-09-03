@@ -39,15 +39,9 @@ public final class EqualsUtil {
     return Objects.equals(a, b);
   }
 
-  /** Check if <code>a</code> and <code>b</code> are equal. Each of them may be null. */
-  @Deprecated
-  public static boolean eq(Object a, Object b) {
-    return Objects.equals(a, b);
-  }
-
   /** Check if <code>a</code> and <code>b</code> are not equal. Each of them may be null. */
   public static boolean ne(Object a, Object b) {
-    return !eq(a, b);
+    return !Objects.equals(a, b);
   }
 
   /** Check if <code>a</code> and <code>b</code> have the same class ({@link Object#getClass()}). Each may be null. */

@@ -21,8 +21,9 @@
 
 package org.opencastproject.composer.layout;
 
-import static org.opencastproject.util.EqualsUtil.eq;
 import static org.opencastproject.util.EqualsUtil.hash;
+
+import java.util.Objects;
 
 /**
  * This layout specification describes where to position a shape in relation to another.
@@ -55,7 +56,7 @@ public final class AbsolutePositionLayoutSpec {
   }
 
   private boolean eqFields(AbsolutePositionLayoutSpec that) {
-    return eq(anchorOffset, that.anchorOffset);
+    return Objects.equals(anchorOffset, that.anchorOffset);
   }
 
   @Override

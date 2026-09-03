@@ -21,11 +21,11 @@
 
 package org.opencastproject.job.api;
 
-import static org.opencastproject.util.EqualsUtil.eq;
 import static org.opencastproject.util.EqualsUtil.hash;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 public final class IncidentTreeImpl implements IncidentTree {
   private final List<Incident> incidents;
@@ -58,7 +58,7 @@ public final class IncidentTreeImpl implements IncidentTree {
   }
 
   private boolean eqFields(IncidentTree that) {
-    return eq(incidents, that.getIncidents())
-            && eq(descendants, that.getDescendants());
+    return Objects.equals(incidents, that.getIncidents())
+            && Objects.equals(descendants, that.getDescendants());
   }
 }

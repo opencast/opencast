@@ -21,9 +21,8 @@
 
 package org.opencastproject.util.data.functions;
 
-import static org.opencastproject.util.EqualsUtil.eq;
-
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Function;
 
@@ -56,17 +55,17 @@ public final class Misc {
   /** Cast from A to B with special treatment of the Number classes. */
   public static <A, B> B cast(A v, Class<B> to) {
     if (Number.class.isAssignableFrom(v.getClass())) {
-      if (eq(Integer.class, to)) {
+      if (Objects.equals(Integer.class, to)) {
         return (B) ((Object) (((Number) v).intValue()));
-      } else if (eq(Long.class, to)) {
+      } else if (Objects.equals(Long.class, to)) {
         return (B) ((Object) (((Number) v).longValue()));
-      } else if (eq(Double.class, to)) {
+      } else if (Objects.equals(Double.class, to)) {
         return (B) ((Object) (((Number) v).doubleValue()));
-      } else if (eq(Float.class, to)) {
+      } else if (Objects.equals(Float.class, to)) {
         return (B) ((Object) (((Number) v).floatValue()));
-      } else if (eq(Short.class, to)) {
+      } else if (Objects.equals(Short.class, to)) {
         return (B) ((Object) (((Number) v).shortValue()));
-      } else if (eq(Byte.class, to)) {
+      } else if (Objects.equals(Byte.class, to)) {
         return (B) ((Object) (((Number) v).byteValue()));
       } else {
         return (B) v;
