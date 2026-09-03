@@ -55,7 +55,6 @@ import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TYPE;
 import static org.opencastproject.scheduler.api.RecordingState.CAPTURING;
 import static org.opencastproject.scheduler.api.RecordingState.UPLOADING;
 import static org.opencastproject.scheduler.api.RecordingState.UPLOAD_FINISHED;
-import static org.opencastproject.util.EqualsUtil.eqObj;
 import static org.opencastproject.util.UrlSupport.uri;
 import static org.opencastproject.util.data.Collections.map;
 import static org.opencastproject.util.data.Tuple.tuple;
@@ -171,6 +170,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
@@ -1548,7 +1548,7 @@ public class SchedulerServiceImplTest {
           .map(p -> parseProperties(decodeBase64(getValue(p))))
           .toList();
       assertEquals("number of CA property sets", 1, caPropsIcal.size());
-      assertTrue("CA properties", eqObj(caProps, caPropsIcal.get(0)));
+      assertTrue("CA properties", Objects.equals(caProps, caPropsIcal.get(0)));
     }
   }
 
