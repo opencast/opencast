@@ -21,8 +21,9 @@
 
 package org.opencastproject.composer.layout;
 
-import static org.opencastproject.util.EqualsUtil.eq;
 import static org.opencastproject.util.EqualsUtil.hash;
+
+import java.util.Objects;
 
 /** Layout of two shapes on a common canvas. */
 public final class TwoShapeLayout {
@@ -57,7 +58,8 @@ public final class TwoShapeLayout {
   }
 
   private boolean eqFields(TwoShapeLayout that) {
-    return eq(upper, that.upper) && eq(lower, that.lower) && eq(canvas, that.canvas);
+    return Objects.equals(upper, that.upper) && Objects.equals(lower, that.lower)
+            && Objects.equals(canvas, that.canvas);
   }
 
   @Override

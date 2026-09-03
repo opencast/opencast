@@ -27,7 +27,6 @@ import static javax.servlet.http.HttpServletResponse.SC_CREATED;
 import static javax.servlet.http.HttpServletResponse.SC_NOT_FOUND;
 import static javax.servlet.http.HttpServletResponse.SC_OK;
 import static javax.ws.rs.core.Response.Status.INTERNAL_SERVER_ERROR;
-import static org.opencastproject.util.EqualsUtil.eq;
 import static org.opencastproject.util.RestUtil.R.badRequest;
 import static org.opencastproject.util.RestUtil.R.ok;
 import static org.opencastproject.util.RestUtil.getResponseType;
@@ -78,6 +77,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DefaultValue;
@@ -193,11 +193,11 @@ public class IncidentServiceEndpoint {
     try {
       final List<Incident> incidents = svc.getIncidentsOfJob(jobIds);
       final MediaType mt = getResponseType(type);
-      if (eq(FMT_SYS, format)) {
+      if (Objects.equals(FMT_SYS, format)) {
         return ok(mt, new JaxbIncidentList(incidents));
-      } else if (eq(FMT_DIGEST, format)) {
+      } else if (Objects.equals(FMT_DIGEST, format)) {
         return ok(mt, new JaxbIncidentDigestList(svc, request.getLocale(), incidents));
-      } else if (eq(FMT_FULL, format)) {
+      } else if (Objects.equals(FMT_FULL, format)) {
         return ok(mt, new JaxbIncidentFullList(svc, request.getLocale(), incidents));
       } else {
         return unknownFormat();
@@ -247,11 +247,11 @@ public class IncidentServiceEndpoint {
     try {
       final IncidentTree tree = svc.getIncidentsOfJob(jobId, cascade);
       final MediaType mt = getResponseType(type);
-      if (eq(FMT_SYS, format)) {
+      if (Objects.equals(FMT_SYS, format)) {
         return ok(mt, new JaxbIncidentTree(tree));
-      } else if (eq(FMT_DIGEST, format)) {
+      } else if (Objects.equals(FMT_DIGEST, format)) {
         return ok(mt, new JaxbIncidentFullTree(svc, request.getLocale(), tree));
-      } else if (eq(FMT_FULL, format)) {
+      } else if (Objects.equals(FMT_FULL, format)) {
         return ok(mt, new JaxbIncidentFullTree(svc, request.getLocale(), tree));
       } else {
         return unknownFormat();
