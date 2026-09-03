@@ -152,37 +152,6 @@ public final class RestUtil {
     return response;
   }
 
-  /**
-   * Create a stream response.
-   *
-   * @deprecated use
-   *             {@link org.opencastproject.util.RestUtil.R#ok(java.io.InputStream, String, java.util.Optional,
- *                      java.util.Optional)}
-   *             instead
-   */
-  @Deprecated
-  public static Response.ResponseBuilder streamResponse(InputStream in, String contentType, Optional<Long> streamLength,
-          Optional<String> fileName) {
-    final Response.ResponseBuilder b = Response.ok(in).header("Content-Type", contentType);
-    if (streamLength.isPresent()) {
-      b.header("Content-Length", streamLength.get());
-    }
-    if (fileName.isPresent()) {
-      b.header("Content-Disposition", "attachment; filename=" + fileName.get());
-    }
-    return b;
-  }
-
-  /**
-   * Return JSON if <code>format</code> == json, XML else.
-   *
-   * @deprecated use {@link #getResponseType(String)}
-   */
-  @Deprecated
-  public static MediaType getResponseFormat(String format) {
-    return "json".equalsIgnoreCase(format) ? MediaType.APPLICATION_JSON_TYPE : MediaType.APPLICATION_XML_TYPE;
-  }
-
   /** Return JSON if <code>type</code> == json, XML else. */
   public static MediaType getResponseType(String type) {
     return "json".equalsIgnoreCase(type) ? MediaType.APPLICATION_JSON_TYPE : MediaType.APPLICATION_XML_TYPE;
