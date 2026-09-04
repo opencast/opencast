@@ -186,14 +186,20 @@ public interface LifeCyclePolicy {
   void setCreatedFromConfig(boolean createdFromConfig);
 
   /**
-   * Gets the filters used to determine which entities this policy targets
+   * Gets the filters used to determine which entities this policy targets.
+   *
+   * The outer map is keyed by metadata catalog flavor (e.g. "dublincore/episode").
+   * The inner map hols the catalogs name/value pairs.
    *
    * @return the target filters
    */
   Map<String, Map<String, EventSearchQueryField<String>>> getTargetFilters();
 
   /**
-   * Sets the filters used to determine which entities this policy targets
+   * Sets the filters used to determine which entities this policy targets.
+   *
+   * The outer map is keyed by metadata catalog flavor (e.g. "dublincore/episode").
+   * The inner map hols the catalogs name/value pairs.
    *
    * @param targetFilters the target filters
    */
