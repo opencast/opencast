@@ -513,13 +513,17 @@ public class UserAndRoleDirectoryServiceImpl implements UserDirectoryService, Us
       throw new IllegalStateException("No organization is set");
     }
 
+    // Instead of getting all roles from all providers, limit the providers by "limit" and "offset" if possible.
+    // Intended to reduce computing time for low offset + limit requests.
+    final int providerLimit = limit > 0 ? (int) Math.min((long) offset + limit, Integer.MAX_VALUE) : 0;
+
     // Multiple providers can return the same role (e.g.built-in system roles), so deduplicate them using a
     // LinkedHashSet, before limit is applied.
     final Set<Role> roles = new LinkedHashSet<>();
     for (RoleProvider roleProvider : roleProviders) {
       final String providerOrgId = roleProvider.getOrganization();
       if (ALL_ORGANIZATIONS.equals(providerOrgId) || org.getId().equals(providerOrgId)) {
-        roleProvider.findRoles(query, target, 0, 0).forEachRemaining(roles::add);
+        roleProvider.findRoles(query, target, 0, providerLimit).forEachRemaining(roles::add);
       }
     }
     Stream<Role> stream = roles.stream().sorted(Comparator.comparing(Role::getName)).skip(offset);
