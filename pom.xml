@@ -160,6 +160,8 @@
     <module>modules/inspection-workflowoperation</module>
     <module>modules/jacoco-reports</module>
     <module>modules/kernel</module>
+    <module>modules/lifecycle-management-api</module>
+    <module>modules/lifecycle-management-impl</module>
     <module>modules/list-providers-api</module>
     <module>modules/list-providers-impl</module>
     <module>modules/list-providers-common</module>
@@ -872,6 +874,11 @@
         <groupId>org.apache.servicemix.bundles</groupId>
         <artifactId>org.apache.servicemix.bundles.quartz</artifactId>
         <version>1.8.5_1</version>
+      </dependency>
+      <dependency>
+        <groupId>com.cronutils</groupId>
+        <artifactId>cron-utils</artifactId>
+        <version>9.2.1</version>
       </dependency>
       <!-- OSGi -->
       <dependency>
