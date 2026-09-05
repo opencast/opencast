@@ -38,6 +38,7 @@ import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
 
+import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -47,6 +48,8 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 
 /**
  * Take look in specified catalog for specified term, if the value matches the specified value add the target-tags
@@ -78,6 +81,9 @@ public class ConfigureByDublinCoreTermWOH extends ResumableWorkflowOperationHand
   /** Name of the configuration option that provides the copy boolean we are looking for */
   public static final String COPY_PROPERTY = "copy";
 
+  /** Name of the configuration option that enables regex matching. */
+  public static final String CHECK_REGEX = "check-regex";
+
   /**
    * Callback for declarative services configuration that will introduce us to the local workspace service.
    * Implementation assumes that the reference is configured as being static.
@@ -107,6 +113,7 @@ public class ConfigureByDublinCoreTermWOH extends ResumableWorkflowOperationHand
     String configuredDCTerm = StringUtils.trimToEmpty(currentOperation.getConfiguration(DCTERM_PROPERTY));
     String configuredDefaultValue = StringUtils.trimToNull(currentOperation.getConfiguration(DEFAULT_VALUE_PROPERTY));
     String configuredMatchValue = StringUtils.trimToEmpty(currentOperation.getConfiguration(MATCH_VALUE_PROPERTY));
+    boolean configuredCheckRegex = BooleanUtils.toBoolean(currentOperation.getConfiguration(CHECK_REGEX));
 
     // Find Catalog
     Catalog[] catalogs = mediaPackage
@@ -125,6 +132,17 @@ public class ConfigureByDublinCoreTermWOH extends ResumableWorkflowOperationHand
           // Use default
           if (configuredDefaultValue != null) {
             foundValue = configuredDefaultValue.equals(configuredMatchValue);
+          }
+        } else if (configuredCheckRegex && isMatchValueValidRegex(configuredMatchValue)) { // Checking regex.
+          // We need to check each value to ensure it matches the Regex.
+          for (int i = 0; i < values.size(); i++) {
+            String valueString = values.get(i).getValue();
+            // If any of the values match the Regex, we consider it as found.
+            // We don't care about those that don't match here!
+            if (valueString.matches(configuredMatchValue)) {
+              foundValue = true;
+              break;
+            }
           }
         } else {
           foundValue = values.contains(DublinCoreValue.mk(configuredMatchValue));
@@ -153,5 +171,22 @@ public class ConfigureByDublinCoreTermWOH extends ResumableWorkflowOperationHand
     } // if catalogs
 
     return createResult(mediaPackage, Action.CONTINUE);
+  }
+
+  /**
+   * Ensures that the match value is a valid regex to check each dublin core values against.
+   * @param configuredMatchValue
+   * @return
+   */
+  private Boolean isMatchValueValidRegex(String configuredMatchValue) {
+    if (configuredMatchValue == null || configuredMatchValue.isBlank()) {
+      return false;
+    }
+    try {
+      Pattern.compile(configuredMatchValue);
+      return true;
+    } catch (PatternSyntaxException e) {
+      return false;
+    }
   }
 }

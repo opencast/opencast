@@ -32,6 +32,7 @@ Tags and flavors can be used in combination.
 |target-tags       |"tagged,+engage" / "-engaged,+tagged"|Apply these (comma separated) tags to any media package elements. If a target-tag starts with a '-', it will be removed from preexisting tags, if a target-tag starts with a '+', it will be added to preexisting tags. If there is no prefix, all preexisting tags are removed and replaced by the target-tags.|EMPTY|
 |target-flavor     |"presentation/tagged"     |Apply these flavor to any media package elements|EMPTY|
 |copy              |"true" or "false"         |Indicates if matching elements will be cloned before tagging is applied or whether tagging is applied to the original element. Set to "true" to create a copy first, "false" otherwise.|FALSE|
+|check-regex       |"true" or "false"         |enables regex matching for the dcterm value against match-value when set to true.|FALSE|
 
 Note: see [`tag` operation](tag-woh.md) for further explanation of the source/target-flavor/tags
 
@@ -46,7 +47,7 @@ additional term adding to the catalog.
 
 ### match-value
 
-The value of the `dcterm` which to match against. The comparison is case sensitive.
+The target string or regex pattern to match against `dcterm` values. The comparison is case-sensitive. If `check-regex` is `true`, this value is treated as a regular expression pattern to match the `dcterm` value, and comparison stops on the first match.
 
 ### default-value
 
@@ -55,6 +56,10 @@ match as false and not tag anything. If `default-value` is specified the operati
 the `default-value` and apply the tags if they match. This allows an implied value to be explicitly and clearly
 defined. For example if you have mediapackages that were created before additional metadata was added to the episode
 catalog you may want to imply that the `audience` term has a value of `all-enrolled`.
+
+### check-regex
+
+Controls whether `match-value` is evaluated as a regular expression pattern against the `dcterm` value. When set to `true`, the process uses regex matching and stops at the first match.
 
 Operation Example
 -----------------
@@ -68,5 +73,20 @@ Operation Example
       - dcterm: audience
       - match-value: learning-difficulties
       - default-value: all-enrolled
+      - target-tags: +publishBeforeEditing
+```
+
+Operation Example with regular expression
+-----------------
+
+```yaml
+  - id: tag-by-dcterm
+    description: Tagging media package elements according to dcterm
+    configurations:
+      - source-flavors: dublincore/*,security/*
+      - dccatalog: episode
+      - dcterm: audience
+      - match-value: "^learning-[a-zA-Z0-9-]+$"
+      - check-regex: true
       - target-tags: +publishBeforeEditing
 ```
