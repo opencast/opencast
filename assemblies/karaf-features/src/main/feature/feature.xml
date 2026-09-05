@@ -24,7 +24,6 @@
     <!-- httpclient needs to start before common so that it can get org.apache.commons.logging -->
     <bundle start-level="55">mvn:org.apache.httpcomponents/httpclient-osgi/${httpcomponents-httpclient.version}</bundle>
     <bundle start-level="55">mvn:org.apache.httpcomponents/httpcore-osgi/${httpcomponents-httpcore.version}</bundle>
-    <bundle start-level="55">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.commons-httpclient/3.1_7</bundle>
     <bundle start-level="55">mvn:commons-codec/commons-codec/${commons-codec.version}</bundle>
 
     <!-- JPA -->

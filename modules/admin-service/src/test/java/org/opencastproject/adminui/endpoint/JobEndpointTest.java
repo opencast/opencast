@@ -64,7 +64,7 @@ public class JobEndpointTest {
   @Test
   public void testSortCreator() {
     given().param("sort", "creator:ASC").expect()
-            .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
+            .statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
             .body("count", equalTo(4)).body("total", equalTo(4))
             .body("results[0].creator", equalTo("testuser1"))
             .body("results[1].creator", equalTo("testuser1"))
@@ -73,7 +73,7 @@ public class JobEndpointTest {
             .when().get(rt.host("/jobs.json"));
 
     given().param("sort", "creator:DESC").expect()
-            .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
+            .statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
             .body("count", equalTo(4)).body("total", equalTo(4))
             .body("results[0].creator", equalTo("testuser3"))
             .body("results[1].creator", equalTo("testuser2"))
@@ -85,7 +85,7 @@ public class JobEndpointTest {
   @Test
   public void testSortOperation() {
     given().param("sort", "operation:ASC").expect()
-            .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
+            .statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
             .body("count", equalTo(4)).body("total", equalTo(4))
             .body("results[0].operation", equalTo("Encode"))
             .body("results[1].operation", equalTo("Inspect"))
@@ -94,7 +94,7 @@ public class JobEndpointTest {
             .when().get(rt.host("/jobs.json"));
 
     given().param("sort", "operation:DESC").expect()
-            .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
+            .statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
             .body("count", equalTo(4)).body("total", equalTo(4))
             .body("results[0].operation", equalTo("test"))
             .body("results[1].operation", equalTo("RESUME"))
@@ -106,7 +106,7 @@ public class JobEndpointTest {
   @Test
   public void testSortProcessingHost() {
     given().param("sort", "processingHost:ASC").expect()
-            .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
+            .statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
             .body("count", equalTo(4)).body("total", equalTo(4))
             .body("results[0].processingHost", equalTo("host1"))
             .body("results[1].processingHost", equalTo("host1"))
@@ -115,7 +115,7 @@ public class JobEndpointTest {
             .when().get(rt.host("/jobs.json"));
 
     given().param("sort", "processingHost:DESC").expect()
-            .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
+            .statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
             .body("count", equalTo(4)).body("total", equalTo(4))
             .body("results[0].processingHost", equalTo("host3"))
             .body("results[1].processingHost", equalTo("host2"))
@@ -127,7 +127,7 @@ public class JobEndpointTest {
   @Test
   public void testSortStarted() {
     given().param("sort", "started:ASC").expect()
-            .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
+            .statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
             .body("count", equalTo(4)).body("total", equalTo(4))
             .body("results[0].started", equalTo("2014-06-05T09:05:00Z"))
             .body("results[1].started", equalTo("2014-06-05T09:10:00Z"))
@@ -136,7 +136,7 @@ public class JobEndpointTest {
             .when().get(rt.host("/jobs.json"));
 
     given().param("sort", "started:DESC").expect()
-            .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
+            .statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
             .body("count", equalTo(4)).body("total", equalTo(4))
             .body("results[0].started", equalTo("2014-06-05T09:16:00Z"))
             .body("results[1].started", equalTo("2014-06-05T09:11:11Z"))
@@ -148,7 +148,7 @@ public class JobEndpointTest {
   @Test
   public void testSortSubmitted() {
     given().param("sort", "submitted:ASC").expect()
-            .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
+            .statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
             .body("count", equalTo(4)).body("total", equalTo(4))
             .body("results[0].submitted", equalTo("2014-06-05T09:05:00Z"))
             .body("results[1].submitted", equalTo("2014-06-05T09:10:00Z"))
@@ -157,7 +157,7 @@ public class JobEndpointTest {
             .when().get(rt.host("/jobs.json"));
 
     given().param("sort", "started:DESC").expect()
-            .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
+            .statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
             .body("count", equalTo(4)).body("total", equalTo(4))
             .body("results[0].submitted", equalTo("2014-06-05T09:16:00Z"))
             .body("results[1].submitted", equalTo("2014-06-05T09:11:11Z"))
@@ -169,7 +169,7 @@ public class JobEndpointTest {
   @Test
   public void testSortType() {
     given().param("sort", "type:ASC").expect()
-            .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
+            .statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
             .body("count", equalTo(4)).body("total", equalTo(4))
             .body("results[0].type", equalTo("org.opencastproject.composer"))
             .body("results[1].type", equalTo("org.opencastproject.composer"))
@@ -178,7 +178,7 @@ public class JobEndpointTest {
             .when().get(rt.host("/jobs.json"));
 
     given().param("sort", "type:DESC").expect()
-            .statusCode(org.apache.commons.httpclient.HttpStatus.SC_OK).contentType(ContentType.JSON)
+            .statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON)
             .body("count", equalTo(4)).body("total", equalTo(4))
             .body("results[0].type", equalTo("org.opencastproject.workflow"))
             .body("results[1].type", equalTo("org.opencastproject.inspection"))

@@ -1129,11 +1129,6 @@
       </dependency>
       <dependency>
         <groupId>org.apache.servicemix.bundles</groupId>
-        <artifactId>org.apache.servicemix.bundles.commons-httpclient</artifactId>
-        <version>3.1_7</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.servicemix.bundles</groupId>
         <artifactId>org.apache.servicemix.bundles.xerces</artifactId>
         <version>2.12.2_1</version>
       </dependency>
