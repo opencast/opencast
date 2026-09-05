@@ -25,6 +25,7 @@ import '@asicupv/paella-zoom-plugin/paella-zoom-plugin.css';
 import '@asicupv/paella-extra-plugins/paella-extra-plugins.css';
 import '@asicupv/paella-ai-plugins/paella-ai-plugins.css';
 import '@asicupv/paella-opencast-core/paella-opencast-core.css';
+import '@asicupv/paella-opencast-plugins/paella-opencast-plugins.css';
 import defaultDictionaries from './i18n/all';
 
 const USE_OC_SERVER_FROM_URL = import.meta.env.USE_OC_SERVER_FROM_URL === 'true' || false;

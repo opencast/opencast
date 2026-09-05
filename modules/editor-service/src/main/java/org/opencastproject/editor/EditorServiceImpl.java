@@ -33,6 +33,7 @@ import org.opencastproject.editor.api.EditingData;
 import org.opencastproject.editor.api.EditorService;
 import org.opencastproject.editor.api.EditorServiceException;
 import org.opencastproject.editor.api.ErrorStatus;
+import org.opencastproject.editor.api.InteractiveElementData;
 import org.opencastproject.editor.api.LockData;
 import org.opencastproject.editor.api.SegmentData;
 import org.opencastproject.editor.api.TrackData;
@@ -173,6 +174,8 @@ public class EditorServiceImpl implements EditorService {
   private ElasticsearchIndex searchIndex;
   private MediaPackageElementFlavor captionsFlavor;
   private MediaPackageElementFlavor chapterFlavor;
+  private MediaPackageElementFlavor textboxesFlavor;
+  private MediaPackageElementFlavor quizzesFlavor;
   private String thumbnailWfProperty;
   private List<MediaPackageElementFlavor> thumbnailSourcePrimary;
   private String distributionDirectory;
@@ -187,6 +190,8 @@ public class EditorServiceImpl implements EditorService {
   private static final String DEFAULT_PREVIEW_VIDEO_SUBTYPE = "video+preview";
   private static final String DEFAULT_CAPTIONS_FLAVOR = "captions/*";
   private static final String DEFAULT_CHAPTER_FLAVOR = "chapters/*";
+  private static final String DEFAULT_TEXTBOXES_FLAVOR = "textboxes/*";
+  private static final String DEFAULT_QUIZZES_FLAVOR = "quizzes/*";
   private static final String DEFAULT_THUMBNAIL_SUBTYPE = "player+preview";
   private static final String DEFAULT_THUMBNAIL_WF_PROPERTY = "thumbnail_edited";
   private static final List<MediaPackageElementFlavor> DEFAULT_THUMBNAIL_PRIORITY_FLAVOR = new ArrayList<>();
@@ -202,6 +207,8 @@ public class EditorServiceImpl implements EditorService {
   public static final String OPT_PREVIEW_VIDEO_SUBTYPE = "preview.video.subtype";
   public static final String OPT_CAPTIONS_FLAVOR = "captions.flavor";
   public static final String OPT_CHAPTER_FLAVOR = "chapter.flavor";
+  public static final String OPT_TEXTBOXES_FLAVOR = "textboxes.flavor";
+  public static final String OPT_QUIZZES_FLAVOR = "quizzes.flavor";
   public static final String OPT_THUMBNAILSUBTYPE = "thumbnail.subtype";
   public static final String OPT_THUMBNAIL_WF_PROPERTY = "thumbnail.workflow.property";
   public static final String OPT_THUMBNAIL_PRIORITY_FLAVOR = "thumbnail.priority.flavor";
@@ -347,6 +354,14 @@ public class EditorServiceImpl implements EditorService {
     chapterFlavor = MediaPackageElementFlavor.parseFlavor(
         StringUtils.defaultString((String) properties.get(OPT_CHAPTER_FLAVOR), DEFAULT_CHAPTER_FLAVOR));
     logger.debug("Chapter flavor set to '{}'", chapterFlavor);
+
+    textboxesFlavor = MediaPackageElementFlavor.parseFlavor(
+        StringUtils.defaultString((String) properties.get(OPT_TEXTBOXES_FLAVOR), DEFAULT_TEXTBOXES_FLAVOR));
+    logger.debug("Textboxes flavor set to '{}'", textboxesFlavor);
+
+    quizzesFlavor = MediaPackageElementFlavor.parseFlavor(
+        StringUtils.defaultString((String) properties.get(OPT_QUIZZES_FLAVOR), DEFAULT_QUIZZES_FLAVOR));
+    logger.debug("Quizzes flavor set to '{}'", quizzesFlavor);
 
     thumbnailSubType =  Objects.toString(properties.get(OPT_THUMBNAILSUBTYPE), DEFAULT_THUMBNAIL_SUBTYPE);
     logger.debug("Thumbnail subtype set to '{}'", thumbnailSubType);
@@ -613,6 +628,63 @@ public class EditorServiceImpl implements EditorService {
           } catch (NotFoundException | IOException e) {
             logger.info("Could not remove track from workspace. Could be it was never there.");
           }
+        }
+      }
+    }
+
+    return mediaPackage;
+  }
+
+  private MediaPackage processInteractiveElements(
+      MediaPackage mediaPackage,
+      InteractiveElementData element,
+      String flavorType
+  ) throws IOException, IllegalArgumentException {
+
+    // Generate ID for new tracks
+    String elementId = UUID.randomUUID().toString();
+    String trackId = null;
+
+    // Check if subtitle already exists
+    for (Track t : mediaPackage.getTracks()) {
+      if (t.getIdentifier().matches(element.getId())) {
+        logger.debug("Set Identifier for interactive element to: {}", t.getIdentifier());
+        elementId = t.getIdentifier();
+        trackId = t.getIdentifier();
+        break;
+      }
+    }
+
+    Track track = mediaPackage.getTrack(trackId);
+
+    // Memorize uri of the previous track file for deletion
+    URI oldTrackURI = null;
+    if (track != null) {
+      oldTrackURI = track.getURI();
+    }
+
+    // Put updated filename in working file repository and update the track.
+    try (InputStream is = IOUtils.toInputStream(element.getElementsJSON(), "UTF-8")) {
+      URI elementUri = workspace.put(mediaPackage.getIdentifier().toString(), elementId, elementId + ".json", is);
+
+      // If not exists, create new Track
+      if (track == null) {
+        track = (Track) mediaPackage.add(elementUri, MediaPackageElement.Type.Track,
+            new MediaPackageElementFlavor(flavorType,"source"));
+        logger.info("Creating new interactive element track {}", track.getIdentifier());
+      }
+
+      track.setURI(elementUri);
+      track.setIdentifier(elementId);
+      track.setChecksum(null);
+
+      if (oldTrackURI != null && oldTrackURI != elementUri) {
+        // Delete the old files from the working file repository and workspace if they were in there
+        logger.info("Removing old track file {}", oldTrackURI);
+        try {
+          workspace.delete(oldTrackURI);
+        } catch (NotFoundException | IOException e) {
+          logger.info("Could not remove track from workspace. Could be it was never there.");
         }
       }
     }
@@ -1002,6 +1074,7 @@ public class EditorServiceImpl implements EditorService {
       }
     }
 
+
     // Get chapters too
     Track[] chapterTracks = mp.getTracks(chapterFlavor);
     List<EditingData.Subtitle> chapters = new ArrayList<>();
@@ -1012,6 +1085,33 @@ public class EditorServiceImpl implements EditorService {
         chapters.add(new EditingData.Subtitle(t.getIdentifier(), chapterString, t.getTags()));
       } catch (NotFoundException | IOException e) {
         errorExit("Could not read chapter from file", mediaPackageId, ErrorStatus.UNKNOWN);
+      }
+    }
+
+    // Interactive elements
+    Track[] textboxTracks = mp.getTracks(textboxesFlavor);
+    InteractiveElementData textboxes = null;
+    if (textboxTracks.length > 0) {
+      try {
+        Track t = textboxTracks[0];
+        File textboxFile = workspace.get(t.getURI());
+        String textboxString = FileUtils.readFileToString(textboxFile, StandardCharsets.UTF_8);
+        textboxes = new InteractiveElementData(t.getIdentifier(), textboxString);
+      } catch (NotFoundException | IOException e) {
+        errorExit("Could not read textboxes from file", mediaPackageId, ErrorStatus.UNKNOWN);
+      }
+    }
+
+    Track[] quizTracks = mp.getTracks(quizzesFlavor);
+    InteractiveElementData quizzes = null;
+    if (quizTracks.length > 0) {
+      try {
+        Track t = quizTracks[0];
+        File quizFile = workspace.get(t.getURI());
+        String quizString = FileUtils.readFileToString(quizFile, StandardCharsets.UTF_8);
+        quizzes = new InteractiveElementData(t.getIdentifier(), quizString);
+      } catch (NotFoundException | IOException e) {
+        errorExit("Could not read quizzes from file", mediaPackageId, ErrorStatus.UNKNOWN);
       }
     }
 
@@ -1072,7 +1172,7 @@ public class EditorServiceImpl implements EditorService {
 
     return new EditingData(segments, tracks, workflows, mp.getDuration(), mp.getTitle(), event.getRecordingStartDate(),
             event.getSeriesId(), event.getSeriesName(), workflowActive, waveformList, subtitles, chapters,
-            localPublication, lockingActive, lockRefresh, user, "");
+            textboxes, quizzes, localPublication, lockingActive, lockRefresh, user, "");
   }
 
 
@@ -1174,6 +1274,26 @@ public class EditorServiceImpl implements EditorService {
       errorExit("Unable to add subtitle track to archive", mediaPackageId, ErrorStatus.UNKNOWN, e);
     } catch (IllegalArgumentException e) {
       errorExit("Illegal subtitle given", mediaPackageId, ErrorStatus.UNKNOWN, e);
+    }
+
+    try {
+      if (editingData.getTextboxes() != null) {
+        mediaPackage = processInteractiveElements(mediaPackage, editingData.getTextboxes(), textboxesFlavor.getType());
+      }
+    } catch (IOException e) {
+      errorExit("Unable to add textboxes track to archive", mediaPackageId, ErrorStatus.UNKNOWN, e);
+    } catch (IllegalArgumentException e) {
+      errorExit("Illegal textbox given", mediaPackageId, ErrorStatus.UNKNOWN, e);
+    }
+
+    try {
+      if (editingData.getQuizzes() != null) {
+        mediaPackage = processInteractiveElements(mediaPackage, editingData.getQuizzes(), quizzesFlavor.getType());
+      }
+    } catch (IOException e) {
+      errorExit("Unable to add quizzes track to archive", mediaPackageId, ErrorStatus.UNKNOWN, e);
+    } catch (IllegalArgumentException e) {
+      errorExit("Illegal quiz given", mediaPackageId, ErrorStatus.UNKNOWN, e);
     }
 
     try {
