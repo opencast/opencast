@@ -1,0 +1,43 @@
+meta {
+  name: get_event_by_id
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/api/events/:eventId
+  body: none
+  auth: inherit
+}
+
+params:path {
+  eventId: {{eventId}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Event by ID properties should have correct types", function() {
+    if (res.status === 200) {
+      const body = res.getBody();
+      expect(body).to.be.an('object');
+      expect(body.identifier).to.be.a('string');
+      expect(body.creator).to.be.a('string');
+      expect(body.presenter).to.be.an('array');
+      expect(body.created).to.be.a('string');
+      expect(body.subjects).to.be.an('array');
+      expect(body.start).to.be.a('string');
+      expect(body.description).to.be.a('string');
+      expect(body.title).to.be.a('string');
+      expect(body.processing_state).to.be.a('string');
+      expect(body.duration).to.satisfy(val => typeof val === 'string' || typeof val === 'number');
+      expect(body.archive_version).to.satisfy(val => typeof val === 'string' || typeof val === 'number');
+      expect(body.contributor).to.be.an('array');
+      expect(body.has_previews).to.be.a('boolean');
+      expect(body.location).to.be.a('string');
+      expect(body.publication_status).to.be.an('array');
+    }
+  });
+}

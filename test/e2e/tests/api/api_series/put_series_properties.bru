@@ -1,0 +1,35 @@
+meta {
+  name: put_series_properties
+  type: http
+  seq: 10
+}
+
+put {
+  url: {{baseUrl}}/api/series/:seriesId/properties
+  body: formUrlEncoded
+  auth: inherit
+}
+
+params:path {
+  seriesId: {{identifier}}
+}
+
+body:form-urlencoded {
+  properties: {"ondemand":"true","live":"false"}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Update series properties response should have correct types", function() {
+    if (res.status === 200) {
+      const body = res.getBody();
+      expect(body).to.be.an('object');
+      for (const key in body) {
+        expect(body[key]).to.be.a('string');
+      }
+    }
+  });
+}

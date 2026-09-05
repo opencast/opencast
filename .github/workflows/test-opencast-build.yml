@@ -171,6 +171,28 @@ jobs:
           jq -r '.workflows.workflow.state' < instances.json | tee status
           grep -q SUCCEEDED status
 
+      - name: run bruno tests
+        if: matrix.java == 21
+        continue-on-error: true
+        working-directory: test/e2e
+        run: |
+          npx -y @usebruno/cli run tests -r \
+            --env opencast_develop \
+            --env-var baseUrl=http://localhost:8080 \
+            --env-var searchBaseUrl=http://localhost:8081 \
+            --env-var password=opencast \
+            --format html --output results.html \
+            --reporter-junit results.xml
+
+      - name: upload Bruno test reports
+        if: always() && matrix.java == 21
+        uses: actions/upload-artifact@v7
+        with:
+          name: bruno-test-reports
+          path: |
+            test/e2e/results.html
+            test/e2e/results.xml
+
       - name: show admin logs
         if: always()
         run: cat build/opencast-dist-admin/data/log/opencast.log || true

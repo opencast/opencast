@@ -1,0 +1,27 @@
+meta {
+  name: create_media_package_for_ingest
+  type: http
+  seq: 19
+}
+
+get {
+  url: {{baseUrl}}/ingest/createMediaPackage
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Create MediaPackage for standard Ingest should succeed", function() {
+    const body = res.getBody();
+    expect(body).to.be.a('string');
+  });
+}
+
+script:post-response {
+  const body = res.getBody();
+  bru.setVar("mediaPackage_B", body);
+}

@@ -1,0 +1,33 @@
+meta {
+  name: get_series_acl
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/api/series/:seriesId/acl
+  body: none
+  auth: inherit
+}
+
+params:path {
+  seriesId: {{identifier}}
+}
+
+assert {
+  res.status: eq 200
+}
+
+tests {
+  test("Series ACL list should have correct types", function() {
+    if (res.status === 200) {
+      const body = res.getBody();
+      expect(body).to.be.an('array');
+      body.forEach(function(ace) {
+        expect(ace.allow).to.be.a('boolean');
+        expect(ace.action).to.be.a('string');
+        expect(ace.role).to.be.a('string');
+      });
+    }
+  });
+}

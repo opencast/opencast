@@ -1,0 +1,22 @@
+meta {
+  name: get_api
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/api
+  body: none
+  auth: inherit
+}
+
+assert {
+  res.status: eq 200
+  res.body.version: isString
+  res.body.url: isString
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}
