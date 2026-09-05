@@ -23,6 +23,7 @@ package org.opencastproject.transcription.microsoft.azure;
 
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.apache.http.HttpStatus;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -71,7 +72,7 @@ public class MicrosoftAzureStorageClient {
           throws MicrosoftAzureStorageClientException, IOException, MicrosoftAzureNotAllowedException {
     try {
       Map<String, String> containerProperties = getContainerProperties(azureContainerName);
-      return containerProperties.containsKey("x-ms-blob-public-access") && StringUtils.equalsIgnoreCase("unlocked",
+      return containerProperties.containsKey("x-ms-blob-public-access") && Strings.CI.equals("unlocked",
           containerProperties.getOrDefault("x-ms-lease-status", "INVALID"));
     } catch (MicrosoftAzureNotFoundException ex) {
       return false;

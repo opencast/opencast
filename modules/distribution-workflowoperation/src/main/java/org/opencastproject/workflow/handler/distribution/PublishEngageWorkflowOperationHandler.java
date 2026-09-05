@@ -88,6 +88,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
@@ -247,11 +248,11 @@ public class PublishEngageWorkflowOperationHandler extends AbstractWorkflowOpera
     String streamingSourceFlavors = StringUtils.trimToEmpty(op.getConfiguration(STREAMING_SOURCE_FLAVORS));
     String streamingTargetSubflavor = StringUtils.trimToNull(op.getConfiguration(STREAMING_TARGET_SUBFLAVOR));
     String republishStrategy = StringUtils.trimToEmpty(
-            StringUtils.defaultString(op.getConfiguration(STRATEGY), PUBLISH_STRATEGY_DEFAULT));
+            Objects.toString(op.getConfiguration(STRATEGY), PUBLISH_STRATEGY_DEFAULT));
     String mergeForceFlavorsStr = StringUtils.trimToEmpty(
-            StringUtils.defaultString(op.getConfiguration(MERGE_FORCE_FLAVORS), MERGE_FORCE_FLAVORS_DEFAULT));
+            Objects.toString(op.getConfiguration(MERGE_FORCE_FLAVORS), MERGE_FORCE_FLAVORS_DEFAULT));
     String addForceFlavorsStr = StringUtils.trimToEmpty(
-            StringUtils.defaultString(op.getConfiguration(ADD_FORCE_FLAVORS), ADD_FORCE_FLAVORS_DEFAULT));
+            Objects.toString(op.getConfiguration(ADD_FORCE_FLAVORS), ADD_FORCE_FLAVORS_DEFAULT));
 
 
     boolean checkAvailability = Optional.ofNullable(op.getConfiguration(CHECK_AVAILABILITY))

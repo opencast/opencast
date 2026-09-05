@@ -32,6 +32,7 @@ import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.util.UrlSupport;
 
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.osgi.framework.ServiceRegistration;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.component.ComponentContext;
@@ -257,7 +258,7 @@ public final class OaiPmhServer extends HttpServlet implements OaiPmhServerInfo 
    *          the base path of the OAI-PMH server, e.g. /oaipmh
    */
   public static Optional<String> repositoryId(HttpServletRequest req, String mountPoint) {
-    String[] parts = StringUtils.removeStart(UrlSupport.removeDoubleSeparator(req.getRequestURI()), mountPoint)
+    String[] parts = Strings.CS.removeStart(UrlSupport.removeDoubleSeparator(req.getRequestURI()), mountPoint)
         .split("/");
 
     return Arrays.stream(parts)
