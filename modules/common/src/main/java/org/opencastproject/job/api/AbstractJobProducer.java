@@ -173,7 +173,7 @@ public abstract class AbstractJobProducer implements JobProducer {
     // get back from the service registry.
     float currentLoad = getServiceRegistry().getOwnLoad();
     logger.debug("{} Current load on this host: {}, job's load: {}, job's status: {}, max load: {}",
-            Thread.currentThread().getId(), currentLoad, job.getJobLoad(), job.getStatus().name(),
+            Thread.currentThread().threadId(), currentLoad, job.getJobLoad(), job.getStatus().name(),
             maxload.getMaxLoad());
     // Add the current job load to compare below
     currentLoad += job.getJobLoad();
@@ -184,19 +184,19 @@ public abstract class AbstractJobProducer implements JobProducer {
     if (job.getJobLoad() > maxload.getMaxLoad() && acceptJobLoadsExeedingMaxLoad) {
       logger.warn(
               "{} Accepting job {} of type {} with load {} even though load of {} is above this node's limit of {}.",
-              Thread.currentThread().getId(), job.getId(), job.getJobType(), df.format(job.getJobLoad()),
+              Thread.currentThread().threadId(), job.getId(), job.getJobType(), df.format(job.getJobLoad()),
               df.format(currentLoad), df.format(maxload.getMaxLoad()));
       logger.warn("This is a configuration issue that you should resolve in a production system!");
       return true;
     } else if (currentLoad > maxload.getMaxLoad()) {
       logger.debug(
               "{} Declining job {} of type {} with load {} because load of {} would exceed this node's limit of {}.",
-              Thread.currentThread().getId(), job.getId(), job.getJobType(), df.format(job.getJobLoad()),
+              Thread.currentThread().threadId(), job.getId(), job.getJobType(), df.format(job.getJobLoad()),
               df.format(currentLoad), df.format(maxload.getMaxLoad()));
       return false;
     } else  {
       logger.debug("{} Accepting job {} of type {} with load {} because load of {} is within this node's limit of {}.",
-              Thread.currentThread().getId(), job.getId(), job.getJobType(), df.format(job.getJobLoad()),
+              Thread.currentThread().threadId(), job.getId(), job.getJobType(), df.format(job.getJobLoad()),
               df.format(currentLoad), df.format(maxload.getMaxLoad()));
       return true;
     }
