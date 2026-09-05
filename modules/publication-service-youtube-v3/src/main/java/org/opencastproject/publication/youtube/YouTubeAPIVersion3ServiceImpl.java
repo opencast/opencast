@@ -99,17 +99,16 @@ public class YouTubeAPIVersion3ServiceImpl implements YouTubeAPIVersion3Service 
   }
 
   @Override
-  public Playlist createPlaylist(final String title, final String description, final String... tags)
-          throws IOException {
+  public Playlist createPlaylist(final String title, final String description, PrivacyStatus privacyStatus,
+          final String... tags) throws IOException {
     final PlaylistSnippet playlistSnippet = new PlaylistSnippet();
     playlistSnippet.setTitle(title);
     playlistSnippet.setDescription(description);
     if (tags.length > 0) {
       playlistSnippet.setTags(Collections.list(tags));
     }
-    // Playlists are always public. The videos therein might be private.
     final PlaylistStatus playlistStatus = new PlaylistStatus();
-    playlistStatus.setPrivacyStatus("public");
+    playlistStatus.setPrivacyStatus(privacyStatus.name().toLowerCase());
 
     // Create playlist with metadata and status.
     final Playlist youTubePlaylist = new Playlist();

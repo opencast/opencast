@@ -110,9 +110,11 @@ public interface YouTubeAPIVersion3Service {
    * Creates YouTube Playlist and adds it to the authorized account.
    * @param title may not be {@code null}
    * @param description may not be {@code null}
+   * @param privacyStatus may not be {@code null}
    * @param tags zero or more tags to be applied to playlist on YouTube.
    */
-  Playlist createPlaylist(String title, String description, String... tags) throws IOException;
+  Playlist createPlaylist(String title, String description, PrivacyStatus privacyStatus, String... tags)
+          throws IOException;
 
   /**
    * Remove a previously uploaded video from YouTube.
@@ -136,4 +138,10 @@ public interface YouTubeAPIVersion3Service {
    */
   void removeMyPlaylist(String playlistId) throws IOException;
 
+  /** Valid values for YouTube privacy statuses */
+  enum PrivacyStatus {
+    PUBLIC,
+    PRIVATE,
+    UNLISTED
+  }
 }
