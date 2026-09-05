@@ -29,6 +29,7 @@ import static org.opencastproject.util.RestUtil.R.serverError;
 import org.opencastproject.job.api.JaxbJob;
 import org.opencastproject.job.api.Job;
 import org.opencastproject.job.api.JobProducer;
+import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.mediapackage.MediaPackageParser;
 import org.opencastproject.mediapackage.Track;
@@ -109,6 +110,12 @@ public class YouTubePublicationRestService extends AbstractJobProducerEndpoint {
               isRequired = true,
               description = "The element to publish",
               type = Type.STRING
+          ),
+          @RestParameter(
+              name = "thumbnailId",
+              isRequired = false,
+              description = "The optional thumbnail to publish",
+              type = Type.STRING
           )
       },
       responses = {
@@ -118,14 +125,16 @@ public class YouTubePublicationRestService extends AbstractJobProducerEndpoint {
   )
   public Response publish(
       @FormParam("mediapackage") final String mediaPackageXml,
-      @FormParam("elementId") final String elementId
+      @FormParam("elementId") final String elementId,
+      @FormParam("thumbnailId") final String thumbnailId
   ) {
     final Job job;
     try {
       final MediaPackage mediapackage = MediaPackageParser.getFromXml(mediaPackageXml);
       final Track track = mediapackage.getTrack(elementId);
+      final Attachment thumbnail = (Attachment) mediapackage.getElementById(thumbnailId);
       if (track != null) {
-        job = service.publish(mediapackage, track);
+        job = service.publish(mediapackage, track, thumbnail);
       } else {
         return badRequest();
       }

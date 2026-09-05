@@ -99,6 +99,16 @@ public class YouTubeAPIVersion3ServiceImpl implements YouTubeAPIVersion3Service 
   }
 
   @Override
+  public void setThumbnail(String videoId, File thumbnail, String mimeType) throws IOException {
+    final BufferedInputStream inputStream = new BufferedInputStream(new FileInputStream(thumbnail));
+    final InputStreamContent mediaContent = new InputStreamContent(mimeType, inputStream);
+    mediaContent.setLength(thumbnail.length());
+
+    final YouTube.Thumbnails.Set thumbnailSet = youTube.thumbnails().set(videoId, mediaContent);
+    execute(thumbnailSet);
+  }
+
+  @Override
   public Playlist createPlaylist(final String title, final String description, final String... tags)
           throws IOException {
     final PlaylistSnippet playlistSnippet = new PlaylistSnippet();
