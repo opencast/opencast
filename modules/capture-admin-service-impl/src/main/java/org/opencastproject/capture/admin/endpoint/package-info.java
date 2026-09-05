@@ -28,4 +28,3 @@ package org.opencastproject.capture.admin.endpoint;
 
 import javax.xml.bind.annotation.XmlNsForm;
 import javax.xml.bind.annotation.XmlSchema;
-

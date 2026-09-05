@@ -64,6 +64,7 @@
     <org.osgi.service.configurator.version>1.0.1</org.osgi.service.configurator.version>
     <org.osgi.service.metatype.annotations.version>1.4.1</org.osgi.service.metatype.annotations.version>
     <rest-assured.version>4.4.0</rest-assured.version>
+    <spotless.version>3.9.0</spotless.version>
     <spring.version>5.3.39</spring.version>
     <spring-security.version>5.7.12</spring-security.version>
     <spring-security-cas.version>5.7.12_4</spring-security-cas.version>
@@ -424,6 +425,57 @@
           </systemPropertyVariables>
         </configuration>
       </plugin>
+      <!-- Automatically fix the mechanical part of the style rules, above all the import order.
+
+           This runs in the `initialize` phase, i.e. deliberately before the checkstyle plugin below
+           which is bound to `validate`, so that a build repairs the imports instead of failing on
+           them.  Use `-Dspotless.apply.skip=true` to keep a build from modifying sources (release
+           builds, CI). -->
+      <plugin>
+        <groupId>com.diffplug.spotless</groupId>
+        <artifactId>spotless-maven-plugin</artifactId>
+        <version>${spotless.version}</version>
+        <configuration>
+          <java>
+            <includes>
+              <include>src/**/*.java</include>
+            </includes>
+            <excludes>
+              <exclude>**/generated-sources/**</exclude>
+              <exclude>**/org/apache/commons/**</exclude>
+              <exclude>**/org/w3c/**</exclude>
+              <!-- Spotless parses imports line by line and cannot deal with a single import
+                   statement wrapped over two lines.  It would drop the continuation line and hence
+                   the whole import.  This is the only file in the repository doing that, since
+                   these static imports do not fit into 120 characters on one line. -->
+              <exclude>**/DuplicateEventWorkflowOperationHandlerTest.java</exclude>
+            </excludes>
+            <!-- Mirrors the checkstyle `ImportOrder` rule: all static imports in one block at the
+                 top, then the group prefixes, then a catch-all group (the trailing comma) for
+                 everything matching none of them.  Sorting is plain, case-sensitive and
+                 lexicographic, like checkstyle's. -->
+            <importOrder>
+              <order>\#,org.opencastproject,com,net,org,java,javax,</order>
+            </importOrder>
+            <removeUnusedImports/>
+            <endWithNewline/>
+            <!-- Deliberately no `licenseHeader` and no `trimTrailingWhitespace`: both are enforced by
+                 checkstyle in a laxer form than spotless would impose (the license header may have a
+                 blank line before `package`, and trailing whitespace is tolerated inside comments),
+                 so letting spotless normalise them would rewrite nearly every file in the repository
+                 for no gain. -->
+          </java>
+        </configuration>
+        <executions>
+          <execution>
+            <id>spotless-apply</id>
+            <phase>initialize</phase>
+            <goals>
+              <goal>apply</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
       <!-- Ensure that the source code matches the style rules -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -657,6 +709,11 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-checkstyle-plugin</artifactId>
           <version>3.6.0</version>
+        </plugin>
+        <plugin>
+          <groupId>com.diffplug.spotless</groupId>
+          <artifactId>spotless-maven-plugin</artifactId>
+          <version>${spotless.version}</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
