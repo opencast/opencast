@@ -62,7 +62,6 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.Dictionary;
 import java.util.List;
@@ -225,10 +224,21 @@ public class YouTubeV3PublicationServiceImpl
   }
 
   @Override
-  public Job publish(final MediaPackage mediaPackage, final Track track) throws PublicationException {
+  public Job publish(final MediaPackage mediaPackage, final Track track, final List<Track> captions)
+          throws PublicationException {
     if (mediaPackage.contains(track)) {
       try {
-        final List<String> args = Arrays.asList(MediaPackageParser.getAsXml(mediaPackage), track.getIdentifier());
+        final List<String> args = new ArrayList<>();
+        args.add(MediaPackageParser.getAsXml(mediaPackage));
+        args.add(track.getIdentifier());
+        if (captions != null && !captions.isEmpty()) {
+          final List<String> captionIds = new ArrayList<>();
+          for (Track caption : captions) {
+            captionIds.add(caption.getIdentifier());
+          }
+          args.add(StringUtils.join(captionIds, ","));
+        }
+
         return serviceRegistry.createJob(JOB_TYPE, Operation.Publish.toString(), args, youtubePublishJobLoad);
       } catch (ServiceRegistryException e) {
         throw new PublicationException("Unable to create a job for track: " + track.toString(), e);
@@ -248,11 +258,14 @@ public class YouTubeV3PublicationServiceImpl
    *          the mediapackage
    * @param elementId
    *          the mediapackage element id to publish
+   * @param captions
+   *          the mediapackage caption elements to publish
    * @return the published element
    * @throws PublicationException
    *           if publication fails
    */
-  private Publication publish(final Job job, final MediaPackage mediaPackage, final String elementId)
+  private Publication publish(final Job job, final MediaPackage mediaPackage, final String elementId,
+                              final List<Track> captions)
           throws PublicationException {
     if (mediaPackage == null) {
       throw new IllegalArgumentException("Mediapackage must be specified");
@@ -301,6 +314,31 @@ public class YouTubeV3PublicationServiceImpl
         playlist = existingPlaylist;
       }
       youTubeService.addPlaylistItem(playlist.getId(), video.getId());
+
+      if (captions != null) {
+        for (Track caption : captions) {
+          try {
+            final File captionFile = workspace.get(caption.getURI());
+            String language = null;
+            for (String tag : caption.getTags()) {
+              if (tag.startsWith("lang:")) {
+                language = tag.substring(5);
+                break;
+              }
+            }
+            if (language == null) {
+              logger.warn("No language tag (lang:<bcp-code>) found for caption track {}. Skipping upload.", caption);
+              continue;
+            }
+            // Google YouTube API requires ISO 639-1 language code.
+            // Opencast flavors often use that too.
+            youTubeService.addCaptions(video.getId(), captionFile, language, caption.getFlavor().toString());
+          } catch (Exception e) {
+            logger.warn("Failed to upload captions {} for video {}: {}", caption, video.getId(), e.getMessage());
+          }
+        }
+      }
+
       // Create new publication element
       final URL url = new URL("http://www.youtube.com/watch?v=" + video.getId());
       return PublicationImpl.publication(
@@ -394,7 +432,17 @@ public class YouTubeV3PublicationServiceImpl
       MediaPackage mediapackage = MediaPackageParser.getFromXml(arguments.get(0));
       switch (op) {
         case Publish:
-          Publication publicationElement = publish(job, mediapackage, arguments.get(1));
+          final List<Track> captions = new ArrayList<>();
+          if (arguments.size() > 2) {
+            final String[] captionIds = arguments.get(2).split(",");
+            for (String captionId : captionIds) {
+              final Track caption = mediapackage.getTrack(captionId);
+              if (caption != null) {
+                captions.add(caption);
+              }
+            }
+          }
+          Publication publicationElement = publish(job, mediapackage, arguments.get(1), captions);
           return (publicationElement == null) ? null : MediaPackageElementParser.getAsXml(publicationElement);
         case Retract:
           Publication retractedElement = retract(job, mediapackage);

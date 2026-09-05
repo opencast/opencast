@@ -32,6 +32,7 @@ import org.opencastproject.security.api.TrustedHttpClient;
 import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
@@ -64,11 +65,19 @@ public class YouTubePublicationServiceRemoteImpl extends RemoteBase implements Y
   }
 
   @Override
-  public Job publish(MediaPackage mediaPackage, Track track) throws PublicationException {
+  public Job publish(MediaPackage mediaPackage, Track track, List<Track> captions)
+          throws PublicationException {
     final String trackId = track.getIdentifier();
     List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
     params.add(new BasicNameValuePair("mediapackage", MediaPackageParser.getAsXml(mediaPackage)));
     params.add(new BasicNameValuePair("elementId", trackId));
+    if (captions != null && !captions.isEmpty()) {
+      List<String> captionIds = new ArrayList<>();
+      for (Track caption : captions) {
+        captionIds.add(caption.getIdentifier());
+      }
+      params.add(new BasicNameValuePair("captionIds", StringUtils.join(captionIds, ",")));
+    }
     HttpPost post = new HttpPost();
     HttpResponse response = null;
     try {

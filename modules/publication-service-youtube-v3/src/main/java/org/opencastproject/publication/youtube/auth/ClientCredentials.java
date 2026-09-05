@@ -58,8 +58,12 @@ public final class ClientCredentials {
   }
 
   public List<String> getScopes() {
-    return Collections.list("https://www.googleapis.com/auth/youtube",
-        "https://www.googleapis.com/auth/youtube.upload", "https://www.googleapis.com/auth/youtube.readonly");
+    return Collections.list(
+        "https://www.googleapis.com/auth/youtube",
+        "https://www.googleapis.com/auth/youtube.upload",
+        "https://www.googleapis.com/auth/youtube.readonly",
+        "https://www.googleapis.com/auth/youtube.force-ssl"
+    );
   }
 
   public File getClientSecrets() {
