@@ -1,0 +1,1 @@
+When changing the series of an event (e.g. metadata or ACL), those changes are automatically republished to search. In org.opencastproject.event.handler.SearchUpdatedEventHandler.cfg you can now switch off checkAvailability after distributing the changed files, which might improve performance. Default behavior has not changed.
