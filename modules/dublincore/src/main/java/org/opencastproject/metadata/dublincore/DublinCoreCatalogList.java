@@ -24,10 +24,12 @@ package org.opencastproject.metadata.dublincore;
 import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.XmlSafeParser;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.apache.commons.io.IOUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.DOMImplementation;
@@ -150,13 +152,11 @@ public class DublinCoreCatalogList {
   public static DublinCoreCatalogList parse(String dcString) throws IOException {
     List<DublinCoreCatalog> catalogs = new ArrayList<DublinCoreCatalog>();
     if (dcString.startsWith("{")) {
-      JSONObject json;
       try {
-        json = (JSONObject) new JSONParser().parse(dcString);
-        long totalCount = Long.parseLong((String) json.get("totalCount"));
-        JSONArray catalogsArray = (JSONArray) json.get("catalogs");
-        for (Object catalog : catalogsArray) {
-          catalogs.add(DublinCoreJsonFormat.read((JSONObject) catalog));
+        JsonObject json = JsonParser.parseString(dcString).getAsJsonObject();
+        long totalCount = Long.parseLong(json.get("totalCount").getAsString());
+        for (JsonElement catalog : json.getAsJsonArray("catalogs")) {
+          catalogs.add(DublinCoreJsonFormat.read(catalog.getAsJsonObject()));
         }
         return new DublinCoreCatalogList(catalogs, totalCount);
       } catch (Exception e) {
@@ -222,15 +222,14 @@ public class DublinCoreCatalogList {
    *
    * @return serialized array as json array string
    */
-  @SuppressWarnings("unchecked")
   public String getResultsAsJson() {
-    JSONObject jsonObj = new JSONObject();
-    JSONArray jsonArray = new JSONArray();
+    JsonArray jsonArray = new JsonArray();
     for (DublinCoreCatalog catalog : catalogList) {
-      jsonArray.add(DublinCoreJsonFormat.writeJsonObject((DublinCoreCatalog) catalog));
+      jsonArray.add(DublinCoreJsonFormat.writeJsonObject(catalog));
     }
-    jsonObj.put("totalCount", String.valueOf(totalCatalogCount));
-    jsonObj.put("catalogs", jsonArray);
-    return jsonObj.toJSONString();
+    JsonObject jsonObj = new JsonObject();
+    jsonObj.addProperty("totalCount", String.valueOf(totalCatalogCount));
+    jsonObj.add("catalogs", jsonArray);
+    return jsonObj.toString();
   }
 }

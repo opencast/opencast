@@ -47,7 +47,6 @@
     <jersey.version>2.29.1</jersey.version>
     <jettison.version>1.5.4</jettison.version>
     <joda-time.version>2.14.0</joda-time.version>
-    <json-simple.version>1.1.1</json-simple.version>
     <junit5.version>6.0.1</junit5.version>
     <karaf.version>4.4.7</karaf.version>
     <lucene.version>8.7.0</lucene.version>
@@ -1256,17 +1255,6 @@
         <groupId>com.google.code.findbugs</groupId>
         <artifactId>jsr305</artifactId>
         <version>3.0.2</version>
-      </dependency>
-      <dependency>
-        <groupId>com.googlecode.json-simple</groupId>
-        <artifactId>json-simple</artifactId>
-        <version>${json-simple.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.hamcrest</groupId>
-            <artifactId>hamcrest-core</artifactId>
-          </exclusion>
-        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.hamcrest</groupId>

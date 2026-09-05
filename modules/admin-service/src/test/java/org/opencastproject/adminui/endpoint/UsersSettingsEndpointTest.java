@@ -28,11 +28,12 @@ import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses
 
 import org.opencastproject.test.rest.RestServiceTestEnv;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.apache.http.HttpStatus;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
@@ -52,26 +53,25 @@ public class UsersSettingsEndpointTest {
   private static final Logger logger = LoggerFactory.getLogger(UsersSettingsEndpointTest.class);
   private static final RestServiceTestEnv rt = testEnvForClasses(TestUserSettingsEndpoint.class);
 
-  private JSONParser parser;
 
-  private void compareIds(String key, JSONObject expected, JSONObject actual) {
-    JSONArray expectedArray = (JSONArray) expected.get(key);
-    JSONArray actualArray = (JSONArray) actual.get(key);
+  private void compareIds(String key, JsonObject expected, JsonObject actual) {
+    JsonArray expectedArray = expected.getAsJsonArray(key);
+    JsonArray actualArray = actual.getAsJsonArray(key);
 
     Assert.assertEquals(expectedArray.size(), actualArray.size());
-    JSONObject exObject;
-    JSONObject acObject;
+    JsonObject exObject;
+    JsonObject acObject;
     int actualId;
-    for (Object anActualArray : actualArray) {
-      acObject = (JSONObject) anActualArray;
-      actualId = Integer.parseInt(acObject.get("id").toString()) - 1;
-      exObject = (JSONObject) expectedArray.get(actualId);
-      Set exEntrySet = exObject.keySet();
+    for (JsonElement anActualArray : actualArray) {
+      acObject = anActualArray.getAsJsonObject();
+      actualId = acObject.get("id").getAsInt() - 1;
+      exObject = expectedArray.get(actualId).getAsJsonObject();
+      Set<String> exEntrySet = exObject.keySet();
       Assert.assertEquals(exEntrySet.size(), acObject.size());
 
-      for (Object item : exEntrySet) {
-        Object exValue = exObject.get(item);
-        Object acValue = acObject.get(item);
+      for (String item : exEntrySet) {
+        JsonElement exValue = exObject.get(item);
+        JsonElement acValue = acObject.get(item);
         Assert.assertEquals(exValue, acValue);
       }
 
@@ -79,52 +79,53 @@ public class UsersSettingsEndpointTest {
   }
 
   @Test
-  public void testGetUserSettingsInputsDefaultsExpectsDefaultLimitsAndOffsets() throws ParseException, IOException {
+  public void testGetUserSettingsInputsDefaultsExpectsDefaultLimitsAndOffsets() throws IOException {
     InputStream stream = UsersSettingsEndpointTest.class.getResourceAsStream("/usersettings.json");
     InputStreamReader reader = new InputStreamReader(stream);
-    JSONObject expected = (JSONObject) new JSONParser().parse(reader);
-    JSONObject actual = (JSONObject) parser.parse(given().expect().statusCode(HttpStatus.SC_OK)
+    JsonObject expected = JsonParser.parseReader(reader).getAsJsonObject();
+    JsonObject actual = JsonParser.parseString(given().expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON).body("total", equalTo(10)).body("offset", equalTo(0))
-            .body("limit", equalTo(100)).body("results", hasSize(10)).when().get(rt.host("/settings.json")).asString());
+            .body("limit", equalTo(100)).body("results", hasSize(10)).when().get(rt.host("/settings.json")).asString()
+                ).getAsJsonObject();
 
-    logger.info(actual.toJSONString());
+    logger.info(actual.toString());
     compareIds("results", expected, actual);
   }
 
   @Test
-  public void testGetUserSettingsInputsNormalLimitsAndOffsetsExpectsDefaultLimitsAndOffsets() throws ParseException,
+  public void testGetUserSettingsInputsNormalLimitsAndOffsetsExpectsDefaultLimitsAndOffsets() throws Exception,
           IOException {
     InputStream stream = UsersSettingsEndpointTest.class.getResourceAsStream("/usersettings.json");
     InputStreamReader reader = new InputStreamReader(stream);
-    JSONObject expected = (JSONObject) new JSONParser().parse(reader);
+    JsonObject expected = JsonParser.parseReader(reader).getAsJsonObject();
 
-    JSONObject actual = (JSONObject) parser.parse(given().expect().statusCode(HttpStatus.SC_OK)
+    JsonObject actual = JsonParser.parseString(given().expect().statusCode(HttpStatus.SC_OK)
             .contentType(ContentType.JSON).body("total", equalTo(10)).body("offset", equalTo(0))
             .body("limit", equalTo(100)).body("results", hasSize(10)).when()
-            .get(rt.host("/settings.json?limit=100&offset=0")).asString());
+            .get(rt.host("/settings.json?limit=100&offset=0")).asString()).getAsJsonObject();
 
-    logger.info(actual.toJSONString());
+    logger.info(actual.toString());
     compareIds("results", expected, actual);
   }
 
   @Test
-  public void testPostSettingExpectsOK() throws ParseException, IOException {
+  public void testPostSettingExpectsOK() throws IOException {
     String key = "example_key";
     String value = "example_value";
 
-    JSONObject actual = (JSONObject) parser.parse(given().formParam("key", key).formParam("value", value)
+    JsonObject actual = JsonParser.parseString(given().formParam("key", key).formParam("value", value)
             .expect().statusCode(HttpStatus.SC_OK).contentType(ContentType.JSON).body("key", equalTo(key))
-            .body("value", equalTo(value)).when().post(rt.host("setting")).asString());
-    logger.info(actual.toJSONString());
+            .body("value", equalTo(value)).when().post(rt.host("setting")).asString()).getAsJsonObject();
+    logger.info(actual.toString());
   }
 
   @Test
-  public void testDeleteUserSettingExpectsOK() throws ParseException, IOException {
+  public void testDeleteUserSettingExpectsOK() throws IOException {
     given().expect().statusCode(HttpStatus.SC_OK).when().delete(rt.host("/setting/18"));
   }
 
   @Test
-  public void testPutSettingExpectsOK() throws ParseException, IOException {
+  public void testPutSettingExpectsOK() throws IOException {
     String key = TestUserSettingsEndpoint.EXAMPLE_KEY;
     String value = TestUserSettingsEndpoint.EXAMPLE_VALUE;
 
@@ -135,7 +136,6 @@ public class UsersSettingsEndpointTest {
 
   @Before
   public void setUp() {
-    parser = new JSONParser();
   }
 
   @BeforeClass

@@ -43,8 +43,6 @@ import org.opencastproject.util.requests.SortCriterion.Order;
 import com.google.gson.JsonObject;
 
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.JSONAware;
-import org.json.simple.JSONObject;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -55,9 +53,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -222,7 +218,7 @@ public class ServicesEndpoint {
   /**
    * Service UI model. Wrapper class for a {@code ServiceStatistics} class.
    */
-  class Service implements JSONAware {
+  class Service {
     /** Completed model field name. */
     public static final String COMPLETED_NAME = "completed";
     /** Host model field name. */
@@ -343,35 +339,6 @@ public class ServicesEndpoint {
      */
     public boolean getisMaintenance() {
       return serviceStatistics.getServiceRegistration().isInMaintenanceMode();
-    }
-
-    /**
-     * Returns a map of all service fields.
-     * @return a map of all service fields
-     */
-    public Map<String, String> toMap() {
-      Map<String, String> serviceMap = new HashMap<String, String>();
-      serviceMap.put(COMPLETED_NAME, Integer.toString(getCompletedJobs()));
-      serviceMap.put(HOST_NAME, getHost());
-      serviceMap.put(NODE_NAME, getNodeName());
-      serviceMap.put(MEAN_QUEUE_TIME_NAME, Long.toString(getMeanQueueTime()));
-      serviceMap.put(MEAN_RUN_TIME_NAME, Long.toString(getMeanRunTime()));
-      serviceMap.put(NAME_NAME, getName());
-      serviceMap.put(QUEUED_NAME, Integer.toString(getQueuedJobs()));
-      serviceMap.put(RUNNING_NAME, Integer.toString(getRunningJobs()));
-      serviceMap.put(STATUS_NAME, getStatus().name());
-      serviceMap.put(ONLINE_NAME, Boolean.toString(getIsOnline()));
-      serviceMap.put(MAINTENANCE_NAME, Boolean.toString(getisMaintenance()));
-      return serviceMap;
-    }
-
-    /**
-     * Returns a json representation of a service as {@code String}.
-     * @return a json representation of a service as {@code String}
-     */
-    @Override
-    public String toJSONString() {
-      return JSONObject.toJSONString(toMap());
     }
 
     /**

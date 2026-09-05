@@ -36,10 +36,12 @@ import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses
 
 import org.opencastproject.test.rest.RestServiceTestEnv;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonPrimitive;
+
 import org.apache.commons.io.IOUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -57,7 +59,6 @@ public class SeriesEndpointTest {
   private static final RestServiceTestEnv env = testEnvForClasses(TestSeriesEndpoint.class);
 
   /** The json parser */
-  private static final JSONParser parser = new JSONParser();
 
   @BeforeClass
   public static void oneTimeSetUp() {
@@ -74,18 +75,18 @@ public class SeriesEndpointTest {
   public void testGetSeriesListJson() throws Exception {
     final String response = given().log().all().expect().statusCode(SC_OK).when().get(env.host("/")).asString();
 
-    final JSONArray json = (JSONArray) parser.parse(response);
+    final JsonArray json = JsonParser.parseString(response).getAsJsonArray();
     assertEquals(1, json.size());
 
-    final JSONObject series1 = (JSONObject) json.get(0);
-    assertEquals("4fd0ef66-aea5-4b7a-a62a-a4ada0eafd6f", series1.get("identifier"));
-    assertEquals("Via API", series1.get("title"));
-    assertEquals("2015-04-16T09:12:36Z", series1.get("created"));
-    assertEquals("Gracie Walsh", series1.get("creator"));
+    final JsonObject series1 = json.get(0).getAsJsonObject();
+    assertEquals("4fd0ef66-aea5-4b7a-a62a-a4ada0eafd6f", series1.get("identifier").getAsString());
+    assertEquals("Via API", series1.get("title").getAsString());
+    assertEquals("2015-04-16T09:12:36Z", series1.get("created").getAsString());
+    assertEquals("Gracie Walsh", series1.get("creator").getAsString());
 
-    final JSONArray subjects = (JSONArray) series1.get("subjects");
+    final JsonArray subjects = series1.getAsJsonArray("subjects");
     assertEquals(1, subjects.size());
-    assertEquals("Topic", subjects.get(0));
+    assertEquals("Topic", subjects.get(0).getAsString());
   }
 
   /** Unit test for {@link SeriesEndpoint#getSeries(String, String, Boolean)} */
@@ -95,31 +96,31 @@ public class SeriesEndpointTest {
             .accept(APP_V1_0_0_JSON).log().all().expect().statusCode(SC_OK).when().get(env.host("/{seriesId}"))
             .asString();
 
-    final JSONObject json = (JSONObject) parser.parse(response);
-    assertEquals("4fd0ef66-aea5-4b7a-a62a-a4ada0eafd6f", json.get("identifier"));
-    assertEquals("Via API", json.get("title"));
-    assertEquals("A series created over the external API", json.get("description"));
-    assertEquals("opencast", json.get("organization"));
-    assertEquals("Gracie Walsh", json.get("creator"));
-    assertEquals("2015-04-16T09:12:36Z", json.get("created"));
+    final JsonObject json = JsonParser.parseString(response).getAsJsonObject();
+    assertEquals("4fd0ef66-aea5-4b7a-a62a-a4ada0eafd6f", json.get("identifier").getAsString());
+    assertEquals("Via API", json.get("title").getAsString());
+    assertEquals("A series created over the external API", json.get("description").getAsString());
+    assertEquals("opencast", json.get("organization").getAsString());
+    assertEquals("Gracie Walsh", json.get("creator").getAsString());
+    assertEquals("2015-04-16T09:12:36Z", json.get("created").getAsString());
 
-    JSONArray topics = (JSONArray) json.get("subjects");
+    JsonArray topics = json.getAsJsonArray("subjects");
     assertEquals(1, topics.size());
-    assertEquals("Topic", topics.get(0));
+    assertEquals("Topic", topics.get(0).getAsString());
 
-    JSONArray contributors = (JSONArray) json.get("contributors");
-    assertTrue(contributors.contains("Nu'man Farooq Morcos"));
-    assertTrue(contributors.contains("Alfie Gibbons"));
+    JsonArray contributors = json.getAsJsonArray("contributors");
+    assertTrue(contributors.contains(new JsonPrimitive("Nu'man Farooq Morcos")));
+    assertTrue(contributors.contains(new JsonPrimitive("Alfie Gibbons")));
     assertEquals(2, contributors.size());
 
-    JSONArray publishers = (JSONArray) json.get("publishers");
-    assertTrue(publishers.contains("Sophie Chandler"));
+    JsonArray publishers = json.getAsJsonArray("publishers");
+    assertTrue(publishers.contains(new JsonPrimitive("Sophie Chandler")));
     assertEquals(1, publishers.size());
 
-    JSONArray organizers = (JSONArray) json.get("organizers");
-    assertTrue(organizers.contains("Peter Feierabend"));
-    assertTrue(organizers.contains("Florian Naumann"));
-    assertTrue(organizers.contains("Niklas Vogler"));
+    JsonArray organizers = json.getAsJsonArray("organizers");
+    assertTrue(organizers.contains(new JsonPrimitive("Peter Feierabend")));
+    assertTrue(organizers.contains(new JsonPrimitive("Florian Naumann")));
+    assertTrue(organizers.contains(new JsonPrimitive("Niklas Vogler")));
     assertEquals(3, organizers.size());
   }
 
@@ -264,23 +265,23 @@ public class SeriesEndpointTest {
             .accept(APP_V1_0_0_JSON).log().all().expect().statusCode(SC_OK).when().get(env.host("/{seriesId}/acl"))
             .asString();
 
-    final JSONArray json = (JSONArray) parser.parse(response);
+    final JsonArray json = JsonParser.parseString(response).getAsJsonArray();
     assertEquals(3, json.size());
 
-    JSONObject adminRead = new JSONObject();
-    adminRead.put("allow", true);
-    adminRead.put("action", "read");
-    adminRead.put("role", "ROLE_ADMIN");
+    JsonObject adminRead = new JsonObject();
+    adminRead.addProperty("allow", true);
+    adminRead.addProperty("action", "read");
+    adminRead.addProperty("role", "ROLE_ADMIN");
 
-    JSONObject adminWrite = new JSONObject();
-    adminWrite.put("allow", true);
-    adminWrite.put("action", "write");
-    adminWrite.put("role", "ROLE_ADMIN");
+    JsonObject adminWrite = new JsonObject();
+    adminWrite.addProperty("allow", true);
+    adminWrite.addProperty("action", "write");
+    adminWrite.addProperty("role", "ROLE_ADMIN");
 
-    JSONObject anonRead = new JSONObject();
-    anonRead.put("allow", true);
-    anonRead.put("action", "read");
-    anonRead.put("role", "ROLE_ANONYMOUS");
+    JsonObject anonRead = new JsonObject();
+    anonRead.addProperty("allow", true);
+    anonRead.addProperty("action", "read");
+    anonRead.addProperty("role", "ROLE_ANONYMOUS");
 
     assertTrue(json.contains(adminRead));
     assertTrue(json.contains(adminWrite));
@@ -294,10 +295,10 @@ public class SeriesEndpointTest {
             .accept(APP_V1_0_0_JSON).log().all().expect().statusCode(SC_OK).when()
             .get(env.host("/{seriesId}/properties")).asString();
 
-    final JSONObject json = (JSONObject) parser.parse(response);
+    final JsonObject json = JsonParser.parseString(response).getAsJsonObject();
     assertEquals(2, json.size());
-    assertEquals("false", json.get("live"));
-    assertEquals("true", json.get("ondemand"));
+    assertEquals("false", json.get("live").getAsString());
+    assertEquals("true", json.get("ondemand").getAsString());
   }
 
   @Test
@@ -308,8 +309,8 @@ public class SeriesEndpointTest {
             .formParam("acl", updatedAcl).accept(APP_V1_0_0_JSON).log().all().expect().statusCode(SC_OK).when()
             .put(env.host("/{seriesId}/acl")).asString();
 
-    final JSONArray json = (JSONArray) parser.parse(response);
-    assertEquals(parser.parse(updatedAcl), json);
+    final JsonArray json = JsonParser.parseString(response).getAsJsonArray();
+    assertEquals(JsonParser.parseString(updatedAcl), json);
   }
 
   @Test
@@ -319,7 +320,7 @@ public class SeriesEndpointTest {
             .formParam("properties", updatedProperties).accept(APP_V1_0_0_JSON).log().all().expect().statusCode(SC_OK)
             .when().put(env.host("/{seriesId}/properties")).asString();
 
-    final JSONObject json = (JSONObject) parser.parse(response);
-    assertEquals(parser.parse(updatedProperties), json);
+    final JsonObject json = JsonParser.parseString(response).getAsJsonObject();
+    assertEquals(JsonParser.parseString(updatedProperties), json);
   }
 }

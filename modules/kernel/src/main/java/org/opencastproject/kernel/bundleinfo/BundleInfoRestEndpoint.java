@@ -24,19 +24,18 @@ package org.opencastproject.kernel.bundleinfo;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.TEXT_PLAIN_TYPE;
 import static org.opencastproject.util.EqualsUtil.ne;
-import static org.opencastproject.util.Jsons.arr;
-import static org.opencastproject.util.Jsons.obj;
-import static org.opencastproject.util.Jsons.p;
 import static org.opencastproject.util.RestUtil.R.notFound;
 import static org.opencastproject.util.RestUtil.R.ok;
 import static org.opencastproject.util.data.Collections.set;
 import static org.opencastproject.util.data.Collections.toArray;
 
-import org.opencastproject.util.Jsons;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
@@ -48,8 +47,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.DELETE;
@@ -101,11 +98,15 @@ public abstract class BundleInfoRestEndpoint {
           @RestResponse(description = "A list of bundles.", responseCode = HttpServletResponse.SC_OK) },
       returnDescription = "The search results, expressed as xml or json.")
   public Response getVersions() {
-    List<Jsons.Val> bundleInfos = getDb().getBundles().stream()
-        .map(b -> (Jsons.Val) bundleInfo(b))
-        .toList();
+    JsonArray bundleInfos = new JsonArray();
+    for (BundleInfo bundle : getDb().getBundles()) {
+      bundleInfos.add(bundleInfo(bundle));
+    }
 
-    return ok(obj(p("bundleInfos", arr(bundleInfos)), p("count", bundleInfos.size())));
+    JsonObject json = new JsonObject();
+    json.add("bundleInfos", bundleInfos);
+    json.addProperty("count", bundleInfos.size());
+    return ok(json);
   }
 
   /** Return true if all bundles have the same bundle version and build number. */
@@ -169,20 +170,25 @@ public abstract class BundleInfoRestEndpoint {
         case 0:
           // no versions...
           throw new Error("bug");
-        case 1:
+        case 1: {
           // all versions align
-          return ok(obj(p("consistent", true))
-              .append(fullVersionJson(example.getVersion()))
-              .append(obj(p("last-modified", lastModified))));
-        default:
+          JsonObject json = new JsonObject();
+          json.addProperty("consistent", true);
+          merge(json, fullVersionJson(example.getVersion()));
+          json.addProperty("last-modified", lastModified);
+          return ok(json);
+        }
+        default: {
           // multiple versions found
-          return ok(obj(
-              p("consistent", false),
-              p("versions",
-                  arr(StreamSupport.stream(versions.spliterator(), false)
-                      .map(v -> (Jsons.Val) fullVersionJson(v))
-                      .collect(Collectors.toList())))
-          ));
+          JsonArray versionsJson = new JsonArray();
+          for (BundleVersion version : versions) {
+            versionsJson.add(fullVersionJson(version));
+          }
+          JsonObject json = new JsonObject();
+          json.addProperty("consistent", false);
+          json.add("versions", versionsJson);
+          return ok(json);
+        }
       }
     });
   }
@@ -211,19 +217,32 @@ public abstract class BundleInfoRestEndpoint {
     return Response.noContent().build();
   }
 
-  public static final Jsons.Obj fullVersionJson(BundleVersion version) {
-    return obj(
-        p("version", version.getBundleVersion()),
-        p("buildNumber", version.getBuildNumber().map(Jsons::stringVal)));
+  public static JsonObject fullVersionJson(BundleVersion version) {
+    JsonObject json = new JsonObject();
+    json.addProperty("version", version.getBundleVersion());
+    // an absent build number is left out entirely rather than serialized as null
+    version.getBuildNumber().ifPresent(buildNumber -> json.addProperty("buildNumber", buildNumber));
+    return json;
   }
 
-  public static Jsons.Obj bundleInfoJson(BundleInfo bundle) {
-    return obj(p("host", bundle.getHost()), p("bundleSymbolicName", bundle.getBundleSymbolicName()),
-            p("bundleId", bundle.getBundleId())).append(fullVersionJson(bundle.getVersion()));
+  public static JsonObject bundleInfoJson(BundleInfo bundle) {
+    JsonObject json = new JsonObject();
+    json.addProperty("host", bundle.getHost());
+    json.addProperty("bundleSymbolicName", bundle.getBundleSymbolicName());
+    json.addProperty("bundleId", bundle.getBundleId());
+    merge(json, fullVersionJson(bundle.getVersion()));
+    return json;
   }
 
-  public static final Jsons.Obj bundleInfo(BundleInfo bundle) {
+  public static JsonObject bundleInfo(BundleInfo bundle) {
     return bundleInfoJson(bundle);
+  }
+
+  /** Copy all members of <code>source</code> into <code>target</code>, overwriting on conflict. */
+  private static void merge(JsonObject target, JsonObject source) {
+    for (String key : source.keySet()) {
+      target.add(key, source.get(key));
+    }
   }
 
   /** Run <code>f</code> if there is at least one bundle matching the given prefixes. */

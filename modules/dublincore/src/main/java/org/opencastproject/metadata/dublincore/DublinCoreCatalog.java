@@ -514,6 +514,6 @@ public class DublinCoreCatalog extends XMLCatalogImpl implements DublinCore, Met
 
   @Override
   public String toJson() throws IOException {
-    return DublinCoreJsonFormat.writeJsonObject(this).toJSONString();
+    return DublinCoreJsonFormat.writeJsonObject(this).toString();
   }
 }

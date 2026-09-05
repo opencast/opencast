@@ -30,7 +30,6 @@ import org.opencastproject.test.rest.RestServiceTestEnv;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
-import org.json.simple.parser.JSONParser;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -42,7 +41,6 @@ import uk.co.datumedge.hamcrest.json.SameJSONAs;
 public class JobEndpointTest {
   private static final RestServiceTestEnv rt = testEnvForClasses(TestJobEndpoint.class);
 
-  private JSONParser parser;
 
   @Test
   public void testJobsRequest() throws Exception {
@@ -189,7 +187,6 @@ public class JobEndpointTest {
 
   @Before
   public void setUp() {
-    parser = new JSONParser();
   }
 
   @BeforeClass

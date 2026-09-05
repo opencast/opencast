@@ -28,10 +28,10 @@ import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses
 import org.opencastproject.adminui.util.ServiceEndpointTestsUtil;
 import org.opencastproject.test.rest.RestServiceTestEnv;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.apache.commons.httpclient.HttpStatus;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -54,11 +54,9 @@ public class ServicesEndpointTest {
   private static final RestServiceTestEnv rt = testEnvForClasses(TestServicesEndpoint.class);
 
   /** Json parser. */
-  private JSONParser parser;
 
   @Before
   public void setUp() {
-    parser = new JSONParser();
   }
 
   @BeforeClass
@@ -72,12 +70,12 @@ public class ServicesEndpointTest {
   }
 
   @Test
-  public void testSimpleRequest() throws ParseException, IOException {
+  public void testSimpleRequest() throws IOException {
     InputStream stream = ServicesEndpointTest.class.getResourceAsStream(TEST_DATA_JSON);
     InputStreamReader reader = new InputStreamReader(stream);
-    JSONObject expected = (JSONObject) new JSONParser().parse(reader);
-    JSONObject actual = (JSONObject) parser.parse(given().expect().statusCode(HttpStatus.SC_OK)
-            .contentType(ContentType.JSON).when().get(rt.host(TEST_DATA_JSON)).asString());
+    JsonObject expected = JsonParser.parseReader(reader).getAsJsonObject();
+    JsonObject actual = JsonParser.parseString(given().expect().statusCode(HttpStatus.SC_OK)
+            .contentType(ContentType.JSON).when().get(rt.host(TEST_DATA_JSON)).asString()).getAsJsonObject();
 
     ServiceEndpointTestsUtil.testJSONObjectEquality(expected, actual);
   }

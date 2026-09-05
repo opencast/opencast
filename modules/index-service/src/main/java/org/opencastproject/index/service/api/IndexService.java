@@ -43,7 +43,7 @@ import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.workflow.api.WorkflowDatabaseException;
 
-import org.json.simple.JSONObject;
+import com.google.gson.JsonObject;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -314,7 +314,7 @@ public interface IndexService {
    * @throws UnauthorizedException
    *           Thrown if the user cannot create a new series.
    */
-  String createSeries(JSONObject metadata) throws IllegalArgumentException, IndexServiceException,
+  String createSeries(JsonObject metadata) throws IllegalArgumentException, IndexServiceException,
           UnauthorizedException;
 
   /**

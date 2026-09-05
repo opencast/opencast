@@ -32,9 +32,9 @@ import org.opencastproject.util.IoSupport;
 import org.opencastproject.util.PropertiesUtil;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonParser;
 
-import org.json.simple.JSONArray;
-import org.json.simple.parser.JSONParser;
 import org.junit.Before;
 import org.junit.Test;
 import org.osgi.service.component.ComponentException;
@@ -72,7 +72,7 @@ public class MetadataListTest {
   public void testFromJson() throws WebApplicationException, Exception {
     InputStream stream = SeriesEndpointTest.class.getResourceAsStream("/metadata-list-input.json");
     InputStreamReader reader = new InputStreamReader(stream);
-    JSONArray inputJson = (JSONArray) new JSONParser().parse(reader);
+    JsonArray inputJson = JsonParser.parseReader(reader).getAsJsonArray();
 
     DublinCoreMetadataCollection abstractMetadataCollection = episodeDublinCoreCatalogUIAdapter.getRawFields();
 
@@ -85,13 +85,13 @@ public class MetadataListTest {
   public void testLocked() throws WebApplicationException, Exception {
     InputStream stream = SeriesEndpointTest.class.getResourceAsStream("/metadata-list-input-locked.json");
     InputStreamReader reader = new InputStreamReader(stream);
-    JSONArray inputJson = (JSONArray) new JSONParser().parse(reader);
+    JsonArray inputJson = JsonParser.parseReader(reader).getAsJsonArray();
 
     MetadataList metadataList = new MetadataList();
     metadataList.add(episodeDublinCoreCatalogUIAdapter, episodeDublinCoreCatalogUIAdapter.getRawFields());
     metadataList.setLocked(Locked.WORKFLOW_RUNNING);
 
-    assertThat(inputJson.toJSONString(),
+    assertThat(inputJson.toString(),
         SameJSONAs.sameJSONAs(new Gson().toJson(MetadataJson.listToJson(metadataList, true, false)))
         .allowingAnyArrayOrdering());
 

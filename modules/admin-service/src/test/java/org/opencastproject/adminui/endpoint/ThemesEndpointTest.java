@@ -30,13 +30,13 @@ import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses
 import org.opencastproject.test.rest.NotFoundExceptionMapper;
 import org.opencastproject.test.rest.RestServiceTestEnv;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -54,7 +54,6 @@ public class ThemesEndpointTest {
           TestThemesEndpoint.class,
           NotFoundExceptionMapper.class);
   /** A parser for handling JSON documents inside the body of a request. */
-  private final JSONParser parser = new JSONParser();
   private Long foundId = 1L;
   private Long notFoundId = 10L;
 
@@ -69,7 +68,7 @@ public class ThemesEndpointTest {
   }
 
   @Test
-  public void testCreateTheme() throws ParseException, IOException {
+  public void testCreateTheme() throws IOException {
     String themesString = IOUtils.toString(getClass().getResource("/theme-create.json"), "UTF-8");
     Boolean isDefault = true;
     String name = "New Theme Name";
@@ -105,18 +104,18 @@ public class ThemesEndpointTest {
             .formParam("watermarkFile", watermarkFile).expect().statusCode(HttpStatus.SC_OK).when().post(rt.host("/"))
             .asString();
 
-    JSONObject theme = ((JSONObject) parser.parse(result));
+    JsonObject theme = (JsonParser.parseString(result).getAsJsonObject());
     // Make sure the creationDate property exists
-    assertTrue(StringUtils.trimToNull(theme.get("creationDate").toString()) != null);
+    assertTrue(StringUtils.trimToNull(theme.get("creationDate").getAsString()) != null);
     // Remove it from the results
     theme.remove("creationDate");
     logger.info("Expected" + themesString);
-    logger.info("Result: " + theme.toJSONString());
-    assertThat(themesString, SameJSONAs.sameJSONAs(theme.toJSONString()).allowingAnyArrayOrdering());
+    logger.info("Result: " + theme.toString());
+    assertThat(themesString, SameJSONAs.sameJSONAs(theme.toString()).allowingAnyArrayOrdering());
   }
 
   @Test
-  public void testUpdateTheme() throws ParseException, IOException {
+  public void testUpdateTheme() throws IOException {
     String themesString = IOUtils.toString(getClass().getResource("/theme-update.json"), "UTF-8");
     String result = given().pathParam("themeId", 1).formParam("default", true).formParam("name", "new-name")
             .formParam("description", "new-description").formParam("bumperActive", true)
@@ -129,18 +128,18 @@ public class ThemesEndpointTest {
             .formParam("watermarkPosition", "new-watermark-position").formParam("watermarkFile", "new-watermark-file")
             .expect().statusCode(HttpStatus.SC_OK).when().put(rt.host("/{themeId}")).asString();
 
-    JSONObject theme = ((JSONObject) parser.parse(result));
+    JsonObject theme = (JsonParser.parseString(result).getAsJsonObject());
     // Make sure the creationDate property exists
-    assertTrue(StringUtils.trimToNull(theme.get("creationDate").toString()) != null);
+    assertTrue(StringUtils.trimToNull(theme.get("creationDate").getAsString()) != null);
     // Remove it from the results
     theme.remove("creationDate");
     logger.info("Expected" + themesString);
-    logger.info("Result: " + theme.toJSONString());
-    assertThat(themesString, SameJSONAs.sameJSONAs(theme.toJSONString()).allowingAnyArrayOrdering());
+    logger.info("Result: " + theme.toString());
+    assertThat(themesString, SameJSONAs.sameJSONAs(theme.toString()).allowingAnyArrayOrdering());
   }
 
   @Test
-  public void testGetThemes() throws ParseException, IOException {
+  public void testGetThemes() throws IOException {
     String themesString = IOUtils.toString(getClass().getResource("/themes.json"), "UTF-8");
     String result = given().expect().statusCode(HttpStatus.SC_OK).when().get(rt.host("/themes.json")).asString();
     logger.info("Expected" + themesString);
@@ -149,7 +148,7 @@ public class ThemesEndpointTest {
   }
 
   @Test
-  public void testGetTheme() throws ParseException {
+  public void testGetTheme() {
     // Test invalid id
     given().pathParam("themeId", "asdasd").expect().statusCode(HttpStatus.SC_NOT_FOUND).when()
             .get(rt.host("/{themeId}.json")).asString();
@@ -159,14 +158,14 @@ public class ThemesEndpointTest {
     // Test correct id
     String result = given().pathParam("themeId", foundId).expect().statusCode(HttpStatus.SC_OK).when()
             .get(rt.host("/{themeId}.json")).asString();
-    JSONObject theme = ((JSONObject) parser.parse(result));
-    assertEquals(foundId.toString(), theme.get("id").toString());
-    assertEquals("test.mp4", theme.get("bumperFileName").toString());
-    assertEquals("http://localhost:8080/staticfiles/uuid1", theme.get("bumperFileUrl").toString());
+    JsonObject theme = (JsonParser.parseString(result).getAsJsonObject());
+    assertEquals(foundId.toString(), theme.get("id").getAsString());
+    assertEquals("test.mp4", theme.get("bumperFileName").getAsString());
+    assertEquals("http://localhost:8080/staticfiles/uuid1", theme.get("bumperFileUrl").getAsString());
   }
 
   @Test
-  public void testGetThemeUsage() throws ParseException {
+  public void testGetThemeUsage() {
     // Test invalid id
     given().pathParam("themeId", "asdasd").expect().statusCode(HttpStatus.SC_NOT_FOUND).when()
             .get(rt.host("/{themeId}/usage.json")).asString();
@@ -176,12 +175,12 @@ public class ThemesEndpointTest {
     // Test correct id
     String result = given().pathParam("themeId", foundId).expect().statusCode(HttpStatus.SC_OK).when()
             .get(rt.host("/{themeId}/usage.json")).asString();
-    JSONObject series = ((JSONObject) parser.parse(result));
-    JSONArray seriesArr = (JSONArray) series.get("series");
+    JsonObject series = (JsonParser.parseString(result).getAsJsonObject());
+    JsonArray seriesArr = series.getAsJsonArray("series");
     Assert.assertEquals(3, seriesArr.size());
-    JSONObject series1 = (JSONObject) seriesArr.get(0);
-    Assert.assertEquals("Series1Id", series1.get("id").toString());
-    Assert.assertEquals("Series 1 Title", series1.get("title").toString());
+    JsonObject series1 = seriesArr.get(0).getAsJsonObject();
+    Assert.assertEquals("Series1Id", series1.get("id").getAsString());
+    Assert.assertEquals("Series 1 Title", series1.get("title").getAsString());
   }
 
   @Test

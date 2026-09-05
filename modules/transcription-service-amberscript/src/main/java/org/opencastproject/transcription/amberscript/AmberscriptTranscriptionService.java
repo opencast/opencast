@@ -53,6 +53,7 @@ import org.opencastproject.transcription.persistence.TranscriptionDatabase;
 import org.opencastproject.transcription.persistence.TranscriptionDatabaseException;
 import org.opencastproject.transcription.persistence.TranscriptionJobControl;
 import org.opencastproject.transcription.persistence.TranscriptionProviderControl;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.OsgiUtil;
 import org.opencastproject.workflow.api.ConfiguredWorkflow;
@@ -61,6 +62,10 @@ import org.opencastproject.workflow.api.WorkflowInstance;
 import org.opencastproject.workflow.api.WorkflowService;
 import org.opencastproject.workingfilerepository.api.WorkingFileRepository;
 import org.opencastproject.workspace.api.Workspace;
+
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
@@ -76,9 +81,6 @@ import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -549,11 +551,11 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
 
   @Override
   public void transcriptionError(String mpId, Object obj) throws TranscriptionServiceException {
-    JSONObject jsonObj = null;
+    JsonObject jsonObj = null;
     String jobId = null;
     try {
-      jsonObj = (JSONObject) obj;
-      jobId = (String) jsonObj.get("name");
+      jsonObj = (JsonObject) obj;
+      jobId = getString(jsonObj, "name");
       // Update state in database
       database.updateJobControl(jobId, TranscriptionJobControl.Status.Error.name());
       TranscriptionJobControl jobControl = database.findByJob(jobId);
@@ -665,14 +667,13 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
       HttpEntity entity = response.getEntity();
 
       String jsonString = EntityUtils.toString(response.getEntity());
-      JSONParser jsonParser = new JSONParser();
-      JSONObject jsonObject = (JSONObject) jsonParser.parse(jsonString);
+      JsonObject jsonObject = GsonUtil.gson().fromJson(jsonString, JsonObject.class);
 
       logger.debug("Submitting new transcription job: {}" + System.lineSeparator()
               + "Response: {}", removePrivateInfo(submitUrl), jsonString);
 
-      JSONObject result = (JSONObject) jsonObject.get("jobStatus");
-      String jobId = (String) result.get("jobId");
+      JsonObject result = jsonObject.getAsJsonObject("jobStatus");
+      String jobId = getString(result, "jobId");
 
       switch (code) {
         case HttpStatus.SC_OK: // 200
@@ -682,8 +683,8 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
           EntityUtils.consume(entity);
           return;
         default:
-          String error = (String) result.get("error");
-          String message = (String) result.get("message");
+          String error = getString(result, "error");
+          String message = getString(result, "message");
           String msg = String.format("Unable to submit job: API returned %s - %s: %s", code, error, message);
           logger.warn(msg);
           throw new TranscriptionServiceException(msg);
@@ -723,19 +724,18 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
       logger.debug("AmberScript API call was '{}'." + System.lineSeparator() + "Response: {}",
               removePrivateInfo(checkUrl), jsonString);
 
-      JSONParser jsonParser = new JSONParser();
-      JSONObject jsonObject = (JSONObject) jsonParser.parse(jsonString);
+      JsonObject jsonObject = GsonUtil.gson().fromJson(jsonString, JsonObject.class);
 
       switch (code) {
         case HttpStatus.SC_OK:
-          JSONObject result = (JSONObject) jsonObject.get("jobStatus");
-          String status = (String) result.get("status");
+          JsonObject result = jsonObject.getAsJsonObject("jobStatus");
+          String status = getString(result, "status");
           switch (status) {
             case STATUS_OPEN:
               logger.debug("Captions job '{}' has not finished yet.", jobId);
               return false;
             case STATUS_ERROR:
-              var errorMsg = (String) result.get("errorMsg");
+              var errorMsg = getString(result, "errorMsg");
               throw new TranscriptionServiceException(
                       String.format("Captions job '%s' failed: %s", jobId, errorMsg),
                       code,
@@ -752,14 +752,14 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
               return false; // only here to obey checkstyle
           }
         default:
-          String error = (String) jsonObject.get("error");
-          String errorMessage = (String) jsonObject.get("errorMessage");
+          String error = getString(jsonObject, "error");
+          String errorMessage = getString(jsonObject, "errorMessage");
           logger.warn("Error while checking status: {}."
                   + System.lineSeparator() + "{}: {}", code, error, errorMessage);
           throw new TranscriptionServiceException(
                   String.format("Captions job '%s' failed: Return Code %d", jobId, code), code);
       }
-    } catch (TranscriptionDatabaseException | IOException | ParseException e) {
+    } catch (TranscriptionDatabaseException | IOException | JsonParseException e) {
       logger.warn("Error while checking status: {}", e.toString());
     } finally {
       try {
@@ -1115,6 +1115,12 @@ public class AmberscriptTranscriptionService extends AbstractJobProducer impleme
         logger.warn("Could not cleanup old submission and transcript results files", e);
       }
     }
+  }
+
+  /** Read a string member, returning null when it is absent or JSON null. */
+  private static String getString(JsonObject json, String key) {
+    JsonElement value = json.get(key);
+    return value == null || value.isJsonNull() ? null : value.getAsString();
   }
 
   private String removePrivateInfo(String unsafeString) {

@@ -32,9 +32,10 @@ import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses
 import org.opencastproject.playlists.Playlist;
 import org.opencastproject.test.rest.RestServiceTestEnv;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -45,7 +46,6 @@ public class PlaylistsEndpointTest {
   /** The REST test environment */
   private static final RestServiceTestEnv env = testEnvForClasses(TestPlaylistsEndpoint.class);
 
-  private static final JSONParser parser = new JSONParser();
 
   private static final String PLAYLIST_ID = "28";
   private static final String MISSING_PLAYLIST_ID = "4444";
@@ -64,30 +64,30 @@ public class PlaylistsEndpointTest {
     env.tearDownServer();
   }
 
-  private void assertPlaylist(JSONObject json) {
-    assertEquals("title", json.get("title"));
-    assertEquals("description", json.get("description"));
-    assertEquals("creator", json.get("creator"));
-    assertEquals("2023-11-30T16:16:47Z", json.get("updated"));
+  private void assertPlaylist(JsonObject json) {
+    assertEquals("title", json.get("title").getAsString());
+    assertEquals("description", json.get("description").getAsString());
+    assertEquals("creator", json.get("creator").getAsString());
+    assertEquals("2023-11-30T16:16:47Z", json.get("updated").getAsString());
 
-    final JSONArray entries = (JSONArray) json.get("entries");
+    final JsonArray entries = json.getAsJsonArray("entries");
     assertEquals(2, entries.size());
 
-    final JSONObject entry = (JSONObject) entries.get(0);
-    assertEquals("1234", entry.get("contentId"));
-    assertEquals("EVENT", entry.get("type"));
+    final JsonObject entry = entries.get(0).getAsJsonObject();
+    assertEquals("1234", entry.get("contentId").getAsString());
+    assertEquals("EVENT", entry.get("type").getAsString());
 
-    final JSONObject entryTwo = (JSONObject) entries.get(1);
-    assertEquals("abcd", entryTwo.get("contentId"));
-    assertEquals("EVENT", entryTwo.get("type"));
+    final JsonObject entryTwo = entries.get(1).getAsJsonObject();
+    assertEquals("abcd", entryTwo.get("contentId").getAsString());
+    assertEquals("EVENT", entryTwo.get("type").getAsString());
 
-    final JSONArray accessControlEntries = (JSONArray) json.get("accessControlEntries");
+    final JsonArray accessControlEntries = json.getAsJsonArray("accessControlEntries");
     assertEquals(1, accessControlEntries.size());
 
-    final JSONObject accessControlEntry = (JSONObject) accessControlEntries.get(0);
-    assertEquals(true, accessControlEntry.get("allow"));
-    assertEquals("ROLE_USER_BOB", accessControlEntry.get("role"));
-    assertEquals("read", accessControlEntry.get("action"));
+    final JsonObject accessControlEntry = accessControlEntries.get(0).getAsJsonObject();
+    assertEquals(true, accessControlEntry.get("allow").getAsBoolean());
+    assertEquals("ROLE_USER_BOB", accessControlEntry.get("role").getAsString());
+    assertEquals("read", accessControlEntry.get("action").getAsString());
   }
 
   @Test
@@ -99,7 +99,7 @@ public class PlaylistsEndpointTest {
         .get(env.host("/{id}"))
         .asString();
 
-    assertPlaylist((JSONObject) parser.parse(response));
+    assertPlaylist(JsonParser.parseString(response).getAsJsonObject());
   }
 
   @Test
@@ -132,8 +132,8 @@ public class PlaylistsEndpointTest {
         .get(env.host("/"))
         .asString();
 
-    JSONArray playlists = (JSONArray) parser.parse(response);
-    assertPlaylist((JSONObject) playlists.get(0));
+    JsonArray playlists = JsonParser.parseString(response).getAsJsonArray();
+    assertPlaylist(playlists.get(0).getAsJsonObject());
   }
 
   @Test
@@ -145,7 +145,7 @@ public class PlaylistsEndpointTest {
         .post(env.host("/"))
         .asString();
 
-    assertPlaylist((JSONObject) parser.parse(response));
+    assertPlaylist(JsonParser.parseString(response).getAsJsonObject());
   }
 
   @Test

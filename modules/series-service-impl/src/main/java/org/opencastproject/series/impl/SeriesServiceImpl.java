@@ -60,7 +60,6 @@ import org.opencastproject.series.impl.persistence.SeriesEntity;
 import org.opencastproject.util.NotFoundException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.parser.ParseException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -547,7 +546,7 @@ public class SeriesServiceImpl extends AbstractIndexProducer implements SeriesSe
                     updatedSeriesData = getExtendedMetadataUpdateFunction(seriesId, dc, entry.getKey(),
                             organization.getId()).apply(updatedSeriesData);
 
-                  } catch (IOException | ParseException | ParserConfigurationException | SAXException e) {
+                  } catch (IOException | ParserConfigurationException | SAXException e) {
                     logger.error("Could not parse series element {} of series {} as a dublin core catalog, skipping.",
                             entry.getKey(), seriesId, e);
                   }

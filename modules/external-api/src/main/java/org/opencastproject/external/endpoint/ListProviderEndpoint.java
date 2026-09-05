@@ -33,8 +33,8 @@ import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
 
-import org.json.simple.JSONArray;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -103,11 +103,15 @@ public class ListProviderEndpoint {
       },
       returnDescription = "")
   public Response getAvailableProviders(@HeaderParam("Accept") String acceptHeader) {
-    JSONArray list = new JSONArray();
+    // The provider names are nested one level deep, as an array inside the response array. Odd, but it is
+    // the published shape of this response, so it is kept.
+    JsonArray providers = new JsonArray();
+    listProvidersService.getAvailableProviders().forEach(providers::add);
 
-    list.add(listProvidersService.getAvailableProviders());
+    JsonArray list = new JsonArray();
+    list.add(providers);
 
-    return ApiResponseBuilder.Json.ok(acceptHeader, list.toJSONString());
+    return ApiResponseBuilder.Json.ok(acceptHeader, list.toString());
   }
 
   @GET

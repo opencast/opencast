@@ -31,10 +31,9 @@ import static org.opencastproject.capture.CaptureParameters.CAPTURE_DEVICE_NAMES
 import org.opencastproject.capture.admin.api.Agent;
 import org.opencastproject.capture.admin.api.CaptureAgentStateService;
 
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -43,6 +42,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Properties;
@@ -78,44 +78,44 @@ public class TestCaptureAgentsEndpoint extends CaptureAgentsEndpoint {
     setAgentStateService(agentStateService);
   }
 
-  @SuppressWarnings("unchecked")
-  public static List<Agent> loadAgents() throws IOException, URISyntaxException, ParseException {
-    JSONParser parser = new JSONParser();
-    JSONArray json = (JSONArray) parser.parse(readResource(AGENTS_PATH));
-    return (List<Agent>) json.stream()
-        .map(j -> mockAgent((JSONObject) j))
+  public static List<Agent> loadAgents() throws IOException, URISyntaxException {
+    JsonArray json = JsonParser.parseString(readResource(AGENTS_PATH)).getAsJsonArray();
+    return json.asList().stream()
+        .map(j -> mockAgent(j.getAsJsonObject()))
         .collect(Collectors.toList());
   }
 
-  public static JSONObject toJson(Agent agent) {
-    final JSONObject result = new JSONObject();
-    result.put(JSON_KEY_UPDATE, DateTimeFormatter.ISO_DATE_TIME.format(
+  public static JsonObject toJson(Agent agent) {
+    final JsonObject result = new JsonObject();
+    result.addProperty(JSON_KEY_UPDATE, DateTimeFormatter.ISO_DATE_TIME.format(
         Instant.ofEpochMilli(agent.getLastHeardFrom()).atZone(UTC)));
-    result.put(JSON_KEY_AGENT_ID, agent.getName());
-    result.put(JSON_KEY_STATUS, agent.getState());
-    result.put(JSON_KEY_URL, agent.getUrl());
-    JSONArray inputs = new JSONArray();
-    inputs.addAll(Arrays.asList(agent.getCapabilities().getProperty(CAPTURE_DEVICE_NAMES).split(",")));
-    result.put(JSON_KEY_INPUTS, inputs);
+    result.addProperty(JSON_KEY_AGENT_ID, agent.getName());
+    result.addProperty(JSON_KEY_STATUS, agent.getState());
+    result.addProperty(JSON_KEY_URL, agent.getUrl());
+    JsonArray inputs = new JsonArray();
+    Arrays.asList(agent.getCapabilities().getProperty(CAPTURE_DEVICE_NAMES).split(",")).forEach(inputs::add);
+    result.add(JSON_KEY_INPUTS, inputs);
     return result;
   }
 
-  public static JSONArray toJson(List<Agent> agents) {
-    JSONArray result = new JSONArray();
-    result.addAll(agents.stream().map(a -> toJson(a)).collect(Collectors.toList()));
+  public static JsonArray toJson(List<Agent> agents) {
+    JsonArray result = new JsonArray();
+    agents.stream().map(a -> toJson(a)).forEach(result::add);
     return result;
   }
 
-  private static Agent mockAgent(JSONObject json) {
+  private static Agent mockAgent(JsonObject json) {
     Agent agent = createNiceMock(Agent.class);
-    final String update = (String) json.get(JSON_KEY_UPDATE);
+    final String update = json.get(JSON_KEY_UPDATE).getAsString();
     long updateMillis = Instant.from(DateTimeFormatter.ISO_DATE_TIME.parse(update)).toEpochMilli();
-    expect(agent.getName()).andReturn((String) json.get(JSON_KEY_AGENT_ID)).anyTimes();
-    expect(agent.getState()).andReturn((String) json.get(JSON_KEY_STATUS)).anyTimes();
+    expect(agent.getName()).andReturn(json.get(JSON_KEY_AGENT_ID).getAsString()).anyTimes();
+    expect(agent.getState()).andReturn(json.get(JSON_KEY_STATUS).getAsString()).anyTimes();
     expect(agent.getLastHeardFrom()).andReturn(updateMillis).anyTimes();
-    expect(agent.getUrl()).andReturn((String) json.get(JSON_KEY_URL)).anyTimes();
+    expect(agent.getUrl()).andReturn(json.get(JSON_KEY_URL).getAsString()).anyTimes();
     Properties capabilities = new Properties();
-    capabilities.setProperty(CAPTURE_DEVICE_NAMES, String.join(",", ((JSONArray) json.get(JSON_KEY_INPUTS))));
+    List<String> inputs = new ArrayList<>();
+    json.getAsJsonArray(JSON_KEY_INPUTS).forEach(input -> inputs.add(input.getAsString()));
+    capabilities.setProperty(CAPTURE_DEVICE_NAMES, String.join(",", inputs));
     expect(agent.getCapabilities()).andReturn(capabilities).anyTimes();
     replay(agent);
     return agent;

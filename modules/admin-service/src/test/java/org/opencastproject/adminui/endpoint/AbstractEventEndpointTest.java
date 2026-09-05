@@ -48,13 +48,13 @@ import org.opencastproject.test.rest.NotFoundExceptionMapper;
 import org.opencastproject.test.rest.RestServiceTestEnv;
 import org.opencastproject.workflow.api.WorkflowService;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpStatus;
 import org.easymock.EasyMock;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -205,10 +205,10 @@ public class AbstractEventEndpointTest {
             .formParam("text", "Text").expect().statusCode(HttpStatus.SC_OK).when()
             .put(rt.host("{eventId}/comment/{commentId}/{replyId}")).asString();
 
-    JSONObject parse = (JSONObject) new JSONParser().parse(result);
-    JSONArray replies = (JSONArray) parse.get("replies");
-    JSONObject reply = (JSONObject) replies.get(0);
-    Assert.assertEquals("Text", reply.get("text"));
+    JsonObject parse = JsonParser.parseString(result).getAsJsonObject();
+    JsonArray replies = parse.getAsJsonArray("replies");
+    JsonObject reply = replies.get(0).getAsJsonObject();
+    Assert.assertEquals("Text", reply.get("text").getAsString());
   }
 
   @Test
@@ -220,11 +220,11 @@ public class AbstractEventEndpointTest {
             .formParam("resolved", true).expect().statusCode(HttpStatus.SC_OK).when()
             .post(rt.host("{eventId}/comment/{commentId}/reply")).asString();
 
-    JSONObject parse = (JSONObject) new JSONParser().parse(result);
-    JSONArray replies = (JSONArray) parse.get("replies");
-    JSONObject reply = (JSONObject) replies.get(1);
-    Assert.assertEquals("Text", reply.get("text"));
-    Assert.assertEquals(true, parse.get("resolvedStatus"));
+    JsonObject parse = JsonParser.parseString(result).getAsJsonObject();
+    JsonArray replies = parse.getAsJsonArray("replies");
+    JsonObject reply = replies.get(1).getAsJsonObject();
+    Assert.assertEquals("Text", reply.get("text").getAsString());
+    Assert.assertEquals(true, parse.get("resolvedStatus").getAsBoolean());
   }
 
   @Test
@@ -515,30 +515,32 @@ public class AbstractEventEndpointTest {
     given().pathParam("eventId", "notExists").expect().statusCode(HttpStatus.SC_NOT_FOUND).when()
             .get(rt.host("{eventId}/access.json"));
 
-    JSONObject result = (JSONObject) new JSONParser().parse(given().pathParam("eventId", "asdasd").expect()
-            .statusCode(HttpStatus.SC_OK).when().get(rt.host("{eventId}/access.json")).asString());
+    JsonObject result = JsonParser.parseString(given().pathParam("eventId", "asdasd").expect()
+            .statusCode(HttpStatus.SC_OK).when().get(rt.host("{eventId}/access.json")).asString())
+            .getAsJsonObject();
 
-    // Fix ordering for embedded acl json string
+    // The fixture carries the acl as an embedded json string, the response as an array. Compare them as json,
+    // then put the fixture's form back so the documents can be compared as a whole.
     String expectedAclString = getAclString(eventAccessJson);
-    JSONArray aclString = getAclArray(result.toJSONString());
-    assertThat(expectedAclString, SameJSONAs.sameJSONAs(aclString.toJSONString()));
+    JsonArray aclString = getAclArray(result.toString());
+    assertThat(expectedAclString, SameJSONAs.sameJSONAs(aclString.toString()));
 
-    JSONObject episodeAccess = (JSONObject) result.get("episode_access");
-    episodeAccess.replace("acl", expectedAclString);
+    JsonObject episodeAccess = result.getAsJsonObject("episode_access");
+    episodeAccess.addProperty("acl", expectedAclString);
 
-    assertThat(eventAccessJson, SameJSONAs.sameJSONAs(result.toJSONString()));
+    assertThat(eventAccessJson, SameJSONAs.sameJSONAs(result.toString()));
   }
 
-  private String getAclString(String accessJsonString) throws ParseException {
-    JSONObject accessJson = (JSONObject) new JSONParser().parse(accessJsonString);
-    JSONObject episodeAccess = (JSONObject) accessJson.get("episode_access");
-    return (String) episodeAccess.get("acl");
+  private String getAclString(String accessJsonString) {
+    JsonObject accessJson = JsonParser.parseString(accessJsonString).getAsJsonObject();
+    JsonObject episodeAccess = accessJson.getAsJsonObject("episode_access");
+    return episodeAccess.get("acl").getAsString();
   }
 
-  private JSONArray getAclArray(String accessJsonString) throws ParseException {
-    JSONObject accessJson = (JSONObject) new JSONParser().parse(accessJsonString);
-    JSONObject episodeAccess = (JSONObject) accessJson.get("episode_access");
-    return (JSONArray) episodeAccess.get("acl");
+  private JsonArray getAclArray(String accessJsonString) {
+    JsonObject accessJson = JsonParser.parseString(accessJsonString).getAsJsonObject();
+    JsonObject episodeAccess = accessJson.getAsJsonObject("episode_access");
+    return episodeAccess.getAsJsonArray("acl");
   }
 
   @Test

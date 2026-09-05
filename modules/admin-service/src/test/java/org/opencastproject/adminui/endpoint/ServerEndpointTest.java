@@ -28,10 +28,10 @@ import static org.opencastproject.test.rest.RestServiceTestEnv.testEnvForClasses
 import org.opencastproject.adminui.util.ServiceEndpointTestsUtil;
 import org.opencastproject.test.rest.RestServiceTestEnv;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import org.apache.commons.httpclient.HttpStatus;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
@@ -46,12 +46,11 @@ import io.restassured.http.ContentType;
 public class ServerEndpointTest {
   private static final RestServiceTestEnv rt = testEnvForClasses(TestServerEndpoint.class);
 
-  private JSONParser parser;
 
   @Test
-  public void testSimpleRequest() throws ParseException, IOException {
+  public void testSimpleRequest() throws IOException {
     InputStream stream = ServerEndpointTest.class.getResourceAsStream("/servers.json");
-    JSONObject expected = (JSONObject) new JSONParser().parse(new InputStreamReader(stream));
+    JsonObject expected = JsonParser.parseReader(new InputStreamReader(stream)).getAsJsonObject();
     String response = given()
         .param("limit", 5)
         .expect()
@@ -60,7 +59,7 @@ public class ServerEndpointTest {
         .when()
         .get(rt.host("/servers.json"))
         .asString();
-    JSONObject actual = (JSONObject) parser.parse(response);
+    JsonObject actual = JsonParser.parseString(response).getAsJsonObject();
 
     ServiceEndpointTestsUtil.testJSONObjectEquality(expected, actual);
   }
@@ -224,7 +223,7 @@ public class ServerEndpointTest {
   }
 
   @Test
-  public void testSortCores() throws ParseException {
+  public void testSortCores() {
     given().param("sort", "CORES:ASC")
         .param("limit", 5)
         .expect()
@@ -251,7 +250,7 @@ public class ServerEndpointTest {
   }
 
   @Test
-  public void testSortHostName() throws ParseException {
+  public void testSortHostName() {
     given().param("sort", "HOSTNAME:ASC")
         .param("limit", 5)
         .expect()
@@ -278,7 +277,7 @@ public class ServerEndpointTest {
   }
 
   @Test
-  public void testSortStatus() throws ParseException {
+  public void testSortStatus() {
     given().param("sort", "ONLINE:ASC")
         .param("limit", 5)
         .expect()
@@ -304,7 +303,6 @@ public class ServerEndpointTest {
 
   @Before
   public void setUp() {
-    parser = new JSONParser();
   }
 
   @BeforeClass

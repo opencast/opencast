@@ -50,6 +50,7 @@ import org.opencastproject.serviceregistry.api.ServiceState;
 import org.opencastproject.serviceregistry.api.SystemLoad;
 import org.opencastproject.serviceregistry.impl.ServiceRegistryJpaImpl;
 import org.opencastproject.systems.OpencastConstants;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.doc.rest.RestParameter;
@@ -58,9 +59,11 @@ import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
+
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONValue;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -69,6 +72,7 @@ import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -1035,13 +1039,24 @@ public class ServiceRegistryEndpoint {
       },
       responses = {
           @RestResponse(responseCode = SC_NO_CONTENT, description = "Jobs successfully removed"),
+          @RestResponse(responseCode = SC_BAD_REQUEST, description = "jobIds is not a JSON array of identifiers"),
           @RestResponse(responseCode = HttpServletResponse.SC_INTERNAL_SERVER_ERROR,
               description = "Error while removing jobs")
       })
   public Response removeParentlessJobs(@FormParam("jobIds") String jobIds) throws NotFoundException {
+    final List<Long> jobIdList = new ArrayList<>();
     try {
-      final JSONArray array = (JSONArray) JSONValue.parse(jobIds);
-      final List<Long> jobIdList = Arrays.asList((Long[]) array.toArray(new Long[0]));
+      final JsonArray array = GsonUtil.gson().fromJson(jobIds, JsonArray.class);
+      if (array == null) {
+        throw new JsonParseException("jobIds is empty");
+      }
+      for (JsonElement id : array) {
+        jobIdList.add(id.getAsLong());
+      }
+    } catch (JsonParseException | IllegalStateException | NumberFormatException e) {
+      return Response.status(Status.BAD_REQUEST).entity("jobIds must be a JSON array of job identifiers").build();
+    }
+    try {
       serviceRegistry.removeJobs(jobIdList);
       return Response.noContent().build();
     } catch (ServiceRegistryException e) {

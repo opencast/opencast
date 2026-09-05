@@ -70,6 +70,7 @@ import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.DateTimeSupport;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.RestUtil.R;
@@ -82,14 +83,12 @@ import org.opencastproject.util.doc.rest.RestService;
 import org.opencastproject.util.requests.SortCriterion;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 
 import org.apache.commons.lang3.StringUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -748,7 +747,7 @@ public class SeriesEndpoint {
     Map<String, String> updatedFields;
     try {
       updatedFields = RequestUtils.getKeyValueMap(metadataJSON);
-    } catch (ParseException e) {
+    } catch (JsonParseException | IllegalStateException e) {
       logger.debug("Unable to update series '{}' with metadata type '{}' and content '{}'", id, type, metadataJSON, e);
       return RestUtil.R.badRequest(String.format("Unable to parse metadata fields as json from '%s' because '%s'",
               metadataJSON, e.getMessage()));
@@ -899,7 +898,6 @@ public class SeriesEndpoint {
   public Response getSeriesAcl(@HeaderParam("Accept") String acceptHeader, @PathParam("seriesId") String id)
           throws Exception {
     final ApiVersion requestedVersion = ApiMediaType.parse(acceptHeader).getVersion();
-    JSONParser parser = new JSONParser();
     Optional<Series> optSeries = elasticsearchIndex.getSeries(id, securityService.getOrganization(),
         securityService.getUser());
     if (optSeries.isPresent()) {
@@ -908,13 +906,13 @@ public class SeriesEndpoint {
       if (series.getAccessPolicy() == null) {
         return ApiResponseBuilder.notFound("Acl for series with id '%s' is not defined.", id);
       }
-      JSONObject acl = (JSONObject) parser.parse(series.getAccessPolicy());
+      JsonObject acl = GsonUtil.gson().fromJson(series.getAccessPolicy(), JsonObject.class);
 
-      if (!((JSONObject) acl.get("acl")).containsKey("ace")) {
+      if (!acl.getAsJsonObject("acl").has("ace")) {
         return ApiResponseBuilder.notFound("Cannot find acl for series with id '%s'.", id);
       } else {
-        return ApiResponseBuilder.Json.ok(requestedVersion, ((JSONArray) ((JSONObject) acl.get("acl")).get("ace"))
-            .toJSONString());
+        return ApiResponseBuilder.Json.ok(requestedVersion, acl.getAsJsonObject("acl").getAsJsonArray("ace")
+            .toString());
       }
     }
 
@@ -1053,7 +1051,7 @@ public class SeriesEndpoint {
     MetadataList metadataList;
     try {
       metadataList = deserializeMetadataList(metadataParam);
-    } catch (ParseException e) {
+    } catch (JsonParseException e) {
       logger.debug("Unable to parse series metadata '{}'", metadataParam, e);
       return R.badRequest(String.format("Unable to parse metadata because '%s'", e.getMessage()));
     } catch (NotFoundException e) {
@@ -1076,7 +1074,7 @@ public class SeriesEndpoint {
     AccessControlList acl;
     try {
       acl = AclUtils.deserializeJsonToAcl(aclParam, false);
-    } catch (ParseException e) {
+    } catch (JsonParseException | IllegalStateException e) {
       logger.debug("Unable to parse acl '{}'", aclParam, e);
       return R.badRequest(String.format("Unable to parse acl '%s' because '%s'", aclParam, e.getMessage()));
     } catch (IllegalArgumentException e) {
@@ -1102,22 +1100,21 @@ public class SeriesEndpoint {
    * @param json
    *          The json string that contains an array of metadata field lists for the different catalogs.
    * @return A {@link MetadataList} with the fields populated with the values provided.
-   * @throws ParseException
+   * @throws JsonParseException
    *           Thrown if unable to parse the json string.
    * @throws NotFoundException
    *           Thrown if unable to find the catalog or field that the json refers to.
    */
-  protected MetadataList deserializeMetadataList(String json) throws ParseException, NotFoundException {
+  protected MetadataList deserializeMetadataList(String json) throws NotFoundException {
     MetadataList metadataList = new MetadataList();
-    JSONParser parser = new JSONParser();
-    JSONArray jsonCatalogs = (JSONArray) parser.parse(json);
-    for (int i = 0; i < jsonCatalogs.size(); i++) {
-      JSONObject catalog = (JSONObject) jsonCatalogs.get(i);
-      if (catalog.get("flavor") == null || StringUtils.isBlank(catalog.get("flavor").toString())) {
+    JsonArray jsonCatalogs = GsonUtil.gson().fromJson(json, JsonArray.class);
+    for (JsonElement catalogElement : jsonCatalogs) {
+      JsonObject catalog = catalogElement.getAsJsonObject();
+      String flavorString = GsonUtil.getStringOrNull(catalog, "flavor");
+      if (StringUtils.isBlank(flavorString)) {
         throw new IllegalArgumentException(
                 "Unable to create new series as no flavor was given for one of the metadata collections");
       }
-      String flavorString = catalog.get("flavor").toString();
 
       MediaPackageElementFlavor flavor = MediaPackageElementFlavor.parseFlavor(flavorString);
 
@@ -1138,6 +1135,7 @@ public class SeriesEndpoint {
       }
 
       String fieldsJson = catalog.get("fields").toString();
+      // toString() is the JSON text here on purpose: getKeyValueMap parses it again.
       if (StringUtils.trimToNull(fieldsJson) != null) {
         Map<String, String> fields = RequestUtils.getKeyValueMap(fieldsJson);
         for (String key : fields.keySet()) {
@@ -1149,10 +1147,12 @@ public class SeriesEndpoint {
             }
             collection.removeField(field);
             try {
-              JSONArray subjects = (JSONArray) parser.parse(fields.get(key));
+              JsonArray subjects = GsonUtil.gson().fromJson(fields.get(key), JsonArray.class);
+              List<String> subjectValues = new ArrayList<>();
+              subjects.forEach(subject -> subjectValues.add(GsonUtil.asText(subject)));
               collection.addField(
-                      MetadataJson.copyWithDifferentJsonValue(field, StringUtils.join(subjects.iterator(), ",")));
-            } catch (ParseException e) {
+                      MetadataJson.copyWithDifferentJsonValue(field, StringUtils.join(subjectValues, ",")));
+            } catch (JsonParseException e) {
               throw new IllegalArgumentException(
                       String.format("Unable to parse the 'subjects' metadata array field because: %s", e.toString()));
             }
@@ -1205,22 +1205,21 @@ public class SeriesEndpoint {
       override = false;
     }
 
-    JSONParser parser = new JSONParser();
-    JSONArray acl;
+    JsonArray acl;
     try {
-      acl = (JSONArray) parser.parse(aclJson);
-    } catch (ParseException e) {
+      acl = GsonUtil.gson().fromJson(aclJson, JsonArray.class);
+    } catch (JsonParseException e) {
       logger.debug("Could not parse ACL ({})", aclJson, e);
       return R.badRequest("Could not parse ACL");
     }
 
-    List<AccessControlEntry> accessControlEntries = ((List<?>) acl).stream()
+    List<AccessControlEntry> accessControlEntries = acl.asList().stream()
         .map(a -> {
-          JSONObject ace = (JSONObject) a;
+          JsonObject ace = a.getAsJsonObject();
           return new AccessControlEntry(
-              (String) ace.get("role"),
-              (String) ace.get("action"),
-              (Boolean) ace.get("allow")
+              GsonUtil.getStringOrNull(ace, "role"),
+              GsonUtil.getStringOrNull(ace, "action"),
+              ace.get("allow").getAsBoolean()
           );
         })
         .collect(Collectors.toList());
@@ -1255,18 +1254,16 @@ public class SeriesEndpoint {
       return R.badRequest("Missing form parameter 'acl'");
     }
 
-    JSONParser parser = new JSONParser();
-    JSONObject props;
+    JsonObject props;
     try {
-      props = (JSONObject) parser.parse(propertiesJson);
-    } catch (ParseException e) {
+      props = GsonUtil.gson().fromJson(propertiesJson, JsonObject.class);
+    } catch (JsonParseException e) {
       logger.debug("Could not parse properties ({})", propertiesJson, e);
       return R.badRequest("Could not parse series properties");
     }
 
-    for (Object prop : props.entrySet()) {
-      Entry<String, Object> field = (Entry<String, Object>) prop;
-      seriesService.updateSeriesProperty(seriesID, field.getKey(), field.getValue().toString());
+    for (Entry<String, JsonElement> field : props.entrySet()) {
+      seriesService.updateSeriesProperty(seriesID, field.getKey(), GsonUtil.asText(field.getValue()));
     }
 
     return ApiResponseBuilder.Json.ok(acceptHeader, propertiesJson);

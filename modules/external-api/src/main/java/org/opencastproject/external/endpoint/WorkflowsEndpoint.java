@@ -38,6 +38,7 @@ import org.opencastproject.mediapackage.MediaPackage;
 import org.opencastproject.rest.RestConstants;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.systems.OpencastConstants;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.UrlSupport;
@@ -56,11 +57,9 @@ import org.opencastproject.workflow.api.WorkflowStateException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -108,6 +107,16 @@ import javax.ws.rs.core.Response;
 @JaxrsResource
 public class WorkflowsEndpoint {
   /** The logging facility */
+  /** Flatten a JSON object of scalars into a string map. */
+  private static Map<String, String> toStringMap(JsonObject json) {
+    Map<String, String> map = new HashMap<>();
+    for (String key : json.keySet()) {
+      JsonElement value = json.get(key);
+      map.put(key, value.isJsonNull() ? null : (value.isJsonPrimitive() ? value.getAsString() : value.toString()));
+    }
+    return map;
+  }
+
   private static final Logger logger = LoggerFactory.getLogger(WorkflowsEndpoint.class);
 
   /** Base URL of this endpoint */
@@ -208,10 +217,9 @@ public class WorkflowsEndpoint {
       // Configuration
       Map<String, String> properties = new HashMap<>();
       if (isNoneBlank(configuration)) {
-        JSONParser parser = new JSONParser();
         try {
-          properties.putAll((JSONObject) parser.parse(configuration));
-        } catch (ParseException e) {
+          properties.putAll(toStringMap(GsonUtil.gson().fromJson(configuration, JsonObject.class)));
+        } catch (JsonParseException | IllegalStateException e) {
           return RestUtil.R.badRequest("Passed parameter 'configuration' is invalid JSON.");
         }
       }
@@ -313,9 +321,8 @@ public class WorkflowsEndpoint {
 
       // Configuration
       if (isNoneBlank(configuration)) {
-        JSONParser parser = new JSONParser();
         try {
-          Map<String, String> properties = new HashMap<>((JSONObject) parser.parse(configuration));
+          Map<String, String> properties = toStringMap(GsonUtil.gson().fromJson(configuration, JsonObject.class));
 
           // Remove old configuration
           wi.getConfigurationKeys().forEach(wi::removeConfiguration);
@@ -323,7 +330,7 @@ public class WorkflowsEndpoint {
           properties.forEach(wi::setConfiguration);
 
           changed = true;
-        } catch (ParseException e) {
+        } catch (JsonParseException | IllegalStateException e) {
           return RestUtil.R.badRequest("Passed parameter 'configuration' is invalid JSON.");
         }
       }

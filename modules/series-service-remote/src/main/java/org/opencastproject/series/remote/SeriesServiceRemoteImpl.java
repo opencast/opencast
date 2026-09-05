@@ -45,10 +45,14 @@ import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
 import org.opencastproject.serviceregistry.api.RemoteBase;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.doc.rest.RestService;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 import org.apache.commons.io.IOUtils;
@@ -63,9 +67,6 @@ import org.apache.http.client.utils.URLEncodedUtils;
 import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.ContentType;
 import org.apache.http.message.BasicNameValuePair;
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.jaxrs.whiteboard.propertytypes.JaxrsResource;
@@ -407,7 +408,6 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
           throws SeriesException, NotFoundException, UnauthorizedException {
     HttpGet get = new HttpGet(seriesID + "/properties.json");
     HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND, SC_UNAUTHORIZED);
-    JSONParser parser = new JSONParser();
     try {
       if (response != null) {
         if (SC_NOT_FOUND == response.getStatusLine().getStatusCode()) {
@@ -418,13 +418,11 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
           logger.debug("Successfully received series {} properties from the remote series index", seriesID);
           StringWriter writer = new StringWriter();
           IOUtils.copy(response.getEntity().getContent(), writer, StandardCharsets.UTF_8);
-          JSONArray jsonProperties = (JSONArray) parser.parse(writer.toString());
+          JsonArray jsonProperties = JsonParser.parseString(writer.toString()).getAsJsonArray();
           Map<String, String> properties = new TreeMap<>();
-          for (int i = 0; i < jsonProperties.length(); i++) {
-            JSONObject property = (JSONObject) jsonProperties.get(i);
-            JSONArray names = property.names();
-            for (int j = 0; j < names.length(); j++) {
-              properties.put(names.get(j).toString(), property.get(names.get(j).toString()).toString());
+          for (JsonElement element : jsonProperties) {
+            for (Map.Entry<String, JsonElement> property : element.getAsJsonObject().entrySet()) {
+              properties.put(property.getKey(), GsonUtil.asText(property.getValue()));
             }
           }
           return properties;
@@ -573,7 +571,6 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
   public Optional<Map<String, byte[]>> getSeriesElements(String seriesID) throws SeriesException {
     HttpGet get = new HttpGet("/" + seriesID + "/elements.json");
     HttpResponse response = getResponse(get, SC_OK, SC_NOT_FOUND, SC_INTERNAL_SERVER_ERROR);
-    JSONParser parser = new JSONParser();
 
     try {
       if (response == null) {
@@ -582,10 +579,11 @@ public class SeriesServiceRemoteImpl extends RemoteBase implements SeriesService
         final int statusCode = response.getStatusLine().getStatusCode();
         switch (statusCode) {
           case SC_OK:
-            JSONArray elementArray = (JSONArray) parser.parse(IOUtils.toString(response.getEntity().getContent()));
+            JsonArray elementArray = JsonParser
+                .parseString(IOUtils.toString(response.getEntity().getContent())).getAsJsonArray();
             Map<String, byte[]> elements = new HashMap<>();
-            for (int i = 0; i < elementArray.length(); i++) {
-              final String type = elementArray.getString(i);
+            for (JsonElement element : elementArray) {
+              final String type = element.getAsString();
               Optional<byte[]> optData = getSeriesElementData(seriesID, type);
               if (optData.isPresent()) {
                 elements.put(type, optData.get());

@@ -31,10 +31,6 @@ import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_CREATE
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_SPATIAL;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TEMPORAL;
 import static org.opencastproject.metadata.dublincore.DublinCore.PROPERTY_TITLE;
-import static org.opencastproject.util.Jsons.arr;
-import static org.opencastproject.util.Jsons.obj;
-import static org.opencastproject.util.Jsons.p;
-import static org.opencastproject.util.Jsons.v;
 import static org.opencastproject.util.RestUtil.generateErrorResponse;
 
 import org.opencastproject.capture.admin.api.Agent;
@@ -66,10 +62,7 @@ import org.opencastproject.scheduler.impl.CaptureNowProlongingService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.systems.OpencastConstants;
 import org.opencastproject.util.DateTimeSupport;
-import org.opencastproject.util.Jsons;
-import org.opencastproject.util.Jsons.Arr;
-import org.opencastproject.util.Jsons.Prop;
-import org.opencastproject.util.Jsons.Val;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.RestUtil;
 import org.opencastproject.util.UrlSupport;
@@ -82,6 +75,9 @@ import org.opencastproject.workspace.api.Workspace;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonPrimitive;
 import com.google.gson.JsonSerializer;
 
@@ -91,9 +87,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.joda.time.DateTime;
 import org.joda.time.DateTimeZone;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -123,7 +116,6 @@ import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TimeZone;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -455,31 +447,35 @@ public class SchedulerRestService {
     try {
       TechnicalMetadata metadata = service.getTechnicalMetadata(eventId);
 
-      Val state = v("");
-      Val lastHeard = v("");
+      String state = "";
+      String lastHeard = "";
       if (metadata.getRecording().isPresent()) {
-        state = v(metadata.getRecording().get().getState());
-        lastHeard = v(DateTimeSupport.toUTC(metadata.getRecording().get().getLastCheckinTime()));
+        state = metadata.getRecording().get().getState();
+        lastHeard = DateTimeSupport.toUTC(metadata.getRecording().get().getLastCheckinTime());
       }
 
-      List<Val> presenterVals = metadata.getPresenters().stream()
-          .map(Jsons::stringVal)
-          .collect(Collectors.toList());
-      Arr presenters = arr(presenterVals);
-      List<Prop> wfProperties = new ArrayList<>();
+      JsonArray presenters = new JsonArray();
+      metadata.getPresenters().forEach(presenters::add);
+      JsonObject wfProperties = new JsonObject();
       for (Entry<String, String> entry : metadata.getWorkflowProperties().entrySet()) {
-        wfProperties.add(p(entry.getKey(), entry.getValue()));
+        wfProperties.addProperty(entry.getKey(), entry.getValue());
       }
-      List<Prop> agentConfig = new ArrayList<>();
+      JsonObject agentConfig = new JsonObject();
       for (Entry<String, String> entry : metadata.getCaptureAgentConfiguration().entrySet()) {
-        agentConfig.add(p(entry.getKey(), entry.getValue()));
+        agentConfig.addProperty(entry.getKey(), entry.getValue());
       }
-      return RestUtil.R.ok(obj(p("id", metadata.getEventId()), p("location", metadata.getAgentId()),
-              p("start", DateTimeSupport.toUTC(metadata.getStartDate().getTime())),
-              p("end", DateTimeSupport.toUTC(metadata.getEndDate().getTime())),
-              p("presenters", presenters), p("wfProperties", obj(wfProperties.toArray(new Prop[wfProperties.size()]))),
-              p("agentConfig", obj(agentConfig.toArray(new Prop[agentConfig.size()]))), p("state", state),
-              p("lastHeardFrom", lastHeard)));
+
+      JsonObject json = new JsonObject();
+      json.addProperty("id", metadata.getEventId());
+      json.addProperty("location", metadata.getAgentId());
+      json.addProperty("start", DateTimeSupport.toUTC(metadata.getStartDate().getTime()));
+      json.addProperty("end", DateTimeSupport.toUTC(metadata.getEndDate().getTime()));
+      json.add("presenters", presenters);
+      json.add("wfProperties", wfProperties);
+      json.add("agentConfig", agentConfig);
+      json.addProperty("state", state);
+      json.addProperty("lastHeardFrom", lastHeard);
+      return RestUtil.R.ok(json);
     } catch (NotFoundException e) {
       logger.info("Event with id '{}' does not exist.", eventId);
       return Response.status(Status.NOT_FOUND).build();
@@ -1507,8 +1503,11 @@ public class SchedulerRestService {
   public Response getRecordingState(@PathParam("id") String id) throws NotFoundException {
     try {
       Recording rec = service.getRecordingState(id);
-      return RestUtil.R
-              .ok(obj(p("id", rec.getID()), p("state", rec.getState()), p("lastHeardFrom", rec.getLastCheckinTime())));
+      JsonObject json = new JsonObject();
+      json.addProperty("id", rec.getID());
+      json.addProperty("state", rec.getState());
+      json.addProperty("lastHeardFrom", rec.getLastCheckinTime());
+      return RestUtil.R.ok(json);
     } catch (SchedulerException e) {
       logger.debug("Unable to get recording state of {}:", id, e);
       return Response.serverError().build();
@@ -1560,12 +1559,15 @@ public class SchedulerRestService {
   )
   public Response getAllRecordings() {
     try {
-      List<Val> update = new ArrayList<>();
+      JsonArray update = new JsonArray();
       for (Entry<String, Recording> e : service.getKnownRecordings().entrySet()) {
-        update.add(obj(p("id", e.getValue().getID()), p("state", e.getValue().getState()),
-                p("lastHeardFrom", e.getValue().getLastCheckinTime())));
+        JsonObject recording = new JsonObject();
+        recording.addProperty("id", e.getValue().getID());
+        recording.addProperty("state", e.getValue().getState());
+        recording.addProperty("lastHeardFrom", e.getValue().getLastCheckinTime());
+        update.add(recording);
       }
-      return RestUtil.R.ok(arr(update).toJson());
+      return RestUtil.R.ok(update.toString());
     } catch (SchedulerException e) {
       logger.debug("Unable to get all recordings:", e);
       throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
@@ -2021,23 +2023,20 @@ public class SchedulerRestService {
    *           if parsing list into JSON format fails
    */
   public String getEventListAsJsonString(List<MediaPackage> mpList) throws SchedulerException {
-    JSONParser parser = new JSONParser();
-    JSONObject jsonObj = new JSONObject();
-    JSONArray jsonArray = new JSONArray();
+    JsonObject jsonObj = new JsonObject();
+    JsonArray jsonArray = new JsonArray();
     for (MediaPackage mp: mpList) {
-      JSONObject mpJson;
       try {
-        mpJson = (JSONObject) parser.parse(MediaPackageParser.getAsJSON(mp));
-        mpJson = (JSONObject) mpJson.get("mediapackage");
-        jsonArray.add(mpJson);
-      } catch (org.json.simple.parser.ParseException e) {
+        JsonObject mpJson = GsonUtil.gson().fromJson(MediaPackageParser.getAsJSON(mp), JsonObject.class);
+        jsonArray.add(mpJson.getAsJsonObject("mediapackage"));
+      } catch (JsonParseException e) {
         logger.warn("Unexpected JSON parse exception for getAsJSON on mp {}", mp.getIdentifier().toString(), e);
         throw new SchedulerException(e);
       }
     }
-    jsonObj.put("totalCount", String.valueOf(mpList.size()));
-    jsonObj.put("events", jsonArray);
-    return jsonObj.toJSONString();
+    jsonObj.addProperty("totalCount", String.valueOf(mpList.size()));
+    jsonObj.add("events", jsonArray);
+    return jsonObj.toString();
   }
 }
 

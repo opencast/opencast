@@ -48,7 +48,6 @@ import org.opencastproject.mediapackage.selector.AbstractMediaPackageElementSele
 import org.opencastproject.mediapackage.selector.AttachmentSelector;
 import org.opencastproject.mediapackage.selector.TrackSelector;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
-import org.opencastproject.util.JsonObj;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.UrlSupport;
 import org.opencastproject.util.data.Tuple;
@@ -61,6 +60,8 @@ import org.opencastproject.workflow.api.WorkflowOperationInstance;
 import org.opencastproject.workflow.api.WorkflowOperationResult;
 import org.opencastproject.workflow.api.WorkflowOperationResult.Action;
 import org.opencastproject.workspace.api.Workspace;
+
+import com.google.gson.JsonParser;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
@@ -479,12 +480,12 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
         }
 
         List<HorizontalCoverageLayoutSpec> multipleLayouts = list(
-                Serializer.horizontalCoverageLayoutSpec(JsonObj.jsonObj(layouts[0])),
-                Serializer.horizontalCoverageLayoutSpec(JsonObj.jsonObj(layouts[1])));
+                Serializer.horizontalCoverageLayoutSpec(JsonParser.parseString(layouts[0]).getAsJsonObject()),
+                Serializer.horizontalCoverageLayoutSpec(JsonParser.parseString(layouts[1]).getAsJsonObject()));
 
         AbsolutePositionLayoutSpec watermarkLayout = null;
         if (layouts.length > 2) {
-          watermarkLayout = Serializer.absolutePositionLayoutSpec(JsonObj.jsonObj(layouts[2]));
+          watermarkLayout = Serializer.absolutePositionLayoutSpec(JsonParser.parseString(layouts[2]).getAsJsonObject());
         }
 
         return Tuple.tuple(multipleLayouts, Optional.ofNullable(watermarkLayout));
@@ -503,11 +504,11 @@ public class CompositeWorkflowOperationHandler extends AbstractWorkflowOperation
         }
 
         HorizontalCoverageLayoutSpec singleLayout = Serializer
-                .horizontalCoverageLayoutSpec(JsonObj.jsonObj(layouts[0]));
+                .horizontalCoverageLayoutSpec(JsonParser.parseString(layouts[0]).getAsJsonObject());
 
         AbsolutePositionLayoutSpec watermarkLayout = null;
         if (layouts.length > 1) {
-          watermarkLayout = Serializer.absolutePositionLayoutSpec(JsonObj.jsonObj(layouts[1]));
+          watermarkLayout = Serializer.absolutePositionLayoutSpec(JsonParser.parseString(layouts[1]).getAsJsonObject());
         }
 
         return Tuple.tuple(singleLayout, Optional.ofNullable(watermarkLayout));

@@ -575,7 +575,7 @@ public class TestEventEndpoint extends AbstractEventEndpoint {
     EasyMock.expect(event.getAccessPolicy())
         .andReturn(
             "{\"acl\":{\"ace\":[{\"allow\":true,\"action\":\"read\",\"role\":\"ROLE_ADMIN\"},"
-                + "{\"allow\":true,\"action\":\"write\",\"role\":\"ROLE_ADMIN\"}]}}\"")
+                + "{\"allow\":true,\"action\":\"write\",\"role\":\"ROLE_ADMIN\"}]}}")
         .anyTimes();
 
     EasyMock.expect(event.hasRecordingStarted()).andReturn(true);

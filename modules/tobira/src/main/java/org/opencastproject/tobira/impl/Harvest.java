@@ -31,8 +31,10 @@ import org.opencastproject.security.api.SecurityService;
 import org.opencastproject.security.api.UnauthorizedException;
 import org.opencastproject.series.api.SeriesException;
 import org.opencastproject.series.api.SeriesService;
-import org.opencastproject.util.Jsons;
 import org.opencastproject.workspace.api.Workspace;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -74,7 +76,7 @@ final class Harvest {
 
   private static final Logger logger = LoggerFactory.getLogger(Harvest.class);
 
-  static Jsons.Obj harvest(
+  static JsonObject harvest(
       int preferredAmount,
       Date since,
       SearchService searchService,
@@ -225,14 +227,12 @@ final class Harvest {
 
 
     // Assembly full response.
-    final var outItems = items.stream()
-        .map(item -> item.getJson())
-        .collect(Collectors.toCollection(ArrayList::new));
-    final var json = Jsons.obj(
-        Jsons.p("includesItemsUntil", includesItemsUntil),
-        Jsons.p("hasMore", hasMore),
-        Jsons.p("items", Jsons.arr(outItems))
-    );
+    final var outItems = new JsonArray();
+    items.forEach(item -> outItems.add(item.getJson()));
+    final var json = new JsonObject();
+    json.addProperty("includesItemsUntil", includesItemsUntil);
+    json.addProperty("hasMore", hasMore);
+    json.add("items", outItems);
     logger.debug(
         "Returning {} items from harvesting (hasMore = {}, includesItemsUntil = {})",
         items.size(),

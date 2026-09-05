@@ -22,7 +22,7 @@ package org.opencastproject.external.util.statistics;
 
 import org.opencastproject.statistics.export.api.DetailLevel;
 
-import org.json.simple.JSONArray;
+import com.google.gson.JsonArray;
 
 import java.util.Optional;
 import java.util.Set;
@@ -32,8 +32,8 @@ public final class DetailLevelUtils {
   private DetailLevelUtils() {
   }
 
-  public static JSONArray toJson(Set<DetailLevel> detailLevels) {
-    JSONArray result = new JSONArray();
+  public static JsonArray toJson(Set<DetailLevel> detailLevels) {
+    JsonArray result = new JsonArray();
     for (DetailLevel resolution : detailLevels) {
       result.add(toString(resolution));
     }

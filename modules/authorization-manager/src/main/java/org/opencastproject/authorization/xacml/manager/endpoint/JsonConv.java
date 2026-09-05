@@ -21,17 +21,13 @@
 
 package org.opencastproject.authorization.xacml.manager.endpoint;
 
-import static org.opencastproject.util.Jsons.Obj;
-import static org.opencastproject.util.Jsons.Val;
-import static org.opencastproject.util.Jsons.arr;
-import static org.opencastproject.util.Jsons.obj;
-import static org.opencastproject.util.Jsons.p;
-
 import org.opencastproject.authorization.xacml.manager.api.ManagedAcl;
 import org.opencastproject.security.api.AccessControlEntry;
 import org.opencastproject.security.api.AccessControlList;
 
-import java.util.List;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
 import java.util.function.Function;
 
 /** Converter functions from business objects to JSON structures. */
@@ -49,32 +45,41 @@ public final class JsonConv {
   private JsonConv() {
   }
 
-  public static Obj digest(ManagedAcl acl) {
-    return obj(p(KEY_ID, acl.getId()),
-               p(KEY_NAME, acl.getName()));
+  public static JsonObject digest(ManagedAcl acl) {
+    JsonObject json = new JsonObject();
+    json.addProperty(KEY_ID, acl.getId());
+    json.addProperty(KEY_NAME, acl.getName());
+    return json;
   }
 
-  public static Obj full(ManagedAcl acl) {
-    return obj(p(KEY_ID, acl.getId()),
-               p(KEY_NAME, acl.getName()),
-               p(KEY_ORGANIZATION_ID, acl.getOrganizationId()),
-               p(KEY_ACL, full(acl.getAcl())));
+  public static JsonObject full(ManagedAcl acl) {
+    JsonObject json = new JsonObject();
+    json.addProperty(KEY_ID, acl.getId());
+    json.addProperty(KEY_NAME, acl.getName());
+    json.addProperty(KEY_ORGANIZATION_ID, acl.getOrganizationId());
+    json.add(KEY_ACL, full(acl.getAcl()));
+    return json;
   }
 
-  public static final Function<ManagedAcl, Val> fullManagedAcl = JsonConv::full;
+  public static final Function<ManagedAcl, JsonObject> fullManagedAcl = JsonConv::full;
 
-  public static Obj full(AccessControlList acl) {
-    List<Val> entries = acl.getEntries().stream()
-        .map(fullAccessControlEntry)
-        .toList();
-    return obj(p(KEY_ACE, arr(entries)));
+  public static JsonObject full(AccessControlList acl) {
+    JsonArray entries = new JsonArray();
+    for (AccessControlEntry entry : acl.getEntries()) {
+      entries.add(full(entry));
+    }
+    JsonObject json = new JsonObject();
+    json.add(KEY_ACE, entries);
+    return json;
   }
 
-  public static Obj full(AccessControlEntry ace) {
-    return obj(p(KEY_ROLE, ace.getRole()),
-               p(KEY_ACTION, ace.getAction()),
-               p(KEY_ALLOW, ace.isAllow()));
+  public static JsonObject full(AccessControlEntry ace) {
+    JsonObject json = new JsonObject();
+    json.addProperty(KEY_ROLE, ace.getRole());
+    json.addProperty(KEY_ACTION, ace.getAction());
+    json.addProperty(KEY_ALLOW, ace.isAllow());
+    return json;
   }
 
-  public static final Function<AccessControlEntry, Val> fullAccessControlEntry = JsonConv::full;
+  public static final Function<AccessControlEntry, JsonObject> fullAccessControlEntry = JsonConv::full;
 }

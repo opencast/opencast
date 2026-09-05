@@ -24,15 +24,17 @@ import org.opencastproject.job.api.JobProducer;
 import org.opencastproject.rest.AbstractJobProducerEndpoint;
 import org.opencastproject.serviceregistry.api.ServiceRegistry;
 import org.opencastproject.transcription.ibmwatson.IBMWatsonTranscriptionService;
+import org.opencastproject.util.GsonUtil;
 import org.opencastproject.util.doc.rest.RestParameter;
 import org.opencastproject.util.doc.rest.RestParameter.Type;
 import org.opencastproject.util.doc.rest.RestQuery;
 import org.opencastproject.util.doc.rest.RestResponse;
 import org.opencastproject.util.doc.rest.RestService;
 
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+
 import org.osgi.service.component.ComponentContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -166,13 +168,11 @@ public class IBMWatsonTranscriptionRestService extends AbstractJobProducerEndpoi
   public Response reportStatus(String body) {
     logger.trace("Body is: " + body);
 
-    JSONObject jsonObj = null;
+    JsonObject jsonObj = null;
     try {
-      JSONParser parser = new JSONParser();
-      jsonObj = (JSONObject) parser.parse(body);
-      // jsonObj = (JSONObject) parser.parse(request.getReader());
-      String mpId = (String) jsonObj.get("user_token");
-      String event = (String) jsonObj.get("event");
+      jsonObj = GsonUtil.gson().fromJson(body, JsonObject.class);
+      String mpId = getString(jsonObj, "user_token");
+      String event = getString(jsonObj, "event");
       logger.info("Transcription notification for mp {} is {}", mpId, event);
 
       if (IBMWatsonTranscriptionService.JobEvent.COMPLETED_WITH_RESULTS.equals(event)) {
@@ -183,14 +183,20 @@ public class IBMWatsonTranscriptionRestService extends AbstractJobProducerEndpoi
 
       // return Response.ok().build();
       return Response.ok().type(MediaType.APPLICATION_JSON).build();
-    } catch (ParseException e) {
+    } catch (JsonParseException e) {
       logger.warn("{} occurred. Notification results could not be parsed: {}", e.getClass(),
-              jsonObj == null ? jsonObj : jsonObj.toJSONString());
+              jsonObj == null ? null : jsonObj.toString());
       return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
     } catch (Exception e) {
       logger.warn("Error handling notification results: {}", e.getMessage());
       return Response.status(HttpServletResponse.SC_INTERNAL_SERVER_ERROR).entity(e.getMessage()).build();
     }
+  }
+
+  /** Read a string member, returning null when it is absent or JSON null. */
+  private static String getString(JsonObject json, String key) {
+    JsonElement value = json.get(key);
+    return value == null || value.isJsonNull() ? null : value.getAsString();
   }
 
 }
