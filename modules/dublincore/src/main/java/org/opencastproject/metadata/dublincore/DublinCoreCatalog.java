@@ -29,10 +29,6 @@ import org.opencastproject.util.XmlNamespaceContext;
 
 import com.google.gson.annotations.JsonAdapter;
 
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
 import org.w3c.dom.Document;
 import org.xml.sax.Attributes;
 
@@ -92,31 +88,22 @@ public class DublinCoreCatalog extends XMLCatalogImpl implements DublinCore, Met
   }
 
   @Override
-  @SuppressWarnings("unchecked")
   public List<String> get(EName property, final String language) {
     RequireUtil.notNull(property, "property");
     RequireUtil.notNull(language, "language");
     if (LANGUAGE_ANY.equals(language)) {
-      return (List<String>) CollectionUtils.collect(getValuesAsList(property), new Transformer() {
-        @Override
-        public Object transform(Object o) {
-          return ((CatalogEntry) o).getValue();
-        }
-      });
+      return getValuesAsList(property).stream()
+          .map(CatalogEntry::getValue)
+          .collect(Collectors.toList());
     } else {
-      final List<String> values = new ArrayList<String>();
       final boolean langUndef = LANGUAGE_UNDEFINED.equals(language);
-      CollectionUtils.forAllDo(getValuesAsList(property), new Closure() {
-        @Override
-        public void execute(Object o) {
-          CatalogEntry c = (CatalogEntry) o;
-          String lang = c.getAttribute(XML_LANG_ATTR);
-          if ((langUndef && lang == null) || (language.equals(lang))) {
-            values.add(c.getValue());
-          }
-        }
-      });
-      return values;
+      return getValuesAsList(property).stream()
+          .filter(c -> {
+            String lang = c.getAttribute(XML_LANG_ATTR);
+            return (langUndef && lang == null) || language.equals(lang);
+          })
+          .map(CatalogEntry::getValue)
+          .collect(Collectors.toList());
     }
   }
 
@@ -303,12 +290,8 @@ public class DublinCoreCatalog extends XMLCatalogImpl implements DublinCore, Met
     if (LANGUAGE_ANY.equals(language)) {
       return getValuesAsList(property).size() > 0;
     } else {
-      return CollectionUtils.find(getValuesAsList(property), new Predicate() {
-        @Override
-        public boolean evaluate(Object o) {
-          return equalLanguage(((CatalogEntry) o).getAttribute(XML_LANG_ATTR), language);
-        }
-      }) != null;
+      return getValuesAsList(property).stream()
+          .anyMatch(c -> equalLanguage(c.getAttribute(XML_LANG_ATTR), language));
     }
   }
 
