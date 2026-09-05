@@ -162,7 +162,7 @@ public class SecurityEndpoint implements ManagedService {
     if (isNotBlank(validUntilUtc)) {
       try {
         validUntil = new DateTime(fromUTC(validUntilUtc));
-      } catch (IllegalStateException | ParseException e) {
+      } catch (IllegalArgumentException | IllegalStateException | ParseException e) {
         return R.badRequest("Query parameter 'valid-until' is not a valid ISO-8601 date string");
       }
     } else {
