@@ -22,7 +22,6 @@
 package org.opencastproject.workflow.handler.composer;
 
 import static java.lang.String.format;
-import static org.opencastproject.util.EqualsUtil.eq;
 
 import org.opencastproject.composer.api.ComposerService;
 import org.opencastproject.composer.api.EncodingProfile;
@@ -196,10 +195,10 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
   protected void adjustMetadata(Extraction extraction, Attachment image, Cfg cfg) {
     // Adjust the target flavor. Make sure to account for partial updates
     for (final MediaPackageElementFlavor flavor : cfg.targetImageFlavor) {
-      final String flavorType = eq("*", flavor.getType())
+      final String flavorType = Objects.equals("*", flavor.getType())
           ? extraction.track.getFlavor().getType()
           : flavor.getType();
-      final String flavorSubtype = eq("*", flavor.getSubtype())
+      final String flavorSubtype = Objects.equals("*", flavor.getSubtype())
           ? extraction.track.getFlavor().getSubtype()
           : flavor.getSubtype();
       image.setFlavor(new MediaPackageElementFlavor(flavorType, flavorSubtype));
@@ -596,7 +595,7 @@ public class ImageWorkflowOperationHandler extends AbstractWorkflowOperationHand
     }
 
     private boolean eqFields(MediaPosition that) {
-      return position == that.position && eq(type, that.type);
+      return position == that.position && Objects.equals(type, that.type);
     }
 
     @Override public String toString() {

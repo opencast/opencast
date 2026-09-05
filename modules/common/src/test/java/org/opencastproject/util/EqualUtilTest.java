@@ -26,26 +26,12 @@ import static java.util.Arrays.asList;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.opencastproject.util.EqualsUtil.eqListUnsorted;
-import static org.opencastproject.util.EqualsUtil.eqMap;
-import static org.opencastproject.util.data.Arrays.array;
-import static org.opencastproject.util.data.Collections.map;
-import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.junit.Test;
 
 import java.util.List;
 
 public class EqualUtilTest {
-  @Test
-  public void testEqualMap() {
-    assertTrue(eqMap(map(tuple("a", "b")), map(tuple("a", "b"))));
-    assertTrue(eqMap(map(tuple("a", map(tuple(1, "bla")))), map(tuple("a", map(tuple(1, "bla"))))));
-    // this yields false since Java does not define equality on arrays.
-    assertFalse(eqMap(map(tuple(4, array(1, 2, 4))), map(tuple(4, array(1, 2, 4)))));
-    assertFalse(eqMap(map(tuple(1, new Object())), map(tuple(1, new Object()))));
-    assertFalse(eqMap(map(tuple("a", "b"), tuple("x", "y")), map(tuple("a", "b"), tuple("x", "z"))));
-  }
-
   @Test
   public void testEqualListUnsorted() {
     // A List is equal to itself

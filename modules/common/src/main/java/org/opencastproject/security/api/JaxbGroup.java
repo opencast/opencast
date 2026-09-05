@@ -21,9 +21,8 @@
 
 package org.opencastproject.security.api;
 
-import org.opencastproject.util.EqualsUtil;
-
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 import javax.xml.bind.annotation.XmlAccessType;
@@ -211,7 +210,7 @@ public final class JaxbGroup implements Group {
    */
   @Override
   public int hashCode() {
-    return EqualsUtil.hash(groupId, organization);
+    return Objects.hash(groupId, organization);
   }
 
   /**

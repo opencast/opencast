@@ -22,32 +22,13 @@
 
 package org.opencastproject.util;
 
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
 /** Utility function helping to implement equality. */
 public final class EqualsUtil {
   private EqualsUtil() {
-  }
-
-  /** Check if <code>a</code> and <code>b</code> are equal. Each of them may be null. */
-  @Deprecated
-  public static boolean eqObj(Object a, Object b) {
-    return Objects.equals(a, b);
-  }
-
-  /** Check if <code>a</code> and <code>b</code> are equal. Each of them may be null. */
-  @Deprecated
-  public static boolean eq(Object a, Object b) {
-    return Objects.equals(a, b);
-  }
-
-  /** Check if <code>a</code> and <code>b</code> are not equal. Each of them may be null. */
-  public static boolean ne(Object a, Object b) {
-    return !eq(a, b);
   }
 
   /** Check if <code>a</code> and <code>b</code> have the same class ({@link Object#getClass()}). Each may be null. */
@@ -69,7 +50,7 @@ public final class EqualsUtil {
    */
   public static boolean eqListUnsorted(List<?> as, List<?> bs) {
     if (as == null || bs == null) {
-      return eqObj(as, bs);
+      return Objects.equals(as, bs);
     }
 
     as = as.stream().distinct().collect(Collectors.toList());
@@ -87,52 +68,8 @@ public final class EqualsUtil {
     return true;
   }
 
-  /**
-   * Compare the elements of two lists one by one.
-   *
-   * @deprecated use {@link #eqObj(Object, Object)} or {@link java.util.List#equals(Object)}
-   */
-  public static boolean eqListSorted(List<?> as, List<?> bs) {
-    if (as != null && bs != null && as.size() == bs.size()) {
-      final Iterator<?> asi = as.iterator();
-      final Iterator<?> bsi = bs.iterator();
-      while (asi.hasNext() && bsi.hasNext()) {
-        if (!asi.next().equals(bsi.next())) {
-          return false;
-        }
-      }
-      return true;
-    } else {
-      return eqObj(as, bs);
-    }
-  }
-
-  /**
-   * Compare two maps.
-   *
-   * @deprecated use {@link #eqObj(Object, Object)} or {@link java.util.Map#equals(Object)}
-   */
-  public static boolean eqMap(Map<?, ?> as, Map<?, ?> bs) {
-    for (Map.Entry<?, ?> ae : as.entrySet()) {
-      final Object bv = bs.get(ae.getKey());
-      if (bv == null || !eqObj(ae.getValue(), bv)) {
-        return false;
-      }
-    }
-    return true;
-  }
-
   public static boolean bothNotNull(Object a, Object b) {
     return a != null && b != null;
-  }
-
-  /**
-   * Create a hash code for a list of objects. Each of them may be null.
-   * Algorithm adapted from "Programming in Scala, Second Edition", p670.
-   */
-  @Deprecated
-  public static int hash(Object... as) {
-    return Objects.hash(as);
   }
 
 }

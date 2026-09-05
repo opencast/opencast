@@ -20,9 +20,9 @@
  */
 package org.opencastproject.oaipmh.server;
 
-import static org.opencastproject.util.EqualsUtil.eq;
-
 import org.junit.Ignore;
+
+import java.util.Objects;
 
 import javax.ws.rs.Path;
 
@@ -31,7 +31,7 @@ import javax.ws.rs.Path;
 public class TestRestService extends AbstractOaiPmhServerInfoRestEndpoint {
   private final OaiPmhServerInfo s = new OaiPmhServerInfo() {
     @Override public boolean hasRepo(String id) {
-      return eq("default", id);
+      return Objects.equals("default", id);
     }
 
     @Override public String getMountPoint() {
