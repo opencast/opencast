@@ -38,7 +38,7 @@
     <guava.version>33.3.1-jre</guava.version>
     <httpcomponents-httpclient.version>4.5.14</httpcomponents-httpclient.version>
     <httpcomponents-httpcore.version>4.4.16</httpcomponents-httpcore.version>
-    <jackson.version>2.17.2</jackson.version>
+    <jackson.version>2.18.3</jackson.version>
     <jakarta.mail.version>1.6.7</jakarta.mail.version>
     <java.release>21</java.release>
     <jakarta.activation.version>1.2.1</jakarta.activation.version>
