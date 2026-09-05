@@ -37,6 +37,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import java.io.OutputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -122,7 +123,7 @@ public abstract class XmlGen {
   public String generateAsString() {
     return withResource(new ByteArrayOutputStream(), out -> {
       generate(out);
-      return out.toString();
+      return out.toString(StandardCharsets.UTF_8);
     });
   }
 

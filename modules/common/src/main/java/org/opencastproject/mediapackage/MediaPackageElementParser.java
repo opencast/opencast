@@ -29,6 +29,7 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -88,7 +89,7 @@ public final class MediaPackageElementParser {
     Unmarshaller m = null;
     try {
       m = MediaPackageImpl.context.createUnmarshaller();
-      return (MediaPackageElement) m.unmarshal(XmlSafeParser.parse(toInputStream(xml)));
+      return (MediaPackageElement) m.unmarshal(XmlSafeParser.parse(toInputStream(xml, StandardCharsets.UTF_8)));
     } catch (JAXBException e) {
       throw new MediaPackageException(e.getLinkedException() != null ? e.getLinkedException() : e);
     } catch (IOException | SAXException e) {
