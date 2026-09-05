@@ -122,6 +122,11 @@
     </dependency>
     <dependency>
       <groupId>org.apache.xmlgraphics</groupId>
+      <artifactId>batik-i18n</artifactId>
+      <version>${batik.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.xmlgraphics</groupId>
       <artifactId>batik-parser</artifactId>
       <version>${batik.version}</version>
     </dependency>
@@ -218,6 +223,7 @@
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-dom</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-ext</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-gvt</ignoredUnusedDeclaredDependency>
+            <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-i18n</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-js</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-parser</ignoredUnusedDeclaredDependency>
             <ignoredUnusedDeclaredDependency>org.apache.xmlgraphics:batik-script</ignoredUnusedDeclaredDependency>
@@ -262,6 +268,7 @@
               batik-dom;inline=true,
               batik-ext;inline=true,
               batik-gvt;inline=true,
+              batik-i18n;inline=true,
               batik-parser;inline=true,
               batik-rasterizer;inline=true,
               batik-svgrasterizer;inline=true,

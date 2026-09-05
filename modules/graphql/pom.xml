@@ -188,6 +188,9 @@
         <configuration>
           <ignoredUnusedDeclaredDependencies>
             <ignoredUnusedDeclaredDependency>org.osgi:org.osgi.service.cm</ignoredUnusedDeclaredDependency>
+            <!-- only used for the compile time constant EventListQuery.FILTER_STATUS_NAME, which
+                 javac inlines, so the reference is not visible in the bytecode -->
+            <ignoredUnusedDeclaredDependency>org.opencastproject:opencast-list-providers-common</ignoredUnusedDeclaredDependency>
           </ignoredUnusedDeclaredDependencies>
         </configuration>
       </plugin>
