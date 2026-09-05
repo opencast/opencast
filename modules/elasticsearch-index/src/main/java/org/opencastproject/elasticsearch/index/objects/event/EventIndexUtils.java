@@ -407,7 +407,7 @@ public final class EventIndexUtils {
     // Convert roles to permission blocks
     for (AccessControlEntry entry : entries) {
       if (!entry.isAllow()) {
-        logger.info("Event index does not support denial via ACL, ignoring {}", entry);
+        logger.debug("Event index does not support denial via ACL, ignoring {}", entry);
         continue;
       }
       List<String> actionPermissions = permissions.get(entry.getAction());
