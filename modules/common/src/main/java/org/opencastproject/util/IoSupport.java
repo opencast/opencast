@@ -26,22 +26,15 @@ import static org.opencastproject.util.data.Either.left;
 import static org.opencastproject.util.data.Either.right;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
-import org.opencastproject.security.api.TrustedHttpClient;
-import org.opencastproject.security.api.TrustedHttpClientException;
 import org.opencastproject.util.data.Either;
 
 import com.google.common.io.Resources;
 
 import org.apache.commons.io.IOUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
-import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -67,11 +60,6 @@ import de.schlichtherle.io.FileWriter;
  * Contains operations concerning IO.
  */
 public final class IoSupport {
-
-  /**
-   * the logging facility provided by log4j
-   */
-  private static Logger logger = LoggerFactory.getLogger(IoSupport.class.getName());
 
   public static String getSystemTmpDir() {
     String tmpdir = System.getProperty("java.io.tmpdir");
@@ -167,81 +155,6 @@ public final class IoSupport {
     } finally {
       closeQuietly(out);
     }
-  }
-
-  /**
-   * Convenience method to read in a file from a local source.
-   *
-   * @param url
-   *          The {@code URL} to read the source data from.
-   * @return A String containing the source data or null in the case of an error.
-   * @deprecated this method doesn't support UTF8 or handle HTTP response codes
-   */
-  @Deprecated
-  public static String readFileFromURL(URL url) {
-    return readFileFromURL(url, null);
-  }
-
-  /**
-   * Convenience method to read in a file from either a remote or local source.
-   *
-   * @param url
-   *          The {@code URL} to read the source data from.
-   * @param trustedClient
-   *          The {@code TrustedHttpClient} which should be used to communicate with the remote server. This can be null
-   *          for local file reads.
-   * @return A String containing the source data or null in the case of an error.
-   * @deprecated this method doesn't support UTF8 or handle HTTP response codes
-   */
-  @Deprecated
-  public static String readFileFromURL(URL url, TrustedHttpClient trustedClient) {
-    StringBuilder sb = new StringBuilder();
-    DataInputStream in = null;
-    HttpResponse response = null;
-    try {
-      // Do different things depending on what we're reading...
-      if ("file".equals(url.getProtocol())) {
-        in = new DataInputStream(url.openStream());
-      } else {
-        if (trustedClient == null) {
-          logger.error("Unable to read from remote source {} because trusted client is null!", url.getFile());
-          return null;
-        }
-        HttpGet get = new HttpGet(url.toURI());
-        try {
-          response = trustedClient.execute(get);
-        } catch (TrustedHttpClientException e) {
-          logger.warn("Unable to fetch file from {}.", url, e);
-          trustedClient.close(response);
-          return null;
-        }
-        in = new DataInputStream(response.getEntity().getContent());
-      }
-      int c = 0;
-      while ((c = in.read()) != -1) {
-        sb.append((char) c);
-      }
-    } catch (IOException e) {
-      logger.warn("IOException attempting to get file from {}.", url);
-      return null;
-    } catch (URISyntaxException e) {
-      logger.warn("URI error attempting to get file from {}.", url);
-      return null;
-    } catch (NullPointerException e) {
-      logger.warn("Nullpointer attempting to get file from {}.", url);
-      return null;
-    } finally {
-      IOUtils.closeQuietly(in);
-
-      if (response != null) {
-        try {
-          trustedClient.close(response);
-        } catch (IOException e) {
-        }
-      }
-    }
-
-    return sb.toString();
   }
 
   public static Properties loadPropertiesFromUrl(final URL url) {
