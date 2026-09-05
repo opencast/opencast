@@ -24,7 +24,6 @@ import static java.lang.String.format;
 import static org.opencastproject.systems.OpencastConstants.DIGEST_USER_PROPERTY;
 import static org.opencastproject.util.EqualsUtil.ne;
 import static org.opencastproject.util.HttpUtil.waitForResource;
-import static org.opencastproject.util.PathSupport.path;
 import static org.opencastproject.util.RequireUtil.notNull;
 
 import org.opencastproject.distribution.api.AbstractDistributionService;
@@ -837,13 +836,13 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
       if (splitUrl.length < 5) {
         logger.warn("Malformed URI {}. Format must be .../{orgId}/{channelId}/{mediapackageId}/{elementId}/{fileName}."
                         + " Trying URI without channelId", uriString);
-        return new File(path(directoryName, orgId, splitUrl[1], splitUrl[2], splitUrl[3]));
+        return Paths.get(directoryName, orgId, splitUrl[1], splitUrl[2], splitUrl[3]).toFile();
       } else {
-        return new File(path(directoryName, orgId, splitUrl[1], splitUrl[2], splitUrl[3], splitUrl[4]));
+        return Paths.get(directoryName, orgId, splitUrl[1], splitUrl[2], splitUrl[3], splitUrl[4]).toFile();
       }
     }
-    return new File(path(directoryName, orgId, channelId, mp.getIdentifier().toString(), element.getIdentifier(),
-            FilenameUtils.getName(uriString)));
+    return Paths.get(directoryName, orgId, channelId, mp.getIdentifier().toString(), element.getIdentifier(),
+            FilenameUtils.getName(uriString)).toFile();
   }
 
   /**
@@ -853,7 +852,7 @@ public class DownloadDistributionServiceImpl extends AbstractDistributionService
    */
   protected File getMediaPackageDirectory(String channelId, MediaPackage mp) {
     final String orgId = securityService.getOrganization().getId();
-    return new File(distributionDirectory, path(orgId, channelId, mp.getIdentifier().toString()));
+    return new File(distributionDirectory, Paths.get(orgId, channelId, mp.getIdentifier().toString()).toString());
   }
 
   /**
