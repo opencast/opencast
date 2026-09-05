@@ -29,6 +29,8 @@ import org.opencastproject.assetmanager.api.AssetManager;
 import org.opencastproject.assetmanager.api.AssetManagerException;
 import org.opencastproject.assetmanager.util.WorkflowPropertiesUtil;
 import org.opencastproject.assetmanager.util.Workflows;
+import org.opencastproject.editor.api.CommentData;
+import org.opencastproject.editor.api.CommentReplyData;
 import org.opencastproject.editor.api.EditingData;
 import org.opencastproject.editor.api.EditorService;
 import org.opencastproject.editor.api.EditorServiceException;
@@ -41,9 +43,17 @@ import org.opencastproject.editor.api.WorkflowData;
 import org.opencastproject.elasticsearch.api.SearchIndexException;
 import org.opencastproject.elasticsearch.index.ElasticsearchIndex;
 import org.opencastproject.elasticsearch.index.objects.event.Event;
+import org.opencastproject.event.comment.EventComment;
+import org.opencastproject.event.comment.EventCommentException;
+import org.opencastproject.event.comment.EventCommentReply;
+import org.opencastproject.event.comment.EventCommentService;
 import org.opencastproject.index.service.api.IndexService;
 import org.opencastproject.index.service.exception.IndexServiceException;
 import org.opencastproject.index.service.impl.util.EventUtils;
+import org.opencastproject.list.api.ListProviderException;
+import org.opencastproject.list.api.ListProvidersService;
+import org.opencastproject.list.api.ResourceListQuery;
+import org.opencastproject.list.impl.ResourceListQueryImpl;
 import org.opencastproject.mediapackage.Attachment;
 import org.opencastproject.mediapackage.Catalog;
 import org.opencastproject.mediapackage.MediaPackage;
@@ -74,6 +84,7 @@ import org.opencastproject.smil.entity.api.Smil;
 import org.opencastproject.smil.entity.media.api.SmilMediaObject;
 import org.opencastproject.smil.entity.media.container.api.SmilMediaContainer;
 import org.opencastproject.smil.entity.media.element.api.SmilMediaElement;
+import org.opencastproject.util.DateTimeSupport;
 import org.opencastproject.util.MimeType;
 import org.opencastproject.util.MimeTypes;
 import org.opencastproject.util.NotFoundException;
@@ -161,6 +172,8 @@ public class EditorServiceImpl implements EditorService {
   private WorkflowService workflowService;
   private Workspace workspace;
   private AuthorizationService authorizationService;
+  private EventCommentService eventCommentService;
+  private ListProvidersService listProvidersService;
 
 
   private MediaPackageElementFlavor smilCatalogFlavor;
@@ -259,6 +272,16 @@ public class EditorServiceImpl implements EditorService {
   @Reference
   public void setAuthorizationService(AuthorizationService authorizationService) {
     this.authorizationService = authorizationService;
+  }
+
+  @Reference
+  public void setEventCommentService(EventCommentService eventCommentService) {
+    this.eventCommentService = eventCommentService;
+  }
+
+  @Reference
+  public void setListProvidersService(ListProvidersService listProvidersService) {
+    this.listProvidersService = listProvidersService;
   }
 
   public MediaPackageElementFlavor getSmilCatalogFlavor() {
@@ -1070,9 +1093,47 @@ public class EditorServiceImpl implements EditorService {
 
     User user = securityService.getUser();
 
+    // Get comments
+    List<CommentData> comments = new ArrayList<>();
+    List<String> commentReasons = new ArrayList<>();
+    try {
+      List<EventComment> eventComments = eventCommentService.getComments(mediaPackageId);
+      for (EventComment ec : eventComments) {
+        List<CommentReplyData> replyDataList = new ArrayList<>();
+        for (EventCommentReply reply : ec.getReplies()) {
+          replyDataList.add(new CommentReplyData(
+                  reply.getId().orElseThrow(),
+                  DateTimeSupport.toUTC(reply.getCreationDate().getTime()),
+                  reply.getAuthor().getUsername(),
+                  reply.getAuthor().getName(),
+                  reply.getText()));
+        }
+        comments.add(new CommentData(
+                ec.getId().orElseThrow(),
+                DateTimeSupport.toUTC(ec.getCreationDate().getTime()),
+                ec.getAuthor().getUsername(),
+                ec.getAuthor().getName(),
+                ec.getReason(),
+                ec.getText(),
+                ec.isResolvedStatus(),
+                replyDataList));
+      }
+    } catch (EventCommentException e) {
+      logger.warn("Unable to get comments for event {}", mediaPackageId, e);
+    }
+
+    // Get configured comment reasons from the list provider (same source as Admin UI)
+    try {
+      ResourceListQuery query = new ResourceListQueryImpl();
+      Map<String, String> reasonsMap = listProvidersService.getList("eventCommentReasons", query, true);
+      commentReasons = new ArrayList<>(reasonsMap.keySet());
+    } catch (ListProviderException e) {
+      logger.warn("Unable to get comment reasons from list provider", e);
+    }
+
     return new EditingData(segments, tracks, workflows, mp.getDuration(), mp.getTitle(), event.getRecordingStartDate(),
             event.getSeriesId(), event.getSeriesName(), workflowActive, waveformList, subtitles, chapters,
-            localPublication, lockingActive, lockRefresh, user, "");
+            localPublication, lockingActive, lockRefresh, user, "", comments, commentReasons);
   }
 
 
@@ -1203,6 +1264,11 @@ public class EditorServiceImpl implements EditorService {
       errorExit("Not authorized to update event metadata .", mediaPackageId, ErrorStatus.NOT_AUTHORIZED, e);
     }
 
+    // Process comments
+    if (editingData.getComments() != null) {
+      processComments(mediaPackageId, editingData.getComments());
+    }
+
     if (editingData.getPostProcessingWorkflow() != null) {
       final String workflowId = editingData.getPostProcessingWorkflow();
       try {
@@ -1218,6 +1284,96 @@ public class EditorServiceImpl implements EditorService {
       } catch (NotFoundException e) {
         errorExit("Unable to load workflow" + workflowId, mediaPackageId, ErrorStatus.WORKFLOW_NOT_FOUND, e);
       }
+    }
+  }
+
+  /**
+   * Process comments from the editor. Compares incoming comments with existing
+   * ones and creates, updates, or deletes comments as needed.
+   *
+   * @param mediaPackageId the media package id
+   * @param incomingComments the comments from the editor
+   */
+  private void processComments(String mediaPackageId, List<CommentData> incomingComments) {
+    try {
+      List<EventComment> existingComments = eventCommentService.getComments(mediaPackageId);
+      Set<Long> incomingIds = incomingComments.stream()
+          .map(CommentData::getId)
+          .filter(id -> id > 0)
+          .collect(Collectors.toSet());
+
+      // Delete comments that are no longer in the incoming list
+      for (EventComment existing : existingComments) {
+        if (existing.getId().isPresent() && !incomingIds.contains(existing.getId().get())) {
+          try {
+            eventCommentService.deleteComment(existing.getId().get());
+          } catch (NotFoundException e) {
+            logger.warn("Comment {} not found for deletion", existing.getId().get());
+          }
+        }
+      }
+
+      // Create new comments (those with id 0 are new)
+      User currentUser = securityService.getUser();
+      String organization = securityService.getOrganization().getId();
+      for (CommentData commentData : incomingComments) {
+        if (commentData.getId() <= 0) {
+          // Persist the comment first (without replies) so JPA assigns an ID.
+          EventComment newComment = EventComment.create(
+              Optional.empty(), mediaPackageId, organization,
+              commentData.getText(), currentUser, commentData.getReason(),
+              commentData.isResolvedStatus());
+          EventComment savedComment = eventCommentService.updateComment(newComment);
+
+          // Now add replies to the persisted comment and save again
+          if (!commentData.getReplies().isEmpty()) {
+            for (CommentReplyData replyData : commentData.getReplies()) {
+              savedComment.addReply(EventCommentReply.create(
+                  Optional.empty(), replyData.getText(), currentUser));
+            }
+            eventCommentService.updateComment(savedComment);
+          }
+        } else {
+          // Update existing comment
+          Optional<EventComment> existingOpt = existingComments.stream()
+              .filter(ec -> ec.getId().isPresent() && ec.getId().get() == commentData.getId())
+              .findFirst();
+          if (existingOpt.isPresent()) {
+            EventComment existing = existingOpt.get();
+
+            // Process replies: add new ones and remove deleted ones
+            List<EventCommentReply> updatedReplies = new ArrayList<>(existing.getReplies());
+
+            // Collect incoming reply IDs (id > 0 means existing)
+            Set<Long> incomingReplyIds = commentData.getReplies().stream()
+                .map(CommentReplyData::getId)
+                .filter(rid -> rid > 0)
+                .collect(Collectors.toSet());
+
+            // Remove replies that are no longer in the incoming list
+            updatedReplies
+                .removeIf(reply -> reply.getId().isPresent() && !incomingReplyIds.contains(reply.getId().get()));
+
+            // Add new replies (those with id 0)
+            for (CommentReplyData replyData : commentData.getReplies()) {
+              if (replyData.getId() <= 0) {
+                updatedReplies.add(EventCommentReply.create(
+                    Optional.empty(), replyData.getText(), currentUser));
+              }
+            }
+
+            // Recreate the comment with updated fields and updated replies
+            EventComment updated = EventComment.create(
+                existing.getId(), mediaPackageId, organization,
+                commentData.getText(), existing.getAuthor(), commentData.getReason(),
+                commentData.isResolvedStatus(), existing.getCreationDate(),
+                existing.getModificationDate(), updatedReplies);
+            eventCommentService.updateComment(updated);
+          }
+        }
+      }
+    } catch (EventCommentException e) {
+      logger.error("Unable to process comments for event {}", mediaPackageId, e);
     }
   }
 

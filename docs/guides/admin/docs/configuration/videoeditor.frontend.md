@@ -55,6 +55,19 @@ Replacing the Admin Interface Editor
 It is possible to have the admin interface link to old internal editor instead of the stand-alone editor.
 For this, configure the `prop.admin.editor.url` in `etc/org.opencastproject.organization-mh_default_org.cfg`.
 
+## Comments
+
+The editor supports creating, replying to, and deleting comments on events - the same comment system available in the
+admin interface. Comments and their replies are persisted to the Opencast database and are visible in both the editor
+and the admin interface.
+
+### Comment Reasons
+
+The list of available comment reasons is read from the list provider `eventCommentReasons`, which is configured in:
+
+```
+etc/listproviders/event.comment.reasons.properties
+```
 
 Configuration
 -------------
