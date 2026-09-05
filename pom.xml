@@ -65,7 +65,7 @@
     <org.osgi.service.metatype.annotations.version>1.4.1</org.osgi.service.metatype.annotations.version>
     <rest-assured.version>4.4.0</rest-assured.version>
     <spring.version>5.3.39</spring.version>
-    <spring-security.version>5.7.12</spring-security.version>
+    <spring-security.version>6.5.11</spring-security.version>
     <spring-security-cas.version>5.7.12_4</spring-security-cas.version>
     <!-- Compile-time artifact and the ServiceMix OSGi repackage installed by feature.xml must stay in
          sync; the suffixed version is the ServiceMix rebuild of the same upstream release. -->
