@@ -228,8 +228,8 @@ public class SeriesServiceImplTest {
 
   @Test
   public void testDublinCoreCatalogEquality1() {
-    DublinCoreCatalog a = DublinCores.mkOpencast().getCatalog();
-    DublinCoreCatalog b = DublinCores.mkOpencast().getCatalog();
+    DublinCoreCatalog a = DublinCores.mkOpencastEpisode().getCatalog();
+    DublinCoreCatalog b = DublinCores.mkOpencastEpisode().getCatalog();
     a.set(DublinCore.PROPERTY_IDENTIFIER, "123");
     assertFalse(DublinCoreUtil.equals(a, b));
     b.set(DublinCore.PROPERTY_IDENTIFIER, "123");
@@ -250,8 +250,8 @@ public class SeriesServiceImplTest {
 
   @Test
   public void testDublinCoreCatalogEquality2() {
-    DublinCoreCatalog a = DublinCores.mkOpencast().getCatalog();
-    DublinCoreCatalog b = DublinCores.mkOpencast().getCatalog();
+    DublinCoreCatalog a = DublinCores.mkOpencastEpisode().getCatalog();
+    DublinCoreCatalog b = DublinCores.mkOpencastEpisode().getCatalog();
     a.set(DublinCore.PROPERTY_DESCRIPTION, "this is a test lecture");
     a.set(DublinCore.PROPERTY_SPATIAL, "room1");
     a.set(DublinCore.PROPERTY_IDENTIFIER, "123");
