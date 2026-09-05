@@ -28,7 +28,6 @@ import static org.opencastproject.oaipmh.server.OaiPmhRepositoryTest.OaiPmhRespo
 import static org.opencastproject.oaipmh.server.OaiPmhRepositoryTest.OaiPmhResponseStatus.IsValid;
 import static org.opencastproject.util.EqualsUtil.eq;
 import static org.opencastproject.util.IoSupport.withResource;
-import static org.opencastproject.util.data.Collections.list;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 import static org.xmlmatchers.transform.XmlConverters.the;
 import static org.xmlmatchers.xpath.HasXPath.hasXPath;
@@ -54,7 +53,6 @@ import org.opencastproject.util.JsonObj;
 import org.opencastproject.util.JsonVal;
 import org.opencastproject.util.NotFoundException;
 import org.opencastproject.util.XmlUtil;
-import org.opencastproject.util.data.Collections;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
@@ -115,7 +113,7 @@ public class OaiPmhRepositoryTest {
     runChecks(OaiPmhConstants.VERB_IDENTIFY,
               repo.selectVerb(params("Identify", null, null, null, null, null)),
               Optional.of(IsValid),
-              list(hasXPath("//oai20:Identify[oai20:deletedRecord='transient']", NS_CTX)));
+              List.of(hasXPath("//oai20:Identify[oai20:deletedRecord='transient']", NS_CTX)));
   }
 
   @Test
@@ -124,7 +122,7 @@ public class OaiPmhRepositoryTest {
     runChecks(OaiPmhConstants.VERB_LIST_IDENTIFIERS,
               repo.selectVerb(params("ListIdentifiers", null, null, null, null, null)),
               Optional.of(IsError),
-              list(hasXPath("//oai20:error[@code='badArgument']", NS_CTX)));
+              List.of(hasXPath("//oai20:error[@code='badArgument']", NS_CTX)));
   }
 
   @Test
@@ -136,7 +134,7 @@ public class OaiPmhRepositoryTest {
     runChecks(OaiPmhConstants.VERB_LIST_IDENTIFIERS,
               repo.selectVerb(params("ListIdentifiers", null, "oai_dc", null, null, null)),
               Optional.of(IsValid),
-              list(hasXPath("//oai20:ListIdentifiers/oai20:header[oai20:identifier='id-1']", NS_CTX),
+              List.of(hasXPath("//oai20:ListIdentifiers/oai20:header[oai20:identifier='id-1']", NS_CTX),
                    hasXPath("//oai20:ListIdentifiers/oai20:header[oai20:identifier='id-2']", NS_CTX),
                    hasXPath("//oai20:ListIdentifiers/oai20:header[oai20:datestamp='2011-06-01']", NS_CTX),
                    hasXPath("count(//oai20:ListIdentifiers/oai20:header)", NS_CTX, returningANumber(), equalTo(2.0))));
@@ -152,12 +150,12 @@ public class OaiPmhRepositoryTest {
               repo(null, Granularity.DAY)
                       .selectVerb(params("ListIdentifiers", null, "oai_dc", "2011-01-02", "2011-01-01", null)),
               Optional.of(IsError),
-              list(hasXPath("//oai20:error[@code='badArgument']", NS_CTX)));
+              List.of(hasXPath("//oai20:error[@code='badArgument']", NS_CTX)));
     runChecks(OaiPmhConstants.VERB_LIST_IDENTIFIERS,
               repo(null, Granularity.SECOND).selectVerb(params("ListIdentifiers", null, "oai_dc",
                       "2011-01-01T10:20:10Z", "2011-01-01T10:20:00Z", null)),
               Optional.of(IsError),
-              list(hasXPath("//oai20:error[@code='badArgument']", NS_CTX)));
+              List.of(hasXPath("//oai20:error[@code='badArgument']", NS_CTX)));
   }
 
   @Test
@@ -168,7 +166,7 @@ public class OaiPmhRepositoryTest {
                                          searchResultItem("id-2", utcDate(2011, 6, 1), true)), Granularity.DAY)
                       .selectVerb(params("ListRecords", null, "oai_dc", null, null, null)),
               Optional.of(IsValid),
-              list(hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:identifier='id-1']", NS_CTX),
+              List.of(hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:identifier='id-1']", NS_CTX),
                    hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:datestamp='2011-05-01']", NS_CTX),
                    hasXPath("//oai20:ListRecords/oai20:record/oai20:header[@status='deleted']", NS_CTX),
                    hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:identifier='id-2']", NS_CTX),
@@ -186,7 +184,7 @@ public class OaiPmhRepositoryTest {
                    Granularity.DAY)
                       .selectVerb(params("GetRecord", "id-1", "oai_dc", null, null, null)),
               Optional.<OaiPmhResponseStatus>empty(),
-              list(hasXPath("//oai20:GetRecord/oai20:record/oai20:header[oai20:identifier='id-1']", NS_CTX),
+              List.of(hasXPath("//oai20:GetRecord/oai20:record/oai20:header[oai20:identifier='id-1']", NS_CTX),
                    hasXPath("//oai20:GetRecord/oai20:record/oai20:header[oai20:datestamp='2011-06-01']", NS_CTX),
                    hasXPath("//oai20:GetRecord/oai20:record/oai20:header[not(@status='deleted')]", NS_CTX),
                    hasXPath("count(//oai20:GetRecord/oai20:record)", NS_CTX, returningANumber(), equalTo(1.0)),
@@ -202,7 +200,7 @@ public class OaiPmhRepositoryTest {
                    Granularity.DAY)
                       .selectVerb(params("GetRecord", "id-1", "oai_dc", null, null, null)),
               Optional.<OaiPmhResponseStatus>empty(),
-              list(hasXPath("//oai20:GetRecord/oai20:record/oai20:header[oai20:identifier='id-1']", NS_CTX),
+              List.of(hasXPath("//oai20:GetRecord/oai20:record/oai20:header[oai20:identifier='id-1']", NS_CTX),
                    hasXPath("//oai20:GetRecord/oai20:record/oai20:header[oai20:datestamp='2011-05-01']", NS_CTX),
                    hasXPath("//oai20:GetRecord/oai20:record/oai20:header[@status='deleted']", NS_CTX),
                    hasXPath("count(//oai20:GetRecord/oai20:record)", NS_CTX, returningANumber(), equalTo(1.0)),
@@ -217,7 +215,7 @@ public class OaiPmhRepositoryTest {
                                          searchResultItem("id-2", utcDate(2011, 6, 1), true)), Granularity.DAY)
                       .selectVerb(params("ListRecords", null, "matterhorn-inlined", null, null, null)),
               Optional.of(IsValid),
-              list(hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:identifier='id-1']", NS_CTX),
+              List.of(hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:identifier='id-1']", NS_CTX),
                    hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:datestamp='2011-05-01']", NS_CTX),
                    hasXPath("//oai20:ListRecords/oai20:record/oai20:header[@status='deleted']", NS_CTX),
                    hasXPath("//oai20:ListRecords/oai20:record/oai20:header[oai20:identifier='id-2']", NS_CTX),
@@ -354,7 +352,7 @@ public class OaiPmhRepositoryTest {
 
   private static OaiPmhDatabase oaiPmhPersistenceMock(SearchResultItem... items) {
     final SearchResult result = EasyMock.createNiceMock(SearchResult.class);
-    final List<SearchResultItem> db = list(items);
+    final List<SearchResultItem> db = Arrays.asList(items);
     EasyMock.expect(result.getItems()).andReturn(db).anyTimes();
     EasyMock.expect(result.size()).andReturn((long) items.length).anyTimes();
     EasyMock.replay(result);
@@ -423,7 +421,7 @@ public class OaiPmhRepositoryTest {
     } catch (OaiPmhDatabaseException ex) { }
 
     EasyMock.expect(item.getElements()).andReturn(
-            Collections.list(episodeDcElement, seriesDcElement, securityXacmlElement)).anyTimes();
+            List.of(episodeDcElement, seriesDcElement, securityXacmlElement)).anyTimes();
     try {
       EasyMock.expect(item.getEpisodeDublinCore()).andReturn(episodeDc).anyTimes();
       EasyMock.expect(item.getSeriesDublinCore()).andReturn(seriesDc).anyTimes();

@@ -21,7 +21,10 @@
 
 package org.opencastproject.util.data;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.opencastproject.util.data.Arrays.append;
+import static org.opencastproject.util.data.Arrays.array;
 import static org.opencastproject.util.data.Arrays.cons;
 import static org.opencastproject.util.data.Arrays.singleton;
 
@@ -38,6 +41,25 @@ public class ArraysTest {
   public void testSingleton() {
     final String[] as = singleton(String.class, "1");
     assertEquals("1", as[0]);
+  }
+
+  @Test
+  public void testArray() {
+    assertArrayEquals(new Integer[]{1, 2, 3}, array(1, 2, 3));
+    assertArrayEquals(new String[]{"1", "2", "3"}, array("1", "2", "3"));
+  }
+
+  @Test
+  public void testConsArray() {
+    assertArrayEquals(new Integer[]{0, 1, 2, 3}, Arrays.cons(Integer.class, 0, array(1, 2, 3)));
+    String[] x = Arrays.cons(String.class, "0", array("1", "2", "3"));
+    assertArrayEquals(new String[]{"0", "1", "2", "3"}, x);
+    assertArrayEquals(new Object[]{"0", "1", "2", "3"}, x);
+  }
+
+  @Test
+  public void testAppendArray() {
+    append(Object.class, new String[]{"a", "b"}, new Exception());
   }
 
   static class Ax<A> {

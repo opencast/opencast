@@ -46,7 +46,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.smil.api.util.SmilUtil;
 import org.opencastproject.util.JobUtil;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Collections;
 import org.opencastproject.util.data.Tuple;
 import org.opencastproject.util.data.VCell;
 import org.opencastproject.workflow.api.AbstractWorkflowOperationHandler;
@@ -561,9 +560,9 @@ public class PartialImportWorkflowOperationHandler extends AbstractWorkflowOpera
     final Dimension dim = determineDimension(tracks, forceDivisible);
     if (outputFramerate > 0.0) {
       return composerService.concat(profile.getIdentifier(), dim, outputFramerate, true,
-          Collections.toArray(Track.class, tracks));
+          tracks.toArray(Track[]::new));
     } else {
-      return composerService.concat(profile.getIdentifier(), dim, true, Collections.toArray(Track.class, tracks));
+      return composerService.concat(profile.getIdentifier(), dim, true, tracks.toArray(Track[]::new));
     }
   }
 

@@ -24,11 +24,11 @@ package org.opencastproject.util.data;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.opencastproject.util.data.Collections.toList;
 import static org.opencastproject.util.data.Iterators.intRangeE;
 
 import org.junit.Test;
 
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 public class IteratorsTest {
@@ -36,7 +36,11 @@ public class IteratorsTest {
   public void testIntRangeE1() {
     assertFalse(intRangeE(0, 0).hasNext());
     assertTrue(intRangeE(0, 1).hasNext());
-    assertEquals(10, toList(intRangeE(0, 10)).size());
+    int count = 0;
+    for (Iterator<Integer> it = intRangeE(0, 10); it.hasNext(); it.next()) {
+      count++;
+    }
+    assertEquals(10, count);
   }
 
   @Test(expected = NoSuchElementException.class)

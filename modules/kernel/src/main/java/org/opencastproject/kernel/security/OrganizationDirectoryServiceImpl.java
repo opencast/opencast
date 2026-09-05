@@ -22,8 +22,6 @@
 package org.opencastproject.kernel.security;
 
 import static org.opencastproject.security.util.SecurityUtil.hostAndPort;
-import static org.opencastproject.util.data.Collections.map;
-import static org.opencastproject.util.data.Collections.toList;
 import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.kernel.security.persistence.OrganizationDatabase;
@@ -336,8 +334,8 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
     // A simple hash map is sufficient here.
     // No need to deal with soft references or an LRU map since the number of organizations
     // will be quite low.
-    private final Map<Tuple<String, Integer>, Organization> byHost = map();
-    private final Map<String, Organization> byId = map();
+    private final Map<Tuple<String, Integer>, Organization> byHost = new HashMap<>();
+    private final Map<String, Organization> byId = new HashMap<>();
     private final long refreshInterval;
     private long lastRefresh;
 
@@ -366,7 +364,7 @@ public class OrganizationDirectoryServiceImpl implements OrganizationDirectorySe
     public List<Organization> getAll() {
       synchronized (lock) {
         refresh();
-        return toList(byId.values());
+        return new ArrayList<>(byId.values());
       }
     }
 

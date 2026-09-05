@@ -21,7 +21,6 @@
 
 package org.opencastproject.job.api;
 
-import static org.opencastproject.util.data.Collections.nullToNil;
 import static org.opencastproject.util.data.functions.Misc.chuck;
 
 import org.opencastproject.serviceregistry.api.IncidentServiceException;
@@ -68,11 +67,13 @@ public final class JaxbIncidentTree {
   }
 
   public IncidentTree toIncidentTree() {
-    List<Incident> mappedIncidents = nullToNil(incidents).stream()
+    List<JaxbIncident> incidentsOrEmpty = incidents != null ? incidents : List.of();
+    List<Incident> mappedIncidents = incidentsOrEmpty.stream()
         .map(JaxbIncident::toIncident)
         .collect(Collectors.toList());
 
-    List<IncidentTree> mappedDescendants = nullToNil(descendants).stream()
+    List<JaxbIncidentTree> descendantsOrEmpty = descendants != null ? descendants : List.of();
+    List<IncidentTree> mappedDescendants = descendantsOrEmpty.stream()
         .map(JaxbIncidentTree::toIncidentTree)
         .collect(Collectors.toList());
 

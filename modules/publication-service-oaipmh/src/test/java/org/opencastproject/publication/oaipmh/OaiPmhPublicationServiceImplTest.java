@@ -46,7 +46,6 @@ import org.opencastproject.serviceregistry.api.ServiceRegistryException;
 import org.opencastproject.serviceregistry.api.ServiceRegistryInMemoryImpl;
 import org.opencastproject.serviceregistry.api.UndispatchableJobException;
 import org.opencastproject.util.NotFoundException;
-import org.opencastproject.util.data.Collections;
 
 import org.apache.commons.lang3.BooleanUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -78,7 +77,7 @@ public class OaiPmhPublicationServiceImplTest {
   public void setUp() throws Exception {
     mp = MediaPackageSupport.loadFromClassPath("/mediapackage.xml");
     mp2 = MediaPackageSupport.loadFromClassPath("/mediapackage2.xml");
-    validOaiPmhRepositories = Collections.list("default");
+    validOaiPmhRepositories = List.of("default");
 
     OaiPmhServerInfo oaiPmhServerInfo = EasyMock.createNiceMock(OaiPmhServerInfo.class);
     EasyMock.expect(oaiPmhServerInfo.hasRepo(anyString()))
@@ -165,7 +164,7 @@ public class OaiPmhPublicationServiceImplTest {
     service.setServiceRegistry(serviceRegistry);
 
     Job j = service.publish(mp, "default",
-            Collections.set("catalog-1", "catalog-2", "track-1"), Collections.set("track-1"),true);
+            Set.of("catalog-1", "catalog-2", "track-1"), Set.of("track-1"), true);
 
     Assert.assertSame(dummyJob, j);
     List<String> jobArgs = jobArgsCapture.getValue();
@@ -220,8 +219,8 @@ public class OaiPmhPublicationServiceImplTest {
     EasyMock.replay(serviceRegistry);
     service.setServiceRegistry(serviceRegistry);
 
-    Set<String> flavorsSet = Collections.set("dublincore/*", "security/*");
-    Set<String> tagsSet = Collections.set("archive", "other");
+    Set<String> flavorsSet = Set.of("dublincore/*", "security/*");
+    Set<String> tagsSet = Set.of("archive", "other");
     Job j = service.updateMetadata(mp, "default", flavorsSet, tagsSet, true);
 
     Assert.assertSame(dummyJob, j);

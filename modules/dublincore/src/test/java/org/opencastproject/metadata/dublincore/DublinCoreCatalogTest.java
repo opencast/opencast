@@ -26,9 +26,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import static org.opencastproject.util.data.Collections.list;
-import static org.opencastproject.util.data.Collections.map;
-import static org.opencastproject.util.data.Tuple.tuple;
 
 import org.opencastproject.mediapackage.EName;
 import org.opencastproject.mediapackage.XMLCatalogImpl.CatalogEntry;
@@ -195,17 +192,17 @@ public class DublinCoreCatalogTest {
     List<Map<EName, String>> attributes = dc1.getEntriesSorted().stream()
         .map(CatalogEntry::getAttributes)
         .collect(Collectors.toList());
-    assertEquals("Attribute order", attributes, list(
-        map(),
-        map(tuple(EName.mk(XMLConstants.XML_NS_URI, "lang"), "de")),
-        map(tuple(EName.mk(XMLConstants.XML_NS_URI, "lang"), "de"),
-            tuple(EName.mk(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "type"), "string")),
-        map(tuple(EName.mk(XMLConstants.XML_NS_URI, "lang"), "en"),
-            tuple(EName.mk(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "type"), "string")),
-        map(),
-        map(),
-        map(),
-        map(tuple(EName.mk(XMLConstants.XML_NS_URI, "lang"), "de"))));
+    assertEquals("Attribute order", attributes, List.of(
+        Map.of(),
+        Map.of(EName.mk(XMLConstants.XML_NS_URI, "lang"), "de"),
+        Map.of(EName.mk(XMLConstants.XML_NS_URI, "lang"), "de",
+            EName.mk(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "type"), "string"),
+        Map.of(EName.mk(XMLConstants.XML_NS_URI, "lang"), "en",
+            EName.mk(XMLConstants.W3C_XML_SCHEMA_INSTANCE_NS_URI, "type"), "string"),
+        Map.of(),
+        Map.of(),
+        Map.of(),
+        Map.of(EName.mk(XMLConstants.XML_NS_URI, "lang"), "de")));
     assertEquals(dc1.toXmlString(), dc2.toXmlString());
   }
 
